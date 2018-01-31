@@ -23,7 +23,7 @@ default: &default
 
 development:
   <<: *default
-  database: ideo-sso-demo_development
+  database: oie_development
 
   # The specified database role being used to connect to postgres.
   # To create additional roles in postgres see `$ createuser --help`.
@@ -57,7 +57,7 @@ development:
 # Do not set this db to the same as development or production.
 test:
   <<: *default
-  database: ideo-sso-demo_test
+  database: oie_test
 
 # As with config/secrets.yml, you never want to store sensitive information,
 # like your database password, in your source code. If your source code is
@@ -80,6 +80,6 @@ test:
 #
 production:
   <<: *default
-  database: ideo-sso-demo_production
-  username: ideo-sso-demo
-  password: <%= ENV['IDEO-SSO-DEMO_DATABASE_PASSWORD'] %>
+  database: oie_production
+  username: <%= ENV['OIE_DATABASE_USERNAME'] %>
+  password: <%= ENV['OIE_DATABASE_PASSWORD'] %>
