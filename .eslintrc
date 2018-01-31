@@ -1,0 +1,49 @@
+{
+  "plugins": [
+    "react"
+  ],
+  "extends" : [
+    "airbnb",
+    "standard",
+    "standard-react"
+  ],
+  "parser": "babel-eslint",
+  "parserOptions": {
+      "ecmaVersion": 7,
+      "sourceType": "module",
+      "ecmaFeatures": {
+          "jsx": true
+      }
+  },
+  "globals" : {
+    "__DEV__"      : false,
+    "__PROD__"     : false,
+    "__DEBUG__"    : false,
+    "React": true,
+    "ReactDOM": true,
+    "SimpleSchema": true
+  },
+  "settings": {
+    "import/resolver": {
+      "babel-plugin-root-import": {},
+      "node": {}
+    }
+  },
+  "rules": {
+    "react/jsx-filename-extension": 0,
+    "import/no-absolute-path": 0,
+    "import/extensions": 0,
+    "semi" : [2, "never"],
+    "camelcase": 0,
+    "comma-dangle": 0,
+    "arrow-parens": [0, "as-needed"],
+    "function-paren-newline": ["error", "consistent"],
+    "indent": ["error", 2],
+    "no-param-reassign": ["error", { "props": false }],
+    "radix": ["error", "as-needed"],
+    "jsx-quotes": ["warn", "prefer-double"],
+    "react-in-jsx-scope": 0,
+    "react/prefer-stateless-function": 0,
+    "react/prop-types": [1, {"skipUndeclared": true}]
+  }
+}

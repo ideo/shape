@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>OIE 2.0</title>
+    <%= csrf_meta_tags %>
+
+    <script type="text/javascript" src="https://d3none3dlnlrde.cloudfront.net/1.0/js/ideo-sso-js-sdk.min.js"></script>
+    <link href="https://d3none3dlnlrde.cloudfront.net/1.0/css/ideo-sso-js-sdk.min.css" rel="stylesheet" />
+    <script>
+      IdeoSSO.init({
+        client: '<%= ENV['OKTA_CLIENT_ID'] %>',
+        redirect: '<%= ENV['OKTA_REDIRECT_URL'] %>'
+      });
+    </script>
+    <%= stylesheet_link_tag    'application', media: 'all' %>
+    <%= javascript_include_tag 'application' %>
+  </head>
+
+  <body>
+
+    <div>
+      <%= link_to 'Login', login_path %>
+
+      <%= yield %>
+    </div>
+
+  </body>
+</html>
