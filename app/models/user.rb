@@ -5,7 +5,7 @@ class User < ApplicationRecord
          :rememberable, :validatable, :omniauthable,
          omniauth_providers: [:okta]
 
-  def self.from_omniauth(email_address, auth)
+  def self.from_omniauth(auth)
     user = self.where(provider: auth.provider, uid: auth.uid).first
 
     unless user
@@ -14,8 +14,13 @@ class User < ApplicationRecord
       user.password_confirmation = user.password
       user.provider = auth.provider
       user.uid = auth.uid
-      user.email = email_address.downcase
     end
-    return user
+
+    # Update user on every auth
+    user.email = auth.info.email
+    user.first_name = auth.info.first_name
+    user.last_name = auth.info.last_name
+
+    user
   end
 end
