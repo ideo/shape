@@ -35,6 +35,7 @@ gem 'omniauth-okta'
 
 # Webpacker
 gem 'webpacker', '~> 3.0'
+gem 'hashie'
 
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
@@ -59,6 +60,9 @@ group :development do
   gem 'spring'
   gem 'spring-watcher-listen', '~> 2.0.0'
   gem 'rubocop', require: false
+  gem 'spring-commands-rspec'
+  gem 'guard', require: false
+  gem 'guard-rspec', require: false
 end
 
 group :test do
