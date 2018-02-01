@@ -30,5 +30,14 @@ Create the database and migrate:
 ```
 rails db:create
 rails db:migrate
-bundle rails s
+bin/rails s
+```
+
+Run tests:
+
+```
+# run tests once:
+bin/rspec
+# watch files and re-run tests:
+bundle exec guard
 ```
