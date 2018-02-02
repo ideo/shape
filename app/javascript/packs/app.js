@@ -5,7 +5,7 @@ import { useStrict } from 'mobx'
 import { Provider } from 'mobx-react'
 import { syncHistoryWithStore } from 'mobx-react-router'
 
-import Routes from '~/app/Routes'
+import Routes from '~/config/Routes'
 import stores, { routingStore } from '~/stores/index'
 
 // Enable MobX Strict functionality -- requires explicit @actions

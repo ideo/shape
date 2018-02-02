@@ -7,19 +7,54 @@ const fakeCollections = [
   { id: 4, name: 'zzzz' },
 ]
 
-// define User model
-const Collection = types
+const fakeCollection = {
+  id: 1,
+  name: 'My Collection',
+  cards: [
+    {
+      id: 1,
+      type: 'atom',
+      name: 'Sub-item',
+      order: 0,
+      width: 1,
+      height: 1,
+      record: {
+        id: 999,
+        name: 'Heyo'
+      }
+    },
+  ]
+}
+
+// define Collection models
+export const CollectionCard = types
+  .model('CollectionCard', {
+    id: types.identifier(types.number),
+    record: types.model({
+      id: types.number,
+      name: types.string
+    }),
+    name: types.string,
+    type: types.string,
+    order: types.number,
+    width: types.number,
+    height: types.number,
+  })
+
+export const Collection = types
   .model('Collection', {
     id: types.identifier(types.number),
     name: types.string,
-    type: types.maybe(types.number),
+    cards: types.optional(types.array(CollectionCard), []),
+    // type: types.maybe(types.number),
   })
 
 // define model for storing User model
-const CollectionStore = types
+export const CollectionStore = types
   .model('CollectionStore', {
     loading: types.optional(types.boolean, false),
-    collections: types.optional(types.array(Collection), [])
+    collections: types.optional(types.array(Collection), []),
+    collection: types.maybe(Collection),
   })
   .actions(self => ({
     setCollections(data) {
@@ -41,6 +76,9 @@ const CollectionStore = types
         }, 1000)
         resolve('hi')
       })
+    },
+    fetchCollection(id) {
+      self.collection = fakeCollection
     }
   }))
 

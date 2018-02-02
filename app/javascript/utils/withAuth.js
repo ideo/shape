@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import { inject, observer } from 'mobx-react'
 
 const withAuth = (options = {}) => (WrappedComponent) => (
-  @inject('authStore', 'collectionStore', 'routingStore')
+  @inject('authStore')
   @observer
   class WithAuth extends Component {
     componentWillMount() {
@@ -14,13 +14,12 @@ const withAuth = (options = {}) => (WrappedComponent) => (
       //   console.warn('not allowed!', routingStore.location.pathname)
       //   // go back to homepage
       //   routingStore.push('/')
-      // } else if (options && options.store && this.props[options.store]) {
-      //   // call passed method
-      //   const store = this.props[options.store]
+      // } else if (options.onSuccess) {
+      //   options.onSuccess()
       // }
-      if (options && options.store && this.props[options.store]) {
-        const store = this.props[options.store]
-        store[options.method]()
+      if (options.onSuccess) {
+        // options.onSuccess(authStore.currentUser.token)
+        options.onSuccess()
       }
     }
 

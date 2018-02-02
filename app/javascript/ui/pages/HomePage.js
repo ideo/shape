@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import { Link } from 'react-router-dom'
 import { inject, observer } from 'mobx-react'
 
+import { collectionStore } from '~/stores/index'
 import withAuth from '~/utils/withAuth'
 
 const CollectionList = ({ collections }) => (
@@ -17,10 +18,9 @@ const CollectionList = ({ collections }) => (
 
 // Homepage component
 @withAuth({
-  store: 'collectionStore',
-  method: 'loadCollections'
+  onSuccess: () => collectionStore.loadCollections()
 })
-@inject('collectionStore')
+@inject('collectionStore', 'routingStore')
 @observer
 class HomePage extends Component {
   render () {
