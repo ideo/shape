@@ -1,28 +1,9 @@
 import React, { Component } from 'react'
-import { Link } from 'react-router-dom'
 import { inject, observer } from 'mobx-react'
 
 import withAuth from '~/utils/withAuth'
 
-const fakeCollections = [
-  { id: 1, name: 'x' },
-  { id: 2, name: 'y' },
-  { id: 3, name: 'z' },
-  { id: 4, name: 'zzzz' },
-]
-
-const CollectionsView = ({ collections }) => (
-  collections.map(c => (
-    <div key={c.id}>
-      <Link to={`/collections/${c.id}`}>
-        {c.name}
-      </Link>
-      <hr />
-    </div>
-  ))
-)
-
-@withAuth
+@withAuth()
 @inject('routingStore', 'authStore')
 @observer
 class CollectionPage extends Component {
@@ -49,8 +30,6 @@ class CollectionPage extends Component {
           { JSON.stringify(authStore) }
           { testThing }
         </div>
-
-        <CollectionsView collections={fakeCollections} />
       </div>
     )
   }

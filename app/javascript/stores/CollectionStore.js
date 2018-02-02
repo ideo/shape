@@ -38,8 +38,8 @@ const CollectionStore = types
             self.setCollections(fakeCollections)
           }
           self.setLoading(false)
-          resolve('hi')
         }, 1000)
+        resolve('hi')
       })
     }
   }))
