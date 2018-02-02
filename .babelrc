@@ -1,7 +1,7 @@
 {
   "presets": [
     [
-      "env",
+      "es2015",
       {
         "modules": false,
         "targets": {
@@ -11,9 +11,11 @@
         "useBuiltIns": true
       }
     ],
+    "stage-1",
     "react"
   ],
   "plugins": [
+    ["transform-decorators-legacy"],
     ["babel-plugin-root-import", {
       "rootPathSuffix": "app/javascript"
     }],

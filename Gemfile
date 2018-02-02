@@ -22,6 +22,9 @@ gem 'puma', '~> 3.11'
 
 # Use SCSS for stylesheets
 gem 'sass-rails', '~> 5.0'
+gem 'bourbon', '~> 5.0.0'
+gem 'autoprefixer-rails'
+gem "normalize-rails", "~> 4.1"
 
 # Use Uglifier as compressor for JavaScript assets
 gem 'uglifier', '>= 1.3.0'
@@ -56,7 +59,6 @@ group :development, :test do
   gem 'faker', '~> 1.8.7'
   gem 'rspec-rails', '~> 3.7'
   gem 'database_cleaner'
-  gem 'rubocop'
 end
 
 group :development do

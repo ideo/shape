@@ -20,4 +20,7 @@ Rails.application.routes.draw do
 
   get :whoami, to: 'home#whoami'
   get :login, to: 'home#login'
+
+  # catch all HTML route requests, send to frontend
+  get '*path', to: 'home#index', constraints: ->(req) { req.format == :html || req.format == '*/*' }
 end

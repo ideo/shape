@@ -30,7 +30,6 @@
     }
   },
   "rules": {
-    "react/jsx-filename-extension": 0,
     "import/no-absolute-path": 0,
     "import/extensions": 0,
     "semi" : [2, "never"],
@@ -38,11 +37,18 @@
     "comma-dangle": 0,
     "arrow-parens": [0, "as-needed"],
     "function-paren-newline": ["error", "consistent"],
+    "space-before-function-paren": 0,
     "indent": ["error", 2],
     "no-param-reassign": ["error", { "props": false }],
     "radix": ["error", "as-needed"],
     "jsx-quotes": ["warn", "prefer-double"],
+    "jsx-a11y/anchor-is-valid": [ "error", {
+      "components": [ "Link" ],
+      "specialLink": [ "to", "hrefLeft", "hrefRight" ],
+      "aspects": [ "noHref", "invalidHref", "preferButton" ]
+    }],
     "react-in-jsx-scope": 0,
+    "react/jsx-filename-extension": 0,
     "react/prefer-stateless-function": 0,
     "react/prop-types": [1, {"skipUndeclared": true}]
   }

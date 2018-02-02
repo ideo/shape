@@ -19,8 +19,7 @@
   <body>
 
     <div>
-      <%= link_to 'Login', login_path %>
-
+      <%= current_user.inspect %>
       <%= yield %>
     </div>
 

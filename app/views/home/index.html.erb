@@ -1,10 +1,3 @@
-<%= javascript_pack_tag 'hello_react' %>
+<div id="react-root"></div>
 
-<div class="container">
-  <div class="col-sm-12">
-    <h1>Home!</h1>
-
-    <h3>Welcome <%= current_user ? current_user.email : 'Guest'  %>!</h3>
-
-  </div>
-</div>
+<%= javascript_pack_tag 'app' %>
