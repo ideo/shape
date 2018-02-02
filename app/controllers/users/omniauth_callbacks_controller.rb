@@ -1,10 +1,6 @@
 class Users::OmniauthCallbacksController < Devise::OmniauthCallbacksController
   def okta
-    # You need to implement the method below in your model (e.g. app/models/user.rb)
-    # TODO: Can't get OKTA to consistently provide "email" field as part of
-    #       User's Profile info, sometimes it's blank which requires this workaround
     @user = User.from_omniauth(request.env['omniauth.auth'])
-
     if @user.save
       # this will throw if @user is not activated
       sign_in_and_redirect @user, event: :authentication

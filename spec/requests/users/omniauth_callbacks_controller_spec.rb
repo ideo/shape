@@ -5,6 +5,7 @@ describe Users::OmniauthCallbacksController, type: :request do
     let!(:user) { build(:user) }
     let(:email) { user.email }
     let(:pic_url_square) { user.pic_url_square }
+    let(:first_name) { user.first_name }
     let(:path) { '/users/auth/okta/callback' }
 
     before do
@@ -13,7 +14,7 @@ describe Users::OmniauthCallbacksController, type: :request do
         provider: 'okta',
         uid: user.uid,
         info: {
-          first_name: user.first_name,
+          first_name: first_name,
           last_name: user.last_name,
           email: email,
           image: pic_url_square
@@ -41,6 +42,7 @@ describe Users::OmniauthCallbacksController, type: :request do
     context 'with updated email and pic' do
       let!(:email) { 'newemail@user.com' }
       let!(:pic_url_square) { 'newpic.jpg' }
+      let!(:first_name) { 'Barney' }
 
       before do
         user.save
@@ -49,12 +51,14 @@ describe Users::OmniauthCallbacksController, type: :request do
       it 'should update the user' do
         expect(user.email).not_to eq(email)
         expect(user.pic_url_square).not_to eq(pic_url_square)
+        expect(user.first_name).not_to eq(first_name)
 
         post(path)
         user.reload
 
         expect(user.email).to eq(email)
         expect(user.pic_url_square).to eq(pic_url_square)
+        expect(user.first_name).to eq(first_name)
       end
     end
   end
