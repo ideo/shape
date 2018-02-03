@@ -1,0 +1,12 @@
+{
+  "type": "object",
+  "properties": {
+    "id": { "type": "integer" },
+    "linkable_id": { "type": "integer" },
+    "linkable_type": { "type": "string" },
+    "order": { "type": "integer" },
+    "width": { "type": "integer" },
+    "height": { "type": "integer" },
+    "reference": { "type": "boolean" }
+  }
+}

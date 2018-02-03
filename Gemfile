@@ -37,6 +37,13 @@ gem 'omniauth-okta'
 gem 'webpacker', '~> 3.0'
 gem 'hashie'
 
+# JSON serializer
+gem 'fast_jsonapi'
+gem 'jsonapi-rails'
+
+# For defining user abilities
+gem 'cancancan', '~> 2.0'
+
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
   gem 'byebug', platforms: [:mri, :mingw, :x64_mingw]
@@ -46,7 +53,7 @@ group :development, :test do
 
   gem 'pry-rails'
   gem 'factory_bot_rails'
-  gem 'faker', '~> 1.8.4'
+  gem 'faker', '~> 1.8.7'
   gem 'rspec-rails', '~> 3.7'
   gem 'database_cleaner'
   gem 'rubocop'
@@ -67,6 +74,7 @@ end
 
 group :test do
   gem 'shoulda-matchers', '~> 3.1'
+  gem 'json-schema'
 end
 
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem

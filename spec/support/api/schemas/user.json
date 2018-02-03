@@ -1,0 +1,11 @@
+{
+  "type": "object",
+  "properties": {
+    "id": { "type": "integer" },
+    "first_name": { "type": "string" },
+    "last_name": { "type": "string" },
+    "email": { "type": "string" },
+    "pic_url_square": { "type": "string" },
+    "created_at": { "type": "date" }
+  }
+}
