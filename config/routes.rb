@@ -3,7 +3,14 @@ Rails.application.routes.draw do
 
   namespace :api do
     namespace :v1 do
-      resources :collections
+      resources :collections do
+        resources :collection_cards, shallow: true do
+          resources :items, shallow: true, except: :index
+        end
+      end
+      resources :organizations, only: [:show, :update] do
+        resources :collections, only: [:index, :create]
+      end
       resources :users
     end
   end

@@ -4,5 +4,6 @@
     "id": { "type": "integer" },
     "name": { "type": "string" },
     "created_at": { "type": "date" }
-  }
+  },
+  "required": ["id", "name", "created_at"]
 }

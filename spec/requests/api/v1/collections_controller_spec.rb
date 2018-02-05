@@ -5,7 +5,7 @@ describe Api::V1::CollectionsController, type: :request do
     let!(:collection) {
       create(:collection, num_cards: 5)
     }
-    let(:path) { "/api/v1/collections/#{collection.id}.json" }
+    let(:path) { "/api/v1/collections/#{collection.id}" }
 
     it 'returns a 200' do
       get(path)
@@ -61,6 +61,52 @@ describe Api::V1::CollectionsController, type: :request do
         get(path)
         expect(collections_json.first['attributes']).to match_json_schema('collection')
       end
+    end
+  end
+
+  describe 'POST #create' do
+    let!(:organization) { create(:organization) }
+    let(:path) { "/api/v1/organizations/#{organization.id}/collections" }
+    let(:collection_params) {
+      {
+        name: 'What a wonderful life'
+      }
+    }
+
+    it 'returns a 200' do
+      post(path, params: { collection: collection_params })
+      expect(response.status).to eq(200)
+    end
+
+    it 'matches Collection schema' do
+      post(path, params: { collection: collection_params })
+      expect(json['data']['attributes']).to match_json_schema('collection')
+    end
+  end
+
+  describe 'PATCH #update' do
+    let!(:collection) { create(:collection) }
+    let(:path) { "/api/v1/collections/#{collection.id}" }
+    let(:collection_params) {
+      {
+        'name': 'Who let the dogs out?'
+      }
+    }
+
+    it 'returns a 200' do
+      patch(path, params: { collection: collection_params })
+      expect(response.status).to eq(200)
+    end
+
+    it 'matches Collection schema' do
+      patch(path, params: { collection: collection_params })
+      expect(json['data']['attributes']).to match_json_schema('collection')
+    end
+
+    it 'updates the name' do
+      expect(collection.name).not_to eq('Who let the dogs out?')
+      patch(path, params: { collection: collection_params })
+      expect(collection.reload.name).to eq('Who let the dogs out?')
     end
   end
 end
