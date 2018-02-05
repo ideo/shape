@@ -4,8 +4,7 @@ class CreateCollectionCards < ActiveRecord::Migration[5.1]
       t.integer :order, null: false
       t.integer :width, :height
       t.boolean :reference, default: false
-      t.references :collection, foreign_key: true
-      t.references :linkable, polymorphic: true
+      t.references :parent, :collection, :item
       t.timestamps
     end
   end

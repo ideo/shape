@@ -1,4 +1,4 @@
 class SerializableItem < BaseJsonSerializer
   type 'items'
-  attributes :id, :name, :content
+  attributes :id, :type, :name, :content
 end

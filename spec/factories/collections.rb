@@ -10,7 +10,7 @@ FactoryBot.define do
     after(:build) do |collection, evaluator|
       if evaluator.num_cards > 0
         1.upto(evaluator.num_cards) do
-          cc = build(:collection_card, collection: collection)
+          cc = build(:collection_card_item, parent: collection)
           collection.collection_cards << cc
         end
       end

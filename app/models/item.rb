@@ -4,11 +4,10 @@ class Item < ApplicationRecord
           -> { not_reference },
           class_name: 'CollectionCard'
 
-  # All collections this is linked to
-  has_many :collection_cards,
-           -> { reference },
-           as: :linkable
+  # All collection cards this is linked to
+  has_many :collection_cards, -> { reference }
 
   delegate :collection, to: :primary_collection_card
 
+  validates :type, presence: true
 end

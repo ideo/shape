@@ -1,34 +1,34 @@
 class Api::V1::CollectionsController < Api::V1::BaseController
   def show
     @collection = Collection.where(id: params[:id])
-                            .includes(collection_cards: [:linkable])
+                            .includes(collection_cards: [:item, :collection])
                             .first
 
-    render jsonapi: @collection, include: [collection_cards: [:linkable]]
+    render jsonapi: @collection, include: [collection_cards: [:item, :collection]]
   end
 
   def create
     if @collection.save
-      render_json @collection
+      render jsonapi: @collection
     else
-      render_json_errors @collection.errors.full_messages
+      render jsonapi_errors: @collection.errors.full_messages
     end
   end
 
   def update
     @collection.attributes = collection_params
     if @collection.save
-      render_json @collection
+      render jsonapi: @collection
     else
-      render_json_errors @collection.errors.full_messages
+      render jsonapi_errors: @collection.errors.full_messages
     end
   end
 
   def destroy
     if @collection.destroy
-      render_json head :ok
+      render jsonapi: @collection
     else
-      render_json_errors @collection.errors.full_messages
+      render jsonapi_errors: @collection.errors.full_messages
     end
   end
 

@@ -19,14 +19,15 @@ ActiveRecord::Schema.define(version: 20180202214858) do
     t.integer "order", null: false
     t.integer "width"
     t.integer "height"
-    t.boolean "reference"
+    t.boolean "reference", default: false
+    t.bigint "parent_id"
     t.bigint "collection_id"
-    t.string "linkable_type"
-    t.bigint "linkable_id"
+    t.bigint "item_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["collection_id"], name: "index_collection_cards_on_collection_id"
-    t.index ["linkable_type", "linkable_id"], name: "index_collection_cards_on_linkable_type_and_linkable_id"
+    t.index ["item_id"], name: "index_collection_cards_on_item_id"
+    t.index ["parent_id"], name: "index_collection_cards_on_parent_id"
   end
 
   create_table "collections", force: :cascade do |t|
@@ -90,7 +91,6 @@ ActiveRecord::Schema.define(version: 20180202214858) do
     t.index ["uid"], name: "index_users_on_uid"
   end
 
-  add_foreign_key "collection_cards", "collections"
   add_foreign_key "collections", "organizations"
   add_foreign_key "organization_users", "organizations"
   add_foreign_key "organization_users", "users"

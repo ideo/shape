@@ -3,14 +3,13 @@ class Api::V1::BaseController < ApplicationController
 
   respond_to :json
 
-  private
+  # jsonapi-rb has issues inferring STI classes,
+  # so we must explicitly what serializer to use
+  # See: https://github.com/jsonapi-rb/jsonapi-rails/issues/68
 
-  def render_json(object)
-    render json: object
-  end
-
-  def render_json_errors(errors)
-    render json: { errors: errors },
-           status: :unprocessable_entity
+  def jsonapi_class
+    super.merge(
+      'Item::TextItem': SerializableItem
+    )
   end
 end

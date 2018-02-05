@@ -1,5 +1,5 @@
 class Item
-  class TextItem
-
-  class
+  class TextItem < Item
+    validates :content, presence: true
+  end
 end
