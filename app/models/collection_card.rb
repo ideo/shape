@@ -9,18 +9,6 @@ class CollectionCard < ApplicationRecord
   scope :not_reference, -> { where(reference: false) }
   scope :reference, -> { where(reference: true) }
 
-  def create_subcollection(collection_params)
-    subcollection = Collection.new(collection_params)
-    subcollection.primary_collection_card = self
-
-    ActiveRecord::Base.transaction do
-      subcollection.save!
-      update_attributes!(collection: subcollection)
-    end
-
-    subcollection
-  end
-
   private
 
   def single_item_or_collection_is_present
