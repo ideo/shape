@@ -1,8 +1,10 @@
 class Api::V1::CollectionsController < Api::V1::BaseController
   load_and_authorize_resource :organization, only: [:index, :create]
+  load_and_authorize_resource :collection_card, only: [:create]
+  #deserializable_resource :collection, class: DeserializableCollection
 
   def index
-    render jsonapi: @organization.collections.order(name: :asc)
+    render jsonapi: @organization.collections.root.order(name: :asc)
   end
 
   def show
@@ -14,12 +16,14 @@ class Api::V1::CollectionsController < Api::V1::BaseController
   end
 
   def create
-    @collection = @organization.collections
-                               .build(collection_params)
-    if @collection.save
-      render jsonapi: @collection
+    builder = CollectionBuilder.new(params: collection_params,
+                                    organization: @organization,
+                                    collection_card: @collection_card)
+
+    if builder.save
+      render jsonapi: builder.collection
     else
-      render jsonapi_errors: @collection.errors.full_messages
+      render jsonapi_errors: builder.errors
     end
   end
 

@@ -5,15 +5,28 @@ class Collection < ApplicationRecord
           class_name: 'CollectionCard'
   has_many :items, through: :collection_cards
   has_many :collections, through: :collection_cards
-  belongs_to :organization
+  belongs_to :organization, optional: true
   belongs_to :cloned_from, class_name: 'Collection', optional: true
+
+  scope :root, -> { where.not(organization_id: nil) }
 
   delegate :parent, to: :primary_collection_card, allow_nil: true
 
+  validates :name, presence: true
+  validates :organization, presence: true, if: :primary_collection_card_blank?
+
   enum collection_type: {
     normal: 1,
-    root: 2,
+    user: 2,
   }
 
-  validates :name, presence: true
+  def root?
+    organization_id.present?
+  end
+
+  private
+
+  def primary_collection_card_blank?
+    primary_collection_card.blank?
+  end
 end

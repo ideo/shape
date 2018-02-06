@@ -5,3 +5,30 @@
 #
 #   movies = Movie.create([{ name: 'Star Wars' }, { name: 'Lord of the Rings' }])
 #   Character.create(name: 'Luke', movie: movies.first)
+
+num_collections = 10
+num_cards_per_collection = 30
+num_sub_collections = 2
+
+organization = FactoryBot.create(:organization)
+
+1.upto(num_collections) do
+  # Create collection
+  collection = FactoryBot.create(:collection,
+                                 organization: organization,
+                                 num_cards: num_cards_per_collection)
+
+  # Create sub-collections
+  1.upto(num_sub_collections) do |i|
+    order = num_cards_per_collection + i + 1
+
+    card = FactoryBot.create(:collection_card_collection,
+                             parent: collection,
+                             order: order)
+
+    FactoryBot.create(:collection,
+                      :subcollection,
+                      num_cards: num_cards_per_collection,
+                      primary_collection_card: card)
+  end
+end

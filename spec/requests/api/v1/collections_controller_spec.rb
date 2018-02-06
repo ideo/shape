@@ -82,6 +82,23 @@ describe Api::V1::CollectionsController, type: :request do
       post(path, params: { collection: collection_params })
       expect(json['data']['attributes']).to match_json_schema('collection')
     end
+
+    context 'as sub-collection' do
+      let!(:collection) { create(:collection, organization: organization) }
+      let!(:collection_card) { create(:collection_card, parent: collection) }
+      let(:path) { "/api/v1/collection_cards/#{collection_card.id}/collections" }
+
+      it 'returns a 200' do
+        post(path, params: { collection: collection_params })
+        expect(response.status).to eq(200)
+      end
+
+      it 'has collection as parent' do
+        post(path, params: { collection: collection_params })
+        id = json['data']['attributes']['id']
+        expect(Collection.find(id).parent).to eq(collection)
+      end
+    end
   end
 
   describe 'PATCH #update' do
