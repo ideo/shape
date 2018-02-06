@@ -4,11 +4,11 @@ import Style from 'style-it'
 import FlipMove from 'react-flip-move'
 import Draggable from 'react-draggable'
 
-import GridItemAtom from '~/ui/grid/GridItemAtom'
-import GridItemCollection from '~/ui/grid/GridItemCollection'
+import GridCardItem from '~/ui/grid/GridCardItem'
+import GridCardCollection from '~/ui/grid/GridCardCollection'
 import GridItemBlank from '~/ui/grid/GridItemBlank'
 
-class DraggableGridItem extends React.PureComponent {
+class DraggableGridCard extends React.PureComponent {
   state = {
     position: { x: 0, y: 0 },
     dragging: false,
@@ -28,11 +28,11 @@ class DraggableGridItem extends React.PureComponent {
       dragY: e.pageY - 80, // compensate for padding-top: 80px
       ...position
     }
-    this.props.onDrag(this.props.record.id, dragPosition)
+    this.props.onDrag(this.props.cardId, dragPosition)
   }
   handleStop = () => {
     if (this.props.onDragStop) {
-      this.props.onDragStop(this.props.record.id)
+      this.props.onDragStop(this.props.cardId)
     }
     this.setState({ dragging: false })
     setTimeout(() => {
@@ -43,25 +43,23 @@ class DraggableGridItem extends React.PureComponent {
 
   render() {
     const {
-      record,
-      type,
+      cardType,
       position
     } = this.props
 
     // GridItem setup
     const itemProps = { ...this.props }
-    let GridItem = GridItemAtom
-    const placeholder = type === 'placeholder'
-    const blank = type === 'blank'
-    if (type === 'atom') {
-      itemProps.atom = record
-    } else if (type === 'collection') {
-      GridItem = GridItemCollection
-      itemProps.collection = record
+    let GridCard = () => <div />
+    const placeholder = cardType === 'placeholder'
+    const blank = cardType === 'blank'
+    if (cardType === 'items') {
+      GridCard = GridCardItem
+    } else if (cardType === 'collection') {
+      GridCard = GridCardCollection
     } else if (placeholder) {
-      GridItem = () => <div />
+      GridCard = () => <div />
     } else if (blank) {
-      GridItem = GridItemBlank
+      GridCard = GridItemBlank
     }
     //
     const {
@@ -74,7 +72,7 @@ class DraggableGridItem extends React.PureComponent {
     let transition = 'transform 0.5s, opacity 0.5s ease-out 0.2s;'
     let opacity = 1
     let rotation = '0deg'
-    const { zIndex } = this.state
+    let { zIndex } = this.state
     const bounds = {
       left: (-50 + (xPos * -1)),
       // TODO: `1200` would come from some viewport width
@@ -85,6 +83,7 @@ class DraggableGridItem extends React.PureComponent {
       rotation = '5deg'
     }
     if (placeholder) {
+      zIndex = 0
       transition = 'none'
       rotation = '0deg'
     }
@@ -110,8 +109,8 @@ class DraggableGridItem extends React.PureComponent {
                   opacity: ${opacity};
                 }
               `}
-              <div className={`GridItem PositionedDiv ${placeholder ? 'placeholder' : ''}`}>
-                <GridItem {...itemProps} />
+              <div className={`GridCard PositionedDiv ${placeholder ? 'placeholder' : ''}`}>
+                <GridCard {...itemProps} />
               </div>
             </Style>
           </div>
@@ -121,4 +120,4 @@ class DraggableGridItem extends React.PureComponent {
   }
 }
 
-export default DraggableGridItem
+export default DraggableGridCard

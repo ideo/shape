@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import { inject, observer } from 'mobx-react'
 
 const withAuth = (options = {}) => (WrappedComponent) => (
-  @inject('authStore')
+  @inject('apiStore')
   @observer
   class WithAuth extends Component {
     componentWillMount() {

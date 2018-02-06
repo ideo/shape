@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import { Link } from 'react-router-dom'
 import { inject, observer } from 'mobx-react'
 
-import { collectionStore } from '~/stores/index'
+import { apiStore } from '~/stores/index'
 import withAuth from '~/utils/withAuth'
 
 const CollectionList = ({ collections }) => (
@@ -18,19 +18,25 @@ const CollectionList = ({ collections }) => (
 
 // Homepage component
 @withAuth({
-  onSuccess: () => collectionStore.loadCollections()
+  onSuccess: () => apiStore.request('test.json').then((data) => {
+    apiStore.sync(data)
+  })
 })
-@inject('collectionStore', 'routingStore')
+@inject('apiStore', 'routingStore')
 @observer
 class HomePage extends Component {
   render () {
+    const { collections } = apiStore
+    console.log(apiStore.collections)
     return (
       <div>
         <h1>Collection List</h1>
+
         <div>
-          {this.props.collectionStore.loading ? 'loading' : 'not loading'}
+          {collections.length === 0 ? 'loading' : 'not loading'}
         </div>
-        <CollectionList collections={this.props.collectionStore.collections} />
+        <CollectionList collections={collections} />
+
       </div>
     )
   }

@@ -8,9 +8,9 @@ import { MenuList, MenuItem } from 'material-ui/Menu'
 import FontAwesome from 'react-fontawesome'
 
 // import Shapes from '~/utils/Shapes'
-import GridItemHotspots from '~/ui/grid/GridItemHotspots'
+import GridCardHotspots from '~/ui/grid/GridCardHotspots'
 
-class GridItemCollection extends React.PureComponent {
+class GridCardCollection extends React.PureComponent {
   constructor(props) {
     super(props)
     this.state = {
@@ -84,7 +84,7 @@ class GridItemCollection extends React.PureComponent {
       <div className="GridItem">
 
         <div className="DragHandle" />
-        <GridItemHotspots {...this.props} />
+        <GridCardHotspots {...this.props} />
         {this.controls()}
         <div className="GridItem__inner">
           {/* <h1>{collection._id}</h1> */}
@@ -101,11 +101,11 @@ class GridItemCollection extends React.PureComponent {
   }
 }
 
-// GridItemCollection.propTypes = {
+// GridCardCollection.propTypes = {
 //   collection: PropTypes.shape(Shapes.COLLECTION).isRequired,
 //   parentId: PropTypes.string.isRequired,
 //   //
 //   // connectDragSource: PropTypes.func.isRequired,
 // }
 
-export default GridItemCollection
+export default GridCardCollection

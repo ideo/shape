@@ -1,4 +1,4 @@
-import CollectionStore from '~/stores/CollectionStore'
+import CollectionStore from '~/stores/Collection'
 
 const fakeCollections = [
   { id: 1, name: 'x' },

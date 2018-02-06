@@ -16,7 +16,7 @@ const Hotspot = (props) => (
   </div>
 )
 
-class GridItemHotspots extends React.PureComponent {
+class GridCardHotspots extends React.PureComponent {
   render() {
     return (
       <div>
@@ -33,4 +33,4 @@ class GridItemHotspots extends React.PureComponent {
   }
 }
 
-export default GridItemHotspots
+export default GridCardHotspots

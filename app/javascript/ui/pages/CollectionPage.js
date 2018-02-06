@@ -3,33 +3,51 @@ import { inject, observer } from 'mobx-react'
 
 import CollectionGrid from '~/ui/grid/CollectionGrid'
 
-@inject('routingStore', 'collectionStore')
+@inject('routingStore', 'apiStore')
 @observer
 class CollectionPage extends Component {
-  // state = {
-  //   blank: null,
-  //   cols: 4
-  // }
+  constructor(props) {
+    super(props)
+    this.state = {
+      // blank: null,
+      cols: 4,
+    }
+  }
 
   componentWillMount() {
-    const { collectionStore } = this.props
-    const { id } = this.props.match.params
-    collectionStore.fetchCollection(id)
+    const { apiStore } = this.props
+    // const { id } = this.props.match.params
+    apiStore.request('test.json').then((data) => {
+      apiStore.sync(data)
+    })
+  }
+
+  componentWillReceiveProps(nextProps) {
+    console.log('CollectionPage', nextProps)
   }
 
   render () {
-    const { routingStore, collectionStore } = this.props
-    const { collection } = collectionStore
+    const { routingStore, apiStore } = this.props
     //
-    if (!collection) return <div>Loading</div>
+    if (!apiStore.collections.length) return <div>Loading</div>
     //
+    // const { id } = this.props.match.params
+    // const collection = apiStore.find('collections', id)
+    const collection = apiStore.collections[0]
+
     return (
       <div>
         <h1>Collection Page: {collection.name}</h1>
         <div>
           { routingStore.location.pathname }
         </div>
-        {/* <CollectionGrid /> */}
+        <CollectionGrid
+          cols={this.state.cols}
+          gridH={200}
+          gridW={300}
+          gutter={12}
+          collection={collection}
+        />
       </div>
     )
   }

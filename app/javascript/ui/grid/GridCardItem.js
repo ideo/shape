@@ -8,33 +8,33 @@ import React from 'react'
 // import FontAwesome from 'react-fontawesome'
 
 // import Shapes from '~/utils/Shapes'
-import GridItemHotspots from '~/ui/grid/GridItemHotspots'
+import GridCardHotspots from '~/ui/grid/GridCardHotspots'
 
-class GridItemAtom extends React.PureComponent {
+class GridCardItem extends React.PureComponent {
   render() {
-    const { atom } = this.props
+    const { record } = this.props
     // const classNames = atom.imageUrl ? 'GridItem with-image' : 'GridItem'
     // const atomStyle = {}
     // if (atom.imageUrl) {
     //   atomStyle.backgroundImage = `url(${atom.imageUrl})`
     // }
-    console.log(atom)
+    // console.log(record)
 
     return (
       <div>
-        <GridItemHotspots {...this.props} />
+        <GridCardHotspots {...this.props} />
         <div className="DragHandle" />
-        {this.controls()}
+        {/* {this.controls()} */}
 
         <div className="GridItem__inner">
-          This is the atom
+          { record.name }
         </div>
       </div>
     )
   }
 }
 
-// GridItemAtom.propTypes = {
+// GridCardItem.propTypes = {
 //   atom: PropTypes.shape(Shapes.ATOM).isRequired,
 //   parentId: PropTypes.string.isRequired,
 //   order: PropTypes.number,
@@ -45,9 +45,9 @@ class GridItemAtom extends React.PureComponent {
 //   // connectDragSource: PropTypes.func.isRequired,
 // }
 //
-// GridItemAtom.defaultProps = {
+// GridCardItem.defaultProps = {
 //   pinned: false,
 //   order: 99999
 // }
 
-export default GridItemAtom
+export default GridCardItem

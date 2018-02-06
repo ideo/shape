@@ -19,10 +19,10 @@ class AddItemButton extends React.PureComponent {
 
   handleAddButtonClick = () => {
     // this.setState({ menuOpen: true, anchorEl: event.currentTarget })
-    this.props.add(this.props.order)
-    if (this.props.first) {
-      scroll.scrollToTop()
-    }
+    // this.props.add(this.props.order)
+    // if (this.props.first) {
+    //   scroll.scrollToTop()
+    // }
   }
 
   closeMenu = () => {
@@ -31,20 +31,19 @@ class AddItemButton extends React.PureComponent {
 
   addItem = type => () => {
     if (!this.state.newItemName) return
-    const { collectionId, order, first } = this.props
-    const name = this.state.newItemName
-    Meteor.call('addItem', type, collectionId, name, order, () => {
-      if (first) {
-        scroll.scrollToTop()
-      }
-    })
+    // const { collectionId, order, first } = this.props
+    // const name = this.state.newItemName
+    // Meteor.call('addItem', type, collectionId, name, order, () => {
+    //   if (first) {
+    //     scroll.scrollToTop()
+    //   }
+    // })
     this.setState({ newItemName: '', menuOpen: false })
   }
 
   handleNameChange = (event) => {
     this.setState({ newItemName: event.target.value })
   }
-
 
   render() {
     return (
@@ -86,8 +85,8 @@ class AddItemButton extends React.PureComponent {
 }
 
 AddItemButton.propTypes = {
-  add: PropTypes.func.isRequired,
-  collectionId: PropTypes.string.isRequired,
+  // add: PropTypes.func.isRequired,
+  // collectionId: PropTypes.string.isRequired,
   order: PropTypes.number.isRequired,
   first: PropTypes.bool,
 }

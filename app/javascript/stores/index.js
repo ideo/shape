@@ -1,14 +1,19 @@
+import { Store } from 'mobx-jsonapi-store'
 import { RouterStore } from 'mobx-react-router'
 
-import AuthStore from '~/stores/AuthStore'
-import CollectionStore from '~/stores/CollectionStore'
+import User from './User'
+import Collection from './Collection'
+import CollectionCard from './CollectionCard'
 
 export const routingStore = new RouterStore()
-export const authStore = AuthStore.create()
-export const collectionStore = CollectionStore.create()
+// export const collectionStore = CollectionStore.create()
+
+class ApiStore extends Store {}
+ApiStore.types = [User, Collection, CollectionCard]
+
+export const apiStore = new ApiStore()
 
 export default {
   routingStore,
-  authStore,
-  collectionStore,
+  apiStore
 }

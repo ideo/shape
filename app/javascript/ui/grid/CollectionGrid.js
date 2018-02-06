@@ -1,8 +1,12 @@
 // import { Meteor } from 'meteor/meteor'
-import React from 'react'
+import React, { Component } from 'react'
+import { observer } from 'mobx-react'
 import _ from 'lodash'
 
-import DraggableGridItem from '~/ui/grid/DraggableGridItem'
+// TODO: refactor?
+import '~/styles/grid_tmp.scss'
+
+import DraggableGridCard from '~/ui/grid/DraggableGridCard'
 
 const calculateDistance = (pos1, pos2) => {
   // pythagoras!
@@ -11,80 +15,96 @@ const calculateDistance = (pos1, pos2) => {
   return Math.sqrt((a * a) + (b * b))
 }
 
-class CollectionGrid extends React.PureComponent {
-  state = {
-    cards: [...this.props.cards],
-    positionedItems: [],
-    timeoutId: null
+// needs to be an observer to observe changes to the collection + items
+@observer
+class CollectionGrid extends Component {
+  constructor(props) {
+    super(props)
+    this.state = {
+      cards: [...this.props.collection.collection_cards],
+      positionedCards: [],
+      timeoutId: null
+    }
   }
 
   componentWillMount() {
-    this.positionItems()
+    this.positionCards()
   }
 
   componentWillReceiveProps(nextProps) {
-    this.setState({ cards: nextProps.cards }, () => {
-      this.positionItems()
-    })
+    console.log(nextProps)
+    // this.setState({ cards: nextProps.cards }, () => {
+    //   this.positionCards()
+    // })
   }
 
-  onDrag = (itemId, dragPosition) => {
-    const draggedItem = _.find(this.state.positionedItems, { id: itemId })
-    const phKey = `${itemId}-ph`
-    const stateItems = [...this.state.cards]
-    let placeholder = _.find(stateItems, { id: phKey })
-    const hoveringOver = this.findOverlap(itemId, dragPosition)
+  // --------------------------
+  // <Drag related functions>
+  // --------------------------
+  onDrag = (cardId, dragPosition) => {
+    const positionedCard = _.find(this.state.positionedCards, { id: cardId })
+    const placeholderKey = `${cardId}-placeholder`
+    const stateCards = [...this.state.cards]
+    let placeholder = _.find(stateCards, { id: placeholderKey })
+    const hoveringOver = this.findOverlap(cardId, dragPosition)
     if (!placeholder) {
       placeholder = {
-        ...draggedItem,
-        order: (draggedItem.order - 1),
-        id: phKey,
-        type: 'placeholder'
+        position: positionedCard.position,
+        // better way to do this??
+        order: (positionedCard.order - 1),
+        id: placeholderKey,
+        originalId: cardId,
+        cardType: 'placeholder'
       }
-      const newItems = _.concat(stateItems, placeholder)
+      const newItems = _.concat(stateCards, placeholder)
       this.setState({ cards: newItems }, () => {
-        this.positionItems({ dragging: draggedItem.id, position: draggedItem.position })
+        this.positionCards({
+          dragging: positionedCard.id,
+          position: positionedCard.position
+        })
       })
     } else if (hoveringOver) {
       const { direction } = hoveringOver
-      const hoveringItem = hoveringOver.item
-      const newOrder = hoveringItem.order + (direction === 'left' ? -1 : 1)
+      const newOrder = positionedCard.order + (direction === 'left' ? -1 : 1)
       if (placeholder.order !== newOrder) {
-        // this should modify stateItems in place?
+        // this should modify stateCards in place?
         placeholder.order = newOrder
         // NOTE: delay is for not having flickery drag placeholders
         // -- adding the clearTimeout seems to make it behave fine
         const timeoutId = setTimeout(() => {
-          this.setState({ cards: stateItems }, () => {
-            this.positionItems({
-              dragging: draggedItem.id,
-              position: draggedItem.position,
+          this.setState({ cards: stateCards }, () => {
+            this.positionCards({
+              dragging: positionedCard.id,
+              position: positionedCard.position,
               cursor: { x: dragPosition.dragX, y: dragPosition.dragY }
             })
           })
         }, 330)
-        this.clearTimeout()
+        this.clearDragTimeout()
         this.setState({ timeoutId })
       }
     }
   }
 
   onDragStop = () => {
-    const placeholder = _.find(this.state.positionedItems, { type: 'placeholder' }) || {}
-    const original = _.find(this.state.positionedItems, { id: placeholder.itemId })
-    this.clearTimeout()
+    const placeholder = _.find(this.state.positionedCards, { placeholder: true }) || {}
+    const original = _.find(this.state.positionedCards, { id: placeholder.originalId })
+
+    console.log(placeholder, original)
+
+    this.clearDragTimeout()
     if (!placeholder || !original) return
     const moved = (
       !_.isEqual(placeholder.position, original.position) ||
       Math.abs(placeholder.order - original.order) > 10
     )
-    if (moved) {
+    if (moved && false) {
       // const { parentId } = this.props
       // // we want to drop this item on the order where placeholder is already sitting
       // const { order } = placeholder
-      // // itemId stores the original itemId not the phKey
+      // // cardId stores the original cardId not the placeholderKey
       // // calling updateItem will also reset this.state.cards
-      // Meteor.call('updateItem', parentId, placeholder.itemId, { order })
+      // Meteor.call('updateItem', parentId, placeholder.cardId, { order })
       console.log('moved', moved)
     } else {
       // reset back to normal
@@ -94,45 +114,48 @@ class CollectionGrid extends React.PureComponent {
     }
   }
 
-  clearTimeout = () => {
+  clearDragTimeout = () => {
     if (this.state.timeoutId) {
       clearTimeout(this.state.timeoutId)
       this.setState({ timeoutId: null })
     }
   }
 
-  findOverlap = (itemId, dragPosition) => {
+  findOverlap = (cardId, dragPosition) => {
     let hoveringOver = null
     const { dragX, dragY } = dragPosition
-    const distances = _.map(this.state.positionedItems, item => {
-      if (item.id === itemId || item.type === 'placeholder') return null
+    const distances = _.map(this.state.positionedCards, card => {
+      if (card.id === cardId || card.placeholder) return null
       // only run this check if we're within the reasonable row bounds
-      if (item.position.yPos <= dragY && item.position.yPos + item.position.height >= dragY) {
+      if (card.position.yPos <= dragY && card.position.yPos + card.position.height >= dragY) {
         const mousePos = { x: dragX, y: dragY }
-        // centered itemPos
-        const itemPos = {
-          x: item.position.xPos + (item.position.width / 2),
-          y: item.position.yPos + (item.position.height / 2)
+        // centered cardPos
+        const cardPos = {
+          x: card.position.xPos + (card.position.width / 2),
+          y: card.position.yPos + (card.position.height / 2)
         }
-        const distance = calculateDistance(mousePos, itemPos)
+        const distance = calculateDistance(mousePos, cardPos)
         let direction = 'left'
-        if (mousePos.x - itemPos.x > item.position.width / 4 ||
-          mousePos.y - itemPos.y > item.position.height / 4 ||
-          (mousePos.x > itemPos.x && mousePos.y > itemPos.y)) {
+        if (mousePos.x - cardPos.x > card.position.width / 4 ||
+          mousePos.y - cardPos.y > card.position.height / 4 ||
+          (mousePos.x > cardPos.x && mousePos.y > cardPos.y)) {
           direction = 'right'
         }
-        return { ...item, distance, direction }
+        return { ...card, distance, direction }
       }
       return null
     })
     const closest = _.first(_.sortBy(distances, 'distance'))
     if (closest) {
-      hoveringOver = { item: closest, direction: closest.direction }
+      hoveringOver = { card: closest, direction: closest.direction }
     }
     return hoveringOver
   }
+  // --------------------------
+  // </end Drag related functions>
+  // --------------------------
 
-  positionItems = (opts = {}) => {
+  positionCards = (opts = {}) => {
     const {
       gridW,
       gridH,
@@ -142,14 +165,23 @@ class CollectionGrid extends React.PureComponent {
     let row = 0
     // let col = 0
     const matrix = []
-    const positionedItems = []
+    const positionedCards = []
     // create an empty row
     matrix.push(_.fill(Array(cols), null))
-    _.each(_.sortBy(this.state.cards, 'order'), item => {
-      if (opts.dragging === item.id) {
-        const { position } = opts
-        const positionedItem = { ...item, position }
-        positionedItems.push(positionedItem)
+
+    console.log(this.state.cards, opts)
+
+    _.each(_.sortBy(this.state.cards, 'order'), card => {
+      // we don't actually want to "re-position" the dragging card
+      // because its position is being determined by the drag (i.e. mouse cursor)
+      if (opts.dragging === card.id) {
+        const positionedCard = {
+          id: card.id,
+          placeholder: false,
+          order: card.order,
+          position: opts.position,
+        }
+        positionedCards.push(positionedCard)
         return
       }
 
@@ -160,16 +192,16 @@ class CollectionGrid extends React.PureComponent {
         let itFits = false
         let gap = 0
         let nextX = 0
-        // go through the row and see if there is an empty gap that fits item.w
+        // go through the row and see if there is an empty gap that fits card.w
         for (let x = 0; x < cols; x += 1) {
           if (matrix[row][x] === null) {
             gap += 1
           } else {
             gap = 0
           }
-          if (gap >= item.width) {
+          if (gap >= card.width) {
             // jump back the number of spaces to the opening of the gap
-            nextX = (x + 1) - item.width
+            nextX = (x + 1) - card.width
             itFits = true
             break
           }
@@ -183,55 +215,78 @@ class CollectionGrid extends React.PureComponent {
           _.assign(position, {
             xPos: position.x * (gridW + gutter),
             yPos: position.y * (gridH + gutter),
-            width: (item.width * (gridW + gutter)) - gutter,
-            height: (item.height * (gridH + gutter)) - gutter,
+            width: (card.width * (gridW + gutter)) - gutter,
+            height: (card.height * (gridH + gutter)) - gutter,
           })
 
           // fill rows and columns
-          _.fill(matrix[row], item.id, position.x, position.x + item.width)
-          for (let y = 1; y < item.height; y += 1) {
+          _.fill(matrix[row], card.id, position.x, position.x + card.width)
+          for (let y = 1; y < card.height; y += 1) {
             if (!matrix[row + y]) matrix.push(_.fill(Array(cols), null))
-            _.fill(matrix[row + y], item.id, position.x, position.x + item.width)
+            _.fill(matrix[row + y], card.id, position.x, position.x + card.width)
           }
 
           // NOTE: if you remove this check, then it will fill things in
           // slightly out of order to "fill empty gaps"
-          if (nextX + item.w === cols) {
+          if (nextX + card.w === cols) {
             row += 1
             if (!matrix[row]) matrix.push(_.fill(Array(cols), null))
           }
           //  --------
 
-          const positionedItem = { ...item, position }
-          positionedItems.push(positionedItem)
+          // create + push positionedCard to list
+
+          const positionedCard = {
+            id: card.id,
+            placeholder: card.cardType === 'placeholder',
+            order: card.order,
+            position,
+          }
+          positionedCards.push(positionedCard)
         } else {
           row += 1
           if (!matrix[row]) matrix.push(_.fill(Array(cols), null))
         }
       }
     })
-    // console.log(positionedItems)
-    this.setState({ positionedItems })
+    // console.log(positionedCards)
+    this.setState({ positionedCards })
   }
 
-  renderPositionedItems = () => {
+  renderPositionedCards = () => {
     const grid = []
-
     // unnecessary? we seem to need to preserve the array order
     // in order to not re-draw divs (make transform animation work)
     // so that's why we do this second pass to actually create the divs in their original order
-    _.each(this.state.cards, originalItem => {
-      const item = _.find(this.state.positionedItems, { id: originalItem.id })
-      if (_.isEmpty(item)) return
+
+    _.each(this.state.cards, card => {
+      let { id } = card
+      let record = null
+      let { cardType } = card
+      if (card.cardType === 'placeholder') {
+        id = card.originalId
+      } else {
+        // TODO: some kind of error catch if no record()?
+        const cardRecord = card.record()
+        if (cardRecord) {
+          record = card.record().toJsonApi().attributes
+          cardType = card.record().getRecordType()
+        }
+      }
+
+      const positionedCard = _.find(this.state.positionedCards, { id })
+      if (_.isEmpty(positionedCard)) return
       grid.push(
-        <DraggableGridItem
-          key={item.id}
-          position={item.position}
+        <DraggableGridCard
+          key={card.id}
+          cardId={card.id}
+          cardType={cardType}
+          record={record}
+          position={positionedCard.position}
           onDrag={this.onDrag}
           onDragStop={this.onDragStop}
           onHotspotHover={this.onHotspotHover}
           add={this.props.add}
-          {...item}
         />
       )
     })
@@ -241,7 +296,7 @@ class CollectionGrid extends React.PureComponent {
   render() {
     return (
       <div className="Grid">
-        { this.renderPositionedItems() }
+        { this.renderPositionedCards() }
       </div>
     )
   }
