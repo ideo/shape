@@ -1,0 +1,2 @@
+class DeserializableOrganization < BaseJsonSerializer
+end

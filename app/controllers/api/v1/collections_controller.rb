@@ -1,7 +1,8 @@
 class Api::V1::CollectionsController < Api::V1::BaseController
+  deserializable_resource :collection, only: [:create, :update]
   load_and_authorize_resource :organization, only: [:index, :create]
   load_and_authorize_resource :collection_card, only: [:create]
-  #deserializable_resource :collection, class: DeserializableCollection
+  load_and_authorize_resource
 
   def index
     render jsonapi: @organization.collections.root.order(name: :asc)

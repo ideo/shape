@@ -1,5 +1,7 @@
 class Api::V1::ItemsController < Api::V1::BaseController
+  deserializable_resource :item, only: [:create, :update]
   load_and_authorize_resource :collection_card, only: :create
+  load_and_authorize_resource
 
   def show
     render jsonapi: @item

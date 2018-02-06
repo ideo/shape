@@ -19,20 +19,23 @@ describe Api::V1::ItemsController, type: :request do
   describe 'POST #create' do
     let!(:collection_card) { create(:collection_card) }
     let(:path) { "/api/v1/collection_cards/#{collection_card.id}/items" }
-    let(:item_params) {
-      {
-        type: 'Item::TextItem',
-        content: 'A is for Apples'
-      }
+    let(:params) {
+      json_api_params(
+        'items',
+        {
+          'type': 'Item::TextItem',
+          'content': 'A is for Apples'
+        }
+      )
     }
 
     it 'returns a 200' do
-      post(path, params: { item: item_params })
+      post(path, params: params)
       expect(response.status).to eq(200)
     end
 
     it 'matches JSON schema' do
-      post(path, params: { item: item_params })
+      post(path, params: params)
       expect(json['data']['attributes']).to match_json_schema('item')
     end
   end
@@ -40,25 +43,28 @@ describe Api::V1::ItemsController, type: :request do
   describe 'PATCH #update' do
     let!(:item) { create(:text_item) }
     let(:path) { "/api/v1/items/#{item.id}" }
-    let(:item_params) {
-      {
-        'content': 'The wheels on the bus...'
-      }
+    let(:params) {
+      json_api_params(
+        'items',
+        {
+          'content': 'The wheels on the bus...'
+        }
+      )
     }
 
     it 'returns a 200' do
-      patch(path, params: { item: item_params })
+      patch(path, params: params)
       expect(response.status).to eq(200)
     end
 
     it 'matches JSON schema' do
-      patch(path, params: { item: item_params })
+      patch(path, params: params)
       expect(json['data']['attributes']).to match_json_schema('item')
     end
 
     it 'updates the content' do
       expect(item.content).not_to eq('The wheels on the bus...')
-      patch(path, params: { item: item_params })
+      patch(path, params: params)
       expect(item.reload.content).to eq('The wheels on the bus...')
     end
   end
