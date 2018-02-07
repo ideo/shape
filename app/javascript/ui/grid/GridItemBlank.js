@@ -21,7 +21,6 @@ class GridItemBlank extends React.PureComponent {
     if (!this.state.newItemName) return
     // const { parentId, order } = this.props
     // const name = this.state.newItemName
-    // Meteor.call('addItem', type, parentId, name, order)
     this.close()
   }
 

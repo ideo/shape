@@ -13,10 +13,11 @@ class DraggableGridCard extends React.PureComponent {
     position: { x: 0, y: 0 },
     dragging: false,
     zIndex: 1,
+    x: 0,
   }
 
-  handleStart = () => {
-    this.setState({ dragging: true, zIndex: 1000 })
+  handleStart = (e) => {
+    this.setState({ dragging: true, zIndex: 1000, x: e.pageX })
   }
 
   handleDrag = (e) => {
@@ -68,30 +69,42 @@ class DraggableGridCard extends React.PureComponent {
     }
     //
     const {
-      width,
-      height,
-      xPos,
       yPos
     } = position
+    let {
+      xPos,
+      height,
+      width
+    } = position
 
-    let transition = 'transform 0.5s, opacity 0.5s ease-out 0.2s;'
+    let transition = 'transform 0.5s, width 0.5s, height 0.5s, opacity 0.5s ease-out 0.2s;'
     let opacity = 1
     let rotation = '0deg'
     let { zIndex } = this.state
+    if (this.state.dragging) {
+      opacity = 0.9
+      // arbitrary -- shrink wide and tall cards
+      if (width > 500) {
+        xPos = this.state.x - 100
+        width *= 0.6
+      }
+      if (height > 400) {
+        height *= 0.7
+      }
+      rotation = '3deg'
+    }
+    if (placeholder) {
+      zIndex = 0
+      // transition = 'none'
+      rotation = '0deg'
+    }
+
     const bounds = {
       left: (-50 + (xPos * -1)),
       // TODO: `1200` would come from some viewport width
       right: (1200 - (width / 2)) - xPos
     }
-    if (this.state.dragging) {
-      opacity = 0.9
-      rotation = '5deg'
-    }
-    if (placeholder) {
-      zIndex = 0
-      transition = 'none'
-      rotation = '0deg'
-    }
+
     return (
       <FlipMove appearAnimation={placeholder ? null : 'elevator'}>
         <Draggable

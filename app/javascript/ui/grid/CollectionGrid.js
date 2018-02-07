@@ -93,7 +93,6 @@ class CollectionGrid extends Component {
 
       // // cardId stores the original cardId not the placeholderKey
       // // calling updateItem will also reset this.state.cards
-      // Meteor.call('updateItem', parentId, placeholder.cardId, { order })
       // console.log('moved', order)
     } else {
       // reset back to normal
@@ -129,6 +128,10 @@ class CollectionGrid extends Component {
           (mousePos.x > cardPos.x && mousePos.y > cardPos.y)) {
           direction = 'right'
         }
+        // if ((direction === 'right' && cardPos.x > 3) ||
+        //   (direction === 'left' && cardPos.x === 0)) {
+        //   return null
+        // }
         const { order } = card
         return {
           order,
