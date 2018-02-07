@@ -1,0 +1,11 @@
+{
+  "type": "object",
+  "properties": {
+    "id": { "type": "integer" },
+    "order": { "type": "integer" },
+    "width": { "type": "integer" },
+    "height": { "type": "integer" },
+    "reference": { "type": "boolean" }
+  },
+  "required": ["id", "order", "width", "height"]
+}

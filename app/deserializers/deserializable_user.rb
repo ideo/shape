@@ -1,0 +1,2 @@
+class DeserializableUser < BaseJsonSerializer
+end

@@ -1,0 +1,10 @@
+{
+  "type": "object",
+  "properties": {
+    "id": { "type": "integer" },
+    "type": { "type": "string" },
+    "name": { "type": ["string", "null"] },
+    "content": { "type": ["string", "null"] }
+  },
+  "required": ["id", "type"]
+}

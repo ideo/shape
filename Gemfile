@@ -22,6 +22,9 @@ gem 'puma', '~> 3.11'
 
 # Use SCSS for stylesheets
 gem 'sass-rails', '~> 5.0'
+gem 'bourbon', '~> 5.0.0'
+gem 'autoprefixer-rails'
+gem "normalize-rails", "~> 4.1"
 
 # Use Uglifier as compressor for JavaScript assets
 gem 'uglifier', '>= 1.3.0'
@@ -37,6 +40,13 @@ gem 'omniauth-okta'
 gem 'webpacker', '~> 3.0'
 gem 'hashie'
 
+# JSON serializer
+gem 'fast_jsonapi'
+gem 'jsonapi-rails'
+
+# For defining user abilities
+gem 'cancancan', '~> 2.0'
+
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
   gem 'byebug', platforms: [:mri, :mingw, :x64_mingw]
@@ -46,10 +56,9 @@ group :development, :test do
 
   gem 'pry-rails'
   gem 'factory_bot_rails'
-  gem 'faker', '~> 1.8.4'
+  gem 'faker', '~> 1.8.7'
   gem 'rspec-rails', '~> 3.7'
   gem 'database_cleaner'
-  gem 'rubocop'
 end
 
 group :development do
@@ -67,6 +76,7 @@ end
 
 group :test do
   gem 'shoulda-matchers', '~> 3.1'
+  gem 'json-schema'
 end
 
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem

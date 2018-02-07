@@ -1,19 +1,29 @@
 {
   "presets": [
     [
-      "env",
+      "es2015",
       {
-        "modules": false,
         "targets": {
           "browsers": "> 1%",
           "uglify": true
         },
-        "useBuiltIns": true
+        "useBuiltIns": true,
+        "test": {
+        },
+        "development": {
+          "modules": false
+        },
+        "production": {
+          "modules": false
+        }
       }
     ],
+    "stage-1",
     "react"
   ],
   "plugins": [
+    "styled-jsx/babel",
+    ["transform-decorators-legacy"],
     ["babel-plugin-root-import", {
       "rootPathSuffix": "app/javascript"
     }],
