@@ -10,7 +10,7 @@ import Routes from '~/config/Routes'
 import stores, { routingStore } from '~/stores/index'
 
 // TODO: refactor?
-import '../styles/grid_tmp.scss'
+import '~/styles/grid_tmp.scss'
 
 // Enable MobX Strict functionality -- requires explicit @actions
 useStrict(true)
