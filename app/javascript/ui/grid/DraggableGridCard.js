@@ -1,6 +1,5 @@
 import React from 'react'
-
-// import Style from 'style-it'
+import Style from 'style-it'
 import FlipMove from 'react-flip-move'
 import Draggable from 'react-draggable'
 
@@ -116,21 +115,24 @@ class DraggableGridCard extends React.PureComponent {
           position={this.state.position}
         >
           <div style={{ zIndex, position: 'relative' }}>
-            <style jsx>{`
-              .PositionedDiv {
-                width: ${width}px;
-                height: ${height}px;
-                transform: translate(${xPos}px, ${yPos}px) rotate(${rotation});
-                transform: translate3d(${xPos}px, ${yPos}px, 0) rotate(${rotation});
-                transition: ${transition};
-                opacity: ${opacity};
-              }
-            `}</style>
-            <div className={`GridCard PositionedDiv ${placeholder ? 'placeholder' : ''}`}>
-              <GridCard card={card} record={record} />
-            </div>
+            <Style>
+              {`
+                .PositionedDiv {
+                    width: ${width}px;
+                    height: ${height}px;
+                    transform: translate(${xPos}px, ${yPos}px) rotate(${rotation});
+                    transform: translate3d(${xPos}px, ${yPos}px, 0) rotate(${rotation});
+                    transition: ${transition};
+                    opacity: ${opacity};
+                  }
+              `}
+              <div className={`GridCard PositionedDiv ${placeholder ? 'placeholder' : ''}`}>
+                <GridCard card={card} record={record} />
+              </div>
+            </Style>
           </div>
         </Draggable>
+
       </FlipMove>
     )
   }

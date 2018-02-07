@@ -43,6 +43,7 @@
     "react-router-dom": "~4.2.2",
     "react-scroll": "~1.7.5",
     "react-window-size-listener": "^1.0.10",
+    "style-it": "^2.0.0",
     "styled-jsx": "^2.2.3"
   },
   "devDependencies": {
