@@ -30,14 +30,11 @@
     "lodash": "~4.17.4",
     "material-ui": "~1.0.0-beta.31",
     "mobx": "^3.4.1",
-    "mobx-collection-store": "^2.0.0",
     "mobx-jsonapi-store": "^4.0.0",
     "mobx-react": "^4.3.5",
     "mobx-react-router": "^4.0.1",
     "prop-types": "~15.6.0",
     "react": "~16.2.0",
-    "react-dnd": "~2.5.4",
-    "react-dnd-html5-backend": "~2.5.4",
     "react-dom": "~16.2.0",
     "react-draggable": "~3.0.5",
     "react-flip-move": "~2.10.0",
@@ -45,8 +42,8 @@
     "react-router": "^4.2.0",
     "react-router-dom": "~4.2.2",
     "react-scroll": "~1.7.5",
-    "react-window-size-listener": "~1.0.10",
-    "style-it": "~2.0.0"
+    "react-window-size-listener": "^1.0.10",
+    "styled-jsx": "^2.2.3"
   },
   "devDependencies": {
     "babel-core": "^6.26.0",

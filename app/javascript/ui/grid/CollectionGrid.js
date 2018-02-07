@@ -3,9 +3,6 @@ import React, { Component } from 'react'
 import { observer } from 'mobx-react'
 import _ from 'lodash'
 
-// TODO: refactor?
-import '~/styles/grid_tmp.scss'
-
 import DraggableGridCard from '~/ui/grid/DraggableGridCard'
 
 const calculateDistance = (pos1, pos2) => {

@@ -1,6 +1,6 @@
 import React from 'react'
 
-import Style from 'style-it'
+// import Style from 'style-it'
 import FlipMove from 'react-flip-move'
 import Draggable from 'react-draggable'
 
@@ -77,7 +77,7 @@ class DraggableGridCard extends React.PureComponent {
       width
     } = position
 
-    let transition = 'transform 0.5s, width 0.5s, height 0.5s, opacity 0.5s ease-out 0.2s;'
+    const transition = 'transform 0.5s, width 0.5s, height 0.5s, opacity 0.5s ease-out 0.2s;'
     let opacity = 1
     let rotation = '0deg'
     let { zIndex } = this.state
@@ -116,21 +116,19 @@ class DraggableGridCard extends React.PureComponent {
           position={this.state.position}
         >
           <div style={{ zIndex, position: 'relative' }}>
-            <Style>
-              {`
-                .PositionedDiv {
-                  width: ${width}px;
-                  height: ${height}px;
-                  transform: translate(${xPos}px, ${yPos}px) rotate(${rotation});
-                  transform: translate3d(${xPos}px, ${yPos}px, 0) rotate(${rotation});
-                  transition: ${transition};
-                  opacity: ${opacity};
-                }
-              `}
-              <div className={`GridCard PositionedDiv ${placeholder ? 'placeholder' : ''}`}>
-                <GridCard card={card} record={record} />
-              </div>
-            </Style>
+            <style jsx>{`
+              .PositionedDiv {
+                width: ${width}px;
+                height: ${height}px;
+                transform: translate(${xPos}px, ${yPos}px) rotate(${rotation});
+                transform: translate3d(${xPos}px, ${yPos}px, 0) rotate(${rotation});
+                transition: ${transition};
+                opacity: ${opacity};
+              }
+            `}</style>
+            <div className={`GridCard PositionedDiv ${placeholder ? 'placeholder' : ''}`}>
+              <GridCard card={card} record={record} />
+            </div>
           </div>
         </Draggable>
       </FlipMove>

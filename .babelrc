@@ -22,6 +22,7 @@
     "react"
   ],
   "plugins": [
+    "styled-jsx/babel",
     ["transform-decorators-legacy"],
     ["babel-plugin-root-import", {
       "rootPathSuffix": "app/javascript"

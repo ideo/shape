@@ -55,6 +55,7 @@
     "react-in-jsx-scope": 0,
     "react/jsx-filename-extension": 0,
     "react/prefer-stateless-function": 0,
+    "react/jsx-closing-tag-location": 0,
     "react/prop-types": [1, {"skipUndeclared": true}]
   }
 }
