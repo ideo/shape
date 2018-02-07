@@ -41,6 +41,7 @@
     "comma-dangle": 0,
     "arrow-parens": [0, "as-needed"],
     "function-paren-newline": ["error", "consistent"],
+    "func-names": 0,
     "space-before-function-paren": 0,
     "indent": ["error", 2],
     "no-param-reassign": ["error", { "props": false }],

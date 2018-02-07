@@ -18,7 +18,7 @@ const CollectionList = ({ collections }) => (
 
 // Homepage component
 @withAuth({
-  onSuccess: () => apiStore.request('test.json').then((data) => {
+  onSuccess: () => apiStore.request('collections/1').then((data) => {
     apiStore.sync(data)
   })
 })

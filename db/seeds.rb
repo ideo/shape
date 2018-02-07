@@ -13,7 +13,7 @@ num_sub_collections = 2
 organization = FactoryBot.create(:organization)
 
 1.upto(num_collections) do
-  # Create collection
+  # Create collection, with cards of text items
   collection = FactoryBot.create(:collection,
                                  organization: organization,
                                  num_cards: num_cards_per_collection)
@@ -22,10 +22,12 @@ organization = FactoryBot.create(:organization)
   1.upto(num_sub_collections) do |i|
     order = num_cards_per_collection + i + 1
 
+    # Create card to store the sub-collection
     card = FactoryBot.create(:collection_card_collection,
                              parent: collection,
                              order: order)
 
+    # Create the sub-collection
     FactoryBot.create(:collection,
                       :subcollection,
                       num_cards: num_cards_per_collection,

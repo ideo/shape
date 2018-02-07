@@ -111,7 +111,8 @@ describe Api::V1::CollectionsController, type: :request do
       json_api_params(
         'collections',
         {
-          'name': 'Who let the dogs out?'
+          'id': collection.id,
+          'name': 'Who let the dogs out?',
         }
       )
     }

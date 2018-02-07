@@ -21,20 +21,14 @@ class CollectionGrid extends Component {
   constructor(props) {
     super(props)
     this.state = {
-      cards: [...this.props.collection.collection_cards],
+      cards: [],
       timeoutId: null
     }
   }
 
-  componentWillMount() {
-    this.positionCards()
-  }
-
   componentWillReceiveProps(nextProps) {
-    console.log('nextProps', nextProps)
-    // this.setState({ cards: nextProps.cards }, () => {
-    //   this.positionCards()
-    // })
+    // console.log('Grid: nextProps', nextProps)
+    this.positionCards(nextProps.collection.collection_cards)
   }
 
   // --------------------------
@@ -49,8 +43,8 @@ class CollectionGrid extends Component {
     if (!placeholder) {
       placeholder = {
         position: positionedCard.position,
-        width: positionedCard.height,
-        height: positionedCard.width,
+        width: positionedCard.width,
+        height: positionedCard.height,
         // better way to do this??
         order: (positionedCard.order - 1),
         id: placeholderKey,
@@ -58,29 +52,18 @@ class CollectionGrid extends Component {
         cardType: 'placeholder'
       }
       const newItems = _.concat(stateCards, placeholder)
-      this.setState({ cards: newItems }, () => {
-        this.positionCards({
-          dragging: positionedCard.id,
-          position: positionedCard.position
-        })
-      })
+      this.positionCards(newItems, { dragging: positionedCard.id })
     } else if (hoveringOver) {
       const { direction, order } = hoveringOver
-      const newOrder = order + (direction === 'left' ? -1 : 1)
+      const newOrder = parseFloat(order) + (direction === 'left' ? -0.5 : 0.5)
       if (placeholder.order !== newOrder) {
         // this should modify stateCards in place?
         placeholder.order = newOrder
         // NOTE: delay is for not having flickery drag placeholders
-        // -- adding the clearTimeout seems to make it behave fine
+        // -- adding the clearTimeout seems to make it behave better
         const timeoutId = setTimeout(() => {
-          this.setState({ cards: stateCards }, () => {
-            this.positionCards({
-              dragging: positionedCard.id,
-              position: positionedCard.position,
-              cursor: { x: dragPosition.dragX, y: dragPosition.dragY }
-            })
-          })
-        }, 330)
+          this.positionCards(stateCards, { dragging: positionedCard.id })
+        }, 500)
         this.clearDragTimeout()
         this.setState({ timeoutId })
       }
@@ -97,22 +80,25 @@ class CollectionGrid extends Component {
       !_.isEqual(placeholder.position, original.position) ||
       Math.abs(placeholder.order - original.order) > 10
     )
-    if (moved && false) {
+    if (moved) {
       // const { parentId } = this.props
       // // we want to drop this item on the order where placeholder is already sitting
-      // const { order } = placeholder
+      const { order } = placeholder
+      original.order = order
+      // stateCards = _.reject(stateCards, { cardType: 'placeholder' })
+
+      this.props.collection.reorderCards()
+      this.saveCollectionUpdates()
+      this.positionCards(this.props.collection.collection_cards)
+
       // // cardId stores the original cardId not the placeholderKey
       // // calling updateItem will also reset this.state.cards
       // Meteor.call('updateItem', parentId, placeholder.cardId, { order })
-      console.log('moved', moved)
+      // console.log('moved', order)
     } else {
       // reset back to normal
-      console.log('resetting')
-      this.setState({
-        cards: [...this.props.collection.collection_cards]
-      }, () => {
-        this.positionCards()
-      })
+      // console.log('resetting')
+      this.positionCards(this.props.collection.collection_cards)
     }
   }
 
@@ -144,7 +130,12 @@ class CollectionGrid extends Component {
           direction = 'right'
         }
         const { order } = card
-        return { order, distance, direction }
+        return {
+          order,
+          distance,
+          direction,
+          record: card.record()
+        }
       }
       return null
     })
@@ -158,7 +149,14 @@ class CollectionGrid extends Component {
   // </end Drag related functions>
   // --------------------------
 
-  positionCards = (opts = {}) => {
+  saveCollectionUpdates = () => {
+    const { collection } = this.props
+    collection.save()
+    // do we have to do any kind of "sync" here?
+    // presumably we already have the proper data in store...
+  }
+
+  positionCards = (cards, opts = {}) => {
     const {
       gridW,
       gridH,
@@ -166,14 +164,11 @@ class CollectionGrid extends Component {
       cols
     } = this.props
     let row = 0
-    // let col = 0
     const matrix = []
-    // const positionedCards = []
-    const stateCards = [...this.state.cards]
     // create an empty row
     matrix.push(_.fill(Array(cols), null))
 
-    _.each(_.sortBy(stateCards, 'order'), card => {
+    _.each(_.sortBy(cards, 'order'), card => {
       // we don't actually want to "re-position" the dragging card
       // because its position is being determined by the drag (i.e. mouse cursor)
       if (opts.dragging === card.id) {
@@ -215,7 +210,7 @@ class CollectionGrid extends Component {
           })
 
           // add position attrs to card
-          _.assign(card, { position })
+          card.position = position
 
           // fill rows and columns
           _.fill(matrix[row], card.id, position.x, position.x + card.width)
@@ -238,7 +233,7 @@ class CollectionGrid extends Component {
       }
     })
     // update cards in state
-    this.setState({ cards: stateCards })
+    this.setState({ cards })
   }
 
   renderPositionedCards = () => {
@@ -246,25 +241,24 @@ class CollectionGrid extends Component {
     // unnecessary? we seem to need to preserve the array order
     // in order to not re-draw divs (make transform animation work)
     // so that's why we do this second pass to actually create the divs in their original order
-
     _.each(this.state.cards, card => {
       let record = null
       let { cardType } = card
       if (card.cardType !== 'placeholder') {
-        // TODO: some kind of error catch if no record()?
+        // TODO: some kind of error catch if no record?
         const cardRecord = card.record()
         if (cardRecord) {
-          record = card.record().toJsonApi().attributes
+          record = card.record().rawAttributes()
           cardType = card.record().getRecordType()
         }
       }
       grid.push(
         <DraggableGridCard
           key={card.id}
-          cardId={card.id}
+          card={card}
           cardType={cardType}
-          record={record}
           position={card.position}
+          record={record}
           onDrag={this.onDrag}
           onDragStop={this.onDragStop}
           onHotspotHover={this.onHotspotHover}

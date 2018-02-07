@@ -20,19 +20,22 @@ class DraggableGridCard extends React.PureComponent {
   }
 
   handleDrag = (e) => {
-    // console.log('drag', e)
     const { position } = this.props
+    const pad = {
+      left: 0,
+      top: 100,
+    }
     const dragPosition = {
       // use position of mouseX / Y
-      dragX: e.pageX - 20, // compensate for padding-left: 20px
-      dragY: e.pageY - 80, // compensate for padding-top: 80px
+      dragX: e.pageX - pad.left, // compensate for padding-left in container
+      dragY: e.pageY - pad.top, // compensate for padding-top in container
       ...position
     }
-    this.props.onDrag(this.props.cardId, dragPosition)
+    this.props.onDrag(this.props.card.id, dragPosition)
   }
   handleStop = () => {
     if (this.props.onDragStop) {
-      this.props.onDragStop(this.props.cardId)
+      this.props.onDragStop(this.props.card.id)
     }
     this.setState({ dragging: false })
     setTimeout(() => {
@@ -43,18 +46,20 @@ class DraggableGridCard extends React.PureComponent {
 
   render() {
     const {
+      card,
       cardType,
+      record,
       position
     } = this.props
 
     // GridItem setup
-    const itemProps = { ...this.props }
+    // const itemProps = { ...this.props }
     let GridCard = () => <div />
     const placeholder = cardType === 'placeholder'
     const blank = cardType === 'blank'
     if (cardType === 'items') {
       GridCard = GridCardItem
-    } else if (cardType === 'collection') {
+    } else if (cardType === 'collections') {
       GridCard = GridCardCollection
     } else if (placeholder) {
       GridCard = () => <div />
@@ -110,7 +115,7 @@ class DraggableGridCard extends React.PureComponent {
                 }
               `}
               <div className={`GridCard PositionedDiv ${placeholder ? 'placeholder' : ''}`}>
-                <GridCard {...itemProps} />
+                <GridCard card={card} record={record} />
               </div>
             </Style>
           </div>

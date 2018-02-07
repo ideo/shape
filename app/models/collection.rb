@@ -15,6 +15,8 @@ class Collection < ApplicationRecord
   validates :name, presence: true
   validates :organization, presence: true, if: :primary_collection_card_blank?
 
+  accepts_nested_attributes_for :collection_cards
+
   enum collection_type: {
     normal: 1,
     user: 2,

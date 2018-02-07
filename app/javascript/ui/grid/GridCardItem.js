@@ -12,7 +12,7 @@ import GridCardHotspots from '~/ui/grid/GridCardHotspots'
 
 class GridCardItem extends React.PureComponent {
   render() {
-    const { record } = this.props
+    const { card, record } = this.props
     // const classNames = atom.imageUrl ? 'GridItem with-image' : 'GridItem'
     // const atomStyle = {}
     // if (atom.imageUrl) {
@@ -27,7 +27,7 @@ class GridCardItem extends React.PureComponent {
         {/* {this.controls()} */}
 
         <div className="GridItem__inner">
-          { record.name }
+          { record.name } { card.order }
         </div>
       </div>
     )

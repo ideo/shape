@@ -1,5 +1,5 @@
 class Api::V1::CollectionsController < Api::V1::BaseController
-  deserializable_resource :collection, only: [:create, :update]
+  deserializable_resource :collection, class: DeserializableCollection, only: [:create, :update]
   load_and_authorize_resource :organization, only: [:index, :create]
   load_and_authorize_resource :collection_card, only: [:create]
   load_and_authorize_resource
@@ -41,7 +41,8 @@ class Api::V1::CollectionsController < Api::V1::BaseController
 
   def collection_params
     params.require(:collection).permit(
-      :name
+      :name,
+      collection_cards_attributes: %i[id order],
     )
   end
 end

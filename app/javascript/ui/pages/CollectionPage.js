@@ -3,7 +3,7 @@ import { inject, observer } from 'mobx-react'
 
 import CollectionGrid from '~/ui/grid/CollectionGrid'
 
-@inject('routingStore', 'apiStore')
+@inject('apiStore')
 @observer
 class CollectionPage extends Component {
   constructor(props) {
@@ -16,31 +16,24 @@ class CollectionPage extends Component {
 
   componentWillMount() {
     const { apiStore } = this.props
-    // const { id } = this.props.match.params
-    apiStore.request('test.json').then((data) => {
+    const { id } = this.props.match.params
+    apiStore.request(`collections/${id}`).then((data) => {
       apiStore.sync(data)
     })
   }
 
-  componentWillReceiveProps(nextProps) {
-    console.log('CollectionPage', nextProps)
-  }
-
   render () {
-    const { routingStore, apiStore } = this.props
+    const { apiStore } = this.props
+    const { id } = this.props.match.params
+    const collection = apiStore.find('collections', id)
     //
-    if (!apiStore.collections.length) return <div>Loading</div>
+    if (!apiStore.collections.length || !collection) return <div>Loading</div>
     //
-    // const { id } = this.props.match.params
-    // const collection = apiStore.find('collections', id)
-    const collection = apiStore.collections[0]
+    // console.log(collection, apiStore)
 
     return (
       <div>
-        <h1>Collection Page: {collection.name}</h1>
-        <div>
-          { routingStore.location.pathname }
-        </div>
+        <h1>Collection: {collection.name}</h1>
         <CollectionGrid
           cols={this.state.cols}
           gridH={200}

@@ -1,6 +1,6 @@
-import { Record } from 'mobx-jsonapi-store'
+import BaseRecord from './BaseRecord'
 
-class CollectionCard extends Record {
+class CollectionCard extends BaseRecord {
   record = () => {
     if (this.item) {
       return this.item
