@@ -12,14 +12,16 @@ Rails.application.routes.draw do
       resources :organizations, only: [:show, :update] do
         resources :collections, only: [:index, :create]
       end
-      resources :users
+      resources :users do
+        collection do
+          get 'me'
+        end
+      end
     end
   end
 
-  root to: "home#index"
-
-  get :whoami, to: 'home#whoami'
-  get :login, to: 'home#login'
+  root to: 'home#index'
+  get :login, to: 'home#login', as: :login
 
   # catch all HTML route requests, send to frontend
   get '*path', to: 'home#index', constraints: ->(req) { req.format == :html || req.format == '*/*' }
