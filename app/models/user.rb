@@ -1,10 +1,16 @@
 class User < ApplicationRecord
+  rolify
   devise :database_authenticatable, :registerable, :trackable,
          :rememberable, :validatable, :omniauthable,
          omniauth_providers: [:okta]
 
-  has_many :organization_users
-  has_many :organizations, through: :organization_users
+  has_many :users_roles, dependent: :destroy
+  has_many :organizations,
+           through: :roles,
+           source: :resource,
+           source_type: 'Organization'
+
+  after_commit :add_user_to_default_organization_group
 
   validates :uid, :provider, :email, presence: true
 
@@ -26,5 +32,16 @@ class User < ApplicationRecord
     user.pic_url_square = auth.info.image
 
     user
+  end
+
+  def organizations_with_role(role)
+    Organization.with_role(role, self)
+  end
+
+  private
+
+  def add_user_to_default_organization_group
+    org = Organization.first
+    add_role(:member, org.primary_group) if org.present?
   end
 end

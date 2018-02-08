@@ -2,6 +2,7 @@ require 'rails_helper'
 
 describe Users::OmniauthCallbacksController, type: :request do
   describe 'POST #okta' do
+    let!(:organization) { create(:organization) }
     let!(:user) { build(:user) }
     let(:email) { user.email }
     let(:pic_url_square) { user.pic_url_square }
@@ -37,6 +38,11 @@ describe Users::OmniauthCallbacksController, type: :request do
     it 'should create the user' do
       expect { post(path) }.to change(User, :count).by(1)
       expect(User.find_by_uid(user.uid)).not_to be_nil
+    end
+
+    it 'should add the user to the org group' do
+      post(path)
+      expect(organization.members).to include(User.find_by_uid(user.uid))
     end
 
     context 'with updated email and pic' do
