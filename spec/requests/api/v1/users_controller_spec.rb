@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-describe Api::V1::UsersController, type: :request do
+describe Api::V1::UsersController, type: :request, auth: true do
   describe 'GET #show' do
     let!(:user) { create(:user) }
     let(:path) { "/api/v1/users/#{user.id}" }

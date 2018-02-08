@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-describe Api::V1::ItemsController, type: :request do
+describe Api::V1::ItemsController, type: :request, auth: true do
   describe 'GET #show' do
     let!(:item) { create(:text_item) }
     let(:path) { "/api/v1/items/#{item.id}" }

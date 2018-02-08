@@ -46,9 +46,8 @@ RSpec.configure do |config|
   config.include Warden::Test::Helpers
 
   config.include ApiHelper, type: :request
-
   config.include ApiDefaultHeaders, type: :request
-
+  config.include SessionHelper
 
   # Database Cleaner Configuration
   # See: http://www.virtuouscode.com/2012/08/31/configuring-database_cleaner-with-rails-rspec-capybara-and-selenium/
@@ -60,7 +59,8 @@ RSpec.configure do |config|
     DatabaseCleaner.strategy = :transaction
   end
 
-  config.before(:each, js: true) do
+  config.before(:each, auth: true) do
+    log_in_as_user
     DatabaseCleaner.strategy = :transaction
   end
 

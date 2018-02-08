@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-describe Api::V1::OrganizationsController, type: :request do
+describe Api::V1::OrganizationsController, type: :request, auth: true do
   describe 'GET #show' do
     let!(:organization) { create(:organization) }
     let(:path) { "/api/v1/organizations/#{organization.id}" }

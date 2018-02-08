@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-describe Api::V1::CollectionsController, type: :request do
+describe Api::V1::CollectionsController, type: :request, auth: true do
   describe 'GET #show' do
     let!(:collection) {
       create(:collection, num_cards: 5)
