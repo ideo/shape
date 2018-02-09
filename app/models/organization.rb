@@ -16,6 +16,7 @@ class Organization < ApplicationRecord
 
   delegate :admins, to: :primary_group
   delegate :members, to: :primary_group
+  delegate :guests, to: :primary_group
 
   validates :name, presence: true
 
@@ -23,6 +24,7 @@ class Organization < ApplicationRecord
 
   def create_primary_group
     build_primary_group(name: name, organization: self).save
+    save # Save primary group attr
   end
 
   def update_primary_group_name

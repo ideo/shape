@@ -9,6 +9,25 @@ describe User, type: :model do
     it { should validate_presence_of(:email) }
   end
 
+  context 'callbacks' do
+    describe '#after_add_role' do
+      let(:organization) { create(:organization) }
+
+      it 'should set current_organization' do
+        user.add_role(:member, organization)
+        expect(user.reload.current_organization).to eq(organization)
+      end
+
+      it 'should not override current_organization if already set' do
+        org2 = create(:organization)
+        user.update_attributes(current_organization: org2)
+        expect(user.reload.current_organization).to eq(org2)
+        user.add_role(:member, organization)
+        expect(user.reload.current_organization).to eq(org2)
+      end
+    end
+  end
+
   describe '#organizations' do
     let!(:organizations) { create_list(:organization, 2) }
 

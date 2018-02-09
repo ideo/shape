@@ -1,5 +1,5 @@
 class User < ApplicationRecord
-  rolify
+  rolify after_add: :after_add_role
   devise :database_authenticatable, :registerable, :trackable,
          :rememberable, :validatable, :omniauthable,
          omniauth_providers: [:okta]
@@ -9,8 +9,11 @@ class User < ApplicationRecord
            through: :roles,
            source: :resource,
            source_type: 'Organization'
+  belongs_to :current_organization,
+             class_name: 'Organization',
+             optional: true
 
-  after_commit :add_user_to_default_organization_group
+  after_commit :add_to_default_org_group, on: :create
 
   validates :uid, :provider, :email, presence: true
 
@@ -40,7 +43,14 @@ class User < ApplicationRecord
 
   private
 
-  def add_user_to_default_organization_group
+  def after_add_role(role)
+    if role.resource.is_a?(Organization) && current_organization_id.blank?
+      # Set this as the user's current organization if they don't have one
+      update_attributes(current_organization: role.resource)
+    end
+  end
+
+  def add_to_default_org_group
     org = Organization.first
     add_role(:member, org.primary_group) if org.present?
   end

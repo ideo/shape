@@ -12,6 +12,17 @@ class Group < ApplicationRecord
     User.with_role(:member, self)
   end
 
+  def admins_and_members
+    User.joins(:roles)
+        .where(Role.arel_table[:name].in([:admin, :member]))       
+  end
+
+  # Guests can access the org's space, but don't have access
+  # to anything they aren't explicitly invited to
+  def guests
+    User.with_role(:guest, self)
+  end
+
   def primary?
     organization.primary_group_id == id
   end

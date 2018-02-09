@@ -14,8 +14,8 @@ class Role < ApplicationRecord
 
   # All the resources of a specific type (e.g. Organization) that this user is connected to
   # Role name is optional but can additionally scope it
-  def self.all_resources_of_type(user:, resource_type:, role_name: nil)
-    roles = joins(:user_roles)
+  def self.user_resources(user:, resource_type:, role_name: nil)
+    roles = joins(:users_roles)
             .where(UsersRole.arel_table[:user_id].eq(user.id))
             .where(resource_type: resource_type)
             .includes(:resource)
