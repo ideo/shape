@@ -10,6 +10,9 @@ Rails.application.routes.draw do
         end
       end
       resources :organizations, only: [:show, :update] do
+        collection do
+          get 'current'
+        end
         resources :collections, only: [:index, :create]
       end
       resources :users do

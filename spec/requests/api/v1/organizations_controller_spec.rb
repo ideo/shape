@@ -1,6 +1,26 @@
 require 'rails_helper'
 
 describe Api::V1::OrganizationsController, type: :request, auth: true do
+  describe 'GET #current' do
+    let!(:organization) { create(:organization) }
+    let(:user) { @user }
+    let(:path) { '/api/v1/organizations/current' }
+
+    before do
+      user.update_attributes(current_organization: organization)
+    end
+
+    it 'returns a 200' do
+      get(path)
+      expect(response.status).to eq(200)
+    end
+
+    it 'matches user.current_organization' do
+      get(path)
+      expect(json['data']['id'].to_i).to eq(user.current_organization_id)
+    end
+  end
+
   describe 'GET #show' do
     let!(:organization) { create(:organization) }
     let(:path) { "/api/v1/organizations/#{organization.id}" }

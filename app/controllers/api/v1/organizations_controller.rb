@@ -2,6 +2,11 @@ class Api::V1::OrganizationsController < Api::V1::BaseController
   deserializable_resource :organization, only: :update
   load_and_authorize_resource
 
+  # The logged-in user's current organization context
+  def current
+    render jsonapi: current_organization
+  end
+
   def show
     render jsonapi: @organization
   end

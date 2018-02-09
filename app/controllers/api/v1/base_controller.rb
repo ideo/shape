@@ -10,4 +10,10 @@ class Api::V1::BaseController < ApplicationController
       'Item::TextItem': SerializableItem
     )
   end
+
+  private
+
+  def current_organization
+    @current_organization ||= current_user.try(:current_organization)
+  end
 end
