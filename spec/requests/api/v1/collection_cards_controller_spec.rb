@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-describe Api::V1::CollectionCardsController, type: :request do
+describe Api::V1::CollectionCardsController, type: :request, auth: true do
   describe 'GET #index' do
     let!(:collection) { create(:collection, num_cards: 5) }
     let(:path) { "/api/v1/collections/#{collection.id}/collection_cards" }

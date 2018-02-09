@@ -12,14 +12,14 @@
         redirect: '<%= ENV['OKTA_REDIRECT_URL'] %>'
       });
     </script>
+    <!-- provide polyfills e.g. for `fetch`  -->
+    <script src="https://cdn.polyfill.io/v2/polyfill.min.js"></script>
     <%= stylesheet_link_tag    'application', media: 'all' %>
-    <%= javascript_include_tag 'application' %>
   </head>
 
   <body>
 
     <div>
-      current user: <%= current_user.inspect %>
       <%= yield %>
     </div>
 

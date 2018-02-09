@@ -23,9 +23,9 @@
     "__DEV__"      : false,
     "__PROD__"     : false,
     "__DEBUG__"    : false,
+    "fetch": true,
     "React": true,
-    "ReactDOM": true,
-    "SimpleSchema": true
+    "ReactDOM": true
   },
   "settings": {
     "import/resolver": {

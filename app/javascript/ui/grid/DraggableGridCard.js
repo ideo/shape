@@ -21,14 +21,15 @@ class DraggableGridCard extends React.PureComponent {
 
   handleDrag = (e) => {
     const { position } = this.props
-    const pad = {
+    // compensate for offset of container (e.g. padding)
+    const offset = {
       left: 0,
-      top: 100,
+      top: 80,
     }
     const dragPosition = {
       // use position of mouseX / Y
-      dragX: e.pageX - pad.left, // compensate for padding-left in container
-      dragY: e.pageY - pad.top, // compensate for padding-top in container
+      dragX: e.pageX - offset.left,
+      dragY: e.pageY - offset.top,
       ...position
     }
     this.props.onDrag(this.props.card.id, dragPosition)
