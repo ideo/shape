@@ -14,6 +14,6 @@ class CollectionCard < ApplicationRecord
   def single_item_or_collection_is_present
     return unless item.present? && collection.present?
 
-    errors.add(:base, 'must have only one of Item or Collection assigned')
+    errors.add(:base, 'Only one of Item or Collection can be assigned')
   end
 end
