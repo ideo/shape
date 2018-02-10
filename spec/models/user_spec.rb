@@ -10,20 +10,43 @@ describe User, type: :model do
   end
 
   context 'callbacks' do
+    let!(:org) { create(:organization) }
+    let(:org_group) { org.primary_group }
+    let!(:org_2) { create(:organization) }
+    let(:org_2_group) { org_2.primary_group }
+
     describe '#after_add_role' do
-      let(:organization) { create(:organization) }
+      before do
+        user.add_role(:member, org_group)
+        user.reload
+      end
 
       it 'should set current_organization' do
-        user.add_role(:member, organization)
-        expect(user.reload.current_organization).to eq(organization)
+        expect(user.current_organization).to eq(org)
       end
 
       it 'should not override current_organization if already set' do
-        org2 = create(:organization)
-        user.update_attributes(current_organization: org2)
-        expect(user.reload.current_organization).to eq(org2)
-        user.add_role(:member, organization)
-        expect(user.reload.current_organization).to eq(org2)
+        user.add_role(:member, org_2_group)
+        expect(user.reload.current_organization).to eq(org)
+      end
+    end
+
+    describe '#after_remove_role' do
+      before do
+        user.add_role(:member, org_group)
+      end
+
+      it 'should set another org they belonged to as current' do
+        user.add_role(:member, org_2_group)
+        expect(user.reload.current_organization).to eq(org)
+
+        user.remove_role(:member, org_group)
+        expect(user.reload.current_organization).to eq(org_2)
+      end
+
+      it 'should remove current_organization if user only belonged to one' do
+        user.remove_role(:member, org_group)
+        expect(user.reload.current_organization).to  be_nil
       end
     end
   end
@@ -32,25 +55,12 @@ describe User, type: :model do
     let!(:organizations) { create_list(:organization, 2) }
 
     before do
-      user.add_role(:member, organizations[0])
-      user.add_role(:admin, organizations[1])
+      user.add_role(:member, organizations[0].primary_group)
+      user.add_role(:admin, organizations[1].primary_group)
     end
 
     it 'should return all organizations they have any role on' do
       expect(user.organizations).to match_array(organizations)
-    end
-  end
-
-  describe '#organizations_with_role' do
-    let!(:organizations) { create_list(:organization, 2) }
-
-    before do
-      user.add_role(:member, organizations[0])
-      user.add_role(:admin, organizations[1])
-    end
-
-    it 'should only return orgs with role provided' do
-      expect(user.organizations_with_role(:admin)).to match_array([organizations[1]])
     end
   end
 end

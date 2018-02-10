@@ -1,10 +1,5 @@
 class Organization < ApplicationRecord
-  resourcify
-
   has_many :collections, -> { root }
-  has_many :roles, as: :resource, dependent: :destroy
-  has_many :users_roles, through: :roles
-  has_many :users, through: :users_roles
   has_many :groups, dependent: :destroy
   belongs_to :primary_group,
              class_name: 'Group',
