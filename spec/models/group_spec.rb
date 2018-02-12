@@ -7,12 +7,10 @@ RSpec.describe Group, type: :model do
   context 'with users in roles' do
     let!(:admins) { create_list(:user, 3) }
     let!(:members) { create_list(:user, 3) }
-    let!(:guests) { create_list(:user, 3) }
 
     before do
       admins.each { |admin| admin.add_role(:admin, group) }
       members.each { |member| member.add_role(:member, group) }
-      guests.each { |guest| guest.add_role(:guest, group) }
     end
 
     describe '#admins' do
@@ -30,12 +28,6 @@ RSpec.describe Group, type: :model do
     describe '#admins_and_members' do
       it 'should have all admins and members' do
         expect(group.admins_and_members).to match_array(admins + members)
-      end
-    end
-
-    describe '#guests' do
-      it 'should have all guests' do
-        expect(group.guests).to match_array(guests)
       end
     end
   end

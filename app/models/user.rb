@@ -16,8 +16,6 @@ class User < ApplicationRecord
              class_name: 'Organization',
              optional: true
 
-  after_commit :add_to_default_org_group, on: :create
-
   validates :uid, :provider, :email, presence: true
 
   def self.from_omniauth(auth)
@@ -56,10 +54,5 @@ class User < ApplicationRecord
       # If nil, that is fine as they shouldn't have a current organization
       update_attributes(current_organization: other_org)
     end
-  end
-
-  def add_to_default_org_group
-    org = Organization.first
-    add_role(:member, org.primary_group) if org.present?
   end
 end

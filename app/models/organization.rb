@@ -11,7 +11,6 @@ class Organization < ApplicationRecord
 
   delegate :admins, to: :primary_group
   delegate :members, to: :primary_group
-  delegate :guests, to: :primary_group
 
   validates :name, presence: true
 

@@ -7,9 +7,6 @@ describe Organization, type: :model do
 
   context 'associations' do
     it { should have_many :collections }
-    it { should have_many :roles }
-    it { should have_many :users_roles }
-    it { should have_many :users }
     it { should have_many :groups }
     it { should belong_to :primary_group }
   end

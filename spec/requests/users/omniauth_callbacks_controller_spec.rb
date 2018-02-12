@@ -39,12 +39,7 @@ describe Users::OmniauthCallbacksController, type: :request do
       expect { post(path) }.to change(User, :count).by(1)
       expect(User.find_by_uid(user.uid)).not_to be_nil
     end
-
-    it 'should add the user to the org group' do
-      post(path)
-      expect(organization.members).to include(User.find_by_uid(user.uid))
-    end
-
+    
     context 'with updated email and pic' do
       let!(:email) { 'newemail@user.com' }
       let!(:pic_url_square) { 'newpic.jpg' }

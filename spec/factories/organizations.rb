@@ -11,7 +11,7 @@ FactoryBot.define do
     after(:create) do |org, evaluator|
       [:admin, :member, :guest].each do |role|
         next if evaluator.send(role).blank?
-        evaluator.send(role).add_role(role, org)
+        evaluator.send(role).add_role(role, org.primary_group)
       end
     end
   end

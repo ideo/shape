@@ -3,41 +3,40 @@ require 'rails_helper'
 RSpec.describe Role, type: :model do
   describe '#user_resources' do
     let(:user) { create(:user) }
-    let!(:organizations) { create_list(:organization, 3) }
+    let!(:groups) { create_list(:group, 2) }
 
     before do
-      user.add_role(:admin, organizations[0])
-      user.add_role(:member, organizations[1])
-      user.add_role(:guest, organizations[2])
+      user.add_role(:admin, groups[0])
+      user.add_role(:member, groups[1])
     end
 
-    it 'should return all orgs a user is a member, guest or admin of' do
+    it 'should return all groups a user is a member or admin of' do
       expect(
         Role.user_resources(
           user: user,
-          resource_type: 'Organization'
+          resource_type: 'Group'
         )
-      ).to match_array(organizations)
+      ).to match_array(groups)
     end
 
     it 'should scope on one role type if given' do
       expect(
         Role.user_resources(
           user: user,
-          resource_type: 'Organization',
+          resource_type: 'Group',
           role_name: :admin
         )
-      ).to match_array([organizations[0]])
+      ).to match_array([groups[0]])
     end
 
     it 'should scope on many role types if given' do
       expect(
         Role.user_resources(
           user: user,
-          resource_type: 'Organization',
+          resource_type: 'Group',
           role_name: [:admin, :member]
         )
-      ).to match_array([organizations[0], organizations[1]])
+      ).to match_array([groups[0], groups[1]])
     end
   end
 end
