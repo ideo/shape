@@ -1,4 +1,3 @@
-import React, { Component } from 'react'
 import { Link } from 'react-router-dom'
 import { inject, observer } from 'mobx-react'
 
@@ -22,12 +21,11 @@ const CollectionList = ({ collections }) => (
     apiStore.sync(data)
   })
 })
-@inject('apiStore', 'routingStore')
+@inject('apiStore')
 @observer
-class HomePage extends Component {
+class HomePage extends React.Component {
   render () {
     const { collections } = apiStore
-    console.log(apiStore.collections)
     return (
       <div>
         <h1>Collection List</h1>

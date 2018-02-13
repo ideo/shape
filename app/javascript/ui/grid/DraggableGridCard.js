@@ -1,4 +1,3 @@
-import React from 'react'
 import Style from 'style-it'
 import FlipMove from 'react-flip-move'
 import Draggable from 'react-draggable'

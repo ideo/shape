@@ -1,5 +1,3 @@
-// import { Meteor } from 'meteor/meteor'
-import React, { Component } from 'react'
 import { observer } from 'mobx-react'
 import _ from 'lodash'
 
@@ -14,7 +12,7 @@ const calculateDistance = (pos1, pos2) => {
 
 // needs to be an observer to observe changes to the collection + items
 @observer
-class CollectionGrid extends Component {
+class CollectionGrid extends React.Component {
   constructor(props) {
     super(props)
     this.state = {
@@ -85,7 +83,7 @@ class CollectionGrid extends Component {
       // stateCards = _.reject(stateCards, { cardType: 'placeholder' })
 
       this.props.collection.reorderCards()
-      this.saveCollectionUpdates()
+      this.props.updateCollection()
       this.positionCards(this.props.collection.collection_cards)
 
       // // cardId stores the original cardId not the placeholderKey
@@ -149,12 +147,12 @@ class CollectionGrid extends Component {
   // </end Drag related functions>
   // --------------------------
 
-  saveCollectionUpdates = () => {
-    const { collection } = this.props
-    collection.save()
-    // do we have to do any kind of "sync" here?
-    // presumably we already have the proper data in store...
-  }
+  // saveCollectionUpdates = () => {
+  //   const { collection } = this.props
+  //   collection.save()
+  //   // do we have to do any kind of "sync" here?
+  //   // presumably we already have the proper data in store...
+  // }
 
   positionCards = (cards, opts = {}) => {
     const {
@@ -177,8 +175,8 @@ class CollectionGrid extends Component {
 
       let position = {}
       let filled = false
-      // TODO: remove row < 100 constraint, was just to prevent bad looping
-      while (!filled && row < 100) {
+      // find an open row that can fit the current card
+      while (!filled) {
         let itFits = false
         let gap = 0
         let nextX = 0
@@ -220,7 +218,7 @@ class CollectionGrid extends Component {
           }
 
           // NOTE: if you remove this check, then it will fill things in
-          // slightly out of order to "fill empty gaps"
+          // slightly out of order to "fill empty gaps" at the end of the row
           if (nextX + card.w === cols) {
             row += 1
             if (!matrix[row]) matrix.push(_.fill(Array(cols), null))

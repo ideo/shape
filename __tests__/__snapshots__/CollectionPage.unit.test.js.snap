@@ -1,0 +1,51 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`CollectionPage renders correctly 1`] = `
+<div>
+  <header
+    className="sc-bwzfXH QcAuQ"
+  >
+    <div
+      className="_Rfx0_ _Rfx1_ _Rfx2_"
+    >
+      <div
+        className=""
+      >
+        <div
+          className="sc-bdVaJa eoHBTQ"
+        >
+          <span>
+            Innovation OS
+          </span>
+        </div>
+      </div>
+      <div
+        className=""
+      >
+        <div
+          className="MuiAvatar-root-2 Header-smallAvatar-1"
+        >
+          <img
+            alt={undefined}
+            className="MuiAvatar-img-4"
+            sizes={undefined}
+            src="https://picsum.photos/38"
+            srcSet={undefined}
+          />
+        </div>
+      </div>
+    </div>
+  </header>
+  <main
+    className="sc-htpNat fkLAVu"
+  >
+    <h1>
+      Collection: 
+      My Workspace X
+    </h1>
+    <div
+      className="Grid"
+    />
+  </main>
+</div>
+`;

@@ -1,39 +1,41 @@
-{
-  "plugins": [
+module.exports = {
+  plugins: [
     "react",
     "jest"
   ],
-  "env": {
+  env: {
     "jest/globals": true
   },
-  "extends" : [
+  extends: [
     "airbnb",
     "standard",
     "standard-react"
   ],
-  "parser": "babel-eslint",
-  "parserOptions": {
+  parser: "babel-eslint",
+  parserOptions: {
       "ecmaVersion": 7,
       "sourceType": "module",
       "ecmaFeatures": {
           "jsx": true
       }
   },
-  "globals" : {
+  globals: {
     "__DEV__"      : false,
     "__PROD__"     : false,
     "__DEBUG__"    : false,
-    "fetch": true,
-    "React": true,
-    "ReactDOM": true
+    "fetch":   true,
+    "webpack": true,
+    "React":   true,
+    "shallow": true,
   },
-  "settings": {
+  settings: {
     "import/resolver": {
       "babel-plugin-root-import": {},
       "node": {}
-    }
+    },
+    "import/core-modules": ["styled-jsx/css"]
   },
-  "rules": {
+  rules: {
     "import/no-absolute-path": 0,
     "import/extensions": 0,
     "semi" : [2, "never"],
@@ -45,6 +47,7 @@
     "space-before-function-paren": 0,
     "indent": ["error", 2],
     "no-param-reassign": ["error", { "props": false }],
+    "one-var-declaration-per-line": ["error", "initializations"],
     "radix": ["error", "as-needed"],
     "jsx-quotes": ["warn", "prefer-double"],
     "jsx-a11y/anchor-is-valid": [ "error", {
@@ -55,7 +58,11 @@
     "react-in-jsx-scope": 0,
     "react/jsx-filename-extension": 0,
     "react/prefer-stateless-function": 0,
+    "react/jsx-curly-brace-presence": 0,
     "react/jsx-closing-tag-location": 0,
+    // react/no-typos disabled until this is resolved:
+    // https://github.com/yannickcr/eslint-plugin-react/issues/1389
+    "react/no-typos": 0,
     "react/prop-types": [1, {"skipUndeclared": true}]
   }
 }

@@ -1,26 +1,44 @@
-import { shallow } from 'enzyme'
-import React from 'react'
 import CollectionPage from '~/ui/pages/CollectionPage'
+import createComponentWithIntl from '../js_test_config/intl-enzyme-test-helper.js'
 
-// don't use arrow function, preserve value of `this`
-describe('CollectionPage', function() {
-  beforeEach(() => {
-    this.apiStore = {
-      request: () => ({ then: () => {} }),
-      find: () => this.apiStore.collections[0],
-      collections: [
-        { id: 1, name: 'xyz' }
-      ]
-    }
-    this.fakeParams = { params: { id: 1 } }
+const id = 1
+const collections = [
+  { id: 1, name: 'My Workspace X' }
+]
+let wrapper, match, request, find, apiStore
+let props
+beforeEach(() => {
+  match = { params: { id } }
+  request = jest.fn()
+  request.mockReturnValue(Promise.resolve({}))
+  find = jest.fn()
+  find.mockReturnValue(collections[0])
+  apiStore = {
+    request,
+    find,
+    sync: jest.fn(),
+    collections,
+  }
+  props = { apiStore, match }
+  wrapper = shallow(
+    <CollectionPage.wrappedComponent {...props} />
+  )
+})
+
+describe('CollectionPage', () => {
+  it('makes an API call to fetch the collection', () => {
+    expect(request).toBeCalledWith(`collections/${match.params.id}`)
   })
 
-  it('renders the collection name', () => {
-    const wrapper = shallow(<CollectionPage.wrappedComponent
-      apiStore={this.apiStore}
-      match={this.fakeParams}
-    />)
+  it('displays the collection name', () => {
+    expect(wrapper.find('h1').at(0).text()).toBe('Collection: My Workspace X')
+  })
 
-    expect(wrapper.find('h1').at(0).text()).toBe('Collection: xyz')
+  it('renders correctly', () => {
+    wrapper = createComponentWithIntl(
+      <CollectionPage.wrappedComponent {...props} />
+    )
+    const tree = wrapper.toJSON()
+    expect(tree).toMatchSnapshot()
   })
 })

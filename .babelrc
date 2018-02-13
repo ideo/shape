@@ -22,13 +22,19 @@
     "react"
   ],
   "plugins": [
-    "styled-jsx/babel",
     ["transform-decorators-legacy"],
     ["babel-plugin-root-import", {
       "rootPathSuffix": "app/javascript"
     }],
+    ["react-intl", {
+      "messagesDir": "./build/messages/"
+    }],
     "syntax-dynamic-import",
     "transform-object-rest-spread",
+    ["transform-runtime", {
+      "polyfill": false,
+      "regenerator": true
+    }],
     [
       "transform-class-properties",
       {

@@ -1,7 +1,3 @@
-// import { Meteor } from 'meteor/meteor'
-import React from 'react'
-// import _ from 'lodash'
-
 import AddItemButton from '~/ui/grid/AddItemButton'
 
 const Hotspot = (props) => (

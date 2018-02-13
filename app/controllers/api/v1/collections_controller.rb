@@ -44,7 +44,9 @@ class Api::V1::CollectionsController < Api::V1::BaseController
   def update
     @collection.attributes = collection_params
     if @collection.save
-      render jsonapi: @collection
+      # TODO: optimize this as in the show method
+      # include collection_cards for UI to receive any updates
+      render jsonapi: @collection, include: [collection_cards: [:item, :collection]]
     else
       render jsonapi_errors: @collection.errors.full_messages
     end
