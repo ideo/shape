@@ -1,9 +1,29 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`CollectionPage renders correctly 1`] = `
+.c1 {
+  font-size: 0.75rem;
+  font-family: 'Gotham';
+  text-transform: uppercase;
+}
+
+.c0 {
+  z-index: 9999;
+  position: fixed;
+  top: 0;
+  width: calc(100% - 4rem);
+  background: #f2f2f2;
+  padding: 1rem 2rem;
+}
+
+.c2 {
+  margin-top: 90px;
+  padding: 0 2rem;
+}
+
 <div>
   <header
-    className="sc-bwzfXH QcAuQ"
+    className="c0"
   >
     <div
       className="_Rfx0_ _Rfx1_ _Rfx2_"
@@ -12,7 +32,7 @@ exports[`CollectionPage renders correctly 1`] = `
         className=""
       >
         <div
-          className="sc-bdVaJa eoHBTQ"
+          className="c1"
         >
           <span>
             Innovation OS
@@ -37,7 +57,7 @@ exports[`CollectionPage renders correctly 1`] = `
     </div>
   </header>
   <main
-    className="sc-htpNat fkLAVu"
+    className="c2"
   >
     <h1>
       Collection: 

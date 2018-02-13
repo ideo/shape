@@ -2,9 +2,11 @@ import Style from 'style-it'
 import FlipMove from 'react-flip-move'
 import Draggable from 'react-draggable'
 
-import GridCardItem from '~/ui/grid/GridCardItem'
-import GridCardCollection from '~/ui/grid/GridCardCollection'
-import GridItemBlank from '~/ui/grid/GridItemBlank'
+import GridCard from '~/ui/grid/GridCard'
+import GridCardPlaceholder from '~/ui/grid/GridCardPlaceholder'
+// import GridCardItem from '~/ui/grid/GridCardItem'
+// import GridCardCollection from '~/ui/grid/GridCardCollection'
+// import GridItemBlank from '~/ui/grid/GridItemBlank'
 
 class DraggableGridCard extends React.PureComponent {
   state = {
@@ -54,19 +56,19 @@ class DraggableGridCard extends React.PureComponent {
 
     // GridItem setup
     // const itemProps = { ...this.props }
-    let GridCard = () => <div />
+    // let GridCard = () => <div />
     const placeholder = cardType === 'placeholder'
-    const blank = cardType === 'blank'
-    if (cardType === 'items') {
-      GridCard = GridCardItem
-    } else if (cardType === 'collections') {
-      GridCard = GridCardCollection
-    } else if (placeholder) {
-      GridCard = () => <div />
-    } else if (blank) {
-      GridCard = GridItemBlank
-    }
-    //
+    // const blank = cardType === 'blank'
+    // if (cardType === 'items') {
+    //   GridCard = GridCardItem
+    // } else if (cardType === 'collections') {
+    //   GridCard = GridCardCollection
+    // } else if (placeholder) {
+    //   GridCard = Placeholder
+    // } else if (blank) {
+    //   GridCard = GridItemBlank
+    // }
+
     const {
       yPos
     } = position
@@ -118,6 +120,7 @@ class DraggableGridCard extends React.PureComponent {
             <Style>
               {`
                 .PositionedDiv {
+                    position: absolute;
                     width: ${width}px;
                     height: ${height}px;
                     transform: translate(${xPos}px, ${yPos}px) rotate(${rotation});
@@ -126,8 +129,12 @@ class DraggableGridCard extends React.PureComponent {
                     opacity: ${opacity};
                   }
               `}
-              <div className={`GridCard PositionedDiv ${placeholder ? 'placeholder' : ''}`}>
-                <GridCard card={card} record={record} />
+              <div className="PositionedDiv">
+                {
+                  placeholder
+                    ? <GridCardPlaceholder />
+                    : <GridCard card={card} record={record} />
+                }
               </div>
             </Style>
           </div>

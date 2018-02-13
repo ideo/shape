@@ -9,9 +9,6 @@ import { MobxIntlProvider } from 'mobx-react-intl'
 import Routes from '~/ui/Routes'
 import stores, { routingStore } from '~/stores'
 
-// TODO: refactor?
-import '~/styles/grid_tmp.scss'
-
 // Enable MobX Strict functionality -- requires explicit @actions
 useStrict(true)
 

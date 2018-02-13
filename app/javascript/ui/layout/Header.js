@@ -19,7 +19,7 @@ const StyledHeader = styled.header`
   width: calc(100% - 4rem);
   background: #f2f2f2;
   padding: 1rem 2rem;
-  box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.25);
+  ${'' /* box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.25); */}
 `
 
 @withStyles(materialStyles)
