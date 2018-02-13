@@ -31,14 +31,13 @@ ActiveRecord::Schema.define(version: 20180209192525) do
   end
 
   create_table "collections", force: :cascade do |t|
-    t.string "name", null: false
+    t.string "name"
+    t.string "type"
     t.bigint "organization_id"
     t.bigint "cloned_from_id"
-    t.integer "collection_type", default: 1, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["cloned_from_id"], name: "index_collections_on_cloned_from_id"
-    t.index ["organization_id", "collection_type"], name: "index_collections_on_organization_id_and_collection_type"
     t.index ["organization_id"], name: "index_collections_on_organization_id"
   end
 

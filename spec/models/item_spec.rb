@@ -6,7 +6,7 @@ RSpec.describe Item, type: :model do
   end
 
   context 'associations' do
-    it { should have_one :primary_collection_card }
+    it { should have_one :parent_collection_card }
     it { should have_many :collection_cards }
   end
 end

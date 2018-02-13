@@ -21,7 +21,7 @@ RSpec.describe CollectionCard, type: :model do
     describe '#card_is_only_non_reference' do
       context 'with item' do
         let!(:collection_card) { create(:collection_card_item) }
-        # primary_collection_card relationship gets cached without a reload
+        # parent_collection_card relationship gets cached without a reload
         let(:item) { collection_card.item.reload }
 
         it 'should add error if item already has non-reference card' do

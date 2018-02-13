@@ -49,6 +49,22 @@ describe User, type: :model do
         expect(user.reload.current_organization).to  be_nil
       end
     end
+
+    describe '#create_user_collection' do
+      let(:user) { create(:user) }
+      let!(:organization) { create(:organization) }
+      let(:user_collections) { user.collections.user }
+
+      before do
+        user.add_role(:member, organization.primary_group)
+      end
+
+      it 'should create a Collection::UserCollection' do
+        expect(user_collections.size).to eq(1)
+        expect(user_collections[0]).to be_instance_of(Collection::UserCollection)
+        expect(user_collections[0].persisted?).to be true
+      end
+    end
   end
 
   describe '#organizations' do

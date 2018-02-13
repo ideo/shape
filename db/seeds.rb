@@ -31,6 +31,6 @@ organization = FactoryBot.create(:organization)
     FactoryBot.create(:collection,
                       :subcollection,
                       num_cards: num_cards_per_collection,
-                      primary_collection_card: card)
+                      parent_collection_card: card)
   end
 end

@@ -14,7 +14,13 @@ class Group < ApplicationRecord
 
   def admins_and_members
     User.joins(:roles)
-        .where(Role.arel_table[:name].in([:admin, :member]))
+        .where(Role.arel_table[:name].in(%i[admin member]))
+        .where(Role.arel_table[:resource_type].in(self.class.name))
+        .where(Role.arel_table[:resource_id].in(id))
+  end
+
+  def admin_and_member_ids
+    admins_and_members.pluck(:id)
   end
 
   def primary?
