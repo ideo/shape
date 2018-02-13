@@ -10,7 +10,7 @@ class Collection < ApplicationRecord
   belongs_to :organization, optional: true
   belongs_to :cloned_from, class_name: 'Collection', optional: true
 
-  scope :root, -> { where.not(organization_id: nil) }
+  scope :root, -> { where.not(organization_id: nil).where(type: nil) }
   scope :user, -> { where(type: 'Collection::UserCollection') }
   scope :shared_with_me, -> { where(type: 'Collection::SharedWithMeCollection') }
 
