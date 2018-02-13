@@ -8,7 +8,7 @@ describe Collection::UserCollection, type: :model do
       Collection::UserCollection.create_for_user(user, organization)
     }
     let(:shared_with_me_collection) {
-      user_collection.collections.shared_with_me.first
+      user_collection.shared_with_me_collection
     }
 
     it 'should create a Collection::UserCollection' do

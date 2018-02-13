@@ -19,5 +19,9 @@ class Collection
     def searchable?
       false
     end
+
+    def shared_with_me_collection
+      collections.shared_with_me.first
+    end
   end
 end

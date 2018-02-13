@@ -5,7 +5,11 @@ class Api::V1::CollectionsController < Api::V1::BaseController
   load_and_authorize_resource
 
   def index
-    render jsonapi: current_organization.collections.root.order(name: :asc)
+    @collections = current_organization.collections
+                                       .root
+                                       .not_custom_type
+                                       .order(name: :asc)
+    render jsonapi: @collections
   end
 
   def show
