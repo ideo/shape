@@ -4,6 +4,7 @@ class CollectionCard < ApplicationRecord
   belongs_to :item, optional: true
 
   before_validation :assign_order, if: :assign_order?
+  before_create :assign_default_height_and_width
 
   validates :parent, :order, presence: true
   validate :single_item_or_collection_is_present
@@ -15,6 +16,11 @@ class CollectionCard < ApplicationRecord
   accepts_nested_attributes_for :collection, :item
 
   private
+
+  def assign_default_height_and_width
+    self.height ||= 1
+    self.width ||= 1
+  end
 
   def assign_order?
     order.blank? && parent.present?

@@ -1,8 +1,6 @@
 FactoryBot.define do
   factory :collection_card do
     parent factory: :collection
-    width 1
-    height 1
     order 0
 
     trait :reference do
