@@ -2,6 +2,7 @@ require 'rails_helper'
 
 describe Users::OmniauthCallbacksController, type: :request do
   describe 'POST #okta' do
+    let!(:organization) { create(:organization) }
     let!(:user) { build(:user) }
     let(:email) { user.email }
     let(:pic_url_square) { user.pic_url_square }
@@ -38,7 +39,7 @@ describe Users::OmniauthCallbacksController, type: :request do
       expect { post(path) }.to change(User, :count).by(1)
       expect(User.find_by_uid(user.uid)).not_to be_nil
     end
-
+    
     context 'with updated email and pic' do
       let!(:email) { 'newemail@user.com' }
       let!(:pic_url_square) { 'newpic.jpg' }

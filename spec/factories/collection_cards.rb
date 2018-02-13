@@ -5,6 +5,10 @@ FactoryBot.define do
     height 1
     order 0
 
+    trait :reference do
+      reference true
+    end
+
     factory :collection_card_item do
       item factory: :text_item
       collection nil

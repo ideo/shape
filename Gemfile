@@ -47,6 +47,9 @@ gem 'jsonapi-rails'
 # For defining user abilities
 gem 'cancancan', '~> 2.0'
 
+# For assigning user roles
+gem 'rolify', '~> 5.2.0'
+
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
   gem 'byebug', platforms: [:mri, :mingw, :x64_mingw]
