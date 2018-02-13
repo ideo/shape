@@ -2,8 +2,8 @@ require 'rails_helper'
 
 RSpec.describe CollectionBuilder, type: :service do
   let(:organization) { create(:organization) }
-  let(:root_collection) { create(:collection, organization: organization) }
-  let(:collection_card) { create(:collection_card, parent: root_collection) }
+  let(:collection) { create(:collection, organization: organization) }
+  let(:collection_card) { create(:collection_card, parent: collection) }
   let(:params) {
     {
       'name': 'My Fancy Collection'
@@ -14,17 +14,8 @@ RSpec.describe CollectionBuilder, type: :service do
     let(:builder) {
       CollectionBuilder.new(params: params,
                             organization: organization,
-                            collection_card: collection_card)
+                            parent_card: collection_card)
     }
-
-    it 'should be false if given org and collection card' do
-      expect(builder.save).to be false
-    end
-
-    it 'should have errors' do
-      builder.save
-      expect(builder.errors).to include('Can only assign organization or as sub-collection, not both')
-    end
 
     context 'for root collection' do
       let(:builder) {
@@ -39,7 +30,7 @@ RSpec.describe CollectionBuilder, type: :service do
 
     context 'for sub-collection' do
       let(:builder) {
-        CollectionBuilder.new(params: params, collection_card: collection_card)
+        CollectionBuilder.new(params: params, parent_card: collection_card)
       }
 
       it 'should be true' do
@@ -69,7 +60,7 @@ RSpec.describe CollectionBuilder, type: :service do
 
     context 'for sub-collection' do
       let(:builder) {
-        CollectionBuilder.new(params: params, collection_card: collection_card)
+        CollectionBuilder.new(params: params, parent_card: collection_card)
       }
 
       before do
@@ -81,7 +72,7 @@ RSpec.describe CollectionBuilder, type: :service do
       end
 
       it 'should have parent assigned' do
-        expect(builder.collection.parent).to eq(root_collection)
+        expect(builder.collection.parent).to eq(collection)
       end
     end
   end

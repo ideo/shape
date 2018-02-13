@@ -6,12 +6,16 @@ class User < ApplicationRecord
          :rememberable, :validatable, :omniauthable,
          omniauth_providers: [:okta]
 
-  has_many :users_roles, dependent: :destroy
+  has_many :collections,
+           through: :roles,
+           source: :resource,
+           source_type: 'Collection'
   has_many :groups,
            through: :roles,
            source: :resource,
            source_type: 'Group'
   has_many :organizations, through: :groups
+  has_many :users_roles, dependent: :destroy
   belongs_to :current_organization,
              class_name: 'Organization',
              optional: true
@@ -41,18 +45,16 @@ class User < ApplicationRecord
   private
 
   def after_add_role(role)
-    if role.resource.is_a?(Group) && current_organization_id.blank?
-      # Set this as the user's current organization if they don't have one
-      update_attributes(current_organization: role.resource.organization)
+    if role.resource.is_a?(Group)
+      organization = role.resource.organization
+      organization.user_role_added(self)
     end
   end
 
   def after_remove_role(role)
     if role.resource.is_a?(Group)
-      other_org = organizations.first
-      # Set current org as one they are a member of
-      # If nil, that is fine as they shouldn't have a current organization
-      update_attributes(current_organization: other_org)
+      organization = role.resource.organization
+      organization.user_role_removed(self)
     end
   end
 end
