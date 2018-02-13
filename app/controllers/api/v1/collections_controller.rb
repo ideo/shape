@@ -2,7 +2,7 @@ class Api::V1::CollectionsController < Api::V1::BaseController
   deserializable_resource :collection, class: DeserializableCollection, only: [:create, :update]
   load_and_authorize_resource :organization, only: [:index, :create]
   load_and_authorize_resource :collection_card, only: [:create]
-  load_and_authorize_resource
+  load_and_authorize_resource except: [:me]
 
   def index
     @collections = current_organization.collections
@@ -14,10 +14,19 @@ class Api::V1::CollectionsController < Api::V1::BaseController
 
   def show
     @collection = Collection.where(id: params[:id])
-                            .includes(collection_cards: [:item, :collection])
+                            .includes(collection_cards: %i[item collection])
                             .first
 
-    render jsonapi: @collection, include: [collection_cards: [:item, :collection]]
+    render jsonapi: @collection, include: [collection_cards: %i[item collection]]
+  end
+
+  def me
+    # Gets the user collection for this user/org combo
+    @collection = current_user.collections
+                              .user
+                              .find_by_organization_id(current_organization.id)
+
+    render jsonapi: @collection, include: [collection_cards: %i[item collection]]
   end
 
   def create

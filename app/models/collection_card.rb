@@ -12,6 +12,8 @@ class CollectionCard < ApplicationRecord
   scope :not_reference, -> { where(reference: false) }
   scope :reference, -> { where(reference: true) }
 
+  accepts_nested_attributes_for :collection, :item
+
   private
 
   def assign_order?

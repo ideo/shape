@@ -40,7 +40,16 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
       :reference,
       :parent_id,
       :collection_id,
-      :item_id
+      :item_id,
+      collection_attributes: %i[id name],
+      item_attributes: [
+        :id,
+        :type,
+        :name,
+        :content,
+        :image,
+        :archived
+      ]
     )
   end
 end

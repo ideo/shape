@@ -4,6 +4,9 @@ Rails.application.routes.draw do
   namespace :api do
     namespace :v1 do
       resources :collections do
+        collection do
+          get 'me'
+        end
         resources :collection_cards, shallow: true do
           resources :items, shallow: true, except: :index
           resources :collections, only: :create

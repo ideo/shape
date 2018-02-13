@@ -87,6 +87,32 @@ describe Api::V1::CollectionsController, type: :request, auth: true do
     end
   end
 
+  describe 'GET #me' do
+    let(:user) { @user }
+    let!(:organization) { create(:organization, member: user) }
+    let!(:org_2) { create(:organization, member: user) }
+    let(:path) { '/api/v1/collections/me' }
+    let(:user_collection) { user.collections.user.where(organization_id: organization.id).first }
+    let(:shared_with_me_collection) { user_collection.collections.shared_with_me.first }
+    let(:collection_cards_json) { json_included_objects_of_type('collection_cards') }
+    let(:collections_json) { json_included_objects_of_type('collections') }
+
+    it 'returns a 200' do
+      get(path)
+      expect(response.status).to eq(200)
+    end
+
+    it 'returns their user collection for this org' do
+      get(path)
+      expect(json['data']['attributes']['id']).to eq(user_collection.id)
+    end
+
+    it 'includes the shared-with-me subcollection' do
+      get(path)
+      expect(collections_json.first['id'].to_i).to eq(shared_with_me_collection.id)
+    end
+  end
+
   describe 'POST #create' do
     let!(:organization) { create(:organization) }
     let(:path) { "/api/v1/organizations/#{organization.id}/collections" }
