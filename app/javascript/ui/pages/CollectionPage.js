@@ -1,13 +1,15 @@
 // import PropTypes from 'prop-types'
 import ReactRouterPropTypes from 'react-router-prop-types'
-import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
-import to from 'await-to-js'
+import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 
+import withApi from '~/utils/withApi'
 import Header from '~/ui/layout/Header'
 import PageContainer from '~/ui/layout/PageContainer'
 import CollectionGrid from '~/ui/grid/CollectionGrid'
 
-@inject('apiStore')
+@withApi({
+  requestPath: ({ match }) => `/collections/${match.params.id}`
+})
 @observer
 class CollectionPage extends React.Component {
   constructor(props) {
@@ -15,17 +17,6 @@ class CollectionPage extends React.Component {
     this.state = {
       // blank: null,
       cols: 4,
-    }
-  }
-
-  async componentDidMount() {
-    const { apiStore } = this.props
-    const { id } = this.props.match.params
-    const [err, data] = await to(apiStore.request(`collections/${id}`))
-    if (data) {
-      apiStore.sync(data)
-    } else if (err) {
-      // console.log('error!', err)
     }
   }
 

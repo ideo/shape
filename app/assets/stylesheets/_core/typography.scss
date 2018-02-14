@@ -1,5 +1,7 @@
 html {
-  @include prefix(font-smoothing, antialiased);
+  // we were just using bourbon for font-smoothing, so have included explicitly here
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
   font-size: 16px;
   font-family: 'Sentinel'
 }

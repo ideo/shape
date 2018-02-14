@@ -21,6 +21,10 @@ class CollectionGrid extends React.Component {
     }
   }
 
+  componentDidMount() {
+    this.positionCards(this.props.collection.collection_cards)
+  }
+
   componentWillReceiveProps(nextProps) {
     // console.log('Grid: nextProps', nextProps)
     this.positionCards(nextProps.collection.collection_cards)

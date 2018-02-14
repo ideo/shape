@@ -1,7 +1,0 @@
-$default-prefixes: ("webkit", "moz");
-
-// Call bourbon's similarly named "prefixer" mixin, but with a list of default
-// prefixes for Webkit and Mozilla.
-@mixin prefix($property, $value, $browser-prefixes: $default-prefixes) {
-  @include prefixer($property, $value, $browser-prefixes);
-}
