@@ -1,3 +1,5 @@
+import PropTypes from 'prop-types'
+import { PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 import { Link } from 'react-router-dom'
 
@@ -54,7 +56,7 @@ class GridCard extends React.PureComponent {
 
   render() {
     return (
-      <StyledGridCard className={this.props.className}>
+      <StyledGridCard>
         <GridCardHotspots card={this.props.card} />
 
         <DragHandle />
@@ -65,6 +67,12 @@ class GridCard extends React.PureComponent {
       </StyledGridCard>
     )
   }
+}
+
+GridCard.propTypes = {
+  card: MobxPropTypes.objectOrObservableObject.isRequired,
+  cardType: PropTypes.string.isRequired,
+  record: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 
 export default GridCard

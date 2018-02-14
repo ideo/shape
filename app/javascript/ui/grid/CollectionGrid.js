@@ -1,6 +1,8 @@
-import { observer } from 'mobx-react'
+import PropTypes from 'prop-types'
+import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import _ from 'lodash'
 
+import Loader from '~/ui/layout/Loader'
 import DraggableGridCard from '~/ui/grid/DraggableGridCard'
 
 const calculateDistance = (pos1, pos2) => {
@@ -29,10 +31,6 @@ class CollectionGrid extends React.Component {
     // console.log('Grid: nextProps', nextProps)
     this.positionCards(nextProps.collection.collection_cards)
   }
-
-  // componentWillUpdate(nextProps, nextState, nextContext) {
-  //   console.log(nextProps, nextState, nextContext)
-  // }
 
   // --------------------------
   // <Drag related functions>
@@ -162,7 +160,7 @@ class CollectionGrid extends React.Component {
   //   // presumably we already have the proper data in store...
   // }
 
-  positionCards = (cards, opts = {}) => {
+  positionCards = (cards = [], opts = {}) => {
     const {
       gridW,
       gridH,
@@ -267,8 +265,8 @@ class CollectionGrid extends React.Component {
           record={record}
           onDrag={this.onDrag}
           onDragStop={this.onDragStop}
-          onHotspotHover={this.onHotspotHover}
-          add={this.props.add}
+          // onHotspotHover={this.onHotspotHover}
+          // add={this.props.add}
         />
       )
     })
@@ -276,12 +274,23 @@ class CollectionGrid extends React.Component {
   }
 
   render() {
+    if (!this.state.cards.length) return <Loader />
+
     return (
       <div className="Grid">
         { this.renderPositionedCards() }
       </div>
     )
   }
+}
+
+CollectionGrid.propTypes = {
+  cols: PropTypes.number.isRequired,
+  gridH: PropTypes.number.isRequired,
+  gridW: PropTypes.number.isRequired,
+  gutter: PropTypes.number.isRequired,
+  updateCollection: PropTypes.func.isRequired,
+  collection: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 
 export default CollectionGrid

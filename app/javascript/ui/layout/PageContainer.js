@@ -1,6 +1,6 @@
 import styled from 'styled-components'
 
-import v from '~/ui/global/variables'
+import v from '~/utils/variables'
 
 const StyledContainer = styled.main`
   max-width: 1300px;

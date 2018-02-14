@@ -4,6 +4,7 @@ import ReactRouterPropTypes from 'react-router-prop-types'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 
 import withApi from '~/utils/withApi'
+import Loader from '~/ui/layout/Loader'
 import Header from '~/ui/layout/Header'
 import PageContainer from '~/ui/layout/PageContainer'
 import CollectionGrid from '~/ui/grid/CollectionGrid'
@@ -52,7 +53,7 @@ class CollectionPage extends React.Component {
   render() {
     const { collection } = this
     // console.log('thiscollection', this.props.apiStore, collection)
-    if (!collection) return <div>Loading</div>
+    if (!collection) return <Loader />
 
     return (
       <Fragment>

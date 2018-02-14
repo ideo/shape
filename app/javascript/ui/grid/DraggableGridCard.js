@@ -1,8 +1,11 @@
+import PropTypes from 'prop-types'
+import { PropTypes as MobxPropTypes } from 'mobx-react'
 import Style from 'style-it'
 import FlipMove from 'react-flip-move'
 import Draggable from 'react-draggable'
 
-import v from '~/ui/global/variables'
+import v from '~/utils/variables'
+import propShapes from '~/utils/propShapes'
 import GridCard from '~/ui/grid/GridCard'
 import GridCardPlaceholder from '~/ui/grid/GridCardPlaceholder'
 
@@ -51,6 +54,12 @@ class DraggableGridCard extends React.PureComponent {
       record,
       position
     } = this.props
+
+    const cardProps = {
+      card,
+      cardType,
+      record,
+    }
 
     const placeholder = cardType === 'placeholder'
 
@@ -118,7 +127,7 @@ class DraggableGridCard extends React.PureComponent {
                 {
                   placeholder
                     ? <GridCardPlaceholder />
-                    : <GridCard {...this.props} />
+                    : <GridCard {...cardProps} />
                 }
               </div>
             </Style>
@@ -128,6 +137,16 @@ class DraggableGridCard extends React.PureComponent {
       </FlipMove>
     )
   }
+}
+
+DraggableGridCard.propTypes = {
+  card: MobxPropTypes.objectOrObservableObject.isRequired,
+  cardType: PropTypes.string.isRequired,
+  position: PropTypes.shape(propShapes.position).isRequired,
+  record: MobxPropTypes.objectOrObservableObject.isRequired,
+  onDrag: PropTypes.func.isRequired,
+  onDragStop: PropTypes.func.isRequired,
+  // onHotspotHover: PropTypes.func.isRequired,
 }
 
 export default DraggableGridCard

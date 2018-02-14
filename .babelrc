@@ -24,9 +24,13 @@
   "plugins": [
     ["transform-decorators-legacy"],
     ["transform-class-properties"],
-    ["babel-plugin-root-import", {
+    ["babel-plugin-root-import", [{
+      "rootPathPrefix": "#",
+      "rootPathSuffix": "js_test_config"
+    }, {
+      "rootPathPrefix": "~",
       "rootPathSuffix": "app/javascript"
-    }],
+    }]],
     ["react-intl", {
       "messagesDir": "./build/messages/"
     }],
