@@ -42,6 +42,16 @@ class User < ApplicationRecord
     user
   end
 
+  def current_user_collection_id
+    current_user_collection.try(:id)
+  end
+
+  def current_user_collection
+    return nil if current_organization.blank?
+
+    collections.user.find_by_organization_id(current_organization_id)
+  end
+
   private
 
   def after_add_role(role)

@@ -6,6 +6,7 @@
     "last_name": { "type": "string" },
     "email": { "type": "string" },
     "pic_url_square": { "type": "string" },
+    "current_user_collection_id": { "type": ["integer", "null"] },
     "created_at": { "type": "date" }
   },
   "required": ["id", "email", "created_at"]

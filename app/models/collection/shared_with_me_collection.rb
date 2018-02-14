@@ -1,6 +1,10 @@
 class Collection
   class SharedWithMeCollection < Collection
-    def self.create_for_collection(parent_collection)
+    def self.find_or_create_for_collection(parent_collection)
+      existing = parent_collection.collections.shared_with_me.first
+
+      return existing if existing.present?
+
       collection = create(
         organization: parent_collection.organization
       )

@@ -1,11 +1,11 @@
 require 'rails_helper'
 
 describe Collection::UserCollection, type: :model do
-  describe '.create_for_user' do
+  describe '.find_or_create_for_user' do
     let(:organization) { create(:organization) }
     let(:user) { create(:user) }
     let!(:user_collection) {
-      Collection::UserCollection.create_for_user(user, organization)
+      Collection::UserCollection.find_or_create_for_user(user, organization)
     }
     let(:shared_with_me_collection) {
       user_collection.shared_with_me_collection

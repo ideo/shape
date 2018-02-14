@@ -23,11 +23,7 @@ class Organization < ApplicationRecord
       user.update_attributes(current_organization: self)
     end
 
-    # Create the user's workspace collection for this org
-    # if they don't already have one
-    return if collections.user.where(organization_id: id).count.positive?
-
-    Collection::UserCollection.create_for_user(user, self)
+    Collection::UserCollection.find_or_find_or_create_for_user(user, self)
   end
 
   # Note: this method can be called many times for the same org
