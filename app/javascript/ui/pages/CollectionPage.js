@@ -1,4 +1,5 @@
 // import PropTypes from 'prop-types'
+import { Fragment } from 'react'
 import ReactRouterPropTypes from 'react-router-prop-types'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 
@@ -6,9 +7,18 @@ import withApi from '~/utils/withApi'
 import Header from '~/ui/layout/Header'
 import PageContainer from '~/ui/layout/PageContainer'
 import CollectionGrid from '~/ui/grid/CollectionGrid'
+// import Icon from '~/ui/global/Icon'
+import H1 from '~/ui/global/H1'
+
+const isHomepage = match => match.path === '/'
 
 @withApi({
-  requestPath: ({ match }) => `collections/${match.params.id}`
+  requestPath: ({ match, apiStore }) => {
+    if (isHomepage(match)) {
+      return `collections/${apiStore.currentUser.current_user_collection_id}`
+    }
+    return `collections/${match.params.id}`
+  }
 })
 @observer
 class CollectionPage extends React.Component {
@@ -20,28 +30,37 @@ class CollectionPage extends React.Component {
     }
   }
 
-  collection = () => {
-    const { apiStore } = this.props
+  get isHomepage() {
+    return isHomepage(this.props.match)
+  }
+
+  get collection() {
+    const { match, apiStore } = this.props
     if (!apiStore.collections.length) return null
-    const { id } = this.props.match.params
-    return apiStore.find('collections', id)
+    if (this.isHomepage) {
+      return apiStore.find('collections', apiStore.currentUser.current_user_collection_id)
+    }
+    return apiStore.find('collections', match.params.id)
   }
 
   updateCollection = () => {
     // TODO: what if there's no collection?
     // calling .save() will receive any API updates and sync them
-    this.collection().save()
+    this.collection.save()
   }
 
   render() {
-    const collection = this.collection()
+    const { collection } = this
+    // console.log('thiscollection', this.props.apiStore, collection)
     if (!collection) return <div>Loading</div>
 
     return (
-      <div>
-        <Header />
+      <Fragment>
+        <Header>
+          <H1>{collection.name}</H1>
+          {/* <Icon name="caret" size="8px" /> */}
+        </Header>
         <PageContainer>
-          <h1>Collection: {collection.name}</h1>
           <CollectionGrid
             cols={this.state.cols}
             gridH={200}
@@ -51,7 +70,7 @@ class CollectionPage extends React.Component {
             collection={collection}
           />
         </PageContainer>
-      </div>
+      </Fragment>
     )
   }
 }

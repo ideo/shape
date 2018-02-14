@@ -1,45 +1,36 @@
-import React, { Component } from 'react'
+import React from 'react'
 import { inject, observer } from 'mobx-react'
-import to from 'await-to-js'
 
-const withApi = (options = {}) => (WrappedComponent) => (
+const withApi = ({ requestPath }) => (WrappedComponent) => {
   @inject('apiStore')
   @observer
-  class WithApi extends Component {
-    async componentDidMount() {
-      const { requestPath } = options
-      if (!requestPath) return
-      const { apiStore } = this.props
-      const [err, data] = await to(apiStore.request(requestPath(this.props)))
-      if (data) {
-        apiStore.sync(data)
-      } else if (err) {
-        // console.log('error!', err)
-      }
+  class WithApi extends React.Component {
+    componentDidMount() {
+      // this will get called on initial render
+      this.fetchData(this.props)
     }
 
-    // componentDidMount() {
-    //   // const {
-    //   //   authStore,
-    //   //   routingStore
-    //   // } = this.props
-    //   // if (!authStore.currentUser) {
-    //   //   console.warn('not allowed!', routingStore.location.pathname)
-    //   //   // go back to homepage
-    //   //   routingStore.push('/')
-    //   // } else if (options.onSuccess) {
-    //   //   options.onSuccess()
-    //   // }
-    //   if (options.onSuccess) {
-    //     // options.onSuccess(authStore.currentUser.token)
-    //     options.onSuccess()
-    //   }
-    // }
-    //
+    componentWillReceiveProps(nextProps) {
+      // this will get called if you switch between CollectionPages
+      // (component does not "re-mount" between routes, but the props change)
+      this.fetchData(nextProps)
+    }
+
+    fetchData = (props) => {
+      if (!requestPath) return
+      const { apiStore } = props
+      apiStore.request(requestPath(props))
+        .then(response => apiStore.sync(response))
+        // .catch(err => console.log('error!', err))
+    }
+
     render() {
       return <WrappedComponent {...this.props} />
     }
   }
-)
+  WithApi.Undecorated = WrappedComponent
+
+  return WithApi
+}
 
 export default withApi

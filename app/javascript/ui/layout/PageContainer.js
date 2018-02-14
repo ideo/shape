@@ -1,7 +1,10 @@
 import styled from 'styled-components'
 
+import v from '~/ui/global/variables'
+
 const StyledContainer = styled.main`
-  margin-top: 90px;
+  max-width: 1300px;
+  margin: ${v.headerHeight}px auto 0;
   padding: 0 2rem;
 `
 

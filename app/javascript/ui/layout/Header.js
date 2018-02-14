@@ -1,40 +1,52 @@
 import styled from 'styled-components'
 import { inject, observer } from 'mobx-react'
-import { Link } from 'react-router-dom'
 import { Flex, Box } from 'reflexbox'
 
 import Logo from '~/ui/layout/Logo'
+import PlainLink from '~/ui/global/PlainLink'
 import UserAvatar from '~/ui/layout/UserAvatar'
 
 const StyledHeader = styled.header`
-  z-index: 9999;
+  z-index: 100;
   position: fixed;
   top: 0;
   width: calc(100% - 4rem);
   background: #f2f2f2;
   padding: 1rem 2rem;
 `
-// box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.25);
+
+const MaxWidthContainer = styled.header`
+  max-width: 1340px;
+  margin: 0 auto;
+`
 
 @inject('apiStore')
 @observer
 class Header extends React.Component {
   render() {
-    const { apiStore } = this.props
+    const { apiStore, children } = this.props
     const { currentUser } = apiStore
     return (
       <StyledHeader>
-        <Flex align="center" justify="space-between">
-          <Box>
-            <Link className="text-link" to="/">
-              <Logo />
-            </Link>
-          </Box>
+        <MaxWidthContainer>
 
-          <Box>
-            <UserAvatar user={currentUser} />
-          </Box>
-        </Flex>
+          <Flex align="center" justify="space-between">
+            <Box>
+              <PlainLink to="/">
+                <Logo />
+              </PlainLink>
+            </Box>
+
+            <Box>
+              <UserAvatar user={currentUser} />
+            </Box>
+          </Flex>
+
+          <div>
+            { children }
+          </div>
+
+        </MaxWidthContainer>
       </StyledHeader>
 
     )

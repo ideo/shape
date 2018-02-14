@@ -27,6 +27,8 @@ module.exports = {
     "webpack": true,
     "React":   true,
     "shallow": true,
+    "render": true,
+    "mount": true,
   },
   settings: {
     "import/resolver": {
@@ -60,6 +62,7 @@ module.exports = {
     "react/prefer-stateless-function": 0,
     "react/jsx-curly-brace-presence": 0,
     "react/jsx-closing-tag-location": 0,
+    "react/no-did-mount-set-state": 0,
     // react/no-typos disabled until this is resolved:
     // https://github.com/yannickcr/eslint-plugin-react/issues/1389
     "react/no-typos": 0,

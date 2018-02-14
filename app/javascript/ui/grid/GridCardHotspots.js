@@ -43,8 +43,9 @@ const Hotspot = (props) => (
 
 class GridCardHotspots extends React.PureComponent {
   render() {
+    const { card } = this.props
     return (
-      <Hotspot {...this.props} />
+      <Hotspot order={card.order} />
     )
   }
 }

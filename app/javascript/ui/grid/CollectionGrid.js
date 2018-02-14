@@ -30,6 +30,10 @@ class CollectionGrid extends React.Component {
     this.positionCards(nextProps.collection.collection_cards)
   }
 
+  // componentWillUpdate(nextProps, nextState, nextContext) {
+  //   console.log(nextProps, nextState, nextContext)
+  // }
+
   // --------------------------
   // <Drag related functions>
   // --------------------------

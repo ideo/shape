@@ -3,6 +3,7 @@ import { FormattedMessage } from 'react-intl'
 
 const StyledLogo = styled.div`
   font-size: 0.75rem;
+  letter-spacing: 0.5px;
   font-family: 'Gotham';
   text-transform: uppercase;
 `

@@ -1,4 +1,5 @@
 import styled from 'styled-components'
+import { Link } from 'react-router-dom'
 
 import GridCardHotspots from '~/ui/grid/GridCardHotspots'
 import DragHandle from '~/ui/grid/DragHandle'
@@ -26,17 +27,40 @@ const StyledGridCardInner = styled.div`
 `
 
 class GridCard extends React.PureComponent {
-  render() {
-    const { card, record } = this.props
+  get isItem() {
+    return this.props.cardType === 'items'
+  }
+  get isCollection() {
+    return this.props.cardType === 'collections'
+  }
 
+  get inner() {
+    const { card, record } = this.props
+    if (this.isItem) {
+      return (
+        <div>
+          {record.name} {card.order}
+        </div>
+      )
+    } else if (this.isCollection) {
+      return (
+        <Link to={`/collections/${record.id}`}>
+          {record.name} {card.order}
+        </Link>
+      )
+    }
+    return <div />
+  }
+
+  render() {
     return (
       <StyledGridCard className={this.props.className}>
-        <GridCardHotspots {...this.props} />
+        <GridCardHotspots card={this.props.card} />
 
         <DragHandle />
 
         <StyledGridCardInner>
-          { record.name } { card.order }
+          {this.inner}
         </StyledGridCardInner>
       </StyledGridCard>
     )

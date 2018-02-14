@@ -2,6 +2,7 @@ import Style from 'style-it'
 import FlipMove from 'react-flip-move'
 import Draggable from 'react-draggable'
 
+import v from '~/ui/global/variables'
 import GridCard from '~/ui/grid/GridCard'
 import GridCardPlaceholder from '~/ui/grid/GridCardPlaceholder'
 
@@ -22,7 +23,7 @@ class DraggableGridCard extends React.PureComponent {
     // compensate for offset of container (e.g. padding)
     const offset = {
       left: 0,
-      top: 80,
+      top: v.headerHeight,
     }
     const dragPosition = {
       // use position of mouseX / Y
@@ -117,7 +118,7 @@ class DraggableGridCard extends React.PureComponent {
                 {
                   placeholder
                     ? <GridCardPlaceholder />
-                    : <GridCard card={card} record={record} />
+                    : <GridCard {...this.props} />
                 }
               </div>
             </Style>
