@@ -9,7 +9,7 @@ import PageContainer from '~/ui/layout/PageContainer'
 import CollectionGrid from '~/ui/grid/CollectionGrid'
 
 // @withApi({
-//   requestPath: ({ match }) => '/collections/me'
+//   requestPath: ({ match }) => 'collections/me'
 // })
 @inject('apiStore')
 @observer
@@ -25,7 +25,7 @@ class HomePage extends React.Component {
 
   async componentDidMount() {
     const { apiStore } = this.props
-    const [err, response] = await to(apiStore.request('/collections/me'))
+    const [err, response] = await to(apiStore.request('collections/me'))
     if (response) {
       apiStore.sync(response)
       this.setState({ myCollectionId: response.data.id })

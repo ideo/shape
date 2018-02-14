@@ -6,13 +6,6 @@ const withApi = (options = {}) => (WrappedComponent) => (
   @inject('apiStore')
   @observer
   class WithApi extends Component {
-    constructor(props) {
-      super(props)
-      this.state = {
-        collectionId: 1,
-      }
-    }
-
     async componentDidMount() {
       const { requestPath } = options
       if (!requestPath) return
@@ -20,7 +13,6 @@ const withApi = (options = {}) => (WrappedComponent) => (
       const [err, data] = await to(apiStore.request(requestPath(this.props)))
       if (data) {
         apiStore.sync(data)
-        this.setState({ collectionId: data.data.id })
       } else if (err) {
         // console.log('error!', err)
       }
@@ -45,8 +37,7 @@ const withApi = (options = {}) => (WrappedComponent) => (
     // }
     //
     render() {
-      console.log(this.state.collectionId)
-      return <WrappedComponent {...this.props} collectionId={this.state.collectionId} />
+      return <WrappedComponent {...this.props} />
     }
   }
 )

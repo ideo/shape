@@ -8,7 +8,7 @@ import Collection from './Collection'
 import Item from './Item'
 import CollectionCard from './CollectionCard'
 
-jsonApiConfig.baseUrl = '/api/v1'
+jsonApiConfig.baseUrl = '/api/v1/'
 // modify fetch to include 'same-origin' credentials
 jsonApiConfig.fetchReference = (url, opts) => {
   opts.credentials = 'same-origin'

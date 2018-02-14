@@ -8,7 +8,7 @@ import PageContainer from '~/ui/layout/PageContainer'
 import CollectionGrid from '~/ui/grid/CollectionGrid'
 
 @withApi({
-  requestPath: ({ match }) => `/collections/${match.params.id}`
+  requestPath: ({ match }) => `collections/${match.params.id}`
 })
 @observer
 class CollectionPage extends React.Component {
