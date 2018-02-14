@@ -4,9 +4,6 @@ import Draggable from 'react-draggable'
 
 import GridCard from '~/ui/grid/GridCard'
 import GridCardPlaceholder from '~/ui/grid/GridCardPlaceholder'
-// import GridCardItem from '~/ui/grid/GridCardItem'
-// import GridCardCollection from '~/ui/grid/GridCardCollection'
-// import GridItemBlank from '~/ui/grid/GridItemBlank'
 
 class DraggableGridCard extends React.PureComponent {
   state = {
@@ -54,20 +51,7 @@ class DraggableGridCard extends React.PureComponent {
       position
     } = this.props
 
-    // GridItem setup
-    // const itemProps = { ...this.props }
-    // let GridCard = () => <div />
     const placeholder = cardType === 'placeholder'
-    // const blank = cardType === 'blank'
-    // if (cardType === 'items') {
-    //   GridCard = GridCardItem
-    // } else if (cardType === 'collections') {
-    //   GridCard = GridCardCollection
-    // } else if (placeholder) {
-    //   GridCard = Placeholder
-    // } else if (blank) {
-    //   GridCard = GridItemBlank
-    // }
 
     const {
       yPos
