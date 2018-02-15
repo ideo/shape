@@ -19,6 +19,6 @@ class Users::OmniauthCallbacksController < Devise::OmniauthCallbacksController
     return if user.current_organization_id.present?
 
     org = Organization.first
-    user.add_role(:member, org.primary_group)
+    user.add_role(Role::MEMBER, org.primary_group)
   end
 end

@@ -38,11 +38,11 @@ describe Collection::SharedWithMeCollection, type: :model do
 
       before do
         collections.each do |collection|
-          user.add_role(:viewer, collection)
+          user.add_role(Role::VIEWER, collection)
         end
 
         items.each do |item|
-          user.add_role(:viewer, item.becomes(Item))
+          user.add_role(Role::VIEWER, item.becomes(Item))
         end
       end
 
@@ -67,7 +67,7 @@ describe Collection::SharedWithMeCollection, type: :model do
       # TODO: need to add this logic
       pending 'should not return any items from other orgs' do
         coll = create(:collection, organization: org_2)
-        user.add_role(:viewer, coll)
+        user.add_role(Role::VIEWER, coll)
 
         expect(
           shared_with_me_collection

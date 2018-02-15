@@ -10,7 +10,7 @@ class Collection
 
       return collection if collection.new_record?
 
-      user.add_role(:editor, collection.becomes(Collection))
+      user.add_role(Role::EDITOR, collection.becomes(Collection))
 
       Collection::SharedWithMeCollection.find_or_create_for_collection(collection)
 

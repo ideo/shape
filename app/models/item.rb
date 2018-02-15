@@ -1,4 +1,5 @@
 class Item < ApplicationRecord
+  include Breadcrumbable
   resourcify
 
   # The primary collection that 'owns' this item
@@ -9,15 +10,15 @@ class Item < ApplicationRecord
   # All collection cards this is linked to
   has_many :collection_cards, -> { reference }
 
-  delegate :collection, to: :parent_collection_card
+  delegate :parent, to: :parent_collection_card, allow_nil: true
 
   validates :type, presence: true
 
   def editors
-    User.with_role(:editor, self)
+    User.with_role(Role::EDITOR, self)
   end
 
   def viewers
-    User.with_role(:viewer, self)
+    User.with_role(Role::VIEWER, self)
   end
 end
