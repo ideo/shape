@@ -21,7 +21,7 @@ module Breadcrumbable
   end
 
   def breadcrumb_for_user(user)
-    content_can = Permissions::ContentCan.new(user)
+    content_can = Permissions::UserCan.new(user)
     can_view = false
 
     breadcrumb.select do |breadcrumb_item|

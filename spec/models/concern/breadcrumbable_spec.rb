@@ -56,8 +56,6 @@ describe Item, type: :model do
     context 'with full access to parents' do
       before do
         user.add_role(Role::VIEWER, collection)
-        item.reset_breadcrumb!
-        item.save
       end
 
       it 'should return full breadcrumb' do
@@ -72,8 +70,6 @@ describe Item, type: :model do
     context 'with access to only direct ancestor' do
       before do
         user.add_role(Role::VIEWER, subcollection)
-        item.reset_breadcrumb!
-        item.save
       end
 
       it 'should return breadcrumb with direct ancestor and item' do
@@ -87,8 +83,6 @@ describe Item, type: :model do
     context 'with access only to item' do
       before do
         user.add_role(Role::VIEWER, item.becomes(Item))
-        item.reset_breadcrumb!
-        item.save
       end
 
       it 'should return breadcrumb with only item' do
