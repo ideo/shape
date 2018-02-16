@@ -20,7 +20,9 @@ module Breadcrumbable
     end
   end
 
-  def breadcrumb_for_user(user)
+  def breadcrumb_for_user(user = nil)
+    return if user.blank? || breadcrumb.nil?
+
     content_can = Permissions::UserCan.new(user)
     can_view = false
 
@@ -39,8 +41,10 @@ module Breadcrumbable
     [ Role.object_identifier(self), breadcrumb_title ]
   end
 
-  def reset_breadcrumb!
+  def recalculate_breadcrumb!
     self.breadcrumb = nil
+    calculate_breadcrumb
+    save
   end
 
   private

@@ -45,8 +45,7 @@ describe Item, type: :model do
       collection.collection_cards.create!(
         collection: subcollection
       )
-      item.reset_breadcrumb!
-      item.save
+      item.recalculate_breadcrumb!
     end
 
     it 'with no access, should return empty breadcrumb' do

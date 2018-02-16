@@ -13,6 +13,13 @@ class Api::V1::BaseController < ApplicationController
     )
   end
 
+  # See all configuration options in the jsonapi-rb-rails gem
+  def jsonapi_expose
+    {
+      current_user: current_user
+    }
+  end
+
   private
 
   def current_organization

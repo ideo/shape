@@ -3,7 +3,8 @@
   "properties": {
     "id": { "type": "integer" },
     "name": { "type": "string" },
-    "created_at": { "type": "date" }
+    "created_at": { "type": "date" },
+    "breadcrumb": { "type": ["array", "null"] }
   },
   "required": ["id", "name", "created_at"]
 }
