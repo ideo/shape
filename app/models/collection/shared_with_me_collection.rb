@@ -22,6 +22,10 @@ class Collection
       false
     end
 
+    def read_only?
+      true
+    end
+
     def name
       'Shared with Me'
     end
