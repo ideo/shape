@@ -37,6 +37,9 @@ beforeEach(() => {
     gutter: 10,
     updateCollection: jest.fn(),
 
+    uiStore: {
+      blankContentToolState: null
+    },
     routingStore: {
       push: jest.fn()
     }
@@ -49,8 +52,8 @@ beforeEach(() => {
 describe('CollectionGrid', () => {
   it('renders the Grid with draggable collection cards', () => {
     expect(wrapper.find('.Grid').exists()).toBe(true)
-    expect(wrapper.find('DraggableGridCard').at(0).props().cardType).toBe('items')
-    expect(wrapper.find('DraggableGridCard').at(0).props().record).toBe(fakeAttrs)
-    expect(wrapper.find('DraggableGridCard').length).toBe(3)
+    expect(wrapper.find('MovableGridCard').at(0).props().cardType).toBe('items')
+    expect(wrapper.find('MovableGridCard').at(0).props().record).toBe(fakeAttrs)
+    expect(wrapper.find('MovableGridCard').length).toBe(3)
   })
 })

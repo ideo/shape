@@ -1,31 +1,29 @@
 import PropTypes from 'prop-types'
 import { PropTypes as MobxPropTypes } from 'mobx-react'
-import Style from 'style-it'
 import FlipMove from 'react-flip-move'
 import Draggable from 'react-draggable'
 import ReactHoverObserver from 'react-hover-observer'
 
 import v from '~/utils/variables'
 import propShapes from '~/utils/propShapes'
+import PositionedGridCard from '~/ui/grid/PositionedGridCard'
 import GridCard from '~/ui/grid/GridCard'
 import GridCardPlaceholder from '~/ui/grid/GridCardPlaceholder'
+import GridCardBlank from '~/ui/grid/GridCardBlank'
 
-class DraggableGridCard extends React.PureComponent {
+class MovableGridCard extends React.PureComponent {
   state = {
     timeoutId: null,
     // this is really just used so that it will reset when you finish dragging
     position: { x: 0, y: 0 },
     dragging: false,
+    dragComplete: true,
     zIndex: 1,
     // track where on the page the mouse position is, e.g. if browser is stretched wide
     initialOffsetX: 0,
     initialOffsetY: 0,
     target: null
   }
-
-  // componentWillReceiveProps(nextProps) {
-  //   console.log(nextProps)
-  // }
 
   componentWillUnmount() {
     this.clearDragTimeout()
@@ -57,6 +55,7 @@ class DraggableGridCard extends React.PureComponent {
     }
     this.setState({
       dragging: true,
+      dragComplete: false,
       zIndex: 1000,
     })
     const dragPosition = {
@@ -76,11 +75,9 @@ class DraggableGridCard extends React.PureComponent {
       this.setState({ dragging: false })
       const timeoutId = setTimeout(() => {
         // have this item remain "on top" while it animates back
-        this.setState({ zIndex: 1 })
+        this.setState({ zIndex: 1, dragComplete: true })
       }, 350)
       this.setState({ timeoutId })
-    } else {
-      this.handleClick()
     }
   }
 
@@ -108,7 +105,8 @@ class DraggableGridCard extends React.PureComponent {
       position
     } = this.props
 
-    const placeholder = cardType === 'placeholder'
+    const isPlaceholder = cardType === 'placeholder'
+    const isBlank = cardType === 'blank'
 
     const {
       xPos,
@@ -125,7 +123,8 @@ class DraggableGridCard extends React.PureComponent {
     if (dragging) {
       // transition = 'width 0.3s, height 0.3s, opacity 0.5s ease-out 0.2s;'
       opacity = 0.9
-      // arbitrary -- shrink wide and tall cards
+      // experiment -- shrink wide and tall cards
+      // NOTE: turned off, was causing other issues about card placement
       // if (width > 500) {
       //   if (this.state.initialOffsetX > 200) {
       //     xPos += this.state.initialOffsetX * 0.5
@@ -136,25 +135,38 @@ class DraggableGridCard extends React.PureComponent {
       //   if (this.state.initialOffsetY > 200) {
       //     yPos += this.state.initialOffsetY * 0.5
       //   }
-      //   height *= 0.7
+      //   height *= 0.6
       // }
       rotation = '3deg'
     }
-    if (placeholder) {
+    if (isPlaceholder) {
       zIndex = 0
       // transition = 'none'
       rotation = '0deg'
     }
     let outline = ''
     if (card.hoveringOver) {
-      outline = `outline: 1px dashed ${v.colors.teal};`
+      outline = `outline: 3px dashed ${v.colors.teal};`
     }
 
     const cardProps = {
       card,
       cardType,
       record,
-      dragging,
+      // we want to track "dragging" until the transition is complete
+      // also so that click handler doesn't register while dragging
+      dragging: !this.state.dragComplete,
+      handleClick: this.handleClick,
+    }
+    const styleProps = {
+      width,
+      height,
+      xPos,
+      yPos,
+      rotation,
+      transition,
+      opacity,
+      outline,
     }
 
     const bounds = {
@@ -165,18 +177,43 @@ class DraggableGridCard extends React.PureComponent {
 
     const z = zIndex
 
+    if (isPlaceholder) {
+      return (
+        <PositionedGridCard {...styleProps}>
+          <GridCardPlaceholder />
+        </PositionedGridCard>
+      )
+    } else if (isBlank) {
+      styleProps.transition = 'none'
+      /*
+        NOTE: FlipMove doesn't work that well because of our transform/positioned elements,
+        It always thinks the element is animating from 0,0 on the screen...
+      */
+      return (
+        <FlipMove
+          appearAnimation="accordionHorizontal"
+        >
+          <div>
+            <PositionedGridCard {...styleProps}>
+              <GridCardBlank />
+            </PositionedGridCard>
+          </div>
+        </FlipMove>
+      )
+    }
+
     return (
       <ReactHoverObserver>
         {/* this isHovering wrapper is so that the Hotspots have max zIndex when you hover */}
         {({ isHovering }) => (
           <div
             style={{
-              zIndex: ((isHovering || dragging) && !placeholder) ? (z * 2) : z,
+              zIndex: ((isHovering || dragging) && !isPlaceholder) ? (z * 2) : z,
               position: 'relative'
             }}
           >
             <FlipMove
-              appearAnimation={placeholder ? null : 'elevator'}
+              appearAnimation={isPlaceholder ? null : 'elevator'}
               typeName={null}
             >
               <Draggable
@@ -186,32 +223,14 @@ class DraggableGridCard extends React.PureComponent {
                 onStop={this.handleStop}
                 position={this.state.position}
               >
+                {/*
+                  intermediary div is necessary so that we can apply our own transforms
+                  and not be overridden by Draggable
+                */}
                 <div>
-                  {/*
-                    intermediary div is necessary so that we can apply our own transforms
-                    and not be overridden by Draggable
-                  */}
-                  <Style>
-                    {`
-                      .PositionedDiv {
-                          position: absolute;
-                          width: ${width}px;
-                          height: ${height}px;
-                          transform: translate(${xPos}px, ${yPos}px) rotate(${rotation});
-                          transform: translate3d(${xPos}px, ${yPos}px, 0) rotate(${rotation});
-                          transition: ${transition};
-                          opacity: ${opacity};
-                          ${outline}
-                        }
-                    `}
-                    <div className="PositionedDiv">
-                      {
-                        placeholder
-                          ? <GridCardPlaceholder />
-                          : <GridCard {...cardProps} />
-                      }
-                    </div>
-                  </Style>
+                  <PositionedGridCard {...styleProps}>
+                    <GridCard {...cardProps} />
+                  </PositionedGridCard>
                 </div>
               </Draggable>
 
@@ -223,7 +242,7 @@ class DraggableGridCard extends React.PureComponent {
   }
 }
 
-DraggableGridCard.propTypes = {
+MovableGridCard.propTypes = {
   card: MobxPropTypes.objectOrObservableObject.isRequired,
   cardType: PropTypes.string.isRequired,
   position: PropTypes.shape(propShapes.position).isRequired,
@@ -233,4 +252,4 @@ DraggableGridCard.propTypes = {
   routeTo: PropTypes.func.isRequired,
 }
 
-export default DraggableGridCard
+export default MovableGridCard

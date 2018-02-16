@@ -6,7 +6,7 @@ const collections = [
   { id: 1, name: 'My Workspace X', breadcrumb: [] }
 ]
 const collection = collections[0]
-let wrapper, match, apiStore
+let wrapper, match, apiStore, uiStore
 let props
 
 beforeEach(() => {
@@ -15,7 +15,10 @@ beforeEach(() => {
     findResult: collection
   })
   apiStore.collections = collections
-  props = { apiStore, match }
+  uiStore = {
+    blankContentToolState: null
+  }
+  props = { apiStore, uiStore, match }
 })
 
 describe('CollectionPage', () => {

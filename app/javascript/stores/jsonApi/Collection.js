@@ -27,4 +27,9 @@ class Collection extends BaseRecord {
 }
 Collection.type = 'collections'
 
+Collection.defaults = {
+  // set as array so it's never `undefined`
+  collection_cards: []
+}
+
 export default Collection

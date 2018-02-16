@@ -11,7 +11,7 @@ export const StyledGridCard = styled.div`
   width: 100%;
   background: white;
   padding: 0;
-  cursor: ${props => (props.dragging ? 'move' : 'pointer')};
+  cursor: ${props => (props.dragging ? 'grabbing' : 'pointer')};
 `
 
 const StyledGridCardInner = styled.div`
@@ -47,11 +47,17 @@ class GridCard extends React.PureComponent {
     return <div />
   }
 
+  handleClick = () => {
+    if (this.props.dragging) return
+    this.props.handleClick()
+  }
+
   render() {
     return (
       <StyledGridCard dragging={this.props.dragging}>
         <GridCardHotspot card={this.props.card} dragging={this.props.dragging} />
-        <StyledGridCardInner>
+        {/* onClick placed here so it's separate from hotspot click */}
+        <StyledGridCardInner onClick={this.handleClick}>
           {this.inner}
         </StyledGridCardInner>
       </StyledGridCard>
@@ -64,6 +70,7 @@ GridCard.propTypes = {
   cardType: PropTypes.string.isRequired,
   record: MobxPropTypes.objectOrObservableObject.isRequired,
   dragging: PropTypes.bool.isRequired,
+  handleClick: PropTypes.func.isRequired,
 }
 
 export default GridCard
