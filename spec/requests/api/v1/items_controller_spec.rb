@@ -35,8 +35,8 @@ describe Api::V1::ItemsController, type: :request, auth: true do
         user.add_role(Role::VIEWER, collection)
         get(path)
         expect(json['data']['attributes']['breadcrumb']).to match_array([
-          [Role.object_identifier(collection), collection.name],
-          [Role.object_identifier(item), item.name]
+          ['collections', collection.id, collection.name],
+          ['items', item.id, item.name]
         ])
       end
     end

@@ -21,4 +21,8 @@ class Item < ApplicationRecord
   def viewers
     User.with_role(Role::VIEWER, self)
   end
+
+  def breadcrumb_title
+    name
+  end
 end

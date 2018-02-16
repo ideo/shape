@@ -4,6 +4,9 @@ class SerializableCollection < BaseJsonSerializer
   belongs_to :organization
   has_many :collection_cards
   attribute :breadcrumb do
-    @object.breadcrumb_for_user(@current_user)
+    Breadcrumb::ForUser.new(
+      @object.breadcrumb,
+      @current_user,
+    ).call
   end
 end

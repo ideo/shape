@@ -48,6 +48,10 @@ class Collection < ApplicationRecord
     User.with_role(Role::VIEWER, becomes(Collection))
   end
 
+  def breadcrumb_title
+    name
+  end
+
   private
 
   def organization_blank?

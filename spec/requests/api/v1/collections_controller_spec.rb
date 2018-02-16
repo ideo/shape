@@ -47,7 +47,7 @@ describe Api::V1::CollectionsController, type: :request, auth: true do
       collection.recalculate_breadcrumb!
       get(path)
       expect(json['data']['attributes']['breadcrumb']).to match_array([
-        [Role.object_identifier(collection), collection.name]
+        ['collections', collection.id, collection.name]
       ])
     end
 
