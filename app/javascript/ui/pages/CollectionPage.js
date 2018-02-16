@@ -10,6 +10,7 @@ import PageContainer from '~/ui/layout/PageContainer'
 import CollectionGrid from '~/ui/grid/CollectionGrid'
 // import Icon from '~/ui/global/Icon'
 import H1 from '~/ui/global/H1'
+import Breadcrumb from '~/ui/layout/Breadcrumb'
 
 const isHomepage = match => match.path === '/'
 
@@ -60,6 +61,9 @@ class CollectionPage extends React.Component {
         <Header>
           <H1>{collection.name}</H1>
           {/* <Icon name="caret" size="8px" /> */}
+          <Breadcrumb
+            items={collection.breadcrumb}
+          />
         </Header>
         <PageContainer>
           <CollectionGrid
