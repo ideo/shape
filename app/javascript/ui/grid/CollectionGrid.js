@@ -1,8 +1,8 @@
-// import { Meteor } from 'meteor/meteor'
-import React, { Component } from 'react'
-import { observer } from 'mobx-react'
+import PropTypes from 'prop-types'
+import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import _ from 'lodash'
 
+import Loader from '~/ui/layout/Loader'
 import DraggableGridCard from '~/ui/grid/DraggableGridCard'
 
 const calculateDistance = (pos1, pos2) => {
@@ -14,13 +14,17 @@ const calculateDistance = (pos1, pos2) => {
 
 // needs to be an observer to observe changes to the collection + items
 @observer
-class CollectionGrid extends Component {
+class CollectionGrid extends React.Component {
   constructor(props) {
     super(props)
     this.state = {
       cards: [],
       timeoutId: null
     }
+  }
+
+  componentDidMount() {
+    this.positionCards(this.props.collection.collection_cards)
   }
 
   componentWillReceiveProps(nextProps) {
@@ -85,7 +89,7 @@ class CollectionGrid extends Component {
       // stateCards = _.reject(stateCards, { cardType: 'placeholder' })
 
       this.props.collection.reorderCards()
-      this.saveCollectionUpdates()
+      this.props.updateCollection()
       this.positionCards(this.props.collection.collection_cards)
 
       // // cardId stores the original cardId not the placeholderKey
@@ -149,14 +153,14 @@ class CollectionGrid extends Component {
   // </end Drag related functions>
   // --------------------------
 
-  saveCollectionUpdates = () => {
-    const { collection } = this.props
-    collection.save()
-    // do we have to do any kind of "sync" here?
-    // presumably we already have the proper data in store...
-  }
+  // saveCollectionUpdates = () => {
+  //   const { collection } = this.props
+  //   collection.save()
+  //   // do we have to do any kind of "sync" here?
+  //   // presumably we already have the proper data in store...
+  // }
 
-  positionCards = (cards, opts = {}) => {
+  positionCards = (cards = [], opts = {}) => {
     const {
       gridW,
       gridH,
@@ -177,8 +181,8 @@ class CollectionGrid extends Component {
 
       let position = {}
       let filled = false
-      // TODO: remove row < 100 constraint, was just to prevent bad looping
-      while (!filled && row < 100) {
+      // find an open row that can fit the current card
+      while (!filled) {
         let itFits = false
         let gap = 0
         let nextX = 0
@@ -220,7 +224,7 @@ class CollectionGrid extends Component {
           }
 
           // NOTE: if you remove this check, then it will fill things in
-          // slightly out of order to "fill empty gaps"
+          // slightly out of order to "fill empty gaps" at the end of the row
           if (nextX + card.w === cols) {
             row += 1
             if (!matrix[row]) matrix.push(_.fill(Array(cols), null))
@@ -261,8 +265,8 @@ class CollectionGrid extends Component {
           record={record}
           onDrag={this.onDrag}
           onDragStop={this.onDragStop}
-          onHotspotHover={this.onHotspotHover}
-          add={this.props.add}
+          // onHotspotHover={this.onHotspotHover}
+          // add={this.props.add}
         />
       )
     })
@@ -270,12 +274,23 @@ class CollectionGrid extends Component {
   }
 
   render() {
+    if (!this.state.cards.length) return <Loader />
+
     return (
       <div className="Grid">
         { this.renderPositionedCards() }
       </div>
     )
   }
+}
+
+CollectionGrid.propTypes = {
+  cols: PropTypes.number.isRequired,
+  gridH: PropTypes.number.isRequired,
+  gridW: PropTypes.number.isRequired,
+  gutter: PropTypes.number.isRequired,
+  updateCollection: PropTypes.func.isRequired,
+  collection: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 
 export default CollectionGrid

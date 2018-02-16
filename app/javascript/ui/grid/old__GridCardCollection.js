@@ -1,4 +1,3 @@
-import React from 'react'
 // import PropTypes from 'prop-types'
 // import _ from 'lodash'
 // import Button from 'material-ui/Button'
@@ -10,9 +9,9 @@ import React from 'react'
 // import Shapes from '~/utils/Shapes'
 import GridCardHotspots from '~/ui/grid/GridCardHotspots'
 
-class GridCardItem extends React.PureComponent {
+class GridCardCollection extends React.PureComponent {
   render() {
-    const { card, record } = this.props
+    const { record } = this.props
     // const classNames = atom.imageUrl ? 'GridItem with-image' : 'GridItem'
     // const atomStyle = {}
     // if (atom.imageUrl) {
@@ -27,14 +26,15 @@ class GridCardItem extends React.PureComponent {
         {/* {this.controls()} */}
 
         <div className="GridItem__inner">
-          { record.name } { card.order }
+          (subcollection) <br />
+          { record.name }
         </div>
       </div>
     )
   }
 }
 
-// GridCardItem.propTypes = {
+// GridCardCollection.propTypes = {
 //   atom: PropTypes.shape(Shapes.ATOM).isRequired,
 //   parentId: PropTypes.string.isRequired,
 //   order: PropTypes.number,
@@ -45,9 +45,9 @@ class GridCardItem extends React.PureComponent {
 //   // connectDragSource: PropTypes.func.isRequired,
 // }
 //
-// GridCardItem.defaultProps = {
+// GridCardCollection.defaultProps = {
 //   pinned: false,
 //   order: 99999
 // }
 
-export default GridCardItem
+export default GridCardCollection

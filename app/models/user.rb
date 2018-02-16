@@ -15,7 +15,7 @@ class User < ApplicationRecord
            source: :resource,
            source_type: 'Group'
   has_many :organizations, through: :groups
-  has_many :users_roles, dependent: :destroy
+  has_many :users_roles
   belongs_to :current_organization,
              class_name: 'Organization',
              optional: true

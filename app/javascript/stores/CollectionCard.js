@@ -1,7 +1,7 @@
 import BaseRecord from './BaseRecord'
 
 class CollectionCard extends BaseRecord {
-  record = () => {
+  record() {
     if (this.item) {
       return this.item
     } else if (this.collection) {

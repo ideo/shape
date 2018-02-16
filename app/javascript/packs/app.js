@@ -1,30 +1,28 @@
 /* eslint global-require: 0 */
-import React from 'react'
 import ReactDOM from 'react-dom'
 import createBrowserHistory from 'history/createBrowserHistory'
 import { useStrict } from 'mobx'
 import { Provider } from 'mobx-react'
 import { syncHistoryWithStore } from 'mobx-react-router'
+import { MobxIntlProvider } from 'mobx-react-intl'
 
-import Routes from '~/config/Routes'
-import stores, { routingStore } from '~/stores/index'
-
-// TODO: refactor?
-import '~/styles/grid_tmp.scss'
+import Routes from '~/ui/Routes'
+import stores, { routingStore } from '~/stores'
 
 // Enable MobX Strict functionality -- requires explicit @actions
 useStrict(true)
 
 const browserHistory = createBrowserHistory()
-
 const history = syncHistoryWithStore(browserHistory, routingStore)
 
 if (module.hot) {
-  module.hot.accept('../config/Routes', () => {
-    const HotRoutes = require('../config/Routes').default
+  module.hot.accept('../ui/Routes', () => {
+    const HotRoutes = require('../ui/Routes').default
     ReactDOM.render(
       <Provider {...stores}>
-        <HotRoutes history={history} />
+        <MobxIntlProvider>
+          <HotRoutes history={history} />
+        </MobxIntlProvider>
       </Provider>,
       document.getElementById('react-root')
     )
@@ -33,7 +31,9 @@ if (module.hot) {
 
 ReactDOM.render(
   <Provider {...stores}>
-    <Routes history={history} />
+    <MobxIntlProvider>
+      <Routes history={history} />
+    </MobxIntlProvider>
   </Provider>,
   document.getElementById('react-root')
 )

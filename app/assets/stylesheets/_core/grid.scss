@@ -1,0 +1,11 @@
+.Grid {
+  position: relative;
+
+  .react-draggable-dragged:not(.react-draggable-dragging) {
+    // this is to transition the draggable back to its original spot when you let go
+    transition: all 0.5s;
+  }
+  .react-draggable-dragging .GridCard {
+    box-shadow: 1px 1px 5px 2px rgba(0, 0, 0, 0.25);
+  }
+}

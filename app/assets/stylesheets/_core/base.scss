@@ -1,0 +1,12 @@
+body {
+  background: #f2f2f2;
+  // mainly for grid, so that you can't drag off to the right forever
+  overflow-x: hidden;
+}
+
+a {
+  &.text-link {
+    color: inherit;
+    text-decoration: none;
+  }
+}
