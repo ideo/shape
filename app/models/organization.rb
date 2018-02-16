@@ -23,7 +23,7 @@ class Organization < ApplicationRecord
       user.update_attributes(current_organization: self)
     end
 
-    Collection::UserCollection.find_or_find_or_create_for_user(user, self)
+    Collection::UserCollection.find_or_create_for_user(user, self)
   end
 
   # Note: this method can be called many times for the same org

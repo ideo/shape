@@ -1,11 +1,13 @@
-import React from 'react'
+import PropTypes from 'prop-types'
+import { PropTypes as MobxPropTypes } from 'mobx-react'
 import Style from 'style-it'
 import FlipMove from 'react-flip-move'
 import Draggable from 'react-draggable'
 
-import GridCardItem from '~/ui/grid/GridCardItem'
-import GridCardCollection from '~/ui/grid/GridCardCollection'
-import GridItemBlank from '~/ui/grid/GridItemBlank'
+import v from '~/utils/variables'
+import propShapes from '~/utils/propShapes'
+import GridCard from '~/ui/grid/GridCard'
+import GridCardPlaceholder from '~/ui/grid/GridCardPlaceholder'
 
 class DraggableGridCard extends React.PureComponent {
   state = {
@@ -24,7 +26,7 @@ class DraggableGridCard extends React.PureComponent {
     // compensate for offset of container (e.g. padding)
     const offset = {
       left: 0,
-      top: 80,
+      top: v.headerHeight,
     }
     const dragPosition = {
       // use position of mouseX / Y
@@ -53,21 +55,14 @@ class DraggableGridCard extends React.PureComponent {
       position
     } = this.props
 
-    // GridItem setup
-    // const itemProps = { ...this.props }
-    let GridCard = () => <div />
-    const placeholder = cardType === 'placeholder'
-    const blank = cardType === 'blank'
-    if (cardType === 'items') {
-      GridCard = GridCardItem
-    } else if (cardType === 'collections') {
-      GridCard = GridCardCollection
-    } else if (placeholder) {
-      GridCard = () => <div />
-    } else if (blank) {
-      GridCard = GridItemBlank
+    const cardProps = {
+      card,
+      cardType,
+      record,
     }
-    //
+
+    const placeholder = cardType === 'placeholder'
+
     const {
       yPos
     } = position
@@ -119,6 +114,7 @@ class DraggableGridCard extends React.PureComponent {
             <Style>
               {`
                 .PositionedDiv {
+                    position: absolute;
                     width: ${width}px;
                     height: ${height}px;
                     transform: translate(${xPos}px, ${yPos}px) rotate(${rotation});
@@ -127,8 +123,12 @@ class DraggableGridCard extends React.PureComponent {
                     opacity: ${opacity};
                   }
               `}
-              <div className={`GridCard PositionedDiv ${placeholder ? 'placeholder' : ''}`}>
-                <GridCard card={card} record={record} />
+              <div className="PositionedDiv">
+                {
+                  placeholder
+                    ? <GridCardPlaceholder />
+                    : <GridCard {...cardProps} />
+                }
               </div>
             </Style>
           </div>
@@ -137,6 +137,16 @@ class DraggableGridCard extends React.PureComponent {
       </FlipMove>
     )
   }
+}
+
+DraggableGridCard.propTypes = {
+  card: MobxPropTypes.objectOrObservableObject.isRequired,
+  cardType: PropTypes.string.isRequired,
+  position: PropTypes.shape(propShapes.position).isRequired,
+  record: MobxPropTypes.objectOrObservableObject.isRequired,
+  onDrag: PropTypes.func.isRequired,
+  onDragStop: PropTypes.func.isRequired,
+  // onHotspotHover: PropTypes.func.isRequired,
 }
 
 export default DraggableGridCard

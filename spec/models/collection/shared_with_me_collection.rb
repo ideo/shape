@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 describe Collection::SharedWithMeCollection, type: :model do
-  describe '.find_or_create_for_user' do
+  describe '.find_or_create_for_collection' do
     let(:parent_collection) { create(:collection) }
     let(:shared_with_me_collection) {
       Collection::SharedWithMeCollection.find_or_create_for_collection(parent_collection)
@@ -62,6 +62,12 @@ describe Collection::SharedWithMeCollection, type: :model do
           .map(&:item)
           .compact
         ).to match_array(items)
+      end
+
+      it 'should not allow dynamic cards to be saved' do
+        card = shared_with_me_collection.collection_cards.first
+        expect(card.save).to be false
+        expect(card.errors[:parent]).to include("is read-only so you can't save this card")
       end
 
       # TODO: need to add this logic

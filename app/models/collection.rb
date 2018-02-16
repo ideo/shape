@@ -36,6 +36,10 @@ class Collection < ApplicationRecord
     true
   end
 
+  def read_only?
+    false
+  end
+
   def editors
     User.with_role(Role::EDITOR, becomes(Collection))
   end

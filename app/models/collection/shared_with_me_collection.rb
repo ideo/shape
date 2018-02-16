@@ -22,6 +22,10 @@ class Collection
       false
     end
 
+    def read_only?
+      true
+    end
+
     def name
       'Shared with Me'
     end
@@ -40,7 +44,10 @@ class Collection
 
       collections_and_items_shared_with_me.map do |obj|
         CollectionCard.new(
+          id: i,
           parent: self,
+          height: 1,
+          width: 1,
           order: i += 1,
           item: obj.is_a?(Item) ? obj : nil,
           collection: obj.is_a?(Collection) ? obj : nil

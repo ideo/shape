@@ -9,6 +9,7 @@ class CollectionCard < ApplicationRecord
   validates :parent, :order, presence: true
   validate :single_item_or_collection_is_present
   validate :card_is_only_primary_card, if: :check_if_primary_card_is_unique?
+  validate :parent_is_not_readonly, on: :create
 
   scope :not_reference, -> { where(reference: false) }
   scope :reference, -> { where(reference: true) }
@@ -46,5 +47,11 @@ class CollectionCard < ApplicationRecord
     elsif collection.present? && collection.parent_collection_card.present?
       errors.add(:collection, 'already has a primary card')
     end
+  end
+
+  def parent_is_not_readonly
+    return if parent.blank?
+    
+    errors.add(:parent, 'is read-only so you can\'t save this card') if parent.read_only?
   end
 end

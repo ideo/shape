@@ -1,5 +1,3 @@
-import React from 'react'
-
 import Button from 'material-ui/Button'
 import { MenuList, MenuItem } from 'material-ui/Menu'
 import TextField from 'material-ui/TextField'

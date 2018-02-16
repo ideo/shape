@@ -1,6 +1,6 @@
 class Collection
   class UserCollection < Collection
-    def self.find_or_find_or_create_for_user(user, organization)
+    def self.find_or_create_for_user(user, organization)
       existing = user.current_user_collection
       return existing if existing.present?
 
