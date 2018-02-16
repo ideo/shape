@@ -2,7 +2,7 @@ import React from 'react'
 import { inject, observer } from 'mobx-react'
 
 const withApi = ({ requestPath }) => (WrappedComponent) => {
-  @inject('apiStore')
+  @inject('apiStore', 'uiStore')
   @observer
   class WithApi extends React.Component {
     componentDidMount() {

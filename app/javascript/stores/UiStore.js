@@ -1,16 +1,13 @@
 import { observable, action } from 'mobx'
 
 export default class UiStore {
-  @observable blankContentToolOpen = false
-  @observable blankContentToolOrder = null
+  @observable blankContentToolState = null
 
   @action openBlankContentTool({ order }) {
-    this.blankContentToolOpen = true
-    this.blankContentToolOrder = order
+    this.blankContentToolState = { order }
   }
 
   @action closeBlankContentTool() {
-    this.blankContentToolOpen = false
-    this.blankContentToolOrder = null
+    this.blankContentToolState = null
   }
 }

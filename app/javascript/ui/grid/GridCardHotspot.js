@@ -14,7 +14,7 @@ const StyledHotspot = styled.div`
   transition: all 100ms;
   color: ${v.colors.teal};
 
-  right: -1.25rem;
+  right: -1.4rem;
   height: 100%;
   width: 2.25rem;
   button {
@@ -34,8 +34,9 @@ const HotspotLine = styled.div`
 
 const StyledPlusIcon = styled.div`
   position: relative;
-  left: -1rem;
+  left: -1.25rem;
   background: white;
+  border-radius: 50%;
   cursor: pointer;
 `
 
@@ -53,7 +54,7 @@ class GridCardHotspot extends React.Component {
       <StyledHotspot dragging={dragging}>
         <HotspotLine />
         <StyledPlusIcon onClick={this.clickHotspot}>
-          <Icon name="B7" size="2rem" color={v.colors.teal} />
+          <Icon name="B7" size="2.25rem" color={v.colors.teal} />
         </StyledPlusIcon>
       </StyledHotspot>
     )

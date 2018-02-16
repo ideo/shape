@@ -31,6 +31,12 @@ class CollectionPage extends React.Component {
     }
   }
 
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.match.params.id !== this.props.match.params.id) {
+      this.props.uiStore.closeBlankContentTool()
+    }
+  }
+
   get isHomepage() {
     return isHomepage(this.props.match)
   }
@@ -67,7 +73,8 @@ class CollectionPage extends React.Component {
 
   render() {
     const { collection } = this
-    // console.log('thiscollection', this.props.apiStore, collection)
+    const { uiStore } = this.props
+    // console.log(this.props.apiStore, collection)
     if (!collection) return <Loader />
 
     return (
@@ -84,6 +91,7 @@ class CollectionPage extends React.Component {
             gutter={12}
             updateCollection={this.updateCollection}
             collection={collection}
+            blankContentToolState={uiStore.blankContentToolState}
           />
         </PageContainer>
       </Fragment>
@@ -96,6 +104,7 @@ CollectionPage.propTypes = {
 }
 CollectionPage.wrappedComponent.propTypes = {
   apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
+  uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 
 export default CollectionPage
