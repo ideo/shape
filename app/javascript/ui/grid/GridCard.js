@@ -1,10 +1,9 @@
 import PropTypes from 'prop-types'
 import { PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
-import { Link } from 'react-router-dom'
 
-import GridCardHotspots from '~/ui/grid/GridCardHotspots'
-import DragHandle from '~/ui/grid/DragHandle'
+import GridCardHotspot from '~/ui/grid/GridCardHotspot'
+// import DragHandle from '~/ui/grid/DragHandle'
 
 export const StyledGridCard = styled.div`
   z-index: 1;
@@ -12,13 +11,7 @@ export const StyledGridCard = styled.div`
   width: 100%;
   background: white;
   padding: 0;
-
-  &:hover {
-    z-index: 2;
-    .DragHandle {
-      opacity: 1;
-    }
-  }
+  cursor: ${props => (props.dragging ? 'move' : 'pointer')};
 `
 
 const StyledGridCardInner = styled.div`
@@ -41,14 +34,14 @@ class GridCard extends React.PureComponent {
     if (this.isItem) {
       return (
         <div>
-          {record.name} {card.order}
+          {record.name} [{card.order}]
         </div>
       )
     } else if (this.isCollection) {
       return (
-        <Link to={`/collections/${record.id}`}>
-          {record.name} {card.order}
-        </Link>
+        <div>
+          {record.name} (coll.) [{card.order}]
+        </div>
       )
     }
     return <div />
@@ -56,11 +49,8 @@ class GridCard extends React.PureComponent {
 
   render() {
     return (
-      <StyledGridCard>
-        <GridCardHotspots card={this.props.card} />
-
-        <DragHandle />
-
+      <StyledGridCard dragging={this.props.dragging}>
+        <GridCardHotspot card={this.props.card} dragging={this.props.dragging} />
         <StyledGridCardInner>
           {this.inner}
         </StyledGridCardInner>
@@ -73,6 +63,7 @@ GridCard.propTypes = {
   card: MobxPropTypes.objectOrObservableObject.isRequired,
   cardType: PropTypes.string.isRequired,
   record: MobxPropTypes.objectOrObservableObject.isRequired,
+  dragging: PropTypes.bool.isRequired,
 }
 
 export default GridCard

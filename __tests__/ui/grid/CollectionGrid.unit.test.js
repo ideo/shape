@@ -36,9 +36,13 @@ beforeEach(() => {
     gridH: 200,
     gutter: 10,
     updateCollection: jest.fn(),
+
+    routingStore: {
+      push: jest.fn()
+    }
   }
   wrapper = shallow(
-    <CollectionGrid {...props} />
+    <CollectionGrid.wrappedComponent {...props} />
   )
 })
 
