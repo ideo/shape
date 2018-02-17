@@ -12,7 +12,7 @@ class Collection
 
       user.add_role(Role::EDITOR, collection.becomes(Collection))
 
-      Collection::SharedWithMeCollection.find_or_create_for_collection(collection)
+      Collection::SharedWithMeCollection.find_or_create_for_collection(collection, user)
 
       collection
     end

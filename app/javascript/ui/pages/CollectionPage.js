@@ -51,6 +51,18 @@ class CollectionPage extends React.Component {
     this.collection.save()
   }
 
+  breadcrumb = () => {
+    const { collection } = this
+
+    if (this.isHomepage || !collection) return <div />
+
+    return (
+      <Breadcrumb
+        items={collection.breadcrumb}
+      />
+    )
+  }
+
   render() {
     const { collection } = this
     // console.log('thiscollection', this.props.apiStore, collection)
@@ -61,9 +73,7 @@ class CollectionPage extends React.Component {
         <Header>
           <H1>{collection.name}</H1>
           {/* <Icon name="caret" size="8px" /> */}
-          <Breadcrumb
-            items={collection.breadcrumb}
-          />
+          {this.breadcrumb()}
         </Header>
         <PageContainer>
           <CollectionGrid

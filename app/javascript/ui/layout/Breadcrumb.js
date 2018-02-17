@@ -18,24 +18,19 @@ const StyledBreadcrumb = styled.div`
   }
 `
 
-const pathForItem = (item) => {
-  const [klass, id] = item.split('_')
-  return `/${klass}/${id}`
-}
-
 class Breadcrumb extends React.PureComponent {
   breadcrumbItem = (item) => {
-    const path = pathForItem(item[0])
+    const [klass, id, name] = item
+    const path = `/${klass}/${id}`
     return (
       <Link key={path} to={path}>
-        {item[1]}
+        {name}
       </Link>
     )
   }
 
   render() {
     const { items } = this.props
-    console.log(items)
     const links = items.map(item => this.breadcrumbItem(item))
     return (
       <StyledBreadcrumb>
