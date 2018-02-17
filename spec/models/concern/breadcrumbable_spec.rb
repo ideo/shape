@@ -15,14 +15,26 @@ describe Item, type: :model do
       end
 
       it 'should populate breadcrumb from parent and self' do
-        expect(item.breadcrumb.first).to match_array(Breadcrumb::Builder.new(collection).call)
+        expect(item.breadcrumb.first).to match_array(Breadcrumb::Builder.for_object(collection))
 
-        expect(item.breadcrumb.last).to match_array(Breadcrumb::Builder.new(item).call)
+        expect(item.breadcrumb.last).to match_array(Breadcrumb::Builder.for_object(item))
       end
 
       it 'should have parent and self' do
         expect(item.breadcrumb.size).to eq(2)
       end
     end
+  end
+
+  describe '#breadcrumb_viewable_by' do
+    # TODO: write tests
+  end
+
+  describe '#can_view?' do
+    # TODO: write tests
+  end
+
+  describe '#can_edit?' do
+    # TODO: write tests
   end
 end
