@@ -10,7 +10,7 @@ import PageContainer from '~/ui/layout/PageContainer'
 import CollectionGrid from '~/ui/grid/CollectionGrid'
 // import Icon from '~/ui/global/Icon'
 import H1 from '~/ui/global/H1'
-import Breadcrumb from '~/ui/layout/Breadcrumb'
+import { Breadcrumb, BreadcrumbPadding } from '~/ui/layout/Breadcrumb'
 
 const isHomepage = match => match.path === '/'
 
@@ -54,7 +54,7 @@ class CollectionPage extends React.Component {
   breadcrumb = () => {
     const { collection } = this
 
-    if (this.isHomepage || !collection) return <div />
+    if (this.isHomepage || !collection) return <BreadcrumbPadding />
 
     return (
       <Breadcrumb
@@ -71,9 +71,9 @@ class CollectionPage extends React.Component {
     return (
       <Fragment>
         <Header>
+          {this.breadcrumb()}
           <H1>{collection.name}</H1>
           {/* <Icon name="caret" size="8px" /> */}
-          {this.breadcrumb()}
         </Header>
         <PageContainer>
           <CollectionGrid
