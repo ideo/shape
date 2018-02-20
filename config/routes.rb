@@ -7,10 +7,11 @@ Rails.application.routes.draw do
         collection do
           get 'me'
         end
-        resources :collection_cards, shallow: true do
-          resources :items, shallow: true, except: :index
-          resources :collections, only: :create
-        end
+        resources :collection_cards, only: :index
+      end
+      resources :collection_cards, shallow: true do
+        resources :items, shallow: true, except: :index
+        resources :collections, only: :create
       end
       resources :organizations, only: [:show, :update] do
         collection do

@@ -53,7 +53,7 @@ class CollectionPage extends React.Component {
   updateCollection = () => {
     // TODO: what if there's no collection?
     // calling .save() will receive any API updates and sync them
-    this.collection.save()
+    this.collection.API_updateCardOrder()
   }
 
   breadcrumb = () => {
@@ -86,7 +86,7 @@ class CollectionPage extends React.Component {
         <PageContainer>
           <CollectionGrid
             cols={this.state.cols}
-            gridH={200}
+            gridH={230}
             gridW={300}
             gutter={12}
             updateCollection={this.updateCollection}

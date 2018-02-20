@@ -20,8 +20,8 @@ class MovableGridCard extends React.PureComponent {
     dragComplete: true,
     zIndex: 1,
     // track where on the page the mouse position is, e.g. if browser is stretched wide
-    initialOffsetX: 0,
-    initialOffsetY: 0,
+    // initialOffsetX: 0,
+    // initialOffsetY: 0,
     target: null
   }
 
@@ -32,11 +32,11 @@ class MovableGridCard extends React.PureComponent {
   handleStart = (e, data) => {
     // initialOffset tracks the coordinates *within* the card where you clicked,
     // e.g. bottom left corner of the card itself
-    const initialOffsetX = (e.screenX - e.target.getBoundingClientRect().x)
-    const initialOffsetY = (e.screenY - e.target.getBoundingClientRect().y)
+    // const initialOffsetX = (e.screenX - e.target.getBoundingClientRect().x)
+    // const initialOffsetY = (e.screenY - e.target.getBoundingClientRect().y)
     this.setState({
-      initialOffsetX,
-      initialOffsetY,
+      // initialOffsetX,
+      // initialOffsetY,
       target: e.target,
     })
   }
@@ -86,7 +86,7 @@ class MovableGridCard extends React.PureComponent {
     if (cardType === 'collections') {
       // timeout is just a stupid thing so that Draggable doesn't complain about unmounting
       setTimeout(() => {
-        this.props.routeTo(`/collections/${record.id}`)
+        this.props.routeTo('collections', record.id)
       })
     }
   }
@@ -195,47 +195,56 @@ class MovableGridCard extends React.PureComponent {
         >
           <div>
             <PositionedGridCard {...styleProps}>
-              <GridCardBlank />
+              <GridCardBlank parent={this.props.parent} order={card.order} />
             </PositionedGridCard>
           </div>
         </FlipMove>
       )
     }
 
+    const innerContent = (isHovering = false) => (
+      <div
+        style={{
+          zIndex: ((isHovering || dragging) && !isPlaceholder) ? (z * 2) : z,
+          position: 'relative'
+        }}
+      >
+        <FlipMove
+          appearAnimation={isPlaceholder ? null : 'elevator'}
+          typeName={null}
+        >
+          <Draggable
+            bounds={bounds}
+            onStart={this.handleStart}
+            onDrag={this.handleDrag}
+            onStop={this.handleStop}
+            position={this.state.position}
+          >
+            {/*
+              intermediary div is necessary so that we can apply our own transforms
+              and not be overridden by Draggable
+            */}
+            <div>
+              <PositionedGridCard {...styleProps}>
+                <GridCard {...cardProps} />
+              </PositionedGridCard>
+            </div>
+          </Draggable>
+
+        </FlipMove>
+      </div>
+    )
+
+    if (this.props.test) {
+      // for unit test, don't wrap in ReactHoverObserver
+      return innerContent()
+    }
+
     return (
       <ReactHoverObserver>
         {/* this isHovering wrapper is so that the Hotspots have max zIndex when you hover */}
         {({ isHovering }) => (
-          <div
-            style={{
-              zIndex: ((isHovering || dragging) && !isPlaceholder) ? (z * 2) : z,
-              position: 'relative'
-            }}
-          >
-            <FlipMove
-              appearAnimation={isPlaceholder ? null : 'elevator'}
-              typeName={null}
-            >
-              <Draggable
-                bounds={bounds}
-                onStart={this.handleStart}
-                onDrag={this.handleDrag}
-                onStop={this.handleStop}
-                position={this.state.position}
-              >
-                {/*
-                  intermediary div is necessary so that we can apply our own transforms
-                  and not be overridden by Draggable
-                */}
-                <div>
-                  <PositionedGridCard {...styleProps}>
-                    <GridCard {...cardProps} />
-                  </PositionedGridCard>
-                </div>
-              </Draggable>
-
-            </FlipMove>
-          </div>
+          innerContent(isHovering)
         )}
       </ReactHoverObserver>
     )
@@ -247,9 +256,15 @@ MovableGridCard.propTypes = {
   cardType: PropTypes.string.isRequired,
   position: PropTypes.shape(propShapes.position).isRequired,
   record: MobxPropTypes.objectOrObservableObject.isRequired,
+  parent: MobxPropTypes.objectOrObservableObject.isRequired,
   onDrag: PropTypes.func.isRequired,
   onDragStop: PropTypes.func.isRequired,
   routeTo: PropTypes.func.isRequired,
+  test: PropTypes.bool,
+}
+
+MovableGridCard.defaultProps = {
+  test: false,
 }
 
 export default MovableGridCard

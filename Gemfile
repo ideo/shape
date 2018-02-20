@@ -75,6 +75,8 @@ group :development do
   gem 'spring-commands-rspec'
   gem 'guard', require: false
   gem 'guard-rspec', require: false
+  gem 'binding_of_caller'
+  gem 'better_errors'
 end
 
 group :test do

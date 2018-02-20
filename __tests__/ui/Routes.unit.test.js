@@ -1,11 +1,11 @@
 import Routes from '~/ui/Routes'
-import apiStoreMock from '#/mocks/apiStoreMock'
+import fakeApiStore from '#/mocks/fakeApiStore'
 
 let props, requestResult, apiStore, history
 beforeEach(() => {
   requestResult = { data: { id: 1 } }
   history = {}
-  apiStore = apiStoreMock({
+  apiStore = fakeApiStore({
     requestResult
   })
   props = { apiStore, history }

@@ -191,12 +191,12 @@ class CollectionGrid extends React.Component {
             (dragY > (card.position.yPos + card.position.height))) {
           direction = 'right'
         }
-        const { order } = card
+        const { order, record } = card
         return {
           order,
           distance,
           direction,
-          record: card.record()
+          record
         }
       }
       return null
@@ -305,10 +305,9 @@ class CollectionGrid extends React.Component {
       let { cardType } = card
       if (cardType !== 'placeholder' && cardType !== 'blank') {
         // TODO: some kind of error catch if no record?
-        const cardRecord = card.record()
-        if (cardRecord) {
-          record = card.record().rawAttributes()
-          cardType = card.record().getRecordType()
+        if (card.record) {
+          record = card.record.rawAttributes()
+          cardType = card.record.getRecordType()
         }
       }
       grid.push(
@@ -320,9 +319,8 @@ class CollectionGrid extends React.Component {
           record={record}
           onDrag={this.onDrag}
           onDragStop={this.onDragStop}
-          routeTo={this.props.routingStore.push}
-          // onHotspotHover={this.onHotspotHover}
-          // add={this.props.add}
+          routeTo={this.props.routingStore.routeTo}
+          parent={this.props.collection}
         />
       )
     })
