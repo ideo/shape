@@ -1,4 +1,4 @@
-const apiStoreMock = ({ findResult, requestResult }) => {
+const fakeApiStore = ({ findResult, requestResult }) => {
   return {
     find: jest.fn()
       .mockReturnValue(findResult),
@@ -13,4 +13,4 @@ const apiStoreMock = ({ findResult, requestResult }) => {
   }
 }
 
-export default apiStoreMock
+export default fakeApiStore

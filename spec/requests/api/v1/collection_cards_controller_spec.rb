@@ -38,14 +38,16 @@ describe Api::V1::CollectionCardsController, type: :request, auth: true do
 
   describe 'POST #create' do
     let!(:collection) { create(:collection) }
-    let(:path) { "/api/v1/collections/#{collection.id}/collection_cards" }
+    let(:path) { "/api/v1/collection_cards" }
     let(:params) {
       json_api_params(
         'collection_cards',
         {
           'order': 1,
           'width': 3,
-          'height': 1
+          'height': 1,
+          # parent_id is required to retrieve the parent collection without a nested route
+          'parent_id': collection.id,
         }
       )
     }

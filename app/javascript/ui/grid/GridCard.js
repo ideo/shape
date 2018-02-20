@@ -3,7 +3,6 @@ import { PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 
 import GridCardHotspot from '~/ui/grid/GridCardHotspot'
-// import DragHandle from '~/ui/grid/DragHandle'
 
 export const StyledGridCard = styled.div`
   z-index: 1;
@@ -13,6 +12,7 @@ export const StyledGridCard = styled.div`
   padding: 0;
   cursor: ${props => (props.dragging ? 'grabbing' : 'pointer')};
 `
+StyledGridCard.displayName = 'StyledGridCard'
 
 const StyledGridCardInner = styled.div`
   position: relative;
@@ -20,6 +20,7 @@ const StyledGridCardInner = styled.div`
   height: calc(100% - 2rem);
   overflow: hidden;
 `
+StyledGridCardInner.displayName = 'StyledGridCardInner'
 
 class GridCard extends React.PureComponent {
   get isItem() {

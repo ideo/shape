@@ -1,9 +1,5 @@
 # Getting Started
 
-...
-
-# Setting up the app
-
 Here are the commands you can use to get started:
 
 Install all the libraries first:
@@ -30,14 +26,48 @@ Create the database and migrate:
 ```
 rails db:create
 rails db:migrate
-bin/rails s
+# if you want to seed some fake data
+rails db:seed
 ```
 
 Run tests:
 
 ```
-# run tests once:
+# run rails tests once:
 bin/rspec
 # watch files and re-run tests:
 bundle exec guard
+
+# run JS tests once:
+yarn run jest
+# watch files and re-run JS tests:
+yarn test
 ```
+
+## Running your dev environment
+
+1. Run your webpack server:
+```
+bin/webpack-dev-server
+```
+1. Run your rails server:
+```
+bin/rails s
+```
+
+### Use ttab for quick dev environment setup
+
+Install ttab and foreman:
+```
+npm install -g ttab
+gem install foreman
+```
+
+Run dev script:
+```
+./dev.sh
+```
+This will open separate tabs to:
+  1. Run the webpack dev server
+  1. Run the rails server
+  1. Open atom in the project directory

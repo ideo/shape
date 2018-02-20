@@ -1,8 +1,8 @@
 import { config as jsonApiConfig } from 'mobx-jsonapi-store'
-import { RouterStore } from 'mobx-react-router'
 
 import locale from './Locale'
 import ApiStore from './ApiStore'
+import RoutingStore from './RoutingStore'
 import UiStore from './UiStore'
 
 jsonApiConfig.baseUrl = '/api/v1/'
@@ -12,7 +12,7 @@ jsonApiConfig.fetchReference = (url, opts) => {
   return fetch(url, opts)
 }
 
-export const routingStore = new RouterStore()
+export const routingStore = new RoutingStore()
 export const apiStore = new ApiStore()
 export const uiStore = new UiStore()
 

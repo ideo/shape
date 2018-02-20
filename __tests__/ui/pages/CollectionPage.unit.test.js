@@ -1,5 +1,5 @@
 import CollectionPage from '~/ui/pages/CollectionPage'
-import apiStoreMock from '#/mocks/apiStoreMock'
+import fakeApiStore from '#/mocks/fakeApiStore'
 
 const id = 1
 const collections = [
@@ -11,7 +11,7 @@ let props
 
 beforeEach(() => {
   match = { params: { id }, path: '/collections/1', url: '/collections/1' }
-  apiStore = apiStoreMock({
+  apiStore = fakeApiStore({
     findResult: collection
   })
   apiStore.collections = collections
