@@ -2,7 +2,7 @@ import { PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 import { Link } from 'react-router-dom'
 
-const BreadcrumbPadding = styled.div`
+export const BreadcrumbPadding = styled.div`
   height: 1.7rem;
 `
 
@@ -54,7 +54,4 @@ Breadcrumb.propTypes = {
   items: MobxPropTypes.arrayOrObservableArray.isRequired,
 }
 
-module.exports = {
-  Breadcrumb,
-  BreadcrumbPadding,
-}
+export default Breadcrumb
