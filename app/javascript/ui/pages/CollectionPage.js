@@ -72,7 +72,7 @@ class CollectionPage extends PageWithApi {
 
     if (collection && !this.isHomepage) {
       items = collection.breadcrumb
-}
+    }
 
     return (
       <Breadcrumb
