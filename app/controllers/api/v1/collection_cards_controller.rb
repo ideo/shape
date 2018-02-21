@@ -17,7 +17,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
                                   .build(collection_card_params)
 
     if @collection_card.save
-      render jsonapi: @collection_card, include: %i[item collection]
+      render jsonapi: @collection_card, include: [:collection, item: [:filestack_file]]
     else
       render jsonapi_errors: @collection_card.errors.full_messages
     end
@@ -54,7 +54,14 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
         :name,
         :content,
         :image,
-        :archived
+        :archived,
+        filestack_file_attributes: [
+          :url,
+          :handle,
+          :filename,
+          :size,
+          :mimetype,
+        ],
       ]
     )
   end

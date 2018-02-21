@@ -32,7 +32,14 @@ class Api::V1::ItemsController < Api::V1::BaseController
       :name,
       :content,
       :image,
-      :archived
+      :archived,
+      filestack_file_attributes: [
+        :url,
+        :handle,
+        :filename,
+        :size,
+        :mimetype,
+      ],
     )
   end
 end

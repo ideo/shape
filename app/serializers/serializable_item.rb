@@ -7,4 +7,5 @@ class SerializableItem < BaseJsonSerializer
       @current_user,
     ).to_api
   end
+  belongs_to :filestack_file
 end

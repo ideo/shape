@@ -5,6 +5,7 @@ import User from './jsonApi/User'
 import Collection from './jsonApi/Collection'
 import Item from './jsonApi/Item'
 import CollectionCard from './jsonApi/CollectionCard'
+import FilestackFile from './jsonApi/FilestackFile'
 
 class ApiStore extends Store {
   @observable currentUserId = null
@@ -17,6 +18,6 @@ class ApiStore extends Store {
     return this.find('users', this.currentUserId)
   }
 }
-ApiStore.types = [User, Collection, Item, CollectionCard]
+ApiStore.types = [User, Collection, Item, CollectionCard, FilestackFile]
 
 export default ApiStore
