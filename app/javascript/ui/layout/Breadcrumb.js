@@ -6,6 +6,8 @@ const BreadcrumbPadding = styled.div`
   height: 1.7rem;
 `
 
+BreadcrumbPadding.displayName = 'BreadcrumbPadding'
+
 const StyledBreadcrumb = styled.div`
   margin-top: 0.5rem;
   height: 1.2rem;
@@ -27,6 +29,8 @@ const StyledBreadcrumb = styled.div`
   }
 `
 
+StyledBreadcrumb.displayName = 'StyledBreadcrumb'
+
 class Breadcrumb extends React.PureComponent {
   breadcrumbItem = (item) => {
     const [klass, id, name] = item
@@ -38,7 +42,7 @@ class Breadcrumb extends React.PureComponent {
     )
   }
 
-  render() {
+  renderItems = () => {
     const { items } = this.props
     const links = items.map(item => this.breadcrumbItem(item))
     return (
@@ -48,13 +52,16 @@ class Breadcrumb extends React.PureComponent {
       </StyledBreadcrumb>
     )
   }
+
+  render() {
+    const { items } = this.props
+    if (items.length > 0) return this.renderItems()
+    return <BreadcrumbPadding />
+  }
 }
 
 Breadcrumb.propTypes = {
   items: MobxPropTypes.arrayOrObservableArray.isRequired,
 }
 
-module.exports = {
-  Breadcrumb,
-  BreadcrumbPadding,
-}
+export default Breadcrumb
