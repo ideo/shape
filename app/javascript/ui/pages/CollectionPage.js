@@ -1,9 +1,9 @@
 // import PropTypes from 'prop-types'
 import { Fragment } from 'react'
 import ReactRouterPropTypes from 'react-router-prop-types'
-import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
+import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 
-import withApi from '~/utils/withApi'
+import PageWithApi from '~/ui/pages/PageWithApi'
 import Loader from '~/ui/layout/Loader'
 import Header from '~/ui/layout/Header'
 import PageContainer from '~/ui/layout/PageContainer'
@@ -11,18 +11,11 @@ import CollectionGrid from '~/ui/grid/CollectionGrid'
 import H1 from '~/ui/global/H1'
 import Breadcrumb from '~/ui/layout/Breadcrumb'
 
-const isHomepage = match => match.path === '/'
+const isHomepage = ({ path }) => path === '/'
 
-@withApi({
-  requestPath: ({ match, apiStore }) => {
-    if (isHomepage(match)) {
-      return `collections/${apiStore.currentUser.current_user_collection_id}`
-    }
-    return `collections/${match.params.id}`
-  }
-})
+@inject('apiStore', 'uiStore')
 @observer
-class CollectionPage extends React.Component {
+class CollectionPage extends PageWithApi {
   constructor(props) {
     super(props)
     this.state = {
@@ -32,6 +25,8 @@ class CollectionPage extends React.Component {
   }
 
   componentWillReceiveProps(nextProps) {
+    super.componentWillReceiveProps(nextProps)
+    // when navigating between collections, close BCT
     if (nextProps.match.params.id !== this.props.match.params.id) {
       this.props.uiStore.closeBlankContentTool()
     }
@@ -50,6 +45,21 @@ class CollectionPage extends React.Component {
     return apiStore.find('collections', match.params.id)
   }
 
+  requestPath = (props) => {
+    const { match, apiStore } = props
+    if (isHomepage(match)) {
+      return `collections/${apiStore.currentUser.current_user_collection_id}`
+    }
+    return `collections/${match.params.id}`
+  }
+
+  onAPILoad = (collection) => {
+    const { uiStore } = this.props
+    if (!collection.collection_cards.length) {
+      uiStore.openBlankContentTool()
+    }
+  }
+
   updateCollection = () => {
     // TODO: what if there's no collection?
     // calling .save() will receive any API updates and sync them
@@ -62,6 +72,7 @@ class CollectionPage extends React.Component {
 
     if (collection && !this.isHomepage) {
       items = collection.breadcrumb
+      console.log(items)
     }
 
     return (
