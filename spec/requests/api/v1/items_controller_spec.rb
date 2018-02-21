@@ -14,6 +14,32 @@ describe Api::V1::ItemsController, type: :request, auth: true do
       get(path)
       expect(json['data']['attributes']).to match_json_schema('item')
     end
+
+    context 'with parents' do
+      let!(:collection) { create(:collection) }
+      let!(:collection_card) { create(:collection_card_item, parent: collection) }
+      let!(:item) { collection_card.item }
+      let(:user) { @user }
+
+      before do
+        item.reload
+        item.recalculate_breadcrumb!
+      end
+
+      it 'returns empty breadcrumb' do
+        get(path)
+        expect(json['data']['attributes']['breadcrumb']).to be_empty
+      end
+
+      it 'returns full breadcrumb if user has access' do
+        user.add_role(Role::VIEWER, collection)
+        get(path)
+        expect(json['data']['attributes']['breadcrumb']).to match_array([
+          ['collections', collection.id, collection.name],
+          ['items', item.id, item.name]
+        ])
+      end
+    end
   end
 
   describe 'POST #create' do

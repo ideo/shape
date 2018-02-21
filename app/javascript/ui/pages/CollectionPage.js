@@ -10,6 +10,7 @@ import PageContainer from '~/ui/layout/PageContainer'
 import CollectionGrid from '~/ui/grid/CollectionGrid'
 // import Icon from '~/ui/global/Icon'
 import H1 from '~/ui/global/H1'
+import Breadcrumb from '~/ui/layout/Breadcrumb'
 
 const isHomepage = match => match.path === '/'
 
@@ -50,6 +51,21 @@ class CollectionPage extends React.Component {
     this.collection.save()
   }
 
+  breadcrumb = () => {
+    const { collection } = this
+    let items = []
+
+    if (collection && !this.isHomepage) {
+      items = collection.breadcrumb
+    }
+
+    return (
+      <Breadcrumb
+        items={items}
+      />
+    )
+  }
+
   render() {
     const { collection } = this
     // console.log('thiscollection', this.props.apiStore, collection)
@@ -58,6 +74,7 @@ class CollectionPage extends React.Component {
     return (
       <Fragment>
         <Header>
+          {this.breadcrumb()}
           <H1>{collection.name}</H1>
           {/* <Icon name="caret" size="8px" /> */}
         </Header>

@@ -29,6 +29,7 @@ describe Api::V1::CollectionsController, type: :request, auth: true do
       create(:collection, num_cards: 5)
     }
     let(:path) { "/api/v1/collections/#{collection.id}" }
+    let(:user) { @user }
 
     it 'returns a 200' do
       get(path)
@@ -38,6 +39,16 @@ describe Api::V1::CollectionsController, type: :request, auth: true do
     it 'matches JSON schema' do
       get(path)
       expect(json['data']['attributes']).to match_json_schema('collection')
+    end
+
+    it 'should include breadcrumb' do
+      user.add_role(Role::VIEWER, collection)
+      collection.reload
+      collection.recalculate_breadcrumb!
+      get(path)
+      expect(json['data']['attributes']['breadcrumb']).to match_array([
+        ['collections', collection.id, collection.name]
+      ])
     end
 
     describe 'included' do

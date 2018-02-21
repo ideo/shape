@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180209192525) do
+ActiveRecord::Schema.define(version: 20180214211104) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -37,6 +37,7 @@ ActiveRecord::Schema.define(version: 20180209192525) do
     t.bigint "cloned_from_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.jsonb "breadcrumb"
     t.index ["cloned_from_id"], name: "index_collections_on_cloned_from_id"
     t.index ["organization_id"], name: "index_collections_on_organization_id"
   end
@@ -58,6 +59,7 @@ ActiveRecord::Schema.define(version: 20180209192525) do
     t.boolean "archived", default: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.jsonb "breadcrumb"
     t.index ["cloned_from_id"], name: "index_items_on_cloned_from_id"
   end
 

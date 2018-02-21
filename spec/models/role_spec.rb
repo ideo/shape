@@ -6,8 +6,8 @@ RSpec.describe Role, type: :model do
     let!(:groups) { create_list(:group, 2) }
 
     before do
-      user.add_role(:admin, groups[0])
-      user.add_role(:member, groups[1])
+      user.add_role(Role::ADMIN, groups[0])
+      user.add_role(Role::MEMBER, groups[1])
     end
 
     it 'should return all groups a user is a member or admin of' do
@@ -24,7 +24,7 @@ RSpec.describe Role, type: :model do
         Role.user_resources(
           user: user,
           resource_type: 'Group',
-          role_name: :admin
+          role_name: Role::ADMIN
         )
       ).to match_array([groups[0]])
     end
@@ -34,7 +34,7 @@ RSpec.describe Role, type: :model do
         Role.user_resources(
           user: user,
           resource_type: 'Group',
-          role_name: [:admin, :member]
+          role_name: [Role::ADMIN, Role::MEMBER]
         )
       ).to match_array([groups[0], groups[1]])
     end

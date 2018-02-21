@@ -4,7 +4,8 @@
     "id": { "type": "integer" },
     "type": { "type": "string" },
     "name": { "type": ["string", "null"] },
-    "content": { "type": ["string", "null"] }
+    "content": { "type": ["string", "null"] },
+    "breadcrumb": { "type": ["array", "null"] }
   },
   "required": ["id", "type"]
 }

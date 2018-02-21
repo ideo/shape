@@ -2,9 +2,13 @@ require 'rails_helper'
 
 describe Collection::SharedWithMeCollection, type: :model do
   describe '.find_or_create_for_collection' do
+    let(:user) { create(:user) }
     let(:parent_collection) { create(:collection) }
     let(:shared_with_me_collection) {
-      Collection::SharedWithMeCollection.find_or_create_for_collection(parent_collection)
+      Collection::SharedWithMeCollection.find_or_create_for_collection(
+        parent_collection,
+        user
+      )
     }
 
     it 'should create a Collection::UserCollection' do
@@ -15,6 +19,10 @@ describe Collection::SharedWithMeCollection, type: :model do
 
     it 'the collection should belong to same org as parent' do
       expect(shared_with_me_collection.organization).to eq(parent_collection.organization)
+    end
+
+    it 'should add user as editor' do
+      expect(user.has_role?(Role::EDITOR, shared_with_me_collection.becomes(Collection))).to be true
     end
   end
 
@@ -38,11 +46,11 @@ describe Collection::SharedWithMeCollection, type: :model do
 
       before do
         collections.each do |collection|
-          user.add_role(:viewer, collection)
+          user.add_role(Role::VIEWER, collection)
         end
 
         items.each do |item|
-          user.add_role(:viewer, item.becomes(Item))
+          user.add_role(Role::VIEWER, item.becomes(Item))
         end
       end
 
@@ -73,7 +81,7 @@ describe Collection::SharedWithMeCollection, type: :model do
       # TODO: need to add this logic
       pending 'should not return any items from other orgs' do
         coll = create(:collection, organization: org_2)
-        user.add_role(:viewer, coll)
+        user.add_role(Role::VIEWER, coll)
 
         expect(
           shared_with_me_collection

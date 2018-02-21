@@ -9,7 +9,7 @@ FactoryBot.define do
     name { Faker::Company.name }
 
     after(:create) do |org, evaluator|
-      [:admin, :member, :guest].each do |role|
+      [Role::ADMIN, Role::MEMBER].each do |role|
         next if evaluator.send(role).blank?
         evaluator.send(role).add_role(role, org.primary_group)
       end

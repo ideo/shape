@@ -1,4 +1,5 @@
 class Collection < ApplicationRecord
+  include Breadcrumbable
   resourcify
   has_many :collection_cards, foreign_key: :parent_id
   has_many :items, through: :collection_cards
@@ -40,11 +41,15 @@ class Collection < ApplicationRecord
   end
 
   def editors
-    User.with_role(:editor, becomes(Collection))
+    User.with_role(Role::EDITOR, becomes(Collection))
   end
 
   def viewers
-    User.with_role(:viewer, becomes(Collection))
+    User.with_role(Role::VIEWER, becomes(Collection))
+  end
+
+  def breadcrumb_title
+    name
   end
 
   private

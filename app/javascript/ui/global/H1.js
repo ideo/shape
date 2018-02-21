@@ -8,6 +8,7 @@ const H1 = styled.h1`
   color: black;
   text-transform: uppercase;
   margin-bottom: 0.5rem;
+  margin-top: 0.5rem;
 `
 
 // useful for doing unit testing e.g. wrapper.find('H1')

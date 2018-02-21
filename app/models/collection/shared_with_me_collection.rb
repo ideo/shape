@@ -1,6 +1,6 @@
 class Collection
   class SharedWithMeCollection < Collection
-    def self.find_or_create_for_collection(parent_collection)
+    def self.find_or_create_for_collection(parent_collection, user)
       existing = parent_collection.collections.shared_with_me.first
 
       return existing if existing.present?
@@ -10,6 +10,8 @@ class Collection
       )
 
       if collection.persisted?
+        user.add_role(Role::EDITOR, collection.becomes(Collection))
+
         parent_collection.collection_cards.create(
           collection: collection
         )

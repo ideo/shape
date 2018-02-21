@@ -9,8 +9,8 @@ RSpec.describe Group, type: :model do
     let!(:members) { create_list(:user, 3) }
 
     before do
-      admins.each { |admin| admin.add_role(:admin, group) }
-      members.each { |member| member.add_role(:member, group) }
+      admins.each { |admin| admin.add_role(Role::ADMIN, group) }
+      members.each { |member| member.add_role(Role::MEMBER, group) }
     end
 
     describe '#admins' do
