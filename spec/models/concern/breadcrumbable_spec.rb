@@ -15,9 +15,9 @@ describe Item, type: :model do
       end
 
       it 'should populate breadcrumb from parent and self' do
-        expect(item.breadcrumb.first).to match_array(Breadcrumb::Builder.new(collection).call)
+        expect(item.breadcrumb.first).to match_array(Breadcrumb::Builder.new(collection).call.last)
 
-        expect(item.breadcrumb.last).to match_array(Breadcrumb::Builder.new(item).call)
+        expect(item.breadcrumb.last).to match_array(Breadcrumb::Builder.new(item).call.last)
       end
 
       it 'should have parent and self' do
