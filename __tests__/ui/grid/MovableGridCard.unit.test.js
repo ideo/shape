@@ -14,8 +14,6 @@ const props = {
   onDrag: jest.fn(),
   onDragStop: jest.fn(),
   routeTo: jest.fn(),
-  // this prop tells it not to wrap with the ReactHoverObserver
-  test: true,
 }
 
 let wrapper

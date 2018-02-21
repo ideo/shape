@@ -2,7 +2,6 @@ import PropTypes from 'prop-types'
 import { PropTypes as MobxPropTypes } from 'mobx-react'
 import FlipMove from 'react-flip-move'
 import Draggable from 'react-draggable'
-import ReactHoverObserver from 'react-hover-observer'
 
 import v from '~/utils/variables'
 import propShapes from '~/utils/propShapes'
@@ -202,10 +201,10 @@ class MovableGridCard extends React.PureComponent {
       )
     }
 
-    const innerContent = (isHovering = false) => (
+    return (
       <div
         style={{
-          zIndex: ((isHovering || dragging) && !isPlaceholder) ? (z * 2) : z,
+          zIndex: (dragging && !isPlaceholder) ? (z * 2) : z,
           position: 'relative'
         }}
       >
@@ -234,20 +233,6 @@ class MovableGridCard extends React.PureComponent {
         </FlipMove>
       </div>
     )
-
-    if (this.props.test) {
-      // for unit test, don't wrap in ReactHoverObserver
-      return innerContent()
-    }
-
-    return (
-      <ReactHoverObserver>
-        {/* this isHovering wrapper is so that the Hotspots have max zIndex when you hover */}
-        {({ isHovering }) => (
-          innerContent(isHovering)
-        )}
-      </ReactHoverObserver>
-    )
   }
 }
 
@@ -260,11 +245,6 @@ MovableGridCard.propTypes = {
   onDrag: PropTypes.func.isRequired,
   onDragStop: PropTypes.func.isRequired,
   routeTo: PropTypes.func.isRequired,
-  test: PropTypes.bool,
-}
-
-MovableGridCard.defaultProps = {
-  test: false,
 }
 
 export default MovableGridCard
