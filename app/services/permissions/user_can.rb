@@ -9,7 +9,7 @@ module Permissions
     # it doesn't traverse object inheritance chain
 
     def view?(object_identifier)
-      has_role?(Role::VIEWER, object_identifier)
+      has_role?(Role::VIEWER, object_identifier) || edit?(object_identifier)
     end
 
     def edit?(object_identifier)
