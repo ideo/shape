@@ -3,11 +3,12 @@ import apiStoreMock from '#/mocks/apiStoreMock'
 
 const id = 1
 const collections = [
-  { id: 1, name: 'My Workspace X' }
+  { id: 1, name: 'My Workspace X', breadcrumb: [] }
 ]
 const collection = collections[0]
 let wrapper, match, apiStore
 let props
+
 beforeEach(() => {
   match = { params: { id }, path: '/collections/1', url: '/collections/1' }
   apiStore = apiStoreMock({
