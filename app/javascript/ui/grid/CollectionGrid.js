@@ -2,7 +2,6 @@ import PropTypes from 'prop-types'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import _ from 'lodash'
 
-import Loader from '~/ui/layout/Loader'
 import MovableGridCard from '~/ui/grid/MovableGridCard'
 
 const calculateDistance = (pos1, pos2) => {
@@ -31,7 +30,6 @@ class CollectionGrid extends React.Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    // console.log('Grid: nextProps', nextProps)
     const { collection } = nextProps
     const cards = [...collection.collection_cards]
     if (nextProps.blankContentToolState) {
@@ -328,8 +326,6 @@ class CollectionGrid extends React.Component {
   }
 
   render() {
-    if (!this.state.cards.length) return <Loader />
-
     return (
       <div className="Grid">
         { this.renderPositionedCards() }

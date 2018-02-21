@@ -16,6 +16,11 @@ class CollectionCard < ApplicationRecord
 
   accepts_nested_attributes_for :collection, :item
 
+  def record
+    return item if item.present?
+    return collection if collection.present?
+  end
+
   private
 
   def assign_default_height_and_width
@@ -51,7 +56,7 @@ class CollectionCard < ApplicationRecord
 
   def parent_is_not_readonly
     return if parent.blank?
-    
+
     errors.add(:parent, 'is read-only so you can\'t save this card') if parent.read_only?
   end
 end

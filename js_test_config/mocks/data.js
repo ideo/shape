@@ -18,6 +18,7 @@ export const fakeCard = {
 export const fakeCollection = {
   id: 1,
   name: 'My Workspace X',
+  breadcrumb: [],
   collection_cards: [
     fakeCard, fakeCard, fakeCard
   ]
