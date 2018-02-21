@@ -2,9 +2,11 @@ import { PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 import { Link } from 'react-router-dom'
 
-export const BreadcrumbPadding = styled.div`
+const BreadcrumbPadding = styled.div`
   height: 1.7rem;
 `
+
+BreadcrumbPadding.displayName = 'BreadcrumbPadding'
 
 const StyledBreadcrumb = styled.div`
   margin-top: 0.5rem;
@@ -27,6 +29,8 @@ const StyledBreadcrumb = styled.div`
   }
 `
 
+StyledBreadcrumb.displayName = 'StyledBreadcrumb'
+
 class Breadcrumb extends React.PureComponent {
   breadcrumbItem = (item) => {
     const [klass, id, name] = item
@@ -38,7 +42,7 @@ class Breadcrumb extends React.PureComponent {
     )
   }
 
-  render() {
+  renderItems = () => {
     const { items } = this.props
     const links = items.map(item => this.breadcrumbItem(item))
     return (
@@ -47,6 +51,12 @@ class Breadcrumb extends React.PureComponent {
         {links}
       </StyledBreadcrumb>
     )
+  }
+
+  render() {
+    const { items } = this.props
+    if (items.length > 0) return this.renderItems()
+    return <BreadcrumbPadding />
   }
 }
 
