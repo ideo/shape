@@ -5,6 +5,6 @@ class SerializableItem < BaseJsonSerializer
     Breadcrumb::ForUser.new(
       @object.breadcrumb,
       @current_user,
-    ).to_api
+    ).viewable_to_api
   end
 end

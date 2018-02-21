@@ -23,9 +23,9 @@ RSpec.describe Breadcrumb::ForUser, type: :service do
     item.recalculate_breadcrumb!
   end
 
-  describe '#call' do
+  describe '#viewable' do
     it 'returns empty breadcrumb if user has no access' do
-      expect(Breadcrumb::ForUser.new(item.breadcrumb, user).call).to eq([])
+      expect(Breadcrumb::ForUser.new(item.breadcrumb, user).viewable).to eq([])
     end
 
     context 'with full access to parents' do
@@ -34,7 +34,7 @@ RSpec.describe Breadcrumb::ForUser, type: :service do
       end
 
       it 'should return full breadcrumb' do
-        expect(Breadcrumb::ForUser.new(item.breadcrumb, user).call).to match_array([
+        expect(Breadcrumb::ForUser.new(item.breadcrumb, user).viewable).to match_array([
           collection_breadcrumb,
           subcollection_breadcrumb,
           item_breadcrumb,
@@ -48,7 +48,7 @@ RSpec.describe Breadcrumb::ForUser, type: :service do
       end
 
       it 'should return breadcrumb with direct ancestor and item' do
-        expect(Breadcrumb::ForUser.new(item.breadcrumb, user).call).to match_array([
+        expect(Breadcrumb::ForUser.new(item.breadcrumb, user).viewable).to match_array([
           subcollection_breadcrumb,
           item_breadcrumb,
         ])
@@ -61,24 +61,24 @@ RSpec.describe Breadcrumb::ForUser, type: :service do
       end
 
       it 'should return breadcrumb with only item' do
-        expect(Breadcrumb::ForUser.new(item.breadcrumb, user).call).to match_array([
+        expect(Breadcrumb::ForUser.new(item.breadcrumb, user).viewable).to match_array([
           item_breadcrumb,
         ])
       end
     end
   end
 
-  describe '#to_api' do
+  describe '#viewable_to_api' do
     before do
       user.add_role(Role::VIEWER, collection)
     end
 
     it 'should have full length breadcrumb' do
-      expect(Breadcrumb::ForUser.new(item.breadcrumb, user).to_api.size).to eq(3)
+      expect(Breadcrumb::ForUser.new(item.breadcrumb, user).viewable_to_api.size).to eq(3)
     end
 
     it 'should have pluralize, underscored items' do
-      breadcrumb = Breadcrumb::ForUser.new(item.breadcrumb, user).to_api
+      breadcrumb = Breadcrumb::ForUser.new(item.breadcrumb, user).viewable_to_api
       expect(breadcrumb.first[0]).to eq('collections')
       expect(breadcrumb.last[0]).to eq('items')
     end
