@@ -1,0 +1,10 @@
+{
+  "name": "OIE 2.0",
+  "description": "The future of work is here.",
+  "buildpacks": [
+    {
+      "url": "heroku/nodejs",
+      "url": "heroku/ruby"
+    }
+  ]
+}
