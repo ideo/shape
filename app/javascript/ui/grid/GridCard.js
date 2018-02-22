@@ -42,7 +42,8 @@ class GridCard extends React.PureComponent {
       default:
         return (
           <div>
-            {record.name} [{card.order}]
+            [{card.order}] &nbsp;
+            {record.content}
           </div>
         )
       }

@@ -13,7 +13,7 @@ class Role < ApplicationRecord
   scopify
 
   VIEWER = :viewer
-  EDITOR= :editor
+  EDITOR = :editor
   MEMBER = :member
   ADMIN = :admin
 

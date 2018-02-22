@@ -48,6 +48,11 @@ describe Api::V1::CollectionCardsController, type: :request, auth: true do
           'height': 1,
           # parent_id is required to retrieve the parent collection without a nested route
           'parent_id': collection.id,
+          # create with a nested item
+          'item_attributes': {
+            'content': 'This is my item content',
+            'type': 'Item::TextItem',
+          },
         }
       )
     }

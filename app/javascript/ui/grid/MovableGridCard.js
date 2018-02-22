@@ -184,13 +184,19 @@ class MovableGridCard extends React.PureComponent {
       )
     } else if (isBlank) {
       styleProps.transition = 'none'
-      /*
-        NOTE: FlipMove doesn't work that well because of our transform/positioned elements,
-        It always thinks the element is animating from 0,0 on the screen...
-      */
       return (
         <FlipMove
-          appearAnimation="accordionHorizontal"
+          easing="ease-out"
+          appearAnimation={{
+            from: {
+              transform: `scaleX(0) scaleY(0)`,
+              transformOrigin: `${xPos}px ${yPos}px`
+            },
+            to: {
+              transform: `scaleX(1) scaleY(1)`,
+              transformOrigin: `${xPos}px ${yPos}px`
+            },
+          }}
         >
           <div>
             <PositionedGridCard {...styleProps}>

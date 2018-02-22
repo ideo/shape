@@ -47,7 +47,7 @@ class Breadcrumb extends React.PureComponent {
     const links = items.map(item => this.breadcrumbItem(item))
     return (
       <StyledBreadcrumb>
-        <Link key='myCollection' to='/'>My Collection</Link>
+        <Link key="myCollection" to="/">My Collection</Link>
         {links}
       </StyledBreadcrumb>
     )
