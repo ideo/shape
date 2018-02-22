@@ -5,8 +5,9 @@ class Collection < ApplicationRecord
   has_many :items, through: :collection_cards
   has_many :collections, through: :collection_cards
   has_one :parent_collection_card,
-          -> { not_reference },
-          class_name: 'CollectionCard'
+          -> { primary },
+          class_name: 'CollectionCard',
+          inverse_of: :collection
 
   belongs_to :organization, optional: true
   belongs_to :cloned_from, class_name: 'Collection', optional: true

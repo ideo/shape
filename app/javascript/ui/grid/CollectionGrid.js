@@ -1,9 +1,8 @@
 import PropTypes from 'prop-types'
-import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
+import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import _ from 'lodash'
 
-import Loader from '~/ui/layout/Loader'
-import DraggableGridCard from '~/ui/grid/DraggableGridCard'
+import MovableGridCard from '~/ui/grid/MovableGridCard'
 
 const calculateDistance = (pos1, pos2) => {
   // pythagoras!
@@ -13,13 +12,16 @@ const calculateDistance = (pos1, pos2) => {
 }
 
 // needs to be an observer to observe changes to the collection + items
+@inject('routingStore', 'uiStore')
 @observer
 class CollectionGrid extends React.Component {
   constructor(props) {
     super(props)
     this.state = {
       cards: [],
-      timeoutId: null
+      timeoutId: null,
+      transitioning: false,
+      hoveringOver: { order: null },
     }
   }
 
@@ -28,14 +30,42 @@ class CollectionGrid extends React.Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    // console.log('Grid: nextProps', nextProps)
-    this.positionCards(nextProps.collection.collection_cards)
+    const { collection } = nextProps
+    const cards = [...collection.collection_cards]
+    if (nextProps.blankContentToolState) {
+      const order = nextProps.blankContentToolState.order + 0.25
+      const blankFound = _.find(this.state.cards, { cardType: 'blank' })
+      let blankCard = {
+        id: 'blank',
+        num: 0,
+        cardType: 'blank',
+        width: 1,
+        height: 1,
+        order,
+      }
+      if (blankFound) {
+        blankFound.num += 1
+        blankFound.id = `blank-${blankFound.num}`
+        _.remove(cards, blankFound)
+        blankCard = { ...blankFound, order }
+      }
+      cards.unshift(blankCard)
+    }
+    this.positionCards(cards)
+  }
+
+  componentWillUnmount() {
+    this.clearDragTimeout()
   }
 
   // --------------------------
   // <Drag related functions>
   // --------------------------
   onDrag = (cardId, dragPosition) => {
+    if (this.state.transitioning) return
+
+    this.props.uiStore.closeBlankContentTool()
+
     const positionedCard = _.find(this.state.cards, { id: cardId })
     const placeholderKey = `${cardId}-placeholder`
     const stateCards = [...this.state.cards]
@@ -57,17 +87,27 @@ class CollectionGrid extends React.Component {
     } else if (hoveringOver) {
       const { direction, order } = hoveringOver
       const newOrder = parseFloat(order) + (direction === 'left' ? -0.5 : 0.5)
-      if (placeholder.order !== newOrder) {
-        // this should modify stateCards in place?
+      const positionChanged = (
+        hoveringOver.order !== this.state.hoveringOver.order ||
+        newOrder !== placeholder.order
+      )
+      if (positionChanged) {
+        // NOTE: this should modify stateCards in place, for later save/update
         placeholder.order = newOrder
-        // NOTE: delay is for not having flickery drag placeholders
-        // -- adding the clearTimeout seems to make it behave better
+        // delay is for not having flickery drag placeholders
+        // card transform has 0.5s animation so timeout should be >0.5s
+        this.positionCards(stateCards, {
+          dragging: positionedCard.id,
+          hoveringOver: hoveringOver.order
+        })
+        this.setState({ transitioning: true, hoveringOver })
         const timeoutId = setTimeout(() => {
-          this.positionCards(stateCards, { dragging: positionedCard.id })
-        }, 500)
-        this.clearDragTimeout()
+          this.setState({ transitioning: false })
+        }, 900)
         this.setState({ timeoutId })
       }
+    } else {
+      this.setState({ hoveringOver: { order: null } })
     }
   }
 
@@ -76,25 +116,20 @@ class CollectionGrid extends React.Component {
     const original = _.find(this.state.cards, { id: placeholder.originalId })
 
     this.clearDragTimeout()
+    this.setState({ transitioning: false, hoveringOver: { order: null } })
     if (!placeholder || !original) return
-    const moved = (
-      !_.isEqual(placeholder.position, original.position) ||
-      Math.abs(placeholder.order - original.order) > 10
-    )
+    // const moved = (
+    //   !_.isEqual(placeholder.position, original.position) ||
+    //   Math.abs(placeholder.order - original.order) > 10
+    // )
+    const moved = (placeholder.order !== original.order)
     if (moved) {
-      // const { parentId } = this.props
-      // // we want to drop this item on the order where placeholder is already sitting
+      // we want to drop this item on the order where placeholder is already sitting
       const { order } = placeholder
       original.order = order
-      // stateCards = _.reject(stateCards, { cardType: 'placeholder' })
-
-      this.props.collection.reorderCards()
+      // reorder cards and persist changes
       this.props.updateCollection()
       this.positionCards(this.props.collection.collection_cards)
-
-      // // cardId stores the original cardId not the placeholderKey
-      // // calling updateItem will also reset this.state.cards
-      // console.log('moved', order)
     } else {
       // reset back to normal
       // console.log('resetting')
@@ -113,32 +148,51 @@ class CollectionGrid extends React.Component {
     let hoveringOver = null
     const { dragX, dragY } = dragPosition
     const distances = _.map(this.state.cards, card => {
-      if (card.id === cardId || card.cardType === 'placeholder') return null
+      const placeholder = (
+        card.cardType === 'placeholder' ||
+        card.cardType === 'blank'
+      )
+      if (card.id === cardId || placeholder) return null
       // only run this check if we're within the reasonable row bounds
-      if (card.position.yPos <= dragY && card.position.yPos + card.position.height >= dragY) {
+      if (card.position.yPos <= (dragY + 15) &&
+          card.position.yPos + card.position.height >= (dragY - 15)) {
         const mousePos = { x: dragX, y: dragY }
-        // centered cardPos
-        const cardPos = {
-          x: card.position.xPos + (card.position.width / 2),
-          y: card.position.yPos + (card.position.height / 2)
+        // const cardCenter = {
+        //   x: card.position.xPos + (card.position.width / 2),
+        //   y: card.position.yPos + (card.position.height / 2),
+        // }
+        const cardTL = {
+          x: card.position.xPos,
+          y: card.position.yPos,
         }
-        const distance = calculateDistance(mousePos, cardPos)
+        const cardTR = {
+          x: card.position.xPos + card.position.width,
+          y: card.position.yPos,
+        }
+        const cardBL = {
+          x: card.position.xPos,
+          y: card.position.yPos + card.position.height,
+        }
+        const cardBR = {
+          x: card.position.xPos + card.position.width,
+          y: card.position.yPos + card.position.height,
+        }
+        const distanceTL = calculateDistance(mousePos, cardTL)
+        const distanceTR = calculateDistance(mousePos, cardTR)
+        const distanceBL = calculateDistance(mousePos, cardBL)
+        const distanceBR = calculateDistance(mousePos, cardBR)
+        const distance = Math.min(distanceTL, distanceTR, distanceBL, distanceBR)
         let direction = 'left'
-        if (mousePos.x - cardPos.x > card.position.width / 4 ||
-          mousePos.y - cardPos.y > card.position.height / 4 ||
-          (mousePos.x > cardPos.x && mousePos.y > cardPos.y)) {
+        if ((distance === distanceBR || distance === distanceTR) ||
+            (dragY > (card.position.yPos + card.position.height))) {
           direction = 'right'
         }
-        // if ((direction === 'right' && cardPos.x > 3) ||
-        //   (direction === 'left' && cardPos.x === 0)) {
-        //   return null
-        // }
-        const { order } = card
+        const { order, record } = card
         return {
           order,
           distance,
           direction,
-          record: card.record()
+          record
         }
       }
       return null
@@ -152,13 +206,6 @@ class CollectionGrid extends React.Component {
   // --------------------------
   // </end Drag related functions>
   // --------------------------
-
-  // saveCollectionUpdates = () => {
-  //   const { collection } = this.props
-  //   collection.save()
-  //   // do we have to do any kind of "sync" here?
-  //   // presumably we already have the proper data in store...
-  // }
 
   positionCards = (cards = [], opts = {}) => {
     const {
@@ -215,6 +262,10 @@ class CollectionGrid extends React.Component {
 
           // add position attrs to card
           card.position = position
+          card.hoveringOver = false
+          if (opts.hoveringOver) {
+            card.hoveringOver = (opts.hoveringOver === card.order)
+          }
 
           // fill rows and columns
           _.fill(matrix[row], card.id, position.x, position.x + card.width)
@@ -225,10 +276,10 @@ class CollectionGrid extends React.Component {
 
           // NOTE: if you remove this check, then it will fill things in
           // slightly out of order to "fill empty gaps" at the end of the row
-          if (nextX + card.w === cols) {
-            row += 1
-            if (!matrix[row]) matrix.push(_.fill(Array(cols), null))
-          }
+          // if (nextX + card.w === cols) {
+          //   row += 1
+          //   if (!matrix[row]) matrix.push(_.fill(Array(cols), null))
+          // }
           //  --------
         } else {
           row += 1
@@ -246,18 +297,17 @@ class CollectionGrid extends React.Component {
     // in order to not re-draw divs (make transform animation work)
     // so that's why we do this second pass to actually create the divs in their original order
     _.each(this.state.cards, card => {
-      let record = null
+      let record = {}
       let { cardType } = card
-      if (card.cardType !== 'placeholder') {
+      if (cardType !== 'placeholder' && cardType !== 'blank') {
         // TODO: some kind of error catch if no record?
-        const cardRecord = card.record()
-        if (cardRecord) {
-          record = card.record().rawAttributes()
-          cardType = card.record().getRecordType()
+        if (card.record) {
+          record = card.record.rawAttributes()
+          cardType = card.record.getRecordType()
         }
       }
       grid.push(
-        <DraggableGridCard
+        <MovableGridCard
           key={card.id}
           card={card}
           cardType={cardType}
@@ -265,8 +315,8 @@ class CollectionGrid extends React.Component {
           record={record}
           onDrag={this.onDrag}
           onDragStop={this.onDragStop}
-          // onHotspotHover={this.onHotspotHover}
-          // add={this.props.add}
+          routeTo={this.props.routingStore.routeTo}
+          parent={this.props.collection}
         />
       )
     })
@@ -274,8 +324,6 @@ class CollectionGrid extends React.Component {
   }
 
   render() {
-    if (!this.state.cards.length) return <Loader />
-
     return (
       <div className="Grid">
         { this.renderPositionedCards() }
@@ -291,6 +339,14 @@ CollectionGrid.propTypes = {
   gutter: PropTypes.number.isRequired,
   updateCollection: PropTypes.func.isRequired,
   collection: MobxPropTypes.objectOrObservableObject.isRequired,
+  blankContentToolState: MobxPropTypes.objectOrObservableObject,
+}
+CollectionGrid.defaultProps = {
+  blankContentToolState: null
+}
+CollectionGrid.wrappedComponent.propTypes = {
+  routingStore: MobxPropTypes.objectOrObservableObject.isRequired,
+  uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 
 export default CollectionGrid

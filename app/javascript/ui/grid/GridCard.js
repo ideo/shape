@@ -1,10 +1,8 @@
 import PropTypes from 'prop-types'
 import { PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
-import { Link } from 'react-router-dom'
 
-import GridCardHotspots from '~/ui/grid/GridCardHotspots'
-import DragHandle from '~/ui/grid/DragHandle'
+import GridCardHotspot from '~/ui/grid/GridCardHotspot'
 
 export const StyledGridCard = styled.div`
   z-index: 1;
@@ -12,14 +10,9 @@ export const StyledGridCard = styled.div`
   width: 100%;
   background: white;
   padding: 0;
-
-  &:hover {
-    z-index: 2;
-    .DragHandle {
-      opacity: 1;
-    }
-  }
+  cursor: ${props => (props.dragging ? 'grabbing' : 'pointer')};
 `
+StyledGridCard.displayName = 'StyledGridCard'
 
 const StyledGridCardInner = styled.div`
   position: relative;
@@ -27,6 +20,7 @@ const StyledGridCardInner = styled.div`
   height: calc(100% - 2rem);
   overflow: hidden;
 `
+StyledGridCardInner.displayName = 'StyledGridCardInner'
 
 class GridCard extends React.PureComponent {
   get isItem() {
@@ -41,27 +35,30 @@ class GridCard extends React.PureComponent {
     if (this.isItem) {
       return (
         <div>
-          {record.name} {card.order}
+          {record.name} [{card.order}]
         </div>
       )
     } else if (this.isCollection) {
       return (
-        <Link to={`/collections/${record.id}`}>
-          {record.name} {card.order}
-        </Link>
+        <div>
+          {record.name} (coll.) [{card.order}]
+        </div>
       )
     }
     return <div />
   }
 
+  handleClick = () => {
+    if (this.props.dragging) return
+    this.props.handleClick()
+  }
+
   render() {
     return (
-      <StyledGridCard>
-        <GridCardHotspots card={this.props.card} />
-
-        <DragHandle />
-
-        <StyledGridCardInner>
+      <StyledGridCard dragging={this.props.dragging}>
+        <GridCardHotspot card={this.props.card} dragging={this.props.dragging} />
+        {/* onClick placed here so it's separate from hotspot click */}
+        <StyledGridCardInner onClick={this.handleClick}>
           {this.inner}
         </StyledGridCardInner>
       </StyledGridCard>
@@ -73,6 +70,8 @@ GridCard.propTypes = {
   card: MobxPropTypes.objectOrObservableObject.isRequired,
   cardType: PropTypes.string.isRequired,
   record: MobxPropTypes.objectOrObservableObject.isRequired,
+  dragging: PropTypes.bool.isRequired,
+  handleClick: PropTypes.func.isRequired,
 }
 
 export default GridCard

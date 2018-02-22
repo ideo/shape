@@ -2,6 +2,8 @@ import styled from 'styled-components'
 import Spinner from 'react-spinkit'
 import { Flex, Box } from 'reflexbox'
 
+import v from '~/utils/variables'
+
 const StyledSpinner = styled(Spinner)`
   &.sk-spinner {
     margin: 0 auto;
@@ -17,7 +19,7 @@ const Logo = () => (
       <StyledSpinner
         fadeIn="half"
         name="folding-cube"
-        color="#00bfa3"
+        color={v.colors.teal}
       />
     </Box>
   </Flex>

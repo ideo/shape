@@ -1,6 +1,8 @@
 class CollectionCard < ApplicationRecord
   belongs_to :parent, class_name: 'Collection'
-  belongs_to :collection, optional: true
+  # not all collection relations are truly inverse_of :parent_collection_card, when they are references
+  # this is just needed for doing validations on accepts_nested_attributes_for :collection
+  belongs_to :collection, optional: true, inverse_of: :parent_collection_card
   belongs_to :item, optional: true
 
   before_validation :assign_order, if: :assign_order?
@@ -11,10 +13,23 @@ class CollectionCard < ApplicationRecord
   validate :card_is_only_primary_card, if: :check_if_primary_card_is_unique?
   validate :parent_is_not_readonly, on: :create
 
-  scope :not_reference, -> { where(reference: false) }
+  scope :primary, -> { where(reference: false) }
   scope :reference, -> { where(reference: true) }
 
   accepts_nested_attributes_for :collection, :item
+
+  def record
+    return item if item.present?
+    return collection if collection.present?
+  end
+
+  def record_type
+    record.class.base_class.name.underscore.to_sym
+  end
+
+  def primary?
+    !reference
+  end
 
   private
 
@@ -42,16 +57,15 @@ class CollectionCard < ApplicationRecord
   end
 
   def card_is_only_primary_card
-    if item.present? && item.parent_collection_card.present?
-      errors.add(:item, 'already has a primary card')
-    elsif collection.present? && collection.parent_collection_card.present?
-      errors.add(:collection, 'already has a primary card')
+    # look for an existing primary CollectionCard that is already pointed to this record
+    if record.present? && CollectionCard.primary.where("#{record_type}_id" => record.id).count.positive?
+      errors.add(record_type, 'already has a primary card')
     end
   end
 
   def parent_is_not_readonly
     return if parent.blank?
-    
+
     errors.add(:parent, 'is read-only so you can\'t save this card') if parent.read_only?
   end
 end

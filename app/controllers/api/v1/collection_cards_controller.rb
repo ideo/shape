@@ -1,7 +1,8 @@
 class Api::V1::CollectionCardsController < Api::V1::BaseController
-  deserializable_resource :collection_card, only: [:create, :update]
+  deserializable_resource :collection_card, class: DeserializableCollectionCard, only: [:create, :update]
   load_and_authorize_resource :collection, only: [:index, :create]
   load_and_authorize_resource
+  before_action :load_parent_collection, only: [:create]
 
   def index
     render jsonapi: @collection.collection_cards
@@ -14,10 +15,11 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
   def create
     @collection_card = @collection.collection_cards
                                   .build(collection_card_params)
+
     if @collection_card.save
-      render jsonapi: @collection_card
+      render jsonapi: @collection_card, include: %i[record]
     else
-      render jsonapi_errors: @collection_card.errors.full_messages
+      render jsonapi_errors: @collection_card.errors, status: :bad_request
     end
   end
 
@@ -26,11 +28,15 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
     if @collection_card.save
       render jsonapi: @collection_card
     else
-      render jsonapi_errors: @collection_card.errors.full_messages
+      render jsonapi_errors: @collection_card.errors, status: :bad_request
     end
   end
 
   private
+
+  def load_parent_collection
+    @collection = Collection.find(collection_card_params[:parent_id])
+  end
 
   def collection_card_params
     params.require(:collection_card).permit(

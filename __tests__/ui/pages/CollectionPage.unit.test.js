@@ -1,45 +1,49 @@
 import CollectionPage from '~/ui/pages/CollectionPage'
-import apiStoreMock from '#/mocks/apiStoreMock'
+import fakeApiStore from '#/mocks/fakeApiStore'
+import {
+  fakeCollection
+} from '#/mocks/data'
 
 const id = 1
 const collections = [
-  { id: 1, name: 'My Workspace X', breadcrumb: [] }
+  Object.assign({}, fakeCollection, { id: 1 }),
+  Object.assign({}, fakeCollection, { id: 2 }),
+  Object.assign({}, fakeCollection, { id: 3 }),
 ]
 const collection = collections[0]
-let wrapper, match, apiStore
+let wrapper, match, apiStore, uiStore
 let props
 
 beforeEach(() => {
   match = { params: { id }, path: '/collections/1', url: '/collections/1' }
-  apiStore = apiStoreMock({
-    findResult: collection
+  apiStore = fakeApiStore({
+    findResult: collection,
+    requestResult: { data: collection }
   })
   apiStore.collections = collections
-  props = { apiStore, match }
+  uiStore = {
+    blankContentToolState: null
+  }
+  props = { apiStore, uiStore, match }
+
+  wrapper = shallow(
+    <CollectionPage.wrappedComponent {...props} />
+  )
 })
 
 describe('CollectionPage', () => {
   it('makes an API call to fetch the collection', () => {
-    wrapper = shallow(
-      <CollectionPage.wrappedComponent {...props} />
-    )
     expect(apiStore.request).toBeCalledWith(`collections/${match.params.id}`)
+    expect(apiStore.find).toBeCalledWith('collections', match.params.id)
   })
 
   it('displays the collection name', () => {
-    wrapper = shallow(
-      <CollectionPage.Undecorated {...props} />
-    )
-    expect(wrapper.find('H1').children().text()).toBe(collection.name)
+    expect(wrapper.find('H1').children().text()).toEqual(collection.name)
   })
 
-  // it('renders correctly', () => {
-  //   wrapper = renderer.create(
-  //     <Provider apiStore={props.apiStore}>
-  //       <CollectionPage {...props} />
-  //     </Provider>
-  //   )
-  //   const tree = wrapper.toJSON()
-  //   expect(tree).toMatchSnapshot()
-  // })
+  it('passes collection to the CollectionGrid', () => {
+    // better way to reference this? otherwise it works
+    const grid = wrapper.find('inject-CollectionGrid-with-routingStore-uiStore')
+    expect(grid.props().collection).toBe(collection)
+  })
 })

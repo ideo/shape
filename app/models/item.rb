@@ -4,7 +4,7 @@ class Item < ApplicationRecord
 
   # The primary collection that 'owns' this item
   has_one :parent_collection_card,
-          -> { not_reference },
+          -> { primary },
           class_name: 'CollectionCard'
 
   # All collection cards this is linked to
