@@ -53,7 +53,6 @@ class GridCardBlank extends React.Component {
     FilestackUpload
       .pickImage()
       .then(resp => {
-        console.log(resp)
         if (resp.filesUploaded.length > 0) {
           const img = resp.filesUploaded[0]
           const attrs = {
@@ -70,13 +69,9 @@ class GridCardBlank extends React.Component {
           }
           this.createCard(attrs)
         } else {
-          console.log('Failed to upload image:', resp.filesFailed)
+          //console.log('Failed to upload image:', resp.filesFailed)
         }
       })
-  }
-
-  startCreatingCollection = () => {
-    this.setState({ creatingCollection: true })
   }
 
   createCard = (customAttrs = {}) => {
@@ -93,6 +88,10 @@ class GridCardBlank extends React.Component {
     })
   }
 
+  startCreatingCollection = () => {
+    this.setState({ creatingCollection: true })
+  }
+
   createCollection = () => {
     const attrs = {
       // `collection` is the collection being created within the card
@@ -100,7 +99,7 @@ class GridCardBlank extends React.Component {
         name: this.state.inputText,
       }
     }
-    createCard(attrs)
+    this.createCard(attrs)
   }
 
   closeBlankContentTool = () => {
