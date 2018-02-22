@@ -40,6 +40,8 @@ GEM
       tzinfo (~> 1.1)
     addressable (2.5.2)
       public_suffix (>= 2.0.2, < 4.0)
+    appsignal (2.5.0)
+      rack
     arel (8.0.0)
     ast (2.4.0)
     autoprefixer-rails (8.0.0)
@@ -309,6 +311,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  appsignal
   autoprefixer-rails
   byebug
   cancancan (~> 2.0)
