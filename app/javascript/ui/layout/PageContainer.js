@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types'
 import styled from 'styled-components'
 
 import v from '~/utils/variables'
@@ -13,5 +14,9 @@ const PageContainer = ({ children }) => (
     {children}
   </StyledContainer>
 )
+
+PageContainer.propTypes = {
+  children: PropTypes.node.isRequired,
+}
 
 export default PageContainer

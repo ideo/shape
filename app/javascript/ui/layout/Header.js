@@ -1,5 +1,6 @@
+import PropTypes from 'prop-types'
 import styled from 'styled-components'
-import { inject, observer } from 'mobx-react'
+import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import { Flex, Box } from 'reflexbox'
 
 import Logo from '~/ui/layout/Logo'
@@ -51,6 +52,13 @@ class Header extends React.Component {
 
     )
   }
+}
+
+Header.propTypes = {
+  children: PropTypes.node.isRequired,
+}
+Header.wrappedComponent.propTypes = {
+  apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 
 export default Header

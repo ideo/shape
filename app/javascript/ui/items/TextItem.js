@@ -1,10 +1,12 @@
 import { PropTypes as MobxPropTypes } from 'mobx-react'
-import styled from 'styled-components'
 
 class TextItem extends React.Component {
   render() {
+    const { item } = this.props
     return (
-      <div>{this.props.item.content}</div>
+      <div>
+        <span dangerouslySetInnerHTML={{ __html: item.content }} />
+      </div>
     )
   }
 }

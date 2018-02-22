@@ -1,3 +1,5 @@
+import { propTypes, defaultProps } from './iconProps'
+
 const AddTextIcon = ({ color = 'black', width = 32, height = 32 }) => (
   <svg width={width} height={height} viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
     <g fill="none" fillRule="evenodd">
@@ -8,5 +10,8 @@ const AddTextIcon = ({ color = 'black', width = 32, height = 32 }) => (
     </g>
   </svg>
 )
+
+AddTextIcon.propTypes = { ...propTypes }
+AddTextIcon.defaultProps = { ...defaultProps }
 
 export default AddTextIcon

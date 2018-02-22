@@ -68,6 +68,5 @@ module.exports = {
     // react/no-typos disabled until this is resolved:
     // https://github.com/yannickcr/eslint-plugin-react/issues/1389
     "react/no-typos": 0,
-    "react/prop-types": [1, {"skipUndeclared": true}]
   }
 }

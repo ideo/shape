@@ -1,4 +1,5 @@
-import { inject, observer } from 'mobx-react'
+import ReactRouterPropTypes from 'react-router-prop-types'
+import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import { Router, Switch, Route } from 'react-router-dom'
 
 import CollectionPage from '~/ui/pages/CollectionPage'
@@ -14,7 +15,7 @@ class Routes extends React.Component {
         apiStore.sync(response)
         apiStore.setCurrentUserId(response.data.id)
       })
-      .catch(err => console.warn(new Error(err)))
+      // .catch(err => console.warn(new Error(err)))
   }
 
   render() {
@@ -31,6 +32,13 @@ class Routes extends React.Component {
       </Router>
     )
   }
+}
+
+Routes.propTypes = {
+  history: ReactRouterPropTypes.history.isRequired,
+}
+Routes.wrappedComponent.propTypes = {
+  apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 
 export default Routes

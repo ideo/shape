@@ -47,6 +47,7 @@
     "react-fontawesome": "~1.6.1",
     "react-hover-observer": "^2.1.0",
     "react-intl": "^2.4.0",
+    "react-quill": "^1.2.4",
     "react-router": "^4.2.0",
     "react-router-dom": "~4.2.2",
     "react-router-prop-types": "^0.0.3",

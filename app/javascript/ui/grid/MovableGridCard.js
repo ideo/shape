@@ -114,14 +114,12 @@ class MovableGridCard extends React.PureComponent {
       width
     } = position
 
-    const transition = 'transform 0.5s, width 0.3s, height 0.3s, opacity 0.5s ease-out 0.2s;'
-    let opacity = 1
+    const transition = 'transform 0.5s, width 0.3s, height 0.3s;'
     let rotation = '0deg'
     let { zIndex } = this.state
     const { dragging } = this.state
     if (dragging) {
-      // transition = 'width 0.3s, height 0.3s, opacity 0.5s ease-out 0.2s;'
-      opacity = 0.9
+      // transition = 'width 0.3s, height 0.3s;'
       // experiment -- shrink wide and tall cards
       // NOTE: turned off, was causing other issues about card placement
       // if (width > 500) {
@@ -164,7 +162,6 @@ class MovableGridCard extends React.PureComponent {
       yPos,
       rotation,
       transition,
-      opacity,
       outline,
     }
 

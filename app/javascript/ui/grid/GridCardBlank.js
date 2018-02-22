@@ -2,6 +2,7 @@ import PropTypes from 'prop-types'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 import { Flex, Box } from 'reflexbox'
+import ReactQuill from 'react-quill'
 
 import CollectionCard from '~/stores/jsonApi/CollectionCard'
 import AddTextIcon from '~/ui/icons/AddTextIcon'
@@ -79,9 +80,16 @@ class GridCardBlank extends React.Component {
     inputText: '',
   }
 
-  onTextChange = (e) => {
+  onInputChange = (e) => {
     this.setState({
       inputText: e.target.value
+    })
+  }
+
+  onTextChange = (content, delta, source, editor) => {
+    // console.log(editor.getContents())
+    this.setState({
+      inputText: content
     })
   }
 
@@ -170,7 +178,7 @@ class GridCardBlank extends React.Component {
           <input
             placeholder="Collection name"
             value={this.state.inputText}
-            onChange={this.onTextChange}
+            onChange={this.onInputChange}
           />
           <input
             onClick={this.createCollection}
@@ -183,12 +191,11 @@ class GridCardBlank extends React.Component {
     } else if (this.state.creatingText) {
       return (
         <div>
-          <textarea
-            rows="8"
-            cols="28"
+          <ReactQuill
             placeholder="Add your text"
             onChange={this.onTextChange}
             value={this.state.inputText}
+            theme="bubble"
           />
           <input
             onClick={this.createTextItem}

@@ -1,6 +1,7 @@
-@import 'normalize-rails';
+// @import 'normalize-rails';
+@import 'quill';
 
+@import '_core/reset';
 @import '_core/base';
 @import '_core/typography';
-@import '_core/icons';
 @import '_core/grid';

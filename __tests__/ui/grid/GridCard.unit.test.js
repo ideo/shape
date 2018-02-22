@@ -33,7 +33,7 @@ describe('GridCard', () => {
     })
 
     it('renders the item content', () => {
-      expect(wrapper.find('StyledGridCardInner').children().text()).toContain(fakeItem.content)
+      expect(wrapper.find('StyledGridCardInner').children().html()).toContain(fakeItem.content)
     })
   })
 

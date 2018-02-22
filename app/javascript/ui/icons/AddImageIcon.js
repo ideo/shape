@@ -1,4 +1,6 @@
-const AddImageIcon = ({ color = 'black', width = 32, height = 32 }) => (
+import { propTypes, defaultProps } from './iconProps'
+
+const AddImageIcon = ({ color, width, height }) => (
   <svg width={width} height={height} viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
     <g fillRule="evenodd">
       <g fillRule="nonzero">
@@ -11,5 +13,8 @@ const AddImageIcon = ({ color = 'black', width = 32, height = 32 }) => (
 
   </svg>
 )
+
+AddImageIcon.propTypes = { ...propTypes }
+AddImageIcon.defaultProps = { ...defaultProps }
 
 export default AddImageIcon
