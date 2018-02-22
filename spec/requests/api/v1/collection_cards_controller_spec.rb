@@ -93,6 +93,7 @@ describe Api::V1::CollectionCardsController, type: :request, auth: true do
     end
 
     context 'with filestack file attrs' do
+      let(:filename) { 'apple.jpg' }
       let(:filestack_file) { build(:filestack_file) }
       let(:params_with_filestack_file) {
         json_api_params(
@@ -110,6 +111,7 @@ describe Api::V1::CollectionCardsController, type: :request, auth: true do
                 'handle': filestack_file.handle,
                 'size': filestack_file.size,
                 'mimetype': filestack_file.mimetype,
+                'filename': filename,
               }
             },
           }
@@ -125,6 +127,12 @@ describe Api::V1::CollectionCardsController, type: :request, auth: true do
         expect {
           post(path, params: params_with_filestack_file)
         }.to change(FilestackFile, :count).by(1)
+      end
+
+      it 'has filename without extension as name' do
+        post(path, params: params_with_filestack_file)
+        item = json_included_objects_of_type('items').first
+        expect(item['attributes']['name']).to eq('apple')
       end
     end
   end

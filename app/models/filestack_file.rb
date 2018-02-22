@@ -6,6 +6,12 @@ class FilestackFile < ApplicationRecord
   after_create :process_image, if: :image?
   after_destroy :delete_on_filestack
 
+  def filename_without_extension
+    return if filename.blank?
+
+    filename.sub(/\.\w+$/, '')
+  end
+
   def image?
     mimetype.include?('image')
   end
