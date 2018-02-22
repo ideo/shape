@@ -15,12 +15,19 @@ class CollectionCardBuilder
   private
 
   def create_collection_card
+    if @collection_card.record.blank?
+      @errors << 'Must build a collection card with a related record'
+      return false
+    end
     result = @collection_card.save
     if result
       if @collection_card.collection.present?
         @user.add_role(Role::EDITOR, collection_card.collection)
       end
       @collection_card.record.reload.recalculate_breadcrumb!
+    else
+      @errors << @collection_card.errors.full_messages
+      @errors.flatten!
     end
     result
   end
