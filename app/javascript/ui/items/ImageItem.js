@@ -2,10 +2,12 @@ import { PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 
 export const StyledImageItem = styled.div`
-  img {
-    display: block;
-    width: 100%;
-  }
+  background-image: url(${props => props.url});
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  width: 100%;
+  height: 100%;
 `
 StyledImageItem.displayName = 'StyledImageItem'
 
@@ -15,9 +17,7 @@ class ImageItem extends React.Component {
     const imageUrl = item.filestack_file.url
 
     return (
-      <StyledImageItem>
-        <img src={imageUrl} alt={item.name} />
-      </StyledImageItem>
+      <StyledImageItem url={imageUrl} />
     )
   }
 }

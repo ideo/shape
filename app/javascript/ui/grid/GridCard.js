@@ -18,8 +18,7 @@ StyledGridCard.displayName = 'StyledGridCard'
 
 const StyledGridCardInner = styled.div`
   position: relative;
-  padding: 1rem;
-  height: calc(100% - 2rem);
+  height: 100%;
   overflow: hidden;
 `
 StyledGridCardInner.displayName = 'StyledGridCardInner'
