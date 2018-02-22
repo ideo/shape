@@ -5,7 +5,8 @@ class Item < ApplicationRecord
   # The primary collection that 'owns' this item
   has_one :parent_collection_card,
           -> { primary },
-          class_name: 'CollectionCard'
+          class_name: 'CollectionCard',
+          inverse_of: :item
 
   # All collection cards this is linked to
   has_many :collection_cards, -> { reference }

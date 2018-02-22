@@ -1,9 +1,9 @@
 class CollectionCard < ApplicationRecord
   belongs_to :parent, class_name: 'Collection'
-  # not all collection relations are truly inverse_of :parent_collection_card, when they are references
+  # not all relations are truly inverse_of :parent_collection_card, i.e. when they are references
   # this is just needed for doing validations on accepts_nested_attributes_for :collection
   belongs_to :collection, optional: true, inverse_of: :parent_collection_card
-  belongs_to :item, optional: true
+  belongs_to :item, optional: true, inverse_of: :parent_collection_card
 
   before_validation :assign_order, if: :assign_order?
   before_create :assign_default_height_and_width
@@ -58,7 +58,7 @@ class CollectionCard < ApplicationRecord
 
   def card_is_only_primary_card
     # look for an existing primary CollectionCard that is already pointed to this record
-    if record.present? && CollectionCard.primary.where("#{record_type}_id" => record.id).count.positive?
+    if record.present? && record.persisted? && CollectionCard.primary.where("#{record_type}_id": record.id).count.positive?
       errors.add(record_type, 'already has a primary card')
     end
   end
