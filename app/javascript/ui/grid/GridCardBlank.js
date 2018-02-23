@@ -23,6 +23,19 @@ const StyledGridCardInner = styled.div`
   padding: 2rem;
 `
 
+const ValidIndicator = styled.div`
+  display: inline-block;
+  font-size: 20px;
+  font-weight: bold;
+  width: 20px;
+  &.valid {
+    color: green;
+  }
+  &.invalid {
+    color: red;
+  }
+`
+
 @inject('uiStore', 'apiStore')
 @observer
 class GridCardBlank extends React.Component {
@@ -148,7 +161,6 @@ class GridCardBlank extends React.Component {
             value={this.state.inputText}
             onChange={this.onTextChange}
           />
-          ${this.videoUrlIsValid ? '&#x2714;' : '&#x9675;'}
           <input
             onClick={this.createCollection}
             type="submit"
@@ -158,6 +170,16 @@ class GridCardBlank extends React.Component {
         </div>
       )
     } else if (this.state.showVideoItemForm) {
+      let validIndicator = <ValidIndicator />
+
+      if (this.state.videoUrl.length > 3) {
+        validIndicator = (
+          <ValidIndicator className={this.videoUrlIsValid() ? 'valid' : 'invalid'}>
+            {this.videoUrlIsValid() ? '✔' : 'x'}
+          </ValidIndicator>
+        )
+      }
+
       return (
         <div>
           <input
@@ -165,6 +187,7 @@ class GridCardBlank extends React.Component {
             value={this.state.videoUrl}
             onChange={this.onVideoUrlChange}
           />
+          {validIndicator}
           <input
             onClick={this.createVideoItem}
             type="submit"
