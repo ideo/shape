@@ -38,7 +38,8 @@ class VideoUrl {
 
   static isValid(url) {
     const { service, id } = this.parse(url)
-    return (service && id)
+    if (service && id) return true
+    return false
   }
 }
 
