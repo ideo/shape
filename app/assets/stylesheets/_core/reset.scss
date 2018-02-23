@@ -1,34 +1,158 @@
 // https://perishablepress.com/a-killer-collection-of-global-css-reset-styles/
 // -- Condensed Meyer Reset --
-body, div, dl, dt, dd, ul, ol, li, h1, h2, h3, h4, h5, h6,
-pre, form, fieldset, input, textarea, p, blockquote, th, td {
+body {
 	padding: 0;
 	margin: 0;
-	}
-fieldset, img {
+}
+div {
+	padding: 0;
+	margin: 0;
+}
+dl {
+	padding: 0;
+	margin: 0;
+}
+dt {
+	padding: 0;
+	margin: 0;
+}
+dd {
+	padding: 0;
+	margin: 0;
+}
+ul {
+	padding: 0;
+	margin: 0;
+	list-style: none;
+}
+ol {
+	padding: 0;
+	margin: 0;
+	list-style: none;
+}
+li {
+	padding: 0;
+	margin: 0;
+}
+h1 {
+	padding: 0;
+	margin: 0;
+	font-weight: normal;
+	font-size: 100%;
+}
+h2 {
+	padding: 0;
+	margin: 0;
+	font-weight: normal;
+	font-size: 100%;
+}
+h3 {
+	padding: 0;
+	margin: 0;
+	font-weight: normal;
+	font-size: 100%;
+}
+h4 {
+	padding: 0;
+	margin: 0;
+	font-weight: normal;
+	font-size: 100%;
+}
+h5 {
+	padding: 0;
+	margin: 0;
+	font-weight: normal;
+	font-size: 100%;
+}
+h6 {
+	padding: 0;
+	margin: 0;
+	font-weight: normal;
+	font-size: 100%;
+}
+pre {
+	padding: 0;
+	margin: 0;
+}
+form {
+	padding: 0;
+	margin: 0;
+}
+fieldset {
+	padding: 0;
+	margin: 0;
 	border: 0;
-	}
+}
+input {
+	padding: 0;
+	margin: 0;
+}
+textarea {
+	padding: 0;
+	margin: 0;
+}
+p {
+	padding: 0;
+	margin: 0;
+}
+blockquote {
+	padding: 0;
+	margin: 0;
+}
+th {
+	padding: 0;
+	margin: 0;
+	font-weight: normal;
+	font-style: normal;
+	text-align: left;
+}
+td {
+	padding: 0;
+	margin: 0;
+}
+img {
+	border: 0;
+}
 table {
 	border-collapse: collapse;
 	border-spacing: 0;
-	}
-ol, ul {
-	list-style: none;
-	}
-address, caption, cite, code, dfn, th, var {
+}
+address {
 	font-weight: normal;
 	font-style: normal;
-	}
-caption, th {
-	text-align: left;
-	}
-h1, h2, h3, h4, h5, h6 {
+}
+caption {
 	font-weight: normal;
-	font-size: 100%;
+	font-style: normal;
+	text-align: left;
+}
+cite {
+	font-weight: normal;
+	font-style: normal;
+}
+code {
+	font-weight: normal;
+	font-style: normal;
+}
+dfn {
+	font-weight: normal;
+	font-style: normal;
+}
+var {
+	font-weight: normal;
+	font-style: normal;
+}
+q {
+	&:before {
+		content: '';
 	}
-q:before, q:after {
-	content: '';
+	&:after {
+		content: '';
 	}
-abbr, acronym {
+}
+abbr {
 	border: 0;
-	}
+}
+acronym {
+	border: 0;
+}
