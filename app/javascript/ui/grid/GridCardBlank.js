@@ -202,6 +202,7 @@ class GridCardBlank extends React.Component {
             placeholder="Add your text"
             onChange={this.onTextChange}
             value={this.state.textData}
+            {...v.quillDefaults}
             theme="bubble"
           />
           <input

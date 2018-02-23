@@ -19,5 +19,16 @@ export default {
     cyan: '#c0dbde',
     cyanLight: '#f0f4f6',
     dark: '#120f0e',
-  }
+  },
+
+  quillDefaults: {
+    formats: ['link', 'size', 'list'],
+    modules: {
+      toolbar: [
+        // size: false means "normal" i.e. no formatting
+        [{ size: [false, 'large'] }],
+        ['link'],
+      ]
+    }
+  },
 }
