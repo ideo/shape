@@ -53,14 +53,15 @@ class Api::V1::CollectionsController < Api::V1::BaseController
   def render_collection
     render jsonapi: @collection,
            include: [
+             # include collection_cards for UI to receive any updates
              collection_cards: [
-               :collection,
-               item: [:filestack_file],
+               record: [:filestack_file],
              ],
            ]
   end
 
   def load_collection_with_cards
+    # item/collection will turn into "record" when serialized
     @collection = Collection.where(id: params[:id])
                             .includes(collection_cards: %i[item collection])
                             .first

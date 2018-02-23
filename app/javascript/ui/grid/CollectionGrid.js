@@ -127,9 +127,7 @@ class CollectionGrid extends React.Component {
       // we want to drop this item on the order where placeholder is already sitting
       const { order } = placeholder
       original.order = order
-      // update order of all cards from 1...X
-      this.props.collection.reorderCards()
-      // persist changes
+      // reorder cards and persist changes
       this.props.updateCollection()
       this.positionCards(this.props.collection.collection_cards)
     } else {

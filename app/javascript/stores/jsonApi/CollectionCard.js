@@ -5,14 +5,14 @@ class CollectionCard extends BaseRecord {
     return this.apiStore.find('collections', this.parent_id)
   }
 
-  get record() {
-    if (this.item) {
-      return this.item
-    } else if (this.collection) {
-      return this.collection
-    }
-    return null
-  }
+  // get record() {
+  //   if (this.item) {
+  //     return this.item
+  //   } else if (this.collection) {
+  //     return this.collection
+  //   }
+  //   return null
+  // }
 
   API_create() {
     // we call apiStore.request so we can interact with the response data
@@ -21,7 +21,6 @@ class CollectionCard extends BaseRecord {
       .then((response) => {
         const newCard = response.data
         this.parent.collection_cards.push(newCard)
-        this.parent.reorderCards()
         // NOTE: reordering happens on the frontend; so we perform this extra save...
         // could be replaced by reordering on the backend
         this.parent.API_updateCardOrder()
