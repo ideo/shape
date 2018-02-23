@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180214211104) do
+ActiveRecord::Schema.define(version: 20180221220511) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -42,6 +42,16 @@ ActiveRecord::Schema.define(version: 20180214211104) do
     t.index ["organization_id"], name: "index_collections_on_organization_id"
   end
 
+  create_table "filestack_files", force: :cascade do |t|
+    t.string "url"
+    t.string "handle"
+    t.string "filename"
+    t.string "mimetype"
+    t.integer "size"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
   create_table "groups", force: :cascade do |t|
     t.string "name"
     t.bigint "organization_id"
@@ -60,6 +70,7 @@ ActiveRecord::Schema.define(version: 20180214211104) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.jsonb "breadcrumb"
+    t.integer "filestack_file_id"
     t.index ["cloned_from_id"], name: "index_items_on_cloned_from_id"
   end
 

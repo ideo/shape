@@ -1,9 +1,11 @@
 import PropTypes from 'prop-types'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
+import _ from 'lodash'
 
 import CollectionCard from '~/stores/jsonApi/CollectionCard'
 import Icon from '~/ui/global/Icon'
+import FilestackUpload from '~/utils/filestack_upload'
 import { StyledGridCard } from './GridCard'
 
 const StyledGridCardBlank = StyledGridCard.extend`
@@ -35,12 +37,8 @@ class GridCardBlank extends React.Component {
     })
   }
 
-  startCreatingCollection = () => {
-    this.setState({ creatingCollection: true })
-  }
-
-  createCollection = () => {
-    const card = new CollectionCard({
+  newCardAttrs = (customAttrs) => (
+    _.merge({
       // NOTE: technically this uses the same order as the card it is going "next to"
       // but will be given order + 1 after reorderCards()
       order: this.props.order,
@@ -48,11 +46,39 @@ class GridCardBlank extends React.Component {
       height: 1,
       // `parent` is the collection this card belgngs to
       parent_id: this.props.parent.id,
-      // `collection` is the collection being created within the card
-      collection_attributes: {
-        name: this.state.inputText,
-      }
-    }, this.props.apiStore)
+    }, customAttrs)
+  )
+
+  pickImage = () => {
+    FilestackUpload
+      .pickImage()
+      .then(resp => {
+        if (resp.filesUploaded.length > 0) {
+          const img = resp.filesUploaded[0]
+          const attrs = {
+            item_attributes: {
+              type: 'Item::ImageItem',
+              filestack_file_attributes: {
+                url: img.url,
+                handle: img.handle,
+                filename: img.filename,
+                size: img.size,
+                mimetype: img.mimetype,
+              },
+            },
+          }
+          this.createCard(attrs)
+        } else {
+          //console.log('Failed to upload image:', resp.filesFailed)
+        }
+      })
+  }
+
+  createCard = (customAttrs = {}) => {
+    const card = new CollectionCard(
+      this.newCardAttrs(customAttrs),
+      this.props.apiStore
+    )
 
     this.setState({ loading: true }, () => {
       card.API_create().then(() => {
@@ -60,6 +86,20 @@ class GridCardBlank extends React.Component {
         this.closeBlankContentTool()
       })
     })
+  }
+
+  startCreatingCollection = () => {
+    this.setState({ creatingCollection: true })
+  }
+
+  createCollection = () => {
+    const attrs = {
+      // `collection` is the collection being created within the card
+      collection_attributes: {
+        name: this.state.inputText,
+      }
+    }
+    this.createCard(attrs)
   }
 
   closeBlankContentTool = () => {
@@ -88,6 +128,12 @@ class GridCardBlank extends React.Component {
       <div>
         <button onClick={this.startCreatingCollection}>
           Add Collection
+          &nbsp;
+          <Icon name="squarePlus" size="2rem" />
+        </button>
+
+        <button onClick={this.pickImage}>
+          Add Image
           &nbsp;
           <Icon name="squarePlus" size="2rem" />
         </button>

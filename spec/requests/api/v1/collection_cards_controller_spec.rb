@@ -61,6 +61,80 @@ describe Api::V1::CollectionCardsController, type: :request, auth: true do
       post(path, params: params)
       expect(json['data']['attributes']).to match_json_schema('collection_card')
     end
+
+    context 'with item attrs' do
+      let(:params_with_item) {
+        json_api_params(
+          'collection_cards',
+          {
+            'order': 1,
+            'width': 3,
+            'height': 1,
+            # parent_id is required to retrieve the parent collection without a nested route
+            'parent_id': collection.id,
+            'item_attributes': {
+              'type': 'Item::TextItem',
+              'content': 'Mary had a little lamb...',
+            },
+          }
+        )
+      }
+
+      it 'returns a 200' do
+        post(path, params: params_with_item)
+        expect(response.status).to eq(200)
+      end
+
+      it 'creates record' do
+        expect {
+          post(path, params: params_with_item)
+        }.to change(Item, :count).by(1)
+      end
+    end
+
+    context 'with filestack file attrs' do
+      let(:filename) { 'apple.jpg' }
+      let(:filestack_file) { build(:filestack_file) }
+      let(:params_with_filestack_file) {
+        json_api_params(
+          'collection_cards',
+          {
+            'order': 1,
+            'width': 3,
+            'height': 1,
+            # parent_id is required to retrieve the parent collection without a nested route
+            'parent_id': collection.id,
+            'item_attributes': {
+              'type': 'Item::ImageItem',
+              'filestack_file_attributes': {
+                'url': filestack_file.url,
+                'handle': filestack_file.handle,
+                'size': filestack_file.size,
+                'mimetype': filestack_file.mimetype,
+                'filename': filename,
+              }
+            },
+          }
+        )
+      }
+
+      it 'returns a 200' do
+        post(path, params: params_with_filestack_file)
+        expect(response.status).to eq(200)
+      end
+
+      it 'creates record' do
+        expect {
+          post(path, params: params_with_filestack_file)
+        }.to change(FilestackFile, :count).by(1)
+      end
+
+      it 'has filename without extension as name' do
+        post(path, params: params_with_filestack_file)
+        item = json_included_objects_of_type('items').first
+        expect(item['attributes']['name']).to eq('apple')
+      end
+    end
   end
 
   describe 'PATCH #update' do

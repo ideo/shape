@@ -3,6 +3,8 @@ import { PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 
 import GridCardHotspot from '~/ui/grid/GridCardHotspot'
+import TextItem from '~/ui/items/TextItem'
+import ImageItem from '~/ui/items/ImageItem'
 
 export const StyledGridCard = styled.div`
   z-index: 1;
@@ -16,8 +18,7 @@ StyledGridCard.displayName = 'StyledGridCard'
 
 const StyledGridCardInner = styled.div`
   position: relative;
-  padding: 1rem;
-  height: calc(100% - 2rem);
+  height: 100%;
   overflow: hidden;
 `
 StyledGridCardInner.displayName = 'StyledGridCardInner'
@@ -33,11 +34,18 @@ class GridCard extends React.PureComponent {
   get inner() {
     const { card, record } = this.props
     if (this.isItem) {
-      return (
-        <div>
-          {record.name} [{card.order}]
-        </div>
-      )
+      switch (record.type) {
+      case 'Item::TextItem':
+        return <TextItem item={record} />
+      case 'Item::ImageItem':
+        return <ImageItem item={record} />
+      default:
+        return (
+          <div>
+            {record.name} [{card.order}]
+          </div>
+        )
+      }
     } else if (this.isCollection) {
       return (
         <div>

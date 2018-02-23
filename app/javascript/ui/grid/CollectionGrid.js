@@ -302,7 +302,7 @@ class CollectionGrid extends React.Component {
       if (cardType !== 'placeholder' && cardType !== 'blank') {
         // TODO: some kind of error catch if no record?
         if (card.record) {
-          record = card.record.rawAttributes()
+          ({ record } = card)
           cardType = card.record.getRecordType()
         }
       }

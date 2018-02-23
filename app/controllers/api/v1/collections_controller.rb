@@ -15,7 +15,7 @@ class Api::V1::CollectionsController < Api::V1::BaseController
   end
 
   def show
-    render jsonapi: @collection, include: [collection_cards: %i[record]]
+    render_collection
   end
 
   def me
@@ -24,7 +24,7 @@ class Api::V1::CollectionsController < Api::V1::BaseController
                               .user
                               .find_by_organization_id(current_organization.id)
 
-    render jsonapi: @collection, include: [collection_cards: %i[record]]
+    render_collection
   end
 
   def create
@@ -42,14 +42,23 @@ class Api::V1::CollectionsController < Api::V1::BaseController
   def update
     @collection.attributes = collection_params
     if @collection.save
-      # include collection_cards for UI to receive any updates
-      render jsonapi: @collection, include: [collection_cards: %i[record]]
+      render_collection
     else
       render jsonapi_errors: @collection.errors.full_messages
     end
   end
 
   private
+
+  def render_collection
+    render jsonapi: @collection,
+           include: [
+             # include collection_cards for UI to receive any updates
+             collection_cards: [
+               record: [:filestack_file],
+             ],
+           ]
+  end
 
   def load_collection_with_cards
     # item/collection will turn into "record" when serialized
