@@ -1,6 +1,6 @@
 import filestack from 'filestack-js'
 
-const API_KEY = 'AhSviFaSOQwS4o2dzycl0z'
+const API_KEY = process.env.FILESTACK_API_KEY
 
 const imageUploadConfig = {
   accept: 'image/*',

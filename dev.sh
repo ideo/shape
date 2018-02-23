@@ -4,8 +4,8 @@ if ! [ -x "$(command -v ttab)" ]; then
   exit 1
 fi
 # echo 'Running rails server...'
-ttab ./bin/rails s
-# echo 'Starting foreman to run webpack-dev-server...'
-ttab foreman start -f Procfile.development
+ttab heroku local web -f Procfile.development
+# echo 'Starting heroku local to run webpack-dev-server...'
+ttab heroku local webpack -f Procfile.development
 # echo 'Opening atom...'
 ttab atom .
