@@ -16,7 +16,7 @@ class Api::V1::OrganizationsController < Api::V1::BaseController
     if @organization.save
       render jsonapi: @organization
     else
-      render jsonapi_errors: @organization.errors.full_messages
+      render_api_errors @organization.errors
     end
   end
 

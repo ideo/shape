@@ -3,9 +3,9 @@ class CollectionCardBuilder
 
   def initialize(params:, collection: nil, user: nil)
     @collection_card = collection.collection_cards.build(params)
+    @errors = @collection_card.errors
     @user = user
     @collection = collection
-    @errors = []
   end
 
   def create
@@ -16,18 +16,16 @@ class CollectionCardBuilder
 
   def create_collection_card
     if @collection_card.record.blank?
-      @errors << 'Must build a collection card with a related record'
+      @collection_card.errors.add(:record, "can't be blank")
       return false
     end
     result = @collection_card.save
     if result
+      # TODO: rollback transaction if these later actions fail; add errors, return false
       if @collection_card.collection.present?
-        @user.add_role(Role::EDITOR, collection_card.collection)
+        @user.add_role(Role::EDITOR, @collection_card.collection)
       end
       @collection_card.record.reload.recalculate_breadcrumb!
-    else
-      @errors << @collection_card.errors.full_messages
-      @errors.flatten!
     end
     result
   end

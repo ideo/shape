@@ -19,7 +19,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
     if builder.create
       render jsonapi: builder.collection_card, include: [record: [:filestack_file]]
     else
-      render jsonapi_errors: builder.errors, status: :bad_request
+      render_api_errors builder.errors
     end
   end
 
@@ -28,7 +28,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
     if @collection_card.save
       render jsonapi: @collection_card
     else
-      render jsonapi_errors: @collection_card.errors, status: :bad_request
+      render_api_errors @collection_card.errors
     end
   end
 

@@ -26,6 +26,9 @@ class CollectionCard extends BaseRecord {
         this.parent.API_updateCardOrder()
         // this.apiStore.sync(response)
       })
+      .catch((error) => {
+        console.warn(error)
+      })
   }
 }
 CollectionCard.type = 'collection_cards'

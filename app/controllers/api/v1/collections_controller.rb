@@ -35,7 +35,7 @@ class Api::V1::CollectionsController < Api::V1::BaseController
     if builder.save
       render jsonapi: builder.collection
     else
-      render jsonapi_errors: builder.errors
+      render_api_errors builder.errors
     end
   end
 
@@ -44,7 +44,7 @@ class Api::V1::CollectionsController < Api::V1::BaseController
     if @collection.save
       render_collection
     else
-      render jsonapi_errors: @collection.errors.full_messages
+      render_api_errors @collection.errors
     end
   end
 

@@ -136,14 +136,26 @@ describe Api::V1::CollectionsController, type: :request, auth: true do
       )
     }
 
-    it 'returns a 200' do
-      post(path, params: params)
-      expect(response.status).to eq(200)
+    context 'success' do
+      it 'returns a 200' do
+        post(path, params: params)
+        expect(response.status).to eq(200)
+      end
+
+      it 'matches Collection schema' do
+        post(path, params: params)
+        expect(json['data']['attributes']).to match_json_schema('collection')
+      end
     end
 
-    it 'matches Collection schema' do
-      post(path, params: params)
-      expect(json['data']['attributes']).to match_json_schema('collection')
+    context 'with errors' do
+      let(:path) { "/api/v1/collections" }
+
+      it 'returns a 400' do
+        # because of the new path, will get an "organization can't be blank" error
+        post(path, params: params)
+        expect(response.status).to eq(400)
+      end
     end
 
     context 'as sub-collection' do

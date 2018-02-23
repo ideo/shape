@@ -13,7 +13,7 @@ RSpec.describe CollectionCardBuilder, type: :service do
   end
 
   describe '#create' do
-    describe 'success creating card with collection' do
+    context 'success creating card with collection' do
       let(:builder) do
         CollectionCardBuilder.new(
           params: params.merge(collection_attributes: {
@@ -42,7 +42,7 @@ RSpec.describe CollectionCardBuilder, type: :service do
       end
     end
 
-    describe 'success creating card with item' do
+    context 'success creating card with item' do
       let(:builder) do
         CollectionCardBuilder.new(
           params: params.merge(item_attributes: {
@@ -69,7 +69,7 @@ RSpec.describe CollectionCardBuilder, type: :service do
       end
     end
 
-    describe 'error because the item has no type' do
+    context 'error because the item has no type' do
       # attempt to build card without any item or collection
       let(:builder) do
         CollectionCardBuilder.new(
@@ -87,11 +87,11 @@ RSpec.describe CollectionCardBuilder, type: :service do
       end
 
       it 'should display errors' do
-        expect(builder.errors.first).to eq "Item type can't be blank"
+        expect(builder.errors.full_messages.first).to eq "Item type can't be blank"
       end
     end
 
-    describe 'error because there is no related record' do
+    context 'error because there is no related record' do
       # attempt to build card without any item or collection
       let(:builder) do
         CollectionCardBuilder.new(
@@ -106,21 +106,22 @@ RSpec.describe CollectionCardBuilder, type: :service do
       end
 
       it 'should display errors' do
-        expect(builder.errors.first).to eq 'Must build a collection card with a related record'
+        expect(builder.errors.full_messages.first).to eq "Record can't be blank"
       end
     end
 
-    describe 'error when trying to create both related records' do
+    context 'error when trying to create both related records' do
       # attempt to build card without any item or collection
       let(:builder) do
         CollectionCardBuilder.new(
           params: params.merge(
             collection_attributes: {
-              name: 'Test'
+              name: 'Test',
             },
             item_attributes: {
-              name: 'Test Item'
-            }
+              content: 'Test Content',
+              type: 'Item::TextItem',
+            },
           ),
           collection: parent,
           user: user,
@@ -132,7 +133,7 @@ RSpec.describe CollectionCardBuilder, type: :service do
       end
 
       it 'should display errors' do
-        expect(builder.errors.first).to eq 'Only one of Item or Collection can be assigned'
+        expect(builder.errors.full_messages.first).to eq 'Only one of Item or Collection can be assigned'
       end
     end
   end

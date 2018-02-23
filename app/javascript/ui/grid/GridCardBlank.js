@@ -115,10 +115,11 @@ class GridCardBlank extends React.Component {
     Object.assign(attrs, nested)
     const card = new CollectionCard(attrs, this.props.apiStore)
     this.setState({ loading: true }, () => {
-      card.API_create().then(() => {
-        // this will close the blank card so no need to set loading: false
-        this.closeBlankContentTool()
-      })
+      card.API_create()
+        .then(() => {
+          // this will close the blank card so no need to set loading: false
+          this.closeBlankContentTool()
+        })
     })
   }
 
