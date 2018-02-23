@@ -53,6 +53,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
         :type,
         :name,
         :content,
+        :url,
         :image,
         :archived,
         filestack_file_attributes: [
