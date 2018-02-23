@@ -5,7 +5,8 @@ import _ from 'lodash'
 
 import CollectionCard from '~/stores/jsonApi/CollectionCard'
 import Icon from '~/ui/global/Icon'
-import FilestackUpload from '~/utils/filestack_upload'
+import FilestackUpload from '~/utils/FilestackUpload'
+import VideoUrl from '~/utils/VideoUrl'
 import { StyledGridCard } from './GridCard'
 
 const StyledGridCardBlank = StyledGridCard.extend`
@@ -27,13 +28,21 @@ const StyledGridCardInner = styled.div`
 class GridCardBlank extends React.Component {
   state = {
     creatingCollection: false,
+    showVideoItemForm: false,
     loading: false,
     inputText: '',
+    videoUrl: ''
   }
 
   onTextChange = (e) => {
     this.setState({
       inputText: e.target.value
+    })
+  }
+
+  onVideoUrlChange = (e) => {
+    this.setState({
+      videoUrl: e.target.value
     })
   }
 
@@ -74,6 +83,26 @@ class GridCardBlank extends React.Component {
       })
   }
 
+  videoUrlIsValid = () => (
+    VideoUrl.isValid(this.state.videoUrl)
+  )
+
+  createVideoItem = () => {
+    if (this.videoUrlIsValid()) {
+      // Get a normalized URL to make it easier to handle in our system
+      const { normalizedUrl } = VideoUrl.parse(this.state.videoUrl)
+      const attrs = {
+        item_attributes: {
+          type: 'Item::VideoItem',
+          url: normalizedUrl
+        },
+      }
+      this.createCard(attrs)
+    } else {
+      console.log('invalid url')
+    }
+  }
+
   createCard = (customAttrs = {}) => {
     const card = new CollectionCard(
       this.newCardAttrs(customAttrs),
@@ -86,6 +115,10 @@ class GridCardBlank extends React.Component {
         this.closeBlankContentTool()
       })
     })
+  }
+
+  showVideoItemForm = () => {
+    this.setState({ showVideoItemForm: true })
   }
 
   startCreatingCollection = () => {
@@ -115,8 +148,25 @@ class GridCardBlank extends React.Component {
             value={this.state.inputText}
             onChange={this.onTextChange}
           />
+          ${this.videoUrlIsValid ? '&#x2714;' : '&#x9675;'}
           <input
             onClick={this.createCollection}
+            type="submit"
+            value="save"
+            disabled={this.state.loading}
+          />
+        </div>
+      )
+    } else if (this.state.showVideoItemForm) {
+      return (
+        <div>
+          <input
+            placeholder="Video URL"
+            value={this.state.videoUrl}
+            onChange={this.onVideoUrlChange}
+          />
+          <input
+            onClick={this.createVideoItem}
             type="submit"
             value="save"
             disabled={this.state.loading}
@@ -134,6 +184,12 @@ class GridCardBlank extends React.Component {
 
         <button onClick={this.pickImage}>
           Add Image
+          &nbsp;
+          <Icon name="squarePlus" size="2rem" />
+        </button>
+
+        <button onClick={this.showVideoItemForm}>
+          Add Video
           &nbsp;
           <Icon name="squarePlus" size="2rem" />
         </button>

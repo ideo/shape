@@ -5,6 +5,7 @@ import styled from 'styled-components'
 import GridCardHotspot from '~/ui/grid/GridCardHotspot'
 import TextItem from '~/ui/items/TextItem'
 import ImageItem from '~/ui/items/ImageItem'
+import VideoItem from '~/ui/items/VideoItem'
 
 export const StyledGridCard = styled.div`
   z-index: 1;
@@ -39,6 +40,8 @@ class GridCard extends React.PureComponent {
         return <TextItem item={record} />
       case 'Item::ImageItem':
         return <ImageItem item={record} />
+      case 'Item::VideoItem':
+        return <VideoItem item={record} />
       default:
         return (
           <div>

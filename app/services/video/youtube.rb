@@ -17,12 +17,12 @@ module Video
 
         # youtube.com/watch?v=id
         if uri.path.match(%r{^\/watch}).present?
-          vid_id = CGI::parse(uri.query)
+          vid_id = CGI.parse(uri.query)
           return vid_id['v'].first if vid_id.present? && vid_id['v'].present?
 
         # youtube.com/oembed?url=http%3A//www.youtube.com/watch?v%3D-wtIMTCHWuI
         elsif uri.path.match(/^oembed/).present?
-          vid_url = CGI.unescape(CGI::parse(uri.query)['url'])
+          vid_url = CGI.unescape(CGI.parse(uri.query)['url'])
           return Video::Youtube.new(vid_url).video_id
         end
 

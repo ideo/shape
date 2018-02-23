@@ -14,7 +14,7 @@ class Item < ApplicationRecord
 
   delegate :parent, to: :parent_collection_card, allow_nil: true
 
-  before_validation :format_url, if: :url_changed?
+  before_validation :format_url, if: :saved_change_to_url?
   validates :type, presence: true
 
   accepts_nested_attributes_for :filestack_file
@@ -38,11 +38,5 @@ class Item < ApplicationRecord
 
     # Remove spaces
     url.strip!
-
-    # Prepend with scheme if there is none (default to https)
-    uri = URI.parse(url)
-    url = "https://#{url}" if uri.scheme.blank?
-
-    self.url = url
   end
 end
