@@ -1,3 +1,8 @@
+export const ITEM_TYPES = {
+  TEXT: 'Item::TextItem',
+  IMAGE: 'Item::ImageItem',
+}
+
 export default {
   headerHeight: 170,
 

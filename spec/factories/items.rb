@@ -4,6 +4,7 @@ FactoryBot.define do
 
     factory :text_item, class: 'Item::TextItem' do
       content { Faker::BackToTheFuture.quote }
+      text_data { { ops: [{ insert: 'Hola, world.' }] } }
     end
   end
 end

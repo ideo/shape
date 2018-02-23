@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
+import _ from 'lodash'
 import styled from 'styled-components'
 import { Flex, Box } from 'reflexbox'
 import ReactQuill from 'react-quill'
@@ -8,7 +9,7 @@ import CollectionCard from '~/stores/jsonApi/CollectionCard'
 import AddTextIcon from '~/ui/icons/AddTextIcon'
 import AddCollectionIcon from '~/ui/icons/AddCollectionIcon'
 import AddImageIcon from '~/ui/icons/AddImageIcon'
-import v from '~/utils/variables'
+import v, { ITEM_TYPES } from '~/utils/variables'
 import FilestackUpload from '~/utils/filestack_upload'
 import { StyledGridCard } from './GridCard'
 
@@ -78,6 +79,7 @@ class GridCardBlank extends React.Component {
     creatingText: false,
     loading: false,
     inputText: '',
+    textData: {},
   }
 
   onInputChange = (e) => {
@@ -87,9 +89,13 @@ class GridCardBlank extends React.Component {
   }
 
   onTextChange = (content, delta, source, editor) => {
-    // console.log(editor.getContents())
-    this.setState({
-      inputText: content
+    const textData = editor.getContents()
+    // see: https://github.com/quilljs/quill/issues/1134#issuecomment-265065953
+    _.defer(() => {
+      this.setState({
+        inputText: content,
+        textData,
+      })
     })
   }
 
@@ -131,7 +137,7 @@ class GridCardBlank extends React.Component {
           const img = resp.filesUploaded[0]
           const attrs = {
             item_attributes: {
-              type: 'Item::ImageItem',
+              type: ITEM_TYPES.IMAGE,
               filestack_file_attributes: {
                 url: img.url,
                 handle: img.handle,
@@ -162,8 +168,8 @@ class GridCardBlank extends React.Component {
       item_attributes: {
         // name will get created in Rails
         content: this.state.inputText,
-        // store all of these types somewhere centrally?
-        type: 'Item::TextItem',
+        text_data: this.state.textData,
+        type: ITEM_TYPES.TEXT,
       }
     })
   }
@@ -195,7 +201,7 @@ class GridCardBlank extends React.Component {
           <ReactQuill
             placeholder="Add your text"
             onChange={this.onTextChange}
-            value={this.state.inputText}
+            value={this.state.textData}
             theme="bubble"
           />
           <input
@@ -242,8 +248,6 @@ class GridCardBlank extends React.Component {
       <StyledGridCardBlank>
         <StyledGridCardInner>
           {this.renderInner()}
-          <br />
-          <br />
           <button className="close" onClick={this.closeBlankContentTool}>
             &times;
           </button>

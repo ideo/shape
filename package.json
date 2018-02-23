@@ -40,6 +40,8 @@
     "mobx-react-intl": "^1.4.0",
     "mobx-react-router": "^4.0.1",
     "prop-types": "~15.6.0",
+    "quill": "^1.2.6",
+    "quill-delta-to-plaintext": "^1.0.0",
     "react": "~16.2.0",
     "react-dom": "~16.2.0",
     "react-draggable": "~3.0.5",

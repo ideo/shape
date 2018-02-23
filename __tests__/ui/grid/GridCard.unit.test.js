@@ -47,8 +47,8 @@ describe('GridCard', () => {
       )
     })
 
-    it('renders the collection name', () => {
-      expect(wrapper.find('StyledGridCardInner').children().text()).toContain(fakeCollection.name)
+    it('renders the collection cover', () => {
+      expect(wrapper.find('CollectionCover').props().collection).toEqual(fakeCollection)
     })
   })
 })

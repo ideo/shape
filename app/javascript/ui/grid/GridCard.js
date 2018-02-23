@@ -5,6 +5,8 @@ import styled from 'styled-components'
 import GridCardHotspot from '~/ui/grid/GridCardHotspot'
 import TextItem from '~/ui/items/TextItem'
 import ImageItem from '~/ui/items/ImageItem'
+import CollectionCover from '~/ui/collections/CollectionCover'
+import { ITEM_TYPES } from '~/utils/variables'
 
 export const StyledGridCard = styled.div`
   z-index: 1;
@@ -37,9 +39,9 @@ class GridCard extends React.PureComponent {
     const { card, record } = this.props
     if (this.isItem) {
       switch (record.type) {
-      case 'Item::TextItem':
+      case ITEM_TYPES.TEXT:
         return <TextItem item={record} />
-      case 'Item::ImageItem':
+      case ITEM_TYPES.IMAGE:
         return <ImageItem item={record} />
       default:
         return (
@@ -50,11 +52,7 @@ class GridCard extends React.PureComponent {
         )
       }
     } else if (this.isCollection) {
-      return (
-        <div>
-          {record.name} (coll.) [{card.order}]
-        </div>
-      )
+      return <CollectionCover collection={record} />
     }
     return <div />
   }
