@@ -4,17 +4,8 @@ import BaseRecord from './BaseRecord'
 class Collection extends BaseRecord {
   attributesForAPI = ['name']
 
-  // after we reorder a single card, we want to make sure everything goes into sequential order
-  reorderCards() {
-    if (this.collection_cards) {
-      return _.each(_.sortBy(this.collection_cards, 'order'), (card, i) => {
-        card.order = i + 1
-      })
-    }
-    return false
-  }
-
   API_updateCardOrder() {
+    this._reorderCards()
     const data = this.toJsonApi()
     delete data.relationships
     // attach nested attributes of cards
@@ -26,6 +17,16 @@ class Collection extends BaseRecord {
       .then((response) => {
         this.apiStore.sync(response)
       })
+  }
+
+  // after we reorder a single card, we want to make sure everything goes into sequential order
+  _reorderCards() {
+    if (this.collection_cards) {
+      return _.each(_.sortBy(this.collection_cards, 'order'), (card, i) => {
+        card.order = i + 1
+      })
+    }
+    return false
   }
 }
 Collection.type = 'collections'

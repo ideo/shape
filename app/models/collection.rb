@@ -5,8 +5,9 @@ class Collection < ApplicationRecord
   has_many :items, through: :collection_cards
   has_many :collections, through: :collection_cards
   has_one :parent_collection_card,
-          -> { not_reference },
-          class_name: 'CollectionCard'
+          -> { primary },
+          class_name: 'CollectionCard',
+          inverse_of: :collection
 
   belongs_to :organization, optional: true
   belongs_to :cloned_from, class_name: 'Collection', optional: true
@@ -17,8 +18,8 @@ class Collection < ApplicationRecord
   scope :shared_with_me, -> { where(type: 'Collection::SharedWithMeCollection') }
 
   validates :name, presence: true, if: :base_collection_type?
-  # validates :organization, presence: true, if: :parent_collection_card_blank?
-  # validates :parent_collection_card, presence: true, if: :organization_blank?
+  validates :organization, presence: true, if: :parent_collection_card_blank?
+  validates :parent_collection_card, presence: true, if: :organization_blank?
 
   accepts_nested_attributes_for :collection_cards
 
