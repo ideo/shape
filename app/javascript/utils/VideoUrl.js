@@ -11,10 +11,9 @@ class VideoUrl {
       normalizedUrl: null,
     }
 
-    const { id, service } = getVideoId(url)
+    if (!this.isValid(url)) return retv
 
-    // If not valid, return
-    if (!id || !service) return retv
+    const { id, service } = getVideoId(url)
 
     retv.service = service
     retv.id = id
@@ -37,7 +36,8 @@ class VideoUrl {
   }
 
   static isValid(url) {
-    const { service, id } = this.parse(url)
+    const { id, service } = getVideoId(url)
+
     if (service && id) {
       switch (service) {
       case 'youtube':
