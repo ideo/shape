@@ -31,6 +31,7 @@ class Api::V1::ItemsController < Api::V1::BaseController
       :type,
       :name,
       :content,
+      { text_data: {} },
       :image,
       :archived,
       filestack_file_attributes: [

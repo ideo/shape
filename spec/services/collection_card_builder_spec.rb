@@ -16,9 +16,11 @@ RSpec.describe CollectionCardBuilder, type: :service do
     context 'success creating card with collection' do
       let(:builder) do
         CollectionCardBuilder.new(
-          params: params.merge(collection_attributes: {
-            name: 'Cool Collection',
-          }),
+          params: params.merge(
+            collection_attributes: {
+              name: 'Cool Collection',
+            },
+          ),
           collection: parent,
           user: user,
         )
@@ -45,11 +47,14 @@ RSpec.describe CollectionCardBuilder, type: :service do
     context 'success creating card with item' do
       let(:builder) do
         CollectionCardBuilder.new(
-          params: params.merge(item_attributes: {
-            name: 'My item name',
-            content: 'My Text Content goes here',
-            type: 'Item::TextItem',
-          }),
+          params: params.merge(
+            item_attributes: {
+              name: 'My item name',
+              content: 'My Text Content goes here',
+              text_data: { ops: [] },
+              type: 'Item::TextItem',
+            },
+          ),
           collection: parent,
           user: user,
         )
@@ -73,10 +78,12 @@ RSpec.describe CollectionCardBuilder, type: :service do
       # attempt to build card without any item or collection
       let(:builder) do
         CollectionCardBuilder.new(
-          params: params.merge(item_attributes: {
-            name: 'My item name',
-            content: 'My Text Content goes here',
-          }),
+          params: params.merge(
+            item_attributes: {
+              name: 'My item name',
+              content: 'My Text Content goes here',
+            },
+          ),
           collection: parent,
           user: user,
         )

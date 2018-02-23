@@ -49,6 +49,7 @@ describe Api::V1::CollectionCardsController, type: :request, auth: true do
         # create with a nested item
         item_attributes: {
           content: 'This is my item content',
+          text_data: { ops: [{ insert: 'This is my item content.' }] },
           type: 'Item::TextItem',
         },
       }
@@ -64,6 +65,12 @@ describe Api::V1::CollectionCardsController, type: :request, auth: true do
         expect(response.status).to eq(200)
       end
 
+      it 'creates record' do
+        expect {
+          post(path, params: params)
+        }.to change(Item, :count).by(1)
+      end
+
       it 'matches JSON schema' do
         post(path, params: params)
         expect(json['data']['attributes']).to match_json_schema('collection_card')
@@ -74,36 +81,6 @@ describe Api::V1::CollectionCardsController, type: :request, auth: true do
       it 'returns a 400 bad request' do
         post(path, params: bad_params)
         expect(response.status).to eq(400)
-      end
-    end
-
-    context 'with item attrs' do
-      let(:params_with_item) {
-        json_api_params(
-          'collection_cards',
-          {
-            'order': 1,
-            'width': 3,
-            'height': 1,
-            # parent_id is required to retrieve the parent collection without a nested route
-            'parent_id': collection.id,
-            'item_attributes': {
-              'type': 'Item::TextItem',
-              'content': 'Mary had a little lamb...',
-            },
-          }
-        )
-      }
-
-      it 'returns a 200' do
-        post(path, params: params_with_item)
-        expect(response.status).to eq(200)
-      end
-
-      it 'creates record' do
-        expect {
-          post(path, params: params_with_item)
-        }.to change(Item, :count).by(1)
       end
     end
 

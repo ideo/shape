@@ -49,8 +49,9 @@ describe Api::V1::ItemsController, type: :request, auth: true do
       json_api_params(
         'items',
         {
-          'type': 'Item::TextItem',
-          'content': 'A is for Apples'
+          type: 'Item::TextItem',
+          content: 'A is for Apples',
+          text_data: { ops: [{ insert: 'A is for Apples.' }] },
         }
       )
     }
@@ -73,7 +74,7 @@ describe Api::V1::ItemsController, type: :request, auth: true do
       json_api_params(
         'items',
         {
-          'content': 'The wheels on the bus...'
+          content: 'The wheels on the bus...'
         }
       )
     }
