@@ -20,6 +20,7 @@ RSpec.describe Video::Youtube, type: :service do
   describe '.valid?' do
     it 'is true with valid urls' do
       valid_urls.each do |url|
+        valid = Video::Youtube.new(url).valid_url?
         expect(Video::Youtube.new(url).valid_url?).to be true
       end
     end

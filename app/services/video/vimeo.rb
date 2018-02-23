@@ -19,7 +19,7 @@ module Video
     end
 
     def video_thumbnail_url
-      "https://img.youtube.com/vi/#{video_id}/0.jpg"
+      ''
     end
 
     private
