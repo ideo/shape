@@ -9,6 +9,7 @@ const validYoutubeUrls = [
 
 const invalidYoutubeUrls = [
   'https://www.youtube.com/results?search_query=puppies',
+  'https://www.youtuberz.com/?v=-wtIM49CWuI',
 ]
 
 const validVimeoUrls = [
@@ -21,6 +22,7 @@ const validVimeoUrls = [
 const invalidVimeoUrls = [
   'https://vimeo.com/channels/staffpicks',
   'https://vimeo.com/groups/12345678',
+  'https://vimeomeomeo.com/131244'
 ]
 
 describe('isValid', () => {
@@ -48,21 +50,21 @@ describe('isValid', () => {
 describe('parse', () => {
   describe('Youtube', () => {
     it('returns id and service for all valid urls', () => {
-      for(const url of validYoutubeUrls) {
+      validYoutubeUrls.forEach(url => {
         const { id, service } = VideoUrl.parse(url)
         expect(id).toEqual('-wtIM49CWuI')
         expect(service).toEqual('youtube')
-      }
+      })
     })
   })
 
   describe('Vimeo', () => {
     it('returns id and service for all valid urls', () => {
-      for(const url of validVimeoUrls) {
+      validVimeoUrls.forEach(url => {
         const { id, service } = VideoUrl.parse(url)
         expect(id).toEqual('12345678')
         expect(service).toEqual('vimeo')
-      }
+      })
     })
   })
 })

@@ -38,7 +38,19 @@ class VideoUrl {
 
   static isValid(url) {
     const { service, id } = this.parse(url)
-    if (service && id) return true
+    if (service && id) {
+      switch (service) {
+      case 'youtube':
+        // ensure no extra characters between youtube[...].com
+        return !/youtube(.+)\.com/.test(url)
+      case 'vimeo':
+        // ensure id is numeric (unless vimeo changes their format!)
+        // ensure id is not identifying a group/id
+        return /\d+/.test(id) && !/groups\/(\d+)$/.test(url)
+      default:
+        return true
+      }
+    }
     return false
   }
 }
