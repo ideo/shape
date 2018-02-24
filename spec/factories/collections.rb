@@ -11,6 +11,9 @@ FactoryBot.define do
       organization nil
     end
 
+    factory :user_collection, class: Collection::UserCollection
+    factory :shared_with_me_collection, class: Collection::SharedWithMeCollection
+
     after(:build) do |collection, evaluator|
       if evaluator.num_cards > 0
         1.upto(evaluator.num_cards) do |i|

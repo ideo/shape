@@ -20,10 +20,7 @@ class Api::V1::CollectionsController < Api::V1::BaseController
 
   def me
     # Gets the user collection for this user/org combo
-    @collection = current_user.collections
-                              .user
-                              .find_by_organization_id(current_organization.id)
-
+    @collection = current_user.current_user_collection
     render_collection
   end
 

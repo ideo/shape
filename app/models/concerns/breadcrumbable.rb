@@ -20,6 +20,12 @@ module Breadcrumbable
     end
   end
 
+  # Override this method in any classes to restrict
+  # this object from the breadcrumb
+  def breadcrumbable?
+    true
+  end
+
   def breadcrumb_for_user(user = nil)
     return [] if user.blank? || breadcrumb.nil?
 
