@@ -39,56 +39,48 @@ describe Api::V1::CollectionCardsController, type: :request, auth: true do
   describe 'POST #create' do
     let!(:collection) { create(:collection) }
     let(:path) { "/api/v1/collection_cards" }
-    let(:params) {
-      json_api_params(
-        'collection_cards',
-        {
-          'order': 1,
-          'width': 3,
-          'height': 1,
-          # parent_id is required to retrieve the parent collection without a nested route
-          'parent_id': collection.id,
-        }
-      )
-    }
-
-    it 'returns a 200' do
-      post(path, params: params)
-      expect(response.status).to eq(200)
-    end
-
-    it 'matches JSON schema' do
-      post(path, params: params)
-      expect(json['data']['attributes']).to match_json_schema('collection_card')
-    end
-
-    context 'with item attrs' do
-      let(:params_with_item) {
-        json_api_params(
-          'collection_cards',
-          {
-            'order': 1,
-            'width': 3,
-            'height': 1,
-            # parent_id is required to retrieve the parent collection without a nested route
-            'parent_id': collection.id,
-            'item_attributes': {
-              'type': 'Item::TextItem',
-              'content': 'Mary had a little lamb...',
-            },
-          }
-        )
+    let(:raw_params) do
+      {
+        order: 1,
+        width: 3,
+        height: 1,
+        # parent_id is required to retrieve the parent collection without a nested route
+        parent_id: collection.id,
+        # create with a nested item
+        item_attributes: {
+          content: 'This is my item content',
+          text_data: { ops: [{ insert: 'This is my item content.' }] },
+          type: 'Item::TextItem',
+        },
       }
+    end
+    let(:params) { json_api_params('collection_cards', raw_params) }
+    let(:bad_params) do
+      json_api_params('collection_cards', raw_params.reject{ |k| k == :item_attributes })
+    end
 
+    context 'success' do
       it 'returns a 200' do
-        post(path, params: params_with_item)
+        post(path, params: params)
         expect(response.status).to eq(200)
       end
 
       it 'creates record' do
         expect {
-          post(path, params: params_with_item)
+          post(path, params: params)
         }.to change(Item, :count).by(1)
+      end
+
+      it 'matches JSON schema' do
+        post(path, params: params)
+        expect(json['data']['attributes']).to match_json_schema('collection_card')
+      end
+    end
+
+    context 'with errors' do
+      it 'returns a 400 bad request' do
+        post(path, params: bad_params)
+        expect(response.status).to eq(400)
       end
     end
 
@@ -182,9 +174,9 @@ describe Api::V1::CollectionCardsController, type: :request, auth: true do
       json_api_params(
         'collection_cards',
         {
-          'order': 2,
-          'width': 1,
-          'height': 3
+          order: 2,
+          width: 1,
+          height: 3
         }
       )
     }

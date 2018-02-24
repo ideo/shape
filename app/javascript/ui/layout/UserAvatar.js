@@ -1,4 +1,5 @@
-import { observer } from 'mobx-react'
+import PropTypes from 'prop-types'
+import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import Avatar from 'material-ui/Avatar'
 import { withStyles } from 'material-ui/styles'
 
@@ -9,7 +10,6 @@ const materialStyles = {
   }
 }
 
-@withStyles(materialStyles)
 @observer
 class UserAvatar extends React.Component {
   render() {
@@ -23,4 +23,12 @@ class UserAvatar extends React.Component {
   }
 }
 
-export default UserAvatar
+UserAvatar.propTypes = {
+  user: MobxPropTypes.objectOrObservableObject.isRequired,
+  classes: PropTypes.shape({
+    smallAvatar: PropTypes.string,
+  }).isRequired,
+}
+
+// apply the wrapper here so that it doesn't interfere with propType definition
+export default withStyles(materialStyles)(UserAvatar)

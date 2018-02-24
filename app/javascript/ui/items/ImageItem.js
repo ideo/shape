@@ -11,7 +11,7 @@ export const StyledImageItem = styled.div`
 `
 StyledImageItem.displayName = 'StyledImageItem'
 
-class ImageItem extends React.Component {
+class ImageItem extends React.PureComponent {
   render() {
     const { item } = this.props
     const imageUrl = item.filestack_file.url

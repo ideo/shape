@@ -33,7 +33,7 @@ class CollectionGrid extends React.Component {
     const { collection } = nextProps
     const cards = [...collection.collection_cards]
     if (nextProps.blankContentToolState) {
-      const order = nextProps.blankContentToolState.order + 0.25
+      const order = nextProps.blankContentToolState.order + 0.5
       const blankFound = _.find(this.state.cards, { cardType: 'blank' })
       let blankCard = {
         id: 'blank',

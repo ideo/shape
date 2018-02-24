@@ -13,13 +13,13 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
   end
 
   def create
-    @collection_card = @collection.collection_cards
-                                  .build(collection_card_params)
-
-    if @collection_card.save
-      render jsonapi: @collection_card, include: [record: [:filestack_file]]
+    builder = CollectionCardBuilder.new(params: collection_card_params,
+                                        collection: @collection,
+                                        user: current_user)
+    if builder.create
+      render jsonapi: builder.collection_card, include: [record: [:filestack_file]]
     else
-      render jsonapi_errors: @collection_card.errors, status: :bad_request
+      render_api_errors builder.errors
     end
   end
 
@@ -28,7 +28,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
     if @collection_card.save
       render jsonapi: @collection_card
     else
-      render jsonapi_errors: @collection_card.errors, status: :bad_request
+      render_api_errors @collection_card.errors
     end
   end
 
@@ -53,6 +53,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
         :type,
         :name,
         :content,
+        { text_data: {} },
         :url,
         :image,
         :archived,

@@ -4,9 +4,25 @@ body {
   overflow-x: hidden;
 }
 
-a {
-  &.text-link {
-    color: inherit;
-    text-decoration: none;
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Gotham', sans-serif;
+  text-transform: uppercase;
+  word-wrap: break-word;
+  strong {
+    font-weight: inherit;
   }
+}
+
+h1 {
+  font-size: 2.25rem;
+  margin-bottom: 0.5rem;
+}
+
+h2 {
+  font-size: 2rem;
+  margin-bottom: 0.33rem;
+}
+
+p {
+  line-height: 1.25;
 }

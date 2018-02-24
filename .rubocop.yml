@@ -50,6 +50,9 @@ Style/AndOr:
   # They read better, more like normal English.
   Enabled: false
 
+Style/IfUnlessModifier:
+  Enabled: false
+
 Style/ClassAndModuleChildren:
   Exclude:
     - 'app/controllers/**/*'

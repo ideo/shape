@@ -11,7 +11,7 @@ class Api::V1::ItemsController < Api::V1::BaseController
     if @item.save
       render jsonapi: @item
     else
-      render jsonapi_errors: @item.errors.full_messages
+      render_api_errors @item.errors
     end
   end
 
@@ -20,7 +20,7 @@ class Api::V1::ItemsController < Api::V1::BaseController
     if @item.save
       render jsonapi: @item
     else
-      render jsonapi_errors: @item.errors.full_messages
+      render_api_errors @item.errors
     end
   end
 
@@ -31,6 +31,7 @@ class Api::V1::ItemsController < Api::V1::BaseController
       :type,
       :name,
       :content,
+      { text_data: {} },
       :url,
       :image,
       :archived,

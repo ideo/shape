@@ -3,7 +3,6 @@ import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 
 import v from '~/utils/variables'
-import Icon from '~/ui/global/Icon'
 
 const StyledHotspot = styled.div`
   position: absolute;
@@ -12,14 +11,10 @@ const StyledHotspot = styled.div`
   justify-content: center;
   opacity: 0;
   transition: all 100ms;
-  color: ${v.colors.teal};
-  right: -1.4rem;
+  right: -27px;
   height: 100%;
-  width: 2.25rem;
+  width: 36px;
   z-index: 100;
-  button {
-    height: 50px;
-  }
 
   &:hover, &.is-over {
     opacity: ${props => (props.dragging ? 0 : 1)};
@@ -28,16 +23,18 @@ const StyledHotspot = styled.div`
 
 const HotspotLine = styled.div`
   height: 100%;
-  background: ${v.colors.teal};
-  margin-left: 0.8rem;
-  width: 0.8rem;
+  background: ${v.colors.cyan};
+  position: relative;
+  left: 7px;
+  width: ${v.grid.gutter}px;
 `
 
 const StyledPlusIcon = styled.div`
   position: relative;
-  left: -0.6rem;
+  left: -10px;
   width: 12px;
   color: white;
+  font-size: 1.5rem;
   cursor: pointer;
 `
 

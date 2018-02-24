@@ -10,6 +10,7 @@ import PageContainer from '~/ui/layout/PageContainer'
 import CollectionGrid from '~/ui/grid/CollectionGrid'
 import H1 from '~/ui/global/H1'
 import Breadcrumb from '~/ui/layout/Breadcrumb'
+import v from '~/utils/variables'
 
 const isHomepage = ({ path }) => path === '/'
 
@@ -20,7 +21,7 @@ class CollectionPage extends PageWithApi {
     super(props)
     this.state = {
       // blank: null,
-      cols: 4,
+      cols: v.grid.cols,
     }
   }
 
@@ -95,10 +96,9 @@ class CollectionPage extends PageWithApi {
         </Header>
         <PageContainer>
           <CollectionGrid
+            // pull in gridW, gridH, gutter
+            {...v.grid}
             cols={this.state.cols}
-            gridH={230}
-            gridW={300}
-            gutter={12}
             updateCollection={this.updateCollection}
             collection={collection}
             blankContentToolState={uiStore.blankContentToolState}

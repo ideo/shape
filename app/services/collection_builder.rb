@@ -3,9 +3,9 @@ class CollectionBuilder
 
   def initialize(params:, organization: nil, parent_card: nil)
     @collection = Collection.new(params)
+    @errors = @collection.errors
     @organization = organization
     @parent_card = parent_card
-    @errors = []
   end
 
   def save
@@ -19,28 +19,28 @@ class CollectionBuilder
 
   def assign_attributes
     if parent_card? && parent_card.reference? && organization?
-      errors << 'Can only assign organization or as sub-collection, not both'
+      @collection.errors.add(:base, 'Can only assign organization or as sub-collection, not both')
       return false
     end
 
-    collection.parent_collection_card = parent_card if parent_card?
-    collection.organization = organization if organization?
+    @collection.parent_collection_card = parent_card if parent_card?
+    @collection.organization = organization if organization?
 
     true
   end
 
   def save_collection
-    if collection.save
+    result = @collection.save
+    if result
       return true unless parent_card?
 
-      unless parent_card.update_attributes(collection: collection)
-        errors << parent_card.errors.full_messages
+      unless parent_card.update_attributes(collection: @collection)
+        parent_card.errors.each do |field, message|
+          @collection.errors.add(field, message)
+        end
       end
-    else
-      errors << collection.errors.full_messages
     end
-
-    errors.blank?
+    result
   end
 
   def organization?

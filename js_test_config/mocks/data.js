@@ -1,6 +1,7 @@
 export const fakeItemAttrs = {
   id: 1,
   name: 'My Cool Item',
+  content: 'This is the content for the item and it contains multiple sentences. Like this one.'
 }
 export const fakeItem = {
   ...fakeItemAttrs,
@@ -14,6 +15,14 @@ export const fakeCard = {
   width: 1,
   record: fakeItem,
   item: fakeItem,
+}
+export const fakeCollectionCard = {
+  id: 11,
+  order: 1,
+  height: 1,
+  width: 1,
+  record: fakeCollection,
+  item: fakeCollection,
 }
 export const fakeCollection = {
   id: 1,

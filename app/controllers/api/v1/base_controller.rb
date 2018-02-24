@@ -25,6 +25,10 @@ class Api::V1::BaseController < ApplicationController
     }
   end
 
+  def render_api_errors(errors)
+    render jsonapi_errors: errors, status: :bad_request
+  end
+
   private
 
   def current_organization

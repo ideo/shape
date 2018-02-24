@@ -114,14 +114,12 @@ class MovableGridCard extends React.PureComponent {
       width
     } = position
 
-    const transition = 'transform 0.5s, width 0.3s, height 0.3s, opacity 0.5s ease-out 0.2s;'
-    let opacity = 1
+    const transition = 'transform 0.5s, width 0.3s, height 0.3s;'
     let rotation = '0deg'
     let { zIndex } = this.state
     const { dragging } = this.state
     if (dragging) {
-      // transition = 'width 0.3s, height 0.3s, opacity 0.5s ease-out 0.2s;'
-      opacity = 0.9
+      // transition = 'width 0.3s, height 0.3s;'
       // experiment -- shrink wide and tall cards
       // NOTE: turned off, was causing other issues about card placement
       // if (width > 500) {
@@ -164,7 +162,6 @@ class MovableGridCard extends React.PureComponent {
       yPos,
       rotation,
       transition,
-      opacity,
       outline,
     }
 
@@ -184,13 +181,19 @@ class MovableGridCard extends React.PureComponent {
       )
     } else if (isBlank) {
       styleProps.transition = 'none'
-      /*
-        NOTE: FlipMove doesn't work that well because of our transform/positioned elements,
-        It always thinks the element is animating from 0,0 on the screen...
-      */
       return (
         <FlipMove
-          appearAnimation="accordionHorizontal"
+          easing="ease-out"
+          appearAnimation={{
+            from: {
+              transform: `scaleX(0) scaleY(0)`,
+              transformOrigin: `${xPos}px ${yPos}px`
+            },
+            to: {
+              transform: `scaleX(1) scaleY(1)`,
+              transformOrigin: `${xPos}px ${yPos}px`
+            },
+          }}
         >
           <div>
             <PositionedGridCard {...styleProps}>

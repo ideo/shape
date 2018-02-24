@@ -6,6 +6,8 @@ import GridCardHotspot from '~/ui/grid/GridCardHotspot'
 import TextItem from '~/ui/items/TextItem'
 import ImageItem from '~/ui/items/ImageItem'
 import VideoItem from '~/ui/items/VideoItem'
+import CollectionCover from '~/ui/collections/CollectionCover'
+import { ITEM_TYPES } from '~/utils/variables'
 
 export const StyledGridCard = styled.div`
   z-index: 1;
@@ -14,6 +16,8 @@ export const StyledGridCard = styled.div`
   background: white;
   padding: 0;
   cursor: ${props => (props.dragging ? 'grabbing' : 'pointer')};
+  box-shadow: ${props => (props.dragging ? '1px 1px 5px 2px rgba(0, 0, 0, 0.25)' : '')};
+  opacity: ${props => (props.dragging ? '0.95' : '1')};
 `
 StyledGridCard.displayName = 'StyledGridCard'
 
@@ -36,25 +40,22 @@ class GridCard extends React.PureComponent {
     const { card, record } = this.props
     if (this.isItem) {
       switch (record.type) {
-      case 'Item::TextItem':
+      case ITEM_TYPES.TEXT:
         return <TextItem item={record} />
-      case 'Item::ImageItem':
+      case ITEM_TYPES.IMAGE:
         return <ImageItem item={record} />
       case 'Item::VideoItem':
         return <VideoItem item={record} />
       default:
         return (
           <div>
-            {record.name} [{card.order}]
+            [{card.order}] &nbsp;
+            {record.content}
           </div>
         )
       }
     } else if (this.isCollection) {
-      return (
-        <div>
-          {record.name} (coll.) [{card.order}]
-        </div>
-      )
+      return <CollectionCover collection={record} />
     }
     return <div />
   }
