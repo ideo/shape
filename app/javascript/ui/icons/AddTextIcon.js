@@ -1,6 +1,6 @@
 import { propTypes, defaultProps } from './iconProps'
 
-const AddTextIcon = ({ color = 'black', width = 32, height = 32 }) => (
+const AddTextIcon = ({ color, width, height }) => (
   <svg width={width} height={height} viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
     <g fill="none" fillRule="evenodd">
       <g stroke={color} strokeLinecap="round" strokeWidth="4">

@@ -9,6 +9,7 @@ import CollectionCard from '~/stores/jsonApi/CollectionCard'
 import AddTextIcon from '~/ui/icons/AddTextIcon'
 import AddCollectionIcon from '~/ui/icons/AddCollectionIcon'
 import AddImageIcon from '~/ui/icons/AddImageIcon'
+import AddVideoIcon from '~/ui/icons/AddVideoIcon'
 import v, { ITEM_TYPES } from '~/utils/variables'
 import FilestackUpload from '~/utils/FilestackUpload'
 import VideoUrl from '~/utils/VideoUrl'
@@ -115,18 +116,18 @@ class GridCardBlank extends React.Component {
     })
   }
 
+  onVideoUrlChange = (e) => {
+    this.setState({
+      videoUrl: e.target.value
+    })
+  }
+
   startCreatingCollection = () => {
     this.setState({ creatingCollection: true })
   }
 
   startCreatingText = () => {
     this.setState({ creatingText: true })
-  }
-
-  onVideoUrlChange = (e) => {
-    this.setState({
-      videoUrl: e.target.value
-    })
   }
 
   createCard = (nested = {}) => {
@@ -192,7 +193,7 @@ class GridCardBlank extends React.Component {
       }
       this.createCard(attrs)
     } else {
-      console.log('invalid url')
+      // console.log('invalid url')
     }
   }
 
@@ -304,7 +305,7 @@ class GridCardBlank extends React.Component {
           </Box>
           <Box>
             <BctButton onClick={this.showVideoItemForm}>
-              <AddTextIcon width={iconSize} height={iconSize} color="white" />
+              <AddVideoIcon width={iconSize} height={iconSize} color="white" />
             </BctButton>
           </Box>
           <Box>
