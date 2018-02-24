@@ -5,6 +5,7 @@ import styled from 'styled-components'
 import GridCardHotspot from '~/ui/grid/GridCardHotspot'
 import TextItem from '~/ui/items/TextItem'
 import ImageItem from '~/ui/items/ImageItem'
+import VideoItem from '~/ui/items/VideoItem'
 import CollectionCover from '~/ui/collections/CollectionCover'
 import { ITEM_TYPES } from '~/utils/variables'
 
@@ -43,6 +44,8 @@ class GridCard extends React.PureComponent {
         return <TextItem item={record} />
       case ITEM_TYPES.IMAGE:
         return <ImageItem item={record} />
+      case 'Item::VideoItem':
+        return <VideoItem item={record} />
       default:
         return (
           <div>

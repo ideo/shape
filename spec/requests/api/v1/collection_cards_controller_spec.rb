@@ -127,6 +127,44 @@ describe Api::V1::CollectionCardsController, type: :request, auth: true do
         expect(item['attributes']['name']).to eq('apple')
       end
     end
+
+    context 'with video url attributes' do
+      let(:filename) { 'apple.jpg' }
+      let(:filestack_file) { build(:filestack_file) }
+      let(:params_with_video_item) {
+        json_api_params(
+          'collection_cards',
+          {
+            'order': 1,
+            'width': 3,
+            'height': 1,
+            # parent_id is required to retrieve the parent collection without a nested route
+            'parent_id': collection.id,
+            'item_attributes': {
+              'type': 'Item::VideoItem',
+              'url': 'https://www.youtube.com/watch?v=4r7wHMg5Yjg',
+            },
+          }
+        )
+      }
+
+      it 'returns a 200' do
+        post(path, params: params_with_video_item)
+        expect(response.status).to eq(200)
+      end
+
+      it 'creates video item' do
+        expect {
+          post(path, params: params_with_video_item)
+        }.to change(Item::VideoItem, :count).by(1)
+      end
+
+      it 'returns item with given video url' do
+        post(path, params: params_with_video_item)
+        item = json_included_objects_of_type('items').first
+        expect(item['attributes']['url']).to eq('https://www.youtube.com/watch?v=4r7wHMg5Yjg')
+      end
+    end
   end
 
   describe 'PATCH #update' do

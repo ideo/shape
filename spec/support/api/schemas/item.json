@@ -6,6 +6,7 @@
     "name": { "type": ["string", "null"] },
     "content": { "type": ["string", "null"] },
     "text_data": { "type": "object" },
+    "url": { "type": ["string", "null"] },
     "breadcrumb": { "type": ["array", "null"] }
   },
   "required": ["id", "type"]

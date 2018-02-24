@@ -10,7 +10,8 @@ import AddTextIcon from '~/ui/icons/AddTextIcon'
 import AddCollectionIcon from '~/ui/icons/AddCollectionIcon'
 import AddImageIcon from '~/ui/icons/AddImageIcon'
 import v, { ITEM_TYPES } from '~/utils/variables'
-import FilestackUpload from '~/utils/filestack_upload'
+import FilestackUpload from '~/utils/FilestackUpload'
+import VideoUrl from '~/utils/VideoUrl'
 import { StyledGridCard } from './GridCard'
 
 const StyledGridCardBlank = StyledGridCard.extend`
@@ -71,6 +72,19 @@ const BctBackground = styled.div`
   background: ${v.colors.cyanLight};
 `
 
+const ValidIndicator = styled.div`
+  display: inline-block;
+  font-size: 20px;
+  font-weight: bold;
+  width: 20px;
+  &.valid {
+    color: green;
+  }
+  &.invalid {
+    color: red;
+  }
+`
+
 @inject('uiStore', 'apiStore')
 @observer
 class GridCardBlank extends React.Component {
@@ -80,6 +94,8 @@ class GridCardBlank extends React.Component {
     loading: false,
     inputText: '',
     textData: {},
+    showVideoItemForm: false,
+    videoUrl: '',
   }
 
   onInputChange = (e) => {
@@ -105,6 +121,12 @@ class GridCardBlank extends React.Component {
 
   startCreatingText = () => {
     this.setState({ creatingText: true })
+  }
+
+  onVideoUrlChange = (e) => {
+    this.setState({
+      videoUrl: e.target.value
+    })
   }
 
   createCard = (nested = {}) => {
@@ -154,6 +176,30 @@ class GridCardBlank extends React.Component {
       })
   }
 
+  videoUrlIsValid = () => (
+    VideoUrl.isValid(this.state.videoUrl)
+  )
+
+  createVideoItem = () => {
+    if (this.videoUrlIsValid()) {
+      // Get a normalized URL to make it easier to handle in our system
+      const { normalizedUrl } = VideoUrl.parse(this.state.videoUrl)
+      const attrs = {
+        item_attributes: {
+          type: 'Item::VideoItem',
+          url: normalizedUrl
+        },
+      }
+      this.createCard(attrs)
+    } else {
+      console.log('invalid url')
+    }
+  }
+
+  showVideoItemForm = () => {
+    this.setState({ showVideoItemForm: true })
+  }
+
   createCollection = () => {
     this.createCard({
       // `collection` is the collection being created within the card
@@ -195,6 +241,33 @@ class GridCardBlank extends React.Component {
           />
         </div>
       )
+    } else if (this.state.showVideoItemForm) {
+      let validIndicator = <ValidIndicator />
+
+      if (this.state.videoUrl.length > 3) {
+        validIndicator = (
+          <ValidIndicator className={this.videoUrlIsValid() ? 'valid' : 'invalid'}>
+            {this.videoUrlIsValid() ? '✔' : 'x'}
+          </ValidIndicator>
+        )
+      }
+
+      return (
+        <div>
+          <input
+            placeholder="Video URL"
+            value={this.state.videoUrl}
+            onChange={this.onVideoUrlChange}
+          />
+          {validIndicator}
+          <input
+            onClick={this.createVideoItem}
+            type="submit"
+            value="save"
+            disabled={this.state.loading}
+          />
+        </div>
+      )
     } else if (this.state.creatingText) {
       return (
         <div>
@@ -214,6 +287,7 @@ class GridCardBlank extends React.Component {
         </div>
       )
     }
+
     const iconSize = 47
     return (
       <div>
@@ -229,7 +303,7 @@ class GridCardBlank extends React.Component {
             </BctButton>
           </Box>
           <Box>
-            <BctButton onClick={this.startCreatingText}>
+            <BctButton onClick={this.showVideoItemForm}>
               <AddTextIcon width={iconSize} height={iconSize} color="white" />
             </BctButton>
           </Box>

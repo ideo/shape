@@ -72,6 +72,7 @@ ActiveRecord::Schema.define(version: 20180223170513) do
     t.jsonb "breadcrumb"
     t.integer "filestack_file_id"
     t.jsonb "text_data"
+    t.string "url"
     t.index ["cloned_from_id"], name: "index_items_on_cloned_from_id"
   end
 

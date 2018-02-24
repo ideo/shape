@@ -15,6 +15,7 @@ class Item < ApplicationRecord
 
   delegate :parent, to: :parent_collection_card, allow_nil: true
 
+  before_validation :format_url, if: :saved_change_to_url?
   validates :type, presence: true
 
   accepts_nested_attributes_for :filestack_file
@@ -29,5 +30,14 @@ class Item < ApplicationRecord
 
   def breadcrumb_title
     name
+  end
+
+  private
+
+  def format_url
+    return if url.blank?
+
+    # Remove spaces
+    url.strip!
   end
 end

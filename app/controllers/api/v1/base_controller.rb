@@ -9,6 +9,7 @@ class Api::V1::BaseController < ApplicationController
   # See: https://github.com/jsonapi-rb/jsonapi-rails/issues/68
   def jsonapi_class
     super.merge(
+      'Item::VideoItem': SerializableItem,
       'Item::ImageItem': SerializableItem,
       'Item::TextItem': SerializableItem,
       'Collection::UserCollection': SerializableCollection,
