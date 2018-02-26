@@ -26,7 +26,7 @@
     ["transform-class-properties"],
     ["babel-plugin-root-import", [{
       "rootPathPrefix": "#",
-      "rootPathSuffix": "js_test_config"
+      "rootPathSuffix": "__js_test_config"
     }, {
       "rootPathPrefix": "~",
       "rootPathSuffix": "app/javascript"

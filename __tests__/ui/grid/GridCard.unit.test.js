@@ -1,16 +1,16 @@
 import GridCard from '~/ui/grid/GridCard'
 
 import {
-  fakeCard,
+  fakeItemCard,
   fakeCollectionCard,
   fakeCollection,
-  fakeItem,
+  fakeTextItem,
 } from '#/mocks/data'
 
 const props = {
-  card: fakeCard,
+  card: fakeItemCard,
   cardType: 'items',
-  record: fakeItem,
+  record: fakeTextItem,
   handleClick: jest.fn(),
   dragging: false,
 }
@@ -32,8 +32,21 @@ describe('GridCard', () => {
       expect(wrapper.find('StyledGridCardInner').props().onClick).toEqual(wrapper.instance().handleClick)
     })
 
-    it('renders the item content', () => {
-      expect(wrapper.find('StyledGridCardInner').children().html()).toContain(fakeItem.content)
+    it('does not render link icon if card is primary', () => {
+      expect(wrapper.find('StyledGridCardInner').find('LinkIcon').exists()).toBe(false)
+    })
+
+    describe('as reference', () => {
+      beforeEach(() => {
+        props.card.reference = true
+        wrapper = shallow(
+          <GridCard {...props} />
+        )
+      })
+
+      it('renders the link icon', () => {
+        expect(wrapper.find('StyledGridCardInner').find('LinkIcon').exists()).toBe(true)
+      })
     })
   })
 
@@ -49,6 +62,23 @@ describe('GridCard', () => {
 
     it('renders the collection cover', () => {
       expect(wrapper.find('CollectionCover').props().collection).toEqual(fakeCollection)
+    })
+
+    it('renders the collection icon', () => {
+      expect(wrapper.find('StyledGridCardInner').find('CollectionIcon').exists()).toBe(true)
+    })
+
+    describe('as reference', () => {
+      beforeEach(() => {
+        props.card.reference = true
+        wrapper = shallow(
+          <GridCard {...props} />
+        )
+      })
+
+      it('has linked collection icon', () => {
+        expect(wrapper.find('StyledGridCardInner').find('LinkedCollectionIcon').exists()).toBe(true)
+      })
     })
   })
 })

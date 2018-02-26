@@ -24,6 +24,7 @@ const CollectionIcon = ({ color, width, height }) => (
   </svg>
 )
 
+CollectionIcon.displayName = 'CollectionIcon'
 CollectionIcon.propTypes = { ...propTypes }
 CollectionIcon.defaultProps = { ...defaultProps }
 
