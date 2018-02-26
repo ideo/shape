@@ -7,6 +7,9 @@ import TextItem from '~/ui/items/TextItem'
 import ImageItem from '~/ui/items/ImageItem'
 import VideoItem from '~/ui/items/VideoItem'
 import CollectionCover from '~/ui/collections/CollectionCover'
+import CollectionIcon from '~/ui/icons/CollectionIcon'
+import LinkedCollectionIcon from '~/ui/icons/LinkedCollectionIcon'
+import LinkIcon from '~/ui/icons/LinkIcon'
 import { ITEM_TYPES } from '~/utils/variables'
 
 export const StyledGridCard = styled.div`
@@ -25,6 +28,11 @@ const StyledGridCardInner = styled.div`
   position: relative;
   height: 100%;
   overflow: hidden;
+  .icon {
+    position: absolute;
+    left: 1rem;
+    bottom: 0.25rem;
+  }
 `
 StyledGridCardInner.displayName = 'StyledGridCardInner'
 
@@ -60,6 +68,26 @@ class GridCard extends React.PureComponent {
     return <div />
   }
 
+  get icon() {
+    const { card, record } = this.props
+    let icon
+    const iconSize = 24
+    if (card.reference) {
+      if (record.type === 'Collection') {
+        icon = <LinkedCollectionIcon width={iconSize} height={iconSize} color="#FFFFFF" />
+      } else {
+        icon = <LinkIcon width={iconSize} height={iconSize} color="#FFFFFF" />
+      }
+    } else {
+      icon = <CollectionIcon width={iconSize} height={iconSize} color="#FFFFFF" />
+    }
+
+    if (icon) {
+      return <div className="icon">{icon}</div>
+    }
+    return ''
+  }
+
   handleClick = () => {
     if (this.props.dragging) return
     this.props.handleClick()
@@ -72,6 +100,7 @@ class GridCard extends React.PureComponent {
         {/* onClick placed here so it's separate from hotspot click */}
         <StyledGridCardInner onClick={this.handleClick}>
           {this.inner}
+          {this.icon}
         </StyledGridCardInner>
       </StyledGridCard>
     )
