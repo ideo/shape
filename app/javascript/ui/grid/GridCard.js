@@ -69,17 +69,18 @@ class GridCard extends React.PureComponent {
   }
 
   get icon() {
-    const { card, record } = this.props
+    const { card, cardType } = this.props
     let icon
     const iconSize = 24
-    if (record.type === 'Collection') {
+    const color = 'white'
+    if (cardType === 'collections') {
       if (card.reference) {
-        icon = <LinkedCollectionIcon width={iconSize} height={iconSize} color="#FFFFFF" />
+        icon = <LinkedCollectionIcon width={iconSize} height={iconSize} color={color} />
       } else {
-        icon = <CollectionIcon width={iconSize} height={iconSize} color="#FFFFFF" />
+        icon = <CollectionIcon width={iconSize} height={iconSize} color={color} />
       }
     } else if (card.reference) {
-      icon = <LinkIcon width={iconSize} height={iconSize} color="#FFFFFF" />
+      icon = <LinkIcon width={iconSize} height={iconSize} color={color} />
     }
 
     if (icon) {
