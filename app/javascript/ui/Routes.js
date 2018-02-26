@@ -3,6 +3,7 @@ import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import { Router, Switch, Route } from 'react-router-dom'
 
 import CollectionPage from '~/ui/pages/CollectionPage'
+import ItemPage from '~/ui/pages/ItemPage'
 import Loader from '~/ui/layout/Loader'
 
 @inject('apiStore')
@@ -28,6 +29,7 @@ class Routes extends React.Component {
         <Switch>
           <Route exact path="/" component={CollectionPage} />
           <Route path="/collections/:id" component={CollectionPage} />
+          <Route path="/items/:id" component={ItemPage} />
         </Switch>
       </Router>
     )

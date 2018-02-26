@@ -10,21 +10,12 @@ import PageContainer from '~/ui/layout/PageContainer'
 import CollectionGrid from '~/ui/grid/CollectionGrid'
 import H1 from '~/ui/global/H1'
 import Breadcrumb from '~/ui/layout/Breadcrumb'
-import v from '~/utils/variables'
 
 const isHomepage = ({ path }) => path === '/'
 
 @inject('apiStore', 'uiStore')
 @observer
 class CollectionPage extends PageWithApi {
-  constructor(props) {
-    super(props)
-    this.state = {
-      // blank: null,
-      cols: v.grid.cols,
-    }
-  }
-
   componentWillReceiveProps(nextProps) {
     super.componentWillReceiveProps(nextProps)
     // when navigating between collections, close BCT
@@ -67,38 +58,24 @@ class CollectionPage extends PageWithApi {
     this.collection.API_updateCardOrder()
   }
 
-  breadcrumb = () => {
-    const { collection } = this
-    let items = []
-
-    if (collection && !this.isHomepage) {
-      items = collection.breadcrumb
-    }
-
-    return (
-      <Breadcrumb
-        items={items}
-      />
-    )
-  }
-
   render() {
     const { collection } = this
     const { uiStore } = this.props
     // console.log(this.props.apiStore, collection)
     if (!collection) return <Loader />
 
+    const breadcrumb = this.isHomepage ? [] : collection.breadcrumb
+
     return (
       <Fragment>
         <Header>
-          {this.breadcrumb()}
+          <Breadcrumb items={breadcrumb} />
           <H1>{collection.name}</H1>
         </Header>
         <PageContainer>
           <CollectionGrid
-            // pull in gridW, gridH, gutter
-            {...v.grid}
-            cols={this.state.cols}
+            // pull in cols, gridW, gridH, gutter
+            {...uiStore.gridSettings}
             updateCollection={this.updateCollection}
             collection={collection}
             blankContentToolState={uiStore.blankContentToolState}
