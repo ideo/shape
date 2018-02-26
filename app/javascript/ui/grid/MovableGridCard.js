@@ -8,7 +8,7 @@ import propShapes from '~/utils/propShapes'
 import PositionedGridCard from '~/ui/grid/PositionedGridCard'
 import GridCard from '~/ui/grid/GridCard'
 import GridCardPlaceholder from '~/ui/grid/GridCardPlaceholder'
-import GridCardBlank from '~/ui/grid/GridCardBlank'
+import GridCardBlank from '~/ui/grid/blankContentTool/GridCardBlank'
 
 class MovableGridCard extends React.PureComponent {
   state = {
@@ -48,7 +48,8 @@ class MovableGridCard extends React.PureComponent {
     const { target } = this.state
     const offsetX = (e.screenX - target.getBoundingClientRect().x)
     const offsetY = (e.screenY - (target.getBoundingClientRect().y + 100))
-    // console.log(e.screenY, target.getBoundingClientRect().y)
+
+    // don't consider it to be "dragging" unless you've moved >5 px
     if (Math.abs(x) + Math.abs(y) < 5) {
       return
     }
@@ -80,14 +81,13 @@ class MovableGridCard extends React.PureComponent {
     }
   }
 
+  // this function gets passed down to the card, so it can place the onClick handler
   handleClick = () => {
     const { cardType, record } = this.props
-    if (cardType === 'collections') {
-      // timeout is just a stupid thing so that Draggable doesn't complain about unmounting
-      setTimeout(() => {
-        this.props.routeTo('collections', record.id)
-      })
-    }
+    // timeout is just a stupid thing so that Draggable doesn't complain about unmounting
+    setTimeout(() => {
+      this.props.routeTo(cardType, record.id)
+    })
   }
 
   clearDragTimeout = () => {
@@ -119,6 +119,7 @@ class MovableGridCard extends React.PureComponent {
     let { zIndex } = this.state
     const { dragging } = this.state
     if (dragging) {
+      rotation = '3deg'
       // transition = 'width 0.3s, height 0.3s;'
       // experiment -- shrink wide and tall cards
       // NOTE: turned off, was causing other issues about card placement
@@ -134,7 +135,6 @@ class MovableGridCard extends React.PureComponent {
       //   }
       //   height *= 0.6
       // }
-      rotation = '3deg'
     }
     if (isPlaceholder) {
       zIndex = 0

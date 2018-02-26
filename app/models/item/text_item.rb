@@ -9,7 +9,8 @@ class Item
     def add_name
       # create a name based on the first <25 characters, splitting on words.
       # primarily used for breadcrumb trail (perhaps eventually slugs?)
-      self.name = content.truncate(25, separator: /\s/, omission: '')
+      plain_content = Rails::Html::FullSanitizer.new.sanitize(content)
+      self.name = plain_content.truncate(25, separator: /\s/, omission: '')
     end
   end
 end

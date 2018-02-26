@@ -52,7 +52,7 @@ class GridCard extends React.PureComponent {
         return <TextItem item={record} />
       case ITEM_TYPES.IMAGE:
         return <ImageItem item={record} />
-      case 'Item::VideoItem':
+      case ITEM_TYPES.VIDEO:
         return <VideoItem item={record} />
       default:
         return (
