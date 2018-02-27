@@ -10,9 +10,9 @@
     "test": "jest --watch"
   },
   "jest": {
-    "setupTestFrameworkScriptFile": "./js_test_config/setup.js",
+    "setupTestFrameworkScriptFile": "./__js_test_config/setup.js",
     "modulePaths": [
-      "js_test_config"
+      "__js_test_config"
     ],
     "moduleNameMapper": {
       "\\.(css)$": "<rootDir>/node_modules/jest-css-modules",

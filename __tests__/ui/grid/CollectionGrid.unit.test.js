@@ -1,7 +1,7 @@
 import CollectionGrid from '~/ui/grid/CollectionGrid'
 
 import {
-  fakeItem,
+  fakeTextItem,
   fakeCollection
 } from '#/mocks/data'
 
@@ -32,7 +32,7 @@ describe('CollectionGrid', () => {
   it('renders the Grid with draggable collection cards', () => {
     expect(wrapper.find('.Grid').exists()).toBe(true)
     expect(wrapper.find('MovableGridCard').at(0).props().cardType).toBe('items')
-    expect(wrapper.find('MovableGridCard').at(0).props().record).toBe(fakeItem)
+    expect(wrapper.find('MovableGridCard').at(0).props().record).toBe(fakeTextItem)
     expect(wrapper.find('MovableGridCard').length).toBe(3)
   })
 })

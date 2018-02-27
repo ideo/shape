@@ -1,15 +1,15 @@
 import MovableGridCard from '~/ui/grid/MovableGridCard'
 import {
-  fakeCard,
-  fakeItem,
+  fakeItemCard,
+  fakeTextItem,
   fakePosition,
   fakeCollection
 } from '#/mocks/data'
 
 const props = {
-  card: fakeCard,
+  card: fakeItemCard,
   position: fakePosition,
-  record: fakeItem,
+  record: fakeTextItem,
   parent: fakeCollection,
   onDrag: jest.fn(),
   onDragStop: jest.fn(),
@@ -52,9 +52,9 @@ describe('MovableGridCard', () => {
     })
 
     it('renders a GridCard component', () => {
-      expect(wrapper.find('GridCard').props().card).toBe(fakeCard)
+      expect(wrapper.find('GridCard').props().card).toBe(fakeItemCard)
       expect(wrapper.find('GridCard').props().cardType).toBe('items')
-      expect(wrapper.find('GridCard').props().record).toBe(fakeItem)
+      expect(wrapper.find('GridCard').props().record).toBe(fakeTextItem)
     })
   })
 })
