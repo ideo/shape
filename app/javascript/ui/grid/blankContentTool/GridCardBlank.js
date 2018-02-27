@@ -16,6 +16,11 @@ import CollectionCreator from './CollectionCreator'
 import TextItemCreator from './TextItemCreator'
 import VideoCreator from './VideoCreator'
 
+const zIndex = {
+  foreground: 2,
+  background: 1,
+}
+
 const StyledGridCardBlank = StyledGridCard.extend`
   background: white;
   cursor: auto;
@@ -29,8 +34,6 @@ const StyledGridCardBlank = StyledGridCard.extend`
 `
 
 const StyledGridCardInner = styled.div`
-  padding: 2rem;
-
   button.close {
     position: absolute;
     color: #9b9b9b;
@@ -43,6 +46,14 @@ const StyledGridCardInner = styled.div`
     }
   }
 `
+const StyledBlankCreationTool = styled.div`
+  padding: 2rem;
+  .foreground {
+    position: relative;
+    z-index: ${zIndex.foreground};
+  }
+`
+
 const BctButton = styled.button`
   position: relative;
   width: 47px;
@@ -61,9 +72,10 @@ const BctButton = styled.button`
     top: 0;
   }
 `
+BctButton.displayName = 'BctButton'
 
 const BctBackground = styled.div`
-  z-index: 1;
+  z-index: ${zIndex.background};
   position: absolute;
   top: 40px;
   left: 60px;
@@ -168,6 +180,7 @@ class GridCardBlank extends React.Component {
     case 'text':
       return (
         <TextItemCreator
+          height={this.props.height}
           createCard={this.createCard}
           closeBlankContentTool={this.closeBlankContentTool}
         />
@@ -178,8 +191,8 @@ class GridCardBlank extends React.Component {
 
     const iconSize = 47
     return (
-      <div>
-        <Flex style={{ position: 'relative', zIndex: 2 }} align="center" justify="space-between">
+      <StyledBlankCreationTool>
+        <Flex className="foreground" align="center" justify="space-between">
           <Box>
             <BctButton onClick={this.startCreatingCollection}>
               <AddCollectionIcon width={iconSize} height={iconSize} color="white" />
@@ -202,7 +215,7 @@ class GridCardBlank extends React.Component {
           </Box>
         </Flex>
         <BctBackground />
-      </div>
+      </StyledBlankCreationTool>
     )
   }
 
@@ -224,6 +237,7 @@ GridCardBlank.propTypes = {
   order: PropTypes.number.isRequired,
   // parent is the parent collection
   parent: MobxPropTypes.objectOrObservableObject.isRequired,
+  height: PropTypes.number.isRequired,
 }
 GridCardBlank.wrappedComponent.propTypes = {
   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,

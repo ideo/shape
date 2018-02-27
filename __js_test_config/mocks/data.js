@@ -2,7 +2,8 @@ export const fakeTextItemAttrs = {
   id: 1,
   type: 'Item::TextItem',
   name: 'My Cool Item',
-  text_data: 'This is the content for the item and it contains multiple sentences. Like this one.'
+  text_data: 'This is the content for the item and it contains multiple sentences. Like this one.',
+  breadcrumb: [['collections', 1, 'Some collection'], ['items', 1, 'my item']],
 }
 export const fakeTextItem = {
   ...fakeTextItemAttrs,

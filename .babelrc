@@ -21,6 +21,11 @@
     "stage-1",
     "react"
   ],
+  "env": {
+    "development": {
+      "plugins": ["babel-plugin-styled-components"]
+    }
+  },
   "plugins": [
     ["transform-decorators-legacy"],
     ["transform-class-properties"],

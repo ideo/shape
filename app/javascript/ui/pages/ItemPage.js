@@ -4,6 +4,7 @@ import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 
 import PageWithApi from '~/ui/pages/PageWithApi'
+import PageContainer from '~/ui/layout/PageContainer'
 import Loader from '~/ui/layout/Loader'
 import Header from '~/ui/layout/Header'
 import H1 from '~/ui/global/H1'
@@ -11,16 +12,15 @@ import Breadcrumb from '~/ui/layout/Breadcrumb'
 import TextItem from '~/ui/items/TextItem'
 import ImageItem from '~/ui/items/ImageItem'
 import VideoItem from '~/ui/items/VideoItem'
-import v, { ITEM_TYPES } from '~/utils/variables'
+import { ITEM_TYPES } from '~/utils/variables'
 
 const ItemPageContainer = styled.main`
-  width: 100%;
-  height: 100%;
   background: white;
-  margin: ${v.headerHeight}px auto 0;
-  position: absolute;
-  top: 0;
-  left: 0;
+  min-height: 75vh;
+  /*
+  need attributes to deal with displaying ImageItem correctly...
+
+  */
 `
 
 @inject('apiStore')
@@ -38,7 +38,7 @@ class ItemPage extends PageWithApi {
     // similar function as in GridCard, could extract?
     switch (item.type) {
     case ITEM_TYPES.TEXT:
-      return <TextItem item={item} editable padding="2rem" />
+      return <TextItem item={item} editable padding="2rem 0.5rem" />
     case ITEM_TYPES.IMAGE:
       return <ImageItem item={item} backgroundSize="contain" />
     case ITEM_TYPES.VIDEO:
@@ -66,8 +66,10 @@ class ItemPage extends PageWithApi {
           <H1>{item.name}</H1>
         </Header>
         <ItemPageContainer>
-          {/* TODO: calculate item container size? */}
-          {this.content}
+          <PageContainer>
+            {/* TODO: calculate item container size? */}
+            {this.content}
+          </PageContainer>
         </ItemPageContainer>
       </Fragment>
     )

@@ -6,6 +6,10 @@ export const ITEM_TYPES = {
 
 export default {
   headerHeight: 150,
+  maxWidth: 1400,
+  containerPadding: {
+    horizontal: '2rem',
+  },
 
   colors: {
     placeholder: '#d6fffe',
@@ -15,6 +19,10 @@ export default {
     darkCharcoal: '#120f0e',
     darkGray: '#444',
     linkHover: '#06c',
+  },
+
+  zIndex: {
+    header: 100,
   },
 
   quillDefaults: {

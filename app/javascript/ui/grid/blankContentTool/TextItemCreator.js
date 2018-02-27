@@ -1,8 +1,21 @@
 import PropTypes from 'prop-types'
 import ReactQuill from 'react-quill'
 import _ from 'lodash'
+import styled from 'styled-components'
 
 import v, { ITEM_TYPES } from '~/utils/variables'
+
+const StyledTextItemCreator = styled.div`
+  padding: 1rem;
+  height: calc(${props => props.height}px - 2rem);
+  overflow-y: scroll;
+  /* hide semi-awkward scrollbar */
+  -ms-overflow-style: none;
+  overflow: -moz-scrollbars-none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+`
 
 class TextItemCreator extends React.Component {
   constructor(props) {
@@ -53,7 +66,7 @@ class TextItemCreator extends React.Component {
     }
 
     return (
-      <div>
+      <StyledTextItemCreator height={this.props.height}>
         <ReactQuill
           ref={(c) => { this.quillEditor = c }}
           formats={v.quillDefaults.formats}
@@ -64,7 +77,7 @@ class TextItemCreator extends React.Component {
             keyboard: { bindings }
           }}
         />
-      </div>
+      </StyledTextItemCreator>
     )
   }
 }
@@ -72,6 +85,7 @@ class TextItemCreator extends React.Component {
 TextItemCreator.propTypes = {
   createCard: PropTypes.func.isRequired,
   closeBlankContentTool: PropTypes.func.isRequired,
+  height: PropTypes.number.isRequired,
 }
 
 export default TextItemCreator

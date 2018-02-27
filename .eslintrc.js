@@ -30,6 +30,7 @@ module.exports = {
     "shallow": true,
     "render": true,
     "mount": true,
+    "relPath": true,
   },
   settings: {
     "import/resolver": {
@@ -50,6 +51,11 @@ module.exports = {
     "no-param-reassign": ["error", { "props": false }],
     "no-underscore-dangle": 0,
     "one-var-declaration-per-line": ["error", "initializations"],
+    "object-curly-newline": ["error", {
+      "multiline": true,
+      "consistent": true,
+      "minProperties": 6
+    }],
     "radix": ["error", "as-needed"],
     "semi" : [2, "never"],
     "space-before-function-paren": 0,

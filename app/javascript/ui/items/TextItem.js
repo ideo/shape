@@ -39,8 +39,10 @@ class TextItem extends React.Component {
 
   componentDidMount() {
     if (this.props.editable) return
+    if (!this.quillEditor) return
+    const { height } = this.props
     const h = this.quillEditor.getEditingArea().offsetHeight
-    if (h > 250) {
+    if (height && h > height) {
       this.setState({ readMore: true })
     }
   }
@@ -101,11 +103,13 @@ class TextItem extends React.Component {
 
 TextItem.propTypes = {
   item: MobxPropTypes.objectOrObservableObject.isRequired,
+  height: PropTypes.number,
   padding: PropTypes.string,
   editable: PropTypes.bool,
 }
 
 TextItem.defaultProps = {
+  height: null,
   padding: '1rem',
   editable: false,
 }

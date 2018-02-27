@@ -150,6 +150,8 @@ class MovableGridCard extends React.PureComponent {
       card,
       cardType,
       record,
+      // useful for sub-components to know about the card's height
+      height,
       // we want to track "dragging" until the transition is complete
       // also so that click handler doesn't register while dragging
       dragging: !this.state.dragComplete,
@@ -197,7 +199,7 @@ class MovableGridCard extends React.PureComponent {
         >
           <div>
             <PositionedGridCard {...styleProps}>
-              <GridCardBlank parent={this.props.parent} order={card.order} />
+              <GridCardBlank height={height} parent={this.props.parent} order={card.order} />
             </PositionedGridCard>
           </div>
         </FlipMove>

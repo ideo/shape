@@ -24,7 +24,6 @@ const LinkIcon = ({ color, width, height }) => (
   </svg>
 )
 
-LinkIcon.displayName = 'LinkIcon'
 LinkIcon.propTypes = { ...propTypes }
 LinkIcon.defaultProps = { ...defaultProps }
 
