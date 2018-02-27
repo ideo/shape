@@ -26,3 +26,20 @@ h2 {
 p {
   line-height: 1.25;
 }
+
+.icon {
+  position: relative;
+  display: inline-block;
+}
+
+.icon--stroke {
+  svg {
+    stroke: currentColor;
+  }
+}
+
+.icon--fill {
+  svg {
+    fill: currentColor;
+  }
+}

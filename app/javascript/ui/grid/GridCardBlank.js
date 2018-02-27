@@ -54,10 +54,12 @@ const BctButton = styled.button`
     background-color: #676767;
   }
 
-  svg {
+  .icon {
     position: absolute;
     left: 0;
     top: 0;
+    width: 47px;
+    height: 47px;
   }
 `
 

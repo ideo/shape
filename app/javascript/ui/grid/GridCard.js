@@ -11,8 +11,7 @@ import CollectionIcon from '~/ui/icons/CollectionIcon'
 import LinkedCollectionIcon from '~/ui/icons/LinkedCollectionIcon'
 import LinkIcon from '~/ui/icons/LinkIcon'
 import CardMenu from '~/ui/grid/CardMenu'
-import { ITEM_TYPES } from '~/utils/variables'
-import v from '~/utils/variables'
+import v, { ITEM_TYPES } from '~/utils/variables'
 
 export const StyledGridCard = styled.div`
   z-index: 1;

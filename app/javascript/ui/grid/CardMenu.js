@@ -45,6 +45,9 @@ export const StyledMenuItem = styled.li`
     text-align: left;
     border-bottom: 1px solid ${v.colors.cyanLight};
     .icon {
+      width: 14px;
+      height: 14px;
+      color: #FFFFFF;
       position: absolute;
       right: 1.5rem;
     }
@@ -74,8 +77,6 @@ class CardMenu extends React.PureComponent {
 
   render() {
     const { className } = this.props
-    const iconSize = 14
-    const iconColor = '#666666'
     let css = className || ''
     if (this.state.open) {
       css += ' open'
@@ -86,39 +87,31 @@ class CardMenu extends React.PureComponent {
         role="presentation"
       >
         <StyledMenuToggle onClick={this.toggleMenuVisibility}>
-          <MenuIcon width={iconSize} height={iconSize} color="#FFFFFF" />
+          <MenuIcon />
         </StyledMenuToggle>
         <ul>
           <StyledMenuItem>
             <button onClick={this.props.handleDuplicate}>
               Duplicate
-              <span className="icon">
-                <DuplicateIcon width={iconSize} height={iconSize} color={iconColor} />
-              </span>
+              <DuplicateIcon />
             </button>
           </StyledMenuItem>
           <StyledMenuItem>
             <button onClick={this.props.handleLink}>
               Link
-              <span className="icon">
-                <LinkIcon width={iconSize} height={iconSize} color={iconColor} />
-              </span>
+              <LinkIcon />
             </button>
           </StyledMenuItem>
           <StyledMenuItem>
             <button onClick={this.props.handleOrganize}>
               Organize
-              <span className="icon">
-                <OrganizeIcon width={iconSize} height={iconSize} color={iconColor} />
-              </span>
+              <OrganizeIcon />
             </button>
           </StyledMenuItem>
           <StyledMenuItem>
             <button onClick={this.props.handleArchive}>
               Archive
-              <span className="icon">
-                <ArchiveIcon width={iconSize} height={iconSize} color={iconColor} />
-              </span>
+              <ArchiveIcon />
             </button>
           </StyledMenuItem>
         </ul>
