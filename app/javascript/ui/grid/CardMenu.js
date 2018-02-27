@@ -24,11 +24,15 @@ export const StyledMenu = styled.div`
 `
 
 export const StyledMenuToggle = styled.button`
-  -webkit-transform: rotate(90deg);
-  -moz-transform: rotate(90deg);
-  -o-transform: rotate(90deg);
-  -ms-transform: rotate(90deg);
-  transform: rotate(90deg);
+  .icon {
+    -webkit-transform: rotate(90deg);
+    -moz-transform: rotate(90deg);
+    -o-transform: rotate(90deg);
+    -ms-transform: rotate(90deg);
+    transform: rotate(90deg);
+    width: 20px;
+    height: 20px;
+  }
 `
 
 export const StyledMenuItem = styled.li`
@@ -45,11 +49,13 @@ export const StyledMenuItem = styled.li`
     text-align: left;
     border-bottom: 1px solid ${v.colors.cyanLight};
     .icon {
-      width: 14px;
-      height: 14px;
-      color: #FFFFFF;
+      top: 50%;
+      transform: translateY(-50%);
+      color: ${v.colors.dark};
       position: absolute;
       right: 1.5rem;
+      width: 16px;
+      height: 16px;
     }
   }
   &:hover,
@@ -58,7 +64,7 @@ export const StyledMenuItem = styled.li`
       border-left: 3px solid ${v.colors.teal};
     }
     button,
-    button .icon svg {
+    button .icon {
       color: ${v.colors.teal};
     }
   }

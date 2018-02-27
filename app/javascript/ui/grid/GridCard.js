@@ -54,13 +54,14 @@ const StyledSelectionCircle = styled.div`
   width: 14px;
   height: 14px;
   border-radius: 14px;
-  border: 1px solid #FFFFFF;
+  border: 1px solid #CCCCCC;
   margin: 5px;
   &.selected {
     border-color: ${v.colors.teal};
     background-color: ${v.colors.teal};
   }
 `
+StyledSelectionCircle.displayName = 'StyledSelectionCircle'
 
 const StyledDragIcon = styled.div`
   position: absolute;
