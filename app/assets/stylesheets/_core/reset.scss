@@ -1,158 +1,179 @@
 // https://perishablepress.com/a-killer-collection-of-global-css-reset-styles/
 // -- Condensed Meyer Reset --
 body {
-	padding: 0;
-	margin: 0;
+  padding: 0;
+  margin: 0;
 }
 div {
-	padding: 0;
-	margin: 0;
+  padding: 0;
+  margin: 0;
 }
 dl {
-	padding: 0;
-	margin: 0;
+  padding: 0;
+  margin: 0;
 }
 dt {
-	padding: 0;
-	margin: 0;
+  padding: 0;
+  margin: 0;
 }
 dd {
-	padding: 0;
-	margin: 0;
+  padding: 0;
+  margin: 0;
 }
 ul {
-	padding: 0;
-	margin: 0;
-	list-style: none;
+  padding: 0;
+  margin: 0;
+  list-style: none;
 }
 ol {
-	padding: 0;
-	margin: 0;
-	list-style: none;
+  padding: 0;
+  margin: 0;
+  list-style: none;
 }
 li {
-	padding: 0;
-	margin: 0;
+  padding: 0;
+  margin: 0;
 }
 h1 {
-	padding: 0;
-	margin: 0;
-	font-weight: normal;
-	font-size: 100%;
+  padding: 0;
+  margin: 0;
+  font-weight: normal;
+  font-size: 100%;
 }
 h2 {
-	padding: 0;
-	margin: 0;
-	font-weight: normal;
-	font-size: 100%;
+  padding: 0;
+  margin: 0;
+  font-weight: normal;
+  font-size: 100%;
 }
 h3 {
-	padding: 0;
-	margin: 0;
-	font-weight: normal;
-	font-size: 100%;
+  padding: 0;
+  margin: 0;
+  font-weight: normal;
+  font-size: 100%;
 }
 h4 {
-	padding: 0;
-	margin: 0;
-	font-weight: normal;
-	font-size: 100%;
+  padding: 0;
+  margin: 0;
+  font-weight: normal;
+  font-size: 100%;
 }
 h5 {
-	padding: 0;
-	margin: 0;
-	font-weight: normal;
-	font-size: 100%;
+  padding: 0;
+  margin: 0;
+  font-weight: normal;
+  font-size: 100%;
 }
 h6 {
-	padding: 0;
-	margin: 0;
-	font-weight: normal;
-	font-size: 100%;
+  padding: 0;
+  margin: 0;
+  font-weight: normal;
+  font-size: 100%;
 }
 pre {
-	padding: 0;
-	margin: 0;
+  padding: 0;
+  margin: 0;
 }
 form {
-	padding: 0;
-	margin: 0;
+  padding: 0;
+  margin: 0;
 }
 fieldset {
-	padding: 0;
-	margin: 0;
-	border: 0;
+  padding: 0;
+  margin: 0;
+  border: 0;
 }
 input {
-	padding: 0;
-	margin: 0;
+  padding: 0;
+  margin: 0;
 }
 textarea {
-	padding: 0;
-	margin: 0;
+  padding: 0;
+  margin: 0;
 }
 p {
-	padding: 0;
-	margin: 0;
+  padding: 0;
+  margin: 0;
 }
 blockquote {
-	padding: 0;
-	margin: 0;
+  padding: 0;
+  margin: 0;
 }
 th {
-	padding: 0;
-	margin: 0;
-	font-weight: normal;
-	font-style: normal;
-	text-align: left;
+  padding: 0;
+  margin: 0;
+  font-weight: normal;
+  font-style: normal;
+  text-align: left;
 }
 td {
-	padding: 0;
-	margin: 0;
+  padding: 0;
+  margin: 0;
 }
 img {
-	border: 0;
+  border: 0;
 }
 table {
-	border-collapse: collapse;
-	border-spacing: 0;
+  border-collapse: collapse;
+  border-spacing: 0;
 }
 address {
-	font-weight: normal;
-	font-style: normal;
+  font-weight: normal;
+  font-style: normal;
 }
 caption {
-	font-weight: normal;
-	font-style: normal;
-	text-align: left;
+  font-weight: normal;
+  font-style: normal;
+  text-align: left;
 }
 cite {
-	font-weight: normal;
-	font-style: normal;
+  font-weight: normal;
+  font-style: normal;
 }
 code {
-	font-weight: normal;
-	font-style: normal;
+  font-weight: normal;
+  font-style: normal;
 }
 dfn {
-	font-weight: normal;
-	font-style: normal;
+  font-weight: normal;
+  font-style: normal;
 }
 var {
-	font-weight: normal;
-	font-style: normal;
+  font-weight: normal;
+  font-style: normal;
 }
 q {
-	&:before {
-		content: '';
-	}
-	&:after {
-		content: '';
-	}
+  &:before {
+    content: '';
+  }
+  &:after {
+    content: '';
+  }
 }
 abbr {
-	border: 0;
+  border: 0;
 }
 acronym {
-	border: 0;
+  border: 0;
+}
+button {
+  background: none;
+  border: 0;
+  color: inherit;
+  cursor: pointer;
+  font: inherit;
+  line-height: normal;
+  overflow: visible;
+  padding: 0;
+  -webkit-appearance: button; /* for input */
+  -webkit-user-select: none; /* for button */
+  -moz-user-select: none;
+  -ms-user-select: none;
+  &::-moz-focus-inner {
+    border: 0;
+    padding: 0;
+  }
+  &:focus {
+    outline: 0;
+  }
 }

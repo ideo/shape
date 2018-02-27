@@ -2,6 +2,7 @@ import PropTypes from 'prop-types'
 import { PropTypes as MobxPropTypes } from 'mobx-react'
 import FlipMove from 'react-flip-move'
 import Draggable from 'react-draggable'
+import styled from 'styled-components'
 
 import v from '~/utils/variables'
 import propShapes from '~/utils/propShapes'
@@ -10,6 +11,14 @@ import GridCard from '~/ui/grid/GridCard'
 import GridCardPlaceholder from '~/ui/grid/GridCardPlaceholder'
 import GridCardBlank from '~/ui/grid/GridCardBlank'
 
+export const StyledMovableGridCard = styled.div`
+  position: relative;
+  z-index: ${props => ((props.dragging && !props.isPlaceholder) ? 1500 : 1)};
+  &:hover {
+    z-index: 150;
+  }
+`
+
 class MovableGridCard extends React.PureComponent {
   state = {
     timeoutId: null,
@@ -17,7 +26,6 @@ class MovableGridCard extends React.PureComponent {
     position: { x: 0, y: 0 },
     dragging: false,
     dragComplete: true,
-    zIndex: 1,
     // track where on the page the mouse position is, e.g. if browser is stretched wide
     // initialOffsetX: 0,
     // initialOffsetY: 0,
@@ -55,7 +63,6 @@ class MovableGridCard extends React.PureComponent {
     this.setState({
       dragging: true,
       dragComplete: false,
-      zIndex: 1000,
     })
     const dragPosition = {
       // dragPosition indicates the x/y of the dragged element,
@@ -74,7 +81,7 @@ class MovableGridCard extends React.PureComponent {
       this.setState({ dragging: false })
       const timeoutId = setTimeout(() => {
         // have this item remain "on top" while it animates back
-        this.setState({ zIndex: 1, dragComplete: true })
+        this.setState({ dragComplete: true })
       }, 350)
       this.setState({ timeoutId })
     }
@@ -116,7 +123,6 @@ class MovableGridCard extends React.PureComponent {
 
     const transition = 'transform 0.5s, width 0.3s, height 0.3s;'
     let rotation = '0deg'
-    let { zIndex } = this.state
     const { dragging } = this.state
     if (dragging) {
       // transition = 'width 0.3s, height 0.3s;'
@@ -137,7 +143,6 @@ class MovableGridCard extends React.PureComponent {
       rotation = '3deg'
     }
     if (isPlaceholder) {
-      zIndex = 0
       // transition = 'none'
       rotation = '0deg'
     }
@@ -171,8 +176,6 @@ class MovableGridCard extends React.PureComponent {
       right: (1400 - (width / 2)) - xPos
     }
 
-    const z = zIndex
-
     if (isPlaceholder) {
       return (
         <PositionedGridCard {...styleProps}>
@@ -205,11 +208,13 @@ class MovableGridCard extends React.PureComponent {
     }
 
     return (
-      <div
-        style={{
-          zIndex: (dragging && !isPlaceholder) ? (z * 2) : z,
-          position: 'relative'
-        }}
+      <StyledMovableGridCard
+        dragging={dragging}
+        isPlaceholder={isPlaceholder}
+        // style={{
+        //   zIndex: (dragging && !isPlaceholder) ? (z * 2) : z,
+        //   position: 'relative'
+        // }}
       >
         <FlipMove
           appearAnimation={isPlaceholder ? null : 'elevator'}
@@ -234,7 +239,7 @@ class MovableGridCard extends React.PureComponent {
           </Draggable>
 
         </FlipMove>
-      </div>
+      </StyledMovableGridCard>
     )
   }
 }
