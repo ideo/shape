@@ -4,7 +4,6 @@ import ReactQuill from 'react-quill'
 import _ from 'lodash'
 import styled from 'styled-components'
 
-import { routingStore } from '~/stores'
 import v from '~/utils/variables'
 import TextItemToolbar from '~/ui/items/TextItemToolbar'
 
@@ -94,16 +93,10 @@ class TextItem extends React.Component {
       }
     }
 
-    // simple way to "go back" to the previous breadcrumb
-    // NOTE: what if we want "x" to actually goBack i.e. w/ routing history?
-    //  -- particularly if you were jumping in/out of "referenced" items
-    const [type, id] = item.breadcrumb[item.breadcrumb.length - 2]
-    const closePath = routingStore.pathTo(type, id)
-
     return (
       <div>
         <StyledCard padding={padding}>
-          { editable && <TextItemToolbar closePath={closePath} /> }
+          { editable && <TextItemToolbar closePath={item.parentPath} /> }
 
           <ReactQuill
             {...quillProps}

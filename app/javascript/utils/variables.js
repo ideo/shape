@@ -26,11 +26,10 @@ export default {
   },
 
   quillDefaults: {
-    formats: ['link', 'size', 'header'],
+    formats: ['link', 'header'],
     modules: {
       toolbar: [
-        // size: false means "normal" i.e. no formatting
-        [{ size: [false, 'large'] }],
+        // header: false means "normal" i.e. no formatting
         [{ header: [3, false] }],
         ['link'],
       ]
