@@ -26,11 +26,12 @@ export default {
   },
 
   quillDefaults: {
-    formats: ['link', 'size', 'list'],
+    formats: ['link', 'size', 'header'],
     modules: {
       toolbar: [
         // size: false means "normal" i.e. no formatting
         [{ size: [false, 'large'] }],
+        [{ header: [3, false] }],
         ['link'],
       ]
     }

@@ -27,6 +27,11 @@ export const StyledReadMore = styled.div`
   }
 `
 
+const remapHeaderToH3 = (node, delta) => {
+  delta.map((op) => (op.attributes.header = 3))
+  return delta
+}
+
 class TextItem extends React.Component {
   constructor(props) {
     super(props)
@@ -38,7 +43,16 @@ class TextItem extends React.Component {
   }
 
   componentDidMount() {
-    if (this.props.editable) return
+    if (this.props.editable) {
+      const { editor } = this.quillEditor
+      // change all non-H3 header attributes to H3, e.g. when copy/pasting
+      editor.clipboard.addMatcher('H1', remapHeaderToH3)
+      editor.clipboard.addMatcher('H2', remapHeaderToH3)
+      editor.clipboard.addMatcher('H4', remapHeaderToH3)
+      editor.clipboard.addMatcher('H5', remapHeaderToH3)
+      editor.clipboard.addMatcher('H6', remapHeaderToH3)
+      return
+    }
     if (!this.quillEditor) return
     const { height } = this.props
     const h = this.quillEditor.getEditingArea().offsetHeight
@@ -64,6 +78,7 @@ class TextItem extends React.Component {
     if (editable) {
       quillProps = {
         ...v.quillDefaults,
+        ref: c => { this.quillEditor = c },
         theme: 'snow',
         onChange: this.onTextChange,
         modules: {
@@ -72,10 +87,10 @@ class TextItem extends React.Component {
       }
     } else {
       quillProps = {
-        readOnly: true,
-        theme: null,
         // ref is used to get the height of the div in componentDidMount
         ref: c => { this.quillEditor = c },
+        readOnly: true,
+        theme: null,
       }
     }
 

@@ -68,10 +68,11 @@
   // -------
   // currently, this is the only "styled text" we use:
 
-  .ql-size-large {
+  h3 {
+    font-family: 'Gotham', sans-serif;
     text-transform: uppercase;
     font-size: 1rem;
-    font-family: 'Gotham', sans-serif;
+    margin-bottom: 1rem;
   }
   // -------
 
