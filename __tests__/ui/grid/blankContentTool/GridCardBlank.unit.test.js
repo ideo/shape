@@ -3,7 +3,7 @@ import fakeApiStore from '#/mocks/fakeApiStore'
 import FilestackUpload from '~/utils/FilestackUpload'
 
 // replace FilestackUpload with a mock, no need to hit actual filestack API
-jest.mock(relPath('~/utils/FilestackUpload'))
+jest.mock('../../../../app/javascript/utils/FilestackUpload')
 
 let props, wrapper
 beforeEach(() => {
