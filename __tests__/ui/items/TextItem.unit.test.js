@@ -42,11 +42,7 @@ describe('TextItem', () => {
   describe('editable', () => {
     beforeEach(() => {
       props.editable = true
-      // closePath should come from 2nd to last breadcrumb
-      props.item.breadcrumb = [
-        ['collections', 99, 'Some collection'],
-        ['items', 1, 'my item'],
-      ]
+      props.item.parentPath = '/collections/99'
       wrapper = shallow(
         <TextItem {...props} />
       )
@@ -57,6 +53,7 @@ describe('TextItem', () => {
     })
 
     it('gives the TextItemToolbar the path for the close button', () => {
+      // should come from item.parentPath
       expect(wrapper.find('TextItemToolbar').props().closePath).toEqual('/collections/99')
     })
   })

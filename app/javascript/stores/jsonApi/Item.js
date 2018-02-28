@@ -1,5 +1,5 @@
-import BaseRecord from './BaseRecord'
 import { routingStore } from '~/stores'
+import BaseRecord from './BaseRecord'
 
 class Item extends BaseRecord {
   get parentPath() {

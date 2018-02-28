@@ -42,6 +42,7 @@ class TextItem extends React.Component {
   }
 
   componentDidMount() {
+    if (!this.quillEditor) return
     if (this.props.editable) {
       const { editor } = this.quillEditor
       // change all non-H3 header attributes to H3, e.g. when copy/pasting
@@ -52,7 +53,6 @@ class TextItem extends React.Component {
       editor.clipboard.addMatcher('H6', remapHeaderToH3)
       return
     }
-    if (!this.quillEditor) return
     const { height } = this.props
     const h = this.quillEditor.getEditingArea().offsetHeight
     if (height && h > height) {
