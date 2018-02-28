@@ -55,6 +55,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
         :content,
         { text_data: {} },
         :url,
+        :thumbnail_url,
         :image,
         :archived,
         filestack_file_attributes: [
