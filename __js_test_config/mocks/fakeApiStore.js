@@ -1,4 +1,4 @@
-const fakeApiStore = ({ findResult, requestResult }) => {
+const fakeApiStore = ({ findResult = '', requestResult = '' } = {}) => {
   return {
     find: jest.fn()
       .mockReturnValue(findResult),
@@ -9,7 +9,9 @@ const fakeApiStore = ({ findResult, requestResult }) => {
     setCurrentUserId: jest.fn(),
     currentUser: {
       current_user_collection_id: 99
-    }
+    },
+    collections: [],
+    items: [],
   }
 }
 

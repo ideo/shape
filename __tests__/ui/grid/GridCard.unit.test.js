@@ -13,6 +13,7 @@ const props = {
   record: fakeTextItem,
   handleClick: jest.fn(),
   dragging: false,
+  height: 100,
 }
 
 let wrapper

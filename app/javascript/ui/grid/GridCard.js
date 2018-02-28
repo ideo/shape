@@ -45,14 +45,14 @@ class GridCard extends React.PureComponent {
   }
 
   get inner() {
-    const { card, record } = this.props
+    const { card, record, height } = this.props
     if (this.isItem) {
       switch (record.type) {
       case ITEM_TYPES.TEXT:
-        return <TextItem item={record} />
+        return <TextItem item={record} height={height} />
       case ITEM_TYPES.IMAGE:
         return <ImageItem item={record} />
-      case 'Item::VideoItem':
+      case ITEM_TYPES.VIDEO:
         return <VideoItem item={record} />
       default:
         return (
@@ -111,6 +111,7 @@ class GridCard extends React.PureComponent {
 GridCard.propTypes = {
   card: MobxPropTypes.objectOrObservableObject.isRequired,
   cardType: PropTypes.string.isRequired,
+  height: PropTypes.number.isRequired,
   record: MobxPropTypes.objectOrObservableObject.isRequired,
   dragging: PropTypes.bool.isRequired,
   handleClick: PropTypes.func.isRequired,

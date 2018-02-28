@@ -24,7 +24,6 @@ const LinkedCollectionIcon = ({ color, width, height }) => (
   </svg>
 )
 
-LinkedCollectionIcon.displayName = 'LinkedCollectionIcon'
 LinkedCollectionIcon.propTypes = { ...propTypes }
 LinkedCollectionIcon.defaultProps = { ...defaultProps }
 

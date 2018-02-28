@@ -22,6 +22,12 @@ beforeEach(() => {
   })
   apiStore.collections = collections
   uiStore = {
+    gridSettings: {
+      cols: 4,
+      gutter: 20,
+      gridW: 312,
+      gridH: 250,
+    },
     blankContentToolState: null
   }
   props = { apiStore, uiStore, match }
