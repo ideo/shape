@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom'
 import v from '~/utils/variables'
 
 const StyledButton = styled.button`
-  color: ${v.colors.darkGray};
+  color: ${v.colors.lightGray};
   &.ql-format-reg {
     font-size: 0.9rem;
     font-family: 'Sentintel', serif;
@@ -25,7 +25,7 @@ const CloseLink = styled(Link)`
   /* add the .close class for more specificity to override quill theme-snow */
   &.close {
     text-decoration: none;
-    color: ${v.colors.darkGray};
+    color: ${v.colors.lightGray};
     &:hover {
       color: ${v.colors.linkHover};
     }

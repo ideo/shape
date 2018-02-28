@@ -8,6 +8,7 @@ h1, h2, h3, h4, h5, h6 {
   font-family: 'Gotham', sans-serif;
   text-transform: uppercase;
   word-wrap: break-word;
+  line-height: 1.25;
   strong {
     font-weight: inherit;
   }
@@ -15,12 +16,17 @@ h1, h2, h3, h4, h5, h6 {
 
 h1 {
   font-size: 2.25rem;
-  margin-bottom: 0.5rem;
+  margin-bottom: 1rem;
 }
 
 h2 {
   font-size: 2rem;
-  margin-bottom: 0.33rem;
+  margin-bottom: 1rem;
+}
+
+h3 {
+  font-size: 1rem;
+  margin-bottom: 0.75rem;
 }
 
 p {

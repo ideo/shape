@@ -18,6 +18,7 @@ export default {
     cyanLight: '#f0f4f6',
     darkCharcoal: '#120f0e',
     darkGray: '#444',
+    lightGray: '#c8c8c8',
     linkHover: '#06c',
   },
 
