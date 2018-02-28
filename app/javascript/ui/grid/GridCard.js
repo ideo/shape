@@ -3,10 +3,11 @@ import { PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 
 import GridCardHotspot from '~/ui/grid/GridCardHotspot'
-import TextItem from '~/ui/items/TextItem'
-import ImageItem from '~/ui/items/ImageItem'
-import VideoItem from '~/ui/items/VideoItem'
-import CollectionCover from '~/ui/collections/CollectionCover'
+import TextItemCover from '~/ui/grid/covers/TextItemCover'
+import ImageItemCover from '~/ui/grid/covers/ImageItemCover'
+import VideoItemCover from '~/ui/grid/covers/VideoItemCover'
+import CollectionCover from '~/ui/grid/covers/CollectionCover'
+
 import CollectionIcon from '~/ui/icons/CollectionIcon'
 import LinkedCollectionIcon from '~/ui/icons/LinkedCollectionIcon'
 import LinkIcon from '~/ui/icons/LinkIcon'
@@ -111,11 +112,11 @@ class GridCard extends React.Component {
     if (this.isItem) {
       switch (record.type) {
       case ITEM_TYPES.TEXT:
-        return <TextItem item={record} height={height} />
+        return <TextItemCover item={record} height={height} />
       case ITEM_TYPES.IMAGE:
-        return <ImageItem item={record} />
+        return <ImageItemCover item={record} />
       case ITEM_TYPES.VIDEO:
-        return <VideoItem item={record} />
+        return <VideoItemCover item={record} />
       default:
         return (
           <div>
