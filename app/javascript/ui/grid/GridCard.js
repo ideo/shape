@@ -115,7 +115,7 @@ class GridCard extends React.Component {
     const { card, cardType } = this.props
     let icon
     const iconSize = 24
-    const color = 'black'
+    const color = 'white'
     if (cardType === 'collections') {
       if (card.reference) {
         icon = <LinkedCollectionIcon />
