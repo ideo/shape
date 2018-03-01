@@ -1,0 +1,78 @@
+/*!
+ * -- ORIGINAL --
+ * Quill Editor v1.3.5
+ * https://quilljs.com/
+ * Copyright (c) 2014, Jason Chen
+ * Copyright (c) 2013, salesforce.com
+ *
+ * -- MODIFIED --
+ * 1. converted with: http://css2sass.herokuapp.com/
+ *
+ * 2. We want the quill editor to inherit our global styles e.g. h1, p, ol
+ *    and just want to use some of their basic CSS for styling the editor
+ */
+
+@import './theme-snow';
+
+.ql-container {
+  box-sizing: border-box;
+  // font-family: Helvetica, Arial, sans-serif;
+  font-family: 'Sentinel', serif;
+  // font-size: 13px;
+  height: 100%;
+  margin: 0px;
+  position: relative;
+  &.ql-disabled {
+    .ql-tooltip {
+      visibility: hidden;
+    }
+    .ql-editor ul[data-checked] > li::before {
+      pointer-events: none;
+    }
+    // added this for draggable
+    .ql-editor > * {
+      cursor: inherit;
+    }
+  }
+}
+
+.ql-clipboard {
+  left: -100000px;
+  height: 1px;
+  overflow-y: hidden;
+  position: absolute;
+  top: 50%;
+  p {
+    margin: 0;
+    padding: 0;
+  }
+}
+
+.ql-editor {
+  box-sizing: border-box;
+  // line-height: 1.42;
+  height: 100%;
+  outline: none;
+  overflow-y: auto;
+  // padding: 12px 15px;
+  tab-size: 4;
+  -moz-tab-size: 4;
+  text-align: left;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  > * {
+    cursor: text;
+  }
+
+  // placeholder text
+  &.ql-blank::before {
+    color: rgba(0, 0, 0, 0.6);
+    content: attr(data-placeholder);
+    font-style: italic;
+    // left: 15px;
+    left: 0;
+    pointer-events: none;
+    position: absolute;
+    right: 15px;
+  }
+}

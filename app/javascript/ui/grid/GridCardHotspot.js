@@ -26,7 +26,7 @@ const HotspotLine = styled.div`
   background: ${v.colors.cyan};
   position: relative;
   left: 7px;
-  width: ${v.grid.gutter}px;
+  width: ${props => props.gutter}px;
 `
 
 const StyledPlusIcon = styled.div`
@@ -47,10 +47,10 @@ class GridCardHotspot extends React.Component {
   }
 
   render() {
-    const { dragging } = this.props
+    const { dragging, uiStore } = this.props
     return (
       <StyledHotspot dragging={dragging} onClick={this.clickHotspot}>
-        <HotspotLine />
+        <HotspotLine gutter={uiStore.gridSettings.gutter} />
         <StyledPlusIcon>
           +
         </StyledPlusIcon>

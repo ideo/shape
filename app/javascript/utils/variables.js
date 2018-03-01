@@ -1,16 +1,14 @@
 export const ITEM_TYPES = {
   TEXT: 'Item::TextItem',
   IMAGE: 'Item::ImageItem',
+  VIDEO: 'Item::VideoItem',
 }
 
 export default {
-  headerHeight: 170,
-
-  grid: {
-    cols: 4,
-    gutter: 20,
-    gridW: 312,
-    gridH: 250,
+  headerHeight: 150,
+  maxWidth: 1400,
+  containerPadding: {
+    horizontal: '2rem',
   },
 
   colors: {
@@ -18,16 +16,23 @@ export default {
     teal: '#00bfa3',
     cyan: '#c0dbde',
     cyanLight: '#f0f4f6',
-    dark: '#120f0e',
+    darkCharcoal: '#120f0e',
+    darkGray: '#444',
+    lightGray: '#c8c8c8',
     lightBrown: '#D8D4D2',
+    linkHover: '#06c',
+  },
+
+  zIndex: {
+    header: 100,
   },
 
   quillDefaults: {
-    formats: ['link', 'size', 'list'],
+    formats: ['link', 'header'],
     modules: {
       toolbar: [
-        // size: false means "normal" i.e. no formatting
-        [{ size: [false, 'large'] }],
+        // header: false means "normal" i.e. no formatting
+        [{ header: [3, false] }],
         ['link'],
       ]
     }

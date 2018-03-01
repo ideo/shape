@@ -6,18 +6,19 @@ import { Flex, Box } from 'reflexbox'
 import Logo from '~/ui/layout/Logo'
 import PlainLink from '~/ui/global/PlainLink'
 import UserAvatar from '~/ui/layout/UserAvatar'
+import v from '~/utils/variables'
 
 const StyledHeader = styled.header`
-  z-index: 100;
+  z-index: ${v.zIndex.header};
   position: fixed;
   top: 0;
-  width: calc(100% - 4rem);
+  width: calc(100% - ${v.containerPadding.horizontal}*2);
   background: #f2f2f2;
-  padding: 1rem 2rem;
+  padding: 1rem ${v.containerPadding.horizontal};
 `
 
-const MaxWidthContainer = styled.header`
-  max-width: 1340px;
+const MaxWidthContainer = styled.div`
+  max-width: ${v.maxWidth}px;
   margin: 0 auto;
 `
 

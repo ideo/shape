@@ -23,7 +23,9 @@ class CollectionCardBuilder
     if result
       # TODO: rollback transaction if these later actions fail; add errors, return false
       if @collection_card.collection.present?
-        @user.add_role(Role::EDITOR, @collection_card.collection)
+        @user.add_role(Role::EDITOR, @collection_card.collection.becomes(Collection))
+      elsif @collection_card.item.present?
+        @user.add_role(Role::EDITOR, @collection_card.item.becomes(Item))
       end
       @collection_card.record.reload.recalculate_breadcrumb!
     end

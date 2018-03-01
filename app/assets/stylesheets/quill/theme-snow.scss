@@ -1,0 +1,169 @@
+// this has been heavily stripped down from the actual Quill snow theme
+
+$dark: #06c;
+
+.ql-toolbar {
+  margin-bottom: 2rem;
+}
+
+.ql-snow {
+  &.ql-toolbar:after, .ql-toolbar:after {
+    clear: both;
+    content: '';
+    display: table;
+  }
+  &.ql-toolbar button, .ql-toolbar button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    display: inline-block;
+    float: left;
+    height: 24px;
+    padding: 3px 5px;
+    width: 28px;
+  }
+  &.ql-toolbar button svg, .ql-toolbar button svg {
+    float: left;
+    height: 100%;
+  }
+  &.ql-toolbar button:active:hover, .ql-toolbar button:active:hover {
+    outline: none;
+  }
+  &.ql-toolbar input.ql-image[type=file], .ql-toolbar input.ql-image[type=file] {
+    display: none;
+  }
+  &.ql-toolbar button:hover, .ql-toolbar button:hover, &.ql-toolbar button:focus, .ql-toolbar button:focus, &.ql-toolbar button.ql-active, .ql-toolbar button.ql-active, &.ql-toolbar .ql-picker-label:hover, .ql-toolbar .ql-picker-label:hover, &.ql-toolbar .ql-picker-label.ql-active, .ql-toolbar .ql-picker-label.ql-active, &.ql-toolbar .ql-picker-item:hover, .ql-toolbar .ql-picker-item:hover, &.ql-toolbar .ql-picker-item.ql-selected, .ql-toolbar .ql-picker-item.ql-selected {
+    color: $dark;
+  }
+  &.ql-toolbar button:hover .ql-fill, .ql-toolbar button:hover .ql-fill, &.ql-toolbar button:focus .ql-fill, .ql-toolbar button:focus .ql-fill, &.ql-toolbar button.ql-active .ql-fill, .ql-toolbar button.ql-active .ql-fill, &.ql-toolbar .ql-picker-label:hover .ql-fill, .ql-toolbar .ql-picker-label:hover .ql-fill, &.ql-toolbar .ql-picker-label.ql-active .ql-fill, .ql-toolbar .ql-picker-label.ql-active .ql-fill, &.ql-toolbar .ql-picker-item:hover .ql-fill, .ql-toolbar .ql-picker-item:hover .ql-fill, &.ql-toolbar .ql-picker-item.ql-selected .ql-fill, .ql-toolbar .ql-picker-item.ql-selected .ql-fill, &.ql-toolbar button:hover .ql-stroke.ql-fill, .ql-toolbar button:hover .ql-stroke.ql-fill, &.ql-toolbar button:focus .ql-stroke.ql-fill, .ql-toolbar button:focus .ql-stroke.ql-fill, &.ql-toolbar button.ql-active .ql-stroke.ql-fill, .ql-toolbar button.ql-active .ql-stroke.ql-fill, &.ql-toolbar .ql-picker-label:hover .ql-stroke.ql-fill, .ql-toolbar .ql-picker-label:hover .ql-stroke.ql-fill, &.ql-toolbar .ql-picker-label.ql-active .ql-stroke.ql-fill, .ql-toolbar .ql-picker-label.ql-active .ql-stroke.ql-fill, &.ql-toolbar .ql-picker-item:hover .ql-stroke.ql-fill, .ql-toolbar .ql-picker-item:hover .ql-stroke.ql-fill, &.ql-toolbar .ql-picker-item.ql-selected .ql-stroke.ql-fill, .ql-toolbar .ql-picker-item.ql-selected .ql-stroke.ql-fill {
+    fill: currentColor;
+  }
+  &.ql-toolbar button:hover .ql-stroke, .ql-toolbar button:hover .ql-stroke, &.ql-toolbar button:focus .ql-stroke, .ql-toolbar button:focus .ql-stroke, &.ql-toolbar button.ql-active .ql-stroke, .ql-toolbar button.ql-active .ql-stroke, &.ql-toolbar .ql-picker-label:hover .ql-stroke, .ql-toolbar .ql-picker-label:hover .ql-stroke, &.ql-toolbar .ql-picker-label.ql-active .ql-stroke, .ql-toolbar .ql-picker-label.ql-active .ql-stroke, &.ql-toolbar .ql-picker-item:hover .ql-stroke, .ql-toolbar .ql-picker-item:hover .ql-stroke, &.ql-toolbar .ql-picker-item.ql-selected .ql-stroke, .ql-toolbar .ql-picker-item.ql-selected .ql-stroke, &.ql-toolbar button:hover .ql-stroke-miter, .ql-toolbar button:hover .ql-stroke-miter, &.ql-toolbar button:focus .ql-stroke-miter, .ql-toolbar button:focus .ql-stroke-miter, &.ql-toolbar button.ql-active .ql-stroke-miter, .ql-toolbar button.ql-active .ql-stroke-miter, &.ql-toolbar .ql-picker-label:hover .ql-stroke-miter, .ql-toolbar .ql-picker-label:hover .ql-stroke-miter, &.ql-toolbar .ql-picker-label.ql-active .ql-stroke-miter, .ql-toolbar .ql-picker-label.ql-active .ql-stroke-miter, &.ql-toolbar .ql-picker-item:hover .ql-stroke-miter, .ql-toolbar .ql-picker-item:hover .ql-stroke-miter, &.ql-toolbar .ql-picker-item.ql-selected .ql-stroke-miter, .ql-toolbar .ql-picker-item.ql-selected .ql-stroke-miter {
+    stroke: $dark;
+  }
+  box-sizing: border-box;
+  * {
+    box-sizing: border-box;
+  }
+  .ql-hidden {
+    display: none;
+  }
+  .ql-out-bottom, .ql-out-top {
+    visibility: hidden;
+  }
+  .ql-tooltip {
+    position: absolute;
+    transform: translateY(10px);
+    a {
+      cursor: pointer;
+      text-decoration: none;
+    }
+    &.ql-flip {
+      transform: translateY(-10px);
+    }
+  }
+  .ql-formats {
+    display: inline-block;
+    vertical-align: middle;
+    &:after {
+      clear: both;
+      content: '';
+      display: table;
+    }
+  }
+  .ql-stroke {
+    fill: none;
+    stroke: currentColor;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-width: 2;
+  }
+  .ql-stroke-miter {
+    fill: none;
+    stroke: currentColor;
+    stroke-miterlimit: 10;
+    stroke-width: 2;
+  }
+  .ql-fill, .ql-stroke.ql-fill {
+    fill: currentColor;
+  }
+  .ql-empty {
+    fill: none;
+  }
+  .ql-even {
+    fill-rule: evenodd;
+  }
+  .ql-thin, .ql-stroke.ql-thin {
+    stroke-width: 1;
+  }
+
+  .ql-tooltip {
+    background-color: #fff;
+    border: 1px solid #ccc;
+    box-shadow: 0px 0px 5px #ddd;
+    color: #444;
+    padding: 5px 12px;
+    white-space: nowrap;
+    &::before {
+      content: "Visit URL:";
+      line-height: 26px;
+      margin-right: 8px;
+    }
+    input[type=text] {
+      display: none;
+      border: 1px solid #ccc;
+      font-size: 13px;
+      height: 26px;
+      margin: 0px;
+      padding: 3px 5px;
+      width: 170px;
+    }
+    a {
+      &.ql-preview {
+        display: inline-block;
+        max-width: 200px;
+        overflow-x: hidden;
+        text-overflow: ellipsis;
+        vertical-align: top;
+      }
+      &.ql-action::after {
+        border-right: 1px solid #ccc;
+        content: 'Edit';
+        margin-left: 16px;
+        padding-right: 8px;
+      }
+      &.ql-remove::before {
+        content: 'Remove';
+        margin-left: 8px;
+      }
+      line-height: 26px;
+    }
+    &.ql-editing {
+      a {
+        &.ql-preview, &.ql-remove {
+          display: none;
+        }
+      }
+      input[type=text] {
+        display: inline-block;
+      }
+      a.ql-action::after {
+        border-right: 0px;
+        content: 'Save';
+        padding-right: 0px;
+      }
+    }
+    &[data-mode=link]::before {
+      content: "Enter link:";
+    }
+    &[data-mode=formula]::before {
+      content: "Enter formula:";
+    }
+    &[data-mode=video]::before {
+      content: "Enter video:";
+    }
+  }
+  a {
+    color: $dark;
+  }
+}
