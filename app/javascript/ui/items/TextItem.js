@@ -69,7 +69,7 @@ class TextItem extends React.Component {
 
     return (
       <StyledContainer>
-        { editable && <TextItemToolbar closePath={item.parentPath} /> }
+        { editable && <TextItemToolbar /> }
         <ReactQuill
           {...quillProps}
           value={textData}

@@ -4,8 +4,9 @@ import ReactPlayer from 'react-player'
 
 const StyledVideoItem = styled.div`
   /* arbitrary styles for now */
-  width: 800px;
-  height: 600px;
+  width: 1024px;
+  height: 768px;
+  max-width: 100vw;
   > div {
     height: 100%;
   }
@@ -25,8 +26,8 @@ class VideoItem extends React.Component {
           url={videoUrl}
           playing={false}
           controls={false}
-          width="800"
-          height="600"
+          width="1024"
+          height="768"
         />
       </StyledVideoItem>
     )

@@ -2,6 +2,7 @@ import { Fragment } from 'react'
 import ReactRouterPropTypes from 'react-router-prop-types'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
+import { Link } from 'react-router-dom'
 
 import PageWithApi from '~/ui/pages/PageWithApi'
 import PageContainer from '~/ui/layout/PageContainer'
@@ -12,15 +13,32 @@ import Breadcrumb from '~/ui/layout/Breadcrumb'
 import TextItem from '~/ui/items/TextItem'
 import ImageItem from '~/ui/items/ImageItem'
 import VideoItem from '~/ui/items/VideoItem'
-import { ITEM_TYPES } from '~/utils/variables'
+import v, { ITEM_TYPES } from '~/utils/variables'
 
 const ItemPageContainer = styled.main`
   background: white;
   min-height: 75vh;
-  /*
-  need attributes to deal with displaying ImageItem correctly...
+  position: relative;
+`
 
-  */
+const StyledRightColumn = styled.div`
+  position: absolute;
+  top: 2rem;
+  right: 2rem;
+`
+
+const CloseLink = styled(Link)`
+  /* add the .close class for more specificity to override quill theme-snow */
+  text-decoration: none;
+  color: ${v.colors.cloudy};
+  &:hover {
+    color: ${v.colors.linkHover};
+  }
+  padding: 0;
+  height: auto;
+  position: relative;
+  top: -6px;
+  font-size: 1.75rem;
 `
 
 @inject('apiStore')
@@ -70,6 +88,12 @@ class ItemPage extends PageWithApi {
           <PageContainer>
             {/* TODO: calculate item container size? */}
             {this.content}
+
+            <StyledRightColumn>
+              <CloseLink to={item.parentPath}>
+                &times;
+              </CloseLink>
+            </StyledRightColumn>
           </PageContainer>
         </ItemPageContainer>
       </Fragment>
