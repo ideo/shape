@@ -19,6 +19,7 @@ export default {
     cyan: '#c0dbde',
     cyanLight: '#f0f4f6',
     dark: '#120f0e',
+    lightBrown: '#D8D4D2',
   },
 
   quillDefaults: {

@@ -10,6 +10,7 @@ import CollectionCover from '~/ui/collections/CollectionCover'
 import CollectionIcon from '~/ui/icons/CollectionIcon'
 import LinkedCollectionIcon from '~/ui/icons/LinkedCollectionIcon'
 import LinkIcon from '~/ui/icons/LinkIcon'
+import ResizeIcon from '~/ui/icons/ResizeIcon'
 import CardMenu from '~/ui/grid/CardMenu'
 import v, { ITEM_TYPES } from '~/utils/variables'
 
@@ -26,6 +27,12 @@ export const StyledGridCard = styled.div`
   &:hover {
     z-index: 150;
   }
+  > .icon {
+    position: absolute;
+    left: 1rem;
+    bottom: 0.25rem;
+    color: ${v.colors.lightBrown};
+  }
 `
 StyledGridCard.displayName = 'StyledGridCard'
 
@@ -40,7 +47,7 @@ StyledGridCardInner.displayName = 'StyledGridCardInner'
 export const StyledCardActions = styled.div`
   position: absolute;
   top: 0.25rem;
-  right: 1rem;
+  right: 0.25rem;
   z-index: 150;
   .card-menu {
     display: inline-block;
@@ -54,7 +61,7 @@ const StyledSelectionCircle = styled.div`
   width: 14px;
   height: 14px;
   border-radius: 14px;
-  border: 1px solid #CCCCCC;
+  border: 1px solid ${v.colors.lightBrown};
   margin: 5px;
   &.selected {
     border-color: ${v.colors.teal};
@@ -63,16 +70,13 @@ const StyledSelectionCircle = styled.div`
 `
 StyledSelectionCircle.displayName = 'StyledSelectionCircle'
 
-const StyledDragIcon = styled.div`
+const StyledResizeIcon = styled.div`
   position: absolute;
-  right: 0.5rem;
+  right: 0.3rem;
   bottom: 0.25rem;
-`
-
-export const StyledIcon = styled.div`
-  position: absolute;
-  left: 1rem;
-  bottom: 0.25rem;
+  color: ${v.colors.lightBrown};
+  width: 6px;
+  height: 6px;
 `
 
 class GridCard extends React.Component {
@@ -113,22 +117,18 @@ class GridCard extends React.Component {
 
   get icon() {
     const { card, record } = this.props
-    let icon
-    const iconSize = 24
+    let icon = ''
     if (record.type === 'Collection') {
       if (card.reference) {
-        icon = <LinkedCollectionIcon width={iconSize} height={iconSize} color="#FFFFFF" />
+        icon = <LinkedCollectionIcon />
       } else {
-        icon = <CollectionIcon width={iconSize} height={iconSize} color="#FFFFFF" />
+        icon = <CollectionIcon />
       }
     } else if (card.reference) {
-      icon = <LinkIcon width={iconSize} height={iconSize} color="#FFFFFF" />
+      icon = <LinkIcon />
     }
 
-    if (icon) {
-      return <StyledIcon>{icon}</StyledIcon>
-    }
-    return ''
+    return icon
   }
 
   toggleSelected = () => {
@@ -169,6 +169,7 @@ class GridCard extends React.Component {
             role="button"
           />
           <CardMenu
+            cardId={this.props.card.id}
             className="card-menu"
             visible={this.state.menuVisible}
             handleDuplicate={this.duplicateCard}
@@ -178,7 +179,9 @@ class GridCard extends React.Component {
           />
         </StyledCardActions>
         {this.icon}
-        <StyledDragIcon>V</StyledDragIcon>
+        <StyledResizeIcon>
+          <ResizeIcon />
+        </StyledResizeIcon>
         {/* onClick placed here so it's separate from hotspot click */}
         <StyledGridCardInner onClick={this.handleClick}>
           {this.inner}

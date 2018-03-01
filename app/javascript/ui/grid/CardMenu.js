@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types'
 import styled from 'styled-components'
+import { inject, propTypes as MobxPropTypes } from 'mobx-react'
 
 import ArchiveIcon from '~/ui/icons/ArchiveIcon'
 import DuplicateIcon from '~/ui/icons/DuplicateIcon'
@@ -30,8 +31,8 @@ export const StyledMenuToggle = styled.button`
     -o-transform: rotate(90deg);
     -ms-transform: rotate(90deg);
     transform: rotate(90deg);
-    width: 20px;
-    height: 20px;
+    width: 24px;
+    height: 24px;
   }
 `
 
@@ -70,15 +71,30 @@ export const StyledMenuItem = styled.li`
   }
 `
 
+@inject('uiStore')
 class CardMenu extends React.PureComponent {
   state = {
     open: false
   }
 
-  toggleMenuVisibility = () => {
+  get cardId() {
+    return this.props.cardId
+  }
+
+  setOpen = (open, closeOthers = true) => {
+    if (open && closeOthers) {
+      // Close any other open menus
+      this.props.uiStore.cardMenuOpened(this)
+    }
+
     this.setState({
-      open: !this.state.open
+      open: open
     })
+  }
+
+  toggleOpen = (e) => {
+    e.stopPropagation()
+    this.setOpen(!this.state.open)
   }
 
   render() {
@@ -92,7 +108,7 @@ class CardMenu extends React.PureComponent {
         className={css}
         role="presentation"
       >
-        <StyledMenuToggle onClick={this.toggleMenuVisibility}>
+        <StyledMenuToggle onClick={this.toggleOpen}>
           <MenuIcon />
         </StyledMenuToggle>
         <ul>
@@ -127,6 +143,7 @@ class CardMenu extends React.PureComponent {
 }
 
 CardMenu.propTypes = {
+  cardId: PropTypes.number.isRequired,
   className: PropTypes.string,
   handleDuplicate: PropTypes.func.isRequired,
   handleLink: PropTypes.func.isRequired,
@@ -136,6 +153,10 @@ CardMenu.propTypes = {
 
 CardMenu.defaultProps = {
   className: 'card-menu'
+}
+
+CardMenu.wrappedComponent.propTypes = {
+  uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 
 export default CardMenu
