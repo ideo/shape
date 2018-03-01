@@ -17,10 +17,10 @@ describe('ImageItemCover', () => {
   })
 
   it('renders the StyledImageItem', () => {
-    expect(wrapper.find('StyledCover').exists()).toBe(true)
+    expect(wrapper.find('StyledImageCover').exists()).toBe(true)
   })
 
-  it('passes the url to StyledCover', () => {
-    expect(wrapper.find('StyledCover').props().url).toEqual(fakeImageItem.filestack_file.url)
+  it('passes the url to StyledImageCover', () => {
+    expect(wrapper.find('StyledImageCover').props().url).toEqual(fakeImageItem.filestack_file.url)
   })
 })

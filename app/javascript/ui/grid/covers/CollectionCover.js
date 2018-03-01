@@ -1,5 +1,5 @@
 import { PropTypes as MobxPropTypes } from 'mobx-react'
-import StyledCover from './StyledCover'
+import PaddedCardCover from './PaddedCardCover'
 
 // This styling is really just a placeholder.
 // CollectionCovers will eventually display differently than just showing the name
@@ -7,9 +7,9 @@ class CollectionCover extends React.PureComponent {
   render() {
     const { collection } = this.props
     return (
-      <StyledCover>
+      <PaddedCardCover>
         {collection.name} (coll.)
-      </StyledCover>
+      </PaddedCardCover>
     )
   }
 }

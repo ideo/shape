@@ -96,7 +96,7 @@ class GridCard extends React.Component {
       case ITEM_TYPES.IMAGE:
         return <ImageItemCover item={record} />
       case ITEM_TYPES.VIDEO:
-        return <VideoItemCover item={record} />
+        return <VideoItemCover item={record} dragging={this.props.dragging} />
       default:
         return (
           <div>
@@ -114,6 +114,8 @@ class GridCard extends React.Component {
   get icon() {
     const { card, cardType } = this.props
     let icon
+    const iconSize = 24
+    const color = 'black'
     if (cardType === 'collections') {
       if (card.reference) {
         icon = <LinkedCollectionIcon />
@@ -159,9 +161,9 @@ class GridCard extends React.Component {
     console.log('Archive card')
   }
 
-  handleClick = () => {
+  handleClick = (e) => {
     if (this.props.dragging) return
-    this.props.handleClick()
+    this.props.handleClick(e)
   }
 
   render() {

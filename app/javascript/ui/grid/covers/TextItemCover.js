@@ -4,7 +4,7 @@ import ReactQuill from 'react-quill'
 import styled from 'styled-components'
 
 import v from '~/utils/variables'
-import StyledCover from './StyledCover'
+import PaddedCardCover from './PaddedCardCover'
 
 const StyledReadMore = styled.div`
   position: absolute;
@@ -48,12 +48,12 @@ class TextItemCover extends React.Component {
 
     return (
       <div>
-        <StyledCover>
+        <PaddedCardCover>
           <ReactQuill
             {...quillProps}
             value={textData}
           />
-        </StyledCover>
+        </PaddedCardCover>
         {/* readMore is a sibling to the cover itself */}
         { this.state.readMore && <StyledReadMore>read more...</StyledReadMore> }
       </div>
