@@ -49,10 +49,10 @@ export const StyledMenuItem = styled.li`
     font-size: 0.8rem;
     text-align: left;
     border-bottom: 1px solid ${v.colors.cyanLight};
+    color: ${v.colors.darkCharcoal};
     .icon {
       top: 50%;
       transform: translateY(-50%);
-      color: ${v.colors.dark};
       position: absolute;
       right: 1.5rem;
       width: 16px;
@@ -63,11 +63,8 @@ export const StyledMenuItem = styled.li`
   &:hover,
   &:active {
     button {
-      border-left: 3px solid ${v.colors.teal};
-    }
-    button,
-    button .icon {
-      color: ${v.colors.teal};
+      border-left: 3px solid ${v.colors.darkCharcoal};
+      background-color: ${v.colors.cyanLight};
     }
   }
 `

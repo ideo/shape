@@ -54,6 +54,7 @@ export const StyledCardActions = styled.div`
   .card-menu {
     display: inline-block;
     z-index: 150;
+    color: ${v.colors.lightBrown};
   }
 `
 StyledCardActions.displayName = 'StyledCardActions'
@@ -66,8 +67,8 @@ const StyledSelectionCircle = styled.div`
   border: 1px solid ${v.colors.lightBrown};
   margin: 5px;
   &.selected {
-    border-color: ${v.colors.teal};
-    background-color: ${v.colors.teal};
+    border-color: ${v.colors.darkCharcoal};
+    background-color: ${v.colors.darkCharcoal};
   }
 `
 StyledSelectionCircle.displayName = 'StyledSelectionCircle'
