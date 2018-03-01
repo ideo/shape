@@ -26,15 +26,16 @@ class Routes extends React.Component {
       return <Loader />
     }
     return (
-      <Router history={history}>
-        <ClickWrapper>
+      <div>
+        <ClickWrapper />
+        <Router history={history}>
           <Switch>
             <Route exact path="/" component={CollectionPage} />
             <Route path="/collections/:id" component={CollectionPage} />
             <Route path="/items/:id" component={ItemPage} />
           </Switch>
-        </ClickWrapper>
-      </Router>
+        </Router>
+      </div>
     )
   }
 }

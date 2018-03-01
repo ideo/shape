@@ -1,30 +1,28 @@
 import PropTypes from 'prop-types'
-import { inject, propTypes as MobxPropTypes } from 'mobx-react'
+import { inject, observer, propTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 
 const StyledClickWrapper = styled.div`
-  height: 100vh;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
 `
 StyledClickWrapper.displayName = 'StyledClickWrapper'
 
 @inject('uiStore')
-class ClickWrapper extends React.PureComponent {
+@observer
+class ClickWrapper extends React.Component {
   handleClick = () => {
     this.props.uiStore.closeCardMenuIfOpen()
   }
 
   render () {
-    const { children } = this.props
     return (
-      <StyledClickWrapper onClick={this.handleClick}>
-        { children }
-      </StyledClickWrapper>
+      <StyledClickWrapper onClick={this.handleClick} />
     )
   }
-}
-
-ClickWrapper.propTypes = {
-  children: PropTypes.node.isRequired,
 }
 
 ClickWrapper.wrappedComponent.propTypes = {
