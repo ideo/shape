@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types'
 import { PropTypes as MobxPropTypes } from 'mobx-react'
+import _ from 'lodash'
 import ReactQuill from 'react-quill'
 import styled from 'styled-components'
 
@@ -16,6 +17,11 @@ const remapHeaderToH3 = (node, delta) => {
 }
 
 class TextItem extends React.Component {
+  constructor(props) {
+    super(props)
+    this.onTextChange = _.debounce(this._onTextChange, 1000)
+  }
+
   componentDidMount() {
     if (!this.quillEditor) return
     if (this.props.editable) {
