@@ -24,19 +24,27 @@ export const StyledGridCard = styled.div`
   cursor: ${props => (props.dragging ? 'grabbing' : 'pointer')};
   box-shadow: ${props => (props.dragging ? '1px 1px 5px 2px rgba(0, 0, 0, 0.25)' : '')};
   opacity: ${props => (props.dragging ? '0.95' : '1')};
+  .show-on-hover {
+    display: none;
+  }
   &:hover {
     z-index: 150;
-  }
-  > .icon {
-    position: absolute;
-    left: -0.25rem; /* Because the icon has internal padding */
-    bottom: -0.4rem;
-    color: ${v.colors.lightBrown};
-    width: 34px;
-    height: 34px;
+    .show-on-hover {
+      display: block;
+    }
   }
 `
 StyledGridCard.displayName = 'StyledGridCard'
+
+export const StyledBottomLeftIcon = styled.div`
+  position: absolute;
+  left: -0.25rem; /* Because the icon has internal padding */
+  bottom: -0.4rem;
+  color: ${v.colors.lightBrown};
+  width: 34px;
+  height: 34px;
+`
+StyledBottomLeftIcon.displayName = 'StyledBottomLeftIcon'
 
 const StyledGridCardInner = styled.div`
   position: relative;
@@ -46,7 +54,7 @@ const StyledGridCardInner = styled.div`
 `
 StyledGridCardInner.displayName = 'StyledGridCardInner'
 
-export const StyledCardActions = styled.div`
+export const StyledTopRightActions = styled.div`
   position: absolute;
   top: 0.25rem;
   right: 0.25rem;
@@ -57,7 +65,7 @@ export const StyledCardActions = styled.div`
     color: ${v.colors.lightBrown};
   }
 `
-StyledCardActions.displayName = 'StyledCardActions'
+StyledTopRightActions.displayName = 'StyledTopRightActions'
 
 const StyledSelectionCircle = styled.div`
   display: inline-block;
@@ -120,7 +128,7 @@ class GridCard extends React.Component {
 
   get icon() {
     const { card, cardType } = this.props
-    let icon = ''
+    let icon
     if (cardType === 'collections') {
       if (card.reference) {
         icon = <LinkedCollectionIcon />
@@ -130,7 +138,14 @@ class GridCard extends React.Component {
     } else if (card.reference) {
       icon = <LinkIcon />
     }
-    return icon
+
+    if (!icon) return ''
+
+    return (
+      <StyledBottomLeftIcon lassName="show-on-hover">
+        {icon}
+      </StyledBottomLeftIcon>
+    )
   }
 
   toggleSelected = () => {
@@ -164,7 +179,7 @@ class GridCard extends React.Component {
     return (
       <StyledGridCard dragging={this.props.dragging}>
         <GridCardHotspot card={this.props.card} dragging={this.props.dragging} />
-        <StyledCardActions>
+        <StyledTopRightActions className="show-on-hover">
           <StyledSelectionCircle
             className={this.state.selected ? 'selected' : ''}
             onClick={this.toggleSelected}
@@ -179,9 +194,9 @@ class GridCard extends React.Component {
             handleOrganize={this.organizeCard}
             handleArchive={this.archiveCard}
           />
-        </StyledCardActions>
+        </StyledTopRightActions>
         {this.icon}
-        <StyledResizeIcon>
+        <StyledResizeIcon className="show-on-hover">
           <ResizeIcon />
         </StyledResizeIcon>
         {/* onClick placed here so it's separate from hotspot click */}

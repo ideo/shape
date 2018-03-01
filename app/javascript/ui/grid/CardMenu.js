@@ -90,6 +90,12 @@ class CardMenu extends React.PureComponent {
     })
   }
 
+  handleMouseLeave = () => {
+    if (this.state.open) {
+      this.setOpen(false, false)
+    }
+  }
+
   toggleOpen = (e) => {
     e.stopPropagation()
     this.setOpen(!this.state.open)
@@ -105,6 +111,7 @@ class CardMenu extends React.PureComponent {
       <StyledMenu
         className={css}
         role="presentation"
+        onMouseLeave={this.handleMouseLeave}
       >
         <StyledMenuToggle onClick={this.toggleOpen}>
           <MenuIcon />
