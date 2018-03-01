@@ -148,7 +148,7 @@ class MovableGridCard extends React.PureComponent {
     }
     let outline = ''
     if (card.hoveringOver) {
-      outline = `outline: 3px dashed ${v.colors.teal};`
+      outline = `outline: 3px dashed ${v.colors.gray};`
     }
 
     const cardProps = {

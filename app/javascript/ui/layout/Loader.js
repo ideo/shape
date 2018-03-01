@@ -19,7 +19,7 @@ const Logo = () => (
       <StyledSpinner
         fadeIn="half"
         name="folding-cube"
-        color={v.colors.teal}
+        color={v.colors.cloudy}
       />
     </Box>
   </Flex>

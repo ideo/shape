@@ -40,7 +40,7 @@ export const StyledBottomLeftIcon = styled.div`
   position: absolute;
   left: -0.25rem; /* Because the icon has internal padding */
   bottom: -0.4rem;
-  color: ${v.colors.lightBrown};
+  color: ${v.colors.gray};
   width: 34px;
   height: 34px;
 `
@@ -60,23 +60,26 @@ export const StyledTopRightActions = styled.div`
   right: 0.25rem;
   z-index: 150;
   .card-menu {
+    margin-top: 0.25rem;
     display: inline-block;
+    vertical-align: top;
     z-index: 150;
-    color: ${v.colors.lightBrown};
+    color: ${v.colors.gray};
   }
 `
 StyledTopRightActions.displayName = 'StyledTopRightActions'
 
 const StyledSelectionCircle = styled.div`
   display: inline-block;
+  vertical-align: top;
   width: 14px;
   height: 14px;
   border-radius: 14px;
-  border: 1px solid ${v.colors.lightBrown};
+  border: 1px solid ${v.colors.gray};
   margin: 5px;
   &.selected {
-    border-color: ${v.colors.darkCharcoal};
-    background-color: ${v.colors.darkCharcoal};
+    border-color: ${v.colors.blackLava};
+    background-color: ${v.colors.blackLava};
   }
 `
 StyledSelectionCircle.displayName = 'StyledSelectionCircle'
@@ -85,7 +88,7 @@ const StyledResizeIcon = styled.div`
   position: absolute;
   right: 0.3rem;
   bottom: 0.25rem;
-  color: ${v.colors.lightBrown};
+  color: ${v.colors.gray};
   width: 6px;
   height: 6px;
 `

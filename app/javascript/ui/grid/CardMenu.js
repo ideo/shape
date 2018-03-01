@@ -26,13 +26,8 @@ export const StyledMenu = styled.div`
 
 export const StyledMenuToggle = styled.button`
   .icon {
-    -webkit-transform: rotate(90deg);
-    -moz-transform: rotate(90deg);
-    -o-transform: rotate(90deg);
-    -ms-transform: rotate(90deg);
-    transform: rotate(90deg);
-    width: 24px;
-    height: 24px;
+    width: 16px;
+    height: 16px;
   }
 `
 
@@ -48,8 +43,8 @@ export const StyledMenuItem = styled.li`
     font-weight: 300;
     font-size: 0.8rem;
     text-align: left;
-    border-bottom: 1px solid ${v.colors.cyanLight};
-    color: ${v.colors.darkCharcoal};
+    border-bottom: 1px solid ${v.colors.gray};
+    color: ${v.colors.blackLava};
     .icon {
       top: 50%;
       transform: translateY(-50%);
@@ -63,8 +58,8 @@ export const StyledMenuItem = styled.li`
   &:hover,
   &:active {
     button {
-      border-left: 3px solid ${v.colors.darkCharcoal};
-      background-color: ${v.colors.cyanLight};
+      border-left: 3px solid ${v.colors.blackLava};
+      background-color: ${v.colors.desert};
     }
   }
 `

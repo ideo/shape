@@ -2,7 +2,7 @@ import v from '~/utils/variables'
 import { StyledGridCard } from './GridCard'
 
 const GridCardPlaceholder = StyledGridCard.extend`
-  background: ${v.colors.placeholder};
+  background: ${v.colors.cyan};
 `
 
 // useful for doing unit testing e.g. wrapper.find('H1')

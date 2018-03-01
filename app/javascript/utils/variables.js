@@ -12,15 +12,13 @@ export default {
   },
 
   colors: {
-    placeholder: '#d6fffe',
-    teal: '#00bfa3',
+    cararra: '#f2f1ee',
+    desert: '#f5f4f3',
     cyan: '#c0dbde',
-    cyanLight: '#f0f4f6',
-    darkCharcoal: '#120f0e',
-    darkGray: '#444',
-    lightGray: '#c8c8c8',
-    lightBrown: '#D8D4D2',
+    gray: '#c6c1bf',
+    cloudy: '#a89f9b',
     linkHover: '#06c',
+    blackLava: '#120f0e',
   },
 
   zIndex: {
