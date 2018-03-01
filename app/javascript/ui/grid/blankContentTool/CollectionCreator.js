@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types'
 
-import StyledCover from '~/ui/grid/covers/StyledCover'
+import PaddedCardCover from '~/ui/grid/covers/PaddedCardCover'
 
 class CollectionCreator extends React.Component {
   state = {
@@ -24,7 +24,7 @@ class CollectionCreator extends React.Component {
 
   render() {
     return (
-      <StyledCover>
+      <PaddedCardCover>
         <input
           placeholder="Collection name"
           value={this.state.inputText}
@@ -36,7 +36,7 @@ class CollectionCreator extends React.Component {
           value="save"
           disabled={this.props.loading}
         />
-      </StyledCover>
+      </PaddedCardCover>
     )
   }
 }

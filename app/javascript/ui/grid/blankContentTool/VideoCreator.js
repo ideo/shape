@@ -2,7 +2,7 @@ import PropTypes from 'prop-types'
 import styled from 'styled-components'
 import _ from 'lodash'
 
-import StyledCover from '~/ui/grid/covers/StyledCover'
+import PaddedCardCover from '~/ui/grid/covers/PaddedCardCover'
 import VideoUrl from '~/utils/VideoUrl'
 import { ITEM_TYPES } from '~/utils/variables'
 
@@ -87,7 +87,7 @@ class VideoCreator extends React.Component {
     }
 
     return (
-      <StyledCover>
+      <PaddedCardCover>
         <input
           placeholder="Video URL"
           value={videoUrl}
@@ -100,7 +100,7 @@ class VideoCreator extends React.Component {
           value="save"
           disabled={this.props.loading || this.state.loading}
         />
-      </StyledCover>
+      </PaddedCardCover>
     )
   }
 }
