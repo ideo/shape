@@ -25,12 +25,13 @@ export const StyledGridCard = styled.div`
   box-shadow: ${props => (props.dragging ? '1px 1px 5px 2px rgba(0, 0, 0, 0.25)' : '')};
   opacity: ${props => (props.dragging ? '0.95' : '1')};
   .show-on-hover {
-    display: none;
+    opacity: 0;
+    transition: opacity 275ms;
   }
   &:hover {
     z-index: 150;
     .show-on-hover {
-      display: block;
+      opacity: 1;
     }
   }
 `
