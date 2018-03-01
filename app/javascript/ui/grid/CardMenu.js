@@ -5,7 +5,7 @@ import { inject, propTypes as MobxPropTypes } from 'mobx-react'
 import ArchiveIcon from '~/ui/icons/ArchiveIcon'
 import DuplicateIcon from '~/ui/icons/DuplicateIcon'
 import MenuIcon from '~/ui/icons/MenuIcon'
-import OrganizeIcon from '~/ui/icons/OrganizeIcon'
+import MoveIcon from '~/ui/icons/MoveIcon'
 import LinkIcon from '~/ui/icons/LinkIcon'
 import v from '~/utils/variables'
 
@@ -57,6 +57,7 @@ export const StyledMenuItem = styled.li`
       right: 1.5rem;
       width: 16px;
       height: 16px;
+      line-height: 1.4rem;
     }
   }
   &:hover,
@@ -127,7 +128,7 @@ class CardMenu extends React.PureComponent {
           <StyledMenuItem>
             <button onClick={this.props.handleOrganize}>
               Organize
-              <OrganizeIcon />
+              <MoveIcon />
             </button>
           </StyledMenuItem>
           <StyledMenuItem>

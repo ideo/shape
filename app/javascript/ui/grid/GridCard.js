@@ -29,9 +29,11 @@ export const StyledGridCard = styled.div`
   }
   > .icon {
     position: absolute;
-    left: 1rem;
-    bottom: 0.25rem;
+    left: -0.25rem; /* Because the icon has internal padding */
+    bottom: -0.4rem;
     color: ${v.colors.lightBrown};
+    width: 34px;
+    height: 34px;
   }
 `
 StyledGridCard.displayName = 'StyledGridCard'
