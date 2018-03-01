@@ -67,7 +67,7 @@ class Api::V1::CollectionsController < Api::V1::BaseController
   def collection_params
     params.require(:collection).permit(
       :name,
-      collection_cards_attributes: %i[id order],
+      collection_cards_attributes: %i[id order width height],
     )
   end
 end

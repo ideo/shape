@@ -6,8 +6,8 @@ const PositionedDiv = styled.div`
   ${props => (`
     width: ${props.width}px;
     height: ${props.height}px;
-    transform: translate(${props.xPos}px, ${props.yPos}px) rotate(${props.rotation});
-    transform: translate3d(${props.xPos}px, ${props.yPos}px, 0) rotate(${props.rotation});
+    transform: translate(${props.xPos}px, ${props.yPos}px);
+    transform: translate3d(${props.xPos}px, ${props.yPos}px, 0);
     transition: ${props.transition};
     ${props.outline}
   `)}
@@ -28,14 +28,14 @@ PositionedGridCard.propTypes = {
   height: PropTypes.number.isRequired,
   xPos: PropTypes.number.isRequired,
   yPos: PropTypes.number.isRequired,
-  rotation: PropTypes.string.isRequired,
-  transition: PropTypes.string.isRequired,
   children: PropTypes.node.isRequired,
+  transition: PropTypes.string,
   outline: PropTypes.string,
 }
 
 PositionedGridCard.defaultProps = {
-  outline: ''
+  outline: '',
+  transition: 'none',
 }
 
 export default PositionedGridCard

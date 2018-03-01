@@ -55,7 +55,7 @@ class CollectionPage extends PageWithApi {
   updateCollection = () => {
     // TODO: what if there's no collection?
     // calling .save() will receive any API updates and sync them
-    this.collection.API_updateCardOrder()
+    this.collection.API_updateCards()
   }
 
   render() {

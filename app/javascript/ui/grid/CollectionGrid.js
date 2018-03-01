@@ -19,9 +19,9 @@ class CollectionGrid extends React.Component {
     super(props)
     this.state = {
       cards: [],
+      hoveringOver: { order: null },
       timeoutId: null,
       transitioning: false,
-      hoveringOver: { order: null },
     }
   }
 
@@ -61,29 +61,63 @@ class CollectionGrid extends React.Component {
   // --------------------------
   // <Drag related functions>
   // --------------------------
-  onDrag = (cardId, dragPosition) => {
-    if (this.state.transitioning) return
-
-    this.props.uiStore.closeBlankContentTool()
+  onResize = (cardId, newSize) => {
+    const { uiStore } = this.props
+    uiStore.closeBlankContentTool()
 
     const positionedCard = _.find(this.state.cards, { id: cardId })
     const placeholderKey = `${cardId}-placeholder`
     const stateCards = [...this.state.cards]
-    let placeholder = _.find(stateCards, { id: placeholderKey })
+    const placeholder = _.find(stateCards, { id: placeholderKey })
+
+    if (!placeholder) {
+      this.createPlaceholderCard(positionedCard, newSize)
+    } else if (placeholder.width !== newSize.width || placeholder.height !== newSize.height) {
+      placeholder.width = newSize.width
+      placeholder.height = newSize.height
+      this.positionCards(stateCards, { dragging: positionedCard.id })
+    }
+  }
+
+  onMoveStop = () => {
+    const placeholder = _.find(this.state.cards, { cardType: 'placeholder' }) || {}
+    const original = _.find(this.state.cards, { id: placeholder.originalId })
+
+    this.clearDragTimeout()
+    this.setState({ transitioning: false, hoveringOver: { order: null } })
+    if (!placeholder || !original) return
+
+    const fields = ['order', 'width', 'height']
+    const placeholderPosition = _.pick(placeholder, fields)
+    placeholderPosition.order = Math.ceil(placeholderPosition.order)
+    const originalPosition = _.pick(original, fields)
+
+    const moved = (!_.isEqual(placeholderPosition, originalPosition))
+    if (moved) {
+      // we want to update this card to match the placeholder
+      const { order, width, height } = placeholder
+      _.assign(original, { order, width, height })
+
+      // reorder cards and persist changes
+      this.props.updateCollection()
+      this.positionCards(this.props.collection.collection_cards)
+    } else {
+      // reset back to normal
+      this.positionCards(this.props.collection.collection_cards)
+    }
+  }
+
+  onDrag = (cardId, dragPosition) => {
+    this.props.uiStore.closeBlankContentTool()
+    if (this.state.transitioning) return
+
+    const positionedCard = _.find(this.state.cards, { id: cardId })
+    const placeholderKey = `${cardId}-placeholder`
+    const stateCards = [...this.state.cards]
+    const placeholder = _.find(stateCards, { id: placeholderKey })
     const hoveringOver = this.findOverlap(cardId, dragPosition)
     if (!placeholder) {
-      placeholder = {
-        position: positionedCard.position,
-        width: positionedCard.width,
-        height: positionedCard.height,
-        // better way to do this??
-        order: (positionedCard.order - 1),
-        id: placeholderKey,
-        originalId: cardId,
-        cardType: 'placeholder'
-      }
-      const newItems = _.concat(stateCards, placeholder)
-      this.positionCards(newItems, { dragging: positionedCard.id })
+      this.createPlaceholderCard(positionedCard)
     } else if (hoveringOver) {
       const { direction, order } = hoveringOver
       const newOrder = parseFloat(order) + (direction === 'left' ? -0.5 : 0.5)
@@ -92,18 +126,18 @@ class CollectionGrid extends React.Component {
         newOrder !== placeholder.order
       )
       if (positionChanged) {
-        // NOTE: this should modify stateCards in place, for later save/update
+        // NOTE: this will modify observable card attrs, for later save/update
         placeholder.order = newOrder
-        // delay is for not having flickery drag placeholders
-        // card transform has 0.5s animation so timeout should be >0.5s
         this.positionCards(stateCards, {
           dragging: positionedCard.id,
           hoveringOver: hoveringOver.order
         })
+        // set temporary transitioning state so that multiple changes can't
+        // be triggered within milliseconds of each other, creating flicker
         this.setState({ transitioning: true, hoveringOver })
         const timeoutId = setTimeout(() => {
           this.setState({ transitioning: false })
-        }, 900)
+        }, 350)
         this.setState({ timeoutId })
       }
     } else {
@@ -111,37 +145,20 @@ class CollectionGrid extends React.Component {
     }
   }
 
-  onDragStop = () => {
-    const placeholder = _.find(this.state.cards, { cardType: 'placeholder' }) || {}
-    const original = _.find(this.state.cards, { id: placeholder.originalId })
-
-    this.clearDragTimeout()
-    this.setState({ transitioning: false, hoveringOver: { order: null } })
-    if (!placeholder || !original) return
-    // const moved = (
-    //   !_.isEqual(placeholder.position, original.position) ||
-    //   Math.abs(placeholder.order - original.order) > 10
-    // )
-    const moved = (placeholder.order !== original.order)
-    if (moved) {
-      // we want to drop this item on the order where placeholder is already sitting
-      const { order } = placeholder
-      original.order = order
-      // reorder cards and persist changes
-      this.props.updateCollection()
-      this.positionCards(this.props.collection.collection_cards)
-    } else {
-      // reset back to normal
-      // console.log('resetting')
-      this.positionCards(this.props.collection.collection_cards)
+  createPlaceholderCard = (original, { width = original.width, height = original.height } = {}) => {
+    const placeholderKey = `${original.id}-placeholder`
+    const placeholder = {
+      position: original.position,
+      width,
+      height,
+      // better way to do this??
+      order: original.order,
+      id: placeholderKey,
+      originalId: original.id,
+      cardType: 'placeholder'
     }
-  }
-
-  clearDragTimeout = () => {
-    if (this.state.timeoutId) {
-      clearTimeout(this.state.timeoutId)
-      this.setState({ timeoutId: null })
-    }
+    const newItems = _.concat(this.state.cards, placeholder)
+    this.positionCards(newItems, { dragging: original.id })
   }
 
   findOverlap = (cardId, dragPosition) => {
@@ -183,8 +200,9 @@ class CollectionGrid extends React.Component {
         const distanceBR = calculateDistance(mousePos, cardBR)
         const distance = Math.min(distanceTL, distanceTR, distanceBL, distanceBR)
         let direction = 'left'
-        if ((distance === distanceBR || distance === distanceTR) ||
-            (dragY > (card.position.yPos + card.position.height))) {
+        if (dragY > card.position.yPos &&
+            ((distance === distanceBR || distance === distanceTR) ||
+            (dragY > (card.position.yPos + card.position.height)))) {
           direction = 'right'
         }
         const { order, record } = card
@@ -203,11 +221,20 @@ class CollectionGrid extends React.Component {
     }
     return hoveringOver
   }
+
+  clearDragTimeout = () => {
+    if (this.state.timeoutId) {
+      clearTimeout(this.state.timeoutId)
+      this.setState({ timeoutId: null })
+    }
+  }
+
   // --------------------------
   // </end Drag related functions>
   // --------------------------
 
-  positionCards = (cards = [], opts = {}) => {
+  positionCards = (collectionCards = [], opts = {}) => {
+    const cards = [...collectionCards]
     const {
       gridW,
       gridH,
@@ -218,7 +245,6 @@ class CollectionGrid extends React.Component {
     const matrix = []
     // create an empty row
     matrix.push(_.fill(Array(cols), null))
-
     _.each(_.sortBy(cards, 'order'), card => {
       // we don't actually want to "re-position" the dragging card
       // because its position is being determined by the drag (i.e. mouse cursor)
@@ -229,7 +255,8 @@ class CollectionGrid extends React.Component {
       let position = {}
       let filled = false
       // find an open row that can fit the current card
-      while (!filled) {
+      // NOTE: row limit check is to catch any bad calculations with resizing/moving
+      while (!filled && row < 200) {
         let itFits = false
         let gap = 0
         let nextX = 0
@@ -314,7 +341,9 @@ class CollectionGrid extends React.Component {
           position={card.position}
           record={record}
           onDrag={this.onDrag}
-          onDragStop={this.onDragStop}
+          onMoveStop={this.onMoveStop}
+          onResize={this.onResize}
+          onResizeStop={this.onResizeStop}
           routeTo={this.props.routingStore.routeTo}
           parent={this.props.collection}
         />

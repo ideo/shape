@@ -1,9 +1,9 @@
 import PropTypes from 'prop-types'
 import { PropTypes as MobxPropTypes } from 'mobx-react'
 import FlipMove from 'react-flip-move'
-import Draggable from 'react-draggable'
-import styled from 'styled-components'
+import Rnd from 'react-rnd'
 
+import { uiStore } from '~/stores'
 import v from '~/utils/variables'
 import propShapes from '~/utils/propShapes'
 import PositionedGridCard from '~/ui/grid/PositionedGridCard'
@@ -11,25 +11,16 @@ import GridCard from '~/ui/grid/GridCard'
 import GridCardPlaceholder from '~/ui/grid/GridCardPlaceholder'
 import GridCardBlank from '~/ui/grid/blankContentTool/GridCardBlank'
 
-export const StyledMovableGridCard = styled.div`
-  position: relative;
-  z-index: ${props => ((props.dragging && !props.isPlaceholder) ? 1500 : 1)};
-  &:hover {
-    z-index: 150;
-  }
-`
-
 class MovableGridCard extends React.PureComponent {
   state = {
     timeoutId: null,
     // this is really just used so that it will reset when you finish dragging
-    position: { x: 0, y: 0 },
     dragging: false,
     dragComplete: true,
+    zIndex: 1,
     // track where on the page the mouse position is, e.g. if browser is stretched wide
-    // initialOffsetX: 0,
-    // initialOffsetY: 0,
-    target: null
+    initialOffsetX: 0,
+    initialOffsetY: 0,
   }
 
   componentWillUnmount() {
@@ -39,53 +30,61 @@ class MovableGridCard extends React.PureComponent {
   handleStart = (e, data) => {
     // initialOffset tracks the coordinates *within* the card where you clicked,
     // e.g. bottom left corner of the card itself
-    // const initialOffsetX = (e.screenX - e.target.getBoundingClientRect().x)
-    // const initialOffsetY = (e.screenY - e.target.getBoundingClientRect().y)
+    const initialOffsetX = (e.screenX - e.target.getBoundingClientRect().x)
+    const initialOffsetY = (e.screenY - e.target.getBoundingClientRect().y)
     this.setState({
-      // initialOffsetX,
-      // initialOffsetY,
-      target: e.target,
+      initialOffsetX,
+      initialOffsetY,
     })
   }
 
-  handleDrag = (e, data) => {
+  handleDrag = (e, data, dX, dY) => {
     const { position } = this.props
-    // x, y represent the drag delta
+    // x, y represent the current drag position
     const { x, y } = data
-    // const { initialOffsetX, initialOffsetY, target } = this.state
-    const { target } = this.state
-    const offsetX = (e.screenX - target.getBoundingClientRect().x)
-    const offsetY = (e.screenY - (target.getBoundingClientRect().y + 100))
-
-    // don't consider it to be "dragging" unless you've moved >5 px
-    if (Math.abs(x) + Math.abs(y) < 5) {
+    // don't consider it to be "dragging" unless you've moved >10 px
+    if (Math.abs(x - position.xPos) + Math.abs(y - position.yPos) < 10) {
       return
     }
     this.setState({
       dragging: true,
       dragComplete: false,
+      zIndex: 1000,
     })
     const dragPosition = {
-      // dragPosition indicates the x/y of the dragged element,
-      // relative to the grid
-      dragX: x + offsetX + position.xPos,
-      dragY: y + offsetY + position.yPos,
+      // dragPosition indicates the x/y of the dragged element, relative to the grid
+      // divide by 2 to get center position of the card (instead of top left)
+      dragX: x + position.width / 2,
+      dragY: y + position.height / 2,
       ...position
     }
-    // console.log(position.xPos, position.yPos, dragPosition)
     this.props.onDrag(this.props.card.id, dragPosition)
   }
 
   handleStop = () => {
-    if (this.state.dragging) {
-      this.props.onDragStop(this.props.card.id)
-      this.setState({ dragging: false })
-      const timeoutId = setTimeout(() => {
-        // have this item remain "on top" while it animates back
-        this.setState({ dragComplete: true })
-      }, 350)
-      this.setState({ timeoutId })
+    this.props.onMoveStop(this.props.card.id)
+    this.setState({ dragging: false })
+    const timeoutId = setTimeout(() => {
+      // have this item remain "on top" while it animates back
+      this.setState({ zIndex: 1, dragComplete: true })
+    }, 350)
+    this.setState({ timeoutId })
+  }
+
+  handleResize = (e, dir, ref, delta, position) => {
+    const { gridW, gridH } = uiStore.gridSettings
+    this.setState({
+      zIndex: 1000,
+    })
+    const { card } = this.props
+    const newSize = {
+      width: card.width + Math.floor((delta.width + 200) / gridW),
+      height: card.height + Math.floor((delta.height + 200) / gridH),
     }
+    newSize.width = Math.max(newSize.width, 1)
+    newSize.height = Math.max(newSize.height, 1)
+    // console.log(newSize)
+    this.props.onResize(this.props.card.id, newSize)
   }
 
   // this function gets passed down to the card, so it can place the onClick handler
@@ -111,44 +110,53 @@ class MovableGridCard extends React.PureComponent {
       position
     } = this.props
 
+    const { gridW, gridH, gutter } = uiStore.gridSettings
+    const maxWidth = (gridW * 4) + (gutter * 3)
+    const maxHeight = (gridH * 2) + gutter
+
     const isPlaceholder = cardType === 'placeholder'
     const isBlank = cardType === 'blank'
 
     const {
       xPos,
-      yPos,
+      yPos
+    } = position
+    let {
       height,
       width
     } = position
 
-    const transition = 'transform 0.5s, width 0.3s, height 0.3s;'
-    let rotation = '0deg'
+    let xAdjust = 0
+    let yAdjust = 0
+
+    // const transition = 'transform 0.5s, width 0.3s, height 0.3s;'
+    let { zIndex } = this.state
     const { dragging } = this.state
     if (dragging) {
-      rotation = '3deg'
       // transition = 'width 0.3s, height 0.3s;'
       // experiment -- shrink wide and tall cards
       // NOTE: turned off, was causing other issues about card placement
-      // if (width > 500) {
-      //   if (this.state.initialOffsetX > 200) {
-      //     xPos += this.state.initialOffsetX * 0.5
-      //   }
-      //   width *= 0.6
-      // }
-      // if (height > 400) {
-      //   if (this.state.initialOffsetY > 200) {
-      //     yPos += this.state.initialOffsetY * 0.5
-      //   }
-      //   height *= 0.6
-      // }
+      if (width > 500) {
+        if (this.state.initialOffsetX > 200) {
+          xAdjust = this.state.initialOffsetX * 0.25
+        }
+        width *= 0.8
+      }
+      if (height > 500) {
+        if (this.state.initialOffsetY > 200) {
+          yAdjust = this.state.initialOffsetY * 0.25
+        }
+        height *= 0.8
+      }
     }
     if (isPlaceholder) {
+      zIndex = 0
       // transition = 'none'
-      rotation = '0deg'
     }
     let outline = ''
     if (card.hoveringOver) {
-      outline = `outline: 3px dashed ${v.colors.gray};`
+      // outline = `outline: 3px dashed ${v.colors.teal};`
+      outline = `3px dashed ${v.colors.teal}`
     }
 
     const cardProps = {
@@ -167,16 +175,16 @@ class MovableGridCard extends React.PureComponent {
       height,
       xPos,
       yPos,
-      rotation,
-      transition,
-      outline,
+      // transition,
     }
 
-    const bounds = {
-      left: (-50 + (xPos * -1)),
-      // TODO: `1200` would come from some viewport width
-      right: (1400 - (width / 2)) - xPos
-    }
+    // const bounds = {
+    //   left: (-50 + (xPos * -1)),
+    //   // TODO: `1200` would come from some viewport width
+    //   right: (1400 - (width / 2)) - xPos
+    // }
+
+    const z = zIndex
 
     if (isPlaceholder) {
       return (
@@ -210,38 +218,78 @@ class MovableGridCard extends React.PureComponent {
     }
 
     return (
-      <StyledMovableGridCard
-        dragging={dragging}
-        isPlaceholder={isPlaceholder}
-        // style={{
-        //   zIndex: (dragging && !isPlaceholder) ? (z * 2) : z,
-        //   position: 'relative'
-        // }}
+      <div
+        style={{
+          zIndex: (dragging && !isPlaceholder) ? (z * 2) : z,
+          position: 'relative'
+        }}
       >
         <FlipMove
           appearAnimation={isPlaceholder ? null : 'elevator'}
           typeName={null}
         >
-          <Draggable
-            bounds={bounds}
-            onStart={this.handleStart}
+          <Rnd
+            bounds={null}
+            onDragStart={this.handleStart}
             onDrag={this.handleDrag}
-            onStop={this.handleStop}
-            position={this.state.position}
+            onDragStop={this.handleStop}
+
+            onResizeStart={this.handleStart}
+            onResize={this.handleResize}
+            onResizeStop={this.handleStop}
+
+            maxWidth={maxWidth}
+            maxHeight={maxHeight}
+
+            cancel=".no-drag"
+
+            size={{ width, height }}
+            position={{ x: xPos, y: yPos }}
+            // position={this.state.position}
+            default={{ width, height, x: xPos, y: yPos }}
+            enableResizing={{
+              bottomRight: true,
+              bottom: false,
+              bottomLeft: false,
+              left: false,
+              right: false,
+              top: false,
+              topLeft: false,
+              topRight: false,
+            }}
+            // resizeGrid={resizeGrid}
+            resizeHandleStyles={{
+              bottomRight: {
+                display: dragging ? 'none' : 'block',
+                position: 'absolute',
+                zIndex: 1000,
+                bottom: 0,
+                right: 0,
+                width: 50,
+                height: 50,
+                background: 'red',
+              }
+            }}
+            style={{
+              outline,
+              // animate grid items that are moving as they're being displaced
+              transition: dragging ? 'none' : 'transform 0.25s',
+            }}
+
           >
-            {/*
-              intermediary div is necessary so that we can apply our own transforms
-              and not be overridden by Draggable
-            */}
-            <div>
-              <PositionedGridCard {...styleProps}>
-                <GridCard {...cardProps} />
-              </PositionedGridCard>
+            <div
+              style={{
+                width: '100%',
+                height: '100%',
+                transform: dragging ? `translate(${xAdjust}px, ${yAdjust}px) rotate(3deg)` : '',
+              }}
+            >
+              <GridCard {...cardProps} />
             </div>
-          </Draggable>
+          </Rnd>
 
         </FlipMove>
-      </StyledMovableGridCard>
+      </div>
     )
   }
 }
@@ -253,7 +301,8 @@ MovableGridCard.propTypes = {
   record: MobxPropTypes.objectOrObservableObject.isRequired,
   parent: MobxPropTypes.objectOrObservableObject.isRequired,
   onDrag: PropTypes.func.isRequired,
-  onDragStop: PropTypes.func.isRequired,
+  onResize: PropTypes.func.isRequired,
+  onMoveStop: PropTypes.func.isRequired,
   routeTo: PropTypes.func.isRequired,
 }
 
