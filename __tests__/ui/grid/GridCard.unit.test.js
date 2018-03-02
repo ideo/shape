@@ -34,7 +34,7 @@ describe('GridCard', () => {
     })
 
     it('does not render link icon if card is primary', () => {
-      expect(wrapper.find('StyledGridCardInner').find('LinkIcon').exists()).toBe(false)
+      expect(wrapper.find('StyledGridCard').find('LinkIcon').exists()).toBe(false)
     })
 
     describe('as reference', () => {
@@ -46,7 +46,7 @@ describe('GridCard', () => {
       })
 
       it('renders the link icon', () => {
-        expect(wrapper.find('StyledGridCardInner').find('LinkIcon').exists()).toBe(true)
+        expect(wrapper.find('StyledGridCard').find('LinkIcon').exists()).toBe(true)
       })
     })
   })
@@ -66,7 +66,7 @@ describe('GridCard', () => {
     })
 
     it('renders the collection icon', () => {
-      expect(wrapper.find('StyledGridCardInner').find('CollectionIcon').exists()).toBe(true)
+      expect(wrapper.find('StyledGridCard').find('CollectionIcon').exists()).toBe(true)
     })
 
     describe('as reference', () => {
@@ -78,7 +78,7 @@ describe('GridCard', () => {
       })
 
       it('has linked collection icon', () => {
-        expect(wrapper.find('StyledGridCardInner').find('LinkedCollectionIcon').exists()).toBe(true)
+        expect(wrapper.find('StyledGridCard').find('LinkedCollectionIcon').exists()).toBe(true)
       })
     })
   })
