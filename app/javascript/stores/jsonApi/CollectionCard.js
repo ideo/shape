@@ -30,6 +30,21 @@ class CollectionCard extends BaseRecord {
         console.warn(error)
       })
   }
+
+  API_duplicate() {
+    return this.apiStore.request(`collection_cards/${this.id}/duplicate`, 'POST')
+      .then((response) => {
+        const newCard = response.data
+        this.parent.collection_cards.push(newCard)
+        // NOTE: reordering happens on the frontend; so we perform this extra save...
+        // could be replaced by reordering on the backend
+        this.parent.API_updateCards()
+        // this.apiStore.sync(response)
+      })
+      .catch((error) => {
+        console.warn(error)
+      })
+  }
 }
 CollectionCard.type = 'collection_cards'
 

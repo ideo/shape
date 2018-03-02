@@ -13,6 +13,9 @@ Rails.application.routes.draw do
         resources :collection_cards, only: :index
       end
       resources :collection_cards, shallow: true do
+        member do
+          post 'duplicate'
+        end
         resources :items, shallow: true, except: :index do
           member do
             post 'duplicate'
