@@ -7116,7 +7116,7 @@ react-reconciler@^0.7.0:
     object-assign "^4.1.1"
     prop-types "^15.6.0"
 
-react-rnd@~/projects/react-rnd:
+react-rnd@^7.3.0:
   version "7.3.0"
   resolved "https://registry.yarnpkg.com/react-rnd/-/react-rnd-7.3.0.tgz#b5def82c217abf5f201ccf3941aec1f5dde57749"
   dependencies:

@@ -5,4 +5,9 @@
     // this is to transition the draggable back to its original spot when you let go
     transition: all 0.5s;
   }
+  // related to userSelectHack from Rnd / Draggable
+  // disable blue text selection on Draggables
+  // https://github.com/bokuweb/react-rnd/issues/199
+  *::-moz-selection {background: transparent;}
+  *::selection {background: transparent;}
 }

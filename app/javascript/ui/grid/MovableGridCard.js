@@ -15,12 +15,33 @@ import ResizeIcon from '~/ui/icons/ResizeIcon'
 
 const StyledResizeIcon = styled.div`
   position: absolute;
-  z-index: ${v.zIndex.gridControls};
+  z-index: ${v.zIndex.gridCard};
   right: 1rem;
   bottom: 1rem;
   color: ${v.colors.gray};
-  width: 6px;
-  height: 6px;
+  width: 1rem;
+  height: 1rem;
+  svg {
+    position: relative;
+    bottom: -0.5rem;
+    right: -0.5rem;
+  }
+`
+
+const StyledCardWrapper = styled.div`
+  /* this is for both the ResizeIcon (in this component) and CardMenu (in GridCard) */
+  .show-on-hover {
+    opacity: 0;
+    transition: opacity 0.25s;
+  }
+  &:hover {
+    z-index: ${v.zIndex.gridCard};
+    .show-on-hover {
+      /* don't show hover items while dragging */
+      opacity: ${props => (props.dragging ? 0 : 1)};
+    }
+  }
+  z-index: ${props => (props.dragging ? v.zIndex.cardDragging + 1 : 0)};
 `
 
 class MovableGridCard extends React.PureComponent {
@@ -196,6 +217,8 @@ class MovableGridCard extends React.PureComponent {
     }
 
     const { gridW, gridH, gutter } = uiStore.gridSettings
+    const minWidth = gridW * 0.8
+    const minHeight = gridH * 0.8
     const maxWidth = (gridW * 4) + (gutter * 3)
     const maxHeight = (gridH * 2) + gutter
 
@@ -231,63 +254,65 @@ class MovableGridCard extends React.PureComponent {
     }
 
     return (
-      <Rnd
-        z={moveComplete ? 1 : 1500}
-        bounds={null}
-        onDragStart={this.handleStart}
-        onDrag={this.handleDrag}
-        onDragStop={this.handleStop}
+      <StyledCardWrapper dragging={!moveComplete}>
+        <Rnd
+          bounds={null}
+          onDragStart={this.handleStart}
+          onDrag={this.handleDrag}
+          onDragStop={this.handleStop}
 
-        onResizeStart={this.handleStart}
-        onResize={this.handleResize}
-        onResizeStop={this.handleStop}
+          onResizeStart={this.handleStart}
+          onResize={this.handleResize}
+          onResizeStop={this.handleStop}
 
-        maxWidth={maxWidth}
-        maxHeight={maxHeight}
+          minWidth={minWidth}
+          minHeight={minHeight}
+          maxWidth={maxWidth}
+          maxHeight={maxHeight}
 
-        cancel=".no-drag"
+          cancel=".no-drag"
 
-        size={{ width, height }}
-        position={{ x: xPos, y: yPos }}
-        default={{ width, height, x: xPos, y: yPos }}
-        enableResizing={{
-          bottomRight: true,
-          bottom: false,
-          bottomLeft: false,
-          left: false,
-          right: false,
-          top: false,
-          topLeft: false,
-          topRight: false,
-        }}
-        // resizeGrid={resizeGrid}
-        extendsProps={{
-          handleComponent: {
-            bottomRight: () => (
-              <StyledResizeIcon>
-                <ResizeIcon />
-              </StyledResizeIcon>
-            )
-          }
-        }}
-
-        style={{
-          // outline,
-          // animate grid items that are moving as they're being displaced
-          transition: ((dragging || resizing) ? 'none' : 'transform 0.4s, width 0.4s, height 0.4s'),
-        }}
-
-      >
-        <div
-          style={{
-            width: '100%',
-            height: '100%',
-            transform: dragging ? `translate(${xAdjust}px, ${yAdjust}px) rotate(3deg)` : '',
+          size={{ width, height }}
+          position={{ x: xPos, y: yPos }}
+          default={{ width, height, x: xPos, y: yPos }}
+          enableResizing={{
+            bottomRight: true,
+            bottom: false,
+            bottomLeft: false,
+            left: false,
+            right: false,
+            top: false,
+            topLeft: false,
+            topRight: false,
           }}
+          // resizeGrid={resizeGrid}
+          extendsProps={{
+            handleComponent: {
+              bottomRight: () => (
+                <StyledResizeIcon className="show-on-hover">
+                  <ResizeIcon />
+                </StyledResizeIcon>
+              )
+            }
+          }}
+
+          style={{
+            // animate grid items that are moving as they're being displaced
+            transition: ((dragging || resizing) ? 'none' : 'transform 0.4s, width 0.25s, height 0.25s'),
+          }}
+
         >
-          <GridCard {...cardProps} />
-        </div>
-      </Rnd>
+          <div
+            style={{
+              width: '100%',
+              height: '100%',
+              transform: dragging ? `translate(${xAdjust}px, ${yAdjust}px) rotate(3deg)` : '',
+            }}
+          >
+            <GridCard {...cardProps} />
+          </div>
+        </Rnd>
+      </StyledCardWrapper>
     )
   }
 }

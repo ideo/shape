@@ -23,16 +23,6 @@ export const StyledGridCard = styled.div`
   cursor: ${props => (props.dragging ? 'grabbing' : 'pointer')};
   box-shadow: ${props => (props.dragging ? '1px 1px 5px 2px rgba(0, 0, 0, 0.25)' : '')};
   opacity: ${props => (props.dragging ? '0.95' : '1')};
-  .show-on-hover {
-    opacity: 0;
-    transition: opacity 0.25s;
-  }
-  &:hover {
-    z-index: ${v.zIndex.gridControls};
-    .show-on-hover {
-      opacity: 1;
-    }
-  }
 `
 StyledGridCard.displayName = 'StyledGridCard'
 
