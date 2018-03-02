@@ -22,7 +22,9 @@ export default {
   },
 
   zIndex: {
-    header: 100,
+    header: 200,
+    cardDragging: 160,
+    gridCard: 150,
   },
 
   quillDefaults: {

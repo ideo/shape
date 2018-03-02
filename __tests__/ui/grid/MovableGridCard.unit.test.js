@@ -1,4 +1,6 @@
 import MovableGridCard from '~/ui/grid/MovableGridCard'
+import _ from 'lodash'
+
 import {
   fakeItemCard,
   fakeTextItem,
@@ -12,7 +14,8 @@ const props = {
   record: fakeTextItem,
   parent: fakeCollection,
   onDrag: jest.fn(),
-  onDragStop: jest.fn(),
+  onResize: jest.fn(),
+  onMoveStop: jest.fn(),
   routeTo: jest.fn(),
 }
 
@@ -42,13 +45,19 @@ describe('MovableGridCard', () => {
       )
     })
 
-    it('renders a Draggable component', () => {
-      expect(wrapper.find('Draggable').exists()).toBe(true)
+    it('renders a "Rnd" Resize-n-Draggable component', () => {
+      expect(wrapper.find('Rnd').exists()).toBe(true)
     })
 
-    it('renders a PositionedGridCard component', () => {
-      expect(wrapper.find('PositionedGridCard').props().width).toBe(fakePosition.width)
-      expect(wrapper.find('PositionedGridCard').props().height).toBe(fakePosition.height)
+    it('passes position props to Rnd component', () => {
+      expect(wrapper.find('Rnd').props().size).toEqual(_.pick(fakePosition, ['width', 'height']))
+      expect(wrapper.find('Rnd').props().enableResizing.bottomRight).toBe(true)
+    })
+
+    it('passes ResizeIcon to Rnd component', () => {
+      const ep = wrapper.find('Rnd').props().extendsProps
+      const handleComponentWrapper = shallow(<ep.handleComponent.bottomRight />)
+      expect(handleComponentWrapper.find('ResizeIcon').exists()).toBe(true)
     })
 
     it('renders a GridCard component', () => {

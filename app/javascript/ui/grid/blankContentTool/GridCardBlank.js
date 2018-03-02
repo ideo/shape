@@ -246,6 +246,7 @@ GridCardBlank.wrappedComponent.propTypes = {
   apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 
+// give a name to the injected component for unit tests
 GridCardBlank.displayName = 'GridCardBlankHOC'
 
 export default GridCardBlank

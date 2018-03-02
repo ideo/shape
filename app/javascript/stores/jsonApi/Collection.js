@@ -4,13 +4,13 @@ import BaseRecord from './BaseRecord'
 class Collection extends BaseRecord {
   attributesForAPI = ['name']
 
-  API_updateCardOrder() {
+  API_updateCards() {
     this._reorderCards()
     const data = this.toJsonApi()
     delete data.relationships
     // attach nested attributes of cards
     data.attributes.collection_cards_attributes = _.map(this.collection_cards, card => (
-      _.pick(card, ['id', 'order'])
+      _.pick(card, ['id', 'order', 'width', 'height'])
     ))
     const apiPath = `collections/${this.id}`
     return this.apiStore.request(apiPath, 'PATCH', { data })

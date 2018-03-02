@@ -178,6 +178,7 @@ describe Api::V1::CollectionsController, type: :request, auth: true do
 
   describe 'PATCH #update' do
     let!(:collection) { create(:collection) }
+    let(:collection_card) { create(:collection_card, order: 0, width: 1, parent: collection) }
     let(:path) { "/api/v1/collections/#{collection.id}" }
     let(:params) {
       json_api_params(
@@ -185,6 +186,11 @@ describe Api::V1::CollectionsController, type: :request, auth: true do
         {
           'id': collection.id,
           'name': 'Who let the dogs out?',
+          'collection_cards_attributes': [
+            {
+              id: collection_card.id, order: 1, width: 3
+            }
+          ]
         }
       )
     }
@@ -203,6 +209,14 @@ describe Api::V1::CollectionsController, type: :request, auth: true do
       expect(collection.name).not_to eq('Who let the dogs out?')
       patch(path, params: params)
       expect(collection.reload.name).to eq('Who let the dogs out?')
+    end
+
+    it 'updates the collection_card' do
+      expect(collection_card.width).not_to eq(3)
+      expect(collection_card.order).not_to eq(1)
+      patch(path, params: params)
+      expect(collection_card.reload.width).to eq(3)
+      expect(collection_card.reload.order).to eq(1)
     end
   end
 end

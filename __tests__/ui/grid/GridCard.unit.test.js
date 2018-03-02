@@ -37,10 +37,9 @@ describe('GridCard', () => {
       expect(wrapper.find('StyledGridCard').find('LinkIcon').exists()).toBe(false)
     })
 
-    it('renders menu, selection circle and resize icon', () => {
+    it('renders menu and selection circle', () => {
       expect(wrapper.find('.card-menu').exists()).toBe(true)
       expect(wrapper.find('StyledSelectionCircle').exists()).toBe(true)
-      expect(wrapper.find('ResizeIcon').exists()).toBe(true)
     })
 
     describe('as reference', () => {
@@ -75,10 +74,9 @@ describe('GridCard', () => {
       expect(wrapper.find('StyledGridCard').find('CollectionIcon').exists()).toBe(true)
     })
 
-    it('renders menu, selection circle and resize icon', () => {
+    it('renders menu and selection circle', () => {
       expect(wrapper.find('.card-menu').exists()).toBe(true)
       expect(wrapper.find('StyledSelectionCircle').exists()).toBe(true)
-      expect(wrapper.find('ResizeIcon').exists()).toBe(true)
     })
 
     describe('as reference', () => {
