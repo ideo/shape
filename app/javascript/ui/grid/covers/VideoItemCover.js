@@ -2,17 +2,15 @@ import { PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 import ReactPlayer from 'react-player'
 
-const StyledVideoItem = styled.div`
-  /* arbitrary styles for now */
-  width: 800px;
-  height: 600px;
-  > div {
-    height: 100%;
-  }
+const StyledCover = styled.div`
+  background: black;
+  height: 100%;
+  width: 100%;
+  position: relative;
 `
-StyledVideoItem.displayName = 'StyledVideoItem'
+StyledCover.displayName = 'StyledCover'
 
-class VideoItem extends React.Component {
+class VideoItemCover extends React.Component {
   render() {
     const { item } = this.props
     const videoUrl = item.url
@@ -20,21 +18,21 @@ class VideoItem extends React.Component {
     // ReactPlayer can play most external video server URLs
     // Examples: https://github.com/CookPete/react-player/blob/master/src/demo/App.js
     return (
-      <StyledVideoItem>
+      <StyledCover>
         <ReactPlayer
           url={videoUrl}
           playing={false}
           controls={false}
-          width="800"
-          height="600"
+          width="95%"
+          height="95%"
         />
-      </StyledVideoItem>
+      </StyledCover>
     )
   }
 }
 
-VideoItem.propTypes = {
+VideoItemCover.propTypes = {
   item: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 
-export default VideoItem
+export default VideoItemCover
