@@ -42,7 +42,9 @@ class Collection
     # collections and items that have been shared directly with user,
     # or through any group they are a member of
     def collection_cards
-      i = -1
+      # HACK: this is obviously an imperfect solution but the problem is that if the frontend
+      # has loaded the "real" collectionCard with id=X then there will be a collision.
+      i = 99_999
 
       collections_and_items_shared_with_me.map do |obj|
         CollectionCard.new(
