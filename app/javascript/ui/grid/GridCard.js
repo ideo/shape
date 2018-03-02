@@ -57,7 +57,7 @@ StyledGridCardInner.displayName = 'StyledGridCardInner'
 
 export const StyledTopRightActions = styled.div`
   position: absolute;
-  top: 0.25rem;
+  top: 0.35rem;
   right: 0.25rem;
   z-index: 150;
   .card-menu {
@@ -158,6 +158,10 @@ class GridCard extends React.Component {
     })
   }
 
+  shareCard = () => {
+    console.log('Share card')
+  }
+
   duplicateCard = () => {
     console.log('Duplicate card')
   }
@@ -193,6 +197,7 @@ class GridCard extends React.Component {
             cardId={this.props.card.id}
             className="card-menu"
             visible={this.state.menuVisible}
+            handleShare={this.shareCard}
             handleDuplicate={this.duplicateCard}
             handleLink={this.linkCard}
             handleOrganize={this.organizeCard}

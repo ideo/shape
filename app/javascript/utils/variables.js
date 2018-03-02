@@ -5,7 +5,7 @@ export const ITEM_TYPES = {
 }
 
 export default {
-  headerHeight: 150,
+  headerHeight: 160,
   maxWidth: 1400,
   containerPadding: {
     horizontal: '2rem',

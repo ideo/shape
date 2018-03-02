@@ -3,28 +3,38 @@ import styled from 'styled-components'
 import { inject, propTypes as MobxPropTypes } from 'mobx-react'
 
 import ArchiveIcon from '~/ui/icons/ArchiveIcon'
+import ShareIcon from '~/ui/icons/ShareIcon'
 import DuplicateIcon from '~/ui/icons/DuplicateIcon'
 import MenuIcon from '~/ui/icons/MenuIcon'
 import MoveIcon from '~/ui/icons/MoveIcon'
 import LinkIcon from '~/ui/icons/LinkIcon'
 import v from '~/utils/variables'
 
-export const StyledMenu = styled.div`
+export const StyledMenuButtonWrapper = styled.div`
   position: relative;
-  ul {
-    position: absolute;
-    top: 20px;
-    left: 0;
+  .menu-wrapper {
     display: none;
-    background-color: #FFFFFF;
-    width: 200px;
   }
-  &.open ul {
+  &.open .menu-wrapper {
     display: block;
   }
 `
 
+export const StyledMenuWrapper = styled.div`
+  position: absolute;
+  padding: 10px;
+  top: 14px;
+  left: -6px;
+`
+
+export const StyledMenu = styled.ul`
+  background-color: #FFFFFF;
+  width: 200px;
+  box-shadow: 0 0 8px 0 rgba(0, 0, 0, 0.36);
+`
+
 export const StyledMenuToggle = styled.button`
+  padding: 0 5px;
   .icon {
     width: 16px;
     height: 16px;
@@ -38,7 +48,7 @@ export const StyledMenuItem = styled.li`
     line-height: 2.5rem;
     text-transform: uppercase;
     position: relative;
-    border-left: 3px solid transparent;
+    border-left: 7px solid transparent;
     font-family: 'Gotham';
     font-weight: 300;
     font-size: 0.8rem;
@@ -58,8 +68,7 @@ export const StyledMenuItem = styled.li`
   &:hover,
   &:active {
     button {
-      border-left: 3px solid ${v.colors.blackLava};
-      background-color: ${v.colors.desert};
+      border-left: 7px solid ${v.colors.blackLava};
     }
   }
 `
@@ -67,7 +76,7 @@ export const StyledMenuItem = styled.li`
 @inject('uiStore')
 class CardMenu extends React.PureComponent {
   state = {
-    open: false
+    open: false,
   }
 
   get cardId() {
@@ -75,14 +84,14 @@ class CardMenu extends React.PureComponent {
   }
 
   setOpen = (open, closeOthers = true) => {
+    this.setState({
+      open: open,
+    })
+
     if (open && closeOthers) {
       // Close any other open menus
       this.props.uiStore.cardMenuOpened(this)
     }
-
-    this.setState({
-      open: open
-    })
   }
 
   handleMouseLeave = () => {
@@ -103,7 +112,7 @@ class CardMenu extends React.PureComponent {
       css += ' open'
     }
     return (
-      <StyledMenu
+      <StyledMenuButtonWrapper
         className={css}
         role="presentation"
         onMouseLeave={this.handleMouseLeave}
@@ -111,33 +120,41 @@ class CardMenu extends React.PureComponent {
         <StyledMenuToggle onClick={this.toggleOpen}>
           <MenuIcon />
         </StyledMenuToggle>
-        <ul>
-          <StyledMenuItem>
-            <button onClick={this.props.handleDuplicate}>
-              Duplicate
-              <DuplicateIcon />
-            </button>
-          </StyledMenuItem>
-          <StyledMenuItem>
-            <button onClick={this.props.handleLink}>
-              Link
-              <LinkIcon />
-            </button>
-          </StyledMenuItem>
-          <StyledMenuItem>
-            <button onClick={this.props.handleOrganize}>
-              Organize
-              <MoveIcon />
-            </button>
-          </StyledMenuItem>
-          <StyledMenuItem>
-            <button onClick={this.props.handleArchive}>
-              Archive
-              <ArchiveIcon />
-            </button>
-          </StyledMenuItem>
-        </ul>
-      </StyledMenu>
+        <StyledMenuWrapper className="menu-wrapper">
+          <StyledMenu>
+            <StyledMenuItem>
+              <button onClick={this.props.handleShare}>
+                Share
+                <ShareIcon />
+              </button>
+            </StyledMenuItem>
+            <StyledMenuItem>
+              <button onClick={this.props.handleDuplicate}>
+                Duplicate
+                <DuplicateIcon />
+              </button>
+            </StyledMenuItem>
+            <StyledMenuItem>
+              <button onClick={this.props.handleLink}>
+                Link
+                <LinkIcon />
+              </button>
+            </StyledMenuItem>
+            <StyledMenuItem>
+              <button onClick={this.props.handleOrganize}>
+                Organize
+                <MoveIcon />
+              </button>
+            </StyledMenuItem>
+            <StyledMenuItem>
+              <button onClick={this.props.handleArchive}>
+                Archive
+                <ArchiveIcon />
+              </button>
+            </StyledMenuItem>
+          </StyledMenu>
+        </StyledMenuWrapper>
+      </StyledMenuButtonWrapper>
     )
   }
 }
@@ -145,6 +162,7 @@ class CardMenu extends React.PureComponent {
 CardMenu.propTypes = {
   cardId: PropTypes.number.isRequired,
   className: PropTypes.string,
+  handleShare: PropTypes.func.isRequired,
   handleDuplicate: PropTypes.func.isRequired,
   handleLink: PropTypes.func.isRequired,
   handleOrganize: PropTypes.func.isRequired,
