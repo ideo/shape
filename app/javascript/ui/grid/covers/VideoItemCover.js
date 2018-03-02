@@ -40,7 +40,8 @@ StyledVideoCover.displayName = 'StyledVideoCover'
 
 class VideoItemCover extends React.PureComponent {
   // NOTE: this could later be managed in global state
-  // e.g. only 1 video playing at a time, clicking outside will revert it back to non-playing mode
+  // e.g. only 1 video playing at a time, clicking outside could revert it back to non-playing mode
+  // also -- could listen for pause events within the player so that we know when it's not playing
   state = {
     playing: false,
   }
@@ -69,7 +70,7 @@ class VideoItemCover extends React.PureComponent {
         <div className="playing">
           <ReactPlayer
             url={item.url}
-            controls={false}
+            controls
             playing={this.state.playing}
             width="100%"
             height="100%"

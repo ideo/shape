@@ -25,7 +25,7 @@ class VideoItem extends React.Component {
         <ReactPlayer
           url={videoUrl}
           playing={false}
-          controls={false}
+          controls
           width="1024"
           height="768"
         />
