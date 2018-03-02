@@ -1,7 +1,7 @@
-import Icon from '~/ui/global/Icon'
+import Icon from './Icon'
 
 const AddVideoIcon = () => (
-  <Icon className="icon icon--stroke">
+  <Icon stroke>
     <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
       <g fill="none" fillRule="evenodd">
         <path d="M61 98.727775V69c0-2.209139 1.790861-4 4-4h76.915427c2.20914 0 4 1.790861 4 4v55.975408c0 2.209139-1.79086 4-4 4h-51.93715" strokeLinecap="round" strokeWidth="4" />

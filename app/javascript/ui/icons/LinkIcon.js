@@ -1,7 +1,7 @@
-import Icon from '~/ui/global/Icon'
+import Icon from './Icon'
 
 const LinkIcon = () => (
-  <Icon className="icon icon--fill">
+  <Icon fill>
     <svg viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg">
       <defs>
         <path d="M6.123 10.315a.72.72 0 0 0-.035 1.037.758.758 0 0 0 .548.231.758.758 0 0 0 .514-.198L11.8 7.13a.72.72 0 0 0 .035-1.036.764.764 0 0 0-1.062-.034l-4.65 4.255z" id="a" />

@@ -1,7 +1,7 @@
-import Icon from '~/ui/global/Icon'
+import Icon from './Icon'
 
 const ShareIcon = () => (
-  <Icon className="icon icon--fill">
+  <Icon fill>
     <svg viewBox="0 0 32 44" xmlns="http://www.w3.org/2000/svg">
       <g fillRule="evenodd">
         <path d="M9.69 9.847l4.691-4.691v15.755a1.5 1.5 0 0 0 3 0V5.158l4.688 4.689c.293.293.677.439 1.061.439a1.5 1.5 0 0 0 1.06-2.56L16.94.476a1.5 1.5 0 0 0-2.121 0l-7.25 7.25A1.5 1.5 0 1 0 9.69 9.847" />
