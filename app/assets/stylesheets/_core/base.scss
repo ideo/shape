@@ -33,20 +33,3 @@ p {
   line-height: 1.25;
   margin-bottom: 0.75rem;
 }
-
-.icon {
-  position: relative;
-  display: inline-block;
-}
-
-.icon--stroke {
-  svg {
-    stroke: currentColor;
-  }
-}
-
-.icon--fill {
-  svg {
-    fill: currentColor;
-  }
-}

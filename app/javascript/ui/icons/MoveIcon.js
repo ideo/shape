@@ -1,4 +1,4 @@
-import Icon from '~/ui/global/Icon'
+import Icon from './Icon'
 
 const MoveIcon = () => (
   <Icon className="icon icon--fill ">

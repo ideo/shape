@@ -1,7 +1,7 @@
-import Icon from '~/ui/global/Icon'
+import Icon from './Icon'
 
 const AddImageIcon = () => (
-  <Icon className="icon icon--fill">
+  <Icon fill>
     <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
       <g fillRule="evenodd">
         <g fillRule="nonzero">
