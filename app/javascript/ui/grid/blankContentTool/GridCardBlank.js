@@ -59,17 +59,19 @@ const BctButton = styled.button`
   width: 47px;
   height: 47px;
   border-radius: 50%;
-  background: ${v.colors.darkCharcoal};
+  background: ${v.colors.blackLava};
   color: white;
 
   &:hover {
-    background-color: #676767;
+    background-color: ${v.colors.gray};
   }
 
-  svg {
+  .icon {
     position: absolute;
     left: 0;
     top: 0;
+    width: 47px;
+    height: 47px;
   }
 `
 BctButton.displayName = 'BctButton'
@@ -83,7 +85,7 @@ const BctBackground = styled.div`
   height: 175px;
   border-radius: 50%;
   border: 8px solid ${v.colors.cyan};
-  background: ${v.colors.cyanLight};
+  background: ${v.colors.desert};
 `
 
 @inject('uiStore', 'apiStore')

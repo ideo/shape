@@ -13,7 +13,7 @@ const StyledHeader = styled.header`
   position: fixed;
   top: 0;
   width: calc(100% - ${v.containerPadding.horizontal}*2);
-  background: #f2f2f2;
+  background: ${v.colors.cararra};
   padding: 1rem ${v.containerPadding.horizontal};
 `
 

@@ -5,6 +5,7 @@ import { Router, Switch, Route } from 'react-router-dom'
 import CollectionPage from '~/ui/pages/CollectionPage'
 import ItemPage from '~/ui/pages/ItemPage'
 import Loader from '~/ui/layout/Loader'
+import ClickWrapper from '~/ui/layout/ClickWrapper'
 
 @inject('apiStore')
 @observer
@@ -25,13 +26,16 @@ class Routes extends React.Component {
       return <Loader />
     }
     return (
-      <Router history={history}>
-        <Switch>
-          <Route exact path="/" component={CollectionPage} />
-          <Route path="/collections/:id" component={CollectionPage} />
-          <Route path="/items/:id" component={ItemPage} />
-        </Switch>
-      </Router>
+      <div>
+        <ClickWrapper />
+        <Router history={history}>
+          <Switch>
+            <Route exact path="/" component={CollectionPage} />
+            <Route path="/collections/:id" component={CollectionPage} />
+            <Route path="/items/:id" component={ItemPage} />
+          </Switch>
+        </Router>
+      </div>
     )
   }
 }
