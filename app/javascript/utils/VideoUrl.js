@@ -59,7 +59,7 @@ class VideoUrl {
         name: data.title,
         // "high" = 480x360
         // NOTE: Does "high" always exist? Do we have to check for sizes?
-        thumbnail_url: data.thumbnails.high.url,
+        thumbnailUrl: data.thumbnails.high.url,
       }
     } catch (e) {
       return {}
@@ -79,7 +79,7 @@ class VideoUrl {
       const thumbnail = _.find(data.pictures.sizes, i => i.width > 600)
       return {
         name: data.name,
-        thumbnail_url: thumbnail.link,
+        thumbnailUrl: thumbnail.link,
       }
     } catch (e) {
       return {}

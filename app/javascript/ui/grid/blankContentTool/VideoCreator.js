@@ -27,7 +27,7 @@ class VideoCreator extends React.Component {
       urlValid: false,
       loading: false,
       name: '',
-      thumbnail_url: '',
+      thumbnailUrl: '',
     }
     this.lookupVideoAPI = _.debounce(this._lookupVideoAPI, 1000)
   }
@@ -41,10 +41,10 @@ class VideoCreator extends React.Component {
   }
 
   _lookupVideoAPI = async (url) => {
-    const { name, thumbnail_url } = await VideoUrl.getAPIdetails(url)
+    const { name, thumbnailUrl } = await VideoUrl.getAPIdetails(url)
     this.setState({ loading: false })
-    if (name && thumbnail_url) {
-      this.setState({ name, thumbnail_url, urlValid: true })
+    if (name && thumbnailUrl) {
+      this.setState({ name, thumbnailUrl, urlValid: true })
     } else {
       this.setState({ urlValid: false })
     }
@@ -58,13 +58,13 @@ class VideoCreator extends React.Component {
     if (this.videoUrlIsValid()) {
       // Get a normalized URL to make it easier to handle in our system
       const { normalizedUrl } = VideoUrl.parse(this.state.videoUrl)
-      const { name, thumbnail_url } = this.state
+      const { name, thumbnailUrl } = this.state
       const attrs = {
         item_attributes: {
           type: ITEM_TYPES.VIDEO,
           url: normalizedUrl,
           name,
-          thumbnail_url,
+          thumbnail_url: thumbnailUrl,
         },
       }
       this.props.createCard(attrs)
