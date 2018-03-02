@@ -16,15 +16,14 @@ import ResizeIcon from '~/ui/icons/ResizeIcon'
 const StyledResizeIcon = styled.div`
   position: absolute;
   z-index: ${v.zIndex.gridCard};
-  right: 1rem;
-  bottom: 1rem;
+  right: 0.75rem;
+  bottom: 0.75rem;
   color: ${v.colors.gray};
-  width: 1rem;
-  height: 1rem;
+  width: 1.25rem;
+  height: 1.25rem;
   svg {
-    position: relative;
-    bottom: -0.5rem;
-    right: -0.5rem;
+    width: 60%;
+    height: 60%;
   }
 `
 
