@@ -1,5 +1,6 @@
 class Item < ApplicationRecord
   include Breadcrumbable
+  include Archivable
   resourcify
 
   belongs_to :filestack_file, dependent: :destroy, optional: true
