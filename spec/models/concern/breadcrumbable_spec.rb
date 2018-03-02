@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-describe Item, type: :model do
+describe Breadcrumbable, type: :concern do
   it 'should have concern included' do
     expect(Item.ancestors).to include(Breadcrumbable)
   end
