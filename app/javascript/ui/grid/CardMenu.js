@@ -26,6 +26,7 @@ export const StyledMenuWrapper = styled.div`
   top: 14px;
   left: -6px;
 `
+StyledMenuWrapper.displayName = 'StyledMenuWrapper'
 
 export const StyledMenu = styled.ul`
   background-color: #FFFFFF;
@@ -40,6 +41,7 @@ export const StyledMenuToggle = styled.button`
     height: 16px;
   }
 `
+StyledMenuToggle.displayName = 'StyledMenuToggle'
 
 export const StyledMenuItem = styled.li`
   button {
@@ -123,31 +125,46 @@ class CardMenu extends React.PureComponent {
         <StyledMenuWrapper className="menu-wrapper">
           <StyledMenu>
             <StyledMenuItem>
-              <button onClick={this.props.handleShare}>
+              <button
+                onClick={this.props.handleShare}
+                className="menu-share"
+              >
                 Share
                 <ShareIcon />
               </button>
             </StyledMenuItem>
             <StyledMenuItem>
-              <button onClick={this.props.handleDuplicate}>
+              <button
+                onClick={this.props.handleDuplicate}
+                className="menu-duplicate"
+              >
                 Duplicate
                 <DuplicateIcon />
               </button>
             </StyledMenuItem>
             <StyledMenuItem>
-              <button onClick={this.props.handleLink}>
+              <button
+                onClick={this.props.handleLink}
+                className="menu-link"
+              >
                 Link
                 <LinkIcon />
               </button>
             </StyledMenuItem>
             <StyledMenuItem>
-              <button onClick={this.props.handleOrganize}>
+              <button
+                onClick={this.props.handleOrganize}
+                className="menu-organize"
+              >
                 Organize
                 <MoveIcon />
               </button>
             </StyledMenuItem>
             <StyledMenuItem>
-              <button onClick={this.props.handleArchive}>
+              <button
+                onClick={this.props.handleArchive}
+                className="menu-archive"
+              >
                 Archive
                 <ArchiveIcon />
               </button>
