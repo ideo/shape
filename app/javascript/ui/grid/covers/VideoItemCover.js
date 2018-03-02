@@ -5,6 +5,7 @@ import { Flex, Box } from 'reflexbox'
 import ReactPlayer from 'react-player'
 
 import v from '~/utils/variables'
+import hexToRgba from '~/utils/hexToRgba'
 import { StyledImageCover } from './ImageItemCover'
 
 const StyledVideoCover = styled.div`
@@ -14,16 +15,16 @@ const StyledVideoCover = styled.div`
     height: 100%;
     button {
       border: none;
-      background: ${v.colors.teal};
+      background: ${hexToRgba(v.colors.cyan, 0.75)};
+      transition: background 0.2s;
       color: white;
       height: 4rem;
       width: 5rem;
       font-size: 2rem;
       border-radius: 10px;
-      opacity: 0.8;
       cursor: pointer;
       &:hover {
-        opacity: 1;
+        background: ${v.colors.cyan}
       }
     }
   }
