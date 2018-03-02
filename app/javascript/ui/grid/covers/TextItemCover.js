@@ -20,6 +20,7 @@ const StyledReadMore = styled.div`
     background: ${v.colors.desert};
   }
 `
+StyledReadMore.displayName = 'StyledReadMore'
 
 class TextItemCover extends React.Component {
   state = {
@@ -27,10 +28,15 @@ class TextItemCover extends React.Component {
   }
 
   componentDidMount() {
+    this.checkTextAreaHeight()
+  }
+
+  checkTextAreaHeight = () => {
     if (!this.quillEditor) return
     const { height } = this.props
-    const h = this.quillEditor.getEditingArea().offsetHeight
-    if (height && h > height) {
+    const textAreaHeight = this.quillEditor.getEditingArea().offsetHeight
+    // render the Read More link if the text height exceeds viewable area
+    if (height && textAreaHeight > height) {
       this.setState({ readMore: true })
     }
   }
@@ -40,7 +46,7 @@ class TextItemCover extends React.Component {
     // we have to convert the item to a normal JS object for Quill to be happy
     const textData = item.toJS().text_data
     const quillProps = {
-      // ref is used to get the height of the div in componentDidMount
+      // ref is used to get the height of the div in checkTextAreaHeight
       ref: c => { this.quillEditor = c },
       readOnly: true,
       theme: null,

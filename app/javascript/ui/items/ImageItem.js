@@ -5,6 +5,7 @@ const StyledImage = styled.img`
   /* basic way to make it "responsive" */
   max-width: 100vw;
 `
+StyledImage.displayName = 'StyledImage'
 
 class ImageItem extends React.PureComponent {
   render() {

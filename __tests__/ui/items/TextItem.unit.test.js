@@ -51,10 +51,5 @@ describe('TextItem', () => {
     it('renders the TextItemToolbar', () => {
       expect(wrapper.find('TextItemToolbar').exists()).toBe(true)
     })
-
-    it('gives the TextItemToolbar the path for the close button', () => {
-      // should come from item.parentPath
-      expect(wrapper.find('TextItemToolbar').props().closePath).toEqual('/collections/99')
-    })
   })
 })
