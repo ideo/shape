@@ -3,6 +3,7 @@ import { PropTypes as MobxPropTypes } from 'mobx-react'
 import ReactQuill from 'react-quill'
 import styled from 'styled-components'
 
+import v from '~/utils/variables'
 import StyledCover from './StyledCover'
 
 const StyledReadMore = styled.div`
@@ -16,7 +17,7 @@ const StyledReadMore = styled.div`
   font-size: 0.9rem;
 
   &:hover {
-    background: #f1f1f1;
+    background: ${v.colors.desert};
   }
 `
 
