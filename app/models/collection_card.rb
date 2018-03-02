@@ -18,6 +18,26 @@ class CollectionCard < ApplicationRecord
 
   accepts_nested_attributes_for :collection, :item
 
+  amoeba do
+    enable
+    exclude_association :collection
+    exclude_association :item
+    exclude_association :parent
+  end
+
+  def duplicate!(shallow: false)
+    cc = amoeba_dup
+    cc.order = order + 1
+
+    unless shallow
+      cc.collection = collection.duplicate! if collection.present?
+      cc.item = item.duplicate! if item.present?
+    end
+
+    cc.save
+    cc
+  end
+
   def record
     return item if item.present?
     return collection if collection.present?

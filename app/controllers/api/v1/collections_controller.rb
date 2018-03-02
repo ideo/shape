@@ -45,6 +45,15 @@ class Api::V1::CollectionsController < Api::V1::BaseController
     end
   end
 
+  def duplicate
+    duplicate = @collection.duplicate!(copy_parent_card: true)
+    if duplicate.persisted?
+      render jsonapi: duplicate
+    else
+      render_api_errors duplicate.errors
+    end
+  end
+
   private
 
   def render_collection
