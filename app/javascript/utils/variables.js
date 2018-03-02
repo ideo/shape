@@ -23,6 +23,7 @@ export default {
 
   zIndex: {
     header: 100,
+    gridControls: 150,
   },
 
   quillDefaults: {

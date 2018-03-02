@@ -10,7 +10,6 @@ import CollectionCover from '~/ui/collections/CollectionCover'
 import CollectionIcon from '~/ui/icons/CollectionIcon'
 import LinkedCollectionIcon from '~/ui/icons/LinkedCollectionIcon'
 import LinkIcon from '~/ui/icons/LinkIcon'
-import ResizeIcon from '~/ui/icons/ResizeIcon'
 import CardMenu from '~/ui/grid/CardMenu'
 import v, { ITEM_TYPES } from '~/utils/variables'
 
@@ -26,10 +25,10 @@ export const StyledGridCard = styled.div`
   opacity: ${props => (props.dragging ? '0.95' : '1')};
   .show-on-hover {
     opacity: 0;
-    transition: opacity 275ms;
+    transition: opacity 0.25s;
   }
   &:hover {
-    z-index: 150;
+    z-index: ${v.zIndex.gridControls};
     .show-on-hover {
       opacity: 1;
     }
@@ -84,15 +83,6 @@ const StyledSelectionCircle = styled.div`
   }
 `
 StyledSelectionCircle.displayName = 'StyledSelectionCircle'
-
-const StyledResizeIcon = styled.div`
-  position: absolute;
-  right: 0.3rem;
-  bottom: 0.25rem;
-  color: ${v.colors.gray};
-  width: 6px;
-  height: 6px;
-`
 
 class GridCard extends React.Component {
   state = {
@@ -205,9 +195,6 @@ class GridCard extends React.Component {
           />
         </StyledTopRightActions>
         {this.icon}
-        <StyledResizeIcon className="show-on-hover">
-          <ResizeIcon />
-        </StyledResizeIcon>
         {/* onClick placed here so it's separate from hotspot click */}
         <StyledGridCardInner onClick={this.handleClick}>
           {this.inner}
