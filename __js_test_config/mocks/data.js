@@ -16,7 +16,8 @@ export const fakeVideoItemAttrs = {
   id: 2,
   type: 'Item::VideoItem',
   name: 'Crazy Honey Badger',
-  url: 'https://www.youtube.com/watch?v=4r7wHMg5Yjg'
+  url: 'https://www.youtube.com/watch?v=4r7wHMg5Yjg',
+  thumbnail_url: 'https://img.youtube.com/vi/4r7wHMg5Yjg/hqdefault.jpg',
 }
 export const fakeVideoItem = {
   ...fakeVideoItemAttrs,

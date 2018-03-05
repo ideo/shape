@@ -13,6 +13,8 @@ FactoryBot.define do
 
     factory :video_item, class: 'Item::VideoItem' do
       url 'https://www.youtube.com/watch?v=igJ4qADrSwo'
+      url { Faker::Internet.url }
+      thumbnail_url { Faker::Company.logo }
     end
   end
 end

@@ -1,5 +1,7 @@
 import PropTypes from 'prop-types'
 
+import PaddedCardCover from '~/ui/grid/covers/PaddedCardCover'
+
 class CollectionCreator extends React.Component {
   state = {
     inputText: '',
@@ -22,7 +24,7 @@ class CollectionCreator extends React.Component {
 
   render() {
     return (
-      <div>
+      <PaddedCardCover>
         <input
           placeholder="Collection name"
           value={this.state.inputText}
@@ -34,7 +36,7 @@ class CollectionCreator extends React.Component {
           value="save"
           disabled={this.props.loading}
         />
-      </div>
+      </PaddedCardCover>
     )
   }
 }

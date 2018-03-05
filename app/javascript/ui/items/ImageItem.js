@@ -1,39 +1,24 @@
-import PropTypes from 'prop-types'
 import { PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 
-export const StyledImageItem = styled.div`
-  background-image: url(${props => props.url});
-  background-size: ${props => props.backgroundSize};
-  background-position: center;
-  background-repeat: no-repeat;
-  width: 100%;
-  height: 100%;
+const StyledImage = styled.img`
+  /* basic way to make it "responsive" */
+  max-width: 100vw;
 `
-StyledImageItem.displayName = 'StyledImageItem'
+StyledImage.displayName = 'StyledImage'
 
 class ImageItem extends React.PureComponent {
   render() {
-    const { item, backgroundSize } = this.props
+    const { item } = this.props
     const { url } = item.filestack_file
-    const styledProps = {
-      backgroundSize,
-      url
-    }
-
     return (
-      <StyledImageItem {...styledProps} />
+      <StyledImage src={url} alt={item.name} />
     )
   }
 }
 
 ImageItem.propTypes = {
   item: MobxPropTypes.objectOrObservableObject.isRequired,
-  backgroundSize: PropTypes.string,
-}
-
-ImageItem.defaultProps = {
-  backgroundSize: 'cover',
 }
 
 export default ImageItem

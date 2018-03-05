@@ -1,6 +1,4 @@
-import PropTypes from 'prop-types'
 import styled from 'styled-components'
-import { Link } from 'react-router-dom'
 
 import v from '~/utils/variables'
 
@@ -16,28 +14,7 @@ const StyledButton = styled.button`
   }
 `
 
-const StyledRightColumn = styled.div`
-  position: absolute;
-  right: 1rem;
-`
-
-const CloseLink = styled(Link)`
-  /* add the .close class for more specificity to override quill theme-snow */
-  &.close {
-    text-decoration: none;
-    color: ${v.colors.cloudy};
-    &:hover {
-      color: ${v.colors.linkHover};
-    }
-    padding: 0;
-    height: auto;
-    position: relative;
-    top: -6px;
-    font-size: 1.75rem;
-  }
-`
-
-const TextItemToolbar = ({ closePath }) => (
+const TextItemToolbar = () => (
   <div id="quill-toolbar">
     <span className="ql-formats">
       <StyledButton className="ql-header ql-format-reg" value="">T</StyledButton>
@@ -46,16 +23,7 @@ const TextItemToolbar = ({ closePath }) => (
       {/* quill inserts ql-link SVG */}
       <StyledButton className="ql-link" />
     </span>
-    <StyledRightColumn className="ql-formats">
-      <CloseLink className="close" to={closePath}>
-        &times;
-      </CloseLink>
-    </StyledRightColumn>
   </div>
 )
-
-TextItemToolbar.propTypes = {
-  closePath: PropTypes.string.isRequired,
-}
 
 export default TextItemToolbar

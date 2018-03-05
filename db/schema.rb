@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180223170513) do
+ActiveRecord::Schema.define(version: 20180228212023) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -73,6 +73,7 @@ ActiveRecord::Schema.define(version: 20180223170513) do
     t.integer "filestack_file_id"
     t.jsonb "text_data"
     t.string "url"
+    t.string "thumbnail_url"
     t.index ["cloned_from_id"], name: "index_items_on_cloned_from_id"
   end
 

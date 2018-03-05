@@ -130,7 +130,6 @@ describe Api::V1::CollectionCardsController, type: :request, auth: true do
 
     context 'with video url attributes' do
       let(:filename) { 'apple.jpg' }
-      let(:filestack_file) { build(:filestack_file) }
       let(:params_with_video_item) {
         json_api_params(
           'collection_cards',
@@ -143,6 +142,7 @@ describe Api::V1::CollectionCardsController, type: :request, auth: true do
             'item_attributes': {
               'type': 'Item::VideoItem',
               'url': 'https://www.youtube.com/watch?v=4r7wHMg5Yjg',
+              'thumbnail_url': 'https://img.youtube.com/vi/4r7wHMg5Yjg/hqdefault.jpg',
             },
           }
         )

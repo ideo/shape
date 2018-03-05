@@ -16,11 +16,12 @@ describe('ImageItem', () => {
     )
   })
 
-  it('renders the StyledImageItem', () => {
-    expect(wrapper.find('StyledImageItem').exists()).toBe(true)
+  it('renders the StyledImage', () => {
+    expect(wrapper.find('StyledImage').exists()).toBe(true)
   })
 
-  it('passes the url to StyledImageItem', () => {
-    expect(wrapper.find('StyledImageItem').props().url).toEqual(fakeImageItem.filestack_file.url)
+  it('passes the url and alt text to StyledImage', () => {
+    expect(wrapper.find('StyledImage').props().src).toEqual(fakeImageItem.filestack_file.url)
+    expect(wrapper.find('StyledImage').props().alt).toEqual(fakeImageItem.name)
   })
 })

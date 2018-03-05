@@ -1,6 +1,8 @@
 import PropTypes from 'prop-types'
 import styled from 'styled-components'
+import _ from 'lodash'
 
+import PaddedCardCover from '~/ui/grid/covers/PaddedCardCover'
 import VideoUrl from '~/utils/VideoUrl'
 import { ITEM_TYPES } from '~/utils/variables'
 
@@ -18,14 +20,34 @@ const ValidIndicator = styled.div`
 `
 
 class VideoCreator extends React.Component {
-  state = {
-    videoUrl: '',
+  constructor(props) {
+    super(props)
+    this.state = {
+      videoUrl: '',
+      urlValid: false,
+      loading: false,
+      name: '',
+      thumbnailUrl: '',
+    }
+    this.lookupVideoAPI = _.debounce(this._lookupVideoAPI, 1000)
   }
 
   onVideoUrlChange = (e) => {
     this.setState({
-      videoUrl: e.target.value
+      videoUrl: e.target.value,
+      loading: true,
     })
+    this.lookupVideoAPI(e.target.value)
+  }
+
+  _lookupVideoAPI = async (url) => {
+    const { name, thumbnailUrl } = await VideoUrl.getAPIdetails(url)
+    this.setState({ loading: false })
+    if (name && thumbnailUrl) {
+      this.setState({ name, thumbnailUrl, urlValid: true })
+    } else {
+      this.setState({ urlValid: false })
+    }
   }
 
   videoUrlIsValid = () => (
@@ -36,10 +58,13 @@ class VideoCreator extends React.Component {
     if (this.videoUrlIsValid()) {
       // Get a normalized URL to make it easier to handle in our system
       const { normalizedUrl } = VideoUrl.parse(this.state.videoUrl)
+      const { name, thumbnailUrl } = this.state
       const attrs = {
         item_attributes: {
           type: ITEM_TYPES.VIDEO,
-          url: normalizedUrl
+          url: normalizedUrl,
+          name,
+          thumbnail_url: thumbnailUrl,
         },
       }
       this.props.createCard(attrs)
@@ -50,20 +75,22 @@ class VideoCreator extends React.Component {
 
   render() {
     let validIndicator = <ValidIndicator />
+    const { videoUrl, urlValid, loading } = this.state
 
-    if (this.state.videoUrl.length > 3) {
+    if (videoUrl.length > 3) {
       validIndicator = (
-        <ValidIndicator className={this.videoUrlIsValid() ? 'valid' : 'invalid'}>
-          {this.videoUrlIsValid() ? '✔' : 'x'}
+        <ValidIndicator className={urlValid ? 'valid' : 'invalid'}>
+          {!loading && (urlValid ? '✔' : 'x')}
+          {loading && '...'}
         </ValidIndicator>
       )
     }
 
     return (
-      <div>
+      <PaddedCardCover>
         <input
           placeholder="Video URL"
-          value={this.state.videoUrl}
+          value={videoUrl}
           onChange={this.onVideoUrlChange}
         />
         {validIndicator}
@@ -71,9 +98,9 @@ class VideoCreator extends React.Component {
           onClick={this.createVideoItem}
           type="submit"
           value="save"
-          disabled={this.props.loading}
+          disabled={this.props.loading || this.state.loading}
         />
-      </div>
+      </PaddedCardCover>
     )
   }
 }

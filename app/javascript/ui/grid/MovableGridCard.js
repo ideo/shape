@@ -121,8 +121,10 @@ class MovableGridCard extends React.PureComponent {
   }
 
   // this function gets passed down to the card, so it can place the onClick handler
-  handleClick = () => {
+  handleClick = (e) => {
     const { cardType, record } = this.props
+    if (e.target.className.match(/cancelGridClick/)) return
+
     // timeout is just a stupid thing so that Draggable doesn't complain about unmounting
     setTimeout(() => {
       this.props.routeTo(cardType, record.id)
