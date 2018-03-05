@@ -9,6 +9,7 @@ describe Archivable, type: :concern do
 
   describe 'scopes' do
     let!(:collection) { create(:collection, num_cards: 3) }
+    let!(:collection_card) { create(:collection_card, collection: collection) }
 
     it 'should be active by default' do
       expect(collection.active?).to be true
@@ -29,8 +30,9 @@ describe Archivable, type: :concern do
 
   describe 'methods' do
     describe '#archive!' do
-      let(:collection_card) { create(:collection_card_collection) }
-      let(:collection) { create(:collection, num_cards: 3, parent_collection_card: collection_card) }
+      let!(:collection_card) { create(:collection_card_collection) }
+      let!(:collection) { create(:collection, num_cards: 3, parent_collection_card: collection_card) }
+      let!(:subcollection) { create(:collection, parent_collection_card: collection.collection_cards.last) }
 
       it 'can be archived' do
         collection_card.archive!
@@ -38,22 +40,28 @@ describe Archivable, type: :concern do
         expect(collection_card.archived?).to be true
       end
 
-      it 'should be able to archive related items/collections' do
-        collection_card.archive! with: [:collection]
+      it 'should archive related items/collections' do
+        collection_card.archive!
         expect(collection_card.archived?).to be true
         expect(collection_card.collection.archived?).to be true
       end
 
-      it 'should be able to archive the parent card with the collection' do
-        collection.archive!(with: [:parent_collection_card])
+      it 'should archive the parent card with the collection' do
+        collection.archive!
         expect(collection.archived?).to be true
         expect(collection_card.archived?).to be true
       end
 
-      it 'should be able to archive without affecting relations' do
+      it 'should recursively archive everything within a collection' do
+        # archiving from the parent card
         collection_card.archive!
-        expect(collection_card.archived?).to be true
-        expect(collection_card.collection.archived?).to be false
+        # should archive the collection
+        expect(collection.archived?).to be true
+        # and that collection's card(s)
+        expect(collection.collection_cards.first.archived?).to be true
+        # including each card's items/collections...
+        expect(collection.collection_cards.first.item.archived?).to be true
+        expect(subcollection.archived?).to be true
       end
     end
   end

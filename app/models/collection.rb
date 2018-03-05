@@ -1,7 +1,9 @@
 class Collection < ApplicationRecord
   include Breadcrumbable
   include Archivable
+  archivable as: :parent_collection_card, with: %i[collection_cards]
   resourcify
+
   has_many :collection_cards, foreign_key: :parent_id
   has_many :items, through: :collection_cards
   has_many :collections, through: :collection_cards

@@ -1,5 +1,7 @@
 class CollectionCard < ApplicationRecord
   include Archivable
+  archivable with: %i[collection item]
+
   belongs_to :parent, class_name: 'Collection'
   # not all relations are truly inverse_of :parent_collection_card, i.e. when they are references
   # this is just needed for doing validations on accepts_nested_attributes_for :collection
