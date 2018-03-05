@@ -27,7 +27,7 @@ class CollectionCard < ApplicationRecord
 
   def duplicate!(shallow: false)
     cc = amoeba_dup
-    cc.order = order + 1
+    cc.order = order + 0.5
 
     unless shallow
       cc.collection = collection.duplicate! if collection.present?

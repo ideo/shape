@@ -27,7 +27,7 @@ class Api::V1::ItemsController < Api::V1::BaseController
   def duplicate
     duplicate = @item.duplicate!(copy_parent_card: true)
     if duplicate.persisted?
-      render jsonapi: duplicate
+      render jsonapi: duplicate, include: [:parent]
     else
       render_api_errors duplicate.errors
     end
