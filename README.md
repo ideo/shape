@@ -23,6 +23,12 @@ bundle install
 yarn install
 ```
 
+Setup the `.env` file with valid credentials:
+```
+cp .env.example .env
+# modify credentials
+```
+
 Create the database and migrate:
 
 ```
