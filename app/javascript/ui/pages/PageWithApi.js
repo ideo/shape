@@ -19,7 +19,6 @@ class PageWithApi extends React.Component {
     const { apiStore } = props
     return apiStore.request(this.requestPath(props))
       .then(response => {
-        apiStore.sync(response)
         // to be created in child class
         if (this.onAPILoad) {
           this.onAPILoad(response.data)

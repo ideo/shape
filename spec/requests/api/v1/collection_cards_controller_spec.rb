@@ -197,4 +197,25 @@ describe Api::V1::CollectionCardsController, type: :request, auth: true do
       expect(collection_card.reload.order).to eq(2)
     end
   end
+
+  describe 'PATCH #archive' do
+    let!(:collection_card) { create(:collection_card) }
+    let(:path) { "/api/v1/collection_cards/#{collection_card.id}/archive" }
+
+    it 'returns a 200' do
+      patch(path)
+      expect(response.status).to eq(200)
+    end
+
+    it 'matches JSON schema' do
+      patch(path)
+      expect(json['data']['attributes']).to match_json_schema('collection_card')
+    end
+
+    it 'updates the content' do
+      expect(collection_card.archived).to eq(false)
+      patch(path)
+      expect(collection_card.reload.archived).to eq(true)
+    end
+  end
 end

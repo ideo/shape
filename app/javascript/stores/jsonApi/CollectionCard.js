@@ -9,7 +9,7 @@ class CollectionCard extends BaseRecord {
     // eslint-disable-next-line no-alert
     const agree = window.confirm('Are you sure?')
     if (agree) {
-      return this.apiStore.request(`collection_cards/${this.id}/archive`, 'PUT')
+      return this.apiStore.request(`collection_cards/${this.id}/archive`, 'PATCH')
         .then((response) => {
           this.parent.collection_cards.remove(this)
           // TODO: replace with backend reordering

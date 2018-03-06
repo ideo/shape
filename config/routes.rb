@@ -13,7 +13,7 @@ Rails.application.routes.draw do
         resources :items, shallow: true, except: :index
         resources :collections, only: :create
         member do
-          put 'archive'
+          patch 'archive'
         end
       end
       resources :organizations, only: [:show, :update] do
