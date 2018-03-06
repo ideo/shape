@@ -45,15 +45,6 @@ class Api::V1::CollectionsController < Api::V1::BaseController
     end
   end
 
-  def duplicate
-    duplicate = @collection.duplicate!(copy_parent_card: true)
-    if duplicate.persisted?
-      render jsonapi: duplicate, include: [:parent]
-    else
-      render_api_errors duplicate.errors
-    end
-  end
-
   private
 
   def render_collection
@@ -69,7 +60,7 @@ class Api::V1::CollectionsController < Api::V1::BaseController
   def load_collection_with_cards
     # item/collection will turn into "record" when serialized
     @collection = Collection.where(id: params[:id])
-                            .includes(collection_cards: %i[item collection])
+                            .includes(collection_cards: [:collection, item: [:filestack_file]])
                             .first
   end
 

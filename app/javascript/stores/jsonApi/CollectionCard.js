@@ -5,15 +5,6 @@ class CollectionCard extends BaseRecord {
     return this.apiStore.find('collections', this.parent_id)
   }
 
-  // get record() {
-  //   if (this.item) {
-  //     return this.item
-  //   } else if (this.collection) {
-  //     return this.collection
-  //   }
-  //   return null
-  // }
-
   API_create() {
     return this.apiStore.request('collection_cards', 'POST', { data: this.toJsonApi() })
       .then((response) => {
@@ -30,12 +21,11 @@ class CollectionCard extends BaseRecord {
   }
 
   API_duplicate() {
+    // This method will increment order of all cards after this one
     return this.apiStore.request(`collection_cards/${this.id}/duplicate`, 'POST')
       .then((response) => {
-        const newCard = response.data
-        this.parent.collection_cards.push(newCard)
-        // Update cards after new one being added
-        this.parent.API_updateCards()
+        // Refresh collection after re-ordering - force reloading
+        this.apiStore.fetch('collections', this.parent.id, true)
       })
       .catch((error) => {
         console.warn(error)

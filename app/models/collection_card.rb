@@ -60,7 +60,11 @@ class CollectionCard < ApplicationRecord
                        .where.not(id: id)
                        .pluck(:id)
 
+    return true if update_ids.blank?
+
     CollectionCard.increment_counter(:order, update_ids)
+
+    true
   end
 
   private

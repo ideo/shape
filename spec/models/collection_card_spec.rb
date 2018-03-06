@@ -75,6 +75,10 @@ RSpec.describe CollectionCard, type: :model do
       expect(order_arr).to match_array([0, 2, 3, 4, 5])
     end
 
+    it 'should return true if success' do
+      expect(collection_cards.first.increment_next_card_orders!).to be true
+    end
+
     context 'with another card created at same order as existing' do
       let(:second_card_order) { collection_cards[1].order }
       let!(:dupe_card) do

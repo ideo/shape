@@ -34,9 +34,9 @@ RSpec.describe Item, type: :model do
         expect(dupe.id).not_to eq(item.parent_collection_card.id)
       end
 
-      it 'increases the order by 0.5' do
+      it 'increases the order by 1' do
         dupe = item.duplicate!(copy_parent_card: true)
-        expect(dupe.parent_collection_card.order).to eq(item.parent_collection_card.order + 0.5)
+        expect(dupe.parent_collection_card.order).to eq(item.parent_collection_card.order + 1)
       end
     end
   end

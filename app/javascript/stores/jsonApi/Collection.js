@@ -19,17 +19,6 @@ class Collection extends BaseRecord {
       })
   }
 
-  API_duplicate() {
-    return this.apiStore.request(`collections/${this.id}/duplicate`, 'POST')
-      .then((response) => {
-        const newCollection = response.data
-        // TODO: handle redirect to new collection
-      })
-      .catch((error) => {
-        console.warn(error)
-      })
-  }
-
   // after we reorder a single card, we want to make sure everything goes into sequential order
   _reorderCards() {
     if (this.collection_cards) {

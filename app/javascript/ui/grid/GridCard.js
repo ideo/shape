@@ -177,7 +177,6 @@ class GridCard extends React.Component {
           <CardMenu
             cardId={this.props.card.id}
             className="card-menu"
-            visible={this.state.menuVisible}
             handleShare={this.shareCard}
             handleDuplicate={this.duplicateCard}
             handleLink={this.linkCard}

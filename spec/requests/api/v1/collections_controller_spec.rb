@@ -219,23 +219,4 @@ describe Api::V1::CollectionsController, type: :request, auth: true do
       expect(collection_card.reload.order).to eq(1)
     end
   end
-
-  describe 'POST #duplicate' do
-    let!(:collection) { create(:collection) }
-    let(:path) { "/api/v1/collections/#{collection.id}/duplicate" }
-
-    it 'returns a 200' do
-      post(path)
-      expect(response.status).to eq(200)
-    end
-
-    it 'creates new collection' do
-      expect { post(path) }.to change(Collection, :count).by(1)
-    end
-
-    it 'returns new collection' do
-      post(path)
-      expect(json['data']['attributes']['id']).not_to eq(collection.id)
-    end
-  end
 end

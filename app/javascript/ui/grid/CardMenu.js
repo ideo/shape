@@ -86,9 +86,7 @@ class CardMenu extends React.PureComponent {
   }
 
   setOpen = (open, closeOthers = true) => {
-    this.setState({
-      open: open,
-    })
+    this.setState({ open })
 
     if (open && closeOthers) {
       // Close any other open menus
