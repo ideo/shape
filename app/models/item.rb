@@ -1,7 +1,8 @@
 class Item < ApplicationRecord
   include Breadcrumbable
   include Archivable
-  archivable as: :parent_collection_card
+  archivable as: :parent_collection_card,
+             with: %i[reference_collection_cards]
   resourcify
 
   belongs_to :filestack_file, dependent: :destroy, optional: true
@@ -13,7 +14,10 @@ class Item < ApplicationRecord
           inverse_of: :item
 
   # All collection cards this is linked to
-  has_many :collection_cards, -> { reference }
+  has_many :reference_collection_cards,
+           -> { reference },
+           class_name: 'CollectionCard',
+           inverse_of: :referenced_item
 
   delegate :parent, to: :parent_collection_card, allow_nil: true
 

@@ -7,5 +7,5 @@ fi
 ttab heroku local web -f Procfile.development
 # echo 'Starting heroku local to run webpack-dev-server...'
 ttab heroku local webpack -f Procfile.development
-# echo 'Starting spring; Opening atom...'
-ttab spring server --background && atom .
+# echo 'Opening atom...'
+ttab atom .

@@ -5,16 +5,16 @@ module Archivable
     scope :archived, -> { where(archived: true) }
     scope :active, -> { where(archived: false) }
     default_scope -> { active }
+
+    class_attribute :archive_with
+    class_attribute :archive_as
   end
 
   class_methods do
     # define which relations should get archived (much like dependent: :destroy)
-    attr_reader :archive_with
-    attr_reader :archive_as
-
     def archivable(as: nil, with: [])
-      @archive_as = as
-      @archive_with = with
+      self.archive_as = as
+      self.archive_with = with
     end
 
     # Helpers to add archived field to any model
@@ -51,10 +51,11 @@ module Archivable
     if self.class.archive_with.present?
       self.class.archive_with.each do |relation|
         related = try(relation)
-        # use .map if relation is one-to-many
         if related.is_a? ActiveRecord::Relation
+          # use .map if relation is one-to-many (e.g. collection_cards)
           related.map { |r| r.try(:archive_with_relations!) }
         else
+          # otherwise just archive the relation (e.g. item)
           related.try(:archive_with_relations!)
         end
       end

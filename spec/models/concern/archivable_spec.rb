@@ -30,7 +30,7 @@ describe Archivable, type: :concern do
 
   describe 'methods' do
     describe '#archive!' do
-      let!(:collection_card) { create(:collection_card_collection) }
+      let(:collection_card) { create(:collection_card_collection) }
       let!(:collection) { create(:collection, num_cards: 3, parent_collection_card: collection_card) }
       let!(:subcollection) { create(:collection, parent_collection_card: collection.collection_cards.last) }
 
