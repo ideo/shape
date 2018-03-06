@@ -7,6 +7,8 @@ Install all the libraries first:
 brew install nvm
 nvm install 8.9.4
 brew install yarn
+curl -L https://get.rvm.io | bash -s stable --auto-dotfiles --autolibs=enable --rails
+brew install postgresql
 ```
 
 Clone the app and install the gems:
@@ -19,6 +21,12 @@ cd oie-2/
 gem install bundler
 bundle install
 yarn install
+```
+
+Setup the `.env` file with valid credentials:
+```
+cp .env.example .env
+# modify credentials
 ```
 
 Create the database and migrate:
