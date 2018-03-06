@@ -57,4 +57,37 @@ RSpec.describe CollectionCard, type: :model do
       end
     end
   end
+
+  describe '#increment_next_card_orders!' do
+    let(:collection) { create(:collection) }
+    let!(:collection_cards) { create_list(:collection_card, 5, parent: collection) }
+
+    before do
+      # Make sure cards are in sequential order
+      collection_cards.each_with_index do |card, i|
+        card.update_attribute(:order, i)
+      end
+    end
+
+    it 'should increment all orders by 1' do
+      collection_cards.first.increment_next_card_orders!
+      order_arr = collection_cards.map(&:reload).map(&:order)
+      expect(order_arr).to match_array([0, 2, 3, 4, 5])
+    end
+
+    context 'with another card created at same order as existing' do
+      let(:second_card_order) { collection_cards[1].order }
+      let!(:dupe_card) do
+        create(:collection_card, parent: collection, order: second_card_order)
+      end
+
+      it 'should increment all cards by 1, and leave dupe card' do
+        expect(dupe_card.order).to eq(second_card_order)
+        dupe_card.increment_next_card_orders!
+        order_array = collection_cards.map(&:reload).map(&:order)
+        expect(dupe_card.reload.order).to eq(1)
+        expect(order_array).to match_array([0, 2, 3, 4, 5])
+      end
+    end
+  end
 end

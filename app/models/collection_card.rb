@@ -27,7 +27,7 @@ class CollectionCard < ApplicationRecord
 
   def duplicate!(shallow: false)
     cc = amoeba_dup
-    cc.order = order + 0.5
+    cc.order += 1
 
     unless shallow
       cc.collection = collection.duplicate! if collection.present?
@@ -49,6 +49,18 @@ class CollectionCard < ApplicationRecord
 
   def primary?
     !reference
+  end
+
+  # increment the order of all cards 'after' this card by 1
+  def increment_next_card_orders!
+    greater_than_or_equal = CollectionCard.arel_table[:order].gteq(order)
+
+    update_ids = parent.collection_cards
+                       .where(greater_than_or_equal)
+                       .where.not(id: id)
+                       .pluck(:id)
+
+    CollectionCard.increment_counter(:order, update_ids)
   end
 
   private
