@@ -7,6 +7,8 @@ Install all the libraries first:
 brew install nvm
 nvm install 8.9.4
 brew install yarn
+curl -L https://get.rvm.io | bash -s stable --auto-dotfiles --autolibs=enable --rails
+brew install postgresql
 ```
 
 Clone the app and install the gems:
