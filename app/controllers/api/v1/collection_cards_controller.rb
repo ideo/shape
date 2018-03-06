@@ -32,6 +32,14 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
     end
   end
 
+  def archive
+    if @collection_card.archive!
+      render jsonapi: @collection_card.reload
+    else
+      render_api_errors @collection_card.errors
+    end
+  end
+
   private
 
   def load_parent_collection

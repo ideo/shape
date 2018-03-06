@@ -5,14 +5,19 @@ class CollectionCard extends BaseRecord {
     return this.apiStore.find('collections', this.parent_id)
   }
 
-  // get record() {
-  //   if (this.item) {
-  //     return this.item
-  //   } else if (this.collection) {
-  //     return this.collection
-  //   }
-  //   return null
-  // }
+  API_archive() {
+    // eslint-disable-next-line no-alert
+    const agree = window.confirm('Are you sure?')
+    if (agree) {
+      return this.apiStore.request(`collection_cards/${this.id}/archive`, 'PUT')
+        .then((response) => {
+          this.parent.collection_cards.remove(this)
+          // TODO: replace with backend reordering
+          this.parent.API_updateCards()
+        })
+    }
+    return false
+  }
 
   API_create() {
     // we call apiStore.request so we can interact with the response data

@@ -12,6 +12,9 @@ Rails.application.routes.draw do
       resources :collection_cards, shallow: true do
         resources :items, shallow: true, except: :index
         resources :collections, only: :create
+        member do
+          put 'archive'
+        end
       end
       resources :organizations, only: [:show, :update] do
         collection do
