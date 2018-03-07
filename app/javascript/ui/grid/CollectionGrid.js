@@ -367,7 +367,7 @@ CollectionGrid.propTypes = {
   gutter: PropTypes.number.isRequired,
   updateCollection: PropTypes.func.isRequired,
   collection: MobxPropTypes.objectOrObservableObject.isRequired,
-  collectionCards: MobxPropTypes.objectOrObservableObject.isRequired,
+  collectionCards: PropTypes.arrayOf(MobxPropTypes.objectOrObservableObject).isRequired,
   blankContentToolState: MobxPropTypes.objectOrObservableObject,
 }
 CollectionGrid.defaultProps = {

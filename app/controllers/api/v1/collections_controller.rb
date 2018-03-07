@@ -61,8 +61,15 @@ class Api::V1::CollectionsController < Api::V1::BaseController
   def load_collection_with_cards
     # item/collection will turn into "record" when serialized
     @collection = Collection.where(id: params[:id])
-                            .includes(collection_cards: [:collection, item: [:filestack_file]])
-                            .first
+                            .includes(
+                              collection_cards: [
+                                :parent,
+                                :collection,
+                                item: [
+                                  :filestack_file,
+                                ],
+                              ],
+                            ).first
   end
 
   def collection_params
