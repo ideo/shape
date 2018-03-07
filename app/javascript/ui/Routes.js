@@ -8,7 +8,7 @@ import ItemPage from '~/ui/pages/ItemPage'
 import Loader from '~/ui/layout/Loader'
 import ClickWrapper from '~/ui/layout/ClickWrapper'
 
-@inject('apiStore', 'uiStore')
+@inject('apiStore')
 @observer
 class Routes extends React.Component {
   componentDidMount() {
@@ -22,18 +22,16 @@ class Routes extends React.Component {
   }
 
   render() {
-    const { history, apiStore, uiStore } = this.props
+    const { history, apiStore } = this.props
     if (!apiStore.currentUser) {
       return <Loader />
     }
     return (
       <div>
         <ClickWrapper />
-        { !!uiStore.organizationMenuOpen &&
-          <OrganizationMenu
-            organization={apiStore.currentUser.current_organization}
-          />
-        }
+        <OrganizationMenu
+          organization={apiStore.currentUser.current_organization}
+        />
         <Router history={history}>
           <Switch>
             <Route exact path="/" component={CollectionPage} />
@@ -51,7 +49,6 @@ Routes.propTypes = {
 }
 Routes.wrappedComponent.propTypes = {
   apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
-  uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 
 export default Routes

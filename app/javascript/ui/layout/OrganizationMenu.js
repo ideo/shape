@@ -14,9 +14,10 @@ class OrganizationMenu extends React.Component {
   }
 
   render() {
+    const { uiStore } = this.props
     return (
       <Dialog
-        open
+        open={!!uiStore.organizationMenuOpen}
         onClose={this.handleClose}
         aria-labelledby="form-dialog-title"
         BackdropProps={{ invisible: true }}
