@@ -15,7 +15,17 @@ class Api::V1::CollectionsController < Api::V1::BaseController
   end
 
   def show
-    render_collection
+    render_collection(include:
+      [
+        :editors,
+        :viewers,
+        collection_cards: [
+          record: [
+            :filestack_file,
+          ],
+        ],
+      ],
+    )
   end
 
   def me
@@ -47,14 +57,15 @@ class Api::V1::CollectionsController < Api::V1::BaseController
 
   private
 
-  def render_collection
-    render jsonapi: @collection,
-           include: [
-             # include collection_cards for UI to receive any updates
-             collection_cards: [
-               record: [:filestack_file],
-             ],
-           ]
+  def render_collection(include: nil)
+    # include collection_cards for UI to receive any updates
+    include ||= [
+      collection_cards: [
+        record: [:filestack_file],
+      ],
+    ]
+    
+    render jsonapi: @collection, include: include
   end
 
   def load_collection_with_cards

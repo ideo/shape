@@ -9,4 +9,10 @@ class SerializableCollection < BaseJsonSerializer
       @current_user,
     ).to_api
   end
+  has_many :editors do
+    data { @object.editors }
+  end
+  has_many :viewers do
+    data { @object.viewers }
+  end
 end

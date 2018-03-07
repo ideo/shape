@@ -1,6 +1,7 @@
 class Item < ApplicationRecord
   include Breadcrumbable
-  resourcify
+  include Resourceable
+  resourceable roles: %i[editor viewer]
 
   belongs_to :filestack_file, dependent: :destroy, optional: true
 
@@ -19,14 +20,6 @@ class Item < ApplicationRecord
   validates :type, presence: true
 
   accepts_nested_attributes_for :filestack_file
-
-  def editors
-    User.with_role(Role::EDITOR, self)
-  end
-
-  def viewers
-    User.with_role(Role::VIEWER, self)
-  end
 
   def breadcrumb_title
     name

@@ -1,6 +1,7 @@
 class Collection < ApplicationRecord
   include Breadcrumbable
-  resourcify
+  include Resourceable
+  resourceable roles: %i[editor viewer]
   has_many :collection_cards, foreign_key: :parent_id
   has_many :items, through: :collection_cards
   has_many :collections, through: :collection_cards
@@ -39,14 +40,6 @@ class Collection < ApplicationRecord
 
   def read_only?
     false
-  end
-
-  def editors
-    User.with_role(Role::EDITOR, becomes(Collection))
-  end
-
-  def viewers
-    User.with_role(Role::VIEWER, becomes(Collection))
   end
 
   def breadcrumb_title
