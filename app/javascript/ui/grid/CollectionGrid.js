@@ -330,9 +330,11 @@ class CollectionGrid extends React.Component {
         // TODO: some kind of error catch if no record?
         if (card.record) {
           ({ record } = card)
+          // getRecordType gets either 'items' or 'collections'
           cardType = card.record.getRecordType()
         }
       }
+      const { openCardMenuId } = this.props.uiStore
       grid.push(
         <MovableGridCard
           key={card.id}
@@ -346,6 +348,7 @@ class CollectionGrid extends React.Component {
           onResizeStop={this.onResizeStop}
           routeTo={this.props.routingStore.routeTo}
           parent={this.props.collection}
+          menuOpen={openCardMenuId === card.id}
         />
       )
     })

@@ -15,7 +15,7 @@ StyledClickWrapper.displayName = 'StyledClickWrapper'
 @observer
 class ClickWrapper extends React.Component {
   handleClick = () => {
-    this.props.uiStore.closeCardMenuIfOpen()
+    this.props.uiStore.openCardMenu(false)
   }
 
   render () {

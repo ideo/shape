@@ -25,6 +25,7 @@ export default {
     header: 200,
     cardDragging: 160,
     gridCard: 150,
+    gridCardBg: 1,
   },
 
   quillDefaults: {

@@ -17,6 +17,7 @@ const props = {
   onResize: jest.fn(),
   onMoveStop: jest.fn(),
   routeTo: jest.fn(),
+  menuOpen: false,
 }
 
 let wrapper

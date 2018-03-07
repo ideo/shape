@@ -49,12 +49,12 @@ export const StyledTopRightActions = styled.div`
   position: absolute;
   top: 0.35rem;
   right: 0.25rem;
-  z-index: 150;
+  z-index: ${v.zIndex.gridCard};
   .card-menu {
     margin-top: 0.25rem;
     display: inline-block;
     vertical-align: top;
-    z-index: 150;
+    z-index: ${v.zIndex.gridCard};
     color: ${v.colors.gray};
   }
 `
@@ -175,9 +175,9 @@ class GridCard extends React.Component {
             role="button"
           />
           <CardMenu
-            cardId={this.props.card.id}
             className="card-menu"
-            visible={this.state.menuVisible}
+            cardId={this.props.card.id}
+            menuOpen={this.props.menuOpen}
             handleShare={this.shareCard}
             handleDuplicate={this.duplicateCard}
             handleLink={this.linkCard}
@@ -202,6 +202,7 @@ GridCard.propTypes = {
   record: MobxPropTypes.objectOrObservableObject.isRequired,
   dragging: PropTypes.bool.isRequired,
   handleClick: PropTypes.func.isRequired,
+  menuOpen: PropTypes.bool.isRequired,
 }
 
 export default GridCard
