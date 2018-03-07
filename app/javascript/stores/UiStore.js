@@ -3,7 +3,7 @@ import { observable, action } from 'mobx'
 export default class UiStore {
   @observable blankContentToolState = null
   @observable openCardMenuId = false
-  @observable organizationMenuOpen = null
+  @observable organizationMenuOpen = false
   @observable gridSettings = {
     cols: 4,
     gutter: 20,
