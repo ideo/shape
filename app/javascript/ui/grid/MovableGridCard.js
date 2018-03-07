@@ -15,7 +15,9 @@ import ResizeIcon from '~/ui/icons/ResizeIcon'
 
 const StyledResizeIcon = styled.div`
   position: absolute;
-  z-index: ${v.zIndex.gridCard};
+  /* hide the resize icon while the menu is open so they don't overlap */
+  display: ${props => (props.menuOpen ? 'none' : 'block')};
+  z-index: ${v.zIndex.gridCardBg};
   right: 0.75rem;
   bottom: 0.75rem;
   color: ${v.colors.gray};
@@ -198,6 +200,7 @@ class MovableGridCard extends React.PureComponent {
       record,
       position: { xPos },
       position: { yPos },
+      menuOpen,
     } = this.props
 
     let {
@@ -252,6 +255,7 @@ class MovableGridCard extends React.PureComponent {
       // also so that click handler doesn't register while dragging
       dragging: !moveComplete,
       handleClick: this.handleClick,
+      menuOpen,
     }
 
     return (
@@ -290,7 +294,7 @@ class MovableGridCard extends React.PureComponent {
           extendsProps={{
             handleComponent: {
               bottomRight: () => (
-                <StyledResizeIcon className="show-on-hover">
+                <StyledResizeIcon menuOpen={menuOpen} className="show-on-hover">
                   <ResizeIcon />
                 </StyledResizeIcon>
               )
@@ -328,6 +332,7 @@ MovableGridCard.propTypes = {
   onResize: PropTypes.func.isRequired,
   onMoveStop: PropTypes.func.isRequired,
   routeTo: PropTypes.func.isRequired,
+  menuOpen: PropTypes.bool.isRequired,
 }
 
 export default MovableGridCard
