@@ -1,10 +1,6 @@
 import BaseRecord from './BaseRecord'
 
 class CollectionCard extends BaseRecord {
-  get parent() {
-    return this.apiStore.find('collections', this.parent_id)
-  }
-
   API_create() {
     return this.apiStore.request('collection_cards', 'POST', { data: this.toJsonApi() })
       .then((response) => {

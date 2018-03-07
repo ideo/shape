@@ -52,6 +52,7 @@ class Api::V1::CollectionsController < Api::V1::BaseController
            include: [
              # include collection_cards for UI to receive any updates
              collection_cards: [
+               :parent,
                record: [:filestack_file],
              ],
            ]

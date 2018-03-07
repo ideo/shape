@@ -17,7 +17,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
                                         collection: @collection,
                                         user: current_user)
     if builder.create
-      render jsonapi: builder.collection_card, include: [record: [:filestack_file]]
+      render jsonapi: builder.collection_card, include: [:parent, record: [:filestack_file]]
     else
       render_api_errors builder.errors
     end
