@@ -29,7 +29,7 @@ export const StyledMenuWrapper = styled.div`
 StyledMenuWrapper.displayName = 'StyledMenuWrapper'
 
 export const StyledMenu = styled.ul`
-  background-color: #FFFFFF;
+  background-color: white;
   width: 200px;
   box-shadow: 0 0 8px 0 rgba(0, 0, 0, 0.36);
 `
@@ -77,40 +77,29 @@ export const StyledMenuItem = styled.li`
 
 @inject('uiStore')
 class CardMenu extends React.PureComponent {
-  state = {
-    open: false,
-  }
-
   get cardId() {
     return this.props.cardId
   }
 
-  setOpen = (open, closeOthers = true) => {
-    this.setState({
-      open: open,
-    })
-
-    if (open && closeOthers) {
-      // Close any other open menus
-      this.props.uiStore.cardMenuOpened(this)
-    }
-  }
-
   handleMouseLeave = () => {
-    if (this.state.open) {
-      this.setOpen(false, false)
+    if (this.props.menuOpen) {
+      this.props.uiStore.openCardMenu(false)
     }
   }
 
   toggleOpen = (e) => {
     e.stopPropagation()
-    this.setOpen(!this.state.open)
+    if (this.props.menuOpen) {
+      this.props.uiStore.openCardMenu(false)
+    } else {
+      this.props.uiStore.openCardMenu(this.cardId)
+    }
   }
 
   render() {
     const { className } = this.props
     let css = className || ''
-    if (this.state.open) {
+    if (this.props.menuOpen) {
       css += ' open'
     }
     return (
@@ -184,6 +173,7 @@ CardMenu.propTypes = {
   handleLink: PropTypes.func.isRequired,
   handleOrganize: PropTypes.func.isRequired,
   handleArchive: PropTypes.func.isRequired,
+  menuOpen: PropTypes.bool.isRequired,
 }
 
 CardMenu.defaultProps = {
