@@ -64,7 +64,7 @@ class Api::V1::CollectionsController < Api::V1::BaseController
         record: [:filestack_file],
       ],
     ]
-    
+
     render jsonapi: @collection, include: include
   end
 

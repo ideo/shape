@@ -2,6 +2,7 @@
 import { Fragment } from 'react'
 import ReactRouterPropTypes from 'react-router-prop-types'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
+import styled from 'styled-components'
 
 import PageWithApi from '~/ui/pages/PageWithApi'
 import Loader from '~/ui/layout/Loader'
@@ -10,8 +11,19 @@ import PageContainer from '~/ui/layout/PageContainer'
 import CollectionGrid from '~/ui/grid/CollectionGrid'
 import H1 from '~/ui/global/H1'
 import Breadcrumb from '~/ui/layout/Breadcrumb'
+import RolesSummary from '~/ui/layout/RolesSummary'
 
 const isHomepage = ({ path }) => path === '/'
+
+const StyledTitleAndRoles = styled.div`
+  h1 {
+    float: left;
+  }
+  .roles-summary {
+    float: right;
+  }
+  clear: both;
+`
 
 @inject('apiStore', 'uiStore')
 @observer
@@ -52,6 +64,10 @@ class CollectionPage extends PageWithApi {
     }
   }
 
+  showObjectRoleDialog = () => {
+    console.log('Manage object roles')
+  }
+
   updateCollection = () => {
     // TODO: what if there's no collection?
     // calling .save() will receive any API updates and sync them
@@ -70,7 +86,15 @@ class CollectionPage extends PageWithApi {
       <Fragment>
         <Header>
           <Breadcrumb items={breadcrumb} />
-          <H1>{collection.name}</H1>
+          <StyledTitleAndRoles>
+            <H1>{collection.name}</H1>
+            <RolesSummary
+              className="roles-summary"
+              handleClick={this.showObjectRoleDialog}
+              viewers={collection.viewers}
+              editors={collection.editors}
+            />
+          </StyledTitleAndRoles>
         </Header>
         <PageContainer>
           <CollectionGrid
