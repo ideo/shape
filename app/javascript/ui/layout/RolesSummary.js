@@ -7,19 +7,24 @@ import UserAvatar from './UserAvatar'
 
 const MAX_USERS_TO_SHOW = 5
 
+const StyledRolesSummary = styled.div
+StyledRolesSummary.displayName = 'StyledRolesSummary'
+
 const StyledAvatarGroup = styled.div`
   display: inline-block;
   margin: 0 12px;
-  .title {
-    font-family: 'Gotham';
-    text-align: ${props => props.align || 'left'};
-    color: ${v.colors.cloudy};
-    font-size: 1rem;
-    font-weight: 100;
-    margin: 0 0 6px 0;
-  }
 `
 StyledAvatarGroup.displayName = 'StyledAvatarGroup'
+
+const StyledRoleTitle = styled.div`
+  font-family: 'Gotham';
+  text-align: ${props => props.align || 'left'};
+  color: ${v.colors.cloudy};
+  font-size: 1rem;
+  font-weight: 100;
+  margin: 0 0 6px 0;
+`
+StyledRoleTitle.displayName = 'StyledRoleTitle'
 
 const StyledUser = styled.div`
   display: inline-block;
@@ -32,6 +37,7 @@ const StyledUser = styled.div`
     height: 30px;
   }
 `
+StyledUser.displayName = 'StyledUser'
 
 const StyledSeparator = styled.div`
   width: 1px;
@@ -61,11 +67,11 @@ class RolesSummary extends React.PureComponent {
   // prioritizing editors over viewers
   get viewersAndEditorsLimited() {
     let { editors, viewers } = this.props
-    editors = editors.slice(0, MAX_USERS_TO_SHOW - 1)
+    editors = editors.slice(0, MAX_USERS_TO_SHOW)
 
     if (editors.length < MAX_USERS_TO_SHOW) {
       const numViewers = MAX_USERS_TO_SHOW - editors.length
-      viewers = viewers.slice(0, numViewers - 1)
+      viewers = viewers.slice(0, numViewers)
     } else {
       viewers = []
     }
@@ -73,28 +79,21 @@ class RolesSummary extends React.PureComponent {
     return { editors, viewers }
   }
 
-  get addUserBtn() {
-    return (
-      <StyledAddUserBtn
-        onClick={this.props.handleClick}
-      >+</StyledAddUserBtn>
-    )
-  }
-
   get renderEditors() {
     const { editors, viewers } = this.viewersAndEditorsLimited
-
-    if (editors.length === 0) return ''
+    // If there aren't any editors or viewers, render with add user button
+    // If there aren't any editors but are viewers, don't render label/button
+    if (editors.length === 0 && viewers.length > 0) return ''
 
     const editorAvatars = editors.map(editor => (
-      <StyledUser key={editor.id}>
+      <StyledUser key={editor.id} className="editor">
         <UserAvatar user={editor} />
       </StyledUser>
     ))
 
     return (
       <StyledAvatarGroup align="right">
-        <div className="title">Editors</div>
+        <StyledRoleTitle>Editors</StyledRoleTitle>
         {(editors.length > 0 || viewers.length === 0) ? this.addUserBtn : ''}
         {editorAvatars}
       </StyledAvatarGroup>
@@ -105,30 +104,36 @@ class RolesSummary extends React.PureComponent {
     const { viewers, editors } = this.viewersAndEditorsLimited
 
     if (viewers.length === 0) return ''
-
     const viewerAvatars = viewers.map(viewer => (
-      <StyledUser key={viewer.id}>
+      <StyledUser key={viewer.id} className="viewer">
         <UserAvatar user={viewer} />
       </StyledUser>
     ))
     return (
       <StyledAvatarGroup>
-        <div className="title">Viewers</div>
+        <StyledRoleTitle>Viewers</StyledRoleTitle>
         {editors.length === 0 ? this.addUserBtn : ''}
         {viewerAvatars}
       </StyledAvatarGroup>
     )
   }
 
+  get addUserBtn() {
+    return (
+      <StyledAddUserBtn
+        onClick={this.props.handleClick}
+      >+</StyledAddUserBtn>
+    )
+  }
+
   render() {
     const { editors, viewers } = this.viewersAndEditorsLimited
     return (
-      <div className={this.props.className}>
-        {(editors.length === 0 && viewers.length === 0) ? this.addUserBtn : ''}
+      <StyledRolesSummary className={this.props.className}>
         {this.renderEditors}
         {(editors.length > 0 && viewers.length > 0) ? <StyledSeparator /> : ''}
         {this.renderViewers}
-      </div>
+      </StyledRolesSummary>
     )
   }
 }

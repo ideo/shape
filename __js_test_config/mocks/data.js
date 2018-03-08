@@ -65,6 +65,7 @@ export const fakeCollection = {
   ]
 }
 export const fakeUserAttrs = {
+  id: 1,
   first_name: 'Oprah',
   last_name: 'Winfrey',
   email: 'oprah@winfrey.com',
