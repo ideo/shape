@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types'
-import { observable } from 'mobx'
+import { action, observable } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import Dialog, {
   DialogContent,
@@ -24,6 +24,7 @@ class OrganizationMenu extends React.Component {
     uiStore.closeOrganizationMenu()
   }
 
+  @action
   handleOrganizationClick = () => {
     if (!this.editOrganization) {
       this.editOrganizationOpen = true
@@ -67,5 +68,4 @@ OrganizationMenu.wrappedComponent.propTypes = {
   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 
-// apply the wrapper here so that it doesn't interfere with propType definition
 export default withStyles(materialStyles)(OrganizationMenu)
