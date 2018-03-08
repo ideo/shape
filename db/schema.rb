@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180228212023) do
+ActiveRecord::Schema.define(version: 20180302185830) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -25,6 +25,7 @@ ActiveRecord::Schema.define(version: 20180228212023) do
     t.bigint "item_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.boolean "archived", default: false
     t.index ["collection_id"], name: "index_collection_cards_on_collection_id"
     t.index ["item_id"], name: "index_collection_cards_on_item_id"
     t.index ["parent_id"], name: "index_collection_cards_on_parent_id"
@@ -38,6 +39,7 @@ ActiveRecord::Schema.define(version: 20180228212023) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.jsonb "breadcrumb"
+    t.boolean "archived", default: false
     t.index ["cloned_from_id"], name: "index_collections_on_cloned_from_id"
     t.index ["organization_id"], name: "index_collections_on_organization_id"
   end

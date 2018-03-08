@@ -6,6 +6,8 @@ import { withStyles } from 'material-ui/styles'
 const materialStyles = {
   smallAvatar: {
     width: 34,
+    marginLeft: 5,
+    marginRight: 5,
     height: 34,
   }
 }

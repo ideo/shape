@@ -1,9 +1,16 @@
 class CollectionCard < ApplicationRecord
+  include Archivable
+  archivable with: %i[collection item]
+
   belongs_to :parent, class_name: 'Collection'
-  # not all relations are truly inverse_of :parent_collection_card, i.e. when they are references
-  # this is just needed for doing validations on accepts_nested_attributes_for :collection
+
+  # TODO: Need to refactor CollectionCards to have a subclass e.g. CollectionCard::LinkedCollectionCard
+  # Currently this `collection` vs. `referenced_collection` doesn't exactly work because there's nothing
+  # differentiating the two relationships.
   belongs_to :collection, optional: true, inverse_of: :parent_collection_card
   belongs_to :item, optional: true, inverse_of: :parent_collection_card
+  belongs_to :referenced_item, class_name: 'Item', optional: true, inverse_of: :reference_collection_cards, foreign_key: 'item_id'
+  belongs_to :referenced_collection, class_name: 'Collection', optional: true, inverse_of: :reference_collection_cards, foreign_key: 'collection_id'
 
   before_validation :assign_order, if: :assign_order?
   before_create :assign_default_height_and_width
@@ -18,6 +25,26 @@ class CollectionCard < ApplicationRecord
 
   accepts_nested_attributes_for :collection, :item
 
+  amoeba do
+    enable
+    exclude_association :collection
+    exclude_association :item
+    exclude_association :parent
+  end
+
+  def duplicate!(shallow: false)
+    cc = amoeba_dup
+    cc.order += 1
+
+    unless shallow
+      cc.collection = collection.duplicate! if collection.present?
+      cc.item = item.duplicate! if item.present?
+    end
+
+    cc.save
+    cc
+  end
+
   def record
     return item if item.present?
     return collection if collection.present?
@@ -29,6 +56,22 @@ class CollectionCard < ApplicationRecord
 
   def primary?
     !reference
+  end
+
+  # increment the order of all cards 'after' this card by 1
+  def increment_next_card_orders!
+    greater_than_or_equal = CollectionCard.arel_table[:order].gteq(order)
+
+    update_ids = parent.collection_cards
+                       .where(greater_than_or_equal)
+                       .where.not(id: id)
+                       .pluck(:id)
+
+    return true if update_ids.blank?
+
+    CollectionCard.increment_counter(:order, update_ids)
+
+    true
   end
 
   private

@@ -5,6 +5,7 @@ import { Flex, Box } from 'reflexbox'
 
 import Logo from '~/ui/layout/Logo'
 import PlainLink from '~/ui/global/PlainLink'
+import OrganizationAvatar from '~/ui/layout/OrganizationAvatar'
 import UserAvatar from '~/ui/layout/UserAvatar'
 import v from '~/utils/variables'
 
@@ -39,7 +40,10 @@ class Header extends React.Component {
               </PlainLink>
             </Box>
 
-            <Box>
+            <Box flex>
+              <OrganizationAvatar
+                organization={currentUser.current_organization}
+              />
               <UserAvatar user={currentUser} />
             </Box>
           </Flex>

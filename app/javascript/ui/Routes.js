@@ -3,6 +3,7 @@ import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import { Router, Switch, Route } from 'react-router-dom'
 
 import CollectionPage from '~/ui/pages/CollectionPage'
+import OrganizationMenu from '~/ui/layout/OrganizationMenu'
 import ItemPage from '~/ui/pages/ItemPage'
 import Loader from '~/ui/layout/Loader'
 import ClickWrapper from '~/ui/layout/ClickWrapper'
@@ -14,7 +15,6 @@ class Routes extends React.Component {
     const { apiStore } = this.props
     apiStore.request('users/me')
       .then(response => {
-        apiStore.sync(response)
         apiStore.setCurrentUserId(response.data.id)
       })
       // .catch(err => console.warn(new Error(err)))
@@ -28,6 +28,9 @@ class Routes extends React.Component {
     return (
       <div>
         <ClickWrapper />
+        <OrganizationMenu
+          organization={apiStore.currentUser.current_organization}
+        />
         <Router history={history}>
           <Switch>
             <Route exact path="/" component={CollectionPage} />

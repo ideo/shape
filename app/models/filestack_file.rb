@@ -6,6 +6,16 @@ class FilestackFile < ApplicationRecord
   after_create :process_image, if: :image?
   after_destroy :delete_on_filestack
 
+  amoeba do
+    enable
+  end
+
+  def duplicate!
+    ff = amoeba_dup
+    ff.save
+    ff
+  end
+
   def filename_without_extension
     return if filename.blank?
 

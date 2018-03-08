@@ -7,11 +7,24 @@ Rails.application.routes.draw do
         collection do
           get 'me'
         end
+        member do
+          post 'duplicate'
+        end
         resources :collection_cards, only: :index
       end
       resources :collection_cards, shallow: true do
-        resources :items, shallow: true, except: :index
+        member do
+          post 'duplicate'
+        end
+        resources :items, shallow: true, except: :index do
+          member do
+            post 'duplicate'
+          end
+        end
         resources :collections, only: :create
+        member do
+          patch 'archive'
+        end
       end
       resources :organizations, only: [:show, :update] do
         collection do

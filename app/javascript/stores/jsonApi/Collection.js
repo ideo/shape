@@ -14,9 +14,6 @@ class Collection extends BaseRecord {
     ))
     const apiPath = `collections/${this.id}`
     return this.apiStore.request(apiPath, 'PATCH', { data })
-      .then((response) => {
-        this.apiStore.sync(response)
-      })
   }
 
   // after we reorder a single card, we want to make sure everything goes into sequential order

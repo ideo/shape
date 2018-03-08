@@ -3,6 +3,7 @@ import { observable, action } from 'mobx'
 export default class UiStore {
   @observable blankContentToolState = null
   @observable openCardMenuId = false
+  @observable organizationMenuOpen = false
   @observable gridSettings = {
     cols: 4,
     gutter: 20,
@@ -20,5 +21,17 @@ export default class UiStore {
 
   @action openCardMenu(cardId) {
     this.openCardMenuId = cardId
+  }
+
+  @action openOrganizationMenu() {
+    if (!this.organizationMenuOpen) {
+      this.organizationMenuOpen = true
+    }
+  }
+
+  @action closeOrganizationMenu() {
+    if (this.organizationMenuOpen) {
+      this.organizationMenuOpen = false
+    }
   }
 }

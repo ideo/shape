@@ -1,8 +1,19 @@
 class Collection < ApplicationRecord
   include Breadcrumbable
   include Resourceable
+  include Archivable
   resourceable roles: %i[editor viewer]
+
+  archivable as: :parent_collection_card,
+             with: %i[collection_cards reference_collection_cards]
+  resourcify
+
   has_many :collection_cards, foreign_key: :parent_id
+  # All collection cards this is linked to
+  has_many :reference_collection_cards,
+           -> { reference },
+           class_name: 'CollectionCard',
+           inverse_of: :referenced_collection
   has_many :items, through: :collection_cards
   has_many :collections, through: :collection_cards
   has_one :parent_collection_card,
@@ -23,6 +34,34 @@ class Collection < ApplicationRecord
   validates :parent_collection_card, presence: true, if: :organization_blank?
 
   accepts_nested_attributes_for :collection_cards
+
+  amoeba do
+    enable
+    exclude_association :collection_cards
+    exclude_association :items
+    exclude_association :collections
+    exclude_association :parent_collection_card
+  end
+
+  def duplicate!(copy_parent_card: false)
+    # Clones collection and all embedded items/collections
+    c = amoeba_dup
+
+    if copy_parent_card && parent_collection_card.present?
+      c.parent_collection_card = parent_collection_card.duplicate!(shallow: true)
+      c.parent_collection_card.collection = c
+    end
+
+    collection_cards.each do |collection_card|
+      c.collection_cards << collection_card.duplicate!
+    end
+
+    if c.save && c.parent_collection_card.present?
+      c.parent_collection_card.save
+    end
+
+    c
+  end
 
   def parent
     return parent_collection_card.parent if parent_collection_card.present?
