@@ -16,6 +16,18 @@ class CollectionCard extends BaseRecord {
       })
   }
 
+  API_archive() {
+    // eslint-disable-next-line no-alert
+    const agree = window.confirm('Are you sure?')
+    if (agree) {
+      return this.apiStore.request(`collection_cards/${this.id}/archive`, 'PATCH')
+        .then((response) => {
+          this.apiStore.fetch('collections', this.parent.id, true)
+        })
+    }
+    return false
+  }
+
   API_duplicate() {
     // This method will increment order of all cards after this one
     return this.apiStore.request(`collection_cards/${this.id}/duplicate`, 'POST')

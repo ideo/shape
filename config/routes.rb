@@ -22,6 +22,9 @@ Rails.application.routes.draw do
           end
         end
         resources :collections, only: :create
+        member do
+          patch 'archive'
+        end
       end
       resources :organizations, only: [:show, :update] do
         collection do

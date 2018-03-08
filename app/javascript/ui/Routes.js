@@ -14,7 +14,6 @@ class Routes extends React.Component {
     const { apiStore } = this.props
     apiStore.request('users/me')
       .then(response => {
-        apiStore.sync(response)
         apiStore.setCurrentUserId(response.data.id)
       })
       // .catch(err => console.warn(new Error(err)))

@@ -17,7 +17,6 @@ beforeEach(() => {
 describe('Routes', () => {
   it('makes an API call to fetch the user', () => {
     expect(apiStore.request).toBeCalledWith('users/me')
-    expect(apiStore.sync).toBeCalledWith(requestResult)
     expect(apiStore.setCurrentUserId).toBeCalledWith(requestResult.data.id)
   })
 })

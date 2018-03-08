@@ -1,9 +1,16 @@
 class CollectionCard < ApplicationRecord
+  include Archivable
+  archivable with: %i[collection item]
+
   belongs_to :parent, class_name: 'Collection'
-  # not all relations are truly inverse_of :parent_collection_card, i.e. when they are references
-  # this is just needed for doing validations on accepts_nested_attributes_for :collection
+
+  # TODO: Need to refactor CollectionCards to have a subclass e.g. CollectionCard::LinkedCollectionCard
+  # Currently this `collection` vs. `referenced_collection` doesn't exactly work because there's nothing
+  # differentiating the two relationships.
   belongs_to :collection, optional: true, inverse_of: :parent_collection_card
   belongs_to :item, optional: true, inverse_of: :parent_collection_card
+  belongs_to :referenced_item, class_name: 'Item', optional: true, inverse_of: :reference_collection_cards, foreign_key: 'item_id'
+  belongs_to :referenced_collection, class_name: 'Collection', optional: true, inverse_of: :reference_collection_cards, foreign_key: 'collection_id'
 
   before_validation :assign_order, if: :assign_order?
   before_create :assign_default_height_and_width

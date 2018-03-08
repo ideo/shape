@@ -32,6 +32,15 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
     end
   end
 
+  def archive
+    if @collection_card.archive!
+      @collection_card.reload
+      render jsonapi: @collection_card, include: [:parent, record: [:filestack_file]]
+    else
+      render_api_errors @collection_card.errors
+    end
+  end
+
   def duplicate
     duplicate = @collection_card.duplicate!
     if duplicate.persisted? && duplicate.increment_next_card_orders!
