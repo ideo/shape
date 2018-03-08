@@ -157,7 +157,6 @@ class GridCard extends React.Component {
   }
 
   archiveCard = () => {
-    console.log('Archive card')
     this.props.card.API_archive()
   }
 

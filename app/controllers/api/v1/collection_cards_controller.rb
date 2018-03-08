@@ -34,7 +34,8 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
 
   def archive
     if @collection_card.archive!
-      render jsonapi: @collection_card.reload
+      @collection_card.reload
+      render jsonapi: @collection_card, include: [:parent, record: [:filestack_file]]
     else
       render_api_errors @collection_card.errors
     end

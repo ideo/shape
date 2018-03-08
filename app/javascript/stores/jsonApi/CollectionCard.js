@@ -1,20 +1,6 @@
 import BaseRecord from './BaseRecord'
 
 class CollectionCard extends BaseRecord {
-  API_archive() {
-    // eslint-disable-next-line no-alert
-    const agree = window.confirm('Are you sure?')
-    if (agree) {
-      return this.apiStore.request(`collection_cards/${this.id}/archive`, 'PATCH')
-        .then((response) => {
-          this.parent.collection_cards.remove(this)
-          // TODO: replace with backend reordering
-          this.parent.API_updateCards()
-        })
-    }
-    return false
-  }
-
   API_create() {
     return this.apiStore.request('collection_cards', 'POST', { data: this.toJsonApi() })
       .then((response) => {
@@ -28,6 +14,18 @@ class CollectionCard extends BaseRecord {
       .catch((error) => {
         console.warn(error)
       })
+  }
+
+  API_archive() {
+    // eslint-disable-next-line no-alert
+    const agree = window.confirm('Are you sure?')
+    if (agree) {
+      return this.apiStore.request(`collection_cards/${this.id}/archive`, 'PATCH')
+        .then((response) => {
+          this.apiStore.fetch('collections', this.parent.id, true)
+        })
+    }
+    return false
   }
 
   API_duplicate() {
