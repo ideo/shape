@@ -26,15 +26,16 @@ class CollectionGrid extends React.Component {
   }
 
   componentDidMount() {
-    console.log('component did mount')
-    this.positionCards(this.props.collectionCards)
+    this.positionCards(this.props.collection.collection_cards)
   }
 
   componentWillReceiveProps(nextProps) {
-    const { collectionCards } = nextProps
+    const { collection } = nextProps
+    // TODO: why do we need to pack this into an array? It should always be an array
+    const cards = [...collection.collection_cards]
+    // If we already have a BCT open, find it in our cards
     if (nextProps.blankContentToolState) {
       const order = nextProps.blankContentToolState.order + 0.5
-      const blankFound = _.find(this.state.cards, { cardType: 'blank' })
       let blankCard = {
         id: 'blank',
         num: 0,
@@ -43,16 +44,21 @@ class CollectionGrid extends React.Component {
         height: 1,
         order,
       }
+      const blankFound = _.find(this.state.cards, { cardType: 'blank' })
+      // Look for card in state...
       if (blankFound) {
+        // TODO: What is num used for?
         blankFound.num += 1
         blankFound.id = `blank-${blankFound.num}`
-        _.remove(collectionCards, blankFound)
+        // Remove BCT from passed-in cards
+        _.remove(cards, blankFound)
+        // Increments order from existing BCT order
         blankCard = { ...blankFound, order }
       }
-      collectionCards.unshift(blankCard)
+      // Always add a blank card to the beginning of collection cards
+      cards.unshift(blankCard)
     }
-    console.log('componentWillReceiveProps')
-    //this.positionCards(collectionCards)
+    this.positionCards(cards)
   }
 
   componentWillUnmount() {
@@ -234,6 +240,7 @@ class CollectionGrid extends React.Component {
   // </end Drag related functions>
   // --------------------------
 
+  // Sorts cards and sets state.cards after doing so
   positionCards = (collectionCards = [], opts = {}) => {
     const cards = [...collectionCards]
     const {
@@ -357,8 +364,10 @@ class CollectionGrid extends React.Component {
   }
 
   render() {
+    const { cardIds } = this.props
+    // Rendering cardIds so that grid re-renders when they change
     return (
-      <div className="Grid">
+      <div className="Grid" data-card-ids={cardIds}>
         { this.renderPositionedCards() }
       </div>
     )
@@ -372,8 +381,8 @@ CollectionGrid.propTypes = {
   gutter: PropTypes.number.isRequired,
   updateCollection: PropTypes.func.isRequired,
   collection: MobxPropTypes.objectOrObservableObject.isRequired,
-  collectionCards: MobxPropTypes.arrayOrObservableArray.isRequired,
   blankContentToolState: MobxPropTypes.objectOrObservableObject,
+  cardIds: MobxPropTypes.arrayOrObservableArray.isRequired
 }
 CollectionGrid.defaultProps = {
   blankContentToolState: null

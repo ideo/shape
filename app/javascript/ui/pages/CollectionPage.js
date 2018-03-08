@@ -78,7 +78,8 @@ class CollectionPage extends PageWithApi {
             {...uiStore.gridSettings}
             updateCollection={this.updateCollection}
             collection={collection}
-            collectionCards={collection.collection_cards}
+            // Pass in cardIds so grid will re-render when they change
+            cardIds={collection.cardIds}
             blankContentToolState={uiStore.blankContentToolState}
           />
         </PageContainer>
