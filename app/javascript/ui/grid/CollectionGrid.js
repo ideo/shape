@@ -26,12 +26,11 @@ class CollectionGrid extends React.Component {
   }
 
   componentDidMount() {
-    this.positionCards(this.props.collection.collection_cards)
+    this.positionCards(this.props.collectionCards)
   }
 
   componentWillReceiveProps(nextProps) {
-    const { collection } = nextProps
-    const cards = [...collection.collection_cards]
+    const { collectionCards } = nextProps
     if (nextProps.blankContentToolState) {
       const order = nextProps.blankContentToolState.order + 0.5
       const blankFound = _.find(this.state.cards, { cardType: 'blank' })
@@ -46,12 +45,12 @@ class CollectionGrid extends React.Component {
       if (blankFound) {
         blankFound.num += 1
         blankFound.id = `blank-${blankFound.num}`
-        _.remove(cards, blankFound)
+        _.remove(collectionCards, blankFound)
         blankCard = { ...blankFound, order }
       }
-      cards.unshift(blankCard)
+      collectionCards.unshift(blankCard)
     }
-    this.positionCards(cards)
+    this.positionCards(collectionCards)
   }
 
   componentWillUnmount() {
@@ -371,6 +370,7 @@ CollectionGrid.propTypes = {
   gutter: PropTypes.number.isRequired,
   updateCollection: PropTypes.func.isRequired,
   collection: MobxPropTypes.objectOrObservableObject.isRequired,
+  collectionCards: PropTypes.arrayOf(MobxPropTypes.objectOrObservableObject).isRequired,
   blankContentToolState: MobxPropTypes.objectOrObservableObject,
 }
 CollectionGrid.defaultProps = {

@@ -18,6 +18,26 @@ class CollectionCard < ApplicationRecord
 
   accepts_nested_attributes_for :collection, :item
 
+  amoeba do
+    enable
+    exclude_association :collection
+    exclude_association :item
+    exclude_association :parent
+  end
+
+  def duplicate!(shallow: false)
+    cc = amoeba_dup
+    cc.order += 1
+
+    unless shallow
+      cc.collection = collection.duplicate! if collection.present?
+      cc.item = item.duplicate! if item.present?
+    end
+
+    cc.save
+    cc
+  end
+
   def record
     return item if item.present?
     return collection if collection.present?
@@ -29,6 +49,22 @@ class CollectionCard < ApplicationRecord
 
   def primary?
     !reference
+  end
+
+  # increment the order of all cards 'after' this card by 1
+  def increment_next_card_orders!
+    greater_than_or_equal = CollectionCard.arel_table[:order].gteq(order)
+
+    update_ids = parent.collection_cards
+                       .where(greater_than_or_equal)
+                       .where.not(id: id)
+                       .pluck(:id)
+
+    return true if update_ids.blank?
+
+    CollectionCard.increment_counter(:order, update_ids)
+
+    true
   end
 
   private

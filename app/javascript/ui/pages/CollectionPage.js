@@ -78,6 +78,7 @@ class CollectionPage extends PageWithApi {
             {...uiStore.gridSettings}
             updateCollection={this.updateCollection}
             collection={collection}
+            collectionCards={collection.collection_cards}
             blankContentToolState={uiStore.blankContentToolState}
           />
         </PageContainer>

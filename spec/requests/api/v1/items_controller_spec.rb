@@ -95,4 +95,23 @@ describe Api::V1::ItemsController, type: :request, auth: true do
       expect(item.reload.content).to eq('The wheels on the bus...')
     end
   end
+
+  describe 'POST #duplicate' do
+    let!(:item) { create(:text_item) }
+    let(:path) { "/api/v1/items/#{item.id}/duplicate" }
+
+    it 'returns a 200' do
+      post(path)
+      expect(response.status).to eq(200)
+    end
+
+    it 'creates new item' do
+      expect { post(path) }.to change(Item, :count).by(1)
+    end
+
+    it 'returns new item' do
+      post(path)
+      expect(json['data']['attributes']['id']).not_to eq(item.id)
+    end
+  end
 end

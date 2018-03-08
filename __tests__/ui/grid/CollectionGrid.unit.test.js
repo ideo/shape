@@ -9,6 +9,7 @@ let props, wrapper
 beforeEach(() => {
   props = {
     collection: fakeCollection,
+    collectionCards: fakeCollection.collection_cards,
     cols: 4,
     gridW: 200,
     gridH: 200,

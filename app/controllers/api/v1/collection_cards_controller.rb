@@ -17,7 +17,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
                                         collection: @collection,
                                         user: current_user)
     if builder.create
-      render jsonapi: builder.collection_card, include: [record: [:filestack_file]]
+      render jsonapi: builder.collection_card, include: [:parent, record: [:filestack_file]]
     else
       render_api_errors builder.errors
     end
@@ -29,6 +29,15 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
       render jsonapi: @collection_card
     else
       render_api_errors @collection_card.errors
+    end
+  end
+
+  def duplicate
+    duplicate = @collection_card.duplicate!
+    if duplicate.persisted? && duplicate.increment_next_card_orders!
+      render jsonapi: duplicate, include: [:parent, record: [:filestack_file]]
+    else
+      render_api_errors duplicate.errors
     end
   end
 
