@@ -29,4 +29,36 @@ describe Organization, type: :model do
       end
     end
   end
+
+  describe '.create_for_user' do
+    let!(:user) { create(:user) }
+    let(:organization) { Organization.create_for_user(user) }
+
+    it 'creates org' do
+      expect { organization }.to change(Organization, :count).by(1)
+    end
+
+    it 'has name: FirstName LastName Organization' do
+      expect(organization.name).to eq("#{user.first_name} #{user.last_name} Organization")
+    end
+
+    it 'adds user as admin of org\'s primary group' do
+      expect(organization.admins).to match_array([user])
+    end
+
+    it 'sets user.current_organization' do
+      organization
+      expect(user.reload.current_organization).to eq(organization)
+    end
+
+    context 'with user.last_name blank' do
+      before do
+        user.update_attributes(last_name: nil)
+      end
+
+      it 'has name: FirstName Organization' do
+        expect(organization.name).to eq("#{user.first_name} Organization")
+      end
+    end
+  end
 end
