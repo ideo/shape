@@ -26,6 +26,7 @@ class CollectionGrid extends React.Component {
   }
 
   componentDidMount() {
+    console.log('component did mount')
     this.positionCards(this.props.collectionCards)
   }
 
@@ -50,7 +51,8 @@ class CollectionGrid extends React.Component {
       }
       collectionCards.unshift(blankCard)
     }
-    this.positionCards(collectionCards)
+    console.log('componentWillReceiveProps')
+    //this.positionCards(collectionCards)
   }
 
   componentWillUnmount() {
@@ -370,7 +372,7 @@ CollectionGrid.propTypes = {
   gutter: PropTypes.number.isRequired,
   updateCollection: PropTypes.func.isRequired,
   collection: MobxPropTypes.objectOrObservableObject.isRequired,
-  collectionCards: PropTypes.arrayOf(MobxPropTypes.objectOrObservableObject).isRequired,
+  collectionCards: MobxPropTypes.arrayOrObservableArray.isRequired,
   blankContentToolState: MobxPropTypes.objectOrObservableObject,
 }
 CollectionGrid.defaultProps = {

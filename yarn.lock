@@ -8385,6 +8385,10 @@ trim-right@^1.0.1:
   dependencies:
     glob "^6.0.4"
 
+ttab@^0.6.1:
+  version "0.6.1"
+  resolved "https://registry.yarnpkg.com/ttab/-/ttab-0.6.1.tgz#72001a333d477a92c49f6cb0e83ae07984c66be5"
+
 tty-browserify@0.0.0:
   version "0.0.0"
   resolved "https://registry.yarnpkg.com/tty-browserify/-/tty-browserify-0.0.0.tgz#a157ba402da24e9bf957f9aa69d524eed42901a6"
