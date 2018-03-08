@@ -26,6 +26,33 @@ class Item < ApplicationRecord
 
   accepts_nested_attributes_for :filestack_file
 
+  amoeba do
+    enable
+    exclude_association :filestack_file
+    exclude_association :parent_collection_card
+  end
+
+  def duplicate!(copy_parent_card: false)
+    # Clones item
+    i = amoeba_dup
+
+    # Clone parent + increase order
+    if copy_parent_card && parent_collection_card.present?
+      i.parent_collection_card = parent_collection_card.duplicate!(shallow: true)
+      i.parent_collection_card.item = i
+    end
+
+    if filestack_file.present?
+      i.filestack_file = filestack_file.duplicate!
+    end
+
+    if i.save && i.parent_collection_card.present?
+      i.parent_collection_card.save
+    end
+
+    i
+  end
+
   def editors
     User.with_role(Role::EDITOR, self)
   end

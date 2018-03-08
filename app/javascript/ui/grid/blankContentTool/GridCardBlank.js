@@ -144,12 +144,13 @@ class GridCardBlank extends React.Component {
       order: this.props.order,
       width: 1,
       height: 1,
-      // `parent` is the collection this card belgngs to
+      // `parent` is the collection this card belongs to
       parent_id: this.props.parent.id,
     }
     // apply nested attrs
     Object.assign(attrs, nested)
     const card = new CollectionCard(attrs, this.props.apiStore)
+    card.parent = this.props.parent // Assign parent so store can get access to it
     this.setState({ loading: true }, () => {
       card.API_create()
         .then(() => {

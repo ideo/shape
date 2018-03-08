@@ -144,7 +144,8 @@ class GridCard extends React.Component {
   }
 
   duplicateCard = () => {
-    console.log('Duplicate card')
+    const { card } = this.props
+    card.API_duplicate()
   }
 
   linkCard = () => {
