@@ -14,6 +14,7 @@ const props = {
   handleClick: jest.fn(),
   dragging: false,
   height: 100,
+  menuOpen: false,
 }
 
 let wrapper

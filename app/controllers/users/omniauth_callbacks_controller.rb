@@ -2,7 +2,7 @@ class Users::OmniauthCallbacksController < Devise::OmniauthCallbacksController
   def okta
     @user = User.from_omniauth(request.env['omniauth.auth'])
     if @user.save
-      add_user_to_org_if_none(@user)
+      create_org_if_none(@user)
       # this will throw if @user is not activated
       sign_in_and_redirect @user, event: :authentication
     else
@@ -13,12 +13,9 @@ class Users::OmniauthCallbacksController < Devise::OmniauthCallbacksController
 
   private
 
-  # Temporary method while we are testing the app
-  # Automatically add user to first organization
-  def add_user_to_org_if_none(user)
+  def create_org_if_none(user)
     return if user.current_organization_id.present?
 
-    org = Organization.first
-    user.add_role(Role::MEMBER, org.primary_group)
+    Organization.create_for_user(user)
   end
 end
