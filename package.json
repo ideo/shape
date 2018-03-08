@@ -99,7 +99,6 @@
     "jest-fetch-mock": "^1.4.1",
     "jest-styled-components": "styled-components/jest-styled-components",
     "react-test-renderer": "^16.2.0",
-    "ttab": "^0.6.1",
     "webpack-dev-server": "^2.11.1"
   }
 }
