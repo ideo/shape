@@ -73,35 +73,61 @@ class RolesSummary extends React.PureComponent {
     return { editors, viewers }
   }
 
-  render() {
+  get addUserBtn() {
+    return (
+      <StyledAddUserBtn
+        onClick={this.props.handleClick}
+      >+</StyledAddUserBtn>
+    )
+  }
+
+  get renderEditors() {
     const { editors, viewers } = this.viewersAndEditorsLimited
+
+    if (editors.length === 0) return ''
+
     const editorAvatars = editors.map(editor => (
-      <StyledUser>
-        <UserAvatar key={editor.id} user={editor} />
+      <StyledUser key={editor.id}>
+        <UserAvatar user={editor} />
       </StyledUser>
     ))
+
+    return (
+      <StyledAvatarGroup align="right">
+        <div className="title">Editors</div>
+        {(editors.length > 0 || viewers.length === 0) ? this.addUserBtn : ''}
+        {editorAvatars}
+      </StyledAvatarGroup>
+    )
+  }
+
+  get renderViewers() {
+    const { viewers, editors } = this.viewersAndEditorsLimited
+
+    if (viewers.length === 0) return ''
+
     const viewerAvatars = viewers.map(viewer => (
-      <StyledUser>
-        <UserAvatar key={viewer.id} user={viewer} />
+      <StyledUser key={viewer.id}>
+        <UserAvatar user={viewer} />
       </StyledUser>
     ))
     return (
+      <StyledAvatarGroup>
+        <div className="title">Viewers</div>
+        {editors.length === 0 ? this.addUserBtn : ''}
+        {viewerAvatars}
+      </StyledAvatarGroup>
+    )
+  }
+
+  render() {
+    const { editors, viewers } = this.viewersAndEditorsLimited
+    return (
       <div className={this.props.className}>
-        <StyledAvatarGroup align="right">
-          <div className="title">Editors</div>
-          <StyledAddUserBtn
-            onClick={this.props.handleClick}
-          >+
-          </StyledAddUserBtn>
-          {editorAvatars}
-        </StyledAvatarGroup>
-
-        <StyledSeparator />
-
-        <StyledAvatarGroup>
-          <div className="title">Viewers</div>
-          {viewerAvatars}
-        </StyledAvatarGroup>
+        {(editors.length === 0 && viewers.length === 0) ? this.addUserBtn : ''}
+        {this.renderEditors}
+        {(editors.length > 0 && viewers.length > 0) ? <StyledSeparator /> : ''}
+        {this.renderViewers}
       </div>
     )
   }
