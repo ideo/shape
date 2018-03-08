@@ -8,7 +8,10 @@ const fakeApiStore = ({ findResult = '', requestResult = '' } = {}) => {
     sync: jest.fn().mockName('sync'),
     setCurrentUserId: jest.fn(),
     currentUser: {
-      current_user_collection_id: 99
+      current_user_collection_id: 99,
+      current_organization: {
+        name: 'test org'
+      }
     },
     collections: [],
     items: [],
