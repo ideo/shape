@@ -64,6 +64,17 @@ export const fakeCollection = {
     fakeItemCard, fakeItemCard, fakeItemCard
   ]
 }
+export const fakeUserAttrs = {
+  first_name: 'Oprah',
+  last_name: 'Winfrey',
+  email: 'oprah@winfrey.com',
+  pic_url_square: 'https://pmcvariety.files.wordpress.com/2017/09/oprah_winfrey.png'
+}
+export const fakeUser = {
+  ...fakeUserAttrs,
+  rawAttributes: jest.fn().mockReturnValue(fakeUserAttrs),
+  getRecordType: jest.fn().mockReturnValue('users'),
+}
 export const fakePosition = {
   xPos: 0,
   yPos: 0,
