@@ -9,6 +9,7 @@ const materialStyles = {
     marginLeft: 5,
     marginRight: 5,
     height: 34,
+    cursor: 'pointer'
   }
 }
 
