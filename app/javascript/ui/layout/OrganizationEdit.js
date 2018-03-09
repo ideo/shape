@@ -6,10 +6,29 @@ import OrganizationAvatar from '~/ui/layout/OrganizationAvatar'
 
 @observer
 class OrganizationEdit extends React.Component {
+  constructor(props) {
+    super()
+    const { organization } = props
+    this.editingOrganization = {
+      name: organization.name,
+      pic_url_square: organization.pic_url_square
+    }
+  }
+
+  @observable editingOrganization = null
+
+  @action
+  changeName(name) {
+    this.editingOrganization.name = name
+  }
+
+  @action
+  changeUrl(url) {
+    this.editingOrganization.pic_url_square = url
+  }
 
   handleNameChange = (ev) => {
-    // this.changeName(ev.target.value)
-    this.props.organization.name = ev.target.value
+    this.changeName(ev.target.value)
   }
 
   handleImagePick = (ev) => {
@@ -18,7 +37,7 @@ class OrganizationEdit extends React.Component {
       .then(resp => {
         if (resp.filesUploaded.length > 0) {
           const img = resp.filesUploaded[0]
-          this.props.organization.pic_url_square = img.url
+          this.changeUrl(img.url)
         } else {
           console.warn('Failed to upload image:', resp.filesFailed)
         }
@@ -28,24 +47,24 @@ class OrganizationEdit extends React.Component {
   handleSave = (ev) => {
     ev.preventDefault()
     const { organization, onSave } = this.props
-    console.log('organization', organization)
+    organization.name = this.editingOrganization.name
+    organization.pic_url_square = this.editingOrganization.pic_url_square
     organization.save().then(() => {
       onSave && onSave()
     })
   }
 
   render() {
-    const { organization } = this.props
     return (
       <form>
         <input
           type="text"
-          value={organization.name}
+          value={this.editingOrganization.name}
           onChange={this.handleNameChange}
         />
         <OrganizationAvatar
           onClickOverride={this.handleImagePick}
-          organization={organization}
+          organization={this.editingOrganization}
         />
         <input
           onClick={this.handleSave}

@@ -33,7 +33,7 @@ class OrganizationMenu extends React.Component {
 
   @action
   onSave = () => {
-      this.editOrganizationOpen = false
+    this.editOrganizationOpen = false
   }
 
   render() {
