@@ -8,11 +8,10 @@ const StyledAvatar = styled.div`
   justify-content: center;
   overflow: hidden;
   border-radius: 50%;
-  width: ${$props => `{props.size}px`};
-  height: ${$props => `{props.size}px`};
-  margin-left: ${$props => `{props.size * 0.15}px`};
-  margin-left: ${$props => `{props.size * 0.15}px`};
-  margin-right:
+  width: ${props => `${props.size}px`};
+  height: ${props => `${props.size}px`};
+  margin-left: ${props => `${props.size * 0.15}px`};
+  margin-right: ${props => `${props.size * 0.15}px`};
   img {
     width: 100%;
     height: 100%;
@@ -30,8 +29,9 @@ class UserAvatar extends React.Component {
       <StyledAvatar
         size={size}
         className={className}
-        src={user.pic_url_square}
-      />
+      >
+        <img src={user.pic_url_square} title={user.name} alt={user.name} />
+      </StyledAvatar>
     )
   }
 }

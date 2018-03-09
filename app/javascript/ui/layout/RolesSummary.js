@@ -7,7 +7,9 @@ import UserAvatar from './UserAvatar'
 
 const MAX_USERS_TO_SHOW = 5
 
-const StyledRolesSummary = styled.div
+const StyledRolesSummary = styled.div`
+  position: relative;
+`
 StyledRolesSummary.displayName = 'StyledRolesSummary'
 
 const StyledAvatarGroup = styled.div`
