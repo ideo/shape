@@ -22,6 +22,18 @@ class User < ApplicationRecord
 
   validates :uid, :provider, :email, presence: true
 
+  searchkick word_start: [:name]
+
+  scope :search_import, -> { includes(:roles, :organizations) }
+
+  def search_data
+    {
+      name: name,
+      email: email,
+      organization_ids: organizations.map(&:id),
+    }
+  end
+
   def self.from_omniauth(auth)
     user = where(provider: auth.provider, uid: auth.uid).first
 
@@ -40,6 +52,10 @@ class User < ApplicationRecord
     user.pic_url_square = auth.info.image
 
     user
+  end
+
+  def name
+    [first_name, last_name].compact.join(' ')
   end
 
   def current_user_collection_id

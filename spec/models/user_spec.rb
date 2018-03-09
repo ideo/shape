@@ -79,4 +79,46 @@ describe User, type: :model do
       expect(user.organizations).to match_array(organizations)
     end
   end
+
+  describe '#name' do
+    it 'should concatenate first and last name' do
+      expect(user.name).to eq("#{user.first_name} #{user.last_name}")
+    end
+
+    it 'should not include spaces if first name is empty' do
+      user.first_name = nil
+      expect(user.name).to eq(user.last_name)
+    end
+
+    it 'should not include spaces if last name is empty' do
+      user.last_name = nil
+      expect(user.name).to eq(user.first_name)
+    end
+  end
+
+  describe '#search_data' do
+    let!(:user) { create(:user) }
+    let(:organizations) { create_list(:organization, 2) }
+
+    it 'should include name, email, organization_ids' do
+      expect(user.search_data).to eq(
+        {
+          name: user.name,
+          email: user.email,
+          organization_ids: [],
+        }
+      )
+    end
+
+    context 'if user is member of orgs' do
+      before do
+        user.add_role(:member, organizations[0].primary_group)
+        user.add_role(:member, organizations[1].primary_group)
+      end
+
+      it 'should have org ids' do
+        expect(user.search_data[:organization_ids]).to match_array(organizations.map(&:id))
+      end
+    end
+  end
 end
