@@ -58,7 +58,46 @@ RSpec.describe CollectionCard, type: :model do
     end
   end
 
-  describe '#increment_next_card_orders!' do
+  describe '#duplicate!' do
+    let!(:collection_card) { create(:collection_card_item) }
+    let!(:collection_card_collection) { create(:collection_card_collection) }
+
+    it 'should create copy of card' do
+      expect(collection_card.duplicate!.id).not_to eq(collection_card.id)
+    end
+
+    it 'should duplicate collection' do
+      expect { collection_card_collection.duplicate! }.to change(Collection, :count).by(1)
+    end
+
+    it 'should duplicate item' do
+      expect { collection_card.duplicate! }.to change(Item, :count).by(1)
+    end
+
+    it 'should not call increment_card_orders!' do
+      expect_any_instance_of(CollectionCard).not_to receive(:increment_card_orders!)
+      collection_card.duplicate!
+    end
+
+    context 'with shallow true' do
+      it 'should not duplicate item' do
+        expect { collection_card.duplicate!(shallow: true) }.not_to change(Item, :count)
+      end
+
+      it 'should not duplicate collection' do
+        expect { collection_card_collection.duplicate!(shallow: true) }.not_to change(Collection, :count)
+      end
+    end
+
+    context 'with update_order true' do
+      it 'should call increment_card_orders!' do
+        expect_any_instance_of(CollectionCard).to receive(:increment_card_orders!)
+        collection_card.duplicate!(update_order: true)
+      end
+    end
+  end
+
+  describe '#increment_card_orders!' do
     let(:collection) { create(:collection) }
     let!(:collection_cards) { create_list(:collection_card, 5, parent: collection) }
 
@@ -70,13 +109,13 @@ RSpec.describe CollectionCard, type: :model do
     end
 
     it 'should increment all orders by 1' do
-      collection_cards.first.increment_next_card_orders!
+      collection_cards.first.increment_card_orders!
       order_arr = collection_cards.map(&:reload).map(&:order)
       expect(order_arr).to match_array([0, 2, 3, 4, 5])
     end
 
     it 'should return true if success' do
-      expect(collection_cards.first.increment_next_card_orders!).to be true
+      expect(collection_cards.first.increment_card_orders!).to be true
     end
 
     context 'with another card created at same order as existing' do
@@ -87,11 +126,33 @@ RSpec.describe CollectionCard, type: :model do
 
       it 'should increment all cards by 1, and leave dupe card' do
         expect(dupe_card.order).to eq(second_card_order)
-        dupe_card.increment_next_card_orders!
+        dupe_card.increment_card_orders!
         order_array = collection_cards.map(&:reload).map(&:order)
         expect(dupe_card.reload.order).to eq(1)
         expect(order_array).to match_array([0, 2, 3, 4, 5])
       end
+    end
+  end
+
+  describe '#decrement_card_orders!' do
+    let(:collection) { create(:collection) }
+    let!(:collection_cards) { create_list(:collection_card, 5, parent: collection) }
+
+    before do
+      # Make sure cards are in sequential order
+      collection_cards.each_with_index do |card, i|
+        card.update_attribute(:order, i)
+      end
+    end
+
+    it 'should decrement all orders by 1' do
+      collection_cards.last.decrement_card_orders!
+      order_arr = collection_cards.map(&:reload).map(&:order)
+      expect(order_arr).to match_array([-1, 0, 1, 2, 4])
+    end
+
+    it 'should return true if success' do
+      expect(collection_cards.last.decrement_card_orders!).to be true
     end
   end
 end

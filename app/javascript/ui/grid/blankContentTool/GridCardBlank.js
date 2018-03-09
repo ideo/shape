@@ -139,9 +139,7 @@ class GridCardBlank extends React.Component {
 
   createCard = (nested = {}) => {
     const attrs = {
-      // NOTE: technically this uses the same order as the card it is going "next to"
-      // but will be given order + 1 after reorderCards()
-      order: this.props.order,
+      order: this.props.order + 1,
       width: 1,
       height: 1,
       // `parent` is the collection this card belongs to

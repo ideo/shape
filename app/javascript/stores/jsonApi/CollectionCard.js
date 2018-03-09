@@ -4,12 +4,7 @@ class CollectionCard extends BaseRecord {
   API_create() {
     return this.apiStore.request('collection_cards', 'POST', { data: this.toJsonApi() })
       .then((response) => {
-        const newCard = response.data
-        this.parent.collection_cards.push(newCard)
-        // NOTE: reordering happens on the frontend; so we perform this extra save...
-        // could be replaced by reordering on the backend
-        this.parent.API_updateCards()
-        // this.apiStore.sync(response)
+        this.apiStore.fetch('collections', this.parent.id, true)
       })
       .catch((error) => {
         console.warn(error)
@@ -23,6 +18,9 @@ class CollectionCard extends BaseRecord {
       return this.apiStore.request(`collection_cards/${this.id}/archive`, 'PATCH')
         .then((response) => {
           this.apiStore.fetch('collections', this.parent.id, true)
+        })
+        .catch((error) => {
+          console.warn(error)
         })
     }
     return false
