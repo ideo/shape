@@ -1,24 +1,35 @@
 import PropTypes from 'prop-types'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
-import Avatar from 'material-ui/Avatar'
-import { withStyles } from 'material-ui/styles'
+import styled from 'styled-components'
 
-const materialStyles = {
-  smallAvatar: {
-    width: 34,
-    marginLeft: 5,
-    marginRight: 5,
-    height: 34,
+const StyledAvatar = styled.div`
+  position: relative;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border-radius: 50%;
+  width: ${$props => `{props.size}px`};
+  height: ${$props => `{props.size}px`};
+  margin-left: ${$props => `{props.size * 0.15}px`};
+  margin-left: ${$props => `{props.size * 0.15}px`};
+  margin-right:
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    text-align: center;
   }
-}
+`
+StyledAvatar.displayName = 'StyledAvatar'
 
 @observer
 class UserAvatar extends React.Component {
   render() {
-    const { user, classes } = this.props
+    const { user, className, size } = this.props
     return (
-      <Avatar
-        className={classes.smallAvatar}
+      <StyledAvatar
+        size={size}
+        className={className}
         src={user.pic_url_square}
       />
     )
@@ -27,10 +38,13 @@ class UserAvatar extends React.Component {
 
 UserAvatar.propTypes = {
   user: MobxPropTypes.objectOrObservableObject.isRequired,
-  classes: PropTypes.shape({
-    smallAvatar: PropTypes.string,
-  }).isRequired,
+  size: PropTypes.number,
+  className: PropTypes.string,
 }
 
-// apply the wrapper here so that it doesn't interfere with propType definition
-export default withStyles(materialStyles)(UserAvatar)
+UserAvatar.defaultProps = {
+  size: 34,
+  className: 'avatar',
+}
+
+export default UserAvatar

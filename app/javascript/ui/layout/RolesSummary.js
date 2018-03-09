@@ -13,6 +13,14 @@ StyledRolesSummary.displayName = 'StyledRolesSummary'
 const StyledAvatarGroup = styled.div`
   display: inline-block;
   margin: 0 12px;
+  .editor,
+  .viewer {
+    display: inline-block;
+    margin-right: 12px;
+    &:last-of-type {
+      margin-right: 0;
+    }
+  }
 `
 StyledAvatarGroup.displayName = 'StyledAvatarGroup'
 
@@ -25,19 +33,6 @@ const StyledRoleTitle = styled.div`
   margin: 0 0 6px 0;
 `
 StyledRoleTitle.displayName = 'StyledRoleTitle'
-
-const StyledUser = styled.div`
-  display: inline-block;
-  margin-right: 12px;
-  &:last-of-type {
-    margin-right: 0;
-  }
-  div {
-    width: 30px;
-    height: 30px;
-  }
-`
-StyledUser.displayName = 'StyledUser'
 
 const StyledSeparator = styled.div`
   width: 1px;
@@ -86,9 +81,12 @@ class RolesSummary extends React.PureComponent {
     if (editors.length === 0 && viewers.length > 0) return ''
 
     const editorAvatars = editors.map(editor => (
-      <StyledUser key={editor.id} className="editor">
-        <UserAvatar user={editor} />
-      </StyledUser>
+      <UserAvatar
+        key={editor.id}
+        user={editor}
+        size={30}
+        className="editor"
+      />
     ))
 
     return (
@@ -105,9 +103,12 @@ class RolesSummary extends React.PureComponent {
 
     if (viewers.length === 0) return ''
     const viewerAvatars = viewers.map(viewer => (
-      <StyledUser key={viewer.id} className="viewer">
-        <UserAvatar user={viewer} />
-      </StyledUser>
+      <UserAvatar
+        key={viewer.id}
+        user={viewer}
+        size={30}
+        className="viewer"
+      />
     ))
     return (
       <StyledAvatarGroup>
