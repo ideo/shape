@@ -1,8 +1,13 @@
 import _ from 'lodash'
+import { computed } from 'mobx'
 import BaseRecord from './BaseRecord'
 
 class Collection extends BaseRecord {
   attributesForAPI = ['name']
+
+  @computed get cardIds() {
+    return this.collection_cards.map(card => card.id)
+  }
 
   API_updateCards() {
     this._reorderCards()
