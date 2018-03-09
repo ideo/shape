@@ -32,7 +32,7 @@ class CollectionCard < ApplicationRecord
     exclude_association :parent
   end
 
-  def duplicate!(shallow: false)
+  def duplicate!(shallow: false, update_order: false)
     cc = amoeba_dup
     cc.order += 1
 
@@ -41,7 +41,10 @@ class CollectionCard < ApplicationRecord
       cc.item = item.duplicate! if item.present?
     end
 
-    cc.save
+    if cc.save && update_order
+      cc.increment_card_orders!
+    end
+
     cc
   end
 
@@ -58,9 +61,13 @@ class CollectionCard < ApplicationRecord
     !reference
   end
 
-  # increment the order of all cards 'after' this card by 1
-  def increment_next_card_orders!
-    greater_than_or_equal = CollectionCard.arel_table[:order].gteq(order)
+  # Increment the order by 1 of all cards >= specified order
+  # - Defaults to use this card's order
+  # - Useful when inserting a new card to increment card order after this card
+  def increment_card_orders!(starting_at_order = nil)
+    starting_at_order ||= order
+
+    greater_than_or_equal = CollectionCard.arel_table[:order].gteq(starting_at_order)
 
     update_ids = parent.collection_cards
                        .where(greater_than_or_equal)
@@ -70,6 +77,26 @@ class CollectionCard < ApplicationRecord
     return true if update_ids.blank?
 
     CollectionCard.increment_counter(:order, update_ids)
+
+    true
+  end
+
+  # Decrement the order by 1 of all cards with <= specified order
+  # - Defaults to use this card's order
+  # - Useful when removing a card from the collection
+  def decrement_card_orders!(starting_at_order = nil)
+    starting_at_order ||= order
+
+    less_than_or_equal = CollectionCard.arel_table[:order].lteq(starting_at_order)
+
+    update_ids = parent.collection_cards
+                       .where(less_than_or_equal)
+                       .where.not(id: id)
+                       .pluck(:id)
+
+    return true if update_ids.blank?
+
+    CollectionCard.decrement_counter(:order, update_ids)
 
     true
   end

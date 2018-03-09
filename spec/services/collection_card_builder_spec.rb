@@ -26,15 +26,18 @@ RSpec.describe CollectionCardBuilder, type: :service do
         )
       end
 
-      before do
-        expect(builder.create).to be true
-      end
-
       it 'should add the user as editor to the card\'s child collection' do
+        expect(builder.create).to be true
         expect(user.has_role?(Role::EDITOR, builder.collection_card.collection)).to be true
       end
 
+      it 'should increase order of additional cards' do
+        expect_any_instance_of(CollectionCard).to receive(:increment_card_orders!)
+        expect(builder.create).to be true
+      end
+
       it 'should calculate the breadcrumb for the card\'s child collection' do
+        expect(builder.create).to be true
         created_collection = builder.collection_card.collection
         crumb = ['Collection', parent.id, parent.name]
         expect(created_collection.breadcrumb.first).to eq crumb
@@ -60,17 +63,19 @@ RSpec.describe CollectionCardBuilder, type: :service do
         )
       end
 
-      before do
-        expect(builder.create).to be true
-      end
-
       it 'should calculate the breadcrumb for the card\'s child item' do
+        expect(builder.create).to be true
         created_item = builder.collection_card.item
         crumb = ['Collection', parent.id, parent.name]
         expect(created_item.breadcrumb.first).to eq crumb
 
         crumb = ['Item', created_item.id, 'My item name']
         expect(created_item.breadcrumb.last).to eq crumb
+      end
+
+      it 'should increase order of additional cards' do
+        expect_any_instance_of(CollectionCard).to receive(:increment_card_orders!)
+        expect(builder.create).to be true
       end
     end
 
@@ -89,12 +94,14 @@ RSpec.describe CollectionCardBuilder, type: :service do
         )
       end
 
-      before do
+      it 'should display errors' do
         expect(builder.create).to be false
+        expect(builder.errors.full_messages.first).to eq "Item type can't be blank"
       end
 
-      it 'should display errors' do
-        expect(builder.errors.full_messages.first).to eq "Item type can't be blank"
+      it 'should not increase order of additional cards' do
+        expect_any_instance_of(CollectionCard).not_to receive(:increment_card_orders!)
+        expect(builder.create).to be false
       end
     end
 
