@@ -36,12 +36,12 @@ describe('RolesSummary', () => {
     })
 
     it('renders editors', () => {
-      expect(wrapper.find('StyledRoleTitle').at(0).children().text()).toMatch(/editors/i)
+      expect(wrapper.render().text()).toMatch(/editors/i)
       expect(wrapper.find('[className="editor"]').length).toEqual(2)
     })
 
     it('renders viewers', () => {
-      expect(wrapper.find('StyledRoleTitle').at(1).children().text()).toMatch(/viewers/i)
+      expect(wrapper.render().text()).toMatch(/viewers/i)
       expect(wrapper.find('[className="viewer"]').length).toEqual(2)
     })
 
@@ -60,11 +60,11 @@ describe('RolesSummary', () => {
 
     it('renders 2 viewers and label', () => {
       expect(wrapper.find('[className="viewer"]').length).toEqual(2)
-      expect(wrapper.find('StyledRoleTitle').at(0).children().text()).toMatch(/viewers/i)
+      expect(wrapper.render().text()).toMatch(/viewers/i)
     })
 
     it('does not render editors label', () => {
-      expect(wrapper.find('StyledRoleTitle').length).toEqual(1)
+      expect(wrapper.render().text()).not.toMatch(/editors/i)
     })
 
     it('renders manage roles button', () => {
@@ -81,11 +81,11 @@ describe('RolesSummary', () => {
 
     it('renders 2 editors and label', () => {
       expect(wrapper.find('[className="editor"]').length).toEqual(2)
-      expect(wrapper.find('StyledRoleTitle').at(0).children().text()).toMatch(/editors/i)
+      expect(wrapper.render().text()).toMatch(/editors/i)
     })
 
     it('does not render viewers', () => {
-      expect(wrapper.find('StyledRoleTitle').length).toEqual(1)
+      expect(wrapper.render().text()).not.toMatch(/viewers/i)
       expect(wrapper.find('[className="viewer"]').exists()).toBe(false)
     })
 
@@ -105,8 +105,9 @@ describe('RolesSummary', () => {
       expect(wrapper.find('[className="editor"]').length).toEqual(5)
     })
 
-    it('does not render any viewers', () => {
+    it('does not render any viewers or viewer label', () => {
       expect(wrapper.find('[className="viewer"]').exists()).toBe(false)
+      expect(wrapper.render().text()).not.toMatch(/viewer/i)
     })
   })
 
@@ -118,7 +119,11 @@ describe('RolesSummary', () => {
     })
 
     it('renders editor label', () => {
-      expect(wrapper.find('StyledRoleTitle').at(0).children().text()).toMatch(/editors/i)
+      expect(wrapper.render().text()).toMatch(/editors/i)
+    })
+
+    it('does not render viewer label', () => {
+      expect(wrapper.render().text()).not.toMatch(/viewers/i)
     })
 
     it('does not render editors or viewers', () => {
