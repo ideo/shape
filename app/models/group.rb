@@ -1,16 +1,9 @@
 class Group < ApplicationRecord
-  resourcify
-  belongs_to :organization
-
+  include Resourceable
   # Admins can manage people in the group
-  def admins
-    User.with_role(Role::ADMIN, self)
-  end
-
   # Members have read access to everything the group is linked to
-  def members
-    User.with_role(Role::MEMBER, self)
-  end
+  resourceable roles: %i[admin member]
+  belongs_to :organization
 
   def admins_and_members
     User.joins(:roles)

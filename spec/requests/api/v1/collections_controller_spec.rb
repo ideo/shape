@@ -54,6 +54,7 @@ describe Api::V1::CollectionsController, type: :request, auth: true do
     describe 'included' do
       let(:collection_cards_json) { json_included_objects_of_type('collection_cards') }
       let(:items_json) { json_included_objects_of_type('items') }
+      let(:users_json) { json_included_objects_of_type('users') }
 
       it 'returns all collection cards' do
         get(path)
@@ -73,6 +74,40 @@ describe Api::V1::CollectionsController, type: :request, auth: true do
       it 'matches Item schema' do
         get(path)
         expect(items_json.first['attributes']).to match_json_schema('item')
+      end
+
+      context 'with editor' do
+        before do
+          user.add_role(Role::EDITOR, collection)
+        end
+
+        it 'includes editors' do
+          get(path)
+          expect(json['data']['relationships']['editors']['data'][0]['id'].to_i).to eq(user.id)
+          expect(users_json.map { |u| u['id'].to_i }).to match_array([user.id])
+        end
+
+        it 'has no viewers' do
+          get(path)
+          expect(json['data']['relationships']['viewers']['data']).to be_empty
+        end
+      end
+
+      context 'with viewer' do
+        before do
+          user.add_role(Role::VIEWER, collection)
+        end
+
+        it 'includes viewers' do
+          get(path)
+          expect(json['data']['relationships']['viewers']['data'][0]['id'].to_i).to eq(user.id)
+          expect(users_json.map { |u| u['id'].to_i }).to match_array([user.id])
+        end
+
+        it 'has no editors' do
+          get(path)
+          expect(json['data']['relationships']['editors']['data']).to be_empty
+        end
       end
     end
 

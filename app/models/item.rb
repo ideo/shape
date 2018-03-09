@@ -1,9 +1,12 @@
 class Item < ApplicationRecord
   include Breadcrumbable
+  include Resourceable
   include Archivable
+
+  resourceable roles: %i[editor viewer]
+
   archivable as: :parent_collection_card,
              with: %i[reference_collection_cards]
-  resourcify
 
   belongs_to :filestack_file, dependent: :destroy, optional: true
 
@@ -51,14 +54,6 @@ class Item < ApplicationRecord
     end
 
     i
-  end
-
-  def editors
-    User.with_role(Role::EDITOR, self)
-  end
-
-  def viewers
-    User.with_role(Role::VIEWER, self)
   end
 
   def breadcrumb_title

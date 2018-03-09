@@ -4,6 +4,8 @@ describe Api::V1::ItemsController, type: :request, auth: true do
   describe 'GET #show' do
     let!(:item) { create(:text_item) }
     let(:path) { "/api/v1/items/#{item.id}" }
+    let(:users_json) { json_included_objects_of_type('users') }
+    let(:user) { @user }
 
     it 'returns a 200' do
       get(path)
@@ -13,6 +15,40 @@ describe Api::V1::ItemsController, type: :request, auth: true do
     it 'matches JSON schema' do
       get(path)
       expect(json['data']['attributes']).to match_json_schema('item')
+    end
+
+    context 'with editor' do
+      before do
+        user.add_role(Role::EDITOR, item.becomes(Item))
+      end
+
+      it 'includes editors' do
+        get(path)
+        expect(json['data']['relationships']['editors']['data'][0]['id'].to_i).to eq(user.id)
+        expect(users_json.map { |u| u['id'].to_i }).to match_array([user.id])
+      end
+
+      it 'has no viewers' do
+        get(path)
+        expect(json['data']['relationships']['viewers']['data']).to be_empty
+      end
+    end
+
+    context 'with viewer' do
+      before do
+        user.add_role(Role::VIEWER, item.becomes(Item))
+      end
+
+      it 'includes viewers' do
+        get(path)
+        expect(json['data']['relationships']['viewers']['data'][0]['id'].to_i).to eq(user.id)
+        expect(users_json.map { |u| u['id'].to_i }).to match_array([user.id])
+      end
+
+      it 'has no editors' do
+        get(path)
+        expect(json['data']['relationships']['editors']['data']).to be_empty
+      end
     end
 
     context 'with parents' do

@@ -35,7 +35,9 @@ Collection.type = 'collections'
 
 Collection.defaults = {
   // set as array so it's never `undefined`
-  collection_cards: []
+  collection_cards: [],
+  editors: [],
+  viewers: []
 }
 
 export default Collection
