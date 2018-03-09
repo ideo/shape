@@ -31,6 +31,11 @@ class OrganizationMenu extends React.Component {
     }
   }
 
+  @action
+  onSave = () => {
+      this.editOrganizationOpen = false
+  }
+
   render() {
     const { classes, organization, uiStore } = this.props
     return (
@@ -50,7 +55,10 @@ class OrganizationMenu extends React.Component {
             <strong>{ organization.name }</strong>
           </button>
           { !!this.editOrganizationOpen &&
-            <OrganizationEdit organization={organization} />
+            <OrganizationEdit
+              onSave={this.onSave }
+              organization={organization}
+            />
           }
         </DialogContent>
       </Dialog>

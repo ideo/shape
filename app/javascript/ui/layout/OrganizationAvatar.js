@@ -17,17 +17,21 @@ const materialStyles = {
 @observer
 class OrganizationAvatar extends React.Component {
   handleClick = (ev) => {
-    const { uiStore, organization } = this.props
-    uiStore.openOrganizationMenu(organization)
+    const { onClickOverride, uiStore, organization } = this.props
+    if (onClickOverride) {
+      onClickOverride(ev)
+    } else {
+      uiStore.openOrganizationMenu(organization)
+    }
   }
 
   render() {
-    const { classes } = this.props
+    const { classes, organization } = this.props
     return (
       <Avatar
         onClick={this.handleClick}
         className={classes.smallAvatar}
-        src={'https://d3none3dlnlrde.cloudfront.net/assets/users/avatars/missing/square.jpg'}
+        src={organization.pic_url_square}
       />
     )
   }
@@ -38,6 +42,7 @@ OrganizationAvatar.propTypes = {
   classes: PropTypes.shape({
     smallAvatar: PropTypes.string,
   }).isRequired,
+  onClickOverride: PropTypes.func,
 }
 OrganizationAvatar.wrappedComponent.propTypes = {
   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
