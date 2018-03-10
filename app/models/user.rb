@@ -20,11 +20,18 @@ class User < ApplicationRecord
              class_name: 'Organization',
              optional: true
 
-  validates :uid, :provider, :email, presence: true
+  validates :email, presence: true
+  validates :uid, :provider, presence: true, if: :active?
 
   searchkick word_start: [:name]
 
   scope :search_import, -> { includes(:roles, :organizations) }
+
+  enum status: {
+    active: 0,
+    pending: 1,
+    deleted: 2,
+  }
 
   def search_data
     {
@@ -52,6 +59,14 @@ class User < ApplicationRecord
     user.pic_url_square = auth.info.image
 
     user
+  end
+
+  def self.create_pending_from_email(email)
+    create(
+      email: email,
+      status: User.statuses[:pending],
+      password: Devise.friendly_token,
+    )
   end
 
   def name

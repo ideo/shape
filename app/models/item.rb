@@ -60,6 +60,11 @@ class Item < ApplicationRecord
     name
   end
 
+  def resourceable_class
+    # Use top-level class since this is an STI model
+    Item
+  end
+
   private
 
   def format_url

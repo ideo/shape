@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180302185830) do
+ActiveRecord::Schema.define(version: 20180309222116) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -73,8 +73,8 @@ ActiveRecord::Schema.define(version: 20180302185830) do
     t.datetime "updated_at", null: false
     t.jsonb "breadcrumb"
     t.integer "filestack_file_id"
-    t.jsonb "text_data"
     t.string "url"
+    t.jsonb "text_data"
     t.string "thumbnail_url"
     t.index ["cloned_from_id"], name: "index_items_on_cloned_from_id"
   end
@@ -113,6 +113,7 @@ ActiveRecord::Schema.define(version: 20180302185830) do
     t.string "provider"
     t.string "uid"
     t.integer "current_organization_id"
+    t.integer "status", default: 0
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["provider"], name: "index_users_on_provider"
     t.index ["uid"], name: "index_users_on_uid"

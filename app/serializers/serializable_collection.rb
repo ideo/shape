@@ -1,4 +1,5 @@
 class SerializableCollection < BaseJsonSerializer
+  ROLES_LIMIT = 5
   type 'collections'
   attributes :id, :name, :created_at
   belongs_to :organization
@@ -10,9 +11,9 @@ class SerializableCollection < BaseJsonSerializer
     ).to_api
   end
   has_many :editors do
-    data { @object.editors }
+    data { @object.editors.first(ROLES_LIMIT) }
   end
   has_many :viewers do
-    data { @object.viewers }
+    data { @object.viewers.first(ROLES_LIMIT) }
   end
 end
