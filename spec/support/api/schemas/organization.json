@@ -3,7 +3,7 @@
   "properties": {
     "id": { "type": "integer" },
     "name": { "type": "string" },
-    "pic_url_square": { "type": "string"}
+    "pic_url_square": { "type": ["string", "null"]}
   },
   "required": ["id", "name"]
 }
