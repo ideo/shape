@@ -13,6 +13,8 @@ const materialStyles = {
   }
 }
 
+const DEFAULT_URL = 'https://d3none3dlnlrde.cloudfront.net/assets/users/avatars/missing/square.jpg'
+
 @inject('uiStore')
 @observer
 class OrganizationAvatar extends React.Component {
@@ -27,11 +29,12 @@ class OrganizationAvatar extends React.Component {
 
   render() {
     const { classes, organization } = this.props
+    const url = organization.pic_url_square || DEFAULT_URL
     return (
       <Avatar
         onClick={this.handleClick}
         className={classes.smallAvatar}
-        src={organization.pic_url_square}
+        src={url}
       />
     )
   }

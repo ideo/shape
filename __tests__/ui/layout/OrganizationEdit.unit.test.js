@@ -1,19 +1,20 @@
 import { observable, useStrict } from 'mobx'
 import OrganizationEdit from '~/ui/layout/OrganizationEdit'
 
+const fakeMouseEvent = { preventDefault: jest.fn() }
 const props = {
   organization: {
     name: 'Space',
-    save: jest.fn()
-  }
+    save: jest.fn(() => Promise.resolve({}))
+  },
+  onSave: jest.fn()
 }
-
 let wrapper
 
 describe('OrganizationEdit', () => {
   beforeEach(() => {
     useStrict(false)
-    wrapper = mount(
+    wrapper = shallow(
       <OrganizationEdit {...props} />
     )
   })
@@ -28,11 +29,17 @@ describe('OrganizationEdit', () => {
     () => {
       wrapper.find('[type="text"]').simulate('change',
         { target: { value: 'Ocean' }})
-      wrapper.find('[type="submit"]').simulate('click')
+      wrapper.find('[type="submit"]').simulate('click', fakeMouseEvent)
       expect(props.organization.save).toHaveBeenCalled()
     })
 
-  it('should open the file loader when you click on the avatar', () => {
+  it('should call the onSave method when saved successfully', () => {
+    wrapper.find('[type="submit"]').simulate('click', fakeMouseEvent)
+    expect(props.onSave).toHaveBeenCalled()
+  })
 
+  it('should open the file loader when you click on the avatar', () => {
+    // TODO this test requires mocking, I wanted to go over our
+    // patterns for that first
   })
 })

@@ -1,4 +1,5 @@
 import { observable, useStrict } from 'mobx'
+import { Provider } from 'mobx-react';
 import OrganizationMenu from '~/ui/layout/OrganizationMenu'
 
 const uiStore = observable({
@@ -18,7 +19,9 @@ describe('OrganizationMenu', () => {
   beforeEach(() => {
     useStrict(false)
     wrapper = mount(
-      <OrganizationMenu {...props} />
+      <Provider uiStore={uiStore}>
+        <OrganizationMenu {...props} />
+      </Provider>
     )
   })
 
@@ -31,6 +34,11 @@ describe('OrganizationMenu', () => {
 
   it('closes the organization menu in the UI store when exited', () => {
     wrapper.find('OrganizationMenu').instance().handleClose()
+    expect(props.uiStore.closeOrganizationMenu).toHaveBeenCalled()
+  })
+
+  it('closes the edit menu when changes are save in the UI store', () => {
+    wrapper.find('OrganizationMenu').instance().onSave()
     expect(props.uiStore.closeOrganizationMenu).toHaveBeenCalled()
   })
 
