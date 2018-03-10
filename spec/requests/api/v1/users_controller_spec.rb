@@ -38,14 +38,27 @@ describe Api::V1::UsersController, type: :request, auth: true do
 
     it 'returns user that matches name search' do
       get(path, params: { query: find_user.name })
-      expect(json['data'].size).to be(1)
+      expect(json['data'].size).to eq(1)
+      expect(json['data'].first['id'].to_i).to eq(find_user.id)
+    end
+
+    it 'returns user that matches fuzzy search' do
+      name_without_first_char = find_user.name.slice(1, find_user.name.length)
+      get(path, params: { query: name_without_first_char })
+      expect(json['data'].size).to eq(1)
       expect(json['data'].first['id'].to_i).to eq(find_user.id)
     end
 
     it 'returns user that matches email search' do
       get(path, params: { query: find_user.email })
-      expect(json['data'].size).to be(1)
+      expect(json['data'].size).to eq(1)
       expect(json['data'].first['id'].to_i).to eq(find_user.id)
+    end
+
+    it 'does not return fuzzy email match' do
+      email_without_first_char = find_user.email.slice(1, find_user.email.length)
+      get(path, params: { query: email_without_first_char })
+      expect(json['data'].size).to eq(0)
     end
 
     it 'returns empty array if no match' do
@@ -69,7 +82,7 @@ describe Api::V1::UsersController, type: :request, auth: true do
 
       it 'does not return user that has same name in another org' do
         get(path, params: { query: find_user.name })
-        expect(json['data'].size).to be(1)
+        expect(json['data'].size).to eq(1)
         expect(json['data'].first['id'].to_i).to eq(find_user.id)
       end
     end

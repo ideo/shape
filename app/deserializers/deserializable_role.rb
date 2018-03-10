@@ -1,0 +1,2 @@
+class DeserializableRole < BaseJsonDeserializer
+end

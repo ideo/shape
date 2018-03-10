@@ -11,6 +11,7 @@ Rails.application.routes.draw do
           post 'duplicate'
         end
         resources :collection_cards, only: :index
+        resources :roles, only: %i[index create destroy], shallow: true
       end
       resources :collection_cards, shallow: true do
         member do
@@ -20,23 +21,25 @@ Rails.application.routes.draw do
           member do
             post 'duplicate'
           end
+          resources :roles, only: %i[index create], shallow: true
         end
         resources :collections, only: :create
         member do
           patch 'archive'
         end
       end
-      resources :organizations, only: [:show, :update] do
+      resources :organizations, only: %i[show update] do
         collection do
           get 'current'
         end
-        resources :collections, only: [:index, :create]
+        resources :collections, only: %i[index create]
       end
       resources :users do
         collection do
           get 'me'
           get 'search'
         end
+        resources :roles, only: %i[destroy]
       end
     end
   end

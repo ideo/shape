@@ -19,8 +19,9 @@ class Api::V1::UsersController < Api::V1::BaseController
     return [] if query.blank?
 
     User.search(
-      query,
-      fields: ['name^2', :email],
+      query.downcase,
+      fields: ['name^2', { email: :exact }],
+      match: :word_start,
       where: { organization_ids: current_organization.id },
     )
   end
