@@ -1,11 +1,13 @@
 import PropTypes from 'prop-types'
 import { action, observable } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
+import styled from 'styled-components'
 import Dialog, {
   DialogContent,
   DialogTitle,
 } from 'material-ui/Dialog'
 import { withStyles } from 'material-ui/styles'
+import OrganizationAvatar from '~/ui/layout/OrganizationAvatar'
 import OrganizationEdit from '~/ui/layout/OrganizationEdit'
 
 const materialStyles = {
@@ -13,6 +15,11 @@ const materialStyles = {
     width: 624,
   }
 }
+
+const Row = styled.div`
+  display: flex
+`
+Row.displayName = 'Row'
 
 @inject('uiStore')
 @observer
@@ -51,12 +58,18 @@ class OrganizationMenu extends React.Component {
           <h3>
             Your Organization
           </h3>
-          <button onClick={this.handleOrganizationClick}>
-            <strong>{ organization.name }</strong>
-          </button>
+          <Row>
+            <OrganizationAvatar
+              onClickOverride={this.handleOrganizationClick}
+              organization={organization}
+            />
+            <button onClick={this.handleOrganizationClick}>
+              <strong>{ organization.name }</strong>
+            </button>
+          </Row>
           { !!this.editOrganizationOpen &&
             <OrganizationEdit
-              onSave={this.onSave }
+              onSave={this.onSave}
               organization={organization}
             />
           }
