@@ -94,7 +94,7 @@ class Collection < ApplicationRecord
   private
 
   def inherit_roles_from_parent
-    InheritRolesFromParentWorker.perform_async(id, self.class.name.to_s)
+    AddRolesToChildrenWorker.perform_async(role_ids, id, self.class.name.to_s)
   end
 
   def organization_blank?

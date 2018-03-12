@@ -1,34 +1,43 @@
 module Roles
   class AddToChildren
-    def initialize(object:, role:)
+    def initialize(object:, roles:)
       @object = object
-      @role = role
+      @roles = roles
     end
 
     def call
-      apply_role_to_children
+      return false unless add_roles_to_children
+      recursively_add_roles
     end
 
     private
 
-    attr_reader :object, :role
+    attr_reader :object, :roles
 
-    def apply_role_to_children
-      object.children.all? do |child|
-        # Apply the role to this object
-        add_to_child = Roles::AddToChild.new(
-          object: child,
-          parent_role: role,
-        )
+    def add_roles_to_children
+      roles.all? do |role|
+        children.all? do |child|
+          child_role = copy_role_to_object(role, child)
+          child_role.persisted?
+        end
+      end
+    end
 
-        return false unless add_to_child.call
-
-        # Apply the role recursively to this object's children
+    def recursively_add_roles
+      children.all? do |child|
         Roles::AddToChildren.new(
           object: child,
-          role: add_to_child.role,
+          roles: roles,
         ).call
       end
+    end
+
+    def copy_role_to_object(role, object)
+      # Use amoeba_dup so it copies all associated users_roles
+      new_role = role.amoeba_dup
+      new_role.resource = object
+      new_role.save
+      new_role
     end
 
     def children

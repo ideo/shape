@@ -54,6 +54,7 @@ class CollectionCard < ApplicationRecord
   end
 
   def record_type
+    return nil if record.blank?
     record.class.base_class.name.underscore.to_sym
   end
 

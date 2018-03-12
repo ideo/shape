@@ -1,26 +1,40 @@
 module Roles
   class RemoveFromChildren
-    def initialize(object:, role:)
+    def initialize(object:, roles:)
       @object = object
-      @role = role
+      @roles = roles
     end
 
     def call
-      remove_role_from_children
+      return false unless remove_roles_from_children
+      recursively_remove_roles
     end
 
     private
 
-    def remove_role_from_children
-      object.children.all? do |object|
-        return false unless object.roles.delete(role)
+    attr_reader :object, :roles
 
-        # Remove the role recursively from this object's children
+    def remove_roles_from_children
+      object.children.all? do |child|
+        roles.all? do |role|
+          remove_role_from_object(child, role.name)
+        end
+      end
+    end
+
+    def recursively_remove_roles
+      children.all? do |child|
         Roles::RemoveFromChildren.new(
-          object: object,
-          role: role,
+          object: child,
+          roles: roles,
         ).call
       end
+    end
+
+    def remove_role_from_object(object, role_name)
+      object_role = object.roles.find_by(name: role_name)
+      return false unless object_role.present?
+      object_role.destroy_without_children_callbacks
     end
 
     def children

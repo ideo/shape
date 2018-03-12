@@ -7,13 +7,15 @@ class Role < ApplicationRecord
              optional: true
 
   after_create :apply_to_children, if: :apply_to_children?
-  after_destroy :remove_from_children, if: :apply_to_children?
+  after_destroy :remove_from_children, if: :remove_from_children?
 
   validates :resource_type,
             inclusion: { in: Rolify.resource_types },
             allow_nil: true
 
   scopify
+
+  attr_accessor :skip_children_callbacks
 
   VIEWER = :viewer
   EDITOR = :editor
@@ -56,17 +58,28 @@ class Role < ApplicationRecord
     [name, resource_identifier].select(&:present?).join('_')
   end
 
+  def destroy_without_children_callbacks
+    self.skip_children_callbacks = true
+    destroy
+  end
+
   private
 
   def apply_to_children?
+    return false if skip_children_callbacks
+
     resource.is_a?(Item) || resource.is_a?(Collection)
   end
 
+  def remove_from_children?
+    apply_to_children?
+  end
+
   def apply_to_children
-    AddRoleToChildrenWorker.perform_async(id, resource_id, resource_type)
+    AddRolesToChildrenWorker.perform_async([id], resource_id, resource_type)
   end
 
   def remove_from_children
-    RemoveRoleFromChildrenWorker.perform_async(id, resource_id, resource_type)
+    RemoveRolesFromChildrenWorker.perform_async([id], resource_id, resource_type)
   end
 end
