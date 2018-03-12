@@ -38,6 +38,7 @@ Rails.application.routes.draw do
         collection do
           get 'me'
           get 'search'
+          post 'create_from_emails'
         end
         resources :roles, only: %i[destroy]
       end

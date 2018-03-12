@@ -13,23 +13,21 @@ class Api::V1::RolesController < Api::V1::BaseController
 
   # Create role(s) on this resource (collection or item)
   # Params:
-  # - role: name of the role, e.g. 'admin' or 'editor'
+  # - role: { name: 'editor' }
   # - user_ids: array of of users that you want to assign
-  # - emails: array of email addresses that you want to invite
-  #           (it will create pending user accounts for them)
   # Returns:
-  # - array of roles successfully created
+  # - array of roles successfully created, including users with that role
   def create
-    assigner = RoleAssigner.new(
+    users = User.where(id: json_api_params[:user_ids]).to_a
+    assigner = AssignRole.new(
       object: resource,
       role_name: role_params[:name],
-      user_ids: json_api_params[:user_ids],
-      emails: json_api_params[:emails],
+      users: users,
     )
     if assigner.call
       render jsonapi: assigner.roles, include: %i[users]
     else
-      render_api_errors role_assigner.errors
+      render_api_errors assigner.errors
     end
   end
 
