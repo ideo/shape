@@ -20,6 +20,7 @@ class Api::V1::CollectionsController < Api::V1::BaseController
         :editors,
         :viewers,
         collection_cards: [
+          :parent,
           record: [
             :filestack_file,
           ],
