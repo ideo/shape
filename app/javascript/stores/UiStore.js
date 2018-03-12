@@ -39,4 +39,8 @@ export default class UiStore {
   @action openRolesMenu() {
     this.rolesMenuOpen = true
   }
+
+  @action closeRolesMenu() {
+    this.rolesMenuOpen = false
+  }
 }
