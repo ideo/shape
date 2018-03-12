@@ -1,12 +1,12 @@
 require 'rails_helper'
 
-RSpec.describe AssignRole, type: :service do
+RSpec.describe Roles::AssignToUsers, type: :service do
   let(:organization) { create(:organization) }
   let(:object) { create(:text_item) }
   let(:users) { create_list(:user, 3) }
   let(:role_name) { :editor }
   let(:assign_role) do
-    AssignRole.new(object: object, role_name: role_name, users: users)
+    Roles::AssignToUsers.new(object: object, role_name: role_name, users: users)
   end
 
   describe '#call' do

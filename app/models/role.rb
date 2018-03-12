@@ -6,7 +6,7 @@ class Role < ApplicationRecord
              polymorphic: true,
              optional: true
 
-  after_create :apply_to_children, if: :apply_to_children?
+  after_create :add_to_children, if: :add_to_children?
   after_destroy :remove_from_children, if: :remove_from_children?
 
   validates :resource_type,
@@ -65,17 +65,17 @@ class Role < ApplicationRecord
 
   private
 
-  def apply_to_children?
+  def add_to_children?
     return false if skip_children_callbacks
 
     resource.is_a?(Item) || resource.is_a?(Collection)
   end
 
   def remove_from_children?
-    apply_to_children?
+    add_to_children?
   end
 
-  def apply_to_children
+  def add_to_children
     AddRolesToChildrenWorker.perform_async([id], resource_id, resource_type)
   end
 

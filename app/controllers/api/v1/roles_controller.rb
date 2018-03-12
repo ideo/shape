@@ -19,7 +19,7 @@ class Api::V1::RolesController < Api::V1::BaseController
   # - array of roles successfully created, including users with that role
   def create
     users = User.where(id: json_api_params[:user_ids]).to_a
-    assigner = AssignRole.new(
+    assigner = Roles::AssignToUsers.new(
       object: resource,
       role_name: role_params[:name],
       users: users,

@@ -15,8 +15,8 @@ module Roles
     attr_reader :object, :roles
 
     def remove_roles_from_children
-      object.children.all? do |child|
-        roles.all? do |role|
+      roles.all? do |role|
+        children.all? do |child|
           remove_role_from_object(child, role.name)
         end
       end
