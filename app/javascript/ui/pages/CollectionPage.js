@@ -65,7 +65,8 @@ class CollectionPage extends PageWithApi {
   }
 
   showObjectRoleDialog = () => {
-    console.log('Manage object roles')
+    const { uiStore } = this.props
+    uiStore.openRolesMenu()
   }
 
   updateCollection = () => {
