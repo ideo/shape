@@ -53,6 +53,13 @@ RSpec.configure do |config|
   # See: http://www.virtuouscode.com/2012/08/31/configuring-database_cleaner-with-rails-rspec-capybara-and-selenium/
   config.before(:suite) do
     DatabaseCleaner.clean_with(:truncation)
+    Searchkick.disable_callbacks
+  end
+
+  config.around(:each, search: true) do |example|
+    Searchkick.callbacks(true) do
+      example.run
+    end
   end
 
   config.before(:each) do

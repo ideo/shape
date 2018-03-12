@@ -66,6 +66,11 @@ class Item < ApplicationRecord
     name
   end
 
+  def resourceable_class
+    # Use top-level class since this is an STI model
+    Item
+  end
+
   private
 
   def inherit_roles_from_parent

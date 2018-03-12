@@ -3,11 +3,14 @@ module Resourceable
 
   included do
     resourcify
+    class_attribute :resourceable_roles
   end
 
   class_methods do
     def resourceable(**args)
       if args[:roles].present?
+        self.resourceable_roles = args[:roles]
+
         args[:roles].each do |role_name|
           # Define a pluralized method with this role on the class
           # e.g. if given [:viewer], the method would be .viewers
@@ -29,5 +32,9 @@ module Resourceable
 
   def role_with_name(role_name)
     roles.find_by(name: role_name)
+  end
+
+  def resourceable_class
+    self.class
   end
 end
