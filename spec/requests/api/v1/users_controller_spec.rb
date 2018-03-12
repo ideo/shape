@@ -87,4 +87,27 @@ describe Api::V1::UsersController, type: :request, auth: true do
       end
     end
   end
+
+  describe 'POST #create_from_emails' do
+    let(:emails) { Array.new(3).map { Faker::Internet.email } }
+    let(:users_json) { json_included_objects_of_type('users') }
+    let(:path) { '/api/v1/users/create_from_emails' }
+    let(:params) {
+      {
+        'emails': emails,
+      }.to_json
+    }
+
+    it 'returns a 200' do
+      post(path, params: params)
+      expect(response.status).to eq(200)
+    end
+
+    it 'returns 3 pending users' do
+      post(path, params: params)
+      expect(json['data'].size).to eq(3)
+      expect(json['data'].map { |u| u['attributes']['email'] }).to match_array(emails)
+      expect(json['data'].all? { |u| u['attributes']['status'] == 'pending' }).to be true
+    end
+  end
 end

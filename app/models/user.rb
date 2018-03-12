@@ -23,6 +23,9 @@ class User < ApplicationRecord
   validates :email, presence: true
   validates :uid, :provider, presence: true, if: :active?
 
+  alias rolify_has_role? has_role?
+  alias rolify_add_role add_role
+
   searchkick word_start: [:name]
 
   scope :search_import, -> { includes(:roles, :organizations) }
@@ -61,7 +64,7 @@ class User < ApplicationRecord
     user
   end
 
-  def self.create_pending_from_email(email)
+  def self.create_pending_user(email:)
     create(
       email: email,
       status: User.statuses[:pending],
@@ -81,6 +84,18 @@ class User < ApplicationRecord
     return nil if current_organization.blank?
 
     collections.user.find_by_organization_id(current_organization_id)
+  end
+
+  # Override rolify has_role? and add_role methods to ensure
+  # we always pass root class, not STI child class - which it can't handle
+  def has_role?(role_name, resource = nil)
+    return rolify_has_role?(role_name) if resource.blank?
+    rolify_has_role?(role_name, resource.becomes(resource.resourceable_class))
+  end
+
+  def add_role(role_name, resource = nil)
+    return rolify_add_role(role_name) if resource.blank?
+    rolify_add_role(role_name, resource.becomes(resource.resourceable_class))
   end
 
   private

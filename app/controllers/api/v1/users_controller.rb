@@ -13,7 +13,21 @@ class Api::V1::UsersController < Api::V1::BaseController
     render jsonapi: search_users(params[:query])
   end
 
+  # Create new pending users from email addresses
+  def create_from_emails
+    cpu = CreatePendingUsers.new(json_api_params[:emails])
+    if cpu.call
+      render jsonapi: cpu.users
+    else
+      render_api_errors cpu.failed_emails
+    end
+  end
+
   private
+
+  def json_api_params
+    params[:_jsonapi]
+  end
 
   def search_users(query)
     return [] if query.blank?
