@@ -1,9 +1,17 @@
+import PropTypes from 'prop-types'
+import styled from 'styled-components'
+import { extendObservable } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import Dialog, {
   DialogContent,
   DialogContentText,
   DialogTitle,
 } from 'material-ui/Dialog'
+
+const Row = styled.div`
+  display: flex
+`
+Row.displayName = 'Row'
 
 @inject('uiStore')
 @observer
@@ -13,8 +21,25 @@ class RolesMenu extends React.Component {
     uiStore.closeRolesMenu()
   }
 
+  renderUser(user, role) {
+    return (
+      <Row>
+        <span>
+          {user.name}<br />
+          {user.email}
+        </span>
+        <span>
+          <select value={role}>
+            <option value="editor">Editor</option>
+            <option value="viewer">Viewer</option>
+          </select>
+        </span>
+      </Row>
+    )
+  }
+
   render() {
-    const { uiStore } = this.props
+    const { uiStore, editors, viewers } = this.props
     // TODO abstract shared dialog functionality to component
     return (
       <Dialog
@@ -26,7 +51,13 @@ class RolesMenu extends React.Component {
         <DialogTitle id="form-dialog-title">Sharing</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            Organization
+            <p>Shared with</p>
+            { editors.map((user) =>
+              this.renderUser(user, 'editor'))
+            }
+            { viewers.map((user) =>
+              this.renderUser(user, 'viewers'))
+            }
           </DialogContentText>
         </DialogContent>
       </Dialog>
@@ -35,6 +66,9 @@ class RolesMenu extends React.Component {
 }
 
 RolesMenu.propTypes = {
+  editors: MobxPropTypes.arrayOrObservableArray.isRequired,
+  viewers: MobxPropTypes.arrayOrObservableArray.isRequired,
+  collectionId: PropTypes.number
 }
 RolesMenu.wrappedComponent.propTypes = {
   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,

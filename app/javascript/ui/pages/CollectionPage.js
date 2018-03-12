@@ -12,6 +12,7 @@ import CollectionGrid from '~/ui/grid/CollectionGrid'
 import H1 from '~/ui/global/H1'
 import Breadcrumb from '~/ui/layout/Breadcrumb'
 import RolesSummary from '~/ui/layout/RolesSummary'
+import RolesMenu from '~/ui/layout/RolesMenu'
 
 const isHomepage = ({ path }) => path === '/'
 
@@ -98,6 +99,11 @@ class CollectionPage extends PageWithApi {
           </StyledTitleAndRoles>
         </Header>
         <PageContainer>
+          <RolesMenu
+            viewers={collection.viewers}
+            editors={collection.editors}
+            collectionId={collection.id}
+          />
           <CollectionGrid
             // pull in cols, gridW, gridH, gutter
             {...uiStore.gridSettings}
