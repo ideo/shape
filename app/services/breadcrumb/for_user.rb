@@ -55,7 +55,7 @@ module Breadcrumb
     end
 
     def content_can
-      @content_can ||= Permissions::UserCan.new(user)
+      @content_can ||= Roles::UserCan.new(user)
     end
   end
 end

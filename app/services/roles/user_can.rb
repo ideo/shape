@@ -1,4 +1,4 @@
-module Permissions
+module Roles
   class UserCan
     def initialize(user)
       @user = user

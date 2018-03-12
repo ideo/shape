@@ -25,6 +25,8 @@ class Item < ApplicationRecord
   delegate :parent, to: :parent_collection_card, allow_nil: true
 
   before_validation :format_url, if: :saved_change_to_url?
+  after_create :inherit_roles_from_parent
+
   validates :type, presence: true
 
   accepts_nested_attributes_for :filestack_file
@@ -33,6 +35,10 @@ class Item < ApplicationRecord
     enable
     exclude_association :filestack_file
     exclude_association :parent_collection_card
+  end
+
+  def children
+    []
   end
 
   def duplicate!(copy_parent_card: false)
@@ -61,6 +67,10 @@ class Item < ApplicationRecord
   end
 
   private
+
+  def inherit_roles_from_parent
+    InheritRolesFromParentWorker.perform_async(id, self.class.name.to_s)
+  end
 
   def format_url
     return if url.blank?

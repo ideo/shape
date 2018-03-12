@@ -6,6 +6,9 @@ class Role < ApplicationRecord
              polymorphic: true,
              optional: true
 
+  after_create :apply_to_children, if: :apply_to_children?
+  after_destroy :remove_from_children, if: :apply_to_children?
+
   validates :resource_type,
             inclusion: { in: Rolify.resource_types },
             allow_nil: true
@@ -16,6 +19,13 @@ class Role < ApplicationRecord
   EDITOR = :editor
   MEMBER = :member
   ADMIN = :admin
+
+  amoeba do
+    enable
+    include_association :users_roles
+    exclude_association :resource
+    exclude_association :users
+  end
 
   # All the resources of a specific type (e.g. Organization) that this user is connected to
   # Role name is optional but can additionally scope it
@@ -44,5 +54,19 @@ class Role < ApplicationRecord
 
   def identifier
     [name, resource_identifier].select(&:present?).join('_')
+  end
+
+  private
+
+  def apply_to_children?
+    resource.is_a?(Item) || resource.is_a?(Collection)
+  end
+
+  def apply_to_children
+    AddRoleToChildrenWorker.perform_async(id, resource_id, resource_type)
+  end
+
+  def remove_from_children
+    RemoveRoleFromChildrenWorker.perform_async(id, resource_id, resource_type)
   end
 end
