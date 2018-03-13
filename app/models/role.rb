@@ -50,6 +50,15 @@ class Role < ApplicationRecord
     [role_name, resource_identifier].select(&:present?).join('_')
   end
 
+  # Builds a copy of this role,
+  # allowing you to copy from one object to another
+  def build_copy(new_object)
+    # Use amoeba_dup so it copies all associated users_roles
+    new_role = amoeba_dup
+    new_role.resource = new_object
+    new_role
+  end
+
   def resource_identifier
     "#{resource_type}_#{resource_id}"
   end

@@ -1,7 +1,7 @@
 module Roles
   class RemoveFromChildren
-    def initialize(object:, roles:)
-      @object = object
+    def initialize(parent:, roles:)
+      @object = parent
       @roles = roles
     end
 
@@ -12,7 +12,7 @@ module Roles
 
     private
 
-    attr_reader :object, :roles
+    attr_reader :parent, :roles
 
     def remove_roles_from_children
       roles.all? do |role|
@@ -38,9 +38,9 @@ module Roles
     end
 
     def children
-      return [] unless object.respond_to?(:children)
+      return [] unless parent.respond_to?(:children)
 
-      object.children
+      parent.children
     end
   end
 end

@@ -74,7 +74,7 @@ class Item < ApplicationRecord
   private
 
   def inherit_roles_from_parent
-    AddRolesToChildrenWorker.perform_async(role_ids, id, self.class.name.to_s, true)
+    AddRolesToChildrenWorker.perform_async(role_ids, id, self.class.name.to_s)
   end
 
   def format_url

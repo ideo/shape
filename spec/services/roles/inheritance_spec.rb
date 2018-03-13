@@ -2,47 +2,123 @@ require 'rails_helper'
 
 RSpec.describe Roles::Inheritance, type: :service do
   let!(:collection) { create(:collection, num_cards: 5) }
-  let(:user) { create(:user) }
-  let!(:role) { user.add_role(Role::EDITOR, collection) }
-  let(:add_to_children) do
-    Roles::AddToChildren.new(object: collection, roles: [role])
+  let!(:subcollection_card) do
+    create(:collection_card_collection, parent: collection)
+  end
+  let(:subcollection) { subcollection_card.collection }
+  let(:inheritance) do
+    Roles::Inheritance.new(collection)
   end
 
-  describe '#call' do
-    it 'should create new roles for each item' do
-      expect { add_to_children.call }.to change(Role, :count).by(5)
-    end
+  describe '#inherit_from_parent?' do
+    let(:all_objects) {
+      [collection] + collection.children
+    }
+    let(:editors) { create_list(:user, 2) }
+    let(:viewers) { create_list(:user, 2) }
+    let(:item) { collection.items.first }
 
-    it 'should add editor role to all card items' do
-      expect(add_to_children.call).to be true
-      user.reload
-      expect(collection.items.all? { |i| user.has_role?(:editor, i) }).to be true
-    end
-
-    context 'with sub-collection' do
-      let!(:subcollection_card) do
-        create(:collection_card_collection, parent: collection)
+    context 'same editors and viewers on all items' do
+      before do
+        add_roles(Role::EDITOR, editors, all_objects)
+        add_roles(Role::VIEWER, viewers, all_objects)
       end
-      let(:subcollection) { subcollection_card.collection }
 
-      it 'should add editor role to sub-collection' do
-        expect(collection.children).to include(subcollection)
-        expect(add_to_children.call).to be true
-        expect(user.has_role?(:editor, subcollection)).to be true
+      it 'returns true for all children' do
+        expect(collection.children.all? { |item| inheritance.inherit_from_parent?(item) == true }).to be true
       end
     end
 
-    context 'with multiple users' do
-      let!(:users) { create_list(:user, 3) }
+    context 'child has more roles than parent, but includes all parent roles' do
+      before do
+        add_roles(Role::EDITOR, editors, all_objects)
+        add_roles(Role::VIEWER, viewers, item)
+      end
+
+      it 'returns true' do
+        expect(inheritance.inherit_from_parent?(item)).to be true
+      end
+    end
+
+    context 'less users on child, but same role as parent' do
+      before do
+        add_roles(Role::EDITOR, editors, collection)
+        add_roles(Role::EDITOR, editors[0], item)
+      end
+
+      it 'returns false' do
+        expect(inheritance.inherit_from_parent?(item)).to be false
+      end
+    end
+
+    context 'same users, different role' do
+      before do
+        add_roles(Role::EDITOR, editors, collection)
+        add_roles(Role::VIEWER, editors, item)
+        expect(inheritance.inherit_from_parent?(item)).to be false
+      end
+
+      it 'return false' do
+        expect(inheritance.inherit_from_parent?(item)).to be false
+      end
+    end
+
+    context 'same users, different roles' do
+      before do
+        add_roles(Role::EDITOR, editors, collection)
+        add_roles(Role::VIEWER, viewers, item)
+      end
+
+      it 'returns false' do
+        expect(inheritance.inherit_from_parent?(item)).to be false
+      end
+    end
+
+    context 'different users, different roles' do
+      before do
+        add_roles(Role::EDITOR, editors, collection)
+        add_roles(Role::VIEWER, viewers, item)
+      end
+
+      it 'returns false' do
+        expect(inheritance.inherit_from_parent?(item)).to be false
+      end
+    end
+
+    context 'parent has more roles than children' do
+      before do
+        add_roles(Role::EDITOR, editors, all_objects)
+        add_roles(Role::VIEWER, viewers, collection)
+      end
+
+      it 'returns false' do
+        expect(inheritance.inherit_from_parent?(item)).to be false
+      end
+    end
+
+    context 'when adding new roles, passing in potential child roles' do
+      let(:addtl_viewer) { create(:user) }
 
       before do
-        users.each { |u| u.add_role(Role::EDITOR, collection) }
+        add_roles(Role::EDITOR, editors, all_objects)
+        add_roles(Role::VIEWER, viewers, all_objects)
       end
 
-      it 'should include all users from parent' do
-        expect(add_to_children.call).to be true
-        expect(collection.items.first.editors).to match_array([user] + users)
+      it 'returns true for child' do
+        new_role = add_roles(Role::VIEWER, addtl_viewer, collection).first
+        new_child_role = new_role.build_copy(item)
+        expect(inheritance.inherit_from_parent?(item, new_child_role)).to be true
       end
     end
+  end
+
+  def add_roles(role_name, user_or_users, object_or_objects)
+    users = *user_or_users
+    objects = *object_or_objects
+    users.map do |user|
+      objects.map do |object|
+        user.add_role(role_name, object)
+      end
+    end.flatten
   end
 end

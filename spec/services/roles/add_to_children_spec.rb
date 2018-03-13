@@ -2,15 +2,20 @@ require 'rails_helper'
 
 RSpec.describe Roles::AddToChildren, type: :service do
   let!(:collection) { create(:collection, num_cards: 5) }
-  let(:user) { create(:user) }
-  let!(:role) { user.add_role(Role::EDITOR, collection) }
+  let!(:subcollection_card) do
+    create(:collection_card_collection, parent: collection)
+  end
+  let(:subcollection) { subcollection_card.collection }
   let(:add_to_children) do
-    Roles::AddToChildren.new(object: collection, roles: [role])
+    Roles::AddToChildren.new(parent: collection, roles: [role])
   end
 
   describe '#call' do
+    let(:user) { create(:user) }
+    let!(:role) { user.add_role(Role::EDITOR, collection) }
+
     it 'should create new roles for each item' do
-      expect { add_to_children.call }.to change(Role, :count).by(5)
+      expect { add_to_children.call }.to change(Role, :count).by(6)
     end
 
     it 'should add editor role to all card items' do

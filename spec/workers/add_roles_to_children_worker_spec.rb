@@ -16,7 +16,7 @@ RSpec.describe AddRolesToChildrenWorker, type: :worker do
 
     it 'should call Roles::AddToChildren' do
       expect(Roles::AddToChildren).to receive(:new).with(
-        object: collection,
+        parent: collection,
         roles: [role],
       )
       expect(instance_double).to receive(:call)
