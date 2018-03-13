@@ -82,19 +82,27 @@ class OrganizationMenu extends React.Component {
     this.editOrganizationOpen = false
   }
 
+  renderEditOrganization() {
+    const { organization } = this.props
+    return (
+      <div>
+        <DialogTitle disableTypography id="form-dialog-title">
+          <StyledH2>Your Organization</StyledH2>
+        </DialogTitle>
+        <DialogContent>
+          <OrganizationEdit
+            onSave={this.onSave}
+            organization={organization}
+          />
+        </DialogContent>
+      </div>
+    )
+  }
+
   render() {
     const { classes, organization, uiStore } = this.props
-    return (
-      <Dialog
-        open={uiStore.organizationMenuOpen}
-        classes={classes}
-        onClose={this.handleClose}
-        aria-labelledby="form-dialog-title"
-        BackdropProps={{ invisible: true }}
-      >
-        <StyledCloseButton onClick={this.handleClose}>
-          <CloseIcon />
-        </StyledCloseButton>
+    let content = (
+      <div>
         <DialogTitle disableTypography id="form-dialog-title">
           <StyledH2>People & Groups</StyledH2>
         </DialogTitle>
@@ -107,13 +115,24 @@ class OrganizationMenu extends React.Component {
               <StyledText>{ organization.name }</StyledText>
             </button>
           </Row>
-          { !!this.editOrganizationOpen &&
-            <OrganizationEdit
-              onSave={this.onSave}
-              organization={organization}
-            />
-          }
         </DialogContent>
+      </div>
+    )
+    if (this.editOrganizationOpen) {
+      content = this.renderEditOrganization()
+    }
+    return (
+      <Dialog
+        open={uiStore.organizationMenuOpen}
+        classes={classes}
+        onClose={this.handleClose}
+        aria-labelledby="form-dialog-title"
+        BackdropProps={{ invisible: true }}
+      >
+        <StyledCloseButton onClick={this.handleClose}>
+          <CloseIcon />
+        </StyledCloseButton>
+        { content}
       </Dialog>
     )
   }

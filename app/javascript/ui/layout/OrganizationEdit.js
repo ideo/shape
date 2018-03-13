@@ -10,35 +10,71 @@ import v from '~/utils/variables'
 
 // TODO remove duplication with GridCardBlank
 const BctButton = styled.button`
-  position: relative;
-  width: 47px;
-  height: 47px;
-  border-radius: 50%;
-  background: ${v.colors.blackLava};
-  color: white;
-
-  &:hover {
-    background-color: ${v.colors.gray};
-  }
-
-  .icon {
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: 47px;
-    height: 47px;
-  }
 `
 BctButton.displayName = 'BctButton'
 
+const StyledLabel = styled.div`
+  margin-bottom: 20px;
+  font-family: Gotham;
+  font-size: 16px;
+  font-weight: 500;
+  letter-spacing: 1px;
+  display: block;
+`
+
+StyledLabel.displayName = 'StyledLabel'
+
 const StyledFieldBox = styled.div`
-  padding: 15px;
+  padding-bottom: 35px;
 
   label {
     margin-right: 15px;
   }
 `
 StyledFieldBox.displayName = 'StyledFieldBox'
+
+const StyledTextbox = styled.input`
+  width: 224px;
+  padding-bottom: 6px;
+  font-size: 16px;
+  border: 0;
+  border-bottom: 0.5px solid ${v.colors.gray};
+`
+StyledTextbox.displayName = 'StyledTextbox'
+
+const StyledSubmit = styled.input`
+  width: 183px;
+  height: 40px;
+  border-radius: 19.5px;
+  border: none;
+  background-color: ${v.colors.blackLava};
+  text-transform: uppercase;
+  font-family: Gotham;
+  font-size: 16px;
+  font-weight: 500;
+  letter-spacing: 1.5px;
+  color: #ffffff;
+`
+StyledSubmit.displayName = 'StyledSubmit'
+
+const StyledAddImageIcon = styled.span`
+  width: 100px;
+  position: relative;
+  height: 100px;
+  display: block;
+  color: #ffffff;
+  border-radius: 50%;
+  background-color: ${v.colors.gray};
+
+  span {
+    position: absolute;
+    font-size: 36px;
+    font-weight: 300;
+    left: calc(50% - 9px);
+    top: calc(50% - 25px);
+  }
+`
+StyledAddImageIcon.displayName = 'StyledAddImageIcon'
 
 @observer
 class OrganizationEdit extends React.Component {
@@ -93,26 +129,27 @@ class OrganizationEdit extends React.Component {
   render() {
     return (
       <form>
-        <Divider />
         <StyledFieldBox>
-          <label htmlFor="organizationName">Name</label>
-          <input
+          <StyledLabel htmlFor="organizationName">Organization Name</StyledLabel>
+          <StyledTextbox
             id="organizationName"
             type="text"
             value={this.editingOrganization.name}
             onChange={this.handleNameChange}
           />
         </StyledFieldBox>
-        <Divider />
         <StyledFieldBox>
-          <label htmlFor="organizationAvatar">Avatar</label>
+          <StyledLabel htmlFor="organizationAvatar">Organization Avatar</StyledLabel>
           <BctButton onClick={this.handleImagePick} id="organizationAvatar">
-            <AddImageIcon width="32" height="32" color="white" />
+            <StyledAddImageIcon>
+              <span>
+                +
+              </span>
+            </StyledAddImageIcon>
           </BctButton>
         </StyledFieldBox>
-        <Divider />
-        <StyledFieldBox>
-          <input
+        <StyledFieldBox style={{ textAlign: 'center' }}>
+          <StyledSubmit
             onClick={this.handleSave}
             type="submit"
             value="save"
