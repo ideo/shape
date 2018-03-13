@@ -2,6 +2,7 @@ import PropTypes from 'prop-types'
 import { action, observable } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
+import v from '~/utils/variables'
 import Dialog, {
   DialogContent,
   DialogTitle,
@@ -13,23 +14,51 @@ import OrganizationEdit from '~/ui/layout/OrganizationEdit'
 
 const materialStyles = {
   paper: {
-    width: 624,
+    borderLeft: `17px solid ${v.colors.blackLava}`,
+    minWidth: 824,
   }
 }
 
 const Row = styled.div`
-  display: flex
+  display: flex;
+  margin-left: 5px;
 `
 Row.displayName = 'Row'
 
-const closeStyle = {
-  cursor: 'pointer',
-  display: 'block',
-  right: '15px',
-  position: 'absolute',
-  top: '14px',
-  width: '14px'
-}
+const StyledH2 = styled.h2`
+  font-family: Gotham;
+  font-size: 24px;
+  font-weight: 500;
+  letter-spacing: 2.3px;
+  color: ${v.colors.blackLava};
+`
+
+const StyledH3 = styled.h3`
+  text-fransform: uppercase;
+  margin-bottom: 13px;
+  font-family: Gotham;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: normal;
+  letter-spacing: 1px;
+`
+StyledH3.displayName = 'StyledH3'
+
+const StyledText = styled.span`
+  font-weight: 300;
+  font-family: Gotham;
+  font-size: 16px;
+`
+StyledText.displayName = 'StyledText'
+
+const StyledCloseButton = styled.button`
+  cursor: pointer;
+  display: block;
+  right: 15px;
+  position: absolute;
+  top: 14px;
+  width: 14px;
+`
 
 @inject('uiStore')
 @observer
@@ -63,21 +92,19 @@ class OrganizationMenu extends React.Component {
         aria-labelledby="form-dialog-title"
         BackdropProps={{ invisible: true }}
       >
-        <button onClick={this.handleClose} style={closeStyle}>
+        <StyledCloseButton onClick={this.handleClose}>
           <CloseIcon />
-        </button>
-        <DialogTitle id="form-dialog-title">People & Groups</DialogTitle>
+        </StyledCloseButton>
+        <DialogTitle disableTypography id="form-dialog-title">
+          <StyledH2>People & Groups</StyledH2>
+        </DialogTitle>
         <DialogContent>
-          <h3>
+          <StyledH3>
             Your Organization
-          </h3>
+          </StyledH3>
           <Row>
-            <OrganizationAvatar
-              onClickOverride={this.handleOrganizationClick}
-              organization={organization}
-            />
             <button onClick={this.handleOrganizationClick}>
-              <strong>{ organization.name }</strong>
+              <StyledText>{ organization.name }</StyledText>
             </button>
           </Row>
           { !!this.editOrganizationOpen &&
