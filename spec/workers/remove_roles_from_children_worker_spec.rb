@@ -16,7 +16,7 @@ RSpec.describe RemoveRolesFromChildrenWorker, type: :worker do
 
     it 'should call Roles::RemoveFromChildren' do
       expect(Roles::RemoveFromChildren).to receive(:new).with(
-        object: collection,
+        parent: collection,
         roles: [role],
       )
       expect(instance_double).to receive(:call)

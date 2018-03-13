@@ -1,7 +1,7 @@
 module Roles
   class RemoveFromChildren
     def initialize(parent:, roles:)
-      @object = parent
+      @parent = parent
       @roles = roles
     end
 
@@ -25,7 +25,7 @@ module Roles
     def recursively_remove_roles
       children.all? do |child|
         Roles::RemoveFromChildren.new(
-          object: child,
+          parent: child,
           roles: roles,
         ).call
       end
