@@ -1,3 +1,5 @@
+import _ from 'lodash'
+
 class PageWithApi extends React.Component {
   componentDidMount() {
     // this will get called on initial render
@@ -11,16 +13,15 @@ class PageWithApi extends React.Component {
   }
 
   // to be overridden in child class
-  onAPILoad = () => null
-  requestPath = () => ''
+  onAPILoad = null
+  requestPath = null
 
   fetchData = (props) => {
-    if (!this.requestPath) return null
+    if (!_.isFunction(this.requestPath)) return null
     const { apiStore } = props
     return apiStore.request(this.requestPath(props))
       .then(response => {
-        // to be created in child class
-        if (this.onAPILoad) {
+        if (_.isFunction(this.onAPILoad)) {
           this.onAPILoad(response.data)
         }
       })

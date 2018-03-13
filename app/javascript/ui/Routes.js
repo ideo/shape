@@ -1,10 +1,12 @@
+import { Fragment } from 'react'
 import ReactRouterPropTypes from 'react-router-prop-types'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import { Router, Switch, Route } from 'react-router-dom'
 
 import CollectionPage from '~/ui/pages/CollectionPage'
-import OrganizationMenu from '~/ui/layout/OrganizationMenu'
 import ItemPage from '~/ui/pages/ItemPage'
+import SearchPage from '~/ui/pages/SearchPage'
+import OrganizationMenu from '~/ui/layout/OrganizationMenu'
 import Loader from '~/ui/layout/Loader'
 import ClickWrapper from '~/ui/layout/ClickWrapper'
 
@@ -26,7 +28,7 @@ class Routes extends React.Component {
       return <Loader />
     }
     return (
-      <div>
+      <Fragment>
         <ClickWrapper />
         <OrganizationMenu
           organization={apiStore.currentUser.current_organization}
@@ -36,9 +38,10 @@ class Routes extends React.Component {
             <Route exact path="/" component={CollectionPage} />
             <Route path="/collections/:id" component={CollectionPage} />
             <Route path="/items/:id" component={ItemPage} />
+            <Route path="/search/:query" component={SearchPage} />
           </Switch>
         </Router>
-      </div>
+      </Fragment>
     )
   }
 }
