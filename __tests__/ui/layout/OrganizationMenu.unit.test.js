@@ -43,7 +43,7 @@ describe('OrganizationMenu', () => {
   })
 
   it('opens the organization edit menu when you click on the org name', () => {
-    wrapper.find('button').simulate('click')
+    wrapper.find('.orgEdit').simulate('click')
     expect(wrapper.find('OrganizationMenu').instance().editOrganizationOpen)
       .toBeTruthy()
   })

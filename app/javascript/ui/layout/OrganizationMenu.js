@@ -111,7 +111,7 @@ class OrganizationMenu extends React.Component {
             Your Organization
           </StyledH3>
           <Row>
-            <button onClick={this.handleOrganizationClick}>
+            <button className="orgEdit" onClick={this.handleOrganizationClick}>
               <StyledText>{ organization.name }</StyledText>
             </button>
           </Row>
