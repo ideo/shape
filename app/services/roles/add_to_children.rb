@@ -1,8 +1,14 @@
 module Roles
   class AddToChildren
-    def initialize(object:, roles:)
+
+    # Use ignore_inheritance_rules when first setting up object inheritance,
+    # as the object will have a single user assigned as the editor
+
+    def initialize(object:, roles:, ignore_inheritance_rules: false)
       @object = object
       @roles = roles
+      @ignore_inheritance_rules = ignore_inheritance_rules
+      @inheritance = Roles::Inheritance.new(object)
     end
 
     def call
@@ -12,11 +18,17 @@ module Roles
 
     private
 
-    attr_reader :object, :roles
+    attr_reader :object, :roles, :inheritance,
+                :ignore_inheritance_rules
 
     def add_roles_to_children
-      roles.all? do |role|
-        children.all? do |child|
+      children.all? do |child|
+        # TODO: how do we know this is the first time through, to ignore this?
+        unless ignore_inheritance_rules
+          next if inheritance.child_should_inherit?(child)
+        end
+
+        roles.all? do |role|
           child_role = copy_role_to_object(role, child)
           child_role.persisted?
         end
