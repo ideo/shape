@@ -7,6 +7,7 @@ import Dialog, {
   DialogTitle,
 } from 'material-ui/Dialog'
 import { withStyles } from 'material-ui/styles'
+import CloseIcon from '~/ui/icons/CloseIcon'
 import OrganizationAvatar from '~/ui/layout/OrganizationAvatar'
 import OrganizationEdit from '~/ui/layout/OrganizationEdit'
 
@@ -20,6 +21,15 @@ const Row = styled.div`
   display: flex
 `
 Row.displayName = 'Row'
+
+const closeStyle = {
+  cursor: 'pointer',
+  display: 'block',
+  right: '15px',
+  position: 'absolute',
+  top: '14px',
+  width: '14px'
+}
 
 @inject('uiStore')
 @observer
@@ -53,6 +63,9 @@ class OrganizationMenu extends React.Component {
         aria-labelledby="form-dialog-title"
         BackdropProps={{ invisible: true }}
       >
+        <button onClick={this.handleClose} style={closeStyle}>
+          <CloseIcon />
+        </button>
         <DialogTitle id="form-dialog-title">People & Groups</DialogTitle>
         <DialogContent>
           <h3>
