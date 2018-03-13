@@ -40,11 +40,4 @@ describe('OrganizationAvatar', () => {
     wrapper.find('Avatar').at(0).simulate('click')
     expect(props.uiStore.openOrganizationMenu).toHaveBeenCalled()
   })
-
-  it('should use the click override if it exists on click', () => {
-    const newProps = Object.assign({}, props, { onClickOverride: jest.fn() })
-    wrapper = mount(<OrganizationAvatar {...newProps} />)
-    wrapper.find('Avatar').at(0).simulate('click')
-    expect(newProps.onClickOverride).toHaveBeenCalled()
-  })
 })

@@ -19,12 +19,8 @@ const DEFAULT_URL = 'https://d3none3dlnlrde.cloudfront.net/assets/users/avatars/
 @observer
 class OrganizationAvatar extends React.Component {
   handleClick = (ev) => {
-    const { onClickOverride, uiStore, organization } = this.props
-    if (onClickOverride) {
-      onClickOverride(ev)
-    } else {
-      uiStore.openOrganizationMenu(organization)
-    }
+    const { uiStore, organization } = this.props
+    uiStore.openOrganizationMenu(organization)
   }
 
   render() {
@@ -45,7 +41,6 @@ OrganizationAvatar.propTypes = {
   classes: PropTypes.shape({
     smallAvatar: PropTypes.string,
   }).isRequired,
-  onClickOverride: PropTypes.func,
 }
 OrganizationAvatar.wrappedComponent.propTypes = {
   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
