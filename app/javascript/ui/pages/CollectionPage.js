@@ -79,7 +79,6 @@ class CollectionPage extends PageWithApi {
   render() {
     const { collection } = this
     const { uiStore } = this.props
-    // console.log(this.props.apiStore, collection)
     if (!collection) return <Loader />
 
     const breadcrumb = this.isHomepage ? [] : collection.breadcrumb
@@ -100,8 +99,6 @@ class CollectionPage extends PageWithApi {
         </Header>
         <PageContainer>
           <RolesMenu
-            viewers={collection.viewers}
-            editors={collection.editors}
             collectionId={collection.id}
           />
           <CollectionGrid

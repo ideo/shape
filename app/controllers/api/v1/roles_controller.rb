@@ -37,7 +37,7 @@ class Api::V1::RolesController < Api::V1::BaseController
     if @user.present? && @user.remove_role(@role.name, @role.resource)
       render jsonapi: @role
     else
-      render_api_errors user.errors
+      render_api_errors @user.errors
     end
   end
 
