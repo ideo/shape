@@ -2,11 +2,41 @@ import PropTypes from 'prop-types'
 import styled from 'styled-components'
 import { toJS } from 'mobx'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
+import { withStyles } from 'material-ui/styles'
+import { MenuItem } from 'material-ui/Menu';
+import Select from 'material-ui/Select';
+import v from '~/utils/variables'
+
+const materialStyles = {
+  root: {
+    fontFamily: 'Gotham',
+    fontSize: '16px',
+  },
+  selectMenu: {
+    backgroundColor: 'transparent'
+  }
+}
 
 const Row = styled.div`
-  display: flex
+  display: flex;
+  justify-content: space-between;
+  width: 90%;
 `
 Row.displayName = 'Row'
+
+const StyledText = styled.span`
+  font-family: Gotham;
+  font-size: 16px
+`
+StyledText.displayName = 'StyledText'
+
+const StyledSmText = styled.span`
+  vertical-align: super;
+  font-family: Sentinel;
+  font-size: 12px;
+  color: ${v.colors.gray};
+`
+StyledSmText.displayName = 'StyledSmText'
 
 class RoleSelect extends React.Component {
   onRoleSelect = (ev) => {
@@ -29,18 +59,25 @@ class RoleSelect extends React.Component {
   }
 
   render() {
-    const { role, user } = this.props
+    const { classes, role, user } = this.props
     return (
       <Row>
         <span>
-          {user.name}<br />
-          {user.email}
+          <StyledText>{user.name}</StyledText><br />
+          <StyledSmText>{user.email}</StyledSmText>
         </span>
         <span>
-          <select value={role.name} onChange={this.onRoleSelect}>
-            <option value="editor">Editor</option>
-            <option value="viewer">Viewer</option>
-          </select>
+          <Select
+            classes={classes}
+            displayEmpty
+            disableUnderline
+            name="role"
+            onChange={this.onRoleSelect}
+            value={role.name}
+          >
+            <MenuItem value="editor">Editor</MenuItem>
+            <MenuItem value="viewer">Viewer</MenuItem>
+          </Select>
         </span>
       </Row>
     )
@@ -52,6 +89,9 @@ RoleSelect.propTypes = {
   user: MobxPropTypes.objectOrObservableObject.isRequired,
   onDelete: PropTypes.func.isRequired,
   onCreate: PropTypes.func.isRequired,
+  classes: PropTypes.shape({
+    paper: PropTypes.string,
+  }).isRequired,
 }
 
-export default RoleSelect
+export default withStyles(materialStyles)(RoleSelect)

@@ -1,13 +1,51 @@
 import PropTypes from 'prop-types'
 import styled from 'styled-components'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
+import { withStyles } from 'material-ui/styles'
 import Dialog, {
   DialogContent,
   DialogContentText,
   DialogTitle,
 } from 'material-ui/Dialog'
+import v from '~/utils/variables'
+import CloseIcon from '~/ui/icons/CloseIcon'
 import Role from '~/stores/jsonApi/Role'
 import RoleSelect from '~/ui/layout/RoleSelect'
+
+const materialStyles = {
+  paper: {
+    borderLeft: `17px solid ${v.colors.blackLava}`,
+    minWidth: 824,
+  }
+}
+
+const StyledH2 = styled.h2`
+  font-family: Gotham;
+  font-size: 24px;
+  font-weight: 500;
+  letter-spacing: 2.3px;
+  color: ${v.colors.blackLava};
+`
+StyledH2.displayName = 'StyledH2'
+
+const StyledH3 = styled.h3`
+  text-fransform: uppercase;
+  margin-bottom: 13px;
+  font-size: 16px;
+  font-weight: 500;
+  letter-spacing: 1px;
+`
+StyledH3.displayName = 'StyledH3'
+
+const StyledCloseButton = styled.button`
+  cursor: pointer;
+  display: block;
+  right: 15px;
+  position: absolute;
+  top: 14px;
+  width: 14px;
+`
+StyledCloseButton.displayName = 'StyledCloseButton'
 
 @inject('apiStore', 'uiStore')
 @observer
@@ -37,7 +75,7 @@ class RolesMenu extends React.Component {
   }
 
   render() {
-    const { apiStore, uiStore } = this.props
+    const { apiStore, classes, uiStore } = this.props
     // TODO how to get the right roles?
     const roles = apiStore.findAll('roles')
     if (!apiStore.roles.length) return <div></div>
@@ -47,11 +85,17 @@ class RolesMenu extends React.Component {
         open={!!uiStore.rolesMenuOpen}
         onClose={this.handleClose}
         aria-labelledby="sharing"
+        classes={classes}
         BackdropProps={{ invisible: true }}
       >
-        <DialogTitle id="form-dialog-title">Sharing</DialogTitle>
+        <StyledCloseButton onClick={this.handleClose}>
+          <CloseIcon />
+        </StyledCloseButton>
+        <DialogTitle disableTypography id="sharing">
+          <StyledH2>Sharing</StyledH2>
+        </DialogTitle>
         <DialogContent>
-          <h4>Shared with</h4>
+          <StyledH3>Shared with</StyledH3>
           { roles.map((role) =>
             role.users.map((user) =>
               (<RoleSelect
@@ -69,11 +113,14 @@ class RolesMenu extends React.Component {
 }
 
 RolesMenu.propTypes = {
-  collectionId: PropTypes.number.isRequired
+  collectionId: PropTypes.number.isRequired,
+  classes: PropTypes.shape({
+    paper: PropTypes.string,
+  }).isRequired,
 }
 RolesMenu.wrappedComponent.propTypes = {
   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
   apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 
-export default RolesMenu
+export default withStyles(materialStyles)(RolesMenu)
