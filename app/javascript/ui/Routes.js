@@ -38,7 +38,7 @@ class Routes extends React.Component {
             <Route exact path="/" component={CollectionPage} />
             <Route path="/collections/:id" component={CollectionPage} />
             <Route path="/items/:id" component={ItemPage} />
-            <Route path="/search/:query" component={SearchPage} />
+            <Route path="/search" component={SearchPage} />
           </Switch>
         </Router>
       </Fragment>

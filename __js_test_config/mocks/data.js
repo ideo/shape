@@ -60,6 +60,9 @@ export const fakeCollection = {
   name: 'My Workspace X',
   type: 'Collection',
   breadcrumb: [],
+  viewers: [],
+  editors: [],
+  cardIds: [fakeItemCard.id],
   collection_cards: [
     fakeItemCard, fakeItemCard, fakeItemCard
   ]

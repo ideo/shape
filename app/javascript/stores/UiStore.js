@@ -10,6 +10,7 @@ export default class UiStore {
     gridW: 312,
     gridH: 250,
   }
+  @observable isLoading = false
 
   @action openBlankContentTool({ order = 0 } = {}) {
     this.blankContentToolState = { order }
@@ -27,6 +28,10 @@ export default class UiStore {
     if (!this.organizationMenuOpen) {
       this.organizationMenuOpen = true
     }
+  }
+
+  @action loading(val) {
+    this.isLoading = val
   }
 
   @action closeOrganizationMenu() {

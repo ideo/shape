@@ -1,15 +1,18 @@
 import SearchPage from '~/ui/pages/SearchPage'
 import fakeApiStore from '#/mocks/fakeApiStore'
+import fakeUiStore from '#/mocks/fakeUiStore'
 
-let wrapper, match, apiStore, props
+let wrapper, location, apiStore, uiStore, routingStore, props
 const query = 'stuff'
 
 beforeEach(() => {
-  match = { params: { query }, path: `/search/${query}` }
+  location = { search: `?q=${query}`, pathname: `/search?q=${query}` }
   apiStore = fakeApiStore({
     requestResult: { data: [] }
   })
-  props = { apiStore, match }
+  uiStore = fakeUiStore
+  routingStore = {}
+  props = { apiStore, uiStore, routingStore, location }
 
   wrapper = shallow(
     <SearchPage.wrappedComponent {...props} />
@@ -18,10 +21,10 @@ beforeEach(() => {
 
 describe('SearchPage', () => {
   it('makes an API call to fetch the search results', () => {
-    expect(apiStore.request).toBeCalledWith(`search?query=${match.params.query}`)
+    expect(apiStore.request).toBeCalledWith(`search?query=${query}`)
   })
 
   it('displays the search results', () => {
-    expect(wrapper.find('PageContainer').children().text()).toContain('You are searching now.')
+    expect(wrapper.find('PageContainer').children().text()).toContain(`No results found for ${query}.`)
   })
 })

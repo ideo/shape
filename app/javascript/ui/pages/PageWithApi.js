@@ -1,5 +1,7 @@
 import _ from 'lodash'
 
+import { uiStore } from '~/stores'
+
 class PageWithApi extends React.Component {
   componentDidMount() {
     // this will get called on initial render
@@ -13,19 +15,24 @@ class PageWithApi extends React.Component {
   }
 
   // to be overridden in child class
-  onAPILoad = null
-  requestPath = null
+  // onAPILoad = null
+  // requestPath = null
 
   fetchData = (props) => {
     if (!_.isFunction(this.requestPath)) return null
     const { apiStore } = props
+    uiStore.loading(true)
     return apiStore.request(this.requestPath(props))
       .then(response => {
+        uiStore.loading(false)
         if (_.isFunction(this.onAPILoad)) {
           this.onAPILoad(response.data)
         }
       })
-      // .catch(err => console.log('error!', err))
+      .catch(err => {
+        uiStore.loading(false)
+        console.log('API error!', err)
+      })
   }
 }
 

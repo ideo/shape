@@ -12,7 +12,7 @@ class RoutingStore extends RouterStore {
       // `id` means query in this case
       // if no query, then go back to homepage (e.g. clearing out your search)
       if (!id) return '/'
-      return `/search/${id}`
+      return `/search?q=${id.replace(/\s/g, '+')}`
     default:
       return ''
     }

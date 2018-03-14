@@ -1,5 +1,6 @@
 import CollectionPage from '~/ui/pages/CollectionPage'
 import fakeApiStore from '#/mocks/fakeApiStore'
+import fakeUiStore from '#/mocks/fakeUiStore'
 import {
   fakeCollection
 } from '#/mocks/data'
@@ -21,15 +22,7 @@ beforeEach(() => {
     requestResult: { data: collection }
   })
   apiStore.collections = collections
-  uiStore = {
-    gridSettings: {
-      cols: 4,
-      gutter: 20,
-      gridW: 312,
-      gridH: 250,
-    },
-    blankContentToolState: null
-  }
+  uiStore = fakeUiStore
   props = { apiStore, uiStore, match }
 
   wrapper = shallow(
