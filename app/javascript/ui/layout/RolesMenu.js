@@ -52,7 +52,8 @@ StyledCloseButton.displayName = 'StyledCloseButton'
 class RolesMenu extends React.Component {
   componentDidMount() {
     const { apiStore, collectionId } = this.props
-    apiStore.fetch(`/collections/${collectionId}/roles`)
+    Role.endpoint = () => `collections/${collectionId}/roles`
+    apiStore.fetchAll('roles', true)
   }
 
   onDelete = (role, user) => {
@@ -65,7 +66,12 @@ class RolesMenu extends React.Component {
     const newRole = new Role(roleData, apiStore)
     newRole.resourceId = collectionId
     newRole.API_create()
-      .then((res) => console.log('create res', res))
+      .then(() => {
+        // Re-sync all the roles once modifications successfully happened
+        Role.endpoint = () => `collections/${collectionId}/roles`
+        apiStore.removeAll('roles')
+        apiStore.fetchAll('roles', true)
+      })
       .catch((err) => console.warn(err))
   }
 
@@ -75,10 +81,8 @@ class RolesMenu extends React.Component {
   }
 
   render() {
-    const { apiStore, classes, uiStore } = this.props
+    const { classes, roles, uiStore } = this.props
     // TODO how to get the right roles?
-    const roles = apiStore.findAll('roles')
-    if (!apiStore.roles.length) return <div></div>
     // TODO abstract shared dialog functionality to component
     return (
       <Dialog
@@ -117,10 +121,14 @@ RolesMenu.propTypes = {
   classes: PropTypes.shape({
     paper: PropTypes.string,
   }).isRequired,
+  roles: MobxPropTypes.arrayOrObservableArray,
 }
 RolesMenu.wrappedComponent.propTypes = {
   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
   apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
+}
+RolesMenu.defaultProps = {
+  roles: [],
 }
 
 export default withStyles(materialStyles)(RolesMenu)

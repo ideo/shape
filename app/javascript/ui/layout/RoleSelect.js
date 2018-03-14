@@ -51,7 +51,7 @@ StyledSmText.displayName = 'StyledSmText'
 class RoleSelect extends React.Component {
   onRoleSelect = (ev) => {
     ev.preventDefault()
-    this.deleteRole()
+    this.deleteRole().then(this.createRole(ev.target.value))
   }
 
   createRole(roleName) {

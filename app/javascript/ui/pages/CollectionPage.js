@@ -1,6 +1,7 @@
 // import PropTypes from 'prop-types'
 import { Fragment } from 'react'
 import ReactRouterPropTypes from 'react-router-prop-types'
+import { toJS } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 
@@ -50,6 +51,23 @@ class CollectionPage extends PageWithApi {
     return apiStore.find('collections', match.params.id)
   }
 
+  get roles() {
+    const { apiStore } = this.props
+    return apiStore.findAll('roles')
+  }
+
+  get editors() {
+    const { apiStore } = this.props
+    return apiStore.findAll('roles')
+      .filter((role) => role.name === 'editor')
+  }
+
+  get viewers() {
+    const { apiStore } = this.props
+    return apiStore.findAll('roles')
+      .filter((role) => role.name === 'viewer')
+  }
+
   requestPath = (props) => {
     const { match, apiStore } = props
     if (isHomepage(match)) {
@@ -77,7 +95,7 @@ class CollectionPage extends PageWithApi {
   }
 
   render() {
-    const { collection } = this
+    const { collection, editors, viewers, roles } = this
     const { uiStore } = this.props
     if (!collection) return <Loader />
 
@@ -92,14 +110,15 @@ class CollectionPage extends PageWithApi {
             <RolesSummary
               className="roles-summary"
               handleClick={this.showObjectRoleDialog}
-              viewers={collection.viewers}
-              editors={collection.editors}
+              viewers={viewers}
+              editors={editors}
             />
           </StyledTitleAndRoles>
         </Header>
         <PageContainer>
           <RolesMenu
             collectionId={collection.id}
+            roles={roles}
           />
           <CollectionGrid
             // pull in cols, gridW, gridH, gutter
