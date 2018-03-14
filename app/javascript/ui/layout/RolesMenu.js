@@ -40,9 +40,9 @@ StyledH3.displayName = 'StyledH3'
 const StyledCloseButton = styled.button`
   cursor: pointer;
   display: block;
-  right: 15px;
+  right: 28px;
   position: absolute;
-  top: 14px;
+  top: 24px;
   width: 14px;
 `
 StyledCloseButton.displayName = 'StyledCloseButton'

@@ -15,7 +15,9 @@ const materialStyles = {
     fontWeight: 300,
   },
   selectMenu: {
-    backgroundColor: 'transparent'
+    backgroundColor: 'transparent',
+    '&:focus': { backgroundColor: 'transparent' },
+    '&:hover': { backgroundColor: 'transparent' },
   }
 }
 
