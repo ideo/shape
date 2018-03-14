@@ -13,7 +13,7 @@ const materialStyles = {
   }
 }
 
-const DEFAULT_URL = 'https://d3none3dlnlrde.cloudfront.net/assets/users/avatars/missing/square.jpg'
+const DEFAULT_URL = 'https://cdn.filestackcontent.com/XYWsMijFTDWBsGzzKEEo'
 
 @inject('uiStore')
 @observer

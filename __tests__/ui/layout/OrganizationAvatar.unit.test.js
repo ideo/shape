@@ -24,7 +24,7 @@ describe('OrganizationAvatar', () => {
     const avatar = wrapper.find('Avatar')
     expect(avatar).toHaveLength(1)
     expect(avatar.props().src).toEqual(
-      'https://d3none3dlnlrde.cloudfront.net/assets/users/avatars/missing/square.jpg'
+      'https://cdn.filestackcontent.com/XYWsMijFTDWBsGzzKEEo'
     )
   })
 
