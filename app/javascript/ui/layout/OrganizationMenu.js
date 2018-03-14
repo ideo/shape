@@ -26,6 +26,8 @@ const Row = styled.div`
 Row.displayName = 'Row'
 
 const StyledH2 = styled.h2`
+  text-transform: uppercase;
+  margin-bottom: 20px;
   font-family: Gotham;
   font-size: 24px;
   font-weight: 500;
@@ -34,7 +36,7 @@ const StyledH2 = styled.h2`
 `
 
 const StyledH3 = styled.h3`
-  text-fransform: uppercase;
+  text-transform: uppercase;
   margin-bottom: 13px;
   font-family: Gotham;
   font-size: 16px;

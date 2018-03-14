@@ -14,6 +14,7 @@ const BctButton = styled.button`
 BctButton.displayName = 'BctButton'
 
 const StyledLabel = styled.div`
+  text-transform: uppercase;
   margin-bottom: 20px;
   font-family: Gotham;
   font-size: 16px;
@@ -33,12 +34,28 @@ const StyledFieldBox = styled.div`
 `
 StyledFieldBox.displayName = 'StyledFieldBox'
 
+const StyledActionBox = styled.div`
+  padding-bottom: 14px;
+  text-align: center;
+`
+
 const StyledTextbox = styled.input`
   width: 224px;
+  padding-right: 4px;
+  padding-left: 4px;
   padding-bottom: 6px;
+  outline-width: 0;
   font-size: 16px;
   border: 0;
   border-bottom: 0.5px solid ${v.colors.gray};
+
+  &::placeholder {
+    color: ${v.colors.gray};
+  }
+
+  &:focus {
+    outline-width: 0;
+  }
 `
 StyledTextbox.displayName = 'StyledTextbox'
 
@@ -53,6 +70,7 @@ const StyledSubmit = styled.input`
   font-size: 16px;
   font-weight: 500;
   letter-spacing: 1.5px;
+  cursor: pointer;
   color: #ffffff;
 `
 StyledSubmit.displayName = 'StyledSubmit'
@@ -70,8 +88,8 @@ const StyledAddImageIcon = styled.span`
     position: absolute;
     font-size: 36px;
     font-weight: 300;
-    left: calc(50% - 9px);
-    top: calc(50% - 25px);
+    left: calc(50% - 8px);
+    top: calc(50% - 23px);
   }
 `
 StyledAddImageIcon.displayName = 'StyledAddImageIcon'
@@ -136,6 +154,7 @@ class OrganizationEdit extends React.Component {
             type="text"
             value={this.editingOrganization.name}
             onChange={this.handleNameChange}
+            placeholder="Enter Organization Name"
           />
         </StyledFieldBox>
         <StyledFieldBox>
@@ -148,13 +167,13 @@ class OrganizationEdit extends React.Component {
             </StyledAddImageIcon>
           </BctButton>
         </StyledFieldBox>
-        <StyledFieldBox style={{ textAlign: 'center' }}>
+        <StyledActionBox>
           <StyledSubmit
             onClick={this.handleSave}
             type="submit"
             value="save"
           />
-        </StyledFieldBox>
+        </StyledActionBox>
       </form>
     )
   }
