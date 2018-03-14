@@ -6,11 +6,13 @@ import { withStyles } from 'material-ui/styles'
 import { MenuItem } from 'material-ui/Menu';
 import Select from 'material-ui/Select';
 import v from '~/utils/variables'
+import UserAvatar from './UserAvatar'
 
 const materialStyles = {
   root: {
     fontFamily: 'Gotham',
     fontSize: '16px',
+    fontWeight: 300,
   },
   selectMenu: {
     backgroundColor: 'transparent'
@@ -20,11 +22,17 @@ const materialStyles = {
 const Row = styled.div`
   display: flex;
   justify-content: space-between;
-  width: 90%;
+  width: 94%;
 `
 Row.displayName = 'Row'
 
+const RowItemLeft = styled.span`
+  margin-right: auto;
+  margin-left: 18px;
+`
+
 const StyledText = styled.span`
+  font-weight: 300;
   font-family: Gotham;
   font-size: 16px
 `
@@ -41,7 +49,7 @@ StyledSmText.displayName = 'StyledSmText'
 class RoleSelect extends React.Component {
   onRoleSelect = (ev) => {
     ev.preventDefault()
-    this.deleteRole().then(this.createRole(ev.target.value))
+    this.deleteRole()
   }
 
   createRole(roleName) {
@@ -63,9 +71,16 @@ class RoleSelect extends React.Component {
     return (
       <Row>
         <span>
+          <UserAvatar
+            key={user.id}
+            user={user}
+            size={38}
+          />
+        </span>
+        <RowItemLeft>
           <StyledText>{user.name}</StyledText><br />
           <StyledSmText>{user.email}</StyledSmText>
-        </span>
+        </RowItemLeft>
         <span>
           <Select
             classes={classes}

@@ -31,7 +31,7 @@ StyledH2.displayName = 'StyledH2'
 const StyledH3 = styled.h3`
   text-fransform: uppercase;
   margin-bottom: 13px;
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 500;
   letter-spacing: 1px;
 `
