@@ -27,7 +27,7 @@ Row.displayName = 'Row'
 
 const StyledH2 = styled.h2`
   text-transform: uppercase;
-  margin-bottom: 20px;
+  margin-bottom: 28px;
   font-family: Gotham;
   font-size: 24px;
   font-weight: 500;
