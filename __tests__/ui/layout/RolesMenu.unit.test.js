@@ -2,11 +2,18 @@ import { observable, useStrict } from 'mobx'
 import { Provider } from 'mobx-react';
 import RolesMenu from '~/ui/layout/RolesMenu'
 
+const apiStore = observable({
+  request: jest.fn(),
+  fetchAll: jest.fn(),
+  find: jest.fn(),
+})
 const uiStore = observable({
   rolesMenuOpen: false,
   closeRolesMenu: jest.fn()
 })
 const props = {
+  collectionId: 1,
+  roles: [],
   uiStore,
 }
 
@@ -16,7 +23,7 @@ describe('RolesMenu', () => {
   beforeEach(() => {
     useStrict(false)
     wrapper = mount(
-      <Provider uiStore={uiStore}>
+      <Provider apiStore={apiStore} uiStore={uiStore}>
         <RolesMenu {...props} />
       </Provider>
     )
@@ -32,5 +39,20 @@ describe('RolesMenu', () => {
   it('closes the roles menu in the UI store when exited', () => {
     wrapper.find('RolesMenu').instance().handleClose()
     expect(props.uiStore.closeRolesMenu).toHaveBeenCalled()
+  })
+
+  it('calls fetch with the api store on mount', () => {
+    expect(apiStore.fetchAll).toHaveBeenCalled()
+  })
+
+  describe('onDelete', () => {
+    it('should make an api store request with correct data', () => {
+      const role = { id: 2 }
+      const user = { id: 4 }
+      wrapper.find('RolesMenu').instance().onDelete(role, user)
+      expect(apiStore.request).toHaveBeenCalledWith(
+        `users/${user.id}/roles/${role.id}`, 'DELETE'
+      )
+    })
   })
 })

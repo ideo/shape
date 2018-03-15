@@ -18,6 +18,7 @@ beforeEach(() => {
   match = { params: { id }, path: '/collections/1', url: '/collections/1' }
   apiStore = fakeApiStore({
     findResult: collection,
+    findAllResult: collections,
     requestResult: { data: collection }
   })
   apiStore.collections = collections

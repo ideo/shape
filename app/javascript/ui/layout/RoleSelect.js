@@ -56,12 +56,14 @@ class RoleSelect extends React.Component {
 
   createRole(roleName) {
     const { onCreate, role } = this.props
+    // TODO id here is strangely not used in the role data to create the role,
+    // it's used to remove the old role from the client side. Maybe it should
+    // be a second param
     const roleData = Object.assign({}, {
-      id: role.id,
       name: roleName,
       users: role.users.map((user) => { return { id: user.id }})
     })
-    onCreate(roleData)
+    onCreate(roleData, role.id)
   }
 
   deleteRole = () => {

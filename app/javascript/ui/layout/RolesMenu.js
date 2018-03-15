@@ -52,24 +52,24 @@ StyledCloseButton.displayName = 'StyledCloseButton'
 class RolesMenu extends React.Component {
   componentDidMount() {
     const { apiStore, collectionId } = this.props
+    // TODO investigate how this can be set all the time on Role
     Role.endpoint = () => `collections/${collectionId}/roles`
     apiStore.fetchAll('roles', true)
   }
 
   onDelete = (role, user) => {
-    const { apiStore } = this.props
     return this.props.apiStore.request(`users/${user.id}/roles/${role.id}`,
       'DELETE')
   }
 
-  onCreate = (roleData) => {
+  onCreate = (roleData, oldRoleId) => {
     const { apiStore, collectionId } = this.props
     const newRole = new Role(roleData, apiStore)
     newRole.resourceId = collectionId
     newRole.API_create()
       .then((res) => {
         // Re-sync all the roles once modifications successfully happened
-        apiStore.remove('roles', roleData.id)
+        apiStore.remove('roles', oldRoleId)
         apiStore.add(res.data)
       })
       .catch((err) => console.warn(err))
