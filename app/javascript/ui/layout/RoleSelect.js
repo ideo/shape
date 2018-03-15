@@ -24,13 +24,13 @@ const materialStyles = {
 const Row = styled.div`
   display: flex;
   justify-content: space-between;
-  width: 94%;
+  width: 92%;
 `
 Row.displayName = 'Row'
 
 const RowItemLeft = styled.span`
   margin-right: auto;
-  margin-left: 18px;
+  margin-left: 14px;
 `
 
 const StyledText = styled.span`

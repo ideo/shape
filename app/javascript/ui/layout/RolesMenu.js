@@ -15,7 +15,7 @@ import RoleSelect from '~/ui/layout/RoleSelect'
 const materialStyles = {
   paper: {
     borderLeft: `17px solid ${v.colors.blackLava}`,
-    minWidth: 824,
+    minWidth: 856,
   }
 }
 
