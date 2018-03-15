@@ -2,7 +2,6 @@ import BaseRecord from './BaseRecord'
 
 class Role extends BaseRecord {
   static endpoint(collectionId) {
-    console.log('endpoint', this)
     return `collections/${collectionId}/roles`
   }
 
