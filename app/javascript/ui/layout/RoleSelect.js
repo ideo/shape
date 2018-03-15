@@ -57,6 +57,7 @@ class RoleSelect extends React.Component {
   createRole(roleName) {
     const { onCreate, role } = this.props
     const roleData = Object.assign({}, {
+      id: role.id,
       name: roleName,
       users: role.users.map((user) => { return { id: user.id }})
     })
