@@ -1,4 +1,6 @@
 class User < ApplicationRecord
+  include CacheableRoles
+
   rolify after_add: :after_add_role,
          after_remove: :after_remove_role,
          strict: true

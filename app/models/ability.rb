@@ -8,11 +8,15 @@ class Ability
 
     user ||= User.new
 
-    can :read, Organization
-    can :read, User
+    if user.has_cached_role?(:super_admin)
+      can :read, :all
+      can :manage, :all
 
-    # Logged-in users only
-    if user.persisted?
+    elsif  user.persisted?
+      # Logged-in users only
+
+      can :read, Organization
+      can :read, User
 
       can :read, Group do |group|
         group.can_view?(user)

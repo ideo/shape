@@ -2,7 +2,6 @@ module Roles
   class UserCan
     def initialize(user)
       @user = user
-      load_and_cache_user_roles
     end
 
     # Right now these methods only return true if role is directly applied,
@@ -26,21 +25,10 @@ module Roles
 
     private
 
-    attr_reader :user, :cached_roles
+    attr_reader :user
 
     def has_role?(name, resource_identifier)
-      cached_roles.include?(
-        Role.role_identifier(
-          role_name: name,
-          resource_identifier: resource_identifier,
-        )
-      )
-    end
-
-    def load_and_cache_user_roles
-      return cached_roles unless cached_roles.nil?
-
-      @cached_roles = user.roles.map(&:identifier)
+      user.has_role_by_identifier?(name, resource_identifier)
     end
   end
 end
