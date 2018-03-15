@@ -1,5 +1,8 @@
 module Breadcrumb
   class ForUser
+    CONTENT_VIEW_ROLE = Role::VIEWER
+    CONTENT_EDIT_ROLE = Role::EDITOR
+
     def initialize(breadcrumb, user)
       @breadcrumb = breadcrumb
       @user = user
@@ -7,13 +10,13 @@ module Breadcrumb
 
     def viewable
       @viewable ||= select_breadcrumb_items_cascading do |item|
-        content_can_view?(item)
+        user_can?(CONTENT_VIEW_ROLE, item)
       end
     end
 
     def editable
       @editable ||= select_breadcrumb_items_cascading do |item|
-        content_can_edit?(item)
+        user_can?(CONTENT_EDIT_ROLE, item)
       end
     end
 
@@ -56,22 +59,6 @@ module Breadcrumb
       end
     end
 
-    def content_can_view?(breadcrumb_item)
-      content_can.view?(
-        resource_identifier_for_breadcrumb_item(
-          breadcrumb_item,
-        ),
-      )
-    end
-
-    def content_can_edit?(breadcrumb_item)
-      content_can.edit?(
-        resource_identifier_for_breadcrumb_item(
-          breadcrumb_item,
-        ),
-      )
-    end
-
     # API expects downcase, pluralized classname (e.g. 'collections')
     def breadcrumb_item_for_api(item)
       klass = item.shift.downcase.pluralize
@@ -82,8 +69,9 @@ module Breadcrumb
       item.first(2).join('_')
     end
 
-    def content_can
-      @content_can ||= Roles::UserCan.new(user)
+    def user_can?(role_name, breadcrumb_item)
+      resource_identifier = resource_identifier_for_breadcrumb_item(breadcrumb_item)
+      user.has_role_by_identifier?(role_name, resource_identifier)
     end
   end
 end
