@@ -60,7 +60,7 @@ class RoleSelect extends React.Component {
     // be a second param
     const roleData = Object.assign({}, {
       name: roleName,
-      users: role.users.map((user) => { return { id: user.id }})
+      users: role.users.map((user) => ({ id: user.id }))
     })
     onCreate(roleData, role.id)
   }

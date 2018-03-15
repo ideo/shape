@@ -4,10 +4,7 @@ import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 import { withStyles } from 'material-ui/styles'
 import Chip from 'material-ui/Chip'
-import Paper from 'material-ui/Paper';
 
-import v from '~/utils/variables'
-import CloseIcon from '~/ui/icons/CloseIcon'
 import UserAvatar from '~/ui/layout/UserAvatar'
 
 const materialStyles = {

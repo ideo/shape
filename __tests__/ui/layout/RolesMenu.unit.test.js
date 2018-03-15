@@ -1,5 +1,5 @@
 import { observable, useStrict } from 'mobx'
-import { Provider } from 'mobx-react';
+import { Provider } from 'mobx-react'
 import Role from '~/stores/jsonApi/Role'
 import RolesMenu from '~/ui/layout/RolesMenu'
 
@@ -95,7 +95,9 @@ describe('RolesMenu', () => {
   describe('onUserSearch', () => {
     describe('when a user is found', () => {
       it('should api request the users search route', (done) => {
-        apiStore.request.mockReturnValue(Promise.resolve({ data: [ { id: 3 }]}))
+        apiStore.request.mockReturnValue(Promise.resolve(
+          { data: [{ id: 3 }] }
+        ))
         wrapper.find('RolesMenu').instance().onUserSearch('mary').then(() => {
           expect(apiStore.request).toHaveBeenCalledWith(
             'users/search?query=mary'

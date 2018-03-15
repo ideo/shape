@@ -63,10 +63,9 @@ class RolesMenu extends React.Component {
     apiStore.fetchAll('roles', true)
   }
 
-  onDelete = (role, user) => {
-    return this.props.apiStore.request(`users/${user.id}/roles/${role.id}`,
+  onDelete = (role, user) =>
+    this.props.apiStore.request(`users/${user.id}/roles/${role.id}`,
       'DELETE')
-  }
 
   onReplace = (roleData, oldRoleId) => {
     const { apiStore, collectionId } = this.props

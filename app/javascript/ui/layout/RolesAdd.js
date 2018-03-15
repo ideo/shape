@@ -39,13 +39,10 @@ class RolesAdd extends React.Component {
     this.selectedUsers.remove(user)
   }
 
-  onUserSearch = (searchTerm) => {
-    return this.props.onSearch(searchTerm).then((res) => {
-      return res.data.map((user) => {
-        return { value: user.name, label: user.name, data: user }
-      })
-    })
-  }
+  onUserSearch = (searchTerm) =>
+    this.props.onSearch(searchTerm).then((res) =>
+      res.data.map((user) =>
+        ({ value: user.name, label: user.name, data: user })))
 
   @action
   handleSave = (ev) => {

@@ -1,8 +1,5 @@
 import { observable, useStrict } from 'mobx'
 import RolesAdd from '~/ui/layout/RolesAdd'
-import {
-  fakeRole
-} from '#/mocks/data'
 
 let props
 let wrapper
@@ -20,7 +17,7 @@ describe('RolesAdd', () => {
   })
 
   describe('onSearch', () => {
-    let user = { id: 2, name: 'Uncle Leo' }
+    const user = { id: 2, name: 'Uncle Leo' }
 
     describe('when a user is found', () => {
       beforeEach(() => {
@@ -36,5 +33,4 @@ describe('RolesAdd', () => {
       })
     })
   })
-
 })
