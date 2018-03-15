@@ -1,27 +1,90 @@
 import PropTypes from 'prop-types'
+import { observable, action } from 'mobx'
+import { observer } from 'mobx-react'
 import styled from 'styled-components'
 import v from '~/utils/variables'
 import AutoComplete from '~/ui/global/AutoComplete'
+import PillList from '~/ui/global/PillList'
 
+const Button = styled.button`
+  width: 183px;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  height: 40px;
+  font-weight: 500;
+  font-size: 16px;
+  font-family: Gotham;
+  cursor: pointer;
+  color: white;
+  border-radius: 19.5px;
+  border: none;
+  background-color: ${v.colors.blackLava};
+`
 
+@observer
 class RolesAdd extends React.Component {
+  @action
+  onUserSelected = (data) => {
+    let user = data
+    if (!data.id) {
+      user = Object.assign({}, { name: data.custom, email: data.custom })
+    }
+    if (!this.selectedUsers.find((selected) => selected.name === user.name)) {
+      this.selectedUsers.push(user)
+    }
+  }
+
+  @action
+  onUserDelete = (user) => {
+    this.selectedUsers.remove(user)
+  }
+
   onUserSearch = (searchTerm) => {
     return this.props.onSearch(searchTerm).then((res) => {
       return res.data.map((user) => {
-        return { value: user, label: user.name }
+        return { value: user.name, label: user.name, data: user }
       })
     })
   }
 
+  @action
+  handleSave = (ev) => {
+    const emails = this.selectedUsers
+      .filter((selected) => !selected.id)
+      .map((selected) => selected.email)
+    this.props.onCreateUsers(emails)
+      .then((users) =>
+        this.props.onCreateRoles([...users, ...this.selectedUsers]))
+      .then((roles) => {
+        this.selectedUsers = []
+        return roles
+      })
+  }
+
+  @observable selectedUsers = []
+
   render() {
     return (
-      <AutoComplete onInputChange={this.onUserSearch}/>
+      <div>
+        { this.selectedUsers.length > 0 && (
+          <PillList
+            itemList={this.selectedUsers}
+            onItemDelete={this.onUserDelete}
+          />)
+        }
+        <AutoComplete
+          onInputChange={this.onUserSearch}
+          onOptionSelect={this.onUserSelected}
+        />
+        <Button onClick={this.handleSave}>Add</Button>
+      </div>
     )
   }
 }
 
 RolesAdd.propTypes = {
-  onCreate: PropTypes.func.isRequired,
+  onCreateRoles: PropTypes.func.isRequired,
+  onCreateUsers: PropTypes.func.isRequired,
   onSearch: PropTypes.func,
 }
 RolesAdd.defaultProps = {

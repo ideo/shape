@@ -1,10 +1,9 @@
 import PropTypes from 'prop-types'
 import styled from 'styled-components'
-import { toJS } from 'mobx'
-import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
+import { PropTypes as MobxPropTypes } from 'mobx-react'
 import { withStyles } from 'material-ui/styles'
-import { MenuItem } from 'material-ui/Menu';
-import Select from 'material-ui/Select';
+import { MenuItem } from 'material-ui/Menu'
+import Select from 'material-ui/Select'
 import v from '~/utils/variables'
 import UserAvatar from './UserAvatar'
 

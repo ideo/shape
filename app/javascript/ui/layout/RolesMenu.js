@@ -68,7 +68,7 @@ class RolesMenu extends React.Component {
       'DELETE')
   }
 
-  onCreate = (roleData, oldRoleId) => {
+  onReplace = (roleData, oldRoleId) => {
     const { apiStore, collectionId } = this.props
     const newRole = new Role(roleData, apiStore)
     newRole.resourceId = collectionId
@@ -79,6 +79,20 @@ class RolesMenu extends React.Component {
         apiStore.add(res.data)
       })
       .catch((err) => console.warn(err))
+  }
+
+  onCreateRoles = (users) => {
+    const { apiStore, collectionId } = this.props
+    const defaultRole = 'viewer'
+    const userIds = users.map((user) => user.id)
+    const data = { role: { name: defaultRole }, user_ids: userIds }
+    return apiStore.request(`collections/${collectionId}/roles`, 'POST', data)
+      .catch((err) => console.warn(err))
+  }
+
+  onCreateUsers = (emails) => {
+    const { apiStore } = this.props
+    return apiStore.request(`users/create_from_emails`, 'POST', { emails })
   }
 
   onUserSearch = (searchTerm) => {
@@ -120,12 +134,16 @@ class RolesMenu extends React.Component {
                 role={role}
                 user={user}
                 onDelete={this.onDelete}
-                onCreate={this.onCreate}
+                onCreate={this.onReplace}
               />)))
           }
           <Spacer />
           <StyledH3>Add groups or people</StyledH3>
-          <RolesAdd onSearch={this.onUserSearch} />
+          <RolesAdd
+            onCreateRoles={this.onCreateRoles}
+            onCreateUsers={this.onCreateUsers}
+            onSearch={this.onUserSearch}
+          />
         </DialogContent>
       </Dialog>
     )

@@ -59,7 +59,7 @@ class Option extends React.Component {
     const { children, isFocused, isSelected, option, onFocus } = this.props
     let content = children
     if (!option.className) {
-      content = this.renderUser(option.value)
+      content = this.renderUser(option.data)
     }
 
     // TODO abstract render of user with avatar to shared place
@@ -227,18 +227,25 @@ const styles = theme => ({
 
 class AutoComplete extends React.Component {
   constructor(props) {
-    super()
+    super(props)
     this.fireInputChange = _.throttle(this._fireInputChange, 50)
   }
 
   state = {
     multi: null,
+    options: [],
   }
 
-  handleChangeMulti = multi => {
+  handleChange = (multi) => {
     this.setState({
       multi,
     })
+    let fullOption = this.state.options.find((option) =>
+      option.label === multi)
+    if (!fullOption.data) {
+      fullOption = Object.assign({}, { data: { custom: fullOption.value } })
+    }
+    this.props.onOptionSelect(fullOption.data)
   }
 
   _fireInputChange = input => {
@@ -246,13 +253,16 @@ class AutoComplete extends React.Component {
       return Promise.resolve({ options: [] })
     }
     return this.props.onInputChange(input).then((results) => {
+      this.setState({
+        options: results
+      })
       return { options: results }
     })
   }
 
   render() {
-    const { classes, onInputChange } = this.props
-    const { multi } = this.state
+    const { classes } = this.props
+    const { options } = this.state
 
     return (
       <div className={classes.root}>
@@ -261,10 +271,10 @@ class AutoComplete extends React.Component {
           inputComponent={SelectWrapped}
           inputProps={{
             classes,
-            value: multi,
             multi: true,
-            onChange: this.handleChangeMulti,
-            placeholder: 'Select multiple countries',
+            options,
+            onChange: this.handleChange,
+            placeholder: 'email address or username',
             instanceId: 'react-select-chip',
             id: 'react-select-chip',
             name: 'react-select-chip',
@@ -279,7 +289,7 @@ class AutoComplete extends React.Component {
 
 AutoComplete.propTypes = {
   classes: PropTypes.object.isRequired,
-  onSelect: PropTypes.func,
+  onOptionSelect: PropTypes.func.isRequired,
   onInputChange: PropTypes.func,
 }
 
