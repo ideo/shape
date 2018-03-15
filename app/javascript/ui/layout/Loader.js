@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types'
 import styled from 'styled-components'
 import Spinner from 'react-spinkit'
 import { Flex, Box } from 'reflexbox'
@@ -13,8 +14,8 @@ const StyledSpinner = styled(Spinner)`
   }
 `
 
-const Logo = () => (
-  <Flex style={{ height: '50vh' }} align="center" justify="center">
+const Logo = ({ height }) => (
+  <Flex style={{ height }} align="center" justify="center">
     <Box>
       <StyledSpinner
         fadeIn="half"
@@ -24,5 +25,12 @@ const Logo = () => (
     </Box>
   </Flex>
 )
+
+Logo.propTypes = {
+  height: PropTypes.string,
+}
+Logo.defaultProps = {
+  height: '50vh',
+}
 
 export default Logo

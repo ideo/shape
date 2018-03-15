@@ -3,72 +3,77 @@ import ReactRouterPropTypes from 'react-router-prop-types'
 import { action, observable } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import queryString from 'query-string'
-import styled from 'styled-components'
 
 import v from '~/utils/variables'
 import PageWithApi from '~/ui/pages/PageWithApi'
 import Loader from '~/ui/layout/Loader'
 import Header from '~/ui/layout/Header'
 import PageContainer from '~/ui/layout/PageContainer'
-import CollectionCover from '~/ui/grid/covers/CollectionCover'
-import CollectionIcon from '~/ui/icons/CollectionIcon'
-import { StyledTopRightActions, StyledBottomLeftIcon } from '~/ui/grid/GridCard'
-
-const StyledSearchResult = styled.div`
-  height: ${props => props.gridH}px;
-  max-width: ${props => props.gridMaxW}px;
-  background: white;
-  margin-bottom: ${props => props.gutter}px;
-  position: relative;
-  cursor: pointer;
-`
+import SearchResultsInfinite from '~/ui/search/SearchResultsInfinite'
 
 @inject('apiStore', 'uiStore', 'routingStore')
 @observer
 class SearchPage extends PageWithApi {
   @observable searchResults = []
+  @observable hasMore = false
 
-  searchQuery = (props) => (
-    queryString.parse(props.location.search).q
-  )
-
-  requestPath = (props) => (
-    `search?query=${this.searchQuery(props).replace(/\s/g, '+')}`
-  )
-
-  @action onAPILoad = (results, meta) => {
-    this.searchResults = results
+  @action componentWillReceiveProps(nextProps) {
+    // i.e. you are on SearchPage and perform a new search
+    // NOTE: important to do this here to "reset" infinite scroll!
+    if (this.searchQuery(nextProps) !== this.searchQuery(this.props)) {
+      this.searchResults.replace([])
+    }
+    super.componentWillReceiveProps(nextProps)
   }
 
-  routeToCollection = id => () => {
-    this.props.routingStore.routeTo('collections', id)
+  searchQuery = (props, opts = {}) => {
+    let query = queryString.parse(props.location.search).q
+    if (opts.url) query = query.replace(/\s/g, '+')
+    return query
+  }
+
+  requestPath = (props) => {
+    const q = this.searchQuery(props, { url: true })
+    const page = props.page || 1
+    return `search?query=${q}&page=${page}`
+  }
+
+  checkIfHasMore = () => this.hasMore
+
+  @action onAPILoad = (results, meta) => {
+    if (meta.page === 1) {
+      // reset if we are performing a new search starting at page 1
+      this.searchResults.replace([])
+    }
+    const newResults = this.searchResults.concat(results)
+    this.searchResults.replace(newResults)
+    this.hasMore = (meta.total > this.searchResults.length)
+  }
+
+  handleInfiniteLoad = (page) => {
+    // for some reason it seems to trigger one extra page even when !hasMore
+    if (!this.hasMore) return
+    this.fetchData({ ...this.props, page })
   }
 
   renderSearchResults = () => {
-    const { uiStore } = this.props
-    if (uiStore.isLoading) {
-      return <Loader />
-    }
+    const { uiStore, routingStore } = this.props
     if (this.searchResults.length === 0) {
+      if (uiStore.isLoading) {
+        return <Loader />
+      }
       return <div>No results found for &quot;{this.searchQuery(this.props)}&quot;.</div>
     }
+
     return (
-      this.searchResults.map((collection) => (
-        <StyledSearchResult
-          {...uiStore.gridSettings}
-          gridMaxW={uiStore.gridMaxW}
-          key={collection.id}
-          onClick={this.routeToCollection(collection.id)}
-        >
-          <StyledTopRightActions className="show-on-hover">
-            {/* NOTE: once linking is enabled, should setup CardMenu here */}
-          </StyledTopRightActions>
-          <StyledBottomLeftIcon>
-            <CollectionIcon />
-          </StyledBottomLeftIcon>
-          <CollectionCover collection={collection} />
-        </StyledSearchResult>
-      ))
+      <SearchResultsInfinite
+        routeTo={routingStore.routeTo}
+        gridSettings={uiStore.gridSettings}
+        gridMaxW={uiStore.gridMaxW}
+        searchResults={this.searchResults}
+        loadMore={this.handleInfiniteLoad}
+        hasMore={this.hasMore}
+      />
     )
   }
 

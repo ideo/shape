@@ -14,7 +14,7 @@ class Api::V1::SearchController < Api::V1::BaseController
   private
 
   def page
-    params[:page] || 1
+    params[:page].to_i || 1
   end
 
   def search_collections(query)

@@ -7123,6 +7123,12 @@ react-fontawesome@~1.6.1:
   dependencies:
     prop-types "^15.5.6"
 
+react-infinite-scroller@^1.1.3:
+  version "1.1.3"
+  resolved "https://registry.yarnpkg.com/react-infinite-scroller/-/react-infinite-scroller-1.1.3.tgz#c4230024bc237ce876c76b2e38d77dc1f6aabb26"
+  dependencies:
+    prop-types "^15.5.8"
+
 react-intl@^2.4.0:
   version "2.4.0"
   resolved "https://registry.yarnpkg.com/react-intl/-/react-intl-2.4.0.tgz#66c14dc9df9a73b2fbbfbd6021726e80a613eb15"
