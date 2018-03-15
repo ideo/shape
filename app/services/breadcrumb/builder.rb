@@ -31,7 +31,7 @@ module Breadcrumb
     end
 
     def build(object)
-      return unless object.is_a?(Breadcrumbable)
+      return unless object.is_a?(Breadcrumbable) && object.breadcrumbable?
       breadcrumb << Breadcrumb::Builder.for_object(object)
 
       return unless object.parent.present?
