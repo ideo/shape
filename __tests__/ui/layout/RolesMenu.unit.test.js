@@ -1,11 +1,14 @@
 import { observable, useStrict } from 'mobx'
 import { Provider } from 'mobx-react';
+import Role from '~/stores/jsonApi/Role'
 import RolesMenu from '~/ui/layout/RolesMenu'
 
 const apiStore = observable({
   request: jest.fn(),
   fetchAll: jest.fn(),
   find: jest.fn(),
+  remove: jest.fn(),
+  add: jest.fn(),
 })
 const uiStore = observable({
   rolesMenuOpen: false,
@@ -17,6 +20,7 @@ const props = {
   uiStore,
 }
 
+jest.mock('../../../app/javascript/stores/jsonApi/Role')
 let wrapper
 
 describe('RolesMenu', () => {
@@ -53,6 +57,38 @@ describe('RolesMenu', () => {
       expect(apiStore.request).toHaveBeenCalledWith(
         `users/${user.id}/roles/${role.id}`, 'DELETE'
       )
+    })
+  })
+
+  describe('onCreate', () => {
+    let newRole
+    let fakeRole
+
+    beforeEach(() => {
+      newRole = {
+        id: 5,
+        name: 'editor',
+        users: []
+      }
+      fakeRole = {
+        API_create: jest.fn().mockReturnValue(
+          Promise.resolve({ data: newRole })
+        )
+      }
+      Role.mockImplementation(() => fakeRole)
+    })
+
+    it('calls api create on a new role', () => {
+      wrapper.find('RolesMenu').instance().onCreate(newRole, 4)
+      expect(fakeRole.API_create()).resolves.toHaveBeenCalled()
+    })
+
+    it('syncs the roles by deleting the old one and adding the new one', done => {
+      wrapper.find('RolesMenu').instance().onCreate(newRole, 4).then(() => {
+        expect(apiStore.remove).toHaveBeenCalledWith('roles', 4)
+        expect(apiStore.add).toHaveBeenCalledWith(newRole)
+        done()
+      })
     })
   })
 })
