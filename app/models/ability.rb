@@ -14,12 +14,6 @@ class Ability
     # Logged-in users only
     if user.persisted?
 
-      # Anyone can create a new object
-      # (controllers will authorize manage abilities on parent object)
-      can :create, Collection
-      can :create, CollectionCard
-      can :create, Item
-
       can :read, Group do |group|
         group.can_view?(user)
       end
@@ -32,30 +26,29 @@ class Ability
         organization.can_manage?(user)
       end
 
+      can :create, Collection
       can :read, Collection do |collection|
         collection.can_view?(user)
       end
-
       can :manage, Collection do |collection|
         collection.can_edit?(user)
       end
-
       cannot :manage, Collection do |collection|
         collection.is_a?(Collection::SharedWithMeCollection)
       end
 
+      can :create, CollectionCard
       can :read, CollectionCard do |collection_card|
         collection_card.can_view?(user)
       end
-
       can :manage, CollectionCard do |collection_card|
         collection_card.can_edit?(user)
       end
 
+      can :create, Item
       can :read, Item do |item|
         item.can_view?(user)
       end
-
       can :manage, Item do |item|
         item.can_edit?(user)
       end
