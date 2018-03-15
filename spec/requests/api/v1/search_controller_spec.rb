@@ -21,6 +21,13 @@ describe Api::V1::SearchController, type: :request, auth: true do
       expect(response.status).to eq(200)
     end
 
+    it 'returns metadata' do
+      get(path, params: { query: find_collection.name })
+      expect(json['meta']['page']).to eq(1)
+      expect(json['meta']['size']).to eq(1)
+      expect(json['meta']['total']).to eq(1)
+    end
+
     it 'returns collection that matches name search' do
       get(path, params: { query: find_collection.name })
       expect(json['data'].size).to be(1)

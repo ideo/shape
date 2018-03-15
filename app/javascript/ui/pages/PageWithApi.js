@@ -26,7 +26,7 @@ class PageWithApi extends React.Component {
       .then(response => {
         uiStore.loading(false)
         if (_.isFunction(this.onAPILoad)) {
-          this.onAPILoad(response.data)
+          this.onAPILoad(response.data, response.meta)
         }
       })
       .catch(err => {

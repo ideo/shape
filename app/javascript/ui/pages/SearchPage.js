@@ -12,10 +12,11 @@ import Header from '~/ui/layout/Header'
 import PageContainer from '~/ui/layout/PageContainer'
 import CollectionCover from '~/ui/grid/covers/CollectionCover'
 import CollectionIcon from '~/ui/icons/CollectionIcon'
-import { StyledBottomLeftIcon } from '~/ui/grid/GridCard'
+import { StyledTopRightActions, StyledBottomLeftIcon } from '~/ui/grid/GridCard'
 
 const StyledSearchResult = styled.div`
   height: ${props => props.gridH}px;
+  max-width: ${props => props.gridMaxW}px;
   background: white;
   margin-bottom: ${props => props.gutter}px;
   position: relative;
@@ -35,7 +36,7 @@ class SearchPage extends PageWithApi {
     `search?query=${this.searchQuery(props).replace(/\s/g, '+')}`
   )
 
-  @action onAPILoad = (results) => {
+  @action onAPILoad = (results, meta) => {
     this.searchResults = results
   }
 
@@ -44,9 +45,8 @@ class SearchPage extends PageWithApi {
   }
 
   renderSearchResults = () => {
-    const { gridH, gutter } = this.props.uiStore.gridSettings
-    const gridProps = { gridH, gutter }
-    if (this.props.uiStore.isLoading) {
+    const { uiStore } = this.props
+    if (uiStore.isLoading) {
       return <Loader />
     }
     if (this.searchResults.length === 0) {
@@ -55,14 +55,18 @@ class SearchPage extends PageWithApi {
     return (
       this.searchResults.map((collection) => (
         <StyledSearchResult
-          {...gridProps}
-          onClick={this.routeToCollection(collection.id)}
+          {...uiStore.gridSettings}
+          gridMaxW={uiStore.gridMaxW}
           key={collection.id}
+          onClick={this.routeToCollection(collection.id)}
         >
-          <CollectionCover collection={collection} />
+          <StyledTopRightActions className="show-on-hover">
+            {/* NOTE: once linking is enabled, should setup CardMenu here */}
+          </StyledTopRightActions>
           <StyledBottomLeftIcon>
             <CollectionIcon />
           </StyledBottomLeftIcon>
+          <CollectionCover collection={collection} />
         </StyledSearchResult>
       ))
     )
