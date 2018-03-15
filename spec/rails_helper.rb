@@ -26,6 +26,9 @@ Dir[Rails.root.join('spec/support/**/*.rb')].each { |f| require f }
 # If you are not using ActiveRecord, you can remove this line.
 ActiveRecord::Migration.maintain_test_schema!
 
+require 'sidekiq/testing'
+Sidekiq::Testing.fake! 
+
 RSpec.configure do |config|
   # If you're not using ActiveRecord, or you'd prefer not to run each of your
   # examples within a transaction, remove the following line or assign false
@@ -53,6 +56,13 @@ RSpec.configure do |config|
   # See: http://www.virtuouscode.com/2012/08/31/configuring-database_cleaner-with-rails-rspec-capybara-and-selenium/
   config.before(:suite) do
     DatabaseCleaner.clean_with(:truncation)
+    Searchkick.disable_callbacks
+  end
+
+  config.around(:each, search: true) do |example|
+    Searchkick.callbacks(true) do
+      example.run
+    end
   end
 
   config.before(:each) do

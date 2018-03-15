@@ -24,14 +24,16 @@ class Collection < ApplicationRecord
   belongs_to :organization, optional: true
   belongs_to :cloned_from, class_name: 'Collection', optional: true
 
-  scope :root, -> { where.not(organization_id: nil) }
-  scope :not_custom_type, -> { where(type: nil) }
-  scope :user, -> { where(type: 'Collection::UserCollection') }
-  scope :shared_with_me, -> { where(type: 'Collection::SharedWithMeCollection') }
+  after_create :inherit_roles_from_parent
 
   validates :name, presence: true, if: :base_collection_type?
   validates :organization, presence: true, if: :parent_collection_card_blank?
   validates :parent_collection_card, presence: true, if: :organization_blank?
+
+  scope :root, -> { where.not(organization_id: nil) }
+  scope :not_custom_type, -> { where(type: nil) }
+  scope :user, -> { where(type: 'Collection::UserCollection') }
+  scope :shared_with_me, -> { where(type: 'Collection::SharedWithMeCollection') }
 
   accepts_nested_attributes_for :collection_cards
 
@@ -69,6 +71,10 @@ class Collection < ApplicationRecord
     organization
   end
 
+  def children
+    (items + collections)
+  end
+
   def subcollection?
     organization.blank?
   end
@@ -95,6 +101,10 @@ class Collection < ApplicationRecord
   end
 
   private
+
+  def inherit_roles_from_parent
+    AddRolesToChildrenWorker.perform_async(role_ids, id, self.class.name.to_s)
+  end
 
   def organization_blank?
     organization.blank?

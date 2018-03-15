@@ -1,4 +1,5 @@
 class SerializableItem < BaseJsonSerializer
+  ROLES_LIMIT = 5
   type 'items'
   attributes :id, :type, :name, :content, :text_data, :url, :thumbnail_url
   belongs_to :filestack_file
@@ -12,9 +13,9 @@ class SerializableItem < BaseJsonSerializer
     @current_ability.can?(:edit, @object)
   end
   has_many :editors do
-    data { @object.editors }
+    data { @object.editors.first(ROLES_LIMIT) }
   end
   has_many :viewers do
-    data { @object.viewers }
+    data { @object.viewers.first(ROLES_LIMIT) }
   end
 end

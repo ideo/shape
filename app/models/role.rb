@@ -6,16 +6,28 @@ class Role < ApplicationRecord
              polymorphic: true,
              optional: true
 
+  after_create :add_to_children, if: :add_to_children?
+  after_destroy :remove_from_children, if: :remove_from_children?
+
   validates :resource_type,
             inclusion: { in: Rolify.resource_types },
             allow_nil: true
 
   scopify
 
+  attr_accessor :skip_children_callbacks
+
   VIEWER = :viewer
   EDITOR = :editor
   MEMBER = :member
   ADMIN = :admin
+
+  amoeba do
+    enable
+    include_association :users_roles
+    exclude_association :resource
+    exclude_association :users
+  end
 
   # All the resources of a specific type (e.g. Organization) that this user is connected to
   # Role name is optional but can additionally scope it
@@ -38,11 +50,45 @@ class Role < ApplicationRecord
     [role_name, resource_identifier].select(&:present?).join('_')
   end
 
+  # Builds a copy of this role,
+  # allowing you to copy from one object to another
+  def build_copy(new_object)
+    # Use amoeba_dup so it copies all associated users_roles
+    new_role = amoeba_dup
+    new_role.resource = new_object
+    new_role
+  end
+
   def resource_identifier
     "#{resource_type}_#{resource_id}"
   end
 
   def identifier
     [name, resource_identifier].select(&:present?).join('_')
+  end
+
+  def destroy_without_children_callbacks
+    self.skip_children_callbacks = true
+    destroy
+  end
+
+  private
+
+  def add_to_children?
+    return false if skip_children_callbacks
+
+    resource.is_a?(Item) || resource.is_a?(Collection)
+  end
+
+  def remove_from_children?
+    add_to_children?
+  end
+
+  def add_to_children
+    AddRolesToChildrenWorker.perform_async([id], resource_id, resource_type)
+  end
+
+  def remove_from_children
+    RemoveRolesFromChildrenWorker.perform_async([id], resource_id, resource_type)
   end
 end

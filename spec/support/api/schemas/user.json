@@ -7,7 +7,8 @@
     "email": { "type": "string" },
     "pic_url_square": { "type": "string" },
     "current_user_collection_id": { "type": ["integer", "null"] },
-    "created_at": { "type": "date" }
+    "created_at": { "type": "date" },
+    "status": { "type": "string" }
   },
-  "required": ["id", "email", "created_at"]
+  "required": ["id", "email", "created_at", "status"]
 }
