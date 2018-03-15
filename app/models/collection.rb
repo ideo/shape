@@ -85,6 +85,10 @@ class Collection < ApplicationRecord
     name
   end
 
+  def can_edit?(user)
+    editor_ids.include?(user.id)
+  end
+
   private
 
   def organization_blank?

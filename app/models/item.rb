@@ -56,6 +56,10 @@ class Item < ApplicationRecord
     i
   end
 
+  def can_edit?(user)
+    editor_ids.include?(user.id)
+  end
+
   def breadcrumb_title
     name
   end

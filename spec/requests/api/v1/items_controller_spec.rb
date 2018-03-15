@@ -17,9 +17,19 @@ describe Api::V1::ItemsController, type: :request, auth: true do
       expect(json['data']['attributes']).to match_json_schema('item')
     end
 
+    it 'returns can_edit as false' do
+      get(path)
+      expect(json['data']['attributes']['can_edit']).to eq(false)
+    end
+
     context 'with editor' do
       before do
         user.add_role(Role::EDITOR, item.becomes(Item))
+      end
+
+      it 'returns can_edit as true' do
+        get(path)
+        expect(json['data']['attributes']['can_edit']).to eq(true)
       end
 
       it 'includes editors' do

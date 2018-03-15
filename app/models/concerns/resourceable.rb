@@ -11,18 +11,32 @@ module Resourceable
         args[:roles].each do |role_name|
           # Define a pluralized method with this role on the class
           # e.g. if given [:viewer], the method would be .viewers
-          define_role_method(role_name)
+          define_dynamic_role_method(role_name)
+
+          # An additional method that returns user ids, e.g. viewer_ids
+          define_dynamic_role_ids_method(role_name)
         end
       end
     end
 
-    def define_role_method(role_name)
+    def define_dynamic_role_method(role_name)
       define_method role_name.to_s.pluralize.to_sym do
         role = role_with_name(role_name)
         return [] if role.blank?
 
         User.joins(:users_roles)
             .where(UsersRole.arel_table[:role_id].eq(role.id))
+      end
+    end
+
+    def define_dynamic_role_ids_method(role_name)
+      define_method "#{role_name}_ids".to_s.to_sym do
+        role = role_with_name(role_name)
+        return [] if role.blank?
+
+        User.joins(:users_roles)
+            .where(UsersRole.arel_table[:role_id].eq(role.id))
+            .pluck(:id)
       end
     end
   end

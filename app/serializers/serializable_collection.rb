@@ -9,6 +9,9 @@ class SerializableCollection < BaseJsonSerializer
       @current_user,
     ).to_api
   end
+  attribute :can_edit do
+    @current_ability.can?(:edit, @object)
+  end
   has_many :editors do
     data { @object.editors }
   end

@@ -51,6 +51,11 @@ describe Api::V1::CollectionsController, type: :request, auth: true do
       ])
     end
 
+    it 'returns can_edit as false' do
+      get(path)
+      expect(json['data']['attributes']['can_edit']).to eq(false)
+    end
+
     describe 'included' do
       let(:collection_cards_json) { json_included_objects_of_type('collection_cards') }
       let(:items_json) { json_included_objects_of_type('items') }
@@ -79,6 +84,11 @@ describe Api::V1::CollectionsController, type: :request, auth: true do
       context 'with editor' do
         before do
           user.add_role(Role::EDITOR, collection)
+        end
+
+        it 'returns can_edit as true' do
+          get(path)
+          expect(json['data']['attributes']['can_edit']).to eq(true)
         end
 
         it 'includes editors' do

@@ -13,6 +13,7 @@ class Organization < ApplicationRecord
   delegate :members, to: :primary_group
   delegate :admins_and_members, to: :primary_group
   delegate :admin_and_member_ids, to: :primary_group
+  delegate :can_edit?, to: :primary_group
 
   validates :name, presence: true
 
