@@ -10,6 +10,7 @@ import Dialog, {
 import v from '~/utils/variables'
 import CloseIcon from '~/ui/icons/CloseIcon'
 import Role from '~/stores/jsonApi/Role'
+import RolesAdd from '~/ui/layout/RolesAdd'
 import RoleSelect from '~/ui/layout/RoleSelect'
 
 const materialStyles = {
@@ -47,6 +48,11 @@ const StyledCloseButton = styled.button`
 `
 StyledCloseButton.displayName = 'StyledCloseButton'
 
+const Spacer = styled.div`
+  margin-bottom: 55px;
+`
+Spacer.displayName = 'StyledSpacer'
+
 @inject('apiStore', 'uiStore')
 @observer
 class RolesMenu extends React.Component {
@@ -73,6 +79,13 @@ class RolesMenu extends React.Component {
         apiStore.add(res.data)
       })
       .catch((err) => console.warn(err))
+  }
+
+  onUserSearch = (searchTerm) => {
+    const { apiStore } = this.props
+    return apiStore.request(
+      `users/search?query=${searchTerm}`
+    )
   }
 
   handleClose = (ev) => {
@@ -110,6 +123,9 @@ class RolesMenu extends React.Component {
                 onCreate={this.onCreate}
               />)))
           }
+          <Spacer />
+          <StyledH3>Add groups or people</StyledH3>
+          <RolesAdd onSearch={this.onUserSearch} />
         </DialogContent>
       </Dialog>
     )
