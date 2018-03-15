@@ -1,6 +1,5 @@
 class Api::V1::SearchController < Api::V1::BaseController
   def search
-    # NOTE: currently just searches collections
     render jsonapi: search_collections(params[:query])
   end
 
@@ -10,8 +9,8 @@ class Api::V1::SearchController < Api::V1::BaseController
     return [] if query.blank?
 
     Collection.search(
-      query.downcase,
-      fields: ['name^2', :content],
+      query,
+      fields: %w[name^5 content],
       where: { organization_id: current_organization.id },
     )
   end

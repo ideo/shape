@@ -50,7 +50,7 @@ class SearchPage extends PageWithApi {
       return <Loader />
     }
     if (this.searchResults.length === 0) {
-      return <div>No results found for {this.searchQuery(this.props)}.</div>
+      return <div>No results found for &quot;{this.searchQuery(this.props)}&quot;.</div>
     }
     return (
       this.searchResults.map((collection) => (

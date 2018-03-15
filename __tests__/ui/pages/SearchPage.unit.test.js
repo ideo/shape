@@ -25,6 +25,6 @@ describe('SearchPage', () => {
   })
 
   it('displays the search results', () => {
-    expect(wrapper.find('PageContainer').children().text()).toContain(`No results found for ${query}.`)
+    expect(wrapper.find('PageContainer').children().text()).toContain(`No results found for "${query}".`)
   })
 })

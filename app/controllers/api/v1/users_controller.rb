@@ -20,7 +20,7 @@ class Api::V1::UsersController < Api::V1::BaseController
 
     User.search(
       query,
-      fields: ['name^2', :email],
+      fields: %w[name^2 email],
       where: { organization_ids: current_organization.id },
     )
   end

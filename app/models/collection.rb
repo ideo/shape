@@ -39,8 +39,8 @@ class Collection < ApplicationRecord
   accepts_nested_attributes_for :collection_cards
 
   # Searchkick config
-  searchkick word_start: [:name], word: [:content]
-  scope :search_import, -> { includes(:items) }
+  searchkick
+  scope :search_import, -> { active.where(type: nil).includes(:items) }
 
   def search_data
     {
