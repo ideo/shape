@@ -60,7 +60,7 @@ describe('RolesMenu', () => {
     })
   })
 
-  describe('onCreate', () => {
+  describe('onReplace', () => {
     let newRole
     let fakeRole
 
@@ -79,12 +79,12 @@ describe('RolesMenu', () => {
     })
 
     it('calls api create on a new role', () => {
-      wrapper.find('RolesMenu').instance().onCreate(newRole, 4)
+      wrapper.find('RolesMenu').instance().onReplace(newRole, 4)
       expect(fakeRole.API_create()).resolves.toHaveBeenCalled()
     })
 
     it('syncs the roles by deleting the old one and adding the new one', done => {
-      wrapper.find('RolesMenu').instance().onCreate(newRole, 4).then(() => {
+      wrapper.find('RolesMenu').instance().onReplace(newRole, 4).then(() => {
         expect(apiStore.remove).toHaveBeenCalledWith('roles', 4)
         expect(apiStore.add).toHaveBeenCalledWith(newRole)
         done()
