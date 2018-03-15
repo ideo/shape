@@ -20,7 +20,8 @@ class CollectionCard < ApplicationRecord
   validate :card_is_only_primary_card, if: :check_if_primary_card_is_unique?
   validate :parent_is_not_readonly, on: :create
 
-  delegate :can_edit?, to: :collection, allow_nil: true
+  delegate :can_edit?, to: :parent, allow_nil: true
+  delegate :can_view?, to: :parent, allow_nil: true
 
   scope :primary, -> { where(reference: false) }
   scope :reference, -> { where(reference: true) }

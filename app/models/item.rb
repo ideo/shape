@@ -60,6 +60,11 @@ class Item < ApplicationRecord
     editor_ids.include?(user.id)
   end
 
+  def can_view?(user)
+    return true if can_edit?(user)
+    viewer_ids.include?(user.id)
+  end
+
   def breadcrumb_title
     name
   end

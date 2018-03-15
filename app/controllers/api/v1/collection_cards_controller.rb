@@ -1,6 +1,6 @@
 class Api::V1::CollectionCardsController < Api::V1::BaseController
   deserializable_resource :collection_card, class: DeserializableCollectionCard, only: [:create, :update]
-  load_and_authorize_resource :collection, only: [:index, :create]
+  load_and_authorize_resource :collection, only: [:index]
   load_and_authorize_resource
   before_action :load_parent_collection, only: [:create]
 

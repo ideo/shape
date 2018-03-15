@@ -1,11 +1,12 @@
 require 'rails_helper'
 
 describe Api::V1::CollectionsController, type: :request, auth: true do
+  let(:user) { @user }
+
   describe 'GET #index' do
-    let(:user) { @user }
-    let!(:organization) { create(:organization, member: @user) }
-    let!(:collections_in_org) { create_list(:collection, 3, organization: organization) }
-    let!(:collections_outside_org) { create_list(:collection, 3) }
+    let!(:organization) { create(:organization, member: user) }
+    let!(:collections_in_org) { create_list(:collection, 3, organization: organization, add_editors: [user]) }
+    let!(:collections_outside_org) { create_list(:collection, 3, add_editors: [user]) }
     let(:path) { "/api/v1/collections" }
 
     it 'returns a 200' do
@@ -26,7 +27,7 @@ describe Api::V1::CollectionsController, type: :request, auth: true do
 
   describe 'GET #show' do
     let!(:collection) {
-      create(:collection, num_cards: 5)
+      create(:collection, num_cards: 5, add_viewers: [user])
     }
     let(:path) { "/api/v1/collections/#{collection.id}" }
     let(:user) { @user }
@@ -51,9 +52,25 @@ describe Api::V1::CollectionsController, type: :request, auth: true do
       ])
     end
 
+    it 'has no editors' do
+      get(path)
+      expect(json['data']['relationships']['editors']['data']).to be_empty
+    end
+
     it 'returns can_edit as false' do
       get(path)
       expect(json['data']['attributes']['can_edit']).to eq(false)
+    end
+
+    context 'with editor' do
+      let!(:collection) {
+        create(:collection, num_cards: 5, add_editors: [user])
+      }
+
+      it 'returns can_edit as true' do
+        get(path)
+        expect(json['data']['attributes']['can_edit']).to eq(true)
+      end
     end
 
     describe 'included' do
@@ -81,15 +98,16 @@ describe Api::V1::CollectionsController, type: :request, auth: true do
         expect(items_json.first['attributes']).to match_json_schema('item')
       end
 
-      context 'with editor' do
-        before do
-          user.add_role(Role::EDITOR, collection)
-        end
+      it 'includes viewers' do
+        get(path)
+        expect(json['data']['relationships']['viewers']['data'][0]['id'].to_i).to eq(user.id)
+        expect(users_json.map { |u| u['id'].to_i }).to match_array([user.id])
+      end
 
-        it 'returns can_edit as true' do
-          get(path)
-          expect(json['data']['attributes']['can_edit']).to eq(true)
-        end
+      context 'with editor' do
+        let!(:collection) {
+          create(:collection, num_cards: 5, add_editors: [user])
+        }
 
         it 'includes editors' do
           get(path)
@@ -102,27 +120,10 @@ describe Api::V1::CollectionsController, type: :request, auth: true do
           expect(json['data']['relationships']['viewers']['data']).to be_empty
         end
       end
-
-      context 'with viewer' do
-        before do
-          user.add_role(Role::VIEWER, collection)
-        end
-
-        it 'includes viewers' do
-          get(path)
-          expect(json['data']['relationships']['viewers']['data'][0]['id'].to_i).to eq(user.id)
-          expect(users_json.map { |u| u['id'].to_i }).to match_array([user.id])
-        end
-
-        it 'has no editors' do
-          get(path)
-          expect(json['data']['relationships']['editors']['data']).to be_empty
-        end
-      end
     end
 
     context 'with nested collection' do
-      let!(:nested_collection) { create(:collection) }
+      let!(:nested_collection) { create(:collection, add_editors: [user]) }
       let(:collections_json) { json_included_objects_of_type('collections') }
 
       before do
@@ -144,7 +145,6 @@ describe Api::V1::CollectionsController, type: :request, auth: true do
   end
 
   describe 'GET #me' do
-    let(:user) { @user }
     let!(:organization) { create(:organization, member: user) }
     let!(:org_2) { create(:organization, member: user) }
     let(:path) { '/api/v1/collections/me' }
@@ -204,7 +204,7 @@ describe Api::V1::CollectionsController, type: :request, auth: true do
     end
 
     context 'as sub-collection' do
-      let!(:collection) { create(:collection, organization: organization) }
+      let!(:collection) { create(:collection, organization: organization, add_editors: [user]) }
       let!(:collection_card) { create(:collection_card, parent: collection) }
       let(:path) { "/api/v1/collection_cards/#{collection_card.id}/collections" }
 
@@ -222,7 +222,7 @@ describe Api::V1::CollectionsController, type: :request, auth: true do
   end
 
   describe 'PATCH #update' do
-    let!(:collection) { create(:collection) }
+    let!(:collection) { create(:collection, add_editors: [user]) }
     let(:collection_card) { create(:collection_card, order: 0, width: 1, parent: collection) }
     let(:path) { "/api/v1/collections/#{collection.id}" }
     let(:params) {

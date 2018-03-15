@@ -89,6 +89,11 @@ class Collection < ApplicationRecord
     editor_ids.include?(user.id)
   end
 
+  def can_view?(user)
+    return true if can_edit?(user)
+    viewer_ids.include?(user.id)
+  end
+
   private
 
   def organization_blank?

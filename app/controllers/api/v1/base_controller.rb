@@ -31,7 +31,7 @@ class Api::V1::BaseController < ApplicationController
   end
 
   rescue_from CanCan::AccessDenied do |exception|
-    render json_api_errors([exception.message])
+    render json: { errors: [exception.message] }, status: :unauthorized
   end
 
   private

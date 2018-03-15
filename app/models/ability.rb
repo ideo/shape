@@ -20,12 +20,20 @@ class Ability
       can :create, CollectionCard
       can :create, Item
 
+      can :read, Group do |group|
+        group.can_view?(user)
+      end
+
       can :manage, Group do |group|
-        group.can_edit?(user)
+        group.can_manage?(user)
       end
 
       can :manage, Organization do |organization|
-        organization.can_edit?(user)
+        organization.can_manage?(user)
+      end
+
+      can :read, Collection do |collection|
+        collection.can_view?(user)
       end
 
       can :manage, Collection do |collection|
@@ -36,8 +44,16 @@ class Ability
         collection.is_a?(Collection::SharedWithMeCollection)
       end
 
+      can :read, CollectionCard do |collection_card|
+        collection_card.can_view?(user)
+      end
+
       can :manage, CollectionCard do |collection_card|
         collection_card.can_edit?(user)
+      end
+
+      can :read, Item do |item|
+        item.can_view?(user)
       end
 
       can :manage, Item do |item|

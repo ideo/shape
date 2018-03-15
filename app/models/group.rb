@@ -20,7 +20,11 @@ class Group < ApplicationRecord
     organization.primary_group_id == id
   end
 
-  def can_edit?(user)
+  def can_manage?(user)
     admin_ids.include?(user.id)
+  end
+
+  def can_view?(user)
+    admin_and_member_ids.include?(user.id)
   end
 end
