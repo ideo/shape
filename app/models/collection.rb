@@ -2,7 +2,9 @@ class Collection < ApplicationRecord
   include Breadcrumbable
   include Resourceable
   include Archivable
-  resourceable roles: %i[editor viewer]
+  resourceable roles: [Role::EDITOR, Role::VIEWER],
+               edit_role: Role::EDITOR,
+               view_role: Role::VIEWER
 
   archivable as: :parent_collection_card,
              with: %i[collection_cards reference_collection_cards]
@@ -89,15 +91,6 @@ class Collection < ApplicationRecord
 
   def breadcrumb_title
     name
-  end
-
-  def can_edit?(user)
-    editor_ids.include?(user.id)
-  end
-
-  def can_view?(user)
-    return true if can_edit?(user)
-    viewer_ids.include?(user.id)
   end
 
   private

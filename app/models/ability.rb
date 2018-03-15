@@ -23,11 +23,11 @@ class Ability
       end
 
       can :manage, Group do |group|
-        group.can_manage?(user)
+        group.can_edit?(user)
       end
 
       can :manage, Organization do |organization|
-        organization.can_manage?(user)
+        organization.can_edit?(user)
       end
 
       can :create, Collection

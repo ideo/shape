@@ -1,8 +1,9 @@
 require 'rails_helper'
 
 describe Api::V1::UsersController, type: :request, auth: true do
+  let(:user) { @user }
+
   describe 'GET #show' do
-    let!(:user) { create(:user) }
     let(:path) { "/api/v1/users/#{user.id}" }
 
     it 'returns a 200' do
@@ -17,16 +18,14 @@ describe Api::V1::UsersController, type: :request, auth: true do
   end
 
   describe '#GET #search', search: true do
-    let!(:organization) { create(:organization) }
-    let(:current_user) { @user }
+    let!(:organization) { create(:organization, member: user) }
     let!(:users) { create_list(:user, 3) }
     let(:path) { '/api/v1/users/search' }
     let(:find_user) { users.first }
 
     before do
-      current_user.add_role(:member, organization.primary_group)
-      users.each do |user|
-        user.add_role(:member, organization.primary_group)
+      users.each do |member|
+        member.add_role(:member, organization.primary_group)
       end
       User.reindex
     end
