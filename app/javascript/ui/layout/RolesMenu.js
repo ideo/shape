@@ -66,7 +66,7 @@ class RolesMenu extends React.Component {
     const { apiStore, collectionId } = this.props
     const newRole = new Role(roleData, apiStore)
     newRole.resourceId = collectionId
-    newRole.API_create()
+    return newRole.API_create()
       .then((res) => {
         // Re-sync all the roles once modifications successfully happened
         apiStore.remove('roles', oldRoleId)
