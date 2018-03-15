@@ -23,11 +23,19 @@ class Item < ApplicationRecord
            inverse_of: :referenced_item
 
   delegate :parent, to: :parent_collection_card, allow_nil: true
+  belongs_to :cloned_from, class_name: 'Item', optional: true
 
   before_validation :format_url, if: :saved_change_to_url?
   validates :type, presence: true
 
   accepts_nested_attributes_for :filestack_file
+
+  after_commit :reindex_parent_collection
+
+  def reindex_parent_collection
+    return unless parent.present?
+    parent.reindex
+  end
 
   amoeba do
     enable
@@ -38,6 +46,7 @@ class Item < ApplicationRecord
   def duplicate!(copy_parent_card: false)
     # Clones item
     i = amoeba_dup
+    i.cloned_from = self
 
     # Clone parent + increase order
     if copy_parent_card && parent_collection_card.present?

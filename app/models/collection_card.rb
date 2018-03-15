@@ -64,9 +64,7 @@ class CollectionCard < ApplicationRecord
   # Increment the order by 1 of all cards >= specified order
   # - Defaults to use this card's order
   # - Useful when inserting a new card to increment card order after this card
-  def increment_card_orders!(starting_at_order = nil)
-    starting_at_order ||= order
-
+  def increment_card_orders!(starting_at_order = order)
     greater_than_or_equal = CollectionCard.arel_table[:order].gteq(starting_at_order)
 
     update_ids = parent.collection_cards

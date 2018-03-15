@@ -65,6 +65,7 @@ describe Api::V1::UsersController, type: :request, auth: true do
       before do
         org2_user.add_role(:member, org2.primary_group)
         expect(org2_user.name).to eq(find_user.name)
+        User.reindex
       end
 
       it 'does not return user that has same name in another org' do
