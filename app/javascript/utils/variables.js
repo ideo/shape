@@ -24,6 +24,7 @@ export default {
 
   zIndex: {
     header: 200,
+    scrollIndicator: 200,
     cardDragging: 160,
     gridCard: 150,
     gridCardBg: 1,

@@ -9,6 +9,7 @@ beforeEach(() => {
     gridSettings: {},
     gridMaxW: 100,
     hasMore: false,
+    total: 10,
     loadMore: jest.fn(),
     routeTo: jest.fn(),
   }

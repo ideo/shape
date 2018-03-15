@@ -16,6 +16,7 @@ import SearchResultsInfinite from '~/ui/search/SearchResultsInfinite'
 class SearchPage extends PageWithApi {
   @observable searchResults = []
   @observable hasMore = false
+  @observable total = 0
 
   @action componentWillReceiveProps(nextProps) {
     // i.e. you are on SearchPage and perform a new search
@@ -48,6 +49,7 @@ class SearchPage extends PageWithApi {
     const newResults = this.searchResults.concat(results)
     this.searchResults.replace(newResults)
     this.hasMore = (meta.total > this.searchResults.length)
+    this.total = meta.total
   }
 
   handleInfiniteLoad = (page) => {
@@ -73,6 +75,7 @@ class SearchPage extends PageWithApi {
         searchResults={this.searchResults}
         loadMore={this.handleInfiniteLoad}
         hasMore={this.hasMore}
+        total={this.total}
       />
     )
   }
