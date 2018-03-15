@@ -76,6 +76,16 @@ export const fakeUser = {
   rawAttributes: jest.fn().mockReturnValue(fakeUserAttrs),
   getRecordType: jest.fn().mockReturnValue('users'),
 }
+export const fakeRoleAttrs = {
+  id: 1,
+  name: 'editor',
+  users: [fakeUser],
+}
+export const fakeRole = {
+  ...fakeRoleAttrs,
+  rawAttributes: jest.fn().mockReturnValue(fakeRoleAttrs),
+  getRecordType: jest.fn().mockReturnValue('roles'),
+}
 export const fakePosition = {
   xPos: 0,
   yPos: 0,
