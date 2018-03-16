@@ -5,6 +5,12 @@ class Group < ApplicationRecord
   resourceable roles: %i[admin member]
   belongs_to :organization
 
+  before_validation :set_tag_if_none, on: :create
+
+  validates :name, presence: true
+  validates :tag, uniqueness: { scope: :organization_id }
+  validate :tag_formatted_correctly # Tried to use format validation but it didn't work
+
   def admins_and_members
     User.joins(:roles)
         .where(Role.arel_table[:name].in([Role::ADMIN, Role::MEMBER]))
@@ -18,5 +24,16 @@ class Group < ApplicationRecord
 
   def primary?
     organization.primary_group_id == id
+  end
+
+  private
+
+  def set_tag_if_none
+    self.tag ||= name.underscore
+  end
+
+  def tag_formatted_correctly
+    return unless tag.match(/[a-zA-Z0-9\-\_]*/).present?
+    errors.add(:tag, 'must be letters, numbers, -, and _ characters')
   end
 end
