@@ -1,17 +1,24 @@
 import PropTypes from 'prop-types'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import Avatar from 'material-ui/Avatar'
-import { withStyles } from 'material-ui/styles'
+import styled from 'styled-components'
 
-const materialStyles = {
-  smallAvatar: {
-    width: 34,
-    marginLeft: 5,
-    marginRight: 5,
-    height: 34,
-    cursor: 'pointer'
+import v from '~/utils/variables'
+
+const StyledAvatar = styled(Avatar)`
+  &.orgAvatar {
+    width: ${props => props.size}px;
+    height: ${props => props.size}px;
+    margin-left: 5px;
+    margin-right: 5px;
+    cursor: pointer;
+
+    @media only screen and (max-width: ${v.responsive.smallBreakpoint}px) {
+      width: ${props => props.size * 0.8}px;
+      height: ${props => props.size * 0.8}px;
+    }
   }
-}
+`
 
 const DEFAULT_URL = 'https://cdn.filestackcontent.com/XYWsMijFTDWBsGzzKEEo'
 
@@ -24,12 +31,13 @@ class OrganizationAvatar extends React.Component {
   }
 
   render() {
-    const { classes, organization } = this.props
+    const { organization, size } = this.props
     const url = organization.pic_url_square || DEFAULT_URL
     return (
-      <Avatar
+      <StyledAvatar
+        size={size}
         onClick={this.handleClick}
-        className={classes.smallAvatar}
+        className="orgAvatar"
         src={url}
       />
     )
@@ -38,13 +46,13 @@ class OrganizationAvatar extends React.Component {
 
 OrganizationAvatar.propTypes = {
   organization: MobxPropTypes.objectOrObservableObject.isRequired,
-  classes: PropTypes.shape({
-    smallAvatar: PropTypes.string,
-  }).isRequired,
+  size: PropTypes.number,
 }
 OrganizationAvatar.wrappedComponent.propTypes = {
   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }
+OrganizationAvatar.defaultProps = {
+  size: 34,
+}
 
-// apply the wrapper here so that it doesn't interfere with propType definition
-export default withStyles(materialStyles)(OrganizationAvatar)
+export default OrganizationAvatar

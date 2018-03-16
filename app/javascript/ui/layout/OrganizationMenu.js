@@ -28,7 +28,7 @@ const StyledH2 = styled.h2`
   text-transform: uppercase;
   margin-bottom: 28px;
   font-family: Gotham;
-  font-size: 24px;
+  font-size: 1.5rem;
   font-weight: 500;
   letter-spacing: 2.3px;
   color: ${v.colors.blackLava};
@@ -38,7 +38,7 @@ const StyledH3 = styled.h3`
   text-transform: uppercase;
   margin-bottom: 13px;
   font-family: Gotham;
-  font-size: 16px;
+  font-size: 1rem;
   font-weight: 500;
   line-height: normal;
   letter-spacing: 1px;
@@ -48,7 +48,7 @@ StyledH3.displayName = 'StyledH3'
 const StyledText = styled.span`
   font-weight: 300;
   font-family: Gotham;
-  font-size: 16px;
+  font-size: 1rem;
 `
 StyledText.displayName = 'StyledText'
 

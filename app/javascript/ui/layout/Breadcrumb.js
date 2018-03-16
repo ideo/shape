@@ -11,8 +11,9 @@ BreadcrumbPadding.displayName = 'BreadcrumbPadding'
 const StyledBreadcrumb = styled.div`
   margin-top: 0.5rem;
   height: 1.2rem;
+  white-space: nowrap; /* better this way for responsive? */
   a {
-    font-size: 15px;
+    font-size: 1rem;
     font-weight: 100;
     color: #9b9b9b;
     letter-spacing: 1.5px;

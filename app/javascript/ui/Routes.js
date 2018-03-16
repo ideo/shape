@@ -7,8 +7,9 @@ import OrganizationMenu from '~/ui/layout/OrganizationMenu'
 import ItemPage from '~/ui/pages/ItemPage'
 import Loader from '~/ui/layout/Loader'
 import ClickWrapper from '~/ui/layout/ClickWrapper'
+import WindowSizeListener from 'react-window-size-listener'
 
-@inject('apiStore')
+@inject('apiStore', 'uiStore')
 @observer
 class Routes extends React.Component {
   componentDidMount() {
@@ -20,6 +21,10 @@ class Routes extends React.Component {
       // .catch(err => console.warn(new Error(err)))
   }
 
+  handleWindowResize = ({ windowWidth }) => {
+    this.props.uiStore.updateColumnsToFit(windowWidth)
+  }
+
   render() {
     const { history, apiStore } = this.props
     if (!apiStore.currentUser) {
@@ -28,6 +33,7 @@ class Routes extends React.Component {
     return (
       <div>
         <ClickWrapper />
+        <WindowSizeListener onResize={this.handleWindowResize} />
         <OrganizationMenu
           organization={apiStore.currentUser.current_organization}
         />
@@ -48,6 +54,7 @@ Routes.propTypes = {
 }
 Routes.wrappedComponent.propTypes = {
   apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
+  uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 
 export default Routes

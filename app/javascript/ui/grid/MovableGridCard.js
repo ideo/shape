@@ -221,10 +221,10 @@ class MovableGridCard extends React.PureComponent {
       return this.renderBlank()
     }
 
-    const { gridW, gridH, gutter } = uiStore.gridSettings
+    const { gridW, gridH, cols, gutter } = uiStore.gridSettings
     const minWidth = gridW * 0.8
     const minHeight = gridH * 0.8
-    const maxWidth = (gridW * 4) + (gutter * 3)
+    const maxWidth = uiStore.gridWidthFor(cols)
     const maxHeight = (gridH * 2) + gutter
 
     let xAdjust = 0

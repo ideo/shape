@@ -1,9 +1,15 @@
 html {
   // we were just using bourbon for font-smoothing, so have included explicitly here
-	-webkit-font-smoothing: antialiased;
-	-moz-osx-font-smoothing: grayscale;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
   font-size: 16px;
   font-family: 'Sentinel', serif;
+}
+
+@media only screen and (max-width: 645px) {
+  html {
+    font-size: 14px;
+  }
 }
 
 @font-face {

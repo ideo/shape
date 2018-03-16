@@ -61,7 +61,7 @@ class CollectionGrid extends React.Component {
         cards.unshift(blankCard)
       }
     }
-    this.positionCards(cards)
+    this.positionCards(cards, { props: nextProps })
   }
 
   componentWillUnmount() {
@@ -246,12 +246,14 @@ class CollectionGrid extends React.Component {
   // Sorts cards and sets state.cards after doing so
   positionCards = (collectionCards = [], opts = {}) => {
     const cards = [...collectionCards]
+    // props might get passed in e.g. nextProps for componentWillReceiveProps
+    if (!opts.props) opts.props = this.props
     const {
       gridW,
       gridH,
       gutter,
       cols
-    } = this.props
+    } = opts.props
     let row = 0
     const matrix = []
     // create an empty row
@@ -271,6 +273,8 @@ class CollectionGrid extends React.Component {
         let itFits = false
         let gap = 0
         let nextX = 0
+        // e.g. if card.width is 4, but we're at 2 columns, max out at cardWidth = 2
+        const cardWidth = Math.min(cols, card.width)
         // go through the row and see if there is an empty gap that fits card.w
         for (let x = 0; x < cols; x += 1) {
           if (matrix[row][x] === null) {
@@ -278,9 +282,9 @@ class CollectionGrid extends React.Component {
           } else {
             gap = 0
           }
-          if (gap >= card.width) {
+          if (gap >= cardWidth) {
             // jump back the number of spaces to the opening of the gap
-            nextX = (x + 1) - card.width
+            nextX = (x + 1) - cardWidth
             itFits = true
             break
           }
@@ -294,7 +298,7 @@ class CollectionGrid extends React.Component {
           _.assign(position, {
             xPos: position.x * (gridW + gutter),
             yPos: position.y * (gridH + gutter),
-            width: (card.width * (gridW + gutter)) - gutter,
+            width: (cardWidth * (gridW + gutter)) - gutter,
             height: (card.height * (gridH + gutter)) - gutter,
           })
 
@@ -306,10 +310,10 @@ class CollectionGrid extends React.Component {
           }
 
           // fill rows and columns
-          _.fill(matrix[row], card.id, position.x, position.x + card.width)
+          _.fill(matrix[row], card.id, position.x, position.x + cardWidth)
           for (let y = 1; y < card.height; y += 1) {
             if (!matrix[row + y]) matrix.push(_.fill(Array(cols), null))
-            _.fill(matrix[row + y], card.id, position.x, position.x + card.width)
+            _.fill(matrix[row + y], card.id, position.x, position.x + cardWidth)
           }
 
           // NOTE: if you remove this check, then it will fill things in
@@ -379,10 +383,13 @@ class CollectionGrid extends React.Component {
 }
 
 CollectionGrid.propTypes = {
-  cols: PropTypes.number.isRequired,
-  gridH: PropTypes.number.isRequired,
-  gridW: PropTypes.number.isRequired,
-  gutter: PropTypes.number.isRequired,
+  // these gridSettings are technically props,
+  // but they confuse eslint because of the way they're used in positionCards
+  // ---
+  // cols: PropTypes.number.isRequired,
+  // gridH: PropTypes.number.isRequired,
+  // gridW: PropTypes.number.isRequired,
+  // gutter: PropTypes.number.isRequired,
   updateCollection: PropTypes.func.isRequired,
   collection: MobxPropTypes.objectOrObservableObject.isRequired,
   blankContentToolState: MobxPropTypes.objectOrObservableObject,

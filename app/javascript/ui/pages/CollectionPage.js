@@ -3,6 +3,7 @@ import ReactRouterPropTypes from 'react-router-prop-types'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 
+import v from '~/utils/variables'
 import PageWithApi from '~/ui/pages/PageWithApi'
 import Loader from '~/ui/layout/Loader'
 import Header from '~/ui/layout/Header'
@@ -21,6 +22,9 @@ const StyledTitleAndRoles = styled.div`
   }
   .roles-summary {
     float: right;
+    @media only screen and (max-width: ${v.responsive.smallBreakpoint}px) {
+      display: none;
+    }
   }
   clear: both;
 `
@@ -109,6 +113,7 @@ class CollectionPage extends PageWithApi {
           <CollectionGrid
             // pull in cols, gridW, gridH, gutter
             {...uiStore.gridSettings}
+            gridSettings={uiStore.gridSettings}
             updateCollection={this.updateCollection}
             collection={collection}
             canEditCollection={collection.can_edit}

@@ -2,6 +2,8 @@ import PropTypes from 'prop-types'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 
+import v from '~/utils/variables'
+
 const StyledAvatar = styled.div`
   position: relative;
   align-items: center;
@@ -18,6 +20,11 @@ const StyledAvatar = styled.div`
     object-fit: cover;
     text-align: center;
   }
+  @media only screen and (max-width: ${v.responsive.smallBreakpoint}px) {
+    width: ${props => props.size * 0.8}px;
+    height: ${props => props.size * 0.8}px;
+  }
+
 `
 StyledAvatar.displayName = 'StyledAvatar'
 
