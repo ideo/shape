@@ -1,113 +1,20 @@
 import _ from 'lodash'
 import React from 'react'
 import PropTypes from 'prop-types'
-import styled from 'styled-components'
 import { withStyles } from 'material-ui/styles'
 import Input from 'material-ui/Input'
-import { MenuItem } from 'material-ui/Menu'
 import Chip from 'material-ui/Chip'
 import Select from 'react-select'
 import 'react-select/dist/react-select.css'
 
-import v from '~/utils/variables'
-import CloseIcon from '~/ui/icons/CloseIcon'
-import UserAvatar from '~/ui/layout/UserAvatar'
-
-const Row = styled.div`
-  align-items: center;
-  display: flex;
-  justify-content: space-between;
-`
-Row.displayName = 'Row'
-
-const RowItemLeft = styled.span`
-  margin-right: auto;
-  margin-left: 14px;
-`
-RowItemLeft.displayName = 'RowItemLeft'
-
-const StyledText = styled.span`
-  font-weight: 300;
-  font-family: Gotham;
-  font-size: 16px
-`
-StyledText.displayName = 'StyledText'
-
-const optionStyles = {
-  root: {
-    alignItems: 'center',
-    opacity: 0.5,
-    '&:hover': {
-      opacity: 1.0
-    }
-  }
-}
-
-class Option extends React.Component {
-  handleClick = event => {
-    this.props.onSelect(this.props.option, event)
-  }
-
-  renderUser(user) {
-    // TODO make more generic
-    return (
-      <Row>
-        <span>
-          <UserAvatar
-            key={user.id}
-            user={user}
-            size={38}
-          />
-        </span>
-        <RowItemLeft>
-          <StyledText>{user.name}</StyledText><br />
-        </RowItemLeft>
-      </Row>
-    )
-  }
-
-  render() {
-    const { children, classes, isFocused, isSelected, option, onFocus } = this.props
-    let content = children
-    if (!option.className) {
-      content = this.renderUser(option.data)
-    }
-
-    // TODO abstract render of user with avatar to shared place
-    return (
-      <MenuItem
-        classes={classes}
-        onFocus={onFocus}
-        selected={isFocused}
-        onClick={this.handleClick}
-        component="div"
-        style={{
-          fontWeight: isSelected ? 500 : 400,
-          height: '38px',
-          marginBottom: '7px',
-          padding: '0 4px',
-        }}
-      >
-        { content }
-      </MenuItem>
-    )
-  }
-}
-
-Option.propTypes = {
-  onSelect: PropTypes.func,
-}
-Option.defaultProps = {
-  onSelect: () => {}
-}
-const StyledOption = withStyles(optionStyles)(Option)
+import { AutocompleteOption as Option } from '~/ui/global/AutocompleteOption'
 
 function SelectWrapped(props) {
   const { classes, ...other } = props
 
   return (
     <Select.AsyncCreatable
-      optionComponent={StyledOption}
+      optionComponent={Option}
       noResultsText={'No results found'}
       valueComponent={valueProps => {
         const { value, children, onRemove } = valueProps
@@ -134,6 +41,14 @@ function SelectWrapped(props) {
       {...other}
     />
   )
+}
+
+SelectWrapped.propTypes = {
+  classes: PropTypes.shape({
+    root: PropTypes.string,
+    chip: PropTypes.string,
+    '@global': PropTypes.string,
+  }).isRequired,
 }
 
 const ITEM_HEIGHT = 48
@@ -287,8 +202,8 @@ class AutoComplete extends React.Component {
   }
 
   render() {
-    const { classes } = this.props
-    const { options } = this.state
+    const { classes, keepSelectedOptions } = this.props
+    const { multi, options } = this.state
 
     return (
       <div className={classes.root}>
@@ -297,6 +212,7 @@ class AutoComplete extends React.Component {
           inputProps={{
             classes,
             multi: true,
+            value: keepSelectedOptions ? multi : null,
             options,
             onChange: this.handleChange,
             placeholder: 'email address or username',
@@ -314,14 +230,20 @@ class AutoComplete extends React.Component {
 }
 
 AutoComplete.propTypes = {
-  classes: PropTypes.object.isRequired,
+  classes: PropTypes.shape({
+    root: PropTypes.string,
+    chip: PropTypes.string,
+    '@global': PropTypes.string,
+  }).isRequired,
   onOptionSelect: PropTypes.func.isRequired,
   onInputChange: PropTypes.func,
+  keepSelectedOptions: PropTypes.bool,
 }
 
 AutoComplete.defaultProps = {
   onSelect: () => {},
   onInputChange: () => {},
+  keepSelectedOptions: false,
 }
 
 export default withStyles(styles)(AutoComplete)
