@@ -1,4 +1,3 @@
-// import PropTypes from 'prop-types'
 import { Fragment } from 'react'
 import ReactRouterPropTypes from 'react-router-prop-types'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
@@ -51,19 +50,18 @@ class CollectionPage extends PageWithApi {
   }
 
   get roles() {
-    const { apiStore } = this.props
-    return apiStore.findAll('roles')
+    const { apiStore, match } = this.props
+    return apiStore.findAll('roles').filter((role) =>
+      role.resource && role.resource.id === parseInt(match.params.id))
   }
 
   get editors() {
-    const { apiStore } = this.props
-    return apiStore.findAll('roles')
+    return this.roles
       .filter((role) => role.name === 'editor')
   }
 
   get viewers() {
-    const { apiStore } = this.props
-    return apiStore.findAll('roles')
+    return this.roles
       .filter((role) => role.name === 'viewer')
   }
 

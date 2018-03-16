@@ -183,7 +183,7 @@ class AutoComplete extends React.Component {
     })
     let fullOption = this.state.options.find((option) =>
       option.value === multi)
-    if (!fullOption.data) {
+    if (!fullOption || !fullOption.data) {
       fullOption = Object.assign({}, { data: { custom: fullOption.value } })
     }
     this.props.onOptionSelect(fullOption.data)

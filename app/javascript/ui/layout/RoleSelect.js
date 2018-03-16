@@ -54,17 +54,15 @@ class RoleSelect extends React.Component {
   }
 
   createRole(roleName) {
-    const { onCreate, role } = this.props
-    const roleData = Object.assign({}, {
-      name: roleName,
-      users: role.users.map((user) => ({ id: user.id }))
-    })
-    onCreate(roleData, role.id)
+    const { onCreate, user } = this.props
+    onCreate([user], roleName)
   }
 
   deleteRole = () => {
     const { role, user } = this.props
-    return this.props.onDelete(role, user)
+    return this.props.onDelete(role, user).then(() => {
+      role.toDelete = true
+    })
   }
 
   render() {

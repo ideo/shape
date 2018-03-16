@@ -80,6 +80,7 @@ export const fakeRoleAttrs = {
   id: 1,
   name: 'editor',
   users: [fakeUser],
+  resource: { id: 1, type: 'collection' }
 }
 export const fakeRole = {
   ...fakeRoleAttrs,

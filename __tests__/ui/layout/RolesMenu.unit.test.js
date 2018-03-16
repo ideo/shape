@@ -60,38 +60,6 @@ describe('RolesMenu', () => {
     })
   })
 
-  describe('onReplace', () => {
-    let newRole
-    let fakeRole
-
-    beforeEach(() => {
-      newRole = {
-        id: 5,
-        name: 'editor',
-        users: []
-      }
-      fakeRole = {
-        API_create: jest.fn().mockReturnValue(
-          Promise.resolve({ data: newRole })
-        )
-      }
-      Role.mockImplementation(() => fakeRole)
-    })
-
-    it('calls api create on a new role', () => {
-      wrapper.find('RolesMenu').instance().onReplace(newRole, 4)
-      expect(fakeRole.API_create()).resolves.toHaveBeenCalled()
-    })
-
-    it('syncs the roles by deleting the old one and adding the new one', done => {
-      wrapper.find('RolesMenu').instance().onReplace(newRole, 4).then(() => {
-        expect(apiStore.remove).toHaveBeenCalledWith('roles', 4)
-        expect(apiStore.add).toHaveBeenCalledWith(newRole)
-        done()
-      })
-    })
-  })
-
   describe('onUserSearch', () => {
     describe('when a user is found', () => {
       it('should api request the users search route', (done) => {
@@ -108,7 +76,7 @@ describe('RolesMenu', () => {
     })
   })
 
-  describe('onCreateroles', () => {
+  describe('onCreateRoles', () => {
     let component
     let users
 
@@ -125,6 +93,17 @@ describe('RolesMenu', () => {
         'POST',
         { role: { name: 'editor' }, user_ids: [3, 5] }
       )
+    })
+
+    it('should remove the roles to delete when request returns', (done) => {
+      props.roles.push({
+        id: 9,
+        toDelete: true
+      })
+      component.onCreateRoles(users, 'editor').then(() => {
+        expect(apiStore.remove).toHaveBeenCalled()
+        done()
+      })
     })
   })
 })

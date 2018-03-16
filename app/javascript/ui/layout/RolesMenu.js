@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types'
 import styled from 'styled-components'
+import { toJS } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import { withStyles } from 'material-ui/styles'
 import Dialog, {
@@ -67,24 +68,17 @@ class RolesMenu extends React.Component {
     this.props.apiStore.request(`users/${user.id}/roles/${role.id}`,
       'DELETE')
 
-  onReplace = (roleData, oldRoleId) => {
-    const { apiStore, collectionId } = this.props
-    const newRole = new Role(roleData, apiStore)
-    newRole.resourceId = collectionId
-    return newRole.API_create()
-      .then((res) => {
-        // Re-sync all the roles once modifications successfully happened
-        apiStore.remove('roles', oldRoleId)
-        apiStore.add(res.data)
-      })
-      .catch((err) => console.warn(err))
-  }
-
   onCreateRoles = (users, roleName) => {
-    const { apiStore, collectionId } = this.props
+    const { apiStore, collectionId, roles } = this.props
     const userIds = users.map((user) => user.id)
     const data = { role: { name: roleName }, user_ids: userIds }
     return apiStore.request(`collections/${collectionId}/roles`, 'POST', data)
+      .then(() => {
+        const roleToDelete = roles.find((role) => !!role.toDelete)
+        if (roleToDelete) {
+          apiStore.remove('roles', roleToDelete.id)
+        }
+      })
       .catch((err) => console.warn(err))
   }
 
@@ -106,9 +100,7 @@ class RolesMenu extends React.Component {
   }
 
   render() {
-    const { classes, collectionId, roles, uiStore } = this.props
-    const collectionRoles = roles.filter((role) =>
-      role.resource.id === collectionId)
+    const { classes, roles, uiStore } = this.props
     // TODO abstract shared dialog functionality to component
     return (
       <Dialog
@@ -126,14 +118,14 @@ class RolesMenu extends React.Component {
         </DialogTitle>
         <DialogContent>
           <StyledH3>Shared with</StyledH3>
-          { collectionRoles.map((role) =>
+          { roles.map((role) =>
             role.users.map((user) =>
               (<RoleSelect
                 key={user.id + role.id}
                 role={role}
                 user={user}
                 onDelete={this.onDelete}
-                onCreate={this.onReplace}
+                onCreate={this.onCreateRoles}
               />)))
           }
           <Spacer />

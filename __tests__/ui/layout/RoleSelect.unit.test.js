@@ -38,20 +38,24 @@ describe('RoleSelect', () => {
   })
 
   describe('createRole', () => {
-    it('should call onCreate with the role data with the rolename', () => {
+    it('should call onCreate with list of users and role name', () => {
       wrapper.find('RoleSelect').instance().createRole('viewer')
-      const expectedRole = Object.assign({}, {
-        name: 'viewer',
-        users: [{ id: 1 }]
-      })
-      expect(props.onCreate).toHaveBeenCalledWith(expectedRole, props.role.id)
+      expect(props.onCreate).toHaveBeenCalledWith([fakeRole.users[0]], 'viewer')
     })
   })
 
   describe('deleteRole', () => {
-    it('should call onDelete with the role and user', () => {
+    beforeEach(() => {
+      props.onDelete.mockReturnValue(Promise.resolve())
       wrapper.find('RoleSelect').instance().deleteRole()
+    })
+
+    it('should call onDelete with the role and user', () => {
       expect(props.onDelete).toHaveBeenCalledWith(props.role, props.user)
+    })
+
+    it('should mark the role for deletion after the req finishes', () => {
+      expect(props.role.toDelete).toBeTruthy()
     })
   })
 })
