@@ -78,6 +78,10 @@ describe Api::V1::CollectionsController, type: :request, auth: true do
       let(:items_json) { json_included_objects_of_type('items') }
       let(:users_json) { json_included_objects_of_type('users') }
 
+      before do
+        collection.items.each { |item| user.add_role(Role::VIEWER, item) }
+      end
+
       it 'returns all collection cards' do
         get(path)
         expect(collection_cards_json.map { |cc| cc['id'].to_i }).to match_array(collection.collection_card_ids)
@@ -223,7 +227,9 @@ describe Api::V1::CollectionsController, type: :request, auth: true do
 
   describe 'PATCH #update' do
     let!(:collection) { create(:collection, add_editors: [user]) }
-    let(:collection_card) { create(:collection_card, order: 0, width: 1, parent: collection) }
+    let(:collection_card) do
+      create(:collection_card_item, order: 0, width: 1, parent: collection)
+    end
     let(:path) { "/api/v1/collections/#{collection.id}" }
     let(:params) {
       json_api_params(
@@ -239,6 +245,10 @@ describe Api::V1::CollectionsController, type: :request, auth: true do
         }
       )
     }
+
+    before do
+      user.add_role(Role::VIEWER, collection_card.item)
+    end
 
     it 'returns a 200' do
       patch(path, params: params)
