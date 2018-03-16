@@ -1,7 +1,6 @@
 // import PropTypes from 'prop-types'
 import { Fragment } from 'react'
 import ReactRouterPropTypes from 'react-router-prop-types'
-import { toJS } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 

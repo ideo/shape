@@ -4,7 +4,6 @@ import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import { withStyles } from 'material-ui/styles'
 import Dialog, {
   DialogContent,
-  DialogContentText,
   DialogTitle,
 } from 'material-ui/Dialog'
 import v from '~/utils/variables'

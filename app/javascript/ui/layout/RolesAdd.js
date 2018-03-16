@@ -140,7 +140,7 @@ RolesAdd.propTypes = {
   onCreateUsers: PropTypes.func.isRequired,
   onSearch: PropTypes.func,
   classes: PropTypes.shape({
-  selectMenu : PropTypes.string,
+    selectMenu: PropTypes.string,
   }).isRequired,
 }
 RolesAdd.defaultProps = {

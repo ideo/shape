@@ -65,11 +65,9 @@ const StyledCloseButton = styled.button`
 @inject('uiStore')
 @observer
 class OrganizationMenu extends React.Component {
-  @observable editOrganizationOpen = null;
-
-  handleClose = (ev) => {
-    const { uiStore } = this.props
-    uiStore.closeOrganizationMenu()
+  @action
+  onSave = () => {
+    this.editOrganizationOpen = false
   }
 
   @action
@@ -79,9 +77,11 @@ class OrganizationMenu extends React.Component {
     }
   }
 
-  @action
-  onSave = () => {
-    this.editOrganizationOpen = false
+  @observable editOrganizationOpen = null;
+
+  handleClose = (ev) => {
+    const { uiStore } = this.props
+    uiStore.closeOrganizationMenu()
   }
 
   renderEditOrganization() {
