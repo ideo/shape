@@ -1,5 +1,5 @@
 class Api::V1::GroupsController < Api::V1::BaseController
-  deserializable_resource :item, class: DeserializableGroup, only: %i[create update]
+  deserializable_resource :group, class: DeserializableGroup, only: %i[create update]
   load_and_authorize_resource
 
   def show
@@ -7,6 +7,7 @@ class Api::V1::GroupsController < Api::V1::BaseController
   end
 
   def create
+    @group.organization = current_organization
     if @group.save
       render jsonapi: @group
     else

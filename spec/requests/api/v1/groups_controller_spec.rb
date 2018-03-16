@@ -4,7 +4,7 @@ describe Api::V1::GroupsController, type: :request, auth: true do
   let(:user) { @user }
 
   describe 'GET #show' do
-    let!(:group) { create(:group, admin: user) }
+    let!(:group) { create(:group, add_admins: [user]) }
     let(:path) { "/api/v1/groups/#{group.id}" }
     let(:users_json) { json_included_objects_of_type('users') }
 
@@ -19,16 +19,16 @@ describe Api::V1::GroupsController, type: :request, auth: true do
     end
 
     it 'includes admin' do
-      admin_json = json['data']['relationships']['admins']['data'].first
-      expect(admin_json).to match_json_schema('user')
-      expect(admin_json['id']).to eq(user.id)
+      get(path)
+      expect(json['data']['relationships']['admins']['data'][0]['id'].to_i).to eq(user.id)
+      expect(users_json.first['attributes']).to match_json_schema('user')
     end
 
     context 'with member' do
       let!(:member) { create(:user) }
 
       before do
-        editor.add_role(Role::MEMBER, group)
+        member.add_role(Role::MEMBER, group)
       end
 
       it 'includes editors' do
@@ -39,6 +39,7 @@ describe Api::V1::GroupsController, type: :request, auth: true do
   end
 
   describe 'POST #create' do
+    let!(:organization) { create(:organization, admin: user) }
     let(:path) { '/api/v1/groups' }
     let(:params) do
       json_api_params(
@@ -55,14 +56,23 @@ describe Api::V1::GroupsController, type: :request, auth: true do
       expect(response.status).to eq(200)
     end
 
+    it 'creates new group' do
+      expect { post(path, params: params) }.to change(Group, :count).by(1)
+    end
+
     it 'matches JSON schema' do
       post(path, params: params)
       expect(json['data']['attributes']).to match_json_schema('group')
     end
+
+    it 'sets current org as org' do
+      post(path, params: params)
+      expect(Group.find(json['data']['attributes']['id']).organization).to eq(organization)
+    end
   end
 
   describe 'PATCH #update' do
-    let!(:group) { create(:group) }
+    let!(:group) { create(:group, add_admins: [user]) }
     let(:path) { "/api/v1/groups/#{group.id}" }
     let(:params) do
       json_api_params(
