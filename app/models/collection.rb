@@ -40,6 +40,8 @@ class Collection < ApplicationRecord
 
   # Searchkick config
   searchkick
+  # active == don't index archived collections
+  # where(type: nil) == don't index User/SharedWithMe collections
   scope :search_import, -> { active.where(type: nil).includes(:items) }
 
   def search_data
@@ -51,6 +53,11 @@ class Collection < ApplicationRecord
   end
 
   def search_content
+    # Current functionality for getting a collection's searchable "text content":
+    # - go through all items in the collection
+    # - for TextItems, grab the first 200 characters of their content
+    # - for other items (e.g. media), grab the name
+    # - join it all together into one blob of text, remove non-normal characters
     items.map do |item|
       if item.is_a? Item::TextItem
         item.plain_content.truncate(200, separator: /\s/, omission: '')
