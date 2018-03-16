@@ -80,11 +80,10 @@ class RolesMenu extends React.Component {
       .catch((err) => console.warn(err))
   }
 
-  onCreateRoles = (users) => {
+  onCreateRoles = (users, roleName) => {
     const { apiStore, collectionId } = this.props
-    const defaultRole = 'viewer'
     const userIds = users.map((user) => user.id)
-    const data = { role: { name: defaultRole }, user_ids: userIds }
+    const data = { role: { name: roleName }, user_ids: userIds }
     return apiStore.request(`collections/${collectionId}/roles`, 'POST', data)
       .catch((err) => console.warn(err))
   }
