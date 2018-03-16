@@ -107,4 +107,24 @@ describe('RolesMenu', () => {
       })
     })
   })
+
+  describe('onCreateroles', () => {
+    let component
+    let users
+
+    beforeEach(() => {
+      component = wrapper.find('RolesMenu').instance()
+      users = [{ id: 3 }, { id: 5 }]
+      apiStore.request.mockReturnValue(Promise.resolve({}))
+    })
+
+    it('should send a request to create roles with role and user ids', () => {
+      component.onCreateRoles(users, 'editor')
+      expect(apiStore.request).toHaveBeenCalledWith(
+        'collections/1/roles',
+        'POST',
+        { role: { name: 'editor' }, user_ids: [3, 5] }
+      )
+    })
+  })
 })

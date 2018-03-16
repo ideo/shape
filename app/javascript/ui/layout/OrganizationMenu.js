@@ -9,7 +9,6 @@ import Dialog, {
 } from 'material-ui/Dialog'
 import { withStyles } from 'material-ui/styles'
 import CloseIcon from '~/ui/icons/CloseIcon'
-import OrganizationAvatar from '~/ui/layout/OrganizationAvatar'
 import OrganizationEdit from '~/ui/layout/OrganizationEdit'
 
 const materialStyles = {

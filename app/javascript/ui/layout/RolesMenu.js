@@ -57,6 +57,7 @@ Spacer.displayName = 'StyledSpacer'
 class RolesMenu extends React.Component {
   componentDidMount() {
     const { apiStore, collectionId } = this.props
+    // TODO might want to refactor PageWithApi so this can be called earlier there
     // TODO investigate how this can be set all the time on Role
     Role.endpoint = () => `collections/${collectionId}/roles`
     apiStore.fetchAll('roles', true)
