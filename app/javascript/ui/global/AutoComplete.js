@@ -253,6 +253,7 @@ class AutoComplete extends React.Component {
       return Promise.resolve({ options: [] })
     }
     return this.props.onInputChange(input).then((results) => {
+      console.log('search', results[0].data.name)
       this.setState({
         options: results
       })

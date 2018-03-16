@@ -42,9 +42,8 @@ class RolesAdd extends React.Component {
   onUserSearch = (searchTerm) =>
     this.props.onSearch(searchTerm).then((res) =>
       res.data.map((user) =>
-        ({ value: user.name, label: user.name, data: user })))
+        ({ value: user.email, label: user.name, data: user })))
 
-  @action
   handleSave = (ev) => {
     const emails = this.selectedUsers
       .filter((selected) => !selected.id)
@@ -53,9 +52,14 @@ class RolesAdd extends React.Component {
       .then((users) =>
         this.props.onCreateRoles([...users, ...this.selectedUsers]))
       .then((roles) => {
-        this.selectedUsers = []
+        this.reset()
         return roles
       })
+  }
+
+  @action
+  reset() {
+    this.selectedUsers = []
   }
 
   @observable selectedUsers = []
