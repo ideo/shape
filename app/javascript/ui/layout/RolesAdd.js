@@ -69,11 +69,18 @@ class RolesAdd extends React.Component {
     const emails = this.selectedUsers
       .filter((selected) => !selected.id)
       .map((selected) => selected.email)
-    this.props.onCreateUsers(emails)
-      .then((users) =>
-        this.props.onCreateRoles(
-          [...users, ...this.selectedUsers], this.selectedRole
-        ))
+
+    const fullUsers = this.selectedUsers
+      .filter((selected) => !!selected.id)
+
+    let firstReq = Promise.resolve([])
+    if (emails.length) {
+      firstReq = this.props.onCreateUsers(emails)
+    }
+    return firstReq.then((users) =>
+      this.props.onCreateRoles(
+        [...users, ...fullUsers], this.selectedRole
+      ))
       .then((roles) => {
         this.reset()
         return roles

@@ -9,6 +9,8 @@ describe('RolesAdd', () => {
     useStrict(false)
     props = {
       onCreate: jest.fn(),
+      onCreateUsers: jest.fn(),
+      onCreateRoles: jest.fn(),
       onSearch: jest.fn(),
     }
     wrapper = mount(
@@ -16,8 +18,13 @@ describe('RolesAdd', () => {
     )
   })
 
-  describe('onSearch', () => {
-    const user = { id: 2, name: 'Uncle Leo' }
+  describe('onUserSearch', () => {
+    const user = { id: 2, name: 'Uncle Leo', email: 'leo@leo.l' }
+    let component
+
+    beforeEach(() => {
+      component = wrapper.find('RolesAdd').instance()
+    })
 
     describe('when a user is found', () => {
       beforeEach(() => {
@@ -26,9 +33,14 @@ describe('RolesAdd', () => {
         ))
       })
 
+      it('should pass the search term to the parent component', () => {
+        component.onUserSearch('term')
+        expect(props.onSearch).toHaveBeenCalledWith('term')
+      })
+
       it('should map the data with a value and a user', () => {
         expect(wrapper.find('RolesAdd').instance().onUserSearch('leo'))
-          .resolves.toEqual([{ value: user, label: user.name }])
+          .resolves.toEqual([{ value: user.email, label: user.name, data: user }])
       })
     })
   })
@@ -81,6 +93,64 @@ describe('RolesAdd', () => {
         const anotherUser = { custom: 'r@r.r' }
         component.onUserSelected(anotherUser)
         expect(component.selectedUsers.length).toEqual(1)
+      })
+    })
+  })
+
+  describe('handleSave', () => {
+    let component
+    let unregisteredUsers
+    let registeredUsers
+
+    beforeEach(() => {
+      component = wrapper.find('RolesAdd').instance()
+      unregisteredUsers = [
+        { email: 'name@name.com' },
+        { email: 'mo@mo.com' }
+      ]
+      registeredUsers = [
+        { id: 4, email: 'm@ideo.com', name: 'm' },
+        { id: 3, email: 't@ideo.com', name: 't' }
+      ]
+    })
+
+    describe('with unregistered users', () => {
+      beforeEach(() => {
+        component.selectedUsers = unregisteredUsers
+        props.onCreateUsers.mockReturnValue(Promise.resolve([{ id: 1 }]))
+      })
+
+      it('should send the emails to be created', (done) => {
+        component.handleSave().then(() => {
+          expect(props.onCreateUsers).toHaveBeenCalledWith(
+            unregisteredUsers.map((user) => user.email)
+          )
+          done()
+        })
+      })
+
+      it('should send the new users to be created with selected role', (done) => {
+        component.handleSave().then(() => {
+          expect(props.onCreateRoles).toHaveBeenCalledWith(
+            [{ id: 1 }], 'viewer'
+          )
+          done()
+        })
+      })
+    })
+
+    describe('with registered users', () => {
+      beforeEach(() => {
+        component.selectedUsers = registeredUsers
+      })
+
+      it('should send the new users to be created with selected role', (done) => {
+        component.handleSave().then(() => {
+          expect(props.onCreateRoles).toHaveBeenCalledWith(
+            registeredUsers, 'viewer'
+          )
+          done()
+        })
       })
     })
   })
