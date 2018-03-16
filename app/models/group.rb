@@ -2,7 +2,10 @@ class Group < ApplicationRecord
   include Resourceable
   # Admins can manage people in the group
   # Members have read access to everything the group is linked to
-  resourceable roles: %i[admin member]
+  resourceable roles: [Role::ADMIN, Role::MEMBER],
+               edit_role: Role::ADMIN,
+               view_role: Role::MEMBER
+
   belongs_to :organization
 
   def admins_and_members

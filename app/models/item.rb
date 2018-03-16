@@ -3,7 +3,9 @@ class Item < ApplicationRecord
   include Resourceable
   include Archivable
 
-  resourceable roles: %i[editor viewer]
+  resourceable roles: [Role::EDITOR, Role::VIEWER],
+               edit_role: Role::EDITOR,
+               view_role: Role::VIEWER
 
   archivable as: :parent_collection_card,
              with: %i[reference_collection_cards]

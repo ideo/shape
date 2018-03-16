@@ -7,7 +7,10 @@ class SerializableItem < BaseJsonSerializer
     Breadcrumb::ForUser.new(
       @object.breadcrumb,
       @current_user,
-    ).to_api
+    ).viewable_to_api
+  end
+  attribute :can_edit do
+    @current_ability.can?(:edit, @object)
   end
   has_many :editors do
     data { @object.editors.first(ROLES_LIMIT) }

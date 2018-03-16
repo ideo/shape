@@ -1,7 +1,8 @@
 class Api::V1::RolesController < Api::V1::BaseController
-  load_and_authorize_resource :collection
-  load_and_authorize_resource :item
-  load_and_authorize_resource :user
+  load_resource :collection, except: :destroy
+  load_resource :item, except: :destroy
+  before_action :authorize_manage_resource, except: :destroy
+  load_and_authorize_resource :user, only: :destroy
   load_resource only: %i[destroy]
 
   # All roles that exist on this resource (collection or item)
@@ -31,6 +32,7 @@ class Api::V1::RolesController < Api::V1::BaseController
     end
   end
 
+  # Remove a role on a specific user
   def destroy
     # We want to call remove_role instead of deleting the UserRole
     # So that role lifecycle methods are called
@@ -51,6 +53,10 @@ class Api::V1::RolesController < Api::V1::BaseController
     json_api_params.require(:role).permit(
       :name,
     )
+  end
+
+  def authorize_manage_resource
+    authorize! :manage, resource
   end
 
   def resource

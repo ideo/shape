@@ -1,15 +1,16 @@
 require 'rails_helper'
 
 describe Api::V1::RolesController, type: :request, auth: true do
+  let(:user) { @user }
+
   describe 'GET #index' do
-    let!(:collection) { create(:collection) }
-    let!(:editor) { create(:user) }
+    let!(:collection) { create(:collection, add_editors: [user]) }
+    let(:editor) { user }
     let!(:viewer) { create(:user) }
     let(:path) { "/api/v1/collections/#{collection.id}/roles" }
     let(:users_json) { json_included_objects_of_type('users') }
 
     before do
-      editor.add_role(Role::EDITOR, collection)
       viewer.add_role(Role::VIEWER, collection)
     end
 
@@ -42,7 +43,7 @@ describe Api::V1::RolesController, type: :request, auth: true do
     }
 
     context 'on a collection' do
-      let!(:collection) { create(:collection) }
+      let!(:collection) { create(:collection, add_editors: [user]) }
       let(:path) { "/api/v1/collections/#{collection.id}/roles" }
 
       it 'returns a 200' do
@@ -73,7 +74,7 @@ describe Api::V1::RolesController, type: :request, auth: true do
     end
 
     context 'on an item' do
-      let!(:item) { create(:text_item) }
+      let!(:item) { create(:text_item, add_editors: [user]) }
       let(:path) { "/api/v1/items/#{item.id}/roles" }
 
       it 'returns a 200' do
@@ -89,10 +90,10 @@ describe Api::V1::RolesController, type: :request, auth: true do
   end
 
   describe 'DELETE #destroy' do
-    let!(:collection) { create(:collection) }
-    let!(:editor) { create(:user) }
-    let!(:role) { editor.add_role(Role::EDITOR, collection) }
-    let(:path) { "/api/v1/users/#{editor.id}/roles/#{role.id}" }
+    let!(:collection) { create(:collection, add_editors: [user]) }
+    let!(:viewer) { create(:user) }
+    let!(:role) { viewer.add_role(Role::VIEWER, collection) }
+    let(:path) { "/api/v1/users/#{viewer.id}/roles/#{role.id}" }
 
     it 'returns a 200' do
       delete(path)
@@ -105,7 +106,7 @@ describe Api::V1::RolesController, type: :request, auth: true do
 
     it 'matches Role schema' do
       delete(path)
-      expect(editor.reload.has_role?(Role::EDITOR, collection)).to be false
+      expect(viewer.reload.has_role?(Role::VIEWER, collection)).to be false
     end
   end
 end

@@ -18,14 +18,6 @@ const editorsAndViewersProps = {
   handleClick: jest.fn()
 }
 
-const tooManyEditorsProps = _.merge({}, editorsAndViewersProps, {
-  editors: [fakeUser, fakeUser, fakeUser, fakeUser, fakeUser, fakeUser]
-})
-
-const onlyViewersProps = _.merge({}, emptyProps, { viewers: [fakeUser, fakeUser] })
-
-const onlyEditorsProps = _.merge({}, emptyProps, { editors: [fakeUser, fakeUser] })
-
 let wrapper
 describe('RolesSummary', () => {
   describe('with editors and viewers', () => {
@@ -53,6 +45,7 @@ describe('RolesSummary', () => {
 
   describe('with only viewers', () => {
     beforeEach(() => {
+      const onlyViewersProps = _.merge({}, emptyProps, { viewers: [fakeUser, fakeUser] })
       wrapper = shallow(
         <RolesSummary {...onlyViewersProps} />
       )
@@ -74,8 +67,9 @@ describe('RolesSummary', () => {
 
   describe('with only editors', () => {
     beforeEach(() => {
+      const props = _.merge({}, emptyProps, { editors: [fakeUser, fakeUser] })
       wrapper = shallow(
-        <RolesSummary {...onlyEditorsProps} />
+        <RolesSummary {...props} />
       )
     })
 
@@ -96,8 +90,11 @@ describe('RolesSummary', () => {
 
   describe('with more editors than should show', () => {
     beforeEach(() => {
+      const props = _.merge({}, editorsAndViewersProps, {
+        editors: [fakeUser, fakeUser, fakeUser, fakeUser, fakeUser, fakeUser]
+      })
       wrapper = shallow(
-        <RolesSummary {...tooManyEditorsProps} />
+        <RolesSummary {...props} />
       )
     })
 

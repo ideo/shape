@@ -56,7 +56,10 @@ class CollectionGrid extends React.Component {
         blankCard = { ...blankFound, order }
       }
       // Always add a blank card to the beginning of collection cards
-      cards.unshift(blankCard)
+      // If they have edit capabilities
+      if (this.props.canEditCollection) {
+        cards.unshift(blankCard)
+      }
     }
     this.positionCards(cards)
   }
@@ -348,6 +351,7 @@ class CollectionGrid extends React.Component {
           key={card.id}
           card={card}
           cardType={cardType}
+          canEditCollection={this.props.canEditCollection}
           position={card.position}
           record={record}
           onDrag={this.onDrag}
@@ -382,7 +386,8 @@ CollectionGrid.propTypes = {
   updateCollection: PropTypes.func.isRequired,
   collection: MobxPropTypes.objectOrObservableObject.isRequired,
   blankContentToolState: MobxPropTypes.objectOrObservableObject,
-  cardIds: MobxPropTypes.arrayOrObservableArray.isRequired
+  cardIds: MobxPropTypes.arrayOrObservableArray.isRequired,
+  canEditCollection: PropTypes.bool.isRequired,
 }
 CollectionGrid.defaultProps = {
   blankContentToolState: null
