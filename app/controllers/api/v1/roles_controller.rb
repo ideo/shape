@@ -7,8 +7,8 @@ class Api::V1::RolesController < Api::V1::BaseController
   # All roles that exist on this resource (collection or item)
 
   def index
-    @roles = resource.roles.includes(:users)
-    render jsonapi: @roles, include: %i[users]
+    @roles = resource.roles.includes(:users, :resource)
+    render jsonapi: @roles, include: %i[users resource]
   end
 
   # Create role(s) on this resource (collection or item)

@@ -106,8 +106,9 @@ class RolesMenu extends React.Component {
   }
 
   render() {
-    const { classes, roles, uiStore } = this.props
-    // TODO how to get the right roles?
+    const { classes, collectionId, roles, uiStore } = this.props
+    const collectionRoles = roles.filter((role) =>
+      role.resource.id === collectionId)
     // TODO abstract shared dialog functionality to component
     return (
       <Dialog
@@ -125,7 +126,7 @@ class RolesMenu extends React.Component {
         </DialogTitle>
         <DialogContent>
           <StyledH3>Shared with</StyledH3>
-          { roles.map((role) =>
+          { collectionRoles.map((role) =>
             role.users.map((user) =>
               (<RoleSelect
                 key={user.id + role.id}
