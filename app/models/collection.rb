@@ -93,6 +93,13 @@ class Collection < ApplicationRecord
     name
   end
 
+  def collection_cards_viewable_by(cached_cards, user)
+    cached_cards ||= collection_cards.includes(:items, :collections)
+    cached_cards.select do |collection_card|
+      collection_card.record.can_view?(user)
+    end
+  end
+
   private
 
   def inherit_roles_from_parent
