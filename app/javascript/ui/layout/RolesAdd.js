@@ -21,6 +21,11 @@ const Button = styled.button`
   background-color: ${v.colors.blackLava};
 `
 
+const StyledActionBox = styled.div`
+  padding-bottom: 14px;
+  text-align: center;
+`
+
 @observer
 class RolesAdd extends React.Component {
   @action
@@ -77,7 +82,9 @@ class RolesAdd extends React.Component {
           onInputChange={this.onUserSearch}
           onOptionSelect={this.onUserSelected}
         />
-        <Button onClick={this.handleSave}>Add</Button>
+        <StyledActionBox>
+          <Button onClick={this.handleSave}>Add</Button>
+        </StyledActionBox>
       </div>
     )
   }

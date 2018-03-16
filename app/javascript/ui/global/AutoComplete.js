@@ -14,6 +14,7 @@ import CloseIcon from '~/ui/icons/CloseIcon'
 import UserAvatar from '~/ui/layout/UserAvatar'
 
 const Row = styled.div`
+  align-items: center;
   display: flex;
   justify-content: space-between;
 `
@@ -31,6 +32,16 @@ const StyledText = styled.span`
   font-size: 16px
 `
 StyledText.displayName = 'StyledText'
+
+const optionStyles = {
+  root: {
+    alignItems: 'center',
+    opacity: 0.5,
+    '&:hover': {
+      opacity: 1.0
+    }
+  }
+}
 
 class Option extends React.Component {
   handleClick = event => {
@@ -56,7 +67,7 @@ class Option extends React.Component {
   }
 
   render() {
-    const { children, isFocused, isSelected, option, onFocus } = this.props
+    const { children, classes, isFocused, isSelected, option, onFocus } = this.props
     let content = children
     if (!option.className) {
       content = this.renderUser(option.data)
@@ -65,15 +76,19 @@ class Option extends React.Component {
     // TODO abstract render of user with avatar to shared place
     return (
       <MenuItem
+        classes={classes}
         onFocus={onFocus}
         selected={isFocused}
         onClick={this.handleClick}
         component="div"
         style={{
           fontWeight: isSelected ? 500 : 400,
+          height: '38px',
+          marginBottom: '7px',
+          padding: '0 4px',
         }}
       >
-      { content }
+        { content }
       </MenuItem>
     )
   }
@@ -85,13 +100,14 @@ Option.propTypes = {
 Option.defaultProps = {
   onSelect: () => {}
 }
+const StyledOption = withStyles(optionStyles)(Option)
 
 function SelectWrapped(props) {
   const { classes, ...other } = props
 
   return (
     <Select.AsyncCreatable
-      optionComponent={Option}
+      optionComponent={StyledOption}
       noResultsText={'No results found'}
       valueComponent={valueProps => {
         const { value, children, onRemove } = valueProps
@@ -125,10 +141,14 @@ const ITEM_HEIGHT = 48
 const styles = theme => ({
   root: {
     flexGrow: 1,
-    height: 250,
+    height: 220,
   },
   chip: {
     margin: theme.spacing.unit / 4,
+    paddingBottom: 0,
+    paddingLeft: '4px',
+    paddingRight: '4px',
+    paddingTop: 0,
   },
   // We had to use a lot of global selectors in order to style react-select.
   // We are waiting on https://github.com/JedWatson/react-select/issues/1679
@@ -136,6 +156,7 @@ const styles = theme => ({
   // Also, we had to reset the default style injected by the library.
   '@global': {
     '.Select-control': {
+      width: '370px',
       display: 'flex',
       alignItems: 'center',
       border: 0,
@@ -151,6 +172,7 @@ const styles = theme => ({
       flexWrap: 'wrap',
     },
     '.Select--multi .Select-input': {
+      width: '370px',
       margin: 0,
     },
     '.Select-noresults': {
@@ -160,6 +182,7 @@ const styles = theme => ({
       display: 'inline-flex !important',
       padding: 0,
       height: 'auto',
+      width: '370px',
     },
     '.Select-input input': {
       background: 'transparent',
@@ -171,6 +194,7 @@ const styles = theme => ({
       fontSize: 'inherit',
       margin: 0,
       outline: 0,
+      width: '370px',
     },
     '.Select-placeholder, .Select--single .Select-value': {
       position: 'absolute',
@@ -187,21 +211,23 @@ const styles = theme => ({
       color: theme.palette.common.black,
     },
     '.Select-menu-outer': {
-      backgroundColor: theme.palette.background.paper,
-      boxShadow: theme.shadows[2],
+      backgroundColor: 'white',
+      border: 'none',
+      boxShadow: 'none',
       position: 'absolute',
       left: 0,
       top: `calc(100% + ${theme.spacing.unit}px)`,
-      width: '100%',
+      width: '370px',
       zIndex: 2,
-      maxHeight: ITEM_HEIGHT * 4.5,
+      maxHeight: ITEM_HEIGHT * 3.5,
     },
     '.Select.is-focused:not(.is-open) > .Select-control': {
       boxShadow: 'none',
     },
     '.Select-menu': {
-      maxHeight: ITEM_HEIGHT * 4.5,
+      maxHeight: ITEM_HEIGHT * 3.5,
       overflowY: 'auto',
+      width: '100%',
     },
     '.Select-menu div': {
       boxSizing: 'content-box',
@@ -241,7 +267,8 @@ class AutoComplete extends React.Component {
       multi,
     })
     let fullOption = this.state.options.find((option) =>
-      option.label === multi)
+      option.value === multi)
+    console.log('full option', multi, this.state)
     if (!fullOption.data) {
       fullOption = Object.assign({}, { data: { custom: fullOption.value } })
     }
@@ -253,7 +280,6 @@ class AutoComplete extends React.Component {
       return Promise.resolve({ options: [] })
     }
     return this.props.onInputChange(input).then((results) => {
-      console.log('search', results[0].data.name)
       this.setState({
         options: results
       })
@@ -268,7 +294,6 @@ class AutoComplete extends React.Component {
     return (
       <div className={classes.root}>
         <Input
-          fullWidth
           inputComponent={SelectWrapped}
           inputProps={{
             classes,
@@ -279,6 +304,7 @@ class AutoComplete extends React.Component {
             instanceId: 'react-select-chip',
             id: 'react-select-chip',
             name: 'react-select-chip',
+            promptTextCreator: label => `Invite email ${label}`,
             simpleValue: true,
             loadOptions: this.fireInputChange,
           }}
