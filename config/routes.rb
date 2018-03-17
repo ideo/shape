@@ -26,11 +26,12 @@ Rails.application.routes.draw do
           patch 'archive'
         end
       end
-      resources :organizations, only: [:show, :update] do
+      resources :groups, except: :delete
+      resources :organizations, only: %i[show update] do
         collection do
           get 'current'
         end
-        resources :collections, only: [:index, :create]
+        resources :collections, only: %i[index create]
       end
       resources :users do
         collection do

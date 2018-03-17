@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180308233902) do
+ActiveRecord::Schema.define(version: 20180316164813) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -59,6 +59,8 @@ ActiveRecord::Schema.define(version: 20180308233902) do
     t.bigint "organization_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "handle"
+    t.index ["handle"], name: "index_groups_on_handle"
     t.index ["organization_id"], name: "index_groups_on_organization_id"
   end
 
@@ -85,6 +87,8 @@ ActiveRecord::Schema.define(version: 20180308233902) do
     t.datetime "updated_at", null: false
     t.integer "primary_group_id"
     t.string "pic_url_square"
+    t.string "handle"
+    t.index ["handle"], name: "index_organizations_on_handle"
   end
 
   create_table "roles", force: :cascade do |t|
@@ -114,12 +118,13 @@ ActiveRecord::Schema.define(version: 20180308233902) do
     t.string "provider"
     t.string "uid"
     t.integer "current_organization_id"
+    t.integer "status", default: 0
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["provider"], name: "index_users_on_provider"
     t.index ["uid"], name: "index_users_on_uid"
   end
 
-  create_table "users_roles", id: false, force: :cascade do |t|
+  create_table "users_roles", force: :cascade do |t|
     t.bigint "user_id"
     t.bigint "role_id"
     t.index ["role_id"], name: "index_users_roles_on_role_id"
