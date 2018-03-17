@@ -11,6 +11,7 @@ Rails.application.routes.draw do
           post 'duplicate'
         end
         resources :collection_cards, only: :index
+        resources :roles, only: %i[index create destroy], shallow: true
       end
       resources :collection_cards, shallow: true do
         member do
@@ -20,6 +21,7 @@ Rails.application.routes.draw do
           member do
             post 'duplicate'
           end
+          resources :roles, only: %i[index create], shallow: true
         end
         resources :collections, only: :create
         member do
@@ -36,9 +38,17 @@ Rails.application.routes.draw do
       resources :users do
         collection do
           get 'me'
+          get 'search'
+          post 'create_from_emails'
         end
+        resources :roles, only: %i[destroy]
       end
     end
+  end
+
+  authenticate :user do
+    require 'sidekiq/web'
+    mount Sidekiq::Web => '/sidekiq'
   end
 
   root to: 'home#index'

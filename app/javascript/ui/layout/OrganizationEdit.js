@@ -2,10 +2,7 @@ import PropTypes from 'prop-types'
 import { action, observable } from 'mobx'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
-import AddImageIcon from '~/ui/icons/AddImageIcon'
-import Divider from 'material-ui/Divider';
 import FilestackUpload from '~/utils/FilestackUpload'
-import OrganizationAvatar from '~/ui/layout/OrganizationAvatar'
 import v from '~/utils/variables'
 
 // TODO remove duplication with GridCardBlank
@@ -182,6 +179,9 @@ class OrganizationEdit extends React.Component {
 OrganizationEdit.propTypes = {
   organization: MobxPropTypes.objectOrObservableObject.isRequired,
   onSave: PropTypes.func,
+}
+OrganizationEdit.defaultProps = {
+  onSave: () => {}
 }
 
 export default OrganizationEdit

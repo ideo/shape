@@ -74,6 +74,7 @@ export const StyledMenuItem = styled.li`
     }
   }
 `
+StyledMenuItem.displayName = 'StyledMenuItem'
 
 @inject('uiStore')
 class CardMenu extends React.PureComponent {
@@ -96,6 +97,42 @@ class CardMenu extends React.PureComponent {
     }
   }
 
+  get renderMenuItems() {
+    let items
+    const duplicateItem = {
+      name: 'Duplicate',
+      icon: <DuplicateIcon />,
+      onClick: this.props.handleDuplicate
+    }
+
+    if (this.props.canEdit) {
+      items = [
+        { name: 'Share', icon: <ShareIcon />, onClick: this.props.handleShare },
+        duplicateItem,
+        { name: 'Link', icon: <LinkIcon />, onClick: this.props.handleLink },
+        { name: 'Organize', icon: <MoveIcon />, onClick: this.props.handleOrganize },
+        { name: 'Archive', icon: <ArchiveIcon />, onClick: this.props.handleArchive },
+      ]
+    } else {
+      items = [duplicateItem]
+    }
+
+    return items.map(item => {
+      const { name, icon, onClick } = item
+      return (
+        <StyledMenuItem key={name}>
+          <button
+            onClick={onClick}
+            className={`menu-${name.toLowerCase()}`}
+          >
+            {name}
+            {icon}
+          </button>
+        </StyledMenuItem>
+      )
+    })
+  }
+
   render() {
     const { className } = this.props
     let css = className || ''
@@ -113,51 +150,7 @@ class CardMenu extends React.PureComponent {
         </StyledMenuToggle>
         <StyledMenuWrapper className="menu-wrapper">
           <StyledMenu>
-            <StyledMenuItem>
-              <button
-                onClick={this.props.handleShare}
-                className="menu-share"
-              >
-                Share
-                <ShareIcon />
-              </button>
-            </StyledMenuItem>
-            <StyledMenuItem>
-              <button
-                onClick={this.props.handleDuplicate}
-                className="menu-duplicate"
-              >
-                Duplicate
-                <DuplicateIcon />
-              </button>
-            </StyledMenuItem>
-            <StyledMenuItem>
-              <button
-                onClick={this.props.handleLink}
-                className="menu-link"
-              >
-                Link
-                <LinkIcon />
-              </button>
-            </StyledMenuItem>
-            <StyledMenuItem>
-              <button
-                onClick={this.props.handleOrganize}
-                className="menu-organize"
-              >
-                Organize
-                <MoveIcon />
-              </button>
-            </StyledMenuItem>
-            <StyledMenuItem>
-              <button
-                onClick={this.props.handleArchive}
-                className="menu-archive"
-              >
-                Archive
-                <ArchiveIcon />
-              </button>
-            </StyledMenuItem>
+            {this.renderMenuItems}
           </StyledMenu>
         </StyledMenuWrapper>
       </StyledMenuButtonWrapper>
@@ -174,6 +167,7 @@ CardMenu.propTypes = {
   handleOrganize: PropTypes.func.isRequired,
   handleArchive: PropTypes.func.isRequired,
   menuOpen: PropTypes.bool.isRequired,
+  canEdit: PropTypes.bool.isRequired,
 }
 
 CardMenu.defaultProps = {

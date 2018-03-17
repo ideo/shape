@@ -4,6 +4,7 @@ export default class UiStore {
   @observable blankContentToolState = null
   @observable openCardMenuId = false
   @observable organizationMenuOpen = false
+  @observable rolesMenuOpen = false
   @observable gridSettings = {
     cols: 4,
     gutter: 20,
@@ -33,5 +34,13 @@ export default class UiStore {
     if (this.organizationMenuOpen) {
       this.organizationMenuOpen = false
     }
+  }
+
+  @action openRolesMenu() {
+    this.rolesMenuOpen = true
+  }
+
+  @action closeRolesMenu() {
+    this.rolesMenuOpen = false
   }
 }

@@ -1,8 +1,11 @@
 require 'rails_helper'
 
 describe Api::V1::CollectionCardsController, type: :request, auth: true do
+  let(:user) { @user }
+  let(:collection) { create(:collection, add_editors: [user]) }
+
   describe 'GET #index' do
-    let!(:collection) { create(:collection, num_cards: 5) }
+    let!(:collection) { create(:collection, num_cards: 5, add_editors: [user]) }
     let(:path) { "/api/v1/collections/#{collection.id}/collection_cards" }
 
     it 'returns a 200' do
@@ -22,7 +25,7 @@ describe Api::V1::CollectionCardsController, type: :request, auth: true do
   end
 
   describe 'GET #show' do
-    let!(:collection_card) { create(:collection_card) }
+    let!(:collection_card) { create(:collection_card, parent: collection) }
     let(:path) { "/api/v1/collection_cards/#{collection_card.id}" }
 
     it 'returns a 200' do
@@ -37,7 +40,6 @@ describe Api::V1::CollectionCardsController, type: :request, auth: true do
   end
 
   describe 'POST #create' do
-    let!(:collection) { create(:collection) }
     let(:path) { "/api/v1/collection_cards" }
     let(:raw_params) do
       {
@@ -74,6 +76,11 @@ describe Api::V1::CollectionCardsController, type: :request, auth: true do
       it 'matches JSON schema' do
         post(path, params: params)
         expect(json['data']['attributes']).to match_json_schema('collection_card')
+      end
+
+      it 'has collection as parent' do
+        post(path, params: params)
+        expect(CollectionCard.find(json['data']['attributes']['id']).parent).to eq(collection)
       end
     end
 
@@ -168,7 +175,7 @@ describe Api::V1::CollectionCardsController, type: :request, auth: true do
   end
 
   describe 'PATCH #update' do
-    let!(:collection_card) { create(:collection_card) }
+    let!(:collection_card) { create(:collection_card, parent: collection) }
     let(:path) { "/api/v1/collection_cards/#{collection_card.id}" }
     let(:params) {
       json_api_params(
@@ -199,7 +206,7 @@ describe Api::V1::CollectionCardsController, type: :request, auth: true do
   end
 
   describe 'PATCH #archive' do
-    let!(:collection_card) { create(:collection_card) }
+    let!(:collection_card) { create(:collection_card, parent: collection) }
     let(:path) { "/api/v1/collection_cards/#{collection_card.id}/archive" }
 
     it 'returns a 200' do
@@ -220,7 +227,7 @@ describe Api::V1::CollectionCardsController, type: :request, auth: true do
   end
 
   describe 'POST #duplicate' do
-    let!(:collection_card) { create(:collection_card_item) }
+    let!(:collection_card) { create(:collection_card_item, parent: collection) }
     let(:path) { "/api/v1/collection_cards/#{collection_card.id}/duplicate" }
 
     it 'returns a 200' do

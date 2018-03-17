@@ -79,4 +79,100 @@ describe User, type: :model do
       expect(user.organizations).to match_array(organizations)
     end
   end
+
+  describe '#name' do
+    it 'should concatenate first and last name' do
+      expect(user.name).to eq("#{user.first_name} #{user.last_name}")
+    end
+
+    it 'should not include spaces if first name is empty' do
+      user.first_name = nil
+      expect(user.name).to eq(user.last_name)
+    end
+
+    it 'should not include spaces if last name is empty' do
+      user.last_name = nil
+      expect(user.name).to eq(user.first_name)
+    end
+  end
+
+  describe '#search_data' do
+    let!(:user) { create(:user) }
+    let(:organizations) { create_list(:organization, 2) }
+
+    it 'should include name, email, organization_ids' do
+      expect(user.search_data).to eq(
+        {
+          name: user.name,
+          email: user.email,
+          organization_ids: [],
+        }
+      )
+    end
+
+    context 'if user is member of orgs' do
+      before do
+        user.add_role(:member, organizations[0].primary_group)
+        user.add_role(:member, organizations[1].primary_group)
+      end
+
+      it 'should have org ids' do
+        expect(user.search_data[:organization_ids]).to match_array(organizations.map(&:id))
+      end
+    end
+  end
+
+  describe '#has_role?' do
+    context 'with base role' do
+      it 'is true if user has role' do
+        user.add_role(:admin)
+        expect(user.has_role?(:admin)).to be true
+      end
+
+      it 'is false if user does not have role' do
+        expect(user.has_role?(:admin)).to be false
+      end
+    end
+
+    context 'with base class object' do
+      let(:object) { create(:collection) }
+
+      it 'is true if user has role' do
+        user.add_role(Role::EDITOR, object)
+        expect(user.has_role?(:editor, object)).to be true
+      end
+
+      it 'is false if user does not have role' do
+        expect(user.has_role?(:editor, object)).to be false
+      end
+    end
+
+    context 'with STI object' do
+      let(:object) { create(:text_item) }
+
+      it 'is true if user has role' do
+        user.add_role(Role::EDITOR, object)
+        expect(user.has_role?(:editor, object)).to be true
+      end
+
+      it 'is fale if user does not have role' do
+        expect(user.has_role?(:editor, object)).to be false
+      end
+    end
+  end
+
+  describe '#create_pending_user' do
+    let(:email) { Faker::Internet.email }
+
+    it 'should create a new pending user' do
+      user = User.create_pending_user(email: email)
+      expect(user.persisted? && user.pending?).to be true
+      expect(user.email).to eq(email)
+    end
+
+    it 'should not be case sensitive' do
+      user.update_attributes(email: email.upcase)
+      expect(User.create_pending_user(email: email).email).to eq(email.downcase)
+    end
+  end
 end

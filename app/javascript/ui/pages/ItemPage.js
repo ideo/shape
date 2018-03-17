@@ -56,8 +56,7 @@ class ItemPage extends PageWithApi {
     // similar function as in GridCard, could extract?
     switch (item.type) {
     case ITEM_TYPES.TEXT:
-      // TODO: editable should come from user permissions
-      return <TextItem item={item} editable />
+      return <TextItem item={item} />
     case ITEM_TYPES.IMAGE:
       return <ImageItem item={item} backgroundSize="contain" />
     case ITEM_TYPES.VIDEO:
