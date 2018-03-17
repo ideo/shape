@@ -29,7 +29,7 @@ class Api::V1::GroupsController < Api::V1::BaseController
   def group_params
     params.require(:group).permit(
       :name,
-      :tag,
+      :handle,
     )
   end
 end

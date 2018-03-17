@@ -3,7 +3,7 @@
   "properties": {
     "id": { "type": "integer" },
     "name": { "type": "string" },
-    "tag": { "type": ["string", "null"] }
+    "handle": { "type": ["string", "null"] }
   },
   "required": ["id", "name"]
 }

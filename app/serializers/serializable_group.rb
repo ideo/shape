@@ -1,6 +1,6 @@
 class SerializableGroup < BaseJsonSerializer
   type 'groups'
-  attributes :id, :name, :tag
+  attributes :id, :name, :handle
   has_many :admins do
     data { @object.admins }
   end

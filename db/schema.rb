@@ -59,9 +59,9 @@ ActiveRecord::Schema.define(version: 20180316164813) do
     t.bigint "organization_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.string "tag"
+    t.string "handle"
+    t.index ["handle"], name: "index_groups_on_handle"
     t.index ["organization_id"], name: "index_groups_on_organization_id"
-    t.index ["tag"], name: "index_groups_on_tag"
   end
 
   create_table "items", force: :cascade do |t|
@@ -87,8 +87,8 @@ ActiveRecord::Schema.define(version: 20180316164813) do
     t.datetime "updated_at", null: false
     t.integer "primary_group_id"
     t.string "pic_url_square"
-    t.string "tag"
-    t.index ["tag"], name: "index_organizations_on_tag"
+    t.string "handle"
+    t.index ["handle"], name: "index_organizations_on_handle"
   end
 
   create_table "roles", force: :cascade do |t|
