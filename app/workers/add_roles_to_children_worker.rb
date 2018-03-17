@@ -1,5 +1,6 @@
 class AddRolesToChildrenWorker
   include Sidekiq::Worker
+  sidekiq_options queue: 'critical'
 
   def perform(role_ids, object_id, object_class)
     roles = Role.where(id: role_ids).to_a
