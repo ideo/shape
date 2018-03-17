@@ -50,4 +50,49 @@ describe Collection, type: :model do
       end
     end
   end
+
+  describe '#collection_cards_viewable_by' do
+    let!(:collection) { create(:collection, num_cards: 3) }
+    let!(:subcollection_card) { create(:collection_card_collection, parent: collection) }
+    let(:cards) { collection.collection_cards }
+    let(:user) { create(:user) }
+
+    before do
+      user.add_role(Role::VIEWER, collection)
+      collection.items.each do |item|
+        user.add_role(Role::VIEWER, item)
+      end
+      user.add_role(Role::VIEWER, subcollection_card.collection)
+    end
+
+    it 'should show all cards without limiting' do
+      expect(collection.collection_cards_viewable_by(cards, user)).to match_array(cards)
+    end
+
+    context 'if one item is private' do
+      let(:private_card) { cards[0] }
+
+      before do
+        user.remove_role(Role::VIEWER, private_card.record)
+      end
+
+      it 'should not include card' do
+        expect(collection.collection_cards_viewable_by(cards, user)).not_to include(private_card)
+        expect(collection.collection_cards_viewable_by(cards, user)).to match_array(cards - [private_card])
+      end
+    end
+
+    context 'if one subcollection is private' do
+      let(:private_card) { subcollection_card }
+
+      before do
+        user.remove_role(Role::VIEWER, subcollection_card.collection)
+      end
+
+      it 'should not include card' do
+        expect(collection.collection_cards_viewable_by(cards, user)).not_to include(private_card)
+        expect(collection.collection_cards_viewable_by(cards, user)).to match_array(cards - [private_card])
+      end
+    end
+  end
 end
