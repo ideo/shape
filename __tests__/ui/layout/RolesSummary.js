@@ -3,6 +3,7 @@ import _ from 'lodash'
 import RolesSummary from '~/ui/layout/RolesSummary'
 
 import {
+  fakeRole,
   fakeUser,
 } from '#/mocks/data'
 
@@ -13,8 +14,8 @@ const emptyProps = {
 }
 
 const editorsAndViewersProps = {
-  editors: [fakeUser, fakeUser],
-  viewers: [fakeUser, fakeUser],
+  editors: [fakeRole, fakeRole],
+  viewers: [fakeRole, fakeRole],
   handleClick: jest.fn()
 }
 

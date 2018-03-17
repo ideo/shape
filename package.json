@@ -57,6 +57,7 @@
     "react-router-dom": "~4.2.2",
     "react-router-prop-types": "^0.0.3",
     "react-scroll": "~1.7.5",
+    "react-select": "^1.2.1",
     "react-spinkit": "^3.0.0",
     "react-window-size-listener": "^1.0.10",
     "reflexbox": "^3.0.1",

@@ -32,7 +32,7 @@ class User < ApplicationRecord
 
   searchkick word_start: [:name]
 
-  scope :search_import, -> { includes(:roles, :organizations) }
+  scope :search_import, -> { includes(:roles) }
 
   enum status: {
     active: 0,

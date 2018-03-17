@@ -8,8 +8,8 @@ class Api::V1::RolesController < Api::V1::BaseController
   # All roles that exist on this resource (collection or item)
 
   def index
-    @roles = resource.roles.includes(:users)
-    render jsonapi: @roles, include: %i[users]
+    @roles = resource.roles.includes(:users, :resource)
+    render jsonapi: @roles, include: %i[users resource]
   end
 
   # Create role(s) on this resource (collection or item)
@@ -26,7 +26,7 @@ class Api::V1::RolesController < Api::V1::BaseController
       users: users,
     )
     if assigner.call
-      render jsonapi: assigner.roles, include: %i[users]
+      render jsonapi: assigner.roles, include: %i[users resource]
     else
       render_api_errors assigner.errors
     end
@@ -39,7 +39,7 @@ class Api::V1::RolesController < Api::V1::BaseController
     if @user.present? && @user.remove_role(@role.name, @role.resource)
       render jsonapi: @role
     else
-      render_api_errors user.errors
+      render_api_errors @user.errors
     end
   end
 
