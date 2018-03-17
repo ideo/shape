@@ -1,4 +1,3 @@
-// import PropTypes from 'prop-types'
 import { Fragment } from 'react'
 import ReactRouterPropTypes from 'react-router-prop-types'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
@@ -12,6 +11,7 @@ import CollectionGrid from '~/ui/grid/CollectionGrid'
 import H1 from '~/ui/global/H1'
 import Breadcrumb from '~/ui/layout/Breadcrumb'
 import RolesSummary from '~/ui/layout/RolesSummary'
+import RolesMenu from '~/ui/layout/RolesMenu'
 
 const isHomepage = ({ path }) => path === '/'
 
@@ -49,6 +49,22 @@ class CollectionPage extends PageWithApi {
     return apiStore.find('collections', match.params.id)
   }
 
+  get roles() {
+    const { apiStore, match } = this.props
+    return apiStore.findAll('roles').filter((role) =>
+      role.resource && role.resource.id === parseInt(match.params.id))
+  }
+
+  get editors() {
+    return this.roles
+      .filter((role) => role.name === 'editor')
+  }
+
+  get viewers() {
+    return this.roles
+      .filter((role) => role.name === 'viewer')
+  }
+
   requestPath = (props) => {
     const { match, apiStore } = props
     if (isHomepage(match)) {
@@ -65,7 +81,8 @@ class CollectionPage extends PageWithApi {
   }
 
   showObjectRoleDialog = () => {
-    console.log('Manage object roles')
+    const { uiStore } = this.props
+    uiStore.openRolesMenu()
   }
 
   updateCollection = () => {
@@ -75,9 +92,8 @@ class CollectionPage extends PageWithApi {
   }
 
   render() {
-    const { collection } = this
+    const { collection, editors, viewers, roles } = this
     const { uiStore } = this.props
-    // console.log(this.props.apiStore, collection)
     if (!collection) return <Loader />
 
     const breadcrumb = this.isHomepage ? [] : collection.breadcrumb
@@ -91,12 +107,16 @@ class CollectionPage extends PageWithApi {
             <RolesSummary
               className="roles-summary"
               handleClick={this.showObjectRoleDialog}
-              viewers={collection.viewers}
-              editors={collection.editors}
+              viewers={viewers}
+              editors={editors}
             />
           </StyledTitleAndRoles>
         </Header>
         <PageContainer>
+          <RolesMenu
+            collectionId={collection.id}
+            roles={roles}
+          />
           <CollectionGrid
             // pull in cols, gridW, gridH, gutter
             {...uiStore.gridSettings}

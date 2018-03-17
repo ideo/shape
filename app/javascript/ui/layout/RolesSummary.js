@@ -59,16 +59,24 @@ const StyledAddUserBtn = styled.div`
 `
 StyledAddUserBtn.displayName = 'StyledAddUserBtn'
 
+function flattenRoles(roles) {
+  return roles.reduce(
+    (a, b) => a.concat(b.users.slice()), []
+  )
+}
+
 class RolesSummary extends React.PureComponent {
   // Return at most MAX_USERS_TO_SHOW users,
   // prioritizing editors over viewers
   get viewersAndEditorsLimited() {
     let { editors, viewers } = this.props
-    editors = editors.slice(0, MAX_USERS_TO_SHOW)
+    const editorUsers = flattenRoles(editors)
+    const viewerUsers = flattenRoles(viewers)
+    editors = editorUsers.slice(0, MAX_USERS_TO_SHOW)
 
     if (editors.length < MAX_USERS_TO_SHOW) {
       const numViewers = MAX_USERS_TO_SHOW - editors.length
-      viewers = viewers.slice(0, numViewers)
+      viewers = viewerUsers.slice(0, numViewers)
     } else {
       viewers = []
     }

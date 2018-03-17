@@ -24,7 +24,8 @@ class Api::V1::OrganizationsController < Api::V1::BaseController
 
   def organization_params
     params.require(:organization).permit(
-      :name
+      :name,
+      :pic_url_square
     )
   end
 end

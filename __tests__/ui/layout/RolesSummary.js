@@ -3,6 +3,7 @@ import _ from 'lodash'
 import RolesSummary from '~/ui/layout/RolesSummary'
 
 import {
+  fakeRole,
   fakeUser,
 } from '#/mocks/data'
 
@@ -13,18 +14,18 @@ const emptyProps = {
 }
 
 const editorsAndViewersProps = {
-  editors: [fakeUser, fakeUser],
-  viewers: [fakeUser, fakeUser],
+  editors: [fakeRole, fakeRole],
+  viewers: [fakeRole, fakeRole],
   handleClick: jest.fn()
 }
 
 const tooManyEditorsProps = _.merge({}, editorsAndViewersProps, {
-  editors: [fakeUser, fakeUser, fakeUser, fakeUser, fakeUser, fakeUser]
+  editors: [fakeRole, fakeRole, fakeRole, fakeRole, fakeRole, fakeRole]
 })
 
-const onlyViewersProps = _.merge({}, emptyProps, { viewers: [fakeUser, fakeUser] })
+const onlyViewersProps = _.merge({}, emptyProps, { viewers: [fakeRole, fakeRole] })
 
-const onlyEditorsProps = _.merge({}, emptyProps, { editors: [fakeUser, fakeUser] })
+const onlyEditorsProps = _.merge({}, emptyProps, { editors: [fakeRole, fakeRole] })
 
 let wrapper
 describe('RolesSummary', () => {
