@@ -5,6 +5,18 @@ class Group < ApplicationRecord
   resourceable roles: %i[admin member]
   belongs_to :organization
 
+  before_validation :set_handle_if_none, on: :create
+
+  validates :name, presence: true
+
+  validates :handle,
+            uniqueness: { scope: :organization_id },
+            if: :validate_handle?
+
+  validates :handle,
+            format: { with: /[a-zA-Z0-9\-\_]+/ },
+            if: :validate_handle?
+
   def admins_and_members
     User.joins(:roles)
         .where(Role.arel_table[:name].in([Role::ADMIN, Role::MEMBER]))
@@ -18,5 +30,15 @@ class Group < ApplicationRecord
 
   def primary?
     organization.primary_group_id == id
+  end
+
+  private
+
+  def validate_handle?
+    new_record? || handle_changed?
+  end
+
+  def set_handle_if_none
+    self.handle ||= name.parameterize
   end
 end
