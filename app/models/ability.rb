@@ -12,12 +12,13 @@ class Ability
       can :read, :all
       can :manage, :all
 
-    elsif  user.persisted?
+    elsif user.persisted?
       # Logged-in users only
 
       can :read, Organization
       can :read, User
 
+      can :create, Group
       can :read, Group do |group|
         group.can_view?(user)
       end
