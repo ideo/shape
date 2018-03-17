@@ -55,16 +55,6 @@ class CollectionPage extends PageWithApi {
       role.resource && role.resource.id === parseInt(match.params.id))
   }
 
-  get editors() {
-    return this.roles
-      .filter((role) => role.name === 'editor')
-  }
-
-  get viewers() {
-    return this.roles
-      .filter((role) => role.name === 'viewer')
-  }
-
   requestPath = (props) => {
     const { match, apiStore } = props
     if (isHomepage(match)) {
@@ -92,7 +82,7 @@ class CollectionPage extends PageWithApi {
   }
 
   render() {
-    const { collection, editors, viewers, roles } = this
+    const { collection, roles } = this
     const { uiStore } = this.props
     if (!collection) return <Loader />
 
@@ -107,8 +97,7 @@ class CollectionPage extends PageWithApi {
             <RolesSummary
               className="roles-summary"
               handleClick={this.showObjectRoleDialog}
-              viewers={viewers}
-              editors={editors}
+              roles={roles}
             />
           </StyledTitleAndRoles>
         </Header>
