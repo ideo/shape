@@ -54,7 +54,9 @@ describe Api::V1::CollectionsController, type: :request, auth: true do
 
     it 'has no editors' do
       get(path)
-      expect(json['data']['relationships']['editors']['data']).to be_empty
+      roles = json['data']['relationships']['roles']['data']
+      editor_role = roles.select { |role| role['name'] == 'editor' }
+      expect(editor_role).to be_empty
     end
 
     it 'returns can_edit as false' do
@@ -104,7 +106,6 @@ describe Api::V1::CollectionsController, type: :request, auth: true do
 
       it 'includes viewers' do
         get(path)
-        expect(json['data']['relationships']['viewers']['data'][0]['id'].to_i).to eq(user.id)
         expect(users_json.map { |u| u['id'].to_i }).to match_array([user.id])
       end
 
@@ -113,15 +114,9 @@ describe Api::V1::CollectionsController, type: :request, auth: true do
           create(:collection, num_cards: 5, add_editors: [user])
         }
 
-        it 'includes editors' do
+        it 'includes only editors' do
           get(path)
-          expect(json['data']['relationships']['editors']['data'][0]['id'].to_i).to eq(user.id)
           expect(users_json.map { |u| u['id'].to_i }).to match_array([user.id])
-        end
-
-        it 'has no viewers' do
-          get(path)
-          expect(json['data']['relationships']['viewers']['data']).to be_empty
         end
       end
     end

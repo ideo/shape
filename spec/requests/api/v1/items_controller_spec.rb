@@ -31,15 +31,9 @@ describe Api::V1::ItemsController, type: :request, auth: true do
         expect(json['data']['attributes']['can_edit']).to eq(true)
       end
 
-      it 'includes editors' do
+      it 'includes only editors' do
         get(path)
-        expect(json['data']['relationships']['editors']['data'][0]['id'].to_i).to eq(user.id)
         expect(users_json.map { |u| u['id'].to_i }).to match_array([user.id])
-      end
-
-      it 'has no viewers' do
-        get(path)
-        expect(json['data']['relationships']['viewers']['data']).to be_empty
       end
     end
 
@@ -48,15 +42,9 @@ describe Api::V1::ItemsController, type: :request, auth: true do
         user.add_role(Role::VIEWER, item.becomes(Item))
       end
 
-      it 'includes viewers' do
+      it 'includes only viewer' do
         get(path)
-        expect(json['data']['relationships']['viewers']['data'][0]['id'].to_i).to eq(user.id)
         expect(users_json.map { |u| u['id'].to_i }).to match_array([user.id])
-      end
-
-      it 'has no editors' do
-        get(path)
-        expect(json['data']['relationships']['editors']['data']).to be_empty
       end
     end
 
