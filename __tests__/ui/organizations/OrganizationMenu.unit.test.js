@@ -20,7 +20,7 @@ describe('OrganizationMenu', () => {
     useStrict(false)
     wrapper = mount(
       <Provider uiStore={uiStore}>
-        <OrganizationMenu {...props} />
+        <OrganizationMenu.wrappedComponent {...props} />
       </Provider>
     )
   })
@@ -33,12 +33,12 @@ describe('OrganizationMenu', () => {
   })
 
   it('closes the organization menu in the UI store when exited', () => {
-    wrapper.find('OrganizationMenu').instance().handleClose()
+    wrapper.instance().handleClose()
     expect(props.uiStore.closeOrganizationMenu).toHaveBeenCalled()
   })
 
   it('closes the edit menu when changes are save in the UI store', () => {
-    wrapper.find('OrganizationMenu').instance().onSave()
+    wrapper.instance().onSave()
     expect(props.uiStore.closeOrganizationMenu).toHaveBeenCalled()
   })
 
@@ -46,5 +46,17 @@ describe('OrganizationMenu', () => {
     wrapper.find('.orgEdit').simulate('click')
     expect(wrapper.find('OrganizationMenu').instance().editOrganizationOpen)
       .toBeTruthy()
+  })
+
+  it('opens the group edit menu when you click on any group name', () => {
+    const fakeEv = { target: { value: { id: 1, name: 'group' } } }
+    wrapper.find('.group').simulate('click', fakeEv)
+    expect(wrapper.instance().editGroup).toEqual(fakeEv.target.value)
+  })
+
+  it('opens the group add menu when you click on the new group button', () => {
+    const fakeEv = { target: { value: { id: 1, name: 'group' } } }
+    wrapper.find('.group').simulate('click', fakeEv)
+    expect(wrapper.instance().editGroup).toEqual(fakeEv.target.value)
   })
 })

@@ -2,11 +2,11 @@ class Api::V1::UsersController < Api::V1::BaseController
   load_and_authorize_resource except: %i[me search create_from_emails]
 
   def show
-    render jsonapi: @user, include: %i[current_organization]
+    render jsonapi: @user, include: %i[current_organization groups]
   end
 
   def me
-    render jsonapi: current_user, include: %i[current_organization]
+    render jsonapi: current_user, include: %i[current_organization groups]
   end
 
   def search
