@@ -42,6 +42,20 @@ RSpec.describe Breadcrumb::ForUser, type: :service do
       end
     end
 
+    context 'with edit access to parents' do
+      before do
+        user.add_role(Role::EDITOR, collection)
+      end
+
+      it 'should return full breadcrumb' do
+        expect(Breadcrumb::ForUser.new(item.breadcrumb, user).viewable).to match_array([
+          collection_breadcrumb,
+          subcollection_breadcrumb,
+          item_breadcrumb,
+        ])
+      end
+    end
+
     context 'with access to only direct ancestor' do
       before do
         user.add_role(Role::VIEWER, subcollection)

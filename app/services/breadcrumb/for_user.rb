@@ -10,7 +10,8 @@ module Breadcrumb
 
     def viewable
       @viewable ||= select_breadcrumb_items_cascading do |item|
-        user_can?(CONTENT_VIEW_ROLE, item)
+        user_can?(CONTENT_VIEW_ROLE, item) ||
+          user_can?(CONTENT_EDIT_ROLE, item)
       end
     end
 
