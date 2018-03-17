@@ -1,10 +1,10 @@
 class Api::V1::CollectionsController < Api::V1::BaseController
   deserializable_resource :collection, class: DeserializableCollection, only: [:create, :update]
-  load_and_authorize_resource :organization, only: [:index, :create]
+  load_and_authorize_resource :organization, only: [:create]
   load_and_authorize_resource :collection_card, only: [:create]
   before_action :load_collection_with_cards, only: %i[show update]
   # @collection will only be loaded if it hasn't already, but will still authorize
-  load_and_authorize_resource except: [:me]
+  load_and_authorize_resource except: [:me, :index]
 
   def index
     @collections = current_organization.collections
@@ -17,8 +17,7 @@ class Api::V1::CollectionsController < Api::V1::BaseController
   def show
     render_collection(include:
       [
-        :editors,
-        :viewers,
+        roles: [:users],
         collection_cards: [
           :parent,
           record: [
@@ -61,6 +60,7 @@ class Api::V1::CollectionsController < Api::V1::BaseController
   def render_collection(include: nil)
     # include collection_cards for UI to receive any updates
     include ||= [
+      roles: [:users],
       collection_cards: [
         :parent,
         record: [:filestack_file],
@@ -74,6 +74,7 @@ class Api::V1::CollectionsController < Api::V1::BaseController
     # item/collection will turn into "record" when serialized
     @collection = Collection.where(id: params[:id])
                             .includes(
+                              roles: [:users],
                               collection_cards: [
                                 :parent,
                                 :collection,

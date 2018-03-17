@@ -138,7 +138,7 @@ describe User, type: :model do
       let(:object) { create(:collection) }
 
       it 'is true if user has role' do
-        user.add_role(:editor, object)
+        user.add_role(Role::EDITOR, object)
         expect(user.has_role?(:editor, object)).to be true
       end
 
@@ -151,7 +151,7 @@ describe User, type: :model do
       let(:object) { create(:text_item) }
 
       it 'is true if user has role' do
-        user.add_role(:editor, object)
+        user.add_role(Role::EDITOR, object)
         expect(user.has_role?(:editor, object)).to be true
       end
 

@@ -8,24 +8,18 @@ import {
 } from '#/mocks/data'
 
 const emptyProps = {
-  editors: [],
-  viewers: [],
+  roles: [],
   handleClick: jest.fn()
 }
+
+const editorRole = Object.assign({}, fakeRole)
+const viewerRole = Object.assign({}, fakeRole)
+viewerRole.name = 'viewer'
 
 const editorsAndViewersProps = {
-  editors: [fakeRole, fakeRole],
-  viewers: [fakeRole, fakeRole],
+  roles: [editorRole, viewerRole],
   handleClick: jest.fn()
 }
-
-const tooManyEditorsProps = _.merge({}, editorsAndViewersProps, {
-  editors: [fakeRole, fakeRole, fakeRole, fakeRole, fakeRole, fakeRole]
-})
-
-const onlyViewersProps = _.merge({}, emptyProps, { viewers: [fakeRole, fakeRole] })
-
-const onlyEditorsProps = _.merge({}, emptyProps, { editors: [fakeRole, fakeRole] })
 
 let wrapper
 describe('RolesSummary', () => {
@@ -54,6 +48,7 @@ describe('RolesSummary', () => {
 
   describe('with only viewers', () => {
     beforeEach(() => {
+      const onlyViewersProps = _.merge({}, emptyProps, { roles: [viewerRole] })
       wrapper = shallow(
         <RolesSummary {...onlyViewersProps} />
       )
@@ -75,8 +70,9 @@ describe('RolesSummary', () => {
 
   describe('with only editors', () => {
     beforeEach(() => {
+      const props = _.merge({}, emptyProps, { roles: [editorRole] })
       wrapper = shallow(
-        <RolesSummary {...onlyEditorsProps} />
+        <RolesSummary {...props} />
       )
     })
 
@@ -97,8 +93,10 @@ describe('RolesSummary', () => {
 
   describe('with more editors than should show', () => {
     beforeEach(() => {
+      editorRole.users = [fakeUser, fakeUser, fakeUser, fakeUser, fakeUser, fakeUser]
+      const props = _.merge({}, editorsAndViewersProps, { roles: [editorRole] })
       wrapper = shallow(
-        <RolesSummary {...tooManyEditorsProps} />
+        <RolesSummary {...props} />
       )
     })
 

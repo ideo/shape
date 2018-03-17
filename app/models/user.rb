@@ -1,6 +1,9 @@
 class User < ApplicationRecord
+  include CacheableRoles
+
   rolify after_add: :after_add_role,
-         after_remove: :after_remove_role
+         after_remove: :after_remove_role,
+         strict: true
 
   devise :database_authenticatable, :registerable, :trackable,
          :rememberable, :validatable, :omniauthable,
@@ -25,6 +28,7 @@ class User < ApplicationRecord
 
   alias rolify_has_role? has_role?
   alias rolify_add_role add_role
+  alias rolify_remove_role remove_role
 
   searchkick word_start: [:name]
 
@@ -96,6 +100,11 @@ class User < ApplicationRecord
   def add_role(role_name, resource = nil)
     return rolify_add_role(role_name) if resource.blank?
     rolify_add_role(role_name, resource.becomes(resource.resourceable_class))
+  end
+
+  def remove_role(role_name, resource = nil)
+    return rolify_remove_role(role_name) if resource.blank?
+    rolify_remove_role(role_name, resource.becomes(resource.resourceable_class))
   end
 
   private

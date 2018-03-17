@@ -1,9 +1,10 @@
 require 'rails_helper'
 
 describe Api::V1::OrganizationsController, type: :request, auth: true do
+  let(:user) { @user }
+
   describe 'GET #current' do
     let!(:organization) { create(:organization) }
-    let(:user) { @user }
     let(:path) { '/api/v1/organizations/current' }
 
     before do
@@ -30,14 +31,14 @@ describe Api::V1::OrganizationsController, type: :request, auth: true do
       expect(response.status).to eq(200)
     end
 
-    it 'matches User schema' do
+    it 'matches Organization schema' do
       get(path)
       expect(json['data']['attributes']).to match_json_schema('organization')
     end
   end
 
   describe 'PATCH #update' do
-    let!(:organization) { create(:organization) }
+    let!(:organization) { create(:organization, admin: user) }
     let(:path) { "/api/v1/organizations/#{organization.id}" }
     let(:params) {
       json_api_params(

@@ -58,7 +58,7 @@ class PillList extends React.Component {
 
           return (
             <Chip
-              key={item.name}
+              key={item.email}
               avatar={avatar}
               label={item.name}
               onDelete={this.handleDelete(item)}

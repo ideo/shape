@@ -18,6 +18,7 @@ const props = {
   onMoveStop: jest.fn(),
   routeTo: jest.fn(),
   menuOpen: false,
+  canEditCollection: false
 }
 
 let wrapper
@@ -38,7 +39,7 @@ describe('MovableGridCard', () => {
     expect(wrapper.find('GridCardBlankHOC').exists()).toBe(true)
   })
 
-  describe('with grid cards for items and collections', () => {
+  describe('as viewer, with grid cards for items and collections', () => {
     beforeEach(() => {
       props.cardType = 'items'
       wrapper = shallow(
@@ -52,7 +53,8 @@ describe('MovableGridCard', () => {
 
     it('passes position props to Rnd component', () => {
       expect(wrapper.find('Rnd').props().size).toEqual(_.pick(fakePosition, ['width', 'height']))
-      expect(wrapper.find('Rnd').props().enableResizing.bottomRight).toBe(true)
+      expect(wrapper.find('Rnd').props().enableResizing.bottomRight).toBe(false)
+      expect(wrapper.find('Rnd').props().disableDragging).toBe(true)
     })
 
     it('passes ResizeIcon to Rnd component', () => {
@@ -65,6 +67,22 @@ describe('MovableGridCard', () => {
       expect(wrapper.find('GridCard').props().card).toBe(fakeItemCard)
       expect(wrapper.find('GridCard').props().cardType).toBe('items')
       expect(wrapper.find('GridCard').props().record).toBe(fakeTextItem)
+    })
+  })
+
+  describe('as editor, with grid cards for items and collections', () => {
+    beforeEach(() => {
+      props.cardType = 'items'
+      props.canEditCollection = true
+      wrapper = shallow(
+        <MovableGridCard {...props} />
+      )
+    })
+
+    it('passes position props to Rnd component', () => {
+      expect(wrapper.find('Rnd').props().size).toEqual(_.pick(fakePosition, ['width', 'height']))
+      expect(wrapper.find('Rnd').props().enableResizing.bottomRight).toBe(true)
+      expect(wrapper.find('Rnd').props().disableDragging).toBe(false)
     })
   })
 })

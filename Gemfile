@@ -56,6 +56,10 @@ gem 'appsignal'
 # Easy DSL for cloning AR objects
 gem 'amoeba'
 
+
+# Background processing
+gem 'sidekiq'
+
 # ElasticSearch wrapper
 gem 'searchkick', '~> 3.0.0'
 

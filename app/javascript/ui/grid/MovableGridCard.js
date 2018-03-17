@@ -201,6 +201,7 @@ class MovableGridCard extends React.PureComponent {
       position: { xPos },
       position: { yPos },
       menuOpen,
+      canEditCollection,
     } = this.props
 
     let {
@@ -256,6 +257,7 @@ class MovableGridCard extends React.PureComponent {
       dragging: !moveComplete,
       handleClick: this.handleClick,
       menuOpen,
+      canEditCollection,
     }
 
     return (
@@ -280,8 +282,9 @@ class MovableGridCard extends React.PureComponent {
           size={{ width, height }}
           position={{ x: xPos, y: yPos }}
           default={{ width, height, x: xPos, y: yPos }}
+          disableDragging={!canEditCollection}
           enableResizing={{
-            bottomRight: true,
+            bottomRight: canEditCollection,
             bottom: false,
             bottomLeft: false,
             left: false,
@@ -325,6 +328,7 @@ class MovableGridCard extends React.PureComponent {
 MovableGridCard.propTypes = {
   card: MobxPropTypes.objectOrObservableObject.isRequired,
   cardType: PropTypes.string.isRequired,
+  canEditCollection: PropTypes.bool.isRequired,
   position: PropTypes.shape(propShapes.position).isRequired,
   record: MobxPropTypes.objectOrObservableObject.isRequired,
   parent: MobxPropTypes.objectOrObservableObject.isRequired,

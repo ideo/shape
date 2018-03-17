@@ -46,6 +46,11 @@ Rails.application.routes.draw do
     end
   end
 
+  authenticate :user do
+    require 'sidekiq/web'
+    mount Sidekiq::Web => '/sidekiq'
+  end
+
   root to: 'home#index'
   get :login, to: 'home#login', as: :login
 
