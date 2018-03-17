@@ -12,10 +12,5 @@ class SerializableItem < BaseJsonSerializer
   attribute :can_edit do
     @current_ability.can?(:edit, @object)
   end
-  has_many :editors do
-    data { @object.editors.first(ROLES_LIMIT) }
-  end
-  has_many :viewers do
-    data { @object.viewers.first(ROLES_LIMIT) }
-  end
+  has_many :roles
 end

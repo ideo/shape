@@ -17,8 +17,7 @@ class Api::V1::CollectionsController < Api::V1::BaseController
   def show
     render_collection(include:
       [
-        :editors,
-        :viewers,
+        roles: [:users],
         collection_cards: [
           :parent,
           record: [

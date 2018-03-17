@@ -59,24 +59,30 @@ const StyledAddUserBtn = styled.div`
 `
 StyledAddUserBtn.displayName = 'StyledAddUserBtn'
 
-function flattenRoles(roles) {
-  return roles.reduce(
-    (a, b) => a.concat(b.users.slice()), []
-  )
-}
-
 class RolesSummary extends React.PureComponent {
+  get editors() {
+    const { roles } = this.props
+    const editorRole = roles.find(role => role.name === 'editor')
+    if (!editorRole) return []
+    return editorRole.users
+  }
+
+  get viewers() {
+    const { roles } = this.props
+    const editorRole = roles.find(role => role.name === 'viewer')
+    if (!editorRole) return []
+    return editorRole.users
+  }
+
   // Return at most MAX_USERS_TO_SHOW users,
   // prioritizing editors over viewers
   get viewersAndEditorsLimited() {
-    let { editors, viewers } = this.props
-    const editorUsers = flattenRoles(editors)
-    const viewerUsers = flattenRoles(viewers)
-    editors = editorUsers.slice(0, MAX_USERS_TO_SHOW)
+    let { editors, viewers } = this
+    editors = editors.slice(0, MAX_USERS_TO_SHOW)
 
     if (editors.length < MAX_USERS_TO_SHOW) {
       const numViewers = MAX_USERS_TO_SHOW - editors.length
-      viewers = viewerUsers.slice(0, numViewers)
+      viewers = viewers.slice(0, numViewers)
     } else {
       viewers = []
     }
@@ -150,8 +156,7 @@ class RolesSummary extends React.PureComponent {
 }
 
 RolesSummary.propTypes = {
-  editors: MobxPropTypes.arrayOrObservableArray.isRequired,
-  viewers: MobxPropTypes.arrayOrObservableArray.isRequired,
+  roles: MobxPropTypes.arrayOrObservableArray.isRequired,
   handleClick: PropTypes.func.isRequired,
   className: PropTypes.string
 }

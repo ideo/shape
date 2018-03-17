@@ -66,8 +66,7 @@ export const fakeCollection = {
     fakeItemCard, fakeItemCard, fakeItemCard
   ],
   breadcrumb: [],
-  viewers: [],
-  editors: [],
+  roles: [],
   can_edit: false,
   // This is a computed property on the collection store
   cardIds: [
@@ -89,7 +88,7 @@ export const fakeUser = {
 export const fakeRoleAttrs = {
   id: 1,
   name: 'editor',
-  users: [fakeUser],
+  users: [fakeUser, fakeUser],
   resource: { id: 1, type: 'collection' }
 }
 export const fakeRole = {
