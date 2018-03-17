@@ -20,7 +20,6 @@ export default class UiStore {
 
   @action updateColumnsToFit(windowWidth) {
     let cols = null
-    console.log('ww', windowWidth)
     // shortcut for 4,3,2,1
     _.each(_.range(4, 0), numCols => {
       if (!cols && windowWidth > this.gridWidthFor(numCols)) {
@@ -29,7 +28,6 @@ export default class UiStore {
       }
       return true
     })
-    console.log(cols)
     if (cols && this.gridSettings.cols !== cols) {
       this.gridSettings.cols = cols
     }
