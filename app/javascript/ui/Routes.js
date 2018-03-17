@@ -6,7 +6,6 @@ import CollectionPage from '~/ui/pages/CollectionPage'
 import OrganizationMenu from '~/ui/layout/OrganizationMenu'
 import ItemPage from '~/ui/pages/ItemPage'
 import Loader from '~/ui/layout/Loader'
-import ClickWrapper from '~/ui/layout/ClickWrapper'
 
 @inject('apiStore')
 @observer
@@ -27,7 +26,6 @@ class Routes extends React.Component {
     }
     return (
       <div>
-        <ClickWrapper />
         <OrganizationMenu
           organization={apiStore.currentUser.current_organization}
         />

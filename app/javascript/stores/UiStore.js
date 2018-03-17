@@ -4,6 +4,7 @@ export default class UiStore {
   @observable blankContentToolState = null
   @observable openCardMenuId = false
   @observable organizationMenuOpen = false
+  @observable editingItemName = false
   @observable gridSettings = {
     cols: 4,
     gutter: 20,
@@ -33,5 +34,15 @@ export default class UiStore {
     if (this.organizationMenuOpen) {
       this.organizationMenuOpen = false
     }
+  }
+
+  @action stopEditingItemName() {
+    if (this.editingItemName) {
+      this.editingItemName = false
+    }
+  }
+
+  @action startEditingItemName() {
+    this.editingItemName = true
   }
 }

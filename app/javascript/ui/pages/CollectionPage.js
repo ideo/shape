@@ -7,6 +7,7 @@ import styled from 'styled-components'
 import PageWithApi from '~/ui/pages/PageWithApi'
 import Loader from '~/ui/layout/Loader'
 import Header from '~/ui/layout/Header'
+import ClickWrapper from '~/ui/layout/ClickWrapper'
 import PageContainer from '~/ui/layout/PageContainer'
 import CollectionGrid from '~/ui/grid/CollectionGrid'
 import H1 from '~/ui/global/H1'
@@ -82,8 +83,13 @@ class CollectionPage extends PageWithApi {
 
     const breadcrumb = this.isHomepage ? [] : collection.breadcrumb
 
+    const clickHandlers = [
+      () => uiStore.openCardMenu(false)
+    ]
+
     return (
       <Fragment>
+        {uiStore.openCardMenuId && <ClickWrapper clickHandlers={clickHandlers} />}
         <Header>
           <Breadcrumb items={breadcrumb} />
           <StyledTitleAndRoles>

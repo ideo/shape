@@ -6,7 +6,6 @@ const H1 = styled.h1`
   font-weight: normal;
   letter-spacing: 2px;
   color: black;
-  text-transform: uppercase;
   margin-bottom: 0.5rem;
   margin-top: 0.5rem;
 `

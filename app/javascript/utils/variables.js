@@ -22,6 +22,8 @@ export default {
   },
 
   zIndex: {
+    aboveClickWrapper: 501,
+    clickWrapper: 500,
     header: 200,
     cardDragging: 160,
     gridCard: 150,
