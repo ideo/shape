@@ -8,24 +8,39 @@ import OrganizationEdit from './OrganizationEdit'
 @inject('uiStore')
 @observer
 class OrganizationMenu extends React.Component {
-  @observable editOrganizationOpen = null;
+  @action onGroupSave = () => {
+    this.editGroup = {}
+  }
 
-  @action
-  onSave = () => {
+  @action onOrganizationSave = () => {
     this.editOrganizationOpen = false
   }
 
-  @action
-  handleOrganizationClick = () => {
+  @action handleGroupClick = group => () => {
+    this.editGroup = group
+  }
+
+  @action handleOrganizationClick = () => {
     if (!this.editOrganization) {
       this.editOrganizationOpen = true
     }
   }
 
+  @action handleGroupAddClick = (ev) => {
+    this.addGroupOpen = true
+  }
+
+  @observable editOrganizationOpen = null;
+
+>>>>>>> Start on Groups editing/adding
   handleClose = (ev) => {
     const { uiStore } = this.props
     uiStore.closeOrganizationMenu()
   }
+
+  @observable editOrganizationOpen = false
+  @observable addGroupOpen = false
+  @observable editGroup = {}
 
   renderEditOrganization() {
     const { organization } = this.props
@@ -37,21 +52,55 @@ class OrganizationMenu extends React.Component {
     )
   }
 
-  render() {
-    const { organization, uiStore } = this.props
-    let content = (
+  renderEditGroup() {
+    return (
+      <GroupModify group={this.editGroup} onSave={this.onGroupSave} />
+    )
+  }
+
+  renderBase() {
+    const { organization, userGroups } = this.props
+    return (
       <div>
-        <Heading3>Your Organization</Heading3>
+        <Row>
+          <TextButton onClick={this.handleGroupAddClick}>
+            + New Group
+          </TextButton>
+        </Row>
+        <Heading3>
+          Your Organization
+        </Heading3>
         <Row>
           <button className="orgEdit" onClick={this.handleOrganizationClick}>
             <DisplayText>{ organization.name }</DisplayText>
           </button>
         </Row>
+        <Heading3>
+          Your Groups
+        </Heading3>
+        { userGroups.map((group) =>
+          (<Row key={group.id}>
+            <button
+              className="groupEdit"
+              onClick={this.handleGroupClick(group)}
+            >
+              <DisplayText>{group.name}</DisplayText>
+            </button>
+          </Row>))
+        }
       </div>
     )
+  }
+
+  render() {
+    const { uiStore } = this.props
+    let content = this.renderBase()
     if (this.editOrganizationOpen) {
       content = this.renderEditOrganization()
+    } else if (this.addGroupOpen) {
+      content = this.renderEditGroup()
     }
+    // TODO correct title for each 3 states
     return (
       <Modal
         title={this.editOrganizationOpen
@@ -60,7 +109,7 @@ class OrganizationMenu extends React.Component {
         onClose={this.handleClose}
         open={uiStore.organizationMenuOpen}
       >
-        { content}
+        { content }
       </Modal>
     )
   }
