@@ -1,56 +1,17 @@
 import PropTypes from 'prop-types'
-import styled from 'styled-components'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
-import { withStyles } from 'material-ui/styles'
-import Dialog, {
-  DialogContent,
-  DialogTitle,
-} from 'material-ui/Dialog'
-import v from '~/utils/variables'
+import { DialogContent, DialogTitle } from 'material-ui/Dialog'
+import {
+  FormSpacer,
+  Heading2,
+  Heading3,
+  Modal,
+  ModalCloseButton
+} from '~/ui/global/styled'
 import CloseIcon from '~/ui/icons/CloseIcon'
 import Role from '~/stores/jsonApi/Role'
 import RolesAdd from '~/ui/layout/RolesAdd'
 import RoleSelect from '~/ui/layout/RoleSelect'
-
-const materialStyles = {
-  paper: {
-    borderLeft: `17px solid ${v.colors.blackLava}`,
-    minWidth: 856,
-  }
-}
-
-const StyledH2 = styled.h2`
-  font-family: Gotham;
-  font-size: 24px;
-  font-weight: 500;
-  letter-spacing: 2.3px;
-  color: ${v.colors.blackLava};
-`
-StyledH2.displayName = 'StyledH2'
-
-const StyledH3 = styled.h3`
-  text-fransform: uppercase;
-  margin-bottom: 13px;
-  font-size: 15px;
-  font-weight: 500;
-  letter-spacing: 1px;
-`
-StyledH3.displayName = 'StyledH3'
-
-const StyledCloseButton = styled.button`
-  cursor: pointer;
-  display: block;
-  right: 28px;
-  position: absolute;
-  top: 24px;
-  width: 14px;
-`
-StyledCloseButton.displayName = 'StyledCloseButton'
-
-const Spacer = styled.div`
-  margin-bottom: 55px;
-`
-Spacer.displayName = 'StyledSpacer'
 
 function sortUser(a, b) {
   return a.user.name
@@ -100,21 +61,21 @@ class RolesMenu extends React.Component {
     const sortedRoleUsers = roleUsers.sort(sortUser)
     // TODO abstract shared dialog functionality to component
     return (
-      <Dialog
+      <Modal
         open={!!uiStore.rolesMenuOpen}
         onClose={this.handleClose}
         aria-labelledby="sharing"
         classes={classes}
         BackdropProps={{ invisible: true }}
       >
-        <StyledCloseButton onClick={this.handleClose}>
+        <ModalCloseButton onClick={this.handleClose}>
           <CloseIcon />
-        </StyledCloseButton>
+        </ModalCloseButton>
         <DialogTitle disableTypography id="sharing">
-          <StyledH2>Sharing</StyledH2>
+          <Heading2>Sharing</Heading2>
         </DialogTitle>
         <DialogContent>
-          <StyledH3>Shared with</StyledH3>
+          <Heading3>Shared with</Heading3>
           { sortedRoleUsers.map(combined =>
             (<RoleSelect
               key={combined.user.id + combined.role.id}
@@ -124,15 +85,15 @@ class RolesMenu extends React.Component {
               onCreate={this.onCreateRoles}
             />))
           }
-          <Spacer />
-          <StyledH3>Add groups or people</StyledH3>
+          <FormSpacer />
+          <Heading3>Add groups or people</Heading3>
           <RolesAdd
             onCreateRoles={this.onCreateRoles}
             onCreateUsers={this.onCreateUsers}
             onSearch={this.onUserSearch}
           />
         </DialogContent>
-      </Dialog>
+      </Modal>
     )
   }
 }
