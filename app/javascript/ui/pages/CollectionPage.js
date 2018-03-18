@@ -101,14 +101,14 @@ class CollectionPage extends PageWithApi {
             <RolesSummary
               className="roles-summary"
               handleClick={this.showObjectRoleDialog}
-              roles={roles}
+              roles={collection.roles}
             />
           </StyledTitleAndRoles>
         </Header>
         <PageContainer>
           <RolesMenu
             collectionId={collection.id}
-            roles={roles}
+            roles={collection.roles}
           />
           <CollectionGrid
             // pull in cols, gridW, gridH, gutter

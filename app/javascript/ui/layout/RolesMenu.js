@@ -69,15 +69,16 @@ class RolesMenu extends React.Component {
       'DELETE')
 
   onCreateRoles = (users, roleName) => {
-    const { apiStore, collectionId, roles } = this.props
+    const { apiStore, collectionId } = this.props
     const userIds = users.map((user) => user.id)
     const data = { role: { name: roleName }, user_ids: userIds }
     return apiStore.request(`collections/${collectionId}/roles`, 'POST', data)
       .then(() => {
-        const roleToDelete = roles.find((role) => !!role.toDelete)
-        if (roleToDelete) {
-          apiStore.remove('roles', roleToDelete.id)
-        }
+        apiStore.fetchAll('roles', true).then(res => {
+          // TODO this is a potentially dangerous operation to do this data
+          // modification here in this component rathern then a central place
+          apiStore.find('collections', collectionId).roles = res.data
+        })
       })
       .catch((err) => console.warn(err))
   }

@@ -53,9 +53,5 @@ describe('RoleSelect', () => {
     it('should call onDelete with the role and user', () => {
       expect(props.onDelete).toHaveBeenCalledWith(props.role, props.user)
     })
-
-    it('should mark the role for deletion after the req finishes', () => {
-      expect(props.role.toDelete).toBeTruthy()
-    })
   })
 })

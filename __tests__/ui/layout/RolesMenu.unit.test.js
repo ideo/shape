@@ -95,13 +95,9 @@ describe('RolesMenu', () => {
       )
     })
 
-    it('should remove the roles to delete when request returns', (done) => {
-      props.roles.push({
-        id: 9,
-        toDelete: true
-      })
+    it('should fetch all the roles again', (done) => {
       component.onCreateRoles(users, 'editor').then(() => {
-        expect(apiStore.remove).toHaveBeenCalled()
+        expect(apiStore.fetchAll).toHaveBeenCalledWith('roles', true)
         done()
       })
     })
