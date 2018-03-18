@@ -28,6 +28,15 @@ export default {
     blackLava: '#120f0e',
   },
 
+  fonts: {
+    sans: 'Gotham'
+  },
+
+  weights: {
+    book: 300,
+    medium: 500,
+  },
+
   zIndex: {
     aboveClickWrapper: 501,
     clickWrapper: 500,
