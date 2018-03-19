@@ -41,7 +41,7 @@ describe('CollectionPage', () => {
     expect(wrapper.find('EditableName').exists()).toEqual(true)
   })
 
-  it('passes canEdit = true to EditableName', () => {
+  it('passes canEdit = false to EditableName', () => {
     expect(wrapper.find('EditableName').props().canEdit).toEqual(false)
   })
 
