@@ -1,6 +1,9 @@
 class User < ApplicationRecord
+  include CacheableRoles
+
   rolify after_add: :after_add_role,
-         after_remove: :after_remove_role
+         after_remove: :after_remove_role,
+         strict: true
 
   devise :database_authenticatable, :registerable, :trackable,
          :rememberable, :validatable, :omniauthable,
@@ -20,11 +23,22 @@ class User < ApplicationRecord
              class_name: 'Organization',
              optional: true
 
-  validates :uid, :provider, :email, presence: true
+  validates :email, presence: true
+  validates :uid, :provider, presence: true, if: :active?
+
+  alias rolify_has_role? has_role?
+  alias rolify_add_role add_role
+  alias rolify_remove_role remove_role
 
   searchkick word_start: [:name]
 
   scope :search_import, -> { includes(:roles) }
+
+  enum status: {
+    active: 0,
+    pending: 1,
+    deleted: 2,
+  }
 
   def search_data
     {
@@ -54,6 +68,14 @@ class User < ApplicationRecord
     user
   end
 
+  def self.create_pending_user(email:)
+    create(
+      email: email,
+      status: User.statuses[:pending],
+      password: Devise.friendly_token,
+    )
+  end
+
   def name
     [first_name, last_name].compact.join(' ')
   end
@@ -66,6 +88,23 @@ class User < ApplicationRecord
     return nil if current_organization.blank?
 
     collections.user.find_by_organization_id(current_organization_id)
+  end
+
+  # Override rolify has_role? and add_role methods to ensure
+  # we always pass root class, not STI child class - which it can't handle
+  def has_role?(role_name, resource = nil)
+    return rolify_has_role?(role_name) if resource.blank?
+    rolify_has_role?(role_name, resource.becomes(resource.resourceable_class))
+  end
+
+  def add_role(role_name, resource = nil)
+    return rolify_add_role(role_name) if resource.blank?
+    rolify_add_role(role_name, resource.becomes(resource.resourceable_class))
+  end
+
+  def remove_role(role_name, resource = nil)
+    return rolify_remove_role(role_name) if resource.blank?
+    rolify_remove_role(role_name, resource.becomes(resource.resourceable_class))
   end
 
   private

@@ -2,7 +2,8 @@
   "type": "object",
   "properties": {
     "id": { "type": "integer" },
-    "name": { "type": "string" }
+    "name": { "type": "string" },
+    "pic_url_square": { "type": ["string", "null"]}
   },
   "required": ["id", "name"]
 }

@@ -3,28 +3,23 @@ import _ from 'lodash'
 import RolesSummary from '~/ui/layout/RolesSummary'
 
 import {
+  fakeRole,
   fakeUser,
 } from '#/mocks/data'
 
 const emptyProps = {
-  editors: [],
-  viewers: [],
+  roles: [],
   handleClick: jest.fn()
 }
+
+const editorRole = Object.assign({}, fakeRole)
+const viewerRole = Object.assign({}, fakeRole)
+viewerRole.name = 'viewer'
 
 const editorsAndViewersProps = {
-  editors: [fakeUser, fakeUser],
-  viewers: [fakeUser, fakeUser],
+  roles: [editorRole, viewerRole],
   handleClick: jest.fn()
 }
-
-const tooManyEditorsProps = _.merge({}, editorsAndViewersProps, {
-  editors: [fakeUser, fakeUser, fakeUser, fakeUser, fakeUser, fakeUser]
-})
-
-const onlyViewersProps = _.merge({}, emptyProps, { viewers: [fakeUser, fakeUser] })
-
-const onlyEditorsProps = _.merge({}, emptyProps, { editors: [fakeUser, fakeUser] })
 
 let wrapper
 describe('RolesSummary', () => {
@@ -53,6 +48,7 @@ describe('RolesSummary', () => {
 
   describe('with only viewers', () => {
     beforeEach(() => {
+      const onlyViewersProps = _.merge({}, emptyProps, { roles: [viewerRole] })
       wrapper = shallow(
         <RolesSummary {...onlyViewersProps} />
       )
@@ -74,8 +70,9 @@ describe('RolesSummary', () => {
 
   describe('with only editors', () => {
     beforeEach(() => {
+      const props = _.merge({}, emptyProps, { roles: [editorRole] })
       wrapper = shallow(
-        <RolesSummary {...onlyEditorsProps} />
+        <RolesSummary {...props} />
       )
     })
 
@@ -96,8 +93,10 @@ describe('RolesSummary', () => {
 
   describe('with more editors than should show', () => {
     beforeEach(() => {
+      editorRole.users = [fakeUser, fakeUser, fakeUser, fakeUser, fakeUser, fakeUser]
+      const props = _.merge({}, editorsAndViewersProps, { roles: [editorRole] })
       wrapper = shallow(
-        <RolesSummary {...tooManyEditorsProps} />
+        <RolesSummary {...props} />
       )
     })
 

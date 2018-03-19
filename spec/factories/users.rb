@@ -11,5 +11,11 @@ FactoryBot.define do
       user.password = Devise.friendly_token[0,40]
       user.password_confirmation = user.password
     end
+
+    trait :pending do
+      status :pending
+      provider nil
+      uid nil
+    end
   end
 end

@@ -1,4 +1,3 @@
-import PropTypes from 'prop-types'
 import { PropTypes as MobxPropTypes } from 'mobx-react'
 import _ from 'lodash'
 import ReactQuill from 'react-quill'
@@ -24,7 +23,7 @@ class TextItem extends React.Component {
 
   componentDidMount() {
     if (!this.quillEditor) return
-    if (this.props.editable) {
+    if (this.canEdit) {
       const { editor } = this.quillEditor
       // change all non-H3 header attributes to H3, e.g. when copy/pasting
       editor.clipboard.addMatcher('H1', remapHeaderToH3)
@@ -33,6 +32,10 @@ class TextItem extends React.Component {
       editor.clipboard.addMatcher('H5', remapHeaderToH3)
       editor.clipboard.addMatcher('H6', remapHeaderToH3)
     }
+  }
+
+  get canEdit() {
+    return this.props.item.can_edit
   }
 
   _onTextChange = (content, delta, source, editor) => {
@@ -44,12 +47,12 @@ class TextItem extends React.Component {
   }
 
   render() {
-    const { item, editable } = this.props
+    const { item } = this.props
 
     // we have to convert the item to a normal JS object for Quill to be happy
     const textData = item.toJS().text_data
     let quillProps = {}
-    if (editable) {
+    if (this.canEdit) {
       quillProps = {
         ...v.quillDefaults,
         ref: c => { this.quillEditor = c },
@@ -69,7 +72,7 @@ class TextItem extends React.Component {
 
     return (
       <StyledContainer>
-        { editable && <TextItemToolbar /> }
+        { this.canEdit && <TextItemToolbar /> }
         <ReactQuill
           {...quillProps}
           value={textData}
@@ -81,11 +84,6 @@ class TextItem extends React.Component {
 
 TextItem.propTypes = {
   item: MobxPropTypes.objectOrObservableObject.isRequired,
-  editable: PropTypes.bool,
-}
-
-TextItem.defaultProps = {
-  editable: false,
 }
 
 export default TextItem

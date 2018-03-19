@@ -19,6 +19,7 @@ beforeEach(() => {
   match = { params: { id }, path: '/collections/1', url: '/collections/1' }
   apiStore = fakeApiStore({
     findResult: collection,
+    findAllResult: collections,
     requestResult: { data: collection }
   })
   apiStore.collections = collections
@@ -44,5 +45,10 @@ describe('CollectionPage', () => {
     // better way to reference this? otherwise it works
     const grid = wrapper.find('inject-CollectionGrid-with-routingStore-uiStore')
     expect(grid.props().collection).toBe(collection)
+  })
+
+  it('shows the roles edit menu on click of roles summary add button', () => {
+    wrapper.instance().showObjectRoleDialog()
+    expect(uiStore.openRolesMenu).toHaveBeenCalled()
   })
 })

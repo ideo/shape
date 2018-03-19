@@ -121,4 +121,58 @@ describe User, type: :model do
       end
     end
   end
+
+  describe '#has_role?' do
+    context 'with base role' do
+      it 'is true if user has role' do
+        user.add_role(:admin)
+        expect(user.has_role?(:admin)).to be true
+      end
+
+      it 'is false if user does not have role' do
+        expect(user.has_role?(:admin)).to be false
+      end
+    end
+
+    context 'with base class object' do
+      let(:object) { create(:collection) }
+
+      it 'is true if user has role' do
+        user.add_role(Role::EDITOR, object)
+        expect(user.has_role?(:editor, object)).to be true
+      end
+
+      it 'is false if user does not have role' do
+        expect(user.has_role?(:editor, object)).to be false
+      end
+    end
+
+    context 'with STI object' do
+      let(:object) { create(:text_item) }
+
+      it 'is true if user has role' do
+        user.add_role(Role::EDITOR, object)
+        expect(user.has_role?(:editor, object)).to be true
+      end
+
+      it 'is fale if user does not have role' do
+        expect(user.has_role?(:editor, object)).to be false
+      end
+    end
+  end
+
+  describe '#create_pending_user' do
+    let(:email) { Faker::Internet.email }
+
+    it 'should create a new pending user' do
+      user = User.create_pending_user(email: email)
+      expect(user.persisted? && user.pending?).to be true
+      expect(user.email).to eq(email)
+    end
+
+    it 'should not be case sensitive' do
+      user.update_attributes(email: email.upcase)
+      expect(User.create_pending_user(email: email).email).to eq(email.downcase)
+    end
+  end
 end

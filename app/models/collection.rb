@@ -2,7 +2,9 @@ class Collection < ApplicationRecord
   include Breadcrumbable
   include Resourceable
   include Archivable
-  resourceable roles: %i[editor viewer]
+  resourceable roles: [Role::EDITOR, Role::VIEWER],
+               edit_role: Role::EDITOR,
+               view_role: Role::VIEWER
 
   archivable as: :parent_collection_card,
              with: %i[collection_cards reference_collection_cards]
@@ -27,14 +29,16 @@ class Collection < ApplicationRecord
   belongs_to :organization, optional: true
   belongs_to :cloned_from, class_name: 'Collection', optional: true
 
-  scope :root, -> { where.not(organization_id: nil) }
-  scope :not_custom_type, -> { where(type: nil) }
-  scope :user, -> { where(type: 'Collection::UserCollection') }
-  scope :shared_with_me, -> { where(type: 'Collection::SharedWithMeCollection') }
+  after_create :inherit_roles_from_parent
 
   validates :name, presence: true, if: :base_collection_type?
   validates :organization, presence: true
   before_validation :inherit_parent_organization_id, on: :create
+
+  scope :root, -> { where.not(organization_id: nil) }
+  scope :not_custom_type, -> { where(type: nil) }
+  scope :user, -> { where(type: 'Collection::UserCollection') }
+  scope :shared_with_me, -> { where(type: 'Collection::SharedWithMeCollection') }
 
   accepts_nested_attributes_for :collection_cards
 
@@ -103,6 +107,10 @@ class Collection < ApplicationRecord
     organization
   end
 
+  def children
+    (items + collections)
+  end
+
   def subcollection?
     organization.blank?
   end
@@ -119,7 +127,18 @@ class Collection < ApplicationRecord
     name
   end
 
+  def collection_cards_viewable_by(cached_cards, user)
+    cached_cards ||= collection_cards.includes(:items, :collections)
+    cached_cards.select do |collection_card|
+      collection_card.record.can_view?(user)
+    end
+  end
+
   private
+
+  def inherit_roles_from_parent
+    AddRolesToChildrenWorker.perform_async(role_ids, id, self.class.name.to_s)
+  end
 
   def organization_blank?
     organization.blank?

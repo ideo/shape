@@ -10,25 +10,19 @@ const props = {
 
 let wrapper
 describe('TextItem', () => {
-  describe('general usage', () => {
-    beforeEach(() => {
-      wrapper = shallow(
-        <TextItem {...props} />
-      )
-    })
-
-    it('renders the Quill editor', () => {
-      expect(wrapper.find('Quill').exists()).toBe(true)
-    })
-
-    it('passes the text content to Quill', () => {
-      expect(wrapper.find('Quill').props().value).toEqual(fakeTextItem.text_data)
-    })
+  beforeEach(() => {
+    wrapper = shallow(
+      <TextItem {...props} />
+    )
   })
 
-  describe('readOnly', () => {
+  it('passes the text content to Quill', () => {
+    expect(wrapper.find('Quill').props().value).toEqual(fakeTextItem.text_data)
+  })
+
+  describe('as viewer', () => {
     beforeEach(() => {
-      props.editable = false
+      props.item.can_edit = false
       wrapper = shallow(
         <TextItem {...props} />
       )
@@ -37,15 +31,24 @@ describe('TextItem', () => {
     it('does not render the TextItemToolbar', () => {
       expect(wrapper.find('TextItemToolbar').exists()).toBe(false)
     })
+
+    it('passes readOnly to ReactQuill', () => {
+      expect(wrapper.find('Quill').props().readOnly).toBe(true)
+    })
   })
 
-  describe('editable', () => {
+  describe('as editor', () => {
     beforeEach(() => {
-      props.editable = true
+      props.item.can_edit = true
       props.item.parentPath = '/collections/99'
       wrapper = shallow(
         <TextItem {...props} />
       )
+    })
+
+    it('renders the Quill editor', () => {
+      expect(wrapper.find('Quill').exists()).toBe(true)
+      expect(wrapper.find('Quill').props().readOnly).toBeUndefined()
     })
 
     it('renders the TextItemToolbar', () => {
