@@ -111,7 +111,7 @@ class CollectionPage extends PageWithApi {
             <EditableName
               name={collection.name}
               updateNameHandler={this.updateCollectionName}
-              viewOnly={!collection.can_edit}
+              canEdit={collection.can_edit}
             />
             {this.renderName}
             <RolesSummary

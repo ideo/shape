@@ -41,8 +41,8 @@ describe('CollectionPage', () => {
     expect(wrapper.find('EditableName').exists()).toEqual(true)
   })
 
-  it('passes viewOnly = true to EditableName', () => {
-    expect(wrapper.find('EditableName').props().viewOnly).toEqual(true)
+  it('passes canEdit = true to EditableName', () => {
+    expect(wrapper.find('EditableName').props().canEdit).toEqual(false)
   })
 
   it('passes collection to the CollectionGrid', () => {
@@ -64,8 +64,8 @@ describe('CollectionPage', () => {
       )
     })
 
-    it('passes viewOnly = false to EditableName', () => {
-      expect(wrapper.find('EditableName').props().viewOnly).toEqual(false)
+    it('passes canEdit = true to EditableName', () => {
+      expect(wrapper.find('EditableName').props().canEdit).toEqual(true)
     })
   })
 })

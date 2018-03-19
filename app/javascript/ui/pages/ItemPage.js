@@ -89,7 +89,7 @@ class ItemPage extends PageWithApi {
           <EditableName
             name={item.name}
             updateNameHandler={this.updateItemName}
-            viewOnly={!item.can_edit}
+            canEdit={item.can_edit}
           />
         </Header>
         <ItemPageContainer>

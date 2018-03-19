@@ -7,7 +7,8 @@ describe('EditableName', () => {
     beforeEach(() => {
       props = {
         name: 'Amazing Collection',
-        updateNameHandler: jest.fn()
+        updateNameHandler: jest.fn(),
+        canEdit: true,
       }
       wrapper = shallow(
         <EditableName {...props} />
@@ -31,6 +32,7 @@ describe('EditableName', () => {
       props = {
         name: 'Amazing Collection',
         updateNameHandler: jest.fn(),
+        canEdit: true,
         editing: true,
       }
       wrapper = shallow(
@@ -62,12 +64,12 @@ describe('EditableName', () => {
     })
   })
 
-  describe('if viewOnly is true', () => {
+  describe('if canEdit is false', () => {
     beforeEach(() => {
       props = {
         name: 'Amazing Collection',
         updateNameHandler: jest.fn(),
-        viewOnly: true,
+        canEdit: false,
       }
       wrapper = shallow(
         <EditableName {...props} />
