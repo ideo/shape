@@ -1,5 +1,4 @@
 import PropTypes from 'prop-types'
-import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import AutosizeInput from 'react-input-autosize'
 import styled from 'styled-components'
 import _ from 'lodash'
@@ -9,6 +8,11 @@ import H1 from '~/ui/global/H1'
 import ClickWrapper from '~/ui/layout/ClickWrapper'
 
 const StyledName = styled.div`
+  display: inline-block;
+`
+StyledName.displayName = 'StyledName'
+
+const StyledEditableName = styled.div`
   display: inline-block;
   .input__name {
     width: 30vw;
@@ -32,52 +36,55 @@ const StyledName = styled.div`
     }
   }
 `
+StyledEditableName.displayName = 'StyledEditableName'
 
-@inject('uiStore')
-@observer
 class EditableName extends React.Component {
   constructor(props) {
     super(props)
-    this.saveName = _.debounce(this.saveName, 1000)
+    this.saveName = _.debounce(this._saveName, 1000)
     this.state = {
       name: props.name,
+      editing: props.editing,
     }
   }
 
   onNameFieldKeypress = (e) => {
     if (e.key === 'Enter') {
-      const { uiStore } = this.props
-      uiStore.stopEditingObjectName()
+      this.stopEditingName()
     }
   }
 
   onNameChange = (e) => {
     const name = e.target.value
     this.setState({ name })
-    this.saveName()
+    this._saveName()
   }
 
   startEditingName = (e) => {
     e.stopPropagation()
-    const { uiStore } = this.props
-    uiStore.startEditingObjectName()
+    this.setState({ editing: true })
   }
 
-  saveName = () => {
+  stopEditingName = () => {
+    // Ensure that save is called if user presses enter
+    this.saveName.flush()
+    this.setState({ editing: false })
+  }
+
+  _saveName = () => {
     const { updateNameHandler } = this.props
     const { name } = this.state
     updateNameHandler(name)
   }
 
   render() {
-    const { name } = this.state
-    const { editingObjectName } = this.props.uiStore
-    if (editingObjectName) {
+    const { name, editing } = this.state
+    if (editing) {
       const clickHandlers = [
-        () => this.props.uiStore.stopEditingObjectName()
+        () => this.stopEditingName()
       ]
       return (
-        <StyledName>
+        <StyledEditableName>
           <AutosizeInput
             className="input__name"
             style={{ fontSize: '2.25rem' }}
@@ -89,7 +96,7 @@ class EditableName extends React.Component {
             clickHandlers={clickHandlers}
             zIndex={900}
           />
-        </StyledName>
+        </StyledEditableName>
       )
     }
     return (
@@ -100,10 +107,14 @@ class EditableName extends React.Component {
   }
 }
 
-EditableName.wrappedComponent.propTypes = {
+EditableName.propTypes = {
   name: PropTypes.string.isRequired,
   updateNameHandler: PropTypes.func.isRequired,
-  uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
+  editing: PropTypes.bool,
+}
+
+EditableName.defaultProps = {
+  editing: false
 }
 
 export default EditableName

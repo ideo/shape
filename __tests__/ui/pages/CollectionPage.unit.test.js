@@ -38,7 +38,7 @@ describe('CollectionPage', () => {
   })
 
   it('displays the collection name', () => {
-    expect(wrapper.find('H1').children().text()).toEqual(collection.name)
+    expect(wrapper.find('EditableName').exists()).toEqual(true)
   })
 
   it('passes collection to the CollectionGrid', () => {
