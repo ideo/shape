@@ -23,7 +23,7 @@ const StyledEditableName = styled.div`
       position: relative;
       font-size: 2.25rem;
       font-family: 'Gotham';
-      letter-spacing: 2px;
+      letter-spacing: 0.125rem;
       padding: 0.15rem 0 0.5rem 0;
       background-color: transparent;
       border-left: none;
@@ -92,10 +92,7 @@ class EditableName extends React.Component {
             onChange={this.onNameChange}
             onKeyPress={this.onNameFieldKeypress}
           />
-          <ClickWrapper
-            clickHandlers={clickHandlers}
-            zIndex={900}
-          />
+          <ClickWrapper clickHandlers={clickHandlers} />
         </StyledEditableName>
       )
     }
