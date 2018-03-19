@@ -5,7 +5,7 @@ export default class UiStore {
   @observable blankContentToolState = null
   @observable openCardMenuId = false
   @observable organizationMenuOpen = false
-  @observable editingItemName = false
+  @observable editingObjectName = false
   @observable rolesMenuOpen = false
   @observable gridSettings = {
     cols: 4,
@@ -68,14 +68,14 @@ export default class UiStore {
     }
   }
 
-  @action stopEditingItemName() {
-    if (this.editingItemName) {
-      this.editingItemName = false
+  @action stopEditingObjectName() {
+    if (this.editingObjectName) {
+      this.editingObjectName = false
     }
   }
 
-  @action startEditingItemName() {
-    this.editingItemName = true
+  @action startEditingObjectName() {
+    this.editingObjectName = true
   }
 
   @action openRolesMenu() {
