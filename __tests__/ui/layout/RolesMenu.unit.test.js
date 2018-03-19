@@ -84,6 +84,7 @@ describe('RolesMenu', () => {
       component = wrapper.find('RolesMenu').instance()
       users = [{ id: 3 }, { id: 5 }]
       apiStore.request.mockReturnValue(Promise.resolve({}))
+      apiStore.fetchAll.mockReturnValue(Promise.resolve({ data: [] }))
     })
 
     it('should send a request to create roles with role and user ids', () => {
