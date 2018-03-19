@@ -1,6 +1,6 @@
 import _ from 'lodash'
 
-import RolesSummary from '~/ui/layout/RolesSummary'
+import RolesSummary from '~/ui/pages/shared/RolesSummary'
 
 import {
   fakeRole,
@@ -9,7 +9,8 @@ import {
 
 const emptyProps = {
   roles: [],
-  handleClick: jest.fn()
+  handleClick: jest.fn(),
+  canEdit: true,
 }
 
 const editorRole = Object.assign({}, fakeRole)
@@ -18,7 +19,8 @@ viewerRole.name = 'viewer'
 
 const editorsAndViewersProps = {
   roles: [editorRole, viewerRole],
-  handleClick: jest.fn()
+  handleClick: jest.fn(),
+  canEdit: true,
 }
 
 let wrapper
@@ -132,6 +134,19 @@ describe('RolesSummary', () => {
 
     it('renders manage roles button', () => {
       expect(wrapper.find('StyledAddUserBtn').exists()).toBe(true)
+    })
+  })
+
+  describe('without edit permission', () => {
+    beforeEach(() => {
+      editorsAndViewersProps.canEdit = false
+      wrapper = shallow(
+        <RolesSummary {...editorsAndViewersProps} />
+      )
+    })
+
+    it('does not render manage roles button', () => {
+      expect(wrapper.find('StyledAddUserBtn').exists()).toBe(false)
     })
   })
 })

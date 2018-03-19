@@ -11,8 +11,8 @@ import PageContainer from '~/ui/layout/PageContainer'
 import ClickWrapper from '~/ui/layout/ClickWrapper'
 import CollectionGrid from '~/ui/grid/CollectionGrid'
 import Breadcrumb from '~/ui/layout/Breadcrumb'
-import RolesSummary from '~/ui/layout/RolesSummary'
 import RolesMenu from '~/ui/layout/RolesMenu'
+import RolesSummary from './shared/RolesSummary'
 import EditableName from './shared/EditableName'
 
 const isHomepage = ({ path }) => path === '/'
@@ -118,6 +118,7 @@ class CollectionPage extends PageWithApi {
               className="roles-summary"
               handleClick={this.showObjectRoleDialog}
               roles={roles}
+              canEdit={collection.can_edit}
             />
           </StyledTitleAndRoles>
         </Header>
