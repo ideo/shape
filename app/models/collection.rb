@@ -9,6 +9,7 @@ class Collection < ApplicationRecord
   archivable as: :parent_collection_card,
              with: %i[collection_cards reference_collection_cards]
   resourcify
+  acts_as_taggable
 
   has_many :collection_cards,
            -> { active },
