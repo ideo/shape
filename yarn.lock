@@ -7264,7 +7264,7 @@ react-transition-group@^2.2.1:
     prop-types "^15.5.8"
     warning "^3.0.0"
 
-react-window-size-listener@^1.0.10:
+react-window-size-listener@^1.2.1:
   version "1.2.1"
   resolved "https://registry.yarnpkg.com/react-window-size-listener/-/react-window-size-listener-1.2.1.tgz#8dddce05574ff9057116e55254cd97c4b33bf9cd"
   dependencies:
