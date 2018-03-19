@@ -131,15 +131,18 @@ export const ImageField = styled.span`
 `
 ImageField.displayName = 'StyledImageField'
 
+// TODO research if we can get these styles working without extra className
 export const Pill = styled(Chip)`
-  padding: 7px;
-  margin: 5px;
-  font-weight: 300;
-  font-family: ${v.fonts.sans};
-  font-size: 1rem;
-  justify-content: flex-start;
-  background-color: v.colors.desert;
-  border-radius: 0;
+  &.pill {
+    padding: 7px;
+    margin: 5px;
+    font-weight: ${v.weights.medium};
+    font-family: ${v.fonts.sans};
+    font-size: 1rem;
+    justify-content: flex-start;
+    background-color: ${v.colors.desert};
+    border-radius: 0;
+  }
 
   &.avatar {
     height: 38px;
@@ -149,11 +152,13 @@ export const Pill = styled(Chip)`
 Pill.displayName = 'StyledPill'
 
 export const SelectOption = styled(MenuItem)`
-  alignItems: center;
-  height: 38px;
-  margin-bottom: 7px;
-  opacity: 0.5;
-  padding: 0 4px;
+  .selectOption {
+    alignItems: center;
+    height: 38px;
+    margin-bottom: 7px;
+    opacity: 0.5;
+    padding: 0 4px;
+  }
 
   &:hover: {
     opacity: 1.0

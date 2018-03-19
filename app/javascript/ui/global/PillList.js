@@ -4,7 +4,7 @@ import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 
 import CloseIcon from '~/ui/icons/CloseIcon'
-import Pill from '~/ui/global/styled'
+import { Pill } from '~/ui/global/styled'
 import UserAvatar from '~/ui/layout/UserAvatar'
 
 const ChipHolder = styled.div`
@@ -12,13 +12,18 @@ const ChipHolder = styled.div`
   justify-content: flex-start;
   flex-wrap: wrap;
 `
+ChipHolder.displayName = 'StyledChipHolder'
 
+// Holder needs extra specificity to not be overridden by material ui (&&)
 const IconHolder = styled.span`
-  width: 9px;
-  height: 20px;
-  margin-left: 0px;
-  margin-bottom: 2px;
+  && {
+    width: 9px;
+    height: 20px;
+    margin-left: 0px;
+    margin-bottom: 2px;
+  }
 `
+IconHolder.displayName = 'StyledIconHolder'
 
 @observer
 class PillList extends React.Component {
@@ -40,6 +45,7 @@ class PillList extends React.Component {
 
           return (
             <Pill
+              className="pill"
               key={item.email}
               avatar={avatar}
               label={item.name}

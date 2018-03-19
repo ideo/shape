@@ -1,6 +1,5 @@
 import { action, observable } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
-import styled from 'styled-components'
 import { Heading3, DisplayText, Row } from '~/ui/global/styled'
 import Modal from '~/ui/global/Modal'
 import OrganizationEdit from '~/ui/layout/OrganizationEdit'

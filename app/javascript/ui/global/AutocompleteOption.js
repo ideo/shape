@@ -39,6 +39,7 @@ class AutocompleteOption extends React.Component {
     // TODO abstract render of user with avatar to shared place
     return (
       <SelectOption
+        className="selectOption"
         onFocus={onFocus}
         selected={isFocused}
         onClick={this.handleClick}
