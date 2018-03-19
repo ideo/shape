@@ -8,7 +8,6 @@ import ItemPage from '~/ui/pages/ItemPage'
 import SearchPage from '~/ui/pages/SearchPage'
 import OrganizationMenu from '~/ui/layout/OrganizationMenu'
 import Loader from '~/ui/layout/Loader'
-import ClickWrapper from '~/ui/layout/ClickWrapper'
 import WindowSizeListener from 'react-window-size-listener'
 
 @inject('apiStore', 'uiStore')
@@ -34,7 +33,6 @@ class Routes extends React.Component {
     }
     return (
       <Fragment>
-        <ClickWrapper />
         <WindowSizeListener onResize={this.handleWindowResize} />
         <OrganizationMenu
           organization={apiStore.currentUser.current_organization}
