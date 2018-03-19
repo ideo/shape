@@ -21,7 +21,10 @@ class Api::V1::SearchController < Api::V1::BaseController
     Collection.search(
       query,
       fields: %w[name^5 content],
-      where: { organization_id: current_organization.id },
+      where: {
+        organization_id: current_organization.id,
+        user_ids: [current_user.id],
+      },
       per_page: 3,
       page: page,
     )

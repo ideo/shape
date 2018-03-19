@@ -53,6 +53,8 @@ class Collection < ApplicationRecord
       name: name,
       content: search_content,
       organization_id: organization_id,
+      user_ids: viewer_ids,
+      group_ids: [],
     }
   end
 
