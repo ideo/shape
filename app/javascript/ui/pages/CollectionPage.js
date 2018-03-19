@@ -8,11 +8,12 @@ import PageWithApi from '~/ui/pages/PageWithApi'
 import Loader from '~/ui/layout/Loader'
 import Header from '~/ui/layout/Header'
 import PageContainer from '~/ui/layout/PageContainer'
+import ClickWrapper from '~/ui/layout/ClickWrapper'
 import CollectionGrid from '~/ui/grid/CollectionGrid'
-import H1 from '~/ui/global/H1'
 import Breadcrumb from '~/ui/layout/Breadcrumb'
 import RolesSummary from '~/ui/layout/RolesSummary'
 import RolesMenu from '~/ui/layout/RolesMenu'
+import EditableName from './shared/EditableName'
 
 const isHomepage = ({ path }) => path === '/'
 
@@ -85,6 +86,11 @@ class CollectionPage extends PageWithApi {
     this.collection.API_updateCards()
   }
 
+  updateCollectionName = (name) => {
+    this.collection.name = name
+    this.collection.save()
+  }
+
   render() {
     const { collection, roles } = this
     const { uiStore } = this.props
@@ -92,12 +98,22 @@ class CollectionPage extends PageWithApi {
 
     const breadcrumb = this.isHomepage ? [] : collection.breadcrumb
 
+    const clickHandlers = [
+      () => uiStore.openCardMenu(false)
+    ]
+
     return (
       <Fragment>
+        {uiStore.openCardMenuId && <ClickWrapper clickHandlers={clickHandlers} />}
         <Header>
           <Breadcrumb items={breadcrumb} />
           <StyledTitleAndRoles>
-            <H1>{collection.name}</H1>
+            <EditableName
+              name={collection.name}
+              updateNameHandler={this.updateCollectionName}
+              canEdit={collection.can_edit}
+            />
+            {this.renderName}
             <RolesSummary
               className="roles-summary"
               handleClick={this.showObjectRoleDialog}

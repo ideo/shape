@@ -8,12 +8,12 @@ import PageWithApi from '~/ui/pages/PageWithApi'
 import PageContainer from '~/ui/layout/PageContainer'
 import Loader from '~/ui/layout/Loader'
 import Header from '~/ui/layout/Header'
-import H1 from '~/ui/global/H1'
 import Breadcrumb from '~/ui/layout/Breadcrumb'
 import TextItem from '~/ui/items/TextItem'
 import ImageItem from '~/ui/items/ImageItem'
 import VideoItem from '~/ui/items/VideoItem'
 import v, { ITEM_TYPES } from '~/utils/variables'
+import EditableName from './shared/EditableName'
 
 const ItemPageContainer = styled.main`
   background: white;
@@ -47,7 +47,7 @@ class ItemPage extends PageWithApi {
   get item() {
     const { match, apiStore } = this.props
     if (!apiStore.items.length) return null
-    return apiStore.find('items', match.params.id)
+    return apiStore.find('collections', match.params.id)
   }
 
   // could be smarter or broken out once we want to do different things per type
@@ -73,21 +73,29 @@ class ItemPage extends PageWithApi {
     return `items/${match.params.id}`
   }
 
-  render() {
+  updateItemName = (name) => {
     const { item } = this
-    if (!item) return <Loader />
+    item.name = name
+    item.save()
+  }
 
+  render() {
+    const { item } = this.state
+    if (!item) return <Loader />
     return (
       <Fragment>
         <Header>
           <Breadcrumb items={item.breadcrumb} />
-          <H1>{item.name}</H1>
+          <EditableName
+            name={item.name}
+            updateNameHandler={this.updateItemName}
+            canEdit={item.can_edit}
+          />
         </Header>
         <ItemPageContainer>
           <PageContainer>
             {/* TODO: calculate item container size? */}
             {this.content}
-
             <StyledRightColumn>
               <CloseLink to={item.parentPath}>
                 &times;

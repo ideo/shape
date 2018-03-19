@@ -38,7 +38,11 @@ describe('CollectionPage', () => {
   })
 
   it('displays the collection name', () => {
-    expect(wrapper.find('H1').children().text()).toEqual(collection.name)
+    expect(wrapper.find('EditableName').exists()).toEqual(true)
+  })
+
+  it('passes canEdit = false to EditableName', () => {
+    expect(wrapper.find('EditableName').props().canEdit).toEqual(false)
   })
 
   it('passes collection to the CollectionGrid', () => {
@@ -50,5 +54,18 @@ describe('CollectionPage', () => {
   it('shows the roles edit menu on click of roles summary add button', () => {
     wrapper.instance().showObjectRoleDialog()
     expect(uiStore.openRolesMenu).toHaveBeenCalled()
+  })
+
+  describe('as editor', () => {
+    beforeEach(() => {
+      collection.can_edit = true
+      wrapper = shallow(
+        <CollectionPage.wrappedComponent {...props} />
+      )
+    })
+
+    it('passes canEdit = true to EditableName', () => {
+      expect(wrapper.find('EditableName').props().canEdit).toEqual(true)
+    })
   })
 })

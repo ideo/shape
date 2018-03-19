@@ -3,6 +3,7 @@ module Breadcrumbable
 
   included do
     after_create :recalculate_breadcrumb!, if: :calculate_breadcrumb?
+    before_update :calculate_breadcrumb
   end
 
   class_methods do
@@ -38,12 +39,16 @@ module Breadcrumbable
   end
 
   def recalculate_breadcrumb!
-    self.breadcrumb = Breadcrumb::Builder.new(self).call
+    calculate_breadcrumb
     save
     breadcrumb
   end
 
   private
+
+  def calculate_breadcrumb
+    self.breadcrumb = Breadcrumb::Builder.new(self).call
+  end
 
   def breadcrumb_for_user(user)
     Breadcrumb::ForUser.new(
