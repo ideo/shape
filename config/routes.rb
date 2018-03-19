@@ -3,7 +3,7 @@ Rails.application.routes.draw do
 
   namespace :api do
     namespace :v1 do
-      resources :collections do
+      resources :collections, except: %i[index] do
         collection do
           get 'me'
         end
@@ -33,7 +33,7 @@ Rails.application.routes.draw do
         collection do
           get 'current'
         end
-        resources :collections, only: %i[index create]
+        resources :collections, only: %i[create]
       end
       resources :users do
         collection do

@@ -37,9 +37,6 @@ class Ability
       can :manage, Collection do |collection|
         collection.can_edit?(user)
       end
-      cannot :manage, Collection do |collection|
-        collection.is_a?(Collection::SharedWithMeCollection)
-      end
 
       can :create, CollectionCard
       can :read, CollectionCard do |collection_card|

@@ -10,7 +10,7 @@ class Collection
       )
 
       if collection.persisted?
-        user.add_role(Role::EDITOR, collection.becomes(Collection))
+        user.add_role(Role::VIEWER, collection.becomes(Collection))
 
         parent_collection.collection_cards.create(
           collection: collection,

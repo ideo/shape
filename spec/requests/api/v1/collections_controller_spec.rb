@@ -3,28 +3,6 @@ require 'rails_helper'
 describe Api::V1::CollectionsController, type: :request, auth: true do
   let(:user) { @user }
 
-  describe 'GET #index' do
-    let!(:organization) { create(:organization, member: user) }
-    let!(:collections_in_org) { create_list(:collection, 3, organization: organization, add_editors: [user]) }
-    let!(:collections_outside_org) { create_list(:collection, 3, add_editors: [user]) }
-    let(:path) { "/api/v1/collections" }
-
-    it 'returns a 200' do
-      get(path)
-      expect(response.status).to eq(200)
-    end
-
-    it 'matches JSON schema' do
-      get(path)
-      expect(json['data'].first['attributes']).to match_json_schema('collection')
-    end
-
-    it 'should return all collections in the org' do
-      get(path)
-      expect(json['data'].map { |c| c['id'].to_i }).to match_array(collections_in_org.map(&:id))
-    end
-  end
-
   describe 'GET #show' do
     let!(:collection) {
       create(:collection, num_cards: 5, add_viewers: [user])
