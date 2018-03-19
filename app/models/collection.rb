@@ -11,6 +11,7 @@ class Collection < ApplicationRecord
   resourcify
 
   has_many :collection_cards,
+           -> { active },
            foreign_key: :parent_id
   # All collection cards this is linked to
   has_many :reference_collection_cards,
