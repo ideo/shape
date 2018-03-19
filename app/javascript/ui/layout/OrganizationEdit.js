@@ -88,8 +88,9 @@ class OrganizationEdit extends React.Component {
           <FormButton
             onClick={this.handleSave}
             type="submit"
-            value="save"
-          />
+          >
+            Save
+          </FormButton>
         </FormActionsContainer>
       </form>
     )

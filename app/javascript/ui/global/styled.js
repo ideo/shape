@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types'
 import Chip from 'material-ui/Chip'
+import { MenuItem } from 'material-ui/Menu'
 import styled from 'styled-components'
 import v from '~/utils/variables'
 
@@ -63,9 +64,9 @@ export const Label = styled.label`
   text-transform: uppercase;
   margin-bottom: 20px;
   font-family: ${v.fonts.sans};
-  font-size: 1.25rem;
+  font-size: 1rem;
   font-weight: ${v.weights.medium};
-  letter-spacing: 1px;
+  letter-spacing: 0.0625rem;
   display: block;
 `
 Label.displayName = 'StyledLabel'
@@ -79,7 +80,7 @@ export const FormButton = styled.button`
   letter-spacing: 0.09375rem;
   height: 40px;
   cursor: pointer;
-  color: #ffffff;
+  color: white;
   border-radius: 20px;
   border: none;
   background-color: ${v.colors.blackLava};
@@ -147,6 +148,19 @@ export const Pill = styled(Chip)`
 `
 Pill.displayName = 'StyledPill'
 
+export const SelectOption = styled(MenuItem)`
+  alignItems: center;
+  height: 38px;
+  margin-bottom: 7px;
+  opacity: 0.5;
+  padding: 0 4px;
+
+  &:hover: {
+    opacity: 1.0
+  }
+`
+SelectOption.displayName = 'StyledSelectOption'
+
 // layout
 
 export const Row = styled.div`
@@ -169,3 +183,10 @@ export const RowItemLeft = styled.span`
   margin-left: 14px;
 `
 RowItemLeft.displayName = 'StyledRowItemLeft'
+
+// TODO too large of a right margin, might have to make configurable
+export const RowItemRight = styled.span`
+  float: right;
+  margin-right: 64px;
+`
+RowItemRight.displayName = 'StyledRowItemRight'
