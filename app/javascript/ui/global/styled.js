@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types'
 import Chip from 'material-ui/Chip'
 import styled from 'styled-components'
 import v from '~/utils/variables'
@@ -32,6 +33,14 @@ export const DisplayText = styled.span`
   font-size: 1rem;
 `
 DisplayText.displayName = 'StyledDisplayText'
+
+export const SubText = styled.span`
+  vertical-align: super;
+  font-family: ${v.fonts.serif};
+  font-size: 0.75rem;
+  color: ${v.colors.gray};
+`
+SubText.displayName = 'StyledSubText'
 
 // Form Styles
 
@@ -141,6 +150,22 @@ Pill.displayName = 'StyledPill'
 // layout
 
 export const Row = styled.div`
+  align-items: ${props => props.align};
   display: flex;
+  justify-content: space-between;
   margin-left: 5px;
+  width: 92%;
 `
+Row.displayName = 'StyledRow'
+Row.propTypes = {
+  align: PropTypes.oneOf(['flex-start', 'flex-end', 'center']),
+}
+Row.defaultProps = {
+  align: 'flex-start'
+}
+
+export const RowItemLeft = styled.span`
+  margin-right: auto;
+  margin-left: 14px;
+`
+RowItemLeft.displayName = 'StyledRowItemLeft'

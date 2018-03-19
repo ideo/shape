@@ -1,10 +1,14 @@
 import PropTypes from 'prop-types'
-import styled from 'styled-components'
 import { PropTypes as MobxPropTypes } from 'mobx-react'
 import { withStyles } from 'material-ui/styles'
 import { MenuItem } from 'material-ui/Menu'
 import Select from 'material-ui/Select'
-import v from '~/utils/variables'
+import {
+  DisplayText,
+  Row,
+  RowItemLeft,
+  SubText
+} from '~/ui/global/styled'
 import UserAvatar from './UserAvatar'
 
 const materialStyles = {
@@ -19,33 +23,6 @@ const materialStyles = {
     '&:hover': { backgroundColor: 'transparent' },
   }
 }
-
-const Row = styled.div`
-  display: flex;
-  justify-content: space-between;
-  width: 92%;
-`
-Row.displayName = 'Row'
-
-const RowItemLeft = styled.span`
-  margin-right: auto;
-  margin-left: 14px;
-`
-
-const StyledText = styled.span`
-  font-weight: 300;
-  font-family: Gotham;
-  font-size: 16px
-`
-StyledText.displayName = 'StyledText'
-
-const StyledSmText = styled.span`
-  vertical-align: super;
-  font-family: Sentinel;
-  font-size: 12px;
-  color: ${v.colors.gray};
-`
-StyledSmText.displayName = 'StyledSmText'
 
 class RoleSelect extends React.Component {
   onRoleSelect = (ev) => {
@@ -77,8 +54,8 @@ class RoleSelect extends React.Component {
           />
         </span>
         <RowItemLeft>
-          <StyledText>{user.name}</StyledText><br />
-          <StyledSmText>{user.email}</StyledSmText>
+          <DisplayText>{user.name}</DisplayText><br />
+          <SubText>{user.email}</SubText>
         </RowItemLeft>
         <span>
           <Select

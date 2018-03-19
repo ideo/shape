@@ -29,7 +29,8 @@ export default {
   },
 
   fonts: {
-    sans: 'Gotham'
+    sans: 'Gotham',
+    serif: 'Sentinel',
   },
 
   weights: {
