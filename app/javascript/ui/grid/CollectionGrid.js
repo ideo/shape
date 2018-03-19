@@ -31,7 +31,8 @@ class CollectionGrid extends React.Component {
 
   componentWillReceiveProps(nextProps) {
     const { collection } = nextProps
-    // TODO: why do we need to pack this into an array? It should always be an array
+    // convert observableArray values into a "normal" JS array (equivalent of .toJS())
+    // for the sake of later calculations/manipulations
     const cards = [...collection.collection_cards]
     // If we already have a BCT open, find it in our cards
     if (nextProps.blankContentToolState) {
@@ -105,7 +106,11 @@ class CollectionGrid extends React.Component {
     const moved = (!_.isEqual(placeholderPosition, originalPosition))
     if (moved) {
       // we want to update this card to match the placeholder
-      const { order, width, height } = placeholder
+      const { order } = placeholder
+      let { width, height } = placeholder
+      // just some double-checking validations
+      if (height > 2) height = 2
+      if (width > 4) width = 4
       _.assign(original, { order, width, height })
 
       // reorder cards and persist changes

@@ -107,10 +107,12 @@ class MovableGridCard extends React.PureComponent {
   }
 
   handleResize = (e, dir, ref, delta, position) => {
-    const { gridW, gridH } = uiStore.gridSettings
+    const { gridW, gridH, cols } = uiStore.gridSettings
     const { card } = this.props
+    // e.g. if card.width is 4, but we're at 2 columns, max out at cardWidth = 2
+    const cardWidth = Math.min(cols, card.width)
     const newSize = {
-      width: card.width + Math.floor((delta.width + 200) / gridW),
+      width: cardWidth + Math.floor((delta.width + 200) / gridW),
       height: card.height + Math.floor((delta.height + 200) / gridH),
     }
     if (!this.state.resizing) {
@@ -221,10 +223,12 @@ class MovableGridCard extends React.PureComponent {
       return this.renderBlank()
     }
 
-    const { gridW, gridH, cols, gutter } = uiStore.gridSettings
+    const { gridW, gridH, gutter } = uiStore.gridSettings
     const minWidth = gridW * 0.8
     const minHeight = gridH * 0.8
-    const maxWidth = uiStore.gridWidthFor(cols)
+    // need to always set Rnd maxWidth to 4 columns instead of `cols`
+    // because of this issue: https://github.com/bokuweb/react-rnd/issues/221
+    const maxWidth = uiStore.gridWidthFor(4)
     const maxHeight = (gridH * 2) + gutter
 
     let xAdjust = 0
