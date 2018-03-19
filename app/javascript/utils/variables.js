@@ -6,6 +6,7 @@ export const ITEM_TYPES = {
 
 export default {
   headerHeight: 160,
+  headerHeightCompact: 100,
   maxWidth: 1400,
   containerPadding: {
     horizontal: '2rem',
@@ -31,6 +32,7 @@ export default {
     aboveClickWrapper: 501,
     clickWrapper: 500,
     header: 200,
+    scrollIndicator: 200,
     cardDragging: 160,
     gridCard: 150,
     gridCardBg: 1,

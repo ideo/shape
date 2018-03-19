@@ -5,19 +5,24 @@ import v from '~/utils/variables'
 
 const StyledContainer = styled.main`
   max-width: ${v.maxWidth}px;
-  margin: ${v.headerHeight}px auto 0;
+  margin: ${props => props.marginTop}px auto 0;
   padding: 0 ${v.containerPadding.horizontal};
   position: relative;
 `
 
-const PageContainer = ({ children }) => (
-  <StyledContainer>
+const PageContainer = ({ children, marginTop }) => (
+  <StyledContainer marginTop={marginTop}>
     {children}
   </StyledContainer>
 )
 
 PageContainer.propTypes = {
   children: PropTypes.node.isRequired,
+  marginTop: PropTypes.number,
+}
+
+PageContainer.defaultProps = {
+  marginTop: v.headerHeight,
 }
 
 export default PageContainer

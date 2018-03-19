@@ -10,7 +10,9 @@ class Collection < ApplicationRecord
              with: %i[collection_cards reference_collection_cards]
   resourcify
 
-  has_many :collection_cards, foreign_key: :parent_id
+  has_many :collection_cards,
+           -> { active },
+           foreign_key: :parent_id
   # All collection cards this is linked to
   has_many :reference_collection_cards,
            -> { reference },
@@ -22,6 +24,7 @@ class Collection < ApplicationRecord
           -> { primary },
           class_name: 'CollectionCard',
           inverse_of: :collection
+  delegate :parent, to: :parent_collection_card, allow_nil: true
 
   belongs_to :organization, optional: true
   belongs_to :cloned_from, class_name: 'Collection', optional: true
@@ -29,8 +32,8 @@ class Collection < ApplicationRecord
   after_create :inherit_roles_from_parent
 
   validates :name, presence: true, if: :base_collection_type?
-  validates :organization, presence: true, if: :parent_collection_card_blank?
-  validates :parent_collection_card, presence: true, if: :organization_blank?
+  validates :organization, presence: true
+  before_validation :inherit_parent_organization_id, on: :create
 
   scope :root, -> { where.not(organization_id: nil) }
   scope :not_custom_type, -> { where(type: nil) }
@@ -38,6 +41,36 @@ class Collection < ApplicationRecord
   scope :shared_with_me, -> { where(type: 'Collection::SharedWithMeCollection') }
 
   accepts_nested_attributes_for :collection_cards
+
+  # Searchkick config
+  searchkick
+  # active == don't index archived collections
+  # where(type: nil) == don't index User/SharedWithMe collections
+  scope :search_import, -> { active.where(type: nil).includes(:items) }
+
+  def search_data
+    {
+      name: name,
+      content: search_content,
+      organization_id: organization_id,
+    }
+  end
+
+  def search_content
+    # Current functionality for getting a collection's searchable "text content":
+    # - go through all items in the collection
+    # - for TextItems, grab the first 200 characters of their content
+    # - for other items (e.g. media), grab the name
+    # - join it all together into one blob of text, remove non-normal characters
+    items.map do |item|
+      if item.is_a? Item::TextItem
+        item.plain_content.truncate(200, separator: /\s/, omission: '')
+      else
+        item.name
+      end
+    end.join(' ').gsub(/[^\p{Alnum}\s]/, ' ')
+  end
+  # <-- End Searchkick
 
   amoeba do
     enable
@@ -50,6 +83,7 @@ class Collection < ApplicationRecord
   def duplicate!(copy_parent_card: false)
     # Clones collection and all embedded items/collections
     c = amoeba_dup
+    c.cloned_from = self
 
     if copy_parent_card && parent_collection_card.present?
       c.parent_collection_card = parent_collection_card.duplicate!(shallow: true)
@@ -85,6 +119,10 @@ class Collection < ApplicationRecord
     true
   end
 
+  def should_index?
+    active?
+  end
+
   def read_only?
     false
   end
@@ -114,7 +152,24 @@ class Collection < ApplicationRecord
     parent_collection_card.blank?
   end
 
+  def parent_collection
+    # this first case should return e.g. when using CollectionCardBuilder
+    return parent if parent_collection_card.present?
+    # if the collection is in process of being built, parent_collection_card will always be nil
+    # (currently mostly useful for specs, when we are creating models directly)
+    if (primary = collection_cards.reject(&:reference).first)
+      return primary.parent
+    end
+    nil
+  end
+
+  def inherit_parent_organization_id
+    return true if organization.present?
+    return true unless parent_collection.present?
+    self.organization_id = parent_collection.organization_id
+  end
+
   def base_collection_type?
-    type.to_s == 'Collection'
+    self.class.name == 'Collection'
   end
 end

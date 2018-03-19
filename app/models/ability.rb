@@ -2,7 +2,6 @@ class Ability
   include CanCan::Ability
 
   def initialize(user)
-
     # See the wiki for details:
     # https://github.com/CanCanCommunity/cancancan/wiki/Defining-Abilities
 
@@ -37,9 +36,6 @@ class Ability
       end
       can :manage, Collection do |collection|
         collection.can_edit?(user)
-      end
-      cannot :manage, Collection do |collection|
-        collection.is_a?(Collection::SharedWithMeCollection)
       end
 
       can :create, CollectionCard

@@ -36,6 +36,13 @@ RSpec.describe CollectionCardBuilder, type: :service do
         expect(builder.create).to be true
       end
 
+      it 'should create the collection with organization inherited from parent' do
+        expect(builder.create).to be true
+        created_collection = builder.collection_card.collection
+        # this behavior comes from collection before_validation
+        expect(created_collection.organization).to eq organization
+      end
+
       it 'should calculate the breadcrumb for the card\'s child collection' do
         expect(builder.create).to be true
         created_collection = builder.collection_card.collection

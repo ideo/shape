@@ -6,14 +6,14 @@ class Collection
       return existing if existing.present?
 
       collection = create(
-        organization: parent_collection.organization
+        organization: parent_collection.organization,
       )
 
       if collection.persisted?
-        user.add_role(Role::EDITOR, collection.becomes(Collection))
+        user.add_role(Role::VIEWER, collection.becomes(Collection))
 
         parent_collection.collection_cards.create(
-          collection: collection
+          collection: collection,
         )
       end
 
@@ -21,6 +21,10 @@ class Collection
     end
 
     def searchable?
+      false
+    end
+
+    def should_index?
       false
     end
 
