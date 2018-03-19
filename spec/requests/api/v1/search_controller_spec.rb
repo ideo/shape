@@ -14,6 +14,7 @@ describe Api::V1::SearchController, type: :request, auth: true do
     before do
       current_user.add_role(:member, organization.primary_group)
       Collection.reindex
+      sleep 1 # Let ElasticSearch indexing finish (even though it seems to be synchronous)
     end
 
     it 'returns a 200' do
