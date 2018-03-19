@@ -5,7 +5,9 @@ const fakeUiStore = {
     gridW: 312,
     gridH: 250,
   },
-  blankContentToolState: null
+  blankContentToolState: null,
+  rolesMenuOpen: false,
+  openRolesMenu: jest.fn(),
 }
 
 export default fakeUiStore
