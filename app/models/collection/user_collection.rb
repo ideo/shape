@@ -25,6 +25,10 @@ class Collection
       false
     end
 
+    def should_index?
+      false
+    end
+
     def breadcrumbable?
       false
     end

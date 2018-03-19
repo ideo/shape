@@ -11,7 +11,6 @@ class Collection < ApplicationRecord
   resourcify
 
   has_many :collection_cards,
-           -> { active },
            foreign_key: :parent_id
   # All collection cards this is linked to
   has_many :reference_collection_cards,
@@ -117,6 +116,10 @@ class Collection < ApplicationRecord
 
   def searchable?
     true
+  end
+
+  def should_index?
+    active?
   end
 
   def read_only?

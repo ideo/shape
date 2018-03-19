@@ -39,8 +39,6 @@ class SearchPage extends PageWithApi {
     return `search?query=${q}&page=${page}`
   }
 
-  checkIfHasMore = () => this.hasMore
-
   @action onAPILoad = (results, meta) => {
     if (meta.page === 1) {
       // reset if we are performing a new search starting at page 1
