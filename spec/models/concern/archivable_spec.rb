@@ -24,7 +24,7 @@ describe Archivable, type: :concern do
     it 'should only look up active collection cards when retrieving a collection' do
       expect {
         collection.collection_cards.first.archive!
-      }.to change(collection.collection_cards, :count).by(-1)
+      }.to change(collection.collection_cards.active, :count).by(-1)
     end
   end
 
