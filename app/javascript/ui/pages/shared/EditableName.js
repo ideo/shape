@@ -56,8 +56,7 @@ class EditableName extends React.Component {
 
   onNameChange = (e) => {
     const name = e.target.value
-    this.setState({ name })
-    this._saveName()
+    this.setState({ name }, () => this.saveName())
   }
 
   startEditingName = (e) => {
