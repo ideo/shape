@@ -61,14 +61,6 @@ function sortUser(a, b) {
 @inject('apiStore', 'uiStore')
 @observer
 class RolesMenu extends React.Component {
-  componentDidMount() {
-    const { apiStore, collectionId } = this.props
-    // TODO might want to refactor PageWithApi so this can be called earlier there
-    // TODO investigate how this can be set all the time on Role
-    Role.endpoint = () => `collections/${collectionId}/roles`
-    apiStore.fetchAll('roles', true)
-  }
-
   onDelete = (role, user) =>
     this.props.apiStore.request(`users/${user.id}/roles/${role.id}`,
       'DELETE')
@@ -78,13 +70,6 @@ class RolesMenu extends React.Component {
     const userIds = users.map((user) => user.id)
     const data = { role: { name: roleName }, user_ids: userIds }
     return apiStore.request(`collections/${collectionId}/roles`, 'POST', data)
-      .then(() => {
-        apiStore.fetchAll('roles', true).then(res => {
-          // TODO this is a potentially dangerous operation to do this data
-          // modification here in this component rathern then a central place
-          apiStore.find('collections', collectionId).roles = res.data
-        })
-      })
       .catch((err) => console.warn(err))
   }
 
