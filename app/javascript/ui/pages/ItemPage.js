@@ -44,30 +44,15 @@ const CloseLink = styled(Link)`
 @inject('apiStore')
 @observer
 class ItemPage extends PageWithApi {
-  constructor(props) {
-    super(props)
-    this.state = {}
-  }
-
-  componentWillMount() {
-    const { match, apiStore } = this.props
-    return apiStore
-      .fetch('items', match.params.id)
-      .then(response => {
-        const item = response.data
-        this.setState({ item })
-      })
-  }
-
   get item() {
-    const { apiStore } = this.props
+    const { match, apiStore } = this.props
     if (!apiStore.items.length) return null
-    return this.state.item
+    return apiStore.find('collections', match.params.id)
   }
 
   // could be smarter or broken out once we want to do different things per type
   get content() {
-    const { item } = this.state
+    const { item } = this
     // similar function as in GridCard, could extract?
     switch (item.type) {
     case ITEM_TYPES.TEXT:
@@ -89,7 +74,7 @@ class ItemPage extends PageWithApi {
   }
 
   updateItemName = (name) => {
-    const { item } = this.state
+    const { item } = this
     item.name = name
     item.save()
   }
