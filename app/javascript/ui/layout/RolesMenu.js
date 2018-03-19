@@ -1,15 +1,10 @@
 import PropTypes from 'prop-types'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
-import { DialogContent, DialogTitle } from 'material-ui/Dialog'
 import {
   FormSpacer,
-  Heading2,
   Heading3,
-  Modal,
-  ModalCloseButton
 } from '~/ui/global/styled'
-import CloseIcon from '~/ui/icons/CloseIcon'
-import Role from '~/stores/jsonApi/Role'
+import Modal from '~/ui/global/Modal'
 import RolesAdd from '~/ui/layout/RolesAdd'
 import RoleSelect from '~/ui/layout/RoleSelect'
 
@@ -52,7 +47,7 @@ class RolesMenu extends React.Component {
   }
 
   render() {
-    const { classes, roles, uiStore } = this.props
+    const { roles, uiStore } = this.props
     const roleUsers = []
     roles.forEach((role) =>
       role.users.forEach((user) => {
@@ -62,37 +57,27 @@ class RolesMenu extends React.Component {
     // TODO abstract shared dialog functionality to component
     return (
       <Modal
-        open={!!uiStore.rolesMenuOpen}
+        title="Sharing"
         onClose={this.handleClose}
-        aria-labelledby="sharing"
-        classes={classes}
-        BackdropProps={{ invisible: true }}
+        open={uiStore.rolesMenuOpen}
       >
-        <ModalCloseButton onClick={this.handleClose}>
-          <CloseIcon />
-        </ModalCloseButton>
-        <DialogTitle disableTypography id="sharing">
-          <Heading2>Sharing</Heading2>
-        </DialogTitle>
-        <DialogContent>
-          <Heading3>Shared with</Heading3>
-          { sortedRoleUsers.map(combined =>
-            (<RoleSelect
-              key={combined.user.id + combined.role.id}
-              role={combined.role}
-              user={combined.user}
-              onDelete={this.onDelete}
-              onCreate={this.onCreateRoles}
-            />))
-          }
-          <FormSpacer />
-          <Heading3>Add groups or people</Heading3>
-          <RolesAdd
-            onCreateRoles={this.onCreateRoles}
-            onCreateUsers={this.onCreateUsers}
-            onSearch={this.onUserSearch}
-          />
-        </DialogContent>
+        <Heading3>Shared with</Heading3>
+        { sortedRoleUsers.map(combined =>
+          (<RoleSelect
+            key={combined.user.id + combined.role.id}
+            role={combined.role}
+            user={combined.user}
+            onDelete={this.onDelete}
+            onCreate={this.onCreateRoles}
+          />))
+        }
+        <FormSpacer />
+        <Heading3>Add groups or people</Heading3>
+        <RolesAdd
+          onCreateRoles={this.onCreateRoles}
+          onCreateUsers={this.onCreateUsers}
+          onSearch={this.onUserSearch}
+        />
       </Modal>
     )
   }
@@ -100,9 +85,6 @@ class RolesMenu extends React.Component {
 
 RolesMenu.propTypes = {
   collectionId: PropTypes.number.isRequired,
-  classes: PropTypes.shape({
-    paper: PropTypes.string,
-  }).isRequired,
   roles: MobxPropTypes.arrayOrObservableArray,
 }
 RolesMenu.wrappedComponent.propTypes = {
@@ -113,4 +95,4 @@ RolesMenu.defaultProps = {
   roles: [],
 }
 
-export default withStyles(materialStyles)(RolesMenu)
+export default RolesMenu

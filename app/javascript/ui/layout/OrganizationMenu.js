@@ -1,49 +1,9 @@
-import PropTypes from 'prop-types'
 import { action, observable } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
-import v from '~/utils/variables'
-import Dialog, {
-  DialogContent,
-  DialogTitle,
-} from 'material-ui/Dialog'
-import { withStyles } from 'material-ui/styles'
-import CloseIcon from '~/ui/icons/CloseIcon'
+import { Heading3, DisplayText, Row } from '~/ui/global/styled'
+import Modal from '~/ui/global/Modal'
 import OrganizationEdit from '~/ui/layout/OrganizationEdit'
-
-const materialStyles = {
-  paper: {
-    borderLeft: `17px solid ${v.colors.blackLava}`,
-    minWidth: 824,
-  }
-}
-
-const Row = styled.div`
-  display: flex;
-  margin-left: 5px;
-`
-Row.displayName = 'Row'
-
-const StyledH2 = styled.h2`
-  text-transform: uppercase;
-  margin-bottom: 28px;
-  font-family: Gotham;
-  font-size: 1.5rem;
-  font-weight: 500;
-  letter-spacing: 2.3px;
-  color: ${v.colors.blackLava};
-`
-
-const StyledH3 = styled.h3`
-  text-transform: uppercase;
-  margin-bottom: 13px;
-  font-family: Gotham;
-  font-size: 1rem;
-  font-weight: 500;
-  line-height: normal;
-  letter-spacing: 1px;
-`
-StyledH3.displayName = 'StyledH3'
 
 const StyledText = styled.span`
   font-weight: 300;
@@ -51,15 +11,6 @@ const StyledText = styled.span`
   font-size: 1rem;
 `
 StyledText.displayName = 'StyledText'
-
-const StyledCloseButton = styled.button`
-  cursor: pointer;
-  display: block;
-  right: 15px;
-  position: absolute;
-  top: 14px;
-  width: 14px;
-`
 
 @inject('uiStore')
 @observer
@@ -86,67 +37,47 @@ class OrganizationMenu extends React.Component {
   renderEditOrganization() {
     const { organization } = this.props
     return (
-      <div>
-        <DialogTitle disableTypography id="form-dialog-title">
-          <StyledH2>Your Organization</StyledH2>
-        </DialogTitle>
-        <DialogContent>
-          <OrganizationEdit
-            onSave={this.onSave}
-            organization={organization}
-          />
-        </DialogContent>
-      </div>
+      <OrganizationEdit
+        onSave={this.onSave}
+        organization={organization}
+      />
     )
   }
 
   render() {
-    const { classes, organization, uiStore } = this.props
+    const { organization, uiStore } = this.props
     let content = (
       <div>
-        <DialogTitle disableTypography id="form-dialog-title">
-          <StyledH2>People & Groups</StyledH2>
-        </DialogTitle>
-        <DialogContent>
-          <StyledH3>
-            Your Organization
-          </StyledH3>
-          <Row>
-            <button className="orgEdit" onClick={this.handleOrganizationClick}>
-              <StyledText>{ organization.name }</StyledText>
-            </button>
-          </Row>
-        </DialogContent>
+        <Heading3>Your Organization</Heading3>
+        <Row>
+          <button className="orgEdit" onClick={this.handleOrganizationClick}>
+            <DisplayText>{ organization.name }</DisplayText>
+          </button>
+        </Row>
       </div>
     )
     if (this.editOrganizationOpen) {
       content = this.renderEditOrganization()
     }
     return (
-      <Dialog
-        open={uiStore.organizationMenuOpen}
-        classes={classes}
+      <Modal
+        title={this.editOrganizationOpen
+          ? 'Your Organization'
+          : 'People & Groups'}
         onClose={this.handleClose}
-        aria-labelledby="form-dialog-title"
-        BackdropProps={{ invisible: true }}
+        open={uiStore.organizationMenuOpen}
       >
-        <StyledCloseButton onClick={this.handleClose}>
-          <CloseIcon />
-        </StyledCloseButton>
         { content}
-      </Dialog>
+      </Modal>
     )
   }
 }
 
 OrganizationMenu.propTypes = {
   organization: MobxPropTypes.objectOrObservableObject.isRequired,
-  classes: PropTypes.shape({
-    paper: PropTypes.string,
-  }).isRequired,
 }
 OrganizationMenu.wrappedComponent.propTypes = {
   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 
-export default withStyles(materialStyles)(OrganizationMenu)
+export default OrganizationMenu
