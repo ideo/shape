@@ -5,13 +5,6 @@ import { Heading3, DisplayText, Row } from '~/ui/global/styled'
 import Modal from '~/ui/global/Modal'
 import OrganizationEdit from '~/ui/layout/OrganizationEdit'
 
-const StyledText = styled.span`
-  font-weight: 300;
-  font-family: Gotham;
-  font-size: 1rem;
-`
-StyledText.displayName = 'StyledText'
-
 @inject('uiStore')
 @observer
 class OrganizationMenu extends React.Component {
