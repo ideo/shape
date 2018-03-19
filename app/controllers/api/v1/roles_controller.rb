@@ -29,7 +29,7 @@ class Api::V1::RolesController < Api::V1::BaseController
       users: users,
     )
     if assigner.call
-      render jsonapi: assigner.roles, include: %i[users resource]
+      render jsonapi: record.roles, include: %i[users resource]
     else
       render_api_errors assigner.errors
     end

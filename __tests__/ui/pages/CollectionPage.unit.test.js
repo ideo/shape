@@ -50,9 +50,9 @@ describe('CollectionPage', () => {
   })
 
   it('passes collection to the CollectionGrid', () => {
-    // better way to reference this? otherwise it works
-    const grid = wrapper.find('inject-CollectionGrid-with-routingStore-uiStore')
+    const grid = wrapper.find('InjectedCollectionGrid')
     expect(grid.props().collection).toBe(collection)
+
   })
 
   it('shows the roles edit menu on click of roles summary add button', () => {

@@ -61,7 +61,7 @@ class RoleSelect extends React.Component {
   deleteRole = () => {
     const { role, user } = this.props
     return this.props.onDelete(role, user).then(() => {
-      role.toDelete = true
+      role.toUpdate = true
     })
   }
 

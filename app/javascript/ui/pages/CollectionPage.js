@@ -92,7 +92,7 @@ class CollectionPage extends PageWithApi {
   }
 
   render() {
-    const { collection, roles } = this
+    const { collection } = this
     const { uiStore } = this.props
     if (!collection || this.props.uiStore.isLoading) return <Loader />
 
@@ -117,7 +117,7 @@ class CollectionPage extends PageWithApi {
             <RolesSummary
               className="roles-summary"
               handleClick={this.showObjectRoleDialog}
-              roles={roles}
+              roles={collection.roles}
               canEdit={collection.can_edit}
             />
           </StyledTitleAndRoles>
@@ -125,7 +125,7 @@ class CollectionPage extends PageWithApi {
         <PageContainer>
           <RolesMenu
             collectionId={collection.id}
-            roles={roles}
+            roles={collection.roles}
           />
           <CollectionGrid
             // pull in cols, gridW, gridH, gutter

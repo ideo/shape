@@ -408,5 +408,6 @@ CollectionGrid.wrappedComponent.propTypes = {
   routingStore: MobxPropTypes.objectOrObservableObject.isRequired,
   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }
+CollectionGrid.displayName = 'InjectedCollectionGrid'
 
 export default CollectionGrid
