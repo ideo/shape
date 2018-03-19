@@ -15,16 +15,16 @@ describe Archivable, type: :concern do
       expect(collection.active?).to be true
     end
 
-    it 'should have a default scope that only finds active objects' do
+    it 'should have an active scope that only finds active objects' do
       expect {
         collection.archive!
-      }.to change(Collection, :count).by(-1)
+      }.to change(Collection.active, :count).by(-1)
     end
 
-    it 'should use default active scope when looking up related objects' do
+    it 'should only look up active collection cards when retrieving a collection' do
       expect {
         collection.collection_cards.first.archive!
-      }.to change(collection.collection_cards, :count).by(-1)
+      }.to change(collection.collection_cards.active, :count).by(-1)
     end
   end
 

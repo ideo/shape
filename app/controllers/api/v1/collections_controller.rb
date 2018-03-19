@@ -4,15 +4,7 @@ class Api::V1::CollectionsController < Api::V1::BaseController
   load_and_authorize_resource :collection_card, only: [:create]
   before_action :load_collection_with_cards, only: %i[show update]
   # @collection will only be loaded if it hasn't already, but will still authorize
-  load_and_authorize_resource except: [:me, :index]
-
-  def index
-    @collections = current_organization.collections
-                                       .root
-                                       .not_custom_type
-                                       .order(name: :asc)
-    render jsonapi: @collections
-  end
+  authorize_resource except: %i[me]
 
   def show
     render_collection(include:

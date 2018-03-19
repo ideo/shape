@@ -8,7 +8,7 @@ class CollectionCover extends React.PureComponent {
     const { collection } = this.props
     return (
       <PaddedCardCover>
-        {collection.name} (coll.)
+        {collection.name}
       </PaddedCardCover>
     )
   }

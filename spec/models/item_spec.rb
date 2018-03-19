@@ -9,14 +9,20 @@ RSpec.describe Item, type: :model do
     it { should have_one :parent_collection_card }
     it { should have_many :reference_collection_cards }
     it { should belong_to :filestack_file }
+    it { should belong_to :cloned_from }
   end
 
   describe '#duplicate!' do
     let!(:item) { create(:text_item) }
+    let(:duplicate) { item.duplicate! }
 
     it 'clones the item' do
       expect { item.duplicate! }.to change(Item, :count).by(1)
-      expect(item.duplicate!).not_to eq(item)
+      expect(duplicate).not_to eq(item)
+    end
+
+    it 'references the current item as cloned_from' do
+      expect(duplicate.cloned_from).to eq(item)
     end
 
     context 'with parent collection card' do

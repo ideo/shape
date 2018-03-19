@@ -74,5 +74,14 @@ module.exports = {
     // react/no-typos disabled until this is resolved:
     // https://github.com/yannickcr/eslint-plugin-react/issues/1389
     "react/no-typos": 0,
+    "react/sort-comp": [1, {
+      order: [
+        'static-methods',
+        'instance-variables',
+        'lifecycle',
+        'everything-else',
+        'render',
+      ]
+    }],
   }
 }

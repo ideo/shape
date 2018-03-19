@@ -29,8 +29,8 @@ StyledGridCard.displayName = 'StyledGridCard'
 
 export const StyledBottomLeftIcon = styled.div`
   position: absolute;
-  left: -0.25rem; /* Because the icon has internal padding */
-  bottom: -0.4rem;
+  left: 0.25rem;
+  bottom: 0;
   color: ${v.colors.gray};
   width: 34px;
   height: 34px;

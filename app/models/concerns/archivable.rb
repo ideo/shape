@@ -4,7 +4,6 @@ module Archivable
   included do
     scope :archived, -> { where(archived: true) }
     scope :active, -> { where(archived: false) }
-    default_scope -> { active }
 
     class_attribute :archive_with
     class_attribute :archive_as

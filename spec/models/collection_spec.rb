@@ -1,6 +1,14 @@
 require 'rails_helper'
 
 describe Collection, type: :model do
+  context 'validations' do
+    it { should validate_presence_of(:organization) }
+    it { should validate_presence_of(:name) }
+    it 'does not validate presence of :name if not base_collection_type' do
+      expect(Collection::UserCollection.new).not_to validate_presence_of(:name)
+    end
+  end
+
   context 'associations' do
     it { should have_many :collection_cards }
     it { should have_many :reference_collection_cards }
@@ -11,6 +19,16 @@ describe Collection, type: :model do
     it { should belong_to :organization }
   end
 
+  describe '#inherit_parent_organization_id' do
+    let!(:parent_collection) { create(:user_collection) }
+    let!(:collection_card) { create(:collection_card, parent: parent_collection) }
+    let!(:collection) { create(:collection, name: 'fart', organization: nil, collection_cards: [collection_card]) }
+
+    it 'inherits organization id from parent collection' do
+      expect(collection.organization_id).to eq(parent_collection.organization_id)
+    end
+  end
+
   describe '#duplicate' do
     let!(:collection) { create(:collection, num_cards: 5) }
     let(:duplicate) { collection.duplicate! }
@@ -18,6 +36,10 @@ describe Collection, type: :model do
     it 'clones the collection' do
       expect { collection.duplicate! }.to change(Collection, :count).by(1)
       expect(collection.id).not_to eq(duplicate.id)
+    end
+
+    it 'references the current collection as cloned_from' do
+      expect(duplicate.cloned_from).to eq(collection)
     end
 
     it 'clones all the collection cards' do

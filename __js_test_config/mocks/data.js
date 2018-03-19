@@ -62,12 +62,12 @@ export const fakeCollection = {
   id: 1,
   name: 'My Workspace X',
   type: 'Collection',
-  collection_cards: [
-    fakeItemCard, fakeItemCard, fakeItemCard
-  ],
   breadcrumb: [],
   roles: [],
   can_edit: false,
+  collection_cards: [
+    fakeItemCard, fakeItemCard, fakeItemCard
+  ],
   // This is a computed property on the collection store
   cardIds: [
     fakeItemCard.id, fakeItemCard.id, fakeItemCard.id

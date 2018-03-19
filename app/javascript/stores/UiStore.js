@@ -1,5 +1,5 @@
 import _ from 'lodash'
-import { observable, action } from 'mobx'
+import { observable, action, computed } from 'mobx'
 
 export default class UiStore {
   @observable blankContentToolState = null
@@ -11,6 +11,12 @@ export default class UiStore {
     gutter: 20,
     gridW: 312,
     gridH: 250,
+  }
+  @observable isLoading = false
+
+  @computed get gridMaxW() {
+    const grid = this.gridSettings
+    return (grid.gridW * grid.cols) + (grid.gutter * (grid.cols - 1))
   }
 
   gridWidthFor(cols) {
@@ -49,6 +55,10 @@ export default class UiStore {
     if (!this.organizationMenuOpen) {
       this.organizationMenuOpen = true
     }
+  }
+
+  @action loading(val) {
+    this.isLoading = val
   }
 
   @action closeOrganizationMenu() {

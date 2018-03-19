@@ -1,14 +1,16 @@
 class Api::V1::RolesController < Api::V1::BaseController
+  # don't need to load records on destroy because it's nested under the user
   load_resource :collection, except: :destroy
   load_resource :item, except: :destroy
-  before_action :authorize_manage_resource, except: :destroy
-  load_and_authorize_resource :user, only: :destroy
   load_resource only: %i[destroy]
+  load_resource :user, only: :destroy
+  before_action :authorize_manage_record, except: :index
+  before_action :authorize_view_record, only: :index
 
   # All roles that exist on this resource (collection or item)
-
+  # /[collections/items]/:id/roles
   def index
-    @roles = resource.roles.includes(:users, :resource)
+    @roles = record.roles.includes(:users, :resource)
     render jsonapi: @roles, include: %i[users resource]
   end
 
@@ -18,10 +20,11 @@ class Api::V1::RolesController < Api::V1::BaseController
   # - user_ids: array of of users that you want to assign
   # Returns:
   # - array of roles successfully created, including users with that role
+  # /[collections/items]/:id/roles
   def create
     users = User.where(id: json_api_params[:user_ids]).to_a
     assigner = Roles::AssignToUsers.new(
-      object: resource,
+      object: record,
       role_name: role_params[:name],
       users: users,
     )
@@ -32,7 +35,8 @@ class Api::V1::RolesController < Api::V1::BaseController
     end
   end
 
-  # Remove a role on a specific user
+  # Remove a user role from a specific resource
+  # /users/:id/roles/:id
   def destroy
     # We want to call remove_role instead of deleting the UserRole
     # So that role lifecycle methods are called
@@ -55,11 +59,15 @@ class Api::V1::RolesController < Api::V1::BaseController
     )
   end
 
-  def authorize_manage_resource
-    authorize! :manage, resource
+  def authorize_manage_record
+    authorize! :manage, record
   end
 
-  def resource
-    @collection || @item
+  def authorize_view_record
+    authorize! :read, record
+  end
+
+  def record
+    @collection || @item || @role.resource
   end
 end

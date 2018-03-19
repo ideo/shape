@@ -88,7 +88,7 @@ class CollectionPage extends PageWithApi {
   render() {
     const { collection, roles } = this
     const { uiStore } = this.props
-    if (!collection) return <Loader />
+    if (!collection || this.props.uiStore.isLoading) return <Loader />
 
     const breadcrumb = this.isHomepage ? [] : collection.breadcrumb
 
