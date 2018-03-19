@@ -6,6 +6,12 @@ export default class UiStore {
   @observable openCardMenuId = false
   @observable organizationMenuOpen = false
   @observable rolesMenuOpen = false
+  @observable isTouchDevice = (
+    // https://hacks.mozilla.org/2013/04/detecting-touch-its-the-why-not-the-how/
+    ('ontouchstart' in window) ||
+     (navigator.maxTouchPoints > 0) ||
+     (navigator.msMaxTouchPoints > 0)
+  )
   @observable gridSettings = {
     cols: 4,
     gutter: 20,
