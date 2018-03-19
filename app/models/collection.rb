@@ -68,7 +68,7 @@ class Collection < ApplicationRecord
       else
         item.name
       end
-    end.join(' ').gsub(/[^0-9A-Za-z\']/, ' ')
+    end.join(' ').gsub(/[^\p{Alnum}\s]/, ' ')
   end
   # <-- End Searchkick
 
