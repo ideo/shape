@@ -1,4 +1,4 @@
-import Dialog from 'material-ui/Dialog'
+import Chip from 'material-ui/Chip'
 import styled from 'styled-components'
 import v from '~/utils/variables'
 
@@ -12,12 +12,12 @@ export const Heading2 = styled.h2`
   font-family: {v.fonts.sans};
   font-size: 1.5rem;
   font-weight: {v.weights.medium};
-  letter-spacing: 1.4375rem;
+  letter-spacing: 0.14375rem;
   color: ${v.colors.blackLava};
 `
 Heading2.displayName = 'Heading2'
 
-const Heading3 = styled.h3`
+export const Heading3 = styled.h3`
   text-fransform: uppercase;
   margin-bottom: 13px;
   font-size: 0.9375rem;
@@ -25,6 +25,13 @@ const Heading3 = styled.h3`
   letter-spacing: 0.0625rem;
 `
 Heading3.displayName = 'StyledHeading3'
+
+export const DisplayText = styled.span`
+  font-weight: ${v.weights.book};
+  font-family: ${v.fonts.sans};
+  font-size: 1rem;
+`
+DisplayText.displayName = 'StyledDisplayText'
 
 // Form Styles
 
@@ -95,7 +102,7 @@ export const FormSpacer = styled.div`
 `
 FormSpacer.displayName = 'StyledFormSpacer'
 
-const ImageField = styled.span`
+export const ImageField = styled.span`
   width: 100px;
   position: relative;
   height: 100px;
@@ -114,23 +121,26 @@ const ImageField = styled.span`
 `
 ImageField.displayName = 'StyledImageField'
 
-// Modals
+export const Pill = styled(Chip)`
+  padding: 7px;
+  margin: 5px;
+  font-weight: 300;
+  font-family: ${v.fonts.sans};
+  font-size: 1rem;
+  justify-content: flex-start;
+  background-color: v.colors.desert;
+  border-radius: 0;
 
-export const Modal = styled(Dialog)`
-  &.paper: {
-    border-left: 17px solid ${v.colors.blackLava};
-    max-width: 855px;
-    width: 100%
+  &.avatar {
+    height: 38px;
+    width: 38px;
   }
 `
-Modal.displayName = 'StyledDialog'
+Pill.displayName = 'StyledPill'
 
-export const ModalCloseButton = styled.button`
-  cursor: pointer;
-  display: block;
-  right: 28px;
-  position: absolute;
-  top: 24px;
-  width: 14px;
+// layout
+
+export const Row = styled.div`
+  display: flex;
+  margin-left: 5px;
 `
-ModalCloseButton.displayName = 'ModalCloseButton'
