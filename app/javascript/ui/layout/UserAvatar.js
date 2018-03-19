@@ -28,19 +28,16 @@ const StyledAvatar = styled.div`
 `
 StyledAvatar.displayName = 'StyledAvatar'
 
-const DEFAULT_URL = 'https://d3none3dlnlrde.cloudfront.net/assets/users/avatars/missing/square.jpg'
-
 @observer
 class UserAvatar extends React.Component {
   render() {
     const { user, className, size } = this.props
-    const url = user.pic_url_square || DEFAULT_URL
     return (
       <StyledAvatar
         size={size}
         className={className}
       >
-        <img src={url} title={user.name} alt={user.name} />
+        <img src={user.pic_url_square} title={user.name} alt={user.name} />
       </StyledAvatar>
     )
   }

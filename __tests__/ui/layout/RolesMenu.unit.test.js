@@ -45,10 +45,6 @@ describe('RolesMenu', () => {
     expect(props.uiStore.closeRolesMenu).toHaveBeenCalled()
   })
 
-  it('calls fetch with the api store on mount', () => {
-    expect(apiStore.fetchAll).toHaveBeenCalled()
-  })
-
   describe('onDelete', () => {
     it('should make an api store request with correct data', () => {
       const role = { id: 2 }
@@ -94,13 +90,6 @@ describe('RolesMenu', () => {
         'POST',
         { role: { name: 'editor' }, user_ids: [3, 5] }
       )
-    })
-
-    it('should fetch all the roles again', (done) => {
-      component.onCreateRoles(users, 'editor').then(() => {
-        expect(apiStore.fetchAll).toHaveBeenCalledWith('roles', true)
-        done()
-      })
     })
   })
 })
