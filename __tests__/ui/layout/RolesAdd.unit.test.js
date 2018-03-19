@@ -117,7 +117,9 @@ describe('RolesAdd', () => {
     describe('with unregistered users', () => {
       beforeEach(() => {
         component.selectedUsers = unregisteredUsers
-        props.onCreateUsers.mockReturnValue(Promise.resolve([{ id: 1 }]))
+        props.onCreateUsers.mockReturnValue(Promise.resolve(
+          { data: [{ id: 1 }] }
+        ))
       })
 
       it('should send the emails to be created', (done) => {

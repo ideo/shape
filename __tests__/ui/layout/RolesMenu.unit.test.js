@@ -45,10 +45,6 @@ describe('RolesMenu', () => {
     expect(props.uiStore.closeRolesMenu).toHaveBeenCalled()
   })
 
-  it('calls fetch with the api store on mount', () => {
-    expect(apiStore.fetchAll).toHaveBeenCalled()
-  })
-
   describe('onDelete', () => {
     it('should make an api store request with correct data', () => {
       const role = { id: 2 }
@@ -84,6 +80,7 @@ describe('RolesMenu', () => {
       component = wrapper.find('RolesMenu').instance()
       users = [{ id: 3 }, { id: 5 }]
       apiStore.request.mockReturnValue(Promise.resolve({}))
+      apiStore.fetchAll.mockReturnValue(Promise.resolve({ data: [] }))
     })
 
     it('should send a request to create roles with role and user ids', () => {
@@ -93,17 +90,6 @@ describe('RolesMenu', () => {
         'POST',
         { role: { name: 'editor' }, user_ids: [3, 5] }
       )
-    })
-
-    it('should remove the roles to delete when request returns', (done) => {
-      props.roles.push({
-        id: 9,
-        toDelete: true
-      })
-      component.onCreateRoles(users, 'editor').then(() => {
-        expect(apiStore.remove).toHaveBeenCalled()
-        done()
-      })
     })
   })
 })

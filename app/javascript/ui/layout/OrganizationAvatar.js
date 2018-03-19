@@ -20,8 +20,6 @@ const StyledAvatar = styled(Avatar)`
   }
 `
 
-const DEFAULT_URL = 'https://cdn.filestackcontent.com/XYWsMijFTDWBsGzzKEEo'
-
 @inject('uiStore')
 @observer
 class OrganizationAvatar extends React.Component {
@@ -32,13 +30,12 @@ class OrganizationAvatar extends React.Component {
 
   render() {
     const { organization, size } = this.props
-    const url = organization.pic_url_square || DEFAULT_URL
     return (
       <StyledAvatar
         size={size}
         onClick={this.handleClick}
         className="orgAvatar"
-        src={url}
+        src={organization.pic_url_square}
       />
     )
   }

@@ -1,6 +1,5 @@
 import PropTypes from 'prop-types'
 import styled from 'styled-components'
-import { toJS } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import { withStyles } from 'material-ui/styles'
 import Dialog, {
@@ -53,32 +52,24 @@ const Spacer = styled.div`
 `
 Spacer.displayName = 'StyledSpacer'
 
+function sortUser(a, b) {
+  return a.user.name
+    ? a.user.name.localeCompare(b.user.name)
+    : a.user.email.localeCompare(b.user.email)
+}
+
 @inject('apiStore', 'uiStore')
 @observer
 class RolesMenu extends React.Component {
-  componentDidMount() {
-    const { apiStore, collectionId } = this.props
-    // TODO might want to refactor PageWithApi so this can be called earlier there
-    // TODO investigate how this can be set all the time on Role
-    Role.endpoint = () => `collections/${collectionId}/roles`
-    apiStore.fetchAll('roles', true)
-  }
-
   onDelete = (role, user) =>
     this.props.apiStore.request(`users/${user.id}/roles/${role.id}`,
       'DELETE')
 
   onCreateRoles = (users, roleName) => {
-    const { apiStore, collectionId, roles } = this.props
+    const { apiStore, collectionId } = this.props
     const userIds = users.map((user) => user.id)
     const data = { role: { name: roleName }, user_ids: userIds }
     return apiStore.request(`collections/${collectionId}/roles`, 'POST', data)
-      .then(() => {
-        const roleToDelete = roles.find((role) => !!role.toDelete)
-        if (roleToDelete) {
-          apiStore.remove('roles', roleToDelete.id)
-        }
-      })
       .catch((err) => console.warn(err))
   }
 
@@ -101,6 +92,12 @@ class RolesMenu extends React.Component {
 
   render() {
     const { classes, roles, uiStore } = this.props
+    const roleUsers = []
+    roles.forEach((role) =>
+      role.users.forEach((user) => {
+        roleUsers.push(Object.assign({}, { role, user }))
+      }))
+    const sortedRoleUsers = roleUsers.sort(sortUser)
     // TODO abstract shared dialog functionality to component
     return (
       <Dialog
@@ -118,15 +115,14 @@ class RolesMenu extends React.Component {
         </DialogTitle>
         <DialogContent>
           <StyledH3>Shared with</StyledH3>
-          { roles.map((role) =>
-            role.users.map((user) =>
-              (<RoleSelect
-                key={user.id + role.id}
-                role={role}
-                user={user}
-                onDelete={this.onDelete}
-                onCreate={this.onCreateRoles}
-              />)))
+          { sortedRoleUsers.map(combined =>
+            (<RoleSelect
+              key={combined.user.id + combined.role.id}
+              role={combined.role}
+              user={combined.user}
+              onDelete={this.onDelete}
+              onCreate={this.onCreateRoles}
+            />))
           }
           <Spacer />
           <StyledH3>Add groups or people</StyledH3>

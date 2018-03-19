@@ -1,6 +1,5 @@
 import OrganizationAvatar from '~/ui/layout/OrganizationAvatar'
 
-
 let props
 let wrapper
 
@@ -17,14 +16,6 @@ describe('OrganizationAvatar', () => {
     }
     wrapper = mount(
       <OrganizationAvatar {...props} />
-    )
-  })
-
-  it('renders a default icon image', () => {
-    const avatar = wrapper.find('Avatar')
-    expect(avatar).toHaveLength(1)
-    expect(avatar.props().src).toEqual(
-      'https://cdn.filestackcontent.com/XYWsMijFTDWBsGzzKEEo'
     )
   })
 
