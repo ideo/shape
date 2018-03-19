@@ -4,7 +4,8 @@
     "id": { "type": "integer" },
     "name": { "type": "string" },
     "created_at": { "type": "date" },
-    "breadcrumb": { "type": ["array", "null"] }
+    "breadcrumb": { "type": ["array", "null"] },
+    "can_edit": { "type": ["boolean"] }
   },
   "required": ["id", "name", "created_at"]
 }

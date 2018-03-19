@@ -8,7 +8,7 @@ import { ITEM_TYPES } from '~/utils/variables'
 
 const ValidIndicator = styled.div`
   display: inline-block;
-  font-size: 20px;
+  font-size: 1.25rem;
   font-weight: bold;
   width: 20px;
   &.valid {

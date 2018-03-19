@@ -2,6 +2,8 @@ FactoryBot.define do
   factory :collection do
     transient do
       num_cards 0
+      add_editors []
+      add_viewers []
     end
 
     name { Faker::Company.buzzword }
@@ -23,6 +25,20 @@ FactoryBot.define do
           h = 2 if rand(1..4) == 4
           cc = build(:collection_card_item, parent: collection, order: i, width: w, height: h)
           collection.collection_cards << cc
+        end
+      end
+    end
+
+    after(:create) do |collection, evaluator|
+      if evaluator.add_editors.present?
+        evaluator.add_editors.each do |user|
+          user.add_role(Role::EDITOR, collection)
+        end
+      end
+
+      if evaluator.add_viewers.present?
+        evaluator.add_viewers.each do |user|
+          user.add_role(Role::VIEWER, collection)
         end
       end
     end

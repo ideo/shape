@@ -1,0 +1,2 @@
+class DeserializableGroup < BaseJsonDeserializer
+end

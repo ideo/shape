@@ -11,6 +11,12 @@ export default {
     horizontal: '2rem',
   },
 
+  // breakpoint sizes
+  responsive: {
+    // based on going from 2 -> 1 column
+    smallBreakpoint: 645,
+  },
+
   colors: {
     cararra: '#f2f1ee',
     desert: '#f5f4f3',

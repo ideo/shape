@@ -1,9 +1,9 @@
-// import PropTypes from 'prop-types'
 import { Fragment } from 'react'
 import ReactRouterPropTypes from 'react-router-prop-types'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 
+import v from '~/utils/variables'
 import PageWithApi from '~/ui/pages/PageWithApi'
 import Loader from '~/ui/layout/Loader'
 import Header from '~/ui/layout/Header'
@@ -13,6 +13,7 @@ import CollectionGrid from '~/ui/grid/CollectionGrid'
 import H1 from '~/ui/global/H1'
 import Breadcrumb from '~/ui/layout/Breadcrumb'
 import RolesSummary from '~/ui/layout/RolesSummary'
+import RolesMenu from '~/ui/layout/RolesMenu'
 
 const isHomepage = ({ path }) => path === '/'
 
@@ -22,6 +23,9 @@ const StyledTitleAndRoles = styled.div`
   }
   .roles-summary {
     float: right;
+    @media only screen and (max-width: ${v.responsive.smallBreakpoint}px) {
+      display: none;
+    }
   }
   clear: both;
 `
@@ -50,6 +54,12 @@ class CollectionPage extends PageWithApi {
     return apiStore.find('collections', match.params.id)
   }
 
+  get roles() {
+    const { apiStore, match } = this.props
+    return apiStore.findAll('roles').filter((role) =>
+      role.resource && role.resource.id === parseInt(match.params.id))
+  }
+
   requestPath = (props) => {
     const { match, apiStore } = props
     if (isHomepage(match)) {
@@ -66,7 +76,8 @@ class CollectionPage extends PageWithApi {
   }
 
   showObjectRoleDialog = () => {
-    console.log('Manage object roles')
+    const { uiStore } = this.props
+    uiStore.openRolesMenu()
   }
 
   updateCollection = () => {
@@ -76,9 +87,8 @@ class CollectionPage extends PageWithApi {
   }
 
   render() {
-    const { collection } = this
+    const { collection, roles } = this
     const { uiStore } = this.props
-    // console.log(this.props.apiStore, collection)
     if (!collection) return <Loader />
 
     const breadcrumb = this.isHomepage ? [] : collection.breadcrumb
@@ -97,17 +107,22 @@ class CollectionPage extends PageWithApi {
             <RolesSummary
               className="roles-summary"
               handleClick={this.showObjectRoleDialog}
-              viewers={collection.viewers}
-              editors={collection.editors}
+              roles={roles}
             />
           </StyledTitleAndRoles>
         </Header>
         <PageContainer>
+          <RolesMenu
+            collectionId={collection.id}
+            roles={roles}
+          />
           <CollectionGrid
             // pull in cols, gridW, gridH, gutter
             {...uiStore.gridSettings}
+            gridSettings={uiStore.gridSettings}
             updateCollection={this.updateCollection}
             collection={collection}
+            canEditCollection={collection.can_edit}
             // Pass in cardIds so grid will re-render when they change
             cardIds={collection.cardIds}
             blankContentToolState={uiStore.blankContentToolState}

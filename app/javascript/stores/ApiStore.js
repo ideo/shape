@@ -3,6 +3,7 @@ import { Store } from 'mobx-jsonapi-store'
 
 import Collection from './jsonApi/Collection'
 import CollectionCard from './jsonApi/CollectionCard'
+import Role from './jsonApi/Role'
 import FilestackFile from './jsonApi/FilestackFile'
 import Item from './jsonApi/Item'
 import Organization from './jsonApi/Organization'
@@ -19,6 +20,14 @@ class ApiStore extends Store {
     return this.find('users', this.currentUserId)
   }
 }
-ApiStore.types = [Organization, User, Collection, Item, CollectionCard, FilestackFile]
+ApiStore.types = [
+  Collection,
+  CollectionCard,
+  FilestackFile,
+  Item,
+  Role,
+  Organization,
+  User,
+]
 
 export default ApiStore

@@ -1,7 +1,9 @@
-const fakeApiStore = ({ findResult = '', requestResult = '' } = {}) => {
+const fakeApiStore = ({ findResult = '', findAllResult = [], requestResult = '' } = {}) => {
   return {
     find: jest.fn()
       .mockReturnValue(findResult),
+    findAll: jest.fn()
+      .mockReturnValue(findAllResult),
     request: jest.fn()
       .mockReturnValue(Promise.resolve(requestResult))
       .mockName('request'),

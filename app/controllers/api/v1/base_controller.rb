@@ -22,11 +22,16 @@ class Api::V1::BaseController < ApplicationController
   def jsonapi_expose
     {
       current_user: current_user,
+      current_ability: current_ability,
     }
   end
 
   def render_api_errors(errors)
     render jsonapi_errors: errors, status: :bad_request
+  end
+
+  rescue_from CanCan::AccessDenied do |exception|
+    render json: { errors: [exception.message] }, status: :unauthorized
   end
 
   private

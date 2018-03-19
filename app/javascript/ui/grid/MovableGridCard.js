@@ -107,10 +107,12 @@ class MovableGridCard extends React.PureComponent {
   }
 
   handleResize = (e, dir, ref, delta, position) => {
-    const { gridW, gridH } = uiStore.gridSettings
+    const { gridW, gridH, cols } = uiStore.gridSettings
     const { card } = this.props
+    // e.g. if card.width is 4, but we're at 2 columns, max out at cardWidth = 2
+    const cardWidth = Math.min(cols, card.width)
     const newSize = {
-      width: card.width + Math.floor((delta.width + 200) / gridW),
+      width: cardWidth + Math.floor((delta.width + 200) / gridW),
       height: card.height + Math.floor((delta.height + 200) / gridH),
     }
     if (!this.state.resizing) {
@@ -201,6 +203,7 @@ class MovableGridCard extends React.PureComponent {
       position: { xPos },
       position: { yPos },
       menuOpen,
+      canEditCollection,
     } = this.props
 
     let {
@@ -223,7 +226,9 @@ class MovableGridCard extends React.PureComponent {
     const { gridW, gridH, gutter } = uiStore.gridSettings
     const minWidth = gridW * 0.8
     const minHeight = gridH * 0.8
-    const maxWidth = (gridW * 4) + (gutter * 3)
+    // need to always set Rnd maxWidth to 4 columns instead of `cols`
+    // because of this issue: https://github.com/bokuweb/react-rnd/issues/221
+    const maxWidth = uiStore.gridWidthFor(4)
     const maxHeight = (gridH * 2) + gutter
 
     let xAdjust = 0
@@ -256,6 +261,7 @@ class MovableGridCard extends React.PureComponent {
       dragging: !moveComplete,
       handleClick: this.handleClick,
       menuOpen,
+      canEditCollection,
     }
 
     return (
@@ -280,8 +286,9 @@ class MovableGridCard extends React.PureComponent {
           size={{ width, height }}
           position={{ x: xPos, y: yPos }}
           default={{ width, height, x: xPos, y: yPos }}
+          disableDragging={!canEditCollection}
           enableResizing={{
-            bottomRight: true,
+            bottomRight: canEditCollection,
             bottom: false,
             bottomLeft: false,
             left: false,
@@ -325,6 +332,7 @@ class MovableGridCard extends React.PureComponent {
 MovableGridCard.propTypes = {
   card: MobxPropTypes.objectOrObservableObject.isRequired,
   cardType: PropTypes.string.isRequired,
+  canEditCollection: PropTypes.bool.isRequired,
   position: PropTypes.shape(propShapes.position).isRequired,
   record: MobxPropTypes.objectOrObservableObject.isRequired,
   parent: MobxPropTypes.objectOrObservableObject.isRequired,

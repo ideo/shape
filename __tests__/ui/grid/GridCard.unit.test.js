@@ -15,12 +15,14 @@ const props = {
   dragging: false,
   height: 100,
   menuOpen: false,
+  canEditCollection: false,
 }
 
 let wrapper
 describe('GridCard', () => {
   describe('with item', () => {
     beforeEach(() => {
+      props.record.can_edit = false
       wrapper = shallow(
         <GridCard {...props} />
       )
@@ -38,9 +40,32 @@ describe('GridCard', () => {
       expect(wrapper.find('StyledGridCard').find('LinkIcon').exists()).toBe(false)
     })
 
-    it('renders menu and selection circle', () => {
+    it('renders menu', () => {
       expect(wrapper.find('.card-menu').exists()).toBe(true)
-      expect(wrapper.find('StyledSelectionCircle').exists()).toBe(true)
+    })
+
+    it('does not render selection circle or hotspot', () => {
+      expect(wrapper.find('StyledSelectionCircle').exists()).toBe(false)
+      expect(wrapper.find('GridCardHotspot').exists()).toBe(false)
+    })
+
+    describe('as editor', () => {
+      beforeEach(() => {
+        props.record.can_edit = true
+        props.canEditCollection = true
+        wrapper = shallow(
+          <GridCard {...props} />
+        )
+      })
+
+      it('passes canEdit to menu', () => {
+        expect(wrapper.find('.card-menu').props().canEdit).toBe(true)
+      })
+
+      it('renders selection circle and hotspot', () => {
+        expect(wrapper.find('StyledSelectionCircle').exists()).toBe(true)
+        expect(wrapper.find('GridCardHotspot').exists()).toBe(false)
+      })
     })
 
     describe('as reference', () => {
@@ -62,6 +87,7 @@ describe('GridCard', () => {
       props.cardType = 'collections'
       props.card = fakeCollectionCard
       props.record = fakeCollection
+      props.record.can_edit = false
       wrapper = shallow(
         <GridCard {...props} />
       )
@@ -77,7 +103,30 @@ describe('GridCard', () => {
 
     it('renders menu and selection circle', () => {
       expect(wrapper.find('.card-menu').exists()).toBe(true)
-      expect(wrapper.find('StyledSelectionCircle').exists()).toBe(true)
+    })
+
+    it('does not render selection circle or hotspot', () => {
+      expect(wrapper.find('StyledSelectionCircle').exists()).toBe(false)
+      expect(wrapper.find('GridCardHotspot').exists()).toBe(false)
+    })
+
+    describe('as editor', () => {
+      beforeEach(() => {
+        props.record.can_edit = true
+        props.canEditCollection = true
+        wrapper = shallow(
+          <GridCard {...props} />
+        )
+      })
+
+      it('passes canEdit to menu', () => {
+        expect(wrapper.find('.card-menu').props().canEdit).toBe(true)
+      })
+
+      it('renders selection circle and hotspot', () => {
+        expect(wrapper.find('StyledSelectionCircle').exists()).toBe(true)
+        expect(wrapper.find('GridCardHotspot').exists()).toBe(false)
+      })
     })
 
     describe('as reference', () => {

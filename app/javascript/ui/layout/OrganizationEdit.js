@@ -2,10 +2,7 @@ import PropTypes from 'prop-types'
 import { action, observable } from 'mobx'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
-import AddImageIcon from '~/ui/icons/AddImageIcon'
-import Divider from 'material-ui/Divider';
 import FilestackUpload from '~/utils/FilestackUpload'
-import OrganizationAvatar from '~/ui/layout/OrganizationAvatar'
 import v from '~/utils/variables'
 
 // TODO remove duplication with GridCardBlank
@@ -17,7 +14,7 @@ const StyledLabel = styled.div`
   text-transform: uppercase;
   margin-bottom: 20px;
   font-family: Gotham;
-  font-size: 16px;
+  font-size: 1rem;
   font-weight: 500;
   letter-spacing: 1px;
   display: block;
@@ -45,7 +42,7 @@ const StyledTextbox = styled.input`
   padding-left: 4px;
   padding-bottom: 6px;
   outline-width: 0;
-  font-size: 16px;
+  font-size: 1rem;
   border: 0;
   border-bottom: 0.5px solid ${v.colors.gray};
 
@@ -67,7 +64,7 @@ const StyledSubmit = styled.input`
   background-color: ${v.colors.blackLava};
   text-transform: uppercase;
   font-family: Gotham;
-  font-size: 16px;
+  font-size: 1rem;
   font-weight: 500;
   letter-spacing: 1.5px;
   cursor: pointer;
@@ -86,7 +83,7 @@ const StyledAddImageIcon = styled.span`
 
   span {
     position: absolute;
-    font-size: 36px;
+    font-size: 2.25rem;
     font-weight: 300;
     left: calc(50% - 8px);
     top: calc(50% - 23px);
@@ -182,6 +179,9 @@ class OrganizationEdit extends React.Component {
 OrganizationEdit.propTypes = {
   organization: MobxPropTypes.objectOrObservableObject.isRequired,
   onSave: PropTypes.func,
+}
+OrganizationEdit.defaultProps = {
+  onSave: () => {}
 }
 
 export default OrganizationEdit
