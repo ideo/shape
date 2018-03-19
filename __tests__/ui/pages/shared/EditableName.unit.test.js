@@ -61,4 +61,26 @@ describe('EditableName', () => {
       expect(wrapper.find('H1').exists()).toEqual(true)
     })
   })
+
+  describe('if viewOnly is true', () => {
+    beforeEach(() => {
+      props = {
+        name: 'Amazing Collection',
+        updateNameHandler: jest.fn(),
+        viewOnly: true,
+      }
+      wrapper = shallow(
+        <EditableName {...props} />
+      )
+    })
+
+    it('renders name', () => {
+      expect(wrapper.render().text()).toMatch(/Amazing Collection/)
+    })
+
+    it('does not show editable field when clicked', () => {
+      wrapper.find('H1').simulate('click', { stopPropagation: jest.fn() })
+      expect(wrapper.find('AutosizeInput').exists()).toEqual(false)
+    })
+  })
 })

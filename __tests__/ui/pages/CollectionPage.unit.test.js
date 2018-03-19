@@ -41,6 +41,10 @@ describe('CollectionPage', () => {
     expect(wrapper.find('EditableName').exists()).toEqual(true)
   })
 
+  it('passes viewOnly = true to EditableName', () => {
+    expect(wrapper.find('EditableName').props().viewOnly).toEqual(true)
+  })
+
   it('passes collection to the CollectionGrid', () => {
     // better way to reference this? otherwise it works
     const grid = wrapper.find('inject-CollectionGrid-with-routingStore-uiStore')
@@ -50,5 +54,18 @@ describe('CollectionPage', () => {
   it('shows the roles edit menu on click of roles summary add button', () => {
     wrapper.instance().showObjectRoleDialog()
     expect(uiStore.openRolesMenu).toHaveBeenCalled()
+  })
+
+  describe('as editor', () => {
+    beforeEach(() => {
+      collection.can_edit = true
+      wrapper = shallow(
+        <CollectionPage.wrappedComponent {...props} />
+      )
+    })
+
+    it('passes viewOnly = false to EditableName', () => {
+      expect(wrapper.find('EditableName').props().viewOnly).toEqual(false)
+    })
   })
 })

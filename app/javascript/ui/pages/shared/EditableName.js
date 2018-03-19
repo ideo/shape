@@ -77,8 +77,9 @@ class EditableName extends React.Component {
   }
 
   render() {
+    const { viewOnly } = this.props
     const { name, editing } = this.state
-    if (editing) {
+    if (!viewOnly && editing) {
       const clickHandlers = [
         () => this.stopEditingName()
       ]
@@ -100,7 +101,9 @@ class EditableName extends React.Component {
     }
     return (
       <StyledName>
-        <H1 onClick={this.startEditingName}>{name}</H1>
+        <H1
+          onClick={!viewOnly && this.startEditingName}
+        >{name}</H1>
       </StyledName>
     )
   }
@@ -110,10 +113,12 @@ EditableName.propTypes = {
   name: PropTypes.string.isRequired,
   updateNameHandler: PropTypes.func.isRequired,
   editing: PropTypes.bool,
+  viewOnly: PropTypes.bool,
 }
 
 EditableName.defaultProps = {
-  editing: false
+  editing: false,
+  viewOnly: false
 }
 
 export default EditableName
