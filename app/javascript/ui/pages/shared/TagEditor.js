@@ -1,29 +1,43 @@
 import { action, observable } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import _ from 'lodash'
+import ReactTags from 'react-tag-autocomplete'
+import 'react-tag-autocomplete/example/styles.css'
 
 import Modal from '~/ui/global/Modal'
 
 @inject('uiStore')
 @observer
 class TagEditor extends React.Component {
-  @observable tagText = ''
+  @observable tags = []
 
   constructor(props) {
     super(props)
     this.saveTags = _.debounce(this._saveTags, 1000)
-    this.tagText = props.record.tag_list
+    // `id` is used by react-tag-autocomplete, but otherwise doesn't hold any meaning
+    this.tags = _.map(props.record.tag_list.toJS(), (t, i) => ({
+      id: i, name: t
+    }))
   }
 
   _saveTags = () => {
     const { record } = this.props
-    record.tag_list = this.tagText
-    console.log(record)
+    record.tag_list = _.map(this.tags.toJS(), t => t.name).join(', ')
     record.save()
   }
 
-  @action updateTags = (ev) => {
-    this.tagText = ev.target.value
+  @action handleAddition = (tag) => {
+    const found = this.tags.find(t => t.name === tag.name)
+    if (!found) {
+      this.tags.push(tag)
+      this.saveTags()
+    } else {
+      // tag already exists, don't add to the list. Notify the user?
+    }
+  }
+
+  @action handleDelete = (i) => {
+    this.tags.remove(this.tags[i])
     this.saveTags()
   }
 
@@ -36,9 +50,13 @@ class TagEditor extends React.Component {
         title="Tags"
         open={uiStore.tagsModalOpen}
       >
-        <input
-          value={this.tagText}
-          onChange={this.updateTags}
+        <ReactTags
+          tags={this.tags.toJS()}
+          delimiterChars={[',']}
+          placeholder="Add new tags, comma separated"
+          handleAddition={this.handleAddition}
+          handleDelete={this.handleDelete}
+          allowNew
         />
       </Modal>
     )

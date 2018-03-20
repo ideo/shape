@@ -8,9 +8,28 @@ export const StyledMenuButtonWrapper = styled.div`
   position: relative;
   .menu-wrapper {
     display: none;
+    opacity: 0;
   }
   &.open .menu-wrapper {
     display: block;
+    opacity: 1;
+    animation: fadeInFromNone 0.25s;
+  }
+  @keyframes fadeInFromNone {
+    0% {
+      display: none;
+      opacity: 0;
+    }
+
+    0.1% {
+      display: block;
+      opacity: 0;
+    }
+
+    100% {
+      display: block;
+      opacity: 1;
+    }
   }
 `
 

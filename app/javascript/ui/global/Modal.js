@@ -11,6 +11,7 @@ const materialStyles = {
   paper: {
     borderLeft: `17px solid ${v.colors.blackLava}`,
     maxWidth: '855px',
+    paddingBottom: '30px',
     width: '100%'
   }
 }

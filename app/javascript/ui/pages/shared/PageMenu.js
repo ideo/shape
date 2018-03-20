@@ -4,6 +4,7 @@ import { PropTypes as MobxPropTypes } from 'mobx-react'
 
 import { uiStore } from '~/stores'
 import ShareIcon from '~/ui/icons/ShareIcon'
+import PermissionsIcon from '~/ui/icons/PermissionsIcon'
 import PopoutMenu from '~/ui/global/PopoutMenu'
 import TagEditor from '~/ui/pages/shared/TagEditor'
 
@@ -23,9 +24,14 @@ class PageMenu extends React.PureComponent {
     uiStore.update('tagsModalOpen', true)
   }
 
+  showRolesMenu = () => {
+    uiStore.update('rolesMenuOpen', true)
+  }
+
   get menuItems() {
     const items = [
-      { name: 'Tags', icon: <ShareIcon />, onClick: this.showTags }
+      { name: 'Tags', icon: <ShareIcon />, onClick: this.showTags },
+      { name: 'Permissions', icon: <PermissionsIcon />, onClick: this.showRolesMenu },
     ]
     return items
   }
