@@ -45,7 +45,7 @@ class Modal extends React.Component {
           <CloseIcon />
         </ModalCloseButton>
         <DialogTitle disableTypography id="sharing">
-          <Heading2>Sharing</Heading2>
+          <Heading2>{title}</Heading2>
         </DialogTitle>
         <DialogContent>
           { children }
