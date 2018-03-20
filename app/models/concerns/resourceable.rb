@@ -64,14 +64,14 @@ module Resourceable
     self.class
   end
 
+  def resource_identifier
+    Role.object_identifier(self)
+  end
+
   private
 
   def role_with_name(role_name)
     roles.find_by(name: role_name)
-  end
-
-  def resource_identifier
-    Role.object_identifier(self)
   end
 
   def raise_role_name_not_set(role_name)

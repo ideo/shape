@@ -175,4 +175,158 @@ describe User, type: :model do
       expect(User.create_pending_user(email: email).email).to eq(email.downcase)
     end
   end
+
+  describe '#viewable_collections_and_items' do
+    let!(:organization) { create(:organization) }
+    let(:org_2) { create(:organization) }
+
+    context 'with collections' do
+      let!(:view_coll) do
+        create(:collection,
+               add_viewers: [user],
+               organization: organization)
+      end
+      let!(:edit_coll) do
+        create(:collection,
+               add_editors: [user],
+               organization: organization)
+      end
+      let!(:other_coll) do
+        create(:collection,
+               organization: organization)
+      end
+
+      it 'should return all collections user has been added to' do
+        expect(user.viewable_collections_and_items(organization)).to match_array([view_coll, edit_coll])
+      end
+
+      pending 'it should only return collections in this org' do
+        edit_coll.update_attributes(organization: org_2)
+        expect(user.viewable_collections_and_items(organization)).to match_array(
+          [
+            view_item
+          ]
+        )
+      end
+    end
+
+    context 'with items' do
+      let!(:view_item) { create(:text_item, add_viewers: [user]) }
+      let!(:edit_item) { create(:text_item, add_editors: [user]) }
+      let!(:other_item) { create(:text_item) }
+
+      it 'should return all items user has been added to' do
+        expect(user.viewable_collections_and_items(organization)).to match_array(
+          [
+            edit_item,
+            view_item
+          ]
+        )
+      end
+
+      pending 'it should only return items in this org' do
+        # TODO: figure out how to reference org from item
+        expect(user.viewable_collections_and_items(organization)).to match_array(
+          [
+            view_item
+          ]
+        )
+      end
+    end
+  end
+
+  describe '#collection_and_group_identifiers' do
+    let!(:organization) { create(:organization) }
+    let(:collection) do
+      create(:collection,
+             add_viewers: [user],
+             organization: organization)
+    end
+    let!(:member_group) do
+      create(:group,
+             add_members: [user],
+             organization: organization)
+    end
+    let!(:admin_group) do
+      create(:group,
+             add_admins: [user],
+             organization: organization)
+    end
+    let!(:other_group) do
+      create(:group, organization: organization)
+    end
+
+    before do
+      allow(user).to receive(:viewable_collections_and_items).and_return([collection])
+    end
+
+    it 'should add all groups user is member/admin of' do
+      expect(user.collection_and_group_identifiers(organization)).to match_array(
+        [
+          member_group.resource_identifier,
+          admin_group.resource_identifier,
+          collection.resource_identifier,
+        ]
+      )
+    end
+  end
+
+  describe '#users_through_collections_items_and_groups' do
+    let!(:organization) { create(:organization) }
+    let!(:users) { create_list(:user, 4) }
+
+    context 'when added to collections' do
+      let!(:view_coll) do
+        create(:collection,
+               add_viewers: [user, users[0]],
+               organization: organization,
+              )
+      end
+      let!(:edit_coll) do
+        create(:collection,
+               add_editors: [user, users[1]],
+               add_viewers: [users[2]],
+               organization: organization,
+              )
+      end
+      let!(:other_coll) do
+        create(:collection,
+               add_editors: [users[3]])
+      end
+
+      it 'returns all users of collections they are editor/viewer of' do
+        expect(user.users_through_collections_items_and_groups(organization)).to match_array(
+          [
+            users[0],
+            users[1],
+            users[2],
+          ]
+        )
+      end
+    end
+
+    context 'when added to groups' do
+      let!(:edit_group) do
+        create(:group,
+               add_admins: [user, users[0]],
+               organization: organization)
+      end
+      let!(:member_group) do
+        create(:group,
+               add_admins: [users[2]],
+               add_members: [user, users[1]],
+               organization: organization)
+      end
+
+      it 'returns users from all groups they are member/admin of' do
+        expect(user.users_through_collections_items_and_groups(organization)).to match_array(
+          [
+            users[0],
+            users[1],
+            users[2],
+          ]
+        )
+      end
+    end
+  end
 end

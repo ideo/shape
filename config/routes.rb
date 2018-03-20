@@ -34,6 +34,8 @@ Rails.application.routes.draw do
           get 'current'
         end
         resources :collections, only: %i[create]
+        resources :groups, only: %i[index]
+        resources :users, only: %i[index]
       end
       resources :users do
         collection do

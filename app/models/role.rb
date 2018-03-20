@@ -8,6 +8,7 @@ class Role < ApplicationRecord
 
   after_create :add_to_children, if: :add_to_children?
   after_destroy :remove_from_children, if: :remove_from_children?
+  before_save :set_resource_identifier
 
   validates :resource_type,
             inclusion: { in: Rolify.resource_types },
@@ -90,5 +91,9 @@ class Role < ApplicationRecord
 
   def remove_from_children
     RemoveRolesFromChildrenWorker.perform_async([id], resource_id, resource_type)
+  end
+
+  def set_resource_identifier
+    self.resource_identifier = resource_identifier
   end
 end

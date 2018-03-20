@@ -3,6 +3,24 @@ require 'rails_helper'
 describe Api::V1::UsersController, type: :request, auth: true do
   let(:user) { @user }
 
+  describe 'GET #index' do
+    it 'returns a 200' do
+
+    end
+
+    context 'when added to content' do
+      it 'includes all users also on that content' do
+
+      end
+    end
+
+    context 'when added to groups' do
+      it 'includes all users also in those groups' do
+
+      end
+    end
+  end
+
   describe 'GET #show' do
     let(:path) { "/api/v1/users/#{user.id}" }
 
