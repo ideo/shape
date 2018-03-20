@@ -26,7 +26,7 @@ UserAvatar.propTypes = {
 
 UserAvatar.defaultProps = {
   size: 34,
-  className: 'avatar',
+  className: '',
 }
 
 export default UserAvatar

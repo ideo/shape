@@ -27,7 +27,7 @@ class Avatar extends React.Component {
         alt={title}
         size={size}
         onClick={this.handleClick}
-        className={className}
+        className={`avatar ${className}`}
         src={url}
       />
     )
@@ -42,7 +42,7 @@ Avatar.propTypes = {
 }
 Avatar.defaultProps = {
   size: 34,
-  className: 'avatar',
+  className: '',
   title: 'Avatar',
 }
 

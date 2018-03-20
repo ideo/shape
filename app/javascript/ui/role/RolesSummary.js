@@ -6,6 +6,7 @@ import v from '~/utils/variables'
 import UserAvatar from '~/ui/user/UserAvatar'
 
 const MAX_USERS_TO_SHOW = 5
+const AVATAR_SIZE = 30
 
 const StyledRolesSummary = styled.div`
   position: relative;
@@ -100,7 +101,7 @@ class RolesSummary extends React.PureComponent {
       <UserAvatar
         key={editor.id}
         user={editor}
-        size={30}
+        size={AVATAR_SIZE}
         className="editor"
       />
     ))
@@ -122,7 +123,7 @@ class RolesSummary extends React.PureComponent {
       <UserAvatar
         key={viewer.id}
         user={viewer}
-        size={30}
+        size={AVATAR_SIZE}
         className="viewer"
       />
     ))
