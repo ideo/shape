@@ -11,7 +11,8 @@ describe('OrganizationAvatar', () => {
         openOrganizationMenu: jest.fn()
       },
       organization: {
-        name: 'Space'
+        name: 'Space',
+        pic_url_square: 'test.jpg',
       }
     }
     wrapper = mount(
