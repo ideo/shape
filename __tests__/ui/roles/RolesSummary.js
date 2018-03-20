@@ -1,6 +1,6 @@
 import _ from 'lodash'
 
-import RolesSummary from '~/ui/role/RolesSummary'
+import RolesSummary from '~/ui/roles/RolesSummary'
 
 import {
   fakeRole,

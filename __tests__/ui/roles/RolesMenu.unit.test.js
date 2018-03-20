@@ -1,6 +1,6 @@
 import { observable, useStrict } from 'mobx'
 import { Provider } from 'mobx-react'
-import RolesMenu from '~/ui/role/RolesMenu'
+import RolesMenu from '~/ui/roles/RolesMenu'
 
 const apiStore = observable({
   request: jest.fn(),

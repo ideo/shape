@@ -5,7 +5,7 @@ import styled from 'styled-components'
 
 import CloseIcon from '~/ui/icons/CloseIcon'
 import { Pill } from '~/ui/global/styled/forms'
-import UserAvatar from '~/ui/user/UserAvatar'
+import UserAvatar from '~/ui/users/UserAvatar'
 
 const ChipHolder = styled.div`
   display: flex;

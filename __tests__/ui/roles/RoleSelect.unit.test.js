@@ -1,5 +1,5 @@
 import { useStrict } from 'mobx'
-import RoleSelect from '~/ui/role/RoleSelect'
+import RoleSelect from '~/ui/roles/RoleSelect'
 import {
   fakeRole
 } from '#/mocks/data'

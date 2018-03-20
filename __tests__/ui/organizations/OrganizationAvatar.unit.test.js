@@ -1,4 +1,4 @@
-import OrganizationAvatar from '~/ui/organization/OrganizationAvatar'
+import OrganizationAvatar from '~/ui/organizations/OrganizationAvatar'
 
 let props
 let wrapper

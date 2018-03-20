@@ -6,7 +6,7 @@ import { Router, Switch, Route } from 'react-router-dom'
 import CollectionPage from '~/ui/pages/CollectionPage'
 import ItemPage from '~/ui/pages/ItemPage'
 import SearchPage from '~/ui/pages/SearchPage'
-import OrganizationMenu from '~/ui/organization/OrganizationMenu'
+import OrganizationMenu from '~/ui/organizations/OrganizationMenu'
 import Loader from '~/ui/layout/Loader'
 import WindowSizeListener from 'react-window-size-listener'
 

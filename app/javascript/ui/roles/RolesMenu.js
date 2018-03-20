@@ -7,8 +7,8 @@ import {
   FormSpacer,
 } from '~/ui/global/styled/forms'
 import Modal from '~/ui/global/Modal'
-import RolesAdd from '~/ui/role/RolesAdd'
-import RoleSelect from '~/ui/role/RoleSelect'
+import RolesAdd from '~/ui/roles/RolesAdd'
+import RoleSelect from '~/ui/roles/RoleSelect'
 
 function sortUser(a, b) {
   return a.user.name

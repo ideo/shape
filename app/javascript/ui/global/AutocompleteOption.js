@@ -10,7 +10,7 @@ import {
 import {
   SelectOption,
 } from '~/ui/global/styled/forms'
-import UserAvatar from '~/ui/user/UserAvatar'
+import UserAvatar from '~/ui/users/UserAvatar'
 
 class AutocompleteOption extends React.Component {
   handleClick = event => {

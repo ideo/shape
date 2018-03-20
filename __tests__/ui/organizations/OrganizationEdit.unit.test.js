@@ -1,5 +1,5 @@
 import { observable, useStrict } from 'mobx'
-import OrganizationEdit from '~/ui/organization/OrganizationEdit'
+import OrganizationEdit from '~/ui/organizations/OrganizationEdit'
 
 const fakeMouseEvent = { preventDefault: jest.fn() }
 const props = {

@@ -3,7 +3,7 @@ import { PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 
 import v from '~/utils/variables'
-import UserAvatar from '~/ui/user/UserAvatar'
+import UserAvatar from '~/ui/users/UserAvatar'
 
 const MAX_USERS_TO_SHOW = 5
 const AVATAR_SIZE = 30
