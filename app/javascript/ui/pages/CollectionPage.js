@@ -92,7 +92,7 @@ class CollectionPage extends PageWithApi {
   }
 
   render() {
-    const { collection, roles } = this
+    const { collection } = this
     const { uiStore } = this.props
     if (!collection || this.props.uiStore.isLoading) return <Loader />
 
@@ -104,7 +104,7 @@ class CollectionPage extends PageWithApi {
 
     return (
       <Fragment>
-        {uiStore.openCardMenuId && <ClickWrapper clickHandlers={clickHandlers} />}
+        {/* {uiStore.openCardMenuId && <ClickWrapper clickHandlers={clickHandlers} />} */}
         <Header>
           <Breadcrumb items={breadcrumb} />
           <StyledTitleAndRoles>
