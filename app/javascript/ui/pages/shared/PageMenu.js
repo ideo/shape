@@ -8,20 +8,19 @@ import TagEditor from '~/ui/pages/shared/TagEditor'
 
 class PageMenu extends React.PureComponent {
   handleMouseLeave = () => {
-    // const { uiStore } = this.props
     if (this.props.menuOpen) {
-      uiStore.closePageMenu()
+      uiStore.update('pageMenuOpen', false)
     }
   }
 
   toggleOpen = (e) => {
     e.stopPropagation()
     // const { uiStore } = this.props
-    uiStore.togglePageMenuOpen()
+    uiStore.update('pageMenuOpen', true)
   }
 
   showTags = () => {
-    console.log('show tags')
+    uiStore.update('tagsModalOpen', true)
   }
 
   get menuItems() {
