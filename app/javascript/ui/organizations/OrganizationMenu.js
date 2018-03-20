@@ -1,6 +1,6 @@
 import { action, observable } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
-import { TextButton } from '~/ui/global/styled/forms'
+import { FormSpacer, TextButton } from '~/ui/global/styled/forms'
 import { Row, RowItemRight } from '~/ui/global/styled/layout'
 import { Heading3, DisplayText } from '~/ui/global/styled/typography'
 import Modal from '~/ui/global/Modal'
@@ -11,6 +11,7 @@ import OrganizationEdit from './OrganizationEdit'
 @observer
 class OrganizationMenu extends React.Component {
   @action onGroupSave = () => {
+    this.modifyGroupOpen = false
     this.editGroup = {}
   }
 
@@ -18,7 +19,8 @@ class OrganizationMenu extends React.Component {
     this.editOrganizationOpen = false
   }
 
-  @action handleGroupClick = group => () => {
+  @action changeModifyGroup(group) {
+    this.modifyGroupOpen = true
     this.editGroup = group
   }
 
@@ -29,13 +31,17 @@ class OrganizationMenu extends React.Component {
   }
 
   @action handleGroupAddClick = (ev) => {
-    this.addGroupOpen = true
+    this.modifyGroupOpen = true
   }
 
   @action handleBack = () => {
     this.editOrganizationOpen = false
-    this.addGroupOpen = false
+    this.modifyGroupOpen = false
     this.editGroup = {}
+  }
+
+  handleGroupClick = group => () => {
+    this.changeModifyGroup(group)
   }
 
   handleClose = (ev) => {
@@ -44,14 +50,14 @@ class OrganizationMenu extends React.Component {
   }
 
   @observable editOrganizationOpen = false
-  @observable addGroupOpen = false
+  @observable modifyGroupOpen = false
   @observable editGroup = {}
 
   renderEditOrganization() {
     const { organization } = this.props
     return (
       <OrganizationEdit
-        onSave={this.onSave}
+        onSave={this.onOrganizationSave}
         organization={organization}
       />
     )
@@ -82,6 +88,7 @@ class OrganizationMenu extends React.Component {
             <DisplayText>{ organization.name }</DisplayText>
           </button>
         </Row>
+        <FormSpacer />
         <Heading3>
           Your Groups
         </Heading3>
@@ -106,7 +113,7 @@ class OrganizationMenu extends React.Component {
     if (this.editOrganizationOpen) {
       content = this.renderEditOrganization()
       title = 'Your Organization'
-    } else if (this.addGroupOpen) {
+    } else if (this.modifyGroupOpen) {
       content = this.renderEditGroup()
       title = this.editGroup.id ? this.editGroup.name : 'New Group'
     }
@@ -115,7 +122,7 @@ class OrganizationMenu extends React.Component {
       <Modal
         title={title}
         onClose={this.handleClose}
-        onBack={(this.editOrganizationOpen || this.addGroupOpen) && this.handleBack}
+        onBack={(this.editOrganizationOpen || this.modifyGroupOpen) && this.handleBack}
         open={uiStore.organizationMenuOpen}
       >
         { content }
