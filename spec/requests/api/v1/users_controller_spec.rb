@@ -52,7 +52,7 @@ describe Api::V1::UsersController, type: :request, auth: true do
         expect(json_object_ids).to match_array((org_users + collection_users).map(&:id))
       end
 
-      pending 'does not include content that user belongs to in other org' do
+      it 'does not include content that user belongs to in other org' do
         expect(other_org_collection.can_view?(user)).to be true
         get(path)
         expect(json_object_ids).to match_array((org_users + collection_users).map(&:id))

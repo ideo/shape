@@ -196,17 +196,17 @@ describe User, type: :model do
                organization: organization)
       end
 
-      it 'should return all collections user has been added to' do
-        expect(user.viewable_collections_and_items(organization)).to match_array([view_coll, edit_coll])
+      it 'returns all collections user has been added to' do
+        expect(
+          user.viewable_collections_and_items(organization),
+        ).to match_array([view_coll, edit_coll])
       end
 
-      pending 'it should only return collections in this org' do
+      it 'returns collections only in this org' do
         edit_coll.update_attributes(organization: org_2)
-        expect(user.viewable_collections_and_items(organization)).to match_array(
-          [
-            view_item
-          ]
-        )
+        expect(
+          user.viewable_collections_and_items(organization),
+        ).to match_array(*view_coll)
       end
     end
 
@@ -216,21 +216,16 @@ describe User, type: :model do
       let!(:other_item) { create(:text_item) }
 
       it 'should return all items user has been added to' do
-        expect(user.viewable_collections_and_items(organization)).to match_array(
-          [
-            edit_item,
-            view_item
-          ]
-        )
+        expect(
+          user.viewable_collections_and_items(organization)
+        ).to match_array([edit_item, view_item])
       end
 
       pending 'it should only return items in this org' do
-        # TODO: figure out how to reference org from item
-        expect(user.viewable_collections_and_items(organization)).to match_array(
-          [
-            view_item
-          ]
-        )
+        # TODO: figure out how to efficiently reference org from item
+        expect(
+          user.viewable_collections_and_items(organization)
+        ).to match_array(*view_item)
       end
     end
   end
@@ -257,6 +252,7 @@ describe User, type: :model do
     end
 
     before do
+      user.add_role(Role::MEMBER, organization.primary_group)
       allow(user).to receive(:viewable_collections_and_items).and_return([collection])
     end
 
@@ -266,8 +262,21 @@ describe User, type: :model do
           member_group.resource_identifier,
           admin_group.resource_identifier,
           collection.resource_identifier,
+          organization.primary_group.resource_identifier,
         ]
       )
+    end
+
+    context 'if user is not member of primary group' do
+      # We chose to do this because you should be able to 'see' anyone
+      # who is an admin or member of the org
+      it 'should include primary group even if user is not a member' do
+        user.remove_role(Role::MEMBER, organization.primary_group)
+        expect(organization.primary_group.can_view?(user)).to be false
+        expect(
+          user.collection_and_group_identifiers(organization)
+        ).to include(organization.primary_group.resource_identifier)
+      end
     end
   end
 
