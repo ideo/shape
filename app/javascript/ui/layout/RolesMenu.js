@@ -54,7 +54,7 @@ class RolesMenu extends React.Component {
         roleUsers.push(Object.assign({}, { role, user }))
       }))
     const sortedRoleUsers = roleUsers.sort(sortUser)
-    // TODO abstract shared dialog functionality to component
+
     return (
       <Modal
         title="Sharing"
