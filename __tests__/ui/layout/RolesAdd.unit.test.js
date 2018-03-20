@@ -1,5 +1,5 @@
 import { useStrict } from 'mobx'
-import RolesAdd from '~/ui/layout/RolesAdd'
+import RolesAdd from '~/ui/role/RolesAdd'
 
 let props
 let wrapper

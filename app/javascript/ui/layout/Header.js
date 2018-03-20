@@ -6,8 +6,8 @@ import { Flex, Box } from 'reflexbox'
 import Logo from '~/ui/layout/Logo'
 import PlainLink from '~/ui/global/PlainLink'
 import SearchBar from '~/ui/layout/SearchBar'
-import OrganizationAvatar from '~/ui/layout/OrganizationAvatar'
-import UserAvatar from '~/ui/layout/UserAvatar'
+import OrganizationAvatar from '~/ui/organization/OrganizationAvatar'
+import UserAvatar from '~/ui/user/UserAvatar'
 import v from '~/utils/variables'
 
 const StyledHeader = styled.header`

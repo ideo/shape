@@ -3,7 +3,7 @@ import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import { Row } from '~/ui/global/styled/layout'
 import { Heading3, DisplayText } from '~/ui/global/styled/typography'
 import Modal from '~/ui/global/Modal'
-import OrganizationEdit from '~/ui/layout/OrganizationEdit'
+import OrganizationEdit from './OrganizationEdit'
 
 @inject('uiStore')
 @observer

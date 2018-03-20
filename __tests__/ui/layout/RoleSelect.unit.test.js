@@ -1,5 +1,5 @@
-import { observable, useStrict } from 'mobx'
-import RoleSelect from '~/ui/layout/RoleSelect'
+import { useStrict } from 'mobx'
+import RoleSelect from '~/ui/role/RoleSelect'
 import {
   fakeRole
 } from '#/mocks/data'

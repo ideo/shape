@@ -11,7 +11,7 @@ import {
   Row,
   RowItemLeft,
 } from '~/ui/global/styled/layout'
-import UserAvatar from './UserAvatar'
+import UserAvatar from '~/ui/user/UserAvatar'
 
 const materialStyles = {
   root: {
