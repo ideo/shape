@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 import styled from 'styled-components'
 import { withStyles } from 'material-ui/styles'
 import Dialog, { DialogContent, DialogTitle } from 'material-ui/Dialog'
-import { Heading2 } from '~/ui/global/styled'
+import { Heading2 } from '~/ui/global/styled/typography'
 import v from '~/utils/variables'
 import CloseIcon from '~/ui/icons/CloseIcon'
 

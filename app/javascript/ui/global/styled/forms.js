@@ -1,49 +1,7 @@
-import PropTypes from 'prop-types'
 import Chip from 'material-ui/Chip'
 import { MenuItem } from 'material-ui/Menu'
 import styled from 'styled-components'
 import v from '~/utils/variables'
-
-export const BctButton = styled.button`
-`
-BctButton.displayName = 'BctButton'
-
-// Typography Styles
-
-export const Heading2 = styled.h2`
-  font-family: {v.fonts.sans};
-  font-size: 1.5rem;
-  font-weight: {v.weights.medium};
-  letter-spacing: 0.14375rem;
-  color: ${v.colors.blackLava};
-`
-Heading2.displayName = 'Heading2'
-
-export const Heading3 = styled.h3`
-  text-fransform: uppercase;
-  margin-bottom: 13px;
-  font-size: 0.9375rem;
-  font-weight: ${v.weights.medium};
-  letter-spacing: 0.0625rem;
-`
-Heading3.displayName = 'StyledHeading3'
-
-export const DisplayText = styled.span`
-  font-weight: ${v.weights.book};
-  font-family: ${v.fonts.sans};
-  font-size: 1rem;
-`
-DisplayText.displayName = 'StyledDisplayText'
-
-export const SubText = styled.span`
-  vertical-align: super;
-  font-family: ${v.fonts.serif};
-  font-size: 0.75rem;
-  color: ${v.colors.gray};
-`
-SubText.displayName = 'StyledSubText'
-
-// Form Styles
 
 export const FormActionsContainer = styled.div`
   padding-bottom: 14px;
@@ -165,33 +123,3 @@ export const SelectOption = styled(MenuItem)`
   }
 `
 SelectOption.displayName = 'StyledSelectOption'
-
-// layout
-
-export const Row = styled.div`
-  align-items: ${props => props.align};
-  display: flex;
-  justify-content: space-between;
-  margin-left: 5px;
-  width: 92%;
-`
-Row.displayName = 'StyledRow'
-Row.propTypes = {
-  align: PropTypes.oneOf(['flex-start', 'flex-end', 'center']),
-}
-Row.defaultProps = {
-  align: 'flex-start'
-}
-
-export const RowItemLeft = styled.span`
-  margin-right: auto;
-  margin-left: 14px;
-`
-RowItemLeft.displayName = 'StyledRowItemLeft'
-
-// TODO too large of a right margin, might have to make configurable
-export const RowItemRight = styled.span`
-  float: right;
-  margin-right: 64px;
-`
-RowItemRight.displayName = 'StyledRowItemRight'

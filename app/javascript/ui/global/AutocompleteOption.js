@@ -1,11 +1,15 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import {
-  DisplayText,
   Row,
   RowItemLeft,
+} from '~/ui/global/styled/layout'
+import {
+  DisplayText,
+} from '~/ui/global/styled/typography'
+import {
   SelectOption,
-} from '~/ui/global/styled'
+} from '~/ui/global/styled/forms'
 import UserAvatar from '~/ui/layout/UserAvatar'
 
 class AutocompleteOption extends React.Component {

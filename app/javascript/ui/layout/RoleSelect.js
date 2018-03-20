@@ -5,10 +5,12 @@ import { MenuItem } from 'material-ui/Menu'
 import Select from 'material-ui/Select'
 import {
   DisplayText,
+  SubText
+} from '~/ui/global/styled/typography'
+import {
   Row,
   RowItemLeft,
-  SubText
-} from '~/ui/global/styled'
+} from '~/ui/global/styled/layout'
 import UserAvatar from './UserAvatar'
 
 const materialStyles = {

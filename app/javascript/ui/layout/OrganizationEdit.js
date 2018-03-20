@@ -9,7 +9,7 @@ import {
   ImageField,
   Label,
   TextField,
-} from '~/ui/global/styled'
+} from '~/ui/global/styled/forms'
 
 @observer
 class OrganizationEdit extends React.Component {

@@ -1,9 +1,11 @@
 import PropTypes from 'prop-types'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import {
-  FormSpacer,
   Heading3,
-} from '~/ui/global/styled'
+} from '~/ui/global/styled/typography'
+import {
+  FormSpacer,
+} from '~/ui/global/styled/forms'
 import Modal from '~/ui/global/Modal'
 import RolesAdd from '~/ui/layout/RolesAdd'
 import RoleSelect from '~/ui/layout/RoleSelect'

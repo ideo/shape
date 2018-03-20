@@ -4,7 +4,7 @@ import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 
 import CloseIcon from '~/ui/icons/CloseIcon'
-import { Pill } from '~/ui/global/styled'
+import { Pill } from '~/ui/global/styled/forms'
 import UserAvatar from '~/ui/layout/UserAvatar'
 
 const ChipHolder = styled.div`
