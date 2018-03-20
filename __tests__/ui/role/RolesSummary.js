@@ -9,8 +9,7 @@ import {
 
 const emptyProps = {
   roles: [],
-  handleClick: jest.fn(),
-  canEdit: true,
+  handleClick: jest.fn()
 }
 
 const editorRole = Object.assign({}, fakeRole)
@@ -19,8 +18,7 @@ viewerRole.name = 'viewer'
 
 const editorsAndViewersProps = {
   roles: [editorRole, viewerRole],
-  handleClick: jest.fn(),
-  canEdit: true,
+  handleClick: jest.fn()
 }
 
 let wrapper
@@ -134,19 +132,6 @@ describe('RolesSummary', () => {
 
     it('renders manage roles button', () => {
       expect(wrapper.find('StyledAddUserBtn').exists()).toBe(true)
-    })
-  })
-
-  describe('without edit permission', () => {
-    beforeEach(() => {
-      editorsAndViewersProps.canEdit = false
-      wrapper = shallow(
-        <RolesSummary {...editorsAndViewersProps} />
-      )
-    })
-
-    it('does not render manage roles button', () => {
-      expect(wrapper.find('StyledAddUserBtn').exists()).toBe(false)
     })
   })
 })
