@@ -1,5 +1,6 @@
 class Group < ApplicationRecord
   include Resourceable
+  include HasFilestackFile
   # Admins can manage people in the group
   # Members have read access to everything the group is linked to
   resourceable roles: [Role::ADMIN, Role::MEMBER],

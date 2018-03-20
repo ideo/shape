@@ -1,5 +1,7 @@
 class FilestackFile < ApplicationRecord
   has_one :item
+  has_one :group
+  has_one :organization
 
   validates :url, :handle, presence: true
 
@@ -8,6 +10,9 @@ class FilestackFile < ApplicationRecord
 
   amoeba do
     enable
+    exclude_association :item
+    exclude_association :group
+    exclude_association :organization
   end
 
   def duplicate!

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180316164813) do
+ActiveRecord::Schema.define(version: 20180319231721) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -60,8 +60,9 @@ ActiveRecord::Schema.define(version: 20180316164813) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "handle"
-    t.index ["organization_id"], name: "index_groups_on_organization_id"
+    t.integer "filestack_file_id"
     t.index ["handle"], name: "index_groups_on_handle"
+    t.index ["organization_id"], name: "index_groups_on_organization_id"
   end
 
   create_table "items", force: :cascade do |t|
@@ -88,6 +89,7 @@ ActiveRecord::Schema.define(version: 20180316164813) do
     t.integer "primary_group_id"
     t.string "pic_url_square"
     t.string "handle"
+    t.integer "filestack_file_id"
     t.index ["handle"], name: "index_organizations_on_handle"
   end
 

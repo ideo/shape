@@ -1,4 +1,6 @@
 class Organization < ApplicationRecord
+  include HasFilestackFile
+  
   has_many :collections, -> { root }
   has_many :groups, dependent: :destroy
   belongs_to :primary_group,

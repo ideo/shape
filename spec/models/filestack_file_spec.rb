@@ -27,4 +27,16 @@ RSpec.describe FilestackFile, type: :model do
       end
     end
   end
+
+  describe '#duplicate' do
+    let!(:filestack_file) { create(:filestack_file) }
+
+    it 'should create new object' do
+      expect { filestack_file.duplicate! }.to change(FilestackFile, :count).by(1)
+    end
+
+    it 'should have the same url (for now)' do
+      expect(filestack_file.duplicate!.url).to eq(filestack_file.url)
+    end
+  end
 end

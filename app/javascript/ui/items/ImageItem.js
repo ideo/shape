@@ -10,9 +10,9 @@ StyledImage.displayName = 'StyledImage'
 class ImageItem extends React.PureComponent {
   render() {
     const { item } = this.props
-    const { url } = item.filestack_file
+    const { filestack_file_url } = item
     return (
-      <StyledImage src={url} alt={item.name} />
+      <StyledImage src={filestack_file_url} alt={item.name} />
     )
   }
 }
