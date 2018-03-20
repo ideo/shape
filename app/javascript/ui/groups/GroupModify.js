@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types'
 import { action, observable, toJS } from 'mobx'
-import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
+import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import {
   FormButton,
   FieldContainer,
@@ -12,6 +12,7 @@ import {
 import FilestackUpload from '~/utils/FilestackUpload'
 import Group from '~/stores/jsonApi/Group'
 
+@inject('apiStore')
 @observer
 class GroupModify extends React.Component {
   constructor(props) {
@@ -41,6 +42,18 @@ class GroupModify extends React.Component {
     this.editingGroup.filestack_file_url = url
   }
 
+  @action afterSave(res) {
+    const { apiStore } = this.props
+    // TODO because we're pulling groups from currentUser we have to update
+    // it manually. Is there a way to not have to do this?
+    const existing = apiStore.currentUser.groups.find(
+      existingGroup => existingGroup.id === res.id
+    )
+    if (!existing) {
+      apiStore.currentUser.groups.push(res)
+    }
+  }
+
   handleNameChange = (ev) => {
     this.changeName(ev.target.value)
   }
@@ -64,16 +77,18 @@ class GroupModify extends React.Component {
 
   handleSave = (ev) => {
     ev.preventDefault()
-    const { onSave } = this.props
+    const { apiStore, onSave } = this.props
     let { group } = this.props
     if (!group.id) {
-      group = new Group(toJS(this.editingGroup))
+      group = new Group(toJS(this.editingGroup), apiStore)
     } else {
       group.name = this.editingGroup.name
       group.handle = this.editingGroup.handle
       group.filestack_file_url = this.editingGroup.filestack_file_url
     }
     group.save().then((res) => {
+      // TODO why isn't res wrapped in "data"?
+      this.afterSave(res)
       onSave && onSave()
     })
   }
@@ -127,6 +142,9 @@ class GroupModify extends React.Component {
 GroupModify.propTypes = {
   group: MobxPropTypes.objectOrObservableObject.isRequired,
   onSave: PropTypes.func.isRequired,
+}
+GroupModify.wrappedComponent.propTypes = {
+  apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 
 export default GroupModify

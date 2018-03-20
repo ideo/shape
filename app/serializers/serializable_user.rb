@@ -12,7 +12,7 @@ class SerializableUser < BaseJsonSerializer
     end
   end
   has_many :organizations
-  # TODO this probably isn't needed
+  # TODO is this needed?
   has_many :groups do
     data { @object.groups }
   end
