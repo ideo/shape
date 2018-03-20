@@ -2,9 +2,10 @@ import { action, observable } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import _ from 'lodash'
 import ReactTags from 'react-tag-autocomplete'
-import 'react-tag-autocomplete/example/styles.css'
+// import 'react-tag-autocomplete/example/styles.css'
 
 import Modal from '~/ui/global/Modal'
+import StyledReactTags from './StyledReactTags'
 
 @inject('uiStore')
 @observer
@@ -55,14 +56,16 @@ class TagEditor extends React.Component {
         title="Tags"
         open={uiStore.tagsModalOpen}
       >
-        <ReactTags
-          tags={[...this.tags]}
-          delimiterChars={[',']}
-          placeholder="Add new tags, comma separated"
-          handleAddition={this.handleAddition}
-          handleDelete={this.handleDelete}
-          allowNew
-        />
+        <StyledReactTags>
+          <ReactTags
+            tags={[...this.tags]}
+            delimiterChars={[',']}
+            placeholder="Add new tags, separated by comma or pressing enter."
+            handleAddition={this.handleAddition}
+            handleDelete={this.handleDelete}
+            allowNew
+          />
+        </StyledReactTags>
       </Modal>
     )
   }

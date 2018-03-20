@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 import { PropTypes as MobxPropTypes } from 'mobx-react'
 
 import { uiStore } from '~/stores'
-import ShareIcon from '~/ui/icons/ShareIcon'
+import TagIcon from '~/ui/icons/TagIcon'
 import PermissionsIcon from '~/ui/icons/PermissionsIcon'
 import PopoutMenu from '~/ui/global/PopoutMenu'
 import TagEditor from '~/ui/pages/shared/TagEditor'
@@ -30,7 +30,7 @@ class PageMenu extends React.PureComponent {
 
   get menuItems() {
     const items = [
-      { name: 'Tags', icon: <ShareIcon />, onClick: this.showTags },
+      { name: 'Tags', icon: <TagIcon />, onClick: this.showTags },
       { name: 'Permissions', icon: <PermissionsIcon />, onClick: this.showRolesMenu },
     ]
     return items
