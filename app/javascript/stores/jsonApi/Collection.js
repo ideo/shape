@@ -3,7 +3,7 @@ import { computed } from 'mobx'
 import BaseRecord from './BaseRecord'
 
 class Collection extends BaseRecord {
-  attributesForAPI = ['name']
+  attributesForAPI = ['name', 'tag_list']
 
   @computed get cardIds() {
     return this.collection_cards.map(card => card.id)

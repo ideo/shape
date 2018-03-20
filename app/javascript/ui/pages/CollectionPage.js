@@ -24,6 +24,10 @@ const StyledTitleAndRoles = styled(Flex)`
       display: none;
     }
   }
+  .page-menu {
+    position: relative;
+    top: -5px;
+  }
 `
 
 @inject('apiStore', 'uiStore')
@@ -119,7 +123,12 @@ class CollectionPage extends PageWithApi {
                 
                 canEdit={collection.can_edit}
               />
-              <PageMenu menuOpen={uiStore.pageMenuOpen} />
+              {!this.isHomepage &&
+                <PageMenu
+                  record={collection}
+                  menuOpen={uiStore.pageMenuOpen}
+                />
+              }
             </Flex>
           </StyledTitleAndRoles>
         </Header>

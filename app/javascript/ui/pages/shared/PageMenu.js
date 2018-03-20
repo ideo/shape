@@ -1,5 +1,6 @@
 import { Fragment } from 'react'
 import PropTypes from 'prop-types'
+import { PropTypes as MobxPropTypes } from 'mobx-react'
 
 import { uiStore } from '~/stores'
 import ShareIcon from '~/ui/icons/ShareIcon'
@@ -15,8 +16,7 @@ class PageMenu extends React.PureComponent {
 
   toggleOpen = (e) => {
     e.stopPropagation()
-    // const { uiStore } = this.props
-    uiStore.update('pageMenuOpen', true)
+    uiStore.update('pageMenuOpen', !uiStore.pageMenuOpen)
   }
 
   showTags = () => {
@@ -31,23 +31,26 @@ class PageMenu extends React.PureComponent {
   }
 
   render() {
-    // const { uiStore } = this.props
+    const { menuOpen, record } = this.props
+
     return (
       <Fragment>
         <PopoutMenu
+          className="page-menu"
           onMouseLeave={this.handleMouseLeave}
           onClick={this.toggleOpen}
           menuItems={this.menuItems}
-          menuOpen={this.props.menuOpen}
+          menuOpen={menuOpen}
         />
 
-        <TagEditor />
+        <TagEditor record={record} />
       </Fragment>
     )
   }
 }
 
 PageMenu.propTypes = {
+  record: MobxPropTypes.objectOrObservableObject.isRequired,
   menuOpen: PropTypes.bool,
 }
 PageMenu.defaultProps = {

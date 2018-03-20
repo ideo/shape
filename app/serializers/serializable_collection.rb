@@ -29,4 +29,8 @@ class SerializableCollection < BaseJsonSerializer
   end
 
   has_many :roles
+
+  attribute :tag_list do
+    @object.tag_list.join(', ')
+  end
 end
