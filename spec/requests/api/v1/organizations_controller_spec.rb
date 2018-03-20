@@ -45,7 +45,11 @@ describe Api::V1::OrganizationsController, type: :request, auth: true do
         'organizations',
         {
           'name': 'Acme Inc 2.0',
-          'pic_url_square': 'https://filestack.com/image.jpg'
+          'filestack_file_attributes': {
+            url: 'https://filestack.com/image.jpg',
+            handle: 'image.jpg',
+            mimetype: 'image/jpeg',
+          }
         }
       )
     }
@@ -67,10 +71,10 @@ describe Api::V1::OrganizationsController, type: :request, auth: true do
     end
 
     it 'updates the pic url' do
-      expect(organization.pic_url_square)
+      expect(organization.filestack_file_url)
         .not_to eq('https://filestack.com/image.jpg')
       patch(path, params: params)
-      expect(organization.reload.pic_url_square)
+      expect(organization.reload.filestack_file_url)
         .to eq('https://filestack.com/image.jpg')
     end
   end

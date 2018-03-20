@@ -78,7 +78,7 @@ export const fakeUserAttrs = {
   first_name: 'Oprah',
   last_name: 'Winfrey',
   email: 'oprah@winfrey.com',
-  pic_url_square: 'https://pmcvariety.files.wordpress.com/2017/09/oprah_winfrey.png'
+  filestack_file_url: 'https://filestackcdn.com/abc123'
 }
 export const fakeUser = {
   ...fakeUserAttrs,

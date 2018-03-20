@@ -45,5 +45,17 @@ RSpec.describe Item, type: :model do
         expect(dupe.parent_collection_card.order).to eq(item.parent_collection_card.order + 1)
       end
     end
+
+    context 'with filestack file' do
+      let!(:filestack_file) { create(:filestack_file) }
+
+      before do
+        item.update_attributes(filestack_file: filestack_file)
+      end
+
+      it 'duplicates the filestack file' do
+        expect { item.duplicate! }.to change(FilestackFile, :count).by(1)
+      end
+    end
   end
 end

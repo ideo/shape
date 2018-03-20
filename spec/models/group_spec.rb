@@ -4,6 +4,10 @@ RSpec.describe Group, type: :model do
   let(:organization) { create(:organization) }
   let(:group) { create(:group, organization: organization) }
 
+  context 'associations' do
+    it { should belong_to :filestack_file }
+  end
+
   context 'with users in roles' do
     let!(:admins) { create_list(:user, 3) }
     let!(:members) { create_list(:user, 3) }

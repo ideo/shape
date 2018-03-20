@@ -98,7 +98,7 @@ class OrganizationEdit extends React.Component {
     const { organization } = props
     this.editingOrganization = {
       name: organization.name,
-      pic_url_square: organization.pic_url_square
+      filestack_file_url: organization.filestack_file_url
     }
   }
 
@@ -111,7 +111,7 @@ class OrganizationEdit extends React.Component {
 
   @action
   changeUrl(url) {
-    this.editingOrganization.pic_url_square = url
+    this.editingOrganization.filestack_file_url = url
   }
 
   handleNameChange = (ev) => {
@@ -135,7 +135,7 @@ class OrganizationEdit extends React.Component {
     ev.preventDefault()
     const { organization, onSave } = this.props
     organization.name = this.editingOrganization.name
-    organization.pic_url_square = this.editingOrganization.pic_url_square
+    organization.filestack_file_url = this.editingOrganization.filestack_file_url
     organization.save().then(() => {
       onSave && onSave()
     })
