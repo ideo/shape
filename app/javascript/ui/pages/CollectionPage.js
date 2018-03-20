@@ -116,6 +116,7 @@ class CollectionPage extends PageWithApi {
                 className="roles-summary"
                 handleClick={this.showObjectRoleDialog}
                 roles={collection.roles}
+                
                 canEdit={collection.can_edit}
               />
               <PageMenu menuOpen={uiStore.pageMenuOpen} />
