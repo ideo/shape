@@ -9,7 +9,7 @@ describe Api::V1::SearchController, type: :request, auth: true do
         :collection,
         3,
         organization: organization,
-        add_viewers: [current_user],
+        add_editors: [current_user],
       )
     end
     let!(:collection_with_text) do
@@ -25,6 +25,11 @@ describe Api::V1::SearchController, type: :request, auth: true do
 
     before do
       current_user.add_role(:member, organization.primary_group)
+    end
+
+    before(:all) do
+      Collection.reindex
+      sleep 1 # Let ElasticSearch indexing finish (even though it seems to be synchronous)
     end
 
     context 'if user can view collection' do
@@ -65,13 +70,27 @@ describe Api::V1::SearchController, type: :request, auth: true do
 
     context 'if user cannot view collection' do
       before do
-        current_user.remove_role(Role::VIEWER, find_collection)
+        current_user.remove_role(Role::EDITOR, find_collection)
         Collection.reindex
       end
 
       it 'returns empty array' do
         get(path, params: { query: find_collection.name })
         expect(json['data']).to be_empty
+      end
+    end
+
+    context 'as a read-only viewer of the collection' do
+      before do
+        current_user.remove_role(Role::EDITOR, find_collection)
+        current_user.add_role(Role::VIEWER, find_collection)
+        Collection.reindex
+      end
+
+      it 'returns collection that matches name search' do
+        get(path, params: { query: find_collection.name })
+        expect(json['data'].size).to be(1)
+        expect(json['data'].first['id'].to_i).to eq(find_collection.id)
       end
     end
 
