@@ -39,6 +39,7 @@ describe('CollectionPage', () => {
 
   it('displays the collection name', () => {
     expect(wrapper.find('EditableName').exists()).toEqual(true)
+    expect(wrapper.find('EditableName').props().name).toEqual(collection.name)
   })
 
   it('passes canEdit = false to EditableName', () => {
@@ -48,7 +49,6 @@ describe('CollectionPage', () => {
   it('passes collection to the CollectionGrid', () => {
     const grid = wrapper.find('InjectedCollectionGrid')
     expect(grid.props().collection).toBe(collection)
-
   })
 
   it('shows the roles edit menu on click of roles summary add button', () => {
