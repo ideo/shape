@@ -1,9 +1,14 @@
 import PropTypes from 'prop-types'
 import { observable, action } from 'mobx'
 import { observer } from 'mobx-react'
-import styled from 'styled-components'
 import { withStyles } from 'material-ui/styles'
-import v from '~/utils/variables'
+import {
+  FormButton,
+  FormActionsContainer,
+} from '~/ui/global/styled/forms'
+import {
+  RowItemRight,
+} from '~/ui/global/styled/layout'
 import AutoComplete from '~/ui/global/AutoComplete'
 import PillList from '~/ui/global/PillList'
 import Select from 'material-ui/Select'
@@ -16,31 +21,6 @@ const materialStyles = {
     '&:hover': { backgroundColor: 'transparent' },
   }
 }
-
-const Button = styled.button`
-  width: 183px;
-  text-transform: uppercase;
-  letter-spacing: 1.5px;
-  height: 40px;
-  font-weight: 500;
-  font-size: 16px;
-  font-family: Gotham;
-  cursor: pointer;
-  color: white;
-  border-radius: 19.5px;
-  border: none;
-  background-color: ${v.colors.blackLava};
-`
-
-const StyledActionBox = styled.div`
-  padding-bottom: 14px;
-  text-align: center;
-`
-
-const RowRight = styled.div`
-  float: right;
-  margin-right: 64px;
-`
 
 @observer
 class RolesAdd extends React.Component {
@@ -110,7 +90,7 @@ class RolesAdd extends React.Component {
             onItemDelete={this.onUserDelete}
           />)
         }
-        <RowRight>
+        <RowItemRight>
           <Select
             classes={classes}
             displayEmpty
@@ -122,14 +102,14 @@ class RolesAdd extends React.Component {
             <MenuItem value="editor">Editor</MenuItem>
             <MenuItem value="viewer">Viewer</MenuItem>
           </Select>
-        </RowRight>
+        </RowItemRight>
         <AutoComplete
           onInputChange={this.onUserSearch}
           onOptionSelect={this.onUserSelected}
         />
-        <StyledActionBox>
-          <Button onClick={this.handleSave}>Add</Button>
-        </StyledActionBox>
+        <FormActionsContainer>
+          <FormButton onClick={this.handleSave}>Add</FormButton>
+        </FormActionsContainer>
       </div>
     )
   }
