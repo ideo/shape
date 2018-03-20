@@ -2,6 +2,7 @@ import styled from 'styled-components'
 import v from '~/utils/variables'
 
 export const Heading2 = styled.h2`
+  text-tranform: uppercase;
   font-family: {v.fonts.sans};
   font-size: 1.5rem;
   font-weight: {v.weights.medium};

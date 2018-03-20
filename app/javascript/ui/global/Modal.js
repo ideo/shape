@@ -4,6 +4,7 @@ import styled from 'styled-components'
 import Dialog, { DialogContent, DialogTitle } from 'material-ui/Dialog'
 import { Heading2 } from '~/ui/global/styled/typography'
 import v from '~/utils/variables'
+import ArrowIcon from '~/ui/icons/ArrowIcon'
 import CloseIcon from '~/ui/icons/CloseIcon'
 
 const StyledDialog = styled(Dialog)`
@@ -24,6 +25,20 @@ const ModalCloseButton = styled.button`
 `
 ModalCloseButton.displayName = 'ModalCloseButton'
 
+const BackIconHolder = styled.button`
+  cursor: pointer;
+  display: block;
+  left: 10px;
+  position: absolute;
+  top: 33px;
+  width: 15px;
+`
+
+// TODO figure out what eslint is complaining about here
+const PaddedContent = styled.div`
+  padding: ${props => { return props.onBack ? '0 20px' : '0' }};
+`
+
 class Modal extends React.Component {
   handleClose = (ev) => {
     ev.preventDefault()
@@ -31,7 +46,7 @@ class Modal extends React.Component {
   }
 
   render() {
-    const { children, open, title } = this.props
+    const { children, open, onBack, title } = this.props
     return (
       <StyledDialog
         classes={{ paper: 'modal__paper' }}
@@ -40,6 +55,9 @@ class Modal extends React.Component {
         aria-labelledby={title}
         BackdropProps={{ invisible: true }}
       >
+        { !!onBack && (
+          <BackIconHolder onClick={onBack}><ArrowIcon /></BackIconHolder>
+        )}
         <ModalCloseButton onClick={this.handleClose}>
           <CloseIcon />
         </ModalCloseButton>
@@ -58,11 +76,13 @@ Modal.propTypes = {
   title: PropTypes.string.isRequired,
   children: PropTypes.node,
   open: PropTypes.bool,
+  onBack: PropTypes.func,
 }
 
 Modal.defaultProps = {
   children: <div />,
   open: false,
+  onBack: null,
 }
 
 export default Modal
