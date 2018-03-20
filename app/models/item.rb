@@ -78,6 +78,12 @@ class Item < ApplicationRecord
     Item
   end
 
+  def name
+    return read_attribute(:name) if read_attribute(:name).present?
+    return if filestack_file.blank?
+    filestack_file.filename_without_extension
+  end
+
   private
 
   def inherit_roles_from_parent

@@ -5,7 +5,7 @@ RSpec.describe Group, type: :model do
   let(:group) { create(:group, organization: organization) }
 
   context 'associations' do
-    it { should have_one :filestack_file }
+    it { should belong_to :filestack_file }
   end
 
   context 'with users in roles' do
