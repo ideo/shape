@@ -1,6 +1,7 @@
 import { Fragment } from 'react'
 import ReactRouterPropTypes from 'react-router-prop-types'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
+import { Flex, Box } from 'reflexbox'
 import styled from 'styled-components'
 
 import v from '~/utils/variables'
@@ -13,20 +14,16 @@ import Breadcrumb from '~/ui/layout/Breadcrumb'
 import RolesSummary from '~/ui/roles/RolesSummary'
 import RolesMenu from '~/ui/roles/RolesMenu'
 import EditableName from './shared/EditableName'
+import PageMenu from './shared/PageMenu'
 
 const isHomepage = ({ path }) => path === '/'
 
-const StyledTitleAndRoles = styled.div`
-  h1 {
-    float: left;
-  }
+const StyledTitleAndRoles = styled(Flex)`
   .roles-summary {
-    float: right;
-    @media only screen and (max-width: ${v.responsive.smallBreakpoint}px) {
+    @media only screen and (max-width: ${v.responsive.medBreakpoint}px) {
       display: none;
     }
   }
-  clear: both;
 `
 
 @inject('apiStore', 'uiStore')
@@ -106,19 +103,23 @@ class CollectionPage extends PageWithApi {
         {/* {uiStore.openCardMenuId && <ClickWrapper clickHandlers={clickHandlers} />} */}
         <Header>
           <Breadcrumb items={breadcrumb} />
-          <StyledTitleAndRoles>
-            <EditableName
-              name={collection.name}
-              updateNameHandler={this.updateCollectionName}
-              canEdit={collection.can_edit}
-            />
-            {this.renderName}
-            <RolesSummary
-              className="roles-summary"
-              handleClick={this.showObjectRoleDialog}
-              roles={collection.roles}
-              canEdit={collection.can_edit}
-            />
+          <StyledTitleAndRoles justify="space-between">
+            <Box>
+              <EditableName
+                name={collection.name}
+                updateNameHandler={this.updateCollectionName}
+                canEdit={collection.can_edit}
+              />
+            </Box>
+            <Flex align="baseline">
+              <RolesSummary
+                className="roles-summary"
+                handleClick={this.showObjectRoleDialog}
+                roles={collection.roles}
+                canEdit={collection.can_edit}
+              />
+              <PageMenu menuOpen={uiStore.pageMenuOpen} />
+            </Flex>
           </StyledTitleAndRoles>
         </Header>
         <PageContainer>
