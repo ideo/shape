@@ -45,6 +45,16 @@ export const FormButton = styled.button`
 `
 FormButton.displayName = 'StyledFormButton'
 
+export const TextButton = styled.button`
+  text-transform: uppercase;
+  font-family: ${v.fonts.sans};
+  font-size: 1rem;
+  font-weight: 500;
+  letter-spacing: 0.09375rem;
+  cursor: pointer;
+`
+TextButton.displayName = 'StyledTextButton'
+
 export const TextField = styled.input`
   width: 225px;
   padding-right: 4px;

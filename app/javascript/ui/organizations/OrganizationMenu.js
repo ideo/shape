@@ -1,8 +1,10 @@
 import { action, observable } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
+import { TextButton } from '~/ui/global/styled/forms'
 import { Row } from '~/ui/global/styled/layout'
-import { Heading3, DisplayText, TextButton } from '~/ui/global/styled/typography'
+import { Heading3, DisplayText } from '~/ui/global/styled/typography'
 import Modal from '~/ui/global/Modal'
+import GroupModify from '~/ui/groups/GroupModify'
 import OrganizationEdit from './OrganizationEdit'
 
 @inject('uiStore')
@@ -117,6 +119,7 @@ class OrganizationMenu extends React.Component {
 
 OrganizationMenu.propTypes = {
   organization: MobxPropTypes.objectOrObservableObject.isRequired,
+  userGroups: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 OrganizationMenu.wrappedComponent.propTypes = {
   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,

@@ -25,13 +25,6 @@ const IconHolder = styled.span`
 `
 IconHolder.displayName = 'StyledIconHolder'
 
-const IconHolder = styled.span`
-  width: 9px;
-  height: 20px;
-  margin-left: 0px;
-  margin-bottom: 2px;
-`
-
 @observer
 class PillList extends React.Component {
   handleDelete = item => () => {
