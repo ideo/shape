@@ -1,7 +1,7 @@
 import { action, observable } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import { TextButton } from '~/ui/global/styled/forms'
-import { Row } from '~/ui/global/styled/layout'
+import { Row, RowItemRight } from '~/ui/global/styled/layout'
 import { Heading3, DisplayText } from '~/ui/global/styled/typography'
 import Modal from '~/ui/global/Modal'
 import GroupModify from '~/ui/groups/GroupModify'
@@ -32,7 +32,11 @@ class OrganizationMenu extends React.Component {
     this.addGroupOpen = true
   }
 
-  @observable editOrganizationOpen = null;
+  @action handleBack = () => {
+    this.editOrganizationOpen = false
+    this.addGroupOpen = false
+    this.editGroup = {}
+  }
 
   handleClose = (ev) => {
     const { uiStore } = this.props
@@ -64,9 +68,11 @@ class OrganizationMenu extends React.Component {
     return (
       <div>
         <Row>
-          <TextButton onClick={this.handleGroupAddClick}>
-            + New Group
-          </TextButton>
+          <RowItemRight>
+            <TextButton onClick={this.handleGroupAddClick}>
+              + New Group
+            </TextButton>
+          </RowItemRight>
         </Row>
         <Heading3>
           Your Organization
@@ -96,18 +102,20 @@ class OrganizationMenu extends React.Component {
   render() {
     const { uiStore } = this.props
     let content = this.renderBase()
+    let title = 'People & Groups'
     if (this.editOrganizationOpen) {
       content = this.renderEditOrganization()
+      title = 'Your Organization'
     } else if (this.addGroupOpen) {
       content = this.renderEditGroup()
+      title = this.editGroup.id ? this.editGroup.name : 'New Group'
     }
     // TODO correct title for each 3 states
     return (
       <Modal
-        title={this.editOrganizationOpen
-          ? 'Your Organization'
-          : 'People & Groups'}
+        title={title}
         onClose={this.handleClose}
+        onBack={(this.editOrganizationOpen || this.addGroupOpen) && this.handleBack}
         open={uiStore.organizationMenuOpen}
       >
         { content }
