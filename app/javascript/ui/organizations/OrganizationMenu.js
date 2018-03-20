@@ -1,7 +1,7 @@
 import { action, observable } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import { Row } from '~/ui/global/styled/layout'
-import { Heading3, DisplayText } from '~/ui/global/styled/typography'
+import { Heading3, DisplayText, TextButton } from '~/ui/global/styled/typography'
 import Modal from '~/ui/global/Modal'
 import OrganizationEdit from './OrganizationEdit'
 
