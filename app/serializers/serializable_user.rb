@@ -12,7 +12,8 @@ class SerializableUser < BaseJsonSerializer
     end
   end
   has_many :organizations
+  # TODO this probably isn't needed
   has_many :groups do
-    data { @object.current_groups }
+    data { @object.groups }
   end
 end
