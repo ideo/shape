@@ -21,6 +21,6 @@ describe('ImageItemCover', () => {
   })
 
   it('passes the url to StyledImageCover', () => {
-    expect(wrapper.find('StyledImageCover').props().url).toEqual(fakeImageItem.filestack_file.url)
+    expect(wrapper.find('StyledImageCover').props().url).toEqual(fakeImageItem.filestack_file_url)
   })
 })

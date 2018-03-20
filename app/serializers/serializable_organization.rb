@@ -1,9 +1,9 @@
 class SerializableOrganization < BaseJsonSerializer
   type 'organizations'
   attributes :id, :name
-  attribute :pic_url_square do
-    if @object.pic_url_square
-      @object.pic_url_square
+  attribute :filestack_file_url do
+    if @object.filestack_file_url.present?
+      @object.filestack_file_url
     else
       'https://cdn.filestackcontent.com/XYWsMijFTDWBsGzzKEEo'
     end

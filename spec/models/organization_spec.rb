@@ -9,6 +9,7 @@ describe Organization, type: :model do
     it { should have_many :collections }
     it { should have_many :groups }
     it { should belong_to :primary_group }
+    it { should belong_to :filestack_file }
   end
 
   context 'callbacks' do

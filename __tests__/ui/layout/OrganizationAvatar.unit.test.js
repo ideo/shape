@@ -19,8 +19,8 @@ describe('OrganizationAvatar', () => {
     )
   })
 
-  it('renders the url if pic_url_square exists', () => {
-    props.organization.pic_url_square = 'testfile.jpg'
+  it('renders the url if filestack_file_url exists', () => {
+    props.organization.filestack_file_url = 'testfile.jpg'
     wrapper = mount(
       <OrganizationAvatar {...props} />
     )

@@ -21,7 +21,7 @@ describe('ImageItem', () => {
   })
 
   it('passes the url and alt text to StyledImage', () => {
-    expect(wrapper.find('StyledImage').props().src).toEqual(fakeImageItem.filestack_file.url)
+    expect(wrapper.find('StyledImage').props().src).toEqual(fakeImageItem.filestack_file_url)
     expect(wrapper.find('StyledImage').props().alt).toEqual(fakeImageItem.name)
   })
 })

@@ -44,13 +44,7 @@ class Api::V1::ItemsController < Api::V1::BaseController
       :url,
       :image,
       :archived,
-      filestack_file_attributes: [
-        :url,
-        :handle,
-        :filename,
-        :size,
-        :mimetype,
-      ],
+      filestack_file_attributes: Item.filestack_file_attributes_whitelist,
     )
   end
 end

@@ -3,7 +3,7 @@ import { PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 
 import v from '~/utils/variables'
-import UserAvatar from './UserAvatar'
+import UserAvatar from '~/ui/layout/UserAvatar'
 
 const MAX_USERS_TO_SHOW = 5
 
@@ -136,6 +136,8 @@ class RolesSummary extends React.PureComponent {
   }
 
   get addUserBtn() {
+    const { canEdit } = this.props
+    if (!canEdit) return ''
     return (
       <StyledAddUserBtn
         onClick={this.props.handleClick}
@@ -158,11 +160,13 @@ class RolesSummary extends React.PureComponent {
 RolesSummary.propTypes = {
   roles: MobxPropTypes.arrayOrObservableArray.isRequired,
   handleClick: PropTypes.func.isRequired,
-  className: PropTypes.string
+  className: PropTypes.string,
+  canEdit: PropTypes.bool,
 }
 
 RolesSummary.defaultProps = {
-  className: ''
+  className: '',
+  canEdit: false,
 }
 
 export default RolesSummary
