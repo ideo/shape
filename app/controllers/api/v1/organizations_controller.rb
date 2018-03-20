@@ -25,7 +25,6 @@ class Api::V1::OrganizationsController < Api::V1::BaseController
   def organization_params
     params.require(:organization).permit(
       :name,
-      :pic_url_square,
       filestack_file_attributes: Organization.filestack_file_attributes_whitelist,
     )
   end

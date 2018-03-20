@@ -3,7 +3,7 @@ class FilestackFile < ApplicationRecord
   has_one :group
   has_one :organization
 
-  validates :url, :handle, presence: true
+  validates :url, :handle, :mimetype, presence: true
 
   after_create :process_image, if: :image?
   after_destroy :delete_on_filestack

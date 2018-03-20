@@ -35,7 +35,7 @@ class OrganizationAvatar extends React.Component {
         size={size}
         onClick={this.handleClick}
         className="orgAvatar"
-        src={organization.pic_url_square}
+        src={organization.filestack_file_url}
       />
     )
   }
