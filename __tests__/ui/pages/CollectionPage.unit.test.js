@@ -46,6 +46,10 @@ describe('CollectionPage', () => {
     expect(wrapper.find('EditableName').props().canEdit).toEqual(false)
   })
 
+  it('passes canEdit = false to RolesSummary', () => {
+    expect(wrapper.find('RolesSummary').props().canEdit).toEqual(false)
+  })
+
   it('passes collection to the CollectionGrid', () => {
     const grid = wrapper.find('InjectedCollectionGrid')
     expect(grid.props().collection).toBe(collection)
@@ -66,6 +70,10 @@ describe('CollectionPage', () => {
 
     it('passes canEdit = true to EditableName', () => {
       expect(wrapper.find('EditableName').props().canEdit).toEqual(true)
+    })
+
+    it('passes canEdit = true to RolesSummary', () => {
+      expect(wrapper.find('RolesSummary').props().canEdit).toEqual(true)
     })
   })
 })
