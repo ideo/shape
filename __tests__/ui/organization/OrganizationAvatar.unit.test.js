@@ -12,7 +12,7 @@ describe('OrganizationAvatar', () => {
       },
       organization: {
         name: 'Space',
-        pic_url_square: 'test.jpg',
+        filestack_file_url: 'test.jpg',
       }
     }
     wrapper = mount(
@@ -25,7 +25,7 @@ describe('OrganizationAvatar', () => {
     wrapper = mount(
       <OrganizationAvatar {...props} />
     )
-    expect(wrapper.find('Avatar').props().src).toEqual('testfile.jpg')
+    expect(wrapper.find('Avatar').first().props().url).toEqual('testfile.jpg')
   })
 
   it('should open the organization menu in the ui store on click', () => {

@@ -19,7 +19,7 @@ class OrganizationAvatar extends React.Component {
           title={organization.name}
           size={size}
           className="orgAvatar"
-          url={organization.pic_url_square}
+          url={organization.filestack_file_url}
         />
       </button>
     )

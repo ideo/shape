@@ -12,7 +12,7 @@ class UserAvatar extends React.Component {
         title={user.name}
         size={size}
         className={className}
-        url={user.pic_url_square}
+        url={user.filestack_file_url}
       />
     )
   }
