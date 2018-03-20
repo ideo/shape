@@ -15,14 +15,18 @@ class TagEditor extends React.Component {
     super(props)
     this.saveTags = _.debounce(this._saveTags, 1000)
     // `id` is used by react-tag-autocomplete, but otherwise doesn't hold any meaning
-    this.tags = _.map(props.record.tag_list.toJS(), (t, i) => ({
+    this.tags = _.map([...props.record.tag_list], (t, i) => ({
       id: i, name: t
     }))
   }
 
+  componentWillUnmount() {
+    this.saveTags.flush()
+  }
+
   _saveTags = () => {
     const { record } = this.props
-    record.tag_list = _.map(this.tags.toJS(), t => t.name).join(', ')
+    record.tag_list = _.map([...this.tags], t => t.name).join(', ')
     record.save()
   }
 
@@ -32,7 +36,8 @@ class TagEditor extends React.Component {
       this.tags.push(tag)
       this.saveTags()
     } else {
-      // tag already exists, don't add to the list. Notify the user?
+      // tag already exists, don't add to the list.
+      // Any error/message in the UI needed?
     }
   }
 
@@ -51,7 +56,7 @@ class TagEditor extends React.Component {
         open={uiStore.tagsModalOpen}
       >
         <ReactTags
-          tags={this.tags.toJS()}
+          tags={[...this.tags]}
           delimiterChars={[',']}
           placeholder="Add new tags, comma separated"
           handleAddition={this.handleAddition}

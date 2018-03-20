@@ -5,7 +5,8 @@
     "name": { "type": "string" },
     "created_at": { "type": "date" },
     "breadcrumb": { "type": ["array", "null"] },
-    "can_edit": { "type": ["boolean"] }
+    "can_edit": { "type": ["boolean"] },
+    "tag_list": { "type": ["array", "null"] }
   },
   "required": ["id", "name", "created_at"]
 }
