@@ -46,6 +46,7 @@ describe Api::V1::GroupsController, type: :request, auth: true do
 
   describe 'POST #create' do
     let!(:organization) { create(:organization, admin: user) }
+    let(:current_user) { user }
     let(:path) { '/api/v1/groups' }
     let(:params) do
       json_api_params(
@@ -64,6 +65,11 @@ describe Api::V1::GroupsController, type: :request, auth: true do
 
     it 'creates new group' do
       expect { post(path, params: params) }.to change(Group, :count).by(1)
+    end
+
+    it 'adds the current user as an admin to the group' do
+      post(path, params: params)
+      expect(Group.find(json['data']['attributes']['id']).admins[0]).to eq(current_user)
     end
 
     it 'matches JSON schema' do
