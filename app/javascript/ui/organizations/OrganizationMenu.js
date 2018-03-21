@@ -110,19 +110,22 @@ class OrganizationMenu extends React.Component {
     const { uiStore } = this.props
     let content = this.renderBase()
     let title = 'People & Groups'
+    let onBack
     if (this.editOrganizationOpen) {
       content = this.renderEditOrganization()
       title = 'Your Organization'
+      onBack = this.handleBack
     } else if (this.modifyGroupOpen) {
       content = this.renderEditGroup()
       title = this.editGroup.id ? this.editGroup.name : 'New Group'
+      onBack = this.handleBack
     }
     // TODO correct title for each 3 states
     return (
       <Modal
         title={title}
         onClose={this.handleClose}
-        onBack={(this.editOrganizationOpen || this.modifyGroupOpen) && this.handleBack}
+        onBack={onBack}
         open={uiStore.organizationMenuOpen}
       >
         { content }
