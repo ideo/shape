@@ -78,7 +78,8 @@ export const fakeUserAttrs = {
   first_name: 'Oprah',
   last_name: 'Winfrey',
   email: 'oprah@winfrey.com',
-  filestack_file_url: 'https://filestackcdn.com/abc123'
+  filestack_file_url: 'https://filestackcdn.com/abc123',
+  groups: [],
 }
 export const fakeUser = {
   ...fakeUserAttrs,
