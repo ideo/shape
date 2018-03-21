@@ -3,6 +3,7 @@ import ReactRouterPropTypes from 'react-router-prop-types'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import { Flex, Box } from 'reflexbox'
 import styled from 'styled-components'
+import { animateScroll as scroll } from 'react-scroll'
 
 import v from '~/utils/variables'
 import PageWithApi from '~/ui/pages/PageWithApi'
@@ -33,6 +34,11 @@ const StyledTitleAndRoles = styled(Flex)`
 @inject('apiStore', 'uiStore')
 @observer
 class CollectionPage extends PageWithApi {
+  componentDidMount() {
+    super.componentDidMount()
+    scroll.scrollToTop({ duration: 0 })
+  }
+
   componentWillReceiveProps(nextProps) {
     super.componentWillReceiveProps(nextProps)
     // when navigating between collections, close BCT

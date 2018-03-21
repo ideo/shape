@@ -8,6 +8,7 @@ import styled from 'styled-components'
 
 import v from '~/utils/variables'
 import SearchIcon from '~/ui/icons/SearchIcon'
+import CloseIcon from '~/ui/icons/CloseIcon'
 
 const StyledSearchBar = styled.div`
   border-bottom: 1px solid ${props => (props.focused ? v.colors.blackLava : v.colors.cloudy)};
@@ -15,9 +16,15 @@ const StyledSearchBar = styled.div`
   height: 28px;
   margin-right: 16px;
   position: relative;
+  width: 205px;
+  @media only screen and (max-width: ${v.responsive.smallBreakpoint}px) {
+    width: 140px;
+  }
+
 
   input {
     display: inline-block;
+    width: 60%;
     font-size: 1rem;
     padding-left: 14px;
     background: none;
@@ -39,12 +46,11 @@ const StyledSearchBar = styled.div`
   }
   .close {
     position: absolute;
-    right: 0;
-    bottom: -4px;
-    font-size: 2.25rem;
+    right: 2px;
+    bottom: 10px;
     color: ${v.colors.cloudy};
     &:hover {
-      color: ${v.colors.linkHover};
+      color: black;
     }
   }
 `
@@ -118,9 +124,11 @@ class SearchBar extends React.Component {
           onBlur={this.handleFocus(false)}
           onChange={this.handleTextChange}
         />
-        <button onClick={this.clearSearch} className="close">
-          &times;
-        </button>
+        {this.searchText &&
+          <button onClick={this.clearSearch} className="close">
+            <CloseIcon />
+          </button>
+        }
       </StyledSearchBar>
     )
   }

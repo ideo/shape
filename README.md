@@ -14,10 +14,10 @@ brew install postgresql
 Clone the app and install the gems:
 ```
 git clone <clone URL>
-cd oie-2/
+cd shape/
 rvm install ruby 2.4.3
 cd ..
-cd oie-2/
+cd shape/
 gem install bundler
 bundle install
 yarn install
