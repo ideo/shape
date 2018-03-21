@@ -35,13 +35,13 @@ class CollectionCard < ApplicationRecord
     exclude_association :parent
   end
 
-  def duplicate!(shallow: false, update_order: false)
+  def duplicate!(for_user:, shallow: false, update_order: false)
     cc = amoeba_dup
     cc.order += 1
 
     unless shallow
-      cc.collection = collection.duplicate! if collection.present?
-      cc.item = item.duplicate! if item.present?
+      cc.collection = collection.duplicate!(for_user: for_user) if collection.present?
+      cc.item = item.duplicate!(for_user: for_user) if item.present?
     end
 
     if cc.save && update_order

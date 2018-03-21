@@ -36,7 +36,7 @@ module Roles
 
     def build_child_roles(child)
       roles.map do |role|
-        role.build_copy(child)
+        role.duplicate!(assign_resource: child)
       end
     end
 

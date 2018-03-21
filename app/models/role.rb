@@ -50,8 +50,14 @@ class Role < ApplicationRecord
     [role_name, resource_identifier].select(&:present?).join('_')
   end
 
-  # Builds a copy of this role,
-  # allowing you to copy from one object to another
+  def duplicate!(assign_resource: nil)
+    r = amoeba_dup
+    r.resource = assign_resource if assign_resource.present?
+    r.save
+    r
+  end
+
+  # Builds a copy of this role - for changing the resource
   def build_copy(new_object)
     # Use amoeba_dup so it copies all associated users_roles
     new_role = amoeba_dup

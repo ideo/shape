@@ -48,15 +48,22 @@ class Item < ApplicationRecord
     []
   end
 
-  def duplicate!(copy_parent_card: false)
+  def duplicate!(for_user:, copy_parent_card: false)
     # Clones item
     i = amoeba_dup
     i.cloned_from = self
 
     # Clone parent + increase order
     if copy_parent_card && parent_collection_card.present?
-      i.parent_collection_card = parent_collection_card.duplicate!(shallow: true)
+      i.parent_collection_card = parent_collection_card.duplicate!(
+        for_user: for_user,
+        shallow: true,
+      )
       i.parent_collection_card.item = i
+    end
+
+    roles.each do |role|
+      i.roles << role.duplicate!(assign_resource: i)
     end
 
     # Method from HasFilestackFile
