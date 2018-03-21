@@ -21,8 +21,8 @@ describe('GroupModify', () => {
   beforeEach(() => {
     useStrict(false)
     props = {
-      group: {
-      }
+      onSave: jest.fn(),
+      group: {},
     }
     apiStore = {
       fetch: jest.fn(),
@@ -43,21 +43,58 @@ describe('GroupModify', () => {
         expect(component.instance().editingGroup.handle).toEqual('')
         expect(component.instance().editingGroup.filestack_file_url).toEqual('')
       })
+
+      it('should set syncing to true', () => {
+        expect(component.instance().syncing).toBeTruthy()
+      })
     })
 
     describe('with an existing group to be edited', () => {
-      it('should should copy the existing group attrs to editingGroup', () => {
+      beforeEach(() => {
         props.group = {
+          id: 1,
           name: 'tester',
           handle: 'test-er',
           filestack_file_url: 'test.jpg'
         }
         mountComponent()
         component = wrapper.find('GroupModify')
+      })
+
+      it('should should copy the existing group attrs to editingGroup', () => {
         expect(component.instance().editingGroup.name).toEqual('tester')
         expect(component.instance().editingGroup.handle).toEqual('test-er')
         expect(component.instance().editingGroup.filestack_file_url)
           .toEqual('test.jpg')
+      })
+
+      it('should set syncing to false', () => {
+        expect(component.instance().syncing).toBeFalsy()
+      })
+    })
+  })
+
+  describe('handleHandleChange', () => {
+    describe('with an uncreated group', () => {
+      it('should set syncing to false', () => {
+        component.instance().handleHandleChange({ target: { value: 'a' } })
+        expect(component.instance().syncing).toBeFalsy()
+      })
+    })
+  })
+
+  describe('handleNameChange', () => {
+    describe('with an uncreated group', () => {
+      it('should set the handle with a name', () => {
+        const name = 'hello'
+        component.instance().handleNameChange({ target: { value: name } })
+        expect(component.instance().editingGroup.handle).toEqual(name)
+      })
+
+      it('should should transform the name to be a handle', () => {
+        const name = 'hello world!'
+        component.instance().handleNameChange({ target: { value: name } })
+        expect(component.instance().editingGroup.handle).toEqual('hello-world')
       })
     })
   })

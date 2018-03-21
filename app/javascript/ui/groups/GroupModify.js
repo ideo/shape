@@ -1,6 +1,7 @@
 import PropTypes from 'prop-types'
 import { action, observable, toJS } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
+import parameterize from 'parameterize'
 import {
   FormButton,
   FieldContainer,
@@ -11,6 +12,11 @@ import {
 } from '~/ui/global/styled/forms'
 import FilestackUpload from '~/utils/FilestackUpload'
 import Group from '~/stores/jsonApi/Group'
+
+function transformToHandle(name) {
+  // Keep in sync with models/group.rb
+  return parameterize(name)
+}
 
 @inject('apiStore')
 @observer
@@ -23,9 +29,15 @@ class GroupModify extends React.Component {
       handle: group.handle || '',
       filestack_file_url: group.filestack_file_url || '',
     }
+    if (!group.id) this.setSyncing(true)
   }
 
   @observable editingGroup = null
+  @observable syncing = false
+
+  @action setSyncing(val) {
+    this.syncing = val
+  }
 
   @action
   changeName(name) {
@@ -44,8 +56,6 @@ class GroupModify extends React.Component {
 
   @action afterSave(res) {
     const { apiStore } = this.props
-    // TODO because we're pulling groups from currentUser we have to update
-    // it manually. Is there a way to not have to do this?
     const existing = apiStore.currentUser.groups.find(
       existingGroup => existingGroup.id === res.id
     )
@@ -56,10 +66,12 @@ class GroupModify extends React.Component {
 
   handleNameChange = (ev) => {
     this.changeName(ev.target.value)
+    if (this.syncing) this.changeHandle(transformToHandle(ev.target.value))
   }
 
   handleHandleChange = (ev) => {
     this.changeHandle(ev.target.value)
+    this.setSyncing(false)
   }
 
   handleImagePick = (ev) => {
