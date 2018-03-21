@@ -73,6 +73,7 @@ export const fakeCollection = {
   cardIds: [
     fakeItemCard.id, fakeItemCard.id, fakeItemCard.id
   ],
+  API_archive: jest.fn(),
 }
 export const fakeUserAttrs = {
   id: 1,

@@ -247,4 +247,48 @@ describe Api::V1::CollectionsController, type: :request, auth: true do
       expect(collection_card.reload.order).to eq(1)
     end
   end
+
+  describe 'PATCH #archive' do
+    let!(:collection) { create(:collection, add_editors: [user]) }
+    # parent_collection_card is required to exist because it calls decrement_card_orders
+    let!(:parent_collection_card) { create(:collection_card, collection: collection) }
+    let(:collection_card) do
+      create(:collection_card_item, order: 0, width: 1, parent: collection)
+    end
+    let(:path) { "/api/v1/collections/#{collection.id}/archive" }
+
+    it 'returns a 200' do
+      puts path
+      patch(path)
+      expect(response.status).to eq(200)
+    end
+
+    it 'matches Collection schema' do
+      patch(path)
+      expect(json['data']['attributes']).to match_json_schema('collection')
+    end
+
+    it 'updates the archived status of the collection' do
+      expect(collection.active?).to eq(true)
+      patch(path)
+      expect(collection.reload.archived?).to eq(true)
+    end
+
+    it 'updates the archived status of the collection_card' do
+      expect(collection_card.active?).to eq(true)
+      patch(path)
+      expect(collection_card.reload.archived?).to eq(true)
+    end
+
+    context 'without edit access' do
+      before do
+        user.remove_role(Role::EDITOR, collection)
+      end
+
+      it 'rejects non-editors' do
+        patch(path)
+        expect(response.status).to eq(401)
+      end
+    end
+  end
 end

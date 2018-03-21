@@ -2,10 +2,11 @@ import { PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 import { Link } from 'react-router-dom'
 
+import { routingStore } from '~/stores'
+
 const BreadcrumbPadding = styled.div`
   height: 1.7rem;
 `
-
 BreadcrumbPadding.displayName = 'BreadcrumbPadding'
 
 const StyledBreadcrumb = styled.div`
@@ -35,7 +36,7 @@ StyledBreadcrumb.displayName = 'StyledBreadcrumb'
 class Breadcrumb extends React.PureComponent {
   breadcrumbItem = (item) => {
     const [klass, id, name] = item
-    const path = `/${klass}/${id}`
+    const path = routingStore.pathTo(klass, id)
     return (
       <Link key={path} to={path}>
         {name}

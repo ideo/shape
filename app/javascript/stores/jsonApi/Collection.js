@@ -1,5 +1,7 @@
 import _ from 'lodash'
 import { computed } from 'mobx'
+
+import { routingStore } from '~/stores'
 import BaseRecord from './BaseRecord'
 
 class Collection extends BaseRecord {
@@ -7,6 +9,23 @@ class Collection extends BaseRecord {
 
   @computed get cardIds() {
     return this.collection_cards.map(card => card.id)
+  }
+
+  API_archive() {
+    // eslint-disable-next-line no-alert
+    const agree = window.confirm('Are you sure?')
+    if (agree) {
+      return this.apiStore.request(`collections/${this.id}/archive`, 'PATCH').then(() => {
+        // NOTE: should we handle the redirect here, or in the PageMenu/etc?
+        let redirect = '/'
+        if (this.breadcrumb.length >= 2) {
+          const [klass, id] = this.breadcrumb[this.breadcrumb.length - 2]
+          redirect = routingStore.pathTo(klass, id)
+        }
+        routingStore.push(redirect)
+      })
+    }
+    return false
   }
 
   API_updateCards() {

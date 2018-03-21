@@ -38,10 +38,9 @@ class CardMenu extends React.PureComponent {
 
     if (this.props.canEdit) {
       items = [
-        { name: 'Share', icon: <ShareIcon />, onClick: this.props.handleShare },
         duplicateItem,
+        { name: 'Move', icon: <MoveIcon />, onClick: this.props.handleMove },
         { name: 'Link', icon: <LinkIcon />, onClick: this.props.handleLink },
-        { name: 'Organize', icon: <MoveIcon />, onClick: this.props.handleOrganize },
         { name: 'Archive', icon: <ArchiveIcon />, onClick: this.props.handleArchive },
       ]
     } else {
@@ -67,10 +66,9 @@ class CardMenu extends React.PureComponent {
 CardMenu.propTypes = {
   cardId: PropTypes.number.isRequired,
   className: PropTypes.string,
-  handleShare: PropTypes.func.isRequired,
   handleDuplicate: PropTypes.func.isRequired,
   handleLink: PropTypes.func.isRequired,
-  handleOrganize: PropTypes.func.isRequired,
+  handleMove: PropTypes.func.isRequired,
   handleArchive: PropTypes.func.isRequired,
   menuOpen: PropTypes.bool.isRequired,
   canEdit: PropTypes.bool.isRequired,

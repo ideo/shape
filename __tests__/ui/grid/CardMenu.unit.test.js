@@ -7,7 +7,7 @@ const props = {
   handleShare: jest.fn(),
   handleDuplicate: jest.fn(),
   handleLink: jest.fn(),
-  handleOrganize: jest.fn(),
+  handleMove: jest.fn(),
   handleArchive: jest.fn(),
   uiStore: {
     openCardMenuId: false,
@@ -23,10 +23,9 @@ describe('CardMenu', () => {
   describe('as editor', () => {
     beforeEach(() => {
       actions = [
-        'Share',
         'Duplicate',
+        'Move',
         'Link',
-        'Organize',
         'Archive'
       ]
       props.canEdit = true
@@ -35,9 +34,9 @@ describe('CardMenu', () => {
       )
     })
 
-    it('creates a PopoutMenu with all 5 editable actions', () => {
+    it('creates a PopoutMenu with all editable actions', () => {
       const popout = wrapper.find('PopoutMenu').at(0)
-      expect(popout.props().menuItems.length).toEqual(5)
+      expect(popout.props().menuItems.length).toEqual(actions.length)
       expect(_.map(popout.props().menuItems, i => i.name)).toEqual(actions)
     })
   })

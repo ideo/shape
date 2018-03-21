@@ -98,9 +98,9 @@ class CollectionPage extends PageWithApi {
 
     const breadcrumb = this.isHomepage ? [] : collection.breadcrumb
 
-    const clickHandlers = [
-      () => uiStore.openCardMenu(false)
-    ]
+    // const clickHandlers = [
+    //   () => uiStore.openCardMenu(false)
+    // ]
 
     return (
       <Fragment>

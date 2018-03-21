@@ -5,6 +5,7 @@ import { PropTypes as MobxPropTypes } from 'mobx-react'
 import { uiStore } from '~/stores'
 import TagIcon from '~/ui/icons/TagIcon'
 import PermissionsIcon from '~/ui/icons/PermissionsIcon'
+import ArchiveIcon from '~/ui/icons/ArchiveIcon'
 import PopoutMenu from '~/ui/global/PopoutMenu'
 import TagEditor from '~/ui/pages/shared/TagEditor'
 
@@ -28,10 +29,16 @@ class PageMenu extends React.PureComponent {
     uiStore.update('rolesMenuOpen', true)
   }
 
+  archiveRecord = () => {
+    uiStore.update('pageMenuOpen', false)
+    this.props.record.API_archive()
+  }
+
   get menuItems() {
     const items = [
       { name: 'Tags', icon: <TagIcon />, onClick: this.showTags },
       { name: 'Permissions', icon: <PermissionsIcon />, onClick: this.showRolesMenu },
+      { name: 'Archive', icon: <ArchiveIcon />, onClick: this.archiveRecord },
     ]
     return items
   }
