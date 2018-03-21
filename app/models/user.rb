@@ -90,6 +90,47 @@ class User < ApplicationRecord
     collections.user.find_by_organization_id(current_organization_id)
   end
 
+  def viewable_collections_and_items(organization)
+    Role.user_resources(
+      user: self,
+      resource_type: %i[Collection Item],
+    ).select do |resource|
+      if resource.archived?
+        false
+      elsif resource.respond_to?(:organization_id)
+        resource.organization_id == organization.id
+      else
+        # TODO: this is potentially including items from other orgs
+        # For now, most people will belong only to one org, so leaving it in.
+        true
+      end
+    end
+  end
+
+  def collection_and_group_identifiers(organization)
+    # Always include primary group
+    identifiers = [organization.primary_group.resource_identifier]
+
+    # Get all content user can see, in this org
+    identifiers |= viewable_collections_and_items(organization)
+                   .map(&:resource_identifier)
+
+    # All groups user is a member of in this org
+    identifiers | groups.where(organization_id: organization.id)
+                        .map(&:resource_identifier)
+  end
+
+  def users_through_collections_items_and_groups(organization)
+    identifiers = collection_and_group_identifiers(organization)
+
+    User.distinct(User.arel_table[:id])
+        .joins(:roles)
+        .where(Role.arel_table[:resource_identifier].in(identifiers))
+        .where.not(id: id)
+        .order(first_name: :asc)
+        .to_a
+  end
+
   # Override rolify has_role? and add_role methods to ensure
   # we always pass root class, not STI child class - which it can't handle
   def has_role?(role_name, resource = nil)
