@@ -10,7 +10,7 @@ class Api::V1::GroupsController < Api::V1::BaseController
   end
 
   def show
-    render jsonapi: @group, include: %i[admins members]
+    render jsonapi: @group, include: [roles: [:users]]
   end
 
   def create
