@@ -98,13 +98,8 @@ class CollectionPage extends PageWithApi {
 
     const breadcrumb = this.isHomepage ? [] : collection.breadcrumb
 
-    // const clickHandlers = [
-    //   () => uiStore.openCardMenu(false)
-    // ]
-
     return (
       <Fragment>
-        {/* {uiStore.openCardMenuId && <ClickWrapper clickHandlers={clickHandlers} />} */}
         <Header>
           <Breadcrumb items={breadcrumb} />
           <StyledTitleAndRoles justify="space-between">

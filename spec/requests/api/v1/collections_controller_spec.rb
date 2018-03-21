@@ -258,7 +258,6 @@ describe Api::V1::CollectionsController, type: :request, auth: true do
     let(:path) { "/api/v1/collections/#{collection.id}/archive" }
 
     it 'returns a 200' do
-      puts path
       patch(path)
       expect(response.status).to eq(200)
     end
