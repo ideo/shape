@@ -52,11 +52,7 @@ describe('GroupModify', () => {
           handle: 'test-er',
           filestack_file_url: 'test.jpg'
         }
-        wrapper = mount(
-          <Provider apiStore={apiStore}>
-            <GroupModify.wrappedComponent {...props} />
-          </Provider>
-        )
+        mountComponent()
         component = wrapper.find('GroupModify')
         expect(component.instance().editingGroup.name).toEqual('tester')
         expect(component.instance().editingGroup.handle).toEqual('test-er')
