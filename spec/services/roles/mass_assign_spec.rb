@@ -1,18 +1,29 @@
 require 'rails_helper'
 
-RSpec.describe Roles::AssignToUsers, type: :service do
+RSpec.describe Roles::MassAssign, type: :service do
   let(:organization) { create(:organization) }
   let(:object) { create(:text_item) }
   let(:users) { create_list(:user, 3) }
+  let(:groups) { create_list(:group, 3) }
   let(:role_name) { :editor }
   let(:assign_role) do
-    Roles::AssignToUsers.new(object: object, role_name: role_name, users: users)
+    Roles::MassAssign.new(
+      object: object,
+      role_name: role_name,
+      users: users,
+      groups: groups,
+    )
   end
 
   describe '#call' do
     it 'assigns role to users' do
       expect(assign_role.call).to be true
-      expect(users.all? { |user| user.reload.has_role?(:editor, object) }).to be true
+      expect(users.all? { |user| user.has_role?(:editor, object) }).to be true
+    end
+
+    it 'assigns role to groups' do
+      expect(assign_role.call).to be true
+      expect(groups.all? { |group| group.has_role?(:editor, object) }).to be true
     end
 
     context 'given pending users' do
@@ -20,7 +31,7 @@ RSpec.describe Roles::AssignToUsers, type: :service do
 
       it 'assigns role to users' do
         expect(assign_role.call).to be true
-        expect(users.all? { |user| user.reload.has_role?(:editor, object) }).to be true
+        expect(users.all? { |user| user.has_role?(:editor, object) }).to be true
       end
     end
 

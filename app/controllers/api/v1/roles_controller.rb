@@ -19,15 +19,18 @@ class Api::V1::RolesController < Api::V1::BaseController
   # Params:
   # - role: { name: 'editor' }
   # - user_ids: array of of users that you want to assign
+  # - group_ids: array of group ids that you want to assign
   # Returns:
   # - array of roles successfully created, including users with that role
   # /[collections/items]/:id/roles
   def create
     users = User.where(id: json_api_params[:user_ids]).to_a
-    assigner = Roles::AssignToUsers.new(
+    groups = User.where(id: json_api_params[:group_ids]).to_a
+    assigner = Roles::MassAssign.new(
       object: record,
       role_name: role_params[:name],
       users: users,
+      groups: groups,
     )
     if assigner.call
       render jsonapi: record.roles, include: %i[users resource]

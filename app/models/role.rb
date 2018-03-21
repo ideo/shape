@@ -2,6 +2,9 @@ class Role < ApplicationRecord
   has_many :users_roles, dependent: :destroy
   has_many :users, through: :users_roles
 
+  has_many :groups_roles, dependent: :destroy
+  has_many :groups, through: :groups_roles
+
   belongs_to :resource,
              polymorphic: true,
              optional: true
@@ -26,8 +29,10 @@ class Role < ApplicationRecord
   amoeba do
     enable
     include_association :users_roles
-    exclude_association :resource
+    include_association :groups_roles
     exclude_association :users
+    exclude_association :groups
+    exclude_association :resource
   end
 
   # All the resources of a specific type (e.g. Organization) that this user is connected to

@@ -1,11 +1,18 @@
 class Group < ApplicationRecord
   include Resourceable
   include HasFilestackFile
+  prepend CacheableRoles # Prepend so it can call rolify methods using super
+
   # Admins can manage people in the group
   # Members have read access to everything the group is linked to
+  # This method must be above rolify method
   resourceable roles: [Role::ADMIN, Role::MEMBER],
                edit_role: Role::ADMIN,
                view_role: Role::MEMBER
+
+  rolify after_add: :after_add_role,
+         after_remove: :after_remove_role,
+         strict: true
 
   belongs_to :organization
 
@@ -37,6 +44,18 @@ class Group < ApplicationRecord
   end
 
   private
+
+  def after_add_role(role)
+    resource = role.resource
+    # Reindex record if it is a searchkick model
+    resource.reindex if resource.respond_to?(:queryable) && queryable
+  end
+
+  def after_remove_role(role)
+    resource = role.resource
+    # Reindex record if it is a searchkick model
+    resource.reindex if resource.respond_to?(:queryable) && queryable
+  end
 
   def validate_handle?
     new_record? || handle_changed?

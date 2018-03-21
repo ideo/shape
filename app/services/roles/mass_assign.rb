@@ -1,33 +1,34 @@
 module Roles
-  class AssignToUsers
-    attr_reader :roles, :errors, :failed_users
+  class MassAssign
+    attr_reader :roles, :errors, :failed
 
-    def initialize(object:, role_name:, users: [])
+    def initialize(object:, role_name:, users: [], groups: [])
       @object = object
       @role_name = role_name
       @users = users
+      @groups = groups
       @roles = []
       @errors = []
-      @failed_users = []
+      @failed = []
     end
 
     def call
       return false unless valid_object_and_role_name?
-      assign_role_to_users
-      failed_users.blank?
+      assign_role_to_users_and_groups
+      failed.blank?
     end
 
     private
 
-    attr_reader :object, :role_name, :users
+    attr_reader :object, :role_name, :users, :groups
 
-    def assign_role_to_users
-      users.each do |user|
-        role = user.add_role(role_name, object)
+    def assign_role_to_users_and_groups
+      (users + groups).each do |user_or_group|
+        role = user_or_group.add_role(role_name, object)
         if role.persisted?
           roles << role
         else
-          failed_users << user
+          failed << object
         end
       end
       roles.uniq!
