@@ -5,6 +5,7 @@ export const Row = styled.div`
   align-items: ${props => props.align};
   display: flex;
   justify-content: space-between;
+  margin-bottom: 15px;
   margin-left: 5px;
   width: 92%;
 `
@@ -26,6 +27,5 @@ RowItemLeft.displayName = 'StyledRowItemLeft'
 export const RowItemRight = styled.span`
   float: right;
   margin-left: auto;
-  margin-right: 64px;
 `
 RowItemRight.displayName = 'StyledRowItemRight'

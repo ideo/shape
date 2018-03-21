@@ -2,7 +2,7 @@ import styled from 'styled-components'
 import v from '~/utils/variables'
 
 export const Heading2 = styled.h2`
-  text-tranform: uppercase;
+  text-transform: uppercase;
   font-family: {v.fonts.sans};
   font-size: 1.5rem;
   font-weight: {v.weights.medium};
@@ -12,7 +12,7 @@ export const Heading2 = styled.h2`
 Heading2.displayName = 'Heading2'
 
 export const Heading3 = styled.h3`
-  text-fransform: uppercase;
+  text-transform: uppercase;
   margin-bottom: 13px;
   font-size: 0.9375rem;
   font-weight: ${v.weights.medium};
