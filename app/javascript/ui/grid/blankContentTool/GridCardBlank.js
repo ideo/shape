@@ -8,6 +8,7 @@ import AddTextIcon from '~/ui/icons/AddTextIcon'
 import AddCollectionIcon from '~/ui/icons/AddCollectionIcon'
 import AddImageIcon from '~/ui/icons/AddImageIcon'
 import AddVideoIcon from '~/ui/icons/AddVideoIcon'
+import CloseIcon from '~/ui/icons/CloseIcon'
 import v, { ITEM_TYPES } from '~/utils/variables'
 import FilestackUpload from '~/utils/FilestackUpload'
 import { StyledGridCard } from '~/ui/grid/GridCard'
@@ -36,10 +37,13 @@ const StyledGridCardBlank = StyledGridCard.extend`
 const StyledGridCardInner = styled.div`
   button.close {
     position: absolute;
+    top: 5px;
+    right: 10px;
     color: #9b9b9b;
-    font-size: 1.75rem;
-    top: 0rem;
-    right: 0.33rem;
+    .icon {
+      width: 12px;
+      height: 12px;
+    }
 
     &:hover {
       color: black;
@@ -226,7 +230,7 @@ class GridCardBlank extends React.Component {
         <StyledGridCardInner>
           {this.renderInner()}
           <button className="close" onClick={this.closeBlankContentTool}>
-            &times;
+            <CloseIcon />
           </button>
         </StyledGridCardInner>
       </StyledGridCardBlank>

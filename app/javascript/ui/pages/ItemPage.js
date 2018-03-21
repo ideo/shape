@@ -3,6 +3,7 @@ import ReactRouterPropTypes from 'react-router-prop-types'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 import { Link } from 'react-router-dom'
+import { animateScroll as scroll } from 'react-scroll'
 
 import PageWithApi from '~/ui/pages/PageWithApi'
 import PageContainer from '~/ui/layout/PageContainer'
@@ -12,6 +13,7 @@ import Breadcrumb from '~/ui/layout/Breadcrumb'
 import TextItem from '~/ui/items/TextItem'
 import ImageItem from '~/ui/items/ImageItem'
 import VideoItem from '~/ui/items/VideoItem'
+import CloseIcon from '~/ui/icons/CloseIcon'
 import v, { ITEM_TYPES } from '~/utils/variables'
 import EditableName from './shared/EditableName'
 
@@ -32,18 +34,26 @@ const CloseLink = styled(Link)`
   text-decoration: none;
   color: ${v.colors.cloudy};
   &:hover {
-    color: ${v.colors.linkHover};
+    color: black;
   }
   padding: 0;
   height: auto;
   position: relative;
   top: -6px;
-  font-size: 1.75rem;
+  .icon {
+    width: 12px;
+    height: 12px;
+  }
 `
 
 @inject('apiStore')
 @observer
 class ItemPage extends PageWithApi {
+  componentDidMount() {
+    super.componentDidMount()
+    scroll.scrollToTop({ duration: 0 })
+  }
+
   get item() {
     const { match, apiStore } = this.props
     if (!apiStore.items.length) return null
@@ -98,7 +108,7 @@ class ItemPage extends PageWithApi {
             {this.content}
             <StyledRightColumn>
               <CloseLink to={item.parentPath}>
-                &times;
+                <CloseIcon />
               </CloseLink>
             </StyledRightColumn>
           </PageContainer>

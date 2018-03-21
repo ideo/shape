@@ -3,6 +3,95 @@ require 'rails_helper'
 describe Api::V1::UsersController, type: :request, auth: true do
   let(:user) { @user }
 
+  describe 'GET #index' do
+    let!(:organization) { create(:organization) }
+    let!(:org_users) { create_list(:user, 3) }
+    let!(:other_org) { create(:organization) }
+    let!(:other_org_users) { create_list(:user, 3) }
+    let(:path) { "/api/v1/organizations/#{organization.id}/users" }
+
+    before do
+      user.add_role(Role::MEMBER, organization.primary_group)
+      org_users.each { |u| u.add_role(Role::MEMBER, organization.primary_group) }
+      other_org_users.each { |u| u.add_role(Role::MEMBER, other_org.primary_group) }
+    end
+
+    it 'returns a 200' do
+      get(path)
+      expect(response.status).to eq(200)
+    end
+
+    it 'includes all users in the org' do
+      get(path)
+      expect(json_object_ids).to match_array(org_users.map(&:id))
+    end
+
+    context 'when added to content' do
+      let!(:collection_users) { create_list(:user, 2) }
+      let!(:collection_1) do
+        create(:collection,
+               organization: organization,
+               add_editors: [user],
+               add_viewers: [collection_users[0]])
+      end
+      let!(:collection_2) do
+        create(:collection,
+               organization: organization,
+               add_editors: [collection_users[1]],
+               add_viewers: [user])
+      end
+      let(:other_org_collection) do
+        create(:collection,
+               organization: other_org,
+               add_editors: [other_org_users[1]],
+               add_viewers: [user])
+      end
+
+      it 'includes all users also on that content' do
+        get(path)
+        expect(json_object_ids).to match_array((org_users + collection_users).map(&:id))
+      end
+
+      it 'does not include content that user belongs to in other org' do
+        expect(other_org_collection.can_view?(user)).to be true
+        get(path)
+        expect(json_object_ids).to match_array((org_users + collection_users).map(&:id))
+      end
+    end
+
+    context 'when added to groups' do
+      let!(:group_users) { create_list(:user, 2) }
+      let!(:group_1) do
+        create(:group,
+               organization: organization,
+               add_admins: [group_users[0]],
+               add_members: [user])
+      end
+      let!(:group_2) do
+        create(:group,
+               organization: organization,
+               add_admins: [user],
+               add_members: [group_users[1]])
+      end
+      let(:other_org_group) do
+        create(:group,
+               organization: other_org,
+               add_admins: [user, other_org_users[0]])
+      end
+
+      it 'includes all users also in those groups' do
+        get(path)
+        expect(json_object_ids).to match_array((org_users + group_users).map(&:id))
+      end
+
+      it 'does not include groups from another org that user belongs to' do
+        expect(other_org_group.can_view?(user)).to be true
+        get(path)
+        expect(json_object_ids).to match_array((org_users + group_users).map(&:id))
+      end
+    end
+  end
+
   describe 'GET #show' do
     let(:path) { "/api/v1/users/#{user.id}" }
 
