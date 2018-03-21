@@ -7,14 +7,14 @@ import v from '~/utils/variables'
 import ArrowIcon from '~/ui/icons/ArrowIcon'
 import CloseIcon from '~/ui/icons/CloseIcon'
 
-const materialStyles = {
-  paper: {
-    borderLeft: `17px solid ${v.colors.blackLava}`,
-    boxSizing: 'border-box',
-    maxWidth: '855px',
-    width: '100%'
+const StyledDialog = styled(Dialog)`
+  .modal__paper {
+    border-left: 17px solid ${v.colors.blackLava};
+    max-width: 855px;
+    padding-bottom: 30px;
+    width: 100%;
   }
-  
+`
 const ModalCloseButton = styled.button`
   cursor: pointer;
   display: block;
@@ -46,7 +46,7 @@ class Modal extends React.Component {
   }
 
   render() {
-    const { children, classes, onBack, open, title } = this.props
+    const { children, onBack, open, title } = this.props
     return (
       <StyledDialog
         classes={{ paper: 'modal__paper' }}
@@ -69,7 +69,7 @@ class Modal extends React.Component {
             { children }
           </DialogContent>
         </PaddedContent>
-      </Dialog>
+      </StyledDialog>
     )
   }
 }
