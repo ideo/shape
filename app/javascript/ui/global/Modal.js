@@ -1,3 +1,4 @@
+import _ from 'lodash'
 import React from 'react'
 import PropTypes from 'prop-types'
 import styled from 'styled-components'
@@ -36,7 +37,7 @@ const BackIconHolder = styled.button`
 
 // TODO figure out what eslint is complaining about here
 const PaddedContent = styled.div`
-  padding: ${props => { return props.onBack ? '0 20px' : '0' }};
+  padding: ${props => (props.onBack ? '0 20px' : '0')};
 `
 
 class Modal extends React.Component {
@@ -55,7 +56,7 @@ class Modal extends React.Component {
         aria-labelledby={title}
         BackdropProps={{ invisible: true }}
       >
-        { !!onBack && (
+        { _.isFunction(onBack) && (
           <BackIconHolder onClick={onBack}><ArrowIcon /></BackIconHolder>
         )}
         <ModalCloseButton onClick={this.handleClose}>
