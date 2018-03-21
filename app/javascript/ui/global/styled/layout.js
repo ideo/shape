@@ -23,7 +23,6 @@ export const RowItemLeft = styled.span`
 `
 RowItemLeft.displayName = 'StyledRowItemLeft'
 
-// TODO too large of a right margin, might have to make configurable
 export const RowItemRight = styled.span`
   float: right;
   margin-left: auto;

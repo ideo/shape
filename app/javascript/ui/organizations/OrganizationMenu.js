@@ -120,7 +120,6 @@ class OrganizationMenu extends React.Component {
       title = this.editGroup.id ? this.editGroup.name : 'New Group'
       onBack = this.handleBack
     }
-    // TODO correct title for each 3 states
     return (
       <Modal
         title={title}

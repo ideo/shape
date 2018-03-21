@@ -35,7 +35,6 @@ const BackIconHolder = styled.button`
   width: 15px;
 `
 
-// TODO figure out what eslint is complaining about here
 const PaddedContent = styled.div`
   padding: ${props => (props.onBack ? '0 20px' : '0')};
 `
