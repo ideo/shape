@@ -10,6 +10,10 @@ import OrganizationEdit from './OrganizationEdit'
 @inject('uiStore')
 @observer
 class OrganizationMenu extends React.Component {
+  @observable editOrganizationOpen = false
+  @observable modifyGroupOpen = false
+  @observable editGroup = {}
+
   @action onGroupSave = () => {
     this.modifyGroupOpen = false
     this.editGroup = {}
@@ -48,10 +52,6 @@ class OrganizationMenu extends React.Component {
     const { uiStore } = this.props
     uiStore.closeOrganizationMenu()
   }
-
-  @observable editOrganizationOpen = false
-  @observable modifyGroupOpen = false
-  @observable editGroup = {}
 
   renderEditOrganization() {
     const { organization } = this.props

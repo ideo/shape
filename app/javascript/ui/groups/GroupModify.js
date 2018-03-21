@@ -21,8 +21,11 @@ function transformToHandle(name) {
 @inject('apiStore')
 @observer
 class GroupModify extends React.Component {
+  @observable editingGroup = null
+  @observable syncing = false
+
   constructor(props) {
-    super()
+    super(props)
     const { group } = props
     this.editingGroup = {
       name: group.name || '',
@@ -31,9 +34,6 @@ class GroupModify extends React.Component {
     }
     if (!group.id) this.setSyncing(true)
   }
-
-  @observable editingGroup = null
-  @observable syncing = false
 
   @action setSyncing(val) {
     this.syncing = val
