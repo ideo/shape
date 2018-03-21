@@ -46,7 +46,7 @@ class Modal extends React.Component {
   }
 
   render() {
-    const { children, open, onBack, title } = this.props
+    const { children, onBack, open, title } = this.props
     return (
       <StyledDialog
         classes={{ paper: 'modal__paper' }}
@@ -61,12 +61,14 @@ class Modal extends React.Component {
         <ModalCloseButton onClick={this.handleClose}>
           <CloseIcon />
         </ModalCloseButton>
-        <DialogTitle disableTypography id="sharing">
-          <Heading2>{title}</Heading2>
-        </DialogTitle>
-        <DialogContent>
-          { children }
-        </DialogContent>
+        <PaddedContent onBack={onBack}>
+          <DialogTitle disableTypography id="sharing">
+            <Heading2>{title}</Heading2>
+          </DialogTitle>
+          <DialogContent>
+            { children }
+          </DialogContent>
+        </PaddedContent>
       </StyledDialog>
     )
   }
