@@ -1,3 +1,4 @@
+import _ from 'lodash'
 import CardMenu from '~/ui/grid/CardMenu'
 
 const props = {
@@ -6,7 +7,7 @@ const props = {
   handleShare: jest.fn(),
   handleDuplicate: jest.fn(),
   handleLink: jest.fn(),
-  handleOrganize: jest.fn(),
+  handleMove: jest.fn(),
   handleArchive: jest.fn(),
   uiStore: {
     openCardMenuId: false,
@@ -15,53 +16,28 @@ const props = {
   menuOpen: false,
 }
 
-const fakeMouseEvent = { stopPropagation: jest.fn() }
+// const fakeMouseEvent = { stopPropagation: jest.fn() }
 
 let wrapper, actions
 describe('CardMenu', () => {
   describe('as editor', () => {
     beforeEach(() => {
       actions = [
-        'Share',
         'Duplicate',
+        'Move',
         'Link',
-        'Organize',
         'Archive'
       ]
       props.canEdit = true
       wrapper = shallow(
-        <CardMenu.wrappedComponent {...props} />
+        <CardMenu {...props} />
       )
     })
 
-    it('renders a toggle button', () => {
-      expect(wrapper.find('StyledMenuToggle').exists()).toBe(true)
-    })
-
-    it('renders menu', () => {
-      expect(wrapper.find('StyledMenuWrapper').exists()).toBe(true)
-    })
-
-    it('has all menu items with click handlers', () => {
-      expect(wrapper.find('StyledMenuItem').length).toEqual(actions.length)
-      actions.forEach(action => {
-        expect(wrapper.find(`.menu-${action.toLowerCase()}`).exists()).toBe(true)
-        const handlerFn = props[`handle${action}`]
-        expect(wrapper.find(`.menu-${action.toLowerCase()}`).props().onClick).toEqual(handlerFn)
-      })
-    })
-
-    it('has "open" CSS class if menu is open', () => {
-      wrapper = shallow(
-        <CardMenu.wrappedComponent {...props} menuOpen />
-      )
-      expect(wrapper.find('.open').exists()).toBe(true)
-    })
-
-    it('calls openCardMenu on uiStore on click', () => {
-      wrapper.find('StyledMenuToggle').at(0).simulate('click', fakeMouseEvent)
-      expect(fakeMouseEvent.stopPropagation).toHaveBeenCalledWith()
-      expect(props.uiStore.openCardMenu).toHaveBeenCalledWith(props.cardId)
+    it('creates a PopoutMenu with all editable actions', () => {
+      const popout = wrapper.find('PopoutMenu').at(0)
+      expect(popout.props().menuItems.length).toEqual(actions.length)
+      expect(_.map(popout.props().menuItems, i => i.name)).toEqual(actions)
     })
   })
 
@@ -70,19 +46,14 @@ describe('CardMenu', () => {
       actions = ['Duplicate']
       props.canEdit = false
       wrapper = shallow(
-        <CardMenu.wrappedComponent {...props} />
+        <CardMenu {...props} />
       )
     })
 
-    it('renders menu', () => {
-      expect(wrapper.find('StyledMenuWrapper').exists()).toBe(true)
-    })
-
-    it('only has actions defined', () => {
-      expect(wrapper.find('StyledMenuItem').length).toEqual(actions.length)
-      actions.forEach(action => {
-        expect(wrapper.find(`.menu-${action.toLowerCase()}`).exists()).toBe(true)
-      })
+    it('creates a PopoutMenu with only 1 viewer action', () => {
+      const popout = wrapper.find('PopoutMenu').at(0)
+      expect(popout.props().menuItems.length).toEqual(1)
+      expect(_.map(popout.props().menuItems, i => i.name)).toEqual(actions)
     })
   })
 })

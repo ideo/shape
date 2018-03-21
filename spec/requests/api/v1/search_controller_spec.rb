@@ -4,6 +4,15 @@ describe Api::V1::SearchController, type: :request, auth: true do
   describe '#GET #search', search: true do
     let!(:organization) { create(:organization) }
     let(:current_user) { @user }
+    let(:tag_list) { %w(blockchain prototype innovation) }
+    let!(:collection_with_tags) do
+      create(
+        :collection,
+        organization: organization,
+        tag_list: tag_list,
+        add_viewers: [current_user],
+      )
+    end
     let!(:collections) do
       create_list(
         :collection,
@@ -25,6 +34,7 @@ describe Api::V1::SearchController, type: :request, auth: true do
 
     before do
       current_user.add_role(:member, organization.primary_group)
+      Collection.reindex
     end
 
     before(:all) do
@@ -51,15 +61,21 @@ describe Api::V1::SearchController, type: :request, auth: true do
 
       it 'returns collection that matches name search' do
         get(path, params: { query: find_collection.name })
-        expect(json['data'].size).to be(1)
+        expect(json['data'].size).to eq(1)
         expect(json['data'].first['id'].to_i).to eq(find_collection.id)
       end
 
       it 'returns collection that matches sub-item text search' do
         text = collection_with_text.collection_cards.first.item.plain_content
         get(path, params: { query: text })
-        expect(json['data'].size).to be(1)
+        expect(json['data'].size).to eq(1)
         expect(json['data'].first['id'].to_i).to eq(collection_with_text.id)
+      end
+
+      it 'returns collection that matches tag search' do
+        get(path, params: { query: tag_list.first })
+        expect(json['data'].size).to eq(1)
+        expect(json['data'].first['id'].to_i).to eq(collection_with_tags.id)
       end
 
       it 'returns empty array if no match' do

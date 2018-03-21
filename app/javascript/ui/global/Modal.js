@@ -1,20 +1,19 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import styled from 'styled-components'
-import { withStyles } from 'material-ui/styles'
 import Dialog, { DialogContent, DialogTitle } from 'material-ui/Dialog'
 import { Heading2 } from '~/ui/global/styled/typography'
 import v from '~/utils/variables'
 import CloseIcon from '~/ui/icons/CloseIcon'
 
-const materialStyles = {
-  paper: {
-    borderLeft: `17px solid ${v.colors.blackLava}`,
-    maxWidth: '855px',
-    width: '100%'
+const StyledDialog = styled(Dialog)`
+  .modal__paper {
+    border-left: 17px solid ${v.colors.blackLava};
+    max-width: 855px;
+    padding-bottom: 30px;
+    width: 100%;
   }
-}
-
+`
 const ModalCloseButton = styled.button`
   cursor: pointer;
   display: block;
@@ -32,10 +31,10 @@ class Modal extends React.Component {
   }
 
   render() {
-    const { children, classes, open, title } = this.props
+    const { children, open, title } = this.props
     return (
-      <Dialog
-        classes={classes}
+      <StyledDialog
+        classes={{ paper: 'modal__paper' }}
         open={open}
         onClose={this.handleclose}
         aria-labelledby={title}
@@ -50,14 +49,11 @@ class Modal extends React.Component {
         <DialogContent>
           { children }
         </DialogContent>
-      </Dialog>
+      </StyledDialog>
     )
   }
 }
 Modal.propTypes = {
-  classes: PropTypes.shape({
-    paper: PropTypes.string
-  }).isRequired,
   onClose: PropTypes.func.isRequired,
   title: PropTypes.string.isRequired,
   children: PropTypes.node,
@@ -69,4 +65,4 @@ Modal.defaultProps = {
   open: false,
 }
 
-export default withStyles(materialStyles)(Modal)
+export default Modal

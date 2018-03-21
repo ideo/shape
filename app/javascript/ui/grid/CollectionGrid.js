@@ -47,12 +47,11 @@ class CollectionGrid extends React.Component {
       }
       const blankFound = _.find(this.state.cards, { cardType: 'blank' })
       // Look for card in state...
-      if (blankFound) {
-        // TODO: What is num used for?
+      if (blankFound && blankFound.order !== order) {
+        // HACK: `num` just makes it so that BCT can get a new unique `id`
+        // otherwise grid thinks the BCT has simply "moved"
         blankFound.num += 1
         blankFound.id = `blank-${blankFound.num}`
-        // Remove BCT from passed-in cards
-        _.remove(cards, blankFound)
         // Increments order from existing BCT order
         blankCard = { ...blankFound, order }
       }

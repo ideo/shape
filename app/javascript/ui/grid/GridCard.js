@@ -167,8 +167,8 @@ class GridCard extends React.Component {
     console.log('Link card')
   }
 
-  organizeCard = () => {
-    console.log('Organize card')
+  moveCard = () => {
+    console.log('Move card')
   }
 
   archiveCard = () => {
@@ -193,10 +193,9 @@ class GridCard extends React.Component {
             cardId={this.props.card.id}
             canEdit={this.canEdit}
             menuOpen={this.props.menuOpen}
-            handleShare={this.shareCard}
             handleDuplicate={this.duplicateCard}
             handleLink={this.linkCard}
-            handleOrganize={this.organizeCard}
+            handleMove={this.moveCard}
             handleArchive={this.archiveCard}
           />
         </StyledTopRightActions>

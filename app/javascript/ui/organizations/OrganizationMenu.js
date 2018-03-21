@@ -8,6 +8,8 @@ import OrganizationEdit from './OrganizationEdit'
 @inject('uiStore')
 @observer
 class OrganizationMenu extends React.Component {
+  @observable editOrganizationOpen = null;
+
   @action
   onSave = () => {
     this.editOrganizationOpen = false
@@ -19,8 +21,6 @@ class OrganizationMenu extends React.Component {
       this.editOrganizationOpen = true
     }
   }
-
-  @observable editOrganizationOpen = null;
 
   handleClose = (ev) => {
     const { uiStore } = this.props

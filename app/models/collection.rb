@@ -9,6 +9,7 @@ class Collection < ApplicationRecord
   archivable as: :parent_collection_card,
              with: %i[collection_cards reference_collection_cards]
   resourcify
+  acts_as_taggable
 
   has_many :collection_cards,
            -> { active },
@@ -46,11 +47,12 @@ class Collection < ApplicationRecord
   searchkick
   # active == don't index archived collections
   # where(type: nil) == don't index User/SharedWithMe collections
-  scope :search_import, -> { active.where(type: nil).includes(:items) }
+  scope :search_import, -> { active.where(type: nil).includes(%i[tags items]) }
 
   def search_data
     {
       name: name,
+      tags: tags.map(&:name),
       content: search_content,
       organization_id: organization_id,
       user_ids: (editor_ids + viewer_ids).uniq,
