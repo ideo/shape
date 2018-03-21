@@ -95,7 +95,9 @@ class User < ApplicationRecord
       user: self,
       resource_type: %i[Collection Item],
     ).select do |resource|
-      if resource.respond_to?(:organization_id)
+      if resource.archived?
+        false
+      elsif resource.respond_to?(:organization_id)
         resource.organization_id == organization.id
       else
         # TODO: this is potentially including items from other orgs
