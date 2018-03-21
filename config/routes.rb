@@ -9,6 +9,7 @@ Rails.application.routes.draw do
         end
         member do
           post 'duplicate'
+          patch 'archive'
         end
         resources :collection_cards, only: :index
         resources :roles, only: %i[index create destroy], shallow: true

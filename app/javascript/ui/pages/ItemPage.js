@@ -47,7 +47,7 @@ class ItemPage extends PageWithApi {
   get item() {
     const { match, apiStore } = this.props
     if (!apiStore.items.length) return null
-    return apiStore.find('collections', match.params.id)
+    return apiStore.find('items', match.params.id)
   }
 
   // could be smarter or broken out once we want to do different things per type
@@ -80,7 +80,7 @@ class ItemPage extends PageWithApi {
   }
 
   render() {
-    const { item } = this.state
+    const { item } = this
     if (!item) return <Loader />
     return (
       <Fragment>

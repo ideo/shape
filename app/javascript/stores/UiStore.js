@@ -12,6 +12,8 @@ export default class UiStore {
      (navigator.maxTouchPoints > 0) ||
      (navigator.msMaxTouchPoints > 0)
   )
+  @observable pageMenuOpen = false
+  @observable tagsModalOpen = false
   @observable gridSettings = {
     cols: 4,
     gutter: 20,
@@ -79,5 +81,9 @@ export default class UiStore {
 
   @action closeRolesMenu() {
     this.rolesMenuOpen = false
+  }
+
+  @action update(name, value) {
+    this[name] = value
   }
 }

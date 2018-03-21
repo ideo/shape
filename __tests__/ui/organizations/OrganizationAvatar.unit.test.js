@@ -1,4 +1,4 @@
-import OrganizationAvatar from '~/ui/layout/OrganizationAvatar'
+import OrganizationAvatar from '~/ui/organizations/OrganizationAvatar'
 
 let props
 let wrapper
@@ -11,7 +11,8 @@ describe('OrganizationAvatar', () => {
         openOrganizationMenu: jest.fn()
       },
       organization: {
-        name: 'Space'
+        name: 'Space',
+        filestack_file_url: 'test.jpg',
       }
     }
     wrapper = mount(
@@ -19,12 +20,12 @@ describe('OrganizationAvatar', () => {
     )
   })
 
-  it('renders the url if pic_url_square exists', () => {
-    props.organization.pic_url_square = 'testfile.jpg'
+  it('renders the url if filestack_file_url exists', () => {
+    props.organization.filestack_file_url = 'testfile.jpg'
     wrapper = mount(
       <OrganizationAvatar {...props} />
     )
-    expect(wrapper.find('Avatar').props().src).toEqual('testfile.jpg')
+    expect(wrapper.find('Avatar').first().props().url).toEqual('testfile.jpg')
   })
 
   it('should open the organization menu in the ui store on click', () => {

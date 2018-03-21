@@ -16,6 +16,8 @@ export default {
   responsive: {
     // based on going from 2 -> 1 column
     smallBreakpoint: 645,
+    // based on going from 3 -> 2 cols
+    medBreakpoint: 976,
   },
 
   colors: {
@@ -26,6 +28,16 @@ export default {
     cloudy: '#a89f9b',
     linkHover: '#06c',
     blackLava: '#120f0e',
+  },
+
+  fonts: {
+    sans: 'Gotham',
+    serif: 'Sentinel',
+  },
+
+  weights: {
+    book: 300,
+    medium: 500,
   },
 
   zIndex: {

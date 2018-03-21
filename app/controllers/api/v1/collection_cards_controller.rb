@@ -33,6 +33,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
   end
 
   def archive
+    # TODO: make decrement_card_orders part of the card's archive action
     if @collection_card.archive! && @collection_card.decrement_card_orders!
       @collection_card.reload
       render jsonapi: @collection_card, include: [:parent, record: [:filestack_file]]

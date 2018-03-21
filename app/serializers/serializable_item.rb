@@ -1,8 +1,8 @@
 class SerializableItem < BaseJsonSerializer
   ROLES_LIMIT = 5
   type 'items'
-  attributes :id, :type, :name, :content, :text_data, :url, :thumbnail_url
-  belongs_to :filestack_file
+  attributes :id, :type, :name, :content, :text_data,
+             :url, :thumbnail_url, :filestack_file_url
   attribute :breadcrumb do
     Breadcrumb::ForUser.new(
       @object.breadcrumb,

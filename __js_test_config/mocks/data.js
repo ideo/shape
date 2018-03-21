@@ -64,6 +64,7 @@ export const fakeCollection = {
   type: 'Collection',
   breadcrumb: [],
   roles: [],
+  tag_list: ['prototype', 'blockchain'],
   can_edit: false,
   collection_cards: [
     fakeItemCard, fakeItemCard, fakeItemCard
@@ -72,13 +73,14 @@ export const fakeCollection = {
   cardIds: [
     fakeItemCard.id, fakeItemCard.id, fakeItemCard.id
   ],
+  API_archive: jest.fn(),
 }
 export const fakeUserAttrs = {
   id: 1,
   first_name: 'Oprah',
   last_name: 'Winfrey',
   email: 'oprah@winfrey.com',
-  pic_url_square: 'https://pmcvariety.files.wordpress.com/2017/09/oprah_winfrey.png'
+  pic_url_square: 'https://filestackcdn.com/abc123',
 }
 export const fakeUser = {
   ...fakeUserAttrs,

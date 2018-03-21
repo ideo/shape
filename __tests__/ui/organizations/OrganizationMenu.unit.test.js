@@ -1,6 +1,6 @@
 import { observable, useStrict } from 'mobx'
-import { Provider } from 'mobx-react';
-import OrganizationMenu from '~/ui/layout/OrganizationMenu'
+import { Provider } from 'mobx-react'
+import OrganizationMenu from '~/ui/organizations/OrganizationMenu'
 
 const uiStore = observable({
   organizationMenuOpen: false,

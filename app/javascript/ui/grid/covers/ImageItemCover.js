@@ -14,9 +14,9 @@ StyledImageCover.displayName = 'StyledImageCover'
 class ImageItemCover extends React.PureComponent {
   render() {
     const { item } = this.props
-    const { url } = item.filestack_file
+    const { filestack_file_url } = item
     return (
-      <StyledImageCover url={url} />
+      <StyledImageCover url={filestack_file_url} />
     )
   }
 }

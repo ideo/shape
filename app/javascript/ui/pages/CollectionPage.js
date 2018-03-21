@@ -1,6 +1,7 @@
 import { Fragment } from 'react'
 import ReactRouterPropTypes from 'react-router-prop-types'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
+import { Flex, Box } from 'reflexbox'
 import styled from 'styled-components'
 
 import v from '~/utils/variables'
@@ -8,26 +9,25 @@ import PageWithApi from '~/ui/pages/PageWithApi'
 import Loader from '~/ui/layout/Loader'
 import Header from '~/ui/layout/Header'
 import PageContainer from '~/ui/layout/PageContainer'
-import ClickWrapper from '~/ui/layout/ClickWrapper'
 import CollectionGrid from '~/ui/grid/CollectionGrid'
 import Breadcrumb from '~/ui/layout/Breadcrumb'
-import RolesSummary from '~/ui/layout/RolesSummary'
-import RolesMenu from '~/ui/layout/RolesMenu'
+import RolesSummary from '~/ui/roles/RolesSummary'
+import RolesMenu from '~/ui/roles/RolesMenu'
 import EditableName from './shared/EditableName'
+import PageMenu from './shared/PageMenu'
 
 const isHomepage = ({ path }) => path === '/'
 
-const StyledTitleAndRoles = styled.div`
-  h1 {
-    float: left;
-  }
+const StyledTitleAndRoles = styled(Flex)`
   .roles-summary {
-    float: right;
-    @media only screen and (max-width: ${v.responsive.smallBreakpoint}px) {
+    @media only screen and (max-width: ${v.responsive.medBreakpoint}px) {
       display: none;
     }
   }
-  clear: both;
+  .page-menu {
+    position: relative;
+    top: -5px;
+  }
 `
 
 @inject('apiStore', 'uiStore')
@@ -92,33 +92,38 @@ class CollectionPage extends PageWithApi {
   }
 
   render() {
-    const { collection, roles } = this
+    const { collection } = this
     const { uiStore } = this.props
     if (!collection || this.props.uiStore.isLoading) return <Loader />
 
     const breadcrumb = this.isHomepage ? [] : collection.breadcrumb
 
-    const clickHandlers = [
-      () => uiStore.openCardMenu(false)
-    ]
-
     return (
       <Fragment>
-        {uiStore.openCardMenuId && <ClickWrapper clickHandlers={clickHandlers} />}
         <Header>
           <Breadcrumb items={breadcrumb} />
-          <StyledTitleAndRoles>
-            <EditableName
-              name={collection.name}
-              updateNameHandler={this.updateCollectionName}
-              canEdit={collection.can_edit}
-            />
-            {this.renderName}
-            <RolesSummary
-              className="roles-summary"
-              handleClick={this.showObjectRoleDialog}
-              roles={collection.roles}
-            />
+          <StyledTitleAndRoles justify="space-between">
+            <Box>
+              <EditableName
+                name={collection.name}
+                updateNameHandler={this.updateCollectionName}
+                canEdit={collection.can_edit}
+              />
+            </Box>
+            <Flex align="baseline">
+              <RolesSummary
+                className="roles-summary"
+                handleClick={this.showObjectRoleDialog}
+                roles={collection.roles}
+                canEdit={collection.can_edit}
+              />
+              {!this.isHomepage &&
+                <PageMenu
+                  record={collection}
+                  menuOpen={uiStore.pageMenuOpen}
+                />
+              }
+            </Flex>
           </StyledTitleAndRoles>
         </Header>
         <PageContainer>

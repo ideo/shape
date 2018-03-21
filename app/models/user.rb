@@ -149,16 +149,22 @@ class User < ApplicationRecord
   private
 
   def after_add_role(role)
-    if role.resource.is_a?(Group)
-      organization = role.resource.organization
+    resource = role.resource
+    if resource.is_a?(Group)
+      organization = resource.organization
       organization.user_role_added(self)
     end
+    # Reindex record if it is a searchkick model
+    resource.reindex if resource.respond_to?(:queryable) && queryable
   end
 
   def after_remove_role(role)
-    if role.resource.is_a?(Group)
-      organization = role.resource.organization
+    resource = role.resource
+    if resource.is_a?(Group)
+      organization = resource.organization
       organization.user_role_removed(self)
     end
+    # Reindex record if it is a searchkick model
+    resource.reindex if resource.respond_to?(:queryable) && queryable
   end
 end

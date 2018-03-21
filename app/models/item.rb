@@ -2,6 +2,7 @@ class Item < ApplicationRecord
   include Breadcrumbable
   include Resourceable
   include Archivable
+  include HasFilestackFile
 
   resourceable roles: [Role::EDITOR, Role::VIEWER],
                edit_role: Role::EDITOR,
@@ -9,8 +10,6 @@ class Item < ApplicationRecord
 
   archivable as: :parent_collection_card,
              with: %i[reference_collection_cards]
-
-  belongs_to :filestack_file, dependent: :destroy, optional: true
 
   # The primary collection that 'owns' this item
   has_one :parent_collection_card,
@@ -31,8 +30,6 @@ class Item < ApplicationRecord
   after_create :inherit_roles_from_parent
 
   validates :type, presence: true
-
-  accepts_nested_attributes_for :filestack_file
 
   after_commit :reindex_parent_collection
 
@@ -62,9 +59,8 @@ class Item < ApplicationRecord
       i.parent_collection_card.item = i
     end
 
-    if filestack_file.present?
-      i.filestack_file = filestack_file.duplicate!
-    end
+    # Method from HasFilestackFile
+    filestack_file_duplicate!(i)
 
     if i.save && i.parent_collection_card.present?
       i.parent_collection_card.save
@@ -80,6 +76,12 @@ class Item < ApplicationRecord
   def resourceable_class
     # Use top-level class since this is an STI model
     Item
+  end
+
+  def name
+    return read_attribute(:name) if read_attribute(:name).present?
+    return if filestack_file.blank?
+    filestack_file.filename_without_extension
   end
 
   private
