@@ -79,8 +79,6 @@ class GroupModify extends React.Component {
     ev.preventDefault()
     const { apiStore, onSave } = this.props
     let { group } = this.props
-    console.log('group name', group.name)
-    console.log('group id', group.id)
     if (!group.id) {
       group = new Group(toJS(this.editingGroup), apiStore)
     } else {
