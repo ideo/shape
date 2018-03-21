@@ -25,6 +25,9 @@ const materialStyles = {
 
 @observer
 class RolesAdd extends React.Component {
+  @observable selectedUsers = []
+  @observable selectedRole = 'viewer'
+
   @action
   onUserSelected = (data) => {
     let user = data
@@ -77,9 +80,6 @@ class RolesAdd extends React.Component {
   reset() {
     this.selectedUsers = []
   }
-
-  @observable selectedUsers = []
-  @observable selectedRole = 'viewer'
 
   render() {
     const { classes } = this.props

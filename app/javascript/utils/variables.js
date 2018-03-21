@@ -16,6 +16,8 @@ export default {
   responsive: {
     // based on going from 2 -> 1 column
     smallBreakpoint: 645,
+    // based on going from 3 -> 2 cols
+    medBreakpoint: 976,
   },
 
   colors: {

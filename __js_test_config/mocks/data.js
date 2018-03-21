@@ -64,6 +64,7 @@ export const fakeCollection = {
   type: 'Collection',
   breadcrumb: [],
   roles: [],
+  tag_list: ['prototype', 'blockchain'],
   can_edit: false,
   collection_cards: [
     fakeItemCard, fakeItemCard, fakeItemCard
@@ -72,6 +73,7 @@ export const fakeCollection = {
   cardIds: [
     fakeItemCard.id, fakeItemCard.id, fakeItemCard.id
   ],
+  API_archive: jest.fn(),
 }
 export const fakeUserAttrs = {
   id: 1,

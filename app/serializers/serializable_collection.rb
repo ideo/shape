@@ -17,7 +17,6 @@ class SerializableCollection < BaseJsonSerializer
   has_many :collection_cards do
     data do
       @object.collection_cards_viewable_by(
-        # NOTE: this is where we are limiting viewable access to active (un-archived) collection_cards
         @object.collection_cards,
         @current_user,
       )
@@ -29,4 +28,8 @@ class SerializableCollection < BaseJsonSerializer
   end
 
   has_many :roles
+
+  attribute :tag_list do
+    @object.tag_list
+  end
 end

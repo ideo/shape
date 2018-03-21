@@ -1,7 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import styled from 'styled-components'
-import { withStyles } from 'material-ui/styles'
 import Dialog, { DialogContent, DialogTitle } from 'material-ui/Dialog'
 import { Heading2 } from '~/ui/global/styled/typography'
 import v from '~/utils/variables'
@@ -15,8 +14,7 @@ const materialStyles = {
     maxWidth: '855px',
     width: '100%'
   }
-}
-
+  
 const ModalCloseButton = styled.button`
   cursor: pointer;
   display: block;
@@ -50,8 +48,8 @@ class Modal extends React.Component {
   render() {
     const { children, classes, onBack, open, title } = this.props
     return (
-      <Dialog
-        classes={classes}
+      <StyledDialog
+        classes={{ paper: 'modal__paper' }}
         open={open}
         onClose={this.handleclose}
         aria-labelledby={title}
@@ -76,9 +74,6 @@ class Modal extends React.Component {
   }
 }
 Modal.propTypes = {
-  classes: PropTypes.shape({
-    paper: PropTypes.string
-  }).isRequired,
   onClose: PropTypes.func.isRequired,
   title: PropTypes.string.isRequired,
   children: PropTypes.node,
@@ -92,4 +87,4 @@ Modal.defaultProps = {
   onBack: null,
 }
 
-export default withStyles(materialStyles)(Modal)
+export default Modal
