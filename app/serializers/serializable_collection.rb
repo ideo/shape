@@ -5,6 +5,10 @@ class SerializableCollection < BaseJsonSerializer
 
   attributes :id, :name, :created_at
 
+  attribute :type do
+    @object.type || @object.class.name.to_s
+  end
+
   attribute :breadcrumb do
     Breadcrumb::ForUser.new(
       @object.breadcrumb,
