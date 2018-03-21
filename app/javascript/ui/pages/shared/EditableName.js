@@ -99,7 +99,7 @@ class EditableName extends React.Component {
     return (
       <StyledName>
         <H1
-          onClick={canEdit && this.startEditingName}
+          onClick={canEdit ? this.startEditingName : null}
         >{name}</H1>
       </StyledName>
     )
