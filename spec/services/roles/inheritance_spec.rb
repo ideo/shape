@@ -106,7 +106,7 @@ RSpec.describe Roles::Inheritance, type: :service do
 
       it 'returns true for child' do
         new_role = add_roles(Role::VIEWER, addtl_viewer, collection).first
-        new_child_role = new_role.duplicate!(assign_resource: item)
+        new_child_role = new_role.duplicate!(assign_resource: item, dont_save: true)
         expect(inheritance.inherit_from_parent?(item, new_child_role)).to be true
       end
     end

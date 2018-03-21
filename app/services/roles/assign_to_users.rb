@@ -14,6 +14,8 @@ module Roles
     def call
       return false unless valid_object_and_role_name?
       assign_role_to_users
+      # TODO: refactor
+      # AddRolesToChildrenWorker.perform_async(roles.map(&:id), object.id, resource_type)
       failed_users.blank?
     end
 

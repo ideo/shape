@@ -8,7 +8,7 @@ class AddRolesToChildrenWorker
 
     Roles::AddToChildren.new(
       parent: object,
-      roles: roles,
+      new_roles: roles,
     ).call
   end
 end
