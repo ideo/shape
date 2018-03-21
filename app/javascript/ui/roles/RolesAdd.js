@@ -85,13 +85,13 @@ class RolesAdd extends React.Component {
     const { classes } = this.props
     return (
       <div>
+        { this.selectedUsers.length > 0 && (
+          <PillList
+            itemList={this.selectedUsers}
+            onItemDelete={this.onUserDelete}
+          />)
+        }
         <Row>
-          { this.selectedUsers.length > 0 && (
-            <PillList
-              itemList={this.selectedUsers}
-              onItemDelete={this.onUserDelete}
-            />)
-          }
           <AutoComplete
             onInputChange={this.onUserSearch}
             onOptionSelect={this.onUserSelected}
