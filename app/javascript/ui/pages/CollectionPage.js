@@ -134,7 +134,9 @@ class CollectionPage extends PageWithApi {
         </Header>
         <PageContainer>
           <RolesMenu
-            collectionId={collection.id}
+            ownerId={collection.id}
+            ownerType="collections"
+            title="Sharing"
             roles={collection.roles}
           />
           <CollectionGrid

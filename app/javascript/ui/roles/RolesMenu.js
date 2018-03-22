@@ -19,23 +19,26 @@ function sortUser(a, b) {
 @inject('apiStore', 'uiStore')
 @observer
 class RolesMenu extends React.Component {
-  onDelete = (role, user) =>
-    this.props.apiStore.request(`users/${user.id}/roles/${role.id}`,
+  onDelete = (role, entity) =>
+    this.props.apiStore.request(`users/${entity.id}/roles/${role.id}`,
       'DELETE')
 
   onCreateRoles = (users, roleName) => {
-    const { apiStore, collectionId } = this.props
+    const { apiStore, ownerId, ownerType } = this.props
+    // TODO eventually have to make this groups?
     const userIds = users.map((user) => user.id)
     const data = { role: { name: roleName }, user_ids: userIds }
-    return apiStore.request(`collections/${collectionId}/roles`, 'POST', data)
+    return apiStore.request(`${ownerType}/${ownerId}/roles`, 'POST', data)
       .catch((err) => console.warn(err))
   }
 
+  // TODO what to do about this?
   onCreateUsers = (emails) => {
     const { apiStore } = this.props
     return apiStore.request(`users/create_from_emails`, 'POST', { emails })
   }
 
+  // TODO remoe eventually
   onUserSearch = (searchTerm) => {
     const { apiStore } = this.props
     return apiStore.request(
@@ -49,7 +52,7 @@ class RolesMenu extends React.Component {
   }
 
   render() {
-    const { roles, uiStore } = this.props
+    const { roles, uiStore, title } = this.props
     const roleUsers = []
     roles.forEach((role) =>
       role.users.forEach((user) => {
@@ -59,7 +62,7 @@ class RolesMenu extends React.Component {
 
     return (
       <Modal
-        title="Sharing"
+        title={title}
         onClose={this.handleClose}
         open={uiStore.rolesMenuOpen}
       >
@@ -86,8 +89,10 @@ class RolesMenu extends React.Component {
 }
 
 RolesMenu.propTypes = {
-  collectionId: PropTypes.number.isRequired,
+  ownerId: PropTypes.number.isRequired,
+  ownerType: PropTypes.string.isRequired,
   roles: MobxPropTypes.arrayOrObservableArray,
+  title: PropTypes.string,
 }
 RolesMenu.wrappedComponent.propTypes = {
   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
@@ -95,6 +100,7 @@ RolesMenu.wrappedComponent.propTypes = {
 }
 RolesMenu.defaultProps = {
   roles: [],
+  title: 'Sharing',
 }
 
 export default RolesMenu

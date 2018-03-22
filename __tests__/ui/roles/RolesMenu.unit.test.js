@@ -14,7 +14,8 @@ const uiStore = observable({
   closeRolesMenu: jest.fn()
 })
 const props = {
-  collectionId: 1,
+  ownerId: 1,
+  ownerType: 'collections',
   roles: [],
   uiStore,
 }
