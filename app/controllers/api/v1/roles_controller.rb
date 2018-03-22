@@ -11,8 +11,8 @@ class Api::V1::RolesController < Api::V1::BaseController
   # All roles that exist on this resource (collection, item or group)
   # /[collections/items]/:id/roles
   def index
-    @roles = record.roles.includes(:users, :resource)
-    render jsonapi: @roles, include: %i[users resource]
+    @roles = record.roles.includes(:users, :groups, :resource)
+    render jsonapi: @roles, include: %i[users groups resource]
   end
 
   # Create role(s) on this resource (collection, item or group)
@@ -33,7 +33,7 @@ class Api::V1::RolesController < Api::V1::BaseController
       groups: groups,
     )
     if assigner.call
-      render jsonapi: record.roles, include: %i[users resource]
+      render jsonapi: record.roles, include: %i[users groups resource]
     else
       render_api_errors assigner.errors
     end

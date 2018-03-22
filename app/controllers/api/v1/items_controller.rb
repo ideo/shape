@@ -1,10 +1,10 @@
 class Api::V1::ItemsController < Api::V1::BaseController
-  deserializable_resource :item, class: DeserializableItem, only: [:create, :update]
+  deserializable_resource :item, class: DeserializableItem, only: %i[create update]
   load_and_authorize_resource :collection_card, only: :create
   load_and_authorize_resource
 
   def show
-    render jsonapi: @item, include: [:filestack_file, roles: [:users]]
+    render jsonapi: @item, include: [:filestack_file, roles: %i[users groups]]
   end
 
   def create

@@ -9,7 +9,7 @@ class Api::V1::CollectionsController < Api::V1::BaseController
   def show
     render_collection(include:
       [
-        roles: [:users],
+        roles: %i[users groups],
         collection_cards: [
           :parent,
           record: [
@@ -61,7 +61,7 @@ class Api::V1::CollectionsController < Api::V1::BaseController
   def render_collection(include: nil)
     # include collection_cards for UI to receive any updates
     include ||= [
-      roles: [:users],
+      roles: %i[users groups],
       collection_cards: [
         :parent,
         record: [:filestack_file],
@@ -75,7 +75,7 @@ class Api::V1::CollectionsController < Api::V1::BaseController
     # item/collection will turn into "record" when serialized
     @collection = Collection.where(id: params[:id])
                             .includes(
-                              roles: [:users],
+                              roles: %i[users groups],
                               collection_cards: [
                                 :parent,
                                 :collection,
