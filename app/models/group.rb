@@ -28,17 +28,6 @@ class Group < ApplicationRecord
             format: { with: /[a-zA-Z0-9\-\_]+/ },
             if: :validate_handle?
 
-  def admins_and_members
-    User.joins(:roles)
-        .where(Role.arel_table[:name].in([Role::ADMIN, Role::MEMBER]))
-        .where(Role.arel_table[:resource_type].in(self.class.name))
-        .where(Role.arel_table[:resource_id].in(id))
-  end
-
-  def admin_and_member_ids
-    admins_and_members.pluck(:id)
-  end
-
   def primary?
     organization.primary_group_id == id
   end
