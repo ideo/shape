@@ -1,5 +1,13 @@
 class Api::V1::UsersController < Api::V1::BaseController
+  load_and_authorize_resource :organization, only: %i[index]
   load_and_authorize_resource except: %i[me search create_from_emails]
+
+  # All the users in this org, that this user can 'see' through groups or content
+  # /organizations/:id/users
+  def index
+    @users = current_user.users_through_collections_items_and_groups(current_organization)
+    render jsonapi: @users
+  end
 
   def show
     render jsonapi: @user, include: %i[current_organization groups]

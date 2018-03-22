@@ -1,6 +1,13 @@
 class Api::V1::GroupsController < Api::V1::BaseController
   deserializable_resource :group, class: DeserializableGroup, only: %i[create update]
+  load_and_authorize_resource :organization, only: %i[index]
   load_and_authorize_resource
+
+  # All the groups in this org
+  # /organizations/:id/groups
+  def index
+    render jsonapi: @organization.groups.order(name: :asc)
+  end
 
   def show
     render jsonapi: @group, include: %i[admins members]

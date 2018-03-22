@@ -3,6 +3,7 @@ import ReactRouterPropTypes from 'react-router-prop-types'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import { Flex, Box } from 'reflexbox'
 import styled from 'styled-components'
+import { animateScroll as scroll } from 'react-scroll'
 
 import v from '~/utils/variables'
 import PageWithApi from '~/ui/pages/PageWithApi'
@@ -33,12 +34,21 @@ const StyledTitleAndRoles = styled(Flex)`
 @inject('apiStore', 'uiStore')
 @observer
 class CollectionPage extends PageWithApi {
+  componentDidMount() {
+    super.componentDidMount()
+    scroll.scrollToTop({ duration: 0 })
+  }
+
   componentWillReceiveProps(nextProps) {
     super.componentWillReceiveProps(nextProps)
     // when navigating between collections, close BCT
     if (nextProps.match.params.id !== this.props.match.params.id) {
       this.props.uiStore.closeBlankContentTool()
     }
+  }
+
+  get isUserCollection() {
+    return this.collection.type === 'Collection::UserCollection'
   }
 
   get isHomepage() {
@@ -107,7 +117,7 @@ class CollectionPage extends PageWithApi {
               <EditableName
                 name={collection.name}
                 updateNameHandler={this.updateCollectionName}
-                canEdit={collection.can_edit}
+                canEdit={collection.can_edit && !this.isUserCollection}
               />
             </Box>
             <Flex align="baseline">
@@ -117,7 +127,7 @@ class CollectionPage extends PageWithApi {
                 roles={collection.roles}
                 canEdit={collection.can_edit}
               />
-              {!this.isHomepage &&
+              {!this.isUserCollection &&
                 <PageMenu
                   record={collection}
                   menuOpen={uiStore.pageMenuOpen}
