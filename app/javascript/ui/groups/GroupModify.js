@@ -122,9 +122,9 @@ class GroupModify extends React.Component {
       })
       .catch((err) => {
         console.warn(err)
-        group.name = originalOrg.name
-        group.handle = originalOrg.handle
-        group.filestack_file_url = originalOrg.filestack_file_url
+        group.name = originalGroup.name
+        group.handle = originalGroup.handle
+        group.filestack_file_url = originalGroup.filestack_file_url
       })
   }
 
