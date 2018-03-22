@@ -135,7 +135,7 @@ class OrganizationMenu extends React.Component {
 
 OrganizationMenu.propTypes = {
   organization: MobxPropTypes.objectOrObservableObject.isRequired,
-  userGroups: MobxPropTypes.objectOrObservableObject.isRequired,
+  userGroups: MobxPropTypes.arrayOrObservableArray.isRequired,
 }
 OrganizationMenu.wrappedComponent.propTypes = {
   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
