@@ -1,9 +1,6 @@
 import PropTypes from 'prop-types'
 import { PropTypes as MobxPropTypes } from 'mobx-react'
-import styled from 'styled-components'
 import { MenuItem } from 'material-ui/Menu'
-import Select from 'material-ui/Select'
-import v from '~/utils/variables'
 import {
   DisplayText,
   SubText
@@ -12,21 +9,8 @@ import {
   Row,
   RowItemLeft,
 } from '~/ui/global/styled/layout'
+import { Select } from '~/ui/global/styled/forms'
 import UserAvatar from '~/ui/users/UserAvatar'
-
-const StyledSelect = styled(Select)`
-  .select {
-    font-family: ${v.fonts.sans};
-    font-size: 1rem;
-    font-weight: ${v.weights.book};
-  }
-
-  .selectMenu: {
-    background-color: transparent;
-    &:focus { background-color: transparent; }
-    &:hover { background-color: transparent; }
-  }
-`
 
 class RoleSelect extends React.Component {
   onRoleSelect = (ev) => {
@@ -62,7 +46,7 @@ class RoleSelect extends React.Component {
           <SubText>{user.email}</SubText>
         </RowItemLeft>
         <span>
-          <StyledSelect
+          <Select
             classes={{ root: 'select', selectMenu: 'selectMenu' }}
             displayEmpty
             disableUnderline
@@ -72,7 +56,7 @@ class RoleSelect extends React.Component {
           >
             <MenuItem value="editor">Editor</MenuItem>
             <MenuItem value="viewer">Viewer</MenuItem>
-          </StyledSelect>
+          </Select>
         </span>
       </Row>
     )
