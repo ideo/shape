@@ -8,7 +8,7 @@ module Roles
       # Yes if there are no child roles yet
       return true if child.roles.empty?
 
-      proposed_roles = proposed_new_role_identifiers(child, new_user_role_identifiers)
+      proposed_roles = proposed_role_identifiers(child, new_user_role_identifiers)
       should_inherit?(proposed_roles)
     end
 
@@ -34,7 +34,7 @@ module Roles
       false
     end
 
-    def proposed_new_role_identifiers(child, new_user_role_identifiers)
+    def proposed_role_identifiers(child, new_user_role_identifiers)
       (role_user_identifiers(child.roles) + new_user_role_identifiers).uniq
     end
 
