@@ -1,20 +1,21 @@
 module Roles
   class AssignToUsers
-    attr_reader :roles, :errors, :failed_users
+    attr_reader :errors, :failed_users
 
-    def initialize(object:, role_name:, users: [])
+    def initialize(object:, role_name:, users: [], propagate: false)
       @object = object
       @role_name = role_name
       @users = users
-      @roles = []
+      @added_users = []
       @errors = []
       @failed_users = []
+      @propagate = propagate
     end
 
     def call
       return false unless valid_object_and_role_name?
       assign_role_to_users
-      add_roles_to_children_async
+      add_roles_to_children_async if @propagate
       failed_users.blank?
     end
 
@@ -23,22 +24,22 @@ module Roles
     attr_reader :object, :role_name, :users
 
     def assign_role_to_users
-      users.each do |user|
-        role = user.add_role(role_name, object)
+      @users.each do |user|
+        role = user.add_role(@role_name, @object)
         if role.persisted?
-          roles << role
+          @added_users << user
         else
-          failed_users << user
+          @failed_users << user
         end
       end
-      roles.uniq!
     end
 
     def add_roles_to_children_async
       AddRolesToChildrenWorker.perform_async(
-        roles.map(&:id),
-        object.id,
-        object.class.name.to_s,
+        @added_users.map(&:id),
+        @role_name,
+        @object.id,
+        @object.class.name.to_s,
       )
     end
 
