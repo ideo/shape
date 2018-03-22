@@ -80,6 +80,7 @@ class GroupModify extends React.Component {
   }
 
   handleImagePick = (ev) => {
+    ev.preventDefault()
     FilestackUpload
       .pickImage()
       .then(resp => {

@@ -39,6 +39,7 @@ class OrganizationEdit extends React.Component {
   }
 
   handleImagePick = (ev) => {
+    ev.preventDefault()
     FilestackUpload
       .pickImage()
       .then(resp => {
