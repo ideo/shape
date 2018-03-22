@@ -14,8 +14,6 @@ import {
 import { RowItemRight } from '~/ui/global/styled/layout'
 import FilestackUpload from '~/utils/FilestackUpload'
 import Group from '~/stores/jsonApi/Group'
-import FilestackUpload from '~/utils/FilestackUpload'
-import Group from '~/stores/jsonApi/Group'
 import Avatar from '~/ui/global/Avatar'
 
 function transformToHandle(name) {

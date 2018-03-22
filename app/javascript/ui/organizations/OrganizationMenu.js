@@ -5,10 +5,7 @@ import { Row, RowItemRight } from '~/ui/global/styled/layout'
 import { Heading3, DisplayText } from '~/ui/global/styled/typography'
 import Modal from '~/ui/global/Modal'
 import GroupModify from '~/ui/groups/GroupModify'
-<<<<<<< HEAD
 import RolesMenu from '~/ui/roles/RolesMenu'
-=======
->>>>>>> development
 import OrganizationEdit from './OrganizationEdit'
 
 @inject('uiStore')
