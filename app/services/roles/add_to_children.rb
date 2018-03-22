@@ -16,16 +16,18 @@ module Roles
 
     def add_roles_to_children
       children.all? do |child|
-        next unless @inheritance.inherit_from_parent?(child, new_user_role_identifiers)
-        # Save all new children roles
-        save_new_child_roles(child)
+        if @inheritance.inherit_from_parent?(child, new_user_role_identifiers)
+          save_new_child_roles(child)
+        else
+          true
+        end
       end
     end
 
     def recursively_add_roles_to_grandchildren
       children.all? do |child|
         if child.respond_to?(:children) &&
-           child.children.present
+           child.children.present?
           Roles::AddToChildren.new(
             users_to_add: @users_to_add,
             role_name: @role_name,

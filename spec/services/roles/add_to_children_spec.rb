@@ -59,7 +59,7 @@ RSpec.describe Roles::AddToChildren, type: :service do
           object: child,
           role_name: role_name,
           users: users,
-          propagate: false,
+          propagate_to_children: false,
         }
       end
       let(:instance_double) do
