@@ -30,8 +30,6 @@ class Collection < ApplicationRecord
   belongs_to :organization, optional: true
   belongs_to :cloned_from, class_name: 'Collection', optional: true
 
-  # after_commit :inherit_roles_from_parent, on: :create
-
   validates :name, presence: true, if: :base_collection_type?
   validates :organization, presence: true
   before_validation :inherit_parent_organization_id, on: :create

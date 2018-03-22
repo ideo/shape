@@ -27,7 +27,6 @@ class Item < ApplicationRecord
   belongs_to :cloned_from, class_name: 'Item', optional: true
 
   before_validation :format_url, if: :saved_change_to_url?
-  # after_commit :inherit_roles_from_parent, on: :create
 
   validates :type, presence: true
 
