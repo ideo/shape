@@ -1,7 +1,7 @@
 class Group < ApplicationRecord
   include Resourceable
   include HasFilestackFile
-  prepend CacheableRoles # Prepend so it can call rolify methods using super
+  prepend RolifyExtensions # Prepend so it can call rolify methods using super
 
   # Admins can manage people in the group
   # Members have read access to everything the group is linked to

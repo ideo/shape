@@ -1,12 +1,10 @@
-module CacheableRoles
+module RolifyExtensions
   extend ActiveSupport::Concern
 
-  # Note: there is already a #has_cached_role? that Rolify adds,
-  # but it requires instantiated objects to use it
-  def has_role_by_identifier?(name, resource_identifier)
+  def has_role_by_identifier?(role_name, resource_identifier)
     cached_roles_by_identifier.include?(
       Role.role_identifier(
-        role_name: name,
+        role_name: role_name,
         resource_identifier: resource_identifier,
       )
     )
@@ -29,8 +27,12 @@ module CacheableRoles
     super(role_name, resource.becomes(resource.resourceable_class))
   end
 
+  # This includes all roles a user explicitly has
+  # And all roles they get through their group membership
   def cached_roles_by_identifier
-    @cached_roles_by_identifier ||= roles.map(&:identifier)
+    @cached_roles_by_identifier ||= (
+      roles.map(&:identifier) + current_org_groups_roles_identifiers
+    ).uniq
   end
 
   def reset_cached_roles!

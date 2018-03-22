@@ -338,4 +338,24 @@ describe User, type: :model do
       end
     end
   end
+
+  describe '#current_org_groups_roles_identifiers' do
+    let(:organization) { create(:organization) }
+    let(:group) { create(:group, organization: organization) }
+    let(:collection) { create(:collection) }
+    let(:item) { create(:text_item) }
+    let!(:user) { create(:user) }
+
+    before do
+      user.add_role(Role::MEMBER, organization.primary_group)
+      user.add_role(Role::MEMBER, group)
+      group.add_role(Role::EDITOR, collection)
+      group.add_role(Role::VIEWER, item)
+    end
+
+    it 'should include all group role identifiers' do
+      expect(group.roles.size).to eq(2)
+      expect(user.current_org_groups_roles_identifiers).to eq(group.roles.map(&:identifier))
+    end
+  end
 end

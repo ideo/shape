@@ -1,5 +1,5 @@
 class User < ApplicationRecord
-  prepend CacheableRoles # Prepend so it can call rolify methods using super
+  prepend RolifyExtensions # Prepend so it can call rolify methods using super
 
   rolify after_add: :after_add_role,
          after_remove: :after_remove_role,
@@ -125,6 +125,22 @@ class User < ApplicationRecord
         .where.not(id: id)
         .order(first_name: :asc)
         .to_a
+  end
+
+  def organization_group_ids(organization)
+    groups.where(organization_id: organization.id).pluck(:id)
+  end
+
+  def current_org_groups_roles_identifiers
+    return [] if current_organization.blank?
+
+    org_group_ids = organization_group_ids(current_organization)
+
+    return [] if org_group_ids.blank?
+
+    Role.joins(:groups_roles)
+        .where(GroupsRole.arel_table[:group_id].in(org_group_ids))
+        .map(&:identifier)
   end
 
   private

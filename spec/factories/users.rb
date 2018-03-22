@@ -1,5 +1,9 @@
 FactoryBot.define do
   factory :user do
+    transient do
+      add_to_org nil
+    end
+
     email { Faker::Internet.unique.email }
     first_name { Faker::Name.first_name }
     last_name { Faker::Name.last_name }
@@ -10,6 +14,12 @@ FactoryBot.define do
     after(:build) do |user|
       user.password = Devise.friendly_token[0,40]
       user.password_confirmation = user.password
+    end
+
+    after(:create) do |user, evaluator|
+      if evaluator.add_to_org.present?
+        user.add_role(Role::MEMBER, evaluator.add_to_org.primary_group)
+      end
     end
 
     trait :pending do

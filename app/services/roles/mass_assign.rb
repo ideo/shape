@@ -16,7 +16,7 @@ module Roles
       return false unless valid_object_and_role_name?
       assign_role_to_users_and_groups
       add_roles_to_children_async
-      failed_users.blank?
+      failed.blank?
     end
 
     private
