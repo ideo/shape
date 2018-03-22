@@ -31,7 +31,8 @@ class CollectionGrid extends React.Component {
 
   componentWillReceiveProps(nextProps) {
     const { collection } = nextProps
-    // TODO: why do we need to pack this into an array? It should always be an array
+    // convert observableArray values into a "normal" JS array (equivalent of .toJS())
+    // for the sake of later calculations/manipulations
     const cards = [...collection.collection_cards]
     // If we already have a BCT open, find it in our cards
     if (nextProps.blankContentToolState) {
@@ -46,19 +47,21 @@ class CollectionGrid extends React.Component {
       }
       const blankFound = _.find(this.state.cards, { cardType: 'blank' })
       // Look for card in state...
-      if (blankFound) {
-        // TODO: What is num used for?
+      if (blankFound && blankFound.order !== order) {
+        // HACK: `num` just makes it so that BCT can get a new unique `id`
+        // otherwise grid thinks the BCT has simply "moved"
         blankFound.num += 1
         blankFound.id = `blank-${blankFound.num}`
-        // Remove BCT from passed-in cards
-        _.remove(cards, blankFound)
         // Increments order from existing BCT order
         blankCard = { ...blankFound, order }
       }
       // Always add a blank card to the beginning of collection cards
-      cards.unshift(blankCard)
+      // If they have edit capabilities
+      if (this.props.canEditCollection) {
+        cards.unshift(blankCard)
+      }
     }
-    this.positionCards(cards)
+    this.positionCards(cards, { props: nextProps })
   }
 
   componentWillUnmount() {
@@ -102,7 +105,11 @@ class CollectionGrid extends React.Component {
     const moved = (!_.isEqual(placeholderPosition, originalPosition))
     if (moved) {
       // we want to update this card to match the placeholder
-      const { order, width, height } = placeholder
+      const { order } = placeholder
+      let { width, height } = placeholder
+      // just some double-checking validations
+      if (height > 2) height = 2
+      if (width > 4) width = 4
       _.assign(original, { order, width, height })
 
       // reorder cards and persist changes
@@ -243,12 +250,14 @@ class CollectionGrid extends React.Component {
   // Sorts cards and sets state.cards after doing so
   positionCards = (collectionCards = [], opts = {}) => {
     const cards = [...collectionCards]
+    // props might get passed in e.g. nextProps for componentWillReceiveProps
+    if (!opts.props) opts.props = this.props
     const {
       gridW,
       gridH,
       gutter,
       cols
-    } = this.props
+    } = opts.props
     let row = 0
     const matrix = []
     // create an empty row
@@ -268,6 +277,8 @@ class CollectionGrid extends React.Component {
         let itFits = false
         let gap = 0
         let nextX = 0
+        // e.g. if card.width is 4, but we're at 2 columns, max out at cardWidth = 2
+        const cardWidth = Math.min(cols, card.width)
         // go through the row and see if there is an empty gap that fits card.w
         for (let x = 0; x < cols; x += 1) {
           if (matrix[row][x] === null) {
@@ -275,9 +286,9 @@ class CollectionGrid extends React.Component {
           } else {
             gap = 0
           }
-          if (gap >= card.width) {
+          if (gap >= cardWidth) {
             // jump back the number of spaces to the opening of the gap
-            nextX = (x + 1) - card.width
+            nextX = (x + 1) - cardWidth
             itFits = true
             break
           }
@@ -291,7 +302,7 @@ class CollectionGrid extends React.Component {
           _.assign(position, {
             xPos: position.x * (gridW + gutter),
             yPos: position.y * (gridH + gutter),
-            width: (card.width * (gridW + gutter)) - gutter,
+            width: (cardWidth * (gridW + gutter)) - gutter,
             height: (card.height * (gridH + gutter)) - gutter,
           })
 
@@ -303,10 +314,10 @@ class CollectionGrid extends React.Component {
           }
 
           // fill rows and columns
-          _.fill(matrix[row], card.id, position.x, position.x + card.width)
+          _.fill(matrix[row], card.id, position.x, position.x + cardWidth)
           for (let y = 1; y < card.height; y += 1) {
             if (!matrix[row + y]) matrix.push(_.fill(Array(cols), null))
-            _.fill(matrix[row + y], card.id, position.x, position.x + card.width)
+            _.fill(matrix[row + y], card.id, position.x, position.x + cardWidth)
           }
 
           // NOTE: if you remove this check, then it will fill things in
@@ -348,6 +359,7 @@ class CollectionGrid extends React.Component {
           key={card.id}
           card={card}
           cardType={cardType}
+          canEditCollection={this.props.canEditCollection}
           position={card.position}
           record={record}
           onDrag={this.onDrag}
@@ -375,14 +387,18 @@ class CollectionGrid extends React.Component {
 }
 
 CollectionGrid.propTypes = {
-  cols: PropTypes.number.isRequired,
-  gridH: PropTypes.number.isRequired,
-  gridW: PropTypes.number.isRequired,
-  gutter: PropTypes.number.isRequired,
+  // these gridSettings are technically props,
+  // but they confuse eslint because of the way they're used in positionCards
+  // ---
+  // cols: PropTypes.number.isRequired,
+  // gridH: PropTypes.number.isRequired,
+  // gridW: PropTypes.number.isRequired,
+  // gutter: PropTypes.number.isRequired,
   updateCollection: PropTypes.func.isRequired,
   collection: MobxPropTypes.objectOrObservableObject.isRequired,
   blankContentToolState: MobxPropTypes.objectOrObservableObject,
-  cardIds: MobxPropTypes.arrayOrObservableArray.isRequired
+  cardIds: MobxPropTypes.arrayOrObservableArray.isRequired,
+  canEditCollection: PropTypes.bool.isRequired,
 }
 CollectionGrid.defaultProps = {
   blankContentToolState: null
@@ -391,5 +407,6 @@ CollectionGrid.wrappedComponent.propTypes = {
   routingStore: MobxPropTypes.objectOrObservableObject.isRequired,
   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }
+CollectionGrid.displayName = 'InjectedCollectionGrid'
 
 export default CollectionGrid

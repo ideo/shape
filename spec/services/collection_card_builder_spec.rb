@@ -2,7 +2,11 @@ require 'rails_helper'
 
 RSpec.describe CollectionCardBuilder, type: :service do
   let(:organization) { create(:organization) }
-  let(:parent) { create(:collection, organization: organization) }
+  let(:parent) do
+    create(:collection,
+           organization: organization,
+           add_editors: [user])
+  end
   let(:user) { create(:user) }
   let(:params) do
     {
@@ -34,6 +38,13 @@ RSpec.describe CollectionCardBuilder, type: :service do
       it 'should increase order of additional cards' do
         expect_any_instance_of(CollectionCard).to receive(:increment_card_orders!)
         expect(builder.create).to be true
+      end
+
+      it 'should create the collection with organization inherited from parent' do
+        expect(builder.create).to be true
+        created_collection = builder.collection_card.collection
+        # this behavior comes from collection before_validation
+        expect(created_collection.organization).to eq organization
       end
 
       it 'should calculate the breadcrumb for the card\'s child collection' do

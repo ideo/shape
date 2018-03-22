@@ -3,17 +3,19 @@ import ReactRouterPropTypes from 'react-router-prop-types'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 import { Link } from 'react-router-dom'
+import { animateScroll as scroll } from 'react-scroll'
 
 import PageWithApi from '~/ui/pages/PageWithApi'
 import PageContainer from '~/ui/layout/PageContainer'
 import Loader from '~/ui/layout/Loader'
 import Header from '~/ui/layout/Header'
-import H1 from '~/ui/global/H1'
 import Breadcrumb from '~/ui/layout/Breadcrumb'
 import TextItem from '~/ui/items/TextItem'
 import ImageItem from '~/ui/items/ImageItem'
 import VideoItem from '~/ui/items/VideoItem'
+import CloseIcon from '~/ui/icons/CloseIcon'
 import v, { ITEM_TYPES } from '~/utils/variables'
+import EditableName from './shared/EditableName'
 
 const ItemPageContainer = styled.main`
   background: white;
@@ -32,18 +34,26 @@ const CloseLink = styled(Link)`
   text-decoration: none;
   color: ${v.colors.cloudy};
   &:hover {
-    color: ${v.colors.linkHover};
+    color: black;
   }
   padding: 0;
   height: auto;
   position: relative;
   top: -6px;
-  font-size: 1.75rem;
+  .icon {
+    width: 12px;
+    height: 12px;
+  }
 `
 
 @inject('apiStore')
 @observer
 class ItemPage extends PageWithApi {
+  componentDidMount() {
+    super.componentDidMount()
+    scroll.scrollToTop({ duration: 0 })
+  }
+
   get item() {
     const { match, apiStore } = this.props
     if (!apiStore.items.length) return null
@@ -56,8 +66,7 @@ class ItemPage extends PageWithApi {
     // similar function as in GridCard, could extract?
     switch (item.type) {
     case ITEM_TYPES.TEXT:
-      // TODO: editable should come from user permissions
-      return <TextItem item={item} editable />
+      return <TextItem item={item} />
     case ITEM_TYPES.IMAGE:
       return <ImageItem item={item} backgroundSize="contain" />
     case ITEM_TYPES.VIDEO:
@@ -74,24 +83,32 @@ class ItemPage extends PageWithApi {
     return `items/${match.params.id}`
   }
 
+  updateItemName = (name) => {
+    const { item } = this
+    item.name = name
+    item.save()
+  }
+
   render() {
     const { item } = this
     if (!item) return <Loader />
-
     return (
       <Fragment>
         <Header>
           <Breadcrumb items={item.breadcrumb} />
-          <H1>{item.name}</H1>
+          <EditableName
+            name={item.name}
+            updateNameHandler={this.updateItemName}
+            canEdit={item.can_edit}
+          />
         </Header>
         <ItemPageContainer>
           <PageContainer>
             {/* TODO: calculate item container size? */}
             {this.content}
-
             <StyledRightColumn>
               <CloseLink to={item.parentPath}>
-                &times;
+                <CloseIcon />
               </CloseLink>
             </StyledRightColumn>
           </PageContainer>

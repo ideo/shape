@@ -1,11 +1,12 @@
 require 'rails_helper'
 
 describe Api::V1::ItemsController, type: :request, auth: true do
+  let(:user) { @user }
+
   describe 'GET #show' do
-    let!(:item) { create(:text_item) }
+    let!(:item) { create(:text_item, add_viewers: [user]) }
     let(:path) { "/api/v1/items/#{item.id}" }
     let(:users_json) { json_included_objects_of_type('users') }
-    let(:user) { @user }
 
     it 'returns a 200' do
       get(path)
@@ -17,20 +18,22 @@ describe Api::V1::ItemsController, type: :request, auth: true do
       expect(json['data']['attributes']).to match_json_schema('item')
     end
 
+    it 'returns can_edit as false' do
+      get(path)
+      expect(json['data']['attributes']['can_edit']).to eq(false)
+    end
+
     context 'with editor' do
-      before do
-        user.add_role(Role::EDITOR, item.becomes(Item))
+      let!(:item) { create(:text_item, add_editors: [user]) }
+
+      it 'returns can_edit as true' do
+        get(path)
+        expect(json['data']['attributes']['can_edit']).to eq(true)
       end
 
-      it 'includes editors' do
+      it 'includes only editors' do
         get(path)
-        expect(json['data']['relationships']['editors']['data'][0]['id'].to_i).to eq(user.id)
         expect(users_json.map { |u| u['id'].to_i }).to match_array([user.id])
-      end
-
-      it 'has no viewers' do
-        get(path)
-        expect(json['data']['relationships']['viewers']['data']).to be_empty
       end
     end
 
@@ -39,15 +42,9 @@ describe Api::V1::ItemsController, type: :request, auth: true do
         user.add_role(Role::VIEWER, item.becomes(Item))
       end
 
-      it 'includes viewers' do
+      it 'includes only viewer' do
         get(path)
-        expect(json['data']['relationships']['viewers']['data'][0]['id'].to_i).to eq(user.id)
         expect(users_json.map { |u| u['id'].to_i }).to match_array([user.id])
-      end
-
-      it 'has no editors' do
-        get(path)
-        expect(json['data']['relationships']['editors']['data']).to be_empty
       end
     end
 
@@ -55,19 +52,19 @@ describe Api::V1::ItemsController, type: :request, auth: true do
       let!(:collection) { create(:collection) }
       let!(:collection_card) { create(:collection_card_item, parent: collection) }
       let!(:item) { collection_card.item }
-      let(:user) { @user }
 
       before do
+        user.add_role(Role::VIEWER, item.becomes(Item))
         item.reload
         item.recalculate_breadcrumb!
       end
 
-      it 'returns empty breadcrumb' do
+      it 'returns breadcrumb with only item' do
         get(path)
-        expect(json['data']['attributes']['breadcrumb']).to be_empty
+        expect(json['data']['attributes']['breadcrumb'].size).to eq(1)
       end
 
-      it 'returns full breadcrumb if user has access' do
+      it 'returns full breadcrumb if user has access to parent' do
         user.add_role(Role::VIEWER, collection)
         get(path)
         expect(json['data']['attributes']['breadcrumb']).to match_array([
@@ -79,7 +76,8 @@ describe Api::V1::ItemsController, type: :request, auth: true do
   end
 
   describe 'POST #create' do
-    let!(:collection_card) { create(:collection_card) }
+    let!(:collection) { create(:collection, add_editors: [user]) }
+    let!(:collection_card) { create(:collection_card, parent: collection) }
     let(:path) { "/api/v1/collection_cards/#{collection_card.id}/items" }
     let(:params) {
       json_api_params(
@@ -104,7 +102,7 @@ describe Api::V1::ItemsController, type: :request, auth: true do
   end
 
   describe 'PATCH #update' do
-    let!(:item) { create(:text_item) }
+    let!(:item) { create(:text_item, add_editors: [user]) }
     let(:path) { "/api/v1/items/#{item.id}" }
     let(:params) {
       json_api_params(
@@ -133,7 +131,7 @@ describe Api::V1::ItemsController, type: :request, auth: true do
   end
 
   describe 'POST #duplicate' do
-    let!(:item) { create(:text_item) }
+    let!(:item) { create(:text_item, add_editors: [user]) }
     let(:path) { "/api/v1/items/#{item.id}/duplicate" }
 
     it 'returns a 200' do

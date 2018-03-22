@@ -9,13 +9,14 @@ let props, wrapper
 beforeEach(() => {
   props = {
     collection: fakeCollection,
+    canEditCollection: true,
     collectionCards: fakeCollection.collection_cards,
     cols: 4,
     gridW: 200,
     gridH: 200,
     gutter: 10,
     updateCollection: jest.fn(),
-
+    cardIds: fakeCollection.cardIds,
     uiStore: {
       blankContentToolState: null
     },

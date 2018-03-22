@@ -1,0 +1,15 @@
+---
+:verbose: true
+:namespace: sidekiq
+:concurrency: 7
+development:
+  :concurrency: 20
+staging:
+  :concurrency: 7
+production:
+  :concurrency: 10
+:queues:
+  - [critical, 10]
+  - [mailers, 5]
+  - [default, 2]
+  - [low, 1]

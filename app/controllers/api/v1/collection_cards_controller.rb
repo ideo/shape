@@ -1,6 +1,6 @@
 class Api::V1::CollectionCardsController < Api::V1::BaseController
   deserializable_resource :collection_card, class: DeserializableCollectionCard, only: [:create, :update]
-  load_and_authorize_resource :collection, only: [:index, :create]
+  load_and_authorize_resource :collection, only: [:index]
   load_and_authorize_resource
   before_action :load_parent_collection, only: [:create]
 
@@ -33,6 +33,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
   end
 
   def archive
+    # TODO: make decrement_card_orders part of the card's archive action
     if @collection_card.archive! && @collection_card.decrement_card_orders!
       @collection_card.reload
       render jsonapi: @collection_card, include: [:parent, record: [:filestack_file]]
@@ -42,7 +43,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
   end
 
   def duplicate
-    duplicate = @collection_card.duplicate!(update_order: true)
+    duplicate = @collection_card.duplicate!(for_user: current_user, update_order: true)
     if duplicate.persisted?
       render jsonapi: duplicate, include: [:parent, record: [:filestack_file]]
     else

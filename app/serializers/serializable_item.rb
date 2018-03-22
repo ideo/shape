@@ -1,17 +1,16 @@
 class SerializableItem < BaseJsonSerializer
+  ROLES_LIMIT = 5
   type 'items'
-  attributes :id, :type, :name, :content, :text_data, :url, :thumbnail_url
-  belongs_to :filestack_file
+  attributes :id, :type, :name, :content, :text_data,
+             :url, :thumbnail_url, :filestack_file_url
   attribute :breadcrumb do
     Breadcrumb::ForUser.new(
       @object.breadcrumb,
       @current_user,
-    ).to_api
+    ).viewable_to_api
   end
-  has_many :editors do
-    data { @object.editors }
+  attribute :can_edit do
+    @current_ability.can?(:edit, @object)
   end
-  has_many :viewers do
-    data { @object.viewers }
-  end
+  has_many :roles
 end

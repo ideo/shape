@@ -8,7 +8,9 @@
     "text_data": { "type": "object" },
     "url": { "type": ["string", "null"] },
     "thumbnail_url": { "type": ["string", "null"] },
-    "breadcrumb": { "type": ["array", "null"] }
+    "breadcrumb": { "type": ["array", "null"] },
+    "can_edit": { "type": ["boolean"] },
+    "filestack_file_url": { "type": ["string", "null"] }
   },
   "required": ["id", "type"]
 }

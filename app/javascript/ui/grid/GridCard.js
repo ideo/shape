@@ -29,8 +29,8 @@ StyledGridCard.displayName = 'StyledGridCard'
 
 export const StyledBottomLeftIcon = styled.div`
   position: absolute;
-  left: -0.25rem; /* Because the icon has internal padding */
-  bottom: -0.4rem;
+  left: 0.25rem;
+  bottom: 0;
   color: ${v.colors.gray};
   width: 34px;
   height: 34px;
@@ -80,6 +80,10 @@ class GridCard extends React.Component {
     selected: false,
   }
 
+  get canEdit() {
+    return this.props.record.can_edit
+  }
+
   get isItem() {
     return this.props.cardType === 'items'
   }
@@ -87,7 +91,7 @@ class GridCard extends React.Component {
     return this.props.cardType === 'collections'
   }
 
-  get inner() {
+  get renderInner() {
     const { card, record, height } = this.props
     if (this.isItem) {
       switch (record.type) {
@@ -111,7 +115,7 @@ class GridCard extends React.Component {
     return <div />
   }
 
-  get icon() {
+  get renderIcon() {
     const { card, cardType } = this.props
     let icon
     if (cardType === 'collections') {
@@ -130,6 +134,17 @@ class GridCard extends React.Component {
       <StyledBottomLeftIcon lassName="show-on-hover">
         {icon}
       </StyledBottomLeftIcon>
+    )
+  }
+
+  get renderSelectionCircle() {
+    if (!this.canEdit) return ''
+    return (
+      <StyledSelectionCircle
+        className={this.state.selected ? 'selected' : ''}
+        onClick={this.toggleSelected}
+        role="button"
+      />
     )
   }
 
@@ -152,8 +167,8 @@ class GridCard extends React.Component {
     console.log('Link card')
   }
 
-  organizeCard = () => {
-    console.log('Organize card')
+  moveCard = () => {
+    console.log('Move card')
   }
 
   archiveCard = () => {
@@ -168,28 +183,26 @@ class GridCard extends React.Component {
   render() {
     return (
       <StyledGridCard dragging={this.props.dragging}>
-        <GridCardHotspot card={this.props.card} dragging={this.props.dragging} />
+        {this.props.canEditCollection &&
+          <GridCardHotspot card={this.props.card} dragging={this.props.dragging} />
+        }
         <StyledTopRightActions className="show-on-hover">
-          <StyledSelectionCircle
-            className={this.state.selected ? 'selected' : ''}
-            onClick={this.toggleSelected}
-            role="button"
-          />
+          {this.renderSelectionCircle}
           <CardMenu
             className="card-menu"
             cardId={this.props.card.id}
+            canEdit={this.canEdit}
             menuOpen={this.props.menuOpen}
-            handleShare={this.shareCard}
             handleDuplicate={this.duplicateCard}
             handleLink={this.linkCard}
-            handleOrganize={this.organizeCard}
+            handleMove={this.moveCard}
             handleArchive={this.archiveCard}
           />
         </StyledTopRightActions>
-        {this.icon}
+        {this.renderIcon}
         {/* onClick placed here so it's separate from hotspot click */}
         <StyledGridCardInner onClick={this.handleClick}>
-          {this.inner}
+          {this.renderInner}
         </StyledGridCardInner>
       </StyledGridCard>
     )
@@ -198,6 +211,7 @@ class GridCard extends React.Component {
 
 GridCard.propTypes = {
   card: MobxPropTypes.objectOrObservableObject.isRequired,
+  canEditCollection: PropTypes.bool.isRequired,
   cardType: PropTypes.string.isRequired,
   height: PropTypes.number.isRequired,
   record: MobxPropTypes.objectOrObservableObject.isRequired,

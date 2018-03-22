@@ -5,8 +5,9 @@ import { Flex, Box } from 'reflexbox'
 
 import Logo from '~/ui/layout/Logo'
 import PlainLink from '~/ui/global/PlainLink'
-import OrganizationAvatar from '~/ui/layout/OrganizationAvatar'
-import UserAvatar from '~/ui/layout/UserAvatar'
+import SearchBar from '~/ui/layout/SearchBar'
+import OrganizationAvatar from '~/ui/organizations/OrganizationAvatar'
+import UserAvatar from '~/ui/users/UserAvatar'
 import v from '~/utils/variables'
 
 const StyledHeader = styled.header`
@@ -41,6 +42,7 @@ class Header extends React.Component {
             </Box>
 
             <Box flex>
+              <SearchBar />
               <OrganizationAvatar
                 organization={currentUser.current_organization}
               />
@@ -60,10 +62,13 @@ class Header extends React.Component {
 }
 
 Header.propTypes = {
-  children: PropTypes.node.isRequired,
+  children: PropTypes.node,
 }
 Header.wrappedComponent.propTypes = {
   apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
+}
+Header.defaultProps = {
+  children: null,
 }
 
 export default Header

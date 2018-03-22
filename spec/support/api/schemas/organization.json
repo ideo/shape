@@ -2,7 +2,8 @@
   "type": "object",
   "properties": {
     "id": { "type": "integer" },
-    "name": { "type": "string" }
+    "name": { "type": "string" },
+    "filestack_file_url": { "type": ["string", "null"] }
   },
   "required": ["id", "name"]
 }

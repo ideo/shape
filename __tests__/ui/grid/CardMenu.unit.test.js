@@ -1,11 +1,13 @@
+import _ from 'lodash'
 import CardMenu from '~/ui/grid/CardMenu'
 
 const props = {
   cardId: 123,
+  canEdit: false,
   handleShare: jest.fn(),
   handleDuplicate: jest.fn(),
   handleLink: jest.fn(),
-  handleOrganize: jest.fn(),
+  handleMove: jest.fn(),
   handleArchive: jest.fn(),
   uiStore: {
     openCardMenuId: false,
@@ -14,50 +16,44 @@ const props = {
   menuOpen: false,
 }
 
-const fakeMouseEvent = { stopPropagation: jest.fn() }
+// const fakeMouseEvent = { stopPropagation: jest.fn() }
 
-const actions = [
-  'Share',
-  'Duplicate',
-  'Link',
-  'Organize',
-  'Archive'
-]
-
-let wrapper
+let wrapper, actions
 describe('CardMenu', () => {
-  beforeEach(() => {
-    wrapper = shallow(
-      <CardMenu.wrappedComponent {...props} />
-    )
-  })
+  describe('as editor', () => {
+    beforeEach(() => {
+      actions = [
+        'Duplicate',
+        'Move',
+        'Link',
+        'Archive'
+      ]
+      props.canEdit = true
+      wrapper = shallow(
+        <CardMenu {...props} />
+      )
+    })
 
-  it('renders a toggle button', () => {
-    expect(wrapper.find('StyledMenuToggle').exists()).toBe(true)
-  })
-
-  it('renders menu', () => {
-    expect(wrapper.find('StyledMenuWrapper').exists()).toBe(true)
-  })
-
-  it('has all menu items with click handlers', () => {
-    actions.forEach(action => {
-      expect(wrapper.find(`.menu-${action.toLowerCase()}`).exists()).toBe(true)
-      const handlerFn = props[`handle${action}`]
-      expect(wrapper.find(`.menu-${action.toLowerCase()}`).props().onClick).toEqual(handlerFn)
+    it('creates a PopoutMenu with all editable actions', () => {
+      const popout = wrapper.find('PopoutMenu').at(0)
+      expect(popout.props().menuItems.length).toEqual(actions.length)
+      expect(_.map(popout.props().menuItems, i => i.name)).toEqual(actions)
     })
   })
 
-  it('has "open" CSS class if menu is open', () => {
-    wrapper = shallow(
-      <CardMenu.wrappedComponent {...props} menuOpen />
-    )
-    expect(wrapper.find('.open').exists()).toBe(true)
-  })
+  describe('as viewer', () => {
+    beforeEach(() => {
+      actions = ['Duplicate']
+      props.canEdit = false
+      wrapper = shallow(
+        <CardMenu {...props} />
+      )
+    })
 
-  it('calls openCardMenu on uiStore on click', () => {
-    wrapper.find('StyledMenuToggle').at(0).simulate('click', fakeMouseEvent)
-    expect(fakeMouseEvent.stopPropagation).toHaveBeenCalledWith()
-    expect(props.uiStore.openCardMenu).toHaveBeenCalledWith(props.cardId)
+    it('creates a PopoutMenu with only 1 viewer action', () => {
+      const popout = wrapper.find('PopoutMenu').at(0)
+      expect(popout.props().menuItems.length).toEqual(1)
+      expect(_.map(popout.props().menuItems, i => i.name)).toEqual(actions)
+    })
   })
 })

@@ -1,4 +1,6 @@
 class Organization < ApplicationRecord
+  include HasFilestackFile
+  
   has_many :collections, -> { root }
   has_many :groups, dependent: :destroy
   belongs_to :primary_group,
@@ -13,6 +15,8 @@ class Organization < ApplicationRecord
   delegate :members, to: :primary_group
   delegate :admins_and_members, to: :primary_group
   delegate :admin_and_member_ids, to: :primary_group
+  delegate :can_edit?, to: :primary_group
+  delegate :can_view?, to: :primary_group
 
   validates :name, presence: true
 

@@ -1,14 +1,15 @@
 import Routes from '~/ui/Routes'
 import fakeApiStore from '#/mocks/fakeApiStore'
 
-let props, requestResult, apiStore, history
+let props, requestResult, apiStore, uiStore, history
 beforeEach(() => {
   requestResult = { data: { id: 1 } }
   history = {}
   apiStore = fakeApiStore({
     requestResult
   })
-  props = { apiStore, history }
+  uiStore = {}
+  props = { apiStore, uiStore, history }
   shallow(
     <Routes.wrappedComponent {...props} />
   )

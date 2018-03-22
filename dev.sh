@@ -4,8 +4,8 @@ if ! [ -x "$(command -v ttab)" ]; then
   exit 1
 fi
 # echo 'Running rails server...'
-ttab heroku local web -f Procfile.development
+ttab bin/rails server
 # echo 'Starting heroku local to run webpack-dev-server...'
-ttab heroku local webpack -f Procfile.development
+ttab heroku local webpack,worker -f Procfile.development
 # echo 'Opening atom...'
-ttab atom .
+ttab 'atom . && open http://localhost:3000'

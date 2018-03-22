@@ -1,5 +1,6 @@
 import CollectionPage from '~/ui/pages/CollectionPage'
 import fakeApiStore from '#/mocks/fakeApiStore'
+import fakeUiStore from '#/mocks/fakeUiStore'
 import {
   fakeCollection
 } from '#/mocks/data'
@@ -18,18 +19,11 @@ beforeEach(() => {
   match = { params: { id }, path: '/collections/1', url: '/collections/1' }
   apiStore = fakeApiStore({
     findResult: collection,
+    findAllResult: collections,
     requestResult: { data: collection }
   })
   apiStore.collections = collections
-  uiStore = {
-    gridSettings: {
-      cols: 4,
-      gutter: 20,
-      gridW: 312,
-      gridH: 250,
-    },
-    blankContentToolState: null
-  }
+  uiStore = fakeUiStore
   props = { apiStore, uiStore, match }
 
   wrapper = shallow(
@@ -44,12 +38,42 @@ describe('CollectionPage', () => {
   })
 
   it('displays the collection name', () => {
-    expect(wrapper.find('H1').children().text()).toEqual(collection.name)
+    expect(wrapper.find('EditableName').exists()).toEqual(true)
+    expect(wrapper.find('EditableName').props().name).toEqual(collection.name)
+  })
+
+  it('passes canEdit = false to EditableName', () => {
+    expect(wrapper.find('EditableName').props().canEdit).toEqual(false)
+  })
+
+  it('passes canEdit = false to RolesSummary', () => {
+    expect(wrapper.find('RolesSummary').props().canEdit).toEqual(false)
   })
 
   it('passes collection to the CollectionGrid', () => {
-    // better way to reference this? otherwise it works
-    const grid = wrapper.find('inject-CollectionGrid-with-routingStore-uiStore')
+    const grid = wrapper.find('InjectedCollectionGrid')
     expect(grid.props().collection).toBe(collection)
+  })
+
+  it('shows the roles edit menu on click of roles summary add button', () => {
+    wrapper.instance().showObjectRoleDialog()
+    expect(uiStore.openRolesMenu).toHaveBeenCalled()
+  })
+
+  describe('as editor', () => {
+    beforeEach(() => {
+      collection.can_edit = true
+      wrapper = shallow(
+        <CollectionPage.wrappedComponent {...props} />
+      )
+    })
+
+    it('passes canEdit = true to EditableName', () => {
+      expect(wrapper.find('EditableName').props().canEdit).toEqual(true)
+    })
+
+    it('passes canEdit = true to RolesSummary', () => {
+      expect(wrapper.find('RolesSummary').props().canEdit).toEqual(true)
+    })
   })
 })

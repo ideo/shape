@@ -20,6 +20,9 @@ class CollectionCard < ApplicationRecord
   validate :card_is_only_primary_card, if: :check_if_primary_card_is_unique?
   validate :parent_is_not_readonly, on: :create
 
+  delegate :can_edit?, to: :parent, allow_nil: true
+  delegate :can_view?, to: :parent, allow_nil: true
+
   scope :primary, -> { where(reference: false) }
   scope :reference, -> { where(reference: true) }
 
@@ -32,13 +35,13 @@ class CollectionCard < ApplicationRecord
     exclude_association :parent
   end
 
-  def duplicate!(shallow: false, update_order: false)
+  def duplicate!(for_user:, shallow: false, update_order: false)
     cc = amoeba_dup
     cc.order += 1
 
     unless shallow
-      cc.collection = collection.duplicate! if collection.present?
-      cc.item = item.duplicate! if item.present?
+      cc.collection = collection.duplicate!(for_user: for_user) if collection.present?
+      cc.item = item.duplicate!(for_user: for_user) if item.present?
     end
 
     if cc.save && update_order
@@ -54,6 +57,7 @@ class CollectionCard < ApplicationRecord
   end
 
   def record_type
+    return nil if record.blank?
     record.class.base_class.name.underscore.to_sym
   end
 
@@ -64,9 +68,7 @@ class CollectionCard < ApplicationRecord
   # Increment the order by 1 of all cards >= specified order
   # - Defaults to use this card's order
   # - Useful when inserting a new card to increment card order after this card
-  def increment_card_orders!(starting_at_order = nil)
-    starting_at_order ||= order
-
+  def increment_card_orders!(starting_at_order = order)
     greater_than_or_equal = CollectionCard.arel_table[:order].gteq(starting_at_order)
 
     update_ids = parent.collection_cards

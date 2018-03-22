@@ -4,7 +4,7 @@ class Api::V1::ItemsController < Api::V1::BaseController
   load_and_authorize_resource
 
   def show
-    render jsonapi: @item, include: %i[editors viewers filestack_file]
+    render jsonapi: @item, include: [:filestack_file, roles: [:users]]
   end
 
   def create
@@ -25,7 +25,7 @@ class Api::V1::ItemsController < Api::V1::BaseController
   end
 
   def duplicate
-    duplicate = @item.duplicate!(copy_parent_card: true)
+    duplicate = @item.duplicate!(for_user: current_user, copy_parent_card: true)
     if duplicate.persisted?
       render jsonapi: duplicate, include: [:parent]
     else
@@ -44,13 +44,7 @@ class Api::V1::ItemsController < Api::V1::BaseController
       :url,
       :image,
       :archived,
-      filestack_file_attributes: [
-        :url,
-        :handle,
-        :filename,
-        :size,
-        :mimetype,
-      ],
+      filestack_file_attributes: Item.filestack_file_attributes_whitelist,
     )
   end
 end

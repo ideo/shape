@@ -3,14 +3,16 @@ Rails.application.routes.draw do
 
   namespace :api do
     namespace :v1 do
-      resources :collections do
+      resources :collections, except: %i[index] do
         collection do
           get 'me'
         end
         member do
           post 'duplicate'
+          patch 'archive'
         end
         resources :collection_cards, only: :index
+        resources :roles, only: %i[index create destroy], shallow: true
       end
       resources :collection_cards, shallow: true do
         member do
@@ -20,24 +22,38 @@ Rails.application.routes.draw do
           member do
             post 'duplicate'
           end
+          resources :roles, only: %i[index create], shallow: true
         end
         resources :collections, only: :create
         member do
           patch 'archive'
         end
       end
-      resources :organizations, only: [:show, :update] do
+      resources :groups, except: :delete
+      resources :organizations, only: %i[show update] do
         collection do
           get 'current'
         end
-        resources :collections, only: [:index, :create]
+        resources :collections, only: %i[create]
+        resources :groups, only: %i[index]
+        resources :users, only: %i[index]
       end
       resources :users do
         collection do
           get 'me'
+          get 'search'
+          post 'create_from_emails'
         end
+        resources :roles, only: %i[destroy]
       end
+
+      get :search, to: 'search#search', as: :search
     end
+  end
+
+  authenticate :user do
+    require 'sidekiq/web'
+    mount Sidekiq::Web => '/sidekiq'
   end
 
   root to: 'home#index'

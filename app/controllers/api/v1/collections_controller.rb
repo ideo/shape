@@ -1,24 +1,15 @@
 class Api::V1::CollectionsController < Api::V1::BaseController
   deserializable_resource :collection, class: DeserializableCollection, only: [:create, :update]
-  load_and_authorize_resource :organization, only: [:index, :create]
+  load_and_authorize_resource :organization, only: [:create]
   load_and_authorize_resource :collection_card, only: [:create]
-  before_action :load_collection_with_cards, only: %i[show update]
+  before_action :load_collection_with_cards, only: %i[show update archive]
   # @collection will only be loaded if it hasn't already, but will still authorize
-  load_and_authorize_resource except: [:me]
-
-  def index
-    @collections = current_organization.collections
-                                       .root
-                                       .not_custom_type
-                                       .order(name: :asc)
-    render jsonapi: @collections
-  end
+  authorize_resource except: %i[me]
 
   def show
     render_collection(include:
       [
-        :editors,
-        :viewers,
+        roles: [:users],
         collection_cards: [
           :parent,
           record: [
@@ -56,11 +47,21 @@ class Api::V1::CollectionsController < Api::V1::BaseController
     end
   end
 
+  def archive
+    # TODO: make decrement_card_orders part of the card's archive action
+    if @collection.archive! && @collection.parent_collection_card.decrement_card_orders!
+      render jsonapi: @collection.reload
+    else
+      render_api_errors @collection.errors
+    end
+  end
+
   private
 
   def render_collection(include: nil)
     # include collection_cards for UI to receive any updates
     include ||= [
+      roles: [:users],
       collection_cards: [
         :parent,
         record: [:filestack_file],
@@ -74,6 +75,7 @@ class Api::V1::CollectionsController < Api::V1::BaseController
     # item/collection will turn into "record" when serialized
     @collection = Collection.where(id: params[:id])
                             .includes(
+                              roles: [:users],
                               collection_cards: [
                                 :parent,
                                 :collection,
@@ -87,6 +89,7 @@ class Api::V1::CollectionsController < Api::V1::BaseController
   def collection_params
     params.require(:collection).permit(
       :name,
+      :tag_list,
       collection_cards_attributes: %i[id order width height],
     )
   end

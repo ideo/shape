@@ -8,6 +8,11 @@ class RoutingStore extends RouterStore {
       return `/collections/${id}`
     case 'items':
       return `/items/${id}`
+    case 'search':
+      // `id` means query in this case
+      // if no query, then go back to homepage (e.g. clearing out your search)
+      if (!id) return '/'
+      return `/search?q=${id.replace(/\s/g, '+')}`
     default:
       return ''
     }

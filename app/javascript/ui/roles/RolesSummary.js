@@ -3,9 +3,10 @@ import { PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 
 import v from '~/utils/variables'
-import UserAvatar from './UserAvatar'
+import UserAvatar from '~/ui/users/UserAvatar'
 
 const MAX_USERS_TO_SHOW = 5
+const AVATAR_SIZE = 30
 
 const StyledRolesSummary = styled.div`
   position: relative;
@@ -60,10 +61,24 @@ const StyledAddUserBtn = styled.div`
 StyledAddUserBtn.displayName = 'StyledAddUserBtn'
 
 class RolesSummary extends React.PureComponent {
+  get editors() {
+    const { roles } = this.props
+    const editorRole = roles.find(role => role.name === 'editor')
+    if (!editorRole) return []
+    return editorRole.users
+  }
+
+  get viewers() {
+    const { roles } = this.props
+    const editorRole = roles.find(role => role.name === 'viewer')
+    if (!editorRole) return []
+    return editorRole.users
+  }
+
   // Return at most MAX_USERS_TO_SHOW users,
   // prioritizing editors over viewers
   get viewersAndEditorsLimited() {
-    let { editors, viewers } = this.props
+    let { editors, viewers } = this
     editors = editors.slice(0, MAX_USERS_TO_SHOW)
 
     if (editors.length < MAX_USERS_TO_SHOW) {
@@ -86,7 +101,7 @@ class RolesSummary extends React.PureComponent {
       <UserAvatar
         key={editor.id}
         user={editor}
-        size={30}
+        size={AVATAR_SIZE}
         className="editor"
       />
     ))
@@ -108,7 +123,7 @@ class RolesSummary extends React.PureComponent {
       <UserAvatar
         key={viewer.id}
         user={viewer}
-        size={30}
+        size={AVATAR_SIZE}
         className="viewer"
       />
     ))
@@ -142,8 +157,7 @@ class RolesSummary extends React.PureComponent {
 }
 
 RolesSummary.propTypes = {
-  editors: MobxPropTypes.arrayOrObservableArray.isRequired,
-  viewers: MobxPropTypes.arrayOrObservableArray.isRequired,
+  roles: MobxPropTypes.arrayOrObservableArray.isRequired,
   handleClick: PropTypes.func.isRequired,
   className: PropTypes.string
 }

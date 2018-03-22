@@ -1,32 +1,11 @@
 require 'rails_helper'
 
 describe Api::V1::CollectionsController, type: :request, auth: true do
-  describe 'GET #index' do
-    let(:user) { @user }
-    let!(:organization) { create(:organization, member: @user) }
-    let!(:collections_in_org) { create_list(:collection, 3, organization: organization) }
-    let!(:collections_outside_org) { create_list(:collection, 3) }
-    let(:path) { "/api/v1/collections" }
-
-    it 'returns a 200' do
-      get(path)
-      expect(response.status).to eq(200)
-    end
-
-    it 'matches JSON schema' do
-      get(path)
-      expect(json['data'].first['attributes']).to match_json_schema('collection')
-    end
-
-    it 'should return all collections in the org' do
-      get(path)
-      expect(json['data'].map { |c| c['id'].to_i }).to match_array(collections_in_org.map(&:id))
-    end
-  end
+  let(:user) { @user }
 
   describe 'GET #show' do
     let!(:collection) {
-      create(:collection, num_cards: 5)
+      create(:collection, num_cards: 5, add_viewers: [user])
     }
     let(:path) { "/api/v1/collections/#{collection.id}" }
     let(:user) { @user }
@@ -51,10 +30,37 @@ describe Api::V1::CollectionsController, type: :request, auth: true do
       ])
     end
 
+    it 'has no editors' do
+      get(path)
+      roles = json['data']['relationships']['roles']['data']
+      editor_role = roles.select { |role| role['name'] == 'editor' }
+      expect(editor_role).to be_empty
+    end
+
+    it 'returns can_edit as false' do
+      get(path)
+      expect(json['data']['attributes']['can_edit']).to eq(false)
+    end
+
+    context 'with editor' do
+      let!(:collection) {
+        create(:collection, num_cards: 5, add_editors: [user])
+      }
+
+      it 'returns can_edit as true' do
+        get(path)
+        expect(json['data']['attributes']['can_edit']).to eq(true)
+      end
+    end
+
     describe 'included' do
       let(:collection_cards_json) { json_included_objects_of_type('collection_cards') }
       let(:items_json) { json_included_objects_of_type('items') }
       let(:users_json) { json_included_objects_of_type('users') }
+
+      before do
+        collection.items.each { |item| user.add_role(Role::VIEWER, item) }
+      end
 
       it 'returns all collection cards' do
         get(path)
@@ -76,43 +82,25 @@ describe Api::V1::CollectionsController, type: :request, auth: true do
         expect(items_json.first['attributes']).to match_json_schema('item')
       end
 
-      context 'with editor' do
-        before do
-          user.add_role(Role::EDITOR, collection)
-        end
-
-        it 'includes editors' do
-          get(path)
-          expect(json['data']['relationships']['editors']['data'][0]['id'].to_i).to eq(user.id)
-          expect(users_json.map { |u| u['id'].to_i }).to match_array([user.id])
-        end
-
-        it 'has no viewers' do
-          get(path)
-          expect(json['data']['relationships']['viewers']['data']).to be_empty
-        end
+      it 'includes viewers' do
+        get(path)
+        expect(users_json.map { |u| u['id'].to_i }).to match_array([user.id])
       end
 
-      context 'with viewer' do
-        before do
-          user.add_role(Role::VIEWER, collection)
-        end
+      context 'with editor' do
+        let!(:collection) {
+          create(:collection, num_cards: 5, add_editors: [user])
+        }
 
-        it 'includes viewers' do
+        it 'includes only editors' do
           get(path)
-          expect(json['data']['relationships']['viewers']['data'][0]['id'].to_i).to eq(user.id)
           expect(users_json.map { |u| u['id'].to_i }).to match_array([user.id])
-        end
-
-        it 'has no editors' do
-          get(path)
-          expect(json['data']['relationships']['editors']['data']).to be_empty
         end
       end
     end
 
     context 'with nested collection' do
-      let!(:nested_collection) { create(:collection) }
+      let!(:nested_collection) { create(:collection, add_editors: [user]) }
       let(:collections_json) { json_included_objects_of_type('collections') }
 
       before do
@@ -134,7 +122,6 @@ describe Api::V1::CollectionsController, type: :request, auth: true do
   end
 
   describe 'GET #me' do
-    let(:user) { @user }
     let!(:organization) { create(:organization, member: user) }
     let!(:org_2) { create(:organization, member: user) }
     let(:path) { '/api/v1/collections/me' }
@@ -194,7 +181,7 @@ describe Api::V1::CollectionsController, type: :request, auth: true do
     end
 
     context 'as sub-collection' do
-      let!(:collection) { create(:collection, organization: organization) }
+      let!(:collection) { create(:collection, organization: organization, add_editors: [user]) }
       let!(:collection_card) { create(:collection_card, parent: collection) }
       let(:path) { "/api/v1/collection_cards/#{collection_card.id}/collections" }
 
@@ -212,8 +199,10 @@ describe Api::V1::CollectionsController, type: :request, auth: true do
   end
 
   describe 'PATCH #update' do
-    let!(:collection) { create(:collection) }
-    let(:collection_card) { create(:collection_card, order: 0, width: 1, parent: collection) }
+    let!(:collection) { create(:collection, add_editors: [user]) }
+    let(:collection_card) do
+      create(:collection_card_item, order: 0, width: 1, parent: collection)
+    end
     let(:path) { "/api/v1/collections/#{collection.id}" }
     let(:params) {
       json_api_params(
@@ -229,6 +218,10 @@ describe Api::V1::CollectionsController, type: :request, auth: true do
         }
       )
     }
+
+    before do
+      user.add_role(Role::VIEWER, collection_card.item)
+    end
 
     it 'returns a 200' do
       patch(path, params: params)
@@ -252,6 +245,49 @@ describe Api::V1::CollectionsController, type: :request, auth: true do
       patch(path, params: params)
       expect(collection_card.reload.width).to eq(3)
       expect(collection_card.reload.order).to eq(1)
+    end
+  end
+
+  describe 'PATCH #archive' do
+    let!(:collection) { create(:collection, add_editors: [user]) }
+    # parent_collection_card is required to exist because it calls decrement_card_orders
+    let!(:parent_collection_card) { create(:collection_card, collection: collection) }
+    let(:collection_card) do
+      create(:collection_card_item, order: 0, width: 1, parent: collection)
+    end
+    let(:path) { "/api/v1/collections/#{collection.id}/archive" }
+
+    it 'returns a 200' do
+      patch(path)
+      expect(response.status).to eq(200)
+    end
+
+    it 'matches Collection schema' do
+      patch(path)
+      expect(json['data']['attributes']).to match_json_schema('collection')
+    end
+
+    it 'updates the archived status of the collection' do
+      expect(collection.active?).to eq(true)
+      patch(path)
+      expect(collection.reload.archived?).to eq(true)
+    end
+
+    it 'updates the archived status of the collection_card' do
+      expect(collection_card.active?).to eq(true)
+      patch(path)
+      expect(collection_card.reload.archived?).to eq(true)
+    end
+
+    context 'without edit access' do
+      before do
+        user.remove_role(Role::EDITOR, collection)
+      end
+
+      it 'rejects non-editors' do
+        patch(path)
+        expect(response.status).to eq(401)
+      end
     end
   end
 end
