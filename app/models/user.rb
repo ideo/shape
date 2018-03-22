@@ -90,6 +90,12 @@ class User < ApplicationRecord
     collections.user.find_by_organization_id(current_organization_id)
   end
 
+  def current_org_groups
+    return nil if current_organization.blank?
+
+    current_organization.groups
+  end
+
   # Override rolify has_role? and add_role methods to ensure
   # we always pass root class, not STI child class - which it can't handle
   def has_role?(role_name, resource = nil)
