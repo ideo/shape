@@ -21,7 +21,12 @@ function transformToHandle(name) {
 @inject('apiStore')
 @observer
 class GroupModify extends React.Component {
-  @observable editingGroup = null
+  @observable editingGroup = {
+    name: '',
+    handle: '',
+    filestack_file_url: ''
+  }
+  fileAttrs = {}
   @observable syncing = false
 
   constructor(props) {
@@ -80,6 +85,13 @@ class GroupModify extends React.Component {
       .then(resp => {
         if (resp.filesUploaded.length > 0) {
           const img = resp.filesUploaded[0]
+          this.fileAttrs = {
+            url: img.url,
+            handle: img.handle,
+            filename: img.filename,
+            size: img.size,
+            mimetype: img.mimetype,
+          }
           this.changeUrl(img.url)
         } else {
           console.warn('Failed to upload image:', resp.filesFailed)
@@ -98,6 +110,7 @@ class GroupModify extends React.Component {
       group.handle = this.editingGroup.handle
       group.filestack_file_url = this.editingGroup.filestack_file_url
     }
+    group.filestack_file_attributes = this.fileAttrs
     group.save().then((res) => {
       // TODO why isn't res wrapped in "data"?
       this.afterSave(res)
