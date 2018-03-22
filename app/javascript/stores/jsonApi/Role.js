@@ -19,4 +19,9 @@ class Role extends BaseRecord {
 }
 Role.type = 'roles'
 
+Role.defaults = {
+  // set as array so it's never `undefined`
+  users: [],
+}
+
 export default Role

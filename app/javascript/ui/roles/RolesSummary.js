@@ -70,9 +70,9 @@ class RolesSummary extends React.PureComponent {
 
   get viewers() {
     const { roles } = this.props
-    const editorRole = roles.find(role => role.name === 'viewer')
-    if (!editorRole) return []
-    return editorRole.users
+    const viewerRole = roles.find(role => role.name === 'viewer')
+    if (!viewerRole) return []
+    return viewerRole.users
   }
 
   // Return at most MAX_USERS_TO_SHOW users,
