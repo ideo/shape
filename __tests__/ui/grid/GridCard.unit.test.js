@@ -16,6 +16,7 @@ const props = {
   height: 100,
   menuOpen: false,
   canEditCollection: false,
+  isSharedCollection: false,
 }
 
 let wrapper

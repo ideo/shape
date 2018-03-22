@@ -155,7 +155,7 @@ class GridCard extends React.Component {
   }
 
   shareCard = () => {
-    console.log('Share card')
+    // console.log('Share card')
   }
 
   duplicateCard = () => {
@@ -164,11 +164,11 @@ class GridCard extends React.Component {
   }
 
   linkCard = () => {
-    console.log('Link card')
+    // console.log('Link card')
   }
 
   moveCard = () => {
-    console.log('Move card')
+    // console.log('Move card')
   }
 
   archiveCard = () => {
@@ -187,7 +187,7 @@ class GridCard extends React.Component {
           <GridCardHotspot card={this.props.card} dragging={this.props.dragging} />
         }
         {/*
-          TODO: Not fully disable CardMenu for SharedCollectiononce
+          TODO: Not fully disable CardMenu for SharedCollection
           once we have appropriate actions?
         */}
         {!this.props.isSharedCollection &&

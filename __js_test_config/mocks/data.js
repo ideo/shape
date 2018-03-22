@@ -66,6 +66,9 @@ export const fakeCollection = {
   roles: [],
   tag_list: ['prototype', 'blockchain'],
   can_edit: false,
+  isSharedCollection: false,
+  isUserCollection: false,
+  isNormalCollection: true,
   collection_cards: [
     fakeItemCard, fakeItemCard, fakeItemCard
   ],
