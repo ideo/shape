@@ -40,11 +40,6 @@ describe('RolesMenu', () => {
     expect(wrapper.find('Dialog').props().open).toBeTruthy()
   })
 
-  it('closes the roles menu in the UI store when exited', () => {
-    wrapper.find('RolesMenu').instance().handleClose()
-    expect(props.uiStore.closeRolesMenu).toHaveBeenCalled()
-  })
-
   describe('onDelete', () => {
     it('should make an api store request with correct data', () => {
       const role = { id: 2 }

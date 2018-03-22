@@ -8,8 +8,10 @@ import {
   FormActionsContainer,
   Label,
   ImageField,
+  TextButton,
   TextField,
 } from '~/ui/global/styled/forms'
+import { RowItemRight } from '~/ui/global/styled/layout'
 import FilestackUpload from '~/utils/FilestackUpload'
 import Group from '~/stores/jsonApi/Group'
 
@@ -74,6 +76,11 @@ class GroupModify extends React.Component {
     this.setSyncing(false)
   }
 
+  handleRoles = (ev) => {
+    ev.preventDefault()
+    this.props.onGroupRoles(this.props.group)
+  }
+
   handleImagePick = (ev) => {
     FilestackUpload
       .pickImage()
@@ -108,6 +115,11 @@ class GroupModify extends React.Component {
   render() {
     return (
       <form>
+        <RowItemRight>
+          <TextButton onClick={this.handleRoles}>
+            Members
+          </TextButton>
+        </RowItemRight>
         <FieldContainer>
           <Label htmlFor="groupName">Group Name</Label>
           <TextField
@@ -154,6 +166,7 @@ class GroupModify extends React.Component {
 GroupModify.propTypes = {
   group: MobxPropTypes.objectOrObservableObject.isRequired,
   onSave: PropTypes.func.isRequired,
+  onGroupRoles: PropTypes.func.isRequired,
 }
 GroupModify.wrappedComponent.propTypes = {
   apiStore: MobxPropTypes.objectOrObservableObject.isRequired,

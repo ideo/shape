@@ -1,3 +1,4 @@
+import _ from 'lodash'
 import PropTypes from 'prop-types'
 import { observable, action } from 'mobx'
 import { observer } from 'mobx-react'
@@ -17,7 +18,13 @@ import { MenuItem } from 'material-ui/Menu'
 @observer
 class RolesAdd extends React.Component {
   @observable selectedUsers = []
-  @observable selectedRole = 'viewer'
+  @observable selectedRole = ''
+
+  constructor(props) {
+    super(props)
+    const [first] = this.props.roleTypes
+    this.selectedRole = first
+  }
 
   @action
   onUserSelected = (data) => {
@@ -73,6 +80,7 @@ class RolesAdd extends React.Component {
   }
 
   render() {
+    const { roleTypes } = this.props
     return (
       <div>
         { this.selectedUsers.length > 0 && (
@@ -95,8 +103,11 @@ class RolesAdd extends React.Component {
               onChange={this.handleRoleSelect}
               value={this.selectedRole}
             >
-              <MenuItem value="editor">Editor</MenuItem>
-              <MenuItem value="viewer">Viewer</MenuItem>
+              { roleTypes.map(roleType =>
+                (<MenuItem key={roleType} value={roleType}>
+                  {_.startCase(roleType)}
+                </MenuItem>))
+              }
             </Select>
           </RowItemRight>
         </Row>
@@ -109,6 +120,7 @@ class RolesAdd extends React.Component {
 }
 
 RolesAdd.propTypes = {
+  roleTypes: PropTypes.arrayOf(PropTypes.string).isRequired,
   onCreateRoles: PropTypes.func.isRequired,
   onCreateUsers: PropTypes.func.isRequired,
   onSearch: PropTypes.func,

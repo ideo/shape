@@ -13,7 +13,7 @@ import PageContainer from '~/ui/layout/PageContainer'
 import CollectionGrid from '~/ui/grid/CollectionGrid'
 import Breadcrumb from '~/ui/layout/Breadcrumb'
 import RolesSummary from '~/ui/roles/RolesSummary'
-import RolesMenu from '~/ui/roles/RolesMenu'
+import Roles from '~/ui/grid/Roles'
 import EditableName from './shared/EditableName'
 import PageMenu from './shared/PageMenu'
 
@@ -133,10 +133,8 @@ class CollectionPage extends PageWithApi {
           </StyledTitleAndRoles>
         </Header>
         <PageContainer>
-          <RolesMenu
+          <Roles
             ownerId={collection.id}
-            ownerType="collections"
-            title="Sharing"
             roles={collection.roles}
           />
           <CollectionGrid

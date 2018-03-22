@@ -5,6 +5,7 @@ import { Row, RowItemRight } from '~/ui/global/styled/layout'
 import { Heading3, DisplayText } from '~/ui/global/styled/typography'
 import Modal from '~/ui/global/Modal'
 import GroupModify from '~/ui/groups/GroupModify'
+import RolesMenu from '~/ui/roles/RolesMenu'
 import OrganizationEdit from './OrganizationEdit'
 
 @inject('uiStore')
@@ -13,10 +14,16 @@ class OrganizationMenu extends React.Component {
   @observable editOrganizationOpen = false
   @observable modifyGroupOpen = false
   @observable editGroup = {}
+  @observable modifyGroupRoles = false
 
   @action onGroupSave = () => {
     this.modifyGroupOpen = false
-    this.editGroup = {}
+    this.editGroup = false
+  }
+
+  @action onModifyGroupRoles(group) {
+    this.editingGroup = group
+    this.modifyGroupRoles = true
   }
 
   @action onOrganizationSave = () => {
@@ -41,11 +48,16 @@ class OrganizationMenu extends React.Component {
   @action handleBack = () => {
     this.editOrganizationOpen = false
     this.modifyGroupOpen = false
+    this.modifyGroupRoles = false
     this.editGroup = {}
   }
 
   handleGroupClick = group => () => {
     this.changeModifyGroup(group)
+  }
+
+  handleGroupRolesClick = (group) => {
+    this.onModifyGroupRoles(group)
   }
 
   handleClose = (ev) => {
@@ -65,7 +77,11 @@ class OrganizationMenu extends React.Component {
 
   renderEditGroup() {
     return (
-      <GroupModify group={this.editGroup} onSave={this.onGroupSave} />
+      <GroupModify
+        group={this.editGroup}
+        onGroupRoles={this.handleGroupRolesClick}
+        onSave={this.onGroupSave}
+      />
     )
   }
 
@@ -115,6 +131,17 @@ class OrganizationMenu extends React.Component {
       content = this.renderEditOrganization()
       title = 'Your Organization'
       onBack = this.handleBack
+    } else if (this.modifyGroupRoles) {
+      content = (
+        <RolesMenu
+          ownerId={this.editingGroup.id}
+          ownerType="groups"
+          title="Members:"
+          addCallout="Add people:"
+          roles={this.editingGroup.roles}
+        />)
+      onBack = this.handleBack
+      title = this.editingGroup.name
     } else if (this.modifyGroupOpen) {
       content = this.renderEditGroup()
       title = this.editGroup.id ? this.editGroup.name : 'New Group'

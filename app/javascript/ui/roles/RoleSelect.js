@@ -1,3 +1,4 @@
+import _ from 'lodash'
 import PropTypes from 'prop-types'
 import { PropTypes as MobxPropTypes } from 'mobx-react'
 import { MenuItem } from 'material-ui/Menu'
@@ -31,7 +32,8 @@ class RoleSelect extends React.Component {
   }
 
   render() {
-    const { role, user } = this.props
+    const { role, roleTypes, user } = this.props
+    // TODO remove duplication with RolesAdd role select menu
     return (
       <Row>
         <span>
@@ -54,8 +56,11 @@ class RoleSelect extends React.Component {
             onChange={this.onRoleSelect}
             value={role.name}
           >
-            <MenuItem value="editor">Editor</MenuItem>
-            <MenuItem value="viewer">Viewer</MenuItem>
+            { roleTypes.map(roleType =>
+              (<MenuItem key={roleType} value={roleType}>
+                {_.startCase(roleType)}
+              </MenuItem>))
+            }
           </Select>
         </span>
       </Row>
@@ -65,6 +70,7 @@ class RoleSelect extends React.Component {
 
 RoleSelect.propTypes = {
   role: MobxPropTypes.objectOrObservableObject.isRequired,
+  roleTypes: PropTypes.arrayOf(PropTypes.string).isRequired,
   user: MobxPropTypes.objectOrObservableObject.isRequired,
   onDelete: PropTypes.func.isRequired,
   onCreate: PropTypes.func.isRequired,
