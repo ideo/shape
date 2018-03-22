@@ -41,7 +41,7 @@ class Api::V1::RolesController < Api::V1::BaseController
   def destroy
     # We want to call remove_role instead of deleting the UserRole
     # So that role lifecycle methods are called
-    if @user.present? && @user.remove_role(@role.name, @role.resource)
+    if @user.present? && remove_role(user: @user, role: @role)
       render jsonapi: @role
     else
       render_api_errors @user.errors
@@ -49,6 +49,20 @@ class Api::V1::RolesController < Api::V1::BaseController
   end
 
   private
+
+  def remove_role(user:, role:)
+    resource = role.resource
+
+    return false unless user.remove_role(role.name, resource)
+
+    RemoveRolesFromChildrenWorker.perform_async(
+      [role.id],
+      resource.id,
+      resource.class.name.to_s,
+    )
+
+    true
+  end
 
   def json_api_params
     params[:_jsonapi]

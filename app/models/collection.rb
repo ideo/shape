@@ -30,8 +30,6 @@ class Collection < ApplicationRecord
   belongs_to :organization, optional: true
   belongs_to :cloned_from, class_name: 'Collection', optional: true
 
-  after_create :inherit_roles_from_parent
-
   validates :name, presence: true, if: :base_collection_type?
   validates :organization, presence: true
   before_validation :inherit_parent_organization_id, on: :create
@@ -78,24 +76,33 @@ class Collection < ApplicationRecord
 
   amoeba do
     enable
+    exclude_association :roles
     exclude_association :collection_cards
     exclude_association :items
     exclude_association :collections
     exclude_association :parent_collection_card
   end
 
-  def duplicate!(copy_parent_card: false)
+  def duplicate!(for_user:, copy_parent_card: false)
     # Clones collection and all embedded items/collections
     c = amoeba_dup
     c.cloned_from = self
 
     if copy_parent_card && parent_collection_card.present?
-      c.parent_collection_card = parent_collection_card.duplicate!(shallow: true)
+      c.parent_collection_card = parent_collection_card.duplicate!(
+        for_user: for_user,
+        shallow: true,
+      )
       c.parent_collection_card.collection = c
     end
 
+    roles.each do |role|
+      c.roles << role.duplicate!(assign_resource: c)
+    end
+
     collection_cards.each do |collection_card|
-      c.collection_cards << collection_card.duplicate!
+      next unless collection_card.record.can_view?(for_user)
+      c.collection_cards << collection_card.duplicate!(for_user: for_user)
     end
 
     if c.save && c.parent_collection_card.present?
@@ -143,10 +150,6 @@ class Collection < ApplicationRecord
   end
 
   private
-
-  def inherit_roles_from_parent
-    AddRolesToChildrenWorker.perform_async(role_ids, id, self.class.name.to_s)
-  end
 
   def organization_blank?
     organization.blank?

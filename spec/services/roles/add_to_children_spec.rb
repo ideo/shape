@@ -7,7 +7,7 @@ RSpec.describe Roles::AddToChildren, type: :service do
   end
   let(:subcollection) { subcollection_card.collection }
   let(:add_to_children) do
-    Roles::AddToChildren.new(parent: collection, roles: [role])
+    Roles::AddToChildren.new(parent: collection, new_roles: [role])
   end
 
   describe '#call' do

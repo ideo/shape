@@ -27,7 +27,6 @@ class Item < ApplicationRecord
   belongs_to :cloned_from, class_name: 'Item', optional: true
 
   before_validation :format_url, if: :saved_change_to_url?
-  after_create :inherit_roles_from_parent
 
   validates :type, presence: true
 
@@ -48,15 +47,22 @@ class Item < ApplicationRecord
     []
   end
 
-  def duplicate!(copy_parent_card: false)
+  def duplicate!(for_user:, copy_parent_card: false)
     # Clones item
     i = amoeba_dup
     i.cloned_from = self
 
     # Clone parent + increase order
     if copy_parent_card && parent_collection_card.present?
-      i.parent_collection_card = parent_collection_card.duplicate!(shallow: true)
+      i.parent_collection_card = parent_collection_card.duplicate!(
+        for_user: for_user,
+        shallow: true,
+      )
       i.parent_collection_card.item = i
+    end
+
+    roles.each do |role|
+      i.roles << role.duplicate!(assign_resource: i)
     end
 
     # Method from HasFilestackFile
@@ -85,10 +91,6 @@ class Item < ApplicationRecord
   end
 
   private
-
-  def inherit_roles_from_parent
-    AddRolesToChildrenWorker.perform_async(role_ids, id, self.class.name.to_s)
-  end
 
   def format_url
     return if url.blank?

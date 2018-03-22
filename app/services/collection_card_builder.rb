@@ -23,11 +23,7 @@ class CollectionCardBuilder
     @collection_card.save.tap do |result|
       if result
         # TODO: rollback transaction if these later actions fail; add errors, return false
-        if @collection_card.collection.present?
-          @user.add_role(Role::EDITOR, @collection_card.collection.becomes(Collection))
-        elsif @collection_card.item.present?
-          @user.add_role(Role::EDITOR, @collection_card.item.becomes(Item))
-        end
+        @collection_card.record.inherit_roles_from_parent!
         @collection_card.increment_card_orders!
         @collection_card.record.reload.recalculate_breadcrumb!
       end

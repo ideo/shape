@@ -68,6 +68,13 @@ module Resourceable
     Role.object_identifier(self)
   end
 
+  def inherit_roles_from_parent!
+    return false unless parent.present?
+    parent.roles.each do |role|
+      role.duplicate!(assign_resource: self)
+    end
+  end
+
   private
 
   def role_with_name(role_name)

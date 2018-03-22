@@ -1,8 +1,8 @@
 module Roles
   class AddToChildren
-    def initialize(parent:, roles:)
+    def initialize(parent:, new_roles:)
       @parent = parent
-      @roles = roles
+      @new_roles = new_roles
       @inheritance = Roles::Inheritance.new(parent)
     end
 
@@ -13,15 +13,15 @@ module Roles
 
     private
 
-    attr_reader :parent, :roles, :inheritance
+    attr_reader :parent, :new_roles, :inheritance
 
     def add_roles_to_children
       children.all? do |child|
         # Build copy of role and add users to test if we should copy it
-        child_roles = build_child_roles(child)
-        next unless inheritance.inherit_from_parent?(child, child_roles)
+        new_child_roles = copy_new_roles_onto_child(child)
+        next unless inheritance.inherit_from_parent?(child, new_child_roles)
         # Save all new children roles
-        child_roles.all?(&:save)
+        new_child_roles.all?(&:save)
       end
     end
 
@@ -29,14 +29,14 @@ module Roles
       children.all? do |child|
         Roles::AddToChildren.new(
           parent: child,
-          roles: roles,
+          new_roles: new_roles,
         ).call
       end
     end
 
-    def build_child_roles(child)
-      roles.map do |role|
-        role.build_copy(child)
+    def copy_new_roles_onto_child(child)
+      new_roles.map do |role|
+        role.duplicate!(assign_resource: child, dont_save: true)
       end
     end
 

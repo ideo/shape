@@ -43,7 +43,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
   end
 
   def duplicate
-    duplicate = @collection_card.duplicate!(update_order: true)
+    duplicate = @collection_card.duplicate!(for_user: current_user, update_order: true)
     if duplicate.persisted?
       render jsonapi: duplicate, include: [:parent, record: [:filestack_file]]
     else

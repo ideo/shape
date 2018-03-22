@@ -9,6 +9,18 @@ RSpec.describe Roles::AssignToUsers, type: :service do
     Roles::AssignToUsers.new(object: object, role_name: role_name, users: users)
   end
 
+  before :all do
+    Sidekiq::Testing.inline!
+  end
+
+  after :all do
+    Sidekiq::Testing.fake!
+  end
+
+  before do
+    Sidekiq::Worker.clear_all
+  end
+
   describe '#call' do
     it 'assigns role to users' do
       expect(assign_role.call).to be true
