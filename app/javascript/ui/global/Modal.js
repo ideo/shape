@@ -31,9 +31,11 @@ class Modal extends React.Component {
 
   render() {
     const { children, open, title } = this.props
+    // TODO progamatically set disableAutoFocus
     return (
       <StyledDialog
         classes={{ paper: 'modal__paper' }}
+        disableAutoFocus
         open={open}
         onClose={this.handleclose}
         aria-labelledby={title}
