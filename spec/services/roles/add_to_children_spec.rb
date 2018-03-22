@@ -51,5 +51,30 @@ RSpec.describe Roles::AddToChildren, type: :service do
         expect(collection.items.first.editors).to match_array(users)
       end
     end
+
+    context 'with child items' do
+      let(:child) { collection.children.first }
+      let(:params) do
+        {
+          object: child,
+          role_name: role_name,
+          users: users,
+          propagate: false,
+        }
+      end
+      let(:instance_double) do
+        double('Roles::AssignToUsers')
+      end
+
+      before do
+        allow(Roles::AssignToUsers).to receive(:new).and_return(instance_double)
+        allow(instance_double).to receive(:call).and_return(true)
+      end
+
+      it 'should call AssignToUsers to save roles on the child item' do
+        expect(Roles::AssignToUsers).to receive(:new).with(params)
+        expect(add_to_children.call).to be true
+      end
+    end
   end
 end
