@@ -20,6 +20,7 @@ class OrganizationEdit extends React.Component {
       name: organization.name,
       filestack_file_url: organization.filestack_file_url
     }
+    this.fileAttrs = {}
   }
 
   @observable editingOrganization = null
@@ -45,6 +46,13 @@ class OrganizationEdit extends React.Component {
       .then(resp => {
         if (resp.filesUploaded.length > 0) {
           const img = resp.filesUploaded[0]
+          this.fileAttrs = {
+            url: img.url,
+            handle: img.handle,
+            filename: img.filename,
+            size: img.size,
+            mimetype: img.mimetype,
+          }
           this.changeUrl(img.url)
         } else {
           console.warn('Failed to upload image:', resp.filesFailed)
@@ -57,6 +65,7 @@ class OrganizationEdit extends React.Component {
     const { organization, onSave } = this.props
     organization.name = this.editingOrganization.name
     organization.filestack_file_url = this.editingOrganization.filestack_file_url
+    organization.assign('filestack_file_attributes', this.fileAttrs)
     organization.save().then(() => {
       onSave && onSave()
     })

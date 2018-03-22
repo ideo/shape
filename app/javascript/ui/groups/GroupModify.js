@@ -26,7 +26,6 @@ class GroupModify extends React.Component {
     handle: '',
     filestack_file_url: ''
   }
-  fileAttrs = {}
   @observable syncing = false
 
   constructor(props) {
@@ -38,6 +37,7 @@ class GroupModify extends React.Component {
       filestack_file_url: group.filestack_file_url || '',
     }
     if (!group.id) this.setSyncing(true)
+    this.fileAttrs = {}
   }
 
   @action setSyncing(val) {
@@ -111,7 +111,7 @@ class GroupModify extends React.Component {
       group.handle = this.editingGroup.handle
       group.filestack_file_url = this.editingGroup.filestack_file_url
     }
-    group.filestack_file_attributes = this.fileAttrs
+    group.assign('filestack_file_attributes', this.fileAttrs)
     group.save().then((res) => {
       // TODO why isn't res wrapped in "data"?
       this.afterSave(res)
