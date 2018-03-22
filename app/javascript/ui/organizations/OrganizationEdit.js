@@ -67,12 +67,19 @@ class OrganizationEdit extends React.Component {
   handleSave = (ev) => {
     ev.preventDefault()
     const { organization, onSave } = this.props
+    const originalOrg = Object.assign({}, organization)
     organization.name = this.editingOrganization.name
     organization.filestack_file_url = this.editingOrganization.filestack_file_url
     organization.assign('filestack_file_attributes', this.fileAttrs)
-    organization.save().then(() => {
-      onSave && onSave()
-    })
+    organization.save()
+      .then(() => {
+        onSave && onSave()
+      })
+      .catch((err) => {
+        organization.name = originalOrg.name
+        organization.filestack_file_url = originalOrg.filestack_file_url
+        console.warn(err)
+      })
   }
 
   renderImagePicker() {

@@ -105,6 +105,7 @@ class GroupModify extends React.Component {
     ev.preventDefault()
     const { apiStore, onSave } = this.props
     let { group } = this.props
+    const originalGroup = Object.assign({}, group)
     if (!group.id) {
       group = new Group(toJS(this.editingGroup), apiStore)
     } else {
@@ -113,11 +114,18 @@ class GroupModify extends React.Component {
       group.filestack_file_url = this.editingGroup.filestack_file_url
     }
     group.assign('filestack_file_attributes', this.fileAttrs)
-    group.save().then((res) => {
-      // TODO why isn't res wrapped in "data"?
-      this.afterSave(res)
-      onSave && onSave()
-    })
+    group.save()
+      .then((res) => {
+        // TODO why isn't res wrapped in "data"?
+        this.afterSave(res)
+        onSave && onSave()
+      })
+      .catch((err) => {
+        console.warn(err)
+        group.name = originalOrg.name
+        group.handle = originalOrg.handle
+        group.filestack_file_url = originalOrg.filestack_file_url
+      })
   }
 
   renderImagePicker() {
