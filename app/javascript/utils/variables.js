@@ -37,7 +37,7 @@ export default {
 
   weights: {
     book: 300,
-    medium: 500,
+    medium: 400,
   },
 
   zIndex: {
