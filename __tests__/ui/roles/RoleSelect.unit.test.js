@@ -12,6 +12,7 @@ describe('RoleSelect', () => {
     useStrict(false)
     props = {
       role: fakeRole,
+      roleTypes: ['viewer', 'editor'],
       user: fakeRole.users[0],
       onDelete: jest.fn(),
       onCreate: jest.fn(),
@@ -31,7 +32,7 @@ describe('RoleSelect', () => {
 
     it('should call delete role then create role', () => {
       props.onDelete.mockReturnValue(Promise.resolve())
-      wrapper.find('RoleSelect').instance().onRoleSelect(fakeSelectEvent)
+      wrapper.instance().onRoleSelect(fakeSelectEvent)
       expect(props.onDelete).toHaveBeenCalled()
       expect(props.onCreate).toHaveBeenCalled()
     })
@@ -39,7 +40,7 @@ describe('RoleSelect', () => {
 
   describe('createRole', () => {
     it('should call onCreate with list of users and role name', () => {
-      wrapper.find('RoleSelect').instance().createRole('viewer')
+      wrapper.instance().createRole('viewer')
       expect(props.onCreate).toHaveBeenCalledWith([fakeRole.users[0]], 'viewer')
     })
   })
@@ -47,7 +48,7 @@ describe('RoleSelect', () => {
   describe('deleteRole', () => {
     beforeEach(() => {
       props.onDelete.mockReturnValue(Promise.resolve())
-      wrapper.find('RoleSelect').instance().deleteRole()
+      wrapper.instance().deleteRole()
     })
 
     it('should call onDelete with the role and user', () => {

@@ -33,13 +33,6 @@ describe('RolesMenu', () => {
     )
   })
 
-  it('only shows itself if the UI Store says it should be open', () => {
-    expect(wrapper.find('Dialog').props().open).toBeFalsy()
-    uiStore.rolesMenuOpen = true
-    wrapper.update()
-    expect(wrapper.find('Dialog').props().open).toBeTruthy()
-  })
-
   describe('onDelete', () => {
     it('should make an api store request with correct data', () => {
       const role = { id: 2 }
