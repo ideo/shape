@@ -208,6 +208,7 @@ GEM
       rack
     rack-proxy (0.6.3)
       rack
+    rack-rewrite (1.5.1)
     rack-test (0.7.0)
       rack (>= 1.0, < 3)
     rails (5.1.4)
@@ -370,6 +371,7 @@ DEPENDENCIES
   pg (~> 0.21)
   pry-rails
   puma (~> 3.11)
+  rack-rewrite (~> 1.5)
   rails (~> 5.1.4)
   rolify (~> 5.2.0)
   rspec-rails (~> 3.7)

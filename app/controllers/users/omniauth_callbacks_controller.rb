@@ -11,6 +11,10 @@ class Users::OmniauthCallbacksController < Devise::OmniauthCallbacksController
     end
   end
 
+  def failure
+    redirect_to root_path
+  end
+
   private
 
   def create_org_if_none(user)

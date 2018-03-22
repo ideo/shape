@@ -4,7 +4,7 @@ describe Api::V1::SearchController, type: :request, auth: true do
   describe '#GET #search', search: true do
     let!(:organization) { create(:organization) }
     let(:current_user) { @user }
-    let(:tag_list) { %w(blockchain prototype innovation) }
+    let(:tag_list) { %w[blockchain prototype innovation] }
     let!(:collection_with_tags) do
       create(
         :collection,
@@ -35,18 +35,11 @@ describe Api::V1::SearchController, type: :request, auth: true do
     before do
       current_user.add_role(:member, organization.primary_group)
       Collection.reindex
-    end
-
-    before(:all) do
-      Collection.reindex
-      sleep 1 # Let ElasticSearch indexing finish (even though it seems to be synchronous)
+      Collection.searchkick_index.refresh
+      sleep 0.25 # Let ElasticSearch indexing finish (even though it seems to be synchronous)
     end
 
     context 'if user can view collection' do
-      before do
-        Collection.reindex
-      end
-
       it 'returns a 200' do
         get(path, params: { query: '' })
         expect(response.status).to eq(200)
@@ -66,6 +59,7 @@ describe Api::V1::SearchController, type: :request, auth: true do
       end
 
       it 'returns collection that matches sub-item text search' do
+        Collection.reindex # just re-index again because this test sometimes fails
         text = collection_with_text.collection_cards.first.item.plain_content
         get(path, params: { query: text })
         expect(json['data'].size).to eq(1)

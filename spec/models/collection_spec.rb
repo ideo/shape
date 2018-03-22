@@ -30,11 +30,29 @@ describe Collection, type: :model do
   end
 
   describe '#duplicate' do
+    let!(:user) { create(:user) }
     let!(:collection) { create(:collection, num_cards: 5) }
-    let(:duplicate) { collection.duplicate! }
+    let(:copy_parent_card) { false }
+    let(:duplicate) do
+      dupe = collection.duplicate!(
+        for_user: user,
+        copy_parent_card: copy_parent_card,
+      )
+      # Necessary because AR-relationship is cached
+      user.roles.reload
+      user.reset_cached_roles!
+      dupe
+    end
+
+    before do
+      user.add_role(Role::EDITOR, collection)
+      collection.items.each do |item|
+        user.add_role(Role::EDITOR, item)
+      end
+    end
 
     it 'clones the collection' do
-      expect { collection.duplicate! }.to change(Collection, :count).by(1)
+      expect { duplicate }.to change(Collection, :count).by(1)
       expect(collection.id).not_to eq(duplicate.id)
     end
 
@@ -52,6 +70,34 @@ describe Collection, type: :model do
       expect(collection.items.map(&:id)).not_to match_array(duplicate.items.map(&:id))
     end
 
+    it 'clones all roles on collection' do
+      expect(duplicate.roles.map(&:name)).to match(collection.roles.map(&:name))
+      expect(duplicate.can_edit?(user)).to be true
+    end
+
+    it 'clones all roles on items' do
+      expect(duplicate.items.all? { |item| item.can_edit?(user) }).to be true
+    end
+
+    context 'with items you can\'t see' do
+      let!(:hidden_item) { collection.items.first }
+      let!(:viewable_items) { collection.items - [hidden_item] }
+
+      before do
+        user.remove_role(Role::EDITOR, hidden_item)
+      end
+
+      it 'duplicates collection' do
+        expect { duplicate }.to change(Collection, :count).by(1)
+      end
+
+      it 'duplicates all viewable items' do
+        # Use cloned_from to get original items
+        expect(duplicate.items.map(&:cloned_from)).to match_array(viewable_items)
+        expect(duplicate.items(&:cloned_from)).not_to include(hidden_item)
+      end
+    end
+
     context 'with parent collection card' do
       let!(:parent_collection_card) do
         create(:collection_card_collection, collection: collection)
@@ -61,14 +107,16 @@ describe Collection, type: :model do
         expect(duplicate.parent_collection_card).to be_nil
       end
 
-      it 'duplicates parent' do
-        dupe = collection.duplicate!(copy_parent_card: true)
-        expect(dupe.id).not_to eq(collection.parent_collection_card.id)
-      end
+      context 'with copy_parent_card true' do
+        let!(:copy_parent_card) { true }
 
-      it 'increases the order by 1' do
-        dupe = collection.duplicate!(copy_parent_card: true)
-        expect(dupe.parent_collection_card.order).to eq(collection.parent_collection_card.order + 1)
+        it 'duplicates parent' do
+          expect(duplicate.id).not_to eq(collection.parent_collection_card.id)
+        end
+
+        it 'increases the order by 1' do
+          expect(duplicate.parent_collection_card.order).to eq(collection.parent_collection_card.order + 1)
+        end
       end
     end
   end

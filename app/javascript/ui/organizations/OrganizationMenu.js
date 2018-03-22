@@ -5,7 +5,10 @@ import { Row, RowItemRight } from '~/ui/global/styled/layout'
 import { Heading3, DisplayText } from '~/ui/global/styled/typography'
 import Modal from '~/ui/global/Modal'
 import GroupModify from '~/ui/groups/GroupModify'
+<<<<<<< HEAD
 import RolesMenu from '~/ui/roles/RolesMenu'
+=======
+>>>>>>> development
 import OrganizationEdit from './OrganizationEdit'
 
 @inject('uiStore')
@@ -24,6 +27,11 @@ class OrganizationMenu extends React.Component {
   @action onModifyGroupRoles(group) {
     this.editingGroup = group
     this.modifyGroupRoles = true
+  }
+
+  @action onGroupSave = () => {
+    this.modifyGroupOpen = false
+    this.editGroup = {}
   }
 
   @action onOrganizationSave = () => {
@@ -162,7 +170,7 @@ class OrganizationMenu extends React.Component {
 
 OrganizationMenu.propTypes = {
   organization: MobxPropTypes.objectOrObservableObject.isRequired,
-  userGroups: MobxPropTypes.objectOrObservableObject.isRequired,
+  userGroups: MobxPropTypes.arrayOrObservableArray.isRequired,
 }
 OrganizationMenu.wrappedComponent.propTypes = {
   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,

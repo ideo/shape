@@ -14,6 +14,9 @@ import {
 import { RowItemRight } from '~/ui/global/styled/layout'
 import FilestackUpload from '~/utils/FilestackUpload'
 import Group from '~/stores/jsonApi/Group'
+import FilestackUpload from '~/utils/FilestackUpload'
+import Group from '~/stores/jsonApi/Group'
+import Avatar from '~/ui/global/Avatar'
 
 function transformToHandle(name) {
   // Keep in sync with models/group.rb
@@ -23,7 +26,11 @@ function transformToHandle(name) {
 @inject('apiStore')
 @observer
 class GroupModify extends React.Component {
-  @observable editingGroup = null
+  @observable editingGroup = {
+    name: '',
+    handle: '',
+    filestack_file_url: ''
+  }
   @observable syncing = false
 
   constructor(props) {
@@ -35,6 +42,7 @@ class GroupModify extends React.Component {
       filestack_file_url: group.filestack_file_url || '',
     }
     if (!group.id) this.setSyncing(true)
+    this.fileAttrs = {}
   }
 
   @action setSyncing(val) {
@@ -82,11 +90,19 @@ class GroupModify extends React.Component {
   }
 
   handleImagePick = (ev) => {
+    ev.preventDefault()
     FilestackUpload
       .pickImage()
       .then(resp => {
         if (resp.filesUploaded.length > 0) {
           const img = resp.filesUploaded[0]
+          this.fileAttrs = {
+            url: img.url,
+            handle: img.handle,
+            filename: img.filename,
+            size: img.size,
+            mimetype: img.mimetype,
+          }
           this.changeUrl(img.url)
         } else {
           console.warn('Failed to upload image:', resp.filesFailed)
@@ -98,6 +114,7 @@ class GroupModify extends React.Component {
     ev.preventDefault()
     const { apiStore, onSave } = this.props
     let { group } = this.props
+    const originalGroup = Object.assign({}, group)
     if (!group.id) {
       group = new Group(toJS(this.editingGroup), apiStore)
     } else {
@@ -105,11 +122,39 @@ class GroupModify extends React.Component {
       group.handle = this.editingGroup.handle
       group.filestack_file_url = this.editingGroup.filestack_file_url
     }
-    group.save().then((res) => {
-      // TODO why isn't res wrapped in "data"?
-      this.afterSave(res)
-      onSave && onSave()
-    })
+    group.assign('filestack_file_attributes', this.fileAttrs)
+    group.save()
+      .then((res) => {
+        // TODO why isn't res wrapped in "data"?
+        this.afterSave(res)
+        onSave && onSave()
+      })
+      .catch((err) => {
+        console.warn(err)
+        group.name = originalGroup.name
+        group.handle = originalGroup.handle
+        group.filestack_file_url = originalGroup.filestack_file_url
+      })
+  }
+
+  renderImagePicker() {
+    let imagePicker = (
+      <ImageField>
+        <span>
+          +
+        </span>
+      </ImageField>
+    )
+    if (this.editingGroup.filestack_file_url) {
+      imagePicker = (
+        <Avatar
+          title={this.editingGroup.name}
+          url={this.editingGroup.filestack_file_url}
+          size={100}
+        />
+      )
+    }
+    return imagePicker
   }
 
   render() {
@@ -143,11 +188,7 @@ class GroupModify extends React.Component {
         <FieldContainer>
           <Label htmlFor="groupAvatar">Group Avatar</Label>
           <button onClick={this.handleImagePick} id="groupAvatar">
-            <ImageField>
-              <span>
-                +
-              </span>
-            </ImageField>
+            { this.renderImagePicker() }
           </button>
         </FieldContainer>
         <FormActionsContainer>

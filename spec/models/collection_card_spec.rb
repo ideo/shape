@@ -59,40 +59,70 @@ RSpec.describe CollectionCard, type: :model do
   end
 
   describe '#duplicate!' do
+    let(:user) { create(:user) }
     let!(:collection_card) { create(:collection_card_item) }
-    let!(:collection_card_collection) { create(:collection_card_collection) }
-
-    it 'should create copy of card' do
-      expect(collection_card.duplicate!.id).not_to eq(collection_card.id)
+    let(:shallow) { false }
+    let(:update_order) { false }
+    let(:duplicate) do
+      collection_card.duplicate!(
+        for_user: user,
+        shallow: shallow,
+        update_order: update_order,
+      )
     end
 
-    it 'should duplicate collection' do
-      expect { collection_card_collection.duplicate! }.to change(Collection, :count).by(1)
+    before do
+      user.add_role(Role::EDITOR, collection_card.item)
+    end
+
+    it 'should create copy of card' do
+      expect(duplicate.id).not_to eq(collection_card.id)
     end
 
     it 'should duplicate item' do
-      expect { collection_card.duplicate! }.to change(Item, :count).by(1)
+      expect { duplicate }.to change(Item, :count).by(1)
     end
 
     it 'should not call increment_card_orders!' do
       expect_any_instance_of(CollectionCard).not_to receive(:increment_card_orders!)
-      collection_card.duplicate!
+      duplicate
+    end
+
+    context 'for collection' do
+      let!(:collection_card_collection) { create(:collection_card_collection) }
+      let(:duplicate) do
+        collection_card_collection.duplicate!(
+          for_user: user,
+        )
+      end
+
+      before do
+        user.add_role(Role::EDITOR, collection_card_collection.collection)
+      end
+
+      it 'should duplicate collection' do
+        expect { duplicate }.to change(Collection, :count).by(1)
+      end
     end
 
     context 'with shallow true' do
+      let!(:shallow) { true }
+
       it 'should not duplicate item' do
-        expect { collection_card.duplicate!(shallow: true) }.not_to change(Item, :count)
+        expect { duplicate }.not_to change(Item, :count)
       end
 
       it 'should not duplicate collection' do
-        expect { collection_card_collection.duplicate!(shallow: true) }.not_to change(Collection, :count)
+        expect { duplicate }.not_to change(Collection, :count)
       end
     end
 
     context 'with update_order true' do
+      let!(:update_order) { true }
+
       it 'should call increment_card_orders!' do
         expect_any_instance_of(CollectionCard).to receive(:increment_card_orders!)
-        collection_card.duplicate!(update_order: true)
+        duplicate
       end
     end
   end

@@ -66,6 +66,9 @@ export const fakeCollection = {
   roles: [],
   tag_list: ['prototype', 'blockchain'],
   can_edit: false,
+  isSharedCollection: false,
+  isUserCollection: false,
+  isNormalCollection: true,
   collection_cards: [
     fakeItemCard, fakeItemCard, fakeItemCard
   ],
@@ -81,7 +84,6 @@ export const fakeUserAttrs = {
   last_name: 'Winfrey',
   email: 'oprah@winfrey.com',
   pic_url_square: 'https://filestackcdn.com/abc123',
-  filestack_file_url: 'https://filestackcdn.com/abc123',
   groups: [],
 }
 export const fakeUser = {

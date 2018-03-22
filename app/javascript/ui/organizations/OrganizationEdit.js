@@ -10,9 +10,15 @@ import {
   Label,
   TextField,
 } from '~/ui/global/styled/forms'
+import OrganizationAvatar from '~/ui/organizations/OrganizationAvatar'
 
 @observer
 class OrganizationEdit extends React.Component {
+  @observable editingOrganization = {
+    name: '',
+    filestack_file_url: ''
+  }
+
   constructor(props) {
     super()
     const { organization } = props
@@ -20,9 +26,8 @@ class OrganizationEdit extends React.Component {
       name: organization.name,
       filestack_file_url: organization.filestack_file_url
     }
+    this.fileAttrs = {}
   }
-
-  @observable editingOrganization = null
 
   @action
   changeName(name) {
@@ -39,11 +44,19 @@ class OrganizationEdit extends React.Component {
   }
 
   handleImagePick = (ev) => {
+    ev.preventDefault()
     FilestackUpload
       .pickImage()
       .then(resp => {
         if (resp.filesUploaded.length > 0) {
           const img = resp.filesUploaded[0]
+          this.fileAttrs = {
+            url: img.url,
+            handle: img.handle,
+            filename: img.filename,
+            size: img.size,
+            mimetype: img.mimetype,
+          }
           this.changeUrl(img.url)
         } else {
           console.warn('Failed to upload image:', resp.filesFailed)
@@ -54,11 +67,38 @@ class OrganizationEdit extends React.Component {
   handleSave = (ev) => {
     ev.preventDefault()
     const { organization, onSave } = this.props
+    const originalOrg = Object.assign({}, organization)
     organization.name = this.editingOrganization.name
     organization.filestack_file_url = this.editingOrganization.filestack_file_url
-    organization.save().then(() => {
-      onSave && onSave()
-    })
+    organization.assign('filestack_file_attributes', this.fileAttrs)
+    organization.save()
+      .then(() => {
+        onSave && onSave()
+      })
+      .catch((err) => {
+        organization.name = originalOrg.name
+        organization.filestack_file_url = originalOrg.filestack_file_url
+        console.warn(err)
+      })
+  }
+
+  renderImagePicker() {
+    let imagePicker = (
+      <ImageField>
+        <span>
+          +
+        </span>
+      </ImageField>
+    )
+    if (this.editingOrganization.filestack_file_url) {
+      imagePicker = (
+        <OrganizationAvatar
+          organization={this.editingOrganization}
+          size={100}
+        />
+      )
+    }
+    return imagePicker
   }
 
   render() {
@@ -77,11 +117,7 @@ class OrganizationEdit extends React.Component {
         <FieldContainer>
           <Label htmlFor="organizationAvatar">Organization Avatar</Label>
           <button onClick={this.handleImagePick} id="organizationAvatar">
-            <ImageField>
-              <span>
-                +
-              </span>
-            </ImageField>
+            { this.renderImagePicker() }
           </button>
         </FieldContainer>
         <FormActionsContainer>
