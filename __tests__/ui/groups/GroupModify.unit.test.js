@@ -22,7 +22,9 @@ describe('GroupModify', () => {
     useStrict(false)
     props = {
       onSave: jest.fn(),
-      group: {},
+      group: {
+        assign: jest.fn(),
+      },
     }
     apiStore = {
       fetch: jest.fn(),
@@ -55,7 +57,8 @@ describe('GroupModify', () => {
           id: 1,
           name: 'tester',
           handle: 'test-er',
-          filestack_file_url: 'test.jpg'
+          filestack_file_url: 'test.jpg',
+          assign: jest.fn(),
         }
         mountComponent()
         component = wrapper.find('GroupModify')
@@ -139,7 +142,8 @@ describe('GroupModify', () => {
         saveFn = jest.fn().mockReturnValue(Promise.resolve({}))
         Group.mockImplementation(() =>
           ({
-            save: saveFn
+            save: saveFn,
+            assign: jest.fn(),
           }))
         component.instance().changeName('after name')
         component.instance().changeHandle('after-handle')
@@ -164,6 +168,7 @@ describe('GroupModify', () => {
           handle: 'before-handle',
           filestack_file_url: 'before.jpg',
           save: jest.fn().mockReturnValue(Promise.resolve({})),
+          assign: jest.fn(),
         })
         // Have to remount, because of the provider, setProps wouldn't pass the
         // props to the child correctly.
