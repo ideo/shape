@@ -18,7 +18,9 @@ const props = {
   onMoveStop: jest.fn(),
   routeTo: jest.fn(),
   menuOpen: false,
-  canEditCollection: false
+  canEditCollection: false,
+  isUserCollection: false,
+  isSharedCollection: false,
 }
 
 let wrapper

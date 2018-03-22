@@ -48,17 +48,17 @@ class Collection
     def collection_cards
       # HACK: this is obviously an imperfect solution but the problem is that if the frontend
       # has loaded the "real" collectionCard with id=X then there will be a collision.
-      i = 99_999
+      i = 999_999
 
-      collections_and_items_shared_with_me.map do |obj|
+      collections_shared_with_me.map do |obj|
         CollectionCard.new(
           id: i,
           parent: self,
           height: 1,
           width: 1,
           order: i += 1,
-          item: obj.is_a?(Item) ? obj : nil,
-          collection: obj.is_a?(Collection) ? obj : nil
+          item: nil,
+          collection: obj.is_a?(Collection) ? obj : nil,
         )
       end
     end
@@ -67,10 +67,10 @@ class Collection
 
     # TODO: right now this is all items shared with me,
     #       not scoped to org
-    def collections_and_items_shared_with_me
+    def collections_shared_with_me
       Role.user_resources(
         user: user,
-        resource_type: %w[Collection Item]
+        resource_type: %w[Collection],
       ).select do |obj|
         include_object?(obj)
       end.sort_by(&:updated_at)

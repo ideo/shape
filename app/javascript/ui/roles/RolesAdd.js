@@ -7,6 +7,7 @@ import {
   FormActionsContainer,
 } from '~/ui/global/styled/forms'
 import {
+  Row,
   RowItemRight,
 } from '~/ui/global/styled/layout'
 import AutoComplete from '~/ui/global/AutoComplete'
@@ -90,23 +91,25 @@ class RolesAdd extends React.Component {
             onItemDelete={this.onUserDelete}
           />)
         }
-        <RowItemRight>
-          <Select
-            classes={classes}
-            displayEmpty
-            disableUnderline
-            name="role"
-            onChange={this.handleRoleSelect}
-            value={this.selectedRole}
-          >
-            <MenuItem value="editor">Editor</MenuItem>
-            <MenuItem value="viewer">Viewer</MenuItem>
-          </Select>
-        </RowItemRight>
-        <AutoComplete
-          onInputChange={this.onUserSearch}
-          onOptionSelect={this.onUserSelected}
-        />
+        <Row>
+          <AutoComplete
+            onInputChange={this.onUserSearch}
+            onOptionSelect={this.onUserSelected}
+          />
+          <RowItemRight>
+            <Select
+              classes={classes}
+              displayEmpty
+              disableUnderline
+              name="role"
+              onChange={this.handleRoleSelect}
+              value={this.selectedRole}
+            >
+              <MenuItem value="editor">Editor</MenuItem>
+              <MenuItem value="viewer">Viewer</MenuItem>
+            </Select>
+          </RowItemRight>
+        </Row>
         <FormActionsContainer>
           <FormButton onClick={this.handleSave}>Add</FormButton>
         </FormActionsContainer>

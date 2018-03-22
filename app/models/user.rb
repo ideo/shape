@@ -90,6 +90,12 @@ class User < ApplicationRecord
     collections.user.find_by_organization_id(current_organization_id)
   end
 
+  def current_org_groups
+    return nil if current_organization.blank?
+
+    current_organization.groups
+  end 
+  
   def viewable_collections_and_items(organization)
     Role.user_resources(
       user: self,
@@ -151,21 +157,27 @@ class User < ApplicationRecord
   private
 
   def after_add_role(role)
+    reset_cached_roles!
+
     resource = role.resource
     if resource.is_a?(Group)
       organization = resource.organization
       organization.user_role_added(self)
     end
+
     # Reindex record if it is a searchkick model
     resource.reindex if resource.respond_to?(:queryable) && queryable
   end
 
   def after_remove_role(role)
+    reset_cached_roles!
+
     resource = role.resource
     if resource.is_a?(Group)
       organization = resource.organization
       organization.user_role_removed(self)
     end
+
     # Reindex record if it is a searchkick model
     resource.reindex if resource.respond_to?(:queryable) && queryable
   end

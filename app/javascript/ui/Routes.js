@@ -36,6 +36,7 @@ class Routes extends React.Component {
         <WindowSizeListener onResize={this.handleWindowResize} />
         <OrganizationMenu
           organization={apiStore.currentUser.current_organization}
+          userGroups={apiStore.currentUser.groups}
         />
         <Router history={history}>
           <Switch>

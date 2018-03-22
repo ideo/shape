@@ -113,21 +113,23 @@ class CollectionPage extends PageWithApi {
               <EditableName
                 name={collection.name}
                 updateNameHandler={this.updateCollectionName}
-                canEdit={collection.can_edit}
+                canEdit={collection.can_edit && !this.isUserCollection}
               />
             </Box>
             <Flex align="baseline">
-              <RolesSummary
-                className="roles-summary"
-                handleClick={this.showObjectRoleDialog}
-                roles={collection.roles}
-                canEdit={collection.can_edit}
-              />
-              {!this.isHomepage &&
-                <PageMenu
-                  record={collection}
-                  menuOpen={uiStore.pageMenuOpen}
-                />
+              {this.collection.isNormalCollection &&
+                <Fragment>
+                  <RolesSummary
+                    className="roles-summary"
+                    handleClick={this.showObjectRoleDialog}
+                    roles={collection.roles}
+                    canEdit={collection.can_edit}
+                  />
+                  <PageMenu
+                    record={collection}
+                    menuOpen={uiStore.pageMenuOpen}
+                  />
+                </Fragment>
               }
             </Flex>
           </StyledTitleAndRoles>

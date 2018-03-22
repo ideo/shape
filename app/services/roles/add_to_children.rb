@@ -1,49 +1,63 @@
 module Roles
   class AddToChildren
-    def initialize(parent:, roles:)
+    def initialize(users_to_add:, role_name:, parent:)
+      @users_to_add = users_to_add
       @parent = parent
-      @roles = roles
+      @role_name = role_name
       @inheritance = Roles::Inheritance.new(parent)
     end
 
     def call
       return false unless add_roles_to_children
-      recursively_add_roles
+      recursively_add_roles_to_grandchildren
     end
 
     private
 
-    attr_reader :parent, :roles, :inheritance
-
     def add_roles_to_children
       children.all? do |child|
-        # Build copy of role and add users to test if we should copy it
-        child_roles = build_child_roles(child)
-        next unless inheritance.inherit_from_parent?(child, child_roles)
-        # Save all new children roles
-        child_roles.all?(&:save)
+        if @inheritance.inherit_from_parent?(child, new_user_role_identifiers)
+          save_new_child_roles(child)
+        else
+          true
+        end
       end
     end
 
-    def recursively_add_roles
+    def recursively_add_roles_to_grandchildren
       children.all? do |child|
-        Roles::AddToChildren.new(
-          parent: child,
-          roles: roles,
-        ).call
+        if child.respond_to?(:children) &&
+           child.children.present?
+          Roles::AddToChildren.new(
+            users_to_add: @users_to_add,
+            role_name: @role_name,
+            parent: child,
+          ).call
+        else
+          true
+        end
       end
     end
 
-    def build_child_roles(child)
-      roles.map do |role|
-        role.build_copy(child)
+    def new_user_role_identifiers
+      @users_to_add.map do |user|
+        UsersRole.identifier(role_name: @role_name, user_id: user.id)
       end
+    end
+
+    def save_new_child_roles(child)
+      Roles::AssignToUsers.new(
+        object: child,
+        role_name: @role_name,
+        users: @users_to_add,
+        propagate_to_children: false,
+      ).call
     end
 
     def children
-      return [] unless parent.respond_to?(:children)
+      return [] unless @parent.respond_to?(:children)
 
-      parent.children
+      @parent.children
     end
   end
 end
