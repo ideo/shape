@@ -130,21 +130,27 @@ class User < ApplicationRecord
   private
 
   def after_add_role(role)
+    reset_cached_roles!
+
     resource = role.resource
     if resource.is_a?(Group)
       organization = resource.organization
       organization.user_role_added(self)
     end
+
     # Reindex record if it is a searchkick model
     resource.reindex if resource.respond_to?(:queryable) && queryable
   end
 
   def after_remove_role(role)
+    reset_cached_roles!
+
     resource = role.resource
     if resource.is_a?(Group)
       organization = resource.organization
       organization.user_role_removed(self)
     end
+
     # Reindex record if it is a searchkick model
     resource.reindex if resource.respond_to?(:queryable) && queryable
   end

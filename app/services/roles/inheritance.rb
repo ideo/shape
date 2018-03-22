@@ -4,9 +4,12 @@ module Roles
       @parent_roles = role_user_identifiers(parent.roles)
     end
 
-    def inherit_from_parent?(child, new_role_or_roles = nil)
-      roles = child_role_identifiers(child, new_role_or_roles)
-      should_inherit?(roles)
+    def inherit_from_parent?(child, new_child_roles = nil)
+      # Yes if there are no child roles yet
+      return true if child.roles.empty?
+
+      proposed_roles = proposed_new_role_identifiers(child, new_child_roles)
+      should_inherit?(proposed_roles)
     end
 
     private
@@ -15,24 +18,24 @@ module Roles
 
     # Tests to see if children permissions are same or more permissive than parent
     # If so, apply roles. If not, ignore this object.
-    def should_inherit?(child_roles)
+    def should_inherit?(proposed_roles)
       # Yes if they have the same roles
-      return true if parent_roles == child_roles
+      return true if parent_roles == proposed_roles
 
       # No if parent has more roles than child
-      return false if (parent_roles - child_roles).size.positive?
+      return false if (parent_roles - proposed_roles).size.positive?
 
       # Yes if child has more roles than parent,
       #   but all of parents' roles are included in the child
-      intersection = parent_roles & child_roles
+      intersection = parent_roles & proposed_roles
       return true if (parent_roles - intersection).size.zero?
 
       # Otherwise No
       false
     end
 
-    def child_role_identifiers(child, new_role_or_roles)
-      new_roles = *new_role_or_roles
+    def proposed_new_role_identifiers(child, proposed_child_roles)
+      new_roles = *proposed_child_roles
       role_user_identifiers(child.roles + new_roles)
     end
 
@@ -46,7 +49,7 @@ module Roles
         user_ids.map do |user_id|
           "#{role.name}_User_#{user_id}"
         end
-      end.flatten.compact
+      end.flatten.compact.uniq
     end
   end
 end

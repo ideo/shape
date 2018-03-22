@@ -13,11 +13,18 @@ RSpec.describe Item, type: :model do
   end
 
   describe '#duplicate!' do
+    let(:user) { create(:user) }
     let!(:item) { create(:text_item) }
-    let(:duplicate) { item.duplicate! }
+    let(:copy_parent_card) { false }
+    let(:duplicate) do
+      item.duplicate!(
+        for_user: user,
+        copy_parent_card: copy_parent_card,
+      )
+    end
 
     it 'clones the item' do
-      expect { item.duplicate! }.to change(Item, :count).by(1)
+      expect { duplicate }.to change(Item, :count).by(1)
       expect(duplicate).not_to eq(item)
     end
 
@@ -29,20 +36,21 @@ RSpec.describe Item, type: :model do
       let!(:parent_collection_card) do
         create(:collection_card_item, item: item)
       end
-      let!(:duplicate) { item.duplicate! }
 
-      it 'does not duplicate if no flag passed' do
+      it 'does not duplicate if no copy_parent_card is false' do
         expect(duplicate.parent_collection_card).to be_nil
       end
 
-      it 'duplicates parent' do
-        dupe = item.duplicate!(copy_parent_card: true)
-        expect(dupe.id).not_to eq(item.parent_collection_card.id)
-      end
+      context 'copy_parent_card true' do
+        let!(:copy_parent_card) { true }
 
-      it 'increases the order by 1' do
-        dupe = item.duplicate!(copy_parent_card: true)
-        expect(dupe.parent_collection_card.order).to eq(item.parent_collection_card.order + 1)
+        it 'duplicates parent' do
+          expect(duplicate.id).not_to eq(item.parent_collection_card.id)
+        end
+
+        it 'increases the order by 1' do
+          expect(duplicate.parent_collection_card.order).to eq(item.parent_collection_card.order + 1)
+        end
       end
     end
 
@@ -54,7 +62,7 @@ RSpec.describe Item, type: :model do
       end
 
       it 'duplicates the filestack file' do
-        expect { item.duplicate! }.to change(FilestackFile, :count).by(1)
+        expect { duplicate }.to change(FilestackFile, :count).by(1)
       end
     end
   end

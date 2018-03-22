@@ -2,7 +2,11 @@ require 'rails_helper'
 
 RSpec.describe CollectionCardBuilder, type: :service do
   let(:organization) { create(:organization) }
-  let(:parent) { create(:collection, organization: organization) }
+  let(:parent) do
+    create(:collection,
+           organization: organization,
+           add_editors: [user])
+  end
   let(:user) { create(:user) }
   let(:params) do
     {

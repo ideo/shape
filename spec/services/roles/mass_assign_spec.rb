@@ -15,6 +15,18 @@ RSpec.describe Roles::MassAssign, type: :service do
     )
   end
 
+  before :all do
+    Sidekiq::Testing.inline!
+  end
+
+  after :all do
+    Sidekiq::Testing.fake!
+  end
+
+  before do
+    Sidekiq::Worker.clear_all
+  end
+
   describe '#call' do
     it 'assigns role to users' do
       expect(assign_role.call).to be true

@@ -15,7 +15,8 @@ module Roles
     def call
       return false unless valid_object_and_role_name?
       assign_role_to_users_and_groups
-      failed.blank?
+      add_roles_to_children_async
+      failed_users.blank?
     end
 
     private
@@ -32,6 +33,14 @@ module Roles
         end
       end
       roles.uniq!
+    end
+
+    def add_roles_to_children_async
+      AddRolesToChildrenWorker.perform_async(
+        roles.map(&:id),
+        object.id,
+        object.class.name.to_s,
+      )
     end
 
     def valid_object_and_role_name?
