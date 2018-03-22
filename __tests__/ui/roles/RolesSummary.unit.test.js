@@ -11,6 +11,10 @@ const emptyProps = {
   roles: [],
   handleClick: jest.fn()
 }
+const canEditProps = {
+  ...emptyProps,
+  canEdit: true,
+}
 
 const editorRole = Object.assign({}, fakeRole)
 const viewerRole = Object.assign({}, fakeRole)
@@ -40,9 +44,8 @@ describe('RolesSummary', () => {
       expect(wrapper.find('[className="viewer"]').length).toEqual(2)
     })
 
-    it('renders manage roles button with onClick', () => {
-      expect(wrapper.find('StyledAddUserBtn').exists()).toBe(true)
-      expect(wrapper.find('StyledAddUserBtn').props().onClick).toEqual(editorsAndViewersProps.handleClick)
+    it('does not render StyledAddUserBtn by default', () => {
+      expect(wrapper.find('StyledAddUserBtn').exists()).toBe(false)
     })
   })
 
@@ -62,10 +65,6 @@ describe('RolesSummary', () => {
     it('does not render editors label', () => {
       expect(wrapper.render().text()).not.toMatch(/editors/i)
     })
-
-    it('renders manage roles button', () => {
-      expect(wrapper.find('StyledAddUserBtn').exists()).toBe(true)
-    })
   })
 
   describe('with only editors', () => {
@@ -84,10 +83,6 @@ describe('RolesSummary', () => {
     it('does not render viewers', () => {
       expect(wrapper.render().text()).not.toMatch(/viewers/i)
       expect(wrapper.find('[className="viewer"]').exists()).toBe(false)
-    })
-
-    it('renders manage roles button', () => {
-      expect(wrapper.find('StyledAddUserBtn').exists()).toBe(true)
     })
   })
 
@@ -129,9 +124,18 @@ describe('RolesSummary', () => {
       expect(wrapper.find('[className="editor"]').exists()).toBe(false)
       expect(wrapper.find('[className="viewer"]').exists()).toBe(false)
     })
+  })
 
-    it('renders manage roles button', () => {
+  describe('when user canEdit', () => {
+    beforeEach(() => {
+      wrapper = shallow(
+        <RolesSummary {...canEditProps} />
+      )
+    })
+
+    it('renders manage roles button with onClick', () => {
       expect(wrapper.find('StyledAddUserBtn').exists()).toBe(true)
+      expect(wrapper.find('StyledAddUserBtn').props().onClick).toEqual(canEditProps.handleClick)
     })
   })
 })

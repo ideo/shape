@@ -47,6 +47,10 @@ class CollectionPage extends PageWithApi {
     }
   }
 
+  get isUserCollection() {
+    return this.collection.type === 'Collection::UserCollection'
+  }
+
   get isHomepage() {
     return isHomepage(this.props.match)
   }
@@ -113,7 +117,7 @@ class CollectionPage extends PageWithApi {
               <EditableName
                 name={collection.name}
                 updateNameHandler={this.updateCollectionName}
-                canEdit={collection.can_edit}
+                canEdit={collection.can_edit && !this.isUserCollection}
               />
             </Box>
             <Flex align="baseline">
@@ -123,7 +127,7 @@ class CollectionPage extends PageWithApi {
                 roles={collection.roles}
                 canEdit={collection.can_edit}
               />
-              {!this.isHomepage &&
+              {!this.isUserCollection &&
                 <PageMenu
                   record={collection}
                   menuOpen={uiStore.pageMenuOpen}

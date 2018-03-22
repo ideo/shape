@@ -84,4 +84,12 @@ Rails.application.configure do
 
   # Do not dump schema after migrations.
   config.active_record.dump_schema_after_migration = false
+
+  # redirect all URLs that do not match OKTA_BASE_URL
+  config.middleware.insert_before(Rack::Runtime, Rack::Rewrite) do
+    uri = URI.parse(ENV['OKTA_BASE_URL'])
+    r301 %r{.*}, "//#{uri.host}$&", if: Proc.new { |rack_env|
+      rack_env['SERVER_NAME'] != uri.host
+    }
+  end
 end
