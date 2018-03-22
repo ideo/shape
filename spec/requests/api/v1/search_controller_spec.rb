@@ -35,18 +35,11 @@ describe Api::V1::SearchController, type: :request, auth: true do
     before do
       current_user.add_role(:member, organization.primary_group)
       Collection.reindex
-    end
-
-    before(:all) do
-      Collection.reindex
-      sleep 1 # Let ElasticSearch indexing finish (even though it seems to be synchronous)
+      Collection.searchkick_index.refresh
+      sleep 0.25 # Let ElasticSearch indexing finish (even though it seems to be synchronous)
     end
 
     context 'if user can view collection' do
-      before do
-        Collection.reindex
-      end
-
       it 'returns a 200' do
         get(path, params: { query: '' })
         expect(response.status).to eq(200)

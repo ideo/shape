@@ -5,14 +5,37 @@ RSpec.describe Roles::AssignToUsers, type: :service do
   let(:object) { create(:text_item) }
   let(:users) { create_list(:user, 3) }
   let(:role_name) { :editor }
+  let(:propagate_to_children) { false }
   let(:assign_role) do
-    Roles::AssignToUsers.new(object: object, role_name: role_name, users: users)
+    Roles::AssignToUsers.new(
+      object: object,
+      role_name: role_name,
+      users: users,
+      propagate_to_children: propagate_to_children,
+    )
+  end
+
+  before :all do
+    Sidekiq::Testing.inline!
+  end
+
+  after :all do
+    Sidekiq::Testing.fake!
+  end
+
+  before do
+    Sidekiq::Worker.clear_all
   end
 
   describe '#call' do
     it 'assigns role to users' do
       expect(assign_role.call).to be true
       expect(users.all? { |user| user.reload.has_role?(:editor, object) }).to be true
+    end
+
+    it 'does not call AddRolesToChildrenWorker' do
+      expect(AddRolesToChildrenWorker).not_to receive(:perform_async)
+      assign_role.call
     end
 
     context 'given pending users' do
@@ -39,6 +62,20 @@ RSpec.describe Roles::AssignToUsers, type: :service do
       it 'returns errors' do
         expect(assign_role.call).to be false
         expect(assign_role.errors).to include('admin is not a valid role on Item::TextItem')
+      end
+    end
+
+    context 'with propagate_to_children true' do
+      let!(:propagate_to_children) { true }
+
+      it 'calls AddRolesToChildrenWorker' do
+        expect(AddRolesToChildrenWorker).to receive(:perform_async).with(
+          users.map(&:id),
+          role_name,
+          object.id,
+          object.class.name.to_s,
+        )
+        assign_role.call
       end
     end
   end
