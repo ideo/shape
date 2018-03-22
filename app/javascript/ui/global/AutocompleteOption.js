@@ -10,7 +10,7 @@ import {
 import {
   SelectOption,
 } from '~/ui/global/styled/forms'
-import UserAvatar from '~/ui/users/UserAvatar'
+import Avatar from '~/ui/global/Avatar'
 
 class AutocompleteOption extends React.Component {
   handleClick = event => {
@@ -24,12 +24,14 @@ class AutocompleteOption extends React.Component {
     let content = children
     if (!option.className) {
       const { data } = option
+      const url = data.pic_url_square || data.filestack_file_url
       content = (
         <Row>
           <span>
-            <UserAvatar
+            <Avatar
+              url={url}
+              title={data.name}
               key={data.id}
-              data={data}
               size={38}
             />
           </span>

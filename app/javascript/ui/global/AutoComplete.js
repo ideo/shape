@@ -5,9 +5,8 @@ import { withStyles } from 'material-ui/styles'
 import Input from 'material-ui/Input'
 import Chip from 'material-ui/Chip'
 import Select from 'react-select'
-import 'react-select/dist/react-select.css'
 
-import { AutocompleteOption as Option } from '~/ui/global/AutocompleteOption'
+import Option from '~/ui/global/AutocompleteOption'
 
 function SelectWrapped(props) {
   const { classes, ...other } = props
