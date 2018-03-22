@@ -12,6 +12,7 @@ import {
 } from '~/ui/global/styled/forms'
 import FilestackUpload from '~/utils/FilestackUpload'
 import Group from '~/stores/jsonApi/Group'
+import Avatar from '~/ui/global/Avatar'
 
 function transformToHandle(name) {
   // Keep in sync with models/group.rb
@@ -119,6 +120,26 @@ class GroupModify extends React.Component {
     })
   }
 
+  renderImagePicker() {
+    let imagePicker = (
+      <ImageField>
+        <span>
+          +
+        </span>
+      </ImageField>
+    )
+    if (this.editingGroup.filestack_file_url) {
+      imagePicker = (
+        <Avatar
+          title={this.editingGroup.name}
+          url={this.editingGroup.filestack_file_url}
+          size={100}
+        />
+      )
+    }
+    return imagePicker
+  }
+
   render() {
     return (
       <form>
@@ -145,11 +166,7 @@ class GroupModify extends React.Component {
         <FieldContainer>
           <Label htmlFor="groupAvatar">Group Avatar</Label>
           <button onClick={this.handleImagePick} id="groupAvatar">
-            <ImageField>
-              <span>
-                +
-              </span>
-            </ImageField>
+            { this.renderImagePicker() }
           </button>
         </FieldContainer>
         <FormActionsContainer>

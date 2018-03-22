@@ -10,9 +10,15 @@ import {
   Label,
   TextField,
 } from '~/ui/global/styled/forms'
+import OrganizationAvatar from '~/ui/organizations/OrganizationAvatar'
 
 @observer
 class OrganizationEdit extends React.Component {
+  @observable editingOrganization = {
+    name: '',
+    filestack_file_url: ''
+  }
+
   constructor(props) {
     super()
     const { organization } = props
@@ -22,8 +28,6 @@ class OrganizationEdit extends React.Component {
     }
     this.fileAttrs = {}
   }
-
-  @observable editingOrganization = null
 
   @action
   changeName(name) {
@@ -71,6 +75,25 @@ class OrganizationEdit extends React.Component {
     })
   }
 
+  renderImagePicker() {
+    let imagePicker = (
+      <ImageField>
+        <span>
+          +
+        </span>
+      </ImageField>
+    )
+    if (this.editingOrganization.filestack_file_url) {
+      imagePicker = (
+        <OrganizationAvatar
+          organization={this.editingOrganization}
+          size={100}
+        />
+      )
+    }
+    return imagePicker
+  }
+
   render() {
     return (
       <form>
@@ -87,11 +110,7 @@ class OrganizationEdit extends React.Component {
         <FieldContainer>
           <Label htmlFor="organizationAvatar">Organization Avatar</Label>
           <button onClick={this.handleImagePick} id="organizationAvatar">
-            <ImageField>
-              <span>
-                +
-              </span>
-            </ImageField>
+            { this.renderImagePicker() }
           </button>
         </FieldContainer>
         <FormActionsContainer>
