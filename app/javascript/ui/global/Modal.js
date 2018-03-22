@@ -10,7 +10,6 @@ const StyledDialog = styled(Dialog)`
   .modal__paper {
     border-left: 17px solid ${v.colors.blackLava};
     max-width: 855px;
-    padding-bottom: 30px;
     width: 100%;
   }
 `

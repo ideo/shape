@@ -58,7 +58,7 @@ class AutocompleteOption extends React.Component {
 }
 
 AutocompleteOption.propTypes = {
-  children: PropTypes.arrayOf(PropTypes.Element),
+  children: PropTypes.string,
   isFocused: PropTypes.bool,
   option: PropTypes.shape({
     className: PropTypes.string,
