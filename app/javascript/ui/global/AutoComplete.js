@@ -168,7 +168,7 @@ const styles = theme => ({
 class AutoComplete extends React.Component {
   constructor(props) {
     super(props)
-    this.fireInputChange = _.throttle(this._fireInputChange, 50)
+    this.fireInputChange = _.debounce(this._fireInputChange, 250)
   }
 
   state = {
