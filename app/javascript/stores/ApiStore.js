@@ -5,6 +5,7 @@ import Collection from './jsonApi/Collection'
 import CollectionCard from './jsonApi/CollectionCard'
 import Role from './jsonApi/Role'
 import FilestackFile from './jsonApi/FilestackFile'
+import Group from './jsonApi/Group'
 import Item from './jsonApi/Item'
 import Organization from './jsonApi/Organization'
 import User from './jsonApi/User'
@@ -24,6 +25,7 @@ ApiStore.types = [
   Collection,
   CollectionCard,
   FilestackFile,
+  Group,
   Item,
   Role,
   Organization,
