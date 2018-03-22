@@ -47,10 +47,6 @@ class CollectionPage extends PageWithApi {
     }
   }
 
-  get isUserCollection() {
-    return this.collection.type === 'Collection::UserCollection'
-  }
-
   get isHomepage() {
     return isHomepage(this.props.match)
   }
@@ -121,17 +117,19 @@ class CollectionPage extends PageWithApi {
               />
             </Box>
             <Flex align="baseline">
-              <RolesSummary
-                className="roles-summary"
-                handleClick={this.showObjectRoleDialog}
-                roles={collection.roles}
-                canEdit={collection.can_edit}
-              />
-              {!this.isUserCollection &&
-                <PageMenu
-                  record={collection}
-                  menuOpen={uiStore.pageMenuOpen}
-                />
+              {this.collection.isNormalCollection &&
+                <Fragment>
+                  <RolesSummary
+                    className="roles-summary"
+                    handleClick={this.showObjectRoleDialog}
+                    roles={collection.roles}
+                    canEdit={collection.can_edit}
+                  />
+                  <PageMenu
+                    record={collection}
+                    menuOpen={uiStore.pageMenuOpen}
+                  />
+                </Fragment>
               }
             </Flex>
           </StyledTitleAndRoles>

@@ -4,7 +4,7 @@ describe Api::V1::SearchController, type: :request, auth: true do
   describe '#GET #search', search: true do
     let!(:organization) { create(:organization) }
     let(:current_user) { @user }
-    let(:tag_list) { %w(blockchain prototype innovation) }
+    let(:tag_list) { %w[blockchain prototype innovation] }
     let!(:collection_with_tags) do
       create(
         :collection,
@@ -59,6 +59,7 @@ describe Api::V1::SearchController, type: :request, auth: true do
       end
 
       it 'returns collection that matches sub-item text search' do
+        Collection.reindex # just re-index again because this test sometimes fails
         text = collection_with_text.collection_cards.first.item.plain_content
         get(path, params: { query: text })
         expect(json['data'].size).to eq(1)
