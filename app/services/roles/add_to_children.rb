@@ -14,8 +14,6 @@ module Roles
 
     private
 
-    attr_reader :users_to_add, :role_name, :parent, :inheritance
-
     def add_roles_to_children
       children.all? do |child|
         next unless @inheritance.inherit_from_parent?(child, new_user_role_identifiers)
@@ -26,11 +24,16 @@ module Roles
 
     def recursively_add_roles_to_grandchildren
       children.all? do |child|
-        Roles::AddToChildren.new(
-          users_to_add: @users_to_add,
-          role_name: @role_name,
-          parent: child,
-        ).call
+        if child.respond_to?(:children) &&
+           child.children.present
+          Roles::AddToChildren.new(
+            users_to_add: @users_to_add,
+            role_name: @role_name,
+            parent: child,
+          ).call
+        else
+          true
+        end
       end
     end
 
@@ -41,19 +44,18 @@ module Roles
     end
 
     def save_new_child_roles(child)
-      assigner = Roles::AssignToUsers.new(
+      Roles::AssignToUsers.new(
         object: child,
         role_name: @role_name,
         users: @users_to_add,
-        propagate: false,
-      )
-      assigner.call
+        propagate_to_children: false,
+      ).call
     end
 
     def children
-      return [] unless parent.respond_to?(:children)
+      return [] unless @parent.respond_to?(:children)
 
-      parent.children
+      @parent.children
     end
   end
 end

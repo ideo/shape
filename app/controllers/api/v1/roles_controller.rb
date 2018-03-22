@@ -27,7 +27,7 @@ class Api::V1::RolesController < Api::V1::BaseController
       object: record,
       role_name: role_params[:name],
       users: users,
-      propagate: true,
+      propagate_to_children: true,
     )
     if assigner.call
       render jsonapi: record.roles, include: %i[users resource]
