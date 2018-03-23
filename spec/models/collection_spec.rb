@@ -44,6 +44,24 @@ describe Collection, type: :model do
     end
   end
 
+  describe '#allow_primary_group_view_access' do
+    let!(:organization) { create(:organization) }
+    let!(:user_collection) { create(:user_collection, organization: organization) }
+    let!(:collection_card) { create(:collection_card_collection, parent: user_collection) }
+    let!(:new_collection_card) { create(:collection_card_collection, parent: user_collection) }
+    let(:collection) { collection_card.collection }
+    let(:new_collection) { new_collection_card.collection }
+
+    it 'gives view access to its organization\'s primary group if created in a UserCollection' do
+      expect(organization.primary_group.has_role?(Role::VIEWER, collection)).to be true
+    end
+
+    it 'does not give view access to primary group if created in a different collection' do
+      # in practice, new_collection would inherit permissions from the parent, but not without running our services
+      expect(organization.primary_group.has_role?(Role::VIEWER, new_collection)).to be false
+    end
+  end
+
   describe '#duplicate' do
     let!(:user) { create(:user) }
     let!(:collection) { create(:collection, num_cards: 5, tag_list: %w[Prototype Other]) }
