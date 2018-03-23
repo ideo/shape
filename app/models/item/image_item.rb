@@ -5,5 +5,13 @@ class Item
     def image_url
       filestack_file_url
     end
+
+    private
+
+    # on_create callback
+    def generate_name
+      self.name = filestack_file.filename_without_extension
+      truncate_name
+    end
   end
 end

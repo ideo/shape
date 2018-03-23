@@ -4,5 +4,6 @@ FactoryBot.define do
     handle 'cc8rnrhQcqaZwasMJIJb'
     size 716_198
     mimetype 'image/jpeg'
+    filename { Faker::File.file_name }
   end
 end

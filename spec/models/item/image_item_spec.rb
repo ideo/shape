@@ -11,5 +11,9 @@ RSpec.describe Item::ImageItem, type: :model do
     it 'should return filestack_file_url' do
       expect(item.image_url).to eq item.filestack_file_url
     end
+
+    it 'should have a generated name' do
+      expect(item.filestack_file.filename_without_extension).to include item.name
+    end
   end
 end

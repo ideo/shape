@@ -2,6 +2,11 @@ import axios from 'axios'
 import getVideoId from 'get-video-id'
 import _ from 'lodash'
 
+const truncateOpts = {
+  length: 40,
+  separator: /,? +/,
+}
+
 class VideoUrl {
   // Returns object with video { service, id, normalizedUrl }
   // Attrs are null if video URL is not valid
@@ -60,7 +65,7 @@ class VideoUrl {
       // maxres = 1280w, standard = 640w, high = 480w, medium=320w
       const thumb = thumbs.maxres || thumbs.standard || thumbs.high || thumbs.medium
       return {
-        name: data.title,
+        name: _.truncate(data.title, truncateOpts),
         // NOTE: Does "high" always exist? Do we have to check for sizes?
         thumbnailUrl: thumb.url,
       }
@@ -81,7 +86,7 @@ class VideoUrl {
       const { data } = response
       const thumbnail = _.find(_.reverse(data.pictures.sizes), i => i.width > 600)
       return {
-        name: data.name,
+        name: _.truncate(data.name, truncateOpts),
         thumbnailUrl: thumbnail.link,
       }
     } catch (e) {

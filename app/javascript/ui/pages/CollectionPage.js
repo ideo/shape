@@ -20,9 +20,15 @@ import PageMenu from './shared/PageMenu'
 const isHomepage = ({ path }) => path === '/'
 
 const StyledTitleAndRoles = styled(Flex)`
-  .roles-summary {
-    @media only screen and (max-width: ${v.responsive.medBreakpoint}px) {
+  .title {
+    max-width: 75%;
+  }
+  @media only screen and (max-width: ${v.responsive.medBreakpoint}px) {
+    .roles-summary {
       display: none;
+    }
+    .title {
+      max-width: 90%;
     }
   }
   .page-menu {
@@ -109,7 +115,7 @@ class CollectionPage extends PageWithApi {
         <Header>
           <Breadcrumb items={breadcrumb} />
           <StyledTitleAndRoles justify="space-between">
-            <Box>
+            <Box className="title">
               <EditableName
                 name={collection.name}
                 updateNameHandler={this.updateCollectionName}
