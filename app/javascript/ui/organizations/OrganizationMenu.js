@@ -25,6 +25,7 @@ class OrganizationMenu extends React.Component {
       const roles = responses.map(res => res.data)
       apiStore.add(roles, 'roles')
     })
+      .catch((err) => console.warn(err))
   }
 
   @action onGroupSave = () => {
@@ -68,6 +69,12 @@ class OrganizationMenu extends React.Component {
     this.editGroup = {}
   }
 
+  onRolesSave = (res) => {
+    const { apiStore } = this.props
+    apiStore.removeAll('roles')
+    apiStore.add(res.data, 'roles')
+  }
+
   handleGroupClick = group => () => {
     this.changeModifyGroup(group)
   }
@@ -99,6 +106,22 @@ class OrganizationMenu extends React.Component {
         onSave={this.onGroupSave}
       />
     )
+  }
+
+  renderEditRoles() {
+    const { apiStore } = this.props
+    // Some roles in the Api store don't have a resource included
+    const roles = apiStore.findAll('roles').filter((role) =>
+      role.resource && role.resource.id === this.editingGroup.id)
+    return (
+      <RolesMenu
+        ownerId={this.editingGroup.id}
+        ownerType="groups"
+        title="Members:"
+        addCallout="Add people:"
+        roles={roles}
+        onSave={this.onRolesSave}
+      />)
   }
 
   renderBase() {
@@ -140,7 +163,7 @@ class OrganizationMenu extends React.Component {
 
   render() {
     // TODO build nested modal functionality out in separate component
-    const { apiStore, uiStore } = this.props
+    const { uiStore } = this.props
     let content = this.renderBase()
     let title = 'People & Groups'
     let onBack
@@ -149,18 +172,7 @@ class OrganizationMenu extends React.Component {
       title = 'Your Organization'
       onBack = this.handleBack
     } else if (this.modifyGroupRoles) {
-      // There are roles in the apiStore from collection that don't have
-      // resource
-      const roles = apiStore.findAll('roles').filter((role) =>
-        role.resource && role.resource.id === this.editingGroup.id)
-      content = (
-        <RolesMenu
-          ownerId={this.editingGroup.id}
-          ownerType="groups"
-          title="Members:"
-          addCallout="Add people:"
-          roles={roles}
-        />)
+      content = this.renderEditRoles()
       onBack = this.handleBack
       title = this.editingGroup.name
     } else if (this.modifyGroupOpen) {

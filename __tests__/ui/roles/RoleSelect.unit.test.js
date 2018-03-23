@@ -30,11 +30,13 @@ describe('RoleSelect', () => {
       }
     }
 
-    it('should call delete role then create role', () => {
+    it('should call delete role then create role', (done) => {
       props.onDelete.mockReturnValue(Promise.resolve())
-      wrapper.instance().onRoleSelect(fakeSelectEvent)
-      expect(props.onDelete).toHaveBeenCalled()
-      expect(props.onCreate).toHaveBeenCalled()
+      wrapper.instance().onRoleSelect(fakeSelectEvent).then(() => {
+        expect(props.onDelete).toHaveBeenCalled()
+        expect(props.onCreate).toHaveBeenCalled()
+        done()
+      })
     })
   })
 

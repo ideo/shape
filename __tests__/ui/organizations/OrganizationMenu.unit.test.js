@@ -7,6 +7,10 @@ import {
 
 const apiStore = observable({
   currentUser: fakeUser,
+  request: jest.fn().mockReturnValue(Promise.resolve({ data: [] })),
+  add: jest.fn(),
+  removeAll: jest.fn(),
+  findAll: jest.fn(),
 })
 const uiStore = observable({
   organizationMenuOpen: false,
@@ -32,7 +36,7 @@ describe('OrganizationMenu', () => {
     ])
     wrapper = mount(
       <Provider apiStore={apiStore} uiStore={uiStore}>
-        <OrganizationMenu.wrappedComponent {...props} />
+        <OrganizationMenu {...props} />
       </Provider>
     )
     component = wrapper.find('OrganizationMenu')

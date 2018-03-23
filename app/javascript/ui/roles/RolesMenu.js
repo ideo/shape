@@ -23,14 +23,11 @@ class RolesMenu extends React.Component {
       'DELETE')
 
   onCreateRoles = (users, roleName) => {
-    const { apiStore, ownerId, ownerType } = this.props
+    const { apiStore, ownerId, ownerType, onSave } = this.props
     const userIds = users.map((user) => user.id)
     const data = { role: { name: roleName }, user_ids: userIds }
     return apiStore.request(`${ownerType}/${ownerId}/roles`, 'POST', data)
-      .then(res => {
-      // TODO make this generic
-        apiStore.find('collections', ownerId).roles = res.data
-      })
+      .then(onSave)
       .catch((err) => console.warn(err))
   }
 
@@ -90,6 +87,7 @@ RolesMenu.propTypes = {
   roles: MobxPropTypes.arrayOrObservableArray,
   title: PropTypes.string,
   addCallout: PropTypes.string,
+  onSave: PropTypes.func.isRequired,
 }
 RolesMenu.wrappedComponent.propTypes = {
   apiStore: MobxPropTypes.objectOrObservableObject.isRequired,

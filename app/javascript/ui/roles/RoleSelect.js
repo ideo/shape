@@ -16,7 +16,7 @@ import UserAvatar from '~/ui/users/UserAvatar'
 class RoleSelect extends React.Component {
   onRoleSelect = (ev) => {
     ev.preventDefault()
-    this.deleteRole().then(this.createRole(ev.target.value))
+    return this.deleteRole().then(() => this.createRole(ev.target.value))
   }
 
   createRole(roleName) {

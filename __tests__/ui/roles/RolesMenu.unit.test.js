@@ -18,6 +18,7 @@ const props = {
   ownerType: 'collections',
   roles: [],
   uiStore,
+  onSave: jest.fn(),
 }
 
 jest.mock('../../../app/javascript/stores/jsonApi/Role')
@@ -78,6 +79,13 @@ describe('RolesMenu', () => {
         'POST',
         { role: { name: 'editor' }, user_ids: [3, 5] }
       )
+    })
+
+    it('should call onSave', (done) => {
+      component.onCreateRoles(users, 'editor').then(() => {
+        expect(props.onSave).toHaveBeenCalled()
+        done()
+      })
     })
   })
 })

@@ -25,6 +25,7 @@ describe('GroupModify', () => {
       group: {
         assign: jest.fn(),
       },
+      onGroupRoles: jest.fn(),
     }
     apiStore = {
       fetch: jest.fn(),
