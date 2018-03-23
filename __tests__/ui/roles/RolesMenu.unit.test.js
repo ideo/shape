@@ -1,6 +1,10 @@
 import { observable, useStrict } from 'mobx'
 import { Provider } from 'mobx-react'
 import RolesMenu from '~/ui/roles/RolesMenu'
+import {
+  fakeOrganization,
+  fakeUser
+} from '#/mocks/data'
 
 const apiStore = observable({
   request: jest.fn(),
@@ -8,6 +12,7 @@ const apiStore = observable({
   find: jest.fn(),
   remove: jest.fn(),
   add: jest.fn(),
+  currentUser: fakeUser,
 })
 const uiStore = observable({
   rolesMenuOpen: false,
@@ -27,11 +32,29 @@ let wrapper
 describe('RolesMenu', () => {
   beforeEach(() => {
     useStrict(false)
+    apiStore.request.mockReturnValue(Promise.resolve(
+      { data: [{ id: 55 }] }
+    ))
     wrapper = mount(
       <Provider apiStore={apiStore} uiStore={uiStore}>
         <RolesMenu {...props} />
       </Provider>
     )
+  })
+
+  describe('componentDidMount', () => {
+    beforeEach(() => {
+      apiStore.request.mockReturnValue(Promise.resolve([{}]))
+    })
+
+    it('should request all the organization groups and users', () => {
+      expect(apiStore.request).toHaveBeenCalledWith(
+        `organizations/${fakeOrganization.id}/users`, 'GET'
+      )
+      expect(apiStore.request).toHaveBeenCalledWith(
+        `organizations/${fakeOrganization.id}/groups`, 'GET'
+      )
+    })
   })
 
   describe('onDelete', () => {

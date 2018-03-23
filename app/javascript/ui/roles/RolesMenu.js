@@ -1,4 +1,5 @@
 import PropTypes from 'prop-types'
+import { action, observable } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import {
   Heading3,
@@ -18,6 +19,28 @@ function sortUser(a, b) {
 @inject('apiStore')
 @observer
 class RolesMenu extends React.Component {
+  @observable searchableItems = []
+
+  componentDidMount() {
+    const { apiStore } = this.props
+    const organizationId = apiStore.currentUser.current_organization.id
+    const req = (type) => this.props.apiStore.request(
+      `organizations/${organizationId}/${type}`,
+      'GET'
+    )
+    Promise.all([req('groups'), req('users')]).then(res => {
+      const groups = res[0].data
+      const users = res[1].data
+      groups.forEach(r => { r.type = 'groups' })
+      users.forEach((u) => { u.type = 'users' })
+      return this.setSearchableItems([...groups, ...users])
+    })
+  }
+
+  @action setSearchableItems(items) {
+    this.searchableItems = items
+  }
+
   onDelete = (role, entity) =>
     this.props.apiStore.request(`users/${entity.id}/roles/${role.id}`,
       'DELETE')
@@ -71,6 +94,7 @@ class RolesMenu extends React.Component {
         <FormSpacer />
         <Heading3>{addCallout}</Heading3>
         <RolesAdd
+          searchableItems={this.searchableItems}
           roleTypes={roleTypes}
           onCreateRoles={this.onCreateRoles}
           onCreateUsers={this.onCreateUsers}
