@@ -55,11 +55,14 @@ class VideoUrl {
     try {
       const response = await axios.get(apiUrl)
       const data = response.data.items[0].snippet
+      const thumbs = data.thumbnails
+      // https://developers.google.com/youtube/v3/docs/thumbnails
+      // maxres = 1280w, standard = 640w, high = 480w, medium=320w
+      const thumb = thumbs.maxres || thumbs.standard || thumbs.high || thumbs.medium
       return {
         name: data.title,
-        // "high" = 480x360
         // NOTE: Does "high" always exist? Do we have to check for sizes?
-        thumbnailUrl: data.thumbnails.high.url,
+        thumbnailUrl: thumb.url,
       }
     } catch (e) {
       return {}
@@ -76,7 +79,7 @@ class VideoUrl {
       }
       const response = await axios.get(apiUrl, config)
       const { data } = response
-      const thumbnail = _.find(data.pictures.sizes, i => i.width > 600)
+      const thumbnail = _.find(_.reverse(data.pictures.sizes), i => i.width > 600)
       return {
         name: data.name,
         thumbnailUrl: thumbnail.link,
