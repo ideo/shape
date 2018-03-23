@@ -75,5 +75,15 @@ describe('CollectionPage', () => {
     it('passes canEdit = true to RolesSummary', () => {
       expect(wrapper.find('RolesSummary').props().canEdit).toEqual(true)
     })
+
+    it('passes canEdit = false to EditableName if it is a UserCollection', () => {
+      collection.isUserCollection = true
+      wrapper = shallow(
+        <CollectionPage.wrappedComponent {...props} />
+      )
+      // set it back for any later tests
+      collection.isUserCollection = false
+      expect(wrapper.find('EditableName').props().canEdit).toEqual(false)
+    })
   })
 })

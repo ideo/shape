@@ -113,7 +113,7 @@ class CollectionPage extends PageWithApi {
               <EditableName
                 name={collection.name}
                 updateNameHandler={this.updateCollectionName}
-                canEdit={collection.can_edit && !this.isUserCollection}
+                canEdit={collection.can_edit && !this.collection.isUserCollection}
               />
             </Box>
             <Flex align="baseline">
