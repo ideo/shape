@@ -3,6 +3,7 @@ import ReactQuill from 'react-quill'
 import _ from 'lodash'
 import styled from 'styled-components'
 
+import { overrideHeadersFromClipboard } from '~/ui/items/TextItem'
 import v, { ITEM_TYPES } from '~/utils/variables'
 
 const StyledTextItemCreator = styled.div`
@@ -25,7 +26,10 @@ class TextItemCreator extends React.Component {
   }
 
   componentDidMount() {
+    if (!this.quillEditor) return
     this.quillEditor.focus()
+    const { editor } = this.quillEditor
+    overrideHeadersFromClipboard(editor)
   }
 
   _onTextChange = (content, delta, source, editor) => {

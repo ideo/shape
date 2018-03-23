@@ -15,6 +15,15 @@ const remapHeaderToH3 = (node, delta) => {
   return delta
 }
 
+export const overrideHeadersFromClipboard = (editor) => {
+  // change all non-H3 header attributes to H3, e.g. when copy/pasting
+  editor.clipboard.addMatcher('H1', remapHeaderToH3)
+  editor.clipboard.addMatcher('H2', remapHeaderToH3)
+  editor.clipboard.addMatcher('H4', remapHeaderToH3)
+  editor.clipboard.addMatcher('H5', remapHeaderToH3)
+  editor.clipboard.addMatcher('H6', remapHeaderToH3)
+}
+
 class TextItem extends React.Component {
   constructor(props) {
     super(props)
@@ -25,12 +34,7 @@ class TextItem extends React.Component {
     if (!this.quillEditor) return
     if (this.canEdit) {
       const { editor } = this.quillEditor
-      // change all non-H3 header attributes to H3, e.g. when copy/pasting
-      editor.clipboard.addMatcher('H1', remapHeaderToH3)
-      editor.clipboard.addMatcher('H2', remapHeaderToH3)
-      editor.clipboard.addMatcher('H4', remapHeaderToH3)
-      editor.clipboard.addMatcher('H5', remapHeaderToH3)
-      editor.clipboard.addMatcher('H6', remapHeaderToH3)
+      overrideHeadersFromClipboard(editor)
     }
   }
 
