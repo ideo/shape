@@ -96,7 +96,7 @@ class Item < ApplicationRecord
   end
 
   def truncate_name
-    self.name = name.truncate(40, separator: /\s/, omission: '')
+    self.name = name.truncate(40, separator: /[,?\.\s]+/, omission: '')
   end
 
   private
