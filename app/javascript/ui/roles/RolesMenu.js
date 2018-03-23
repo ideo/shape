@@ -24,20 +24,17 @@ class RolesMenu extends React.Component {
 
   onCreateRoles = (users, roleName) => {
     const { apiStore, ownerId, ownerType } = this.props
-    // TODO eventually have to make this groups?
     const userIds = users.map((user) => user.id)
     const data = { role: { name: roleName }, user_ids: userIds }
     return apiStore.request(`${ownerType}/${ownerId}/roles`, 'POST', data)
       .catch((err) => console.warn(err))
   }
 
-  // TODO what to do about this?
   onCreateUsers = (emails) => {
     const { apiStore } = this.props
     return apiStore.request(`users/create_from_emails`, 'POST', { emails })
   }
 
-  // TODO remoe eventually
   onUserSearch = (searchTerm) => {
     const { apiStore } = this.props
     return apiStore.request(

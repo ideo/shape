@@ -8,13 +8,24 @@ import GroupModify from '~/ui/groups/GroupModify'
 import RolesMenu from '~/ui/roles/RolesMenu'
 import OrganizationEdit from './OrganizationEdit'
 
-@inject('uiStore')
+@inject('apiStore', 'uiStore')
 @observer
 class OrganizationMenu extends React.Component {
   @observable editOrganizationOpen = false
   @observable modifyGroupOpen = false
   @observable editGroup = {}
   @observable modifyGroupRoles = false
+
+  componentDidMount() {
+    // TODO this gets called on page load because of uiStore isshowing
+    const { apiStore, userGroups } = this.props
+    const groupReqs = userGroups.map(group =>
+      apiStore.request(`groups/${group.id}/roles`, 'GET'))
+    Promise.all(groupReqs).then(responses => {
+      const roles = responses.map(res => res.data)
+      apiStore.add(roles, 'roles')
+    })
+  }
 
   @action onGroupSave = () => {
     this.modifyGroupOpen = false
@@ -128,7 +139,8 @@ class OrganizationMenu extends React.Component {
   }
 
   render() {
-    const { uiStore } = this.props
+    // TODO build nested modal functionality out in separate component
+    const { apiStore, uiStore } = this.props
     let content = this.renderBase()
     let title = 'People & Groups'
     let onBack
@@ -137,13 +149,17 @@ class OrganizationMenu extends React.Component {
       title = 'Your Organization'
       onBack = this.handleBack
     } else if (this.modifyGroupRoles) {
+      // There are roles in the apiStore from collection that don't have
+      // resource
+      const roles = apiStore.findAll('roles').filter((role) =>
+        role.resource && role.resource.id === this.editingGroup.id)
       content = (
         <RolesMenu
           ownerId={this.editingGroup.id}
           ownerType="groups"
           title="Members:"
           addCallout="Add people:"
-          roles={this.editingGroup.roles}
+          roles={roles}
         />)
       onBack = this.handleBack
       title = this.editingGroup.name
@@ -170,6 +186,7 @@ OrganizationMenu.propTypes = {
   userGroups: MobxPropTypes.arrayOrObservableArray.isRequired,
 }
 OrganizationMenu.wrappedComponent.propTypes = {
+  apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 

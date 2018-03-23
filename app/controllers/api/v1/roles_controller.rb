@@ -9,7 +9,7 @@ class Api::V1::RolesController < Api::V1::BaseController
   before_action :authorize_view_record, only: :index
 
   # All roles that exist on this resource (collection, item or group)
-  # /[collections/items]/:id/roles
+  # /[collections/items/group]/:id/roles
   def index
     @roles = record.roles.includes(:users, :resource)
     render jsonapi: @roles, include: %i[users resource]
