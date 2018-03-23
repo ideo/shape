@@ -15,14 +15,14 @@ html {
 @font-face {
   font-family: 'Sentinel';
   src: asset-url('Sentinel-Medium.otf');
-  font-weight: normal;
+  font-weight: 500;
   font-style: normal;
 }
 
 @font-face {
   font-family: 'Sentinel';
   src: asset-url('Sentinel-MediumItal.otf');
-  font-weight: normal;
+  font-weight: 500;
   font-style: italic;
 }
 
@@ -36,13 +36,13 @@ html {
 @font-face {
   font-family: 'Gotham';
   src: asset-url('Gotham-Medium.otf');
-  font-weight: normal;
+  font-weight: 500;
   font-style: normal;
 }
 
 @font-face {
   font-family: 'Gotham';
   src: asset-url('Gotham-Book.otf');
-  font-weight: 100;
+  font-weight: 400;
   font-style: normal;
 }

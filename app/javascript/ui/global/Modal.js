@@ -12,7 +12,6 @@ const StyledDialog = styled(Dialog)`
   .modal__paper {
     border-left: 17px solid ${v.colors.blackLava};
     max-width: 855px;
-    padding-bottom: 30px;
     width: 100%;
   }
 `
@@ -47,9 +46,11 @@ class Modal extends React.Component {
 
   render() {
     const { children, onBack, open, title } = this.props
+    // TODO progamatically set disableAutoFocus
     return (
       <StyledDialog
         classes={{ paper: 'modal__paper' }}
+        disableAutoFocus
         open={open}
         onClose={this.handleclose}
         aria-labelledby={title}
