@@ -73,7 +73,7 @@ class Collection
         resource_type: %w[Collection],
       ).select do |obj|
         include_object?(obj)
-      end.sort_by(&:updated_at)
+      end.uniq.sort_by(&:updated_at).reverse
     end
 
     def include_object?(obj)
