@@ -2,10 +2,11 @@ module Roles
   class MassAssign
     attr_reader :errors, :failed, :added
 
-    def initialize(object:, role_name:, users_and_groups:, propagate_to_children: false)
+    def initialize(object:, role_name:, users: [], groups: [], propagate_to_children: false)
       @object = object
       @role_name = role_name
-      @users_and_groups = users_and_groups
+      @users = users
+      @groups = groups
       @propagate_to_children = propagate_to_children
       @added = []
       @failed = []
@@ -34,7 +35,8 @@ module Roles
 
     def add_roles_to_children_async
       AddRolesToChildrenWorker.perform_async(
-        @added.map(&:id),
+        @users.map(&:id),
+        @groups.map(&:id),
         @role_name,
         @object.id,
         @object.class.name.to_s,

@@ -46,12 +46,23 @@ class Role < ApplicationRecord
     roles.map(&:resource).compact
   end
 
-  def self.object_identifier(obj)
+  def self.object_identifier(object: obj)
     [obj.class.base_class.to_s, obj.id].select(&:present?).join('_')
   end
 
-  def self.role_identifier(role_name:, resource_identifier:)
+  def self.role_identifier(role_name:, resource_identifier: nil, user_id: nil, group_id: nil)
     [role_name, resource_identifier].select(&:present?).join('_')
+
+    if user_id.present? && group_id.present?
+      raise 'role_identifier can accept only user_id OR group_id, not both'
+    end
+
+    if user_id.present?
+      identifier += "_User_#{user_id}"
+    elsif group_id.present?
+      identifier += "_Group_#{group_id}"
+    end
+    identifier
   end
 
   def duplicate!(assign_resource: nil, dont_save: false)

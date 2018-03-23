@@ -6,22 +6,39 @@ RSpec.describe Roles::AddToChildren, type: :service do
     create(:collection_card_collection, parent: collection)
   end
   let(:subcollection) { subcollection_card.collection }
+  let(:group) { create(:group) }
   let(:users) { [user] }
+  let(:groups) { [group] }
   let(:add_to_children) do
-    Roles::AddToChildren.new(users_to_add: users, parent: collection, role_name: role_name)
+    Roles::AddToChildren.new(
+      role_name: role_name,
+      parent: collection,
+      users: users,
+      groups: groups,
+    )
   end
 
   describe '#call' do
     let(:user) { create(:user) }
     let(:role_name) { Role::EDITOR }
 
-    it 'should create new roles for each item' do
+    it 'should create new roles for each user/item' do
       expect { add_to_children.call }.to change(UsersRole, :count).by(6)
+    end
+
+    it 'should create new roles for each group/item' do
+      expect { add_to_children.call }.to change(GroupsRole, :count).by(6)
     end
 
     it 'should add editor role to all card items' do
       expect(add_to_children.call).to be true
       user.reload
+      expect(collection.items.all? { |i| user.has_role?(:editor, i) }).to be true
+    end
+
+    it 'should add editor role to all card items' do
+      expect(add_to_children.call).to be true
+      group.reload
       expect(collection.items.all? { |i| user.has_role?(:editor, i) }).to be true
     end
 
@@ -59,6 +76,7 @@ RSpec.describe Roles::AddToChildren, type: :service do
           object: child,
           role_name: role_name,
           users: users,
+          groups: [],
           propagate_to_children: false,
         }
       end

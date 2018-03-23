@@ -1,7 +1,8 @@
 module Roles
   class AddToChildren
-    def initialize(users_and_groups_to_add:, role_name:, parent:)
-      @users_and_groups_to_add = users_and_groups_to_add
+    def initialize(role_name:, parent:, users_to_add: [], groups_to_add: [])
+      @users_to_add = users_to_add
+      @groups_to_add = groups_to_add
       @parent = parent
       @role_name = role_name
       @inheritance = Roles::Inheritance.new(parent)
@@ -40,20 +41,27 @@ module Roles
     end
 
     def new_role_identifiers
-      @users_and_groups_to_add.map do |user_or_group|
-        if user_or_group.is_a?(User)
-          UsersRole.identifier(role_name: @role_name, user_id: user_or_group.id)
-        elsif user_or_group.is_a?(Group)
-          GroupsRole.identifier(role_name: @role_name, group_id: user_or_group.id)
-        end
+      user_role_identifiers + group_role_identifiers
+    end
+
+    def user_role_identifiers
+      @users.map do |user|
+        Role.identifier(role_name: @role_name, user_id: user.id)
+      end
+    end
+
+    def group_role_identifiers
+      @groups.map do |group|
+        Role.identifier(role_name: @role_name, group_id: group.id)
       end
     end
 
     def save_new_child_roles(child)
-      Roles::AssignToUsers.new(
+      Roles::MassAssign.new(
         object: child,
         role_name: @role_name,
-        users: @users_to_add,
+        users: @users,
+        groups: @groups,
         propagate_to_children: false,
       ).call
     end

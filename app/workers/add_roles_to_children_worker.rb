@@ -8,8 +8,7 @@ class AddRolesToChildrenWorker
     object = object_class.safe_constantize.find(object_id)
 
     Roles::AddToChildren.new(
-      users_to_add: users_to_add,
-      groups_to_add: groups_to_add,
+      users_and_groups_to_add: users_and_groups_to_add,
       role_name: role_name,
       parent: object,
     ).call
