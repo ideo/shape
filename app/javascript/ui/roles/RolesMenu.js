@@ -28,6 +28,9 @@ class RolesMenu extends React.Component {
     const userIds = users.map((user) => user.id)
     const data = { role: { name: roleName }, user_ids: userIds }
     return apiStore.request(`collections/${collectionId}/roles`, 'POST', data)
+      .then(res => {
+        apiStore.find('collections', collectionId).roles = res.data
+      })
       .catch((err) => console.warn(err))
   }
 
