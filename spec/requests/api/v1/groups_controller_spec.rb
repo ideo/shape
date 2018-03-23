@@ -18,9 +18,15 @@ describe Api::V1::GroupsController, type: :request, auth: true do
       expect(json['data']['attributes']).to match_json_schema('group')
     end
 
+    it 'includes the role' do
+      get(path)
+      role_id = group.roles.first.id
+      expect(json['data']['relationships']['roles']['data'][0]['id'].to_i).to eq(role_id)
+    end
+
     it 'includes admin' do
       get(path)
-      expect(json['data']['relationships']['admins']['data'][0]['id'].to_i).to eq(user.id)
+      expect(users_json.map { |user| user['id'].to_i }).to match_array(*user.id)
       expect(users_json.first['attributes']).to match_json_schema('user')
     end
 
@@ -31,9 +37,9 @@ describe Api::V1::GroupsController, type: :request, auth: true do
         member.add_role(Role::MEMBER, group)
       end
 
-      it 'includes editors' do
+      it 'includes member and admin' do
         get(path)
-        expect(json['data']['relationships']['members']['data'][0]['id'].to_i).to eq(member.id)
+        expect(users_json.map { |user| user['id'].to_i }).to match_array([user.id, member.id])
       end
     end
   end

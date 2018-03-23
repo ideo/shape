@@ -35,9 +35,10 @@ describe Api::V1::RolesController, type: :request, auth: true do
     let(:users) { create_list(:user, 3) }
     let(:user_ids) { users.map(&:id) }
     let(:users_json) { json_included_objects_of_type('users') }
+    let(:role_name) { 'editor' }
     let(:params) {
       {
-        'role': { 'name': 'editor' },
+        'role': { 'name': role_name },
         'user_ids': user_ids,
       }.to_json
     }
@@ -85,6 +86,22 @@ describe Api::V1::RolesController, type: :request, auth: true do
       it 'adds role to users' do
         post(path, params: params)
         expect(users.all? { |u| u.reload.has_role?(:editor, item) }).to be true
+      end
+    end
+
+    context 'on an group' do
+      let!(:group) { create(:group, add_admins: [user]) }
+      let(:path) { "/api/v1/groups/#{group.id}/roles" }
+      let!(:role_name) { 'member' }
+
+      it 'returns a 200' do
+        post(path, params: params)
+        expect(response.status).to eq(200)
+      end
+
+      it 'adds role to users' do
+        post(path, params: params)
+        expect(users.all? { |u| u.reload.has_role?(:member, group) }).to be true
       end
     end
   end
