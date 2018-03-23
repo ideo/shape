@@ -34,7 +34,7 @@ RSpec.describe Item, type: :model do
 
     context 'with parent collection card' do
       let!(:parent_collection_card) do
-        create(:collection_card_item, item: item)
+        create(:collection_card_text, item: item)
       end
 
       it 'does not duplicate if no copy_parent_card is false' do

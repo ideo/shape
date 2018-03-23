@@ -27,6 +27,10 @@ class SerializableCollection < BaseJsonSerializer
     end
   end
 
+  attribute :cover do
+    CollectionCover.new(@object).generate
+  end
+
   attribute :can_edit do
     @current_ability.can?(:edit, @object)
   end

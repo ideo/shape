@@ -12,6 +12,11 @@ module Roles
       should_inherit?(proposed_roles)
     end
 
+    # if inherit is false, then the child is "private"
+    def private_child?(child)
+      !inherit_from_parent?(child)
+    end
+
     private
 
     attr_reader :parent_roles

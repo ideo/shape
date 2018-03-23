@@ -1,6 +1,15 @@
+import { action, observable } from 'mobx'
+
 import BaseRecord from './BaseRecord'
 
 class CollectionCard extends BaseRecord {
+  @observable maxWidth = this.width
+
+  // this gets set based on number of visible columns, and used by CollectionCover
+  @action setMaxWidth(val) {
+    this.maxWidth = val
+  }
+
   API_create() {
     return this.apiStore.request('collection_cards', 'POST', { data: this.toJsonApi() })
       .then((response) => {

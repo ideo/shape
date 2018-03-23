@@ -120,7 +120,6 @@ class MovableGridCard extends React.PureComponent {
     }
     newSize.width = Math.max(newSize.width, 1)
     newSize.height = Math.max(newSize.height, 1)
-    // console.log(newSize)
     this.props.onResize(this.props.card.id, newSize)
   }
 

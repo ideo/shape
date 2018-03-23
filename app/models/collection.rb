@@ -12,7 +12,7 @@ class Collection < ApplicationRecord
   acts_as_taggable
 
   has_many :collection_cards,
-           -> { active },
+           -> { active.order(order: :asc) },
            foreign_key: :parent_id
   # All collection cards this is linked to
   has_many :reference_collection_cards,
@@ -120,10 +120,6 @@ class Collection < ApplicationRecord
 
   def children
     (items + collections)
-  end
-
-  def subcollection?
-    organization.blank?
   end
 
   def searchable?

@@ -227,7 +227,7 @@ describe Api::V1::CollectionCardsController, type: :request, auth: true do
   end
 
   describe 'POST #duplicate' do
-    let!(:collection_card) { create(:collection_card_item, parent: collection) }
+    let!(:collection_card) { create(:collection_card_text, parent: collection) }
     let(:path) { "/api/v1/collection_cards/#{collection_card.id}/duplicate" }
 
     it 'returns a 200' do

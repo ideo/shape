@@ -50,7 +50,7 @@ describe Api::V1::ItemsController, type: :request, auth: true do
 
     context 'with parents' do
       let!(:collection) { create(:collection) }
-      let!(:collection_card) { create(:collection_card_item, parent: collection) }
+      let!(:collection_card) { create(:collection_card_text, parent: collection) }
       let!(:item) { collection_card.item }
 
       before do

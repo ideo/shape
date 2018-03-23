@@ -2,6 +2,7 @@ FactoryBot.define do
   factory :collection do
     transient do
       num_cards 0
+      item_type :text
       add_editors []
       add_viewers []
     end
@@ -23,7 +24,8 @@ FactoryBot.define do
           h = 1
           w = 3 if rand(1..4) == 4
           h = 2 if rand(1..4) == 4
-          cc = build(:collection_card_item, parent: collection, order: i, width: w, height: h)
+          card_type = :"collection_card_#{evaluator.item_type}"
+          cc = build(card_type, parent: collection, order: i, width: w, height: h)
           collection.collection_cards << cc
         end
       end

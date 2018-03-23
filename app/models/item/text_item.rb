@@ -6,7 +6,9 @@ class Item
 
     def plain_content
       # strip HTML tags
-      text = Rails::Html::FullSanitizer.new.sanitize(content)
+      # also add spaces between tags that are touching
+      # e.g. <h1>text</h1><p>More text</p> => text More text
+      text = Rails::Html::FullSanitizer.new.sanitize(content.gsub('><', '> <'))
       # strip out escaped strings e.g. "&lt;strong&gt;" if someone typed raw HTML
       text.gsub(/&lt;[^&]*&gt;/, '')
           .squeeze(' ')

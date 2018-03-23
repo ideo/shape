@@ -126,7 +126,11 @@ class SearchResultsInfinite extends React.Component {
               <StyledBottomLeftIcon>
                 <CollectionIcon />
               </StyledBottomLeftIcon>
-              <CollectionCover collection={collection} />
+              <CollectionCover
+                collection={collection}
+                width={gridSettings.cols}
+                height={1}
+              />
             </StyledSearchResult>
           </VisibilitySensor>
         </FlipMove>
