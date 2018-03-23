@@ -5,4 +5,12 @@ RSpec.describe Item::VideoItem, type: :model do
     it { should validate_presence_of(:url) }
     it { should validate_presence_of(:thumbnail_url) }
   end
+
+  describe '#image_url' do
+    let(:item) { create(:video_item) }
+
+    it 'should return thumbnail_url' do
+      expect(item.image_url).to eq item.thumbnail_url
+    end
+  end
 end

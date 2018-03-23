@@ -90,6 +90,11 @@ class Item < ApplicationRecord
     filestack_file.filename_without_extension
   end
 
+  def image_url
+    # overridden by VideoItem / ImageItem
+    nil
+  end
+
   private
 
   def format_url

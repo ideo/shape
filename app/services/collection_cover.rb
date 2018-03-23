@@ -27,11 +27,8 @@ class CollectionCover
   end
 
   def first_media_item
-    item = first_shareable_item(type: 'Item::ImageItem')
-    return item.filestack_file_url if item
-
-    item = first_shareable_item(type: 'Item::VideoItem')
-    return item.thumbnail_url if item
+    item = first_shareable_item(type: ['Item::ImageItem', 'Item::VideoItem'])
+    return item.image_url if item
   end
 
   def first_text_item
