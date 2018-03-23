@@ -141,15 +141,16 @@ describe Api::V1::CollectionCardsController, type: :request, auth: true do
         json_api_params(
           'collection_cards',
           {
-            'order': 1,
-            'width': 3,
-            'height': 1,
+            order: 1,
+            width: 3,
+            height: 1,
             # parent_id is required to retrieve the parent collection without a nested route
-            'parent_id': collection.id,
-            'item_attributes': {
-              'type': 'Item::VideoItem',
-              'url': 'https://www.youtube.com/watch?v=4r7wHMg5Yjg',
-              'thumbnail_url': 'https://img.youtube.com/vi/4r7wHMg5Yjg/hqdefault.jpg',
+            parent_id: collection.id,
+            item_attributes: {
+              type: 'Item::VideoItem',
+              name: 'Youtube video',
+              url: 'https://www.youtube.com/watch?v=4r7wHMg5Yjg',
+              thumbnail_url: 'https://img.youtube.com/vi/4r7wHMg5Yjg/hqdefault.jpg',
             },
           }
         )
