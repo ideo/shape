@@ -5,7 +5,7 @@ import styled from 'styled-components'
 
 import v from '~/utils/variables'
 
-const StyledCardCover = styled.div`
+const StyledCollectionCover = styled.div`
   width: 100%;
   height: 100%;
   background: ${v.colors.cloudy};
@@ -22,7 +22,7 @@ const StyledCardCover = styled.div`
   `
   )}
 `
-StyledCardCover.displayName = 'StyledCardCover'
+StyledCollectionCover.displayName = 'StyledCollectionCover'
 
 const StyledCardContent = styled.div`
   position: absolute;
@@ -44,7 +44,7 @@ const StyledCardContent = styled.div`
 `
 StyledCardContent.displayName = 'StyledCardContent'
 
-class CollectionCover extends React.Component {
+class CollectionCover extends React.PureComponent {
   render() {
     const { height, width, collection } = this.props
     const { cover } = collection
@@ -52,7 +52,7 @@ class CollectionCover extends React.Component {
     const text_length = width > 1 ? 300 : 100
     const separator = /,?\.* +/
     return (
-      <StyledCardCover url={cover.image_url}>
+      <StyledCollectionCover url={cover.image_url}>
         <StyledCardContent height={height} width={width} >
           <h3>
             {_.truncate(cover.name, { length: name_length, separator })}
@@ -61,7 +61,7 @@ class CollectionCover extends React.Component {
             {_.truncate(cover.text, { length: text_length, separator })}
           </p>
         </StyledCardContent>
-      </StyledCardCover>
+      </StyledCollectionCover>
     )
   }
 }

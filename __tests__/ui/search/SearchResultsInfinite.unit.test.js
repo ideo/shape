@@ -6,7 +6,7 @@ let wrapper, props
 beforeEach(() => {
   props = {
     searchResults: [fakeCollection, fakeCollection],
-    gridSettings: {},
+    gridSettings: { cols: 4 },
     gridMaxW: 100,
     hasMore: false,
     total: 10,
