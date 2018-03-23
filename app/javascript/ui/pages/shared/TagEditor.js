@@ -59,6 +59,7 @@ class TagEditor extends React.Component {
         <StyledReactTags>
           <ReactTags
             tags={[...this.tags]}
+            allowBackspace={false}
             delimiterChars={[',']}
             placeholder="Add new tags, separated by comma or pressing enter."
             handleAddition={this.handleAddition}

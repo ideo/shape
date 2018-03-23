@@ -11,6 +11,18 @@ class Collection extends BaseRecord {
     return this.collection_cards.map(card => card.id)
   }
 
+  get isUserCollection() {
+    return this.type === 'Collection::UserCollection'
+  }
+
+  get isSharedCollection() {
+    return this.type === 'Collection::SharedWithMeCollection'
+  }
+
+  get isNormalCollection() {
+    return !this.isUserCollection && !this.isSharedCollection
+  }
+
   API_archive() {
     // eslint-disable-next-line no-alert
     const agree = window.confirm('Are you sure?')

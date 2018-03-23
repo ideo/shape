@@ -6,6 +6,7 @@ const StyledLogo = styled.div`
   font-size: 0.75rem;
   letter-spacing: 0.5px;
   font-family: ${v.fonts.sans};
+  font-weight: ${v.weights.medium};
   text-transform: uppercase;
 `
 const Logo = () => (

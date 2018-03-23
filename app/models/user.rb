@@ -86,6 +86,12 @@ class User < ApplicationRecord
     collections.user.find_by_organization_id(current_organization_id)
   end
 
+  def current_org_groups
+    return nil if current_organization.blank?
+
+    current_organization.groups
+  end 
+  
   def viewable_collections_and_items(organization)
     Role.user_resources(
       user: self,

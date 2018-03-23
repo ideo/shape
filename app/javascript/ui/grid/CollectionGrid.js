@@ -339,6 +339,12 @@ class CollectionGrid extends React.Component {
 
   renderPositionedCards = () => {
     const grid = []
+    const {
+      collection,
+      canEditCollection,
+      routingStore,
+      uiStore,
+    } = this.props
     // unnecessary? we seem to need to preserve the array order
     // in order to not re-draw divs (make transform animation work)
     // so that's why we do this second pass to actually create the divs in their original order
@@ -353,21 +359,23 @@ class CollectionGrid extends React.Component {
           cardType = card.record.getRecordType()
         }
       }
-      const { openCardMenuId } = this.props.uiStore
+      const { openCardMenuId } = uiStore
       grid.push(
         <MovableGridCard
           key={card.id}
           card={card}
           cardType={cardType}
-          canEditCollection={this.props.canEditCollection}
+          canEditCollection={canEditCollection}
+          isUserCollection={collection.isUserCollection}
+          isSharedCollection={collection.isSharedCollection}
           position={card.position}
           record={record}
           onDrag={this.onDrag}
           onMoveStop={this.onMoveStop}
           onResize={this.onResize}
           onResizeStop={this.onResizeStop}
-          routeTo={this.props.routingStore.routeTo}
-          parent={this.props.collection}
+          routeTo={routingStore.routeTo}
+          parent={collection}
           menuOpen={openCardMenuId === card.id}
         />
       )

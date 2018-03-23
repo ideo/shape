@@ -13,7 +13,8 @@ const fakeApiStore = ({ findResult = '', findAllResult = [], requestResult = '' 
       current_user_collection_id: 99,
       current_organization: {
         name: 'test org'
-      }
+      },
+      groups: [],
     },
     collections: [],
     items: [],

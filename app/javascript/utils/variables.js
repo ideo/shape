@@ -36,7 +36,7 @@ export default {
   },
 
   weights: {
-    book: 300,
+    book: 400,
     medium: 500,
   },
 

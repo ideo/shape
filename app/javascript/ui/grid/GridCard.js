@@ -131,7 +131,7 @@ class GridCard extends React.Component {
     if (!icon) return ''
 
     return (
-      <StyledBottomLeftIcon lassName="show-on-hover">
+      <StyledBottomLeftIcon>
         {icon}
       </StyledBottomLeftIcon>
     )
@@ -155,7 +155,7 @@ class GridCard extends React.Component {
   }
 
   shareCard = () => {
-    console.log('Share card')
+    // console.log('Share card')
   }
 
   duplicateCard = () => {
@@ -164,11 +164,11 @@ class GridCard extends React.Component {
   }
 
   linkCard = () => {
-    console.log('Link card')
+    // console.log('Link card')
   }
 
   moveCard = () => {
-    console.log('Move card')
+    // console.log('Move card')
   }
 
   archiveCard = () => {
@@ -186,19 +186,25 @@ class GridCard extends React.Component {
         {this.props.canEditCollection &&
           <GridCardHotspot card={this.props.card} dragging={this.props.dragging} />
         }
-        <StyledTopRightActions className="show-on-hover">
-          {this.renderSelectionCircle}
-          <CardMenu
-            className="card-menu"
-            cardId={this.props.card.id}
-            canEdit={this.canEdit}
-            menuOpen={this.props.menuOpen}
-            handleDuplicate={this.duplicateCard}
-            handleLink={this.linkCard}
-            handleMove={this.moveCard}
-            handleArchive={this.archiveCard}
-          />
-        </StyledTopRightActions>
+        {/*
+          TODO: Not fully disable CardMenu for SharedCollection
+          once we have appropriate actions?
+        */}
+        {!this.props.isSharedCollection &&
+          <StyledTopRightActions className="show-on-hover">
+            {this.renderSelectionCircle}
+            <CardMenu
+              className="card-menu"
+              cardId={this.props.card.id}
+              canEdit={this.canEdit}
+              menuOpen={this.props.menuOpen}
+              handleDuplicate={this.duplicateCard}
+              handleLink={this.linkCard}
+              handleMove={this.moveCard}
+              handleArchive={this.archiveCard}
+            />
+          </StyledTopRightActions>
+        }
         {this.renderIcon}
         {/* onClick placed here so it's separate from hotspot click */}
         <StyledGridCardInner onClick={this.handleClick}>
@@ -212,6 +218,7 @@ class GridCard extends React.Component {
 GridCard.propTypes = {
   card: MobxPropTypes.objectOrObservableObject.isRequired,
   canEditCollection: PropTypes.bool.isRequired,
+  isSharedCollection: PropTypes.bool.isRequired,
   cardType: PropTypes.string.isRequired,
   height: PropTypes.number.isRequired,
   record: MobxPropTypes.objectOrObservableObject.isRequired,

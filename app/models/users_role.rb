@@ -8,7 +8,7 @@ class UsersRole < ApplicationRecord
     exclude_association :role
   end
 
-  def identifier
-    "#{role.name}_User_#{user_id}"
+  def self.identifier(role_name:, user_id:)
+    "#{role_name}_User_#{user_id}"
   end
 end

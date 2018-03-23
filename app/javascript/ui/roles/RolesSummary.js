@@ -70,9 +70,9 @@ class RolesSummary extends React.PureComponent {
 
   get viewers() {
     const { roles } = this.props
-    const editorRole = roles.find(role => role.name === 'viewer')
-    if (!editorRole) return []
-    return editorRole.users
+    const viewerRole = roles.find(role => role.name === 'viewer')
+    if (!viewerRole) return []
+    return viewerRole.users
   }
 
   // Return at most MAX_USERS_TO_SHOW users,
@@ -137,6 +137,8 @@ class RolesSummary extends React.PureComponent {
   }
 
   get addUserBtn() {
+    const { canEdit } = this.props
+    if (!canEdit) return ''
     return (
       <StyledAddUserBtn
         onClick={this.props.handleClick}
@@ -159,11 +161,13 @@ class RolesSummary extends React.PureComponent {
 RolesSummary.propTypes = {
   roles: MobxPropTypes.arrayOrObservableArray.isRequired,
   handleClick: PropTypes.func.isRequired,
-  className: PropTypes.string
+  className: PropTypes.string,
+  canEdit: PropTypes.bool,
 }
 
 RolesSummary.defaultProps = {
-  className: ''
+  className: '',
+  canEdit: false,
 }
 
 export default RolesSummary
