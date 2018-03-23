@@ -22,14 +22,16 @@ Rails.application.routes.draw do
           member do
             post 'duplicate'
           end
-          resources :roles, only: %i[index create], shallow: true
+          resources :roles, only: %i[index create]
         end
         resources :collections, only: :create
         member do
           patch 'archive'
         end
       end
-      resources :groups, except: :delete
+      resources :groups, except: :delete do
+        resources :roles, only: %i[index create]
+      end
       resources :organizations, only: %i[show update] do
         collection do
           get 'current'

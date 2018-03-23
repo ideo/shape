@@ -2,19 +2,20 @@ class Api::V1::RolesController < Api::V1::BaseController
   # don't need to load records on destroy because it's nested under the user
   load_resource :collection, except: :destroy
   load_resource :item, except: :destroy
+  load_resource :group, except: :destroy
   load_resource only: %i[destroy]
   load_resource :user, only: :destroy
   before_action :authorize_manage_record, except: :index
   before_action :authorize_view_record, only: :index
 
-  # All roles that exist on this resource (collection or item)
+  # All roles that exist on this resource (collection, item or group)
   # /[collections/items]/:id/roles
   def index
     @roles = record.roles.includes(:users, :resource)
     render jsonapi: @roles, include: %i[users resource]
   end
 
-  # Create role(s) on this resource (collection or item)
+  # Create role(s) on this resource (collection, item or group)
   # Params:
   # - role: { name: 'editor' }
   # - user_ids: array of of users that you want to assign
@@ -83,6 +84,6 @@ class Api::V1::RolesController < Api::V1::BaseController
   end
 
   def record
-    @collection || @item || @role.resource
+    @collection || @item || @group || @role.resource
   end
 end
