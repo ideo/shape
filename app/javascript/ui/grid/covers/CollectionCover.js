@@ -5,6 +5,7 @@ import styled from 'styled-components'
 import Dotdotdot from 'react-dotdotdot'
 
 import v from '~/utils/variables'
+import hexToRgba from '~/utils/hexToRgba'
 
 const StyledCollectionCover = styled.div`
   width: 100%;
@@ -19,7 +20,6 @@ const StyledCollectionCover = styled.div`
     background-position: center;
     background-repeat: no-repeat;
     color: white;
-    text-shadow: 1px 1px 0px ${v.colors.blackLava};
   `
   )}
 `
@@ -43,17 +43,14 @@ const calcSectionHeight = (props) => {
 }
 
 const StyledCardContent = styled.div`
-  /*
-  NOTE: alternate style, TBD if we want to use instead.
   .overlay {
     position: absolute;
     right: 0;
     top: 0;
-    background: rgba(0, 0, 0, 0.2);
+    background: ${hexToRgba(v.colors.blackLava, 0.1)};
     width: 100%;
     height: 100%;
   }
-  */
   .top, .bottom {
     position: absolute;
     right: 1rem;

@@ -5,12 +5,15 @@ class Item
 
     def plain_content
       # strip HTML tags
-      # also add spaces between tags that are touching
-      # e.g. <h1>text</h1><p>More text</p> => text More text
-      text = Rails::Html::FullSanitizer.new.sanitize(content.gsub('><', '> <'))
+      # also add pipes between tags that are touching
+      # e.g. <h1>Title</h1><p>More text</p> => Title | More text
+      text = Rails::Html::FullSanitizer.new.sanitize(content.gsub('><', '>|<'))
       # strip out escaped strings e.g. "&lt;strong&gt;" if someone typed raw HTML
       text.gsub(/&lt;[^&]*&gt;/, '')
-          .squeeze(' ')
+          .gsub(/^[|]+/, '') # remove any pipes at the beginning
+          .gsub(/[|]+$/, '') # remove any pipes at the end
+          .gsub(/[|]+/, ' | ') # add spaces between pipes
+          .squeeze(' ') # compress multiple whitespaces into one space
           .strip
     end
 

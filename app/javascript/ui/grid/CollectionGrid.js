@@ -279,8 +279,9 @@ class CollectionGrid extends React.Component {
         let nextX = 0
         // e.g. if card.width is 4, but we're at 2 columns, max out at cardWidth = 2
         const cardWidth = Math.min(cols, card.width)
-        // stored so we can refer to the current maxWidth in other components
+        // card.setMaxWidth won't be defined for blank/placeholder cards
         if (card.setMaxWidth) {
+          // stored so we can refer to the current maxWidth in other components
           card.setMaxWidth(cardWidth)
         }
         // go through the row and see if there is an empty gap that fits card.w
