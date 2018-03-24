@@ -17,8 +17,6 @@ class Role < ApplicationRecord
 
   scopify
 
-  attr_accessor :skip_children_callbacks
-
   VIEWER = :viewer
   EDITOR = :editor
   MEMBER = :member
@@ -78,11 +76,6 @@ class Role < ApplicationRecord
 
   def identifier
     [name, resource_identifier].select(&:present?).join('_')
-  end
-
-  def destroy_without_children_callbacks
-    self.skip_children_callbacks = true
-    destroy
   end
 
   private

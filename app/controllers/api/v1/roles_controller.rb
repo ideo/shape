@@ -5,6 +5,7 @@ class Api::V1::RolesController < Api::V1::BaseController
   load_resource :group, except: :destroy
   load_resource only: %i[destroy]
   load_resource :user, only: :destroy
+  load_resource :group, only: :destroy
   before_action :authorize_manage_record, except: :index
   before_action :authorize_view_record, only: :index
 
@@ -40,12 +41,15 @@ class Api::V1::RolesController < Api::V1::BaseController
     end
   end
 
-  # Remove a user role from a specific resource
+  # Remove a user or group with a role from a specific resource
   # /users/:id/roles/:id
+  # /groups/:id/roles/:id
   def destroy
     # We want to call remove_role instead of deleting the UserRole
     # So that role lifecycle methods are called
     if @user.present? && remove_role(user: @user, role: @role)
+      render jsonapi: @role
+    elsif @group.present? && remove_role(group: @group, role: @role)
       render jsonapi: @role
     else
       render_api_errors @user.errors
@@ -54,15 +58,21 @@ class Api::V1::RolesController < Api::V1::BaseController
 
   private
 
-  def remove_role(user:, role:)
+  def remove_role(role:, user: nil, group: nil)
     resource = role.resource
 
-    return false unless user.remove_role(role.name, resource)
+    if user.present?
+      return false unless user.remove_role(role.name, resource)
+    elsif group.present?
+      return false unless group.remove_role(role.name, resource)
+    end
 
     RemoveRolesFromChildrenWorker.perform_async(
-      [role.id],
       resource.id,
       resource.class.name.to_s,
+      role.name,
+      [user.try(:id)],
+      [group.try(:id)],
     )
 
     true
