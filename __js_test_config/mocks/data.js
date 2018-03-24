@@ -95,6 +95,7 @@ export const fakeUserAttrs = {
   pic_url_square: 'https://filestackcdn.com/abc123',
   groups: [],
   current_organization: fakeOrganization,
+  type: 'users',
 }
 export const fakeUser = {
   ...fakeUserAttrs,

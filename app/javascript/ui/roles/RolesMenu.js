@@ -10,10 +10,9 @@ import {
 import RolesAdd from '~/ui/roles/RolesAdd'
 import RoleSelect from '~/ui/roles/RoleSelect'
 
-function sortUser(a, b) {
-  return a.user.name
-    ? a.user.name.localeCompare(b.user.name)
-    : a.user.email.localeCompare(b.user.email)
+// TODO rewrite this
+function sortUserOrGroup(a, b) {
+  return a.entity.name.localeCompare(b.entity.name)
 }
 
 @inject('apiStore')
@@ -42,13 +41,24 @@ class RolesMenu extends React.Component {
   }
 
   onDelete = (role, entity) =>
-    this.props.apiStore.request(`users/${entity.id}/roles/${role.id}`,
-      'DELETE')
+    this.props.apiStore.request(
+      `${entity.type}/${entity.id}/roles/${role.id}`,
+      'DELETE'
+    )
 
-  onCreateRoles = (users, roleName) => {
+  onCreateRoles = (entities, roleName) => {
     const { apiStore, ownerId, ownerType, onSave } = this.props
-    const userIds = users.map((user) => user.id)
-    const data = { role: { name: roleName }, user_ids: userIds }
+    const userIds = entities
+      .filter(entity => entity.type === 'users')
+      .map((user) => user.id)
+    const groupIds = entities
+      .filter(entity => entity.type === 'groups')
+      .map((group) => group.id)
+    const data = {
+      role: { name: roleName },
+      group_ids: groupIds,
+      user_ids: userIds,
+    }
     return apiStore.request(`${ownerType}/${ownerId}/roles`, 'POST', data)
       .then(onSave)
       .catch((err) => console.warn(err))
@@ -59,21 +69,20 @@ class RolesMenu extends React.Component {
     return apiStore.request(`users/create_from_emails`, 'POST', { emails })
   }
 
-  onUserSearch = (searchTerm) => {
-    const { apiStore } = this.props
-    return apiStore.request(
-      `users/search?query=${searchTerm}`
-    )
-  }
-
   render() {
     const { addCallout, roles, ownerType, title } = this.props
-    const roleUsers = []
-    roles.forEach((role) =>
+    const roleEntities = []
+    roles.forEach((role) => {
       role.users.forEach((user) => {
-        roleUsers.push(Object.assign({}, { role, user }))
-      }))
-    const sortedRoleUsers = roleUsers.sort(sortUser)
+        roleEntities.push(Object.assign({}, { role, entity: user }))
+      })
+      // TODO remove when implemented
+      if (!role.groups) return
+      role.groups.forEach((group) => {
+        roleEntities.push(Object.assign({}, { role, entity: group }))
+      })
+    })
+    const sortedRoleEntities = roleEntities.sort(sortUserOrGroup)
     const roleTypes = ownerType === 'groups'
       ? ['member', 'admin']
       : ['viewer', 'editor']
@@ -81,12 +90,12 @@ class RolesMenu extends React.Component {
     return (
       <div>
         <Heading3>{title}</Heading3>
-        { sortedRoleUsers.map(combined =>
+        { sortedRoleEntities.map(combined =>
           (<RoleSelect
-            key={combined.user.id + combined.role.id}
+            key={combined.entity.id + combined.role.id}
             role={combined.role}
             roleTypes={roleTypes}
-            user={combined.user}
+            entity={combined.entity}
             onDelete={this.onDelete}
             onCreate={this.onCreateRoles}
           />))
@@ -98,7 +107,6 @@ class RolesMenu extends React.Component {
           roleTypes={roleTypes}
           onCreateRoles={this.onCreateRoles}
           onCreateUsers={this.onCreateUsers}
-          onSearch={this.onUserSearch}
         />
       </div>
     )
