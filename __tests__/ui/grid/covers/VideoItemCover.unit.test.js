@@ -21,7 +21,7 @@ describe('VideoItemCover', () => {
     expect(wrapper.find('StyledVideoCover').exists()).toBe(true)
   })
 
-  it('passes the thubmnail_url to StyledImageCover', () => {
+  it('passes the thumbnail_url to StyledImageCover', () => {
     expect(wrapper.find('StyledImageCover').props().url).toEqual(fakeVideoItem.thumbnail_url)
   })
 

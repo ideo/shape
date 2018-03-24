@@ -29,6 +29,7 @@ StyledGridCard.displayName = 'StyledGridCard'
 
 export const StyledBottomLeftIcon = styled.div`
   position: absolute;
+  z-index: ${v.zIndex.gridCard};
   left: 0.25rem;
   bottom: 0;
   color: ${v.colors.gray};
@@ -110,7 +111,13 @@ class GridCard extends React.Component {
         )
       }
     } else if (this.isCollection) {
-      return <CollectionCover collection={record} />
+      return (
+        <CollectionCover
+          width={card.maxWidth}
+          height={card.height}
+          collection={record}
+        />
+      )
     }
     return <div />
   }
