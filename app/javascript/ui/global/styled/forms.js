@@ -120,16 +120,18 @@ export const Pill = styled(Chip)`
 Pill.displayName = 'StyledPill'
 
 export const SelectOption = styled(MenuItem)`
-  .selectOption {
-    alignItems: center;
+  &.selectOption {
+    align-items: center;
+    display: flex;
     height: 38px;
-    margin-bottom: 7px;
-    opacity: 0.5;
+    margin-bottom: 4px;
+    margin-top: 4px;
     padding: 0 4px;
+
+    &:hover: {
+      opacity: 1.0
+    }
   }
 
-  &:hover: {
-    opacity: 1.0
-  }
 `
 SelectOption.displayName = 'StyledSelectOption'

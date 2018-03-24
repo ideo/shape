@@ -1,18 +1,41 @@
 import _ from 'lodash'
 import React from 'react'
 import PropTypes from 'prop-types'
+import styled from 'styled-components'
 import { withStyles } from 'material-ui/styles'
 import Input from 'material-ui/Input'
 import Chip from 'material-ui/Chip'
 import Select from 'react-select'
 
 import Option from '~/ui/global/AutocompleteOption'
+import SearchIcon from '~/ui/icons/SearchIcon'
+
+const SearchIconContainer = styled.span`
+  display: block;
+  left: 15px;
+  margin-left: -15px;
+  padding-top: 5px;
+  position: absolute;
+  width: 14px;
+
+  .icon {
+    width: 22px;
+  }
+`
+
+function renderArrow() {
+  return (
+    <SearchIconContainer>
+      <SearchIcon />
+    </SearchIconContainer>
+  )
+}
 
 function SelectWrapped(props) {
   const { classes, ...other } = props
-
   return (
     <Select.AsyncCreatable
+      arrowRenderer={renderArrow}
       optionComponent={Option}
       noResultsText={'No results found'}
       valueComponent={valueProps => {
@@ -71,6 +94,7 @@ const styles = theme => ({
   '@global': {
     '.Select-control': {
       width: '370px',
+      paddingLeft: '24px',
       display: 'flex',
       alignItems: 'center',
       border: 0,
@@ -113,7 +137,7 @@ const styles = theme => ({
     '.Select-placeholder, .Select--single .Select-value': {
       position: 'absolute',
       top: 0,
-      left: 0,
+      left: '24px',
       right: 0,
       bottom: 0,
       display: 'flex',
