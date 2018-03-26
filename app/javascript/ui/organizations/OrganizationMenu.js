@@ -34,13 +34,17 @@ class OrganizationMenu extends React.Component {
   }
 
   @action onModifyGroupRoles(group) {
-    this.editingGroup = group
+    this.editGroup = group
     this.modifyGroupRoles = true
   }
 
-  @action onGroupSave = () => {
+  @action onGroupSave = (editedGroup) => {
+    const newGroup = !this.editGroup.id
     this.modifyGroupOpen = false
     this.editGroup = {}
+    if (newGroup) {
+      this.onModifyGroupRoles(editedGroup)
+    }
   }
 
   @action onOrganizationSave = () => {
@@ -112,10 +116,10 @@ class OrganizationMenu extends React.Component {
     const { apiStore } = this.props
     // Some roles in the Api store don't have a resource included
     const roles = apiStore.findAll('roles').filter((role) =>
-      role.resource && role.resource.id === this.editingGroup.id)
+      role.resource && role.resource.id === this.editGroup.id)
     return (
       <RolesMenu
-        ownerId={this.editingGroup.id}
+        ownerId={this.editGroup.id}
         ownerType="groups"
         title="Members:"
         addCallout="Add people:"
@@ -172,9 +176,11 @@ class OrganizationMenu extends React.Component {
       title = 'Your Organization'
       onBack = this.handleBack
     } else if (this.modifyGroupRoles) {
+      console.log('edited group', this.editGroup.id)
+      console.log('edited group', this.editGroup.name)
       content = this.renderEditRoles()
       onBack = this.handleBack
-      title = this.editingGroup.name
+      title = this.editGroup.name
     } else if (this.modifyGroupOpen) {
       content = this.renderEditGroup()
       title = this.editGroup.id ? this.editGroup.name : 'New Group'

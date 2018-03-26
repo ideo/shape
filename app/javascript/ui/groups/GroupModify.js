@@ -68,8 +68,9 @@ class GroupModify extends React.Component {
       existingGroup => existingGroup.id === res.id
     )
     if (!existing) {
-      apiStore.fetch('users', apiStore.currentUserId)
+      return apiStore.fetch('users', apiStore.currentUserId)
     }
+    return Promise.resolve(existing)
   }
 
   handleNameChange = (ev) => {
@@ -120,12 +121,14 @@ class GroupModify extends React.Component {
       group.handle = this.editingGroup.handle
       group.filestack_file_url = this.editingGroup.filestack_file_url
     }
-    group.assign('filestack_file_attributes', this.fileAttrs)
+    if (this.fileAttrs.url) {
+      group.assign('filestack_file_attributes', this.fileAttrs)
+    }
     group.save()
       .then((res) => {
         // TODO why isn't res wrapped in "data"?
-        this.afterSave(res)
-        onSave && onSave()
+        this.afterSave(res).then(() =>
+          onSave && onSave(res))
       })
       .catch((err) => {
         console.warn(err)
@@ -156,12 +159,15 @@ class GroupModify extends React.Component {
   }
 
   render() {
+    const { group } = this.props
     return (
       <form>
         <RowItemRight>
-          <TextButton onClick={this.handleRoles}>
-            Members
-          </TextButton>
+          { group.id && (
+            <TextButton onClick={this.handleRoles}>
+              Members
+            </TextButton>
+          )}
         </RowItemRight>
         <FieldContainer>
           <Label htmlFor="groupName">Group Name</Label>

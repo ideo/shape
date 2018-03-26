@@ -28,7 +28,7 @@ describe('GroupModify', () => {
       onGroupRoles: jest.fn(),
     }
     apiStore = {
-      fetch: jest.fn(),
+      fetch: jest.fn().mockReturnValue(Promise.resolve()),
       request: jest.fn(),
       currentUser: {
         groups: []
