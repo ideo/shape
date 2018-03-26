@@ -20,6 +20,7 @@ export default class UiStore {
     gridW: 312,
     gridH: 250,
   }
+  @observable collectionCardIds = []
   @observable selectedCardIds = []
   @observable isLoading = false
 
@@ -57,6 +58,7 @@ export default class UiStore {
 
   // --- BCT + GridCard properties
   @action openBlankContentTool({ order = 0 } = {}) {
+    this.deselectCards()
     this.blankContentToolState = { order }
   }
 
@@ -64,11 +66,48 @@ export default class UiStore {
     this.blankContentToolState = null
   }
 
+  @action setCollectionCardIds(cardIds) {
+    // called when loading a new CollectionPage
+    this.collectionCardIds.replace(cardIds)
+    this.deselectCards()
+  }
+
   @action toggleSelectedCardId(cardId) {
     if (this.isSelected(cardId)) {
       this.selectedCardIds.remove(cardId)
     } else {
       this.selectedCardIds.push(cardId)
+    }
+  }
+
+  @action deselectCards() {
+    this.selectedCardIds.replace([])
+  }
+
+  @action selectCardsUpTo(cardId) {
+    const selected = this.selectedCardIds.toJS()
+    const cardIds = this.collectionCardIds.toJS()
+    const lastSelected = _.last(selected)
+    // gather which cardIds are between this card and the last selected card
+    let between = []
+    if (lastSelected) {
+      if (lastSelected === cardId) return
+      const lastIdx = this.collectionCardIds.findIndex(id => id === lastSelected)
+      const thisIdx = this.collectionCardIds.findIndex(id => id === cardId)
+      if (lastIdx > thisIdx) {
+        between = cardIds.slice(thisIdx, lastIdx)
+      } else {
+        between = cardIds.slice(lastIdx, thisIdx)
+      }
+      // get unique cardIds selected, make sure the current card is put at the end w/ reverse
+      let newSelected = _.reverse(_.uniq(_.concat([cardId], selected, between)))
+      // if ALL those items were already selected, then toggle selection to OFF
+      if (_.isEmpty(_.difference(newSelected, selected))) {
+        newSelected = _.difference(selected, between)
+      }
+      this.selectedCardIds.replace(newSelected)
+    } else {
+      this.selectedCardIds.replace([cardId])
     }
   }
 

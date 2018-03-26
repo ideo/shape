@@ -80,6 +80,7 @@ class MovableGridCard extends React.PureComponent {
     if (Math.abs(x - position.xPos) + Math.abs(y - position.yPos) < 10) {
       return
     }
+    uiStore.deselectCards()
     if (!this.state.dragging) {
       this.setState({
         dragging: true,
@@ -107,6 +108,7 @@ class MovableGridCard extends React.PureComponent {
   }
 
   handleResize = (e, dir, ref, delta, position) => {
+    uiStore.deselectCards()
     const { gridW, gridH, cols } = uiStore.gridSettings
     const { card } = this.props
     // e.g. if card.width is 4, but we're at 2 columns, max out at cardWidth = 2
@@ -125,7 +127,19 @@ class MovableGridCard extends React.PureComponent {
 
   // this function gets passed down to the card, so it can place the onClick handler
   handleClick = (e) => {
-    const { cardType, record } = this.props
+    const { card, cardType, record } = this.props
+    // TODO: make sure this is cross-browser compatible?
+    if (e.metaKey || e.shiftKey) {
+      if (e.metaKey) {
+        // individually select
+        uiStore.toggleSelectedCardId(card.id)
+      }
+      if (e.shiftKey) {
+        // select everything between
+        uiStore.selectCardsUpTo(card.id)
+      }
+      return
+    }
     if (e.target.className.match(/cancelGridClick/)) return
 
     // timeout is just a stupid thing so that Draggable doesn't complain about unmounting
