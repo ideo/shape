@@ -20,8 +20,15 @@ export default class UiStore {
     gridW: 312,
     gridH: 250,
   }
+  @observable selectedCardIds = []
   @observable isLoading = false
 
+  // default action for updating any basic UiStore value
+  @action update(name, value) {
+    this[name] = value
+  }
+
+  // --- grid properties
   @computed get gridMaxW() {
     const grid = this.gridSettings
     return (grid.gridW * grid.cols) + (grid.gutter * (grid.cols - 1))
@@ -46,7 +53,9 @@ export default class UiStore {
       this.gridSettings.cols = cols
     }
   }
+  // --- grid properties />
 
+  // --- BCT + GridCard properties
   @action openBlankContentTool({ order = 0 } = {}) {
     this.blankContentToolState = { order }
   }
@@ -55,35 +64,17 @@ export default class UiStore {
     this.blankContentToolState = null
   }
 
-  @action openCardMenu(cardId) {
-    this.openCardMenuId = cardId
-  }
-
-  @action openOrganizationMenu() {
-    if (!this.organizationMenuOpen) {
-      this.organizationMenuOpen = true
+  @action toggleSelectedCardId(cardId) {
+    if (this.isSelected(cardId)) {
+      this.selectedCardIds.remove(cardId)
+    } else {
+      this.selectedCardIds.push(cardId)
     }
   }
 
-  @action loading(val) {
-    this.isLoading = val
+  isSelected(cardId) {
+    if (this.selectedCardIds.length === 0) return false
+    return this.selectedCardIds.findIndex(id => id === cardId) > -1
   }
-
-  @action closeOrganizationMenu() {
-    if (this.organizationMenuOpen) {
-      this.organizationMenuOpen = false
-    }
-  }
-
-  @action openRolesMenu() {
-    this.rolesMenuOpen = true
-  }
-
-  @action closeRolesMenu() {
-    this.rolesMenuOpen = false
-  }
-
-  @action update(name, value) {
-    this[name] = value
-  }
+  // --- BCT + GridCard properties />
 }

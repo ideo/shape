@@ -21,16 +21,16 @@ class PageWithApi extends React.Component {
   fetchData = (props) => {
     if (!_.isFunction(this.requestPath)) return null
     const { apiStore } = props
-    uiStore.loading(true)
+    uiStore.update('loading', true)
     return apiStore.request(this.requestPath(props))
       .then(response => {
-        uiStore.loading(false)
+        uiStore.update('loading', false)
         if (_.isFunction(this.onAPILoad)) {
           this.onAPILoad(response.data, response.meta)
         }
       })
       .catch(err => {
-        uiStore.loading(false)
+        uiStore.update('loading', false)
         console.log('API error!', err)
       })
   }

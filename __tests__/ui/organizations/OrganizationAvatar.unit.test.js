@@ -1,15 +1,11 @@
 import OrganizationAvatar from '~/ui/organizations/OrganizationAvatar'
+import fakeUiStore from '#/mocks/fakeUiStore'
 
-let props
-let wrapper
-
+let props, wrapper
 describe('OrganizationAvatar', () => {
   beforeEach(() => {
     props = {
-      uiStore: {
-        organizationMenuOpen: false,
-        openOrganizationMenu: jest.fn()
-      },
+      uiStore: fakeUiStore,
       organization: {
         name: 'Space',
         filestack_file_url: 'test.jpg',
@@ -30,6 +26,6 @@ describe('OrganizationAvatar', () => {
 
   it('should open the organization menu in the ui store on click', () => {
     wrapper.find('Avatar').at(0).simulate('click')
-    expect(props.uiStore.openOrganizationMenu).toHaveBeenCalled()
+    expect(props.uiStore.update).toHaveBeenCalledWith('organizationMenuOpen', true)
   })
 })

@@ -48,7 +48,7 @@ class RolesMenu extends React.Component {
 
   handleClose = (ev) => {
     const { uiStore } = this.props
-    uiStore.closeRolesMenu()
+    uiStore.update('rolesMenuOpen', false)
   }
 
   render() {

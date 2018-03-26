@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 import { uiStore } from '~/stores'
 import PopoutMenu from '~/ui/global/PopoutMenu'
 import ArchiveIcon from '~/ui/icons/ArchiveIcon'
-import ShareIcon from '~/ui/icons/ShareIcon'
+// import ShareIcon from '~/ui/icons/ShareIcon'
 import DuplicateIcon from '~/ui/icons/DuplicateIcon'
 import MoveIcon from '~/ui/icons/MoveIcon'
 import LinkIcon from '~/ui/icons/LinkIcon'
@@ -15,16 +15,16 @@ class CardMenu extends React.PureComponent {
 
   handleMouseLeave = () => {
     if (this.props.menuOpen) {
-      uiStore.openCardMenu(false)
+      uiStore.update('openCardMenuId', false)
     }
   }
 
   toggleOpen = (e) => {
     e.stopPropagation()
     if (this.props.menuOpen) {
-      uiStore.openCardMenu(false)
+      uiStore.update('openCardMenuId', false)
     } else {
-      uiStore.openCardMenu(this.cardId)
+      uiStore.update('openCardMenuId', this.cardId)
     }
   }
 
