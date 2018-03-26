@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types'
 
+import { TextField, FormButton } from '~/ui/global/styled/forms'
 import PaddedCardCover from '~/ui/grid/covers/PaddedCardCover'
 
 class CollectionCreator extends React.Component {
@@ -25,17 +26,20 @@ class CollectionCreator extends React.Component {
   render() {
     return (
       <PaddedCardCover>
-        <input
-          placeholder="Collection name"
-          value={this.state.inputText}
-          onChange={this.onInputChange}
-        />
-        <input
-          onClick={this.createCollection}
-          type="submit"
-          value="save"
-          disabled={this.props.loading}
-        />
+        <div className="form">
+          <TextField
+            placeholder="Collection name"
+            value={this.state.inputText}
+            onChange={this.onInputChange}
+          />
+          <FormButton
+            onClick={this.createCollection}
+            disabled={this.props.loading}
+            width={125}
+          >
+            Add
+          </FormButton>
+        </div>
       </PaddedCardCover>
     )
   }

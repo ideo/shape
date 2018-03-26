@@ -2,12 +2,15 @@ import PropTypes from 'prop-types'
 import styled from 'styled-components'
 import _ from 'lodash'
 
+import { TextField, FormButton } from '~/ui/global/styled/forms'
 import PaddedCardCover from '~/ui/grid/covers/PaddedCardCover'
 import VideoUrl from '~/utils/VideoUrl'
 import { ITEM_TYPES } from '~/utils/variables'
 
 const ValidIndicator = styled.div`
-  display: inline-block;
+  position: absolute;
+  top: 18px;
+  right: -24px;
   font-size: 1.25rem;
   font-weight: bold;
   width: 20px;
@@ -88,18 +91,20 @@ class VideoCreator extends React.Component {
 
     return (
       <PaddedCardCover>
-        <input
-          placeholder="Video URL"
-          value={videoUrl}
-          onChange={this.onVideoUrlChange}
-        />
-        {validIndicator}
-        <input
-          onClick={this.createVideoItem}
-          type="submit"
-          value="save"
-          disabled={this.props.loading || this.state.loading}
-        />
+        <div className="form">
+          <TextField
+            placeholder="Video URL"
+            value={videoUrl}
+            onChange={this.onVideoUrlChange}
+          />
+          {validIndicator}
+          <FormButton
+            onClick={this.createVideoItem}
+            disabled={this.props.loading || this.state.loading}
+          >
+            Add
+          </FormButton>
+        </div>
       </PaddedCardCover>
     )
   }

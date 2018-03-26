@@ -30,6 +30,10 @@ export default {
     blackLava: '#120f0e',
   },
 
+  iconSizes: {
+    bct: 47,
+  },
+
   fonts: {
     sans: 'Gotham',
     serif: 'Sentinel',

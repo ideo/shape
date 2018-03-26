@@ -59,6 +59,12 @@ class TagEditor extends React.Component {
         <StyledReactTags>
           <ReactTags
             tags={[...this.tags]}
+            suggestions={[
+              { label: 'IDEO', value: 1 },
+              { label: 'Prototype', value: 1 },
+              { label: 'Colab', value: 1 },
+              { label: 'Stuff', value: 1 },
+            ]}
             allowBackspace={false}
             delimiterChars={[',']}
             placeholder="Add new tags, separated by comma or pressing enter."
