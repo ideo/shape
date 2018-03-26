@@ -52,6 +52,13 @@ class EditableName extends React.Component {
     }
   }
 
+  // navigating between collections may trigger this instead of didMount
+  componentWillReceiveProps(nextProps) {
+    this.setState({
+      name: nextProps.name
+    })
+  }
+
   onNameFieldKeypress = (e) => {
     if (e.key === 'Enter') {
       this.stopEditingName()
