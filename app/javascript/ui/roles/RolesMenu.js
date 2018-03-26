@@ -43,6 +43,20 @@ class RolesMenu extends React.Component {
     )
   }
 
+  currentUserCheck(user) {
+    const { apiStore } = this.props
+    const { currentUser } = apiStore
+    return (currentUser.id !== user.id)
+  }
+
+  currentUserRoleCheck() {
+    const { apiStore, roles } = this.props
+    const { currentUser } = apiStore
+    const userRole = roles.find(role => role.users
+      .find(user => user.id === currentUser.id))
+    return userRole && userRole.canEdit()
+  }
+
   render() {
     const { addCallout, roles, ownerType, title } = this.props
     const roleUsers = []
@@ -54,12 +68,14 @@ class RolesMenu extends React.Component {
     const roleTypes = ownerType === 'groups'
       ? ['member', 'admin']
       : ['viewer', 'editor']
+    const userCanEdit = this.currentUserRoleCheck()
 
     return (
       <div>
         <Heading3>{title}</Heading3>
         { sortedRoleUsers.map(combined =>
           (<RoleSelect
+            enabled={userCanEdit && this.currentUserCheck(combined.user, combined.role)}
             key={combined.user.id + combined.role.id}
             role={combined.role}
             roleTypes={roleTypes}

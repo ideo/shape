@@ -1,8 +1,10 @@
 import { observable, useStrict } from 'mobx'
 import { Provider } from 'mobx-react'
 import RolesMenu from '~/ui/roles/RolesMenu'
+import Role from '~/stores/jsonApi/Role'
 
 const apiStore = observable({
+  currentUser: {},
   request: jest.fn(),
   fetchAll: jest.fn(),
   find: jest.fn(),
@@ -25,6 +27,8 @@ jest.mock('../../../app/javascript/stores/jsonApi/Role')
 let wrapper
 
 describe('RolesMenu', () => {
+  let component
+
   beforeEach(() => {
     useStrict(false)
     wrapper = mount(
@@ -32,6 +36,7 @@ describe('RolesMenu', () => {
         <RolesMenu {...props} />
       </Provider>
     )
+    component = wrapper.find('RolesMenu').instance()
   })
 
   describe('onDelete', () => {
@@ -62,7 +67,6 @@ describe('RolesMenu', () => {
   })
 
   describe('onCreateRoles', () => {
-    let component
     let users
 
     beforeEach(() => {
@@ -85,6 +89,49 @@ describe('RolesMenu', () => {
       component.onCreateRoles(users, 'editor').then(() => {
         expect(props.onSave).toHaveBeenCalled()
         done()
+      })
+    })
+  })
+
+  describe('currentUserCheck', () => {
+    describe('on a role that belongs to the current user', () => {
+      it('should return false', () => {
+        apiStore.currentUser = { id: 3 }
+        const user = { id: 3 }
+        expect(component.currentUserCheck(user)).toBeFalsy()
+      })
+    })
+
+    describe('on a role that belongs to another user', () => {
+      it('should return true', () => {
+        apiStore.currentUser = { id: 4 }
+        const user = { id: 3 }
+        expect(component.currentUserCheck(user)).toBeTruthy()
+      })
+    })
+  })
+
+  describe('currentUserRoleCheck', () => {
+    let user
+    let role
+
+    beforeEach(() => {
+      apiStore.currentUser = { id: 3 }
+      user = { id: 3, name: 'a', pic_url_square: 'something' }
+      role = { id: 21, name: 'viewer', users: [user], canEdit: jest.fn() }
+      props.roles = [role]
+      role.canEdit.mockReturnValue(true)
+    })
+
+    describe('when the user has a role that cannot edit', () => {
+      it('should return false', () => {
+        expect(component.currentUserRoleCheck()).toBeFalsy()
+      })
+    })
+
+    describe('when the user has a role that can edit', () => {
+      it('should return true', () => {
+        expect(component.currentUserRoleCheck()).toBeTruthy()
       })
     })
   })
