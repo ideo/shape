@@ -12,13 +12,25 @@ import {
   RowItemLeft,
 } from '~/ui/global/styled/layout'
 import { Select } from '~/ui/global/styled/forms'
+import LeaveIcon from '~/ui/icons/LeaveIcon'
 import UserAvatar from '~/ui/users/UserAvatar'
 
 const MinRowItem = styled.span`
   min-width: 110px;
 `
 
+const LeaveIconHolder = styled.button`
+  margin-top: 8px;
+  width: 16px;
+`
+LeaveIconHolder.displayName = 'StyledLeaveIconHolder'
+
 class RoleSelect extends React.Component {
+  onRoleRemove = (ev) => {
+    ev.preventDefault()
+    this.deleteRole(true)
+  }
+
   onRoleSelect = (ev) => {
     ev.preventDefault()
     return this.deleteRole().then(() => this.createRole(ev.target.value))
@@ -29,11 +41,9 @@ class RoleSelect extends React.Component {
     onCreate([user], roleName)
   }
 
-  deleteRole = () => {
+  deleteRole = (toRemove) => {
     const { role, user } = this.props
-    return this.props.onDelete(role, user).then(() => {
-      role.toUpdate = true
-    })
+    return this.props.onDelete(role, user, toRemove)
   }
 
   render() {
@@ -76,6 +86,9 @@ class RoleSelect extends React.Component {
         <MinRowItem>
           {select}
         </MinRowItem>
+        <LeaveIconHolder onClick={this.onRoleRemove}>
+          <LeaveIcon />
+        </LeaveIconHolder>
       </Row>
     )
   }
