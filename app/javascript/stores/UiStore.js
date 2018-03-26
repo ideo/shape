@@ -84,6 +84,7 @@ export default class UiStore {
     this.selectedCardIds.replace([])
   }
 
+  // TODO: add a unit test for this
   @action selectCardsUpTo(cardId) {
     const selected = this.selectedCardIds.toJS()
     const cardIds = this.collectionCardIds.toJS()
