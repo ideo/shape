@@ -111,7 +111,12 @@ class RolesAdd extends React.Component {
           </RowItemRight>
         </Row>
         <FormActionsContainer>
-          <FormButton onClick={this.handleSave}>Add</FormButton>
+          <FormButton
+            onClick={this.handleSave}
+            disabled={this.selectedUsers.length === 0}
+          >
+            Add
+          </FormButton>
         </FormActionsContainer>
       </div>
     )
