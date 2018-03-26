@@ -1,8 +1,7 @@
+import _ from 'lodash'
 import PropTypes from 'prop-types'
 import { PropTypes as MobxPropTypes } from 'mobx-react'
-import { withStyles } from 'material-ui/styles'
 import { MenuItem } from 'material-ui/Menu'
-import Select from 'material-ui/Select'
 import {
   DisplayText,
   SubText
@@ -11,65 +10,58 @@ import {
   Row,
   RowItemLeft,
 } from '~/ui/global/styled/layout'
-import UserAvatar from '~/ui/users/UserAvatar'
-
-const materialStyles = {
-  root: {
-    fontFamily: 'Gotham',
-    fontSize: '16px',
-    fontWeight: 300,
-  },
-  selectMenu: {
-    backgroundColor: 'transparent',
-    '&:focus': { backgroundColor: 'transparent' },
-    '&:hover': { backgroundColor: 'transparent' },
-  }
-}
+import { Select } from '~/ui/global/styled/forms'
+import Avatar from '~/ui/global/Avatar'
 
 class RoleSelect extends React.Component {
   onRoleSelect = (ev) => {
     ev.preventDefault()
-    this.deleteRole().then(this.createRole(ev.target.value))
+    return this.deleteRole().then(() => this.createRole(ev.target.value))
   }
 
   createRole(roleName) {
-    const { onCreate, user } = this.props
-    onCreate([user], roleName)
+    const { onCreate, entity } = this.props
+    onCreate([entity], roleName)
   }
 
   deleteRole = () => {
-    const { role, user } = this.props
-    return this.props.onDelete(role, user).then(() => {
+    const { role, entity } = this.props
+    return this.props.onDelete(role, entity).then(() => {
       role.toUpdate = true
     })
   }
 
   render() {
-    const { classes, role, user } = this.props
+    const { role, roleTypes, entity } = this.props
+    // TODO remove duplication with RolesAdd role select menu
+    const url = entity.pic_url_square || entity.filestack_file_url
     return (
       <Row>
         <span>
-          <UserAvatar
-            key={user.id}
-            user={user}
+          <Avatar
+            key={entity.id}
+            url={url}
             size={38}
           />
         </span>
         <RowItemLeft>
-          <DisplayText>{user.name}</DisplayText><br />
-          <SubText>{user.email}</SubText>
+          <DisplayText>{entity.name}</DisplayText><br />
+          <SubText>{entity.email}</SubText>
         </RowItemLeft>
         <span>
           <Select
-            classes={classes}
+            classes={{ root: 'select', selectMenu: 'selectMenu' }}
             displayEmpty
             disableUnderline
             name="role"
             onChange={this.onRoleSelect}
             value={role.name}
           >
-            <MenuItem value="editor">Editor</MenuItem>
-            <MenuItem value="viewer">Viewer</MenuItem>
+            { roleTypes.map(roleType =>
+              (<MenuItem key={roleType} value={roleType}>
+                {_.startCase(roleType)}
+              </MenuItem>))
+            }
           </Select>
         </span>
       </Row>
@@ -79,12 +71,10 @@ class RoleSelect extends React.Component {
 
 RoleSelect.propTypes = {
   role: MobxPropTypes.objectOrObservableObject.isRequired,
-  user: MobxPropTypes.objectOrObservableObject.isRequired,
+  roleTypes: PropTypes.arrayOf(PropTypes.string).isRequired,
+  entity: MobxPropTypes.objectOrObservableObject.isRequired,
   onDelete: PropTypes.func.isRequired,
   onCreate: PropTypes.func.isRequired,
-  classes: PropTypes.shape({
-    paper: PropTypes.string,
-  }).isRequired,
 }
 
-export default withStyles(materialStyles)(RoleSelect)
+export default RoleSelect

@@ -7,6 +7,10 @@ import {
 
 const apiStore = observable({
   currentUser: fakeUser,
+  request: jest.fn().mockReturnValue(Promise.resolve({ data: [] })),
+  add: jest.fn(),
+  removeAll: jest.fn(),
+  findAll: jest.fn(),
 })
 const uiStore = observable({
   organizationMenuOpen: false,
@@ -17,7 +21,7 @@ const props = {
   organization: {
     name: 'Space'
   },
-  userGroups: []
+  userGroups: [{ id: 1, name: 'testgroup', }]
 }
 
 let wrapper
@@ -32,7 +36,7 @@ describe('OrganizationMenu', () => {
     ])
     wrapper = mount(
       <Provider apiStore={apiStore} uiStore={uiStore}>
-        <OrganizationMenu.wrappedComponent {...props} />
+        <OrganizationMenu {...props} />
       </Provider>
     )
     component = wrapper.find('OrganizationMenu')
@@ -70,5 +74,28 @@ describe('OrganizationMenu', () => {
     component.instance().handleGroupAddClick()
     expect(component.instance().modifyGroupOpen).toBeTruthy()
     expect(component.instance().editGroup).toEqual({})
+  })
+
+  describe('componentDidMount', () => {
+    it('should fetch all the user groups from the API', () => {
+      expect(apiStore.request).toHaveBeenCalledWith(
+        'groups/1/roles',
+        'GET'
+      )
+    })
+  })
+
+  describe('onRolesSave', () => {
+    let res
+
+    beforeEach(() => {
+      res = { data: [{ id: 3 }] }
+      component.instance().onRolesSave(res)
+    })
+
+    it('should remove all and add back roles to apiStore', () => {
+      expect(apiStore.removeAll).toHaveBeenCalledWith('roles')
+      expect(apiStore.add).toHaveBeenCalledWith(res.data, 'roles')
+    })
   })
 })

@@ -8,6 +8,8 @@ describe('RolesAdd', () => {
   beforeEach(() => {
     useStrict(false)
     props = {
+      searchableItems: [],
+      roleTypes: ['viewer', 'editor'],
       onCreate: jest.fn(),
       onCreateUsers: jest.fn(),
       onCreateRoles: jest.fn(),
@@ -23,7 +25,7 @@ describe('RolesAdd', () => {
     let component
 
     beforeEach(() => {
-      component = wrapper.find('RolesAdd').instance()
+      component = wrapper.instance()
     })
 
     describe('when a user is found', () => {
@@ -39,7 +41,7 @@ describe('RolesAdd', () => {
       })
 
       it('should map the data with a value and a user', () => {
-        expect(wrapper.find('RolesAdd').instance().onUserSearch('leo'))
+        expect(component.onUserSearch('leo'))
           .resolves.toEqual([{ value: user.email, label: user.name, data: user }])
       })
     })
@@ -50,7 +52,7 @@ describe('RolesAdd', () => {
 
     beforeEach(() => {
       // Shortcut so this doesn't have to be found every time
-      component = wrapper.find('RolesAdd').instance()
+      component = wrapper.instance()
     })
 
     describe('for a already registered user', () => {
@@ -97,13 +99,39 @@ describe('RolesAdd', () => {
     })
   })
 
+  describe('mapItems', () => {
+    describe('with groups', () => {
+      it('should map groups with handle as the value', () => {
+        props.searchableItems = [
+          { id: 3, name: 'groupname', handle: 'group-name', type: 'groups' }
+        ]
+        wrapper.setProps(props)
+        expect(wrapper.instance().mapItems()[0]).toEqual(
+          { value: 'group-name', label: 'groupname', data: props.searchableItems[0] }
+        )
+      })
+    })
+
+    describe('with users', () => {
+      it('should map users with email as the value', () => {
+        props.searchableItems = [
+          { id: 3, name: 'user', email: 'user@u.u', type: 'users' }
+        ]
+        wrapper.setProps(props)
+        expect(wrapper.instance().mapItems()[0]).toEqual(
+          { value: 'user@u.u', label: 'user', data: props.searchableItems[0] }
+        )
+      })
+    })
+  })
+
   describe('handleSave', () => {
     let component
     let unregisteredUsers
     let registeredUsers
 
     beforeEach(() => {
-      component = wrapper.find('RolesAdd').instance()
+      component = wrapper.instance()
       unregisteredUsers = [
         { email: 'name@name.com' },
         { email: 'mo@mo.com' }

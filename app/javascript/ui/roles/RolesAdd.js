@@ -1,10 +1,11 @@
+import _ from 'lodash'
 import PropTypes from 'prop-types'
 import { observable, action } from 'mobx'
-import { observer } from 'mobx-react'
-import { withStyles } from 'material-ui/styles'
+import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import {
   FormButton,
   FormActionsContainer,
+  Select,
 } from '~/ui/global/styled/forms'
 import {
   Row,
@@ -12,21 +13,18 @@ import {
 } from '~/ui/global/styled/layout'
 import AutoComplete from '~/ui/global/AutoComplete'
 import PillList from '~/ui/global/PillList'
-import Select from 'material-ui/Select'
 import { MenuItem } from 'material-ui/Menu'
-
-const materialStyles = {
-  selectMenu: {
-    backgroundColor: 'transparent',
-    '&:focus': { backgroundColor: 'transparent' },
-    '&:hover': { backgroundColor: 'transparent' },
-  }
-}
 
 @observer
 class RolesAdd extends React.Component {
   @observable selectedUsers = []
-  @observable selectedRole = 'viewer'
+  @observable selectedRole = ''
+
+  constructor(props) {
+    super(props)
+    const [first] = this.props.roleTypes
+    this.selectedRole = first
+  }
 
   @action
   onUserSelected = (data) => {
@@ -81,8 +79,23 @@ class RolesAdd extends React.Component {
     this.selectedUsers = []
   }
 
+  mapItems() {
+    const { searchableItems } = this.props
+    return searchableItems.map(item => {
+      let value
+      if (item.type === 'users') {
+        value = item.email
+      } else if (item.type === 'groups') {
+        value = item.handle
+      } else {
+        throw new Error('Can only search users and groups')
+      }
+      return { value, label: item.name, data: item }
+    })
+  }
+
   render() {
-    const { classes } = this.props
+    const { roleTypes } = this.props
     return (
       <div>
         { this.selectedUsers.length > 0 && (
@@ -93,20 +106,24 @@ class RolesAdd extends React.Component {
         }
         <Row>
           <AutoComplete
+            options={this.mapItems()}
             onInputChange={this.onUserSearch}
             onOptionSelect={this.onUserSelected}
           />
           <RowItemRight>
             <Select
-              classes={classes}
+              classes={{ root: 'select', selectMenu: 'selectMenu' }}
               displayEmpty
               disableUnderline
               name="role"
               onChange={this.handleRoleSelect}
               value={this.selectedRole}
             >
-              <MenuItem value="editor">Editor</MenuItem>
-              <MenuItem value="viewer">Viewer</MenuItem>
+              { roleTypes.map(roleType =>
+                (<MenuItem key={roleType} value={roleType}>
+                  {_.startCase(roleType)}
+                </MenuItem>))
+              }
             </Select>
           </RowItemRight>
         </Row>
@@ -119,15 +136,14 @@ class RolesAdd extends React.Component {
 }
 
 RolesAdd.propTypes = {
+  searchableItems: MobxPropTypes.arrayOrObservableArray.isRequired,
+  roleTypes: PropTypes.arrayOf(PropTypes.string).isRequired,
   onCreateRoles: PropTypes.func.isRequired,
   onCreateUsers: PropTypes.func.isRequired,
   onSearch: PropTypes.func,
-  classes: PropTypes.shape({
-    selectMenu: PropTypes.string,
-  }).isRequired,
 }
 RolesAdd.defaultProps = {
   onSearch: () => {}
 }
 
-export default withStyles(materialStyles)(RolesAdd)
+export default RolesAdd

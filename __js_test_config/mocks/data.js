@@ -85,6 +85,15 @@ export const fakeCollection = {
   ],
   API_archive: jest.fn(),
 }
+export const fakeOrganizationAttrs = {
+  id: 1,
+  name: 'TestOrg',
+}
+export const fakeOrganization = {
+  ...fakeOrganizationAttrs,
+  rawAttributes: jest.fn().mockReturnValue(fakeOrganizationAttrs),
+  getRecordType: jest.fn().mockReturnValue('organization'),
+}
 export const fakeUserAttrs = {
   id: 1,
   first_name: 'Oprah',
@@ -92,6 +101,8 @@ export const fakeUserAttrs = {
   email: 'oprah@winfrey.com',
   pic_url_square: 'https://filestackcdn.com/abc123',
   groups: [],
+  current_organization: fakeOrganization,
+  type: 'users',
 }
 export const fakeUser = {
   ...fakeUserAttrs,

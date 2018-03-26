@@ -12,7 +12,8 @@ describe('RoleSelect', () => {
     useStrict(false)
     props = {
       role: fakeRole,
-      user: fakeRole.users[0],
+      roleTypes: ['viewer', 'editor'],
+      entity: fakeRole.users[0],
       onDelete: jest.fn(),
       onCreate: jest.fn(),
     }
@@ -29,17 +30,19 @@ describe('RoleSelect', () => {
       }
     }
 
-    it('should call delete role then create role', () => {
+    it('should call delete role then create role', (done) => {
       props.onDelete.mockReturnValue(Promise.resolve())
-      wrapper.find('RoleSelect').instance().onRoleSelect(fakeSelectEvent)
-      expect(props.onDelete).toHaveBeenCalled()
-      expect(props.onCreate).toHaveBeenCalled()
+      wrapper.instance().onRoleSelect(fakeSelectEvent).then(() => {
+        expect(props.onDelete).toHaveBeenCalled()
+        expect(props.onCreate).toHaveBeenCalled()
+        done()
+      })
     })
   })
 
   describe('createRole', () => {
-    it('should call onCreate with list of users and role name', () => {
-      wrapper.find('RoleSelect').instance().createRole('viewer')
+    it('should call onCreate with list of users/groups and role name', () => {
+      wrapper.instance().createRole('viewer')
       expect(props.onCreate).toHaveBeenCalledWith([fakeRole.users[0]], 'viewer')
     })
   })
@@ -47,11 +50,11 @@ describe('RoleSelect', () => {
   describe('deleteRole', () => {
     beforeEach(() => {
       props.onDelete.mockReturnValue(Promise.resolve())
-      wrapper.find('RoleSelect').instance().deleteRole()
+      wrapper.instance().deleteRole()
     })
 
-    it('should call onDelete with the role and user', () => {
-      expect(props.onDelete).toHaveBeenCalledWith(props.role, props.user)
+    it('should call onDelete with the role and user/group', () => {
+      expect(props.onDelete).toHaveBeenCalledWith(props.role, props.entity)
     })
   })
 })
