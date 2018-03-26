@@ -50,7 +50,8 @@ class Collection < ApplicationRecord
   def search_data
     {
       name: name,
-      tags: tags.map(&:name),
+      tags: all_tag_names,
+      item_tags: items.map(&:tags).flatten.map(&:name),
       content: search_content,
       organization_id: organization_id,
       user_ids: (editor_ids + viewer_ids).uniq,
@@ -58,7 +59,12 @@ class Collection < ApplicationRecord
     }
   end
 
+  def all_tag_names
+    (tag_list + items.map(&:tag_list)).uniq
+  end
+
   def search_content
+    # TODO: indexing private sub-content differently?
     # Current functionality for getting a collection's searchable "text content":
     # - go through all items in the collection
     # - for TextItems, grab the first 200 characters of their content
@@ -142,6 +148,13 @@ class Collection < ApplicationRecord
     cached_cards ||= collection_cards.includes(:items, :collections)
     cached_cards.select do |collection_card|
       collection_card.record.can_view?(user)
+    end
+  end
+
+  # convenience method if card order ever gets out of sync
+  def reorder_cards
+    collection_cards.each_with_index do |card, i|
+      card.update_attribute(:order, i)
     end
   end
 

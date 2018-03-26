@@ -4,6 +4,7 @@ class SerializableCollection < BaseJsonSerializer
   type 'collections'
 
   attributes :id, :name, :created_at
+  attribute :tag_list
 
   attribute :type do
     @object.type || @object.class.name.to_s
@@ -36,8 +37,4 @@ class SerializableCollection < BaseJsonSerializer
   end
 
   has_many :roles
-
-  attribute :tag_list do
-    @object.tag_list
-  end
 end

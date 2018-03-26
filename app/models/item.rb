@@ -11,6 +11,8 @@ class Item < ApplicationRecord
   archivable as: :parent_collection_card,
              with: %i[reference_collection_cards]
 
+  acts_as_taggable
+
   # The primary collection that 'owns' this item
   has_one :parent_collection_card,
           -> { primary },
