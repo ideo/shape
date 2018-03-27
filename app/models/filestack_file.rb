@@ -31,7 +31,36 @@ class FilestackFile < ApplicationRecord
     mimetype.include?('image')
   end
 
-  private
+  # Create a new filestack file from an external asset
+  def self.create_from_url(external_url)
+    filelink = api_client.upload(external_url: external_url)
+    metadata = filelink.metadata
+    create(
+      url: filelink.url,
+      handle: filelink.handle,
+      mimetype: metadata['mimetype'],
+      size: metadata['size'],
+    )
+  end
+
+  # private
+
+  # Docs: https://www.filestack.com/docs/sdks?ruby
+  def api_client
+    @api_client ||= FilestackClient.new(ENV['FILESTACK_API_KEY'], filestack_security)
+  end
+
+  def filestack_security
+    FilestackSecurity.new(ENV['FILESTACK_API_SECRET'], options: { call: %w[read store pick] })
+  end
+
+  def filestack_filelink
+    @filelink ||= FilestackFilelink.new(
+      handle: handle,
+      apikey: ENV['FILESTACK_API_KEY'],
+      security: filestack_security,
+    )
+  end
 
   def process_image
     # TODO: We will want do decide what kind of post-processing to do on uploaded files
@@ -39,7 +68,6 @@ class FilestackFile < ApplicationRecord
   end
 
   def delete_on_filestack
-    # TODO: write this method
-    # docs: https://www.filestack.com/docs/rest-api/remove
+    filestack_filelink.delete
   end
 end
