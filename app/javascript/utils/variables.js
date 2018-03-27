@@ -26,7 +26,7 @@ export default {
     cyan: '#c0dbde',
     gray: '#c6c1bf',
     cloudy: '#a89f9b',
-    linkHover: '#06c',
+    sirocco: '#697c7e',
     blackLava: '#120f0e',
   },
 
