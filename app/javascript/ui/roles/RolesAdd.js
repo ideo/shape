@@ -2,6 +2,7 @@ import _ from 'lodash'
 import PropTypes from 'prop-types'
 import { observable, action } from 'mobx'
 import { observer } from 'mobx-react'
+import styled from 'styled-components'
 import {
   FormButton,
   FormActionsContainer,
@@ -14,6 +15,11 @@ import {
 import AutoComplete from '~/ui/global/AutoComplete'
 import PillList from '~/ui/global/PillList'
 import { MenuItem } from 'material-ui/Menu'
+
+const RightAligner = styled.span`
+  margin-right: 30px;
+`
+RightAligner.displayName = 'StyledRightAligner'
 
 @observer
 class RolesAdd extends React.Component {
@@ -95,20 +101,22 @@ class RolesAdd extends React.Component {
             onOptionSelect={this.onUserSelected}
           />
           <RowItemRight>
-            <Select
-              classes={{ root: 'select', selectMenu: 'selectMenu' }}
-              displayEmpty
-              disableUnderline
-              name="role"
-              onChange={this.handleRoleSelect}
-              value={this.selectedRole}
-            >
-              { roleTypes.map(roleType =>
-                (<MenuItem key={roleType} value={roleType}>
-                  {_.startCase(roleType)}
-                </MenuItem>))
-              }
-            </Select>
+            <RightAligner>
+              <Select
+                classes={{ root: 'select', selectMenu: 'selectMenu' }}
+                displayEmpty
+                disableUnderline
+                name="role"
+                onChange={this.handleRoleSelect}
+                value={this.selectedRole}
+              >
+                { roleTypes.map(roleType =>
+                  (<MenuItem key={roleType} value={roleType}>
+                    {_.startCase(roleType)}
+                  </MenuItem>))
+                }
+              </Select>
+            </RightAligner>
           </RowItemRight>
         </Row>
         <FormActionsContainer>

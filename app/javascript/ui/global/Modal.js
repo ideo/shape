@@ -35,7 +35,7 @@ const BackIconHolder = styled.button`
 `
 
 const PaddedContent = styled.div`
-  padding: ${props => (props.onBack ? '0 20px' : '0')};
+  padding: 0 20px;
 `
 
 class Modal extends React.Component {
