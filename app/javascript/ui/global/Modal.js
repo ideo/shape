@@ -53,6 +53,7 @@ class Modal extends React.Component {
         disableAutoFocus
         open={open}
         onClose={this.handleclose}
+        onBackdropClick={this.handleClose}
         aria-labelledby={title}
         BackdropProps={{ invisible: true }}
       >
