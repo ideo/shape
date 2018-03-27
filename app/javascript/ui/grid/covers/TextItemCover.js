@@ -7,6 +7,7 @@ import v from '~/utils/variables'
 import PaddedCardCover from './PaddedCardCover'
 
 const StyledReadMore = styled.div`
+  z-index: ${v.zIndex.gridCard};
   position: absolute;
   bottom: 0;
   width: 100%;
