@@ -43,13 +43,18 @@ export const FormButton = styled.button`
   border-radius: 20px;
   border: none;
   background-color: ${v.colors.blackLava};
-  ${props => props.disabled &&
-      `background-color: white;
-      border: 1px solid ${v.colors.gray};
-      color:  ${v.colors.gray}`};
   &:hover, &:focus {
     background-color: ${v.colors.cloudy};
   }
+  ${props => props.disabled &&
+      `background-color: white;
+      border: 1px solid ${v.colors.gray};
+      color:  ${v.colors.gray};
+      cursor: initial;
+      &:hover, &:focus {
+        background-color: white;
+      }
+    `};
 `
 FormButton.displayName = 'StyledFormButton'
 
