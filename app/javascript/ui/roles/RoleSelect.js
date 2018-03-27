@@ -25,6 +25,11 @@ const LeaveIconHolder = styled.button`
 `
 LeaveIconHolder.displayName = 'StyledLeaveIconHolder'
 
+const CenterAlignedSingleItem = styled.div`
+  margin-top: 6px;
+`
+CenterAlignedSingleItem.displayName = 'StyledCenterAlignedSingleItem'
+
 class RoleSelect extends React.Component {
   onRoleRemove = (ev) => {
     ev.preventDefault()
@@ -70,6 +75,7 @@ class RoleSelect extends React.Component {
       select = <DisplayText>{_.startCase(role.name)}</DisplayText>
     }
     // TODO remove duplication with RolesAdd role select menu
+    console.log('user name', user.name.length)
     return (
       <Row>
         <span>
@@ -80,8 +86,15 @@ class RoleSelect extends React.Component {
           />
         </span>
         <RowItemLeft>
-          <DisplayText>{user.name}</DisplayText><br />
-          <SubText>{user.email}</SubText>
+          { user.name && user.name.trim().length > 0
+            ? (<div>
+              <DisplayText>{user.name}</DisplayText><br />
+              <SubText>{user.email}</SubText>
+            </div>)
+            : (<CenterAlignedSingleItem>
+              <DisplayText>{user.email}</DisplayText>
+            </CenterAlignedSingleItem>)
+          }
         </RowItemLeft>
         <MinRowItem>
           {select}
