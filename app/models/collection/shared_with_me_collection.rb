@@ -65,7 +65,7 @@ class Collection
 
     private
 
-    # TODO: right now this is all items shared with me,
+    # TODO: right now this is all collections shared with me,
     #       not scoped to org
     def collections_shared_with_me
       Role.user_resources(
@@ -77,6 +77,7 @@ class Collection
     end
 
     def include_object?(obj)
+      return false if obj.archived?
       return true if obj.is_a?(Item)
 
       obj.is_a?(Collection) && obj.type.blank?
