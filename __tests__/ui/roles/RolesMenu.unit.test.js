@@ -21,6 +21,7 @@ const props = {
   ownerId: 1,
   ownerType: 'collections',
   roles: [],
+  apiStore,
   uiStore,
   onSave: jest.fn(),
 }
@@ -33,19 +34,17 @@ describe('RolesMenu', () => {
 
   beforeEach(() => {
     useStrict(false)
-    wrapper = mount(
-      <Provider apiStore={apiStore} uiStore={uiStore}>
-        <RolesMenu {...props} />
-      </Provider>
+    wrapper = shallow(
+      <RolesMenu.wrappedComponent {...props} />
     )
-    component = wrapper.find('RolesMenu').instance()
+    component = wrapper.instance()
   })
 
   describe('onDelete', () => {
     it('should make an api store request with correct data', () => {
       const role = { id: 2 }
       const user = { id: 4 }
-      wrapper.find('RolesMenu').instance().onDelete(role, user)
+      component.onDelete(role, user)
       expect(apiStore.request).toHaveBeenCalledWith(
         `users/${user.id}/roles/${role.id}`, 'DELETE'
       )
@@ -55,7 +54,7 @@ describe('RolesMenu', () => {
   describe('onUserSearch', () => {
     describe('when a user is found', () => {
       it('should api request the users search route', (done) => {
-        wrapper.find('RolesMenu').instance().onUserSearch('mary').then(() => {
+        component.onUserSearch('mary').then(() => {
           expect(apiStore.request).toHaveBeenCalledWith(
             'users/search?query=mary'
           )
@@ -69,7 +68,6 @@ describe('RolesMenu', () => {
     let users
 
     beforeEach(() => {
-      component = wrapper.find('RolesMenu').instance()
       users = [{ id: 3 }, { id: 5 }]
       apiStore.request.mockReturnValue(Promise.resolve({}))
       apiStore.fetchAll.mockReturnValue(Promise.resolve({ data: [] }))
@@ -119,12 +117,7 @@ describe('RolesMenu', () => {
       user = { id: 3, name: 'a', pic_url_square: 'something' }
       role = { id: 21, name: 'viewer', users: [user], canEdit: jest.fn() }
       props.roles = [role]
-      wrapper = mount(
-        <Provider apiStore={apiStore} uiStore={uiStore}>
-          <RolesMenu {...props} />
-        </Provider>
-      )
-      component = wrapper.find('RolesMenu').instance()
+      wrapper.setProps(props)
     })
 
     describe('when the user has a role that cannot edit', () => {
