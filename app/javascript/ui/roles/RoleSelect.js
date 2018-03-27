@@ -20,7 +20,7 @@ const MinRowItem = styled.span`
 `
 
 const LeaveIconHolder = styled.button`
-  margin-top: 8px;
+  margin-top: ${props => (props.enabled ? 8 : 2)}px;
   width: 16px;
 `
 LeaveIconHolder.displayName = 'StyledLeaveIconHolder'
@@ -47,9 +47,9 @@ class RoleSelect extends React.Component {
   }
 
   render() {
-    const { role, roleTypes, user } = this.props
+    const { enabled, role, roleTypes, user } = this.props
     let select
-    if (this.props.enabled) {
+    if (enabled) {
       select = (
         <Select
           classes={{ root: 'select', selectMenu: 'selectMenu' }}
@@ -86,7 +86,7 @@ class RoleSelect extends React.Component {
         <MinRowItem>
           {select}
         </MinRowItem>
-        <LeaveIconHolder onClick={this.onRoleRemove}>
+        <LeaveIconHolder enabled={enabled} onClick={this.onRoleRemove}>
           <LeaveIcon />
         </LeaveIconHolder>
       </Row>

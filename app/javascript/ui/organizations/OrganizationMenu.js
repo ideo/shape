@@ -176,8 +176,6 @@ class OrganizationMenu extends React.Component {
       title = 'Your Organization'
       onBack = this.handleBack
     } else if (this.modifyGroupRoles) {
-      console.log('edited group', this.editGroup.id)
-      console.log('edited group', this.editGroup.name)
       content = this.renderEditRoles()
       onBack = this.handleBack
       title = this.editGroup.name
