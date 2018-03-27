@@ -119,17 +119,24 @@ describe('RolesMenu', () => {
       user = { id: 3, name: 'a', pic_url_square: 'something' }
       role = { id: 21, name: 'viewer', users: [user], canEdit: jest.fn() }
       props.roles = [role]
-      role.canEdit.mockReturnValue(true)
+      wrapper = mount(
+        <Provider apiStore={apiStore} uiStore={uiStore}>
+          <RolesMenu {...props} />
+        </Provider>
+      )
+      component = wrapper.find('RolesMenu').instance()
     })
 
     describe('when the user has a role that cannot edit', () => {
       it('should return false', () => {
+        role.canEdit.mockReturnValue(false)
         expect(component.currentUserRoleCheck()).toBeFalsy()
       })
     })
 
     describe('when the user has a role that can edit', () => {
       it('should return true', () => {
+        role.canEdit.mockReturnValue(true)
         expect(component.currentUserRoleCheck()).toBeTruthy()
       })
     })

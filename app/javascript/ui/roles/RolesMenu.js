@@ -54,7 +54,8 @@ class RolesMenu extends React.Component {
     const { currentUser } = apiStore
     const userRole = roles.find(role => role.users
       .find(user => user.id === currentUser.id))
-    return userRole && userRole.canEdit()
+    if (!userRole) return false
+    return userRole.canEdit()
   }
 
   render() {
