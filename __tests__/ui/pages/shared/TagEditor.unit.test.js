@@ -9,7 +9,7 @@ describe('TagEditor', () => {
   beforeEach(() => {
     record = fakeCollection
     uiStore = fakeUiStore
-    props = { record, uiStore }
+    props = { record, uiStore, canEdit: true }
     wrapper = shallow(
       <TagEditor.wrappedComponent {...props} />
     )

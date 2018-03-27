@@ -1,4 +1,5 @@
 import Chip from 'material-ui/Chip'
+import MuiSelect from 'material-ui/Select'
 import { MenuItem } from 'material-ui/Menu'
 import styled from 'styled-components'
 import v from '~/utils/variables'
@@ -126,6 +127,21 @@ export const Pill = styled(Chip)`
   }
 `
 Pill.displayName = 'StyledPill'
+
+export const Select = styled(MuiSelect)`
+  .select {
+    font-family: ${v.fonts.sans};
+    font-size: 1rem;
+    font-weight: ${v.weights.book};
+  }
+
+  .selectMenu: {
+    background-color: transparent;
+    &:focus { background-color: transparent; }
+    &:hover { background-color: transparent; }
+  }
+`
+Select.displayName = 'StyledSelect'
 
 export const SelectOption = styled(MenuItem)`
   &.selectOption {

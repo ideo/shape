@@ -1,10 +1,11 @@
+import _ from 'lodash'
 import PropTypes from 'prop-types'
 import { observable, action } from 'mobx'
 import { observer } from 'mobx-react'
-import { withStyles } from 'material-ui/styles'
 import {
   FormButton,
   FormActionsContainer,
+  Select,
 } from '~/ui/global/styled/forms'
 import {
   Row,
@@ -12,21 +13,18 @@ import {
 } from '~/ui/global/styled/layout'
 import AutoComplete from '~/ui/global/AutoComplete'
 import PillList from '~/ui/global/PillList'
-import Select from 'material-ui/Select'
 import { MenuItem } from 'material-ui/Menu'
-
-const materialStyles = {
-  selectMenu: {
-    backgroundColor: 'transparent',
-    '&:focus': { backgroundColor: 'transparent' },
-    '&:hover': { backgroundColor: 'transparent' },
-  }
-}
 
 @observer
 class RolesAdd extends React.Component {
   @observable selectedUsers = []
-  @observable selectedRole = 'viewer'
+  @observable selectedRole = ''
+
+  constructor(props) {
+    super(props)
+    const [first] = this.props.roleTypes
+    this.selectedRole = first
+  }
 
   @action
   onUserSelected = (data) => {
@@ -82,7 +80,7 @@ class RolesAdd extends React.Component {
   }
 
   render() {
-    const { classes } = this.props
+    const { roleTypes } = this.props
     return (
       <div>
         { this.selectedUsers.length > 0 && (
@@ -98,15 +96,18 @@ class RolesAdd extends React.Component {
           />
           <RowItemRight>
             <Select
-              classes={classes}
+              classes={{ root: 'select', selectMenu: 'selectMenu' }}
               displayEmpty
               disableUnderline
               name="role"
               onChange={this.handleRoleSelect}
               value={this.selectedRole}
             >
-              <MenuItem value="editor">Editor</MenuItem>
-              <MenuItem value="viewer">Viewer</MenuItem>
+              { roleTypes.map(roleType =>
+                (<MenuItem key={roleType} value={roleType}>
+                  {_.startCase(roleType)}
+                </MenuItem>))
+              }
             </Select>
           </RowItemRight>
         </Row>
@@ -124,15 +125,13 @@ class RolesAdd extends React.Component {
 }
 
 RolesAdd.propTypes = {
+  roleTypes: PropTypes.arrayOf(PropTypes.string).isRequired,
   onCreateRoles: PropTypes.func.isRequired,
   onCreateUsers: PropTypes.func.isRequired,
   onSearch: PropTypes.func,
-  classes: PropTypes.shape({
-    selectMenu: PropTypes.string,
-  }).isRequired,
 }
 RolesAdd.defaultProps = {
   onSearch: () => {}
 }
 
-export default withStyles(materialStyles)(RolesAdd)
+export default RolesAdd

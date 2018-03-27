@@ -29,6 +29,10 @@ export default class UiStore {
     this[name] = value
   }
 
+  @action closeRolesMenu() {
+    this.rolesMenuOpen = false
+  }
+
   // --- grid properties
   @computed get gridMaxW() {
     const grid = this.gridSettings

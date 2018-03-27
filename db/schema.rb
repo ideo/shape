@@ -59,9 +59,8 @@ ActiveRecord::Schema.define(version: 20180320003745) do
     t.bigint "organization_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.string "handle"
     t.integer "filestack_file_id"
-    t.index ["handle"], name: "index_groups_on_handle"
+    t.string "handle"
     t.index ["organization_id"], name: "index_groups_on_organization_id"
   end
 
