@@ -30,7 +30,7 @@ export const Label = styled.label`
 Label.displayName = 'StyledLabel'
 
 export const FormButton = styled.button`
-  width: 183px;
+  width: ${props => (props.width ? props.width : 183)}px;
   text-transform: uppercase;
   font-family: ${v.fonts.sans};
   font-size: 1rem;
@@ -46,6 +46,9 @@ export const FormButton = styled.button`
       `background-color: white;
       border: 1px solid ${v.colors.gray};
       color:  ${v.colors.gray}`};
+  &:hover, &:focus {
+    background-color: ${v.colors.cloudy};
+  }
 `
 FormButton.displayName = 'StyledFormButton'
 
@@ -60,6 +63,7 @@ export const TextButton = styled.button`
 TextButton.displayName = 'StyledTextButton'
 
 export const TextField = styled.input`
+  font-family: ${v.fonts.sans};
   width: 225px;
   padding-right: 4px;
   padding-left: 4px;
