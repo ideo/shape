@@ -43,6 +43,13 @@ const StyledGridCardInner = styled.div`
   height: 100%;
   overflow: hidden;
   z-index: 1;
+  /*
+  // related to userSelectHack from Rnd / Draggable
+  // disable blue text selection on Draggables
+  // https://github.com/bokuweb/react-rnd/issues/199
+  */
+  *::-moz-selection {background: transparent;}
+  *::selection {background: transparent;}
 `
 StyledGridCardInner.displayName = 'StyledGridCardInner'
 
