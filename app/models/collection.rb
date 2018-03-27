@@ -120,7 +120,8 @@ class Collection < ApplicationRecord
       collection_card.duplicate!(for_user: for_user, parent: c)
     end
 
-    c
+    # pick up newly created relationships
+    c.reload
   end
 
   def parent

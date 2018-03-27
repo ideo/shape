@@ -80,7 +80,7 @@ class Item < ApplicationRecord
     # Method from HasFilestackFile
     filestack_file_duplicate!(i)
 
-    i
+    i.reload
   end
 
   def breadcrumb_title
