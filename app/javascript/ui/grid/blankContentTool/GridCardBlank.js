@@ -143,7 +143,7 @@ class GridCardBlank extends React.Component {
     super(props)
 
     this.state = {
-      creating: null,
+      creating: props.creating,
       loading: false,
     }
   }
@@ -340,10 +340,14 @@ GridCardBlank.propTypes = {
   // parent is the parent collection
   parent: MobxPropTypes.objectOrObservableObject.isRequired,
   height: PropTypes.number.isRequired,
+  creating: PropTypes.string,
 }
 GridCardBlank.wrappedComponent.propTypes = {
   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
   apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
+}
+GridCardBlank.defaultProps = {
+  creating: null,
 }
 
 // give a name to the injected component for unit tests

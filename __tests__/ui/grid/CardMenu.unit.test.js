@@ -9,6 +9,7 @@ const props = {
   handleLink: jest.fn(),
   handleMove: jest.fn(),
   handleArchive: jest.fn(),
+  handleReplace: jest.fn(),
   uiStore: {
     openCardMenuId: false,
     update: jest.fn(),
@@ -24,6 +25,7 @@ describe('CardMenu', () => {
     beforeEach(() => {
       actions = [
         'Duplicate',
+        'Replace',
         'Move',
         'Link',
         'Archive'

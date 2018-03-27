@@ -4,6 +4,7 @@ import { uiStore } from '~/stores'
 import PopoutMenu from '~/ui/global/PopoutMenu'
 import ArchiveIcon from '~/ui/icons/ArchiveIcon'
 import DuplicateIcon from '~/ui/icons/DuplicateIcon'
+import ReplaceIcon from '~/ui/icons/ReplaceIcon'
 import MoveIcon from '~/ui/icons/MoveIcon'
 import LinkIcon from '~/ui/icons/LinkIcon'
 
@@ -38,6 +39,7 @@ class CardMenu extends React.PureComponent {
     if (this.props.canEdit) {
       items = [
         duplicateItem,
+        { name: 'Replace', icon: <ReplaceIcon />, onClick: this.props.handleReplace },
         { name: 'Move', icon: <MoveIcon />, onClick: this.props.handleMove },
         { name: 'Link', icon: <LinkIcon />, onClick: this.props.handleLink },
         { name: 'Archive', icon: <ArchiveIcon />, onClick: this.props.handleArchive },
@@ -69,6 +71,7 @@ CardMenu.propTypes = {
   handleLink: PropTypes.func.isRequired,
   handleMove: PropTypes.func.isRequired,
   handleArchive: PropTypes.func.isRequired,
+  handleReplace: PropTypes.func.isRequired,
   menuOpen: PropTypes.bool.isRequired,
   canEdit: PropTypes.bool.isRequired,
 }

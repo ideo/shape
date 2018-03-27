@@ -143,13 +143,13 @@ class GridCard extends React.Component {
     })
   }
 
-  shareCard = () => {
-    // console.log('Share card')
-  }
-
   duplicateCard = () => {
     const { card } = this.props
     card.API_duplicate()
+  }
+
+  replaceCard = () => {
+    console.log('Replace card')
   }
 
   linkCard = () => {
@@ -190,6 +190,7 @@ class GridCard extends React.Component {
               canEdit={this.canEdit}
               menuOpen={this.props.menuOpen}
               handleDuplicate={this.duplicateCard}
+              handleReplace={this.replaceCard}
               handleLink={this.linkCard}
               handleMove={this.moveCard}
               handleArchive={this.archiveCard}
