@@ -40,14 +40,12 @@ describe('RolesMenu', () => {
   })
 
   describe('onDelete', () => {
-    let component
     const role = { id: 2 }
     const user = { id: 4 }
-    const res = { data: [ ]}
+    const res = { data: [] }
 
     beforeEach(() => {
       apiStore.request.mockReturnValue(Promise.resolve(res))
-      component = wrapper.find('RolesMenu').instance()
     })
 
     it('should make an api store request with correct data', () => {
