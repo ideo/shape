@@ -14,7 +14,7 @@ const apiStore = observable({
 })
 const uiStore = observable({
   organizationMenuOpen: false,
-  closeOrganizationMenu: jest.fn()
+  update: jest.fn()
 })
 const props = {
   uiStore,
@@ -51,12 +51,12 @@ describe('OrganizationMenu', () => {
 
   it('closes the organization menu in the UI store when exited', () => {
     component.instance().handleClose()
-    expect(props.uiStore.closeOrganizationMenu).toHaveBeenCalled()
+    expect(props.uiStore.update).toHaveBeenCalledWith('organizationMenuOpen', false)
   })
 
   it('closes the edit menu when changes are save in the UI store', () => {
     component.instance().onOrganizationSave()
-    expect(props.uiStore.closeOrganizationMenu).toHaveBeenCalled()
+    expect(props.uiStore.update).toHaveBeenCalledWith('organizationMenuOpen', false)
   })
 
   it('opens the organization edit menu when you click on the org name', () => {

@@ -1,4 +1,5 @@
 import { routingStore } from '~/stores'
+import { archive } from './shared'
 import BaseRecord from './BaseRecord'
 
 class Item extends BaseRecord {
@@ -8,6 +9,10 @@ class Item extends BaseRecord {
       return routingStore.pathTo(type, id)
     }
     return '/'
+  }
+
+  API_archive() {
+    return archive('items', this)
   }
 }
 Item.type = 'items'

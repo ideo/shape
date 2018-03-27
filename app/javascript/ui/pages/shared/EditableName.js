@@ -8,7 +8,10 @@ import { Heading1 } from '~/ui/global/styled/typography'
 import ClickWrapper from '~/ui/layout/ClickWrapper'
 
 const StyledName = styled.div`
-  display: inline-block;
+  h1 {
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
 `
 StyledName.displayName = 'StyledName'
 
@@ -49,6 +52,13 @@ class EditableName extends React.Component {
     }
   }
 
+  // navigating between collections may trigger this instead of didMount
+  componentWillReceiveProps(nextProps) {
+    this.setState({
+      name: nextProps.name
+    })
+  }
+
   onNameFieldKeypress = (e) => {
     if (e.key === 'Enter') {
       this.stopEditingName()
@@ -87,6 +97,7 @@ class EditableName extends React.Component {
       return (
         <StyledEditableName>
           <AutosizeInput
+            maxLength={40}
             className="input__name"
             style={{ fontSize: '2.25rem' }}
             value={name}

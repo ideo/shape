@@ -20,19 +20,19 @@ RSpec.describe CollectionCard, type: :model do
 
     describe '#card_is_only_non_reference' do
       context 'with item' do
-        let!(:collection_card) { create(:collection_card_item) }
+        let!(:collection_card) { create(:collection_card_text) }
         # parent_collection_card relationship gets cached without a reload
         let(:item) { collection_card.item.reload }
 
         it 'should add error if item already has non-reference card' do
-          card = build(:collection_card_item, item: item)
+          card = build(:collection_card_text, item: item)
           expect(card.reference?).to be false
           expect(card.valid?).to be false
           expect(card.errors[:item]).to include('already has a primary card')
         end
 
         it 'should be valid if using reference card' do
-          card = build(:collection_card_item, :reference, item: item)
+          card = build(:collection_card_text, :reference, item: item)
           expect(card.reference?).to be true
           expect(card.valid?).to be true
         end
@@ -60,7 +60,7 @@ RSpec.describe CollectionCard, type: :model do
 
   describe '#duplicate!' do
     let(:user) { create(:user) }
-    let!(:collection_card) { create(:collection_card_item) }
+    let!(:collection_card) { create(:collection_card_text) }
     let(:shallow) { false }
     let(:update_order) { false }
     let(:duplicate) do
@@ -129,13 +129,12 @@ RSpec.describe CollectionCard, type: :model do
 
   describe '#increment_card_orders!' do
     let(:collection) { create(:collection) }
-    let!(:collection_cards) { create_list(:collection_card, 5, parent: collection) }
+    let!(:collection_card_list) { create_list(:collection_card, 5, parent: collection) }
+    let(:collection_cards) { collection.collection_cards }
 
     before do
       # Make sure cards are in sequential order
-      collection_cards.each_with_index do |card, i|
-        card.update_attribute(:order, i)
-      end
+      collection.reorder_cards
     end
 
     it 'should increment all orders by 1' do
@@ -149,7 +148,7 @@ RSpec.describe CollectionCard, type: :model do
     end
 
     context 'with another card created at same order as existing' do
-      let(:second_card_order) { collection_cards[1].order }
+      let(:second_card_order) { collection.collection_cards[1].order }
       let!(:dupe_card) do
         create(:collection_card, parent: collection, order: second_card_order)
       end
@@ -166,19 +165,19 @@ RSpec.describe CollectionCard, type: :model do
 
   describe '#decrement_card_orders!' do
     let(:collection) { create(:collection) }
-    let!(:collection_cards) { create_list(:collection_card, 5, parent: collection) }
+    let!(:collection_card_list) { create_list(:collection_card, 5, parent: collection) }
+    let(:collection_cards) { collection.collection_cards }
 
     before do
       # Make sure cards are in sequential order
-      collection_cards.each_with_index do |card, i|
-        card.update_attribute(:order, i)
-      end
+      collection.reorder_cards
     end
 
     it 'should decrement all orders by 1' do
-      collection_cards.last.decrement_card_orders!
+      collection_cards.first.decrement_card_orders!
       order_arr = collection_cards.map(&:reload).map(&:order)
-      expect(order_arr).to match_array([-1, 0, 1, 2, 4])
+      # technically you'd do this while archiving card 0, so it would get removed
+      expect(order_arr).to match_array([0, 0, 1, 2, 3])
     end
 
     it 'should return true if success' do

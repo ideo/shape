@@ -44,6 +44,7 @@ class PageMenu extends React.PureComponent {
         { name: 'Archive', icon: <ArchiveIcon />, onClick: this.archiveRecord },
       )
     }
+    if (this.props.disablePermissions) items.splice(1, 1)
     return items
   }
 
@@ -70,10 +71,12 @@ PageMenu.propTypes = {
   record: MobxPropTypes.objectOrObservableObject.isRequired,
   menuOpen: PropTypes.bool,
   canEdit: PropTypes.bool,
+  disablePermissions: PropTypes.bool,
 }
 PageMenu.defaultProps = {
   menuOpen: false,
   canEdit: false,
+  disablePermissions: false,
 }
 
 export default PageMenu

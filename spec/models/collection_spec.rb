@@ -121,6 +121,27 @@ describe Collection, type: :model do
     end
   end
 
+  describe '#all_tag_names' do
+    let!(:collection) { create(:collection, num_cards: 3) }
+    let(:cards) { collection.collection_cards }
+
+    it 'should be empty by default' do
+      expect(collection.all_tag_names).to match_array []
+    end
+
+    it 'should gather collection tags' do
+      collection.update(tag_list: %w[this that])
+      expect(collection.reload.all_tag_names).to match_array %w[this that]
+    end
+
+    it 'should gather collection + item tags' do
+      collection.update(tag_list: %w[this that])
+      cards.first.item.update(tag_list: %w[other stuff])
+      cards[1].item.update(tag_list: %w[more things])
+      expect(collection.reload.all_tag_names).to match_array %w[this that other stuff more things]
+    end
+  end
+
   describe '#collection_cards_viewable_by' do
     let!(:collection) { create(:collection, num_cards: 3) }
     let!(:subcollection_card) { create(:collection_card_collection, parent: collection) }

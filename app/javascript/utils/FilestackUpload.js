@@ -12,13 +12,24 @@ const imageUploadConfig = {
   }
 }
 
+const dropPaneDefaults = {
+  overlay: false,
+  showIcon: false,
+  customText: ' ',
+}
+
 class FilestackUpload {
-  static client() {
+  static get client() {
     return filestack.init(API_KEY)
   }
 
   static pickImage() {
-    return this.client().pick(imageUploadConfig)
+    return this.client.pick(imageUploadConfig)
+  }
+
+  static makeDropPane(opts = {}) {
+    const config = Object.assign({}, dropPaneDefaults, opts)
+    return this.client.makeDropPane(config)
   }
 }
 

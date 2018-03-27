@@ -5,15 +5,17 @@ import Role from '~/stores/jsonApi/Role'
 
 const apiStore = observable({
   currentUser: {},
-  request: jest.fn(),
+  request: jest.fn()
+    .mockReturnValue(Promise.resolve({ id: 1 })),
   fetchAll: jest.fn(),
-  find: jest.fn(),
+  find: jest.fn()
+    .mockReturnValue(Promise.resolve({ roles: [] })),
   remove: jest.fn(),
   add: jest.fn(),
 })
 const uiStore = observable({
   rolesMenuOpen: false,
-  closeRolesMenu: jest.fn()
+  update: jest.fn()
 })
 const props = {
   ownerId: 1,
@@ -53,9 +55,6 @@ describe('RolesMenu', () => {
   describe('onUserSearch', () => {
     describe('when a user is found', () => {
       it('should api request the users search route', (done) => {
-        apiStore.request.mockReturnValue(Promise.resolve(
-          { data: [{ id: 3 }] }
-        ))
         wrapper.find('RolesMenu').instance().onUserSearch('mary').then(() => {
           expect(apiStore.request).toHaveBeenCalledWith(
             'users/search?query=mary'

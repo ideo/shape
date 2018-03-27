@@ -46,6 +46,7 @@ export const fakeItemCard = {
   order: 0,
   height: 1,
   width: 1,
+  maxWidth: 1,
   record: fakeTextItem,
   item: fakeTextItem,
 }
@@ -54,6 +55,7 @@ export const fakeCollectionCard = {
   order: 1,
   height: 1,
   width: 1,
+  maxWidth: 1,
   record: fakeCollection,
   item: fakeCollection,
   reference: false,
@@ -69,6 +71,11 @@ export const fakeCollection = {
   isSharedCollection: false,
   isUserCollection: false,
   isNormalCollection: true,
+  cover: {
+    image_url: 'http://fake.url.net',
+    text: 'Lorem ipsum blockchain boogie',
+    name: 'Proto-typo',
+  },
   collection_cards: [
     fakeItemCard, fakeItemCard, fakeItemCard
   ],

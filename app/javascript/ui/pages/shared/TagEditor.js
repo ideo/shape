@@ -3,7 +3,6 @@ import { action, observable } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import _ from 'lodash'
 import ReactTags from 'react-tag-autocomplete'
-// import 'react-tag-autocomplete/example/styles.css'
 
 import Modal from '~/ui/global/Modal'
 import StyledReactTags from './StyledReactTags'
@@ -81,6 +80,12 @@ class TagEditor extends React.Component {
           {canEdit &&
             <ReactTags
               tags={[...this.tags]}
+              suggestions={[
+                { label: 'IDEO', value: 1 },
+                { label: 'Prototype', value: 1 },
+                { label: 'Colab', value: 1 },
+                { label: 'Stuff', value: 1 },
+              ]}
               allowBackspace={false}
               delimiterChars={[',']}
               placeholder="Add new tags, separated by comma or pressing enter."

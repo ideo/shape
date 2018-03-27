@@ -17,11 +17,6 @@ import CollectionCreator from './CollectionCreator'
 import TextItemCreator from './TextItemCreator'
 import VideoCreator from './VideoCreator'
 
-const zIndex = {
-  foreground: 2,
-  background: 1,
-}
-
 const StyledGridCardBlank = StyledGridCard.extend`
   background: white;
   cursor: auto;
@@ -54,9 +49,22 @@ const StyledBlankCreationTool = styled.div`
   padding: 2rem;
   .foreground {
     position: relative;
-    z-index: ${zIndex.foreground};
+    z-index: ${v.zIndex.gridCard};
   }
 `
+
+const BctBackground = styled.div`
+  z-index: ${v.zIndex.gridCardBg};
+  position: absolute;
+  top: 40px;
+  left: 60px;
+  width: 175px;
+  height: 175px;
+  border-radius: 50%;
+  border: 8px solid ${v.colors.cyan};
+  background: ${v.colors.desert};
+`
+BctBackground.displayName = 'BctBackground'
 
 const BctButton = styled.button`
   position: relative;
@@ -66,8 +74,11 @@ const BctButton = styled.button`
   background: ${v.colors.blackLava};
   color: white;
 
+  left: ${props => (props.creating ? '100px' : 0)};
+  transform: ${props => (props.creating ? 'rotate(360deg)' : 'none')};
+
   &:hover {
-    background-color: ${v.colors.gray};
+    background-color: ${v.colors.cloudy};
   }
 
   .icon {
@@ -80,16 +91,49 @@ const BctButton = styled.button`
 `
 BctButton.displayName = 'BctButton'
 
-const BctBackground = styled.div`
-  z-index: ${zIndex.background};
+const BctDropzone = styled.div`
   position: absolute;
+  text-align: center;
   top: 40px;
-  left: 60px;
+  left: 56px;
   width: 175px;
-  height: 175px;
-  border-radius: 50%;
-  border: 8px solid ${v.colors.cyan};
-  background: ${v.colors.desert};
+  .text {
+    z-index: ${v.zIndex.gridCardBg + 1};
+    font-family: ${v.fonts.sans};
+    font-weight: 500;
+    font-size: 1rem;
+    position: absolute;
+    top: 80px;
+    left: 40px;
+    .top, .bottom {
+      text-transform: uppercase;
+    }
+    .top, .or {
+      color: ${v.colors.cyan};
+    }
+    .bottom {
+      color: ${v.colors.blackLava};
+    }
+    .or {
+      font-size: 0.75rem;
+      margin: 6px 0;
+    }
+    p {
+      font-size: 0.8rem;
+      color: ${v.colors.cloudy};
+    }
+  }
+
+  /* Override Filestack styling */
+  .fsp-drop-pane__container {
+    cursor: pointer;
+    z-index: ${v.zIndex.gridCardBg + 1};
+    border-radius: 50%;
+    background: transparent;
+    border: none;
+    width: 165px;
+    height: 160px;
+  }
 `
 
 @inject('uiStore', 'apiStore')
@@ -104,6 +148,25 @@ class GridCardBlank extends React.Component {
     }
   }
 
+  componentDidMount() {
+    FilestackUpload.makeDropPane({
+      id: 'dropzone',
+      onProgress: (pct) => {
+        if (this.state.loading) return
+        this.setState({ loading: true })
+      },
+      onDrop: () => {
+        if (this.state.loading) return
+        this.setState({ loading: true })
+      },
+      onSuccess: (res) => {
+        if (res.length > 0) {
+          this.createCardWith(res[0])
+        }
+      }
+    })
+  }
+
   startCreatingCollection = () => {
     this.setState({ creating: 'collection' })
   }
@@ -116,25 +179,29 @@ class GridCardBlank extends React.Component {
     this.setState({ creating: 'video' })
   }
 
+  createCardWith = (img) => {
+    const attrs = {
+      item_attributes: {
+        type: ITEM_TYPES.IMAGE,
+        filestack_file_attributes: {
+          url: img.url,
+          handle: img.handle,
+          filename: img.filename,
+          size: img.size,
+          mimetype: img.mimetype,
+        },
+      },
+    }
+    this.createCard(attrs)
+  }
+
   pickImage = () => {
     FilestackUpload
       .pickImage()
       .then(resp => {
         if (resp.filesUploaded.length > 0) {
           const img = resp.filesUploaded[0]
-          const attrs = {
-            item_attributes: {
-              type: ITEM_TYPES.IMAGE,
-              filestack_file_attributes: {
-                url: img.url,
-                handle: img.handle,
-                filename: img.filename,
-                size: img.size,
-                mimetype: img.mimetype,
-              },
-            },
-          }
-          this.createCard(attrs)
+          this.createCardWith(img)
         } else {
           // console.log('Failed to upload image:', resp.filesFailed)
         }
@@ -167,22 +234,27 @@ class GridCardBlank extends React.Component {
   }
 
   renderInner = () => {
+    let inner
     switch (this.state.creating) {
     case 'collection':
-      return (
+      inner = (
         <CollectionCreator
           loading={this.state.loading}
           createCard={this.createCard}
         />
       )
+      break
     case 'video':
-      return (
+      inner = (
         <VideoCreator
           loading={this.state.loading}
           createCard={this.createCard}
         />
       )
+      break
     case 'text':
+      // TextItemCreator is the only one that `returns`
+      // since it doesn't use the BctBackground
       return (
         <TextItemCreator
           height={this.props.height}
@@ -191,34 +263,59 @@ class GridCardBlank extends React.Component {
         />
       )
     default:
-      break
+      inner = (
+        <BctDropzone id="dropzone">
+          {!this.state.loading &&
+            <div className="text">
+              <div className="top">Drag &amp; Drop</div>
+              <div className="or">or</div>
+              <div className="bottom">Browse</div>
+            </div>
+          }
+        </BctDropzone>
+      )
     }
 
-    const iconSize = 47
+    const size = v.iconSizes.bct
     return (
       <StyledBlankCreationTool>
         <Flex className="foreground" align="center" justify="space-between">
-          <Box>
-            <BctButton onClick={this.startCreatingCollection}>
-              <AddCollectionIcon width={iconSize} height={iconSize} color="white" />
-            </BctButton>
-          </Box>
-          <Box>
-            <BctButton onClick={this.pickImage}>
-              <AddImageIcon width={iconSize} height={iconSize} color="white" />
-            </BctButton>
-          </Box>
-          <Box>
-            <BctButton onClick={this.startCreatingVideo}>
-              <AddVideoIcon width={iconSize} height={iconSize} color="white" />
-            </BctButton>
-          </Box>
-          <Box>
-            <BctButton onClick={this.startCreatingText}>
-              <AddTextIcon width={iconSize} height={iconSize} color="white" />
-            </BctButton>
-          </Box>
+          {(!this.state.creating || this.state.creating === 'collection') &&
+            <Box>
+              <BctButton
+                creating={this.state.creating === 'collection'}
+                onClick={this.startCreatingCollection}
+              >
+                <AddCollectionIcon width={size} height={size} color="white" />
+              </BctButton>
+            </Box>
+          }
+          {(!this.state.creating) &&
+            <Box>
+              <BctButton onClick={this.pickImage}>
+                <AddImageIcon width={size} height={size} color="white" />
+              </BctButton>
+            </Box>
+          }
+          {(!this.state.creating || this.state.creating === 'video') &&
+            <Box>
+              <BctButton
+                creating={this.state.creating === 'video'}
+                onClick={this.startCreatingVideo}
+              >
+                <AddVideoIcon width={size} height={size} color="white" />
+              </BctButton>
+            </Box>
+          }
+          {(!this.state.creating) &&
+            <Box>
+              <BctButton onClick={this.startCreatingText}>
+                <AddTextIcon width={size} height={size} color="white" />
+              </BctButton>
+            </Box>
+          }
         </Flex>
+        {inner}
         <BctBackground />
       </StyledBlankCreationTool>
     )

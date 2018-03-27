@@ -11,6 +11,8 @@ class Item < ApplicationRecord
   archivable as: :parent_collection_card,
              with: %i[reference_collection_cards]
 
+  acts_as_taggable
+
   # The primary collection that 'owns' this item
   has_one :parent_collection_card,
           -> { primary },
@@ -27,6 +29,7 @@ class Item < ApplicationRecord
   belongs_to :cloned_from, class_name: 'Item', optional: true
 
   before_validation :format_url, if: :saved_change_to_url?
+  before_create :generate_name, unless: :name?
 
   validates :type, presence: true
 
@@ -84,10 +87,18 @@ class Item < ApplicationRecord
     Item
   end
 
-  def name
-    return read_attribute(:name) if read_attribute(:name).present?
-    return if filestack_file.blank?
-    filestack_file.filename_without_extension
+  def image_url
+    # overridden by VideoItem / ImageItem
+    nil
+  end
+
+  def generate_name
+    # overridden by TextItem / ImageItem
+    true
+  end
+
+  def truncate_name
+    self.name = name.truncate(40, separator: /[,?\.\s]+/, omission: '')
   end
 
   private
