@@ -11,7 +11,7 @@ const props = {
   handleArchive: jest.fn(),
   uiStore: {
     openCardMenuId: false,
-    openCardMenu: jest.fn(),
+    update: jest.fn(),
   },
   menuOpen: false,
 }

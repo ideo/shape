@@ -53,6 +53,11 @@ class CollectionPage extends PageWithApi {
     }
   }
 
+  componentWillUnmount() {
+    const { uiStore } = this.props
+    uiStore.setCollectionCardIds([])
+  }
+
   get isHomepage() {
     return isHomepage(this.props.match)
   }
@@ -85,11 +90,12 @@ class CollectionPage extends PageWithApi {
     if (!collection.collection_cards.length) {
       uiStore.openBlankContentTool()
     }
+    uiStore.setCollectionCardIds(this.collection.cardIds)
   }
 
   showObjectRoleDialog = () => {
     const { uiStore } = this.props
-    uiStore.openRolesMenu()
+    uiStore.update('rolesMenuOpen', true)
   }
 
   updateCollection = () => {

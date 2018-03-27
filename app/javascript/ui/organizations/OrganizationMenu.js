@@ -50,7 +50,7 @@ class OrganizationMenu extends React.Component {
 
   handleClose = (ev) => {
     const { uiStore } = this.props
-    uiStore.closeOrganizationMenu()
+    uiStore.update('organizationMenuOpen', false)
   }
 
   renderEditOrganization() {

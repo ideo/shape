@@ -57,7 +57,7 @@ describe('CollectionPage', () => {
 
   it('shows the roles edit menu on click of roles summary add button', () => {
     wrapper.instance().showObjectRoleDialog()
-    expect(uiStore.openRolesMenu).toHaveBeenCalled()
+    expect(uiStore.update).toHaveBeenCalledWith('rolesMenuOpen', true)
   })
 
   describe('as editor', () => {

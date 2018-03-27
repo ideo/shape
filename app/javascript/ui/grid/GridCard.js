@@ -12,6 +12,7 @@ import CollectionIcon from '~/ui/icons/CollectionIcon'
 import LinkedCollectionIcon from '~/ui/icons/LinkedCollectionIcon'
 import LinkIcon from '~/ui/icons/LinkIcon'
 import CardMenu from '~/ui/grid/CardMenu'
+import SelectionCircle from '~/ui/grid/SelectionCircle'
 import v, { ITEM_TYPES } from '~/utils/variables'
 
 export const StyledGridCard = styled.div`
@@ -67,21 +68,6 @@ export const StyledTopRightActions = styled.div`
   }
 `
 StyledTopRightActions.displayName = 'StyledTopRightActions'
-
-const StyledSelectionCircle = styled.div`
-  display: inline-block;
-  vertical-align: top;
-  width: 14px;
-  height: 14px;
-  border-radius: 14px;
-  border: 1px solid ${v.colors.gray};
-  margin: 5px;
-  &.selected {
-    border-color: ${v.colors.blackLava};
-    background-color: ${v.colors.blackLava};
-  }
-`
-StyledSelectionCircle.displayName = 'StyledSelectionCircle'
 
 class GridCard extends React.Component {
   state = {
@@ -151,17 +137,6 @@ class GridCard extends React.Component {
     )
   }
 
-  get renderSelectionCircle() {
-    if (!this.canEdit) return ''
-    return (
-      <StyledSelectionCircle
-        className={this.state.selected ? 'selected' : ''}
-        onClick={this.toggleSelected}
-        role="button"
-      />
-    )
-  }
-
   toggleSelected = () => {
     this.setState({
       selected: !this.state.selected
@@ -205,10 +180,12 @@ class GridCard extends React.Component {
           once we have appropriate actions?
         */}
         {!this.props.isSharedCollection &&
-          <StyledTopRightActions className="show-on-hover">
-            {this.renderSelectionCircle}
+          <StyledTopRightActions className="">
+            {this.canEdit &&
+              <SelectionCircle cardId={this.props.card.id} />
+            }
             <CardMenu
-              className="card-menu"
+              className="show-on-hover card-menu"
               cardId={this.props.card.id}
               canEdit={this.canEdit}
               menuOpen={this.props.menuOpen}

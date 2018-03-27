@@ -7,7 +7,9 @@ const fakeUiStore = {
   },
   blankContentToolState: null,
   rolesMenuOpen: false,
-  openRolesMenu: jest.fn(),
+  isLoading: false,
+  selectedCardIds: [],
+  update: jest.fn(),
 }
 
 export default fakeUiStore
