@@ -43,7 +43,7 @@ class Api::V1::RolesController < Api::V1::BaseController
     # We want to call remove_role instead of deleting the UserRole
     # So that role lifecycle methods are called
     if @user.present? && remove_role(user: @user, role: @role)
-      render jsonapi: @role
+      render jsonapi: record.roles, include: %i[users resource]
     else
       render_api_errors @user.errors
     end

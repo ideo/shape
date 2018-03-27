@@ -18,9 +18,13 @@ function sortUser(a, b) {
 @inject('apiStore')
 @observer
 class RolesMenu extends React.Component {
-  onDelete = (role, entity) =>
+  onDelete = (role, entity, toRemove) =>
     this.props.apiStore.request(`users/${entity.id}/roles/${role.id}`,
-      'DELETE')
+      'DELETE').then((res) => {
+      if (toRemove) {
+        this.props.onSave(res)
+      }
+    })
 
   onCreateRoles = (users, roleName) => {
     const { apiStore, ownerId, ownerType, onSave } = this.props
