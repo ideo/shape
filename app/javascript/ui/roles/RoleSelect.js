@@ -41,7 +41,7 @@ class RoleSelect extends React.Component {
     onCreate([user], roleName)
   }
 
-  deleteRole = (toRemove) => {
+  deleteRole = (toRemove = false) => {
     const { role, user } = this.props
     return this.props.onDelete(role, user, toRemove)
   }

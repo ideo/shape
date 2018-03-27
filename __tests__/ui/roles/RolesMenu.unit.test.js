@@ -40,13 +40,30 @@ describe('RolesMenu', () => {
   })
 
   describe('onDelete', () => {
+    let component
+    const role = { id: 2 }
+    const user = { id: 4 }
+    const res = { data: [ ]}
+
+    beforeEach(() => {
+      apiStore.request.mockReturnValue(Promise.resolve(res))
+      component = wrapper.find('RolesMenu').instance()
+    })
+
     it('should make an api store request with correct data', () => {
-      const role = { id: 2 }
-      const user = { id: 4 }
-      wrapper.find('RolesMenu').instance().onDelete(role, user)
+      component.onDelete(role, user, false)
       expect(apiStore.request).toHaveBeenCalledWith(
         `users/${user.id}/roles/${role.id}`, 'DELETE'
       )
+    })
+
+    describe('when to remove is true', () => {
+      it('should call the onSave prop after the request is done', (done) => {
+        component.onDelete(role, user, true).then(() => {
+          expect(props.onSave).toHaveBeenCalledWith(res)
+          done()
+        })
+      })
     })
   })
 
