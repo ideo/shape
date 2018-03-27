@@ -85,13 +85,17 @@ class RolesMenu extends React.Component {
           />))
         }
         <FormSpacer />
-        <Heading3>{addCallout}</Heading3>
-        <RolesAdd
-          roleTypes={roleTypes}
-          onCreateRoles={this.onCreateRoles}
-          onCreateUsers={this.onCreateUsers}
-          onSearch={this.onUserSearch}
-        />
+        {userCanEdit &&
+          <div>
+            <Heading3>{addCallout}</Heading3>
+            <RolesAdd
+              roleTypes={roleTypes}
+              onCreateRoles={this.onCreateRoles}
+              onCreateUsers={this.onCreateUsers}
+              onSearch={this.onUserSearch}
+            />
+          </div>
+        }
       </div>
     )
   }

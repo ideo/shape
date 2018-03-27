@@ -128,6 +128,7 @@ class CollectionPage extends PageWithApi {
                   <PageMenu
                     record={collection}
                     menuOpen={uiStore.pageMenuOpen}
+                    canEdit={collection.can_edit}
                   />
                 </Fragment>
               }

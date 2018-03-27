@@ -38,8 +38,12 @@ class PageMenu extends React.PureComponent {
     const items = [
       { name: 'Tags', icon: <TagIcon />, onClick: this.showTags },
       { name: 'Permissions', icon: <PermissionsIcon />, onClick: this.showRolesMenu },
-      { name: 'Archive', icon: <ArchiveIcon />, onClick: this.archiveRecord },
     ]
+    if (this.props.canEdit) {
+      items.push(
+        { name: 'Archive', icon: <ArchiveIcon />, onClick: this.archiveRecord },
+      )
+    }
     return items
   }
 
@@ -56,7 +60,7 @@ class PageMenu extends React.PureComponent {
           menuOpen={menuOpen}
         />
 
-        <TagEditor record={record} />
+        <TagEditor canEdit={this.props.canEdit} record={record} />
       </Fragment>
     )
   }
@@ -65,9 +69,11 @@ class PageMenu extends React.PureComponent {
 PageMenu.propTypes = {
   record: MobxPropTypes.objectOrObservableObject.isRequired,
   menuOpen: PropTypes.bool,
+  canEdit: PropTypes.bool,
 }
 PageMenu.defaultProps = {
   menuOpen: false,
+  canEdit: false,
 }
 
 export default PageMenu
