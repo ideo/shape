@@ -87,9 +87,8 @@ ActiveRecord::Schema.define(version: 20180320003745) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "primary_group_id"
-    t.string "pic_url_square"
-    t.integer "filestack_file_id"
     t.string "handle"
+    t.integer "filestack_file_id"
     t.index ["handle"], name: "index_organizations_on_handle"
   end
 
@@ -153,7 +152,7 @@ ActiveRecord::Schema.define(version: 20180320003745) do
     t.index ["uid"], name: "index_users_on_uid"
   end
 
-  create_table "users_roles", force: :cascade do |t|
+  create_table "users_roles", id: false, force: :cascade do |t|
     t.bigint "user_id"
     t.bigint "role_id"
     t.index ["role_id"], name: "index_users_roles_on_role_id"
