@@ -2,10 +2,8 @@ import { Fragment } from 'react'
 import ReactRouterPropTypes from 'react-router-prop-types'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import { Flex, Box } from 'reflexbox'
-import styled from 'styled-components'
 import { animateScroll as scroll } from 'react-scroll'
 
-import v from '~/utils/variables'
 import PageWithApi from '~/ui/pages/PageWithApi'
 import Loader from '~/ui/layout/Loader'
 import Header from '~/ui/layout/Header'
@@ -16,26 +14,9 @@ import RolesSummary from '~/ui/roles/RolesSummary'
 import RolesMenu from '~/ui/roles/RolesMenu'
 import EditableName from './shared/EditableName'
 import PageMenu from './shared/PageMenu'
+import { StyledTitleAndRoles } from './shared/styled'
 
 const isHomepage = ({ path }) => path === '/'
-
-const StyledTitleAndRoles = styled(Flex)`
-  .title {
-    max-width: 75%;
-  }
-  @media only screen and (max-width: ${v.responsive.medBreakpoint}px) {
-    .roles-summary {
-      display: none;
-    }
-    .title {
-      max-width: 90%;
-    }
-  }
-  .page-menu {
-    position: relative;
-    top: -5px;
-  }
-`
 
 @inject('apiStore', 'uiStore')
 @observer

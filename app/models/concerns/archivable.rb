@@ -7,13 +7,15 @@ module Archivable
 
     class_attribute :archive_with
     class_attribute :archive_as
+    class_attribute :after_archive
   end
 
   class_methods do
     # define which relations should get archived (much like dependent: :destroy)
-    def archivable(as: nil, with: [])
+    def archivable(as: nil, with: [], after_archive: nil)
       self.archive_as = as
       self.archive_with = with
+      self.after_archive = after_archive
     end
 
     # Helpers to add archived field to any model
@@ -40,12 +42,11 @@ module Archivable
       # treat this archive! as if you had triggered it on the parent
       # e.g. by archiving a Collection we should really be archiving its parent card
       return try(self.class.archive_as).try(:archive_with_relations!)
-    elsif self.class.archive_with.present?
-      archive_with_relations!
     end
+    archive_with_relations!
   end
 
-  # will archive the card as well as its @archive_with
+  # will archive the card as well as its `archive_with` and calling `after_archive`
   def archive_with_relations!
     if self.class.archive_with.present?
       self.class.archive_with.each do |relation|
@@ -61,5 +62,6 @@ module Archivable
     end
     # then update self
     update(archived: true)
+    try(self.class.after_archive) if self.class.after_archive
   end
 end

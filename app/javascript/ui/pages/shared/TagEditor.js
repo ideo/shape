@@ -2,7 +2,6 @@ import { action, observable } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import _ from 'lodash'
 import ReactTags from 'react-tag-autocomplete'
-// import 'react-tag-autocomplete/example/styles.css'
 
 import Modal from '~/ui/global/Modal'
 import StyledReactTags from './StyledReactTags'

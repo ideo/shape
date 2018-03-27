@@ -1,6 +1,7 @@
 class CollectionCard < ApplicationRecord
   include Archivable
-  archivable with: %i[collection item]
+  archivable with: %i[collection item],
+             after_archive: :decrement_card_orders!
 
   belongs_to :parent, class_name: 'Collection'
 
@@ -83,16 +84,14 @@ class CollectionCard < ApplicationRecord
     true
   end
 
-  # Decrement the order by 1 of all cards with <= specified order
+  # Decrement the order by 1 of all cards with >= specified order
   # - Defaults to use this card's order
   # - Useful when removing a card from the collection
-  def decrement_card_orders!(starting_at_order = nil)
-    starting_at_order ||= order
-
-    less_than_or_equal = CollectionCard.arel_table[:order].lteq(starting_at_order)
+  def decrement_card_orders!(starting_at_order = order)
+    greater_than_or_equal = CollectionCard.arel_table[:order].gteq(starting_at_order)
 
     update_ids = parent.collection_cards
-                       .where(less_than_or_equal)
+                       .where(greater_than_or_equal)
                        .where.not(id: id)
                        .pluck(:id)
 

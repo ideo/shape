@@ -33,6 +33,14 @@ class Api::V1::ItemsController < Api::V1::BaseController
     end
   end
 
+  def archive
+    if @item.archive!
+      render jsonapi: @item.reload
+    else
+      render_api_errors @item.errors
+    end
+  end
+
   private
 
   def item_params
@@ -44,6 +52,7 @@ class Api::V1::ItemsController < Api::V1::BaseController
       :url,
       :image,
       :archived,
+      :tag_list,
       filestack_file_attributes: Item.filestack_file_attributes_whitelist,
     )
   end

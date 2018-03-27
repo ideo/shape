@@ -3,6 +3,7 @@ class SerializableItem < BaseJsonSerializer
   type 'items'
   attributes :id, :type, :name, :content, :text_data,
              :url, :thumbnail_url, :filestack_file_url
+  attribute :tag_list
   attribute :breadcrumb do
     Breadcrumb::ForUser.new(
       @object.breadcrumb,
