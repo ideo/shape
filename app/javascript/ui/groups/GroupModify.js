@@ -11,7 +11,7 @@ import {
   TextButton,
   TextField,
 } from '~/ui/global/styled/forms'
-import { RowItemRight } from '~/ui/global/styled/layout'
+import { FloatRight } from '~/ui/global/styled/layout'
 import FilestackUpload from '~/utils/FilestackUpload'
 import Group from '~/stores/jsonApi/Group'
 import Avatar from '~/ui/global/Avatar'
@@ -162,13 +162,13 @@ class GroupModify extends React.Component {
     const { group } = this.props
     return (
       <form>
-        <RowItemRight>
+        <FloatRight>
           { group.id && (
             <TextButton onClick={this.handleRoles}>
               Members
             </TextButton>
           )}
-        </RowItemRight>
+        </FloatRight>
         <FieldContainer>
           <Label htmlFor="groupName">Group Name</Label>
           <TextField

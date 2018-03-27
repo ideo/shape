@@ -18,6 +18,7 @@ import { MenuItem } from 'material-ui/Menu'
 
 const RightAligner = styled.span`
   margin-right: 30px;
+  min-width: 97px;
 `
 RightAligner.displayName = 'StyledRightAligner'
 
@@ -100,8 +101,8 @@ class RolesAdd extends React.Component {
             onInputChange={this.onUserSearch}
             onOptionSelect={this.onUserSelected}
           />
-          <RowItemRight>
-            <RightAligner>
+          <RightAligner>
+            <RowItemRight>
               <Select
                 classes={{ root: 'select', selectMenu: 'selectMenu' }}
                 displayEmpty
@@ -116,8 +117,8 @@ class RolesAdd extends React.Component {
                   </MenuItem>))
                 }
               </Select>
-            </RightAligner>
-          </RowItemRight>
+            </RowItemRight>
+          </RightAligner>
         </Row>
         <FormActionsContainer>
           <FormButton
