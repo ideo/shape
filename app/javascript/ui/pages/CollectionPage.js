@@ -55,7 +55,7 @@ class CollectionPage extends PageWithApi {
 
   componentWillUnmount() {
     const { uiStore } = this.props
-    uiStore.setCollectionCardIds([])
+    uiStore.setViewingCollection(null)
   }
 
   get isHomepage() {
@@ -90,7 +90,7 @@ class CollectionPage extends PageWithApi {
     if (!collection.collection_cards.length) {
       uiStore.openBlankContentTool()
     }
-    uiStore.setCollectionCardIds(this.collection.cardIds)
+    uiStore.setViewingCollection(collection)
   }
 
   showObjectRoleDialog = () => {

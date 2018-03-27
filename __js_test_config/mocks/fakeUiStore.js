@@ -9,6 +9,8 @@ const fakeUiStore = {
   rolesMenuOpen: false,
   isLoading: false,
   selectedCardIds: [],
+  setViewingCollection: jest.fn(),
+  viewingCollection: null,
   update: jest.fn(),
 }
 

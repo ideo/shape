@@ -20,7 +20,7 @@ export default class UiStore {
     gridW: 312,
     gridH: 250,
   }
-  @observable collectionCardIds = []
+  @observable viewingCollection = null
   @observable selectedCardIds = []
   @observable isLoading = false
 
@@ -66,9 +66,9 @@ export default class UiStore {
     this.blankContentToolState = null
   }
 
-  @action setCollectionCardIds(cardIds) {
+  @action setViewingCollection(collection = null) {
     // called when loading a new CollectionPage
-    this.collectionCardIds.replace(cardIds)
+    this.viewingCollection = collection
     this.deselectCards()
   }
 
@@ -80,14 +80,18 @@ export default class UiStore {
     }
   }
 
+  @computed get collectionCardIds() {
+    return this.viewingCollection.cardIds
+  }
+
   @action deselectCards() {
     this.selectedCardIds.replace([])
   }
 
   // TODO: add a unit test for this
   @action selectCardsUpTo(cardId) {
-    const selected = this.selectedCardIds.toJS()
-    const cardIds = this.collectionCardIds.toJS()
+    const selected = [...this.selectedCardIds]
+    const cardIds = [...this.collectionCardIds]
     const lastSelected = _.last(selected)
     // gather which cardIds are between this card and the last selected card
     let between = []
