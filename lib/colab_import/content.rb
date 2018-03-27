@@ -123,11 +123,12 @@ module ColabImport
 
     # Links + github url
     def update_card_3(card)
-      html_elements = links.each do |title, url|
+      html_elements = "<h3>Links></h3>"
+      html_elements += links.map do |title, url|
         "<p><a href=\"#{url}\">#{title}</a></p>"
       end
       if github_url.present?
-        html_elements << "<p><a href=\"#{github_url}\">#{github_url}</a></p>"
+        html_elements << "<p><a href=\"#{github_url}\">Github</a></p>"
       end
       update_text_item(card.item, html_elements)
     end
@@ -141,7 +142,8 @@ module ColabImport
         name: video_alt,
         url: video_url,
         thumbnail_url: video_image_url,
-        filestack_file: create_filestack_file(video_image_url),
+        # TODO: once we make video covers filestack files, create it here:
+        # filestack_file: create_filestack_file(video_image_url),
       )
     end
 
