@@ -15,14 +15,22 @@ class TagEditor extends React.Component {
   constructor(props) {
     super(props)
     this.saveTags = _.debounce(this._saveTags, 1000)
-    // `id` is used by react-tag-autocomplete, but otherwise doesn't hold any meaning
-    this.tags = _.map([...props.record.tag_list], (t, i) => ({
-      id: i, name: t
-    }))
+    this.initTags(props.record.tag_list)
+  }
+
+  componentWillReceiveProps(nextProps) {
+    this.initTags(nextProps.record.tag_list)
   }
 
   componentWillUnmount() {
     this.saveTags.flush()
+  }
+
+  @action initTags = (tag_list) => {
+    // `id` is used by react-tag-autocomplete, but otherwise doesn't hold any meaning
+    this.tags = _.map([...tag_list], (t, i) => ({
+      id: i, name: t
+    }))
   }
 
   _saveTags = () => {
@@ -80,12 +88,6 @@ class TagEditor extends React.Component {
           {canEdit &&
             <ReactTags
               tags={[...this.tags]}
-              suggestions={[
-                { label: 'IDEO', value: 1 },
-                { label: 'Prototype', value: 1 },
-                { label: 'Colab', value: 1 },
-                { label: 'Stuff', value: 1 },
-              ]}
               allowBackspace={false}
               delimiterChars={[',']}
               placeholder="Add new tags, separated by comma or pressing enter."
