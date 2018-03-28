@@ -13,11 +13,6 @@ class CardMenu extends React.PureComponent {
     return this.props.cardId
   }
 
-  handleMove = (ev) => {
-    ev.preventDefault()
-    this.props.handleMove()
-  }
-
   handleMouseLeave = () => {
     if (this.props.menuOpen) {
       uiStore.update('openCardMenuId', false)
@@ -39,13 +34,15 @@ class CardMenu extends React.PureComponent {
       name: 'Duplicate', icon: <DuplicateIcon />, onClick: this.props.handleDuplicate
     }
     let items = [duplicateItem]
-    
+
     if (canEdit) {
+      items = items.concat([
         { name: 'Move', icon: <MoveIcon />, onClick: this.props.handleMove },
         { name: 'Link', icon: <LinkIcon />, onClick: this.props.handleLink },
         { name: 'Archive', icon: <ArchiveIcon />, onClick: this.props.handleArchive },
       ])
     }
+
     if (canReplace) {
       items.push(
         { name: 'Replace', icon: <ReplaceIcon />, onClick: this.props.handleReplace }
