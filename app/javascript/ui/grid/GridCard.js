@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types'
 import { PropTypes as MobxPropTypes } from 'mobx-react'
+import _ from 'lodash'
 import styled from 'styled-components'
 
 import GridCardHotspot from '~/ui/grid/GridCardHotspot'
@@ -70,12 +71,13 @@ export const StyledTopRightActions = styled.div`
 StyledTopRightActions.displayName = 'StyledTopRightActions'
 
 class GridCard extends React.Component {
-  state = {
-    selected: false,
-  }
-
   get canEdit() {
     return this.props.record.can_edit
+  }
+
+  get canReplace() {
+    const { record } = this.props
+    return (this.isItem && _.includes([ITEM_TYPES.IMAGE, ITEM_TYPES.VIDEO], record.type))
   }
 
   get isItem() {
@@ -137,19 +139,14 @@ class GridCard extends React.Component {
     )
   }
 
-  toggleSelected = () => {
-    this.setState({
-      selected: !this.state.selected
-    })
-  }
-
   duplicateCard = () => {
     const { card } = this.props
     card.API_duplicate()
   }
 
   replaceCard = () => {
-    console.log('Replace card')
+    const { card } = this.props
+    card.beginReplacing()
   }
 
   linkCard = () => {
@@ -188,6 +185,7 @@ class GridCard extends React.Component {
               className="show-on-hover card-menu"
               cardId={this.props.card.id}
               canEdit={this.canEdit}
+              canReplace={this.canReplace}
               menuOpen={this.props.menuOpen}
               handleDuplicate={this.duplicateCard}
               handleReplace={this.replaceCard}

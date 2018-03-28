@@ -30,21 +30,30 @@ class CollectionGrid extends React.Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    const { collection } = nextProps
+    const { blankContentToolState, collection, cardIds } = nextProps
     // convert observableArray values into a "normal" JS array (equivalent of .toJS())
     // for the sake of later calculations/manipulations
     const cards = [...collection.collection_cards]
-    // If we already have a BCT open, find it in our cards
-    if (nextProps.blankContentToolState) {
-      const order = nextProps.blankContentToolState.order + 0.5
+    // If we have a BCT open...
+    if (blankContentToolState && blankContentToolState.order !== null) {
+      // make the BCT appear to the right of the current card
+      let { order } = blankContentToolState
+      const { width, height, replacingId } = blankContentToolState
+      if (replacingId) {
+        // remove the card being replaced from our current state cards
+        _.remove(cards, { id: replacingId })
+      } else {
+        order += 0.5
+      }
       let blankCard = {
         id: 'blank',
         num: 0,
         cardType: 'blank',
-        width: 1,
-        height: 1,
+        width,
+        height,
         order,
       }
+      // If we already have a BCT open, find it in our cards
       const blankFound = _.find(this.state.cards, { cardType: 'blank' })
       // Look for card in state...
       if (blankFound && blankFound.order !== order) {
@@ -53,11 +62,13 @@ class CollectionGrid extends React.Component {
         blankFound.num += 1
         blankFound.id = `blank-${blankFound.num}`
         // Increments order from existing BCT order
-        blankCard = { ...blankFound, order }
+        blankCard = { ...blankFound, order, width, height }
       }
-      // Always add a blank card to the beginning of collection cards
-      // If they have edit capabilities
-      if (this.props.canEditCollection) {
+      // NOTE: how reliable is this length check for indicating a newly added card?
+      const previousLength = this.props.cardIds.length
+      const cardJustAdded = cardIds.length === previousLength + 1
+      if (this.props.canEditCollection && !cardJustAdded) {
+        // Add the BCT to the array of cards to be positioned, if they can edit
         cards.unshift(blankCard)
       }
     }
@@ -73,7 +84,6 @@ class CollectionGrid extends React.Component {
   // --------------------------
   onResize = (cardId, newSize) => {
     const { uiStore } = this.props
-    uiStore.closeBlankContentTool()
 
     const positionedCard = _.find(this.state.cards, { id: cardId })
     const placeholderKey = `${cardId}-placeholder`
@@ -122,7 +132,6 @@ class CollectionGrid extends React.Component {
   }
 
   onDrag = (cardId, dragPosition) => {
-    this.props.uiStore.closeBlankContentTool()
     if (this.state.transitioning) return
 
     const positionedCard = _.find(this.state.cards, { id: cardId })
@@ -389,7 +398,7 @@ class CollectionGrid extends React.Component {
   }
 
   render() {
-    const { cardIds } = this.props
+    const { cardIds } = this.props.collection
     // Rendering cardIds so that grid re-renders when they change
     return (
       <div className="Grid" data-card-ids={cardIds}>
@@ -409,12 +418,9 @@ CollectionGrid.propTypes = {
   // gutter: PropTypes.number.isRequired,
   updateCollection: PropTypes.func.isRequired,
   collection: MobxPropTypes.objectOrObservableObject.isRequired,
-  blankContentToolState: MobxPropTypes.objectOrObservableObject,
+  blankContentToolState: MobxPropTypes.objectOrObservableObject.isRequired,
   cardIds: MobxPropTypes.arrayOrObservableArray.isRequired,
   canEditCollection: PropTypes.bool.isRequired,
-}
-CollectionGrid.defaultProps = {
-  blankContentToolState: null
 }
 CollectionGrid.wrappedComponent.propTypes = {
   routingStore: MobxPropTypes.objectOrObservableObject.isRequired,

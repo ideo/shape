@@ -29,23 +29,23 @@ class CardMenu extends React.PureComponent {
   }
 
   get menuItems() {
-    let items
+    const { canEdit, canReplace } = this.props
     const duplicateItem = {
-      name: 'Duplicate',
-      icon: <DuplicateIcon />,
-      onClick: this.props.handleDuplicate
+      name: 'Duplicate', icon: <DuplicateIcon />, onClick: this.props.handleDuplicate
     }
+    let items = [duplicateItem]
 
-    if (this.props.canEdit) {
-      items = [
-        duplicateItem,
-        { name: 'Replace', icon: <ReplaceIcon />, onClick: this.props.handleReplace },
+    if (canReplace) {
+      items.push(
+        { name: 'Replace', icon: <ReplaceIcon />, onClick: this.props.handleReplace }
+      )
+    }
+    if (canEdit) {
+      items = items.concat([
         { name: 'Move', icon: <MoveIcon />, onClick: this.props.handleMove },
         { name: 'Link', icon: <LinkIcon />, onClick: this.props.handleLink },
         { name: 'Archive', icon: <ArchiveIcon />, onClick: this.props.handleArchive },
-      ]
-    } else {
-      items = [duplicateItem]
+      ])
     }
     return items
   }
@@ -74,6 +74,7 @@ CardMenu.propTypes = {
   handleReplace: PropTypes.func.isRequired,
   menuOpen: PropTypes.bool.isRequired,
   canEdit: PropTypes.bool.isRequired,
+  canReplace: PropTypes.bool.isRequired,
 }
 
 CardMenu.defaultProps = {
