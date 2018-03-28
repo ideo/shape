@@ -38,6 +38,7 @@ class FilestackFile < ApplicationRecord
     create(
       url: filelink.url,
       handle: filelink.handle,
+      filename: metadata['filename'],
       mimetype: metadata['mimetype'],
       size: metadata['size'],
     )
@@ -46,11 +47,12 @@ class FilestackFile < ApplicationRecord
   # private
 
   # Docs: https://www.filestack.com/docs/sdks?ruby
-  def api_client
-    @api_client ||= FilestackClient.new(ENV['FILESTACK_API_KEY'], filestack_security)
+  def self.api_client
+    @api_client ||= FilestackClient.new(ENV['FILESTACK_API_KEY'], security: filestack_security)
   end
 
-  def filestack_security
+  def self.filestack_security
+    raise 'FilestackSecurity needs FILESTACK_API_SECRET to be set' if ENV['FILESTACK_API_SECRET'].blank?
     FilestackSecurity.new(ENV['FILESTACK_API_SECRET'], options: { call: %w[read store pick] })
   end
 
@@ -58,7 +60,7 @@ class FilestackFile < ApplicationRecord
     @filelink ||= FilestackFilelink.new(
       handle: handle,
       apikey: ENV['FILESTACK_API_KEY'],
-      security: filestack_security,
+      security: FilestackFile.filestack_security,
     )
   end
 
