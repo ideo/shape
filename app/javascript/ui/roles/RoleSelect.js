@@ -75,7 +75,6 @@ class RoleSelect extends React.Component {
       select = <DisplayText>{_.startCase(role.name)}</DisplayText>
     }
     // TODO remove duplication with RolesAdd role select menu
-    console.log('user name', user.name.length)
     return (
       <Row>
         <span>
