@@ -42,6 +42,9 @@ class Item < ApplicationRecord
 
   amoeba do
     enable
+    exclude_association :tags
+    exclude_association :taggings
+    exclude_association :tag_taggings
     exclude_association :filestack_file
     exclude_association :parent_collection_card
   end
@@ -54,6 +57,12 @@ class Item < ApplicationRecord
     # Clones item
     i = amoeba_dup
     i.cloned_from = self
+    i.tag_list = tag_list
+
+    # save the dupe item first so that we can reference it later
+    # return if it didn't work for whatever reason
+    return i unless i.save
+    i.parent_collection_card.save if i.parent_collection_card.present?
 
     # Clone parent + increase order
     if copy_parent_card && parent_collection_card.present?
@@ -71,11 +80,7 @@ class Item < ApplicationRecord
     # Method from HasFilestackFile
     filestack_file_duplicate!(i)
 
-    if i.save && i.parent_collection_card.present?
-      i.parent_collection_card.save
-    end
-
-    i
+    i.reload
   end
 
   def breadcrumb_title

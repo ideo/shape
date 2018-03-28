@@ -82,6 +82,9 @@ class Collection < ApplicationRecord
 
   amoeba do
     enable
+    exclude_association :tags
+    exclude_association :taggings
+    exclude_association :tag_taggings
     exclude_association :roles
     exclude_association :collection_cards
     exclude_association :items
@@ -93,6 +96,12 @@ class Collection < ApplicationRecord
     # Clones collection and all embedded items/collections
     c = amoeba_dup
     c.cloned_from = self
+    c.tag_list = tag_list
+
+    # save the dupe collection first so that we can reference it later
+    # return if it didn't work for whatever reason
+    return c unless c.save
+    c.parent_collection_card.save if c.parent_collection_card.present?
 
     if copy_parent_card && parent_collection_card.present?
       c.parent_collection_card = parent_collection_card.duplicate!(
@@ -108,14 +117,11 @@ class Collection < ApplicationRecord
 
     collection_cards.each do |collection_card|
       next unless collection_card.record.can_view?(for_user)
-      c.collection_cards << collection_card.duplicate!(for_user: for_user)
+      collection_card.duplicate!(for_user: for_user, parent: c)
     end
 
-    if c.save && c.parent_collection_card.present?
-      c.parent_collection_card.save
-    end
-
-    c
+    # pick up newly created relationships
+    c.reload
   end
 
   def parent

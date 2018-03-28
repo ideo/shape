@@ -31,7 +31,7 @@ describe Collection, type: :model do
 
   describe '#duplicate' do
     let!(:user) { create(:user) }
-    let!(:collection) { create(:collection, num_cards: 5) }
+    let!(:collection) { create(:collection, num_cards: 5, tag_list: %w[Prototype Other]) }
     let(:copy_parent_card) { false }
     let(:duplicate) do
       dupe = collection.duplicate!(
@@ -77,6 +77,10 @@ describe Collection, type: :model do
 
     it 'clones all roles on items' do
       expect(duplicate.items.all? { |item| item.can_edit?(user) }).to be true
+    end
+
+    it 'clones tag list' do
+      expect(duplicate.tag_list).to match_array collection.tag_list
     end
 
     context 'with items you can\'t see' do
