@@ -1,5 +1,5 @@
 class CardMover
-  attr_reader :to_collection, :errors
+  attr_reader :to_collection
 
   def initialize(from_collection:, to_collection:, card_ids:, placement: 'beginning')
     @from_collection = from_collection
@@ -8,15 +8,16 @@ class CardMover
     @placement = placement
     # retain array of cards being moved
     @moving_cards = @from_collection.collection_cards.where(id: @card_ids).to_a
-    @errors = []
-
-    # puts "from_collection #{@from_collection.id}"
-    # puts "to_collection #{@to_collection.id}"
   end
 
   def call
     move_cards
     assign_permissions
+  end
+
+  def errors
+    # will this be useful?
+    @moving_cards.map(&:errors).flatten
   end
 
   private
@@ -47,7 +48,6 @@ class CardMover
   end
 
   def assign_permissions
-    # puts "@moving_cards #{@moving_cards.collect{|c| [c.id, c.parent_id]}}"
     @moving_cards.each do |card|
       # assign each role from the @to_collection to our newly moved cards
       to_permissions.each do |role_name, users|
