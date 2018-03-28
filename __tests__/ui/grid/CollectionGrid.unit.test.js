@@ -1,4 +1,5 @@
 import CollectionGrid from '~/ui/grid/CollectionGrid'
+import fakeUiStore from '#/mocks/fakeUiStore'
 
 import {
   fakeTextItem,
@@ -17,9 +18,7 @@ beforeEach(() => {
     gutter: 10,
     updateCollection: jest.fn(),
     cardIds: fakeCollection.cardIds,
-    uiStore: {
-      blankContentToolState: null
-    },
+    uiStore: fakeUiStore,
     routingStore: {
       routeTo: jest.fn(),
       push: jest.fn()

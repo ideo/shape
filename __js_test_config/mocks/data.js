@@ -1,3 +1,5 @@
+import _ from 'lodash'
+
 export const fakeTextItemAttrs = {
   id: 1,
   type: 'Item::TextItem',
@@ -49,6 +51,8 @@ export const fakeItemCard = {
   maxWidth: 1,
   record: fakeTextItem,
   item: fakeTextItem,
+  API_create: jest.fn(),
+  API_archive: jest.fn(),
 }
 export const fakeCollectionCard = {
   id: 11,
@@ -59,7 +63,14 @@ export const fakeCollectionCard = {
   record: fakeCollection,
   item: fakeCollection,
   reference: false,
+  API_create: jest.fn(),
+  API_archive: jest.fn(),
 }
+
+const fakeCards = [
+  fakeItemCard, fakeItemCard, fakeItemCard
+]
+
 export const fakeCollection = {
   id: 1,
   name: 'My Workspace X',
@@ -76,13 +87,9 @@ export const fakeCollection = {
     text: 'Lorem ipsum blockchain boogie',
     name: 'Proto-typo',
   },
-  collection_cards: [
-    fakeItemCard, fakeItemCard, fakeItemCard
-  ],
+  collection_cards: fakeCards,
   // This is a computed property on the collection store
-  cardIds: [
-    fakeItemCard.id, fakeItemCard.id, fakeItemCard.id
-  ],
+  cardIds: _.map(fakeCards, c => c.id),
   API_archive: jest.fn(),
 }
 export const fakeUserAttrs = {

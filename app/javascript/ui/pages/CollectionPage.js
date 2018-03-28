@@ -24,6 +24,7 @@ class CollectionPage extends PageWithApi {
   componentDidMount() {
     super.componentDidMount()
     scroll.scrollToTop({ duration: 0 })
+    this.props.uiStore.closeBlankContentTool()
   }
 
   componentWillReceiveProps(nextProps) {
@@ -142,6 +143,7 @@ class CollectionPage extends PageWithApi {
             canEditCollection={collection.can_edit}
             // Pass in cardIds so grid will re-render when they change
             cardIds={collection.cardIds}
+            // Pass in BCT state so grid will re-render when open/closed
             blankContentToolState={uiStore.blankContentToolState}
           />
         </PageContainer>

@@ -21,15 +21,11 @@ const StyledGridCardBlank = StyledGridCard.extend`
   background: white;
   cursor: auto;
   position: relative;
-
   button {
     cursor: pointer;
     border: none;
     transition: all 300ms;
   }
-`
-
-const StyledGridCardInner = styled.div`
   button.close {
     position: absolute;
     top: 5px;
@@ -45,11 +41,22 @@ const StyledGridCardInner = styled.div`
     }
   }
 `
+
+// width of card is constrained by gridW
+// vertical position is adjusted by gridH / 2 if card is 2 rows tall
+const StyledGridCardInner = styled.div`
+  max-width: ${props => props.gridW}px;
+  margin: 0 auto;
+  position: relative;
+  top: ${props => (props.height > 1 ? (props.gridH / 2) : 0)}px;
+`
 const StyledBlankCreationTool = styled.div`
   padding: 2rem;
   .foreground {
     position: relative;
     z-index: ${v.zIndex.gridCard};
+    left: ${props => (props.replacing ? '25%' : 'auto')};
+    width: ${props => (props.replacing ? '50%' : 'auto')};
   }
 `
 
@@ -95,7 +102,7 @@ const BctDropzone = styled.div`
   position: absolute;
   text-align: center;
   top: 40px;
-  left: 56px;
+  left: 60px;
   width: 175px;
   .text {
     z-index: ${v.zIndex.gridCardBg + 1};
@@ -104,7 +111,7 @@ const BctDropzone = styled.div`
     font-size: 1rem;
     position: absolute;
     top: 80px;
-    left: 40px;
+    left: 38px;
     .top, .bottom {
       text-transform: uppercase;
     }
@@ -126,26 +133,31 @@ const BctDropzone = styled.div`
 
   /* Override Filestack styling */
   .fsp-drop-pane__container {
+    font-family: ${v.fonts.sans};
     cursor: pointer;
     z-index: ${v.zIndex.gridCardBg + 1};
     border-radius: 50%;
     background: transparent;
     border: none;
-    width: 165px;
+    width: 160px;
     height: 160px;
+    ${props => props.droppingFile && `
+      background: ${v.colors.cyan};
+      &::after {
+        content: '+';
+        font-size: 4rem;
+      }
+    `}
   }
 `
 
 @inject('uiStore', 'apiStore')
 @observer
 class GridCardBlank extends React.Component {
-  constructor(props) {
-    super(props)
-
-    this.state = {
-      creating: null,
-      loading: false,
-    }
+  state = {
+    creating: null,
+    loading: false,
+    droppingFile: false,
   }
 
   componentDidMount() {
@@ -155,9 +167,15 @@ class GridCardBlank extends React.Component {
         if (this.state.loading) return
         this.setState({ loading: true })
       },
+      onDragOver: () => {
+        this.setState({ droppingFile: true })
+      },
+      onDragLeave: () => {
+        this.setState({ droppingFile: false })
+      },
       onDrop: () => {
         if (this.state.loading) return
-        this.setState({ loading: true })
+        this.setState({ loading: true, droppingFile: false })
       },
       onSuccess: (res) => {
         if (res.length > 0) {
@@ -209,23 +227,28 @@ class GridCardBlank extends React.Component {
   }
 
   createCard = (nested = {}) => {
+    const { parent, apiStore, uiStore } = this.props
+    const { order, width, height, replacingId } = uiStore.blankContentToolState
+    const isReplacing = !!replacingId
     const attrs = {
-      order: this.props.order + 1,
-      width: 1,
-      height: 1,
+      order: replacingId ? order : order + 1,
+      width,
+      height,
       // `parent` is the collection this card belongs to
-      parent_id: this.props.parent.id,
+      parent_id: parent.id,
     }
     // apply nested attrs
     Object.assign(attrs, nested)
-    const card = new CollectionCard(attrs, this.props.apiStore)
-    card.parent = this.props.parent // Assign parent so store can get access to it
-    this.setState({ loading: true }, () => {
-      card.API_create()
-        .then(() => {
-          // this will close the blank card so no need to set loading: false
-          this.closeBlankContentTool()
-        })
+    const card = new CollectionCard(attrs, apiStore)
+    card.parent = parent // Assign parent so store can get access to it
+    this.setState({ loading: true }, async () => {
+      await card.API_create({ isReplacing })
+      if (isReplacing) {
+        const cardToReplace = apiStore.find('collection_cards', replacingId)
+        await cardToReplace.API_archive({ isReplacing })
+      }
+      // NOTE: closeBlankContentTool() will automatically get called
+      // in CollectionCard after the async actions are complete
     })
   }
 
@@ -264,8 +287,8 @@ class GridCardBlank extends React.Component {
       )
     default:
       inner = (
-        <BctDropzone id="dropzone">
-          {!this.state.loading &&
+        <BctDropzone droppingFile={this.state.droppingFile} id="dropzone">
+          {!this.state.loading && !this.state.droppingFile &&
             <div className="text">
               <div className="top">Drag &amp; Drop</div>
               <div className="or">or</div>
@@ -276,38 +299,41 @@ class GridCardBlank extends React.Component {
       )
     }
 
+    const isReplacing = !!this.props.uiStore.blankContentToolState.replacingId
+    const { creating } = this.state
+
     const size = v.iconSizes.bct
     return (
-      <StyledBlankCreationTool>
+      <StyledBlankCreationTool replacing={isReplacing && !creating}>
         <Flex className="foreground" align="center" justify="space-between">
-          {(!this.state.creating || this.state.creating === 'collection') &&
+          {(!isReplacing && (!creating || creating === 'collection')) &&
             <Box>
               <BctButton
-                creating={this.state.creating === 'collection'}
+                creating={creating === 'collection'}
                 onClick={this.startCreatingCollection}
               >
                 <AddCollectionIcon width={size} height={size} color="white" />
               </BctButton>
             </Box>
           }
-          {(!this.state.creating) &&
+          {!creating &&
             <Box>
               <BctButton onClick={this.pickImage}>
                 <AddImageIcon width={size} height={size} color="white" />
               </BctButton>
             </Box>
           }
-          {(!this.state.creating || this.state.creating === 'video') &&
+          {(!creating || creating === 'video') &&
             <Box>
               <BctButton
-                creating={this.state.creating === 'video'}
+                creating={creating === 'video'}
                 onClick={this.startCreatingVideo}
               >
                 <AddVideoIcon width={size} height={size} color="white" />
               </BctButton>
             </Box>
           }
-          {(!this.state.creating) &&
+          {(!isReplacing && !creating) &&
             <Box>
               <BctButton onClick={this.startCreatingText}>
                 <AddTextIcon width={size} height={size} color="white" />
@@ -322,21 +348,26 @@ class GridCardBlank extends React.Component {
   }
 
   render() {
+    const { uiStore } = this.props
+    const { gridSettings, blankContentToolState } = uiStore
     return (
       <StyledGridCardBlank>
-        <StyledGridCardInner>
+        <StyledGridCardInner
+          height={blankContentToolState.height}
+          gridW={gridSettings.gridW}
+          gridH={gridSettings.gridH}
+        >
           {this.renderInner()}
-          <button className="close" onClick={this.closeBlankContentTool}>
-            <CloseIcon />
-          </button>
         </StyledGridCardInner>
+        <button className="close" onClick={this.closeBlankContentTool}>
+          <CloseIcon />
+        </button>
       </StyledGridCardBlank>
     )
   }
 }
 
 GridCardBlank.propTypes = {
-  order: PropTypes.number.isRequired,
   // parent is the parent collection
   parent: MobxPropTypes.objectOrObservableObject.isRequired,
   height: PropTypes.number.isRequired,

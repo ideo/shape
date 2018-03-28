@@ -1,7 +1,7 @@
 import _ from 'lodash'
 import { computed, action } from 'mobx'
 
-import { uiStore, routingStore } from '~/stores'
+import { uiStore } from '~/stores'
 import { archive } from './shared'
 import BaseRecord from './BaseRecord'
 
