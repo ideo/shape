@@ -2,7 +2,12 @@ import _ from 'lodash'
 import { observable, action, computed } from 'mobx'
 
 export default class UiStore {
-  @observable blankContentToolState = null
+  @observable blankContentToolState = {
+    order: null,
+    width: null,
+    height: null,
+    replacingId: null,
+  }
   @observable openCardMenuId = false
   @observable organizationMenuOpen = false
   @observable rolesMenuOpen = false
@@ -73,13 +78,19 @@ export default class UiStore {
   // --- grid properties />
 
   // --- BCT + GridCard properties
-  @action openBlankContentTool({ order = 0 } = {}) {
+  @action openBlankContentTool({ order = 0, width = 1, height = 1, replacingId = null } = {}) {
     this.deselectCards()
-    this.blankContentToolState = { order }
+    this.openCardMenuId = false
+    this.blankContentToolState = { order, width, height, replacingId }
   }
 
   @action closeBlankContentTool() {
-    this.blankContentToolState = null
+    this.blankContentToolState = {
+      order: null,
+      width: null,
+      height: null,
+      replacingId: null,
+    }
   }
 
   @action setViewingCollection(collection = null) {

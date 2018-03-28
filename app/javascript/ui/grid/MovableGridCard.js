@@ -82,6 +82,7 @@ class MovableGridCard extends React.PureComponent {
     }
     uiStore.deselectCards()
     if (!this.state.dragging) {
+      uiStore.closeBlankContentTool()
       this.setState({
         dragging: true,
         moveComplete: false,
@@ -109,6 +110,7 @@ class MovableGridCard extends React.PureComponent {
 
   handleResize = (e, dir, ref, delta, position) => {
     uiStore.deselectCards()
+    uiStore.closeBlankContentTool()
     const { gridW, gridH, cols } = uiStore.gridSettings
     const { card } = this.props
     // e.g. if card.width is 4, but we're at 2 columns, max out at cardWidth = 2
@@ -183,7 +185,7 @@ class MovableGridCard extends React.PureComponent {
   )
 
   renderBlank = () => {
-    const { card, parent } = this.props
+    const { parent } = this.props
     const styleProps = this.styleProps()
     const {
       height,
@@ -207,7 +209,7 @@ class MovableGridCard extends React.PureComponent {
       >
         <div>
           <PositionedGridCard {...styleProps}>
-            <GridCardBlank height={height} parent={parent} order={card.order} />
+            <GridCardBlank height={height} parent={parent} />
           </PositionedGridCard>
         </div>
       </FlipMove>

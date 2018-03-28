@@ -36,8 +36,9 @@ class CollectionCard < ApplicationRecord
     exclude_association :parent
   end
 
-  def duplicate!(for_user:, shallow: false, update_order: false)
+  def duplicate!(for_user:, parent: self.parent, shallow: false, update_order: false)
     cc = amoeba_dup
+    cc.parent = parent # defaults to self.parent, unless one is passed in
     cc.order += 1
 
     unless shallow
@@ -45,9 +46,11 @@ class CollectionCard < ApplicationRecord
       cc.item = item.duplicate!(for_user: for_user) if item.present?
     end
 
-    if cc.save && update_order
-      cc.increment_card_orders!
-    end
+    return cc unless cc.save
+
+    # TODO: better way to get the correct breadcrumb upon initial duplication?
+    cc.record.recalculate_breadcrumb!
+    cc.increment_card_orders! if update_order
 
     cc
   end
