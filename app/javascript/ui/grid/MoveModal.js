@@ -1,21 +1,50 @@
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 import v from '~/utils/variables'
-import AppBar from 'material-ui/AppBar';
+import Snackbar, { SnackbarContent } from 'material-ui/Snackbar'
+import MoveArrowIcon from '~/ui/icons/MoveArrowIcon'
+import CloseIcon from '~/ui/icons/CloseIcon'
 
-const StyledAppBar = styled(AppBar)`
-  &.appBar {
+const StyledSnackbar = styled(Snackbar)`
+  &.Snackbar {
     width: 100%;
     top: auto;
-    padding: 22px 30px;
-    right: calc(50% - 340px);
-    max-width: 680px;
-    height: 60px;
+    max-width: 673px;
+    margin-bottom: 35px;
     flex-grow: 1;
     color: white;
-    bottom: 65px;
-    background-color: #a89f9b;
+    background-color: transparent;
   }
+`
+
+const StyledSnackbarContent = styled(SnackbarContent)`
+  &.SnackbarContent {
+    background-color: ${v.colors.cloudy};
+    max-width: none;
+    padding: 15px 30px;
+    width: 100%;
+  }
+`
+
+// This text is different from other typography
+const StyledMoveText = styled.span`
+  text-transform: uppercase;
+  font-family: ${v.fonts.sans};
+  font-size: 1rem;
+  font-weight: ${v.weights.book};
+  letter-spacing: 0.1rem;
+  color: white;
+`
+
+const IconHolder = styled.span`
+  margin-left: 40px;
+  margin-top: 8px;
+  width: 16px;
+`
+
+const CloseIconHolder = styled.span`
+  margin-left: 60px;
+  width: 16px;
 `
 
 @inject('uiStore')
@@ -27,13 +56,24 @@ class MoveModal extends React.Component {
     return (
       <div>
         { uiStore.moveMenuOpen && (
-          <StyledAppBar
-            classes={{ root: 'appBar' }}
-            position="fixed"
+          <StyledSnackbar
+            classes={{ root: 'Snackbar', }}
             open={uiStore.moveMenuOpen}
           >
-            Hellow
-          </StyledAppBar>
+            <StyledSnackbarContent
+              classes={{ root: 'SnackbarContent', }}
+              message={<StyledMoveText id="message-id">1 in transit</StyledMoveText>}
+              action={[
+                <IconHolder><button>
+                  <MoveArrowIcon direction="up" />
+                </button></IconHolder>,
+                <IconHolder><button>
+                  <MoveArrowIcon direction="down" />
+                </button></IconHolder>,
+                <CloseIconHolder><button><CloseIcon /></button></CloseIconHolder>,
+              ]}
+            />
+          </StyledSnackbar>
         )}
       </div>
     )
