@@ -42,10 +42,13 @@ const StyledGridCardBlank = StyledGridCard.extend`
   }
 `
 
+// width of card is constrained by gridW
+// vertical position is adjusted by gridH / 2 if card is 2 rows tall
 const StyledGridCardInner = styled.div`
-  max-width: ${props => props.maxWidth}px;
+  max-width: ${props => props.gridW}px;
   margin: 0 auto;
   position: relative;
+  top: ${props => (props.height > 1 ? (props.gridH / 2) : 0)}px;
 `
 const StyledBlankCreationTool = styled.div`
   padding: 2rem;
@@ -345,10 +348,15 @@ class GridCardBlank extends React.Component {
   }
 
   render() {
-    const { gridSettings } = this.props.uiStore
+    const { uiStore } = this.props
+    const { gridSettings, blankContentToolState } = uiStore
     return (
       <StyledGridCardBlank>
-        <StyledGridCardInner maxWidth={gridSettings.gridW}>
+        <StyledGridCardInner
+          height={blankContentToolState.height}
+          gridW={gridSettings.gridW}
+          gridH={gridSettings.gridH}
+        >
           {this.renderInner()}
         </StyledGridCardInner>
         <button className="close" onClick={this.closeBlankContentTool}>
