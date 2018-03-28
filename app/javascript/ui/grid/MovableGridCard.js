@@ -148,6 +148,11 @@ class MovableGridCard extends React.PureComponent {
     })
   }
 
+  onMove = () => {
+    const { card } = this.props
+    uiStore.selectCardId(card.id)
+  }
+
   clearDragTimeout = () => {
     if (this.state.timeoutId) {
       clearTimeout(this.state.timeoutId)
@@ -275,6 +280,7 @@ class MovableGridCard extends React.PureComponent {
       // also so that click handler doesn't register while dragging
       dragging: !moveComplete,
       handleClick: this.handleClick,
+      onMove: this.onMove,
       menuOpen,
       canEditCollection,
       isUserCollection,

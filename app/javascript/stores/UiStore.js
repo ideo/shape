@@ -85,6 +85,13 @@ export default class UiStore {
     }
   }
 
+  // For certain actions we want to force a toggle on
+  @action selectCardId(cardId) {
+    if (!this.isSelected(cardId)) {
+      this.selectedCardIds.push(cardId)
+    }
+  }
+
   @computed get collectionCardIds() {
     return this.viewingCollection.cardIds
   }

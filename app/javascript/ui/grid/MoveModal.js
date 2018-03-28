@@ -50,8 +50,15 @@ const CloseIconHolder = styled.span`
 @inject('uiStore')
 @observer
 class MoveModal extends React.Component {
+  handleClose = (ev) => {
+    ev.preventDefault()
+    const { uiStore } = this.props
+    uiStore.update('moveMenuOpen', false)
+  }
+
   render() {
     const { uiStore } = this.props
+    const amount = uiStore.selectedCardIds.length
 
     return (
       <div>
@@ -62,15 +69,20 @@ class MoveModal extends React.Component {
           >
             <StyledSnackbarContent
               classes={{ root: 'SnackbarContent', }}
-              message={<StyledMoveText id="message-id">1 in transit</StyledMoveText>}
+              message={<StyledMoveText id="message-id">
+                {amount} in transit</StyledMoveText>}
               action={[
-                <IconHolder><button>
+                <IconHolder key="moveup"><button>
                   <MoveArrowIcon direction="up" />
                 </button></IconHolder>,
-                <IconHolder><button>
+                <IconHolder key="movedown"><button>
                   <MoveArrowIcon direction="down" />
                 </button></IconHolder>,
-                <CloseIconHolder><button><CloseIcon /></button></CloseIconHolder>,
+                <CloseIconHolder key="close">
+                  <button onClick={this.handleClose}>
+                    <CloseIcon />
+                  </button>
+                </CloseIconHolder>,
               ]}
             />
           </StyledSnackbar>

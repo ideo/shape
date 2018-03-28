@@ -157,7 +157,10 @@ class GridCard extends React.Component {
   }
 
   moveCard = () => {
-    // console.log('Move card')
+    this.setState({
+      selected: true
+    })
+    this.props.onMove()
   }
 
   archiveCard = () => {
@@ -216,6 +219,7 @@ GridCard.propTypes = {
   dragging: PropTypes.bool.isRequired,
   handleClick: PropTypes.func.isRequired,
   menuOpen: PropTypes.bool.isRequired,
+  onMove: PropTypes.func.isRequired,
 }
 
 export default GridCard
