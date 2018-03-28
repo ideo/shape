@@ -17,10 +17,6 @@ class Collection extends BaseRecord {
     uiStore.openBlankContentTool()
   }
 
-  openBlankContentTool = (opts) => {
-    uiStore.openBlankContentTool(opts)
-  }
-
   get isUserCollection() {
     return this.type === 'Collection::UserCollection'
   }
