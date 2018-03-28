@@ -6,6 +6,7 @@ import { uiStore } from '~/stores'
 import TagIcon from '~/ui/icons/TagIcon'
 import PermissionsIcon from '~/ui/icons/PermissionsIcon'
 import ArchiveIcon from '~/ui/icons/ArchiveIcon'
+import MoveIcon from '~/ui/icons/MoveIcon'
 import PopoutMenu from '~/ui/global/PopoutMenu'
 import TagEditor from '~/ui/pages/shared/TagEditor'
 
@@ -34,6 +35,10 @@ class PageMenu extends React.PureComponent {
     this.props.record.API_archive()
   }
 
+  moveItems = () => {
+    uiStore.update('moveMenuOpen', true)
+  }
+
   get menuItems() {
     const items = [
       { name: 'Tags', icon: <TagIcon />, onClick: this.showTags },
@@ -42,6 +47,7 @@ class PageMenu extends React.PureComponent {
     if (this.props.canEdit) {
       items.push(
         { name: 'Archive', icon: <ArchiveIcon />, onClick: this.archiveRecord },
+        { name: 'Move', icon: <MoveIcon />, onClick: this.moveItems },
       )
     }
     if (this.props.disablePermissions) items.splice(1, 1)

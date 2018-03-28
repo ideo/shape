@@ -10,6 +10,7 @@ import Header from '~/ui/layout/Header'
 import PageContainer from '~/ui/layout/PageContainer'
 import CollectionGrid from '~/ui/grid/CollectionGrid'
 import Breadcrumb from '~/ui/layout/Breadcrumb'
+import MoveModal from '~/ui/grid/MoveModal'
 import RolesSummary from '~/ui/roles/RolesSummary'
 import Roles from '~/ui/grid/Roles'
 import EditableName from './shared/EditableName'
@@ -144,6 +145,7 @@ class CollectionPage extends PageWithApi {
             cardIds={collection.cardIds}
             blankContentToolState={uiStore.blankContentToolState}
           />
+          <MoveModal />
         </PageContainer>
       </Fragment>
     )

@@ -23,6 +23,7 @@ export default class UiStore {
   @observable viewingCollection = null
   @observable selectedCardIds = []
   @observable isLoading = false
+  @observable moveMenuOpen = false
 
   // default action for updating any basic UiStore value
   @action update(name, value) {
