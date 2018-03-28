@@ -59,7 +59,16 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
       placement: json_api_params[:placement],
     )
     if mover.call
-      render jsonapi: mover.to_collection
+      render jsonapi: @to_collection.reload, include:
+        [
+          roles: [:users],
+          collection_cards: [
+            :parent,
+            record: [
+              :filestack_file,
+            ],
+          ],
+        ]
     else
       render_api_errors mover.errors
     end

@@ -1,6 +1,4 @@
 class CardMover
-  attr_reader :to_collection
-
   def initialize(from_collection:, to_collection:, card_ids:, placement: 'beginning')
     @from_collection = from_collection
     @to_collection = to_collection
@@ -23,8 +21,10 @@ class CardMover
   private
 
   def move_cards
-    # get original cards
-    existing_cards = @to_collection.collection_cards.to_a
+    # get original cards, minus any we're moving
+    existing_cards = @to_collection.collection_cards.to_a.reject do |card|
+      @moving_cards.include? card
+    end
     joined_cards = []
     # created joined array with moving_cards either at beginning or end
     if @placement == 'beginning'
@@ -32,6 +32,8 @@ class CardMover
     else
       joined_cards = (existing_cards + @moving_cards)
     end
+    # uniq the array because we may be moving within the same collection
+    joined_cards.uniq!
     # Reorder all cards based on order of joined_cards
     joined_cards.each_with_index do |card, i|
       # parent_id will already be set for existing_cards but no harm to indicate

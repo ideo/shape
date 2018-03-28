@@ -99,7 +99,7 @@ class MovableGridCard extends React.PureComponent {
   }
 
   handleStop = () => {
-    this.props.onMoveStop(this.props.card.id)
+    this.props.onDragOrResizeStop(this.props.card.id)
     this.setState({ dragging: false, resizing: false })
     const timeoutId = setTimeout(() => {
       // have this item remain "on top" while it animates back
@@ -150,10 +150,10 @@ class MovableGridCard extends React.PureComponent {
     })
   }
 
-  onMove = () => {
-    const { card } = this.props
+  onMoveStart = () => {
+    const { card, parent } = this.props
     uiStore.selectCardId(card.id)
-    uiStore.openMoveMenu()
+    uiStore.openMoveMenu({ from: parent.id })
   }
 
   clearDragTimeout = () => {
@@ -283,7 +283,7 @@ class MovableGridCard extends React.PureComponent {
       // also so that click handler doesn't register while dragging
       dragging: !moveComplete,
       handleClick: this.handleClick,
-      onMove: this.onMove,
+      onMoveStart: this.onMoveStart,
       menuOpen,
       canEditCollection,
       isUserCollection,
@@ -367,7 +367,7 @@ MovableGridCard.propTypes = {
   parent: MobxPropTypes.objectOrObservableObject.isRequired,
   onDrag: PropTypes.func.isRequired,
   onResize: PropTypes.func.isRequired,
-  onMoveStop: PropTypes.func.isRequired,
+  onDragOrResizeStop: PropTypes.func.isRequired,
   routeTo: PropTypes.func.isRequired,
   menuOpen: PropTypes.bool.isRequired,
 }

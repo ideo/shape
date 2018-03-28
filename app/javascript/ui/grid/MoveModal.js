@@ -47,13 +47,35 @@ const CloseIconHolder = styled.span`
   width: 16px;
 `
 
-@inject('uiStore')
+@inject('uiStore', 'apiStore')
 @observer
 class MoveModal extends React.Component {
   handleClose = (ev) => {
     ev.preventDefault()
     const { uiStore } = this.props
     uiStore.closeMoveMenu()
+  }
+
+  moveCards = async (placement) => {
+    const { uiStore, apiStore } = this.props
+    const data = {
+      to_id: uiStore.viewingCollection.id,
+      from_id: uiStore.movingFromCollectionId,
+      collection_card_ids: uiStore.movingCardIds,
+      placement,
+    }
+    const result = await apiStore.request('/collection_cards/move', 'PATCH', data)
+    console.log(result)
+    uiStore.closeMoveMenu()
+    uiStore.deselectCards()
+  }
+
+  handleMoveToBeginning = () => {
+    this.moveCards('beginning')
+  }
+
+  handleMoveToEnd = () => {
+    this.moveCards('end')
   }
 
   render() {
@@ -72,12 +94,16 @@ class MoveModal extends React.Component {
               message={<StyledMoveText id="message-id">
                 {amount} in transit</StyledMoveText>}
               action={[
-                <IconHolder key="moveup"><button>
-                  <MoveArrowIcon direction="up" />
-                </button></IconHolder>,
-                <IconHolder key="movedown"><button>
-                  <MoveArrowIcon direction="down" />
-                </button></IconHolder>,
+                <IconHolder key="moveup">
+                  <button onClick={this.handleMoveToBeginning}>
+                    <MoveArrowIcon direction="up" />
+                  </button>
+                </IconHolder>,
+                <IconHolder key="movedown">
+                  <button onClick={this.handleMoveToEnd}>
+                    <MoveArrowIcon direction="down" />
+                  </button>
+                </IconHolder>,
                 <CloseIconHolder key="close">
                   <button onClick={this.handleClose}>
                     <CloseIcon />
@@ -96,6 +122,7 @@ MoveModal.propTypes = {
 }
 MoveModal.wrappedComponent.propTypes = {
   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
+  apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 MoveModal.defaultProps = {
 }
