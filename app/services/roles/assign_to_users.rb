@@ -33,6 +33,8 @@ module Roles
     end
 
     def add_roles_to_children_async
+      return unless @object.respond_to?(:children)
+      return unless @object.children.any?
       AddRolesToChildrenWorker.perform_async(
         @added_users.map(&:id),
         @role_name,
