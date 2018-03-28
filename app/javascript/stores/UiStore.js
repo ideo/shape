@@ -29,6 +29,7 @@ export default class UiStore {
   @observable selectedCardIds = []
   @observable isLoading = false
   @observable movingCardIds = []
+  @observable movingFromCollectionId = null
 
   // default action for updating any basic UiStore value
   @action update(name, value) {
@@ -39,8 +40,10 @@ export default class UiStore {
     this.rolesMenuOpen = false
   }
 
-  @action openMoveMenu() {
+  @action openMoveMenu({ from: fromCollectionId }) {
     // On move, copy over selected cards to moving cards
+    this.movingFromCollectionId = fromCollectionId
+    this.movingCardIds.replace([])
     this.selectedCardIds.forEach((id) => {
       this.movingCardIds.push(id)
     })
@@ -48,6 +51,7 @@ export default class UiStore {
 
   @action closeMoveMenu() {
     this.movingCardIds.replace([])
+    this.movingFromCollectionId = null
   }
 
   // --- grid properties

@@ -65,10 +65,6 @@ class Api::V1::RolesController < Api::V1::BaseController
     true
   end
 
-  def json_api_params
-    params[:_jsonapi]
-  end
-
   def role_params
     json_api_params.require(:role).permit(
       :name,

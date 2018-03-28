@@ -2,7 +2,7 @@ require 'rails_helper'
 
 RSpec.describe Roles::AssignToUsers, type: :service do
   let(:organization) { create(:organization) }
-  let(:object) { create(:text_item) }
+  let(:object) { create(:collection, num_cards: 2) }
   let(:users) { create_list(:user, 3) }
   let(:role_name) { :editor }
   let(:propagate_to_children) { false }
@@ -61,21 +61,32 @@ RSpec.describe Roles::AssignToUsers, type: :service do
 
       it 'returns errors' do
         expect(assign_role.call).to be false
-        expect(assign_role.errors).to include('admin is not a valid role on Item::TextItem')
+        expect(assign_role.errors).to include('admin is not a valid role on Collection')
       end
     end
 
     context 'with propagate_to_children true' do
       let!(:propagate_to_children) { true }
 
-      it 'calls AddRolesToChildrenWorker' do
-        expect(AddRolesToChildrenWorker).to receive(:perform_async).with(
-          users.map(&:id),
-          role_name,
-          object.id,
-          object.class.name.to_s,
-        )
-        assign_role.call
+      describe 'with collection' do
+        it 'calls AddRolesToChildrenWorker' do
+          expect(AddRolesToChildrenWorker).to receive(:perform_async).with(
+            users.map(&:id),
+            role_name,
+            object.id,
+            object.class.name.to_s,
+          )
+          assign_role.call
+        end
+      end
+
+      describe 'with item' do
+        let(:object) { create(:text_item) }
+
+        it 'does not call AddRolesToChildrenWorker' do
+          expect(AddRolesToChildrenWorker).not_to receive(:perform_async)
+          assign_role.call
+        end
       end
     end
   end
