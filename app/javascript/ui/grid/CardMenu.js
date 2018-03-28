@@ -14,7 +14,6 @@ class CardMenu extends React.PureComponent {
 
   handleMove = (ev) => {
     ev.preventDefault()
-    uiStore.update('moveMenuOpen', true)
     this.props.handleMove()
   }
 

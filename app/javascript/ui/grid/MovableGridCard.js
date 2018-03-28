@@ -151,6 +151,7 @@ class MovableGridCard extends React.PureComponent {
   onMove = () => {
     const { card } = this.props
     uiStore.selectCardId(card.id)
+    uiStore.openMoveMenu()
   }
 
   clearDragTimeout = () => {

@@ -23,7 +23,7 @@ export default class UiStore {
   @observable viewingCollection = null
   @observable selectedCardIds = []
   @observable isLoading = false
-  @observable moveMenuOpen = false
+  @observable movingCardIds = []
 
   // default action for updating any basic UiStore value
   @action update(name, value) {
@@ -32,6 +32,17 @@ export default class UiStore {
 
   @action closeRolesMenu() {
     this.rolesMenuOpen = false
+  }
+
+  @action openMoveMenu() {
+    // On move, copy over selected cards to moving cards
+    this.selectedCardIds.forEach((id) => {
+      this.movingCardIds.push(id)
+    })
+  }
+
+  @action closeMoveMenu() {
+    this.movingCardIds.replace([])
   }
 
   // --- grid properties

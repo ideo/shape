@@ -53,19 +53,19 @@ class MoveModal extends React.Component {
   handleClose = (ev) => {
     ev.preventDefault()
     const { uiStore } = this.props
-    uiStore.update('moveMenuOpen', false)
+    uiStore.closeMoveMenu()
   }
 
   render() {
     const { uiStore } = this.props
-    const amount = uiStore.selectedCardIds.length
+    const amount = uiStore.movingCardIds.length
 
     return (
       <div>
-        { uiStore.moveMenuOpen && (
+        { uiStore.movingCardIds.length > 0 && (
           <StyledSnackbar
             classes={{ root: 'Snackbar', }}
-            open={uiStore.moveMenuOpen}
+            open
           >
             <StyledSnackbarContent
               classes={{ root: 'SnackbarContent', }}
