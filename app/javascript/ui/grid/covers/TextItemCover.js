@@ -7,6 +7,7 @@ import v from '~/utils/variables'
 import PaddedCardCover from './PaddedCardCover'
 
 const StyledReadMore = styled.div`
+  z-index: ${v.zIndex.gridCard};
   position: absolute;
   bottom: 0;
   width: 100%;
@@ -28,16 +29,22 @@ class TextItemCover extends React.Component {
   }
 
   componentDidMount() {
-    this.checkTextAreaHeight()
+    const { height } = this.props
+    this.checkTextAreaHeight(height)
   }
 
-  checkTextAreaHeight = () => {
+  componentWillReceiveProps({ height }) {
+    this.checkTextAreaHeight(height)
+  }
+
+  checkTextAreaHeight = (height) => {
     if (!this.quillEditor) return
-    const { height } = this.props
     const textAreaHeight = this.quillEditor.getEditingArea().offsetHeight
     // render the Read More link if the text height exceeds viewable area
     if (height && textAreaHeight > height) {
       this.setState({ readMore: true })
+    } else {
+      this.setState({ readMore: false })
     }
   }
 

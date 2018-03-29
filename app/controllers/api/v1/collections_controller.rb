@@ -48,8 +48,7 @@ class Api::V1::CollectionsController < Api::V1::BaseController
   end
 
   def archive
-    # TODO: make decrement_card_orders part of the card's archive action
-    if @collection.archive! && @collection.parent_collection_card.decrement_card_orders!
+    if @collection.archive!
       render jsonapi: @collection.reload
     else
       render_api_errors @collection.errors

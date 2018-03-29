@@ -1,6 +1,7 @@
 import { Fragment } from 'react'
 import ReactRouterPropTypes from 'react-router-prop-types'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
+import { Flex, Box } from 'reflexbox'
 import styled from 'styled-components'
 import { Link } from 'react-router-dom'
 import { animateScroll as scroll } from 'react-scroll'
@@ -16,6 +17,8 @@ import VideoItem from '~/ui/items/VideoItem'
 import CloseIcon from '~/ui/icons/CloseIcon'
 import v, { ITEM_TYPES } from '~/utils/variables'
 import EditableName from './shared/EditableName'
+import PageMenu from './shared/PageMenu'
+import { StyledTitleAndRoles } from './shared/styled'
 
 const ItemPageContainer = styled.main`
   background: white;
@@ -46,7 +49,7 @@ const CloseLink = styled(Link)`
   }
 `
 
-@inject('apiStore')
+@inject('apiStore', 'uiStore')
 @observer
 class ItemPage extends PageWithApi {
   componentDidMount() {
@@ -90,17 +93,29 @@ class ItemPage extends PageWithApi {
   }
 
   render() {
+    const { uiStore } = this.props
     const { item } = this
     if (!item) return <Loader />
     return (
       <Fragment>
         <Header>
           <Breadcrumb items={item.breadcrumb} />
-          <EditableName
-            name={item.name}
-            updateNameHandler={this.updateItemName}
-            canEdit={item.can_edit}
-          />
+          <StyledTitleAndRoles justify="space-between">
+            <Box className="title">
+              <EditableName
+                name={item.name}
+                updateNameHandler={this.updateItemName}
+                canEdit={item.can_edit}
+              />
+            </Box>
+            <Flex align="baseline" className="item-page">
+              <PageMenu
+                record={item}
+                menuOpen={uiStore.pageMenuOpen}
+                disablePermissions
+              />
+            </Flex>
+          </StyledTitleAndRoles>
         </Header>
         <ItemPageContainer>
           <PageContainer>
@@ -123,6 +138,7 @@ ItemPage.propTypes = {
 }
 ItemPage.wrappedComponent.propTypes = {
   apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
+  uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 
 export default ItemPage

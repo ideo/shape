@@ -1,4 +1,5 @@
 import Chip from 'material-ui/Chip'
+import MuiSelect from 'material-ui/Select'
 import { MenuItem } from 'material-ui/Menu'
 import styled from 'styled-components'
 import v from '~/utils/variables'
@@ -30,7 +31,7 @@ export const Label = styled.label`
 Label.displayName = 'StyledLabel'
 
 export const FormButton = styled.button`
-  width: 183px;
+  width: ${props => (props.width ? props.width : 183)}px;
   text-transform: uppercase;
   font-family: ${v.fonts.sans};
   font-size: 1rem;
@@ -42,6 +43,13 @@ export const FormButton = styled.button`
   border-radius: 20px;
   border: none;
   background-color: ${v.colors.blackLava};
+  ${props => props.disabled &&
+      `background-color: white;
+      border: 1px solid ${v.colors.gray};
+      color:  ${v.colors.gray}`};
+  &:hover, &:focus {
+    background-color: ${v.colors.cloudy};
+  }
 `
 FormButton.displayName = 'StyledFormButton'
 
@@ -56,6 +64,7 @@ export const TextButton = styled.button`
 TextButton.displayName = 'StyledTextButton'
 
 export const TextField = styled.input`
+  font-family: ${v.fonts.sans};
   width: 225px;
   padding-right: 4px;
   padding-left: 4px;
@@ -119,17 +128,34 @@ export const Pill = styled(Chip)`
 `
 Pill.displayName = 'StyledPill'
 
-export const SelectOption = styled(MenuItem)`
-  .selectOption {
-    alignItems: center;
-    height: 38px;
-    margin-bottom: 7px;
-    opacity: 0.5;
-    padding: 0 4px;
+export const Select = styled(MuiSelect)`
+  .select {
+    font-family: ${v.fonts.sans};
+    font-size: 1rem;
+    font-weight: ${v.weights.book};
   }
 
-  &:hover: {
-    opacity: 1.0
+  .selectMenu: {
+    background-color: transparent;
+    &:focus { background-color: transparent; }
+    &:hover { background-color: transparent; }
   }
+`
+Select.displayName = 'StyledSelect'
+
+export const SelectOption = styled(MenuItem)`
+  &.selectOption {
+    align-items: center;
+    display: flex;
+    height: 38px;
+    margin-bottom: 4px;
+    margin-top: 4px;
+    padding: 0 4px;
+
+    &:hover: {
+      opacity: 1.0
+    }
+  }
+
 `
 SelectOption.displayName = 'StyledSelectOption'

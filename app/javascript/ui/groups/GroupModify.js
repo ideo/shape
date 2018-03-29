@@ -8,8 +8,10 @@ import {
   FormActionsContainer,
   Label,
   ImageField,
+  TextButton,
   TextField,
 } from '~/ui/global/styled/forms'
+import { RowItemRight } from '~/ui/global/styled/layout'
 import FilestackUpload from '~/utils/FilestackUpload'
 import Group from '~/stores/jsonApi/Group'
 import Avatar from '~/ui/global/Avatar'
@@ -66,8 +68,9 @@ class GroupModify extends React.Component {
       existingGroup => existingGroup.id === res.id
     )
     if (!existing) {
-      apiStore.fetch('users', apiStore.currentUserId)
+      return apiStore.fetch('users', apiStore.currentUserId)
     }
+    return Promise.resolve(existing)
   }
 
   handleNameChange = (ev) => {
@@ -78,6 +81,11 @@ class GroupModify extends React.Component {
   handleHandleChange = (ev) => {
     this.changeHandle(ev.target.value)
     this.setSyncing(false)
+  }
+
+  handleRoles = (ev) => {
+    ev.preventDefault()
+    this.props.onGroupRoles(this.props.group)
   }
 
   handleImagePick = (ev) => {
@@ -113,12 +121,14 @@ class GroupModify extends React.Component {
       group.handle = this.editingGroup.handle
       group.filestack_file_url = this.editingGroup.filestack_file_url
     }
-    group.assign('filestack_file_attributes', this.fileAttrs)
+    if (this.fileAttrs.url) {
+      group.assign('filestack_file_attributes', this.fileAttrs)
+    }
     group.save()
       .then((res) => {
         // TODO why isn't res wrapped in "data"?
-        this.afterSave(res)
-        onSave && onSave()
+        this.afterSave(res).then(() =>
+          onSave && onSave(res))
       })
       .catch((err) => {
         console.warn(err)
@@ -149,8 +159,16 @@ class GroupModify extends React.Component {
   }
 
   render() {
+    const { group } = this.props
     return (
       <form>
+        <RowItemRight>
+          { group.id && (
+            <TextButton onClick={this.handleRoles}>
+              Members
+            </TextButton>
+          )}
+        </RowItemRight>
         <FieldContainer>
           <Label htmlFor="groupName">Group Name</Label>
           <TextField
@@ -193,6 +211,7 @@ class GroupModify extends React.Component {
 GroupModify.propTypes = {
   group: MobxPropTypes.objectOrObservableObject.isRequired,
   onSave: PropTypes.func.isRequired,
+  onGroupRoles: PropTypes.func.isRequired,
 }
 GroupModify.wrappedComponent.propTypes = {
   apiStore: MobxPropTypes.objectOrObservableObject.isRequired,

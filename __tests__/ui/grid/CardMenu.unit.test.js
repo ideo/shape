@@ -4,30 +4,34 @@ import CardMenu from '~/ui/grid/CardMenu'
 const props = {
   cardId: 123,
   canEdit: false,
+  canReplace: false,
   handleShare: jest.fn(),
   handleDuplicate: jest.fn(),
   handleLink: jest.fn(),
   handleMove: jest.fn(),
   handleArchive: jest.fn(),
+  handleReplace: jest.fn(),
   uiStore: {
     openCardMenuId: false,
-    openCardMenu: jest.fn(),
+    update: jest.fn(),
   },
   menuOpen: false,
 }
 
 // const fakeMouseEvent = { stopPropagation: jest.fn() }
 
-let wrapper, actions
+let wrapper, allActions, actions
 describe('CardMenu', () => {
   describe('as editor', () => {
     beforeEach(() => {
-      actions = [
+      allActions = [
         'Duplicate',
+        'Replace',
         'Move',
         'Link',
         'Archive'
       ]
+      actions = _.without(allActions, 'Replace')
       props.canEdit = true
       wrapper = shallow(
         <CardMenu {...props} />
@@ -39,12 +43,23 @@ describe('CardMenu', () => {
       expect(popout.props().menuItems.length).toEqual(actions.length)
       expect(_.map(popout.props().menuItems, i => i.name)).toEqual(actions)
     })
+
+    it('creates a PopoutMenu with editable actions including replace if canReplace', () => {
+      props.canReplace = true
+      wrapper = shallow(
+        <CardMenu {...props} />
+      )
+      const popout = wrapper.find('PopoutMenu').at(0)
+      expect(popout.props().menuItems.length).toEqual(allActions.length)
+      expect(_.map(popout.props().menuItems, i => i.name)).toEqual(allActions)
+    })
   })
 
   describe('as viewer', () => {
     beforeEach(() => {
       actions = ['Duplicate']
       props.canEdit = false
+      props.canReplace = false
       wrapper = shallow(
         <CardMenu {...props} />
       )

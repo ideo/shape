@@ -31,7 +31,7 @@ describe Collection, type: :model do
 
   describe '#duplicate' do
     let!(:user) { create(:user) }
-    let!(:collection) { create(:collection, num_cards: 5) }
+    let!(:collection) { create(:collection, num_cards: 5, tag_list: %w[Prototype Other]) }
     let(:copy_parent_card) { false }
     let(:duplicate) do
       dupe = collection.duplicate!(
@@ -79,6 +79,10 @@ describe Collection, type: :model do
       expect(duplicate.items.all? { |item| item.can_edit?(user) }).to be true
     end
 
+    it 'clones tag list' do
+      expect(duplicate.tag_list).to match_array collection.tag_list
+    end
+
     context 'with items you can\'t see' do
       let!(:hidden_item) { collection.items.first }
       let!(:viewable_items) { collection.items - [hidden_item] }
@@ -118,6 +122,27 @@ describe Collection, type: :model do
           expect(duplicate.parent_collection_card.order).to eq(collection.parent_collection_card.order + 1)
         end
       end
+    end
+  end
+
+  describe '#all_tag_names' do
+    let!(:collection) { create(:collection, num_cards: 3) }
+    let(:cards) { collection.collection_cards }
+
+    it 'should be empty by default' do
+      expect(collection.all_tag_names).to match_array []
+    end
+
+    it 'should gather collection tags' do
+      collection.update(tag_list: %w[this that])
+      expect(collection.reload.all_tag_names).to match_array %w[this that]
+    end
+
+    it 'should gather collection + item tags' do
+      collection.update(tag_list: %w[this that])
+      cards.first.item.update(tag_list: %w[other stuff])
+      cards[1].item.update(tag_list: %w[more things])
+      expect(collection.reload.all_tag_names).to match_array %w[this that other stuff more things]
     end
   end
 

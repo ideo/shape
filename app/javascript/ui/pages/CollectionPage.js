@@ -2,10 +2,8 @@ import { Fragment } from 'react'
 import ReactRouterPropTypes from 'react-router-prop-types'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import { Flex, Box } from 'reflexbox'
-import styled from 'styled-components'
 import { animateScroll as scroll } from 'react-scroll'
 
-import v from '~/utils/variables'
 import PageWithApi from '~/ui/pages/PageWithApi'
 import Loader from '~/ui/layout/Loader'
 import Header from '~/ui/layout/Header'
@@ -13,29 +11,12 @@ import PageContainer from '~/ui/layout/PageContainer'
 import CollectionGrid from '~/ui/grid/CollectionGrid'
 import Breadcrumb from '~/ui/layout/Breadcrumb'
 import RolesSummary from '~/ui/roles/RolesSummary'
-import RolesMenu from '~/ui/roles/RolesMenu'
+import Roles from '~/ui/grid/Roles'
 import EditableName from './shared/EditableName'
 import PageMenu from './shared/PageMenu'
+import { StyledTitleAndRoles } from './shared/styled'
 
 const isHomepage = ({ path }) => path === '/'
-
-const StyledTitleAndRoles = styled(Flex)`
-  .title {
-    max-width: 75%;
-  }
-  @media only screen and (max-width: ${v.responsive.medBreakpoint}px) {
-    .roles-summary {
-      display: none;
-    }
-    .title {
-      max-width: 90%;
-    }
-  }
-  .page-menu {
-    position: relative;
-    top: -5px;
-  }
-`
 
 @inject('apiStore', 'uiStore')
 @observer
@@ -43,6 +24,7 @@ class CollectionPage extends PageWithApi {
   componentDidMount() {
     super.componentDidMount()
     scroll.scrollToTop({ duration: 0 })
+    this.props.uiStore.closeBlankContentTool()
   }
 
   componentWillReceiveProps(nextProps) {
@@ -51,6 +33,11 @@ class CollectionPage extends PageWithApi {
     if (nextProps.match.params.id !== this.props.match.params.id) {
       this.props.uiStore.closeBlankContentTool()
     }
+  }
+
+  componentWillUnmount() {
+    const { uiStore } = this.props
+    uiStore.setViewingCollection(null)
   }
 
   get isHomepage() {
@@ -85,11 +72,12 @@ class CollectionPage extends PageWithApi {
     if (!collection.collection_cards.length) {
       uiStore.openBlankContentTool()
     }
+    uiStore.setViewingCollection(collection)
   }
 
   showObjectRoleDialog = () => {
     const { uiStore } = this.props
-    uiStore.openRolesMenu()
+    uiStore.update('rolesMenuOpen', true)
   }
 
   updateCollection = () => {
@@ -134,6 +122,7 @@ class CollectionPage extends PageWithApi {
                   <PageMenu
                     record={collection}
                     menuOpen={uiStore.pageMenuOpen}
+                    canEdit={collection.can_edit}
                   />
                 </Fragment>
               }
@@ -141,7 +130,7 @@ class CollectionPage extends PageWithApi {
           </StyledTitleAndRoles>
         </Header>
         <PageContainer>
-          <RolesMenu
+          <Roles
             collectionId={collection.id}
             roles={collection.roles}
           />
@@ -154,6 +143,7 @@ class CollectionPage extends PageWithApi {
             canEditCollection={collection.can_edit}
             // Pass in cardIds so grid will re-render when they change
             cardIds={collection.cardIds}
+            // Pass in BCT state so grid will re-render when open/closed
             blankContentToolState={uiStore.blankContentToolState}
           />
         </PageContainer>

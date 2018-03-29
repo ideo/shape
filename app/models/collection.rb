@@ -50,7 +50,8 @@ class Collection < ApplicationRecord
   def search_data
     {
       name: name,
-      tags: tags.map(&:name),
+      tags: all_tag_names,
+      item_tags: items.map(&:tags).flatten.map(&:name),
       content: search_content,
       organization_id: organization_id,
       user_ids: (editor_ids + viewer_ids).uniq,
@@ -58,7 +59,12 @@ class Collection < ApplicationRecord
     }
   end
 
+  def all_tag_names
+    (tag_list + items.map(&:tag_list)).uniq
+  end
+
   def search_content
+    # TODO: indexing private sub-content differently?
     # Current functionality for getting a collection's searchable "text content":
     # - go through all items in the collection
     # - for TextItems, grab the first 200 characters of their content
@@ -76,6 +82,9 @@ class Collection < ApplicationRecord
 
   amoeba do
     enable
+    exclude_association :tags
+    exclude_association :taggings
+    exclude_association :tag_taggings
     exclude_association :roles
     exclude_association :collection_cards
     exclude_association :items
@@ -87,6 +96,12 @@ class Collection < ApplicationRecord
     # Clones collection and all embedded items/collections
     c = amoeba_dup
     c.cloned_from = self
+    c.tag_list = tag_list
+
+    # save the dupe collection first so that we can reference it later
+    # return if it didn't work for whatever reason
+    return c unless c.save
+    c.parent_collection_card.save if c.parent_collection_card.present?
 
     if copy_parent_card && parent_collection_card.present?
       c.parent_collection_card = parent_collection_card.duplicate!(
@@ -102,14 +117,11 @@ class Collection < ApplicationRecord
 
     collection_cards.each do |collection_card|
       next unless collection_card.record.can_view?(for_user)
-      c.collection_cards << collection_card.duplicate!(for_user: for_user)
+      collection_card.duplicate!(for_user: for_user, parent: c)
     end
 
-    if c.save && c.parent_collection_card.present?
-      c.parent_collection_card.save
-    end
-
-    c
+    # pick up newly created relationships
+    c.reload
   end
 
   def parent
@@ -142,6 +154,13 @@ class Collection < ApplicationRecord
     cached_cards ||= collection_cards.includes(:items, :collections)
     cached_cards.select do |collection_card|
       collection_card.record.can_view?(user)
+    end
+  end
+
+  # convenience method if card order ever gets out of sync
+  def reorder_cards
+    collection_cards.each_with_index do |card, i|
+      card.update_attribute(:order, i)
     end
   end
 

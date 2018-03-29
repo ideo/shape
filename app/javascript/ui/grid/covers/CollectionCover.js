@@ -10,8 +10,8 @@ import hexToRgba from '~/utils/hexToRgba'
 const StyledCollectionCover = styled.div`
   width: 100%;
   height: 100%;
-  background: ${v.colors.cloudy};
-  color: ${v.colors.blackLava};
+  background: ${props => (props.isSharedCollection ? v.colors.sirocco : v.colors.cloudy)};
+  color: white;
   position: relative;
   overflow: hidden;
   ${props => (props.url && `
@@ -91,7 +91,10 @@ class CollectionCover extends React.Component {
     const { gridW, gutter } = uiStore.gridSettings
 
     return (
-      <StyledCollectionCover url={cover.image_url}>
+      <StyledCollectionCover
+        url={cover.image_url}
+        isSharedCollection={collection.isSharedCollection}
+      >
         <StyledCardContent
           height={height}
           width={width}

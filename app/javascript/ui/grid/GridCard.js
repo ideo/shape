@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types'
 import { PropTypes as MobxPropTypes } from 'mobx-react'
+import _ from 'lodash'
 import styled from 'styled-components'
 
 import GridCardHotspot from '~/ui/grid/GridCardHotspot'
@@ -12,6 +13,7 @@ import CollectionIcon from '~/ui/icons/CollectionIcon'
 import LinkedCollectionIcon from '~/ui/icons/LinkedCollectionIcon'
 import LinkIcon from '~/ui/icons/LinkIcon'
 import CardMenu from '~/ui/grid/CardMenu'
+import SelectionCircle from '~/ui/grid/SelectionCircle'
 import v, { ITEM_TYPES } from '~/utils/variables'
 
 export const StyledGridCard = styled.div`
@@ -43,6 +45,13 @@ const StyledGridCardInner = styled.div`
   height: 100%;
   overflow: hidden;
   z-index: 1;
+  /*
+  // related to userSelectHack from Rnd / Draggable
+  // disable blue text selection on Draggables
+  // https://github.com/bokuweb/react-rnd/issues/199
+  */
+  *::-moz-selection {background: transparent;}
+  *::selection {background: transparent;}
 `
 StyledGridCardInner.displayName = 'StyledGridCardInner'
 
@@ -61,28 +70,14 @@ export const StyledTopRightActions = styled.div`
 `
 StyledTopRightActions.displayName = 'StyledTopRightActions'
 
-const StyledSelectionCircle = styled.div`
-  display: inline-block;
-  vertical-align: top;
-  width: 14px;
-  height: 14px;
-  border-radius: 14px;
-  border: 1px solid ${v.colors.gray};
-  margin: 5px;
-  &.selected {
-    border-color: ${v.colors.blackLava};
-    background-color: ${v.colors.blackLava};
-  }
-`
-StyledSelectionCircle.displayName = 'StyledSelectionCircle'
-
 class GridCard extends React.Component {
-  state = {
-    selected: false,
-  }
-
   get canEdit() {
     return this.props.record.can_edit
+  }
+
+  get canReplace() {
+    const { record } = this.props
+    return (this.isItem && _.includes([ITEM_TYPES.IMAGE, ITEM_TYPES.VIDEO], record.type))
   }
 
   get isItem() {
@@ -144,30 +139,14 @@ class GridCard extends React.Component {
     )
   }
 
-  get renderSelectionCircle() {
-    if (!this.canEdit) return ''
-    return (
-      <StyledSelectionCircle
-        className={this.state.selected ? 'selected' : ''}
-        onClick={this.toggleSelected}
-        role="button"
-      />
-    )
-  }
-
-  toggleSelected = () => {
-    this.setState({
-      selected: !this.state.selected
-    })
-  }
-
-  shareCard = () => {
-    // console.log('Share card')
-  }
-
   duplicateCard = () => {
     const { card } = this.props
     card.API_duplicate()
+  }
+
+  replaceCard = () => {
+    const { card } = this.props
+    card.beginReplacing()
   }
 
   linkCard = () => {
@@ -198,14 +177,18 @@ class GridCard extends React.Component {
           once we have appropriate actions?
         */}
         {!this.props.isSharedCollection &&
-          <StyledTopRightActions className="show-on-hover">
-            {this.renderSelectionCircle}
+          <StyledTopRightActions className="">
+            {this.canEdit &&
+              <SelectionCircle cardId={this.props.card.id} />
+            }
             <CardMenu
-              className="card-menu"
+              className="show-on-hover card-menu"
               cardId={this.props.card.id}
               canEdit={this.canEdit}
+              canReplace={this.canReplace}
               menuOpen={this.props.menuOpen}
               handleDuplicate={this.duplicateCard}
+              handleReplace={this.replaceCard}
               handleLink={this.linkCard}
               handleMove={this.moveCard}
               handleArchive={this.archiveCard}

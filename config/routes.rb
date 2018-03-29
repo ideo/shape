@@ -21,6 +21,7 @@ Rails.application.routes.draw do
         resources :items, shallow: true, except: :index do
           member do
             post 'duplicate'
+            patch 'archive'
           end
           resources :roles, only: %i[index create]
         end
