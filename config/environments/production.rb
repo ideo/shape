@@ -1,3 +1,4 @@
+
 Rails.application.configure do
    config.webpacker.check_yarn_integrity = false  # Settings specified here will take precedence over those in config/application.rb.
 
@@ -115,7 +116,8 @@ Rails.application.configure do
 
   # redirect all URLs that do not match OKTA_BASE_URL
   config.middleware.insert_before(Rack::Runtime, Rack::Rewrite) do
-    r301 %r{.*}, "//#{app_uri.host}$&", if: Proc.new { |rack_env|
+    uri = URI.parse(ENV['OKTA_BASE_URL'])
+    r301 %r{.*}, "//#{uri.host}$&", if: Proc.new { |rack_env|
       rack_env['SERVER_NAME'] != uri.host
     }
   end
