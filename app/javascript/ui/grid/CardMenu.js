@@ -8,6 +8,13 @@ import ReplaceIcon from '~/ui/icons/ReplaceIcon'
 import MoveIcon from '~/ui/icons/MoveIcon'
 import LinkIcon from '~/ui/icons/LinkIcon'
 
+function cancelMoving(wrapped) {
+  return function() {
+    uiStore.closeMoveMenu()
+    return wrapped()
+  }
+}
+
 class CardMenu extends React.PureComponent {
   get cardId() {
     return this.props.cardId
@@ -37,9 +44,9 @@ class CardMenu extends React.PureComponent {
 
     if (canEdit) {
       items = items.concat([
-        { name: 'Move', icon: <MoveIcon />, onClick: this.props.handleMove },
-        { name: 'Link', icon: <LinkIcon />, onClick: this.props.handleLink },
-        { name: 'Archive', icon: <ArchiveIcon />, onClick: this.props.handleArchive },
+        { name: 'Move', icon: <MoveIcon />, onClick: cancelMoving(this.props.handleMove) },
+        { name: 'Link', icon: <LinkIcon />, onClick: cancelMoving(this.props.handleLink) },
+        { name: 'Archive', icon: <ArchiveIcon />, onClick: cancelMoving(this.props.handleArchive) },
       ])
     }
 
