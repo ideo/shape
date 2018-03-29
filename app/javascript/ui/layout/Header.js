@@ -1,13 +1,14 @@
 import PropTypes from 'prop-types'
 import styled from 'styled-components'
+import { action } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import { Flex, Box } from 'reflexbox'
 
 import Logo from '~/ui/layout/Logo'
 import PlainLink from '~/ui/global/PlainLink'
 import SearchBar from '~/ui/layout/SearchBar'
-import OrganizationAvatar from '~/ui/organizations/OrganizationAvatar'
-import UserAvatar from '~/ui/users/UserAvatar'
+import Avatar from '~/ui/global/Avatar'
+import { uiStore } from '~/stores'
 import v from '~/utils/variables'
 
 const StyledHeader = styled.header`
@@ -27,9 +28,14 @@ const MaxWidthContainer = styled.div`
 @inject('apiStore')
 @observer
 class Header extends React.Component {
+  @action handleOrgClick = (ev) => {
+    uiStore.update('organizationMenuOpen', true)
+  }
+
   render() {
     const { apiStore, children } = this.props
     const { currentUser } = apiStore
+    const primaryGroup = currentUser.current_organization.primary_group
     return (
       <StyledHeader>
         <MaxWidthContainer>
@@ -43,10 +49,18 @@ class Header extends React.Component {
 
             <Box flex>
               <SearchBar />
-              <OrganizationAvatar
-                organization={currentUser.current_organization}
+              <button onClick={this.handleOrgClick}>
+                <Avatar
+                  title={primaryGroup.name}
+                  url={primaryGroup.filestack_file_url}
+                  className="organizationAvatar"
+                />
+              </button>
+              <Avatar
+                title={currentUser.name}
+                url={currentUser.pic_url_square}
+                className="userAvatar"
               />
-              <UserAvatar user={currentUser} />
             </Box>
           </Flex>
 

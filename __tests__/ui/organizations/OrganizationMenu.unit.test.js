@@ -19,7 +19,12 @@ const uiStore = observable({
 const props = {
   uiStore,
   organization: {
-    name: 'Space'
+    name: 'Space',
+    primary_group: {
+      name: 'Space',
+      handle: 'space',
+      filestack_file_url: 'space.jpg',
+    }
   },
   userGroups: [{ id: 1, name: 'testgroup', }]
 }

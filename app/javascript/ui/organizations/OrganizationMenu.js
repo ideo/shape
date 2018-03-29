@@ -6,7 +6,6 @@ import { Heading3, DisplayText } from '~/ui/global/styled/typography'
 import Modal from '~/ui/global/Modal'
 import GroupModify from '~/ui/groups/GroupModify'
 import RolesMenu from '~/ui/roles/RolesMenu'
-import OrganizationEdit from './OrganizationEdit'
 
 @inject('apiStore', 'uiStore')
 @observer
@@ -35,6 +34,7 @@ class OrganizationMenu extends React.Component {
   }
 
   @action onModifyGroupRoles(group) {
+    this.editOrganizationOpen = false
     this.editGroup = group
     this.modifyGroupRoles = true
   }
@@ -50,6 +50,8 @@ class OrganizationMenu extends React.Component {
 
   @action onOrganizationSave = () => {
     this.editOrganizationOpen = false
+    this.modifyGroupOpen = false
+    this.modifyGroupRoles = false
   }
 
   @action changeModifyGroup(group) {
@@ -84,7 +86,7 @@ class OrganizationMenu extends React.Component {
     this.changeModifyGroup(group)
   }
 
-  handleGroupRolesClick = (group) => {
+  handleGroupRolesClick = group => () => {
     this.onModifyGroupRoles(group)
   }
 
@@ -108,7 +110,7 @@ class OrganizationMenu extends React.Component {
     return (
       <GroupModify
         group={this.editGroup}
-        onGroupRoles={this.handleGroupRolesClick}
+        onGroupRoles={this.handleGroupRolesClick(this.editGroup)}
         onSave={this.onGroupSave}
       />
     )
