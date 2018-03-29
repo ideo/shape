@@ -22,9 +22,15 @@ module ColabImport
       @item.errors
     end
 
+    def url
+      @data['source']
+    end
+
     private
 
     def create_image_item
+      return if !UrlExists.new(image_url).call
+
       @item = Item::ImageItem.create(
         name: name,
         filestack_file: FilestackFile.create_from_url(url)
@@ -44,10 +50,6 @@ module ColabImport
     # All 'types' seemed to be image or video
     def type
       @data['type']
-    end
-
-    def url
-      @data['source']
     end
 
     def name

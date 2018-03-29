@@ -55,19 +55,25 @@ module ColabImport
       @media_items.all? do |item|
         create_item = CreateMediaItem.new(data: item)
 
-        unless create_item.call
-          raise "Could not create image item on card: #{create_item.errors.full_messages.join('. ')}"
-        end
+        # Skip if url no longer exists
+        if UrlExists.new(create_item.url).call
 
-        builder = CollectionCardBuilder.new(
-          params: { item_id: create_item.item.id, order: order += 1 },
-          parent_collection: @collection,
-        )
-        unless builder.create
-          raise "Could not create card for media: #{builder.errors.full_messages.join('. ')}"
-        end
+          unless create_item.call
+            raise "Could not create image item on card: #{create_item.errors.full_messages.join('. ')}"
+          end
 
-        true
+          builder = CollectionCardBuilder.new(
+            params: { item_id: create_item.item.id, order: order += 1 },
+            parent_collection: @collection,
+          )
+          unless builder.create
+            raise "Could not create card for media: #{builder.errors.full_messages.join('. ')}"
+          end
+
+          true
+        else
+          true
+        end
       end
     end
 
@@ -98,12 +104,18 @@ module ColabImport
 
     # Hero Image
     def update_card_1(card)
+      return true if image_url.blank?
+
       # TODO: what if image url doesn't exist? - may need to test
       # -KbLPoqNXmZDF-QUJgYo it doesn't
-      card.item.update_attributes(
-        name: image_alt,
-        filestack_file: FilestackFile.create_from_url(image_url),
-      )
+      if UrlExists.new(image_url).call
+        card.item.update_attributes(
+          name: image_alt,
+          filestack_file: FilestackFile.create_from_url(image_url),
+        )
+      else
+        true
+      end
     end
 
     # Links + github url
