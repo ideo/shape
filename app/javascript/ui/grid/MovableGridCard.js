@@ -80,9 +80,8 @@ class MovableGridCard extends React.PureComponent {
     if (Math.abs(x - position.xPos) + Math.abs(y - position.yPos) < 10) {
       return
     }
-    uiStore.deselectCards()
     if (!this.state.dragging) {
-      uiStore.closeBlankContentTool()
+      uiStore.resetSelectionAndBCT()
       this.setState({
         dragging: true,
         moveComplete: false,
@@ -113,6 +112,10 @@ class MovableGridCard extends React.PureComponent {
     uiStore.deselectCards()
     uiStore.closeBlankContentTool()
     uiStore.closeMoveMenu()
+    if (!this.state.resizing) {
+      this.setState({ resizing: true, moveComplete: false })
+      uiStore.resetSelectionAndBCT()
+    }
     const { gridW, gridH, cols } = uiStore.gridSettings
     const { card } = this.props
     // e.g. if card.width is 4, but we're at 2 columns, max out at cardWidth = 2
@@ -120,9 +123,6 @@ class MovableGridCard extends React.PureComponent {
     const newSize = {
       width: cardWidth + Math.floor((delta.width + 200) / gridW),
       height: card.height + Math.floor((delta.height + 200) / gridH),
-    }
-    if (!this.state.resizing) {
-      this.setState({ resizing: true, moveComplete: false })
     }
     newSize.width = Math.max(newSize.width, 1)
     newSize.height = Math.max(newSize.height, 1)
