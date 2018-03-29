@@ -16,7 +16,7 @@ module ColabImport
 
     def call(only_uids = [])
       concepts_to_copy = concepts_by_session(only_uids)
-      create_root_collection!
+      create_root_collection
       assign_roles_to_root
       create_collections_for_concepts(concepts_to_copy)
       @root_collection
@@ -27,14 +27,14 @@ module ColabImport
     def create_collections_for_concepts(concepts_by_session)
       concepts_by_session.each do |session_name, concepts|
         # Create collection for session
-        session_collection = create_session_collection!(session_name)
+        session_collection = create_session_collection(session_name)
 
         concepts.each do |concept|
           # Clone the template for this sub-collection
-          cloned = clone_template!
+          cloned = clone_template
 
           # Create the card for this sub-collection
-          card = create_collection_card!(parent: session_collection, collection: cloned)
+          card = create_collection_card(parent: session_collection, collection: cloned)
 
           # Create card for this subcollection
           puts "Adding concept: #{concept['uid']} - #{concept['title']}"
@@ -55,7 +55,7 @@ module ColabImport
       end
     end
 
-    def create_root_collection!
+    def create_root_collection
       collection = Collection.create(
         organization: @organization,
         name: "Concept Database - #{Time.now.to_s}",
@@ -68,7 +68,7 @@ module ColabImport
       @root_collection = collection
     end
 
-    def create_session_collection!(name)
+    def create_session_collection(name)
       collection = Collection.create(
         organization: @organization,
         name: name,
@@ -91,7 +91,7 @@ module ColabImport
       collection
     end
 
-    def create_collection_card!(parent:, collection:)
+    def create_collection_card(parent:, collection:)
       card = CollectionCardBuilder.new(
         params: { collection_id: collection.id },
         parent_collection: parent,
@@ -121,7 +121,7 @@ module ColabImport
       end
     end
 
-    def clone_template!
+    def clone_template
       collection = @template_collection.duplicate!(
         for_user: @editor,
         copy_parent_card: false,

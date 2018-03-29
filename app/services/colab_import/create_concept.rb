@@ -11,7 +11,8 @@ module ColabImport
       update_collection_cards_with_data &&
         create_and_add_media &&
         update_name &&
-        add_tags
+        add_tags &&
+        recalculate_breadcrumbs
     end
 
     def uid
@@ -75,6 +76,13 @@ module ColabImport
           true
         end
       end
+    end
+
+    def recalculate_breadcrumbs
+      @collection.reload
+      @collection.recalculate_breadcrumb!
+      @collection.items.each(&:recalculate_breadcrumb!)
+      true
     end
 
     def update_collection_cards_with_data
