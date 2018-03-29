@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180320003745) do
+ActiveRecord::Schema.define(version: 20180329014550) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -152,11 +152,11 @@ ActiveRecord::Schema.define(version: 20180320003745) do
     t.index ["uid"], name: "index_users_on_uid"
   end
 
-  create_table "users_roles", force: :cascade do |t|
+  create_table "users_roles", id: :serial, force: :cascade do |t|
     t.bigint "user_id"
     t.bigint "role_id"
     t.index ["role_id"], name: "index_users_roles_on_role_id"
-    t.index ["user_id", "role_id"], name: "index_users_roles_on_user_id_and_role_id"
+    t.index ["user_id", "role_id"], name: "index_users_roles_on_user_id_and_role_id", unique: true
     t.index ["user_id"], name: "index_users_roles_on_user_id"
   end
 
