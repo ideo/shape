@@ -18,22 +18,22 @@ RSpec.describe CollectionCard, type: :model do
       end
     end
 
-    describe '#card_is_only_non_reference' do
+    describe '#card_is_only_non_link' do
       context 'with item' do
         let!(:collection_card) { create(:collection_card_text) }
         # parent_collection_card relationship gets cached without a reload
         let(:item) { collection_card.item.reload }
 
-        it 'should add error if item already has non-reference card' do
+        it 'should add error if item already has non-link card' do
           card = build(:collection_card_text, item: item)
-          expect(card.reference?).to be false
+          expect(card.link?).to be false
           expect(card.valid?).to be false
           expect(card.errors[:item]).to include('already has a primary card')
         end
 
-        it 'should be valid if using reference card' do
-          card = build(:collection_card_text, :reference, item: item)
-          expect(card.reference?).to be true
+        it 'should be valid if using link card' do
+          card = build(:collection_card_link_text, item: item)
+          expect(card.link?).to be true
           expect(card.valid?).to be true
         end
       end
@@ -42,16 +42,16 @@ RSpec.describe CollectionCard, type: :model do
         let!(:collection_card) { create(:collection_card_collection) }
         let!(:collection) { collection_card.collection.reload }
 
-        it 'should add error if collection already has non-reference card' do
+        it 'should add error if collection already has non-link card' do
           card = build(:collection_card_collection, collection: collection)
-          expect(card.reference?).to be false
+          expect(card.link?).to be false
           expect(card.valid?).to be false
           expect(card.errors[:collection]).to include('already has a primary card')
         end
 
-        it 'should be valid if using reference card' do
-          card = build(:collection_card_collection, :reference, collection: collection)
-          expect(card.reference?).to be true
+        it 'should be valid if using link card' do
+          card = build(:collection_card_link_collection, collection: collection)
+          expect(card.link?).to be true
           expect(card.valid?).to be true
         end
       end

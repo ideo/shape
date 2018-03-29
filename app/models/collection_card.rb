@@ -5,20 +5,25 @@ class CollectionCard < ApplicationRecord
 
   belongs_to :parent, class_name: 'Collection'
 
-  # TODO: Need to refactor CollectionCards to have a subclass e.g. CollectionCard::LinkedCollectionCard
-  # Currently this `collection` vs. `referenced_collection` doesn't exactly work because there's nothing
-  # differentiating the two relationships.
-  belongs_to :collection, optional: true, inverse_of: :parent_collection_card
-  belongs_to :item, optional: true, inverse_of: :parent_collection_card
-  belongs_to :referenced_item, class_name: 'Item', optional: true, inverse_of: :reference_collection_cards, foreign_key: 'item_id'
-  belongs_to :referenced_collection, class_name: 'Collection', optional: true, inverse_of: :reference_collection_cards, foreign_key: 'collection_id'
+  # # TODO: Need to refactor CollectionCards to have a subclass e.g. CollectionCard::LinkedCollectionCard
+  # # Currently this `collection` vs. `referenced_collection` doesn't exactly work because there's nothing
+  # # differentiating the two relationships.
+  # belongs_to :referenced_item, class_name: 'Item', optional: true, inverse_of: :reference_collection_cards, foreign_key: 'item_id'
+  # belongs_to :referenced_collection, class_name: 'Collection', optional: true, inverse_of: :reference_collection_cards, foreign_key: 'collection_id'
+
+  belongs_to :collection,
+             optional: true
+  belongs_to :item,
+             optional: true
+  # this really is only appropriate for CollectionCard::Primary but defined globally here
+  accepts_nested_attributes_for :collection, :item
 
   before_validation :assign_order, if: :assign_order?
   before_create :assign_default_height_and_width
 
   validates :parent, :order, presence: true
   validate :single_item_or_collection_is_present
-  validate :card_is_only_primary_card, if: :check_if_primary_card_is_unique?
+
   validate :parent_is_not_readonly, on: :create
 
   delegate :can_edit?, to: :parent, allow_nil: true
@@ -27,8 +32,6 @@ class CollectionCard < ApplicationRecord
   scope :primary, -> { where(reference: false) }
   scope :reference, -> { where(reference: true) }
   scope :ordered, -> { order(order: :asc) }
-
-  accepts_nested_attributes_for :collection, :item
 
   amoeba do
     enable
@@ -67,7 +70,11 @@ class CollectionCard < ApplicationRecord
   end
 
   def primary?
-    !reference
+    is_a? CollectionCard::Primary
+  end
+
+  def link?
+    is_a? CollectionCard::Link
   end
 
   # Increment the order by 1 of all cards >= specified order
@@ -121,21 +128,15 @@ class CollectionCard < ApplicationRecord
     self.order = parent.collection_cards.maximum(:order) || 0
   end
 
+  def resourceable_class
+    # Use top-level class since this is an STI model
+    Item
+  end
+
   def single_item_or_collection_is_present
     return unless item.present? && collection.present?
 
     errors.add(:base, 'Only one of Item or Collection can be assigned')
-  end
-
-  def check_if_primary_card_is_unique?
-    !reference? && (new_record? || reference_changed?)
-  end
-
-  def card_is_only_primary_card
-    # look for an existing primary CollectionCard that is already pointed to this record
-    if record.present? && record.persisted? && CollectionCard.primary.where("#{record_type}_id": record.id).count.positive?
-      errors.add(record_type, 'already has a primary card')
-    end
   end
 
   def parent_is_not_readonly
