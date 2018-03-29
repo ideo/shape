@@ -24,7 +24,7 @@ gem 'puma', '~> 3.11'
 gem 'sass-rails', '~> 5.0'
 # gem 'bourbon', '~> 5.0.0'
 gem 'autoprefixer-rails'
-gem "normalize-rails", "~> 4.1"
+gem 'normalize-rails', '~> 4.1'
 
 # Use Uglifier as compressor for JavaScript assets
 gem 'uglifier', '>= 1.3.0'
@@ -66,13 +66,13 @@ gem 'searchkick', '~> 3.0.0'
 gem 'acts-as-taggable-on'
 
 # middleware for 301 redirects
-gem "rack-rewrite", "~> 1.5"
+gem 'rack-rewrite', '~> 1.5'
 
 # Filestack API Wrapper
 gem 'filestack'
 
 # inline styles for email
-gem "roadie-rails", "~> 1.2"
+gem 'roadie-rails', '~> 1.2'
 
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
