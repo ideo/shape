@@ -49,7 +49,6 @@ Rails.application.routes.draw do
         end
         resources :roles, only: %i[destroy]
       end
-
       get :search, to: 'search#search', as: :search
     end
   end
@@ -59,8 +58,13 @@ Rails.application.routes.draw do
     mount Sidekiq::Web => '/sidekiq'
   end
 
+  get 'invitations/:token', to: 'invitations#accept', as: :accept_invitation
+
   root to: 'home#index'
   get :login, to: 'home#login', as: :login
+
+  # catch all mailer preview paths
+  get '/rails/mailers/*path' => 'rails/mailers#preview'
 
   # catch all HTML route requests, send to frontend
   get '*path', to: 'home#index', constraints: ->(req) { req.format == :html || req.format == '*/*' }
