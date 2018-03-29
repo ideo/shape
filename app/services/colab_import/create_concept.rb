@@ -50,6 +50,8 @@ module ColabImport
     def create_and_add_media
       return true unless @media_items.present?
 
+      order = collection_cards.last.order
+
       @media_items.all? do |item|
         create_item = CreateMediaItem.new(data: item)
 
@@ -58,7 +60,7 @@ module ColabImport
         end
 
         builder = CollectionCardBuilder.new(
-          params: { item_id: create_item.item.id },
+          params: { item_id: create_item.item.id, order: order += 1 },
           parent_collection: @collection,
         )
         unless builder.create
@@ -90,49 +92,53 @@ module ColabImport
 
     # Desc
     def update_card_0(card)
-      html_elements = ["<p>#{description}</p>"]
-      update_text_item(card.item, html_elements)
+      text_ops = build_text_operations(content: description)
+      update_text_item(card.item, text_ops)
     end
 
     # Hero Image
     def update_card_1(card)
       card.item.update_attributes(
         name: image_alt,
-        filestack_file: FilestackFile.first # FilestackFile.create_from_url(image_url),
+        filestack_file: FilestackFile.create_from_url(image_url),
       )
     end
 
     # Links + github url
     def update_card_2(card)
-      html_elements = ["<h3>Links></h3>"]
-      html_elements += links.map do |title, url|
-        "<p><a href=\"#{url}\">#{title}</a></p>"
+      text_ops = build_text_operations(content: 'Links', header: true)
+      links.each do |title, url|
+        text_ops += build_text_operations(content: title, url: url)
       end
       if github_url.present?
         # Note: this may be other urls, like drive or dropbox
-        html_elements << "<p><a href=\"#{github_url}\">#{github_url}</a></p>"
+        text_ops += build_text_operations(content: github_url, url: github_url)
       end
-      update_text_item(card.item, html_elements)
+      update_text_item(card.item, text_ops)
     end
 
     # How might we
     def update_card_3(card)
-      html_elements = ["<h3>#{how_might_we}</h3>"]
-      update_text_item(card.item, html_elements)
+      # Add three newlines above text
+      text_ops = 3.times.map { build_text_operations }.flatten
+      text_ops += build_text_operations(content: how_might_we, header: true)
+      update_text_item(card.item, text_ops)
     end
 
     # What did we learn?
     def update_card_4(card)
-      html_elements = ['<h3>What Did We Learn?</h3>']
-      html_elements += insights.map { |insight| "<p>#{insight}</p>" }
-      update_text_item(card.item, html_elements)
+      text_ops = build_text_operations(content: 'What Did We Learn?', header: true)
+      insights.each do |insight|
+        text_ops += build_text_operations(content: insight)
+      end
+      update_text_item(card.item, text_ops)
     end
 
     # Why did we build it?
     def update_card_5(card)
-      html_elements = ['<h3>Why Did We Build It?</h3>']
-      html_elements << "<p>#{why_did_we_build_it}</p>"
-      update_text_item(card.item, html_elements)
+      text_ops = build_text_operations(content: 'Why Did We Build It?', header: true)
+      text_ops += build_text_operations(content: why_did_we_build_it)
+      update_text_item(card.item, text_ops)
     end
 
     # Video
@@ -151,22 +157,57 @@ module ColabImport
 
     # The Story
     def update_card_7(card)
-      html_elements = ['<h3>The Story</h3>', "<p>#{content_body}</p>"]
-      update_text_item(card.item, html_elements)
+      text_ops = build_text_operations(content: 'The Story', header: true)
+      text_ops += build_text_operations(content: content_body)
+      update_text_item(card.item, text_ops)
     end
 
     # The Team
     def update_card_8(card)
-      html_elements = ['<h3>Team</h3>']
-      html_elements += team_member_names.map { |name| "<p>#{name}</p>" }
-      update_text_item(card.item, html_elements)
+      text_ops = build_text_operations(content: 'Team', header: true)
+      team_member_names.each do |name|
+        text_ops += build_text_operations(content: name)
+      end
+      update_text_item(card.item, text_ops)
     end
 
-    def update_text_item(item, html_elements)
-      item.content = html_elements.join('')
-      inserts = html_elements.map { |html| { 'insert': html } }
-      item.text_data = { 'ops': inserts }
+    def update_text_item(item, text_operations)
+      return true if text_operations.blank?
+      item.content = text_operations_to_html(text_operations)
+      item.text_data = { 'ops' => text_operations }
       item.save
+    end
+
+    def build_text_operations(content: nil, header: false, url: nil)
+      ops = []
+
+      if content.present?
+        content = { 'insert' => content }
+        content['attributes'] = { 'link' => url } if url.present?
+        ops << content
+      end
+
+      newline = { 'insert' => "\n" }
+      newline['attributes'] = { 'header' => 3 } if header
+      ops << newline
+
+      ops
+    end
+
+    def text_operations_to_html(text_operations)
+      text_operations.map do |op|
+        if op['insert'] == "\n"
+          nil
+        elsif op['attributes'].blank?
+          "<p>#{op['insert']}</p>"
+        elsif op['attributes']['header'].present?
+          "<h3>#{op['insert']}</h3>"
+        elsif op['attributes']['link'].present?
+          "<a href=\"#{op['attributes']['link']}\">#{op['insert']}</a>"
+        else
+          nil
+        end
+      end.compact.join("\n")
     end
 
     # e.g. BOS: Food + Future
@@ -211,7 +252,13 @@ module ColabImport
 
       # Links is an array, so build a hash
       @data['content']['links'].each_with_object({}) do |link, h|
-        h[link] = link
+        # Note: links can be malformed, and be title : url
+        if link.include?(': h')
+          title, url = link.split(' : ').map(&:strip)
+        else
+          title, url = [link, link]
+        end
+        h[title] = url
       end
     end
 
@@ -249,7 +296,7 @@ module ColabImport
     end
 
     def team_member_names
-      @data['team'].try(:values) || []
+      @data['team'] || []
     end
   end
 end

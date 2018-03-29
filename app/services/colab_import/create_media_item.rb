@@ -27,7 +27,7 @@ module ColabImport
     def create_image_item
       @item = Item::ImageItem.create(
         name: name,
-        filestack_file: FilestackFile.first, # FilestackFile.create_from_url(url)
+        filestack_file: FilestackFile.create_from_url(url)
       )
     end
 

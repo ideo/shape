@@ -18,6 +18,7 @@ module ColabImport
       concepts_to_copy = concepts_by_session(only_uids)
       create_root_collection!
       create_collections_for_concepts(concepts_to_copy)
+      assign_roles
       @root_collection
     end
 
@@ -77,14 +78,14 @@ module ColabImport
         raise_error("Failed to create collection named #{name}", collection)
       end
 
-      card = CollectionCardBuilder.new(
+      builder = CollectionCardBuilder.new(
         params: { collection_id: collection.id },
         parent_collection: @root_collection,
         user: @editor,
       )
 
-      unless card.create
-        raise_error("Failed to create card for session collection named #{name}", card)
+      unless builder.create
+        raise_error("Failed to create card for session collection named #{name}", builder.collection_card)
       end
 
       collection
@@ -102,6 +103,21 @@ module ColabImport
       end
 
       card
+    end
+
+    def assign_roles
+      # Copy roles from template collection to root and all children
+      @template_collection.roles.each do |role|
+        assign_role = Roles::AssignToUsers.new(
+          object: @root_collection,
+          role_name: role.name,
+          users: role.users,
+          propagate_to_children: true,
+        )
+        unless assign_role.call
+          raise "Could not assign role to items: #{role.name}"
+        end
+      end
     end
 
     def clone_template!
