@@ -249,4 +249,81 @@ describe Api::V1::CollectionCardsController, type: :request, auth: true do
       expect(json['data']['attributes']['id']).not_to eq(collection_card.id)
     end
   end
+
+  describe 'PATCH #move', :only do
+    let!(:from_collection) { create(:collection, num_cards: 3, add_editors: [user]) }
+    let!(:moving_cards) { from_collection.collection_cards.first(2) }
+    let!(:unmoved_card) { from_collection.collection_cards.last }
+    let(:path) { '/api/v1/collection_cards/move' }
+    let(:raw_params) do
+      {
+        from_id: from_collection.id,
+        to_id: to_collection.id,
+        collection_card_ids: moving_cards.map(&:id),
+        placement: 'beginning',
+      }
+    end
+    let(:params_at_end) { raw_params.merge(placement: 'end').to_json }
+    let(:params) { raw_params.to_json }
+
+    describe 'without manage access for to_collection' do
+      let(:to_collection) { create(:collection) }
+
+      it 'returns a 401' do
+        patch(path, params: params)
+        expect(response.status).to eq(401)
+      end
+    end
+
+    describe 'with manage access for to_collection' do
+      let(:editor) { create(:user) }
+      let(:viewer) { create(:user) }
+      let(:to_collection) do
+        create(:collection, num_cards: 3, add_editors: [user, editor], add_viewers: [viewer])
+      end
+
+      it 'returns a 200' do
+        patch(path, params: params)
+        expect(response.status).to eq(200)
+      end
+
+      it 'moves cards from one collection to the other' do
+        expect(moving_cards.map(&:parent_id).uniq).to match_array [from_collection.id]
+        patch(path, params: params)
+        expect(moving_cards.map(&:reload).map(&:parent_id).uniq).to match_array [to_collection.id]
+      end
+
+      it 'only moves specified cards' do
+        expect(unmoved_card.parent_id).to eq from_collection.id
+        patch(path, params: params)
+        expect(unmoved_card.reload.parent_id).to eq from_collection.id
+      end
+
+      it 'moves new cards to the front of the collection' do
+        patch(path, params: params)
+        combined_cards = to_collection.reload.collection_cards
+        # expect to find moved card at the front
+        expect(combined_cards.first).to eq moving_cards.first
+        # expect not to find moved cards at the end
+        expect(combined_cards.last).not_to eq moving_cards.last
+        expect(combined_cards.count).to eq 5
+      end
+
+      it 'moves new cards to the bottom of the collection if placement: end' do
+        patch(path, params: params_at_end)
+        combined_cards = to_collection.reload.collection_cards
+        # expect to find moved card at the end
+        expect(combined_cards.last).to eq moving_cards.last
+        # expect to find moved card at the end
+        expect(combined_cards.first).not_to eq moving_cards.first
+        expect(combined_cards.count).to eq 5
+      end
+
+      it 're-assigns permissions' do
+        patch(path, params: params)
+        expect(moving_cards.first.record.editors.last).to eq editor
+        expect(moving_cards.first.record.viewers.last).to eq viewer
+      end
+    end
+  end
 end

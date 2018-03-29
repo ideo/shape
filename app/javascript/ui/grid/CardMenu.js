@@ -35,17 +35,18 @@ class CardMenu extends React.PureComponent {
     }
     let items = [duplicateItem]
 
-    if (canReplace) {
-      items.push(
-        { name: 'Replace', icon: <ReplaceIcon />, onClick: this.props.handleReplace }
-      )
-    }
     if (canEdit) {
       items = items.concat([
         { name: 'Move', icon: <MoveIcon />, onClick: this.props.handleMove },
         { name: 'Link', icon: <LinkIcon />, onClick: this.props.handleLink },
         { name: 'Archive', icon: <ArchiveIcon />, onClick: this.props.handleArchive },
       ])
+    }
+
+    if (canReplace) {
+      items.push(
+        { name: 'Replace', icon: <ReplaceIcon />, onClick: this.props.handleReplace }
+      )
     }
     return items
   }

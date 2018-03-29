@@ -153,10 +153,6 @@ class GridCard extends React.Component {
     // console.log('Link card')
   }
 
-  moveCard = () => {
-    // console.log('Move card')
-  }
-
   archiveCard = () => {
     this.props.card.API_archive()
   }
@@ -190,7 +186,7 @@ class GridCard extends React.Component {
               handleDuplicate={this.duplicateCard}
               handleReplace={this.replaceCard}
               handleLink={this.linkCard}
-              handleMove={this.moveCard}
+              handleMove={this.props.onMoveStart}
               handleArchive={this.archiveCard}
             />
           </StyledTopRightActions>
@@ -215,6 +211,7 @@ GridCard.propTypes = {
   dragging: PropTypes.bool.isRequired,
   handleClick: PropTypes.func.isRequired,
   menuOpen: PropTypes.bool.isRequired,
+  onMoveStart: PropTypes.func.isRequired,
 }
 
 export default GridCard
