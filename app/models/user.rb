@@ -90,6 +90,12 @@ class User < ApplicationRecord
     collections.user.find_by_organization_id(current_organization_id)
   end
 
+  def current_org_groups
+    return nil if current_organization.blank?
+
+    current_organization.groups
+  end
+
   def viewable_collections_and_items(organization)
     Role.user_resources(
       user: self,
@@ -139,8 +145,13 @@ class User < ApplicationRecord
   end
 
   def add_role(role_name, resource = nil)
-    return rolify_add_role(role_name) if resource.blank?
-    rolify_add_role(role_name, resource.becomes(resource.resourceable_class))
+    # Rolify was super slow in adding roles once there became thousands,
+    # so we wrote our own method
+    # return rolify_add_role(role_name) if resource.blank?
+    # rolify_add_role(role_name, resource.becomes(resource.resourceable_class))
+    role = Role.find_or_create(role_name, resource)
+    role.users << self
+    role
   end
 
   def remove_role(role_name, resource = nil)

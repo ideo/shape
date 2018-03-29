@@ -201,7 +201,7 @@ describe Api::V1::CollectionsController, type: :request, auth: true do
   describe 'PATCH #update' do
     let!(:collection) { create(:collection, add_editors: [user]) }
     let(:collection_card) do
-      create(:collection_card_item, order: 0, width: 1, parent: collection)
+      create(:collection_card_text, order: 0, width: 1, parent: collection)
     end
     let(:path) { "/api/v1/collections/#{collection.id}" }
     let(:params) {
@@ -253,7 +253,7 @@ describe Api::V1::CollectionsController, type: :request, auth: true do
     # parent_collection_card is required to exist because it calls decrement_card_orders
     let!(:parent_collection_card) { create(:collection_card, collection: collection) }
     let(:collection_card) do
-      create(:collection_card_item, order: 0, width: 1, parent: collection)
+      create(:collection_card_text, order: 0, width: 1, parent: collection)
     end
     let(:path) { "/api/v1/collections/#{collection.id}/archive" }
 

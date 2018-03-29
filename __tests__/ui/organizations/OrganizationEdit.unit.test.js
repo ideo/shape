@@ -1,11 +1,12 @@
-import { observable, useStrict } from 'mobx'
+import { useStrict } from 'mobx'
 import OrganizationEdit from '~/ui/organizations/OrganizationEdit'
 
 const fakeMouseEvent = { preventDefault: jest.fn() }
 const props = {
   organization: {
     name: 'Space',
-    save: jest.fn(() => Promise.resolve({}))
+    save: jest.fn(() => Promise.resolve({})),
+    assign: jest.fn(),
   },
   onSave: jest.fn()
 }

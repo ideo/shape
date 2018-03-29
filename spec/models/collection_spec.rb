@@ -22,7 +22,7 @@ describe Collection, type: :model do
   describe '#inherit_parent_organization_id' do
     let!(:parent_collection) { create(:user_collection) }
     let!(:collection_card) { create(:collection_card, parent: parent_collection) }
-    let!(:collection) { create(:collection, name: 'fart', organization: nil, collection_cards: [collection_card]) }
+    let!(:collection) { create(:collection, name: 'New Collection', organization: nil, collection_cards: [collection_card]) }
 
     it 'inherits organization id from parent collection' do
       expect(collection.organization_id).to eq(parent_collection.organization_id)

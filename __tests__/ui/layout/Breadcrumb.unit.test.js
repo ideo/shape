@@ -22,11 +22,11 @@ describe('StyledBreadcrumb', () => {
   })
 
   it('renders each item as a link', () => {
-    expect(wrapper.find('StyledBreadcrumb > Link')).toHaveLength(4)
+    expect(wrapper.find('Link')).toHaveLength(4)
   })
 
   it('has My Collection, then all titles', () => {
-    const titles = wrapper.find('StyledBreadcrumb > Link').children().map(link => link.text())
+    const titles = wrapper.find('Link').children().map(link => link.text())
     expect(titles).toEqual(['My Collection', 'Outer Space', 'Earth', 'California'])
   })
 })

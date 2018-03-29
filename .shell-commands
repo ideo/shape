@@ -1,0 +1,82 @@
+#!/bin/sh
+
+# Include all these commands in your shell by adding this to ~/.bash_profile
+#   source ~/path-to-directory/shape/.shell-commands
+
+function shapecopydb {
+  if [ "$1" = "" ]; then
+    echo "Copies a sanitized version of the production database to another environment"
+    echo
+    echo "To create a new backup, first run:"
+    echo "  heroku pg:backups:capture -a shape-production"
+    echo
+    echo "Usage: shapecopydb <environment>"
+    echo
+    echo "  shapecopydb local"
+    echo "  shapecopydb staging"
+    echo "  shapecopydb development"
+  elif [ "$1" = "local" ]; then
+    echo "Attempting to drop the local database..."
+    if dropdb --if-exists shape_development
+    then
+      echo "Recreating the local database..." &&
+      createdb shape_development &&
+
+      echo "Downloading the latest dump..." &&
+      curl -o 'tmp/latest.dump' `heroku pg:backups public-url -a shape-production` &&
+
+      echo "Loading the dump..." &&
+      pg_restore --no-acl --no-owner --dbname shape_development tmp/latest.dump &&
+
+      echo "Migrating development and test databases..." &&
+      rake db:migrate &&
+      rake db:test:prepare
+      return 0
+    else
+      echo "Failed to drop local database."
+      return 1
+    fi
+  elif [ "$1" = "development" ] || [ "$1" = "staging" ]; then
+    echo "Loading the last backup into $1..." &&
+    heroku pg:backups restore `heroku pg:backups public-url -a shape-production` DATABASE_URL -a shape-$1 &&
+
+    echo "Migrating up..." &&
+    heroku run rake db:migrate -a shape-$1
+  elif [ "$1" = "review" ]; then
+    echo "Loading the last backup into review app" $2 "..." &&
+    heroku pg:backups restore `heroku pg:backups public-url -a shape-production` DATABASE_URL -a shape-development-pr-$2 &&
+
+    echo "Migrating up..." &&
+    heroku run rake db:migrate -a shape-development-pr-$2
+  fi
+}
+
+function shaperelease {
+  if [ "$1" = "" ]; then
+    echo "Usage: shaperelease new <version>"
+    echo
+    echo "Creates a new release branch off of development, pushes to Github, and creates a pull request"
+    echo
+    echo "  shaperelease new 1.0"
+    echo "  shaperelease new 21.12"
+  else
+    if [ "$1" = "new" ]; then
+      echo &&
+      echo "Checking out the latest development branch..." &&
+      git checkout development &&
+      git pull --rebase &&
+
+      echo &&
+      echo "Creating a release-$2 branch..." &&
+      git checkout -b release-$2 &&
+
+      echo &&
+      echo "Pushing up the release branch..." &&
+      git push -u origin head &&
+
+      echo &&
+      echo "Creating a pull request" &&
+      hub pull-request -b master -m "Release $2"
+    fi
+  fi
+}

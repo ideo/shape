@@ -279,6 +279,11 @@ class CollectionGrid extends React.Component {
         let nextX = 0
         // e.g. if card.width is 4, but we're at 2 columns, max out at cardWidth = 2
         const cardWidth = Math.min(cols, card.width)
+        // card.setMaxWidth won't be defined for blank/placeholder cards
+        if (card.setMaxWidth) {
+          // stored so we can refer to the current maxWidth in other components
+          card.setMaxWidth(cardWidth)
+        }
         // go through the row and see if there is an empty gap that fits card.w
         for (let x = 0; x < cols; x += 1) {
           if (matrix[row][x] === null) {
@@ -339,6 +344,12 @@ class CollectionGrid extends React.Component {
 
   renderPositionedCards = () => {
     const grid = []
+    const {
+      collection,
+      canEditCollection,
+      routingStore,
+      uiStore,
+    } = this.props
     // unnecessary? we seem to need to preserve the array order
     // in order to not re-draw divs (make transform animation work)
     // so that's why we do this second pass to actually create the divs in their original order
@@ -353,21 +364,23 @@ class CollectionGrid extends React.Component {
           cardType = card.record.getRecordType()
         }
       }
-      const { openCardMenuId } = this.props.uiStore
+      const { openCardMenuId } = uiStore
       grid.push(
         <MovableGridCard
           key={card.id}
           card={card}
           cardType={cardType}
-          canEditCollection={this.props.canEditCollection}
+          canEditCollection={canEditCollection}
+          isUserCollection={collection.isUserCollection}
+          isSharedCollection={collection.isSharedCollection}
           position={card.position}
           record={record}
           onDrag={this.onDrag}
           onMoveStop={this.onMoveStop}
           onResize={this.onResize}
           onResizeStop={this.onResizeStop}
-          routeTo={this.props.routingStore.routeTo}
-          parent={this.props.collection}
+          routeTo={routingStore.routeTo}
+          parent={collection}
           menuOpen={openCardMenuId === card.id}
         />
       )

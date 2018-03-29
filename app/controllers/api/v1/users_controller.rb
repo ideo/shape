@@ -10,11 +10,11 @@ class Api::V1::UsersController < Api::V1::BaseController
   end
 
   def show
-    render jsonapi: @user, include: %i[current_organization]
+    render jsonapi: @user, include: %i[current_organization groups]
   end
 
   def me
-    render jsonapi: current_user, include: %i[current_organization]
+    render jsonapi: current_user, include: %i[current_organization groups]
   end
 
   def search

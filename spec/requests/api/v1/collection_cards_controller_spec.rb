@@ -141,15 +141,16 @@ describe Api::V1::CollectionCardsController, type: :request, auth: true do
         json_api_params(
           'collection_cards',
           {
-            'order': 1,
-            'width': 3,
-            'height': 1,
+            order: 1,
+            width: 3,
+            height: 1,
             # parent_id is required to retrieve the parent collection without a nested route
-            'parent_id': collection.id,
-            'item_attributes': {
-              'type': 'Item::VideoItem',
-              'url': 'https://www.youtube.com/watch?v=4r7wHMg5Yjg',
-              'thumbnail_url': 'https://img.youtube.com/vi/4r7wHMg5Yjg/hqdefault.jpg',
+            parent_id: collection.id,
+            item_attributes: {
+              type: 'Item::VideoItem',
+              name: 'Youtube video',
+              url: 'https://www.youtube.com/watch?v=4r7wHMg5Yjg',
+              thumbnail_url: 'https://img.youtube.com/vi/4r7wHMg5Yjg/hqdefault.jpg',
             },
           }
         )
@@ -227,7 +228,7 @@ describe Api::V1::CollectionCardsController, type: :request, auth: true do
   end
 
   describe 'POST #duplicate' do
-    let!(:collection_card) { create(:collection_card_item, parent: collection) }
+    let!(:collection_card) { create(:collection_card_text, parent: collection) }
     let(:path) { "/api/v1/collection_cards/#{collection_card.id}/duplicate" }
 
     it 'returns a 200' do

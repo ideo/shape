@@ -5,9 +5,8 @@ import { withStyles } from 'material-ui/styles'
 import Input from 'material-ui/Input'
 import Chip from 'material-ui/Chip'
 import Select from 'react-select'
-import 'react-select/dist/react-select.css'
 
-import { AutocompleteOption as Option } from '~/ui/global/AutocompleteOption'
+import Option from '~/ui/global/AutocompleteOption'
 
 function SelectWrapped(props) {
   const { classes, ...other } = props
@@ -56,7 +55,7 @@ const ITEM_HEIGHT = 48
 const styles = theme => ({
   root: {
     flexGrow: 1,
-    height: 220,
+    height: 140,
   },
   chip: {
     margin: theme.spacing.unit / 4,
@@ -169,7 +168,7 @@ const styles = theme => ({
 class AutoComplete extends React.Component {
   constructor(props) {
     super(props)
-    this.fireInputChange = _.throttle(this._fireInputChange, 50)
+    this.fireInputChange = _.debounce(this._fireInputChange, 250)
   }
 
   state = {

@@ -120,7 +120,6 @@ class MovableGridCard extends React.PureComponent {
     }
     newSize.width = Math.max(newSize.width, 1)
     newSize.height = Math.max(newSize.height, 1)
-    // console.log(newSize)
     this.props.onResize(this.props.card.id, newSize)
   }
 
@@ -204,6 +203,8 @@ class MovableGridCard extends React.PureComponent {
       position: { yPos },
       menuOpen,
       canEditCollection,
+      isUserCollection,
+      isSharedCollection,
     } = this.props
 
     let {
@@ -262,6 +263,8 @@ class MovableGridCard extends React.PureComponent {
       handleClick: this.handleClick,
       menuOpen,
       canEditCollection,
+      isUserCollection,
+      isSharedCollection,
     }
 
     return (
@@ -334,6 +337,8 @@ MovableGridCard.propTypes = {
   card: MobxPropTypes.objectOrObservableObject.isRequired,
   cardType: PropTypes.string.isRequired,
   canEditCollection: PropTypes.bool.isRequired,
+  isUserCollection: PropTypes.bool.isRequired,
+  isSharedCollection: PropTypes.bool.isRequired,
   position: PropTypes.shape(propShapes.position).isRequired,
   record: MobxPropTypes.objectOrObservableObject.isRequired,
   parent: MobxPropTypes.objectOrObservableObject.isRequired,

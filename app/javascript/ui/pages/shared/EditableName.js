@@ -4,11 +4,14 @@ import styled from 'styled-components'
 import _ from 'lodash'
 
 import v from '~/utils/variables'
-import H1 from '~/ui/global/H1'
+import { Heading1 } from '~/ui/global/styled/typography'
 import ClickWrapper from '~/ui/layout/ClickWrapper'
 
 const StyledName = styled.div`
-  display: inline-block;
+  h1 {
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
 `
 StyledName.displayName = 'StyledName'
 
@@ -22,7 +25,8 @@ const StyledEditableName = styled.div`
       z-index: ${v.zIndex.aboveClickWrapper};
       position: relative;
       font-size: 2.25rem;
-      font-family: 'Gotham';
+      font-family: ${v.fonts.sans};
+      font-weight: ${v.weights.medium};
       letter-spacing: 0.125rem;
       padding: 0.15rem 0 0.5rem 0;
       background-color: transparent;
@@ -86,6 +90,7 @@ class EditableName extends React.Component {
       return (
         <StyledEditableName>
           <AutosizeInput
+            maxLength={40}
             className="input__name"
             style={{ fontSize: '2.25rem' }}
             value={name}
@@ -98,9 +103,11 @@ class EditableName extends React.Component {
     }
     return (
       <StyledName>
-        <H1
+        <Heading1
           onClick={canEdit ? this.startEditingName : null}
-        >{name}</H1>
+        >
+          {name}
+        </Heading1>
       </StyledName>
     )
   }

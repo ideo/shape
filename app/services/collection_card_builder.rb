@@ -1,11 +1,11 @@
 class CollectionCardBuilder
   attr_reader :collection_card, :errors
 
-  def initialize(params:, collection: nil, user: nil)
-    @collection_card = collection.collection_cards.build(params)
+  def initialize(params:, parent_collection: nil, user: nil)
+    @collection_card = parent_collection.collection_cards.build(params)
     @errors = @collection_card.errors
     @user = user
-    @collection = collection
+    @parent_collection = parent_collection
   end
 
   def create
@@ -26,6 +26,8 @@ class CollectionCardBuilder
         @collection_card.record.inherit_roles_from_parent!
         @collection_card.increment_card_orders!
         @collection_card.record.reload.recalculate_breadcrumb!
+        # mark the collection as recently updated
+        @parent_collection.touch
       end
     end
   end

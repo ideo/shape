@@ -3,6 +3,7 @@ import styled from 'styled-components'
 import { Link } from 'react-router-dom'
 
 import { routingStore } from '~/stores'
+import v from '~/utils/variables'
 
 const BreadcrumbPadding = styled.div`
   height: 1.7rem;
@@ -13,20 +14,31 @@ const StyledBreadcrumb = styled.div`
   margin-top: 0.5rem;
   height: 1.2rem;
   white-space: nowrap; /* better this way for responsive? */
-  a {
+  .crumb {
+    display: inline-block;
+    line-height: 1;
     font-size: 1rem;
-    font-weight: 100;
-    color: #9b9b9b;
+    margin-right: 0.5rem;
+    font-weight: ${v.weights.book};
+    color: ${v.colors.cloudy};
     letter-spacing: 1.5px;
     font-family: 'Gotham';
 
-    text-decoration: none;
-
-    &:last-child:after {
+    &::after {
+      position: relative;
+      top: -2px;
+      content: ' > ';
+    }
+    &:last-child::after {
       content: '';
     }
-    &:after {
-      content: ' > ';
+    a {
+      color: ${v.colors.cloudy};
+      text-decoration: none;
+      display: inline-block;
+      max-width: 200px;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
   }
 `
@@ -38,9 +50,11 @@ class Breadcrumb extends React.PureComponent {
     const [klass, id, name] = item
     const path = routingStore.pathTo(klass, id)
     return (
-      <Link key={path} to={path}>
-        {name}
-      </Link>
+      <span className="crumb" key={path}>
+        <Link to={path}>
+          {name}
+        </Link>
+      </span>
     )
   }
 
@@ -49,7 +63,9 @@ class Breadcrumb extends React.PureComponent {
     const links = items.map(item => this.breadcrumbItem(item))
     return (
       <StyledBreadcrumb>
-        <Link key="myCollection" to="/">My Collection</Link>
+        <span className="crumb" key="myCollection">
+          <Link to="/">My Collection</Link>
+        </span>
         {links}
       </StyledBreadcrumb>
     )

@@ -20,19 +20,19 @@ RSpec.describe CollectionCard, type: :model do
 
     describe '#card_is_only_non_reference' do
       context 'with item' do
-        let!(:collection_card) { create(:collection_card_item) }
+        let!(:collection_card) { create(:collection_card_text) }
         # parent_collection_card relationship gets cached without a reload
         let(:item) { collection_card.item.reload }
 
         it 'should add error if item already has non-reference card' do
-          card = build(:collection_card_item, item: item)
+          card = build(:collection_card_text, item: item)
           expect(card.reference?).to be false
           expect(card.valid?).to be false
           expect(card.errors[:item]).to include('already has a primary card')
         end
 
         it 'should be valid if using reference card' do
-          card = build(:collection_card_item, :reference, item: item)
+          card = build(:collection_card_text, :reference, item: item)
           expect(card.reference?).to be true
           expect(card.valid?).to be true
         end
@@ -60,7 +60,7 @@ RSpec.describe CollectionCard, type: :model do
 
   describe '#duplicate!' do
     let(:user) { create(:user) }
-    let!(:collection_card) { create(:collection_card_item) }
+    let!(:collection_card) { create(:collection_card_text) }
     let(:shallow) { false }
     let(:update_order) { false }
     let(:duplicate) do

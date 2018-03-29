@@ -46,6 +46,7 @@ export const fakeItemCard = {
   order: 0,
   height: 1,
   width: 1,
+  maxWidth: 1,
   record: fakeTextItem,
   item: fakeTextItem,
 }
@@ -54,6 +55,7 @@ export const fakeCollectionCard = {
   order: 1,
   height: 1,
   width: 1,
+  maxWidth: 1,
   record: fakeCollection,
   item: fakeCollection,
   reference: false,
@@ -66,6 +68,14 @@ export const fakeCollection = {
   roles: [],
   tag_list: ['prototype', 'blockchain'],
   can_edit: false,
+  isSharedCollection: false,
+  isUserCollection: false,
+  isNormalCollection: true,
+  cover: {
+    image_url: 'http://fake.url.net',
+    text: 'Lorem ipsum blockchain boogie',
+    name: 'Proto-typo',
+  },
   collection_cards: [
     fakeItemCard, fakeItemCard, fakeItemCard
   ],
@@ -81,6 +91,7 @@ export const fakeUserAttrs = {
   last_name: 'Winfrey',
   email: 'oprah@winfrey.com',
   pic_url_square: 'https://filestackcdn.com/abc123',
+  groups: [],
 }
 export const fakeUser = {
   ...fakeUserAttrs,

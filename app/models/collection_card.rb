@@ -25,6 +25,7 @@ class CollectionCard < ApplicationRecord
 
   scope :primary, -> { where(reference: false) }
   scope :reference, -> { where(reference: true) }
+  scope :ordered, -> { order(order: :asc) }
 
   accepts_nested_attributes_for :collection, :item
 
