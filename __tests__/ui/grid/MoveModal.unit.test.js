@@ -6,7 +6,6 @@ import {
 
 import fakeApiStore from '#/mocks/fakeApiStore'
 
-
 describe('MoveModal', () => {
   let props
   let wrapper
