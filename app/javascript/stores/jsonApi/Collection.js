@@ -17,6 +17,19 @@ class Collection extends BaseRecord {
     uiStore.openBlankContentTool()
   }
 
+  userCanEdit(userId) {
+    if (!this.isUserCollection) return false
+    let perms = false
+    _.forEach(this.roles, role => {
+      if (role.canEdit()) {
+        role.users.forEach(u => {
+          if (u.id === userId) perms = true
+        })
+      }
+    })
+    return perms
+  }
+
   get isUserCollection() {
     return this.type === 'Collection::UserCollection'
   }

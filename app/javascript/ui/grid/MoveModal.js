@@ -1,3 +1,4 @@
+import { intercept, observable } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 import v from '~/utils/variables'
@@ -50,6 +51,27 @@ const CloseIconHolder = styled.span`
 @inject('uiStore', 'apiStore')
 @observer
 class MoveModal extends React.Component {
+  @observable disabled = false
+
+  constructor(props) {
+    super(props)
+    const { apiStore, uiStore } = props
+
+    intercept(uiStore, 'viewingCollection', change => {
+      if (change.newValue) {
+        const { currentUser } = apiStore
+        console.log('change', change.newValue.id, currentUser.id)
+        const newCollection = change.newValue
+        if (uiStore.movingFromCollectionId !== newCollection.id) {
+          if (!newCollection.userCanEdit(currentUser.id)) {
+            this.disabled = true
+          }
+        }
+      }
+      return null
+    })
+  }
+
   handleClose = (ev) => {
     ev.preventDefault()
     const { uiStore } = this.props
@@ -84,6 +106,8 @@ class MoveModal extends React.Component {
   render() {
     const { uiStore } = this.props
     const amount = uiStore.movingCardIds.length
+    console.log('disabled', this.disabled)
+    if (this.disabled) return <div>disabled</div>
 
     return (
       <div>
@@ -124,8 +148,8 @@ class MoveModal extends React.Component {
 MoveModal.propTypes = {
 }
 MoveModal.wrappedComponent.propTypes = {
-  uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
   apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
+  uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 MoveModal.defaultProps = {
 }
