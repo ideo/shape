@@ -150,7 +150,9 @@ class User < ApplicationRecord
     # return rolify_add_role(role_name) if resource.blank?
     # rolify_add_role(role_name, resource.becomes(resource.resourceable_class))
     role = Role.find_or_create(role_name, resource)
-    role.users << self
+    if role.users << self
+      after_add_role(role)
+    end
     role
   end
 

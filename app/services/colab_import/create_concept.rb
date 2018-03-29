@@ -296,7 +296,8 @@ module ColabImport
     end
 
     def team_member_names
-      @data['team'] || []
+      return [] if @data['team'].blank?
+      @data['team']
     end
   end
 end
