@@ -58,16 +58,19 @@ class MoveModal extends React.Component {
 
   moveCards = async (placement) => {
     const { uiStore, apiStore } = this.props
+    const { currentUser } = apiStore
+    const collectionId = uiStore.viewingCollection.id
+    if (!currentUser.canEditCollection()) return Promise.resolve()
     const data = {
-      to_id: uiStore.viewingCollection.id,
+      to_id: collectionId,
       from_id: uiStore.movingFromCollectionId,
       collection_card_ids: uiStore.movingCardIds,
       placement,
     }
     const result = await apiStore.request('/collection_cards/move', 'PATCH', data)
-    console.log(result)
     uiStore.closeMoveMenu()
     uiStore.deselectCards()
+    return result
   }
 
   handleMoveToBeginning = () => {
