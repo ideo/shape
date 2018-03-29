@@ -119,7 +119,7 @@ RolesMenu.wrappedComponent.propTypes = {
 }
 RolesMenu.defaultProps = {
   roles: [],
-  title: 'Sharing',
+  title: 'Shared with',
   addCallout: 'Add groups or people:'
 }
 

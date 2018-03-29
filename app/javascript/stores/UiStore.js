@@ -72,6 +72,12 @@ export default class UiStore {
     this.blankContentToolState = { order, width, height, replacingId }
   }
 
+  @action resetSelectionAndBCT() {
+    this.deselectCards()
+    this.closeBlankContentTool()
+    // TODO: should also close the Move snackbar
+  }
+
   @action closeBlankContentTool() {
     this.blankContentToolState = {
       order: null,
