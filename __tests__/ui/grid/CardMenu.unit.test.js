@@ -26,10 +26,10 @@ describe('CardMenu', () => {
     beforeEach(() => {
       allActions = [
         'Duplicate',
-        'Replace',
         'Move',
         'Link',
-        'Archive'
+        'Archive',
+        'Replace',
       ]
       actions = _.without(allActions, 'Replace')
       props.canEdit = true
