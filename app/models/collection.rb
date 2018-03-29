@@ -13,7 +13,8 @@ class Collection < ApplicationRecord
 
   has_many :collection_cards,
            -> { active.order(order: :asc) },
-           foreign_key: :parent_id
+           foreign_key: :parent_id,
+           dependent: :destroy
   # All collection cards this is linked to
   has_many :reference_collection_cards,
            -> { reference },

@@ -33,6 +33,16 @@ class Role < ApplicationRecord
     exclude_association :resource
   end
 
+  def self.find_or_create(role_name, resource = nil)
+    return Role.find_or_create_by(name: role_name) if resource.blank?
+
+    Role.find_or_create_by(
+      name: role_name,
+      resource_type: resource.class.base_class.to_s,
+      resource_id: resource.id
+    )
+  end
+
   # All the resources of a specific type (e.g. Organization) that this user is connected to
   # Role name is optional but can additionally scope it
   def self.user_resources(user:, resource_type:, role_name: nil)

@@ -1,46 +1,79 @@
 module Roles
   class MassAssign
-    attr_reader :errors, :failed, :added
+    attr_reader :errors, :added_users, :added_groups,
+                :failed_users, :failed_groups
 
-    def initialize(object:, role_name:, users: [], groups: [], propagate_to_children: false)
+    def initialize(
+      object:,
+      role_name:,
+      users: [],
+      groups: [],
+      propagate_to_children: false,
+      synchronous: false
+    )
       @object = object
       @role_name = role_name
       @users = users
       @groups = groups
       @propagate_to_children = propagate_to_children
-      @added = []
-      @failed = []
+      @synchronous = synchronous
+      @added_users = []
+      @added_groups = []
+      @failed_users = []
+      @failed_groups = []
       @roles = []
     end
 
     def call
       return false unless valid_object_and_role_name?
-      assign_role_to_users_and_groups
-      add_roles_to_children_async if @propagate_to_children
+      assign_role_to_users
+      assign_role_to_groups
+      add_roles_to_children if @propagate_to_children
       failed_users.blank? && failed_groups.blank?
     end
 
     private
 
-    def assign_role_to_users_and_groups
-      (@users + @groups).each do |user_or_group|
-        role = user_or_group.add_role(@role_name, @object)
+    def assign_role_to_users
+      @users.each do |user|
+        role = user.add_role(@role_name, @object)
         if role.persisted?
-          @added << user_or_group
+          @added_users << user
         else
-          @failed << user_or_group
+          @failed_users << user
         end
       end
     end
 
-    def add_roles_to_children_async
-      AddRolesToChildrenWorker.perform_async(
-        @users.map(&:id),
-        @groups.map(&:id),
-        @role_name,
-        @object.id,
-        @object.class.name.to_s,
-      )
+    def assign_role_to_groups
+      @groups.each do |group|
+        role = group.add_role(@role_name, @object)
+        if role.persisted?
+          @added_groups << group
+        else
+          @failed_groups << group
+        end
+      end
+    end
+
+    def add_roles_to_children
+      if @synchronous
+        AddRolesToChildrenWorker.new.perform(
+          @added_users.map(&:id),
+          @added_groups.map(&:id),
+          @role_name,
+          @object.id,
+          @object.class.name.to_s,
+        )
+      else
+        AddRolesToChildrenWorker.perform_async(
+          @added_users.map(&:id),
+          @added_groups.map(&:id),
+          @role_name,
+          @object.id,
+          @object.class.name.to_s,
+        )
+      end
     end
 
     def valid_object_and_role_name?
