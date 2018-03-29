@@ -14,6 +14,7 @@ const props = {
   uiStore: {
     openCardMenuId: false,
     update: jest.fn(),
+    closeMoveMenu: jest.fn(),
   },
   menuOpen: false,
 }
