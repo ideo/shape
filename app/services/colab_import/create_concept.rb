@@ -98,6 +98,8 @@ module ColabImport
 
     # Hero Image
     def update_card_1(card)
+      # TODO: what if image url doesn't exist? - may need to test
+      # -KbLPoqNXmZDF-QUJgYo it doesn't
       card.item.update_attributes(
         name: image_alt,
         filestack_file: FilestackFile.create_from_url(image_url),

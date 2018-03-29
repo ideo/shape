@@ -149,11 +149,13 @@ class User < ApplicationRecord
     # so we wrote our own method
     # return rolify_add_role(role_name) if resource.blank?
     # rolify_add_role(role_name, resource.becomes(resource.resourceable_class))
-    role = Role.find_or_create(role_name, resource)
-    role.users << self
-    # rescue if we already added user - as it doesn't matter
-  rescue ActiveRecord::RecordNotUnique
-    after_add_role(role)
+    begin
+      role = Role.find_or_create(role_name, resource)
+      role.users << self
+      after_add_role(role)
+    rescue ActiveRecord::RecordNotUnique
+      # rescue if we already added user - as it doesn't matter
+    end
     role
   end
 
