@@ -1,6 +1,7 @@
 class CollectionCard < ApplicationRecord
   include Archivable
-  archivable with: %i[collection item]
+  archivable with: %i[collection item],
+             after_archive: :decrement_card_orders!
 
   belongs_to :parent, class_name: 'Collection'
 
@@ -35,8 +36,9 @@ class CollectionCard < ApplicationRecord
     exclude_association :parent
   end
 
-  def duplicate!(for_user:, shallow: false, update_order: false)
+  def duplicate!(for_user:, parent: self.parent, shallow: false, update_order: false)
     cc = amoeba_dup
+    cc.parent = parent # defaults to self.parent, unless one is passed in
     cc.order += 1
 
     unless shallow
@@ -44,9 +46,11 @@ class CollectionCard < ApplicationRecord
       cc.item = item.duplicate!(for_user: for_user) if item.present?
     end
 
-    if cc.save && update_order
-      cc.increment_card_orders!
-    end
+    return cc unless cc.save
+
+    # TODO: better way to get the correct breadcrumb upon initial duplication?
+    cc.record.recalculate_breadcrumb!
+    cc.increment_card_orders! if update_order
 
     cc
   end
@@ -83,16 +87,14 @@ class CollectionCard < ApplicationRecord
     true
   end
 
-  # Decrement the order by 1 of all cards with <= specified order
+  # Decrement the order by 1 of all cards with >= specified order
   # - Defaults to use this card's order
   # - Useful when removing a card from the collection
-  def decrement_card_orders!(starting_at_order = nil)
-    starting_at_order ||= order
-
-    less_than_or_equal = CollectionCard.arel_table[:order].lteq(starting_at_order)
+  def decrement_card_orders!(starting_at_order = order)
+    greater_than_or_equal = CollectionCard.arel_table[:order].gteq(starting_at_order)
 
     update_ids = parent.collection_cards
-                       .where(less_than_or_equal)
+                       .where(greater_than_or_equal)
                        .where.not(id: id)
                        .pluck(:id)
 

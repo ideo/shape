@@ -26,6 +26,8 @@ class CollectionCardBuilder
         @collection_card.record.inherit_roles_from_parent!
         @collection_card.increment_card_orders!
         @collection_card.record.reload.recalculate_breadcrumb!
+        # mark the collection as recently updated
+        @collection.touch
       end
     end
   end

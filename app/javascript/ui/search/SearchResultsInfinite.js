@@ -8,6 +8,7 @@ import FlipMove from 'react-flip-move'
 import VisibilitySensor from 'react-visibility-sensor'
 
 import v from '~/utils/variables'
+import Breadcrumb from '~/ui/layout/Breadcrumb'
 import Loader from '~/ui/layout/Loader'
 import CollectionCover from '~/ui/grid/covers/CollectionCover'
 import CollectionIcon from '~/ui/icons/CollectionIcon'
@@ -22,6 +23,11 @@ const StyledSearchResult = styled.div`
   cursor: pointer;
 `
 StyledSearchResult.displayName = 'StyledSearchResult'
+
+const StyledBreadcrumb = styled.div`
+  margin-top: 16px;
+  margin-bottom: 1px;
+`
 
 const StyledScrollIndicator = styled.div`
   position: fixed;
@@ -112,22 +118,31 @@ class SearchResultsInfinite extends React.Component {
               top: v.headerHeightCompact + (gridSettings.gridH / 2),
             }}
           >
-            <StyledSearchResult
-              {...gridSettings}
-              gridMaxW={gridMaxW}
-              onClick={this.routeToCollection(collection.id)}
-              onMouseEnter={this.handleMouseOver(i + 1)}
-              onMouseLeave={this.handleMouseOver(i + 1, false)}
-              // onFocus={this.handleMouseOver(i + 1)}
-            >
-              <StyledTopRightActions className="show-on-hover">
-                {/* NOTE: once linking is enabled, should setup CardMenu here */}
-              </StyledTopRightActions>
-              <StyledBottomLeftIcon>
-                <CollectionIcon />
-              </StyledBottomLeftIcon>
-              <CollectionCover collection={collection} />
-            </StyledSearchResult>
+            <div>
+              <StyledBreadcrumb>
+                <Breadcrumb items={collection.breadcrumb} />
+              </StyledBreadcrumb>
+              <StyledSearchResult
+                {...gridSettings}
+                gridMaxW={gridMaxW}
+                onClick={this.routeToCollection(collection.id)}
+                onMouseEnter={this.handleMouseOver(i + 1)}
+                onMouseLeave={this.handleMouseOver(i + 1, false)}
+                // onFocus={this.handleMouseOver(i + 1)}
+              >
+                <StyledTopRightActions className="show-on-hover">
+                  {/* NOTE: once linking is enabled, should setup CardMenu here */}
+                </StyledTopRightActions>
+                <StyledBottomLeftIcon>
+                  <CollectionIcon />
+                </StyledBottomLeftIcon>
+                <CollectionCover
+                  collection={collection}
+                  width={gridSettings.cols}
+                  height={1}
+                />
+              </StyledSearchResult>
+            </div>
           </VisibilitySensor>
         </FlipMove>
       ))

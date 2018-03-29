@@ -95,9 +95,8 @@ ActiveRecord::Schema.define(version: 20180321233803) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "primary_group_id"
-    t.string "pic_url_square"
-    t.integer "filestack_file_id"
     t.string "handle"
+    t.integer "filestack_file_id"
     t.index ["handle"], name: "index_organizations_on_handle"
   end
 

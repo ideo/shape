@@ -1,8 +1,8 @@
+import _ from 'lodash'
 import PropTypes from 'prop-types'
 import { PropTypes as MobxPropTypes } from 'mobx-react'
-import { withStyles } from 'material-ui/styles'
 import { MenuItem } from 'material-ui/Menu'
-import Select from 'material-ui/Select'
+import styled from 'styled-components'
 import {
   DisplayText,
   SubText
@@ -11,25 +11,34 @@ import {
   Row,
   RowItemLeft,
 } from '~/ui/global/styled/layout'
+import { Select } from '~/ui/global/styled/forms'
+import LeaveIcon from '~/ui/icons/LeaveIcon'
 import UserAvatar from '~/ui/users/UserAvatar'
 
-const materialStyles = {
-  root: {
-    fontFamily: 'Gotham',
-    fontSize: '16px',
-    fontWeight: 300,
-  },
-  selectMenu: {
-    backgroundColor: 'transparent',
-    '&:focus': { backgroundColor: 'transparent' },
-    '&:hover': { backgroundColor: 'transparent' },
-  }
-}
+const MinRowItem = styled.span`
+  min-width: 110px;
+`
+
+const LeaveIconHolder = styled.button`
+  margin-top: ${props => (props.enabled ? 8 : 2)}px;
+  width: 16px;
+`
+LeaveIconHolder.displayName = 'StyledLeaveIconHolder'
+
+const CenterAlignedSingleItem = styled.div`
+  margin-top: 6px;
+`
+CenterAlignedSingleItem.displayName = 'StyledCenterAlignedSingleItem'
 
 class RoleSelect extends React.Component {
+  onRoleRemove = (ev) => {
+    ev.preventDefault()
+    this.deleteRole(true)
+  }
+
   onRoleSelect = (ev) => {
     ev.preventDefault()
-    this.deleteRole().then(this.createRole(ev.target.value))
+    return this.deleteRole().then(() => this.createRole(ev.target.value))
   }
 
   createRole(roleName) {
@@ -37,15 +46,35 @@ class RoleSelect extends React.Component {
     onCreate([user], roleName)
   }
 
-  deleteRole = () => {
+  deleteRole = (toRemove = false) => {
     const { role, user } = this.props
-    return this.props.onDelete(role, user).then(() => {
-      role.toUpdate = true
-    })
+    return this.props.onDelete(role, user, toRemove)
   }
 
   render() {
-    const { classes, role, user } = this.props
+    const { enabled, role, roleTypes, user } = this.props
+    let select
+    if (enabled) {
+      select = (
+        <Select
+          classes={{ root: 'select', selectMenu: 'selectMenu' }}
+          displayEmpty
+          disableUnderline
+          name="role"
+          onChange={this.onRoleSelect}
+          value={role.name}
+        >
+          { roleTypes.map(roleType =>
+            (<MenuItem key={roleType} value={roleType}>
+              {_.startCase(roleType)}
+            </MenuItem>))
+          }
+        </Select>
+      )
+    } else {
+      select = <DisplayText>{_.startCase(role.name)}</DisplayText>
+    }
+    // TODO remove duplication with RolesAdd role select menu
     return (
       <Row>
         <span>
@@ -56,22 +85,22 @@ class RoleSelect extends React.Component {
           />
         </span>
         <RowItemLeft>
-          <DisplayText>{user.name}</DisplayText><br />
-          <SubText>{user.email}</SubText>
+          { user.name && user.name.trim().length > 0
+            ? (<div>
+              <DisplayText>{user.name}</DisplayText><br />
+              <SubText>{user.email}</SubText>
+            </div>)
+            : (<CenterAlignedSingleItem>
+              <DisplayText>{user.email}</DisplayText>
+            </CenterAlignedSingleItem>)
+          }
         </RowItemLeft>
-        <span>
-          <Select
-            classes={classes}
-            displayEmpty
-            disableUnderline
-            name="role"
-            onChange={this.onRoleSelect}
-            value={role.name}
-          >
-            <MenuItem value="editor">Editor</MenuItem>
-            <MenuItem value="viewer">Viewer</MenuItem>
-          </Select>
-        </span>
+        <MinRowItem>
+          {select}
+        </MinRowItem>
+        <LeaveIconHolder enabled={enabled} onClick={this.onRoleRemove}>
+          <LeaveIcon />
+        </LeaveIconHolder>
       </Row>
     )
   }
@@ -79,12 +108,14 @@ class RoleSelect extends React.Component {
 
 RoleSelect.propTypes = {
   role: MobxPropTypes.objectOrObservableObject.isRequired,
+  roleTypes: PropTypes.arrayOf(PropTypes.string).isRequired,
   user: MobxPropTypes.objectOrObservableObject.isRequired,
   onDelete: PropTypes.func.isRequired,
   onCreate: PropTypes.func.isRequired,
-  classes: PropTypes.shape({
-    paper: PropTypes.string,
-  }).isRequired,
+  enabled: PropTypes.bool
+}
+RoleSelect.defaultProps = {
+  enabled: true
 }
 
-export default withStyles(materialStyles)(RoleSelect)
+export default RoleSelect

@@ -1,7 +1,8 @@
 import _ from 'lodash'
-import { computed } from 'mobx'
+import { computed, action } from 'mobx'
 
-import { routingStore } from '~/stores'
+import { uiStore } from '~/stores'
+import { archive } from './shared'
 import BaseRecord from './BaseRecord'
 
 class Collection extends BaseRecord {
@@ -9,6 +10,11 @@ class Collection extends BaseRecord {
 
   @computed get cardIds() {
     return this.collection_cards.map(card => card.id)
+  }
+
+  @action emptyCards() {
+    this.collection_cards.replace([])
+    uiStore.openBlankContentTool()
   }
 
   get isUserCollection() {
@@ -24,20 +30,7 @@ class Collection extends BaseRecord {
   }
 
   API_archive() {
-    // eslint-disable-next-line no-alert
-    const agree = window.confirm('Are you sure?')
-    if (agree) {
-      return this.apiStore.request(`collections/${this.id}/archive`, 'PATCH').then(() => {
-        // NOTE: should we handle the redirect here, or in the PageMenu/etc?
-        let redirect = '/'
-        if (this.breadcrumb.length >= 2) {
-          const [klass, id] = this.breadcrumb[this.breadcrumb.length - 2]
-          redirect = routingStore.pathTo(klass, id)
-        }
-        routingStore.push(redirect)
-      })
-    }
-    return false
+    return archive('collections', this)
   }
 
   API_updateCards() {

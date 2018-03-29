@@ -6,7 +6,6 @@ import {
 import {
   FormSpacer,
 } from '~/ui/global/styled/forms'
-import Modal from '~/ui/global/Modal'
 import RolesAdd from '~/ui/roles/RolesAdd'
 import RoleSelect from '~/ui/roles/RoleSelect'
 
@@ -16,18 +15,23 @@ function sortUser(a, b) {
     : a.user.email.localeCompare(b.user.email)
 }
 
-@inject('apiStore', 'uiStore')
+@inject('apiStore')
 @observer
 class RolesMenu extends React.Component {
-  onDelete = (role, user) =>
-    this.props.apiStore.request(`users/${user.id}/roles/${role.id}`,
-      'DELETE')
+  onDelete = (role, entity, toRemove) =>
+    this.props.apiStore.request(`users/${entity.id}/roles/${role.id}`,
+      'DELETE').then((res) => {
+      if (toRemove) {
+        this.props.onSave(res)
+      }
+    })
 
   onCreateRoles = (users, roleName) => {
-    const { apiStore, collectionId } = this.props
+    const { apiStore, ownerId, ownerType, onSave } = this.props
     const userIds = users.map((user) => user.id)
     const data = { role: { name: roleName }, user_ids: userIds }
-    return apiStore.request(`collections/${collectionId}/roles`, 'POST', data)
+    return apiStore.request(`${ownerType}/${ownerId}/roles`, 'POST', data)
+      .then(onSave)
       .catch((err) => console.warn(err))
   }
 
@@ -43,58 +47,80 @@ class RolesMenu extends React.Component {
     )
   }
 
-  handleClose = (ev) => {
-    const { uiStore } = this.props
-    uiStore.closeRolesMenu()
+  currentUserCheck(user) {
+    const { apiStore } = this.props
+    const { currentUser } = apiStore
+    return (currentUser.id !== user.id)
+  }
+
+  currentUserRoleCheck() {
+    const { apiStore, roles } = this.props
+    const { currentUser } = apiStore
+    const userRole = roles.find(role => role.users
+      .find(user => user.id === currentUser.id))
+    if (!userRole) return false
+    return userRole.canEdit()
   }
 
   render() {
-    const { roles, uiStore } = this.props
+    const { addCallout, roles, ownerType, title } = this.props
     const roleUsers = []
     roles.forEach((role) =>
       role.users.forEach((user) => {
         roleUsers.push(Object.assign({}, { role, user }))
       }))
     const sortedRoleUsers = roleUsers.sort(sortUser)
+    const roleTypes = ownerType === 'groups'
+      ? ['member', 'admin']
+      : ['viewer', 'editor']
+    const userCanEdit = this.currentUserRoleCheck()
 
     return (
-      <Modal
-        title="Sharing"
-        onClose={this.handleClose}
-        open={uiStore.rolesMenuOpen}
-      >
-        <Heading3>Shared with</Heading3>
+      <div>
+        <Heading3>{title}</Heading3>
         { sortedRoleUsers.map(combined =>
           (<RoleSelect
+            enabled={userCanEdit && this.currentUserCheck(combined.user, combined.role)}
             key={combined.user.id + combined.role.id}
             role={combined.role}
+            roleTypes={roleTypes}
             user={combined.user}
             onDelete={this.onDelete}
             onCreate={this.onCreateRoles}
           />))
         }
         <FormSpacer />
-        <Heading3>Add groups or people</Heading3>
-        <RolesAdd
-          onCreateRoles={this.onCreateRoles}
-          onCreateUsers={this.onCreateUsers}
-          onSearch={this.onUserSearch}
-        />
-      </Modal>
+        {userCanEdit &&
+          <div>
+            <Heading3>{addCallout}</Heading3>
+            <RolesAdd
+              roleTypes={roleTypes}
+              onCreateRoles={this.onCreateRoles}
+              onCreateUsers={this.onCreateUsers}
+              onSearch={this.onUserSearch}
+            />
+          </div>
+        }
+      </div>
     )
   }
 }
 
 RolesMenu.propTypes = {
-  collectionId: PropTypes.number.isRequired,
+  ownerId: PropTypes.number.isRequired,
+  ownerType: PropTypes.string.isRequired,
   roles: MobxPropTypes.arrayOrObservableArray,
+  title: PropTypes.string,
+  addCallout: PropTypes.string,
+  onSave: PropTypes.func.isRequired,
 }
 RolesMenu.wrappedComponent.propTypes = {
-  uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
   apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 RolesMenu.defaultProps = {
   roles: [],
+  title: 'Shared with',
+  addCallout: 'Add groups or people:'
 }
 
 export default RolesMenu

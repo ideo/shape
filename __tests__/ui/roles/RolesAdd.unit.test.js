@@ -8,6 +8,7 @@ describe('RolesAdd', () => {
   beforeEach(() => {
     useStrict(false)
     props = {
+      roleTypes: ['viewer', 'editor'],
       onCreate: jest.fn(),
       onCreateUsers: jest.fn(),
       onCreateRoles: jest.fn(),
@@ -23,7 +24,7 @@ describe('RolesAdd', () => {
     let component
 
     beforeEach(() => {
-      component = wrapper.find('RolesAdd').instance()
+      component = wrapper.instance()
     })
 
     describe('when a user is found', () => {
@@ -39,7 +40,7 @@ describe('RolesAdd', () => {
       })
 
       it('should map the data with a value and a user', () => {
-        expect(wrapper.find('RolesAdd').instance().onUserSearch('leo'))
+        expect(wrapper.instance().onUserSearch('leo'))
           .resolves.toEqual([{ value: user.email, label: user.name, data: user }])
       })
     })
@@ -50,7 +51,7 @@ describe('RolesAdd', () => {
 
     beforeEach(() => {
       // Shortcut so this doesn't have to be found every time
-      component = wrapper.find('RolesAdd').instance()
+      component = wrapper.instance()
     })
 
     describe('for a already registered user', () => {
@@ -103,7 +104,7 @@ describe('RolesAdd', () => {
     let registeredUsers
 
     beforeEach(() => {
-      component = wrapper.find('RolesAdd').instance()
+      component = wrapper.instance()
       unregisteredUsers = [
         { email: 'name@name.com' },
         { email: 'mo@mo.com' }

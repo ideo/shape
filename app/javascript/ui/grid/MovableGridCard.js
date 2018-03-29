@@ -81,6 +81,7 @@ class MovableGridCard extends React.PureComponent {
       return
     }
     if (!this.state.dragging) {
+      uiStore.resetSelectionAndBCT()
       this.setState({
         dragging: true,
         moveComplete: false,
@@ -107,6 +108,10 @@ class MovableGridCard extends React.PureComponent {
   }
 
   handleResize = (e, dir, ref, delta, position) => {
+    if (!this.state.resizing) {
+      this.setState({ resizing: true, moveComplete: false })
+      uiStore.resetSelectionAndBCT()
+    }
     const { gridW, gridH, cols } = uiStore.gridSettings
     const { card } = this.props
     // e.g. if card.width is 4, but we're at 2 columns, max out at cardWidth = 2
@@ -115,18 +120,26 @@ class MovableGridCard extends React.PureComponent {
       width: cardWidth + Math.floor((delta.width + 200) / gridW),
       height: card.height + Math.floor((delta.height + 200) / gridH),
     }
-    if (!this.state.resizing) {
-      this.setState({ resizing: true, moveComplete: false })
-    }
     newSize.width = Math.max(newSize.width, 1)
     newSize.height = Math.max(newSize.height, 1)
-    // console.log(newSize)
     this.props.onResize(this.props.card.id, newSize)
   }
 
   // this function gets passed down to the card, so it can place the onClick handler
   handleClick = (e) => {
-    const { cardType, record } = this.props
+    const { card, cardType, record } = this.props
+    // TODO: make sure this is cross-browser compatible?
+    if (e.metaKey || e.shiftKey) {
+      if (e.metaKey) {
+        // individually select
+        uiStore.toggleSelectedCardId(card.id)
+      }
+      if (e.shiftKey) {
+        // select everything between
+        uiStore.selectCardsUpTo(card.id)
+      }
+      return
+    }
     if (e.target.className.match(/cancelGridClick/)) return
 
     // timeout is just a stupid thing so that Draggable doesn't complain about unmounting
@@ -164,7 +177,7 @@ class MovableGridCard extends React.PureComponent {
   )
 
   renderBlank = () => {
-    const { card, parent } = this.props
+    const { parent } = this.props
     const styleProps = this.styleProps()
     const {
       height,
@@ -188,7 +201,7 @@ class MovableGridCard extends React.PureComponent {
       >
         <div>
           <PositionedGridCard {...styleProps}>
-            <GridCardBlank height={height} parent={parent} order={card.order} />
+            <GridCardBlank height={height} parent={parent} />
           </PositionedGridCard>
         </div>
       </FlipMove>

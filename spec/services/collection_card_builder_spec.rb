@@ -88,6 +88,11 @@ RSpec.describe CollectionCardBuilder, type: :service do
         expect_any_instance_of(CollectionCard).to receive(:increment_card_orders!)
         expect(builder.create).to be true
       end
+
+      it 'should mark the collection as updated' do
+        expect_any_instance_of(Collection).to receive(:touch)
+        expect(builder.create).to be true
+      end
     end
 
     context 'error because the item has no type' do

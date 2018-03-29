@@ -3,8 +3,8 @@ import PropTypes from 'prop-types'
 import { uiStore } from '~/stores'
 import PopoutMenu from '~/ui/global/PopoutMenu'
 import ArchiveIcon from '~/ui/icons/ArchiveIcon'
-import ShareIcon from '~/ui/icons/ShareIcon'
 import DuplicateIcon from '~/ui/icons/DuplicateIcon'
+import ReplaceIcon from '~/ui/icons/ReplaceIcon'
 import MoveIcon from '~/ui/icons/MoveIcon'
 import LinkIcon from '~/ui/icons/LinkIcon'
 
@@ -15,36 +15,37 @@ class CardMenu extends React.PureComponent {
 
   handleMouseLeave = () => {
     if (this.props.menuOpen) {
-      uiStore.openCardMenu(false)
+      uiStore.update('openCardMenuId', false)
     }
   }
 
   toggleOpen = (e) => {
     e.stopPropagation()
     if (this.props.menuOpen) {
-      uiStore.openCardMenu(false)
+      uiStore.update('openCardMenuId', false)
     } else {
-      uiStore.openCardMenu(this.cardId)
+      uiStore.update('openCardMenuId', this.cardId)
     }
   }
 
   get menuItems() {
-    let items
+    const { canEdit, canReplace } = this.props
     const duplicateItem = {
-      name: 'Duplicate',
-      icon: <DuplicateIcon />,
-      onClick: this.props.handleDuplicate
+      name: 'Duplicate', icon: <DuplicateIcon />, onClick: this.props.handleDuplicate
     }
+    let items = [duplicateItem]
 
-    if (this.props.canEdit) {
-      items = [
-        duplicateItem,
+    if (canReplace) {
+      items.push(
+        { name: 'Replace', icon: <ReplaceIcon />, onClick: this.props.handleReplace }
+      )
+    }
+    if (canEdit) {
+      items = items.concat([
         { name: 'Move', icon: <MoveIcon />, onClick: this.props.handleMove },
         { name: 'Link', icon: <LinkIcon />, onClick: this.props.handleLink },
         { name: 'Archive', icon: <ArchiveIcon />, onClick: this.props.handleArchive },
-      ]
-    } else {
-      items = [duplicateItem]
+      ])
     }
     return items
   }
@@ -70,8 +71,10 @@ CardMenu.propTypes = {
   handleLink: PropTypes.func.isRequired,
   handleMove: PropTypes.func.isRequired,
   handleArchive: PropTypes.func.isRequired,
+  handleReplace: PropTypes.func.isRequired,
   menuOpen: PropTypes.bool.isRequired,
   canEdit: PropTypes.bool.isRequired,
+  canReplace: PropTypes.bool.isRequired,
 }
 
 CardMenu.defaultProps = {

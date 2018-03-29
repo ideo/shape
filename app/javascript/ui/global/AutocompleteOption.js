@@ -26,7 +26,7 @@ class AutocompleteOption extends React.Component {
       const { data } = option
       const url = data.pic_url_square || data.filestack_file_url
       content = (
-        <Row>
+        <Row align="center" noSpacing>
           <span>
             <Avatar
               url={url}

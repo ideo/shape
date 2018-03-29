@@ -7,8 +7,8 @@ import Avatar from '~/ui/global/Avatar'
 @observer
 class OrganizationAvatar extends React.Component {
   handleClick = (ev) => {
-    const { uiStore, organization } = this.props
-    uiStore.openOrganizationMenu(organization)
+    const { uiStore } = this.props
+    uiStore.update('organizationMenuOpen', true)
   }
 
   render() {

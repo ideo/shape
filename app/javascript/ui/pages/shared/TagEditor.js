@@ -1,8 +1,8 @@
+import PropTypes from 'prop-types'
 import { action, observable } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import _ from 'lodash'
 import ReactTags from 'react-tag-autocomplete'
-// import 'react-tag-autocomplete/example/styles.css'
 
 import Modal from '~/ui/global/Modal'
 import StyledReactTags from './StyledReactTags'
@@ -15,14 +15,22 @@ class TagEditor extends React.Component {
   constructor(props) {
     super(props)
     this.saveTags = _.debounce(this._saveTags, 1000)
-    // `id` is used by react-tag-autocomplete, but otherwise doesn't hold any meaning
-    this.tags = _.map([...props.record.tag_list], (t, i) => ({
-      id: i, name: t
-    }))
+    this.initTags(props.record.tag_list)
+  }
+
+  componentWillReceiveProps(nextProps) {
+    this.initTags(nextProps.record.tag_list)
   }
 
   componentWillUnmount() {
     this.saveTags.flush()
+  }
+
+  @action initTags = (tag_list) => {
+    // `id` is used by react-tag-autocomplete, but otherwise doesn't hold any meaning
+    this.tags = _.map([...tag_list], (t, i) => ({
+      id: i, name: t
+    }))
   }
 
   _saveTags = () => {
@@ -47,8 +55,27 @@ class TagEditor extends React.Component {
     this.saveTags()
   }
 
+  readOnlyTags = () => {
+    const { record } = this.props
+    if (!record.tag_list.length) {
+      return 'No tags added.'
+    }
+    const inner = record.tag_list.map(tag => (
+      <div key={tag} className="react-tags__selected-tag read-only">
+        <span className="react-tags__selected-tag-name">
+          {tag}
+        </span>
+      </div>
+    ))
+    return (
+      <div className="react-tags__selected">
+        {inner}
+      </div>
+    )
+  }
+
   render() {
-    const { uiStore } = this.props
+    const { canEdit, uiStore } = this.props
 
     return (
       <Modal
@@ -57,15 +84,18 @@ class TagEditor extends React.Component {
         open={uiStore.tagsModalOpen}
       >
         <StyledReactTags>
-          <ReactTags
-            tags={[...this.tags]}
-            allowBackspace={false}
-            delimiterChars={[',']}
-            placeholder="Add new tags, separated by comma or pressing enter."
-            handleAddition={this.handleAddition}
-            handleDelete={this.handleDelete}
-            allowNew
-          />
+          {!canEdit && this.readOnlyTags()}
+          {canEdit &&
+            <ReactTags
+              tags={[...this.tags]}
+              allowBackspace={false}
+              delimiterChars={[',']}
+              placeholder="Add new tags, separated by comma or pressing enter."
+              handleAddition={this.handleAddition}
+              handleDelete={this.handleDelete}
+              allowNew
+            />
+          }
         </StyledReactTags>
       </Modal>
     )
@@ -74,9 +104,13 @@ class TagEditor extends React.Component {
 
 TagEditor.propTypes = {
   record: MobxPropTypes.objectOrObservableObject.isRequired,
+  canEdit: PropTypes.bool,
 }
 TagEditor.wrappedComponent.propTypes = {
   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
+}
+TagEditor.defaultProps = {
+  canEdit: false,
 }
 
 export default TagEditor

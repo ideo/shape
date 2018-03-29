@@ -5,6 +5,10 @@ class Role extends BaseRecord {
     return `collections/${collectionId}/roles`
   }
 
+  canEdit() {
+    return this.name === 'editor' || this.name === 'admin'
+  }
+
   API_create() {
     // TODO why can't the API figure out where name is if calling toJsonApi?
     return this.apiStore.request(`collections/${this.resourceId}/roles`,

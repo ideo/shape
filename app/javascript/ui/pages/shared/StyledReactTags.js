@@ -41,6 +41,9 @@ export default styled.div`
       color: ${v.colors.cloudy};
       margin-left: 8px;
     }
+    &.read-only:after {
+      content: '';
+    }
     &:hover, &:focus {
       &:after {
         color: red;

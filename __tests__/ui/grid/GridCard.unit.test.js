@@ -46,7 +46,7 @@ describe('GridCard', () => {
     })
 
     it('does not render selection circle or hotspot', () => {
-      expect(wrapper.find('StyledSelectionCircle').exists()).toBe(false)
+      expect(wrapper.find('SelectionCircle').exists()).toBe(false)
       expect(wrapper.find('GridCardHotspot').exists()).toBe(false)
     })
 
@@ -64,7 +64,7 @@ describe('GridCard', () => {
       })
 
       it('renders selection circle and hotspot', () => {
-        expect(wrapper.find('StyledSelectionCircle').exists()).toBe(true)
+        expect(wrapper.find('SelectionCircle').exists()).toBe(true)
         expect(wrapper.find('GridCardHotspot').exists()).toBe(false)
       })
     })
@@ -107,7 +107,7 @@ describe('GridCard', () => {
     })
 
     it('does not render selection circle or hotspot', () => {
-      expect(wrapper.find('StyledSelectionCircle').exists()).toBe(false)
+      expect(wrapper.find('SelectionCircle').exists()).toBe(false)
       expect(wrapper.find('GridCardHotspot').exists()).toBe(false)
     })
 
@@ -125,7 +125,7 @@ describe('GridCard', () => {
       })
 
       it('renders selection circle and hotspot', () => {
-        expect(wrapper.find('StyledSelectionCircle').exists()).toBe(true)
+        expect(wrapper.find('SelectionCircle').exists()).toBe(true)
         expect(wrapper.find('GridCardHotspot').exists()).toBe(false)
       })
     })
