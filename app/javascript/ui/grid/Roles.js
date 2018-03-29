@@ -28,7 +28,7 @@ class Roles extends React.Component {
         <RolesMenu
           ownerId={collectionId}
           ownerType="collections"
-          title="Sharing"
+          title="Shared with"
           roles={roles}
           onSave={this.onSave}
         />

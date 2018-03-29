@@ -32,7 +32,7 @@ const StyledRoleTitle = styled.div`
   text-align: ${props => props.align || 'left'};
   color: ${v.colors.cloudy};
   font-size: 1rem;
-  font-weight: 100;
+  font-weight: ${v.weights.book};
   margin: 0 0 6px 0;
 `
 StyledRoleTitle.displayName = 'StyledRoleTitle'
