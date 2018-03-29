@@ -4,7 +4,7 @@ class Api::V1::OrganizationsController < Api::V1::BaseController
 
   # The logged-in user's current organization context
   def current
-    render jsonapi: current_organization
+    render jsonapi: current_organization, include: [:primary_group]
   end
 
   def show

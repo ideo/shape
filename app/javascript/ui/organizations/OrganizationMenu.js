@@ -17,7 +17,8 @@ class OrganizationMenu extends React.Component {
   @observable modifyGroupRoles = false
 
   componentDidMount() {
-    // TODO this gets called on page load because of uiStore isshowing
+    // TODO this gets called on pageload rather then when the modal gets
+    // initially opened.
     const { apiStore, userGroups } = this.props
     const groupReqs = userGroups.map(group =>
       apiStore.request(`groups/${group.id}/roles`, 'GET'))
@@ -95,9 +96,10 @@ class OrganizationMenu extends React.Component {
   renderEditOrganization() {
     const { organization } = this.props
     return (
-      <OrganizationEdit
+      <GroupModify
+        group={organization.primary_group}
+        onGroupRoles={this.handleGroupRolesClick(organization.primary_group)}
         onSave={this.onOrganizationSave}
-        organization={organization}
       />
     )
   }
@@ -130,6 +132,7 @@ class OrganizationMenu extends React.Component {
 
   renderBase() {
     const { organization, userGroups } = this.props
+    const primaryGroup = organization.primary_group
     return (
       <div>
         <Row>
@@ -144,7 +147,7 @@ class OrganizationMenu extends React.Component {
         </Heading3>
         <Row>
           <button className="orgEdit" onClick={this.handleOrganizationClick}>
-            <DisplayText>{ organization.name }</DisplayText>
+            <DisplayText>{ primaryGroup.name }</DisplayText>
           </button>
         </Row>
         <FormSpacer />
@@ -152,7 +155,8 @@ class OrganizationMenu extends React.Component {
           Your Groups
         </Heading3>
         { userGroups.map((group) =>
-          (<Row key={group.id}>
+          (!group.is_primary &&
+          <Row key={group.id}>
             <button
               className="groupEdit"
               onClick={this.handleGroupClick(group)}
