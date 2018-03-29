@@ -2,7 +2,7 @@ import _ from 'lodash'
 import CardMenu from '~/ui/grid/CardMenu'
 
 const props = {
-  cardId: 123,
+  card: { id: 123 },
   canEdit: false,
   canReplace: false,
   handleShare: jest.fn(),
