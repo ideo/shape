@@ -18,7 +18,7 @@ class Collection extends BaseRecord {
   }
 
   userCanEdit(userId) {
-    if (!this.isUserCollection) return false
+    if (!this.isNormalCollection) return false
     let perms = false
     _.forEach(this.roles, role => {
       if (role.canEdit()) {

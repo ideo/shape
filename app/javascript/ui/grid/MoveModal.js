@@ -51,27 +51,6 @@ const CloseIconHolder = styled.span`
 @inject('uiStore', 'apiStore')
 @observer
 class MoveModal extends React.Component {
-  @observable disabled = false
-
-  constructor(props) {
-    super(props)
-    const { apiStore, uiStore } = props
-
-    intercept(uiStore, 'viewingCollection', change => {
-      if (change.newValue) {
-        const { currentUser } = apiStore
-        console.log('change', change.newValue.id, currentUser.id)
-        const newCollection = change.newValue
-        if (uiStore.movingFromCollectionId !== newCollection.id) {
-          if (!newCollection.userCanEdit(currentUser.id)) {
-            this.disabled = true
-          }
-        }
-      }
-      return null
-    })
-  }
-
   handleClose = (ev) => {
     ev.preventDefault()
     const { uiStore } = this.props
@@ -82,7 +61,11 @@ class MoveModal extends React.Component {
     const { uiStore, apiStore } = this.props
     const { currentUser } = apiStore
     const collectionId = uiStore.viewingCollection.id
-    if (!currentUser.canEditCollection()) return Promise.resolve()
+    if (!uiStore.viewingCollection.userCanEdit(currentUser.id)) {
+      // TODO add error dialog
+      console.warn('Cannot edit this collection')
+      return Promise.resolve()
+    }
     const data = {
       to_id: collectionId,
       from_id: uiStore.movingFromCollectionId,
@@ -106,8 +89,6 @@ class MoveModal extends React.Component {
   render() {
     const { uiStore } = this.props
     const amount = uiStore.movingCardIds.length
-    console.log('disabled', this.disabled)
-    if (this.disabled) return <div>disabled</div>
 
     return (
       <div>
