@@ -30,9 +30,10 @@ module Roles
         if child.respond_to?(:children) &&
            child.children.present?
           Roles::AddToChildren.new(
-            users_and_groups_to_add: @users_and_groups_to_add,
             role_name: @role_name,
             parent: child,
+            users_to_add: @users_to_add,
+            groups_to_add: @groups_to_add,
           ).call
         else
           true
@@ -45,13 +46,13 @@ module Roles
     end
 
     def user_role_identifiers
-      @users.map do |user|
+      @users_to_add.map do |user|
         Role.identifier(role_name: @role_name, user_id: user.id)
       end
     end
 
     def group_role_identifiers
-      @groups.map do |group|
+      @groups_to_add.map do |group|
         Role.identifier(role_name: @role_name, group_id: group.id)
       end
     end
@@ -60,8 +61,8 @@ module Roles
       Roles::MassAssign.new(
         object: child,
         role_name: @role_name,
-        users: @users,
-        groups: @groups,
+        users: @users_to_add,
+        groups: @groups_to_add,
         propagate_to_children: false,
       ).call
     end

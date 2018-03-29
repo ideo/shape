@@ -5,6 +5,6 @@ class CreateGroupsRole < ActiveRecord::Migration[5.1]
       t.references :role
     end
 
-    add_index(:groups_roles, [ :group_id, :role_id ])
+    add_index :groups_roles, [:group_id, :role_id], unique: true
   end
 end

@@ -68,7 +68,7 @@ ActiveRecord::Schema.define(version: 20180329014550) do
   create_table "groups_roles", force: :cascade do |t|
     t.bigint "group_id"
     t.bigint "role_id"
-    t.index ["group_id", "role_id"], name: "index_groups_roles_on_group_id_and_role_id"
+    t.index ["group_id", "role_id"], name: "index_groups_roles_on_group_id_and_role_id", unique: true
     t.index ["group_id"], name: "index_groups_roles_on_group_id"
     t.index ["role_id"], name: "index_groups_roles_on_role_id"
   end

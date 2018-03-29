@@ -28,6 +28,28 @@ class Group < ApplicationRecord
             format: { with: /[a-zA-Z0-9\-\_]+/ },
             if: :validate_handle?
 
+  # Default for .roles are those where a
+  # user is admin/member of this group
+  def roles
+    roles_from_users
+  end
+
+  def role_ids
+    roles_from_users.pluck(:id)
+  end
+
+  # Roles where this group is an editor/viewer of a collection/item
+  def roles_to_resources
+    Role
+      .joins(:groups_roles)
+      .where(GroupsRole.arel_table[:group_id].in(id))
+  end
+
+  # Roles where a user is admin/viewer of this group
+  def roles_from_users
+    Role.for_resource(self)
+  end
+
   def primary?
     organization.primary_group_id == id
   end

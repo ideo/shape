@@ -3,14 +3,12 @@ module Roles
     attr_reader :errors, :added_users, :added_groups,
                 :failed_users, :failed_groups
 
-    def initialize(
-      object:,
-      role_name:,
-      users: [],
-      groups: [],
-      propagate_to_children: false,
-      synchronous: false
-    )
+    def initialize(object:,
+                   role_name:,
+                   users: [],
+                   groups: [],
+                   propagate_to_children: false,
+                   synchronous: false)
       @object = object
       @role_name = role_name
       @users = users
@@ -22,6 +20,7 @@ module Roles
       @failed_users = []
       @failed_groups = []
       @roles = []
+      @errors = []
     end
 
     def call

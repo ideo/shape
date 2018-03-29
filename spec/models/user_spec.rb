@@ -354,8 +354,8 @@ describe User, type: :model do
     end
 
     it 'should include all group role identifiers' do
-      expect(group.roles.size).to eq(2)
-      expect(user.current_org_groups_roles_identifiers).to eq(group.roles.map(&:identifier))
+      expect(group.roles_to_resources.size).to eq(2)
+      expect(user.current_org_groups_roles_identifiers).to eq(group.roles_to_resources.map(&:identifier))
     end
   end
 end

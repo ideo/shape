@@ -39,7 +39,7 @@ class Collection
     def user
       # TODO: how do we reliably figure out who the user is?
       # This only works because of implicit associations
-      parent.editors.first
+      parent.editors[:users].first
     end
 
     # Returns (unpersisted) array of collection cards with

@@ -31,6 +31,10 @@ class Role < ApplicationRecord
     exclude_association :resource
   end
 
+  def self.for_resource(object)
+    where(resource_identifier: object_identifier(object))
+  end
+
   def self.find_or_create(role_name, resource = nil)
     return Role.find_or_create_by(name: role_name) if resource.blank?
 
@@ -54,23 +58,26 @@ class Role < ApplicationRecord
     roles.map(&:resource).compact
   end
 
-  def self.object_identifier(object: obj)
-    [obj.class.base_class.to_s, obj.id].select(&:present?).join('_')
+  def self.object_identifier(object)
+    [object.class.base_class.to_s, object.id].select(&:present?).join('_')
   end
 
-  def self.role_identifier(role_name:, resource_identifier: nil, user_id: nil, group_id: nil)
-    [role_name, resource_identifier].select(&:present?).join('_')
+  def self.identifier(role_name:, resource_identifier: nil, user_id: nil, group_id: nil)
+    identifier = [role_name]
 
-    if user_id.present? && group_id.present?
-      raise 'role_identifier can accept only user_id OR group_id, not both'
+    if [resource_identifier, user_id, group_id].select(&:present?).size > 1
+      raise 'role_identifier can accept only resource_identifier, user_id OR group_id'
     end
 
-    if user_id.present?
-      identifier += "_User_#{user_id}"
+    if resource_identifier.present?
+      identifier << resource_identifier
+    elsif user_id.present?
+      identifier << object_identifier(User.new(id: user_id))
     elsif group_id.present?
-      identifier += "_Group_#{group_id}"
+      identifier << object_identifier(Group.new(id: group_id))
     end
-    identifier
+
+    identifier.select(&:present?).join('_')
   end
 
   def duplicate!(assign_resource: nil, dont_save: false)
@@ -86,6 +93,20 @@ class Role < ApplicationRecord
 
   def identifier
     [name, resource_identifier].select(&:present?).join('_')
+  end
+
+  def user_identifiers
+    ids = persisted? ? user_ids : users_roles.map(&:user_id)
+    ids.map do |user_id|
+      Role.identifier(role_name: name, user_id: user_id)
+    end
+  end
+
+  def group_identifiers
+    ids = persisted? ? group_ids : groups_roles.map(&:group_id)
+    ids.map do |group_id|
+      Role.identifier(role_name: name, group_id: group_id)
+    end
   end
 
   private

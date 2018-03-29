@@ -13,8 +13,8 @@ RSpec.describe Roles::AddToChildren, type: :service do
     Roles::AddToChildren.new(
       role_name: role_name,
       parent: collection,
-      users: users,
-      groups: groups,
+      users_to_add: users,
+      groups_to_add: groups,
     )
   end
 
@@ -65,7 +65,7 @@ RSpec.describe Roles::AddToChildren, type: :service do
 
       it 'should include all users from parent' do
         expect(add_to_children.call).to be true
-        expect(collection.items.first.editors).to match_array(users)
+        expect(collection.items.first.editors[:users]).to match_array(users)
       end
     end
 
@@ -81,16 +81,16 @@ RSpec.describe Roles::AddToChildren, type: :service do
         }
       end
       let(:instance_double) do
-        double('Roles::AssignToUsers')
+        double('Roles::MassAssign')
       end
 
       before do
-        allow(Roles::AssignToUsers).to receive(:new).and_return(instance_double)
+        allow(Roles::MassAssign).to receive(:new).and_return(instance_double)
         allow(instance_double).to receive(:call).and_return(true)
       end
 
-      it 'should call AssignToUsers to save roles on the child item' do
-        expect(Roles::AssignToUsers).to receive(:new).with(params)
+      it 'should call MassAssign to save roles on the child item' do
+        expect(Roles::MassAssign).to receive(:new).with(params)
         expect(add_to_children.call).to be true
       end
     end

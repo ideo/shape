@@ -149,24 +149,6 @@ class User < ApplicationRecord
         .map(&:identifier)
   end
 
-  def add_role(role_name, resource = nil)
-    # Rolify was super slow in adding roles once there became thousands,
-    # so we wrote our own method
-    # return rolify_add_role(role_name) if resource.blank?
-    # rolify_add_role(role_name, resource.becomes(resource.resourceable_class))
-    begin
-      role = Role.find_or_create(role_name, resource)
-      role.users << self
-      after_add_role(role)
-
-    # rubocop:disable Lint/HandleExceptions
-    rescue ActiveRecord::RecordNotUnique
-      # rescue if we already added user - as it doesn't matter
-      # rubocop:enable Lint/HandleExceptions
-    end
-    role
-  end
-
   private
 
   def after_add_role(role)

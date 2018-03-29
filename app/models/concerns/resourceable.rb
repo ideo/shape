@@ -26,26 +26,33 @@ module Resourceable
     end
 
     def define_dynamic_role_method(role_name)
-      # Returns all users and groups that match this role name
+      # Returns a hash of users and groups that match this role
+      # --> { users: [...users], groups: [..groups] }
+      # e.g. .viewers returns all users and groups that are viewers
+      #      .editors[:users] returns all users that are editors
       define_method role_name.to_s.pluralize.to_sym do
-        roles.where(name: role_name)
-             .includes(:users, :groups)
-             .map do |role|
-               (role.users + role.groups)
-             end.flatten
+        ret = { users: [], groups: [] }
+        roles
+          .where(name: role_name)
+          .includes(:users, :groups)
+          .each do |role|
+            ret[:users] += role.users
+            ret[:groups] += role.groups
+          end
+        ret
       end
     end
   end
 
-  def can_edit?(user)
+  def can_edit?(user_or_group)
     raise_role_name_not_set(:edit_role) if self.class.edit_role.blank?
-    user.has_role_by_identifier?(self.class.edit_role, resource_identifier)
+    user_or_group.has_role_by_identifier?(self.class.edit_role, resource_identifier)
   end
 
-  def can_view?(user)
-    return true if can_edit?(user)
+  def can_view?(user_or_group)
+    return true if can_edit?(user_or_group)
     raise_role_name_not_set(:view_role) if self.class.view_role.blank?
-    user.has_role_by_identifier?(self.class.view_role, resource_identifier)
+    user_or_group.has_role_by_identifier?(self.class.view_role, resource_identifier)
   end
 
   def resourceable_class

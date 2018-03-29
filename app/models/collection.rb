@@ -55,8 +55,8 @@ class Collection < ApplicationRecord
       item_tags: items.map(&:tags).flatten.map(&:name),
       content: search_content,
       organization_id: organization_id,
-      user_ids: (editor_ids + viewer_ids).uniq,
-      group_ids: [],
+      user_ids: (editors[:users] + viewers[:users]).uniq,
+      group_ids: (editors[:groups] + viewers[:groups]).uniq,
     }
   end
 
