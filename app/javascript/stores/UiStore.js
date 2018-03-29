@@ -90,6 +90,7 @@ export default class UiStore {
 
   @action resetSelectionAndBCT() {
     this.deselectCards()
+    this.closeMoveMenu()
     this.closeBlankContentTool()
     // TODO: should also close the Move snackbar
   }

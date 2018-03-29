@@ -98,7 +98,6 @@ class MovableGridCard extends React.PureComponent {
   }
 
   handleStop = () => {
-    uiStore.closeMoveMenu()
     this.props.onDragOrResizeStop(this.props.card.id)
     this.setState({ dragging: false, resizing: false })
     const timeoutId = setTimeout(() => {
@@ -109,7 +108,6 @@ class MovableGridCard extends React.PureComponent {
   }
 
   handleResize = (e, dir, ref, delta, position) => {
-    uiStore.deselectCards()
     uiStore.closeBlankContentTool()
     uiStore.closeMoveMenu()
     if (!this.state.resizing) {

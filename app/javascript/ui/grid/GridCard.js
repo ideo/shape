@@ -139,24 +139,6 @@ class GridCard extends React.Component {
     )
   }
 
-  duplicateCard = () => {
-    const { card } = this.props
-    card.API_duplicate()
-  }
-
-  replaceCard = () => {
-    const { card } = this.props
-    card.beginReplacing()
-  }
-
-  linkCard = () => {
-    // console.log('Link card')
-  }
-
-  archiveCard = () => {
-    this.props.card.API_archive()
-  }
-
   handleClick = (e) => {
     if (this.props.dragging) return
     this.props.handleClick(e)
@@ -179,15 +161,11 @@ class GridCard extends React.Component {
             }
             <CardMenu
               className="show-on-hover card-menu"
-              cardId={this.props.card.id}
+              card={this.props.card}
               canEdit={this.canEdit}
               canReplace={this.canReplace}
               menuOpen={this.props.menuOpen}
-              handleDuplicate={this.duplicateCard}
-              handleReplace={this.replaceCard}
-              handleLink={this.linkCard}
               handleMove={this.props.onMoveStart}
-              handleArchive={this.archiveCard}
             />
           </StyledTopRightActions>
         }
