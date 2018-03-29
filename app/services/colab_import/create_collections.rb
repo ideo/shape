@@ -37,7 +37,7 @@ module ColabImport
           card = create_collection_card(parent: session_collection, collection: cloned)
 
           # Create card for this subcollection
-          puts "Adding concept: #{concept['uid']} - #{concept['title']}"
+          Rails.logger.info "Adding concept: #{concept['uid']} - #{concept['title']}"
 
           media_item_names = concept['media'].is_a?(Hash) ? concept['media'].values : concept['media']
           media = media_items(media_item_names)
