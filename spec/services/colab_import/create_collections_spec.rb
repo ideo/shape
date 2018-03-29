@@ -28,8 +28,12 @@ RSpec.describe ColabImport::CreateCollections, type: :service do
     let(:filestack_file) {
       create(:filestack_file)
     }
+    let(:url_exists_double) {
+      double('UrlExists', call: true)
+    }
 
     before do
+      allow(UrlExists).to receive(:new).and_return(url_exists_double)
       allow(FilestackFile).to receive(:create_from_url).and_return(filestack_file)
       editor.add_role(Role::ADMIN, organization.primary_group)
       # Add user as editor to template and all items

@@ -29,7 +29,7 @@ module ColabImport
     private
 
     def create_image_item
-      return if !UrlExists.new(image_url).call
+      return if !UrlExists.new(url).call
 
       @item = Item::ImageItem.create(
         name: name,
