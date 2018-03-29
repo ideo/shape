@@ -27,7 +27,7 @@ module ColabImport
       @data['media'].values
     end
 
-    # private
+    private
 
     def skip_import?
       @data['content'].blank? ||
