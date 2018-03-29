@@ -17,8 +17,8 @@ module ColabImport
     def call(only_uids = [])
       concepts_to_copy = concepts_by_session(only_uids)
       create_root_collection!
+      assign_roles_to_root
       create_collections_for_concepts(concepts_to_copy)
-      assign_roles
       @root_collection
     end
 
@@ -105,14 +105,15 @@ module ColabImport
       card
     end
 
-    def assign_roles
-      # Copy roles from template collection to root and all children
+    def assign_roles_to_root
+      # Copy roles from template collection to root
       @template_collection.roles.each do |role|
         assign_role = Roles::AssignToUsers.new(
           object: @root_collection,
           role_name: role.name,
           users: role.users,
           propagate_to_children: true,
+          synchronous: true,
         )
         unless assign_role.call
           raise "Could not assign role to items: #{role.name}"
@@ -162,7 +163,7 @@ module ColabImport
     end
 
     def raise_error(message, object)
-      raise "#{message}: #{object.errors.full_messages.join('. ')}"
+      raise "#{self.class.name} #{message}: #{object.errors.full_messages.join('. ')}"
     end
   end
 end

@@ -59,7 +59,7 @@ module ColabImport
         if UrlExists.new(create_item.url).call
 
           unless create_item.call
-            raise "Could not create image item on card: #{create_item.errors.full_messages.join('. ')}"
+            raise_error("Could not create image item on card: #{create_item.errors.full_messages.join('. ')}")
           end
 
           builder = CollectionCardBuilder.new(
@@ -67,7 +67,7 @@ module ColabImport
             parent_collection: @collection,
           )
           unless builder.create
-            raise "Could not create card for media: #{builder.errors.full_messages.join('. ')}"
+            raise_error("Could not create card for media: #{builder.errors.full_messages.join('. ')}")
           end
 
           true
@@ -81,8 +81,8 @@ module ColabImport
       i = -1
       collection_cards.all? do |card|
         update_method = "update_card_#{i += 1}".to_sym
-        unless respond_to?(update_method)
-          raise "ColabConcept needs to implement update_card_#{i}"
+        unless respond_to?(update_method, true)
+          raise_error("needs to implement update_card_#{i}")
         end
         send(update_method, card)
       end
@@ -196,7 +196,9 @@ module ColabImport
       ops = []
 
       if content.present?
-        content = { 'insert' => content }
+        # Add content, stripping any existing html tags
+        # For some reason the string is frozen, so need to dupe it
+        content = { 'insert' => StripTags.new(content.dup).call }
         content['attributes'] = { 'link' => url } if url.present?
         ops << content
       end
@@ -312,6 +314,10 @@ module ColabImport
     def team_member_names
       return [] if @data['team'].blank?
       @data['team']
+    end
+
+    def raise_error(message)
+      raise "#{self.class.name} #{message}"
     end
   end
 end
