@@ -76,7 +76,7 @@ RSpec.describe Roles::AddToChildren, type: :service do
           object: child,
           role_name: role_name,
           users: users,
-          groups: [],
+          groups: groups,
           propagate_to_children: false,
         }
       end

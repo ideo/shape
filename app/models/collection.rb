@@ -42,21 +42,23 @@ class Collection < ApplicationRecord
 
   accepts_nested_attributes_for :collection_cards
 
-  # Searchkick config
+  # Searchkick config - by default all string fields are searchable
   searchkick
   # active == don't index archived collections
   # where(type: nil) == don't index User/SharedWithMe collections
   scope :search_import, -> { active.where(type: nil).includes(%i[tags items]) }
 
   def search_data
+    user_ids = (editors[:users].pluck(:id) + viewers[:users].pluck(:id)).uniq
+    group_ids = (editors[:groups].pluck(:id) + viewers[:groups].pluck(:id)).uniq
     {
       name: name,
       tags: all_tag_names,
       item_tags: items.map(&:tags).flatten.map(&:name),
       content: search_content,
       organization_id: organization_id,
-      user_ids: (editors[:users] + viewers[:users]).uniq,
-      group_ids: (editors[:groups] + viewers[:groups]).uniq,
+      user_ids: user_ids,
+      group_ids: group_ids,
     }
   end
 

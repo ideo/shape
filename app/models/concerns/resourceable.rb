@@ -31,15 +31,14 @@ module Resourceable
       # e.g. .viewers returns all users and groups that are viewers
       #      .editors[:users] returns all users that are editors
       define_method role_name.to_s.pluralize.to_sym do
-        ret = { users: [], groups: [] }
-        roles
-          .where(name: role_name)
-          .includes(:users, :groups)
-          .each do |role|
-            ret[:users] += role.users
-            ret[:groups] += role.groups
-          end
-        ret
+        # There's only one role with a name per resource
+        role = roles.where(name: role_name)
+                    .includes(:users, :groups)
+                    .first
+
+        return { users: [], groups: [] } if role.blank?
+
+        { users: role.users, groups: role.groups }
       end
     end
   end

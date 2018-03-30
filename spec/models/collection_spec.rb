@@ -190,4 +190,25 @@ describe Collection, type: :model do
       end
     end
   end
+
+  describe '#search_data' do
+    let(:collection) { create(:collection) }
+    let(:users) { create_list(:user, 2) }
+    let(:groups) { create_list(:group, 2) }
+
+    before do
+      users[0].add_role(Role::EDITOR, collection)
+      users[1].add_role(Role::VIEWER, collection)
+      groups[0].add_role(Role::EDITOR, collection)
+      groups[1].add_role(Role::VIEWER, collection)
+    end
+
+    it 'includes all user_ids' do
+      expect(collection.search_data[:user_ids]).to match_array(users.map(&:id))
+    end
+
+    it 'includes all group_ids' do
+      expect(collection.search_data[:group_ids]).to match_array(groups.map(&:id))
+    end
+  end
 end
