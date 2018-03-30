@@ -107,8 +107,6 @@ GEM
       i18n (>= 0.7)
     faraday (0.12.2)
       multipart-post (>= 1.2, < 3)
-    fast_jsonapi (1.1.1)
-      activesupport (>= 4.2)
     ffi (1.9.23)
     filestack (2.2.1)
       mimemagic (~> 0.3.2)
@@ -134,6 +132,8 @@ GEM
       rspec (>= 2.99.0, < 4.0)
     hashie (3.5.7)
     highline (1.7.10)
+    httparty (0.16.1)
+      multi_xml (>= 0.5.2)
     i18n (0.9.5)
       concurrent-ruby (~> 1.0)
     jbuilder (2.7.0)
@@ -177,7 +177,6 @@ GEM
     nio4r (2.3.0)
     nokogiri (1.8.2)
       mini_portile2 (~> 2.3.0)
-    normalize-rails (4.1.1)
     notiffany (0.1.1)
       nenv (~> 0.1)
       shellany (~> 0.0)
@@ -379,16 +378,15 @@ DEPENDENCIES
   dotenv-rails
   factory_bot_rails
   faker (~> 1.8.7)
-  fast_jsonapi
   filestack
   guard
   guard-rspec
   hashie
+  httparty
   jbuilder (~> 2.5)
   json-schema
   jsonapi-rails
   listen (>= 3.0.5, < 3.2)
-  normalize-rails (~> 4.1)
   omniauth-okta
   pg (~> 0.21)
   pry-rails

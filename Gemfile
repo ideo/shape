@@ -22,7 +22,6 @@ gem 'puma', '~> 3.11'
 
 # Use SCSS for stylesheets
 gem 'sass-rails', '~> 5.0'
-# gem 'bourbon', '~> 5.0.0'
 gem 'autoprefixer-rails'
 gem 'normalize-rails', '~> 4.1'
 
@@ -41,7 +40,6 @@ gem 'webpacker', '~> 3.0'
 gem 'hashie'
 
 # JSON serializer
-gem 'fast_jsonapi'
 gem 'jsonapi-rails'
 
 # For defining user abilities
@@ -73,6 +71,8 @@ gem 'filestack'
 
 # inline styles for email
 gem 'roadie-rails', '~> 1.2'
+# For easier http request
+gem 'httparty'
 
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console

@@ -53,29 +53,27 @@ module ColabImport
 
       order = collection_cards.last.order
 
-      @media_items.all? do |item|
+      @media_items.each do |item|
         create_item = CreateMediaItem.new(data: item)
 
         # Skip if url no longer exists
-        if UrlExists.new(create_item.url).call
+        next unless UrlExists.new(create_item.url).call
 
-          unless create_item.call
-            raise_error("Could not create image item on card: #{create_item.errors.full_messages.join('. ')}")
-          end
+        unless create_item.call
+          raise_error("Could not create image item on card: #{create_item.errors.full_messages.join('. ')}")
+        end
 
-          builder = CollectionCardBuilder.new(
-            params: { item_id: create_item.item.id, order: order += 1 },
-            parent_collection: @collection,
-          )
-          unless builder.create
-            raise_error("Could not create card for media: #{builder.errors.full_messages.join('. ')}")
-          end
-
-          true
-        else
-          true
+        builder = CollectionCardBuilder.new(
+          params: { item_id: create_item.item.id, order: order += 1 },
+          parent_collection: @collection,
+        )
+        unless builder.create
+          raise_error("Could not create card for media: #{builder.errors.full_messages.join('. ')}")
         end
       end
+
+      # We've had many issues importing them, so return true no matter what
+      true
     end
 
     def recalculate_breadcrumbs
