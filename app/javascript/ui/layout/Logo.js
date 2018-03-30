@@ -3,15 +3,18 @@ import { FormattedMessage } from 'react-intl'
 import v from '~/utils/variables'
 
 const StyledLogo = styled.div`
-  font-size: 0.75rem;
-  letter-spacing: 0.5px;
-  font-family: ${v.fonts.sans};
-  font-weight: ${v.weights.medium};
-  text-transform: uppercase;
+  margin-bottom: 10px;
+
+  & img {
+    width: 81.7px;
+  }
 `
 const Logo = () => (
   <StyledLogo>
-    <FormattedMessage id="Logo.name" defaultMessage="Shape" />
+    <img
+      src="https://s3-us-west-2.amazonaws.com/assets.shape.space/shape-logo.png"
+      alt="Shape"
+    />
   </StyledLogo>
 )
 
