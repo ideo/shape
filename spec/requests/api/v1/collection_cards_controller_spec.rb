@@ -250,7 +250,7 @@ describe Api::V1::CollectionCardsController, type: :request, auth: true do
     end
   end
 
-  describe 'PATCH #move', :only do
+  describe 'PATCH #move' do
     let!(:from_collection) { create(:collection, num_cards: 3, add_editors: [user]) }
     let!(:moving_cards) { from_collection.collection_cards.first(2) }
     let!(:unmoved_card) { from_collection.collection_cards.last }

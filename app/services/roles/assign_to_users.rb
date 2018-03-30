@@ -35,7 +35,6 @@ module Roles
 
     def add_roles_to_children
       return unless @object.respond_to?(:children)
-      return unless @object.children.any?
       if @synchronous
         AddRolesToChildrenWorker.new.perform(
           @added_users.map(&:id),
