@@ -28,7 +28,7 @@ class Api::V1::SearchController < Api::V1::BaseController
           { group_ids: current_user_current_group_ids },
         ],
       },
-      per_page: 3,
+      per_page: 10,
       page: page,
     )
   end

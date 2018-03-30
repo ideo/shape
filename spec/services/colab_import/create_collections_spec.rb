@@ -66,7 +66,7 @@ RSpec.describe ColabImport::CreateCollections, type: :service do
       expect(prototype_collection.items)
     end
 
-    it 'has name, breadcrumb and correct content' do
+    it 'has concept name, breadcrumb & description' do
       expect(prototype_collection.name).to eq('Voyaging')
       expect(prototype_collection.breadcrumb.size).to eq(3)
       expect(

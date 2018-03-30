@@ -16,6 +16,9 @@ module ColabImport
       else
         raise "Unsupported CreateMediaItem item type: #{type}"
       end
+
+      return false if @item.blank?
+      @item.persisted?
     end
 
     def errors
@@ -29,12 +32,16 @@ module ColabImport
     private
 
     def create_image_item
-      return if !UrlExists.new(url).call
+      return unless UrlExists.new(url).call
 
-      @item = Item::ImageItem.create(
-        name: name,
-        filestack_file: FilestackFile.create_from_url(url)
-      )
+      begin
+        @item = Item::ImageItem.create(
+          name: name,
+          filestack_file: FilestackFile.create_from_url(url)
+        )
+      rescue
+        @item = nil
+      end
     end
 
     def create_video_item
