@@ -53,7 +53,8 @@ class CardMenu extends React.PureComponent {
   get menuItems() {
     const { canEdit, canReplace } = this.props
     const duplicateItem = {
-      name: 'Duplicate', icon: <DuplicateIcon />, onClick: this.duplicateCard }
+      name: 'Duplicate', icon: <DuplicateIcon />, onClick: this.duplicateCard
+    }
     let items = [duplicateItem]
 
     if (canEdit) {

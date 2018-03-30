@@ -92,7 +92,6 @@ export default class UiStore {
     this.deselectCards()
     this.closeMoveMenu()
     this.closeBlankContentTool()
-    // TODO: should also close the Move snackbar
   }
 
   @action closeBlankContentTool() {

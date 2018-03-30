@@ -145,27 +145,36 @@ class GridCard extends React.Component {
   }
 
   render() {
+    const {
+      card,
+      canEditCollection,
+      isSharedCollection,
+      dragging,
+      menuOpen,
+      onMoveStart,
+    } = this.props
+
     return (
-      <StyledGridCard dragging={this.props.dragging}>
-        {this.props.canEditCollection &&
-          <GridCardHotspot card={this.props.card} dragging={this.props.dragging} />
+      <StyledGridCard dragging={dragging}>
+        {canEditCollection &&
+          <GridCardHotspot card={card} dragging={dragging} />
         }
         {/*
           TODO: Not fully disable CardMenu for SharedCollection
           once we have appropriate actions?
         */}
-        {!this.props.isSharedCollection &&
+        {!isSharedCollection &&
           <StyledTopRightActions className="">
             {this.canEdit &&
-              <SelectionCircle cardId={this.props.card.id} />
+              <SelectionCircle cardId={card.id} />
             }
             <CardMenu
               className="show-on-hover card-menu"
-              card={this.props.card}
+              card={card}
               canEdit={this.canEdit}
               canReplace={this.canReplace}
-              menuOpen={this.props.menuOpen}
-              handleMove={this.props.onMoveStart}
+              menuOpen={menuOpen}
+              handleMove={onMoveStart}
             />
           </StyledTopRightActions>
         }

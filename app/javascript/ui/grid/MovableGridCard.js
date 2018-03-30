@@ -108,8 +108,6 @@ class MovableGridCard extends React.PureComponent {
   }
 
   handleResize = (e, dir, ref, delta, position) => {
-    uiStore.closeBlankContentTool()
-    uiStore.closeMoveMenu()
     if (!this.state.resizing) {
       this.setState({ resizing: true, moveComplete: false })
       uiStore.resetSelectionAndBCT()
