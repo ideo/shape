@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe ColabImport::CreateCollections, :only, type: :service do
+RSpec.describe ColabImport::CreateCollections, type: :service do
   describe '#call' do
     let(:concept_uids) { '-L2MabbTxWEL7FBgL_oL' }
     let(:editor) { create(:user) }

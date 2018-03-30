@@ -2,7 +2,7 @@ require 'rails_helper'
 
 RSpec.describe AddRolesToChildrenWorker, type: :worker do
   describe '#perform' do
-    let(:collection) { create(:collection) }
+    let(:collection) { create(:collection, num_cards: 3) }
     let(:users_to_add) { create_list(:user, 3) }
     let(:role_name) { Role::EDITOR }
     let(:instance_double) do
@@ -27,6 +27,21 @@ RSpec.describe AddRolesToChildrenWorker, type: :worker do
         collection.id,
         collection.class.name,
       )).to be true
+    end
+
+    context 'with no child cards' do
+      let(:collection) { create(:collection) }
+
+      it 'should not call Roles::AddToChildren' do
+        expect(Roles::AddToChildren).not_to receive(:new)
+        expect(instance_double).not_to receive(:call)
+        AddRolesToChildrenWorker.new.perform(
+          users_to_add.map(&:id),
+          role_name,
+          collection.id,
+          collection.class.name,
+        )
+      end
     end
   end
 end
