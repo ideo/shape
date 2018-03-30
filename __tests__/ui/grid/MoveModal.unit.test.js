@@ -5,24 +5,17 @@ import {
 } from '#/mocks/data'
 
 import fakeApiStore from '#/mocks/fakeApiStore'
+import fakeUiStore from '#/mocks/fakeUiStore'
 
+let props, wrapper, component
+const uiStore = fakeUiStore
 describe('MoveModal', () => {
-  let props
-  let wrapper
-  let component
-
   beforeEach(() => {
     props = {
       apiStore: fakeApiStore({
         requestResult: { data: fakeCollection }
       }),
-      uiStore: {
-        closeMoveMenu: jest.fn(),
-        deselectCards: jest.fn(),
-        viewingCollection: fakeCollection,
-        movingFromCollectionId: null,
-        movingCardIds: [],
-      }
+      uiStore,
     }
     props.apiStore.request = jest.fn()
     wrapper = shallow(
@@ -94,7 +87,7 @@ describe('MoveModal', () => {
 
       it('should deselect the cards', async () => {
         await component.moveCards('beginning')
-        expect(props.uiStore.deselectCards).toHaveBeenCalled()
+        expect(props.uiStore.resetSelectionAndBCT).toHaveBeenCalled()
       })
     })
   })

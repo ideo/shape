@@ -39,7 +39,7 @@ class SearchPage extends PageWithApi {
     return `search?query=${q}&page=${page}`
   }
 
-  @action onAPILoad = (results, meta) => {
+  @action onAPILoad = ({ data: results, meta }) => {
     if (meta.page === 1) {
       // reset if we are performing a new search starting at page 1
       this.searchResults.replace([])

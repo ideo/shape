@@ -79,15 +79,6 @@ RSpec.describe Roles::AssignToUsers, type: :service do
           assign_role.call
         end
       end
-
-      describe 'with item' do
-        let(:object) { create(:text_item) }
-
-        it 'does not call AddRolesToChildrenWorker' do
-          expect(AddRolesToChildrenWorker).not_to receive(:perform_async)
-          assign_role.call
-        end
-      end
     end
   end
 end
