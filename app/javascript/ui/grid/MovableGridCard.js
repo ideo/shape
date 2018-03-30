@@ -128,10 +128,6 @@ class MovableGridCard extends React.PureComponent {
   // this function gets passed down to the card, so it can place the onClick handler
   handleClick = (e) => {
     const { card, cardType, record } = this.props
-    // if currently moving cards, cancel moving
-    if (uiStore.movingCardIds.length > 0) {
-      uiStore.closeMoveMenu()
-    }
     // TODO: make sure this is cross-browser compatible?
     if (e.metaKey || e.shiftKey) {
       if (e.metaKey) {

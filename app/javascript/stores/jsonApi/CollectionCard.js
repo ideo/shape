@@ -37,15 +37,14 @@ class CollectionCard extends BaseRecord {
     const agree = isReplacing ? true : window.confirm('Are you sure?')
     if (agree) {
       const collection = this.parent
-      let lastCard = false
       try {
         await this.apiStore.request(`collection_cards/${this.id}/archive`, 'PATCH')
-        if (collection.collection_cards.length === 1) lastCard = true
 
-        await this.apiStore.fetch('collections', collection.id, true)
+        const response = await this.apiStore.fetch('collections', collection.id, true)
+        // extra check if we archived the last card in the collection
+        collection.checkResponseForEmptyCards(response)
         if (isReplacing) uiStore.closeBlankContentTool()
-        // for some reason it doesn't remove the last card when you re-fetch
-        if (lastCard) collection.emptyCards()
+
         return true
       } catch (e) {
         // console.warn(e)

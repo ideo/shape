@@ -64,10 +64,8 @@ class MoveModal extends React.Component {
       collection_card_ids: uiStore.movingCardIds,
       placement,
     }
-    const result = await apiStore.request('/collection_cards/move', 'PATCH', data)
-    console.log(result)
-    uiStore.closeMoveMenu()
-    uiStore.deselectCards()
+    await apiStore.request('/collection_cards/move', 'PATCH', data)
+    uiStore.resetSelectionAndBCT()
   }
 
   handleMoveToBeginning = () => {
