@@ -1,8 +1,8 @@
 class Api::V1::RolesController < Api::V1::BaseController
   # don't need to load records on destroy because it's nested under the user
-  load_resource :collection, except: :destroy
-  load_resource :item, except: :destroy
-  load_resource :group, except: :destroy
+  load_resource :collection
+  load_resource :item
+  load_resource :group
   load_resource only: %i[destroy]
   load_resource :user, only: :destroy
   load_resource :group, only: :destroy
@@ -26,7 +26,7 @@ class Api::V1::RolesController < Api::V1::BaseController
   # /[collections/items]/:id/roles
   def create
     users = User.where(id: json_api_params[:user_ids]).to_a
-    groups = User.where(id: json_api_params[:group_ids]).to_a
+    groups = Group.where(id: json_api_params[:group_ids]).to_a
     assigner = Roles::MassAssign.new(
       object: record,
       role_name: role_params[:name],
@@ -48,9 +48,9 @@ class Api::V1::RolesController < Api::V1::BaseController
     # We want to call remove_role instead of deleting the UserRole
     # So that role lifecycle methods are called
     if @user.present? && remove_role(user: @user, role: @role)
-      render jsonapi: @role, include: %i[users groups resource]
+      render jsonapi: record.roles, include: %i[users groups resource]
     elsif @group.present? && remove_role(group: @group, role: @role)
-      render jsonapi: @role, include: %i[users groups resource]
+      render jsonapi: record.roles, include: %i[users groups resource]
     else
       render_api_errors @user.errors
     end

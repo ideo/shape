@@ -21,17 +21,23 @@ class RolesMenu extends React.Component {
   @observable searchableItems = []
 
   componentDidMount() {
-    const { apiStore } = this.props
+    const { apiStore, ownerType } = this.props
     const organizationId = apiStore.currentUser.current_organization.id
     const req = (type) => this.props.apiStore.request(
       `organizations/${organizationId}/${type}`,
       'GET'
     )
-    Promise.all([req('groups'), req('users')]).then(res => {
-      const groups = res[0].data
-      const users = res[1].data
-      groups.forEach(r => { r.type = 'groups' })
+    // Groups should not be addable to other groups, return nothing for
+    // consistency
+    const reqs = ownerType === 'groups'
+      ? [req('users'), Promise.resolve({ data: [] })]
+      : [req('users'), req('groups')]
+
+    Promise.all(reqs).then(res => {
+      const users = res[0].data
+      const groups = res[1].data
       users.forEach((u) => { u.type = 'users' })
+      groups.forEach(r => { r.type = 'groups' })
       return this.setSearchableItems([...groups, ...users])
     })
   }

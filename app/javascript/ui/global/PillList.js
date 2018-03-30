@@ -46,7 +46,7 @@ class PillList extends React.Component {
           return (
             <Pill
               className="pill"
-              key={item.email}
+              key={item.name}
               avatar={avatar}
               label={item.name}
               onDelete={this.handleDelete(item)}
