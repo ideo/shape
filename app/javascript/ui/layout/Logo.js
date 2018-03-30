@@ -3,8 +3,6 @@ import { FormattedMessage } from 'react-intl'
 import v from '~/utils/variables'
 
 const StyledLogo = styled.div`
-  margin-bottom: 10px;
-
   & img {
     width: 81.7px;
   }
