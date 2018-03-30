@@ -111,6 +111,7 @@ class ItemPage extends PageWithApi {
             <Flex align="baseline" className="item-page">
               <PageMenu
                 record={item}
+                canEdit={item.can_edit}
                 menuOpen={uiStore.pageMenuOpen}
                 disablePermissions
               />
