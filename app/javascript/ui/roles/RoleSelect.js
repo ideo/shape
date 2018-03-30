@@ -13,7 +13,7 @@ import {
 } from '~/ui/global/styled/layout'
 import { Select } from '~/ui/global/styled/forms'
 import LeaveIcon from '~/ui/icons/LeaveIcon'
-import UserAvatar from '~/ui/users/UserAvatar'
+import Avatar from '~/ui/global/Avatar'
 
 const MinRowItem = styled.span`
   min-width: 110px;
@@ -42,17 +42,17 @@ class RoleSelect extends React.Component {
   }
 
   createRole(roleName) {
-    const { onCreate, user } = this.props
-    onCreate([user], roleName)
+    const { onCreate, entity } = this.props
+    onCreate([entity], roleName)
   }
 
   deleteRole = (toRemove = false) => {
-    const { role, user } = this.props
-    return this.props.onDelete(role, user, toRemove)
+    const { role, entity } = this.props
+    return this.props.onDelete(role, entity, toRemove)
   }
 
   render() {
-    const { enabled, role, roleTypes, user } = this.props
+    const { enabled, role, roleTypes, entity } = this.props
     let select
     if (enabled) {
       select = (
@@ -75,23 +75,24 @@ class RoleSelect extends React.Component {
       select = <DisplayText>{_.startCase(role.name)}</DisplayText>
     }
     // TODO remove duplication with RolesAdd role select menu
+    const url = entity.pic_url_square || entity.filestack_file_url
     return (
       <Row>
         <span>
-          <UserAvatar
-            key={user.id}
-            user={user}
+          <Avatar
+            key={entity.id}
+            url={url}
             size={38}
           />
         </span>
         <RowItemLeft>
-          { user.name && user.name.trim().length > 0
+          { entity.name && entity.name.trim().length > 0
             ? (<div>
-              <DisplayText>{user.name}</DisplayText><br />
-              <SubText>{user.email}</SubText>
+              <DisplayText>{entity.name}</DisplayText><br />
+              <SubText>{entity.email}</SubText>
             </div>)
             : (<CenterAlignedSingleItem>
-              <DisplayText>{user.email}</DisplayText>
+              <DisplayText>{entity.email}</DisplayText>
             </CenterAlignedSingleItem>)
           }
         </RowItemLeft>
@@ -109,7 +110,7 @@ class RoleSelect extends React.Component {
 RoleSelect.propTypes = {
   role: MobxPropTypes.objectOrObservableObject.isRequired,
   roleTypes: PropTypes.arrayOf(PropTypes.string).isRequired,
-  user: MobxPropTypes.objectOrObservableObject.isRequired,
+  entity: MobxPropTypes.objectOrObservableObject.isRequired,
   onDelete: PropTypes.func.isRequired,
   onCreate: PropTypes.func.isRequired,
   enabled: PropTypes.bool

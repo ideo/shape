@@ -3,6 +3,11 @@ import { Provider } from 'mobx-react'
 import RolesMenu from '~/ui/roles/RolesMenu'
 import Role from '~/stores/jsonApi/Role'
 
+import {
+  fakeOrganization,
+  fakeUser
+} from '#/mocks/data'
+
 const apiStore = observable({
   currentUser: {},
   request: jest.fn()
@@ -12,6 +17,7 @@ const apiStore = observable({
     .mockReturnValue(Promise.resolve({ roles: [] })),
   remove: jest.fn(),
   add: jest.fn(),
+  currentUser: fakeUser,
 })
 const uiStore = observable({
   rolesMenuOpen: false,
@@ -40,29 +46,18 @@ describe('RolesMenu', () => {
     component = wrapper.instance()
   })
 
-  describe('onDelete', () => {
-    const role = { id: 2 }
-    const user = { id: 4 }
-    const res = { data: [] }
-
+  describe('componentDidMount', () => {
     beforeEach(() => {
-      apiStore.request.mockReturnValue(Promise.resolve(res))
+      apiStore.request.mockReturnValue(Promise.resolve([{}]))
     })
 
-    it('should make an api store request with correct data', () => {
-      component.onDelete(role, user, false)
+    it('should request all the organization groups and users', () => {
       expect(apiStore.request).toHaveBeenCalledWith(
-        `users/${user.id}/roles/${role.id}`, 'DELETE'
+        `organizations/${fakeOrganization.id}/users`, 'GET'
       )
-    })
-
-    describe('when to remove is true', () => {
-      it('should call the onSave prop after the request is done', (done) => {
-        component.onDelete(role, user, true).then(() => {
-          expect(props.onSave).toHaveBeenCalledWith(res)
-          done()
-        })
-      })
+      expect(apiStore.request).toHaveBeenCalledWith(
+        `organizations/${fakeOrganization.id}/groups`, 'GET'
+      )
     })
   })
 
@@ -77,30 +72,63 @@ describe('RolesMenu', () => {
         })
       })
     })
+
+  describe('onDelete', () => {
+    const role = { id: 2 }
+    const user = { id: 4 }
+    const res = { data: [] }
+
+    beforeEach(() => {
+      apiStore.request.mockReturnValue(Promise.resolve(res))
+    })
+
+    describe('with a user', () => {
+      it('should make an api store request with correct data', () => {
+        const role = { id: 2 }
+        const user = { id: 4, type: 'users' }
+        component.onDelete(role, user, false)
+        expect(apiStore.request).toHaveBeenCalledWith(
+          `users/${user.id}/roles/${role.id}`, 'DELETE'
+        )
+      })
+    })
+
+    describe('when to remove is true', () => {
+      it('should call the onSave prop after the request is done', (done) => {
+        component.onDelete(role, user, true).then(() => {
+          expect(props.onSave).toHaveBeenCalledWith(res)
+          done()
+        })
+      })
+    })
   })
 
   describe('onCreateRoles', () => {
-    let users
+    describe('with a users', () => {
+      let component
+      let users
 
-    beforeEach(() => {
-      users = [{ id: 3 }, { id: 5 }]
-      apiStore.request.mockReturnValue(Promise.resolve({}))
-      apiStore.fetchAll.mockReturnValue(Promise.resolve({ data: [] }))
-    })
+      beforeEach(() => {
+        component = wrapper.find('RolesMenu').instance()
+        users = [{ id: 3, type: 'users' }, { id: 5, type: 'users' }]
+        apiStore.request.mockReturnValue(Promise.resolve({}))
+        apiStore.fetchAll.mockReturnValue(Promise.resolve({ data: [] }))
+      })
 
-    it('should send a request to create roles with role and user ids', () => {
-      component.onCreateRoles(users, 'editor')
-      expect(apiStore.request).toHaveBeenCalledWith(
-        'collections/1/roles',
-        'POST',
-        { role: { name: 'editor' }, user_ids: [3, 5] }
-      )
-    })
+      it('should send a request to create roles with role and user ids', () => {
+        component.onCreateRoles(users, 'editor')
+        expect(apiStore.request).toHaveBeenCalledWith(
+          'collections/1/roles',
+          'POST',
+          { role: { name: 'editor' }, user_ids: [3, 5], group_ids: [] }
+        )
+      })
 
-    it('should call onSave', (done) => {
-      component.onCreateRoles(users, 'editor').then(() => {
-        expect(props.onSave).toHaveBeenCalled()
-        done()
+      it('should call onSave', (done) => {
+        component.onCreateRoles(users, 'editor').then(() => {
+          expect(props.onSave).toHaveBeenCalled()
+          done()
+        })
       })
     })
   })
