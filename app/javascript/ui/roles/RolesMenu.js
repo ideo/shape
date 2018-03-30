@@ -47,11 +47,12 @@ class RolesMenu extends React.Component {
   }
 
   onDelete = (role, entity, toRemove) =>
-    this.props.apiStore.request(`users/${entity.id}/roles/${role.id}`,
+    this.props.apiStore.request(`${entity.type}/${entity.id}/roles/${role.id}`,
       'DELETE').then((res) => {
       if (toRemove) {
-        this.props.onSave(res)
+        return this.props.onSave(res)
       }
+      return {}
     })
 
   onCreateRoles = (entities, roleName) => {

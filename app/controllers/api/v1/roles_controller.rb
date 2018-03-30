@@ -23,7 +23,7 @@ class Api::V1::RolesController < Api::V1::BaseController
   # - group_ids: array of group ids that you want to assign
   # Returns:
   # - array of roles successfully created, including users with that role
-  # /[collections/items]/:id/roles
+  # /[collections/items/groups]/:id/roles
   def create
     users = User.where(id: json_api_params[:user_ids]).to_a
     groups = Group.where(id: json_api_params[:group_ids]).to_a
