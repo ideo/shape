@@ -43,10 +43,11 @@ class PillList extends React.Component {
             avatar = <UserAvatar className="avatar" size={38} user={item} />
           }
 
+          // This could be a user, a group or an unregistered user
           return (
             <Pill
               className="pill"
-              key={item.name}
+              key={item.name || item.id || item.email}
               avatar={avatar}
               label={item.name}
               onDelete={this.handleDelete(item)}
