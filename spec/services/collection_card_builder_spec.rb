@@ -25,7 +25,7 @@ RSpec.describe CollectionCardBuilder, type: :service do
               name: 'Cool Collection',
             },
           ),
-          collection: parent,
+          parent_collection: parent,
           user: user,
         )
       end
@@ -69,7 +69,7 @@ RSpec.describe CollectionCardBuilder, type: :service do
               type: 'Item::TextItem',
             },
           ),
-          collection: parent,
+          parent_collection: parent,
           user: user,
         )
       end
@@ -105,7 +105,7 @@ RSpec.describe CollectionCardBuilder, type: :service do
               content: 'My Text Content goes here',
             },
           ),
-          collection: parent,
+          parent_collection: parent,
           user: user,
         )
       end
@@ -126,7 +126,7 @@ RSpec.describe CollectionCardBuilder, type: :service do
       let(:builder) do
         CollectionCardBuilder.new(
           params: params,
-          collection: parent,
+          parent_collection: parent,
           user: user,
         )
       end
@@ -153,7 +153,7 @@ RSpec.describe CollectionCardBuilder, type: :service do
               type: 'Item::TextItem',
             },
           ),
-          collection: parent,
+          parent_collection: parent,
           user: user,
         )
       end

@@ -50,7 +50,8 @@ class Collection
       # has loaded the "real" collectionCard with id=X then there will be a collision.
       i = 999_999
 
-      collections_shared_with_me.map do |obj|
+      # Hack - only include 25 as it's crashing
+      collections_shared_with_me.first(25).map do |obj|
         CollectionCard.new(
           id: i,
           parent: self,

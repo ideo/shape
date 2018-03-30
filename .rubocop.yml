@@ -32,7 +32,9 @@ Metrics/AbcSize:
 # to have been changed, as it would if it lacked a comma and had one added.
 Style/TrailingCommaInArguments:
   EnforcedStyleForMultiline: comma
-Style/TrailingCommaInLiteral:
+Style/TrailingCommaInHashLiteral:
+  EnforcedStyleForMultiline: comma
+Style/TrailingCommaInArrayLiteral:
   EnforcedStyleForMultiline: comma
 
 # Cop supports --auto-correct.

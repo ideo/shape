@@ -11,7 +11,7 @@ class Item
       text_data['ops'].each_with_index do |data, i|
         # strip out escaped strings e.g. "&lt;strong&gt;" if someone typed raw HTML
         # strip out extra whitespaces/newlines
-        t = data['insert'].gsub(/&lt;[^&]*&gt;/, '').squeeze(' ').strip
+        t = StripTags.new(data['insert']).call
         # sometimes the data['insert'] is just a newline, ignore
         next if t.empty?
         text += ' | ' if i.positive?

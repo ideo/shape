@@ -15,7 +15,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
 
   def create
     builder = CollectionCardBuilder.new(params: collection_card_params,
-                                        collection: @collection,
+                                        parent_collection: @collection,
                                         user: current_user)
     if builder.create
       render jsonapi: builder.collection_card, include: [:parent, record: [:filestack_file]]

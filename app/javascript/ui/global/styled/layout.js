@@ -24,7 +24,11 @@ export const RowItemLeft = styled.span`
 RowItemLeft.displayName = 'StyledRowItemLeft'
 
 export const RowItemRight = styled.span`
-  float: right;
   margin-left: auto;
 `
 RowItemRight.displayName = 'StyledRowItemRight'
+
+export const FloatRight = styled.span`
+  float: right;
+`
+FloatRight.displayName = 'StyledFloatRight'
