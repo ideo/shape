@@ -63,7 +63,7 @@ class MoveModal extends React.Component {
     if (!uiStore.viewingCollection.userCanEdit(currentUser.id)) {
       // TODO add error dialog
       console.warn('Cannot edit this collection')
-      return Promise.resolve()
+      return
     }
     const data = {
       to_id: collectionId,
@@ -71,14 +71,13 @@ class MoveModal extends React.Component {
       collection_card_ids: uiStore.movingCardIds,
       placement,
     }
-    let response
     try {
-      response = await apiStore.request('/collection_cards/move', 'PATCH', data)
+      await apiStore.request('/collection_cards/move', 'PATCH', data)
       uiStore.resetSelectionAndBCT()
     } catch (e) {
-      // alert('sorry bro.')
+      // TODO add error dialog
+      console.warn('Cannot move this collection')
     }
-    return response
   }
 
   handleMoveToBeginning = () => {

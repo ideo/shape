@@ -59,18 +59,11 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
       placement: json_api_params[:placement],
     )
     if mover.call
-      render jsonapi: @to_collection.reload, include:
-        [
-          roles: [:users],
-          collection_cards: [
-            :parent,
-            record: [
-              :filestack_file,
-            ],
-          ],
-        ]
+      # NOTE: even though this action is in CollectionCardsController, it returns the to_collection
+      # so that it can be easily re-rendered on the page
+      render jsonapi: @to_collection.reload, include: Collection.default_relationships_for_api
     else
-      render_api_errors mover.errors
+      render json: { errors: mover.errors }, status: :bad_request
     end
   end
 
