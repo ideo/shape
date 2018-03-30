@@ -115,6 +115,7 @@ export const fakeRole = {
   ...fakeRoleAttrs,
   rawAttributes: jest.fn().mockReturnValue(fakeRoleAttrs),
   getRecordType: jest.fn().mockReturnValue('roles'),
+  canEdit: jest.fn(),
 }
 export const fakePosition = {
   xPos: 0,

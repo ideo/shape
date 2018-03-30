@@ -58,8 +58,15 @@ class MoveModal extends React.Component {
 
   moveCards = async (placement) => {
     const { uiStore, apiStore } = this.props
+    const { currentUser } = apiStore
+    const collectionId = uiStore.viewingCollection.id
+    if (!uiStore.viewingCollection.userCanEdit(currentUser.id)) {
+      // TODO add error dialog
+      console.warn('Cannot edit this collection')
+      return Promise.resolve()
+    }
     const data = {
-      to_id: uiStore.viewingCollection.id,
+      to_id: collectionId,
       from_id: uiStore.movingFromCollectionId,
       collection_card_ids: uiStore.movingCardIds,
       placement,
@@ -119,8 +126,8 @@ class MoveModal extends React.Component {
 MoveModal.propTypes = {
 }
 MoveModal.wrappedComponent.propTypes = {
-  uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
   apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
+  uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 MoveModal.defaultProps = {
 }
