@@ -68,7 +68,7 @@ describe('RoleSelect', () => {
       wrapper.instance().onRoleRemove(fakeEvent)
       expect(props.onDelete).toHaveBeenCalledWith(
         props.role,
-        props.user,
+        props.entity,
         true
       )
     })

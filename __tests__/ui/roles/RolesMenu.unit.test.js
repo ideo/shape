@@ -1,7 +1,6 @@
 import { observable, useStrict } from 'mobx'
 import { Provider } from 'mobx-react'
 import RolesMenu from '~/ui/roles/RolesMenu'
-import Role from '~/stores/jsonApi/Role'
 
 import {
   fakeOrganization,
@@ -9,9 +8,8 @@ import {
 } from '#/mocks/data'
 
 const apiStore = observable({
-  currentUser: {},
   request: jest.fn()
-    .mockReturnValue(Promise.resolve({ id: 1 })),
+    .mockReturnValue(Promise.resolve({ data: [] })),
   fetchAll: jest.fn(),
   find: jest.fn()
     .mockReturnValue(Promise.resolve({ roles: [] })),
@@ -48,7 +46,7 @@ describe('RolesMenu', () => {
 
   describe('componentDidMount', () => {
     beforeEach(() => {
-      apiStore.request.mockReturnValue(Promise.resolve([{}]))
+      apiStore.request.mockReturnValue(Promise.resolve({ data: [] }))
     })
 
     it('should request all the organization groups and users', () => {
@@ -72,6 +70,7 @@ describe('RolesMenu', () => {
         })
       })
     })
+  })
 
   describe('onDelete', () => {
     const role = { id: 2 }
@@ -105,13 +104,11 @@ describe('RolesMenu', () => {
 
   describe('onCreateRoles', () => {
     describe('with a users', () => {
-      let component
       let users
 
       beforeEach(() => {
-        component = wrapper.find('RolesMenu').instance()
         users = [{ id: 3, type: 'users' }, { id: 5, type: 'users' }]
-        apiStore.request.mockReturnValue(Promise.resolve({}))
+        apiStore.request.mockReturnValue(Promise.resolve({ data: [] }))
         apiStore.fetchAll.mockReturnValue(Promise.resolve({ data: [] }))
       })
 
@@ -136,7 +133,7 @@ describe('RolesMenu', () => {
   describe('currentUserCheck', () => {
     describe('on a role that belongs to the current user', () => {
       it('should return false', () => {
-        apiStore.currentUser = { id: 3 }
+        apiStore.currentUser.id = 3
         const user = { id: 3 }
         expect(component.currentUserCheck(user)).toBeFalsy()
       })
@@ -144,7 +141,7 @@ describe('RolesMenu', () => {
 
     describe('on a role that belongs to another user', () => {
       it('should return true', () => {
-        apiStore.currentUser = { id: 4 }
+        apiStore.currentUser.id = 4
         const user = { id: 3 }
         expect(component.currentUserCheck(user)).toBeTruthy()
       })
@@ -156,7 +153,7 @@ describe('RolesMenu', () => {
     let role
 
     beforeEach(() => {
-      apiStore.currentUser = { id: 3 }
+      apiStore.currentUser.id = 3
       user = { id: 3, name: 'a', pic_url_square: 'something' }
       role = { id: 21, name: 'viewer', users: [user], canEdit: jest.fn() }
       props.roles = [role]
