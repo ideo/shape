@@ -51,6 +51,21 @@ class RoleSelect extends React.Component {
     return this.props.onDelete(role, user, toRemove)
   }
 
+  renderName() {
+    const { user } = this.props
+    let nameDisplay = user.name
+    if (!user.name || user.name.trim().length === 0) {
+      nameDisplay = user.email
+    }
+    if (user.isCurrentUser()) {
+      nameDisplay += ' (you)'
+    }
+    if (user.status === 'pending') {
+      nameDisplay += ' (pending)'
+    }
+    return nameDisplay
+  }
+
   render() {
     const { enabled, role, roleTypes, user } = this.props
     let select
@@ -74,6 +89,7 @@ class RoleSelect extends React.Component {
     } else {
       select = <DisplayText>{_.startCase(role.name)}</DisplayText>
     }
+
     // TODO remove duplication with RolesAdd role select menu
     return (
       <Row>
@@ -87,11 +103,11 @@ class RoleSelect extends React.Component {
         <RowItemLeft>
           { user.name && user.name.trim().length > 0
             ? (<div>
-              <DisplayText>{user.name}</DisplayText><br />
+              <DisplayText>{this.renderName()}</DisplayText><br />
               <SubText>{user.email}</SubText>
             </div>)
             : (<CenterAlignedSingleItem>
-              <DisplayText>{user.email}</DisplayText>
+              <DisplayText>{this.renderName()}</DisplayText>
             </CenterAlignedSingleItem>)
           }
         </RowItemLeft>
