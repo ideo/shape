@@ -8,12 +8,13 @@ FactoryBot.define do
     pic_url_square 'https://a3-images.myspacecdn.com/images03/1/240e42b5d9ce48a78983961e7fcb3c39/600x600.jpg'
 
     after(:build) do |user|
-      user.password = Devise.friendly_token[0,40]
+      user.password = Devise.friendly_token(40)
       user.password_confirmation = user.password
     end
 
     trait :pending do
       status :pending
+      invitation_token { Devise.friendly_token(40) }
       provider nil
       uid nil
     end

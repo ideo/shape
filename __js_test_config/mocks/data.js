@@ -99,6 +99,7 @@ export const fakeUserAttrs = {
   email: 'oprah@winfrey.com',
   pic_url_square: 'https://filestackcdn.com/abc123',
   groups: [],
+  isCurrentUser: jest.fn(),
 }
 export const fakeUser = {
   ...fakeUserAttrs,

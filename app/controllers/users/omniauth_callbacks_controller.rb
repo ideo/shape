@@ -1,6 +1,11 @@
 class Users::OmniauthCallbacksController < Devise::OmniauthCallbacksController
   def okta
-    @user = User.from_omniauth(request.env['omniauth.auth'])
+    if session[:pending_user_id]
+      # if this is nil for whatever reason, it will just end up creating a new User
+      pending_user = User.find(session[:pending_user_id])
+      session[:pending_user_id] = nil
+    end
+    @user = User.from_omniauth(request.env['omniauth.auth'], pending_user)
     if @user.save
       create_org_if_none(@user)
       # this will throw if @user is not activated
