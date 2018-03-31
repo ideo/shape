@@ -28,6 +28,8 @@ export default class UiStore {
   @observable viewingCollection = null
   @observable selectedCardIds = []
   @observable isLoading = false
+  @observable movingCardIds = []
+  @observable movingFromCollectionId = null
 
   // default action for updating any basic UiStore value
   @action update(name, value) {
@@ -36,6 +38,20 @@ export default class UiStore {
 
   @action closeRolesMenu() {
     this.rolesMenuOpen = false
+  }
+
+  @action openMoveMenu({ from: fromCollectionId }) {
+    // On move, copy over selected cards to moving cards
+    this.movingFromCollectionId = fromCollectionId
+    this.movingCardIds.replace([])
+    this.selectedCardIds.forEach((id) => {
+      this.movingCardIds.push(id)
+    })
+  }
+
+  @action closeMoveMenu() {
+    this.movingCardIds.replace([])
+    this.movingFromCollectionId = null
   }
 
   // --- grid properties
@@ -74,8 +90,8 @@ export default class UiStore {
 
   @action resetSelectionAndBCT() {
     this.deselectCards()
+    this.closeMoveMenu()
     this.closeBlankContentTool()
-    // TODO: should also close the Move snackbar
   }
 
   @action closeBlankContentTool() {
@@ -97,6 +113,13 @@ export default class UiStore {
     if (this.isSelected(cardId)) {
       this.selectedCardIds.remove(cardId)
     } else {
+      this.selectedCardIds.push(cardId)
+    }
+  }
+
+  // For certain actions we want to force a toggle on
+  @action selectCardId(cardId) {
+    if (!this.isSelected(cardId)) {
       this.selectedCardIds.push(cardId)
     }
   }

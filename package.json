@@ -41,7 +41,7 @@
     "lodash": "~4.17.4",
     "material-ui": "~1.0.0-beta.31",
     "mobx": "^3.4.1",
-    "mobx-jsonapi-store": "^4.0.0",
+    "mobx-jsonapi-store": "^4.2.1",
     "mobx-react": "^4.3.5",
     "mobx-react-intl": "^1.4.0",
     "mobx-react-router": "^4.0.1",

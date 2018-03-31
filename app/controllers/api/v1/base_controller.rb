@@ -26,6 +26,10 @@ class Api::V1::BaseController < ApplicationController
     }
   end
 
+  def json_api_params
+    params[:_jsonapi]
+  end
+
   def render_api_errors(errors)
     render jsonapi_errors: errors, status: :bad_request
   end

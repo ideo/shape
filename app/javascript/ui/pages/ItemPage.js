@@ -52,11 +52,6 @@ const CloseLink = styled(Link)`
 @inject('apiStore', 'uiStore')
 @observer
 class ItemPage extends PageWithApi {
-  componentDidMount() {
-    super.componentDidMount()
-    scroll.scrollToTop({ duration: 0 })
-  }
-
   get item() {
     const { match, apiStore } = this.props
     if (!apiStore.items.length) return null

@@ -83,6 +83,29 @@ class Collection < ApplicationRecord
   end
   # <-- End Searchkick
 
+  # default relationships to include when rendering Collections in the API
+  def self.default_relationships_for_api
+    [
+      roles: [:users, :groups],
+      collection_cards: [
+        :parent,
+        record: [:filestack_file],
+      ],
+    ]
+  end
+
+  # similar to above but requires `collection/item` instead of `record`
+  def self.default_relationships
+    [
+      roles: [:users],
+      collection_cards: [
+        :parent,
+        :collection,
+        item: [:filestack_file],
+      ],
+    ]
+  end
+
   amoeba do
     enable
     exclude_association :tags

@@ -15,6 +15,9 @@ Rails.application.routes.draw do
         resources :roles, only: %i[index create destroy], shallow: true
       end
       resources :collection_cards, shallow: true do
+        collection do
+          patch 'move'
+        end
         member do
           post 'duplicate'
         end

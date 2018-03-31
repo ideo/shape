@@ -91,6 +91,7 @@ export const fakeCollection = {
   // This is a computed property on the collection store
   cardIds: _.map(fakeCards, c => c.id),
   API_archive: jest.fn(),
+  checkResponseForEmptyCards: jest.fn(),
 }
 export const fakeOrganizationAttrs = {
   id: 1,
@@ -128,6 +129,7 @@ export const fakeRole = {
   ...fakeRoleAttrs,
   rawAttributes: jest.fn().mockReturnValue(fakeRoleAttrs),
   getRecordType: jest.fn().mockReturnValue('roles'),
+  canEdit: jest.fn(),
 }
 export const fakePosition = {
   xPos: 0,

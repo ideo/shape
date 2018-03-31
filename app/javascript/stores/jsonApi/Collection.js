@@ -17,6 +17,32 @@ class Collection extends BaseRecord {
     uiStore.openBlankContentTool()
   }
 
+  checkResponseForEmptyCards(response) {
+    /*
+      NOTE: if a collection goes from having cards to having an empty array of cards
+      (e.g. those cards were moved out, archived, etc)
+      then jsonapi-store seems to ignore the change, so we have to empty cards manually
+    */
+    const rawData = response.__response.data.data
+    if (!rawData && !rawData.relationships.collection_cards) return
+    if (_.isEmpty(rawData.relationships.collection_cards.data)) {
+      this.emptyCards()
+    }
+  }
+
+  userCanEdit(userId) {
+    if (this.isSharedCollection) return false
+    let perms = false
+    _.forEach(this.roles, role => {
+      if (role.canEdit()) {
+        role.users.forEach(u => {
+          if (u.id === userId) perms = true
+        })
+      }
+    })
+    return perms
+  }
+
   get isUserCollection() {
     return this.type === 'Collection::UserCollection'
   }

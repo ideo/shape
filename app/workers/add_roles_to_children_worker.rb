@@ -6,7 +6,8 @@ class AddRolesToChildrenWorker
     users_to_add = User.where(id: user_ids).to_a
     groups_to_add = Group.where(id: group_ids).to_a
     object = object_class.safe_constantize.find(object_id)
-
+    # no need to proceed unless this object has children
+    return unless object.children.any?
     Roles::AddToChildren.new(
       role_name: role_name,
       parent: object,
