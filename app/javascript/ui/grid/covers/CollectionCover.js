@@ -47,7 +47,7 @@ const StyledCardContent = styled.div`
     position: absolute;
     right: 0;
     top: 0;
-    background: ${hexToRgba(v.colors.blackLava, 0.1)};
+    background: ${hexToRgba(v.colors.blackLava, 0.4)};
     width: 100%;
     height: 100%;
   }
