@@ -110,6 +110,7 @@ export const fakeUserAttrs = {
   groups: [],
   current_organization: fakeOrganization,
   type: 'users',
+  isCurrentUser: jest.fn(),
 }
 export const fakeUser = {
   ...fakeUserAttrs,

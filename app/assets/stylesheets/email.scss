@@ -1,0 +1,131 @@
+// copied from c-delta
+// Styles for email templates (inlined using Roadie gem)
+
+$color-gray-gallery: #EEEEEE;
+$color-gray-boulder: #787878;
+$color-gray-tundora: #4A4A4A;
+
+.email-wrapper {
+  font-family: 'Sentinel-Light', Palatino, Georgia, serif;
+  font-size: 14px;
+  width: 100%;
+  max-width: 710px;
+  margin: 0 auto;
+  background-color: $color-gray-gallery;
+  color: $color-gray-tundora;
+
+  a, a:visited {
+    color: $color-gray-tundora;
+    text-decoration: none;
+  }
+
+  h1 {
+    font-size: 40px;
+  }
+  h2 {
+    font-size: 32px;
+  }
+  h3 {
+    font-size: 28px;
+  }
+  h4 {
+    font-size: 24px;
+  }
+  h5 {
+    font-size: 20px;
+  }
+  h6 {
+    font-size: 16px;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Gotham-Bold', 'Arial Black', Arial, Helvetica, sans-serif;
+    font-weight: bold;
+  }
+
+  .center {
+    text-align: center;
+  }
+
+  .p {
+    padding: 0 0 1em 0;
+  }
+
+  table {
+    border-spacing: 0;
+    border-collapse: collapse;
+    td {
+      padding: 6px;
+    }
+  }
+
+  .email-inner {
+    padding: 30px;
+    margin: 0 auto;
+    max-width: 650px;
+  }
+
+  .email-header {
+    background-color: #FFFFFF;
+    text-align: center;
+    padding-top: 30px;
+  }
+
+  .email-header__logo {
+    background-color: #ffffff;
+  }
+
+  .email-header__title {
+    text-align: center;
+    margin: 25px 15px 15px 15px;
+    text-transform: uppercase;
+  }
+
+  .email-header__image {
+    max-width: 95%;
+    margin: 0 auto;
+  }
+
+  .email-content {
+    background-color: #FFFFFF;
+    padding: 30px 20px;
+    font-size: 16px;
+  }
+
+  .email-link {
+    padding-top: 10px;
+    a {
+      font-weight: bold;
+    }
+  }
+
+  .email-image {
+    display: block;
+    margin: auto;
+  }
+
+  .email-footer {
+    font-size: 11px;
+    text-align: center;
+    padding: 40px;
+
+    &, a, a:visited {
+      color: $color-gray-boulder;
+    }
+  }
+
+  .email-footer__why {
+    font-size: 15px;
+  }
+
+  .email-footer__links {
+    a {
+      display: inline-block;
+      margin: 40px 20px;
+    }
+  }
+
+  .email-footer__copyright {
+    margin-top: 10px;
+  }
+}

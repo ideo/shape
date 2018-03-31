@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180329014550) do
+ActiveRecord::Schema.define(version: 20180329211218) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -19,13 +19,13 @@ ActiveRecord::Schema.define(version: 20180329014550) do
     t.integer "order", null: false
     t.integer "width"
     t.integer "height"
-    t.boolean "reference", default: false
     t.bigint "parent_id"
     t.bigint "collection_id"
     t.bigint "item_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.boolean "archived", default: false
+    t.boolean "reference", default: false
     t.index ["collection_id"], name: "index_collection_cards_on_collection_id"
     t.index ["item_id"], name: "index_collection_cards_on_item_id"
     t.index ["parent_id"], name: "index_collection_cards_on_parent_id"
@@ -155,7 +155,9 @@ ActiveRecord::Schema.define(version: 20180329014550) do
     t.string "uid"
     t.integer "current_organization_id"
     t.integer "status", default: 0
+    t.string "invitation_token"
     t.index ["email"], name: "index_users_on_email", unique: true
+    t.index ["invitation_token"], name: "index_users_on_invitation_token"
     t.index ["provider"], name: "index_users_on_provider"
     t.index ["uid"], name: "index_users_on_uid"
   end

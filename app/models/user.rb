@@ -44,12 +44,16 @@ class User < ApplicationRecord
     }
   end
 
-  def self.from_omniauth(auth)
+  def self.from_omniauth(auth, pending_user)
     user = where(provider: auth.provider, uid: auth.uid).first
 
     unless user
-      user = User.new
-      user.password = Devise.friendly_token[0,40]
+      user = pending_user || User.new
+      if pending_user
+        user.status = User.statuses[:active]
+        user.invitation_token = nil
+      end
+      user.password = Devise.friendly_token(40)
       user.password_confirmation = user.password
       user.provider = auth.provider
       user.uid = auth.uid
@@ -68,7 +72,8 @@ class User < ApplicationRecord
     create(
       email: email,
       status: User.statuses[:pending],
-      password: Devise.friendly_token,
+      password: Devise.friendly_token(40),
+      invitation_token: Devise.friendly_token(40),
     )
   end
 

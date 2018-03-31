@@ -51,6 +51,21 @@ class RoleSelect extends React.Component {
     return this.props.onDelete(role, entity, toRemove)
   }
 
+  renderName() {
+    const { entity } = this.props
+    let nameDisplay = entity.name
+    if (!entity.name || entity.name.trim().length === 0) {
+      nameDisplay = entity.email
+    }
+    if (entity.type === 'users' && entity.isCurrentUser()) {
+      nameDisplay += ' (you)'
+    }
+    if (entity.type === 'users' && entity.status === 'pending') {
+      nameDisplay += ' (pending)'
+    }
+    return nameDisplay
+  }
+
   render() {
     const { enabled, role, roleTypes, entity } = this.props
     let select
@@ -74,6 +89,7 @@ class RoleSelect extends React.Component {
     } else {
       select = <DisplayText>{_.startCase(role.name)}</DisplayText>
     }
+
     // TODO remove duplication with RolesAdd role select menu
     const url = entity.pic_url_square || entity.filestack_file_url
     return (
@@ -88,11 +104,11 @@ class RoleSelect extends React.Component {
         <RowItemLeft>
           { entity.name && entity.name.trim().length > 0
             ? (<div>
-              <DisplayText>{entity.name}</DisplayText><br />
+              <DisplayText>{this.renderName()}</DisplayText><br />
               <SubText>{entity.email}</SubText>
             </div>)
             : (<CenterAlignedSingleItem>
-              <DisplayText>{entity.email}</DisplayText>
+              <DisplayText>{this.renderName()}</DisplayText>
             </CenterAlignedSingleItem>)
           }
         </RowItemLeft>
