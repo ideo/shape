@@ -16,10 +16,8 @@ module Resourceable
         args[:roles].each do |role_name|
           # Define a pluralized method with this role on the class
           # e.g. if given [:viewer], the method would be .viewers
+          # Returns users and groups
           define_dynamic_role_method(role_name)
-
-          # An additional method that returns user ids, e.g. viewer_ids
-          define_dynamic_role_ids_method(role_name)
         end
       end
 
@@ -28,36 +26,32 @@ module Resourceable
     end
 
     def define_dynamic_role_method(role_name)
+      # Returns a hash of users and groups that match this role
+      # --> { users: [...users], groups: [..groups] }
+      # e.g. .viewers returns all users and groups that are viewers
+      #      .editors[:users] returns all users that are editors
       define_method role_name.to_s.pluralize.to_sym do
-        role = role_with_name(role_name)
-        return [] if role.blank?
+        # There's only one role with a name per resource
+        role = roles.where(name: role_name)
+                    .includes(:users, :groups)
+                    .first
 
-        User.joins(:users_roles)
-            .where(UsersRole.arel_table[:role_id].eq(role.id))
-      end
-    end
+        return { users: [], groups: [] } if role.blank?
 
-    def define_dynamic_role_ids_method(role_name)
-      define_method "#{role_name}_ids".to_s.to_sym do
-        role = role_with_name(role_name)
-        return [] if role.blank?
-
-        User.joins(:users_roles)
-            .where(UsersRole.arel_table[:role_id].eq(role.id))
-            .pluck(:id)
+        { users: role.users, groups: role.groups }
       end
     end
   end
 
-  def can_edit?(user)
+  def can_edit?(user_or_group)
     raise_role_name_not_set(:edit_role) if self.class.edit_role.blank?
-    user.has_role_by_identifier?(self.class.edit_role, resource_identifier)
+    user_or_group.has_role_by_identifier?(self.class.edit_role, resource_identifier)
   end
 
-  def can_view?(user)
-    return true if can_edit?(user)
+  def can_view?(user_or_group)
+    return true if can_edit?(user_or_group)
     raise_role_name_not_set(:view_role) if self.class.view_role.blank?
-    user.has_role_by_identifier?(self.class.view_role, resource_identifier)
+    user_or_group.has_role_by_identifier?(self.class.view_role, resource_identifier)
   end
 
   def resourceable_class
@@ -76,10 +70,6 @@ module Resourceable
   end
 
   private
-
-  def role_with_name(role_name)
-    roles.find_by(name: role_name)
-  end
 
   def raise_role_name_not_set(role_name)
     raise StandardError, "Pass in `#{role_name}` to #{self.class.name}'s resourceable definition to use this method"

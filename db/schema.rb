@@ -65,6 +65,14 @@ ActiveRecord::Schema.define(version: 20180329211218) do
     t.index ["organization_id"], name: "index_groups_on_organization_id"
   end
 
+  create_table "groups_roles", force: :cascade do |t|
+    t.bigint "group_id"
+    t.bigint "role_id"
+    t.index ["group_id", "role_id"], name: "index_groups_roles_on_group_id_and_role_id", unique: true
+    t.index ["group_id"], name: "index_groups_roles_on_group_id"
+    t.index ["role_id"], name: "index_groups_roles_on_role_id"
+  end
+
   create_table "items", force: :cascade do |t|
     t.string "name"
     t.string "type"

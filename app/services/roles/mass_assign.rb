@@ -1,23 +1,34 @@
 module Roles
-  class AssignToUsers
-    attr_reader :errors, :failed_users, :added_users
+  class MassAssign
+    attr_reader :errors, :added_users, :added_groups,
+                :failed_users, :failed_groups
 
-    def initialize(object:, role_name:, users: [], propagate_to_children: false, synchronous: false)
+    def initialize(object:,
+                   role_name:,
+                   users: [],
+                   groups: [],
+                   propagate_to_children: false,
+                   synchronous: false)
       @object = object
       @role_name = role_name
       @users = users
+      @groups = groups
       @propagate_to_children = propagate_to_children
       @synchronous = synchronous
       @added_users = []
-      @errors = []
+      @added_groups = []
       @failed_users = []
+      @failed_groups = []
+      @roles = []
+      @errors = []
     end
 
     def call
       return false unless valid_object_and_role_name?
       assign_role_to_users
+      assign_role_to_groups
       add_roles_to_children if @propagate_to_children
-      failed_users.blank?
+      failed_users.blank? && failed_groups.blank?
     end
 
     private
@@ -33,10 +44,22 @@ module Roles
       end
     end
 
+    def assign_role_to_groups
+      @groups.each do |group|
+        role = group.add_role(@role_name, @object)
+        if role.persisted?
+          @added_groups << group
+        else
+          @failed_groups << group
+        end
+      end
+    end
+
     def add_roles_to_children
       if @synchronous
         AddRolesToChildrenWorker.new.perform(
           @added_users.map(&:id),
+          @added_groups.map(&:id),
           @role_name,
           @object.id,
           @object.class.name.to_s,
@@ -44,6 +67,7 @@ module Roles
       else
         AddRolesToChildrenWorker.perform_async(
           @added_users.map(&:id),
+          @added_groups.map(&:id),
           @role_name,
           @object.id,
           @object.class.name.to_s,

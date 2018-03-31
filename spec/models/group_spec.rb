@@ -19,19 +19,13 @@ RSpec.describe Group, type: :model do
 
     describe '#admins' do
       it 'should have all admins' do
-        expect(group.admins).to match_array(admins)
+        expect(group.admins[:users]).to match_array(admins)
       end
     end
 
     describe '#members' do
       it 'should have all members' do
-        expect(group.members).to match_array(members)
-      end
-    end
-
-    describe '#admins_and_members' do
-      it 'should have all admins and members' do
-        expect(group.admins_and_members).to match_array(admins + members)
+        expect(group.members[:users]).to match_array(members)
       end
     end
   end

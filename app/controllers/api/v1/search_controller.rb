@@ -23,10 +23,19 @@ class Api::V1::SearchController < Api::V1::BaseController
       fields: %w[name^5 tags^3 content],
       where: {
         organization_id: current_organization.id,
-        user_ids: [current_user.id],
+        _or: [
+          { user_ids: [current_user.id] },
+          { group_ids: current_user_current_group_ids },
+        ],
       },
       per_page: 10,
       page: page,
+    )
+  end
+
+  def current_user_current_group_ids
+    current_user.organization_group_ids(
+      current_user.current_organization,
     )
   end
 end
