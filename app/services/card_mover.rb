@@ -66,11 +66,12 @@ class CardMover
   def assign_permissions
     @moving_cards.each do |card|
       # assign each role from the @to_collection to our newly moved cards
-      to_permissions.each do |role_name, users|
-        Roles::AssignToUsers.new(
+      to_permissions.each do |role_name, entity|
+        Roles::MassAssign.new(
           object: card.record,
           role_name: role_name,
-          users: users,
+          users: entity[:users],
+          groups: entity[:groups],
           propagate_to_children: true,
         ).call
       end

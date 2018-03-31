@@ -321,8 +321,8 @@ describe Api::V1::CollectionCardsController, type: :request, auth: true do
 
       it 're-assigns permissions' do
         patch(path, params: params)
-        expect(moving_cards.first.record.editors.last).to eq editor
-        expect(moving_cards.first.record.viewers.last).to eq viewer
+        expect(moving_cards.first.record.editors[:users].last).to eq editor
+        expect(moving_cards.first.record.viewers[:users].last).to eq viewer
       end
     end
   end
