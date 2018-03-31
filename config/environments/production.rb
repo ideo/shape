@@ -1,3 +1,4 @@
+
 Rails.application.configure do
    config.webpacker.check_yarn_integrity = false  # Settings specified here will take precedence over those in config/application.rb.
 
@@ -30,6 +31,9 @@ Rails.application.configure do
   # Do not fallback to assets pipeline if a precompiled asset is missed.
   config.assets.compile = false
 
+  # Suppress logger output for asset requests.
+  config.assets.quiet = true
+
   # `config.assets.precompile` and `config.assets.version` have moved to config/initializers/assets.rb
 
   # Enable serving of images, stylesheets, and JavaScripts from an asset server.
@@ -45,7 +49,7 @@ Rails.application.configure do
 
   # Use the lowest log level to ensure availability of diagnostic information
   # when problems arise.
-  config.log_level = :debug
+  config.log_level = :info
 
   # Prepend all log lines with the following tags.
   config.log_tags = [ :request_id ]
@@ -54,9 +58,37 @@ Rails.application.configure do
   # config.cache_store = :mem_cache_store
 
   # Use a real queuing backend for Active Job (and separate queues per environment)
-  # config.active_job.queue_adapter     = :resque
+  config.active_job.queue_adapter = :sidekiq
+
   # config.active_job.queue_name_prefix = "ideo-sso-demo_#{Rails.env}"
   config.action_mailer.perform_caching = false
+
+  app_uri = URI.parse(ENV['OKTA_BASE_URL'])
+  config.action_mailer.default_url_options = { host: app_uri.host }
+  config.action_mailer.delivery_method = :smtp
+
+  # Asset host must be nil for Roadie inline to work
+  config.action_mailer.asset_host = nil
+
+  # Use Roadie's url_options for inline email styles
+  config.roadie.url_options = {
+    host: app_uri.host,
+    scheme: 'https'
+  }
+
+  config.action_mailer.perform_deliveries = true
+  config.action_mailer.default charset: 'utf-8'
+
+  config.action_mailer.smtp_settings = {
+    :address        => 'smtp.sendgrid.net',
+    :port           => '587',
+    :authentication => :plain,
+    :user_name      => ENV['SENDGRID_USERNAME'],
+    :password       => ENV['SENDGRID_PASSWORD'],
+    :domain         => 'heroku.com',
+    :enable_starttls_auto => true
+  }
+
 
   # Ignore bad email addresses and do not raise email delivery errors.
   # Set this to true and configure the email server for immediate delivery to raise delivery errors.

@@ -8,6 +8,7 @@ describe('RolesAdd', () => {
   beforeEach(() => {
     useStrict(false)
     props = {
+      searchableItems: [],
       roleTypes: ['viewer', 'editor'],
       onCreate: jest.fn(),
       onCreateUsers: jest.fn(),
@@ -40,7 +41,7 @@ describe('RolesAdd', () => {
       })
 
       it('should map the data with a value and a user', () => {
-        expect(wrapper.instance().onUserSearch('leo'))
+        expect(component.onUserSearch('leo'))
           .resolves.toEqual([{ value: user.email, label: user.name, data: user }])
       })
     })
@@ -94,6 +95,32 @@ describe('RolesAdd', () => {
         const anotherUser = { custom: 'r@r.r' }
         component.onUserSelected(anotherUser)
         expect(component.selectedUsers.length).toEqual(1)
+      })
+    })
+  })
+
+  describe('mapItems', () => {
+    describe('with groups', () => {
+      it('should map groups with handle as the value', () => {
+        props.searchableItems = [
+          { id: 3, name: 'groupname', handle: 'group-name', type: 'groups' }
+        ]
+        wrapper.setProps(props)
+        expect(wrapper.instance().mapItems()[0]).toEqual(
+          { value: 'group-name', label: 'groupname', data: props.searchableItems[0] }
+        )
+      })
+    })
+
+    describe('with users', () => {
+      it('should map users with email as the value', () => {
+        props.searchableItems = [
+          { id: 3, name: 'user', email: 'user@u.u', type: 'users' }
+        ]
+        wrapper.setProps(props)
+        expect(wrapper.instance().mapItems()[0]).toEqual(
+          { value: 'user@u.u', label: 'user', data: props.searchableItems[0] }
+        )
       })
     })
   })

@@ -1,13 +1,28 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <style>
-      /* Email styles need to be inline */
-    </style>
+    <%= stylesheet_link_tag 'email' %>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type' />
   </head>
-
   <body>
-    <%= yield %>
+    <div class="email-wrapper">
+      <div class="email-inner">
+        <div class="email-header">
+
+          <% if content_for(:title).present? %>
+            <h3 class="email-header__title"><%= content_for(:title) %></h3>
+          <% end %>
+
+        <div class="email-content">
+          <%= yield %>
+        </div>
+
+        <div class="email-footer">
+          <div class="email-footer__why">You are receiving this email because you have an account or have been invited to Shape.</div>
+
+          <div class="email-footer__copyright">&copy; 2018 IDEO</div>
+        </div>
+      </div>
+    </div>
   </body>
 </html>

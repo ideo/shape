@@ -53,4 +53,11 @@ Rails.application.configure do
   # Use an evented file watcher to asynchronously detect changes in source code,
   # routes, locales, etc. This feature depends on the listen gem.
   config.file_watcher = ActiveSupport::EventedFileUpdateChecker
+
+  # ActiveJob just used for ActionMailer.deliver_later
+  # inline will print emails in rails server log
+  config.active_job.queue_adapter = :inline
+
+  # http://guides.rubyonrails.org/action_mailer_basics.html#previewing-emails
+  config.action_mailer.preview_path = "#{Rails.root}/lib/mailer_previews"
 end

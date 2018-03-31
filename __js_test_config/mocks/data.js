@@ -93,6 +93,15 @@ export const fakeCollection = {
   API_archive: jest.fn(),
   checkResponseForEmptyCards: jest.fn(),
 }
+export const fakeOrganizationAttrs = {
+  id: 1,
+  name: 'TestOrg',
+}
+export const fakeOrganization = {
+  ...fakeOrganizationAttrs,
+  rawAttributes: jest.fn().mockReturnValue(fakeOrganizationAttrs),
+  getRecordType: jest.fn().mockReturnValue('organization'),
+}
 export const fakeUserAttrs = {
   id: 1,
   first_name: 'Oprah',
@@ -100,6 +109,9 @@ export const fakeUserAttrs = {
   email: 'oprah@winfrey.com',
   pic_url_square: 'https://filestackcdn.com/abc123',
   groups: [],
+  current_organization: fakeOrganization,
+  type: 'users',
+  isCurrentUser: jest.fn(),
 }
 export const fakeUser = {
   ...fakeUserAttrs,
@@ -110,6 +122,7 @@ export const fakeRoleAttrs = {
   id: 1,
   name: 'editor',
   users: [fakeUser, fakeUser],
+  groups: [],
   resource: { id: 1, type: 'collection' }
 }
 export const fakeRole = {

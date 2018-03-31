@@ -1,16 +1,18 @@
 require 'rails_helper'
 
-RSpec.describe Roles::AssignToUsers, type: :service do
+RSpec.describe Roles::MassAssign, type: :service do
   let(:organization) { create(:organization) }
   let(:object) { create(:collection, num_cards: 2) }
   let(:users) { create_list(:user, 3) }
+  let(:groups) { create_list(:group, 3) }
   let(:role_name) { :editor }
   let(:propagate_to_children) { false }
   let(:assign_role) do
-    Roles::AssignToUsers.new(
+    Roles::MassAssign.new(
       object: object,
       role_name: role_name,
       users: users,
+      groups: groups,
       propagate_to_children: propagate_to_children,
     )
   end
@@ -30,7 +32,12 @@ RSpec.describe Roles::AssignToUsers, type: :service do
   describe '#call' do
     it 'assigns role to users' do
       expect(assign_role.call).to be true
-      expect(users.all? { |user| user.reload.has_role?(:editor, object) }).to be true
+      expect(users.all? { |user| user.has_role?(:editor, object) }).to be true
+    end
+
+    it 'assigns role to groups' do
+      expect(assign_role.call).to be true
+      expect(groups.all? { |group| group.has_role?(:editor, object) }).to be true
     end
 
     it 'does not call AddRolesToChildrenWorker' do
@@ -43,7 +50,7 @@ RSpec.describe Roles::AssignToUsers, type: :service do
 
       it 'assigns role to users' do
         expect(assign_role.call).to be true
-        expect(users.all? { |user| user.reload.has_role?(:editor, object) }).to be true
+        expect(users.all? { |user| user.has_role?(:editor, object) }).to be true
       end
     end
 
@@ -72,6 +79,7 @@ RSpec.describe Roles::AssignToUsers, type: :service do
         it 'calls AddRolesToChildrenWorker' do
           expect(AddRolesToChildrenWorker).to receive(:perform_async).with(
             users.map(&:id),
+            groups.map(&:id),
             role_name,
             object.id,
             object.class.name.to_s,

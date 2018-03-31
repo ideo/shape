@@ -1,7 +1,7 @@
 import _ from 'lodash'
 import PropTypes from 'prop-types'
 import { observable, action } from 'mobx'
-import { observer } from 'mobx-react'
+import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 import {
   FormButton,
@@ -86,6 +86,21 @@ class RolesAdd extends React.Component {
     this.selectedUsers = []
   }
 
+  mapItems() {
+    const { searchableItems } = this.props
+    return searchableItems.map(item => {
+      let value
+      if (item.type === 'users') {
+        value = item.email
+      } else if (item.type === 'groups') {
+        value = item.handle
+      } else {
+        throw new Error('Can only search users and groups')
+      }
+      return { value, label: item.name, data: item }
+    })
+  }
+
   render() {
     const { roleTypes } = this.props
     return (
@@ -98,6 +113,7 @@ class RolesAdd extends React.Component {
         }
         <Row>
           <AutoComplete
+            options={this.mapItems()}
             onInputChange={this.onUserSearch}
             onOptionSelect={this.onUserSelected}
           />
@@ -134,6 +150,7 @@ class RolesAdd extends React.Component {
 }
 
 RolesAdd.propTypes = {
+  searchableItems: MobxPropTypes.arrayOrObservableArray.isRequired,
   roleTypes: PropTypes.arrayOf(PropTypes.string).isRequired,
   onCreateRoles: PropTypes.func.isRequired,
   onCreateUsers: PropTypes.func.isRequired,

@@ -44,7 +44,7 @@ describe Organization, type: :model do
     end
 
     it 'adds user as admin of org\'s primary group' do
-      expect(organization.admins).to match_array([user])
+      expect(organization.admins[:users]).to match_array([user])
     end
 
     it 'sets user.current_organization' do

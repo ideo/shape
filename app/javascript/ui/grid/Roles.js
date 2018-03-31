@@ -1,3 +1,4 @@
+import _ from 'lodash'
 import PropTypes from 'prop-types'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import Modal from '~/ui/global/Modal'
@@ -13,7 +14,10 @@ class Roles extends React.Component {
 
   onSave = (res) => {
     const { apiStore, collectionId } = this.props
-    apiStore.find('collections', collectionId).roles = res.data
+    // TODO why is the API sometimes returning an {} vs [] here?
+    let formattedRes = res.data
+    if (!_.isArray(res.data)) formattedRes = [res.data]
+    apiStore.find('collections', collectionId).roles = formattedRes
   }
 
   render() {

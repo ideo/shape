@@ -85,7 +85,7 @@ class GroupModify extends React.Component {
 
   handleRoles = (ev) => {
     ev.preventDefault()
-    this.props.onGroupRoles(this.props.group)
+    this.props.onGroupRoles()
   }
 
   handleImagePick = (ev) => {
