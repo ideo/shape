@@ -86,7 +86,7 @@ class Collection < ApplicationRecord
   # default relationships to include when rendering Collections in the API
   def self.default_relationships_for_api
     [
-      roles: [:users],
+      roles: [:users, :groups],
       collection_cards: [
         :parent,
         record: [:filestack_file],
