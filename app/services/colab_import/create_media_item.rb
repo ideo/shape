@@ -32,6 +32,7 @@ module ColabImport
     private
 
     def create_image_item
+      return if url.blank?
       return unless UrlExists.new(url).call
 
       begin

@@ -1,11 +1,10 @@
-require 'net/http'
-
 class UrlExists
   def initialize(url)
     @url = url
   end
 
   def call
+    return false if @url.blank?
     success_codes.include?(get_url_code)
   end
 

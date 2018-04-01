@@ -46,7 +46,7 @@ class Collection < ApplicationRecord
   searchkick
   # active == don't index archived collections
   # where(type: nil) == don't index User/SharedWithMe collections
-  scope :search_import, -> { active.where(type: nil).includes(%i[tags items]) }
+  scope :search_import, -> { active.where(type: nil).includes(%i[items tags]) }
 
   def search_data
     user_ids = (editors[:users].pluck(:id) + viewers[:users].pluck(:id)).uniq

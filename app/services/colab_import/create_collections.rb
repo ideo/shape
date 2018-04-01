@@ -4,52 +4,65 @@ module ColabImport
   class CreateCollections
     attr_reader :collections, :root_collection, :failed
 
-    def initialize(path_to_json:, organization:, template_collection:, editor:)
+    def initialize(path_to_json:, organization:, template_collection:, editor:, only_uids: [], root_collection: nil)
       @data = JSON.parse(File.read(path_to_json))
       @template_collection = template_collection
       @organization = organization
       @editor = editor
-      @root_collection = nil
+      @root_collection = root_collection
+      @concepts_by_session = find_concepts_by_session(only_uids)
+      @session_collections_by_name = {}
       @failed = []
       @collections = []
     end
 
-    def call(only_uids = [])
-      concepts_to_copy = concepts_by_session(only_uids)
-      create_root_collection
+    def call
+      create_root_collection unless @root_collection.present?
       assign_roles_to_root
-      create_collections_for_concepts(concepts_to_copy)
+      find_or_create_session_collections
+      create_collections_for_concepts
       @root_collection
+    end
+
+    def print_concepts
+      @concepts_by_session.each do |session_name, concepts|
+        puts "SESSION: #{session_name}\n\n"
+        concepts.each do |concept|
+          puts CreateConcept.new(
+            data: concept,
+            collection: Collection.new,
+          ).summary
+          puts '-' * 10
+        end
+        puts "\n\n\n"
+      end
     end
 
     private
 
-    def create_collections_for_concepts(concepts_by_session)
-      concepts_by_session.each do |session_name, concepts|
-        # Create collection for session
-        session_collection = create_session_collection(session_name)
-
-        concepts.each do |concept|
-          # Clone the template for this sub-collection
-          cloned = clone_template
-
-          # Create the card for this sub-collection
-          card = create_collection_card(parent: session_collection, collection: cloned)
-
-          # Create card for this subcollection
-          Rails.logger.info "Adding concept: #{concept['uid']} - #{concept['title']}"
-
-          media_item_names = concept['media'].is_a?(Hash) ? concept['media'].values : concept['media']
-          media = media_items(media_item_names)
+    def create_collections_for_concepts
+      @concepts_by_session.each do |session_name, concepts|
+        session_collection = @session_collections_by_name[session_name]
+        concepts.each do |concept_data|
           concept = CreateConcept.new(
-            data: concept,
-            collection: cloned,
-            media_items: media,
+            data: concept_data,
+            template: @template_collection,
+            editor: @editor,
           )
-          if concept.call
-            @collections << cloned
+          existing_collection = session_collection.collections.find_by(name: concept.name)
+          if existing_collection.present?
+            @collections << existing_collection
           else
-            @failed << concept
+            # Update the collection and all it's items
+            media = media_items(concept.media_item_names)
+            if concept.call(media_items: media)
+              concept_collection = concept.collection
+              # Create the card for this sub-collection
+              create_collection_card(parent: session_collection, collection: concept_collection)
+              @collections << concept_collection
+            else
+              @failed << concept.collection
+            end
           end
         end
       end
@@ -66,6 +79,15 @@ module ColabImport
       end
 
       @root_collection = collection
+    end
+
+    def find_or_create_session_collections
+      session_names = @concepts_by_session.keys
+      @session_collections_by_name = session_names.each_with_object({}) do |name, h|
+        session_collection = root_collection.collections.find_by_name(name)
+        session_collection ||= create_session_collection(name)
+        h[name] = session_collection
+      end
     end
 
     def create_session_collection(name)
@@ -121,20 +143,7 @@ module ColabImport
       end
     end
 
-    def clone_template
-      collection = @template_collection.duplicate!(
-        for_user: @editor,
-        copy_parent_card: false,
-      )
-
-      unless collection.persisted?
-        raise_error('Failed to clone template', collection)
-      end
-
-      collection
-    end
-
-    def concepts_by_session(only_uids = [])
+    def find_concepts_by_session(only_uids = [])
       @data['concepts'].values.each_with_object({}) do |concept, h|
         next if only_uids.present? &&
                 !only_uids.include?(concept['uid'])

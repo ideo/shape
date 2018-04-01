@@ -112,7 +112,7 @@ class Item < ApplicationRecord
   private
 
   def reindex_parent_collection
-    return if @dont_reindex_parent || parent.blank?
+    return if @dont_reindex_parent || !Searchkick.callbacks? || parent.blank?
     parent.reindex
   end
 
