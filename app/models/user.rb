@@ -176,7 +176,9 @@ class User < ApplicationRecord
     end
 
     # Reindex record if it is a searchkick model
-    resource.reindex if resource.respond_to?(:queryable) && queryable
+    if Searchkick.callbacks? && resource.respond_to?(:queryable) && queryable
+      resource.reindex
+    end
   end
 
   def after_remove_role(role)
@@ -189,6 +191,8 @@ class User < ApplicationRecord
     end
 
     # Reindex record if it is a searchkick model
-    resource.reindex if resource.respond_to?(:queryable) && queryable
+    if Searchkick.callbacks? && resource.respond_to?(:queryable) && queryable
+      resource.reindex
+    end
   end
 end

@@ -6,7 +6,7 @@ class FilestackFile < ApplicationRecord
   validates :url, :handle, :mimetype, presence: true
 
   after_create :process_image, if: :image?
-  after_destroy :delete_on_filestack
+  after_destroy :delete_on_filestack, unless: :url_being_used?
 
   amoeba do
     enable
@@ -14,6 +14,10 @@ class FilestackFile < ApplicationRecord
     exclude_association :group
     exclude_association :organization
   end
+
+  # TODO: change this so it actually duplicates the file - needs background worker
+  #       Instead of duplicating the object, it would call:
+  #       FilestackFile.create_from_url(url)
 
   def duplicate!
     ff = amoeba_dup
@@ -67,6 +71,14 @@ class FilestackFile < ApplicationRecord
   def process_image
     # TODO: We will want do decide what kind of post-processing to do on uploaded files
     # docs: https://www.filestack.com/docs/image-transformations
+  end
+
+  def url_being_used?
+    FilestackFile
+      .where(url: url)
+      .where.not(id: id)
+      .count
+      .positive?
   end
 
   def delete_on_filestack
