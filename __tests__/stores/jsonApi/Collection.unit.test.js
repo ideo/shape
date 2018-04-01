@@ -17,39 +17,36 @@ describe('Collection', () => {
     }, fakeApiStore)
   })
 
-  describe('userCanEdit', () => {
-    describe('on a non-normal collection', () => {
-      it('should return false because it is not editable', () => {
-        collection.type = 'Collection::SharedWithMeCollection'
-        expect(collection.userCanEdit(1)).toBeFalsy()
-        collection.type = 'Collection::UserCollection'
-        expect(collection.userCanEdit(1)).toBeFalsy()
-      })
-    })
-
-    describe('when there are no users on the colleciton that can edit', () => {
+  describe('isNormalCollection', () => {
+    describe('on a user collection', () => {
       beforeEach(() => {
-        collection.roles.push({
-          canEdit: jest.fn().mockReturnValue(false)
-        })
+        collection.type = 'Collection::UserCollection'
       })
 
       it('should return false', () => {
-        expect(collection.userCanEdit(1)).toBeFalsy()
+        expect(collection.isNormalCollection).toBeFalsy()
       })
     })
 
-    describe('when there are users on the collection that can edit', () => {
+    describe('on a shared collection', () => {
       beforeEach(() => {
-        collection.roles.push({
-          users: [{ id: 3 }],
-          canEdit: jest.fn().mockReturnValue(true),
-        })
+        collection.type = 'Collection::SharedWithMeCollection'
+      })
+
+      it('should return false', () => {
+        expect(collection.isNormalCollection).toBeFalsy()
+      })
+    })
+
+    describe('on a normal collection', () => {
+      beforeEach(() => {
+        collection.type = 'Collection'
       })
 
       it('should return true', () => {
-        expect(collection.userCanEdit(3)).toBeTruthy()
+        expect(collection.isNormalCollection).toBeTruthy()
       })
+
     })
   })
 })
