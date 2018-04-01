@@ -1,5 +1,3 @@
-require 'net/http'
-
 class UrlExists
   def initialize(url)
     @url = url

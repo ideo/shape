@@ -5,7 +5,7 @@ class Item
 
     # build up a plaintext string of all the text content, with elements separated by pipes "|"
     # e.g. "Mission Statement | How might we do x..."
-    def plain_content
+    def plain_content(only_first_line: false)
       return '' unless text_data.present? && text_data['ops'].present?
       text = ''
       text_data['ops'].each_with_index do |data, i|
@@ -14,6 +14,7 @@ class Item
         t = StripTags.new(data['insert']).call
         # sometimes the data['insert'] is just a newline, ignore
         next if t.empty?
+        return t if only_first_line
         text += ' | ' if i.positive?
         text += t
       end

@@ -22,6 +22,20 @@ module ColabImport
       @root_collection
     end
 
+    def print_concepts(only_uids = [])
+      concepts_by_session(only_uids).each do |session_name, concepts|
+        puts "SESSION: #{session_name}\n\n"
+        concepts.each do |concept|
+          puts CreateConcept.new(
+            data: concept,
+            collection: Collection.new,
+          ).summary
+          puts '-' * 10
+        end
+        puts "\n\n\n"
+      end
+    end
+
     private
 
     def create_collections_for_concepts(concepts_by_session)

@@ -37,7 +37,7 @@ class Item < ApplicationRecord
 
   def reindex_parent_collection
     return unless parent.present?
-    parent.reindex
+    parent.reindex if Searchkick.callbacks?
   end
 
   amoeba do
