@@ -92,18 +92,8 @@ class RolesMenu extends React.Component {
     return (currentUser.id !== user.id)
   }
 
-  // TODO needs to check group roles too
-  currentUserRoleCheck() {
-    const { apiStore, roles } = this.props
-    const { currentUser } = apiStore
-    const userRole = roles.find(role => role.users
-      .find(user => user.id === currentUser.id))
-    if (!userRole) return false
-    return userRole.canEdit()
-  }
-
   render() {
-    const { addCallout, roles, ownerType, title } = this.props
+    const { addCallout, canEdit, roles, ownerType, title } = this.props
     const roleEntities = []
     roles.forEach((role) => {
       role.users.forEach((user) => {
@@ -119,14 +109,13 @@ class RolesMenu extends React.Component {
     const roleTypes = ownerType === 'groups'
       ? ['member', 'admin']
       : ['viewer', 'editor']
-    const userCanEdit = this.currentUserRoleCheck()
 
     return (
       <div>
         <Heading3>{title}</Heading3>
         { sortedRoleEntities.map(combined =>
           (<RoleSelect
-            enabled={userCanEdit && this.currentUserCheck(combined.entity, combined.role)}
+            enabled={canEdit && this.currentUserCheck(combined.entity, combined.role)}
             key={combined.entity.id + combined.role.id}
             role={combined.role}
             roleTypes={roleTypes}
@@ -136,7 +125,7 @@ class RolesMenu extends React.Component {
           />))
         }
         <FormSpacer />
-        {userCanEdit &&
+        {canEdit &&
           <div>
             <Heading3>{addCallout}</Heading3>
             <RolesAdd
@@ -153,6 +142,7 @@ class RolesMenu extends React.Component {
 }
 
 RolesMenu.propTypes = {
+  canEdit: PropTypes.bool,
   ownerId: PropTypes.number.isRequired,
   ownerType: PropTypes.string.isRequired,
   roles: MobxPropTypes.arrayOrObservableArray,
@@ -164,6 +154,7 @@ RolesMenu.wrappedComponent.propTypes = {
   apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 RolesMenu.defaultProps = {
+  canEdit: false,
   roles: [],
   title: 'Shared with',
   addCallout: 'Add groups or people:'
