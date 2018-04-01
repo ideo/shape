@@ -16,6 +16,7 @@ RSpec.describe ColabImport::CreateCollections, type: :service do
         path_to_json: 'db/import/colab-concept-library-export.json',
         organization: organization,
         template_collection: template_collection,
+        only_uids: concept_uids,
         editor: editor,
       )
     end
@@ -47,7 +48,7 @@ RSpec.describe ColabImport::CreateCollections, type: :service do
       template_collection.roles.reload
 
       # Create root, session collection and concept collection
-      create_collections.call(concept_uids)
+      create_collections.call
     end
 
     it 'creates root collection' do
@@ -67,7 +68,7 @@ RSpec.describe ColabImport::CreateCollections, type: :service do
     end
 
     it 'has concept name, breadcrumb & description' do
-      expect(prototype_collection.name).to eq('Voyaging | -L2MabbTxWEL7FBgL_oL')
+      expect(prototype_collection.name).to eq('Voyaging')
       expect(prototype_collection.breadcrumb.size).to eq(3)
       expect(
         prototype_collection.items[0].content

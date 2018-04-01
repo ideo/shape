@@ -1,14 +1,19 @@
 module ColabImport
   class CreateConcept
-    def initialize(data:, collection:, media_items: [])
+    attr_reader :collection
+
+    def initialize(data:, template:, editor:)
       @data = data
-      @collection = collection
-      @media_items = media_items
+      @editor = editor
+      @template = template
     end
 
-    def call
+    def call(media_items: [])
+      @media_items = media_items
+
       return false if skip_import?
-      update_name_and_tags &&
+      clone_from_template &&
+        update_name_and_tags &&
         update_collection_cards_with_data &&
         create_and_add_media &&
         recalculate_breadcrumbs
@@ -17,7 +22,7 @@ module ColabImport
     def summary
       return "UID: #{uid} -- Skipping import" if skip_import?
       "UID: #{uid}
-      Title: #{title}
+      Name: #{name}
       Desc: #{(description || '').first(40)}
       Hero Image: #{image_url}
       Video URL: #{video_url}
@@ -26,20 +31,34 @@ module ColabImport
       "
     end
 
+    def name
+      @data['title'] || @data['uid']
+    end
+
     def uid
       @data['uid']
     end
 
-    # e.g. Q3 2016
-    def session_year_quarter
-      "#{@data['session']['season']} #{@data['session']['year']}"
-    end
-
     def media_item_names
-      @data['media'].values
+      return [] if @data['media'].blank?
+      return @data['media'].values if @data['media'].is_a?(Hash)
+      @data['media']
     end
 
     private
+
+    def clone_from_template
+      @collection = @template.duplicate!(
+        for_user: @editor,
+        copy_parent_card: false,
+      )
+
+      unless @collection.persisted?
+        raise_error('Failed to clone template')
+      end
+
+      @collection.persisted?
+    end
 
     def skip_import?
       @data['content'].blank? ||
@@ -48,7 +67,7 @@ module ColabImport
     end
 
     def update_name_and_tags
-      @collection.name = "#{title} | #{uid}"
+      @collection.name = name
       @collection.tag_list = tags.join(', ') unless tags.blank?
       @collection.save
     end
@@ -130,8 +149,8 @@ module ColabImport
         change_card_to_placeholder(card)
       else
         text_ops = build_text_operations(content: 'Links', header: true)
-        links.each do |title, url|
-          text_ops += build_text_operations(content: title, url: url)
+        links.each do |link_title, url|
+          text_ops += build_text_operations(content: link_title, url: url)
         end
         if github_url.present?
           # Note: this may be other urls, like drive or dropbox
@@ -287,10 +306,6 @@ module ColabImport
       "#{@data['session']['location']}: #{@data['session']['title']}"
     end
 
-    def title
-      @data['title'] || @data['uid']
-    end
-
     def subtitle
       @data['subtitle']
     end
@@ -327,11 +342,11 @@ module ColabImport
       @data['content']['links'].each_with_object({}) do |link, h|
         # Note: links can be malformed, and be title : url
         if link.include?(': h')
-          title, url = link.split(' : ').map(&:strip)
+          link_title, url = link.split(' : ').map(&:strip)
         else
-          title, url = [link, link]
+          link_title, url = [link, link]
         end
-        h[title] = url
+        h[link_title] = url
       end
     end
 
@@ -374,6 +389,11 @@ module ColabImport
     def team_member_names
       return [] if @data['team'].blank?
       @data['team']
+    end
+
+    # e.g. Q3 2016
+    def session_year_quarter
+      "#{@data['session']['season']} #{@data['session']['year']}"
     end
 
     def raise_error(message)
