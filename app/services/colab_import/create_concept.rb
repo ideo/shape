@@ -61,9 +61,6 @@ module ColabImport
       @media_items.each do |item|
         create_item = CreateMediaItem.new(data: item)
 
-        # Skip if url no longer exists
-        next unless UrlExists.new(create_item.url).call
-
         unless create_item.call
           raise_error("Could not create image item on card: #{create_item.errors.full_messages.join('. ')}")
         end
@@ -252,10 +249,23 @@ module ColabImport
     end
 
     # Use if we don't have content for an item
-    # There's 1.png, 2.png, 3.png, 4.png and video.png
+    # Makes sure it doesn't return the same image twice in a row
+    # Placeholders that exist: 1.png, 2.png, 3.png, 4.png and video.png
     def random_placeholder_image_url(placeholder_image_name = nil)
-      placeholder_image_name ||= rand(1..4)
+      if placeholder_image_name.blank?
+        # Generate a random name, and ensure it is unique
+        placeholder_image_name = generate_random_name
+        while placeholder_image_name == @last_random_name
+          placeholder_image_name = generate_random_name
+        end
+        @last_random_name = placeholder_image_name
+      end
+
       "https://s3-us-west-2.amazonaws.com/assets.shape.space/colab/placeholders/#{placeholder_image_name}.png"
+    end
+
+    def generate_random_name
+      rand(1..4)
     end
 
     def text_operations_to_html(text_operations)
