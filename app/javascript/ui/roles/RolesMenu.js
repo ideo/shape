@@ -1,3 +1,4 @@
+import _ from 'lodash'
 import PropTypes from 'prop-types'
 import { action, observable } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
@@ -38,8 +39,33 @@ class RolesMenu extends React.Component {
       const groups = res[1].data
       users.forEach((u) => { u.type = 'users' })
       groups.forEach(r => { r.type = 'groups' })
-      return this.setSearchableItems([...groups, ...users])
+      this.visibleUsers = users
+      this.visibleGroups = groups
+      this.setSearchableItems([...groups, ...users])
+      this.filterSearchableItems()
     })
+  }
+
+  filterSearchableItems() {
+    const filteredUsers = this.filterSearchableUsers(this.visibleUsers)
+    const filteredGroups = this.filterSearchableGroups(this.visibleGroups)
+    this.setSearchableItems([...filteredGroups, ...filteredUsers])
+  }
+
+  filterSearchableUsers(userRoles) {
+    const { roles } = this.props
+    return _.reject(userRoles, userRole =>
+      roles.find(role =>
+        role.users.find(user =>
+          user.id === userRole.id)))
+  }
+
+  filterSearchableGroups(groupRoles) {
+    const { roles } = this.props
+    return _.reject(groupRoles, groupRole =>
+      roles.find(role =>
+        role.groups.find(group =>
+          group.id === groupRole.id)))
   }
 
   @action setSearchableItems(items) {
@@ -50,7 +76,9 @@ class RolesMenu extends React.Component {
     this.props.apiStore.request(`${entity.type}/${entity.id}/roles/${role.id}`,
       'DELETE').then((res) => {
       if (toRemove) {
-        return this.props.onSave(res)
+        const saveReturn = this.props.onSave(res)
+        this.filterSearchableItems()
+        return saveReturn
       }
       return {}
     })
@@ -69,7 +97,11 @@ class RolesMenu extends React.Component {
       user_ids: userIds,
     }
     return apiStore.request(`${ownerType}/${ownerId}/roles`, 'POST', data)
-      .then(onSave)
+      .then(res => {
+        const saveReturn = onSave(res)
+        this.filterSearchableItems()
+        return saveReturn
+      })
       .catch((err) => console.warn(err))
   }
 

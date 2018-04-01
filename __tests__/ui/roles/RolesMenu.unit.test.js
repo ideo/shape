@@ -21,14 +21,7 @@ const uiStore = observable({
   rolesMenuOpen: false,
   update: jest.fn()
 })
-const props = {
-  ownerId: 1,
-  ownerType: 'collections',
-  roles: [],
-  apiStore,
-  uiStore,
-  onSave: jest.fn(),
-}
+let props
 
 jest.mock('../../../app/javascript/stores/jsonApi/Role')
 let wrapper
@@ -38,6 +31,14 @@ describe('RolesMenu', () => {
 
   beforeEach(() => {
     useStrict(false)
+    props = {
+      ownerId: 1,
+      ownerType: 'collections',
+      roles: [],
+      apiStore,
+      uiStore,
+      onSave: jest.fn(),
+    }
     wrapper = shallow(
       <RolesMenu.wrappedComponent {...props} />
     )
@@ -46,6 +47,7 @@ describe('RolesMenu', () => {
 
   describe('componentDidMount', () => {
     beforeEach(() => {
+      component.filterSearchableItems = jest.fn()
       apiStore.request.mockReturnValue(Promise.resolve({ data: [] }))
     })
 
@@ -56,6 +58,42 @@ describe('RolesMenu', () => {
       expect(apiStore.request).toHaveBeenCalledWith(
         `organizations/${fakeOrganization.id}/groups`, 'GET'
       )
+    })
+  })
+
+  describe('filterSearchableItems', () => {
+    let roles
+    let visibleUsers
+    let visibleGroups
+
+    beforeEach(() => {
+      roles = [
+        { id: 23, users: [{ id: 3, type: 'users' }], groups: [] },
+        { id: 26, groups: [{ id: 6, type: 'groups' }], users: [] },
+      ]
+      visibleUsers = [
+        { id: 3, type: 'users' },
+        { id: 33, type: 'users' },
+      ]
+      visibleGroups = [
+        { id: 6, type: 'groups' },
+        { id: 64, type: 'groups' },
+      ]
+      wrapper.setProps(props)
+      component.visibleUsers = visibleUsers
+      component.visibleGroups = visibleGroups
+      props.roles = roles
+      component.filterSearchableItems()
+    })
+
+    it('should filter out users in roles from visible users', () => {
+      expect(component.searchableItems).toContainEqual(visibleUsers[1])
+      expect(component.searchableItems).not.toContainEqual(visibleUsers[0])
+    })
+
+    it('should filter out groups in roles from visible groups', () => {
+      expect(component.searchableItems).toContainEqual(visibleGroups[1])
+      expect(component.searchableItems).not.toContainEqual(visibleGroups[0])
     })
   })
 
@@ -99,6 +137,14 @@ describe('RolesMenu', () => {
           done()
         })
       })
+
+      it('should filter the searchable items', (done) => {
+        component.filterSearchableItems = jest.fn()
+        component.onDelete(role, user, true).then(() => {
+          expect(component.filterSearchableItems).toHaveBeenCalled()
+          done()
+        })
+      })
     })
   })
 
@@ -124,6 +170,14 @@ describe('RolesMenu', () => {
       it('should call onSave', (done) => {
         component.onCreateRoles(users, 'editor').then(() => {
           expect(props.onSave).toHaveBeenCalled()
+          done()
+        })
+      })
+
+      it('should filter the searchable items', (done) => {
+        component.filterSearchableItems = jest.fn()
+        component.onCreateRoles(users, 'editor').then(() => {
+          expect(component.filterSearchableItems).toHaveBeenCalled()
           done()
         })
       })
