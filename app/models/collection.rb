@@ -46,7 +46,7 @@ class Collection < ApplicationRecord
   searchkick
   # active == don't index archived collections
   # where(type: nil) == don't index User/SharedWithMe collections
-  scope :search_import, -> { active.where(type: nil).includes(:items, taggings: [:tags]) }
+  scope :search_import, -> { active.where(type: nil).includes(:items, taggings: [:tag]) }
 
   def search_data
     {
