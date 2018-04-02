@@ -44,6 +44,7 @@ Rails.application.routes.draw do
         resources :groups, only: %i[index]
         resources :users, only: %i[index]
       end
+      delete 'sessions' => 'sessions#destroy'
       resources :users do
         collection do
           get 'me'
