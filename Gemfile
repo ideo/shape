@@ -71,8 +71,12 @@ gem 'filestack'
 
 # inline styles for email
 gem 'roadie-rails', '~> 1.2'
+
 # For easier http request
 gem 'httparty'
+
+# Redis in-memory caching
+gem 'redis'
 
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console

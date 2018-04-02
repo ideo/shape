@@ -395,6 +395,7 @@ DEPENDENCIES
   puma (~> 3.11)
   rack-rewrite (~> 1.5)
   rails (~> 5.1.4)
+  redis
   roadie-rails (~> 1.2)
   rolify (~> 5.2.0)
   rspec-rails (~> 3.7)

@@ -19,13 +19,13 @@ ActiveRecord::Schema.define(version: 20180329211218) do
     t.integer "order", null: false
     t.integer "width"
     t.integer "height"
+    t.boolean "reference", default: false
     t.bigint "parent_id"
     t.bigint "collection_id"
     t.bigint "item_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.boolean "archived", default: false
-    t.boolean "reference", default: false
     t.index ["collection_id"], name: "index_collection_cards_on_collection_id"
     t.index ["item_id"], name: "index_collection_cards_on_item_id"
     t.index ["parent_id"], name: "index_collection_cards_on_parent_id"
