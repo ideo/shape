@@ -14,6 +14,7 @@ import {
 import { Select } from '~/ui/global/styled/forms'
 import LeaveIcon from '~/ui/icons/LeaveIcon'
 import Avatar from '~/ui/global/Avatar'
+import { uiStore } from '~/stores'
 
 const MinRowItem = styled.span`
   min-width: 110px;
@@ -33,7 +34,13 @@ CenterAlignedSingleItem.displayName = 'StyledCenterAlignedSingleItem'
 class RoleSelect extends React.Component {
   onRoleRemove = (ev) => {
     ev.preventDefault()
-    this.deleteRole(true)
+    // render confirmation modal
+    uiStore.openConfirmationModal({
+      icon: <LeaveIcon />,
+      prompt: 'Are you sure you want to leave this group?',
+      onConfirm: this.deleteRole.bind(this, true),
+      confirmText: 'Leave',
+    })
   }
 
   onRoleSelect = (ev) => {

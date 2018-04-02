@@ -30,6 +30,25 @@ export default class UiStore {
   @observable isLoading = false
   @observable movingCardIds = []
   @observable movingFromCollectionId = null
+  @observable confirmationModal = {
+    open: false,
+    prompt: null,
+    onClose: null,
+    onConfirm: null,
+    onCancel: null,
+    icon: null,
+    confirmText: null,
+    cancelText: null,
+  }
+
+  @action openConfirmationModal(props) {
+    this.confirmationModal = { open: true, ...props }
+  }
+
+  @action closeConfirmationModal() {
+    _.mapValues(this.confirmationModal, () => null)
+    this.confirmationModal.open = false
+  }
 
   // default action for updating any basic UiStore value
   @action update(name, value) {
