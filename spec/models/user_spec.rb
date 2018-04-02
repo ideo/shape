@@ -67,6 +67,34 @@ describe User, type: :model do
     end
   end
 
+  describe '#add_role' do
+    let(:collection) { create(:collection) }
+
+    it 'adds role' do
+      expect(user.add_role(Role::EDITOR, collection).persisted?).to be true
+      expect(user.has_role?(Role::EDITOR, collection)).to be true
+    end
+
+    context 'with another user' do
+      let(:user_2) { create(:user) }
+
+      before do
+        user.add_role(Role::EDITOR, collection)
+      end
+
+      it 'adds role' do
+        expect(user_2.add_role(Role::EDITOR, collection).persisted?).to be true
+        expect(user_2.has_role?(Role::EDITOR, collection)).to be true
+      end
+
+      it 'does not duplicate role' do
+        expect do
+          user_2.add_role(Role::EDITOR, collection)
+        end.not_to change(Collection, :count)
+      end
+    end
+  end
+
   describe '#organizations' do
     let!(:organizations) { create_list(:organization, 2) }
 
