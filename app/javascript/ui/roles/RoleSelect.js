@@ -34,12 +34,22 @@ CenterAlignedSingleItem.displayName = 'StyledCenterAlignedSingleItem'
 class RoleSelect extends React.Component {
   onRoleRemove = (ev) => {
     ev.preventDefault()
-    // render confirmation modal
+    const { entity } = this.props
+    let prompt
+    let confirmText
+    if (entity.isCurrentUser && entity.isCurrentUser()) {
+      prompt = 'Are you sure you want to leave this group?'
+      confirmText = 'Leave'
+    } else {
+      prompt = `Are you sure you want to remove
+        ${this.renderName()} from this group?`
+      confirmText = 'Remove'
+    }
     uiStore.openConfirmationModal({
+      prompt,
+      confirmText,
       icon: <LeaveIcon />,
-      prompt: 'Are you sure you want to leave this group?',
       onConfirm: this.deleteRole.bind(this, true),
-      confirmText: 'Leave',
     })
   }
 
