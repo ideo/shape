@@ -38,6 +38,7 @@ const StyledUserAndMenu = styled.div`
     }
   }
 `
+StyledUserAndMenu.displayName = 'StyledUserAndMenu'
 
 const MaxWidthContainer = styled.div`
   max-width: ${v.maxWidth}px;
@@ -62,6 +63,7 @@ class Header extends React.Component {
 
   get renderMenu() {
     const { menuOpen } = this.state
+    if (!menuOpen) return ''
     return (
       <PopoutMenu
         className="user-menu"
@@ -117,12 +119,12 @@ class Header extends React.Component {
             </Box>
 
             <Box flex>
-              <SearchBar />
+              <SearchBar className="search-bar" />
               <button onClick={this.handleOrgClick}>
                 <Avatar
                   title={primaryGroup.name}
                   url={primaryGroup.filestack_file_url}
-                  className="organizationAvatar"
+                  className="organization-avatar"
                 />
               </button>
               <StyledUserAndMenu

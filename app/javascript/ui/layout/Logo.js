@@ -9,6 +9,7 @@ const StyledLogo = styled.div`
     width: 81.7px;
   }
 `
+
 const Logo = () => (
   <StyledLogo>
     <img
