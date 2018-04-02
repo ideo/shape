@@ -36,7 +36,8 @@ describe Api::V1::SearchController, type: :request, auth: true do
       expect(current_user.has_role?(Role::MEMBER, organization.primary_group))
       Collection.reindex
       Collection.searchkick_index.refresh
-      sleep 0.25 # Let ElasticSearch indexing finish (even though it seems to be synchronous)
+      # Let ElasticSearch indexing finish (even though it seems to be synchronous)
+      sleep 0.5 if ENV['CODESHIP']
     end
 
     context 'if user can view collection' do
