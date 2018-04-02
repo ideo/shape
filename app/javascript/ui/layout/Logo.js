@@ -2,8 +2,8 @@ import styled from 'styled-components'
 
 const StyledLogo = styled.div`
   margin-bottom: 15px;
-  width: 80px;
-  height: 50px;
+  width: 83px;
+  height: 53px;
   background-image: url('https://s3-us-west-2.amazonaws.com/assets.shape.space/logo_1x.png');
   background-position: center;
   background-repeat: no-repeat;
