@@ -19,6 +19,10 @@ class Callbacks::IdeoNetworkController < ActionController::Base
 
   private
 
+  def jsonapi_params
+    params[:_jsonapi]
+  end
+
   def process_user_updated
     user.update_from_network_profile(user_params)
   end
@@ -28,15 +32,15 @@ class Callbacks::IdeoNetworkController < ActionController::Base
   end
 
   def event
-    params[:event].to_sym
+    jsonapi_params[:event].to_sym
   end
 
   def user
-    @user ||= User.find_by_uid(params[:uid])
+    @user ||= User.find_by_uid(jsonapi_params[:uid])
   end
 
   def user_params
-    params.require(:user).permit(
+    jsonapi_params.require(:user).permit(
       :uid,
       :provider,
       :first_name,
