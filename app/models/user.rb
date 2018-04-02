@@ -77,6 +77,14 @@ class User < ApplicationRecord
     )
   end
 
+  def update_from_network_profile(params)
+    self.first_name = params[:first_name] if params[:first_name].present?
+    self.last_name = params[:last_name] if params[:last_name].present?
+    self.email = params[:email] if params[:email].present?
+    self.pic_url_square = params[:picture] if params[:picture].present?
+    save
+  end
+
   def name
     [first_name, last_name].compact.join(' ')
   end
