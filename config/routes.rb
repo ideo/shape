@@ -61,6 +61,10 @@ Rails.application.routes.draw do
     mount Sidekiq::Web => '/sidekiq'
   end
 
+  namespace :callbacks do
+    post 'ideo_network/users' => 'ideo_network#users'
+  end
+
   get 'invitations/:token', to: 'invitations#accept', as: :accept_invitation
 
   root to: 'home#index'
