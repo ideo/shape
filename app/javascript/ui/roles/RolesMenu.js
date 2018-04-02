@@ -1,3 +1,4 @@
+import _ from 'lodash'
 import PropTypes from 'prop-types'
 import { action, observable } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
@@ -38,8 +39,33 @@ class RolesMenu extends React.Component {
       const groups = res[1].data
       users.forEach((u) => { u.type = 'users' })
       groups.forEach(r => { r.type = 'groups' })
-      return this.setSearchableItems([...groups, ...users])
+      this.visibleUsers = users
+      this.visibleGroups = groups
+      this.setSearchableItems([...groups, ...users])
+      this.filterSearchableItems()
     })
+  }
+
+  filterSearchableItems() {
+    const filteredUsers = this.filterSearchableUsers(this.visibleUsers)
+    const filteredGroups = this.filterSearchableGroups(this.visibleGroups)
+    this.setSearchableItems([...filteredGroups, ...filteredUsers])
+  }
+
+  filterSearchableUsers(userRoles) {
+    const { roles } = this.props
+    return _.reject(userRoles, userRole =>
+      roles.find(role =>
+        role.users.find(user =>
+          user.id === userRole.id)))
+  }
+
+  filterSearchableGroups(groupRoles) {
+    const { roles } = this.props
+    return _.reject(groupRoles, groupRole =>
+      roles.find(role =>
+        role.groups.find(group =>
+          group.id === groupRole.id)))
   }
 
   @action setSearchableItems(items) {
@@ -50,7 +76,9 @@ class RolesMenu extends React.Component {
     this.props.apiStore.request(`${entity.type}/${entity.id}/roles/${role.id}`,
       'DELETE').then((res) => {
       if (toRemove) {
-        return this.props.onSave(res)
+        const saveReturn = this.props.onSave(res)
+        this.filterSearchableItems()
+        return saveReturn
       }
       return {}
     })
@@ -69,7 +97,11 @@ class RolesMenu extends React.Component {
       user_ids: userIds,
     }
     return apiStore.request(`${ownerType}/${ownerId}/roles`, 'POST', data)
-      .then(onSave)
+      .then(res => {
+        const saveReturn = onSave(res)
+        this.filterSearchableItems()
+        return saveReturn
+      })
       .catch((err) => console.warn(err))
   }
 
@@ -92,18 +124,8 @@ class RolesMenu extends React.Component {
     return (currentUser.id !== user.id)
   }
 
-  // TODO needs to check group roles too
-  currentUserRoleCheck() {
-    const { apiStore, roles } = this.props
-    const { currentUser } = apiStore
-    const userRole = roles.find(role => role.users
-      .find(user => user.id === currentUser.id))
-    if (!userRole) return false
-    return userRole.canEdit()
-  }
-
   render() {
-    const { addCallout, roles, ownerType, title } = this.props
+    const { addCallout, canEdit, roles, ownerType, title } = this.props
     const roleEntities = []
     roles.forEach((role) => {
       role.users.forEach((user) => {
@@ -119,14 +141,13 @@ class RolesMenu extends React.Component {
     const roleTypes = ownerType === 'groups'
       ? ['member', 'admin']
       : ['viewer', 'editor']
-    const userCanEdit = this.currentUserRoleCheck()
 
     return (
       <div>
         <Heading3>{title}</Heading3>
         { sortedRoleEntities.map(combined =>
           (<RoleSelect
-            enabled={userCanEdit && this.currentUserCheck(combined.entity, combined.role)}
+            enabled={canEdit && this.currentUserCheck(combined.entity, combined.role)}
             key={combined.entity.id + combined.role.id}
             role={combined.role}
             roleTypes={roleTypes}
@@ -136,7 +157,7 @@ class RolesMenu extends React.Component {
           />))
         }
         <FormSpacer />
-        {userCanEdit &&
+        {canEdit &&
           <div>
             <Heading3>{addCallout}</Heading3>
             <RolesAdd
@@ -153,6 +174,7 @@ class RolesMenu extends React.Component {
 }
 
 RolesMenu.propTypes = {
+  canEdit: PropTypes.bool,
   ownerId: PropTypes.number.isRequired,
   ownerType: PropTypes.string.isRequired,
   roles: MobxPropTypes.arrayOrObservableArray,
@@ -164,6 +186,7 @@ RolesMenu.wrappedComponent.propTypes = {
   apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 RolesMenu.defaultProps = {
+  canEdit: false,
   roles: [],
   title: 'Shared with',
   addCallout: 'Add groups or people:'

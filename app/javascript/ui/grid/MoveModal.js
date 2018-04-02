@@ -58,9 +58,8 @@ class MoveModal extends React.Component {
 
   moveCards = async (placement) => {
     const { uiStore, apiStore } = this.props
-    const { currentUser } = apiStore
     const collectionId = uiStore.viewingCollection.id
-    if (!uiStore.viewingCollection.userCanEdit(currentUser.id)) {
+    if (!uiStore.viewingCollection.can_edit) {
       // TODO add error dialog
       console.warn('Cannot edit this collection')
       return

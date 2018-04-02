@@ -82,6 +82,16 @@ class OrganizationMenu extends React.Component {
     apiStore.add(res.data, 'roles')
   }
 
+  currentUserRoleCheck(roles) {
+    // If the current user is an admin in the group they can edit
+    const { apiStore } = this.props
+    const { currentUser } = apiStore
+    const userRole = roles.find(role => role.users
+      .find(user => user.id === currentUser.id))
+    if (!userRole) return false
+    return userRole.canEdit()
+  }
+
   handleGroupClick = group => () => {
     this.changeModifyGroup(group)
   }
@@ -123,6 +133,7 @@ class OrganizationMenu extends React.Component {
       role.resource && role.resource.id === this.editGroup.id)
     return (
       <RolesMenu
+        canEdit={this.currentUserRoleCheck(roles)}
         ownerId={this.editGroup.id}
         ownerType="groups"
         title="Members:"
