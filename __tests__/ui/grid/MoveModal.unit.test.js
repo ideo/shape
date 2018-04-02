@@ -39,7 +39,7 @@ describe('MoveModal', () => {
     describe('on an uneditable collection', () => {
       beforeEach(() => {
         props.uiStore.viewingCollection = {
-          userCanEdit: jest.fn().mockReturnValue(true)
+          can_edit: true,
         }
       })
 
@@ -60,7 +60,7 @@ describe('MoveModal', () => {
         props.uiStore.movingFromCollectionId = 3
         props.uiStore.viewingCollection = {
           id: 4,
-          userCanEdit: jest.fn().mockReturnValue(true),
+          can_edit: true,
         }
         wrapper.setProps(props)
         component = wrapper.instance()

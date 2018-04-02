@@ -147,31 +147,4 @@ describe('RolesMenu', () => {
       })
     })
   })
-
-  describe('currentUserRoleCheck', () => {
-    let user
-    let role
-
-    beforeEach(() => {
-      apiStore.currentUser.id = 3
-      user = { id: 3, name: 'a', pic_url_square: 'something' }
-      role = { id: 21, name: 'viewer', users: [user], canEdit: jest.fn() }
-      props.roles = [role]
-      wrapper.setProps(props)
-    })
-
-    describe('when the user has a role that cannot edit', () => {
-      it('should return false', () => {
-        role.canEdit.mockReturnValue(false)
-        expect(component.currentUserRoleCheck()).toBeFalsy()
-      })
-    })
-
-    describe('when the user has a role that can edit', () => {
-      it('should return true', () => {
-        role.canEdit.mockReturnValue(true)
-        expect(component.currentUserRoleCheck()).toBeTruthy()
-      })
-    })
-  })
 })
