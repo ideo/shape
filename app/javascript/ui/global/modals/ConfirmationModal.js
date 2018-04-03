@@ -11,11 +11,6 @@ class ConfirmationModal extends React.Component {
     this.props.uiStore.closeAlertModal()
   }
 
-  handleClose = (ev) => {
-    ev.preventDefault()
-    this.close()
-  }
-
   handleCancel = (ev) => {
     ev.preventDefault()
     const { onCancel } = this.props
@@ -66,7 +61,6 @@ ConfirmationModal.propTypes = {
 ConfirmationModal.wrappedComponent.propTypes = {
   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }
-
 ConfirmationModal.defaultProps = {
   onCancel: null,
   confirmText: 'Roger',

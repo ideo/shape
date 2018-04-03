@@ -100,9 +100,6 @@ ConfirmationModal.wrappedComponent.propTypes = {
 
 ConfirmationModal.defaultProps = {
   open: true,
-  onCancel: null,
-  confirmText: 'Roger',
-  cancelText: 'Cancel',
 }
 
 export default ConfirmationModal
