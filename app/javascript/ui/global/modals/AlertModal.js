@@ -53,18 +53,23 @@ const PromptText = styled.span`
 @inject('uiStore')
 @observer
 class ConfirmationModal extends React.Component {
-  handleClose = (ev) => {
-    ev.preventDefault()
+  close = () => {
     this.props.uiStore.closeAlertModal()
   }
 
+  handleClose = (ev) => {
+    ev.preventDefault()
+    this.close()
+  }
+
   render() {
-    const { children, icon } = this.props
+    const { children, icon, open } = this.props
     return (
       <StyledDialog
-        open
+        open={open}
         classes={{ paper: 'modal__paper' }}
         onClose={this.handleClose}
+        onExited={this.close}
         onBackdropClick={this.handleClose}
         aria-labelledby="Confirmation"
         BackdropProps={{ invisible: true }}
@@ -87,12 +92,14 @@ class ConfirmationModal extends React.Component {
 ConfirmationModal.propTypes = {
   icon: PropTypes.node.isRequired,
   children: PropTypes.node.isRequired,
+  open: PropTypes.bool,
 }
 ConfirmationModal.wrappedComponent.propTypes = {
   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 
 ConfirmationModal.defaultProps = {
+  open: true,
   onCancel: null,
   confirmText: 'Roger',
   cancelText: 'Cancel',
