@@ -54,13 +54,6 @@ class MoveModal extends React.Component {
   handleClose = (ev) => {
     ev.preventDefault()
     const { uiStore } = this.props
-    // Notify the user if they're on a different collection
-    if (uiStore.moveingFromCollectionId !== uiStore.viewingCollection) {
-      uiStore.openAlertModal({
-        prompt: 'Your items have been returned to their orginal location',
-        icon: <BackIcon />,
-      })
-    }
     uiStore.closeMoveMenu()
   }
 
@@ -80,6 +73,13 @@ class MoveModal extends React.Component {
     }
     try {
       await apiStore.request('/collection_cards/move', 'PATCH', data)
+      // Notify the user if they're on a different collection
+      if (uiStore.movingFromCollectionId !== uiStore.viewingCollection.id) {
+        uiStore.openAlertModal({
+          prompt: 'Your items have been returned to their original location',
+          icon: <BackIcon />,
+        })
+      }
       uiStore.resetSelectionAndBCT()
     } catch (e) {
       console.warn('Cannot move this collection')
