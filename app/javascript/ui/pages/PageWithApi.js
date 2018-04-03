@@ -1,7 +1,7 @@
 import _ from 'lodash'
 import { animateScroll as scroll } from 'react-scroll'
 
-import { uiStore } from '~/stores'
+import { uiStore, routingStore } from '~/stores'
 
 class PageWithApi extends React.Component {
   componentDidMount() {
@@ -35,6 +35,7 @@ class PageWithApi extends React.Component {
       .catch(err => {
         uiStore.update('loading', false)
         console.log('API error!', err)
+        routingStore.routeTo('/')
       })
   }
 }

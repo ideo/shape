@@ -1,15 +1,13 @@
 class InvitationsController < ApplicationController
   def accept
-    @user = User.where(
-      invitation_token: params.require(:token),
-      status: User.statuses[:pending],
-    ).first
+    @user = User.pending_user_with_token(params.require(:token))
 
     # store cookie
-    session[:pending_user_id] = @user.id if @user
+    session[:pending_user_token] = @user.invitation_token if @user
     # if not found -- any error messaging to user?
 
-    # after login we will access the pending_user_id cookie
-    redirect_to login_url
+    # this will redirect user to the invited path, where the user will be 401 Unauthorized
+    # however it will store the attempted path to send them upon successful login
+    redirect_to params.require(:redirect)
   end
 end

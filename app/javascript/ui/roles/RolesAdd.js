@@ -54,7 +54,7 @@ class RolesAdd extends React.Component {
       res.data.map((user) =>
         ({ value: user.email, label: user.name, data: user })))
 
-  handleSave = (ev) => {
+  handleSave = async (ev) => {
     const emails = this.selectedUsers
       .filter((selected) => !selected.id)
       .map((selected) => selected.email)
@@ -62,18 +62,15 @@ class RolesAdd extends React.Component {
     const fullUsers = this.selectedUsers
       .filter((selected) => !!selected.id)
 
-    let firstReq = Promise.resolve({ data: [] })
+    let created = { data: [] }
     if (emails.length) {
-      firstReq = this.props.onCreateUsers(emails)
+      created = await this.props.onCreateUsers(emails)
     }
-    return firstReq.then((res) =>
-      this.props.onCreateRoles(
-        [...res.data, ...fullUsers], this.selectedRole
-      ))
-      .then((roles) => {
-        this.reset()
-        return roles
-      })
+    const roles = await this.props.onCreateRoles(
+      [...created.data, ...fullUsers], this.selectedRole
+    )
+    this.reset()
+    return roles
   }
 
   @action

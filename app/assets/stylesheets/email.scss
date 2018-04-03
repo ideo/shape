@@ -1,9 +1,10 @@
 // copied from c-delta
 // Styles for email templates (inlined using Roadie gem)
 
-$color-gray-gallery: #EEEEEE;
+$color-gray-bg: #f0f2f4;
 $color-gray-boulder: #787878;
 $color-gray-tundora: #4A4A4A;
+$color-blacklava: #120f0e;
 
 .email-wrapper {
   font-family: 'Sentinel-Light', Palatino, Georgia, serif;
@@ -11,8 +12,8 @@ $color-gray-tundora: #4A4A4A;
   width: 100%;
   max-width: 710px;
   margin: 0 auto;
-  background-color: $color-gray-gallery;
-  color: $color-gray-tundora;
+  background-color: $color-gray-bg;
+  color: $color-blacklava;
 
   a, a:visited {
     color: $color-gray-tundora;
@@ -49,6 +50,7 @@ $color-gray-tundora: #4A4A4A;
 
   .p {
     padding: 0 0 1em 0;
+    line-height: 1.33;
   }
 
   table {
@@ -66,9 +68,8 @@ $color-gray-tundora: #4A4A4A;
   }
 
   .email-header {
-    background-color: #FFFFFF;
     text-align: center;
-    padding-top: 30px;
+    padding: 10px 0;
   }
 
   .email-header__logo {
@@ -76,9 +77,13 @@ $color-gray-tundora: #4A4A4A;
   }
 
   .email-header__title {
-    text-align: center;
+    // text-align: center;
+    font-family: 'Sentinel', Palatino, Georgia, serif;
+    font-weight: bold;
     margin: 25px 15px 15px 15px;
-    text-transform: uppercase;
+    letter-spacing: 2px;
+    font-size: 32px;
+    // text-transform: uppercase;
   }
 
   .email-header__image {
@@ -88,14 +93,24 @@ $color-gray-tundora: #4A4A4A;
 
   .email-content {
     background-color: #FFFFFF;
-    padding: 30px 20px;
+    padding: 45px;
     font-size: 16px;
   }
 
   .email-link {
-    padding-top: 10px;
     a {
-      font-weight: bold;
+      font-family: 'Gotham-Bold', 'Arial Black', Arial, Helvetica, sans-serif;
+      text-align: center;
+      text-transform: uppercase;
+      color: white;
+      font-size: 16px;
+      letter-spacing: 1.5px;
+      padding: 12px;
+      display: block;
+      background: black;
+      margin: 40px auto;
+      max-width: 250px;
+      border-radius: 24px;
     }
   }
 
