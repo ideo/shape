@@ -1,6 +1,7 @@
 import { action, observable } from 'mobx'
 
 import { uiStore } from '~/stores'
+import ArchiveIcon from '~/ui/icons/ArchiveIcon'
 import BaseRecord from './BaseRecord'
 
 class CollectionCard extends BaseRecord {
@@ -33,9 +34,7 @@ class CollectionCard extends BaseRecord {
   }
 
   async API_archive({ isReplacing = false } = {}) {
-    // eslint-disable-next-line no-alert
-    const agree = isReplacing ? true : window.confirm('Are you sure?')
-    if (agree) {
+    const onAgree = async () => {
       const collection = this.parent
       try {
         await this.apiStore.request(`collection_cards/${this.id}/archive`, 'PATCH')
@@ -49,8 +48,16 @@ class CollectionCard extends BaseRecord {
       } catch (e) {
         // console.warn(e)
       }
+      return false
     }
-    return false
+    if (!isReplacing) {
+      uiStore.openAlertModal({
+        prompt: 'Are you sure you want to archive this?',
+        confirmText: 'Archive',
+        icon: <ArchiveIcon />,
+        onConfirm: onAgree,
+      })
+    } else onAgree()
   }
 
   async API_duplicate() {

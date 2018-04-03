@@ -1,10 +1,9 @@
-import { routingStore } from '~/stores'
+import { routingStore, uiStore } from '~/stores'
+import ArchiveIcon from '~/ui/icons/ArchiveIcon'
 
 export const archive = (type, obj) => {
-  // eslint-disable-next-line no-alert
-  const agree = window.confirm('Are you sure?')
-  if (agree) {
-    return obj.apiStore.request(`${type}/${obj.id}/archive`, 'PATCH').then(() => {
+  const onAgree = () =>
+    obj.apiStore.request(`${type}/${obj.id}/archive`, 'PATCH').then(() => {
       // NOTE: should we handle the redirect here, or in the PageMenu/etc?
       let redirect = '/'
       if (obj.breadcrumb.length >= 2) {
@@ -13,8 +12,13 @@ export const archive = (type, obj) => {
       }
       routingStore.push(redirect)
     })
-  }
-  return false
+
+  uiStore.openAlertModal({
+    prompt: 'Are you sure you want to archive this?',
+    confirmText: 'Archive',
+    icon: <ArchiveIcon />,
+    onConfirm: onAgree,
+  })
 }
 
 export default {
