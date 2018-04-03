@@ -4,6 +4,7 @@ import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import { Router, Switch, Route } from 'react-router-dom'
 
 import ConfirmationModal from '~/ui/global/modals/ConfirmationModal'
+import InformationModal from '~/ui/global/modals/InformationModal'
 import CollectionPage from '~/ui/pages/CollectionPage'
 import ItemPage from '~/ui/pages/ItemPage'
 import SearchPage from '~/ui/pages/SearchPage'
@@ -32,6 +33,14 @@ class Routes extends React.Component {
     if (!apiStore.currentUser) {
       return <Loader />
     }
+    let alertModal
+    if (uiStore.alertModal.open) {
+      if (_.isFunction(uiStore.alertModal.onConfirm)) {
+        alertModal = <ConfirmationModal {...uiStore.alertModal} />
+      } else {
+        alertModal = <InformationModal {...uiStore.alertModal} />
+      }
+    }
     return (
       <Fragment>
         <WindowSizeListener onResize={this.handleWindowResize} />
@@ -39,9 +48,7 @@ class Routes extends React.Component {
           organization={apiStore.currentUser.current_organization}
           userGroups={apiStore.currentUser.groups}
         />
-        {uiStore.confirmationModal.open && (
-          <ConfirmationModal {...uiStore.confirmationModal} />
-        )}
+        {alertModal}
         <Router history={history}>
           <Switch>
             <Route exact path="/" component={CollectionPage} />

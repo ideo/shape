@@ -30,10 +30,9 @@ export default class UiStore {
   @observable isLoading = false
   @observable movingCardIds = []
   @observable movingFromCollectionId = null
-  @observable confirmationModal = {
+  @observable alertModal = {
     open: false,
     prompt: null,
-    onClose: null,
     onConfirm: null,
     onCancel: null,
     icon: null,
@@ -41,13 +40,13 @@ export default class UiStore {
     cancelText: null,
   }
 
-  @action openConfirmationModal(props) {
-    this.confirmationModal = { open: true, ...props }
+  @action openAlertModal(props) {
+    this.alertModal = { open: true, ...props }
   }
 
-  @action closeConfirmationModal() {
-    _.mapValues(this.confirmationModal, () => null)
-    this.confirmationModal.open = false
+  @action closeAlertModal() {
+    _.mapValues(this.alertModal, () => null)
+    this.alertModal.open = false
   }
 
   // default action for updating any basic UiStore value
