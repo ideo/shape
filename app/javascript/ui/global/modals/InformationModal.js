@@ -1,7 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { action, observable } from 'mobx'
-import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
+import { observer } from 'mobx-react'
 import CloseIcon from '~/ui/icons/CloseIcon'
 import AlertModal from './AlertModal'
 
@@ -9,7 +9,6 @@ import AlertModal from './AlertModal'
 const delay = ms => new Promise((resolve, reject) =>
   setTimeout(() => { resolve(ms) }), ms)
 
-@inject('uiStore')
 @observer
 class InformationModal extends React.Component {
   @observable isOpen = true
@@ -45,9 +44,6 @@ InformationModal.propTypes = {
   prompt: PropTypes.node,
   icon: PropTypes.node,
   fadeOutTime: PropTypes.number,
-}
-InformationModal.wrappedComponent.propTypes = {
-  uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 
 InformationModal.defaultProps = {

@@ -1,9 +1,5 @@
 import ConfirmationModal from '~/ui/global/modals/ConfirmationModal'
 
-import fakeUiStore from '#/mocks/fakeUiStore'
-
-const uiStore = fakeUiStore
-
 describe('ConfirmationModal', () => {
   const fakeEvent = {
     preventDefault: jest.fn(),
@@ -16,10 +12,9 @@ describe('ConfirmationModal', () => {
       onConfirm: jest.fn(),
       icon: <div />,
       confirmText: 'roger',
-      uiStore,
     }
     wrapper = shallow(
-      <ConfirmationModal.wrappedComponent {...props} />
+      <ConfirmationModal {...props} />
     )
     component = wrapper.instance()
   })
@@ -33,7 +28,7 @@ describe('ConfirmationModal', () => {
       })
 
       it('it should run the onCancel prop if it exists', () => {
-        expect(props.uiStore.closeAlertModal).not.toHaveBeenCalled()
+        expect(component.isOpen).toBeTruthy()
         expect(props.onCancel).toHaveBeenCalled()
       })
     })
@@ -45,8 +40,8 @@ describe('ConfirmationModal', () => {
         component.handleCancel(fakeEvent)
       })
 
-      it('it should cancel the alert modal in the UI Store', () => {
-        expect(props.uiStore.closeAlertModal).toHaveBeenCalled()
+      it('it should close the alert modal', () => {
+        expect(component.isOpen).toBeFalsy()
       })
     })
   })
@@ -60,8 +55,8 @@ describe('ConfirmationModal', () => {
       expect(props.onConfirm).toHaveBeenCalled()
     })
 
-    it('should close the modal in the UI store', () => {
-      expect(props.uiStore.closeAlertModal).toHaveBeenCalled()
+    it('should close the modal', () => {
+      expect(component.isOpen).toBeFalsy()
     })
   })
 })

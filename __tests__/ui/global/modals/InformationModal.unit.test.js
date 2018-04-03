@@ -1,9 +1,5 @@
 import InformationModal from '~/ui/global/modals/InformationModal'
 
-import fakeUiStore from '#/mocks/fakeUiStore'
-
-const uiStore = fakeUiStore
-
 describe('InformationModal', () => {
   let props, wrapper, component
 
@@ -11,11 +7,10 @@ describe('InformationModal', () => {
     props = {
       prompt: 'test prompt',
       icon: <div />,
-      uiStore,
       fadeOutTime: 20,
     }
     wrapper = shallow(
-      <InformationModal.wrappedComponent {...props} />
+      <InformationModal {...props} />
     )
     component = wrapper.instance()
   })

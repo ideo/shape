@@ -1,27 +1,29 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
+import { action, observable } from 'mobx'
+import { observer } from 'mobx-react'
 import { FormActionsContainer, TextButton } from '~/ui/global/styled/forms'
 import AlertModal from './AlertModal'
 
-@inject('uiStore')
 @observer
 class ConfirmationModal extends React.Component {
-  close() {
-    this.props.uiStore.closeAlertModal()
-  }
+  @observable isOpen = true
 
   handleCancel = (ev) => {
     ev.preventDefault()
     const { onCancel } = this.props
-    if (!onCancel) return this.close()
+    if (!onCancel) return this.setOpen(false)
     return onCancel()
   }
 
   handleConfirm = (ev) => {
     ev.preventDefault()
     this.props.onConfirm()
-    this.close()
+    this.setOpen(false)
+  }
+
+  @action setOpen(val) {
+    this.isOpen = val
   }
 
   render() {
@@ -32,7 +34,7 @@ class ConfirmationModal extends React.Component {
       prompt,
     } = this.props
     return (
-      <AlertModal icon={icon}>
+      <AlertModal icon={icon} open={this.isOpen}>
         <form>
           <p>
             { prompt }
@@ -57,9 +59,6 @@ ConfirmationModal.propTypes = {
   onCancel: PropTypes.func,
   confirmText: PropTypes.string,
   cancelText: PropTypes.string,
-}
-ConfirmationModal.wrappedComponent.propTypes = {
-  uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 ConfirmationModal.defaultProps = {
   onCancel: null,
