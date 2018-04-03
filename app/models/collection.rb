@@ -34,7 +34,6 @@ class Collection < ApplicationRecord
   validates :name, presence: true, if: :base_collection_type?
   validates :organization, presence: true
   before_validation :inherit_parent_organization_id, on: :create
-  after_create :allow_primary_group_view_access, if: :parent_is_user_collection?
 
   scope :root, -> { where.not(organization_id: nil) }
   scope :not_custom_type, -> { where(type: nil) }
@@ -192,6 +191,7 @@ class Collection < ApplicationRecord
   end
 
   def allow_primary_group_view_access
+    return unless parent_is_user_collection?
     organization.primary_group.add_role(Role::VIEWER, self)
   end
 
