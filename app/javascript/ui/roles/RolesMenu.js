@@ -37,8 +37,6 @@ class RolesMenu extends React.Component {
     Promise.all(reqs).then(res => {
       const users = res[0].data
       const groups = res[1].data
-      users.forEach((u) => { u.type = 'users' })
-      groups.forEach(r => { r.type = 'groups' })
       this.visibleUsers = users
       this.visibleGroups = groups
       this.setSearchableItems([...groups, ...users])
@@ -73,7 +71,7 @@ class RolesMenu extends React.Component {
   }
 
   onDelete = (role, entity, toRemove) =>
-    this.props.apiStore.request(`${entity.type}/${entity.id}/roles/${role.id}`,
+    this.props.apiStore.request(`${entity.internalType}/${entity.id}/roles/${role.id}`,
       'DELETE').then((res) => {
       if (toRemove) {
         const saveReturn = this.props.onSave(res)
@@ -86,10 +84,10 @@ class RolesMenu extends React.Component {
   onCreateRoles = (entities, roleName) => {
     const { apiStore, ownerId, ownerType, onSave } = this.props
     const userIds = entities
-      .filter(entity => entity.type === 'users')
+      .filter(entity => entity.internalType === 'users')
       .map((user) => user.id)
     const groupIds = entities
-      .filter(entity => entity.type === 'groups')
+      .filter(entity => entity.internalType === 'groups')
       .map((group) => group.id)
     const data = {
       role: { name: roleName },

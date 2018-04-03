@@ -29,6 +29,7 @@ class Api::V1::RolesController < Api::V1::BaseController
       users: users,
       groups: groups,
       propagate_to_children: true,
+      invited_by: current_user,
     )
     if assigner.call
       render jsonapi: record.roles.reload, include: %i[users groups resource]
