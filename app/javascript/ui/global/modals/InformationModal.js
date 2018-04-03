@@ -5,29 +5,24 @@ import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import CloseIcon from '~/ui/icons/CloseIcon'
 import AlertModal from './AlertModal'
 
+// Wrap setTimeout in promise for better API and easier testing
+const delay = ms => new Promise((resolve, reject) =>
+  setTimeout(() => { resolve(ms) }), ms)
+
 @inject('uiStore')
 @observer
 class InformationModal extends React.Component {
   @observable isOpen = true
 
   componentDidMount() {
-    window.setTimeout(() => {
+    return delay(this.props.fadeOutTime).then(() => {
       // Change the open value so we get the closing animation from MUI.
       this.setOpen(false)
-    }, this.props.fadeOutTime)
+    })
   }
 
   @action setOpen(val) {
     this.isOpen = val
-  }
-
-  close() {
-    this.props.uiStore.closeAlertModal()
-  }
-
-  handleClose = (ev) => {
-    ev.preventDefault()
-    this.close()
   }
 
   render() {
