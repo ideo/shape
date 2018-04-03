@@ -14,6 +14,7 @@ const StyledLogo = styled.div`
     background-image: url('https://s3-us-west-2.amazonaws.com/assets.shape.space/logo.svg');
   }
 `
+
 const Logo = () => (
   <StyledLogo title="Shape" />
 )
