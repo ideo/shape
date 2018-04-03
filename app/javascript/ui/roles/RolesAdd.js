@@ -87,9 +87,9 @@ class RolesAdd extends React.Component {
     const { searchableItems } = this.props
     return searchableItems.map(item => {
       let value
-      if (item.type === 'users') {
+      if (item.internalType === 'users') {
         value = item.email
-      } else if (item.type === 'groups') {
+      } else if (item.internalType === 'groups') {
         value = item.handle
       } else {
         throw new Error('Can only search users and groups')
