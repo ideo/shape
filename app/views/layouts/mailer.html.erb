@@ -8,9 +8,7 @@
     <div class="email-wrapper">
       <div class="email-inner">
         <div class="email-header">
-          <% if content_for(:title).present? %>
-            <div class="email-header__title"><%= content_for(:title) %></div>
-          <% end %>
+          <a class="email-header__logo" href="<%= ENV['OKTA_BASE_URL']%>" title="Shape"></a>
         </div>
 
 

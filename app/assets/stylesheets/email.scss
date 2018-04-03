@@ -1,13 +1,17 @@
-// copied from c-delta
+// copied / modified from c-delta
 // Styles for email templates (inlined using Roadie gem)
 
+$color-white: #ffffff;
 $color-gray-bg: #f0f2f4;
 $color-gray-boulder: #787878;
 $color-gray-tundora: #4A4A4A;
 $color-blacklava: #120f0e;
+$header-font: 'Gotham', 'Arial Black', Arial, Helvetica, sans-serif;
+$sentinel-font: 'Sentinel', Palatino, Georgia, serif;
+$sentinel-lt-font: 'Sentinel-Light', 'Sentinel', Palatino, Georgia, serif;
 
 .email-wrapper {
-  font-family: 'Sentinel-Light', Palatino, Georgia, serif;
+  font-family: $sentinel-lt-font;
   font-size: 14px;
   width: 100%;
   max-width: 710px;
@@ -40,7 +44,7 @@ $color-blacklava: #120f0e;
   }
 
   h1, h2, h3, h4, h5, h6 {
-    font-family: 'Gotham-Bold', 'Arial Black', Arial, Helvetica, sans-serif;
+    font-family: $header-font;
     font-weight: bold;
   }
 
@@ -73,17 +77,22 @@ $color-blacklava: #120f0e;
   }
 
   .email-header__logo {
-    background-color: #ffffff;
-  }
+    display: block;
+    margin: 25px auto 10px;
 
-  .email-header__title {
-    // text-align: center;
-    font-family: 'Sentinel', Palatino, Georgia, serif;
-    font-weight: bold;
-    margin: 25px 15px 15px 15px;
-    letter-spacing: 2px;
-    font-size: 32px;
-    // text-transform: uppercase;
+    // uses same styling as Logo.js
+    width: 83px;
+    height: 53px;
+    background-image: url('https://s3-us-west-2.amazonaws.com/assets.shape.space/logo_1x.png');
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: contain;
+    @media
+    (-webkit-min-device-pixel-ratio: 2),
+    (min-resolution: 192dpi) {
+      background-image: url('https://s3-us-west-2.amazonaws.com/assets.shape.space/logo.svg');
+    }
+
   }
 
   .email-header__image {
@@ -92,17 +101,17 @@ $color-blacklava: #120f0e;
   }
 
   .email-content {
-    background-color: #FFFFFF;
+    background-color: $color-white;
     padding: 45px;
     font-size: 16px;
   }
 
   .email-link {
     a {
-      font-family: 'Gotham-Bold', 'Arial Black', Arial, Helvetica, sans-serif;
+      font-family: $header-font;
       text-align: center;
       text-transform: uppercase;
-      color: white;
+      color: $color-white;
       font-size: 16px;
       letter-spacing: 1.5px;
       padding: 12px;
