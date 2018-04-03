@@ -56,6 +56,8 @@ RSpec.configure do |config|
   # See: http://www.virtuouscode.com/2012/08/31/configuring-database_cleaner-with-rails-rspec-capybara-and-selenium/
   config.before(:suite) do
     DatabaseCleaner.clean_with(:truncation)
+    # NOTE: need to reindex every searchable model before test suite is run
+    Searchkick.models.each(&:reindex)
     Searchkick.disable_callbacks
   end
 
