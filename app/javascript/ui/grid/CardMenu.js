@@ -60,7 +60,6 @@ class CardMenu extends React.PureComponent {
     if (canEdit) {
       items = items.concat([
         { name: 'Move', icon: <MoveIcon />, onClick: this.props.handleMove },
-        { name: 'Link', icon: <LinkIcon />, onClick: this.linkCard },
         { name: 'Archive', icon: <ArchiveIcon />, onClick: this.archiveCard },
       ])
     }
