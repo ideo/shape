@@ -35,18 +35,28 @@ class RolesAdd extends React.Component {
 
   @action
   onUserSelected = (data) => {
-    let user = data
-    if (!data.id) {
-      user = Object.assign({}, { name: data.custom, email: data.custom })
+    let existing = null
+    let entity = data
+    if (data.type === 'users') {
+      if (!data.id) {
+        entity = Object.assign({}, { name: data.custom, email: data.custom })
+      }
+      existing = this.selectedUsers
+        .filter(selected => selected.internalType === 'users')
+        .find(selected => selected.email === entity.email)
+    } else if (data.type === 'groups') {
+      existing = this.selectedUsers
+        .filter(selected => selected.internalType === 'groups')
+        .find(selected => selected.id === entity.id)
     }
-    if (!this.selectedUsers.find((selected) => selected.email === user.email)) {
-      this.selectedUsers.push(user)
+    if (!existing) {
+      this.selectedUsers.push(entity)
     }
   }
 
   @action
-  onUserDelete = (user) => {
-    this.selectedUsers.remove(user)
+  onUserDelete = (entity) => {
+    this.selectedUsers.remove(entity)
   }
 
   onUserSearch = (searchTerm) =>
