@@ -57,20 +57,4 @@ describe('RoleSelect', () => {
       expect(props.onDelete).toHaveBeenCalledWith(props.role, props.entity, false)
     })
   })
-
-  describe('onRoleRemove', () => {
-    const fakeEvent = {
-      preventDefault: jest.fn(),
-    }
-
-    it('should call delete role with true to remove the role now', () => {
-      props.onDelete.mockReturnValue(Promise.resolve())
-      wrapper.instance().onRoleRemove(fakeEvent)
-      expect(props.onDelete).toHaveBeenCalledWith(
-        props.role,
-        props.entity,
-        true
-      )
-    })
-  })
 })

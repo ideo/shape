@@ -5,6 +5,8 @@ import styled from 'styled-components'
 import v from '~/utils/variables'
 
 export const FormActionsContainer = styled.div`
+  display: flex;
+  justify-content: space-around;
   padding-bottom: 14px;
   text-align: center;
 `
