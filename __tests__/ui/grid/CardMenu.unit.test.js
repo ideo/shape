@@ -5,11 +5,6 @@ const props = {
   card: { id: 123 },
   canEdit: false,
   canReplace: false,
-  handleShare: jest.fn(),
-  handleDuplicate: jest.fn(),
-  handleMove: jest.fn(),
-  handleArchive: jest.fn(),
-  handleReplace: jest.fn(),
   uiStore: {
     openCardMenuId: false,
     update: jest.fn(),

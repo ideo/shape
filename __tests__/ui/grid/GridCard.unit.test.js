@@ -13,7 +13,6 @@ const props = {
   record: fakeTextItem,
   handleClick: jest.fn(),
   onMoveStart: jest.fn(),
-  handleMove: jest.fn(),
   dragging: false,
   height: 100,
   menuOpen: false,

@@ -160,7 +160,6 @@ class GridCard extends React.Component {
       isSharedCollection,
       dragging,
       menuOpen,
-      onMoveStart,
     } = this.props
 
     return (
@@ -183,7 +182,6 @@ class GridCard extends React.Component {
               canEdit={this.canEdit}
               canReplace={this.canReplace}
               menuOpen={menuOpen}
-              handleMove={onMoveStart}
             />
           </StyledTopRightActions>
         }
@@ -207,7 +205,6 @@ GridCard.propTypes = {
   dragging: PropTypes.bool.isRequired,
   handleClick: PropTypes.func.isRequired,
   menuOpen: PropTypes.bool.isRequired,
-  onMoveStart: PropTypes.func.isRequired,
 }
 
 export default GridCard
