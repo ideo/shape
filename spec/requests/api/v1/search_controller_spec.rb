@@ -1,7 +1,7 @@
 require 'rails_helper'
 
-describe Api::V1::SearchController, type: :request, auth: true do
-  describe '#GET #search', search: true do
+describe Api::V1::SearchController, type: :request, auth: true, search: true do
+  describe '#GET #search' do
     let!(:current_user) { @user }
     let!(:organization) { current_user.current_organization }
     let(:tag_list) { %w[blockchain prototype innovation] }

@@ -26,7 +26,6 @@ class Avatar extends React.Component {
       <StyledAvatar
         alt={title}
         size={size}
-        onClick={this.handleClick}
         className={`avatar ${className}`}
         src={url}
       />
