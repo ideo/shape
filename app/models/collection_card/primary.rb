@@ -15,9 +15,9 @@ class CollectionCard
 
     def card_is_only_primary_card
       # look for an existing primary CollectionCard that is already pointed to this record
-      if record.present? && record.persisted? && CollectionCard::Primary.where("#{record_type}_id": record.id).count.positive?
-        errors.add(record_type, 'already has a primary card')
-      end
+      return unless record.present? && record.persisted?
+      return unless CollectionCard::Primary.where("#{record_type}_id": record.id).count.positive?
+      errors.add(record_type, 'already has a primary card')
     end
   end
 end

@@ -18,7 +18,7 @@ RSpec.describe CollectionCard, type: :model do
       end
     end
 
-    describe '#card_is_only_non_link' do
+    describe '#card_is_only_primary_card' do
       context 'with item' do
         let!(:collection_card) { create(:collection_card_text) }
         # parent_collection_card relationship gets cached without a reload
