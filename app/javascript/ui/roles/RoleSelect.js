@@ -1,6 +1,6 @@
 import _ from 'lodash'
 import PropTypes from 'prop-types'
-import { PropTypes as MobxPropTypes } from 'mobx-react'
+import { inject, PropTypes as MobxPropTypes } from 'mobx-react'
 import { MenuItem } from 'material-ui/Menu'
 import styled from 'styled-components'
 import {
@@ -14,7 +14,6 @@ import {
 import { Select } from '~/ui/global/styled/forms'
 import LeaveIcon from '~/ui/icons/LeaveIcon'
 import Avatar from '~/ui/global/Avatar'
-import { uiStore } from '~/stores'
 
 const MinRowItem = styled.span`
   min-width: 110px;
@@ -31,18 +30,19 @@ const CenterAlignedSingleItem = styled.div`
 `
 CenterAlignedSingleItem.displayName = 'StyledCenterAlignedSingleItem'
 
+@inject('uiStore')
 class RoleSelect extends React.Component {
   onRoleRemove = (ev) => {
     ev.preventDefault()
-    const { entity } = this.props
+    const { entity, uiStore } = this.props
     let prompt
     let confirmText
     if (entity.isCurrentUser && entity.isCurrentUser()) {
-      prompt = 'Are you sure you want to leave this group?'
+      prompt = 'Are you sure you want to leave this?'
       confirmText = 'Leave'
     } else {
       prompt = `Are you sure you want to remove
-        ${this.renderName()} from this group?`
+        ${this.renderName()} from this?`
       confirmText = 'Remove'
     }
     uiStore.openAlertModal({
@@ -147,6 +147,9 @@ RoleSelect.propTypes = {
   onDelete: PropTypes.func.isRequired,
   onCreate: PropTypes.func.isRequired,
   enabled: PropTypes.bool
+}
+RoleSelect.wrappedComponent.propTypes = {
+  uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 RoleSelect.defaultProps = {
   enabled: true

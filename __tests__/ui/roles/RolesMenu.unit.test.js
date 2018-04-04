@@ -7,21 +7,7 @@ import {
   fakeUser
 } from '#/mocks/data'
 
-const apiStore = observable({
-  request: jest.fn()
-    .mockReturnValue(Promise.resolve({ data: [] })),
-  fetchAll: jest.fn(),
-  find: jest.fn()
-    .mockReturnValue(Promise.resolve({ roles: [] })),
-  remove: jest.fn(),
-  add: jest.fn(),
-  currentUser: fakeUser,
-})
-const uiStore = observable({
-  rolesMenuOpen: false,
-  update: jest.fn()
-})
-let props
+let props, apiStore, uiStore
 
 jest.mock('../../../app/javascript/stores/jsonApi/Role')
 let wrapper
@@ -31,6 +17,22 @@ describe('RolesMenu', () => {
 
   beforeEach(() => {
     useStrict(false)
+    // TODO use fake stores
+    apiStore = {
+      request: jest.fn()
+        .mockReturnValue(Promise.resolve({ data: [] })),
+      fetchAll: jest.fn(),
+      find: jest.fn()
+        .mockReturnValue(Promise.resolve({ roles: [] })),
+      remove: jest.fn(),
+      add: jest.fn(),
+      currentUser: fakeUser,
+    }
+    uiStore = {
+      openAlertModal: jest.fn(),
+      rolesMenuOpen: false,
+      update: jest.fn()
+    }
     props = {
       ownerId: 1,
       ownerType: 'collections',
@@ -155,7 +157,6 @@ describe('RolesMenu', () => {
       beforeEach(() => {
         users = [{ id: 3, internalType: 'users' }, { id: 5, internalType: 'users' }]
         apiStore.request.mockReturnValue(Promise.resolve({ data: [] }))
-        apiStore.fetchAll.mockReturnValue(Promise.resolve({ data: [] }))
       })
 
       it('should send a request to create roles with role and user ids', () => {
@@ -180,6 +181,18 @@ describe('RolesMenu', () => {
           expect(component.filterSearchableItems).toHaveBeenCalled()
           done()
         })
+      })
+    })
+
+    describe('with errors', () => {
+      beforeEach(() => {
+        apiStore.request.mockReturnValue(
+          Promise.reject({ error: [ 'bad' ] }))
+        component.onCreateRoles([], 'editor')
+      })
+
+      it('should open an alert modal', () => {
+        expect(props.uiStore.openAlertModal).toHaveBeenCalled()
       })
     })
   })

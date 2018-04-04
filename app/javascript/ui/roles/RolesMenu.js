@@ -10,14 +10,13 @@ import {
 } from '~/ui/global/styled/forms'
 import RolesAdd from '~/ui/roles/RolesAdd'
 import RoleSelect from '~/ui/roles/RoleSelect'
-import { uiStore } from '~/stores'
 
 // TODO rewrite this
 function sortUserOrGroup(a, b) {
   return a.entity.name.localeCompare(b.entity.name)
 }
 
-@inject('apiStore')
+@inject('apiStore', 'uiStore')
 @observer
 class RolesMenu extends React.Component {
   @observable searchableItems = []
@@ -102,7 +101,7 @@ class RolesMenu extends React.Component {
         return saveReturn
       })
       .catch((err) => {
-        uiStore.openAlertModal({
+        this.props.uiStore.openAlertModal({
           prompt: err.error[0],
         })
       })
@@ -112,7 +111,7 @@ class RolesMenu extends React.Component {
     const { apiStore } = this.props
     return apiStore.request(`users/create_from_emails`, 'POST', { emails })
       .catch((err) => {
-        uiStore.openAlertModal({
+        this.props.uiStore.openAlertModal({
           prompt: err.error[0],
         })
       })
@@ -192,6 +191,7 @@ RolesMenu.propTypes = {
 }
 RolesMenu.wrappedComponent.propTypes = {
   apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
+  uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 RolesMenu.defaultProps = {
   canEdit: false,

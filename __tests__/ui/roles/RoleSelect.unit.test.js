@@ -3,6 +3,7 @@ import RoleSelect from '~/ui/roles/RoleSelect'
 import {
   fakeRole
 } from '#/mocks/data'
+import fakeUiStore from '#/mocks/fakeUiStore'
 
 let props
 let wrapper
@@ -16,9 +17,10 @@ describe('RoleSelect', () => {
       entity: fakeRole.users[0],
       onDelete: jest.fn(),
       onCreate: jest.fn(),
+      uiStore: fakeUiStore,
     }
-    wrapper = mount(
-      <RoleSelect {...props} />
+    wrapper = shallow(
+      <RoleSelect.wrappedComponent {...props} />
     )
   })
 
@@ -55,6 +57,26 @@ describe('RoleSelect', () => {
 
     it('should call onDelete with the role and user/group', () => {
       expect(props.onDelete).toHaveBeenCalledWith(props.role, props.entity, false)
+    })
+  })
+
+  describe('onRoleRemove', () => {
+    const fakeEvent = {
+      preventDefault: jest.fn(),
+    }
+
+    beforeEach(() => {
+      wrapper.instance().onRoleRemove(fakeEvent)
+    })
+
+    it('should ask if you want to remove something', () => {
+      expect(props.uiStore.openAlertModal).toHaveBeenCalled()
+      expect(props.uiStore.openAlertModal.mock.calls[0][0].prompt).toMatch(
+        'Are you sure you want to remove'
+      )
+      expect(props.uiStore.openAlertModal.mock.calls[0][0].iconName).toEqual(
+        'LeaveIcon'
+      )
     })
   })
 })
