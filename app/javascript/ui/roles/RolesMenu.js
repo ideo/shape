@@ -10,6 +10,7 @@ import {
 } from '~/ui/global/styled/forms'
 import RolesAdd from '~/ui/roles/RolesAdd'
 import RoleSelect from '~/ui/roles/RoleSelect'
+import uiStore from '~/stores'
 
 // TODO rewrite this
 function sortUserOrGroup(a, b) {
@@ -102,12 +103,21 @@ class RolesMenu extends React.Component {
         this.filterSearchableItems()
         return saveReturn
       })
-      .catch((err) => console.warn(err))
+      .catch((err) => {
+        uiStore.openAlertModal({
+          prompt: err.error[0],
+        })
+      })
   }
 
   onCreateUsers = (emails) => {
     const { apiStore } = this.props
     return apiStore.request(`users/create_from_emails`, 'POST', { emails })
+      .catch((err) => {
+        uiStore.openAlertModal({
+          prompt: err.error[0],
+        })
+      })
   }
 
   onUserSearch = (searchTerm) => {

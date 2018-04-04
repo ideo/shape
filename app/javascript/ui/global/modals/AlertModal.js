@@ -90,7 +90,7 @@ class ConfirmationModal extends React.Component {
   }
 }
 ConfirmationModal.propTypes = {
-  icon: PropTypes.node.isRequired,
+  icon: PropTypes.node,
   children: PropTypes.node.isRequired,
   open: PropTypes.bool,
 }
@@ -100,6 +100,7 @@ ConfirmationModal.wrappedComponent.propTypes = {
 
 ConfirmationModal.defaultProps = {
   open: true,
+  icon: <CloseIcon />,
 }
 
 export default ConfirmationModal

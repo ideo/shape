@@ -43,7 +43,6 @@ export default class UiStore {
   @action openAlertModal(props) {
     this.alertModal = { open: true, ...props }
     this.alertModal.open = true
-    console.log('alert', this.alertModal)
   }
 
   @action closeAlertModal() {
