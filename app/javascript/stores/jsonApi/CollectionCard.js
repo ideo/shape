@@ -39,10 +39,9 @@ class CollectionCard extends BaseRecord {
       const collection = this.parent
       try {
         await this.apiStore.request(`collection_cards/${this.id}/archive`, 'PATCH')
+        await this.apiStore.fetch('collections', collection.id, true)
 
-        const response = await this.apiStore.fetch('collections', collection.id, true)
-        // extra check if we archived the last card in the collection
-        collection.checkResponseForEmptyCards(response)
+        if (collection.collection_cards.length === 0) uiStore.openBlankContentTool()
         if (isReplacing) uiStore.closeBlankContentTool()
 
         return true

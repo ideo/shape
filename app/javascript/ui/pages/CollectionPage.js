@@ -64,7 +64,6 @@ class CollectionPage extends PageWithApi {
   onAPILoad = (response) => {
     const collection = response.data
     const { uiStore } = this.props
-    collection.checkResponseForEmptyCards(response)
     if (!collection.collection_cards.length) {
       uiStore.openBlankContentTool()
     }
