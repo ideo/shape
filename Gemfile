@@ -90,6 +90,7 @@ group :development, :test do
   gem 'faker', '~> 1.8.7'
   gem 'rspec-rails', '~> 3.7'
   gem 'database_cleaner'
+  gem 'rails-controller-testing'
 end
 
 group :development do

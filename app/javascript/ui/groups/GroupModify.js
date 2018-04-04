@@ -11,6 +11,7 @@ import {
   TextButton,
   TextField,
 } from '~/ui/global/styled/forms'
+import { uiStore } from '~/stores'
 import { FloatRight } from '~/ui/global/styled/layout'
 import FilestackUpload from '~/utils/FilestackUpload'
 import Group from '~/stores/jsonApi/Group'
@@ -104,7 +105,9 @@ class GroupModify extends React.Component {
           }
           this.changeUrl(img.url)
         } else {
-          console.warn('Failed to upload image:', resp.filesFailed)
+          uiStore.openAlertModal({
+            prompt: `Failed to upload image: ${resp.filesFailed}`,
+          })
         }
       })
   }

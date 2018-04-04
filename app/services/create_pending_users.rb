@@ -27,8 +27,6 @@ class CreatePendingUsers
     emails.each do |email|
       user = User.create_pending_user(email: email)
       if user.persisted?
-        # queue up invitation email
-        InvitationMailer.invite(user.id).deliver_later
         users << user
       else
         failed_emails << email

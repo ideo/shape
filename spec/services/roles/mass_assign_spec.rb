@@ -7,6 +7,7 @@ RSpec.describe Roles::MassAssign, type: :service do
   let(:groups) { create_list(:group, 3) }
   let(:role_name) { :editor }
   let(:propagate_to_children) { false }
+  let(:invited_by) { nil }
   let(:assign_role) do
     Roles::MassAssign.new(
       object: object,
@@ -14,7 +15,11 @@ RSpec.describe Roles::MassAssign, type: :service do
       users: users,
       groups: groups,
       propagate_to_children: propagate_to_children,
+      invited_by: invited_by,
     )
+  end
+  let(:deliver_double) do
+    double('InvitationMailer')
   end
 
   before :all do
@@ -27,6 +32,8 @@ RSpec.describe Roles::MassAssign, type: :service do
 
   before do
     Sidekiq::Worker.clear_all
+    allow(InvitationMailer).to receive(:invite).and_return(deliver_double)
+    allow(deliver_double).to receive(:deliver_later).and_return(true)
   end
 
   describe '#call' do
@@ -86,6 +93,20 @@ RSpec.describe Roles::MassAssign, type: :service do
           )
           assign_role.call
         end
+      end
+    end
+
+    context 'with invited_by user' do
+      let!(:invited_by) { create(:user) }
+
+      it 'should queue up invitation for invited user' do
+        expect(InvitationMailer).to receive(:invite).with(
+          user_id: users.first.id,
+          invited_by_id: invited_by.id,
+          invited_to_type: object.class.name,
+          invited_to_id: object.id,
+        )
+        assign_role.call
       end
     end
   end

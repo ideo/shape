@@ -7,7 +7,6 @@ const props = {
   canReplace: false,
   handleShare: jest.fn(),
   handleDuplicate: jest.fn(),
-  handleLink: jest.fn(),
   handleMove: jest.fn(),
   handleArchive: jest.fn(),
   handleReplace: jest.fn(),
@@ -28,7 +27,6 @@ describe('CardMenu', () => {
       allActions = [
         'Duplicate',
         'Move',
-        'Link',
         'Archive',
         'Replace',
       ]

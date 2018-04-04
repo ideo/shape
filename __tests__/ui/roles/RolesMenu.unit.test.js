@@ -21,14 +21,7 @@ const uiStore = observable({
   rolesMenuOpen: false,
   update: jest.fn()
 })
-const props = {
-  ownerId: 1,
-  ownerType: 'collections',
-  roles: [],
-  apiStore,
-  uiStore,
-  onSave: jest.fn(),
-}
+let props
 
 jest.mock('../../../app/javascript/stores/jsonApi/Role')
 let wrapper
@@ -38,6 +31,14 @@ describe('RolesMenu', () => {
 
   beforeEach(() => {
     useStrict(false)
+    props = {
+      ownerId: 1,
+      ownerType: 'collections',
+      roles: [],
+      apiStore,
+      uiStore,
+      onSave: jest.fn(),
+    }
     wrapper = shallow(
       <RolesMenu.wrappedComponent {...props} />
     )
@@ -46,6 +47,7 @@ describe('RolesMenu', () => {
 
   describe('componentDidMount', () => {
     beforeEach(() => {
+      component.filterSearchableItems = jest.fn()
       apiStore.request.mockReturnValue(Promise.resolve({ data: [] }))
     })
 
@@ -56,6 +58,42 @@ describe('RolesMenu', () => {
       expect(apiStore.request).toHaveBeenCalledWith(
         `organizations/${fakeOrganization.id}/groups`, 'GET'
       )
+    })
+  })
+
+  describe('filterSearchableItems', () => {
+    let roles
+    let visibleUsers
+    let visibleGroups
+
+    beforeEach(() => {
+      roles = [
+        { id: 23, users: [{ id: 3, internalType: 'users' }], groups: [] },
+        { id: 26, groups: [{ id: 6, internalType: 'groups' }], users: [] },
+      ]
+      visibleUsers = [
+        { id: 3, internalType: 'users' },
+        { id: 33, internalType: 'users' },
+      ]
+      visibleGroups = [
+        { id: 6, internalType: 'groups' },
+        { id: 64, internalType: 'groups' },
+      ]
+      wrapper.setProps(props)
+      component.visibleUsers = visibleUsers
+      component.visibleGroups = visibleGroups
+      props.roles = roles
+      component.filterSearchableItems()
+    })
+
+    it('should filter out users in roles from visible users', () => {
+      expect(component.searchableItems).toContainEqual(visibleUsers[1])
+      expect(component.searchableItems).not.toContainEqual(visibleUsers[0])
+    })
+
+    it('should filter out groups in roles from visible groups', () => {
+      expect(component.searchableItems).toContainEqual(visibleGroups[1])
+      expect(component.searchableItems).not.toContainEqual(visibleGroups[0])
     })
   })
 
@@ -73,8 +111,8 @@ describe('RolesMenu', () => {
   })
 
   describe('onDelete', () => {
-    const role = { id: 2 }
-    const user = { id: 4 }
+    let role = { id: 2 }
+    let user = { id: 4 }
     const res = { data: [] }
 
     beforeEach(() => {
@@ -83,8 +121,8 @@ describe('RolesMenu', () => {
 
     describe('with a user', () => {
       it('should make an api store request with correct data', () => {
-        const role = { id: 2 }
-        const user = { id: 4, type: 'users' }
+        role = { id: 2 }
+        user = { id: 4, internalType: 'users' }
         component.onDelete(role, user, false)
         expect(apiStore.request).toHaveBeenCalledWith(
           `users/${user.id}/roles/${role.id}`, 'DELETE'
@@ -99,6 +137,14 @@ describe('RolesMenu', () => {
           done()
         })
       })
+
+      it('should filter the searchable items', (done) => {
+        component.filterSearchableItems = jest.fn()
+        component.onDelete(role, user, true).then(() => {
+          expect(component.filterSearchableItems).toHaveBeenCalled()
+          done()
+        })
+      })
     })
   })
 
@@ -107,7 +153,7 @@ describe('RolesMenu', () => {
       let users
 
       beforeEach(() => {
-        users = [{ id: 3, type: 'users' }, { id: 5, type: 'users' }]
+        users = [{ id: 3, internalType: 'users' }, { id: 5, internalType: 'users' }]
         apiStore.request.mockReturnValue(Promise.resolve({ data: [] }))
         apiStore.fetchAll.mockReturnValue(Promise.resolve({ data: [] }))
       })
@@ -124,6 +170,14 @@ describe('RolesMenu', () => {
       it('should call onSave', (done) => {
         component.onCreateRoles(users, 'editor').then(() => {
           expect(props.onSave).toHaveBeenCalled()
+          done()
+        })
+      })
+
+      it('should filter the searchable items', (done) => {
+        component.filterSearchableItems = jest.fn()
+        component.onCreateRoles(users, 'editor').then(() => {
+          expect(component.filterSearchableItems).toHaveBeenCalled()
           done()
         })
       })
@@ -144,33 +198,6 @@ describe('RolesMenu', () => {
         apiStore.currentUser.id = 4
         const user = { id: 3 }
         expect(component.currentUserCheck(user)).toBeTruthy()
-      })
-    })
-  })
-
-  describe('currentUserRoleCheck', () => {
-    let user
-    let role
-
-    beforeEach(() => {
-      apiStore.currentUser.id = 3
-      user = { id: 3, name: 'a', pic_url_square: 'something' }
-      role = { id: 21, name: 'viewer', users: [user], canEdit: jest.fn() }
-      props.roles = [role]
-      wrapper.setProps(props)
-    })
-
-    describe('when the user has a role that cannot edit', () => {
-      it('should return false', () => {
-        role.canEdit.mockReturnValue(false)
-        expect(component.currentUserRoleCheck()).toBeFalsy()
-      })
-    })
-
-    describe('when the user has a role that can edit', () => {
-      it('should return true', () => {
-        role.canEdit.mockReturnValue(true)
-        expect(component.currentUserRoleCheck()).toBeTruthy()
       })
     })
   })

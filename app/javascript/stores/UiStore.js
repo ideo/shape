@@ -30,6 +30,25 @@ export default class UiStore {
   @observable isLoading = false
   @observable movingCardIds = []
   @observable movingFromCollectionId = null
+  @observable alertModal = {
+    open: false,
+    prompt: null,
+    onConfirm: null,
+    onCancel: null,
+    icon: null,
+    confirmText: null,
+    cancelText: null,
+  }
+
+  @action openAlertModal(props) {
+    this.alertModal = { open: true, ...props }
+    this.alertModal.open = true
+  }
+
+  @action closeAlertModal() {
+    _.mapValues(this.alertModal, () => null)
+    this.alertModal.open = false
+  }
 
   // default action for updating any basic UiStore value
   @action update(name, value) {

@@ -33,24 +33,29 @@ class CollectionCard extends BaseRecord {
   }
 
   async API_archive({ isReplacing = false } = {}) {
-    // eslint-disable-next-line no-alert
-    const agree = isReplacing ? true : window.confirm('Are you sure?')
-    if (agree) {
+    const onAgree = async () => {
       const collection = this.parent
       try {
         await this.apiStore.request(`collection_cards/${this.id}/archive`, 'PATCH')
+        await this.apiStore.fetch('collections', collection.id, true)
 
-        const response = await this.apiStore.fetch('collections', collection.id, true)
-        // extra check if we archived the last card in the collection
-        collection.checkResponseForEmptyCards(response)
+        if (collection.collection_cards.length === 0) uiStore.openBlankContentTool()
         if (isReplacing) uiStore.closeBlankContentTool()
 
         return true
       } catch (e) {
         // console.warn(e)
       }
+      return false
     }
-    return false
+    if (!isReplacing) {
+      uiStore.openAlertModal({
+        prompt: 'Are you sure you want to archive this?',
+        confirmText: 'Archive',
+        iconName: 'ArchiveIcon',
+        onConfirm: onAgree,
+      })
+    } else onAgree()
   }
 
   async API_duplicate() {

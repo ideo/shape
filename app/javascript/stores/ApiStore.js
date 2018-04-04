@@ -1,5 +1,6 @@
 import { action, observable, computed } from 'mobx'
 import { Store } from 'mobx-jsonapi-store'
+import _ from 'lodash'
 
 import Collection from './jsonApi/Collection'
 import CollectionCard from './jsonApi/CollectionCard'
@@ -19,6 +20,24 @@ class ApiStore extends Store {
 
   @computed get currentUser() {
     return this.find('users', this.currentUserId)
+  }
+
+  __updateRelationships(obj) {
+    const record = this.find(obj.type, obj.id)
+    const refs = obj.relationships ? Object.keys(obj.relationships) : []
+    refs.forEach((ref) => {
+      const items = obj.relationships[ref].data
+      if (items instanceof Array && items.length < 1) {
+        /* NOTE: special case, if relationship data comes back with an empty array
+         * we have to manually empty the array, while also assigning the proper type
+         */
+        const possibleTypes = _.map(ApiStore.types, model => model.type)
+        if (possibleTypes.indexOf(ref) > -1) {
+          record.assignRef(ref, observable([]), ref)
+        }
+      }
+    })
+    super.__updateRelationships(obj)
   }
 }
 ApiStore.types = [

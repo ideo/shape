@@ -8,13 +8,15 @@ module Roles
                    users: [],
                    groups: [],
                    propagate_to_children: false,
-                   synchronous: false)
+                   synchronous: false,
+                   invited_by: nil)
       @object = object
       @role_name = role_name
       @users = users
       @groups = groups
       @propagate_to_children = propagate_to_children
       @synchronous = synchronous
+      @invited_by = invited_by
       @added_users = []
       @added_groups = []
       @failed_users = []
@@ -26,6 +28,7 @@ module Roles
     def call
       return false unless valid_object_and_role_name?
       assign_role_to_users
+      notify_users if @invited_by
       assign_role_to_groups
       add_roles_to_children if @propagate_to_children
       failed_users.blank? && failed_groups.blank?
@@ -73,6 +76,17 @@ module Roles
           @object.id,
           @object.class.name.to_s,
         )
+      end
+    end
+
+    def notify_users
+      @added_users.each do |user|
+        InvitationMailer.invite(
+          user_id: user.id,
+          invited_by_id: @invited_by.id,
+          invited_to_type: @object.class.name,
+          invited_to_id: @object.id,
+        ).deliver_later
       end
     end
 

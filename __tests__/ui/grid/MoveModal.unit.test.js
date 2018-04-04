@@ -17,6 +17,7 @@ describe('MoveModal', () => {
       }),
       uiStore,
     }
+    uiStore.viewingCollection = { id: 3 }
     props.apiStore.request = jest.fn()
     wrapper = shallow(
       <MoveModal.wrappedComponent {...props} />
@@ -39,8 +40,10 @@ describe('MoveModal', () => {
     describe('on an uneditable collection', () => {
       beforeEach(() => {
         props.uiStore.viewingCollection = {
-          userCanEdit: jest.fn().mockReturnValue(true)
+          can_edit: false,
         }
+        wrapper.setProps(props)
+        component.moveCards('top')
       })
 
       it('should not make an API request', () => {
@@ -48,7 +51,19 @@ describe('MoveModal', () => {
       })
 
       it('should show a warning', () => {
-        // Unimplemented
+        expect(uiStore.openAlertModal).toHaveBeenCalled()
+      })
+    })
+
+    describe('on a nested collection', () => {
+      beforeEach(() => {
+        props.apiStore.request.mockReturnValue(Promise.reject())
+        wrapper.setProps(props)
+        component.moveCards('top')
+      })
+
+      it('should show an alert dialog', () => {
+        expect(uiStore.openAlertModal).toHaveBeenCalled()
       })
     })
 
@@ -60,7 +75,7 @@ describe('MoveModal', () => {
         props.uiStore.movingFromCollectionId = 3
         props.uiStore.viewingCollection = {
           id: 4,
-          userCanEdit: jest.fn().mockReturnValue(true),
+          can_edit: true,
         }
         wrapper.setProps(props)
         component = wrapper.instance()

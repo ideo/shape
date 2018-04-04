@@ -54,15 +54,22 @@ class MoveModal extends React.Component {
     ev.preventDefault()
     const { uiStore } = this.props
     uiStore.closeMoveMenu()
+    // Notify the user if they're on a different collection
+    if (uiStore.movingFromCollectionId !== uiStore.viewingCollection.id) {
+      uiStore.openAlertModal({
+        prompt: 'Your items have been returned to their original location',
+        iconName: 'BackIcon',
+      })
+    }
   }
 
   moveCards = async (placement) => {
     const { uiStore, apiStore } = this.props
-    const { currentUser } = apiStore
     const collectionId = uiStore.viewingCollection.id
-    if (!uiStore.viewingCollection.userCanEdit(currentUser.id)) {
-      // TODO add error dialog
-      console.warn('Cannot edit this collection')
+    if (!uiStore.viewingCollection.can_edit) {
+      uiStore.openAlertModal({
+        prompt: 'You don\'t have permission to move items to this collection',
+      })
       return
     }
     const data = {
@@ -75,8 +82,9 @@ class MoveModal extends React.Component {
       await apiStore.request('/collection_cards/move', 'PATCH', data)
       uiStore.resetSelectionAndBCT()
     } catch (e) {
-      // TODO add error dialog
-      console.warn('Cannot move this collection')
+      uiStore.openAlertModal({
+        prompt: 'You cannot move a collection within itself',
+      })
     }
   }
 

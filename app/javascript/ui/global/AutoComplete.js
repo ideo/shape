@@ -197,7 +197,6 @@ class AutoComplete extends React.Component {
 
   state = {
     multi: null,
-    options: [],
   }
 
   handleChange = (multi) => {
@@ -205,7 +204,7 @@ class AutoComplete extends React.Component {
       multi,
     })
     let fullOption = this.props.options.find((option) =>
-      option.value === multi)
+      option.value === multi || option.label === multi)
     if (!fullOption || !fullOption.data) {
       fullOption = Object.assign({}, { data: { custom: fullOption.value } })
     }

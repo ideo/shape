@@ -49,10 +49,8 @@ class User < ApplicationRecord
 
     unless user
       user = pending_user || User.new
-      if pending_user
-        user.status = User.statuses[:active]
-        user.invitation_token = nil
-      end
+      user.status = User.statuses[:active]
+      user.invitation_token = nil
       user.password = Devise.friendly_token(40)
       user.password_confirmation = user.password
       user.provider = auth.provider
@@ -77,6 +75,21 @@ class User < ApplicationRecord
     )
   end
 
+  def self.pending_user_with_token(token)
+    where(
+      invitation_token: token,
+      status: User.statuses[:pending],
+    ).first
+  end
+
+  def update_from_network_profile(params)
+    self.first_name = params[:first_name] if params[:first_name].present?
+    self.last_name = params[:last_name] if params[:last_name].present?
+    self.email = params[:email] if params[:email].present?
+    self.pic_url_square = params[:picture] if params[:picture].present?
+    save
+  end
+
   def name
     [first_name, last_name].compact.join(' ')
   end
@@ -92,9 +105,9 @@ class User < ApplicationRecord
   end
 
   def current_org_groups
-    return nil if current_organization.blank?
+    return [] if current_organization.blank?
 
-    current_organization.groups
+    groups.where(organization_id: current_organization_id)
   end
 
   def viewable_collections_and_items(organization)

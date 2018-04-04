@@ -60,8 +60,18 @@ describe('RolesAdd', () => {
       let userDataExisting
 
       beforeEach(() => {
-        userDataNew = { id: 3, name: 'Mo', email: 'Mo@mo.com' }
-        userDataExisting = { id: 4, name: 't', email: 't@t.t' }
+        userDataNew = {
+          id: 3,
+          name: 'Mo',
+          email: 'Mo@mo.com',
+          internalType: 'users'
+        }
+        userDataExisting = {
+          id: 4,
+          name: 't',
+          email: 't@t.t',
+          internalType: 'users',
+        }
         component.selectedUsers = [userDataExisting]
       })
 
@@ -73,12 +83,12 @@ describe('RolesAdd', () => {
     })
 
     describe('for a new user', () => {
-      const newUserData = { custom: 'm@m.m' }
+      const newUserData = { custom: 'm@m.m', internalType: 'users' }
       let existingUsers
 
       beforeEach(() => {
         existingUsers = [
-          { name: 'r@r.r', email: 'r@r.r' }
+          { name: 'r@r.r', email: 'r@r.r', internalType: 'users' }
         ]
         component.selectedUsers = existingUsers
       })
@@ -92,7 +102,7 @@ describe('RolesAdd', () => {
       })
 
       it('should not add the same email twice', () => {
-        const anotherUser = { custom: 'r@r.r' }
+        const anotherUser = { custom: 'r@r.r', internalType: 'users' }
         component.onUserSelected(anotherUser)
         expect(component.selectedUsers.length).toEqual(1)
       })
@@ -103,7 +113,7 @@ describe('RolesAdd', () => {
     describe('with groups', () => {
       it('should map groups with handle as the value', () => {
         props.searchableItems = [
-          { id: 3, name: 'groupname', handle: 'group-name', type: 'groups' }
+          { id: 3, name: 'groupname', handle: 'group-name', internalType: 'groups' }
         ]
         wrapper.setProps(props)
         expect(wrapper.instance().mapItems()[0]).toEqual(
@@ -115,7 +125,7 @@ describe('RolesAdd', () => {
     describe('with users', () => {
       it('should map users with email as the value', () => {
         props.searchableItems = [
-          { id: 3, name: 'user', email: 'user@u.u', type: 'users' }
+          { id: 3, name: 'user', email: 'user@u.u', internalType: 'users' }
         ]
         wrapper.setProps(props)
         expect(wrapper.instance().mapItems()[0]).toEqual(

@@ -1,5 +1,5 @@
-<% content_for(:title) { 'Welcome to Shape!' } %>
+Hello<%= " #{@user.name}" if @user.name.present?%>,
 
-You have been invited to join your organization on Shape.
+<%= @invited_by.name %> has invited you to join <%= @invited_to.name %> on Shape.
 
-Register for your account with this link: <%= accept_invitation_url(token: @user.invitation_token) %>
+Get started: <%= @url %>

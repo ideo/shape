@@ -44,6 +44,7 @@ Rails.application.routes.draw do
         resources :groups, only: %i[index]
         resources :users, only: %i[index]
       end
+      delete 'sessions' => 'sessions#destroy'
       resources :users do
         collection do
           get 'me'
@@ -59,6 +60,10 @@ Rails.application.routes.draw do
   authenticate :user do
     require 'sidekiq/web'
     mount Sidekiq::Web => '/sidekiq'
+  end
+
+  namespace :callbacks do
+    post 'ideo_network/users' => 'ideo_network#users'
   end
 
   get 'invitations/:token', to: 'invitations#accept', as: :accept_invitation

@@ -1,14 +1,15 @@
 class Users::OmniauthCallbacksController < Devise::OmniauthCallbacksController
   def okta
-    if session[:pending_user_id]
-      # if this is nil for whatever reason, it will just end up creating a new User
-      pending_user = User.find(session[:pending_user_id])
-      session[:pending_user_id] = nil
+    if session[:pending_user_token]
+      # if this is nil for whatever reason, it will later end up creating a new User
+      pending_user = User.pending_user_with_token(session[:pending_user_token])
+      session[:pending_user_token] = nil
     end
     @user = User.from_omniauth(request.env['omniauth.auth'], pending_user)
     if @user.save
       create_org_if_none(@user)
       # this will throw if @user is not activated
+      # will also redirect to stored path from any previous 401
       sign_in_and_redirect @user, event: :authentication
     else
       # set_flash_message(:alert, @user.errors.full_messages.first, :kind => 'OKTA') if is_navigational_format?

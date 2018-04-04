@@ -17,6 +17,8 @@ const fakeApiStore = ({ findResult = '', findAllResult = [], requestResult = '' 
       current_organization: {
         name: 'test org'
       },
+      name: 'Johnny Appleseed',
+      pic_url_square: 'https://s3.amazonaws.com/pic.png',
       groups: [],
     },
     collections: [],
