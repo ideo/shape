@@ -90,7 +90,25 @@ describe User, type: :model do
       it 'does not duplicate role' do
         expect do
           user_2.add_role(Role::EDITOR, collection)
-        end.not_to change(Collection, :count)
+        end.not_to change(Role, :count)
+      end
+    end
+
+    context 'with another group' do
+      let!(:group) { create(:group) }
+
+      before do
+        group.add_role(Role::EDITOR, collection)
+      end
+
+      it 'adds role' do
+        expect(group.has_role?(Role::EDITOR, collection)).to be true
+      end
+
+      it 'does not duplicate role' do
+        expect do
+          group.add_role(Role::EDITOR, collection)
+        end.not_to change(Role, :count)
       end
     end
   end

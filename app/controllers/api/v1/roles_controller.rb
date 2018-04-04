@@ -1,14 +1,9 @@
 class Api::V1::RolesController < Api::V1::BaseController
-  # don't need to load records on destroy because it's nested under the user
   load_resource :collection
   load_resource :item
   load_resource :group
-  load_resource only: %i[destroy]
-  load_resource :user, only: :destroy
-  load_resource :group, only: :destroy
-  before_action :authorize_manage_record, except: :index
-  before_action :authorize_view_record, only: :index
 
+  before_action :authorize_view_record, only: :index
   # All roles that exist on this resource (collection, item or group)
   # /[collections/items/group]/:id/roles
   def index
@@ -16,6 +11,7 @@ class Api::V1::RolesController < Api::V1::BaseController
     render jsonapi: @roles, include: %i[users groups resource]
   end
 
+  before_action :authorize_manage_record, only: :create
   # Create role(s) on this resource (collection, item or group)
   # Params:
   # - role: { name: 'editor' }
@@ -41,18 +37,18 @@ class Api::V1::RolesController < Api::V1::BaseController
     end
   end
 
+  load_resource only: :destroy
+  load_resource :user, only: :destroy
+  load_resource :group, only: :destroy
+  before_action :authorize_manage_resource, only: :destroy
   # Remove a user or group with a role from a specific resource
   # /users/:id/roles/:id
   # /groups/:id/roles/:id
   def destroy
-    # We want to call remove_role instead of deleting the UserRole
-    # So that role lifecycle methods are called
-    if @user.present? && remove_role(user: @user, role: @role)
-      render jsonapi: record.roles, include: %i[users groups resource]
-    elsif @group.present? && remove_role(group: @group, role: @role)
+    if remove_role(role: @role, user: @user, group: @group)
       render jsonapi: record.roles, include: %i[users groups resource]
     else
-      render_api_errors @user.errors
+      render_api_errors remove_roles.errors
     end
   end
 
@@ -61,21 +57,13 @@ class Api::V1::RolesController < Api::V1::BaseController
   def remove_role(role:, user: nil, group: nil)
     resource = role.resource
 
-    if user.present?
-      return false unless user.remove_role(role.name, resource)
-    elsif group.present?
-      return false unless group.remove_role(role.name, resource)
-    end
-
-    RemoveRolesFromChildrenWorker.perform_async(
-      resource.id,
-      resource.class.name.to_s,
-      role.name,
-      [user.try(:id)],
-      [group.try(:id)],
-    )
-
-    true
+    Roles::MassRemove.new(
+      object: resource,
+      role_name: role.name,
+      users: [user].compact,
+      groups: [group].compact,
+      remove_from_children_sync: false,
+    ).call
   end
 
   def role_params
@@ -90,6 +78,10 @@ class Api::V1::RolesController < Api::V1::BaseController
 
   def authorize_view_record
     authorize! :read, record
+  end
+
+  def authorize_manage_resource
+    authorize! :manage, @role.resource
   end
 
   def record
