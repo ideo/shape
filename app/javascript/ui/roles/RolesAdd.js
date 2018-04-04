@@ -37,18 +37,18 @@ class RolesAdd extends React.Component {
   onUserSelected = (data) => {
     let existing = null
     let entity = data
-    if (data.type === 'users') {
+    if (data.internalType === 'users') {
       if (!data.id) {
         entity = Object.assign({}, { name: data.custom, email: data.custom })
       }
       existing = this.selectedUsers
         .filter(selected => selected.internalType === 'users')
         .find(selected => selected.email === entity.email)
-    } else if (data.type === 'groups') {
+    } else if (data.internalType === 'groups') {
       existing = this.selectedUsers
         .filter(selected => selected.internalType === 'groups')
         .find(selected => selected.id === entity.id)
-    }
+    } else throw new Error('Selected entity can only be user or group')
     if (!existing) {
       this.selectedUsers.push(entity)
     }
