@@ -60,8 +60,18 @@ describe('RolesAdd', () => {
       let userDataExisting
 
       beforeEach(() => {
-        userDataNew = { id: 3, name: 'Mo', email: 'Mo@mo.com' }
-        userDataExisting = { id: 4, name: 't', email: 't@t.t' }
+        userDataNew = {
+          id: 3,
+          name: 'Mo',
+          email: 'Mo@mo.com',
+          internalType: 'users'
+        }
+        userDataExisting = {
+          id: 4,
+          name: 'to',
+          email: 't@t.t',
+          internalType: 'users',
+        }
         component.selectedUsers = [userDataExisting]
       })
 
@@ -138,7 +148,7 @@ describe('RolesAdd', () => {
       ]
       registeredUsers = [
         { id: 4, email: 'm@ideo.com', name: 'm' },
-        { id: 3, email: 't@ideo.com', name: 't' }
+        { id: 3, email: 't@ideo.com', name: 'ta' }
       ]
     })
 
