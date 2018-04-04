@@ -63,7 +63,6 @@ class MoveModal extends React.Component {
     if (!uiStore.viewingCollection.can_edit) {
       uiStore.openAlertModal({
         prompt: 'You don\'t have permission to move items to this collection',
-        icon: <CloseIcon />,
       })
       return
     }
@@ -86,7 +85,6 @@ class MoveModal extends React.Component {
     } catch (e) {
       uiStore.openAlertModal({
         prompt: 'You cannot move a collection within itself',
-        icon: <CloseIcon />,
       })
     }
   }
