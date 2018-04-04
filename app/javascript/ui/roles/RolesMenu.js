@@ -10,7 +10,7 @@ import {
 } from '~/ui/global/styled/forms'
 import RolesAdd from '~/ui/roles/RolesAdd'
 import RoleSelect from '~/ui/roles/RoleSelect'
-import uiStore from '~/stores'
+import { uiStore } from '~/stores'
 
 // TODO rewrite this
 function sortUserOrGroup(a, b) {

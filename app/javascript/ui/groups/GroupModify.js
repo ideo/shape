@@ -11,7 +11,7 @@ import {
   TextButton,
   TextField,
 } from '~/ui/global/styled/forms'
-import uiStore from '~/stores'
+import { uiStore } from '~/stores'
 import { FloatRight } from '~/ui/global/styled/layout'
 import FilestackUpload from '~/utils/FilestackUpload'
 import Group from '~/stores/jsonApi/Group'
