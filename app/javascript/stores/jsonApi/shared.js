@@ -1,5 +1,4 @@
 import { routingStore, uiStore } from '~/stores'
-import ArchiveIcon from '~/ui/icons/ArchiveIcon'
 
 export const archive = (type, obj) => {
   const onAgree = () =>
@@ -16,7 +15,7 @@ export const archive = (type, obj) => {
   uiStore.openAlertModal({
     prompt: 'Are you sure you want to archive this?',
     confirmText: 'Archive',
-    icon: <ArchiveIcon />,
+    iconName: 'ArchiveIcon',
     onConfirm: onAgree,
   })
 }

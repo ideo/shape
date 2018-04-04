@@ -30,11 +30,11 @@ class ConfirmationModal extends React.Component {
     const {
       cancelText,
       confirmText,
-      icon,
+      iconName,
       prompt,
     } = this.props
     return (
-      <AlertModal icon={icon} open={this.isOpen}>
+      <AlertModal open={this.isOpen} iconName={iconName} >
         <form>
           <p>
             { prompt }
@@ -53,9 +53,9 @@ class ConfirmationModal extends React.Component {
   }
 }
 ConfirmationModal.propTypes = {
+  iconName: AlertModal.propTypes.iconName.isRequired,
   prompt: PropTypes.node.isRequired,
   onConfirm: PropTypes.func.isRequired,
-  icon: PropTypes.node.isRequired,
   onCancel: PropTypes.func,
   confirmText: PropTypes.string,
   cancelText: PropTypes.string,

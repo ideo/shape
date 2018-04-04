@@ -6,7 +6,7 @@ describe('InformationModal', () => {
   beforeEach(async () => {
     props = {
       prompt: 'test prompt',
-      icon: <div />,
+      iconName: 'CloseIcon',
       fadeOutTime: 20,
     }
     wrapper = shallow(

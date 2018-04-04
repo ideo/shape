@@ -27,11 +27,11 @@ class InformationModal extends React.Component {
 
   render() {
     const {
-      icon,
+      iconName,
       prompt,
     } = this.props
     return (
-      <AlertModal icon={icon} open={this.isOpen}>
+      <AlertModal open={this.isOpen} iconName={iconName}>
         <div>
           <p>
             { prompt }
@@ -42,14 +42,14 @@ class InformationModal extends React.Component {
   }
 }
 InformationModal.propTypes = {
+  iconName: AlertModal.propTypes.iconName,
   prompt: PropTypes.node,
-  icon: PropTypes.node,
   fadeOutTime: PropTypes.number,
 }
 
 InformationModal.defaultProps = {
+  iconName: 'CloseIcon',
   prompt: <span>Something went wrong!</span>,
-  icon: <CloseIcon />,
   fadeOutTime: 2000,
 }
 

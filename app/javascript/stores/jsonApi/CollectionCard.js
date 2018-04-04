@@ -1,7 +1,6 @@
 import { action, observable } from 'mobx'
 
 import { uiStore } from '~/stores'
-import ArchiveIcon from '~/ui/icons/ArchiveIcon'
 import BaseRecord from './BaseRecord'
 
 class CollectionCard extends BaseRecord {
@@ -54,7 +53,7 @@ class CollectionCard extends BaseRecord {
       uiStore.openAlertModal({
         prompt: 'Are you sure you want to archive this?',
         confirmText: 'Archive',
-        icon: <ArchiveIcon />,
+        iconName: 'ArchiveIcon',
         onConfirm: onAgree,
       })
     } else onAgree()

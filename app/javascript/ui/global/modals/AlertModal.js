@@ -1,12 +1,15 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
+import { inject, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 import Dialog from 'material-ui/Dialog'
 import { ConfirmText } from '~/ui/global/styled/typography'
 import { FormActionsContainer, TextButton } from '~/ui/global/styled/forms'
 import v from '~/utils/variables'
+import ArchiveIcon from '~/ui/icons/ArchiveIcon'
+import BackIcon from '~/ui/icons/BackIcon'
 import CloseIcon from '~/ui/icons/CloseIcon'
+import LeaveIcon from '~/ui/icons/LeaveIcon'
 
 const StyledDialog = styled(Dialog)`
   .modal__paper {
@@ -51,8 +54,7 @@ const PromptText = styled.span`
 `
 
 @inject('uiStore')
-@observer
-class ConfirmationModal extends React.Component {
+class AlertModal extends React.Component {
   close = () => {
     this.props.uiStore.closeAlertModal()
   }
@@ -62,8 +64,23 @@ class ConfirmationModal extends React.Component {
     this.close()
   }
 
+  get icon() {
+    switch (this.props.iconName) {
+    case 'ArchiveIcon':
+      return <ArchiveIcon />
+    case 'CloseIcon':
+      return <CloseIcon />
+    case 'LeaveIcon':
+      return <LeaveIcon />
+    case 'BackIcon':
+      return <BackIcon />
+    default:
+      return <CloseIcon />
+    }
+  }
+
   render() {
-    const { children, icon, open } = this.props
+    const { children, open } = this.props
     return (
       <StyledDialog
         open={open}
@@ -79,7 +96,7 @@ class ConfirmationModal extends React.Component {
         </ModalCloseButton>
         <CenteredPaddedContent>
           <IconHolder>
-            { icon }
+            { this.icon }
           </IconHolder>
           <PromptText>
             { children }
@@ -89,18 +106,19 @@ class ConfirmationModal extends React.Component {
     )
   }
 }
-ConfirmationModal.propTypes = {
-  icon: PropTypes.node,
+AlertModal.propTypes = {
+  iconName: PropTypes.oneOf(['ArchiveIcon', 'CloseIcon', 'LeaveIcon', 'BackIcon',
+  ]),
   children: PropTypes.node.isRequired,
   open: PropTypes.bool,
 }
-ConfirmationModal.wrappedComponent.propTypes = {
+AlertModal.wrappedComponent.propTypes = {
   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 
-ConfirmationModal.defaultProps = {
-  open: true,
-  icon: <CloseIcon />,
+AlertModal.defaultProps = {
+  open: false,
+  iconName: 'CloseIcon',
 }
 
-export default ConfirmationModal
+export default AlertModal

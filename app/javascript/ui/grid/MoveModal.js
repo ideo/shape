@@ -2,7 +2,6 @@ import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 import v from '~/utils/variables'
 import Snackbar, { SnackbarContent } from 'material-ui/Snackbar'
-import BackIcon from '~/ui/icons/BackIcon'
 import MoveArrowIcon from '~/ui/icons/MoveArrowIcon'
 import CloseIcon from '~/ui/icons/CloseIcon'
 
@@ -55,6 +54,13 @@ class MoveModal extends React.Component {
     ev.preventDefault()
     const { uiStore } = this.props
     uiStore.closeMoveMenu()
+    // Notify the user if they're on a different collection
+    if (uiStore.movingFromCollectionId !== uiStore.viewingCollection.id) {
+      uiStore.openAlertModal({
+        prompt: 'Your items have been returned to their original location',
+        iconName: 'BackIcon',
+      })
+    }
   }
 
   moveCards = async (placement) => {
@@ -74,13 +80,6 @@ class MoveModal extends React.Component {
     }
     try {
       await apiStore.request('/collection_cards/move', 'PATCH', data)
-      // Notify the user if they're on a different collection
-      if (uiStore.movingFromCollectionId !== uiStore.viewingCollection.id) {
-        uiStore.openAlertModal({
-          prompt: 'Your items have been returned to their original location',
-          icon: <BackIcon />,
-        })
-      }
       uiStore.resetSelectionAndBCT()
     } catch (e) {
       uiStore.openAlertModal({

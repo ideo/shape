@@ -48,7 +48,7 @@ class RoleSelect extends React.Component {
     uiStore.openAlertModal({
       prompt,
       confirmText,
-      icon: <LeaveIcon />,
+      iconName: 'LeaveIcon',
       onConfirm: () => this.deleteRole(true),
     })
   }

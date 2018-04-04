@@ -17,6 +17,7 @@ describe('MoveModal', () => {
       }),
       uiStore,
     }
+    uiStore.viewingCollection = { id: 3 }
     props.apiStore.request = jest.fn()
     wrapper = shallow(
       <MoveModal.wrappedComponent {...props} />

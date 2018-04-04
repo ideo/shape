@@ -10,7 +10,7 @@ describe('ConfirmationModal', () => {
     props = {
       prompt: 'test prompt',
       onConfirm: jest.fn(),
-      icon: <div />,
+      iconName: 'CloseIcon',
       confirmText: 'roger',
     }
     wrapper = shallow(
