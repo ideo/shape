@@ -161,28 +161,38 @@ class GridCardBlank extends React.Component {
   }
 
   componentDidMount() {
-    FilestackUpload.makeDropPane({
-      id: 'dropzone',
-      onProgress: (pct) => {
-        if (this.state.loading) return
-        this.setState({ loading: true })
-      },
-      onDragOver: () => {
-        this.setState({ droppingFile: true })
-      },
-      onDragLeave: () => {
-        this.setState({ droppingFile: false })
-      },
-      onDrop: () => {
-        if (this.state.loading) return
-        this.setState({ loading: true, droppingFile: false })
-      },
-      onSuccess: (res) => {
-        if (res.length > 0) {
-          this.createCardWith(res[0])
+    // creating the DropPane via filestack is asynchronous;
+    // if the BCT mounts but then immediately gets closed via a uiStore action,
+    // we check to not to make the drop pane to prevent it throwing an error
+    setTimeout(() => {
+      if (this.canceled) return
+      FilestackUpload.makeDropPane({
+        id: 'dropzone',
+        onProgress: (pct) => {
+          if (this.state.loading) return
+          this.setState({ loading: true })
+        },
+        onDragOver: () => {
+          this.setState({ droppingFile: true })
+        },
+        onDragLeave: () => {
+          this.setState({ droppingFile: false })
+        },
+        onDrop: () => {
+          if (this.state.loading) return
+          this.setState({ loading: true, droppingFile: false })
+        },
+        onSuccess: (res) => {
+          if (res.length > 0) {
+            this.createCardWith(res[0])
+          }
         }
-      }
-    })
+      })
+    }, 500)
+  }
+
+  componentWillUnmount() {
+    this.canceled = true
   }
 
   startCreatingCollection = () => {

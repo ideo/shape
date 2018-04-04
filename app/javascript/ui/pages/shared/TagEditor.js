@@ -4,7 +4,7 @@ import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import _ from 'lodash'
 import ReactTags from 'react-tag-autocomplete'
 
-import Modal from '~/ui/global/Modal'
+import Modal from '~/ui/global/modals/Modal'
 import StyledReactTags from './StyledReactTags'
 
 @inject('uiStore')

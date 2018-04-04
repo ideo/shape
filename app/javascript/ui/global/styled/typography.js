@@ -43,6 +43,12 @@ export const DisplayText = styled.span`
 `
 DisplayText.displayName = 'StyledDisplayText'
 
+export const ConfirmText = styled.span`
+  font-weight: ${v.weights.book};
+  font-family: ${v.fonts.sans};
+  font-size: 1.25rem;
+`
+
 export const SubText = styled.span`
   vertical-align: super;
   font-family: ${v.fonts.serif};
