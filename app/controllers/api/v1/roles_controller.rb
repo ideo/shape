@@ -31,7 +31,7 @@ class Api::V1::RolesController < Api::V1::BaseController
       propagate_to_children: true,
     )
     if assigner.call
-      render jsonapi: record.roles, include: %i[users groups resource]
+      render jsonapi: record.roles.reload, include: %i[users groups resource]
     else
       render_api_errors assigner.errors
     end
@@ -46,7 +46,7 @@ class Api::V1::RolesController < Api::V1::BaseController
   # /groups/:id/roles/:id
   def destroy
     if remove_role(role: @role, user: @user, group: @group)
-      render jsonapi: record.roles, include: %i[users groups resource]
+      render jsonapi: @role.resource.roles.reload, include: %i[users groups resource]
     else
       render_api_errors remove_roles.errors
     end
