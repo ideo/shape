@@ -197,7 +197,6 @@ class AutoComplete extends React.Component {
 
   state = {
     multi: null,
-    options: [],
   }
 
   handleChange = (multi) => {
