@@ -404,4 +404,30 @@ describe User, type: :model do
       expect(user.current_org_groups_roles_identifiers).to eq(group.roles_to_resources.map(&:identifier))
     end
   end
+
+  describe '#current_org_groups' do
+    let!(:org) { create(:organization, member: user) }
+    let!(:org_2) { create(:organization) }
+    let!(:group_in_org_member) do
+      create(:group,
+             organization: user.current_organization,
+             add_members: [user])
+    end
+    let!(:group_in_org_not_member) do
+      create(:group, organization: user.current_organization)
+    end
+    let!(:group_not_in_org) do
+      create(:group,
+             organization: org_2,
+             add_members: [user])
+    end
+
+    it 'only returns groups this user is a member of in current org' do
+      expect(user.has_role?(Role::MEMBER, group_in_org_member)).to be true
+      expect(user.has_role?(Role::MEMBER, org.primary_group)).to be true
+      expect(user.has_role?(Role::MEMBER, group_in_org_not_member)).to be false
+      expect(user.has_role?(Role::MEMBER, group_not_in_org)).to be true
+      expect(user.current_org_groups).to match_array([group_in_org_member, org.primary_group])
+    end
+  end
 end

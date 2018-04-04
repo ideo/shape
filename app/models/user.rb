@@ -100,9 +100,9 @@ class User < ApplicationRecord
   end
 
   def current_org_groups
-    return nil if current_organization.blank?
+    return [] if current_organization.blank?
 
-    current_organization.groups
+    groups.where(organization_id: current_organization_id)
   end
 
   def viewable_collections_and_items(organization)
