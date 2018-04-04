@@ -49,10 +49,8 @@ class User < ApplicationRecord
 
     unless user
       user = pending_user || User.new
-      if pending_user
-        user.status = User.statuses[:active]
-        user.invitation_token = nil
-      end
+      user.status = User.statuses[:active]
+      user.invitation_token = nil
       user.password = Devise.friendly_token(40)
       user.password_confirmation = user.password
       user.provider = auth.provider
@@ -75,6 +73,13 @@ class User < ApplicationRecord
       password: Devise.friendly_token(40),
       invitation_token: Devise.friendly_token(40),
     )
+  end
+
+  def self.pending_user_with_token(token)
+    where(
+      invitation_token: token,
+      status: User.statuses[:pending],
+    ).first
   end
 
   def update_from_network_profile(params)

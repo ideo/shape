@@ -68,16 +68,16 @@ describe('RolesMenu', () => {
 
     beforeEach(() => {
       roles = [
-        { id: 23, users: [{ id: 3, type: 'users' }], groups: [] },
-        { id: 26, groups: [{ id: 6, type: 'groups' }], users: [] },
+        { id: 23, users: [{ id: 3, internalType: 'users' }], groups: [] },
+        { id: 26, groups: [{ id: 6, internalType: 'groups' }], users: [] },
       ]
       visibleUsers = [
-        { id: 3, type: 'users' },
-        { id: 33, type: 'users' },
+        { id: 3, internalType: 'users' },
+        { id: 33, internalType: 'users' },
       ]
       visibleGroups = [
-        { id: 6, type: 'groups' },
-        { id: 64, type: 'groups' },
+        { id: 6, internalType: 'groups' },
+        { id: 64, internalType: 'groups' },
       ]
       wrapper.setProps(props)
       component.visibleUsers = visibleUsers
@@ -111,8 +111,8 @@ describe('RolesMenu', () => {
   })
 
   describe('onDelete', () => {
-    const role = { id: 2 }
-    const user = { id: 4 }
+    let role = { id: 2 }
+    let user = { id: 4 }
     const res = { data: [] }
 
     beforeEach(() => {
@@ -121,8 +121,8 @@ describe('RolesMenu', () => {
 
     describe('with a user', () => {
       it('should make an api store request with correct data', () => {
-        const role = { id: 2 }
-        const user = { id: 4, type: 'users' }
+        role = { id: 2 }
+        user = { id: 4, internalType: 'users' }
         component.onDelete(role, user, false)
         expect(apiStore.request).toHaveBeenCalledWith(
           `users/${user.id}/roles/${role.id}`, 'DELETE'
@@ -153,7 +153,7 @@ describe('RolesMenu', () => {
       let users
 
       beforeEach(() => {
-        users = [{ id: 3, type: 'users' }, { id: 5, type: 'users' }]
+        users = [{ id: 3, internalType: 'users' }, { id: 5, internalType: 'users' }]
         apiStore.request.mockReturnValue(Promise.resolve({ data: [] }))
         apiStore.fetchAll.mockReturnValue(Promise.resolve({ data: [] }))
       })

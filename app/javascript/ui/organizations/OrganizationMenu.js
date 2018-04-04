@@ -3,7 +3,7 @@ import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import { FormSpacer, TextButton } from '~/ui/global/styled/forms'
 import { Row, RowItemRight } from '~/ui/global/styled/layout'
 import { Heading3, DisplayText } from '~/ui/global/styled/typography'
-import Modal from '~/ui/global/Modal'
+import Modal from '~/ui/global/modals/Modal'
 import GroupModify from '~/ui/groups/GroupModify'
 import RolesMenu from '~/ui/roles/RolesMenu'
 

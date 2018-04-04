@@ -14,6 +14,7 @@ import {
 import { Select } from '~/ui/global/styled/forms'
 import LeaveIcon from '~/ui/icons/LeaveIcon'
 import Avatar from '~/ui/global/Avatar'
+import { uiStore } from '~/stores'
 
 const MinRowItem = styled.span`
   min-width: 110px;
@@ -33,7 +34,23 @@ CenterAlignedSingleItem.displayName = 'StyledCenterAlignedSingleItem'
 class RoleSelect extends React.Component {
   onRoleRemove = (ev) => {
     ev.preventDefault()
-    this.deleteRole(true)
+    const { entity } = this.props
+    let prompt
+    let confirmText
+    if (entity.isCurrentUser && entity.isCurrentUser()) {
+      prompt = 'Are you sure you want to leave this group?'
+      confirmText = 'Leave'
+    } else {
+      prompt = `Are you sure you want to remove
+        ${this.renderName()} from this group?`
+      confirmText = 'Remove'
+    }
+    uiStore.openAlertModal({
+      prompt,
+      confirmText,
+      iconName: 'LeaveIcon',
+      onConfirm: () => this.deleteRole(true),
+    })
   }
 
   onRoleSelect = (ev) => {
@@ -57,10 +74,10 @@ class RoleSelect extends React.Component {
     if (!entity.name || entity.name.trim().length === 0) {
       nameDisplay = entity.email
     }
-    if (entity.type === 'users' && entity.isCurrentUser()) {
+    if (entity.internalType === 'users' && entity.isCurrentUser()) {
       nameDisplay += ' (you)'
     }
-    if (entity.type === 'users' && entity.status === 'pending') {
+    if (entity.internalType === 'users' && entity.status === 'pending') {
       nameDisplay += ' (pending)'
     }
     return nameDisplay

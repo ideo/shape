@@ -1,12 +1,16 @@
-<% content_for(:title) { 'Welcome to Shape!' } %>
+<div class='p'>
+  Hello<%= " #{@user.name}" if @user.name.present?%>,
+</div>
 
 <div class='p'>
-  You have been invited to join your organization on Shape.
+  <%= @invited_by.name %> has invited you to join <%= @invited_to.name %> on Shape.
+  <br/>
+  Click <%= "Join #{@invited_to_type}" %> below to get started!
   <div class='email-link'>
-    <%= link_to "Register for a Shape Account", accept_invitation_url(token: @user.invitation_token) %>
+    <%= link_to "Join #{@invited_to_type}", @url %>
   </div>
 </div>
 
 <div class='p'>
-  Or copy and paste this link into your browser: <%= accept_invitation_url(token: @user.invitation_token) %>
+  Or copy and paste this link into your browser: <%= @url %>
 </div>

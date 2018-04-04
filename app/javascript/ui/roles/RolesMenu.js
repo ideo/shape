@@ -10,6 +10,7 @@ import {
 } from '~/ui/global/styled/forms'
 import RolesAdd from '~/ui/roles/RolesAdd'
 import RoleSelect from '~/ui/roles/RoleSelect'
+import uiStore from '~/stores'
 
 // TODO rewrite this
 function sortUserOrGroup(a, b) {
@@ -37,8 +38,6 @@ class RolesMenu extends React.Component {
     Promise.all(reqs).then(res => {
       const users = res[0].data
       const groups = res[1].data
-      users.forEach((u) => { u.type = 'users' })
-      groups.forEach(r => { r.type = 'groups' })
       this.visibleUsers = users
       this.visibleGroups = groups
       this.setSearchableItems([...groups, ...users])
@@ -73,7 +72,7 @@ class RolesMenu extends React.Component {
   }
 
   onDelete = (role, entity, toRemove) =>
-    this.props.apiStore.request(`${entity.type}/${entity.id}/roles/${role.id}`,
+    this.props.apiStore.request(`${entity.internalType}/${entity.id}/roles/${role.id}`,
       'DELETE').then((res) => {
       if (toRemove) {
         const saveReturn = this.props.onSave(res)
@@ -86,10 +85,10 @@ class RolesMenu extends React.Component {
   onCreateRoles = (entities, roleName) => {
     const { apiStore, ownerId, ownerType, onSave } = this.props
     const userIds = entities
-      .filter(entity => entity.type === 'users')
+      .filter(entity => entity.internalType === 'users')
       .map((user) => user.id)
     const groupIds = entities
-      .filter(entity => entity.type === 'groups')
+      .filter(entity => entity.internalType === 'groups')
       .map((group) => group.id)
     const data = {
       role: { name: roleName },
@@ -102,12 +101,21 @@ class RolesMenu extends React.Component {
         this.filterSearchableItems()
         return saveReturn
       })
-      .catch((err) => console.warn(err))
+      .catch((err) => {
+        uiStore.openAlertModal({
+          prompt: err.error[0],
+        })
+      })
   }
 
   onCreateUsers = (emails) => {
     const { apiStore } = this.props
     return apiStore.request(`users/create_from_emails`, 'POST', { emails })
+      .catch((err) => {
+        uiStore.openAlertModal({
+          prompt: err.error[0],
+        })
+      })
   }
 
   onUserSearch = (searchTerm) => {

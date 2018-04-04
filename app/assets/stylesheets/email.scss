@@ -1,18 +1,23 @@
-// copied from c-delta
+// copied / modified from c-delta
 // Styles for email templates (inlined using Roadie gem)
 
-$color-gray-gallery: #EEEEEE;
+$color-white: #ffffff;
+$color-gray-bg: #f0f2f4;
 $color-gray-boulder: #787878;
 $color-gray-tundora: #4A4A4A;
+$color-blacklava: #120f0e;
+$header-font: 'Gotham', 'Arial Black', Arial, Helvetica, sans-serif;
+$sentinel-font: 'Sentinel', Palatino, Georgia, serif;
+$sentinel-lt-font: 'Sentinel-Light', 'Sentinel', Palatino, Georgia, serif;
 
 .email-wrapper {
-  font-family: 'Sentinel-Light', Palatino, Georgia, serif;
+  font-family: $sentinel-lt-font;
   font-size: 14px;
   width: 100%;
   max-width: 710px;
   margin: 0 auto;
-  background-color: $color-gray-gallery;
-  color: $color-gray-tundora;
+  background-color: $color-gray-bg;
+  color: $color-blacklava;
 
   a, a:visited {
     color: $color-gray-tundora;
@@ -39,7 +44,7 @@ $color-gray-tundora: #4A4A4A;
   }
 
   h1, h2, h3, h4, h5, h6 {
-    font-family: 'Gotham-Bold', 'Arial Black', Arial, Helvetica, sans-serif;
+    font-family: $header-font;
     font-weight: bold;
   }
 
@@ -49,6 +54,7 @@ $color-gray-tundora: #4A4A4A;
 
   .p {
     padding: 0 0 1em 0;
+    line-height: 1.33;
   }
 
   table {
@@ -66,19 +72,18 @@ $color-gray-tundora: #4A4A4A;
   }
 
   .email-header {
-    background-color: #FFFFFF;
     text-align: center;
-    padding-top: 30px;
+    padding: 10px 0;
   }
 
   .email-header__logo {
-    background-color: #ffffff;
-  }
+    display: block;
+    margin: 25px auto 10px;
 
-  .email-header__title {
-    text-align: center;
-    margin: 25px 15px 15px 15px;
-    text-transform: uppercase;
+    img {      
+      width: 83px;
+      height: 53px;
+    }
   }
 
   .email-header__image {
@@ -87,15 +92,25 @@ $color-gray-tundora: #4A4A4A;
   }
 
   .email-content {
-    background-color: #FFFFFF;
-    padding: 30px 20px;
+    background-color: $color-white;
+    padding: 45px;
     font-size: 16px;
   }
 
   .email-link {
-    padding-top: 10px;
     a {
-      font-weight: bold;
+      font-family: $header-font;
+      text-align: center;
+      text-transform: uppercase;
+      color: $color-white;
+      font-size: 16px;
+      letter-spacing: 1.5px;
+      padding: 12px;
+      display: block;
+      background: black;
+      margin: 40px auto;
+      max-width: 250px;
+      border-radius: 24px;
     }
   }
 
