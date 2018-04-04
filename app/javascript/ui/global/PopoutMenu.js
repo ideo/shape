@@ -43,7 +43,7 @@ StyledMenuWrapper.displayName = 'StyledMenuWrapper'
 
 export const StyledMenu = styled.ul`
   background-color: white;
-  width: 200px;
+  width: ${props => props.width}px;
   box-shadow: 0 0 8px 0 rgba(0, 0, 0, 0.36);
 `
 
@@ -113,6 +113,7 @@ class PopoutMenu extends React.PureComponent {
       menuOpen,
       onMouseLeave,
       onClick,
+      width,
     } = this.props
     return (
       <StyledMenuButtonWrapper
@@ -120,11 +121,14 @@ class PopoutMenu extends React.PureComponent {
         role="presentation"
         onMouseLeave={onMouseLeave}
       >
-        <StyledMenuToggle onClick={onClick}>
+        <StyledMenuToggle
+          onClick={onClick}
+          className="menu-toggle"
+        >
           <MenuIcon />
         </StyledMenuToggle>
         <StyledMenuWrapper className="menu-wrapper">
-          <StyledMenu>
+          <StyledMenu width={width}>
             {this.renderMenuItems}
           </StyledMenu>
         </StyledMenuWrapper>
@@ -137,6 +141,7 @@ PopoutMenu.propTypes = {
   onMouseLeave: PropTypes.func,
   onClick: PropTypes.func,
   className: PropTypes.string,
+  width: PropTypes.number,
   menuOpen: PropTypes.bool,
   menuItems: PropTypes.arrayOf(PropTypes.shape({
     name: PropTypes.string,
@@ -150,6 +155,7 @@ PopoutMenu.defaultProps = {
   onClick: () => null,
   className: '',
   menuOpen: false,
+  width: 200,
 }
 
 export default PopoutMenu

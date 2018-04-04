@@ -6,12 +6,25 @@ RSpec.describe CreatePendingUsers, type: :service do
   describe '#call' do
     let(:emails) { Array.new(3).map { Faker::Internet.email } }
     let(:subject) { CreatePendingUsers.new(emails) }
+    let(:deliver_double) do
+      double('InvitationMailer')
+    end
+
+    before do
+      allow(InvitationMailer).to receive(:invite).and_return(deliver_double)
+      allow(deliver_double).to receive(:deliver_later).and_return(true)
+    end
 
     it 'should return pending users for all emails' do
       subject.call
       expect(subject.users.all? { |user| user.persisted? && user.pending? }).to be true
       expect(subject.users.map(&:email)).to match_array(emails)
       expect(subject.failed_emails).to be_empty
+    end
+
+    it 'should queue up invitations' do
+      expect(InvitationMailer).to receive(:invite)
+      subject.call
     end
 
     it 'should strip any whitespace' do

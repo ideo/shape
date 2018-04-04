@@ -99,7 +99,7 @@ class CollectionGrid extends React.Component {
     }
   }
 
-  onMoveStop = () => {
+  onDragOrResizeStop = () => {
     const placeholder = _.find(this.state.cards, { cardType: 'placeholder' }) || {}
     const original = _.find(this.state.cards, { id: placeholder.originalId })
 
@@ -385,7 +385,7 @@ class CollectionGrid extends React.Component {
           position={card.position}
           record={record}
           onDrag={this.onDrag}
-          onMoveStop={this.onMoveStop}
+          onDragOrResizeStop={this.onDragOrResizeStop}
           onResize={this.onResize}
           onResizeStop={this.onResizeStop}
           routeTo={routingStore.routeTo}

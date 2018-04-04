@@ -42,21 +42,23 @@ class Collection < ApplicationRecord
 
   accepts_nested_attributes_for :collection_cards
 
-  # Searchkick config
+  # Searchkick config - by default all string fields are searchable
   searchkick
   # active == don't index archived collections
   # where(type: nil) == don't index User/SharedWithMe collections
   scope :search_import, -> { active.where(type: nil).includes(%i[items tags]) }
 
   def search_data
+    user_ids = (editors[:users].pluck(:id) + viewers[:users].pluck(:id)).uniq
+    group_ids = (editors[:groups].pluck(:id) + viewers[:groups].pluck(:id)).uniq
     {
       name: name,
       tags: all_tag_names,
       item_tags: items.map(&:tags).flatten.map(&:name),
       content: search_content,
       organization_id: organization_id,
-      user_ids: (editor_ids + viewer_ids).uniq,
-      group_ids: [],
+      user_ids: user_ids,
+      group_ids: group_ids,
     }
   end
 
@@ -80,6 +82,29 @@ class Collection < ApplicationRecord
     end.join(' ').gsub(/[^\p{Alnum}\s]/, ' ')
   end
   # <-- End Searchkick
+
+  # default relationships to include when rendering Collections in the API
+  def self.default_relationships_for_api
+    [
+      roles: [:users, :groups],
+      collection_cards: [
+        :parent,
+        record: [:filestack_file],
+      ],
+    ]
+  end
+
+  # similar to above but requires `collection/item` instead of `record`
+  def self.default_relationships
+    [
+      roles: [:users],
+      collection_cards: [
+        :parent,
+        :collection,
+        item: [:filestack_file],
+      ],
+    ]
+  end
 
   amoeba do
     enable

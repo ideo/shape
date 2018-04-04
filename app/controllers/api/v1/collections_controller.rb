@@ -7,17 +7,7 @@ class Api::V1::CollectionsController < Api::V1::BaseController
   authorize_resource except: %i[me]
 
   def show
-    render_collection(include:
-      [
-        roles: [:users],
-        collection_cards: [
-          :parent,
-          record: [
-            :filestack_file,
-          ],
-        ],
-      ],
-    )
+    render_collection
   end
 
   def me
@@ -59,13 +49,7 @@ class Api::V1::CollectionsController < Api::V1::BaseController
 
   def render_collection(include: nil)
     # include collection_cards for UI to receive any updates
-    include ||= [
-      roles: [:users],
-      collection_cards: [
-        :parent,
-        record: [:filestack_file],
-      ],
-    ]
+    include ||= Collection.default_relationships_for_api
 
     render jsonapi: @collection, include: include
   end
@@ -73,16 +57,7 @@ class Api::V1::CollectionsController < Api::V1::BaseController
   def load_collection_with_cards
     # item/collection will turn into "record" when serialized
     @collection = Collection.where(id: params[:id])
-                            .includes(
-                              roles: [:users],
-                              collection_cards: [
-                                :parent,
-                                :collection,
-                                item: [
-                                  :filestack_file,
-                                ],
-                              ],
-                            ).first
+                            .includes(Collection.default_relationships).first
   end
 
   def collection_params

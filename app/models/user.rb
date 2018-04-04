@@ -1,5 +1,5 @@
 class User < ApplicationRecord
-  include CacheableRoles
+  prepend RolifyExtensions # Prepend so it can call rolify methods using super
 
   rolify after_add: :after_add_role,
          after_remove: :after_remove_role,
@@ -26,10 +26,6 @@ class User < ApplicationRecord
   validates :email, presence: true
   validates :uid, :provider, presence: true, if: :active?
 
-  alias rolify_has_role? has_role?
-  alias rolify_add_role add_role
-  alias rolify_remove_role remove_role
-
   searchkick word_start: [:name]
 
   scope :search_import, -> { includes(:roles) }
@@ -48,12 +44,16 @@ class User < ApplicationRecord
     }
   end
 
-  def self.from_omniauth(auth)
+  def self.from_omniauth(auth, pending_user)
     user = where(provider: auth.provider, uid: auth.uid).first
 
     unless user
-      user = User.new
-      user.password = Devise.friendly_token[0,40]
+      user = pending_user || User.new
+      if pending_user
+        user.status = User.statuses[:active]
+        user.invitation_token = nil
+      end
+      user.password = Devise.friendly_token(40)
       user.password_confirmation = user.password
       user.provider = auth.provider
       user.uid = auth.uid
@@ -72,8 +72,17 @@ class User < ApplicationRecord
     create(
       email: email,
       status: User.statuses[:pending],
-      password: Devise.friendly_token,
+      password: Devise.friendly_token(40),
+      invitation_token: Devise.friendly_token(40),
     )
+  end
+
+  def update_from_network_profile(params)
+    self.first_name = params[:first_name] if params[:first_name].present?
+    self.last_name = params[:last_name] if params[:last_name].present?
+    self.email = params[:email] if params[:email].present?
+    self.pic_url_square = params[:picture] if params[:picture].present?
+    save
   end
 
   def name
@@ -137,31 +146,20 @@ class User < ApplicationRecord
         .to_a
   end
 
-  # Override rolify has_role? and add_role methods to ensure
-  # we always pass root class, not STI child class - which it can't handle
-  def has_role?(role_name, resource = nil)
-    return rolify_has_role?(role_name) if resource.blank?
-    rolify_has_role?(role_name, resource.becomes(resource.resourceable_class))
+  def organization_group_ids(organization)
+    groups.where(organization_id: organization.id).pluck(:id)
   end
 
-  def add_role(role_name, resource = nil)
-    # Rolify was super slow in adding roles once there became thousands,
-    # so we wrote our own method
-    # return rolify_add_role(role_name) if resource.blank?
-    # rolify_add_role(role_name, resource.becomes(resource.resourceable_class))
-    begin
-      role = Role.find_or_create(role_name, resource)
-      role.users << self
-      after_add_role(role)
-    rescue ActiveRecord::RecordNotUnique
-      # rescue if we already added user - as it doesn't matter
-    end
-    role
-  end
+  def current_org_groups_roles_identifiers
+    return [] if current_organization.blank?
 
-  def remove_role(role_name, resource = nil)
-    return rolify_remove_role(role_name) if resource.blank?
-    rolify_remove_role(role_name, resource.becomes(resource.resourceable_class))
+    org_group_ids = organization_group_ids(current_organization)
+
+    return [] if org_group_ids.blank?
+
+    Role.joins(:groups_roles)
+        .where(GroupsRole.arel_table[:group_id].in(org_group_ids))
+        .map(&:identifier)
   end
 
   private

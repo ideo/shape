@@ -3,7 +3,7 @@ import { PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 
 import v from '~/utils/variables'
-import UserAvatar from '~/ui/users/UserAvatar'
+import Avatar from '~/ui/global/Avatar'
 
 const MAX_USERS_TO_SHOW = 5
 const AVATAR_SIZE = 30
@@ -65,14 +65,14 @@ class RolesSummary extends React.PureComponent {
     const { roles } = this.props
     const editorRole = roles.find(role => role.name === 'editor')
     if (!editorRole) return []
-    return editorRole.users
+    return [...editorRole.users, ...editorRole.groups]
   }
 
   get viewers() {
     const { roles } = this.props
     const viewerRole = roles.find(role => role.name === 'viewer')
     if (!viewerRole) return []
-    return viewerRole.users
+    return [...viewerRole.users, ...viewerRole.groups]
   }
 
   // Return at most MAX_USERS_TO_SHOW users,
@@ -98,9 +98,10 @@ class RolesSummary extends React.PureComponent {
     if (editors.length === 0 && viewers.length > 0) return ''
 
     const editorAvatars = editors.map(editor => (
-      <UserAvatar
+      <Avatar
         key={editor.id}
-        user={editor}
+        title={editor.name}
+        url={editor.pic_url_square || editor.filestack_file_url}
         size={AVATAR_SIZE}
         className="editor"
       />
@@ -120,9 +121,10 @@ class RolesSummary extends React.PureComponent {
 
     if (viewers.length === 0) return ''
     const viewerAvatars = viewers.map(viewer => (
-      <UserAvatar
+      <Avatar
         key={viewer.id}
-        user={viewer}
+        title={viewer.name}
+        url={viewer.pic_url_square || viewer.filestack_file_url}
         size={AVATAR_SIZE}
         className="viewer"
       />

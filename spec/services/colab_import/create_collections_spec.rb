@@ -38,7 +38,7 @@ RSpec.describe ColabImport::CreateCollections, type: :service do
       allow(FilestackFile).to receive(:create_from_url).and_return(filestack_file)
       editor.add_role(Role::ADMIN, organization.primary_group)
       # Add user as editor to template and all items
-      Roles::AssignToUsers.new(
+      Roles::MassAssign.new(
         object: template_collection,
         role_name: Role::EDITOR,
         users: [editor],

@@ -2,7 +2,6 @@ import { Fragment } from 'react'
 import ReactRouterPropTypes from 'react-router-prop-types'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import { Flex, Box } from 'reflexbox'
-import { animateScroll as scroll } from 'react-scroll'
 
 import PageWithApi from '~/ui/pages/PageWithApi'
 import Loader from '~/ui/layout/Loader'
@@ -10,6 +9,7 @@ import Header from '~/ui/layout/Header'
 import PageContainer from '~/ui/layout/PageContainer'
 import CollectionGrid from '~/ui/grid/CollectionGrid'
 import Breadcrumb from '~/ui/layout/Breadcrumb'
+import MoveModal from '~/ui/grid/MoveModal'
 import RolesSummary from '~/ui/roles/RolesSummary'
 import Roles from '~/ui/grid/Roles'
 import EditableName from './shared/EditableName'
@@ -21,12 +21,6 @@ const isHomepage = ({ path }) => path === '/'
 @inject('apiStore', 'uiStore')
 @observer
 class CollectionPage extends PageWithApi {
-  componentDidMount() {
-    super.componentDidMount()
-    scroll.scrollToTop({ duration: 0 })
-    this.props.uiStore.closeBlankContentTool()
-  }
-
   componentWillReceiveProps(nextProps) {
     super.componentWillReceiveProps(nextProps)
     // when navigating between collections, close BCT
@@ -67,8 +61,10 @@ class CollectionPage extends PageWithApi {
     return `collections/${match.params.id}`
   }
 
-  onAPILoad = (collection) => {
+  onAPILoad = (response) => {
+    const collection = response.data
     const { uiStore } = this.props
+    collection.checkResponseForEmptyCards(response)
     if (!collection.collection_cards.length) {
       uiStore.openBlankContentTool()
     }
@@ -131,7 +127,7 @@ class CollectionPage extends PageWithApi {
         </Header>
         <PageContainer>
           <Roles
-            collectionId={collection.id}
+            collection={collection}
             roles={collection.roles}
           />
           <CollectionGrid
@@ -146,6 +142,7 @@ class CollectionPage extends PageWithApi {
             // Pass in BCT state so grid will re-render when open/closed
             blankContentToolState={uiStore.blankContentToolState}
           />
+          <MoveModal />
         </PageContainer>
       </Fragment>
     )

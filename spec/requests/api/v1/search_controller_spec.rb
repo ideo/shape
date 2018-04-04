@@ -1,9 +1,9 @@
 require 'rails_helper'
 
-describe Api::V1::SearchController, type: :request, auth: true do
-  describe '#GET #search', search: true do
-    let!(:organization) { create(:organization) }
-    let(:current_user) { @user }
+describe Api::V1::SearchController, type: :request, auth: true, search: true do
+  describe '#GET #search' do
+    let!(:current_user) { @user }
+    let!(:organization) { current_user.current_organization }
     let(:tag_list) { %w[blockchain prototype innovation] }
     let!(:collection_with_tags) do
       create(
@@ -33,10 +33,11 @@ describe Api::V1::SearchController, type: :request, auth: true do
     let(:find_collection) { collections.first }
 
     before do
-      current_user.add_role(:member, organization.primary_group)
+      expect(current_user.has_role?(Role::MEMBER, organization.primary_group))
       Collection.reindex
       Collection.searchkick_index.refresh
-      sleep 0.25 # Let ElasticSearch indexing finish (even though it seems to be synchronous)
+      # Let ElasticSearch indexing finish (even though it seems to be synchronous)
+      sleep 0.5 if ENV['CODESHIP']
     end
 
     context 'if user can view collection' do

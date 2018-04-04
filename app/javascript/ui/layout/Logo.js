@@ -1,18 +1,22 @@
 import styled from 'styled-components'
-import { FormattedMessage } from 'react-intl'
-import v from '~/utils/variables'
 
 const StyledLogo = styled.div`
-  font-size: 0.75rem;
-  letter-spacing: 0.5px;
-  font-family: ${v.fonts.sans};
-  font-weight: ${v.weights.medium};
-  text-transform: uppercase;
+  margin-bottom: 15px;
+  width: 83px;
+  height: 53px;
+  background-image: url('https://s3-us-west-2.amazonaws.com/assets.shape.space/logo_1x.png');
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: contain;
+  @media
+  (-webkit-min-device-pixel-ratio: 2),
+  (min-resolution: 192dpi) {
+    background-image: url('https://s3-us-west-2.amazonaws.com/assets.shape.space/logo.svg');
+  }
 `
+
 const Logo = () => (
-  <StyledLogo>
-    <FormattedMessage id="Logo.name" defaultMessage="Shape" />
-  </StyledLogo>
+  <StyledLogo title="Shape" />
 )
 
 export default Logo

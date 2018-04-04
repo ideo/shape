@@ -4,7 +4,7 @@ describe Api::V1::UsersController, type: :request, auth: true do
   let(:user) { @user }
 
   describe 'GET #index' do
-    let!(:organization) { create(:organization) }
+    let!(:organization) { user.current_organization }
     let!(:org_users) { create_list(:user, 3) }
     let!(:other_org) { create(:organization) }
     let!(:other_org_users) { create_list(:user, 3) }
@@ -106,8 +106,23 @@ describe Api::V1::UsersController, type: :request, auth: true do
     end
   end
 
+  describe 'GET #me' do
+    let(:path) { '/api/v1/users/me' }
+
+    it 'returns a 200' do
+      get(path)
+      expect(response.status).to eq(200)
+    end
+
+    it 'matches User ID' do
+      get(path)
+      expect(json['data']['attributes']['id'].to_i).to eq(user.id)
+      expect(assigns(:current_user)).to eq(user)
+    end
+  end
+
   describe '#GET #search', search: true do
-    let!(:organization) { create(:organization, member: user) }
+    let!(:organization) { user.current_organization }
     let!(:users) { create_list(:user, 3) }
     let(:path) { '/api/v1/users/search' }
     let(:find_user) { users.first }

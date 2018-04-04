@@ -15,6 +15,9 @@ Rails.application.routes.draw do
         resources :roles, only: %i[index create destroy], shallow: true
       end
       resources :collection_cards, shallow: true do
+        collection do
+          patch 'move'
+        end
         member do
           post 'duplicate'
         end
@@ -31,7 +34,7 @@ Rails.application.routes.draw do
         end
       end
       resources :groups, except: :delete do
-        resources :roles, only: %i[index create]
+        resources :roles, only: %i[index create destroy]
       end
       resources :organizations, only: %i[show update] do
         collection do
@@ -41,6 +44,7 @@ Rails.application.routes.draw do
         resources :groups, only: %i[index]
         resources :users, only: %i[index]
       end
+      delete 'sessions' => 'sessions#destroy'
       resources :users do
         collection do
           get 'me'
@@ -49,7 +53,6 @@ Rails.application.routes.draw do
         end
         resources :roles, only: %i[destroy]
       end
-
       get :search, to: 'search#search', as: :search
     end
   end
@@ -59,8 +62,17 @@ Rails.application.routes.draw do
     mount Sidekiq::Web => '/sidekiq'
   end
 
+  namespace :callbacks do
+    post 'ideo_network/users' => 'ideo_network#users'
+  end
+
+  get 'invitations/:token', to: 'invitations#accept', as: :accept_invitation
+
   root to: 'home#index'
   get :login, to: 'home#login', as: :login
+
+  # catch all mailer preview paths
+  get '/rails/mailers/*path' => 'rails/mailers#preview'
 
   # catch all HTML route requests, send to frontend
   get '*path', to: 'home#index', constraints: ->(req) { req.format == :html || req.format == '*/*' }
