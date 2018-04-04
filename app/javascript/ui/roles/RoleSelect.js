@@ -57,10 +57,10 @@ class RoleSelect extends React.Component {
     if (!entity.name || entity.name.trim().length === 0) {
       nameDisplay = entity.email
     }
-    if (entity.type === 'users' && entity.isCurrentUser()) {
+    if (entity.internalType === 'users' && entity.isCurrentUser()) {
       nameDisplay += ' (you)'
     }
-    if (entity.type === 'users' && entity.status === 'pending') {
+    if (entity.internalType === 'users' && entity.status === 'pending') {
       nameDisplay += ' (pending)'
     }
     return nameDisplay

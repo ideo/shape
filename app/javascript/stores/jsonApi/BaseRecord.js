@@ -8,6 +8,10 @@ class BaseRecord extends Record {
     return this.__collection
   }
 
+  get internalType() {
+    return this.__internal.type
+  }
+
   rawAttributes() {
     return super.toJsonApi().attributes
   }

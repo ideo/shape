@@ -103,7 +103,7 @@ describe('RolesAdd', () => {
     describe('with groups', () => {
       it('should map groups with handle as the value', () => {
         props.searchableItems = [
-          { id: 3, name: 'groupname', handle: 'group-name', type: 'groups' }
+          { id: 3, name: 'groupname', handle: 'group-name', internalType: 'groups' }
         ]
         wrapper.setProps(props)
         expect(wrapper.instance().mapItems()[0]).toEqual(
@@ -115,7 +115,7 @@ describe('RolesAdd', () => {
     describe('with users', () => {
       it('should map users with email as the value', () => {
         props.searchableItems = [
-          { id: 3, name: 'user', email: 'user@u.u', type: 'users' }
+          { id: 3, name: 'user', email: 'user@u.u', internalType: 'users' }
         ]
         wrapper.setProps(props)
         expect(wrapper.instance().mapItems()[0]).toEqual(

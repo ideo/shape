@@ -8,10 +8,9 @@
     <div class="email-wrapper">
       <div class="email-inner">
         <div class="email-header">
+          <a class="email-header__logo" href="<%= ENV['OKTA_BASE_URL']%>" title="Shape"></a>
+        </div>
 
-          <% if content_for(:title).present? %>
-            <h3 class="email-header__title"><%= content_for(:title) %></h3>
-          <% end %>
 
         <div class="email-content">
           <%= yield %>
@@ -22,7 +21,7 @@
 
           <div class="email-footer__copyright">&copy; 2018 IDEO</div>
         </div>
-      </div>
+
     </div>
   </body>
 </html>
