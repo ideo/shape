@@ -1,4 +1,4 @@
-class RemoveRolesFromChildrenWorker
+class MassRemoveRolesWorker
   include Sidekiq::Worker
 
   def perform(object_id, object_class, role_name, user_ids, group_ids)
@@ -6,11 +6,12 @@ class RemoveRolesFromChildrenWorker
     users = User.where(id: user_ids).to_a
     groups = Group.where(id: group_ids).to_a
 
-    Roles::RemoveFromChildren.new(
-      parent: object,
+    Roles::MassRemove.new(
+      object: object,
       role_name: role_name,
       users: users,
       groups: groups,
+      remove_from_children_sync: true,
     ).call
   end
 end

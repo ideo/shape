@@ -107,23 +107,172 @@ describe Api::V1::RolesController, type: :request, auth: true do
   end
 
   describe 'DELETE #destroy' do
-    let!(:collection) { create(:collection, add_editors: [user]) }
-    let!(:viewer) { create(:user) }
-    let!(:role) { viewer.add_role(Role::VIEWER, collection) }
-    let(:path) { "/api/v1/users/#{viewer.id}/roles/#{role.id}" }
+    # Note: it's important that the group be in the user's current org,
+    # or else the API won't give access to it
+    let(:organization) { user.current_organization }
+    let(:editor) { user }
+    let!(:group) { create(:group, organization: organization) }
+    let!(:viewers) { create_list(:user, 2, add_to_org: organization) }
+    let(:num_cards) { 0 }
 
-    it 'returns a 200' do
-      delete(path)
-      expect(response.status).to eq(200)
+    context 'for a user' do
+      let(:remove_viewer) { viewers[0] }
+      let(:path) { "/api/v1/users/#{remove_viewer.id}/roles/#{role.id}" }
+      let!(:collection) do
+        create(:collection,
+               num_cards: num_cards,
+               add_editors: [editor],
+               add_viewers: (viewers + [group]))
+      end
+      let(:role) { collection.roles.find_by(name: Role::VIEWER) }
+
+      it 'returns a 200' do
+        delete(path)
+        expect(response.status).to eq(200)
+      end
+
+      it 'matches Role schema' do
+        delete(path)
+        expect(viewers.first.reload.has_role?(Role::VIEWER, collection)).to be false
+      end
+
+      it 'deletes the UserRole' do
+        expect { delete(path) }.to change(UsersRole, :count).by(-1)
+      end
+
+      it 'does not delete Role' do
+        expect { delete(path) }.not_to change(Role, :count)
+        expect(Role.exists?(role.id))
+      end
+
+      it 'does not delete the Group role' do
+        delete(path)
+        expect(group.reload.has_role?(Role::VIEWER, collection)).to be true
+      end
+
+      context 'with cards/children' do
+        let!(:num_cards) { 3 }
+
+        before do
+          collection.items.each(&:inherit_roles_from_parent!)
+        end
+
+        it 'removes roles' do
+          expect(
+            collection.items.all? do |item|
+              remove_viewer.has_role?(Role::VIEWER, item)
+            end,
+          ).to be true
+
+          Sidekiq::Testing.inline! do
+            delete(path)
+            remove_viewer.reload
+            expect(
+              collection.items.all? do |item|
+                remove_viewer.has_role?(Role::VIEWER, item)
+              end,
+            ).to be false
+          end
+        end
+      end
+
+      context 'as viewer', auth: false do
+        # Needs org and editor created because auth is false
+        let!(:organization) { create(:organization) }
+        let!(:editor) { create(:user, add_to_org: organization) }
+
+        before do
+          log_in_as_user(viewers.first)
+        end
+
+        it 'returns 401' do
+          delete(path)
+          expect(response.status).to eq(401)
+        end
+      end
     end
 
-    it 'deletes the UserRole' do
-      expect { delete(path) }.to change(UsersRole, :count).by(-1)
-    end
+    context 'for a group' do
+      let!(:collection) do
+        create(:collection,
+               num_cards: num_cards,
+               add_editors: [group],
+               add_viewers: viewers)
+      end
+      let!(:role) { collection.roles.find_by(name: Role::EDITOR) }
+      let(:path) { "/api/v1/groups/#{group.id}/roles/#{role.id}" }
 
-    it 'matches Role schema' do
-      delete(path)
-      expect(viewer.reload.has_role?(Role::VIEWER, collection)).to be false
+      before do
+        editor.add_role(Role::ADMIN, group)
+      end
+
+      it 'returns 200' do
+        delete(path)
+        expect(response.status).to eq(200)
+      end
+
+      it 'deletes the GroupsRole record' do
+        expect { delete(path) }.to change(GroupsRole, :count).by(-1)
+        expect(group.reload.has_role?(Role::EDITOR, collection)).to be false
+      end
+
+      it 'does not delete the viewer role' do
+        delete(path)
+        expect(viewers.first.reload.has_role?(Role::VIEWER, collection)).to be true
+      end
+
+      context 'with cards/children' do
+        let!(:num_cards) { 3 }
+
+        before do
+          collection.items.each(&:inherit_roles_from_parent!)
+        end
+
+        it 'removes roles' do
+          expect(
+            collection.items.all? do |item|
+              group.has_role?(Role::EDITOR, item)
+            end,
+          ).to be true
+
+          Sidekiq::Testing.inline! do
+            delete(path)
+            group.reload
+            expect(
+              collection.items.all? do |item|
+                group.has_role?(Role::EDITOR, item)
+              end,
+            ).to be false
+          end
+        end
+      end
+
+      context 'user is not group member/admin' do
+        before do
+          editor.remove_role(Role::ADMIN, group)
+        end
+
+        it 'returns a 401' do
+          delete(path)
+          expect(response.status).to eq(401)
+        end
+      end
+
+      context 'user is also collection admin' do
+        before do
+          editor.add_role(Role::EDITOR, collection)
+        end
+
+        it 'returns a 200' do
+          delete(path)
+          expect(response.status).to eq(200)
+        end
+
+        it 'deletes the GroupsRole record' do
+          expect { delete(path) }.to change(GroupsRole, :count).by(-1)
+          expect(group.reload.has_role?(Role::EDITOR, collection)).to be false
+        end
+      end
     end
   end
 end
