@@ -7,7 +7,7 @@ class Collection < ApplicationRecord
                view_role: Role::VIEWER
 
   archivable as: :parent_collection_card,
-             with: %i[all_collection_cards cards_linked_to_this_collection]
+             with: %i[collection_cards cards_linked_to_this_collection]
   resourcify
   acts_as_taggable
 

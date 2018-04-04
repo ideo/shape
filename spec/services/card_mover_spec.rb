@@ -17,11 +17,19 @@ RSpec.describe CardMover, type: :service do
       card_action: card_action,
     )
   end
+  let(:instance_double) do
+    double('Roles::MassAssign')
+  end
 
   before do
     moving_cards.each do |card|
       user.add_role(Role::EDITOR, card.record)
+      user.add_role(Role::EDITOR, from_collection)
+      user.add_role(Role::EDITOR, to_collection)
     end
+
+    allow(Roles::MassAssign).to receive(:new).and_return(instance_double)
+    allow(instance_double).to receive(:call).and_return(true)
   end
 
   describe '#call' do
@@ -32,6 +40,18 @@ RSpec.describe CardMover, type: :service do
         expect(from_collection.collection_cards).to match_array moving_cards
         card_mover.call
         expect(to_collection.reload.collection_cards.first(3)).to match_array moving_cards
+      end
+
+      it 'should assign permissions' do
+        card = moving_cards.first
+        expect(Roles::MassAssign).to receive(:new).with(
+          object: card.record,
+          role_name: Role::EDITOR,
+          users: [user],
+          groups: [],
+          propagate_to_children: true,
+        )
+        card_mover.call
       end
     end
 
@@ -58,6 +78,11 @@ RSpec.describe CardMover, type: :service do
         to_collection.reload
         expect(to_collection.collection_cards.first.link?).to be true
         expect(to_collection.collection_cards.first.item).to eq linking_cards.first.item
+      end
+
+      it 'should not assign any permissions' do
+        expect(Roles::MassAssign).not_to receive(:new)
+        card_mover.call
       end
     end
 

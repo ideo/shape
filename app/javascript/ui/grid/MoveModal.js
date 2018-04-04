@@ -80,9 +80,9 @@ class MoveModal extends React.Component {
     }
     try {
       if (uiStore.cardAction === 'move') {
-        await apiStore.request('/collection_cards/move', 'PATCH', data)
+        await apiStore.request('collection_cards/move', 'PATCH', data)
       } else if (uiStore.cardAction === 'link') {
-        await apiStore.request('/collection_cards/link', 'POST', data)
+        await apiStore.request('collection_cards/link', 'POST', data)
       }
       uiStore.resetSelectionAndBCT()
     } catch (e) {

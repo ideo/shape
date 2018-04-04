@@ -22,6 +22,7 @@ class CardMover
     return false if to_collection_invalid
     move_cards
     assign_permissions if @card_action == 'move'
+    @moving_cards
   end
 
   private

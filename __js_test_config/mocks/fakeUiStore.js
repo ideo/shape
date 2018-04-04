@@ -34,6 +34,7 @@ const fakeUiStore = {
   update: jest.fn(),
   openAlertModal: jest.fn(),
   closeAlertModal: jest.fn(),
+  cardAction: 'move',
 }
 
 export default fakeUiStore

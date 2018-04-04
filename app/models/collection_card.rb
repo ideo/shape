@@ -1,7 +1,5 @@
 class CollectionCard < ApplicationRecord
   include Archivable
-  archivable with: %i[collection item],
-             after_archive: :decrement_card_orders!
 
   belongs_to :parent, class_name: 'Collection'
 
