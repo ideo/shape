@@ -64,6 +64,8 @@ module Resourceable
 
   def inherit_roles_from_parent!
     return false unless parent.present?
+    # NOTE: This should only ever be called on a newly created record
+    return false if roles.present?
     parent.roles.each do |role|
       role.duplicate!(assign_resource: self)
     end
