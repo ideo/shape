@@ -39,8 +39,10 @@ describe('MoveModal', () => {
     describe('on an uneditable collection', () => {
       beforeEach(() => {
         props.uiStore.viewingCollection = {
-          can_edit: true,
+          can_edit: false,
         }
+        wrapper.setProps(props)
+        component.moveCards('top')
       })
 
       it('should not make an API request', () => {
@@ -48,7 +50,19 @@ describe('MoveModal', () => {
       })
 
       it('should show a warning', () => {
-        // Unimplemented
+        expect(uiStore.openAlertModal).toHaveBeenCalled()
+      })
+    })
+
+    describe('on a nested collection', () => {
+      beforeEach(() => {
+        props.apiStore.request.mockReturnValue(Promise.reject())
+        wrapper.setProps(props)
+        component.moveCards('top')
+      })
+
+      it('should show an alert dialog', () => {
+        expect(uiStore.openAlertModal).toHaveBeenCalled()
       })
     })
 

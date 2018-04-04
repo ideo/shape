@@ -49,7 +49,7 @@ class RoleSelect extends React.Component {
       prompt,
       confirmText,
       icon: <LeaveIcon />,
-      onConfirm: this.deleteRole.bind(this, true),
+      onConfirm: () => this.deleteRole(true),
     })
   }
 
