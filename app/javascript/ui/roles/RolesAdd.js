@@ -35,18 +35,28 @@ class RolesAdd extends React.Component {
 
   @action
   onUserSelected = (data) => {
-    let user = data
-    if (!data.id) {
-      user = Object.assign({}, { name: data.custom, email: data.custom })
-    }
-    if (!this.selectedUsers.find((selected) => selected.email === user.email)) {
-      this.selectedUsers.push(user)
+    let existing = null
+    let entity = data
+    if (data.internalType === 'users') {
+      if (!data.id) {
+        entity = Object.assign({}, { name: data.custom, email: data.custom })
+      }
+      existing = this.selectedUsers
+        .filter(selected => selected.internalType === 'users')
+        .find(selected => selected.email === entity.email)
+    } else if (data.internalType === 'groups') {
+      existing = this.selectedUsers
+        .filter(selected => selected.internalType === 'groups')
+        .find(selected => selected.id === entity.id)
+    } else throw new Error('Selected entity can only be user or group')
+    if (!existing) {
+      this.selectedUsers.push(entity)
     }
   }
 
   @action
-  onUserDelete = (user) => {
-    this.selectedUsers.remove(user)
+  onUserDelete = (entity) => {
+    this.selectedUsers.remove(entity)
   }
 
   onUserSearch = (searchTerm) =>
@@ -88,9 +98,9 @@ class RolesAdd extends React.Component {
     return searchableItems.map(item => {
       let value
       if (item.internalType === 'users') {
-        value = item.email
+        value = item.email || item.name
       } else if (item.internalType === 'groups') {
-        value = item.handle
+        value = item.handle || item.name
       } else {
         throw new Error('Can only search users and groups')
       }
