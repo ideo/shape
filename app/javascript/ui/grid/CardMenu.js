@@ -29,11 +29,13 @@ class CardMenu extends React.PureComponent {
   moveCard = () => {
     const { card } = this.props
     uiStore.selectCardId(card.id)
-    uiStore.openMoveMenu({ from: uiStore.viewingCollection.id })
+    uiStore.openMoveMenu({ from: uiStore.viewingCollection.id, cardAction: 'move' })
   }
 
   linkCard = () => {
-    // console.log('Link card')
+    const { card } = this.props
+    uiStore.selectCardId(card.id)
+    uiStore.openMoveMenu({ from: uiStore.viewingCollection.id, cardAction: 'link' })
   }
 
   archiveCard = () => {

@@ -43,7 +43,7 @@ class CollectionCard < ApplicationRecord
     cc.parent = parent # defaults to self.parent, unless one is passed in
     cc.order += 1
 
-    unless shallow
+    unless shallow || link?
       cc.collection = collection.duplicate!(for_user: for_user) if collection.present?
       cc.item = item.duplicate!(for_user: for_user) if item.present?
     end
@@ -73,6 +73,10 @@ class CollectionCard < ApplicationRecord
 
   def link?
     is_a? CollectionCard::Link
+  end
+
+  def copy_into_new_link_card
+    amoeba_dup.becomes!(CollectionCard::Link)
   end
 
   # Increment the order by 1 of all cards >= specified order

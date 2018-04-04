@@ -17,6 +17,7 @@ Rails.application.routes.draw do
       resources :collection_cards, shallow: true do
         collection do
           patch 'move'
+          post 'link'
         end
         member do
           post 'duplicate'

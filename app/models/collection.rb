@@ -54,6 +54,9 @@ class Collection < ApplicationRecord
 
   has_many :items, through: :primary_collection_cards
   has_many :collections, through: :primary_collection_cards
+  has_many :items_and_linked_items,
+           through: :collection_cards,
+           source: :item
 
   delegate :parent, to: :parent_collection_card, allow_nil: true
 

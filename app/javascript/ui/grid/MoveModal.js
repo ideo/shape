@@ -79,7 +79,11 @@ class MoveModal extends React.Component {
       placement,
     }
     try {
-      await apiStore.request('/collection_cards/move', 'PATCH', data)
+      if (uiStore.cardAction === 'move') {
+        await apiStore.request('/collection_cards/move', 'PATCH', data)
+      } else if (uiStore.cardAction === 'link') {
+        await apiStore.request('/collection_cards/link', 'POST', data)
+      }
       uiStore.resetSelectionAndBCT()
     } catch (e) {
       uiStore.openAlertModal({

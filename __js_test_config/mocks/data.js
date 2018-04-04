@@ -63,8 +63,10 @@ export const fakeCollectionCard = {
   record: fakeCollection,
   item: fakeCollection,
   reference: false,
+  beginReplacing: jest.fn(),
   API_create: jest.fn(),
   API_archive: jest.fn(),
+  API_duplicate: jest.fn(),
 }
 
 const fakeCards = [
@@ -91,7 +93,6 @@ export const fakeCollection = {
   // This is a computed property on the collection store
   cardIds: _.map(fakeCards, c => c.id),
   API_archive: jest.fn(),
-  checkResponseForEmptyCards: jest.fn(),
 }
 export const fakeOrganizationAttrs = {
   id: 1,

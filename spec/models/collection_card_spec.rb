@@ -127,6 +127,17 @@ RSpec.describe CollectionCard, type: :model do
     end
   end
 
+  describe '#convert_to_new_link_card' do
+    let(:collection_card) { create(:collection_card) }
+    let(:collection_card_link) { collection_card.copy_into_new_link_card }
+
+    it 'should setup a new link card record with same properties as original' do
+      expect(collection_card.primary?).to be true
+      expect(collection_card_link.new_record?).to be true
+      expect(collection_card_link.link?).to be true
+    end
+  end
+
   describe '#increment_card_orders!' do
     let(:collection) { create(:collection) }
     let!(:collection_card_list) { create_list(:collection_card, 5, parent: collection) }
