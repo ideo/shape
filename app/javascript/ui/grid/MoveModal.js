@@ -61,8 +61,10 @@ class MoveModal extends React.Component {
     const { uiStore, apiStore } = this.props
     const collectionId = uiStore.viewingCollection.id
     if (!uiStore.viewingCollection.can_edit) {
-      // TODO add error dialog
-      console.warn('Cannot edit this collection')
+      uiStore.openAlertModal({
+        prompt: 'You don\'t have permission to move items to this collection',
+        icon: <CloseIcon />,
+      })
       return
     }
     const data = {
@@ -82,7 +84,10 @@ class MoveModal extends React.Component {
       }
       uiStore.resetSelectionAndBCT()
     } catch (e) {
-      console.warn('Cannot move this collection')
+      uiStore.openAlertModal({
+        prompt: 'You cannot move a collection within itself',
+        icon: <CloseIcon />,
+      })
     }
   }
 

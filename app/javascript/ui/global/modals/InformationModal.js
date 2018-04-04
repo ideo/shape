@@ -6,8 +6,9 @@ import CloseIcon from '~/ui/icons/CloseIcon'
 import AlertModal from './AlertModal'
 
 // Wrap setTimeout in promise for better API and easier testing
-const delay = ms => new Promise((resolve, reject) =>
-  setTimeout(() => { resolve(ms) }), ms)
+function delay(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms))
+}
 
 @observer
 class InformationModal extends React.Component {
