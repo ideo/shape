@@ -11,8 +11,7 @@ class Collection < ApplicationRecord
   resourcify
   acts_as_taggable
 
-
-  # including archived
+  # all cards including archived (i.e. undo default :collection_cards scope)
   has_many :all_collection_cards,
            class_name: 'CollectionCard',
            foreign_key: :parent_id,
@@ -22,21 +21,21 @@ class Collection < ApplicationRecord
   # all active cards including links
   # i.e. this is what is displayed in the frontend for collection.collection_cards
   has_many :collection_cards,
-           -> { active.order(order: :asc) },
+           -> { active.ordered },
            class_name: 'CollectionCard',
            foreign_key: :parent_id,
            inverse_of: :parent
 
-  # cards where the item/collection "belongs to" this collection
+  # cards where the item/collection "lives" in this collection
   has_many :primary_collection_cards,
-           -> { active.order(order: :asc) },
+           -> { active.ordered },
            class_name: 'CollectionCard::Primary',
            foreign_key: :parent_id,
            inverse_of: :parent
 
   # cards where the item/collection is linked into this collection
   has_many :link_collection_cards,
-           -> { active.order(order: :asc) },
+           -> { active.ordered },
            class_name: 'CollectionCard::Link',
            foreign_key: :parent_id,
            inverse_of: :parent
@@ -44,12 +43,14 @@ class Collection < ApplicationRecord
   # cards that live outside this collection, linking to this collection
   has_many :cards_linked_to_this_collection,
            class_name: 'CollectionCard::Link',
-           inverse_of: :collection
+           inverse_of: :collection,
+           dependent: :destroy
 
-  # The card that 'holds' this collection and determines its breadcrumb
+  # the card that represents this collection in its parent, and determines its breadcrumb
   has_one :parent_collection_card,
           class_name: 'CollectionCard::Primary',
-          inverse_of: :collection
+          inverse_of: :collection,
+          dependent: :destroy
 
   has_many :items, through: :primary_collection_cards
   has_many :collections, through: :primary_collection_cards

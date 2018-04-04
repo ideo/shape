@@ -29,8 +29,6 @@ class CollectionCard < ApplicationRecord
   delegate :can_edit?, to: :parent, allow_nil: true
   delegate :can_view?, to: :parent, allow_nil: true
 
-  scope :primary, -> { where(reference: false) }
-  scope :reference, -> { where(reference: true) }
   scope :ordered, -> { order(order: :asc) }
 
   amoeba do
