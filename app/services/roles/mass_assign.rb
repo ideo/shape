@@ -30,6 +30,7 @@ module Roles
       assign_role_to_users
       notify_users if @invited_by
       assign_role_to_groups
+      link_to_shared_collections
       add_roles_to_children if @propagate_to_children
       failed_users.blank? && failed_groups.blank?
     end
@@ -77,6 +78,17 @@ module Roles
           @object.class.name.to_s,
         )
       end
+    end
+
+    def link_to_shared_collections
+      group_users = []
+      @added_groups.each { |group| group.roles.each { |role| group_users += role.users } }
+      # LinkToSharedCollectionsWorker.perform_async(
+      LinkToSharedCollectionsWorker.new.perform(
+        (group_users + @added_users).uniq.map(&:id),
+        @object.id,
+        @object.class.name.to_s,
+      )
     end
 
     def notify_users

@@ -28,10 +28,6 @@ class Collection
       false
     end
 
-    def read_only?
-      true
-    end
-
     def name
       'Shared with Me'
     end
@@ -40,28 +36,6 @@ class Collection
       # TODO: how do we reliably figure out who the user is?
       # This only works because of implicit associations
       parent.editors[:users].first
-    end
-
-    # Returns (unpersisted) array of collection cards with
-    # collections and items that have been shared directly with user,
-    # or through any group they are a member of
-    def collection_cards
-      # HACK: this is obviously an imperfect solution but the problem is that if the frontend
-      # has loaded the "real" collectionCard with id=X then there will be a collision.
-      i = 999_999
-
-      # Hack - only include 25 as it's crashing
-      collections_shared_with_me.first(25).map do |obj|
-        CollectionCard.new(
-          id: i,
-          parent: self,
-          height: 1,
-          width: 1,
-          order: i += 1,
-          item: nil,
-          collection: obj.is_a?(Collection) ? obj : nil,
-        )
-      end
     end
 
     private
