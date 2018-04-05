@@ -1,11 +1,12 @@
 class CollectionBuilder
   attr_reader :collection, :errors
 
-  def initialize(params:, organization: nil, parent_card: nil)
+  def initialize(params:, organization: nil, parent_card: nil, created_by: nil)
     @collection = Collection.new(params)
     @errors = @collection.errors
     @organization = organization
     @parent_card = parent_card
+    @created_by = created_by
   end
 
   def save
@@ -15,7 +16,7 @@ class CollectionBuilder
 
   private
 
-  attr_reader :organization, :parent_card
+  attr_reader :organization, :parent_card, :created_by
 
   def assign_attributes
     if parent_card? && parent_card.reference? && organization?
@@ -25,6 +26,7 @@ class CollectionBuilder
 
     @collection.parent_collection_card = parent_card if parent_card?
     @collection.organization = organization if organization?
+    @collection.created_by = created_by if created_by?
 
     true
   end
@@ -49,5 +51,9 @@ class CollectionBuilder
 
   def parent_card?
     parent_card.present?
+  end
+
+  def created_by?
+    created_by.present?
   end
 end

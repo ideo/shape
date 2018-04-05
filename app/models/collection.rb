@@ -30,6 +30,7 @@ class Collection < ApplicationRecord
 
   belongs_to :organization, optional: true
   belongs_to :cloned_from, class_name: 'Collection', optional: true
+  belongs_to :created_by, class_name: 'User', optional: true
 
   validates :name, presence: true, if: :base_collection_type?
   validates :organization, presence: true
@@ -99,6 +100,7 @@ class Collection < ApplicationRecord
   # default relationships to include when rendering Collections in the API
   def self.default_relationships_for_api
     [
+      :created_by,
       roles: [:users, :groups],
       collection_cards: [
         :parent,
