@@ -37,8 +37,11 @@ class RolesAdd extends React.Component {
   onUserSelected = (data) => {
     let existing = null
     let entity = data
-    if (data.internalType === 'users') {
-      if (!data.id) {
+    // TODO: also do email validation on entered input?
+    const isEmail = !data.id
+
+    if (data.internalType === 'users' || isEmail) {
+      if (isEmail) {
         entity = Object.assign({}, { name: data.custom, email: data.custom })
       }
       existing = this.selectedUsers
@@ -48,7 +51,9 @@ class RolesAdd extends React.Component {
       existing = this.selectedUsers
         .filter(selected => selected.internalType === 'groups')
         .find(selected => selected.id === entity.id)
-    } else throw new Error('Selected entity can only be user or group')
+    } else {
+      console.warn('Selected entity can only be user or group')
+    }
     if (!existing) {
       this.selectedUsers.push(entity)
     }
@@ -102,7 +107,7 @@ class RolesAdd extends React.Component {
       } else if (item.internalType === 'groups') {
         value = item.handle || item.name
       } else {
-        throw new Error('Can only search users and groups')
+        console.warn('Can only search users and groups')
       }
       return { value, label: item.name, data: item }
     })
