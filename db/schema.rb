@@ -20,6 +20,7 @@ ActiveRecord::Schema.define(version: 20180406184838) do
     t.integer "order", null: false
     t.integer "width"
     t.integer "height"
+    t.boolean "reference", default: false
     t.bigint "parent_id"
     t.bigint "collection_id"
     t.bigint "item_id"
@@ -41,6 +42,7 @@ ActiveRecord::Schema.define(version: 20180406184838) do
     t.datetime "updated_at", null: false
     t.jsonb "breadcrumb"
     t.boolean "archived", default: false
+    t.integer "created_by_id"
     t.index ["cloned_from_id"], name: "index_collections_on_cloned_from_id"
     t.index ["organization_id"], name: "index_collections_on_organization_id"
   end
@@ -60,9 +62,8 @@ ActiveRecord::Schema.define(version: 20180406184838) do
     t.bigint "organization_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.string "handle"
     t.integer "filestack_file_id"
-    t.index ["handle"], name: "index_groups_on_handle"
+    t.string "handle"
     t.index ["organization_id"], name: "index_groups_on_organization_id"
   end
 
@@ -96,9 +97,9 @@ ActiveRecord::Schema.define(version: 20180406184838) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "primary_group_id"
-    t.string "handle"
+    t.string "pic_url_square"
     t.integer "filestack_file_id"
-    t.index ["handle"], name: "index_organizations_on_handle"
+    t.string "handle"
   end
 
   create_table "roles", force: :cascade do |t|
