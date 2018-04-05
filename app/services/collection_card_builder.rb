@@ -1,8 +1,8 @@
 class CollectionCardBuilder
   attr_reader :collection_card, :errors
 
-  def initialize(params:, parent_collection: nil, user: nil)
-    @collection_card = parent_collection.collection_cards.build(params)
+  def initialize(params:, parent_collection: nil, user: nil, type: 'primary')
+    @collection_card = parent_collection.send("#{type}_collection_cards").build(params)
     @errors = @collection_card.errors
     @user = user
     @parent_collection = parent_collection

@@ -326,4 +326,50 @@ describe Api::V1::CollectionCardsController, type: :request, auth: true do
       end
     end
   end
+
+  describe 'POST #link' do
+    let!(:from_collection) { create(:collection, num_cards: 3, add_editors: [user]) }
+    let!(:moving_cards) { from_collection.collection_cards.first(2) }
+    let!(:unmoved_card) { from_collection.collection_cards.last }
+    let(:path) { '/api/v1/collection_cards/link' }
+    let(:raw_params) do
+      {
+        from_id: from_collection.id,
+        to_id: to_collection.id,
+        collection_card_ids: moving_cards.map(&:id),
+        placement: 'beginning',
+      }
+    end
+    let(:params) { raw_params.to_json }
+
+    describe 'without manage access for to_collection' do
+      let(:to_collection) { create(:collection) }
+
+      it 'returns a 401' do
+        post(path, params: params)
+        expect(response.status).to eq(401)
+      end
+    end
+
+    describe 'with manage access for to_collection' do
+      let(:editor) { create(:user) }
+      let(:viewer) { create(:user) }
+      let(:to_collection) do
+        create(:collection, num_cards: 3, add_editors: [user, editor], add_viewers: [viewer])
+      end
+
+      it 'returns a 200' do
+        post(path, params: params)
+        expect(response.status).to eq(200)
+      end
+
+      it 'links cards from one collection to the other' do
+        expect(moving_cards.map(&:parent_id).uniq).to match_array [from_collection.id]
+        post(path, params: params)
+        # newly linked cards should link to the original moving_cards' items
+        expect(to_collection.collection_cards.first(2).map(&:item)).to match_array moving_cards.map(&:item)
+        expect(to_collection.collection_cards.first.link?).to be true
+      end
+    end
+  end
 end

@@ -18,7 +18,7 @@ class CollectionBuilder
   attr_reader :organization, :parent_card
 
   def assign_attributes
-    if parent_card? && parent_card.reference? && organization?
+    if parent_card? && parent_card.link? && organization?
       @collection.errors.add(:base, 'Can only assign organization or as sub-collection, not both')
       return false
     end

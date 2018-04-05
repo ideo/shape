@@ -7,25 +7,57 @@ class Collection < ApplicationRecord
                view_role: Role::VIEWER
 
   archivable as: :parent_collection_card,
-             with: %i[collection_cards reference_collection_cards]
+             with: %i[collection_cards cards_linked_to_this_collection]
   resourcify
   acts_as_taggable
 
-  has_many :collection_cards,
-           -> { active.order(order: :asc) },
-           foreign_key: :parent_id,
-           dependent: :destroy
-  # All collection cards this is linked to
-  has_many :reference_collection_cards,
-           -> { reference },
+  # all cards including archived (i.e. undo default :collection_cards scope)
+  has_many :all_collection_cards,
            class_name: 'CollectionCard',
-           inverse_of: :referenced_collection
-  has_many :items, through: :collection_cards
-  has_many :collections, through: :collection_cards
+           foreign_key: :parent_id,
+           inverse_of: :parent,
+           dependent: :destroy
+
+  # all active cards including links
+  # i.e. this is what is displayed in the frontend for collection.collection_cards
+  has_many :collection_cards,
+           -> { active.ordered },
+           class_name: 'CollectionCard',
+           foreign_key: :parent_id,
+           inverse_of: :parent
+
+  # cards where the item/collection "lives" in this collection
+  has_many :primary_collection_cards,
+           -> { active.ordered },
+           class_name: 'CollectionCard::Primary',
+           foreign_key: :parent_id,
+           inverse_of: :parent
+
+  # cards where the item/collection is linked into this collection
+  has_many :link_collection_cards,
+           -> { active.ordered },
+           class_name: 'CollectionCard::Link',
+           foreign_key: :parent_id,
+           inverse_of: :parent
+
+  # cards that live outside this collection, linking to this collection
+  has_many :cards_linked_to_this_collection,
+           class_name: 'CollectionCard::Link',
+           inverse_of: :collection,
+           dependent: :destroy
+
+  # the card that represents this collection in its parent, and determines its breadcrumb
   has_one :parent_collection_card,
-          -> { primary },
-          class_name: 'CollectionCard',
-          inverse_of: :collection
+          class_name: 'CollectionCard::Primary',
+          inverse_of: :collection,
+          dependent: :destroy
+
+  has_many :items, through: :primary_collection_cards
+  has_many :collections, through: :primary_collection_cards
+  has_many :items_and_linked_items,
+           through: :collection_cards,
+           source: :item
+
   delegate :parent, to: :parent_collection_card, allow_nil: true
 
   belongs_to :organization, optional: true
@@ -126,6 +158,10 @@ class Collection < ApplicationRecord
     exclude_association :tag_taggings
     exclude_association :roles
     exclude_association :collection_cards
+    exclude_association :all_collection_cards
+    exclude_association :primary_collection_cards
+    exclude_association :link_collection_cards
+    exclude_association :cards_linked_to_this_collection
     exclude_association :items
     exclude_association :collections
     exclude_association :parent_collection_card
@@ -190,7 +226,7 @@ class Collection < ApplicationRecord
   end
 
   def collection_cards_viewable_by(cached_cards, user)
-    cached_cards ||= collection_cards.includes(:items, :collections)
+    cached_cards ||= collection_cards.includes(:item, :collection)
     cached_cards.select do |collection_card|
       collection_card.record.can_view?(user)
     end
@@ -223,7 +259,7 @@ class Collection < ApplicationRecord
     return parent if parent_collection_card.present?
     # if the collection is in process of being built, parent_collection_card will always be nil
     # (currently mostly useful for specs, when we are creating models directly)
-    if (primary = collection_cards.reject(&:reference).first)
+    if (primary = collection_cards.first)
       return primary.parent
     end
     nil

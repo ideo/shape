@@ -18,7 +18,7 @@ class CollectionCover
 
   def first_shareable_item(type:)
     first_item = nil
-    @collection.items.where(type: type).each do |item|
+    @collection.items_and_linked_items.where(type: type).each do |item|
       next if @inheritance.private_child?(item)
       first_item = item
       break

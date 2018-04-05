@@ -3,6 +3,7 @@ FactoryBot.define do
     transient do
       num_cards 0
       item_type :text
+      card_relation :primary
       add_editors []
       add_viewers []
     end
@@ -26,7 +27,9 @@ FactoryBot.define do
           h = 2 if rand(1..4) == 4
           card_type = :"collection_card_#{evaluator.item_type}"
           cc = build(card_type, parent: collection, order: i, width: w, height: h)
-          collection.collection_cards << cc
+          # e.g. primary_collection_cards or link_collection_cards
+          card_relation = "#{evaluator.card_relation}_collection_cards"
+          collection.send(card_relation) << cc
         end
       end
     end

@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types'
 import styled from 'styled-components'
 
-const StyledIcon = styled.span`
+export const StyledIcon = styled.span`
   position: relative;
   display: inline-block;
   svg {

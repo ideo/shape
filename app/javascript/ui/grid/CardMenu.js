@@ -26,8 +26,16 @@ class CardMenu extends React.PureComponent {
     card.beginReplacing()
   }
 
+  moveCard = () => {
+    const { card } = this.props
+    uiStore.selectCardId(card.id)
+    uiStore.openMoveMenu({ from: uiStore.viewingCollection.id, cardAction: 'move' })
+  }
+
   linkCard = () => {
-    // console.log('Link card')
+    const { card } = this.props
+    uiStore.selectCardId(card.id)
+    uiStore.openMoveMenu({ from: uiStore.viewingCollection.id, cardAction: 'link' })
   }
 
   archiveCard = () => {
@@ -59,7 +67,8 @@ class CardMenu extends React.PureComponent {
 
     if (canEdit) {
       items = items.concat([
-        { name: 'Move', icon: <MoveIcon />, onClick: this.props.handleMove },
+        { name: 'Move', icon: <MoveIcon />, onClick: this.moveCard },
+        { name: 'Link', icon: <LinkIcon />, onClick: this.linkCard },
         { name: 'Archive', icon: <ArchiveIcon />, onClick: this.archiveCard },
       ])
     }
@@ -89,7 +98,6 @@ class CardMenu extends React.PureComponent {
 CardMenu.propTypes = {
   card: MobxPropTypes.objectOrObservableObject.isRequired,
   className: PropTypes.string,
-  handleMove: PropTypes.func.isRequired,
   menuOpen: PropTypes.bool.isRequired,
   canEdit: PropTypes.bool.isRequired,
   canReplace: PropTypes.bool.isRequired,

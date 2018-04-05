@@ -56,10 +56,12 @@ class MoveModal extends React.Component {
     uiStore.closeMoveMenu()
     // Notify the user if they're on a different collection
     if (uiStore.movingFromCollectionId !== uiStore.viewingCollection.id) {
-      uiStore.openAlertModal({
-        prompt: 'Your items have been returned to their original location',
-        iconName: 'BackIcon',
-      })
+      if (uiStore.cardAction === 'move') {
+        uiStore.openAlertModal({
+          prompt: 'Your items have been returned to their original location',
+          iconName: 'BackIcon',
+        })
+      }
     }
   }
 
@@ -79,7 +81,11 @@ class MoveModal extends React.Component {
       placement,
     }
     try {
-      await apiStore.request('/collection_cards/move', 'PATCH', data)
+      if (uiStore.cardAction === 'move') {
+        await apiStore.request('collection_cards/move', 'PATCH', data)
+      } else if (uiStore.cardAction === 'link') {
+        await apiStore.request('collection_cards/link', 'POST', data)
+      }
       uiStore.resetSelectionAndBCT()
     } catch (e) {
       uiStore.openAlertModal({

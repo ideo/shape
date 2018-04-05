@@ -6,7 +6,8 @@
     "order": { "type": "integer" },
     "width": { "type": "integer" },
     "height": { "type": "integer" },
-    "reference": { "type": "boolean" }
+    "type": { "type": "string" },
+    "link": { "type": "boolean" }
   },
-  "required": ["id", "order", "width", "height"]
+  "required": ["id", "order", "width", "height", "type", "link"]
 }
