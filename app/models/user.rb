@@ -101,7 +101,14 @@ class User < ApplicationRecord
   def current_user_collection
     return nil if current_organization.blank?
 
+    # TODO rename "user" to user_collection
     collections.user.find_by_organization_id(current_organization_id)
+  end
+
+  def current_shared_collection
+    return nil if current_organization.blank?
+
+    collections.shared_with_me.find_by_organization_id(current_organization_id)
   end
 
   def current_org_groups
