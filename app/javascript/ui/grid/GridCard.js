@@ -156,6 +156,7 @@ class GridCard extends React.Component {
   render() {
     const {
       card,
+      record,
       canEditCollection,
       isSharedCollection,
       dragging,
@@ -171,7 +172,7 @@ class GridCard extends React.Component {
           TODO: Not fully disable CardMenu for SharedCollection
           once we have appropriate actions?
         */}
-        {!isSharedCollection &&
+        {!isSharedCollection && !record.isSharedCollection &&
           <StyledTopRightActions className="">
             {this.canEdit &&
               <SelectionCircle cardId={card.id} />
