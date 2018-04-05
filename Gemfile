@@ -56,6 +56,7 @@ gem 'amoeba'
 
 # Background processing
 gem 'sidekiq'
+gem 'sidekiq-scheduler'
 
 # ElasticSearch wrapper
 gem 'searchkick', '~> 3.0.0'
