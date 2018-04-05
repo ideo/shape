@@ -67,6 +67,52 @@ describe User, type: :model do
     end
   end
 
+  describe '#add_role' do
+    let(:collection) { create(:collection) }
+
+    it 'adds role' do
+      expect(user.add_role(Role::EDITOR, collection).persisted?).to be true
+      expect(user.has_role?(Role::EDITOR, collection)).to be true
+    end
+
+    context 'with another user' do
+      let(:user_2) { create(:user) }
+
+      before do
+        user.add_role(Role::EDITOR, collection)
+      end
+
+      it 'adds role' do
+        expect(user_2.add_role(Role::EDITOR, collection).persisted?).to be true
+        expect(user_2.has_role?(Role::EDITOR, collection)).to be true
+      end
+
+      it 'does not duplicate role' do
+        expect do
+          user_2.add_role(Role::EDITOR, collection)
+        end.not_to change(Role, :count)
+      end
+    end
+
+    context 'with another group' do
+      let!(:group) { create(:group) }
+
+      before do
+        group.add_role(Role::EDITOR, collection)
+      end
+
+      it 'adds role' do
+        expect(group.has_role?(Role::EDITOR, collection)).to be true
+      end
+
+      it 'does not duplicate role' do
+        expect do
+          group.add_role(Role::EDITOR, collection)
+        end.not_to change(Role, :count)
+      end
+    end
+  end
+
   describe '#organizations' do
     let!(:organizations) { create_list(:organization, 2) }
 
@@ -336,6 +382,52 @@ describe User, type: :model do
           ]
         )
       end
+    end
+  end
+
+  describe '#current_org_groups_roles_identifiers' do
+    let(:organization) { create(:organization) }
+    let(:group) { create(:group, organization: organization) }
+    let(:collection) { create(:collection) }
+    let(:item) { create(:text_item) }
+    let!(:user) { create(:user) }
+
+    before do
+      user.add_role(Role::MEMBER, organization.primary_group)
+      user.add_role(Role::MEMBER, group)
+      group.add_role(Role::EDITOR, collection)
+      group.add_role(Role::VIEWER, item)
+    end
+
+    it 'should include all group role identifiers' do
+      expect(group.roles_to_resources.size).to eq(2)
+      expect(user.current_org_groups_roles_identifiers).to eq(group.roles_to_resources.map(&:identifier))
+    end
+  end
+
+  describe '#current_org_groups' do
+    let!(:org) { create(:organization, member: user) }
+    let!(:org_2) { create(:organization) }
+    let!(:group_in_org_member) do
+      create(:group,
+             organization: user.current_organization,
+             add_members: [user])
+    end
+    let!(:group_in_org_not_member) do
+      create(:group, organization: user.current_organization)
+    end
+    let!(:group_not_in_org) do
+      create(:group,
+             organization: org_2,
+             add_members: [user])
+    end
+
+    it 'only returns groups this user is a member of in current org' do
+      expect(user.has_role?(Role::MEMBER, group_in_org_member)).to be true
+      expect(user.has_role?(Role::MEMBER, org.primary_group)).to be true
+      expect(user.has_role?(Role::MEMBER, group_in_org_not_member)).to be false
+      expect(user.has_role?(Role::MEMBER, group_not_in_org)).to be true
+      expect(user.current_org_groups).to match_array([group_in_org_member, org.primary_group])
     end
   end
 end

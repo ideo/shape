@@ -139,59 +139,42 @@ class GridCard extends React.Component {
     )
   }
 
-  duplicateCard = () => {
-    const { card } = this.props
-    card.API_duplicate()
-  }
-
-  replaceCard = () => {
-    const { card } = this.props
-    card.beginReplacing()
-  }
-
-  linkCard = () => {
-    // console.log('Link card')
-  }
-
-  moveCard = () => {
-    // console.log('Move card')
-  }
-
-  archiveCard = () => {
-    this.props.card.API_archive()
-  }
-
   handleClick = (e) => {
     if (this.props.dragging) return
     this.props.handleClick(e)
   }
 
   render() {
+    const {
+      card,
+      canEditCollection,
+      isSharedCollection,
+      dragging,
+      menuOpen,
+      onMoveStart,
+    } = this.props
+
     return (
-      <StyledGridCard dragging={this.props.dragging}>
-        {this.props.canEditCollection &&
-          <GridCardHotspot card={this.props.card} dragging={this.props.dragging} />
+      <StyledGridCard dragging={dragging}>
+        {canEditCollection &&
+          <GridCardHotspot card={card} dragging={dragging} />
         }
         {/*
           TODO: Not fully disable CardMenu for SharedCollection
           once we have appropriate actions?
         */}
-        {!this.props.isSharedCollection &&
+        {!isSharedCollection &&
           <StyledTopRightActions className="">
             {this.canEdit &&
-              <SelectionCircle cardId={this.props.card.id} />
+              <SelectionCircle cardId={card.id} />
             }
             <CardMenu
               className="show-on-hover card-menu"
-              cardId={this.props.card.id}
+              card={card}
               canEdit={this.canEdit}
               canReplace={this.canReplace}
-              menuOpen={this.props.menuOpen}
-              handleDuplicate={this.duplicateCard}
-              handleReplace={this.replaceCard}
-              handleLink={this.linkCard}
-              handleMove={this.moveCard}
-              handleArchive={this.archiveCard}
+              menuOpen={menuOpen}
+              handleMove={onMoveStart}
             />
           </StyledTopRightActions>
         }
@@ -215,6 +198,7 @@ GridCard.propTypes = {
   dragging: PropTypes.bool.isRequired,
   handleClick: PropTypes.func.isRequired,
   menuOpen: PropTypes.bool.isRequired,
+  onMoveStart: PropTypes.func.isRequired,
 }
 
 export default GridCard

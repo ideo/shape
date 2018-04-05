@@ -17,6 +17,21 @@ describe Collection, type: :model do
     it { should have_one :parent_collection_card }
     it { should belong_to :cloned_from }
     it { should belong_to :organization }
+
+    describe '#collection_cards' do
+      let!(:collection) { create(:collection, num_cards: 5) }
+      let(:collection_cards) { collection.collection_cards }
+
+      it 'should find collection cards in order of order: :asc' do
+        expect(collection_cards.sort_by(&:order)).to match_array(collection_cards)
+      end
+
+      it 'should only find active collection cards' do
+        expect {
+          collection_cards.first.archive!
+        }.to change(collection.collection_cards, :count).by(-1)
+      end
+    end
   end
 
   describe '#inherit_parent_organization_id' do
@@ -26,6 +41,28 @@ describe Collection, type: :model do
 
     it 'inherits organization id from parent collection' do
       expect(collection.organization_id).to eq(parent_collection.organization_id)
+    end
+  end
+
+  describe '#allow_primary_group_view_access' do
+    let!(:organization) { create(:organization) }
+    let!(:user_collection) { create(:user_collection, organization: organization) }
+    let!(:collection_card) { create(:collection_card, parent: user_collection) }
+    let(:collection) { create(:collection, organization: nil, parent_collection_card: collection_card) }
+    let!(:new_collection_card) { create(:collection_card_collection, parent: collection) }
+    let(:new_collection) { new_collection_card.collection }
+
+    before do
+      collection.allow_primary_group_view_access
+      new_collection.allow_primary_group_view_access
+    end
+
+    it 'gives view access to its organization\'s primary group if created in a UserCollection' do
+      expect(organization.primary_group.has_role?(Role::VIEWER, collection)).to be true
+    end
+
+    it 'does not give view access to primary group if created in a different collection' do
+      expect(organization.primary_group.has_role?(Role::VIEWER, new_collection)).to be false
     end
   end
 
@@ -188,6 +225,27 @@ describe Collection, type: :model do
         expect(collection.collection_cards_viewable_by(cards, user)).not_to include(private_card)
         expect(collection.collection_cards_viewable_by(cards, user)).to match_array(cards - [private_card])
       end
+    end
+  end
+
+  describe '#search_data' do
+    let(:collection) { create(:collection) }
+    let(:users) { create_list(:user, 2) }
+    let(:groups) { create_list(:group, 2) }
+
+    before do
+      users[0].add_role(Role::EDITOR, collection)
+      users[1].add_role(Role::VIEWER, collection)
+      groups[0].add_role(Role::EDITOR, collection)
+      groups[1].add_role(Role::VIEWER, collection)
+    end
+
+    it 'includes all user_ids' do
+      expect(collection.search_data[:user_ids]).to match_array(users.map(&:id))
+    end
+
+    it 'includes all group_ids' do
+      expect(collection.search_data[:group_ids]).to match_array(groups.map(&:id))
     end
   end
 end

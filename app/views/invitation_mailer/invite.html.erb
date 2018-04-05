@@ -1,0 +1,16 @@
+<div class='p'>
+  Hello<%= " #{@user.name}" if @user.name.present?%>,
+</div>
+
+<div class='p'>
+  <%= @invited_by.name %> has invited you to join <%= @invited_to.name %> on Shape.
+  <br/>
+  Click <%= "Join #{@invited_to_type}" %> below to get started!
+  <div class='email-link'>
+    <%= link_to "Join #{@invited_to_type}", @url %>
+  </div>
+</div>
+
+<div class='p'>
+  Or copy and paste this link into your browser: <%= @url %>
+</div>

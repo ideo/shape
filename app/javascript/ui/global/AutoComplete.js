@@ -34,7 +34,7 @@ function renderArrow() {
 function SelectWrapped(props) {
   const { classes, ...other } = props
   return (
-    <Select.AsyncCreatable
+    <Select.Creatable
       arrowRenderer={renderArrow}
       optionComponent={Option}
       noResultsText={'No results found'}
@@ -197,15 +197,14 @@ class AutoComplete extends React.Component {
 
   state = {
     multi: null,
-    options: [],
   }
 
   handleChange = (multi) => {
     this.setState({
       multi,
     })
-    let fullOption = this.state.options.find((option) =>
-      option.value === multi)
+    let fullOption = this.props.options.find((option) =>
+      option.value === multi || option.label === multi)
     if (!fullOption || !fullOption.data) {
       fullOption = Object.assign({}, { data: { custom: fullOption.value } })
     }
@@ -216,17 +215,13 @@ class AutoComplete extends React.Component {
     if (!input) {
       return Promise.resolve({ options: [] })
     }
-    return this.props.onInputChange(input).then((results) => {
-      this.setState({
-        options: results
-      })
-      return { options: results }
-    })
+    return this.props.onInputChange(input).then((results) =>
+      ({ options: results }))
   }
 
   render() {
-    const { classes, keepSelectedOptions } = this.props
-    const { multi, options } = this.state
+    const { classes, keepSelectedOptions, options } = this.props
+    const { multi } = this.state
 
     return (
       <div className={classes.root}>
@@ -244,7 +239,6 @@ class AutoComplete extends React.Component {
             name: 'react-select-chip',
             promptTextCreator: label => `Invite email ${label}`,
             simpleValue: true,
-            loadOptions: this.fireInputChange,
           }}
         />
       </div>
@@ -258,6 +252,10 @@ AutoComplete.propTypes = {
     chip: PropTypes.string,
     '@global': PropTypes.string,
   }).isRequired,
+  options: PropTypes.arrayOf(PropTypes.shape({
+    label: PropTypes.string,
+    value: PropTypes.string,
+  })).isRequired,
   onOptionSelect: PropTypes.func.isRequired,
   onInputChange: PropTypes.func,
   keepSelectedOptions: PropTypes.bool,

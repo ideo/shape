@@ -1,3 +1,4 @@
+import _ from 'lodash'
 import React from 'react'
 import PropTypes from 'prop-types'
 import {
@@ -25,6 +26,7 @@ class AutocompleteOption extends React.Component {
     if (!option.className) {
       const { data } = option
       const url = data.pic_url_square || data.filestack_file_url
+      const name = _.trim(data.name) ? data.name : data.email
       content = (
         <Row align="center" noSpacing>
           <span>
@@ -36,7 +38,7 @@ class AutocompleteOption extends React.Component {
             />
           </span>
           <RowItemLeft>
-            <DisplayText>{data.name}</DisplayText><br />
+            <DisplayText>{name}</DisplayText><br />
           </RowItemLeft>
         </Row>
       )

@@ -26,6 +26,7 @@ Role.type = 'roles'
 Role.defaults = {
   // set as array so it's never `undefined`
   users: [],
+  groups: [],
 }
 
 export default Role

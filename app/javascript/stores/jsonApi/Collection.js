@@ -1,7 +1,6 @@
 import _ from 'lodash'
-import { computed, action } from 'mobx'
+import { computed } from 'mobx'
 
-import { uiStore } from '~/stores'
 import { archive } from './shared'
 import BaseRecord from './BaseRecord'
 
@@ -10,11 +9,6 @@ class Collection extends BaseRecord {
 
   @computed get cardIds() {
     return this.collection_cards.map(card => card.id)
-  }
-
-  @action emptyCards() {
-    this.collection_cards.replace([])
-    uiStore.openBlankContentTool()
   }
 
   get isUserCollection() {

@@ -4,6 +4,7 @@
     "id": { "type": "integer" },
     "name": { "type": "string" },
     "handle": { "type": ["string", "null"] },
+    "is_primary": { "type": "boolean" },
     "filestack_file_url": { "type": ["string", "null"] }
   },
   "required": ["id", "name"]

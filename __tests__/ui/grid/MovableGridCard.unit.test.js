@@ -15,7 +15,7 @@ const props = {
   parent: fakeCollection,
   onDrag: jest.fn(),
   onResize: jest.fn(),
-  onMoveStop: jest.fn(),
+  onDragOrResizeStop: jest.fn(),
   routeTo: jest.fn(),
   menuOpen: false,
   canEditCollection: false,

@@ -44,6 +44,21 @@ module Breadcrumbable
     breadcrumb
   end
 
+  def breadcrumb_contains?(object: nil, id: nil, klass: nil)
+    found = false
+    if object
+      found = breadcrumb.include?(object.to_breadcrumb_item)
+    else
+      breadcrumb.each do |crumb|
+        if crumb[0] == klass and crumb[1] == id
+          found = true
+          break
+        end
+      end
+    end
+    found
+  end
+
   private
 
   def calculate_breadcrumb

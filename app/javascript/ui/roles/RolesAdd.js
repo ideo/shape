@@ -1,7 +1,7 @@
 import _ from 'lodash'
 import PropTypes from 'prop-types'
 import { observable, action } from 'mobx'
-import { observer } from 'mobx-react'
+import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 import {
   FormButton,
@@ -35,18 +35,28 @@ class RolesAdd extends React.Component {
 
   @action
   onUserSelected = (data) => {
-    let user = data
-    if (!data.id) {
-      user = Object.assign({}, { name: data.custom, email: data.custom })
-    }
-    if (!this.selectedUsers.find((selected) => selected.email === user.email)) {
-      this.selectedUsers.push(user)
+    let existing = null
+    let entity = data
+    if (data.internalType === 'users') {
+      if (!data.id) {
+        entity = Object.assign({}, { name: data.custom, email: data.custom })
+      }
+      existing = this.selectedUsers
+        .filter(selected => selected.internalType === 'users')
+        .find(selected => selected.email === entity.email)
+    } else if (data.internalType === 'groups') {
+      existing = this.selectedUsers
+        .filter(selected => selected.internalType === 'groups')
+        .find(selected => selected.id === entity.id)
+    } else throw new Error('Selected entity can only be user or group')
+    if (!existing) {
+      this.selectedUsers.push(entity)
     }
   }
 
   @action
-  onUserDelete = (user) => {
-    this.selectedUsers.remove(user)
+  onUserDelete = (entity) => {
+    this.selectedUsers.remove(entity)
   }
 
   onUserSearch = (searchTerm) =>
@@ -54,7 +64,7 @@ class RolesAdd extends React.Component {
       res.data.map((user) =>
         ({ value: user.email, label: user.name, data: user })))
 
-  handleSave = (ev) => {
+  handleSave = async (ev) => {
     const emails = this.selectedUsers
       .filter((selected) => !selected.id)
       .map((selected) => selected.email)
@@ -62,18 +72,15 @@ class RolesAdd extends React.Component {
     const fullUsers = this.selectedUsers
       .filter((selected) => !!selected.id)
 
-    let firstReq = Promise.resolve({ data: [] })
+    let created = { data: [] }
     if (emails.length) {
-      firstReq = this.props.onCreateUsers(emails)
+      created = await this.props.onCreateUsers(emails)
     }
-    return firstReq.then((res) =>
-      this.props.onCreateRoles(
-        [...res.data, ...fullUsers], this.selectedRole
-      ))
-      .then((roles) => {
-        this.reset()
-        return roles
-      })
+    const roles = await this.props.onCreateRoles(
+      [...created.data, ...fullUsers], this.selectedRole
+    )
+    this.reset()
+    return roles
   }
 
   @action
@@ -84,6 +91,21 @@ class RolesAdd extends React.Component {
   @action
   reset() {
     this.selectedUsers = []
+  }
+
+  mapItems() {
+    const { searchableItems } = this.props
+    return searchableItems.map(item => {
+      let value
+      if (item.internalType === 'users') {
+        value = item.email || item.name
+      } else if (item.internalType === 'groups') {
+        value = item.handle || item.name
+      } else {
+        throw new Error('Can only search users and groups')
+      }
+      return { value, label: item.name, data: item }
+    })
   }
 
   render() {
@@ -98,6 +120,7 @@ class RolesAdd extends React.Component {
         }
         <Row>
           <AutoComplete
+            options={this.mapItems()}
             onInputChange={this.onUserSearch}
             onOptionSelect={this.onUserSelected}
           />
@@ -134,6 +157,7 @@ class RolesAdd extends React.Component {
 }
 
 RolesAdd.propTypes = {
+  searchableItems: MobxPropTypes.arrayOrObservableArray.isRequired,
   roleTypes: PropTypes.arrayOf(PropTypes.string).isRequired,
   onCreateRoles: PropTypes.func.isRequired,
   onCreateUsers: PropTypes.func.isRequired,

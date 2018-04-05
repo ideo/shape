@@ -1,6 +1,7 @@
 class StripTags
   def initialize(string)
-    @string = string
+    # Make sure it is a string
+    @string = string.to_s
   end
 
   def call

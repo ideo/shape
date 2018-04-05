@@ -91,6 +91,16 @@ export const fakeCollection = {
   // This is a computed property on the collection store
   cardIds: _.map(fakeCards, c => c.id),
   API_archive: jest.fn(),
+  checkResponseForEmptyCards: jest.fn(),
+}
+export const fakeOrganizationAttrs = {
+  id: 1,
+  name: 'TestOrg',
+}
+export const fakeOrganization = {
+  ...fakeOrganizationAttrs,
+  rawAttributes: jest.fn().mockReturnValue(fakeOrganizationAttrs),
+  getRecordType: jest.fn().mockReturnValue('organization'),
 }
 export const fakeUserAttrs = {
   id: 1,
@@ -99,6 +109,9 @@ export const fakeUserAttrs = {
   email: 'oprah@winfrey.com',
   pic_url_square: 'https://filestackcdn.com/abc123',
   groups: [],
+  current_organization: fakeOrganization,
+  type: 'users',
+  isCurrentUser: jest.fn(),
 }
 export const fakeUser = {
   ...fakeUserAttrs,
@@ -109,16 +122,30 @@ export const fakeRoleAttrs = {
   id: 1,
   name: 'editor',
   users: [fakeUser, fakeUser],
+  groups: [],
   resource: { id: 1, type: 'collection' }
 }
 export const fakeRole = {
   ...fakeRoleAttrs,
   rawAttributes: jest.fn().mockReturnValue(fakeRoleAttrs),
   getRecordType: jest.fn().mockReturnValue('roles'),
+  canEdit: jest.fn(),
 }
 export const fakePosition = {
   xPos: 0,
   yPos: 0,
   height: 1,
   width: 1,
+}
+export const fakeGroupAttrs = {
+  id: 1,
+  name: 'IDEO Products',
+  handle: 'ideo-products',
+  filestack_file_url: 'https://cdn.filestackcontent.com/i4iKADquTQCWMAvyz02R',
+  roles: [],
+}
+export const fakeGroup = {
+  ...fakeGroupAttrs,
+  rawAttributes: jest.fn().mockReturnValue(fakeGroupAttrs),
+  getRecordType: jest.fn().mockReturnValue('groups'),
 }

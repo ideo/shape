@@ -122,7 +122,7 @@ describe Api::V1::CollectionsController, type: :request, auth: true do
   end
 
   describe 'GET #me' do
-    let!(:organization) { create(:organization, member: user) }
+    let!(:organization) { user.current_organization }
     let!(:org_2) { create(:organization, member: user) }
     let(:path) { '/api/v1/collections/me' }
     let(:user_collection) { user.collections.user.where(organization_id: organization.id).first }

@@ -16,7 +16,7 @@ describe Collection::UserCollection, type: :model do
     end
 
     it 'the user should be an editor' do
-      expect(user_collection.editors).to include(user)
+      expect(user_collection.editors[:users]).to include(user)
     end
 
     it 'should have a sub-collection of Collection::SharedWithMeCollection' do

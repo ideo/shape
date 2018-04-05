@@ -1,0 +1,146 @@
+// copied / modified from c-delta
+// Styles for email templates (inlined using Roadie gem)
+
+$color-white: #ffffff;
+$color-gray-bg: #f0f2f4;
+$color-gray-boulder: #787878;
+$color-gray-tundora: #4A4A4A;
+$color-blacklava: #120f0e;
+$header-font: 'Gotham', 'Arial Black', Arial, Helvetica, sans-serif;
+$sentinel-font: 'Sentinel', Palatino, Georgia, serif;
+$sentinel-lt-font: 'Sentinel-Light', 'Sentinel', Palatino, Georgia, serif;
+
+.email-wrapper {
+  font-family: $sentinel-lt-font;
+  font-size: 14px;
+  width: 100%;
+  max-width: 710px;
+  margin: 0 auto;
+  background-color: $color-gray-bg;
+  color: $color-blacklava;
+
+  a, a:visited {
+    color: $color-gray-tundora;
+    text-decoration: none;
+  }
+
+  h1 {
+    font-size: 40px;
+  }
+  h2 {
+    font-size: 32px;
+  }
+  h3 {
+    font-size: 28px;
+  }
+  h4 {
+    font-size: 24px;
+  }
+  h5 {
+    font-size: 20px;
+  }
+  h6 {
+    font-size: 16px;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: $header-font;
+    font-weight: bold;
+  }
+
+  .center {
+    text-align: center;
+  }
+
+  .p {
+    padding: 0 0 1em 0;
+    line-height: 1.33;
+  }
+
+  table {
+    border-spacing: 0;
+    border-collapse: collapse;
+    td {
+      padding: 6px;
+    }
+  }
+
+  .email-inner {
+    padding: 30px;
+    margin: 0 auto;
+    max-width: 650px;
+  }
+
+  .email-header {
+    text-align: center;
+    padding: 10px 0;
+  }
+
+  .email-header__logo {
+    display: block;
+    margin: 25px auto 10px;
+
+    img {      
+      width: 83px;
+      height: 53px;
+    }
+  }
+
+  .email-header__image {
+    max-width: 95%;
+    margin: 0 auto;
+  }
+
+  .email-content {
+    background-color: $color-white;
+    padding: 45px;
+    font-size: 16px;
+  }
+
+  .email-link {
+    a {
+      font-family: $header-font;
+      text-align: center;
+      text-transform: uppercase;
+      color: $color-white;
+      font-size: 16px;
+      letter-spacing: 1.5px;
+      padding: 12px;
+      display: block;
+      background: black;
+      margin: 40px auto;
+      max-width: 250px;
+      border-radius: 24px;
+    }
+  }
+
+  .email-image {
+    display: block;
+    margin: auto;
+  }
+
+  .email-footer {
+    font-size: 11px;
+    text-align: center;
+    padding: 40px;
+
+    &, a, a:visited {
+      color: $color-gray-boulder;
+    }
+  }
+
+  .email-footer__why {
+    font-size: 15px;
+  }
+
+  .email-footer__links {
+    a {
+      display: inline-block;
+      margin: 40px 20px;
+    }
+  }
+
+  .email-footer__copyright {
+    margin-top: 10px;
+  }
+}

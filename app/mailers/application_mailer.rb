@@ -1,4 +1,7 @@
 class ApplicationMailer < ActionMailer::Base
-  default from: 'from@example.com'
+  include Roadie::Rails::Automatic
+  include ApplicationHelper
+
+  default from: 'Shape <hello@shape.space>'
   layout 'mailer'
 end

@@ -130,7 +130,7 @@ module ColabImport
     def assign_roles_to_root
       # Copy roles from template collection to root
       @template_collection.roles.each do |role|
-        assign_role = Roles::AssignToUsers.new(
+        assign_role = Roles::MassAssign.new(
           object: @root_collection,
           role_name: role.name,
           users: role.users,

@@ -11,13 +11,28 @@ const fakeUiStore = {
     height: null,
     replacingId: null,
   },
+  alertModal: {
+    open: false,
+    prompt: null,
+    onConfirm: null,
+    onCancel: null,
+    icon: null,
+    confirmText: null,
+    cancelText: null,
+  },
   closeBlankContentTool: jest.fn(),
+  closeMoveMenu: jest.fn(),
+  resetSelectionAndBCT: jest.fn(),
   rolesMenuOpen: false,
   isLoading: false,
   selectedCardIds: [],
   setViewingCollection: jest.fn(),
   viewingCollection: null,
+  movingFromCollectionId: null,
+  movingCardIds: [],
   update: jest.fn(),
+  openAlertModal: jest.fn(),
+  closeAlertModal: jest.fn(),
 }
 
 export default fakeUiStore

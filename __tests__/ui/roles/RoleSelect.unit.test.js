@@ -13,7 +13,7 @@ describe('RoleSelect', () => {
     props = {
       role: fakeRole,
       roleTypes: ['viewer', 'editor'],
-      user: fakeRole.users[0],
+      entity: fakeRole.users[0],
       onDelete: jest.fn(),
       onCreate: jest.fn(),
     }
@@ -41,7 +41,7 @@ describe('RoleSelect', () => {
   })
 
   describe('createRole', () => {
-    it('should call onCreate with list of users and role name', () => {
+    it('should call onCreate with list of users/groups and role name', () => {
       wrapper.instance().createRole('viewer')
       expect(props.onCreate).toHaveBeenCalledWith([fakeRole.users[0]], 'viewer')
     })
@@ -53,24 +53,8 @@ describe('RoleSelect', () => {
       wrapper.instance().deleteRole()
     })
 
-    it('should call onDelete with the role and user', () => {
-      expect(props.onDelete).toHaveBeenCalledWith(props.role, props.user, false)
-    })
-  })
-
-  describe('onRoleRemove', () => {
-    const fakeEvent = {
-      preventDefault: jest.fn(),
-    }
-
-    it('should call delete role with true to remove the role now', () => {
-      props.onDelete.mockReturnValue(Promise.resolve())
-      wrapper.instance().onRoleRemove(fakeEvent)
-      expect(props.onDelete).toHaveBeenCalledWith(
-        props.role,
-        props.user,
-        true
-      )
+    it('should call onDelete with the role and user/group', () => {
+      expect(props.onDelete).toHaveBeenCalledWith(props.role, props.entity, false)
     })
   })
 })

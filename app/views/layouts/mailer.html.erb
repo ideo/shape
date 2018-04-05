@@ -1,13 +1,29 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <style>
-      /* Email styles need to be inline */
-    </style>
+    <%= stylesheet_link_tag 'email' %>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type' />
   </head>
-
   <body>
-    <%= yield %>
+    <div class="email-wrapper">
+      <div class="email-inner">
+        <div class="email-header">
+          <a class="email-header__logo" href="<%= ENV['OKTA_BASE_URL']%>" title="Shape">
+            <img src="https://s3-us-west-2.amazonaws.com/assets.shape.space/logo_2x.png" />
+          </a>
+        </div>
+
+
+        <div class="email-content">
+          <%= yield %>
+        </div>
+
+        <div class="email-footer">
+          <div class="email-footer__why">You are receiving this email because you have an account or have been invited to Shape.</div>
+
+          <div class="email-footer__copyright">&copy; 2018 IDEO</div>
+        </div>
+
+    </div>
   </body>
 </html>

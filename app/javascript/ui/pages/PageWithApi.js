@@ -1,9 +1,12 @@
 import _ from 'lodash'
+import { animateScroll as scroll } from 'react-scroll'
 
-import { uiStore } from '~/stores'
+import { uiStore, routingStore } from '~/stores'
 
 class PageWithApi extends React.Component {
   componentDidMount() {
+    scroll.scrollToTop({ duration: 0 })
+    uiStore.resetSelectionAndBCT()
     // this will get called on initial render
     this.fetchData(this.props)
   }
@@ -26,12 +29,13 @@ class PageWithApi extends React.Component {
       .then(response => {
         uiStore.update('loading', false)
         if (_.isFunction(this.onAPILoad)) {
-          this.onAPILoad(response.data, response.meta)
+          this.onAPILoad(response)
         }
       })
       .catch(err => {
         uiStore.update('loading', false)
         console.log('API error!', err)
+        routingStore.routeTo('/')
       })
   }
 }

@@ -2,18 +2,18 @@ import _ from 'lodash'
 import CardMenu from '~/ui/grid/CardMenu'
 
 const props = {
-  cardId: 123,
+  card: { id: 123 },
   canEdit: false,
   canReplace: false,
   handleShare: jest.fn(),
   handleDuplicate: jest.fn(),
-  handleLink: jest.fn(),
   handleMove: jest.fn(),
   handleArchive: jest.fn(),
   handleReplace: jest.fn(),
   uiStore: {
     openCardMenuId: false,
     update: jest.fn(),
+    closeMoveMenu: jest.fn(),
   },
   menuOpen: false,
 }
@@ -26,10 +26,9 @@ describe('CardMenu', () => {
     beforeEach(() => {
       allActions = [
         'Duplicate',
-        'Replace',
         'Move',
-        'Link',
-        'Archive'
+        'Archive',
+        'Replace',
       ]
       actions = _.without(allActions, 'Replace')
       props.canEdit = true

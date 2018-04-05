@@ -35,11 +35,6 @@ class Item < ApplicationRecord
 
   after_commit :reindex_parent_collection
 
-  def reindex_parent_collection
-    return unless parent.present?
-    parent.reindex if Searchkick.callbacks?
-  end
-
   amoeba do
     enable
     exclude_association :tags
@@ -81,6 +76,10 @@ class Item < ApplicationRecord
     filestack_file_duplicate!(i)
 
     i.reload
+    # Ran into a bug on duplication that parent reindexing failed,
+    # So stopping that for now
+    i.dont_reindex_parent!
+    i
   end
 
   def breadcrumb_title
@@ -106,7 +105,16 @@ class Item < ApplicationRecord
     self.name = name.truncate(40, separator: /[,?\.\s]+/, omission: '')
   end
 
+  def dont_reindex_parent!
+    @dont_reindex_parent = true
+  end
+
   private
+
+  def reindex_parent_collection
+    return if @dont_reindex_parent || !Searchkick.callbacks? || parent.blank?
+    parent.reindex
+  end
 
   def format_url
     return if url.blank?

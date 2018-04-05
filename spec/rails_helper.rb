@@ -27,7 +27,7 @@ Dir[Rails.root.join('spec/support/**/*.rb')].each { |f| require f }
 ActiveRecord::Migration.maintain_test_schema!
 
 require 'sidekiq/testing'
-Sidekiq::Testing.fake! 
+Sidekiq::Testing.fake!
 
 RSpec.configure do |config|
   # If you're not using ActiveRecord, or you'd prefer not to run each of your
@@ -56,6 +56,8 @@ RSpec.configure do |config|
   # See: http://www.virtuouscode.com/2012/08/31/configuring-database_cleaner-with-rails-rspec-capybara-and-selenium/
   config.before(:suite) do
     DatabaseCleaner.clean_with(:truncation)
+    # NOTE: need to reindex every searchable model before test suite is run
+    Searchkick.models.each(&:reindex)
     Searchkick.disable_callbacks
   end
 
@@ -70,7 +72,9 @@ RSpec.configure do |config|
   end
 
   config.before(:each, auth: true) do
-    log_in_as_user
+    user = log_in_as_user
+    # Make sure user is part of org - all permissions needs it
+    Organization.create_for_user(user)
     DatabaseCleaner.strategy = :transaction
   end
 
