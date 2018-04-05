@@ -2,6 +2,7 @@ import { Fragment } from 'react'
 import ReactRouterPropTypes from 'react-router-prop-types'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import { Router, Switch, Route } from 'react-router-dom'
+import _ from 'lodash'
 
 import ConfirmationModal from '~/ui/global/modals/ConfirmationModal'
 import InformationModal from '~/ui/global/modals/InformationModal'
