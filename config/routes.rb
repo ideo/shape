@@ -1,6 +1,8 @@
 Rails.application.routes.draw do
   devise_for :users, controllers: { omniauth_callbacks: 'users/omniauth_callbacks' }
 
+  root to: 'home#index', constraints: ->(req) { req.format == :html || req.format == '*/*' }
+
   namespace :api do
     namespace :v1 do
       resources :collections, except: %i[index] do
@@ -17,6 +19,7 @@ Rails.application.routes.draw do
       resources :collection_cards, shallow: true do
         collection do
           patch 'move'
+          post 'link'
         end
         member do
           post 'duplicate'
@@ -68,7 +71,6 @@ Rails.application.routes.draw do
 
   get 'invitations/:token', to: 'invitations#accept', as: :accept_invitation
 
-  root to: 'home#index'
   get :login, to: 'home#login', as: :login
 
   # catch all mailer preview paths

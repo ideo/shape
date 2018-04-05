@@ -9,21 +9,18 @@ class Item < ApplicationRecord
                view_role: Role::VIEWER
 
   archivable as: :parent_collection_card,
-             with: %i[reference_collection_cards]
+             with: %i[cards_linked_to_this_item]
 
   acts_as_taggable
 
-  # The primary collection that 'owns' this item
+  # The card that 'holds' this item and determines its breadcrumb
   has_one :parent_collection_card,
-          -> { primary },
-          class_name: 'CollectionCard',
+          class_name: 'CollectionCard::Primary',
           inverse_of: :item
 
-  # All collection cards this is linked to
-  has_many :reference_collection_cards,
-           -> { reference },
-           class_name: 'CollectionCard',
-           inverse_of: :referenced_item
+  has_many :cards_linked_to_this_item,
+           class_name: 'CollectionCard::Link',
+           inverse_of: :item
 
   delegate :parent, to: :parent_collection_card, allow_nil: true
   belongs_to :cloned_from, class_name: 'Item', optional: true

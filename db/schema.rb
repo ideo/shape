@@ -27,6 +27,7 @@ ActiveRecord::Schema.define(version: 20180329211218) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.boolean "archived", default: false
+    t.string "type"
     t.index ["collection_id"], name: "index_collection_cards_on_collection_id"
     t.index ["item_id"], name: "index_collection_cards_on_item_id"
     t.index ["parent_id"], name: "index_collection_cards_on_parent_id"

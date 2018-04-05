@@ -30,6 +30,7 @@ export default class UiStore {
   @observable isLoading = false
   @observable movingCardIds = []
   @observable movingFromCollectionId = null
+  @observable cardAction = 'move'
   @observable alertModal = {
     open: false,
     prompt: null,
@@ -59,9 +60,11 @@ export default class UiStore {
     this.rolesMenuOpen = false
   }
 
-  @action openMoveMenu({ from: fromCollectionId }) {
+  @action openMoveMenu({ from: fromCollectionId, cardAction }) {
     // On move, copy over selected cards to moving cards
     this.movingFromCollectionId = fromCollectionId
+    // cardAction can be 'move' or 'link'
+    this.cardAction = cardAction || 'move'
     this.movingCardIds.replace([])
     this.selectedCardIds.forEach((id) => {
       this.movingCardIds.push(id)

@@ -13,7 +13,6 @@ const props = {
   record: fakeTextItem,
   handleClick: jest.fn(),
   onMoveStart: jest.fn(),
-  handleMove: jest.fn(),
   dragging: false,
   height: 100,
   menuOpen: false,
@@ -71,9 +70,9 @@ describe('GridCard', () => {
       })
     })
 
-    describe('as reference', () => {
+    describe('as link', () => {
       beforeEach(() => {
-        props.card.reference = true
+        props.card.link = true
         wrapper = shallow(
           <GridCard {...props} />
         )
@@ -132,9 +131,9 @@ describe('GridCard', () => {
       })
     })
 
-    describe('as reference', () => {
+    describe('as link', () => {
       beforeEach(() => {
-        props.card.reference = true
+        props.card.link = true
         wrapper = shallow(
           <GridCard {...props} />
         )

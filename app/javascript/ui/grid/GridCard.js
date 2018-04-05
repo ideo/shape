@@ -35,8 +35,15 @@ export const StyledBottomLeftIcon = styled.div`
   left: 0.25rem;
   bottom: 0;
   color: ${v.colors.gray};
-  width: 34px;
-  height: 34px;
+  width: 45px;
+  height: 45px;
+  /* LinkIcon appears larger than CollectionIcon so we need to make it smaller */
+  ${props => props.small && `
+    width: 18px;
+    height: 18px;
+    bottom: 0.75rem;
+    left: 0.75rem;
+  `}
 `
 StyledBottomLeftIcon.displayName = 'StyledBottomLeftIcon'
 
@@ -120,20 +127,22 @@ class GridCard extends React.Component {
   get renderIcon() {
     const { card, cardType } = this.props
     let icon
+    let small = false
     if (cardType === 'collections') {
-      if (card.reference) {
+      if (card.link) {
         icon = <LinkedCollectionIcon />
       } else {
         icon = <CollectionIcon />
       }
-    } else if (card.reference) {
+    } else if (card.link) {
+      small = true
       icon = <LinkIcon />
     }
 
     if (!icon) return ''
 
     return (
-      <StyledBottomLeftIcon>
+      <StyledBottomLeftIcon small={small}>
         {icon}
       </StyledBottomLeftIcon>
     )
@@ -151,7 +160,6 @@ class GridCard extends React.Component {
       isSharedCollection,
       dragging,
       menuOpen,
-      onMoveStart,
     } = this.props
 
     return (
@@ -174,7 +182,6 @@ class GridCard extends React.Component {
               canEdit={this.canEdit}
               canReplace={this.canReplace}
               menuOpen={menuOpen}
-              handleMove={onMoveStart}
             />
           </StyledTopRightActions>
         }
@@ -198,7 +205,6 @@ GridCard.propTypes = {
   dragging: PropTypes.bool.isRequired,
   handleClick: PropTypes.func.isRequired,
   menuOpen: PropTypes.bool.isRequired,
-  onMoveStart: PropTypes.func.isRequired,
 }
 
 export default GridCard

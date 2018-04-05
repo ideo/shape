@@ -11,7 +11,9 @@ describe Collection, type: :model do
 
   context 'associations' do
     it { should have_many :collection_cards }
-    it { should have_many :reference_collection_cards }
+    it { should have_many :primary_collection_cards }
+    it { should have_many :link_collection_cards }
+    it { should have_many :cards_linked_to_this_collection }
     it { should have_many :items }
     it { should have_many :collections }
     it { should have_one :parent_collection_card }
@@ -37,7 +39,7 @@ describe Collection, type: :model do
   describe '#inherit_parent_organization_id' do
     let!(:parent_collection) { create(:user_collection) }
     let!(:collection_card) { create(:collection_card, parent: parent_collection) }
-    let!(:collection) { create(:collection, name: 'New Collection', organization: nil, collection_cards: [collection_card]) }
+    let!(:collection) { create(:collection, name: 'New Collection', organization: nil, parent_collection_card: collection_card) }
 
     it 'inherits organization id from parent collection' do
       expect(collection.organization_id).to eq(parent_collection.organization_id)

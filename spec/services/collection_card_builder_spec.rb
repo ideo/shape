@@ -163,6 +163,7 @@ RSpec.describe CollectionCardBuilder, type: :service do
             item_attributes: {
               content: 'Test Content',
               type: 'Item::TextItem',
+              text_data: 'xyz',
             },
           ),
           parent_collection: parent,

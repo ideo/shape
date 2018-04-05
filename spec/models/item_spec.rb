@@ -7,7 +7,7 @@ RSpec.describe Item, type: :model do
 
   context 'associations' do
     it { should have_one :parent_collection_card }
-    it { should have_many :reference_collection_cards }
+    it { should have_many :cards_linked_to_this_item }
     it { should belong_to :filestack_file }
     it { should belong_to :cloned_from }
   end

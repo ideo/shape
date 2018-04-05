@@ -32,7 +32,9 @@ describe Archivable, type: :concern do
     describe '#archive!' do
       let(:collection_card) { create(:collection_card_collection) }
       let!(:collection) { create(:collection, num_cards: 3, parent_collection_card: collection_card) }
-      let!(:subcollection) { create(:collection, parent_collection_card: collection.collection_cards.last) }
+      let(:collection_card_link) { create(:collection_card_link, collection: collection) }
+      let!(:subcollection_card) { create(:collection_card_collection, parent: collection) }
+      let!(:subcollection) { subcollection_card.collection }
 
       it 'can be archived' do
         collection_card.archive!
@@ -58,10 +60,18 @@ describe Archivable, type: :concern do
         # should archive the collection
         expect(collection.archived?).to be true
         # and that collection's card(s)
-        expect(collection.collection_cards.first.archived?).to be true
+        expect(collection.all_collection_cards.first.archived?).to be true
         # including each card's items/collections...
-        expect(collection.collection_cards.first.item.archived?).to be true
-        expect(subcollection.archived?).to be true
+        expect(collection.all_collection_cards.first.record.archived?).to be true
+        expect(subcollection.reload.archived?).to be true
+      end
+
+      it 'should only archive the linked card and not its collection' do
+        # archiving from the parent card
+        collection_card_link.archive!
+        # should not archive the collection
+        expect(collection.archived?).to be false
+        expect(collection_card_link.archived?).to be true
       end
     end
   end

@@ -46,7 +46,6 @@ describe('Collection', () => {
       it('should return true', () => {
         expect(collection.isNormalCollection).toBeTruthy()
       })
-
     })
   })
 })

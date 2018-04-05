@@ -1,28 +1,41 @@
 class CardMover
   attr_reader :errors
 
-  def initialize(from_collection:, to_collection:, card_ids:, placement: 'beginning')
+  def initialize(
+    from_collection:,
+    to_collection:,
+    card_ids:,
+    placement: 'beginning',
+    card_action: 'move'
+  )
     @from_collection = from_collection
     @to_collection = to_collection
     @card_ids = card_ids
     @placement = placement
     # retain array of cards being moved
     @moving_cards = @from_collection.collection_cards.where(id: @card_ids).to_a
+    @card_action = card_action
     @errors = []
   end
 
   def call
     return false if to_collection_invalid
     move_cards
-    assign_permissions
+    assign_permissions if @card_action == 'move'
+    @moving_cards
   end
 
   private
 
   def move_cards
-    # get original cards, minus any we're moving
-    existing_cards = @to_collection.collection_cards.to_a.reject do |card|
-      @moving_cards.include? card
+    # get original cards in the destination
+    existing_cards = @to_collection.collection_cards.to_a
+    if @card_action == 'move'
+      # minus any we're moving (i.e. moving within the same collection)
+      existing_cards.reject! { |card| @moving_cards.include? card }
+    elsif @card_action == 'link'
+      # for links, we build new link cards out of our selected moving ones
+      @moving_cards = @moving_cards.map(&:copy_into_new_link_card)
     end
     joined_cards = []
     # created joined array with moving_cards either at beginning or end
