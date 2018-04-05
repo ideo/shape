@@ -56,10 +56,12 @@ class MoveModal extends React.Component {
     uiStore.closeMoveMenu()
     // Notify the user if they're on a different collection
     if (uiStore.movingFromCollectionId !== uiStore.viewingCollection.id) {
-      uiStore.openAlertModal({
-        prompt: 'Your items have been returned to their original location',
-        iconName: 'BackIcon',
-      })
+      if (uiStore.cardAction === 'move') {
+        uiStore.openAlertModal({
+          prompt: 'Your items have been returned to their original location',
+          iconName: 'BackIcon',
+        })
+      }
     }
   }
 
