@@ -23,6 +23,7 @@ describe('CardMenu', () => {
       allActions = [
         'Duplicate',
         'Move',
+        'Link',
         'Archive',
         'Replace',
       ]
