@@ -18,7 +18,6 @@ class Api::V1::CollectionsController < Api::V1::BaseController
   end
 
   def create
-    debugger
     builder = CollectionBuilder.new(params: collection_params,
                                     organization: @organization,
                                     parent_card: @collection_card,
