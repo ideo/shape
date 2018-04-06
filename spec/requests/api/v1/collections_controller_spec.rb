@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-describe Api::V1::CollectionsController, type: :request, auth: true do
+describe Api::V1::CollectionsController, type: :request, json: true, auth: true do
   let(:user) { @user }
 
   describe 'GET #show' do

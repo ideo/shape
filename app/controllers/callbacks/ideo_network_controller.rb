@@ -1,4 +1,4 @@
-class Callbacks::IdeoNetworkController < ActionController::Base
+class Callbacks::IdeoNetworkController < ApplicationController
   before_action :authenticate_request
 
   def users

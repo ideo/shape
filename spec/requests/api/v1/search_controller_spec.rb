@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-describe Api::V1::SearchController, type: :request, auth: true, search: true do
+describe Api::V1::SearchController, type: :request, json: true, auth: true, search: true do
   describe '#GET #search' do
     let!(:current_user) { @user }
     let!(:organization) { current_user.current_organization }

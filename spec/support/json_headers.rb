@@ -1,7 +1,7 @@
 # Implemented so jsonapi-rb plays nicely with expected params
 # https://github.com/jsonapi-rb/jsonapi-rails/issues/79
 
-module ApiDefaultHeaders
+module JsonHeaders
   extend ActiveSupport::Concern
 
   HTTP_METHODS = %w(get post put delete patch).freeze

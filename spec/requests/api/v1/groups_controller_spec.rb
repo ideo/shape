@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-describe Api::V1::GroupsController, type: :request, auth: true do
+describe Api::V1::GroupsController, type: :request, json: true, auth: true do
   let(:user) { @user }
 
   describe 'GET #show' do
