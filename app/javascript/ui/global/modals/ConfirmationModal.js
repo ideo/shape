@@ -1,6 +1,4 @@
 import PropTypes from 'prop-types'
-// import { action, observable } from 'mobx'
-// import { observer } from 'mobx-react'
 import { FormActionsContainer, TextButton } from '~/ui/global/styled/forms'
 import AlertModal from './AlertModal'
 

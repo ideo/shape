@@ -1,7 +1,10 @@
 import _ from 'lodash'
+import { animateScroll } from 'react-scroll'
 import { observable, action, computed } from 'mobx'
 
 export default class UiStore {
+  // store this for usage by other components
+  scroll = animateScroll
   @observable blankContentToolState = {
     order: null,
     width: null,
@@ -44,11 +47,20 @@ export default class UiStore {
   @observable alertModal = { ...this.defaultAlertModalProps }
 
   @action alert(props = {}) {
-    _.assign(this.alertModal, { ...this.defaultAlertModalProps, open: 'info', ...props })
+    _.assign(this.alertModal, {
+      ...this.defaultAlertModalProps,
+      iconName: 'Alert',
+      open: 'info',
+      ...props
+    })
   }
 
   @action confirm(props = {}) {
-    _.assign(this.alertModal, { ...this.defaultAlertModalProps, open: 'confirm', ...props })
+    _.assign(this.alertModal, {
+      ...this.defaultAlertModalProps,
+      open: 'confirm',
+      ...props
+    })
   }
 
   @action closeAlertModal() {

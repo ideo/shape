@@ -21,6 +21,10 @@ const fakeUiStore = {
     cancelText: 'Cancel',
     close: jest.fn(),
   },
+  scroll: {
+    scrollToTop: jest.fn(),
+    scrollToBottom: jest.fn(),
+  },
   closeBlankContentTool: jest.fn(),
   closeMoveMenu: jest.fn(),
   resetSelectionAndBCT: jest.fn(),

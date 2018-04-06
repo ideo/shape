@@ -66,7 +66,9 @@ class CollectionCard extends BaseRecord {
       routingStore.routeTo('/')
       uiStore.alert({
         prompt: 'Your duplicate has been created in My Collection',
+        iconName: 'Ok',
       })
+      uiStore.scroll.scrollToBottom()
     } catch (e) {
       // console.warn(e)
     }

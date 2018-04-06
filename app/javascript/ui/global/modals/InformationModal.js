@@ -1,9 +1,20 @@
 import PropTypes from 'prop-types'
-// import { action, observable } from 'mobx'
-// import { observer } from 'mobx-react'
 import AlertModal from './AlertModal'
 
+function delay(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms))
+}
+
 class InformationModal extends React.PureComponent {
+  componentWillReceiveProps({ fadeOutTime, open }) {
+    if (open !== 'info') return
+    if (fadeOutTime) {
+      delay(fadeOutTime).then(() => {
+        this.props.close()
+      })
+    }
+  }
+
   get isOpen() {
     return this.props.open === 'info'
   }
@@ -29,12 +40,14 @@ InformationModal.propTypes = {
   prompt: PropTypes.string,
   open: PropTypes.string,
   iconName: PropTypes.string,
+  fadeOutTime: PropTypes.number,
 }
 InformationModal.defaultProps = {
   ...AlertModal.defaultProps,
   prompt: '',
   open: '',
   iconName: 'Alert',
+  fadeOutTime: 2000,
 }
 
 export default InformationModal

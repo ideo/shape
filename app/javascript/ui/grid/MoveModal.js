@@ -87,6 +87,11 @@ class MoveModal extends React.Component {
         await apiStore.request('collection_cards/link', 'POST', data)
       }
       uiStore.resetSelectionAndBCT()
+      if (placement === 'beginning') {
+        uiStore.scroll.scrollToTop()
+      } else {
+        uiStore.scroll.scrollToBottom()
+      }
     } catch (e) {
       uiStore.alert({
         prompt: 'You cannot move a collection within itself',

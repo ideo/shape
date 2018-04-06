@@ -20,6 +20,7 @@ describe('MoveModal', () => {
     }
     props.apiStore.request = jest.fn()
     props.uiStore.alert.mockClear()
+    props.uiStore.scroll.scrollToTop.mockClear()
     wrapper = shallow(
       <MoveModal.wrappedComponent {...props} />
     )
@@ -103,9 +104,10 @@ describe('MoveModal', () => {
         expect(props.uiStore.closeMoveMenu).toHaveBeenCalled()
       })
 
-      it('should deselect the cards', async () => {
+      it('should deselect the cards and scroll to top', async () => {
         await component.moveCards('beginning')
         expect(props.uiStore.resetSelectionAndBCT).toHaveBeenCalled()
+        expect(props.uiStore.scroll.scrollToTop).toHaveBeenCalled()
       })
     })
 
