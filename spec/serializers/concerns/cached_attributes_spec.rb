@@ -18,29 +18,50 @@ RSpec.describe CachedAttributes, type: :serializer do
     )
   end
   let(:serialized_attrs) { serialized[:data][:attributes] }
+  let(:collection_cover_double) do
+    instance_double('CollectionCover',
+                    generate: {
+                      url: 'https://filestack.com/image.png',
+                    })
+  end
 
-  it 'has tag_list as a cached attribute' do
+  it 'has tag_list and cover as a cached attribute' do
     expect(SerializableCollection.cached_attribute?(:tag_list)).to be true
+    expect(SerializableCollection.cached_attribute?(:cover)).to be true
   end
 
-  it 'does not have id as cached attribute' do
+  it 'does not have id or name as cached attribute' do
     expect(SerializableCollection.cached_attribute?(:id)).to be false
+    expect(SerializableCollection.cached_attribute?(:name)).to be false
   end
 
-  it 'sets attribute in cache' do
-    allow(Cache).to receive(:get).and_return(nil)
-    collection.update_attributes(tag_list: 'unicorns, rainbows')
-    expect(Cache).to receive(:set).with(
-      instance_of(String),
-      tag_list: ['unicorns', 'rainbows'],
-    )
-    serialized
+  context 'without cached value' do
+    before do
+      allow(Cache).to receive(:get).and_return(nil)
+    end
+
+    it 'sets attribute in cache' do
+      collection.update_attributes(tag_list: 'unicorns, rainbows')
+      allow(CollectionCover).to receive(:new).and_return(collection_cover_double)
+      expect(Cache).to receive(:set).with(
+        instance_of(String),
+        tag_list: ['unicorns', 'rainbows'],
+      )
+      expect(Cache).to receive(:set).with(
+        instance_of(String),
+        tag_list: ['unicorns', 'rainbows'],
+        cover: {
+          url: 'https://filestack.com/image.png',
+        },
+      )
+      serialized
+    end
   end
 
   context 'with cached value' do
     before do
       allow(Cache).to receive(:get).and_return(
-        tag_list: 'bananas, grapes',
+        'tag_list': 'bananas, grapes',
       )
     end
 

@@ -43,6 +43,13 @@ module CachedAttributes
     end
   end
 
+  def initialize(*args)
+    # Have to init this here,
+    # because the super's initialize freezes the object
+    @cached_attributes_values = {}
+    super(*args)
+  end
+
   private
 
   def set_cached_attribute_value(name, value)
@@ -53,12 +60,13 @@ module CachedAttributes
   end
 
   def cached_attributes_values
-    @cached_attributes_values ||= Cache.get(cached_attributes_cache_key) || {}
+    # Must use merge because the class is frozen
+    @cached_attributes_values.merge!(Cache.get(cached_attributes_cache_key) || {})
   end
 
   def cached_attributes_values=(data)
     Cache.set(cached_attributes_cache_key, data)
-    @cached_attributes_values = data
+    @cached_attributes_values.merge!(data)
   end
 
   def cached_attributes_cache_key
