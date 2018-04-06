@@ -10,8 +10,8 @@ module JsonHeaders
     # make requests xhr requests for all tests
     let(:default_headers) {
       {
-        HTTP_ACCEPT: 'application/vnd.api+json',
-        CONTENT_TYPE: 'application/vnd.api+json'
+        HTTP_ACCEPT: 'application/json',
+        CONTENT_TYPE: 'application/json'
       }
     }
 
