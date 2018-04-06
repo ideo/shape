@@ -53,6 +53,8 @@ RSpec.describe Roles::MassAssign, type: :service do
     end
 
     it 'adds links to user collections' do
+      expect(LinkToSharedCollectionsWorker).to receive(:perform_async)
+      assign_role.call
     end
 
     context 'given pending users' do

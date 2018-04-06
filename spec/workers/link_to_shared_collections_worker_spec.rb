@@ -23,7 +23,8 @@ RSpec.describe AddRolesToChildrenWorker, type: :worker do
       expect(fake_link_my).to receive(:save).at_least(:once)
       LinkToSharedCollectionsWorker.new.perform(
         users_to_add.map(&:id),
-        collection_to_link,
+        collection_to_link.id,
+        collection_to_link.class.name.to_s,
       )
 
       expect(fake_link_shared.parent).to be shared_with_me
