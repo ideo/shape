@@ -12,7 +12,6 @@ class UnlinkFromSharedCollectionsWorker
       shared_link = shared.collection_cards.where(collection_id: object_id).first
       my_link = mine.collection_cards.where(collection_id: object_id).first
 
-      debugger
       shared.collection_cards.delete(shared_link)
       mine.collection_cards.delete(my_link)
     end

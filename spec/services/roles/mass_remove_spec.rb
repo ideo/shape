@@ -76,6 +76,20 @@ RSpec.describe Roles::MassRemove, type: :service do
       mass_remove.call
     end
 
+    context 'with a user and a group which contains the same user' do
+      let!(:users) { create_list(:user, 1) }
+      let!(:groups) { [create(:group, add_members: [users.first])] }
+
+      it 'should only pass unique ids to create links' do
+        expect(UnlinkFromSharedCollectionsWorker).to receive(:perform_async).with(
+          (users).map(&:id),
+          collection.id,
+          collection.class.name.to_s,
+        )
+        mass_remove.call
+      end
+    end
+
     context 'if user has other roles on object' do
       before do
         collection.items.each { |i| user.add_role(Role::VIEWER, i) }

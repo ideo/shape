@@ -53,8 +53,29 @@ RSpec.describe Roles::MassAssign, type: :service do
     end
 
     it 'adds links to user collections' do
-      expect(LinkToSharedCollectionsWorker).to receive(:perform_async)
+      all_group_users = groups.reduce([]) {
+        |accg, group| accg + group.roles.reduce([]) {
+          |accr, role| accr + role.users } }
+      expect(LinkToSharedCollectionsWorker).to receive(:perform_async).with(
+        (users + all_group_users).map(&:id),
+        object.id,
+        object.class.name.to_s,
+      )
       assign_role.call
+    end
+
+    context 'with a user and a group which contains the same user' do
+      let!(:users) { create_list(:user, 1) }
+      let!(:groups) { [create(:group, add_members: [users.first])] }
+
+      it 'should only pass unique ids to create links' do
+        expect(LinkToSharedCollectionsWorker).to receive(:perform_async).with(
+          (users).map(&:id),
+          object.id,
+          object.class.name.to_s,
+        )
+        assign_role.call
+      end
     end
 
     context 'given pending users' do

@@ -20,8 +20,9 @@ module Roles
     private
 
     def remove_links_from_user_collections
-      group_users = []
-      @groups.each { |group| group.roles.each { |role| group_users += role.users } }
+      group_users = @groups.reduce([]) {
+        |accg, group| accg + group.roles.reduce([]) {
+          |accr, role| accr + role.users } }
       UnlinkFromSharedCollectionsWorker.perform_async(
         (group_users + @users).uniq.map(&:id),
         @object.id,
