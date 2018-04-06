@@ -110,6 +110,7 @@ group :development do
 end
 
 group :test do
+  gem 'fakeredis', require: 'fakeredis/rspec'
   gem 'shoulda-matchers', '~> 3.1'
   gem 'json-schema'
 end
