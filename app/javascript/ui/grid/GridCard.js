@@ -80,6 +80,8 @@ StyledTopRightActions.displayName = 'StyledTopRightActions'
 class GridCard extends React.Component {
   get canEdit() {
     if (this.props.isSharedCollection) return false
+    // you can always edit your link cards
+    if (this.props.card.link) return true
     return this.props.record.can_edit
   }
 

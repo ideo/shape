@@ -3,8 +3,7 @@ import ReactRouterPropTypes from 'react-router-prop-types'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import { Router, Switch, Route } from 'react-router-dom'
 
-import ConfirmationDialog from '~/ui/global/modals/ConfirmationDialog'
-import AlertDialog from '~/ui/global/modals/AlertDialog'
+import DialogWrapper from '~/ui/global/modals/DialogWrapper'
 import CollectionPage from '~/ui/pages/CollectionPage'
 import ItemPage from '~/ui/pages/ItemPage'
 import SearchPage from '~/ui/pages/SearchPage'
@@ -25,14 +24,16 @@ class Routes extends React.Component {
   }
 
   handleWindowResize = ({ windowWidth }) => {
+    // NOTE: Routes should only interact with uiStore for global re-rendering changes like this
     this.props.uiStore.updateColumnsToFit(windowWidth)
   }
 
   render() {
-    const { history, apiStore, uiStore } = this.props
+    const { history, apiStore } = this.props
     if (!apiStore.currentUser) {
       return <Loader />
     }
+
     return (
       <Fragment>
         <WindowSizeListener onResize={this.handleWindowResize} />
@@ -40,8 +41,7 @@ class Routes extends React.Component {
           organization={apiStore.currentUser.current_organization}
           userGroups={apiStore.currentUser.groups}
         />
-        <ConfirmationDialog {...uiStore.dialogConfig} />
-        <AlertDialog {...uiStore.dialogConfig} />
+        <DialogWrapper />
         <Router history={history}>
           <Switch>
             <Route exact path="/" component={CollectionPage} />
