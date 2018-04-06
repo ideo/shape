@@ -7,13 +7,13 @@ class ConfirmationModal extends React.PureComponent {
     ev.preventDefault()
     const { onCancel } = this.props
     if (onCancel) onCancel()
-    this.props.close()
+    this.props.onClose()
   }
 
   handleConfirm = (ev) => {
     ev.preventDefault()
     this.props.onConfirm()
-    this.props.close()
+    this.props.onClose()
   }
 
   get isOpen() {
@@ -50,7 +50,7 @@ class ConfirmationModal extends React.PureComponent {
 }
 
 ConfirmationModal.propTypes = {
-  ...AlertModal.propTypes,
+  ...AlertModal.childPropTypes,
   prompt: PropTypes.string,
   open: PropTypes.string,
   onConfirm: PropTypes.func,

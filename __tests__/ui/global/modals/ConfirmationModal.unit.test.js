@@ -9,7 +9,7 @@ describe('ConfirmationModal', () => {
   beforeEach(() => {
     props = {
       prompt: 'test prompt',
-      close: jest.fn(),
+      onClose: jest.fn(),
       iconName: 'Close',
       onConfirm: jest.fn(),
       confirmText: 'roger',
@@ -61,7 +61,7 @@ describe('ConfirmationModal', () => {
         })
 
         it('it should close the alert modal', () => {
-          expect(props.close).toHaveBeenCalled()
+          expect(props.onClose).toHaveBeenCalled()
         })
       })
     })
@@ -76,7 +76,7 @@ describe('ConfirmationModal', () => {
       })
 
       it('should close the modal', () => {
-        expect(props.close).toHaveBeenCalled()
+        expect(props.onClose).toHaveBeenCalled()
       })
     })
   })

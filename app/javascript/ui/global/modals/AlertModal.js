@@ -52,7 +52,7 @@ const PromptText = styled.span`
 class AlertModal extends React.PureComponent {
   handleClose = async (ev) => {
     ev.preventDefault()
-    this.props.close()
+    this.props.onClose()
   }
 
   get icon() {
@@ -60,9 +60,6 @@ class AlertModal extends React.PureComponent {
     const icon = ICONS[`${iconName}Icon`]
     return icon ? React.createElement(icon) : ''
   }
-
-  // to be overridden by extended components
-  renderInner = () => ''
 
   render() {
     const { children, open } = this.props
@@ -100,17 +97,15 @@ AlertModal.propTypes = {
     'Leave',
     'Ok',
   ]),
-  children: PropTypes.node,
+  children: PropTypes.node.isRequired,
   open: PropTypes.bool.isRequired,
-  close: PropTypes.func.isRequired,
+  onClose: PropTypes.func.isRequired,
 }
-// AlertModal.wrappedComponent.propTypes = {
-//   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
-// }
-
 AlertModal.defaultProps = {
-  children: <div />,
   iconName: 'Alert',
 }
+// all propTypes except required `children` node, to be used by Information/ConfirmationModal
+const { children, ...childPropTypes } = AlertModal.propTypes
+AlertModal.childPropTypes = childPropTypes
 
 export default AlertModal

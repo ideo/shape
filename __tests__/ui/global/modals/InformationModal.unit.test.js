@@ -7,7 +7,7 @@ describe('InformationModal', () => {
     props = {
       prompt: 'test prompt',
       iconName: 'Close',
-      close: jest.fn(),
+      onClose: jest.fn(),
       open: '',
     }
     wrapper = shallow(

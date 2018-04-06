@@ -10,7 +10,7 @@ class InformationModal extends React.PureComponent {
     if (open !== 'info') return
     if (fadeOutTime) {
       delay(fadeOutTime).then(() => {
-        this.props.close()
+        this.props.onClose()
       })
     }
   }
@@ -36,7 +36,7 @@ class InformationModal extends React.PureComponent {
 }
 
 InformationModal.propTypes = {
-  ...AlertModal.propTypes,
+  ...AlertModal.childPropTypes,
   prompt: PropTypes.string,
   open: PropTypes.string,
   iconName: PropTypes.string,

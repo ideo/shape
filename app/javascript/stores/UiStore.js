@@ -42,7 +42,7 @@ export default class UiStore {
     iconName: null,
     confirmText: 'OK',
     cancelText: 'Cancel',
-    close: () => this.closeAlertModal(),
+    onClose: () => this.closeAlertModal(),
   }
   @observable alertModal = { ...this.defaultAlertModalProps }
 
