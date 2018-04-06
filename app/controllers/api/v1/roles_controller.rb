@@ -64,6 +64,7 @@ class Api::V1::RolesController < Api::V1::BaseController
       users: [user].compact,
       groups: [group].compact,
       remove_from_children_sync: false,
+      remove_link: true,
     ).call
   end
 
