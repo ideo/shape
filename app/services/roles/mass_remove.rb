@@ -2,10 +2,11 @@ module Roles
   class MassRemove
     attr_reader :errors
 
-    def initialize(object:, role_name:, users: [], groups: [], remove_from_children_sync: false)
+    def initialize(object:, role_name:, users: [], groups: [], remove_from_children_sync: false, remove_link: false)
       @object = object
       @role_name = role_name
       @remove_from_children_sync = remove_from_children_sync
+      @remove_link = remove_link
       @users = users
       @groups = groups
       @errors = []
@@ -13,7 +14,7 @@ module Roles
 
     def call
       remove_role_from_object(@object)
-      remove_links_from_user_collections
+      remove_links_from_user_collections if @remove_link
       remove_roles_from_children
     end
 

@@ -30,7 +30,7 @@ module Roles
       assign_role_to_users
       notify_users if @invited_by
       assign_role_to_groups
-      link_to_shared_collections
+      link_to_shared_collections if @invited_by
       add_roles_to_children if @propagate_to_children
       failed_users.blank? && failed_groups.blank?
     end
