@@ -67,9 +67,24 @@ RSpec.describe Roles::MassRemove, type: :service do
       end
     end
 
+    it 'removes links from user collections' do
+      expect(UnlinkFromSharedCollectionsWorker).to receive(:perform_async).with(
+        [user.id] + group.roles.reduce([]) { |acc, role| acc + role.users },
+        collection.id,
+        collection.class.name.to_s,
+      )
+      mass_remove.call
+    end
+
     context 'if user has other roles on object' do
       before do
         collection.items.each { |i| user.add_role(Role::VIEWER, i) }
+       { roles: [
+        { id: 1, users: [
+          { name: "Mo" }, { name: "Me" }
+        ] },
+        { id: 2, users: [
+          { name: "No" }] }] }
       end
 
       it 'should leave any other roles from same user' do

@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe AddRolesToChildrenWorker, type: :worker do
+RSpec.describe LinkToSharedCollectionsWorker, type: :worker do
   describe '#perform' do
     let(:users_to_add) { create_list(:user, 3) }
     let(:collection_to_link) { create(:collection) }

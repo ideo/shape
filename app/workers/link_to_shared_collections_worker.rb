@@ -24,7 +24,6 @@ class LinkToSharedCollectionsWorker
     link.width = 1
     link.height = 1
     link.order = collection.collection_cards.count
-    # Is it better to batch save somehow?
     link.save
   end
 end
