@@ -52,6 +52,9 @@ RSpec.describe Roles::MassAssign, type: :service do
       assign_role.call
     end
 
+    it 'adds links to user collections' do
+    end
+
     context 'given pending users' do
       let!(:users) { create_list(:user, 3, :pending) }
 
