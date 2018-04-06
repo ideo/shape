@@ -11,7 +11,7 @@ const fakeUiStore = {
     height: null,
     replacingId: null,
   },
-  alertModal: {
+  dialogConfig: {
     open: null,
     prompt: null,
     onConfirm: null,
@@ -19,7 +19,7 @@ const fakeUiStore = {
     iconName: null,
     confirmText: 'OK',
     cancelText: 'Cancel',
-    close: jest.fn(),
+    onClose: jest.fn(),
   },
   scroll: {
     scrollToTop: jest.fn(),
@@ -39,7 +39,7 @@ const fakeUiStore = {
   update: jest.fn(),
   alert: jest.fn(),
   confirm: jest.fn(),
-  closeAlertModal: jest.fn(),
+  closeDialog: jest.fn(),
   cardAction: 'move',
 }
 

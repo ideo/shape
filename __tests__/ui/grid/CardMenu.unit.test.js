@@ -69,7 +69,7 @@ describe('CardMenu', () => {
 
   describe('as viewer', () => {
     beforeEach(() => {
-      actions = ['Duplicate']
+      actions = ['Duplicate', 'Link']
       props.canEdit = false
       props.canReplace = false
       wrapper = shallow(
@@ -77,9 +77,9 @@ describe('CardMenu', () => {
       )
     })
 
-    it('creates a PopoutMenu with only 1 viewer action', () => {
+    it('creates a PopoutMenu with Duplicate and Link viewer actions', () => {
       const popout = wrapper.find('PopoutMenu').at(0)
-      expect(popout.props().menuItems.length).toEqual(1)
+      expect(popout.props().menuItems.length).toEqual(2)
       expect(_.map(popout.props().menuItems, i => i.name)).toEqual(actions)
     })
   })

@@ -3,8 +3,8 @@ import ReactRouterPropTypes from 'react-router-prop-types'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import { Router, Switch, Route } from 'react-router-dom'
 
-import ConfirmationModal from '~/ui/global/modals/ConfirmationModal'
-import InformationModal from '~/ui/global/modals/InformationModal'
+import ConfirmationDialog from '~/ui/global/modals/ConfirmationDialog'
+import AlertDialog from '~/ui/global/modals/AlertDialog'
 import CollectionPage from '~/ui/pages/CollectionPage'
 import ItemPage from '~/ui/pages/ItemPage'
 import SearchPage from '~/ui/pages/SearchPage'
@@ -40,8 +40,8 @@ class Routes extends React.Component {
           organization={apiStore.currentUser.current_organization}
           userGroups={apiStore.currentUser.groups}
         />
-        <ConfirmationModal {...uiStore.alertModal} />
-        <InformationModal {...uiStore.alertModal} />
+        <ConfirmationDialog {...uiStore.dialogConfig} />
+        <AlertDialog {...uiStore.dialogConfig} />
         <Router history={history}>
           <Switch>
             <Route exact path="/" component={CollectionPage} />

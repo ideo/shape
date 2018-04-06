@@ -1,11 +1,11 @@
 import PropTypes from 'prop-types'
-import AlertModal from './AlertModal'
+import Dialog from './Dialog'
 
 function delay(ms) {
   return new Promise(resolve => setTimeout(resolve, ms))
 }
 
-class InformationModal extends React.PureComponent {
+class AlertDialog extends React.PureComponent {
   componentWillReceiveProps({ fadeOutTime, open }) {
     if (open !== 'info') return
     if (fadeOutTime) {
@@ -24,30 +24,30 @@ class InformationModal extends React.PureComponent {
     const modalProps = { ...this.props, open: this.isOpen }
 
     return (
-      <AlertModal {...modalProps}>
+      <Dialog {...modalProps}>
         <div>
           <p>
             { prompt }
           </p>
         </div>
-      </AlertModal>
+      </Dialog>
     )
   }
 }
 
-InformationModal.propTypes = {
-  ...AlertModal.childPropTypes,
+AlertDialog.propTypes = {
+  ...Dialog.childPropTypes,
   prompt: PropTypes.string,
   open: PropTypes.string,
   iconName: PropTypes.string,
   fadeOutTime: PropTypes.number,
 }
-InformationModal.defaultProps = {
-  ...AlertModal.defaultProps,
+AlertDialog.defaultProps = {
+  ...Dialog.defaultProps,
   prompt: '',
   open: '',
   iconName: 'Alert',
   fadeOutTime: 2000,
 }
 
-export default InformationModal
+export default AlertDialog

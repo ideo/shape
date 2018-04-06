@@ -1,8 +1,8 @@
 import PropTypes from 'prop-types'
 import { FormActionsContainer, TextButton } from '~/ui/global/styled/forms'
-import AlertModal from './AlertModal'
+import Dialog from './Dialog'
 
-class ConfirmationModal extends React.PureComponent {
+class ConfirmationDialog extends React.PureComponent {
   handleCancel = (ev) => {
     ev.preventDefault()
     const { onCancel } = this.props
@@ -30,7 +30,7 @@ class ConfirmationModal extends React.PureComponent {
     const modalProps = { ...this.props, open: this.isOpen }
 
     return (
-      <AlertModal {...modalProps}>
+      <Dialog {...modalProps}>
         <form>
           <p>
             { prompt }
@@ -44,13 +44,13 @@ class ConfirmationModal extends React.PureComponent {
             </TextButton>
           </FormActionsContainer>
         </form>
-      </AlertModal>
+      </Dialog>
     )
   }
 }
 
-ConfirmationModal.propTypes = {
-  ...AlertModal.childPropTypes,
+ConfirmationDialog.propTypes = {
+  ...Dialog.childPropTypes,
   prompt: PropTypes.string,
   open: PropTypes.string,
   onConfirm: PropTypes.func,
@@ -58,8 +58,8 @@ ConfirmationModal.propTypes = {
   confirmText: PropTypes.string,
   cancelText: PropTypes.string,
 }
-ConfirmationModal.defaultProps = {
-  ...AlertModal.defaultProps,
+ConfirmationDialog.defaultProps = {
+  ...Dialog.defaultProps,
   prompt: '',
   open: '',
   onConfirm: null,
@@ -68,4 +68,4 @@ ConfirmationModal.defaultProps = {
   cancelText: 'Cancel',
 }
 
-export default ConfirmationModal
+export default ConfirmationDialog

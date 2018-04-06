@@ -34,7 +34,7 @@ export default class UiStore {
   @observable movingCardIds = []
   @observable movingFromCollectionId = null
   @observable cardAction = 'move'
-  defaultAlertModalProps = {
+  defaultDialogProps = {
     open: null,
     prompt: null,
     onConfirm: null,
@@ -42,13 +42,13 @@ export default class UiStore {
     iconName: null,
     confirmText: 'OK',
     cancelText: 'Cancel',
-    onClose: () => this.closeAlertModal(),
+    onClose: () => this.closeDialog(),
   }
-  @observable alertModal = { ...this.defaultAlertModalProps }
+  @observable dialogConfig = { ...this.defaultDialogProps }
 
   @action alert(props = {}) {
-    _.assign(this.alertModal, {
-      ...this.defaultAlertModalProps,
+    _.assign(this.dialogConfig, {
+      ...this.defaultDialogProps,
       iconName: 'Alert',
       open: 'info',
       ...props
@@ -56,15 +56,15 @@ export default class UiStore {
   }
 
   @action confirm(props = {}) {
-    _.assign(this.alertModal, {
-      ...this.defaultAlertModalProps,
+    _.assign(this.dialogConfig, {
+      ...this.defaultDialogProps,
       open: 'confirm',
       ...props
     })
   }
 
-  @action closeAlertModal() {
-    this.alertModal.open = null
+  @action closeDialog() {
+    this.dialogConfig.open = null
   }
 
   // default action for updating any basic UiStore value

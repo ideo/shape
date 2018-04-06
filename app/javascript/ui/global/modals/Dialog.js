@@ -1,13 +1,13 @@
 import PropTypes from 'prop-types'
 import styled from 'styled-components'
-import Dialog from 'material-ui/Dialog'
+import MuiDialog from 'material-ui/Dialog'
 
 import v from '~/utils/variables'
-import ICONS from '~/ui/icons/alertModalIcons'
+import ICONS from '~/ui/icons/dialogIcons'
 
 const { CloseIcon } = ICONS
 
-const StyledDialog = styled(Dialog)`
+const StyledDialog = styled(MuiDialog)`
   .modal__paper {
     background-color: ${v.colors.cloudy};
     border-radius: 6px;
@@ -49,7 +49,7 @@ const PromptText = styled.span`
   }
 `
 
-class AlertModal extends React.PureComponent {
+class Dialog extends React.PureComponent {
   handleClose = async (ev) => {
     ev.preventDefault()
     this.props.onClose()
@@ -88,7 +88,7 @@ class AlertModal extends React.PureComponent {
   }
 }
 
-AlertModal.propTypes = {
+Dialog.propTypes = {
   iconName: PropTypes.oneOf([
     'Alert',
     'Archive',
@@ -101,11 +101,11 @@ AlertModal.propTypes = {
   open: PropTypes.bool.isRequired,
   onClose: PropTypes.func.isRequired,
 }
-AlertModal.defaultProps = {
+Dialog.defaultProps = {
   iconName: 'Alert',
 }
 // all propTypes except required `children` node, to be used by Information/ConfirmationModal
-const { children, ...childPropTypes } = AlertModal.propTypes
-AlertModal.childPropTypes = childPropTypes
+const { children, ...childPropTypes } = Dialog.propTypes
+Dialog.childPropTypes = childPropTypes
 
-export default AlertModal
+export default Dialog

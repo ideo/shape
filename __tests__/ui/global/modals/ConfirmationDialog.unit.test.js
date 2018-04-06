@@ -1,6 +1,6 @@
-import ConfirmationModal from '~/ui/global/modals/ConfirmationModal'
+import ConfirmationDialog from '~/ui/global/modals/ConfirmationDialog'
 
-describe('ConfirmationModal', () => {
+describe('ConfirmationDialog', () => {
   const fakeEvent = {
     preventDefault: jest.fn(),
   }
@@ -15,13 +15,13 @@ describe('ConfirmationModal', () => {
       confirmText: 'roger',
     }
     wrapper = shallow(
-      <ConfirmationModal {...props} />
+      <ConfirmationDialog {...props} />
     )
     component = wrapper.instance()
   })
 
-  it('should render the AlertModal', () => {
-    alert = wrapper.find('AlertModal')
+  it('should render the Dialog', () => {
+    alert = wrapper.find('Dialog')
     expect(alert.exists()).toBe(true)
     expect(component.isOpen).toBeFalsy()
   })
@@ -32,9 +32,9 @@ describe('ConfirmationModal', () => {
       wrapper.setProps(props)
     })
 
-    it('should set AlertModal open prop', () => {
+    it('should set Dialog open prop', () => {
       component = wrapper.instance()
-      alert = wrapper.find('AlertModal')
+      alert = wrapper.find('Dialog')
       expect(component.isOpen).toBeTruthy()
       expect(alert.props().open).toBe(true)
     })
