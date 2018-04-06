@@ -85,7 +85,8 @@ module Roles
       @added_groups.each { |group| group.roles.each { |role| group_users += role.users } }
       LinkToSharedCollectionsWorker.perform_async(
         (group_users + @added_users).uniq.map(&:id),
-        @object,
+        @object.id,
+        @object.class.name.to_s,
       )
     end
 
