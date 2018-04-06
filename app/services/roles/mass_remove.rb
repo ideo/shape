@@ -13,10 +13,21 @@ module Roles
 
     def call
       remove_role_from_object(@object)
+      remove_links_from_user_collections
       remove_roles_from_children
     end
 
     private
+
+    def remove_links_from_user_collections
+      group_users = []
+      @groups.each { |group| group.roles.each { |role| group_users += role.users } }
+      UnlinkFromSharedCollectionsWorker.perform_async(
+        (group_users + @users).uniq.map(&:id),
+        @object.id,
+        @object.class.name.to_s,
+      )
+    end
 
     # Removes roles synchronously from children,
     # and asynchronously from grandchildren
