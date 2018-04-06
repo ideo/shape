@@ -1,40 +1,38 @@
-import React from 'react'
 import PropTypes from 'prop-types'
-import { action, observable } from 'mobx'
-import { observer } from 'mobx-react'
+// import { action, observable } from 'mobx'
+// import { observer } from 'mobx-react'
 import { FormActionsContainer, TextButton } from '~/ui/global/styled/forms'
 import AlertModal from './AlertModal'
 
-@observer
-class ConfirmationModal extends React.Component {
-  @observable isOpen = true
-
+class ConfirmationModal extends React.PureComponent {
   handleCancel = (ev) => {
     ev.preventDefault()
     const { onCancel } = this.props
-    if (!onCancel) return this.setOpen(false)
-    return onCancel()
+    if (onCancel) onCancel()
+    this.props.close()
   }
 
   handleConfirm = (ev) => {
     ev.preventDefault()
     this.props.onConfirm()
-    this.setOpen(false)
+    this.props.close()
   }
 
-  @action setOpen(val) {
-    this.isOpen = val
+  get isOpen() {
+    return this.props.open === 'confirm'
   }
 
   render() {
     const {
       cancelText,
       confirmText,
-      iconName,
       prompt,
     } = this.props
+
+    const modalProps = { ...this.props, open: this.isOpen }
+
     return (
-      <AlertModal open={this.isOpen} iconName={iconName} >
+      <AlertModal {...modalProps}>
         <form>
           <p>
             { prompt }
@@ -52,17 +50,23 @@ class ConfirmationModal extends React.Component {
     )
   }
 }
+
 ConfirmationModal.propTypes = {
-  iconName: AlertModal.propTypes.iconName.isRequired,
-  prompt: PropTypes.node.isRequired,
-  onConfirm: PropTypes.func.isRequired,
+  ...AlertModal.propTypes,
+  prompt: PropTypes.string,
+  open: PropTypes.string,
+  onConfirm: PropTypes.func,
   onCancel: PropTypes.func,
   confirmText: PropTypes.string,
   cancelText: PropTypes.string,
 }
 ConfirmationModal.defaultProps = {
+  ...AlertModal.defaultProps,
+  prompt: '',
+  open: '',
+  onConfirm: null,
   onCancel: null,
-  confirmText: 'Roger',
+  confirmText: 'OK',
   cancelText: 'Cancel',
 }
 

@@ -1,37 +1,19 @@
-import React from 'react'
 import PropTypes from 'prop-types'
-import { action, observable } from 'mobx'
-import { observer } from 'mobx-react'
-import CloseIcon from '~/ui/icons/CloseIcon'
+// import { action, observable } from 'mobx'
+// import { observer } from 'mobx-react'
 import AlertModal from './AlertModal'
 
-// Wrap setTimeout in promise for better API and easier testing
-function delay(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms))
-}
-
-@observer
-class InformationModal extends React.Component {
-  @observable isOpen = true
-
-  componentDidMount() {
-    return delay(this.props.fadeOutTime).then(() => {
-      // Change the open value so we get the closing animation from MUI.
-      this.setOpen(false)
-    })
-  }
-
-  @action setOpen(val) {
-    this.isOpen = val
+class InformationModal extends React.PureComponent {
+  get isOpen() {
+    return this.props.open === 'info'
   }
 
   render() {
-    const {
-      iconName,
-      prompt,
-    } = this.props
+    const { prompt } = this.props
+    const modalProps = { ...this.props, open: this.isOpen }
+
     return (
-      <AlertModal open={this.isOpen} iconName={iconName}>
+      <AlertModal {...modalProps}>
         <div>
           <p>
             { prompt }
@@ -41,16 +23,18 @@ class InformationModal extends React.Component {
     )
   }
 }
-InformationModal.propTypes = {
-  iconName: AlertModal.propTypes.iconName,
-  prompt: PropTypes.node,
-  fadeOutTime: PropTypes.number,
-}
 
+InformationModal.propTypes = {
+  ...AlertModal.propTypes,
+  prompt: PropTypes.string,
+  open: PropTypes.string,
+  iconName: PropTypes.string,
+}
 InformationModal.defaultProps = {
-  iconName: 'CloseIcon',
-  prompt: <span>Something went wrong!</span>,
-  fadeOutTime: 2000,
+  ...AlertModal.defaultProps,
+  prompt: '',
+  open: '',
+  iconName: 'Alert',
 }
 
 export default InformationModal

@@ -233,7 +233,7 @@ class Collection < ApplicationRecord
   end
 
   # convenience method if card order ever gets out of sync
-  def reorder_cards
+  def reorder_cards!
     collection_cards.each_with_index do |card, i|
       card.update_attribute(:order, i)
     end

@@ -19,7 +19,7 @@ describe('MoveModal', () => {
       uiStore,
     }
     props.apiStore.request = jest.fn()
-    props.uiStore.openAlertModal.mockClear()
+    props.uiStore.alert.mockClear()
     wrapper = shallow(
       <MoveModal.wrappedComponent {...props} />
     )
@@ -50,7 +50,7 @@ describe('MoveModal', () => {
       })
 
       it('should show a warning', () => {
-        expect(uiStore.openAlertModal).toHaveBeenCalled()
+        expect(uiStore.alert).toHaveBeenCalled()
       })
     })
 
@@ -63,7 +63,7 @@ describe('MoveModal', () => {
 
       it('should show an alert dialog on failure', async () => {
         await component.moveCards('top')
-        expect(uiStore.openAlertModal).toHaveBeenCalledWith({
+        expect(uiStore.alert).toHaveBeenCalledWith({
           prompt: 'You cannot move a collection within itself',
         })
       })

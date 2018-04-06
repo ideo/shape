@@ -1,13 +1,14 @@
 import InformationModal from '~/ui/global/modals/InformationModal'
 
 describe('InformationModal', () => {
-  let props, wrapper, component
+  let props, wrapper, component, alert
 
-  beforeEach(async () => {
+  beforeEach(() => {
     props = {
       prompt: 'test prompt',
-      iconName: 'CloseIcon',
-      fadeOutTime: 20,
+      iconName: 'Close',
+      close: jest.fn(),
+      open: '',
     }
     wrapper = shallow(
       <InformationModal {...props} />
@@ -15,12 +16,19 @@ describe('InformationModal', () => {
     component = wrapper.instance()
   })
 
-  describe('componentDidMount', () => {
-    it('should set open to false after the timeout', async () => {
-      await component.componentDidMount
-      // TODO fix this not working test, it seems like componentDidMount is
-      // not returning the promise
-      // expect(component.isOpen).toBeFalsy()
+  it('should render the AlertModal', () => {
+    alert = wrapper.find('AlertModal')
+    expect(alert.exists()).toBe(true)
+    expect(component.isOpen).toBeFalsy()
+  })
+
+  describe('when open', () => {
+    it('should set AlertModal open prop', () => {
+      wrapper.setProps({ ...props, open: 'info' })
+      component = wrapper.instance()
+      alert = wrapper.find('AlertModal')
+      expect(component.isOpen).toBeTruthy()
+      expect(alert.props().open).toBe(true)
     })
   })
 })

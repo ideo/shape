@@ -1,15 +1,11 @@
-import React from 'react'
 import PropTypes from 'prop-types'
-import { inject, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 import Dialog from 'material-ui/Dialog'
-import { ConfirmText } from '~/ui/global/styled/typography'
-import { FormActionsContainer, TextButton } from '~/ui/global/styled/forms'
+
 import v from '~/utils/variables'
-import ArchiveIcon from '~/ui/icons/ArchiveIcon'
-import BackIcon from '~/ui/icons/BackIcon'
-import CloseIcon from '~/ui/icons/CloseIcon'
-import LeaveIcon from '~/ui/icons/LeaveIcon'
+import ICONS from '~/ui/icons/alertModalIcons'
+
+const { CloseIcon } = ICONS
 
 const StyledDialog = styled(Dialog)`
   .modal__paper {
@@ -53,31 +49,20 @@ const PromptText = styled.span`
   }
 `
 
-@inject('uiStore')
-class AlertModal extends React.Component {
-  close = () => {
-    this.props.uiStore.closeAlertModal()
-  }
-
-  handleClose = (ev) => {
+class AlertModal extends React.PureComponent {
+  handleClose = async (ev) => {
     ev.preventDefault()
-    this.close()
+    this.props.close()
   }
 
   get icon() {
-    switch (this.props.iconName) {
-    case 'ArchiveIcon':
-      return <ArchiveIcon />
-    case 'CloseIcon':
-      return <CloseIcon />
-    case 'LeaveIcon':
-      return <LeaveIcon />
-    case 'BackIcon':
-      return <BackIcon />
-    default:
-      return <CloseIcon />
-    }
+    const { iconName } = this.props
+    const icon = ICONS[`${iconName}Icon`]
+    return icon ? React.createElement(icon) : ''
   }
+
+  // to be overridden by extended components
+  renderInner = () => ''
 
   render() {
     const { children, open } = this.props
@@ -86,7 +71,6 @@ class AlertModal extends React.Component {
         open={open}
         classes={{ paper: 'modal__paper' }}
         onClose={this.handleClose}
-        onExited={this.close}
         onBackdropClick={this.handleClose}
         aria-labelledby="Confirmation"
         BackdropProps={{ invisible: true }}
@@ -106,19 +90,27 @@ class AlertModal extends React.Component {
     )
   }
 }
+
 AlertModal.propTypes = {
-  iconName: PropTypes.oneOf(['ArchiveIcon', 'CloseIcon', 'LeaveIcon', 'BackIcon',
+  iconName: PropTypes.oneOf([
+    'Alert',
+    'Archive',
+    'Back',
+    'Close',
+    'Leave',
+    'Ok',
   ]),
-  children: PropTypes.node.isRequired,
-  open: PropTypes.bool,
+  children: PropTypes.node,
+  open: PropTypes.bool.isRequired,
+  close: PropTypes.func.isRequired,
 }
-AlertModal.wrappedComponent.propTypes = {
-  uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
-}
+// AlertModal.wrappedComponent.propTypes = {
+//   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
+// }
 
 AlertModal.defaultProps = {
-  open: false,
-  iconName: 'CloseIcon',
+  children: <div />,
+  iconName: 'Alert',
 }
 
 export default AlertModal

@@ -104,15 +104,14 @@ class SearchResultsInfinite extends React.Component {
     const results = (
       searchResults.map((collection, i) => (
         <FlipMove
-          appearAnimation="elevator"
+          appearAnimation="fade"
           key={collection.id}
         >
           <VisibilitySensor
             // minTopValue={1} // consider visible even if we only see top 25px
             partialVisibility
             scrollCheck
-            scrollThrottle={250}
-            intervalDelay={5000}
+            intervalDelay={300}
             onChange={this.handleVisibilityChange(i + 1)}
             offset={{
               top: v.headerHeightCompact + (gridSettings.gridH / 2),

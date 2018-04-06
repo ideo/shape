@@ -12,10 +12,10 @@ export const archive = (type, obj) => {
       routingStore.push(redirect)
     })
 
-  uiStore.openAlertModal({
+  uiStore.confirm({
     prompt: 'Are you sure you want to archive this?',
     confirmText: 'Archive',
-    iconName: 'ArchiveIcon',
+    iconName: 'Archive',
     onConfirm: onAgree,
   })
 }

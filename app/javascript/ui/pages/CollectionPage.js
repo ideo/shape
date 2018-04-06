@@ -140,6 +140,9 @@ class CollectionPage extends PageWithApi {
             cardIds={collection.cardIds}
             // Pass in BCT state so grid will re-render when open/closed
             blankContentToolState={uiStore.blankContentToolState}
+            movingCardIds={uiStore.movingCardIds}
+            // rendering length seems to properly trigger a re-render
+            movingCards={uiStore.movingCardIds.length}
           />
           <MoveModal />
         </PageContainer>

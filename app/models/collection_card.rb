@@ -38,8 +38,10 @@ class CollectionCard < ApplicationRecord
 
   def duplicate!(for_user:, parent: self.parent, shallow: false, update_order: false)
     cc = amoeba_dup
-    cc.parent = parent # defaults to self.parent, unless one is passed in
-    cc.order += 1
+    # defaults to self.parent, unless one is passed in
+    cc.parent = parent
+    # place card at end
+    cc.order = parent.collection_cards.count
 
     unless shallow || link?
       cc.collection = collection.duplicate!(for_user: for_user) if collection.present?

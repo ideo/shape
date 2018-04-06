@@ -31,24 +31,28 @@ export default class UiStore {
   @observable movingCardIds = []
   @observable movingFromCollectionId = null
   @observable cardAction = 'move'
-  @observable alertModal = {
-    open: false,
+  defaultAlertModalProps = {
+    open: null,
     prompt: null,
     onConfirm: null,
     onCancel: null,
-    icon: null,
-    confirmText: null,
-    cancelText: null,
+    iconName: null,
+    confirmText: 'OK',
+    cancelText: 'Cancel',
+    close: () => this.closeAlertModal(),
+  }
+  @observable alertModal = { ...this.defaultAlertModalProps }
+
+  @action alert(props = {}) {
+    _.assign(this.alertModal, { ...this.defaultAlertModalProps, open: 'info', ...props })
   }
 
-  @action openAlertModal(props) {
-    this.alertModal = { open: true, ...props }
-    this.alertModal.open = true
+  @action confirm(props = {}) {
+    _.assign(this.alertModal, { ...this.defaultAlertModalProps, open: 'confirm', ...props })
   }
 
   @action closeAlertModal() {
-    _.mapValues(this.alertModal, () => null)
-    this.alertModal.open = false
+    this.alertModal.open = null
   }
 
   // default action for updating any basic UiStore value
@@ -61,19 +65,18 @@ export default class UiStore {
   }
 
   @action openMoveMenu({ from: fromCollectionId, cardAction }) {
+    this.openCardMenuId = false
     // On move, copy over selected cards to moving cards
     this.movingFromCollectionId = fromCollectionId
     // cardAction can be 'move' or 'link'
     this.cardAction = cardAction || 'move'
-    this.movingCardIds.replace([])
-    this.selectedCardIds.forEach((id) => {
-      this.movingCardIds.push(id)
-    })
+    this.movingCardIds.replace([...this.selectedCardIds])
   }
 
   @action closeMoveMenu() {
     this.movingCardIds.replace([])
     this.movingFromCollectionId = null
+    this.deselectCards()
   }
 
   // --- grid properties

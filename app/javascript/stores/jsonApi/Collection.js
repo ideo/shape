@@ -43,7 +43,7 @@ class Collection extends BaseRecord {
   _reorderCards() {
     if (this.collection_cards) {
       return _.each(_.sortBy(this.collection_cards, 'order'), (card, i) => {
-        card.order = i + 1
+        card.order = i
       })
     }
     return false
