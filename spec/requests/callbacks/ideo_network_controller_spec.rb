@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-describe 'Ideo Profile API Requests', json: true do
+describe 'Ideo Profile API Requests' do
   describe 'POST #user' do
     let!(:user) { create(:user) }
     let(:uid) { user.uid }
