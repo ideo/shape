@@ -167,7 +167,7 @@ class Collection < ApplicationRecord
     exclude_association :parent_collection_card
   end
 
-  def duplicate!(for_user:, copy_parent_card: false)
+  def duplicate!(for_user:, copy_parent_card: false, parent: self.parent)
     # Clones collection and all embedded items/collections
     c = amoeba_dup
     c.cloned_from = self
@@ -182,6 +182,7 @@ class Collection < ApplicationRecord
       c.parent_collection_card = parent_collection_card.duplicate!(
         for_user: for_user,
         shallow: true,
+        parent: parent,
       )
       c.parent_collection_card.collection = c
     end
@@ -233,7 +234,7 @@ class Collection < ApplicationRecord
   end
 
   # convenience method if card order ever gets out of sync
-  def reorder_cards
+  def reorder_cards!
     collection_cards.each_with_index do |card, i|
       card.update_attribute(:order, i)
     end

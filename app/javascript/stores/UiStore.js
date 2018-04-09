@@ -1,7 +1,10 @@
 import _ from 'lodash'
+import { animateScroll } from 'react-scroll'
 import { observable, action, computed } from 'mobx'
 
 export default class UiStore {
+  // store this for usage by other components
+  scroll = animateScroll
   @observable blankContentToolState = {
     order: null,
     width: null,
@@ -31,24 +34,37 @@ export default class UiStore {
   @observable movingCardIds = []
   @observable movingFromCollectionId = null
   @observable cardAction = 'move'
-  @observable alertModal = {
-    open: false,
+  defaultDialogProps = {
+    open: null,
     prompt: null,
     onConfirm: null,
     onCancel: null,
-    icon: null,
-    confirmText: null,
-    cancelText: null,
+    iconName: null,
+    confirmText: 'OK',
+    cancelText: 'Cancel',
+    onClose: () => this.closeDialog(),
+  }
+  @observable dialogConfig = { ...this.defaultDialogProps }
+
+  @action alert(props = {}) {
+    _.assign(this.dialogConfig, {
+      ...this.defaultDialogProps,
+      iconName: 'Alert',
+      open: 'info',
+      ...props
+    })
   }
 
-  @action openAlertModal(props) {
-    this.alertModal = { open: true, ...props }
-    this.alertModal.open = true
+  @action confirm(props = {}) {
+    _.assign(this.dialogConfig, {
+      ...this.defaultDialogProps,
+      open: 'confirm',
+      ...props
+    })
   }
 
-  @action closeAlertModal() {
-    _.mapValues(this.alertModal, () => null)
-    this.alertModal.open = false
+  @action closeDialog() {
+    this.dialogConfig.open = null
   }
 
   // default action for updating any basic UiStore value
@@ -61,19 +77,18 @@ export default class UiStore {
   }
 
   @action openMoveMenu({ from: fromCollectionId, cardAction }) {
+    this.openCardMenuId = false
     // On move, copy over selected cards to moving cards
     this.movingFromCollectionId = fromCollectionId
     // cardAction can be 'move' or 'link'
     this.cardAction = cardAction || 'move'
-    this.movingCardIds.replace([])
-    this.selectedCardIds.forEach((id) => {
-      this.movingCardIds.push(id)
-    })
+    this.movingCardIds.replace([...this.selectedCardIds])
   }
 
   @action closeMoveMenu() {
     this.movingCardIds.replace([])
     this.movingFromCollectionId = null
+    this.deselectCards()
   }
 
   // --- grid properties

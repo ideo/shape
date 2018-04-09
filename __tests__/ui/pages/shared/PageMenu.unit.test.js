@@ -15,11 +15,13 @@ let wrapper, actions, readOnlyActions
 describe('PageMenu', () => {
   beforeEach(() => {
     actions = [
+      'Duplicate',
       'Tags',
       'Permissions',
       'Archive'
     ]
     readOnlyActions = [
+      'Duplicate',
       'Tags',
       'Permissions',
     ]

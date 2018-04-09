@@ -1,6 +1,7 @@
 import { action, observable } from 'mobx'
 
 import { uiStore } from '~/stores'
+import Api from './Api'
 import BaseRecord from './BaseRecord'
 
 class CollectionCard extends BaseRecord {
@@ -49,24 +50,17 @@ class CollectionCard extends BaseRecord {
       return false
     }
     if (!isReplacing) {
-      uiStore.openAlertModal({
+      uiStore.confirm({
         prompt: 'Are you sure you want to archive this?',
         confirmText: 'Archive',
-        iconName: 'ArchiveIcon',
+        iconName: 'Archive',
         onConfirm: onAgree,
       })
     } else onAgree()
   }
 
-  async API_duplicate() {
-    try {
-      // This method will increment order of all cards after this one
-      await this.apiStore.request(`collection_cards/${this.id}/duplicate`, 'POST')
-      // Refresh collection after re-ordering - force reloading
-      this.apiStore.fetch('collections', this.parent.id, true)
-    } catch (e) {
-      // console.warn(e)
-    }
+  API_duplicate() {
+    return Api.duplicate('collection_cards', this)
   }
 }
 CollectionCard.type = 'collection_cards'

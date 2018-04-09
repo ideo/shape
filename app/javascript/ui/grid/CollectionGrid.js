@@ -30,10 +30,18 @@ class CollectionGrid extends React.Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    const { blankContentToolState, collection, cardIds } = nextProps
+    const {
+      blankContentToolState,
+      collection,
+      cardIds,
+      movingCardIds,
+    } = nextProps
     // convert observableArray values into a "normal" JS array (equivalent of .toJS())
     // for the sake of later calculations/manipulations
     const cards = [...collection.collection_cards]
+    if (movingCardIds) {
+      _.each(movingCardIds, id => _.remove(cards, { id }))
+    }
     // If we have a BCT open...
     if (blankContentToolState && blankContentToolState.order !== null) {
       // make the BCT appear to the right of the current card
@@ -43,7 +51,9 @@ class CollectionGrid extends React.Component {
         // remove the card being replaced from our current state cards
         _.remove(cards, { id: replacingId })
       } else {
-        order += 0.5
+        // BCT is technically "order of hotspot card + 1"
+        // so we have to bump it back by 0.5 so it isn't == with the next card
+        order -= 0.5
       }
       let blankCard = {
         id: 'blank',
@@ -421,6 +431,7 @@ CollectionGrid.propTypes = {
   blankContentToolState: MobxPropTypes.objectOrObservableObject.isRequired,
   cardIds: MobxPropTypes.arrayOrObservableArray.isRequired,
   canEditCollection: PropTypes.bool.isRequired,
+  movingCardIds: MobxPropTypes.arrayOrObservableArray.isRequired,
 }
 CollectionGrid.wrappedComponent.propTypes = {
   routingStore: MobxPropTypes.objectOrObservableObject.isRequired,

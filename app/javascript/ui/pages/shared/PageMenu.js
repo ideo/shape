@@ -4,6 +4,7 @@ import { PropTypes as MobxPropTypes } from 'mobx-react'
 
 import { uiStore } from '~/stores'
 import TagIcon from '~/ui/icons/TagIcon'
+import DuplicateIcon from '~/ui/icons/DuplicateIcon'
 import PermissionsIcon from '~/ui/icons/PermissionsIcon'
 import ArchiveIcon from '~/ui/icons/ArchiveIcon'
 import PopoutMenu from '~/ui/global/PopoutMenu'
@@ -29,6 +30,11 @@ class PageMenu extends React.PureComponent {
     uiStore.update('rolesMenuOpen', true)
   }
 
+  duplicateRecord = () => {
+    uiStore.update('pageMenuOpen', false)
+    this.props.record.API_duplicate()
+  }
+
   archiveRecord = () => {
     uiStore.update('pageMenuOpen', false)
     this.props.record.API_archive()
@@ -36,6 +42,7 @@ class PageMenu extends React.PureComponent {
 
   get menuItems() {
     const items = [
+      { name: 'Duplicate', icon: <DuplicateIcon />, onClick: this.duplicateRecord },
       { name: 'Tags', icon: <TagIcon />, onClick: this.showTags },
       { name: 'Permissions', icon: <PermissionsIcon />, onClick: this.showRolesMenu },
     ]
