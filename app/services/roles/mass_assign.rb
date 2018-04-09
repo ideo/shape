@@ -9,7 +9,8 @@ module Roles
                    groups: [],
                    propagate_to_children: false,
                    synchronous: false,
-                   invited_by: nil)
+                   invited_by: nil,
+                   create_link: false)
       @object = object
       @role_name = role_name
       @users = users
@@ -17,6 +18,7 @@ module Roles
       @propagate_to_children = propagate_to_children
       @synchronous = synchronous
       @invited_by = invited_by
+      @create_link = create_link
       @added_users = []
       @added_groups = []
       @failed_users = []
@@ -30,7 +32,7 @@ module Roles
       assign_role_to_users
       notify_users if @invited_by
       assign_role_to_groups
-      link_to_shared_collections if @invited_by
+      link_to_shared_collections if @create_link
       add_roles_to_children if @propagate_to_children
       failed_users.blank? && failed_groups.blank?
     end
