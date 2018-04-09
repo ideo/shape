@@ -97,6 +97,8 @@ GEM
       faraday
       multi_json
     erubi (1.7.1)
+    et-orbi (1.1.0)
+      tzinfo
     execjs (2.7.0)
     factory_bot (4.8.2)
       activesupport (>= 3.0.0)
@@ -105,6 +107,8 @@ GEM
       railties (>= 3.0.0)
     faker (1.8.7)
       i18n (>= 0.7)
+    fakeredis (0.7.0)
+      redis (>= 3.2, < 5.0)
     faraday (0.12.2)
       multipart-post (>= 1.2, < 3)
     ffi (1.9.23)
@@ -296,6 +300,8 @@ GEM
     ruby-progressbar (1.9.0)
     ruby_dep (1.5.0)
     rubyzip (1.2.1)
+    rufus-scheduler (3.4.2)
+      et-orbi (~> 1.0)
     sass (3.5.6)
       sass-listen (~> 4.0.0)
     sass-listen (4.0.0)
@@ -322,6 +328,11 @@ GEM
       connection_pool (~> 2.2, >= 2.2.0)
       rack-protection (>= 1.5.0)
       redis (>= 3.3.5, < 5)
+    sidekiq-scheduler (2.2.1)
+      redis (>= 3, < 5)
+      rufus-scheduler (~> 3.2)
+      sidekiq (>= 3)
+      tilt (>= 1.4.0)
     spring (2.0.2)
       activesupport (>= 4.2)
     spring-commands-rspec (1.0.4)
@@ -383,6 +394,7 @@ DEPENDENCIES
   dotenv-rails
   factory_bot_rails
   faker (~> 1.8.7)
+  fakeredis
   filestack
   guard
   guard-rspec
@@ -400,6 +412,7 @@ DEPENDENCIES
   rack-rewrite (~> 1.5)
   rails (~> 5.1.4)
   rails-controller-testing
+  redis
   roadie-rails (~> 1.2)
   rolify (~> 5.2.0)
   rspec-rails (~> 3.7)
@@ -409,6 +422,7 @@ DEPENDENCIES
   selenium-webdriver
   shoulda-matchers (~> 3.1)
   sidekiq
+  sidekiq-scheduler
   spring
   spring-commands-rspec
   spring-watcher-listen (~> 2.0.0)

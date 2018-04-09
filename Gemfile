@@ -56,6 +56,7 @@ gem 'amoeba'
 
 # Background processing
 gem 'sidekiq'
+gem 'sidekiq-scheduler'
 
 # ElasticSearch wrapper
 gem 'searchkick', '~> 3.0.0'
@@ -71,8 +72,12 @@ gem 'filestack'
 
 # inline styles for email
 gem 'roadie-rails', '~> 1.2'
+
 # For easier http request
 gem 'httparty'
+
+# Redis in-memory caching
+gem 'redis'
 
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
@@ -105,6 +110,7 @@ group :development do
 end
 
 group :test do
+  gem 'fakeredis', require: 'fakeredis/rspec'
   gem 'shoulda-matchers', '~> 3.1'
   gem 'json-schema'
 end

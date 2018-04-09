@@ -3,8 +3,13 @@ class SerializableCollection < BaseJsonSerializer
 
   type 'collections'
 
-  attributes :id, :name, :created_at
-  attribute :tag_list
+  attributes :id, :created_at, :name
+
+  cached_attribute :tag_list
+
+  cached_attribute :cover do
+    CollectionCover.new(@object).generate
+  end
 
   attribute :type do
     @object.type || @object.class.name.to_s
@@ -26,10 +31,6 @@ class SerializableCollection < BaseJsonSerializer
         @current_user,
       )
     end
-  end
-
-  attribute :cover do
-    CollectionCover.new(@object).generate
   end
 
   attribute :can_edit do
