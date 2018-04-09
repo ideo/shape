@@ -83,9 +83,11 @@ module Roles
     end
 
     def link_to_shared_collections
-      group_users = @added_groups.reduce([]) {
-        |accg, group| accg + group.roles.reduce([]) {
-          |accr, role| accr + role.users } }
+      group_users = @added_groups
+        .reject { |group| group.primary? }
+        .reduce([]) {
+          |accg, group| accg + group.roles.reduce([]) {
+            |accr, role| accr + role.users } }
       LinkToSharedCollectionsWorker.perform_async(
         (group_users + @added_users).uniq.map(&:id),
         @object.id,
