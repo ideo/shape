@@ -1,5 +1,11 @@
 class Collection
   class SharedWithMeCollection < Collection
+    has_many :collection_cards,
+             -> { order(:desc) },
+             class_name: 'CollectionCard',
+             foreign_key: :parent_id,
+             inverse_of: :parent
+
     def self.find_or_create_for_collection(parent_collection, user)
       existing = parent_collection.collections.shared_with_me.first
 
