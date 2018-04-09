@@ -30,6 +30,7 @@ class Api::V1::RolesController < Api::V1::BaseController
       groups: groups,
       propagate_to_children: true,
       invited_by: current_user,
+      create_link: !json_api_params[:is_switching],
     )
     if assigner.call
       render jsonapi: record.roles.reload, include: %i[users groups resource]
@@ -46,7 +47,8 @@ class Api::V1::RolesController < Api::V1::BaseController
   # /users/:id/roles/:id
   # /groups/:id/roles/:id
   def destroy
-    if remove_role(role: @role, user: @user, group: @group)
+    if remove_role(role: @role, user: @user, group: @group, is_switching:
+                  json_api_params[:is_switching])
       render jsonapi: @role.resource.roles.reload, include: %i[users groups resource]
     else
       render_api_errors remove_roles.errors
@@ -55,7 +57,7 @@ class Api::V1::RolesController < Api::V1::BaseController
 
   private
 
-  def remove_role(role:, user: nil, group: nil)
+  def remove_role(role:, user: nil, group: nil, is_switching: false)
     resource = role.resource
 
     Roles::MassRemove.new(
@@ -64,13 +66,14 @@ class Api::V1::RolesController < Api::V1::BaseController
       users: [user].compact,
       groups: [group].compact,
       remove_from_children_sync: false,
-      remove_link: true,
+      remove_link: !is_switching,
     ).call
   end
 
   def role_params
     json_api_params.require(:role).permit(
       :name,
+      :is_switching,
     )
   end
 
