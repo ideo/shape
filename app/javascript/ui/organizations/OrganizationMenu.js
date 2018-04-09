@@ -34,11 +34,6 @@ class OrganizationMenu extends React.Component {
       .catch((err) => console.warn(err))
   }
 
-  @action onGroupSave = () => {
-    this.modifyGroupOpen = false
-    this.editGroup = false
-  }
-
   @action onModifyGroupRoles(group) {
     this.editOrganizationOpen = false
     this.editGroup = group
@@ -46,12 +41,19 @@ class OrganizationMenu extends React.Component {
   }
 
   @action onGroupSave = (editedGroup) => {
+    const { apiStore } = this.props
     const newGroup = !this.editGroup.id
     this.modifyGroupOpen = false
     this.editGroup = {}
     if (newGroup) {
+      // TODO loading modal
       this.onModifyGroupRoles(editedGroup)
+      return apiStore.request(`groups/${editedGroup.id}/roles`, 'GET')
+        .then(res => {
+          apiStore.sync(res)
+        })
     }
+    return Promise.resolve()
   }
 
   @action onOrganizationSave = () => {
@@ -84,8 +86,7 @@ class OrganizationMenu extends React.Component {
 
   onRolesSave = (res) => {
     const { apiStore } = this.props
-    apiStore.removeAll('roles')
-    apiStore.add(res.data, 'roles')
+    apiStore.sync(res)
   }
 
   currentUserRoleCheck(roles) {
