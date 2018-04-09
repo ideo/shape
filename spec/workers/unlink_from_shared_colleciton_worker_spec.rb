@@ -30,7 +30,7 @@ RSpec.describe UnlinkFromSharedCollectionsWorker, type: :worker do
       )
 
       expect(shared_with_me.collection_cards.count).to eq(1)
-      expect(my_collection.collection_cards.count).to eq(1)
+      expect(my_collection.collection_cards.count).to eq(2)
     end
   end
 end
