@@ -55,7 +55,7 @@ class RoleSelect extends React.Component {
 
   onRoleSelect = (ev) => {
     ev.preventDefault()
-    return this.deleteRole(true).then(() => this.createRole(ev.target.value))
+    return this.deleteRole().then(() => this.createRole(ev.target.value))
   }
 
   createRole(roleName, isSwitching = true) {
