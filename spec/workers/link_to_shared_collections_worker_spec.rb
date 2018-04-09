@@ -63,5 +63,27 @@ RSpec.describe LinkToSharedCollectionsWorker, type: :worker do
         )
       end
     end
+
+    context 'when object was created by the user being linked to' do
+      let!(:user) { create(:user) }
+      let!(:users_to_add) { [user] }
+      let!(:collection_created_by) { create(:collection) }
+
+      before do
+        collection_created_by.update(created_by: user)
+        my_collection.collection_cards.delete_all
+        shared_with_me.collection_cards.delete_all
+        LinkToSharedCollectionsWorker.new.perform(
+          users_to_add.map(&:id),
+          collection_created_by.id,
+          collection_created_by.class.name.to_s,
+        )
+      end
+
+      it 'should not create any links for that user' do
+        expect(my_collection.collection_cards.count).to eq(0)
+        expect(shared_with_me.collection_cards.count).to eq(0)
+      end
+    end
   end
 end

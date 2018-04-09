@@ -6,10 +6,12 @@ class LinkToSharedCollectionsWorker
     users_to_add = User.where(id: user_ids).to_a
     object = object_class.safe_constantize.find(object_id)
     users_to_add.each do |user|
+      # Don't create any links if object was created by user
+      next if object.created_by and object.created_by.id == user.id
       shared = user.current_shared_collection
       mine = user.current_user_collection
       create_link(object, shared) if shared and object
-      # check for already created links to not create doubles
+      # Check for already created links to not create doubles
       existing = object.is_a?(Item) ?
         mine.collection_cards.where(item_id: object.id) :
         mine.collection_cards.where(collection_id: object.id)
