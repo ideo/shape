@@ -31,6 +31,25 @@ RSpec.describe LinkToSharedCollectionsWorker, type: :worker do
       expect(fake_link_my.collection_id).to equal(collection_to_link.id)
     end
 
+    context 'when a link to the object already exists' do
+      let (:existing_link) { create(:collection_card) }
+
+      before do
+        existing_link.collection_id = collection_to_link.id
+        my_collection.collection_cards.delete_all
+        my_collection.collection_cards.push(existing_link)
+        LinkToSharedCollectionsWorker.new.perform(
+          users_to_add.map(&:id),
+          collection_to_link.id,
+          collection_to_link.class.name.to_s,
+        )
+      end
+
+      it 'should not create a doubled link in my collection' do
+        expect(my_collection.collection_cards.count).to eq(1)
+      end
+    end
+
     context 'with multiple users' do
       let(:users_to_add) { create_list(:user, 4) }
 

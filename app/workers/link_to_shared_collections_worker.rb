@@ -4,13 +4,16 @@ class LinkToSharedCollectionsWorker
 
   def perform(user_ids, object_id, object_class)
     users_to_add = User.where(id: user_ids).to_a
-    # TODO why can't we just pass in the object if we're not using the class?
     object = object_class.safe_constantize.find(object_id)
     users_to_add.each do |user|
       shared = user.current_shared_collection
       mine = user.current_user_collection
-      create_link(object, shared) if shared
-      create_link(object, mine) if mine
+      create_link(object, shared) if shared and object
+      # check for already created links to not create doubles
+      existing = object.is_a?(Item) ?
+        mine.collection_cards.where(item_id: object.id) :
+        mine.collection_cards.where(collection_id: object.id)
+      create_link(object, mine) if existing.count == 0 and mine and object
     end
   end
 
