@@ -1,7 +1,7 @@
 import _ from 'lodash'
 import { computed } from 'mobx'
 
-import { archive } from './shared'
+import Api from './Api'
 import BaseRecord from './BaseRecord'
 
 class Collection extends BaseRecord {
@@ -24,7 +24,11 @@ class Collection extends BaseRecord {
   }
 
   API_archive() {
-    return archive('collections', this)
+    return Api.archive('collections', this)
+  }
+
+  API_duplicate() {
+    return Api.duplicate('collections', this)
   }
 
   API_updateCards() {

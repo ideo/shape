@@ -1,5 +1,5 @@
 import { routingStore } from '~/stores'
-import { archive } from './shared'
+import Api from './Api'
 import BaseRecord from './BaseRecord'
 
 class Item extends BaseRecord {
@@ -12,7 +12,11 @@ class Item extends BaseRecord {
   }
 
   API_archive() {
-    return archive('items', this)
+    return Api.archive('items', this)
+  }
+
+  API_duplicate() {
+    return Api.duplicate('items', this)
   }
 }
 Item.type = 'items'

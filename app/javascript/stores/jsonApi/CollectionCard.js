@@ -1,6 +1,7 @@
 import { action, observable } from 'mobx'
 
-import { uiStore, routingStore } from '~/stores'
+import { uiStore } from '~/stores'
+import Api from './Api'
 import BaseRecord from './BaseRecord'
 
 class CollectionCard extends BaseRecord {
@@ -58,20 +59,8 @@ class CollectionCard extends BaseRecord {
     } else onAgree()
   }
 
-  async API_duplicate() {
-    try {
-      // this will duplicate the card into My Collection
-      await this.apiStore.request(`collection_cards/${this.id}/duplicate`, 'POST')
-      // send to My Collection to view created duplicate
-      routingStore.routeTo('/')
-      uiStore.alert({
-        prompt: 'Your duplicate has been created in My Collection',
-        iconName: 'Ok',
-      })
-      uiStore.scroll.scrollToBottom()
-    } catch (e) {
-      // console.warn(e)
-    }
+  API_duplicate() {
+    return Api.duplicate('collection_cards', this)
   }
 }
 CollectionCard.type = 'collection_cards'
