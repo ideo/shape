@@ -82,6 +82,11 @@ class User < ApplicationRecord
     ).first
   end
 
+  def pic_url_square
+    read_attribute(:pic_url_square) if read_attribute(:pic_url_square).present?
+    'https://d3none3dlnlrde.cloudfront.net/assets/users/avatars/missing/square.jpg'
+  end
+
   def update_from_network_profile(params)
     self.first_name = params[:first_name] if params[:first_name].present?
     self.last_name = params[:last_name] if params[:last_name].present?
