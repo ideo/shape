@@ -6,6 +6,7 @@ import {
 
 let props
 let wrapper
+let component
 
 describe('RoleSelect', () => {
   beforeEach(() => {
@@ -20,6 +21,7 @@ describe('RoleSelect', () => {
     wrapper = mount(
       <RoleSelect {...props} />
     )
+    component = wrapper.instance()
   })
 
   describe('onRoleSelect', () => {
@@ -43,7 +45,11 @@ describe('RoleSelect', () => {
   describe('createRole', () => {
     it('should call onCreate with list of users/groups and role name', () => {
       wrapper.instance().createRole('viewer')
-      expect(props.onCreate).toHaveBeenCalledWith([fakeRole.users[0]], 'viewer')
+      expect(props.onCreate).toHaveBeenCalledWith(
+        [fakeRole.users[0]],
+        'viewer',
+        { isSwitching: true },
+      )
     })
   })
 
@@ -54,7 +60,11 @@ describe('RoleSelect', () => {
     })
 
     it('should call onDelete with the role and user/group', () => {
-      expect(props.onDelete).toHaveBeenCalledWith(props.role, props.entity, false)
+      expect(props.onDelete).toHaveBeenCalledWith(
+        props.role,
+        props.entity,
+        { isSwitching: true },
+      )
     })
   })
 })
