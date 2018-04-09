@@ -49,23 +49,23 @@ class RoleSelect extends React.Component {
       prompt,
       confirmText,
       iconName: 'LeaveIcon',
-      onConfirm: () => this.deleteRole(true),
+      onConfirm: () => this.deleteRole(false),
     })
   }
 
   onRoleSelect = (ev) => {
     ev.preventDefault()
-    return this.deleteRole().then(() => this.createRole(ev.target.value))
+    return this.deleteRole(true).then(() => this.createRole(ev.target.value))
   }
 
-  createRole(roleName) {
+  createRole(roleName, isSwitching = true) {
     const { onCreate, entity } = this.props
-    onCreate([entity], roleName)
+    onCreate([entity], roleName, { isSwitching })
   }
 
-  deleteRole = (toRemove = false) => {
+  deleteRole = (isSwitching = true) => {
     const { role, entity } = this.props
-    return this.props.onDelete(role, entity, toRemove)
+    return this.props.onDelete(role, entity, { isSwitching })
   }
 
   renderName() {
