@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-describe Api::V1::CollectionsController, type: :request, auth: true do
+describe Api::V1::CollectionsController, type: :request, json: true, auth: true do
   let(:user) { @user }
 
   describe 'GET #show' do
@@ -288,6 +288,25 @@ describe Api::V1::CollectionsController, type: :request, auth: true do
         patch(path)
         expect(response.status).to eq(401)
       end
+    end
+  end
+
+  describe 'POST #duplicate' do
+    let!(:collection) { create(:collection, add_editors: [user]) }
+    let(:path) { "/api/v1/collections/#{collection.id}/duplicate" }
+
+    it 'returns a 200' do
+      post(path)
+      expect(response.status).to eq(200)
+    end
+
+    it 'creates new collection' do
+      expect { post(path) }.to change(Collection, :count).by(1)
+    end
+
+    it 'returns new collection' do
+      post(path)
+      expect(json['data']['attributes']['id']).not_to eq(collection.id)
     end
   end
 end

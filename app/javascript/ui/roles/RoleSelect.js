@@ -45,7 +45,7 @@ class RoleSelect extends React.Component {
         ${this.renderName()} from this group?`
       confirmText = 'Remove'
     }
-    uiStore.openAlertModal({
+    uiStore.confirm({
       prompt,
       confirmText,
       iconName: 'LeaveIcon',

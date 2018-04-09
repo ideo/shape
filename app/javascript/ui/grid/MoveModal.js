@@ -57,9 +57,9 @@ class MoveModal extends React.Component {
     // Notify the user if they're on a different collection
     if (uiStore.movingFromCollectionId !== uiStore.viewingCollection.id) {
       if (uiStore.cardAction === 'move') {
-        uiStore.openAlertModal({
+        uiStore.alert({
           prompt: 'Your items have been returned to their original location',
-          iconName: 'BackIcon',
+          iconName: 'Back',
         })
       }
     }
@@ -69,7 +69,7 @@ class MoveModal extends React.Component {
     const { uiStore, apiStore } = this.props
     const collectionId = uiStore.viewingCollection.id
     if (!uiStore.viewingCollection.can_edit) {
-      uiStore.openAlertModal({
+      uiStore.alert({
         prompt: 'You don\'t have permission to move items to this collection',
       })
       return
@@ -87,8 +87,13 @@ class MoveModal extends React.Component {
         await apiStore.request('collection_cards/link', 'POST', data)
       }
       uiStore.resetSelectionAndBCT()
+      if (placement === 'beginning') {
+        uiStore.scroll.scrollToTop()
+      } else {
+        uiStore.scroll.scrollToBottom()
+      }
     } catch (e) {
-      uiStore.openAlertModal({
+      uiStore.alert({
         prompt: 'You cannot move a collection within itself',
       })
     }

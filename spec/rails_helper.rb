@@ -48,8 +48,8 @@ RSpec.configure do |config|
   # Access Warden/Devise authentication methods
   config.include Warden::Test::Helpers
 
-  config.include ApiHelper, type: :request
-  config.include ApiDefaultHeaders, type: :request
+  config.include ApiHelper, json: true
+  config.include JsonHeaders, json: true
   config.include SessionHelper
 
   # Database Cleaner Configuration

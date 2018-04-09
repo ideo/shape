@@ -105,7 +105,7 @@ class GroupModify extends React.Component {
           }
           this.changeUrl(img.url)
         } else {
-          uiStore.openAlertModal({
+          uiStore.alert({
             prompt: `Failed to upload image: ${resp.filesFailed}`,
           })
         }
