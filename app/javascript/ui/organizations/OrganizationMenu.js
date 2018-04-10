@@ -108,6 +108,9 @@ class OrganizationMenu extends React.Component {
     try {
       const { apiStore } = this.props
       await group.API_archive()
+      if (group.containsUser(apiStore.currentUserId)) {
+        window.location.reload()
+      }
       apiStore.fetch('users', apiStore.currentUserId, true)
     } catch (err) {
       console.warn('Unable to archive group', err)
