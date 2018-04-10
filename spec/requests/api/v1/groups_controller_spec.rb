@@ -149,6 +149,7 @@ describe Api::V1::GroupsController, type: :request, json: true, auth: true do
     end
 
     it 'removes group from all content' do
+      patch(path)
       expect(group.reload.roles_to_resources.count).to eq(0)
     end
 
