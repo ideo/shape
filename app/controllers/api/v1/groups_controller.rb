@@ -36,6 +36,7 @@ class Api::V1::GroupsController < Api::V1::BaseController
   def archive
     if @group.archive!
       archive_group_handle(@group)
+      remove_group_roles(@group)
       render jsonapi: @group.reload
     else
       render_api_errors @group.errors
@@ -50,6 +51,21 @@ class Api::V1::GroupsController < Api::V1::BaseController
       :handle,
       filestack_file_attributes: Group.filestack_file_attributes_whitelist,
     )
+  end
+
+  def remove_group_roles(group)
+    call_mass_remove(group, group.admins[:users].to_a, "admin")
+    call_mass_remove(group, group.members[:users].to_a, "member")
+  end
+
+  def call_mass_remove(group, all_users, role_name)
+    Roles::MassRemove.new(
+      object: group,
+      role_name: role_name,
+      users: all_users.compact,
+      groups: [],
+      remove_from_children_sync: false,
+    ).call
   end
 
   def archive_group_handle(group)

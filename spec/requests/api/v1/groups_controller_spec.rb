@@ -115,9 +115,18 @@ describe Api::V1::GroupsController, type: :request, json: true, auth: true do
   end
 
   describe 'PATCH #archive' do
-    let!(:group) { create(:group, add_admins: [user]) }
+    let!(:members) { create_list(:user, 3) }
+    let!(:group) { create(:group, add_admins: [user], add_members: members) }
     let!(:orig_handle) { group.handle }
     let(:path) { "/api/v1/groups/#{group.id}/archive" }
+    let(:instance_double) do
+      double('Roles::MassRemove')
+    end
+
+    before do
+      allow(Roles::MassRemove).to receive(:new).and_return(instance_double)
+      allow(instance_double).to receive(:call).and_return(true)
+    end
 
     it 'returns a 200' do
       patch(path)
@@ -132,7 +141,12 @@ describe Api::V1::GroupsController, type: :request, json: true, auth: true do
 
     it 'updates the handle' do
       patch(path)
-      expect(group.reload.handle).not_to eq(orig_handle)
+      expect(group.reload.hagndle).not_to eq(orig_handle)
+    end
+
+    it 'removes all the roles on the group' do
+      expect(Roles::MassRemove).to receive(:new).exactly(2).times
+      patch(path)
     end
 
     context 'without amdin access' do
