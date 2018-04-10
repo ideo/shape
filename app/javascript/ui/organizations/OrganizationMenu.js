@@ -1,5 +1,6 @@
 import { action, observable } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
+import styled from 'styled-components'
 import { FormSpacer, TextButton } from '~/ui/global/styled/forms'
 import { Row, RowItemRight } from '~/ui/global/styled/layout'
 import { Heading3, DisplayText } from '~/ui/global/styled/typography'
@@ -7,6 +8,10 @@ import Modal from '~/ui/global/modals/Modal'
 import GroupModify from '~/ui/groups/GroupModify'
 import RolesMenu from '~/ui/roles/RolesMenu'
 import ArchiveIcon from '~/ui/icons/ArchiveIcon'
+
+const RemoveIconHolder = styled.button`
+  width: 16px;
+`
 
 @inject('apiStore', 'uiStore')
 @observer
@@ -97,6 +102,10 @@ class OrganizationMenu extends React.Component {
     this.changeModifyGroup(group)
   }
 
+  handleGroupRemove = group => () => {
+    return group.API_archive()
+  }
+
   handleGroupRolesClick = group => () => {
     this.onModifyGroupRoles(group)
   }
@@ -177,7 +186,7 @@ class OrganizationMenu extends React.Component {
             >
               <DisplayText>{group.name}</DisplayText>
             </button>
-            <RemoveIconHolder enabled={enabled} onClick={this.onRoleRemove}>
+            <RemoveIconHolder onClick={this.handleGroupRemove(group)}>
               <ArchiveIcon />
             </RemoveIconHolder>
           </Row>))
