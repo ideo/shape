@@ -11,8 +11,6 @@ class Group < ApplicationRecord
                edit_role: Role::ADMIN,
                view_role: Role::MEMBER
 
-  archivable
-
   rolify after_add: :after_add_role,
          after_remove: :after_remove_role,
          strict: true
