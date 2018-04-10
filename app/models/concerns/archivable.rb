@@ -62,6 +62,7 @@ module Archivable
     end
     # then update self
     update(archived: true)
-    try(self.class.after_archive) if self.class.after_archive
+    return try(self.class.after_archive) if self.class.after_archive
+    true
   end
 end

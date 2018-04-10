@@ -98,12 +98,28 @@ class OrganizationMenu extends React.Component {
     return userRole.canEdit()
   }
 
+  removeGroup = async (group) => {
+    try {
+      const { apiStore } = this.props
+      await group.API_archive()
+      apiStore.fetch('users', apiStore.currentUserId, true)
+    } catch (err) {
+      console.warn('Unable to archive group', err)
+    }
+  }
+
   handleGroupClick = group => () => {
     this.changeModifyGroup(group)
   }
 
-  handleGroupRemove = group => () => {
-    return group.API_archive()
+  handleGroupRemove = group => async () => {
+    const { uiStore } = this.props
+    uiStore.confirm({
+      prompt: `Are you sure you want to archive ${group.name}?`,
+      confirmText: 'Archive',
+      iconName: 'Archive',
+      onConfirm: () => this.removeGroup(group),
+    })
   }
 
   handleGroupRolesClick = group => () => {
