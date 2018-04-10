@@ -37,6 +37,9 @@ describe('OrganizationMenu', () => {
   it('closes the organization menu in the UI store when exited', () => {
     component.handleClose()
     expect(props.uiStore.update).toHaveBeenCalledWith('organizationMenuOpen', false)
+    expect(component.editOrganizationOpen).toBeFalsy()
+    expect(component.modifyGroupOpen).toBeFalsy()
+    expect(component.isLoading).toBeFalsy()
   })
 
   it('closes the edit menu when changes are save in the UI store', () => {

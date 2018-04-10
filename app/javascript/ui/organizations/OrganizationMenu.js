@@ -1,11 +1,13 @@
-import { action, observable } from 'mobx'
+import { action, runInAction, observable } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
+
 import { FormSpacer, TextButton } from '~/ui/global/styled/forms'
 import { Row, RowItemRight } from '~/ui/global/styled/layout'
 import { Heading3, DisplayText } from '~/ui/global/styled/typography'
 import Modal from '~/ui/global/modals/Modal'
 import GroupModify from '~/ui/groups/GroupModify'
 import RolesMenu from '~/ui/roles/RolesMenu'
+import Loader from '~/ui/layout/Loader'
 
 @inject('apiStore', 'uiStore')
 @observer
@@ -14,17 +16,17 @@ class OrganizationMenu extends React.Component {
   @observable modifyGroupOpen = false
   @observable editGroup = {}
   @observable modifyGroupRoles = false
+  @observable isLoading = false
 
   componentDidMount() {
-    // TODO this gets called on pageload rather then when the modal gets
-    // initially opened.
     const { apiStore, userGroups } = this.props
     const groupReqs = userGroups.map(group =>
       apiStore.request(`groups/${group.id}/roles`, 'GET'))
-    Promise.all(groupReqs).then(responses => {
-      const roles = responses.map(res => res.data)
-      apiStore.add(roles, 'roles')
-    })
+    Promise.all(groupReqs)
+      .then(responses => {
+        const roles = responses.map(res => res.data)
+        apiStore.add(roles, 'roles')
+      })
       .catch((err) => console.warn(err))
   }
 
@@ -34,20 +36,18 @@ class OrganizationMenu extends React.Component {
     this.modifyGroupRoles = true
   }
 
-  @action onGroupSave = (editedGroup) => {
+  @action onGroupSave = async (editedGroup) => {
     const { apiStore } = this.props
     const newGroup = !this.editGroup.id
     this.modifyGroupOpen = false
     this.editGroup = {}
     if (newGroup) {
-      // TODO loading modal
+      this.isLoading = true
       this.onModifyGroupRoles(editedGroup)
-      return apiStore.request(`groups/${editedGroup.id}/roles`, 'GET')
-        .then(res => {
-          apiStore.sync(res)
-        })
+      const res = await apiStore.request(`groups/${editedGroup.id}/roles`, 'GET')
+      runInAction(() => { this.isLoading = false })
+      apiStore.sync(res)
     }
-    return Promise.resolve()
   }
 
   @action onOrganizationSave = () => {
@@ -75,6 +75,7 @@ class OrganizationMenu extends React.Component {
     this.editOrganizationOpen = false
     this.modifyGroupOpen = false
     this.modifyGroupRoles = false
+    this.isLoading = false
     this.editGroup = {}
   }
 
@@ -104,6 +105,11 @@ class OrganizationMenu extends React.Component {
   handleClose = (ev) => {
     const { uiStore } = this.props
     uiStore.update('organizationMenuOpen', false)
+    // delay so that you don't see it switch as the modal fades out
+    setTimeout(() => {
+      // reset the state
+      this.handleBack()
+    }, 500)
   }
 
   renderEditOrganization() {
@@ -194,7 +200,11 @@ class OrganizationMenu extends React.Component {
       title = 'Your Organization'
       onBack = this.handleBack
     } else if (this.modifyGroupRoles) {
-      content = this.renderEditRoles()
+      if (this.isLoading) {
+        content = <Loader height="350px" fadeIn="none" />
+      } else {
+        content = this.renderEditRoles()
+      }
       onBack = this.handleBack
       title = this.editGroup.name
     } else if (this.modifyGroupOpen) {
