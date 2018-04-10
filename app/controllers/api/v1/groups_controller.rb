@@ -17,8 +17,7 @@ class Api::V1::GroupsController < Api::V1::BaseController
     @group.organization = current_organization
     if @group.save
       current_user.add_role(Role::ADMIN, @group)
-      # TODO I think this was not wrapping res in "data"?
-      render jsonapi: @group, include: [roles: [:users]]
+      render jsonapi: @group.reload, include: [roles: [:users]]
     else
       render_api_errors @group.errors
     end

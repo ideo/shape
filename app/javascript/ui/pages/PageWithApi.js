@@ -24,16 +24,16 @@ class PageWithApi extends React.Component {
   fetchData = (props) => {
     if (!_.isFunction(this.requestPath)) return null
     const { apiStore } = props
-    uiStore.update('loading', true)
+    uiStore.update('isLoading', true)
     return apiStore.request(this.requestPath(props))
       .then(response => {
-        uiStore.update('loading', false)
+        uiStore.update('isLoading', false)
         if (_.isFunction(this.onAPILoad)) {
           this.onAPILoad(response)
         }
       })
       .catch(err => {
-        uiStore.update('loading', false)
+        uiStore.update('isLoading', false)
         console.warn('API error!', err)
         if (!routingStore.location.pathname === '/') routingStore.routeTo('/')
       })
