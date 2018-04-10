@@ -49,7 +49,6 @@ class Api::V1::GroupsController < Api::V1::BaseController
     params.require(:group).permit(
       :name,
       :handle,
-      :archived,
       filestack_file_attributes: Group.filestack_file_attributes_whitelist,
     )
   end
