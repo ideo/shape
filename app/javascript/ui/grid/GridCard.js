@@ -159,6 +159,7 @@ class GridCard extends React.Component {
   render() {
     const {
       card,
+      record,
       canEditCollection,
       isSharedCollection,
       dragging,
@@ -174,7 +175,7 @@ class GridCard extends React.Component {
           TODO: We can enable this CardMenu for sharedCollection after setting up
           SharedWithMe updates (where it creates the linked cards)
         */}
-        {!isSharedCollection &&
+        {!isSharedCollection && !record.isSharedCollection &&
           <StyledTopRightActions>
             {this.canEdit &&
               <SelectionCircle cardId={card.id} />

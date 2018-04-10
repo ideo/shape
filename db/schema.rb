@@ -10,10 +10,11 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180405001539) do
+ActiveRecord::Schema.define(version: 20180406184838) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
+  enable_extension "pg_stat_statements"
 
   create_table "collection_cards", force: :cascade do |t|
     t.integer "order", null: false
@@ -157,6 +158,7 @@ ActiveRecord::Schema.define(version: 20180405001539) do
     t.integer "current_organization_id"
     t.integer "status", default: 0
     t.string "invitation_token"
+    t.integer "current_user_collection_id"
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["invitation_token"], name: "index_users_on_invitation_token"
     t.index ["provider"], name: "index_users_on_provider"

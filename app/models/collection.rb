@@ -67,6 +67,7 @@ class Collection < ApplicationRecord
   validates :name, presence: true, if: :base_collection_type?
   validates :organization, presence: true
   before_validation :inherit_parent_organization_id, on: :create
+  after_commit :reindex_sync, on: :create
 
   scope :root, -> { where.not(organization_id: nil) }
   scope :not_custom_type, -> { where(type: nil) }
@@ -75,8 +76,10 @@ class Collection < ApplicationRecord
 
   accepts_nested_attributes_for :collection_cards
 
-  # Searchkick config - by default all string fields are searchable
-  searchkick
+  # Searchkick Config
+  # Use queue to bulk reindex every 5m (with Sidekiq Scheduled Job/ActiveJob)
+  searchkick callbacks: :queue
+
   # active == don't index archived collections
   # where(type: nil) == don't index User/SharedWithMe collections
   scope :search_import, -> do
@@ -94,6 +97,7 @@ class Collection < ApplicationRecord
     )
   end
 
+  # By default all string fields are searchable
   def search_data
     user_ids = (editors[:users].pluck(:id) + viewers[:users].pluck(:id)).uniq
     group_ids = (editors[:groups].pluck(:id) + viewers[:groups].pluck(:id)).uniq
@@ -245,6 +249,12 @@ class Collection < ApplicationRecord
   def allow_primary_group_view_access
     return unless parent_is_user_collection?
     organization.primary_group.add_role(Role::VIEWER, self)
+  end
+
+  def reindex_sync
+    Searchkick.callbacks(true) do
+      reindex
+    end
   end
 
   private

@@ -11,5 +11,11 @@ production:
 :queues:
   - [critical, 10]
   - [mailers, 5]
+  - [searchkick, 4]
   - [default, 2]
   - [low, 1]
+:enabled: true
+:schedule:
+  searchkick_reindex_worker:
+      cron: '0 /5 * * * *'  # Runs every 5 minutes
+      class: SearchkickReindexWorker

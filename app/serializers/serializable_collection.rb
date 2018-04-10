@@ -3,8 +3,13 @@ class SerializableCollection < BaseJsonSerializer
 
   type 'collections'
 
-  attributes :id, :name, :created_at
-  attribute :tag_list
+  attributes :id, :created_at, :updated_at, :name
+
+  cached_attribute :tag_list
+
+  cached_attribute :cover do
+    CollectionCover.new(@object).generate
+  end
 
   attribute :type do
     @object.type || @object.class.name.to_s
@@ -23,14 +28,10 @@ class SerializableCollection < BaseJsonSerializer
   has_many :collection_cards do
     data do
       @object.collection_cards_viewable_by(
-        @object.collection_cards,
+        @object.collection_cards.includes(:item, :collection),
         @current_user,
       )
     end
-  end
-
-  attribute :cover do
-    CollectionCover.new(@object).generate
   end
 
   attribute :can_edit do

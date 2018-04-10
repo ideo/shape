@@ -22,11 +22,14 @@ class User < ApplicationRecord
   belongs_to :current_organization,
              class_name: 'Organization',
              optional: true
+  belongs_to :current_user_collection,
+             class_name: 'Collection',
+             optional: true
 
   validates :email, presence: true
   validates :uid, :provider, presence: true, if: :active?
 
-  searchkick word_start: [:name]
+  searchkick callbacks: :async, word_start: [:name]
 
   scope :search_import, -> { includes(:roles) }
 
@@ -103,6 +106,16 @@ class User < ApplicationRecord
 
     # TODO rename "user" to user_collection
     collections.user.find_by_organization_id(current_organization_id)
+  end
+  
+  def switch_to_organization(organization = nil)
+    if organization.blank?
+      self.current_organization = self.current_user_collection = nil
+    else
+      self.current_organization = organization
+      self.current_user_collection = collections.user.find_by_organization_id(organization.id)
+    end
+    save
   end
 
   def current_shared_collection

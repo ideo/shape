@@ -31,8 +31,6 @@ class CollectionCardBuilder
         end
         @collection_card.increment_card_orders!
         @collection_card.record.reload.recalculate_breadcrumb!
-        # mark the collection as recently updated
-        @parent_collection.touch
       end
     end
   end
