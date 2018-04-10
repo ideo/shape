@@ -116,6 +116,7 @@ describe Api::V1::GroupsController, type: :request, json: true, auth: true do
 
   describe 'PATCH #archive' do
     let!(:group) { create(:group, add_admins: [user]) }
+    let!(:orig_handle) { group.handle }
     let(:path) { "/api/v1/groups/#{group.id}/archive" }
 
     it 'returns a 200' do
@@ -127,6 +128,11 @@ describe Api::V1::GroupsController, type: :request, json: true, auth: true do
       expect(group.active?).to eq(true)
       patch(path)
       expect(group.reload.archived?).to eq(true)
+    end
+
+    it 'updates the handle' do
+      patch(path)
+      expect(group.reload.handle).not_to eq(orig_handle)
     end
 
     context 'without amdin access' do

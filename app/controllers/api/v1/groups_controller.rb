@@ -35,6 +35,7 @@ class Api::V1::GroupsController < Api::V1::BaseController
 
   def archive
     if @group.archive!
+      archive_group_handle(@group)
       render jsonapi: @group.reload
     else
       render_api_errors @group.errors
@@ -49,5 +50,9 @@ class Api::V1::GroupsController < Api::V1::BaseController
       :handle,
       filestack_file_attributes: Group.filestack_file_attributes_whitelist,
     )
+  end
+
+  def archive_group_handle(group)
+    group.update(handle: "archived-" + Time.now.to_f.to_s)
   end
 end
