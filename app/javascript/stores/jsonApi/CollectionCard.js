@@ -5,6 +5,18 @@ import Api from './Api'
 import BaseRecord from './BaseRecord'
 
 class CollectionCard extends BaseRecord {
+  attributesForAPI = [
+    'order',
+    'width',
+    'height',
+    'reference',
+    'parent_id',
+    'collection_id',
+    'item_id',
+    'collection_attributes',
+    'item_attributes',
+  ]
+
   @observable maxWidth = this.width
 
   // this gets set based on number of visible columns, and used by CollectionCover

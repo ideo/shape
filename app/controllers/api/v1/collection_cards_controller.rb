@@ -46,7 +46,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
       for_user: current_user,
       parent: current_user.current_user_collection,
     )
-    if duplicate.persisted?
+    if duplicate.persisted? && duplicate.errors.empty?
       render jsonapi: duplicate, include: [:parent, record: [:filestack_file]]
     else
       render_api_errors duplicate.errors

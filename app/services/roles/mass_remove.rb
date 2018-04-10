@@ -24,7 +24,7 @@ module Roles
       if @remove_from_children_sync
         children.all? do |child|
           remove_role_from_object(child) &&
-            remove_roles_from_grandchildren
+            remove_roles_from_grandchildren(child)
         end
       else
         MassRemoveRolesWorker.perform_async(
@@ -38,11 +38,12 @@ module Roles
       end
     end
 
-    def remove_roles_from_grandchildren
-      children.each do |child|
+    def remove_roles_from_grandchildren(child)
+      return true unless child.respond_to?(:children)
+      child.children.each do |grandchild|
         MassRemoveRolesWorker.perform_async(
-          child.id,
-          child.class.name.to_s,
+          grandchild.id,
+          grandchild.class.name.to_s,
           @role_name,
           @users.map(&:id),
           @groups.map(&:id),

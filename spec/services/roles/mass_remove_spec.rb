@@ -6,6 +6,7 @@ RSpec.describe Roles::MassRemove, type: :service do
     create(:collection_card_collection, parent: collection)
   end
   let(:subcollection) { subcollection_card.collection }
+  let(:grandchildren) { create_list(:collection_card_text, 3, parent: subcollection) }
   let(:users) { create_list(:user, 1) }
   let(:groups) { create_list(:group, 1) }
   let(:role_name) { Role::EDITOR }
@@ -57,6 +58,13 @@ RSpec.describe Roles::MassRemove, type: :service do
       group.reload
       expect(user.has_role?(role_name, subcollection)).to be false
       expect(group.has_role?(role_name, subcollection)).to be false
+    end
+
+    context 'remove_from_children_sync = true' do
+      it 'should call worker for each grandchild' do
+        expect(MassRemoveRolesWorker).to receive(:perform_async).exactly(grandchildren.count).times
+        mass_remove.call
+      end
     end
 
     context 'if user has other roles on object' do

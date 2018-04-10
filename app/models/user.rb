@@ -23,11 +23,14 @@ class User < ApplicationRecord
   belongs_to :current_organization,
              class_name: 'Organization',
              optional: true
+  belongs_to :current_user_collection,
+             class_name: 'Collection',
+             optional: true
 
   validates :email, presence: true
   validates :uid, :provider, presence: true, if: :active?
 
-  searchkick word_start: [:name]
+  searchkick callbacks: :async, word_start: [:name]
 
   scope :search_import, -> { includes(:roles) }
 
@@ -95,14 +98,14 @@ class User < ApplicationRecord
     [first_name, last_name].compact.join(' ')
   end
 
-  def current_user_collection_id
-    current_user_collection.try(:id)
-  end
-
-  def current_user_collection
-    return nil if current_organization.blank?
-
-    collections.user.find_by_organization_id(current_organization_id)
+  def switch_to_organization(organization = nil)
+    if organization.blank?
+      self.current_organization = self.current_user_collection = nil
+    else
+      self.current_organization = organization
+      self.current_user_collection = collections.user.find_by_organization_id(organization.id)
+    end
+    save
   end
 
   def current_org_groups

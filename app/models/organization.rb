@@ -27,14 +27,14 @@ class Organization < ApplicationRecord
     o
   end
 
+
+
   # Note: this method can be called many times for the same org
   def user_role_added(user)
-    if user.current_organization_id.blank?
-      # Set this as the user's current organization if they don't have one
-      user.update_attributes(current_organization: self)
-    end
-
     Collection::UserCollection.find_or_create_for_user(user, self)
+
+    # Set this as the user's current organization if they don't have one
+    user.switch_to_organization(self) if user.current_organization_id.blank?
   end
 
   # Note: this method can be called many times for the same org
@@ -44,8 +44,7 @@ class Organization < ApplicationRecord
 
     # Set current org as one they are a member of
     # If nil, that is fine as they shouldn't have a current organization
-    other_org = user.organizations.first
-    user.update_attributes(current_organization: other_org)
+    user.switch_to_organization(user.organizations.first)
   end
 
   private

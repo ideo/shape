@@ -66,4 +66,18 @@ RSpec.describe Item, type: :model do
       end
     end
   end
+
+  describe '#touch_parent' do
+    let!(:item) { create(:text_item) }
+    let!(:parent) { create(:collection) }
+    let!(:parent_collection_card) do
+      create(:collection_card_text, item: item, parent: parent)
+    end
+
+    it 'will update the updated_at attr of parent collection' do
+      expect {
+        item.touch_parent
+      }.to change(parent, :updated_at)
+    end
+  end
 end
