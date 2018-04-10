@@ -430,4 +430,44 @@ describe User, type: :model do
       expect(user.current_org_groups).to match_array([group_in_org_member, org.primary_group])
     end
   end
+
+  describe '#switch_to_organization' do
+    let(:user) { create(:user) }
+    let!(:organization) { create(:organization) }
+    let!(:org_user_collection) do
+      # Create user collection manually
+      # To make sure being in an org isn't coupled with being a group member/admin
+      Collection::UserCollection.find_or_create_for_user(user, organization)
+    end
+
+    it 'sets current_organization' do
+      expect(user.current_organization).to be_nil
+      expect(user.switch_to_organization(organization)).to be true
+      expect(user.current_organization).to eq(organization)
+    end
+
+    it 'sets current_user_collection' do
+      expect(user.current_user_collection).to be_nil
+      expect(user.switch_to_organization(organization)).to be true
+      expect(user.current_user_collection).to eq(org_user_collection)
+    end
+
+    context 'if setting to nil' do
+      before do
+        user.switch_to_organization(organization)
+      end
+
+      it 'sets current_organization to nil' do
+        expect(user.current_organization).not_to be_nil
+        user.switch_to_organization(nil)
+        expect(user.current_organization).to be_nil
+      end
+
+      it 'sets current_user_collection to nil' do
+        expect(user.current_user_collection).not_to be_nil
+        expect(user.switch_to_organization(nil)).to be true
+        expect(user.current_user_collection).to be_nil
+      end
+    end
+  end
 end

@@ -1,18 +1,9 @@
 class CollectionCard < ApplicationRecord
   include Archivable
 
-  belongs_to :parent, class_name: 'Collection'
-
-  # # TODO: Need to refactor CollectionCards to have a subclass e.g. CollectionCard::LinkedCollectionCard
-  # # Currently this `collection` vs. `referenced_collection` doesn't exactly work because there's nothing
-  # # differentiating the two relationships.
-  # belongs_to :referenced_item, class_name: 'Item', optional: true, inverse_of: :reference_collection_cards, foreign_key: 'item_id'
-  # belongs_to :referenced_collection, class_name: 'Collection', optional: true, inverse_of: :reference_collection_cards, foreign_key: 'collection_id'
-
-  belongs_to :collection,
-             optional: true
-  belongs_to :item,
-             optional: true
+  belongs_to :parent, class_name: 'Collection', touch: true
+  belongs_to :collection, optional: true
+  belongs_to :item, optional: true
   # this really is only appropriate for CollectionCard::Primary but defined globally here
   accepts_nested_attributes_for :collection, :item
 

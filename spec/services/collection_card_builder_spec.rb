@@ -102,6 +102,7 @@ RSpec.describe CollectionCardBuilder, type: :service do
       end
 
       it 'should mark the collection as updated' do
+        # this should happen via collection_card belongs_to w/ touch: true
         expect_any_instance_of(Collection).to receive(:touch)
         expect(builder.create).to be true
       end
