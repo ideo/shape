@@ -18,21 +18,24 @@ module CachedAttributes
     #      cached_attribute :tag_list { @object.get_tag_list }
     #
     def cached_attribute(name, options = {}, &block)
+      name = name.to_s
+
       self.cached_attribute_names ||= []
-      self.cached_attribute_names << name.to_sym
+      self.cached_attribute_names << name
 
       # Define attribute using the regular attribute DSL
       # Use a block that returns the cached value
       attribute(name, options) do
-        # Return cached value if present
-        if cached_attributes_values[name].present?
-          cached_attributes_values[name]
-        else
+        # Only generate value if nothing was found
+        if cached_attributes_values[name].nil?
           # Block used to get attribute value
           attr_block = block || proc { @object.public_send(name) }
 
           # Sets and returns value
           set_cached_attribute_value(name, instance_eval(&attr_block))
+        else
+          # Return cached value if present
+          cached_attributes_values[name]
         end
       end
     end
@@ -70,10 +73,6 @@ module CachedAttributes
   end
 
   def cached_attributes_cache_key
-    [
-      @object.class.base_class.name,
-      @object.id,
-      (@object.updated_at || @object.created_at).to_i,
-    ].compact.join('_')
+    @object.jsonapi_cache_key
   end
 end

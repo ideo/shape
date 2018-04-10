@@ -79,6 +79,9 @@ gem 'httparty'
 # Redis in-memory caching
 gem 'redis'
 
+gem 'bootsnap', require: false
+
+
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
   gem 'byebug', platforms: [:mri, :mingw, :x64_mingw]
@@ -107,6 +110,7 @@ group :development do
   gem 'guard-rspec', require: false
   gem 'binding_of_caller'
   gem 'better_errors'
+  # gem 'rack-mini-profiler', '~> 1.0'
 end
 
 group :test do

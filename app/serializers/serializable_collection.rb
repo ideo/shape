@@ -26,8 +26,11 @@ class SerializableCollection < BaseJsonSerializer
 
   has_many :collection_cards do
     data do
+      cached_cards = Rails.cache.fetch("#{@object.jsonapi_cache_key}-cards") do
+        @object.collection_cards.includes(:item, :collection)
+      end
       @object.collection_cards_viewable_by(
-        @object.collection_cards,
+        cached_cards,
         @current_user,
       )
     end
