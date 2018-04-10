@@ -2,7 +2,7 @@ import { StyledIcon } from './Icon'
 
 const StyledCollectionIcon = StyledIcon.extend`
   .st0 {
-    fill: #fff;
+    fill: black;
   }
   .st1 {
     fill: currentColor;

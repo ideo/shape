@@ -95,6 +95,7 @@ Dialog.propTypes = {
     'Back',
     'Close',
     'Leave',
+    'Link',
     'Ok',
   ]),
   children: PropTypes.node.isRequired,
