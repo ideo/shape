@@ -125,6 +125,20 @@ RSpec.describe CollectionCard, type: :model do
         duplicate
       end
     end
+
+    context 'for user collection' do
+      let!(:shared_with_me_collection) { create(:shared_with_me_collection) }
+      let!(:collection_card_collection) { create(:collection_card, collection: shared_with_me_collection) }
+      let(:duplicate) do
+        collection_card_collection.duplicate!(
+          for_user: user
+        )
+      end
+
+      it 'should return errors' do
+        expect(duplicate.errors[:collection]).to include('cannot be a SharedWithMeCollection for duplication')
+      end
+    end
   end
 
   describe '#copy_into_new_link_card' do

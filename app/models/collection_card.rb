@@ -28,6 +28,10 @@ class CollectionCard < ApplicationRecord
   end
 
   def duplicate!(for_user:, parent: self.parent, shallow: false, update_order: false)
+    if record.is_a? Collection::SharedWithMeCollection
+      errors.add(:collection, 'cannot be a SharedWithMeCollection for duplication')
+      return self
+    end
     cc = amoeba_dup
     # defaults to self.parent, unless one is passed in
     cc.parent = parent

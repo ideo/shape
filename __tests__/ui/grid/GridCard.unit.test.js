@@ -43,7 +43,7 @@ describe('GridCard', () => {
     })
 
     it('renders menu', () => {
-      expect(wrapper.find('.card-menu').exists()).toBe(true)
+      expect(wrapper.find('CardMenu').exists()).toBe(true)
     })
 
     it('does not render selection circle or hotspot', () => {
@@ -55,13 +55,11 @@ describe('GridCard', () => {
       beforeEach(() => {
         props.record.can_edit = true
         props.canEditCollection = true
-        wrapper = shallow(
-          <GridCard {...props} />
-        )
+        wrapper.setProps(props)
       })
 
       it('passes canEdit to menu', () => {
-        expect(wrapper.find('.card-menu').props().canEdit).toBe(true)
+        expect(wrapper.find('CardMenu').props().canEdit).toBe(true)
       })
 
       it('renders selection circle and hotspot', () => {
@@ -73,9 +71,7 @@ describe('GridCard', () => {
     describe('as link', () => {
       beforeEach(() => {
         props.card.link = true
-        wrapper = shallow(
-          <GridCard {...props} />
-        )
+        wrapper.setProps(props)
       })
 
       it('renders the link icon', () => {
@@ -90,9 +86,7 @@ describe('GridCard', () => {
       props.card = fakeCollectionCard
       props.record = fakeCollection
       props.record.can_edit = false
-      wrapper = shallow(
-        <GridCard {...props} />
-      )
+      wrapper.setProps(props)
     })
 
     it('renders the collection cover', () => {
@@ -104,7 +98,7 @@ describe('GridCard', () => {
     })
 
     it('renders menu and selection circle', () => {
-      expect(wrapper.find('.card-menu').exists()).toBe(true)
+      expect(wrapper.find('CardMenu').exists()).toBe(true)
     })
 
     it('does not render selection circle or hotspot', () => {
@@ -116,13 +110,11 @@ describe('GridCard', () => {
       beforeEach(() => {
         props.record.can_edit = true
         props.canEditCollection = true
-        wrapper = shallow(
-          <GridCard {...props} />
-        )
+        wrapper.setProps(props)
       })
 
       it('passes canEdit to menu', () => {
-        expect(wrapper.find('.card-menu').props().canEdit).toBe(true)
+        expect(wrapper.find('CardMenu').props().canEdit).toBe(true)
       })
 
       it('renders selection circle and hotspot', () => {
@@ -131,12 +123,35 @@ describe('GridCard', () => {
       })
     })
 
-    describe('as link', () => {
+    describe('with SharedCollection', () => {
+      beforeEach(() => {
+        props.isSharedCollection = true
+        props.canEditCollection = true
+        wrapper.setProps(props)
+      })
+
+      it('does not render CardMenu', () => {
+        expect(wrapper.find('CardMenu').exists()).toBe(false)
+      })
+    })
+
+    describe('with SharedCollection card', () => {
+      beforeEach(() => {
+        props.isSharedCollection = false
+        props.canEditCollection = true
+        props.record.isSharedCollection = true
+        wrapper.setProps(props)
+      })
+
+      it('does not render CardMenu', () => {
+        expect(wrapper.find('CardMenu').exists()).toBe(false)
+      })
+    })
+
+    describe('as reference', () => {
       beforeEach(() => {
         props.card.link = true
-        wrapper = shallow(
-          <GridCard {...props} />
-        )
+        wrapper.setProps(props)
       })
 
       it('has linked collection icon', () => {
