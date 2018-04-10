@@ -106,6 +106,34 @@ class Item < ApplicationRecord
     @dont_reindex_parent = true
   end
 
+  def self.editing_stream_name(item_id)
+    "item_#{item_id}_editing"
+  end
+
+  def editing_stream_name
+    Item.editing_stream_name(id)
+  end
+
+  def started_editing(user)
+    Cache.set_add(editing_stream_name, user.id)
+    #ItemEditingChannel.broadcast(self)
+    ActionCable.server.broadcast \
+      editing_stream_name,
+      user_ids: currently_editing_user_ids
+  end
+
+  def stopped_editing(user)
+    Cache.set_remove(editing_stream_name, user.id)
+    #ItemEditingChannel.broadcast(self)
+    ActionCable.server.broadcast \
+      editing_stream_name,
+      user_ids: currently_editing_user_ids
+  end
+
+  def currently_editing_user_ids
+    Cache.set_members(editing_stream_name)
+  end
+
   private
 
   def reindex_parent_collection

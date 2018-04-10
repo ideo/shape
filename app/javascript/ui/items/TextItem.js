@@ -28,6 +28,8 @@ class TextItem extends React.Component {
   constructor(props) {
     super(props)
     this.onTextChange = _.debounce(this._onTextChange, 1000)
+    this.cable = ActionCable.createConsumer('ws://localhost:3000/cable')
+    this.channel = null
   }
 
   componentDidMount() {
@@ -36,6 +38,48 @@ class TextItem extends React.Component {
       const { editor } = this.quillEditor
       overrideHeadersFromClipboard(editor)
     }
+    this.subscribeToItemEditingChannel()
+  }
+
+  subscribeToItemEditingChannel = () => {
+    const { item } = this.props
+    this.channel = this.cable.subscriptions.create(
+      { channel: 'ItemEditingChannel', id: item.id },
+      {
+        connected: this.connected,
+        disconnected: this.disconnected,
+        received: this.received,
+        rejected: this.rejected,
+      }
+    )
+  }
+
+  received = (data) => {
+    console.log('Channel received: ', data)
+  }
+
+  connected = () => {
+    console.log('Channel connected')
+  }
+
+  disconnected = () => {
+   console.log('Channel disconnected.')
+  }
+
+  rejected = () => {
+   console.log('I was rejected! :(')
+  }
+
+  onBlur = () => {
+    const { item } = this.props
+    console.log('stop editing')
+    this.channel.perform('start_editing', { id: item.id })
+  }
+
+  onFocus = () => {
+    const { item } = this.props
+    console.log('start editing')
+    this.channel.perform('stop_editing', { id: item.id })
   }
 
   get canEdit() {
@@ -62,6 +106,8 @@ class TextItem extends React.Component {
         ref: c => { this.quillEditor = c },
         theme: 'snow',
         onChange: this.onTextChange,
+        onFocus: this.onFocus,
+        onBlur: this.onBlur,
         modules: {
           toolbar: '#quill-toolbar',
         },

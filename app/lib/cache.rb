@@ -21,6 +21,22 @@ class Cache
   end
 
   def self.delete(key)
-    client.del(key) == '1' # returns 1 if was set, 0 if not
+    client.del(key) == '1'
+  end
+
+  def self.set_add(key, value)
+    client.sadd(key, value) == '1'
+  end
+
+  def self.set_members(key)
+    client.smembers(key)
+  end
+
+  def self.set_member?(key, value)
+    client.sismember(key, value) == '1'
+  end
+
+  def self.set_remove(key, value)
+    client.srem(key, value) == '1'
   end
 end
