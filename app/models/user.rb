@@ -29,7 +29,7 @@ class User < ApplicationRecord
   validates :email, presence: true
   validates :uid, :provider, presence: true, if: :active?
 
-  searchkick word_start: [:name]
+  searchkick callbacks: :async, word_start: [:name]
 
   scope :search_import, -> { includes(:roles) }
 

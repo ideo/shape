@@ -19,7 +19,6 @@ module CachedAttributes
     #
     def cached_attribute(name, options = {}, &block)
       name = name.to_s
-
       self.cached_attribute_names ||= []
       self.cached_attribute_names << name
 
@@ -42,7 +41,7 @@ module CachedAttributes
 
     def cached_attribute?(name)
       return false if cached_attribute_names.blank?
-      cached_attribute_names.include?(name.to_sym)
+      cached_attribute_names.include?(name.to_s)
     end
   end
 

@@ -103,6 +103,10 @@ describe Api::V1::ItemsController, type: :request, auth: true do
 
   describe 'PATCH #update' do
     let!(:item) { create(:text_item, add_editors: [user]) }
+    let!(:parent) { create(:collection) }
+    let!(:parent_collection_card) do
+      create(:collection_card_text, item: item, parent: parent)
+    end
     let(:path) { "/api/v1/items/#{item.id}" }
     let(:params) {
       json_api_params(
@@ -127,6 +131,11 @@ describe Api::V1::ItemsController, type: :request, auth: true do
       expect(item.content).not_to eq('The wheels on the bus...')
       patch(path, params: params)
       expect(item.reload.content).to eq('The wheels on the bus...')
+    end
+
+    it 'updates the parent' do
+      patch(path, params: params)
+      expect(parent.updated_at).to be > parent.created_at
     end
   end
 

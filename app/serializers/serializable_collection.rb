@@ -3,7 +3,7 @@ class SerializableCollection < BaseJsonSerializer
 
   type 'collections'
 
-  attributes :id, :created_at, :name
+  attributes :id, :created_at, :updated_at, :name
 
   cached_attribute :tag_list
 

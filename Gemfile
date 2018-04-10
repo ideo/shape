@@ -110,7 +110,6 @@ group :development do
   gem 'guard-rspec', require: false
   gem 'binding_of_caller'
   gem 'better_errors'
-  # gem 'rack-mini-profiler', '~> 1.0'
 end
 
 group :test do

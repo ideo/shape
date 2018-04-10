@@ -106,6 +106,10 @@ class Item < ApplicationRecord
     @dont_reindex_parent = true
   end
 
+  def touch_parent
+    try(:parent).try(:touch)
+  end
+
   private
 
   def reindex_parent_collection
