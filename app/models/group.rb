@@ -1,6 +1,7 @@
 class Group < ApplicationRecord
   include Resourceable
   include HasFilestackFile
+  include Archivable
   prepend RolifyExtensions # Prepend so it can call rolify methods using super
 
   # Admins can manage people in the group
@@ -9,6 +10,8 @@ class Group < ApplicationRecord
   resourceable roles: [Role::ADMIN, Role::MEMBER],
                edit_role: Role::ADMIN,
                view_role: Role::MEMBER
+
+  archivable
 
   rolify after_add: :after_add_role,
          after_remove: :after_remove_role,

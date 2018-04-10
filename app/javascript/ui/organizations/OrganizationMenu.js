@@ -6,6 +6,7 @@ import { Heading3, DisplayText } from '~/ui/global/styled/typography'
 import Modal from '~/ui/global/modals/Modal'
 import GroupModify from '~/ui/groups/GroupModify'
 import RolesMenu from '~/ui/roles/RolesMenu'
+import ArchiveIcon from '~/ui/icons/ArchiveIcon'
 
 @inject('apiStore', 'uiStore')
 @observer
@@ -176,6 +177,9 @@ class OrganizationMenu extends React.Component {
             >
               <DisplayText>{group.name}</DisplayText>
             </button>
+            <RemoveIconHolder enabled={enabled} onClick={this.onRoleRemove}>
+              <ArchiveIcon />
+            </RemoveIconHolder>
           </Row>))
         }
       </div>
