@@ -42,8 +42,10 @@ class CollectionCard < ApplicationRecord
       return self
     end
     cc = amoeba_dup
-    cc.parent = parent # defaults to self.parent, unless one is passed in
-    cc.order += 1
+    # defaults to self.parent, unless one is passed in
+    cc.parent = parent
+    # place card at end
+    cc.order = parent.collection_cards.count
 
     unless shallow || link?
       cc.collection = collection.duplicate!(for_user: for_user) if collection.present?

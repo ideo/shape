@@ -11,14 +11,19 @@ const fakeUiStore = {
     height: null,
     replacingId: null,
   },
-  alertModal: {
-    open: false,
+  dialogConfig: {
+    open: null,
     prompt: null,
     onConfirm: null,
     onCancel: null,
-    icon: null,
-    confirmText: null,
-    cancelText: null,
+    iconName: null,
+    confirmText: 'OK',
+    cancelText: 'Cancel',
+    onClose: jest.fn(),
+  },
+  scroll: {
+    scrollToTop: jest.fn(),
+    scrollToBottom: jest.fn(),
   },
   closeBlankContentTool: jest.fn(),
   closeMoveMenu: jest.fn(),
@@ -32,8 +37,9 @@ const fakeUiStore = {
   movingFromCollectionId: null,
   movingCardIds: [],
   update: jest.fn(),
-  openAlertModal: jest.fn(),
-  closeAlertModal: jest.fn(),
+  alert: jest.fn(),
+  confirm: jest.fn(),
+  closeDialog: jest.fn(),
   cardAction: 'move',
 }
 

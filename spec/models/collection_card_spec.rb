@@ -141,7 +141,7 @@ RSpec.describe CollectionCard, type: :model do
     end
   end
 
-  describe '#convert_to_new_link_card' do
+  describe '#copy_into_new_link_card' do
     let(:collection_card) { create(:collection_card) }
     let(:collection_card_link) { collection_card.copy_into_new_link_card }
 
@@ -159,7 +159,7 @@ RSpec.describe CollectionCard, type: :model do
 
     before do
       # Make sure cards are in sequential order
-      collection.reorder_cards
+      collection.reorder_cards!
     end
 
     it 'should increment all orders by 1' do
@@ -195,7 +195,7 @@ RSpec.describe CollectionCard, type: :model do
 
     before do
       # Make sure cards are in sequential order
-      collection.reorder_cards
+      collection.reorder_cards!
     end
 
     it 'should decrement all orders by 1' do

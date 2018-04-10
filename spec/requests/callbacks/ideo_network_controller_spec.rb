@@ -4,7 +4,7 @@ describe 'Ideo Profile API Requests' do
   describe 'POST #user' do
     let!(:user) { create(:user) }
     let(:uid) { user.uid }
-    let(:user_data) {
+    let(:user_data) do
       {
         uid: user.uid,
         first_name: user.first_name,
@@ -12,12 +12,19 @@ describe 'Ideo Profile API Requests' do
         email: user.email,
         picture: user.pic_url_square
       }
-    }
-    let(:valid_headers) {
+    end
+    # These are the headers the request from profile.ideo.com will have
+    let(:json_headers) do
       {
-        'Authorization' => 'shared_secret_key_abc123'
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
       }
-    }
+    end
+    let(:valid_headers) do
+      json_headers.merge(
+        'Authorization': 'shared_secret_key_abc123',
+      )
+    end
 
     before do
       ENV['IDEO_NETWORK_CALLBACK_SECRET'] = 'shared_secret_key_abc123'
@@ -48,7 +55,7 @@ describe 'Ideo Profile API Requests' do
               first_name: 'Fancy',
               last_name: 'Newname',
               email: 'fancy@newname.com',
-              picture: 'newpic.jpg'
+              picture: 'newpic.jpg',
             }
           }.to_json,
           headers: valid_headers,
@@ -107,9 +114,9 @@ describe 'Ideo Profile API Requests' do
 
     context 'invalid auth secret' do
       let(:invalid_headers) {
-        {
-          'Authorization' => 'invalid_shared_secret'
-        }
+        json_headers.merge(
+          'Authorization': 'invalid_shared_secret'
+        )
       }
 
       it 'returns a 401' do

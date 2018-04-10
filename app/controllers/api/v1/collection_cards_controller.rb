@@ -1,11 +1,8 @@
 class Api::V1::CollectionCardsController < Api::V1::BaseController
   deserializable_resource :collection_card, class: DeserializableCollectionCard, only: %i[create update]
-  load_and_authorize_resource :collection, only: %i[index]
   load_and_authorize_resource except: %i[move]
-  before_action :load_and_authorize_parent_collection, only: %i[create]
-  before_action :load_and_authorize_moving_collections, only: %i[move]
-  before_action :load_and_authorize_linking_collections, only: %i[link]
 
+  load_and_authorize_resource :collection, only: %i[index]
   def index
     render jsonapi: @collection.collection_cards
   end
@@ -14,6 +11,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
     render jsonapi: @collection_card
   end
 
+  before_action :load_and_authorize_parent_collection, only: %i[create]
   def create
     builder = CollectionCardBuilder.new(params: collection_card_params,
                                         parent_collection: @collection,
@@ -44,7 +42,10 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
   end
 
   def duplicate
-    duplicate = @collection_card.duplicate!(for_user: current_user, update_order: true)
+    duplicate = @collection_card.duplicate!(
+      for_user: current_user,
+      parent: current_user.current_user_collection,
+    )
     if duplicate.persisted? && duplicate.errors.empty?
       render jsonapi: duplicate, include: [:parent, record: [:filestack_file]]
     else
@@ -52,6 +53,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
     end
   end
 
+  before_action :load_and_authorize_moving_collections, only: %i[move]
   def move
     mover = CardMover.new(
       from_collection: @from_collection,
@@ -70,6 +72,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
   end
 
   # has its own route even though it's mostly the same as #move
+  before_action :load_and_authorize_linking_collections, only: %i[link]
   def link
     @card_action = 'link'
     move

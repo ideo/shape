@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-describe Api::V1::CollectionCardsController, type: :request, auth: true do
+describe Api::V1::CollectionCardsController, type: :request, json: true, auth: true do
   let(:user) { @user }
   let(:collection) { create(:collection, add_editors: [user]) }
 

@@ -102,7 +102,7 @@ class RolesMenu extends React.Component {
         return saveReturn
       })
       .catch((err) => {
-        uiStore.openAlertModal({
+        uiStore.alert({
           prompt: err.error[0],
         })
       })
@@ -112,7 +112,7 @@ class RolesMenu extends React.Component {
     const { apiStore } = this.props
     return apiStore.request(`users/create_from_emails`, 'POST', { emails })
       .catch((err) => {
-        uiStore.openAlertModal({
+        uiStore.alert({
           prompt: err.error[0],
         })
       })

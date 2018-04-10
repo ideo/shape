@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types'
 import { PropTypes as MobxPropTypes } from 'mobx-react'
+import _ from 'lodash'
 
 import { uiStore } from '~/stores'
 import PopoutMenu from '~/ui/global/PopoutMenu'
@@ -60,23 +61,28 @@ class CardMenu extends React.PureComponent {
 
   get menuItems() {
     const { canEdit, canReplace } = this.props
-    const duplicateItem = {
-      name: 'Duplicate', icon: <DuplicateIcon />, onClick: this.duplicateCard
-    }
-    let items = [duplicateItem]
+    let items = []
+    const actions = [
+      { name: 'Duplicate', icon: <DuplicateIcon />, onClick: this.duplicateCard },
+      { name: 'Move', icon: <MoveIcon />, onClick: this.moveCard },
+      { name: 'Link', icon: <LinkIcon />, onClick: this.linkCard },
+      { name: 'Archive', icon: <ArchiveIcon />, onClick: this.archiveCard },
+      { name: 'Replace', icon: <ReplaceIcon />, onClick: this.replaceCard },
+    ]
 
     if (canEdit) {
-      items = items.concat([
-        { name: 'Move', icon: <MoveIcon />, onClick: this.moveCard },
-        { name: 'Link', icon: <LinkIcon />, onClick: this.linkCard },
-        { name: 'Archive', icon: <ArchiveIcon />, onClick: this.archiveCard },
-      ])
+      // Replace action is added later if this.props.canReplace
+      items = _.reject(actions, { name: 'Replace' })
+    } else {
+      const viewActions = [
+        'Duplicate',
+        'Link',
+      ]
+      items = _.filter(actions, a => _.includes(viewActions, a.name))
     }
 
     if (canReplace) {
-      items.push(
-        { name: 'Replace', icon: <ReplaceIcon />, onClick: this.replaceCard }
-      )
+      items.push(_.find(actions, { name: 'Replace' }))
     }
     return items
   }
