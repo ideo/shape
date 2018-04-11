@@ -63,6 +63,18 @@ class TextItem extends React.Component {
     this.channel.unsubscribe()
   }
 
+  get canEdit() {
+    return this.props.item.can_edit
+  }
+
+  get renderEditorPill() {
+    const { locked, currentEditor } = this.state
+    const { apiStore } = this.props
+    if (!locked || !currentEditor) return ''
+    if (currentEditor.id === apiStore.currentUserId) return ''
+    return <EditorPill className="editor-pill" editor={currentEditor} />
+  }
+
   subscribeToItemEditingChannel = () => {
     const { item } = this.props
     this.channel = this.cable.subscriptions.create(
@@ -140,6 +152,8 @@ class TextItem extends React.Component {
     if (editing) {
       this.channel.perform('start_editing', { id: item.id })
     } else {
+      // Call save / debounced flush
+      this.debouncedOnTextChange.flush()
       this.channel.perform('stop_editing', { id: item.id })
     }
   }
@@ -168,18 +182,6 @@ class TextItem extends React.Component {
         this.unlockEditingIfOtherViewers()
       }, UNLOCK_WAIT_MILLISECONDS)
     }
-  }
-
-  get canEdit() {
-    return this.props.item.can_edit
-  }
-
-  get renderEditorPill() {
-    const { locked, currentEditor } = this.state
-    const { apiStore } = this.props
-    if (!locked || !currentEditor) return ''
-    if (currentEditor.id === apiStore.currentUserId) return ''
-    return <EditorPill className="editor-pill" editor={currentEditor} />
   }
 
   onTextChange = (content, delta, source, quill) => {
