@@ -108,7 +108,10 @@ class OrganizationMenu extends React.Component {
     try {
       const { apiStore } = this.props
       await group.API_archive()
-      if (group.containsUser(apiStore.currentUserId)) {
+      const roles = apiStore.findAll('roles').filter((role) =>
+        role.resource && role.resource.id === group.id)
+      if (roles.find(role => role.users.find(user => user.id ===
+          apiStore.currentUserId))) {
         window.location.reload()
       }
       apiStore.fetch('users', apiStore.currentUserId, true)
