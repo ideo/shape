@@ -41,6 +41,66 @@ class Item < ApplicationRecord
     exclude_association :parent_collection_card
   end
 
+  def started_editing(user, notify: true)
+    Cache.set(editing_cache_key, user.id, raw: true)
+    publish_to_item_channel if notify
+  end
+
+  def stopped_editing(_user, notify: true)
+    Cache.delete(editing_cache_key)
+    publish_to_item_channel if notify
+  end
+
+  def currently_editing_user_as_json
+    user_id = Cache.get(editing_cache_key, raw: true)
+    return {} if user_id.blank?
+    user = User.find(user_id)
+    {
+      id: user.id,
+      name: user.name,
+      pic_url_square: user.pic_url_square,
+    }
+  end
+
+  # Track viewers - using an increment can be prone to dupe issues
+  # e.g. same user with two browser windows open
+  def started_viewing(user, notify: true)
+    Rails.logger.info "Started Viewing #{user.id}"
+    Cache.increment(viewing_cache_key)
+    publish_to_item_channel if notify
+  end
+
+  def stopped_viewing(_user, notify: true)
+    Cache.decrement(viewing_cache_key)
+    publish_to_item_channel if notify
+  end
+
+  def num_viewers
+    Cache.get(viewing_cache_key, raw: true).to_i
+  end
+
+  def publish_to_item_channel
+    Rails.logger.info "Publish to item #{id} channel"
+    ActionCable.server.broadcast \
+      editing_stream_name,
+      {
+        editor: currently_editing_user_as_json,
+        num_viewers: num_viewers,
+      }
+  end
+
+  def editing_stream_name
+    editing_cache_key
+  end
+
+  def editing_cache_key
+    "item_#{id}_editing"
+  end
+
+  def viewing_cache_key
+    "item_#{id}_viewing"
+  end
+
   def children
     []
   end
@@ -104,34 +164,6 @@ class Item < ApplicationRecord
 
   def dont_reindex_parent!
     @dont_reindex_parent = true
-  end
-
-  def self.editing_stream_name(item_id)
-    "item_#{item_id}_editing"
-  end
-
-  def editing_stream_name
-    Item.editing_stream_name(id)
-  end
-
-  def started_editing(user)
-    Cache.set_add(editing_stream_name, user.id)
-    #ItemEditingChannel.broadcast(self)
-    ActionCable.server.broadcast \
-      editing_stream_name,
-      user_ids: currently_editing_user_ids
-  end
-
-  def stopped_editing(user)
-    Cache.set_remove(editing_stream_name, user.id)
-    #ItemEditingChannel.broadcast(self)
-    ActionCable.server.broadcast \
-      editing_stream_name,
-      user_ids: currently_editing_user_ids
-  end
-
-  def currently_editing_user_ids
-    Cache.set_members(editing_stream_name)
   end
 
   private

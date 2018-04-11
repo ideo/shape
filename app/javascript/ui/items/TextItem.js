@@ -1,13 +1,20 @@
-import { PropTypes as MobxPropTypes } from 'mobx-react'
+import { inject, PropTypes as MobxPropTypes } from 'mobx-react'
 import _ from 'lodash'
 import ReactQuill from 'react-quill'
 import styled from 'styled-components'
 
 import v from '~/utils/variables'
 import TextItemToolbar from '~/ui/items/TextItemToolbar'
+import EditorPill from '~/ui/items/EditorPill'
 
 const StyledContainer = styled.div`
   padding: 2rem 0.5rem;
+  .editor-pill {
+    position: absolute;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+  }
 `
 
 const remapHeaderToH3 = (node, delta) => {
@@ -24,12 +31,19 @@ export const overrideHeadersFromClipboard = (editor) => {
   editor.clipboard.addMatcher('H6', remapHeaderToH3)
 }
 
+@inject('apiStore')
 class TextItem extends React.Component {
   constructor(props) {
     super(props)
     this.onTextChange = _.debounce(this._onTextChange, 1000)
     this.cable = ActionCable.createConsumer('ws://localhost:3000/cable')
     this.channel = null
+  }
+
+  state = {
+    locked: false,
+    numViewers: 0,
+    editor: null
   }
 
   componentDidMount() {
@@ -41,10 +55,18 @@ class TextItem extends React.Component {
     this.subscribeToItemEditingChannel()
   }
 
+  componentWillUnmount() {
+    this.channel.unsubscribe()
+  }
+
   subscribeToItemEditingChannel = () => {
+    console.log('subscribe to editing channel')
     const { item } = this.props
     this.channel = this.cable.subscriptions.create(
-      { channel: 'ItemEditingChannel', id: item.id },
+      {
+        channel: 'ItemEditingChannel',
+        id: item.id
+      },
       {
         connected: this.connected,
         disconnected: this.disconnected,
@@ -55,7 +77,16 @@ class TextItem extends React.Component {
   }
 
   received = (data) => {
-    console.log('Channel received: ', data)
+    console.log('Channel received data', data)
+    // If editor is this user, ignore
+    const { apiStore } = this.props
+    if (data.editor.id === apiStore.currentUserId || _.isEmpty(data.editor)) {
+      data.editor = null
+    }
+    this.setState({
+      editor: data.editor,
+      numViewers: data.numViewers,
+    })
   }
 
   connected = () => {
@@ -63,23 +94,41 @@ class TextItem extends React.Component {
   }
 
   disconnected = () => {
-   console.log('Channel disconnected.')
+   console.log('Channel disconnected')
   }
 
   rejected = () => {
-   console.log('I was rejected! :(')
+   console.log('Channel rejected')
   }
 
   onBlur = () => {
-    const { item } = this.props
-    console.log('stop editing')
-    this.channel.perform('start_editing', { id: item.id })
+    this.broadcastIsEditing(false)
   }
 
   onFocus = () => {
+    this.broadcastIsEditing()
+  }
+
+  broadcastIsEditing = (editing = true) => {
+    console.log('is editing', editing)
     const { item } = this.props
-    console.log('start editing')
-    this.channel.perform('stop_editing', { id: item.id })
+    if (editing) {
+      this.channel.perform('start_editing', { id: item.id })
+    } else {
+      this.channel.perform('stop_editing', { id: item.id })
+    }
+  }
+
+  allowEditingIfViewers = () => {
+    const { numViewers } = this.state
+    if (numViewers === 0) this.broadcastIsEditing(false)
+  }
+
+  userFinishedEditing = () => {
+    // Unlock text box after 5 seconds of inactivity
+    setTimeout(() => {
+      this.allowEditingIfViewers()
+    }, 10000)
   }
 
   get canEdit() {
@@ -96,6 +145,7 @@ class TextItem extends React.Component {
 
   render() {
     const { item } = this.props
+    const { editor } = this.state
 
     // we have to convert the item to a normal JS object for Quill to be happy
     const textData = item.toJS().text_data
@@ -108,6 +158,7 @@ class TextItem extends React.Component {
         onChange: this.onTextChange,
         onFocus: this.onFocus,
         onBlur: this.onBlur,
+        readOnly: !!editor,
         modules: {
           toolbar: '#quill-toolbar',
         },
@@ -123,6 +174,7 @@ class TextItem extends React.Component {
     return (
       <StyledContainer>
         { this.canEdit && <TextItemToolbar /> }
+        { editor && <EditorPill className="editor-pill" editor={editor} /> }
         <ReactQuill
           {...quillProps}
           value={textData}
@@ -134,6 +186,10 @@ class TextItem extends React.Component {
 
 TextItem.propTypes = {
   item: MobxPropTypes.objectOrObservableObject.isRequired,
+}
+
+TextItem.wrappedComponent.propTypes = {
+  apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 
 export default TextItem

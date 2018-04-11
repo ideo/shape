@@ -1,23 +1,27 @@
 class ItemEditingChannel < ApplicationCable::Channel
-  # Called when the consumer has successfully become a subscriber to this channel.
+  # All public methods are exposed to consumers
+
   def subscribed
-    stream_from Item.editing_stream_name(params[:id])
+    item = Item.find(params[:id])
+    item.started_viewing(current_user, notify: false)
+    stream_from item.editing_stream_name
   end
 
-  # All public methods are exposed to consumers
   def start_editing
     item = Item.find(params[:id])
+    item.stopped_viewing(current_user, notify: false)
     item.started_editing(current_user)
   end
 
   def stop_editing
     item = Item.find(params[:id])
-    item.stopped_editing(current_user)
+    item.stopped_editing(current_user, notify: false)
+    item.started_viewing(current_user)
   end
 
   def unsubscribed
-    # Make sure they get marked as stopped editing
     item = Item.find(params[:id])
+    item.stopped_viewing(current_user, notify: false)
     item.stopped_editing(current_user)
   end
 end
