@@ -92,6 +92,7 @@ group :development, :test do
   gem 'rspec-rails', '~> 3.7'
   gem 'database_cleaner'
   gem 'rails-controller-testing'
+  gem 'action-cable-testing'
 end
 
 group :development do

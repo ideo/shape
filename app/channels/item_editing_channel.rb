@@ -4,7 +4,7 @@ class ItemEditingChannel < ApplicationCable::Channel
   def subscribed
     item = Item.find(params[:id])
     item.started_viewing(current_user)
-    stream_from item.editing_stream_name
+    stream_from item.stream_name
   end
 
   def start_editing

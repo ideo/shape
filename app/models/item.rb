@@ -3,6 +3,7 @@ class Item < ApplicationRecord
   include Resourceable
   include Archivable
   include HasFilestackFile
+  include RealtimeEditorsViewers
 
   resourceable roles: [Role::EDITOR, Role::VIEWER],
                edit_role: Role::EDITOR,
@@ -39,64 +40,6 @@ class Item < ApplicationRecord
     exclude_association :tag_taggings
     exclude_association :filestack_file
     exclude_association :parent_collection_card
-  end
-
-  def started_editing(user, dont_notify: false)
-    Cache.set(editing_cache_key, user.id, raw: true)
-    publish_to_item_channel unless dont_notify
-  end
-
-  def stopped_editing(_user, dont_notify: false)
-    Cache.delete(editing_cache_key)
-    publish_to_item_channel unless dont_notify
-  end
-
-  def currently_editing_user_as_json
-    user_id = Cache.get(editing_cache_key, raw: true)
-    return {} if user_id.blank?
-    user = User.find(user_id)
-    {
-      id: user.id,
-      name: user.name,
-      pic_url_square: user.pic_url_square,
-    }
-  end
-
-  # Track viewers - using an increment can be prone to dupe issues
-  # e.g. same user with two browser windows open
-  def started_viewing(user, dont_notify: false)
-    Cache.set_add(viewing_cache_key, user.id)
-    publish_to_item_channel unless dont_notify
-  end
-
-  def stopped_viewing(user, dont_notify: false)
-    Cache.set_remove(viewing_cache_key, user.id)
-    publish_to_item_channel unless dont_notify
-  end
-
-  def num_viewers
-    Cache.set_members(viewing_cache_key).size
-  end
-
-  def publish_to_item_channel
-    ActionCable.server.broadcast \
-      editing_stream_name,
-      {
-        current_editor: currently_editing_user_as_json,
-        num_viewers: num_viewers,
-      }
-  end
-
-  def editing_stream_name
-    editing_cache_key
-  end
-
-  def editing_cache_key
-    "item_#{id}_editing"
-  end
-
-  def viewing_cache_key
-    "item_#{id}_viewing"
   end
 
   def children

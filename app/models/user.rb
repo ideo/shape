@@ -85,6 +85,15 @@ class User < ApplicationRecord
     ).first
   end
 
+  # Simplified format, used by action cable
+  def as_json(options = {})
+    {
+      id: id,
+      name: name,
+      pic_url_square: pic_url_square
+    }
+  end
+
   def pic_url_square
     read_attribute(:pic_url_square) if read_attribute(:pic_url_square).present?
     'https://d3none3dlnlrde.cloudfront.net/assets/users/avatars/missing/square.jpg'
