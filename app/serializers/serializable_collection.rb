@@ -12,7 +12,7 @@ class SerializableCollection < BaseJsonSerializer
   end
 
   attribute :type do
-    @object.type || @object.class.name.to_s
+    @object.type || @object.class.name
   end
 
   attribute :breadcrumb do

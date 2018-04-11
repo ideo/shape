@@ -97,17 +97,6 @@ class User < ApplicationRecord
     [first_name, last_name].compact.join(' ')
   end
 
-  def current_user_collection_id
-    current_user_collection.try(:id)
-  end
-
-  def current_user_collection
-    return nil if current_organization.blank?
-
-    # TODO rename "user" to user_collection
-    collections.user.find_by_organization_id(current_organization_id)
-  end
-
   def switch_to_organization(organization = nil)
     if organization.blank?
       self.current_organization = self.current_user_collection = nil
@@ -125,7 +114,7 @@ class User < ApplicationRecord
   def current_user_collection
     return nil if current_organization.blank?
 
-    # TODO rename "user" to user_collection
+    # TODO: rename "user" to user_collection
     collections.user.find_by_organization_id(current_organization_id)
   end
 
@@ -189,7 +178,7 @@ class User < ApplicationRecord
   def current_org_groups_roles_identifiers
     return [] if current_organization.blank?
 
-    org_group_ids = organization_group_ids(current_organization)
+    org_group_ids = organization_group_ids(current_organization).uniq
 
     return [] if org_group_ids.blank?
 

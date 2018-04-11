@@ -3,45 +3,42 @@ require 'rails_helper'
 RSpec.describe LinkToSharedCollectionsWorker, type: :worker do
   describe '#perform' do
     let(:users_to_add) { create_list(:user, 1) }
-    let(:collection_to_link) { create(:collection) }
-    let(:shared_with_me) { create(:collection, num_cards: 0) }
-    let(:my_collection) { create(:collection, num_cards: 1) }
-    let(:fake_link_shared) { create(:collection_card) }
-    let(:fake_link_my) { create(:collection_card) }
+    let!(:collection_to_link) { create(:collection) }
+    let(:shared_with_me) { create(:shared_with_me_collection, num_cards: 0) }
+    let(:my_collection) { create(:user_collection, num_cards: 1) }
 
     before do
       allow_any_instance_of(User)
         .to receive(:current_shared_collection).and_return(shared_with_me)
       allow_any_instance_of(User)
         .to receive(:current_user_collection).and_return(my_collection)
-      allow(CollectionCard::Link).to receive(:new).and_return(
-        fake_link_shared, fake_link_my)
     end
 
     it 'should create a link to shared/my collections' do
       LinkToSharedCollectionsWorker.new.perform(
         users_to_add.map(&:id),
         collection_to_link.id,
-        collection_to_link.class.name.to_s,
+        collection_to_link.class.name,
       )
 
-      expect(fake_link_shared.parent).to be shared_with_me
-      expect(fake_link_my.parent).to be my_collection
-      expect(fake_link_shared.collection_id).to equal(collection_to_link.id)
-      expect(fake_link_my.collection_id).to equal(collection_to_link.id)
+      # each one should have been added 1 link card
+      expect(shared_with_me.link_collection_cards.count).to eq 1
+      expect(my_collection.link_collection_cards.count).to eq 1
+      # my_collection now has 2 cards total
+      expect(my_collection.collection_cards.count).to eq 2
     end
 
     context 'when a link to the object already exists' do
-      let (:existing_link) { create(:collection_card) }
+      let(:my_collection) { create(:user_collection, num_cards: 0) }
+      let!(:existing_link) do
+        create(:collection_card_link, parent: my_collection, collection: collection_to_link)
+      end
 
       before do
-        existing_link.collection_id = collection_to_link.id
-        my_collection.collection_cards.delete_all
-        my_collection.collection_cards.push(existing_link)
         LinkToSharedCollectionsWorker.new.perform(
           users_to_add.map(&:id),
           collection_to_link.id,
-          collection_to_link.class.name.to_s,
+          collection_to_link.class.name,
         )
       end
 
@@ -53,13 +50,12 @@ RSpec.describe LinkToSharedCollectionsWorker, type: :worker do
     context 'with multiple users' do
       let(:users_to_add) { create_list(:user, 4) }
 
-      it 'should create links for every user in every group' do
-        expect(CollectionCard::Link).to receive(:new).at_least(8).times
-
+      it 'should create two links for every user' do
+        expect(CollectionCard::Link).to receive(:create).at_least(8).times
         LinkToSharedCollectionsWorker.new.perform(
           users_to_add.map(&:id),
           collection_to_link.id,
-          collection_to_link.class.name.to_s,
+          collection_to_link.class.name,
         )
       end
     end
@@ -67,16 +63,15 @@ RSpec.describe LinkToSharedCollectionsWorker, type: :worker do
     context 'when object was created by the user being linked to' do
       let!(:user) { create(:user) }
       let!(:users_to_add) { [user] }
-      let!(:collection_created_by) { create(:collection) }
+      let!(:collection_created_by) { create(:collection, created_by: user) }
+      let(:shared_with_me) { create(:shared_with_me_collection, num_cards: 0) }
+      let(:my_collection) { create(:user_collection, num_cards: 0) }
 
       before do
-        collection_created_by.update(created_by: user)
-        my_collection.collection_cards.delete_all
-        shared_with_me.collection_cards.delete_all
         LinkToSharedCollectionsWorker.new.perform(
           users_to_add.map(&:id),
           collection_created_by.id,
-          collection_created_by.class.name.to_s,
+          collection_created_by.class.name,
         )
       end
 

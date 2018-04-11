@@ -69,7 +69,7 @@ RSpec.describe Roles::MassRemove, type: :service do
         expect(UnlinkFromSharedCollectionsWorker).to receive(:perform_async).with(
           [user.id] + group.roles.reduce([]) { |acc, role| acc + role.users },
           collection.id,
-          collection.class.name.to_s,
+          collection.class.name,
         )
         mass_remove.call
       end
@@ -80,9 +80,9 @@ RSpec.describe Roles::MassRemove, type: :service do
 
         it 'should only pass unique ids to create links' do
           expect(UnlinkFromSharedCollectionsWorker).to receive(:perform_async).with(
-            (users).map(&:id),
+            users.map(&:id),
             collection.id,
-            collection.class.name.to_s,
+            collection.class.name,
           )
           mass_remove.call
         end
@@ -146,7 +146,7 @@ RSpec.describe Roles::MassRemove, type: :service do
       it 'queues worker for itself again to remove children' do
         expect(MassRemoveRolesWorker).to receive(:perform_async).with(
           collection.id,
-          collection.class.name.to_s,
+          collection.class.name,
           Role::EDITOR,
           users.map(&:id),
           groups.map(&:id),

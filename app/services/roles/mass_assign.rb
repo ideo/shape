@@ -63,36 +63,36 @@ module Roles
 
     def add_roles_to_children
       return unless @object.respond_to?(:children)
+      params = [
+        @added_users.map(&:id),
+        @added_groups.map(&:id),
+        @role_name,
+        @object.id,
+        @object.class.name,
+      ]
       if @synchronous
-        AddRolesToChildrenWorker.new.perform(
-          @added_users.map(&:id),
-          @added_groups.map(&:id),
-          @role_name,
-          @object.id,
-          @object.class.name.to_s,
-        )
+        AddRolesToChildrenWorker.new.perform(*params)
       else
-        AddRolesToChildrenWorker.perform_async(
-          @added_users.map(&:id),
-          @added_groups.map(&:id),
-          @role_name,
-          @object.id,
-          @object.class.name.to_s,
-        )
+        AddRolesToChildrenWorker.perform_async(*params)
       end
     end
 
     def link_to_shared_collections
-      group_users = @added_groups
-        .reject { |group| group.primary? }
-        .reduce([]) {
-          |accg, group| accg + group.roles.reduce([]) {
-            |accr, role| accr + role.users } }
       LinkToSharedCollectionsWorker.perform_async(
-        (group_users + @added_users).uniq.map(&:id),
+        shared_user_ids,
         @object.id,
-        @object.class.name.to_s,
+        @object.class.name,
       )
+    end
+
+    # NOTE: this method is duplicated w/ MassRemove
+    def shared_user_ids
+      groups = @groups.reject(&:primary?)
+      # @groups can be an array and not a relation, try to get user_ids via relation first
+      unless (group_user_ids = groups.try(:user_ids))
+        group_user_ids = Group.where(id: groups.pluck(:id)).user_ids
+      end
+      (group_user_ids + @users.map(&:id)).uniq
     end
 
     def notify_users

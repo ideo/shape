@@ -14,21 +14,28 @@ module Roles
 
     def call
       remove_role_from_object(@object)
-      remove_links_from_user_collections if @remove_link
+      remove_links_from_shared_collections if @remove_link
       remove_roles_from_children
     end
 
     private
 
-    def remove_links_from_user_collections
-      group_users = @groups.reduce([]) {
-        |accg, group| accg + group.roles.reduce([]) {
-          |accr, role| accr + role.users } }
+    def remove_links_from_shared_collections
       UnlinkFromSharedCollectionsWorker.perform_async(
-        (group_users + @users).uniq.map(&:id),
+        shared_user_ids,
         @object.id,
-        @object.class.name.to_s,
+        @object.class.name,
       )
+    end
+
+    # NOTE: this method is duplicated w/ MassAssign
+    def shared_user_ids
+      groups = @groups.reject(&:primary?)
+      # @groups can be an array and not a relation, try to get user_ids via relation first
+      unless (group_user_ids = groups.try(:user_ids))
+        group_user_ids = Group.where(id: groups.pluck(:id)).user_ids
+      end
+      (group_user_ids + @users.map(&:id)).uniq
     end
 
     # Removes roles synchronously from children,
@@ -42,7 +49,7 @@ module Roles
       else
         MassRemoveRolesWorker.perform_async(
           @object.id,
-          @object.class.name.to_s,
+          @object.class.name,
           @role_name,
           @users.map(&:id),
           @groups.map(&:id),
@@ -56,7 +63,7 @@ module Roles
       child.children.each do |grandchild|
         MassRemoveRolesWorker.perform_async(
           grandchild.id,
-          grandchild.class.name.to_s,
+          grandchild.class.name,
           @role_name,
           @users.map(&:id),
           @groups.map(&:id),

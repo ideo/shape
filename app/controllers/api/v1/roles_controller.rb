@@ -21,8 +21,8 @@ class Api::V1::RolesController < Api::V1::BaseController
   # - array of roles successfully created, including users with that role
   # /[collections/items/groups]/:id/roles
   def create
-    users = User.where(id: json_api_params[:user_ids]).to_a
-    groups = Group.where(id: json_api_params[:group_ids]).to_a
+    users = User.where(id: json_api_params[:user_ids])
+    groups = Group.where(id: json_api_params[:group_ids])
     assigner = Roles::MassAssign.new(
       object: record,
       role_name: role_params[:name],
@@ -30,7 +30,7 @@ class Api::V1::RolesController < Api::V1::BaseController
       groups: groups,
       propagate_to_children: true,
       invited_by: current_user,
-      create_link: !json_api_params[:is_switching],
+      create_link: !json_api_params[:is_switching] && !record.is_a?(Group),
     )
     if assigner.call
       render jsonapi: record.roles.reload, include: %i[users groups resource]

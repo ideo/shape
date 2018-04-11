@@ -158,7 +158,7 @@ class RolesMenu extends React.Component {
         { sortedRoleEntities.map(combined =>
           (<RoleSelect
             enabled={canEdit && this.currentUserCheck(combined.entity, combined.role)}
-            key={combined.entity.id + combined.role.id}
+            key={`${combined.entity.id}_${combined.entity.internalType}_r${combined.role.id}`}
             role={combined.role}
             roleTypes={roleTypes}
             entity={combined.entity}
