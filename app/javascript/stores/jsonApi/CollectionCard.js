@@ -62,10 +62,17 @@ class CollectionCard extends BaseRecord {
       return false
     }
     if (!isReplacing) {
+      let prompt = 'Are you sure you want to archive this?'
+      const confirmText = 'Archive'
+      let iconName = 'Archive'
+      if (this.link) {
+        iconName = 'Link'
+        prompt = 'Are you sure you want to archive this link?'
+      }
       uiStore.confirm({
-        prompt: 'Are you sure you want to archive this?',
-        confirmText: 'Archive',
-        iconName: 'Archive',
+        prompt,
+        confirmText,
+        iconName,
         onConfirm: onAgree,
       })
     } else onAgree()

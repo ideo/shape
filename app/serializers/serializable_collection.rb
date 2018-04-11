@@ -28,7 +28,7 @@ class SerializableCollection < BaseJsonSerializer
   has_many :collection_cards do
     data do
       @object.collection_cards_viewable_by(
-        @object.collection_cards.includes(:item, :collection),
+        @object.collection_cards,
         @current_user,
       )
     end

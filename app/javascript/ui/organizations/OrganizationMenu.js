@@ -20,8 +20,7 @@ class OrganizationMenu extends React.Component {
 
   componentDidMount() {
     const { apiStore, userGroups } = this.props
-    const groupReqs = userGroups.map(group =>
-      apiStore.request(`groups/${group.id}/roles`, 'GET'))
+    const groupReqs = userGroups.map(group => this.fetchRoles(group))
     Promise.all(groupReqs)
       .then(responses => {
         const roles = responses.map(res => res.data)
@@ -42,9 +41,10 @@ class OrganizationMenu extends React.Component {
     this.modifyGroupOpen = false
     this.editGroup = {}
     if (newGroup) {
-      this.isLoading = true
       this.onModifyGroupRoles(editedGroup)
-      const res = await apiStore.request(`groups/${editedGroup.id}/roles`, 'GET')
+      this.isLoading = true
+      const res = await this.fetchRoles(editedGroup)
+      // because this is after async/await
       runInAction(() => { this.isLoading = false })
       apiStore.sync(res)
     }
@@ -77,6 +77,11 @@ class OrganizationMenu extends React.Component {
     this.modifyGroupRoles = false
     this.isLoading = false
     this.editGroup = {}
+  }
+
+  fetchRoles = (group) => {
+    const { apiStore } = this.props
+    return apiStore.request(`groups/${group.id}/roles`, 'GET')
   }
 
   onRolesSave = (res) => {
