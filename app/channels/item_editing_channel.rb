@@ -3,7 +3,7 @@ class ItemEditingChannel < ApplicationCable::Channel
 
   def subscribed
     item = Item.find(params[:id])
-    item.started_viewing(current_user, notify: false)
+    item.started_viewing(current_user)
     stream_from item.editing_stream_name
   end
 
@@ -14,12 +14,12 @@ class ItemEditingChannel < ApplicationCable::Channel
 
   def stop_editing
     item = Item.find(params[:id])
-    item.stopped_editing(current_user, notify: false)
+    item.stopped_editing(current_user)
   end
 
   def unsubscribed
     item = Item.find(params[:id])
-    item.stopped_viewing(current_user, notify: false)
+    item.stopped_viewing(current_user, dont_notify: true)
     item.stopped_editing(current_user)
   end
 end

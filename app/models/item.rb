@@ -41,14 +41,14 @@ class Item < ApplicationRecord
     exclude_association :parent_collection_card
   end
 
-  def started_editing(user, notify: true)
+  def started_editing(user, dont_notify: false)
     Cache.set(editing_cache_key, user.id, raw: true)
-    publish_to_item_channel if notify
+    publish_to_item_channel unless dont_notify
   end
 
-  def stopped_editing(_user, notify: true)
+  def stopped_editing(_user, dont_notify: false)
     Cache.delete(editing_cache_key)
-    publish_to_item_channel if notify
+    publish_to_item_channel unless dont_notify
   end
 
   def currently_editing_user_as_json
@@ -64,14 +64,14 @@ class Item < ApplicationRecord
 
   # Track viewers - using an increment can be prone to dupe issues
   # e.g. same user with two browser windows open
-  def started_viewing(user, notify: true)
+  def started_viewing(user, dont_notify: false)
     Cache.set_add(viewing_cache_key, user.id)
-    publish_to_item_channel if notify
+    publish_to_item_channel unless dont_notify
   end
 
-  def stopped_viewing(user, notify: true)
+  def stopped_viewing(user, dont_notify: false)
     Cache.set_remove(viewing_cache_key, user.id)
-    publish_to_item_channel if notify
+    publish_to_item_channel unless dont_notify
   end
 
   def num_viewers
@@ -82,7 +82,7 @@ class Item < ApplicationRecord
     ActionCable.server.broadcast \
       editing_stream_name,
       {
-        editor: currently_editing_user_as_json,
+        current_editor: currently_editing_user_as_json,
         num_viewers: num_viewers,
       }
   end
