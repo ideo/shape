@@ -37,7 +37,8 @@ class TextItem extends React.Component {
     super(props)
     this.onTextChange = _.debounce(this._onTextChange, 1000)
     this.cable = ActionCable.createConsumer('ws://localhost:3000/cable')
-    this.channel = null
+    this.channel = undefined
+    this.unlockTimeout = undefined
   }
 
   state = {
@@ -110,7 +111,7 @@ class TextItem extends React.Component {
   }
 
   broadcastIsEditing = (editing = true) => {
-    console.log('is editing', editing)
+    console.log('broadcast editing', editing)
     const { item } = this.props
     if (editing) {
       this.channel.perform('start_editing', { id: item.id })
@@ -121,12 +122,20 @@ class TextItem extends React.Component {
 
   allowEditingIfViewers = () => {
     const { numViewers } = this.state
-    if (numViewers === 0) this.broadcastIsEditing(false)
+    // TODO: stop user from editing text
+
+    // Broadcast that other viewers can edit,
+    // if there are other viewers (this user is counted as a viewer)
+    if (numViewers > 1) this.broadcastIsEditing(false)
   }
 
+  // Unlock text box after 5 seconds of inactivity
   userFinishedEditing = () => {
-    // Unlock text box after 5 seconds of inactivity
-    setTimeout(() => {
+    // Reset the timeout so user has another 5 seconds
+    // if they just finished editing
+    if (this.unlockTimeout) clearTimeout(this.unlockTimeout)
+
+    this.unlockTimeout = setTimeout(() => {
       this.allowEditingIfViewers()
     }, 10000)
   }

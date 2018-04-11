@@ -65,22 +65,20 @@ class Item < ApplicationRecord
   # Track viewers - using an increment can be prone to dupe issues
   # e.g. same user with two browser windows open
   def started_viewing(user, notify: true)
-    Rails.logger.info "Started Viewing #{user.id}"
-    Cache.increment(viewing_cache_key)
+    Cache.set_add(viewing_cache_key, user.id)
     publish_to_item_channel if notify
   end
 
-  def stopped_viewing(_user, notify: true)
-    Cache.decrement(viewing_cache_key)
+  def stopped_viewing(user, notify: true)
+    Cache.set_remove(viewing_cache_key, user.id)
     publish_to_item_channel if notify
   end
 
   def num_viewers
-    Cache.get(viewing_cache_key, raw: true).to_i
+    Cache.set_members(viewing_cache_key).size
   end
 
   def publish_to_item_channel
-    Rails.logger.info "Publish to item #{id} channel"
     ActionCable.server.broadcast \
       editing_stream_name,
       {
