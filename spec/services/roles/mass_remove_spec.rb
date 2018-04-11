@@ -11,6 +11,7 @@ RSpec.describe Roles::MassRemove, type: :service do
   let(:groups) { create_list(:group, 1) }
   let(:role_name) { Role::EDITOR }
   let(:remove_from_children_sync) { true }
+  let(:remove_link) { false }
   let(:mass_remove) do
     Roles::MassRemove.new(
       object: collection,
@@ -18,6 +19,7 @@ RSpec.describe Roles::MassRemove, type: :service do
       users: users,
       groups: groups,
       remove_from_children_sync: remove_from_children_sync,
+      remove_link: remove_link,
     )
   end
 
@@ -60,6 +62,33 @@ RSpec.describe Roles::MassRemove, type: :service do
       expect(group.has_role?(role_name, subcollection)).to be false
     end
 
+    context 'with remove_link true' do
+      let!(:remove_link) { true }
+
+      it 'removes links from user collections' do
+        expect(UnlinkFromSharedCollectionsWorker).to receive(:perform_async).with(
+          [user.id] + group.roles.reduce([]) { |acc, role| acc + role.users },
+          collection.id,
+          collection.class.name,
+        )
+        mass_remove.call
+      end
+
+      context 'with a user and a group which contains the same user' do
+        let!(:users) { create_list(:user, 1) }
+        let!(:groups) { [create(:group, add_members: [users.first])] }
+
+        it 'should only pass unique ids to create links' do
+          expect(UnlinkFromSharedCollectionsWorker).to receive(:perform_async).with(
+            users.map(&:id),
+            collection.id,
+            collection.class.name,
+          )
+          mass_remove.call
+        end
+      end
+    end
+
     context 'remove_from_children_sync = true' do
       it 'should call worker for each grandchild' do
         expect(MassRemoveRolesWorker).to receive(:perform_async).exactly(grandchildren.count).times
@@ -70,6 +99,12 @@ RSpec.describe Roles::MassRemove, type: :service do
     context 'if user has other roles on object' do
       before do
         collection.items.each { |i| user.add_role(Role::VIEWER, i) }
+       { roles: [
+        { id: 1, users: [
+          { name: "Mo" }, { name: "Me" }
+        ] },
+        { id: 2, users: [
+          { name: "No" }] }] }
       end
 
       it 'should leave any other roles from same user' do
@@ -111,7 +146,7 @@ RSpec.describe Roles::MassRemove, type: :service do
       it 'queues worker for itself again to remove children' do
         expect(MassRemoveRolesWorker).to receive(:perform_async).with(
           collection.id,
-          collection.class.name.to_s,
+          collection.class.name,
           Role::EDITOR,
           users.map(&:id),
           groups.map(&:id),

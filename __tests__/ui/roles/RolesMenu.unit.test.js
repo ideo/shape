@@ -110,75 +110,86 @@ describe('RolesMenu', () => {
     })
   })
 
-  describe('onDelete', () => {
-    let role = { id: 2 }
-    let user = { id: 4 }
+  describe('deleteRoles', () => {
+    const role = { id: 2 }
+    const user = { id: 4, internalType: 'users' }
     const res = { data: [] }
 
-    beforeEach(() => {
+    beforeEach(async () => {
       apiStore.request.mockReturnValue(Promise.resolve(res))
+      await component.deleteRoles(role, user, { isSwitching: true })
     })
 
-    describe('with a user', () => {
+    describe('when switching a role', () => {
       it('should make an api store request with correct data', () => {
-        role = { id: 2 }
-        user = { id: 4, internalType: 'users' }
-        component.onDelete(role, user, false)
         expect(apiStore.request).toHaveBeenCalledWith(
-          `users/${user.id}/roles/${role.id}`, 'DELETE'
+          `users/${user.id}/roles/${role.id}`,
+          'DELETE',
+          { is_switching: true },
         )
       })
     })
 
-    describe('when to remove is true', () => {
-      it('should call the onSave prop after the request is done', (done) => {
-        component.onDelete(role, user, true).then(() => {
-          expect(props.onSave).toHaveBeenCalledWith(res)
-          done()
-        })
+    describe('when is not swtching', () => {
+      beforeEach(async () => {
+        component.filterSearchableItems = jest.fn()
+        await component.deleteRoles(role, user, { isSwitching: false })
       })
 
-      it('should filter the searchable items', (done) => {
-        component.filterSearchableItems = jest.fn()
-        component.onDelete(role, user, true).then(() => {
-          expect(component.filterSearchableItems).toHaveBeenCalled()
-          done()
-        })
+      it('should call the onSave prop after the request is done', () => {
+        expect(props.onSave).toHaveBeenCalledWith(res)
+      })
+
+      it('should filter the searchable items', () => {
+        expect(component.filterSearchableItems).toHaveBeenCalled()
       })
     })
   })
 
-  describe('onCreateRoles', () => {
+  describe('createRoles', () => {
     describe('with a users', () => {
       let users
+      let opts
 
-      beforeEach(() => {
+      beforeEach(async () => {
         users = [{ id: 3, internalType: 'users' }, { id: 5, internalType: 'users' }]
+        opts = { isSwitching: true }
         apiStore.request.mockReturnValue(Promise.resolve({ data: [] }))
         apiStore.fetchAll.mockReturnValue(Promise.resolve({ data: [] }))
+        component.filterSearchableItems = jest.fn()
+        await component.createRoles(users, 'editor', opts)
       })
 
       it('should send a request to create roles with role and user ids', () => {
-        component.onCreateRoles(users, 'editor')
         expect(apiStore.request).toHaveBeenCalledWith(
           'collections/1/roles',
           'POST',
-          { role: { name: 'editor' }, user_ids: [3, 5], group_ids: [] }
+          {
+            role: { name: 'editor' },
+            user_ids: [3, 5],
+            group_ids: [],
+            is_switching: true,
+          },
         )
       })
 
-      it('should call onSave', (done) => {
-        component.onCreateRoles(users, 'editor').then(() => {
-          expect(props.onSave).toHaveBeenCalled()
-          done()
-        })
+      it('should call onSave', () => {
+        expect(props.onSave).toHaveBeenCalled()
       })
 
-      it('should filter the searchable items', (done) => {
-        component.filterSearchableItems = jest.fn()
-        component.onCreateRoles(users, 'editor').then(() => {
-          expect(component.filterSearchableItems).toHaveBeenCalled()
-          done()
+      it('should filter the searchable items', () => {
+        expect(component.filterSearchableItems).toHaveBeenCalled()
+      })
+
+      describe('when not switching roles', () => {
+        beforeEach(async () => {
+          opts.isSwitching = false
+          apiStore.request.mockClear()
+          await component.createRoles(users, 'editor', opts)
+        })
+
+        it('should pass is switching as false', () => {
+          expect(apiStore.request.mock.calls[0][2].is_switching).toBeFalsy()
         })
       })
     })

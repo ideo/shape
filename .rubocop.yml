@@ -50,7 +50,7 @@ Style/AndOr:
   # Whether `and` and `or` are banned only in conditionals (conditionals)
   # or completely (always).
   # They read better, more like normal English.
-  Enabled: false
+  Enabled: 'conditionals'
 
 Style/IfUnlessModifier:
   Enabled: false

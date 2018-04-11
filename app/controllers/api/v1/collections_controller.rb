@@ -20,7 +20,8 @@ class Api::V1::CollectionsController < Api::V1::BaseController
   def create
     builder = CollectionBuilder.new(params: collection_params,
                                     organization: @organization,
-                                    parent_card: @collection_card)
+                                    parent_card: @collection_card,
+                                    created_by: current_user)
 
     if builder.save
       render jsonapi: builder.collection

@@ -3,7 +3,7 @@
 :namespace: sidekiq
 :concurrency: 7
 development:
-  :concurrency: 20
+  :concurrency: 5
 staging:
   :concurrency: 7
 production:

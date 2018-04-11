@@ -8,6 +8,7 @@ RSpec.describe Roles::MassAssign, type: :service do
   let(:role_name) { :editor }
   let(:propagate_to_children) { false }
   let(:invited_by) { nil }
+  let(:create_link) { false }
   let(:assign_role) do
     Roles::MassAssign.new(
       object: object,
@@ -16,6 +17,7 @@ RSpec.describe Roles::MassAssign, type: :service do
       groups: groups,
       propagate_to_children: propagate_to_children,
       invited_by: invited_by,
+      create_link: create_link,
     )
   end
   let(:deliver_double) do
@@ -89,7 +91,55 @@ RSpec.describe Roles::MassAssign, type: :service do
             groups.map(&:id),
             role_name,
             object.id,
-            object.class.name.to_s,
+            object.class.name,
+          )
+          assign_role.call
+        end
+      end
+    end
+
+    context 'when it should create links' do
+      let!(:create_link) { true }
+
+      it 'adds links to user collections' do
+        all_group_users = groups.reduce([]) {
+          |accg, group| accg + group.roles.reduce([]) {
+            |accr, role| accr + role.users } }
+        expect(LinkToSharedCollectionsWorker).to receive(:perform_async).with(
+          (users + all_group_users).map(&:id),
+          object.id,
+          object.class.name,
+        )
+        assign_role.call
+      end
+
+      context 'with a user and a group which contains the same user' do
+        let!(:users) { create_list(:user, 1) }
+        let!(:groups) { [create(:group, add_members: [users.first])] }
+
+        it 'should only pass unique ids to create links' do
+          expect(LinkToSharedCollectionsWorker).to receive(:perform_async).with(
+            (users).map(&:id),
+            object.id,
+            object.class.name,
+          )
+          assign_role.call
+        end
+      end
+
+      context 'with a primary group' do
+        let!(:primary_group) { create(:group) }
+        let!(:groups) { [primary_group] }
+
+        before do
+          allow(primary_group).to receive(:primary?).and_return(true)
+        end
+
+        it 'should not link to any primary groups' do
+          expect(LinkToSharedCollectionsWorker).to receive(:perform_async).with(
+            (users).map(&:id),
+            object.id,
+            object.class.name,
           )
           assign_role.call
         end

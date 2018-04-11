@@ -110,6 +110,16 @@ class CollectionCard < ApplicationRecord
     true
   end
 
+  def self.with_record(record)
+    if record.is_a?(Item)
+      where(item_id: record.id)
+    elsif record.is_a?(Collection)
+      where(collection_id: record.id)
+    else
+      []
+    end
+  end
+
   private
 
   def assign_default_height_and_width

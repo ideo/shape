@@ -41,6 +41,7 @@ ActiveRecord::Schema.define(version: 20180406184838) do
     t.datetime "updated_at", null: false
     t.jsonb "breadcrumb"
     t.boolean "archived", default: false
+    t.integer "created_by_id"
     t.index ["cloned_from_id"], name: "index_collections_on_cloned_from_id"
     t.index ["organization_id"], name: "index_collections_on_organization_id"
   end
