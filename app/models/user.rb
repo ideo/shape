@@ -28,6 +28,7 @@ class User < ApplicationRecord
 
   validates :email, presence: true
   validates :uid, :provider, presence: true, if: :active?
+  validates :uid, uniqueness: { scope: :provider }, if: :active?
 
   searchkick callbacks: :async, word_start: [:name]
 
@@ -38,6 +39,11 @@ class User < ApplicationRecord
     pending: 1,
     deleted: 2,
   }
+
+  # to turn off devise validatable for uniqueness of email
+  def will_save_change_to_email?
+    false
+  end
 
   def search_data
     {
