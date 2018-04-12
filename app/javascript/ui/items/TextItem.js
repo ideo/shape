@@ -9,6 +9,7 @@ import TextItemToolbar from '~/ui/items/TextItemToolbar'
 import EditorPill from '~/ui/items/EditorPill'
 
 // How long to wait before unlocking editor due to inactivity
+// Only used if there are other viewers
 const UNLOCK_IN_MILLISECONDS = 3000
 
 const StyledContainer = styled.div`
@@ -39,8 +40,8 @@ export const overrideHeadersFromClipboard = (editor) => {
 
 // EDITOR
 // start editing - focus event: broadcast, start unlock timer
-// typing - change event: save, reset unlock timer
-// stop editing - blur event OR unlock timer completes: save, unlock, broadcast
+// typing - keyUp event: save, reset unlock timer
+// stop editing - blur event OR unlock timer completes: unlock, save, broadcast
 
 // VIEWER
 // receive editor present event: lock text box
