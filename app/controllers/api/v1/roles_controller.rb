@@ -47,8 +47,12 @@ class Api::V1::RolesController < Api::V1::BaseController
   # /users/:id/roles/:id
   # /groups/:id/roles/:id
   def destroy
+    # mobx-jsonapi-store might not be sending params when set to false so
+    # is_switching isn't coming through.
+    # TODO: investigate why json_api_params doesn't exist.
+    is_switching = json_api_params ? json_api_params[:is_switching] : false
     if remove_role(role: @role, user: @user, group: @group, is_switching:
-                  json_api_params[:is_switching])
+                  is_switching)
       render jsonapi: @role.resource.roles.reload, include: %i[users groups resource]
     else
       render_api_errors remove_roles.errors
