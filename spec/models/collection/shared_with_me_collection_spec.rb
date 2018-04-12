@@ -14,7 +14,7 @@ describe Collection::SharedWithMeCollection, type: :model do
     it 'should create a Collection::UserCollection' do
       expect {
         shared_with_me_collection
-      }.to change(Collection::SharedWithMeCollection, :count).by(1)
+      }.to change(Collection::SharedWithMeCollection, :count).by(2)
     end
 
     it 'the collection should belong to same org as parent' do
@@ -36,7 +36,7 @@ describe Collection::SharedWithMeCollection, type: :model do
     it 'should create a Collection::UserCollection' do
       expect {
         shared_with_me_collection
-      }.to change(Collection::SharedWithMeCollection, :count).by(1)
+      }.to change(Collection::SharedWithMeCollection, :count).by(4)
     end
 
     it 'should set the group as the viewer of the collection' do

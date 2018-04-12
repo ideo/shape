@@ -3,6 +3,7 @@ require 'rails_helper'
 RSpec.describe LinkToSharedCollectionsWorker, type: :worker do
   describe '#perform' do
     let(:users_to_add) { create_list(:user, 1) }
+    let(:groups_to_add) { create_list(:group, 1) }
     let!(:collection_to_link) { create(:collection) }
     let(:shared_with_me) { create(:shared_with_me_collection, num_cards: 0) }
     let(:my_collection) { create(:user_collection, num_cards: 1) }
@@ -17,6 +18,7 @@ RSpec.describe LinkToSharedCollectionsWorker, type: :worker do
     it 'should create a link to shared/my collections' do
       LinkToSharedCollectionsWorker.new.perform(
         users_to_add.map(&:id),
+        groups_to_add.map(&:id),
         collection_to_link.id,
         collection_to_link.class.name,
       )
@@ -28,6 +30,18 @@ RSpec.describe LinkToSharedCollectionsWorker, type: :worker do
       expect(my_collection.collection_cards.count).to eq 2
     end
 
+    it 'should create links to groups shared collections' do
+      LinkToSharedCollectionsWorker.new.perform(
+        users_to_add.map(&:id),
+        groups_to_add.map(&:id),
+        collection_to_link.id,
+        collection_to_link.class.name,
+      )
+      expect(
+        groups_to_add.first.current_shared_collection.collection_cards.count
+      ).to eq(1)
+    end
+
     context 'when a link to the object already exists' do
       let(:my_collection) { create(:user_collection, num_cards: 0) }
       let!(:existing_link) do
@@ -37,6 +51,7 @@ RSpec.describe LinkToSharedCollectionsWorker, type: :worker do
       before do
         LinkToSharedCollectionsWorker.new.perform(
           users_to_add.map(&:id),
+          groups_to_add.map(&:id),
           collection_to_link.id,
           collection_to_link.class.name,
         )
@@ -54,6 +69,7 @@ RSpec.describe LinkToSharedCollectionsWorker, type: :worker do
         expect(CollectionCard::Link).to receive(:create).at_least(8).times
         LinkToSharedCollectionsWorker.new.perform(
           users_to_add.map(&:id),
+          groups_to_add.map(&:id),
           collection_to_link.id,
           collection_to_link.class.name,
         )
@@ -70,6 +86,7 @@ RSpec.describe LinkToSharedCollectionsWorker, type: :worker do
       before do
         LinkToSharedCollectionsWorker.new.perform(
           users_to_add.map(&:id),
+          groups_to_add.map(&:id),
           collection_created_by.id,
           collection_created_by.class.name,
         )

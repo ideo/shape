@@ -80,9 +80,15 @@ module Roles
     def link_to_shared_collections
       LinkToSharedCollectionsWorker.perform_async(
         shared_user_ids,
+        group_ids,
         @object.id,
         @object.class.name,
       )
+    end
+
+    def group_ids
+      groups = @groups.reject(&:primary?)
+      groups.map(&:id)
     end
 
     # NOTE: this method is duplicated w/ MassRemove

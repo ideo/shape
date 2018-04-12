@@ -68,6 +68,7 @@ RSpec.describe Roles::MassRemove, type: :service do
       it 'removes links from user collections' do
         expect(UnlinkFromSharedCollectionsWorker).to receive(:perform_async).with(
           [user.id] + group.roles.reduce([]) { |acc, role| acc + role.users },
+          groups.map(&:id),
           collection.id,
           collection.class.name,
         )
@@ -81,6 +82,7 @@ RSpec.describe Roles::MassRemove, type: :service do
         it 'should only pass unique ids to create links' do
           expect(UnlinkFromSharedCollectionsWorker).to receive(:perform_async).with(
             users.map(&:id),
+            groups.map(&:id),
             collection.id,
             collection.class.name,
           )

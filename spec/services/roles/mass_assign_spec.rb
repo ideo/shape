@@ -107,6 +107,7 @@ RSpec.describe Roles::MassAssign, type: :service do
             |accr, role| accr + role.users } }
         expect(LinkToSharedCollectionsWorker).to receive(:perform_async).with(
           (users + all_group_users).map(&:id),
+          groups.map(&:id),
           object.id,
           object.class.name,
         )
@@ -120,6 +121,7 @@ RSpec.describe Roles::MassAssign, type: :service do
         it 'should only pass unique ids to create links' do
           expect(LinkToSharedCollectionsWorker).to receive(:perform_async).with(
             (users).map(&:id),
+            groups.map(&:id),
             object.id,
             object.class.name,
           )
@@ -138,6 +140,7 @@ RSpec.describe Roles::MassAssign, type: :service do
         it 'should not link to any primary groups' do
           expect(LinkToSharedCollectionsWorker).to receive(:perform_async).with(
             (users).map(&:id),
+            [],
             object.id,
             object.class.name,
           )
