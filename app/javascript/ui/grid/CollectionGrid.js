@@ -419,15 +419,18 @@ class CollectionGrid extends React.Component {
   }
 }
 
+const gridConfigProps = {
+  // these gridSettings confuse eslint because of the way they're used in positionCards
+  // so we list them separately here
+  cols: PropTypes.number.isRequired,
+  gridH: PropTypes.number.isRequired,
+  gridW: PropTypes.number.isRequired,
+  gutter: PropTypes.number.isRequired,
+  sortBy: PropTypes.string.isRequired,
+}
+
 CollectionGrid.propTypes = {
-  // these gridSettings are technically props,
-  // but they confuse eslint because of the way they're used in positionCards
-  // ---
-  // cols: PropTypes.number.isRequired,
-  // gridH: PropTypes.number.isRequired,
-  // gridW: PropTypes.number.isRequired,
-  // gutter: PropTypes.number.isRequired,
-  // sortBy: PropTypes.string.isRequired,
+  ...gridConfigProps,
   updateCollection: PropTypes.func.isRequired,
   collection: MobxPropTypes.objectOrObservableObject.isRequired,
   blankContentToolState: MobxPropTypes.objectOrObservableObject.isRequired,
