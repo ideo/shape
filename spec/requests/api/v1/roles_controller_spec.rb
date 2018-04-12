@@ -40,6 +40,7 @@ describe Api::V1::RolesController, type: :request, json: true, auth: true do
       {
         'role': { 'name': role_name },
         'user_ids': user_ids,
+        'is_switching': false,
       }.to_json
     }
 
@@ -114,6 +115,7 @@ describe Api::V1::RolesController, type: :request, json: true, auth: true do
     let!(:group) { create(:group, organization: organization) }
     let!(:viewers) { create_list(:user, 2, add_to_org: organization) }
     let(:num_cards) { 0 }
+    let(:params) { { 'is_switching': false }.to_json }
 
     context 'for a user' do
       let(:remove_viewer) { viewers[0] }
@@ -127,26 +129,26 @@ describe Api::V1::RolesController, type: :request, json: true, auth: true do
       let(:role) { collection.roles.find_by(name: Role::VIEWER) }
 
       it 'returns a 200' do
-        delete(path)
+        delete(path, params: params)
         expect(response.status).to eq(200)
       end
 
       it 'matches Role schema' do
-        delete(path)
+        delete(path, params: params)
         expect(viewers.first.reload.has_role?(Role::VIEWER, collection)).to be false
       end
 
       it 'deletes the UserRole' do
-        expect { delete(path) }.to change(UsersRole, :count).by(-1)
+        expect { delete(path, params: params) }.to change(UsersRole, :count).by(-1)
       end
 
       it 'does not delete Role' do
-        expect { delete(path) }.not_to change(Role, :count)
+        expect { delete(path, params: params) }.not_to change(Role, :count)
         expect(Role.exists?(role.id))
       end
 
       it 'does not delete the Group role' do
-        delete(path)
+        delete(path, params: params)
         expect(group.reload.has_role?(Role::VIEWER, collection)).to be true
       end
 
@@ -165,7 +167,7 @@ describe Api::V1::RolesController, type: :request, json: true, auth: true do
           ).to be true
 
           Sidekiq::Testing.inline! do
-            delete(path)
+            delete(path, params: params)
             remove_viewer.reload
             expect(
               collection.items.all? do |item|
@@ -186,7 +188,7 @@ describe Api::V1::RolesController, type: :request, json: true, auth: true do
         end
 
         it 'returns 401' do
-          delete(path)
+          delete(path, params: params)
           expect(response.status).to eq(401)
         end
       end
@@ -207,17 +209,17 @@ describe Api::V1::RolesController, type: :request, json: true, auth: true do
       end
 
       it 'returns 200' do
-        delete(path)
+        delete(path, params: params)
         expect(response.status).to eq(200)
       end
 
       it 'deletes the GroupsRole record' do
-        expect { delete(path) }.to change(GroupsRole, :count).by(-1)
+        expect { delete(path, params: params) }.to change(GroupsRole, :count).by(-1)
         expect(group.reload.has_role?(Role::EDITOR, collection)).to be false
       end
 
       it 'does not delete the viewer role' do
-        delete(path)
+        delete(path, params: params)
         expect(viewers.first.reload.has_role?(Role::VIEWER, collection)).to be true
       end
 
@@ -236,7 +238,7 @@ describe Api::V1::RolesController, type: :request, json: true, auth: true do
           ).to be true
 
           Sidekiq::Testing.inline! do
-            delete(path)
+            delete(path, params: params)
             group.reload
             expect(
               collection.items.all? do |item|
@@ -264,12 +266,12 @@ describe Api::V1::RolesController, type: :request, json: true, auth: true do
         end
 
         it 'returns a 200' do
-          delete(path)
+          delete(path, params: params)
           expect(response.status).to eq(200)
         end
 
         it 'deletes the GroupsRole record' do
-          expect { delete(path) }.to change(GroupsRole, :count).by(-1)
+          expect { delete(path, params: params) }.to change(GroupsRole, :count).by(-1)
           expect(group.reload.has_role?(Role::EDITOR, collection)).to be false
         end
       end

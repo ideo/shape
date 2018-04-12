@@ -99,7 +99,7 @@ class RolesSummary extends React.PureComponent {
 
     const editorAvatars = editors.map(editor => (
       <Avatar
-        key={editor.id}
+        key={`${editor.internalType}_${editor.id}`}
         title={editor.name}
         url={editor.pic_url_square || editor.filestack_file_url}
         size={AVATAR_SIZE}
@@ -122,7 +122,7 @@ class RolesSummary extends React.PureComponent {
     if (viewers.length === 0) return ''
     const viewerAvatars = viewers.map(viewer => (
       <Avatar
-        key={viewer.id}
+        key={`${viewer.internalType}_${viewer.id}`}
         title={viewer.name}
         url={viewer.pic_url_square || viewer.filestack_file_url}
         size={AVATAR_SIZE}
