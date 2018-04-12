@@ -114,6 +114,11 @@ export const fakeUserAttrs = {
   type: 'users',
   isCurrentUser: jest.fn(),
 }
+export const fakeActionCableUser = {
+  id: 1,
+  name: 'Oprah Winfrey',
+  pic_url_square: 'https://filestackcdn.com/abc123',
+}
 export const fakeUser = {
   ...fakeUserAttrs,
   rawAttributes: jest.fn().mockReturnValue(fakeUserAttrs),

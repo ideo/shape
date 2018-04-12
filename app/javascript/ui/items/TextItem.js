@@ -1,4 +1,5 @@
-import { inject, PropTypes as MobxPropTypes } from 'mobx-react'
+import PropTypes from 'prop-types'
+import { PropTypes as MobxPropTypes } from 'mobx-react'
 import _ from 'lodash'
 import ReactQuill from 'react-quill'
 import styled from 'styled-components'
@@ -8,7 +9,7 @@ import TextItemToolbar from '~/ui/items/TextItemToolbar'
 import EditorPill from '~/ui/items/EditorPill'
 
 // How long to wait before unlocking editor due to inactivity
-const UNLOCK_WAIT_MILLISECONDS = 3000
+const UNLOCK_IN_MILLISECONDS = 3000
 
 const StyledContainer = styled.div`
   padding: 2rem 0.5rem;
@@ -34,14 +35,14 @@ export const overrideHeadersFromClipboard = (editor) => {
   editor.clipboard.addMatcher('H6', remapHeaderToH3)
 }
 
-@inject('apiStore')
 class TextItem extends React.Component {
   constructor(props) {
     super(props)
     this.debouncedOnTextChange = _.debounce(this._debouncedOnTextChange, 1000)
-    this.cable = ActionCable.createConsumer('ws://localhost:3000/cable')
+    this.debouncedStartUnlockTimer = _.debounce(this._startUnlockTimer, 1000)
     this.channel = undefined
     this.unlockTimeout = undefined
+    this.ignoreBlurEvent = false
   }
 
   state = {
@@ -69,31 +70,35 @@ class TextItem extends React.Component {
 
   get renderEditorPill() {
     const { locked, currentEditor } = this.state
-    const { apiStore } = this.props
+    const { currentUserId } = this.props
     if (!locked || !currentEditor) return ''
-    if (currentEditor.id === apiStore.currentUserId) return ''
+    if (currentEditor.id === currentUserId) return ''
     return <EditorPill className="editor-pill" editor={currentEditor} />
   }
 
+  componentWillReceiveProps(nextProps) {
+    console.log('next props', nextProps)
+  }
+
   subscribeToItemEditingChannel = () => {
-    const { item } = this.props
-    this.channel = this.cable.subscriptions.create(
+    const { item, actionCableConsumer } = this.props
+    this.channel = actionCableConsumer.subscriptions.create(
       {
         channel: 'ItemEditingChannel',
         id: item.id
       },
       {
-        connected: this.channelConnected,
+        connected: () => {},
         disconnected: this.channelDisconnected,
         received: this.channelReceivedData,
-        rejected: this.channelRejected,
+        rejected: () => {},
       }
     )
   }
 
   channelReceivedData = (data) => {
     console.log('Channel received data:', data)
-    const { item, apiStore } = this.props
+    const { item, currentUserId } = this.props
     const { currentEditor } = this.state
     const numViewers = data.num_viewers
     let newCurrentEditor = data.current_editor
@@ -103,7 +108,7 @@ class TextItem extends React.Component {
     if (_.isEmpty(newCurrentEditor)) newCurrentEditor = null
 
     // If editor is present and is not this user, lock editing
-    if (newCurrentEditor && newCurrentEditor.id !== apiStore.currentUserId) {
+    if (newCurrentEditor && newCurrentEditor.id !== currentUserId) {
       locked = true
     } else {
       locked = false
@@ -113,14 +118,10 @@ class TextItem extends React.Component {
       numViewers,
       locked
     })
-    // If someone previously finished editing, fetch updates
-    if (currentEditor && !newCurrentEditor) {
-      apiStore.fetch('items', item.id, { force: true })
+    // If someone else previously finished editing, fetch updates
+    if ((currentEditor && !newCurrentEditor) && (currentEditor.id !== currentUserId)) {
+      this.props.handleRefetchItem()
     }
-  }
-
-  channelConnected = () => {
-    // console.log('Channel connected')
   }
 
   channelDisconnected = () => {
@@ -133,20 +134,21 @@ class TextItem extends React.Component {
     }
   }
 
-  channelRejected = () => {
-    // console.log('Channel rejected')
-  }
-
   onEditorBlur = () => {
-    this.startUnlockTimer(true)
+    // If they click outside of editor, release the lock immediately
+    if (!this.ignoreBlurEvent) {
+      this.debouncedStartUnlockTimer.flush()
+      this._startUnlockTimer(true)
+    }
   }
 
   onEditorFocus = () => {
-    this.broadcastIsEditing()
-    this.startUnlockTimer()
+    this.broadcastEditingState({ editing: true })
+    // Start unlock timer, in case they never type anything
+    this.debouncedStartUnlockTimer()
   }
 
-  broadcastIsEditing = (editing = true) => {
+  broadcastEditingState = ({ editing }) => {
     console.log('Broadcast editing is:', editing)
     const { item } = this.props
     if (editing) {
@@ -163,14 +165,20 @@ class TextItem extends React.Component {
     const { numViewers } = this.state
     // Unlock if there are other viewers (this user is counted as a viewer)
     if (numViewers > 1) {
+      this.ignoreBlurEvent = true
       // Kick user out of editor
-      this.quillEditor.blur()
+      this.quillEditor.blur() // <-- this is triggering two unlocks
+      this.ignoreBlurEvent = false
       // Broadcast that other viewers can edit
-      this.broadcastIsEditing(false)
+      this.broadcastEditingState({ editing: false })
     }
   }
 
-  startUnlockTimer = (unlockImmediately) => {
+  _startUnlockTimer = (unlockImmediately) => {
+    const { locked } = this.state
+    // On text change gets called when text is updated from other editor
+    // So return if we're not locked
+    if (!locked) return
     // Reset the timeout so user has another 3 seconds
     // if they just finished editing
     if (this.unlockTimeout) clearTimeout(this.unlockTimeout)
@@ -180,13 +188,14 @@ class TextItem extends React.Component {
     } else {
       this.unlockTimeout = setTimeout(() => {
         this.unlockEditingIfOtherViewers()
-      }, UNLOCK_WAIT_MILLISECONDS)
+      }, UNLOCK_IN_MILLISECONDS)
     }
   }
 
   onTextChange = (content, delta, source, quill) => {
+    console.log('on text change')
     this.debouncedOnTextChange(content, delta, source, quill)
-    this.startUnlockTimer()
+    this.debouncedStartUnlockTimer()
   }
 
   _debouncedOnTextChange = (content, delta, source, quill) => {
@@ -194,13 +203,13 @@ class TextItem extends React.Component {
     const textData = quill.getContents()
     item.content = content
     item.text_data = textData
+    console.log('saved item')
     item.save()
   }
 
   render() {
     const { item } = this.props
     const { locked } = this.state
-
     // we have to convert the item to a normal JS object for Quill to be happy
     const textData = item.toJS().text_data
     let quillProps = {}
@@ -240,10 +249,9 @@ class TextItem extends React.Component {
 
 TextItem.propTypes = {
   item: MobxPropTypes.objectOrObservableObject.isRequired,
-}
-
-TextItem.wrappedComponent.propTypes = {
-  apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
+  actionCableConsumer: MobxPropTypes.objectOrObservableObject.isRequired,
+  currentUserId: PropTypes.number.isRequired,
+  handleRefetchItem: PropTypes.func.isRequired,
 }
 
 export default TextItem
