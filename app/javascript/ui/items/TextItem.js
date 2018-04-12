@@ -35,6 +35,17 @@ export const overrideHeadersFromClipboard = (editor) => {
   editor.clipboard.addMatcher('H6', remapHeaderToH3)
 }
 
+// Real-time event handling:
+
+// EDITOR
+// start editing - focus event: broadcast, start unlock timer
+// typing - change event: save, reset unlock timer
+// stop editing - blur event OR unlock timer completes: save, unlock, broadcast
+
+// VIEWER
+// receive editor present event: lock text box
+// receive no editor present event: unlock text box
+
 class TextItem extends React.Component {
   constructor(props) {
     super(props)
@@ -192,6 +203,12 @@ class TextItem extends React.Component {
     }
   }
 
+  get textData() {
+    const { item } = this.props
+    // we have to convert the item to a normal JS object for Quill to be happy
+    return item.toJS().text_data
+  }
+
   onTextChange = (content, delta, source, quill) => {
     console.log('on text change')
     this.debouncedOnTextChange(content, delta, source, quill)
@@ -208,10 +225,7 @@ class TextItem extends React.Component {
   }
 
   render() {
-    const { item } = this.props
     const { locked } = this.state
-    // we have to convert the item to a normal JS object for Quill to be happy
-    const textData = item.toJS().text_data
     let quillProps = {}
     if (this.canEdit) {
       quillProps = {
