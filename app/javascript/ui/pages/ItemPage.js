@@ -62,7 +62,6 @@ class ItemPage extends PageWithApi {
   }
 
   refetchItem = async() => {
-    console.log('refetch item')
     const { apiStore } = this.props
     const { item } = this.state
     const { data } = await apiStore.fetch('items', item.id, { force: true })

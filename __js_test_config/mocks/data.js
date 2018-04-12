@@ -115,7 +115,7 @@ export const fakeUserAttrs = {
   isCurrentUser: jest.fn(),
 }
 export const fakeActionCableUser = {
-  id: 1,
+  id: 99,
   name: 'Oprah Winfrey',
   pic_url_square: 'https://filestackcdn.com/abc123',
 }

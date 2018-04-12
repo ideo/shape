@@ -1,11 +1,11 @@
 import TextItem from '~/ui/items/TextItem'
 
-import fakeApiStore from '#/mocks/fakeApiStore'
 import fakeActionCableConsumer from '#/mocks/fakeActionCableConsumer'
 
 import {
   fakeTextItem,
-  fakeActionCableUser
+  fakeActionCableUser,
+  fakeUser
 } from '#/mocks/data'
 
 const actionCableReceived = message => message
@@ -13,9 +13,9 @@ const actionCableConnected = message => message
 const actionCableDisconnected = message => message
 
 const props = {
-  apiStore: fakeApiStore(),
   item: fakeTextItem,
-  currentUserId: fakeActionCableUser.id,
+  currentUserId: fakeUser.id,
+  handleRefetchItem: jest.fn(),
   actionCableConsumer: fakeActionCableConsumer({
     connectedFn: actionCableConnected,
     receivedFn: actionCableReceived,
@@ -27,7 +27,7 @@ let wrapper
 describe('TextItem', () => {
   beforeEach(() => {
     wrapper = shallow(
-      <TextItem.wrappedComponent {...props} />
+      <TextItem {...props} />
     )
   })
 
@@ -35,11 +35,11 @@ describe('TextItem', () => {
     expect(wrapper.find('Quill').props().value).toEqual(fakeTextItem.text_data)
   })
 
-  describe('as viewer', () => {
+  describe('can view', () => {
     beforeEach(() => {
       props.item.can_edit = false
       wrapper = shallow(
-        <TextItem.wrappedComponent {...props} />
+        <TextItem {...props} />
       )
     })
 
@@ -51,22 +51,38 @@ describe('TextItem', () => {
       expect(wrapper.find('Quill').props().readOnly).toBe(true)
     })
 
-    it('shows editor if someone else is editing', () => {
+    it('does not render the editor pill', () => {
       expect(wrapper.find('EditorPill').exists()).toBe(false)
-      wrapper.instance().channelReceivedData({
-        current_editor: fakeActionCableUser,
-        num_viewers: 2
+    })
+
+    describe('with someone else editing', () => {
+      beforeEach(() => {
+        wrapper.instance().channelReceivedData({
+          current_editor: fakeActionCableUser,
+          num_viewers: 2
+        })
+        wrapper.update()
       })
-      expect(wrapper.find('EditorPill').exists()).toBe(true)
+
+      it('shows editor pill if someone else is editing', () => {
+        // Make sure user ID's are not the same
+        expect(fakeUser.id).not.toEqual(fakeActionCableUser.id)
+        expect(wrapper.find('EditorPill').exists()).toBe(true)
+        expect(wrapper.find('EditorPill').props().editor).toEqual(fakeActionCableUser)
+      })
+
+      it('locks quill', () => {
+        expect(wrapper.find('Quill').props().readOnly).toBe(true)
+      })
     })
   })
 
-  describe('as editor', () => {
+  describe('can edit', () => {
     beforeEach(() => {
       props.item.can_edit = true
       props.item.parentPath = '/collections/99'
       wrapper = shallow(
-        <TextItem.wrappedComponent {...props} />
+        <TextItem {...props} />
       )
     })
 
@@ -79,23 +95,26 @@ describe('TextItem', () => {
       expect(wrapper.find('TextItemToolbar').exists()).toBe(true)
     })
 
+    it('does not render the editor pill', () => {
+      expect(wrapper.find('EditorPill').exists()).toBe(false)
+    })
+
     describe('with someone else editing', () => {
-      it('shows editor pill', () => {
-        expect(wrapper.find('EditorPill').exists()).toBe(false)
+      beforeEach(() => {
         wrapper.instance().channelReceivedData({
           current_editor: fakeActionCableUser,
           num_viewers: 2
         })
+        wrapper.update()
+      })
+
+      it('shows editor pill', () => {
         expect(wrapper.find('EditorPill').exists()).toBe(true)
+        expect(wrapper.find('EditorPill').props().editor).toEqual(fakeActionCableUser)
       })
 
       it('locks quill', () => {
-        expect(wrapper.find('EditorPill').exists()).toBe(false)
-        wrapper.instance().channelReceivedData({
-          current_editor: fakeActionCableUser,
-          num_viewers: 2
-        })
-        expect(wrapper.find('EditorPill').exists()).toBe(true)
+        expect(wrapper.find('Quill').props().readOnly).toBe(true)
       })
     })
   })

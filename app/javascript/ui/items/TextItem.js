@@ -55,7 +55,7 @@ class TextItem extends React.Component {
     this.quillEditor = undefined
     this.unlockTimeout = undefined
     this.ignoreBlurEvent = false
-    this.broadcastStoppedEditing = false
+    this.broadcastStoppedEditingAfterSave = false
     this.isEditing = false
     this.numViewers = 0
   }
@@ -88,18 +88,6 @@ class TextItem extends React.Component {
     this.quillEditor = this.reactQuillRef.getEditor()
   }
 
-  get canEdit() {
-    return this.props.item.can_edit
-  }
-
-  get renderEditorPill() {
-    const { locked, currentEditor } = this.state
-    const { currentUserId } = this.props
-    if (!locked || !currentEditor) return ''
-    if (currentEditor.id === currentUserId) return ''
-    return <EditorPill className="editor-pill" editor={currentEditor} />
-  }
-
   subscribeToItemEditingChannel = () => {
     const { item, actionCableConsumer } = this.props
     this.channel = actionCableConsumer.subscriptions.create(
@@ -117,7 +105,6 @@ class TextItem extends React.Component {
   }
 
   channelReceivedData = (data) => {
-    console.log('Channel received data:', data)
     const { currentUserId } = this.props
     const { currentEditor } = this.state
     let { locked } = this.state
@@ -179,7 +166,7 @@ class TextItem extends React.Component {
   }
 
   broadcastEditingState = ({ editing }) => {
-    console.log('Broadcast editing is:', editing)
+    // console.log('Broadcast editing is:', editing)
     const { item } = this.props
     if (editing) {
       this.channel.perform('start_editing', { id: item.id })
@@ -189,14 +176,14 @@ class TextItem extends React.Component {
   }
 
   unlockEditingIfOtherViewers = () => {
-    console.log('Check if we should unlock editing')
+    // console.log('Check if we should unlock editing')
     // Unlock if there are other viewers (this user is counted as a viewer)
     if (this.numViewers > 1) {
       // Kick user out of editor
       this.ignoreBlurEvent = true
       this.reactQuillRef.blur() // <-- this triggers two unlocks unless event is ignored
       this.ignoreBlurEvent = false
-      this.broadcastStoppedEditing = true
+      this.broadcastStoppedEditingAfterSave = true
       // Cancel any outstanding requests to save
       this.debouncedOnKeyUp.cancel()
       // Call save immediately if there are changes
@@ -234,11 +221,22 @@ class TextItem extends React.Component {
     item.content = quillEditor.root.innerHTML
     item.text_data = quillEditor.getContents()
     item.save().then(() => {
-      if (this.broadcastStoppedEditing) {
+      if (this.broadcastStoppedEditingAfterSave) {
         this.broadcastEditingState({ editing: false })
-        this.broadcastStoppedEditing = false
+        this.broadcastStoppedEditingAfterSave = false
       }
     })
+  }
+
+  get canEdit() {
+    return this.props.item.can_edit
+  }
+
+  get renderEditorPill() {
+    const { currentEditor } = this.state
+    const { currentUserId } = this.props
+    if (!currentEditor || currentEditor.id === currentUserId) return ''
+    return <EditorPill className="editor-pill" editor={currentEditor} />
   }
 
   render() {
