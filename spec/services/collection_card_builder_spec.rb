@@ -47,6 +47,12 @@ RSpec.describe CollectionCardBuilder, type: :service do
         expect(created_collection.organization).to eq organization
       end
 
+      it 'should set the collections created by to current user' do
+        expect(builder.create).to be true
+        created_collection = builder.collection_card.collection
+        expect(created_collection.created_by).to eq user
+      end
+
       it 'should calculate the breadcrumb for the card\'s child collection' do
         expect(builder.create).to be true
         created_collection = builder.collection_card.collection
@@ -102,6 +108,7 @@ RSpec.describe CollectionCardBuilder, type: :service do
       end
 
       it 'should mark the collection as updated' do
+        # this should happen via collection_card belongs_to w/ touch: true
         expect_any_instance_of(Collection).to receive(:touch)
         expect(builder.create).to be true
       end

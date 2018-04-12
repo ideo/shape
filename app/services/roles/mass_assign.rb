@@ -9,7 +9,8 @@ module Roles
                    groups: [],
                    propagate_to_children: false,
                    synchronous: false,
-                   invited_by: nil)
+                   invited_by: nil,
+                   create_link: false)
       @object = object
       @role_name = role_name
       @users = users
@@ -17,6 +18,7 @@ module Roles
       @propagate_to_children = propagate_to_children
       @synchronous = synchronous
       @invited_by = invited_by
+      @create_link = create_link
       @added_users = []
       @added_groups = []
       @failed_users = []
@@ -30,6 +32,7 @@ module Roles
       assign_role_to_users
       notify_users if @invited_by
       assign_role_to_groups
+      link_to_shared_collections if @create_link
       add_roles_to_children if @propagate_to_children
       failed_users.blank? && failed_groups.blank?
     end
@@ -60,23 +63,36 @@ module Roles
 
     def add_roles_to_children
       return unless @object.respond_to?(:children)
+      params = [
+        @added_users.map(&:id),
+        @added_groups.map(&:id),
+        @role_name,
+        @object.id,
+        @object.class.name,
+      ]
       if @synchronous
-        AddRolesToChildrenWorker.new.perform(
-          @added_users.map(&:id),
-          @added_groups.map(&:id),
-          @role_name,
-          @object.id,
-          @object.class.name.to_s,
-        )
+        AddRolesToChildrenWorker.new.perform(*params)
       else
-        AddRolesToChildrenWorker.perform_async(
-          @added_users.map(&:id),
-          @added_groups.map(&:id),
-          @role_name,
-          @object.id,
-          @object.class.name.to_s,
-        )
+        AddRolesToChildrenWorker.perform_async(*params)
       end
+    end
+
+    def link_to_shared_collections
+      LinkToSharedCollectionsWorker.perform_async(
+        shared_user_ids,
+        @object.id,
+        @object.class.name,
+      )
+    end
+
+    # NOTE: this method is duplicated w/ MassRemove
+    def shared_user_ids
+      groups = @groups.reject(&:primary?)
+      # @groups can be an array and not a relation, try to get user_ids via relation first
+      unless (group_user_ids = groups.try(:user_ids))
+        group_user_ids = Group.where(id: groups.pluck(:id)).user_ids
+      end
+      (group_user_ids + @users.map(&:id)).uniq
     end
 
     def notify_users

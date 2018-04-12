@@ -45,11 +45,11 @@ class RoleSelect extends React.Component {
         ${this.renderName()} from this group?`
       confirmText = 'Remove'
     }
-    uiStore.openAlertModal({
+    uiStore.confirm({
       prompt,
       confirmText,
-      iconName: 'LeaveIcon',
-      onConfirm: () => this.deleteRole(true),
+      iconName: 'Leave',
+      onConfirm: () => this.deleteRole(false),
     })
   }
 
@@ -58,14 +58,14 @@ class RoleSelect extends React.Component {
     return this.deleteRole().then(() => this.createRole(ev.target.value))
   }
 
-  createRole(roleName) {
+  createRole(roleName, isSwitching = true) {
     const { onCreate, entity } = this.props
-    onCreate([entity], roleName)
+    onCreate([entity], roleName, { isSwitching })
   }
 
-  deleteRole = (toRemove = false) => {
+  deleteRole = (isSwitching = true) => {
     const { role, entity } = this.props
-    return this.props.onDelete(role, entity, toRemove)
+    return this.props.onDelete(role, entity, { isSwitching })
   }
 
   renderName() {

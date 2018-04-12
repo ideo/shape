@@ -3,7 +3,7 @@ class SerializableCollection < BaseJsonSerializer
 
   type 'collections'
 
-  attributes :id, :created_at, :name
+  attributes :id, :created_at, :updated_at, :name
 
   cached_attribute :tag_list
 
@@ -12,7 +12,7 @@ class SerializableCollection < BaseJsonSerializer
   end
 
   attribute :type do
-    @object.type || @object.class.name.to_s
+    @object.type || @object.class.name
   end
 
   attribute :breadcrumb do
@@ -23,6 +23,7 @@ class SerializableCollection < BaseJsonSerializer
   end
 
   belongs_to :organization
+  belongs_to :created_by
 
   has_many :collection_cards do
     data do

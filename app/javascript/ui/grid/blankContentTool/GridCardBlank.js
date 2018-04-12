@@ -241,7 +241,7 @@ class GridCardBlank extends React.Component {
     const { order, width, height, replacingId } = uiStore.blankContentToolState
     const isReplacing = !!replacingId
     const attrs = {
-      order: replacingId ? order : order + 1,
+      order,
       width,
       height,
       // `parent` is the collection this card belongs to

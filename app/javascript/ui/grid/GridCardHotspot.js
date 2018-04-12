@@ -43,7 +43,7 @@ const StyledPlusIcon = styled.div`
 class GridCardHotspot extends React.Component {
   clickHotspot = () => {
     const { uiStore, card } = this.props
-    uiStore.openBlankContentTool({ order: card.order })
+    uiStore.openBlankContentTool({ order: card.order + 1 })
   }
 
   render() {

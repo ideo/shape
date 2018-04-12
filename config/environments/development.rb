@@ -1,5 +1,5 @@
 Rails.application.configure do
-  config.webpacker.check_yarn_integrity = true  # Settings specified here will take precedence over those in config/application.rb.
+  config.webpacker.check_yarn_integrity = true # Settings specified here will take precedence over those in config/application.rb.
 
   config.action_cable.url = "ws://localhost:3000/cable"
 
@@ -20,7 +20,7 @@ Rails.application.configure do
 
     config.cache_store = :memory_store
     config.public_file_server.headers = {
-      'Cache-Control' => "public, max-age=#{2.days.seconds.to_i}"
+      'Cache-Control' => "public, max-age=#{2.days.seconds.to_i}",
     }
   else
     config.action_controller.perform_caching = false

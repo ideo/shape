@@ -14,4 +14,5 @@ class HomeController < ApplicationController
   def set_okta_state
     session['omniauth.state'] = cookies['IdeoSSO-State']
   end
+
 end

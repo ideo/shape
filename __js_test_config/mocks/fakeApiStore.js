@@ -1,5 +1,7 @@
 const fakeApiStore = ({ findResult = '', findAllResult = [], requestResult = '' } = {}) => {
   return {
+    add: jest.fn().mockName('add'),
+    removeAll: jest.fn().mockName('removeAll'),
     find: jest.fn()
       .mockReturnValue(findResult),
     findAll: jest.fn()

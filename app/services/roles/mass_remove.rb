@@ -2,10 +2,11 @@ module Roles
   class MassRemove
     attr_reader :errors
 
-    def initialize(object:, role_name:, users: [], groups: [], remove_from_children_sync: false)
+    def initialize(object:, role_name:, users: [], groups: [], remove_from_children_sync: false, remove_link: false)
       @object = object
       @role_name = role_name
       @remove_from_children_sync = remove_from_children_sync
+      @remove_link = remove_link
       @users = users
       @groups = groups
       @errors = []
@@ -13,10 +14,29 @@ module Roles
 
     def call
       remove_role_from_object(@object)
+      remove_links_from_shared_collections if @remove_link
       remove_roles_from_children
     end
 
     private
+
+    def remove_links_from_shared_collections
+      UnlinkFromSharedCollectionsWorker.perform_async(
+        shared_user_ids,
+        @object.id,
+        @object.class.name,
+      )
+    end
+
+    # NOTE: this method is duplicated w/ MassAssign
+    def shared_user_ids
+      groups = @groups.reject(&:primary?)
+      # @groups can be an array and not a relation, try to get user_ids via relation first
+      unless (group_user_ids = groups.try(:user_ids))
+        group_user_ids = Group.where(id: groups.pluck(:id)).user_ids
+      end
+      (group_user_ids + @users.map(&:id)).uniq
+    end
 
     # Removes roles synchronously from children,
     # and asynchronously from grandchildren
@@ -24,12 +44,12 @@ module Roles
       if @remove_from_children_sync
         children.all? do |child|
           remove_role_from_object(child) &&
-            remove_roles_from_grandchildren
+            remove_roles_from_grandchildren(child)
         end
       else
         MassRemoveRolesWorker.perform_async(
           @object.id,
-          @object.class.name.to_s,
+          @object.class.name,
           @role_name,
           @users.map(&:id),
           @groups.map(&:id),
@@ -38,11 +58,12 @@ module Roles
       end
     end
 
-    def remove_roles_from_grandchildren
-      children.each do |child|
+    def remove_roles_from_grandchildren(child)
+      return true unless child.respond_to?(:children)
+      child.children.each do |grandchild|
         MassRemoveRolesWorker.perform_async(
-          child.id,
-          child.class.name.to_s,
+          grandchild.id,
+          grandchild.class.name,
           @role_name,
           @users.map(&:id),
           @groups.map(&:id),

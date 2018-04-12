@@ -51,6 +51,7 @@ class CardMover
       # parent_id will already be set for existing_cards but no harm to indicate
       card.update(parent_id: @to_collection.id, order: i)
     end
+    @from_collection.reload.reorder_cards!
     @moving_cards
   end
 

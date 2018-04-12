@@ -28,8 +28,9 @@ class User < ApplicationRecord
 
   validates :email, presence: true
   validates :uid, :provider, presence: true, if: :active?
+  validates :uid, uniqueness: { scope: :provider }, if: :active?
 
-  searchkick word_start: [:name]
+  searchkick callbacks: :async, word_start: [:name]
 
   scope :search_import, -> { includes(:roles) }
 
@@ -38,6 +39,11 @@ class User < ApplicationRecord
     pending: 1,
     deleted: 2,
   }
+
+  # to turn off devise validatable for uniqueness of email
+  def will_save_change_to_email?
+    false
+  end
 
   def search_data
     {
@@ -121,6 +127,23 @@ class User < ApplicationRecord
     save
   end
 
+  def current_user_collection_id
+    current_user_collection.try(:id)
+  end
+
+  def current_user_collection
+    return nil if current_organization.blank?
+
+    # TODO: rename "user" to user_collection
+    collections.user.find_by_organization_id(current_organization_id)
+  end
+
+  def current_shared_collection
+    return nil if current_organization.blank?
+
+    collections.shared_with_me.find_by_organization_id(current_organization_id)
+  end
+
   def current_org_groups
     return [] if current_organization.blank?
 
@@ -175,7 +198,7 @@ class User < ApplicationRecord
   def current_org_groups_roles_identifiers
     return [] if current_organization.blank?
 
-    org_group_ids = organization_group_ids(current_organization)
+    org_group_ids = organization_group_ids(current_organization).uniq
 
     return [] if org_group_ids.blank?
 

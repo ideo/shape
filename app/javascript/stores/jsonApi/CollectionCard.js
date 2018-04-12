@@ -1,9 +1,22 @@
 import { action, observable } from 'mobx'
 
 import { uiStore } from '~/stores'
+import Api from './Api'
 import BaseRecord from './BaseRecord'
 
 class CollectionCard extends BaseRecord {
+  attributesForAPI = [
+    'order',
+    'width',
+    'height',
+    'reference',
+    'parent_id',
+    'collection_id',
+    'item_id',
+    'collection_attributes',
+    'item_attributes',
+  ]
+
   @observable maxWidth = this.width
 
   // this gets set based on number of visible columns, and used by CollectionCover
@@ -49,24 +62,24 @@ class CollectionCard extends BaseRecord {
       return false
     }
     if (!isReplacing) {
-      uiStore.openAlertModal({
-        prompt: 'Are you sure you want to archive this?',
-        confirmText: 'Archive',
-        iconName: 'ArchiveIcon',
+      let prompt = 'Are you sure you want to archive this?'
+      const confirmText = 'Archive'
+      let iconName = 'Archive'
+      if (this.link) {
+        iconName = 'Link'
+        prompt = 'Are you sure you want to archive this link?'
+      }
+      uiStore.confirm({
+        prompt,
+        confirmText,
+        iconName,
         onConfirm: onAgree,
       })
     } else onAgree()
   }
 
-  async API_duplicate() {
-    try {
-      // This method will increment order of all cards after this one
-      await this.apiStore.request(`collection_cards/${this.id}/duplicate`, 'POST')
-      // Refresh collection after re-ordering - force reloading
-      this.apiStore.fetch('collections', this.parent.id, true)
-    } catch (e) {
-      // console.warn(e)
-    }
+  API_duplicate() {
+    return Api.duplicate('collection_cards', this)
   }
 }
 CollectionCard.type = 'collection_cards'

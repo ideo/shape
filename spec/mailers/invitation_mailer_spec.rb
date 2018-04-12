@@ -20,7 +20,7 @@ RSpec.describe InvitationMailer, type: :mailer do
     end
 
     it 'renders the body' do
-      expect(mail.body.encoded).to match("#{invited_by.name} has invited you to join #{collection.name}")
+      expect(mail.body.encoded).to match("#{invited_by.name} has invited you to join \"#{collection.name}\"")
     end
   end
 end

@@ -46,7 +46,7 @@ class Item < ApplicationRecord
     []
   end
 
-  def duplicate!(for_user:, copy_parent_card: false)
+  def duplicate!(for_user:, copy_parent_card: false, parent: self.parent)
     # Clones item
     i = amoeba_dup
     i.cloned_from = self
@@ -62,6 +62,7 @@ class Item < ApplicationRecord
       i.parent_collection_card = parent_collection_card.duplicate!(
         for_user: for_user,
         shallow: true,
+        parent: parent,
       )
       i.parent_collection_card.item = i
     end
@@ -105,6 +106,10 @@ class Item < ApplicationRecord
 
   def dont_reindex_parent!
     @dont_reindex_parent = true
+  end
+
+  def touch_parent
+    try(:parent).try(:touch)
   end
 
   private

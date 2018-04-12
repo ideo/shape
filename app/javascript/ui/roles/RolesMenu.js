@@ -71,10 +71,11 @@ class RolesMenu extends React.Component {
     this.searchableItems = items
   }
 
-  onDelete = (role, entity, toRemove) =>
+  deleteRoles = (role, entity, opts = {}) =>
     this.props.apiStore.request(`${entity.internalType}/${entity.id}/roles/${role.id}`,
-      'DELETE').then((res) => {
-      if (toRemove) {
+      'DELETE',
+      { is_switching: opts.isSwitching }).then((res) => {
+      if (!opts.isSwitching) {
         const saveReturn = this.props.onSave(res)
         this.filterSearchableItems()
         return saveReturn
@@ -82,7 +83,7 @@ class RolesMenu extends React.Component {
       return {}
     })
 
-  onCreateRoles = (entities, roleName) => {
+  createRoles = (entities, roleName, opts = {}) => {
     const { apiStore, ownerId, ownerType, onSave } = this.props
     const userIds = entities
       .filter(entity => entity.internalType === 'users')
@@ -94,6 +95,7 @@ class RolesMenu extends React.Component {
       role: { name: roleName },
       group_ids: groupIds,
       user_ids: userIds,
+      is_switching: opts.isSwitching,
     }
     return apiStore.request(`${ownerType}/${ownerId}/roles`, 'POST', data)
       .then(res => {
@@ -102,7 +104,7 @@ class RolesMenu extends React.Component {
         return saveReturn
       })
       .catch((err) => {
-        uiStore.openAlertModal({
+        uiStore.alert({
           prompt: err.error[0],
         })
       })
@@ -112,7 +114,7 @@ class RolesMenu extends React.Component {
     const { apiStore } = this.props
     return apiStore.request(`users/create_from_emails`, 'POST', { emails })
       .catch((err) => {
-        uiStore.openAlertModal({
+        uiStore.alert({
           prompt: err.error[0],
         })
       })
@@ -156,12 +158,12 @@ class RolesMenu extends React.Component {
         { sortedRoleEntities.map(combined =>
           (<RoleSelect
             enabled={canEdit && this.currentUserCheck(combined.entity, combined.role)}
-            key={combined.entity.id + combined.role.id}
+            key={`${combined.entity.id}_${combined.entity.internalType}_r${combined.role.id}`}
             role={combined.role}
             roleTypes={roleTypes}
             entity={combined.entity}
-            onDelete={this.onDelete}
-            onCreate={this.onCreateRoles}
+            onDelete={this.deleteRoles}
+            onCreate={this.createRoles}
           />))
         }
         <FormSpacer />
@@ -171,7 +173,7 @@ class RolesMenu extends React.Component {
             <RolesAdd
               searchableItems={this.searchableItems}
               roleTypes={roleTypes}
-              onCreateRoles={this.onCreateRoles}
+              onCreateRoles={this.createRoles}
               onCreateUsers={this.onCreateUsers}
             />
           </div>

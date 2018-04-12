@@ -3,7 +3,7 @@
 :namespace: sidekiq
 :concurrency: 7
 development:
-  :concurrency: 20
+  :concurrency: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
 staging:
   :concurrency: 7
 production:
@@ -11,6 +11,7 @@ production:
 :queues:
   - [critical, 10]
   - [mailers, 5]
+  - [searchkick, 4]
   - [default, 2]
   - [low, 1]
 :enabled: true

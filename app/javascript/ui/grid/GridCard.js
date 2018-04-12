@@ -79,6 +79,9 @@ StyledTopRightActions.displayName = 'StyledTopRightActions'
 
 class GridCard extends React.Component {
   get canEdit() {
+    if (this.props.isSharedCollection) return false
+    // you can always edit your link cards
+    if (this.props.card.link) return true
     return this.props.record.can_edit
   }
 
@@ -156,6 +159,7 @@ class GridCard extends React.Component {
   render() {
     const {
       card,
+      record,
       canEditCollection,
       isSharedCollection,
       dragging,
@@ -168,11 +172,11 @@ class GridCard extends React.Component {
           <GridCardHotspot card={card} dragging={dragging} />
         }
         {/*
-          TODO: Not fully disable CardMenu for SharedCollection
-          once we have appropriate actions?
+          TODO: We can enable this CardMenu for sharedCollection after setting up
+          SharedWithMe updates (where it creates the linked cards)
         */}
-        {!isSharedCollection &&
-          <StyledTopRightActions className="">
+        {!isSharedCollection && !record.isSharedCollection &&
+          <StyledTopRightActions>
             {this.canEdit &&
               <SelectionCircle cardId={card.id} />
             }

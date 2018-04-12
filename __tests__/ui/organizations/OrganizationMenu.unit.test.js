@@ -1,89 +1,72 @@
-import { observable, useStrict } from 'mobx'
-import { Provider } from 'mobx-react'
 import OrganizationMenu from '~/ui/organizations/OrganizationMenu'
 import {
   fakeUser,
 } from '#/mocks/data'
-
-const apiStore = observable({
-  currentUser: fakeUser,
-  request: jest.fn().mockReturnValue(Promise.resolve({ data: [] })),
-  add: jest.fn(),
-  removeAll: jest.fn(),
-  findAll: jest.fn(),
-})
-const uiStore = observable({
-  organizationMenuOpen: false,
-  update: jest.fn()
-})
-const props = {
-  uiStore,
-  organization: {
-    name: 'Space',
-    primary_group: {
-      name: 'Space',
-      handle: 'space',
-      filestack_file_url: 'space.jpg',
-    }
-  },
-  userGroups: [{ id: 1, name: 'testgroup', }]
-}
-
-let wrapper
+import fakeApiStore from '#/mocks/fakeApiStore'
+import fakeUiStore from '#/mocks/fakeUiStore'
 
 describe('OrganizationMenu', () => {
-  let component
+  let component, props, wrapper
 
   beforeEach(() => {
-    useStrict(false)
-    props.userGroups = observable([
-      { id: 1, name: 'groupTest', handle: 'test', filestack_file_url: 'jpg' }
-    ])
-    wrapper = mount(
-      <Provider apiStore={apiStore} uiStore={uiStore}>
-        <OrganizationMenu {...props} />
-      </Provider>
+    fakeApiStore.currentUser = fakeUser
+    fakeApiStore.request = jest.fn().mockReturnValue(
+      Promise.resolve({ data: [] })
     )
-    component = wrapper.find('OrganizationMenu')
-  })
-
-  it('only shows itself if the UI Store says it should be open', () => {
-    expect(wrapper.find('Dialog').props().open).toBeFalsy()
-    uiStore.organizationMenuOpen = true
-    wrapper.update()
-    expect(wrapper.find('Dialog').props().open).toBeTruthy()
+    props = {
+      apiStore: fakeApiStore(),
+      uiStore: fakeUiStore,
+      organization: {
+        name: 'Space',
+        primary_group: {
+          name: 'Space',
+          handle: 'space',
+          filestack_file_url: 'space.jpg',
+        }
+      },
+      userGroups: [
+        { id: 1, name: 'groupTest', handle: 'test', filestack_file_url: 'jpg' }
+      ]
+    }
+    wrapper = shallow(
+      <OrganizationMenu.wrappedComponent {...props} />
+    )
+    component = wrapper.instance()
   })
 
   it('closes the organization menu in the UI store when exited', () => {
-    component.instance().handleClose()
+    component.handleClose()
     expect(props.uiStore.update).toHaveBeenCalledWith('organizationMenuOpen', false)
+    expect(component.editOrganizationOpen).toBeFalsy()
+    expect(component.modifyGroupOpen).toBeFalsy()
+    expect(component.isLoading).toBeFalsy()
   })
 
   it('closes the edit menu when changes are save in the UI store', () => {
-    component.instance().onOrganizationSave()
+    component.onOrganizationSave()
     expect(props.uiStore.update).toHaveBeenCalledWith('organizationMenuOpen', false)
   })
 
   it('opens the organization edit menu when you click on the org name', () => {
     wrapper.find('.orgEdit').simulate('click')
-    expect(component.instance().editOrganizationOpen)
+    expect(component.editOrganizationOpen)
       .toBeTruthy()
   })
 
   it('opens the group edit menu when you click on any group name', () => {
     wrapper.find('.groupEdit').first().simulate('click')
-    expect(component.instance().editGroup).toEqual(props.userGroups[0])
+    expect(component.editGroup).toEqual(props.userGroups[0])
   })
 
   it('opens the group add menu when you click on the new group button', () => {
-    component.instance().handleGroupAddClick()
-    expect(component.instance().modifyGroupOpen).toBeTruthy()
-    expect(component.instance().editGroup).toEqual({})
+    component.handleGroupAddClick()
+    expect(component.modifyGroupOpen).toBeTruthy()
+    expect(component.editGroup).toEqual({})
   })
 
   describe('componentDidMount', () => {
     it('should fetch all the user groups from the API', () => {
-      expect(apiStore.request).toHaveBeenCalledWith(
+      expect(props.apiStore.request).toHaveBeenCalledWith(
         'groups/1/roles',
         'GET'
       )
@@ -95,12 +78,43 @@ describe('OrganizationMenu', () => {
 
     beforeEach(() => {
       res = { data: [{ id: 3 }] }
-      component.instance().onRolesSave(res)
+      component.onRolesSave(res)
     })
 
     it('should remove all and add back roles to apiStore', () => {
-      expect(apiStore.removeAll).toHaveBeenCalledWith('roles')
-      expect(apiStore.add).toHaveBeenCalledWith(res.data, 'roles')
+      expect(props.apiStore.sync).toHaveBeenCalledWith(res)
+    })
+  })
+
+  describe('onGroupSave', () => {
+    describe('on a newly created group', () => {
+      let newGroup
+
+      beforeEach(async () => {
+        newGroup = {
+          id: 5,
+          name: 'newgroup',
+          handle: 'ng',
+          filestack_file_url: 'new.jpg'
+        }
+        props.apiStore.request = jest.fn().mockReturnValue(
+          Promise.resolve({ data: [] })
+        )
+        component.editGroup = { name: 'newgroup' }
+        await component.onGroupSave(newGroup)
+      })
+
+      it('should refetch the roles for the new group', () => {
+        expect(props.apiStore.request).toHaveBeenCalledWith(`groups/5/roles`, 'GET')
+      })
+
+      it('should sync the api store with the request result', () => {
+        expect(props.apiStore.sync).toHaveBeenCalled()
+      })
+
+      it('should modify the group roles after synced', () => {
+        expect(component.modifyGroupRoles).toBeTruthy()
+      })
     })
   })
 })

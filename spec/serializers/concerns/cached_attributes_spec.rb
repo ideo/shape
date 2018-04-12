@@ -45,12 +45,12 @@ RSpec.describe CachedAttributes, type: :serializer do
       allow(CollectionCover).to receive(:new).and_return(collection_cover_double)
       expect(Cache).to receive(:set).with(
         instance_of(String),
-        tag_list: ['unicorns', 'rainbows'],
+        'tag_list' => ['unicorns', 'rainbows'],
       )
       expect(Cache).to receive(:set).with(
         instance_of(String),
-        tag_list: ['unicorns', 'rainbows'],
-        cover: {
+        'tag_list' => ['unicorns', 'rainbows'],
+        'cover' => {
           url: 'https://filestack.com/image.png',
         },
       )
@@ -61,7 +61,7 @@ RSpec.describe CachedAttributes, type: :serializer do
   context 'with cached value' do
     before do
       allow(Cache).to receive(:get).and_return(
-        'tag_list': 'bananas, grapes',
+        'tag_list' => 'bananas, grapes',
       )
     end
 

@@ -14,11 +14,11 @@ const StyledSpinner = styled(Spinner)`
   }
 `
 
-const Logo = ({ height }) => (
+const Loader = ({ height, fadeIn }) => (
   <Flex style={{ height }} align="center" justify="center">
     <Box>
       <StyledSpinner
-        fadeIn="half"
+        fadeIn={fadeIn}
         name="folding-cube"
         color={v.colors.cloudy}
       />
@@ -26,11 +26,13 @@ const Logo = ({ height }) => (
   </Flex>
 )
 
-Logo.propTypes = {
+Loader.propTypes = {
   height: PropTypes.string,
+  fadeIn: PropTypes.string,
 }
-Logo.defaultProps = {
+Loader.defaultProps = {
   height: '50vh',
+  fadeIn: 'half'
 }
 
-export default Logo
+export default Loader

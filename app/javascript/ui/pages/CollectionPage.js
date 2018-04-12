@@ -89,9 +89,11 @@ class CollectionPage extends PageWithApi {
   render() {
     const { collection } = this
     const { uiStore } = this.props
-    if (!collection || this.props.uiStore.isLoading) return <Loader />
-
+    if (!collection || uiStore.isLoading) return <Loader />
     const breadcrumb = this.isHomepage ? [] : collection.breadcrumb
+    const { movingCardIds, cardAction } = uiStore
+    // only tell the Grid to hide "movingCards" if we're moving and not linking
+    const uiMovingCardIds = cardAction === 'move' ? movingCardIds : []
 
     return (
       <Fragment>
@@ -140,6 +142,9 @@ class CollectionPage extends PageWithApi {
             cardIds={collection.cardIds}
             // Pass in BCT state so grid will re-render when open/closed
             blankContentToolState={uiStore.blankContentToolState}
+            movingCardIds={uiMovingCardIds}
+            // passing length prop seems to properly trigger a re-render
+            movingCards={uiStore.movingCardIds.length}
           />
           <MoveModal />
         </PageContainer>

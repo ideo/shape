@@ -25,11 +25,12 @@ class CollectionCardBuilder
         # TODO: rollback transaction if these later actions fail; add errors, return false
         @collection_card.record.inherit_roles_from_parent!
         # NOTE: should items created in My Collection get this access as well?
-        @collection_card.record.allow_primary_group_view_access if @collection_card.record_type == :collection
+        if @collection_card.record_type == :collection
+          @collection_card.record.allow_primary_group_view_access
+          @collection_card.record.update(created_by: @user)
+        end
         @collection_card.increment_card_orders!
         @collection_card.record.reload.recalculate_breadcrumb!
-        # mark the collection as recently updated
-        @parent_collection.touch
       end
     end
   end

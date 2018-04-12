@@ -7,6 +7,14 @@ describe User, type: :model do
     it { should validate_presence_of(:uid) }
     it { should validate_presence_of(:provider) }
     it { should validate_presence_of(:email) }
+    it { should validate_uniqueness_of(:uid).scoped_to(:provider) }
+
+    it 'should not validate uniqueness of email' do
+      email = 'email@me.com'
+      create(:user, email: email, uid: 1)
+      # should allow me to create a second user w/ unique uid, but same email
+      expect(create(:user, email: email, uid: 2)).to be_truthy
+    end
   end
 
   context 'callbacks' do

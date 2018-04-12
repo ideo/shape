@@ -62,6 +62,7 @@ class Collection < ApplicationRecord
 
   belongs_to :organization, optional: true
   belongs_to :cloned_from, class_name: 'Collection', optional: true
+  belongs_to :created_by, class_name: 'User', optional: true
 
   validates :name, presence: true, if: :base_collection_type?
   validates :organization, presence: true
@@ -135,6 +136,7 @@ class Collection < ApplicationRecord
   # default relationships to include when rendering Collections in the API
   def self.default_relationships_for_api
     [
+      :created_by,
       roles: [:users, :groups],
       collection_cards: [
         :parent,
@@ -171,7 +173,7 @@ class Collection < ApplicationRecord
     exclude_association :parent_collection_card
   end
 
-  def duplicate!(for_user:, copy_parent_card: false)
+  def duplicate!(for_user:, copy_parent_card: false, parent: self.parent)
     # Clones collection and all embedded items/collections
     c = amoeba_dup
     c.cloned_from = self
@@ -186,6 +188,7 @@ class Collection < ApplicationRecord
       c.parent_collection_card = parent_collection_card.duplicate!(
         for_user: for_user,
         shallow: true,
+        parent: parent,
       )
       c.parent_collection_card.collection = c
     end
@@ -237,7 +240,7 @@ class Collection < ApplicationRecord
   end
 
   # convenience method if card order ever gets out of sync
-  def reorder_cards
+  def reorder_cards!
     collection_cards.each_with_index do |card, i|
       card.update_attribute(:order, i)
     end

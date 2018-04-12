@@ -1,5 +1,11 @@
 class Collection
   class SharedWithMeCollection < Collection
+    has_many :collection_cards,
+             -> { order(order: :asc) },
+             class_name: 'CollectionCard',
+             foreign_key: :parent_id,
+             inverse_of: :parent
+
     def self.find_or_create_for_collection(parent_collection, user)
       existing = parent_collection.collections.shared_with_me.first
 
@@ -28,10 +34,6 @@ class Collection
       false
     end
 
-    def read_only?
-      true
-    end
-
     def name
       'Shared with Me'
     end
@@ -42,40 +44,7 @@ class Collection
       parent.editors[:users].first
     end
 
-    # Returns (unpersisted) array of collection cards with
-    # collections and items that have been shared directly with user,
-    # or through any group they are a member of
-    def collection_cards
-      # HACK: this is obviously an imperfect solution but the problem is that if the frontend
-      # has loaded the "real" collectionCard with id=X then there will be a collision.
-      i = 999_999
-
-      # Hack - only include 25 as it's crashing
-      collections_shared_with_me.first(25).map do |obj|
-        CollectionCard.new(
-          id: i,
-          parent: self,
-          height: 1,
-          width: 1,
-          order: i += 1,
-          item: nil,
-          collection: obj.is_a?(Collection) ? obj : nil,
-        )
-      end
-    end
-
     private
-
-    # TODO: right now this is all collections shared with me,
-    #       not scoped to org
-    def collections_shared_with_me
-      Role.user_resources(
-        user: user,
-        resource_type: %w[Collection],
-      ).select do |obj|
-        include_object?(obj)
-      end.uniq.sort_by(&:updated_at).reverse
-    end
 
     def include_object?(obj)
       return false if obj.archived?
