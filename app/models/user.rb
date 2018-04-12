@@ -34,6 +34,8 @@ class User < ApplicationRecord
 
   scope :search_import, -> { includes(:roles) }
 
+  attribute :pic_url_square, default: 'https://d3none3dlnlrde.cloudfront.net/assets/users/avatars/missing/square.jpg'
+
   enum status: {
     active: 0,
     pending: 1,
@@ -98,11 +100,6 @@ class User < ApplicationRecord
       name: name,
       pic_url_square: pic_url_square
     }
-  end
-
-  def pic_url_square
-    read_attribute(:pic_url_square) if read_attribute(:pic_url_square).present?
-    'https://d3none3dlnlrde.cloudfront.net/assets/users/avatars/missing/square.jpg'
   end
 
   def update_from_network_profile(params)
