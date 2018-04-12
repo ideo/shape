@@ -78,12 +78,24 @@ module Roles
     end
 
     def link_to_shared_collections
-      LinkToSharedCollectionsWorker.perform_async(
+      # TODO: attempt to get rid of if statement here
+      if !record.is_a?(Group)
+        # TODO: use relation to query this
+        links = @object.current_shared_collection.link_collection_cards.map(&:record)
+        LinkToSharedCollectionsWorker.perform_async(
+          @users.map(&:id),
+          [],
+          links.map(&:id),
+          links.map(&:type),
+        )
+      else
+        LinkToSharedCollectionsWorker.perform_async(
         shared_user_ids,
         group_ids,
         @object.id,
         @object.class.name,
       )
+      end
     end
 
     def group_ids

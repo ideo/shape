@@ -2,24 +2,28 @@ class LinkToSharedCollectionsWorker
   include Sidekiq::Worker
   sidekiq_options queue: 'critical'
 
-  def perform(user_ids, group_ids, object_id, object_class)
+  def perform(user_ids, group_ids, object_ids, object_classes)
+    # TODO: don't like how object ids and classes separated like this
     users_to_add = User.where(id: user_ids)
     groups_to_add = Group.where(id: group_ids)
-    # this will raise ActiveRecord::RecordNotFound if not found
-    object = object_class.safe_constantize.find(object_id)
+    # TODO: anyway to do this with where rather then map?
+    objects = object_ids.map { |o| o.record_type.find(o.id) }
     users_to_add.each do |user|
-      # Don't create any links if object was created by user
-      next if object.try(:created_by_id) == user.id
-      shared = user.current_shared_collection
-      mine = user.current_user_collection
-      # Check for already created links to not create doubles
-      [shared, mine].each do |collection|
-        unless collection.link_collection_cards.with_record(object).exists?
-          create_link(object, collection)
+      objects.each do |object|
+        # Don't create any links if object was created by user
+        next if object.try(:created_by_id) == user.id
+        shared = user.current_shared_collection
+        mine = user.current_user_collection
+        # Check for already created links to not create doubles
+        [shared, mine].each do |collection|
+          unless collection.link_collection_cards.with_record(object).exists?
+            create_link(object, collection)
+          end
         end
       end
     end
 
+    # TODO: try and reuse above
     groups_to_add.each do |group|
       shared = group.current_shared_collection
       unless shared.link_collection_cards.with_record(object).exists?
