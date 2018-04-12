@@ -2,32 +2,25 @@ class LinkToSharedCollectionsWorker
   include Sidekiq::Worker
   sidekiq_options queue: 'critical'
 
-  def perform(user_ids, group_ids, object_ids, object_classes)
-    # TODO: don't like how object ids and classes separated like this
+  def perform(user_ids, group_ids, objects_info)
     users_to_add = User.where(id: user_ids)
     groups_to_add = Group.where(id: group_ids)
     # TODO: anyway to do this with where rather then map?
-    objects = object_ids.map { |o, i| object_classes[i].safe_constantize.find(o.id) }
-    users_to_add.each do |user|
+    objects = objects_info.map { |o| o["type"].safe_constantize.find(o["id"]) }
+    (users_to_add + groups_to_add).each do |entity|
       objects.each do |object|
         # Don't create any links if object was created by user
-        next if object.try(:created_by_id) == user.id
+        next if object.try(:created_by_id) == entity.id
         shared = user.current_shared_collection
         mine = user.current_user_collection
         # Check for already created links to not create doubles
+        # Groups won't have my collections so skip creating lnks
         [shared, mine].each do |collection|
-          unless collection.link_collection_cards.with_record(object).exists?
+          unless collection and
+                 collection.link_collection_cards.with_record(object).exists?
             create_link(object, collection)
           end
         end
-      end
-    end
-
-    # TODO: try and reuse above
-    groups_to_add.each do |group|
-      shared = group.current_shared_collection
-      unless shared.link_collection_cards.with_record(object).exists?
-        create_link(object, shared)
       end
     end
   end

@@ -70,9 +70,6 @@ class Group < ApplicationRecord
   end
 
   def current_shared_collection
-    # TODO: do we need this check here?
-    return nil if organization.blank?
-
     # TODO: make relation
     collections = roles_to_resources
       .map(&:resource)
