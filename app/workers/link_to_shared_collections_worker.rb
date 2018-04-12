@@ -7,7 +7,7 @@ class LinkToSharedCollectionsWorker
     users_to_add = User.where(id: user_ids)
     groups_to_add = Group.where(id: group_ids)
     # TODO: anyway to do this with where rather then map?
-    objects = object_ids.map { |o| o.record_type.find(o.id) }
+    objects = object_ids.map { |o, i| object_classes[i].safe_constantize.find(o.id) }
     users_to_add.each do |user|
       objects.each do |object|
         # Don't create any links if object was created by user
