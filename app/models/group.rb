@@ -93,7 +93,7 @@ class Group < ApplicationRecord
   end
 
   def validate_handle?
-    new_record? || handle_changed?
+    new_record? || will_save_change_to_attribute?(:handle)
   end
 
   def set_handle_if_none

@@ -24,9 +24,16 @@ module Roles
       UnlinkFromSharedCollectionsWorker.perform_async(
         shared_user_ids,
         group_ids,
-        @object.id,
-        @object.class.name,
+        objects_to_link,
       )
+    end
+
+    def objects_to_link
+      # TODO: use relation to query this?
+      links = @object.is_a?(Group) ?
+        @object.current_shared_collection.link_collection_cards.map(&:record) :
+        [@object]
+      links.map { |o| { id: o.id, type: o.class.name } }
     end
 
     def group_ids
