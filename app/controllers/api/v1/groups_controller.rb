@@ -32,6 +32,14 @@ class Api::V1::GroupsController < Api::V1::BaseController
     end
   end
 
+  def archive
+    if @group.archive!
+      render jsonapi: @group.reload
+    else
+      render_api_errors @group.errors
+    end
+  end
+
   private
 
   def group_params
