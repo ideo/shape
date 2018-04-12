@@ -1,21 +1,22 @@
 module Archivable
   extend ActiveSupport::Concern
+  extend ActiveModel::Callbacks
 
   included do
+    define_model_callbacks :archive, only: %i[after]
+
     scope :archived, -> { where(archived: true) }
     scope :active, -> { where(archived: false) }
 
     class_attribute :archive_with
     class_attribute :archive_as
-    class_attribute :after_archive
   end
 
   class_methods do
     # define which relations should get archived (much like dependent: :destroy)
-    def archivable(as: nil, with: [], after_archive: nil)
+    def archivable(as: nil, with: [])
       self.archive_as = as
       self.archive_with = with
-      self.after_archive = after_archive
     end
 
     # Helpers to add archived field to any model
@@ -38,12 +39,14 @@ module Archivable
 
   def archive!
     return true if archived?
-    if self.class.archive_as.present?
-      # treat this archive! as if you had triggered it on the parent
-      # e.g. by archiving a Collection we should really be archiving its parent card
-      return try(self.class.archive_as).try(:archive_with_relations!)
+    run_callbacks :archive do
+      if self.class.archive_as.present?
+        # treat this archive! as if you had triggered it on the parent
+        # e.g. by archiving a Collection we should really be archiving its parent card
+        return try(self.class.archive_as).try(:archive_with_relations!)
+      end
+      archive_with_relations!
     end
-    archive_with_relations!
   end
 
   # will archive the card as well as its `archive_with` and calling `after_archive`
@@ -62,7 +65,5 @@ module Archivable
     end
     # then update self
     update(archived: true)
-    return try(self.class.after_archive) if self.class.after_archive
-    true
   end
 end

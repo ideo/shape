@@ -141,11 +141,11 @@ describe Api::V1::GroupsController, type: :request, json: true, auth: true do
       expect(group.reload.handle).not_to eq(orig_handle)
     end
 
-    it 'removes all the roles on the group' do
+    it 'preserves the user roles on the group' do
       patch(path)
       group.reload
-      expect(group.members[:users].count).to eq(0)
-      expect(group.admins[:users].count).to eq(0)
+      expect(group.members[:users].count).to eq(3)
+      expect(group.admins[:users].count).to eq(1)
     end
 
     it 'removes group from all content' do
@@ -153,7 +153,7 @@ describe Api::V1::GroupsController, type: :request, json: true, auth: true do
       expect(group.reload.roles_to_resources.count).to eq(0)
     end
 
-    context 'without amdin access' do
+    context 'without admin access' do
       before do
         user.remove_role(Role::ADMIN, group)
       end

@@ -29,4 +29,20 @@ RSpec.describe Group, type: :model do
       end
     end
   end
+
+  describe '#archive!' do
+    let(:members) { create_list(:users, 3) }
+    let(:collection) { create(:collection, organization: organization) }
+
+    before do
+      group.add_role(Role::EDITOR, collection)
+    end
+
+    it 'removes the group from the collection' do
+      expect(collection.editors[:groups]).to include(group)
+      group.archive!
+      expect(group.archived?).to be true
+      expect(collection.editors[:groups]).to be_empty
+    end
+  end
 end

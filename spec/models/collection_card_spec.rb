@@ -188,25 +188,36 @@ RSpec.describe CollectionCard, type: :model do
     end
   end
 
-  describe '#decrement_card_orders!' do
+  context 'archiving' do
     let(:collection) { create(:collection) }
     let!(:collection_card_list) { create_list(:collection_card, 5, parent: collection) }
     let(:collection_cards) { collection.collection_cards }
+    let(:collection_card) { collection_cards.first }
 
-    before do
-      # Make sure cards are in sequential order
-      collection.reorder_cards!
+    describe '#decrement_card_orders!' do
+      before do
+        # Make sure cards are in sequential order
+        collection.reorder_cards!
+      end
+
+      it 'should decrement all orders by 1' do
+        collection_cards.first.decrement_card_orders!
+        order_arr = collection_cards.map(&:reload).map(&:order)
+        # technically you'd do this while archiving card 0, so it would get removed
+        expect(order_arr).to match_array([0, 0, 1, 2, 3])
+      end
+
+      it 'should return true if success' do
+        expect(collection_cards.last.decrement_card_orders!).to be true
+      end
     end
 
-    it 'should decrement all orders by 1' do
-      collection_cards.first.decrement_card_orders!
-      order_arr = collection_cards.map(&:reload).map(&:order)
-      # technically you'd do this while archiving card 0, so it would get removed
-      expect(order_arr).to match_array([0, 0, 1, 2, 3])
-    end
-
-    it 'should return true if success' do
-      expect(collection_cards.last.decrement_card_orders!).to be true
+    describe 'archive!' do
+      it 'archive and call decrement_card_orders' do
+        expect(CollectionCard).to receive(:decrement_counter)
+        collection_card.archive!
+        expect(collection_card.archived?).to be true
+      end
     end
   end
 end
