@@ -52,6 +52,10 @@ Style/AndOr:
   # They read better, more like normal English.
   Enabled: 'conditionals'
 
+Style/BlockDelimiters:
+  Exclude:
+    - 'spec/**/*.rb'
+
 Style/IfUnlessModifier:
   Enabled: false
 

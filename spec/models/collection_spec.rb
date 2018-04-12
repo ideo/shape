@@ -33,6 +33,22 @@ describe Collection, type: :model do
           collection_cards.first.archive!
         }.to change(collection.collection_cards, :count).by(-1)
       end
+
+      describe '#touch_cards_linked_to_this_collection' do
+        let!(:collection) { create(:collection) }
+        let!(:card_linked_to_this_collection) { create(:collection_card_link, collection: collection) }
+
+        it 'should update linked cards after touch' do
+          expect {
+            collection.touch && card_linked_to_this_collection.reload
+          }.to change(card_linked_to_this_collection, :updated_at)
+        end
+        it 'should update linked cards after update' do
+          expect {
+            collection.update(name: 'Bobo') && card_linked_to_this_collection.reload
+          }.to change(card_linked_to_this_collection, :updated_at)
+        end
+      end
     end
   end
 

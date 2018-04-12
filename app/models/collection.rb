@@ -46,6 +46,9 @@ class Collection < ApplicationRecord
            inverse_of: :collection,
            dependent: :destroy
 
+  # will fire for both after_update and after_touch
+  after_commit :touch_cards_linked_to_this_collection
+
   # the card that represents this collection in its parent, and determines its breadcrumb
   has_one :parent_collection_card,
           class_name: 'CollectionCard::Primary',
@@ -255,6 +258,10 @@ class Collection < ApplicationRecord
     Searchkick.callbacks(true) do
       reindex
     end
+  end
+
+  def touch_cards_linked_to_this_collection
+    cards_linked_to_this_collection.update_all(updated_at: Time.now)
   end
 
   private
