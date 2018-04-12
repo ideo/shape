@@ -2,99 +2,72 @@ require 'rails_helper'
 
 RSpec.describe LinkToSharedCollectionsWorker, type: :worker do
   describe '#perform' do
-    let(:users_to_add) { create_list(:user, 1) }
+    let(:organization) { create(:organization) }
+    let!(:user) { create(:user, add_to_org: organization) }
+    let!(:users_to_add) { [user] }
     let(:groups_to_add) { create_list(:group, 1) }
     let!(:collection_to_link) { create(:collection) }
-    let(:shared_with_me) { create(:shared_with_me_collection, num_cards: 0) }
-    let(:my_collection) { create(:user_collection, num_cards: 1) }
+    let(:existing_link) { nil }
 
     before do
-      allow_any_instance_of(User)
-        .to receive(:current_shared_collection).and_return(shared_with_me)
-      allow_any_instance_of(User)
-        .to receive(:current_user_collection).and_return(my_collection)
+      # TODO: why is this needed?
+      unless !existing_link
+        user.current_shared_collection.link_collection_cards.push(existing_link)
+      end
+      LinkToSharedCollectionsWorker.new.perform(
+        users_to_add.map(&:id),
+        groups_to_add.map(&:id),
+        [{ "id"=>collection_to_link.id, "type"=>collection_to_link.class.name }],
+      )
     end
 
     it 'should create a link to shared/my collections' do
-      LinkToSharedCollectionsWorker.new.perform(
-        users_to_add.map(&:id),
-        groups_to_add.map(&:id),
-        collection_to_link.id,
-        collection_to_link.class.name,
-      )
 
       # each one should have been added 1 link card
-      expect(shared_with_me.link_collection_cards.count).to eq 1
-      expect(my_collection.link_collection_cards.count).to eq 1
-      # my_collection now has 2 cards total
-      expect(my_collection.collection_cards.count).to eq 2
+      expect(user.current_shared_collection.link_collection_cards.count).to eq 1
+      expect(user.current_user_collection.link_collection_cards.count).to eq 1
+      # current_user_collection now has 2 cards total
+      expect(user.current_user_collection.collection_cards.count).to eq 2
     end
 
     it 'should create links to groups shared collections' do
-      LinkToSharedCollectionsWorker.new.perform(
-        users_to_add.map(&:id),
-        groups_to_add.map(&:id),
-        collection_to_link.id,
-        collection_to_link.class.name,
-      )
       expect(
         groups_to_add.first.current_shared_collection.collection_cards.count
       ).to eq(1)
     end
 
     context 'when a link to the object already exists' do
-      let(:my_collection) { create(:user_collection, num_cards: 0) }
+      let(:groups_to_add) { [] }
       let!(:existing_link) do
-        create(:collection_card_link, parent: my_collection, collection: collection_to_link)
+        create(:collection_card_link_collection,
+               parent: user.current_shared_collection,
+               collection: collection_to_link)
       end
 
-      before do
-        LinkToSharedCollectionsWorker.new.perform(
-          users_to_add.map(&:id),
-          groups_to_add.map(&:id),
-          collection_to_link.id,
-          collection_to_link.class.name,
-        )
-      end
-
-      it 'should not create a doubled link in my collection' do
-        expect(my_collection.collection_cards.count).to eq(1)
+      it 'should not create a duplicate link in my collection' do
+        expect(user.current_shared_collection.link_collection_cards.count).to eq(1)
       end
     end
 
     context 'with multiple users' do
-      let(:users_to_add) { create_list(:user, 4) }
+      let(:users_to_add) { create_list(:user, 4, add_to_org: organization) }
 
       it 'should create two links for every user' do
-        expect(CollectionCard::Link).to receive(:create).at_least(8).times
-        LinkToSharedCollectionsWorker.new.perform(
-          users_to_add.map(&:id),
-          groups_to_add.map(&:id),
-          collection_to_link.id,
-          collection_to_link.class.name,
-        )
+        # NOTE: thoughts on looping in tests, I usually don't do it
+        users_to_add.each do |user|
+          expect(user.current_shared_collection.link_collection_cards.count).to eq(1)
+          expect(user.current_user_collection.link_collection_cards.count).to eq(1)
+        end
       end
     end
 
     context 'when object was created by the user being linked to' do
-      let!(:user) { create(:user) }
-      let!(:users_to_add) { [user] }
       let!(:collection_created_by) { create(:collection, created_by: user) }
-      let(:shared_with_me) { create(:shared_with_me_collection, num_cards: 0) }
-      let(:my_collection) { create(:user_collection, num_cards: 0) }
-
-      before do
-        LinkToSharedCollectionsWorker.new.perform(
-          users_to_add.map(&:id),
-          groups_to_add.map(&:id),
-          collection_created_by.id,
-          collection_created_by.class.name,
-        )
-      end
+      let!(:collection_to_link) { collection_created_by }
 
       it 'should not create any links for that user' do
-        expect(my_collection.collection_cards.count).to eq(0)
-        expect(shared_with_me.collection_cards.count).to eq(0)
+        expect(user.current_user_collection.link_collection_cards.count).to eq(0)
+        expect(user.current_shared_collection.link_collection_cards.count).to eq(0)
       end
     end
   end
