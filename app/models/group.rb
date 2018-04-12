@@ -20,6 +20,9 @@ class Group < ApplicationRecord
          strict: true
 
   belongs_to :organization
+  belongs_to :current_shared_collection,
+              class_name: 'Collection',
+              optional: true
 
   before_validation :set_handle_if_none, on: :create
 
@@ -69,18 +72,12 @@ class Group < ApplicationRecord
     organization.primary_group_id == id
   end
 
-  def current_shared_collection
-    # TODO: make relation
-    collections = roles_to_resources
-      .map(&:resource)
-      .select { |resource| resource.type == Collection::SharedWithMeCollection.name }
-    collections.first
-  end
-
   private
 
   def create_shared_collection
-    Collection::SharedWithMeCollection.create_for_group(self, organization)
+    shared = Collection::SharedWithMeCollection.create_for_group(
+      self, organization)
+    self.update(current_shared_collection: shared)
   end
 
   def after_add_role(role)
