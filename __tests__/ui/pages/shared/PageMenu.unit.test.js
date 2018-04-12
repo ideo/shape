@@ -1,3 +1,5 @@
+import _ from 'lodash'
+
 import PageMenu from '~/ui/pages/shared/PageMenu'
 import {
   fakeCollection
@@ -11,7 +13,7 @@ const props = {
 
 // const fakeMouseEvent = { stopPropagation: jest.fn() }
 
-let wrapper, actions, readOnlyActions
+let wrapper, actions, readOnlyActions, noPermissionActions
 describe('PageMenu', () => {
   beforeEach(() => {
     actions = [
@@ -25,6 +27,11 @@ describe('PageMenu', () => {
       'Tags',
       'Permissions',
     ]
+    noPermissionActions = [
+      'Duplicate',
+      'Tags',
+      'Archive',
+    ]
     wrapper = shallow(
       <PageMenu {...props} />
     )
@@ -32,7 +39,8 @@ describe('PageMenu', () => {
 
   it('creates a PopoutMenu with all editable actions when canEdit', () => {
     const popout = wrapper.find('PopoutMenu').at(0)
-    expect(popout.props().menuItems.length).toEqual(actions.length)
+    const menuItemNames = _.map(popout.props().menuItems, 'name')
+    expect(menuItemNames).toEqual(actions)
   })
 
   it('creates a PopoutMenu with all read-only actions when canEdit==false', () => {
@@ -44,7 +52,8 @@ describe('PageMenu', () => {
       <PageMenu {...readOnlyProps} />
     )
     const popout = wrapper.find('PopoutMenu').at(0)
-    expect(popout.props().menuItems.length).toEqual(readOnlyActions.length)
+    const menuItemNames = _.map(popout.props().menuItems, 'name')
+    expect(menuItemNames).toEqual(readOnlyActions)
   })
 
   it('allows permissions option to be disabled', () => {
@@ -52,7 +61,8 @@ describe('PageMenu', () => {
       <PageMenu {...props} disablePermissions />
     )
     const popout = wrapper.find('PopoutMenu').at(0)
-    expect(popout.props().menuItems.length).toEqual(actions.length - 1)
+    const menuItemNames = _.map(popout.props().menuItems, 'name')
+    expect(menuItemNames).toEqual(noPermissionActions)
   })
 
   it('calls archive on the record', () => {
