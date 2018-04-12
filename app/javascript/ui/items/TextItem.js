@@ -49,30 +49,43 @@ export const overrideHeadersFromClipboard = (editor) => {
 class TextItem extends React.Component {
   constructor(props) {
     super(props)
-    this.debouncedOnTextChange = _.debounce(this._debouncedOnTextChange, 1000)
-    this.debouncedStartUnlockTimer = _.debounce(this._startUnlockTimer, 1000)
+    this.debouncedOnKeyUp = _.debounce(this._onKeyUp, 2000)
     this.channel = undefined
+    this.reactQuillRef = undefined
+    this.quillEditor = undefined
     this.unlockTimeout = undefined
     this.ignoreBlurEvent = false
+    this.broadcastStoppedEditing = false
+    this.isEditing = false
+    this.numViewers = 0
   }
 
   state = {
-    numViewers: 0,
     currentEditor: null,
     locked: false
   }
 
   componentDidMount() {
-    if (!this.quillEditor) return
+    if (!this.reactQuillRef) return
     if (this.canEdit) {
-      const { editor } = this.quillEditor
+      const { editor } = this.reactQuillRef
       overrideHeadersFromClipboard(editor)
     }
     this.subscribeToItemEditingChannel()
+    this.attachQuillRefs()
+  }
+
+  componentDidUpdate() {
+    this.attachQuillRefs()
   }
 
   componentWillUnmount() {
     this.channel.unsubscribe()
+  }
+
+  attachQuillRefs = () => {
+    if (typeof this.reactQuillRef.getEditor !== 'function') return
+    this.quillEditor = this.reactQuillRef.getEditor()
   }
 
   get canEdit() {
@@ -85,10 +98,6 @@ class TextItem extends React.Component {
     if (!locked || !currentEditor) return ''
     if (currentEditor.id === currentUserId) return ''
     return <EditorPill className="editor-pill" editor={currentEditor} />
-  }
-
-  componentWillReceiveProps(nextProps) {
-    console.log('next props', nextProps)
   }
 
   subscribeToItemEditingChannel = () => {
@@ -109,14 +118,21 @@ class TextItem extends React.Component {
 
   channelReceivedData = (data) => {
     console.log('Channel received data:', data)
-    const { item, currentUserId } = this.props
+    const { currentUserId } = this.props
     const { currentEditor } = this.state
-    const numViewers = data.num_viewers
+    let { locked } = this.state
     let newCurrentEditor = data.current_editor
-    let locked
+
+    // Store this internally, not forcing a re-render if user is editing
+    // As it only affects internal state about whether to unlock
+    this.numViewers = data.num_viewers
 
     // Set null if it is an empty object
     if (_.isEmpty(newCurrentEditor)) newCurrentEditor = null
+
+    // Return if this is the user that is currently editing,
+    // as setting state led to many bugs when the text contents hadn't been saved yet
+    if (newCurrentEditor && newCurrentEditor.id === currentUserId) return
 
     // If editor is present and is not this user, lock editing
     if (newCurrentEditor && newCurrentEditor.id !== currentUserId) {
@@ -124,11 +140,12 @@ class TextItem extends React.Component {
     } else {
       locked = false
     }
+
     this.setState({
       currentEditor: newCurrentEditor,
-      numViewers,
       locked
     })
+
     // If someone else previously finished editing, fetch updates
     if ((currentEditor && !newCurrentEditor) && (currentEditor.id !== currentUserId)) {
       this.props.handleRefetchItem()
@@ -148,15 +165,17 @@ class TextItem extends React.Component {
   onEditorBlur = () => {
     // If they click outside of editor, release the lock immediately
     if (!this.ignoreBlurEvent) {
-      this.debouncedStartUnlockTimer.flush()
-      this._startUnlockTimer(true)
+      this.startUnlockTimer(true)
     }
   }
 
   onEditorFocus = () => {
+    const { locked } = this.state
+    // Ignore any events while editor is locked
+    if (locked) return
     this.broadcastEditingState({ editing: true })
-    // Start unlock timer, in case they never type anything
-    this.debouncedStartUnlockTimer()
+    // Start unlock timer immediately, in case they never type anything
+    this.startUnlockTimer()
   }
 
   broadcastEditingState = ({ editing }) => {
@@ -165,33 +184,28 @@ class TextItem extends React.Component {
     if (editing) {
       this.channel.perform('start_editing', { id: item.id })
     } else {
-      // Call save / debounced flush
-      this.debouncedOnTextChange.flush()
       this.channel.perform('stop_editing', { id: item.id })
     }
   }
 
   unlockEditingIfOtherViewers = () => {
     console.log('Check if we should unlock editing')
-    const { numViewers } = this.state
     // Unlock if there are other viewers (this user is counted as a viewer)
-    if (numViewers > 1) {
-      this.ignoreBlurEvent = true
+    if (this.numViewers > 1) {
       // Kick user out of editor
-      this.quillEditor.blur() // <-- this is triggering two unlocks
+      this.ignoreBlurEvent = true
+      this.reactQuillRef.blur() // <-- this triggers two unlocks unless event is ignored
       this.ignoreBlurEvent = false
-      // Broadcast that other viewers can edit
-      this.broadcastEditingState({ editing: false })
+      this.broadcastStoppedEditing = true
+      // Cancel any outstanding requests to save
+      this.debouncedOnKeyUp.cancel()
+      // Call save immediately if there are changes
+      this._onKeyUp()
     }
   }
 
-  _startUnlockTimer = (unlockImmediately) => {
-    const { locked } = this.state
-    // On text change gets called when text is updated from other editor
-    // So return if we're not locked
-    if (!locked) return
-    // Reset the timeout so user has another 3 seconds
-    // if they just finished editing
+  startUnlockTimer = (unlockImmediately) => {
+    // Reset the timeout if it is running, to extend the unlock
     if (this.unlockTimeout) clearTimeout(this.unlockTimeout)
 
     if (unlockImmediately) {
@@ -209,19 +223,22 @@ class TextItem extends React.Component {
     return item.toJS().text_data
   }
 
-  onTextChange = (content, delta, source, quill) => {
-    console.log('on text change')
-    this.debouncedOnTextChange(content, delta, source, quill)
-    this.debouncedStartUnlockTimer()
+  onKeyUp = () => {
+    this.debouncedOnKeyUp()
+    this.startUnlockTimer()
   }
 
-  _debouncedOnTextChange = (content, delta, source, quill) => {
+  _onKeyUp = () => {
     const { item } = this.props
-    const textData = quill.getContents()
-    item.content = content
-    item.text_data = textData
-    console.log('saved item')
-    item.save()
+    const { quillEditor } = this
+    item.content = quillEditor.root.innerHTML
+    item.text_data = quillEditor.getContents()
+    item.save().then(() => {
+      if (this.broadcastStoppedEditing) {
+        this.broadcastEditingState({ editing: false })
+        this.broadcastStoppedEditing = false
+      }
+    })
   }
 
   render() {
@@ -230,9 +247,9 @@ class TextItem extends React.Component {
     if (this.canEdit) {
       quillProps = {
         ...v.quillDefaults,
-        ref: c => { this.quillEditor = c },
+        ref: c => { this.reactQuillRef = c },
         theme: 'snow',
-        onChange: this.onTextChange,
+        onKeyUp: this.onKeyUp,
         onFocus: this.onEditorFocus,
         onBlur: this.onEditorBlur,
         readOnly: locked,
@@ -254,7 +271,7 @@ class TextItem extends React.Component {
         {this.renderEditorPill}
         <ReactQuill
           {...quillProps}
-          value={textData}
+          value={this.textData}
         />
       </StyledContainer>
     )
