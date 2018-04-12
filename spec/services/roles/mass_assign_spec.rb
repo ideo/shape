@@ -108,8 +108,7 @@ RSpec.describe Roles::MassAssign, type: :service do
         expect(LinkToSharedCollectionsWorker).to receive(:perform_async).with(
           (users + all_group_users).map(&:id),
           groups.map(&:id),
-          object.id,
-          object.class.name,
+          [{ id: object.id, type: object.class.name }]
         )
         assign_role.call
       end
@@ -122,8 +121,7 @@ RSpec.describe Roles::MassAssign, type: :service do
           expect(LinkToSharedCollectionsWorker).to receive(:perform_async).with(
             (users).map(&:id),
             groups.map(&:id),
-            object.id,
-            object.class.name,
+            [{ id: object.id, type: object.class.name }]
           )
           assign_role.call
         end
@@ -141,8 +139,28 @@ RSpec.describe Roles::MassAssign, type: :service do
           expect(LinkToSharedCollectionsWorker).to receive(:perform_async).with(
             (users).map(&:id),
             [],
-            object.id,
-            object.class.name,
+            [{ id: object.id, type: object.class.name }]
+          )
+          assign_role.call
+        end
+      end
+
+      context 'when the object is a group' do
+        let!(:role_name) { :admin }
+        let!(:user) { create(:user, add_to_org: organization) }
+        let!(:users) { [user] }
+        let!(:groups) { [] }
+        let!(:linked_collection) { create(:collection) }
+        let!(:object) { create(:group) }
+        let!(:link) { create(:collection_card_link,
+                             parent: object.current_shared_collection,
+                             collection: linked_collection)}
+
+        it 'should link all the groups shared collection cards' do
+          expect(LinkToSharedCollectionsWorker).to receive(:perform_async).with(
+            (users).map(&:id),
+            [],
+            [{ id: linked_collection.id, type: linked_collection.class.name }]
           )
           assign_role.call
         end
