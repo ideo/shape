@@ -1,6 +1,7 @@
 import { Fragment } from 'react'
 import PropTypes from 'prop-types'
 import { PropTypes as MobxPropTypes } from 'mobx-react'
+import _ from 'lodash'
 
 import { uiStore } from '~/stores'
 import TagIcon from '~/ui/icons/TagIcon'
@@ -41,7 +42,7 @@ class PageMenu extends React.PureComponent {
   }
 
   get menuItems() {
-    const items = [
+    let items = [
       { name: 'Duplicate', icon: <DuplicateIcon />, onClick: this.duplicateRecord },
       { name: 'Tags', icon: <TagIcon />, onClick: this.showTags },
       { name: 'Permissions', icon: <PermissionsIcon />, onClick: this.showRolesMenu },
@@ -51,7 +52,9 @@ class PageMenu extends React.PureComponent {
         { name: 'Archive', icon: <ArchiveIcon />, onClick: this.archiveRecord },
       )
     }
-    if (this.props.disablePermissions) items.splice(1, 1)
+    if (this.props.disablePermissions) {
+      items = _.reject(items, { name: 'Permissions' })
+    }
     return items
   }
 
