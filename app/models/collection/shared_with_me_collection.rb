@@ -26,6 +26,15 @@ class Collection
       collection
     end
 
+    def self.create_for_group(group, organization)
+      # Collection requires an organization. should be the groups org.
+      collection = create(
+        organization: organization,
+      )
+      group.add_role(Role::VIEWER, collection.becomes(Collection)) if collection.persisted?
+      collection
+    end
+
     def searchable?
       false
     end

@@ -13,6 +13,8 @@ class Group < ApplicationRecord
                edit_role: Role::ADMIN,
                view_role: Role::MEMBER
 
+  after_create :create_shared_collection
+
   rolify after_add: :after_add_role,
          after_remove: :after_remove_role,
          strict: true
@@ -48,16 +50,6 @@ class Group < ApplicationRecord
       .where(GroupsRole.arel_table[:group_id].in(id))
   end
 
-  # really meant to be used on an AR Relation, where `select` is just the relevant records
-  def self.user_ids
-    identifiers = select(:id).map(&:resource_identifier)
-    UsersRole
-      .joins(:role)
-      .where(Role.arel_table[:resource_identifier].in(identifiers))
-      .pluck(:user_id)
-      .uniq
-  end
-
   # Roles where a user is admin/viewer of this group
   def roles_from_users
     Role.for_resource(self)
@@ -67,7 +59,22 @@ class Group < ApplicationRecord
     organization.primary_group_id == id
   end
 
+  def current_shared_collection
+    # TODO: do we need this check here?
+    return nil if organization.blank?
+
+    # TODO: make relation
+    collections = roles_to_resources
+      .map(&:resource)
+      .select { |resource| resource.type == Collection::SharedWithMeCollection.name }
+    collections.first
+  end
+
   private
+
+  def create_shared_collection
+    Collection::SharedWithMeCollection.create_for_group(self, organization)
+  end
 
   def after_add_role(role)
     resource = role.resource
