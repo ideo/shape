@@ -10,7 +10,7 @@ class Group < ApplicationRecord
                edit_role: Role::ADMIN,
                view_role: Role::MEMBER
 
-  after_create :create_shared_collection
+  after_create: create_shared_collection
 
   rolify after_add: :after_add_role,
          after_remove: :after_remove_role,
@@ -45,14 +45,9 @@ class Group < ApplicationRecord
 
   # Roles where this group is an editor/viewer of a collection/item
   def roles_to_resources
-    role_ids = Role
+     Role
       .joins(:groups_roles)
       .where(GroupsRole.arel_table[:group_id].in(id))
-      .reject{ |role|
-        role.groups.first.current_shared_collection_id == role.resource.id
-      }
-      .map(&:id)
-    Role.where(id: role_ids)
   end
 
   # really meant to be used on an AR Relation, where `select` is just the relevant records
@@ -74,12 +69,20 @@ class Group < ApplicationRecord
     organization.primary_group_id == id
   end
 
+  def current_shared_collection
+    roles_to_resources.
+    # TODO: make relation
+    collections = roles_to_resources
+      .map(&:resource)
+      .select { |resource| resource.type == Collection::SharedWithMeCollection.name }
+    collections.first
+  end
+
   private
 
   def create_shared_collection
-    shared = Collection::SharedWithMeCollection.create_for_group(
+    Collection::SharedWithMeCollection.create_for_group(
       self, organization)
-    self.update(current_shared_collection: shared)
   end
 
   def after_add_role(role)
@@ -100,5 +103,29 @@ class Group < ApplicationRecord
 
   def set_handle_if_none
     self.handle ||= name.parameterize
+  end
+
+  def after_archive_group
+    remove_group_from_resources
+    archive_group_handle
+  end
+
+  def remove_group_from_resources
+    # TODO: how to do less here rather then call on every resource
+    # an additional complication here: When you archive the group, you
+    # could be on the current page of the resource it will be removed from
+    # so technically you'd want it to be a synchronous remove, so you can
+    # refetch the resource roles after the request is done.
+    roles_to_resources.each do |role|
+      Roles::MassRemove.new(
+        object: role.resource,
+        role_name: role.name,
+        groups: [self],
+      ).call
+    end
+  end
+
+  def archive_group_handle
+    update(handle: "#{handle}-archived-#{Time.now.to_i}")
   end
 end
