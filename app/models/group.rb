@@ -72,11 +72,13 @@ class Group < ApplicationRecord
   end
 
   def current_shared_collection
-    # TODO: make relation
+    role_ids = roles_to_resources.map(&:id)
+
     Collection
       .where(type: 'Collection::SharedWithMeCollection')
-      .joins(:group_roles)
-      .where(GroupsRole.arel_table[:group_id].in(id))
+      .joins(:roles)
+      .where(Role.arel_table[:id].in(role_ids))
+      .first
   end
 
   private
