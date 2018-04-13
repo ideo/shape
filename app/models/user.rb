@@ -14,6 +14,7 @@ class User < ApplicationRecord
            source: :resource,
            source_type: 'Collection'
   has_many :groups,
+           -> { active },
            through: :roles,
            source: :resource,
            source_type: 'Group'

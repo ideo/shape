@@ -1,6 +1,6 @@
 import { action, runInAction, observable } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
-
+import styled from 'styled-components'
 import { FormSpacer, TextButton } from '~/ui/global/styled/forms'
 import { Row, RowItemRight } from '~/ui/global/styled/layout'
 import { Heading3, DisplayText } from '~/ui/global/styled/typography'
@@ -8,6 +8,11 @@ import Modal from '~/ui/global/modals/Modal'
 import GroupModify from '~/ui/groups/GroupModify'
 import RolesMenu from '~/ui/roles/RolesMenu'
 import Loader from '~/ui/layout/Loader'
+import ArchiveIcon from '~/ui/icons/ArchiveIcon'
+
+const RemoveIconHolder = styled.button`
+  width: 16px;
+`
 
 @inject('apiStore', 'uiStore')
 @observer
@@ -99,8 +104,34 @@ class OrganizationMenu extends React.Component {
     return userRole.canEdit()
   }
 
+  removeGroup = async (group) => {
+    try {
+      const { apiStore } = this.props
+      await group.API_archive()
+      const roles = apiStore.findAll('roles').filter((role) =>
+        role.resource && role.resource.id === group.id)
+      if (roles.find(role => role.users.find(user => user.id ===
+          apiStore.currentUserId))) {
+        window.location.reload()
+      }
+      apiStore.fetch('users', apiStore.currentUserId, true)
+    } catch (err) {
+      console.warn('Unable to archive group', err)
+    }
+  }
+
   handleGroupClick = group => () => {
     this.changeModifyGroup(group)
+  }
+
+  handleGroupRemove = group => async () => {
+    const { uiStore } = this.props
+    uiStore.confirm({
+      prompt: `Are you sure you want to archive ${group.name}?`,
+      confirmText: 'Archive',
+      iconName: 'Archive',
+      onConfirm: () => this.removeGroup(group),
+    })
   }
 
   handleGroupRolesClick = group => () => {
@@ -188,6 +219,9 @@ class OrganizationMenu extends React.Component {
             >
               <DisplayText>{group.name}</DisplayText>
             </button>
+            <RemoveIconHolder onClick={this.handleGroupRemove(group)}>
+              <ArchiveIcon />
+            </RemoveIconHolder>
           </Row>))
         }
       </div>

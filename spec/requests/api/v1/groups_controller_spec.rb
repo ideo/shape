@@ -113,4 +113,55 @@ describe Api::V1::GroupsController, type: :request, json: true, auth: true do
       expect(group.reload.name).to eq('Creative Competitors')
     end
   end
+
+  describe 'PATCH #archive' do
+    let!(:collection) { create(:collection) }
+    let!(:members) { create_list(:user, 3) }
+    let!(:group) { create(:group, add_admins: [user], add_members: members) }
+    let!(:orig_handle) { group.handle }
+    let(:path) { "/api/v1/groups/#{group.id}/archive" }
+
+    before do
+      group.add_role(Role::VIEWER, collection)
+    end
+
+    it 'returns a 200' do
+      patch(path)
+      expect(response.status).to eq(200)
+    end
+
+    it 'updates archived status of the group' do
+      expect(group.active?).to eq(true)
+      patch(path)
+      expect(group.reload.archived?).to eq(true)
+    end
+
+    it 'updates the handle' do
+      patch(path)
+      expect(group.reload.handle).not_to eq(orig_handle)
+    end
+
+    it 'preserves the user roles on the group' do
+      patch(path)
+      group.reload
+      expect(group.members[:users].count).to eq(3)
+      expect(group.admins[:users].count).to eq(1)
+    end
+
+    it 'removes group from all content' do
+      patch(path)
+      expect(group.reload.roles_to_resources.count).to eq(0)
+    end
+
+    context 'without admin access' do
+      before do
+        user.remove_role(Role::ADMIN, group)
+      end
+
+      it 'rejects non-editors' do
+        patch(path)
+        expect(response.status).to eq(401)
+      end
+    end
+  end
 end

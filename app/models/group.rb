@@ -1,6 +1,9 @@
 class Group < ApplicationRecord
   include Resourceable
   include HasFilestackFile
+  include Archivable
+  after_archive :after_archive_group
+
   prepend RolifyExtensions # Prepend so it can call rolify methods using super
 
   # Admins can manage people in the group
@@ -84,5 +87,29 @@ class Group < ApplicationRecord
 
   def set_handle_if_none
     self.handle ||= name.parameterize
+  end
+
+  def after_archive_group
+    remove_group_from_resources
+    archive_group_handle
+  end
+
+  def remove_group_from_resources
+    # TODO: how to do less here rather then call on every resource
+    # an additional complication here: When you archive the group, you
+    # could be on the current page of the resource it will be removed from
+    # so technically you'd want it to be a synchronous remove, so you can
+    # refetch the resource roles after the request is done.
+    roles_to_resources.each do |role|
+      Roles::MassRemove.new(
+        object: role.resource,
+        role_name: role.name,
+        groups: [self],
+      ).call
+    end
+  end
+
+  def archive_group_handle
+    update(handle: "#{handle}-archived-#{Time.now.to_i}")
   end
 end

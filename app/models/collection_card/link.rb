@@ -1,6 +1,6 @@
 class CollectionCard
   class Link < CollectionCard
-    archivable after_archive: :decrement_card_orders!
+    after_archive :decrement_card_orders!
 
     belongs_to :collection,
                optional: true,

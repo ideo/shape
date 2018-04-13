@@ -63,6 +63,7 @@ ActiveRecord::Schema.define(version: 20180411202023) do
     t.datetime "updated_at", null: false
     t.string "handle"
     t.integer "filestack_file_id"
+    t.boolean "archived", default: false
     t.index ["handle"], name: "index_groups_on_handle"
     t.index ["organization_id"], name: "index_groups_on_organization_id"
   end

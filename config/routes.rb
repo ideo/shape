@@ -43,7 +43,10 @@ Rails.application.routes.draw do
         end
       end
       resources :groups, except: :delete do
-        resources :roles, only: %i[index create destroy]
+        resources :roles, only: %i[index create archive destroy]
+        member do
+          patch 'archive'
+        end
       end
       resources :organizations, only: %i[show update] do
         collection do

@@ -23,7 +23,7 @@ default: &default
 
 development:
   <<: *default
-  database: shape_development
+  database: <%= ENV.fetch("SHAPE_DB_NAME") { 'shape_development' } %>
 
   # The specified database role being used to connect to postgres.
   # To create additional roles in postgres see `$ createuser --help`.
