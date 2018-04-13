@@ -10,7 +10,7 @@ const StyledButton = styled.button`
   }
   &.ql-format-large {
     font-size: 1.1rem;
-    font-family: 'Gotham', sans-serif;
+    font-family: ${v.fonts.sans};
   }
 `
 

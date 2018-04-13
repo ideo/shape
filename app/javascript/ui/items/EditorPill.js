@@ -9,14 +9,14 @@ const StyledEditorPill = styled.div`
   border-radius: 5px;
   background-color: ${v.colors.cloudy};
   padding: 10px 20px;
-  color: #ffffff;
+  color: white;
   .editor {
     display: inline-block;
   }
   .name {
     margin-left: 12px;
     display: inline-block;
-    font-family: 'Gotham', sans-serif;
+    font-family: ${v.fonts.sans};
     font-size: 1.1rem;
     letter-spacing: 0.075rem;
     vertical-align: top;

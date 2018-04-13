@@ -5,6 +5,7 @@ import ReactQuill from 'react-quill'
 import styled from 'styled-components'
 
 import v from '~/utils/variables'
+import sleep from '~/utils/sleep'
 import TextItemToolbar from '~/ui/items/TextItemToolbar'
 import EditorPill from '~/ui/items/EditorPill'
 
@@ -67,13 +68,13 @@ class TextItem extends React.Component {
   }
 
   componentDidMount() {
-    if (!this.reactQuillRef) return
     if (this.canEdit) {
+      if (!this.reactQuillRef) return
       const { editor } = this.reactQuillRef
       overrideHeadersFromClipboard(editor)
+      this.attachQuillRefs()
     }
     this.subscribeToItemEditingChannel()
-    this.attachQuillRefs()
   }
 
   componentDidUpdate() {
@@ -85,6 +86,7 @@ class TextItem extends React.Component {
   }
 
   attachQuillRefs = () => {
+    if (!this.reactQuillRef) return
     if (typeof this.reactQuillRef.getEditor !== 'function') return
     this.quillEditor = this.reactQuillRef.getEditor()
   }
@@ -103,9 +105,10 @@ class TextItem extends React.Component {
         rejected: () => {},
       }
     )
+    // console.log('thischannel is being set', this.channel)
   }
 
-  channelReceivedData = (data) => {
+  channelReceivedData = async (data) => {
     const { currentUserId } = this.props
     const { currentEditor } = this.state
     let { locked } = this.state
@@ -120,7 +123,7 @@ class TextItem extends React.Component {
 
     // Return if this is the user that is currently editing,
     // as setting state led to many bugs when the text contents hadn't been saved yet
-    if (newCurrentEditor && newCurrentEditor.id === currentUserId) return
+    if (newCurrentEditor && currentEditor && newCurrentEditor.id === currentEditor.id) return
 
     // If editor is present and is not this user, lock editing
     if (newCurrentEditor && newCurrentEditor.id !== currentUserId) {
@@ -129,15 +132,16 @@ class TextItem extends React.Component {
       locked = false
     }
 
+    // If someone else previously finished editing, fetch updates
+    if ((currentEditor && !newCurrentEditor) && (currentEditor.id !== currentUserId)) {
+      await this.props.handleRefetchItem()
+      // wait before unlocking for the other viewers
+      await sleep(1000)
+    }
     this.setState({
       currentEditor: newCurrentEditor,
       locked
     })
-
-    // If someone else previously finished editing, fetch updates
-    if ((currentEditor && !newCurrentEditor) && (currentEditor.id !== currentUserId)) {
-      this.props.handleRefetchItem()
-    }
   }
 
   channelDisconnected = () => {
@@ -161,6 +165,15 @@ class TextItem extends React.Component {
     const { locked } = this.state
     // Ignore any events while editor is locked
     if (locked) return
+    this.startEditing()
+  }
+
+  startEditing = () => {
+    const { currentUserId } = this.props
+    const { currentEditor } = this.state
+    // no need to broadcast if we're already marked as the editor
+    if (currentEditor && currentEditor.id === currentUserId) return
+    // console.log('startEditing....')
     this.broadcastEditingState({ editing: true })
     // Start unlock timer immediately, in case they never type anything
     this.startUnlockTimer()
@@ -212,6 +225,7 @@ class TextItem extends React.Component {
   }
 
   onKeyUp = () => {
+    this.startEditing()
     this.debouncedOnKeyUp()
     this.startUnlockTimer()
   }

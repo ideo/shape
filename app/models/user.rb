@@ -35,7 +35,9 @@ class User < ApplicationRecord
 
   scope :search_import, -> { includes(:roles) }
 
-  attribute :pic_url_square, default: 'https://d3none3dlnlrde.cloudfront.net/assets/users/avatars/missing/square.jpg'
+  attribute :pic_url_square,
+            :string,
+            default: 'https://d3none3dlnlrde.cloudfront.net/assets/users/avatars/missing/square.jpg'
 
   enum status: {
     active: 0,
@@ -95,11 +97,11 @@ class User < ApplicationRecord
   end
 
   # Simplified format, used by action cable
-  def as_json(options = {})
+  def as_json(_options = {})
     {
       id: id,
       name: name,
-      pic_url_square: pic_url_square
+      pic_url_square: pic_url_square,
     }
   end
 

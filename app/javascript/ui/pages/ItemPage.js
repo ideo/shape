@@ -58,10 +58,11 @@ class ItemPage extends PageWithApi {
 
   onAPILoad = (response) => {
     const item = response.data
+    console.log(this.props.apiStore)
     this.setState({ item })
   }
 
-  refetchItem = async() => {
+  refetchItem = async () => {
     const { apiStore } = this.props
     const { item } = this.state
     const { data } = await apiStore.fetch('items', item.id, { force: true })
@@ -109,6 +110,7 @@ class ItemPage extends PageWithApi {
     const { uiStore } = this.props
     const { item } = this.state
     if (!item) return <Loader />
+
     return (
       <Fragment>
         <Header>

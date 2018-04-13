@@ -37,7 +37,7 @@ const StyledScrollIndicator = styled.div`
   height: 60px;
   color: white;
   font-size: 1rem;
-  font-family: 'Gotham';
+  font-family: ${v.fonts.sans};
   text-align: center;
   line-height: 3.5rem;
   background: ${props => (props.active ? v.colors.gray : v.colors.cloudy)};
