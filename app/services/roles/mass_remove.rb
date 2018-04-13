@@ -33,7 +33,7 @@ module Roles
       links = @object.is_a?(Group) ?
         @object.current_shared_collection.link_collection_cards.map(&:record) :
         [@object]
-      links.map { |o| { id: o.id, type: o.class.name } }
+      links.map { |o| { "id"=>o.id, "type"=>o.class.name } }
     end
 
     def group_ids

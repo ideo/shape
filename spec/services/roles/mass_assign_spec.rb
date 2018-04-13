@@ -108,7 +108,7 @@ RSpec.describe Roles::MassAssign, type: :service do
         expect(LinkToSharedCollectionsWorker).to receive(:perform_async).with(
           (users + all_group_users).map(&:id),
           groups.map(&:id),
-          [{ id: object.id, type: object.class.name }]
+          [{ "id"=>object.id, "type"=>object.class.name }]
         )
         assign_role.call
       end
@@ -121,7 +121,7 @@ RSpec.describe Roles::MassAssign, type: :service do
           expect(LinkToSharedCollectionsWorker).to receive(:perform_async).with(
             (users).map(&:id),
             groups.map(&:id),
-            [{ id: object.id, type: object.class.name }]
+            [{ "id"=>object.id, "type"=>object.class.name }]
           )
           assign_role.call
         end
@@ -139,7 +139,7 @@ RSpec.describe Roles::MassAssign, type: :service do
           expect(LinkToSharedCollectionsWorker).to receive(:perform_async).with(
             (users).map(&:id),
             [],
-            [{ id: object.id, type: object.class.name }]
+            [{ "id"=>object.id, "type"=>object.class.name }]
           )
           assign_role.call
         end
