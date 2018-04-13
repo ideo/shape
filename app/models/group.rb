@@ -10,7 +10,7 @@ class Group < ApplicationRecord
                edit_role: Role::ADMIN,
                view_role: Role::MEMBER
 
-  after_create: create_shared_collection
+  after_create :create_shared_collection
 
   rolify after_add: :after_add_role,
          after_remove: :after_remove_role,
@@ -70,12 +70,11 @@ class Group < ApplicationRecord
   end
 
   def current_shared_collection
-    roles_to_resources.
     # TODO: make relation
-    collections = roles_to_resources
-      .map(&:resource)
-      .select { |resource| resource.type == Collection::SharedWithMeCollection.name }
-    collections.first
+    Collection
+      .where(type: 'Collection::SharedWithMeCollection')
+      .joins(:group_roles)
+      .where(GroupsRole.arel_table[:group_id].in(id))
   end
 
   private
