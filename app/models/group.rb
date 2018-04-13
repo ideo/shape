@@ -2,6 +2,8 @@ class Group < ApplicationRecord
   include Resourceable
   include HasFilestackFile
   prepend RolifyExtensions # Prepend so it can call rolify methods using super
+  include Archivable
+  after_archive :after_archive_group
 
   # Admins can manage people in the group
   # Members have read access to everything the group is linked to
@@ -45,7 +47,7 @@ class Group < ApplicationRecord
 
   # Roles where this group is an editor/viewer of a collection/item
   def roles_to_resources
-     Role
+    Role
       .joins(:groups_roles)
       .where(GroupsRole.arel_table[:group_id].in(id))
   end
