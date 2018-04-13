@@ -48,6 +48,7 @@ class Group < ApplicationRecord
   # Roles where this group is an editor/viewer of a collection/item
   def roles_to_resources
     Role
+      .where.not(resource_id: current_shared_collection.id)
       .joins(:groups_roles)
       .where(GroupsRole.arel_table[:group_id].in(id))
   end
@@ -72,7 +73,10 @@ class Group < ApplicationRecord
   end
 
   def current_shared_collection
-    role_ids = roles_to_resources.map(&:id)
+    role_ids = Role
+      .joins(:groups_roles)
+      .where(GroupsRole.arel_table[:group_id].in(id))
+      .map(&:id)
 
     Collection
       .where(type: 'Collection::SharedWithMeCollection')
