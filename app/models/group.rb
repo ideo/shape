@@ -51,6 +51,9 @@ class Group < ApplicationRecord
     Role
       .joins(:groups_roles)
       .where(GroupsRole.arel_table[:group_id].in(id))
+      .reject{ |role|
+        role.groups.first.current_shared_collection_id == role.resource.id
+      }
   end
 
   # really meant to be used on an AR Relation, where `select` is just the relevant records
