@@ -160,7 +160,7 @@ RSpec.describe Roles::MassAssign, type: :service do
           expect(LinkToSharedCollectionsWorker).to receive(:perform_async).with(
             (users).map(&:id),
             [],
-            [{ id: linked_collection.id, type: linked_collection.class.name }]
+            [{ "id"=>linked_collection.id, "type"=>linked_collection.class.name }]
           )
           assign_role.call
         end
