@@ -94,6 +94,8 @@ class CollectionPage extends PageWithApi {
     const { movingCardIds, cardAction } = uiStore
     // only tell the Grid to hide "movingCards" if we're moving and not linking
     const uiMovingCardIds = cardAction === 'move' ? movingCardIds : []
+    // SharedCollection has special behavior where it sorts by most recently updated
+    const sortBy = collection.isSharedCollection ? 'updated_at' : 'order'
 
     return (
       <Fragment>
@@ -145,6 +147,7 @@ class CollectionPage extends PageWithApi {
             movingCardIds={uiMovingCardIds}
             // passing length prop seems to properly trigger a re-render
             movingCards={uiStore.movingCardIds.length}
+            sortBy={sortBy}
           />
           <MoveModal />
         </PageContainer>

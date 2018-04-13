@@ -1,7 +1,7 @@
 class Collection
   class SharedWithMeCollection < Collection
     has_many :collection_cards,
-             -> { order(order: :asc) },
+             -> { active.order(updated_at: :desc) },
              class_name: 'CollectionCard',
              foreign_key: :parent_id,
              inverse_of: :parent
