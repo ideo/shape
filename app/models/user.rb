@@ -131,21 +131,20 @@ class User < ApplicationRecord
     save
   end
 
-  def current_user_collection_id
-    current_user_collection.try(:id)
-  end
-
-  def current_user_collection
+  def current_user_collection(org_id = current_organization_id)
     return nil if current_organization.blank?
-
+    if current_user_collection_id && org_id == current_organization_id
+      # if within same org, we already have the current_user_collection id
+      return collections.find(current_user_collection_id)
+    end
     # TODO: rename "user" to user_collection
-    collections.user.find_by_organization_id(current_organization_id)
+    collections.user.find_by_organization_id(org_id)
   end
 
-  def current_shared_collection
+  def current_shared_collection(org_id = current_organization_id)
     return nil if current_organization.blank?
 
-    collections.shared_with_me.find_by_organization_id(current_organization_id)
+    collections.shared_with_me.find_by_organization_id(org_id)
   end
 
   def current_org_groups
@@ -164,9 +163,7 @@ class User < ApplicationRecord
       elsif resource.respond_to?(:organization_id)
         resource.organization_id == organization.id
       else
-        # TODO: this is potentially including items from other orgs
-        # For now, most people will belong only to one org, so leaving it in.
-        true
+        false
       end
     end
   end

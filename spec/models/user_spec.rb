@@ -271,24 +271,33 @@ describe User, type: :model do
           user.viewable_collections_and_items(organization),
         ).to match_array(*view_coll)
       end
-    end
 
-    context 'with items' do
-      let!(:view_item) { create(:text_item, add_viewers: [user]) }
-      let!(:edit_item) { create(:text_item, add_editors: [user]) }
-      let!(:other_item) { create(:text_item) }
+      context 'with items in collections' do
+        let!(:view_item_collection_card) { create(:collection_card_text, parent: view_coll) }
+        let!(:edit_item_collection_card) { create(:collection_card_text, parent: edit_coll) }
+        let!(:other_item_collection_card) { create(:collection_card_text, parent: other_coll) }
+        let(:view_item) { view_item_collection_card.item }
+        let(:edit_item) { edit_item_collection_card.item }
+        let(:other_item) { other_item_collection_card.item }
 
-      it 'should return all items user has been added to' do
-        expect(
-          user.viewable_collections_and_items(organization),
-        ).to match_array([edit_item, view_item])
-      end
+        before do
+          # factory does not inherit roles from collection, need to explicitly add
+          user.add_role(Role::EDITOR, edit_item.becomes(Item))
+          user.add_role(Role::VIEWER, view_item.becomes(Item))
+        end
 
-      pending 'it should only return items in this org' do
-        # TODO: figure out how to efficiently reference org from item
-        expect(
-          user.viewable_collections_and_items(organization),
-        ).to match_array(*view_item)
+        it 'should return all collections + items user has been added to' do
+          expect(
+            user.viewable_collections_and_items(organization),
+          ).to match_array([view_coll, edit_coll, view_item, edit_item])
+        end
+
+        it 'it should only return collections + items in this org' do
+          edit_coll.update_attributes(organization: org_2)
+          expect(
+            user.viewable_collections_and_items(organization),
+          ).to match_array([view_coll, view_item])
+        end
       end
     end
   end

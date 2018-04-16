@@ -9,8 +9,9 @@ class LinkToSharedCollectionsWorker
     users_to_add.each do |user|
       # Don't create any links if object was created by user
       next if object.try(:created_by_id) == user.id
-      shared = user.current_shared_collection
-      mine = user.current_user_collection
+      org_id = object.organization_id
+      shared = user.current_shared_collection(org_id)
+      mine = user.current_user_collection(org_id)
       # Check for already created links to not create doubles
       [shared, mine].each do |collection|
         unless collection.link_collection_cards.with_record(object).exists?
