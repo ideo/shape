@@ -58,7 +58,6 @@ class ItemPage extends PageWithApi {
 
   onAPILoad = (response) => {
     const item = response.data
-    console.log(this.props.apiStore)
     this.setState({ item })
   }
 
