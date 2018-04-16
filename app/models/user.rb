@@ -80,13 +80,17 @@ class User < ApplicationRecord
     user
   end
 
-  def self.create_pending_user(email:)
-    create(
+  def self.create_pending_user(email:, organization:)
+    user = create(
       email: email,
       status: User.statuses[:pending],
       password: Devise.friendly_token(40),
       invitation_token: Devise.friendly_token(40),
     )
+    # NOTE: The user is not officially a member of this org, but we add them
+    # so that they have the proper current_organization_id and shared/my collections
+    organization.user_role_added(user)
+    user
   end
 
   def self.pending_user_with_token(token)

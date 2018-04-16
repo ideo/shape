@@ -27,8 +27,6 @@ class Organization < ApplicationRecord
     o
   end
 
-
-
   # Note: this method can be called many times for the same org
   def user_role_added(user)
     Collection::UserCollection.find_or_create_for_user(user, self)

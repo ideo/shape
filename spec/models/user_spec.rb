@@ -216,17 +216,26 @@ describe User, type: :model do
   end
 
   describe '#create_pending_user' do
+    let(:organization) { create(:organization) }
     let(:email) { Faker::Internet.email }
 
     it 'should create a new pending user' do
-      user = User.create_pending_user(email: email)
+      user = User.create_pending_user(email: email, organization: organization)
       expect(user.persisted? && user.pending?).to be true
       expect(user.email).to eq(email)
     end
 
+    it 'should create setup pending user on the current org' do
+      user = User.create_pending_user(email: email, organization: organization)
+      expect(user.current_organization).to eq(organization)
+      expect(user.current_shared_collection.organization_id).to eq(organization.id)
+      expect(user.current_user_collection.organization_id).to eq(organization.id)
+    end
+
     it 'should not be case sensitive' do
+      user = User.create_pending_user(email: email, organization: organization)
       user.update_attributes(email: email.upcase)
-      expect(User.create_pending_user(email: email).email).to eq(email.downcase)
+      expect(user.email).to eq(email.downcase)
     end
   end
 
@@ -271,14 +280,14 @@ describe User, type: :model do
 
       it 'should return all items user has been added to' do
         expect(
-          user.viewable_collections_and_items(organization)
+          user.viewable_collections_and_items(organization),
         ).to match_array([edit_item, view_item])
       end
 
       pending 'it should only return items in this org' do
         # TODO: figure out how to efficiently reference org from item
         expect(
-          user.viewable_collections_and_items(organization)
+          user.viewable_collections_and_items(organization),
         ).to match_array(*view_item)
       end
     end
