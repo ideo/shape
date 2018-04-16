@@ -3,6 +3,7 @@ class Item < ApplicationRecord
   include Resourceable
   include Archivable
   include HasFilestackFile
+  include RealtimeEditorsViewers
 
   resourceable roles: [Role::EDITOR, Role::VIEWER],
                edit_role: Role::EDITOR,

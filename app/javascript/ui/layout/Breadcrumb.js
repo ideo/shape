@@ -21,8 +21,8 @@ const StyledBreadcrumb = styled.div`
     margin-right: 0.5rem;
     font-weight: ${v.weights.book};
     color: ${v.colors.cloudy};
-    letter-spacing: 1.5px;
-    font-family: 'Gotham';
+    letter-spacing: 1.1px;
+    font-family: ${v.fonts.sans};
 
     &::after {
       position: relative;

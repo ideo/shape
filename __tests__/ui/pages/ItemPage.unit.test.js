@@ -5,7 +5,7 @@ import {
   fakeTextItem
 } from '#/mocks/data'
 
-let wrapper, match, apiStore
+let wrapper, match, apiStore, component
 let props
 const item = fakeTextItem
 const uiStore = fakeUiStore
@@ -23,15 +23,27 @@ beforeEach(() => {
   wrapper = shallow(
     <ItemPage.wrappedComponent {...props} />
   )
+  component = wrapper.instance()
 })
 
 describe('ItemPage', () => {
   it('makes an API call to fetch the item', () => {
     expect(apiStore.request).toBeCalledWith(`items/${match.params.id}`)
-    expect(apiStore.find).toBeCalledWith('items', match.params.id)
+  })
+
+  it('sets the item in state', () => {
+    expect(component.state.item).toEqual(item)
+  })
+
+  it('initially displays Loader', () => {
+    expect(wrapper.find('Loader').exists()).toEqual(true)
+    wrapper.update()
+    expect(wrapper.find('Loader').exists()).toEqual(false)
   })
 
   it('displays the item name', () => {
+    // apply the state to re-render
+    wrapper.update()
     expect(wrapper.find('EditableName').exists()).toEqual(true)
     expect(wrapper.find('EditableName').props().name).toEqual(item.name)
   })

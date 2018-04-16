@@ -35,6 +35,10 @@ class User < ApplicationRecord
 
   scope :search_import, -> { includes(:roles) }
 
+  attribute :pic_url_square,
+            :string,
+            default: 'https://d3none3dlnlrde.cloudfront.net/assets/users/avatars/missing/square.jpg'
+
   enum status: {
     active: 0,
     pending: 1,
@@ -90,6 +94,15 @@ class User < ApplicationRecord
       invitation_token: token,
       status: User.statuses[:pending],
     ).first
+  end
+
+  # Simplified format, used by action cable
+  def as_json(_options = {})
+    {
+      id: id,
+      name: name,
+      pic_url_square: pic_url_square,
+    }
   end
 
   def update_from_network_profile(params)

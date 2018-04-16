@@ -31,6 +31,7 @@ Sidekiq::Testing.fake!
 
 # Use fake redis instance for tests
 require 'fakeredis/rspec'
+require 'action_cable/testing/rspec'
 
 RSpec.configure do |config|
   # If you're not using ActiveRecord, or you'd prefer not to run each of your

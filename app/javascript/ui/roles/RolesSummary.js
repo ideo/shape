@@ -28,7 +28,7 @@ const StyledAvatarGroup = styled.div`
 StyledAvatarGroup.displayName = 'StyledAvatarGroup'
 
 const StyledRoleTitle = styled.div`
-  font-family: 'Gotham';
+  font-family: ${v.fonts.sans};
   text-align: ${props => props.align || 'left'};
   color: ${v.colors.cloudy};
   font-size: 1rem;

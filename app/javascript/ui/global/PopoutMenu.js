@@ -64,7 +64,7 @@ export const StyledMenuItem = styled.li`
     text-transform: uppercase;
     position: relative;
     border-left: 7px solid transparent;
-    font-family: 'Gotham';
+    font-family: ${v.fonts.sans};
     font-weight: 300;
     font-size: 0.8rem;
     text-align: left;

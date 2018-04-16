@@ -28,6 +28,7 @@
   },
   "dependencies": {
     "@rails/webpacker": "~3.2.1",
+    "actioncable": "^5.2.0",
     "ajv": "^5.5.2",
     "axios": "^0.18.0",
     "babel-plugin-react-intl": "^2.4.0",
