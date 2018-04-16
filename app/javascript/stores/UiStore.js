@@ -45,6 +45,7 @@ export default class UiStore {
     onClose: () => this.closeDialog(),
   }
   @observable dialogConfig = { ...this.defaultDialogProps }
+  @observable blurContent = false
 
   @action alert(props = {}) {
     _.assign(this.dialogConfig, {

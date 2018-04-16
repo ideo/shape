@@ -6,12 +6,14 @@ class Ability
     # https://github.com/CanCanCommunity/cancancan/wiki/Defining-Abilities
 
     user ||= User.new
+    # modify represents all the non-read-only actions
+    alias_action :create, :update, :destroy, to: :modify
 
     if user.has_cached_role?(:super_admin)
       can :read, :all
       can :manage, :all
 
-    elsif user.persisted?
+    elsif user.persisted? && user.active?
       # Logged-in users only
 
       can :read, Organization
@@ -54,5 +56,9 @@ class Ability
         item.can_edit?(user)
       end
     end
+
+    # don't allow any of the editing actions unless you've accepted terms
+    # (i.e. user becomes view-only)
+    cannot :modify, :all unless user.terms_accepted?
   end
 end

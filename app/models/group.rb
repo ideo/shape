@@ -72,13 +72,13 @@ class Group < ApplicationRecord
   def after_add_role(role)
     resource = role.resource
     # Reindex record if it is a searchkick model
-    resource.reindex if resource.respond_to?(:queryable) && queryable
+    resource.reindex if Searchkick.callbacks? && resource.searchable?
   end
 
   def after_remove_role(role)
     resource = role.resource
     # Reindex record if it is a searchkick model
-    resource.reindex if resource.respond_to?(:queryable) && queryable
+    resource.reindex if Searchkick.callbacks? && resource.searchable?
   end
 
   def validate_handle?

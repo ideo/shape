@@ -112,6 +112,7 @@ export const fakeUserAttrs = {
   groups: [],
   current_organization: fakeOrganization,
   type: 'users',
+  terms_accepted: true,
   isCurrentUser: jest.fn(),
 }
 export const fakeActionCableUser = {

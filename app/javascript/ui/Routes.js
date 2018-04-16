@@ -1,24 +1,35 @@
-import { Fragment } from 'react'
 import ReactRouterPropTypes from 'react-router-prop-types'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import { Router, Switch, Route } from 'react-router-dom'
+import styled from 'styled-components'
 
 import DialogWrapper from '~/ui/global/modals/DialogWrapper'
 import CollectionPage from '~/ui/pages/CollectionPage'
 import ItemPage from '~/ui/pages/ItemPage'
 import SearchPage from '~/ui/pages/SearchPage'
+import TermsOfUseModal from '~/ui/users/TermsOfUseModal'
 import OrganizationMenu from '~/ui/organizations/OrganizationMenu'
 import Loader from '~/ui/layout/Loader'
 import WindowSizeListener from 'react-window-size-listener'
+
+const AppWrapper = styled.div`
+  /* used by terms of use modal to blur the whole site */
+  ${props => props.blur && `
+    filter: blur(10px);
+  `}
+`
+AppWrapper.displayName = 'AppWrapper'
 
 @inject('apiStore', 'uiStore')
 @observer
 class Routes extends React.Component {
   componentDidMount() {
-    const { apiStore } = this.props
+    const { apiStore, uiStore } = this.props
     apiStore.request('users/me')
-      .then(response => {
-        apiStore.setCurrentUserId(response.data.id)
+      .then(({ data }) => {
+        const user = data
+        apiStore.setCurrentUserId(user.id)
+        if (!user.terms_accepted) uiStore.update('blurContent', true)
       })
       // .catch(err => console.warn(new Error(err)))
   }
@@ -29,14 +40,17 @@ class Routes extends React.Component {
   }
 
   render() {
-    const { history, apiStore } = this.props
+    const { history, uiStore, apiStore } = this.props
     if (!apiStore.currentUser) {
       return <Loader />
     }
 
     return (
-      <Fragment>
+      <AppWrapper blur={uiStore.blurContent}>
         <WindowSizeListener onResize={this.handleWindowResize} />
+        {!apiStore.currentUser.terms_accepted &&
+          <TermsOfUseModal user={apiStore.currentUser} />
+        }
         <OrganizationMenu
           organization={apiStore.currentUser.current_organization}
           userGroups={apiStore.currentUser.groups}
@@ -50,7 +64,7 @@ class Routes extends React.Component {
             <Route path="/search" component={SearchPage} />
           </Switch>
         </Router>
-      </Fragment>
+      </AppWrapper>
     )
   }
 }
