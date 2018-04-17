@@ -67,12 +67,6 @@ class OrganizationMenu extends React.Component {
     this.editGroup = group
   }
 
-  // @action handleOrganizationClick = () => {
-  //   if (!this.editOrganization) {
-  //     this.editOrganizationOpen = true
-  //   }
-  // }
-
   @action handleGroupAddClick = (ev) => {
     this.modifyGroupOpen = true
   }
