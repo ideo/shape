@@ -31,7 +31,6 @@ class Collection
       collection = create(
         organization: organization,
       )
-      group.add_role(Role::VIEWER, collection.becomes(Collection)) if collection.persisted?
       collection
     end
 

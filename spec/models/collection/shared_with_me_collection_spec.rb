@@ -38,10 +38,5 @@ describe Collection::SharedWithMeCollection, type: :model do
         shared_with_me_collection
       }.to change(Collection::SharedWithMeCollection, :count).by(4)
     end
-
-    it 'should set the group as the viewer of the collection' do
-      expect(group.has_role?(Role::VIEWER, shared_with_me_collection.becomes(Collection))).to be true
-    end
   end
-
 end

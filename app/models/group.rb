@@ -1,9 +1,10 @@
 class Group < ApplicationRecord
   include Resourceable
   include HasFilestackFile
-  prepend RolifyExtensions # Prepend so it can call rolify methods using super
   include Archivable
   after_archive :after_archive_group
+
+  prepend RolifyExtensions # Prepend so it can call rolify methods using super
 
   # Admins can manage people in the group
   # Members have read access to everything the group is linked to

@@ -189,12 +189,8 @@ class User < ApplicationRecord
 
     return [] if org_group_ids.blank?
 
-    Role
-        .joins(:groups_roles)
+    Role.joins(:groups_roles)
         .where(GroupsRole.arel_table[:group_id].in(org_group_ids))
-        .reject{ |role|
-          role.groups.first.current_shared_collection_id == role.resource.id
-        }
         .map(&:identifier)
   end
 
