@@ -28,15 +28,14 @@ describe Collection::SharedWithMeCollection, type: :model do
 
   describe '.create_for_group' do
     let(:organization) { create(:organization) }
-    let(:group) { create(:group) }
     let(:shared_with_me_collection) {
-  Collection::SharedWithMeCollection.create_for_group(group, organization)
+  Collection::SharedWithMeCollection.create_for_group(organization)
     }
 
     it 'should create a Collection::UserCollection' do
       expect {
         shared_with_me_collection
-      }.to change(Collection::SharedWithMeCollection, :count).by(4)
+      }.to change(Collection::SharedWithMeCollection, :count).by(2)
     end
   end
 end
