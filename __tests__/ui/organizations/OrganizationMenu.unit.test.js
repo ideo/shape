@@ -19,6 +19,7 @@ describe('OrganizationMenu', () => {
       organization: {
         name: 'Space',
         primary_group: {
+          id: 1,
           name: 'Space',
           handle: 'space',
           filestack_file_url: 'space.jpg',
@@ -49,8 +50,8 @@ describe('OrganizationMenu', () => {
 
   it('opens the organization edit menu when you click on the org name', () => {
     wrapper.find('.orgEdit').simulate('click')
-    expect(component.editOrganizationOpen)
-      .toBeTruthy()
+    expect(component.modifyGroupRoles).toBeTruthy()
+    expect(component.editGroup).toEqual(props.organization.primary_group)
   })
 
   it('opens the group edit menu when you click on any group name', () => {

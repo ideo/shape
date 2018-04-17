@@ -1,5 +1,4 @@
 import { observable, useStrict } from 'mobx'
-import { Provider } from 'mobx-react'
 import RolesMenu from '~/ui/roles/RolesMenu'
 
 import {
@@ -16,6 +15,7 @@ const apiStore = observable({
   remove: jest.fn(),
   add: jest.fn(),
   currentUser: fakeUser,
+  currentUserOrganizationId: 1,
 })
 const uiStore = observable({
   rolesMenuOpen: false,

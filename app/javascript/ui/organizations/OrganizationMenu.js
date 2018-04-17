@@ -62,14 +62,9 @@ class OrganizationMenu extends React.Component {
   }
 
   @action changeModifyGroup(group) {
+    this.modifyGroupRoles = false
     this.modifyGroupOpen = true
     this.editGroup = group
-  }
-
-  @action handleOrganizationClick = () => {
-    if (!this.editOrganization) {
-      this.editOrganizationOpen = true
-    }
   }
 
   @action handleGroupAddClick = (ev) => {
@@ -94,16 +89,6 @@ class OrganizationMenu extends React.Component {
     apiStore.sync(res)
   }
 
-  currentUserRoleCheck(roles) {
-    // If the current user is an admin in the group they can edit
-    const { apiStore } = this.props
-    const { currentUser } = apiStore
-    const userRole = roles.find(role => role.users
-      .find(user => user.id === currentUser.id))
-    if (!userRole) return false
-    return userRole.canEdit()
-  }
-
   removeGroup = async (group) => {
     try {
       const { apiStore } = this.props
@@ -121,7 +106,7 @@ class OrganizationMenu extends React.Component {
   }
 
   handleGroupClick = group => () => {
-    this.changeModifyGroup(group)
+    this.onModifyGroupRoles(group)
   }
 
   handleGroupRemove = group => async () => {
@@ -170,18 +155,14 @@ class OrganizationMenu extends React.Component {
   }
 
   renderEditRoles() {
-    const { apiStore } = this.props
-    // Some roles in the Api store don't have a resource included
-    const roles = apiStore.findAll('roles').filter((role) =>
-      role.resource && role.resource.id === this.editGroup.id)
     return (
       <RolesMenu
-        canEdit={this.currentUserRoleCheck(roles)}
+        canEdit={this.editGroup.currentUserCanEdit}
         ownerId={this.editGroup.id}
         ownerType="groups"
         title="Members:"
         addCallout="Add people:"
-        roles={roles}
+        roles={this.editGroup.groupRoles}
         onSave={this.onRolesSave}
       />)
   }
@@ -191,18 +172,20 @@ class OrganizationMenu extends React.Component {
     const primaryGroup = organization.primary_group
     return (
       <div>
-        <Row>
-          <RowItemRight>
-            <TextButton onClick={this.handleGroupAddClick}>
-              + New Group
-            </TextButton>
-          </RowItemRight>
-        </Row>
+        {organization.primary_group.currentUserCanEdit &&
+          <Row>
+            <RowItemRight>
+              <TextButton onClick={this.handleGroupAddClick}>
+                + New Group
+              </TextButton>
+            </RowItemRight>
+          </Row>
+        }
         <Heading3>
           Your Organization
         </Heading3>
         <Row>
-          <button className="orgEdit" onClick={this.handleOrganizationClick}>
+          <button className="orgEdit" onClick={this.handleGroupRolesClick(primaryGroup)}>
             <DisplayText>{ primaryGroup.name }</DisplayText>
           </button>
         </Row>
@@ -219,9 +202,11 @@ class OrganizationMenu extends React.Component {
             >
               <DisplayText>{group.name}</DisplayText>
             </button>
-            <RemoveIconHolder onClick={this.handleGroupRemove(group)}>
-              <ArchiveIcon />
-            </RemoveIconHolder>
+            { group.currentUserCanEdit &&
+              <RemoveIconHolder onClick={this.handleGroupRemove(group)}>
+                <ArchiveIcon />
+              </RemoveIconHolder>
+            }
           </Row>))
         }
       </div>
@@ -233,7 +218,7 @@ class OrganizationMenu extends React.Component {
     const { uiStore } = this.props
     let content = this.renderBase()
     let title = 'People & Groups'
-    let onBack
+    let onBack, onEdit
     if (this.editOrganizationOpen) {
       content = this.renderEditOrganization()
       title = 'Your Organization'
@@ -245,6 +230,11 @@ class OrganizationMenu extends React.Component {
         content = this.renderEditRoles()
       }
       onBack = this.handleBack
+      if (this.editGroup.currentUserCanEdit) {
+        onEdit = () => {
+          this.changeModifyGroup(this.editGroup)
+        }
+      }
       title = this.editGroup.name
     } else if (this.modifyGroupOpen) {
       content = this.renderEditGroup()
@@ -256,6 +246,7 @@ class OrganizationMenu extends React.Component {
         title={title}
         onClose={this.handleClose}
         onBack={onBack}
+        onEdit={onEdit}
         open={uiStore.organizationMenuOpen}
       >
         { content }

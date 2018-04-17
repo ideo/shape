@@ -22,6 +22,11 @@ class ApiStore extends Store {
     return this.find('users', this.currentUserId)
   }
 
+  get currentUserOrganizationId() {
+    if (!this.currentUser.current_organization) return null
+    return this.currentUser.current_organization.id
+  }
+
   __updateRelationships(obj) {
     const record = this.find(obj.type, obj.id)
     const refs = obj.relationships ? Object.keys(obj.relationships) : []
