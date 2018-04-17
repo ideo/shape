@@ -1,12 +1,12 @@
-import ReactRouterPropTypes from 'react-router-prop-types'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
-import { Router, Switch, Route } from 'react-router-dom'
+import { Switch, Route, withRouter } from 'react-router-dom'
 import styled from 'styled-components'
 
 import DialogWrapper from '~/ui/global/modals/DialogWrapper'
 import CollectionPage from '~/ui/pages/CollectionPage'
 import ItemPage from '~/ui/pages/ItemPage'
 import SearchPage from '~/ui/pages/SearchPage'
+import TermsPage from '~/ui/pages/TermsPage'
 import TermsOfUseModal from '~/ui/users/TermsOfUseModal'
 import OrganizationMenu from '~/ui/organizations/OrganizationMenu'
 import Loader from '~/ui/layout/Loader'
@@ -20,16 +20,17 @@ const AppWrapper = styled.div`
 `
 AppWrapper.displayName = 'AppWrapper'
 
-@inject('apiStore', 'uiStore')
+// withRouter allows it to respond automatically to routing changes in props
+@withRouter
+@inject('apiStore', 'uiStore', 'routingStore')
 @observer
 class Routes extends React.Component {
   componentDidMount() {
-    const { apiStore, uiStore } = this.props
+    const { apiStore } = this.props
     apiStore.request('users/me')
       .then(({ data }) => {
         const user = data
         apiStore.setCurrentUserId(user.id)
-        if (!user.terms_accepted) uiStore.update('blurContent', true)
       })
       // .catch(err => console.warn(new Error(err)))
   }
@@ -40,41 +41,44 @@ class Routes extends React.Component {
   }
 
   render() {
-    const { history, uiStore, apiStore } = this.props
+    const { apiStore, routingStore } = this.props
     if (!apiStore.currentUser) {
       return <Loader />
     }
+    const displayTermsPopup = (
+      !apiStore.currentUser.terms_accepted && !routingStore.pathContains('/terms')
+    )
 
     return (
-      <AppWrapper blur={uiStore.blurContent}>
+      <AppWrapper blur={displayTermsPopup}>
+        {/* Global components are rendered here */}
         <WindowSizeListener onResize={this.handleWindowResize} />
-        {!apiStore.currentUser.terms_accepted &&
-          <TermsOfUseModal user={apiStore.currentUser} />
-        }
         <OrganizationMenu
           organization={apiStore.currentUser.current_organization}
           userGroups={apiStore.currentUser.groups}
         />
         <DialogWrapper />
-        <Router history={history}>
-          <Switch>
-            <Route exact path="/" component={CollectionPage} />
-            <Route path="/collections/:id" component={CollectionPage} />
-            <Route path="/items/:id" component={ItemPage} />
-            <Route path="/search" component={SearchPage} />
-          </Switch>
-        </Router>
+        {displayTermsPopup &&
+          <TermsOfUseModal currentUser={apiStore.currentUser} />
+        }
+
+        {/* Switch will stop when it finds the first matching path */}
+        <Switch>
+          <Route exact path="/" component={CollectionPage} />
+          <Route path="/collections/:id" component={CollectionPage} />
+          <Route path="/items/:id" component={ItemPage} />
+          <Route path="/search" component={SearchPage} />
+          <Route path="/terms" component={TermsPage} />
+        </Switch>
       </AppWrapper>
     )
   }
 }
 
-Routes.propTypes = {
-  history: ReactRouterPropTypes.history.isRequired,
-}
 Routes.wrappedComponent.propTypes = {
   apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
+  routingStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 
 export default Routes

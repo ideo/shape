@@ -8,6 +8,15 @@ class User extends BaseRecord {
   isCurrentUser() {
     return this.apiStore.currentUserId === this.id
   }
+
+  async API_acceptTerms() {
+    try {
+      return await this.apiStore.request('users/accept_terms', 'POST')
+    } catch (e) {
+      // console.warn(e)
+      return e
+    }
+  }
 }
 User.type = 'users'
 

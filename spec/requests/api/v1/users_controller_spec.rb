@@ -121,7 +121,7 @@ describe Api::V1::UsersController, type: :request, json: true, auth: true do
     end
   end
 
-  describe '#GET #search', search: true do
+  describe 'GET #search', search: true do
     let!(:organization) { user.current_organization }
     let!(:users) { create_list(:user, 3) }
     let(:path) { '/api/v1/users/search' }
@@ -212,6 +212,25 @@ describe Api::V1::UsersController, type: :request, json: true, auth: true do
       expect(json['data'].size).to eq(3)
       expect(json['data'].map { |u| u['attributes']['email'] }).to match_array(emails)
       expect(json['data'].all? { |u| u['attributes']['status'] == 'pending' }).to be true
+    end
+  end
+
+  describe 'POST #accept_terms' do
+    let(:path) { '/api/v1/users/accept_terms' }
+
+    before do
+      @user.update_attributes(terms_accepted: false)
+    end
+
+    it 'returns a 200' do
+      post(path)
+      expect(response.status).to eq(200)
+    end
+
+    it 'updates terms_accepted for current_user' do
+      expect(@user.terms_accepted).to be false
+      post(path)
+      expect(@user.reload.terms_accepted).to be true
     end
   end
 end

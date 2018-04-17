@@ -5,15 +5,15 @@ import {
   fakeUser
 } from '#/mocks/data'
 
-let props, wrapper, requestResult, apiStore, uiStore, history
+let props, wrapper, requestResult, apiStore, uiStore, routingStore
 beforeEach(() => {
   requestResult = { data: fakeUser }
-  history = {}
+  routingStore = {}
   apiStore = fakeApiStore({
     requestResult
   })
   uiStore = fakeUiStore
-  props = { apiStore, uiStore, history }
+  props = { apiStore, uiStore, routingStore }
 })
 
 describe('Routes', () => {
@@ -41,13 +41,14 @@ describe('Routes', () => {
     beforeEach(() => {
       requestResult = { data: { ...fakeUser, terms_accepted: false } }
       props.apiStore.request = jest.fn().mockReturnValue(Promise.resolve(requestResult))
+      props.routingStore.pathContains = jest.fn().mockReturnValue(false)
       props.apiStore.currentUser.terms_accepted = false
       wrapper = shallow(
         <Routes.wrappedComponent {...props} />
       )
     })
     it('blurs the content if terms have not been accepted', () => {
-      expect(uiStore.update).toHaveBeenCalledWith('blurContent', true)
+      expect(wrapper.find('AppWrapper').props().blur).toBeTruthy()
     })
     it('displays the TermsOfUseModal', () => {
       expect(wrapper.find('TermsOfUseModal').exists()).toBeTruthy()
