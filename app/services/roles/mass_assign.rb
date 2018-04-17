@@ -82,7 +82,7 @@ module Roles
         shared_user_ids,
         group_ids,
         collections_to_link,
-        items_to_link
+        items_to_link,
       )
     end
 
@@ -103,9 +103,11 @@ module Roles
     # NOTE: this method is duplicated w/ MassRemove
     def objects_to_link
       # TODO: use relation to query this?
-      @object.is_a?(Group) ?
-        @object.current_shared_collection.link_collection_cards.map(&:record) :
+      if @object.is_a?(Group)
+        @object.current_shared_collection.link_collection_cards.map(&:record)
+      else
         [@object]
+      end
     end
 
     def group_ids

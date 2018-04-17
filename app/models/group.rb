@@ -21,8 +21,8 @@ class Group < ApplicationRecord
 
   belongs_to :organization
   belongs_to :current_shared_collection,
-              class_name: 'Collection',
-              optional: true
+             class_name: 'Collection',
+             optional: true
 
   before_validation :set_handle_if_none, on: :create
 
@@ -77,7 +77,8 @@ class Group < ApplicationRecord
 
   def create_shared_collection
     shared = Collection::SharedWithMeCollection.create_for_group(
-      self, organization)
+      organization
+    )
     update(current_shared_collection: shared)
   end
 

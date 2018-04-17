@@ -26,7 +26,7 @@ class Collection
       collection
     end
 
-    def self.create_for_group(group, organization)
+    def self.create_for_group(organization)
       # Collection requires an organization. should be the groups org.
       collection = create(
         organization: organization,
