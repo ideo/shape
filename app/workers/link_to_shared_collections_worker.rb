@@ -14,9 +14,9 @@ class LinkToSharedCollectionsWorker
         mine = entity.current_user_collection unless entity.is_a?(Group)
         # Check for already created links to not create doubles
         # Groups won't have my collections so skip creating lnks
-        [shared, mine].each do |collection|
-          unless !collection or
-                 collection.link_collection_cards.with_record(object).exists?
+        collections = entity.is_a?(User) ? [shared, mine] : [shared]
+        collections.each do |collection|
+          unless collection.link_collection_cards.with_record(object).exists?
             create_link(object, collection)
           end
         end
