@@ -29,7 +29,7 @@ describe Collection::SharedWithMeCollection, type: :model do
   describe '.create_for_group' do
     let(:organization) { create(:organization) }
     let(:shared_with_me_collection) {
-  Collection::SharedWithMeCollection.create_for_group(organization)
+      Collection::SharedWithMeCollection.create_for_group(organization)
     }
 
     it 'should create a Collection::UserCollection' do
