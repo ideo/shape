@@ -2,11 +2,10 @@ class LinkToSharedCollectionsWorker
   include Sidekiq::Worker
   sidekiq_options queue: 'critical'
 
-  def perform(user_ids, group_ids, objects_info)
+  def perform(user_ids, group_ids, collection_ids, item_ids)
     users_to_add = User.where(id: user_ids)
     groups_to_add = Group.where(id: group_ids)
-    # TODO: anyway to do this with where rather then map?
-    objects = objects_info.map { |o| o["type"].safe_constantize.find(o["id"]) }
+    objects = Collection.where(id: collection_ids) + Item.where(id: item_ids)
     (users_to_add + groups_to_add).each do |entity|
       objects.each do |object|
         # Don't create any links if object was created by user

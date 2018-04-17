@@ -24,16 +24,30 @@ module Roles
       UnlinkFromSharedCollectionsWorker.perform_async(
         shared_user_ids,
         group_ids,
-        objects_to_link,
+        collections_to_link,
+        items_to_link
       )
     end
 
+    # NOTE: this method is duplicated w/ MassAssign
+    def collections_to_link
+      objects_to_link
+        .select { |object| object.is_a?(Collection) }
+        .map(&:id)
+    end
+
+    # NOTE: this method is duplicated w/ MassAssign
+    def items_to_link
+      objects_to_link
+        .select { |object| object.is_a?(Item) }
+        .map(&:id)
+    end
+
+    # NOTE: this method is duplicated w/ MassAssign
     def objects_to_link
-      # TODO: use relation to query this?
-      links = @object.is_a?(Group) ?
+      @object.is_a?(Group) ?
         @object.current_shared_collection.link_collection_cards.map(&:record) :
         [@object]
-      links.map { |o| { "id"=>o.id, "type"=>o.class.name } }
     end
 
     def group_ids

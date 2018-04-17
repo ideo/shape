@@ -32,7 +32,8 @@ RSpec.describe UnlinkFromSharedCollectionsWorker, type: :worker do
       UnlinkFromSharedCollectionsWorker.new.perform(
         users.map(&:id),
         [group.id],
-        [{ "id"=>collection.id, "type"=>collection.class.name }]
+        [collection.id],
+        [],
       )
       expect(shared_with_me.collection_cards.count).to eq(1)
       expect(my_collection.collection_cards.count).to eq(2)
@@ -45,7 +46,8 @@ RSpec.describe UnlinkFromSharedCollectionsWorker, type: :worker do
       UnlinkFromSharedCollectionsWorker.new.perform(
         users.map(&:id),
         [group.id],
-        [{ "id"=>collection.id, "type"=>collection.class.name }]
+        [collection.id],
+        [],
       )
       expect(
         group.current_shared_collection.link_collection_cards.count

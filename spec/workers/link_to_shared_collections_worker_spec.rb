@@ -17,7 +17,8 @@ RSpec.describe LinkToSharedCollectionsWorker, type: :worker do
       LinkToSharedCollectionsWorker.new.perform(
         users_to_add.map(&:id),
         groups_to_add.map(&:id),
-        [{ "id"=>collection_to_link.id, "type"=>collection_to_link.class.name }],
+        [collection_to_link.id],
+        []
       )
     end
 

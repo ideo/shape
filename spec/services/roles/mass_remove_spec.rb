@@ -71,7 +71,8 @@ RSpec.describe Roles::MassRemove, type: :service do
         expect(UnlinkFromSharedCollectionsWorker).to receive(:perform_async).with(
           [user.id] + group.roles.reduce([]) { |acc, role| acc + role.users },
           groups.map(&:id),
-          [{ "id"=>collection.id, "type"=>collection.class.name }],
+          [collection.id],
+          [],
         )
         mass_remove.call
       end
@@ -84,7 +85,8 @@ RSpec.describe Roles::MassRemove, type: :service do
           expect(UnlinkFromSharedCollectionsWorker).to receive(:perform_async).with(
             users.map(&:id),
             groups.map(&:id),
-            [{ "id"=>collection.id, "type"=>collection.class.name }],
+            [collection.id],
+            [],
           )
           mass_remove.call
         end
@@ -115,7 +117,8 @@ RSpec.describe Roles::MassRemove, type: :service do
           expect(UnlinkFromSharedCollectionsWorker).to receive(:perform_async).with(
             users.map(&:id),
             groups.map(&:id),
-            [{ "id"=>linked_collection.id, "type"=>linked_collection.class.name }],
+            [linked_collection.id],
+            []
           )
           mass_remove.call
         end
