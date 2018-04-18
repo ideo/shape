@@ -41,7 +41,7 @@ class Role < ApplicationRecord
     Role.find_or_create_by(
       name: role_name,
       resource_type: resource.class.base_class.to_s,
-      resource_id: resource.id
+      resource_id: resource.id,
     )
   end
 

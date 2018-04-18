@@ -10,6 +10,9 @@ RSpec.describe Roles::AddToChildren, type: :service do
   let(:users) { [user] }
   let(:groups) { [group] }
   let(:add_to_children) do
+    # NOTE: Groups have shared collections so there will be existing group
+    # roles when creating a group that will spoil the tests.
+    GroupsRole.delete_all
     Roles::AddToChildren.new(
       role_name: role_name,
       parent: collection,

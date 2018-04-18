@@ -53,10 +53,6 @@ class Routes extends React.Component {
       <AppWrapper blur={displayTermsPopup}>
         {/* Global components are rendered here */}
         <WindowSizeListener onResize={this.handleWindowResize} />
-        <OrganizationMenu
-          organization={apiStore.currentUser.current_organization}
-          userGroups={apiStore.currentUser.groups}
-        />
         <DialogWrapper />
         {displayTermsPopup &&
           <TermsOfUseModal currentUser={apiStore.currentUser} />

@@ -5,7 +5,7 @@ const props = {
   onClick: jest.fn(),
   className: '',
   menuItems: [
-    { name: 'Do Stuff', icon: <div className="icon" />, onClick: jest.fn() }
+    { name: 'Do Stuff', iconRight: <div className="icon" />, onClick: jest.fn() }
   ],
   menuOpen: false,
 }
@@ -33,6 +33,10 @@ describe('PopoutMenu', () => {
   it('makes the menu items clickable', () => {
     wrapper.find('StyledMenuItem').at(0).find('button').simulate('click')
     expect(props.menuItems[0].onClick).toHaveBeenCalled()
+  })
+
+  it('renders the right or left icon', () => {
+    expect(wrapper.find('.icon').at(0).exists()).toBe(true)
   })
 
   it('has "open" CSS class if menu is open', () => {

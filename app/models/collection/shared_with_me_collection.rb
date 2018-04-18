@@ -26,6 +26,14 @@ class Collection
       collection
     end
 
+    def self.create_for_group(organization)
+      # Collection requires an organization. should be the groups org.
+      collection = create(
+        organization: organization,
+      )
+      collection
+    end
+
     def searchable?
       false
     end

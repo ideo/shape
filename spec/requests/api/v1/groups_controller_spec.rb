@@ -58,30 +58,43 @@ describe Api::V1::GroupsController, type: :request, json: true, auth: true do
       )
     end
 
-    it 'returns a 200' do
-      post(path, params: params)
-      expect(response.status).to eq(200)
+    context 'without org admin access' do
+      it 'returns a 401 if user is not an org admin' do
+        post(path, params: params)
+        expect(response.status).to eq(401)
+      end
     end
 
-    it 'creates new group' do
-      expect { post(path, params: params) }.to change(Group, :count).by(1)
-    end
+    context 'with org admin access' do
+      before do
+        user.add_role(Role::ADMIN, user.current_organization.primary_group)
+      end
 
-    it 'adds the current user as an admin to the group' do
-      post(path, params: params)
-      group = Group.find(json['data']['attributes']['id'])
-      expect(group.admins[:users]).to match_array([current_user])
-    end
+      it 'returns a 200' do
+        post(path, params: params)
+        expect(response.status).to eq(200)
+      end
 
-    it 'matches JSON schema' do
-      post(path, params: params)
-      expect(json['data']['attributes']).to match_json_schema('group')
-    end
+      it 'creates new group' do
+        expect { post(path, params: params) }.to change(Group, :count).by(1)
+      end
 
-    it 'sets current org as group.organization' do
-      post(path, params: params)
-      group = Group.find(json['data']['attributes']['id'])
-      expect(group.organization).to eq(user.current_organization)
+      it 'adds the current user as an admin to the group' do
+        post(path, params: params)
+        group = Group.find(json['data']['attributes']['id'])
+        expect(group.admins[:users]).to match_array([current_user])
+      end
+
+      it 'matches JSON schema' do
+        post(path, params: params)
+        expect(json['data']['attributes']).to match_json_schema('group')
+      end
+
+      it 'sets current org as group.organization' do
+        post(path, params: params)
+        group = Group.find(json['data']['attributes']['id'])
+        expect(group.organization).to eq(user.current_organization)
+      end
     end
   end
 

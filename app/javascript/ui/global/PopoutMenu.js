@@ -92,15 +92,16 @@ StyledMenuItem.displayName = 'StyledMenuItem'
 class PopoutMenu extends React.PureComponent {
   get renderMenuItems() {
     return this.props.menuItems.map(item => {
-      const { name, icon, onClick } = item
+      const { name, iconLeft, iconRight, onClick } = item
       return (
         <StyledMenuItem key={name}>
           <button
             onClick={onClick}
             className={`menu-${name.toLowerCase()}`}
           >
+            {iconLeft}
             {name}
-            {icon}
+            {iconRight}
           </button>
         </StyledMenuItem>
       )
@@ -145,7 +146,8 @@ PopoutMenu.propTypes = {
   menuOpen: PropTypes.bool,
   menuItems: PropTypes.arrayOf(PropTypes.shape({
     name: PropTypes.string,
-    icon: PropTypes.element,
+    iconLeft: PropTypes.element,
+    iconRight: PropTypes.element,
     onClick: PropTypes.func,
   })).isRequired,
 }

@@ -107,8 +107,9 @@ RSpec.describe Roles::MassAssign, type: :service do
             |accr, role| accr + role.users } }
         expect(LinkToSharedCollectionsWorker).to receive(:perform_async).with(
           (users + all_group_users).map(&:id),
-          object.id,
-          object.class.name,
+          groups.map(&:id),
+          [object.id],
+          [],
         )
         assign_role.call
       end
@@ -120,8 +121,9 @@ RSpec.describe Roles::MassAssign, type: :service do
         it 'should only pass unique ids to create links' do
           expect(LinkToSharedCollectionsWorker).to receive(:perform_async).with(
             (users).map(&:id),
-            object.id,
-            object.class.name,
+            groups.map(&:id),
+            [object.id],
+            [],
           )
           assign_role.call
         end
@@ -138,8 +140,31 @@ RSpec.describe Roles::MassAssign, type: :service do
         it 'should not link to any primary groups' do
           expect(LinkToSharedCollectionsWorker).to receive(:perform_async).with(
             (users).map(&:id),
-            object.id,
-            object.class.name,
+            [],
+            [object.id],
+            [],
+          )
+          assign_role.call
+        end
+      end
+
+      context 'when the object is a group' do
+        let!(:role_name) { :admin }
+        let!(:user) { create(:user, add_to_org: organization) }
+        let!(:users) { [user] }
+        let!(:groups) { [] }
+        let!(:linked_collection) { create(:collection) }
+        let!(:object) { create(:group) }
+        let!(:link) { create(:collection_card_link,
+                             parent: object.current_shared_collection,
+                             collection: linked_collection)}
+
+        it 'should link all the groups shared collection cards' do
+          expect(LinkToSharedCollectionsWorker).to receive(:perform_async).with(
+            (users).map(&:id),
+            [],
+            [linked_collection.id],
+            [],
           )
           assign_role.call
         end

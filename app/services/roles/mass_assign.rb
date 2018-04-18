@@ -1,5 +1,7 @@
 module Roles
   class MassAssign
+    include Roles::SharedMethods
+
     attr_reader :errors, :added_users, :added_groups,
                 :failed_users, :failed_groups
 
@@ -80,19 +82,10 @@ module Roles
     def link_to_shared_collections
       LinkToSharedCollectionsWorker.perform_async(
         shared_user_ids,
-        @object.id,
-        @object.class.name,
+        group_ids,
+        collections_to_link,
+        items_to_link,
       )
-    end
-
-    # NOTE: this method is duplicated w/ MassRemove
-    def shared_user_ids
-      groups = @groups.reject(&:primary?)
-      # @groups can be an array and not a relation, try to get user_ids via relation first
-      unless (group_user_ids = groups.try(:user_ids))
-        group_user_ids = Group.where(id: groups.pluck(:id)).user_ids
-      end
-      (group_user_ids + @users.map(&:id)).uniq
     end
 
     def notify_users

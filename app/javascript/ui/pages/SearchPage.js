@@ -44,10 +44,15 @@ class SearchPage extends PageWithApi {
       // reset if we are performing a new search starting at page 1
       this.searchResults.replace([])
     }
-    const newResults = this.searchResults.concat(results)
-    this.searchResults.replace(newResults)
-    this.hasMore = (meta.total > this.searchResults.length)
-    this.total = meta.total
+    if (results.length === 0) {
+      this.hasMore = false
+      this.total = this.searchResults.length
+    } else {
+      const newResults = this.searchResults.concat(results)
+      this.searchResults.replace(newResults)
+      this.hasMore = (meta.total > this.searchResults.length)
+      this.total = meta.total
+    }
   }
 
   handleInfiniteLoad = (page) => {

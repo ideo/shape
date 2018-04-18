@@ -5,18 +5,19 @@ class Api::V1::UsersController < Api::V1::BaseController
   # All the users in this org, that this user can 'see' through groups or content
   # /organizations/:id/users
   def index
-    @users = current_user.users_through_collections_items_and_groups(current_organization)
+    # show all other active users in the system
+    @users = User.active.where.not(id: current_user.id)
     render jsonapi: @users
   end
 
   def show
     render jsonapi: @user, include:
-      [:groups, current_organization: [:primary_group]]
+      [:groups, :organizations, current_organization: [:primary_group]]
   end
 
   def me
     render jsonapi: current_user, include:
-      [:groups, current_organization: [:primary_group]]
+      [:groups, :organizations, current_organization: [:primary_group]]
   end
 
   def search
@@ -25,7 +26,10 @@ class Api::V1::UsersController < Api::V1::BaseController
 
   # Create new pending users from email addresses
   def create_from_emails
-    cpu = CreatePendingUsers.new(json_api_params[:emails])
+    cpu = CreatePendingUsers.new(
+      emails: json_api_params[:emails],
+      organization: current_organization,
+    )
     if cpu.call
       render jsonapi: cpu.users
     else
