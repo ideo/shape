@@ -101,7 +101,9 @@ class Header extends React.Component {
     const { orgDropdownOpen } = this.state
     if (!orgDropdownOpen) return ''
     return (
-      <OrganizationDropdown />
+      <OrganizationDropdown
+        onItemClick={this.handleOrgClick(false)}
+      />
     )
   }
 

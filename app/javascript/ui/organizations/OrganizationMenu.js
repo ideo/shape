@@ -1,27 +1,16 @@
 import { action, runInAction, observable } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
-import styled from 'styled-components'
-import { FormSpacer, TextButton } from '~/ui/global/styled/forms'
-import { Row, RowItemRight } from '~/ui/global/styled/layout'
-import { Heading3, DisplayText } from '~/ui/global/styled/typography'
 import Modal from '~/ui/global/modals/Modal'
 import GroupModify from '~/ui/groups/GroupModify'
 import RolesMenu from '~/ui/roles/RolesMenu'
 import Loader from '~/ui/layout/Loader'
-import ArchiveIcon from '~/ui/icons/ArchiveIcon'
 import OrganizationPeople from '~/ui/organizations/OrganizationPeople'
-
-const RemoveIconHolder = styled.button`
-  width: 16px;
-`
 
 @inject('apiStore', 'uiStore')
 @observer
 class OrganizationMenu extends React.Component {
-  @observable editOrganizationOpen = false
-  @observable modifyGroupOpen = false
+  @observable currentPage = 'base'
   @observable editGroup = {}
-  @observable modifyGroupRoles = false
   @observable isLoading = false
 
   componentDidMount() {
@@ -35,16 +24,38 @@ class OrganizationMenu extends React.Component {
       .catch((err) => console.warn(err))
   }
 
+  @action changePage(page) {
+    this.currentPage = page
+  }
+
   @action onModifyGroupRoles(group) {
-    this.editOrganizationOpen = false
+    this.changePage('modifyGroupRoles')
     this.editGroup = group
-    this.modifyGroupRoles = true
+  }
+
+  @action onOrganizationSave = () => {
+    this.changePage('base')
+  }
+
+  @action changeModifyGroup(group) {
+    this.changePage('modifyGroup')
+    this.editGroup = group
+  }
+
+  @action addGroup = (ev) => {
+    this.changePage('modifyGroup')
+  }
+
+  @action handleBack = () => {
+    this.changePage('base')
+    this.isLoading = false
+    this.editGroup = {}
   }
 
   @action onGroupSave = async (editedGroup) => {
     const { apiStore } = this.props
     const newGroup = !this.editGroup.id
-    this.modifyGroupOpen = false
+    this.changePage('base')
     this.editGroup = {}
     if (newGroup) {
       this.onModifyGroupRoles(editedGroup)
@@ -56,28 +67,27 @@ class OrganizationMenu extends React.Component {
     }
   }
 
-  @action onOrganizationSave = () => {
-    this.editOrganizationOpen = false
-    this.modifyGroupOpen = false
-    this.modifyGroupRoles = false
+  removeGroup = group => async () => {
+    const { uiStore } = this.props
+    uiStore.confirm({
+      prompt: `Are you sure you want to archive ${group.name}?`,
+      confirmText: 'Archive',
+      iconName: 'Archive',
+      onConfirm: () => this.removeGroup(group),
+    })
   }
 
-  @action changeModifyGroup(group) {
-    this.modifyGroupRoles = false
-    this.modifyGroupOpen = true
-    this.editGroup = group
-  }
+  @action groupRoles = (ev) => {
+    this.onModifyGroupRoles(group)
 
-  @action handleGroupAddClick = (ev) => {
-    this.modifyGroupOpen = true
-  }
-
-  @action handleBack = () => {
-    this.editOrganizationOpen = false
-    this.modifyGroupOpen = false
-    this.modifyGroupRoles = false
-    this.isLoading = false
-    this.editGroup = {}
+  handleClose = (ev) => {
+    const { uiStore } = this.props
+    uiStore.update('organizationMenuOpen', false)
+    // delay so that you don't see it switch as the modal fades out
+    setTimeout(() => {
+      // reset the state
+      this.handleBack()
+    }, 500)
   }
 
   fetchRoles = (group) => {
@@ -104,34 +114,6 @@ class OrganizationMenu extends React.Component {
     } catch (err) {
       console.warn('Unable to archive group', err)
     }
-  }
-
-  handleGroupClick = group => () => {
-    this.onModifyGroupRoles(group)
-  }
-
-  handleGroupRemove = group => async () => {
-    const { uiStore } = this.props
-    uiStore.confirm({
-      prompt: `Are you sure you want to archive ${group.name}?`,
-      confirmText: 'Archive',
-      iconName: 'Archive',
-      onConfirm: () => this.removeGroup(group),
-    })
-  }
-
-  handleGroupRolesClick = group => () => {
-    this.onModifyGroupRoles(group)
-  }
-
-  handleClose = (ev) => {
-    const { uiStore } = this.props
-    uiStore.update('organizationMenuOpen', false)
-    // delay so that you don't see it switch as the modal fades out
-    setTimeout(() => {
-      // reset the state
-      this.handleBack()
-    }, 500)
   }
 
   renderEditOrganization() {
@@ -174,6 +156,9 @@ class OrganizationMenu extends React.Component {
       <OrganizationPeople
         organization={organization}
         userGroups={userGroups}
+        onGroupAdd={this.addGroup}
+        onGroupRemove={this.removeGroup}
+        onGroupRoles={this.groupRoles}
       />
     )
   }
@@ -184,28 +169,37 @@ class OrganizationMenu extends React.Component {
     let content = this.renderBase()
     let title = 'People & Groups'
     let onBack, onEdit
-    if (this.editOrganizationOpen) {
-      content = this.renderEditOrganization()
+    switch (this.currentPage) {
+    case 'modifyGroup':
+      content = this.renderEditGroup()
+      title = this.editGroup.id ? this.editGroup.name : 'New Group'
+      onBack = this.handleBack
+      break
+    case 'editOrganization':
       title = 'Your Organization'
       onBack = this.handleBack
-    } else if (this.modifyGroupRoles) {
+      content = this.renderEditOrganization()
+      break
+    case 'modifyGroupRoles':
+      onBack = this.handleBack
       if (this.isLoading) {
         content = <Loader height="350px" fadeIn="none" />
       } else {
         content = this.renderEditRoles()
       }
-      onBack = this.handleBack
       if (this.editGroup.currentUserCanEdit) {
         onEdit = () => {
           this.changeModifyGroup(this.editGroup)
         }
       }
       title = this.editGroup.name
-    } else if (this.modifyGroupOpen) {
-      content = this.renderEditGroup()
-      title = this.editGroup.id ? this.editGroup.name : 'New Group'
-      onBack = this.handleBack
+      break
+    case 'base':
+    default:
+      content = this.renderBase()
+      break
     }
+
     return (
       <Modal
         title={title}

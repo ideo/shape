@@ -7,7 +7,6 @@ import DialogWrapper from '~/ui/global/modals/DialogWrapper'
 import CollectionPage from '~/ui/pages/CollectionPage'
 import ItemPage from '~/ui/pages/ItemPage'
 import SearchPage from '~/ui/pages/SearchPage'
-import OrganizationMenu from '~/ui/organizations/OrganizationMenu'
 import Loader from '~/ui/layout/Loader'
 import WindowSizeListener from 'react-window-size-listener'
 
@@ -37,10 +36,6 @@ class Routes extends React.Component {
     return (
       <Fragment>
         <WindowSizeListener onResize={this.handleWindowResize} />
-        <OrganizationMenu
-          organization={apiStore.currentUser.current_organization}
-          userGroups={apiStore.currentUser.groups}
-        />
         <DialogWrapper />
         <Router history={history}>
           <Switch>

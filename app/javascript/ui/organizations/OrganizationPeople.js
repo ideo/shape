@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types'
 import { PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 import { FormSpacer, TextButton } from '~/ui/global/styled/forms'
@@ -18,7 +19,7 @@ class OrganizationPeople extends React.PureComponent {
         {organization.primary_group.currentUserCanEdit &&
           <Row>
             <RowItemRight>
-              <TextButton onClick={this.handleGroupAddClick}>
+              <TextButton onClick={this.props.onGroupAdd}>
                 + New Group
               </TextButton>
             </RowItemRight>
@@ -28,7 +29,7 @@ class OrganizationPeople extends React.PureComponent {
           Your Organization
         </Heading3>
         <Row>
-          <button className="orgEdit" onClick={this.handleGroupRolesClick(primaryGroup)}>
+          <button className="orgEdit" onClick={this.props.onGroupRoles(primaryGroup)}>
             <DisplayText>{ primaryGroup.name }</DisplayText>
           </button>
         </Row>
@@ -41,12 +42,12 @@ class OrganizationPeople extends React.PureComponent {
           <Row key={group.id}>
             <button
               className="groupEdit"
-              onClick={this.handleGroupClick(group)}
+              onClick={this.onGropuRoles(group)}
             >
               <DisplayText>{group.name}</DisplayText>
             </button>
             { group.currentUserCanEdit &&
-              <RemoveIconHolder onClick={this.handleGroupRemove(group)}>
+              <RemoveIconHolder onClick={this.props.onGroupRemove(group)}>
                 <ArchiveIcon />
               </RemoveIconHolder>
             }
@@ -60,6 +61,9 @@ class OrganizationPeople extends React.PureComponent {
 OrganizationPeople.propTypes = {
   organization: MobxPropTypes.objectOrObservableObject.isRequired,
   userGroups: MobxPropTypes.objectOrObservableObject.isRequired,
+  onGroupAdd: PropTypes.func.isRequired,
+  onGroupRemove: PropTypes.func.isRequired,
+  onGroupRoles: PropTypes.func.isRequired,
 }
 
 export default OrganizationPeople
