@@ -97,9 +97,9 @@ class Header extends React.Component {
 
   get renderOrgDropdown() {
     const { orgDropdownOpen } = this.state
-    if (!orgDropdownOpen) return ''
     return (
       <OrganizationDropdown
+        open={orgDropdownOpen}
         onItemClick={this.handleOrgClick(false)}
       />
     )
@@ -138,7 +138,7 @@ class Header extends React.Component {
               <SearchBar className="search-bar" />
               <StyledAvatarAndDropdown>
                 {this.renderOrgDropdown}
-                <button onClick={this.handleOrgClick(true)}>
+                <button className="orgBtn" onClick={this.handleOrgClick(true)}>
                   <Avatar
                     title={primaryGroup.name}
                     url={primaryGroup.filestack_file_url}
@@ -148,7 +148,7 @@ class Header extends React.Component {
               </StyledAvatarAndDropdown>
               <StyledAvatarAndDropdown>
                 {this.renderUserDropdown}
-                <button onClick={this.handleUserClick(true)}>
+                <button  className="userBtn" onClick={this.handleUserClick(true)}>
                   <Avatar
                     title={currentUser.name}
                     url={currentUser.pic_url_square}

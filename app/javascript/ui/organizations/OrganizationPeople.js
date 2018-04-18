@@ -42,7 +42,7 @@ class OrganizationPeople extends React.PureComponent {
           <Row key={group.id}>
             <button
               className="groupEdit"
-              onClick={this.onGropuRoles(group)}
+              onClick={this.props.onGroupRoles(group)}
             >
               <DisplayText>{group.name}</DisplayText>
             </button>
@@ -60,7 +60,7 @@ class OrganizationPeople extends React.PureComponent {
 
 OrganizationPeople.propTypes = {
   organization: MobxPropTypes.objectOrObservableObject.isRequired,
-  userGroups: MobxPropTypes.objectOrObservableObject.isRequired,
+  userGroups: MobxPropTypes.arrayOrObservableArray.isRequired,
   onGroupAdd: PropTypes.func.isRequired,
   onGroupRemove: PropTypes.func.isRequired,
   onGroupRoles: PropTypes.func.isRequired,
