@@ -181,6 +181,7 @@ class User < ApplicationRecord
                         .map(&:resource_identifier)
   end
 
+  # NOTE: This can do a pretty huge query. Was being used as users_controller#index but not currently being used.
   def users_through_collections_items_and_groups(organization)
     identifiers = collection_and_group_identifiers(organization)
 

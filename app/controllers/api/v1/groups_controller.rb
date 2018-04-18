@@ -3,10 +3,10 @@ class Api::V1::GroupsController < Api::V1::BaseController
   load_and_authorize_resource :organization, only: %i[index]
   load_and_authorize_resource
 
-  # All the groups in this org
+  # All the current user's groups in this org
   # /organizations/:id/groups
   def index
-    render jsonapi: @organization.groups.order(name: :asc)
+    render jsonapi: current_user.groups.where(organization_id: @organization.id).order(name: :asc)
   end
 
   def show
