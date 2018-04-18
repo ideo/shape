@@ -150,7 +150,7 @@ class RolesMenu extends React.Component {
     const sortedRoleEntities = roleEntities.sort(sortUserOrGroup)
     const roleTypes = ownerType === 'groups'
       ? ['member', 'admin']
-      : ['viewer', 'editor']
+      : ['editor', 'viewer']
 
     return (
       <div>
