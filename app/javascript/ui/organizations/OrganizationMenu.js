@@ -13,6 +13,11 @@ class OrganizationMenu extends React.Component {
   @observable editGroup = {}
   @observable isLoading = false
 
+  constructor(props) {
+    super(props)
+    this.currentPage = props.initialPage
+  }
+
   componentDidMount() {
     const { apiStore, userGroups } = this.props
     const groupReqs = userGroups.map(group => this.fetchRoles(group))
@@ -165,7 +170,6 @@ class OrganizationMenu extends React.Component {
 
   render() {
     // TODO build nested modal functionality out in separate component
-    const { uiStore } = this.props
     let content = this.renderBase()
     let title = 'People & Groups'
     let onBack, onEdit
@@ -217,10 +221,14 @@ class OrganizationMenu extends React.Component {
 OrganizationMenu.propTypes = {
   organization: MobxPropTypes.objectOrObservableObject.isRequired,
   userGroups: MobxPropTypes.arrayOrObservableArray.isRequired,
+  initialPage: PropTypes.oneOf(['base', '']),
 }
 OrganizationMenu.wrappedComponent.propTypes = {
   apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
+}
+OrganizationMenu.defaultProps = {
+  initialPage: 'base',
 }
 
 export default OrganizationMenu

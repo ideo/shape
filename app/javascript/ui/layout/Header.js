@@ -61,13 +61,11 @@ class Header extends React.Component {
     orgDropdownOpen: false,
   }
 
-  handleOrgClick = (open) => (ev) => {
-    ev.preventDefault()
+  handleOrgClick = (open) => () => {
     this.setState({ orgDropdownOpen: open })
   }
 
-  handleUserClick = (open) => (ev) => {
-    ev.preventDefault()
+  handleUserClick = (open) => () => {
     this.setState({ userDropdownOpen: open })
   }
 

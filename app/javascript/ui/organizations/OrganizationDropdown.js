@@ -1,27 +1,28 @@
 import PropTypes from 'prop-types'
 import PopoutMenu from '~/ui/global/PopoutMenu'
-import { observable } from 'mobx'
+import { action, observable } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import OrganizationMenu from '~/ui/organizations/OrganizationMenu'
-import { uiStore } from '~/stores'
 
 @inject('apiStore')
 class OrganizationDropdown extends React.Component {
-  @observable organizationPage = 'base'
+  @observable organizationPage = null
+
+  @action openOrgMenu(page = 'base') {
+    this.props.onItemClick()
+    this.organizationPage = page
+  }
 
   handleOrgPeople = (ev) => {
-    this.props.onItemClick(ev)
-    uiStore.update('organizationMenuOpen', true)
+    this.openOrgMenu('base')
   }
 
   handleNewOrg = (ev) => {
-    this.props.onItemClick(ev)
-    uiStore.update('organizationMenuOpen', true)
+    this.openOrgMenu('base')
   }
 
   handleOrgSettings= (ev) => {
-    this.props.onItemClick(ev)
-    uiStore.update('organizationMenuOpen', true)
+    this.openOrgMenu('base')
   }
 
   get menuItems() {
@@ -42,10 +43,13 @@ class OrganizationDropdown extends React.Component {
           menuItems={this.menuItems}
           menuOpen
         />
-        <OrganizationMenu
-          organization={apiStore.currentUser.current_organization}
-          userGroups={apiStore.currentUser.groups}
-        />
+        { this.organizationPage && (
+          <OrganizationMenu
+            organization={apiStore.currentUser.current_organization}
+            userGroups={apiStore.currentUser.groups}
+            initialPage={this.organizationPage}
+          />
+        )}
       </div>
     )
   }
