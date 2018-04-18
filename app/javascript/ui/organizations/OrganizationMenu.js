@@ -9,6 +9,7 @@ import GroupModify from '~/ui/groups/GroupModify'
 import RolesMenu from '~/ui/roles/RolesMenu'
 import Loader from '~/ui/layout/Loader'
 import ArchiveIcon from '~/ui/icons/ArchiveIcon'
+import OrganizationPeople from '~/ui/organizations/OrganizationPeople'
 
 const RemoveIconHolder = styled.button`
   width: 16px;
@@ -169,47 +170,11 @@ class OrganizationMenu extends React.Component {
 
   renderBase() {
     const { organization, userGroups } = this.props
-    const primaryGroup = organization.primary_group
     return (
-      <div>
-        {organization.primary_group.currentUserCanEdit &&
-          <Row>
-            <RowItemRight>
-              <TextButton onClick={this.handleGroupAddClick}>
-                + New Group
-              </TextButton>
-            </RowItemRight>
-          </Row>
-        }
-        <Heading3>
-          Your Organization
-        </Heading3>
-        <Row>
-          <button className="orgEdit" onClick={this.handleGroupRolesClick(primaryGroup)}>
-            <DisplayText>{ primaryGroup.name }</DisplayText>
-          </button>
-        </Row>
-        <FormSpacer />
-        <Heading3>
-          Your Groups
-        </Heading3>
-        { userGroups.map((group) =>
-          (!group.is_primary &&
-          <Row key={group.id}>
-            <button
-              className="groupEdit"
-              onClick={this.handleGroupClick(group)}
-            >
-              <DisplayText>{group.name}</DisplayText>
-            </button>
-            { group.currentUserCanEdit &&
-              <RemoveIconHolder onClick={this.handleGroupRemove(group)}>
-                <ArchiveIcon />
-              </RemoveIconHolder>
-            }
-          </Row>))
-        }
-      </div>
+      <OrganizationPeople
+        organization={organization}
+        userGroups={userGroups}
+      />
     )
   }
 
