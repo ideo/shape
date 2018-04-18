@@ -1,10 +1,10 @@
 {
   "presets": [
     [
-      "es2015",
+      "env",
       {
         "targets": {
-          "browsers": "> 1%",
+          "browsers": ["IE 11", "> 5%"],
           "uglify": true
         },
         "useBuiltIns": true,
@@ -18,7 +18,6 @@
         }
       }
     ],
-    "stage-1",
     "react"
   ],
   "env": {
