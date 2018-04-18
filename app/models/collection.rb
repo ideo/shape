@@ -8,7 +8,6 @@ class Collection < ApplicationRecord
 
   archivable as: :parent_collection_card,
              with: %i[collection_cards cards_linked_to_this_collection]
-  resourcify
   acts_as_taggable
 
   # all cards including archived (i.e. undo default :collection_cards scope)
