@@ -32,7 +32,7 @@ const StyledDialog = styled(Dialog)`
     margin-right: 8px;
   }
   .button--center {
-    margin-top: 40px;
+    margin-top: 20px;
     margin-bottom: 80px;
     text-align: center;
   }
@@ -48,6 +48,11 @@ const StyledDialog = styled(Dialog)`
   }
   .checkbox--error {
     color: ${v.colors.error};
+  }
+  .footer {
+    p {
+      text-align: center;
+    }
   }
 `
 const StyledLogo = styled(Logo)`
@@ -140,7 +145,7 @@ class TermsOfUseModal extends React.Component {
 
             <div className="button--center">
               <FormButton disabled={this.isLoading}>
-                Save
+                Continue
               </FormButton>
             </div>
             <div className="footer">

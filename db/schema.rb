@@ -64,6 +64,7 @@ ActiveRecord::Schema.define(version: 20180416195913) do
     t.string "handle"
     t.integer "filestack_file_id"
     t.boolean "archived", default: false
+    t.integer "current_shared_collection_id"
     t.index ["handle"], name: "index_groups_on_handle"
     t.index ["organization_id"], name: "index_groups_on_organization_id"
   end
