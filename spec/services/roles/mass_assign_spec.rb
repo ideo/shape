@@ -8,7 +8,7 @@ RSpec.describe Roles::MassAssign, type: :service do
   let(:role_name) { :editor }
   let(:propagate_to_children) { false }
   let(:invited_by) { nil }
-  let(:create_link) { false }
+  let(:new_role) { false }
   let(:assign_role) do
     Roles::MassAssign.new(
       object: object,
@@ -17,7 +17,7 @@ RSpec.describe Roles::MassAssign, type: :service do
       groups: groups,
       propagate_to_children: propagate_to_children,
       invited_by: invited_by,
-      create_link: create_link,
+      new_role: new_role,
     )
   end
   let(:deliver_double) do
@@ -99,7 +99,7 @@ RSpec.describe Roles::MassAssign, type: :service do
     end
 
     context 'when it should create links' do
-      let!(:create_link) { true }
+      let(:new_role) { true }
 
       it 'adds links to user collections' do
         all_group_users = groups.reduce([]) {
@@ -174,14 +174,25 @@ RSpec.describe Roles::MassAssign, type: :service do
     context 'with invited_by user' do
       let!(:invited_by) { create(:user) }
 
-      it 'should queue up invitation for invited user' do
-        expect(InvitationMailer).to receive(:invite).with(
-          user_id: users.first.id,
-          invited_by_id: invited_by.id,
-          invited_to_type: object.class.name,
-          invited_to_id: object.id,
-        )
-        assign_role.call
+      context 'with new role' do
+        let(:new_role) { true }
+        it 'should queue up invitation for invited user' do
+          expect(InvitationMailer).to receive(:invite).with(
+            user_id: users.first.id,
+            invited_by_id: invited_by.id,
+            invited_to_type: object.class.name,
+            invited_to_id: object.id,
+          )
+          assign_role.call
+        end
+      end
+
+      context 'with switching role' do
+        let(:new_role) { false }
+        it 'should not send an email' do
+          expect(InvitationMailer).not_to receive(:invite)
+          assign_role.call
+        end
       end
     end
   end
