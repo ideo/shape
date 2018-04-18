@@ -13,11 +13,16 @@ class Group < ApplicationRecord
                edit_role: Role::ADMIN,
                view_role: Role::MEMBER
 
+  after_create :create_shared_collection
+
   rolify after_add: :after_add_role,
          after_remove: :after_remove_role,
          strict: true
 
   belongs_to :organization
+  belongs_to :current_shared_collection,
+             class_name: 'Collection',
+             optional: true
 
   before_validation :set_handle_if_none, on: :create
 
@@ -44,6 +49,7 @@ class Group < ApplicationRecord
   # Roles where this group is an editor/viewer of a collection/item
   def roles_to_resources
     Role
+      .where.not(resource_id: current_shared_collection_id)
       .joins(:groups_roles)
       .where(GroupsRole.arel_table[:group_id].in(id))
   end
@@ -69,6 +75,13 @@ class Group < ApplicationRecord
 
   private
 
+  def create_shared_collection
+    shared = Collection::SharedWithMeCollection.create_for_group(
+      organization
+    )
+    update(current_shared_collection: shared)
+  end
+
   def after_add_role(role)
     resource = role.resource
     # Reindex record if it is a searchkick model
@@ -82,7 +95,7 @@ class Group < ApplicationRecord
   end
 
   def validate_handle?
-    new_record? || handle_changed?
+    new_record? || will_save_change_to_attribute?(:handle)
   end
 
   def set_handle_if_none

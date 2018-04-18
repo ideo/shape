@@ -131,19 +131,19 @@ class User < ApplicationRecord
     save
   end
 
+  # overrides retrieval of belongs_to relation
   def current_user_collection(org_id = current_organization_id)
-    return nil if current_organization.blank?
+    return nil unless current_organization_id
     if current_user_collection_id && org_id == current_organization_id
       # if within same org, we already have the current_user_collection id
-      return collections.find(current_user_collection_id)
+      return Collection.find(current_user_collection_id)
     end
     # TODO: rename "user" to user_collection
     collections.user.find_by_organization_id(org_id)
   end
 
   def current_shared_collection(org_id = current_organization_id)
-    return nil if current_organization.blank?
-
+    return nil unless current_organization_id
     collections.shared_with_me.find_by_organization_id(org_id)
   end
 

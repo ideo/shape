@@ -4,6 +4,10 @@ RSpec.describe Group, type: :model do
   let(:organization) { create(:organization) }
   let(:group) { create(:group, organization: organization) }
 
+  it 'should create a group shared collection' do
+    expect(group.current_shared_collection).to be_truthy
+  end
+
   context 'associations' do
     it { should belong_to :filestack_file }
   end

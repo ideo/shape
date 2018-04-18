@@ -80,9 +80,39 @@ module Roles
     def link_to_shared_collections
       LinkToSharedCollectionsWorker.perform_async(
         shared_user_ids,
-        @object.id,
-        @object.class.name,
+        group_ids,
+        collections_to_link,
+        items_to_link,
       )
+    end
+
+    # NOTE: this method is duplicated w/ MassRemove
+    def collections_to_link
+      objects_to_link
+        .select { |object| object.is_a?(Collection) }
+        .map(&:id)
+    end
+
+    # NOTE: this method is duplicated w/ MassRemove
+    def items_to_link
+      objects_to_link
+        .select { |object| object.is_a?(Item) }
+        .map(&:id)
+    end
+
+    # NOTE: this method is duplicated w/ MassRemove
+    def objects_to_link
+      # TODO: use relation to query this?
+      if @object.is_a?(Group)
+        @object.current_shared_collection.link_collection_cards.map(&:record)
+      else
+        [@object]
+      end
+    end
+
+    def group_ids
+      groups = @groups.reject(&:primary?)
+      groups.map(&:id)
     end
 
     # NOTE: this method is duplicated w/ MassRemove
