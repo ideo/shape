@@ -275,13 +275,14 @@ class CollectionGrid extends React.Component {
       gridW,
       gridH,
       gutter,
-      cols
+      cols,
+      sortBy,
     } = opts.props
     let row = 0
     const matrix = []
     // create an empty row
     matrix.push(_.fill(Array(cols), null))
-    _.each(_.sortBy(cards, 'order'), card => {
+    _.each(_.sortBy(cards, sortBy), card => {
       // we don't actually want to "re-position" the dragging card
       // because its position is being determined by the drag (i.e. mouse cursor)
       if (opts.dragging === card.id) {
@@ -418,14 +419,18 @@ class CollectionGrid extends React.Component {
   }
 }
 
+const gridConfigProps = {
+  // these gridSettings confuse eslint because of the way they're used in positionCards
+  // so we list them separately here
+  cols: PropTypes.number.isRequired,
+  gridH: PropTypes.number.isRequired,
+  gridW: PropTypes.number.isRequired,
+  gutter: PropTypes.number.isRequired,
+  sortBy: PropTypes.string.isRequired,
+}
+
 CollectionGrid.propTypes = {
-  // these gridSettings are technically props,
-  // but they confuse eslint because of the way they're used in positionCards
-  // ---
-  // cols: PropTypes.number.isRequired,
-  // gridH: PropTypes.number.isRequired,
-  // gridW: PropTypes.number.isRequired,
-  // gutter: PropTypes.number.isRequired,
+  ...gridConfigProps,
   updateCollection: PropTypes.func.isRequired,
   collection: MobxPropTypes.objectOrObservableObject.isRequired,
   blankContentToolState: MobxPropTypes.objectOrObservableObject.isRequired,

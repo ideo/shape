@@ -7,6 +7,8 @@ Rails.application.routes.draw do
 
   root to: 'home#index', constraints: ->(req) { req.format == :html || req.format == '*/*' }
 
+  mount ActionCable.server => '/cable'
+
   namespace :api do
     namespace :v1 do
       resources :collections, except: %i[index] do

@@ -3,6 +3,7 @@ class Item < ApplicationRecord
   include Resourceable
   include Archivable
   include HasFilestackFile
+  include RealtimeEditorsViewers
 
   resourceable roles: [Role::EDITOR, Role::VIEWER],
                edit_role: Role::EDITOR,
@@ -39,6 +40,11 @@ class Item < ApplicationRecord
     exclude_association :tag_taggings
     exclude_association :filestack_file
     exclude_association :parent_collection_card
+  end
+
+  def organization_id
+    # NOTE: this will have to lookup via collection_card -> parent
+    try(:parent).try(:organization_id)
   end
 
   def children

@@ -10,11 +10,17 @@ class LinkToSharedCollectionsWorker
       objects.each do |object|
         # Don't create any links if object was created by user
         next if object.try(:created_by_id) == entity.id
-        shared = entity.current_shared_collection
-        mine = entity.current_user_collection unless entity.is_a?(Group)
+        org_id = object.organization_id
+        if entity.is_a?(User)
+          shared = entity.current_shared_collection(org_id)
+          mine = entity.current_user_collection(org_id)
+          collections = [shared, mine]
+        else
+          # for groups, they already only belong to one org
+          shared = entity.current_shared_collection
+          collections = [shared]
+        end
         # Check for already created links to not create doubles
-        # Groups won't have my collections so skip creating lnks
-        collections = entity.is_a?(User) ? [shared, mine] : [shared]
         collections.each do |collection|
           unless collection.link_collection_cards.with_record(object).exists?
             create_link(object, collection)

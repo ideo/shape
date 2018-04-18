@@ -63,15 +63,16 @@ class GroupModify extends React.Component {
     this.editingGroup.filestack_file_url = url
   }
 
-  @action afterSave(res) {
+  @action afterSave = async (group) => {
     const { apiStore } = this.props
     const existing = apiStore.currentUser.groups.find(
-      existingGroup => existingGroup.id === res.id
+      existingGroup => existingGroup.id === group.id
     )
-    if (!existing) {
-      return apiStore.fetch('users', apiStore.currentUserId)
+    if (existing) {
+      return existing
     }
-    return Promise.resolve(existing)
+    await apiStore.fetch('users', apiStore.currentUserId)
+    return group
   }
 
   handleNameChange = (ev) => {
@@ -112,7 +113,7 @@ class GroupModify extends React.Component {
       })
   }
 
-  handleSave = (ev) => {
+  handleSave = async (ev) => {
     ev.preventDefault()
     const { apiStore, onSave } = this.props
     let { group } = this.props
@@ -127,18 +128,16 @@ class GroupModify extends React.Component {
     if (this.fileAttrs.url) {
       group.assign('filestack_file_attributes', this.fileAttrs)
     }
-    group.save()
-      .then((res) => {
-        // TODO why isn't res wrapped in "data"?
-        this.afterSave(res).then(() =>
-          onSave && onSave(res))
-      })
-      .catch((err) => {
-        console.warn(err)
-        group.name = originalGroup.name
-        group.handle = originalGroup.handle
-        group.filestack_file_url = originalGroup.filestack_file_url
-      })
+    try {
+      let savedGroup = await group.save()
+      savedGroup = await this.afterSave(savedGroup)
+      onSave && onSave(savedGroup)
+    } catch (err) {
+      console.warn(err)
+      group.name = originalGroup.name
+      group.handle = originalGroup.handle
+      group.filestack_file_url = originalGroup.filestack_file_url
+    }
   }
 
   renderImagePicker() {

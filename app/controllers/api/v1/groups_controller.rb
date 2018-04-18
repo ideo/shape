@@ -14,6 +14,7 @@ class Api::V1::GroupsController < Api::V1::BaseController
   end
 
   def create
+    authorize! :update, current_organization
     @group.organization = current_organization
     if @group.save
       current_user.add_role(Role::ADMIN, @group)

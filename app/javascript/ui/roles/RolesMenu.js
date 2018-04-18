@@ -24,7 +24,7 @@ class RolesMenu extends React.Component {
 
   componentDidMount() {
     const { apiStore, ownerType } = this.props
-    const organizationId = apiStore.currentUser.current_organization.id
+    const organizationId = apiStore.currentUserOrganizationId
     const req = (type) => this.props.apiStore.request(
       `organizations/${organizationId}/${type}`,
       'GET'

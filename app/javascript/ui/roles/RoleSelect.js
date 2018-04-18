@@ -14,7 +14,7 @@ import {
 import { Select } from '~/ui/global/styled/forms'
 import LeaveIcon from '~/ui/icons/LeaveIcon'
 import Avatar from '~/ui/global/Avatar'
-import { uiStore } from '~/stores'
+import { uiStore, apiStore } from '~/stores'
 
 const MinRowItem = styled.span`
   min-width: 110px;
@@ -132,9 +132,11 @@ class RoleSelect extends React.Component {
         <MinRowItem>
           {select}
         </MinRowItem>
-        <LeaveIconHolder enabled={enabled} onClick={this.onRoleRemove}>
-          <LeaveIcon />
-        </LeaveIconHolder>
+        { (enabled || entity.id === apiStore.currentUserId) &&
+          <LeaveIconHolder enabled={enabled} onClick={this.onRoleRemove}>
+            <LeaveIcon />
+          </LeaveIconHolder>
+        }
       </Row>
     )
   }

@@ -35,6 +35,10 @@ class User < ApplicationRecord
 
   scope :search_import, -> { includes(:roles) }
 
+  attribute :pic_url_square,
+            :string,
+            default: 'https://d3none3dlnlrde.cloudfront.net/assets/users/avatars/missing/square.jpg'
+
   enum status: {
     active: 0,
     pending: 1,
@@ -76,13 +80,17 @@ class User < ApplicationRecord
     user
   end
 
-  def self.create_pending_user(email:)
-    create(
+  def self.create_pending_user(email:, organization:)
+    user = create(
       email: email,
       status: User.statuses[:pending],
       password: Devise.friendly_token(40),
       invitation_token: Devise.friendly_token(40),
     )
+    # NOTE: The user is not officially a member of this org, but we add them
+    # so that they have the proper current_organization_id and shared/my collections
+    organization.user_role_added(user)
+    user
   end
 
   def self.pending_user_with_token(token)
@@ -90,6 +98,15 @@ class User < ApplicationRecord
       invitation_token: token,
       status: User.statuses[:pending],
     ).first
+  end
+
+  # Simplified format, used by action cable
+  def as_json(_options = {})
+    {
+      id: id,
+      name: name,
+      pic_url_square: pic_url_square,
+    }
   end
 
   def update_from_network_profile(params)
@@ -114,21 +131,20 @@ class User < ApplicationRecord
     save
   end
 
-  def current_user_collection_id
-    current_user_collection.try(:id)
-  end
-
-  def current_user_collection
-    return nil if current_organization.blank?
-
+  # overrides retrieval of belongs_to relation
+  def current_user_collection(org_id = current_organization_id)
+    return nil unless current_organization_id
+    if current_user_collection_id && org_id == current_organization_id
+      # if within same org, we already have the current_user_collection id
+      return Collection.find(current_user_collection_id)
+    end
     # TODO: rename "user" to user_collection
-    collections.user.find_by_organization_id(current_organization_id)
+    collections.user.find_by_organization_id(org_id)
   end
 
-  def current_shared_collection
-    return nil if current_organization.blank?
-
-    collections.shared_with_me.find_by_organization_id(current_organization_id)
+  def current_shared_collection(org_id = current_organization_id)
+    return nil unless current_organization_id
+    collections.shared_with_me.find_by_organization_id(org_id)
   end
 
   def current_org_groups
@@ -147,9 +163,7 @@ class User < ApplicationRecord
       elsif resource.respond_to?(:organization_id)
         resource.organization_id == organization.id
       else
-        # TODO: this is potentially including items from other orgs
-        # For now, most people will belong only to one org, so leaving it in.
-        true
+        false
       end
     end
   end

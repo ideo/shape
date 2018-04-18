@@ -6,24 +6,23 @@ RSpec.describe LinkToSharedCollectionsWorker, type: :worker do
     let!(:user) { create(:user, add_to_org: organization) }
     let!(:users_to_add) { [user] }
     let(:groups_to_add) { create_list(:group, 1) }
-    let!(:collection_to_link) { create(:collection) }
+    let!(:collection_to_link) { create(:collection, organization: organization) }
     let(:existing_link) { nil }
 
     before do
       # TODO: why is this needed?
-      unless !existing_link
+      if existing_link
         user.current_shared_collection.link_collection_cards.push(existing_link)
       end
       LinkToSharedCollectionsWorker.new.perform(
         users_to_add.map(&:id),
         groups_to_add.map(&:id),
         [collection_to_link.id],
-        []
+        [],
       )
     end
 
     it 'should create a link to shared/my collections' do
-
       # each one should have been added 1 link card
       expect(user.current_shared_collection.link_collection_cards.count).to eq 1
       expect(user.current_user_collection.link_collection_cards.count).to eq 1
@@ -33,7 +32,7 @@ RSpec.describe LinkToSharedCollectionsWorker, type: :worker do
 
     it 'should create links to groups shared collections' do
       expect(
-        groups_to_add.first.current_shared_collection.collection_cards.count
+        groups_to_add.first.current_shared_collection.collection_cards.count,
       ).to eq(1)
     end
 

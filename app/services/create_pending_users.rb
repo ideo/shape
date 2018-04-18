@@ -1,8 +1,9 @@
 class CreatePendingUsers
   attr_reader :failed_emails, :users
 
-  def initialize(emails)
+  def initialize(emails:, organization:)
     @emails = emails.map { |email| email.strip.downcase }
+    @organization = organization
     @failed_emails = []
     @users = []
   end
@@ -25,7 +26,7 @@ class CreatePendingUsers
 
   def create_pending_users
     emails.each do |email|
-      user = User.create_pending_user(email: email)
+      user = User.create_pending_user(email: email, organization: @organization)
       if user.persisted?
         users << user
       else

@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types'
-import { PropTypes as MobxPropTypes } from 'mobx-react'
+import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import ReactQuill from 'react-quill'
 import styled from 'styled-components'
 
@@ -23,6 +23,7 @@ const StyledReadMore = styled.div`
 `
 StyledReadMore.displayName = 'StyledReadMore'
 
+@observer
 class TextItemCover extends React.Component {
   state = {
     readMore: false

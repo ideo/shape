@@ -1,15 +1,13 @@
 import PropTypes from 'prop-types'
-import Dialog from './Dialog'
 
-function delay(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms))
-}
+import sleep from '~/utils/sleep'
+import Dialog from './Dialog'
 
 class AlertDialog extends React.PureComponent {
   componentWillReceiveProps({ fadeOutTime, open }) {
     if (open !== 'info') return
     if (fadeOutTime) {
-      delay(fadeOutTime).then(() => {
+      sleep(fadeOutTime).then(() => {
         this.props.onClose()
       })
     }

@@ -4,8 +4,8 @@ import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import { Flex, Box } from 'reflexbox'
 import styled from 'styled-components'
 import { Link } from 'react-router-dom'
-import { animateScroll as scroll } from 'react-scroll'
 
+import ActionCableConsumer from '~/utils/ActionCableConsumer'
 import PageWithApi from '~/ui/pages/PageWithApi'
 import PageContainer from '~/ui/layout/PageContainer'
 import Loader from '~/ui/layout/Loader'
@@ -52,19 +52,37 @@ const CloseLink = styled(Link)`
 @inject('apiStore', 'uiStore')
 @observer
 class ItemPage extends PageWithApi {
-  get item() {
-    const { match, apiStore } = this.props
-    if (!apiStore.items.length) return null
-    return apiStore.find('items', match.params.id)
+  state = {
+    item: null
+  }
+
+  onAPILoad = (response) => {
+    const item = response.data
+    this.setState({ item })
+  }
+
+  refetchItem = async () => {
+    const { apiStore } = this.props
+    const { item } = this.state
+    const { data } = await apiStore.fetch('items', item.id, { force: true })
+    this.setState({ item: data })
   }
 
   // could be smarter or broken out once we want to do different things per type
   get content() {
-    const { item } = this
+    const { item } = this.state
+    const { currentUserId } = this.props.apiStore
     // similar function as in GridCard, could extract?
     switch (item.type) {
     case ITEM_TYPES.TEXT:
-      return <TextItem item={item} />
+      return (
+        <TextItem
+          item={item}
+          actionCableConsumer={ActionCableConsumer}
+          currentUserId={currentUserId}
+          handleRefetchItem={this.refetchItem}
+        />
+      )
     case ITEM_TYPES.IMAGE:
       return <ImageItem item={item} backgroundSize="contain" />
     case ITEM_TYPES.VIDEO:
@@ -82,15 +100,16 @@ class ItemPage extends PageWithApi {
   }
 
   updateItemName = (name) => {
-    const { item } = this
+    const { item } = this.state
     item.name = name
     item.save()
   }
 
   render() {
     const { uiStore } = this.props
-    const { item } = this
+    const { item } = this.state
     if (!item) return <Loader />
+
     return (
       <Fragment>
         <Header>
