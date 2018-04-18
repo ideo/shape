@@ -1,9 +1,22 @@
 import PropTypes from 'prop-types'
 import PopoutMenu from '~/ui/global/PopoutMenu'
+import styled from 'styled-components'
 import { action, observable } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import OrganizationMenu from '~/ui/organizations/OrganizationMenu'
 import Avatar from '~/ui/global/Avatar'
+
+const IconHolder = styled.span`
+  .org_avatar {
+    display: inline-block;
+    margin-bottom: 7px;
+    margin-left: 0;
+    margin-right: 15px;
+    margin-top: 7px;
+    vertical-align: middle;
+  }
+`
+IconHolder.displayName = 'StyledIconHolder'
 
 @inject('apiStore')
 @observer
@@ -27,6 +40,10 @@ class OrganizationDropdown extends React.Component {
     console.warn('unimplemented')
   }
 
+  handleSwitchOrg = (ev) => {
+    console.warn('unimplemented')
+  }
+
   handleOrgSettings= (ev) => {
     this.openOrgMenu('editOrganization')
   }
@@ -35,14 +52,16 @@ class OrganizationDropdown extends React.Component {
     const { apiStore } = this.props
     return apiStore.currentUser.organizations.map(org => {
       const avatar = (
-        <Avatar
-          title={org.name}
-          url={org.filestack_file_url}
-          size={32}
-          className="org_list_item"
-        />
+        <IconHolder>
+          <Avatar
+            title={org.name}
+            url={org.filestack_file_url}
+            size={32}
+            className="org_avatar"
+          />
+        </IconHolder>
       )
-      return { name: org.name, icon: avatar }
+      return { name: org.name, iconLeft: avatar, onClick: this.handleSwitchOrg }
     })
   }
 
