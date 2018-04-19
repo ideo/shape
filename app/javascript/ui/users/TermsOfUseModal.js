@@ -1,4 +1,3 @@
-// import PropTypes from 'prop-types'
 import { observable, action, runInAction } from 'mobx'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
@@ -17,6 +16,7 @@ import { Heading1, Anchor } from '~/ui/global/styled/typography'
 import Link from '~/ui/global/Link'
 import Logo from '~/ui/layout/Logo'
 import v from '~/utils/variables'
+import poweredByIdeo from '~/assets/Powered-by-IDEO.png'
 
 const StyledDialog = styled(Dialog)`
   .modal__paper {
@@ -32,7 +32,7 @@ const StyledDialog = styled(Dialog)`
     margin-right: 8px;
   }
   .button--center {
-    margin-top: 40px;
+    margin-top: 20px;
     margin-bottom: 80px;
     text-align: center;
   }
@@ -48,6 +48,13 @@ const StyledDialog = styled(Dialog)`
   }
   .checkbox--error {
     color: ${v.colors.error};
+  }
+
+  .footer {
+    text-align: center;
+    img {
+      width: 83px;
+    }
   }
 `
 const StyledLogo = styled(Logo)`
@@ -140,13 +147,17 @@ class TermsOfUseModal extends React.Component {
 
             <div className="button--center">
               <FormButton disabled={this.isLoading}>
-                Save
+                Continue
               </FormButton>
             </div>
             <div className="footer">
               <p>
                 Questions? Contact us at <Anchor href="mailto:productsupport@ideo.com">productsupport@ideo.com</Anchor>
               </p>
+
+              <a href="https://www.ideo.com/" rel="noopener noreferrer" target="_blank">
+                <img src={poweredByIdeo} alt="Powered by IDEO" />
+              </a>
             </div>
           </form>
         </DialogContent>
