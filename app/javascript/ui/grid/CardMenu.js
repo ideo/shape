@@ -1,6 +1,5 @@
 import PropTypes from 'prop-types'
-import { observer, inject, PropTypes as MobxPropTypes } from 'mobx-react'
-import { observable, action } from 'mobx'
+import { inject, PropTypes as MobxPropTypes } from 'mobx-react'
 import _ from 'lodash'
 
 import PopoutMenu from '~/ui/global/PopoutMenu'
@@ -11,10 +10,7 @@ import MoveIcon from '~/ui/icons/MoveIcon'
 import LinkIcon from '~/ui/icons/LinkIcon'
 
 @inject('uiStore')
-@observer
 class CardMenu extends React.Component {
-  @observable disabled = false
-
   get cardId() {
     return this.props.card.id
   }
@@ -46,22 +42,11 @@ class CardMenu extends React.Component {
   addToMyCollection = async () => {
     const { card, uiStore } = this.props
     uiStore.closeMoveMenu()
-    this.toggleDisable()
     await card.API_linkToMyCollection()
-    this.toggleDisable()
-  }
-
-  @action toggleDisable() {
-    if (this.disabled) {
-      this.disabled = false
-    } else {
-      this.disabled = true
-    }
   }
 
   archiveCard = () => {
     this.props.uiStore.closeMoveMenu()
-    this.toggleDisable()
     this.props.card.API_archive()
   }
 
@@ -124,7 +109,6 @@ class CardMenu extends React.Component {
         onClick={this.toggleOpen}
         menuItems={this.menuItems}
         menuOpen={menuOpen}
-        disabled={this.disabled}
         width={250}
       />
     )

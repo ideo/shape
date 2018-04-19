@@ -62,25 +62,23 @@ describe('CardMenu', () => {
       expect(card.beginReplacing).toHaveBeenCalled()
     })
 
-    // TODO: figure out how to test uiStore mock methods
-    // it('calls selectCardId and openMoveMenu on moveCard action', () => {
-    //   wrapper.instance().moveCard()
-    //   expect(uiStore.selectCardId).toHaveBeenCalledWith(card.id)
-    // })
+    it('calls selectCardId and openMoveMenu on moveCard action', () => {
+      component.moveCard()
+      expect(props.uiStore.selectCardId).toHaveBeenCalledWith(card.id)
+      expect(props.uiStore.openMoveMenu).toHaveBeenCalledWith({
+        from: props.uiStore.viewingCollection.id,
+        cardAction: 'move',
+      })
+    })
   })
 
   describe('addToMyCollection', () => {
     beforeEach(async () => {
-      component.toggleDisable = jest.fn()
       await component.addToMyCollection()
     })
 
     it('should close the move menu', () => {
       expect(props.uiStore.closeMoveMenu).toHaveBeenCalled()
-    })
-
-    it('should disable then re-enable the menu', () => {
-      expect(component.toggleDisable).toHaveBeenCalled()
     })
 
     it('should call the API to link to my collection', () => {
