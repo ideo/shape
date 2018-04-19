@@ -50,24 +50,26 @@ class OrganizationDropdown extends React.Component {
 
   get organizationItems() {
     const { apiStore } = this.props
-    return apiStore.currentUser.organizations.map(org => {
-      const avatar = (
-        <IconHolder>
-          <Avatar
-            title={org.name}
-            url={org.primary_group.filestack_file_url}
-            size={32}
-            className="org_avatar"
-          />
-        </IconHolder>
-      )
-      return {
-        name: org.name,
-        iconLeft: avatar,
-        onClick: this.handleSwitchOrg,
-        noBorder: true,
-      }
-    })
+    return apiStore.currentUser.organizations
+      .filter(org => org.id !== apiStore.currentUser.current_organization.id)
+      .map(org => {
+        const avatar = (
+          <IconHolder>
+            <Avatar
+              title={org.name}
+              url={org.primary_group.filestack_file_url}
+              size={32}
+              className="org_avatar"
+            />
+          </IconHolder>
+        )
+        return {
+          name: org.name,
+          iconLeft: avatar,
+          onClick: this.handleSwitchOrg,
+          noBorder: true,
+        }
+      })
   }
 
   get menuItems() {
