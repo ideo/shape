@@ -1,7 +1,7 @@
 # for previewing emailer in browser
 class InvitationMailerPreview < ActionMailer::Preview
   def invite
-    u = User.pending.first || User.first
+    u = User.first
     InvitationMailer.invite(
       user_id: u.id,
       invited_by_id: User.second.id,
