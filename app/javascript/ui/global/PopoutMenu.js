@@ -68,7 +68,8 @@ export const StyledMenuItem = styled.li`
     font-weight: 300;
     font-size: 0.8rem;
     text-align: left;
-    border-bottom: 1px solid ${v.colors.gray};
+    border-bottom: solid ${v.colors.gray};
+    border-bottom-width: ${props => (props.noBorder ? 0 : 1)}px;
     color: ${v.colors.blackLava};
     .icon {
       top: 50%;
@@ -94,7 +95,7 @@ class PopoutMenu extends React.PureComponent {
     return this.props.menuItems.map(item => {
       const { name, iconLeft, iconRight, onClick } = item
       return (
-        <StyledMenuItem key={name}>
+        <StyledMenuItem key={name} {...item}>
           <button
             onClick={onClick}
             className={`menu-${name.toLowerCase()}`}
@@ -149,6 +150,7 @@ PopoutMenu.propTypes = {
     iconLeft: PropTypes.element,
     iconRight: PropTypes.element,
     onClick: PropTypes.func,
+    noBorder: PropTypes.bool,
   })).isRequired,
 }
 

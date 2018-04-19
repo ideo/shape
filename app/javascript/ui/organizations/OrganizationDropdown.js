@@ -61,7 +61,12 @@ class OrganizationDropdown extends React.Component {
           />
         </IconHolder>
       )
-      return { name: org.name, iconLeft: avatar, onClick: this.handleSwitchOrg }
+      return {
+        name: org.name,
+        iconLeft: avatar,
+        onClick: this.handleSwitchOrg,
+        noBorder: true,
+      }
     })
   }
 
