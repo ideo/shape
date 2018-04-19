@@ -13,6 +13,7 @@ const props = {
   record: fakeTextItem,
   handleClick: jest.fn(),
   onMoveStart: jest.fn(),
+
   dragging: false,
   height: 100,
   menuOpen: false,
@@ -43,6 +44,7 @@ describe('GridCard', () => {
     })
 
     it('renders menu', () => {
+      console.log(wrapper.debug())
       expect(wrapper.find('CardMenu').exists()).toBe(true)
     })
 

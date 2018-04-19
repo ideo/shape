@@ -125,6 +125,7 @@ CardMenu.propTypes = {
 CardMenu.wrappedComponent.propTypes = {
   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }
+CardMenu.displayName = 'CardMenu'
 
 CardMenu.defaultProps = {
   className: 'card-menu'
