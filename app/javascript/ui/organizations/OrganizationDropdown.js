@@ -67,10 +67,10 @@ class OrganizationDropdown extends React.Component {
 
   get menuItems() {
     return [
-      { name: 'People & Orgs', onClick: this.handleOrgPeople },
+      { name: 'People & Groups', onClick: this.handleOrgPeople },
       ...this.organizationItems,
-      { name: 'New Organization', onClick: this.handleNewOrg },
-      { name: 'Setings', onClick: this.handleOrgSettings },
+      { name: '+ New Organization', onClick: this.handleNewOrg },
+      { name: 'Settings', onClick: this.handleOrgSettings },
     ]
   }
 
