@@ -19,8 +19,7 @@
       "__js_test_config"
     ],
     "moduleNameMapper": {
-      "\\.(css)$": "<rootDir>/node_modules/jest-css-modules",
-      ".scss$": "SassStub.js"
+      ".+\\.(css|styl|less|sass|scss|png|jpg|ttf|woff|woff2)$": "identity-obj-proxy"
     },
     "testPathIgnorePatterns": [
       "/config/webpack/"

@@ -53,5 +53,6 @@ describe('Routes', () => {
     it('displays the TermsOfUseModal', () => {
       expect(wrapper.find('TermsOfUseModal').exists()).toBeTruthy()
     })
+
   })
 })
