@@ -13,6 +13,7 @@ describe('OrganizationDropdown', () => {
     const apiStore = fakeApiStore()
     otherFakeOrg = Object.assign({}, fakeOrganization, { id: 999, name: 'new' })
     apiStore.currentUser.current_organization = fakeOrganization
+    fakeOrganization.primary_group.currentUserCanEdit = true
     apiStore.currentUser.organizations = [
       fakeOrganization,
       otherFakeOrg,
@@ -56,6 +57,16 @@ describe('OrganizationDropdown', () => {
 
     it('should not add your current organization to list of items', () => {
       expect(component.menuItems.length).toEqual(4)
+    })
+
+    describe('if current user is not an org admin', () => {
+      beforeEach(() => {
+        fakeOrganization.primary_group.currentUserCanEdit = false
+      })
+
+      it('should not show the settings link', () => {
+        expect(component.menuItems.length).toEqual(3)
+      })
     })
   })
 })

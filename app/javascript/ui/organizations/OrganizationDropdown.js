@@ -51,7 +51,7 @@ class OrganizationDropdown extends React.Component {
   get organizationItems() {
     const { apiStore } = this.props
     return apiStore.currentUser.organizations
-      .filter(org => org.id !== apiStore.currentUser.current_organization.id)
+      .filter(org => org.id !== this.currentOrganization.id)
       .map(org => {
         const avatar = (
           <IconHolder>
@@ -72,13 +72,22 @@ class OrganizationDropdown extends React.Component {
       })
   }
 
+  get currentOrganization() {
+    // Alias to often used property
+    return this.props.apiStore.currentUser.current_organization
+  }
+
   get menuItems() {
-    return [
+    const userCanEdit = this.currentOrganization.primary_group.currentUserCanEdit
+    const items = [
       { name: 'People & Groups', onClick: this.handleOrgPeople },
       ...this.organizationItems,
       { name: '+ New Organization', onClick: this.handleNewOrg },
-      { name: 'Settings', onClick: this.handleOrgSettings },
     ]
+    if (userCanEdit) {
+      items.push({ name: 'Settings', onClick: this.handleOrgSettings })
+    }
+    return items
   }
 
   render() {
@@ -92,7 +101,7 @@ class OrganizationDropdown extends React.Component {
           menuOpen={this.props.open}
         />
         <OrganizationMenu
-          organization={apiStore.currentUser.current_organization}
+          organization={this.currentOrganization}
           userGroups={apiStore.currentUser.groups}
           initialPage={this.organizationPage}
           onClose={this.closeOrgMenu}
