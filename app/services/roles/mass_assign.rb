@@ -12,7 +12,7 @@ module Roles
                    propagate_to_children: false,
                    synchronous: false,
                    invited_by: nil,
-                   create_link: false)
+                   new_role: false)
       @object = object
       @role_name = role_name
       @users = users
@@ -20,7 +20,8 @@ module Roles
       @propagate_to_children = propagate_to_children
       @synchronous = synchronous
       @invited_by = invited_by
-      @create_link = create_link
+      # new role, as opposed to switching roles e.g. editor/viewer on the same object
+      @new_role = new_role
       @added_users = []
       @added_groups = []
       @failed_users = []
@@ -32,9 +33,9 @@ module Roles
     def call
       return false unless valid_object_and_role_name?
       assign_role_to_users
-      notify_users if @invited_by
+      notify_users if @invited_by && @new_role
       assign_role_to_groups
-      link_to_shared_collections if @create_link
+      link_to_shared_collections if @new_role
       add_roles_to_children if @propagate_to_children
       failed_users.blank? && failed_groups.blank?
     end

@@ -111,7 +111,7 @@ class OrganizationMenu extends React.Component {
       this.goBack()
     }, 500)
   }
-
+  
   removeGroup = async (group) => {
     try {
       const { apiStore } = this.props

@@ -21,7 +21,7 @@ class LinkToSharedCollectionsWorker
           collections = [shared]
         end
         # Check for already created links to not create doubles
-        collections.each do |collection|
+        collections.compact.each do |collection|
           unless collection.link_collection_cards.with_record(object).exists?
             create_link(object, collection)
           end
