@@ -24,7 +24,7 @@ class RolesMenu extends React.Component {
 
   componentDidMount() {
     const { apiStore, ownerType } = this.props
-    const organizationId = apiStore.currentUser.current_organization.id
+    const organizationId = apiStore.currentUserOrganizationId
     const req = (type) => this.props.apiStore.request(
       `organizations/${organizationId}/${type}`,
       'GET'
@@ -150,7 +150,7 @@ class RolesMenu extends React.Component {
     const sortedRoleEntities = roleEntities.sort(sortUserOrGroup)
     const roleTypes = ownerType === 'groups'
       ? ['member', 'admin']
-      : ['viewer', 'editor']
+      : ['editor', 'viewer']
 
     return (
       <div>

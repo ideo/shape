@@ -31,6 +31,9 @@ function shapecopydb {
       echo "Migrating development and test databases..." &&
       rake db:migrate &&
       rake db:test:prepare
+
+      echo "Searchkick reindexing..." &&
+      rake searchkick:reindex:all
       return 0
     else
       echo "Failed to drop local database."

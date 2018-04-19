@@ -1,5 +1,7 @@
 module Roles
   class MassAssign
+    include Roles::SharedMethods
+
     attr_reader :errors, :added_users, :added_groups,
                 :failed_users, :failed_groups
 
@@ -10,7 +12,7 @@ module Roles
                    propagate_to_children: false,
                    synchronous: false,
                    invited_by: nil,
-                   create_link: false)
+                   new_role: false)
       @object = object
       @role_name = role_name
       @users = users
@@ -18,7 +20,8 @@ module Roles
       @propagate_to_children = propagate_to_children
       @synchronous = synchronous
       @invited_by = invited_by
-      @create_link = create_link
+      # new role, as opposed to switching roles e.g. editor/viewer on the same object
+      @new_role = new_role
       @added_users = []
       @added_groups = []
       @failed_users = []
@@ -30,9 +33,9 @@ module Roles
     def call
       return false unless valid_object_and_role_name?
       assign_role_to_users
-      notify_users if @invited_by
+      notify_users if @invited_by && @new_role
       assign_role_to_groups
-      link_to_shared_collections if @create_link
+      link_to_shared_collections if @new_role
       add_roles_to_children if @propagate_to_children
       failed_users.blank? && failed_groups.blank?
     end
@@ -80,19 +83,10 @@ module Roles
     def link_to_shared_collections
       LinkToSharedCollectionsWorker.perform_async(
         shared_user_ids,
-        @object.id,
-        @object.class.name,
+        group_ids,
+        collections_to_link,
+        items_to_link,
       )
-    end
-
-    # NOTE: this method is duplicated w/ MassRemove
-    def shared_user_ids
-      groups = @groups.reject(&:primary?)
-      # @groups can be an array and not a relation, try to get user_ids via relation first
-      unless (group_user_ids = groups.try(:user_ids))
-        group_user_ids = Group.where(id: groups.pluck(:id)).user_ids
-      end
-      (group_user_ids + @users.map(&:id)).uniq
     end
 
     def notify_users

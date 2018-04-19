@@ -1,13 +1,14 @@
 require 'rails_helper'
 
 RSpec.describe Roles::MassRemove, type: :service do
-  let!(:collection) { create(:collection, num_cards: 5) }
+  let(:organization) { create(:organization) }
+  let(:collection) { create(:collection, num_cards: 5) }
   let!(:subcollection_card) do
     create(:collection_card_collection, parent: collection)
   end
   let(:subcollection) { subcollection_card.collection }
   let(:grandchildren) { create_list(:collection_card_text, 3, parent: subcollection) }
-  let(:users) { create_list(:user, 1) }
+  let(:users) { create_list(:user, 1, add_to_org: organization) }
   let(:groups) { create_list(:group, 1) }
   let(:role_name) { Role::EDITOR }
   let(:remove_from_children_sync) { true }
@@ -25,6 +26,7 @@ RSpec.describe Roles::MassRemove, type: :service do
 
   describe '#call' do
     let(:user) { users.first }
+    let(:groups) { create_list(:group, 1) }
     let(:group) { groups.first }
     let(:user_3) { create(:user) }
     let!(:role) { user.add_role(role_name, collection) }
@@ -68,21 +70,55 @@ RSpec.describe Roles::MassRemove, type: :service do
       it 'removes links from user collections' do
         expect(UnlinkFromSharedCollectionsWorker).to receive(:perform_async).with(
           [user.id] + group.roles.reduce([]) { |acc, role| acc + role.users },
-          collection.id,
-          collection.class.name,
+          groups.map(&:id),
+          [collection.id],
+          [],
         )
         mass_remove.call
       end
 
       context 'with a user and a group which contains the same user' do
-        let!(:users) { create_list(:user, 1) }
+        let!(:users) { create_list(:user, 1, add_to_org: organization) }
         let!(:groups) { [create(:group, add_members: [users.first])] }
 
         it 'should only pass unique ids to create links' do
           expect(UnlinkFromSharedCollectionsWorker).to receive(:perform_async).with(
             users.map(&:id),
-            collection.id,
-            collection.class.name,
+            groups.map(&:id),
+            [collection.id],
+            [],
+          )
+          mass_remove.call
+        end
+      end
+
+      context 'when the object is a group' do
+        let!(:organization) { create(:organization) }
+        let!(:role_name) { :admin }
+        let!(:user) { create(:user, add_to_org: organization) }
+        let!(:users) { [user] }
+        let!(:linked_collection) { create(:collection) }
+        let!(:object) { create(:group) }
+        let!(:link) { create(:collection_card_link,
+                             parent: object.current_shared_collection,
+                             collection: linked_collection)}
+        let(:mass_remove) do
+          Roles::MassRemove.new(
+            object: object,
+            role_name: role_name,
+            users: users,
+            groups: groups,
+            remove_from_children_sync: remove_from_children_sync,
+            remove_link: remove_link,
+          )
+        end
+
+        it 'should link all the groups shared collection cards' do
+          expect(UnlinkFromSharedCollectionsWorker).to receive(:perform_async).with(
+            users.map(&:id),
+            groups.map(&:id),
+            [linked_collection.id],
+            []
           )
           mass_remove.call
         end

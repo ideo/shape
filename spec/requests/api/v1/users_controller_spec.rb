@@ -8,6 +8,7 @@ describe Api::V1::UsersController, type: :request, json: true, auth: true do
     let!(:org_users) { create_list(:user, 3) }
     let!(:other_org) { create(:organization) }
     let!(:other_org_users) { create_list(:user, 3) }
+    let!(:pending_users) { create_list(:user, 3, :pending) }
     let(:path) { "/api/v1/organizations/#{organization.id}/users" }
 
     before do
@@ -21,74 +22,9 @@ describe Api::V1::UsersController, type: :request, json: true, auth: true do
       expect(response.status).to eq(200)
     end
 
-    it 'includes all users in the org' do
+    it 'includes all active users in the system, not including current user' do
       get(path)
-      expect(json_object_ids).to match_array(org_users.map(&:id))
-    end
-
-    context 'when added to content' do
-      let!(:collection_users) { create_list(:user, 2) }
-      let!(:collection_1) do
-        create(:collection,
-               organization: organization,
-               add_editors: [user],
-               add_viewers: [collection_users[0]])
-      end
-      let!(:collection_2) do
-        create(:collection,
-               organization: organization,
-               add_editors: [collection_users[1]],
-               add_viewers: [user])
-      end
-      let(:other_org_collection) do
-        create(:collection,
-               organization: other_org,
-               add_editors: [other_org_users[1]],
-               add_viewers: [user])
-      end
-
-      it 'includes all users also on that content' do
-        get(path)
-        expect(json_object_ids).to match_array((org_users + collection_users).map(&:id))
-      end
-
-      it 'does not include content that user belongs to in other org' do
-        expect(other_org_collection.can_view?(user)).to be true
-        get(path)
-        expect(json_object_ids).to match_array((org_users + collection_users).map(&:id))
-      end
-    end
-
-    context 'when added to groups' do
-      let!(:group_users) { create_list(:user, 2) }
-      let!(:group_1) do
-        create(:group,
-               organization: organization,
-               add_admins: [group_users[0]],
-               add_members: [user])
-      end
-      let!(:group_2) do
-        create(:group,
-               organization: organization,
-               add_admins: [user],
-               add_members: [group_users[1]])
-      end
-      let(:other_org_group) do
-        create(:group,
-               organization: other_org,
-               add_admins: [user, other_org_users[0]])
-      end
-
-      it 'includes all users also in those groups' do
-        get(path)
-        expect(json_object_ids).to match_array((org_users + group_users).map(&:id))
-      end
-
-      it 'does not include groups from another org that user belongs to' do
-        expect(other_org_group.can_view?(user)).to be true
-        get(path)
-        expect(json_object_ids).to match_array((org_users + group_users).map(&:id))
-      end
+      expect(json_object_ids).to match_array((org_users + other_org_users).map(&:id))
     end
   end
 

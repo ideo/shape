@@ -30,7 +30,7 @@ class Api::V1::RolesController < Api::V1::BaseController
       groups: groups,
       propagate_to_children: true,
       invited_by: current_user,
-      create_link: !json_api_params[:is_switching] && !record.is_a?(Group),
+      new_role: !json_api_params[:is_switching],
     )
     if assigner.call
       render jsonapi: record.roles.reload, include: %i[users groups resource]
