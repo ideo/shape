@@ -3,6 +3,7 @@ import PopoutMenu from '~/ui/global/PopoutMenu'
 import styled from 'styled-components'
 import { action, observable } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
+import { withRouter } from 'react-router-dom'
 import OrganizationMenu from '~/ui/organizations/OrganizationMenu'
 import Avatar from '~/ui/global/Avatar'
 
@@ -18,6 +19,7 @@ const IconHolder = styled.span`
 `
 IconHolder.displayName = 'StyledIconHolder'
 
+@withRouter
 @inject('apiStore')
 @observer
 class OrganizationDropdown extends React.Component {
@@ -44,8 +46,13 @@ class OrganizationDropdown extends React.Component {
     console.warn('unimplemented')
   }
 
-  handleOrgSettings= (ev) => {
+  handleOrgSettings = (ev) => {
     this.openOrgMenu('editOrganization')
+  }
+
+  handleLegal = (ev) => {
+    this.props.onItemClick()
+    this.props.history.push('/terms')
   }
 
   get organizationItems() {
@@ -71,6 +78,7 @@ class OrganizationDropdown extends React.Component {
       ...this.organizationItems,
       { name: 'New Organization', onClick: this.handleNewOrg },
       { name: 'Setings', onClick: this.handleOrgSettings },
+      { name: 'Legal', onClick: this.handleLegal },
     ]
   }
 
@@ -99,6 +107,9 @@ class OrganizationDropdown extends React.Component {
 OrganizationDropdown.propTypes = {
   open: PropTypes.bool,
   onItemClick: PropTypes.func.isRequired,
+  history: PropTypes.shape({
+    push: PropTypes.func,
+  }).isRequired
 }
 OrganizationDropdown.wrappedComponent.propTypes = {
   apiStore: MobxPropTypes.objectOrObservableObject.isRequired,

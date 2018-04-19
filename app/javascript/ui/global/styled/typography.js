@@ -43,6 +43,15 @@ export const DisplayText = styled.span`
 `
 DisplayText.displayName = 'StyledDisplayText'
 
+export const DisplayLink = styled.a`
+  color: ${v.colors.gray};
+  font-weight: ${v.weights.book};
+  font-family: ${v.fonts.sans};
+  font-size: 1rem;
+  color: black;
+`
+DisplayLink.displayName = 'StyledDisplayLink'
+
 export const ConfirmText = styled.span`
   font-weight: ${v.weights.book};
   font-family: ${v.fonts.sans};
@@ -53,7 +62,6 @@ export const SubText = styled.span`
   vertical-align: super;
   font-family: ${v.fonts.serif};
   font-size: 0.75rem;
-  color: ${v.colors.gray};
 `
 SubText.displayName = 'StyledSubText'
 

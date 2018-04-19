@@ -15,10 +15,12 @@ describe('OrganizationDropdown', () => {
     apiStore.currentUser.organizations = [
       fakeOrganization,
     ]
+    const history = { push: jest.fn() }
     props = {
       open: true,
       onItemClick: jest.fn(),
       apiStore,
+      history,
     }
     wrapper = shallow(
       <OrganizationDropdown.wrappedComponent {...props} />
@@ -50,6 +52,20 @@ describe('OrganizationDropdown', () => {
     it('should add organizations to the list of items', () => {
       expect(component.menuItems[1].name).toEqual(fakeOrganization.name)
       expect(component.menuItems[1].iconLeft).toBeTruthy()
+    })
+  })
+
+  describe('handleLegal', () => {
+    beforeEach(() => {
+      component.handleLegal()
+    })
+
+    it('should call the on item click handler', () => {
+      expect(props.onItemClick).toHaveBeenCalled()
+    })
+
+    it('should push a terms path to router history', () => {
+      expect(props.history.push).toHaveBeenCalled()
     })
   })
 })
