@@ -10,13 +10,13 @@ const card = fakeCollectionCard
 const uiStore = { ...fakeUiStore, viewingCollection: fakeCollection }
 const props = {
   card,
-  uiStore, // NOTE: uiStore doesn't work this way, since CardMenu imports rather than injects
+  uiStore,
   canEdit: false,
   canReplace: false,
   menuOpen: false,
 }
 
-let wrapper, allActions, actions
+let wrapper, allActions, actions, component
 describe('CardMenu', () => {
   describe('as editor', () => {
     beforeEach(() => {
@@ -24,14 +24,16 @@ describe('CardMenu', () => {
         'Duplicate',
         'Move',
         'Link',
+        'Add to My Collection',
         'Archive',
         'Replace',
       ]
       actions = _.without(allActions, 'Replace')
       props.canEdit = true
       wrapper = shallow(
-        <CardMenu {...props} />
+        <CardMenu.wrappedComponent {...props} />
       )
+      component = wrapper.instance()
     })
 
     it('creates a PopoutMenu with all editable actions', () => {
@@ -43,7 +45,7 @@ describe('CardMenu', () => {
     it('creates a PopoutMenu with editable actions including replace if canReplace', () => {
       props.canReplace = true
       wrapper = shallow(
-        <CardMenu {...props} />
+        <CardMenu.wrappedComponent {...props} />
       )
       const popout = wrapper.find('PopoutMenu').at(0)
       expect(popout.props().menuItems.length).toEqual(allActions.length)
@@ -67,19 +69,38 @@ describe('CardMenu', () => {
     // })
   })
 
+  describe('addToMyCollection', () => {
+    beforeEach(async () => {
+      component.toggleDisable = jest.fn()
+      await component.addToMyCollection()
+    })
+
+    it('should close the move menu', () => {
+      expect(props.uiStore.closeMoveMenu).toHaveBeenCalled()
+    })
+
+    it('should disable then re-enable the menu', () => {
+      expect(component.toggleDisable).toHaveBeenCalled()
+    })
+
+    it('should call the API to link to my collection', () => {
+      expect(card.API_linkToMyCollection).toHaveBeenCalled()
+    })
+  })
+
   describe('as viewer', () => {
     beforeEach(() => {
-      actions = ['Duplicate', 'Link']
+      actions = ['Duplicate', 'Link', 'Add to My Collection']
       props.canEdit = false
       props.canReplace = false
       wrapper = shallow(
-        <CardMenu {...props} />
+        <CardMenu.wrappedComponent {...props} />
       )
     })
 
     it('creates a PopoutMenu with Duplicate and Link viewer actions', () => {
       const popout = wrapper.find('PopoutMenu').at(0)
-      expect(popout.props().menuItems.length).toEqual(2)
+      expect(popout.props().menuItems.length).toEqual(3)
       expect(_.map(popout.props().menuItems, i => i.name)).toEqual(actions)
     })
   })

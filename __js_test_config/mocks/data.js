@@ -53,6 +53,7 @@ export const fakeItemCard = {
   item: fakeTextItem,
   API_create: jest.fn(),
   API_archive: jest.fn(),
+  API_linkToMyCollection: jest.fn(),
 }
 export const fakeCollectionCard = {
   id: 11,
@@ -67,6 +68,7 @@ export const fakeCollectionCard = {
   API_create: jest.fn(),
   API_archive: jest.fn(),
   API_duplicate: jest.fn(),
+  API_linkToMyCollection: jest.fn(),
 }
 
 const fakeCards = [

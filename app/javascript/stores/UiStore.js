@@ -12,6 +12,7 @@ export default class UiStore {
     replacingId: null,
   }
   @observable openCardMenuId = false
+  @observable disableCardMenuId = false
   @observable organizationMenuOpen = false
   @observable rolesMenuOpen = false
   @observable isTouchDevice = (

@@ -63,6 +63,7 @@ export const StyledMenuItem = styled.li`
     line-height: 2.5rem;
     text-transform: uppercase;
     position: relative;
+    opacity: ${props => (props.disabled ? 0.5 : 1)};
     border-left: 7px solid transparent;
     font-family: ${v.fonts.sans};
     font-weight: 300;
@@ -94,9 +95,9 @@ class PopoutMenu extends React.PureComponent {
     return this.props.menuItems.map(item => {
       const { name, icon, onClick } = item
       return (
-        <StyledMenuItem key={name}>
+        <StyledMenuItem key={name} disabled={this.props.disabled}>
           <button
-            onClick={onClick}
+            onClick={this.props.disabled ? () => {} : onClick}
             className={`menu-${name.toLowerCase()}`}
           >
             {name}
@@ -111,6 +112,7 @@ class PopoutMenu extends React.PureComponent {
     const {
       className,
       menuOpen,
+      disabled,
       onMouseLeave,
       onClick,
       width,
@@ -148,6 +150,7 @@ PopoutMenu.propTypes = {
     icon: PropTypes.element,
     onClick: PropTypes.func,
   })).isRequired,
+  disabled: PropTypes.bool,
 }
 
 PopoutMenu.defaultProps = {
@@ -155,6 +158,7 @@ PopoutMenu.defaultProps = {
   onClick: () => null,
   className: '',
   menuOpen: false,
+  disabled: false,
   width: 200,
 }
 
