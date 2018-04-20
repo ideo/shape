@@ -25,6 +25,7 @@ const fakeApiStore = ({ findResult = '', findAllResult = [], requestResult = '' 
       name: 'Johnny Appleseed',
       pic_url_square: 'https://s3.amazonaws.com/pic.png',
       groups: [],
+      terms_accepted: true,
     },
     collections: [],
     items: [],

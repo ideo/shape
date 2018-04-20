@@ -26,6 +26,10 @@ class RoutingStore extends RouterStore {
     const path = this.pathTo(type, id)
     this.push(path)
   }
+
+  pathContains = (str) => (
+    this.location.pathname.indexOf(str) > -1
+  )
 }
 
 export default RoutingStore

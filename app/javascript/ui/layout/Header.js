@@ -148,7 +148,7 @@ class Header extends React.Component {
               </StyledAvatarAndDropdown>
               <StyledAvatarAndDropdown>
                 {this.renderUserDropdown}
-                <button  className="userBtn" onClick={this.handleUserClick(true)}>
+                <button className="userBtn" onClick={this.handleUserClick(true)}>
                   <Avatar
                     title={currentUser.name}
                     url={currentUser.pic_url_square}

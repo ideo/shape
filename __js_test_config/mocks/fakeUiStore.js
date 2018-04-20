@@ -41,6 +41,8 @@ const fakeUiStore = {
   confirm: jest.fn(),
   closeDialog: jest.fn(),
   cardAction: 'move',
+  blurContent: false,
+  organizationMenuPage: 'organizationMenuPage',
 }
 
 export default fakeUiStore

@@ -1,7 +1,6 @@
 import PropTypes from 'prop-types'
 import PopoutMenu from '~/ui/global/PopoutMenu'
 import styled from 'styled-components'
-import { action, observable } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import OrganizationMenu from '~/ui/organizations/OrganizationMenu'
 import Avatar from '~/ui/global/Avatar'
@@ -18,18 +17,17 @@ const IconHolder = styled.span`
 `
 IconHolder.displayName = 'StyledIconHolder'
 
-@inject('apiStore')
+@inject('apiStore', 'uiStore')
 @observer
 class OrganizationDropdown extends React.Component {
-  @observable organizationPage = null
-
-  @action openOrgMenu(page = OrganizationMenu.defaultProps.initialPage) {
+  openOrgMenu = (page = 'organizationPeople') => {
+    this.props.uiStore.update('organizationMenuPage', page)
+    // then close dropdown
     this.props.onItemClick()
-    this.organizationPage = page
   }
 
-  @action closeOrgMenu = () => {
-    this.organizationPage = null
+  closeOrgMenu = () => {
+    this.props.uiStore.update('organizationMenuPage', null)
   }
 
   handleOrgPeople = (ev) => {
@@ -44,7 +42,7 @@ class OrganizationDropdown extends React.Component {
     console.warn('unimplemented')
   }
 
-  handleOrgSettings= (ev) => {
+  handleOrgSettings = (ev) => {
     this.openOrgMenu('editOrganization')
   }
 
@@ -91,7 +89,7 @@ class OrganizationDropdown extends React.Component {
   }
 
   render() {
-    const { apiStore } = this.props
+    const { apiStore, uiStore } = this.props
     return (
       <div>
         <PopoutMenu
@@ -103,9 +101,8 @@ class OrganizationDropdown extends React.Component {
         <OrganizationMenu
           organization={this.currentOrganization}
           userGroups={apiStore.currentUser.groups}
-          initialPage={this.organizationPage}
           onClose={this.closeOrgMenu}
-          open={!!this.organizationPage}
+          open={uiStore.organizationMenuOpen}
         />
       </div>
     )
@@ -118,6 +115,7 @@ OrganizationDropdown.propTypes = {
 }
 OrganizationDropdown.wrappedComponent.propTypes = {
   apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
+  uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 OrganizationDropdown.defaultProps = {
   open: false,

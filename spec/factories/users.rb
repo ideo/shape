@@ -10,6 +10,8 @@ FactoryBot.define do
     uid { SecureRandom.hex(15) }
     provider 'okta'
     pic_url_square 'https://a3-images.myspacecdn.com/images03/1/240e42b5d9ce48a78983961e7fcb3c39/600x600.jpg'
+    terms_accepted true
+    status User.statuses[:active]
 
     after(:build) do |user|
       user.password = Devise.friendly_token(40)
@@ -23,7 +25,7 @@ FactoryBot.define do
     end
 
     trait :pending do
-      status :pending
+      status User.statuses[:pending]
       invitation_token { Devise.friendly_token(40) }
       provider nil
       uid nil

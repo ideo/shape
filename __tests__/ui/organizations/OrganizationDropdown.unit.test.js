@@ -3,7 +3,7 @@ import OrganizationDropdown from '~/ui/organizations/OrganizationDropdown'
 import {
   fakeOrganization,
 } from '#/mocks/data'
-
+import fakeUiStore from '#/mocks/fakeUiStore'
 import fakeApiStore from '#/mocks/fakeApiStore'
 
 describe('OrganizationDropdown', () => {
@@ -22,6 +22,7 @@ describe('OrganizationDropdown', () => {
       open: true,
       onItemClick: jest.fn(),
       apiStore,
+      uiStore: fakeUiStore,
     }
     wrapper = shallow(
       <OrganizationDropdown.wrappedComponent {...props} />
@@ -45,7 +46,7 @@ describe('OrganizationDropdown', () => {
     })
 
     it('sets organization page to passed in page name', () => {
-      expect(component.organizationPage).toEqual('organizationPeople')
+      expect(props.uiStore.update).toHaveBeenCalledWith('organizationMenuPage', 'organizationPeople')
     })
   })
 

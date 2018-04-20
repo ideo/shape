@@ -95,7 +95,7 @@ class PopoutMenu extends React.PureComponent {
     return this.props.menuItems.map(item => {
       const { name, iconLeft, iconRight, onClick } = item
       return (
-        <StyledMenuItem key={name} {...item}>
+        <StyledMenuItem key={name} noBorder={item.noBorder}>
           <button
             onClick={onClick}
             className={`menu-${name.toLowerCase()}`}

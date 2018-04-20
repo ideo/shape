@@ -9,7 +9,7 @@ export const Heading1 = styled.h1`
   color: black;
   margin-bottom: 0.5rem;
   margin-top: 0.5rem;
-  white-space: nowrap; /* better this way for responsive? */
+  white-space: ${props => (props.wrap ? 'normal' : 'nowrap')}; /* better this way for responsive? */
 
   @media only screen and (max-width: ${v.responsive.smallBreakpoint}px) {
     font-size: 1.5rem;
@@ -56,3 +56,12 @@ export const SubText = styled.span`
   color: ${v.colors.gray};
 `
 SubText.displayName = 'StyledSubText'
+
+export const Anchor = styled.a`
+  color: ${v.colors.blue};
+  text-decoration: none;
+  &:hover {
+    text-decoration: underline;
+  }
+`
+Anchor.displayName = 'StyledAnchor'
