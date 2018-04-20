@@ -7,7 +7,7 @@ class Api::V1::SearchController < Api::V1::BaseController
         total: results.total_count,
         size: results.size,
       },
-      jsonapi: results,
+      jsonapi: results, include: [:parent_collection_card]
     )
   end
 

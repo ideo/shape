@@ -7,11 +7,15 @@ import InfiniteScroll from 'react-infinite-scroller'
 import FlipMove from 'react-flip-move'
 import VisibilitySensor from 'react-visibility-sensor'
 
+import { apiStore, uiStore } from '~/stores'
 import v from '~/utils/variables'
 import Breadcrumb from '~/ui/layout/Breadcrumb'
 import Loader from '~/ui/layout/Loader'
+import CardMenu from '~/ui/grid/CardMenu'
+import SelectionCircle from '~/ui/grid/SelectionCircle'
 import CollectionCover from '~/ui/grid/covers/CollectionCover'
 import CollectionIcon from '~/ui/icons/CollectionIcon'
+import CollectionCard from '~/stores/jsonApi/CollectionCard'
 import { StyledTopRightActions, StyledBottomLeftIcon } from '~/ui/grid/GridCard'
 
 const StyledSearchResult = styled.div`
@@ -102,7 +106,10 @@ class SearchResultsInfinite extends React.Component {
     } = this.props
 
     const results = (
-      searchResults.map((collection, i) => (
+      searchResults.map((collection, i) => {
+        const card = new CollectionCard(collection.parent_collection_card, apiStore)
+        console.log(card)
+        return (
         <FlipMove
           appearAnimation="fade"
           key={collection.id}
@@ -130,7 +137,14 @@ class SearchResultsInfinite extends React.Component {
                 // onFocus={this.handleMouseOver(i + 1)}
               >
                 <StyledTopRightActions className="show-on-hover">
-                  {/* NOTE: once linking is enabled, should setup CardMenu here */}
+                  <SelectionCircle cardId={card.id} />
+                  <CardMenu
+                    className="show-on-hover card-menu"
+                    card={card}
+                    canEdit={false}
+                    canReplace={false}
+                    menuOpen={uiStore.openCardMenuId === card.id}
+                  />
                 </StyledTopRightActions>
                 <StyledBottomLeftIcon>
                   <CollectionIcon />
@@ -144,8 +158,8 @@ class SearchResultsInfinite extends React.Component {
             </div>
           </VisibilitySensor>
         </FlipMove>
-      ))
-    )
+        )
+    }))
     return (
       <Fragment>
         <StyledScrollIndicator active={this.hovering}>
