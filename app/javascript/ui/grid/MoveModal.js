@@ -55,7 +55,8 @@ class MoveModal extends React.Component {
     const { uiStore } = this.props
     uiStore.closeMoveMenu()
     // Notify the user if they're on a different collection
-    if (uiStore.movingFromCollectionId !== uiStore.viewingCollection.id) {
+    if (uiStore.viewingCollection &&
+        uiStore.movingFromCollectionId !== uiStore.viewingCollection.id) {
       if (uiStore.cardAction === 'move') {
         uiStore.alert({
           prompt: 'Your items have been returned to their original location',
@@ -67,6 +68,13 @@ class MoveModal extends React.Component {
 
   moveCards = async (placement) => {
     const { uiStore, apiStore } = this.props
+    // Viewing collection might not be set, such as on the search page
+    if (!uiStore.viewingCollection) {
+      uiStore.alert({
+        prompt: 'You can\'t move an item here',
+      })
+      return
+    }
     const collectionId = uiStore.viewingCollection.id
     if (!uiStore.viewingCollection.can_edit) {
       uiStore.alert({
@@ -87,6 +95,7 @@ class MoveModal extends React.Component {
         await apiStore.request('collection_cards/link', 'POST', data)
       }
       uiStore.resetSelectionAndBCT()
+      uiStore.closeMoveMenu()
       if (placement === 'beginning') {
         uiStore.scroll.scrollToTop()
       } else {

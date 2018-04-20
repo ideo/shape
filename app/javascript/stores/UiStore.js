@@ -134,7 +134,7 @@ export default class UiStore {
 
   @action resetSelectionAndBCT() {
     this.deselectCards()
-    this.closeMoveMenu()
+    // this.closeMoveMenu()
     this.closeBlankContentTool()
   }
 

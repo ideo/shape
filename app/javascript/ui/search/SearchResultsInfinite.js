@@ -21,7 +21,7 @@ import { StyledTopRightActions, StyledBottomLeftIcon } from '~/ui/grid/GridCard'
 const StyledSearchResult = styled.div`
   height: ${props => props.gridH}px;
   max-width: ${props => props.gridMaxW}px;
-  background: white;
+  background: transparent;
   margin-bottom: ${props => props.gutter}px;
   position: relative;
   cursor: pointer;
@@ -108,58 +108,58 @@ class SearchResultsInfinite extends React.Component {
     const results = (
       searchResults.map((collection, i) => {
         const card = new CollectionCard(collection.parent_collection_card, apiStore)
-        console.log(card)
         return (
-        <FlipMove
-          appearAnimation="fade"
-          key={collection.id}
-        >
-          <VisibilitySensor
-            // minTopValue={1} // consider visible even if we only see top 25px
-            partialVisibility
-            scrollCheck
-            intervalDelay={300}
-            onChange={this.handleVisibilityChange(i + 1)}
-            offset={{
-              top: v.headerHeightCompact + (gridSettings.gridH / 2),
-            }}
+          <FlipMove
+            appearAnimation="fade"
+            key={collection.id}
           >
-            <div>
-              <StyledBreadcrumb>
-                <Breadcrumb items={collection.breadcrumb} />
-              </StyledBreadcrumb>
-              <StyledSearchResult
-                {...gridSettings}
-                gridMaxW={gridMaxW}
-                onClick={this.routeToCollection(collection.id)}
-                onMouseEnter={this.handleMouseOver(i + 1)}
-                onMouseLeave={this.handleMouseOver(i + 1, false)}
-                // onFocus={this.handleMouseOver(i + 1)}
-              >
-                <StyledTopRightActions className="show-on-hover">
-                  <SelectionCircle cardId={card.id} />
-                  <CardMenu
-                    className="show-on-hover card-menu"
-                    card={card}
-                    canEdit={false}
-                    canReplace={false}
-                    menuOpen={uiStore.openCardMenuId === card.id}
-                  />
-                </StyledTopRightActions>
-                <StyledBottomLeftIcon>
-                  <CollectionIcon />
-                </StyledBottomLeftIcon>
-                <CollectionCover
-                  collection={collection}
-                  width={gridSettings.cols}
-                  height={1}
-                />
-              </StyledSearchResult>
-            </div>
-          </VisibilitySensor>
-        </FlipMove>
+            <VisibilitySensor
+              // minTopValue={1} // consider visible even if we only see top 25px
+              partialVisibility
+              scrollCheck
+              intervalDelay={300}
+              onChange={this.handleVisibilityChange(i + 1)}
+              offset={{
+                top: v.headerHeightCompact + (gridSettings.gridH / 2),
+              }}
+            >
+              <div>
+                <StyledBreadcrumb>
+                  <Breadcrumb items={collection.breadcrumb} />
+                </StyledBreadcrumb>
+                <StyledSearchResult
+                  {...gridSettings}
+                  gridMaxW={gridMaxW}
+                  onMouseEnter={this.handleMouseOver(i + 1)}
+                  onMouseLeave={this.handleMouseOver(i + 1, false)}
+                  // onFocus={this.handleMouseOver(i + 1)}
+                >
+                  <StyledTopRightActions className="show-on-hover">
+                    <SelectionCircle cardId={card.id} />
+                    <CardMenu
+                      className="show-on-hover card-menu"
+                      card={card}
+                      canEdit={false}
+                      canReplace={false}
+                      menuOpen={uiStore.openCardMenuId === card.id}
+                    />
+                  </StyledTopRightActions>
+                  <StyledBottomLeftIcon>
+                    <CollectionIcon />
+                  </StyledBottomLeftIcon>
+                  <a onClick={this.routeToCollection(collection.id)}>
+                    <CollectionCover
+                      collection={collection}
+                      width={gridSettings.cols}
+                      height={1}
+                    />
+                  </a>
+                </StyledSearchResult>
+              </div>
+            </VisibilitySensor>
+          </FlipMove>
         )
-    }))
+      }))
     return (
       <Fragment>
         <StyledScrollIndicator active={this.hovering}>

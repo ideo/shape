@@ -46,9 +46,12 @@ class CollectionCard extends BaseRecord {
   }
 
   async API_linkToMyCollection() {
+    const viewingCollectionId = uiStore.viewingCollection
+      ? uiStore.viewingCollection.id
+      : this.parent_id
     const data = {
       to_id: this.apiStore.currentUser.current_user_collection_id,
-      from_id: uiStore.viewingCollection.id,
+      from_id: viewingCollectionId,
       collection_card_ids: [this.id],
       placement: 'end',
     }
