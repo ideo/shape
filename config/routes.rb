@@ -62,6 +62,7 @@ Rails.application.routes.draw do
           get 'me'
           get 'search'
           post 'create_from_emails'
+          post 'accept_terms'
         end
         resources :roles, only: %i[destroy]
       end

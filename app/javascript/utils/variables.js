@@ -24,10 +24,12 @@ export default {
     cararra: '#f2f1ee',
     desert: '#f5f4f3',
     cyan: '#c0dbde',
+    blue: '#00a0e0',
     gray: '#c6c1bf',
     cloudy: '#a89f9b',
     sirocco: '#697c7e',
     blackLava: '#120f0e',
+    error: '#d66742',
   },
 
   iconSizes: {

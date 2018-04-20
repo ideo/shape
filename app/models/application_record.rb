@@ -8,4 +8,9 @@ class ApplicationRecord < ActiveRecord::Base
       (updated_at || created_at).to_i,
     ].compact.join('_')
   end
+
+  # default to false, can be overridden by classes
+  def searchable?
+    false
+  end
 end
