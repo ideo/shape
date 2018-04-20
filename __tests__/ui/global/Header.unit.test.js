@@ -23,6 +23,7 @@ describe('Header', () => {
 
   it('renders the logo', () => {
     expect(wrapper.find('Logo').exists()).toBe(true)
+
   })
 
   it('renders the search bar', () => {
@@ -52,7 +53,7 @@ describe('Header', () => {
     let settings, logout
 
     beforeEach(() => {
-      wrapper.find('StyledUserAndMenu').simulate('click')
+      wrapper.find('.userBtn').first().simulate('click')
       const menuProps = wrapper.find('PopoutMenu').props()
       settings = menuProps.menuItems.find(item => item.name === 'Account Settings')
       logout = menuProps.menuItems.find(item => item.name === 'Logout')

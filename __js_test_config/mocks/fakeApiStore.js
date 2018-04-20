@@ -21,6 +21,7 @@ const fakeApiStore = ({ findResult = '', findAllResult = [], requestResult = '' 
       current_organization: {
         name: 'test org'
       },
+      organizations: [{ name: 'test org 1', filestack_file_url: 'test.jpg' }],
       name: 'Johnny Appleseed',
       pic_url_square: 'https://s3.amazonaws.com/pic.png',
       groups: [],

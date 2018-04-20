@@ -12,7 +12,7 @@ export default class UiStore {
     replacingId: null,
   }
   @observable openCardMenuId = false
-  @observable organizationMenuOpen = false
+  @observable organizationMenuPage = null
   @observable rolesMenuOpen = false
   @observable isTouchDevice = (
     // https://hacks.mozilla.org/2013/04/detecting-touch-its-the-why-not-the-how/
@@ -90,6 +90,12 @@ export default class UiStore {
     this.movingCardIds.replace([])
     this.movingFromCollectionId = null
     this.deselectCards()
+  }
+
+  // NOTE: because we aren't tracking a difference between "closed" and null,
+  // OrgMenu will always default back to "People & Groups" while in the process of closing/fading
+  @computed get organizationMenuOpen() {
+    return !!this.organizationMenuPage
   }
 
   // --- grid properties

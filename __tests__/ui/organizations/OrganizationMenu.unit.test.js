@@ -16,6 +16,8 @@ describe('OrganizationMenu', () => {
     props = {
       apiStore: fakeApiStore(),
       uiStore: fakeUiStore,
+      open: true,
+      onClose: jest.fn(),
       organization: {
         name: 'Space',
         primary_group: {
@@ -35,33 +37,32 @@ describe('OrganizationMenu', () => {
     component = wrapper.instance()
   })
 
-  it('closes the organization menu in the UI store when exited', () => {
+  it('closes the organization menu when exited', () => {
     component.handleClose()
-    expect(props.uiStore.update).toHaveBeenCalledWith('organizationMenuOpen', false)
-    expect(component.editOrganizationOpen).toBeFalsy()
-    expect(component.modifyGroupOpen).toBeFalsy()
+    expect(props.onClose).toHaveBeenCalled()
     expect(component.isLoading).toBeFalsy()
+    expect(component.editGroup).toEqual({})
   })
 
-  it('closes the edit menu when changes are save in the UI store', () => {
+  it('closes the edit menu when changes are saved', () => {
     component.onOrganizationSave()
-    expect(props.uiStore.update).toHaveBeenCalledWith('organizationMenuOpen', false)
+    expect(props.uiStore.update).toHaveBeenCalledWith('organizationMenuPage', 'organizationPeople')
   })
 
   it('opens the organization edit menu when you click on the org name', () => {
-    wrapper.find('.orgEdit').simulate('click')
-    expect(component.modifyGroupRoles).toBeTruthy()
+    component.goToEditGroupRoles(props.organization.primary_group)
+    expect(props.uiStore.update).toHaveBeenCalledWith('organizationMenuPage', 'editRoles')
     expect(component.editGroup).toEqual(props.organization.primary_group)
   })
 
   it('opens the group edit menu when you click on any group name', () => {
-    wrapper.find('.groupEdit').first().simulate('click')
+    component.goToEditGroup(props.userGroups[0])
     expect(component.editGroup).toEqual(props.userGroups[0])
   })
 
   it('opens the group add menu when you click on the new group button', () => {
-    component.handleGroupAddClick()
-    expect(component.modifyGroupOpen).toBeTruthy()
+    component.goToAddGroup()
+    expect(props.uiStore.update).toHaveBeenCalledWith('organizationMenuPage', 'editGroup')
     expect(component.editGroup).toEqual({})
   })
 
@@ -114,7 +115,7 @@ describe('OrganizationMenu', () => {
       })
 
       it('should modify the group roles after synced', () => {
-        expect(component.modifyGroupRoles).toBeTruthy()
+        expect(props.uiStore.update).toHaveBeenCalledWith('organizationMenuPage', 'editRoles')
       })
     })
   })

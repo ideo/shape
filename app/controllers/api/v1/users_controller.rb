@@ -12,12 +12,12 @@ class Api::V1::UsersController < Api::V1::BaseController
 
   def show
     render jsonapi: @user, include:
-      [:groups, current_organization: [:primary_group]]
+      [:groups, :organizations, current_organization: [:primary_group]]
   end
 
   def me
     render jsonapi: current_user, include:
-      [:groups, current_organization: [:primary_group]]
+      [:groups, organizations: [:primary_group], current_organization: [:primary_group]]
   end
 
   def search

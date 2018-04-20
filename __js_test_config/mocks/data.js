@@ -94,9 +94,23 @@ export const fakeCollection = {
   cardIds: _.map(fakeCards, c => c.id),
   API_archive: jest.fn(),
 }
+export const fakeGroupAttrs = {
+  id: 1,
+  name: 'IDEO Products',
+  handle: 'ideo-products',
+  filestack_file_url: 'https://cdn.filestackcontent.com/i4iKADquTQCWMAvyz02R',
+  roles: [],
+  currentUserCanEdit: true,
+}
+export const fakeGroup = {
+  ...fakeGroupAttrs,
+  rawAttributes: jest.fn().mockReturnValue(fakeGroupAttrs),
+  getRecordType: jest.fn().mockReturnValue('groups'),
+}
 export const fakeOrganizationAttrs = {
   id: 1,
   name: 'TestOrg',
+  primary_group: fakeGroup,
 }
 export const fakeOrganization = {
   ...fakeOrganizationAttrs,
@@ -143,16 +157,4 @@ export const fakePosition = {
   yPos: 0,
   height: 1,
   width: 1,
-}
-export const fakeGroupAttrs = {
-  id: 1,
-  name: 'IDEO Products',
-  handle: 'ideo-products',
-  filestack_file_url: 'https://cdn.filestackcontent.com/i4iKADquTQCWMAvyz02R',
-  roles: [],
-}
-export const fakeGroup = {
-  ...fakeGroupAttrs,
-  rawAttributes: jest.fn().mockReturnValue(fakeGroupAttrs),
-  getRecordType: jest.fn().mockReturnValue('groups'),
 }

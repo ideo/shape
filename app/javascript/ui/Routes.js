@@ -8,7 +8,6 @@ import ItemPage from '~/ui/pages/ItemPage'
 import SearchPage from '~/ui/pages/SearchPage'
 import TermsPage from '~/ui/pages/TermsPage'
 import TermsOfUseModal from '~/ui/users/TermsOfUseModal'
-import OrganizationMenu from '~/ui/organizations/OrganizationMenu'
 import Loader from '~/ui/layout/Loader'
 import WindowSizeListener from 'react-window-size-listener'
 
@@ -53,10 +52,6 @@ class Routes extends React.Component {
       <AppWrapper blur={displayTermsPopup}>
         {/* Global components are rendered here */}
         <WindowSizeListener onResize={this.handleWindowResize} />
-        <OrganizationMenu
-          organization={apiStore.currentUser.current_organization}
-          userGroups={apiStore.currentUser.groups}
-        />
         <DialogWrapper />
         {displayTermsPopup &&
           <TermsOfUseModal currentUser={apiStore.currentUser} />
