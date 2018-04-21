@@ -82,6 +82,7 @@ class MovableGridCard extends React.PureComponent {
     }
     if (!this.state.dragging) {
       uiStore.resetSelectionAndBCT()
+      uiStore.closeMoveMenu()
       this.setState({
         dragging: true,
         moveComplete: false,
@@ -111,6 +112,7 @@ class MovableGridCard extends React.PureComponent {
     if (!this.state.resizing) {
       this.setState({ resizing: true, moveComplete: false })
       uiStore.resetSelectionAndBCT()
+      uiStore.closeMoveMenu()
     }
     const { gridW, gridH, cols } = uiStore.gridSettings
     const { card } = this.props

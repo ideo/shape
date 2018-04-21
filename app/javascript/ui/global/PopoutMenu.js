@@ -98,7 +98,7 @@ class PopoutMenu extends React.PureComponent {
       return (
         <StyledMenuItem key={name} noBorder={item.noBorder} loading={loading}>
           <button
-            onClick={this.props.loading ? () => {} : onClick}
+            onClick={loading ? () => null : onClick}
             className={`menu-${name.toLowerCase()}`}
           >
             {iconLeft}
