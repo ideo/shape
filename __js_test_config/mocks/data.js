@@ -92,7 +92,7 @@ export const fakeCollection = {
     name: 'Proto-typo',
   },
   collection_cards: fakeCards,
-  parent_collection_card: fakeCollectionCard,
+  parent: fakeCollectionCard,
   // This is a computed property on the collection store
   cardIds: _.map(fakeCards, c => c.id),
   API_archive: jest.fn(),

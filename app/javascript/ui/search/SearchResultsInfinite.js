@@ -51,6 +51,7 @@ const StyledScrollIndicator = styled.div`
 const StyledLink = styled.a`
   text-decoration: none;
 `
+StyledLink.displayName = 'StyledLink'
 
 @observer
 class SearchResultsInfinite extends React.Component {
@@ -111,7 +112,7 @@ class SearchResultsInfinite extends React.Component {
 
     const results = (
       searchResults.map((collection, i) => {
-        const card = new CollectionCard(collection.parent_collection_card, apiStore)
+        const card = new CollectionCard(collection.parent, apiStore)
         return (
           <FlipMove
             appearAnimation="fade"
