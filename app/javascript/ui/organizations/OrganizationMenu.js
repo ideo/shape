@@ -7,17 +7,9 @@ import RolesMenu from '~/ui/roles/RolesMenu'
 import Loader from '~/ui/layout/Loader'
 import OrganizationPeople from '~/ui/organizations/OrganizationPeople'
 
-const PAGES = [
-  'organizationPeople',
-  'editOrganization',
-  'editGroup',
-  'editRoles',
-]
-
 @inject('apiStore', 'uiStore')
 @observer
 class OrganizationMenu extends React.Component {
-  @observable currentPage = OrganizationMenu.defaultProps.initialPage
   @observable editGroup = {}
   @observable isLoading = false
 
@@ -32,17 +24,17 @@ class OrganizationMenu extends React.Component {
       .catch((err) => console.warn(err))
   }
 
-  componentWillReceiveProps(nextProps) {
-    this.changePage(nextProps.initialPage)
-  }
-
   fetchRoles = (group) => {
     const { apiStore } = this.props
     return apiStore.request(`groups/${group.id}/roles`, 'GET')
   }
 
-  @action changePage(page) {
-    this.currentPage = page
+  get currentPage() {
+    return this.props.uiStore.organizationMenuPage
+  }
+
+  changePage(page) {
+    this.props.uiStore.update('organizationMenuPage', page)
   }
 
   @action goToEditGroupRoles(group) {
@@ -103,13 +95,10 @@ class OrganizationMenu extends React.Component {
     apiStore.sync(res)
   }
 
-  handleClose = (ev) => {
+  @action handleClose = (ev) => {
     this.props.onClose()
-    // delay so that you don't see it switch as the modal fades out
-    setTimeout(() => {
-      // reset the state
-      this.goBack()
-    }, 500)
+    this.isLoading = false
+    this.editGroup = {}
   }
   
   removeGroup = async (group) => {
@@ -227,7 +216,6 @@ class OrganizationMenu extends React.Component {
 OrganizationMenu.propTypes = {
   organization: MobxPropTypes.objectOrObservableObject.isRequired,
   userGroups: MobxPropTypes.arrayOrObservableArray.isRequired,
-  initialPage: PropTypes.oneOf(PAGES),
   open: PropTypes.bool,
   onClose: PropTypes.func.isRequired,
 }
@@ -236,7 +224,6 @@ OrganizationMenu.wrappedComponent.propTypes = {
   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 OrganizationMenu.defaultProps = {
-  initialPage: 'organizationPeople',
   open: false
 }
 

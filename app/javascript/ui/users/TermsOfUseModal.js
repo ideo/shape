@@ -102,11 +102,7 @@ class TermsOfUseModal extends React.Component {
               Hello {currentUser.first_name}!
             </Heading1>
             <p>
-              Welcome to your 6 month free trial of Shape.
-              The first 25 people who use Shape at your organization
-              will be free for the first 6 months.
-              Shape licenses are $4.99 per person per month.
-              Please take a moment to review our{' '}
+              Welcome to Shape. Before you proceed, please take a moment to review our{' '}
               <Link target="_blank" to="/terms">Terms of Use</Link>.
             </p>
 

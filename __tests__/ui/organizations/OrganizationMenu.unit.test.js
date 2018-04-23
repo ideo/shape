@@ -39,19 +39,19 @@ describe('OrganizationMenu', () => {
 
   it('closes the organization menu when exited', () => {
     component.handleClose()
-    expect(component.currentPage).toEqual('organizationPeople')
-    expect(component.isLoading).toBeFalsy()
     expect(props.onClose).toHaveBeenCalled()
+    expect(component.isLoading).toBeFalsy()
+    expect(component.editGroup).toEqual({})
   })
 
   it('closes the edit menu when changes are saved', () => {
     component.onOrganizationSave()
-    expect(component.currentPage).toEqual('organizationPeople')
+    expect(props.uiStore.update).toHaveBeenCalledWith('organizationMenuPage', 'organizationPeople')
   })
 
   it('opens the organization edit menu when you click on the org name', () => {
     component.goToEditGroupRoles(props.organization.primary_group)
-    expect(component.currentPage).toEqual('editRoles')
+    expect(props.uiStore.update).toHaveBeenCalledWith('organizationMenuPage', 'editRoles')
     expect(component.editGroup).toEqual(props.organization.primary_group)
   })
 
@@ -62,7 +62,7 @@ describe('OrganizationMenu', () => {
 
   it('opens the group add menu when you click on the new group button', () => {
     component.goToAddGroup()
-    expect(component.currentPage).toEqual('editGroup')
+    expect(props.uiStore.update).toHaveBeenCalledWith('organizationMenuPage', 'editGroup')
     expect(component.editGroup).toEqual({})
   })
 
@@ -115,7 +115,7 @@ describe('OrganizationMenu', () => {
       })
 
       it('should modify the group roles after synced', () => {
-        expect(component.currentPage).toEqual('editRoles')
+        expect(props.uiStore.update).toHaveBeenCalledWith('organizationMenuPage', 'editRoles')
       })
     })
   })

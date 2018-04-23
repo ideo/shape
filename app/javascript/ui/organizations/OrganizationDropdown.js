@@ -1,7 +1,6 @@
 import PropTypes from 'prop-types'
 import PopoutMenu from '~/ui/global/PopoutMenu'
 import styled from 'styled-components'
-import { action, observable } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import { withRouter } from 'react-router-dom'
 import OrganizationMenu from '~/ui/organizations/OrganizationMenu'
@@ -20,18 +19,17 @@ const IconHolder = styled.span`
 IconHolder.displayName = 'StyledIconHolder'
 
 @withRouter
-@inject('apiStore')
+@inject('apiStore', 'uiStore')
 @observer
 class OrganizationDropdown extends React.Component {
-  @observable organizationPage = null
-
-  @action openOrgMenu(page = OrganizationMenu.defaultProps.initialPage) {
+  openOrgMenu = (page = 'organizationPeople') => {
+    this.props.uiStore.update('organizationMenuPage', page)
+    // then close dropdown
     this.props.onItemClick()
-    this.organizationPage = page
   }
 
-  @action closeOrgMenu = () => {
-    this.organizationPage = null
+  closeOrgMenu = () => {
+    this.props.uiStore.update('organizationMenuPage', null)
   }
 
   handleOrgPeople = (ev) => {
@@ -57,33 +55,49 @@ class OrganizationDropdown extends React.Component {
 
   get organizationItems() {
     const { apiStore } = this.props
-    return apiStore.currentUser.organizations.map(org => {
-      const avatar = (
-        <IconHolder>
-          <Avatar
-            title={org.name}
-            url={org.primary_group.filestack_file_url}
-            size={32}
-            className="org_avatar"
-          />
-        </IconHolder>
-      )
-      return { name: org.name, iconLeft: avatar, onClick: this.handleSwitchOrg }
-    })
+    return apiStore.currentUser.organizations
+      .filter(org => org.id !== this.currentOrganization.id)
+      .map(org => {
+        const avatar = (
+          <IconHolder>
+            <Avatar
+              title={org.name}
+              url={org.primary_group.filestack_file_url}
+              size={32}
+              className="org_avatar"
+            />
+          </IconHolder>
+        )
+        return {
+          name: org.name,
+          iconLeft: avatar,
+          onClick: this.handleSwitchOrg,
+          noBorder: true,
+        }
+      })
+  }
+
+  get currentOrganization() {
+    // Alias to often used property
+    return this.props.apiStore.currentUser.current_organization
   }
 
   get menuItems() {
-    return [
-      { name: 'People & Orgs', onClick: this.handleOrgPeople },
+    const userCanEdit = this.currentOrganization.primary_group.currentUserCanEdit
+    const items = [
+      { name: 'People & Groups', onClick: this.handleOrgPeople },
       ...this.organizationItems,
       { name: 'New Organization', onClick: this.handleNewOrg },
-      { name: 'Setings', onClick: this.handleOrgSettings },
+      ...(!userCanEdit
+        ? [{ name: 'Setings', onClick: this.handleOrgSettings }]
+        : []),
       { name: 'Legal', onClick: this.handleLegal },
     ]
+    return items
   }
 
   render() {
-    const { apiStore } = this.props
+    const { apiStore, uiStore } = this.props
     return (
       <div>
         <PopoutMenu
@@ -93,11 +107,10 @@ class OrganizationDropdown extends React.Component {
           menuOpen={this.props.open}
         />
         <OrganizationMenu
-          organization={apiStore.currentUser.current_organization}
+          organization={this.currentOrganization}
           userGroups={apiStore.currentUser.groups}
-          initialPage={this.organizationPage}
           onClose={this.closeOrgMenu}
-          open={!!this.organizationPage}
+          open={uiStore.organizationMenuOpen}
         />
       </div>
     )
@@ -113,6 +126,7 @@ OrganizationDropdown.propTypes = {
 }
 OrganizationDropdown.wrappedComponent.propTypes = {
   apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
+  uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 OrganizationDropdown.defaultProps = {
   open: false,
