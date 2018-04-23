@@ -23,11 +23,8 @@ describe('OrganizationDropdown', () => {
       open: true,
       onItemClick: jest.fn(),
       apiStore,
-<<<<<<< HEAD
       history,
-=======
       uiStore: fakeUiStore,
->>>>>>> origin/development
     }
     wrapper = shallow(
       <OrganizationDropdown.wrappedComponent {...props} />
