@@ -3,6 +3,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import styled from 'styled-components'
 import Dialog, { DialogContent, DialogTitle } from 'material-ui/Dialog'
+
 import { Heading2 } from '~/ui/global/styled/typography'
 import v from '~/utils/variables'
 import ArrowIcon from '~/ui/icons/ArrowIcon'

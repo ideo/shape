@@ -7,6 +7,12 @@ const position = {
   width: PropTypes.number.isRequired,
 }
 
+const muiBackdrop = {
+  invisible: PropTypes.bool.isRequired,
+  classes: PropTypes.object,
+}
+
 export default {
-  position
+  position,
+  muiBackdrop,
 }

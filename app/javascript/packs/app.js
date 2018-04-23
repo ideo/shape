@@ -5,6 +5,7 @@ import { useStrict } from 'mobx'
 import { Provider } from 'mobx-react'
 import { syncHistoryWithStore } from 'mobx-react-router'
 import { MobxIntlProvider } from 'mobx-react-intl'
+import { Router } from 'react-router-dom'
 
 import Routes from '~/ui/Routes'
 import stores, { routingStore } from '~/stores'
@@ -21,7 +22,9 @@ if (module.hot) {
     ReactDOM.render(
       <Provider {...stores}>
         <MobxIntlProvider>
-          <HotRoutes history={history} />
+          <Router history={history} >
+            <HotRoutes />
+          </Router>
         </MobxIntlProvider>
       </Provider>,
       document.getElementById('react-root')
@@ -32,7 +35,9 @@ if (module.hot) {
 ReactDOM.render(
   <Provider {...stores}>
     <MobxIntlProvider>
-      <Routes history={history} />
+      <Router history={history} >
+        <Routes />
+      </Router>
     </MobxIntlProvider>
   </Provider>,
   document.getElementById('react-root')

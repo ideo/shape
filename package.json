@@ -19,11 +19,13 @@
       "__js_test_config"
     ],
     "moduleNameMapper": {
-      "\\.(css)$": "<rootDir>/node_modules/jest-css-modules",
-      ".scss$": "SassStub.js"
+      ".+\\.(css|styl|less|sass|scss|png|jpg|ttf|woff|woff2)$": "identity-obj-proxy"
     },
     "testPathIgnorePatterns": [
       "/config/webpack/"
+    ],
+    "snapshotSerializers": [
+      "enzyme-to-json/serializer"
     ]
   },
   "dependencies": {
@@ -56,6 +58,7 @@
     "react-infinite-scroller": "^1.1.3",
     "react-input-autosize": "^2.2.1",
     "react-intl": "^2.4.0",
+    "react-markdown": "^3.3.0",
     "react-player": "^1.2.0",
     "react-quill": "^1.2.4",
     "react-rnd": "^7.3.0",
@@ -87,6 +90,7 @@
     "dotenv": "^5.0.1",
     "enzyme": "^3.3.0",
     "enzyme-adapter-react-16": "^1.1.1",
+    "enzyme-to-json": "^3.3.3",
     "eslint": "^4.16.0",
     "eslint-config-airbnb": "~16.1.0",
     "eslint-config-standard": "10.2.1",
@@ -99,11 +103,12 @@
     "eslint-plugin-promise": "~3.5.0",
     "eslint-plugin-react": "~7.6.0",
     "eslint-plugin-standard": "~3.0.1",
+    "identity-obj-proxy": "^3.0.0",
     "jest": "^22.4.3",
     "jest-css-modules": "^1.1.0",
     "jest-enzyme": "^4.2.0",
     "jest-fetch-mock": "^1.4.1",
-    "jest-styled-components": "styled-components/jest-styled-components",
+    "jest-styled-components": "^5.0.1",
     "react-test-renderer": "^16.2.0",
     "webpack-bundle-analyzer": "^2.11.1",
     "webpack-dev-server": "^2.11.1"

@@ -54,7 +54,7 @@ describe User, type: :model do
 
       it 'should remove current_organization if user only belonged to one' do
         user.remove_role(Role::MEMBER, org_group)
-        expect(user.reload.current_organization).to  be_nil
+        expect(user.reload.current_organization).to be_nil
       end
     end
 
@@ -493,6 +493,45 @@ describe User, type: :model do
         expect(user.current_user_collection).not_to be_nil
         expect(user.switch_to_organization(nil)).to be true
         expect(user.current_user_collection).to be_nil
+      end
+    end
+  end
+
+  context 'abilities for viewing and editing' do
+    let(:ability) { Ability.new(user) }
+    let(:collection) { create(:collection) }
+    before do
+      # in this context, this works better than `add_editors [user]`
+      user.add_role(Role::EDITOR, collection)
+    end
+
+    context 'with pending user' do
+      let(:user) { create(:user, status: User.statuses[:pending], terms_accepted: false) }
+
+      it 'does not allow any access to content' do
+        expect(ability).not_to be_able_to(:read, collection)
+      end
+    end
+
+    context 'with active user who has not accepted terms' do
+      let(:user) { create(:user, terms_accepted: false) }
+
+      it 'allows read only access to content' do
+        expect(ability).not_to be_able_to(:create, Collection.new)
+        expect(ability).to be_able_to(:read, collection)
+        expect(ability).not_to be_able_to(:update, collection)
+        expect(ability).not_to be_able_to(:destroy, collection)
+      end
+    end
+
+    context 'with fully activated user' do
+      let(:user) { create(:user) }
+
+      it 'allows edit access to content' do
+        expect(ability).to be_able_to(:create, Collection.new)
+        expect(ability).to be_able_to(:read, collection)
+        expect(ability).to be_able_to(:update, collection)
+        expect(ability).to be_able_to(:destroy, collection)
       end
     end
   end

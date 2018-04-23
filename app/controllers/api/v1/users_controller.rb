@@ -1,6 +1,6 @@
 class Api::V1::UsersController < Api::V1::BaseController
   load_and_authorize_resource :organization, only: %i[index]
-  load_and_authorize_resource except: %i[me search create_from_emails]
+  load_and_authorize_resource except: %i[me search create_from_emails accept_terms]
 
   # All the users in this org, that this user can 'see' through groups or content
   # /organizations/:id/users
@@ -12,12 +12,12 @@ class Api::V1::UsersController < Api::V1::BaseController
 
   def show
     render jsonapi: @user, include:
-      [:groups, current_organization: [:primary_group]]
+      [:groups, :organizations, current_organization: [:primary_group]]
   end
 
   def me
     render jsonapi: current_user, include:
-      [:groups, current_organization: [:primary_group]]
+      [:groups, organizations: [:primary_group], current_organization: [:primary_group]]
   end
 
   def search
@@ -34,6 +34,14 @@ class Api::V1::UsersController < Api::V1::BaseController
       render jsonapi: cpu.users
     else
       render_api_errors cpu.failed_emails
+    end
+  end
+
+  def accept_terms
+    if current_user.update(terms_accepted: true)
+      render jsonapi: current_user
+    else
+      render_api_errors current_user.errors
     end
   end
 
