@@ -88,7 +88,7 @@ class OrganizationDropdown extends React.Component {
       { name: 'People & Groups', onClick: this.handleOrgPeople },
       ...this.organizationItems,
       { name: 'New Organization', onClick: this.handleNewOrg },
-      ...(!userCanEdit
+      ...(userCanEdit
         ? [{ name: 'Setings', onClick: this.handleOrgSettings }]
         : []),
       { name: 'Legal', onClick: this.handleLegal },

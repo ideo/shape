@@ -59,7 +59,7 @@ describe('OrganizationDropdown', () => {
     })
 
     it('should not add your current organization to list of items', () => {
-      expect(component.menuItems.length).toEqual(4)
+      expect(component.menuItems.length).toEqual(5)
     })
 
     describe('if current user is not an org admin', () => {
@@ -68,7 +68,7 @@ describe('OrganizationDropdown', () => {
       })
 
       it('should not show the settings link', () => {
-        expect(component.menuItems.length).toEqual(3)
+        expect(component.menuItems.length).toEqual(4)
       })
     })
   })
