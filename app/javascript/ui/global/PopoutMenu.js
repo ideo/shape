@@ -63,7 +63,7 @@ export const StyledMenuItem = styled.li`
     line-height: 2.5rem;
     text-transform: uppercase;
     position: relative;
-    opacity: ${props => (props.disabled ? 0.5 : 1)};
+    opacity: ${props => (props.loading ? 0.5 : 1)};
     border-left: 7px solid transparent;
     font-family: ${v.fonts.sans};
     font-weight: 300;
@@ -94,11 +94,11 @@ StyledMenuItem.displayName = 'StyledMenuItem'
 class PopoutMenu extends React.PureComponent {
   get renderMenuItems() {
     return this.props.menuItems.map(item => {
-      const { name, iconLeft, iconRight, onClick } = item
+      const { name, iconLeft, iconRight, onClick, loading } = item
       return (
-        <StyledMenuItem key={name} noBorder={item.noBorder}>
+        <StyledMenuItem key={name} noBorder={item.noBorder} loading={loading}>
           <button
-            onClick={this.props.disabled ? () => {} : onClick}
+            onClick={this.props.loading ? () => {} : onClick}
             className={`menu-${name.toLowerCase()}`}
           >
             {iconLeft}
@@ -114,7 +114,6 @@ class PopoutMenu extends React.PureComponent {
     const {
       className,
       menuOpen,
-      disabled,
       onMouseLeave,
       onClick,
       width,
@@ -153,8 +152,8 @@ PopoutMenu.propTypes = {
     iconRight: PropTypes.element,
     onClick: PropTypes.func,
     noBorder: PropTypes.bool,
+    loading: PropTypes.bool,
   })).isRequired,
-  disabled: PropTypes.bool,
 }
 
 PopoutMenu.defaultProps = {
@@ -162,7 +161,6 @@ PopoutMenu.defaultProps = {
   onClick: () => null,
   className: '',
   menuOpen: false,
-  disabled: false,
   width: 200,
 }
 

@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types'
-import { inject, PropTypes as MobxPropTypes } from 'mobx-react'
+import { action, observable } from 'mobx'
+import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import _ from 'lodash'
 
 import PopoutMenu from '~/ui/global/PopoutMenu'
@@ -11,9 +12,16 @@ import LinkIcon from '~/ui/icons/LinkIcon'
 import AddIntoIcon from '~/ui/icons/AddIntoIcon'
 
 @inject('uiStore')
+@observer
 class CardMenu extends React.Component {
+  @observable itemLoading = ''
+
   get cardId() {
     return this.props.card.id
+  }
+
+  @action setLoading(name = '') {
+    this.itemLoading = name
   }
 
   duplicateCard = () => {
@@ -31,19 +39,21 @@ class CardMenu extends React.Component {
   moveCard = () => {
     const { card, uiStore } = this.props
     uiStore.selectCardId(card.id)
-    uiStore.openMoveMenu({ from: uiStore.viewingCollection.id, cardAction: 'move' })
+    uiStore.openMoveMenu({ from: this.viewingCollectionId, cardAction: 'move' })
   }
 
   linkCard = () => {
     const { card, uiStore } = this.props
     uiStore.selectCardId(card.id)
-    uiStore.openMoveMenu({ from: uiStore.viewingCollection.id, cardAction: 'link' })
+    uiStore.openMoveMenu({ from: this.viewingCollectionId, cardAction: 'link' })
   }
 
   addToMyCollection = async () => {
     const { card, uiStore } = this.props
     uiStore.closeMoveMenu()
+    this.setLoading('Add to My Collection')
     await card.API_linkToMyCollection()
+    this.setLoading()
   }
 
   archiveCard = () => {
@@ -67,6 +77,14 @@ class CardMenu extends React.Component {
     }
   }
 
+  // Viewing collection could be null if on the search page
+  get viewingCollectionId() {
+    const { card, uiStore } = this.props
+    return uiStore.viewingCollection
+      ? uiStore.viewingCollection.id
+      : card.parent_id
+  }
+
   get menuItems() {
     const { canEdit, canReplace, uiStore } = this.props
     let items = []
@@ -82,6 +100,11 @@ class CardMenu extends React.Component {
       { name: 'Archive', icon: <ArchiveIcon />, onClick: this.archiveCard },
       { name: 'Replace', icon: <ReplaceIcon />, onClick: this.replaceCard },
     ]
+    actions.forEach(actionItem => {
+      if (actionItem.name === this.itemLoading) {
+        actionItem.loading = true
+      }
+    })
 
     if (canEdit) {
       // Replace action is added later if this.props.canReplace
