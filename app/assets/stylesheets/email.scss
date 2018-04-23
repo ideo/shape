@@ -80,7 +80,7 @@ $sentinel-lt-font: 'Sentinel-Light', 'Sentinel', Palatino, Georgia, serif;
     display: block;
     margin: 25px auto 10px;
 
-    img {      
+    img {
       width: 83px;
       height: 53px;
     }
@@ -120,7 +120,7 @@ $sentinel-lt-font: 'Sentinel-Light', 'Sentinel', Palatino, Georgia, serif;
   }
 
   .email-footer {
-    font-size: 11px;
+    font-size: 13px;
     text-align: center;
     padding: 40px;
 
@@ -142,5 +142,8 @@ $sentinel-lt-font: 'Sentinel-Light', 'Sentinel', Palatino, Georgia, serif;
 
   .email-footer__copyright {
     margin-top: 10px;
+  }
+  .email-footer__address {
+    margin-top: 5px;
   }
 }
