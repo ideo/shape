@@ -7,7 +7,7 @@ import fakeUiStore from '#/mocks/fakeUiStore'
 import fakeApiStore from '#/mocks/fakeApiStore'
 
 describe('OrganizationDropdown', () => {
-  let component, wrapper, props, otherFakeOrg
+  let component, wrapper, props, otherFakeOrg, itemNames
 
   beforeEach(() => {
     const apiStore = fakeApiStore()
@@ -26,6 +26,13 @@ describe('OrganizationDropdown', () => {
       history,
       uiStore: fakeUiStore,
     }
+    itemNames = [
+      'People & Groups',
+      ...[otherFakeOrg.name],
+      'New Organization',
+      'Setings',
+      'Legal'
+    ]
     wrapper = shallow(
       <OrganizationDropdown.wrappedComponent {...props} />
     )
@@ -59,7 +66,7 @@ describe('OrganizationDropdown', () => {
     })
 
     it('should not add your current organization to list of items', () => {
-      expect(component.menuItems.length).toEqual(5)
+      expect(component.menuItems.map(item => item.name)).toEqual(itemNames)
     })
 
     describe('if current user is not an org admin', () => {
@@ -68,7 +75,9 @@ describe('OrganizationDropdown', () => {
       })
 
       it('should not show the settings link', () => {
-        expect(component.menuItems.length).toEqual(4)
+        expect(component.menuItems.find(
+          item => item.name === 'Settings'
+        )).toBeFalsy()
       })
     })
   })
