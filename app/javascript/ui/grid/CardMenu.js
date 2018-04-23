@@ -8,6 +8,7 @@ import DuplicateIcon from '~/ui/icons/DuplicateIcon'
 import ReplaceIcon from '~/ui/icons/ReplaceIcon'
 import MoveIcon from '~/ui/icons/MoveIcon'
 import LinkIcon from '~/ui/icons/LinkIcon'
+import AddIntoIcon from '~/ui/icons/AddIntoIcon'
 
 @inject('uiStore')
 class CardMenu extends React.Component {
@@ -76,7 +77,7 @@ class CardMenu extends React.Component {
       { name: 'Move', icon: <MoveIcon />, onClick: this.moveCard },
       { name: 'Link', icon: <LinkIcon />, onClick: this.linkCard },
       ...(!isUserCollection
-        ? [{ name: 'Add to My Collection', icon: <LinkIcon />, onClick: this.addToMyCollection }]
+        ? [{ name: 'Add to My Collection', icon: <AddIntoIcon />, onClick: this.addToMyCollection }]
         : []),
       { name: 'Archive', icon: <ArchiveIcon />, onClick: this.archiveCard },
       { name: 'Replace', icon: <ReplaceIcon />, onClick: this.replaceCard },
