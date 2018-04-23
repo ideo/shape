@@ -112,7 +112,7 @@ class SearchResultsInfinite extends React.Component {
 
     const results = (
       searchResults.map((collection, i) => {
-        const card = new CollectionCard(collection.parent, apiStore)
+        const card = new CollectionCard(collection.parent_collection_card, apiStore)
         return (
           <FlipMove
             appearAnimation="fade"
@@ -140,7 +140,7 @@ class SearchResultsInfinite extends React.Component {
                   // onFocus={this.handleMouseOver(i + 1)}
                 >
                   <StyledTopRightActions className="show-on-hover">
-                    <SelectionCircle cardId={card.id} />
+                    <SelectionCircle cardId={collection.id} />
                     <CardMenu
                       className="show-on-hover card-menu"
                       card={card}

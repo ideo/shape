@@ -10,7 +10,7 @@
     "can_edit": { "type": ["boolean"] },
     "tag_list": { "type": ["array", "null"] },
     "cover": { "type": ["object"] },
-    "parent": { "type": ["object"] }
+    "parent_collection_card": { "type": ["object"] }
   },
   "required": ["id", "name", "type", "created_at", "cover"]
 }
