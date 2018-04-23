@@ -9,7 +9,7 @@
     "breadcrumb": { "type": ["array", "null"] },
     "can_edit": { "type": ["boolean"] },
     "tag_list": { "type": ["array", "null"] },
-    "cover": { "type": ["object"] },
+    "cover": { "type": ["object"] }
   },
   "required": ["id", "name", "type", "created_at", "cover"]
 }
