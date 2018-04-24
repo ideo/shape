@@ -18,9 +18,10 @@ class RoutingStore extends RouterStore {
     }
   }
 
-  routeTo = (type, id) => {
-    if (type === '/') {
-      this.push('/')
+  routeTo = (type, id = null) => {
+    if (!id) {
+      // in this case, type is a path like '/' or '/terms'
+      this.push(type)
       return
     }
     const path = this.pathTo(type, id)

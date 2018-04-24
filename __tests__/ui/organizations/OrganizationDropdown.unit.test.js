@@ -11,6 +11,10 @@ describe('OrganizationDropdown', () => {
 
   beforeEach(() => {
     const apiStore = fakeApiStore()
+    const routingStore = {
+      pathTo: jest.fn(),
+      routeTo: jest.fn(),
+    }
     otherFakeOrg = Object.assign({}, fakeOrganization, { id: 999, name: 'new' })
     apiStore.currentUser.current_organization = fakeOrganization
     fakeOrganization.primary_group.currentUserCanEdit = true
@@ -18,12 +22,11 @@ describe('OrganizationDropdown', () => {
       fakeOrganization,
       otherFakeOrg,
     ]
-    const history = { push: jest.fn() }
     props = {
       open: true,
       onItemClick: jest.fn(),
       apiStore,
-      history,
+      routingStore,
       uiStore: fakeUiStore,
     }
     itemNames = [
@@ -91,8 +94,8 @@ describe('OrganizationDropdown', () => {
       expect(props.onItemClick).toHaveBeenCalled()
     })
 
-    it('should push a terms path to router history', () => {
-      expect(props.history.push).toHaveBeenCalled()
+    it('should route to the terms page', () => {
+      expect(props.routingStore.routeTo).toHaveBeenCalledWith('/terms')
     })
   })
 })
