@@ -7,10 +7,14 @@ import fakeUiStore from '#/mocks/fakeUiStore'
 import fakeApiStore from '#/mocks/fakeApiStore'
 
 describe('OrganizationDropdown', () => {
-  let component, wrapper, props, otherFakeOrg
+  let component, wrapper, props, otherFakeOrg, itemNames
 
   beforeEach(() => {
     const apiStore = fakeApiStore()
+    const routingStore = {
+      pathTo: jest.fn(),
+      routeTo: jest.fn(),
+    }
     otherFakeOrg = Object.assign({}, fakeOrganization, { id: 999, name: 'new' })
     apiStore.currentUser.current_organization = fakeOrganization
     fakeOrganization.primary_group.currentUserCanEdit = true
@@ -22,8 +26,16 @@ describe('OrganizationDropdown', () => {
       open: true,
       onItemClick: jest.fn(),
       apiStore,
+      routingStore,
       uiStore: fakeUiStore,
     }
+    itemNames = [
+      'People & Groups',
+      ...[otherFakeOrg.name],
+      'New Organization',
+      'Setings',
+      'Legal'
+    ]
     wrapper = shallow(
       <OrganizationDropdown.wrappedComponent {...props} />
     )
@@ -57,7 +69,7 @@ describe('OrganizationDropdown', () => {
     })
 
     it('should not add your current organization to list of items', () => {
-      expect(component.menuItems.length).toEqual(4)
+      expect(component.menuItems.map(item => item.name)).toEqual(itemNames)
     })
 
     describe('if current user is not an org admin', () => {
@@ -66,8 +78,24 @@ describe('OrganizationDropdown', () => {
       })
 
       it('should not show the settings link', () => {
-        expect(component.menuItems.length).toEqual(3)
+        expect(component.menuItems.find(
+          item => item.name === 'Settings'
+        )).toBeFalsy()
       })
+    })
+  })
+
+  describe('handleLegal', () => {
+    beforeEach(() => {
+      component.handleLegal()
+    })
+
+    it('should call the on item click handler', () => {
+      expect(props.onItemClick).toHaveBeenCalled()
+    })
+
+    it('should route to the terms page', () => {
+      expect(props.routingStore.routeTo).toHaveBeenCalledWith('/terms')
     })
   })
 })

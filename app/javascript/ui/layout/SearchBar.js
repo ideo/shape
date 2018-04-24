@@ -56,8 +56,8 @@ const StyledSearchBar = styled.div`
 `
 StyledSearchBar.displayName = 'StyledSearchBar'
 
-@withRouter
-@inject('routingStore')
+@withRouter // needed for props.location
+@inject('routingStore') // needed for routeTo method
 @observer
 class SearchBar extends React.Component {
   @observable searchText = ''

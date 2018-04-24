@@ -7,8 +7,6 @@
 */
 
 const touMarkdown = `
-# TERMS OF USE
-
 Please read these Terms of Use (**"Terms" **or** "TOU"**) carefully before using the Software (as defined below).  By using the Software, you are agreeing to be bound by the Terms. If you have entered into a separate software license or services agreement with IDEO for use of the Software or services, then the terms of that agreement shall controls if it conflicts with the Terms.
 
 The Terms govern the use of the Software, which is licensed to the person using the Software ("You" or "User") by IDEO LP, a Delaware limited partnership, with a principal place of business at 150 Forest Avenue, Palo Alto, California 94301, USA (**"IDEO"**).

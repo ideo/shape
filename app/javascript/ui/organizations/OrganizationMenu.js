@@ -100,7 +100,7 @@ class OrganizationMenu extends React.Component {
     this.isLoading = false
     this.editGroup = {}
   }
-
+  
   removeGroup = async (group) => {
     try {
       const { apiStore } = this.props

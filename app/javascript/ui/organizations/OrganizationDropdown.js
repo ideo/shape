@@ -17,7 +17,7 @@ const IconHolder = styled.span`
 `
 IconHolder.displayName = 'StyledIconHolder'
 
-@inject('apiStore', 'uiStore')
+@inject('apiStore', 'uiStore', 'routingStore')
 @observer
 class OrganizationDropdown extends React.Component {
   openOrgMenu = (page = 'organizationPeople') => {
@@ -44,6 +44,11 @@ class OrganizationDropdown extends React.Component {
 
   handleOrgSettings = (ev) => {
     this.openOrgMenu('editOrganization')
+  }
+
+  handleLegal = (ev) => {
+    this.props.onItemClick()
+    this.props.routingStore.routeTo('/terms')
   }
 
   get organizationItems() {
@@ -80,11 +85,12 @@ class OrganizationDropdown extends React.Component {
     const items = [
       { name: 'People & Groups', onClick: this.handleOrgPeople },
       ...this.organizationItems,
-      { name: '+ New Organization', onClick: this.handleNewOrg },
+      { name: 'New Organization', onClick: this.handleNewOrg },
+      ...(userCanEdit
+        ? [{ name: 'Setings', onClick: this.handleOrgSettings }]
+        : []),
+      { name: 'Legal', onClick: this.handleLegal },
     ]
-    if (userCanEdit) {
-      items.push({ name: 'Settings', onClick: this.handleOrgSettings })
-    }
     return items
   }
 
@@ -116,6 +122,7 @@ OrganizationDropdown.propTypes = {
 OrganizationDropdown.wrappedComponent.propTypes = {
   apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
+  routingStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 OrganizationDropdown.defaultProps = {
   open: false,
