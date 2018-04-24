@@ -44,7 +44,6 @@ describe('GridCard', () => {
     })
 
     it('renders menu', () => {
-      console.log(wrapper.debug())
       expect(wrapper.find('CardMenu').exists()).toBe(true)
     })
 

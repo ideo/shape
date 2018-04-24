@@ -49,7 +49,7 @@ class CollectionCard extends BaseRecord {
     const data = {
       to_id: this.apiStore.currentUser.current_user_collection_id,
       from_id: uiStore.viewingCollection.id,
-      collection_card_ids: this.link ? [this.recordId] : [this.id],
+      collection_card_ids: [this.id],
       placement: 'end',
     }
     await this.apiStore.request('collection_cards/link', 'POST', data)
