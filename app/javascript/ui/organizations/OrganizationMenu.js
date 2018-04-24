@@ -76,16 +76,6 @@ class OrganizationMenu extends React.Component {
     }
   }
 
-  removeGroup = group => async () => {
-    const { uiStore } = this.props
-    uiStore.confirm({
-      prompt: `Are you sure you want to archive ${group.name}?`,
-      confirmText: 'Archive',
-      iconName: 'Archive',
-      onConfirm: () => this.removeGroup(group),
-    })
-  }
-
   onGroupRoles = group => () => {
     this.goToEditGroupRoles(group)
   }
@@ -100,8 +90,8 @@ class OrganizationMenu extends React.Component {
     this.isLoading = false
     this.editGroup = {}
   }
-  
-  removeGroup = async (group) => {
+
+  removeGroup = group => async () => {
     try {
       const { apiStore } = this.props
       await group.API_archive()

@@ -1,3 +1,4 @@
+import { uiStore } from '~/stores'
 import BaseRecord from './BaseRecord'
 
 class Group extends BaseRecord {
@@ -21,7 +22,15 @@ class Group extends BaseRecord {
   }
 
   API_archive() {
-    return this.apiStore.request(`groups/${this.id}/archive`, 'PATCH')
+    const onAgree = async () => {
+      this.apiStore.request(`groups/${this.id}/archive`, 'PATCH')
+    }
+    uiStore.confirm({
+      prompt: 'Are you sure you want to archive this group?',
+      confirmText: 'Archive',
+      iconName: 'Archive',
+      onConfirm: onAgree,
+    })
   }
 }
 
