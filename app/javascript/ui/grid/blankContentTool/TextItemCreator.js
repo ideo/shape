@@ -41,6 +41,8 @@ class TextItemCreator extends React.Component {
   }
 
   createTextItem = () => {
+    this.quillEditor.blur()
+    if (this.props.loading) return
     // make sure to capture last text change before saving
     this.onTextChange.flush()
     this.props.createCard({
@@ -87,6 +89,7 @@ class TextItemCreator extends React.Component {
 }
 
 TextItemCreator.propTypes = {
+  loading: PropTypes.bool.isRequired,
   createCard: PropTypes.func.isRequired,
   closeBlankContentTool: PropTypes.func.isRequired,
   height: PropTypes.number.isRequired,
