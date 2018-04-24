@@ -37,7 +37,6 @@ gem 'omniauth-okta'
 
 # Webpacker
 gem 'webpacker', '~> 3.0'
-gem 'hashie'
 
 # JSON serializer
 gem 'jsonapi-rails'
@@ -78,6 +77,9 @@ gem 'httparty'
 
 # Redis in-memory caching
 gem 'redis'
+
+# memcache
+gem 'dalli', '~> 2.7'
 
 gem 'bootsnap', require: false
 

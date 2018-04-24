@@ -2,7 +2,7 @@ require 'rails_helper'
 
 RSpec.describe CollectionCover, type: :service do
   describe '#generate' do
-    let(:collection_cover) { CollectionCover.new(collection).generate }
+    let(:collection_cover) { CollectionCover.call(collection) }
 
     context 'with normal settings, text and image' do
       let!(:collection) { create(:collection) }
@@ -11,11 +11,11 @@ RSpec.describe CollectionCover, type: :service do
       let!(:video_item) { create(:collection_card_video, parent: collection) }
 
       it 'gets the first image item' do
-        expect(collection_cover[:image_url]).to eq image_item.item.filestack_file_url
+        expect(collection_cover['image_url']).to eq image_item.item.filestack_file_url
       end
 
       it 'gets the first text item' do
-        expect(collection_cover[:text]).to eq text_item.item.plain_content
+        expect(collection_cover['text']).to eq text_item.item.plain_content
       end
     end
 
@@ -24,11 +24,11 @@ RSpec.describe CollectionCover, type: :service do
       let!(:text_item) { create(:collection_card_text, parent: collection) }
 
       it 'does not find an image' do
-        expect(collection_cover[:image_url]).to be nil
+        expect(collection_cover['image_url']).to be nil
       end
 
       it 'gets the first text item' do
-        expect(collection_cover[:text]).to eq text_item.item.plain_content
+        expect(collection_cover['text']).to eq text_item.item.plain_content
       end
     end
 
@@ -38,7 +38,7 @@ RSpec.describe CollectionCover, type: :service do
       let!(:video_item) { create(:collection_card_video, parent: collection) }
 
       it 'uses image from video item' do
-        expect(collection_cover[:image_url]).to eq video_item.item.thumbnail_url
+        expect(collection_cover['image_url']).to eq video_item.item.thumbnail_url
       end
     end
 
@@ -65,11 +65,11 @@ RSpec.describe CollectionCover, type: :service do
       end
 
       it 'uses text from the shared text item' do
-        expect(collection_cover[:text]).to eq text_item.item.plain_content
+        expect(collection_cover['text']).to eq text_item.item.plain_content
       end
 
       it 'uses image from the shared video item' do
-        expect(collection_cover[:image_url]).to eq video_item.item.thumbnail_url
+        expect(collection_cover['image_url']).to eq video_item.item.thumbnail_url
       end
     end
   end

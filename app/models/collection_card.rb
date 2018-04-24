@@ -1,7 +1,7 @@
 class CollectionCard < ApplicationRecord
   include Archivable
 
-  belongs_to :parent, class_name: 'Collection', touch: true
+  belongs_to :parent, class_name: 'Collection'
   belongs_to :collection, optional: true
   belongs_to :item, optional: true
   # this really is only appropriate for CollectionCard::Primary but defined globally here
@@ -120,6 +120,14 @@ class CollectionCard < ApplicationRecord
     end
   end
 
+  def should_update_parent_collection_cover?
+    collection = try(:parent)
+    return unless collection.present? && collection.base_collection_type?
+    cover = collection.cached_cover
+    return true if cover.blank? || cover['card_ids'].nil?
+    cover['card_ids'].include?(id) || cover['card_order'].nil? || order <= cover['card_order']
+  end
+
   private
 
   def assign_default_height_and_width
@@ -137,7 +145,7 @@ class CollectionCard < ApplicationRecord
 
   def resourceable_class
     # Use top-level class since this is an STI model
-    Item
+    CollectionCard
   end
 
   def single_item_or_collection_is_present

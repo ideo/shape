@@ -2,7 +2,7 @@ require 'rails_helper'
 
 describe Collection, type: :model do
   context 'validations' do
-    it { should validate_presence_of(:organization) }
+    it { should validate_presence_of(:organization).with_message('must exist') }
     it { should validate_presence_of(:name) }
     it 'does not validate presence of :name if not base_collection_type' do
       expect(Collection::UserCollection.new).not_to validate_presence_of(:name)
@@ -34,7 +34,7 @@ describe Collection, type: :model do
         }.to change(collection.collection_cards, :count).by(-1)
       end
 
-      describe '#touch_cards_linked_to_this_collection' do
+      describe '#touch_related_cards' do
         let!(:collection) { create(:collection) }
         let!(:card_linked_to_this_collection) { create(:collection_card_link, collection: collection) }
 
@@ -104,6 +104,7 @@ describe Collection, type: :model do
       collection.items.each do |item|
         user.add_role(Role::EDITOR, item)
       end
+      collection.reload
     end
 
     it 'clones the collection' do
@@ -264,6 +265,46 @@ describe Collection, type: :model do
 
     it 'includes all group_ids' do
       expect(collection.search_data[:group_ids]).to match_array(groups.map(&:id))
+    end
+  end
+
+  context 'cached_attributes' do
+    describe '#cache_tag_list' do
+      let(:tag_list) { %w[testing prototyping] }
+      let(:collection) { create(:collection, tag_list: tag_list) }
+
+      it 'caches tag_list onto cached_attributes' do
+        expect(collection.cached_tag_list).to be nil
+        collection.cache_tag_list
+        expect(collection.cached_tag_list).to match_array(tag_list)
+      end
+    end
+
+    describe '#cache_cover' do
+      let(:collection) { create(:collection, num_cards: 3) }
+      let!(:image_card) { create(:collection_card_image, parent: collection) }
+
+      it 'caches cover onto cached_attributes' do
+        expect(collection.cached_cover).to be nil
+        collection.cache_cover
+        expect(collection.cached_cover['text']).not_to be nil
+        expect(collection.cached_cover['image_url']).not_to be nil
+      end
+    end
+
+    describe '#update_cover_text!' do
+      let(:collection) { create(:collection, num_cards: 3) }
+      let(:item) { collection.collection_cards.first.item }
+
+      before do
+        collection.cache_cover!
+      end
+
+      it 'updates cached cover text to match item updates' do
+        item.text_data = { ops: [{ insert: 'Howdy doody.' }] }
+        collection.update_cover_text!(item)
+        expect(collection.cached_cover['text']).to eq 'Howdy doody.'
+      end
     end
   end
 end

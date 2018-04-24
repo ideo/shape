@@ -188,6 +188,29 @@ RSpec.describe CollectionCard, type: :model do
     end
   end
 
+  describe 'should_update_parent_collection_cover?' do
+    let(:collection) { create(:collection, num_cards: 3) }
+    let(:card) { collection.collection_cards.first }
+    let(:last_card) { collection.collection_cards.last }
+
+    it 'should return true if parent cover has not been created' do
+      expect(card.should_update_parent_collection_cover?).to be true
+      expect(last_card.should_update_parent_collection_cover?).to be true
+    end
+
+    it 'should return true if parent cover will be affected by this card' do
+      collection.cache_cover!
+      # cover text comes from the first card, so it should update
+      expect(card.should_update_parent_collection_cover?).to be true
+    end
+
+    it 'should return false if parent cover will not be affected by this card' do
+      collection.cache_cover!
+      # cover text comes from the first card, so last_card shouldn't affect update
+      expect(last_card.should_update_parent_collection_cover?).to be false
+    end
+  end
+
   context 'archiving' do
     let(:collection) { create(:collection) }
     let!(:collection_card_list) { create_list(:collection_card, 5, parent: collection) }

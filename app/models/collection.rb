@@ -10,6 +10,9 @@ class Collection < ApplicationRecord
              with: %i[collection_cards cards_linked_to_this_collection]
   acts_as_taggable
 
+  store_accessor :cached_attributes,
+                 :cached_cover, :cached_tag_list
+
   # all cards including archived (i.e. undo default :collection_cards scope)
   has_many :all_collection_cards,
            class_name: 'CollectionCard',
@@ -46,7 +49,8 @@ class Collection < ApplicationRecord
            dependent: :destroy
 
   # will fire for both after_update and after_touch
-  after_commit :touch_cards_linked_to_this_collection
+  after_commit :touch_related_cards,
+               if: :saved_change_to_updated_at?
 
   # the card that represents this collection in its parent, and determines its breadcrumb
   has_one :parent_collection_card,
@@ -62,12 +66,11 @@ class Collection < ApplicationRecord
 
   delegate :parent, to: :parent_collection_card, allow_nil: true
 
-  belongs_to :organization, optional: true
+  belongs_to :organization
   belongs_to :cloned_from, class_name: 'Collection', optional: true
   belongs_to :created_by, class_name: 'User', optional: true
 
   validates :name, presence: true, if: :base_collection_type?
-  validates :organization, presence: true
   before_validation :inherit_parent_organization_id, on: :create
   after_commit :reindex_sync, on: :create
 
@@ -139,10 +142,10 @@ class Collection < ApplicationRecord
   def self.default_relationships_for_api
     [
       :created_by,
-      roles: [:users, :groups],
+      roles: %i[users groups],
       collection_cards: [
         :parent,
-        record: [:filestack_file],
+        record: %i[filestack_file],
       ],
     ]
   end
@@ -150,11 +153,11 @@ class Collection < ApplicationRecord
   # similar to above but requires `collection/item` instead of `record`
   def self.default_relationships
     [
-      roles: [:users],
+      roles: %i[users],
       collection_cards: [
         :parent,
         :collection,
-        item: [:filestack_file],
+        item: %i[filestack_file],
       ],
     ]
   end
@@ -244,7 +247,7 @@ class Collection < ApplicationRecord
   # convenience method if card order ever gets out of sync
   def reorder_cards!
     collection_cards.each_with_index do |card, i|
-      card.update_attribute(:order, i)
+      card.update_attribute(:order, i) unless card.order == i
     end
   end
 
@@ -259,8 +262,35 @@ class Collection < ApplicationRecord
     end
   end
 
-  def touch_cards_linked_to_this_collection
-    cards_linked_to_this_collection.update_all(updated_at: Time.now)
+  def touch_related_cards
+    try(:parent_collection_card).try(:touch)
+    cards_linked_to_this_collection.update_all(updated_at: updated_at)
+  end
+
+  def cache_tag_list
+    self.cached_tag_list = tag_list
+  end
+
+  def cache_cover
+    self.cached_cover = CollectionCover.call(self)
+  end
+
+  def cache_cover!
+    cache_cover
+    save
+  end
+
+  def update_cover_text!(text_item)
+    cached_cover['text'] = CollectionCover.cover_text(self, text_item)
+    save
+  end
+
+  def base_collection_type?
+    self.class.name == 'Collection'
+  end
+
+  def cache_key
+    "#{jsonapi_cache_key}/cards_#{collection_cards.maximum(:updated_at).to_i}"
   end
 
   private
@@ -292,9 +322,5 @@ class Collection < ApplicationRecord
 
   def parent_is_user_collection?
     parent.is_a? Collection::UserCollection
-  end
-
-  def base_collection_type?
-    self.class.name == 'Collection'
   end
 end

@@ -108,8 +108,8 @@ RSpec.describe CollectionCardBuilder, type: :service do
       end
 
       it 'should mark the collection as updated' do
-        # this should happen via collection_card belongs_to w/ touch: true
-        expect_any_instance_of(Collection).to receive(:touch)
+        # parent's cover hasn't been generated so should_update_parent_collection_cover? == true
+        expect_any_instance_of(Collection).to receive(:cache_cover!)
         expect(builder.create).to be true
       end
     end
