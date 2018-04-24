@@ -120,13 +120,13 @@ class OrganizationDropdown extends React.Component {
 OrganizationDropdown.propTypes = {
   open: PropTypes.bool,
   onItemClick: PropTypes.func.isRequired,
-  history: PropTypes.shape({
-    push: PropTypes.func,
-  }).isRequired
 }
 OrganizationDropdown.wrappedComponent.propTypes = {
   apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
+  history: PropTypes.shape({
+    push: PropTypes.func,
+  }).isRequired
 }
 OrganizationDropdown.defaultProps = {
   open: false,
