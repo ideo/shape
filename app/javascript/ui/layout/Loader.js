@@ -9,30 +9,33 @@ const StyledSpinner = styled(Spinner)`
   &.sk-spinner {
     margin: 0 auto;
     vertical-align: middle;
-    height: ${props => props.height}px;
-    width: ${props => props.height}px;
+    height: ${props => props.size}px;
+    width: ${props => props.size}px;
     margin-top: ${props => (props.enabled ? 8 : 2)}px;
   }
 `
 
-const Loader = ({ height, fadeIn }) => (
-  <Flex style={{ height }} align="center" justify="center">
+const Loader = ({ containerHeight, size, fadeIn }) => (
+  <Flex style={{ height: containerHeight }} align="center" justify="center">
     <Box>
       <StyledSpinner
         fadeIn={fadeIn}
         name="folding-cube"
         color={v.colors.cloudy}
+        size={size}
       />
     </Box>
   </Flex>
 )
 
 Loader.propTypes = {
-  height: PropTypes.string,
+  containerHeight: PropTypes.string,
+  size: PropTypes.number,
   fadeIn: PropTypes.string,
 }
 Loader.defaultProps = {
-  height: '50vh',
+  containerHeight: '50vh',
+  size: 100,
   fadeIn: 'half'
 }
 

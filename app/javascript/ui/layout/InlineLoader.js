@@ -16,7 +16,7 @@ const StyledFlex = styled(Flex)`
 
 const InlineLoader = () => (
   <StyledFlex align="center" justify="center">
-    <Loader fadeIn="half" height={30} />
+    <Loader fadeIn="half" height="30px" size={30} />
   </StyledFlex>
 )
 
