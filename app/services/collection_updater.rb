@@ -19,6 +19,7 @@ class CollectionUpdater < SimpleService
   def assign_attributes
     @collection.attributes = @attributes
     @collection.cache_tag_list if @collection.tag_list != @collection.cached_tag_list
+    # always touch the updated timestamp even though we may just be updating the related cards
     @collection.updated_at = Time.now
   end
 
