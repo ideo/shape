@@ -2,6 +2,9 @@ import axios from 'axios'
 import getVideoId from 'get-video-id'
 import _ from 'lodash'
 
+import v from '~/utils/variables'
+import { parseUrl } from './url'
+
 class VideoUrl {
   // Returns object with video { service, id, normalizedUrl }
   // Attrs are null if video URL is not valid
@@ -37,8 +40,22 @@ class VideoUrl {
     }
   }
 
+  static vimeoPrivate(url) {
+    const parsedUrl = parseUrl(url)
+    if (parsedUrl.pathname.split('/').length > 2) {
+      return {
+        name: v.defaults.video.name,
+        thumbnailUrl: v.defaults.video.thumbnailUrl,
+      }
+    }
+    return {}
+  }
+
   static getAPIdetails(url) {
     const { id, service } = getVideoId(url)
+    if (service === 'vimeo' && !id) {
+      return this.vimeoPrivate()
+    }
     if (!service || !id) return {}
     if (!this.isValid(url)) return {}
 
@@ -91,6 +108,9 @@ class VideoUrl {
 
   static isValid(url) {
     const { id, service } = getVideoId(url)
+    if (service === 'vimeo' && !id) {
+      return !!Object.keys(this.vimeoPrivate(url)).length
+    }
 
     if (!service || !id) return false
     switch (service) {

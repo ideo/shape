@@ -64,4 +64,11 @@ export default {
       ]
     }
   },
+
+  defaults: {
+    video: {
+      thumbnailUrl: 'https://cdn.filestackcontent.com/jh0ytCnkRm6CgTaVulwr',
+      name: 'Video',
+    }
+  }
 }
