@@ -18,8 +18,12 @@ class VideoUrl {
 
     if (!this.isValid(url)) return retv
 
-    const { id, service } = getVideoId(url)
-
+    const data = getVideoId(url)
+    const { service } = data
+    let { id } = data
+    if (service === 'vimeo' && !id) {
+      ({ id } = this.vimeoPrivate(url))
+    }
     retv.service = service
     retv.id = id
     retv.normalizedUrl = this.normalizedUrl(service, id)
@@ -43,9 +47,12 @@ class VideoUrl {
   static vimeoPrivate(url) {
     const parsedUrl = parseUrl(url)
     if (parsedUrl.pathname.split('/').length > 2) {
+      // the "id" in this case e.g. '123123/232323' is the pathname minus the first '/'
+      const id = parsedUrl.pathname.slice(1)
       return {
         name: v.defaults.video.name,
         thumbnailUrl: v.defaults.video.thumbnailUrl,
+        id,
       }
     }
     return {}
