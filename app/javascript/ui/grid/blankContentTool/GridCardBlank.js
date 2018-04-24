@@ -12,6 +12,7 @@ import CloseIcon from '~/ui/icons/CloseIcon'
 import v, { ITEM_TYPES } from '~/utils/variables'
 import FilestackUpload from '~/utils/FilestackUpload'
 import { StyledGridCard } from '~/ui/grid/GridCard'
+import InlineLoader from '~/ui/layout/InlineLoader'
 
 import CollectionCreator from './CollectionCreator'
 import TextItemCreator from './TextItemCreator'
@@ -370,6 +371,7 @@ class GridCardBlank extends React.Component {
         >
           {this.renderInner()}
         </StyledGridCardInner>
+        { this.state.loading && <InlineLoader /> }
         <button className="close" onClick={this.closeBlankContentTool}>
           <CloseIcon />
         </button>
