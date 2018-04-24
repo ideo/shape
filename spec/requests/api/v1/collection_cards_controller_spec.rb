@@ -351,11 +351,30 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
       end
     end
 
-    describe 'with manage access for to_collection' do
+    describe 'without view access for cards in from_collection' do
+      let(:to_collection) do
+        create(:collection, num_cards: 3, add_editors: [user])
+      end
+
+      it 'returns a 401' do
+        # by default user won't have any role added to the records within the cards
+        post(path, params: params)
+        expect(response.status).to eq(401)
+      end
+    end
+
+    describe 'with manage access for to_collection and view access for cards in from_collection' do
       let(:editor) { create(:user) }
       let(:viewer) { create(:user) }
       let(:to_collection) do
         create(:collection, num_cards: 3, add_editors: [user, editor], add_viewers: [viewer])
+      end
+
+      before do
+        # user has to have access to each card's record in order to link them
+        moving_cards.each do |card|
+          user.add_role(Role::VIEWER, card.record)
+        end
       end
 
       it 'returns a 200' do

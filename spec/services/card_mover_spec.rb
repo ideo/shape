@@ -5,14 +5,14 @@ RSpec.describe CardMover, type: :service do
   let(:from_collection) { create(:collection, num_cards: 3) }
   let(:to_collection) { create(:collection, num_cards: 3) }
   let!(:moving_cards) { from_collection.collection_cards }
-  let(:card_ids) { moving_cards.map(&:id) }
+  let(:cards) { moving_cards }
   let(:placement) { 'beginning' }
   let(:card_action) { 'move' }
   let(:card_mover) do
     CardMover.new(
       from_collection: from_collection,
       to_collection: to_collection,
-      card_ids: card_ids,
+      cards: cards,
       placement: placement,
       card_action: card_action,
     )
@@ -92,7 +92,7 @@ RSpec.describe CardMover, type: :service do
       let(:from_collection) { create(:collection, num_cards: 3, parent_collection_card: parent_collection_card) }
       let(:to_parent_collection_card) { create(:collection_card, parent: from_collection) }
       let(:to_collection) { create(:collection, num_cards: 3, parent_collection_card: to_parent_collection_card) }
-      let(:card_ids) { [to_parent_collection_card.id] }
+      let(:cards) { [to_parent_collection_card] }
 
       it 'should produce errors if collection is moving inside itself' do
         expect(card_mover.call).to be false

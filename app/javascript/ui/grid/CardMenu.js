@@ -24,10 +24,16 @@ class CardMenu extends React.Component {
     this.itemLoading = name
   }
 
+  callCardAction = async(name, methodName) => {
+    const { uiStore, card } = this.props
+    uiStore.closeMoveMenu()
+    this.setLoading(name)
+    await card[methodName]()
+    this.setLoading()
+  }
+
   duplicateCard = () => {
-    this.props.uiStore.closeMoveMenu()
-    const { card } = this.props
-    card.API_duplicate()
+    this.callCardAction('Duplicate', 'API_duplicate')
   }
 
   replaceCard = () => {
@@ -48,17 +54,12 @@ class CardMenu extends React.Component {
     uiStore.openMoveMenu({ from: this.viewingCollectionId, cardAction: 'link' })
   }
 
-  addToMyCollection = async () => {
-    const { card, uiStore } = this.props
-    uiStore.closeMoveMenu()
-    this.setLoading('Add to My Collection')
-    await card.API_linkToMyCollection()
-    this.setLoading()
+  addToMyCollection = () => {
+    this.callCardAction('Add to My Collection', 'API_linkToMyCollection')
   }
 
   archiveCard = () => {
-    this.props.uiStore.closeMoveMenu()
-    this.props.card.API_archive()
+    this.callCardAction('Archive', 'API_archive')
   }
 
   handleMouseLeave = () => {

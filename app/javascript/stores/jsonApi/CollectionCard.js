@@ -41,7 +41,7 @@ class CollectionCard extends BaseRecord {
         uiStore.closeBlankContentTool()
       }
     } catch (e) {
-      // console.warn(e)
+      uiStore.defaultAlertError()
     }
   }
 
@@ -55,8 +55,12 @@ class CollectionCard extends BaseRecord {
       collection_card_ids: [this.id],
       placement: 'end',
     }
-    await this.apiStore.request('collection_cards/link', 'POST', data)
-    uiStore.alert({ iconName: 'Ok', prompt: 'Added to your colleciton' })
+    try {
+      await this.apiStore.request('collection_cards/link', 'POST', data)
+      uiStore.alert({ iconName: 'Ok', prompt: 'Added to your collection' })
+    } catch (e) {
+      uiStore.defaultAlertError()
+    }
   }
 
   async API_archive({ isReplacing = false } = {}) {
@@ -71,7 +75,7 @@ class CollectionCard extends BaseRecord {
 
         return true
       } catch (e) {
-        // console.warn(e)
+        uiStore.defaultAlertError()
       }
       return false
     }
