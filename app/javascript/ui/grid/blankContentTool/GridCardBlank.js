@@ -290,6 +290,7 @@ class GridCardBlank extends React.Component {
       // since it doesn't use the BctBackground
       return (
         <TextItemCreator
+          loading={this.state.loading}
           height={this.props.height}
           createCard={this.createCard}
           closeBlankContentTool={this.closeBlankContentTool}
