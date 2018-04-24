@@ -41,19 +41,26 @@ class CollectionCard extends BaseRecord {
         uiStore.closeBlankContentTool()
       }
     } catch (e) {
-      // console.warn(e)
+      uiStore.defaultAlertError()
     }
   }
 
   async API_linkToMyCollection() {
+    const viewingCollectionId = uiStore.viewingCollection
+      ? uiStore.viewingCollection.id
+      : this.parent_id
     const data = {
       to_id: this.apiStore.currentUser.current_user_collection_id,
-      from_id: uiStore.viewingCollection.id,
+      from_id: viewingCollectionId,
       collection_card_ids: [this.id],
       placement: 'end',
     }
-    await this.apiStore.request('collection_cards/link', 'POST', data)
-    uiStore.alert({ iconName: 'Ok', prompt: 'Added to your colleciton' })
+    try {
+      await this.apiStore.request('collection_cards/link', 'POST', data)
+      uiStore.alert({ iconName: 'Ok', prompt: 'Added to your collection' })
+    } catch (e) {
+      uiStore.defaultAlertError()
+    }
   }
 
   async API_archive({ isReplacing = false } = {}) {
@@ -68,7 +75,7 @@ class CollectionCard extends BaseRecord {
 
         return true
       } catch (e) {
-        // console.warn(e)
+        uiStore.defaultAlertError()
       }
       return false
     }

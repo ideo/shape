@@ -1,3 +1,4 @@
+import { uiStore } from '~/stores'
 import BaseRecord from './BaseRecord'
 
 class User extends BaseRecord {
@@ -13,7 +14,7 @@ class User extends BaseRecord {
     try {
       return await this.apiStore.request('users/accept_terms', 'POST')
     } catch (e) {
-      // console.warn(e)
+      uiStore.defaultAlertError()
       return e
     }
   }

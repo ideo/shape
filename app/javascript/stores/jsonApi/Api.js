@@ -32,7 +32,7 @@ const duplicate = async (type, obj) => {
     })
     uiStore.scroll.scrollToBottom()
   } catch (e) {
-    // console.warn(e)
+    uiStore.defaultAlertError()
   }
 }
 

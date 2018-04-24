@@ -9,7 +9,8 @@
     "breadcrumb": { "type": ["array", "null"] },
     "can_edit": { "type": ["boolean"] },
     "tag_list": { "type": ["array", "null"] },
-    "cover": { "type": ["object"] }
+    "cover": { "type": ["object"] },
+    "parent_collection_card": { "type": ["object", "null"] }
   },
   "required": ["id", "name", "type", "created_at", "cover"]
 }

@@ -4,16 +4,15 @@ class CardMover
   def initialize(
     from_collection:,
     to_collection:,
-    card_ids:,
+    cards:,
     placement: 'beginning',
     card_action: 'move'
   )
     @from_collection = from_collection
     @to_collection = to_collection
-    @card_ids = card_ids
     @placement = placement
     # retain array of cards being moved
-    @moving_cards = @from_collection.collection_cards.where(id: @card_ids).to_a
+    @moving_cards = cards.to_a
     @card_action = card_action
     @errors = []
   end

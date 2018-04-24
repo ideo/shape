@@ -26,7 +26,7 @@ describe('SearchResultsInfinite', () => {
   })
 
   it('routes to collection on click', () => {
-    wrapper.find('StyledSearchResult').at(0).simulate('click')
+    wrapper.find('StyledLink').at(0).simulate('click')
     expect(props.routeTo).toBeCalledWith('collections', fakeCollection.id)
   })
 })

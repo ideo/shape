@@ -47,6 +47,10 @@ export default class UiStore {
   @observable dialogConfig = { ...this.defaultDialogProps }
   @observable blurContent = false
 
+  @action defaultAlertError() {
+    this.alert({ prompt: 'There was an error performing this action.' })
+  }
+
   @action alert(props = {}) {
     _.assign(this.dialogConfig, {
       ...this.defaultDialogProps,
@@ -134,7 +138,7 @@ export default class UiStore {
 
   @action resetSelectionAndBCT() {
     this.deselectCards()
-    this.closeMoveMenu()
+    // this.closeMoveMenu()
     this.closeBlankContentTool()
   }
 

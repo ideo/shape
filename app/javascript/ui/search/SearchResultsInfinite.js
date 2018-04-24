@@ -7,17 +7,21 @@ import InfiniteScroll from 'react-infinite-scroller'
 import FlipMove from 'react-flip-move'
 import VisibilitySensor from 'react-visibility-sensor'
 
+import { apiStore, uiStore } from '~/stores'
 import v from '~/utils/variables'
 import Breadcrumb from '~/ui/layout/Breadcrumb'
 import Loader from '~/ui/layout/Loader'
+import CardMenu from '~/ui/grid/CardMenu'
+import SelectionCircle from '~/ui/grid/SelectionCircle'
 import CollectionCover from '~/ui/grid/covers/CollectionCover'
 import CollectionIcon from '~/ui/icons/CollectionIcon'
+import CollectionCard from '~/stores/jsonApi/CollectionCard'
 import { StyledTopRightActions, StyledBottomLeftIcon } from '~/ui/grid/GridCard'
 
 const StyledSearchResult = styled.div`
   height: ${props => props.gridH}px;
   max-width: ${props => props.gridMaxW}px;
-  background: white;
+  background: transparent;
   margin-bottom: ${props => props.gutter}px;
   position: relative;
   cursor: pointer;
@@ -43,6 +47,11 @@ const StyledScrollIndicator = styled.div`
   background: ${props => (props.active ? v.colors.gray : v.colors.cloudy)};
   z-index: ${v.zIndex.scrollIndicator};
 `
+
+const StyledLink = styled.a`
+  text-decoration: none;
+`
+StyledLink.displayName = 'StyledLink'
 
 @observer
 class SearchResultsInfinite extends React.Component {
@@ -102,50 +111,60 @@ class SearchResultsInfinite extends React.Component {
     } = this.props
 
     const results = (
-      searchResults.map((collection, i) => (
-        <FlipMove
-          appearAnimation="fade"
-          key={collection.id}
-        >
-          <VisibilitySensor
-            // minTopValue={1} // consider visible even if we only see top 25px
-            partialVisibility
-            scrollCheck
-            intervalDelay={300}
-            onChange={this.handleVisibilityChange(i + 1)}
-            offset={{
-              top: v.headerHeightCompact + (gridSettings.gridH / 2),
-            }}
+      searchResults.map((collection, i) => {
+        const card = new CollectionCard(collection.parent_collection_card, apiStore)
+        return (
+          <FlipMove
+            appearAnimation="fade"
+            key={collection.id}
           >
-            <div>
-              <StyledBreadcrumb>
-                <Breadcrumb items={collection.breadcrumb} />
-              </StyledBreadcrumb>
-              <StyledSearchResult
-                {...gridSettings}
-                gridMaxW={gridMaxW}
-                onClick={this.routeToCollection(collection.id)}
-                onMouseEnter={this.handleMouseOver(i + 1)}
-                onMouseLeave={this.handleMouseOver(i + 1, false)}
-                // onFocus={this.handleMouseOver(i + 1)}
-              >
-                <StyledTopRightActions className="show-on-hover">
-                  {/* NOTE: once linking is enabled, should setup CardMenu here */}
-                </StyledTopRightActions>
-                <StyledBottomLeftIcon>
-                  <CollectionIcon />
-                </StyledBottomLeftIcon>
-                <CollectionCover
-                  collection={collection}
-                  width={gridSettings.cols}
-                  height={1}
-                />
-              </StyledSearchResult>
-            </div>
-          </VisibilitySensor>
-        </FlipMove>
-      ))
-    )
+            <VisibilitySensor
+              // minTopValue={1} // consider visible even if we only see top 25px
+              partialVisibility
+              scrollCheck
+              intervalDelay={300}
+              onChange={this.handleVisibilityChange(i + 1)}
+              offset={{
+                top: v.headerHeightCompact + (gridSettings.gridH / 2),
+              }}
+            >
+              <div>
+                <StyledBreadcrumb>
+                  <Breadcrumb items={collection.breadcrumb} />
+                </StyledBreadcrumb>
+                <StyledSearchResult
+                  {...gridSettings}
+                  gridMaxW={gridMaxW}
+                  onMouseEnter={this.handleMouseOver(i + 1)}
+                  onMouseLeave={this.handleMouseOver(i + 1, false)}
+                  // onFocus={this.handleMouseOver(i + 1)}
+                >
+                  <StyledTopRightActions className="show-on-hover">
+                    <SelectionCircle cardId={collection.id} />
+                    <CardMenu
+                      className="show-on-hover card-menu"
+                      card={card}
+                      canEdit={false}
+                      canReplace={false}
+                      menuOpen={uiStore.openCardMenuId === card.id}
+                    />
+                  </StyledTopRightActions>
+                  <StyledBottomLeftIcon>
+                    <CollectionIcon />
+                  </StyledBottomLeftIcon>
+                  <StyledLink onClick={this.routeToCollection(collection.id)}>
+                    <CollectionCover
+                      collection={collection}
+                      width={gridSettings.cols}
+                      height={1}
+                    />
+                  </StyledLink>
+                </StyledSearchResult>
+              </div>
+            </VisibilitySensor>
+          </FlipMove>
+        )
+      }))
     return (
       <Fragment>
         <StyledScrollIndicator active={this.hovering}>

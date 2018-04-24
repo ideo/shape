@@ -58,7 +58,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
     mover = CardMover.new(
       from_collection: @from_collection,
       to_collection: @to_collection,
-      card_ids: json_api_params[:collection_card_ids],
+      cards: @cards,
       placement: json_api_params[:placement],
       card_action: @card_action || 'move',
     )
@@ -87,16 +87,20 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
 
   def load_and_authorize_moving_collections
     @from_collection = Collection.find(json_api_params[:from_id])
+    @cards = @from_collection.collection_cards.where(id: json_api_params[:collection_card_ids])
     @to_collection = Collection.find(json_api_params[:to_id])
     authorize! :manage, @from_collection
     authorize! :manage, @to_collection
   end
 
-  # almost the same as above but only needs read access for @from_collection
+  # almost the same as above but needs to authorize read access for each card's record
   def load_and_authorize_linking_collections
     @from_collection = Collection.find(json_api_params[:from_id])
+    @cards = @from_collection.collection_cards.where(id: json_api_params[:collection_card_ids])
+    @cards.each do |card|
+      authorize! :read, card.record
+    end
     @to_collection = Collection.find(json_api_params[:to_id])
-    authorize! :read, @from_collection
     authorize! :manage, @to_collection
   end
 
