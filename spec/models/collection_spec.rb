@@ -268,7 +268,32 @@ describe Collection, type: :model do
     end
   end
 
-  context 'cached_attributes' do
+  context 'caching' do
+    describe '#cache_key' do
+      let(:user) { create(:user) }
+      let(:collection) { create(:collection, num_cards: 2) }
+      let(:first_card) { collection.collection_cards.first }
+
+      it 'updates based on the collection updated_at timestamp' do
+        expect {
+          collection.update(updated_at: 10.seconds.from_now)
+        }.to change(collection, :cache_key)
+      end
+
+      it 'updates when roles are updated' do
+        expect {
+          # this should "touch" the role updated_at
+          user.add_role(Role::EDITOR, collection)
+        }.to change(collection, :cache_key)
+      end
+
+      it 'updates when cards are updated' do
+        expect {
+          first_card.update(updated_at: 10.seconds.from_now)
+        }.to change(collection, :cache_key)
+      end
+    end
+
     describe '#cache_tag_list' do
       let(:tag_list) { %w[testing prototyping] }
       let(:collection) { create(:collection, tag_list: tag_list) }

@@ -42,6 +42,18 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
       expect(json['data']['attributes']['can_edit']).to eq(false)
     end
 
+    context 'with caching' do
+      before do
+        Rails.cache.delete collection.cache_key
+      end
+
+      it 'caches the collection result' do
+        expect(Rails.cache.read(collection.cache_key)).to be nil
+        get(path)
+        expect(Rails.cache.read(collection.cache_key)).not_to be nil
+      end
+    end
+
     context 'with editor' do
       let!(:collection) {
         create(:collection, num_cards: 5, add_editors: [user])
