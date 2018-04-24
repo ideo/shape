@@ -36,6 +36,7 @@ const fakeUiStore = {
   viewingCollection: null,
   movingFromCollectionId: null,
   movingCardIds: [],
+  openMoveMenu: jest.fn(),
   update: jest.fn(),
   alert: jest.fn(),
   confirm: jest.fn(),

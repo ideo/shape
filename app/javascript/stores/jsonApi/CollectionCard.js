@@ -45,6 +45,17 @@ class CollectionCard extends BaseRecord {
     }
   }
 
+  async API_linkToMyCollection() {
+    const data = {
+      to_id: this.apiStore.currentUser.current_user_collection_id,
+      from_id: uiStore.viewingCollection.id,
+      collection_card_ids: [this.id],
+      placement: 'end',
+    }
+    await this.apiStore.request('collection_cards/link', 'POST', data)
+    uiStore.alert({ iconName: 'Ok', prompt: 'Added to your colleciton' })
+  }
+
   async API_archive({ isReplacing = false } = {}) {
     const onAgree = async () => {
       const collection = this.parent
