@@ -290,7 +290,9 @@ class Collection < ApplicationRecord
   end
 
   def cache_key
-    "#{jsonapi_cache_key}/cards_#{collection_cards.maximum(:updated_at).to_i}"
+    "#{jsonapi_cache_key}" \
+      "/cards_#{collection_cards.maximum(:updated_at).to_i}" \
+      "/roles_#{roles.maximum(:updated_at).to_i}"
   end
 
   private
