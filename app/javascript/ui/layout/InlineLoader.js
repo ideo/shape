@@ -1,18 +1,7 @@
 import PropTypes from 'prop-types'
 import styled from 'styled-components'
-import Spinner from 'react-spinkit'
-import { Flex, Box } from 'reflexbox'
-
-import v from '~/utils/variables'
-
-const StyledSpinner = styled(Spinner)`
-  &.sk-spinner {
-    height: 50px;
-    margin: 0 auto;
-    vertical-align: middle;
-    width: 50px;
-  }
-`
+import { Flex } from 'reflexbox'
+import Loader from '~/ui/layout/Loader'
 
 const StyledFlex = styled(Flex)`
   background: rgba(255, 255, 255, 0.5);
@@ -23,23 +12,15 @@ const StyledFlex = styled(Flex)`
   width: 100%;
 `
 
-const InlineLoader = ({ fadeIn }) => (
+const InlineLoader = () => (
   <StyledFlex align="center" justify="center">
-    <Box>
-      <StyledSpinner
-        fadeIn={fadeIn}
-        name="folding-cube"
-        color={v.colors.cloudy}
-      />
-    </Box>
+    <Loader fadeIn="half" height={30} />
   </StyledFlex>
 )
 
 InlineLoader.propTypes = {
-  fadeIn: PropTypes.string,
 }
 InlineLoader.defaultProps = {
-  fadeIn: 'half'
 }
 
 export default InlineLoader

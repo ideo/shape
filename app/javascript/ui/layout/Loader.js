@@ -9,8 +9,9 @@ const StyledSpinner = styled(Spinner)`
   &.sk-spinner {
     margin: 0 auto;
     vertical-align: middle;
-    height: 100px;
-    width: 100px;
+    height: ${props => props.height}px;
+    width: ${props => props.height}px;
+    margin-top: ${props => (props.enabled ? 8 : 2)}px;
   }
 `
 
