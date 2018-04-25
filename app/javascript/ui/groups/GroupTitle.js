@@ -62,10 +62,11 @@ class GroupTitle extends React.Component {
   }
 
   handleSave = (ev) => {
-    const { group } = this.props
+    const { group, onSave } = this.props
     ev.preventDefault()
     group.save()
     this.toggleEditing()
+    onSave(group)
   }
 
   handleInputKeys = (ev) => {
@@ -177,6 +178,7 @@ class GroupTitle extends React.Component {
 
 GroupTitle.propTypes = {
   group: MobxPropTypes.objectOrObservableObject.isRequired,
+  onSave: PropTypes.func.isRequired,
   canEdit: PropTypes.bool.isRequired,
 }
 

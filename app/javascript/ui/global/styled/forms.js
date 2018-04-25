@@ -191,9 +191,11 @@ export const StyledAutosizeInput = styled(AutosizeInput)`
 StyledAutosizeInput.displayName = 'StyledAutosizeInput'
 
 export const EditAvatarButton = styled.button`
+  cursor: auto;
   ${props => props.canEdit &&
     `
-    opacity: 0.75
+    cursor: pointer;
+    opacity: 0.75;
     `
 }
 `

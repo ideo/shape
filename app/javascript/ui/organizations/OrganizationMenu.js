@@ -63,10 +63,13 @@ class OrganizationMenu extends React.Component {
   }
 
   @action onGroupSave = async (editedGroup) => {
-    const { apiStore } = this.props
+    const { apiStore, uiStore } = this.props
     const newGroup = !this.editGroup.id
     this.changePage('organizationPeople')
     this.editGroup = {}
+    // Once a group has been modified, it has be re-fetched on the current
+    // viewed collection. This can be fire and forget
+    apiStore.fetch('collections', uiStore.viewingCollection.id)
     if (newGroup) {
       this.goToEditGroupRoles(editedGroup)
       this.isLoading = true
@@ -106,17 +109,6 @@ class OrganizationMenu extends React.Component {
     } catch (err) {
       console.warn('Unable to archive group', err)
     }
-  }
-
-  renderEditOrganization() {
-    const { organization } = this.props
-    return (
-      <GroupModify
-        group={organization.primary_group}
-        onGroupRoles={this.onGroupRoles(organization.primary_group)}
-        onSave={this.onOrganizationSave}
-      />
-    )
   }
 
   renderEditGroup() {
@@ -159,6 +151,7 @@ class OrganizationMenu extends React.Component {
     return (
       <GroupTitle
         group={this.editGroup}
+        onSave={this.onGroupSave}
         canEdit={this.editGroup.currentUserCanEdit}
       />
     )
@@ -177,11 +170,6 @@ class OrganizationMenu extends React.Component {
       content = this.renderEditGroup()
       title = this.editGroup.id ? this.renderGroupTitle() : 'New Group'
       onBack = this.goBack
-      break
-    case 'editOrganization':
-      title = this.renderGroupTitle()
-      onBack = this.goBack
-      content = this.renderEditOrganization()
       break
     case 'editRoles':
       onBack = this.goBack
