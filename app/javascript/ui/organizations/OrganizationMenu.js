@@ -135,6 +135,17 @@ class OrganizationMenu extends React.Component {
     )
   }
 
+  renderEditOrganization() {
+    const { organization } = this.props
+    return (
+      <GroupModify
+        group={organization.primary_group}
+        onGroupRoles={this.onGroupRoles(organization.primary_group)}
+        onSave={this.onOrganizationSave}
+      />
+    )
+  }
+
   renderGroupTitle() {
     return (
       <GroupTitle
@@ -153,6 +164,11 @@ class OrganizationMenu extends React.Component {
       content = this.renderEditGroup()
       title = 'New Group'
       onBack = this.goBack
+      break
+    case 'editOrganization':
+      title = 'Your Organization'
+      onBack = this.goBack
+      content = this.renderEditOrganization()
       break
     case 'editGroup':
       content = this.renderEditGroup()
