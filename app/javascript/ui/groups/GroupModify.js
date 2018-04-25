@@ -202,7 +202,7 @@ class GroupModify extends React.Component {
             onClick={this.handleSave}
             type="submit"
           >
-            Save
+            Add Members &gt;
           </FormButton>
         </FormActionsContainer>
       </form>
