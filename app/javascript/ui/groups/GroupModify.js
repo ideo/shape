@@ -200,6 +200,7 @@ class GroupModify extends React.Component {
         <FormActionsContainer>
           <FormButton
             onClick={this.handleSave}
+            width={190}
             type="submit"
           >
             Add Members &gt;
