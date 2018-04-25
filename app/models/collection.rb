@@ -162,6 +162,9 @@ class Collection < ApplicationRecord
 
   amoeba do
     enable
+    nullify :breadcrumb
+    nullify :created_by_id
+    set archived: false
     # don't recognize any relations, easiest way to turn them all off
     recognize []
   end
@@ -170,6 +173,7 @@ class Collection < ApplicationRecord
     # Clones collection and all embedded items/collections
     c = amoeba_dup
     c.cloned_from = self
+    c.created_by = for_user
     c.tag_list = tag_list
 
     # save the dupe collection first so that we can reference it later

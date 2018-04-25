@@ -3,7 +3,7 @@ class CollectionCardDuplicationWorker
   sidekiq_options queue: 'critical'
 
   def perform(card_ids, for_user_id, parent_collection_id)
-    collection_cards = CollectionCard.where(id: card_ids)
+    collection_cards = CollectionCard.active.where(id: card_ids).ordered
     for_user = User.find(for_user_id)
     parent_collection = Collection.find(parent_collection_id)
     collection_cards.each do |card|
