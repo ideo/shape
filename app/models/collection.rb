@@ -71,6 +71,7 @@ class Collection < ApplicationRecord
   validates :name, presence: true, if: :base_collection_type?
   before_validation :inherit_parent_organization_id, on: :create
   after_commit :reindex_sync, on: :create
+  after_update :recalculate_child_breadcrumbs_async, if: :saved_change_to_name?
 
   scope :root, -> { where.not(organization_id: nil) }
   scope :not_custom_type, -> { where(type: nil) }
@@ -228,6 +229,20 @@ class Collection < ApplicationRecord
 
   def breadcrumb_title
     name
+  end
+
+  def recalculate_child_breadcrumbs_async
+    BreadcrumbRecalculationWorker.perform_async(id, false)
+  end
+
+  def recalculate_child_breadcrumbs(cards = collection_cards)
+    cards.each do |card|
+      if card.item_id.present?
+        card.item.recalculate_breadcrumb!
+      elsif card.collection_id.present?
+        BreadcrumbRecalculationWorker.perform_async(card.collection_id)
+      end
+    end
   end
 
   def collection_cards_viewable_by(cached_cards, user)

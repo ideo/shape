@@ -55,13 +55,16 @@ class CardMover
     joined_cards.each_with_index do |card, i|
       # parent_id will already be set for existing_cards but no harm to indicate
       card.assign_attributes(parent_id: @to_collection.id, order: i)
-      should_update_to_cover ||= card.should_update_parent_collection_cover? if card.changed?
-      card.save if card.changed?
+      if card.changed?
+        should_update_to_cover ||= card.should_update_parent_collection_cover?
+        card.save
+      end
     end
 
     @from_collection.reload.reorder_cards! unless @from_collection == @to_collection
     @from_collection.cache_cover! if should_update_from_cover
     @to_collection.cache_cover! if should_update_to_cover
+    @to_collection.recalculate_child_breadcrumbs(@moving_cards)
     @moving_cards
   end
 
