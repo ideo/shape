@@ -13,6 +13,7 @@ describe('OrganizationMenu', () => {
     fakeApiStore.request = jest.fn().mockReturnValue(
       Promise.resolve({ data: [] })
     )
+    fakeUiStore.viewingCollection = { id: 1 }
     props = {
       apiStore: fakeApiStore(),
       uiStore: fakeUiStore,
