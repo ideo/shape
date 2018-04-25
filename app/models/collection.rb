@@ -190,10 +190,11 @@ class Collection < ApplicationRecord
       c.roles << role.duplicate!(assign_resource: c)
     end
 
-    collection_cards.each do |collection_card|
-      next unless collection_card.record.can_view?(for_user)
-      collection_card.duplicate!(for_user: for_user, parent: c)
-    end
+    CollectionCardDuplicationWorker.perform_async(
+      collection_cards.map(&:id),
+      for_user.id,
+      c.id,
+    )
 
     # pick up newly created relationships
     c.reload
