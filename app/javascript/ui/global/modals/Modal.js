@@ -8,7 +8,6 @@ import { Heading2 } from '~/ui/global/styled/typography'
 import v from '~/utils/variables'
 import ArrowIcon from '~/ui/icons/ArrowIcon'
 import CloseIcon from '~/ui/icons/CloseIcon'
-import EditPencilIcon from '~/ui/icons/EditPencilIcon'
 
 const StyledDialog = styled(Dialog)`
   .modal__paper {
@@ -35,27 +34,6 @@ const BackIconHolder = styled.button`
   top: 33px;
   width: 15px;
 `
-const EditIconHolder = styled.button`
-  cursor: pointer;
-  display: block;
-  right: 120px;
-  position: absolute;
-  top: 33px;
-  width: 100px;
-  span.text {
-    display: inline-block;
-    padding-right: 4px;
-    position: relative;
-    top: -3px;
-    letter-spacing: 1.2px;
-    text-transform: uppercase;
-    font-family: ${v.fonts.sans};
-    font-weight: ${v.weights.medium};
-  }
-  svg {
-    width: 15px;
-  }
-`
 
 const PaddedContent = styled.div`
   padding: 0 20px;
@@ -68,7 +46,11 @@ class Modal extends React.Component {
   }
 
   render() {
-    const { children, onBack, onEdit, open, title } = this.props
+    const { children, onBack, open, title } = this.props
+    let wrappedTitle = title
+    if (typeof title === 'string') {
+      wrappedTitle = <Heading2>{title}</Heading2>
+    }
     // TODO progamatically set disableAutoFocus
     return (
       <StyledDialog
@@ -83,17 +65,12 @@ class Modal extends React.Component {
         { _.isFunction(onBack) && (
           <BackIconHolder onClick={onBack}><ArrowIcon /></BackIconHolder>
         )}
-        { _.isFunction(onEdit) && (
-          <EditIconHolder onClick={onEdit}>
-            <span className="text">Edit</span> <EditPencilIcon />
-          </EditIconHolder>
-        )}
         <ModalCloseButton onClick={this.handleClose}>
           <CloseIcon />
         </ModalCloseButton>
         <PaddedContent onBack={onBack}>
           <DialogTitle disableTypography id="sharing">
-            <Heading2>{title}</Heading2>
+            {wrappedTitle}
           </DialogTitle>
           <DialogContent>
             { children }
@@ -105,18 +82,16 @@ class Modal extends React.Component {
 }
 Modal.propTypes = {
   onClose: PropTypes.func.isRequired,
-  title: PropTypes.string.isRequired,
+  title: PropTypes.element.isRequired,
   children: PropTypes.node,
   open: PropTypes.bool,
   onBack: PropTypes.func,
-  onEdit: PropTypes.func,
 }
 
 Modal.defaultProps = {
   children: <div />,
   open: false,
   onBack: null,
-  onEdit: null,
 }
 
 export default Modal

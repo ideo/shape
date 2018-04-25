@@ -6,6 +6,7 @@ import GroupModify from '~/ui/groups/GroupModify'
 import RolesMenu from '~/ui/roles/RolesMenu'
 import Loader from '~/ui/layout/Loader'
 import OrganizationPeople from '~/ui/organizations/OrganizationPeople'
+import GroupTitle from '~/ui/groups/GroupTitle'
 
 @inject('apiStore', 'uiStore')
 @observer
@@ -43,7 +44,7 @@ class OrganizationMenu extends React.Component {
   }
 
   goToAddGroup = (ev) => {
-    this.changePage('editGroup')
+    this.changePage('addGroup')
   }
 
   @action goToEditGroup(group) {
@@ -154,17 +155,31 @@ class OrganizationMenu extends React.Component {
     )
   }
 
+  renderGroupTitle() {
+    return (
+      <GroupTitle
+        group={this.editGroup}
+        canEdit={this.editGroup.currentUserCanEdit}
+      />
+    )
+  }
+
   render() {
     const { open } = this.props
     let content, title, onBack, onEdit
     switch (this.currentPage) {
+    case 'addGroup':
+      content = this.renderEditGroup()
+      title = 'New Group'
+      onBack = this.goBack
+      break
     case 'editGroup':
       content = this.renderEditGroup()
-      title = this.editGroup.id ? this.editGroup.name : 'New Group'
+      title = this.editGroup.id ? this.renderGroupTitle() : 'New Group'
       onBack = this.goBack
       break
     case 'editOrganization':
-      title = 'Your Organization'
+      title = this.renderGroupTitle()
       onBack = this.goBack
       content = this.renderEditOrganization()
       break
@@ -180,7 +195,7 @@ class OrganizationMenu extends React.Component {
           this.goToEditGroup(this.editGroup)
         }
       }
-      title = this.editGroup.name
+      title = this.renderGroupTitle()
       break
     case 'organizationPeople':
     default:

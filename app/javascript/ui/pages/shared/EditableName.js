@@ -18,13 +18,13 @@ StyledName.displayName = 'StyledName'
 const StyledEditableName = styled.div`
   display: inline-block;
   .input__name {
-    width: 30vw;
+    width: ${props => props.fontSize > 2 ? '30vw' : 'auto'};
     margin-bottom: 0.5rem;
     margin-top: 0.5rem;
     input {
       z-index: ${v.zIndex.aboveClickWrapper};
       position: relative;
-      font-size: 2.25rem;
+      font-size: ${props => props.fontSize}rem;
       font-family: ${v.fonts.sans};
       font-weight: ${v.weights.medium};
       letter-spacing: 0.125rem;
@@ -55,7 +55,8 @@ class EditableName extends React.Component {
   // navigating between collections may trigger this instead of didMount
   componentWillReceiveProps(nextProps) {
     this.setState({
-      name: nextProps.name
+      name: nextProps.name,
+      editing: nextProps.editing,
     })
   }
 
@@ -88,18 +89,18 @@ class EditableName extends React.Component {
   }
 
   render() {
-    const { canEdit } = this.props
+    const { canEdit, TextWrapper, fontSize } = this.props
     const { name, editing } = this.state
     if (canEdit && editing) {
       const clickHandlers = [
         () => this.stopEditingName()
       ]
       return (
-        <StyledEditableName>
+        <StyledEditableName fontSize={fontSize}>
           <AutosizeInput
             maxLength={40}
             className="input__name"
-            style={{ fontSize: '2.25rem' }}
+            style={{ fontSize }}
             value={name}
             onChange={this.onNameChange}
             onKeyPress={this.onNameFieldKeypress}
@@ -108,13 +109,21 @@ class EditableName extends React.Component {
         </StyledEditableName>
       )
     }
+    let nameEl = (
+      <Heading1 onClick={canEdit ? this.startEditingName : null}>
+        {name}
+      </Heading1>
+    )
+    if (TextWrapper) {
+      nameEl = (
+        <button onClick={canEdit ? this.startEditingName : null}>
+          <TextWrapper>{name}</TextWrapper>
+        </button>
+      )
+    }
     return (
       <StyledName>
-        <Heading1
-          onClick={canEdit ? this.startEditingName : null}
-        >
-          {name}
-        </Heading1>
+        {nameEl}
       </StyledName>
     )
   }
@@ -125,11 +134,15 @@ EditableName.propTypes = {
   updateNameHandler: PropTypes.func.isRequired,
   editing: PropTypes.bool,
   canEdit: PropTypes.bool,
+  TextWrapper: PropTypes.element,
+  fontSize: PropTypes.number,
 }
 
 EditableName.defaultProps = {
   editing: false,
-  canEdit: false
+  canEdit: false,
+  TextWrapper: null,
+  fontSize: 2.25,
 }
 
 export default EditableName

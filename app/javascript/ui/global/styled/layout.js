@@ -32,3 +32,13 @@ export const FloatRight = styled.span`
   float: right;
 `
 FloatRight.displayName = 'StyledFloatRight'
+
+export const RowItem = styled.span`
+  align-self: center;
+  vertical-align: center;
+
+  &:last-child {
+    margin-right: auto;
+  }
+`
+RowItem.displayName = 'StyledRowItem'
