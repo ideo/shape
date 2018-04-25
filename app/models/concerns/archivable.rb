@@ -49,7 +49,7 @@ module Archivable
     end
   end
 
-  # will archive the card as well as its `archive_with` and calling `after_archive`
+  # will first archive all of the `archive_with` relations, and then archive the model itself
   def archive_with_relations!
     if self.class.archive_with.present?
       self.class.archive_with.each do |relation|

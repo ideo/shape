@@ -88,8 +88,6 @@ class CollectionCard < ApplicationRecord
     return true if update_ids.blank?
 
     CollectionCard.increment_counter(:order, update_ids)
-
-    true
   end
 
   # Decrement the order by 1 of all cards with >= specified order
@@ -106,8 +104,12 @@ class CollectionCard < ApplicationRecord
     return true if update_ids.blank?
 
     CollectionCard.decrement_counter(:order, update_ids)
+  end
 
-    true
+  def after_archive_card
+    decrement_card_orders!
+    # touch parent to bust cache
+    parent.touch
   end
 
   def self.with_record(record)
