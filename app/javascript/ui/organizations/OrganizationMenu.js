@@ -62,21 +62,22 @@ class OrganizationMenu extends React.Component {
     this.changePage('organizationPeople')
   }
 
-  @action onGroupSave = async (editedGroup) => {
+  @action onGroupSave = (savedGroup) => {
     const { apiStore, uiStore } = this.props
-    const newGroup = !this.editGroup.id
-    this.editGroup = {}
     // Once a group has been modified, it has be re-fetched on the current
     // viewed collection. This can be fire and forget
     apiStore.fetch('collections', uiStore.viewingCollection.id)
-    if (newGroup) {
-      this.goToEditGroupRoles(editedGroup)
-      this.isLoading = true
-      const res = await this.fetchRoles(editedGroup)
-      // because this is after async/await
-      runInAction(() => { this.isLoading = false })
-      apiStore.sync(res)
-    }
+  }
+
+  @action onNewGroupSave = async (newGroup) => {
+    const { apiStore } = this.props
+    this.editGroup = {}
+    this.goToEditGroupRoles(newGroup)
+    this.isLoading = true
+    const res = await this.fetchRoles(newGroup)
+    // because this is after async/await
+    runInAction(() => { this.isLoading = false })
+    apiStore.sync(res)
   }
 
   onGroupRoles = group => () => {
@@ -95,19 +96,7 @@ class OrganizationMenu extends React.Component {
   }
 
   removeGroup = group => async () => {
-    try {
-      const { apiStore } = this.props
-      await group.API_archive()
-      const roles = apiStore.findAll('roles').filter((role) =>
-        role.resource && role.resource.id === group.id)
-      if (roles.find(role => role.users.find(user => user.id ===
-          apiStore.currentUserId))) {
-        window.location.reload()
-      }
-      apiStore.fetch('users', apiStore.currentUserId, true)
-    } catch (err) {
-      console.warn('Unable to archive group', err)
-    }
+    group.API_archive()
   }
 
   renderEditGroup() {
@@ -115,7 +104,7 @@ class OrganizationMenu extends React.Component {
       <GroupModify
         group={this.editGroup}
         onGroupRoles={this.onGroupRoles(this.editGroup)}
-        onSave={this.onGroupSave}
+        onSave={this.onNewGroupSave}
       />
     )
   }

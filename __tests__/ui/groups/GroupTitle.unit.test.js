@@ -121,7 +121,6 @@ describe('GroupTitle', () => {
       })
 
       it('should render the inputs', () => {
-        console.log(wrapper.debug())
         expect(wrapper.find('Heading2').exists()).toBeTruthy()
         expect(wrapper.find('StyledSubduedTitled').exists()).toBeTruthy()
       })
