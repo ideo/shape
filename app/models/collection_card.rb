@@ -22,9 +22,7 @@ class CollectionCard < ApplicationRecord
 
   amoeba do
     enable
-    exclude_association :collection
-    exclude_association :item
-    exclude_association :parent
+    recognize []
   end
 
   def duplicate!(for_user:, parent: self.parent, shallow: false, update_order: false)

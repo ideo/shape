@@ -10,9 +10,7 @@ class FilestackFile < ApplicationRecord
 
   amoeba do
     enable
-    exclude_association :item
-    exclude_association :group
-    exclude_association :organization
+    recognize []
   end
 
   # TODO: change this so it actually duplicates the file - needs background worker

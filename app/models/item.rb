@@ -36,11 +36,7 @@ class Item < ApplicationRecord
 
   amoeba do
     enable
-    exclude_association :tags
-    exclude_association :taggings
-    exclude_association :tag_taggings
-    exclude_association :filestack_file
-    exclude_association :parent_collection_card
+    recognize []
   end
 
   def organization_id

@@ -4,7 +4,6 @@ class UsersRole < ApplicationRecord
 
   amoeba do
     enable
-    exclude_association :user
-    exclude_association :role
+    recognize []
   end
 end

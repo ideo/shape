@@ -162,18 +162,8 @@ class Collection < ApplicationRecord
 
   amoeba do
     enable
-    exclude_association :tags
-    exclude_association :taggings
-    exclude_association :tag_taggings
-    exclude_association :roles
-    exclude_association :collection_cards
-    exclude_association :all_collection_cards
-    exclude_association :primary_collection_cards
-    exclude_association :link_collection_cards
-    exclude_association :cards_linked_to_this_collection
-    exclude_association :items
-    exclude_association :collections
-    exclude_association :parent_collection_card
+    # don't recognize any relations, easiest way to turn them all off
+    recognize []
   end
 
   def duplicate!(for_user:, copy_parent_card: false, parent: self.parent)
