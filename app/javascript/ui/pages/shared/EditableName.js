@@ -18,7 +18,7 @@ StyledName.displayName = 'StyledName'
 const StyledEditableName = styled.div`
   display: inline-block;
   .input__name {
-    width: ${props => props.fontSize > 2 ? '30vw' : 'auto'};
+    width: 30vw;
     margin-bottom: 0.5rem;
     margin-top: 0.5rem;
     input {
