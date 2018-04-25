@@ -112,14 +112,14 @@ class SearchResultsInfinite extends React.Component {
 
     const results = (
       searchResults.map((collection, i) => {
-        const card = new CollectionCard(collection.parent_collection_card, apiStore)
+        // CardMenu is rendered as if we were operating on the parent_collection_card
+        const card = collection.parent_collection_card
         return (
           <FlipMove
             appearAnimation="fade"
             key={collection.id}
           >
             <VisibilitySensor
-              // minTopValue={1} // consider visible even if we only see top 25px
               partialVisibility
               scrollCheck
               intervalDelay={300}
@@ -137,10 +137,9 @@ class SearchResultsInfinite extends React.Component {
                   gridMaxW={gridMaxW}
                   onMouseEnter={this.handleMouseOver(i + 1)}
                   onMouseLeave={this.handleMouseOver(i + 1, false)}
-                  // onFocus={this.handleMouseOver(i + 1)}
                 >
                   <StyledTopRightActions className="show-on-hover">
-                    <SelectionCircle cardId={collection.id} />
+                    <SelectionCircle cardId={card.id} />
                     <CardMenu
                       className="show-on-hover card-menu"
                       card={card}
