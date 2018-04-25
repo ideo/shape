@@ -1,5 +1,10 @@
 import _ from 'lodash'
 
+const fakeJsonApiAttrs = {
+  assign: jest.fn(),
+  save: jest.fn(),
+}
+
 export const fakeTextItemAttrs = {
   id: 1,
   type: 'Item::TextItem',
@@ -106,6 +111,7 @@ export const fakeGroupAttrs = {
   currentUserCanEdit: true,
 }
 export const fakeGroup = {
+  ...fakeJsonApiAttrs,
   ...fakeGroupAttrs,
   rawAttributes: jest.fn().mockReturnValue(fakeGroupAttrs),
   getRecordType: jest.fn().mockReturnValue('groups'),

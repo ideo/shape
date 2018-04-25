@@ -58,6 +58,7 @@ export const SubduedTitle = styled.span`
   font-family: ${v.fonts.sans};
   font-size: 1rem;
 `
+SubduedTitle.displayName = 'StyledSubduedTitled'
 
 export const ConfirmText = styled.span`
   font-weight: ${v.weights.book};

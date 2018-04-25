@@ -31,6 +31,7 @@ const EditIconHolder = styled.button`
     width: 18px;
   }
 `
+EditIconHolder.displayName = 'EditIconHolder'
 
 @observer
 class GroupTitle extends React.Component {
@@ -70,7 +71,7 @@ class GroupTitle extends React.Component {
   }
 
   handleInputKeys = (ev) => {
-    if (ev.key === 'Enter') this.handleSave()
+    if (ev.key === 'Enter') this.handleSave(ev)
   }
 
   // TODO move this to shared location, dupe with GroupeModify

@@ -65,7 +65,6 @@ class OrganizationMenu extends React.Component {
   @action onGroupSave = async (editedGroup) => {
     const { apiStore, uiStore } = this.props
     const newGroup = !this.editGroup.id
-    this.changePage('organizationPeople')
     this.editGroup = {}
     // Once a group has been modified, it has be re-fetched on the current
     // viewed collection. This can be fire and forget
