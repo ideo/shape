@@ -38,9 +38,9 @@ describe Collection, type: :model do
         let!(:collection) { create(:collection) }
         let!(:card_linked_to_this_collection) { create(:collection_card_link, collection: collection) }
 
-        it 'should update linked cards after touch' do
+        it 'should update linked cards if updated_at changed' do
           expect {
-            collection.touch && card_linked_to_this_collection.reload
+            collection.update(updated_at: Time.now) && card_linked_to_this_collection.reload
           }.to change(card_linked_to_this_collection, :updated_at)
         end
         it 'should update linked cards after update' do

@@ -88,6 +88,7 @@ class CollectionCard < ApplicationRecord
     return true if update_ids.blank?
 
     CollectionCard.increment_counter(:order, update_ids)
+    true
   end
 
   # Decrement the order by 1 of all cards with >= specified order
@@ -104,13 +105,14 @@ class CollectionCard < ApplicationRecord
     return true if update_ids.blank?
 
     CollectionCard.decrement_counter(:order, update_ids)
+    true
   end
 
   # gets called by child STI classes
   def after_archive_card
     decrement_card_orders!
     cover = parent.cached_cover
-    if cover['card_ids'].include?(id)
+    if cover && cover['card_ids'].include?(id)
       # regenerate parent collection cover if archived card was relevant
       parent.cache_cover!
     else
@@ -135,11 +137,19 @@ class CollectionCard < ApplicationRecord
     cover = collection.cached_cover
     cover.blank? ||
       cover['card_ids'].blank? ||
-      cover['text'].blank? ||
-      cover['image_url'].blank? ||
+      (cover['text'].blank? && text_card?) ||
+      (cover['image_url'].blank? && media_card?) ||
       cover['card_ids'].include?(id) ||
       cover['card_order'].nil? ||
       order <= cover['card_order']
+  end
+
+  def text_card?
+    record.is_a? Item::TextItem
+  end
+
+  def media_card?
+    record.is_a?(Item::VideoItem) || record.is_a?(Item::ImageItem)
   end
 
   private
