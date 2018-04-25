@@ -48,9 +48,8 @@ class Collection < ApplicationRecord
            inverse_of: :collection,
            dependent: :destroy
 
-  # will fire for both after_update and after_touch
-  after_commit :touch_related_cards,
-               if: :saved_change_to_updated_at?
+  after_save :touch_related_cards,
+             if: :saved_change_to_updated_at?
 
   # the card that represents this collection in its parent, and determines its breadcrumb
   has_one :parent_collection_card,

@@ -106,10 +106,17 @@ class CollectionCard < ApplicationRecord
     CollectionCard.decrement_counter(:order, update_ids)
   end
 
+  # gets called by child STI classes
   def after_archive_card
     decrement_card_orders!
-    # touch parent to bust cache
-    parent.touch
+    cover = parent.cached_cover
+    if cover['card_ids'].include?(id)
+      # regenerate parent collection cover if archived card was relevant
+      parent.cache_cover!
+    else
+      # touch parent to bust cache
+      parent.touch
+    end
   end
 
   def self.with_record(record)
@@ -126,8 +133,13 @@ class CollectionCard < ApplicationRecord
     collection = try(:parent)
     return unless collection.present? && collection.base_collection_type?
     cover = collection.cached_cover
-    return true if cover.blank? || cover['card_ids'].nil?
-    cover['card_ids'].include?(id) || cover['card_order'].nil? || order <= cover['card_order']
+    cover.blank? ||
+      cover['card_ids'].blank? ||
+      cover['text'].blank? ||
+      cover['image_url'].blank? ||
+      cover['card_ids'].include?(id) ||
+      cover['card_order'].nil? ||
+      order <= cover['card_order']
   end
 
   private
