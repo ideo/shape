@@ -33,7 +33,7 @@ describe('OrganizationDropdown', () => {
       'People & Groups',
       ...[otherFakeOrg.name],
       'New Organization',
-      'Setings',
+      'Settings',
       'Legal'
     ]
     wrapper = shallow(
