@@ -128,7 +128,12 @@ export default class UiStore {
 
   gridWidthFor(cols) {
     const grid = this.gridSettings
-    return (grid.gridW * cols) + (grid.gutter * (cols - 1))
+    return (312 * cols) + (grid.gutter * (cols - 1))
+  }
+
+  gridHeightFor(cols) {
+    const grid = this.gridSettings
+    return (250 * cols) + grid.gutter
   }
 
   @action updateColumnsToFit(windowWidth) {
@@ -141,8 +146,28 @@ export default class UiStore {
       }
       return true
     })
-    if (cols && this.gridSettings.cols !== cols) {
-      this.gridSettings.cols = cols
+
+    // HACK: for colab test
+    let update = {
+      cols,
+      gutter: 20,
+      gridW: 312,
+      gridH: 250,
+    }
+    if (cols === 3) {
+      update = {
+        cols: 4,
+        gutter: 20,
+        gridW: 250,
+        gridH: 200,
+      }
+    }
+
+    // -----
+
+    if (this.gridSettings.cols !== update.cols || this.gridSettings.gridW !== update.gridW) {
+      console.log(update)
+      _.assign(this.gridSettings, update)
     }
   }
   // --- grid properties />

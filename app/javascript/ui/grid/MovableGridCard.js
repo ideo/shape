@@ -246,7 +246,8 @@ class MovableGridCard extends React.PureComponent {
     // need to always set Rnd maxWidth to 4 columns instead of `cols`
     // because of this issue: https://github.com/bokuweb/react-rnd/issues/221
     const maxWidth = uiStore.gridWidthFor(4)
-    const maxHeight = (gridH * 2) + gutter
+    const maxHeight = uiStore.gridHeightFor(2)
+    // const maxHeight = (gridH * 2) + gutter
 
     let xAdjust = 0
     let yAdjust = 0
