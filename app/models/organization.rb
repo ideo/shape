@@ -7,12 +7,17 @@ class Organization < ApplicationRecord
              class_name: 'Group',
              dependent: :destroy,
              optional: true
+  belongs_to :guest_group,
+             class_name: 'Group',
+             dependent: :destroy,
+             optional: true
 
-  after_create :create_primary_group
-  after_save :update_primary_group_name, on: :update, if: :saved_change_to_name?
+  after_create :create_groups
+  after_update :update_group_names, if: :saved_change_to_name?
 
   delegate :admins, to: :primary_group
   delegate :members, to: :primary_group
+  delegate :handle, to: :primary_group
   delegate :can_edit?, to: :primary_group
   delegate :can_view?, to: :primary_group
 
@@ -45,14 +50,24 @@ class Organization < ApplicationRecord
     user.switch_to_organization(user.organizations.first)
   end
 
+  def guest_group_name
+    "#{name} Guests"
+  end
+
+  def guest_group_handle
+    "#{handle}-guest"
+  end
+
   private
 
-  def create_primary_group
-    build_primary_group(name: name, organization: self).save
+  def create_groups
+    create_primary_group(name: name, organization: self)
+    create_guest_group(name: guest_group_name, organization: self, handle: guest_group_handle)
     save # Save primary group attr
   end
 
-  def update_primary_group_name
+  def update_group_names
     primary_group.update_attributes(name: name)
+    guest_group.update_attributes(name: guest_group_name, handle: guest_group_handle)
   end
 end

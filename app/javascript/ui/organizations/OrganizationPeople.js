@@ -14,6 +14,7 @@ class OrganizationPeople extends React.PureComponent {
   render() {
     const { organization, userGroups } = this.props
     const primaryGroup = organization.primary_group
+    const guestGroup = organization.guest_group
     return (
       <div>
         {organization.primary_group.currentUserCanEdit &&
@@ -31,6 +32,11 @@ class OrganizationPeople extends React.PureComponent {
         <Row>
           <button className="orgEdit" onClick={this.props.onGroupRoles(primaryGroup)}>
             <DisplayText>{ primaryGroup.name }</DisplayText>
+          </button>
+        </Row>
+        <Row>
+          <button className="orgEdit" onClick={this.props.onGroupRoles(guestGroup)}>
+            <DisplayText>{ guestGroup.name }</DisplayText>
           </button>
         </Row>
         <FormSpacer />

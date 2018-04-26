@@ -16,17 +16,32 @@ describe Organization, type: :model do
     let(:organization) { create(:organization) }
 
     describe '#initialize_primary_group' do
-      it 'should create group with same name as org' do
+      it 'should create primary group with same name as org' do
         expect(organization.primary_group.persisted?).to be true
         expect(organization.primary_group.name).to eq(organization.name)
+        expect(organization.primary_group.handle).to eq(organization.name.parameterize)
       end
     end
 
-    describe '#update_primary_group_name' do
-      it 'should update group if name changes' do
+    describe '#initialize_guest_group' do
+      it 'should create guest group with same name as org + Guests' do
+        expect(organization.guest_group.persisted?).to be true
+        expect(organization.guest_group.name).to eq("#{organization.name} Guests")
+        expect(organization.guest_group.handle).to eq("#{organization.name.parameterize}-guest")
+      end
+    end
+
+    describe '#update_group_names' do
+      it 'should update primary group if name changes' do
         expect(organization.primary_group.name).not_to eq('Org 2.0')
         organization.update_attributes(name: 'Org 2.0')
         expect(organization.primary_group.reload.name).to eq('Org 2.0')
+      end
+
+      it 'should update guest group if name changes' do
+        expect(organization.guest_group.name).not_to eq('Org 2.0 Guests')
+        organization.update_attributes(name: 'Org 2.0')
+        expect(organization.guest_group.reload.name).to eq('Org 2.0 Guests')
       end
     end
   end

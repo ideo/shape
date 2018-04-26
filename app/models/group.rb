@@ -73,6 +73,10 @@ class Group < ApplicationRecord
     organization.primary_group_id == id
   end
 
+  def guest?
+    organization.guest_group_id == id
+  end
+
   private
 
   def create_shared_collection

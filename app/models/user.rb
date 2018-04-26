@@ -18,6 +18,12 @@ class User < ApplicationRecord
            through: :roles,
            source: :resource,
            source_type: 'Group'
+  has_many :current_org_groups,
+           ->(u) { active.where(organization_id: u.current_organization_id) },
+           through: :roles,
+           source: :resource,
+           source_type: 'Group'
+
   has_many :organizations, through: :groups
   has_many :users_roles
   belongs_to :current_organization,
@@ -145,12 +151,6 @@ class User < ApplicationRecord
   def current_shared_collection(org_id = current_organization_id)
     return nil unless current_organization_id
     collections.shared_with_me.find_by_organization_id(org_id)
-  end
-
-  def current_org_groups
-    return [] if current_organization.blank?
-
-    groups.where(organization_id: current_organization_id)
   end
 
   def viewable_collections_and_items(organization)

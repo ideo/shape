@@ -16,6 +16,7 @@ class OrganizationMenu extends React.Component {
 
   componentDidMount() {
     const { apiStore, userGroups } = this.props
+    console.log(userGroups)
     const groupReqs = userGroups.map(group => this.fetchRoles(group))
     Promise.all(groupReqs)
       .then(responses => {
