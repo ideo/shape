@@ -93,21 +93,14 @@ class GroupModify extends React.Component {
   handleImagePick = (ev) => {
     ev.preventDefault()
     FilestackUpload
-      .pickImage()
-      .then(resp => {
-        if (resp.filesUploaded.length > 0) {
-          const img = resp.filesUploaded[0]
-          this.fileAttrs = {
-            url: img.url,
-            handle: img.handle,
-            filename: img.filename,
-            size: img.size,
-            mimetype: img.mimetype,
-          }
-          this.changeUrl(img.url)
-        } else {
+      .pickImage({
+        onSuccess: (fileAttrs) => {
+          this.fileAttrs = fileAttrs
+          this.changeUrl(fileAttrs.url)
+        },
+        onFailure: (filesFailed) => {
           uiStore.alert({
-            prompt: `Failed to upload image: ${resp.filesFailed}`,
+            prompt: `Failed to upload image: ${filesFailed}`,
           })
         }
       })

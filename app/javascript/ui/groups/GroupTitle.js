@@ -74,25 +74,16 @@ class GroupTitle extends React.Component {
     if (ev.key === 'Enter') this.handleSave(ev)
   }
 
-  // TODO move this to shared location, dupe with GroupeModify
   handleAvatarEdit = (ev) => {
     ev.preventDefault()
     FilestackUpload
-      .pickImage()
-      .then(resp => {
-        if (resp.filesUploaded.length > 0) {
-          const img = resp.filesUploaded[0]
-          const fileAttrs = {
-            url: img.url,
-            handle: img.handle,
-            filename: img.filename,
-            size: img.size,
-            mimetype: img.mimetype,
-          }
+      .pickImage({
+        onSuccess: (fileAttrs) => {
           this.updateGroupAvatar(fileAttrs)
-        } else {
+        },
+        onFailure: (filesFailed) => {
           uiStore.alert({
-            prompt: `Failed to upload image: ${resp.filesFailed}`,
+            prompt: `Failed to upload image: ${filesFailed}`,
           })
         }
       })
