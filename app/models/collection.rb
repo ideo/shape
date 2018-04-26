@@ -13,6 +13,11 @@ class Collection < ApplicationRecord
   store_accessor :cached_attributes,
                  :cached_cover, :cached_tag_list
 
+  # callbacks
+  after_save :touch_related_cards, if: :saved_change_to_updated_at?
+  after_commit :reindex_sync, on: :create
+  after_commit :recalculate_child_breadcrumbs_async, if: :saved_change_to_name?
+
   # all cards including archived (i.e. undo default :collection_cards scope)
   has_many :all_collection_cards,
            class_name: 'CollectionCard',
@@ -48,8 +53,6 @@ class Collection < ApplicationRecord
            inverse_of: :collection,
            dependent: :destroy
 
-  after_save :touch_related_cards, if: :saved_change_to_updated_at?
-
   # the card that represents this collection in its parent, and determines its breadcrumb
   has_one :parent_collection_card,
           class_name: 'CollectionCard::Primary',
@@ -70,8 +73,6 @@ class Collection < ApplicationRecord
 
   validates :name, presence: true, if: :base_collection_type?
   before_validation :inherit_parent_organization_id, on: :create
-  after_commit :reindex_sync, on: :create
-  after_update :recalculate_child_breadcrumbs_async, if: :saved_change_to_name?
 
   scope :root, -> { where.not(organization_id: nil) }
   scope :not_custom_type, -> { where(type: nil) }
@@ -232,7 +233,7 @@ class Collection < ApplicationRecord
   end
 
   def recalculate_child_breadcrumbs_async
-    BreadcrumbRecalculationWorker.perform_async(id, false)
+    BreadcrumbRecalculationWorker.perform_async(id)
   end
 
   def recalculate_child_breadcrumbs(cards = collection_cards)

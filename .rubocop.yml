@@ -47,10 +47,8 @@ Style/PercentLiteralDelimiters:
     '%W': '[]'
 
 Style/AndOr:
-  # Whether `and` and `or` are banned only in conditionals (conditionals)
-  # or completely (always).
-  # They read better, more like normal English.
-  Enabled: 'conditionals'
+  # `and` and `or` banned only in conditionals (conditionals), or completely (always).
+  EnforcedStyle: 'conditionals'
 
 Style/BlockDelimiters:
   Exclude:
@@ -85,3 +83,6 @@ Metrics/BlockLength:
   Exclude:
     - 'config/routes.rb'
     - 'spec/**/*.rb'
+
+Layout/IndentArray:
+  EnforcedStyle: 'consistent'

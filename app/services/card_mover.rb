@@ -20,6 +20,7 @@ class CardMover
   def call
     return false if to_collection_invalid
     move_cards
+    recalculate_cached_values
     assign_permissions if @card_action == 'move'
     @moving_cards
   end
@@ -30,13 +31,13 @@ class CardMover
     # get original cards in the destination
     existing_cards = @to_collection.collection_cards.to_a
     # track if we should update their collection covers
-    should_update_from_cover = false
-    should_update_to_cover = false
+    @should_update_from_cover = false
+    @should_update_to_cover = false
     if @card_action == 'move'
       # minus any we're moving (i.e. moving within the same collection)
       existing_cards.reject! { |card| @moving_cards.include? card }
       unless @to_collection == @from_collection
-        should_update_from_cover = @moving_cards.any?(&:should_update_parent_collection_cover?)
+        @should_update_from_cover = @moving_cards.any?(&:should_update_parent_collection_cover?)
       end
     elsif @card_action == 'link'
       # for links, we build new link cards out of our selected moving ones
@@ -56,18 +57,20 @@ class CardMover
       # parent_id will already be set for existing_cards but no harm to indicate
       card.assign_attributes(parent_id: @to_collection.id, order: i)
       if card.changed?
-        should_update_to_cover ||= card.should_update_parent_collection_cover?
+        @should_update_to_cover ||= card.should_update_parent_collection_cover?
         card.save
       end
     end
+    @moving_cards
+  end
 
+  def recalculate_cached_values
     unless @card_action == 'link' || @from_collection == @to_collection
       @from_collection.reload.reorder_cards!
     end
-    @from_collection.cache_cover! if should_update_from_cover
-    @to_collection.cache_cover! if should_update_to_cover
+    @from_collection.cache_cover! if @should_update_from_cover
+    @to_collection.cache_cover! if @should_update_to_cover
     @to_collection.recalculate_child_breadcrumbs(@moving_cards)
-    @moving_cards
   end
 
   def to_permissions
