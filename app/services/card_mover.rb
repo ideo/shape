@@ -61,7 +61,9 @@ class CardMover
       end
     end
 
-    @from_collection.reload.reorder_cards! unless @from_collection == @to_collection
+    unless @card_action == 'link' || @from_collection == @to_collection
+      @from_collection.reload.reorder_cards!
+    end
     @from_collection.cache_cover! if should_update_from_cover
     @to_collection.cache_cover! if should_update_to_cover
     @to_collection.recalculate_child_breadcrumbs(@moving_cards)
