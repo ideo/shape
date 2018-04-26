@@ -52,6 +52,14 @@ export const DisplayLink = styled.a`
 `
 DisplayLink.displayName = 'StyledDisplayLink'
 
+export const SubduedTitle = styled.span`
+  color: ${v.colors.gray};
+  font-weight: ${v.weights.book};
+  font-family: ${v.fonts.sans};
+  font-size: 1rem;
+`
+SubduedTitle.displayName = 'StyledSubduedTitled'
+
 export const ConfirmText = styled.span`
   font-weight: ${v.weights.book};
   font-family: ${v.fonts.sans};

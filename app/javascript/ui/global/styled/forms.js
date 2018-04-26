@@ -1,6 +1,7 @@
 import Chip from 'material-ui/Chip'
 import MuiSelect from 'material-ui/Select'
 import { MenuItem } from 'material-ui/Menu'
+import AutosizeInput from 'react-input-autosize'
 import styled from 'styled-components'
 import v from '~/utils/variables'
 
@@ -166,3 +167,35 @@ export const SelectOption = styled(MenuItem)`
 
 `
 SelectOption.displayName = 'StyledSelectOption'
+
+export const StyledAutosizeInput = styled(AutosizeInput)`
+  margin-bottom: 0.5rem;
+  margin-top: 0.5rem;
+  input {
+    position: relative;
+    font-size: ${props => props.fontSize}rem;
+    font-family: ${v.fonts.sans};
+    font-weight: ${v.weights.medium};
+    letter-spacing: 0.125rem;
+    padding: 0.15rem 0 0.5rem 0;
+    background-color: transparent;
+    border-left: none;
+    border-top: none;
+    border-right: none;
+    border-bottom: 1px solid ${v.colors.blackLava};
+    &:focus {
+      outline: 0;
+    }
+  }
+`
+StyledAutosizeInput.displayName = 'StyledAutosizeInput'
+
+export const EditAvatarButton = styled.button`
+  cursor: auto;
+  ${props => props.canEdit &&
+    `
+    cursor: pointer;
+    opacity: 0.75;
+    `
+}
+`

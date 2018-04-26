@@ -6,6 +6,7 @@ import GroupModify from '~/ui/groups/GroupModify'
 import RolesMenu from '~/ui/roles/RolesMenu'
 import Loader from '~/ui/layout/Loader'
 import OrganizationPeople from '~/ui/organizations/OrganizationPeople'
+import GroupTitle from '~/ui/groups/GroupTitle'
 
 @inject('apiStore', 'uiStore')
 @observer
@@ -43,7 +44,7 @@ class OrganizationMenu extends React.Component {
   }
 
   goToAddGroup = (ev) => {
-    this.changePage('editGroup')
+    this.changePage('addGroup')
   }
 
   @action goToEditGroup(group) {
@@ -61,19 +62,22 @@ class OrganizationMenu extends React.Component {
     this.changePage('organizationPeople')
   }
 
-  @action onGroupSave = async (editedGroup) => {
+  @action onGroupSave = (savedGroup) => {
+    const { apiStore, uiStore } = this.props
+    // Once a group has been modified, it has be re-fetched on the current
+    // viewed collection. This can be fire and forget
+    apiStore.fetch('collections', uiStore.viewingCollection.id)
+  }
+
+  @action onNewGroupSave = async (newGroup) => {
     const { apiStore } = this.props
-    const newGroup = !this.editGroup.id
-    this.changePage('organizationPeople')
     this.editGroup = {}
-    if (newGroup) {
-      this.goToEditGroupRoles(editedGroup)
-      this.isLoading = true
-      const res = await this.fetchRoles(editedGroup)
-      // because this is after async/await
-      runInAction(() => { this.isLoading = false })
-      apiStore.sync(res)
-    }
+    this.goToEditGroupRoles(newGroup)
+    this.isLoading = true
+    const res = await this.fetchRoles(newGroup)
+    // because this is after async/await
+    runInAction(() => { this.isLoading = false })
+    apiStore.sync(res)
   }
 
   onGroupRoles = group => () => {
@@ -92,30 +96,7 @@ class OrganizationMenu extends React.Component {
   }
 
   removeGroup = group => async () => {
-    try {
-      const { apiStore } = this.props
-      await group.API_archive()
-      const roles = apiStore.findAll('roles').filter((role) =>
-        role.resource && role.resource.id === group.id)
-      if (roles.find(role => role.users.find(user => user.id ===
-          apiStore.currentUserId))) {
-        window.location.reload()
-      }
-      apiStore.fetch('users', apiStore.currentUserId, true)
-    } catch (err) {
-      console.warn('Unable to archive group', err)
-    }
-  }
-
-  renderEditOrganization() {
-    const { organization } = this.props
-    return (
-      <GroupModify
-        group={organization.primary_group}
-        onGroupRoles={this.onGroupRoles(organization.primary_group)}
-        onSave={this.onOrganizationSave}
-      />
-    )
+    group.API_archive()
   }
 
   renderEditGroup() {
@@ -123,7 +104,7 @@ class OrganizationMenu extends React.Component {
       <GroupModify
         group={this.editGroup}
         onGroupRoles={this.onGroupRoles(this.editGroup)}
-        onSave={this.onGroupSave}
+        onSave={this.onNewGroupSave}
       />
     )
   }
@@ -154,19 +135,45 @@ class OrganizationMenu extends React.Component {
     )
   }
 
+  renderEditOrganization() {
+    const { organization } = this.props
+    return (
+      <GroupModify
+        group={organization.primary_group}
+        onGroupRoles={this.onGroupRoles(organization.primary_group)}
+        onSave={this.onOrganizationSave}
+      />
+    )
+  }
+
+  renderGroupTitle() {
+    return (
+      <GroupTitle
+        group={this.editGroup}
+        onSave={this.onGroupSave}
+        canEdit={this.editGroup.currentUserCanEdit}
+      />
+    )
+  }
+
   render() {
     const { open } = this.props
     let content, title, onBack, onEdit
     switch (this.currentPage) {
-    case 'editGroup':
+    case 'addGroup':
       content = this.renderEditGroup()
-      title = this.editGroup.id ? this.editGroup.name : 'New Group'
+      title = 'New Group'
       onBack = this.goBack
       break
     case 'editOrganization':
       title = 'Your Organization'
       onBack = this.goBack
       content = this.renderEditOrganization()
+      break
+    case 'editGroup':
+      content = this.renderEditGroup()
+      title = this.editGroup.id ? this.renderGroupTitle() : 'New Group'
+      onBack = this.goBack
       break
     case 'editRoles':
       onBack = this.goBack
@@ -180,7 +187,7 @@ class OrganizationMenu extends React.Component {
           this.goToEditGroup(this.editGroup)
         }
       }
-      title = this.editGroup.name
+      title = this.renderGroupTitle()
       break
     case 'organizationPeople':
     default:

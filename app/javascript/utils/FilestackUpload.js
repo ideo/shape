@@ -23,8 +23,22 @@ class FilestackUpload {
     return filestack.init(API_KEY)
   }
 
-  static pickImage() {
-    return this.client.pick(imageUploadConfig)
+  static async pickImage({ onSuccess, onFailure } = {}) {
+    const resp = await this.client.pick(imageUploadConfig)
+    if (resp.filesUploaded.length > 0) {
+      const img = resp.filesUploaded[0]
+      const fileAttrs = {
+        url: img.url,
+        handle: img.handle,
+        filename: img.filename,
+        size: img.size,
+        mimetype: img.mimetype,
+      }
+      if (onSuccess) onSuccess(fileAttrs)
+    } else {
+      if (onFailure) onFailure(resp.filesFailed)
+    }
+    return resp
   }
 
   static makeDropPane(opts = {}) {

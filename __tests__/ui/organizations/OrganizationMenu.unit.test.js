@@ -13,6 +13,7 @@ describe('OrganizationMenu', () => {
     fakeApiStore.request = jest.fn().mockReturnValue(
       Promise.resolve({ data: [] })
     )
+    fakeUiStore.viewingCollection = { id: 1 }
     props = {
       apiStore: fakeApiStore(),
       uiStore: fakeUiStore,
@@ -88,7 +89,7 @@ describe('OrganizationMenu', () => {
     })
   })
 
-  describe('onGroupSave', () => {
+  describe('onNewGroupSave', () => {
     describe('on a newly created group', () => {
       let newGroup
 
@@ -103,7 +104,7 @@ describe('OrganizationMenu', () => {
           Promise.resolve({ data: [] })
         )
         component.editGroup = { name: 'newgroup' }
-        await component.onGroupSave(newGroup)
+        await component.onNewGroupSave(newGroup)
       })
 
       it('should refetch the roles for the new group', () => {
