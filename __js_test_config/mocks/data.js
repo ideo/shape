@@ -137,6 +137,7 @@ export const fakeUserAttrs = {
   type: 'users',
   terms_accepted: true,
   isCurrentUser: jest.fn(),
+  switchOrganization: jest.fn(),
 }
 export const fakeActionCableUser = {
   id: 99,
