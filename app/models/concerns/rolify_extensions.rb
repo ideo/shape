@@ -60,6 +60,14 @@ module RolifyExtensions
     super(role_name, resource.becomes(resource.resourceable_class))
   end
 
+  def upgrade_to_editor_role(resource)
+    return unless is_a? User
+    role = Role.for_resource(resource).where(name: Role::VIEWER).first
+    # `remove_role` will too aggressively destroy the entire role, so just remove the user
+    role.users.destroy(self) if role.present?
+    add_role(Role::EDITOR, resource)
+  end
+
   # This includes all roles a user explicitly has
   # And all roles they get through their group membership
   def cached_roles_by_identifier

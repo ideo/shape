@@ -195,6 +195,8 @@ class Collection < ApplicationRecord
     roles.each do |role|
       c.roles << role.duplicate!(assign_resource: c)
     end
+    # make sure duplicate creator becomes an editor
+    for_user.upgrade_to_editor_role(c)
 
     CollectionCardDuplicationWorker.perform_async(
       collection_cards.map(&:id),

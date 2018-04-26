@@ -99,39 +99,54 @@ describe Collection, type: :model do
       dupe
     end
 
-    before do
-      user.add_role(Role::EDITOR, collection)
-      collection.items.each do |item|
-        user.add_role(Role::EDITOR, item)
+    context 'with editor role' do
+      before do
+        user.add_role(Role::EDITOR, collection)
+        collection.items.each do |item|
+          user.add_role(Role::EDITOR, item)
+        end
+        collection.reload
       end
-      collection.reload
+
+      it 'clones the collection' do
+        expect { duplicate }.to change(Collection, :count).by(1)
+        expect(collection.id).not_to eq(duplicate.id)
+      end
+
+      it 'references the current collection as cloned_from' do
+        expect(duplicate.cloned_from).to eq(collection)
+      end
+
+      it 'clones all the collection cards' do
+        expect(CollectionCardDuplicationWorker).to receive(:perform_async)
+        collection.duplicate!(for_user: user)
+      end
+
+      it 'clones all roles on collection' do
+        expect(duplicate.roles.map(&:name)).to match(collection.roles.map(&:name))
+        expect(duplicate.can_edit?(user)).to be true
+      end
+
+      it 'clones all roles on items' do
+        expect(duplicate.items.all? { |item| item.can_edit?(user) }).to be true
+      end
+
+      it 'clones tag list' do
+        expect(duplicate.tag_list).to match_array collection.tag_list
+      end
     end
 
-    it 'clones the collection' do
-      expect { duplicate }.to change(Collection, :count).by(1)
-      expect(collection.id).not_to eq(duplicate.id)
-    end
+    context 'with viewer role' do
+      before do
+        user.add_role(Role::VIEWER, collection)
+      end
 
-    it 'references the current collection as cloned_from' do
-      expect(duplicate.cloned_from).to eq(collection)
-    end
-
-    it 'clones all the collection cards' do
-      expect(CollectionCardDuplicationWorker).to receive(:perform_async)
-      collection.duplicate!(for_user: user)
-    end
-
-    it 'clones all roles on collection' do
-      expect(duplicate.roles.map(&:name)).to match(collection.roles.map(&:name))
-      expect(duplicate.can_edit?(user)).to be true
-    end
-
-    it 'clones all roles on items' do
-      expect(duplicate.items.all? { |item| item.can_edit?(user) }).to be true
-    end
-
-    it 'clones tag list' do
-      expect(duplicate.tag_list).to match_array collection.tag_list
+      it 'upgrades viewer user to editor role upon duplication' do
+        expect(collection.can_edit?(user)).to be false
+        # roles shouldn't match because we're removing Viewer and replacing w/ Editor
+        expect(duplicate.roles.map(&:name)).not_to match(collection.roles.map(&:name))
+        expect(duplicate.can_edit?(user)).to be true
+      end
     end
 
     context 'with parent collection card' do
