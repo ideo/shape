@@ -151,6 +151,8 @@ class Collection < ApplicationRecord
   # similar to above but requires `collection/item` instead of `record`
   def self.default_relationships_for_cache_query
     [
+      # NOTE: we don't include users/groups with roles otherwise we'd have to bust the cache
+      # every time any individual user/group on the role was updated
       :roles,
       collection_cards: [
         :parent,
