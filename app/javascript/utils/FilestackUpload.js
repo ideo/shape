@@ -7,7 +7,7 @@ const imageUploadConfig = {
   maxFiles: 1,
   transformations: {
     crop: {
-      aspectRatio: 16 / 9
+      aspectRatio: 5 / 4
     }
   }
 }
