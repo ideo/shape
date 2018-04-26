@@ -6,6 +6,8 @@ class SerializableItem < BaseJsonSerializer
 
   cached_attributes :filestack_file_url, :tag_list
 
+  has_one :parent
+
   attribute :breadcrumb do
     Breadcrumb::ForUser.new(
       @object.breadcrumb,

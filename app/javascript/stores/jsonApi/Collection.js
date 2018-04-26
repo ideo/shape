@@ -3,6 +3,7 @@ import { computed } from 'mobx'
 
 import Api from './Api'
 import BaseRecord from './BaseRecord'
+import {uiStore} from '~/stores'
 
 class Collection extends BaseRecord {
   attributesForAPI = ['name', 'tag_list']
@@ -51,6 +52,21 @@ class Collection extends BaseRecord {
       })
     }
     return false
+  }
+
+  checkCurrentOrg(itemId) {
+    if (!this.apiStore.currentUser) return
+    if (this.organization_id !==
+        this.apiStore.currentUser.current_organization.id) {
+      const routing = {
+        routeToItemId: itemId,
+        routeToCollectionId: this.id,
+      }
+      this.apiStore.currentUser.switchOrganization(
+        this.organization_id,
+        routing,
+      )
+    }
   }
 }
 Collection.type = 'collections'
