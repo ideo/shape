@@ -38,17 +38,10 @@ class OrganizationDropdown extends React.Component {
     console.warn('unimplemented')
   }
 
-  switchOrg(collectionId) {
-    this.props.routingStore.routeTo(`/collections/${collectionId}`)
-  }
-
-  handleSwitchOrg = (orgId) => async (ev) => {
+  handleSwitchOrg = (orgId) => (ev) => {
+    ev.preventDefault()
     const { apiStore } = this.props
-    const user = await apiStore.request(
-      `/users/switch_org?organization_id=${orgId}`,
-      'POST',
-    )
-    this.switchOrg(user.data.current_user_collection_id)
+    return apiStore.currentUser.switchOrganization(orgId)
   }
 
   handleOrgSettings = (ev) => {
@@ -68,7 +61,7 @@ class OrganizationDropdown extends React.Component {
         const avatar = (
           <IconHolder>
             <Avatar
-              title={org.name}
+              title={org.primary_group.name}
               url={org.primary_group.filestack_file_url}
               size={32}
               className="org_avatar"
@@ -76,7 +69,7 @@ class OrganizationDropdown extends React.Component {
           </IconHolder>
         )
         return {
-          name: org.name,
+          name: org.primary_group.name,
           iconLeft: avatar,
           onClick: this.handleSwitchOrg(org.id),
           noBorder: true,

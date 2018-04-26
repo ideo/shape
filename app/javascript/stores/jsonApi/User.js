@@ -1,4 +1,4 @@
-import { uiStore } from '~/stores'
+import { routingStore, uiStore } from '~/stores'
 import BaseRecord from './BaseRecord'
 
 class User extends BaseRecord {
@@ -17,6 +17,15 @@ class User extends BaseRecord {
       uiStore.defaultAlertError()
       return e
     }
+  }
+
+  async switchOrganization(organizationId) {
+    const user = await this.apiStore.request(
+      `/users/switch_org?organization_id=${organizationId}`,
+      'POST',
+    )
+    const collectionId = user.data.current_user_collection_id
+    routingStore.routeTo(`/collections/${collectionId}`)
   }
 }
 User.type = 'users'
