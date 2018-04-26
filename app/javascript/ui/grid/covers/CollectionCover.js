@@ -105,7 +105,7 @@ class CollectionCover extends React.Component {
           <div className="top">
             <h3>
               <Dotdotdot clamp={height > 1 ? 6 : 3}>
-                {cover.name}
+                {collection.name}
               </Dotdotdot>
             </h3>
           </div>

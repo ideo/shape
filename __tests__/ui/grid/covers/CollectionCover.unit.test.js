@@ -24,8 +24,8 @@ describe('CollectionCover', () => {
     expect(wrapper.find('StyledCollectionCover').props().url).toEqual(cover.image_url)
   })
 
-  it('renders the cover name and text', () => {
-    expect(wrapper.find('Dotdotdot').at(0).children().text()).toContain(cover.name)
+  it('renders the collection name and cover text', () => {
+    expect(wrapper.find('Dotdotdot').at(0).children().text()).toContain(fakeCollection.name)
     expect(wrapper.find('Dotdotdot').at(1).children().text()).toContain(cover.text)
   })
 })

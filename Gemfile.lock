@@ -79,6 +79,7 @@ GEM
     crass (1.0.3)
     css_parser (1.6.0)
       addressable
+    dalli (2.7.8)
     database_cleaner (1.6.2)
     debug_inspector (0.0.3)
     devise (4.4.3)
@@ -396,6 +397,7 @@ DEPENDENCIES
   byebug
   cancancan (~> 2.0)
   capybara (~> 2.13)
+  dalli (~> 2.7)
   database_cleaner
   devise
   dotenv-rails
@@ -405,7 +407,6 @@ DEPENDENCIES
   filestack
   guard
   guard-rspec
-  hashie
   httparty
   jbuilder (~> 2.5)
   json-schema

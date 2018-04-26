@@ -29,6 +29,7 @@ class CollectionCardBuilder
           @collection_card.record.allow_primary_group_view_access
           @collection_card.record.update(created_by: @user)
         end
+        @collection_card.parent.cache_cover! if @collection_card.should_update_parent_collection_cover?
         @collection_card.increment_card_orders!
         @collection_card.record.reload.recalculate_breadcrumb!
       end

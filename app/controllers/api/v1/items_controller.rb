@@ -18,7 +18,6 @@ class Api::V1::ItemsController < Api::V1::BaseController
   def update
     @item.attributes = item_params
     if @item.save
-      @item.touch_parent
       render jsonapi: @item
     else
       render_api_errors @item.errors
