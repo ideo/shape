@@ -98,7 +98,7 @@ class TermsOfUseModal extends React.Component {
         <DialogContent>
           <form onSubmit={this.handleSubmit}>
             <StyledLogo width={128} />
-            <Heading1 wrap>
+            <Heading1 wrapLine>
               Hello {currentUser.first_name}!
             </Heading1>
             <p>

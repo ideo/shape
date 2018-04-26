@@ -149,9 +149,9 @@ class Collection < ApplicationRecord
   end
 
   # similar to above but requires `collection/item` instead of `record`
-  def self.default_relationships
+  def self.default_relationships_for_cache_query
     [
-      roles: %i[users],
+      :roles,
       collection_cards: [
         :parent,
         :collection,
