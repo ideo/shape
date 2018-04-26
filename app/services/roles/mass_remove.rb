@@ -83,7 +83,7 @@ module Roles
 
       @users.each do |user|
         if existing_user_ids.include?(user.id)
-          role.users.delete(user)
+          role.users.destroy(user)
         end
       end
 
@@ -95,7 +95,7 @@ module Roles
 
       @groups.each do |group|
         if existing_group_ids.include?(group.id)
-          role.groups.delete(group)
+          role.groups.destroy(group)
         end
       end
 

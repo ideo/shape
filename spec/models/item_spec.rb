@@ -67,17 +67,27 @@ RSpec.describe Item, type: :model do
     end
   end
 
-  describe '#touch_parent' do
-    let!(:item) { create(:text_item) }
-    let!(:parent) { create(:collection) }
-    let!(:parent_collection_card) do
-      create(:collection_card_text, item: item, parent: parent)
+  describe '#update_parent_collection_cover_if_needed' do
+    let!(:collection) { create(:collection, num_cards: 2) }
+    let!(:item) { collection.collection_cards.first.item }
+    let!(:second_item) { collection.collection_cards.second.item }
+
+    before do
+      collection.cache_cover!
     end
 
-    it 'will update the updated_at attr of parent collection' do
-      expect {
-        item.touch_parent
-      }.to change(parent, :updated_at)
+    it 'will update the collection cover if needed' do
+      item.text_data = { ops: [{ insert: 'Howdy doody.' }] }
+      item.update_parent_collection_cover_if_needed
+      expect(collection.cached_cover['item_id_text']).to eq item.id
+      expect(collection.cached_cover['text']).to eq item.plain_content
+    end
+
+    it 'will not update the collection cover if not needed' do
+      second_item.text_data = { ops: [{ insert: 'Lorem ipsum 123.' }] }
+      second_item.update_parent_collection_cover_if_needed
+      expect(collection.cached_cover['item_id_text']).not_to eq second_item.id
+      expect(collection.cached_cover['text']).not_to eq second_item.plain_content
     end
   end
 end

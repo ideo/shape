@@ -6,10 +6,12 @@ class SerializableCollection < BaseJsonSerializer
   attributes :id, :created_at, :updated_at, :name
   has_one :parent_collection_card
 
-  cached_attribute :tag_list
+  attribute :tag_list do
+    @object.cached_tag_list || []
+  end
 
-  cached_attribute :cover do
-    CollectionCover.new(@object).generate
+  attribute :cover do
+    @object.cached_cover || {}
   end
 
   attribute :type do

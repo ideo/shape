@@ -1,17 +1,29 @@
-class CollectionCover
-  attr_reader :data
-
+class CollectionCover < SimpleService
   def initialize(collection)
     @collection = collection
     @inheritance = Roles::Inheritance.new(collection)
   end
 
-  def generate
-    @data = {
-      image_url: first_media_item,
-      name: @collection.name,
-      text: first_text_item,
-    }
+  def self.cover_text(collection, text_item)
+    new(collection).cover_text(text_item)
+  end
+
+  def call
+    media = first_media_item
+    text = first_text_item
+    {
+      image_url: media[:content],
+      text: text[:content],
+      # these next attributes are just for knowing when to re-generate
+      card_ids: [text[:card_id], media[:card_id]].compact,
+      card_order: [text[:card_order], media[:card_order]].compact.max,
+      item_id_text: text[:item_id],
+      item_id_media: media[:item_id],
+    }.as_json
+  end
+
+  def cover_text(text_item)
+    text_item.plain_content.truncate(500, separator: /\s/, omission: '')
   end
 
   private
@@ -23,16 +35,21 @@ class CollectionCover
       first_item = item
       break
     end
-    first_item
+    return {} unless first_item
+    card = CollectionCard.find_by(item_id: first_item.id)
+    {
+      card_id: card.id,
+      card_order: card.order,
+      item_id: first_item.id,
+      content: type == 'Item::TextItem' ? cover_text(first_item) : first_item.image_url,
+    }
   end
 
   def first_media_item
-    item = first_shareable_item(type: ['Item::ImageItem', 'Item::VideoItem'])
-    return item.image_url if item
+    first_shareable_item(type: ['Item::ImageItem', 'Item::VideoItem'])
   end
 
   def first_text_item
-    item = first_shareable_item(type: 'Item::TextItem')
-    return item.plain_content if item
+    first_shareable_item(type: 'Item::TextItem')
   end
 end

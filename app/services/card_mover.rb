@@ -29,9 +29,15 @@ class CardMover
   def move_cards
     # get original cards in the destination
     existing_cards = @to_collection.collection_cards.to_a
+    # track if we should update their collection covers
+    should_update_from_cover = false
+    should_update_to_cover = false
     if @card_action == 'move'
       # minus any we're moving (i.e. moving within the same collection)
       existing_cards.reject! { |card| @moving_cards.include? card }
+      unless @to_collection == @from_collection
+        should_update_from_cover = @moving_cards.any?(&:should_update_parent_collection_cover?)
+      end
     elsif @card_action == 'link'
       # for links, we build new link cards out of our selected moving ones
       @moving_cards = @moving_cards.map(&:copy_into_new_link_card)
@@ -48,9 +54,14 @@ class CardMover
     # Reorder all cards based on order of joined_cards
     joined_cards.each_with_index do |card, i|
       # parent_id will already be set for existing_cards but no harm to indicate
-      card.update(parent_id: @to_collection.id, order: i)
+      card.assign_attributes(parent_id: @to_collection.id, order: i)
+      should_update_to_cover ||= card.should_update_parent_collection_cover? if card.changed?
+      card.save if card.changed?
     end
-    @from_collection.reload.reorder_cards!
+
+    @from_collection.reload.reorder_cards! unless @from_collection == @to_collection
+    @from_collection.cache_cover! if should_update_from_cover
+    @to_collection.cache_cover! if should_update_to_cover
     @moving_cards
   end
 

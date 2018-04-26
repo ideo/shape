@@ -39,17 +39,17 @@ module Archivable
 
   def archive!
     return true if archived?
+    if self.class.archive_as.present?
+      # treat this archive! as if you had triggered it on the parent
+      # e.g. by archiving a Collection we should really be archiving its parent card
+      return try(self.class.archive_as).try(:archive!)
+    end
     run_callbacks :archive do
-      if self.class.archive_as.present?
-        # treat this archive! as if you had triggered it on the parent
-        # e.g. by archiving a Collection we should really be archiving its parent card
-        return try(self.class.archive_as).try(:archive_with_relations!)
-      end
       archive_with_relations!
     end
   end
 
-  # will archive the card as well as its `archive_with` and calling `after_archive`
+  # will first archive all of the `archive_with` relations, and then archive the model itself
   def archive_with_relations!
     if self.class.archive_with.present?
       self.class.archive_with.each do |relation|

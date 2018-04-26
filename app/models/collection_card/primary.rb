@@ -1,7 +1,7 @@
 class CollectionCard
   class Primary < CollectionCard
     archivable with: %i[collection item]
-    after_archive :decrement_card_orders!
+    after_archive :after_archive_card
 
     belongs_to :collection,
                optional: true,

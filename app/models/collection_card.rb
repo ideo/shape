@@ -1,7 +1,7 @@
 class CollectionCard < ApplicationRecord
   include Archivable
 
-  belongs_to :parent, class_name: 'Collection', touch: true
+  belongs_to :parent, class_name: 'Collection'
   belongs_to :collection, optional: true
   belongs_to :item, optional: true
   # this really is only appropriate for CollectionCard::Primary but defined globally here
@@ -88,7 +88,6 @@ class CollectionCard < ApplicationRecord
     return true if update_ids.blank?
 
     CollectionCard.increment_counter(:order, update_ids)
-
     true
   end
 
@@ -106,8 +105,20 @@ class CollectionCard < ApplicationRecord
     return true if update_ids.blank?
 
     CollectionCard.decrement_counter(:order, update_ids)
-
     true
+  end
+
+  # gets called by child STI classes
+  def after_archive_card
+    decrement_card_orders!
+    cover = parent.cached_cover
+    if cover && cover['card_ids'].include?(id)
+      # regenerate parent collection cover if archived card was relevant
+      parent.cache_cover!
+    else
+      # touch parent to bust cache
+      parent.touch
+    end
   end
 
   def self.with_record(record)
@@ -118,6 +129,27 @@ class CollectionCard < ApplicationRecord
     else
       []
     end
+  end
+
+  def should_update_parent_collection_cover?
+    collection = try(:parent)
+    return unless collection.present? && collection.base_collection_type?
+    cover = collection.cached_cover
+    cover.blank? ||
+      cover['card_ids'].blank? ||
+      (cover['text'].blank? && text_card?) ||
+      (cover['image_url'].blank? && media_card?) ||
+      cover['card_ids'].include?(id) ||
+      cover['card_order'].nil? ||
+      order <= cover['card_order']
+  end
+
+  def text_card?
+    record.is_a? Item::TextItem
+  end
+
+  def media_card?
+    record.is_a?(Item::VideoItem) || record.is_a?(Item::ImageItem)
   end
 
   private
@@ -137,7 +169,7 @@ class CollectionCard < ApplicationRecord
 
   def resourceable_class
     # Use top-level class since this is an STI model
-    Item
+    CollectionCard
   end
 
   def single_item_or_collection_is_present
