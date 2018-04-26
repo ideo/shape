@@ -17,7 +17,7 @@ class OrganizationPeople extends React.PureComponent {
     const guestGroup = organization.guest_group
     return (
       <div>
-        {organization.primary_group.currentUserCanEdit &&
+        {organization.primary_group.can_edit &&
           <Row>
             <RowItemRight>
               <TextButton onClick={this.props.onGroupAdd}>
@@ -52,7 +52,7 @@ class OrganizationPeople extends React.PureComponent {
             >
               <DisplayText>{group.name}</DisplayText>
             </button>
-            { group.currentUserCanEdit &&
+            { group.can_edit &&
               <RemoveIconHolder onClick={this.props.onGroupRemove(group)}>
                 <ArchiveIcon />
               </RemoveIconHolder>

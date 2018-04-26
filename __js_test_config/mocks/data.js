@@ -108,7 +108,7 @@ export const fakeGroupAttrs = {
   handle: 'ideo-products',
   filestack_file_url: 'https://cdn.filestackcontent.com/i4iKADquTQCWMAvyz02R',
   roles: [],
-  currentUserCanEdit: true,
+  can_edit: true,
 }
 export const fakeGroup = {
   ...fakeJsonApiAttrs,

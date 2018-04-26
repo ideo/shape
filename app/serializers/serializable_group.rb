@@ -15,4 +15,8 @@ class SerializableGroup < BaseJsonSerializer
     end
   end
   has_many :roles
+
+  attribute :can_edit do
+    @current_ability.can?(:edit, @object)
+  end
 end

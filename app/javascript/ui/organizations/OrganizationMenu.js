@@ -16,7 +16,6 @@ class OrganizationMenu extends React.Component {
 
   componentDidMount() {
     const { apiStore, userGroups } = this.props
-    console.log(userGroups)
     const groupReqs = userGroups.map(group => this.fetchRoles(group))
     Promise.all(groupReqs)
       .then(responses => {
@@ -106,7 +105,7 @@ class OrganizationMenu extends React.Component {
   renderEditRoles() {
     return (
       <RolesMenu
-        canEdit={this.editGroup.currentUserCanEdit}
+        canEdit={this.editGroup.can_edit}
         ownerId={this.editGroup.id}
         ownerType="groups"
         title="Members:"
@@ -144,7 +143,8 @@ class OrganizationMenu extends React.Component {
     return (
       <GroupTitle
         group={this.editGroup}
-        canEdit={this.editGroup.currentUserCanEdit}
+        onSave={this.onGroupSave}
+        canEdit={this.editGroup.can_edit}
       />
     )
   }
@@ -175,7 +175,7 @@ class OrganizationMenu extends React.Component {
       } else {
         content = this.renderEditRoles()
       }
-      if (this.editGroup.currentUserCanEdit) {
+      if (this.editGroup.can_edit) {
         onEdit = () => {
           this.goToEditGroup(this.editGroup)
         }
