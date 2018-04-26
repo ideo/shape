@@ -93,8 +93,13 @@ class GridCard extends React.Component {
   get isItem() {
     return this.props.cardType === 'items'
   }
+
   get isCollection() {
     return this.props.cardType === 'collections'
+  }
+
+  get isSelectable() {
+    return (this.props.isSharedCollection || this.canEdit)
   }
 
   get renderInner() {
@@ -161,7 +166,6 @@ class GridCard extends React.Component {
       card,
       record,
       canEditCollection,
-      isSharedCollection,
       dragging,
       menuOpen,
     } = this.props
@@ -171,13 +175,9 @@ class GridCard extends React.Component {
         {canEditCollection &&
           <GridCardHotspot card={card} dragging={dragging} />
         }
-        {/*
-          TODO: We can enable this CardMenu for sharedCollection after setting up
-          SharedWithMe updates (where it creates the linked cards)
-        */}
-        {!isSharedCollection && !record.isSharedCollection &&
+        {!record.isSharedCollection &&
           <StyledTopRightActions>
-            {this.canEdit &&
+            {this.isSelectable &&
               <SelectionCircle cardId={card.id} />
             }
             <CardMenu

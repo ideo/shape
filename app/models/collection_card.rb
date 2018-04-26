@@ -22,9 +22,7 @@ class CollectionCard < ApplicationRecord
 
   amoeba do
     enable
-    exclude_association :collection
-    exclude_association :item
-    exclude_association :parent
+    recognize []
   end
 
   def duplicate!(for_user:, parent: self.parent, shallow: false, update_order: false)
@@ -32,13 +30,22 @@ class CollectionCard < ApplicationRecord
       errors.add(:collection, 'cannot be a SharedWithMeCollection for duplication')
       return self
     end
+    if link?
+      # calling "Duplicate" on a link should create a real duplicate of the underlying record
+      return record.parent_collection_card.duplicate!(
+        for_user: for_user,
+        parent: parent,
+        shallow: shallow,
+        update_order: update_order,
+      )
+    end
     cc = amoeba_dup
     # defaults to self.parent, unless one is passed in
     cc.parent = parent
     # place card at end
     cc.order = parent.collection_cards.count
 
-    unless shallow || link?
+    unless shallow
       cc.collection = collection.duplicate!(for_user: for_user) if collection.present?
       cc.item = item.duplicate!(for_user: for_user) if item.present?
     end

@@ -33,7 +33,7 @@ class Ability
       end
 
       can :create, Collection
-      can :read, Collection do |collection|
+      can %i[read duplicate], Collection do |collection|
         collection.can_view?(user)
       end
       can :manage, Collection do |collection|
@@ -41,7 +41,7 @@ class Ability
       end
 
       can :create, CollectionCard
-      can :read, CollectionCard do |collection_card|
+      can %i[read duplicate], CollectionCard do |collection_card|
         collection_card.can_view?(user)
       end
       can :manage, CollectionCard do |collection_card|
@@ -49,7 +49,7 @@ class Ability
       end
 
       can :create, Item
-      can :read, Item do |item|
+      can %i[read duplicate], Item do |item|
         item.can_view?(user)
       end
       can :manage, Item do |item|

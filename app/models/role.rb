@@ -26,9 +26,6 @@ class Role < ApplicationRecord
     enable
     include_association :users_roles
     include_association :groups_roles
-    exclude_association :users
-    exclude_association :groups
-    exclude_association :resource
   end
 
   def self.for_resource(object)
