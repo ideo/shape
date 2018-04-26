@@ -1,6 +1,6 @@
 class Api::V1::UsersController < Api::V1::BaseController
   load_and_authorize_resource :organization, only: %i[index]
-  load_and_authorize_resource except: %i[me search create_from_emails accept_terms]
+  load_and_authorize_resource except: %i[me search create_from_emails accept_terms, switch_org]
 
   # All the users in this org, that this user can 'see' through groups or content
   # /organizations/:id/users
@@ -42,6 +42,15 @@ class Api::V1::UsersController < Api::V1::BaseController
       render jsonapi: current_user
     else
       render_api_errors current_user.errors
+    end
+  end
+
+  def switch_org
+    if current_user.switch_to_organization(Organization.find(params[:organization_id]))
+      render jsonapi: current_user, include:
+        [:groups, organizations: [:primary_group], current_organization: [:primary_group]]
+    else
+      render_api_errors user.errors
     end
   end
 
