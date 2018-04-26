@@ -18,8 +18,10 @@ RSpec.describe Breadcrumb::ForUser, type: :service do
 
   before do
     collection.primary_collection_cards.create!(
-      collection: subcollection
+      collection: subcollection,
     )
+    collection.recalculate_breadcrumb!
+    subcollection.recalculate_breadcrumb!
     item.recalculate_breadcrumb!
   end
 
