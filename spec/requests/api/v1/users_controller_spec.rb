@@ -169,4 +169,22 @@ describe Api::V1::UsersController, type: :request, json: true, auth: true do
       expect(@user.reload.terms_accepted).to be true
     end
   end
+
+  describe 'POST #switch_org' do
+    let!(:switch_organization) { create(:organization) }
+    let!(:organization) { user.current_organization }
+    let(:path) { '/api/v1/users/switch_org' }
+    let!(:params) { { organization_id: switch_organization.id }.to_json }
+
+    it 'returns a 200' do
+      post(path, params: params)
+      expect(response.status).to eq(200)
+    end
+
+    it 'it switches the users current org' do
+      expect(@user).to receive(:switch_to_organization).with(
+        switch_organization)
+      post(path, params: params)
+    end
+  end
 end
