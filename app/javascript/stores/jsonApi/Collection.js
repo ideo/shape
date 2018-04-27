@@ -3,7 +3,6 @@ import { computed } from 'mobx'
 
 import Api from './Api'
 import BaseRecord from './BaseRecord'
-import {uiStore} from '~/stores'
 
 class Collection extends BaseRecord {
   attributesForAPI = ['name', 'tag_list']
