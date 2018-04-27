@@ -23,8 +23,9 @@ class User extends BaseRecord {
     { routeToCollectionId, routeToItemId } = {}) {
     uiStore.update('isLoading', true)
     const user = await this.apiStore.request(
-      `/users/switch_org?organization_id=${organizationId}`,
+      `/users/switch_org`,
       'POST',
+      { organization_id: organizationId }
     )
     if (routeToItemId) return
     let collectionId = user.data.current_user_collection_id
