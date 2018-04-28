@@ -431,7 +431,7 @@ describe User, type: :model do
     end
   end
 
-  describe '#current_org_groups' do
+  context 'loading current organization groups' do
     let!(:org) { create(:organization, member: user) }
     let!(:org_2) { create(:organization) }
     let!(:group_in_org_member) do
@@ -448,12 +448,29 @@ describe User, type: :model do
              add_members: [user])
     end
 
-    it 'only returns groups this user is a member of in current org' do
-      expect(user.has_role?(Role::MEMBER, group_in_org_member)).to be true
-      expect(user.has_role?(Role::MEMBER, org.primary_group)).to be true
-      expect(user.has_role?(Role::MEMBER, group_in_org_not_member)).to be false
-      expect(user.has_role?(Role::MEMBER, group_not_in_org)).to be true
-      expect(user.current_org_groups).to match_array([group_in_org_member, org.primary_group])
+    describe '#current_org_groups' do
+      it 'only returns groups this user is a member of in current org' do
+        expect(user.has_role?(Role::MEMBER, group_in_org_member)).to be true
+        expect(user.has_role?(Role::MEMBER, org.primary_group)).to be true
+        expect(user.has_role?(Role::MEMBER, group_in_org_not_member)).to be false
+        expect(user.has_role?(Role::MEMBER, group_not_in_org)).to be true
+        expect(user.current_org_groups).to match_array([group_in_org_member, org.primary_group])
+      end
+    end
+
+    describe '#current_org_groups_and_special_groups' do
+      let(:admin) { create(:user) }
+      let(:guest) { create(:user) }
+      let!(:org) { create(:organization, member: user, guest: guest, admin: admin) }
+
+      it 'does not allow guest to see their own guest group' do
+        expect(guest.current_org_groups_and_special_groups).to match_array([])
+      end
+
+      it 'allows access to the guest group for org members' do
+        expect(user.current_org_groups_and_special_groups).to match_array([group_in_org_member, org.primary_group, org.guest_group])
+        expect(admin.current_org_groups_and_special_groups).to match_array([org.primary_group, org.guest_group])
+      end
     end
   end
 

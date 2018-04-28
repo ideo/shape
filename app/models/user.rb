@@ -93,9 +93,7 @@ class User < ApplicationRecord
       password: Devise.friendly_token(40),
       invitation_token: Devise.friendly_token(40),
     )
-    # NOTE: The user is not officially a member of this org, but we add them
-    # so that they have the proper current_organization_id and shared/my collections
-    organization.user_role_added(user)
+    organization.add_new_user(user)
     user
   end
 
@@ -207,6 +205,19 @@ class User < ApplicationRecord
     Role.joins(:groups_roles)
         .where(GroupsRole.arel_table[:group_id].in(org_group_ids))
         .map(&:identifier)
+  end
+
+  def current_org_groups_and_special_groups
+    groups = current_org_groups.to_a
+    organization = current_organization
+    if groups.include?(organization.primary_group)
+      # org members get to see the guest group
+      groups << organization.guest_group
+    elsif groups.include?(organization.guest_group)
+      # org guests don't get to see the guest group
+      groups = groups.reject { |g| g == organization.guest_group }
+    end
+    groups
   end
 
   private

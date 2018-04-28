@@ -77,4 +77,25 @@ describe Organization, type: :model do
       end
     end
   end
+
+  describe '#add_new_user' do
+    let(:user) { create(:user, email: 'jill@ideo.com') }
+    let(:guest) { create(:user, email: 'jack@gmail.com') }
+    let(:organization) { create(:organization, domain_whitelist: ['ideo.com']) }
+
+    before do
+      organization.add_new_user(user)
+      organization.add_new_user(guest)
+    end
+
+    it 'adds as an org member if they match the domain' do
+      expect(user.has_role?(Role::MEMBER, organization.primary_group)).to be true
+      expect(user.has_role?(Role::MEMBER, organization.guest_group)).to be false
+    end
+
+    it 'adds as an org guest if they don\'t match the domain' do
+      expect(guest.has_role?(Role::MEMBER, organization.primary_group)).to be false
+      expect(guest.has_role?(Role::MEMBER, organization.guest_group)).to be true
+    end
+  end
 end

@@ -11,6 +11,10 @@ class Group extends BaseRecord {
       role.resource && role.resource.id === this.id)
   }
 
+  get isNormalGroup() {
+    return !this.is_primary && !this.is_guest
+  }
+
   API_archive() {
     const onAgree = async () => {
       await this.apiStore.request(`groups/${this.id}/archive`, 'PATCH')
@@ -33,5 +37,10 @@ class Group extends BaseRecord {
 }
 
 Group.type = 'groups'
+
+Group.defaults = {
+  // set as array so it's never `undefined`
+  roles: [],
+}
 
 export default Group

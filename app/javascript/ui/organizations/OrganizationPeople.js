@@ -1,3 +1,4 @@
+import { Fragment } from 'react'
 import PropTypes from 'prop-types'
 import { PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
@@ -11,10 +12,41 @@ const RemoveIconHolder = styled.button`
 `
 
 class OrganizationPeople extends React.PureComponent {
-  render() {
+  renderYourOrganization() {
     const { organization, userGroups } = this.props
     const primaryGroup = organization.primary_group
     const guestGroup = organization.guest_group
+
+    const orgMember = (userGroups.indexOf(primaryGroup) > -1)
+    const showGuests = orgMember && guestGroup.roles.count
+    return (
+      <Fragment>
+        <Heading3>
+          Your Organization
+        </Heading3>
+        <Row>
+          { orgMember &&
+            <button className="orgEdit" onClick={this.props.onGroupRoles(primaryGroup)}>
+              <DisplayText>{ primaryGroup.name }</DisplayText>
+            </button>
+          }
+          { !orgMember &&
+            <DisplayText>{ primaryGroup.name }</DisplayText>
+          }
+        </Row>
+        { showGuests &&
+          <Row>
+            <button className="orgEdit" onClick={this.props.onGroupRoles(guestGroup)}>
+              <DisplayText>{ guestGroup.name }</DisplayText>
+            </button>
+          </Row>
+        }
+      </Fragment>
+    )
+  }
+
+  render() {
+    const { organization, userGroups } = this.props
     return (
       <div>
         {organization.primary_group.can_edit &&
@@ -26,25 +58,13 @@ class OrganizationPeople extends React.PureComponent {
             </RowItemRight>
           </Row>
         }
-        <Heading3>
-          Your Organization
-        </Heading3>
-        <Row>
-          <button className="orgEdit" onClick={this.props.onGroupRoles(primaryGroup)}>
-            <DisplayText>{ primaryGroup.name }</DisplayText>
-          </button>
-        </Row>
-        <Row>
-          <button className="orgEdit" onClick={this.props.onGroupRoles(guestGroup)}>
-            <DisplayText>{ guestGroup.name }</DisplayText>
-          </button>
-        </Row>
+        {this.renderYourOrganization()}
         <FormSpacer />
         <Heading3>
           Your Groups
         </Heading3>
         { userGroups.map((group) =>
-          (!group.is_primary &&
+          (group.isNormalGroup &&
           <Row key={group.id}>
             <button
               className="groupEdit"

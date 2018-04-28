@@ -102,6 +102,7 @@ ActiveRecord::Schema.define(version: 20180426163602) do
     t.integer "primary_group_id"
     t.integer "filestack_file_id"
     t.integer "guest_group_id"
+    t.jsonb "domain_whitelist", default: []
   end
 
   create_table "roles", force: :cascade do |t|

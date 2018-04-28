@@ -21,7 +21,9 @@ class Ability
 
       can :create, Group
       can :read, Group do |group|
-        group.can_view?(user)
+        # NOTE: guest group access can be granted via primary_group membership
+        group.can_view?(user) ||
+          (group.guest? && group.organization.primary_group.can_view?(user))
       end
 
       can :manage, Group do |group|

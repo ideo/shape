@@ -50,6 +50,21 @@ class Organization < ApplicationRecord
     user.switch_to_organization(user.organizations.first)
   end
 
+  def matches_domain_whitelist?(user)
+    email_domain = user.email.split('@').last
+    domain_whitelist.include? email_domain
+  end
+
+  def add_new_user(user)
+    if matches_domain_whitelist?(user)
+      # add them as an org member
+      user.add_role(Role::MEMBER, primary_group)
+    else
+      # or else as a guest member if their domain doesn't match
+      user.add_role(Role::MEMBER, guest_group)
+    end
+  end
+
   def guest_group_name
     "#{name} Guests"
   end

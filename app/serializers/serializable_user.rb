@@ -6,6 +6,6 @@ class SerializableUser < BaseJsonSerializer
   belongs_to :current_organization
   has_many :organizations
   has_many :groups do
-    data { @object.current_org_groups }
+    data { @object.current_org_groups_and_special_groups }
   end
 end
