@@ -18,6 +18,7 @@ import CloseIcon from '~/ui/icons/CloseIcon'
 import v, { ITEM_TYPES } from '~/utils/variables'
 import EditableName from './shared/EditableName'
 import PageMenu from './shared/PageMenu'
+import Item from '~/stores/jsonApi/Item'
 import { StyledTitleAndRoles } from './shared/styled'
 
 const ItemPageContainer = styled.main`
@@ -61,11 +62,17 @@ class ItemPage extends PageWithApi {
     this.setState({ item })
   }
 
-  refetchItem = async () => {
-    const { apiStore } = this.props
+  updateItem = (itemTextData) => {
     const { item } = this.state
-    const { data } = await apiStore.fetch('items', item.id, { force: true })
-    this.setState({ item: data })
+    item.text_data = itemTextData
+
+    this.setState({ item })
+  }
+
+  save = async (itemData) => {
+    const { apiStore } = this.props
+    const newItem = new Item(itemData, apiStore)
+    newItem.save()
   }
 
   // could be smarter or broken out once we want to do different things per type
@@ -77,10 +84,11 @@ class ItemPage extends PageWithApi {
     case ITEM_TYPES.TEXT:
       return (
         <TextItem
-          item={item}
+          item={item.toJS()}
           actionCableConsumer={ActionCableConsumer}
           currentUserId={currentUserId}
-          handleRefetchItem={this.refetchItem}
+          onUpdatedData={this.updateItem}
+          onSave={this.save}
         />
       )
     case ITEM_TYPES.IMAGE:

@@ -105,10 +105,10 @@ class TextItem extends React.Component {
         rejected: () => {},
       }
     )
-    // console.log('thischannel is being set', this.channel)
   }
 
   channelReceivedData = async (data) => {
+    // console.log('channelReceivedData', data)
     const { currentUserId } = this.props
     const { currentEditor } = this.state
     let { locked } = this.state
@@ -134,9 +134,7 @@ class TextItem extends React.Component {
 
     // If someone else previously finished editing, fetch updates
     if ((currentEditor && !newCurrentEditor) && (currentEditor.id !== currentUserId)) {
-      await this.props.handleRefetchItem()
-      // wait before unlocking for the other viewers
-      await sleep(1000)
+      this.props.onUpdatedData(data.item_text_data)
     }
     this.setState({
       currentEditor: newCurrentEditor,
@@ -183,25 +181,25 @@ class TextItem extends React.Component {
     // console.log('Broadcast editing is:', editing)
     const { item } = this.props
     if (editing) {
-      this.channel.perform('start_editing', { id: item.id })
+      this.channel.perform('start_editing', { id: item.id, data: this.textData })
     } else {
-      this.channel.perform('stop_editing', { id: item.id })
+      this.channel.perform('stop_editing', { id: item.id, data: this.textData })
     }
   }
 
   unlockEditingIfOtherViewers = () => {
-    // console.log('Check if we should unlock editing')
-    // Unlock if there are other viewers (this user is counted as a viewer)
     if (this.numViewers > 1) {
       // Kick user out of editor
       this.ignoreBlurEvent = true
       this.reactQuillRef.blur() // <-- this triggers two unlocks unless event is ignored
       this.ignoreBlurEvent = false
-      this.broadcastStoppedEditingAfterSave = true
+      // this.broadcastStoppedEditingAfterSave = true
       // Cancel any outstanding requests to save
-      this.debouncedOnKeyUp.cancel()
+      this.debouncedOnKeyUp.flush()
+
+      this.broadcastEditingState({ editing: false })
       // Call save immediately if there are changes
-      this._onKeyUp()
+      // this._onKeyUp()
     }
   }
 
@@ -221,26 +219,28 @@ class TextItem extends React.Component {
   get textData() {
     const { item } = this.props
     // we have to convert the item to a normal JS object for Quill to be happy
-    return item.toJS().text_data
+    return item.text_data
   }
 
-  onKeyUp = () => {
+  onKeyUp = (content, delta, source, editor) => {
+    const { currentUserId } = this.props
+    const { currentEditor } = this.state
+    if (currentEditor && currentEditor.id !== currentUserId) return
     this.startEditing()
-    this.debouncedOnKeyUp()
+    this.debouncedOnKeyUp(content, delta, source, editor)
     this.startUnlockTimer()
   }
 
-  _onKeyUp = () => {
+  _onKeyUp = (content, delta, source, editor) => {
     const { item } = this.props
     const { quillEditor } = this
     item.content = quillEditor.root.innerHTML
     item.text_data = quillEditor.getContents()
-    item.save().then(() => {
-      if (this.broadcastStoppedEditingAfterSave) {
-        this.broadcastEditingState({ editing: false })
-        this.broadcastStoppedEditingAfterSave = false
-      }
-    })
+
+    const { currentUserId } = this.props
+    const { currentEditor } = this.state
+
+    this.props.onSave(item)
   }
 
   get canEdit() {
@@ -262,7 +262,7 @@ class TextItem extends React.Component {
         ...v.quillDefaults,
         ref: c => { this.reactQuillRef = c },
         theme: 'snow',
-        onKeyUp: this.onKeyUp,
+        onChange: this.onKeyUp,
         onFocus: this.onEditorFocus,
         onBlur: this.onEditorBlur,
         readOnly: locked,
@@ -292,10 +292,11 @@ class TextItem extends React.Component {
 }
 
 TextItem.propTypes = {
-  item: MobxPropTypes.objectOrObservableObject.isRequired,
+  item: PropTypes.object,
   actionCableConsumer: MobxPropTypes.objectOrObservableObject.isRequired,
   currentUserId: PropTypes.number.isRequired,
-  handleRefetchItem: PropTypes.func.isRequired,
+  onUpdatedData: PropTypes.func.isRequired,
+  onSave: PropTypes.func.isRequired,
 }
 
 export default TextItem
