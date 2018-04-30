@@ -35,10 +35,8 @@ describe('ItemPage', () => {
     expect(component.state.item).toEqual(item)
   })
 
-  it('initially displays Loader', () => {
-    expect(wrapper.find('Loader').exists()).toEqual(true)
-    wrapper.update()
-    expect(wrapper.find('Loader').exists()).toEqual(false)
+  it('renders the ItemPageContainer', () => {
+    expect(wrapper.find('ItemPageContainer').exists()).toEqual(true)
   })
 
   it('displays the item name', () => {

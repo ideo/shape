@@ -25,6 +25,7 @@ const ItemPageContainer = styled.main`
   min-height: 75vh;
   position: relative;
 `
+ItemPageContainer.displayName = 'ItemPageContainer'
 
 const StyledRightColumn = styled.div`
   position: absolute;
