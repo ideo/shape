@@ -43,7 +43,8 @@ class OrganizationDropdown extends React.Component {
   }
 
   handleOrgSettings = (ev) => {
-    this.openOrgMenu('editOrganization')
+    this.props.onItemClick()
+    this.props.routingStore.routeTo('/settings')
   }
 
   handleLegal = (ev) => {

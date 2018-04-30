@@ -1,45 +1,59 @@
 import PropTypes from 'prop-types'
 import { action, observable } from 'mobx'
-import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
+import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import _ from 'lodash'
 import ReactTags from 'react-tag-autocomplete'
 
-import Modal from '~/ui/global/modals/Modal'
 import StyledReactTags from './StyledReactTags'
 
-@inject('uiStore')
 @observer
 class TagEditor extends React.Component {
   @observable tags = []
+  @observable error = ''
 
   constructor(props) {
     super(props)
     this.saveTags = _.debounce(this._saveTags, 1000)
-    this.initTags(props.record.tag_list)
+    if (!props.record[props.tagField]) {
+      // should be some kind of error if tagField doesn't exist
+      props.record[props.tagField] = []
+    }
+    this.initTags(props.record[props.tagField])
   }
 
   componentWillReceiveProps(nextProps) {
-    this.initTags(nextProps.record.tag_list)
+    this.initTags(nextProps.record[nextProps.tagField])
   }
 
   componentWillUnmount() {
     this.saveTags.flush()
   }
 
-  @action initTags = (tag_list) => {
+  @action initTags = (tags) => {
     // `id` is used by react-tag-autocomplete, but otherwise doesn't hold any meaning
-    this.tags = _.map([...tag_list], (t, i) => ({
+    this.tags = _.map([...tags], (t, i) => ({
       id: i, name: t
     }))
   }
 
   _saveTags = () => {
-    const { record } = this.props
-    record.tag_list = _.map([...this.tags], t => t.name).join(', ')
+    const { record, tagField } = this.props
+    record[tagField] = _.map([...this.tags], t => t.name).join(',')
     record.save()
   }
 
   @action handleAddition = (tag) => {
+    const { validate } = this.props
+    tag.name = tag.name.trim()
+    this.error = ''
+    if (validate === 'domain') {
+      const matches = tag.name.match(/([a-z])([a-z0-9]+\.)*[a-z0-9]+\.[a-z.]+/g)
+      if (!matches) {
+        this.error = 'Invalid domain. Please use the format: domain.com'
+        return
+      }
+      tag.name = _.first(matches)
+    }
     const found = this.tags.find(t => t.name === tag.name)
     if (!found) {
       this.tags.push(tag)
@@ -56,11 +70,11 @@ class TagEditor extends React.Component {
   }
 
   readOnlyTags = () => {
-    const { record } = this.props
-    if (!record.tag_list.length) {
+    const { record, tagField } = this.props
+    if (!record[tagField].length) {
       return 'No tags added.'
     }
-    const inner = record.tag_list.map(tag => (
+    const inner = record[tagField].map(tag => (
       <div key={tag} className="react-tags__selected-tag read-only">
         <span className="react-tags__selected-tag-name">
           {tag}
@@ -75,29 +89,26 @@ class TagEditor extends React.Component {
   }
 
   render() {
-    const { canEdit, uiStore } = this.props
+    const { canEdit, placeholder, tagColor } = this.props
 
     return (
-      <Modal
-        onClose={() => uiStore.update('tagsModalOpen', false)}
-        title="Tags"
-        open={uiStore.tagsModalOpen}
-      >
-        <StyledReactTags>
-          {!canEdit && this.readOnlyTags()}
-          {canEdit &&
-            <ReactTags
-              tags={[...this.tags]}
-              allowBackspace={false}
-              delimiterChars={[',']}
-              placeholder="Add new tags, separated by comma or pressing enter."
-              handleAddition={this.handleAddition}
-              handleDelete={this.handleDelete}
-              allowNew
-            />
-          }
-        </StyledReactTags>
-      </Modal>
+      <StyledReactTags tagColor={tagColor}>
+        {!canEdit && this.readOnlyTags()}
+        {canEdit &&
+          <ReactTags
+            tags={[...this.tags]}
+            allowBackspace={false}
+            delimiterChars={[',']}
+            placeholder={placeholder}
+            handleAddition={this.handleAddition}
+            handleDelete={this.handleDelete}
+            allowNew
+          />
+        }
+        {this.error &&
+          <div className="error">{this.error}</div>
+        }
+      </StyledReactTags>
     )
   }
 }
@@ -105,12 +116,16 @@ class TagEditor extends React.Component {
 TagEditor.propTypes = {
   record: MobxPropTypes.objectOrObservableObject.isRequired,
   canEdit: PropTypes.bool,
-}
-TagEditor.wrappedComponent.propTypes = {
-  uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
+  tagField: PropTypes.string.isRequired,
+  tagColor: PropTypes.string,
+  placeholder: PropTypes.string,
+  validate: PropTypes.string,
 }
 TagEditor.defaultProps = {
   canEdit: false,
+  tagColor: 'gray',
+  placeholder: 'Add new tags, separated by comma or pressing enter.',
+  validate: null,
 }
 
 export default TagEditor

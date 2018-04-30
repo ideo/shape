@@ -7,6 +7,7 @@ import CollectionPage from '~/ui/pages/CollectionPage'
 import ItemPage from '~/ui/pages/ItemPage'
 import SearchPage from '~/ui/pages/SearchPage'
 import TermsPage from '~/ui/pages/TermsPage'
+import SettingsPage from '~/ui/pages/SettingsPage'
 import TermsOfUseModal from '~/ui/users/TermsOfUseModal'
 import Loader from '~/ui/layout/Loader'
 import WindowSizeListener from 'react-window-size-listener'
@@ -64,6 +65,7 @@ class Routes extends React.Component {
           <Route path="/items/:id" component={ItemPage} />
           <Route path="/search" component={SearchPage} />
           <Route path="/terms" component={TermsPage} />
+          <Route path="/settings" component={SettingsPage} />
         </Switch>
       </AppWrapper>
     )

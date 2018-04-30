@@ -31,8 +31,8 @@ export default styled.div`
     display: inline-block;
     box-sizing: border-box;
     margin: 0 6px 6px 0;
-    padding: 6px 8px;
-    background: ${v.colors.cararra};
+    padding: 10px 12px;
+    background: ${props => (props.tagColor === 'white' ? 'white' : v.colors.cararra)};
     /* match the font styles */
     font-size: inherit;
     line-height: inherit;
@@ -60,6 +60,7 @@ export default styled.div`
     /* prevent autoresize overflowing the container */
     max-width: 100%;
     input {
+      background: transparent;
       font-family: ${v.fonts.sans};
       font-weight: ${v.weights.book};
       /* prevent autoresize overflowing the container */
@@ -119,6 +120,13 @@ export default styled.div`
         cursor: auto;
       }
     }
+  }
+
+  .error {
+    margin-top: 0.5rem;
+    margin-left: 0.5rem;
+    font-size: 0.9rem;
+    color: ${v.colors.error};
   }
 
   @media screen and (min-width: 30em) {

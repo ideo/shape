@@ -1,8 +1,8 @@
 import ReactMarkdown from 'react-markdown'
-import { DisplayText, DisplayLink } from '~/ui/global/styled/typography'
 import styled from 'styled-components'
-import v from '~/utils/variables'
 
+import { Heading1, DisplayText, DisplayLink } from '~/ui/global/styled/typography'
+import v from '~/utils/variables'
 import Header from '~/ui/layout/Header'
 import PageContainer from '~/ui/layout/PageContainer'
 import termsMarkdown from '~/markdown/TermsOfUse'
@@ -16,9 +16,11 @@ StyledMarkdown.displayName = 'StyledMarkdown'
 
 const StyledTitle = DisplayText.extend`
   font-weight: ${v.weights.medium};
+  text-transform: uppercase;
 `
 
 const StyledLink = DisplayLink.extend`
+  text-transform: uppercase;
   margin-left: 80px;
   margin-bottom: 30px;
   font-weight: ${v.weights.medium};
@@ -30,13 +32,13 @@ class TermsPage extends React.PureComponent {
     return (
       <div>
         <Header />
-        <PageContainer>
-          <h1>Legal</h1>
+        <PageContainer marginTop={v.headerHeightCompact}>
+          <Heading1 noTransform marginBottom>Legal</Heading1>
           <StyledTitle>
-            TERMS OF USE
+            Terms of Use
           </StyledTitle>
           <StyledLink href="https://www.ideo.com/privacy" target="_blank">
-            PRIVACY POLICY
+            Privacy Policy
           </StyledLink>
           <StyledMarkdown source={termsMarkdown} />
         </PageContainer>

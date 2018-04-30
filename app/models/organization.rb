@@ -13,7 +13,9 @@ class Organization < ApplicationRecord
              optional: true
 
   after_create :create_groups
+  before_update :parse_domain_whitelist
   after_update :update_group_names, if: :saved_change_to_name?
+  after_update :check_guests_for_domain_match, if: :saved_change_to_domain_whitelist?
 
   delegate :admins, to: :primary_group
   delegate :members, to: :primary_group
@@ -56,13 +58,14 @@ class Organization < ApplicationRecord
   end
 
   # doublecheck happens when you finally sign in, at which point your email may have updated based on your network profile.
-  # at that point, we don't need to "revoke" primary (e.g. you were invited whitelisted, but signed in with personal)
+  # at that point, we don't need to "revoke" primary -- e.g. you were invited whitelisted, but signed in with personal
   # but we do want to switch you to the org if you switched to your whitelisted domain email
   def add_new_user(user, doublecheck: false)
     if matches_domain_whitelist?(user)
       # add them as an org member
-      user.remove_role(Role::MEMBER, guest_group) # remove if exists
       user.add_role(Role::MEMBER, primary_group)
+      # remove guest role if exists, do this second so that you don't temporarily lose org membership
+      user.remove_role(Role::MEMBER, guest_group)
     elsif !doublecheck
       # or else as a guest member if their domain doesn't match
       user.add_role(Role::MEMBER, guest_group)
@@ -78,6 +81,22 @@ class Organization < ApplicationRecord
   end
 
   private
+
+  def parse_domain_whitelist
+    return true unless will_save_change_to_domain_whitelist?
+    if domain_whitelist.is_a?(String)
+      # when saving from the frontend/API we just pass in a string list of domains,
+      # so we split to save as an array
+      self.domain_whitelist = domain_whitelist.split(',').map(&:strip)
+    end
+    domain_whitelist
+  end
+
+  def check_guests_for_domain_match
+    guest_group.members[:users].each do |user|
+      add_new_user(user, doublecheck: true)
+    end
+  end
 
   def create_groups
     create_primary_group(name: name, organization: self)

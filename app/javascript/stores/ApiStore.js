@@ -22,6 +22,11 @@ class ApiStore extends Store {
     return this.find('users', this.currentUserId)
   }
 
+  get currentUserOrganization() {
+    if (!this.currentUser.current_organization) return null
+    return this.currentUser.current_organization
+  }
+
   get currentUserOrganizationId() {
     if (!this.currentUser.current_organization) return null
     return this.currentUser.current_organization.id

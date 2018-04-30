@@ -7,9 +7,10 @@ export const Heading1 = styled.h1`
   font-weight: ${v.weights.medium};
   letter-spacing: 2px;
   color: black;
-  margin-bottom: 0.5rem;
+  margin-bottom: ${props => (props.marginBottom ? 2 : 0.5)}rem;
   margin-top: 0.5rem;
   white-space: ${props => (props.wrapLine ? 'normal' : 'nowrap')}; /* better this way for responsive? */
+  text-transform: ${props => (props.noTransform ? 'none' : 'uppercase')};
 
   @media only screen and (max-width: ${v.responsive.smallBreakpoint}px) {
     font-size: 1.5rem;

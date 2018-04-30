@@ -9,7 +9,7 @@ import DuplicateIcon from '~/ui/icons/DuplicateIcon'
 import PermissionsIcon from '~/ui/icons/PermissionsIcon'
 import ArchiveIcon from '~/ui/icons/ArchiveIcon'
 import PopoutMenu from '~/ui/global/PopoutMenu'
-import TagEditor from '~/ui/pages/shared/TagEditor'
+import TagEditorModal from '~/ui/pages/shared/TagEditorModal'
 
 class PageMenu extends React.PureComponent {
   handleMouseLeave = () => {
@@ -71,7 +71,7 @@ class PageMenu extends React.PureComponent {
           menuOpen={menuOpen}
         />
 
-        <TagEditor canEdit={this.props.canEdit} record={record} />
+        <TagEditorModal canEdit={this.props.canEdit} record={record} />
       </Fragment>
     )
   }

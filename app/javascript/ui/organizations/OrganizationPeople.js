@@ -18,7 +18,7 @@ class OrganizationPeople extends React.PureComponent {
     const guestGroup = organization.guest_group
 
     const orgMember = (userGroups.indexOf(primaryGroup) > -1)
-    const showGuests = orgMember && guestGroup.groupRoles.length
+    const showGuests = orgMember && !!guestGroup.groupRoles.length
 
     return (
       <Fragment>

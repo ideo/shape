@@ -44,6 +44,45 @@ describe Organization, type: :model do
         expect(organization.guest_group.reload.name).to eq('Org 2.0 Guests')
       end
     end
+
+    describe '#parse_domain_whitelist' do
+      before do
+        organization.update(domain_whitelist: 'ideo.com, ideo.org')
+      end
+
+      it 'should parse string of domains into an array list' do
+        expect(organization.domain_whitelist).to match_array(['ideo.com', 'ideo.org'])
+      end
+    end
+
+    describe '#check_guests_for_domain_match' do
+      let(:user) { create(:user, email: 'email@domain.org') }
+      let(:guest) { create(:user, email: 'email@gmail.com') }
+      let(:organization) { create(:organization) }
+
+      before do
+        user.add_role(Role::MEMBER, organization.guest_group)
+        guest.add_role(Role::MEMBER, organization.guest_group)
+      end
+
+      it 'should set up user matching domain as a org primary group member' do
+        expect(user.has_role?(Role::MEMBER, organization.primary_group)).to be false
+        expect(user.has_role?(Role::MEMBER, organization.guest_group)).to be true
+        # update whitelist to include user's email
+        organization.update(domain_whitelist: 'domain.org')
+        user.reload
+        expect(user.reload.has_role?(Role::MEMBER, organization.primary_group)).to be true
+        expect(user.has_role?(Role::MEMBER, organization.guest_group)).to be false
+      end
+
+      it 'should not affect other guest memberships' do
+        expect(guest.has_role?(Role::MEMBER, organization.guest_group)).to be true
+        # update whitelist to include user's email
+        organization.update(domain_whitelist: 'domain.org')
+        guest.reload
+        expect(guest.has_role?(Role::MEMBER, organization.guest_group)).to be true
+      end
+    end
   end
 
   describe '.create_for_user' do
