@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types'
-import { PropTypes as MobxPropTypes } from 'mobx-react'
+import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 
 import v from '~/utils/variables'
@@ -60,7 +60,8 @@ const StyledAddUserBtn = styled.div`
 `
 StyledAddUserBtn.displayName = 'StyledAddUserBtn'
 
-class RolesSummary extends React.PureComponent {
+@observer
+class RolesSummary extends React.Component {
   get editors() {
     const { roles } = this.props
     const editorRole = roles.find(role => role.name === 'editor')

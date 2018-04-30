@@ -62,13 +62,6 @@ class OrganizationMenu extends React.Component {
     this.changePage('organizationPeople')
   }
 
-  @action onGroupSave = (savedGroup) => {
-    const { apiStore, uiStore } = this.props
-    // Once a group has been modified, it has be re-fetched on the current
-    // viewed collection. This can be fire and forget
-    apiStore.fetch('collections', uiStore.viewingCollection.id)
-  }
-
   @action onNewGroupSave = async (newGroup) => {
     const { apiStore } = this.props
     this.editGroup = {}
@@ -150,7 +143,6 @@ class OrganizationMenu extends React.Component {
     return (
       <GroupTitle
         group={this.editGroup}
-        onSave={this.onGroupSave}
         canEdit={this.editGroup.currentUserCanEdit}
       />
     )
