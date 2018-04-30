@@ -71,6 +71,7 @@ class ItemPage extends PageWithApi {
 
   save = async (itemData) => {
     const { apiStore } = this.props
+    // Create a new item to save the item data without causing a re-render.
     const newItem = new Item(itemData, apiStore)
     newItem.save()
   }
