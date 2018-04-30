@@ -121,6 +121,49 @@ describe User, type: :model do
     end
   end
 
+  describe '.from_omniauth' do
+    let(:pending_user) { nil }
+    let(:auth) do
+      Hashie::Mash.new(
+        provider: 'okta',
+        uid: '123',
+        info: {
+          email: Faker::Internet.unique.email,
+          first_name: Faker::Name.first_name,
+          last_name: Faker::Name.last_name,
+          image: 'http://pic.url.net',
+        },
+      )
+    end
+    let(:from_omniauth) { User.from_omniauth(auth, pending_user) }
+
+    context 'with existing user' do
+      let!(:existing_user) { create(:user, provider: 'okta', uid: '123') }
+
+      it 'updates existing user if found' do
+        expect(from_omniauth.id).to eq existing_user.id
+        expect(from_omniauth.email).to eq auth.info.email
+        expect(from_omniauth.first_name).to eq auth.info.first_name
+        expect(from_omniauth.last_name).to eq auth.info.last_name
+      end
+    end
+
+    context 'with pending user' do
+      let!(:pending_user) { create(:user) }
+
+      it 'updates existing user if found' do
+        expect(from_omniauth.id).to eq pending_user.id
+        expect(from_omniauth.email).to eq auth.info.email
+      end
+    end
+
+    context 'without existing user' do
+      it 'sets up new user record' do
+        expect(from_omniauth.new_record?).to be true
+      end
+    end
+  end
+
   describe '#organizations' do
     let!(:organizations) { create_list(:organization, 2) }
 

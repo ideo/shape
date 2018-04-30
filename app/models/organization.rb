@@ -55,11 +55,15 @@ class Organization < ApplicationRecord
     domain_whitelist.include? email_domain
   end
 
-  def add_new_user(user)
+  # doublecheck happens when you finally sign in, at which point your email may have updated based on your network profile.
+  # at that point, we don't need to "revoke" primary (e.g. you were invited whitelisted, but signed in with personal)
+  # but we do want to switch you to the org if you switched to your whitelisted domain email
+  def add_new_user(user, doublecheck: false)
     if matches_domain_whitelist?(user)
       # add them as an org member
+      user.remove_role(Role::MEMBER, guest_group) # remove if exists
       user.add_role(Role::MEMBER, primary_group)
-    else
+    elsif !doublecheck
       # or else as a guest member if their domain doesn't match
       user.add_role(Role::MEMBER, guest_group)
     end
