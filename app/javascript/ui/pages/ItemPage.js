@@ -56,6 +56,15 @@ class ItemPage extends PageWithApi {
     item: null
   }
 
+  componentDidMount() {
+    super.componentDidMount()
+    const { match, apiStore } = this.props
+    const item = apiStore.find('items', match.params.id)
+    if (item && item.id) {
+      this.setState({ item })
+    }
+  }
+
   onAPILoad = (response) => {
     const item = response.data
     this.setState({ item })
