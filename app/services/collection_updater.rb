@@ -6,10 +6,10 @@ class CollectionUpdater < SimpleService
 
   def call
     assign_attributes
-    result = @collection.save
-    # caching collection cover needs to happen after cards have been updated
-    cache_collection_cover_if_needed if result
-    result
+    @collection.save.tap do |result|
+      # caching collection cover needs to happen after cards have been updated
+      cache_collection_cover_if_needed if result
+    end
   end
 
   private

@@ -22,20 +22,16 @@ module Breadcrumb
     attr_reader :object, :breadcrumb
 
     def calculate_breadcrumb
-      return breadcrumb if object.parent.blank?
-
       build(object)
-
-      # Reverse breadcrumb so it is in the correct order
-      breadcrumb.reverse!
+      @breadcrumb
     end
 
     def build(object)
       return unless object.is_a?(Breadcrumbable) && object.breadcrumbable?
-      breadcrumb << Breadcrumb::Builder.for_object(object)
-
-      return unless object.parent.present?
-      build(object.parent)
+      @breadcrumb << Breadcrumb::Builder.for_object(object)
+      parent = object.parent
+      return unless parent.present? && parent.is_a?(Breadcrumbable)
+      @breadcrumb = (parent.breadcrumb + @breadcrumb)
     end
   end
 end

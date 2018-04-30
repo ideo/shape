@@ -36,11 +36,7 @@ class Item < ApplicationRecord
 
   amoeba do
     enable
-    exclude_association :tags
-    exclude_association :taggings
-    exclude_association :tag_taggings
-    exclude_association :filestack_file
-    exclude_association :parent_collection_card
+    recognize []
   end
 
   def organization_id
@@ -76,6 +72,7 @@ class Item < ApplicationRecord
     roles.each do |role|
       i.roles << role.duplicate!(assign_resource: i)
     end
+    for_user.upgrade_to_editor_role(i)
 
     # Method from HasFilestackFile
     filestack_file_duplicate!(i)

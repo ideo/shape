@@ -129,7 +129,7 @@ class GroupTitle extends React.Component {
       <Row>
         <RowItem>
           <EditAvatarButton
-            editing={this.editing}
+            canEdit={this.editing}
             onClick={this.editing ? this.handleAvatarEdit : () => {}}
           >
             <Avatar

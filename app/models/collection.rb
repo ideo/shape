@@ -13,6 +13,11 @@ class Collection < ApplicationRecord
   store_accessor :cached_attributes,
                  :cached_cover, :cached_tag_list
 
+  # callbacks
+  after_save :touch_related_cards, if: :saved_change_to_updated_at?
+  after_commit :reindex_sync, on: :create
+  after_commit :recalculate_child_breadcrumbs_async, if: :saved_change_to_name?
+
   # all cards including archived (i.e. undo default :collection_cards scope)
   has_many :all_collection_cards,
            class_name: 'CollectionCard',
@@ -48,8 +53,6 @@ class Collection < ApplicationRecord
            inverse_of: :collection,
            dependent: :destroy
 
-  after_save :touch_related_cards, if: :saved_change_to_updated_at?
-
   # the card that represents this collection in its parent, and determines its breadcrumb
   has_one :parent_collection_card,
           class_name: 'CollectionCard::Primary',
@@ -70,7 +73,6 @@ class Collection < ApplicationRecord
 
   validates :name, presence: true, if: :base_collection_type?
   before_validation :inherit_parent_organization_id, on: :create
-  after_commit :reindex_sync, on: :create
 
   scope :root, -> { where.not(organization_id: nil) }
   scope :not_custom_type, -> { where(type: nil) }
@@ -164,24 +166,18 @@ class Collection < ApplicationRecord
 
   amoeba do
     enable
-    exclude_association :tags
-    exclude_association :taggings
-    exclude_association :tag_taggings
-    exclude_association :roles
-    exclude_association :collection_cards
-    exclude_association :all_collection_cards
-    exclude_association :primary_collection_cards
-    exclude_association :link_collection_cards
-    exclude_association :cards_linked_to_this_collection
-    exclude_association :items
-    exclude_association :collections
-    exclude_association :parent_collection_card
+    nullify :breadcrumb
+    nullify :created_by_id
+    set archived: false
+    # don't recognize any relations, easiest way to turn them all off
+    recognize []
   end
 
   def duplicate!(for_user:, copy_parent_card: false, parent: self.parent)
     # Clones collection and all embedded items/collections
     c = amoeba_dup
     c.cloned_from = self
+    c.created_by = for_user
     c.tag_list = tag_list
 
     # save the dupe collection first so that we can reference it later
@@ -201,11 +197,14 @@ class Collection < ApplicationRecord
     roles.each do |role|
       c.roles << role.duplicate!(assign_resource: c)
     end
+    # make sure duplicate creator becomes an editor
+    for_user.upgrade_to_editor_role(c)
 
-    collection_cards.each do |collection_card|
-      next unless collection_card.record.can_view?(for_user)
-      collection_card.duplicate!(for_user: for_user, parent: c)
-    end
+    CollectionCardDuplicationWorker.perform_async(
+      collection_cards.map(&:id),
+      for_user.id,
+      c.id,
+    )
 
     # pick up newly created relationships
     c.reload
@@ -235,6 +234,20 @@ class Collection < ApplicationRecord
 
   def breadcrumb_title
     name
+  end
+
+  def recalculate_child_breadcrumbs_async
+    BreadcrumbRecalculationWorker.perform_async(id)
+  end
+
+  def recalculate_child_breadcrumbs(cards = collection_cards)
+    cards.each do |card|
+      if card.item_id.present?
+        card.item.recalculate_breadcrumb!
+      elsif card.collection_id.present?
+        BreadcrumbRecalculationWorker.perform_async(card.collection_id)
+      end
+    end
   end
 
   def collection_cards_viewable_by(cached_cards, user)

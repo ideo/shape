@@ -48,7 +48,13 @@ RSpec.describe ColabImport::CreateCollections, type: :service do
       template_collection.roles.reload
 
       # Create root, session collection and concept collection
-      create_collections.call
+      Sidekiq::Testing.inline! do
+        # NOTE: CoLab import relies on collection.duplicate! to work synchronously
+        # so this inline block is to get around CollectionCardDuplicationWorker now being async.
+        # We could probably just remove all the CoLab stuff from our codebase at some point,
+        # and resurrect from github if needed.
+        create_collections.call
+      end
     end
 
     it 'creates root collection' do

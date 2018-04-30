@@ -118,8 +118,6 @@ module ColabImport
     def collection_cards
       @collection
         .collection_cards
-        .ordered
-        .active
         .includes(:item)
     end
 

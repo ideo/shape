@@ -99,62 +99,53 @@ describe Collection, type: :model do
       dupe
     end
 
-    before do
-      user.add_role(Role::EDITOR, collection)
-      collection.items.each do |item|
-        user.add_role(Role::EDITOR, item)
-      end
-      collection.reload
-    end
-
-    it 'clones the collection' do
-      expect { duplicate }.to change(Collection, :count).by(1)
-      expect(collection.id).not_to eq(duplicate.id)
-    end
-
-    it 'references the current collection as cloned_from' do
-      expect(duplicate.cloned_from).to eq(collection)
-    end
-
-    it 'clones all the collection cards' do
-      expect(duplicate.collection_cards.size).to eq(5)
-      expect(collection.collection_cards.map(&:id)).not_to match_array(duplicate.collection_cards.map(&:id))
-    end
-
-    it 'clones all items' do
-      expect(duplicate.items.size).to eq(5)
-      expect(collection.items.map(&:id)).not_to match_array(duplicate.items.map(&:id))
-    end
-
-    it 'clones all roles on collection' do
-      expect(duplicate.roles.map(&:name)).to match(collection.roles.map(&:name))
-      expect(duplicate.can_edit?(user)).to be true
-    end
-
-    it 'clones all roles on items' do
-      expect(duplicate.items.all? { |item| item.can_edit?(user) }).to be true
-    end
-
-    it 'clones tag list' do
-      expect(duplicate.tag_list).to match_array collection.tag_list
-    end
-
-    context 'with items you can\'t see' do
-      let!(:hidden_item) { collection.items.first }
-      let!(:viewable_items) { collection.items - [hidden_item] }
-
+    context 'with editor role' do
       before do
-        user.remove_role(Role::EDITOR, hidden_item)
+        user.add_role(Role::EDITOR, collection)
+        collection.items.each do |item|
+          user.add_role(Role::EDITOR, item)
+        end
+        collection.reload
       end
 
-      it 'duplicates collection' do
+      it 'clones the collection' do
         expect { duplicate }.to change(Collection, :count).by(1)
+        expect(collection.id).not_to eq(duplicate.id)
       end
 
-      it 'duplicates all viewable items' do
-        # Use cloned_from to get original items
-        expect(duplicate.items.map(&:cloned_from)).to match_array(viewable_items)
-        expect(duplicate.items(&:cloned_from)).not_to include(hidden_item)
+      it 'references the current collection as cloned_from' do
+        expect(duplicate.cloned_from).to eq(collection)
+      end
+
+      it 'clones all the collection cards' do
+        expect(CollectionCardDuplicationWorker).to receive(:perform_async)
+        collection.duplicate!(for_user: user)
+      end
+
+      it 'clones all roles on collection' do
+        expect(duplicate.roles.map(&:name)).to match(collection.roles.map(&:name))
+        expect(duplicate.can_edit?(user)).to be true
+      end
+
+      it 'clones all roles on items' do
+        expect(duplicate.items.all? { |item| item.can_edit?(user) }).to be true
+      end
+
+      it 'clones tag list' do
+        expect(duplicate.tag_list).to match_array collection.tag_list
+      end
+    end
+
+    context 'with viewer role' do
+      before do
+        user.add_role(Role::VIEWER, collection)
+      end
+
+      it 'upgrades viewer user to editor role upon duplication' do
+        expect(collection.can_edit?(user)).to be false
+        # roles shouldn't match because we're removing Viewer and replacing w/ Editor
+        expect(duplicate.roles.map(&:name)).not_to match(collection.roles.map(&:name))
+        expect(duplicate.can_edit?(user)).to be true
       end
     end
 
@@ -268,7 +259,21 @@ describe Collection, type: :model do
     end
   end
 
-  context 'caching' do
+  context 'caching and stored attributes' do
+    describe '#recalculate_child_breadcrumbs_async' do
+      let(:collection) { create(:collection) }
+
+      it 'queues up BreadcrumbRecalculationWorker on name change' do
+        expect(BreadcrumbRecalculationWorker).to receive(:perform_async)
+        collection.update(name: 'New name')
+      end
+
+      it 'does not queue up BreadcrumbRecalculationWorker unless name change' do
+        expect(BreadcrumbRecalculationWorker).not_to receive(:perform_async)
+        collection.update(updated_at: Time.now)
+      end
+    end
+
     describe '#cache_key' do
       let(:user) { create(:user) }
       let(:collection) { create(:collection, num_cards: 2) }

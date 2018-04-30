@@ -50,7 +50,7 @@ module Breadcrumbable
       found = breadcrumb.include?(object.to_breadcrumb_item)
     else
       breadcrumb.each do |crumb|
-        if crumb[0] == klass and crumb[1] == id
+        if crumb[0] == klass && crumb[1] == id
           found = true
           break
         end
@@ -73,6 +73,6 @@ module Breadcrumbable
   end
 
   def calculate_breadcrumb?
-    breadcrumb.nil?
+    breadcrumb.blank?
   end
 end

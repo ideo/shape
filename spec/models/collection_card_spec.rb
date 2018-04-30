@@ -88,6 +88,17 @@ RSpec.describe CollectionCard, type: :model do
       duplicate
     end
 
+    context 'with linked card' do
+      let(:parent_collection_card) { create(:collection_card_collection) }
+      let(:collection) { parent_collection_card.collection }
+      let!(:collection_card) { create(:collection_card_link, collection: collection) }
+
+      it 'should duplicate the underlying collection record if its a link' do
+        expect { duplicate }.to change(Collection, :count).by(1)
+        expect(duplicate.record.id).not_to eq(collection.id)
+      end
+    end
+
     context 'for collection' do
       let!(:collection_card_collection) { create(:collection_card_collection) }
       let(:duplicate) do

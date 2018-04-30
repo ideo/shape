@@ -130,8 +130,10 @@ describe('GridCard', () => {
         wrapper.setProps(props)
       })
 
-      it('does not render CardMenu', () => {
-        expect(wrapper.find('CardMenu').exists()).toBe(false)
+      it('renders selection circle and card menu, but no hotspot', () => {
+        expect(wrapper.find('SelectionCircle').exists()).toBe(true)
+        expect(wrapper.find('CardMenu').exists()).toBe(true)
+        expect(wrapper.find('GridCardHotspot').exists()).toBe(false)
       })
     })
 
