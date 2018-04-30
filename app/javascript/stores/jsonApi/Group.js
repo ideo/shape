@@ -4,6 +4,9 @@ import BaseRecord from './BaseRecord'
 class Group extends BaseRecord {
   attributesForAPI = ['name', 'handle', 'filestack_file_attributes']
 
+  // NOTE: Because we're never directly hitting the groups/{id} API endpoint,
+  // group.roles relationship never gets set up.
+  // However we have the related roles in the apiStore so we can just look them up.
   get groupRoles() {
     const { apiStore } = this
     // Some roles in the Api store don't have a resource included
