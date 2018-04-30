@@ -5,7 +5,6 @@ import ReactQuill from 'react-quill'
 import styled from 'styled-components'
 
 import v from '~/utils/variables'
-import sleep from '~/utils/sleep'
 import TextItemToolbar from '~/ui/items/TextItemToolbar'
 import EditorPill from '~/ui/items/EditorPill'
 
@@ -218,7 +217,6 @@ class TextItem extends React.Component {
 
   get textData() {
     const { item } = this.props
-    // we have to convert the item to a normal JS object for Quill to be happy
     return item.text_data
   }
 
@@ -236,9 +234,6 @@ class TextItem extends React.Component {
     const { quillEditor } = this
     item.content = quillEditor.root.innerHTML
     item.text_data = quillEditor.getContents()
-
-    const { currentUserId } = this.props
-    const { currentEditor } = this.state
 
     this.props.onSave(item)
   }
@@ -292,7 +287,12 @@ class TextItem extends React.Component {
 }
 
 TextItem.propTypes = {
-  item: PropTypes.object,
+  item: PropTypes.shape({
+    id: PropTypes.number,
+    content: PropTypes.string,
+    text_data: PropTypes.string,
+    can_edit: PropTypes.bool,
+  }).isRequired,
   actionCableConsumer: MobxPropTypes.objectOrObservableObject.isRequired,
   currentUserId: PropTypes.number.isRequired,
   onUpdatedData: PropTypes.func.isRequired,
