@@ -40,11 +40,14 @@ module RealtimeEditorsViewers
   end
 
   def publish_to_channel
-    ActionCable.server.broadcast \
-      stream_name,
+    data = {
       current_editor: currently_editing_user_as_json,
       num_viewers: num_viewers,
-      item_text_data: self.reload.text_data.as_json
+    }
+    if is_a?(Item::TextItem)
+      data[:item_text_data] = text_data.as_json
+    end
+    ActionCable.server.broadcast stream_name, data
   end
 
   def editing_cache_key

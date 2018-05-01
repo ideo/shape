@@ -32,7 +32,7 @@ class Item < ApplicationRecord
   validates :type, presence: true
 
   after_commit :reindex_parent_collection
-  after_commit :touch_parent_collection_and_check_cover
+  after_commit :update_parent_collection_if_needed
 
   amoeba do
     enable
@@ -111,9 +111,9 @@ class Item < ApplicationRecord
     @dont_reindex_parent = true
   end
 
-  def touch_parent_collection_and_check_cover
+  def update_parent_collection_if_needed
     collection = try(:parent)
-    collection.touch if saved_change_to_updated_at?
+    collection.touch if collection && saved_change_to_updated_at?
     return unless collection.present? && collection.cached_cover.present?
     # currently text item is the only one that matters
     return unless id == collection.cached_cover['item_id_text']
