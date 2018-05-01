@@ -16,9 +16,12 @@ class Api::V1::ItemsController < Api::V1::BaseController
   end
 
   def update
-    @item.attributes = item_params.delete_if { |key| key == 'cancel_sync' }
+    cancel_sync = json_api_params[:data][:cancel_sync]
+    @item.attributes = item_params
     if @item.save
-      render jsonapi: @item unless item_params[:cancel_sync]
+      # cancel_sync means we don't want to render the item JSON
+      return head :ok if cancel_sync
+      render jsonapi: @item
     else
       render_api_errors @item.errors
     end
@@ -57,7 +60,6 @@ class Api::V1::ItemsController < Api::V1::BaseController
       :image,
       :archived,
       :tag_list,
-      :cancel_sync,
       filestack_file_attributes: Item.filestack_file_attributes_whitelist,
     )
   end

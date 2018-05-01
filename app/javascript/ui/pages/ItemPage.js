@@ -71,9 +71,9 @@ class ItemPage extends PageWithApi {
 
   save = async (item) => {
     const { apiStore } = this.props
-    // Turn off sycning when saving the item to not reload the page
-    item.assign('cancel_sync', true)
     const data = item.toJsonApi()
+    // Turn off syncing when saving the item to not reload the page
+    data.cancel_sync = true
     apiStore.request(`items/${item.id}`, 'PATCH', {
       data,
     })
