@@ -3,6 +3,7 @@
   "properties": {
     "id": { "type": "integer" },
     "name": { "type": "string" },
+    "domain_whitelist": { "type": "array" },
     "filestack_file_url": { "type": ["string", "null"] }
   },
   "required": ["id", "name"]
