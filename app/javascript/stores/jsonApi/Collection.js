@@ -52,6 +52,14 @@ class Collection extends BaseRecord {
     }
     return false
   }
+
+  checkCurrentOrg() {
+    const { currentUser } = this.apiStore
+    if (!currentUser) return
+    if (this.organization_id !== currentUser.current_organization.id) {
+      currentUser.switchOrganization(this.organization_id)
+    }
+  }
 }
 Collection.type = 'collections'
 

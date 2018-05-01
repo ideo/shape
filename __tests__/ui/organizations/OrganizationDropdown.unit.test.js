@@ -31,7 +31,7 @@ describe('OrganizationDropdown', () => {
     }
     itemNames = [
       'People & Groups',
-      ...[otherFakeOrg.name],
+      ...[otherFakeOrg.primary_group.name],
       'New Organization',
       'Settings',
       'Legal'
@@ -64,7 +64,7 @@ describe('OrganizationDropdown', () => {
 
   describe('menuItems', () => {
     it('should add organizations to the list of items', () => {
-      expect(component.menuItems[1].name).toEqual(otherFakeOrg.name)
+      expect(component.menuItems[1].name).toEqual(otherFakeOrg.primary_group.name)
       expect(component.menuItems[1].iconLeft).toBeTruthy()
     })
 

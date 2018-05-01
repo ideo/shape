@@ -38,8 +38,10 @@ class OrganizationDropdown extends React.Component {
     console.warn('unimplemented')
   }
 
-  handleSwitchOrg = (ev) => {
-    console.warn('unimplemented')
+  handleSwitchOrg = (orgId) => (ev) => {
+    ev.preventDefault()
+    const { apiStore } = this.props
+    return apiStore.currentUser.switchOrganization(orgId, { backToHomepage: true })
   }
 
   handleOrgSettings = (ev) => {
@@ -60,7 +62,7 @@ class OrganizationDropdown extends React.Component {
         const avatar = (
           <IconHolder>
             <Avatar
-              title={org.name}
+              title={org.primary_group.name}
               url={org.primary_group.filestack_file_url}
               size={32}
               className="org_avatar"
@@ -68,9 +70,9 @@ class OrganizationDropdown extends React.Component {
           </IconHolder>
         )
         return {
-          name: org.name,
+          name: org.primary_group.name,
           iconLeft: avatar,
-          onClick: this.handleSwitchOrg,
+          onClick: this.handleSwitchOrg(org.id),
           noBorder: true,
         }
       })
