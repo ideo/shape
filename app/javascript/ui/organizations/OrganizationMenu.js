@@ -5,6 +5,7 @@ import Modal from '~/ui/global/modals/Modal'
 import GroupModify from '~/ui/groups/GroupModify'
 import RolesMenu from '~/ui/roles/RolesMenu'
 import Loader from '~/ui/layout/Loader'
+import Organization from '~/stores/jsonApi/Organization'
 import OrganizationPeople from '~/ui/organizations/OrganizationPeople'
 import GroupTitle from '~/ui/groups/GroupTitle'
 
@@ -60,6 +61,14 @@ class OrganizationMenu extends React.Component {
 
   onOrganizationSave = () => {
     this.changePage('organizationPeople')
+  }
+
+  createNewOrg = async (orgInfo) => {
+    const newOrg = new Organization(orgInfo, this.props.apiStore)
+    await newOrg.save()
+    this.props.apiStore.currentUser.switchOrganization(newOrg.id,
+      { backToHomepage: true })
+    this.props.onClose()
   }
 
   @action onNewGroupSave = async (newGroup) => {
@@ -130,11 +139,16 @@ class OrganizationMenu extends React.Component {
 
   renderEditOrganization() {
     const { organization } = this.props
+    let editGroup = organization.primary_group
+    if (this.currentPage === 'newOrganization') editGroup = {}
+
+    // TODO only set overridesave when on new organization
     return (
       <GroupModify
-        group={organization.primary_group}
-        onGroupRoles={this.onGroupRoles(organization.primary_group)}
+        group={editGroup}
+        onGroupRoles={this.onGroupRoles(editGroup)}
         onSave={this.onOrganizationSave}
+        overrideSave={this.createNewOrg}
       />
     )
   }
@@ -156,6 +170,11 @@ class OrganizationMenu extends React.Component {
       content = this.renderEditGroup()
       title = 'New Group'
       onBack = this.goBack
+      break
+    case 'newOrganization':
+      title = 'New Organization'
+      onBack = this.goBack
+      content = this.renderEditOrganization()
       break
     case 'editOrganization':
       title = 'Your Organization'

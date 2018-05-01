@@ -108,7 +108,11 @@ class GroupModify extends React.Component {
 
   handleSave = async (ev) => {
     ev.preventDefault()
-    const { apiStore, onSave } = this.props
+    const { apiStore, onSave, overrideSave } = this.props
+    if (overrideSave) {
+      this.editingGroup.filestack_file_attributes = this.fileAttrs
+      return overrideSave(this.editingGroup)
+    }
     let { group } = this.props
     const originalGroup = Object.assign({}, group)
     if (!group.id) {
@@ -208,9 +212,13 @@ GroupModify.propTypes = {
   group: MobxPropTypes.objectOrObservableObject.isRequired,
   onSave: PropTypes.func.isRequired,
   onGroupRoles: PropTypes.func.isRequired,
+  overrideSave: PropTypes.func,
 }
 GroupModify.wrappedComponent.propTypes = {
   apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
+}
+GroupModify.defaultProps = {
+  overrideSave: null,
 }
 
 export default GroupModify

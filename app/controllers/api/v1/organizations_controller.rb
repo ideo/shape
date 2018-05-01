@@ -34,6 +34,8 @@ class Api::V1::OrganizationsController < Api::V1::BaseController
   def organization_params
     params.require(:organization).permit(
       :name,
+      :handle,
+      filestack_file_attributes: Group.filestack_file_attributes_whitelist,
     )
   end
 end

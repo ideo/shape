@@ -2,7 +2,6 @@ import PropTypes from 'prop-types'
 import PopoutMenu from '~/ui/global/PopoutMenu'
 import styled from 'styled-components'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
-import Organization from '~/stores/jsonApi/Organization'
 import OrganizationMenu from '~/ui/organizations/OrganizationMenu'
 import Avatar from '~/ui/global/Avatar'
 
@@ -36,10 +35,7 @@ class OrganizationDropdown extends React.Component {
   }
 
   handleNewOrg = async (ev) => {
-    const newOrg = new Organization({ name: 'test' }, this.props.apiStore)
-    await newOrg.save()
-    this.props.apiStore.currentUser.switchOrganization(newOrg.id,
-      { backToHomepage: true })
+    this.openOrgMenu('newOrganization')
   }
 
   handleSwitchOrg = (orgId) => (ev) => {
