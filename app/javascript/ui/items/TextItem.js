@@ -217,7 +217,7 @@ class TextItem extends React.Component {
 
   get textData() {
     const { item } = this.props
-    return item.text_data
+    return item.toJS().text_data
   }
 
   onKeyUp = (content, delta, source, editor) => {
@@ -230,12 +230,12 @@ class TextItem extends React.Component {
   }
 
   _onKeyUp = (content, delta, source, editor) => {
-    const { item } = this.props
+    const { item, onSave } = this.props
     const { quillEditor } = this
     item.content = quillEditor.root.innerHTML
     item.text_data = quillEditor.getContents()
 
-    this.props.onSave(item)
+    onSave(item)
   }
 
   get canEdit() {
@@ -287,12 +287,7 @@ class TextItem extends React.Component {
 }
 
 TextItem.propTypes = {
-  item: PropTypes.shape({
-    id: PropTypes.number,
-    content: PropTypes.string,
-    text_data: PropTypes.string,
-    can_edit: PropTypes.bool,
-  }).isRequired,
+  item: MobxPropTypes.objectOrObservableObject.isRequired,
   actionCableConsumer: MobxPropTypes.objectOrObservableObject.isRequired,
   currentUserId: PropTypes.number.isRequired,
   onUpdatedData: PropTypes.func.isRequired,

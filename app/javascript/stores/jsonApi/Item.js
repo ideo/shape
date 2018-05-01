@@ -12,7 +12,8 @@ class Item extends BaseRecord {
     'image',
     'archived',
     'tag_list',
-    'filestack_file_attributes'
+    'filestack_file_attributes',
+    'cancel_sync',
   ]
 
   get parentPath() {

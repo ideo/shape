@@ -18,7 +18,7 @@ class User < ApplicationRecord
            through: :roles,
            source: :resource,
            source_type: 'Group'
-  has_many :organizations, through: :groups
+  has_many :organizations, -> { distinct }, through: :groups, class_name: 'Organization'
   has_many :users_roles
   belongs_to :current_organization,
              class_name: 'Organization',

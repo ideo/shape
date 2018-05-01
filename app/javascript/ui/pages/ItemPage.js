@@ -69,11 +69,14 @@ class ItemPage extends PageWithApi {
     this.setState({ item })
   }
 
-  save = async (itemData) => {
+  save = async (item) => {
     const { apiStore } = this.props
-    // Create a new item to save the item data without causing a re-render.
-    const newItem = new Item(itemData, apiStore)
-    newItem.save()
+    // Turn off sycning when saving the item to not reload the page
+    item.assign('cancel_sync', true)
+    const data = item.toJsonApi()
+    apiStore.request(`items/${item.id}`, 'PATCH', {
+      data,
+    })
   }
 
   // could be smarter or broken out once we want to do different things per type
@@ -85,7 +88,7 @@ class ItemPage extends PageWithApi {
     case ITEM_TYPES.TEXT:
       return (
         <TextItem
-          item={item.toJS()}
+          item={item}
           actionCableConsumer={ActionCableConsumer}
           currentUserId={currentUserId}
           onUpdatedData={this.updateItem}
