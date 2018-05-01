@@ -21,16 +21,11 @@ class Api::V1::OrganizationsController < Api::V1::BaseController
   end
 
   def create
-    organization = Organization.create(name: organization_params[:name])
-    if organization.save
-      current_user.add_role(Role::ADMIN, organization.primary_group)
-      Collection::UserCollection.find_or_create_for_user(
-        current_user,
-        organization)
-      current_user.switch_to_organization(organization)
-      render jsonapi: organization, include: [:primary_group]
+    builder = OrganizationBuilder.new(organization_params, current_user)
+    if builder.save
+      render jsonapi: builder.organization, include: [:primary_group]
     else
-      render_api_errors organization.errors
+      render_api_errors builder.errors
     end
   end
 

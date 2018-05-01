@@ -17,12 +17,9 @@ class Organization < ApplicationRecord
   validates :name, presence: true
 
   def self.create_for_user(user)
-    o = Organization.new
-    o.name = [user.first_name, user.last_name, 'Organization'].compact.join(' ')
-    if o.save
-      user.add_role(Role::ADMIN, o.primary_group)
-    end
-    o
+    name = [user.first_name, user.last_name, 'Organization'].compact.join(' ')
+    o = OrganizationBuilder.new({ name: name }, user)
+    o.save
   end
 
   # Note: this method can be called many times for the same org

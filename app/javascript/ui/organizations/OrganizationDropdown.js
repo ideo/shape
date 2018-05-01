@@ -38,7 +38,8 @@ class OrganizationDropdown extends React.Component {
   handleNewOrg = async (ev) => {
     const newOrg = new Organization({ name: 'test' }, this.props.apiStore)
     await newOrg.save()
-    console.log(newOrg)
+    this.props.apiStore.currentUser.switchOrganization(newOrg.id,
+      { backToHomepage: true })
   }
 
   handleSwitchOrg = (orgId) => (ev) => {
