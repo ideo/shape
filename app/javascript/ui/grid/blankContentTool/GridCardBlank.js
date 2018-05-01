@@ -185,7 +185,9 @@ class GridCardBlank extends React.Component {
         },
         onSuccess: (res) => {
           if (res.length > 0) {
-            this.createCardWith(res[0])
+            const img = res[0]
+            img.url = FilestackUpload.transformedUrl(img.url)
+            this.createCardWith(img)
           }
         }
       })
@@ -225,16 +227,9 @@ class GridCardBlank extends React.Component {
   }
 
   pickImage = () => {
-    FilestackUpload
-      .pickImage()
-      .then(resp => {
-        if (resp.filesUploaded.length > 0) {
-          const img = resp.filesUploaded[0]
-          this.createCardWith(img)
-        } else {
-          // console.log('Failed to upload image:', resp.filesFailed)
-        }
-      })
+    FilestackUpload.pickImage({
+      onSuccess: (img) => this.createCardWith(img)
+    })
   }
 
   createCard = (nested = {}) => {

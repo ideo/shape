@@ -68,6 +68,7 @@ class CollectionPage extends PageWithApi {
       uiStore.openBlankContentTool()
     }
     uiStore.setViewingCollection(collection)
+    collection.checkCurrentOrg()
   }
 
   showObjectRoleDialog = () => {
@@ -89,7 +90,7 @@ class CollectionPage extends PageWithApi {
   render() {
     const { collection } = this
     const { uiStore } = this.props
-    if (!collection || uiStore.isLoading) return <Loader />
+    if (!collection) return <Loader />
     const breadcrumb = this.isHomepage ? [] : collection.breadcrumb
     const { movingCardIds, cardAction } = uiStore
     // only tell the Grid to hide "movingCards" if we're moving and not linking

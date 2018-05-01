@@ -101,6 +101,7 @@ export const fakeCollection = {
   // This is a computed property on the collection store
   cardIds: _.map(fakeCards, c => c.id),
   API_archive: jest.fn(),
+  checkCurrentOrg: jest.fn(),
 }
 export const fakeGroupAttrs = {
   id: 1,
@@ -137,6 +138,7 @@ export const fakeUserAttrs = {
   type: 'users',
   terms_accepted: true,
   isCurrentUser: jest.fn(),
+  switchOrganization: jest.fn(),
 }
 export const fakeActionCableUser = {
   id: 99,

@@ -25,6 +25,7 @@ const ItemPageContainer = styled.main`
   min-height: 75vh;
   position: relative;
 `
+ItemPageContainer.displayName = 'ItemPageContainer'
 
 const StyledRightColumn = styled.div`
   position: absolute;
@@ -56,9 +57,19 @@ class ItemPage extends PageWithApi {
     item: null
   }
 
+  componentDidMount() {
+    super.componentDidMount()
+    const { match, apiStore } = this.props
+    const item = apiStore.find('items', match.params.id)
+    if (item && item.id) {
+      this.setState({ item })
+    }
+  }
+
   onAPILoad = (response) => {
     const item = response.data
     this.setState({ item })
+    if (item.parent) item.parent.checkCurrentOrg()
   }
 
   updateItem = (itemTextData) => {
