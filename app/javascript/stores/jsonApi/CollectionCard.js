@@ -70,7 +70,9 @@ class CollectionCard extends BaseRecord {
         await this.apiStore.request(`collection_cards/${this.id}/archive`, 'PATCH')
         await this.apiStore.fetch('collections', collection.id, true)
 
-        if (collection.collection_cards.length === 0) uiStore.openBlankContentTool()
+        if (collection.collection_cards.length === 0) {
+          uiStore.openBlankContentTool({ emptyCollection: true })
+        }
         if (isReplacing) uiStore.closeBlankContentTool()
 
         return true

@@ -65,7 +65,7 @@ class CollectionPage extends PageWithApi {
     const collection = response.data
     const { uiStore } = this.props
     if (!collection.collection_cards.length) {
-      uiStore.openBlankContentTool()
+      uiStore.openBlankContentTool({ emptyCollection: true })
     }
     uiStore.setViewingCollection(collection)
     collection.checkCurrentOrg()

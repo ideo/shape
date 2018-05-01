@@ -198,6 +198,11 @@ class GridCardBlank extends React.Component {
     this.canceled = true
   }
 
+  get emptyCollection() {
+    const { uiStore } = this.props
+    return uiStore.blankContentToolState.emptyCollection
+  }
+
   startCreatingCollection = () => {
     this.setState({ creating: 'collection' })
   }
@@ -367,9 +372,11 @@ class GridCardBlank extends React.Component {
           {this.renderInner()}
         </StyledGridCardInner>
         { this.state.loading && <InlineLoader /> }
-        <button className="close" onClick={this.closeBlankContentTool}>
-          <CloseIcon />
-        </button>
+        { !this.emptyCollection &&
+          <button className="close" onClick={this.closeBlankContentTool}>
+            <CloseIcon />
+          </button>
+        }
       </StyledGridCardBlank>
     )
   }
