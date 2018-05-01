@@ -18,7 +18,6 @@ import CloseIcon from '~/ui/icons/CloseIcon'
 import v, { ITEM_TYPES } from '~/utils/variables'
 import EditableName from './shared/EditableName'
 import PageMenu from './shared/PageMenu'
-import Item from '~/stores/jsonApi/Item'
 import { StyledTitleAndRoles } from './shared/styled'
 
 const ItemPageContainer = styled.main`
@@ -70,13 +69,7 @@ class ItemPage extends PageWithApi {
   }
 
   save = async (item) => {
-    const { apiStore } = this.props
-    const data = item.toJsonApi()
-    // Turn off syncing when saving the item to not reload the page
-    data.cancel_sync = true
-    apiStore.request(`items/${item.id}`, 'PATCH', {
-      data,
-    })
+    item.API_updateWithoutSync()
   }
 
   // could be smarter or broken out once we want to do different things per type

@@ -16,11 +16,10 @@ class Api::V1::ItemsController < Api::V1::BaseController
   end
 
   def update
-    cancel_sync = json_api_params[:data][:cancel_sync]
     @item.attributes = item_params
     if @item.save
       # cancel_sync means we don't want to render the item JSON
-      return head :ok if cancel_sync
+      return head :ok if @cancel_sync
       render jsonapi: @item
     else
       render_api_errors @item.errors

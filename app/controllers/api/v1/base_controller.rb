@@ -1,5 +1,7 @@
 class Api::V1::BaseController < ApplicationController
   before_action :authenticate_user!
+  before_action :check_cancel_sync
+
   respond_to :json
 
   # See all configuration options for the jsonapi in the jsonapi-rb-rails gem
@@ -44,5 +46,10 @@ class Api::V1::BaseController < ApplicationController
 
   def current_organization
     @current_organization ||= current_user.try(:current_organization)
+  end
+
+  def check_cancel_sync
+    return unless json_api_params
+    @cancel_sync = json_api_params[:data][:cancel_sync]
   end
 end
