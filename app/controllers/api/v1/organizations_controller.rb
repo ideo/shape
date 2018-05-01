@@ -1,6 +1,6 @@
 class Api::V1::OrganizationsController < Api::V1::BaseController
-  deserializable_resource :organization, only: :update
-  load_and_authorize_resource
+  deserializable_resource :organization, only: %i[create update]
+  load_and_authorize_resource except: %i[create]
 
   # The logged-in user's current organization context
   def current
@@ -20,12 +20,25 @@ class Api::V1::OrganizationsController < Api::V1::BaseController
     end
   end
 
+  def create
+    organization = Organization.create(name: organization_params[:name])
+    if organization.save
+      current_user.add_role(Role::ADMIN, organization.primary_group)
+      Collection::UserCollection.find_or_create_for_user(
+        current_user,
+        organization)
+      current_user.switch_to_organization(organization)
+      render jsonapi: organization, include: [:primary_group]
+    else
+      render_api_errors organization.errors
+    end
+  end
+
   private
 
   def organization_params
     params.require(:organization).permit(
       :name,
-      filestack_file_attributes: Organization.filestack_file_attributes_whitelist,
     )
   end
 end

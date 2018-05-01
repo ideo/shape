@@ -2,6 +2,6 @@ import BaseRecord from './BaseRecord'
 
 class Organization extends BaseRecord {}
 
-Organization.type = 'organization'
+Organization.type = 'organizations'
 
 export default Organization

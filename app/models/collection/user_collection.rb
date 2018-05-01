@@ -1,7 +1,7 @@
 class Collection
   class UserCollection < Collection
     def self.find_or_create_for_user(user, organization)
-      existing = user.current_user_collection
+      existing = user.current_user_collection(org_id: organization.id)
       return existing if existing.present?
 
       # Create the user's workspace collection for this org
