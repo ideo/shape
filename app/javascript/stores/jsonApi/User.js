@@ -19,18 +19,15 @@ class User extends BaseRecord {
     }
   }
 
-  async switchOrganization(organizationId,
-    { routeToCollectionId, routeToItemId } = {}) {
-    uiStore.update('isLoading', true)
-    const user = await this.apiStore.request(
-      `/users/switch_org`,
+  async switchOrganization(organizationId, { backToHomepage = false } = {}) {
+    await this.apiStore.request(
+      'users/switch_org',
       'POST',
       { organization_id: organizationId }
     )
-    if (routeToItemId) return
-    let collectionId = user.data.current_user_collection_id
-    if (routeToCollectionId) collectionId = routeToCollectionId
-    routingStore.routeTo(`/collections/${collectionId}`)
+    if (backToHomepage) {
+      routingStore.routeTo('/')
+    }
   }
 }
 User.type = 'users'

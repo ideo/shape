@@ -52,26 +52,19 @@ describe('Collection', () => {
   })
 
   describe('checkCurrentOrg', () => {
-    let itemId, user, routing
+    let user
 
     beforeEach(() => {
-      itemId = 1442
       user = fakeUser
       user.current_organization = { id: 3 }
-      routing =
-        {
-          routeToItemId: itemId,
-          routeToCollectionId: collection.id
-        }
       collection.__collection = { currentUser: user }
-      collection.checkCurrentOrg(itemId)
+      collection.checkCurrentOrg()
     })
 
     describe('when the org id is different from the current users org', () => {
       it('should call switchOrganization on the collection', () => {
         expect(user.switchOrganization).toHaveBeenCalledWith(
           collection.organization_id,
-          routing,
         )
       })
     })

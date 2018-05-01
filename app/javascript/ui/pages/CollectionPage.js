@@ -68,7 +68,7 @@ class CollectionPage extends PageWithApi {
       uiStore.openBlankContentTool()
     }
     uiStore.setViewingCollection(collection)
-    this.collection && this.collection.checkCurrentOrg()
+    collection.checkCurrentOrg()
   }
 
   showObjectRoleDialog = () => {

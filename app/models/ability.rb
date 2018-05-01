@@ -16,6 +16,7 @@ class Ability
     elsif user.persisted? && user.active?
       # Logged-in users only
 
+      # TODO: ensure that user is member of primary or guest group
       can :read, Organization
       can :read, User
 

@@ -53,18 +53,11 @@ class Collection extends BaseRecord {
     return false
   }
 
-  checkCurrentOrg(itemId) {
-    if (!this.apiStore.currentUser) return
-    if (this.organization_id !==
-        this.apiStore.currentUser.current_organization.id) {
-      const routing = {
-        routeToItemId: itemId,
-        routeToCollectionId: this.id,
-      }
-      this.apiStore.currentUser.switchOrganization(
-        this.organization_id,
-        routing,
-      )
+  checkCurrentOrg() {
+    const { currentUser } = this.apiStore
+    if (!currentUser) return
+    if (this.organization_id !== currentUser.current_organization.id) {
+      currentUser.switchOrganization(this.organization_id)
     }
   }
 }

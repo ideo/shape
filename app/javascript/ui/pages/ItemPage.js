@@ -59,7 +59,7 @@ class ItemPage extends PageWithApi {
   onAPILoad = (response) => {
     const item = response.data
     this.setState({ item })
-    if (item.parent) item.parent.checkCurrentOrg(item.id)
+    if (item.parent) item.parent.checkCurrentOrg()
   }
 
   refetchItem = async () => {
