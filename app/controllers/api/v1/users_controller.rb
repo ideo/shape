@@ -1,15 +1,14 @@
 class Api::V1::UsersController < Api::V1::BaseController
-  load_and_authorize_resource :organization, only: %i[index]
-  load_and_authorize_resource except: %i[me search create_from_emails accept_terms]
-
-  # All the users in this org, that this user can 'see' through groups or content
+  # All the other users in this org
   # /organizations/:id/users
+  load_and_authorize_resource :organization, only: %i[index]
   def index
     # show all other active users in the system
     @users = User.active.where.not(id: current_user.id)
     render jsonapi: @users
   end
 
+  load_and_authorize_resource only: %i[show]
   def show
     render jsonapi: @user, include:
       [:groups, :organizations, current_organization: [:primary_group]]
@@ -45,7 +44,22 @@ class Api::V1::UsersController < Api::V1::BaseController
     end
   end
 
+  before_action :load_and_authorize_organization, only: %i[switch_org]
+  def switch_org
+    if current_user.switch_to_organization(@organization)
+      render jsonapi: current_user, include:
+        [:groups, organizations: [:primary_group], current_organization: [:primary_group]]
+    else
+      render_api_errors current_user.errors
+    end
+  end
+
   private
+
+  def load_and_authorize_organization
+    @organization = Organization.find(json_api_params[:organization_id])
+    authorize! :read, @organization
+  end
 
   def json_api_params
     params[:_jsonapi]
