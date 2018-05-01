@@ -14,7 +14,6 @@ class ItemEditingChannel < ApplicationCable::Channel
 
   def stop_editing
     item = Item.find(params[:id])
-    item.update(text_data: params[:data])
     item.stopped_editing(current_user)
   end
 

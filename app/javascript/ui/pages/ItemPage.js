@@ -68,9 +68,9 @@ class ItemPage extends PageWithApi {
     this.setState({ item })
   }
 
-  save = async (item) => {
-    item.API_updateWithoutSync()
-  }
+  save = (item, { cancel_sync = true } = {}) => (
+    item.API_updateWithoutSync({ cancel_sync })
+  )
 
   // could be smarter or broken out once we want to do different things per type
   get content() {

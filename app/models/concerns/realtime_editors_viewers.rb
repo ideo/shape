@@ -43,7 +43,8 @@ module RealtimeEditorsViewers
     ActionCable.server.broadcast \
       stream_name,
       current_editor: currently_editing_user_as_json,
-      num_viewers: num_viewers
+      num_viewers: num_viewers,
+      item_text_data: self.reload.text_data.as_json
   end
 
   def editing_cache_key

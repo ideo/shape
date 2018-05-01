@@ -23,14 +23,15 @@ class Item extends BaseRecord {
     return '/'
   }
 
-  API_updateWithoutSync() {
+  API_updateWithoutSync({ cancel_sync } = {}) {
     const { apiStore } = this
     const data = this.toJsonApi()
     // Turn off syncing when saving the item to not reload the page
-    data.cancel_sync = true
-    apiStore.request(`items/${this.id}`, 'PATCH', {
+    if (cancel_sync) data.cancel_sync = true
+    return apiStore.request(`items/${this.id}`, 'PATCH', {
       data,
     })
+      .catch(err => { console.warn(err) })
   }
 
   API_archive() {
