@@ -53,10 +53,13 @@ class CollectionCard < ApplicationRecord
     # place card at beginning or end
     cc.order = placement == 'beginning' ? 0 : parent.collection_cards.count
 
-    unless shallow || link?
-      # don't copy underlying record if shallow/link option and we didn't use `duplicate_linked_records`
-      cc.collection = collection.duplicate!(for_user: for_user) if collection.present?
-      cc.item = item.duplicate!(for_user: for_user) if item.present?
+    unless shallow || link
+      opts = {
+        for_user: for_user,
+        parent: parent,
+      }
+      cc.collection = collection.duplicate!(opts) if collection.present?
+      cc.item = item.duplicate!(opts) if item.present?
     end
 
     return cc unless cc.save

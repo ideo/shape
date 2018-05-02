@@ -86,17 +86,43 @@ describe Collection, type: :model do
 
   describe '#duplicate' do
     let!(:user) { create(:user) }
+    let!(:parent_collection) { create(:collection) }
     let!(:collection) { create(:collection, num_cards: 5, tag_list: %w[Prototype Other]) }
+    let!(:parent_collection_card) do
+      create(:collection_card_collection, parent: parent_collection, collection: collection)
+    end
     let(:copy_parent_card) { false }
+    let(:parent) { collection.parent }
     let(:duplicate) do
       dupe = collection.duplicate!(
         for_user: user,
         copy_parent_card: copy_parent_card,
+        parent: parent,
       )
       # Necessary because AR-relationship is cached
       user.roles.reload
       user.reset_cached_roles!
       dupe
+    end
+
+    it 'does not duplicate if no flag passed' do
+      expect(duplicate.parent_collection_card).to be_nil
+    end
+
+    context 'with copy_parent_card true' do
+      let!(:copy_parent_card) { true }
+
+      it 'duplicates parent' do
+        expect(duplicate.id).not_to eq(collection.parent_collection_card.id)
+      end
+
+      it 'creates duplicate with parent_collection as its parent' do
+        expect(duplicate.parent).to eq parent_collection
+      end
+
+      it 'creates duplicate with organization_id matching parent' do
+        expect(duplicate.organization_id).to eq parent_collection.organization_id
+      end
     end
 
     context 'with editor role' do
@@ -146,28 +172,6 @@ describe Collection, type: :model do
         # roles shouldn't match because we're removing Viewer and replacing w/ Editor
         expect(duplicate.roles.map(&:name)).not_to match(collection.roles.map(&:name))
         expect(duplicate.can_edit?(user)).to be true
-      end
-    end
-
-    context 'with parent collection card' do
-      let!(:parent_collection_card) do
-        create(:collection_card_collection, collection: collection)
-      end
-
-      it 'does not duplicate if no flag passed' do
-        expect(duplicate.parent_collection_card).to be_nil
-      end
-
-      context 'with copy_parent_card true' do
-        let!(:copy_parent_card) { true }
-
-        it 'duplicates parent' do
-          expect(duplicate.id).not_to eq(collection.parent_collection_card.id)
-        end
-
-        it 'increases the order by 1' do
-          expect(duplicate.parent_collection_card.order).to eq(collection.parent_collection_card.order + 1)
-        end
       end
     end
   end

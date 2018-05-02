@@ -168,6 +168,7 @@ class Collection < ApplicationRecord
     enable
     nullify :breadcrumb
     nullify :created_by_id
+    nullify :organization_id
     set archived: false
     # don't recognize any relations, easiest way to turn them all off
     recognize []
@@ -179,6 +180,8 @@ class Collection < ApplicationRecord
     c.cloned_from = self
     c.created_by = for_user
     c.tag_list = tag_list
+    # copy organization_id from the collection this is being moved into
+    c.organization_id = parent.organization_id
 
     # save the dupe collection first so that we can reference it later
     # return if it didn't work for whatever reason
@@ -208,12 +211,6 @@ class Collection < ApplicationRecord
 
     # pick up newly created relationships
     c.reload
-  end
-
-  def parent
-    return parent_collection_card.parent if parent_collection_card.present?
-
-    organization
   end
 
   def children
