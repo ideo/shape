@@ -19,7 +19,7 @@ import TextItemCreator from './TextItemCreator'
 import VideoCreator from './VideoCreator'
 
 const StyledGridCardBlank = StyledGridCard.extend`
-  background: white;
+  background: ${props => (props.emptyState ? 'transparent' : 'white')};
   cursor: auto;
   position: relative;
   button {
@@ -70,7 +70,7 @@ const BctBackground = styled.div`
   height: 175px;
   border-radius: 50%;
   border: 8px solid ${v.colors.cyan};
-  background: ${v.colors.desert};
+  background: ${props => (props.emptyState ? v.colors.aquaHaze : v.colors.desert)};
 `
 BctBackground.displayName = 'BctBackground'
 
@@ -138,6 +138,7 @@ const BctDropzone = styled.div`
     cursor: pointer;
     z-index: ${v.zIndex.gridCardBg + 1};
     border-radius: 50%;
+    /* must be transparent -- dropzone is transparent and content behind it is visible */
     background: transparent;
     border: none;
     width: 160px;
@@ -165,42 +166,44 @@ class GridCardBlank extends React.Component {
     // creating the DropPane via filestack is asynchronous;
     // if the BCT mounts but then immediately gets closed via a uiStore action,
     // we check to not to make the drop pane to prevent it throwing an error
-    setTimeout(() => {
-      if (this.canceled) return
-      FilestackUpload.makeDropPane({
-        id: 'dropzone',
-        onProgress: (pct) => {
-          if (this.state.loading) return
-          this.setState({ loading: true })
-        },
-        onDragOver: () => {
-          this.setState({ droppingFile: true })
-        },
-        onDragLeave: () => {
-          this.setState({ droppingFile: false })
-        },
-        onDrop: () => {
-          if (this.state.loading) return
-          this.setState({ loading: true, droppingFile: false })
-        },
-        onSuccess: (res) => {
-          if (res.length > 0) {
-            const img = res[0]
-            img.url = FilestackUpload.transformedUrl(img.url)
-            this.createCardWith(img)
-          }
-        }
-      })
-    }, 500)
+    setTimeout(this.createDropPane, 500)
   }
 
   componentWillUnmount() {
     this.canceled = true
   }
 
-  get emptyCollection() {
+  createDropPane = () => {
+    if (this.canceled) return
+    FilestackUpload.makeDropPane({
+      id: 'dropzone',
+      onProgress: (pct) => {
+        if (this.state.loading) return
+        this.setState({ loading: true })
+      },
+      onDragOver: () => {
+        this.setState({ droppingFile: true })
+      },
+      onDragLeave: () => {
+        this.setState({ droppingFile: false })
+      },
+      onDrop: () => {
+        if (this.state.loading) return
+        this.setState({ loading: true, droppingFile: false })
+      },
+      onSuccess: (res) => {
+        if (res.length > 0) {
+          const img = res[0]
+          img.url = FilestackUpload.transformedUrl(img.url)
+          this.createCardWith(img)
+        }
+      }
+    })
+  }
+
+  get emptyState() {
     const { uiStore } = this.props
-    return uiStore.blankContentToolState.emptyCollection
+    return uiStore.blankContentToolState.emptyCollection && !this.state.creating
   }
 
   startCreatingCollection = () => {
@@ -264,7 +267,14 @@ class GridCardBlank extends React.Component {
   }
 
   closeBlankContentTool = () => {
-    this.props.uiStore.closeBlankContentTool()
+    const { uiStore } = this.props
+    if (uiStore.blankContentToolState.emptyCollection) {
+      this.setState({ creating: null })
+      // have to re-create the DropPane
+      this.createDropPane()
+    } else {
+      this.props.uiStore.closeBlankContentTool()
+    }
   }
 
   renderInner = () => {
@@ -275,6 +285,7 @@ class GridCardBlank extends React.Component {
         <CollectionCreator
           loading={this.state.loading}
           createCard={this.createCard}
+          closeBlankContentTool={this.closeBlankContentTool}
         />
       )
       break
@@ -283,6 +294,7 @@ class GridCardBlank extends React.Component {
         <VideoCreator
           loading={this.state.loading}
           createCard={this.createCard}
+          closeBlankContentTool={this.closeBlankContentTool}
         />
       )
       break
@@ -354,7 +366,7 @@ class GridCardBlank extends React.Component {
           }
         </Flex>
         {inner}
-        <BctBackground />
+        <BctBackground emptyState={this.emptyState} />
       </StyledBlankCreationTool>
     )
   }
@@ -363,7 +375,7 @@ class GridCardBlank extends React.Component {
     const { uiStore } = this.props
     const { gridSettings, blankContentToolState } = uiStore
     return (
-      <StyledGridCardBlank>
+      <StyledGridCardBlank emptyState={this.emptyState}>
         <StyledGridCardInner
           height={blankContentToolState.height}
           gridW={gridSettings.gridW}
@@ -372,7 +384,7 @@ class GridCardBlank extends React.Component {
           {this.renderInner()}
         </StyledGridCardInner>
         { this.state.loading && <InlineLoader /> }
-        { !this.emptyCollection &&
+        { !this.emptyState &&
           <button className="close" onClick={this.closeBlankContentTool}>
             <CloseIcon />
           </button>

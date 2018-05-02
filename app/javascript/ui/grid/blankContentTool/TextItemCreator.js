@@ -4,7 +4,7 @@ import _ from 'lodash'
 import styled from 'styled-components'
 
 import { overrideHeadersFromClipboard } from '~/ui/items/TextItem'
-import v, { ITEM_TYPES } from '~/utils/variables'
+import v, { ITEM_TYPES, KEYS } from '~/utils/variables'
 
 const StyledTextItemCreator = styled.div`
   padding: 1rem;
@@ -59,11 +59,11 @@ class TextItemCreator extends React.Component {
     // re-bind enter to create the item instead of doing a linebreak
     const bindings = {
       enter: {
-        key: 13,
+        key: KEYS.ENTER,
         handler: this.createTextItem,
       },
       esc: {
-        key: 27,
+        key: KEYS.ESC,
         handler: () => {
           this.onTextChange.cancel()
           this.props.closeBlankContentTool()

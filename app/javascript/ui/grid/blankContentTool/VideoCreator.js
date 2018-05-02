@@ -5,7 +5,7 @@ import _ from 'lodash'
 import { TextField, FormButton } from '~/ui/global/styled/forms'
 import PaddedCardCover from '~/ui/grid/covers/PaddedCardCover'
 import VideoUrl from '~/utils/VideoUrl'
-import { ITEM_TYPES } from '~/utils/variables'
+import { ITEM_TYPES, KEYS } from '~/utils/variables'
 
 const ValidIndicator = styled.div`
   position: absolute;
@@ -32,7 +32,12 @@ class VideoCreator extends React.Component {
       name: '',
       thumbnailUrl: '',
     }
+    this.canceled = false
     this.lookupVideoAPI = _.debounce(this._lookupVideoAPI, 1000)
+  }
+
+  componentWillUnmount() {
+    this.canceled = true
   }
 
   onVideoUrlChange = (e) => {
@@ -43,8 +48,15 @@ class VideoCreator extends React.Component {
     this.lookupVideoAPI(e.target.value)
   }
 
+  handleKeyDown = (e) => {
+    if (e.keyCode === KEYS.ESC) {
+      this.props.closeBlankContentTool()
+    }
+  }
+
   _lookupVideoAPI = async (url) => {
     const { name, thumbnailUrl } = await VideoUrl.getAPIdetails(url)
+    if (this.canceled) return
     this.setState({ loading: false })
     if (name && thumbnailUrl) {
       this.setState({ name, thumbnailUrl, urlValid: true })
@@ -57,7 +69,8 @@ class VideoCreator extends React.Component {
     VideoUrl.isValid(this.state.videoUrl)
   )
 
-  createVideoItem = () => {
+  createVideoItem = (e) => {
+    e.preventDefault()
     if (this.videoUrlIsValid()) {
       // Get a normalized URL to make it easier to handle in our system
       const { normalizedUrl } = VideoUrl.parse(this.state.videoUrl)
@@ -71,9 +84,8 @@ class VideoCreator extends React.Component {
         },
       }
       this.props.createCard(attrs)
-    } else {
-      // console.log('invalid url')
     }
+    // console.log('invalid url')
   }
 
   render() {
@@ -91,20 +103,20 @@ class VideoCreator extends React.Component {
 
     return (
       <PaddedCardCover>
-        <div className="form">
+        <form className="form" onSubmit={this.createVideoItem}>
           <TextField
             placeholder="Video URL"
             value={videoUrl}
             onChange={this.onVideoUrlChange}
+            onKeyDown={this.handleKeyDown}
           />
           {validIndicator}
           <FormButton
-            onClick={this.createVideoItem}
             disabled={this.props.loading || this.state.loading}
           >
             Add
           </FormButton>
-        </div>
+        </form>
       </PaddedCardCover>
     )
   }
@@ -113,6 +125,7 @@ class VideoCreator extends React.Component {
 VideoCreator.propTypes = {
   loading: PropTypes.bool.isRequired,
   createCard: PropTypes.func.isRequired,
+  closeBlankContentTool: PropTypes.func.isRequired,
 }
 
 export default VideoCreator
