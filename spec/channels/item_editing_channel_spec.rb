@@ -14,6 +14,7 @@ RSpec.describe ItemEditingChannel, type: :channel do
       expect { subscribe(id: item.id) }.to have_broadcasted_to(stream_name).with(
         current_editor: {},
         num_viewers: 1,
+        item_text_data: item.text_data,
       )
     end
   end
@@ -25,6 +26,7 @@ RSpec.describe ItemEditingChannel, type: :channel do
       expect { perform(:start_editing) }.to have_broadcasted_to(stream_name).with(
         current_editor: user.as_json,
         num_viewers: 1,
+        item_text_data: item.text_data,
       )
     end
 
@@ -39,6 +41,7 @@ RSpec.describe ItemEditingChannel, type: :channel do
         expect { perform(:start_editing) }.to have_broadcasted_to(stream_name).with(
           current_editor: user.as_json,
           num_viewers: 2,
+          item_text_data: item.text_data,
         )
       end
     end
@@ -51,6 +54,7 @@ RSpec.describe ItemEditingChannel, type: :channel do
       expect { perform(:stop_editing) }.to have_broadcasted_to(stream_name).with(
         current_editor: {},
         num_viewers: 1,
+        item_text_data: item.text_data,
       )
     end
   end
@@ -62,6 +66,7 @@ RSpec.describe ItemEditingChannel, type: :channel do
       expect { subscription.unsubscribed }.to have_broadcasted_to(stream_name).with(
         current_editor: {},
         num_viewers: 0,
+        item_text_data: item.text_data,
       )
     end
   end

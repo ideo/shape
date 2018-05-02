@@ -15,7 +15,8 @@ const actionCableDisconnected = message => message
 const props = {
   item: fakeTextItem,
   currentUserId: fakeUser.id,
-  handleRefetchItem: jest.fn(),
+  onSave: jest.fn(),
+  onUpdatedData: jest.fn(),
   actionCableConsumer: fakeActionCableConsumer({
     connectedFn: actionCableConnected,
     receivedFn: actionCableReceived,

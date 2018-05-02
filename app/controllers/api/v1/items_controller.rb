@@ -18,6 +18,9 @@ class Api::V1::ItemsController < Api::V1::BaseController
   def update
     @item.attributes = item_params
     if @item.save
+      # cancel_sync means we don't want to render the item JSON
+      return if @cancel_sync
+      @item.stopped_editing(current_user) if @item.is_a?(Item::TextItem)
       render jsonapi: @item
     else
       render_api_errors @item.errors

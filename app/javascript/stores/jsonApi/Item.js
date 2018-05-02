@@ -12,7 +12,7 @@ class Item extends BaseRecord {
     'image',
     'archived',
     'tag_list',
-    'filestack_file_attributes'
+    'filestack_file_attributes',
   ]
 
   get parentPath() {
@@ -21,6 +21,17 @@ class Item extends BaseRecord {
       return routingStore.pathTo(type, id)
     }
     return '/'
+  }
+
+  API_updateWithoutSync({ cancel_sync } = {}) {
+    const { apiStore } = this
+    const data = this.toJsonApi()
+    // Turn off syncing when saving the item to not reload the page
+    if (cancel_sync) data.cancel_sync = true
+    return apiStore.request(`items/${this.id}`, 'PATCH', {
+      data,
+    })
+      .catch(err => { console.warn(err) })
   }
 
   API_archive() {
