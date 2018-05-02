@@ -63,11 +63,13 @@ RSpec.describe CollectionCard, type: :model do
     let!(:collection_card) { create(:collection_card_text) }
     let(:shallow) { false }
     let(:update_order) { false }
+    let(:duplicate_linked_records) { false }
     let(:duplicate) do
       collection_card.duplicate!(
         for_user: user,
         shallow: shallow,
         update_order: update_order,
+        duplicate_linked_records: duplicate_linked_records,
       )
     end
 
@@ -88,14 +90,28 @@ RSpec.describe CollectionCard, type: :model do
       duplicate
     end
 
-    context 'with linked card' do
+    context 'with linked card and duplicate_linked_records = true' do
+      let(:parent_collection_card) { create(:collection_card_collection) }
+      let(:collection) { parent_collection_card.collection }
+      let(:duplicate_linked_records) { true }
+      let!(:collection_card) { create(:collection_card_link, collection: collection) }
+
+      it 'should duplicate the underlying linked collection record' do
+        expect { duplicate }.to change(Collection, :count).by(1)
+        expect(duplicate.primary?).to be true
+        expect(duplicate.record.id).not_to eq(collection.id)
+      end
+    end
+
+    context 'with linked card and duplicate_linked_records = false' do
       let(:parent_collection_card) { create(:collection_card_collection) }
       let(:collection) { parent_collection_card.collection }
       let!(:collection_card) { create(:collection_card_link, collection: collection) }
 
-      it 'should duplicate the underlying collection record if its a link' do
-        expect { duplicate }.to change(Collection, :count).by(1)
-        expect(duplicate.record.id).not_to eq(collection.id)
+      it 'should not duplicate the underlying linked collection record' do
+        expect { duplicate }.not_to change(Collection, :count)
+        expect(duplicate.link?).to be true
+        expect(duplicate.record.id).to eq(collection.id)
       end
     end
 
