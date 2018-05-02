@@ -5,6 +5,7 @@ RSpec.describe OrganizationBuilder, type: :service do
   let(:params) {
     {
       'name': 'An org',
+      'handle': 'an-org',
     }
   }
 
@@ -31,6 +32,10 @@ RSpec.describe OrganizationBuilder, type: :service do
     it 'should create the user collections' do
       expect(user.current_user_collection).to_not be_nil
       expect(user.current_shared_collection).to_not be_nil
+    end
+
+    it 'should update the primary group attributes' do
+      expect(organization.primary_group.handle).to eq('an-org')
     end
   end
 end

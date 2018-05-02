@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types'
-import { action, observable, toJS } from 'mobx'
-import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
+import { action, observable } from 'mobx'
+import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import parameterize from 'parameterize'
 import {
   FormButton,
@@ -94,7 +94,7 @@ class GroupModify extends React.Component {
       })
   }
 
-  handleSave = async (ev) => {
+  handleSave = (ev) => {
     ev.preventDefault()
     const { onSave } = this.props
     if (onSave) onSave(this.editingGroup)

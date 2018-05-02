@@ -26,6 +26,7 @@ const fakeApiStore = ({ findResult = '', findAllResult = [], requestResult = '' 
       pic_url_square: 'https://s3.amazonaws.com/pic.png',
       groups: [],
       terms_accepted: true,
+      switchOrganization: jest.fn(),
     },
     collections: [],
     items: [],

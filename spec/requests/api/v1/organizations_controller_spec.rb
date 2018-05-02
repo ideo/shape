@@ -44,6 +44,7 @@ describe Api::V1::OrganizationsController, type: :request, json: true, auth: tru
       json_api_params(
         'organizations',
         'name': 'IDEO U',
+        'handle': 'ideo-u',
       )
     }
 
@@ -55,11 +56,6 @@ describe Api::V1::OrganizationsController, type: :request, json: true, auth: tru
     it 'matches JSON schema' do
       post(path, params: params)
       expect(json['data']['attributes']).to match_json_schema('organization')
-    end
-
-    it 'calls the collection builder' do
-      expect(OrganizationBuilder).to receive(:new)
-      post(path, params: params)
     end
   end
 

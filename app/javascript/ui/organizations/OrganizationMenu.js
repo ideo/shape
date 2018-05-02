@@ -72,6 +72,7 @@ class OrganizationMenu extends React.Component {
     apiStore.currentUser.switchOrganization(newOrg.id,
       { backToHomepage: true })
     onClose()
+    return newOrg
   }
 
   @action createGroup = async (groupData) => {
