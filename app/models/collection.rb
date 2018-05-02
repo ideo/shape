@@ -242,6 +242,7 @@ class Collection < ApplicationRecord
 
   def recalculate_child_breadcrumbs(cards = collection_cards)
     cards.each do |card|
+      next if card.link?
       if card.item_id.present?
         card.item.recalculate_breadcrumb!
       elsif card.collection_id.present?

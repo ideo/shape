@@ -45,6 +45,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
     duplicate = @collection_card.duplicate!(
       for_user: current_user,
       parent: current_user.current_user_collection,
+      duplicate_linked_records: true,
     )
     if duplicate.persisted? && duplicate.errors.empty?
       render jsonapi: duplicate, include: [:parent, record: [:filestack_file]]
