@@ -66,13 +66,21 @@ class OrganizationMenu extends React.Component {
   }
 
   createOrganization = async (organizationData) => {
-    const { apiStore, onClose } = this.props
+    const { apiStore, uiStore, onClose } = this.props
     const newOrg = new Organization(organizationData, apiStore)
-    await newOrg.save()
-    apiStore.currentUser.switchOrganization(newOrg.id,
-      { backToHomepage: true })
-    onClose()
-    return newOrg
+    try {
+      this.isLoading = true
+      await newOrg.save()
+      apiStore.currentUser.switchOrganization(newOrg.id,
+        { backToHomepage: true })
+      this.isLoading = false
+      onClose()
+    } catch (err) {
+      this.isLoading = false
+      uiStore.alert({
+        prompt: err.error[0],
+      })
+    }
   }
 
   @action createGroup = async (groupData) => {
