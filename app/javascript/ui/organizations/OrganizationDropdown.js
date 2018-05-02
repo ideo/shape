@@ -34,7 +34,7 @@ class OrganizationDropdown extends React.Component {
     this.openOrgMenu('organizationPeople')
   }
 
-  handleNewOrg = async (ev) => {
+  handleNewOrg = (ev) => {
     this.openOrgMenu('newOrganization')
   }
 
