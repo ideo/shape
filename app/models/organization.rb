@@ -18,8 +18,9 @@ class Organization < ApplicationRecord
 
   def self.create_for_user(user)
     name = [user.first_name, user.last_name, 'Organization'].compact.join(' ')
-    o = OrganizationBuilder.new({ name: name }, user)
-    o.save
+    builder = OrganizationBuilder.new({ name: name }, user)
+    builder.save
+    builder.organization
   end
 
   # Note: this method can be called many times for the same org
