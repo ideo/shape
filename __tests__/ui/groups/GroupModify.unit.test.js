@@ -1,4 +1,4 @@
-import { observable, useStrict } from 'mobx'
+import { useStrict } from 'mobx'
 import GroupModify from '~/ui/groups/GroupModify'
 
 describe('GroupModify', () => {
