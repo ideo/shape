@@ -26,10 +26,11 @@ Rails.application.routes.draw do
         collection do
           patch 'move'
           post 'link'
-        end
-        member do
           post 'duplicate'
         end
+        # member do
+        #   post 'duplicate'
+        # end
         resources :items, shallow: true, except: :index do
           member do
             post 'duplicate'

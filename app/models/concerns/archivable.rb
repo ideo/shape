@@ -51,19 +51,27 @@ module Archivable
 
   # will first archive all of the `archive_with` relations, and then archive the model itself
   def archive_with_relations!
-    if self.class.archive_with.present?
-      self.class.archive_with.each do |relation|
-        related = try(relation)
-        if related.is_a? ActiveRecord::Relation
-          # use .map if relation is one-to-many (e.g. collection_cards)
-          related.map { |r| r.try(:archive_with_relations!) }
-        else
-          # otherwise just archive the relation (e.g. item)
-          related.try(:archive_with_relations!)
-        end
+    archive_relations!
+    archive_self!
+  end
+
+  private
+
+  def archive_relations!
+    return unless self.class.archive_with.present?
+    self.class.archive_with.each do |relation|
+      related = try(relation)
+      if related.is_a? ActiveRecord::Relation
+        # use .map if relation is one-to-many (e.g. collection_cards)
+        related.map { |r| r.try(:archive_with_relations!) }
+      else
+        # otherwise just archive the relation (e.g. item)
+        related.try(:archive_with_relations!)
       end
     end
-    # then update self
+  end
+
+  def archive_self!
     update(archived: true)
   end
 end

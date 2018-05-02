@@ -62,13 +62,13 @@ RSpec.describe CollectionCard, type: :model do
     let(:user) { create(:user) }
     let!(:collection_card) { create(:collection_card_text) }
     let(:shallow) { false }
-    let(:update_order) { false }
     let(:duplicate_linked_records) { false }
+    let(:placement) { 'end' }
     let(:duplicate) do
       collection_card.duplicate!(
         for_user: user,
         shallow: shallow,
-        update_order: update_order,
+        placement: placement,
         duplicate_linked_records: duplicate_linked_records,
       )
     end
@@ -144,8 +144,8 @@ RSpec.describe CollectionCard, type: :model do
       end
     end
 
-    context 'with update_order true' do
-      let!(:update_order) { true }
+    context 'with placement at beginning' do
+      let!(:placement) { 'beginning' }
 
       it 'should call increment_card_orders!' do
         expect_any_instance_of(CollectionCard).to receive(:increment_card_orders!)

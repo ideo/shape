@@ -34,6 +34,8 @@ describe('CardMenu', () => {
         <CardMenu.wrappedComponent {...props} />
       )
       component = wrapper.instance()
+      props.uiStore.selectCardId.mockClear()
+      props.uiStore.openMoveMenu.mockClear()
     })
 
     it('creates a PopoutMenu with all editable actions', () => {
@@ -52,11 +54,6 @@ describe('CardMenu', () => {
       expect(_.map(popout.props().menuItems, i => i.name)).toEqual(allActions)
     })
 
-    it('calls API_duplicate on duplicateCard action', () => {
-      wrapper.instance().duplicateCard()
-      expect(card.API_duplicate).toHaveBeenCalled()
-    })
-
     it('calls beginReplacing on replaceCard action', () => {
       wrapper.instance().replaceCard()
       expect(card.beginReplacing).toHaveBeenCalled()
@@ -68,6 +65,24 @@ describe('CardMenu', () => {
       expect(props.uiStore.openMoveMenu).toHaveBeenCalledWith({
         from: props.uiStore.viewingCollection.id,
         cardAction: 'move',
+      })
+    })
+
+    it('calls selectCardId and openMoveMenu on duplicate action', () => {
+      component.duplicateCard()
+      expect(props.uiStore.selectCardId).toHaveBeenCalledWith(card.id)
+      expect(props.uiStore.openMoveMenu).toHaveBeenCalledWith({
+        from: props.uiStore.viewingCollection.id,
+        cardAction: 'duplicate',
+      })
+    })
+
+    it('calls selectCardId and openMoveMenu on link action', () => {
+      component.linkCard()
+      expect(props.uiStore.selectCardId).toHaveBeenCalledWith(card.id)
+      expect(props.uiStore.openMoveMenu).toHaveBeenCalledWith({
+        from: props.uiStore.viewingCollection.id,
+        cardAction: 'link',
       })
     })
   })
@@ -99,6 +114,7 @@ describe('CardMenu', () => {
     it('creates a PopoutMenu with Duplicate and Link viewer actions', () => {
       const popout = wrapper.find('PopoutMenu').at(0)
       expect(popout.props().menuItems.length).toEqual(3)
+
       expect(_.map(popout.props().menuItems, i => i.name)).toEqual(actions)
     })
   })

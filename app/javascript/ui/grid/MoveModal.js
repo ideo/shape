@@ -93,6 +93,11 @@ class MoveModal extends React.Component {
         await apiStore.request('collection_cards/move', 'PATCH', data)
       } else if (uiStore.cardAction === 'link') {
         await apiStore.request('collection_cards/link', 'POST', data)
+      } else if (uiStore.cardAction === 'duplicate') {
+        await apiStore.request('collection_cards/duplicate', 'POST', data)
+        // have to re-fetch here because the duplicate method wasn't re-rendering
+        // see note in collection_cards_controller#duplicate
+        await apiStore.request(`collections/${collectionId}`)
       }
       uiStore.resetSelectionAndBCT()
       uiStore.closeMoveMenu()
