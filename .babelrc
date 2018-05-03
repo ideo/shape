@@ -26,8 +26,6 @@
     }
   },
   "plugins": [
-    ["transform-es2015-template-literals"],
-    ["transform-es2015-arrow-functions"],
     ["transform-decorators-legacy"],
     ["transform-class-properties"],
     ["babel-plugin-root-import", [{
