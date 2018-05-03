@@ -140,6 +140,7 @@ export default class UiStore {
       order: 0,
       width: 1,
       height: 1,
+      emptyCollection: this.viewingCollection && this.viewingCollection.isEmpty,
       ...options
     }
   }

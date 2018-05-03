@@ -85,7 +85,6 @@ class VideoCreator extends React.Component {
       }
       this.props.createCard(attrs)
     }
-    // console.log('invalid url')
   }
 
   render() {

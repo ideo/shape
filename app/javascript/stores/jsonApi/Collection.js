@@ -23,6 +23,10 @@ class Collection extends BaseRecord {
     return !this.isUserCollection && !this.isSharedCollection
   }
 
+  get isEmpty() {
+    return this.collection_cards.length === 0
+  }
+
   API_archive() {
     return Api.archive('collections', this)
   }
