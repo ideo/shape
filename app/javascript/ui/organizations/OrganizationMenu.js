@@ -17,31 +17,17 @@ class OrganizationMenu extends React.Component {
   @observable isLoading = false
 
   componentDidMount() {
-    const { apiStore, userGroups, uiStore } = this.props
-    const groupReqs = userGroups.map(group => this.fetchRoles(group))
-    Promise.all(groupReqs)
-      .then(responses => {
-        const roles = responses.map(res => res.data)
-        apiStore.add(roles, 'roles')
+    const { apiStore, uiStore } = this.props
 
-        if (uiStore.orgCreated) {
-          uiStore.update('orgCreated', false)
-          uiStore.alert({
-            iconName: 'Ok',
-            prompt: 'Your organization has been created',
-          })
-          // send you to add members to the newly created org
-          this.goToEditGroupRoles(apiStore.currentUserOrganization.primary_group)
-        }
+    if (uiStore.orgCreated) {
+      uiStore.update('orgCreated', false)
+      uiStore.alert({
+        iconName: 'Ok',
+        prompt: 'Your organization has been created',
       })
-      .catch(() => {
-        uiStore.defaultAlertError()
-      })
-  }
-
-  fetchRoles = (group) => {
-    const { apiStore } = this.props
-    return apiStore.request(`groups/${group.id}/roles`, 'GET')
+      // send you to add members to the newly created org
+      this.goToEditGroupRoles(apiStore.currentUserOrganization.primary_group)
+    }
   }
 
   get currentPage() {

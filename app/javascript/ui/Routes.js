@@ -27,12 +27,7 @@ AppWrapper.displayName = 'AppWrapper'
 class Routes extends React.Component {
   componentDidMount() {
     const { apiStore } = this.props
-    apiStore.request('users/me')
-      .then(({ data }) => {
-        const user = data
-        apiStore.setCurrentUserId(user.id)
-      })
-      // .catch(err => console.warn(new Error(err)))
+    apiStore.loadCurrentUserAndGroups()
   }
 
   handleWindowResize = ({ windowWidth }) => {

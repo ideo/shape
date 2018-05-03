@@ -36,10 +36,11 @@ class TagEditor extends React.Component {
     }))
   }
 
-  _saveTags = () => {
-    const { record, tagField } = this.props
+  _saveTags = async () => {
+    const { record, tagField, afterSave } = this.props
     record[tagField] = _.map([...this.tags], t => t.name).join(',')
-    record.save()
+    await record.save()
+    if (afterSave) afterSave()
   }
 
   @action handleAddition = (tag) => {
@@ -120,12 +121,14 @@ TagEditor.propTypes = {
   tagColor: PropTypes.string,
   placeholder: PropTypes.string,
   validate: PropTypes.string,
+  afterSave: PropTypes.func,
 }
 TagEditor.defaultProps = {
   canEdit: false,
   tagColor: 'gray',
   placeholder: 'Add new tags, separated by comma or pressing enter.',
   validate: null,
+  afterSave: null,
 }
 
 export default TagEditor

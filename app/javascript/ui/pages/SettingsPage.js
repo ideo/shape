@@ -1,7 +1,7 @@
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 // import styled from 'styled-components'
 
-import { Heading1, Heading2 } from '~/ui/global/styled/typography'
+import { SimpleHeading1, Heading2 } from '~/ui/global/styled/typography'
 import v from '~/utils/variables'
 import Header from '~/ui/layout/Header'
 import PageContainer from '~/ui/layout/PageContainer'
@@ -22,12 +22,18 @@ class SettingsPage extends React.Component {
     return apiStore.currentUserOrganization
   }
 
+  afterDomainWhitelistUpdate = () => {
+    // need to reload in case updating the domains altered any group memberships
+    const { apiStore } = this.props
+    apiStore.loadCurrentUserGroups({ orgOnly: true })
+  }
+
   render() {
     return (
       <div>
         <Header />
         <PageContainer marginTop={v.headerHeightCompact}>
-          <Heading1 noTransform marginBottom>Settings</Heading1>
+          <SimpleHeading1>Settings</SimpleHeading1>
           <Heading2>Official Domains</Heading2>
           <p>
             Any new people added to {this.organization.name} without these email domains
@@ -41,6 +47,7 @@ class SettingsPage extends React.Component {
             record={this.organization}
             tagField="domain_whitelist"
             tagColor="white"
+            afterSave={this.afterDomainWhitelistUpdate}
           />
         </PageContainer>
       </div>

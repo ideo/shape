@@ -4,7 +4,8 @@ class Api::V1::UsersController < Api::V1::BaseController
   load_and_authorize_resource :organization, only: %i[index]
   def index
     # show all other active users in the system
-    @users = User.active.where.not(id: current_user.id)
+    # i.e. like Trello, is not limited to your org but anyone who's registered
+    @users = User.all_active_except(current_user.id)
     render jsonapi: @users
   end
 

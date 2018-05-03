@@ -13,6 +13,9 @@ const fakeApiStore = ({ findResult = '', findAllResult = [], requestResult = '' 
       .mockReturnValue(Promise.resolve())
       .mockName('fetch'),
     sync: jest.fn().mockName('sync'),
+    loadCurrentUser: jest.fn(),
+    loadCurrentUserGroups: jest.fn(),
+    loadCurrentUserAndGroups: jest.fn(),
     setCurrentUserId: jest.fn(),
     currentUserId: 1,
     currentUser: {

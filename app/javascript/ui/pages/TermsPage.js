@@ -1,7 +1,7 @@
 import ReactMarkdown from 'react-markdown'
 import styled from 'styled-components'
 
-import { Heading1, DisplayText, DisplayLink } from '~/ui/global/styled/typography'
+import { SimpleHeading1, DisplayText, DisplayLink } from '~/ui/global/styled/typography'
 import v from '~/utils/variables'
 import Header from '~/ui/layout/Header'
 import PageContainer from '~/ui/layout/PageContainer'
@@ -33,7 +33,7 @@ class TermsPage extends React.PureComponent {
       <div>
         <Header />
         <PageContainer marginTop={v.headerHeightCompact}>
-          <Heading1 noTransform marginBottom>Legal</Heading1>
+          <SimpleHeading1>Legal</SimpleHeading1>
           <StyledTitle>
             Terms of Use
           </StyledTitle>

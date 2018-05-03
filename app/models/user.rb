@@ -64,6 +64,10 @@ class User < ApplicationRecord
     }
   end
 
+  def self.all_active_except(user_id)
+    active.where.not(id: user_id).order(first_name: :asc)
+  end
+
   def self.from_omniauth(auth, pending_user)
     user = where(provider: auth.provider, uid: auth.uid).first
 

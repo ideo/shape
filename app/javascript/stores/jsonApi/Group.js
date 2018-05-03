@@ -15,7 +15,11 @@ class Group extends BaseRecord {
   }
 
   get isNormalGroup() {
-    return !this.is_primary && !this.is_guest
+    return !this.isOrgGroup
+  }
+
+  get isOrgGroup() {
+    return this.is_primary || this.is_guest
   }
 
   API_archive() {

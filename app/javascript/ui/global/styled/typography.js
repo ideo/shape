@@ -7,16 +7,22 @@ export const Heading1 = styled.h1`
   font-weight: ${v.weights.medium};
   letter-spacing: 2px;
   color: black;
-  margin-bottom: ${props => (props.marginBottom ? 2 : 0.5)}rem;
+  margin-bottom: 0.5rem;
   margin-top: 0.5rem;
   white-space: ${props => (props.wrapLine ? 'normal' : 'nowrap')}; /* better this way for responsive? */
-  text-transform: ${props => (props.noTransform ? 'none' : 'uppercase')};
+  text-transform: uppercase;
 
   @media only screen and (max-width: ${v.responsive.smallBreakpoint}px) {
     font-size: 1.5rem;
   }
 `
-Heading1.displayName = 'H1'
+Heading1.displayName = 'Heading1'
+
+export const SimpleHeading1 = Heading1.extend`
+  margin-bottom: 2rem;
+  text-transform: none;
+`
+SimpleHeading1.displayName = 'SimpleHeading1'
 
 export const Heading2 = styled.h2`
   text-transform: uppercase;
