@@ -53,7 +53,7 @@ class CollectionCard < ApplicationRecord
     # place card at beginning or end
     cc.order = placement == 'beginning' ? 0 : parent.collection_cards.count
 
-    unless shallow || link
+    unless shallow || link?
       opts = {
         for_user: for_user,
         parent: parent,
