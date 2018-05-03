@@ -181,7 +181,8 @@ class Collection < ApplicationRecord
     c.created_by = for_user
     c.tag_list = tag_list
     # copy organization_id from the collection this is being moved into
-    c.organization_id = parent.organization_id
+    # NOTE: parent is only nil in Colab import -- perhaps we should clean up any Colab import specific code?
+    c.organization_id = parent.try(:organization_id) || organization_id
 
     # save the dupe collection first so that we can reference it later
     # return if it didn't work for whatever reason
