@@ -57,6 +57,21 @@ describe Api::V1::OrganizationsController, type: :request, json: true, auth: tru
       post(path, params: params)
       expect(json['data']['attributes']).to match_json_schema('organization')
     end
+
+    context 'with invalid params' do
+      let(:params) {
+        json_api_params(
+          'organizations',
+          'name': nil,
+        )
+      }
+
+      it 'returns a 400 with organization errors' do
+        post(path, params: params)
+        expect(response.status).to eq(400)
+        expect(json['errors'].first['title']).to eq 'Invalid name'
+      end
+    end
   end
 
   describe 'PATCH #update' do

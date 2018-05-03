@@ -133,7 +133,7 @@ class User < ApplicationRecord
 
   # overrides retrieval of belongs_to relation
   def current_user_collection(org_id = current_organization_id)
-    return nil unless current_organization_id
+    return nil unless org_id
     if current_user_collection_id && org_id == current_organization_id
       # if within same org, we already have the current_user_collection id
       return Collection.find(current_user_collection_id)

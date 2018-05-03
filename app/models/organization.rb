@@ -1,5 +1,5 @@
 class Organization < ApplicationRecord
-  has_many :collections, -> { root }
+  has_many :collections, dependent: :destroy
   has_many :groups, dependent: :destroy
   belongs_to :primary_group,
              class_name: 'Group',
@@ -7,7 +7,7 @@ class Organization < ApplicationRecord
              optional: true
 
   after_create :create_primary_group
-  after_save :update_primary_group_name, on: :update, if: :saved_change_to_name?
+  after_update :update_primary_group_name, if: :saved_change_to_name?
 
   delegate :admins, to: :primary_group
   delegate :members, to: :primary_group

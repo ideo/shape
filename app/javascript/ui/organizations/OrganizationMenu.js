@@ -17,14 +17,26 @@ class OrganizationMenu extends React.Component {
   @observable isLoading = false
 
   componentDidMount() {
-    const { apiStore, userGroups } = this.props
+    const { apiStore, userGroups, uiStore } = this.props
     const groupReqs = userGroups.map(group => this.fetchRoles(group))
     Promise.all(groupReqs)
       .then(responses => {
         const roles = responses.map(res => res.data)
         apiStore.add(roles, 'roles')
+
+        if (uiStore.orgCreated) {
+          uiStore.update('orgCreated', false)
+          uiStore.alert({
+            iconName: 'Ok',
+            prompt: 'Your organization has been created',
+          })
+          // send you to add members to the newly created org
+          this.goToEditGroupRoles(apiStore.currentUserOrganization.primary_group)
+        }
       })
-      .catch((err) => console.warn(err))
+      .catch(() => {
+        uiStore.defaultAlertError()
+      })
   }
 
   fetchRoles = (group) => {
@@ -66,15 +78,15 @@ class OrganizationMenu extends React.Component {
   }
 
   createOrganization = async (organizationData) => {
-    const { apiStore, uiStore, onClose } = this.props
+    const { apiStore, uiStore } = this.props
     const newOrg = new Organization(organizationData, apiStore)
     try {
       this.isLoading = true
       await newOrg.save()
-      apiStore.currentUser.switchOrganization(newOrg.id,
+      await apiStore.currentUser.switchOrganization(newOrg.id,
         { backToHomepage: true })
       this.isLoading = false
-      onClose()
+      uiStore.update('orgCreated', true)
     } catch (err) {
       this.isLoading = false
       uiStore.alert({
@@ -89,7 +101,7 @@ class OrganizationMenu extends React.Component {
     try {
       await newGroup.save()
     } catch (err) {
-      uiStore.alert(err)
+      uiStore.defaultAlertError()
     }
     // Re-fetch current user that has the new group now
     apiStore.fetch('users', apiStore.currentUserId)

@@ -9,28 +9,25 @@ class OrganizationBuilder
   end
 
   def save
-    success = @organization.save
-    set_primary_group_attrs
-    add_role
-    create_collections
-    success
+    @organization.transaction do
+      @organization.save!
+      update_primary_group!
+      add_role
+    end
+    true
+  rescue ActiveRecord::RecordInvalid
+    # invalid params, transaction will be rolled back
+    false
   end
 
   private
 
-  def set_primary_group_attrs
+  def update_primary_group!
     @organization.primary_group.attributes = @params
-    @organization.primary_group.save
+    @organization.primary_group.save!
   end
 
   def add_role
     @user.add_role(Role::ADMIN, @organization.primary_group)
-  end
-
-  def create_collections
-    Collection::UserCollection.find_or_create_for_user(
-      @user,
-      @organization,
-    )
   end
 end

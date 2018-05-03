@@ -40,8 +40,10 @@ class OrganizationDropdown extends React.Component {
 
   handleSwitchOrg = (orgId) => (ev) => {
     ev.preventDefault()
-    const { apiStore } = this.props
-    return apiStore.currentUser.switchOrganization(orgId, { backToHomepage: true })
+    const { apiStore, onItemClick } = this.props
+    apiStore.currentUser.switchOrganization(orgId, { backToHomepage: true })
+    // close the menu
+    onItemClick()
   }
 
   handleOrgSettings = (ev) => {

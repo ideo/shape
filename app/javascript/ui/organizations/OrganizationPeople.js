@@ -3,7 +3,7 @@ import { PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 import { FormSpacer, TextButton } from '~/ui/global/styled/forms'
 import { Row, RowItemRight } from '~/ui/global/styled/layout'
-import { Heading3, DisplayText } from '~/ui/global/styled/typography'
+import { Heading3, DisplayText, SubduedText } from '~/ui/global/styled/typography'
 import ArchiveIcon from '~/ui/icons/ArchiveIcon'
 
 const RemoveIconHolder = styled.button`
@@ -11,8 +11,33 @@ const RemoveIconHolder = styled.button`
 `
 
 class OrganizationPeople extends React.PureComponent {
+  renderUserGroups = () => {
+    const { userGroups } = this.props
+    const groups = userGroups.filter(g => !g.is_primary)
+    if (!groups.length) {
+      return (
+        <SubduedText>You have not been added to any groups.</SubduedText>
+      )
+    }
+    return userGroups.map(group => (
+      <Row key={group.id}>
+        <button
+          className="groupEdit"
+          onClick={this.props.onGroupRoles(group)}
+        >
+          <DisplayText>{group.name}</DisplayText>
+        </button>
+        { group.currentUserCanEdit &&
+          <RemoveIconHolder onClick={this.props.onGroupRemove(group)}>
+            <ArchiveIcon />
+          </RemoveIconHolder>
+        }
+      </Row>
+    ))
+  }
+
   render() {
-    const { organization, userGroups } = this.props
+    const { organization } = this.props
     const primaryGroup = organization.primary_group
     return (
       <div>
@@ -37,22 +62,7 @@ class OrganizationPeople extends React.PureComponent {
         <Heading3>
           Your Groups
         </Heading3>
-        { userGroups.map((group) =>
-          (!group.is_primary &&
-          <Row key={group.id}>
-            <button
-              className="groupEdit"
-              onClick={this.props.onGroupRoles(group)}
-            >
-              <DisplayText>{group.name}</DisplayText>
-            </button>
-            { group.currentUserCanEdit &&
-              <RemoveIconHolder onClick={this.props.onGroupRemove(group)}>
-                <ArchiveIcon />
-              </RemoveIconHolder>
-            }
-          </Row>))
-        }
+        { this.renderUserGroups() }
       </div>
     )
   }

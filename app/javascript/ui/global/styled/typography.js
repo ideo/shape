@@ -43,6 +43,11 @@ export const DisplayText = styled.span`
 `
 DisplayText.displayName = 'StyledDisplayText'
 
+export const SubduedText = DisplayText.extend`
+  color: ${v.colors.cloudy};
+`
+SubduedText.displayName = 'SubduedText'
+
 export const DisplayLink = styled.a`
   color: ${v.colors.gray};
   font-weight: ${v.weights.book};

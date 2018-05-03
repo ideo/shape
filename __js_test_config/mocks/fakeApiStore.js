@@ -28,6 +28,12 @@ const fakeApiStore = ({ findResult = '', findAllResult = [], requestResult = '' 
       terms_accepted: true,
       switchOrganization: jest.fn(),
     },
+    currentUserOrganization: {
+      name: 'test org',
+      primary_group: {
+        name: 'test org',
+      }
+    },
     collections: [],
     items: [],
   }

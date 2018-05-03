@@ -46,6 +46,7 @@ export default class UiStore {
   }
   @observable dialogConfig = { ...this.defaultDialogProps }
   @observable blurContent = false
+  @observable orgCreated = false
 
   @action defaultAlertError() {
     this.alert({ prompt: 'There was an error performing this action.' })

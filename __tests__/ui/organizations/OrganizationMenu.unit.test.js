@@ -37,6 +37,8 @@ describe('OrganizationMenu', () => {
         { id: 1, name: 'groupTest', handle: 'test', filestack_file_url: 'jpg' }
       ]
     }
+    props.uiStore.update.mockClear()
+    props.uiStore.alert.mockClear()
     Organization.mockClear()
     wrapper = shallow(
       <OrganizationMenu.wrappedComponent {...props} />
@@ -69,7 +71,7 @@ describe('OrganizationMenu', () => {
 
   it('opens the group add menu when you click on the new group button', () => {
     component.goToAddGroup()
-    expect(props.uiStore.update).toHaveBeenCalledWith('organizationMenuPage', 'editGroup')
+    expect(props.uiStore.update).toHaveBeenCalledWith('organizationMenuPage', 'addGroup')
     expect(component.editGroup).toEqual({})
   })
 
@@ -141,18 +143,40 @@ describe('OrganizationMenu', () => {
       await component.createOrganization({ name: 'hello' })
     })
 
-    it('should close the menu', () => {
-      expect(props.onClose).toHaveBeenCalled()
-    })
-
     it('should switch to the new organization', () => {
       expect(props.apiStore.currentUser.switchOrganization).toHaveBeenCalledWith(
         3, { backToHomepage: true }
       )
     })
 
+    it('should set the uiStore state', () => {
+      expect(props.uiStore.update).toHaveBeenCalledWith('orgCreated', true)
+    })
+
     it('should save the newly created organization', () => {
       expect(saveFn).toHaveBeenCalled()
+    })
+
+    describe('with orgCreated state', () => {
+      beforeEach(() => {
+        props.uiStore.orgCreated = true
+        wrapper = shallow(
+          <OrganizationMenu.wrappedComponent {...props} />
+        )
+        component = wrapper.instance()
+      })
+
+      it('should open the org created alert', () => {
+        expect(props.uiStore.update).toHaveBeenCalledWith('orgCreated', false)
+        expect(props.uiStore.alert).toHaveBeenCalledWith({
+          iconName: 'Ok',
+          prompt: 'Your organization has been created',
+        })
+      })
+
+      it('should set the editGroup to be the org primary_group', () => {
+        expect(component.editGroup).toEqual(props.apiStore.currentUserOrganization.primary_group)
+      })
     })
   })
 })
