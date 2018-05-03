@@ -90,11 +90,11 @@ class OrganizationMenu extends React.Component {
       uiStore.defaultAlertError()
     }
     // Re-fetch current user that has the new group now
-    apiStore.fetch('users', apiStore.currentUserId)
+    apiStore.loadCurrentUser()
     this.goToEditGroupRoles(newGroup)
     // because this is after async/await
     runInAction(() => { this.isLoading = true })
-    const res = await this.fetchRoles(newGroup)
+    const res = await apiStore.fetchRoles(newGroup)
     runInAction(() => { this.isLoading = false })
     apiStore.sync(res)
   }

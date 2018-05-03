@@ -38,8 +38,8 @@ class ApiStore extends Store {
 
   async loadCurrentUser() {
     try {
-      const user = await this.request('users/me')
-      this.setCurrentUserId(user.id)
+      const res = await this.request('users/me')
+      this.setCurrentUserId(res.data.id)
     } catch (e) {
       console.warn(e)
     }
@@ -51,16 +51,17 @@ class ApiStore extends Store {
       if (orgOnly) {
         groups = groups.filter(g => g.isOrgGroup)
       }
-      const groupReqs = groups.map(group => this.fetchRoles(group))
-      const responses = await Promise.all(groupReqs)
-      const roles = responses.map(res => res.data)
-      this.add(roles, 'roles')
+      groups.map(group => this.fetchRoles(group))
     } catch (e) {
       console.warn(e)
     }
   }
 
-  fetchRoles = (group) => this.request(`groups/${group.id}/roles`, 'GET')
+  async fetchRoles(group) {
+    const res = await this.request(`groups/${group.id}/roles`, 'GET')
+    const roles = res.data
+    this.add(roles, 'roles')
+  }
 
   __updateRelationships(obj) {
     const record = this.find(obj.type, obj.id)
