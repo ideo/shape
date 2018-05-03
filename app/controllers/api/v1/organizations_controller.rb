@@ -1,6 +1,6 @@
 class Api::V1::OrganizationsController < Api::V1::BaseController
-  deserializable_resource :organization, only: :update
-  load_and_authorize_resource
+  deserializable_resource :organization, only: %i[create update]
+  load_and_authorize_resource except: %i[create]
 
   # The logged-in user's current organization context
   def current
@@ -20,13 +20,23 @@ class Api::V1::OrganizationsController < Api::V1::BaseController
     end
   end
 
+  def create
+    builder = OrganizationBuilder.new(organization_params, current_user)
+    if builder.save
+      render jsonapi: builder.organization, include: [:primary_group]
+    else
+      render_api_errors builder.errors
+    end
+  end
+
   private
 
   def organization_params
     params.require(:organization).permit(
       :name,
       :domain_whitelist,
-      filestack_file_attributes: Organization.filestack_file_attributes_whitelist,
+      :handle,
+      filestack_file_attributes: Group.filestack_file_attributes_whitelist,
     )
   end
 end

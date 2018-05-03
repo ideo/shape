@@ -48,7 +48,7 @@ Rails.application.routes.draw do
           patch 'archive'
         end
       end
-      resources :organizations, only: %i[show update] do
+      resources :organizations, except: :delete do
         collection do
           get 'current'
         end

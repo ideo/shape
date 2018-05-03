@@ -32,6 +32,10 @@ class ApiStore extends Store {
     return this.currentUser.current_organization.id
   }
 
+  get currentUserOrganization() {
+    return this.currentUser.current_organization
+  }
+
   __updateRelationships(obj) {
     const record = this.find(obj.type, obj.id)
     const refs = obj.relationships ? Object.keys(obj.relationships) : []

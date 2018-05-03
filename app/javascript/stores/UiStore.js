@@ -5,12 +5,14 @@ import { observable, action, computed } from 'mobx'
 export default class UiStore {
   // store this for usage by other components
   scroll = animateScroll
-  @observable blankContentToolState = {
+  defaultBCTState = {
     order: null,
     width: null,
     height: null,
     replacingId: null,
+    emptyCollection: false,
   }
+  @observable blankContentToolState = { ...this.defaultBCTState }
   @observable openCardMenuId = false
   @observable organizationMenuPage = null
   @observable rolesMenuOpen = false
@@ -46,6 +48,7 @@ export default class UiStore {
   }
   @observable dialogConfig = { ...this.defaultDialogProps }
   @observable blurContent = false
+  @observable orgCreated = false
 
   @action defaultAlertError() {
     this.alert({ prompt: 'There was an error performing this action.' })
@@ -130,10 +133,17 @@ export default class UiStore {
   // --- grid properties />
 
   // --- BCT + GridCard properties
-  @action openBlankContentTool({ order = 0, width = 1, height = 1, replacingId = null } = {}) {
+  @action openBlankContentTool(options = {}) {
     this.deselectCards()
     this.openCardMenuId = false
-    this.blankContentToolState = { order, width, height, replacingId }
+    this.blankContentToolState = {
+      ...this.defaultBCTState,
+      order: 0,
+      width: 1,
+      height: 1,
+      emptyCollection: this.viewingCollection && this.viewingCollection.isEmpty,
+      ...options
+    }
   }
 
   @action resetSelectionAndBCT() {
@@ -143,12 +153,7 @@ export default class UiStore {
   }
 
   @action closeBlankContentTool() {
-    this.blankContentToolState = {
-      order: null,
-      width: null,
-      height: null,
-      replacingId: null,
-    }
+    this.blankContentToolState = { ...this.defaultBCTState }
   }
 
   @action setViewingCollection(collection = null) {

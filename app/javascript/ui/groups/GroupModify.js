@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types'
-import { action, observable, toJS } from 'mobx'
-import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
+import { action, observable } from 'mobx'
+import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import parameterize from 'parameterize'
 import {
   FormButton,
@@ -14,7 +14,6 @@ import {
 import { uiStore } from '~/stores'
 import { FloatRight } from '~/ui/global/styled/layout'
 import FilestackUpload from '~/utils/FilestackUpload'
-import Group from '~/stores/jsonApi/Group'
 import Avatar from '~/ui/global/Avatar'
 
 function transformToHandle(name) {
@@ -22,13 +21,13 @@ function transformToHandle(name) {
   return parameterize(name)
 }
 
-@inject('apiStore')
 @observer
 class GroupModify extends React.Component {
   @observable editingGroup = {
     name: '',
     handle: '',
-    filestack_file_url: ''
+    filestack_file_url: '',
+    filestack_file_attributes: null,
   }
   @observable syncing = false
 
@@ -39,9 +38,9 @@ class GroupModify extends React.Component {
       name: group.name || '',
       handle: group.handle || '',
       filestack_file_url: group.filestack_file_url || '',
+      filestack_file_attributes: null,
     }
     if (!group.id) this.setSyncing(true)
-    this.fileAttrs = {}
   }
 
   @action setSyncing(val) {
@@ -59,20 +58,9 @@ class GroupModify extends React.Component {
   }
 
   @action
-  changeUrl(url) {
-    this.editingGroup.filestack_file_url = url
-  }
-
-  @action afterSave = async (group) => {
-    const { apiStore } = this.props
-    const existing = apiStore.currentUser.groups.find(
-      existingGroup => existingGroup.id === group.id
-    )
-    if (existing) {
-      return existing
-    }
-    await apiStore.fetch('users', apiStore.currentUserId)
-    return group
+  changeUrl(fileAttrs) {
+    this.editingGroup.filestack_file_url = fileAttrs.url
+    this.editingGroup.filestack_file_attributes = fileAttrs
   }
 
   handleNameChange = (ev) => {
@@ -87,7 +75,8 @@ class GroupModify extends React.Component {
 
   handleRoles = (ev) => {
     ev.preventDefault()
-    this.props.onGroupRoles()
+    const { onGroupRoles } = this.props
+    if (onGroupRoles) onGroupRoles()
   }
 
   handleImagePick = (ev) => {
@@ -95,8 +84,7 @@ class GroupModify extends React.Component {
     FilestackUpload
       .pickImage({
         onSuccess: (fileAttrs) => {
-          this.fileAttrs = fileAttrs
-          this.changeUrl(fileAttrs.url)
+          this.changeUrl(fileAttrs)
         },
         onFailure: (filesFailed) => {
           uiStore.alert({
@@ -106,31 +94,10 @@ class GroupModify extends React.Component {
       })
   }
 
-  handleSave = async (ev) => {
+  handleSave = (ev) => {
     ev.preventDefault()
-    const { apiStore, onSave } = this.props
-    let { group } = this.props
-    const originalGroup = Object.assign({}, group)
-    if (!group.id) {
-      group = new Group(toJS(this.editingGroup), apiStore)
-    } else {
-      group.name = this.editingGroup.name
-      group.handle = this.editingGroup.handle
-      group.filestack_file_url = this.editingGroup.filestack_file_url
-    }
-    if (this.fileAttrs.url) {
-      group.assign('filestack_file_attributes', this.fileAttrs)
-    }
-    try {
-      let savedGroup = await group.save()
-      savedGroup = await this.afterSave(savedGroup)
-      onSave && onSave(savedGroup)
-    } catch (err) {
-      console.warn(err)
-      group.name = originalGroup.name
-      group.handle = originalGroup.handle
-      group.filestack_file_url = originalGroup.filestack_file_url
-    }
+    const { onSave } = this.props
+    if (onSave) onSave(this.editingGroup)
   }
 
   renderImagePicker() {
@@ -154,7 +121,7 @@ class GroupModify extends React.Component {
   }
 
   render() {
-    const { group } = this.props
+    const { group, groupType } = this.props
     return (
       <form>
         <FloatRight>
@@ -165,27 +132,27 @@ class GroupModify extends React.Component {
           )}
         </FloatRight>
         <FieldContainer>
-          <Label htmlFor="groupName">Group Name</Label>
+          <Label htmlFor="groupName">{groupType} Name</Label>
           <TextField
             id="groupName"
             type="text"
             value={this.editingGroup.name}
             onChange={this.handleNameChange}
-            placeholder="Enter Group Name"
+            placeholder={`Enter ${groupType} Name`}
           />
         </FieldContainer>
         <FieldContainer>
-          <Label htmlFor="grouphandle">Group handle</Label>
+          <Label htmlFor="grouphandle">{groupType} handle</Label>
           <TextField
             id="grouphandle"
             type="text"
             value={this.editingGroup.handle}
             onChange={this.handleHandleChange}
-            placeholder="@group-handle"
+            placeholder={`@${groupType.toLowerCase()}-handle`}
           />
         </FieldContainer>
         <FieldContainer>
-          <Label htmlFor="groupAvatar">Group Avatar</Label>
+          <Label htmlFor="groupAvatar">{groupType} Avatar</Label>
           <button onClick={this.handleImagePick} id="groupAvatar">
             { this.renderImagePicker() }
           </button>
@@ -196,7 +163,7 @@ class GroupModify extends React.Component {
             width={190}
             type="submit"
           >
-            Add Members &gt;
+            { groupType === 'Group' ? 'Add Members' : 'Save' }
           </FormButton>
         </FormActionsContainer>
       </form>
@@ -207,10 +174,12 @@ class GroupModify extends React.Component {
 GroupModify.propTypes = {
   group: MobxPropTypes.objectOrObservableObject.isRequired,
   onSave: PropTypes.func.isRequired,
-  onGroupRoles: PropTypes.func.isRequired,
+  onGroupRoles: PropTypes.func,
+  groupType: PropTypes.oneOf(['Group', 'Organization']),
 }
-GroupModify.wrappedComponent.propTypes = {
-  apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
+GroupModify.defaultProps = {
+  onGroupRoles: null,
+  groupType: 'Group',
 }
 
 export default GroupModify

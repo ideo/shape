@@ -1,10 +1,12 @@
 import PropTypes from 'prop-types'
-import { action, runInAction, observable } from 'mobx'
+import { action, runInAction, observable, toJS } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import Modal from '~/ui/global/modals/Modal'
 import GroupModify from '~/ui/groups/GroupModify'
 import RolesMenu from '~/ui/roles/RolesMenu'
 import Loader from '~/ui/layout/Loader'
+import Group from '~/stores/jsonApi/Group'
+import Organization from '~/stores/jsonApi/Organization'
 import OrganizationPeople from '~/ui/organizations/OrganizationPeople'
 import GroupTitle from '~/ui/groups/GroupTitle'
 
@@ -15,14 +17,26 @@ class OrganizationMenu extends React.Component {
   @observable isLoading = false
 
   componentDidMount() {
-    const { apiStore, userGroups } = this.props
+    const { apiStore, userGroups, uiStore } = this.props
     const groupReqs = userGroups.map(group => this.fetchRoles(group))
     Promise.all(groupReqs)
       .then(responses => {
         const roles = responses.map(res => res.data)
         apiStore.add(roles, 'roles')
+
+        if (uiStore.orgCreated) {
+          uiStore.update('orgCreated', false)
+          uiStore.alert({
+            iconName: 'Ok',
+            prompt: 'Your organization has been created',
+          })
+          // send you to add members to the newly created org
+          this.goToEditGroupRoles(apiStore.currentUserOrganization.primary_group)
+        }
       })
-      .catch((err) => console.warn(err))
+      .catch(() => {
+        uiStore.defaultAlertError()
+      })
   }
 
   fetchRoles = (group) => {
@@ -58,17 +72,43 @@ class OrganizationMenu extends React.Component {
     this.editGroup = {}
   }
 
-  onOrganizationSave = () => {
+  saveOrganization = (primaryGroup) => {
+    primaryGroup.save()
     this.changePage('organizationPeople')
   }
 
-  @action onNewGroupSave = async (newGroup) => {
-    const { apiStore } = this.props
-    this.editGroup = {}
+  createOrganization = async (organizationData) => {
+    const { apiStore, uiStore } = this.props
+    const newOrg = new Organization(organizationData, apiStore)
+    try {
+      this.isLoading = true
+      await newOrg.save()
+      await apiStore.currentUser.switchOrganization(newOrg.id,
+        { backToHomepage: true })
+      this.isLoading = false
+      uiStore.update('orgCreated', true)
+    } catch (err) {
+      this.isLoading = false
+      uiStore.alert({
+        prompt: err.error[0],
+      })
+    }
+  }
+
+  @action createGroup = async (groupData) => {
+    const { apiStore, uiStore } = this.props
+    const newGroup = new Group(toJS(groupData), apiStore)
+    try {
+      await newGroup.save()
+    } catch (err) {
+      uiStore.defaultAlertError()
+    }
+    // Re-fetch current user that has the new group now
+    apiStore.fetch('users', apiStore.currentUserId)
     this.goToEditGroupRoles(newGroup)
-    this.isLoading = true
-    const res = await this.fetchRoles(newGroup)
     // because this is after async/await
+    runInAction(() => { this.isLoading = true })
+    const res = await this.fetchRoles(newGroup)
     runInAction(() => { this.isLoading = false })
     apiStore.sync(res)
   }
@@ -92,12 +132,34 @@ class OrganizationMenu extends React.Component {
     group.API_archive()
   }
 
-  renderEditGroup() {
+  renderAddGroup() {
     return (
       <GroupModify
-        group={this.editGroup}
-        onGroupRoles={this.onGroupRoles(this.editGroup)}
-        onSave={this.onNewGroupSave}
+        group={{}}
+        onSave={this.createGroup}
+      />
+    )
+  }
+
+  renderCreateOrganization() {
+    return (
+      <GroupModify
+        group={{}}
+        onSave={this.createOrganization}
+        groupType="Organization"
+      />
+    )
+  }
+
+  renderEditOrganization() {
+    const { organization } = this.props
+    const editGroup = organization.primary_group
+    return (
+      <GroupModify
+        onGroupRoles={this.onGroupRoles(editGroup)}
+        group={editGroup}
+        onSave={this.saveOrganization}
+        groupType="Organization"
       />
     )
   }
@@ -128,17 +190,6 @@ class OrganizationMenu extends React.Component {
     )
   }
 
-  renderEditOrganization() {
-    const { organization } = this.props
-    return (
-      <GroupModify
-        group={organization.primary_group}
-        onGroupRoles={this.onGroupRoles(organization.primary_group)}
-        onSave={this.onOrganizationSave}
-      />
-    )
-  }
-
   renderGroupTitle() {
     return (
       <GroupTitle
@@ -154,19 +205,19 @@ class OrganizationMenu extends React.Component {
     let content, title, onBack, onEdit
     switch (this.currentPage) {
     case 'addGroup':
-      content = this.renderEditGroup()
+      content = this.renderAddGroup()
       title = 'New Group'
       onBack = this.goBack
+      break
+    case 'newOrganization':
+      title = 'New Organization'
+      onBack = this.goBack
+      content = this.renderCreateOrganization()
       break
     case 'editOrganization':
       title = 'Your Organization'
       onBack = this.goBack
       content = this.renderEditOrganization()
-      break
-    case 'editGroup':
-      content = this.renderEditGroup()
-      title = this.editGroup.id ? this.renderGroupTitle() : 'New Group'
-      onBack = this.goBack
       break
     case 'editRoles':
       onBack = this.goBack

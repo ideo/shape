@@ -1,7 +1,5 @@
 class Organization < ApplicationRecord
-  include HasFilestackFile
-
-  has_many :collections, -> { root }
+  has_many :collections, dependent: :destroy
   has_many :groups, dependent: :destroy
   belongs_to :primary_group,
              class_name: 'Group',
@@ -26,12 +24,10 @@ class Organization < ApplicationRecord
   validates :name, presence: true
 
   def self.create_for_user(user)
-    o = Organization.new
-    o.name = [user.first_name, user.last_name, 'Organization'].compact.join(' ')
-    if o.save
-      user.add_role(Role::ADMIN, o.primary_group)
-    end
-    o
+    name = [user.first_name, user.last_name, 'Organization'].compact.join(' ')
+    builder = OrganizationBuilder.new({ name: name }, user)
+    builder.save
+    builder.organization
   end
 
   # Note: this method can be called many times for the same org

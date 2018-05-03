@@ -25,13 +25,21 @@ class CollectionCard < ApplicationRecord
     recognize []
   end
 
-  def duplicate!(for_user:, parent: self.parent, shallow: false, update_order: false)
+  def duplicate!(
+    for_user:,
+    parent: self.parent,
+    shallow: false,
+    update_order: false,
+    duplicate_linked_records: false
+  )
     if record.is_a? Collection::SharedWithMeCollection
       errors.add(:collection, 'cannot be a SharedWithMeCollection for duplication')
       return self
     end
-    if link?
-      # calling "Duplicate" on a link should create a real duplicate of the underlying record
+    if link? && duplicate_linked_records
+      # this option will create a real duplicate of the underlying record.
+      # should only be used at the topmost level, e.g. if you duplicate a linked collection,
+      # all the links *within* that collection should remain as links
       return record.parent_collection_card.duplicate!(
         for_user: for_user,
         parent: parent,
@@ -45,7 +53,8 @@ class CollectionCard < ApplicationRecord
     # place card at end
     cc.order = parent.collection_cards.count
 
-    unless shallow
+    unless shallow || link?
+      # don't copy underlying record if shallow/link option and we didn't use `duplicate_linked_records`
       cc.collection = collection.duplicate!(for_user: for_user) if collection.present?
       cc.item = item.duplicate!(for_user: for_user) if item.present?
     end

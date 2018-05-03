@@ -94,8 +94,6 @@ class CollectionGrid extends React.Component {
   // <Drag related functions>
   // --------------------------
   onResize = (cardId, newSize) => {
-    const { uiStore } = this.props
-
     const positionedCard = _.find(this.state.cards, { id: cardId })
     const placeholderKey = `${cardId}-placeholder`
     const stateCards = [...this.state.cards]

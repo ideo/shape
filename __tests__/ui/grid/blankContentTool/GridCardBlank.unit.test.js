@@ -35,6 +35,10 @@ describe('GridCardBlank', () => {
       expect(wrapper.find('BctButton').length).toBe(4)
     })
 
+    it('renders the close button', () => {
+      expect(wrapper.find('button.close').exists()).toBeTruthy()
+    })
+
     it('opens CollectionCreator when clicking button 1', () => {
       wrapper.find('BctButton').at(0).simulate('click')
       expect(wrapper.state().creating).toEqual('collection')
@@ -66,6 +70,24 @@ describe('GridCardBlank', () => {
       expect(newCard.API_create).toHaveBeenCalledWith({ isReplacing: false })
       // should not call archive
       expect(replacingCard.API_archive).not.toHaveBeenCalled()
+    })
+  })
+
+  describe('with an empty collection', () => {
+    beforeEach(() => {
+      props.uiStore.blankContentToolState = {
+        order: 0,
+        width: 1,
+        height: 1,
+        emptyCollection: true,
+      }
+      wrapper = shallow(
+        <GridCardBlank.wrappedComponent {...props} />
+      )
+    })
+
+    it('does not render the close button', () => {
+      expect(wrapper.find('button.close').exists()).toBeFalsy()
     })
   })
 

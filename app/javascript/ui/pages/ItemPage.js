@@ -72,12 +72,16 @@ class ItemPage extends PageWithApi {
     if (item.parent) item.parent.checkCurrentOrg()
   }
 
-  refetchItem = async () => {
-    const { apiStore } = this.props
+  updateItem = (itemTextData) => {
     const { item } = this.state
-    const { data } = await apiStore.fetch('items', item.id, { force: true })
-    this.setState({ item: data })
+    item.text_data = itemTextData
+
+    this.setState({ item })
   }
+
+  save = (item, { cancel_sync = true } = {}) => (
+    item.API_updateWithoutSync({ cancel_sync })
+  )
 
   // could be smarter or broken out once we want to do different things per type
   get content() {
@@ -91,7 +95,8 @@ class ItemPage extends PageWithApi {
           item={item}
           actionCableConsumer={ActionCableConsumer}
           currentUserId={currentUserId}
-          handleRefetchItem={this.refetchItem}
+          onUpdatedData={this.updateItem}
+          onSave={this.save}
         />
       )
     case ITEM_TYPES.IMAGE:
