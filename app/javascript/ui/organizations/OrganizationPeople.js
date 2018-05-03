@@ -14,7 +14,7 @@ const RemoveIconHolder = styled.button`
 class OrganizationPeople extends React.PureComponent {
   renderUserGroups = () => {
     const { userGroups } = this.props
-    const groups = userGroups.filter(g => !g.isNormalGroup)
+    const groups = userGroups.filter(g => g.isNormalGroup)
     if (!groups.length) {
       return (
         <SubduedText>You have not been added to any groups.</SubduedText>
