@@ -19,7 +19,7 @@ class OrganizationPeople extends React.PureComponent {
         <SubduedText>You have not been added to any groups.</SubduedText>
       )
     }
-    return userGroups.map(group => (
+    return groups.map(group => (
       <Row key={group.id}>
         <button
           className="groupEdit"
