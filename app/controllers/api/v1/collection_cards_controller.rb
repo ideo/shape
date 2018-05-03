@@ -68,7 +68,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
 
   def duplicate
     placement = json_api_params[:placement]
-    # reverse cards since they get duplicated one by one to the front
+    # reverse cards for 'beginning' since they get duplicated one by one to the front
     @cards = @cards.reverse if placement == 'beginning'
     @cards.each do |card|
       card.duplicate!(

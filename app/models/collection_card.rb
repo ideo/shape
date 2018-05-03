@@ -29,7 +29,7 @@ class CollectionCard < ApplicationRecord
     for_user:,
     parent: self.parent,
     shallow: false,
-    placement: 'beginning',
+    placement: 'end',
     duplicate_linked_records: false
   )
     if record.is_a? Collection::SharedWithMeCollection

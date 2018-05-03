@@ -424,8 +424,8 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
         # newly created cards should be duplicates
         first_cards = to_collection.collection_cards.first(2)
         expect(first_cards.map(&:item)).not_to match_array moving_cards.map(&:item)
-        # names should match
-        expect(first_cards.map(&:item).map(&:name)).to match_array moving_cards.map(&:item).map(&:name)
+        # names should match, in same order
+        expect(first_cards.map(&:item).map(&:name)).to eq moving_cards.map(&:item).map(&:name)
         expect(to_collection.collection_cards.first.primary?).to be true
       end
     end
