@@ -4,10 +4,12 @@ import styled from 'styled-components'
 import v from '~/utils/variables'
 
 const StyledContainer = styled.main`
+  display: block;
   max-width: ${v.maxWidth}px;
   margin: ${props => props.marginTop}px auto 0;
   padding: 0 ${v.containerPadding.horizontal};
   position: relative;
+  width: 100%;
 `
 
 const PageContainer = ({ children, marginTop }) => (

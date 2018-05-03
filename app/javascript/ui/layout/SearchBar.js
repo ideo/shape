@@ -21,7 +21,6 @@ const StyledSearchBar = styled.div`
     width: 140px;
   }
 
-
   input {
     display: inline-block;
     width: 60%;
@@ -35,15 +34,18 @@ const StyledSearchBar = styled.div`
     }
   }
 
-  svg {
-    /* search icon is flipped from the designs */
-    display: inline-block;
-    transform: scaleX(-1);
-    height: 14px;
-    width: 14px;
-    position: relative;
-    top: 3px;
+  .icon {
+    display: inline;
   }
+
+  svg {
+    display: inline;
+    height: 18px;
+    margin-bottom: -7px;
+    padding-top: 4px;
+    width: 18px;
+  }
+
   .close {
     position: absolute;
     right: 2px;
