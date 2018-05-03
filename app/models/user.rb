@@ -93,7 +93,7 @@ class User < ApplicationRecord
       password: Devise.friendly_token(40),
       invitation_token: Devise.friendly_token(40),
     )
-    organization.add_new_user(user)
+    organization.setup_user_membership(user)
     user
   end
 
@@ -217,7 +217,7 @@ class User < ApplicationRecord
       # org guests don't get to see the guest group
       groups = groups.reject { |g| g == organization.guest_group }
     end
-    groups
+    groups.compact.uniq
   end
 
   private

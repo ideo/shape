@@ -74,7 +74,7 @@ describe Users::OmniauthCallbacksController, type: :request do
 
       before do
         # should add to guest group
-        organization.add_new_user(user)
+        organization.setup_user_membership(user)
         OmniAuth.config.mock_auth[:okta] = OmniAuth::AuthHash.new(
           provider: 'okta',
           uid: user.uid,

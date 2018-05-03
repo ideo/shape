@@ -56,13 +56,13 @@ class Organization < ApplicationRecord
   # doublecheck happens when you finally sign in, at which point your email may have updated based on your network profile.
   # at that point, we don't need to "revoke" primary -- e.g. you were invited whitelisted, but signed in with personal
   # but we do want to switch you to the org if you switched to your whitelisted domain email
-  def add_new_user(user, doublecheck: false)
+  def setup_user_membership(user, doublecheck: false)
     if matches_domain_whitelist?(user)
       # add them as an org member
       user.add_role(Role::MEMBER, primary_group)
       # remove guest role if exists, do this second so that you don't temporarily lose org membership
       user.remove_role(Role::MEMBER, guest_group)
-    elsif !doublecheck
+    elsif !doublecheck && !primary_group.can_view?(user)
       # or else as a guest member if their domain doesn't match
       user.add_role(Role::MEMBER, guest_group)
     end
@@ -90,7 +90,7 @@ class Organization < ApplicationRecord
 
   def check_guests_for_domain_match
     guest_group.members[:users].each do |user|
-      add_new_user(user, doublecheck: true)
+      setup_user_membership(user, doublecheck: true)
     end
   end
 

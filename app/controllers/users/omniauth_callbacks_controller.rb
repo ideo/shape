@@ -7,7 +7,7 @@ class Users::OmniauthCallbacksController < Devise::OmniauthCallbacksController
     end
     @user = User.from_omniauth(request.env['omniauth.auth'], pending_user)
     if @user.save
-      setup_org_connection(@user)
+      setup_org_membership(@user)
       # this will throw if @user is not activated
       # will also redirect to stored path from any previous 401
       sign_in_and_redirect @user, event: :authentication
@@ -23,10 +23,10 @@ class Users::OmniauthCallbacksController < Devise::OmniauthCallbacksController
 
   private
 
-  def setup_org_connection(user)
+  def setup_org_membership(user)
     if @user.current_organization.present?
       # double check if they're now signed in with a whitelisted email
-      @user.current_organization.add_new_user(@user, doublecheck: true)
+      @user.current_organization.setup_user_membership(@user, doublecheck: true)
     else
       Organization.create_for_user(user)
     end

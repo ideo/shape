@@ -116,14 +116,14 @@ describe Organization, type: :model do
     end
   end
 
-  describe '#add_new_user' do
+  describe '#setup_user_membership' do
     let(:user) { create(:user, email: 'jill@ideo.com') }
     let(:guest) { create(:user, email: 'jack@gmail.com') }
     let(:organization) { create(:organization, domain_whitelist: ['ideo.com']) }
 
     before do
-      organization.add_new_user(user)
-      organization.add_new_user(guest)
+      organization.setup_user_membership(user)
+      organization.setup_user_membership(guest)
     end
 
     it 'adds as an org member if they match the domain' do
