@@ -64,10 +64,11 @@ class CollectionPage extends PageWithApi {
   onAPILoad = (response) => {
     const collection = response.data
     const { uiStore } = this.props
+    uiStore.setViewingCollection(collection)
+    // setViewingCollection has to happen first bc we use it in openBlankContentTool
     if (!collection.collection_cards.length) {
       uiStore.openBlankContentTool()
     }
-    uiStore.setViewingCollection(collection)
     collection.checkCurrentOrg()
   }
 
