@@ -39,8 +39,10 @@ module RolifyExtensions
     begin
       role = Role.find_or_create(role_name, resource)
       if is_a?(User)
+        return role if role.users.include? self
         role.users << self
       elsif is_a?(Group)
+        return role if role.groups.include? self
         role.groups << self
       else
         raise "RolifyExtension: Unsupported model '#{self.class.name}' for add_role"
