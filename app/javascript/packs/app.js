@@ -1,4 +1,5 @@
 /* eslint global-require: 0 */
+import "babel-polyfill";
 import ReactDOM from 'react-dom'
 import createBrowserHistory from 'history/createBrowserHistory'
 import { useStrict } from 'mobx'
