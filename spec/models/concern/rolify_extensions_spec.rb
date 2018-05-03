@@ -19,7 +19,7 @@ describe RolifyExtensions, type: :concern do
         expect {
           user.add_role(Role::EDITOR, collection)
         }.to change {
-          user.has_role_by_identifier?(Role::EDITOR, collection.resource_identifier)
+          user.reload.has_role_by_identifier?(Role::EDITOR, collection.resource_identifier)
         }.from(false).to(true)
       end
 
@@ -28,7 +28,7 @@ describe RolifyExtensions, type: :concern do
         expect {
           user.remove_role(Role::EDITOR, collection)
         }.to change {
-          user.has_role_by_identifier?(Role::EDITOR, collection.resource_identifier)
+          user.reload.has_role_by_identifier?(Role::EDITOR, collection.resource_identifier)
         }.from(true).to(false)
       end
     end
