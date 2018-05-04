@@ -26,10 +26,7 @@ const duplicate = async (type, obj) => {
     await obj.apiStore.request(`${type}/${obj.id}/duplicate`, 'POST')
     // send to My Collection to view created duplicate
     routingStore.routeTo('/')
-    uiStore.alert({
-      prompt: 'Your duplicate has been created in My Collection',
-      iconName: 'Ok',
-    })
+    uiStore.alertOk('Your duplicate has been created in My Collection')
     uiStore.scroll.scrollToBottom()
   } catch (e) {
     uiStore.defaultAlertError()

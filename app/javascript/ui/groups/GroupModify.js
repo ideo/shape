@@ -99,9 +99,7 @@ class GroupModify extends React.Component {
           this.changeUrl(fileAttrs.url)
         },
         onFailure: (filesFailed) => {
-          uiStore.alert({
-            prompt: `Failed to upload image: ${filesFailed}`,
-          })
+          uiStore.alert(`Failed to upload image: ${filesFailed}`)
         }
       })
   }

@@ -57,7 +57,7 @@ class CollectionCard extends BaseRecord {
     }
     try {
       await this.apiStore.request('collection_cards/link', 'POST', data)
-      uiStore.alert({ iconName: 'Ok', prompt: 'Added to your collection' })
+      uiStore.alertOk('Added to your collection')
     } catch (e) {
       uiStore.defaultAlertError()
     }

@@ -39,6 +39,8 @@ const fakeUiStore = {
   openMoveMenu: jest.fn(),
   update: jest.fn(),
   alert: jest.fn(),
+  alertOk: jest.fn(),
+  defaultAlertError: jest.fn(),
   confirm: jest.fn(),
   closeDialog: jest.fn(),
   cardAction: 'move',

@@ -1,7 +1,9 @@
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
-import v from '~/utils/variables'
 import Snackbar, { SnackbarContent } from 'material-ui/Snackbar'
+import Tooltip from 'material-ui/Tooltip'
+
+import v from '~/utils/variables'
 import MoveArrowIcon from '~/ui/icons/MoveArrowIcon'
 import CloseIcon from '~/ui/icons/CloseIcon'
 
@@ -23,6 +25,13 @@ const StyledSnackbarContent = styled(SnackbarContent)`
     max-width: none;
     padding: 15px 30px;
     width: 100%;
+  }
+`
+
+const StyledTooltip = styled(Tooltip)`
+  .Tooltip {
+    font-size: 0.75rem;
+    font-family: ${v.fonts.sans};
   }
 `
 
@@ -53,33 +62,29 @@ class MoveModal extends React.Component {
   handleClose = (ev) => {
     ev.preventDefault()
     const { uiStore } = this.props
-    uiStore.closeMoveMenu()
     // Notify the user if they're on a different collection
     if (uiStore.viewingCollection &&
         uiStore.movingFromCollectionId !== uiStore.viewingCollection.id) {
       if (uiStore.cardAction === 'move') {
-        uiStore.alert({
-          prompt: 'Your items have been returned to their original location',
-          iconName: 'Back',
-        })
+        uiStore.alert(
+          'Your items have been returned to their original location',
+          'Back'
+        )
       }
     }
+    uiStore.closeMoveMenu()
   }
 
   moveCards = async (placement) => {
     const { uiStore, apiStore } = this.props
     // Viewing collection might not be set, such as on the search page
     if (!uiStore.viewingCollection) {
-      uiStore.alert({
-        prompt: 'You can\'t move an item here',
-      })
+      uiStore.alert('You can\'t move an item here')
       return
     }
     const collectionId = uiStore.viewingCollection.id
     if (!uiStore.viewingCollection.can_edit) {
-      uiStore.alert({
-        prompt: 'You don\'t have permission to move items to this collection',
-      })
+      uiStore.alert('You don\'t have permission to move items to this collection')
       return
     }
     const data = {
@@ -89,16 +94,21 @@ class MoveModal extends React.Component {
       placement,
     }
     try {
+      let successMessage
       if (uiStore.cardAction === 'move') {
         await apiStore.request('collection_cards/move', 'PATCH', data)
+        successMessage = 'Items successfully moved!'
       } else if (uiStore.cardAction === 'link') {
         await apiStore.request('collection_cards/link', 'POST', data)
+        successMessage = 'Items successfully linked!'
       } else if (uiStore.cardAction === 'duplicate') {
         await apiStore.request('collection_cards/duplicate', 'POST', data)
         // have to re-fetch here because the duplicate method wasn't re-rendering
         // see note in collection_cards_controller#duplicate
         await apiStore.request(`collections/${collectionId}`)
+        successMessage = 'Items successfully duplicated!'
       }
+      uiStore.alertOk(successMessage)
       uiStore.resetSelectionAndBCT()
       uiStore.closeMoveMenu()
       if (placement === 'beginning') {
@@ -107,9 +117,7 @@ class MoveModal extends React.Component {
         uiStore.scroll.scrollToBottom()
       }
     } catch (e) {
-      uiStore.alert({
-        prompt: 'You cannot move a collection within itself',
-      })
+      uiStore.alert('You cannot move a collection within itself')
     }
   }
 
@@ -123,7 +131,11 @@ class MoveModal extends React.Component {
 
   render() {
     const { uiStore } = this.props
+    const { cardAction } = uiStore
     const amount = uiStore.movingCardIds.length
+    const moveMessage = cardAction === 'move'
+      ? `${amount} in transit`
+      : `${amount} selected to ${cardAction}`
 
     return (
       <div>
@@ -134,23 +146,42 @@ class MoveModal extends React.Component {
           >
             <StyledSnackbarContent
               classes={{ root: 'SnackbarContent', }}
-              message={<StyledMoveText id="message-id">
-                {amount} in transit</StyledMoveText>}
+              message={
+                <StyledMoveText id="message-id">{moveMessage}</StyledMoveText>
+              }
               action={[
                 <IconHolder key="moveup">
-                  <button onClick={this.handleMoveToBeginning}>
-                    <MoveArrowIcon direction="up" />
-                  </button>
+                  <StyledTooltip
+                    classes={{ tooltip: 'Tooltip' }}
+                    title="Place at top"
+                    placement="top"
+                  >
+                    <button onClick={this.handleMoveToBeginning}>
+                      <MoveArrowIcon direction="up" />
+                    </button>
+                  </StyledTooltip>
                 </IconHolder>,
                 <IconHolder key="movedown">
-                  <button onClick={this.handleMoveToEnd}>
-                    <MoveArrowIcon direction="down" />
-                  </button>
+                  <StyledTooltip
+                    classes={{ tooltip: 'Tooltip' }}
+                    title="Place at bottom"
+                    placement="top"
+                  >
+                    <button onClick={this.handleMoveToEnd}>
+                      <MoveArrowIcon direction="down" />
+                    </button>
+                  </StyledTooltip>
                 </IconHolder>,
                 <CloseIconHolder key="close">
-                  <button onClick={this.handleClose}>
-                    <CloseIcon />
-                  </button>
+                  <StyledTooltip
+                    classes={{ tooltip: 'Tooltip' }}
+                    title="Cancel"
+                    placement="top"
+                  >
+                    <button onClick={this.handleClose}>
+                      <CloseIcon />
+                    </button>
+                  </StyledTooltip>
                 </CloseIconHolder>,
               ]}
             />
