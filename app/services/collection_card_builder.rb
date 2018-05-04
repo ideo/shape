@@ -20,18 +20,19 @@ class CollectionCardBuilder
       return false
     end
 
+    # TODO: rollback transaction if these later actions fail; add errors, return false
     @collection_card.save.tap do |result|
       if result
-        # TODO: rollback transaction if these later actions fail; add errors, return false
-        @collection_card.record.inherit_roles_from_parent!
-        # NOTE: should items created in My Collection get this access as well?
+        record = @collection_card.record
+        record.inherit_roles_from_parent!
         if @collection_card.record_type == :collection
-          @collection_card.record.allow_primary_group_view_access
-          @collection_card.record.update(created_by: @user)
+          # NOTE: should items created in My Collection get this access as well?
+          record.allow_primary_group_view_access if record.parent_is_user_collection?
+          record.update(created_by: @user)
         end
         @collection_card.parent.cache_cover! if @collection_card.should_update_parent_collection_cover?
         @collection_card.increment_card_orders!
-        @collection_card.record.reload.recalculate_breadcrumb!
+        record.reload.recalculate_breadcrumb!
       end
     end
   end

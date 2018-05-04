@@ -86,6 +86,8 @@ describe Collection, type: :model do
 
   describe '#duplicate' do
     let!(:user) { create(:user) }
+    let!(:parent_collection_user) { create(:user) }
+    let!(:collection_user) { create(:user) }
     let!(:parent_collection) { create(:collection) }
     let!(:collection) { create(:collection, num_cards: 5, tag_list: %w[Prototype Other]) }
     let!(:parent_collection_card) do
@@ -127,7 +129,10 @@ describe Collection, type: :model do
 
     context 'with editor role' do
       before do
+        user.add_role(Role::EDITOR, parent)
         user.add_role(Role::EDITOR, collection)
+        parent_collection_user.add_role(Role::EDITOR, parent)
+        collection_user.add_role(Role::EDITOR, collection)
         collection.items.each do |item|
           user.add_role(Role::EDITOR, item)
         end
@@ -148,8 +153,8 @@ describe Collection, type: :model do
         collection.duplicate!(for_user: user)
       end
 
-      it 'clones all roles on collection' do
-        expect(duplicate.roles.map(&:name)).to match(collection.roles.map(&:name))
+      it 'clones all roles from parent collection' do
+        expect(duplicate.editors[:users].map(&:email)).to match(parent.editors[:users].map(&:email))
         expect(duplicate.can_edit?(user)).to be true
       end
 

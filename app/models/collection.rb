@@ -198,8 +198,14 @@ class Collection < ApplicationRecord
       c.parent_collection_card.collection = c
     end
 
-    roles.each do |role|
+    # copy roles from parent (i.e. where it's being placed)
+    parent.roles.each do |role|
       c.roles << role.duplicate!(assign_resource: c)
+    end
+    # NOTE: different from parent_is_user_collection? since we are not necessarily
+    # checking self.parent
+    if parent.is_a? Collection::UserCollection
+      c.allow_primary_group_view_access
     end
     # make sure duplicate creator becomes an editor
     for_user.upgrade_to_editor_role(c)
@@ -264,7 +270,6 @@ class Collection < ApplicationRecord
   end
 
   def allow_primary_group_view_access
-    return unless parent_is_user_collection?
     organization.primary_group.add_role(Role::VIEWER, self)
   end
 
@@ -301,6 +306,10 @@ class Collection < ApplicationRecord
     self.class.name == 'Collection'
   end
 
+  def parent_is_user_collection?
+    parent.is_a? Collection::UserCollection
+  end
+
   def cache_key
     "#{jsonapi_cache_key}" \
       "/cards_#{collection_cards.maximum(:updated_at).to_i}" \
@@ -332,9 +341,5 @@ class Collection < ApplicationRecord
     return true if organization.present?
     return true unless parent_collection.present?
     self.organization_id = parent_collection.organization_id
-  end
-
-  def parent_is_user_collection?
-    parent.is_a? Collection::UserCollection
   end
 end

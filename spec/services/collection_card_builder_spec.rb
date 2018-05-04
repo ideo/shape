@@ -63,6 +63,11 @@ RSpec.describe CollectionCardBuilder, type: :service do
         expect(created_collection.breadcrumb.last).to eq crumb
       end
 
+      it 'should not give the primary group view access to the collection by default' do
+        expect(builder.create).to be true
+        expect(organization.primary_group.has_role?(Role::VIEWER, builder.collection_card.collection)).to be false
+      end
+
       describe 'creating card with collection in UserCollection' do
         let(:parent) do
           create(:user_collection, organization: organization, add_editors: [user])
@@ -74,7 +79,6 @@ RSpec.describe CollectionCardBuilder, type: :service do
         end
       end
     end
-
 
     context 'success creating card with item' do
       let(:builder) do
