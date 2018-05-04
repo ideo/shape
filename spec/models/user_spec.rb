@@ -20,22 +20,31 @@ describe User, type: :model do
   context 'callbacks' do
     let!(:org) { create(:organization) }
     let(:org_group) { org.primary_group }
+    let(:org_guest_group) { org.guest_group }
     let!(:org_2) { create(:organization) }
     let(:org_2_group) { org_2.primary_group }
 
     describe '#after_add_role' do
-      before do
+      it 'should set current_organization' do
         user.add_role(Role::MEMBER, org_group)
-        user.reload
+        expect(user.reload.current_organization).to eq(org)
       end
 
-      it 'should set current_organization' do
-        expect(user.current_organization).to eq(org)
+      it 'should set current_organization when added to guest group' do
+        user.add_role(Role::MEMBER, org_guest_group)
+        expect(user.reload.current_organization).to eq(org)
       end
 
       it 'should not override current_organization if already set' do
+        user.add_role(Role::MEMBER, org_group)
         user.add_role(Role::MEMBER, org_2_group)
         expect(user.reload.current_organization).to eq(org)
+      end
+
+      it 'should remove user from guest group if they are added to primary' do
+        user.add_role(Role::MEMBER, org_guest_group)
+        user.add_role(Role::MEMBER, org_group)
+        expect(user.reload.has_role?(Role::MEMBER, org_guest_group)).to be false
       end
     end
 

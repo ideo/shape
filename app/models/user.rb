@@ -233,6 +233,11 @@ class User < ApplicationRecord
     if resource.is_a?(Group)
       organization = resource.organization
       organization.user_role_added(self)
+
+      # if they were added directly to primary group, remove them from guest
+      if resource.primary?
+        remove_role(Role::MEMBER, resource.organization.guest_group)
+      end
     end
 
     # Reindex record if it is a searchkick model
