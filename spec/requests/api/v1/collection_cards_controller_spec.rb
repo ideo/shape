@@ -2,7 +2,13 @@ require 'rails_helper'
 
 describe Api::V1::CollectionCardsController, type: :request, json: true, auth: true do
   let(:user) { @user }
-  let(:collection) { create(:collection, add_editors: [user]) }
+  let(:collection) do
+    create(:collection, add_editors: [user], organization: user.current_organization)
+  end
+
+  before do
+    @user.reload
+  end
 
   describe 'GET #index' do
     let!(:collection) { create(:collection, num_cards: 5, add_editors: [user]) }

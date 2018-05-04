@@ -45,7 +45,7 @@ describe Api::V1::GroupsController, type: :request, json: true, auth: true do
   end
 
   describe 'POST #create' do
-    let!(:organization) { create(:organization, admin: user) }
+    let!(:organization) { create(:organization) }
     let(:current_user) { user }
     let(:path) { '/api/v1/groups' }
     let(:params) do
@@ -59,6 +59,10 @@ describe Api::V1::GroupsController, type: :request, json: true, auth: true do
     end
 
     context 'without org admin access' do
+      before do
+        user.remove_role(Role::ADMIN, user.current_organization.primary_group)
+      end
+
       it 'returns a 401 if user is not an org admin' do
         post(path, params: params)
         expect(response.status).to eq(401)

@@ -1,6 +1,6 @@
 module SessionHelper
   def log_in_as_user(user = nil)
-    @user ||= user || create(:user, add_to_org: create(:organization))
+    @user ||= user || create(:user)
     login_as(@user, scope: :user)
     @user
   end

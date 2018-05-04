@@ -33,6 +33,7 @@ module Roles
     def call
       return false unless valid_object_and_role_name?
       assign_role_to_users
+      setup_org_membership if @invited_by && @new_role
       notify_users if @invited_by && @new_role
       assign_role_to_groups
       link_to_shared_collections if @new_role
@@ -50,6 +51,13 @@ module Roles
         else
           @failed_users << user
         end
+      end
+    end
+
+    def setup_org_membership
+      @users.each do |user|
+        # if it's an item, @object.organization delegates to the parent collection
+        @object.organization.setup_user_membership_and_collections(user)
       end
     end
 

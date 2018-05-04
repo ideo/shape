@@ -34,7 +34,6 @@ class Api::V1::UsersController < Api::V1::BaseController
   def create_from_emails
     cpu = CreatePendingUsers.new(
       emails: json_api_params[:emails],
-      organization: current_organization,
     )
     if cpu.call
       render jsonapi: cpu.users

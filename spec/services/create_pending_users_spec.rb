@@ -5,8 +5,7 @@ RSpec.describe CreatePendingUsers, type: :service do
 
   describe '#call' do
     let(:emails) { Array.new(3).map { Faker::Internet.email } }
-    let(:org) { create(:organization) }
-    let(:subject) { CreatePendingUsers.new(emails: emails, organization: org) }
+    let(:subject) { CreatePendingUsers.new(emails: emails) }
 
     it 'should return pending users for all emails' do
       subject.call
@@ -15,13 +14,8 @@ RSpec.describe CreatePendingUsers, type: :service do
       expect(subject.failed_emails).to be_empty
     end
 
-    it 'should set pending users current_organization_id to organization_id' do
-      subject.call
-      expect(subject.users.map(&:current_organization_id).uniq).to match_array([org.id])
-    end
-
     it 'should strip any whitespace' do
-      cpu = CreatePendingUsers.new(emails: ['email@address.com '], organization: org)
+      cpu = CreatePendingUsers.new(emails: ['email@address.com '])
       cpu.call
       expect(cpu.users.first.email).to eq('email@address.com')
     end

@@ -6,7 +6,7 @@ describe RolifyExtensions, type: :concern do
   let(:user) { create(:user) }
 
   before do
-    user.add_role(Role::MEMBER, organization.primary_group)
+    organization.setup_user_membership(user)
   end
 
   it 'should have concern included' do

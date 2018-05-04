@@ -13,8 +13,8 @@ class Api::V1::GroupsController < Api::V1::BaseController
     render jsonapi: @group, include: [roles: %i[users groups]]
   end
 
+  before_action :authorize_current_organization, only: %i[create]
   def create
-    authorize! :update, current_organization
     @group.organization = current_organization
     if @group.save
       current_user.add_role(Role::ADMIN, @group)
@@ -42,6 +42,10 @@ class Api::V1::GroupsController < Api::V1::BaseController
   end
 
   private
+
+  def authorize_current_organization
+    authorize! :manage, current_organization
+  end
 
   def group_params
     params.require(:group).permit(
