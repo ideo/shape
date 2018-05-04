@@ -21,10 +21,7 @@ class OrganizationMenu extends React.Component {
 
     if (uiStore.orgCreated) {
       uiStore.update('orgCreated', false)
-      uiStore.alert({
-        iconName: 'Ok',
-        prompt: 'Your organization has been created',
-      })
+      uiStore.alertOk('Your organization has been created')
       // send you to add members to the newly created org
       this.goToEditGroupRoles(apiStore.currentUserOrganization.primary_group)
     }
@@ -75,9 +72,7 @@ class OrganizationMenu extends React.Component {
       uiStore.update('orgCreated', true)
     } catch (err) {
       this.isLoading = false
-      uiStore.alert({
-        prompt: err.error[0],
-      })
+      uiStore.alert(err.error[0])
     }
   }
 
