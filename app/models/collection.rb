@@ -202,8 +202,7 @@ class Collection < ApplicationRecord
     parent.roles.each do |role|
       c.roles << role.duplicate!(assign_resource: c)
     end
-    # NOTE: different from parent_is_user_collection? since we are not necessarily
-    # checking self.parent
+    # NOTE: different from parent_is_user_collection? since `parent` is passed in
     if parent.is_a? Collection::UserCollection
       c.allow_primary_group_view_access
     end

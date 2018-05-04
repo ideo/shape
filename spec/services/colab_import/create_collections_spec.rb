@@ -5,10 +5,13 @@ RSpec.describe ColabImport::CreateCollections, type: :service do
     let(:concept_uids) { '-L2MabbTxWEL7FBgL_oL' }
     let(:editor) { create(:user) }
     let(:organization) { create(:organization) }
+    let(:parent_collection) { create(:collection) }
+    let(:card) { create(:collection_card, parent: parent_collection) }
     let!(:template_collection) do
       create(:collection,
              num_cards: 9,
-             organization: organization
+             organization: organization,
+             parent_collection_card: card,
            )
     end
     let(:create_collections) do
