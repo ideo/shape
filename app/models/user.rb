@@ -18,7 +18,13 @@ class User < ApplicationRecord
            through: :roles,
            source: :resource,
            source_type: 'Group'
-  has_many :organizations, -> { distinct }, through: :groups, class_name: 'Organization'
+  has_many :current_org_groups,
+           ->(u) { active.where(organization_id: u.current_organization_id) },
+           through: :roles,
+           source: :resource,
+           source_type: 'Group'
+
+  has_many :organizations, -> { distinct }, through: :groups
   has_many :users_roles
   belongs_to :current_organization,
              class_name: 'Organization',
@@ -58,6 +64,10 @@ class User < ApplicationRecord
     }
   end
 
+  def self.all_active_except(user_id)
+    active.where.not(id: user_id).order(first_name: :asc)
+  end
+
   def self.from_omniauth(auth, pending_user)
     user = where(provider: auth.provider, uid: auth.uid).first
 
@@ -87,9 +97,7 @@ class User < ApplicationRecord
       password: Devise.friendly_token(40),
       invitation_token: Devise.friendly_token(40),
     )
-    # NOTE: The user is not officially a member of this org, but we add them
-    # so that they have the proper current_organization_id and shared/my collections
-    organization.user_role_added(user)
+    organization.setup_user_membership(user)
     user
   end
 
@@ -145,12 +153,6 @@ class User < ApplicationRecord
   def current_shared_collection(org_id = current_organization_id)
     return nil unless current_organization_id
     collections.shared_with_me.find_by_organization_id(org_id)
-  end
-
-  def current_org_groups
-    return [] if current_organization.blank?
-
-    groups.where(organization_id: current_organization_id)
   end
 
   def viewable_collections_and_items(organization)
@@ -209,6 +211,19 @@ class User < ApplicationRecord
         .map(&:identifier)
   end
 
+  def current_org_groups_and_special_groups
+    groups = current_org_groups.to_a
+    organization = current_organization
+    if groups.include?(organization.primary_group)
+      # org members get to see the guest group
+      groups << organization.guest_group
+    elsif groups.include?(organization.guest_group)
+      # org guests don't get to see the guest group
+      groups = groups.reject { |g| g == organization.guest_group }
+    end
+    groups.compact.uniq
+  end
+
   private
 
   def after_add_role(role)
@@ -218,6 +233,11 @@ class User < ApplicationRecord
     if resource.is_a?(Group)
       organization = resource.organization
       organization.user_role_added(self)
+
+      # if they were added directly to primary group, remove them from guest
+      if resource.primary?
+        remove_role(Role::MEMBER, resource.organization.guest_group)
+      end
     end
 
     # Reindex record if it is a searchkick model

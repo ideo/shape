@@ -20,10 +20,10 @@ describe('EditableName', () => {
     })
 
     it('shows editable field when clicked', () => {
-      wrapper.find('H1').simulate('click', { stopPropagation: jest.fn() })
+      wrapper.find('Heading1').simulate('click', { stopPropagation: jest.fn() })
       expect(wrapper.find('AutosizeInput').exists()).toEqual(true)
       expect(wrapper.find('AutosizeInput').props().value).toEqual(props.name)
-      expect(wrapper.find('H1').exists()).toEqual(false)
+      expect(wrapper.find('Heading1').exists()).toEqual(false)
     })
   })
 
@@ -43,7 +43,7 @@ describe('EditableName', () => {
     it('shows editable field', () => {
       expect(wrapper.find('AutosizeInput').exists()).toEqual(true)
       expect(wrapper.find('AutosizeInput').props().value).toEqual(props.name)
-      expect(wrapper.find('H1').exists()).toEqual(false)
+      expect(wrapper.find('Heading1').exists()).toEqual(false)
     })
 
     it('calls updateNameHandler with name after user edits name', () => {
@@ -60,7 +60,7 @@ describe('EditableName', () => {
       wrapper.find('AutosizeInput').simulate('keyPress', {
         key: 'Enter'
       })
-      expect(wrapper.find('H1').exists()).toEqual(true)
+      expect(wrapper.find('Heading1').exists()).toEqual(true)
     })
   })
 
@@ -81,7 +81,7 @@ describe('EditableName', () => {
     })
 
     it('does not show editable field when clicked', () => {
-      wrapper.find('H1').simulate('click', { stopPropagation: jest.fn() })
+      wrapper.find('Heading1').simulate('click', { stopPropagation: jest.fn() })
       expect(wrapper.find('AutosizeInput').exists()).toEqual(false)
     })
   })

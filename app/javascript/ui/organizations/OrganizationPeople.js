@@ -1,3 +1,4 @@
+import { Fragment } from 'react'
 import PropTypes from 'prop-types'
 import { PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
@@ -13,7 +14,7 @@ const RemoveIconHolder = styled.button`
 class OrganizationPeople extends React.PureComponent {
   renderUserGroups = () => {
     const { userGroups } = this.props
-    const groups = userGroups.filter(g => !g.is_primary)
+    const groups = userGroups.filter(g => g.isNormalGroup)
     if (!groups.length) {
       return (
         <SubduedText>You have not been added to any groups.</SubduedText>
@@ -27,7 +28,7 @@ class OrganizationPeople extends React.PureComponent {
         >
           <DisplayText>{group.name}</DisplayText>
         </button>
-        { group.currentUserCanEdit &&
+        { group.can_edit &&
           <RemoveIconHolder onClick={this.props.onGroupRemove(group)}>
             <ArchiveIcon />
           </RemoveIconHolder>
@@ -36,12 +37,45 @@ class OrganizationPeople extends React.PureComponent {
     ))
   }
 
+  renderYourOrganization() {
+    const { organization, userGroups } = this.props
+    const primaryGroup = organization.primary_group
+    const guestGroup = organization.guest_group
+
+    const orgMember = (userGroups.indexOf(primaryGroup) > -1)
+    const showGuests = orgMember && !!guestGroup.groupRoles.length
+
+    return (
+      <Fragment>
+        <Heading3>
+          Your Organization
+        </Heading3>
+        <Row>
+          { orgMember &&
+            <button className="orgEdit" onClick={this.props.onGroupRoles(primaryGroup)}>
+              <DisplayText>{ primaryGroup.name }</DisplayText>
+            </button>
+          }
+          { !orgMember &&
+            <DisplayText>{ primaryGroup.name }</DisplayText>
+          }
+        </Row>
+        { showGuests &&
+          <Row>
+            <button className="orgEdit" onClick={this.props.onGroupRoles(guestGroup)}>
+              <DisplayText>{ guestGroup.name }</DisplayText>
+            </button>
+          </Row>
+        }
+      </Fragment>
+    )
+  }
+
   render() {
     const { organization } = this.props
-    const primaryGroup = organization.primary_group
     return (
       <div>
-        {organization.primary_group.currentUserCanEdit &&
+        {organization.primary_group.can_edit &&
           <Row>
             <RowItemRight>
               <TextButton onClick={this.props.onGroupAdd}>
@@ -50,14 +84,7 @@ class OrganizationPeople extends React.PureComponent {
             </RowItemRight>
           </Row>
         }
-        <Heading3>
-          Your Organization
-        </Heading3>
-        <Row>
-          <button className="orgEdit" onClick={this.props.onGroupRoles(primaryGroup)}>
-            <DisplayText>{ primaryGroup.name }</DisplayText>
-          </button>
-        </Row>
+        {this.renderYourOrganization()}
         <FormSpacer />
         <Heading3>
           Your Groups

@@ -15,17 +15,71 @@ describe Organization, type: :model do
     let(:organization) { create(:organization) }
 
     describe '#initialize_primary_group' do
-      it 'should create group with same name as org' do
+      it 'should create primary group with same name as org' do
         expect(organization.primary_group.persisted?).to be true
         expect(organization.primary_group.name).to eq(organization.name)
+        expect(organization.primary_group.handle).to eq(organization.name.parameterize)
       end
     end
 
-    describe '#update_primary_group_name' do
-      it 'should update group if name changes' do
+    describe '#initialize_guest_group' do
+      it 'should create guest group with same name as org + Guests' do
+        expect(organization.guest_group.persisted?).to be true
+        expect(organization.guest_group.name).to eq("#{organization.name} Guests")
+        expect(organization.guest_group.handle).to eq("#{organization.name.parameterize}-guest")
+      end
+    end
+
+    describe '#update_group_names' do
+      it 'should update primary group if name changes' do
         expect(organization.primary_group.name).not_to eq('Org 2.0')
         organization.update_attributes(name: 'Org 2.0')
         expect(organization.primary_group.reload.name).to eq('Org 2.0')
+      end
+
+      it 'should update guest group if name changes' do
+        expect(organization.guest_group.name).not_to eq('Org 2.0 Guests')
+        organization.update_attributes(name: 'Org 2.0')
+        expect(organization.guest_group.reload.name).to eq('Org 2.0 Guests')
+      end
+    end
+
+    describe '#parse_domain_whitelist' do
+      before do
+        organization.update(domain_whitelist: 'ideo.com, ideo.org')
+      end
+
+      it 'should parse string of domains into an array list' do
+        expect(organization.domain_whitelist).to match_array(['ideo.com', 'ideo.org'])
+      end
+    end
+
+    describe '#check_guests_for_domain_match' do
+      let(:user) { create(:user, email: 'email@domain.org') }
+      let(:guest) { create(:user, email: 'email@gmail.com') }
+      let(:organization) { create(:organization) }
+
+      before do
+        user.add_role(Role::MEMBER, organization.guest_group)
+        guest.add_role(Role::MEMBER, organization.guest_group)
+      end
+
+      it 'should set up user matching domain as a org primary group member' do
+        expect(user.has_role?(Role::MEMBER, organization.primary_group)).to be false
+        expect(user.has_role?(Role::MEMBER, organization.guest_group)).to be true
+        # update whitelist to include user's email
+        organization.update(domain_whitelist: 'domain.org')
+        user.reload
+        expect(user.reload.has_role?(Role::MEMBER, organization.primary_group)).to be true
+        expect(user.has_role?(Role::MEMBER, organization.guest_group)).to be false
+      end
+
+      it 'should not affect other guest memberships' do
+        expect(guest.has_role?(Role::MEMBER, organization.guest_group)).to be true
+        # update whitelist to include user's email
+        organization.update(domain_whitelist: 'domain.org')
+        guest.reload
+        expect(guest.has_role?(Role::MEMBER, organization.guest_group)).to be true
       end
     end
   end
@@ -59,6 +113,27 @@ describe Organization, type: :model do
       it 'has name: FirstName Organization' do
         expect(organization.name).to eq("#{user.first_name} Organization")
       end
+    end
+  end
+
+  describe '#setup_user_membership' do
+    let(:user) { create(:user, email: 'jill@ideo.com') }
+    let(:guest) { create(:user, email: 'jack@gmail.com') }
+    let(:organization) { create(:organization, domain_whitelist: ['ideo.com']) }
+
+    before do
+      organization.setup_user_membership(user)
+      organization.setup_user_membership(guest)
+    end
+
+    it 'adds as an org member if they match the domain' do
+      expect(user.has_role?(Role::MEMBER, organization.primary_group)).to be true
+      expect(user.has_role?(Role::MEMBER, organization.guest_group)).to be false
+    end
+
+    it 'adds as an org guest if they don\'t match the domain' do
+      expect(guest.has_role?(Role::MEMBER, organization.primary_group)).to be false
+      expect(guest.has_role?(Role::MEMBER, organization.guest_group)).to be true
     end
   end
 end

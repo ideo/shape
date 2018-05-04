@@ -17,31 +17,17 @@ class OrganizationMenu extends React.Component {
   @observable isLoading = false
 
   componentDidMount() {
-    const { apiStore, userGroups, uiStore } = this.props
-    const groupReqs = userGroups.map(group => this.fetchRoles(group))
-    Promise.all(groupReqs)
-      .then(responses => {
-        const roles = responses.map(res => res.data)
-        apiStore.add(roles, 'roles')
+    const { apiStore, uiStore } = this.props
 
-        if (uiStore.orgCreated) {
-          uiStore.update('orgCreated', false)
-          uiStore.alert({
-            iconName: 'Ok',
-            prompt: 'Your organization has been created',
-          })
-          // send you to add members to the newly created org
-          this.goToEditGroupRoles(apiStore.currentUserOrganization.primary_group)
-        }
+    if (uiStore.orgCreated) {
+      uiStore.update('orgCreated', false)
+      uiStore.alert({
+        iconName: 'Ok',
+        prompt: 'Your organization has been created',
       })
-      .catch(() => {
-        uiStore.defaultAlertError()
-      })
-  }
-
-  fetchRoles = (group) => {
-    const { apiStore } = this.props
-    return apiStore.request(`groups/${group.id}/roles`, 'GET')
+      // send you to add members to the newly created org
+      this.goToEditGroupRoles(apiStore.currentUserOrganization.primary_group)
+    }
   }
 
   get currentPage() {
@@ -104,11 +90,11 @@ class OrganizationMenu extends React.Component {
       uiStore.defaultAlertError()
     }
     // Re-fetch current user that has the new group now
-    apiStore.fetch('users', apiStore.currentUserId)
+    apiStore.loadCurrentUser()
     this.goToEditGroupRoles(newGroup)
     // because this is after async/await
     runInAction(() => { this.isLoading = true })
-    const res = await this.fetchRoles(newGroup)
+    const res = await apiStore.fetchRoles(newGroup)
     runInAction(() => { this.isLoading = false })
     apiStore.sync(res)
   }
@@ -167,7 +153,7 @@ class OrganizationMenu extends React.Component {
   renderEditRoles() {
     return (
       <RolesMenu
-        canEdit={this.editGroup.currentUserCanEdit}
+        canEdit={this.editGroup.can_edit}
         ownerId={this.editGroup.id}
         ownerType="groups"
         title="Members:"
@@ -194,7 +180,8 @@ class OrganizationMenu extends React.Component {
     return (
       <GroupTitle
         group={this.editGroup}
-        canEdit={this.editGroup.currentUserCanEdit}
+        onSave={this.onGroupSave}
+        canEdit={this.editGroup.can_edit}
       />
     )
   }
@@ -225,7 +212,7 @@ class OrganizationMenu extends React.Component {
       } else {
         content = this.renderEditRoles()
       }
-      if (this.editGroup.currentUserCanEdit) {
+      if (this.editGroup.can_edit) {
         onEdit = () => {
           this.goToEditGroup(this.editGroup)
         }

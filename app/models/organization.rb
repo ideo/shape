@@ -5,12 +5,19 @@ class Organization < ApplicationRecord
              class_name: 'Group',
              dependent: :destroy,
              optional: true
+  belongs_to :guest_group,
+             class_name: 'Group',
+             dependent: :destroy,
+             optional: true
 
-  after_create :create_primary_group
-  after_update :update_primary_group_name, if: :saved_change_to_name?
+  after_create :create_groups
+  before_update :parse_domain_whitelist
+  after_update :update_group_names, if: :saved_change_to_name?
+  after_update :check_guests_for_domain_match, if: :saved_change_to_domain_whitelist?
 
   delegate :admins, to: :primary_group
   delegate :members, to: :primary_group
+  delegate :handle, to: :primary_group
   delegate :can_edit?, to: :primary_group
   delegate :can_view?, to: :primary_group
 
@@ -41,14 +48,60 @@ class Organization < ApplicationRecord
     user.switch_to_organization(user.organizations.first)
   end
 
+  def matches_domain_whitelist?(user)
+    email_domain = user.email.split('@').last
+    domain_whitelist.include? email_domain
+  end
+
+  # doublecheck happens when you finally sign in, at which point your email may have updated based on your network profile.
+  # at that point, we don't need to "revoke" primary -- e.g. you were invited whitelisted, but signed in with personal
+  # but we do want to switch you to the org if you switched to your whitelisted domain email
+  def setup_user_membership(user, doublecheck: false)
+    if matches_domain_whitelist?(user)
+      # add them as an org member
+      user.add_role(Role::MEMBER, primary_group)
+      # remove guest role if exists, do this second so that you don't temporarily lose org membership
+      user.remove_role(Role::MEMBER, guest_group)
+    elsif !doublecheck && !primary_group.can_view?(user)
+      # or else as a guest member if their domain doesn't match
+      user.add_role(Role::MEMBER, guest_group)
+    end
+  end
+
+  def guest_group_name
+    "#{name} Guests"
+  end
+
+  def guest_group_handle
+    "#{handle}-guest"
+  end
+
   private
 
-  def create_primary_group
-    build_primary_group(name: name, organization: self).save
+  def parse_domain_whitelist
+    return true unless will_save_change_to_domain_whitelist?
+    if domain_whitelist.is_a?(String)
+      # when saving from the frontend/API we just pass in a string list of domains,
+      # so we split to save as an array
+      self.domain_whitelist = domain_whitelist.split(',').map(&:strip)
+    end
+    domain_whitelist
+  end
+
+  def check_guests_for_domain_match
+    guest_group.members[:users].each do |user|
+      setup_user_membership(user, doublecheck: true)
+    end
+  end
+
+  def create_groups
+    create_primary_group(name: name, organization: self)
+    create_guest_group(name: guest_group_name, organization: self, handle: guest_group_handle)
     save # Save primary group attr
   end
 
-  def update_primary_group_name
+  def update_group_names
     primary_group.update_attributes(name: name)
+    guest_group.update_attributes(name: guest_group_name, handle: guest_group_handle)
   end
 end
