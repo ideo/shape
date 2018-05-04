@@ -50,17 +50,32 @@ export default class UiStore {
   @observable blurContent = false
   @observable orgCreated = false
 
-  @action defaultAlertError() {
-    this.alert({ prompt: 'There was an error performing this action.' })
-  }
-
-  @action alert(props = {}) {
+  @action popupAlert(props = {}) {
     _.assign(this.dialogConfig, {
       ...this.defaultDialogProps,
       iconName: 'Alert',
       open: 'info',
       ...props
     })
+  }
+
+  alert(message, iconName = 'Alert') {
+    this.popupAlert({
+      prompt: message,
+      iconName,
+    })
+  }
+
+  // same as above but defaults to OK checkmark
+  alertOk(message) {
+    this.popupAlert({
+      prompt: message,
+      iconName: 'Ok',
+    })
+  }
+
+  defaultAlertError() {
+    this.alert('There was an error performing this action.')
   }
 
   @action confirm(props = {}) {

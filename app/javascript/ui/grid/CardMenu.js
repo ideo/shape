@@ -32,26 +32,28 @@ class CardMenu extends React.Component {
     this.setLoading()
   }
 
-  duplicateCard = () => {
-    this.callCardAction('Duplicate', 'API_duplicate')
-  }
-
   replaceCard = () => {
     this.props.uiStore.closeMoveMenu()
     const { card } = this.props
     card.beginReplacing()
   }
 
-  moveCard = () => {
+  openMoveMenu = cardAction => {
     const { card, uiStore } = this.props
     uiStore.selectCardId(card.id)
-    uiStore.openMoveMenu({ from: this.viewingCollectionId, cardAction: 'move' })
+    uiStore.openMoveMenu({ from: this.viewingCollectionId, cardAction })
+  }
+
+  duplicateCard = () => {
+    this.openMoveMenu('duplicate')
+  }
+
+  moveCard = () => {
+    this.openMoveMenu('move')
   }
 
   linkCard = () => {
-    const { card, uiStore } = this.props
-    uiStore.selectCardId(card.id)
-    uiStore.openMoveMenu({ from: this.viewingCollectionId, cardAction: 'link' })
+    this.openMoveMenu('link')
   }
 
   addToMyCollection = () => {

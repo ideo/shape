@@ -28,13 +28,17 @@ RSpec.describe CollectionCardDuplicationWorker, type: :worker do
       end
 
       it 'clones all the collection cards' do
-        expect(duplicate.collection_cards.size).to eq(5)
-        expect(collection.collection_cards.map(&:id)).not_to match_array(duplicate.collection_cards.map(&:id))
+        dupe_cards = duplicate.collection_cards
+        original_cards = collection.collection_cards
+        expect(dupe_cards.size).to eq(5)
+        # check that cloned_from_ids match the originals, and in the same order
+        expect(dupe_cards.map(&:record).map(&:cloned_from_id)).to eq original_cards.map(&:record).map(&:id)
+        expect(dupe_cards.map(&:id)).not_to match_array(original_cards.map(&:id))
       end
 
       it 'clones all items' do
         expect(duplicate.items.size).to eq(5)
-        expect(collection.items.map(&:id)).not_to match_array(duplicate.items.map(&:id))
+        expect(duplicate.items.map(&:id)).not_to match_array(collection.items.map(&:id))
       end
     end
 

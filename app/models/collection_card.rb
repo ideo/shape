@@ -29,7 +29,7 @@ class CollectionCard < ApplicationRecord
     for_user:,
     parent: self.parent,
     shallow: false,
-    update_order: false,
+    placement: 'end',
     duplicate_linked_records: false
   )
     if record.is_a? Collection::SharedWithMeCollection
@@ -44,26 +44,29 @@ class CollectionCard < ApplicationRecord
         for_user: for_user,
         parent: parent,
         shallow: shallow,
-        update_order: update_order,
+        placement: placement,
       )
     end
     cc = amoeba_dup
     # defaults to self.parent, unless one is passed in
     cc.parent = parent
-    # place card at end
-    cc.order = parent.collection_cards.count
+    # place card at beginning or end
+    cc.order = placement == 'beginning' ? 0 : parent.collection_cards.count
 
     unless shallow || link?
-      # don't copy underlying record if shallow/link option and we didn't use `duplicate_linked_records`
-      cc.collection = collection.duplicate!(for_user: for_user) if collection.present?
-      cc.item = item.duplicate!(for_user: for_user) if item.present?
+      opts = {
+        for_user: for_user,
+        parent: parent,
+      }
+      cc.collection = collection.duplicate!(opts) if collection.present?
+      cc.item = item.duplicate!(opts) if item.present?
     end
 
     return cc unless cc.save
 
     # TODO: better way to get the correct breadcrumb upon initial duplication?
     cc.record.recalculate_breadcrumb!
-    cc.increment_card_orders! if update_order
+    cc.increment_card_orders! if placement == 'beginning'
 
     cc
   end

@@ -82,9 +82,7 @@ class GroupTitle extends React.Component {
           this.updateGroupAvatar(fileAttrs)
         },
         onFailure: (filesFailed) => {
-          uiStore.alert({
-            prompt: `Failed to upload image: ${filesFailed}`,
-          })
+          uiStore.alert(`Failed to upload image: ${filesFailed}`)
         }
       })
   }

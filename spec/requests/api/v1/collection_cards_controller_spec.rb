@@ -46,7 +46,7 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
   end
 
   describe 'POST #create' do
-    let(:path) { "/api/v1/collection_cards" }
+    let(:path) { '/api/v1/collection_cards' }
     let(:raw_params) do
       {
         order: 1,
@@ -64,7 +64,7 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
     end
     let(:params) { json_api_params('collection_cards', raw_params) }
     let(:bad_params) do
-      json_api_params('collection_cards', raw_params.reject{ |k| k == :item_attributes })
+      json_api_params('collection_cards', raw_params.reject { |k| k == :item_attributes })
     end
 
     context 'success' do
@@ -103,23 +103,21 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
       let(:params_with_filestack_file) {
         json_api_params(
           'collection_cards',
-          {
-            'order': 1,
-            'width': 3,
-            'height': 1,
-            # parent_id is required to retrieve the parent collection without a nested route
-            'parent_id': collection.id,
-            'item_attributes': {
-              'type': 'Item::ImageItem',
-              'filestack_file_attributes': {
-                'url': filestack_file.url,
-                'handle': filestack_file.handle,
-                'size': filestack_file.size,
-                'mimetype': filestack_file.mimetype,
-                'filename': filename,
-              }
+          'order': 1,
+          'width': 3,
+          'height': 1,
+          # parent_id is required to retrieve the parent collection without a nested route
+          'parent_id': collection.id,
+          'item_attributes': {
+            'type': 'Item::ImageItem',
+            'filestack_file_attributes': {
+              'url': filestack_file.url,
+              'handle': filestack_file.handle,
+              'size': filestack_file.size,
+              'mimetype': filestack_file.mimetype,
+              'filename': filename,
             },
-          }
+          },
         )
       }
 
@@ -146,19 +144,17 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
       let(:params_with_video_item) {
         json_api_params(
           'collection_cards',
-          {
-            order: 1,
-            width: 3,
-            height: 1,
-            # parent_id is required to retrieve the parent collection without a nested route
-            parent_id: collection.id,
-            item_attributes: {
-              type: 'Item::VideoItem',
-              name: 'Youtube video',
-              url: 'https://www.youtube.com/watch?v=4r7wHMg5Yjg',
-              thumbnail_url: 'https://img.youtube.com/vi/4r7wHMg5Yjg/hqdefault.jpg',
-            },
-          }
+          order: 1,
+          width: 3,
+          height: 1,
+          # parent_id is required to retrieve the parent collection without a nested route
+          parent_id: collection.id,
+          item_attributes: {
+            type: 'Item::VideoItem',
+            name: 'Youtube video',
+            url: 'https://www.youtube.com/watch?v=4r7wHMg5Yjg',
+            thumbnail_url: 'https://img.youtube.com/vi/4r7wHMg5Yjg/hqdefault.jpg',
+          },
         )
       }
 
@@ -187,11 +183,9 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
     let(:params) {
       json_api_params(
         'collection_cards',
-        {
-          order: 2,
-          width: 1,
-          height: 3
-        }
+        order: 2,
+        width: 1,
+        height: 3,
       )
     }
 
@@ -230,29 +224,6 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
       expect(collection_card.archived).to eq(false)
       patch(path)
       expect(collection_card.reload.archived).to eq(true)
-    end
-  end
-
-  describe 'POST #duplicate' do
-    let!(:collection_card) { create(:collection_card_text, parent: collection) }
-    let(:path) { "/api/v1/collection_cards/#{collection_card.id}/duplicate" }
-
-    it 'returns a 200' do
-      post(path)
-      expect(response.status).to eq(200)
-    end
-
-    it 'creates new card' do
-      expect { post(path) }.to change(CollectionCard, :count).by(1)
-    end
-
-    it 'creates new item' do
-      expect { post(path) }.to change(Item, :count).by(1)
-    end
-
-    it 'returns new card' do
-      post(path)
-      expect(json['data']['attributes']['id']).not_to eq(collection_card.id)
     end
   end
 
@@ -394,6 +365,74 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
         # newly linked cards should link to the original moving_cards' items
         expect(to_collection.collection_cards.first(2).map(&:item)).to match_array moving_cards.map(&:item)
         expect(to_collection.collection_cards.first.link?).to be true
+      end
+    end
+  end
+
+  describe 'POST #duplicate' do
+    let!(:from_collection) { create(:collection, num_cards: 3, add_editors: [user]) }
+    let!(:moving_cards) { from_collection.collection_cards.first(2) }
+    let!(:unmoved_card) { from_collection.collection_cards.last }
+    let(:path) { '/api/v1/collection_cards/duplicate' }
+    let(:raw_params) do
+      {
+        from_id: from_collection.id,
+        to_id: to_collection.id,
+        collection_card_ids: moving_cards.map(&:id),
+        placement: 'beginning',
+      }
+    end
+    let(:params) { raw_params.to_json }
+
+    describe 'without manage access for to_collection' do
+      let(:to_collection) { create(:collection) }
+
+      it 'returns a 401' do
+        post(path, params: params)
+        expect(response.status).to eq(401)
+      end
+    end
+
+    describe 'without view access for cards in from_collection' do
+      let(:to_collection) do
+        create(:collection, num_cards: 3, add_editors: [user])
+      end
+
+      it 'returns a 401' do
+        # by default user won't have any role added to the records within the cards
+        post(path, params: params)
+        expect(response.status).to eq(401)
+      end
+    end
+
+    describe 'with manage access for to_collection and view access for cards in from_collection' do
+      let(:editor) { create(:user) }
+      let(:viewer) { create(:user) }
+      let(:to_collection) do
+        create(:collection, num_cards: 3, add_editors: [user, editor], add_viewers: [viewer])
+      end
+
+      before do
+        # user has to have access to each card's record in order to link them
+        moving_cards.each do |card|
+          user.add_role(Role::VIEWER, card.record)
+        end
+      end
+
+      it 'returns a 200' do
+        post(path, params: params)
+        expect(response.status).to eq(200)
+      end
+
+      it 'duplicates cards from one collection to the other' do
+        expect(moving_cards.map(&:parent_id).uniq).to match_array [from_collection.id]
+        post(path, params: params)
+        # newly created cards should be duplicates
+        first_cards = to_collection.collection_cards.first(2)
+        expect(first_cards.map(&:item)).not_to match_array moving_cards.map(&:item)
+        # names should match, in same order
+        expect(first_cards.map(&:item).map(&:name)).to eq moving_cards.map(&:item).map(&:name)
+        expect(to_collection.collection_cards.first.primary?).to be true
       end
     end
   end

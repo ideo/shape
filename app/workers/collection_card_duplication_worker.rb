@@ -8,7 +8,8 @@ class CollectionCardDuplicationWorker
     parent_collection = Collection.find(parent_collection_id)
     collection_cards.each do |card|
       next unless card.record.can_view?(for_user)
-      card.duplicate!(for_user: for_user, parent: parent_collection)
+      # duplicating each card in order, each subsequent one should be placed at the end
+      card.duplicate!(for_user: for_user, parent: parent_collection, placement: 'end')
     end
   end
 end
