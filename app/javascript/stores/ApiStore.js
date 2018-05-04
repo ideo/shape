@@ -31,6 +31,38 @@ class ApiStore extends Store {
     return this.currentUser.current_organization
   }
 
+  async loadCurrentUserAndGroups() {
+    await this.loadCurrentUser()
+    await this.loadCurrentUserGroups()
+  }
+
+  async loadCurrentUser() {
+    try {
+      const res = await this.request('users/me')
+      this.setCurrentUserId(res.data.id)
+    } catch (e) {
+      console.warn(e)
+    }
+  }
+
+  async loadCurrentUserGroups({ orgOnly = false } = {}) {
+    try {
+      let { groups } = this.currentUser
+      if (orgOnly) {
+        groups = groups.filter(g => g.isOrgGroup)
+      }
+      groups.map(group => this.fetchRoles(group))
+    } catch (e) {
+      console.warn(e)
+    }
+  }
+
+  async fetchRoles(group) {
+    const res = await this.request(`groups/${group.id}/roles`, 'GET')
+    const roles = res.data
+    this.add(roles, 'roles')
+  }
+
   __updateRelationships(obj) {
     const record = this.find(obj.type, obj.id)
     const refs = obj.relationships ? Object.keys(obj.relationships) : []

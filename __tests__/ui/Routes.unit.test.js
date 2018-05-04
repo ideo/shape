@@ -25,8 +25,7 @@ describe('Routes', () => {
       )
     })
     it('makes an API call to fetch the user', () => {
-      expect(apiStore.request).toBeCalledWith('users/me')
-      expect(apiStore.setCurrentUserId).toHaveBeenCalledWith(requestResult.data.id)
+      expect(apiStore.loadCurrentUserAndGroups).toHaveBeenCalled()
     })
 
     it('does not blur the content if terms have been accepted', () => {
@@ -53,6 +52,5 @@ describe('Routes', () => {
     it('displays the TermsOfUseModal', () => {
       expect(wrapper.find('TermsOfUseModal').exists()).toBeTruthy()
     })
-
   })
 })

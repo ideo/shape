@@ -4,19 +4,26 @@ class Api::V1::UsersController < Api::V1::BaseController
   load_and_authorize_resource :organization, only: %i[index]
   def index
     # show all other active users in the system
-    @users = User.active.where.not(id: current_user.id)
+    # i.e. like Trello, is not limited to your org but anyone who's registered
+    @users = User.all_active_except(current_user.id)
     render jsonapi: @users
   end
 
   load_and_authorize_resource only: %i[show]
   def show
-    render jsonapi: @user, include:
-      [:groups, :organizations, current_organization: [:primary_group]]
+    render jsonapi: @user, include: [
+      :groups,
+      :organizations,
+      current_organization: [:primary_group],
+    ]
   end
 
   def me
-    render jsonapi: current_user, include:
-      [:groups, organizations: [:primary_group], current_organization: [:primary_group]]
+    render jsonapi: current_user, include: [
+      :groups,
+      organizations: %i[primary_group],
+      current_organization: %i[primary_group guest_group],
+    ]
   end
 
   def search
@@ -48,7 +55,7 @@ class Api::V1::UsersController < Api::V1::BaseController
   def switch_org
     if current_user.switch_to_organization(@organization)
       render jsonapi: current_user, include:
-        [:groups, organizations: [:primary_group], current_organization: [:primary_group]]
+        [:groups, organizations: [:primary_group], current_organization: %i[primary_group guest_group]]
     else
       render_api_errors current_user.errors
     end

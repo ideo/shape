@@ -47,7 +47,8 @@ class OrganizationDropdown extends React.Component {
   }
 
   handleOrgSettings = (ev) => {
-    this.openOrgMenu('editOrganization')
+    this.props.onItemClick()
+    this.props.routingStore.routeTo('/settings')
   }
 
   handleLegal = (ev) => {
@@ -85,7 +86,7 @@ class OrganizationDropdown extends React.Component {
   }
 
   get menuItems() {
-    const userCanEdit = this.currentOrganization.primary_group.currentUserCanEdit
+    const userCanEdit = this.currentOrganization.primary_group.can_edit
     const items = [
       { name: 'People & Groups', onClick: this.handleOrgPeople },
       ...this.organizationItems,

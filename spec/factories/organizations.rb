@@ -13,6 +13,9 @@ FactoryBot.define do
         next if evaluator.send(role).blank?
         evaluator.send(role).add_role(role, org.primary_group)
       end
+      if evaluator.guest.present?
+        evaluator.guest.add_role(Role::MEMBER, org.guest_group)
+      end
     end
   end
 end

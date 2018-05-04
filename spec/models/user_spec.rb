@@ -20,22 +20,31 @@ describe User, type: :model do
   context 'callbacks' do
     let!(:org) { create(:organization) }
     let(:org_group) { org.primary_group }
+    let(:org_guest_group) { org.guest_group }
     let!(:org_2) { create(:organization) }
     let(:org_2_group) { org_2.primary_group }
 
     describe '#after_add_role' do
-      before do
+      it 'should set current_organization' do
         user.add_role(Role::MEMBER, org_group)
-        user.reload
+        expect(user.reload.current_organization).to eq(org)
       end
 
-      it 'should set current_organization' do
-        expect(user.current_organization).to eq(org)
+      it 'should set current_organization when added to guest group' do
+        user.add_role(Role::MEMBER, org_guest_group)
+        expect(user.reload.current_organization).to eq(org)
       end
 
       it 'should not override current_organization if already set' do
+        user.add_role(Role::MEMBER, org_group)
         user.add_role(Role::MEMBER, org_2_group)
         expect(user.reload.current_organization).to eq(org)
+      end
+
+      it 'should remove user from guest group if they are added to primary' do
+        user.add_role(Role::MEMBER, org_guest_group)
+        user.add_role(Role::MEMBER, org_group)
+        expect(user.reload.has_role?(Role::MEMBER, org_guest_group)).to be false
       end
     end
 
@@ -117,6 +126,49 @@ describe User, type: :model do
         expect do
           group.add_role(Role::EDITOR, collection)
         end.not_to change(Role, :count)
+      end
+    end
+  end
+
+  describe '.from_omniauth' do
+    let(:pending_user) { nil }
+    let(:auth) do
+      Hashie::Mash.new(
+        provider: 'okta',
+        uid: '123',
+        info: {
+          email: Faker::Internet.unique.email,
+          first_name: Faker::Name.first_name,
+          last_name: Faker::Name.last_name,
+          image: 'http://pic.url.net',
+        },
+      )
+    end
+    let(:from_omniauth) { User.from_omniauth(auth, pending_user) }
+
+    context 'with existing user' do
+      let!(:existing_user) { create(:user, provider: 'okta', uid: '123') }
+
+      it 'updates existing user if found' do
+        expect(from_omniauth.id).to eq existing_user.id
+        expect(from_omniauth.email).to eq auth.info.email
+        expect(from_omniauth.first_name).to eq auth.info.first_name
+        expect(from_omniauth.last_name).to eq auth.info.last_name
+      end
+    end
+
+    context 'with pending user' do
+      let!(:pending_user) { create(:user) }
+
+      it 'updates existing user if found' do
+        expect(from_omniauth.id).to eq pending_user.id
+        expect(from_omniauth.email).to eq auth.info.email
+      end
+    end
+
+    context 'without existing user' do
+      it 'sets up new user record' do
+        expect(from_omniauth.new_record?).to be true
       end
     end
   end
@@ -431,7 +483,7 @@ describe User, type: :model do
     end
   end
 
-  describe '#current_org_groups' do
+  context 'loading current organization groups' do
     let!(:org) { create(:organization, member: user) }
     let!(:org_2) { create(:organization) }
     let!(:group_in_org_member) do
@@ -448,12 +500,29 @@ describe User, type: :model do
              add_members: [user])
     end
 
-    it 'only returns groups this user is a member of in current org' do
-      expect(user.has_role?(Role::MEMBER, group_in_org_member)).to be true
-      expect(user.has_role?(Role::MEMBER, org.primary_group)).to be true
-      expect(user.has_role?(Role::MEMBER, group_in_org_not_member)).to be false
-      expect(user.has_role?(Role::MEMBER, group_not_in_org)).to be true
-      expect(user.current_org_groups).to match_array([group_in_org_member, org.primary_group])
+    describe '#current_org_groups' do
+      it 'only returns groups this user is a member of in current org' do
+        expect(user.has_role?(Role::MEMBER, group_in_org_member)).to be true
+        expect(user.has_role?(Role::MEMBER, org.primary_group)).to be true
+        expect(user.has_role?(Role::MEMBER, group_in_org_not_member)).to be false
+        expect(user.has_role?(Role::MEMBER, group_not_in_org)).to be true
+        expect(user.current_org_groups).to match_array([group_in_org_member, org.primary_group])
+      end
+    end
+
+    describe '#current_org_groups_and_special_groups' do
+      let(:admin) { create(:user) }
+      let(:guest) { create(:user) }
+      let!(:org) { create(:organization, member: user, guest: guest, admin: admin) }
+
+      it 'does not allow guest to see their own guest group' do
+        expect(guest.current_org_groups_and_special_groups).to match_array([])
+      end
+
+      it 'allows access to the guest group for org members' do
+        expect(user.current_org_groups_and_special_groups).to match_array([group_in_org_member, org.primary_group, org.guest_group])
+        expect(admin.current_org_groups_and_special_groups).to match_array([org.primary_group, org.guest_group])
+      end
     end
   end
 

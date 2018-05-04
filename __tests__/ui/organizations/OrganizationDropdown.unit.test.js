@@ -17,7 +17,7 @@ describe('OrganizationDropdown', () => {
     }
     otherFakeOrg = Object.assign({}, fakeOrganization, { id: 999, name: 'new' })
     apiStore.currentUser.current_organization = fakeOrganization
-    fakeOrganization.primary_group.currentUserCanEdit = true
+    fakeOrganization.primary_group.can_edit = true
     apiStore.currentUser.organizations = [
       fakeOrganization,
       otherFakeOrg,
@@ -74,8 +74,7 @@ describe('OrganizationDropdown', () => {
 
     describe('if current user is not an org admin', () => {
       beforeEach(() => {
-        fakeOrganization.primary_group.currentUserCanEdit = false
-
+        fakeOrganization.primary_group.can_edit = false
       })
 
       it('should not show the settings link', () => {

@@ -13,6 +13,9 @@ class Group < ApplicationRecord
                edit_role: Role::ADMIN,
                view_role: Role::MEMBER
 
+  # alias the resourceable method so we can override with special guest group rules
+  alias resourcable_can_view? can_view?
+
   after_create :create_shared_collection
 
   rolify after_add: :after_add_role,
@@ -73,11 +76,22 @@ class Group < ApplicationRecord
     organization.primary_group_id == id
   end
 
+  def guest?
+    organization.guest_group_id == id
+  end
+
+  def can_view?(user)
+    # NOTE: guest group access can be granted via primary_group membership
+    return true if guest? && organization.primary_group.can_view?(user)
+    # otherwise pass through to the normal resourceable method
+    resourcable_can_view?(user)
+  end
+
   private
 
   def create_shared_collection
     shared = Collection::SharedWithMeCollection.create_for_group(
-      organization
+      organization,
     )
     update(current_shared_collection: shared)
   end
