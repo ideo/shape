@@ -1,7 +1,6 @@
 import OrganizationMenu from '~/ui/organizations/OrganizationMenu'
 import Organization from '~/stores/jsonApi/Organization'
 import {
-  fakeUser,
   fakeGroup,
 } from '#/mocks/data'
 import fakeApiStore from '#/mocks/fakeApiStore'
@@ -13,13 +12,12 @@ describe('OrganizationMenu', () => {
   let component, props, wrapper
 
   beforeEach(() => {
-    fakeApiStore.currentUser = fakeUser
-    fakeApiStore.request = jest.fn().mockReturnValue(
-      Promise.resolve({ data: [] })
-    )
     fakeUiStore.viewingCollection = { id: 1 }
+    const apiStore = fakeApiStore({
+      requestResult: { data: [] },
+    })
     props = {
-      apiStore: fakeApiStore(),
+      apiStore,
       uiStore: fakeUiStore,
       open: true,
       onClose: jest.fn(),
@@ -75,15 +73,6 @@ describe('OrganizationMenu', () => {
     expect(component.editGroup).toEqual({})
   })
 
-  describe('componentDidMount', () => {
-    it('should fetch all the user groups from the API', () => {
-      expect(props.apiStore.request).toHaveBeenCalledWith(
-        'groups/1/roles',
-        'GET'
-      )
-    })
-  })
-
   describe('onRolesSave', () => {
     let res
 
@@ -116,11 +105,7 @@ describe('OrganizationMenu', () => {
       })
 
       it('should refetch the roles for the new group', () => {
-        expect(props.apiStore.request).toHaveBeenCalledWith(`groups/5/roles`, 'GET')
-      })
-
-      it('should sync the api store with the request result', () => {
-        expect(props.apiStore.sync).toHaveBeenCalled()
+        expect(props.apiStore.fetchRoles).toHaveBeenCalled()
       })
 
       it('should modify the group roles after synced', () => {
