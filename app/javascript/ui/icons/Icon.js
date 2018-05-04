@@ -2,8 +2,11 @@ import PropTypes from 'prop-types'
 import styled from 'styled-components'
 
 export const StyledIcon = styled.span`
-  position: relative;
   display: inline-block;
+  position: relative;
+  // NOTE following is to get svg icons displaying correctly in IE
+  height: 100%;
+  width: 100%;
   svg {
     width: 100%;
     height: 100%;

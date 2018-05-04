@@ -1,5 +1,7 @@
 .Grid {
   position: relative;
+  margin-top: 190px;
+  width: 100%;
 
   .react-draggable-dragged:not(.react-draggable-dragging) {
     // this is to transition the draggable back to its original spot when you let go
