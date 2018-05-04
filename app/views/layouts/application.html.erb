@@ -12,8 +12,6 @@
     <script>
       IdeoSSO.init(<%= ideo_sso_init_params.to_json.html_safe %>)
     </script>
-    <!-- provide polyfills e.g. for `fetch`  -->
-    <script src="https://cdn.polyfill.io/v2/polyfill.min.js"></script>
     <%= stylesheet_link_tag 'application', media: 'all' %>
     <%= action_cable_meta_tag %>
   </head>
