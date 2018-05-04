@@ -31,11 +31,10 @@ class Organization < ApplicationRecord
   end
 
   # Note: this method can be called many times for the same org
-  def user_role_added(user)
+  def setup_user_membership_and_collections(user)
+    # make sure they're on the org
+    setup_user_membership(user)
     Collection::UserCollection.find_or_create_for_user(user, self)
-
-    # Set this as the user's current organization if they don't have one
-    user.switch_to_organization(self) if user.current_organization_id.blank?
   end
 
   # Note: this method can be called many times for the same org
@@ -53,19 +52,19 @@ class Organization < ApplicationRecord
     domain_whitelist.include? email_domain
   end
 
-  # doublecheck happens when you finally sign in, at which point your email may have updated based on your network profile.
-  # at that point, we don't need to "revoke" primary -- e.g. you were invited whitelisted, but signed in with personal
-  # but we do want to switch you to the org if you switched to your whitelisted domain email
-  def setup_user_membership(user, doublecheck: false)
+  def setup_user_membership(user)
     if matches_domain_whitelist?(user)
       # add them as an org member
       user.add_role(Role::MEMBER, primary_group)
       # remove guest role if exists, do this second so that you don't temporarily lose org membership
       user.remove_role(Role::MEMBER, guest_group)
-    elsif !doublecheck && !primary_group.can_view?(user)
-      # or else as a guest member if their domain doesn't match
+    elsif !primary_group.can_view?(user)
+      # or else as a guest member if their domain doesn't match,
+      # however if they've already been setup as an org member then they don't get "demoted"
       user.add_role(Role::MEMBER, guest_group)
     end
+    # Set this as the user's current organization if they don't have one
+    user.switch_to_organization(self) if user.current_organization_id.blank?
   end
 
   def guest_group_name
@@ -90,7 +89,7 @@ class Organization < ApplicationRecord
 
   def check_guests_for_domain_match
     guest_group.members[:users].each do |user|
-      setup_user_membership(user, doublecheck: true)
+      setup_user_membership(user)
     end
   end
 

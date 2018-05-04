@@ -77,6 +77,9 @@ describe Api::V1::RolesController, type: :request, json: true, auth: true do
 
     context 'on an item' do
       let!(:item) { create(:text_item, add_editors: [user]) }
+      # item also needs a collection w/ an org in order to assign permissions
+      let!(:collection) { create(:collection) }
+      let!(:collection_card) { create(:collection_card, item: item, parent: collection) }
       let(:path) { "/api/v1/items/#{item.id}/roles" }
 
       it 'returns a 200' do

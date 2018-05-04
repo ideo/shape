@@ -90,15 +90,13 @@ class User < ApplicationRecord
     user
   end
 
-  def self.create_pending_user(email:, organization:)
-    user = create(
+  def self.create_pending_user(email:)
+    create(
       email: email,
       status: User.statuses[:pending],
       password: Devise.friendly_token(40),
       invitation_token: Devise.friendly_token(40),
     )
-    organization.setup_user_membership(user)
-    user
   end
 
   def self.pending_user_with_token(token)
@@ -136,7 +134,8 @@ class User < ApplicationRecord
       self.current_organization = organization
       self.current_user_collection = collections.user.find_by_organization_id(organization.id)
     end
-    save
+    # make sure user picks up new roles / relationships
+    save && reload
   end
 
   # overrides retrieval of belongs_to relation
@@ -153,46 +152,6 @@ class User < ApplicationRecord
   def current_shared_collection(org_id = current_organization_id)
     return nil unless current_organization_id
     collections.shared_with_me.find_by_organization_id(org_id)
-  end
-
-  def viewable_collections_and_items(organization)
-    Role.user_resources(
-      user: self,
-      resource_type: %i[Collection Item],
-    ).select do |resource|
-      if resource.archived?
-        false
-      elsif resource.respond_to?(:organization_id)
-        resource.organization_id == organization.id
-      else
-        false
-      end
-    end
-  end
-
-  def collection_and_group_identifiers(organization)
-    # Always include primary group
-    identifiers = [organization.primary_group.resource_identifier]
-
-    # Get all content user can see, in this org
-    identifiers |= viewable_collections_and_items(organization)
-                   .map(&:resource_identifier)
-
-    # All groups user is a member of in this org
-    identifiers | groups.where(organization_id: organization.id)
-                        .map(&:resource_identifier)
-  end
-
-  # NOTE: This can do a pretty huge query. Was being used as users_controller#index but not currently being used.
-  def users_through_collections_items_and_groups(organization)
-    identifiers = collection_and_group_identifiers(organization)
-
-    User.distinct(User.arel_table[:id])
-        .joins(:roles)
-        .where(Role.arel_table[:resource_identifier].in(identifiers))
-        .where.not(id: id)
-        .order(first_name: :asc)
-        .to_a
   end
 
   def organization_group_ids(organization)
@@ -228,19 +187,8 @@ class User < ApplicationRecord
 
   def after_add_role(role)
     reset_cached_roles!
-
-    resource = role.resource
-    if resource.is_a?(Group)
-      organization = resource.organization
-      organization.user_role_added(self)
-
-      # if they were added directly to primary group, remove them from guest
-      if resource.primary?
-        remove_role(Role::MEMBER, resource.organization.guest_group)
-      end
-    end
-
     # Reindex record if it is a searchkick model
+    resource = role.resource
     resource.reindex if Searchkick.callbacks? && resource.searchable?
   end
 

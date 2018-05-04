@@ -20,7 +20,9 @@ FactoryBot.define do
 
     after(:create) do |user, evaluator|
       if evaluator.add_to_org.present?
-        user.add_role(Role::MEMBER, evaluator.add_to_org.primary_group)
+        org = evaluator.add_to_org
+        user.add_role(Role::MEMBER, org.primary_group)
+        org.setup_user_membership_and_collections(user)
       end
     end
 

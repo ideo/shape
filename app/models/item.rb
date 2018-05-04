@@ -24,6 +24,7 @@ class Item < ApplicationRecord
            inverse_of: :item
 
   delegate :parent, to: :parent_collection_card, allow_nil: true
+  delegate :organization, to: :parent, allow_nil: true
   belongs_to :cloned_from, class_name: 'Item', optional: true
 
   before_validation :format_url, if: :saved_change_to_url?

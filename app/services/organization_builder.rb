@@ -13,6 +13,7 @@ class OrganizationBuilder
       @organization.save!
       update_primary_group!
       add_role
+      setup_user_membership_and_collections
     end
     true
   rescue ActiveRecord::RecordInvalid
@@ -29,5 +30,9 @@ class OrganizationBuilder
 
   def add_role
     @user.add_role(Role::ADMIN, @organization.primary_group)
+  end
+
+  def setup_user_membership_and_collections
+    @organization.setup_user_membership_and_collections(@user)
   end
 end
