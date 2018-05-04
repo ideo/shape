@@ -331,13 +331,13 @@ describe User, type: :model do
 
     it 'sets current_organization' do
       expect(user.current_organization).to be_nil
-      expect(user.switch_to_organization(organization)).to be true
+      expect(user.switch_to_organization(organization)).to be_truthy
       expect(user.current_organization).to eq(organization)
     end
 
     it 'sets current_user_collection' do
       expect(user.current_user_collection).to be_nil
-      expect(user.switch_to_organization(organization)).to be true
+      expect(user.switch_to_organization(organization)).to be_truthy
       expect(user.current_user_collection).to eq(org_user_collection)
     end
 
@@ -354,7 +354,7 @@ describe User, type: :model do
 
       it 'sets current_user_collection to nil' do
         expect(user.current_user_collection).not_to be_nil
-        expect(user.switch_to_organization(nil)).to be true
+        expect(user.switch_to_organization(nil)).to be_truthy
         expect(user.current_user_collection).to be_nil
       end
     end
