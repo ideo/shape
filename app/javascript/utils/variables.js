@@ -4,6 +4,11 @@ export const ITEM_TYPES = {
   VIDEO: 'Item::VideoItem',
 }
 
+export const KEYS = {
+  ENTER: 13,
+  ESC: 27,
+}
+
 export default {
   headerHeight: 192,
   headerHeightCompact: 100,
@@ -25,6 +30,7 @@ export default {
     desert: '#f5f4f3',
     cyan: '#c0dbde',
     blue: '#00a0e0',
+    aquaHaze: '#f0f4f6',
     gray: '#c6c1bf',
     cloudy: '#a89f9b',
     sirocco: '#697c7e',

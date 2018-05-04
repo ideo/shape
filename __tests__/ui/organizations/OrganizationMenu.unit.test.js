@@ -1,9 +1,13 @@
 import OrganizationMenu from '~/ui/organizations/OrganizationMenu'
+import Organization from '~/stores/jsonApi/Organization'
 import {
   fakeUser,
+  fakeGroup,
 } from '#/mocks/data'
 import fakeApiStore from '#/mocks/fakeApiStore'
 import fakeUiStore from '#/mocks/fakeUiStore'
+
+jest.mock('../../../app/javascript/stores/jsonApi/Organization')
 
 describe('OrganizationMenu', () => {
   let component, props, wrapper
@@ -20,6 +24,7 @@ describe('OrganizationMenu', () => {
       open: true,
       onClose: jest.fn(),
       organization: {
+        save: jest.fn(),
         name: 'Space',
         primary_group: {
           id: 1,
@@ -32,6 +37,9 @@ describe('OrganizationMenu', () => {
         { id: 1, name: 'groupTest', handle: 'test', filestack_file_url: 'jpg' }
       ]
     }
+    props.uiStore.update.mockClear()
+    props.uiStore.alert.mockClear()
+    Organization.mockClear()
     wrapper = shallow(
       <OrganizationMenu.wrappedComponent {...props} />
     )
@@ -46,7 +54,7 @@ describe('OrganizationMenu', () => {
   })
 
   it('closes the edit menu when changes are saved', () => {
-    component.onOrganizationSave()
+    component.saveOrganization(fakeGroup)
     expect(props.uiStore.update).toHaveBeenCalledWith('organizationMenuPage', 'organizationPeople')
   })
 
@@ -63,7 +71,7 @@ describe('OrganizationMenu', () => {
 
   it('opens the group add menu when you click on the new group button', () => {
     component.goToAddGroup()
-    expect(props.uiStore.update).toHaveBeenCalledWith('organizationMenuPage', 'editGroup')
+    expect(props.uiStore.update).toHaveBeenCalledWith('organizationMenuPage', 'addGroup')
     expect(component.editGroup).toEqual({})
   })
 
@@ -89,7 +97,7 @@ describe('OrganizationMenu', () => {
     })
   })
 
-  describe('onNewGroupSave', () => {
+  describe('createGroup', () => {
     describe('on a newly created group', () => {
       let newGroup
 
@@ -104,7 +112,7 @@ describe('OrganizationMenu', () => {
           Promise.resolve({ data: [] })
         )
         component.editGroup = { name: 'newgroup' }
-        await component.onNewGroupSave(newGroup)
+        await component.createGroup(newGroup)
       })
 
       it('should refetch the roles for the new group', () => {
@@ -117,6 +125,57 @@ describe('OrganizationMenu', () => {
 
       it('should modify the group roles after synced', () => {
         expect(props.uiStore.update).toHaveBeenCalledWith('organizationMenuPage', 'editRoles')
+      })
+    })
+  })
+
+  describe('createOrganization', () => {
+    let saveFn
+
+    beforeEach(async () => {
+      saveFn = jest.fn().mockReturnValue(Promise.resolve({}))
+      Organization.mockImplementation(() =>
+        ({
+          id: 3,
+          save: saveFn,
+          assign: jest.fn(),
+        }))
+      await component.createOrganization({ name: 'hello' })
+    })
+
+    it('should switch to the new organization', () => {
+      expect(props.apiStore.currentUser.switchOrganization).toHaveBeenCalledWith(
+        3, { backToHomepage: true }
+      )
+    })
+
+    it('should set the uiStore state', () => {
+      expect(props.uiStore.update).toHaveBeenCalledWith('orgCreated', true)
+    })
+
+    it('should save the newly created organization', () => {
+      expect(saveFn).toHaveBeenCalled()
+    })
+
+    describe('with orgCreated state', () => {
+      beforeEach(() => {
+        props.uiStore.orgCreated = true
+        wrapper = shallow(
+          <OrganizationMenu.wrappedComponent {...props} />
+        )
+        component = wrapper.instance()
+      })
+
+      it('should open the org created alert', () => {
+        expect(props.uiStore.update).toHaveBeenCalledWith('orgCreated', false)
+        expect(props.uiStore.alert).toHaveBeenCalledWith({
+          iconName: 'Ok',
+          prompt: 'Your organization has been created',
+        })
+      })
+
+      it('should set the editGroup to be the org primary_group', () => {
+        expect(component.editGroup).toEqual(props.apiStore.currentUserOrganization.primary_group)
       })
     })
   })
