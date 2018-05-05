@@ -189,6 +189,7 @@ class TextItem extends React.Component {
 
   broadcastEditingState = ({ editing }) => {
     // console.log('Broadcast editing is:', editing)
+    if (!this.channel) return
     const { item } = this.props
     if (editing) {
       this.channel.perform('start_editing', { id: item.id, data: this.textData })
