@@ -153,10 +153,9 @@ describe('OrganizationMenu', () => {
 
       it('should open the org created alert', () => {
         expect(props.uiStore.update).toHaveBeenCalledWith('orgCreated', false)
-        expect(props.uiStore.alert).toHaveBeenCalledWith({
-          iconName: 'Ok',
-          prompt: 'Your organization has been created',
-        })
+        expect(props.uiStore.alertOk).toHaveBeenCalledWith(
+          'Your organization has been created'
+        )
       })
 
       it('should set the editGroup to be the org primary_group', () => {
