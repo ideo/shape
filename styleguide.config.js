@@ -1,7 +1,7 @@
 const webpackConfig = require('./config/webpack/development')
 
 module.exports = {
-  title: 'Shape$ Styleguide',
+  title: 'Shape | Styleguide',
   components: 'app/javascript/ui/global/**/*.js',
   webpackConfig: {
     resolve: webpackConfig.resolve,
