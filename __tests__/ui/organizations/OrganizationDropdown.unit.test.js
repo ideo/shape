@@ -40,6 +40,8 @@ describe('OrganizationDropdown', () => {
       <OrganizationDropdown.wrappedComponent {...props} />
     )
     component = wrapper.instance()
+    props.uiStore.alert.mockClear()
+    props.uiStore.confirm.mockClear()
   })
 
   describe('closeOrgMenu', () => {
@@ -82,6 +84,25 @@ describe('OrganizationDropdown', () => {
           item => item.name === 'Settings'
         )).toBeFalsy()
       })
+    })
+  })
+
+  describe('handleSwitchOrg', () => {
+    const orgId = 1
+    const fakeEv = { preventDefault: () => null }
+
+    it('should call switchOrganization on currentUser', () => {
+      component.handleSwitchOrg(orgId)(fakeEv)
+      expect(props.apiStore.currentUser.switchOrganization).toHaveBeenCalledWith(
+        orgId, { backToHomepage: true }
+      )
+    })
+
+    it('should call uiStore.confirm if trying to move cards between orgs', () => {
+      props.uiStore.isMovingCards = true
+      wrapper.setProps(props)
+      component.handleSwitchOrg(orgId)(fakeEv)
+      expect(props.uiStore.confirm).toHaveBeenCalled()
     })
   })
 
