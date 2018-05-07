@@ -66,12 +66,12 @@ export const StyledTopRightActions = styled.div`
   position: absolute;
   top: 0.35rem;
   right: 0.25rem;
-  z-index: ${v.zIndex.gridCard};
+  z-index: ${v.zIndex.gridCardTop};
   .card-menu {
     margin-top: 0.25rem;
     display: inline-block;
     vertical-align: top;
-    z-index: ${v.zIndex.gridCard};
+    z-index: ${v.zIndex.gridCardTop};
     color: ${v.colors.gray};
   }
 `
