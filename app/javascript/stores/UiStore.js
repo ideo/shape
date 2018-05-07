@@ -37,7 +37,7 @@ export default class UiStore {
   @observable movingFromCollectionId = null
   @observable cardAction = 'move'
   defaultDialogProps = {
-    open: null,
+    open: null, // track whether "info" or "confirm" dialog are open, or none
     prompt: null,
     onConfirm: null,
     onCancel: null,
@@ -114,6 +114,10 @@ export default class UiStore {
     this.deselectCards()
   }
 
+  @computed get isMovingCards() {
+    return this.movingCardIds.length && this.cardAction === 'move'
+  }
+
   // NOTE: because we aren't tracking a difference between "closed" and null,
   // OrgMenu will always default back to "People & Groups" while in the process of closing/fading
   @computed get organizationMenuOpen() {
@@ -163,7 +167,6 @@ export default class UiStore {
 
   @action resetSelectionAndBCT() {
     this.deselectCards()
-    // this.closeMoveMenu()
     this.closeBlankContentTool()
   }
 

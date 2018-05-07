@@ -12,7 +12,7 @@ const StyledDialog = styled(MuiDialog)`
     background-color: ${v.colors.cloudy};
     border-radius: 6px;
     color: white;
-    max-width: 320px;
+    max-width: 330px;
     opacity: 0.95;
     width: 100%;
   }
@@ -28,7 +28,7 @@ const ModalCloseButton = styled.button`
 ModalCloseButton.displayName = 'ModalCloseButton'
 
 const CenteredPaddedContent = styled.div`
-  padding: 35px;
+  padding: 20px;
   padding-bottom: 25px;
   text-align: center;
 `
