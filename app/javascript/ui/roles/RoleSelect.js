@@ -32,17 +32,27 @@ const CenterAlignedSingleItem = styled.div`
 CenterAlignedSingleItem.displayName = 'StyledCenterAlignedSingleItem'
 
 class RoleSelect extends React.Component {
+  get resourceType() {
+    const { role } = this.props
+    if (!role.resource) return 'collection'
+    if (role.resource.internalType === 'groups') {
+      return (role.resource.is_primary || role.resource.is_guest)
+        ? 'organization' : 'group'
+    }
+    return role.resource.internalType.slice(0, -1)
+  }
+
   onRoleRemove = (ev) => {
     ev.preventDefault()
     const { entity } = this.props
     let prompt
     let confirmText
     if (entity.isCurrentUser && entity.isCurrentUser()) {
-      prompt = 'Are you sure you want to leave this group?'
+      prompt = `Are you sure you want to leave this ${this.resourceType}?`
       confirmText = 'Leave'
     } else {
       prompt = `Are you sure you want to remove
-        ${this.renderName()} from this group?`
+        ${this.renderName()} from this ${this.resourceType}?`
       confirmText = 'Remove'
     }
     uiStore.confirm({

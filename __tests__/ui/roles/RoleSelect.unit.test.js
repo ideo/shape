@@ -67,4 +67,41 @@ describe('RoleSelect', () => {
       )
     })
   })
+
+  describe('resourceType', () => {
+    let groupResource
+    const updateRole = role => {
+      props.role = role
+      wrapper.setProps(props)
+    }
+
+    beforeEach(() => {
+      groupResource = { internalType: 'groups' }
+    })
+
+    it('should return collection when there is no resource', () => {
+      updateRole({ name: 'admin' })
+      expect(component.resourceType).toEqual('collection')
+    })
+
+    it('should return organization when its a primary/guest group', () => {
+      updateRole(
+        {
+          name: 'admin',
+          resource: Object.assign({}, groupResource, { is_primary: true })
+        }
+      )
+      expect(component.resourceType).toEqual('organization')
+    })
+
+    it('should return group when its a normal group', () => {
+      updateRole({ name: 'admin', resource: groupResource })
+      expect(component.resourceType).toEqual('group')
+    })
+
+    it('should return item when its an item', () => {
+      updateRole({ name: 'admin', resource: { internalType: 'items' } })
+      expect(component.resourceType).toEqual('item')
+    })
+  })
 })
