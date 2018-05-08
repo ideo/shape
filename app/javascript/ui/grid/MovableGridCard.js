@@ -116,10 +116,11 @@ class MovableGridCard extends React.PureComponent {
     }
     const { gridW, gridH, cols } = uiStore.gridSettings
     const { card } = this.props
+    const pad = 0.75
     const newSize = {
-      // pad by 200 so that as you resize, the placeholder represents a slightly larger size
-      width: card.width + Math.floor((delta.width + 200) / gridW),
-      height: card.height + Math.floor((delta.height + 200) / gridH),
+      // pad by some so that as you resize it doesn't immediately jump sizes
+      width: card.width + Math.floor((delta.width / gridW) + pad),
+      height: card.height + Math.floor((delta.height / gridH) + pad),
     }
     // e.g. if card.width is 4, but we're at 2 columns, max out at cardWidth = 2
     newSize.width = Math.max(Math.min(newSize.width, cols), 1)

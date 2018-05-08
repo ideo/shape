@@ -33,7 +33,7 @@ export default class UiStore {
     gridH: 250,
   }
   smallGridSettings = {
-    gutter: 15,
+    gutter: 20,
     gridW: 250,
     gridH: 200,
   }

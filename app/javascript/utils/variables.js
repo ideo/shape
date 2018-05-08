@@ -22,7 +22,7 @@ export default {
     // based on going from 2 -> 1 column
     smallBreakpoint: 645,
     // based on going from 3 -> 2 cols
-    medBreakpoint: 1045,
+    medBreakpoint: 1060,
     largeBreakpoint: 1308,
   },
 
