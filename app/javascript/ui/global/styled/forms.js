@@ -93,7 +93,7 @@ export const TextField = styled.input`
   @media only screen
     and (min-width: ${v.responsive.medBreakpoint}px)
     and (max-width: ${v.responsive.largeBreakpoint}px) {
-    width: 195px;
+    width: 185px;
   }
 `
 TextField.displayName = 'StyledTextField'

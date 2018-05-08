@@ -59,7 +59,7 @@ const StyledBlankCreationTool = styled.div`
     left: ${props => (props.replacing ? '25%' : 'auto')};
     width: ${props => (props.replacing ? '50%' : 'auto')};
   }
-  transition: all 0.3s 0.3s;
+  transition: all 0.3s 0.2s;
   /* handle "small 4-col" layout i.e. layoutSize == 3 */
   @media only screen
     and (min-width: ${v.responsive.medBreakpoint}px)
@@ -78,13 +78,14 @@ const BctBackground = styled.div`
   border-radius: 50%;
   border: 8px solid ${v.colors.cyan};
   background: ${props => (props.emptyState ? v.colors.aquaHaze : v.colors.desert)};
-  transition: all 0.3s 0.3s;
+  transition: all 0.3s 0.2s;
   /* handle "small 4-col" layout i.e. layoutSize == 3 */
   @media only screen
     and (min-width: ${v.responsive.medBreakpoint}px)
     and (max-width: ${v.responsive.largeBreakpoint}px) {
     width: 135px;
     height: 135px;
+    left: 50px;
   }
 `
 BctBackground.displayName = 'BctBackground'
@@ -101,7 +102,7 @@ const BctButton = styled.button`
   @media only screen
     and (min-width: ${v.responsive.medBreakpoint}px)
     and (max-width: ${v.responsive.largeBreakpoint}px) {
-    left: ${props => (props.creating ? '90px' : 0)};
+    left: ${props => (props.creating ? '80px' : 0)};
   }
   transform: ${props => (props.creating ? 'rotate(360deg)' : 'none')};
 
@@ -150,7 +151,7 @@ const BctDropzone = styled.div`
       font-size: 0.8rem;
       color: ${v.colors.cloudy};
     }
-    transition: all 0.3s 0.3s;
+    transition: all 0.3s 0.2s;
   }
 
   /* Override Filestack styling */
@@ -178,6 +179,7 @@ const BctDropzone = styled.div`
     and (min-width: ${v.responsive.medBreakpoint}px)
     and (max-width: ${v.responsive.largeBreakpoint}px) {
     width: 135px;
+    left: 50px;
     .text {
       top: 50px;
       left: 25px;
