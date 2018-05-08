@@ -32,6 +32,14 @@ const CenterAlignedSingleItem = styled.div`
 CenterAlignedSingleItem.displayName = 'StyledCenterAlignedSingleItem'
 
 class RoleSelect extends React.Component {
+  isGuestGroup() {
+    const { role } = this.props
+    if (role.resource && role.resource.internalType === 'groups') {
+      return role.resource.is_guest
+    }
+    return false
+  }
+
   get resourceType() {
     const { role } = this.props
     if (!role.resource) return 'collection'
@@ -96,7 +104,7 @@ class RoleSelect extends React.Component {
   render() {
     const { enabled, role, roleTypes, entity } = this.props
     let select
-    if (enabled) {
+    if (!this.isGuestGroup() && enabled) {
       select = (
         <Select
           classes={{ root: 'select', selectMenu: 'selectMenu' }}

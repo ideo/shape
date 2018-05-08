@@ -24,6 +24,14 @@ describe('RoleSelect', () => {
     component = wrapper.instance()
   })
 
+  describe('render', () => {
+    it('should not render the select for guest groups', () => {
+      props.role = { resource: { internalType: 'groups', is_guest: true } }
+      wrapper.setProps(props)
+      expect(wrapper.find('Select').length).toEqual(0)
+    })
+  })
+
   describe('onRoleSelect', () => {
     const fakeSelectEvent = {
       preventDefault: jest.fn(),
