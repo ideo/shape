@@ -115,7 +115,6 @@ class CollectionPage extends PageWithApi {
               {this.collection.isNormalCollection &&
                 <Fragment>
                   <RolesSummary
-                    className="roles-summary"
                     handleClick={this.showObjectRoleDialog}
                     roles={collection.roles}
                     canEdit={collection.can_edit}

@@ -12,6 +12,22 @@ const calculateDistance = (pos1, pos2) => {
   return Math.sqrt((a * a) + (b * b))
 }
 
+const groupByConsecutive = (array, value) => {
+  const groups = []
+  let buffer = []
+  for (let i = 0; i < array.length; i += 1) {
+    const curItem = array[i]
+    if (curItem === value) {
+      buffer.push(i)
+    } else if (buffer.length > 0) {
+      groups.push(buffer)
+      buffer = []
+    }
+  }
+  if (buffer.length > 0) groups.push(buffer)
+  return groups
+}
+
 // needs to be an observer to observe changes to the collection + items
 @inject('routingStore', 'uiStore')
 @observer
@@ -281,7 +297,7 @@ class CollectionGrid extends React.Component {
     const matrix = []
     // create an empty row
     matrix.push(_.fill(Array(cols), null))
-    _.each(_.sortBy(cards, sortBy), card => {
+    _.each(_.sortBy(cards, sortBy), (card, i) => {
       // we don't actually want to "re-position" the dragging card
       // because its position is being determined by the drag (i.e. mouse cursor)
       if (opts.dragging === card.id) {
@@ -294,29 +310,49 @@ class CollectionGrid extends React.Component {
       // NOTE: row limit check is to catch any bad calculations with resizing/moving
       while (!filled && row < 200) {
         let itFits = false
-        let gap = 0
         let nextX = 0
-        // e.g. if card.width is 4, but we're at 2 columns, max out at cardWidth = 2
-        const cardWidth = Math.min(cols, card.width)
-        // card.setMaxWidth won't be defined for blank/placeholder cards
-        if (card.setMaxWidth) {
-          // stored so we can refer to the current maxWidth in other components
-          card.setMaxWidth(cardWidth)
+        let cardWidth = card.width
+        let cardHeight = card.height
+        if (card.calculateMaxSize) {
+          // card.calculateMaxSize won't be defined for blank/placeholder cards
+          ({ cardWidth, cardHeight } = card.calculateMaxSize(cols))
         }
-        // go through the row and see if there is an empty gap that fits card.w
-        for (let x = 0; x < cols; x += 1) {
-          if (matrix[row][x] === null) {
-            gap += 1
-          } else {
-            gap = 0
+        // go through the row and see if there is an empty gap that fits cardWidth
+        const gaps = groupByConsecutive(matrix[row], null)
+        const maxGap = _.maxBy(gaps, 'length') || { length: 0 }
+        if (maxGap.length >= cardWidth) {
+          [nextX] = maxGap
+          itFits = true
+        } else if (card.isTextItem && cols === 2 && cardWidth === 2 && maxGap.length === 1) {
+          // special case! try to backfill previous gap of 1 by shrinking down
+          cardWidth = 1
+          card.setMaxWidth(1)
+          itFits = true
+          if (cardHeight === 2) {
+            cardHeight = 1
+            card.setMaxHeight(1)
           }
-          if (gap >= cardWidth) {
-            // jump back the number of spaces to the opening of the gap
-            nextX = (x + 1) - cardWidth
-            itFits = true
-            break
-          }
+          [nextX] = maxGap
+          itFits = true
         }
+        // one more special case! stretch out prev text if it can fill out the 2 column row
+        const prevCard = cards[i - 1]
+        const canFitOneRow = prevCard && maxGap.length && prevCard.maxHeight === 1
+        const canFitTwoRows = (
+          prevCard &&
+          prevCard.maxHeight === 2 &&
+          row >= 1 &&
+          matrix[row][1] === null &&
+          matrix[row - 1][1] === null
+        )
+        if (cols === 2 &&
+            !itFits &&
+            (canFitOneRow || canFitTwoRows) &&
+            prevCard.isTextItem) {
+          prevCard.setMaxWidth(2)
+          prevCard.position.width = (2 * (gridW + gutter)) - gutter
+        }
+
         if (itFits) {
           filled = true
           position = {
@@ -327,7 +363,7 @@ class CollectionGrid extends React.Component {
             xPos: position.x * (gridW + gutter),
             yPos: position.y * (gridH + gutter),
             width: (cardWidth * (gridW + gutter)) - gutter,
-            height: (card.height * (gridH + gutter)) - gutter,
+            height: (cardHeight * (gridH + gutter)) - gutter,
           })
 
           // add position attrs to card
@@ -339,7 +375,7 @@ class CollectionGrid extends React.Component {
 
           // fill rows and columns
           _.fill(matrix[row], card.id, position.x, position.x + cardWidth)
-          for (let y = 1; y < card.height; y += 1) {
+          for (let y = 1; y < cardHeight; y += 1) {
             if (!matrix[row + y]) matrix.push(_.fill(Array(cols), null))
             _.fill(matrix[row + y], card.id, position.x, position.x + cardWidth)
           }

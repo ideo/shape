@@ -6,7 +6,7 @@ const StyledVideoItem = styled.div`
   /* arbitrary styles for now */
   width: 1024px;
   height: 768px;
-  max-width: 100vw;
+  max-width: 95vw;
   > div {
     height: 100%;
   }

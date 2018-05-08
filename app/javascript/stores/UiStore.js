@@ -25,6 +25,8 @@ export default class UiStore {
   @observable pageMenuOpen = false
   @observable tagsModalOpen = false
   defaultGridSettings = {
+    // layout will track we are at "size 3" i.e. "small 4 cols" even though cols === 4
+    layoutSize: 4,
     cols: 4,
     gutter: 20,
     gridW: 312,
@@ -143,8 +145,8 @@ export default class UiStore {
     return (gridW * cols) + (gutter * (cols - 1))
   }
 
-  gridHeightFor(cols) {
-    const { gridH, gutter } = this.gridSettings
+  gridHeightFor(cols, { useDefault = false } = {}) {
+    const { gridH, gutter } = useDefault ? this.defaultGridSettings : this.gridSettings
     return (gridH * cols) + gutter
   }
 
@@ -162,17 +164,18 @@ export default class UiStore {
     let update = {
       ...this.defaultGridSettings,
       cols,
+      layoutSize: cols,
     }
     if (cols === 3) {
       update = {
         ...this.smallGridSettings,
         cols: 4,
+        layoutSize: cols,
       }
     }
 
-    // -----
-
-    if (this.gridSettings.cols !== update.cols || this.gridSettings.gridW !== update.gridW) {
+    // finally, apply changes if they have changed
+    if (this.layoutSize !== this.gridSettings.layoutSize) {
       _.assign(this.gridSettings, update)
     }
   }

@@ -124,7 +124,7 @@ class GridCard extends React.Component {
       return (
         <CollectionCover
           width={card.maxWidth}
-          height={card.height}
+          height={card.maxHeight}
           collection={record}
         />
       )
