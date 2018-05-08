@@ -10,7 +10,7 @@ describe 'Ideo Profile API Requests' do
         first_name: user.first_name,
         last_name: user.last_name,
         email: user.email,
-        picture: user.pic_url_square
+        picture: user.pic_url_square,
       }
     end
     # These are the headers the request from profile.ideo.com will have
@@ -56,7 +56,7 @@ describe 'Ideo Profile API Requests' do
               last_name: 'Newname',
               email: 'fancy@newname.com',
               picture: 'newpic.jpg',
-            }
+            },
           }.to_json,
           headers: valid_headers,
         )
@@ -115,7 +115,7 @@ describe 'Ideo Profile API Requests' do
     context 'invalid auth secret' do
       let(:invalid_headers) {
         json_headers.merge(
-          'Authorization': 'invalid_shared_secret'
+          'Authorization': 'invalid_shared_secret',
         )
       }
 
