@@ -83,7 +83,7 @@ module Roles
 
       @users.each do |user|
         if existing_user_ids.include?(user.id)
-          role.users.destroy(user)
+          user.remove_role(role.name, role.resource)
         end
       end
 

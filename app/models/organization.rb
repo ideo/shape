@@ -42,6 +42,12 @@ class Organization < ApplicationRecord
     # If they are still an admin or member, don't do anything
     return if can_view?(user)
 
+    Roles::RemoveFromOrganization.new(self, user).call
+
+    if user.organizations.count.zero?
+      self.create_for_user(user)
+    end
+
     # Set current org as one they are a member of
     # If nil, that is fine as they shouldn't have a current organization
     user.switch_to_organization(user.organizations.first)
