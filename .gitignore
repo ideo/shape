@@ -31,3 +31,4 @@ build/
 
 # redis dump
 dump.rdb
+styleguide

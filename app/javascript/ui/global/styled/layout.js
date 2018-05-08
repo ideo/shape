@@ -1,6 +1,7 @@
 import PropTypes from 'prop-types'
 import styled from 'styled-components'
 
+/** @component */
 export const Row = styled.div`
   align-items: ${props => props.align};
   display: flex;
@@ -17,22 +18,26 @@ Row.defaultProps = {
   align: 'flex-start'
 }
 
+/** @component */
 export const RowItemLeft = styled.span`
   margin-right: auto;
   margin-left: 14px;
 `
 RowItemLeft.displayName = 'StyledRowItemLeft'
 
+/** @component */
 export const RowItemRight = styled.span`
   margin-left: auto;
 `
 RowItemRight.displayName = 'StyledRowItemRight'
 
+/** @component */
 export const FloatRight = styled.span`
   float: right;
 `
 FloatRight.displayName = 'StyledFloatRight'
 
+/** @component */
 export const RowItem = styled.span`
   align-self: center;
   vertical-align: center;
