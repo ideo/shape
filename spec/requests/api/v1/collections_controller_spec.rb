@@ -170,6 +170,10 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
       )
     }
 
+    before do
+      user.add_role(Role::MEMBER, organization.primary_group)
+    end
+
     context 'success' do
       it 'returns a 200' do
         post(path, params: params)

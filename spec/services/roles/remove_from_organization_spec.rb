@@ -11,13 +11,6 @@ RSpec.describe Roles::RemoveFromOrganization, type: :service do
   end
 
   describe '#call' do
-    before do
-      collection.items.each do |item|
-        user.add_role(Role::EDITOR, item)
-      end
-      user.add_role(Role::EDITOR, orphaned_item)
-    end
-
     it 'should call remove user roles from organization worker' do
       expect(RemoveUserRolesFromOrganizationWorker).to receive(:perform_async)
         .with(
