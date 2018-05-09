@@ -136,4 +136,47 @@ describe Organization, type: :model do
       expect(guest.has_role?(Role::MEMBER, organization.guest_group)).to be true
     end
   end
+
+  describe '#remove_user_membership' do
+    let(:organization) { create(:organization) }
+    let(:other_org) { create(:organization) }
+    let(:user) { create(:user) }
+    let(:instance_double) do
+      double('Roles:RemoveFromOrganization')
+    end
+
+    before do
+      user.add_role(Role::MEMBER, other_org.primary_group)
+      other_org.setup_user_membership(user)
+      allow(Roles::RemoveFromOrganization).to receive(:new).and_return(instance_double)
+      allow(instance_double).to receive(:call).and_return(true)
+    end
+
+    it 'should call the remove from organization service' do
+      expect(Roles::RemoveFromOrganization).to receive(:new).with(
+        organization,
+        user,
+      )
+      organization.remove_user_membership(user)
+    end
+
+    it 'should switch to their first organizaiton' do
+      organization.remove_user_membership(user)
+      expect(user.current_organization).to eq other_org
+    end
+
+    context 'for a user where this was their only organization' do
+      let(:user) { create(:user) }
+
+      before do
+        user.roles.destroy_all
+        user.reload
+      end
+
+      it 'should create a new organization' do
+        expect(Organization).to receive(:create_for_user)
+        organization.remove_user_membership(user)
+      end
+    end
+  end
 end

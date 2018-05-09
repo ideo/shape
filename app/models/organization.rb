@@ -47,7 +47,7 @@ class Organization < ApplicationRecord
     Roles::RemoveFromOrganization.new(self, user).call
 
     if user.organizations.count.zero?
-      self.create_for_user(user)
+      Organization.create_for_user(user)
     end
 
     # Set current org as one they are a member of
