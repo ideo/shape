@@ -18,6 +18,7 @@ const StyledHotspot = styled.div`
   width: 36px;
   z-index: 100;
 
+  cursor: pointer;
   &:hover, &.is-over {
     opacity: ${props => (props.dragging ? 0 : 1)};
   }
@@ -73,5 +74,7 @@ GridCardHotspot.wrappedComponent.propTypes = {
 GridCardHotspot.defaultProps = {
   position: 'right',
 }
+
+GridCardHotspot.displayName = 'GridCardHotspot'
 
 export default GridCardHotspot
