@@ -17,7 +17,9 @@ class Ability
       # Logged-in users only
 
       # TODO: ensure that user is member of primary or guest group
-      can :read, Organization
+      can :read, Organization do |organization|
+        organization.can_view?(user)
+      end
       can :read, User
 
       can :create, Group

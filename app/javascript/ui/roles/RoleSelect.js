@@ -83,7 +83,8 @@ class RoleSelect extends React.Component {
 
   deleteRole = (isSwitching = true) => {
     const { role, entity } = this.props
-    return this.props.onDelete(role, entity, { isSwitching })
+    const isGuestGroup = this.isGuestGroup()
+    return this.props.onDelete(role, entity, { isSwitching, isGuestGroup })
   }
 
   renderName() {

@@ -19,8 +19,8 @@ class Group < ApplicationRecord
 
   after_create :create_shared_collection
 
-  rolify after_add: :after_add_role,
-         after_remove: :after_remove_role,
+  rolify after_add: :after_role_update,
+         after_remove: :after_role_update,
          strict: true
 
   belongs_to :organization
@@ -103,13 +103,7 @@ class Group < ApplicationRecord
     update(current_shared_collection: shared)
   end
 
-  def after_add_role(role)
-    resource = role.resource
-    # Reindex record if it is a searchkick model
-    resource.reindex if Searchkick.callbacks? && resource.searchable?
-  end
-
-  def after_remove_role(role)
+  def after_role_update(role)
     resource = role.resource
     # Reindex record if it is a searchkick model
     resource.reindex if Searchkick.callbacks? && resource.searchable?

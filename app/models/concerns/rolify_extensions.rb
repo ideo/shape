@@ -47,7 +47,7 @@ module RolifyExtensions
       else
         raise "RolifyExtension: Unsupported model '#{self.class.name}' for add_role"
       end
-      after_add_role(role)
+      after_role_update(role)
 
     # rubocop:disable Lint/HandleExceptions
     rescue ActiveRecord::RecordNotUnique

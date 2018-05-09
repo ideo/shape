@@ -102,6 +102,14 @@ module Roles
       true
     end
 
+    def remove_org_membership
+      if @object.is_a?(Group) && (@object.guest? || @object.primary?)
+        @users.each do |user|
+          @object.organization.remove_user_membership(user)
+        end
+      end
+    end
+
     def children
       return [] unless @object.respond_to?(:children)
 

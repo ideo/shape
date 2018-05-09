@@ -18,10 +18,16 @@ class Organization < ApplicationRecord
   delegate :admins, to: :primary_group
   delegate :members, to: :primary_group
   delegate :handle, to: :primary_group
-  delegate :can_edit?, to: :primary_group
-  delegate :can_view?, to: :primary_group
 
   validates :name, presence: true
+
+  def can_view?(user)
+    primary_group.can_view?(user) or guest_group.can_view?(user)
+  end
+
+  def can_edit?(user)
+    primary_group.can_edit?(user) or guest_group.can_edit?(user)
+  end
 
   def self.create_for_user(user)
     name = [user.first_name, user.last_name, 'Organization'].compact.join(' ')
@@ -37,8 +43,7 @@ class Organization < ApplicationRecord
     Collection::UserCollection.find_or_create_for_user(user, self)
   end
 
-  # Note: this method can be called many times for the same org
-  def user_role_removed(user)
+  def remove_user_membership(user)
     # If they are still an admin or member, don't do anything
     return if can_view?(user)
 
