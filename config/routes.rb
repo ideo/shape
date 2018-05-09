@@ -84,6 +84,7 @@ Rails.application.routes.draw do
   get 'invitations/:token', to: 'invitations#accept', as: :accept_invitation
 
   get :login, to: 'home#login', as: :login
+  get :sign_up, to: 'home#sign_up', as: :sign_up
 
   # catch all mailer preview paths
   get '/rails/mailers/*path' => 'rails/mailers#preview'
