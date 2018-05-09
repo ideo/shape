@@ -1,0 +1,5 @@
+production:
+  active: true
+  push_api_key: <%= ENV['APPSIGNAL_PUSH_API_KEY'] %>
+  name: "Shape"
+  enable_frontend_error_catching: true
