@@ -78,11 +78,12 @@ export const StyledTopRightActions = styled.div`
 StyledTopRightActions.displayName = 'StyledTopRightActions'
 
 class GridCard extends React.Component {
-  get canEdit() {
-    if (this.props.isSharedCollection) return false
-    // you can always edit your link cards
-    if (this.props.card.link) return true
-    return this.props.record.can_edit
+  get canEditCard() {
+    const { isSharedCollection, canEditCollection, card, record } = this.props
+    if (isSharedCollection) return false
+    // you can always edit your link cards, regardless of record.can_edit
+    if (canEditCollection && card.link) return true
+    return record.can_edit
   }
 
   get canReplace() {
@@ -99,7 +100,7 @@ class GridCard extends React.Component {
   }
 
   get isSelectable() {
-    return (this.props.isSharedCollection || this.canEdit)
+    return (this.props.isSharedCollection || this.canEditCard)
   }
 
   get renderInner() {
@@ -188,7 +189,7 @@ class GridCard extends React.Component {
             <CardMenu
               className="show-on-hover card-menu"
               card={card}
-              canEdit={this.canEdit}
+              canEdit={this.canEditCard}
               canReplace={this.canReplace}
               menuOpen={menuOpen}
             />
