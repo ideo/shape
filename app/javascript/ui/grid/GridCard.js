@@ -170,10 +170,15 @@ class GridCard extends React.Component {
       menuOpen,
     } = this.props
 
+    const firstCardInRow = card.position && card.position.x === 0
+
     return (
       <StyledGridCard dragging={dragging}>
         {canEditCollection &&
           <GridCardHotspot card={card} dragging={dragging} />
+        }
+        {canEditCollection && firstCardInRow &&
+          <GridCardHotspot card={card} dragging={dragging} position="left" />
         }
         {!record.isSharedCollection &&
           <StyledTopRightActions>
