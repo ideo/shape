@@ -73,6 +73,7 @@ export const TextButton = styled.button`
   font-weight: 500;
   letter-spacing: 0.09375rem;
   cursor: pointer;
+  max-width: ${props => (props.maxWidth ? `${props.maxWidth}px` : 'none')};
 `
 TextButton.displayName = 'StyledTextButton'
 

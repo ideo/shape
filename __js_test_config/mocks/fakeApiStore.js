@@ -21,6 +21,7 @@ const fakeApiStore = ({ findResult = '', findAllResult = [], requestResult = '' 
     loadCurrentUserAndGroups: jest.fn(),
     setCurrentUserId: jest.fn(),
     setCurrentUserId: jest.fn(),
+    findOrganizationById: jest.fn().mockReturnValue({ name: 'abc' }),
     currentUserId: 1,
     currentUser: {
       id: 1,

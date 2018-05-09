@@ -7,7 +7,7 @@ import InfiniteScroll from 'react-infinite-scroller'
 import FlipMove from 'react-flip-move'
 import VisibilitySensor from 'react-visibility-sensor'
 
-import { apiStore, uiStore } from '~/stores'
+import { uiStore } from '~/stores'
 import v from '~/utils/variables'
 import Breadcrumb from '~/ui/layout/Breadcrumb'
 import Loader from '~/ui/layout/Loader'
@@ -15,7 +15,6 @@ import CardMenu from '~/ui/grid/CardMenu'
 import SelectionCircle from '~/ui/grid/SelectionCircle'
 import CollectionCover from '~/ui/grid/covers/CollectionCover'
 import CollectionIcon from '~/ui/icons/CollectionIcon'
-import CollectionCard from '~/stores/jsonApi/CollectionCard'
 import { StyledTopRightActions, StyledBottomLeftIcon } from '~/ui/grid/GridCard'
 
 const StyledSearchResult = styled.div`
