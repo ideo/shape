@@ -27,7 +27,7 @@ class ConfirmationDialog extends React.PureComponent {
       prompt,
     } = this.props
 
-    const modalProps = { ...this.props, open: this.isOpen }
+    const modalProps = { ...this.props, open: this.isOpen, maxWidth: 'sm' }
 
     return (
       <Dialog {...modalProps}>

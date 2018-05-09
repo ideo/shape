@@ -12,9 +12,11 @@ const StyledDialog = styled(MuiDialog)`
     background-color: ${v.colors.cloudy};
     border-radius: 6px;
     color: white;
-    max-width: 350px;
     opacity: 0.95;
     width: 100%;
+    &-sm {
+      max-width: 425px;
+    }
   }
 `
 const ModalCloseButton = styled.button`
@@ -62,15 +64,16 @@ class Dialog extends React.PureComponent {
   }
 
   render() {
-    const { children, open } = this.props
+    const { children, open, maxWidth } = this.props
     return (
       <StyledDialog
         open={open}
-        classes={{ paper: 'modal__paper' }}
+        classes={{ paper: 'modal__paper', paperWidthSm: 'modal__paper-sm' }}
         onClose={this.handleClose}
         onBackdropClick={this.handleClose}
         aria-labelledby="Confirmation"
         BackdropProps={{ invisible: true }}
+        maxWidth={maxWidth}
       >
         <ModalCloseButton onClick={this.handleClose}>
           <CloseIcon />
@@ -101,9 +104,11 @@ Dialog.propTypes = {
   children: PropTypes.node.isRequired,
   open: PropTypes.bool.isRequired,
   onClose: PropTypes.func.isRequired,
+  maxWidth: PropTypes.string,
 }
 Dialog.defaultProps = {
   iconName: 'Alert',
+  maxWidth: 'xs', // 'xs' == 360px
 }
 // all propTypes except required `children` node, to be used by Information/ConfirmationModal
 const { children, ...childPropTypes } = Dialog.propTypes

@@ -102,6 +102,8 @@ describe('OrganizationDropdown', () => {
       props.uiStore.isMovingCards = true
       wrapper.setProps(props)
       component.handleSwitchOrg(orgId)(fakeEv)
+      // findOrganizationById to lookup the name for the confirm dialog
+      expect(props.apiStore.findOrganizationById).toHaveBeenCalledWith(orgId)
       expect(props.uiStore.confirm).toHaveBeenCalled()
     })
   })
