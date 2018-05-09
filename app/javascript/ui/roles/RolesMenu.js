@@ -71,19 +71,19 @@ class RolesMenu extends React.Component {
     this.searchableItems = items
   }
 
-  deleteRoles = (role, entity, opts = {}) =>
-    this.props.apiStore.request(`${entity.internalType}/${entity.id}/roles/${role.id}`,
-      'DELETE',
-      { is_switching: opts.isSwitching }).then((res) => {
-      // We should do a page reload to get the correct user's new org
-      if (opts.organizationChange) window.location.reload()
-      if (!opts.isSwitching) {
-        const saveReturn = this.props.onSave(res)
-        this.filterSearchableItems()
-        return saveReturn
-      }
-      return {}
-    })
+  deleteRoles = (role, entity, opts = {}) => {
+    role.API_delete(entity, opts)
+      .then(res => {
+        // We should do a page reload to get the correct user's new org
+        if (opts.organizationChange) window.location.reload()
+        if (!opts.isSwitching) {
+          const saveReturn = this.props.onSave(res)
+          this.filterSearchableItems()
+          return saveReturn
+        }
+        return {}
+      })
+  }
 
   createRoles = (entities, roleName, opts = {}) => {
     const { apiStore, ownerId, ownerType, onSave } = this.props

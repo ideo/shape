@@ -9,6 +9,21 @@ class Role extends BaseRecord {
     return this.name === 'editor' || this.name === 'admin'
   }
 
+  API_delete(entity, opts = {}) {
+    return this.apiStore.request(
+      `${entity.internalType}/${entity.id}/roles/${this.id}`,
+      'DELETE',
+      { is_switching: opts.isSwitching }
+    )
+      .then(res => {
+        const resRoleIds = res.data.map(role => role.id)
+        const deletedRole = this.resource.groupRoles.find(role =>
+          resRoleIds.indexOf(role.id) === -1)
+        if (deletedRole) this.apiStore.remove('roles', deletedRole.id)
+        return res
+      })
+  }
+
   API_create() {
     // TODO why can't the API figure out where name is if calling toJsonApi?
     return this.apiStore.request(`collections/${this.resourceId}/roles`,
