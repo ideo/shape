@@ -47,6 +47,9 @@ class OrganizationDropdown extends React.Component {
       apiStore.currentUser.switchOrganization(orgId, { backToHomepage: true })
     }
     if (uiStore.isMovingCards) {
+      const currentOrgName = apiStore.currentUserOrganization.name
+      const otherOrgName = apiStore.findOrganizationById(orgId).name
+
       uiStore.confirm({
         iconName: 'Alert',
         prompt: 'You can only link or duplicate content between organizations.',
@@ -54,8 +57,8 @@ class OrganizationDropdown extends React.Component {
           switchOrg()
           uiStore.closeMoveMenu()
         },
-        cancelText: 'Move within Org',
-        confirmText: 'Switch to Org',
+        cancelText: `Move within ${currentOrgName}`,
+        confirmText: `Switch to ${otherOrgName}`,
       })
       return
     }

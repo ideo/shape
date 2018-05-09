@@ -12,7 +12,7 @@ const StyledDialog = styled(MuiDialog)`
     background-color: ${v.colors.cloudy};
     border-radius: 6px;
     color: white;
-    max-width: 330px;
+    max-width: 350px;
     opacity: 0.95;
     width: 100%;
   }

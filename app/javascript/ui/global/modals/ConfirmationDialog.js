@@ -36,10 +36,10 @@ class ConfirmationDialog extends React.PureComponent {
             { prompt }
           </p>
           <FormActionsContainer>
-            <TextButton onClick={this.handleCancel}>
+            <TextButton maxWidth={150} onClick={this.handleCancel}>
               {cancelText}
             </TextButton>
-            <TextButton onClick={this.handleConfirm}>
+            <TextButton maxWidth={150} onClick={this.handleConfirm}>
               {confirmText}
             </TextButton>
           </FormActionsContainer>
