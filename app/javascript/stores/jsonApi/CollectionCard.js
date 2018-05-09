@@ -36,18 +36,19 @@ class CollectionCard extends BaseRecord {
   // This sets max W/H based on number of visible columns. Used by Grid + CollectionCover.
   // e.g. "maxWidth" might temporarily be 2 cols even though this card.width == 4
   @action calculateMaxSize(cols) {
-    // e.g. if card.width is 4, but we're at 2 columns, max out at cardWidth = 2
+    // max out width to the number of columns
     this.maxWidth = Math.min(cols, this.width)
-    // only allow for height of 2 if we are at 4 columns (either 4 or "small 4" layout)
+    // generally only allow cards with height of 2 if we are displaying 4 columns
     this.maxHeight = Math.min(cols === 4 ? 2 : 1, this.height)
-    // special case for tall cards
+    // special case for tall cards, allow them to remain tall
     if (this.height === 2 && this.width === 1) {
       this.maxHeight = 2
+      // except for text items at 1 column size, always shrink to 1x1
       if (this.isTextItem && cols <= 1) {
         this.maxHeight = 1
       }
     }
-    // special case for large square tiles, they should remain square
+    // special case for large square tiles, they should remain at a square ratio
     if (this.width === this.height && this.width > 1) {
       if (cols === 1) {
         this.maxWidth = 1

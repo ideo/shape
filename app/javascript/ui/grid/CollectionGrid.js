@@ -1,9 +1,11 @@
 import PropTypes from 'prop-types'
+import { action } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import _ from 'lodash'
 
 import Loader from '~/ui/layout/Loader'
 import MovableGridCard from '~/ui/grid/MovableGridCard'
+import CollectionCard from '~/stores/jsonApi/CollectionCard'
 
 const calculateDistance = (pos1, pos2) => {
   // pythagoras!
@@ -195,7 +197,7 @@ class CollectionGrid extends React.Component {
 
   createPlaceholderCard = (original, { width = original.width, height = original.height } = {}) => {
     const placeholderKey = `${original.id}-placeholder`
-    const placeholder = {
+    const data = {
       position: original.position,
       width,
       height,
@@ -203,8 +205,10 @@ class CollectionGrid extends React.Component {
       order: original.order,
       id: placeholderKey,
       originalId: original.id,
-      cardType: 'placeholder'
+      cardType: 'placeholder',
+      record: original.record,
     }
+    const placeholder = new CollectionCard(data)
     const newItems = _.concat(this.state.cards, placeholder)
     this.positionCards(newItems, { dragging: original.id })
   }
@@ -282,7 +286,7 @@ class CollectionGrid extends React.Component {
   // --------------------------
 
   // Sorts cards and sets state.cards after doing so
-  positionCards = (collectionCards = [], opts = {}) => {
+  @action positionCards = (collectionCards = [], opts = {}) => {
     const cards = [...collectionCards]
     // props might get passed in e.g. nextProps for componentWillReceiveProps
     if (!opts.props) opts.props = this.props
@@ -297,7 +301,8 @@ class CollectionGrid extends React.Component {
     const matrix = []
     // create an empty row
     matrix.push(_.fill(Array(cols), null))
-    _.each(_.sortBy(cards, sortBy), (card, i) => {
+    const sortedCards = _.sortBy(cards, sortBy)
+    _.each(sortedCards, (card, i) => {
       // we don't actually want to "re-position" the dragging card
       // because its position is being determined by the drag (i.e. mouse cursor)
       if (opts.dragging === card.id) {
@@ -323,35 +328,79 @@ class CollectionGrid extends React.Component {
         if (maxGap.length >= cardWidth) {
           [nextX] = maxGap
           itFits = true
-        } else if (card.isTextItem && cols === 2 && cardWidth === 2 && maxGap.length === 1) {
-          // special case! try to backfill previous gap of 1 by shrinking down
-          cardWidth = 1
-          card.setMaxWidth(1)
-          itFits = true
-          if (cardHeight === 2) {
-            cardHeight = 1
-            card.setMaxHeight(1)
+        } else {
+          // 2-COLUMN SPECIAL CASE FOR TEXT CARD:
+          // - card is (2+)x1 or 1x2 text item and there is a gap of 1 remaining on this row
+          // - shrink card to 1x1 to fit on the row.
+          const shouldBackfillSmallGap = (
+            card.isTextItem &&
+            // here we actually check against the card's original dimensions, not its constraints
+            ((card.width >= 2 && card.height === 1) || (card.height === 2 && card.width === 1)) &&
+            cols === 2 && maxGap.length === 1
+          )
+          if (shouldBackfillSmallGap) {
+            cardWidth = 1
+            card.setMaxWidth(1)
+            itFits = true
+            if (cardHeight === 2) {
+              cardHeight = 1
+              card.setMaxHeight(1)
+            }
+            [nextX] = maxGap
+            itFits = true
           }
-          [nextX] = maxGap
-          itFits = true
         }
-        // one more special case! stretch out prev text if it can fill out the 2 column row
-        const prevCard = cards[i - 1]
-        const canFitOneRow = prevCard && maxGap.length && prevCard.maxHeight === 1
-        const canFitTwoRows = (
-          prevCard &&
-          prevCard.maxHeight === 2 &&
-          row >= 1 &&
-          matrix[row][1] === null &&
-          matrix[row - 1][1] === null
-        )
-        if (cols === 2 &&
-            !itFits &&
-            (canFitOneRow || canFitTwoRows) &&
-            prevCard.isTextItem) {
-          prevCard.setMaxWidth(2)
-          prevCard.position.width = (2 * (gridW + gutter)) - gutter
+        // 2-COLUMN SPECIAL CASES FOR PREVIOUS TEXT CARDS:
+        // 1. Check if prevCard is 1x1 but there is a gap to the right of it:
+        //  - stretch to 2x1
+        // 2. Check if prevCard is 1x2 and there is a tall gap to the right of it:
+        //  - stretch to 2x2
+        // 3. Check if prevCard is 1x2 and there is a short gap to the (bottom) left:
+        //  - shrink to 1x1
+        // 4. Likewise if prevPrevCard is 1x2 and there is a short gap to the (bottom) right:
+        //  - shrink to 1x1
+        const prevCard = sortedCards[i - 1]
+        const prevPrevCard = sortedCards[i - 2]
+        if (!itFits && cols === 2) {
+          const canFitOneRow = (
+            prevCard && prevCard.isTextItem &&
+            maxGap.length > 0 && prevCard.position.x === 0 && prevCard.maxHeight === 1
+          )
+          const canFitTwoRows = (
+            prevCard && prevCard.isTextItem &&
+            prevCard.maxHeight === 2 &&
+            row >= 1 &&
+            matrix[row][1] === null &&
+            matrix[row - 1][1] === null
+          )
+          const shouldShrinkOneRow = (
+            prevCard && prevCard.isTextItem &&
+            prevCard.maxHeight === 2 &&
+            matrix[row][0] === null
+          )
+          const shouldShrinkPrevPrevOneRow = (
+            prevPrevCard && prevPrevCard.isTextItem &&
+            prevPrevCard.maxHeight === 2 &&
+            matrix[row][1] === null
+          )
+          if (canFitOneRow || canFitTwoRows) {
+            prevCard.setMaxWidth(2)
+            prevCard.position.width = (2 * (gridW + gutter)) - gutter
+          } else if (shouldShrinkOneRow) {
+            prevCard.setMaxHeight(1)
+            prevCard.position.height = (1 * (gridH + gutter)) - gutter
+            itFits = true
+            nextX = 0
+          } else if (shouldShrinkPrevPrevOneRow) {
+            prevPrevCard.setMaxHeight(1)
+            prevPrevCard.position.height = (1 * (gridH + gutter)) - gutter
+            itFits = true
+            nextX = 0
+          }
         }
+        // --------------------------
+        // </end special cases
+        // --------------------------
 
         if (itFits) {
           filled = true
@@ -379,14 +428,6 @@ class CollectionGrid extends React.Component {
             if (!matrix[row + y]) matrix.push(_.fill(Array(cols), null))
             _.fill(matrix[row + y], card.id, position.x, position.x + cardWidth)
           }
-
-          // NOTE: if you remove this check, then it will fill things in
-          // slightly out of order to "fill empty gaps" at the end of the row
-          // if (nextX + card.w === cols) {
-          //   row += 1
-          //   if (!matrix[row]) matrix.push(_.fill(Array(cols), null))
-          // }
-          //  --------
         } else {
           row += 1
           if (!matrix[row]) matrix.push(_.fill(Array(cols), null))
