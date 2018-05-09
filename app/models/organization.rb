@@ -44,9 +44,6 @@ class Organization < ApplicationRecord
   end
 
   def remove_user_membership(user)
-    # If they are still an admin or member, don't do anything
-    return if can_view?(user)
-
     Roles::RemoveFromOrganization.new(self, user).call
 
     if user.organizations.count.zero?

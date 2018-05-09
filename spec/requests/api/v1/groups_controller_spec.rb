@@ -4,7 +4,8 @@ describe Api::V1::GroupsController, type: :request, json: true, auth: true do
   let(:user) { @user }
 
   describe 'GET #show' do
-    let!(:group) { create(:group, add_admins: [user]) }
+    let!(:organization) { create(:organization) }
+    let!(:group) { create(:group, add_admins: [user], organization: organization) }
     let(:path) { "/api/v1/groups/#{group.id}" }
     let(:users_json) { json_included_objects_of_type('users') }
 
@@ -46,6 +47,7 @@ describe Api::V1::GroupsController, type: :request, json: true, auth: true do
 
   describe 'POST #create' do
     let!(:organization) { create(:organization) }
+    let!(:group) { create(:group, add_admins: [user], organization: organization) }
     let(:current_user) { user }
     let(:path) { '/api/v1/groups' }
     let(:params) do

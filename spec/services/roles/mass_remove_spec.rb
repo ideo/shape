@@ -115,8 +115,10 @@ RSpec.describe Roles::MassRemove, type: :service do
 
         it 'should link all the groups shared collection cards' do
           expect(UnlinkFromSharedCollectionsWorker).to receive(:perform_async).with(
-            user
-          )
+            users.map(&:id),
+            groups.map(&:id),
+            [linked_collection.id],
+            [])
           mass_remove.call
         end
 
@@ -125,10 +127,7 @@ RSpec.describe Roles::MassRemove, type: :service do
 
           it 'should link all the groups shared collection cards' do
             expect(organization).to receive(:remove_user_membership).with(
-              users.map(&:id),
-              groups.map(&:id),
-              [linked_collection.id],
-              []
+              user,
             )
             mass_remove.call
           end

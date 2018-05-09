@@ -26,6 +26,10 @@ describe Api::V1::OrganizationsController, type: :request, json: true, auth: tru
     let!(:organization) { create(:organization) }
     let(:path) { "/api/v1/organizations/#{organization.id}" }
 
+    before do
+      user.add_role(Role::MEMBER, organization.primary_group)
+    end
+
     it 'returns a 200' do
       get(path)
       expect(response.status).to eq(200)

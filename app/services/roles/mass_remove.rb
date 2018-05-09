@@ -22,6 +22,7 @@ module Roles
     def call
       remove_role_from_object(@object)
       remove_links_from_shared_collections if @remove_link
+      remove_org_membership
       remove_roles_from_children
     end
 
