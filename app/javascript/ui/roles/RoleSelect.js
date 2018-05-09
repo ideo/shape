@@ -83,7 +83,12 @@ class RoleSelect extends React.Component {
 
   deleteRole = (isSwitching = true) => {
     const { role, entity } = this.props
-    return this.props.onDelete(role, entity, { isSwitching })
+    let organizationChange = false
+    if (this.resourceType === 'organization' &&
+      entity.id === apiStore.currentUserId) {
+      organizationChange = true
+    }
+    return this.props.onDelete(role, entity, { isSwitching, organizationChange })
   }
 
   renderName() {

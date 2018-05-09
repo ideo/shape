@@ -75,6 +75,8 @@ class RolesMenu extends React.Component {
     this.props.apiStore.request(`${entity.internalType}/${entity.id}/roles/${role.id}`,
       'DELETE',
       { is_switching: opts.isSwitching }).then((res) => {
+      // We should do a page reload to get the correct user's new org
+      if (opts.organizationChange) window.location.reload()
       if (!opts.isSwitching) {
         const saveReturn = this.props.onSave(res)
         this.filterSearchableItems()

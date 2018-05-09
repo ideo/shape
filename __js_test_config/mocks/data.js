@@ -155,7 +155,7 @@ export const fakeRoleAttrs = {
   name: 'editor',
   users: [fakeUser, fakeUser],
   groups: [],
-  resource: { id: 1, type: 'collection' }
+  resource: { id: 1, type: 'collection', internalType: 'collection' }
 }
 export const fakeRole = {
   ...fakeRoleAttrs,
