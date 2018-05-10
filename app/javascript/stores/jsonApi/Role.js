@@ -16,7 +16,7 @@ class Role extends BaseRecord {
       { is_switching: opts.isSwitching }
     )
       .then(res => {
-        if (!this.resource || !this.resource.groupRoles.length) return res
+        if (!this.resource.groupRoles || !this.resource.groupRoles.length) return res
         const resRoleIds = res.data.map(role => role.id)
         const deletedRole = this.resource.groupRoles.find(role =>
           resRoleIds.indexOf(role.id) === -1)
