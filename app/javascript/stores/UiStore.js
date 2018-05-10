@@ -49,6 +49,7 @@ export default class UiStore {
   @observable dialogConfig = { ...this.defaultDialogProps }
   @observable blurContent = false
   @observable orgCreated = false
+  @observable searchText = ''
 
   @action popupAlert(props = {}) {
     _.assign(this.dialogConfig, {
