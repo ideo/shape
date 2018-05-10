@@ -6,7 +6,7 @@ class User extends BaseRecord {
     return [this.first_name, this.last_name].join(' ')
   }
 
-  isCurrentUser() {
+  get isCurrentUser() {
     return this.apiStore.currentUserId === this.id
   }
 

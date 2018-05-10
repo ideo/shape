@@ -3,7 +3,8 @@ import RolesMenu from '~/ui/roles/RolesMenu'
 
 import {
   fakeOrganization,
-  fakeUser
+  fakeUser,
+  fakeRole,
 } from '#/mocks/data'
 
 const apiStore = observable({
@@ -31,12 +32,17 @@ describe('RolesMenu', () => {
 
   beforeEach(() => {
     useStrict(false)
+    const routingStore = {
+      pathTo: jest.fn(),
+      routeTo: jest.fn(),
+    }
     props = {
       ownerId: 1,
       ownerType: 'collections',
       roles: [],
       apiStore,
       uiStore,
+      routingStore,
       onSave: jest.fn(),
     }
     wrapper = shallow(
@@ -111,7 +117,7 @@ describe('RolesMenu', () => {
   })
 
   describe('deleteRoles', () => {
-    const role = { id: 2 }
+    const role = fakeRole
     const user = { id: 4, internalType: 'users' }
     const res = { data: [] }
 
@@ -121,23 +127,23 @@ describe('RolesMenu', () => {
     })
 
     describe('when switching a role', () => {
-      it('should make an api store request with correct data', () => {
-        expect(apiStore.request).toHaveBeenCalledWith(
-          `users/${user.id}/roles/${role.id}`,
-          'DELETE',
-          { is_switching: true },
+      it('should make an call role delete with the correct data', () => {
+        expect(role.API_delete).toHaveBeenCalledWith(
+          user,
+          { isSwitching: true },
         )
       })
     })
 
-    describe('when is not swtching', () => {
+    describe('when is not switching', () => {
       beforeEach(async () => {
         component.filterSearchableItems = jest.fn()
+        role.API_delete.mockReturnValue = Promise.resolve({})
         await component.deleteRoles(role, user, { isSwitching: false })
       })
 
       it('should call the onSave prop after the request is done', () => {
-        expect(props.onSave).toHaveBeenCalledWith(res)
+        expect(props.onSave).toHaveBeenCalledWith({})
       })
 
       it('should filter the searchable items', () => {

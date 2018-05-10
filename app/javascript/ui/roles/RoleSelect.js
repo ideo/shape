@@ -32,17 +32,34 @@ const CenterAlignedSingleItem = styled.div`
 CenterAlignedSingleItem.displayName = 'StyledCenterAlignedSingleItem'
 
 class RoleSelect extends React.Component {
+  isGuestGroup() {
+    const { role } = this.props
+    if (role.resource && role.resource.internalType === 'groups') {
+      return role.resource.is_guest
+    }
+    return false
+  }
+
+  get resourceType() {
+    const { role } = this.props
+    if (role.resource.internalType === 'groups') {
+      return (role.resource.is_primary || role.resource.is_guest)
+        ? 'organization' : 'group'
+    }
+    return role.resource.internalType.slice(0, -1)
+  }
+
   onRoleRemove = (ev) => {
     ev.preventDefault()
     const { entity } = this.props
     let prompt
     let confirmText
-    if (entity.isCurrentUser && entity.isCurrentUser()) {
-      prompt = 'Are you sure you want to leave this group?'
+    if (entity.isCurrentUser) {
+      prompt = `Are you sure you want to leave this ${this.resourceType}?`
       confirmText = 'Leave'
     } else {
       prompt = `Are you sure you want to remove
-        ${this.renderName()} from this group?`
+        ${this.renderName()} from this ${this.resourceType}?`
       confirmText = 'Remove'
     }
     uiStore.confirm({
@@ -65,7 +82,10 @@ class RoleSelect extends React.Component {
 
   deleteRole = (isSwitching = true) => {
     const { role, entity } = this.props
-    return this.props.onDelete(role, entity, { isSwitching })
+    const organizationChange = (
+      this.resourceType === 'organization' && entity.isCurrentUser
+    )
+    return this.props.onDelete(role, entity, { isSwitching, organizationChange })
   }
 
   renderName() {
@@ -74,7 +94,7 @@ class RoleSelect extends React.Component {
     if (!entity.name || entity.name.trim().length === 0) {
       nameDisplay = entity.email
     }
-    if (entity.internalType === 'users' && entity.isCurrentUser()) {
+    if (entity.internalType === 'users' && entity.isCurrentUser) {
       nameDisplay += ' (you)'
     }
     if (entity.internalType === 'users' && entity.status === 'pending') {
@@ -86,7 +106,7 @@ class RoleSelect extends React.Component {
   render() {
     const { enabled, role, roleTypes, entity } = this.props
     let select
-    if (enabled) {
+    if (!this.isGuestGroup() && enabled) {
       select = (
         <Select
           classes={{ root: 'select', selectMenu: 'selectMenu' }}

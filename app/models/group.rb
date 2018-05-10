@@ -14,12 +14,13 @@ class Group < ApplicationRecord
                view_role: Role::MEMBER
 
   # alias the resourceable method so we can override with special guest group rules
-  alias resourcable_can_view? can_view?
+  alias resourceable_can_view? can_view?
+  alias resourceable_can_edit? can_edit?
 
   after_create :create_shared_collection
 
-  rolify after_add: :after_add_role,
-         after_remove: :after_remove_role,
+  rolify after_add: :after_role_update,
+         after_remove: :after_role_update,
          strict: true
 
   belongs_to :organization
@@ -84,7 +85,14 @@ class Group < ApplicationRecord
     # NOTE: guest group access can be granted via primary_group membership
     return true if guest? && organization.primary_group.can_view?(user)
     # otherwise pass through to the normal resourceable method
-    resourcable_can_view?(user)
+    resourceable_can_view?(user)
+  end
+
+  def can_edit?(user)
+    return true if new_record?
+    return true if guest? && organization.primary_group.can_edit?(user)
+    # otherwise pass through to the normal resourceable method
+    resourceable_can_edit?(user)
   end
 
   private
@@ -96,13 +104,7 @@ class Group < ApplicationRecord
     update(current_shared_collection: shared)
   end
 
-  def after_add_role(role)
-    resource = role.resource
-    # Reindex record if it is a searchkick model
-    resource.reindex if Searchkick.callbacks? && resource.searchable?
-  end
-
-  def after_remove_role(role)
+  def after_role_update(role)
     resource = role.resource
     # Reindex record if it is a searchkick model
     resource.reindex if Searchkick.callbacks? && resource.searchable?

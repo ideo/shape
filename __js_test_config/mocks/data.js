@@ -155,7 +155,8 @@ export const fakeRoleAttrs = {
   name: 'editor',
   users: [fakeUser, fakeUser],
   groups: [],
-  resource: { id: 1, type: 'collection' }
+  resource: { id: 1, type: 'collection', internalType: 'collection' },
+  API_delete: jest.fn().mockReturnValue(Promise.resolve({})),
 }
 export const fakeRole = {
   ...fakeRoleAttrs,

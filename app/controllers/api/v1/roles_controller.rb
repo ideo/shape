@@ -42,7 +42,7 @@ class Api::V1::RolesController < Api::V1::BaseController
   load_resource only: :destroy
   load_resource :user, only: :destroy
   load_resource :group, only: :destroy
-  before_action :authorize_manage_resource, only: :destroy
+  before_action :authorize_remove_role_from_resource, only: :destroy
   # Remove a user or group with a role from a specific resource
   # /users/:id/roles/:id
   # /groups/:id/roles/:id
@@ -85,7 +85,8 @@ class Api::V1::RolesController < Api::V1::BaseController
     authorize! :read, record
   end
 
-  def authorize_manage_resource
+  def authorize_remove_role_from_resource
+    return true if @user && @user.id == current_user.id
     authorize! :manage, @role.resource
   end
 

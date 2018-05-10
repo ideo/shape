@@ -142,7 +142,7 @@ class Collection < ApplicationRecord
   def self.default_relationships_for_api
     [
       :created_by,
-      roles: %i[users groups],
+      roles: %i[users groups resource],
       collection_cards: [
         :parent,
         record: %i[filestack_file],

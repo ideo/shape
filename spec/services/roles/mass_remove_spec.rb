@@ -118,9 +118,19 @@ RSpec.describe Roles::MassRemove, type: :service do
             users.map(&:id),
             groups.map(&:id),
             [linked_collection.id],
-            []
-          )
+            [])
           mass_remove.call
+        end
+
+        context 'when the object is a primary group' do
+          let!(:object) { organization.primary_group }
+
+          it 'should link all the groups shared collection cards' do
+            expect(organization).to receive(:remove_user_membership).with(
+              user,
+            )
+            mass_remove.call
+          end
         end
       end
     end
