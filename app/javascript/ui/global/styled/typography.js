@@ -1,6 +1,7 @@
 import styled from 'styled-components'
 import v from '~/utils/variables'
 
+/** @component */
 export const Heading1 = styled.h1`
   font-family: ${v.fonts.sans};
   font-size: 2.25rem;
@@ -18,12 +19,14 @@ export const Heading1 = styled.h1`
 `
 Heading1.displayName = 'Heading1'
 
+/** @component */
 export const SimpleHeading1 = Heading1.extend`
   margin-bottom: 2rem;
   text-transform: none;
 `
 SimpleHeading1.displayName = 'SimpleHeading1'
 
+/** @component */
 export const Heading2 = styled.h2`
   text-transform: uppercase;
   font-family: ${v.fonts.sans};
@@ -34,6 +37,7 @@ export const Heading2 = styled.h2`
 `
 Heading2.displayName = 'Heading2'
 
+/** @component */
 export const Heading3 = styled.h3`
   text-transform: uppercase;
   margin-bottom: 13px;
@@ -43,6 +47,7 @@ export const Heading3 = styled.h3`
 `
 Heading3.displayName = 'StyledHeading3'
 
+/** @component */
 export const DisplayText = styled.span`
   font-weight: ${v.weights.book};
   font-family: ${v.fonts.sans};
@@ -50,11 +55,13 @@ export const DisplayText = styled.span`
 `
 DisplayText.displayName = 'StyledDisplayText'
 
+/** @component */
 export const SubduedText = DisplayText.extend`
   color: ${v.colors.cloudy};
 `
 SubduedText.displayName = 'SubduedText'
 
+/** @component */
 export const DisplayLink = styled.a`
   color: ${v.colors.gray};
   font-weight: ${v.weights.book};
@@ -64,6 +71,7 @@ export const DisplayLink = styled.a`
 `
 DisplayLink.displayName = 'StyledDisplayLink'
 
+/** @component */
 export const SubduedTitle = styled.span`
   color: ${v.colors.gray};
   font-weight: ${v.weights.book};
@@ -72,12 +80,14 @@ export const SubduedTitle = styled.span`
 `
 SubduedTitle.displayName = 'StyledSubduedTitled'
 
+/** @component */
 export const ConfirmText = styled.span`
   font-weight: ${v.weights.book};
   font-family: ${v.fonts.sans};
   font-size: 1.25rem;
 `
 
+/** @component */
 export const SubText = styled.span`
   vertical-align: super;
   font-family: ${v.fonts.serif};
@@ -85,6 +95,7 @@ export const SubText = styled.span`
 `
 SubText.displayName = 'StyledSubText'
 
+/** @component */
 export const Anchor = styled.a`
   color: ${v.colors.blue};
   text-decoration: none;

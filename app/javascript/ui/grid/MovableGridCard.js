@@ -143,6 +143,7 @@ class MovableGridCard extends React.PureComponent {
       return
     }
     if (e.target.className.match(/cancelGridClick/)) return
+    if (e.target.tagName === 'A' && e.target.href) return
 
     // timeout is just a stupid thing so that Draggable doesn't complain about unmounting
     setTimeout(() => {

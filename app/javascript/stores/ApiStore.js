@@ -31,6 +31,10 @@ class ApiStore extends Store {
     return this.currentUser.current_organization
   }
 
+  findOrganizationById(id) {
+    return _.first(this.currentUser.organizations.filter(org => org.id === id))
+  }
+
   async loadCurrentUserAndGroups() {
     await this.loadCurrentUser()
     await this.loadCurrentUserGroups()

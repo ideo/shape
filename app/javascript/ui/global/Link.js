@@ -11,4 +11,5 @@ const Link = styled(RouterLink)`
   }
 `
 
+/** @component */
 export default Link
