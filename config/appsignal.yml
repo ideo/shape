@@ -1,5 +1,5 @@
 production:
-  active: true
+  active: <%= ENV['APPSIGNAL_PUSH_API_KEY'].present? %>
   push_api_key: <%= ENV['APPSIGNAL_PUSH_API_KEY'] %>
-  name: "Shape"
+  name: <%= ENV.fetch('APPSIGNAL_APP_NAME') { 'Shape' } %>
   enable_frontend_error_catching: true
