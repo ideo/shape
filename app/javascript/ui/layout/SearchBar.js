@@ -89,9 +89,11 @@ class SearchBar extends React.Component {
   }
 
   leaveSearch() {
-    // Find the first route in history that is not search.
-    while (this.props.routingStore.location.pathname === '/search') {
-      this.props.routingStore.history.goBack()
+    const { routingStore } = this.props
+    if (routingStore.previousPageBeforeSearch) {
+      routingStore.routeTo(routingStore.previousPageBeforeSearch)
+    } else {
+      routingStore.routeTo('/')
     }
   }
 
