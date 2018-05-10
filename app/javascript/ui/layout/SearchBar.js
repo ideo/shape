@@ -76,6 +76,7 @@ class SearchBar extends React.Component {
 
   componentDidMount() {
     const { location } = this.props
+    if (this.searchText === '') this.leaveSearch()
     if (location && _.startsWith(location.pathname, '/search')) {
       // if we're on the search page, focus on the search input box
       this.focusOnSearchInput()
@@ -83,7 +84,17 @@ class SearchBar extends React.Component {
   }
 
   _search = (query) => {
-    this.props.routingStore.routeTo('search', query)
+    if (!query || query === '') return this.leaveSearch()
+    return this.props.routingStore.routeTo('search', query)
+  }
+
+  leaveSearch() {
+    const { routingStore } = this.props
+    if (routingStore.previousPageBeforeSearch) {
+      routingStore.routeTo(routingStore.previousPageBeforeSearch)
+    } else {
+      routingStore.routeTo('/')
+    }
   }
 
   @action updateFocus = (val) => {
