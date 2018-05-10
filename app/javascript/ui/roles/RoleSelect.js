@@ -55,7 +55,7 @@ class RoleSelect extends React.Component {
     const { entity } = this.props
     let prompt
     let confirmText
-    if (entity.isCurrentUser && entity.isCurrentUser()) {
+    if (entity.isCurrentUser) {
       prompt = `Are you sure you want to leave this ${this.resourceType}?`
       confirmText = 'Leave'
     } else {
@@ -83,11 +83,9 @@ class RoleSelect extends React.Component {
 
   deleteRole = (isSwitching = true) => {
     const { role, entity } = this.props
-    let organizationChange = false
-    if (this.resourceType === 'organization' &&
-      entity.id === apiStore.currentUserId) {
-      organizationChange = true
-    }
+    const organizationChange = (
+      this.resourceType === 'organization' && entity.isCurrentUser
+    )
     return this.props.onDelete(role, entity, { isSwitching, organizationChange })
   }
 
@@ -97,7 +95,7 @@ class RoleSelect extends React.Component {
     if (!entity.name || entity.name.trim().length === 0) {
       nameDisplay = entity.email
     }
-    if (entity.internalType === 'users' && entity.isCurrentUser()) {
+    if (entity.internalType === 'users' && entity.isCurrentUser) {
       nameDisplay += ' (you)'
     }
     if (entity.internalType === 'users' && entity.status === 'pending') {

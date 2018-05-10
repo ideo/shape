@@ -17,7 +17,7 @@ function sortUserOrGroup(a, b) {
   return a.entity.name.localeCompare(b.entity.name)
 }
 
-@inject('apiStore')
+@inject('apiStore', 'routingStore')
 @observer
 class RolesMenu extends React.Component {
   @observable searchableItems = []
@@ -75,7 +75,10 @@ class RolesMenu extends React.Component {
     role.API_delete(entity, opts)
       .then(res => {
         // We should do a page reload to get the correct user's new org
-        if (opts.organizationChange) window.location.reload()
+        if (opts.organizationChange) {
+          this.props.routingStore.routeTo('/')
+          window.location.reload()
+        }
         if (!opts.isSwitching) {
           const saveReturn = this.props.onSave(res)
           this.filterSearchableItems()
@@ -191,6 +194,7 @@ RolesMenu.propTypes = {
 }
 RolesMenu.wrappedComponent.propTypes = {
   apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
+  routingStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 RolesMenu.defaultProps = {
   canEdit: false,

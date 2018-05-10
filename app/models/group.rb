@@ -89,7 +89,7 @@ class Group < ApplicationRecord
   end
 
   def can_edit?(user)
-    return true if organization.blank?
+    return true if new_record?
     return true if guest? && organization.primary_group.can_edit?(user)
     # otherwise pass through to the normal resourceable method
     resourceable_can_edit?(user)

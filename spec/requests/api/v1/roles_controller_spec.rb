@@ -190,9 +190,22 @@ describe Api::V1::RolesController, type: :request, json: true, auth: true do
           log_in_as_user(viewers.first)
         end
 
-        it 'returns 401' do
-          delete(path, params: params)
-          expect(response.status).to eq(401)
+        context 'trying to remove someone else' do
+          let(:path) { "/api/v1/users/#{editor.id}/roles/#{role.id}" }
+
+          it 'returns 401' do
+            delete(path, params: params)
+            expect(response.status).to eq(401)
+          end
+        end
+
+        context 'trying to remove yourself' do
+          let(:path) { "/api/v1/users/#{remove_viewer.id}/roles/#{role.id}" }
+
+          it 'returns 200' do
+            delete(path, params: params)
+            expect(response.status).to eq(200)
+          end
         end
       end
     end

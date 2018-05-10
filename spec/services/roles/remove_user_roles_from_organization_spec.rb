@@ -1,10 +1,10 @@
 require 'rails_helper'
 
-RSpec.describe Roles::RemoveFromOrganization, type: :service do
+RSpec.describe Roles::RemoveUserRolesFromOrganization, type: :service do
   let(:organization) { create(:organization) }
   let(:user) { create(:user, add_to_org: organization) }
   let(:remove) do
-    Roles::RemoveFromOrganization.new(
+    Roles::RemoveUserRolesFromOrganization.new(
       organization,
       user,
     )

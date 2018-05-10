@@ -141,19 +141,15 @@ describe Organization, type: :model do
     let(:organization) { create(:organization) }
     let(:other_org) { create(:organization) }
     let(:user) { create(:user) }
-    let(:instance_double) do
-      double('Roles:RemoveFromOrganization')
-    end
 
     before do
       user.add_role(Role::MEMBER, other_org.primary_group)
       other_org.setup_user_membership(user)
-      allow(Roles::RemoveFromOrganization).to receive(:new).and_return(instance_double)
-      allow(instance_double).to receive(:call).and_return(true)
+      allow(Roles::RemoveUserRolesFromOrganization).to receive(:call).and_return(true)
     end
 
     it 'should call the remove from organization service' do
-      expect(Roles::RemoveFromOrganization).to receive(:new).with(
+      expect(Roles::RemoveUserRolesFromOrganization).to receive(:call).with(
         organization,
         user,
       )

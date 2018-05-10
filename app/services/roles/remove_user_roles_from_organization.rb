@@ -1,7 +1,5 @@
 module Roles
-  class RemoveFromOrganization
-    attr_reader :errors
-
+  class RemoveUserRolesFromOrganization < SimpleService
     def initialize(organization,
                    user)
       @organization = organization

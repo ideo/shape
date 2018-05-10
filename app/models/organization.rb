@@ -22,11 +22,11 @@ class Organization < ApplicationRecord
   validates :name, presence: true
 
   def can_view?(user)
-    primary_group.can_view?(user) or guest_group.can_view?(user)
+    primary_group.can_view?(user) || guest_group.can_view?(user)
   end
 
   def can_edit?(user)
-    primary_group.can_edit?(user) or guest_group.can_edit?(user)
+    primary_group.can_edit?(user) || guest_group.can_edit?(user)
   end
 
   def self.create_for_user(user)
@@ -36,15 +36,17 @@ class Organization < ApplicationRecord
     builder.organization
   end
 
-  # Note: this method can be called many times for the same org
+  # NOTE: this method can be called many times for the same org
   def setup_user_membership_and_collections(user)
     # make sure they're on the org
     setup_user_membership(user)
     Collection::UserCollection.find_or_create_for_user(user, self)
   end
 
+  # This gets called from Roles::MassRemove after leaving a primary/guest group
   def remove_user_membership(user)
-    Roles::RemoveFromOrganization.new(self, user).call
+    # asynchronously remove all other roles e.g. collections, items, groups
+    Roles::RemoveUserRolesFromOrganization.call(self, user)
 
     if user.organizations.count.zero?
       Organization.create_for_user(user)
