@@ -79,7 +79,7 @@ describe('RoleSelect', () => {
 
     describe('when deleting the current user from an org group', () => {
       beforeEach(() => {
-        props.entity.id = apiStore.currentUserId
+        props.entity.isCurrentUser = true
         props.role = {
           name: 'admin',
           resource: { internalType: 'groups', is_primary: true }

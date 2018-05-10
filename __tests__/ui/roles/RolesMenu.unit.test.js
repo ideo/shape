@@ -32,12 +32,17 @@ describe('RolesMenu', () => {
 
   beforeEach(() => {
     useStrict(false)
+    const routingStore = {
+      pathTo: jest.fn(),
+      routeTo: jest.fn(),
+    }
     props = {
       ownerId: 1,
       ownerType: 'collections',
       roles: [],
       apiStore,
       uiStore,
+      routingStore,
       onSave: jest.fn(),
     }
     wrapper = shallow(
