@@ -71,7 +71,7 @@ class RolesMenu extends React.Component {
     this.searchableItems = items
   }
 
-  deleteRoles = (role, entity, opts = {}) => {
+  deleteRoles = (role, entity, opts = {}) =>
     role.API_delete(entity, opts)
       .then(res => {
         // We should do a page reload to get the correct user's new org
@@ -83,7 +83,6 @@ class RolesMenu extends React.Component {
         }
         return {}
       })
-  }
 
   createRoles = (entities, roleName, opts = {}) => {
     const { apiStore, ownerId, ownerType, onSave } = this.props
