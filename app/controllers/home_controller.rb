@@ -14,18 +14,21 @@ class HomeController < ApplicationController
     @email = params[:email]
   end
 
+  before_action :require_dev_env, only: [:login_as]
   def login_as
-    redirect_to login_url unless Rails.env.development?
-    u = User.find(params[:id])
-    redirect_to login_url unless u
-    sign_in(:user, u)
+    if (u = User.find(params[:id]))
+      sign_in(:user, u)
+    end
     redirect_to root_url
-  end
   end
 
   private
 
   def set_okta_state
     session['omniauth.state'] = cookies['IdeoSSO-State']
+  end
+
+  def require_dev_env
+    redirect_to login_url unless Rails.env.development?
   end
 end
