@@ -1,6 +1,6 @@
 import { useStrict } from 'mobx'
 import RoleSelect from '~/ui/roles/RoleSelect'
-import { apiStore } from '~/stores'
+
 import {
   fakeRole
 } from '#/mocks/data'
@@ -27,7 +27,6 @@ describe('RoleSelect', () => {
 
   describe('render', () => {
     it('should not render the select for guest groups', () => {
-      props.entity.id =
       props.role = { resource: { internalType: 'groups', is_guest: true } }
       wrapper.setProps(props)
       expect(wrapper.find('Select').length).toEqual(0)
