@@ -108,11 +108,6 @@ describe('RoleSelect', () => {
       groupResource = { internalType: 'groups' }
     })
 
-    it('should return collection when there is no resource', () => {
-      updateRole({ name: 'admin' })
-      expect(component.resourceType).toEqual('collection')
-    })
-
     it('should return organization when its a primary/guest group', () => {
       updateRole(
         {
