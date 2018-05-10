@@ -106,6 +106,9 @@ class RoleSelect extends React.Component {
 
   render() {
     const { enabled, role, roleTypes, entity } = this.props
+    if (!role.resource) {
+      console.log('select render', role)
+    }
     let select
     if (!this.isGuestGroup() && enabled) {
       select = (
