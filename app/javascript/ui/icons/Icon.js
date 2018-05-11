@@ -4,7 +4,7 @@ import styled from 'styled-components'
 export const StyledIcon = styled.span`
   display: inline-block;
   position: relative;
-  // NOTE following is to get svg icons displaying correctly in IE
+  /* NOTE: following is to get svg icons displaying correctly in IE */
   height: 100%;
   width: 100%;
   svg {

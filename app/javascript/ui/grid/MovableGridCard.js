@@ -11,7 +11,7 @@ import PositionedGridCard from '~/ui/grid/PositionedGridCard'
 import GridCard from '~/ui/grid/GridCard'
 import GridCardPlaceholder from '~/ui/grid/GridCardPlaceholder'
 import GridCardBlank from '~/ui/grid/blankContentTool/GridCardBlank'
-import GridCardHotspot from '~/ui/grid/GridCardHotspot'
+import GridCardEmpty from '~/ui/grid/GridCardEmpty'
 import ResizeIcon from '~/ui/icons/ResizeIcon'
 
 const StyledResizeIcon = styled.div`
@@ -45,6 +45,8 @@ const StyledCardWrapper = styled.div`
   }
   z-index: ${props => (props.dragging ? v.zIndex.cardDragging + 1 : 0)};
 `
+
+const cardCSSTransition = 'transform 0.4s, width 0.25s, height 0.25s'
 
 class MovableGridCard extends React.PureComponent {
   state = {
@@ -183,12 +185,15 @@ class MovableGridCard extends React.PureComponent {
   )
 
   renderEmpty = ({ beginningOfRow } = {}) => (
-    <PositionedGridCard {...this.styleProps()}>
-      <div style={{ width: '100%', height: '100%' }}>
-        {beginningOfRow &&
-          <GridCardHotspot card={this.props.card} dragging={this.state.dragging} position="left" />
-        }
-      </div>
+    <PositionedGridCard
+      {...this.styleProps()}
+      transition={cardCSSTransition}
+    >
+      <GridCardEmpty
+        card={this.props.card}
+        dragging={this.state.dragging}
+        showHotspot={beginningOfRow}
+      />
     </PositionedGridCard>
   )
 
@@ -346,7 +351,7 @@ class MovableGridCard extends React.PureComponent {
 
           style={{
             // animate grid items that are moving as they're being displaced
-            transition: ((dragging || resizing) ? 'none' : 'transform 0.4s, width 0.25s, height 0.25s'),
+            transition: ((dragging || resizing) ? 'none' : cardCSSTransition),
           }}
 
         >

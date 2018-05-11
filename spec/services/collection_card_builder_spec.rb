@@ -68,6 +68,12 @@ RSpec.describe CollectionCardBuilder, type: :service do
         expect(organization.primary_group.has_role?(Role::VIEWER, builder.collection_card.collection)).to be false
       end
 
+      it 'should set user show_helper to false if it was true' do
+        expect(user.show_helper).to be true
+        expect(builder.create).to be true
+        expect(user.show_helper).to be false
+      end
+
       describe 'creating card with collection in UserCollection' do
         let(:parent) do
           create(:user_collection, organization: organization, add_editors: [user])
