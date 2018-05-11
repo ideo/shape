@@ -40,6 +40,11 @@ class SearchPage extends PageWithApi {
     super.componentWillReceiveProps(nextProps)
   }
 
+  componentWillUnmount() {
+    const { uiStore } = this.props
+    uiStore.update('searchText', '')
+  }
+
   searchQuery = (props, opts = {}) => {
     let query = queryString.parse(props.location.search).q
     if (!query) return ''
