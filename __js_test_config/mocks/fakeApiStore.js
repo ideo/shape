@@ -35,6 +35,7 @@ const fakeApiStore = ({ findResult = '', findAllResult = [], requestResult = '' 
       groups: [],
       terms_accepted: true,
       switchOrganization: jest.fn(),
+      API_hideHotEdgeHelper: jest.fn(),
     },
     currentUserOrganization: {
       name: 'test org',
