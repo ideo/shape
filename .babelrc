@@ -3,11 +3,6 @@
     [
       "env",
       {
-        "targets": {
-          "browsers": ["IE 11", "> 5%"],
-          "uglify": true
-        },
-        "useBuiltIns": true,
         "test": {
         },
         "development": {
@@ -15,7 +10,19 @@
         },
         "production": {
           "modules": false
-        }
+        },
+        "targets": {
+          "browsers": [
+            "> 1%",
+            "last 2 firefox versions",
+            "last 2 chrome versions",
+            "last 2 safari versions",
+            "edge 15-16",
+            "ie 11"
+          ],
+          "uglify": true
+        },
+        "useBuiltIns": true
       }
     ],
     "react"
@@ -26,6 +33,7 @@
     }
   },
   "plugins": [
+    ["lodash"],
     ["transform-decorators-legacy"],
     ["transform-class-properties"],
     ["babel-plugin-root-import", [{
