@@ -45,7 +45,7 @@ export default class UiStore {
   @observable movingFromCollectionId = null
   @observable cardAction = 'move'
   defaultDialogProps = {
-    open: null,
+    open: null, // track whether "info" or "confirm" dialog are open, or none
     prompt: null,
     onConfirm: null,
     onCancel: null,
@@ -57,6 +57,7 @@ export default class UiStore {
   @observable dialogConfig = { ...this.defaultDialogProps }
   @observable blurContent = false
   @observable orgCreated = false
+  @observable searchText = ''
 
   @action popupAlert(props = {}) {
     _.assign(this.dialogConfig, {
@@ -120,6 +121,10 @@ export default class UiStore {
     this.movingCardIds.replace([])
     this.movingFromCollectionId = null
     this.deselectCards()
+  }
+
+  @computed get isMovingCards() {
+    return this.movingCardIds.length && this.cardAction === 'move'
   }
 
   // NOTE: because we aren't tracking a difference between "closed" and null,
@@ -197,7 +202,6 @@ export default class UiStore {
 
   @action resetSelectionAndBCT() {
     this.deselectCards()
-    // this.closeMoveMenu()
     this.closeBlankContentTool()
   }
 

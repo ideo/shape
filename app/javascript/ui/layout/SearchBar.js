@@ -1,9 +1,6 @@
 import _ from 'lodash'
-import ReactRouterPropTypes from 'react-router-prop-types'
-import { withRouter } from 'react-router-dom'
 import { action, observable } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
-import queryString from 'query-string'
 import styled from 'styled-components'
 
 import v from '~/utils/variables'
@@ -58,32 +55,32 @@ const StyledSearchBar = styled.div`
 `
 StyledSearchBar.displayName = 'StyledSearchBar'
 
-@withRouter // needed for props.location
-@inject('routingStore') // needed for routeTo method
+@inject('routingStore', 'uiStore') // needed for routeTo method
 @observer
 class SearchBar extends React.Component {
-  @observable searchText = ''
   @observable focused = false
 
   constructor(props) {
     super(props)
     this.search = _.debounce(this._search, 300)
-
-    const { location } = props
-    const query = queryString.parse(location.search).q
-    this.searchText = query || ''
   }
 
   componentDidMount() {
-    const { location } = this.props
-    if (location && _.startsWith(location.pathname, '/search')) {
+    const { routingStore } = this.props
+    if (routingStore.pathContains('/search')) {
       // if we're on the search page, focus on the search input box
       this.focusOnSearchInput()
     }
   }
 
+  get searchText() {
+    return this.props.uiStore.searchText
+  }
+
   _search = (query) => {
-    this.props.routingStore.routeTo('search', query)
+    const { routingStore } = this.props
+    if (!query || query === '') return routingStore.leaveSearch()
+    return routingStore.routeTo('search', query)
   }
 
   @action updateFocus = (val) => {
@@ -92,8 +89,8 @@ class SearchBar extends React.Component {
 
   handleFocus = val => () => this.updateFocus(val)
 
-  @action updateSearchText = (text) => {
-    this.searchText = text
+  updateSearchText = (text) => {
+    this.props.uiStore.update('searchText', text)
     // perform a debounced search
     this.search(this.searchText)
   }
@@ -137,8 +134,8 @@ class SearchBar extends React.Component {
 }
 
 SearchBar.wrappedComponent.propTypes = {
-  location: ReactRouterPropTypes.location.isRequired,
   routingStore: MobxPropTypes.objectOrObservableObject.isRequired,
+  uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 
 export default SearchBar

@@ -11,6 +11,7 @@ import PositionedGridCard from '~/ui/grid/PositionedGridCard'
 import GridCard from '~/ui/grid/GridCard'
 import GridCardPlaceholder from '~/ui/grid/GridCardPlaceholder'
 import GridCardBlank from '~/ui/grid/blankContentTool/GridCardBlank'
+import GridCardHotspot from '~/ui/grid/GridCardHotspot'
 import ResizeIcon from '~/ui/icons/ResizeIcon'
 
 const StyledResizeIcon = styled.div`
@@ -145,6 +146,7 @@ class MovableGridCard extends React.PureComponent {
       return
     }
     if (e.target.className.match(/cancelGridClick/)) return
+    if (e.target.tagName === 'A' && e.target.href) return
 
     // timeout is just a stupid thing so that Draggable doesn't complain about unmounting
     setTimeout(() => {
@@ -177,6 +179,16 @@ class MovableGridCard extends React.PureComponent {
   renderPlaceholder = () => (
     <PositionedGridCard {...this.styleProps()}>
       <GridCardPlaceholder />
+    </PositionedGridCard>
+  )
+
+  renderEmpty = ({ beginningOfRow } = {}) => (
+    <PositionedGridCard {...this.styleProps()}>
+      <div style={{ width: '100%', height: '100%' }}>
+        {beginningOfRow &&
+          <GridCardHotspot card={this.props.card} dragging={this.state.dragging} position="left" />
+        }
+      </div>
     </PositionedGridCard>
   )
 
@@ -240,6 +252,8 @@ class MovableGridCard extends React.PureComponent {
       return this.renderPlaceholder()
     } else if (cardType === 'blank') {
       return this.renderBlank()
+    } else if (cardType === 'empty') {
+      return this.renderEmpty({ beginningOfRow: card.position.x === 0 })
     }
 
     const { gridW, gridH } = uiStore.gridSettings

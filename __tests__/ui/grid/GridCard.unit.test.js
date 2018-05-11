@@ -64,7 +64,21 @@ describe('GridCard', () => {
 
       it('renders selection circle and hotspot', () => {
         expect(wrapper.find('SelectionCircle').exists()).toBe(true)
-        expect(wrapper.find('GridCardHotspot').exists()).toBe(false)
+        expect(wrapper.find('GridCardHotspot').exists()).toBe(true)
+      })
+    })
+
+    describe('as first item in the row', () => {
+      beforeEach(() => {
+        props.record.can_edit = true
+        props.canEditCollection = true
+        props.card.position = { x: 0 }
+        wrapper.setProps(props)
+      })
+
+      it('renders hotspot to the left and right', () => {
+        expect(wrapper.find('GridCardHotspot').at(0).props().position).toBe('right')
+        expect(wrapper.find('GridCardHotspot').at(1).props().position).toBe('left')
       })
     })
 
@@ -84,6 +98,7 @@ describe('GridCard', () => {
     beforeEach(() => {
       props.cardType = 'collections'
       props.card = fakeCollectionCard
+      props.canEditCollection = false
       props.record = fakeCollection
       props.record.can_edit = false
       wrapper.setProps(props)
@@ -119,14 +134,14 @@ describe('GridCard', () => {
 
       it('renders selection circle and hotspot', () => {
         expect(wrapper.find('SelectionCircle').exists()).toBe(true)
-        expect(wrapper.find('GridCardHotspot').exists()).toBe(false)
+        expect(wrapper.find('GridCardHotspot').exists()).toBe(true)
       })
     })
 
     describe('with SharedCollection', () => {
       beforeEach(() => {
         props.isSharedCollection = true
-        props.canEditCollection = true
+        props.canEditCollection = false
         wrapper.setProps(props)
       })
 

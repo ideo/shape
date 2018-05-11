@@ -2,6 +2,8 @@ import { RouterStore } from 'mobx-react-router'
 
 // mobx-react-router with a couple of helper methods
 class RoutingStore extends RouterStore {
+  previousPageBeforeSearch = null
+
   pathTo = (type, id) => {
     switch (type) {
     case 'collections':
@@ -24,6 +26,7 @@ class RoutingStore extends RouterStore {
       this.push(type)
       return
     }
+    if (type === 'search') this.updatePreviousPageBeforeSearch(this.location)
     const path = this.pathTo(type, id)
     this.push(path)
   }
@@ -31,6 +34,20 @@ class RoutingStore extends RouterStore {
   pathContains = (str) => (
     this.location.pathname.indexOf(str) > -1
   )
+
+  updatePreviousPageBeforeSearch(page) {
+    if (page.pathname !== '/search') {
+      this.previousPageBeforeSearch = page.pathname
+    }
+  }
+
+  leaveSearch = () => {
+    if (this.previousPageBeforeSearch) {
+      this.routeTo(this.previousPageBeforeSearch)
+    } else {
+      this.routeTo('/')
+    }
+  }
 }
 
 export default RoutingStore

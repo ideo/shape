@@ -176,6 +176,10 @@ describe Api::V1::UsersController, type: :request, json: true, auth: true do
     let(:path) { '/api/v1/users/switch_org' }
     let!(:params) { { organization_id: switch_organization.id }.to_json }
 
+    before do
+      user.add_role(Role::MEMBER, switch_organization.primary_group)
+    end
+
     it 'returns a 200' do
       post(path, params: params)
       expect(response.status).to eq(200)

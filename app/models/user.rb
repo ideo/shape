@@ -1,8 +1,8 @@
 class User < ApplicationRecord
   prepend RolifyExtensions # Prepend so it can call rolify methods using super
 
-  rolify after_add: :after_add_role,
-         after_remove: :after_remove_role,
+  rolify after_add: :after_role_update,
+         after_remove: :after_role_update,
          strict: true
 
   devise :database_authenticatable, :registerable, :trackable,
@@ -185,23 +185,10 @@ class User < ApplicationRecord
 
   private
 
-  def after_add_role(role)
+  def after_role_update(role)
     reset_cached_roles!
     # Reindex record if it is a searchkick model
     resource = role.resource
-    resource.reindex if Searchkick.callbacks? && resource.searchable?
-  end
-
-  def after_remove_role(role)
-    reset_cached_roles!
-
-    resource = role.resource
-    if resource.is_a?(Group)
-      organization = resource.organization
-      organization.user_role_removed(self)
-    end
-
-    # Reindex record if it is a searchkick model
     resource.reindex if Searchkick.callbacks? && resource.searchable?
   end
 end

@@ -51,7 +51,7 @@ describe('CollectionPage', () => {
   })
 
   it('passes collection to the CollectionGrid', () => {
-    const grid = wrapper.find('InjectedCollectionGrid')
+    const grid = wrapper.find('CollectionGrid')
     expect(grid.props().collection).toBe(collection)
   })
 

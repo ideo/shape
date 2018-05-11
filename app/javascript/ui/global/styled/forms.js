@@ -5,6 +5,7 @@ import AutosizeInput from 'react-input-autosize'
 import styled from 'styled-components'
 import v from '~/utils/variables'
 
+/** @component */
 export const FormActionsContainer = styled.div`
   display: flex;
   justify-content: space-around;
@@ -13,6 +14,7 @@ export const FormActionsContainer = styled.div`
 `
 FormActionsContainer.displayName = 'StyledFormActionsContainer'
 
+/** @component */
 export const FieldContainer = styled.div`
   padding-bottom: 35px;
 
@@ -22,6 +24,7 @@ export const FieldContainer = styled.div`
 `
 FieldContainer.displayName = 'StyledFieldContainer'
 
+/** @component */
 export const Label = styled.label`
   text-transform: uppercase;
   margin-bottom: 20px;
@@ -33,6 +36,7 @@ export const Label = styled.label`
 `
 Label.displayName = 'StyledLabel'
 
+/** @component */
 export const FormButton = styled.button`
   width: ${props => (props.width ? props.width : 183)}px;
   text-transform: uppercase;
@@ -61,6 +65,7 @@ export const FormButton = styled.button`
 `
 FormButton.displayName = 'StyledFormButton'
 
+/** @component */
 export const TextButton = styled.button`
   text-transform: uppercase;
   font-family: ${v.fonts.sans};
@@ -68,9 +73,11 @@ export const TextButton = styled.button`
   font-weight: 500;
   letter-spacing: 0.09375rem;
   cursor: pointer;
+  max-width: ${props => (props.maxWidth ? `${props.maxWidth}px` : 'none')};
 `
 TextButton.displayName = 'StyledTextButton'
 
+/** @component */
 export const TextField = styled.input`
   font-family: ${v.fonts.sans};
   width: 225px;
@@ -98,11 +105,13 @@ export const TextField = styled.input`
 `
 TextField.displayName = 'StyledTextField'
 
+/** @component */
 export const FormSpacer = styled.div`
   margin-bottom: 55px;
 `
 FormSpacer.displayName = 'StyledFormSpacer'
 
+/** @component */
 export const ImageField = styled.span`
   width: 100px;
   position: relative;
@@ -123,6 +132,7 @@ export const ImageField = styled.span`
 ImageField.displayName = 'StyledImageField'
 
 // TODO research if we can get these styles working without extra className
+/** @component */
 export const Pill = styled(Chip)`
   &.pill {
     padding: 7px;
@@ -142,6 +152,7 @@ export const Pill = styled(Chip)`
 `
 Pill.displayName = 'StyledPill'
 
+/** @component */
 export const Select = styled(MuiSelect)`
   .select {
     font-family: ${v.fonts.sans};
@@ -157,6 +168,7 @@ export const Select = styled(MuiSelect)`
 `
 Select.displayName = 'StyledSelect'
 
+/** @component */
 export const SelectOption = styled(MenuItem)`
   &.selectOption {
     align-items: center;
@@ -174,6 +186,7 @@ export const SelectOption = styled(MenuItem)`
 `
 SelectOption.displayName = 'StyledSelectOption'
 
+/** @component */
 export const StyledAutosizeInput = styled(AutosizeInput)`
   margin-bottom: 0.5rem;
   margin-top: 0.5rem;
@@ -196,6 +209,7 @@ export const StyledAutosizeInput = styled(AutosizeInput)`
 `
 StyledAutosizeInput.displayName = 'StyledAutosizeInput'
 
+/** @component */
 export const EditAvatarButton = styled.button`
   cursor: auto;
   ${props => props.canEdit &&

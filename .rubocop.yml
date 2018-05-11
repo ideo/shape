@@ -48,7 +48,7 @@ Style/PercentLiteralDelimiters:
 
 Style/AndOr:
   # `and` and `or` banned only in conditionals (conditionals), or completely (always).
-  EnforcedStyle: 'conditionals'
+  EnforcedStyle: 'always'
 
 Style/BlockDelimiters:
   Exclude:

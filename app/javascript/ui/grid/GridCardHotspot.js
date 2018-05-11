@@ -11,11 +11,14 @@ const StyledHotspot = styled.div`
   justify-content: center;
   opacity: 0;
   transition: all 100ms;
+  /* e.g. "left: -27px;" */
+  ${props => `${props.position}: -27px;`}
   right: -27px;
   height: 100%;
   width: 36px;
   z-index: 100;
 
+  cursor: pointer;
   &:hover, &.is-over {
     opacity: ${props => (props.dragging ? 0 : 1)};
   }
@@ -42,14 +45,15 @@ const StyledPlusIcon = styled.div`
 @observer
 class GridCardHotspot extends React.Component {
   clickHotspot = () => {
-    const { uiStore, card } = this.props
-    uiStore.openBlankContentTool({ order: card.order + 1 })
+    const { uiStore, card, position } = this.props
+    const order = card.order + (position === 'right' ? 1 : 0)
+    uiStore.openBlankContentTool({ order })
   }
 
   render() {
-    const { dragging, uiStore } = this.props
+    const { dragging, uiStore, position } = this.props
     return (
-      <StyledHotspot dragging={dragging} onClick={this.clickHotspot}>
+      <StyledHotspot position={position} dragging={dragging} onClick={this.clickHotspot}>
         <HotspotLine gutter={uiStore.gridSettings.gutter} />
         <StyledPlusIcon>
           +
@@ -62,9 +66,15 @@ class GridCardHotspot extends React.Component {
 GridCardHotspot.propTypes = {
   card: MobxPropTypes.objectOrObservableObject.isRequired,
   dragging: PropTypes.bool.isRequired,
+  position: PropTypes.string,
 }
 GridCardHotspot.wrappedComponent.propTypes = {
   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }
+GridCardHotspot.defaultProps = {
+  position: 'right',
+}
+
+GridCardHotspot.displayName = 'GridCardHotspot'
 
 export default GridCardHotspot

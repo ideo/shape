@@ -22,6 +22,7 @@ module Roles
     def call
       remove_role_from_object(@object)
       remove_links_from_shared_collections if @remove_link
+      remove_org_membership
       remove_roles_from_children
     end
 
@@ -83,7 +84,7 @@ module Roles
 
       @users.each do |user|
         if existing_user_ids.include?(user.id)
-          role.users.destroy(user)
+          user.remove_role(role.name, role.resource)
         end
       end
 
@@ -100,6 +101,14 @@ module Roles
       end
 
       true
+    end
+
+    def remove_org_membership
+      if @object.is_a?(Group) && (@object.guest? || @object.primary?)
+        @users.each do |user|
+          @object.organization.remove_user_membership(user)
+        end
+      end
     end
 
     def children

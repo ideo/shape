@@ -17,7 +17,7 @@ function sortUserOrGroup(a, b) {
   return a.entity.name.localeCompare(b.entity.name)
 }
 
-@inject('apiStore')
+@inject('apiStore', 'routingStore')
 @observer
 class RolesMenu extends React.Component {
   @observable searchableItems = []
@@ -72,16 +72,20 @@ class RolesMenu extends React.Component {
   }
 
   deleteRoles = (role, entity, opts = {}) =>
-    this.props.apiStore.request(`${entity.internalType}/${entity.id}/roles/${role.id}`,
-      'DELETE',
-      { is_switching: opts.isSwitching }).then((res) => {
-      if (!opts.isSwitching) {
-        const saveReturn = this.props.onSave(res)
-        this.filterSearchableItems()
-        return saveReturn
-      }
-      return {}
-    })
+    role.API_delete(entity, opts)
+      .then(res => {
+        // We should do a page reload to get the correct user's new org
+        if (opts.organizationChange) {
+          this.props.routingStore.routeTo('/')
+          window.location.reload()
+        }
+        if (!opts.isSwitching) {
+          const saveReturn = this.props.onSave(res)
+          this.filterSearchableItems()
+          return saveReturn
+        }
+        return {}
+      })
 
   createRoles = (entities, roleName, opts = {}) => {
     const { apiStore, ownerId, ownerType, onSave } = this.props
@@ -190,6 +194,7 @@ RolesMenu.propTypes = {
 }
 RolesMenu.wrappedComponent.propTypes = {
   apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
+  routingStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 RolesMenu.defaultProps = {
   canEdit: false,

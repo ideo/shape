@@ -285,6 +285,24 @@ class CollectionGrid extends React.Component {
   // </end Drag related functions>
   // --------------------------
 
+  // empty card acts as a spacer to always show the last row even if empty,
+  // and to show a GridCardHotspot to the left when it's the first item in the empty row
+  addEmptyCard = (cards) => {
+    if (!this.props.canEditCollection) return
+    if (_.find(cards, { id: 'empty' })) return
+    let order = cards.length
+    const max = _.maxBy(cards, 'order')
+    if (max) order = max.order + 1
+    const emptyCard = {
+      id: 'empty',
+      cardType: 'empty',
+      width: 1,
+      height: 1,
+      order,
+    }
+    cards.push(emptyCard)
+  }
+
   // Sorts cards and sets state.cards after doing so
   @action positionCards = (collectionCards = [], opts = {}) => {
     const cards = [...collectionCards]
@@ -301,8 +319,8 @@ class CollectionGrid extends React.Component {
     const matrix = []
     // create an empty row
     matrix.push(_.fill(Array(cols), null))
-    const sortedCards = _.sortBy(cards, sortBy)
-    _.each(sortedCards, (card, i) => {
+    this.addEmptyCard(cards)
+    _.each(_.sortBy(cards, sortBy), card => {
       // we don't actually want to "re-position" the dragging card
       // because its position is being determined by the drag (i.e. mouse cursor)
       if (opts.dragging === card.id) {
@@ -452,7 +470,7 @@ class CollectionGrid extends React.Component {
     _.each(this.state.cards, card => {
       let record = {}
       let { cardType } = card
-      if (cardType !== 'placeholder' && cardType !== 'blank') {
+      if (!_.includes(['placeholder', 'blank', 'empty'], cardType)) {
         // TODO: some kind of error catch if no record?
         if (card.record) {
           ({ record } = card)
@@ -521,6 +539,6 @@ CollectionGrid.wrappedComponent.propTypes = {
   routingStore: MobxPropTypes.objectOrObservableObject.isRequired,
   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }
-CollectionGrid.displayName = 'InjectedCollectionGrid'
+CollectionGrid.displayName = 'CollectionGrid'
 
 export default CollectionGrid

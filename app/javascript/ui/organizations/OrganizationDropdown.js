@@ -40,10 +40,29 @@ class OrganizationDropdown extends React.Component {
 
   handleSwitchOrg = (orgId) => (ev) => {
     ev.preventDefault()
-    const { apiStore, onItemClick } = this.props
-    apiStore.currentUser.switchOrganization(orgId, { backToHomepage: true })
+    const { apiStore, uiStore, onItemClick } = this.props
     // close the menu
     onItemClick()
+    const switchOrg = () => {
+      apiStore.currentUser.switchOrganization(orgId, { backToHomepage: true })
+    }
+    if (uiStore.isMovingCards) {
+      const currentOrgName = apiStore.currentUserOrganization.name
+      const otherOrgName = apiStore.findOrganizationById(orgId).name
+
+      uiStore.confirm({
+        iconName: 'Alert',
+        prompt: 'You can only link or duplicate content between organizations.',
+        onConfirm: () => {
+          switchOrg()
+          uiStore.closeMoveMenu()
+        },
+        cancelText: `Move within ${currentOrgName}`,
+        confirmText: `Switch to ${otherOrgName}`,
+      })
+      return
+    }
+    switchOrg()
   }
 
   handleOrgSettings = (ev) => {

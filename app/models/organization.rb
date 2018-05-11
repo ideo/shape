@@ -18,10 +18,16 @@ class Organization < ApplicationRecord
   delegate :admins, to: :primary_group
   delegate :members, to: :primary_group
   delegate :handle, to: :primary_group
-  delegate :can_edit?, to: :primary_group
-  delegate :can_view?, to: :primary_group
 
   validates :name, presence: true
+
+  def can_view?(user)
+    primary_group.can_view?(user) || guest_group.can_view?(user)
+  end
+
+  def can_edit?(user)
+    primary_group.can_edit?(user) || guest_group.can_edit?(user)
+  end
 
   def self.create_for_user(user)
     name = [user.first_name, user.last_name, 'Organization'].compact.join(' ')
@@ -30,17 +36,21 @@ class Organization < ApplicationRecord
     builder.organization
   end
 
-  # Note: this method can be called many times for the same org
+  # NOTE: this method can be called many times for the same org
   def setup_user_membership_and_collections(user)
     # make sure they're on the org
     setup_user_membership(user)
     Collection::UserCollection.find_or_create_for_user(user, self)
   end
 
-  # Note: this method can be called many times for the same org
-  def user_role_removed(user)
-    # If they are still an admin or member, don't do anything
-    return if can_view?(user)
+  # This gets called from Roles::MassRemove after leaving a primary/guest group
+  def remove_user_membership(user)
+    # asynchronously remove all other roles e.g. collections, items, groups
+    Roles::RemoveUserRolesFromOrganization.call(self, user)
+
+    if user.organizations.count.zero?
+      Organization.create_for_user(user)
+    end
 
     # Set current org as one they are a member of
     # If nil, that is fine as they shouldn't have a current organization

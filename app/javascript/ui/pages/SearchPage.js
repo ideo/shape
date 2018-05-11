@@ -19,6 +19,18 @@ class SearchPage extends PageWithApi {
   @observable hasMore = false
   @observable total = 0
 
+  componentDidMount() {
+    const { uiStore, routingStore } = this.props
+    const query = this.searchQuery(this.props)
+    if (!query) {
+      routingStore.leaveSearch()
+      return
+    }
+    // initialize SearchBar to the queryString, e.g. when directly loading a search URL
+    uiStore.update('searchText', query)
+    super.componentDidMount()
+  }
+
   @action componentWillReceiveProps(nextProps) {
     // i.e. you are on SearchPage and perform a new search
     // NOTE: important to do this here to "reset" infinite scroll!

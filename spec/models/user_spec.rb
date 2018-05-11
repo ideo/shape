@@ -23,22 +23,10 @@ describe User, type: :model do
     let!(:org_2) { create(:organization) }
     let(:org_2_group) { org_2.guest_group }
 
-    describe '#after_remove_role' do
-      before do
-        org.setup_user_membership_and_collections(user)
-      end
-
-      it 'should set another org they belonged to as current' do
-        org_2.setup_user_membership_and_collections(user)
-        expect(user.reload.current_organization).to eq(org)
-
-        user.remove_role(Role::MEMBER, org_group)
-        expect(user.reload.current_organization).to eq(org_2)
-      end
-
-      it 'should remove current_organization if user only belonged to one' do
-        user.remove_role(Role::MEMBER, org_group)
-        expect(user.reload.current_organization).to be_nil
+    describe '#after_add_role' do
+      it 'should reset cached roles' do
+        expect(user).to receive(:reset_cached_roles!)
+        user.add_role(Role::MEMBER, org_group)
       end
     end
 

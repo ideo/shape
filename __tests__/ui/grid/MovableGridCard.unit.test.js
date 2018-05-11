@@ -30,7 +30,7 @@ describe('MovableGridCard', () => {
     wrapper = shallow(
       <MovableGridCard {...props} />
     )
-    expect(wrapper.find('GridCardPlaceholder').exists()).toBe(true)
+    expect(wrapper.find('GridCardPlaceholder').exists()).toBeTruthy()
   })
 
   it('renders a blank card creation tool if cardType is "blank"', () => {
@@ -38,7 +38,17 @@ describe('MovableGridCard', () => {
     wrapper = shallow(
       <MovableGridCard {...props} />
     )
-    expect(wrapper.find('GridCardBlankHOC').exists()).toBe(true)
+    expect(wrapper.find('GridCardBlankHOC').exists()).toBeTruthy()
+  })
+
+  it('renders an empty if cardType is "empty"', () => {
+    props.cardType = 'empty'
+    props.card.position = { x: 0 }
+    wrapper = shallow(
+      <MovableGridCard {...props} />
+    )
+    expect(wrapper.find('PositionedGridCard').exists()).toBeTruthy()
+    expect(wrapper.find('GridCardHotspot').exists()).toBeTruthy()
   })
 
   describe('as viewer, with grid cards for items and collections', () => {
@@ -50,19 +60,19 @@ describe('MovableGridCard', () => {
     })
 
     it('renders a "Rnd" Resize-n-Draggable component', () => {
-      expect(wrapper.find('Rnd').exists()).toBe(true)
+      expect(wrapper.find('Rnd').exists()).toBeTruthy()
     })
 
     it('passes position props to Rnd component', () => {
       expect(wrapper.find('Rnd').props().size).toEqual(_.pick(fakePosition, ['width', 'height']))
-      expect(wrapper.find('Rnd').props().enableResizing.bottomRight).toBe(false)
-      expect(wrapper.find('Rnd').props().disableDragging).toBe(true)
+      expect(wrapper.find('Rnd').props().enableResizing.bottomRight).toBeFalsy()
+      expect(wrapper.find('Rnd').props().disableDragging).toBeTruthy()
     })
 
     it('passes ResizeIcon to Rnd component', () => {
       const ep = wrapper.find('Rnd').props().extendsProps
       const handleComponentWrapper = shallow(<ep.handleComponent.bottomRight />)
-      expect(handleComponentWrapper.find('ResizeIcon').exists()).toBe(true)
+      expect(handleComponentWrapper.find('ResizeIcon').exists()).toBeTruthy()
     })
 
     it('renders a GridCard component', () => {
@@ -83,8 +93,8 @@ describe('MovableGridCard', () => {
 
     it('passes position props to Rnd component', () => {
       expect(wrapper.find('Rnd').props().size).toEqual(_.pick(fakePosition, ['width', 'height']))
-      expect(wrapper.find('Rnd').props().enableResizing.bottomRight).toBe(true)
-      expect(wrapper.find('Rnd').props().disableDragging).toBe(false)
+      expect(wrapper.find('Rnd').props().enableResizing.bottomRight).toBeTruthy()
+      expect(wrapper.find('Rnd').props().disableDragging).toBeFalsy()
     })
   })
 })
