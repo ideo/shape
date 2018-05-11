@@ -320,7 +320,9 @@ class CollectionGrid extends React.Component {
     // create an empty row
     matrix.push(_.fill(Array(cols), null))
     this.addEmptyCard(cards)
-    _.each(_.sortBy(cards, sortBy), card => {
+    const sortedCards = _.sortBy(cards, sortBy)
+    this.addEmptyCard(cards)
+    _.each(sortedCards, (card, i) => {
       // we don't actually want to "re-position" the dragging card
       // because its position is being determined by the drag (i.e. mouse cursor)
       if (opts.dragging === card.id) {
