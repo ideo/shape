@@ -1,15 +1,6 @@
 import PropTypes from 'prop-types'
 import styled from 'styled-components'
-import { default as MuiTooltip } from 'material-ui/Tooltip'
 import v from '~/utils/variables'
-
-export const Tooltip = styled(MuiTooltip)`
-  .Tooltip {
-    font-size: 0.75rem;
-    font-family: ${v.fonts.sans};
-  }
-`
-Tooltip.displayName = 'StyledTooltip'
 
 /** @component */
 export const Row = styled.div`

@@ -1,7 +1,7 @@
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 import Snackbar, { SnackbarContent } from 'material-ui/Snackbar'
-import { Tooltip } from '~/ui/global/styled/layout'
+import Tooltip from '~/ui/global/Tooltip'
 
 import v from '~/utils/variables'
 import MoveArrowIcon from '~/ui/icons/MoveArrowIcon'

@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types'
 import MuiAvatar from 'material-ui/Avatar'
 import styled from 'styled-components'
-import { Tooltip } from '~/ui/global/styled/layout'
+import Tooltip from '~/ui/global/Tooltip'
 import v from '~/utils/variables'
 
 const StyledAvatar = styled(MuiAvatar)`

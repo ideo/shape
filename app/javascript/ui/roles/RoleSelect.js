@@ -13,7 +13,7 @@ import {
 } from '~/ui/global/styled/layout'
 import { Select } from '~/ui/global/styled/forms'
 import LeaveIcon from '~/ui/icons/LeaveIcon'
-import { Tooltip } from '~/ui/global/styled/layout'
+import Tooltip from '~/ui/global/Tooltip'
 import Avatar from '~/ui/global/Avatar'
 import { uiStore, apiStore } from '~/stores'
 
