@@ -30,6 +30,7 @@ describe('RoleSelect', () => {
       props.role = { resource: { internalType: 'groups', is_guest: true } }
       wrapper.setProps(props)
       expect(wrapper.find('Select').length).toEqual(0)
+
     })
   })
 
