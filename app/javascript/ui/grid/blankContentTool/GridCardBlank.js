@@ -59,6 +59,13 @@ const StyledBlankCreationTool = styled.div`
     left: ${props => (props.replacing ? '25%' : 'auto')};
     width: ${props => (props.replacing ? '50%' : 'auto')};
   }
+  transition: all 0.3s 0.2s;
+  /* handle "small 4-col" layout i.e. layoutSize == 3 */
+  @media only screen
+    and (min-width: ${v.responsive.medBreakpoint}px)
+    and (max-width: ${v.responsive.largeBreakpoint}px) {
+    padding: 1.5rem 1.33rem;
+  }
 `
 
 const BctBackground = styled.div`
@@ -71,6 +78,15 @@ const BctBackground = styled.div`
   border-radius: 50%;
   border: 8px solid ${v.colors.cyan};
   background: ${props => (props.emptyState ? v.colors.aquaHaze : v.colors.desert)};
+  transition: all 0.3s 0.2s;
+  /* handle "small 4-col" layout i.e. layoutSize == 3 */
+  @media only screen
+    and (min-width: ${v.responsive.medBreakpoint}px)
+    and (max-width: ${v.responsive.largeBreakpoint}px) {
+    width: 135px;
+    height: 135px;
+    left: 50px;
+  }
 `
 BctBackground.displayName = 'BctBackground'
 
@@ -83,6 +99,11 @@ const BctButton = styled.button`
   color: white;
 
   left: ${props => (props.creating ? '100px' : 0)};
+  @media only screen
+    and (min-width: ${v.responsive.medBreakpoint}px)
+    and (max-width: ${v.responsive.largeBreakpoint}px) {
+    left: ${props => (props.creating ? '80px' : 0)};
+  }
   transform: ${props => (props.creating ? 'rotate(360deg)' : 'none')};
 
   &:hover {
@@ -111,7 +132,7 @@ const BctDropzone = styled.div`
     font-weight: 500;
     font-size: 1rem;
     position: absolute;
-    top: 80px;
+    top: 70px;
     left: 38px;
     .top, .bottom {
       text-transform: uppercase;
@@ -130,6 +151,7 @@ const BctDropzone = styled.div`
       font-size: 0.8rem;
       color: ${v.colors.cloudy};
     }
+    transition: all 0.3s 0.2s;
   }
 
   /* Override Filestack styling */
@@ -151,6 +173,24 @@ const BctDropzone = styled.div`
       }
     `}
   }
+
+  /* handle "small 4-col" layout i.e. layoutSize == 3 */
+  @media only screen
+    and (min-width: ${v.responsive.medBreakpoint}px)
+    and (max-width: ${v.responsive.largeBreakpoint}px) {
+    width: 135px;
+    left: 50px;
+    .text {
+      top: 50px;
+      left: 25px;
+      font-size: 0.9rem;
+    }
+    .fsp-drop-pane__container {
+      width: 120px;
+      height: 120px;
+    }
+  }
+
 `
 
 @inject('uiStore', 'apiStore')

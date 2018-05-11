@@ -66,6 +66,7 @@ export const fakeCollectionCard = {
   height: 1,
   width: 1,
   maxWidth: 1,
+  maxHeight: 1,
   record: fakeCollection,
   item: fakeCollection,
   reference: false,

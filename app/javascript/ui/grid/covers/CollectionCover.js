@@ -1,6 +1,5 @@
 import PropTypes from 'prop-types'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
-// import _ from 'lodash'
 import styled from 'styled-components'
 import Dotdotdot from 'react-dotdotdot'
 
@@ -78,6 +77,13 @@ const StyledCardContent = styled.div`
     font-size: 2rem;
     margin-bottom: 0.25rem;
     line-height: 1.2;
+    /* transition size change, with 0.25s delay */
+    transition: all 0.33s 0.25s;
+    @media only screen
+      and (min-width: ${v.responsive.medBreakpoint}px)
+      and (max-width: ${v.responsive.largeBreakpoint}px) {
+      font-size: 1.6rem;
+    }
   }
 `
 StyledCardContent.displayName = 'StyledCardContent'

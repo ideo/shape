@@ -10,6 +10,12 @@ const AVATAR_SIZE = 30
 
 const StyledRolesSummary = styled.div`
   position: relative;
+  @media only screen and (max-width: ${v.responsive.medBreakpoint}px) {
+    min-height: 50px;
+    .roles-summary--inner {
+      display: none;
+    }
+  }
 `
 StyledRolesSummary.displayName = 'StyledRolesSummary'
 
@@ -152,10 +158,12 @@ class RolesSummary extends React.Component {
   render() {
     const { editors, viewers } = this.viewersAndEditorsLimited
     return (
-      <StyledRolesSummary className={this.props.className}>
-        {this.renderEditors}
-        {(editors.length > 0 && viewers.length > 0) ? <StyledSeparator /> : ''}
-        {this.renderViewers}
+      <StyledRolesSummary>
+        <div className="roles-summary--inner">
+          {this.renderEditors}
+          {(editors.length > 0 && viewers.length > 0) ? <StyledSeparator /> : ''}
+          {this.renderViewers}
+        </div>
       </StyledRolesSummary>
     )
   }
@@ -164,7 +172,6 @@ class RolesSummary extends React.Component {
 RolesSummary.propTypes = {
   roles: MobxPropTypes.arrayOrObservableArray.isRequired,
   handleClick: PropTypes.func.isRequired,
-  className: PropTypes.string,
   canEdit: PropTypes.bool,
 }
 

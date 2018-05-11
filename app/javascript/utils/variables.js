@@ -22,7 +22,8 @@ export default {
     // based on going from 2 -> 1 column
     smallBreakpoint: 645,
     // based on going from 3 -> 2 cols
-    medBreakpoint: 976,
+    medBreakpoint: 1060,
+    largeBreakpoint: 1308,
   },
 
   colors: {
@@ -59,6 +60,7 @@ export default {
     scrollIndicator: 200,
     cardDragging: 160,
     gridCard: 150,
+    gridCardTop: 151,
     gridCardBg: 1,
   },
 

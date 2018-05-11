@@ -24,12 +24,20 @@ export default class UiStore {
   )
   @observable pageMenuOpen = false
   @observable tagsModalOpen = false
-  @observable gridSettings = {
+  defaultGridSettings = {
+    // layout will track we are at "size 3" i.e. "small 4 cols" even though cols === 4
+    layoutSize: 4,
     cols: 4,
     gutter: 20,
     gridW: 312,
     gridH: 250,
   }
+  smallGridSettings = {
+    gutter: 20,
+    gridW: 250,
+    gridH: 200,
+  }
+  @observable gridSettings = { ...this.defaultGridSettings }
   @observable viewingCollection = null
   @observable selectedCardIds = []
   @observable isLoading = false
@@ -131,9 +139,20 @@ export default class UiStore {
     return (grid.gridW * grid.cols) + (grid.gutter * (grid.cols - 1))
   }
 
-  gridWidthFor(cols) {
-    const grid = this.gridSettings
-    return (grid.gridW * cols) + (grid.gutter * (cols - 1))
+  gridWidthFor(virtualCols) {
+    let cols = virtualCols
+    let { gridW, gutter } = this.defaultGridSettings
+    if (virtualCols === 3) {
+      ({ gridW, gutter } = this.smallGridSettings)
+      // the "3 col" layout is used as a breakpoint, however it actually renders with 4 cols
+      cols = 4
+    }
+    return (gridW * cols) + (gutter * (cols - 1))
+  }
+
+  gridHeightFor(cols, { useDefault = false } = {}) {
+    const { gridH, gutter } = useDefault ? this.defaultGridSettings : this.gridSettings
+    return (gridH * cols) + gutter
   }
 
   @action updateColumnsToFit(windowWidth) {
@@ -146,8 +165,23 @@ export default class UiStore {
       }
       return true
     })
-    if (cols && this.gridSettings.cols !== cols) {
-      this.gridSettings.cols = cols
+
+    let update = {
+      ...this.defaultGridSettings,
+      cols,
+      layoutSize: cols,
+    }
+    if (cols === 3) {
+      update = {
+        ...this.smallGridSettings,
+        cols: 4,
+        layoutSize: cols,
+      }
+    }
+
+    // finally, apply changes if they have changed
+    if (this.layoutSize !== this.gridSettings.layoutSize) {
+      _.assign(this.gridSettings, update)
     }
   }
   // --- grid properties />

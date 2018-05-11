@@ -5,12 +5,14 @@ import v from '~/utils/variables'
 
 export const StyledTitleAndRoles = styled(Flex)`
   .title {
-    max-width: 75%;
+    max-width: 70%;
+  }
+  @media only screen and (max-width: ${v.responsive.largeBreakpoint}px) {
+    .title {
+      max-width: 65%;
+    }
   }
   @media only screen and (max-width: ${v.responsive.medBreakpoint}px) {
-    .roles-summary {
-      display: none;
-    }
     .title {
       max-width: 90%;
     }

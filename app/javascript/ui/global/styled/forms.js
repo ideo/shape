@@ -96,6 +96,12 @@ export const TextField = styled.input`
   &:focus {
     outline-width: 0;
   }
+  /* handle "small 4-col" layout i.e. layoutSize == 3 */
+  @media only screen
+    and (min-width: ${v.responsive.medBreakpoint}px)
+    and (max-width: ${v.responsive.largeBreakpoint}px) {
+    width: 185px;
+  }
 `
 TextField.displayName = 'StyledTextField'
 
