@@ -26,7 +26,7 @@ FactoryBot.define do
           w = 3 if rand(1..4) == 4
           h = 2 if rand(1..4) == 4
           card_type = :"collection_card_#{evaluator.record_type}"
-          cc = build(card_type, parent: collection, order: i, width: w, height: h)
+          cc = build(card_type, parent: collection, order: (i - 1), width: w, height: h)
           # e.g. primary_collection_cards or link_collection_cards
           card_relation = "#{evaluator.card_relation}_collection_cards"
           collection.send(card_relation) << cc

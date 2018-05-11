@@ -70,7 +70,8 @@ class Item < ApplicationRecord
       i.parent_collection_card.item = i
     end
 
-    roles.each do |role|
+    # copy roles from parent (i.e. where it's being placed)
+    parent.roles.each do |role|
       i.roles << role.duplicate!(assign_resource: i)
     end
     for_user.upgrade_to_editor_role(i)

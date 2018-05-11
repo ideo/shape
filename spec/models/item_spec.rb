@@ -14,7 +14,8 @@ RSpec.describe Item, type: :model do
 
   describe '#duplicate!' do
     let(:user) { create(:user) }
-    let!(:item) { create(:text_item) }
+    let!(:collection) { create(:collection, num_cards: 1) }
+    let(:item) { collection.items.first }
     let(:copy_parent_card) { false }
     let(:duplicate) do
       item.duplicate!(
@@ -32,25 +33,29 @@ RSpec.describe Item, type: :model do
       expect(duplicate.cloned_from).to eq(item)
     end
 
-    context 'with parent collection card' do
-      let!(:parent_collection_card) do
-        create(:collection_card_text, item: item)
+    it 'does not duplicate if no copy_parent_card is false' do
+      expect(duplicate.parent_collection_card).to be_nil
+    end
+
+    context 'with roles' do
+      before do
+        user.add_role(Role::EDITOR, collection)
       end
 
-      it 'does not duplicate if no copy_parent_card is false' do
-        expect(duplicate.parent_collection_card).to be_nil
+      it 'copies the roles from its parent collection' do
+        expect(duplicate.can_edit?(user)).to be true
+      end
+    end
+
+    context 'copy_parent_card true' do
+      let!(:copy_parent_card) { true }
+
+      it 'duplicates parent' do
+        expect(duplicate.parent_collection_card.id).not_to eq(item.parent_collection_card.id)
       end
 
-      context 'copy_parent_card true' do
-        let!(:copy_parent_card) { true }
-
-        it 'duplicates parent' do
-          expect(duplicate.id).not_to eq(item.parent_collection_card.id)
-        end
-
-        it 'increases the order by 1' do
-          expect(duplicate.parent_collection_card.order).to eq(item.parent_collection_card.order + 1)
-        end
+      it 'increases the order by 1' do
+        expect(duplicate.parent_collection_card.order).to eq(item.parent_collection_card.order + 1)
       end
     end
 

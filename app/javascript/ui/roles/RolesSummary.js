@@ -1,6 +1,7 @@
 import PropTypes from 'prop-types'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
+import _ from 'lodash'
 
 import v from '~/utils/variables'
 import Avatar from '~/ui/global/Avatar'
@@ -85,7 +86,8 @@ class RolesSummary extends React.Component {
   // Return at most MAX_USERS_TO_SHOW users,
   // prioritizing editors over viewers
   get viewersAndEditorsLimited() {
-    let { editors, viewers } = this
+    let editors = _.sortBy(this.editors, ['first_name'])
+    let viewers = _.sortBy(this.viewers, ['first_name'])
     editors = editors.slice(0, MAX_USERS_TO_SHOW)
 
     if (editors.length < MAX_USERS_TO_SHOW) {
