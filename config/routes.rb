@@ -63,7 +63,7 @@ Rails.application.routes.draw do
           get 'me'
           get 'search'
           post 'create_from_emails'
-          post 'accept_terms'
+          patch 'update_current_user'
           post 'switch_org'
         end
         resources :roles, only: %i[destroy]

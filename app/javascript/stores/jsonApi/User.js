@@ -10,13 +10,23 @@ class User extends BaseRecord {
     return this.apiStore.currentUserId === this.id
   }
 
-  async API_acceptTerms() {
+  async API_updateCurrentUser(option) {
     try {
-      return await this.apiStore.request('users/accept_terms', 'POST')
+      return await this.apiStore.request(
+        'users/update_current_user', 'PATCH', { user: option }
+      )
     } catch (e) {
       uiStore.defaultAlertError()
       return e
     }
+  }
+
+  API_acceptTerms() {
+    return this.API_updateCurrentUser({ terms_accepted: true })
+  }
+
+  API_hideHotEdgeHelper() {
+    return this.API_updateCurrentUser({ show_helper: false })
   }
 
   async switchOrganization(organizationId, { backToHomepage = false } = {}) {

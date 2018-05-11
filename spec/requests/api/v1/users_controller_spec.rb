@@ -151,22 +151,37 @@ describe Api::V1::UsersController, type: :request, json: true, auth: true do
     end
   end
 
-  describe 'POST #accept_terms' do
-    let(:path) { '/api/v1/users/accept_terms' }
+  describe 'PATCH #update_current_user' do
+    let(:path) { '/api/v1/users/update_current_user' }
+    let(:params) do
+      {
+        user:
+        {
+          terms_accepted: true,
+          show_helper: false,
+        }
+      }.to_json
+    end
 
     before do
-      @user.update_attributes(terms_accepted: false)
+      @user.update_attributes(terms_accepted: false, show_helper: true)
     end
 
     it 'returns a 200' do
-      post(path)
+      patch(path, params: params)
       expect(response.status).to eq(200)
     end
 
     it 'updates terms_accepted for current_user' do
       expect(@user.terms_accepted).to be false
-      post(path)
+      patch(path, params: params)
       expect(@user.reload.terms_accepted).to be true
+    end
+
+    it 'updates show_helper for current_user' do
+      expect(@user.show_helper).to be true
+      patch(path, params: params)
+      expect(@user.reload.show_helper).to be false
     end
   end
 

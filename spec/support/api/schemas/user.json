@@ -9,7 +9,8 @@
     "current_user_collection_id": { "type": ["integer", "null"] },
     "created_at": { "type": "date" },
     "status": { "type": "string" },
-    "terms_accepted": { "type": "boolean" }
+    "terms_accepted": { "type": "boolean" },
+    "show_helper": { "type": "boolean" }
   },
   "required": ["id", "email", "created_at", "status"]
 }
