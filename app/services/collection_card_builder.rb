@@ -40,6 +40,7 @@ class CollectionCardBuilder
 
   def hide_helper_for_user
     # if the user has "show_helper" then set it to false, now that they've created a card
-    @user.update(show_helper: false) if @user.show_helper
+    return unless @user.try(:show_helper)
+    @user.update(show_helper: false)
   end
 end
