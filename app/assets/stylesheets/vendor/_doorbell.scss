@@ -8,11 +8,13 @@
   margin-left: 0;
   position: fixed;
   transform: translate(-50%, -50%);
+  // Doorbell tries to set a top on the actual element when rending, override
   top: 50% !important;
   width: 100%;
 }
 
 #doorbell-container .close {
+  // the close button uses an "X" text, replace that with our own image
   background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA4AAAAOCAYAAAAfSC3RAAAAAXNSR0IArs4c6QAAATBJREFUKBVjlJKSqmP8/99cWFQ07NKlS18Z8AAVFRW+79++rf3PwLCLiZGR8QgDI6Pz29evt+rp6XHj0gfVtBOoyYqFgeEYWJ2MjIyHtJTUD2lJyQPYNIM0AeWPA133VVpa2hHFcFyacWliRNYN0vz/378NDP//nwD62fvbt2/MQD+BnKcH9JLP06dP98PUo2gECSJrBvqdHZsmmGYMGuiPMClJyf8gDGT7YCgACjChC4L8BHRqAdC2b0Dn/WT4968EW4ChaIQG+Q6g8/RBfmJkYgoAGmCBN6qgoXcMPchxhTbYpbiCHOYNbJoZoc7DGuQwjSAaObRBUcXMwcHRBRT3RI8nZE0g9qdPn+7w8/OfATJLgPHLxigvL6/4//9/zkePHl1DV4yND7RZl+3fv48AIwSQTNJfGZ8AAAAASUVORK5CYII=);
   background-repeat: no-repeat;
   color: transparent;
