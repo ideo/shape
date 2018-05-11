@@ -16,6 +16,17 @@ const StyledDialog = styled(Dialog)`
     width: 100%;
   }
 `
+
+const StyledDialogTitle = styled(DialogTitle)`
+  align-items: center;
+  display: flex;
+  min-height: 50px;
+`
+
+const StyledHeading2 = styled(Heading2)`
+  margin-bottom: 0.35rem;
+`
+
 const ModalCloseButton = styled.button`
   cursor: pointer;
   display: block;
@@ -54,7 +65,7 @@ class Modal extends React.Component {
     const { children, onBack, open, title } = this.props
     let wrappedTitle = title
     if (typeof title === 'string') {
-      wrappedTitle = <Heading2>{title}</Heading2>
+      wrappedTitle = <StyledHeading2>{title}</StyledHeading2>
     }
     // TODO progamatically set disableAutoFocus
     return (
@@ -74,9 +85,9 @@ class Modal extends React.Component {
           <CloseIcon />
         </ModalCloseButton>
         <PaddedContent onBack={onBack}>
-          <DialogTitle disableTypography id="sharing">
+          <StyledDialogTitle disableTypography id="sharing">
             {wrappedTitle}
-          </DialogTitle>
+          </StyledDialogTitle>
           <DialogContent>
             { children }
           </DialogContent>
