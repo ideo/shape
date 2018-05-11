@@ -77,4 +77,6 @@ GridCardEmpty.wrappedComponent.propTypes = {
   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 
+GridCardEmpty.displayName = 'GridCardEmpty'
+
 export default GridCardEmpty

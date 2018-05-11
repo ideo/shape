@@ -41,14 +41,14 @@ describe('MovableGridCard', () => {
     expect(wrapper.find('GridCardBlankHOC').exists()).toBeTruthy()
   })
 
-  it('renders an empty if cardType is "empty"', () => {
+  it('renders an empty card if cardType is "empty"', () => {
     props.cardType = 'empty'
     props.card.position = { x: 0 }
     wrapper = shallow(
       <MovableGridCard {...props} />
     )
     expect(wrapper.find('PositionedGridCard').exists()).toBeTruthy()
-    expect(wrapper.find('GridCardHotspot').exists()).toBeTruthy()
+    expect(wrapper.find('GridCardEmpty').exists()).toBeTruthy()
   })
 
   describe('as viewer, with grid cards for items and collections', () => {

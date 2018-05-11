@@ -36,7 +36,7 @@ describe('GridCardBlank', () => {
     })
 
     it('renders the close button', () => {
-      expect(wrapper.find('button.close').exists()).toBeTruthy()
+      expect(wrapper.find('CloseButton').exists()).toBeTruthy()
     })
 
     it('opens CollectionCreator when clicking button 1', () => {
