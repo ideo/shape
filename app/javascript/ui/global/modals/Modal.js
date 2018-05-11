@@ -12,7 +12,7 @@ import CloseIcon from '~/ui/icons/CloseIcon'
 const StyledDialog = styled(Dialog)`
   .modal__paper {
     border-left: 17px solid ${v.colors.blackLava};
-    max-width: 855px;
+    max-width: 760px;
     width: 100%;
   }
 `
@@ -33,6 +33,11 @@ const BackIconHolder = styled.button`
   position: absolute;
   top: 33px;
   width: 15px;
+
+  svg {
+    height: 18px;
+    margin-top: 5px;
+  }
 `
 
 const PaddedContent = styled.div`

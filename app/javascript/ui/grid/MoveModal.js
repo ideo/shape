@@ -1,7 +1,7 @@
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 import Snackbar, { SnackbarContent } from 'material-ui/Snackbar'
-import Tooltip from 'material-ui/Tooltip'
+import { Tooltip } from '~/ui/global/styled/layout'
 
 import v from '~/utils/variables'
 import MoveArrowIcon from '~/ui/icons/MoveArrowIcon'
@@ -25,13 +25,6 @@ const StyledSnackbarContent = styled(SnackbarContent)`
     max-width: none;
     padding: 15px 30px;
     width: 100%;
-  }
-`
-
-const StyledTooltip = styled(Tooltip)`
-  .Tooltip {
-    font-size: 0.75rem;
-    font-family: ${v.fonts.sans};
   }
 `
 
@@ -151,7 +144,7 @@ class MoveModal extends React.Component {
               }
               action={[
                 <IconHolder key="moveup">
-                  <StyledTooltip
+                  <Tooltip
                     classes={{ tooltip: 'Tooltip' }}
                     title="Place at top"
                     placement="top"
@@ -159,10 +152,10 @@ class MoveModal extends React.Component {
                     <button onClick={this.handleMoveToBeginning}>
                       <MoveArrowIcon direction="up" />
                     </button>
-                  </StyledTooltip>
+                  </Tooltip>
                 </IconHolder>,
                 <IconHolder key="movedown">
-                  <StyledTooltip
+                  <Tooltip
                     classes={{ tooltip: 'Tooltip' }}
                     title="Place at bottom"
                     placement="top"
@@ -170,10 +163,10 @@ class MoveModal extends React.Component {
                     <button onClick={this.handleMoveToEnd}>
                       <MoveArrowIcon direction="down" />
                     </button>
-                  </StyledTooltip>
+                  </Tooltip>
                 </IconHolder>,
                 <CloseIconHolder key="close">
-                  <StyledTooltip
+                  <Tooltip
                     classes={{ tooltip: 'Tooltip' }}
                     title="Cancel"
                     placement="top"
@@ -181,7 +174,7 @@ class MoveModal extends React.Component {
                     <button onClick={this.handleClose}>
                       <CloseIcon />
                     </button>
-                  </StyledTooltip>
+                  </Tooltip>
                 </CloseIconHolder>,
               ]}
             />

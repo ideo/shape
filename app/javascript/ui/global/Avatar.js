@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types'
 import MuiAvatar from 'material-ui/Avatar'
 import styled from 'styled-components'
-
+import { Tooltip } from '~/ui/global/styled/layout'
 import v from '~/utils/variables'
 
 const StyledAvatar = styled(MuiAvatar)`
@@ -21,8 +21,8 @@ const StyledAvatar = styled(MuiAvatar)`
 
 class Avatar extends React.Component {
   render() {
-    const { className, url, size, title } = this.props
-    return (
+    const { className, displayName, url, size, title } = this.props
+    const renderAvatar = (
       <StyledAvatar
         alt={title}
         size={size}
@@ -30,6 +30,18 @@ class Avatar extends React.Component {
         src={url}
       />
     )
+    let content = renderAvatar
+    if (displayName) {
+      content = (
+        <Tooltip
+          classes={{ tooltip: 'Tooltip' }}
+          title={title}
+          placement="bottom"
+        >
+          {renderAvatar}
+        </Tooltip>)
+    }
+    return content
   }
 }
 
@@ -38,11 +50,13 @@ Avatar.propTypes = {
   url: PropTypes.string.isRequired,
   size: PropTypes.number,
   className: PropTypes.string,
+  displayName: PropTypes.bool,
 }
 Avatar.defaultProps = {
   size: 34,
   className: '',
   title: 'Avatar',
+  displayName: false,
 }
 
 export default Avatar

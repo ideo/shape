@@ -13,6 +13,7 @@ import {
 } from '~/ui/global/styled/layout'
 import { Select } from '~/ui/global/styled/forms'
 import LeaveIcon from '~/ui/icons/LeaveIcon'
+import { Tooltip } from '~/ui/global/styled/layout'
 import Avatar from '~/ui/global/Avatar'
 import { uiStore, apiStore } from '~/stores'
 
@@ -54,7 +55,7 @@ class RoleSelect extends React.Component {
     const { entity } = this.props
     let prompt
     let confirmText
-    if (entity.isCurrentUser) {
+    if (this.isCurrentUser()) {
       prompt = `Are you sure you want to leave this ${this.resourceType}?`
       confirmText = 'Leave'
     } else {
@@ -68,6 +69,11 @@ class RoleSelect extends React.Component {
       iconName: 'Leave',
       onConfirm: () => this.deleteRole(false),
     })
+  }
+
+  isCurrentUser() {
+    const { entity } = this.props
+    return entity.isCurrentUser && entity.isCurrentUser()
   }
 
   onRoleSelect = (ev) => {
@@ -153,9 +159,15 @@ class RoleSelect extends React.Component {
           {select}
         </MinRowItem>
         { (enabled || entity.id === apiStore.currentUserId) &&
-          <LeaveIconHolder enabled={enabled} onClick={this.onRoleRemove}>
-            <LeaveIcon />
-          </LeaveIconHolder>
+          <Tooltip
+            classes={{ tooltip: 'Tooltip' }}
+            title={this.isCurrentUser() ? 'Leave': 'Remove'}
+            placement="bottom"
+          >
+            <LeaveIconHolder enabled={enabled} onClick={this.onRoleRemove}>
+              <LeaveIcon />
+            </LeaveIconHolder>
+          </Tooltip>
         }
       </Row>
     )
