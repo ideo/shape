@@ -8,11 +8,11 @@ import AddTextIcon from '~/ui/icons/AddTextIcon'
 import AddCollectionIcon from '~/ui/icons/AddCollectionIcon'
 import AddImageIcon from '~/ui/icons/AddImageIcon'
 import AddVideoIcon from '~/ui/icons/AddVideoIcon'
-import CloseIcon from '~/ui/icons/CloseIcon'
 import v, { ITEM_TYPES } from '~/utils/variables'
 import FilestackUpload from '~/utils/FilestackUpload'
 import { StyledGridCard } from '~/ui/grid/GridCard'
 import InlineLoader from '~/ui/layout/InlineLoader'
+import { CloseButton } from '~/ui/global/styled/buttons'
 
 import CollectionCreator from './CollectionCreator'
 import TextItemCreator from './TextItemCreator'
@@ -26,20 +26,6 @@ const StyledGridCardBlank = StyledGridCard.extend`
     cursor: pointer;
     border: none;
     transition: all 300ms;
-  }
-  button.close {
-    position: absolute;
-    top: 5px;
-    right: 10px;
-    color: #9b9b9b;
-    .icon {
-      width: 12px;
-      height: 12px;
-    }
-
-    &:hover {
-      color: black;
-    }
   }
 `
 
@@ -59,7 +45,7 @@ const StyledBlankCreationTool = styled.div`
     left: ${props => (props.replacing ? '25%' : 'auto')};
     width: ${props => (props.replacing ? '50%' : 'auto')};
   }
-  transition: all 0.3s 0.2s;
+  transition: ${v.transitionWithDelay};
   /* handle "small 4-col" layout i.e. layoutSize == 3 */
   @media only screen
     and (min-width: ${v.responsive.medBreakpoint}px)
@@ -78,7 +64,7 @@ const BctBackground = styled.div`
   border-radius: 50%;
   border: 8px solid ${v.colors.cyan};
   background: ${props => (props.emptyState ? v.colors.aquaHaze : v.colors.desert)};
-  transition: all 0.3s 0.2s;
+  transition: ${v.transitionWithDelay};
   /* handle "small 4-col" layout i.e. layoutSize == 3 */
   @media only screen
     and (min-width: ${v.responsive.medBreakpoint}px)
@@ -151,7 +137,7 @@ const BctDropzone = styled.div`
       font-size: 0.8rem;
       color: ${v.colors.cloudy};
     }
-    transition: all 0.3s 0.2s;
+    transition: ${v.transitionWithDelay};
   }
 
   /* Override Filestack styling */
@@ -425,9 +411,7 @@ class GridCardBlank extends React.Component {
         </StyledGridCardInner>
         { this.state.loading && <InlineLoader /> }
         { !this.emptyState &&
-          <button className="close" onClick={this.closeBlankContentTool}>
-            <CloseIcon />
-          </button>
+          <CloseButton onClick={this.closeBlankContentTool} />
         }
       </StyledGridCardBlank>
     )

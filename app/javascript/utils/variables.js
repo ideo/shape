@@ -26,6 +26,8 @@ export default {
     largeBreakpoint: 1308,
   },
 
+  transitionWithDelay: 'all 0.3s 0.2s',
+
   colors: {
     cararra: '#f2f1ee',
     desert: '#f5f4f3',

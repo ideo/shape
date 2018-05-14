@@ -9,6 +9,7 @@ class CollectionCardBuilder
   end
 
   def create
+    hide_helper_for_user
     create_collection_card
   end
 
@@ -35,5 +36,11 @@ class CollectionCardBuilder
         record.reload.recalculate_breadcrumb!
       end
     end
+  end
+
+  def hide_helper_for_user
+    # if the user has "show_helper" then set it to false, now that they've created a card
+    return unless @user.try(:show_helper)
+    @user.update(show_helper: false)
   end
 end

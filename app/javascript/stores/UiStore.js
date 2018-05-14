@@ -200,6 +200,10 @@ export default class UiStore {
     }
   }
 
+  @computed get blankContentToolIsOpen() {
+    return this.blankContentToolState.order !== null
+  }
+
   @action resetSelectionAndBCT() {
     this.deselectCards()
     this.closeBlankContentTool()

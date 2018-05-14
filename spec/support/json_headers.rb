@@ -4,14 +4,14 @@
 module JsonHeaders
   extend ActiveSupport::Concern
 
-  HTTP_METHODS = %w(get post put delete patch).freeze
+  HTTP_METHODS = %w[get post put delete patch].freeze
 
   included do
     # make requests xhr requests for all tests
     let(:default_headers) {
       {
         HTTP_ACCEPT: 'application/vnd.api+json',
-        CONTENT_TYPE: 'application/vnd.api+json'
+        CONTENT_TYPE: 'application/vnd.api+json',
       }
     }
 

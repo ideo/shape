@@ -42,8 +42,9 @@ class Api::V1::UsersController < Api::V1::BaseController
     end
   end
 
-  def accept_terms
-    if current_user.update(terms_accepted: true)
+  # since you the only user you can update via the API is yourself, this keeps it simple
+  def update_current_user
+    if current_user.update(user_params)
       render jsonapi: current_user
     else
       render_api_errors current_user.errors
@@ -69,6 +70,14 @@ class Api::V1::UsersController < Api::V1::BaseController
 
   def json_api_params
     params[:_jsonapi]
+  end
+
+  def user_params
+    json_api_params.require(:user).permit(
+      # these are the only fields you would update via the API
+      :terms_accepted,
+      :show_helper,
+    )
   end
 
   def search_users(query)
