@@ -1,10 +1,11 @@
 
 export default function initDoorbell(userId) {
+  if (!process.env.DOORBELL_API_KEY) return
   window.doorbellOptions = {
     id: '8217',
     hideEmail: true,
-    email: "shape@shape.space",
-    appKey: '75KY8PBQn3cLjrSzSGCGJ4HsSj6zgDQ5Sys0IHLxAF2vDCYgb5350FMRF4bJT89c',
+    email: 'shape@shape.space',
+    appKey: process.env.DOORBELL_API_KEY,
     properties: {
       userId
     }
