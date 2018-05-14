@@ -12,7 +12,7 @@ export const KEYS = {
 export default {
   headerHeight: 192,
   headerHeightCompact: 100,
-  maxWidth: 1360,
+  maxWidth: 1320,
   containerPadding: {
     horizontal: '2rem',
   },
@@ -56,11 +56,13 @@ export default {
   zIndex: {
     aboveClickWrapper: 501,
     clickWrapper: 500,
+    popoutMenu: 201,
     header: 200,
     scrollIndicator: 200,
     cardDragging: 160,
     gridCard: 150,
     gridCardTop: 151,
+    itemClose: 10,
     gridCardBg: 1,
   },
 

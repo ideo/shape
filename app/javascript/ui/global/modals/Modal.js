@@ -12,10 +12,21 @@ import CloseIcon from '~/ui/icons/CloseIcon'
 const StyledDialog = styled(Dialog)`
   .modal__paper {
     border-left: 17px solid ${v.colors.blackLava};
-    max-width: 855px;
+    max-width: 760px;
     width: 100%;
   }
 `
+
+const StyledDialogTitle = styled(DialogTitle)`
+  align-items: center;
+  display: flex;
+  min-height: 50px;
+`
+
+const StyledHeading2 = styled(Heading2)`
+  margin-bottom: 0.35rem;
+`
+
 const ModalCloseButton = styled.button`
   cursor: pointer;
   display: block;
@@ -33,6 +44,11 @@ const BackIconHolder = styled.button`
   position: absolute;
   top: 33px;
   width: 15px;
+
+  svg {
+    height: 18px;
+    margin-top: 5px;
+  }
 `
 
 const PaddedContent = styled.div`
@@ -49,7 +65,7 @@ class Modal extends React.Component {
     const { children, onBack, open, title } = this.props
     let wrappedTitle = title
     if (typeof title === 'string') {
-      wrappedTitle = <Heading2>{title}</Heading2>
+      wrappedTitle = <StyledHeading2>{title}</StyledHeading2>
     }
     // TODO progamatically set disableAutoFocus
     return (
@@ -69,9 +85,9 @@ class Modal extends React.Component {
           <CloseIcon />
         </ModalCloseButton>
         <PaddedContent onBack={onBack}>
-          <DialogTitle disableTypography id="sharing">
+          <StyledDialogTitle disableTypography id="sharing">
             {wrappedTitle}
-          </DialogTitle>
+          </StyledDialogTitle>
           <DialogContent>
             { children }
           </DialogContent>

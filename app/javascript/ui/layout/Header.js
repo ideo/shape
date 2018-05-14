@@ -49,9 +49,9 @@ const MaxWidthContainer = styled.div`
 `
 
 // TODO trying to fix alignment issues
-const MaxWidthInnerContainer = styled.div`
-  max-width: 1320px;
-`
+// const MaxWidthInnerContainer = styled.div`
+//   max-width: 1320px;
+// `
 
 @inject('apiStore')
 @observer
@@ -160,11 +160,9 @@ class Header extends React.Component {
                 <ClickWrapper clickHandlers={this.clickHandlers} />}
             </Box>
           </Flex>
-
-          <MaxWidthInnerContainer>
+          <div>
             { children }
-          </MaxWidthInnerContainer>
-
+          </div>
         </MaxWidthContainer>
       </StyledHeader>
     )

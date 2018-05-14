@@ -113,6 +113,7 @@ class RolesSummary extends React.Component {
         url={editor.pic_url_square || editor.filestack_file_url}
         size={AVATAR_SIZE}
         className="editor"
+        displayName
       />
     ))
 
@@ -136,6 +137,7 @@ class RolesSummary extends React.Component {
         url={viewer.pic_url_square || viewer.filestack_file_url}
         size={AVATAR_SIZE}
         className="viewer"
+        displayName
       />
     ))
     return (
