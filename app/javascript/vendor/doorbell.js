@@ -2,6 +2,7 @@
 export default function initDoorbell(userId) {
   if (!process.env.DOORBELL_API_KEY) return
   window.doorbellOptions = {
+    // Our doorbell account ID
     id: '8217',
     hideEmail: true,
     email: 'shape@shape.space',
