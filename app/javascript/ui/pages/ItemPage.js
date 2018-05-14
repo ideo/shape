@@ -42,9 +42,15 @@ const CloseLink = styled(Link)`
   }
   padding: 0;
   height: auto;
-  position: relative;
-  top: -6px;
+  position: fixed;
+  width: 100%;
+  top: 200px;
+  z-index: ${v.zIndex.itemClose};
   .icon {
+    position: relative;
+    right: 28px;
+    padding: 0.5rem;
+    background: rgba(255, 255, 255, 0.95);
     width: 12px;
     height: 12px;
   }

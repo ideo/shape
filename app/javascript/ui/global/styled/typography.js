@@ -14,6 +14,7 @@ export const Heading1 = styled.h1`
   text-transform: uppercase;
 
   @media only screen and (max-width: ${v.responsive.smallBreakpoint}px) {
+    padding: 1rem 0;
     font-size: 1.5rem;
   }
 `

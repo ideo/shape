@@ -22,7 +22,7 @@ const MinRowItem = styled.span`
 `
 
 const LeaveIconHolder = styled.button`
-  margin-top: ${props => (props.enabled ? 8 : 2)}px;
+  margin-top: 8px;
   width: 16px;
 `
 LeaveIconHolder.displayName = 'StyledLeaveIconHolder'
@@ -32,8 +32,14 @@ const CenterAlignedSingleItem = styled.div`
 `
 CenterAlignedSingleItem.displayName = 'StyledCenterAlignedSingleItem'
 
+const DisplayTextPadded = DisplayText.extend`
+  /* match the padding of MuiSelect */
+  padding: 6px 0 7px;
+  display: inline-block;
+`
+
 class RoleSelect extends React.Component {
-  isGuestGroup() {
+  get isGuestGroup() {
     const { role } = this.props
     if (role.resource && role.resource.internalType === 'groups') {
       return role.resource.is_guest
@@ -107,7 +113,7 @@ class RoleSelect extends React.Component {
   render() {
     const { enabled, role, roleTypes, entity } = this.props
     let select
-    if (!this.isGuestGroup() && enabled) {
+    if (!this.isGuestGroup && enabled) {
       select = (
         <Select
           classes={{ root: 'select', selectMenu: 'selectMenu' }}
@@ -125,11 +131,16 @@ class RoleSelect extends React.Component {
         </Select>
       )
     } else {
-      select = <DisplayText>{_.startCase(role.name)}</DisplayText>
+      select = (
+        <DisplayTextPadded>
+          {_.startCase(role.name)}
+        </DisplayTextPadded>
+      )
     }
 
     // TODO remove duplication with RolesAdd role select menu
     const url = entity.pic_url_square || entity.filestack_file_url
+    const showLeaveIcon = (enabled || entity.id === apiStore.currentUserId)
     return (
       <Row>
         <span>
@@ -153,16 +164,19 @@ class RoleSelect extends React.Component {
         <MinRowItem>
           {select}
         </MinRowItem>
-        { (enabled || entity.id === apiStore.currentUserId) &&
+        { showLeaveIcon &&
           <Tooltip
             classes={{ tooltip: 'Tooltip' }}
-            title={entity.isCurrentUser ? 'Leave': 'Remove'}
+            title={entity.isCurrentUser ? 'Leave' : 'Remove'}
             placement="bottom"
           >
-            <LeaveIconHolder enabled={enabled} onClick={this.onRoleRemove}>
+            <LeaveIconHolder onClick={this.onRoleRemove}>
               <LeaveIcon />
             </LeaveIconHolder>
           </Tooltip>
+        }
+        {!showLeaveIcon &&
+          <LeaveIconHolder enabled={false} />
         }
       </Row>
     )
