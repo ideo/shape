@@ -142,24 +142,6 @@ RSpec.describe Roles::MassRemove, type: :service do
       end
     end
 
-    context 'if user has other roles on object' do
-      before do
-        collection.items.each { |i| user.add_role(Role::VIEWER, i) }
-       { roles: [
-        { id: 1, users: [
-          { name: "Mo" }, { name: "Me" }
-        ] },
-        { id: 2, users: [
-          { name: "No" }] }] }
-      end
-
-      it 'should leave any other roles from same user' do
-        expect(mass_remove.call).to be true
-        user.reload
-        expect(collection.items.all? { |i| user.has_role?(Role::VIEWER, i) }).to be true
-      end
-    end
-
     context 'with another user that has the same role' do
       before do
         collection.items.each { |i| user_3.add_role(role_name, i) }
