@@ -74,6 +74,7 @@ class ActivityLogBox extends React.Component {
   }
 
   @action updatePosition({ x, y, w = this.position.w, h = this.position.h }) {
+    if (x < 0 || y < 0) return
     this.position.x = x
     this.position.y = y
     this.position.w = w
@@ -150,7 +151,7 @@ class ActivityLogBox extends React.Component {
             </Action>
             <CloseButton size="lg" onClick={this.handleClose} />
           </Header>
-          <h3>Activity log</h3>
+          <h3 style={{textAlign: 'center'}}>Go to Object</h3>
         </ActivityLog>
       </Rnd>
     )

@@ -105,7 +105,6 @@ describe('ActivityLogBox', () => {
   })
 
   describe('changePage', () => {
-
     beforeEach(() => {
       component.changePage('notifications')
     })
