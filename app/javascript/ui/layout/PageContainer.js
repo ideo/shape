@@ -9,7 +9,6 @@ const StyledContainer = styled.main`
   margin: ${props => props.marginTop}px auto 0;
   padding: 0 ${v.containerPadding.horizontal};
   position: relative;
-  height: 100vh;
 `
 
 const PageContainer = ({ children, marginTop }) => (
