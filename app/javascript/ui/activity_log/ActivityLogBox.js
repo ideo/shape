@@ -23,9 +23,12 @@ export const LOCAL_STORAGE_KEY = 'ActivityLog:position'
 
 const ActivityLog = styled.div`
   background-color: ${v.colors.blue};
+  box-shadow: 0px 0px 24px -5px rgba(0,0,0,0.33);
+  box-sizing: border-box;
   color: white;
-  height: calc(100% - ${HEADER_HEIGHT}px);
+  height: 100%;
   padding: 14px;
+  width: 100%;
 `
 
 const Header = styled.div`
