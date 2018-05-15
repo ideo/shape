@@ -1,8 +1,8 @@
 import { PropTypes as MobxPropTypes } from 'mobx-react'
-import Moment from 'react-moment'
 import styled from 'styled-components'
 
 import v from '~/utils/variables'
+import Moment from '~/ui/global/Moment'
 
 const StyledComment = styled.div`
   padding: 10px;

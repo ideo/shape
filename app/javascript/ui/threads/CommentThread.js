@@ -1,11 +1,11 @@
 import PropTypes from 'prop-types'
 import { PropTypes as MobxPropTypes } from 'mobx-react'
 import _ from 'lodash'
-import Moment from 'react-moment'
 import FlipMove from 'react-flip-move'
 import styled from 'styled-components'
 
 import v from '~/utils/variables'
+import Moment from '~/ui/global/Moment'
 import Comment from './Comment'
 
 const StyledCommentThread = styled.div`
