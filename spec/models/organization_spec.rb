@@ -137,6 +137,28 @@ describe Organization, type: :model do
     end
   end
 
+  describe '#setup_user_membership_and_collections' do
+    let(:user) { create(:user, email: 'jill@ideo.com') }
+    let(:organization) { create(:organization, domain_whitelist: ['ideo.com']) }
+
+    before do
+      organization.setup_user_membership_and_collections(user)
+    end
+
+    it 'should create a UserCollection and SharedWithMeCollection for the user' do
+      expect(user.collections.size).to eq(2)
+    end
+
+    it 'adds as an org member if they match the domain' do
+      expect(user.has_role?(Role::MEMBER, organization.primary_group)).to be true
+    end
+
+    it 'should set the user to be on the current organization' do
+      expect(user.current_organization).to eq(organization)
+      expect(user.current_user_collection_id).not_to be nil
+    end
+  end
+
   describe '#remove_user_membership' do
     let(:organization) { create(:organization) }
     let(:other_org) { create(:organization) }
