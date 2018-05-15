@@ -29,7 +29,7 @@ class Routes extends React.Component {
   componentDidMount() {
     const { apiStore } = this.props
     apiStore.loadCurrentUserAndGroups().then(() => {
-      initDoorbell(apiStore.currentUserId)
+      initDoorbell(apiStore.currentUser)
     })
   }
 
