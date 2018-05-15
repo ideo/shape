@@ -39,8 +39,8 @@ class Organization < ApplicationRecord
   # NOTE: this method can be called many times for the same org
   def setup_user_membership_and_collections(user)
     # make sure they're on the org
-    setup_user_membership(user)
     Collection::UserCollection.find_or_create_for_user(user, self)
+    setup_user_membership(user)
   end
 
   # This gets called from Roles::MassRemove after leaving a primary/guest group

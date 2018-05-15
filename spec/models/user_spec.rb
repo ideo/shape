@@ -29,22 +29,6 @@ describe User, type: :model do
         user.add_role(Role::MEMBER, org_group)
       end
     end
-
-    describe '#create_user_collection' do
-      let(:user) { create(:user) }
-      let!(:organization) { create(:organization) }
-      let(:user_collections) { user.collections.user }
-
-      before do
-        org.setup_user_membership_and_collections(user)
-      end
-
-      it 'should create a Collection::UserCollection' do
-        expect(user_collections.size).to eq(1)
-        expect(user_collections[0]).to be_instance_of(Collection::UserCollection)
-        expect(user_collections[0].persisted?).to be true
-      end
-    end
   end
 
   describe '#add_role' do
