@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180511004129) do
+ActiveRecord::Schema.define(version: 20180514204917) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -45,6 +45,23 @@ ActiveRecord::Schema.define(version: 20180511004129) do
     t.jsonb "cached_attributes"
     t.index ["cloned_from_id"], name: "index_collections_on_cloned_from_id"
     t.index ["organization_id"], name: "index_collections_on_organization_id"
+  end
+
+  create_table "comment_threads", force: :cascade do |t|
+    t.integer "record_id"
+    t.string "record_type"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["record_id"], name: "index_comment_threads_on_record_id", unique: true
+  end
+
+  create_table "comments", force: :cascade do |t|
+    t.integer "comment_thread_id"
+    t.integer "author_id"
+    t.text "message"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["comment_thread_id"], name: "index_comments_on_comment_thread_id"
   end
 
   create_table "filestack_files", force: :cascade do |t|

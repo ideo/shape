@@ -65,6 +65,8 @@ class Collection < ApplicationRecord
            through: :collection_cards,
            source: :item
 
+  has_one :comment_thread, as: :record, dependent: :destroy
+
   delegate :parent, to: :parent_collection_card, allow_nil: true
 
   belongs_to :organization

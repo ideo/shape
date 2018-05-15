@@ -27,7 +27,7 @@ const StyledHeading2 = styled(Heading2)`
   margin-bottom: 0.35rem;
 `
 
-const ModalCloseButton = styled.button`
+export const ModalCloseButton = styled.button`
   cursor: pointer;
   display: block;
   right: 28px;

@@ -10,6 +10,8 @@ import Group from './jsonApi/Group'
 import Item from './jsonApi/Item'
 import Organization from './jsonApi/Organization'
 import User from './jsonApi/User'
+import Comment from './jsonApi/Comment'
+import CommentThread from './jsonApi/CommentThread'
 
 class ApiStore extends Store {
   @observable currentUserId = null
@@ -94,6 +96,8 @@ ApiStore.types = [
   Role,
   Organization,
   User,
+  Comment,
+  CommentThread,
 ]
 
 export default ApiStore

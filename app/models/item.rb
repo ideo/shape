@@ -26,6 +26,7 @@ class Item < ApplicationRecord
   delegate :parent, to: :parent_collection_card, allow_nil: true
   delegate :organization, to: :parent, allow_nil: true
   belongs_to :cloned_from, class_name: 'Item', optional: true
+  has_one :comment_thread, as: :record, dependent: :destroy
 
   before_validation :format_url, if: :saved_change_to_url?
   before_create :generate_name, unless: :name?

@@ -60,6 +60,10 @@ export default class UiStore {
   @observable searchText = ''
   @observable activityLogOpen = false
 
+  // Comments + Threads
+  @observable commentsOpen = false
+  @observable expandedThread = null
+
   @action popupAlert(props = {}) {
     _.assign(this.dialogConfig, {
       ...this.defaultDialogProps,
