@@ -13,10 +13,10 @@ const DEFAULT = {
   y: 83,
 }
 
-const MIN_WIDTH = '375px'
-const MIN_HEIGHT = '400px'
-const MAX_WIDTH = '800px'
-const MAX_HEIGHT = '800px'
+const MIN_WIDTH = 375
+const MIN_HEIGHT = 400
+const MAX_WIDTH = 800
+const MAX_HEIGHT = 800
 
 export const LOCAL_STORAGE_KEY = 'ActivityLog:position'
 
@@ -33,7 +33,10 @@ class ActivityLogBox extends React.Component {
 
   @action componentDidMount() {
     const existingPosition = localStorage.getItem(LOCAL_STORAGE_KEY)
-    this.position = existingPosition || { x: DEFAULT.x, y: DEFAULT.y }
+    this.position = existingPosition || {
+      x: document.querySelector('.Grid').offsetWidth - MIN_WIDTH + DEFAULT.x,
+      y: DEFAULT.y
+    }
   }
 
   @action updatePosition({ x, y }) {
