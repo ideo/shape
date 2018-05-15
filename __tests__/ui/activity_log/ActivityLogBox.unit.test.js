@@ -10,10 +10,15 @@ describe('ActivityLogBox', () => {
     const uiStore = fakeUiStore
     props = { uiStore }
     localStorage.clear()
+    document.body.innerHTML = '<div class="Grid"></div>'
     wrapper = shallow(
       <ActivityLogBox.wrappedComponent {...props} />
     )
     component = wrapper.instance()
+  })
+
+  afterEach(() => {
+    document.body.innerHTML = ''
   })
 
   describe('handleClose()', () => {
@@ -26,7 +31,7 @@ describe('ActivityLogBox', () => {
 
   describe('componentDidMount()', () => {
     it('should set the position based with defaults if not set', () => {
-      expect(component.position.x).toEqual(0)
+      expect(component.position.x).toEqual(-375)
       expect(component.position.y).toEqual(83)
     })
   })
