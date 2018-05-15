@@ -9,7 +9,7 @@ describe('ActivityLogBox', () => {
   beforeEach(() => {
     const uiStore = fakeUiStore
     props = { uiStore }
-    localStorage.clear();
+    localStorage.clear()
     wrapper = shallow(
       <ActivityLogBox.wrappedComponent {...props} />
     )
