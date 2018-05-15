@@ -142,7 +142,10 @@ class CollectionPage extends PageWithApi {
                       roles={collection.roles}
                       canEdit={collection.can_edit}
                     />
-                    <StyledCircledIcon onClick={this.handleComments}>
+                    <StyledCircledIcon
+                      active={uiStore.activityLogOpen}
+                      onClick={this.handleComments}
+                    >
                       <CommentIcon />
                     </StyledCircledIcon>
                     <PageMenu

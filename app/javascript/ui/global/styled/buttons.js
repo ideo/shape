@@ -36,12 +36,17 @@ CloseButton.defaultProps = {
 
 export const CircledIcon = styled.button`
   align-items: center;
-  background-color: ${v.colors.gray};
   border-radius: 50%;
   display: flex;
   height: 32px;
   justify-content: center;
   width: 32px;
+  ${props => props.active &&
+    `background-color: ${v.colors.gray};`}
+
+  &:hover {
+    background-color: ${v.colors.gray};
+  }
 
   .icon {
     height: 20px;
