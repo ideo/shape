@@ -107,6 +107,41 @@ class CollectionPage extends PageWithApi {
     this.toggleComments()
   }
 
+  renderHeader() {
+    const { collection } = this
+    const { uiStore } = this.props
+    const items = [
+      ...(this.collection.isNormalCollection
+        ? [<RolesSummary
+          handleClick={this.showObjectRoleDialog}
+          roles={collection.roles}
+          canEdit={collection.can_edit}
+        />]
+        : []
+      ),
+      <StyledCircledIcon
+        active={uiStore.activityLogOpen}
+        onClick={this.handleComments}
+      >
+        <CommentIcon />
+      </StyledCircledIcon>,
+      ...(this.collection.isNormalCollection
+        ? [<PageMenu
+          record={collection}
+          menuOpen={uiStore.pageMenuOpen}
+          canEdit={collection.can_edit}
+        />]
+        : []
+      ),
+    ]
+
+    return (
+      <Fragment>
+        {items}
+      </Fragment>
+    )
+  }
+
   render() {
     const { collection } = this
     const { uiStore } = this.props
@@ -135,26 +170,7 @@ class CollectionPage extends PageWithApi {
                 />
               </Box>
               <Flex align="baseline">
-                {this.collection.isNormalCollection &&
-                  <Fragment>
-                    <RolesSummary
-                      handleClick={this.showObjectRoleDialog}
-                      roles={collection.roles}
-                      canEdit={collection.can_edit}
-                    />
-                    <StyledCircledIcon
-                      active={uiStore.activityLogOpen}
-                      onClick={this.handleComments}
-                    >
-                      <CommentIcon />
-                    </StyledCircledIcon>
-                    <PageMenu
-                      record={collection}
-                      menuOpen={uiStore.pageMenuOpen}
-                      canEdit={collection.can_edit}
-                    />
-                  </Fragment>
-                }
+                {this.renderHeader()}
               </Flex>
             </StyledTitleAndRoles>
           </div>
