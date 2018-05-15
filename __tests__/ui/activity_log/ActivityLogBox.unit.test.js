@@ -31,7 +31,7 @@ describe('ActivityLogBox', () => {
 
   describe('componentDidMount()', () => {
     it('should set the position based with defaults if not set', () => {
-      expect(component.position.x).toEqual(-375)
+      expect(component.position.x).toEqual(-319)
       expect(component.position.y).toEqual(83)
     })
   })
@@ -40,11 +40,11 @@ describe('ActivityLogBox', () => {
     let pos
 
     beforeEach(() => {
-      pos = { x: 5, y: 5 }
+      pos = { x: 5, y: 5, w: 100, h: 100 }
       component.updatePosition(pos)
     })
 
-    it('should update the position', () => {
+    it('should update the position x and y', () => {
       expect(component.position).toEqual(pos)
     })
 
@@ -53,6 +53,21 @@ describe('ActivityLogBox', () => {
         LOCAL_STORAGE_KEY,
         JSON.stringify(pos)
       )
+    })
+
+    describe('when just the x and y are given', () => {
+      beforeEach(() => {
+        component.position = { x: 10, y: 15, w: 1, h: 2 }
+        pos = { x: 5, y: 5 }
+        component.updatePosition(pos)
+      })
+
+      it('should update the x and y, keep the w and h to previous vals', () => {
+        expect(component.position.x).toEqual(pos.x)
+        expect(component.position.y).toEqual(pos.y)
+        expect(component.position.w).toEqual(1)
+        expect(component.position.h).toEqual(2)
+      })
     })
   })
 })
