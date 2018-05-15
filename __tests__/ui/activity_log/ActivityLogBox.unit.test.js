@@ -1,13 +1,23 @@
-import ActivityLogBox, { LOCAL_STORAGE_KEY } from '~/ui/activity_log/ActivityLogBox'
+import ActivityLogBox, { POSITION_KEY, PAGE_KEY } from '~/ui/activity_log/ActivityLogBox'
+import localStorage from 'mobx-localstorage'
 
 import fakeUiStore from '#/mocks/fakeUiStore'
 
+jest.mock('mobx-localstorage')
+
 describe('ActivityLogBox', () => {
-  let props, wrapper, component
+  let props, wrapper, component, localStorageStore
   const fakeEv = { preventDefault: jest.fn() }
 
   beforeEach(() => {
     const uiStore = fakeUiStore
+
+    // Setup fake local storage
+    localStorageStore = {}
+    localStorage.setItem = (key, val) => {
+      localStorageStore[key] = val
+    }
+    localStorage.getItem = (key) => localStorageStore[key]
     props = { uiStore }
     localStorage.clear()
     document.body.innerHTML = '<div class="Grid"></div>'
@@ -34,6 +44,32 @@ describe('ActivityLogBox', () => {
       expect(component.position.x).toEqual(-319)
       expect(component.position.y).toEqual(83)
     })
+
+    it('should set current page to default comments page', () => {
+      expect(component.currentPage).toEqual('comments')
+    })
+
+    describe('with an existing position set in local storage', () => {
+      let pos
+
+      beforeEach(() => {
+        pos = { x: 2, y: 3, h: 4, w: 5 }
+        localStorage.setItem(POSITION_KEY, pos)
+        localStorage.setItem(PAGE_KEY, 'notifications')
+        wrapper = shallow(
+          <ActivityLogBox.wrappedComponent {...props} />
+        )
+        component = wrapper.instance()
+      })
+
+      it('should use the position value from local storage', () => {
+        expect(component.position).toEqual(pos)
+      })
+
+      it('should use the page value from local storage', () => {
+        expect(component.currentPage).toEqual('notifications')
+      })
+    })
   })
 
   describe('updatePosition', () => {
@@ -49,10 +85,7 @@ describe('ActivityLogBox', () => {
     })
 
     it('should update the local storage key', () => {
-      expect(localStorage.setItem).toHaveBeenCalledWith(
-        LOCAL_STORAGE_KEY,
-        JSON.stringify(pos)
-      )
+      expect(localStorage.getItem(POSITION_KEY)).toEqual(pos)
     })
 
     describe('when just the x and y are given', () => {
@@ -68,6 +101,25 @@ describe('ActivityLogBox', () => {
         expect(component.position.w).toEqual(1)
         expect(component.position.h).toEqual(2)
       })
+    })
+  })
+
+  describe('changePage', () => {
+
+    beforeEach(() => {
+      component.changePage('notifications')
+    })
+
+    afterEach(() => {
+      component.currentPage = 'comments'
+    })
+
+    it('should update the currentPage', () => {
+      expect(component.currentPage).toEqual('notifications')
+    })
+
+    it('should set the local storage key for page', () => {
+      expect(localStorage.getItem(PAGE_KEY)).toEqual('notifications')
     })
   })
 })
