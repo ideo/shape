@@ -2,6 +2,7 @@ import { Fragment } from 'react'
 import ReactRouterPropTypes from 'react-router-prop-types'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import { Flex, Box } from 'reflexbox'
+import styled from 'styled-components'
 
 import PageWithApi from '~/ui/pages/PageWithApi'
 import Loader from '~/ui/layout/Loader'
@@ -9,14 +10,22 @@ import Header from '~/ui/layout/Header'
 import PageContainer from '~/ui/layout/PageContainer'
 import CollectionGrid from '~/ui/grid/CollectionGrid'
 import Breadcrumb from '~/ui/layout/Breadcrumb'
+import ActivityLogBox from '~/ui/activity_log/ActivityLogBox'
 import MoveModal from '~/ui/grid/MoveModal'
 import RolesSummary from '~/ui/roles/RolesSummary'
 import Roles from '~/ui/grid/Roles'
 import EditableName from './shared/EditableName'
 import PageMenu from './shared/PageMenu'
+import CommentIcon from '~/ui/icons/CommentIcon'
 import { StyledTitleAndRoles } from './shared/styled'
+import { CircledIcon } from '~/ui/global/styled/buttons'
 
 const isHomepage = ({ path }) => path === '/'
+
+const StyledCircledIcon = styled(CircledIcon)`
+  align-self: center;
+  margin-top: 18px;
+`
 
 @inject('apiStore', 'uiStore')
 @observer
@@ -88,6 +97,16 @@ class CollectionPage extends PageWithApi {
     this.collection.save()
   }
 
+  toggleComments() {
+    const { uiStore } = this.props
+    uiStore.update('activityLogOpen', !uiStore.activityLogOpen)
+  }
+
+  handleComments = (ev) => {
+    ev.preventDefault()
+    this.toggleComments()
+  }
+
   render() {
     const { collection } = this
     const { uiStore } = this.props
@@ -103,31 +122,39 @@ class CollectionPage extends PageWithApi {
       <Fragment>
         <Header>
           <Breadcrumb items={breadcrumb} />
-          <StyledTitleAndRoles justify="space-between">
-            <Box className="title">
-              <EditableName
-                name={collection.name}
-                updateNameHandler={this.updateCollectionName}
-                canEdit={collection.can_edit && !this.collection.isUserCollection}
-              />
-            </Box>
-            <Flex align="baseline">
-              {this.collection.isNormalCollection &&
-                <Fragment>
-                  <RolesSummary
-                    handleClick={this.showObjectRoleDialog}
-                    roles={collection.roles}
-                    canEdit={collection.can_edit}
-                  />
-                  <PageMenu
-                    record={collection}
-                    menuOpen={uiStore.pageMenuOpen}
-                    canEdit={collection.can_edit}
-                  />
-                </Fragment>
-              }
-            </Flex>
-          </StyledTitleAndRoles>
+          <div>
+            { uiStore.activityLogOpen && (
+              <ActivityLogBox />
+            )}
+            <StyledTitleAndRoles justify="space-between">
+              <Box className="title">
+                <EditableName
+                  name={collection.name}
+                  updateNameHandler={this.updateCollectionName}
+                  canEdit={collection.can_edit && !this.collection.isUserCollection}
+                />
+              </Box>
+              <Flex align="baseline">
+                {this.collection.isNormalCollection &&
+                  <Fragment>
+                    <RolesSummary
+                      handleClick={this.showObjectRoleDialog}
+                      roles={collection.roles}
+                      canEdit={collection.can_edit}
+                    />
+                    <StyledCircledIcon onClick={this.handleComments}>
+                      <CommentIcon />
+                    </StyledCircledIcon>
+                    <PageMenu
+                      record={collection}
+                      menuOpen={uiStore.pageMenuOpen}
+                      canEdit={collection.can_edit}
+                    />
+                  </Fragment>
+                }
+              </Flex>
+            </StyledTitleAndRoles>
+          </div>
         </Header>
         <PageContainer>
           <Roles

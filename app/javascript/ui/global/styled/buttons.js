@@ -7,12 +7,12 @@ import v from '~/utils/variables'
 /** @component */
 export const TopRightButton = styled.button`
   position: absolute;
-  top: 5px;
-  right: 10px;
+  top: ${props => (props.size === 'sm' ? '5px' : '12px')};
+  right: ${props => (props.size === 'sm' ? '10px' : '12px')};
   color: ${v.colors.cloudy};
   .icon {
-    width: 12px;
-    height: 12px;
+    width: ${props => (props.size === 'sm' ? '12px' : '15px')};
+    height: ${props => (props.size === 'sm' ? '12px' : '15px')};
   }
 
   &:hover {
@@ -21,11 +21,31 @@ export const TopRightButton = styled.button`
 `
 TopRightButton.displayName = 'TopRightButton'
 
-export const CloseButton = ({ onClick }) => (
-  <TopRightButton onClick={onClick}>
+export const CloseButton = ({ onClick, size }) => (
+  <TopRightButton onClick={onClick} size={size}>
     <CloseIcon />
   </TopRightButton>
 )
 CloseButton.propTypes = {
+  size: PropTypes.oneOf(['sm', 'lg']),
   onClick: PropTypes.func.isRequired,
 }
+CloseButton.defaultProps = {
+  size: 'sm',
+}
+
+export const CircledIcon = styled.button`
+  align-items: center;
+  background-color: ${v.colors.gray};
+  border-radius: 50%;
+  display: flex;
+  height: 32px;
+  justify-content: center;
+  width: 32px;
+
+  .icon {
+    height: 20px;
+    width: 20px;
+  }
+`
+CircledIcon.displayName = 'StyledCircledIcon'
