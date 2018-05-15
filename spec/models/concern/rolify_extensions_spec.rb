@@ -76,4 +76,43 @@ describe RolifyExtensions, type: :concern do
       end
     end
   end
+
+  describe '#add_role' do
+    # test special case for only being admin/member of group
+    let(:group) { create(:group, organization: organization) }
+
+    it 'does not add admin role if already a member' do
+      # initial role should add
+      expect {
+        user.add_role(Role::MEMBER, group)
+      }.to change(user.users_roles, :count)
+
+      # further additions should not change the count
+      expect {
+        user.add_role(Role::MEMBER, group)
+      }.to not_change(user.users_roles, :count)
+
+      # further additions should not change the count
+      expect {
+        user.add_role(Role::ADMIN, group)
+      }.to not_change(user.users_roles, :count)
+    end
+
+    it 'does not add viewer role if already an editor' do
+      # initial role should add
+      expect {
+        user.add_role(Role::EDITOR, collection)
+      }.to change(user.users_roles, :count)
+
+      # further additions should not change the count
+      expect {
+        user.add_role(Role::EDITOR, collection)
+      }.to not_change(user.users_roles, :count)
+
+      # further additions should not change the count
+      expect {
+        user.add_role(Role::VIEWER, collection)
+      }.to not_change(user.users_roles, :count)
+    end
+  end
 end

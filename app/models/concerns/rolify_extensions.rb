@@ -38,11 +38,10 @@ module RolifyExtensions
   def add_role(role_name, resource = nil)
     begin
       role = Role.find_or_create(role_name, resource)
+      return role if already_has_resource_role?(role)
       if is_a?(User)
-        return role if role.users.include? self
         role.users << self
       elsif is_a?(Group)
-        return role if role.groups.include? self
         role.groups << self
       else
         raise "RolifyExtension: Unsupported model '#{self.class.name}' for add_role"
@@ -60,6 +59,23 @@ module RolifyExtensions
   def remove_role(role_name, resource = nil)
     return super(role_name) if resource.blank?
     super(role_name, resource.becomes(resource.resourceable_class))
+  end
+
+  def already_has_resource_role?(role)
+    role_type = is_a?(User) ? :users : :groups
+    # lookup role.users / role.groups to find self
+    return true if role.send(role_type).include? self
+    already_has_other_role?(role, role_type)
+  end
+
+  def already_has_other_role?(role, role_type)
+    return false if role.resource.blank?
+    found = false
+    # find other roles on this resource, e.g. if we're adding member role, look up admins
+    Role.for_resource(role.resource).each do |role|
+      found ||= role.send(role_type).include? self
+    end
+    found
   end
 
   def upgrade_to_editor_role(resource)
