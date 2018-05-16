@@ -74,7 +74,7 @@ class ActivityLogBox extends React.Component {
   }
 
   @action updatePosition({ x, y, w = this.position.w, h = this.position.h }) {
-    if (x < 0 || y < 0) return
+    if (y < 0) return
     this.position.x = x
     this.position.y = y
     this.position.w = w
@@ -105,7 +105,7 @@ class ActivityLogBox extends React.Component {
   render() {
     return (
       <Rnd
-        bounds={'.Grid'}
+        bounds={'.fixed_boundary'}
         minWidth={MIN_WIDTH}
         minHeight={MIN_HEIGHT}
         maxWidth={MAX_WIDTH}
