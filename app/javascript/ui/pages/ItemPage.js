@@ -14,6 +14,7 @@ import Breadcrumb from '~/ui/layout/Breadcrumb'
 import TextItem from '~/ui/items/TextItem'
 import ImageItem from '~/ui/items/ImageItem'
 import VideoItem from '~/ui/items/VideoItem'
+import PageHeader from '~/ui/pages/shared/PageHeader'
 import CloseIcon from '~/ui/icons/CloseIcon'
 import v, { ITEM_TYPES } from '~/utils/variables'
 import EditableName from './shared/EditableName'
@@ -128,32 +129,11 @@ class ItemPage extends PageWithApi {
   }
 
   render() {
-    const { uiStore } = this.props
     const { item } = this.state
     if (!item) return <Loader />
 
     return (
       <Fragment>
-        <Header>
-          <Breadcrumb items={item.breadcrumb} />
-          <StyledTitleAndRoles justify="space-between">
-            <Box className="title">
-              <EditableName
-                name={item.name}
-                updateNameHandler={this.updateItemName}
-                canEdit={item.can_edit}
-              />
-            </Box>
-            <Flex align="baseline" className="item-page">
-              <PageMenu
-                record={item}
-                canEdit={item.can_edit}
-                menuOpen={uiStore.pageMenuOpen}
-                disablePermissions
-              />
-            </Flex>
-          </StyledTitleAndRoles>
-        </Header>
         <ItemPageContainer>
           <PageContainer>
             {/* TODO: calculate item container size? */}
@@ -165,6 +145,7 @@ class ItemPage extends PageWithApi {
             </StyledRightColumn>
           </PageContainer>
         </ItemPageContainer>
+        <PageHeader record={item} />
       </Fragment>
     )
   }

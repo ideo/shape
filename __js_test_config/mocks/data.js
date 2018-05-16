@@ -13,6 +13,7 @@ export const fakeTextItemAttrs = {
   breadcrumb: [['collections', 1, 'Some collection'], ['items', 1, 'my item']],
   parentPath: '/',
   can_edit: false,
+  internalType: 'items',
 }
 export const fakeTextItem = {
   ...fakeTextItemAttrs,
@@ -103,6 +104,8 @@ export const fakeCollection = {
   cardIds: _.map(fakeCards, c => c.id),
   API_archive: jest.fn(),
   checkCurrentOrg: jest.fn(),
+  internalType: 'collections',
+  ...fakeJsonApiAttrs,
 }
 export const fakeGroupAttrs = {
   id: 1,
