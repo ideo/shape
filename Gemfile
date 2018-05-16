@@ -125,3 +125,6 @@ end
 
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
 # gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw, :jruby]
+
+# Added at 2018-05-16 09:52:31 -0700 by dkaplan:
+gem "google-cloud-firestore", "~> 0.21.0"
