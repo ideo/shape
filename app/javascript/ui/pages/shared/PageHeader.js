@@ -1,8 +1,7 @@
 import PropTypes from 'prop-types'
 import { Fragment } from 'react'
-import { inject, PropTypes as MobxPropTypes } from 'mobx-react'
+import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import { Flex, Box } from 'reflexbox'
-import styled from 'styled-components'
 
 import ActivityLogBox from '~/ui/activity_log/ActivityLogBox'
 import Breadcrumb from '~/ui/layout/Breadcrumb'
@@ -14,13 +13,8 @@ import RolesSummary from '~/ui/roles/RolesSummary'
 import { StyledTitleAndRoles } from '~/ui/pages/shared/styled'
 import PageMenu from '~/ui/pages/shared/PageMenu'
 
-const StyledCircledIcon = styled(CircledIcon)`
-  align-self: center;
-  margin-top: 18px;
-`
-StyledCircledIcon.displayName = 'StyledCircleIcon'
-
 @inject('uiStore')
+@observer
 class PageHeader extends React.Component {
   get canEdit() {
     const { record } = this.props
@@ -67,13 +61,13 @@ class PageHeader extends React.Component {
         />]
         : []
       ),
-      <StyledCircledIcon
+      <CircledIcon
         key="comments"
         active={uiStore.activityLogOpen}
         onClick={this.handleComments}
       >
         <CommentIcon />
-      </StyledCircledIcon>,
+      </CircledIcon>,
       ...(this.hasActions()
         ? [<PageMenu
           key="menu"
@@ -104,7 +98,7 @@ class PageHeader extends React.Component {
                 canEdit={this.canEdit}
               />
             </Box>
-            <Flex align="baseline">
+            <Flex align="flex-end" style={{ height: '60px' }}>
               <Fragment>
                 { this.actions }
               </Fragment>
