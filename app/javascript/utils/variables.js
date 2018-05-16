@@ -38,6 +38,7 @@ export default {
     cloudy: '#a89f9b',
     sirocco: '#697c7e',
     blackLava: '#120f0e',
+    blue: '#3f526a',
     error: '#d66742',
   },
 

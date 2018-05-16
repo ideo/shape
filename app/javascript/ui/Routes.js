@@ -20,6 +20,12 @@ const AppWrapper = styled.div`
 `
 AppWrapper.displayName = 'AppWrapper'
 
+const FixedBoundary = styled.div`
+  height: 100vh;
+  position: fixed;
+  width: 100vw;
+`
+
 // withRouter allows it to respond automatically to routing changes in props
 @withRouter
 @inject('apiStore', 'uiStore', 'routingStore')
@@ -46,6 +52,7 @@ class Routes extends React.Component {
 
     return (
       <AppWrapper blur={displayTermsPopup}>
+        <FixedBoundary className="fixed_boundary" />
         {/* Global components are rendered here */}
         <WindowSizeListener onResize={this.handleWindowResize} />
         <DialogWrapper />

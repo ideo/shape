@@ -58,6 +58,7 @@ export default class UiStore {
   @observable blurContent = false
   @observable orgCreated = false
   @observable searchText = ''
+  @observable activityLogOpen = false
 
   @action popupAlert(props = {}) {
     _.assign(this.dialogConfig, {
