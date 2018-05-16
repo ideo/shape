@@ -98,7 +98,7 @@ class PageHeader extends React.Component {
                 canEdit={this.canEdit}
               />
             </Box>
-            <Flex align="flex-end" style={{ height: '60px' }}>
+            <Flex align="flex-end" style={{ height: '60px', marginTop: '-10px' }}>
               <Fragment>
                 { this.actions }
               </Fragment>
