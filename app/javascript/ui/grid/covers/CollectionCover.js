@@ -9,7 +9,7 @@ import hexToRgba from '~/utils/hexToRgba'
 const StyledCollectionCover = styled.div`
   width: 100%;
   height: 100%;
-  background: ${props => (props.isSharedCollection ? v.colors.sirocco : v.colors.cloudy)};
+  background: ${props => (props.isSharedCollection ? v.colors.sirocco : v.colors.gray)};
   color: white;
   position: relative;
   overflow: hidden;

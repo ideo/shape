@@ -36,7 +36,7 @@ export default {
     aquaHaze: '#f0f4f6',
     gray: '#c6c1bf',
     cloudy: '#a89f9b',
-    sirocco: '#697c7e',
+    sirocco: '#6a7c7e',
     blackLava: '#120f0e',
     error: '#d66742',
   },
