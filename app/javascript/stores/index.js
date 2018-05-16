@@ -15,7 +15,6 @@ jsonApiConfig.fetchReference = (url, opts) => {
 export const routingStore = new RoutingStore()
 export const apiStore = new ApiStore()
 export const uiStore = new UiStore()
-console.log(uiStore)
 
 export default {
   routingStore,

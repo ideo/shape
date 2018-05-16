@@ -5,7 +5,7 @@ import {
   fakeCollection,
 } from '#/mocks/data'
 
-describe('ItemPage', () => {
+describe('PageHeader', () => {
   let wrapper, component, props
 
   beforeEach(() => {
@@ -65,7 +65,9 @@ describe('ItemPage', () => {
       beforeEach(() => {
         props.record.isNormalCollection = false
         props.record.isUserCollection = true
-        wrapper.setProps(props)
+        wrapper = shallow(
+          <PageHeader.wrappedComponent {...props} />
+        )
       })
 
       it('should not render roles', () => {
@@ -97,7 +99,7 @@ describe('ItemPage', () => {
 
     beforeEach(() => {
       props.uiStore.activityLogOpen = false
-      wrapper.find('StyledCircleIcon').simulate('click', fakeEv)
+      wrapper.find('StyledCircledIcon').simulate('click', fakeEv)
     })
 
     it('should open the activiy log in the ui store', () => {
