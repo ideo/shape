@@ -4,12 +4,12 @@ class Api::V1::ItemsController < Api::V1::BaseController
   load_and_authorize_resource
 
   def show
-    render jsonapi: @item, include: [:filestack_file, :parent, roles: %i[users groups]]
+    render jsonapi: @item, include: [:filestack_file, :parent, roles: %i[users groups resource]]
   end
 
   def create
     if @item.save
-      render jsonapi: @item
+      render jsonapi: @item, include: [roles: %i[users groups resource]]
     else
       render_api_errors @item.errors
     end
@@ -21,7 +21,7 @@ class Api::V1::ItemsController < Api::V1::BaseController
       # cancel_sync means we don't want to render the item JSON
       return if @cancel_sync
       @item.stopped_editing(current_user) if @item.is_a?(Item::TextItem)
-      render jsonapi: @item
+      render jsonapi: @item, include: [roles: %i[users groups resource]]
     else
       render_api_errors @item.errors
     end

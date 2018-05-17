@@ -9,6 +9,7 @@ import { CircledIcon } from '~/ui/global/styled/buttons'
 import CommentIcon from '~/ui/icons/CommentIcon'
 import EditableName from '~/ui/pages/shared/EditableName'
 import Header from '~/ui/layout/Header'
+import Roles from '~/ui/grid/Roles'
 import RolesSummary from '~/ui/roles/RolesSummary'
 import { StyledTitleAndRoles } from '~/ui/pages/shared/styled'
 import PageMenu from '~/ui/pages/shared/PageMenu'
@@ -52,8 +53,7 @@ class PageHeader extends React.Component {
     const { record, uiStore } = this.props
     const elements = []
     // 1. RolesSummary
-    // TODO: enable item roles once that is available
-    if (this.hasActions && record.internalType !== 'items') {
+    if (this.hasActions) {
       elements.push(
         <RolesSummary
           key="roles"
@@ -92,6 +92,10 @@ class PageHeader extends React.Component {
     const breadcrumb = isHomepage ? [] : record.breadcrumb
     return (
       <Header>
+        <Roles
+          record={record}
+          roles={record.roles}
+        />
         <Breadcrumb items={breadcrumb} />
         <div>
           { uiStore.activityLogOpen && (
