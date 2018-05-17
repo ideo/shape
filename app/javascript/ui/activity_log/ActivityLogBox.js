@@ -1,4 +1,3 @@
-import PropTypes from 'prop-types'
 import Rnd from 'react-rnd'
 import localStorage from 'mobx-localstorage'
 import { observable, action } from 'mobx'
@@ -151,14 +150,14 @@ class ActivityLogBox extends React.Component {
             </Action>
             <CloseButton size="lg" onClick={this.handleClose} />
           </Header>
-          <h3 style={{textAlign: 'center'}}>Go to Object</h3>
+          <h3 style={{ textAlign: 'center' }}>Go to Object</h3>
         </ActivityLog>
       </Rnd>
     )
   }
 }
 
-ActivityLogBox.propTypes = {
+ActivityLogBox.wrappedComponent.propTypes = {
   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 

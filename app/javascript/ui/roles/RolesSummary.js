@@ -11,6 +11,7 @@ const AVATAR_SIZE = 30
 
 const StyledRolesSummary = styled.div`
   position: relative;
+  top: 5px;
   @media only screen and (max-width: ${v.responsive.medBreakpoint}px) {
     min-height: 50px;
     .roles-summary--inner {

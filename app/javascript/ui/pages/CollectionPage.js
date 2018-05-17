@@ -9,23 +9,11 @@ import Loader from '~/ui/layout/Loader'
 import Header from '~/ui/layout/Header'
 import PageContainer from '~/ui/layout/PageContainer'
 import CollectionGrid from '~/ui/grid/CollectionGrid'
-import Breadcrumb from '~/ui/layout/Breadcrumb'
-import ActivityLogBox from '~/ui/activity_log/ActivityLogBox'
 import MoveModal from '~/ui/grid/MoveModal'
-import RolesSummary from '~/ui/roles/RolesSummary'
 import Roles from '~/ui/grid/Roles'
-import EditableName from './shared/EditableName'
-import PageMenu from './shared/PageMenu'
-import CommentIcon from '~/ui/icons/CommentIcon'
-import { StyledTitleAndRoles } from './shared/styled'
-import { CircledIcon } from '~/ui/global/styled/buttons'
+import PageHeader from '~/ui/pages/shared/PageHeader'
 
 const isHomepage = ({ path }) => path === '/'
-
-const StyledCircledIcon = styled(CircledIcon)`
-  align-self: center;
-  margin-top: 18px;
-`
 
 @inject('apiStore', 'uiStore')
 @observer
@@ -81,11 +69,6 @@ class CollectionPage extends PageWithApi {
     collection.checkCurrentOrg()
   }
 
-  showObjectRoleDialog = () => {
-    const { uiStore } = this.props
-    uiStore.update('rolesMenuOpen', true)
-  }
-
   updateCollection = () => {
     // TODO: what if there's no collection?
     // calling .save() will receive any API updates and sync them
@@ -97,56 +80,10 @@ class CollectionPage extends PageWithApi {
     this.collection.save()
   }
 
-  toggleComments() {
-    const { uiStore } = this.props
-    uiStore.update('activityLogOpen', !uiStore.activityLogOpen)
-  }
-
-  handleComments = (ev) => {
-    ev.preventDefault()
-    this.toggleComments()
-  }
-
-  renderHeader() {
-    const { collection } = this
-    const { uiStore } = this.props
-    const items = [
-      ...(this.collection.isNormalCollection
-        ? [<RolesSummary
-          handleClick={this.showObjectRoleDialog}
-          roles={collection.roles}
-          canEdit={collection.can_edit}
-        />]
-        : []
-      ),
-      <StyledCircledIcon
-        active={uiStore.activityLogOpen}
-        onClick={this.handleComments}
-      >
-        <CommentIcon />
-      </StyledCircledIcon>,
-      ...(this.collection.isNormalCollection
-        ? [<PageMenu
-          record={collection}
-          menuOpen={uiStore.pageMenuOpen}
-          canEdit={collection.can_edit}
-        />]
-        : []
-      ),
-    ]
-
-    return (
-      <Fragment>
-        {items}
-      </Fragment>
-    )
-  }
-
   render() {
     const { collection } = this
     const { uiStore } = this.props
     if (!collection) return <Loader />
-    const breadcrumb = this.isHomepage ? [] : collection.breadcrumb
     const { movingCardIds, cardAction } = uiStore
     // only tell the Grid to hide "movingCards" if we're moving and not linking
     const uiMovingCardIds = cardAction === 'move' ? movingCardIds : []
@@ -155,26 +92,7 @@ class CollectionPage extends PageWithApi {
 
     return (
       <Fragment>
-        <Header>
-          <Breadcrumb items={breadcrumb} />
-          <div>
-            { uiStore.activityLogOpen && (
-              <ActivityLogBox />
-            )}
-            <StyledTitleAndRoles justify="space-between">
-              <Box className="title">
-                <EditableName
-                  name={collection.name}
-                  updateNameHandler={this.updateCollectionName}
-                  canEdit={collection.can_edit && !this.collection.isUserCollection}
-                />
-              </Box>
-              <Flex align="baseline">
-                {this.renderHeader()}
-              </Flex>
-            </StyledTitleAndRoles>
-          </div>
-        </Header>
+        <PageHeader record={collection} isHomepage={this.isHomepage} />
         <PageContainer>
           <Roles
             collection={collection}
