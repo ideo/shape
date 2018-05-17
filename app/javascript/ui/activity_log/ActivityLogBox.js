@@ -9,22 +9,24 @@ import styled from 'styled-components'
 
 import v from '~/utils/variables'
 
-const DEFAULT = {
-  x: 0,
-  y: 83,
-}
-
 const MIN_WIDTH = 319
 const MIN_HEIGHT = 400
 const MAX_WIDTH = 800
 const MAX_HEIGHT = 800
 const HEADER_HEIGHT = 35
 
+const DEFAULT = {
+  x: 0,
+  y: 83,
+  w: MIN_WIDTH,
+  h: MIN_HEIGHT,
+}
+
 export const POSITION_KEY = 'ActivityLog:position'
 export const PAGE_KEY = 'ActivityLog:page'
 
 const ActivityLog = styled.div`
-  background-color: ${v.colors.blue};
+  background-color: ${v.colors.activityBlue};
   box-shadow: 0px 0px 24px -5px rgba(0,0,0,0.33);
   box-sizing: border-box;
   color: white;
@@ -60,16 +62,36 @@ class ActivityLogBox extends React.Component {
   @observable position = { x: 0, y: 0, w: MIN_WIDTH, h: MIN_HEIGHT }
   @observable currentPage = 'comments'
 
+  constructor() {
+    super()
+    this.draggableRef = React.createRef()
+  }
+
   @action componentDidMount() {
-    const existingPosition = localStorage.getItem(POSITION_KEY)
+    const existingPosition = localStorage.getItem(POSITION_KEY) || { }
     const existingPage = localStorage.getItem(PAGE_KEY)
-    this.position = existingPosition || {
+    this.position.x = existingPosition.x ||
+      document.querySelector('.Grid').offsetWidth - MIN_WIDTH + DEFAULT.x
+    this.position.y = existingPosition.y || DEFAULT.y
+    this.position.w = existingPosition.w || DEFAULT.w
+    this.position.h = existingPosition.h || DEFAULT.h
+    this.currentPage = existingPage || 'comments'
+
+    // NOTE This is required because react-rnd doesn't mount the children
+    // components right away (meaning our div with ref won't exist) and
+    // doesn't supply any callback for when it does mount them.
+    setTimeout(() => {
+      if (this.isOffscreen()) {
+        this.setToDefaultPosition()
+      }
+    }, 50)
+  }
+
+  setToDefaultPosition() {
+    this.updatePosition({
       x: document.querySelector('.Grid').offsetWidth - MIN_WIDTH + DEFAULT.x,
       y: DEFAULT.y,
-      w: MIN_WIDTH,
-      h: MIN_HEIGHT,
-    }
-    this.currentPage = existingPage || 'comments'
+    })
   }
 
   @action updatePosition({ x, y, w = this.position.w, h = this.position.h }) {
@@ -84,6 +106,20 @@ class ActivityLogBox extends React.Component {
   @action changePage(page) {
     this.currentPage = page
     localStorage.setItem(PAGE_KEY, page)
+  }
+
+  isOffscreen() {
+    const node = this.draggableRef.current
+    if (!node) return false
+    const rect = node.getBoundingClientRect()
+    const viewHeight = Math.max(document.documentElement.clientHeight, window.innerHeight)
+    const viewWidth = Math.max(document.documentElement.clientWidth, window.innerWidth)
+    return !(
+      rect.top >= 0 &&
+      rect.left >= 0 &&
+      rect.right <= viewWidth &&
+      rect.bottom <= viewHeight
+    )
   }
 
   handleClose = (ev) => {
@@ -104,12 +140,13 @@ class ActivityLogBox extends React.Component {
   render() {
     return (
       <Rnd
+        className="activity_log-draggable"
         bounds={'.fixed_boundary'}
         minWidth={MIN_WIDTH}
         minHeight={MIN_HEIGHT}
         maxWidth={MAX_WIDTH}
         maxHeight={MAX_HEIGHT}
-        position={this.position}
+        position={{ x: this.position.x, y: this.position.y }}
         dragHandleClassName=".activity_log-header"
         size={{ width: this.position.w, height: this.position.h }}
         enableResizing={{
@@ -117,12 +154,6 @@ class ActivityLogBox extends React.Component {
           top: true,
           left: false,
           right: false,
-        }}
-        default={{
-          width: MIN_WIDTH,
-          height: MIN_HEIGHT,
-          x: 10,
-          y: 83,
         }}
         disableDragging={false}
         onDragStop={(ev, d) => { this.updatePosition(d) }}
@@ -134,24 +165,26 @@ class ActivityLogBox extends React.Component {
           this.updatePosition(fullPosition)
         }}
       >
-        <ActivityLog>
-          <Header className="activity_log-header">
-            <Action
-              active={this.currentPage === 'notifications'}
-              onClick={this.handleNotifications}
-            >
-              <NotificationIcon />
-            </Action>
-            <Action
-              active={this.currentPage === 'comments'}
-              onClick={this.handleComments}
-            >
-              <CommentIcon />
-            </Action>
-            <CloseButton size="lg" onClick={this.handleClose} />
-          </Header>
-          <h3 style={{ textAlign: 'center' }}>Go to Object</h3>
-        </ActivityLog>
+        <div ref={this.draggableRef} style={{ height: '100%' }}>
+          <ActivityLog>
+            <Header className="activity_log-header">
+              <Action
+                active={this.currentPage === 'notifications'}
+                onClick={this.handleNotifications}
+              >
+                <NotificationIcon />
+              </Action>
+              <Action
+                active={this.currentPage === 'comments'}
+                onClick={this.handleComments}
+              >
+                <CommentIcon />
+              </Action>
+              <CloseButton size="lg" onClick={this.handleClose} />
+            </Header>
+            <h3 style={{ textAlign: 'center' }}>Go to Object</h3>
+          </ActivityLog>
+        </div>
       </Rnd>
     )
   }
