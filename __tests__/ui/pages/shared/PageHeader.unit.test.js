@@ -50,7 +50,7 @@ describe('PageHeader', () => {
         expect(wrapper.find('RolesSummary').exists()).toBeFalsy()
       })
 
-      it('should render the activty log icon', () => {
+      it('should render the activity log icon', () => {
         expect(wrapper.find('CommentIcon').exists()).toBeTruthy()
       })
 
@@ -62,6 +62,14 @@ describe('PageHeader', () => {
     describe('for a normal collection', () => {
       it('should render the breadcrumb', () => {
         expect(wrapper.find('Breadcrumb').prop('items').length).toBeGreaterThan(0)
+      })
+
+      it('passes canEdit through to EditableName', () => {
+        expect(wrapper.find('EditableName').props().canEdit).toEqual(props.record.can_edit)
+      })
+
+      it('passes canEdit through to RolesSummary', () => {
+        expect(wrapper.find('RolesSummary').props().canEdit).toEqual(props.record.can_edit)
       })
     })
 
