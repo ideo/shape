@@ -68,7 +68,9 @@ Rails.application.routes.draw do
         end
         resources :roles, only: %i[destroy]
       end
-      resources :comment_threads, only: %i[index]
+      resources :comment_threads, only: %i[index show] do
+        resources :comments, only: %i[create]
+      end
       get :search, to: 'search#search', as: :search
     end
   end

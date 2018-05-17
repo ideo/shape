@@ -1,17 +1,28 @@
 import { observable, runInAction } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
-import Dialog, { DialogContent } from 'material-ui/Dialog'
 import { Element as ScrollElement, scroller } from 'react-scroll'
 import _ from 'lodash'
+import styled from 'styled-components'
 
-import { ModalCloseButton } from '~/ui/global/modals/Modal'
 import CommentThread from './CommentThread'
+
+const StyledCommentThreadContainer = styled.div`
+  overflow-y: scroll;
+  overflow-x: hidden;
+  height: 100%;
+`
 
 @inject('apiStore', 'uiStore')
 @observer
 class CommentThreadContainer extends React.Component {
   @observable threads = []
   @observable contentHeight = null
+  scrollOpts = {
+    containerId: 'ctc-content',
+    delay: 75,
+    duration: 400,
+    smooth: true,
+  }
 
   componentDidMount() {
     const { apiStore } = this.props
@@ -22,45 +33,49 @@ class CommentThreadContainer extends React.Component {
     })
   }
 
-  get isOpen() {
-    const { uiStore } = this.props
-    return uiStore.commentsOpen
-  }
-
   contentHeight = () => (
     document.getElementById('ctc-content').clientHeight
   )
 
-  handleClose = () => {
-    const { uiStore } = this.props
-    uiStore.update('commentsOpen', false)
-  }
-
   toggleThreadExpanded = thread => () => {
     const { uiStore } = this.props
     const { id } = thread
-    const val = uiStore.expandedThread === id ? null : id
-    if (val) {
-      const nextIdx = this.threads.indexOf(thread) + 1
-      const scrollOpts = {
-        containerId: 'ctc-content',
-        delay: 75,
-        duration: 400,
-        smooth: true,
-      }
-      if (nextIdx === this.threads.length) {
-        uiStore.scroll.scrollToBottom(scrollOpts)
-      } else {
-        setTimeout(() => {
-          scroller.scrollTo(`thread-${nextIdx}`, {
-            ...scrollOpts,
-            // HACK: should actually calculate content height I guess
-            offset: -1 * this.contentHeight(),
-          })
-        }, 100)
-      }
+    const expand = uiStore.expandedThread === id ? null : id
+    const idx = this.threads.indexOf(thread)
+    if (expand) {
+      // if we're expanding, we scroll to the top of the next thread
+      // (aka bottom of this thread)
+      this.scrollToTopOfNextThread(thread)
+    } else {
+      // if we're compacting, we scroll to the top of this thread
+      scroller.scrollTo(`thread-${idx}`, {
+        ...this.scrollOpts,
+        delay: 0,
+      })
     }
-    uiStore.update('expandedThread', val)
+    uiStore.update('expandedThread', expand)
+  }
+
+  scrollToTopOfNextThread = thread => {
+    const { uiStore } = this.props
+    const idx = this.threads.indexOf(thread)
+    const nextIdx = idx + 1
+    if (nextIdx === this.threads.length) {
+      uiStore.scroll.scrollToBottom(this.scrollOpts)
+    } else {
+      // have to wait for this thread to expand so the next one is actually lower,
+      // then we can scroll down to the top of the next thread.
+      setTimeout(() => {
+        scroller.scrollTo(`thread-${nextIdx}`, {
+          ...this.scrollOpts,
+          offset: -1 * this.contentHeight(),
+        })
+      }, 100)
+    }
+  }
+
+  afterSubmit = thread => () => {
+    this.scrollToTopOfNextThread(thread)
   }
 
   isExpanded = id => {
@@ -75,6 +90,7 @@ class CommentThreadContainer extends React.Component {
           thread={thread}
           expanded={this.isExpanded(thread.id)}
           onClick={this.toggleThreadExpanded(thread)}
+          afterSubmit={this.afterSubmit(thread)}
         />
       </ScrollElement>
     ))
@@ -82,19 +98,9 @@ class CommentThreadContainer extends React.Component {
 
   render() {
     return (
-      <Dialog
-        open={this.isOpen}
-        onClose={this.handleClose}
-        onBackdropClick={this.handleClose}
-        BackdropProps={{ invisible: true }}
-      >
-        <ModalCloseButton onClick={this.handleClose}>
-          x
-        </ModalCloseButton>
-        <DialogContent id="ctc-content" style={{ margin: '25px 0' }}>
-          { this.renderThreads() }
-        </DialogContent>
-      </Dialog>
+      <StyledCommentThreadContainer id="ctc-content">
+        {this.renderThreads()}
+      </StyledCommentThreadContainer>
     )
   }
 }

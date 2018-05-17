@@ -1,15 +1,26 @@
 import { PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
+import { Flex } from 'reflexbox'
 
 import v from '~/utils/variables'
 import Moment from '~/ui/global/Moment'
+import UserAvatar from '~/ui/users/UserAvatar'
 
 const StyledComment = styled.div`
   padding: 10px;
-  margin-left: 20px;
-  border-bottom: 1px solid gray;
-  .author {
+  margin-bottom: 5px;
+  background: ${v.colors.activityLightBlue};
+  .author, .timestamp {
     font-family: ${v.fonts.sans};
+    display: inline-block;
+    margin-left: 10px;
+  }
+  .timestamp {
+    font-size: 0.9rem;
+    color: ${v.colors.cloudy};
+  }
+  .message {
+    margin-top: 5px;
   }
 `
 
@@ -19,12 +30,20 @@ class Comment extends React.Component {
 
     return (
       <StyledComment>
-        <p className="author">
-          { comment.author.name }
-          &nbsp;|&nbsp;
-          <Moment date={comment.created_at} format="lll" />
-        </p>
-        <p>
+        <Flex align="center">
+          <UserAvatar
+            user={comment.author}
+            size={32}
+            className="author-img"
+          />
+          <span className="author">
+            { comment.author.name }
+          </span>
+          <span className="timestamp">
+            <Moment date={comment.created_at} format="LT" />
+          </span>
+        </Flex>
+        <p className="message">
           { comment.message }
         </p>
       </StyledComment>

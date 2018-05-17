@@ -2,10 +2,12 @@ import Rnd from 'react-rnd'
 import localStorage from 'mobx-localstorage'
 import { observable, action } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
+import styled from 'styled-components'
+
 import { CloseButton } from '~/ui/global/styled/buttons'
 import NotificationIcon from '~/ui/icons/NotificationIcon'
 import CommentIcon from '~/ui/icons/CommentIcon'
-import styled from 'styled-components'
+import CommentThreadContainer from '~/ui/threads/CommentThreadContainer'
 
 import v from '~/utils/variables'
 
@@ -25,19 +27,25 @@ const DEFAULT = {
 export const POSITION_KEY = 'ActivityLog:position'
 export const PAGE_KEY = 'ActivityLog:page'
 
-const ActivityLog = styled.div`
-  background-color: ${v.colors.activityBlue};
+const StyledActivityLog = styled.div`
+  background-color: ${v.colors.activityDarkBlue};
   box-shadow: 0px 0px 24px -5px rgba(0,0,0,0.33);
   box-sizing: border-box;
   color: white;
   height: 100%;
-  padding: 12px 14px;
   width: 100%;
+  display: flex;
+  flex-direction: column;
+
+  > h3 {
+    text-align: center;
+  }
 `
 
-const Header = styled.div`
+const StyledHeader = styled.div`
   height: ${HEADER_HEIGHT}px;
   width: 100%;
+  padding: 12px 14px 0;
 
   &:hover,
   &:active {
@@ -151,6 +159,7 @@ class ActivityLogBox extends React.Component {
         size={{ width: this.position.w, height: this.position.h }}
         enableResizing={{
           bottom: true,
+          bottomRight: true,
           top: true,
           left: false,
           right: false,
@@ -166,8 +175,8 @@ class ActivityLogBox extends React.Component {
         }}
       >
         <div ref={this.draggableRef} style={{ height: '100%' }}>
-          <ActivityLog>
-            <Header className="activity_log-header">
+          <StyledActivityLog>
+            <StyledHeader className="activity_log-header">
               <Action
                 active={this.currentPage === 'notifications'}
                 onClick={this.handleNotifications}
@@ -181,9 +190,12 @@ class ActivityLogBox extends React.Component {
                 <CommentIcon />
               </Action>
               <CloseButton size="lg" onClick={this.handleClose} />
-            </Header>
-            <h3 style={{ textAlign: 'center' }}>Go to Object</h3>
-          </ActivityLog>
+            </StyledHeader>
+            <h3>Go to Object</h3>
+
+            <CommentThreadContainer />
+
+          </StyledActivityLog>
         </div>
       </Rnd>
     )

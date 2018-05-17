@@ -5,6 +5,10 @@ class Api::V1::CommentThreadsController < Api::V1::BaseController
     render jsonapi: @comment_threads, include: [:record, comments: [:author]]
   end
 
+  def show
+    render jsonapi: CommentThread.find(params[:id]), include: [:record, comments: [:author]]
+  end
+
   private
 
   def load_comment_threads

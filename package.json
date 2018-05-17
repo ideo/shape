@@ -15,7 +15,9 @@
       "<rootDir>/__tests__",
       "<rootDir>/app/javascript"
     ],
-    "setupFiles": ["jest-localstorage-mock"],
+    "setupFiles": [
+      "jest-localstorage-mock"
+    ],
     "setupTestFrameworkScriptFile": "./__js_test_config/setup.js",
     "modulePaths": [
       "__js_test_config"
@@ -57,6 +59,7 @@
     "prop-types": "^15.6.1",
     "query-string": "5.1.0",
     "react": "^16.3.2",
+    "react-autosize-textarea": "^3.0.3",
     "react-dom": "^16.3.2",
     "react-dotdotdot": "^1.2.3",
     "react-flip-move": "~2.10.0",
