@@ -146,9 +146,13 @@ class ActivityLogBox extends React.Component {
   }
 
   render() {
+    const { uiStore } = this.props
+    if (!uiStore.activityLogOpen) return null
+
     return (
       <Rnd
         className="activity_log-draggable"
+        style={{ zIndex: v.zIndex.activityLog, position: 'fixed' }}
         bounds={'.fixed_boundary'}
         minWidth={MIN_WIDTH}
         minHeight={MIN_HEIGHT}

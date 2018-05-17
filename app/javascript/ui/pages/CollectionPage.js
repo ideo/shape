@@ -1,12 +1,9 @@
 import { Fragment } from 'react'
 import ReactRouterPropTypes from 'react-router-prop-types'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
-import { Flex, Box } from 'reflexbox'
-import styled from 'styled-components'
 
 import PageWithApi from '~/ui/pages/PageWithApi'
 import Loader from '~/ui/layout/Loader'
-import Header from '~/ui/layout/Header'
 import PageContainer from '~/ui/layout/PageContainer'
 import CollectionGrid from '~/ui/grid/CollectionGrid'
 import MoveModal from '~/ui/grid/MoveModal'

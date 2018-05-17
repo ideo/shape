@@ -1,5 +1,6 @@
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import { Switch, Route, withRouter } from 'react-router-dom'
+import WindowSizeListener from 'react-window-size-listener'
 import styled from 'styled-components'
 
 import DialogWrapper from '~/ui/global/modals/DialogWrapper'
@@ -10,7 +11,7 @@ import TermsPage from '~/ui/pages/TermsPage'
 import SettingsPage from '~/ui/pages/SettingsPage'
 import TermsOfUseModal from '~/ui/users/TermsOfUseModal'
 import Loader from '~/ui/layout/Loader'
-import WindowSizeListener from 'react-window-size-listener'
+import ActivityLogBox from '~/ui/activity_log/ActivityLogBox'
 
 const AppWrapper = styled.div`
   /* used by terms of use modal to blur the whole site */
@@ -56,6 +57,7 @@ class Routes extends React.Component {
         {/* Global components are rendered here */}
         <WindowSizeListener onResize={this.handleWindowResize} />
         <DialogWrapper />
+        <ActivityLogBox />
         {displayTermsPopup &&
           <TermsOfUseModal currentUser={apiStore.currentUser} />
         }

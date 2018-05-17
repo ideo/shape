@@ -61,6 +61,7 @@ export default {
   zIndex: {
     aboveClickWrapper: 501,
     clickWrapper: 500,
+    activityLog: 201,
     popoutMenu: 201,
     header: 200,
     scrollIndicator: 200,
