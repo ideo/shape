@@ -29,6 +29,10 @@ describe('PageHeader', () => {
       it('should not render the breadcrumb', () => {
         expect(wrapper.find('Breadcrumb').prop('items').length).toEqual(0)
       })
+
+      it('should render an EditableName with the record.name', () => {
+        expect(wrapper.find('EditableName').props().name).toEqual(props.record.name)
+      })
     })
 
     describe('for an editable item', () => {

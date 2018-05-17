@@ -22,7 +22,7 @@ class PageHeader extends React.Component {
     return record.can_edit && !record.isUserCollection
   }
 
-  hasActions() {
+  get hasActions() {
     const { record } = this.props
     return record.internalType === 'items' || record.isNormalCollection
   }
@@ -50,34 +50,41 @@ class PageHeader extends React.Component {
 
   get actions() {
     const { record, uiStore } = this.props
-    // TODO temporarily disable item roles until we implement it
-    return [
-      ...(this.hasActions() && record.internalType !== 'items'
-        ? [<RolesSummary
+    const elements = []
+    // 1. RolesSummary
+    // TODO: enable item roles once that is available
+    if (this.hasActions && record.internalType !== 'items') {
+      elements.push(
+        <RolesSummary
           key="roles"
           handleClick={this.showObjectRoleDialog}
           roles={record.roles}
           canEdit={record.can_edit}
-        />]
-        : []
-      ),
+        />
+      )
+    }
+    // 2. CommentIcon (toggle ActivityLog)
+    elements.push(
       <CircledIcon
         key="comments"
         active={uiStore.activityLogOpen}
         onClick={this.handleComments}
       >
         <CommentIcon />
-      </CircledIcon>,
-      ...(this.hasActions()
-        ? [<PageMenu
+      </CircledIcon>
+    )
+    // 3. PageMenu actions, if available
+    if (this.hasActions) {
+      elements.push(
+        <PageMenu
           key="menu"
           record={record}
           menuOpen={uiStore.pageMenuOpen}
           canEdit={record.can_edit}
-        />]
-        : []
-      ),
-    ]
+        />
+      )
+    }
+    return elements
   }
 
   render() {
