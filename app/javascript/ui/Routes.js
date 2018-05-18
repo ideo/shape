@@ -8,6 +8,7 @@ import CollectionPage from '~/ui/pages/CollectionPage'
 import ItemPage from '~/ui/pages/ItemPage'
 import SearchPage from '~/ui/pages/SearchPage'
 import TermsPage from '~/ui/pages/TermsPage'
+import Header from '~/ui/layout/Header'
 import SettingsPage from '~/ui/pages/SettingsPage'
 import TermsOfUseModal from '~/ui/users/TermsOfUseModal'
 import Loader from '~/ui/layout/Loader'
@@ -60,6 +61,7 @@ class Routes extends React.Component {
         <WindowSizeListener onResize={this.handleWindowResize} />
         <DialogWrapper />
 
+        <Header />
         <FixedBoundary className="fixed_boundary" />
         <div style={{ position: 'fixed', zIndex: 9999 }}>
           <ActivityLogBox />

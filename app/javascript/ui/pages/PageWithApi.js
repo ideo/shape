@@ -43,6 +43,9 @@ class PageWithApi extends React.Component {
       })
       .catch(err => {
         uiStore.update('isLoading', false)
+        if (_.isFunction(this.onAPIError)) {
+          this.onAPIError(response)
+        }
         console.warn('API error!', err)
         if (!routingStore.location.pathname === '/') routingStore.routeTo('/')
       })
