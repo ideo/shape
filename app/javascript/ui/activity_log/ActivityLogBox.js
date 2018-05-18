@@ -148,6 +148,14 @@ class ActivityLogBox extends React.Component {
     this.changePage('comments')
   }
 
+  get showJumpToThreadButton() {
+    const { uiStore } = this.props
+    return (uiStore.viewingRecord &&
+      (uiStore.viewingRecord.isNormalCollection ||
+      uiStore.viewingRecord.internalType === 'items')
+    )
+  }
+
   jumpToCurrentThread = () => {
     const { apiStore, uiStore } = this.props
     const thread = apiStore.findThreadForRecord(uiStore.viewingRecord)
@@ -206,14 +214,15 @@ class ActivityLogBox extends React.Component {
               </Action>
               <CloseButton size="lg" onClick={this.handleClose} />
             </StyledHeader>
-            {(
-              uiStore.viewingRecord &&
-              (uiStore.viewingRecord.isNormalCollection ||
-              uiStore.viewingRecord.internalType === 'items')) && (
-                <button onClick={this.jumpToCurrentThread}>
-                  <h3>Go to {uiStore.viewingRecord.name}</h3>
-                </button>
-              )}
+            {this.showJumpToThreadButton &&
+              <button onClick={this.jumpToCurrentThread}>
+                <h3>Go to {uiStore.viewingRecord.name}</h3>
+              </button>
+            }
+            {!this.showJumpToThreadButton &&
+              // take up the same amount of space as the button
+              <div style={{ height: '2rem' }} />
+            }
 
             <CommentThreadContainer
               expandedThread={uiStore.expandedThread}

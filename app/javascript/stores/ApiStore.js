@@ -72,7 +72,7 @@ class ApiStore extends Store {
 
   async fetchThreads() {
     // this.findAll('comment_threads')
-    this.fetchAll('comment_threads')
+    return this.fetchAll('comment_threads')
   }
 
   findThreadForRecord(record) {
