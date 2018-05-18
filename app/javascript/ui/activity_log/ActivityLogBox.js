@@ -76,7 +76,7 @@ class ActivityLogBox extends React.Component {
     super(props)
     this.draggableRef = React.createRef()
     this.disposer = observe(props.uiStore, 'activityLogOpen', change => {
-      if (change.newValue && this.isOffscreen()) {
+      if (this.isOffscreen()) {
         this.setToDefaultPosition()
       }
     })
@@ -100,6 +100,7 @@ class ActivityLogBox extends React.Component {
   }
 
   setToDefaultPosition() {
+    console.log('setToDefault')
     this.updatePosition({
       x: document.querySelector('.Grid').offsetWidth - this.position.w + DEFAULT.x,
       y: DEFAULT.y,
@@ -107,7 +108,6 @@ class ActivityLogBox extends React.Component {
   }
 
   @action updatePosition({ x, y, w = this.position.w, h = this.position.h }) {
-    console.log('update position', x, y)
     if (y < 0) return
     this.position.x = x
     this.position.y = y
@@ -170,7 +170,7 @@ class ActivityLogBox extends React.Component {
   get mobileProps() {
     const { uiStore } = this.props
     if (!uiStore.activityLogForceWidth) return {}
-    const headerHeight = 185
+    const headerHeight = 192
     const height = window.innerHeight - (headerHeight + MOBILE_Y)
     return {
       minWidth: uiStore.activityLogForceWidth,
