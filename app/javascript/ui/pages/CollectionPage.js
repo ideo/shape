@@ -8,7 +8,6 @@ import Loader from '~/ui/layout/Loader'
 import PageContainer from '~/ui/layout/PageContainer'
 import CollectionGrid from '~/ui/grid/CollectionGrid'
 import MoveModal from '~/ui/grid/MoveModal'
-import Roles from '~/ui/grid/Roles'
 import PageHeader from '~/ui/pages/shared/PageHeader'
 
 const isHomepage = ({ path }) => path === '/'
@@ -101,10 +100,6 @@ class CollectionPage extends PageWithApi {
           isHomepage={this.isHomepage}
         />
         <PageContainer>
-          <Roles
-            collection={collection}
-            roles={collection.roles}
-          />
           <CollectionGrid
             // pull in cols, gridW, gridH, gutter
             {...uiStore.gridSettings}

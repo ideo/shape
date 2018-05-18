@@ -50,7 +50,7 @@ describe('PageHeader', () => {
       })
 
       it('should not render the roles', () => {
-        expect(wrapper.find('RolesSummary').exists()).toBeFalsy()
+        expect(wrapper.find('RolesSummary').exists()).toBeTruthy()
       })
 
       it('should render the activity log icon', () => {
