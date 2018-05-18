@@ -4,7 +4,12 @@ class SerializableItem < BaseJsonSerializer
   attributes :id, :type, :name, :content, :text_data,
              :url, :thumbnail_url
 
-  cached_attributes :filestack_file_url, :tag_list
+  attribute :tag_list do
+    @object.cached_tag_list || []
+  end
+  attribute :filestack_file_url do
+    @object.cached_filestack_file_url || ''
+  end
 
   has_one :parent
 
