@@ -145,7 +145,7 @@ class Collection < ApplicationRecord
       roles: %i[users groups resource],
       collection_cards: [
         :parent,
-        record: [:filestack_file, roles: %i[users groups resource]],
+        record: [:filestack_file],
       ],
     ]
   end
@@ -159,7 +159,7 @@ class Collection < ApplicationRecord
       collection_cards: [
         :parent,
         :collection,
-        item: [:filestack_file, roles: %i[users groups resource]],
+        item: [:filestack_file],
       ],
     ]
   end

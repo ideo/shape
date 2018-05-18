@@ -21,7 +21,7 @@ class Api::V1::ItemsController < Api::V1::BaseController
       # cancel_sync means we don't want to render the item JSON
       return if @cancel_sync
       @item.stopped_editing(current_user) if @item.is_a?(Item::TextItem)
-      render jsonapi: @item, include: [roles: %i[users groups resource]]
+      render jsonapi: @item
     else
       render_api_errors @item.errors
     end
