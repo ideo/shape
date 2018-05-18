@@ -14,6 +14,9 @@ class Item < ApplicationRecord
 
   acts_as_taggable
 
+  store_accessor :cached_attributes,
+                 :cached_tag_list, :cached_filestack_file_url
+
   # The card that 'holds' this item and determines its breadcrumb
   has_one :parent_collection_card,
           class_name: 'CollectionCard::Primary',
@@ -32,6 +35,7 @@ class Item < ApplicationRecord
 
   validates :type, presence: true
 
+  before_update :cache_attributes
   after_commit :reindex_parent_collection
   after_commit :update_parent_collection_if_needed
 
@@ -120,6 +124,12 @@ class Item < ApplicationRecord
     # currently text item is the only one that matters
     return unless id == collection.cached_cover['item_id_text']
     collection.update_cover_text!(self)
+  end
+
+  def cache_attributes
+    cached_tag_list = tag_list if tag_list_changed?
+    cached_filestack_file_url = filestack_file_url if filestack_file_id_changed?
+    true
   end
 
   private
