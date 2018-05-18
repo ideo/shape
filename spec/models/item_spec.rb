@@ -111,16 +111,4 @@ RSpec.describe Item, type: :model do
       expect(item.cached_filestack_file_url).to eq(item.filestack_file_url)
     end
   end
-
-  describe '#cache_cover' do
-    let(:collection) { create(:collection, num_cards: 3) }
-    let!(:image_card) { create(:collection_card_image, parent: collection) }
-
-    it 'caches cover onto cached_attributes' do
-      expect(collection.cached_cover).to be nil
-      collection.cache_cover
-      expect(collection.cached_cover['text']).not_to be nil
-      expect(collection.cached_cover['image_url']).not_to be nil
-    end
-  end
 end
