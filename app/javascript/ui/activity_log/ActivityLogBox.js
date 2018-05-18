@@ -20,7 +20,7 @@ const MOBILE_Y = 300
 
 const DEFAULT = {
   x: 0,
-  y: 180,
+  y: 1,
   w: MIN_WIDTH,
   h: MIN_HEIGHT,
 }
@@ -100,9 +100,9 @@ class ActivityLogBox extends React.Component {
   }
 
   setToDefaultPosition() {
-    console.log('setToDefault')
+    const gridRect = document.querySelector('.Grid').getBoundingClientRect()
     this.updatePosition({
-      x: document.querySelector('.Grid').offsetWidth - this.position.w + DEFAULT.x,
+      x: gridRect.right - this.position.w + DEFAULT.x,
       y: DEFAULT.y,
     })
   }
@@ -130,8 +130,8 @@ class ActivityLogBox extends React.Component {
     return !(
       rect.top >= 0 &&
       rect.left >= 0 &&
-      rect.right <= viewWidth &&
-      rect.bottom <= viewHeight
+      rect.right - (MIN_WIDTH - 100) <= viewWidth &&
+      rect.bottom - (MIN_HEIGHT - 100) <= viewHeight
     )
   }
 
