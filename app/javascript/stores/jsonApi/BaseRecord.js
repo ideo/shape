@@ -12,6 +12,12 @@ class BaseRecord extends Record {
     return this.__internal.type
   }
 
+  get className() {
+    // very simple version of singularize, just cut off the 's' at the end
+    const name = this.internalType.slice(0, -1)
+    return _.capitalize(_.camelCase(name))
+  }
+
   rawAttributes() {
     return super.toJsonApi().attributes
   }

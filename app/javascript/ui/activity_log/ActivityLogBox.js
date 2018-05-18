@@ -64,7 +64,7 @@ const Action = styled.button`
   }
 `
 
-@inject('uiStore')
+@inject('apiStore', 'uiStore')
 @observer
 class ActivityLogBox extends React.Component {
   @observable position = { x: 0, y: 0, w: MIN_WIDTH, h: MIN_HEIGHT }
@@ -93,6 +93,9 @@ class ActivityLogBox extends React.Component {
         this.setToDefaultPosition()
       }
     }, 50)
+
+    this.currentPage = existingPage || 'comments'
+    this.props.apiStore.fetchThreads()
   }
 
   setToDefaultPosition() {
@@ -145,10 +148,18 @@ class ActivityLogBox extends React.Component {
     this.changePage('comments')
   }
 
+  jumpToCurrentThread = () => {
+    const { apiStore, uiStore } = this.props
+    const thread = apiStore.findThreadForRecord(uiStore.viewingRecord)
+    if (!thread) return
+    // reset it first, that way if it's expanded offscreen, it will get re-opened/scrolled to
+    uiStore.update('expandedThread', null)
+    uiStore.update('expandedThread', thread.id)
+  }
+
   render() {
     const { uiStore } = this.props
     if (!uiStore.activityLogOpen) return null
-
     return (
       <Rnd
         className="activity_log-draggable"
@@ -195,9 +206,18 @@ class ActivityLogBox extends React.Component {
               </Action>
               <CloseButton size="lg" onClick={this.handleClose} />
             </StyledHeader>
-            <h3>Go to Object</h3>
+            {(
+              uiStore.viewingRecord &&
+              (uiStore.viewingRecord.isNormalCollection ||
+              uiStore.viewingRecord.internalType === 'items')) && (
+                <button onClick={this.jumpToCurrentThread}>
+                  <h3>Go to {uiStore.viewingRecord.name}</h3>
+                </button>
+              )}
 
-            <CommentThreadContainer />
+            <CommentThreadContainer
+              expandedThread={uiStore.expandedThread}
+            />
 
           </StyledActivityLog>
         </div>
@@ -207,6 +227,7 @@ class ActivityLogBox extends React.Component {
 }
 
 ActivityLogBox.wrappedComponent.propTypes = {
+  apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 

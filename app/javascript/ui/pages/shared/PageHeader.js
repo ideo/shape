@@ -31,7 +31,7 @@ class PageHeader extends React.Component {
     uiStore.update('rolesMenuOpen', true)
   }
 
-  toggleComments() {
+  toggleActivityLog() {
     const { uiStore } = this.props
     uiStore.update('activityLogOpen', !uiStore.activityLogOpen)
   }
@@ -44,7 +44,7 @@ class PageHeader extends React.Component {
 
   handleComments = (ev) => {
     ev.preventDefault()
-    this.toggleComments()
+    this.toggleActivityLog()
   }
 
   get actions() {
@@ -87,7 +87,7 @@ class PageHeader extends React.Component {
   }
 
   render() {
-    const { record, isHomepage, uiStore } = this.props
+    const { record, isHomepage } = this.props
     const breadcrumb = isHomepage ? [] : record.breadcrumb
     return (
       <Header>

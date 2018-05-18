@@ -39,6 +39,7 @@ export default class UiStore {
   }
   @observable gridSettings = { ...this.defaultGridSettings }
   @observable viewingCollection = null
+  @observable viewingItem = null
   @observable selectedCardIds = []
   @observable isLoading = false
   @observable movingCardIds = []
@@ -62,6 +63,7 @@ export default class UiStore {
 
   // Comments + Threads
   @observable commentsOpen = false
+  // marked by record id
   @observable expandedThread = null
 
   @action popupAlert(props = {}) {
@@ -222,6 +224,15 @@ export default class UiStore {
     // called when loading a new CollectionPage
     this.viewingCollection = collection
     this.deselectCards()
+  }
+
+  @action setViewingItem(item = null) {
+    this.viewingItem = item
+  }
+
+  get viewingRecord() {
+    // only one should be present at a time depending on what page you're on
+    return this.viewingCollection || this.viewingItem
   }
 
   @action toggleSelectedCardId(cardId) {

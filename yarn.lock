@@ -6016,9 +6016,9 @@ mobx-collection-store@^2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/mobx-collection-store/-/mobx-collection-store-2.0.0.tgz#893451fc2ab94be69875946218d6db6cded70946"
 
-mobx-jsonapi-store@^4.2.1:
-  version "4.2.1"
-  resolved "https://registry.yarnpkg.com/mobx-jsonapi-store/-/mobx-jsonapi-store-4.2.1.tgz#39f9e0be08544ce476fcb4e36abeed725fbe5fa1"
+mobx-jsonapi-store@^4.2.2:
+  version "4.2.2"
+  resolved "https://registry.yarnpkg.com/mobx-jsonapi-store/-/mobx-jsonapi-store-4.2.2.tgz#9b7ded05fe8d7495dadf172d1537397553ce0522"
   dependencies:
     mobx-collection-store "^2.0.0"
 

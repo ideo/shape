@@ -1,5 +1,6 @@
 import { Fragment } from 'react'
 import ReactRouterPropTypes from 'react-router-prop-types'
+import { observable, runInAction } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 
 import PageWithApi from '~/ui/pages/PageWithApi'
@@ -15,17 +16,14 @@ const isHomepage = ({ path }) => path === '/'
 @inject('apiStore', 'uiStore')
 @observer
 class CollectionPage extends PageWithApi {
+  @observable thread = null
+
   componentWillReceiveProps(nextProps) {
     super.componentWillReceiveProps(nextProps)
     // when navigating between collections, close BCT
     if (nextProps.match.params.id !== this.props.match.params.id) {
       this.props.uiStore.closeBlankContentTool()
     }
-  }
-
-  componentWillUnmount() {
-    const { uiStore } = this.props
-    uiStore.setViewingCollection(null)
   }
 
   get isHomepage() {
@@ -57,13 +55,22 @@ class CollectionPage extends PageWithApi {
 
   onAPILoad = (response) => {
     const collection = response.data
-    const { uiStore } = this.props
+    const { apiStore, uiStore } = this.props
     uiStore.setViewingCollection(collection)
     // setViewingCollection has to happen first bc we use it in openBlankContentTool
     if (!collection.collection_cards.length) {
       uiStore.openBlankContentTool()
     }
     collection.checkCurrentOrg()
+    if (collection.isNormalCollection) {
+      apiStore.findOrBuildCommentThread(collection).then(thread => {
+        runInAction(() => {
+          this.thread = thread
+        })
+      })
+    } else {
+      apiStore.clearUnpersistedThreads()
+    }
   }
 
   updateCollection = () => {
@@ -89,7 +96,10 @@ class CollectionPage extends PageWithApi {
 
     return (
       <Fragment>
-        <PageHeader record={collection} isHomepage={this.isHomepage} />
+        <PageHeader
+          record={collection}
+          isHomepage={this.isHomepage}
+        />
         <PageContainer>
           <Roles
             collection={collection}

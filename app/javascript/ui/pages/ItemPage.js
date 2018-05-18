@@ -1,7 +1,7 @@
 import { Fragment } from 'react'
 import ReactRouterPropTypes from 'react-router-prop-types'
+import { observable, runInAction } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
-import { Flex, Box } from 'reflexbox'
 import styled from 'styled-components'
 import { Link } from 'react-router-dom'
 
@@ -9,17 +9,12 @@ import ActionCableConsumer from '~/utils/ActionCableConsumer'
 import PageWithApi from '~/ui/pages/PageWithApi'
 import PageContainer from '~/ui/layout/PageContainer'
 import Loader from '~/ui/layout/Loader'
-import Header from '~/ui/layout/Header'
-import Breadcrumb from '~/ui/layout/Breadcrumb'
 import TextItem from '~/ui/items/TextItem'
 import ImageItem from '~/ui/items/ImageItem'
 import VideoItem from '~/ui/items/VideoItem'
 import PageHeader from '~/ui/pages/shared/PageHeader'
 import CloseIcon from '~/ui/icons/CloseIcon'
 import v, { ITEM_TYPES } from '~/utils/variables'
-import EditableName from './shared/EditableName'
-import PageMenu from './shared/PageMenu'
-import { StyledTitleAndRoles } from './shared/styled'
 
 const ItemPageContainer = styled.main`
   background: white;
@@ -60,6 +55,7 @@ const CloseLink = styled(Link)`
 @inject('apiStore', 'uiStore')
 @observer
 class ItemPage extends PageWithApi {
+  @observable thread = null
   state = {
     item: null
   }
@@ -74,9 +70,16 @@ class ItemPage extends PageWithApi {
   }
 
   onAPILoad = (response) => {
+    const { apiStore, uiStore } = this.props
     const item = response.data
     this.setState({ item })
+    uiStore.setViewingItem(item)
     if (item.parent) item.parent.checkCurrentOrg()
+    apiStore.findOrBuildCommentThread(item).then(thread => {
+      runInAction(() => {
+        this.thread = thread
+      })
+    })
   }
 
   updateItem = (itemTextData) => {

@@ -14,23 +14,22 @@ import Comment from './Comment'
 
 const StyledCommentThread = styled.div`
   .title {
+    position: relative;
+    top: 0;
+    z-index: 50;
     /* NOTE: just for prototyping, not fully browser supported */
     ${props => props.expanded && `
       position: sticky;
-      top: 0;
-      z-index: 50;
     `}
     /* ---- */
     display: block;
     width: 100%;
     background-color: ${v.colors.activityDarkBlue};
-    ${props => props.expanded && `
-      background: linear-gradient(
-        ${v.colors.activityDarkBlue} 0,
-        ${v.colors.activityDarkBlue} 80%,
-        ${hexToRgba(v.colors.activityDarkBlue, 0)} 100%
-      );
-    `}
+    background: linear-gradient(
+      ${v.colors.activityDarkBlue} 0,
+      ${v.colors.activityDarkBlue} 80%,
+      ${hexToRgba(v.colors.activityDarkBlue, 0)} 100%
+    );
     padding: 20px 10px;
     text-align: left;
     font-family: ${v.fonts.sans};
@@ -43,6 +42,13 @@ const StyledCommentThread = styled.div`
   }
   .comments {
     margin: 0 10px 0 40px;
+    ${props => !props.expanded && `
+      z-index: 0;
+      position: relative;
+      top: -40px;
+      overflow: hidden;
+      margin-bottom: -40px;
+    `}
   }
   form.reply {
     position: relative;
@@ -108,11 +114,19 @@ const StyledCommentThread = styled.div`
 class CommentThread extends React.Component {
   @observable message = ''
 
+  componentDidMount() {
+    this.focusTextArea(this.props.expanded)
+  }
+
   componentWillReceiveProps({ expanded }) {
+    this.focusTextArea(expanded)
+  }
+
+  focusTextArea = (expanded) => {
     if (expanded && this.textarea) {
       // NOTE: for some reason needs to delay before focus? because of animated scroll?
       setTimeout(() => {
-        this.textarea.focus()
+        if (this.textarea) this.textarea.focus()
       }, 50)
     }
   }
@@ -161,7 +175,7 @@ class CommentThread extends React.Component {
         <div className="comments">
           <FlipMove
             appearAnimation="elevator"
-            leaveAnimation="fade"
+            leaveAnimation="elevator"
           >
             { this.renderComments() }
           </FlipMove>

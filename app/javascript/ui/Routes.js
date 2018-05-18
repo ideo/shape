@@ -22,7 +22,7 @@ const AppWrapper = styled.div`
 AppWrapper.displayName = 'AppWrapper'
 
 const FixedBoundary = styled.div`
-  height: 100vh;
+  height: 9999px;
   position: fixed;
   width: 100vw;
 `

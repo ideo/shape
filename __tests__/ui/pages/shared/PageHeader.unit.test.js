@@ -106,7 +106,7 @@ describe('PageHeader', () => {
     })
   })
 
-  describe('toggleComments', () => {
+  describe('toggleActivityLog', () => {
     const fakeEv = { preventDefault: jest.fn() }
 
     beforeEach(() => {
