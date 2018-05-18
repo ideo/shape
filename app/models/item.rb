@@ -35,7 +35,7 @@ class Item < ApplicationRecord
 
   validates :type, presence: true
 
-  before_update :cache_attributes
+  before_save :cache_attributes
   after_commit :reindex_parent_collection
   after_commit :update_parent_collection_if_needed
 
@@ -127,9 +127,10 @@ class Item < ApplicationRecord
   end
 
   def cache_attributes
-    cached_tag_list = tag_list if tag_list_changed?
-    cached_filestack_file_url = filestack_file_url if filestack_file_id_changed?
-    true
+    if self.cached_tag_list != self.tag_list
+      self.cached_tag_list = self.tag_list
+    end
+    cached_attributes
   end
 
   private

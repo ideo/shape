@@ -95,4 +95,32 @@ RSpec.describe Item, type: :model do
       expect(collection.cached_cover['text']).not_to eq second_item.plain_content
     end
   end
+
+  describe '#cache_attributes' do
+    let(:tag_list) { %w[testing prototyping] }
+    let(:item) { create(:image_item) }
+
+    it 'caches tag_list onto cached_attributes' do
+      expect(item.cached_tag_list).to eq []
+      item.update(tag_list: tag_list)
+      expect(item.cached_tag_list).to match_array(tag_list)
+    end
+
+    it 'caches filestack_file_url onto cached_attributes' do
+      # filestack_file is required so it will be saved upon create(:image_item)
+      expect(item.cached_filestack_file_url).to eq(item.filestack_file_url)
+    end
+  end
+
+  describe '#cache_cover' do
+    let(:collection) { create(:collection, num_cards: 3) }
+    let!(:image_card) { create(:collection_card_image, parent: collection) }
+
+    it 'caches cover onto cached_attributes' do
+      expect(collection.cached_cover).to be nil
+      collection.cache_cover
+      expect(collection.cached_cover['text']).not_to be nil
+      expect(collection.cached_cover['image_url']).not_to be nil
+    end
+  end
 end
