@@ -12,18 +12,10 @@ import OrganizationDropdown from '~/ui/organizations/OrganizationDropdown'
 import LeaveIcon from '~/ui/icons/LeaveIcon'
 import PopoutMenu from '~/ui/global/PopoutMenu'
 import ClickWrapper from '~/ui/layout/ClickWrapper'
+import { FixedHeader, MaxWidthContainer } from '~/ui/global/styled/layout'
 import v from '~/utils/variables'
 
 /* global IdeoSSO */
-
-const StyledHeader = styled.header`
-  z-index: ${v.zIndex.header};
-  position: fixed;
-  top: 0;
-  width: calc(100% - ${v.containerPadding.horizontal}*2);
-  background: ${v.colors.cararra};
-  padding: 1rem ${v.containerPadding.horizontal};
-`
 
 const StyledAvatarAndDropdown = styled.div`
   display: inline-block;
@@ -42,11 +34,6 @@ const StyledAvatarAndDropdown = styled.div`
   }
 `
 StyledAvatarAndDropdown.displayName = 'StyledAvatarAndDropdown'
-
-const MaxWidthContainer = styled.div`
-  max-width: ${v.maxWidth}px;
-  margin: 0 auto;
-`
 
 // TODO trying to fix alignment issues
 // const MaxWidthInnerContainer = styled.div`
@@ -119,12 +106,12 @@ class Header extends React.Component {
   }
 
   render() {
-    const { apiStore, children } = this.props
+    const { apiStore } = this.props
     const { currentUser } = apiStore
     const { userDropdownOpen, orgDropdownOpen } = this.state
     const primaryGroup = currentUser.current_organization.primary_group
     return (
-      <StyledHeader>
+      <FixedHeader zIndex={v.zIndex.globalHeader}>
         <MaxWidthContainer>
 
           <Flex align="center" justify="space-between">
@@ -160,23 +147,14 @@ class Header extends React.Component {
                 <ClickWrapper clickHandlers={this.clickHandlers} />}
             </Box>
           </Flex>
-          <div>
-            { children }
-          </div>
         </MaxWidthContainer>
-      </StyledHeader>
+      </FixedHeader>
     )
   }
 }
 
-Header.propTypes = {
-  children: PropTypes.node,
-}
 Header.wrappedComponent.propTypes = {
   apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
-}
-Header.defaultProps = {
-  children: null,
 }
 
 export default Header

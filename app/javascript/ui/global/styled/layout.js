@@ -48,3 +48,19 @@ export const RowItem = styled.span`
   }
 `
 RowItem.displayName = 'StyledRowItem'
+
+export const FixedHeader = styled.header`
+  z-index: ${props => props.zIndex};
+  position: fixed;
+  top: 0;
+  width: calc(100% - ${v.containerPadding.horizontal}*2);
+  background: ${v.colors.cararra};
+  padding: 1rem ${v.containerPadding.horizontal};
+`
+FixedHeader.displayName = 'FixedHeader'
+
+export const MaxWidthContainer = styled.div`
+  max-width: ${v.maxWidth}px;
+  margin: 0 auto;
+`
+MaxWidthContainer.displayName = 'MaxWidthContainer'

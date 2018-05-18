@@ -9,9 +9,11 @@ import CommentIcon from '~/ui/icons/CommentIcon'
 import EditableName from '~/ui/pages/shared/EditableName'
 import Header from '~/ui/layout/Header'
 import Roles from '~/ui/grid/Roles'
+import { FixedHeader, MaxWidthContainer } from '~/ui/global/styled/layout'
 import RolesSummary from '~/ui/roles/RolesSummary'
 import { StyledTitleAndRoles } from '~/ui/pages/shared/styled'
 import PageMenu from '~/ui/pages/shared/PageMenu'
+import v from '~/utils/variables'
 
 @inject('uiStore')
 @observer
@@ -90,29 +92,31 @@ class PageHeader extends React.Component {
     const { record, isHomepage } = this.props
     const breadcrumb = isHomepage ? [] : record.breadcrumb
     return (
-      <Header>
-        <Roles
-          record={record}
-          roles={record.roles}
-        />
-        <Breadcrumb items={breadcrumb} />
-        <div>
-          <StyledTitleAndRoles justify="space-between">
-            <Box className="title">
-              <EditableName
-                name={record.name}
-                updateNameHandler={this.updateRecordName}
-                canEdit={this.canEdit}
-              />
-            </Box>
-            <Flex align="flex-end" style={{ height: '60px', marginTop: '-10px' }}>
-              <Fragment>
-                { this.actions }
-              </Fragment>
-            </Flex>
-          </StyledTitleAndRoles>
-        </div>
-      </Header>
+      <FixedHeader style={{ top: v.globalHeaderHeight }} zIndex={v.zIndex.pageHeader}>
+        <MaxWidthContainer>
+          <Roles
+            record={record}
+            roles={record.roles}
+          />
+          <Breadcrumb items={breadcrumb} />
+          <div>
+            <StyledTitleAndRoles justify="space-between">
+              <Box className="title">
+                <EditableName
+                  name={record.name}
+                  updateNameHandler={this.updateRecordName}
+                  canEdit={this.canEdit}
+                />
+              </Box>
+              <Flex align="flex-end" style={{ height: '60px', marginTop: '-10px' }}>
+                <Fragment>
+                  { this.actions }
+                </Fragment>
+              </Flex>
+            </StyledTitleAndRoles>
+          </div>
+        </MaxWidthContainer>
+      </FixedHeader>
     )
   }
 }
