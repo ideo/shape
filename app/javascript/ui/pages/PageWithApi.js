@@ -4,6 +4,8 @@ import { animateScroll as scroll } from 'react-scroll'
 import { uiStore, routingStore } from '~/stores'
 
 class PageWithApi extends React.Component {
+  unmounted = false
+
   componentDidMount() {
     scroll.scrollToTop({ duration: 0 })
     uiStore.resetSelectionAndBCT()
@@ -17,6 +19,12 @@ class PageWithApi extends React.Component {
     this.fetchData(nextProps)
   }
 
+  componentWillUnmount() {
+    this.unmounted = true
+    uiStore.setViewingCollection(null)
+    uiStore.setViewingItem(null)
+  }
+
   // to be overridden in child class
   // onAPILoad = null
   // requestPath = null
@@ -28,6 +36,7 @@ class PageWithApi extends React.Component {
     return apiStore.request(this.requestPath(props))
       .then(response => {
         uiStore.update('isLoading', false)
+        if (this.unmounted) return
         if (_.isFunction(this.onAPILoad)) {
           this.onAPILoad(response)
         }

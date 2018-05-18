@@ -68,6 +68,12 @@ Rails.application.routes.draw do
         end
         resources :roles, only: %i[destroy]
       end
+      resources :comment_threads, only: %i[index show create] do
+        resources :comments, only: %i[create]
+        collection do
+          get 'find_by_record/:record_type/:record_id', action: 'find_by_record'
+        end
+      end
       get :search, to: 'search#search', as: :search
     end
   end

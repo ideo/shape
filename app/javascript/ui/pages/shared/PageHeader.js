@@ -3,7 +3,6 @@ import { Fragment } from 'react'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import { Flex, Box } from 'reflexbox'
 
-import ActivityLogBox from '~/ui/activity_log/ActivityLogBox'
 import Breadcrumb from '~/ui/layout/Breadcrumb'
 import { CircledIcon } from '~/ui/global/styled/buttons'
 import CommentIcon from '~/ui/icons/CommentIcon'
@@ -32,7 +31,7 @@ class PageHeader extends React.Component {
     uiStore.update('rolesMenuOpen', true)
   }
 
-  toggleComments() {
+  toggleActivityLog() {
     const { uiStore } = this.props
     uiStore.update('activityLogOpen', !uiStore.activityLogOpen)
   }
@@ -45,7 +44,7 @@ class PageHeader extends React.Component {
 
   handleComments = (ev) => {
     ev.preventDefault()
-    this.toggleComments()
+    this.toggleActivityLog()
   }
 
   get actions() {
@@ -63,18 +62,18 @@ class PageHeader extends React.Component {
         />
       )
     }
-    // 2. CommentIcon (toggle ActivityLog)
-    elements.push(
-      <CircledIcon
-        key="comments"
-        active={uiStore.activityLogOpen}
-        onClick={this.handleComments}
-      >
-        <CommentIcon />
-      </CircledIcon>
-    )
-    // 3. PageMenu actions, if available
     if (this.hasActions) {
+      // 2. CommentIcon (toggle ActivityLog)
+      elements.push(
+        <CircledIcon
+          key="comments"
+          active={uiStore.activityLogOpen}
+          onClick={this.handleComments}
+        >
+          <CommentIcon />
+        </CircledIcon>
+      )
+      // 3. PageMenu actions
       elements.push(
         <PageMenu
           key="menu"
@@ -88,15 +87,12 @@ class PageHeader extends React.Component {
   }
 
   render() {
-    const { record, isHomepage, uiStore } = this.props
+    const { record, isHomepage } = this.props
     const breadcrumb = isHomepage ? [] : record.breadcrumb
     return (
       <Header>
         <Breadcrumb items={breadcrumb} />
         <div>
-          { uiStore.activityLogOpen && (
-            <ActivityLogBox />
-          )}
           <StyledTitleAndRoles justify="space-between">
             <Box className="title">
               <EditableName

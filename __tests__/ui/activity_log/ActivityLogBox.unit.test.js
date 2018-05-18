@@ -2,14 +2,17 @@ import ActivityLogBox, { POSITION_KEY, PAGE_KEY } from '~/ui/activity_log/Activi
 import localStorage from 'mobx-localstorage'
 
 import fakeUiStore from '#/mocks/fakeUiStore'
+import fakeApiStore from '#/mocks/fakeApiStore'
 
 jest.mock('mobx-localstorage')
+jest.mock('mobx')
 
 describe('ActivityLogBox', () => {
   let props, wrapper, component, localStorageStore
   const fakeEv = { preventDefault: jest.fn() }
 
   beforeEach(() => {
+    const apiStore = fakeApiStore()
     const uiStore = fakeUiStore
 
     // Setup fake local storage
@@ -18,7 +21,7 @@ describe('ActivityLogBox', () => {
       localStorageStore[key] = val
     }
     localStorage.getItem = (key) => localStorageStore[key]
-    props = { uiStore }
+    props = { uiStore, apiStore }
     localStorage.clear()
     document.body.innerHTML = '<div class="Grid"></div>'
     wrapper = shallow(
@@ -42,7 +45,7 @@ describe('ActivityLogBox', () => {
   describe('componentDidMount()', () => {
     it('should set the position based with defaults if not set', () => {
       expect(component.position.x).toEqual(-319)
-      expect(component.position.y).toEqual(83)
+      expect(component.position.y).toEqual(180)
     })
 
     it('should set current page to default comments page', () => {

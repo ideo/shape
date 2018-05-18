@@ -44,7 +44,7 @@ const StyledDialog = styled(Dialog)`
     }
   }
   .checkbox--color {
-    color: ${v.colors.blue};
+    color: ${v.colors.pacificBlue};
   }
   .checkbox--error {
     color: ${v.colors.error};

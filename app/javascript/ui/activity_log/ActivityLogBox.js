@@ -1,11 +1,13 @@
 import Rnd from 'react-rnd'
 import localStorage from 'mobx-localstorage'
-import { observable, action } from 'mobx'
+import { observable, observe, action } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
+import styled from 'styled-components'
+
 import { CloseButton } from '~/ui/global/styled/buttons'
 import NotificationIcon from '~/ui/icons/NotificationIcon'
 import CommentIcon from '~/ui/icons/CommentIcon'
-import styled from 'styled-components'
+import CommentThreadContainer from '~/ui/threads/CommentThreadContainer'
 
 import v from '~/utils/variables'
 
@@ -17,7 +19,7 @@ const HEADER_HEIGHT = 35
 
 const DEFAULT = {
   x: 0,
-  y: 83,
+  y: 180,
   w: MIN_WIDTH,
   h: MIN_HEIGHT,
 }
@@ -25,19 +27,25 @@ const DEFAULT = {
 export const POSITION_KEY = 'ActivityLog:position'
 export const PAGE_KEY = 'ActivityLog:page'
 
-const ActivityLog = styled.div`
-  background-color: ${v.colors.activityBlue};
+const StyledActivityLog = styled.div`
+  background-color: ${v.colors.activityDarkBlue};
   box-shadow: 0px 0px 24px -5px rgba(0,0,0,0.33);
   box-sizing: border-box;
   color: white;
   height: 100%;
-  padding: 12px 14px;
   width: 100%;
+  display: flex;
+  flex-direction: column;
+
+  > h3 {
+    text-align: center;
+  }
 `
 
-const Header = styled.div`
+const StyledHeader = styled.div`
   height: ${HEADER_HEIGHT}px;
   width: 100%;
+  padding: 12px 14px 0;
 
   &:hover,
   &:active {
@@ -56,40 +64,43 @@ const Action = styled.button`
   }
 `
 
-@inject('uiStore')
+@inject('apiStore', 'uiStore')
 @observer
 class ActivityLogBox extends React.Component {
   @observable position = { x: 0, y: 0, w: MIN_WIDTH, h: MIN_HEIGHT }
   @observable currentPage = 'comments'
+  disposer = null
 
-  constructor() {
-    super()
+  constructor(props) {
+    super(props)
     this.draggableRef = React.createRef()
+    this.disposer = observe(props.uiStore, 'activityLogOpen', change => {
+      if (this.isOffscreen()) {
+        this.setToDefaultPosition()
+      }
+    })
   }
 
   @action componentDidMount() {
     const existingPosition = localStorage.getItem(POSITION_KEY) || { }
     const existingPage = localStorage.getItem(PAGE_KEY)
-    this.position.x = existingPosition.x ||
-      document.querySelector('.Grid').offsetWidth - MIN_WIDTH + DEFAULT.x
     this.position.y = existingPosition.y || DEFAULT.y
     this.position.w = existingPosition.w || DEFAULT.w
     this.position.h = existingPosition.h || DEFAULT.h
+    this.position.x = existingPosition.x ||
+      document.querySelector('.Grid').offsetWidth - this.position.w + DEFAULT.x
     this.currentPage = existingPage || 'comments'
+    this.props.apiStore.fetchThreads()
+  }
 
-    // NOTE This is required because react-rnd doesn't mount the children
-    // components right away (meaning our div with ref won't exist) and
-    // doesn't supply any callback for when it does mount them.
-    setTimeout(() => {
-      if (this.isOffscreen()) {
-        this.setToDefaultPosition()
-      }
-    }, 50)
+  componentWillUnmount() {
+    // cancel the observer
+    this.disposer()
   }
 
   setToDefaultPosition() {
     this.updatePosition({
-      x: document.querySelector('.Grid').offsetWidth - MIN_WIDTH + DEFAULT.x,
+      x: document.querySelector('.Grid').offsetWidth - this.position.w + DEFAULT.x,
       y: DEFAULT.y,
     })
   }
@@ -137,10 +148,30 @@ class ActivityLogBox extends React.Component {
     this.changePage('comments')
   }
 
+  get showJumpToThreadButton() {
+    const { uiStore } = this.props
+    return (uiStore.viewingRecord &&
+      (uiStore.viewingRecord.isNormalCollection ||
+      uiStore.viewingRecord.internalType === 'items')
+    )
+  }
+
+  jumpToCurrentThread = () => {
+    const { apiStore, uiStore } = this.props
+    const thread = apiStore.findThreadForRecord(uiStore.viewingRecord)
+    if (!thread) return
+    // reset it first, that way if it's expanded offscreen, it will get re-opened/scrolled to
+    uiStore.update('expandedThread', null)
+    uiStore.update('expandedThread', thread.id)
+  }
+
   render() {
+    const { uiStore } = this.props
+    if (!uiStore.activityLogOpen) return null
     return (
       <Rnd
         className="activity_log-draggable"
+        style={{ zIndex: v.zIndex.activityLog }}
         bounds={'.fixed_boundary'}
         minWidth={MIN_WIDTH}
         minHeight={MIN_HEIGHT}
@@ -151,6 +182,7 @@ class ActivityLogBox extends React.Component {
         size={{ width: this.position.w, height: this.position.h }}
         enableResizing={{
           bottom: true,
+          bottomRight: true,
           top: true,
           left: false,
           right: false,
@@ -166,8 +198,8 @@ class ActivityLogBox extends React.Component {
         }}
       >
         <div ref={this.draggableRef} style={{ height: '100%' }}>
-          <ActivityLog>
-            <Header className="activity_log-header">
+          <StyledActivityLog>
+            <StyledHeader className="activity_log-header">
               <Action
                 active={this.currentPage === 'notifications'}
                 onClick={this.handleNotifications}
@@ -181,9 +213,20 @@ class ActivityLogBox extends React.Component {
                 <CommentIcon />
               </Action>
               <CloseButton size="lg" onClick={this.handleClose} />
-            </Header>
-            <h3 style={{ textAlign: 'center' }}>Go to Object</h3>
-          </ActivityLog>
+            </StyledHeader>
+            {this.showJumpToThreadButton &&
+              <button onClick={this.jumpToCurrentThread}>
+                <h3>Go to {uiStore.viewingRecord.name}</h3>
+              </button>
+            }
+            {!this.showJumpToThreadButton &&
+              // take up the same amount of space as the button
+              <div style={{ height: '2rem' }} />
+            }
+
+            <CommentThreadContainer />
+
+          </StyledActivityLog>
         </div>
       </Rnd>
     )
@@ -191,6 +234,7 @@ class ActivityLogBox extends React.Component {
 }
 
 ActivityLogBox.wrappedComponent.propTypes = {
+  apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 

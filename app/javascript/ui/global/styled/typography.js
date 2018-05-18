@@ -98,7 +98,7 @@ SubText.displayName = 'StyledSubText'
 
 /** @component */
 export const Anchor = styled.a`
-  color: ${v.colors.blue};
+  color: ${v.colors.pacificBlue};
   text-decoration: none;
   &:hover {
     text-decoration: underline;

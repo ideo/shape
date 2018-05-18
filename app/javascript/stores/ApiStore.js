@@ -1,6 +1,7 @@
 import { action, observable, computed } from 'mobx'
 import { Store } from 'mobx-jsonapi-store'
 import _ from 'lodash'
+import moment from 'moment-mini'
 
 import Collection from './jsonApi/Collection'
 import CollectionCard from './jsonApi/CollectionCard'
@@ -10,6 +11,8 @@ import Group from './jsonApi/Group'
 import Item from './jsonApi/Item'
 import Organization from './jsonApi/Organization'
 import User from './jsonApi/User'
+import Comment from './jsonApi/Comment'
+import CommentThread from './jsonApi/CommentThread'
 
 class ApiStore extends Store {
   @observable currentUserId = null
@@ -67,6 +70,70 @@ class ApiStore extends Store {
     this.add(roles, 'roles')
   }
 
+  async fetchThreads() {
+    // this.findAll('comment_threads')
+    return this.fetchAll('comment_threads')
+  }
+
+  findThreadForRecord(record) {
+    let thread = null
+    // look within our local store
+    this.findAll('comment_threads').forEach(ct => {
+      if (ct.record.id === record.id) {
+        thread = ct
+      }
+    })
+    return thread
+  }
+
+  clearUnpersistedThreads() {
+    this.findAll('comment_threads').forEach(ct => {
+      // remove any old threads that didn't get persisted
+      if (!ct.__persisted) {
+        this.__removeModels([ct])
+      }
+    })
+  }
+
+  async findOrBuildCommentThread(record) {
+    let thread = this.findThreadForRecord(record)
+    this.clearUnpersistedThreads()
+    if (!thread) {
+      // first search for it via API
+      try {
+        const res = await this.request(
+          `comment_threads/find_by_record/${record.className}/${record.id}`,
+          'GET'
+        )
+        if (res.data && res.data.id) {
+          thread = res.data
+        } else {
+          // if still not found, set up a new empty record
+          thread = new CommentThread({
+            // assign a fake id so that it has a unique key
+            id: `new-${record.id}-${record.internalType}`,
+            record_id: record.id,
+            record_type: record.className,
+            updated_at: new Date()
+          }, this)
+          thread.assignRef('record', record)
+          this.add(thread)
+        }
+      } catch (e) {
+        console.warn(e)
+      }
+    }
+    return thread
+  }
+
+  @computed get currentThreads() {
+    return _.filter(
+      _.sortBy(this.findAll('comment_threads'), t => moment(t.updated_at)),
+      t => t.record && t.record.id
+    )
+  }
+
+  // -- override mobx-jsonapi-store --
   __updateRelationships(obj) {
     const record = this.find(obj.type, obj.id)
     const refs = obj.relationships ? Object.keys(obj.relationships) : []
@@ -94,6 +161,8 @@ ApiStore.types = [
   Role,
   Organization,
   User,
+  Comment,
+  CommentThread,
 ]
 
 export default ApiStore

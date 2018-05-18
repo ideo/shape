@@ -1,0 +1,2 @@
+class DeserializableCommentThread < BaseJsonDeserializer
+end

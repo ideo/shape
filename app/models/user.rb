@@ -26,6 +26,8 @@ class User < ApplicationRecord
 
   has_many :organizations, -> { distinct }, through: :groups
   has_many :users_roles
+  has_many :comments, foreign_key: :author_id
+
   belongs_to :current_organization,
              class_name: 'Organization',
              optional: true

@@ -11,7 +11,7 @@ describe Api::V1::SessionsController, type: :request, json: true, auth: true do
       expect(response.status).to eq(200)
     end
 
-    it 'user is logged out' do
+    it 'logs out user' do
       delete(path)
       # The users/me request spec asserts it is assigned
       expect(assigns(:current_user)).to be nil

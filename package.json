@@ -15,7 +15,9 @@
       "<rootDir>/__tests__",
       "<rootDir>/app/javascript"
     ],
-    "setupFiles": ["jest-localstorage-mock"],
+    "setupFiles": [
+      "jest-localstorage-mock"
+    ],
     "setupTestFrameworkScriptFile": "./__js_test_config/setup.js",
     "modulePaths": [
       "__js_test_config"
@@ -47,15 +49,17 @@
     "lodash": "~4.17.4",
     "material-ui": "~1.0.0-beta.31",
     "mobx": "^3.4.1",
-    "mobx-jsonapi-store": "^4.2.1",
+    "mobx-jsonapi-store": "^4.2.2",
     "mobx-localstorage": "^0.1.7",
     "mobx-react": "^4.3.5",
     "mobx-react-intl": "^1.4.0",
     "mobx-react-router": "^4.0.1",
+    "moment-mini": "^2.19.4",
     "parameterize": "^0.1.0",
     "prop-types": "^15.6.1",
     "query-string": "5.1.0",
     "react": "^16.3.2",
+    "react-autosize-textarea": "^3.0.3",
     "react-dom": "^16.3.2",
     "react-dotdotdot": "^1.2.3",
     "react-flip-move": "~2.10.0",
