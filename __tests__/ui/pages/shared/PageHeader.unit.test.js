@@ -1,6 +1,8 @@
 import PageHeader from '~/ui/pages/shared/PageHeader'
 import fakeUiStore from '#/mocks/fakeUiStore'
 import {
+
+
   fakeTextItem,
   fakeCollection,
 } from '#/mocks/data'
@@ -10,6 +12,7 @@ describe('PageHeader', () => {
 
   beforeEach(() => {
     const uiStore = fakeUiStore
+    fakeCollection.isNormalCollection = true
     fakeCollection.breadcrumb = [{ id: 12 }]
     props = { record: fakeCollection, uiStore }
 
@@ -114,7 +117,7 @@ describe('PageHeader', () => {
       wrapper.find('StyledCircledIcon').simulate('click', fakeEv)
     })
 
-    it('should open the activiy log in the ui store', () => {
+    it('should open the activity log in the ui store', () => {
       expect(props.uiStore.update).toHaveBeenCalledWith(
         'activityLogOpen', true
       )
