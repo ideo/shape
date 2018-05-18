@@ -1,8 +1,9 @@
 import { Fragment } from 'react'
 import ReactRouterPropTypes from 'react-router-prop-types'
-import { observable, runInAction } from 'mobx'
+import { action, observable, runInAction } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 
+import PageError from '~/ui/global/PageError'
 import PageWithApi from '~/ui/pages/PageWithApi'
 import Loader from '~/ui/layout/Loader'
 import PageContainer from '~/ui/layout/PageContainer'
@@ -16,6 +17,7 @@ const isHomepage = ({ path }) => path === '/'
 @observer
 class CollectionPage extends PageWithApi {
   @observable thread = null
+  @observable error = null
 
   componentWillReceiveProps(nextProps) {
     super.componentWillReceiveProps(nextProps)
@@ -23,6 +25,10 @@ class CollectionPage extends PageWithApi {
     if (nextProps.match.params.id !== this.props.match.params.id) {
       this.props.uiStore.closeBlankContentTool()
     }
+  }
+
+  @action updateError(err) {
+    this.error = err
   }
 
   get isHomepage() {
@@ -53,6 +59,7 @@ class CollectionPage extends PageWithApi {
   }
 
   onAPILoad = (response) => {
+    this.updateError(null)
     const collection = response.data
     const { apiStore, uiStore } = this.props
     uiStore.setViewingCollection(collection)
@@ -78,6 +85,10 @@ class CollectionPage extends PageWithApi {
     this.collection.API_updateCards()
   }
 
+  onAPIError = (err) => {
+    this.updateError(err)
+  }
+
   updateCollectionName = (name) => {
     this.collection.name = name
     this.collection.save()
@@ -86,6 +97,7 @@ class CollectionPage extends PageWithApi {
   render() {
     const { collection } = this
     const { uiStore } = this.props
+    if (this.error) return <PageError error={this.error} />
     if (!collection) return <Loader />
     const { movingCardIds, cardAction } = uiStore
     // only tell the Grid to hide "movingCards" if we're moving and not linking
