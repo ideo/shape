@@ -1,5 +1,4 @@
-import PropTypes from 'prop-types'
-import { observable } from 'mobx'
+import { observable, observe } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import { Element as ScrollElement, scroller } from 'react-scroll'
 import styled from 'styled-components'
@@ -17,31 +16,30 @@ const StyledCommentThreadContainer = styled.div`
 class CommentThreadContainer extends React.Component {
   // @observable threads = []
   @observable contentHeight = null
+  disposer = null
   scrollOpts = {
     containerId: 'ctc-content',
-    delay: 50,
+    delay: 0,
     duration: 350,
     smooth: true,
   }
 
-  componentDidMount() {
-    const { expandedThread } = this.props
-    if (expandedThread) {
-      const thread = this.threads.filter(t => t.id === expandedThread)[0]
-      if (thread) {
-        this.scrollToTopOfNextThread(thread)
+  constructor(props) {
+    super(props)
+    this.disposer = observe(props.uiStore, 'expandedThread', change => {
+      const expandedThread = change.newValue
+      if (expandedThread) {
+        const thread = this.threads.filter(t => t.id === expandedThread)[0]
+        if (thread) {
+          this.scrollToTopOfNextThread(thread)
+        }
       }
-    }
+    })
   }
 
-  // happens when log is already open and you toggle
-  componentWillReceiveProps({ expandedThread }) {
-    if (expandedThread) {
-      const thread = this.threads.filter(t => t.id === expandedThread)[0]
-      if (thread) {
-        this.scrollToTopOfNextThread(thread)
-      }
-    }
+  componentWillUnmount() {
+    // cancel the observer
+    this.disposer()
   }
 
   get threads() {
@@ -120,18 +118,9 @@ class CommentThreadContainer extends React.Component {
   }
 }
 
-CommentThreadContainer.propTypes = {
-  expandedThread: PropTypes.oneOfType([
-    PropTypes.string,
-    PropTypes.number
-  ]),
-}
 CommentThreadContainer.wrappedComponent.propTypes = {
   apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
-}
-CommentThreadContainer.defaultProps = {
-  expandedThread: null,
 }
 
 export default CommentThreadContainer

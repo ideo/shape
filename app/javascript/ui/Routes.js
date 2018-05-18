@@ -22,7 +22,7 @@ const AppWrapper = styled.div`
 AppWrapper.displayName = 'AppWrapper'
 
 const FixedBoundary = styled.div`
-  height: 9999px;
+  height: 100vh;
   position: fixed;
   width: 100vw;
 `
@@ -53,11 +53,14 @@ class Routes extends React.Component {
 
     return (
       <AppWrapper blur={displayTermsPopup}>
-        <FixedBoundary className="fixed_boundary" />
         {/* Global components are rendered here */}
         <WindowSizeListener onResize={this.handleWindowResize} />
         <DialogWrapper />
-        <ActivityLogBox />
+
+        <FixedBoundary className="fixed_boundary" />
+        <div style={{ position: 'fixed', zIndex: 9999 }}>
+          <ActivityLogBox />
+        </div>
         {displayTermsPopup &&
           <TermsOfUseModal currentUser={apiStore.currentUser} />
         }

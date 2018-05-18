@@ -2,7 +2,6 @@ import PropTypes from 'prop-types'
 import { observable, action, runInAction } from 'mobx'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import _ from 'lodash'
-import FlipMove from 'react-flip-move'
 import styled from 'styled-components'
 import TextareaAutosize from 'react-autosize-textarea'
 
@@ -173,12 +172,7 @@ class CommentThread extends React.Component {
           { thread.comments.length }
         </button>
         <div className="comments">
-          <FlipMove
-            appearAnimation="elevator"
-            leaveAnimation="elevator"
-          >
-            { this.renderComments() }
-          </FlipMove>
+          { this.renderComments() }
         </div>
         <form className="reply" onSubmit={this.handleSubmit}>
           <div className="textarea-input">

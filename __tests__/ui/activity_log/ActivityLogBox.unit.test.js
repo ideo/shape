@@ -5,6 +5,7 @@ import fakeUiStore from '#/mocks/fakeUiStore'
 import fakeApiStore from '#/mocks/fakeApiStore'
 
 jest.mock('mobx-localstorage')
+jest.mock('mobx')
 
 describe('ActivityLogBox', () => {
   let props, wrapper, component, localStorageStore
@@ -44,7 +45,7 @@ describe('ActivityLogBox', () => {
   describe('componentDidMount()', () => {
     it('should set the position based with defaults if not set', () => {
       expect(component.position.x).toEqual(-319)
-      expect(component.position.y).toEqual(83)
+      expect(component.position.y).toEqual(180)
     })
 
     it('should set current page to default comments page', () => {

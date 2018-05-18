@@ -1,6 +1,6 @@
 import Rnd from 'react-rnd'
 import localStorage from 'mobx-localstorage'
-import { observable, action } from 'mobx'
+import { observable, observe, action } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 
@@ -19,7 +19,7 @@ const HEADER_HEIGHT = 35
 
 const DEFAULT = {
   x: 0,
-  y: 83,
+  y: 180,
   w: MIN_WIDTH,
   h: MIN_HEIGHT,
 }
@@ -69,38 +69,38 @@ const Action = styled.button`
 class ActivityLogBox extends React.Component {
   @observable position = { x: 0, y: 0, w: MIN_WIDTH, h: MIN_HEIGHT }
   @observable currentPage = 'comments'
+  disposer = null
 
-  constructor() {
-    super()
+  constructor(props) {
+    super(props)
     this.draggableRef = React.createRef()
+    this.disposer = observe(props.uiStore, 'activityLogOpen', change => {
+      if (this.isOffscreen()) {
+        this.setToDefaultPosition()
+      }
+    })
   }
 
   @action componentDidMount() {
     const existingPosition = localStorage.getItem(POSITION_KEY) || { }
     const existingPage = localStorage.getItem(PAGE_KEY)
-    this.position.x = existingPosition.x ||
-      document.querySelector('.Grid').offsetWidth - MIN_WIDTH + DEFAULT.x
     this.position.y = existingPosition.y || DEFAULT.y
     this.position.w = existingPosition.w || DEFAULT.w
     this.position.h = existingPosition.h || DEFAULT.h
-    this.currentPage = existingPage || 'comments'
-
-    // NOTE This is required because react-rnd doesn't mount the children
-    // components right away (meaning our div with ref won't exist) and
-    // doesn't supply any callback for when it does mount them.
-    setTimeout(() => {
-      if (this.isOffscreen()) {
-        this.setToDefaultPosition()
-      }
-    }, 50)
-
+    this.position.x = existingPosition.x ||
+      document.querySelector('.Grid').offsetWidth - this.position.w + DEFAULT.x
     this.currentPage = existingPage || 'comments'
     this.props.apiStore.fetchThreads()
   }
 
+  componentWillUnmount() {
+    // cancel the observer
+    this.disposer()
+  }
+
   setToDefaultPosition() {
     this.updatePosition({
-      x: document.querySelector('.Grid').offsetWidth - MIN_WIDTH + DEFAULT.x,
+      x: document.querySelector('.Grid').offsetWidth - this.position.w + DEFAULT.x,
       y: DEFAULT.y,
     })
   }
@@ -171,7 +171,7 @@ class ActivityLogBox extends React.Component {
     return (
       <Rnd
         className="activity_log-draggable"
-        style={{ zIndex: v.zIndex.activityLog, position: 'fixed' }}
+        style={{ zIndex: v.zIndex.activityLog }}
         bounds={'.fixed_boundary'}
         minWidth={MIN_WIDTH}
         minHeight={MIN_HEIGHT}
@@ -224,9 +224,7 @@ class ActivityLogBox extends React.Component {
               <div style={{ height: '2rem' }} />
             }
 
-            <CommentThreadContainer
-              expandedThread={uiStore.expandedThread}
-            />
+            <CommentThreadContainer />
 
           </StyledActivityLog>
         </div>
