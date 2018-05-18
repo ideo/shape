@@ -1,0 +1,107 @@
+
+// TODO: sync variables here with utils/variables.js
+
+#doorbell {
+  font-family: Gotham;
+  left: 50%;
+  max-width: 760px;
+  margin-left: 0;
+  position: fixed;
+  transform: translate(-50%, -50%);
+  // Doorbell tries to set a top on the actual element when rending, override
+  top: 50% !important;
+  width: 100%;
+}
+
+#doorbell-container .close {
+  // the close button uses an "X" text, replace that with our own image
+  background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA4AAAAOCAYAAAAfSC3RAAAAAXNSR0IArs4c6QAAATBJREFUKBVjlJKSqmP8/99cWFQ07NKlS18Z8AAVFRW+79++rf3PwLCLiZGR8QgDI6Pz29evt+rp6XHj0gfVtBOoyYqFgeEYWJ2MjIyHtJTUD2lJyQPYNIM0AeWPA133VVpa2hHFcFyacWliRNYN0vz/378NDP//nwD62fvbt2/MQD+BnKcH9JLP06dP98PUo2gECSJrBvqdHZsmmGYMGuiPMClJyf8gDGT7YCgACjChC4L8BHRqAdC2b0Dn/WT4968EW4ChaIQG+Q6g8/RBfmJkYgoAGmCBN6qgoXcMPchxhTbYpbiCHOYNbJoZoc7DGuQwjSAaObRBUcXMwcHRBRT3RI8nZE0g9qdPn+7w8/OfATJLgPHLxigvL6/4//9/zkePHl1DV4yND7RZl+3fv48AIwSQTNJfGZ8AAAAASUVORK5CYII=);
+  background-repeat: no-repeat;
+  color: transparent;
+  display: block;
+  width: 14px;
+  height: 14px;
+  right: 30px;
+  padding-top: 10px;
+  opacity: 1;
+  top: 30px;
+}
+
+#doorbell .buttons {
+  display: flex;
+  justify-content: space-around;
+}
+
+#doorbell .buttons button {
+  width: 190px;
+  text-transform: uppercase;
+  margin-bottom: 5px;
+  font-family: 'Gotham',sans-serif;
+  font-size: 1rem;
+  font-weight: 500;
+  letter-spacing: 0.09375rem;
+  height: 40px;
+  cursor: pointer;
+  color: white;
+  border-radius: 20px;
+  border: none;
+  background-color: #120f0e;
+}
+
+#doorbell-button {
+  font-family: 'Gotham',sans-serif;
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+#doorbell-powered-by {
+  display: none !important;
+}
+
+#doorbell form {
+  box-shadow: 0px 11px 15px -7px rgba(0, 0, 0, 0.2),0px 24px 38px 3px rgba(0, 0, 0, 0.14),0px 9px 46px 8px rgba(0, 0, 0, 0.12);
+  border-radius: 2px;
+  border: none;
+  border-left: 17px solid #120f0e;
+  padding: 30px;
+}
+
+#doorbell form textarea.form-control {
+  font-size: 1rem;
+  font-family: 'Gotham',sans-serif;
+  margin-bottom: 20px;
+  padding-top: 10px;
+}
+
+#doorbell form legend {
+  border-bottom: none;
+  text-transform: uppercase;
+  font-family: 'Gotham',sans-serif;
+  font-weight: 500;
+  letter-spacing: 0.14375rem;
+  margin-bottom: 30px;
+  color: #120f0e;
+  text-transform: uppercase;
+  font-size: 1.5rem;
+}
+
+#doorbell form input[type="email"] {
+  border-radius: 0;
+  box-shadow: none;
+  font-family: 'Gotham',sans-serif;
+  width: 350px;
+  padding-right: 4px;
+  padding-left: 4px;
+  padding-bottom: 0;
+  margin-bottom: 35px;
+  outline-width: 0;
+  font-size: 1rem;
+  border: 0;
+  border-bottom: 0.5px solid #c6c1bf;
+}
+
+#doorbell-background {
+  opacity: 0;
+}

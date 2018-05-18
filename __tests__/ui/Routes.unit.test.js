@@ -31,6 +31,7 @@ describe('Routes', () => {
     it('does not blur the content if terms have been accepted', () => {
       expect(wrapper.find('AppWrapper').props().blur).toBeFalsy()
     })
+
     it('does not display the TermsOfUseModal', () => {
       expect(wrapper.find('TermsOfUseModal').exists()).toBeFalsy()
     })

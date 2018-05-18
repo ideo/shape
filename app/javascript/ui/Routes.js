@@ -12,6 +12,8 @@ import SettingsPage from '~/ui/pages/SettingsPage'
 import TermsOfUseModal from '~/ui/users/TermsOfUseModal'
 import Loader from '~/ui/layout/Loader'
 import ActivityLogBox from '~/ui/activity_log/ActivityLogBox'
+import WindowSizeListener from 'react-window-size-listener'
+import initDoorbell from '~/vendor/doorbell'
 
 const AppWrapper = styled.div`
   /* used by terms of use modal to blur the whole site */
@@ -34,7 +36,9 @@ const FixedBoundary = styled.div`
 class Routes extends React.Component {
   componentDidMount() {
     const { apiStore } = this.props
-    apiStore.loadCurrentUserAndGroups()
+    apiStore.loadCurrentUserAndGroups().then(() => {
+      initDoorbell(apiStore.currentUser)
+    })
   }
 
   handleWindowResize = ({ windowWidth }) => {
