@@ -43,6 +43,7 @@ class Routes extends React.Component {
   handleWindowResize = ({ windowWidth }) => {
     // NOTE: Routes should only interact with uiStore for global re-rendering changes like this
     this.props.uiStore.updateColumnsToFit(windowWidth)
+    this.props.uiStore.updateActivityLogWidth(windowWidth)
   }
 
   render() {

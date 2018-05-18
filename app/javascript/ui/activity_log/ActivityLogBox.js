@@ -16,6 +16,7 @@ const MIN_HEIGHT = 400
 const MAX_WIDTH = 800
 const MAX_HEIGHT = 800
 const HEADER_HEIGHT = 35
+const MOBILE_Y = 300
 
 const DEFAULT = {
   x: 0,
@@ -88,7 +89,7 @@ class ActivityLogBox extends React.Component {
     this.position.w = existingPosition.w || DEFAULT.w
     this.position.h = existingPosition.h || DEFAULT.h
     this.position.x = existingPosition.x ||
-      document.querySelector('.Grid').offsetWidth - this.position.w + DEFAULT.x
+      this.position.w + DEFAULT.x
     this.currentPage = existingPage || 'comments'
     this.props.apiStore.fetchThreads()
   }
@@ -106,6 +107,7 @@ class ActivityLogBox extends React.Component {
   }
 
   @action updatePosition({ x, y, w = this.position.w, h = this.position.h }) {
+    console.log('update position', x, y)
     if (y < 0) return
     this.position.x = x
     this.position.y = y
@@ -165,6 +167,27 @@ class ActivityLogBox extends React.Component {
     uiStore.update('expandedThread', thread.id)
   }
 
+  get mobileProps() {
+    const { uiStore } = this.props
+    if (!uiStore.activityLogForceWidth) return {}
+    const headerHeight = 185
+    const height = window.innerHeight - (headerHeight + MOBILE_Y)
+    return {
+      minWidth: uiStore.activityLogForceWidth,
+      minHeight: height,
+      position: {
+        x: 0,
+        y: MOBILE_Y,
+      },
+      size: {
+        width: uiStore.activityLogForceWidth,
+        height,
+      },
+      enableResizing: {},
+      disableDragging: true,
+    }
+  }
+
   render() {
     const { uiStore } = this.props
     if (!uiStore.activityLogOpen) return null
@@ -179,7 +202,10 @@ class ActivityLogBox extends React.Component {
         maxHeight={MAX_HEIGHT}
         position={{ x: this.position.x, y: this.position.y }}
         dragHandleClassName=".activity_log-header"
-        size={{ width: this.position.w, height: this.position.h }}
+        size={{
+          width: this.position.w,
+          height: this.position.h,
+        }}
         enableResizing={{
           bottom: true,
           bottomRight: true,
@@ -196,6 +222,7 @@ class ActivityLogBox extends React.Component {
           })
           this.updatePosition(fullPosition)
         }}
+        {...this.mobileProps}
       >
         <div ref={this.draggableRef} style={{ height: '100%' }}>
           <StyledActivityLog>

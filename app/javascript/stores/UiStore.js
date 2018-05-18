@@ -1,6 +1,7 @@
 import _ from 'lodash'
 import { animateScroll } from 'react-scroll'
 import { observable, action, computed } from 'mobx'
+import v from '~/utils/variables'
 
 export default class UiStore {
   // store this for usage by other components
@@ -60,6 +61,7 @@ export default class UiStore {
   @observable orgCreated = false
   @observable searchText = ''
   @observable activityLogOpen = false
+  @observable activityLogForceWidth = null
 
   // Comments + Threads
   @observable commentsOpen = false
@@ -144,6 +146,14 @@ export default class UiStore {
   @computed get gridMaxW() {
     const grid = this.gridSettings
     return (grid.gridW * grid.cols) + (grid.gutter * (grid.cols - 1))
+  }
+
+  @action updateActivityLogWidth(width) {
+    if (width <= v.responsive.smallBreakpoint) {
+      this.activityLogForceWidth = width
+    } else {
+      this.activityLogForceWidth = null
+    }
   }
 
   gridWidthFor(virtualCols) {
