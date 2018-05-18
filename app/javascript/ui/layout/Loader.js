@@ -1,11 +1,11 @@
 import PropTypes from 'prop-types'
 import styled from 'styled-components'
-import Spinner from 'react-spinkit'
+import { MoonLoader } from 'react-spinners'
 import { Flex, Box } from 'reflexbox'
 
 import v from '~/utils/variables'
 
-const StyledSpinner = styled(Spinner)`
+const StyledSpinner = styled(MoonLoader)`
   &.sk-spinner {
     margin: 0 auto;
     vertical-align: middle;
@@ -19,8 +19,6 @@ const Loader = ({ containerHeight, size, fadeIn }) => (
   <Flex style={{ height: containerHeight }} align="center" justify="center">
     <Box>
       <StyledSpinner
-        fadeIn={fadeIn}
-        name="folding-cube"
         color={v.colors.cloudy}
         size={size}
       />
