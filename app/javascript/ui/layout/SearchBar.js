@@ -35,21 +35,30 @@ const StyledSearchBar = styled.div`
     display: inline;
   }
 
-  svg {
-    display: inline;
-    height: 18px;
-    margin-bottom: -7px;
-    padding-top: 4px;
-    width: 18px;
+  .search {
+    color: ${props => (props.focused ? v.colors.blackLava : v.colors.cloudy)};
+    svg {
+      display: inline;
+      height: 18px;
+      margin-bottom: -7px;
+      padding-top: 4px;
+      width: 18px;
+    }
   }
 
   .close {
     position: absolute;
     right: 2px;
-    bottom: 10px;
+    bottom: 7px;
     color: ${v.colors.cloudy};
     &:hover {
       color: black;
+    }
+    svg {
+      display: inline;
+      padding-top: 4px;
+      height: 14px;
+      width: 14px;
     }
   }
 `
@@ -113,7 +122,9 @@ class SearchBar extends React.Component {
   render() {
     return (
       <StyledSearchBar focused={this.focused}>
-        <SearchIcon />
+        <span className="search">
+          <SearchIcon />
+        </span>
         <input
           ref={(input) => { this.searchInput = input }}
           type="text"

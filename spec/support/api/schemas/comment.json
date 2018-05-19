@@ -3,7 +3,7 @@
   "properties": {
     "id": { "type": "integer" },
     "message": { "type": "string" },
-    "created_at": { "type": "date" }
+    "updated_at": { "type": "date" }
   },
-  "required": ["id", "message", "created_at"]
+  "required": ["id", "message", "updated_at"]
 }
