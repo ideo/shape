@@ -88,7 +88,7 @@ class ActivityLogBox extends React.Component {
     this.position.w = existingPosition.w || DEFAULT.w
     this.position.h = existingPosition.h || DEFAULT.h
     this.position.x = existingPosition.x ||
-      this.position.w + DEFAULT.x
+      document.querySelector('.Grid').offsetWidth - this.position.w + DEFAULT.x
     this.currentPage = existingPage || 'comments'
     this.props.apiStore.fetchThreads()
   }
