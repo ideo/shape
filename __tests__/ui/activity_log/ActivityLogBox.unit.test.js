@@ -44,7 +44,7 @@ describe('ActivityLogBox', () => {
 
   describe('componentDidMount()', () => {
     it('should set the position based with defaults if not set', () => {
-      expect(component.position.x).toEqual(-319)
+      expect(component.position.x).toEqual(319)
       expect(component.position.y).toEqual(180)
     })
 
