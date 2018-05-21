@@ -135,6 +135,7 @@ export const fakeUserAttrs = {
   id: 1,
   first_name: 'Oprah',
   last_name: 'Winfrey',
+  name: 'Oprah Winfrey',
   email: 'oprah@winfrey.com',
   pic_url_square: 'https://filestackcdn.com/abc123',
   groups: [],
@@ -177,7 +178,8 @@ export const fakePosition = {
 export const fakeComment = {
   id: 1,
   author: fakeUser,
-  message: 'This is my message to the world.'
+  message: 'This is my message to the world.',
+  updated_at: new Date(),
 }
 export const fakeThread = {
   id: 1,

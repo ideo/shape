@@ -19,9 +19,16 @@ describe('CommentThread', () => {
     expect(wrapper.find('.name').text()).toContain(props.thread.record.name)
   })
 
-  it('renders up to two comments if thread is unexpanded', () => {
-    // fakeThread has 3 comments
-    expect(wrapper.find('Comment').length).toEqual(2)
+  it('renders a textarea', () => {
+    // NOTE: textarea is just shown/hidden via CSS so it should always "exist"
+    expect(wrapper.find('TextareaAutosize').exists()).toBeTruthy()
+  })
+
+  describe('with unexpanded thread', () => {
+    it('renders up to two comments if thread is unexpanded', () => {
+      // fakeThread has 3 comments
+      expect(wrapper.find('Comment').length).toEqual(2)
+    })
   })
 
   describe('with expanded thread', () => {
