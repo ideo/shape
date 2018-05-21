@@ -17,3 +17,9 @@ global.mount = mount
 dotenv.config({ path: '.env.example' })
 
 Enzyme.configure({ adapter: new Adapter() })
+
+// mock mobx observe function
+jest.mock('mobx', () => ({
+  ...require.requireActual('mobx'),
+  observe: jest.fn(),
+}))
