@@ -10,6 +10,7 @@ export const KEYS = {
 }
 
 export default {
+  globalHeaderHeight: 73,
   headerHeight: 192,
   headerHeightCompact: 100,
   maxWidth: 1320,
@@ -63,7 +64,8 @@ export default {
     clickWrapper: 500,
     activityLog: 201,
     popoutMenu: 201,
-    header: 200,
+    globalHeader: 200,
+    pageHeader: 199,
     scrollIndicator: 200,
     cardDragging: 160,
     gridCard: 150,

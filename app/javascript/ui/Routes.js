@@ -8,6 +8,7 @@ import CollectionPage from '~/ui/pages/CollectionPage'
 import ItemPage from '~/ui/pages/ItemPage'
 import SearchPage from '~/ui/pages/SearchPage'
 import TermsPage from '~/ui/pages/TermsPage'
+import Header from '~/ui/layout/Header'
 import SettingsPage from '~/ui/pages/SettingsPage'
 import TermsOfUseModal from '~/ui/users/TermsOfUseModal'
 import Loader from '~/ui/layout/Loader'
@@ -64,11 +65,12 @@ class Routes extends React.Component {
     )
 
     return (
-      <AppWrapper blur={displayTermsPopup}>
+      <AppWrapper blur={displayTermsPopup} id="AppWrapper">
         {/* Global components are rendered here */}
         <WindowSizeListener onResize={this.handleWindowResize} />
         <DialogWrapper />
 
+        <Header />
         <FixedBoundary className="fixed_boundary" />
         <FixedActivityLogWrapper>
           <ActivityLogBox />
