@@ -5,6 +5,8 @@ import _ from 'lodash'
 import styled from 'styled-components'
 import TextareaAutosize from 'react-autosize-textarea'
 
+import CollectionIcon from '~/ui/icons/CollectionIcon'
+import TextIcon from '~/ui/icons/TextIcon'
 import v, { ITEM_TYPES } from '~/utils/variables'
 import hexToRgba from '~/utils/hexToRgba'
 import moment from 'moment-mini'
@@ -124,6 +126,13 @@ const StyledHeader = styled.div`
   }
 `
 
+const ThumbnailHolder = styled.span`
+  width: 50px;
+  img, svg {
+    width: 100%;
+  }
+`
+
 @observer
 class CommentThread extends React.Component {
   @observable message = ''
@@ -174,16 +183,18 @@ class CommentThread extends React.Component {
     let content
     if (record.internalType === 'items') {
       if (record.type === ITEM_TYPES.TEXT) {
-        content = 'T'
+        content = <TextIcon viewBox="0 0 50 50 " />
       } else {
-        content = record.filestack_file_url
+        content = <img src={record.filestack_file_url} alt="Text" />
       }
     } else {
-      content = record.cover.image_url
+      if (record.cover.image_url) {
+        content = <img src={record.cover.image_url} alt="Collection" />
+      } else {
+        content = <CollectionIcon viewBox="50 50 150 150" />
+      }
     }
-    return (
-      <img style={{ width: '50px' }} src={content} alt="Thumbnail" />
-    )
+    return <ThumbnailHolder>{content}</ThumbnailHolder>
   }
 
   renderComments = () => (
