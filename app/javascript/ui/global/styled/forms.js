@@ -233,7 +233,8 @@ export const CommentForm = styled.form`
   }
 `
 
-export const CommentTextarea = styled(TextareaAutosize)`
+export const CommentTextarea = styled(({ textAreaRef, ...rest }) =>
+  <TextareaAutosize innerRef={textAreaRef} {...rest} />)`
   resize: none;
   padding: 10px;
   font-size: 1rem;
