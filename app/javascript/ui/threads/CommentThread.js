@@ -3,17 +3,16 @@ import { observable, action, runInAction } from 'mobx'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import _ from 'lodash'
 import styled from 'styled-components'
-import TextareaAutosize from 'react-autosize-textarea'
+import Dotdotdot from 'react-dotdotdot'
 
 import CollectionIcon from '~/ui/icons/CollectionIcon'
 import TextIcon from '~/ui/icons/TextIcon'
 import v, { ITEM_TYPES } from '~/utils/variables'
 import hexToRgba from '~/utils/hexToRgba'
-import moment from 'moment-mini'
 import Moment from '~/ui/global/Moment'
 import ReturnArrowIcon from '~/ui/icons/ReturnArrowIcon'
-import Comment from './Comment'
 import { CommentForm, CommentTextarea } from '~/ui/global/styled/forms'
+import Comment from './Comment'
 
 const StyledCommentThread = styled.div`
   .title {
@@ -40,6 +39,7 @@ const StyledCommentThread = styled.div`
     font-size: 0.75rem;
     .name {
       font-size: 1.25rem;
+      line-height: 1.5rem;
       text-transform: uppercase;
     }
   }
@@ -64,6 +64,7 @@ const StyledCommentThread = styled.div`
     `}
     /* ---- */
     width: calc(100% - 10px);
+    border-top: 4px solid ${v.colors.activityDarkBlue};
     background: ${v.colors.activityDarkBlue};
     background: linear-gradient(
       ${hexToRgba(v.colors.activityDarkBlue, 0)} 0,
@@ -85,7 +86,7 @@ const StyledCommentThread = styled.div`
 const StyledHeader = styled.div`
   align-items: flex-start;
   display: flex;
-  height: 50px;
+  height: ${props => (props.lines === 1 ? 50 : 70)}px;
 
   *:first-child {
     margin-right: 8px;
@@ -97,9 +98,11 @@ const StyledHeader = styled.div`
 `
 
 const ThumbnailHolder = styled.span`
+  display: block;
   height: 50px;
   width: 50px;
   img, svg {
+    flex-shrink: 0;
     height: 100%;
     object-fit: cover;
     width: 100%;
@@ -109,13 +112,21 @@ const ThumbnailHolder = styled.span`
 @observer
 class CommentThread extends React.Component {
   @observable message = ''
+  @observable titleLines = 1
 
   componentDidMount() {
     this.focusTextArea(this.props.expanded)
+    this.countLines()
   }
 
   componentWillReceiveProps({ expanded }) {
     this.focusTextArea(expanded)
+  }
+
+  @action countLines = () => {
+    if (this.title.offsetHeight > 24) {
+      this.titleLines = 2
+    }
   }
 
   focusTextArea = (expanded) => {
@@ -183,9 +194,13 @@ class CommentThread extends React.Component {
     return (
       <StyledCommentThread expanded={expanded}>
         <button className="title" onClick={this.props.onClick}>
-          <StyledHeader>
+          <StyledHeader lines={this.titleLines}>
             {this.renderThumbnail()}
-            <span className="name">{ thread.record.name }</span>
+            <Dotdotdot clamp={2}>
+              <span className="name" ref={(r) => { this.title = r }}>
+                { thread.record.name }
+              </span>
+            </Dotdotdot>
             <Moment
               date={thread.updated_at}
             />

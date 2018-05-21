@@ -1,6 +1,5 @@
 import { PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
-import { Flex } from 'reflexbox'
 
 import v from '~/utils/variables'
 import { DisplayText } from '~/ui/global/styled/typography'
@@ -12,6 +11,10 @@ const StyledComment = styled.div`
   padding: 10px;
   margin-bottom: 5px;
   background: ${v.colors.activityMedBlue};
+
+  &:last-child {
+    margin-bottom: 0;
+  }
 
   .message {
     margin-top: 5px;
@@ -34,7 +37,7 @@ class Comment extends React.Component {
             { comment.author.name }
           </DisplayText>
           <span className="timestamp">
-            <Moment date={comment.created_at} />
+            <Moment date={comment.updated_at} />
           </span>
         </InlineRow>
         <p className="message">

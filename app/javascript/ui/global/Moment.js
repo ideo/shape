@@ -6,7 +6,7 @@ function defaultFormat(time) {
   const now = moment()
   const m = moment(time)
   if (now.diff(m, 'h') < 24) return 'LT'
-  return 'M/DD/YYYY'
+  return 'MMMM Do - LT'
 }
 
 const StyledDate = styled.span`
