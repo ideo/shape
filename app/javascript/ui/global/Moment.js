@@ -12,6 +12,7 @@ function defaultFormat(time) {
 const StyledDate = styled.span`
   font-size: 12px;
   color: ${v.colors.cloudy};
+  white-space: nowrap;
 `
 
 const Moment = ({ date } = {}) => (

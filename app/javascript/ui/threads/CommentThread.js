@@ -32,7 +32,7 @@ const StyledCommentThread = styled.div`
       ${v.colors.activityDarkBlue} 80%,
       ${hexToRgba(v.colors.activityDarkBlue, 0)} 100%
     );
-    padding: 20px 10px 0 10px;
+    padding: 10px 10px 0 10px;
     text-align: left;
     font-family: ${v.fonts.sans};
     font-weight: 500;
@@ -43,7 +43,7 @@ const StyledCommentThread = styled.div`
     }
   }
   .comments {
-    margin: 0 10px 0 60px;
+    margin: 0 10px 0 68px;
     ${props => !props.expanded && `
       z-index: 0;
       position: relative;
@@ -63,8 +63,8 @@ const StyledCommentThread = styled.div`
       display: none;
     `}
     /* ---- */
-    width: calc(100% - 20px);
-    margin-left: 20px;
+    width: calc(100% - 28px);
+    margin-left: 28px;
     min-height: 70px;
     background: ${v.colors.activityDarkBlue};
     background: linear-gradient(
@@ -128,8 +128,11 @@ const StyledHeader = styled.div`
 `
 
 const ThumbnailHolder = styled.span`
+  height: 50px;
   width: 50px;
   img, svg {
+    height: 100%;
+    object-fit: cover;
     width: 100%;
   }
 `
@@ -184,7 +187,7 @@ class CommentThread extends React.Component {
     let content
     if (record.internalType === 'items') {
       if (record.type === ITEM_TYPES.TEXT) {
-        content = <TextIcon viewBox="0 0 50 50 " />
+        content = <TextIcon viewBox="0 0 70 70" />
       } else {
         content = <img src={record.filestack_file_url} alt="Text" />
       }
@@ -192,7 +195,7 @@ class CommentThread extends React.Component {
       if (record.cover.image_url) {
         content = <img src={record.cover.image_url} alt="Collection" />
       } else {
-        content = <CollectionIcon viewBox="50 50 150 150" />
+        content = <CollectionIcon viewBox="50 50 170 170" />
       }
     }
     return <ThumbnailHolder>{content}</ThumbnailHolder>
