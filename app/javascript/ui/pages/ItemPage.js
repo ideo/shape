@@ -16,7 +16,7 @@ import PageHeader from '~/ui/pages/shared/PageHeader'
 import CloseIcon from '~/ui/icons/CloseIcon'
 import v, { ITEM_TYPES } from '~/utils/variables'
 
-const ItemPageContainer = styled.main`
+const ItemPageContainer = styled.div`
   background: white;
   min-height: 75vh;
   position: relative;
@@ -137,6 +137,7 @@ class ItemPage extends PageWithApi {
 
     return (
       <Fragment>
+        <PageHeader record={item} />
         <ItemPageContainer>
           <PageContainer>
             {/* TODO: calculate item container size? */}
@@ -148,7 +149,6 @@ class ItemPage extends PageWithApi {
             </StyledRightColumn>
           </PageContainer>
         </ItemPageContainer>
-        <PageHeader record={item} />
       </Fragment>
     )
   }

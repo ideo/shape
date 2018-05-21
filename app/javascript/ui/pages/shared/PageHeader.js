@@ -4,16 +4,21 @@ import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import { Flex, Box } from 'reflexbox'
 
 import Breadcrumb from '~/ui/layout/Breadcrumb'
-import { CircledIcon } from '~/ui/global/styled/buttons'
 import CommentIcon from '~/ui/icons/CommentIcon'
 import EditableName from '~/ui/pages/shared/EditableName'
-import Header from '~/ui/layout/Header'
 import Roles from '~/ui/grid/Roles'
-import { FixedHeader, MaxWidthContainer } from '~/ui/global/styled/layout'
 import RolesSummary from '~/ui/roles/RolesSummary'
-import { StyledTitleAndRoles } from '~/ui/pages/shared/styled'
 import PageMenu from '~/ui/pages/shared/PageMenu'
+import { CircledIcon } from '~/ui/global/styled/buttons'
+import { FixedHeader, MaxWidthContainer } from '~/ui/global/styled/layout'
+import { StyledTitleAndRoles } from '~/ui/pages/shared/styled'
 import v from '~/utils/variables'
+
+// NOTE: Header and PageHeader create sibling <header> elements on the page
+const FixedPageHeader = FixedHeader.extend`
+  top: ${v.globalHeaderHeight}px;
+  z-index: ${v.zIndex.pageHeader};
+`
 
 @inject('uiStore')
 @observer
@@ -92,7 +97,7 @@ class PageHeader extends React.Component {
     const { record, isHomepage } = this.props
     const breadcrumb = isHomepage ? [] : record.breadcrumb
     return (
-      <FixedHeader style={{ top: v.globalHeaderHeight }} zIndex={v.zIndex.pageHeader}>
+      <FixedPageHeader>
         <MaxWidthContainer>
           <Roles
             record={record}
@@ -116,7 +121,7 @@ class PageHeader extends React.Component {
             </StyledTitleAndRoles>
           </div>
         </MaxWidthContainer>
-      </FixedHeader>
+      </FixedPageHeader>
     )
   }
 }

@@ -84,12 +84,15 @@ class ActivityLogBox extends React.Component {
   @action componentDidMount() {
     const existingPosition = localStorage.getItem(POSITION_KEY) || { }
     const existingPage = localStorage.getItem(PAGE_KEY)
+    this.currentPage = existingPage || 'comments'
+    if (!document.querySelector('.PageContainer')) {
+      return
+    }
     this.position.y = existingPosition.y || DEFAULT.y
     this.position.w = existingPosition.w || DEFAULT.w
     this.position.h = existingPosition.h || DEFAULT.h
     this.position.x = existingPosition.x ||
-      document.querySelector('.Grid').offsetWidth - this.position.w + DEFAULT.x
-    this.currentPage = existingPage || 'comments'
+      document.querySelector('.PageContainer').offsetWidth - this.position.w + DEFAULT.x
     this.props.apiStore.fetchThreads()
   }
 
@@ -100,7 +103,7 @@ class ActivityLogBox extends React.Component {
 
   setToDefaultPosition() {
     this.updatePosition({
-      x: document.querySelector('.Grid').offsetWidth - this.position.w + DEFAULT.x,
+      x: document.querySelector('.PageContainer').offsetWidth - this.position.w + DEFAULT.x,
       y: DEFAULT.y,
     })
   }

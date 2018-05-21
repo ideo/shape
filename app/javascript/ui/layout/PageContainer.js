@@ -12,7 +12,7 @@ const StyledContainer = styled.main`
 `
 
 const PageContainer = ({ children, marginTop }) => (
-  <StyledContainer marginTop={marginTop}>
+  <StyledContainer marginTop={marginTop} id="PageContainer">
     {children}
   </StyledContainer>
 )
