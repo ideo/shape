@@ -137,6 +137,21 @@ describe Api::V1::ItemsController, type: :request, json: true, auth: true do
       patch(path, params: params)
       expect(parent.updated_at).to be > parent.created_at
     end
+
+    context 'with cancel_sync == true' do
+      let(:params) {
+        json_api_params(
+          'items',
+          { content: 'The wheels on the bus...' },
+          { cancel_sync: true },
+        )
+      }
+
+      it 'returns a 204 no content' do
+        patch(path, params: params)
+        expect(response.status).to eq(204)
+      end
+    end
   end
 
   describe 'POST #duplicate' do

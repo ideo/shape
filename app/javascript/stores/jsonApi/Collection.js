@@ -43,6 +43,8 @@ class Collection extends BaseRecord {
     data.attributes.collection_cards_attributes = _.map(this.collection_cards, card => (
       _.pick(card, ['id', 'order', 'width', 'height'])
     ))
+    // we don't want to receive updates which are just going to try to re-render
+    data.cancel_sync = true
     const apiPath = `collections/${this.id}`
     return this.apiStore.request(apiPath, 'PATCH', { data })
   }
