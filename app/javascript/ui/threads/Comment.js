@@ -9,7 +9,7 @@ import UserAvatar from '~/ui/users/UserAvatar'
 const StyledComment = styled.div`
   padding: 10px;
   margin-bottom: 5px;
-  background: ${v.colors.activityLightBlue};
+  background: ${v.colors.activityMedBlue};
   .author, .timestamp {
     font-family: ${v.fonts.sans};
     display: inline-block;
