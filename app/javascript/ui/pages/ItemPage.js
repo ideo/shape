@@ -137,6 +137,7 @@ class ItemPage extends PageWithApi {
 
     return (
       <Fragment>
+        <PageHeader record={item} />
         <ItemPageContainer>
           <PageContainer>
             {/* TODO: calculate item container size? */}
@@ -148,7 +149,6 @@ class ItemPage extends PageWithApi {
             </StyledRightColumn>
           </PageContainer>
         </ItemPageContainer>
-        <PageHeader record={item} />
       </Fragment>
     )
   }
