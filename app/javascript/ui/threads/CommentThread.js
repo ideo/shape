@@ -7,6 +7,7 @@ import TextareaAutosize from 'react-autosize-textarea'
 
 import v from '~/utils/variables'
 import hexToRgba from '~/utils/hexToRgba'
+import moment from 'moment-mini'
 import Moment from '~/ui/global/Moment'
 import ReturnArrowIcon from '~/ui/icons/ReturnArrowIcon'
 import Comment from './Comment'
@@ -167,7 +168,9 @@ class CommentThread extends React.Component {
         <button className="title" onClick={this.props.onClick}>
           <span className="name">{ thread.record.name }</span>
           &nbsp; - &nbsp;
-          <Moment date={thread.updated_at} format="LT" />
+          <Moment
+            date={thread.updated_at}
+          />
           &nbsp; - &nbsp;
           { thread.comments.length }
         </button>

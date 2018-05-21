@@ -40,7 +40,7 @@ class Comment extends React.Component {
             { comment.author.name }
           </span>
           <span className="timestamp">
-            <Moment date={comment.created_at} format="LT" />
+            <Moment date={comment.created_at} />
           </span>
         </Flex>
         <p className="message">
