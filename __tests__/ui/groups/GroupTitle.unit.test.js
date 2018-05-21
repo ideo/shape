@@ -11,7 +11,7 @@ let props
 let wrapper
 let component
 
-let fakeEvent = {
+const fakeEvent = {
   preventDefault: jest.fn()
 }
 

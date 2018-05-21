@@ -174,3 +174,15 @@ export const fakePosition = {
   height: 1,
   width: 1,
 }
+export const fakeComment = {
+  id: 1,
+  author: fakeUser,
+  message: 'This is my message to the world.'
+}
+export const fakeThread = {
+  id: 1,
+  record: { name: 'xyz' },
+  comments: [
+    fakeComment, fakeComment, fakeComment
+  ],
+}
