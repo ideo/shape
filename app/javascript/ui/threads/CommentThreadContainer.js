@@ -58,6 +58,7 @@ class CommentThreadContainer extends React.Component {
     if (!expandedThread) {
       // when compacting, scroll back up to the top of this thread
       this.scrollToTopOfThread(thread)
+      return
     }
     uiStore.update('expandedThread', expandedThread)
   }
