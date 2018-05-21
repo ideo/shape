@@ -17,7 +17,7 @@ import PageHeader from '~/ui/pages/shared/PageHeader'
 import CloseIcon from '~/ui/icons/CloseIcon'
 import v, { ITEM_TYPES } from '~/utils/variables'
 
-const ItemPageContainer = styled.div`
+const ItemPageContainer = styled.main`
   background: white;
   min-height: 75vh;
   position: relative;
