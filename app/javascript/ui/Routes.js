@@ -13,6 +13,7 @@ import TermsOfUseModal from '~/ui/users/TermsOfUseModal'
 import Loader from '~/ui/layout/Loader'
 import ActivityLogBox from '~/ui/activity_log/ActivityLogBox'
 import initDoorbell from '~/vendor/doorbell'
+import v from '~/utils/variables'
 
 const AppWrapper = styled.div`
   /* used by terms of use modal to blur the whole site */
@@ -23,9 +24,15 @@ const AppWrapper = styled.div`
 AppWrapper.displayName = 'AppWrapper'
 
 const FixedBoundary = styled.div`
-  height: 100vh;
   position: fixed;
+  top: 0;
+  height: 100vh;
   width: 100vw;
+`
+const FixedActivityLogWrapper = styled.div`
+  position: fixed;
+  top: 0;
+  z-index: ${v.zIndex.activityLog};
 `
 
 // withRouter allows it to respond automatically to routing changes in props
@@ -42,8 +49,9 @@ class Routes extends React.Component {
 
   handleWindowResize = ({ windowWidth }) => {
     // NOTE: Routes should only interact with uiStore for global re-rendering changes like this
-    this.props.uiStore.updateColumnsToFit(windowWidth)
-    this.props.uiStore.updateActivityLogWidth(windowWidth)
+    const { uiStore } = this.props
+    uiStore.updateColumnsToFit(windowWidth)
+    uiStore.updateActivityLogWidth(windowWidth)
   }
 
   render() {
@@ -62,9 +70,9 @@ class Routes extends React.Component {
         <DialogWrapper />
 
         <FixedBoundary className="fixed_boundary" />
-        <div style={{ position: 'fixed', zIndex: 9999 }}>
+        <FixedActivityLogWrapper>
           <ActivityLogBox />
-        </div>
+        </FixedActivityLogWrapper>
         {displayTermsPopup &&
           <TermsOfUseModal currentUser={apiStore.currentUser} />
         }

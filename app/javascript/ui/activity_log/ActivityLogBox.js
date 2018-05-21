@@ -20,7 +20,7 @@ const MOBILE_Y = 300
 
 const DEFAULT = {
   x: 0,
-  y: 1,
+  y: 180,
   w: MIN_WIDTH,
   h: MIN_HEIGHT,
 }
@@ -170,8 +170,7 @@ class ActivityLogBox extends React.Component {
   get mobileProps() {
     const { uiStore } = this.props
     if (!uiStore.activityLogForceWidth) return {}
-    const headerHeight = 192
-    const height = window.innerHeight - (headerHeight + MOBILE_Y)
+    const height = window.innerHeight - MOBILE_Y
     return {
       minWidth: uiStore.activityLogForceWidth,
       minHeight: height,
@@ -208,10 +207,13 @@ class ActivityLogBox extends React.Component {
         }}
         enableResizing={{
           bottom: true,
+          bottomLeft: true,
           bottomRight: true,
           top: true,
-          left: false,
-          right: false,
+          topLeft: true,
+          topRight: true,
+          left: true,
+          right: true,
         }}
         disableDragging={false}
         onDragStop={(ev, d) => { this.updatePosition(d) }}
