@@ -13,6 +13,7 @@ import moment from 'moment-mini'
 import Moment from '~/ui/global/Moment'
 import ReturnArrowIcon from '~/ui/icons/ReturnArrowIcon'
 import Comment from './Comment'
+import { CommentForm, CommentTextarea } from '~/ui/global/styled/forms'
 
 const StyledCommentThread = styled.div`
   .title {
@@ -53,7 +54,6 @@ const StyledCommentThread = styled.div`
     `}
   }
   form.reply {
-    position: relative;
     /* NOTE: just for prototyping, not fully browser supported */
     ${props => props.expanded && `
       position: sticky;
@@ -63,52 +63,21 @@ const StyledCommentThread = styled.div`
       display: none;
     `}
     /* ---- */
-    width: calc(100% - 28px);
-    margin-left: 28px;
-    min-height: 70px;
+    width: calc(100% - 10px);
     background: ${v.colors.activityDarkBlue};
     background: linear-gradient(
       ${hexToRgba(v.colors.activityDarkBlue, 0)} 0,
       ${v.colors.activityDarkBlue} 10%,
       ${v.colors.activityDarkBlue} 100%
     );
-    padding-top: 10px;
-    margin-top: -5px;
     .textarea-input {
       background: ${v.colors.activityMedBlue};
-      margin: 0 5px 0 40px;
-      width: calc(100% - 50px);
+      margin: 0 5px 0 68px;
+      width: calc(100% - 68px);
     }
     textarea {
       width: calc(100% - 40px);
-      resize: none;
       color: white;
-      padding: 10px;
-      border: none;
-      background: none;
-      font-size: 1rem;
-      font-family: ${v.fonts.sans};
-      :focus {
-        border: none;
-        outline: none;
-      }
-      ::placeholder {
-        color: ${v.colors.gray};
-      }
-      /* TODO: cross-browser friendly way to hide scrollbar?
-        note this is only for a really long comment (>6 rows) */
-      ::-webkit-scrollbar {
-        background: none;
-      }
-    }
-    /* submit */
-    button {
-      position: absolute;
-      right: 18px;
-      top: 20px;
-      width: 18px;
-      height: 18px;
-
     }
   }
 `
@@ -224,9 +193,9 @@ class CommentThread extends React.Component {
         <div className="comments">
           { this.renderComments() }
         </div>
-        <form className="reply" onSubmit={this.handleSubmit}>
+        <CommentForm className="reply" onSubmit={this.handleSubmit}>
           <div className="textarea-input">
-            <TextareaAutosize
+            <CommentTextarea
               placeholder="add comment"
               value={this.message}
               onChange={this.handleTextChange}
@@ -237,7 +206,7 @@ class CommentThread extends React.Component {
           <button>
             <ReturnArrowIcon />
           </button>
-        </form>
+        </CommentForm>
       </StyledCommentThread>
     )
   }

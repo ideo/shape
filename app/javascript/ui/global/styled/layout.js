@@ -1,4 +1,5 @@
 import PropTypes from 'prop-types'
+import { Flex } from 'reflexbox'
 import styled from 'styled-components'
 import v from '~/utils/variables'
 
@@ -48,3 +49,14 @@ export const RowItem = styled.span`
   }
 `
 RowItem.displayName = 'StyledRowItem'
+
+export const InlineRow = styled(Flex)`
+  & > * {
+    display: inline-block;
+    margin-left: 10px;
+  }
+  & > *:first-child {
+    margin-left: 0;
+  }
+`
+InlineRow.displayName = 'StyledInlineRow'

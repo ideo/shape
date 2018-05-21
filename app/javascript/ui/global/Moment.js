@@ -10,8 +10,10 @@ function defaultFormat(time) {
 }
 
 const StyledDate = styled.span`
-  font-size: 12px;
   color: ${v.colors.cloudy};
+  display: inline-block;
+  font-family: ${v.fonts.sans};
+  font-size: 0.75rem;
   white-space: nowrap;
 `
 

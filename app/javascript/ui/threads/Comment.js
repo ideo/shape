@@ -3,6 +3,8 @@ import styled from 'styled-components'
 import { Flex } from 'reflexbox'
 
 import v from '~/utils/variables'
+import { DisplayText } from '~/ui/global/styled/typography'
+import { InlineRow } from '~/ui/global/styled/layout'
 import Moment from '~/ui/global/Moment'
 import UserAvatar from '~/ui/users/UserAvatar'
 
@@ -10,15 +12,7 @@ const StyledComment = styled.div`
   padding: 10px;
   margin-bottom: 5px;
   background: ${v.colors.activityMedBlue};
-  .author, .timestamp {
-    font-family: ${v.fonts.sans};
-    display: inline-block;
-    margin-left: 10px;
-  }
-  .timestamp {
-    font-size: 0.9rem;
-    color: ${v.colors.cloudy};
-  }
+
   .message {
     margin-top: 5px;
   }
@@ -30,19 +24,19 @@ class Comment extends React.Component {
 
     return (
       <StyledComment>
-        <Flex align="center">
+        <InlineRow align="center">
           <UserAvatar
             user={comment.author}
             size={32}
             className="author-img"
           />
-          <span className="author">
+          <DisplayText className="author">
             { comment.author.name }
-          </span>
+          </DisplayText>
           <span className="timestamp">
             <Moment date={comment.created_at} />
           </span>
-        </Flex>
+        </InlineRow>
         <p className="message">
           { comment.message }
         </p>
