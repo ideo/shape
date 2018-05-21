@@ -4,12 +4,12 @@ class Api::V1::ItemsController < Api::V1::BaseController
   load_and_authorize_resource
 
   def show
-    render jsonapi: @item, include: [:filestack_file, :parent, roles: %i[users groups]]
+    render jsonapi: @item, include: [:filestack_file, :parent, roles: %i[users groups resource]]
   end
 
   def create
     if @item.save
-      render jsonapi: @item
+      render jsonapi: @item, include: [roles: %i[users groups resource]]
     else
       render_api_errors @item.errors
     end

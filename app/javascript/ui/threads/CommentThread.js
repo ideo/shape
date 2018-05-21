@@ -158,7 +158,7 @@ class CommentThread extends React.Component {
   get comments() {
     const { expanded } = this.props
     let { comments } = this.props.thread
-    comments = _.sortBy(comments, ['created_at'])
+    comments = _.sortBy(comments, ['updated_at'])
     // for un-expanded thread, only take the last two
     if (!expanded) comments = comments.slice(-2)
     return comments

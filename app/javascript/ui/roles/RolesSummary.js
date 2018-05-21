@@ -175,13 +175,13 @@ class RolesSummary extends React.Component {
 }
 
 RolesSummary.propTypes = {
-  roles: MobxPropTypes.arrayOrObservableArray.isRequired,
+  roles: MobxPropTypes.arrayOrObservableArray,
   handleClick: PropTypes.func.isRequired,
   canEdit: PropTypes.bool,
 }
 
 RolesSummary.defaultProps = {
-  className: '',
+  roles: [],
   canEdit: false,
 }
 

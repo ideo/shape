@@ -6,6 +6,13 @@ class Item
       filestack_file_url
     end
 
+    def cache_attributes
+      if self.cached_filestack_file_url != self.filestack_file_url
+        self.cached_filestack_file_url = self.filestack_file_url
+      end
+      super
+    end
+
     private
 
     # on_create callback
