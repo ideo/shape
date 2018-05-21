@@ -16,6 +16,7 @@ const MIN_HEIGHT = 400
 const MAX_WIDTH = 800
 const MAX_HEIGHT = 800
 const HEADER_HEIGHT = 35
+const MOBILE_Y = 300
 
 const DEFAULT = {
   x: 0,
@@ -84,12 +85,11 @@ class ActivityLogBox extends React.Component {
   @action componentDidMount() {
     const existingPosition = localStorage.getItem(POSITION_KEY) || { }
     const existingPage = localStorage.getItem(PAGE_KEY)
+    this.currentPage = existingPage || 'comments'
     this.position.y = existingPosition.y || DEFAULT.y
     this.position.w = existingPosition.w || DEFAULT.w
     this.position.h = existingPosition.h || DEFAULT.h
-    this.position.x = existingPosition.x ||
-      document.querySelector('.Grid').offsetWidth - this.position.w + DEFAULT.x
-    this.currentPage = existingPage || 'comments'
+    this.position.x = existingPosition.x || this.defaultX
     this.props.apiStore.fetchThreads()
   }
 
@@ -98,9 +98,17 @@ class ActivityLogBox extends React.Component {
     this.disposer()
   }
 
+  get defaultX() {
+    let { x } = DEFAULT
+    if (document.querySelector('#AppWrapper')) {
+      x += document.querySelector('#AppWrapper').getBoundingClientRect().right - this.position.w
+    }
+    return x
+  }
+
   setToDefaultPosition() {
     this.updatePosition({
-      x: document.querySelector('.Grid').offsetWidth - this.position.w + DEFAULT.x,
+      x: this.defaultX,
       y: DEFAULT.y,
     })
   }
@@ -128,8 +136,8 @@ class ActivityLogBox extends React.Component {
     return !(
       rect.top >= 0 &&
       rect.left >= 0 &&
-      rect.right <= viewWidth &&
-      rect.bottom <= viewHeight
+      rect.right - (MIN_WIDTH - 100) <= viewWidth &&
+      rect.bottom - (MIN_HEIGHT - 100) <= viewHeight
     )
   }
 
@@ -165,6 +173,26 @@ class ActivityLogBox extends React.Component {
     uiStore.update('expandedThread', thread.id)
   }
 
+  get mobileProps() {
+    const { uiStore } = this.props
+    if (!uiStore.activityLogForceWidth) return {}
+    const height = window.innerHeight - MOBILE_Y
+    return {
+      minWidth: uiStore.activityLogForceWidth,
+      minHeight: height,
+      position: {
+        x: 0,
+        y: MOBILE_Y,
+      },
+      size: {
+        width: uiStore.activityLogForceWidth,
+        height,
+      },
+      enableResizing: {},
+      disableDragging: true,
+    }
+  }
+
   render() {
     const { uiStore } = this.props
     if (!uiStore.activityLogOpen) return null
@@ -179,13 +207,19 @@ class ActivityLogBox extends React.Component {
         maxHeight={MAX_HEIGHT}
         position={{ x: this.position.x, y: this.position.y }}
         dragHandleClassName=".activity_log-header"
-        size={{ width: this.position.w, height: this.position.h }}
+        size={{
+          width: this.position.w,
+          height: this.position.h,
+        }}
         enableResizing={{
           bottom: true,
+          bottomLeft: true,
           bottomRight: true,
           top: true,
-          left: false,
-          right: false,
+          topLeft: true,
+          topRight: true,
+          left: true,
+          right: true,
         }}
         disableDragging={false}
         onDragStop={(ev, d) => { this.updatePosition(d) }}
@@ -196,6 +230,7 @@ class ActivityLogBox extends React.Component {
           })
           this.updatePosition(fullPosition)
         }}
+        {...this.mobileProps}
       >
         <div ref={this.draggableRef} style={{ height: '100%' }}>
           <StyledActivityLog>

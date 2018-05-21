@@ -3,6 +3,7 @@ import ReactRouterPropTypes from 'react-router-prop-types'
 import { observable, runInAction } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 
+import PageError from '~/ui/global/PageError'
 import PageWithApi from '~/ui/pages/PageWithApi'
 import Loader from '~/ui/layout/Loader'
 import PageContainer from '~/ui/layout/PageContainer'
@@ -53,6 +54,7 @@ class CollectionPage extends PageWithApi {
   }
 
   onAPILoad = (response) => {
+    this.updateError(null)
     const collection = response.data
     const { apiStore, uiStore } = this.props
     uiStore.setViewingCollection(collection)
@@ -84,6 +86,9 @@ class CollectionPage extends PageWithApi {
   }
 
   render() {
+    // this.error comes from PageWithApi
+    if (this.error) return <PageError error={this.error} />
+
     const { collection } = this
     const { uiStore } = this.props
     if (!collection) return <Loader />
