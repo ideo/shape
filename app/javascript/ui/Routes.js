@@ -56,7 +56,7 @@ class Routes extends React.Component {
     )
 
     return (
-      <AppWrapper blur={displayTermsPopup}>
+      <AppWrapper blur={displayTermsPopup} id="AppWrapper">
         {/* Global components are rendered here */}
         <WindowSizeListener onResize={this.handleWindowResize} />
         <DialogWrapper />
