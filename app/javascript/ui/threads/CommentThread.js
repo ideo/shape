@@ -161,6 +161,7 @@ class CommentThread extends React.Component {
         content = <img src={record.filestack_file_url} alt="Text" />
       }
     } else {
+      // eslint-disable-next-line
       if (record.cover.image_url) {
         content = <img src={record.cover.image_url} alt="Collection" />
       } else {
