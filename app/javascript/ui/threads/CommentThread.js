@@ -5,7 +5,7 @@ import _ from 'lodash'
 import styled from 'styled-components'
 import TextareaAutosize from 'react-autosize-textarea'
 
-import v from '~/utils/variables'
+import v, { ITEM_TYPES } from '~/utils/variables'
 import hexToRgba from '~/utils/hexToRgba'
 import moment from 'moment-mini'
 import Moment from '~/ui/global/Moment'
@@ -110,6 +110,20 @@ const StyledCommentThread = styled.div`
   }
 `
 
+const StyledHeader = styled.div`
+  align-items: flex-start;
+  display: flex;
+  height: 50px;
+
+  *:first-child {
+    margin-right: 8px;
+  }
+
+  *:last-child {
+    margin-left: auto;
+  }
+`
+
 @observer
 class CommentThread extends React.Component {
   @observable message = ''
@@ -154,6 +168,24 @@ class CommentThread extends React.Component {
     this.props.afterSubmit()
   }
 
+  renderThumbnail() {
+    const { thread } = this.props
+    const { record } = thread
+    let content
+    if (record.internalType === 'items') {
+      if (record.type === ITEM_TYPES.TEXT) {
+        content = 'T'
+      } else {
+        content = record.filestack_file_url
+      }
+    } else {
+      content = record.cover.image_url
+    }
+    return (
+      <img style={{ width: '50px' }} src={content} alt="Thumbnail" />
+    )
+  }
+
   renderComments = () => (
     this.comments.map(comment => (
       <Comment key={comment.id} comment={comment} />
@@ -166,13 +198,13 @@ class CommentThread extends React.Component {
     return (
       <StyledCommentThread expanded={expanded}>
         <button className="title" onClick={this.props.onClick}>
-          <span className="name">{ thread.record.name }</span>
-          &nbsp; - &nbsp;
-          <Moment
-            date={thread.updated_at}
-          />
-          &nbsp; - &nbsp;
-          { thread.comments.length }
+          <StyledHeader>
+            {this.renderThumbnail()}
+            <span className="name">{ thread.record.name }</span>
+            <Moment
+              date={thread.updated_at}
+            />
+          </StyledHeader>
         </button>
         <div className="comments">
           { this.renderComments() }
