@@ -32,7 +32,7 @@ const StyledCommentThread = styled.div`
       ${v.colors.activityDarkBlue} 80%,
       ${hexToRgba(v.colors.activityDarkBlue, 0)} 100%
     );
-    padding: 20px 10px;
+    padding: 20px 10px 0 10px;
     text-align: left;
     font-family: ${v.fonts.sans};
     font-weight: 500;
@@ -43,7 +43,7 @@ const StyledCommentThread = styled.div`
     }
   }
   .comments {
-    margin: 0 10px 0 40px;
+    margin: 0 10px 0 60px;
     ${props => !props.expanded && `
       z-index: 0;
       position: relative;
@@ -63,7 +63,8 @@ const StyledCommentThread = styled.div`
       display: none;
     `}
     /* ---- */
-    width: 100%;
+    width: calc(100% - 20px);
+    margin-left: 20px;
     min-height: 70px;
     background: ${v.colors.activityDarkBlue};
     background: linear-gradient(

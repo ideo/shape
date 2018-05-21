@@ -6,6 +6,7 @@ import styled from 'styled-components'
 import CommentThread from './CommentThread'
 
 const StyledCommentThreadContainer = styled.div`
+  margin-top: -2px;
   overflow-y: scroll;
   overflow-x: hidden;
   height: 100%;
