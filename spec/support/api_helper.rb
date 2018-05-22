@@ -15,12 +15,12 @@ module ApiHelper
     json['data'].map { |obj| obj['attributes']['id'].to_i }
   end
 
-  def json_api_params(resource_name, attrs)
-    {
-      'data' => {
-        'type': resource_name,
-        'attributes': attrs
-      }
+  def json_api_params(resource_name, attrs, merge_data = {})
+    params = {
+      data: {
+        type: resource_name,
+        attributes: attrs
+      }.merge(merge_data)
     }.to_json
   end
 end

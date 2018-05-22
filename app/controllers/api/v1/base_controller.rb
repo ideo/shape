@@ -50,6 +50,6 @@ class Api::V1::BaseController < ApplicationController
 
   def check_cancel_sync
     return unless json_api_params && json_api_params[:data]
-    @cancel_sync = json_api_params[:data][:cancel_sync]
+    @cancel_sync = json_api_params[:data].delete :cancel_sync
   end
 end
