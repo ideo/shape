@@ -44,6 +44,18 @@ const fakeApiStore = ({ findResult = '', findAllResult = [], requestResult = '' 
         name: 'test org',
       }
     },
+    currentThreads: [
+      {
+        id: 1,
+        record: { name: 'abc' },
+        comments: [],
+      },
+      {
+        id: 2,
+        record: { name: 'xyz' },
+        comments: [],
+      }
+    ],
     collections: [],
     items: [],
   }
