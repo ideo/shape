@@ -10,8 +10,7 @@ const prependBabelPolyfill = mapValues(
 )
 
 const addBabelPolyfill = env => {
-  const entry = env.entry
-  env.entry.app = prependBabelPolyfill(entry).app
+  env.entry.app = prependBabelPolyfill(env.entry).app
   return env
 }
 
