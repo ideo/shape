@@ -91,6 +91,7 @@ RSpec.describe Roles::MassAssign, type: :service do
           expect(AddRolesToChildrenWorker).to receive(:perform_async).with(
             users.map(&:id),
             groups.map(&:id),
+            @user,
             role_name,
             object.id,
             object.class.name,

@@ -16,6 +16,7 @@ RSpec.describe Roles::AddToChildren, type: :service do
     Roles::AddToChildren.new(
       role_name: role_name,
       parent: collection,
+      current_user: @user,
       users_to_add: users,
       groups_to_add: groups,
     )
@@ -78,6 +79,7 @@ RSpec.describe Roles::AddToChildren, type: :service do
         {
           object: child,
           role_name: role_name,
+          current_user: @user,
           users: users,
           groups: groups,
           propagate_to_children: false,

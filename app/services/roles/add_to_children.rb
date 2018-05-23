@@ -1,9 +1,10 @@
 module Roles
   class AddToChildren
-    def initialize(role_name:, parent:, users_to_add: [], groups_to_add: [])
+    def initialize(role_name:, parent:, current_user:, users_to_add: [], groups_to_add: [])
       @users_to_add = users_to_add
       @groups_to_add = groups_to_add
       @parent = parent
+      @current_user = current_user
       @role_name = role_name
       @inheritance = Roles::Inheritance.new(parent)
     end
@@ -61,6 +62,7 @@ module Roles
       Roles::MassAssign.new(
         object: child,
         role_name: @role_name,
+        current_user: @current_user,
         users: @users_to_add,
         groups: @groups_to_add,
         propagate_to_children: false,

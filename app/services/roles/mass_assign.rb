@@ -80,6 +80,7 @@ module Roles
       params = [
         @added_users.map(&:id),
         @added_groups.map(&:id),
+        @current_user,
         @role_name,
         @object.id,
         @object.class.name,
