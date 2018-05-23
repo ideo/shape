@@ -7,7 +7,6 @@ module Roles
 
     def initialize(object:,
                    role_name:,
-                   current_user:,
                    users: [],
                    groups: [],
                    propagate_to_children: false,
@@ -16,7 +15,6 @@ module Roles
                    new_role: false)
       @object = object
       @role_name = role_name
-      @current_user = current_user
       @users = users
       @groups = groups
       @propagate_to_children = propagate_to_children
@@ -35,12 +33,12 @@ module Roles
     def call
       return false unless valid_object_and_role_name?
       assign_role_to_users
-      setup_org_membership if @invited_by && @new_role
-      notify_users if @invited_by && @new_role
+      setup_org_membership if newly_invited?
+      notify_users if newly_invited?
       assign_role_to_groups
       link_to_shared_collections if @new_role
       add_roles_to_children if @propagate_to_children
-      create_activities_and_notifications if @new_role
+      create_activities_and_notifications if newly_invited?
       failed_users.blank? && failed_groups.blank?
     end
 
@@ -80,7 +78,6 @@ module Roles
       params = [
         @added_users.map(&:id),
         @added_groups.map(&:id),
-        @current_user,
         @role_name,
         @object.id,
         @object.class.name,
@@ -106,7 +103,7 @@ module Roles
         return
       end
       builder = ActivityAndNotificationBuilder.new(
-        actor: @current_user,
+        actor: @invited_by,
         target: @object,
         action: action,
         subject_users: @added_users,
@@ -148,5 +145,9 @@ module Roles
 
       true
     end
+  end
+
+  def newly_invited?
+    @invited_by && @new_role
   end
 end

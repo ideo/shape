@@ -19,7 +19,6 @@ RSpec.describe AddRolesToChildrenWorker, type: :worker do
       expect(Roles::AddToChildren).to receive(:new).with(
         users_to_add: users_to_add,
         groups_to_add: groups_to_add,
-        current_user: @user,
         parent: collection,
         role_name: role_name,
       )

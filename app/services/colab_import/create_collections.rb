@@ -4,12 +4,11 @@ module ColabImport
   class CreateCollections
     attr_reader :collections, :root_collection, :failed
 
-    def initialize(path_to_json:, organization:, template_collection:, editor:, current_user:, only_uids: [], root_collection: nil)
+    def initialize(path_to_json:, organization:, template_collection:, editor:, only_uids: [], root_collection: nil)
       @data = JSON.parse(File.read(path_to_json))
       @template_collection = template_collection
       @organization = organization
       @editor = editor
-      @current_user = current_user
       @root_collection = root_collection
       @concepts_by_session = find_concepts_by_session(only_uids)
       @session_collections_by_name = {}
@@ -134,7 +133,6 @@ module ColabImport
         assign_role = Roles::MassAssign.new(
           object: @root_collection,
           role_name: role.name,
-          current_user: @current_user,
           users: role.users,
           propagate_to_children: true,
           synchronous: true,

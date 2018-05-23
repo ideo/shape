@@ -19,7 +19,6 @@ RSpec.describe ColabImport::CreateCollections, type: :service do
         path_to_json: 'db/import/colab-concept-library-export.json',
         organization: organization,
         template_collection: template_collection,
-        current_user: @user,
         only_uids: concept_uids,
         editor: editor,
       )
@@ -45,7 +44,6 @@ RSpec.describe ColabImport::CreateCollections, type: :service do
       Roles::MassAssign.new(
         object: template_collection,
         role_name: Role::EDITOR,
-        current_user: @user,
         users: [editor],
         propagate_to_children: true,
         synchronous: true,
