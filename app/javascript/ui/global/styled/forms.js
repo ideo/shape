@@ -2,6 +2,7 @@ import Chip from 'material-ui/Chip'
 import MuiSelect from 'material-ui/Select'
 import { MenuItem } from 'material-ui/Menu'
 import AutosizeInput from 'react-input-autosize'
+import TextareaAutosize from 'react-autosize-textarea'
 import styled from 'styled-components'
 import v from '~/utils/variables'
 
@@ -217,5 +218,40 @@ export const EditAvatarButton = styled.button`
     cursor: pointer;
     opacity: 0.75;
     `
-}
+}`
+
+export const CommentForm = styled.form`
+  min-height: 70px;
+  position: relative;
+
+  button {
+    position: absolute;
+    right: 18px;
+    top: 14px;
+    width: 18px;
+    height: 18px;
+  }
+`
+
+export const CommentTextarea = styled(({ textAreaRef, ...rest }) =>
+  <TextareaAutosize innerRef={textAreaRef} {...rest} />)`
+  resize: none;
+  padding: 10px;
+  font-size: 1rem;
+  font-family: ${v.fonts.sans};
+  border: none;
+  background: none;
+
+  :focus {
+    border: none;
+    outline: none;
+  }
+  ::placeholder {
+    color: ${v.colors.gray};
+  }
+  /* TODO: cross-browser friendly way to hide scrollbar?
+    note this is only for a really long comment (>6 rows) */
+  ::-webkit-scrollbar {
+    background: none;
+  }
 `

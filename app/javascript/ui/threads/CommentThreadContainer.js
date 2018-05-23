@@ -6,6 +6,7 @@ import styled from 'styled-components'
 import CommentThread from './CommentThread'
 
 const StyledCommentThreadContainer = styled.div`
+  margin-top: -2px;
   overflow-y: scroll;
   overflow-x: hidden;
   height: 100%;
@@ -57,6 +58,7 @@ class CommentThreadContainer extends React.Component {
     if (!expandedThread) {
       // when compacting, scroll back up to the top of this thread
       this.scrollToTopOfThread(thread)
+      return
     }
     uiStore.update('expandedThread', expandedThread)
   }
