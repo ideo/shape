@@ -52,6 +52,8 @@ ActiveRecord::Schema.define(version: 20180522000311) do
     t.string "record_type"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.bigint "organization_id"
+    t.index ["organization_id"], name: "index_comment_threads_on_organization_id"
     t.index ["record_id"], name: "index_comment_threads_on_record_id", unique: true
   end
 

@@ -51,6 +51,7 @@ const StyledCommentThread = styled.div`
       top: -40px;
       overflow: hidden;
       margin-bottom: -40px;
+      min-height: 40px;
     `}
   }
   form.reply {

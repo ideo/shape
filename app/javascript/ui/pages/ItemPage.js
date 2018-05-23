@@ -1,6 +1,5 @@
 import { Fragment } from 'react'
 import ReactRouterPropTypes from 'react-router-prop-types'
-import { observable, runInAction } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 import { Link } from 'react-router-dom'
@@ -56,7 +55,6 @@ const CloseLink = styled(Link)`
 @inject('apiStore', 'uiStore')
 @observer
 class ItemPage extends PageWithApi {
-  @observable thread = null
   state = {
     item: null
   }
@@ -76,11 +74,7 @@ class ItemPage extends PageWithApi {
     this.setState({ item })
     uiStore.setViewingItem(item)
     if (item.parent) item.parent.checkCurrentOrg()
-    apiStore.findOrBuildCommentThread(item).then(thread => {
-      runInAction(() => {
-        this.thread = thread
-      })
-    })
+    apiStore.findOrBuildCommentThread(item)
   }
 
   updateItem = (itemTextData) => {

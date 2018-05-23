@@ -1,9 +1,19 @@
 require 'rails_helper'
 
 describe Api::V1::CommentThreadsController, type: :request, json: true, auth: true do
+  let(:user) { @user }
+
   describe 'GET #index' do
     let(:path) { '/api/v1/comment_threads' }
-    let!(:comment_threads) { create_list(:item_comment_thread, 2, num_comments: 1) }
+    let!(:comment_threads) do
+      create_list(
+        :collection_comment_thread,
+        2,
+        add_followers: [user],
+        num_comments: 1,
+        organization: user.current_organization
+      )
+    end
 
     before do
       get(path)
@@ -24,19 +34,33 @@ describe Api::V1::CommentThreadsController, type: :request, json: true, auth: tr
     let!(:comment_thread) { create(:item_comment_thread, num_comments: 1) }
     let(:path) { "/api/v1/comment_threads/#{comment_thread.id}" }
 
-    before do
-      get(path)
+    context 'with access to record' do
+      before do
+        user.add_role(Role::EDITOR, comment_thread.record)
+        get(path)
+      end
+
+      it 'returns a 200' do
+        expect(response.status).to eq(200)
+      end
+
+      it 'matches JSON schema for thread and comments' do
+        expect(json['data']['attributes']).to match_json_schema('comment_thread')
+        comment = json['included'].select{ |i| i['type'] == 'comments' }.first
+        expect(comment['attributes']).to match_json_schema('comment')
+      end
     end
 
-    it 'returns a 200' do
-      expect(response.status).to eq(200)
+    context 'without access to record' do
+      before do
+        get(path)
+      end
+
+      it 'returns a 401' do
+        expect(response.status).to eq(401)
+      end
     end
 
-    it 'matches JSON schema for thread and comments' do
-      expect(json['data']['attributes']).to match_json_schema('comment_thread')
-      comment = json['included'].select{ |i| i['type'] == 'comments' }.first
-      expect(comment['attributes']).to match_json_schema('comment')
-    end
   end
 
   describe 'GET #find_by_record' do
@@ -44,6 +68,7 @@ describe Api::V1::CommentThreadsController, type: :request, json: true, auth: tr
     let(:path) { "/api/v1/comment_threads/find_by_record/#{record_type}/#{record_id}" }
 
     before do
+      user.add_role(Role::EDITOR, comment_thread.record)
       get(path)
     end
 
@@ -86,17 +111,30 @@ describe Api::V1::CommentThreadsController, type: :request, json: true, auth: tr
       )
     }
 
-    before do
-      post(path, params: params)
+    context 'with access to record' do
+      before do
+        user.add_role(Role::VIEWER, collection)
+        post(path, params: params)
+      end
+
+      it 'returns a 200' do
+        expect(response.status).to eq(200)
+      end
+
+      it 'creates a comment thread' do
+        expect(json['data']['attributes']).to match_json_schema('comment_thread')
+        expect(json['data']['attributes']['id']).not_to be nil
+      end
     end
 
-    it 'returns a 200' do
-      expect(response.status).to eq(200)
-    end
+    context 'without access to record' do
+      before do
+        post(path, params: params)
+      end
 
-    it 'creates a comment thread' do
-      expect(json['data']['attributes']).to match_json_schema('comment_thread')
-      expect(json['data']['attributes']['id']).not_to be nil
+      it 'returns a 401' do
+        expect(response.status).to eq(401)
+      end
     end
   end
 end

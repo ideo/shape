@@ -7,5 +7,8 @@ class CreateUsersThreads < ActiveRecord::Migration[5.1]
     end
 
     add_index :users_threads, [:user_id, :comment_thread_id], unique: true, name: 'by_users_comment_thread'
+
+    add_column :comment_threads, :organization_id, :bigint
+    add_index :comment_threads, :organization_id
   end
 end

@@ -184,6 +184,7 @@ export const fakeComment = {
 export const fakeThread = {
   id: 1,
   record: fakeCollection,
+  key: 'collection-1',
   comments: [
     fakeComment, fakeComment, fakeComment
   ],

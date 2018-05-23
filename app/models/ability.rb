@@ -58,6 +58,11 @@ class Ability
       can :manage, Item do |item|
         item.can_edit?(user)
       end
+
+      can :create, CommentThread
+      can %i[read manage], CommentThread do |comment_thread|
+        comment_thread.record.can_view?(user)
+      end
     end
 
     # don't allow any of the editing actions unless you've accepted terms

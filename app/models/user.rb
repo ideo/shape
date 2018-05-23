@@ -23,6 +23,9 @@ class User < ApplicationRecord
            through: :roles,
            source: :resource,
            source_type: 'Group'
+  has_many :users_threads, dependent: :destroy
+  has_many :comment_threads,
+           through: :users_threads
 
   has_many :organizations, -> { distinct }, through: :groups
   has_many :users_roles

@@ -1,6 +1,5 @@
 import { Fragment } from 'react'
 import ReactRouterPropTypes from 'react-router-prop-types'
-import { observable, runInAction } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 
 import PageError from '~/ui/global/PageError'
@@ -16,8 +15,6 @@ const isHomepage = ({ path }) => path === '/'
 @inject('apiStore', 'uiStore')
 @observer
 class CollectionPage extends PageWithApi {
-  @observable thread = null
-
   componentWillReceiveProps(nextProps) {
     super.componentWillReceiveProps(nextProps)
     // when navigating between collections, close BCT
@@ -64,11 +61,7 @@ class CollectionPage extends PageWithApi {
     }
     collection.checkCurrentOrg()
     if (collection.isNormalCollection) {
-      apiStore.findOrBuildCommentThread(collection).then(thread => {
-        runInAction(() => {
-          this.thread = thread
-        })
-      })
+      apiStore.findOrBuildCommentThread(collection)
     } else {
       apiStore.clearUnpersistedThreads()
     }

@@ -65,8 +65,8 @@ export default class UiStore {
 
   // Comments + Threads
   @observable commentsOpen = false
-  // marked by record id
-  @observable expandedThread = null
+  // marked by thread.key (so it works for new records as well)
+  @observable expandedThreadKey = null
 
   @action popupAlert(props = {}) {
     _.assign(this.dialogConfig, {
@@ -301,4 +301,10 @@ export default class UiStore {
     return this.selectedCardIds.findIndex(id => id === cardId) > -1
   }
   // --- BCT + GridCard properties />
+
+  @action expandThread(key, { reset = true } = {}) {
+    // reset it first, that way if it's expanded offscreen, it will get re-opened/scrolled to
+    if (reset) this.expandedThreadKey = null
+    this.expandedThreadKey = key
+  }
 }

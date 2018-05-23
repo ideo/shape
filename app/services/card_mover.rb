@@ -81,8 +81,12 @@ class CardMover
   end
 
   def to_collection_invalid
-    # NOTE: recalculate_breadcrumb! could be made unnecessary if we had better
-    # checks for recalculating breadcrumb in other places
+    # Not allowed to move between organizations
+    if @to_collection.organization_id != @from_collection.organization_id
+      @errors << 'You can\'t move a collection to a different organization.'
+      return true
+    end
+    # NOTE: recalculate_breadcrumb! probably unnecessary; just to be safe
     @to_collection.recalculate_breadcrumb!
     @from_collection.recalculate_breadcrumb!
     @moving_cards.each do |card|

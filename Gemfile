@@ -83,6 +83,8 @@ gem 'dalli', '~> 2.7'
 
 gem 'bootsnap', require: false
 
+# easy pagination
+gem 'kaminari', '~> 1.1'
 
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
