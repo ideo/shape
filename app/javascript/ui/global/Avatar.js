@@ -1,6 +1,9 @@
+import { observable, action } from 'mobx'
+import { observer } from 'mobx-react'
 import PropTypes from 'prop-types'
 import MuiAvatar from 'material-ui/Avatar'
 import styled from 'styled-components'
+
 import Tooltip from '~/ui/global/Tooltip'
 import v from '~/utils/variables'
 
@@ -19,15 +22,33 @@ const StyledAvatar = styled(MuiAvatar)`
   }
 `
 
+@observer
 class Avatar extends React.Component {
+  @observable url = null
+
+  constructor(props) {
+    super(props)
+    this.setUrl(props.url)
+  }
+
+  @action setUrl(url) {
+    this.url = url
+  }
+
+  onError = () => {
+    console.log(Avatar.defaultProps.url)
+    this.setUrl(Avatar.defaultProps.url)
+  }
+
   render() {
-    const { className, displayName, url, size, title } = this.props
+    const { className, displayName, size, title } = this.props
     const renderAvatar = (
       <StyledAvatar
         alt={title}
         size={size}
         className={`avatar ${className}`}
-        src={url}
+        src={this.url}
+        imgProps={{ onError: this.onError }}
       />
     )
     let content = renderAvatar
@@ -47,12 +68,13 @@ class Avatar extends React.Component {
 
 Avatar.propTypes = {
   title: PropTypes.string,
-  url: PropTypes.string.isRequired,
+  url: PropTypes.string,
   size: PropTypes.number,
   className: PropTypes.string,
   displayName: PropTypes.bool,
 }
 Avatar.defaultProps = {
+  url: 'https://d3none3dlnlrde.cloudfront.net/assets/users/avatars/missing/square.jpg',
   size: 34,
   className: '',
   title: 'Avatar',
