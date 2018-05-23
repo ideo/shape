@@ -32,6 +32,7 @@ class Api::V1::CollectionsController < Api::V1::BaseController
   def update
     updated = CollectionUpdater.call(@collection, collection_params)
     if updated
+      return if @cancel_sync
       render_collection
     else
       render_api_errors @collection.errors

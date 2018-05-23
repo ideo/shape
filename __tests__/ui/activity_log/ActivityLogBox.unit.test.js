@@ -5,7 +5,6 @@ import fakeUiStore from '#/mocks/fakeUiStore'
 import fakeApiStore from '#/mocks/fakeApiStore'
 
 jest.mock('mobx-localstorage')
-jest.mock('mobx')
 
 describe('ActivityLogBox', () => {
   let props, wrapper, component, localStorageStore

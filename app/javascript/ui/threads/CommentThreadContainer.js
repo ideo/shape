@@ -15,7 +15,6 @@ const StyledCommentThreadContainer = styled.div`
 @inject('apiStore', 'uiStore')
 @observer
 class CommentThreadContainer extends React.Component {
-  // @observable threads = []
   @observable contentHeight = null
   disposer = null
   scrollOpts = {

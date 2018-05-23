@@ -220,18 +220,21 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
       create(:collection_card_text, order: 0, width: 1, parent: collection)
     end
     let(:path) { "/api/v1/collections/#{collection.id}" }
+    let(:raw_params) {
+      {
+        id: collection.id,
+        name: 'Who let the dogs out?',
+        collection_cards_attributes: [
+          {
+            id: collection_card.id, order: 1, width: 3
+          }
+        ]
+      }
+    }
     let(:params) {
       json_api_params(
         'collections',
-        {
-          'id': collection.id,
-          'name': 'Who let the dogs out?',
-          'collection_cards_attributes': [
-            {
-              id: collection_card.id, order: 1, width: 3
-            }
-          ]
-        }
+        raw_params
       )
     }
 
@@ -261,6 +264,21 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
       patch(path, params: params)
       expect(collection_card.reload.width).to eq(3)
       expect(collection_card.reload.order).to eq(1)
+    end
+
+    context 'with cancel_sync == true' do
+      let(:params) {
+        json_api_params(
+          'collections',
+          raw_params,
+          { cancel_sync: true }
+        )
+      }
+
+      it 'returns a 204 no content' do
+        patch(path, params: params)
+        expect(response.status).to eq(204)
+      end
     end
   end
 

@@ -23,7 +23,6 @@ describe('Header', () => {
 
   it('renders the logo', () => {
     expect(wrapper.find('Logo').exists()).toBe(true)
-
   })
 
   it('renders the search bar', () => {

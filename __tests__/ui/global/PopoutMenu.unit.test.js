@@ -1,6 +1,4 @@
 import PopoutMenu from '~/ui/global/PopoutMenu'
-import toJson from 'enzyme-to-json'
-import { css } from 'styled-components';
 
 const props = {
   onMouseLeave: jest.fn(),

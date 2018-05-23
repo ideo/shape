@@ -55,6 +55,16 @@ RSpec.describe CardMover, type: :service do
         )
         card_mover.call
       end
+
+      it 'should recalculate breadcrumbs' do
+        card = moving_cards.first
+        card.item.recalculate_breadcrumb!
+        expect {
+          card_mover.call
+        }.to change(card.item, :breadcrumb)
+        # double check that breadcrumb is showing the new collection
+        expect(card.item.breadcrumb[0].last).to eq to_collection.name
+      end
     end
 
     context 'with placement "end"' do

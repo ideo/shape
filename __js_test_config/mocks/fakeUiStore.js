@@ -49,6 +49,7 @@ const fakeUiStore = {
   cardAction: 'move',
   blurContent: false,
   organizationMenuPage: 'organizationMenuPage',
+  expandedThread: null,
 }
 
 export default fakeUiStore

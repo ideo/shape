@@ -99,6 +99,7 @@ const StyledHeader = styled.div`
 
 const ThumbnailHolder = styled.span`
   display: block;
+  flex-shrink: 0;
   height: 50px;
   width: 50px;
   img, svg {
@@ -124,7 +125,7 @@ class CommentThread extends React.Component {
   }
 
   @action countLines = () => {
-    if (this.title.offsetHeight > 24) {
+    if (this.title && this.title.offsetHeight > 24) {
       this.titleLines = 2
     }
   }
