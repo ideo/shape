@@ -7,6 +7,7 @@ module Roles
 
     def initialize(object:,
                    role_name:,
+                   current_user:,
                    users: [],
                    groups: [],
                    propagate_to_children: false,
@@ -15,6 +16,7 @@ module Roles
                    new_role: false)
       @object = object
       @role_name = role_name
+      @current_user = current_user
       @users = users
       @groups = groups
       @propagate_to_children = propagate_to_children
@@ -38,6 +40,7 @@ module Roles
       assign_role_to_groups
       link_to_shared_collections if @new_role
       add_roles_to_children if @propagate_to_children
+      create_activities_and_notifications if @new_role
       failed_users.blank? && failed_groups.blank?
     end
 
@@ -86,6 +89,29 @@ module Roles
       else
         AddRolesToChildrenWorker.perform_async(*params)
       end
+    end
+
+    def create_activities_and_notifications
+      action = nil
+      # TODO: who is responsible for doing this kinda of thing?
+      if @role_name == Role::EDITOR.to_s
+        action = Activity.actions[:added_editor]
+      elsif @role_name == Role::MEMBER.to_s
+        action = Activity.actions[:added_member]
+      elsif @role_name == Role::ADMIN.to_s
+        action = Activity.actions[:added_admin]
+      end
+      if action.nil?
+        return
+      end
+      builder = ActivityAndNotificationBuilder.new(
+        actor: @current_user,
+        target: @object,
+        action: action,
+        subject_users: @added_users,
+        subject_groups: @added_groups,
+      )
+      builder.call
     end
 
     def link_to_shared_collections

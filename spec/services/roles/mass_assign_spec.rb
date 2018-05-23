@@ -1,6 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe Roles::MassAssign, type: :service do
+  let!(:current_user) { @user }
   let(:organization) { create(:organization) }
   let(:object) { create(:collection, num_cards: 2) }
   let(:users) { create_list(:user, 3) }
@@ -13,6 +14,7 @@ RSpec.describe Roles::MassAssign, type: :service do
     Roles::MassAssign.new(
       object: object,
       role_name: role_name,
+      current_user: current_user,
       users: users,
       groups: groups,
       propagate_to_children: propagate_to_children,
@@ -95,6 +97,30 @@ RSpec.describe Roles::MassAssign, type: :service do
           )
           assign_role.call
         end
+      end
+    end
+
+    context 'when it should create activities and notifications' do
+      let(:new_role) { true }
+      let(:role_name) { Role::EDITOR.to_s }
+      let(:instance_double) do
+        double('ActivityAndNotificationBuilder')
+      end
+
+      before do
+        allow(ActivityAndNotificationBuilder).to receive(:new).and_return(instance_double)
+        allow(instance_double).to receive(:call).and_return(true)
+      end
+
+      it 'should call the activity and notification builder' do
+        expect(ActivityAndNotificationBuilder).to receive(:new).with(
+          actor: current_user,
+          target: object,
+          action: Activity.actions[:added_editor],
+          subject_users: users,
+          subject_groups: groups,
+        )
+        assign_role.call
       end
     end
 

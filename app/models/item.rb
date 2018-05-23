@@ -4,6 +4,7 @@ class Item < ApplicationRecord
   include Archivable
   include HasFilestackFile
   include RealtimeEditorsViewers
+  include HasActivities
 
   resourceable roles: [Role::EDITOR, Role::VIEWER],
                edit_role: Role::EDITOR,
@@ -25,6 +26,9 @@ class Item < ApplicationRecord
   has_many :cards_linked_to_this_item,
            class_name: 'CollectionCard::Link',
            inverse_of: :item
+
+  has_many :activities,
+           as: :object_acted_upon
 
   delegate :parent, to: :parent_collection_card, allow_nil: true
   delegate :organization, to: :parent, allow_nil: true
