@@ -138,7 +138,6 @@ class CollectionCard < ApplicationRecord
       # touch parent to bust cache
       parent.touch
     end
-    notify_editors_of_archive
   end
 
   def self.with_record(record)
@@ -204,16 +203,4 @@ class CollectionCard < ApplicationRecord
     errors.add(:parent, 'is read-only so you can\'t save this card') if parent.read_only?
   end
 
-  def notify_editors_of_archive
-    users = record.editors[:users]
-    groups = record.editors[:groups]
-    builder = ActivityAndNotificationBuilder.new(
-      actor: User.find(22),
-      target: record,
-      action: Activity.actions[:archived],
-      subject_users: users,
-      subject_groups: groups,
-    )
-    builder.call
-  end
 end

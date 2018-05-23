@@ -125,7 +125,6 @@ class Group < ApplicationRecord
   def after_archive_group
     remove_group_from_resources
     archive_group_handle
-    notify_group_members
   end
 
   def remove_group_from_resources
@@ -145,16 +144,5 @@ class Group < ApplicationRecord
 
   def archive_group_handle
     update(handle: "#{handle}-archived-#{Time.now.to_i}")
-  end
-
-  def notify_group_members
-    builder = ActivityAndNotificationBuilder.new(
-      actor: User.find(22),
-      target: self,
-      action: Activity.actions[:archived],
-      subject_users: self.members[:users] + self.admins[:users],
-      subject_groups: self.members[:groups] + self.admins[:groups],
-    )
-    builder.call
   end
 end

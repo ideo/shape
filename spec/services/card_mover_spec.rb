@@ -13,6 +13,7 @@ RSpec.describe CardMover, type: :service do
       from_collection: from_collection,
       to_collection: to_collection,
       cards: cards,
+      current_user: @user,
       placement: placement,
       card_action: card_action,
     )
@@ -48,6 +49,7 @@ RSpec.describe CardMover, type: :service do
           object: card.record,
           role_name: Role::EDITOR,
           users: [user],
+          current_user: @user,
           groups: [],
           propagate_to_children: true,
         )
