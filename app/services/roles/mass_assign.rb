@@ -93,7 +93,7 @@ module Roles
 
     def create_activities_and_notifications
       action = nil
-      # TODO: who is responsible for doing this kinda of thing?
+      # TODO: who is responsible for doing this kinda of thing? make map?
       if @role_name == Role::EDITOR.to_s
         action = Activity.actions[:added_editor]
       elsif @role_name == Role::MEMBER.to_s
