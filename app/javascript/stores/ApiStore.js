@@ -110,8 +110,6 @@ class ApiStore extends Store {
         } else {
           // if still not found, set up a new empty record
           thread = new CommentThread({
-            // assign a fake id so that it has a unique key
-            id: `new-${record.id}-${record.internalType}`,
             record_id: record.id,
             record_type: record.className,
             updated_at: new Date()

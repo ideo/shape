@@ -96,7 +96,7 @@ class CommentThreadContainer extends React.Component {
 
   renderThreads = () => (
     this.threads.map((thread, i) => (
-      <ScrollElement name={`thread-${i}`} key={thread.id}>
+      <ScrollElement name={`thread-${i}`} key={thread.key}>
         <CommentThread
           thread={thread}
           expanded={this.isExpanded(thread.id)}

@@ -2,11 +2,12 @@ import { uiStore } from '~/stores'
 import BaseRecord from './BaseRecord'
 
 class CommentThread extends BaseRecord {
+  get key() {
+    return `thread-${this.record.className}-${this.record.id}${this.__persisted ? '-new' : ''}`
+  }
+
   async API_create() {
     try {
-      // get rid of fake id we assigned
-      this.id = null
-      this.assignRef('record', null)
       await this.save()
       // now that we have a real id, update what's expanded
       uiStore.update('expandedThread', this.id)
