@@ -21,7 +21,7 @@ describe('CommentThread', () => {
 
   it('renders a textarea', () => {
     // NOTE: textarea is just shown/hidden via CSS so it should always "exist"
-    expect(wrapper.find('TextareaAutosize').exists()).toBeTruthy()
+    expect(wrapper.find('CommentTextarea').exists()).toBeTruthy()
   })
 
   describe('with unexpanded thread', () => {

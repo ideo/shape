@@ -183,7 +183,7 @@ export const fakeComment = {
 }
 export const fakeThread = {
   id: 1,
-  record: { name: 'xyz' },
+  record: fakeCollection,
   comments: [
     fakeComment, fakeComment, fakeComment
   ],

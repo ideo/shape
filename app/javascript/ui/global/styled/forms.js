@@ -219,7 +219,9 @@ export const EditAvatarButton = styled.button`
     opacity: 0.75;
     `
 }`
+EditAvatarButton.displayName = 'EditAvatarButton'
 
+/** @component */
 export const CommentForm = styled.form`
   min-height: 70px;
   position: relative;
@@ -232,26 +234,35 @@ export const CommentForm = styled.form`
     height: 18px;
   }
 `
+CommentForm.displayName = 'CommentForm'
 
-export const CommentTextarea = styled(({ textAreaRef, ...rest }) =>
-  <TextareaAutosize innerRef={textAreaRef} {...rest} />)`
-  resize: none;
-  padding: 10px;
-  font-size: 1rem;
-  font-family: ${v.fonts.sans};
-  border: none;
-  background: none;
-
-  :focus {
+const StyledCommentTextarea = styled.div`
+  textarea {
+    resize: none;
+    padding: 10px;
+    font-size: 1rem;
+    font-family: ${v.fonts.sans};
     border: none;
-    outline: none;
-  }
-  ::placeholder {
-    color: ${v.colors.gray};
-  }
-  /* TODO: cross-browser friendly way to hide scrollbar?
-    note this is only for a really long comment (>6 rows) */
-  ::-webkit-scrollbar {
     background: none;
+
+    :focus {
+      border: none;
+      outline: none;
+    }
+    ::placeholder {
+      color: ${v.colors.gray};
+    }
+    /* TODO: cross-browser friendly way to hide scrollbar?
+      note this is only for a really long comment (>6 rows) */
+    ::-webkit-scrollbar {
+      background: none;
+    }
   }
 `
+
+/** @component */
+export const CommentTextarea = props => (
+  <StyledCommentTextarea>
+    <TextareaAutosize {...props} />
+  </StyledCommentTextarea>
+)

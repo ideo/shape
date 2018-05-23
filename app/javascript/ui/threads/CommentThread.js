@@ -125,7 +125,7 @@ class CommentThread extends React.Component {
   }
 
   @action countLines = () => {
-    if (this.title.offsetHeight > 24) {
+    if (this.title && this.title.offsetHeight > 24) {
       this.titleLines = 2
     }
   }
@@ -216,7 +216,7 @@ class CommentThread extends React.Component {
               placeholder="add comment"
               value={this.message}
               onChange={this.handleTextChange}
-              textAreaRef={(input) => { this.textarea = input }}
+              innerRef={(input) => { this.textarea = input }}
               maxRows={6}
             />
           </div>
