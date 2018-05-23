@@ -44,6 +44,10 @@ module Roles
 
     private
 
+    def newly_invited?
+      @invited_by && @new_role
+    end
+
     def assign_role_to_users
       @users.each do |user|
         role = user.add_role(@role_name, @object)
@@ -145,9 +149,5 @@ module Roles
 
       true
     end
-  end
-
-  def newly_invited?
-    @invited_by && @new_role
   end
 end
