@@ -53,7 +53,6 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
       from_collection: @from_collection,
       to_collection: @to_collection,
       cards: @cards,
-      current_user: current_user,
       placement: json_api_params[:placement],
       card_action: @card_action || 'move',
     )
