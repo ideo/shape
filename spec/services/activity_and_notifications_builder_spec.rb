@@ -1,7 +1,8 @@
 require 'rails_helper'
 
 RSpec.describe ActivityAndNotificationBuilder, type: :service do
-  let(:actor) { create(:user) }
+  let(:organization) { create(:organization) }
+  let(:actor) { create(:user, add_to_org: organization) }
   let(:target) { create(:collection) }
   let(:action) { 1 }
   let(:subject_users) { create_list(:user, 1) }

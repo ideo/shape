@@ -31,6 +31,7 @@ class ActivityAndNotificationBuilder
       subject_groups: @subject_groups,
       target: @target,
       action: @action,
+      organization: @actor.current_organization,
     )
   end
 
