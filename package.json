@@ -56,6 +56,7 @@
     "mobx-react-router": "^4.0.1",
     "moment-mini": "^2.19.4",
     "parameterize": "^0.1.0",
+    "pluralize": "^7.0.0",
     "prop-types": "^15.6.1",
     "query-string": "5.1.0",
     "react": "^16.3.2",

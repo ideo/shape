@@ -6,6 +6,7 @@ import styled from 'styled-components'
 
 import { CloseButton } from '~/ui/global/styled/buttons'
 import NotificationIcon from '~/ui/icons/NotificationIcon'
+import NotificationsContainer from '~/ui/notifications/NotificationsContainer'
 import CommentIcon from '~/ui/icons/CommentIcon'
 import CommentThreadContainer from '~/ui/threads/CommentThreadContainer'
 
@@ -91,6 +92,7 @@ class ActivityLogBox extends React.Component {
     this.position.h = existingPosition.h || DEFAULT.h
     this.position.x = existingPosition.x || this.defaultX
     this.props.apiStore.fetchThreads()
+    this.props.apiStore.fetchNotifications()
   }
 
   componentWillUnmount() {
@@ -194,6 +196,7 @@ class ActivityLogBox extends React.Component {
   }
 
   renderComments() {
+    const { uiStore } = this.props
     return (
       <div>
         {this.showJumpToThreadButton &&
@@ -213,7 +216,7 @@ class ActivityLogBox extends React.Component {
 
   renderNotifications() {
     return (
-      <div />
+      <NotificationsContainer />
     )
   }
 
@@ -274,8 +277,8 @@ class ActivityLogBox extends React.Component {
               <CloseButton size="lg" onClick={this.handleClose} />
             </StyledHeader>
             { this.currentPage === 'comments' ?
-                this.renderComments() :
-                this.renderNotifications()
+              this.renderComments() :
+              this.renderNotifications()
             }
           </StyledActivityLog>
         </div>
