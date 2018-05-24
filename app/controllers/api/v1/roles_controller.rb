@@ -26,7 +26,6 @@ class Api::V1::RolesController < Api::V1::BaseController
     assigner = Roles::MassAssign.new(
       object: record,
       role_name: role_params[:name],
-      current_user: current_user,
       users: users,
       groups: groups,
       propagate_to_children: true,

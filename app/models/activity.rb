@@ -13,11 +13,11 @@ class Activity < ApplicationRecord
   belongs_to :target, polymorphic: true
   has_many :notifications, dependent: :destroy
 
-  enum action: [
-    :archived,
-    :added_editor,
-    :added_member,
-    :added_admin,
+  enum action: %i[
+    archived
+    added_editor
+    added_member
+    added_admin
   ]
 
   def self.role_name_to_action(role_name)

@@ -104,7 +104,6 @@ class CardMover
         Roles::MassAssign.new(
           object: card.record,
           role_name: role_name,
-          current_user: @current_user,
           users: entity[:users],
           groups: entity[:groups],
           propagate_to_children: true,
