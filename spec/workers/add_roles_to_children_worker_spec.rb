@@ -27,7 +27,6 @@ RSpec.describe AddRolesToChildrenWorker, type: :worker do
         AddRolesToChildrenWorker.new.perform(
           users_to_add.map(&:id),
           groups_to_add.map(&:id),
-          @user,
           role_name,
           collection.id,
           collection.class.name,
@@ -44,7 +43,6 @@ RSpec.describe AddRolesToChildrenWorker, type: :worker do
         AddRolesToChildrenWorker.new.perform(
           users_to_add.map(&:id),
           groups_to_add.map(&:id),
-          @user,
           role_name,
           collection.id,
           collection.class.name,
