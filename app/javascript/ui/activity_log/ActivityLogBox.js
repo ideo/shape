@@ -193,6 +193,30 @@ class ActivityLogBox extends React.Component {
     }
   }
 
+  renderComments() {
+    return (
+      <div>
+        {this.showJumpToThreadButton &&
+          <button onClick={this.jumpToCurrentThread}>
+            <h3>Go to {uiStore.viewingRecord.name}</h3>
+          </button>
+        }
+        {!this.showJumpToThreadButton &&
+          // take up the same amount of space as the button
+          <div style={{ height: '2rem' }} />
+        }
+
+        <CommentThreadContainer />
+      </div>
+    )
+  }
+
+  renderNotifications() {
+    return (
+      <div />
+    )
+  }
+
   render() {
     const { uiStore } = this.props
     if (!uiStore.activityLogOpen) return null
@@ -249,18 +273,10 @@ class ActivityLogBox extends React.Component {
               </Action>
               <CloseButton size="lg" onClick={this.handleClose} />
             </StyledHeader>
-            {this.showJumpToThreadButton &&
-              <button onClick={this.jumpToCurrentThread}>
-                <h3>Go to {uiStore.viewingRecord.name}</h3>
-              </button>
+            { this.currentPage === 'comments' ?
+                this.renderComments() :
+                this.renderNotifications()
             }
-            {!this.showJumpToThreadButton &&
-              // take up the same amount of space as the button
-              <div style={{ height: '2rem' }} />
-            }
-
-            <CommentThreadContainer />
-
           </StyledActivityLog>
         </div>
       </Rnd>

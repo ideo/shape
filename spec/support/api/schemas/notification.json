@@ -1,0 +1,9 @@
+{
+  "type": "object",
+  "properties": {
+    "id": { "type": "integer" },
+    "read": { "type": "boolean" },
+    "created_at": { "type": "date" }
+  },
+  "required": ["id"]
+}

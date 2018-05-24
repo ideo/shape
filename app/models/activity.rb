@@ -12,6 +12,7 @@ class Activity < ApplicationRecord
 
   belongs_to :target, polymorphic: true
   has_many :notifications, dependent: :destroy
+  belongs_to :organization
 
   enum action: %i[
     archived
