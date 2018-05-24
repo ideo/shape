@@ -40,7 +40,7 @@ class ActivityAndNotificationBuilder
       group_user_ids = Group.where(id: @subject_groups.pluck(:id)).user_ids
     end
     all_users = @subject_users + User.where(id: group_user_ids)
-    all_users.each do |user|
+    all_users.uniq.each do |user|
       Notification.create(
         activity: activity,
         user: user

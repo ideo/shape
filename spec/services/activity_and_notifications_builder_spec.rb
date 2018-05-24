@@ -36,5 +36,13 @@ RSpec.describe ActivityAndNotificationBuilder, type: :service do
         expect { builder.call }.to change(Notification, :count).by(2)
       end
     end
+
+    context 'with a user in the same group' do
+      let(:subject_groups) { [create(:group, add_members: [subject_users.first])] }
+
+      it 'does not create two notifications for the user' do
+        expect { builder.call }.to change(Notification, :count).by(1)
+      end
+    end
   end
 end
