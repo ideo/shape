@@ -6,13 +6,13 @@ RSpec.describe CommentThread, type: :model do
     it { should have_many :comments }
   end
 
-  describe '#add_follower!' do
+  describe '#add_user_follower!' do
     let(:comment_thread) { create(:collection_comment_thread) }
     let(:user) { create(:user) }
 
     it 'should create a user thread for the given user' do
       expect {
-        comment_thread.add_follower!(user)
+        comment_thread.add_user_follower!(user)
       }.to change(comment_thread.users_threads, :count).by(1)
       expect(user.comment_threads).to include(comment_thread)
     end

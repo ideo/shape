@@ -27,7 +27,7 @@ FactoryBot.define do
     after(:create) do |comment_thread, evaluator|
       if evaluator.add_followers.present?
         evaluator.add_followers.each do |user|
-          comment_thread.add_follower!(user)
+          comment_thread.add_user_follower!(user)
         end
       end
     end

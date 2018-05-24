@@ -95,6 +95,12 @@ class Group < ApplicationRecord
     resourceable_can_edit?(user)
   end
 
+  # combine admins + members using Group.user_ids method
+  def users
+    user_ids = self.class.where(id: id).user_ids
+    User.where(id: user_ids)
+  end
+
   private
 
   def create_shared_collection

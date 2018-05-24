@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180522000311) do
+ActiveRecord::Schema.define(version: 20180523225540) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -95,6 +95,13 @@ ActiveRecord::Schema.define(version: 20180522000311) do
     t.index ["group_id", "role_id"], name: "index_groups_roles_on_group_id_and_role_id", unique: true
     t.index ["group_id"], name: "index_groups_roles_on_group_id"
     t.index ["role_id"], name: "index_groups_roles_on_role_id"
+  end
+
+  create_table "groups_threads", force: :cascade do |t|
+    t.bigint "group_id"
+    t.bigint "comment_thread_id"
+    t.datetime "created_at", null: false
+    t.index ["group_id", "comment_thread_id"], name: "by_groups_comment_thread", unique: true
   end
 
   create_table "items", force: :cascade do |t|
@@ -201,6 +208,7 @@ ActiveRecord::Schema.define(version: 20180522000311) do
     t.bigint "user_id"
     t.bigint "comment_thread_id"
     t.datetime "last_viewed_at"
+    t.datetime "created_at", null: false
     t.index ["user_id", "comment_thread_id"], name: "by_users_comment_thread", unique: true
   end
 

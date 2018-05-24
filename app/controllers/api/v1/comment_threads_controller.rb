@@ -14,7 +14,8 @@ class Api::V1::CommentThreadsController < Api::V1::BaseController
   before_action :build_thread_and_authorize_record, only: %i[create]
   def create
     if @comment_thread.save
-      render jsonapi: @comment_thread.reload, include: thread_relations
+      AddCommentThreadFollowers.perform_async(@comment_thread.id)
+      render jsonapi: @comment_thread, include: thread_relations
     else
       render_api_errors @collection.errors
     end

@@ -82,7 +82,7 @@ class CardMover
 
   def to_collection_invalid
     # Not allowed to move between organizations
-    if @to_collection.organization_id != @from_collection.organization_id
+    if @card_action == 'move' && @to_collection.organization_id != @from_collection.organization_id
       @errors << 'You can\'t move a collection to a different organization.'
       return true
     end
