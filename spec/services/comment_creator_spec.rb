@@ -10,7 +10,7 @@ RSpec.describe CommentCreator, type: :service do
     CommentCreator.call(
       comment_thread: comment_thread,
       author: author,
-      message: message
+      message: message,
     )
   end
 

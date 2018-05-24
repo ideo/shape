@@ -11,7 +11,7 @@ describe Api::V1::CommentThreadsController, type: :request, json: true, auth: tr
         2,
         add_followers: [user],
         num_comments: 1,
-        organization: user.current_organization
+        organization: user.current_organization,
       )
     end
 
@@ -25,7 +25,7 @@ describe Api::V1::CommentThreadsController, type: :request, json: true, auth: tr
 
     it 'matches JSON schema for thread and comments' do
       expect(json['data'].first['attributes']).to match_json_schema('comment_thread')
-      comment = json['included'].select{ |i| i['type'] == 'comments' }.first
+      comment = json['included'].select { |i| i['type'] == 'comments' }.first
       expect(comment['attributes']).to match_json_schema('comment')
     end
   end
@@ -46,7 +46,7 @@ describe Api::V1::CommentThreadsController, type: :request, json: true, auth: tr
 
       it 'matches JSON schema for thread and comments' do
         expect(json['data']['attributes']).to match_json_schema('comment_thread')
-        comment = json['included'].select{ |i| i['type'] == 'comments' }.first
+        comment = json['included'].select { |i| i['type'] == 'comments' }.first
         expect(comment['attributes']).to match_json_schema('comment')
       end
     end
@@ -60,7 +60,6 @@ describe Api::V1::CommentThreadsController, type: :request, json: true, auth: tr
         expect(response.status).to eq(401)
       end
     end
-
   end
 
   describe 'GET #find_by_record' do
@@ -87,7 +86,7 @@ describe Api::V1::CommentThreadsController, type: :request, json: true, auth: tr
 
     context 'without valid record' do
       let(:record_type) { 'Collection' }
-      let(:record_id) { 999999 }
+      let(:record_id) { 999_999 }
 
       it 'returns a 200' do
         expect(response.status).to eq(200)
@@ -99,15 +98,13 @@ describe Api::V1::CommentThreadsController, type: :request, json: true, auth: tr
   end
 
   describe 'POST #create' do
-    let(:path) { "/api/v1/comment_threads" }
+    let(:path) { '/api/v1/comment_threads' }
     let(:collection) { create(:collection) }
     let(:params) {
       json_api_params(
         'comment_threads',
-        {
-          record_id: collection.id,
-          record_type: 'Collection'
-        }
+        record_id: collection.id,
+        record_type: 'Collection',
       )
     }
 

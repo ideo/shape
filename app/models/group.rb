@@ -27,6 +27,7 @@ class Group < ApplicationRecord
   belongs_to :current_shared_collection,
              class_name: 'Collection',
              optional: true
+  has_many :groups_threads
 
   before_validation :set_handle_if_none, on: :create
 
@@ -96,9 +97,8 @@ class Group < ApplicationRecord
   end
 
   # combine admins + members using Group.user_ids method
-  def users
-    user_ids = self.class.where(id: id).user_ids
-    User.where(id: user_ids)
+  def user_ids
+    self.class.where(id: id).user_ids
   end
 
   private

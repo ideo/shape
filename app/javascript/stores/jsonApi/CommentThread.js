@@ -57,9 +57,4 @@ class CommentThread extends BaseRecord {
 
 CommentThread.type = 'comment_threads'
 
-// CommentThread.defaults = {
-//   // set as array so it's never `undefined`
-//   comments: [],
-// }
-
 export default CommentThread

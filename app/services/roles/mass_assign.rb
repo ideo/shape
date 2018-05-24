@@ -36,6 +36,8 @@ module Roles
       setup_org_membership if @invited_by && @new_role
       notify_users if @invited_by && @new_role
       assign_role_to_groups
+      add_editors_as_comment_thread_followers
+      add_group_members_as_comment_thread_followers
       link_to_shared_collections if @new_role
       add_roles_to_children if @propagate_to_children
       failed_users.blank? && failed_groups.blank?
@@ -86,6 +88,27 @@ module Roles
       else
         AddRolesToChildrenWorker.perform_async(*params)
       end
+    end
+
+    def add_editors_as_comment_thread_followers
+      return unless @role_name.to_sym == Role::EDITOR
+      return unless @object.is_a?(Item) || @object.is_a?(Collection)
+      return unless @object.comment_thread.present?
+      AddCommentThreadFollowers.perform_async(
+        @object.comment_thread.id,
+        @added_users.map(&:id),
+        @added_groups.map(&:id),
+      )
+    end
+
+    def add_group_members_as_comment_thread_followers
+      return unless @object.is_a?(Group)
+      thread_ids = @object.groups_threads.pluck(:comment_thread_id)
+      return if thread_ids.empty?
+      AddCommentThreadFollowers.perform_async(
+        thread_ids,
+        @added_users.map(&:id),
+      )
     end
 
     def link_to_shared_collections

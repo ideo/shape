@@ -99,9 +99,15 @@ RSpec.describe Roles::MassRemove, type: :service do
         let!(:users) { [user] }
         let!(:linked_collection) { create(:collection) }
         let!(:object) { create(:group) }
-        let!(:link) { create(:collection_card_link,
-                             parent: object.current_shared_collection,
-                             collection: linked_collection)}
+        let!(:link) do
+          create(:collection_card_link,
+                 parent: object.current_shared_collection,
+                 collection: linked_collection)
+        end
+        let(:comment_threads) do
+          create_list(:collection_comment_thread, 2, add_group_followers: [object])
+        end
+
         let(:mass_remove) do
           Roles::MassRemove.new(
             object: object,
@@ -118,7 +124,16 @@ RSpec.describe Roles::MassRemove, type: :service do
             users.map(&:id),
             groups.map(&:id),
             [linked_collection.id],
-            [])
+            [],
+          )
+          mass_remove.call
+        end
+
+        it 'should remove users as followers of the group threads' do
+          expect(RemoveCommentThreadFollowers).to receive(:perform_async).with(
+            comment_threads.map(&:id),
+            users.map(&:id),
+          )
           mass_remove.call
         end
 
@@ -176,6 +191,19 @@ RSpec.describe Roles::MassRemove, type: :service do
           collection.id,
           collection.class.name,
           Role::EDITOR,
+          users.map(&:id),
+          groups.map(&:id),
+        )
+        mass_remove.call
+      end
+    end
+
+    context 'with comment_threads' do
+      let(:comment_thread) { create(:comment_thread, record: collection) }
+
+      it 'removes all followers from comment threads if they no longer have access' do
+        expect(RemoveCommentThreadFollowers).to receive(:perform_async).with(
+          comment_thread.id,
           users.map(&:id),
           groups.map(&:id),
         )

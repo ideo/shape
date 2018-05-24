@@ -61,7 +61,8 @@ class Ability
 
       can :create, CommentThread
       can %i[read manage], CommentThread do |comment_thread|
-        comment_thread.record.can_view?(user)
+        # equivalent to comment_thread.record.can_view?
+        comment_thread.can_edit?(user)
       end
     end
 
