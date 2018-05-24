@@ -234,31 +234,6 @@ export const CommentForm = styled.form`
     height: 18px;
   }
 `
-
-export const CommentTextarea = styled(({ textAreaRef, ...rest }) =>
-  <TextareaAutosize innerRef={textAreaRef} {...rest} />)`
-  resize: none;
-  padding: 10px;
-  font-size: 1rem;
-  font-family: ${v.fonts.sans};
-  border: none;
-  background: none;
-
-  :focus {
-    border: none;
-    outline: none;
-  }
-  ::placeholder {
-    color: ${v.colors.gray};
-  }
-  /* TODO: cross-browser friendly way to hide scrollbar?
-    note this is only for a really long comment (>6 rows) */
-  ::-webkit-scrollbar {
-    background: none;
-  }
-`
-CommentForm.displayName = 'CommentForm'
-
 const StyledCommentTextarea = styled.div`
   textarea {
     resize: none;
