@@ -19,4 +19,15 @@ class Activity < ApplicationRecord
     :added_member,
     :added_admin,
   ]
+
+  def self.role_name_to_action(role_name)
+    case role_name
+    when Role::EDITOR
+      Activity.actions[:added_editor]
+    when Role::MEMBER
+      Activity.actions[:added_member]
+    when Role::ADMIN
+      Activity.actions[:added_admin]
+    end
+  end
 end

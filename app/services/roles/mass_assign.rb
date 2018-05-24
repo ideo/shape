@@ -94,18 +94,8 @@ module Roles
     end
 
     def create_activities_and_notifications
-      action = nil
-      # TODO: who is responsible for doing this kinda of thing? make map?
-      if @role_name == Role::EDITOR.to_s
-        action = Activity.actions[:added_editor]
-      elsif @role_name == Role::MEMBER.to_s
-        action = Activity.actions[:added_member]
-      elsif @role_name == Role::ADMIN.to_s
-        action = Activity.actions[:added_admin]
-      end
-      if action.nil?
-        return
-      end
+      action = Activity.role_name_to_action(@role_name.to_sym)
+      return if action.nil?
       builder = ActivityAndNotificationBuilder.new(
         actor: @invited_by,
         target: @object,
