@@ -17,4 +17,17 @@ RSpec.describe CommentThread, type: :model do
       expect(user.comment_threads).to include(comment_thread)
     end
   end
+
+  describe '#add_group_follower!' do
+    let(:comment_thread) { create(:collection_comment_thread) }
+    let(:user) { create(:user) }
+    let(:group) { create(:group, add_members: [user]) }
+
+    it 'should create a group thread and user thread the group\'s users' do
+      expect {
+        comment_thread.add_group_follower!(group)
+      }.to change(comment_thread.groups_threads, :count).by(1)
+      expect(user.comment_threads).to include(comment_thread)
+    end
+  end
 end

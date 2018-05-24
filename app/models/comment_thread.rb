@@ -12,13 +12,17 @@ class CommentThread < ApplicationRecord
   has_many :groups_threads, dependent: :destroy
 
 
+  # NOTE: add_follower methods will only called for editors of the record
   def add_user_follower!(user)
     users_threads.find_or_create_by(user: user)
   end
 
   def add_group_follower!(group)
     groups_thread = groups_threads.find_or_create_by(group: group)
-    groups_thread.add_users_as_followers!
+    # add each user as a follower as well
+    groups_thread.group.users.each do |user|
+      add_user_follower!(user)
+    end
   end
 
   private
