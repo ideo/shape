@@ -1,3 +1,4 @@
+import { Fragment } from 'react'
 import Rnd from 'react-rnd'
 import localStorage from 'mobx-localstorage'
 import { observable, observe, action } from 'mobx'
@@ -198,7 +199,7 @@ class ActivityLogBox extends React.Component {
   renderComments() {
     const { uiStore } = this.props
     return (
-      <div>
+      <Fragment>
         {this.showJumpToThreadButton &&
           <button onClick={this.jumpToCurrentThread}>
             <h3>Go to {uiStore.viewingRecord.name}</h3>
@@ -210,7 +211,7 @@ class ActivityLogBox extends React.Component {
         }
 
         <CommentThreadContainer />
-      </div>
+      </Fragment>
     )
   }
 
