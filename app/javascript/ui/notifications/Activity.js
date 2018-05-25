@@ -30,11 +30,14 @@ class Activity extends React.PureComponent {
 
     switch (action) {
     case 'archived':
-      return <p><strong>{actorName}</strong> has archived the <strong>{targetName} {targetType}</strong></p>
+      return (<p><strong>{actorName}</strong>
+          has archived the <strong>{targetName} {targetType}</strong></p>)
     case 'added_editor':
     case 'added_member':
     case 'added_admin':
-      return <p><strong>{actorName}</strong> has made <strong>{subjects}</strong> a <strong>{roleName}</strong> of the <strong>{targetName} {targetType}</strong></p>
+      return (<p><strong>{actorName}</strong> has made
+        <strong>{subjects}</strong> a <strong>{roleName}</strong>
+        of the <strong>{targetName} {targetType}</strong></p>)
     default:
       return ''
     }
