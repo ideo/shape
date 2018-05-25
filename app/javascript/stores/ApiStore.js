@@ -88,7 +88,7 @@ class ApiStore extends Store {
     const threads = res.data
     const threadIds = []
     threads.forEach((thread) => {
-      thread.importComments(thread.first_comments)
+      thread.importComments(thread.unread_comments, { unread: true })
       threadIds.push(thread.id)
     })
     runInAction(() => {
@@ -130,7 +130,7 @@ class ApiStore extends Store {
         )
         if (res.data && res.data.id) {
           thread = res.data
-          thread.importComments(thread.first_comments)
+          thread.importComments(thread.unread_comments, { unread: true })
         } else {
           // if still not found, set up a new empty record
           thread = new CommentThread({

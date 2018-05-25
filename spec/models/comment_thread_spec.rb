@@ -6,6 +6,31 @@ RSpec.describe CommentThread, type: :model do
     it { should have_many :comments }
   end
 
+  describe '#unread_comments_for' do
+    let(:user) { create(:user) }
+    let(:comment_thread) { create(:collection_comment_thread, num_comments: 2, add_followers: [user]) }
+
+    before do
+      comment_thread.users_threads.first.update(last_viewed_at: 1.day.ago)
+    end
+
+    context 'with unread comments' do
+      it 'should only get the unread comments for the user' do
+        expect(comment_thread.unread_comments_for(user).count).to eq 2
+      end
+    end
+
+    context 'when recently viewed' do
+      before do
+        comment_thread.viewed_by!(user)
+      end
+
+      it 'should not have any unread comments for the user' do
+        expect(comment_thread.unread_comments_for(user).count).to eq 0
+      end
+    end
+  end
+
   describe '#add_user_follower!' do
     let(:comment_thread) { create(:collection_comment_thread) }
     let(:user) { create(:user) }

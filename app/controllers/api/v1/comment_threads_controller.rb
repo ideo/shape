@@ -3,7 +3,7 @@ class Api::V1::CommentThreadsController < Api::V1::BaseController
 
   before_action :load_users_comment_threads, only: %i[index]
   def index
-    render jsonapi: @comment_threads.page(params[:page]).per(10), include: thread_relations
+    render jsonapi: @comment_threads, include: thread_relations
   end
 
   load_and_authorize_resource only: %i[show]
@@ -33,7 +33,7 @@ class Api::V1::CommentThreadsController < Api::V1::BaseController
   private
 
   def thread_relations
-    [:record, first_comments: [:author]]
+    [:record, unread_comments: [:author]]
   end
 
   def comment_thread_params
@@ -59,9 +59,12 @@ class Api::V1::CommentThreadsController < Api::V1::BaseController
 
   def load_users_comment_threads
     # get the 10 most recent; the front-end will re-sort :asc
-    @comment_threads = current_user.comment_threads
-      .where(organization_id: current_user.current_organization_id)
-      .order(updated_at: :desc)
-      .includes(:record, comments: [:author])
+    @comment_threads = current_user
+                       .comment_threads
+                       .where(organization_id: current_user.current_organization_id)
+                       .order(updated_at: :desc)
+                       .includes(:record, comments: [:author])
+                       .page(params[:page])
+                       .per(10)
   end
 end

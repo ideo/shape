@@ -6,7 +6,7 @@ class AddCommentThreadFollowers
     @comment_threads = CommentThread.where(id: comment_thread_ids)
     @user_ids = user_ids
     @group_ids = group_ids
-    if @comment_threads.count == 1
+    if @comment_threads.count == 1 && (user_ids.empty? || group_ids.empty?)
       init_users_and_groups_from_thread(@comment_threads.first)
     end
     add_users_and_groups_as_followers

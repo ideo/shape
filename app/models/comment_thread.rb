@@ -11,10 +11,38 @@ class CommentThread < ApplicationRecord
   has_many :users_threads, dependent: :destroy
   has_many :groups_threads, dependent: :destroy
 
+  def unread_comments_for(user)
+    ut = users_threads.where(user_id: user.id).first
+    return [] unless ut.present?
+    comments
+      .order(updated_at: :desc)
+      .where('updated_at > ?', ut.last_viewed_at)
+  end
+
+  def unread_comment_count_for(user)
+    unread_comments_for(user).count
+  end
+
+  def latest_unread_comments_for(user)
+    unread = unread_comments_for(user)
+    return [] unless unread.present?
+    unread.limit(3)
+  end
+
+  def viewed_by!(user)
+    ut = users_threads.where(user_id: user.id).first
+    return unless ut.present?
+    ut.update_last_viewed!
+  end
+
   # NOTE: add/remove_follower methods will only get called for editors of the record
   # these only get called within background jobs
   def add_user_follower!(user_id)
     users_threads.find_or_create_by(user_id: user_id)
+  rescue ActiveRecord::RecordNotUnique
+    # to make it threadsafe, see: https://apidock.com/rails/ActiveRecord/Relation/find_or_create_by
+    # in the case where it already ran before, no need to do anything
+    nil
   end
 
   def add_group_follower!(group_id)
@@ -23,6 +51,8 @@ class CommentThread < ApplicationRecord
     groups_thread.group.user_ids.each do |user_id|
       add_user_follower!(user_id)
     end
+  rescue ActiveRecord::RecordNotUnique
+    nil
   end
 
   # `user_ids` can be single id or array
@@ -45,6 +75,7 @@ class CommentThread < ApplicationRecord
   end
 
   def can_edit?(user)
+    return false if record.archived?
     # anyone who can view the record can contribute to the comment thread
     record.can_view?(user)
   end

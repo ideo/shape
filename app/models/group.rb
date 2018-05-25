@@ -127,6 +127,7 @@ class Group < ApplicationRecord
   def after_archive_group
     remove_group_from_resources
     archive_group_handle
+    unfollow_group_users_from_group_threads
   end
 
   def remove_group_from_resources
@@ -146,5 +147,14 @@ class Group < ApplicationRecord
 
   def archive_group_handle
     update(handle: "#{handle}-archived-#{Time.now.to_i}")
+  end
+
+  def unfollow_group_users_from_group_threads
+    thread_ids = groups_threads.pluck(:comment_thread_id)
+    return if thread_ids.empty?
+    RemoveCommentThreadFollowers.perform_async(
+      thread_ids,
+      user_ids,
+    )
   end
 end

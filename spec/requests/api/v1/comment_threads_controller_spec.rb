@@ -16,6 +16,8 @@ describe Api::V1::CommentThreadsController, type: :request, json: true, auth: tr
     end
 
     before do
+      # set user last_viewed_at in the past so there will be unread comments
+      comment_threads.first.users_threads.first.update(last_viewed_at: 1.day.ago)
       get(path)
     end
 
@@ -23,19 +25,26 @@ describe Api::V1::CommentThreadsController, type: :request, json: true, auth: tr
       expect(response.status).to eq(200)
     end
 
-    it 'matches JSON schema for thread and comments' do
+    it 'matches JSON schema for thread and unread comments' do
       expect(json['data'].first['attributes']).to match_json_schema('comment_thread')
       comment = json['included'].select { |i| i['type'] == 'comments' }.first
       expect(comment['attributes']).to match_json_schema('comment')
     end
+
+    it 'shows unread comment count' do
+      thread = json['data'].select { |i| i['attributes']['id'].to_i == comment_threads.first.id }.first
+      expect(thread['attributes']['unread_count']).to eq 1
+    end
   end
 
   describe 'GET #show' do
-    let!(:comment_thread) { create(:item_comment_thread, num_comments: 1) }
+    let!(:comment_thread) { create(:item_comment_thread, num_comments: 1, add_followers: [user]) }
     let(:path) { "/api/v1/comment_threads/#{comment_thread.id}" }
 
     context 'with access to record' do
       before do
+        # set user last_viewed_at in the past so there will be unread comments
+        comment_thread.users_threads.first.update(last_viewed_at: 1.day.ago)
         user.add_role(Role::EDITOR, comment_thread.record)
         get(path)
       end
@@ -44,7 +53,7 @@ describe Api::V1::CommentThreadsController, type: :request, json: true, auth: tr
         expect(response.status).to eq(200)
       end
 
-      it 'matches JSON schema for thread and comments' do
+      it 'matches JSON schema for thread and unread comments' do
         expect(json['data']['attributes']).to match_json_schema('comment_thread')
         comment = json['included'].select { |i| i['type'] == 'comments' }.first
         expect(comment['attributes']).to match_json_schema('comment')
