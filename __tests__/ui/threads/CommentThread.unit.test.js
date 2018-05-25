@@ -25,9 +25,9 @@ describe('CommentThread', () => {
   })
 
   describe('with unexpanded thread', () => {
-    it('renders up to two comments if thread is unexpanded', () => {
-      // fakeThread has 3 comments
-      expect(wrapper.find('Comment').length).toEqual(2)
+    it('renders unread comments if thread is unexpanded', () => {
+      // fakeThread has 2 unread_comments
+      expect(wrapper.find('Comment').length).toEqual(props.thread.unread_comments.length)
     })
   })
 
