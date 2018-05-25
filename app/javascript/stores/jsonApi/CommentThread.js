@@ -25,6 +25,9 @@ class CommentThread extends BaseRecord {
 
   async API_fetchComments({ page = 1 } = {}) {
     const apiPath = `comment_threads/${this.id}/comments?page=${page}`
+    // simulate backend effect
+    this.unread_comments.replace([])
+    this.unread_count = 0
     const res = await this.apiStore.request(apiPath, 'GET')
     this.importComments(res.data)
   }
@@ -49,12 +52,21 @@ class CommentThread extends BaseRecord {
     this.importComments([comment])
   }
 
-  @action importComments(data) {
+  @action importComments(data, { unread = false } = {}) {
     const newComments = _.union(this.comments.toJS(), data)
+    if (unread) {
+      data.forEach(comment => comment.markAsUnread())
+    } else {
+      data.forEach(comment => comment.markAsRead())
+    }
     this.comments.replace(newComments)
   }
 }
 
 CommentThread.type = 'comment_threads'
+
+CommentThread.defaults = {
+  unread_comments: [],
+}
 
 export default CommentThread

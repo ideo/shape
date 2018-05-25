@@ -6,6 +6,7 @@ import styled from 'styled-components'
 import Dotdotdot from 'react-dotdotdot'
 
 import CollectionIcon from '~/ui/icons/CollectionIcon'
+import CommentIconFilled from '~/ui/icons/CommentIconFilled'
 import TextIcon from '~/ui/icons/TextIcon'
 import v, { ITEM_TYPES } from '~/utils/variables'
 import hexToRgba from '~/utils/hexToRgba'
@@ -37,11 +38,6 @@ const StyledCommentThread = styled.div`
     font-family: ${v.fonts.sans};
     font-weight: 500;
     font-size: 0.75rem;
-    .name {
-      font-size: 1.25rem;
-      line-height: 1.5rem;
-      text-transform: uppercase;
-    }
   }
   .comments {
     margin: 0 10px 0 68px;
@@ -93,8 +89,35 @@ const StyledHeader = styled.div`
     margin-right: 8px;
   }
 
-  *:last-child {
+  .timestamp {
     margin-left: auto;
+  }
+
+  .name {
+    font-size: 1.25rem;
+    line-height: 1.5rem;
+    text-transform: uppercase;
+  }
+  .unread {
+    color: ${v.colors.orange};
+    display: flex;
+    flex-basis: content;
+    height: 12px;
+    width: 25px;
+    margin-left: 10px;
+    svg {
+      margin-left: 4px;
+      height: 100%;
+      width: 100%;
+    }
+    .inner {
+      display: flex;
+      opacity: 0;
+      transition: opacity 1s 2s ease;
+    }
+    &.show-unread .inner {
+      opacity: 1;
+    }
   }
 `
 
@@ -115,10 +138,17 @@ const ThumbnailHolder = styled.span`
 class CommentThread extends React.Component {
   @observable message = ''
   @observable titleLines = 1
+  // we store this locally so that it can fade out after unread == 0,
+  // but we still display the old number
+  @observable unreadCount = 0
 
   componentDidMount() {
     this.focusTextArea(this.props.expanded)
     this.countLines()
+    runInAction(() => {
+      const { thread } = this.props
+      this.unreadCount = thread.unread_count
+    })
   }
 
   componentWillReceiveProps({ expanded }) {
@@ -141,11 +171,13 @@ class CommentThread extends React.Component {
   }
 
   get comments() {
-    const { expanded } = this.props
-    let { comments } = this.props.thread
+    const { expanded, thread } = this.props
+    let { comments } = thread
+    // for un-expanded thread, only take the unread comments
+    if (!expanded) {
+      comments = thread.unread_comments
+    }
     comments = _.sortBy(comments, ['updated_at'])
-    // for un-expanded thread, only take the last two
-    if (!expanded) comments = comments.slice(-2)
     return comments
   }
 
@@ -184,6 +216,18 @@ class CommentThread extends React.Component {
     return <ThumbnailHolder>{content}</ThumbnailHolder>
   }
 
+  renderUnreadCount = () => {
+    const { thread } = this.props
+    return (
+      <span className={`unread ${thread.unread_count && 'show-unread'}`}>
+        <span className="inner">
+          { this.unreadCount }
+          <CommentIconFilled />
+        </span>
+      </span>
+    )
+  }
+
   renderComments = () => (
     this.comments.map(comment => (
       <Comment key={comment.id} comment={comment} />
@@ -197,15 +241,18 @@ class CommentThread extends React.Component {
       <StyledCommentThread expanded={expanded}>
         <button className="title" onClick={this.props.onClick}>
           <StyledHeader lines={this.titleLines}>
-            {this.renderThumbnail()}
+            { this.renderThumbnail() }
             <Dotdotdot clamp={2}>
               <span className="name" ref={(r) => { this.title = r }}>
                 { thread.record.name }
               </span>
             </Dotdotdot>
-            <Moment
-              date={thread.updated_at}
-            />
+            <span className="timestamp">
+              <Moment
+                date={thread.updated_at}
+              />
+            </span>
+            { this.renderUnreadCount() }
           </StyledHeader>
         </button>
         <div className="comments">

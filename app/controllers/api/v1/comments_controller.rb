@@ -1,6 +1,7 @@
 class Api::V1::CommentsController < Api::V1::BaseController
   load_and_authorize_resource :comment_thread, only: %i[index create]
   def index
+    @comment_thread.viewed_by!(current_user)
     render jsonapi: @comment_thread.comments.page(params[:page]), include: [:author]
   end
 

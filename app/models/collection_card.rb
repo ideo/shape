@@ -138,6 +138,7 @@ class CollectionCard < ApplicationRecord
       # touch parent to bust cache
       parent.touch
     end
+    record.try(:remove_comment_followers!)
   end
 
   def self.with_record(record)
