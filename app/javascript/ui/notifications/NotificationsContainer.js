@@ -10,6 +10,12 @@ class NotificationsContainer extends React.Component {
     return apiStore.findAll('notifications') || []
   }
 
+  unreadCount() {
+    return this.notifications
+      .filter(notification => !notification.read)
+      .length
+  }
+
   render() {
     const { notifications } = this
     return (
