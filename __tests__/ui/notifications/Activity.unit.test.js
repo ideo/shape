@@ -62,6 +62,30 @@ describe('Activity', () => {
         expect(findPart('roleName').text()).toEqual('member')
       })
     })
+
+    describe('with a comment', () => {
+      beforeEach(() => {
+        props.action = 'commented'
+        props.target = {
+          comments: [{}, { message: 'Some message' }],
+          record: { name: 'Great collection', internalType: 'collections' },
+          internalType: 'comments'
+        }
+        wrapper.setProps(props)
+      })
+
+      it('should show the actor', () => {
+        expect(findPart('actor').text()).toEqual(fakeUser.name)
+      })
+
+      it('should have the target', () => {
+        expect(findPart('target').text()).toEqual('Great collection')
+      })
+
+      it('should have the message of the last comment', () => {
+        expect(findPart('message').text()).toEqual('Some message')
+      })
+    })
   })
 
   describe('isRoleAction', () => {

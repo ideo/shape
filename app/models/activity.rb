@@ -19,6 +19,7 @@ class Activity < ApplicationRecord
     added_editor
     added_member
     added_admin
+    commented
   ]
 
   def self.role_name_to_action(role_name)
