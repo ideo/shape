@@ -42,9 +42,28 @@ class ActivityAndNotificationBuilder
     end
     all_users = @subject_users + User.where(id: group_user_ids)
     all_users.uniq.each do |user|
+
       Notification.create(
         activity: activity,
-        user: user
+        user: user,
+      )
+    end
+  end
+
+  def find_existing_notifications(activity, user)
+    # Get all unread notifications for this comment on this target per user
+    existing = Notification.where(
+      target: @target,
+      action: @action,
+      subject_users: user,
+      unread: true)
+
+    if existing.count > 3
+      # Condense the existing 3 down to one notification
+      existing.destroy_all
+      Notification.create(
+        activity: activity,
+        user: user,
       )
     end
   end
