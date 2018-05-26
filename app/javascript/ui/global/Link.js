@@ -10,6 +10,7 @@ const Link = styled(RouterLink)`
     text-decoration: underline;
   }
 `
+Link.displayName = 'Link'
 
 /** @component */
 export default Link

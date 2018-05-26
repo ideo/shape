@@ -5,6 +5,7 @@ import _ from 'lodash'
 import styled from 'styled-components'
 import Dotdotdot from 'react-dotdotdot'
 
+import Link from '~/ui/global/Link'
 import CollectionIcon from '~/ui/icons/CollectionIcon'
 import CommentIconFilled from '~/ui/icons/CommentIconFilled'
 import TextIcon from '~/ui/icons/TextIcon'
@@ -14,6 +15,7 @@ import Moment from '~/ui/global/Moment'
 import ReturnArrowIcon from '~/ui/icons/ReturnArrowIcon'
 import { CommentForm, CommentTextarea } from '~/ui/global/styled/forms'
 import Comment from './Comment'
+import { routingStore } from '~/stores'
 
 const StyledCommentThread = styled.div`
   .title {
@@ -133,6 +135,7 @@ const ThumbnailHolder = styled.span`
     width: 100%;
   }
 `
+ThumbnailHolder.displayName = 'ThumbnailHolder'
 
 @observer
 class CommentThread extends React.Component {
@@ -195,6 +198,18 @@ class CommentThread extends React.Component {
     this.props.afterSubmit()
   }
 
+  objectLink() {
+    const { thread } = this.props
+    const { record } = thread
+
+    if (record.internalType === 'collections') {
+      return routingStore.pathTo('collections', record.id)
+    } else if (record.internalType === 'items') {
+      return routingStore.pathTo('items', record.id)
+    }
+    return '/'
+  }
+
   renderThumbnail() {
     const { thread } = this.props
     const { record } = thread
@@ -213,7 +228,11 @@ class CommentThread extends React.Component {
         content = <CollectionIcon viewBox="50 50 170 170" />
       }
     }
-    return <ThumbnailHolder>{content}</ThumbnailHolder>
+    return (
+      <Link to={this.objectLink()}>
+        <ThumbnailHolder>{content}</ThumbnailHolder>
+      </Link>
+    )
   }
 
   renderUnreadCount = () => {
