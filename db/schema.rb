@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180524202508) do
+ActiveRecord::Schema.define(version: 20180529175444) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -75,6 +75,8 @@ ActiveRecord::Schema.define(version: 20180524202508) do
     t.string "record_type"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.bigint "organization_id"
+    t.index ["organization_id"], name: "index_comment_threads_on_organization_id"
     t.index ["record_id"], name: "index_comment_threads_on_record_id", unique: true
   end
 
@@ -118,6 +120,13 @@ ActiveRecord::Schema.define(version: 20180524202508) do
     t.index ["role_id"], name: "index_groups_roles_on_role_id"
   end
 
+  create_table "groups_threads", force: :cascade do |t|
+    t.bigint "group_id"
+    t.bigint "comment_thread_id"
+    t.datetime "created_at", null: false
+    t.index ["group_id", "comment_thread_id"], name: "by_groups_comment_thread", unique: true
+  end
+
   create_table "items", force: :cascade do |t|
     t.string "name"
     t.string "type"
@@ -142,6 +151,7 @@ ActiveRecord::Schema.define(version: 20180524202508) do
     t.bigint "user_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "combined_activities_ids", default: [], array: true
     t.index ["activity_id"], name: "index_notifications_on_activity_id"
     t.index ["user_id"], name: "index_notifications_on_user_id"
   end
@@ -226,6 +236,14 @@ ActiveRecord::Schema.define(version: 20180524202508) do
     t.index ["role_id"], name: "index_users_roles_on_role_id"
     t.index ["user_id", "role_id"], name: "index_users_roles_on_user_id_and_role_id", unique: true
     t.index ["user_id"], name: "index_users_roles_on_user_id"
+  end
+
+  create_table "users_threads", force: :cascade do |t|
+    t.bigint "user_id"
+    t.bigint "comment_thread_id"
+    t.datetime "last_viewed_at"
+    t.datetime "created_at", null: false
+    t.index ["user_id", "comment_thread_id"], name: "by_users_comment_thread", unique: true
   end
 
   add_foreign_key "collections", "organizations"

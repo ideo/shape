@@ -6,13 +6,15 @@ class ActivityAndNotificationBuilder
     target:,
     action:,
     subject_users: [],
-    subject_groups: []
+    subject_groups: [],
+    combine: false
   )
     @actor = actor
     @target = target
     @action = action
     @subject_users = subject_users
     @subject_groups = subject_groups
+    @combine = combine
     @errors = []
     @activity = nil
   end
@@ -42,29 +44,39 @@ class ActivityAndNotificationBuilder
     end
     all_users = @subject_users + User.where(id: group_user_ids)
     all_users.uniq.each do |user|
-
       Notification.create(
         activity: activity,
         user: user,
       )
+      combine_existing_notifications(user) if @combine
     end
   end
 
-  def find_existing_notifications(activity, user)
-    # Get all unread notifications for this comment on this target per user
-    existing = Notification.where(
-      target: @target,
-      action: @action,
-      subject_users: user,
-      unread: true)
+  def find_similar_activities
+    Activity
+      .where(target: @target,
+             action: @action)
+  end
 
-    if existing.count > 3
-      # Condense the existing 3 down to one notification
-      existing.destroy_all
-      Notification.create(
-        activity: activity,
-        user: user,
-      )
-    end
+  def find_similar_notifications(user, similar_activities)
+    Notification.where(
+      activity_id: similar_activities.map(&:id),
+      user: user,
+      read: false,
+    )
+  end
+
+  def combine_existing_notifications(user)
+    # Find similar notifications based on target and action (multiple comments) TODO: don't run this for each user
+    similar_activities = find_similar_activities
+    similar_notifications = find_similar_notifications(user, similar_activities)
+    return unless similar_notifications.count > 2 ||
+      similar_notifications.first.combined_activities_ids.count > 0
+    # Condense the existing 3 down to one notification
+    Notification.create(
+      activity: activity,
+      user: user,
+      combined_activities_ids: similar_notifications.map(&:activity).map(&:id),
+    )
   end
 end

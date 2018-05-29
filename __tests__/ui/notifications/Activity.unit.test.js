@@ -13,7 +13,7 @@ describe('Activity', () => {
   beforeEach(() => {
     props = {
       action: fakeActivity.action,
-      actor: fakeActivity.actor,
+      actors: [fakeActivity.actor],
       target: fakeActivity.target,
       subjectUsers: fakeActivity.subject_users,
       subjectGroups: fakeActivity.subject_groups,
@@ -84,6 +84,34 @@ describe('Activity', () => {
 
       it('should have the message of the last comment', () => {
         expect(findPart('message').text()).toEqual('Some message')
+      })
+    })
+
+    describe('with multiple actors', () => {
+      beforeEach(() => {
+        props.actors = [fakeActivity.actor, { id: 200, name: 'Boo' }]
+        wrapper.setProps(props)
+      })
+
+      it('should put a comma between each actor', () => {
+        expect(findPart('actor').text()).toEqual(`${fakeUser.name}, Boo`)
+      })
+
+      describe('with more then 3 actors', () => {
+        beforeEach(() => {
+          props.actors = [
+            ...props.actors,
+            { id: 201, name: 'Lia' },
+            { id: 202, name: 'Joe' },
+            { id: 203, name: 'Jan' },
+          ]
+          wrapper.setProps(props)
+          wrapper.update()
+        })
+
+        it('should say how many people without individual names', () => {
+          expect(findPart('actor').text()).toEqual('5 people')
+        })
       })
     })
   })

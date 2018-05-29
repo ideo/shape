@@ -204,6 +204,7 @@ export const fakeNotification = {
   type: 'notifications',
   read: false,
   activity: fakeActivity,
+  combined_activities: [],
   user: fakeUser,
   ...fakeJsonApiAttrs,
 }

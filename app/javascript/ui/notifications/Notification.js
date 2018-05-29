@@ -13,13 +13,22 @@ class Notification extends React.PureComponent {
     notification.save()
   }
 
+  combineActors() {
+    const { notification } = this.props
+    if (!notification.combined_activities || !notification.combined_activities.length) {
+      return [notification.activity.actor]
+    }
+    return notification.combined_activities.map(activity =>
+      activity.actor)
+  }
+
   render() {
     const { notification } = this.props
     const { activity } = notification
     return (
       <Activity
         action={activity.action}
-        actor={activity.actor}
+        actors={this.combineActors()}
         target={activity.target}
         subjectUsers={activity.subjectUsers}
         subjectGroups={activity.subjectGroups}
