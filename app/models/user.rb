@@ -193,6 +193,17 @@ class User < ApplicationRecord
     groups.compact.uniq
   end
 
+  def unread_notifications
+    Notification
+      .joins(:activity)
+      .where(Activity.arel_table[:organization_id].eq(
+               current_organization_id))
+      .where(
+        user: self,
+        read: false,
+      )
+  end
+
   private
 
   def after_role_update(role)
