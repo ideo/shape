@@ -11,7 +11,7 @@ class Api::V1::CommentsController < Api::V1::BaseController
         actor: current_user,
         target: @comment_thread,
         action: Activity.actions[:commented],
-        subject_users: [User.find(22)],
+        subject_users: [],
         subject_groups: [],
         combine: true,
       ).call
