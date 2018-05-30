@@ -26,13 +26,9 @@ class CommentThreadContainer extends React.Component {
 
   constructor(props) {
     super(props)
-    this.disposer = observe(props.uiStore, 'expandedThread', change => {
-      const expandedThread = change.newValue
-      if (expandedThread) {
-        const thread = this.threads.filter(t => t.id === expandedThread)[0]
-        if (thread) {
-          this.scrollToTopOfNextThread(thread)
-        }
+    this.disposer = observe(props.uiStore, 'expandedThreadKey', async (change) => {
+      if (change.newValue) {
+        this.handleExpandedThreadChange(change.newValue)
       }
     })
   }
@@ -40,6 +36,16 @@ class CommentThreadContainer extends React.Component {
   componentWillUnmount() {
     // cancel the observer
     this.disposer()
+  }
+
+  handleExpandedThreadChange = async (expandedThreadKey) => {
+    const thread = this.threads.filter(t => t.key === expandedThreadKey)[0]
+    if (!thread) return
+    // don't try to load comments of our newly constructed threads
+    if (thread.__persisted && thread.id) {
+      await thread.API_fetchComments()
+    }
+    this.scrollToTopOfNextThread(thread)
   }
 
   get threads() {
@@ -51,16 +57,10 @@ class CommentThreadContainer extends React.Component {
     document.getElementById('ctc-content').clientHeight
   )
 
-  toggleThreadExpanded = thread => () => {
+  expandThread = thread => () => {
     const { uiStore } = this.props
-    const { id } = thread
-    const expandedThread = uiStore.expandedThread === id ? null : id
-    if (!expandedThread) {
-      // when compacting, scroll back up to the top of this thread
-      this.scrollToTopOfThread(thread)
-      return
-    }
-    uiStore.update('expandedThread', expandedThread)
+    const { key } = thread
+    uiStore.expandThread(key)
   }
 
   scrollToTopOfThread = thread => {
@@ -74,7 +74,6 @@ class CommentThreadContainer extends React.Component {
   scrollToTopOfNextThread = thread => {
     const idx = this.threads.indexOf(thread)
     const nextIdx = idx + 1
-
     // have to wait for this thread to expand so the next one is actually lower,
     // then we can scroll down to the top of the next thread.
     setTimeout(() => {
@@ -82,25 +81,25 @@ class CommentThreadContainer extends React.Component {
         ...this.scrollOpts,
         offset: -1 * this.contentHeight(),
       })
-    }, 100)
+    }, 50)
   }
 
   afterSubmit = thread => () => {
     this.scrollToTopOfNextThread(thread)
   }
 
-  isExpanded = id => {
+  isExpanded = key => {
     const { uiStore } = this.props
-    return uiStore.expandedThread === id
+    return uiStore.expandedThreadKey === key
   }
 
   renderThreads = () => (
     this.threads.map((thread, i) => (
-      <ScrollElement name={`thread-${i}`} key={thread.id}>
+      <ScrollElement name={`thread-${i}`} key={thread.key}>
         <CommentThread
           thread={thread}
-          expanded={this.isExpanded(thread.id)}
-          onClick={this.toggleThreadExpanded(thread)}
+          expanded={this.isExpanded(thread.key)}
+          onClick={this.expandThread(thread)}
           afterSubmit={this.afterSubmit(thread)}
         />
       </ScrollElement>

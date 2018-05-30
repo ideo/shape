@@ -171,9 +171,7 @@ class ActivityLogBox extends React.Component {
     const { apiStore, uiStore } = this.props
     const thread = apiStore.findThreadForRecord(uiStore.viewingRecord)
     if (!thread) return
-    // reset it first, that way if it's expanded offscreen, it will get re-opened/scrolled to
-    uiStore.update('expandedThread', null)
-    uiStore.update('expandedThread', thread.id)
+    uiStore.expandThread(thread.key)
   }
 
   get mobileProps() {

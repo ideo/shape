@@ -42,7 +42,7 @@ export default {
     cloudy: '#a89f9b',
     sirocco: '#6a7c7e',
     blackLava: '#120f0e',
-    error: '#d66742',
+    orange: '#d66742',
   },
 
   iconSizes: {

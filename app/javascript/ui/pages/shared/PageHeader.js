@@ -41,7 +41,8 @@ class PageHeader extends React.Component {
 
   toggleActivityLog() {
     const { uiStore } = this.props
-    uiStore.update('activityLogOpen', !uiStore.activityLogOpen)
+    const val = !uiStore.activityLogOpen
+    uiStore.update('activityLogOpen', val)
   }
 
   updateRecordName = (name) => {

@@ -10,7 +10,9 @@ import UserAvatar from '~/ui/users/UserAvatar'
 const StyledComment = styled.div`
   padding: 10px;
   margin-bottom: 5px;
-  background: ${v.colors.activityMedBlue};
+  background: ${props => (props.unread ? v.colors.activityLightBlue : v.colors.activityMedBlue)};
+
+  transition: background 1s 0.5s ease;
 
   &:last-child {
     margin-bottom: 0;
@@ -24,9 +26,8 @@ const StyledComment = styled.div`
 class Comment extends React.Component {
   render() {
     const { comment } = this.props
-
     return (
-      <StyledComment>
+      <StyledComment unread={comment.unread}>
         <InlineRow align="center">
           <UserAvatar
             user={comment.author}

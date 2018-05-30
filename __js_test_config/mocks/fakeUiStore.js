@@ -49,7 +49,8 @@ const fakeUiStore = {
   cardAction: 'move',
   blurContent: false,
   organizationMenuPage: 'organizationMenuPage',
-  expandedThread: null,
+  expandedThreadKey: null,
+  expandThread: jest.fn(),
 }
 
 export default fakeUiStore

@@ -126,7 +126,7 @@ export default styled.div`
     margin-top: 0.5rem;
     margin-left: 0.5rem;
     font-size: 0.9rem;
-    color: ${v.colors.error};
+    color: ${v.colors.orange};
   }
 
   @media screen and (min-width: 30em) {

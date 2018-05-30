@@ -2,8 +2,9 @@ require 'rails_helper'
 
 RSpec.describe CardMover, type: :service do
   let(:user) { create(:user) }
-  let(:from_collection) { create(:collection, num_cards: 3) }
-  let(:to_collection) { create(:collection, num_cards: 3) }
+  let(:organization) { create(:organization) }
+  let(:from_collection) { create(:collection, organization: organization, num_cards: 3) }
+  let(:to_collection) { create(:collection, organization: organization, num_cards: 3) }
   let!(:moving_cards) { from_collection.collection_cards }
   let(:cards) { moving_cards }
   let(:placement) { 'beginning' }
@@ -99,14 +100,35 @@ RSpec.describe CardMover, type: :service do
     context 'with invalid move' do
       let(:parent_collection) { create(:collection) }
       let(:parent_collection_card) { create(:collection_card, collection: parent_collection) }
-      let(:from_collection) { create(:collection, num_cards: 3, parent_collection_card: parent_collection_card) }
       let(:to_parent_collection_card) { create(:collection_card, parent: from_collection) }
-      let(:to_collection) { create(:collection, num_cards: 3, parent_collection_card: to_parent_collection_card) }
       let(:cards) { [to_parent_collection_card] }
 
-      it 'should produce errors if collection is moving inside itself' do
-        expect(card_mover.call).to be false
-        expect(card_mover.errors).to match_array ['You can\'t move a collection inside of itself.']
+      context 'moving inside itself' do
+        let(:from_collection) do
+          create(:collection, organization: organization, num_cards: 3, parent_collection_card: parent_collection_card)
+        end
+        let(:to_collection) do
+          create(:collection, organization: organization, num_cards: 3, parent_collection_card: to_parent_collection_card)
+        end
+
+        it 'should produce errors' do
+          expect(card_mover.call).to be false
+          expect(card_mover.errors).to match_array ["You can't move a collection inside of itself."]
+        end
+      end
+
+      context 'moving between orgs' do
+        let(:from_collection) do
+          create(:collection, num_cards: 3, parent_collection_card: parent_collection_card)
+        end
+        let(:to_collection) do
+          create(:collection, num_cards: 3, parent_collection_card: to_parent_collection_card)
+        end
+
+        it 'should produce errors' do
+          expect(card_mover.call).to be false
+          expect(card_mover.errors).to match_array ["You can't move a collection to a different organization."]
+        end
       end
     end
   end

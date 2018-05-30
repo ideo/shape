@@ -9,6 +9,7 @@ class Collection < ApplicationRecord
 
   archivable as: :parent_collection_card,
              with: %i[collection_cards cards_linked_to_this_collection]
+  after_archive :remove_comment_followers!
   acts_as_taggable
 
   store_accessor :cached_attributes,
@@ -317,6 +318,11 @@ class Collection < ApplicationRecord
     "#{jsonapi_cache_key}" \
       "/cards_#{collection_cards.maximum(:updated_at).to_i}" \
       "/roles_#{roles.maximum(:updated_at).to_i}"
+  end
+
+  def remove_comment_followers!
+    return unless comment_thread.present?
+    RemoveCommentThreadFollowers.perform_async(comment_thread.id)
   end
 
   private

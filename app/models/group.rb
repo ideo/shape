@@ -28,6 +28,7 @@ class Group < ApplicationRecord
   belongs_to :current_shared_collection,
              class_name: 'Collection',
              optional: true
+  has_many :groups_threads
 
   has_many :activities_as_subject, through: :activity_subjects, class_name: 'Activity'
   has_many :activity_subjects, as: :subject
@@ -99,6 +100,11 @@ class Group < ApplicationRecord
     resourceable_can_edit?(user)
   end
 
+  # combine admins + members using Group.user_ids method
+  def user_ids
+    self.class.where(id: id).user_ids
+  end
+
   private
 
   def create_shared_collection
@@ -125,6 +131,7 @@ class Group < ApplicationRecord
   def after_archive_group
     remove_group_from_resources
     archive_group_handle
+    unfollow_group_users_from_group_threads
   end
 
   def remove_group_from_resources
@@ -144,5 +151,14 @@ class Group < ApplicationRecord
 
   def archive_group_handle
     update(handle: "#{handle}-archived-#{Time.now.to_i}")
+  end
+
+  def unfollow_group_users_from_group_threads
+    thread_ids = groups_threads.pluck(:comment_thread_id)
+    return if thread_ids.empty?
+    RemoveCommentThreadFollowers.perform_async(
+      thread_ids,
+      user_ids,
+    )
   end
 end

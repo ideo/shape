@@ -24,7 +24,8 @@ describe('CommentThreadContainer', () => {
   })
 
   it('can toggle a thread being expanded', () => {
-    component.toggleThreadExpanded({ id: 1 })()
-    expect(uiStore.update).toHaveBeenCalledWith('expandedThread', 1)
+    const key = 'abc123'
+    component.expandThread({ key })()
+    expect(uiStore.expandThread).toHaveBeenCalledWith(key)
   })
 })

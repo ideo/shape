@@ -6,6 +6,7 @@ class SerializableUser < BaseJsonSerializer
              :show_helper
   belongs_to :current_organization
   has_many :organizations
+  has_many :comment_threads
   has_many :groups do
     data { @object.current_org_groups_and_special_groups }
   end

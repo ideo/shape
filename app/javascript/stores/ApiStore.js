@@ -1,4 +1,4 @@
-import { action, observable, computed } from 'mobx'
+import { action, runInAction, observable, computed } from 'mobx'
 import { Store } from 'mobx-jsonapi-store'
 import _ from 'lodash'
 import moment from 'moment-mini'
@@ -18,9 +18,21 @@ import CommentThread from './jsonApi/CommentThread'
 
 class ApiStore extends Store {
   @observable currentUserId = null
+  @observable currentUserThreadIds = []
+  @observable currentPageThreadKey = null
 
   @action setCurrentUserId(id) {
     this.currentUserId = id
+  }
+
+  @action setCurrentPageThreadKey(key) {
+    this.currentPageThreadKey = key
+  }
+
+  @action addCurrentUserThread(id) {
+    // no need to do anything if we're already on this thread
+    if (this.currentUserThreadIds.indexOf(id) > -1) return
+    this.currentUserThreadIds.push(id)
   }
 
   @computed get currentUser() {
@@ -73,15 +85,26 @@ class ApiStore extends Store {
   }
 
   async fetchThreads() {
-    // this.findAll('comment_threads')
-    return this.fetchAll('comment_threads')
+    // This is actually fetching the current user's / current org threads
+    const res = await this.fetchAll('comment_threads')
+    const threads = res.data
+    const threadIds = []
+    threads.forEach((thread) => {
+      thread.importComments(thread.unread_comments, { unread: true })
+      threadIds.push(thread.id)
+    })
+    runInAction(() => {
+      // NOTE: we aren't currently doing pagination here, but when we do...
+      // will probably do some kind of union/merge rather than replace
+      this.currentUserThreadIds.replace(threadIds)
+    })
   }
 
   findThreadForRecord(record) {
     let thread = null
     // look within our local store
     this.findAll('comment_threads').forEach(ct => {
-      if (ct.record.id === record.id) {
+      if (ct.record && ct.record.id === record.id) {
         thread = ct
       }
     })
@@ -109,11 +132,10 @@ class ApiStore extends Store {
         )
         if (res.data && res.data.id) {
           thread = res.data
+          thread.importComments(thread.unread_comments, { unread: true })
         } else {
           // if still not found, set up a new empty record
           thread = new CommentThread({
-            // assign a fake id so that it has a unique key
-            id: `new-${record.id}-${record.internalType}`,
             record_id: record.id,
             record_type: record.className,
             updated_at: new Date()
@@ -125,13 +147,20 @@ class ApiStore extends Store {
         console.warn(e)
       }
     }
+    this.setCurrentPageThreadKey(thread.key)
     return thread
   }
 
   @computed get currentThreads() {
     return _.filter(
       _.sortBy(this.findAll('comment_threads'), t => moment(t.updated_at)),
-      t => t.record && t.record.id
+      t => {
+        // don't include any new records that are being constructed
+        if (!t.record || !t.record.id) return false
+        // include the current page thread even if you're not following
+        if (t.key === this.currentPageThreadKey) return true
+        return this.currentUserThreadIds.indexOf(t.id) > -1
+      }
     )
   }
 
