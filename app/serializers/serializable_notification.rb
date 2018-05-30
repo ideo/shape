@@ -4,11 +4,11 @@ class SerializableNotification < BaseJsonSerializer
   belongs_to :activity
   belongs_to :user
 
-  has_many :combined_activites do
+  has_many :combined_activities do
     data do
       Activity.where(id: @object.combined_activities_ids)
               .limit(3)
-              .order(order: :asc)
+              .order(created_at: :desc)
     end
   end
 end

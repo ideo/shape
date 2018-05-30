@@ -70,13 +70,20 @@ class ActivityAndNotificationBuilder
     # Find similar notifications based on target and action (multiple comments) TODO: don't run this for each user
     similar_activities = find_similar_activities
     similar_notifications = find_similar_notifications(user, similar_activities)
-    return unless similar_notifications.count > 2 ||
-      similar_notifications.first.combined_activities_ids.count > 0
+    if similar_notifications.count > 2
+      activity_ids = similar_notifications.map(&:activity).map(&:id)
+    elsif similar_notifications.first.combined_activities_ids.count > 0
+      activity_ids = similar_notifications.first.combined_activities_ids
+    else
+      return
+    end
     # Condense the existing 3 down to one notification
+    # TODO:
     Notification.create(
       activity: activity,
       user: user,
-      combined_activities_ids: similar_notifications.map(&:activity).map(&:id),
+      combined_activities_ids: activity_ids,
     )
+    similar_notifications.destroy_all
   end
 end
