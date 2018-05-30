@@ -1,3 +1,4 @@
+import _ from 'lodash'
 import PropTypes from 'prop-types'
 import pluralize from 'pluralize'
 
@@ -18,7 +19,7 @@ class Activity extends React.PureComponent {
     if (actors.length > MAX_ACTORS || actorCount > MAX_ACTORS) {
       return `${actorCount} people`
     }
-    return actors.map(actor => actor.name).join(', ')
+    return _.uniq(actors).map(actor => actor.name).join(', ')
   }
 
   getDataText() {

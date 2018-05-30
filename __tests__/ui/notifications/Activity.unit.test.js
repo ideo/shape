@@ -99,6 +99,18 @@ describe('Activity', () => {
         expect(findPart('actor').text()).toEqual(`${fakeUser.name}, Boo`)
       })
 
+      describe('with the same 2 actors', () => {
+        beforeEach(() => {
+          props.actors = [fakeActivity.actor, fakeActivity.actor]
+          props.actorCount = 2
+          wrapper.setProps(props)
+        })
+
+        it('should just show one actor', () => {
+          expect(findPart('actor').text()).toEqual(`${fakeUser.name}`)
+        })
+      })
+
       describe('with more then 3 actors', () => {
         beforeEach(() => {
           props.actors = [
