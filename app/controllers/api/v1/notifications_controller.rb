@@ -5,7 +5,7 @@ class Api::V1::NotificationsController < Api::V1::BaseController
   def index
     render jsonapi: current_organization_notifications, include: [
       combined_activities: %i[actor],
-      activity: %i[actor target subject_users subject_groups],
+      activity: [:actor, :subject_users, :subject_groups, target: [:record, :unread_comments] ],
     ]
   end
 

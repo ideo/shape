@@ -2,11 +2,15 @@ import _ from 'lodash'
 import PropTypes from 'prop-types'
 import pluralize from 'pluralize'
 
+import Link from '~/ui/global/Link'
+import { routingStore } from '~/stores'
+
 function insertCommas(subjectUsers, subjectGroups) {
   return (subjectUsers.map(u => u.name).concat(subjectGroups.map(g => g.name))).join(', ')
 }
 
 function commentPreview(comments) {
+  if (!comments.length) return ''
   const lastComment = [...comments].pop().message
   return lastComment.length > 200 ? `${lastComment.substr(0, 200)} \u2026` : lastComment
 }
@@ -20,6 +24,16 @@ class Activity extends React.PureComponent {
       return `${actorCount} people`
     }
     return _.uniq(actors).map(actor => actor.name).join(', ')
+  }
+
+  targetLink() {
+    const { target } = this.props
+    if (target.internalType === 'comment_threads') {
+      const { id, internalType } = target.record
+      return routingStore.pathTo(internalType, id)
+    }
+    const { id, internalType } = target
+    return routingStore.pathTo(internalType, id)
   }
 
   getDataText() {
@@ -45,7 +59,6 @@ class Activity extends React.PureComponent {
     const {
       actorNames,
       targetName,
-      targetType,
       roleName,
       subjects,
       message
@@ -56,7 +69,7 @@ class Activity extends React.PureComponent {
       return (
         <p>
           <strong className="actor">{actorNames}</strong>
-          has archived the <strong className="target">{targetName} {targetType}</strong>
+          has archived the <Link className="target" to={this.targetLink()}>{targetName}</Link>
         </p>)
     case 'added_editor':
     case 'added_member':
@@ -65,13 +78,13 @@ class Activity extends React.PureComponent {
         <p>
           <strong className="actor">{actorNames}</strong> has made
           <strong className="subjects">{subjects}</strong> a <strong className="roleName">{roleName}</strong>
-          of the <strong className="target">{targetName} {targetType}</strong>
+        of the <Link className="target" to={this.targetLink()}>{targetName}</Link>
         </p>)
     case 'commented':
       return (
         <p>
           <strong className="actor">{actorNames}</strong> commented on
-          <strong className="target">{targetName}</strong>:
+          <Link className="target" to={this.targetLink()}>{targetName}</Link>:
           <span className="message">{message}</span>
         </p>)
 

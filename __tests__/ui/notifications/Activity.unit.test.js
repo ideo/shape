@@ -33,13 +33,13 @@ describe('Activity', () => {
     describe('with the archived action', () => {
       beforeEach(() => {
         props.action = 'archived'
-        props.target = { name: 'Plants', internalType: 'Collection' }
+        props.target = { name: 'Plants', internalType: 'collections' }
         wrapper.setProps(props)
       })
 
       it('should render the message with actor and target', () => {
         expect(wrapper.find('.actor').text()).toEqual(fakeUser.name)
-        expect(findPart('target').text()).toEqual('Plants Collection')
+        expect(findPart('target').props().children).toEqual('Plants')
       })
     })
 
@@ -48,6 +48,7 @@ describe('Activity', () => {
         props.action = 'added_member'
         props.subjectUsers = [{ name: 'Bill' }, { name: 'Tom' }]
         props.subjectGroups = [{ name: 'Pokemon' }]
+        props.target = { id: 4, name: 'Pokemons', internalType: 'collections' }
         wrapper.setProps(props)
       })
 
@@ -62,6 +63,11 @@ describe('Activity', () => {
       it('should render with the correct role name', () => {
         expect(findPart('roleName').text()).toEqual('member')
       })
+
+      it('should link to the target', () => {
+        const link = findPart('target')
+        expect(link.props().to).toEqual('/collections/4')
+      })
     })
 
     describe('with a comment', () => {
@@ -69,8 +75,8 @@ describe('Activity', () => {
         props.action = 'commented'
         props.target = {
           comments: [{}, { message: 'Some message' }],
-          record: { name: 'Great collection', internalType: 'collections' },
-          internalType: 'comments'
+          record: { id: 18, name: 'Great collection', internalType: 'collections' },
+          internalType: 'comment_threads'
         }
         wrapper.setProps(props)
       })
@@ -80,11 +86,16 @@ describe('Activity', () => {
       })
 
       it('should have the target', () => {
-        expect(findPart('target').text()).toEqual('Great collection')
+        expect(findPart('target').props().children).toEqual('Great collection')
       })
 
       it('should have the message of the last comment', () => {
         expect(findPart('message').text()).toEqual('Some message')
+      })
+
+      it('should link to the record for the comment thread', () => {
+        const link = findPart('target')
+        expect(link.props().to).toEqual('/collections/18')
       })
     })
 

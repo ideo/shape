@@ -1,6 +1,6 @@
 class SerializableNotification < BaseJsonSerializer
   type 'notifications'
-  attributes :id, :read, :created_at
+  attributes :id, :read, :created_at, :combined_activities_ids
   belongs_to :activity
   belongs_to :user
 
