@@ -78,7 +78,6 @@ class ActivityAndNotificationBuilder
       return
     end
     # Condense the existing 3 down to one notification
-    # TODO:
     Notification.create(
       activity: activity,
       user: user,
