@@ -3,6 +3,11 @@ require 'rails_helper'
 describe User, type: :model do
   let!(:user) { create(:user) }
 
+  context 'associations' do
+    it { should belong_to :current_organization }
+    it { should belong_to :current_user_collection }
+  end
+
   context 'validations' do
     it { should validate_presence_of(:uid) }
     it { should validate_presence_of(:provider) }

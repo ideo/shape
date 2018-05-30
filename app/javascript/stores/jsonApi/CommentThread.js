@@ -1,18 +1,35 @@
+import { observable, action, computed } from 'mobx'
+import _ from 'lodash'
+
 import { uiStore } from '~/stores'
 import BaseRecord from './BaseRecord'
 
 class CommentThread extends BaseRecord {
+  @observable comments = []
+
+  @computed get key() {
+    // include __persisted as part of the key,
+    // because when we .save() the unpersisted and persisted both temporarily exist
+    return `thread-${this.record.className}-${this.record.id}${this.__persisted ? '' : '-new'}`
+  }
+
   async API_create() {
     try {
-      // get rid of fake id we assigned
-      this.id = null
-      this.assignRef('record', null)
       await this.save()
       // now that we have a real id, update what's expanded
-      uiStore.update('expandedThread', this.id)
+      uiStore.expandThread(this.key, { reset: false })
     } catch (e) {
       uiStore.defaultAlertError()
     }
+  }
+
+  async API_fetchComments({ page = 1 } = {}) {
+    const apiPath = `comment_threads/${this.id}/comments?page=${page}`
+    // simulate backend effect
+    this.unread_comments.replace([])
+    this.unread_count = 0
+    const res = await this.apiStore.request(apiPath, 'GET')
+    this.importComments(res.data)
   }
 
   async API_saveComment(message) {
@@ -24,17 +41,32 @@ class CommentThread extends BaseRecord {
         return
       }
     }
+    // make sure we're following this thread in our activity log
+    this.apiStore.addCurrentUserThread(this.id)
     const apiPath = `comment_threads/${this.id}/comments`
     // this will create the comment and retrieve the updated thread
-    await this.apiStore.request(apiPath, 'POST', { message })
+    const res = await this.apiStore.request(apiPath, 'POST', { message })
+    const comment = res.data
+    // simulate the updated_at update so that the thread will move to most recent
+    this.updated_at = new Date()
+    this.importComments([comment])
+  }
+
+  @action importComments(data, { unread = false } = {}) {
+    const newComments = _.union(this.comments.toJS(), data)
+    if (unread) {
+      data.forEach(comment => comment.markAsUnread())
+    } else {
+      data.forEach(comment => comment.markAsRead())
+    }
+    this.comments.replace(newComments)
   }
 }
 
 CommentThread.type = 'comment_threads'
 
 CommentThread.defaults = {
-  // set as array so it's never `undefined`
-  comments: [],
+  unread_comments: [],
 }
 
 export default CommentThread

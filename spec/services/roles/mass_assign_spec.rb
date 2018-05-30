@@ -81,6 +81,19 @@ RSpec.describe Roles::MassAssign, type: :service do
       end
     end
 
+    context 'with a comment thread' do
+      let(:comment_thread) { create(:comment_thread, record: object) }
+
+      it 'should add users and groups as comment thread followers' do
+        expect(AddCommentThreadFollowers).to receive(:perform_async).with(
+          comment_thread.id,
+          users.map(&:id),
+          groups.map(&:id),
+        )
+        assign_role.call
+      end
+    end
+
     context 'with propagate_to_children true' do
       let!(:propagate_to_children) { true }
 
@@ -155,6 +168,9 @@ RSpec.describe Roles::MassAssign, type: :service do
         let!(:groups) { [] }
         let!(:linked_collection) { create(:collection) }
         let!(:object) { create(:group) }
+        let!(:comment_thread) { create(:item_comment_thread) }
+        let!(:groups_thread) { create(:groups_thread, group: object, comment_thread: comment_thread) }
+        let(:thread_ids) { object.groups_threads.pluck(:comment_thread_id) }
         let!(:link) { create(:collection_card_link,
                              parent: object.current_shared_collection,
                              collection: linked_collection)}
@@ -165,6 +181,14 @@ RSpec.describe Roles::MassAssign, type: :service do
             [],
             [linked_collection.id],
             [],
+          )
+          assign_role.call
+        end
+
+        it 'should add all group members as followers of group\'s threads' do
+          expect(AddCommentThreadFollowers).to receive(:perform_async).with(
+            thread_ids,
+            users.map(&:id),
           )
           assign_role.call
         end

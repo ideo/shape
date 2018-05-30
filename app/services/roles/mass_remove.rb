@@ -21,6 +21,8 @@ module Roles
 
     def call
       remove_role_from_object(@object)
+      unfollow_comment_thread
+      unfollow_groups_comment_threads
       remove_links_from_shared_collections if @remove_link
       remove_org_membership
       remove_roles_from_children
@@ -104,10 +106,9 @@ module Roles
     end
 
     def remove_org_membership
-      if @object.is_a?(Group) && (@object.guest? || @object.primary?)
-        @users.each do |user|
-          @object.organization.remove_user_membership(user)
-        end
+      return unless @object.is_a?(Group) && (@object.guest? || @object.primary?)
+      @users.each do |user|
+        @object.organization.remove_user_membership(user)
       end
     end
 
@@ -115,6 +116,26 @@ module Roles
       return [] unless @object.respond_to?(:children)
 
       @object.children
+    end
+
+    def unfollow_comment_thread
+      return unless @object.is_a?(Item) || @object.is_a?(Collection)
+      return unless @object.comment_thread.present?
+      RemoveCommentThreadFollowers.perform_async(
+        @object.comment_thread.id,
+        @users.map(&:id),
+        @groups.map(&:id),
+      )
+    end
+
+    def unfollow_groups_comment_threads
+      return unless @object.is_a?(Group)
+      thread_ids = @object.groups_threads.pluck(:comment_thread_id)
+      return if thread_ids.empty?
+      RemoveCommentThreadFollowers.perform_async(
+        thread_ids,
+        @users.map(&:id),
+      )
     end
   end
 end

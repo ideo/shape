@@ -228,7 +228,9 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
   end
 
   describe 'PATCH #move' do
-    let!(:from_collection) { create(:collection, num_cards: 3, add_editors: [user]) }
+    let!(:from_collection) do
+      create(:collection, organization: to_collection.organization, num_cards: 3, add_editors: [user])
+    end
     let!(:moving_cards) { from_collection.collection_cards.first(2) }
     let!(:unmoved_card) { from_collection.collection_cards.last }
     let(:path) { '/api/v1/collection_cards/move' }
