@@ -202,5 +202,4 @@ class CollectionCard < ApplicationRecord
 
     errors.add(:parent, 'is read-only so you can\'t save this card') if parent.read_only?
   end
-
 end
