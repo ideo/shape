@@ -17,6 +17,7 @@ describe('Activity', () => {
       target: fakeActivity.target,
       subjectUsers: fakeActivity.subject_users,
       subjectGroups: fakeActivity.subject_groups,
+      actorCount: 1,
     }
     wrapper = shallow(
       <Activity {...props} />
@@ -90,6 +91,7 @@ describe('Activity', () => {
     describe('with multiple actors', () => {
       beforeEach(() => {
         props.actors = [fakeActivity.actor, { id: 200, name: 'Boo' }]
+        props.actorCount = 2
         wrapper.setProps(props)
       })
 
@@ -102,9 +104,8 @@ describe('Activity', () => {
           props.actors = [
             ...props.actors,
             { id: 201, name: 'Lia' },
-            { id: 202, name: 'Joe' },
-            { id: 203, name: 'Jan' },
           ]
+          props.actorCount = 5
           wrapper.setProps(props)
           wrapper.update()
         })

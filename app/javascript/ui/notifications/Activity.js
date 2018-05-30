@@ -10,10 +10,14 @@ function commentPreview(comments) {
   return lastComment.length > 200 ? `${lastComment.substr(0, 200)} \u2026` : lastComment
 }
 
+const MAX_ACTORS = 3
+
 class Activity extends React.PureComponent {
   actorText() {
-    const { actors } = this.props
-    if (actors.length > 3) return `${actors.length} people`
+    const { actors, actorCount } = this.props
+    if (actors.length > MAX_ACTORS || actorCount > MAX_ACTORS) {
+      return `${actorCount} people`
+    }
     return actors.map(actor => actor.name).join(', ')
   }
 
@@ -99,11 +103,13 @@ Activity.propTypes = {
   subjectGroups: PropTypes.arrayOf(PropTypes.shape({
     name: PropTypes.string,
   })),
+  actorCount: PropTypes.number,
 }
 
 Activity.defaultProps = {
   subjectUsers: [],
-  subjectGroups: []
+  subjectGroups: [],
+  actorCount: 0,
 }
 
 export default Activity

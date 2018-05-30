@@ -15,7 +15,7 @@ class Notification extends React.PureComponent {
 
   combineActors() {
     const { notification } = this.props
-    if (!notification.combined_activities || !notification.combined_activities.length) {
+    if (!notification.combined_activities_ids.length) {
       return [notification.activity.actor]
     }
     return notification.combined_activities.map(activity =>
@@ -32,6 +32,7 @@ class Notification extends React.PureComponent {
         target={activity.target}
         subjectUsers={activity.subjectUsers}
         subjectGroups={activity.subjectGroups}
+        actorCount={notification.combined_activities_ids.length}
       />
     )
   }
