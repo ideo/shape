@@ -43,6 +43,7 @@ describe('Notification', () => {
           { id: 2, actor: { id: 300 } },
           { id: 3, actor: { id: 301 } },
         ]
+        props.notification.combined_activities_ids = [2, 3]
         wrapper.setProps(props)
       })
 
