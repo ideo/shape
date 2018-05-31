@@ -1,6 +1,6 @@
 import Icon from './Icon'
 
-const OkIcon = () => (
+const NotificationIcon = () => (
   <Icon fill>
     <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50 50">
       <title>Notifications</title>
@@ -14,4 +14,4 @@ const OkIcon = () => (
   </Icon>
 )
 
-export default OkIcon
+export default NotificationIcon
