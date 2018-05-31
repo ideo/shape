@@ -43,6 +43,7 @@
     "babel-preset-react": "^6.24.1",
     "caniuse-lite": "^1.0.30000830",
     "filestack-js": "^0.11.2",
+    "firebase": "^5.0.4",
     "get-video-id": "^3.0.0",
     "hex-rgb": "^2.0.0",
     "history": "^4.7.2",

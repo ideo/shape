@@ -1,4 +1,3 @@
-import { apiStore } from '~/stores'
 import Collection from '~/stores/jsonApi/Collection'
 
 import fakeApiStore from '#/mocks/fakeApiStore'

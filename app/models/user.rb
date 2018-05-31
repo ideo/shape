@@ -137,6 +137,12 @@ class User < ApplicationRecord
     [first_name, last_name].compact.join(' ')
   end
 
+  def self.basic_api_fields
+    %i[
+      id first_name last_name email status pic_url_square
+    ]
+  end
+
   def switch_to_organization(organization = nil)
     if organization.blank?
       self.current_organization = self.current_user_collection = nil
