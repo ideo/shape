@@ -11,6 +11,7 @@ let component
 
 describe('Activity', () => {
   beforeEach(() => {
+
     props = {
       action: fakeActivity.action,
       actors: [fakeActivity.actor],

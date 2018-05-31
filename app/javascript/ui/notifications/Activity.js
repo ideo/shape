@@ -15,6 +15,11 @@ function commentPreview(comments) {
   return lastComment.length > 200 ? `${lastComment.substr(0, 200)} \u2026` : lastComment
 }
 
+function roleArticle(nextWord) {
+  if (nextWord === 'editor' || nextWord === 'admin') return 'an'
+  return 'a'
+}
+
 const MAX_ACTORS = 3
 
 class Activity extends React.PureComponent {
@@ -69,7 +74,7 @@ class Activity extends React.PureComponent {
       return (
         <p>
           <strong className="actor">{actorNames}</strong>
-          has archived the <Link className="target" to={this.targetLink()}>{targetName}</Link>
+          has archived <Link className="target" to={this.targetLink()}>{targetName}</Link>
         </p>)
     case 'added_editor':
     case 'added_member':
@@ -77,7 +82,8 @@ class Activity extends React.PureComponent {
       return (
         <p>
           <strong className="actor">{actorNames}</strong> has made
-          <strong className="subjects">{subjects}</strong> a <strong className="roleName">{roleName}</strong>
+          <strong className="subjects">{subjects}</strong>
+            ${roleArticle(roleName)} <strong className="roleName">{roleName}</strong>
         of the <Link className="target" to={this.targetLink()}>{targetName}</Link>
         </p>)
     case 'commented':
