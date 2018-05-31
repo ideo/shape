@@ -10,6 +10,7 @@ function insertCommas(subjectUsers, subjectGroups) {
 }
 
 function commentPreview(content) {
+  if (!content) return ''
   return content.length > 200 ? `${content.substr(0, 200)} \u2026` : content
 }
 
