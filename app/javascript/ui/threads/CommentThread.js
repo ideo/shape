@@ -195,14 +195,16 @@ class CommentThread extends React.Component {
     this.message = ev.target.value
   }
 
-  handleSubmit = async (e) => {
+  handleSubmit = (e) => {
     e.preventDefault()
+    if (!this.message) return
     const { thread } = this.props
-    await thread.API_saveComment(this.message)
+    thread.API_saveComment(this.message).then(() => {
+      this.props.afterSubmit()
+    })
     runInAction(() => {
       this.message = ''
     })
-    this.props.afterSubmit()
   }
 
   objectLink() {
@@ -256,8 +258,8 @@ class CommentThread extends React.Component {
   }
 
   renderComments = () => (
-    this.comments.map(comment => (
-      <Comment key={comment.id} comment={comment} />
+    this.comments.map((comment, i) => (
+      <Comment key={comment.id || `comment-new-${i}`} comment={comment} />
     ))
   )
 

@@ -47,8 +47,10 @@ class CommentThreadContainer extends React.Component {
         const { expandedThread } = this
         if (!expandedThread) return
         this.disposers.expandedComments = expandedThread.comments.observe((commentChange) => {
-          // console.log('COMMENT_CHANGE', commentChange)
-          if (this.bottomOfExpandedThread) {
+          // console.log('COMMENT_CHANGE', commentChange, this.bottomOfExpandedThread)
+          const lastComment = _.last(expandedThread.comments)
+          // if last comment is unpersisted it means I just added it; scroll me down
+          if (this.bottomOfExpandedThread || !lastComment.__persisted) {
             this.scrollToTopOfNextThread(expandedThread, { duration: 0 })
           }
         })
@@ -61,6 +63,8 @@ class CommentThreadContainer extends React.Component {
       const newThreads = change.newValue
       const oldIdx = oldThreads.indexOf(expandedThread)
       const newIdx = newThreads.indexOf(expandedThread)
+      // if it didn't exist before, thread was newly created
+      if (oldIdx === -1) return
       if (oldIdx !== newIdx) {
         const top = document.getElementsByName(`thread-${oldIdx}`)[0].offsetTop
         this.prevScrollPosition = this.containerDiv.scrollTop - top
@@ -176,6 +180,9 @@ class CommentThreadContainer extends React.Component {
     this.threads.map((thread, i) => (
       <ScrollElement name={`thread-${i}`} key={thread.key}>
         <VisibilitySensor
+          offset={{
+            top: 10,
+          }}
           partialVisibility
           containment={this.containerDiv}
           onChange={this.handleVisibilityChange(i)}
@@ -202,12 +209,16 @@ class CommentThreadContainer extends React.Component {
           {this.renderThreads()}
         </FlipMove>
         <VisibilitySensor
+          offset={{
+            top: 10,
+          }}
           partialVisibility
           containment={this.containerDiv}
           onChange={this.handleVisibilityChange(this.threads.length)}
         >
           <ScrollElement
             name={`thread-${this.threads.length}`}
+            style={{ height: '5px' }}
           />
         </VisibilitySensor>
       </StyledCommentThreadContainer>

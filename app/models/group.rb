@@ -59,16 +59,6 @@ class Group < ApplicationRecord
       .where(GroupsRole.arel_table[:group_id].in(id))
   end
 
-  # really meant to be used on an AR Relation, where `select` is just the relevant records
-  def self.user_ids
-    identifiers = select(:id).map(&:resource_identifier)
-    UsersRole
-      .joins(:role)
-      .where(Role.arel_table[:resource_identifier].in(identifiers))
-      .pluck(:user_id)
-      .uniq
-  end
-
   # Roles where a user is admin/viewer of this group
   def roles_from_users
     Role.for_resource(self)
@@ -94,11 +84,6 @@ class Group < ApplicationRecord
     return true if guest? && organization.primary_group.can_edit?(user)
     # otherwise pass through to the normal resourceable method
     resourceable_can_edit?(user)
-  end
-
-  # combine admins + members using Group.user_ids method
-  def user_ids
-    self.class.where(id: id).user_ids
   end
 
   private

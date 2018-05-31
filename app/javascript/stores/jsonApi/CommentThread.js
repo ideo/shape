@@ -3,6 +3,7 @@ import _ from 'lodash'
 
 import { uiStore } from '~/stores'
 import BaseRecord from './BaseRecord'
+import Comment from './Comment'
 
 class CommentThread extends BaseRecord {
   @observable comments = []
@@ -26,9 +27,7 @@ class CommentThread extends BaseRecord {
     // get latest 3
     let comments = this.comments.slice(-3)
     // only return ones that are unread
-    comments = _.filter(comments, comment => (
-      comment.updated_at > users_thread.last_viewed_at
-    ))
+    comments = _.filter(comments, comment => comment.unread)
     return comments
   }
 
@@ -46,7 +45,7 @@ class CommentThread extends BaseRecord {
     const apiPath = `comment_threads/${this.id}/comments?page=${page}`
     // simulate backend effect
     this.comments.forEach(comment => comment.markAsRead())
-    this.users_thread.unread_count = 0
+    if (this.users_thread) this.users_thread.unread_count = 0
     const res = await this.apiStore.request(apiPath, 'GET')
     this.importComments(res.data)
   }
@@ -57,19 +56,22 @@ class CommentThread extends BaseRecord {
       await this.API_create()
       if (!this.__persisted) {
         // error if that still didn't work...
-        return
+        return false
       }
     }
     // make sure we're following this thread in our activity log
     this.apiStore.addCurrentCommentThread(this.id)
-    const apiPath = `comment_threads/${this.id}/comments`
-    // this will create the comment and retrieve the updated thread
-    const res = await this.apiStore.request(apiPath, 'POST', { message })
-    const comment = res.data
     // simulate the updated_at update so that the thread will move to most recent
     this.updated_at = new Date()
-    if (this.users_thread) this.users_thread.last_viewed_at = new Date()
-    this.importComments([comment])
+    // dynamically set the endpoint to belong to this thread
+    Comment.endpoint = `comment_threads/${this.id}/comments`
+    // create an unsaved comment so that we can see it immediately
+    const comment = new Comment({ message }, this.apiStore)
+    comment.assignRef('author', this.apiStore.currentUser)
+    this.apiStore.add(comment)
+    this.importComments([comment], { created: true })
+    // this will create the comment and retrieve the updated thread
+    return comment.save()
   }
 
   API_markViewed() {
@@ -80,8 +82,10 @@ class CommentThread extends BaseRecord {
     return this.apiStore.request(apiPath, 'POST')
   }
 
-  @action importComments(data) {
+  @action importComments(data, { created = false } = {}) {
     let newComments = _.union(this.comments.toJS(), data)
+    // after we're done creating the temp comment, clear out any prev temp ones
+    if (!created) newComments = _.filter(newComments, c => c.id)
     data.forEach(comment => {
       const { users_thread } = this
       if (comment.author_id !== this.apiStore.currentUserId &&
@@ -91,7 +95,6 @@ class CommentThread extends BaseRecord {
       }
     })
     newComments = _.sortBy(newComments, ['updated_at'])
-    this.lastUnread = _.last(newComments)
     this.comments.replace(newComments)
   }
 }

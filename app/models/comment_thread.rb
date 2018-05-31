@@ -11,8 +11,6 @@ class CommentThread < ApplicationRecord
   has_many :users_threads, dependent: :destroy
   has_many :groups_threads, dependent: :destroy
 
-  # after_touch :store_in_firestore
-
   def unread_comments_for(user)
     ut = users_threads.where(user_id: user.id).first
     return [] unless ut.present?
@@ -98,20 +96,22 @@ class CommentThread < ApplicationRecord
     )
   end
 
-  # def store_in_firestore(batch)
-  #   # fc = FirestoreClient.new
-  #   # fc.client.batch do |batch|
-  #   batch.set("comment_threads/#{id}", serialized_for_firestore)
-  #   # TODO: Do these belong here?
-  #   users_threads.each do |ut|
-  #     batch.set(
-  #       "users_threads/#{ut.user_id}",
-  #       UsersThread.serialized_for_firestore(user_id: ut.user_id),
-  #     )
-  #   end
-  #   # end
-  #   # comments.each(&:store_in_firestore)
-  # end
+  def store_in_firestore
+    # TODO: background job
+    FirestoreClient.new.write("comment_threads/#{id}", serialized_for_firestore)
+  end
+
+  def delete_from_firestore
+    FirestoreClient.client.batch do |batch|
+      batch.delete("comment_threads/#{id}")
+      users_threads.each do |ut|
+        batch.delete("users_threads/#{ut.id}")
+      end
+      comments.each do |c|
+        batch.delete("comments/#{c.id}")
+      end
+    end
+  end
 
   private
 
