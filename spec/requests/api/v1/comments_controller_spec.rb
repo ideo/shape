@@ -54,8 +54,8 @@ describe Api::V1::CommentsController, type: :request, json: true, auth: true do
         actor: @user,
         target: comment_thread.record,
         action: Activity.actions[:commented],
-        subject_users: comment_thread.users_threads.map(&:user),
-        subject_groups: comment_thread.groups_threads.map(&:group),
+        subject_users: [user],
+        subject_groups: [],
         combine: true,
         content: 'heyo',
       )
