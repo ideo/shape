@@ -1,5 +1,5 @@
 class Users::OmniauthCallbacksController < Devise::OmniauthCallbacksController
-  def okta
+  def ideo
     if session[:pending_user_token]
       # if this is nil for whatever reason, it will later end up creating a new User
       pending_user = User.pending_user_with_token(session[:pending_user_token])

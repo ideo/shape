@@ -36,7 +36,7 @@ class Callbacks::IdeoNetworkController < ApplicationController
   end
 
   def user_params
-    params.require(:user).permit(
+    params.require(:attributes).permit(
       :uid,
       :provider,
       :first_name,
@@ -47,7 +47,7 @@ class Callbacks::IdeoNetworkController < ApplicationController
   end
 
   def authenticate_request
-    return true if request.headers['HTTP_AUTHORIZATION'] == ENV['IDEO_NETWORK_CALLBACK_SECRET']
+    return true if request.headers['HTTP_AUTHORIZATION'] == ENV['IDEO_SSO_CLIENT_SECRET']
 
     head :unauthorized
   end

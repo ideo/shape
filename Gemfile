@@ -33,7 +33,8 @@ gem 'jbuilder', '~> 2.5'
 
 # Devise for auth
 gem 'devise'
-gem 'omniauth-okta'
+gem 'omniauth-oauth2'
+gem 'omniauth-ideo', git: 'https://github.com/ideo/omniauth-ideo.git'
 
 # Webpacker
 gem 'webpacker', '~> 3.0'
