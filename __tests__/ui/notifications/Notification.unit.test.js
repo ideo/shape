@@ -19,12 +19,6 @@ describe('Notification', () => {
     component = wrapper.instance()
   })
 
-  describe('componentDidMount', () => {
-    it('should set the notification to read', () => {
-      expect(fakeNotification.read).toBeTruthy()
-    })
-  })
-
   describe('combineActors', () => {
     beforeEach(() => {
       props.notification.combined_activities = []
@@ -51,6 +45,16 @@ describe('Notification', () => {
         expect(component.combineActors()).toEqual(
           [{ id: 300 }, { id: 301 }]
         )
+      })
+    })
+
+    describe('handleRead', () => {
+      beforeEach(() => {
+        wrapper.find('.read').simulate('click', { preventDefault: jest.fn() })
+      })
+
+      it('should set the notification to read', () => {
+        expect(fakeNotification.read).toBeTruthy()
       })
     })
   })

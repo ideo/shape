@@ -3,10 +3,6 @@ import { PropTypes as MobxPropTypes } from 'mobx-react'
 import Activity from '~/ui/notifications/Activity'
 
 class Notification extends React.PureComponent {
-  componentDidMount() {
-    this.updateRead()
-  }
-
   updateRead() {
     const { notification } = this.props
     notification.read = true
@@ -22,19 +18,27 @@ class Notification extends React.PureComponent {
       activity.actor)
   }
 
+  handleRead = (ev) => {
+    ev.preventDefault()
+    this.updateRead()
+  }
+
   render() {
     const { notification } = this.props
     const { activity } = notification
     return (
-      <Activity
-        action={activity.action}
-        actors={this.combineActors()}
-        target={activity.target}
-        subjectUsers={activity.subjectUsers}
-        subjectGroups={activity.subjectGroups}
-        actorCount={notification.combined_activities_ids.length}
-        content={activity.content}
-      />
+      <div>
+        <button className="read" onClick={this.handleRead}>M</button>
+        <Activity
+          action={activity.action}
+          actors={this.combineActors()}
+          target={activity.target}
+          subjectUsers={activity.subjectUsers}
+          subjectGroups={activity.subjectGroups}
+          actorCount={notification.combined_activities_ids.length}
+          content={activity.content}
+        />
+      </div>
     )
   }
 }
