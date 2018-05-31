@@ -23,8 +23,22 @@ export class FirebaseClient {
     firebase.auth().onAuthStateChanged(user => {
       if (user) {
         this.listenForUsersThreads(user.uid)
+        this.listenForUserNotifications(user.uid)
       }
     })
+  }
+
+  listenForUserNotifications = (userId) => {
+    const orgId = apiStore.currentUserOrganizationId
+    db.collection('notifications')
+      .where('data.attributes.identifier', '==', `${orgId}_${userId}`)
+      .onSnapshot(querySnapshot => {
+        querySnapshot.forEach(doc => {
+          apiStore.syncFromFirestore(doc.data())
+        })
+      }, err => {
+        console.warn(err)
+      })
   }
 
   listenForUsersThreads = (userId) => {

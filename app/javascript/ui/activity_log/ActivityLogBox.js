@@ -93,7 +93,7 @@ class ActivityLogBox extends React.Component {
     this.position.h = existingPosition.h || DEFAULT.h
     this.position.x = existingPosition.x || this.defaultX
     // this.props.apiStore.fetchThreads()
-    this.props.apiStore.fetchNotifications()
+    // this.props.apiStore.fetchNotifications()
   }
 
   componentWillUnmount() {

@@ -11,4 +11,8 @@ class SerializableNotification < BaseJsonSerializer
               .order(created_at: :desc)
     end
   end
+
+  attribute :identifier do
+    "#{@object.activity.organization_id}_#{@object.user_id}"
+  end
 end
