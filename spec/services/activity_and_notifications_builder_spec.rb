@@ -8,6 +8,7 @@ RSpec.describe ActivityAndNotificationBuilder, type: :service do
   let(:subject_users) { create_list(:user, 1) }
   let(:subject_groups) { [] }
   let(:combine) { false }
+  let(:content) { nil }
   let(:builder) do
     ActivityAndNotificationBuilder.new(
       actor: actor,
@@ -16,6 +17,7 @@ RSpec.describe ActivityAndNotificationBuilder, type: :service do
       subject_users: subject_users,
       subject_groups: subject_groups,
       combine: combine,
+      content: content,
     )
   end
 
@@ -45,6 +47,15 @@ RSpec.describe ActivityAndNotificationBuilder, type: :service do
 
       it 'does not create two notifications for the user' do
         expect { builder.call }.to change(Notification, :count).by(1)
+      end
+    end
+
+    context 'with content' do
+      let!(:content) { 'hello content' }
+
+      it 'adds the content to the activity' do
+        builder.call
+        expect(Activity.last.content).to eq('hello content')
       end
     end
 

@@ -7,7 +7,8 @@ class ActivityAndNotificationBuilder
     action:,
     subject_users: [],
     subject_groups: [],
-    combine: false
+    combine: false,
+    content: nil
   )
     @actor = actor
     @target = target
@@ -15,6 +16,7 @@ class ActivityAndNotificationBuilder
     @subject_users = subject_users
     @subject_groups = subject_groups
     @combine = combine
+    @content = content
     @errors = []
     @activity = nil
   end
@@ -34,6 +36,7 @@ class ActivityAndNotificationBuilder
       target: @target,
       action: @action,
       organization: @actor.current_organization,
+      content: @content,
     )
   end
 
