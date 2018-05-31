@@ -1,7 +1,6 @@
 import PropTypes from 'prop-types'
-import { observable, action, runInAction } from 'mobx'
+import { observe, observable, action, runInAction, computed } from 'mobx'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
-import _ from 'lodash'
 import styled from 'styled-components'
 import Dotdotdot from 'react-dotdotdot'
 
@@ -143,15 +142,23 @@ class CommentThread extends React.Component {
   @observable titleLines = 1
   // we store this locally so that it can fade out after unread == 0,
   // but we still display the old number
-  @observable unreadCount = 0
+  // @observable unreadCount = 0
+  // @observable comments = []
 
   componentDidMount() {
     this.focusTextArea(this.props.expanded)
     this.countLines()
-    runInAction(() => {
-      const { thread } = this.props
-      this.unreadCount = thread.unread_count
-    })
+    // const { thread } = this.props
+    // runInAction(() => {
+    //   this.unreadCount = thread.unreadCount
+    // })
+    // this.disposer = observe(thread, 'unreadCount', change => {
+    //   runInAction(() => {
+    //     this.unreadCount = thread.unreadCount
+    //     console.log('unread count is changing')
+    //     console.log(thread.comments.length, thread.comments)
+    //   })
+    // })
   }
 
   componentWillReceiveProps({ expanded }) {
@@ -173,14 +180,14 @@ class CommentThread extends React.Component {
     }
   }
 
-  get comments() {
+  @computed get comments() {
     const { expanded, thread } = this.props
     let { comments } = thread
     // for un-expanded thread, only take the unread comments
     if (!expanded) {
-      comments = thread.unread_comments
+      comments = thread.latestUnreadComments
     }
-    comments = _.sortBy(comments, ['updated_at'])
+    // comments = _.sortBy(comments, ['updated_at'])
     return comments
   }
 
@@ -237,10 +244,11 @@ class CommentThread extends React.Component {
 
   renderUnreadCount = () => {
     const { thread } = this.props
+    // console.log('renderUnreadCount', thread.unreadCount)
     return (
-      <span className={`unread ${thread.unread_count && 'show-unread'}`}>
+      <span className={`unread ${thread.unreadCount && 'show-unread'}`}>
         <span className="inner">
-          { this.unreadCount }
+          { thread.unreadCount }
           <CommentIconFilled />
         </span>
       </span>

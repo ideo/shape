@@ -469,6 +469,7 @@ DEPENDENCIES
   jbuilder (~> 2.5)
   json-schema
   jsonapi-rails
+  jwt (~> 1.5)
   kaminari (~> 1.1)
   listen (>= 3.0.5, < 3.2)
   normalize-rails (~> 4.1)

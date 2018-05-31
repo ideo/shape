@@ -11,6 +11,12 @@ class Api::V1::CommentThreadsController < Api::V1::BaseController
     render jsonapi: @comment_thread, include: thread_relations
   end
 
+  load_resource only: %i[view]
+  def view
+    # mark comments as read
+    @comment_thread.viewed_by!(current_user)
+  end
+
   before_action :build_thread_and_authorize_record, only: %i[create]
   def create
     if @comment_thread.save

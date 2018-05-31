@@ -11,6 +11,8 @@ class CommentThread < ApplicationRecord
   has_many :users_threads, dependent: :destroy
   has_many :groups_threads, dependent: :destroy
 
+  # after_touch :store_in_firestore
+
   def unread_comments_for(user)
     ut = users_threads.where(user_id: user.id).first
     return [] unless ut.present?
@@ -33,6 +35,7 @@ class CommentThread < ApplicationRecord
     ut = users_threads.where(user_id: user.id).first
     return unless ut.present?
     ut.update_last_viewed!
+    ut.store_in_firestore
   end
 
   # NOTE: add/remove_follower methods will only get called for editors of the record
@@ -79,6 +82,36 @@ class CommentThread < ApplicationRecord
     # anyone who can view the record can contribute to the comment thread
     record.can_view?(user)
   end
+
+  def serialized_for_firestore
+    renderer = JSONAPI::Serializable::Renderer.new
+    renderer.render(
+      self,
+      class: {
+        CommentThread: SerializableCommentThread,
+        Collection: SerializableSimpleCollection,
+        'Item::VideoItem': SerializableSimpleItem,
+        'Item::ImageItem': SerializableSimpleItem,
+        'Item::TextItem': SerializableSimpleItem,
+      },
+      include: %i[record],
+    )
+  end
+
+  # def store_in_firestore(batch)
+  #   # fc = FirestoreClient.new
+  #   # fc.client.batch do |batch|
+  #   batch.set("comment_threads/#{id}", serialized_for_firestore)
+  #   # TODO: Do these belong here?
+  #   users_threads.each do |ut|
+  #     batch.set(
+  #       "users_threads/#{ut.user_id}",
+  #       UsersThread.serialized_for_firestore(user_id: ut.user_id),
+  #     )
+  #   end
+  #   # end
+  #   # comments.each(&:store_in_firestore)
+  # end
 
   private
 

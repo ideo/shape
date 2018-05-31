@@ -86,6 +86,10 @@ gem 'bootsnap', require: false
 # easy pagination
 gem 'kaminari', '~> 1.1'
 
+# google auth + firestore
+gem 'google-cloud-firestore', '~> 0.21.0'
+gem 'jwt', '~> 1.5'
+
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
   gem 'byebug', platforms: [:mri, :mingw, :x64_mingw]
@@ -125,6 +129,3 @@ end
 
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
 # gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw, :jruby]
-
-# Added at 2018-05-16 09:52:31 -0700 by dkaplan:
-gem "google-cloud-firestore", "~> 0.21.0"
