@@ -15,11 +15,8 @@ class Notification extends React.PureComponent {
     const { activity } = notification
     const targetType = pluralTypeName(activity.target_type)
     const target = apiStore.find(targetType, activity.target_id)
-    console.log('target', target)
     if (!target) {
-      console.log('no target', targetType, activity.target_id)
       apiStore.fetch(targetType, activity.target_id).then(res => {
-        console.log('fetch', res)
         activity.assignRef('target', res.data)
       })
     } else {
@@ -50,6 +47,7 @@ class Notification extends React.PureComponent {
   render() {
     const { notification } = this.props
     const { activity } = notification
+    // TODO we don't actually want a loader for each notification
     if (!activity.target) return <InlineLoader />
     return (
       <div>

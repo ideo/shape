@@ -19,7 +19,8 @@ class Api::V1::NotificationsController < Api::V1::BaseController
     notification = Notification.find(params[:id])
     notification.attributes = notification_params
     if notification.save
-      render jsonapi: notification
+      notification.store_in_firestore
+      # TODO: no content
     else
       render_api_errors notificaiton.errors
     end
