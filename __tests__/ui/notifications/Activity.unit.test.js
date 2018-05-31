@@ -11,7 +11,6 @@ let component
 
 describe('Activity', () => {
   beforeEach(() => {
-
     props = {
       action: fakeActivity.action,
       actors: [fakeActivity.actor],
@@ -74,10 +73,11 @@ describe('Activity', () => {
     describe('with a comment', () => {
       beforeEach(() => {
         props.action = 'commented'
+        props.content = 'some content'
         props.target = {
-          comments: [{}, { message: 'Some message' }],
-          record: { id: 18, name: 'Great collection', internalType: 'collections' },
-          internalType: 'comment_threads'
+          id: 18,
+          name: 'Great collection',
+          internalType: 'collections',
         }
         wrapper.setProps(props)
       })
@@ -91,7 +91,7 @@ describe('Activity', () => {
       })
 
       it('should have the message of the last comment', () => {
-        expect(findPart('message').text()).toEqual('Some message')
+        expect(findPart('message').text()).toEqual('some content')
       })
 
       it('should link to the record for the comment thread', () => {

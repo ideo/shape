@@ -33,6 +33,7 @@ class Notification extends React.PureComponent {
         subjectUsers={activity.subjectUsers}
         subjectGroups={activity.subjectGroups}
         actorCount={notification.combined_activities_ids.length}
+        content={activity.content}
       />
     )
   }

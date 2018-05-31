@@ -9,10 +9,8 @@ function insertCommas(subjectUsers, subjectGroups) {
   return (subjectUsers.map(u => u.name).concat(subjectGroups.map(g => g.name))).join(', ')
 }
 
-function commentPreview(comments) {
-  if (!comments.length) return ''
-  const lastComment = [...comments].pop().message
-  return lastComment.length > 200 ? `${lastComment.substr(0, 200)} \u2026` : lastComment
+function commentPreview(content) {
+  return content.length > 200 ? `${content.substr(0, 200)} \u2026` : content
 }
 
 function roleArticle(nextWord) {
@@ -33,23 +31,19 @@ class Activity extends React.PureComponent {
 
   targetLink() {
     const { target } = this.props
-    if (target.internalType === 'comment_threads') {
-      const { id, internalType } = target.record
-      return routingStore.pathTo(internalType, id)
-    }
     const { id, internalType } = target
     return routingStore.pathTo(internalType, id)
   }
 
   getDataText() {
-    const { action, subjectUsers, subjectGroups, target } = this.props
+    const { action, subjectUsers, subjectGroups, target, content } = this.props
     return {
       actorNames: this.actorText(),
-      targetName: action === 'commented' ? target.record.name : target.name,
+      targetName: target.name,
       subjects: insertCommas(subjectUsers, subjectGroups),
       targetType: pluralize.singular(target.internalType),
       roleName: this.isRoleAction() && action.split('_')[1],
-      message: action === 'commented' && commentPreview(target.comments)
+      message: action === 'commented' && commentPreview(content)
     }
   }
 
@@ -124,12 +118,14 @@ Activity.propTypes = {
     name: PropTypes.string,
   })),
   actorCount: PropTypes.number,
+  content: PropTypes.string,
 }
 
 Activity.defaultProps = {
   subjectUsers: [],
   subjectGroups: [],
   actorCount: 0,
+  content: null,
 }
 
 export default Activity
