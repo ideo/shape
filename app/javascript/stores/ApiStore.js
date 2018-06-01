@@ -1,9 +1,8 @@
-import { action, runInAction, observable, computed } from 'mobx'
+import { action, observable, computed } from 'mobx'
 import { Store } from 'mobx-jsonapi-store'
 import _ from 'lodash'
 import moment from 'moment-mini'
 
-import firestoreClient from '~/vendor/firestore'
 import Collection from './jsonApi/Collection'
 import CollectionCard from './jsonApi/CollectionCard'
 import Role from './jsonApi/Role'
@@ -20,7 +19,6 @@ class ApiStore extends Store {
   @observable currentUserId = null
   @observable currentCommentThreadIds = []
   @observable currentPageThreadKey = null
-  firestoreClient = firestoreClient
 
   @action setCurrentUserId(id) {
     this.currentUserId = id

@@ -4,16 +4,18 @@ import 'firebase/firestore'
 
 import { apiStore } from '~/stores'
 
-firebase.initializeApp({
-  apiKey: process.env.GOOGLE_CLOUD_BROWSER_KEY,
-  projectId: process.env.GOOGLE_CLOUD_PROJECT,
-})
-
-const db = firebase.firestore()
-db.settings({
-  // recommending setting for Firestore 5.0+
-  timestampsInSnapshots: true
-})
+let db = {}
+if (process.env.GOOGLE_CLOUD_BROWSER_KEY) {
+  firebase.initializeApp({
+    apiKey: process.env.GOOGLE_CLOUD_BROWSER_KEY,
+    projectId: process.env.GOOGLE_CLOUD_PROJECT,
+  })
+  db = firebase.firestore()
+  db.settings({
+    // recommending setting for Firestore 5.0+
+    timestampsInSnapshots: true
+  })
+}
 
 export class FirebaseClient {
   subscribedThreadIds = []

@@ -8,10 +8,6 @@ class BaseRecord extends Record {
     return this.__collection
   }
 
-  get firestore() {
-    return this.apiStore.firestoreClient
-  }
-
   get internalType() {
     return this.__internal.type
   }
