@@ -77,11 +77,34 @@ module Resourceable
     self.class.where(id: id).user_ids
   end
 
-  # get all editors/viewers, both individual and via group, for this item/collection
+  def editor_user_ids
+    role_user_ids(Role::EDITOR)
+  end
+
+  def viewer_user_ids
+    role_user_ids(Role::VIEWER)
+  end
+
+  # get all [role] users, both individual and via group, for this item/collection
+  def role_user_ids(role_name)
+    return unless editable_and_viewable?
+    user_ids_for_role = UsersRole
+                        .joins(:role)
+                        .where(Role.arel_table[:resource_identifier].eq(resource_identifier))
+                        .where(Role.arel_table[:name].eq(role_name))
+                        .pluck(:user_id)
+                        .uniq
+    group_ids = send(role_name.to_s.pluralize)[:groups].pluck(:id)
+    (user_ids_for_role + Group.where(id: group_ids).user_ids).uniq
+  end
+
   def allowed_user_ids
-    return unless is_a?(Collection) || is_a?(Item)
-    group_ids = editors[:groups].pluck(:id) + viewers[:groups].pluck(:id)
-    (user_ids + Group.where(id: group_ids).user_ids).uniq
+    (editor_user_ids + viewer_user_ids).uniq
+  end
+
+  def editable_and_viewable?
+    # right now just for Collections/Items
+    self.class.edit_role == Role::EDITOR && self.class.view_role = Role::VIEWER
   end
 
   # NOTE: This should only ever be called on a newly created record, e.g. in CollectionCardBuilder

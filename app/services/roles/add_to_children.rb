@@ -9,52 +9,38 @@ module Roles
     end
 
     def call
-      return false unless add_roles_to_children
-      recursively_add_roles_to_grandchildren
+      add_roles_to_children
     end
 
     private
 
     def add_roles_to_children
       children.all? do |child|
-        if @inheritance.inherit_from_parent?(child, new_role_identifiers)
+        if @inheritance.inherit_from_parent?(child, add_user_ids: all_user_ids, role_name: @role_name)
           save_new_child_roles(child)
+          recursively_add_roles_to_grandchildren(child)
         else
           true
         end
       end
     end
 
-    def recursively_add_roles_to_grandchildren
-      children.all? do |child|
-        if child.respond_to?(:children) &&
-           child.children.present?
-          Roles::AddToChildren.new(
-            role_name: @role_name,
-            parent: child,
-            users_to_add: @users_to_add,
-            groups_to_add: @groups_to_add,
-          ).call
-        else
-          true
-        end
+    def recursively_add_roles_to_grandchildren(child)
+      if child.respond_to?(:children) &&
+         child.children.present?
+        Roles::AddToChildren.new(
+          role_name: @role_name,
+          parent: child,
+          users_to_add: @users_to_add,
+          groups_to_add: @groups_to_add,
+        ).call
+      else
+        true
       end
     end
 
-    def new_role_identifiers
-      user_role_identifiers + group_role_identifiers
-    end
-
-    def user_role_identifiers
-      @users_to_add.map do |user|
-        Role.identifier(role_name: @role_name, user_id: user.id)
-      end
-    end
-
-    def group_role_identifiers
-      @groups_to_add.map do |group|
-        Role.identifier(role_name: @role_name, group_id: group.id)
-      end
+    def all_user_ids
+      (@users_to_add.map(&:id) + @groups_to_add.map(&:user_ids)).flatten.uniq
     end
 
     def save_new_child_roles(child)
