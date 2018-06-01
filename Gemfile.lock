@@ -1,3 +1,11 @@
+GIT
+  remote: https://github.com/ideo/omniauth-ideo.git
+  revision: 0c50f15ffca98148716a76a3fa4929284d07bd8f
+  specs:
+    omniauth-ideo (0.1.0)
+      oauth2 (~> 1.1)
+      omniauth (~> 1.2)
+
 GEM
   remote: https://rubygems.org/
   specs:
@@ -253,9 +261,6 @@ GEM
     omniauth-oauth2 (1.5.0)
       oauth2 (~> 1.1)
       omniauth (~> 1.2)
-    omniauth-okta (0.1.1)
-      omniauth (~> 1.5)
-      omniauth-oauth2 (>= 1.4.0, < 2.0)
     options (2.3.2)
     orm_adapter (0.5.0)
     os (0.9.6)
@@ -473,7 +478,8 @@ DEPENDENCIES
   kaminari (~> 1.1)
   listen (>= 3.0.5, < 3.2)
   normalize-rails (~> 4.1)
-  omniauth-okta
+  omniauth-ideo!
+  omniauth-oauth2
   pg (~> 0.21)
   pry-rails
   puma (~> 3.11)
