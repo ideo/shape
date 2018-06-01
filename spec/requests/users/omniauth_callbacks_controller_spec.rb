@@ -1,32 +1,32 @@
 require 'rails_helper'
 
 describe Users::OmniauthCallbacksController, type: :request do
-  describe 'POST #okta' do
+  describe 'POST #ideo' do
     let!(:organization) { create(:organization) }
     let!(:user) { build(:user) }
     let(:email) { user.email }
     let(:pic_url_square) { user.pic_url_square }
     let(:first_name) { user.first_name }
-    let(:path) { '/users/auth/okta/callback' }
+    let(:path) { '/users/auth/ideo/callback' }
 
     before do
       OmniAuth.config.test_mode = true
-      OmniAuth.config.mock_auth[:okta] = OmniAuth::AuthHash.new(
-        provider: 'okta',
+      OmniAuth.config.mock_auth[:ideo] = OmniAuth::AuthHash.new(
+        provider: 'ideo',
         uid: user.uid,
         info: {
           first_name: first_name,
           last_name: user.last_name,
           email: email,
-          image: pic_url_square,
+          picture: pic_url_square,
         },
       )
       Rails.application.env_config['devise.mapping'] = Devise.mappings[:user]
-      Rails.application.env_config['omniauth.auth'] = OmniAuth.config.mock_auth[:okta]
+      Rails.application.env_config['omniauth.auth'] = OmniAuth.config.mock_auth[:ideo]
     end
 
     after :all do
-      OmniAuth.config.mock_auth[:okta] = nil
+      OmniAuth.config.mock_auth[:ideo] = nil
     end
 
     it 'should redirect to the root url' do
@@ -68,25 +68,25 @@ describe Users::OmniauthCallbacksController, type: :request do
       end
     end
 
-    context 'with okta auth domain matching current organization' do
+    context 'with ideo auth domain matching current organization' do
       let!(:organization) { create(:organization, domain_whitelist: ['company.org']) }
       let!(:user) { build(:user, current_organization: organization, email: 'personal@hotmail.com') }
 
       before do
         # should add to guest group
         organization.setup_user_membership(user)
-        OmniAuth.config.mock_auth[:okta] = OmniAuth::AuthHash.new(
-          provider: 'okta',
+        OmniAuth.config.mock_auth[:ideo] = OmniAuth::AuthHash.new(
+          provider: 'ideo',
           uid: user.uid,
           info: {
             first_name: first_name,
             last_name: user.last_name,
             email: 'user@company.org',
-            image: pic_url_square,
+            picture: pic_url_square,
           },
         )
         Rails.application.env_config['devise.mapping'] = Devise.mappings[:user]
-        Rails.application.env_config['omniauth.auth'] = OmniAuth.config.mock_auth[:okta]
+        Rails.application.env_config['omniauth.auth'] = OmniAuth.config.mock_auth[:ideo]
       end
 
       it 'updates user membership to primary group if they login with their company email' do

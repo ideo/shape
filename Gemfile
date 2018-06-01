@@ -6,7 +6,7 @@ git_source(:github) do |repo_name|
   "https://github.com/#{repo_name}.git"
 end
 
-# NOTE: IMPORTANT for this to be first so that gems e.g. omniauth-okta
+# NOTE: IMPORTANT for this to be first so that gems e.g. omniauth-ideo
 #       can pull in the right ENV vars
 # ENV variables in dev
 gem 'dotenv-rails', groups: [:development, :test], require: 'dotenv/rails-now'

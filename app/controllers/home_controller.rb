@@ -1,7 +1,7 @@
 # Serve up static pages
 class HomeController < ApplicationController
   before_action :authenticate_user!, except: %i[login sign_up login_as]
-  before_action :set_okta_state
+  before_action :set_omniauth_state
 
   def index
   end
@@ -24,7 +24,7 @@ class HomeController < ApplicationController
 
   private
 
-  def set_okta_state
+  def set_omniauth_state
     session['omniauth.state'] = cookies['IdeoSSO-State']
   end
 
