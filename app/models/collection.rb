@@ -355,7 +355,6 @@ class Collection < ApplicationRecord
   def update_comment_thread_in_firestore
     return unless comment_thread.present?
     return unless saved_change_to_name? || saved_change_to_cached_attributes?
-    puts "UPDATING COMMENT THREAD..."
     comment_thread.store_in_firestore
   end
 end
