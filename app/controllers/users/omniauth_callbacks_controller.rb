@@ -12,7 +12,6 @@ class Users::OmniauthCallbacksController < Devise::OmniauthCallbacksController
       # will also redirect to stored path from any previous 401
       sign_in_and_redirect @user, event: :authentication
     else
-      # set_flash_message(:alert, @user.errors.full_messages.first, :kind => 'OKTA') if is_navigational_format?
       redirect_to root_path
     end
   end
