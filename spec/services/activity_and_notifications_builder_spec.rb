@@ -50,6 +50,15 @@ RSpec.describe ActivityAndNotificationBuilder, type: :service do
       end
     end
 
+    context 'when you are the actor' do
+      let(:subject_users) { [actor] }
+
+      it 'should not notifiy you if you are the actor' do
+        builder.call
+        expect { builder.call }.to change(Notification, :count).by(0)
+      end
+    end
+
     context 'with content' do
       let!(:content) { 'hello content' }
 

@@ -47,6 +47,7 @@ class ActivityAndNotificationBuilder
     end
     all_users = @subject_users + User.where(id: group_user_ids)
     all_users.uniq.each do |user|
+      next if user == @actor
       Notification.create(
         activity: activity,
         user: user,
