@@ -1,5 +1,3 @@
-import locale from '../Locale'
-
 import fakeApiStore from '#/mocks/fakeApiStore'
 import fakeUiStore from '#/mocks/fakeUiStore'
 import fakeRoutingStore from '#/mocks/fakeRoutingStore'

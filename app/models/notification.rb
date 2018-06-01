@@ -12,8 +12,9 @@ class Notification < ApplicationRecord
       class: { Activity: SerializableActivity,
                Notification: SerializableNotification,
                User: SerializableUser,
+               Group: SerializableGroup,
              },
-      include: [activity: [:actor]],
+             include: [:subject_users, :subject_groups, activity: [:actor]],
     )
   end
 
