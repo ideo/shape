@@ -44,6 +44,7 @@ describe Api::V1::CommentsController, type: :request, json: true, auth: true do
     end
 
     it 'returns a 204 no content' do
+      post(path, params: params)
       expect(response.status).to eq(204)
     end
 
