@@ -32,11 +32,11 @@ class Callbacks::IdeoNetworkController < ApplicationController
   end
 
   def user
-    @user ||= User.find_by_uid(params[:uid])
+    @user ||= User.find_by_uid(user_params[:uid])
   end
 
   def user_params
-    params.require(:attributes).permit(
+    params.require(:data).require(:attributes).permit(
       :uid,
       :provider,
       :first_name,
