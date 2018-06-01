@@ -1,14 +1,7 @@
 class SerializableUser < BaseJsonSerializer
   type 'users'
   attributes :id, :first_name, :last_name, :email,
-             :created_at, :current_user_collection_id,
-             :status, :pic_url_square, :terms_accepted,
-             :show_helper
-
-  attribute :google_auth_token do
-    # generate user login token for firebase
-    GoogleAuthService.create_custom_token(@object.id)
-  end
+             :created_at, :status, :pic_url_square
 
   belongs_to :current_organization
   has_many :organizations

@@ -1,9 +1,10 @@
 import PropTypes from 'prop-types'
-import { observe, observable, action, runInAction, computed } from 'mobx'
+import { observable, action, runInAction, computed } from 'mobx'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 import Dotdotdot from 'react-dotdotdot'
 
+import { routingStore } from '~/stores'
 import Link from '~/ui/global/Link'
 import CollectionIcon from '~/ui/icons/CollectionIcon'
 import CommentIconFilled from '~/ui/icons/CommentIconFilled'
@@ -14,7 +15,6 @@ import Moment from '~/ui/global/Moment'
 import ReturnArrowIcon from '~/ui/icons/ReturnArrowIcon'
 import { CommentForm, CommentTextarea } from '~/ui/global/styled/forms'
 import Comment from './Comment'
-import { routingStore } from '~/stores'
 
 const StyledCommentThread = styled.div`
   .title {
@@ -140,25 +140,10 @@ ThumbnailHolder.displayName = 'ThumbnailHolder'
 class CommentThread extends React.Component {
   @observable message = ''
   @observable titleLines = 1
-  // we store this locally so that it can fade out after unread == 0,
-  // but we still display the old number
-  // @observable unreadCount = 0
-  // @observable comments = []
 
   componentDidMount() {
     this.focusTextArea(this.props.expanded)
     this.countLines()
-    // const { thread } = this.props
-    // runInAction(() => {
-    //   this.unreadCount = thread.unreadCount
-    // })
-    // this.disposer = observe(thread, 'unreadCount', change => {
-    //   runInAction(() => {
-    //     this.unreadCount = thread.unreadCount
-    //     console.log('unread count is changing')
-    //     console.log(thread.comments.length, thread.comments)
-    //   })
-    // })
   }
 
   componentWillReceiveProps({ expanded }) {
@@ -187,7 +172,6 @@ class CommentThread extends React.Component {
     if (!expanded) {
       comments = thread.latestUnreadComments
     }
-    // comments = _.sortBy(comments, ['updated_at'])
     return comments
   }
 
@@ -230,11 +214,9 @@ class CommentThread extends React.Component {
         content = <img src={record.filestack_file_url} alt="Text" />
       }
     } else {
-      // eslint-disable-next-line
+      content = <CollectionIcon viewBox="50 50 170 170" />
       if (record.cover.image_url) {
-        content = <img src={record.cover.image_url} alt="Collection" />
-      } else {
-        content = <CollectionIcon viewBox="50 50 170 170" />
+        content = <img src={record.cover.image_url} alt={record.name} />
       }
     }
     return (
@@ -246,7 +228,6 @@ class CommentThread extends React.Component {
 
   renderUnreadCount = () => {
     const { thread } = this.props
-    // console.log('renderUnreadCount', thread.unreadCount)
     return (
       <span className={`unread ${thread.unreadCount && 'show-unread'}`}>
         <span className="inner">

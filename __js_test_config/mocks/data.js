@@ -189,7 +189,7 @@ export const fakeThread = {
   comments: [
     fakeComment, fakeComment, fakeComment
   ],
-  unread_comments: [
+  latestUnreadComments: [
     fakeComment, fakeComment
   ],
 }

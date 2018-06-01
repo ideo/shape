@@ -23,11 +23,14 @@ class Api::V1::UsersController < Api::V1::BaseController
 
   def me
     render jsonapi: current_user, include: [
-      :comment_threads,
       :groups,
       organizations: %i[primary_group],
       current_organization: %i[primary_group guest_group],
-    ]
+    ], class: {
+      User: SerializableCurrentUser,
+      Group: SerializableGroup,
+      Organization: SerializableOrganization,
+    }
   end
 
   def search
