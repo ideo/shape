@@ -44,6 +44,9 @@ describe Api::V1::UsersController, type: :request, json: true, auth: true do
 
   describe 'GET #me' do
     let(:path) { '/api/v1/users/me' }
+    before do
+      allow(GoogleAuthService).to receive(:create_custom_token).and_return('token')
+    end
 
     it 'returns a 200' do
       get(path)
@@ -54,6 +57,11 @@ describe Api::V1::UsersController, type: :request, json: true, auth: true do
       get(path)
       expect(json['data']['attributes']['id'].to_i).to eq(user.id)
       expect(assigns(:current_user)).to eq(user)
+    end
+
+    it 'matches User schema' do
+      get(path)
+      expect(json['data']['attributes']).to match_json_schema('user_me')
     end
   end
 

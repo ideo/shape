@@ -7,7 +7,11 @@
     "email": { "type": "string" },
     "status": { "type": "string" },
     "pic_url_square": { "type": "string" },
-    "created_at": { "type": "date" }
+    "current_user_collection_id": { "type": ["integer", "null"] },
+    "created_at": { "type": "date" },
+    "terms_accepted": { "type": "boolean" },
+    "show_helper": { "type": "boolean" },
+    "google_auth_token": { "type": "string" }
   },
   "required": ["id", "email", "first_name", "last_name", "status"]
 }

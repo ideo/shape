@@ -22,6 +22,8 @@ class CommentCreator < SimpleService
   end
 
   def add_author_as_follower_of_thread
-    @comment_thread.add_user_follower!(@author.id)
+    users_thread = @comment_thread.add_user_follower!(@author.id)
+    return unless users_thread.present?
+    users_thread.update_last_viewed!
   end
 end

@@ -85,6 +85,8 @@ RSpec.describe Roles::MassAssign, type: :service do
       let(:comment_thread) { create(:comment_thread, record: object) }
 
       it 'should add users and groups as comment thread followers' do
+        # to pick up comment_thread
+        object.reload
         expect(AddCommentThreadFollowers).to receive(:perform_async).with(
           comment_thread.id,
           users.map(&:id),
@@ -200,7 +202,7 @@ RSpec.describe Roles::MassAssign, type: :service do
                              parent: object.current_shared_collection,
                              collection: linked_collection)}
 
-        it 'should link all the groups shared collection cards' do
+        it 'should link all the group\'s shared collection cards' do
           expect(LinkToSharedCollectionsWorker).to receive(:perform_async).with(
             (users).map(&:id),
             [],

@@ -49,7 +49,6 @@ RSpec.configure do |config|
   # arbitrary gems may also be filtered via:
   # config.filter_gems_from_backtrace("gem name")
 
-
   # Access Warden/Devise authentication methods
   config.include Warden::Test::Helpers
 
@@ -89,6 +88,17 @@ RSpec.configure do |config|
 
   config.before(:each) do
     DatabaseCleaner.start
+  end
+
+  config.before(:each) do
+    # TODO: Replace this mock once we move firestore into sidekiq jobs
+    fake_client = double('firestore')
+    fake_methods = Hashie::Mash.new(
+      batch: {},
+    )
+    allow(fake_client).to receive(:write)
+    allow(fake_client).to receive(:client).and_return(fake_methods)
+    allow(FirestoreClient).to receive(:new).and_return(fake_client)
   end
 
   config.after(:each) do

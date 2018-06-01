@@ -41,6 +41,16 @@ module Resourceable
         { users: role.users, groups: role.groups }
       end
     end
+
+    # really meant to be used on an AR Relation, where `select` is just the relevant records
+    def user_ids
+      identifiers = select(:id).map(&:resource_identifier)
+      UsersRole
+        .joins(:role)
+        .where(Role.arel_table[:resource_identifier].in(identifiers))
+        .pluck(:user_id)
+        .uniq
+    end
   end
 
   def can_edit?(user_or_group)
@@ -60,6 +70,18 @@ module Resourceable
 
   def resource_identifier
     Role.object_identifier(self)
+  end
+
+  # combine all attached user_ids using self.user_ids method
+  def user_ids
+    self.class.where(id: id).user_ids
+  end
+
+  # get all editors/viewers, both individual and via group, for this item/collection
+  def allowed_user_ids
+    return unless is_a?(Collection) || is_a?(Item)
+    group_ids = editors[:groups].pluck(:id) + viewers[:groups].pluck(:id)
+    (user_ids + Group.where(id: group_ids).user_ids).uniq
   end
 
   # NOTE: This should only ever be called on a newly created record, e.g. in CollectionCardBuilder

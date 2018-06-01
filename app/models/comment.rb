@@ -1,5 +1,5 @@
 class Comment < ApplicationRecord
-  paginates_per 10
+  paginates_per 50
   belongs_to :comment_thread, touch: true
   belongs_to :author, class_name: 'User'
 
@@ -21,9 +21,9 @@ class Comment < ApplicationRecord
     # TODO: background job
     FirestoreClient.client.batch do |batch|
       batch.set("comments/#{id}", serialized_for_firestore)
-      # comment_thread.store_in_firestore(batch)
-      # update comment thread
+      # store comment_thread to update its `updated_at`
       batch.set("comment_threads/#{comment_thread.id}", comment_thread.serialized_for_firestore)
+      # ping all the users threads so they get an updated unread_count
       comment_thread.users_threads.each do |ut|
         batch.set("users_threads/#{ut.id}", ut.serialized_for_firestore)
       end

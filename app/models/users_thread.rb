@@ -8,6 +8,7 @@ class UsersThread < ApplicationRecord
 
   def update_last_viewed!
     update(last_viewed_at: Time.now)
+    store_in_firestore
   end
 
   def unread_count
@@ -30,11 +31,4 @@ class UsersThread < ApplicationRecord
     # TODO: background job
     FirestoreClient.new.write("users_threads/#{id}", serialized_for_firestore)
   end
-
-  # def self.store_in_firestore(user_id:)
-  #   FirestoreClient.new.write(
-  #     "users_threads/#{user_id}",
-  #     serialized_for_firestore(user_id: user_id),
-  #   )
-  # end
 end

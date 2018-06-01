@@ -26,6 +26,7 @@ const StyledComment = styled.div`
 class Comment extends React.Component {
   render() {
     const { comment } = this.props
+
     return (
       <StyledComment unread={comment.unread}>
         <InlineRow align="center">

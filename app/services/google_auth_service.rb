@@ -50,6 +50,8 @@ class GoogleAuthService
       iat: now_seconds,
       exp: now_seconds + (60 * 60), # max expiration is 1 hour
       uid: uid,
+      # TODO: look into "claims" which will allow us to add group roles...
+      # that way we can store group + user ids on objects for acccess
     }
     JWT.encode payload, private_key, 'RS256'
   end

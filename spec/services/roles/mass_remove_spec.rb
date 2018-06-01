@@ -202,6 +202,7 @@ RSpec.describe Roles::MassRemove, type: :service do
       let(:comment_thread) { create(:comment_thread, record: collection) }
 
       it 'removes all followers from comment threads if they no longer have access' do
+        collection.reload
         expect(RemoveCommentThreadFollowers).to receive(:perform_async).with(
           comment_thread.id,
           users.map(&:id),

@@ -27,10 +27,15 @@ describe Api::V1::CommentsController, type: :request, json: true, auth: true do
   describe 'POST #create' do
     let!(:comment_thread) { create(:item_comment_thread) }
     let(:path) { "/api/v1/comment_threads/#{comment_thread.id}/comments" }
-    let(:params) { { message: 'heyo' }.to_json }
     let(:instance_double) do
       double('ActivityAndNotificationBuilder')
     end
+    let(:params) {
+      json_api_params(
+        'comments',
+        message: 'heyo',
+      )
+    }
 
     before do
       allow(ActivityAndNotificationBuilder).to receive(:new).and_return(instance_double)
@@ -38,9 +43,8 @@ describe Api::V1::CommentsController, type: :request, json: true, auth: true do
       user.add_role(Role::EDITOR, comment_thread.record)
     end
 
-    it 'returns a 200' do
-      post(path, params: params)
-      expect(response.status).to eq(200)
+    it 'returns a 204 no content' do
+      expect(response.status).to eq(204)
     end
 
     it 'creates a message in the thread' do

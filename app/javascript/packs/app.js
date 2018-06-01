@@ -9,7 +9,6 @@ import { Router } from 'react-router-dom'
 
 import Routes from '~/ui/Routes'
 import stores, { routingStore } from '~/stores'
-// import '~/vendor/firestore'
 
 // Enable MobX Strict functionality -- requires explicit @actions
 useStrict(true)

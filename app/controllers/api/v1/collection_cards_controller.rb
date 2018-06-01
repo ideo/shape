@@ -74,16 +74,19 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
 
   def duplicate
     placement = json_api_params[:placement]
+    should_update_cover = false
     # reverse cards for 'beginning' since they get duplicated one by one to the front
     @cards = @cards.reverse if placement == 'beginning'
     @cards.each do |card|
-      card.duplicate!(
+      dup = card.duplicate!(
         for_user: current_user,
         parent: @to_collection,
         placement: placement,
         duplicate_linked_records: true,
       )
+      should_update_cover ||= dup.should_update_parent_collection_cover?
     end
+    @to_collection.cache_cover! if should_update_cover
     # NOTE: for some odd reason the json api refuses to render the newly created cards here,
     # so we end up re-fetching the to_collection later in the front-end
     render jsonapi: @to_collection.reload, include: Collection.default_relationships_for_api
