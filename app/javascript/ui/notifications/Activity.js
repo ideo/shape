@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 import pluralize from 'pluralize'
 
 import Link from '~/ui/global/Link'
-import { routingStore } from '~/stores'
+import { uiStore, routingStore } from '~/stores'
 
 function insertCommas(subjectUsers, subjectGroups) {
   return (subjectUsers.map(u => u.name).concat(subjectGroups.map(g => g.name))).join(', ')
@@ -30,10 +30,14 @@ class Activity extends React.PureComponent {
     return _.uniq(actors).map(actor => actor.name).join(', ')
   }
 
-  targetLink() {
+  targetLink(targetName) {
     const { target } = this.props
     const { id, internalType } = target
-    return routingStore.pathTo(internalType, id)
+    if (internalType === 'groups') {
+      return <button className="target" onClick={() => uiStore.openGroup(id)}>{targetName}</button>
+    }
+    const link = routingStore.pathTo(internalType, id)
+    return <Link className="target" to={link}>{targetName}</Link>
   }
 
   getDataText() {
@@ -78,14 +82,14 @@ class Activity extends React.PureComponent {
         <p>
           <strong className="actor">{actorNames}</strong> has made
           <strong className="subjects">{subjects}</strong>
-            ${roleArticle(roleName)} <strong className="roleName">{roleName}</strong>
-        of the <Link className="target" to={this.targetLink()}>{targetName}</Link>
+            {roleArticle(roleName)} <strong className="roleName">{roleName}</strong>
+        of the {this.targetLink(targetName)}
         </p>)
     case 'commented':
       return (
         <p>
           <strong className="actor">{actorNames}</strong> commented on
-          <Link className="target" to={this.targetLink()}>{targetName}</Link>:
+          {this.targetLink(targetName)}:
           <span className="message">{message}</span>
         </p>)
 

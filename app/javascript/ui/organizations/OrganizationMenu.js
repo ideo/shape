@@ -32,7 +32,9 @@ class OrganizationMenu extends React.Component {
   }
 
   changePage(page) {
-    this.props.uiStore.update('organizationMenuPage', page)
+    const { uiStore } = this.props
+    uiStore.update('organizationMenuPage', page)
+    uiStore.update('organizationMenuGroupId', null)
   }
 
   @action goToEditGroupRoles(group) {
@@ -182,7 +184,7 @@ class OrganizationMenu extends React.Component {
   }
 
   render() {
-    const { open } = this.props
+    const { open, uiStore, apiStore } = this.props
     let content, title, onBack, onEdit
     switch (this.currentPage) {
     case 'addGroup':
@@ -205,6 +207,9 @@ class OrganizationMenu extends React.Component {
       if (this.isLoading) {
         content = <Loader height="350px" fadeIn="none" />
       } else {
+        if (uiStore.organizationMenuGroupId) {
+          this.editGroup = apiStore.find('groups', uiStore.organizationMenuGroupId)
+        }
         content = this.renderEditRoles()
       }
       if (this.editGroup.can_edit) {

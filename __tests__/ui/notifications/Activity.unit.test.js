@@ -1,9 +1,12 @@
 import Activity from '~/ui/notifications/Activity'
+import { uiStore, routingStore } from '~/stores'
 
 import {
   fakeActivity,
   fakeUser,
 } from '#/mocks/data'
+
+jest.mock('../../../app/javascript/stores')
 
 let props
 let wrapper
@@ -11,6 +14,8 @@ let component
 
 describe('Activity', () => {
   beforeEach(() => {
+    routingStore.pathTo.mockImplementation((type, id) =>
+      `/${type}/${id}`)
     props = {
       action: fakeActivity.action,
       actors: [fakeActivity.actor],
@@ -71,6 +76,21 @@ describe('Activity', () => {
       it('should link to the target', () => {
         const link = findPart('target')
         expect(link.props().to).toEqual('/collections/4')
+      })
+
+      describe('with a group', () => {
+        beforeEach(() => {
+          props.subjectGroups = []
+          props.target = { id: 24, name: 'Pokemon lovers', internalType: 'groups' }
+          wrapper.setProps(props)
+        })
+
+        it('should be a link that opens the group menu', () => {
+          const link = findPart('target')
+          expect(link.type()).toEqual('button')
+          link.simulate('click')
+          expect(uiStore.openGroup).toHaveBeenCalledWith(24)
+        })
       })
     })
 

@@ -107,7 +107,7 @@ module Roles
       )
       builder.call
     end
-    
+
     def add_editors_as_comment_thread_followers
       return unless @role_name.to_sym == Role::EDITOR
       return unless @object.is_a?(Item) || @object.is_a?(Collection)
