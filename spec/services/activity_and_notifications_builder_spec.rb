@@ -50,7 +50,7 @@ RSpec.describe ActivityAndNotificationBuilder, type: :service do
       end
     end
 
-    context 'when you are the actor' do
+    context 'when a subject user is also the actor' do
       let(:subject_users) { [actor] }
 
       it 'should not notifiy you if you are the actor' do

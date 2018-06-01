@@ -41,6 +41,10 @@ describe('Activity', () => {
         expect(wrapper.find('.actor').text()).toEqual(fakeUser.name)
         expect(findPart('target').props().children).toEqual('Plants')
       })
+
+      it('should not render a link to the target', () => {
+        expect(findPart('target').props().to).toBeFalsy()
+      })
     })
 
     describe('with the added role action', () => {

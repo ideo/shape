@@ -69,7 +69,7 @@ class Activity extends React.PureComponent {
       return (
         <p>
           <strong className="actor">{actorNames}</strong>
-          has archived <Link className="target" to={this.targetLink()}>{targetName}</Link>
+          has archived <strong className="target">{targetName}</strong>
         </p>)
     case 'added_editor':
     case 'added_member':
