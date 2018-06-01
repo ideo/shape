@@ -42,14 +42,9 @@ describe Api::V1::NotificationsController, type: :request, json: true, auth: tru
       )
     end
 
-    it 'returns a 200' do
+    it 'returns a 204 no content' do
       patch(path, params: params)
-      expect(response.status).to eq(200)
-    end
-
-    it 'matches JSON schema' do
-      patch(path, params: params)
-      expect(json['data']['attributes']).to match_json_schema('notification')
+      expect(response.status).to eq(204)
     end
 
     it 'updates the content' do

@@ -20,7 +20,7 @@ class Api::V1::NotificationsController < Api::V1::BaseController
     notification.attributes = notification_params
     if notification.save
       notification.store_in_firestore
-      # TODO: no content
+      head :no_content
     else
       render_api_errors notificaiton.errors
     end
