@@ -202,6 +202,8 @@ export const fakeActivity = {
   subject_users: [],
   subject_groups: [],
   target: fakeCollection,
+  target_type: 'Collection',
+  target_id: fakeCollection.id,
   ...fakeJsonApiAttrs,
 }
 export const fakeNotification = {
