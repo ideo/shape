@@ -43,9 +43,6 @@ class CommentThread extends BaseRecord {
 
   async API_fetchComments({ page = 1 } = {}) {
     const apiPath = `comment_threads/${this.id}/comments?page=${page}`
-    // simulate backend effect
-    this.comments.forEach(comment => comment.markAsRead())
-    if (this.users_thread) this.users_thread.unread_count = 0
     const res = await this.apiStore.request(apiPath, 'GET')
     this.importComments(res.data)
   }

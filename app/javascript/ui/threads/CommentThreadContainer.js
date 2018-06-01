@@ -110,10 +110,13 @@ class CommentThreadContainer extends React.Component {
       runInAction(() => {
         this.loadingThreads = true
       })
-      await thread.API_fetchComments()
-      runInAction(() => {
-        this.loadingThreads = false
-      })
+      try {
+        await thread.API_fetchComments()
+      } finally {
+        runInAction(() => {
+          this.loadingThreads = false
+        })
+      }
       // scroll again after any more comments have loaded
       this.scrollToTopOfNextThread(thread)
     }

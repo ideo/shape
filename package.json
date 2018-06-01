@@ -124,5 +124,8 @@
     "react-test-renderer": "^16.2.0",
     "webpack-bundle-analyzer": "^2.11.1",
     "webpack-dev-server": "^2.11.1"
+  },
+  "resolutions": {
+    "react-draggable": "git+https://git@github.com/ideo/react-draggable.git#3.0.5-beta.1"
   }
 }

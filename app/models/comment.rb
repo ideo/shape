@@ -1,5 +1,5 @@
 class Comment < ApplicationRecord
-  paginates_per 10
+  paginates_per 50
   belongs_to :comment_thread, touch: true
   belongs_to :author, class_name: 'User'
 
