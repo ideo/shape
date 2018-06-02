@@ -27,14 +27,14 @@ describe 'Ideo Profile API Requests' do
     end
 
     before do
-      ENV['IDEO_NETWORK_CALLBACK_SECRET'] = 'shared_secret_key_abc123'
+      ENV['IDEO_SSO_CLIENT_SECRET'] = 'shared_secret_key_abc123'
     end
 
     context 'event: updated' do
       it 'returns a 200' do
         post(
           '/callbacks/ideo_network/users',
-          params: { uid: uid, event: :updated, user: user_data }.to_json,
+          params: { uid: uid, event: :updated, data: { attributes: user_data } }.to_json,
           headers: valid_headers,
         )
         expect(response.status).to eq(200)
@@ -51,11 +51,14 @@ describe 'Ideo Profile API Requests' do
           params: {
             uid: uid,
             event: :updated,
-            user: {
-              first_name: 'Fancy',
-              last_name: 'Newname',
-              email: 'fancy@newname.com',
-              picture: 'newpic.jpg',
+            data: {
+              attributes: {
+                uid: uid,
+                first_name: 'Fancy',
+                last_name: 'Newname',
+                email: 'fancy@newname.com',
+                picture: 'newpic.jpg',
+              },
             },
           }.to_json,
           headers: valid_headers,
@@ -73,7 +76,7 @@ describe 'Ideo Profile API Requests' do
       it 'returns a 200' do
         post(
           '/callbacks/ideo_network/users',
-          params: { uid: uid, event: :deleted }.to_json,
+          params: { uid: uid, data: { attributes: user_data }, event: :deleted }.to_json,
           headers: valid_headers,
         )
         expect(response.status).to eq(200)
@@ -84,7 +87,7 @@ describe 'Ideo Profile API Requests' do
 
         post(
           '/callbacks/ideo_network/users',
-          params: { uid: uid, event: :deleted }.to_json,
+          params: { uid: uid, data: { attributes: user_data }, event: :deleted }.to_json,
           headers: valid_headers,
         )
 
@@ -94,7 +97,7 @@ describe 'Ideo Profile API Requests' do
       it 'returns a 200 if user does not exist' do
         post(
           '/callbacks/ideo_network/users',
-          params: { uid: 'FAKEID', event: :deleted }.to_json,
+          params: { uid: 'FAKEID', data: { attributes: { uid: 'FAKEID' } }, event: :deleted }.to_json,
           headers: valid_headers,
         )
         expect(response.status).to eq(200)
@@ -105,7 +108,7 @@ describe 'Ideo Profile API Requests' do
       it 'returns a 400' do
         post(
           '/callbacks/ideo_network/users',
-          params: { uid: uid, event: :transformed, user: user_data }.to_json,
+          params: { uid: uid, event: :transformed, data: { attributes: user_data } }.to_json,
           headers: valid_headers,
         )
         expect(response.status).to eq(400)
@@ -122,7 +125,7 @@ describe 'Ideo Profile API Requests' do
       it 'returns a 401' do
         post(
           '/callbacks/ideo_network/users',
-          params: { uid: uid, event: :updated, user: user_data }.to_json,
+          params: { uid: uid, event: :updated, data: { attributes: user_data } }.to_json,
           headers: invalid_headers,
         )
         expect(response.status).to eq(401)

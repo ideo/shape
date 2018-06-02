@@ -280,22 +280,10 @@ Devise.setup do |config|
   # so you need to do it manually. For the users scope, it would be:
   # config.omniauth_path_prefix = '/my_engine/users/auth'
 
-  if ENV['OKTA_CLIENT_ID'].present? &&
-     ENV['OKTA_CLIENT_SECRET'].present? &&
-     ENV['OKTA_BASE_URL'].present? &&
-     ENV['OKTA_REDIRECT_PATH'].present?
-
-    config.omniauth :okta, ENV['OKTA_CLIENT_ID'], ENV['OKTA_CLIENT_SECRET'], {
-      redirect_uri: URI.join(ENV['OKTA_BASE_URL'], ENV['OKTA_REDIRECT_PATH']).to_s,
-      # callback_path must be defined, and needs to match
-      # the path given above in redirect_uri
-      callback_path: ENV['OKTA_REDIRECT_PATH'],
-      setup: lambda do |env|
-        # Store the JS SSO SDK's "state" param to the session for
-        # validating authentication responses - otherwise you get csrf token errors
-        request = Rack::Request.new(env)
-        request.session["omniauth.state"] = request.cookies['IdeoSSO-State']
-      end
-    }
-  end
+  config.omniauth :ideo, ENV['IDEO_SSO_CLIENT_ID'], ENV['IDEO_SSO_CLIENT_SECRET'], {
+    # This setup proc is necessary to store the JS SSO SDK's "state" param,
+    # which is validated when receiving an authentication response
+    # (otherwise you get csrf token errors)
+    setup: OmniAuth::Ideo::AuthFlow.populate_omniauth_state_from_cookie
+  }
 end

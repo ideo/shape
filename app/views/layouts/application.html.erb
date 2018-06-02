@@ -8,7 +8,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <%= render partial: '/layouts/favicons' %>
     <script type="text/javascript"
-      src="https://d3none3dlnlrde.cloudfront.net/1.0/js/ideo-sso-js-sdk.min.js">
+      src="<%= ideo_sso_js_sdk_url %>">
     </script>
     <script>
       IdeoSSO.init(<%= ideo_sso_init_params.to_json.html_safe %>)

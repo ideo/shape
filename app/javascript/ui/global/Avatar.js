@@ -36,7 +36,6 @@ class Avatar extends React.Component {
   }
 
   onError = () => {
-    console.log(Avatar.defaultProps.url)
     this.setUrl(Avatar.defaultProps.url)
   }
 

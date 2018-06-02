@@ -67,7 +67,7 @@ Rails.application.configure do
   # config.active_job.queue_name_prefix = "ideo-sso-demo_#{Rails.env}"
   config.action_mailer.perform_caching = false
 
-  app_uri = URI.parse(ENV['OKTA_BASE_URL'])
+  app_uri = URI.parse(ENV['BASE_HOST'])
   config.action_mailer.default_url_options = { host: app_uri.host }
   config.action_mailer.delivery_method = :smtp
 
@@ -121,9 +121,9 @@ Rails.application.configure do
   # Do not dump schema after migrations.
   config.active_record.dump_schema_after_migration = false
 
-  # redirect all URLs that do not match OKTA_BASE_URL
+  # redirect all URLs that do not match BASE_HOST
   config.middleware.insert_before(Rack::Runtime, Rack::Rewrite) do
-    uri = URI.parse(ENV['OKTA_BASE_URL'])
+    uri = URI.parse(ENV['BASE_HOST'])
     r301 %r{.*}, "//#{uri.host}$&", if: Proc.new { |rack_env|
       rack_env['SERVER_NAME'] != uri.host
     }

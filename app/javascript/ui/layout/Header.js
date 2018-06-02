@@ -57,7 +57,7 @@ class Header extends React.Component {
   }
 
   handleAccountSettings = () => {
-    window.open(IdeoSSO.getSettingsUrl(), '_blank')
+    window.open(IdeoSSO.profileUrl, '_blank')
   }
 
   handleLogout = async () => {
