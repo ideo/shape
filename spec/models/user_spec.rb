@@ -86,7 +86,7 @@ describe User, type: :model do
     let(:pending_user) { nil }
     let(:auth) do
       Hashie::Mash.new(
-        provider: 'okta',
+        provider: 'ideo',
         uid: '123',
         info: {
           email: Faker::Internet.unique.email,
@@ -99,7 +99,7 @@ describe User, type: :model do
     let(:from_omniauth) { User.from_omniauth(auth, pending_user) }
 
     context 'with existing user' do
-      let!(:existing_user) { create(:user, provider: 'okta', uid: '123') }
+      let!(:existing_user) { create(:user, provider: 'ideo', uid: '123') }
 
       it 'updates existing user if found' do
         expect(from_omniauth.id).to eq existing_user.id
