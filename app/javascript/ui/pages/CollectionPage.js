@@ -3,6 +3,7 @@ import ReactRouterPropTypes from 'react-router-prop-types'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import { Flex, Box } from 'reflexbox'
 
+import PageError from '~/ui/global/PageError'
 import PageWithApi from '~/ui/pages/PageWithApi'
 import Loader from '~/ui/layout/Loader'
 import Header from '~/ui/layout/Header'
@@ -89,6 +90,9 @@ class CollectionPage extends PageWithApi {
   }
 
   render() {
+    // this.error comes from PageWithApi
+    if (this.error) return <PageError error={this.error} />
+
     const { collection } = this
     const { uiStore } = this.props
     if (!collection) return <Loader />

@@ -1,9 +1,15 @@
 import _ from 'lodash'
+import { action, observable } from 'mobx'
 import { animateScroll as scroll } from 'react-scroll'
 
 import { uiStore, routingStore } from '~/stores'
 
+// used as an "interface" class for CollectionPage / ItemPage / SearchPage
+// NOTE: extending classes is not a recommended React approach, could consider refactoring to HOC
 class PageWithApi extends React.Component {
+  unmounted = false
+  @observable error = null
+
   componentDidMount() {
     scroll.scrollToTop({ duration: 0 })
     uiStore.resetSelectionAndBCT()
@@ -17,6 +23,16 @@ class PageWithApi extends React.Component {
     this.fetchData(nextProps)
   }
 
+  componentWillUnmount() {
+    this.unmounted = true
+    uiStore.setViewingCollection(null)
+    uiStore.setViewingItem(null)
+  }
+
+  @action updateError(err) {
+    this.error = err
+  }
+
   // to be overridden in child class
   // onAPILoad = null
   // requestPath = null
@@ -28,12 +44,14 @@ class PageWithApi extends React.Component {
     return apiStore.request(this.requestPath(props))
       .then(response => {
         uiStore.update('isLoading', false)
+        if (this.unmounted) return
         if (_.isFunction(this.onAPILoad)) {
           this.onAPILoad(response)
         }
       })
       .catch(err => {
         uiStore.update('isLoading', false)
+        this.updateError(err)
         console.warn('API error!', err)
         if (!routingStore.location.pathname === '/') routingStore.routeTo('/')
       })

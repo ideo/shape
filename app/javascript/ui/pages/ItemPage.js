@@ -5,6 +5,7 @@ import { Flex, Box } from 'reflexbox'
 import styled from 'styled-components'
 import { Link } from 'react-router-dom'
 
+import PageError from '~/ui/global/PageError'
 import ActionCableConsumer from '~/utils/ActionCableConsumer'
 import PageWithApi from '~/ui/pages/PageWithApi'
 import PageContainer from '~/ui/layout/PageContainer'
@@ -128,6 +129,9 @@ class ItemPage extends PageWithApi {
   }
 
   render() {
+    // this.error comes from PageWithApi
+    if (this.error) return <PageError error={this.error} />
+
     const { uiStore } = this.props
     const { item } = this.state
     if (!item) return <Loader />
