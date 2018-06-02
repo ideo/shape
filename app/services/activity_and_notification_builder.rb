@@ -76,7 +76,7 @@ class ActivityAndNotificationBuilder
     similar_notifications = find_similar_notifications(user, similar_activities)
     if similar_notifications.count > 2
       activity_ids = similar_notifications.map(&:activity).map(&:id)
-    elsif similar_notifications.first.combined_activities_ids.count > 0
+    elsif similar_notifications.first.combined_activities_ids.count.positive?
       activity_ids = similar_notifications.first.combined_activities_ids
     else
       return
