@@ -73,7 +73,8 @@ module RolifyExtensions
     else
       raise "RolifyExtension: Unsupported model '#{self.class.name}' for remove_role"
     end
-    [role]
+    after_role_update(role)
+    role
   end
 
   def existing_resource_role_for_self(role)
