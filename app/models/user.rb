@@ -31,6 +31,11 @@ class User < ApplicationRecord
   has_many :users_roles
   has_many :comments, foreign_key: :author_id
 
+  has_many :activities_as_actor, as: :actor, class_name: 'Activity'
+  has_many :activities_as_subject, through: :activity_subjects, class_name: 'Activity'
+  has_many :activity_subjects, as: :subject
+  has_many :notifications
+
   belongs_to :current_organization,
              class_name: 'Organization',
              optional: true
@@ -186,6 +191,17 @@ class User < ApplicationRecord
       groups = groups.reject { |g| g == organization.guest_group }
     end
     groups.compact.uniq
+  end
+
+  def unread_notifications
+    Notification
+      .joins(:activity)
+      .where(Activity.arel_table[:organization_id].eq(
+               current_organization_id))
+      .where(
+        user: self,
+        read: false,
+      )
   end
 
   private

@@ -2,6 +2,7 @@ class Group < ApplicationRecord
   include Resourceable
   include HasFilestackFile
   include Archivable
+  include HasActivities
   after_archive :after_archive_group
 
   prepend RolifyExtensions # Prepend so it can call rolify methods using super
@@ -28,6 +29,9 @@ class Group < ApplicationRecord
              class_name: 'Collection',
              optional: true
   has_many :groups_threads
+
+  has_many :activities_as_subject, through: :activity_subjects, class_name: 'Activity'
+  has_many :activity_subjects, as: :subject
 
   before_validation :set_handle_if_none, on: :create
 

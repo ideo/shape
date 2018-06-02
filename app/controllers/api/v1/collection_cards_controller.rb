@@ -34,8 +34,14 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
 
   def archive
     if @collection_card.archive!
-      @collection_card.reload
-      render jsonapi: @collection_card, include: [:parent, record: [:filestack_file]]
+      ActivityAndNotificationBuilder.new(
+        actor: current_user,
+        target: @collection_card.record,
+        action: Activity.actions[:archived],
+        subject_users: @collection_card.record.editors[:users],
+        subject_groups: @collection_card.record.editors[:groups],
+      ).call
+      render jsonapi: @collection_card.reload, include: [:parent, record: [:filestack_file]]
     else
       render_api_errors @collection_card.errors
     end

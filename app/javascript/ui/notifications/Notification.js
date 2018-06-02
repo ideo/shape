@@ -1,0 +1,50 @@
+import { PropTypes as MobxPropTypes } from 'mobx-react'
+
+import Activity from '~/ui/notifications/Activity'
+
+class Notification extends React.PureComponent {
+  updateRead() {
+    const { notification } = this.props
+    notification.read = true
+    notification.save()
+  }
+
+  combineActors() {
+    const { notification } = this.props
+    if (!notification.combined_activities_ids.length) {
+      return [notification.activity.actor]
+    }
+    return notification.combined_activities.map(activity =>
+      activity.actor)
+  }
+
+  handleRead = (ev) => {
+    ev.preventDefault()
+    this.updateRead()
+  }
+
+  render() {
+    const { notification } = this.props
+    const { activity } = notification
+    return (
+      <div>
+        <button className="read" onClick={this.handleRead}>M</button>
+        <Activity
+          action={activity.action}
+          actors={this.combineActors()}
+          target={activity.target}
+          subjectUsers={activity.subjectUsers}
+          subjectGroups={activity.subjectGroups}
+          actorCount={notification.combined_activities_ids.length}
+          content={activity.content}
+        />
+      </div>
+    )
+  }
+}
+
+Notification.propTypes = {
+  notification: MobxPropTypes.objectOrObservableObject.isRequired,
+}
+
+export default Notification

@@ -3,12 +3,14 @@ import { Store } from 'mobx-jsonapi-store'
 import _ from 'lodash'
 import moment from 'moment-mini'
 
+import Activity from './jsonApi/Activity'
 import Collection from './jsonApi/Collection'
 import CollectionCard from './jsonApi/CollectionCard'
 import Role from './jsonApi/Role'
 import FilestackFile from './jsonApi/FilestackFile'
 import Group from './jsonApi/Group'
 import Item from './jsonApi/Item'
+import Notification from './jsonApi/Notification'
 import Organization from './jsonApi/Organization'
 import User from './jsonApi/User'
 import Comment from './jsonApi/Comment'
@@ -162,6 +164,11 @@ class ApiStore extends Store {
     )
   }
 
+  async fetchNotifications() {
+    const res = await this.fetchAll('notifications')
+    return res.data
+  }
+
   // -- override mobx-jsonapi-store --
   __updateRelationships(obj) {
     const record = this.find(obj.type, obj.id)
@@ -182,6 +189,7 @@ class ApiStore extends Store {
   }
 }
 ApiStore.types = [
+  Activity,
   Collection,
   CollectionCard,
   FilestackFile,
@@ -192,6 +200,7 @@ ApiStore.types = [
   User,
   Comment,
   CommentThread,
+  Notification,
 ]
 
 export default ApiStore

@@ -234,8 +234,6 @@ export const CommentForm = styled.form`
     height: 18px;
   }
 `
-CommentForm.displayName = 'CommentForm'
-
 const StyledCommentTextarea = styled.div`
   textarea {
     resize: none;

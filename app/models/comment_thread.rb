@@ -1,4 +1,5 @@
 class CommentThread < ApplicationRecord
+  include HasActivities
   belongs_to :record,
              polymorphic: true
   # org comes from the item/collection, but cached on here for easy lookup

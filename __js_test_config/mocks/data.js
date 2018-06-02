@@ -193,3 +193,24 @@ export const fakeThread = {
     fakeComment, fakeComment
   ],
 }
+export const fakeActivity = {
+  id: 1,
+  type: 'activities',
+  action: 'archived',
+  actor: fakeUser,
+  created_at: new Date(),
+  subject_users: [],
+  subject_groups: [],
+  target: fakeCollection,
+  ...fakeJsonApiAttrs,
+}
+export const fakeNotification = {
+  id: 1,
+  type: 'notifications',
+  read: false,
+  activity: fakeActivity,
+  combined_activities: [],
+  combined_activities_ids: [],
+  user: fakeUser,
+  ...fakeJsonApiAttrs,
+}

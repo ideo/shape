@@ -1,0 +1,2 @@
+class DeserializableNotification < BaseJsonDeserializer
+end

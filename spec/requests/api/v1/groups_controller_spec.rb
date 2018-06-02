@@ -139,9 +139,14 @@ describe Api::V1::GroupsController, type: :request, json: true, auth: true do
     let!(:group) { create(:group, add_admins: [user], add_members: members) }
     let!(:orig_handle) { group.handle }
     let(:path) { "/api/v1/groups/#{group.id}/archive" }
+    let(:instance_double) do
+      double('ActivityAndNotificationBuilder')
+    end
 
     before do
       group.add_role(Role::VIEWER, collection)
+      allow(ActivityAndNotificationBuilder).to receive(:new).and_return(instance_double)
+      allow(instance_double).to receive(:call).and_return(true)
     end
 
     it 'returns a 200' do
@@ -170,6 +175,18 @@ describe Api::V1::GroupsController, type: :request, json: true, auth: true do
     it 'removes group from all content' do
       patch(path)
       expect(group.reload.roles_to_resources.count).to eq(0)
+    end
+
+    it 'notifies the editors that the item was archived' do
+      group.archived = true
+      expect(ActivityAndNotificationBuilder).to receive(:new).with(
+        actor: @user,
+        target: group,
+        action: Activity.actions[:archived],
+        subject_users: members << user,
+        subject_groups: [],
+      )
+      patch(path)
     end
 
     context 'without admin access' do

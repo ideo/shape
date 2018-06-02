@@ -12,6 +12,17 @@ class Api::V1::CommentsController < Api::V1::BaseController
       author: current_user,
     )
     if @comment
+      # TODO: update subjects when we have user threads merged in.
+      ActivityAndNotificationBuilder.new(
+        actor: current_user,
+        target: @comment_thread.record,
+        action: Activity.actions[:commented],
+        subject_users: @comment_thread.users_threads.map(&:user),
+        subject_groups: @comment_thread.groups_threads.map(&:group),
+        combine: true,
+        content: @comment.message,
+      ).call
+      # render the whole thread so that the front-end can be updated
       render jsonapi: @comment, include: [:author]
     else
       render jsonapi: @comment.errors
