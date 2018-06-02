@@ -240,7 +240,9 @@ export const CommentForm = styled.form`
     height: 18px;
   }
 `
-const StyledCommentTextarea = styled.div`
+CommentForm.displayName = 'CommentForm'
+
+export const StyledCommentTextarea = styled.div`
   textarea {
     resize: none;
     padding: 10px;

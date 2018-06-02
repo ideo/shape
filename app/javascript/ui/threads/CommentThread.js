@@ -3,6 +3,7 @@ import { observable, action, runInAction, computed } from 'mobx'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 import Dotdotdot from 'react-dotdotdot'
+import { Mention, MentionsInput } from 'react-mentions'
 
 import { routingStore } from '~/stores'
 import Link from '~/ui/global/Link'
@@ -13,8 +14,74 @@ import v, { ITEM_TYPES } from '~/utils/variables'
 import hexToRgba from '~/utils/hexToRgba'
 import Moment from '~/ui/global/Moment'
 import ReturnArrowIcon from '~/ui/icons/ReturnArrowIcon'
-import { CommentForm, CommentTextarea } from '~/ui/global/styled/forms'
+import { CommentForm, StyledCommentTextarea } from '~/ui/global/styled/forms'
 import Comment from './Comment'
+
+const mentionStyle = {
+  highlighter: {
+    overflow: 'hidden',
+  },
+
+  input: {
+    margin: 0,
+  },
+
+  '&singleLine': {
+    control: {
+      display: 'inline-block',
+
+      width: 130,
+    },
+
+    highlighter: {
+      padding: 1,
+      border: '2px inset transparent',
+    },
+
+    input: {
+      padding: 1,
+
+      border: '2px inset',
+    },
+  },
+
+  '&multiLine': {
+    highlighter: {
+      padding: 9,
+    },
+
+    input: {
+      padding: 9,
+      minHeight: 63,
+      outline: 0,
+      border: 0,
+    },
+  },
+
+  suggestions: {
+    list: {
+      backgroundColor: 'orange',
+      border: '1px solid rgba(0,0,0,0.15)',
+    },
+
+    item: {
+      padding: '5px 15px',
+      borderBottom: '1px solid rgba(0,0,0,0.15)',
+
+      '&focused': {
+        backgroundColor: 'green',
+      },
+    },
+  },
+}
+
+const userData = [
+  { display: 'jim', id: 1 },
+  { display: 'jane', id: 2 },
+  { display: 'joseph', id: 3 },
+  { display: 'andy', id: 4 },
+  { display: 'lala', id: 5 },
+]
 
 const StyledCommentThread = styled.div`
   .title {
@@ -191,6 +258,10 @@ class CommentThread extends React.Component {
     })
   }
 
+  handleAddMention = (id, display) => {
+    console.log('mentioned', id, display)
+  }
+
   objectLink() {
     const { thread } = this.props
     const { record } = thread
@@ -270,13 +341,30 @@ class CommentThread extends React.Component {
         </div>
         <CommentForm className="reply" onSubmit={this.handleSubmit}>
           <div className="textarea-input">
-            <CommentTextarea
-              placeholder="add comment"
-              value={this.message}
-              onChange={this.handleTextChange}
-              innerRef={(input) => { this.textarea = input }}
-              maxRows={6}
-            />
+            <StyledCommentTextarea>
+              <MentionsInput
+                style={mentionStyle}
+                value={this.message}
+                onChange={this.handleTextChange}
+                displayTransform={(id, display, type) => (
+                  `@${display}`
+                )}
+                markup="@[__display__](__type__:__id__)"
+                placeholder="Mention people using '@'"
+              >
+                <Mention
+                  type="user"
+                  trigger="@"
+                  data={userData}
+                  renderSuggestion={(suggestion, search, highlightedDisplay) => (
+                    <div className="user">{highlightedDisplay}</div>
+                  )}
+                  onAdd={this.handleAddMention}
+                  style={{ background: '#449', fontWeight: 'bold' }}
+                />
+              </MentionsInput>
+            </StyledCommentTextarea>
+
           </div>
           <button>
             <ReturnArrowIcon />

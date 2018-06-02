@@ -69,6 +69,7 @@
     "react-input-autosize": "^2.2.1",
     "react-intl": "^2.4.0",
     "react-markdown": "^3.3.0",
+    "react-mentions": "^2.0.1",
     "react-player": "^1.2.0",
     "react-quill": "^1.2.4",
     "react-rnd": "^7.3.0",
