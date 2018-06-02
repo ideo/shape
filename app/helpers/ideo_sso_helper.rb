@@ -1,24 +1,38 @@
 module IdeoSsoHelper
   def ideo_sso_init_params
-    prms = {
-      client: okta_client_id,
-      redirect: okta_omniauth_redirect_url.to_s
+    {
+      env: ideo_sso_env,
+      client: ideo_sso_client_id,
+      redirect: ideo_sso_redirect_url.to_s,
     }
-    prms[:recoveryToken] = ideo_sso_recovery_token if ideo_sso_recovery_token.present?
-    prms
   end
 
-  def ideo_sso_recovery_token
-    @ideo_sso_recovery_token
+  def ideo_sso_env
+    return ENV['IDEO_SSO_ENV'].to_sym if ENV['IDEO_SSO_ENV'].present?
+    hostname = URI.parse(request.url).hostname
+    if hostname.match(/(localhost|(staging\.shape\.space))$/).present?
+      :staging
+    else
+      :production
+    end
   end
 
-  def okta_client_id
-    ENV['OKTA_CLIENT_ID']
+  def ideo_sso_js_sdk_url
+    path = '/js/ideo-sso-js-sdk.min.js'
+    case ideo_sso_env
+    when :local then 'http://localhost:9000/' + path
+    when :staging then 'https://d278pcsqxz7fg5.cloudfront.net/1.1' + path
+    else 'https://d3none3dlnlrde.cloudfront.net/1.1' + path
+    end
   end
 
-  def okta_omniauth_redirect_url
-    return unless ENV['OKTA_BASE_URL'].present? && ENV['OKTA_REDIRECT_PATH'].present?
+  def ideo_sso_client_id
+    ENV['IDEO_SSO_CLIENT_ID']
+  end
 
-    URI.join(ENV['OKTA_BASE_URL'], ENV['OKTA_REDIRECT_PATH'])
+  def ideo_sso_redirect_url
+    return unless ENV['BASE_HOST'].present? && ENV['IDEO_SSO_REDIRECT_PATH'].present?
+
+    URI.join(ENV['BASE_HOST'], ENV['IDEO_SSO_REDIRECT_PATH'])
   end
 end
