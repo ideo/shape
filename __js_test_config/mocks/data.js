@@ -2,6 +2,7 @@ import _ from 'lodash'
 
 const fakeJsonApiAttrs = {
   assign: jest.fn(),
+  assignRef: jest.fn(),
   save: jest.fn(),
 }
 

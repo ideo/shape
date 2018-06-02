@@ -33,6 +33,7 @@ class Activity extends React.PureComponent {
   targetLink(targetName) {
     const { target } = this.props
     const { id, internalType } = target
+    if (!target.name) return ''
     if (internalType === 'groups') {
       return <button className="target" onClick={() => uiStore.openGroup(id)}>{targetName}</button>
     }
@@ -82,7 +83,7 @@ class Activity extends React.PureComponent {
         <p>
           <strong className="actor">{actorNames}</strong> has made
           <strong className="subjects">{subjects}</strong>
-            {roleArticle(roleName)} <strong className="roleName">{roleName}</strong>
+          {roleArticle(roleName)} <strong className="roleName">{roleName}</strong>
         of the {this.targetLink(targetName)}
         </p>)
     case 'commented':

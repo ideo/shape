@@ -1,6 +1,8 @@
 import { PropTypes as MobxPropTypes } from 'mobx-react'
+import { Fragment } from 'react'
 import pluralize from 'pluralize'
 import { apiStore } from '~/stores'
+import styled from 'styled-components'
 
 import Activity from '~/ui/notifications/Activity'
 import InlineLoader from '~/ui/layout/InlineLoader'
@@ -8,6 +10,12 @@ import InlineLoader from '~/ui/layout/InlineLoader'
 function pluralTypeName(name) {
   return pluralize(name).toLowerCase()
 }
+
+const StyledContainer = styled.div`
+  margin: 10px;
+  min-height: 80px;
+  position: relative;
+`
 
 class Notification extends React.PureComponent {
   componentWillMount() {
@@ -47,21 +55,29 @@ class Notification extends React.PureComponent {
   render() {
     const { notification } = this.props
     const { activity } = notification
-    // TODO we don't actually want a loader for each notification
-    if (!activity.target) return <InlineLoader />
+    let content
+    if (!activity.target) {
+      content = <InlineLoader />
+    } else {
+      content = (
+        <Fragment>
+          <button className="read" onClick={this.handleRead}>M</button>
+          <Activity
+            action={activity.action}
+            actors={this.combineActors()}
+            target={activity.target}
+            subjectUsers={activity.subjectUsers}
+            subjectGroups={activity.subjectGroups}
+            actorCount={notification.combined_activities_ids.length}
+            content={activity.content}
+          />
+        </Fragment>
+      )
+    }
     return (
-      <div>
-        <button className="read" onClick={this.handleRead}>M</button>
-        <Activity
-          action={activity.action}
-          actors={this.combineActors()}
-          target={activity.target}
-          subjectUsers={activity.subjectUsers}
-          subjectGroups={activity.subjectGroups}
-          actorCount={notification.combined_activities_ids.length}
-          content={activity.content}
-        />
-      </div>
+      <StyledContainer>
+        {content}
+      </StyledContainer>
     )
   }
 }
