@@ -22,13 +22,13 @@ describe('NotificationsContainer', () => {
 
   describe('unreadCount', () => {
     beforeEach(() => {
-      props.apiStore = fakeApiStore({
-        findAllResult: [
-          { id: 1, read: false },
-          { id: 2, read: false },
-          { id: 3, read: true },
-        ]
-      })
+      props.apiStore = fakeApiStore()
+      props.apiStore.unreadNotifications = [
+        { id: 1, read: false },
+        { id: 2, read: false },
+        { id: 3, read: true },
+      ]
+      props.apiStore.unreadNotificationsCount = 2
       wrapper.setProps(props)
     })
 
