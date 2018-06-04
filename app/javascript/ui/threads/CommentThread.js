@@ -1,10 +1,10 @@
 import PropTypes from 'prop-types'
-import { observable, action, runInAction } from 'mobx'
+import { observable, action, runInAction, computed } from 'mobx'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
-import _ from 'lodash'
 import styled from 'styled-components'
 import Dotdotdot from 'react-dotdotdot'
 
+import { routingStore } from '~/stores'
 import Link from '~/ui/global/Link'
 import CollectionIcon from '~/ui/icons/CollectionIcon'
 import CommentIconFilled from '~/ui/icons/CommentIconFilled'
@@ -15,7 +15,6 @@ import Moment from '~/ui/global/Moment'
 import ReturnArrowIcon from '~/ui/icons/ReturnArrowIcon'
 import { CommentForm, CommentTextarea } from '~/ui/global/styled/forms'
 import Comment from './Comment'
-import { routingStore } from '~/stores'
 
 const StyledCommentThread = styled.div`
   .title {
@@ -141,17 +140,10 @@ ThumbnailHolder.displayName = 'ThumbnailHolder'
 class CommentThread extends React.Component {
   @observable message = ''
   @observable titleLines = 1
-  // we store this locally so that it can fade out after unread == 0,
-  // but we still display the old number
-  @observable unreadCount = 0
 
   componentDidMount() {
     this.focusTextArea(this.props.expanded)
     this.countLines()
-    runInAction(() => {
-      const { thread } = this.props
-      this.unreadCount = thread.unread_count
-    })
   }
 
   componentWillReceiveProps({ expanded }) {
@@ -173,14 +165,13 @@ class CommentThread extends React.Component {
     }
   }
 
-  get comments() {
+  @computed get comments() {
     const { expanded, thread } = this.props
     let { comments } = thread
     // for un-expanded thread, only take the unread comments
     if (!expanded) {
-      comments = thread.unread_comments
+      comments = thread.latestUnreadComments
     }
-    comments = _.sortBy(comments, ['updated_at'])
     return comments
   }
 
@@ -188,14 +179,16 @@ class CommentThread extends React.Component {
     this.message = ev.target.value
   }
 
-  handleSubmit = async (e) => {
+  handleSubmit = (e) => {
     e.preventDefault()
+    if (!this.message) return
     const { thread } = this.props
-    await thread.API_saveComment(this.message)
+    thread.API_saveComment(this.message).then(() => {
+      this.props.afterSubmit()
+    })
     runInAction(() => {
       this.message = ''
     })
-    this.props.afterSubmit()
   }
 
   objectLink() {
@@ -221,11 +214,9 @@ class CommentThread extends React.Component {
         content = <img src={record.filestack_file_url} alt="Text" />
       }
     } else {
-      // eslint-disable-next-line
+      content = <CollectionIcon viewBox="50 50 170 170" />
       if (record.cover.image_url) {
-        content = <img src={record.cover.image_url} alt="Collection" />
-      } else {
-        content = <CollectionIcon viewBox="50 50 170 170" />
+        content = <img src={record.cover.image_url} alt={record.name} />
       }
     }
     return (
@@ -238,9 +229,9 @@ class CommentThread extends React.Component {
   renderUnreadCount = () => {
     const { thread } = this.props
     return (
-      <span className={`unread ${thread.unread_count && 'show-unread'}`}>
+      <span className={`unread ${thread.unreadCount && 'show-unread'}`}>
         <span className="inner">
-          { this.unreadCount }
+          { thread.unreadCount }
           <CommentIconFilled />
         </span>
       </span>
@@ -248,8 +239,8 @@ class CommentThread extends React.Component {
   }
 
   renderComments = () => (
-    this.comments.map(comment => (
-      <Comment key={comment.id} comment={comment} />
+    this.comments.map((comment, i) => (
+      <Comment key={comment.id || `comment-new-${i}`} comment={comment} />
     ))
   )
 

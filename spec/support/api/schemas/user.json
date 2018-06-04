@@ -5,12 +5,9 @@
     "first_name": { "type": "string" },
     "last_name": { "type": "string" },
     "email": { "type": "string" },
-    "pic_url_square": { "type": "string" },
-    "current_user_collection_id": { "type": ["integer", "null"] },
-    "created_at": { "type": "date" },
     "status": { "type": "string" },
-    "terms_accepted": { "type": "boolean" },
-    "show_helper": { "type": "boolean" }
+    "pic_url_square": { "type": "string" },
+    "created_at": { "type": "date" }
   },
-  "required": ["id", "email", "created_at", "status"]
+  "required": ["id", "email", "first_name", "last_name", "status"]
 }

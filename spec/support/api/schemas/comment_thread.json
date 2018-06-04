@@ -2,8 +2,7 @@
   "type": "object",
   "properties": {
     "id": { "type": "integer" },
-    "updated_at": { "type": "date" },
-    "unread_count": { "type": "number" }
+    "updated_at": { "type": "date" }
   },
   "required": ["id", "updated_at"]
 }

@@ -15,6 +15,7 @@ import Loader from '~/ui/layout/Loader'
 import ActivityLogBox from '~/ui/activity_log/ActivityLogBox'
 import initDoorbell from '~/vendor/doorbell'
 import v from '~/utils/variables'
+import firebaseClient from '~/vendor/firestore'
 
 const AppWrapper = styled.div`
   /* used by terms of use modal to blur the whole site */
@@ -45,6 +46,7 @@ class Routes extends React.Component {
     const { apiStore } = this.props
     apiStore.loadCurrentUserAndGroups().then(() => {
       initDoorbell(apiStore.currentUser)
+      firebaseClient.authenticate(apiStore.currentUser.google_auth_token)
     })
   }
 

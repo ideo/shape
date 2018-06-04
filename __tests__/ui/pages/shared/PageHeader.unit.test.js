@@ -54,7 +54,7 @@ describe('PageHeader', () => {
       })
 
       it('should render the activity log icon', () => {
-        expect(wrapper.find('CommentIcon').exists()).toBeTruthy()
+        expect(wrapper.find('ActivityLogButton').exists()).toBeTruthy()
       })
 
       it('should render the page menu', () => {
@@ -106,21 +106,6 @@ describe('PageHeader', () => {
 
     it('should save the record', () => {
       expect(props.record.save).toHaveBeenCalled()
-    })
-  })
-
-  describe('toggleActivityLog', () => {
-    const fakeEv = { preventDefault: jest.fn() }
-
-    beforeEach(() => {
-      props.uiStore.activityLogOpen = false
-      wrapper.find('StyledCircledIcon').simulate('click', fakeEv)
-    })
-
-    it('should open the activity log in the ui store', () => {
-      expect(props.uiStore.update).toHaveBeenCalledWith(
-        'activityLogOpen', true
-      )
     })
   })
 

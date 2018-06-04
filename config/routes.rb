@@ -70,8 +70,16 @@ Rails.application.routes.draw do
       end
       resources :comment_threads, only: %i[index show create] do
         resources :comments, only: %i[index create]
+        member do
+          post 'view', action: 'view'
+        end
         collection do
           get 'find_by_record/:record_type/:record_id', action: 'find_by_record'
+        end
+      end
+      resources :notifications, only: %i[index show update] do
+        collection do
+          get 'user_notifications'
         end
       end
       get :search, to: 'search#search', as: :search

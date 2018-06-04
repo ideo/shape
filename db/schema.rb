@@ -10,11 +10,35 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180523225540) do
+ActiveRecord::Schema.define(version: 20180531180724) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
   enable_extension "pg_stat_statements"
+
+  create_table "activities", force: :cascade do |t|
+    t.bigint "actor_id"
+    t.string "target_type"
+    t.bigint "target_id"
+    t.integer "action"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "organization_id"
+    t.text "content"
+    t.index ["actor_id"], name: "index_activities_on_actor_id"
+    t.index ["organization_id"], name: "index_activities_on_organization_id"
+    t.index ["target_type", "target_id"], name: "index_activities_on_target_type_and_target_id"
+  end
+
+  create_table "activity_subjects", force: :cascade do |t|
+    t.bigint "activity_id"
+    t.string "subject_type"
+    t.bigint "subject_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["activity_id"], name: "index_activity_subjects_on_activity_id"
+    t.index ["subject_type", "subject_id"], name: "index_activity_subjects_on_subject_type_and_subject_id"
+  end
 
   create_table "collection_cards", force: :cascade do |t|
     t.integer "order", null: false
@@ -120,6 +144,17 @@ ActiveRecord::Schema.define(version: 20180523225540) do
     t.string "thumbnail_url"
     t.jsonb "cached_attributes"
     t.index ["cloned_from_id"], name: "index_items_on_cloned_from_id"
+  end
+
+  create_table "notifications", force: :cascade do |t|
+    t.boolean "read", default: false
+    t.bigint "activity_id"
+    t.bigint "user_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.integer "combined_activities_ids", default: [], array: true
+    t.index ["activity_id"], name: "index_notifications_on_activity_id"
+    t.index ["user_id"], name: "index_notifications_on_user_id"
   end
 
   create_table "organizations", force: :cascade do |t|

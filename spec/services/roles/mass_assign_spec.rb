@@ -85,6 +85,8 @@ RSpec.describe Roles::MassAssign, type: :service do
       let(:comment_thread) { create(:comment_thread, record: object) }
 
       it 'should add users and groups as comment thread followers' do
+        # to pick up comment_thread
+        object.reload
         expect(AddCommentThreadFollowers).to receive(:perform_async).with(
           comment_thread.id,
           users.map(&:id),
@@ -108,6 +110,31 @@ RSpec.describe Roles::MassAssign, type: :service do
           )
           assign_role.call
         end
+      end
+    end
+
+    context 'when it should create activities and notifications' do
+      let(:invited_by) { create(:user) }
+      let(:new_role) { true }
+      let(:role_name) { Role::EDITOR.to_s }
+      let(:instance_double) do
+        double('ActivityAndNotificationBuilder')
+      end
+
+      before do
+        allow(ActivityAndNotificationBuilder).to receive(:new).and_return(instance_double)
+        allow(instance_double).to receive(:call).and_return(true)
+      end
+
+      it 'should call the activity and notification builder' do
+        expect(ActivityAndNotificationBuilder).to receive(:new).with(
+          actor: invited_by,
+          target: object,
+          action: Activity.actions[:added_editor],
+          subject_users: users,
+          subject_groups: groups,
+        )
+        assign_role.call
       end
     end
 
@@ -175,7 +202,7 @@ RSpec.describe Roles::MassAssign, type: :service do
                              parent: object.current_shared_collection,
                              collection: linked_collection)}
 
-        it 'should link all the groups shared collection cards' do
+        it 'should link all the group\'s shared collection cards' do
           expect(LinkToSharedCollectionsWorker).to receive(:perform_async).with(
             (users).map(&:id),
             [],

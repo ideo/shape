@@ -2,6 +2,7 @@ class Collection < ApplicationRecord
   include Breadcrumbable
   include Resourceable
   include Archivable
+  include HasActivities
   resourceable roles: [Role::EDITOR, Role::VIEWER],
                edit_role: Role::EDITOR,
                view_role: Role::VIEWER
@@ -18,6 +19,7 @@ class Collection < ApplicationRecord
   after_save :touch_related_cards, if: :saved_change_to_updated_at?
   after_commit :reindex_sync, on: :create
   after_commit :recalculate_child_breadcrumbs_async, if: :saved_change_to_name?
+  after_commit :update_comment_thread_in_firestore
 
   # all cards including archived (i.e. undo default :collection_cards scope)
   has_many :all_collection_cards,
@@ -349,5 +351,11 @@ class Collection < ApplicationRecord
     return true if organization.present?
     return true unless parent_collection.present?
     self.organization_id = parent_collection.organization_id
+  end
+
+  def update_comment_thread_in_firestore
+    return unless comment_thread.present?
+    return unless saved_change_to_name? || saved_change_to_cached_attributes?
+    comment_thread.store_in_firestore
   end
 end
