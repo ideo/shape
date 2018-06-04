@@ -26,7 +26,11 @@ class Notification extends React.PureComponent {
     if (!target) {
       apiStore.fetch(targetType, activity.target_id).then(res => {
         activity.assignRef('target', res.data)
-      }).catch((err) => console.warn(err))
+      }).catch((err) => {
+        console.warn(err)
+        // Create a fake target in this strange usecase
+        activity.assignRef('target', { name: 'Unknown', internalType: targetType })
+      })
     } else {
       activity.assignRef('target', target)
     }

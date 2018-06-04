@@ -1,5 +1,4 @@
 import PropTypes from 'prop-types'
-import styled from 'styled-components'
 
 import { Heading1, DisplayText } from '~/ui/global/styled/typography'
 import PageContainer from '~/ui/layout/PageContainer'
