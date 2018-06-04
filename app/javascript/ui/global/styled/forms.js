@@ -223,7 +223,7 @@ EditAvatarButton.displayName = 'EditAvatarButton'
 
 /** @component */
 export const CommentForm = styled.form`
-  min-height: 70px;
+  min-height: 50px;
   position: relative;
 
   button {
@@ -241,7 +241,7 @@ const StyledCommentTextarea = styled.div`
     resize: none;
     padding: 10px;
     font-size: 1rem;
-    font-family: ${v.fonts.sans};
+    font-family: ${v.fonts.serif};
     border: none;
     background: none;
 
