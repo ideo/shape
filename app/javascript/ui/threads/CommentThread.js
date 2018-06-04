@@ -274,7 +274,7 @@ class CommentThread extends React.Component {
               placeholder="add comment"
               value={this.message}
               onChange={this.handleTextChange}
-              textAreaRef={(input) => { this.textarea = input }}
+              innerRef={(input) => { this.textarea = input }}
               maxRows={6}
             />
           </div>
