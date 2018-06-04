@@ -108,6 +108,26 @@ class ApiStore extends Store {
     this.addCurrentCommentThread(thread.id)
   }
 
+  get unreadNotifications() {
+    return this.findAll('notifications')
+      .filter(notification => !notification.read)
+  }
+
+  @computed get unreadNotificationsCount() {
+    return this.unreadNotifications.length
+  }
+
+  @computed get unreadCommentsCount() {
+    if (!this.threads) return 0
+    return this.threads.reduce((acc, thread) =>
+      acc + thread.unreadCount
+      , 0)
+  }
+
+  @computed get unreadActivityCount() {
+    return this.unreadCommentsCount + this.unreadNotificationsCount
+  }
+
   syncFromFirestore(data) {
     const timeFields = ['created_at', 'updated_at', 'last_viewed_at']
     _.each(data.data.attributes, (v, k) => {

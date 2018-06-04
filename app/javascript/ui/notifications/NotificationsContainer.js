@@ -7,13 +7,12 @@ import Notification from '~/ui/notifications/Notification'
 class NotificationsContainer extends React.Component {
   get notifications() {
     const { apiStore } = this.props
-    return apiStore
-      .findAll('notifications')
-      .filter(notification => !notification.read) || []
+    return apiStore.unreadNotifications
   }
 
   unreadCount() {
-    return this.notifications.length
+    const { apiStore } = this.props
+    return apiStore.unreadNotificationsCount
   }
 
   render() {
