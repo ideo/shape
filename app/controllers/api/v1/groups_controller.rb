@@ -35,6 +35,13 @@ class Api::V1::GroupsController < Api::V1::BaseController
 
   def archive
     if @group.archive!
+      ActivityAndNotificationBuilder.new(
+        actor: current_user,
+        target: @group,
+        action: Activity.actions[:archived],
+        subject_users: @group.members[:users] + @group.admins[:users],
+        subject_groups: [],
+      ).call
       render jsonapi: @group.reload
     else
       render_api_errors @group.errors
