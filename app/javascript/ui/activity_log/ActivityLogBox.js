@@ -1,3 +1,4 @@
+import { Fragment } from 'react'
 import Rnd from 'react-rnd'
 import localStorage from 'mobx-localstorage'
 import { observable, observe, action } from 'mobx'
@@ -6,6 +7,7 @@ import styled from 'styled-components'
 
 import { CloseButton } from '~/ui/global/styled/buttons'
 import NotificationIcon from '~/ui/icons/NotificationIcon'
+import NotificationsContainer from '~/ui/notifications/NotificationsContainer'
 import CommentIcon from '~/ui/icons/CommentIcon'
 import CommentThreadContainer from '~/ui/threads/CommentThreadContainer'
 
@@ -91,6 +93,7 @@ class ActivityLogBox extends React.Component {
     this.position.h = existingPosition.h || DEFAULT.h
     this.position.x = existingPosition.x || this.defaultX
     // this.props.apiStore.fetchThreads()
+    // this.props.apiStore.fetchNotifications()
   }
 
   componentWillUnmount() {
@@ -191,6 +194,31 @@ class ActivityLogBox extends React.Component {
     }
   }
 
+  renderComments() {
+    const { uiStore } = this.props
+    return (
+      <Fragment>
+        {this.showJumpToThreadButton &&
+          <button onClick={this.jumpToCurrentThread}>
+            <h3>Go to {uiStore.viewingRecord.name}</h3>
+          </button>
+        }
+        {!this.showJumpToThreadButton &&
+          // take up the same amount of space as the button
+          <div style={{ height: '2rem' }} />
+        }
+
+        <CommentThreadContainer />
+      </Fragment>
+    )
+  }
+
+  renderNotifications() {
+    return (
+      <NotificationsContainer />
+    )
+  }
+
   render() {
     const { uiStore } = this.props
     if (!uiStore.activityLogOpen) return null
@@ -247,18 +275,10 @@ class ActivityLogBox extends React.Component {
               </Action>
               <CloseButton size="lg" onClick={this.handleClose} />
             </StyledHeader>
-            {this.showJumpToThreadButton &&
-              <button onClick={this.jumpToCurrentThread}>
-                <h3>Go to {uiStore.viewingRecord.name}</h3>
-              </button>
+            { this.currentPage === 'comments' ?
+              this.renderComments() :
+              this.renderNotifications()
             }
-            {!this.showJumpToThreadButton &&
-              // take up the same amount of space as the button
-              <div style={{ height: '2rem' }} />
-            }
-
-            <CommentThreadContainer />
-
           </StyledActivityLog>
         </div>
       </Rnd>

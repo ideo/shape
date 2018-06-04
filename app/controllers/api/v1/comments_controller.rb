@@ -11,7 +11,15 @@ class Api::V1::CommentsController < Api::V1::BaseController
       author: current_user,
     )
     if @comment
-      # render jsonapi: @comment, include: [:author], fields: { users: User.basic_api_fields }
+      ActivityAndNotificationBuilder.new(
+        actor: current_user,
+        target: @comment_thread.record,
+        action: Activity.actions[:commented],
+        subject_users: @comment_thread.users_threads.map(&:user),
+        subject_groups: @comment_thread.groups_threads.map(&:group),
+        combine: true,
+        content: @comment.message,
+      ).call
       head :no_content
     else
       render jsonapi: @comment.errors

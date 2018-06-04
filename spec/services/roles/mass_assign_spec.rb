@@ -113,6 +113,31 @@ RSpec.describe Roles::MassAssign, type: :service do
       end
     end
 
+    context 'when it should create activities and notifications' do
+      let(:invited_by) { create(:user) }
+      let(:new_role) { true }
+      let(:role_name) { Role::EDITOR.to_s }
+      let(:instance_double) do
+        double('ActivityAndNotificationBuilder')
+      end
+
+      before do
+        allow(ActivityAndNotificationBuilder).to receive(:new).and_return(instance_double)
+        allow(instance_double).to receive(:call).and_return(true)
+      end
+
+      it 'should call the activity and notification builder' do
+        expect(ActivityAndNotificationBuilder).to receive(:new).with(
+          actor: invited_by,
+          target: object,
+          action: Activity.actions[:added_editor],
+          subject_users: users,
+          subject_groups: groups,
+        )
+        assign_role.call
+      end
+    end
+
     context 'when it should create links' do
       let(:new_role) { true }
 

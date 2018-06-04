@@ -77,6 +77,11 @@ Rails.application.routes.draw do
           get 'find_by_record/:record_type/:record_id', action: 'find_by_record'
         end
       end
+      resources :notifications, only: %i[index show update] do
+        collection do
+          get 'user_notifications'
+        end
+      end
       get :search, to: 'search#search', as: :search
     end
   end

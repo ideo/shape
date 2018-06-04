@@ -97,6 +97,7 @@ RSpec.configure do |config|
       batch: {},
     )
     allow(fake_client).to receive(:write)
+    allow(fake_client).to receive(:read)
     allow(fake_client).to receive(:client).and_return(fake_methods)
     allow(FirestoreClient).to receive(:new).and_return(fake_client)
   end

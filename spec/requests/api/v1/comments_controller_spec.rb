@@ -27,6 +27,9 @@ describe Api::V1::CommentsController, type: :request, json: true, auth: true do
   describe 'POST #create' do
     let!(:comment_thread) { create(:item_comment_thread) }
     let(:path) { "/api/v1/comment_threads/#{comment_thread.id}/comments" }
+    let(:instance_double) do
+      double('ActivityAndNotificationBuilder')
+    end
     let(:params) {
       json_api_params(
         'comments',
@@ -35,17 +38,33 @@ describe Api::V1::CommentsController, type: :request, json: true, auth: true do
     }
 
     before do
+      allow(ActivityAndNotificationBuilder).to receive(:new).and_return(instance_double)
+      allow(instance_double).to receive(:call).and_return(true)
       user.add_role(Role::EDITOR, comment_thread.record)
-      post(path, params: params)
     end
 
     it 'returns a 204 no content' do
+      post(path, params: params)
       expect(response.status).to eq(204)
     end
 
     it 'creates a message in the thread' do
+      post(path, params: params)
       expect(comment_thread.comments.count).to eq(1)
       expect(comment_thread.comments.first.message).to eq('heyo')
+    end
+
+    it 'creates an activity and notifications for the content' do
+      expect(ActivityAndNotificationBuilder).to receive(:new).with(
+        actor: @user,
+        target: comment_thread.record,
+        action: Activity.actions[:commented],
+        subject_users: [user],
+        subject_groups: [],
+        combine: true,
+        content: 'heyo',
+      )
+      post(path, params: params)
     end
   end
 end

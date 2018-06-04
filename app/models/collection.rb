@@ -2,6 +2,7 @@ class Collection < ApplicationRecord
   include Breadcrumbable
   include Resourceable
   include Archivable
+  include HasActivities
   resourceable roles: [Role::EDITOR, Role::VIEWER],
                edit_role: Role::EDITOR,
                view_role: Role::VIEWER
