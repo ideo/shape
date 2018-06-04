@@ -45,6 +45,18 @@ class Group < ApplicationRecord
             format: { with: /[a-zA-Z0-9\-\_]+/ },
             if: :validate_handle?
 
+  # Searchkick Config
+  searchkick callbacks: :async, word_start: %i[name handle]
+
+  def search_data
+    {
+      name: name,
+      handle: handle,
+      # listing this way makes it easier to search Users/Groups together
+      organization_ids: [organization_id],
+    }
+  end
+
   # Default for .roles are those where a
   # user is admin/member of this group
   def roles

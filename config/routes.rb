@@ -82,9 +82,15 @@ Rails.application.routes.draw do
           get 'user_notifications'
         end
       end
-      get :search, to: 'search#search', as: :search
+      # namespace :search do
+      #   get '/', to: 'search#search', as: :search
+      #   get 'users_and_groups', to: 'search#search_users_and_groups', as: :search_users_and_groups
+      # end
+      get 'search', to: 'search#search', as: :search
+      get 'search_users_and_groups', to: 'search#users_and_groups', as: :search_users_and_groups
     end
   end
+
 
   authenticate :user do
     require 'sidekiq/web'

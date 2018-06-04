@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180531180724) do
+ActiveRecord::Schema.define(version: 20180604225632) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -87,6 +87,7 @@ ActiveRecord::Schema.define(version: 20180531180724) do
     t.text "message"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.jsonb "draftjs_data"
     t.index ["comment_thread_id"], name: "index_comments_on_comment_thread_id"
   end
 
@@ -226,7 +227,9 @@ ActiveRecord::Schema.define(version: 20180531180724) do
     t.integer "current_user_collection_id"
     t.boolean "terms_accepted", default: false
     t.boolean "show_helper", default: true
+    t.string "handle"
     t.index ["email"], name: "index_users_on_email"
+    t.index ["handle"], name: "index_users_on_handle", unique: true
     t.index ["invitation_token"], name: "index_users_on_invitation_token"
     t.index ["provider", "uid"], name: "index_users_on_provider_and_uid", unique: true
   end

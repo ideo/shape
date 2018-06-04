@@ -24,6 +24,14 @@ const StyledComment = styled.div`
 `
 
 class Comment extends React.Component {
+  renderMessage() {
+    const { comment } = this.props
+    if (typeof comment.message === 'string') {
+      return comment.message
+    }
+    return []
+  }
+
   render() {
     const { comment } = this.props
 
@@ -43,7 +51,7 @@ class Comment extends React.Component {
           </span>
         </InlineRow>
         <p className="message">
-          { comment.message }
+          { this.renderMessage() }
         </p>
       </StyledComment>
     )

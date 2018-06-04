@@ -1,9 +1,10 @@
 import PropTypes from 'prop-types'
+import { EditorState, convertToRaw } from 'draft-js'
 import { observable, action, runInAction, computed } from 'mobx'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 import Dotdotdot from 'react-dotdotdot'
-import { Mention, MentionsInput } from 'react-mentions'
+// import { Mention, MentionsInput } from 'react-mentions'
 
 import { routingStore } from '~/stores'
 import Link from '~/ui/global/Link'
@@ -16,6 +17,7 @@ import Moment from '~/ui/global/Moment'
 import ReturnArrowIcon from '~/ui/icons/ReturnArrowIcon'
 import { CommentForm, StyledCommentTextarea } from '~/ui/global/styled/forms'
 import Comment from './Comment'
+import CommentInput from './CommentInput'
 
 const mentionStyle = {
   highlighter: {
@@ -206,6 +208,7 @@ ThumbnailHolder.displayName = 'ThumbnailHolder'
 @observer
 class CommentThread extends React.Component {
   @observable message = ''
+  @observable editorState = EditorState.createEmpty()
   @observable titleLines = 1
 
   componentDidMount() {
@@ -272,6 +275,13 @@ class CommentThread extends React.Component {
       return routingStore.pathTo('items', record.id)
     }
     return '/'
+  }
+
+  @action handleInputChange = (editorState) => {
+    this.editorState = editorState
+    const content = editorState.getCurrentContent()
+    console.log(convertToRaw(content))
+    console.log(content.getPlainText())
   }
 
   renderThumbnail() {
@@ -341,7 +351,7 @@ class CommentThread extends React.Component {
         </div>
         <CommentForm className="reply" onSubmit={this.handleSubmit}>
           <div className="textarea-input">
-            <StyledCommentTextarea>
+            {/* <StyledCommentTextarea>
               <MentionsInput
                 style={mentionStyle}
                 value={this.message}
@@ -363,8 +373,12 @@ class CommentThread extends React.Component {
                   style={{ background: '#449', fontWeight: 'bold' }}
                 />
               </MentionsInput>
-            </StyledCommentTextarea>
+            </StyledCommentTextarea> */}
 
+            <CommentInput
+              editorState={this.editorState}
+              onChange={this.handleInputChange}
+            />
           </div>
           <button>
             <ReturnArrowIcon />
