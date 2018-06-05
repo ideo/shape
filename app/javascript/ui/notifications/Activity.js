@@ -1,9 +1,11 @@
 import _ from 'lodash'
 import PropTypes from 'prop-types'
 import pluralize from 'pluralize'
+import styled from 'styled-components'
 
 import Link from '~/ui/global/Link'
-import { uiStore, routingStore } from '~/stores'
+import { apiStore, uiStore, routingStore } from '~/stores'
+import v from '~/utils/variables'
 
 function insertCommas(subjectUsers, subjectGroups) {
   return (subjectUsers.map(u => u.name).concat(subjectGroups.map(g => g.name))).join(', ')
@@ -21,6 +23,14 @@ function roleArticle(nextWord) {
 
 const MAX_ACTORS = 3
 
+const ActivityText = styled.p`
+  color: ${v.colors.cararra};
+  font-family: ${v.fonts.sans};
+  font-size: 1rem;
+  line-height: 1.25;
+  margin-bottom: 0;
+`
+
 class Activity extends React.PureComponent {
   actorText() {
     const { actors, actorCount } = this.props
@@ -28,6 +38,12 @@ class Activity extends React.PureComponent {
       return `${actorCount} people`
     }
     return _.uniq(actors).map(actor => actor.name).join(', ')
+  }
+
+  renameYourself() {
+    const { subjectUsers } = this.props
+    return subjectUsers.map(user => (user.id === apiStore.currentUserId
+      ? { name: 'you' } : user))
   }
 
   targetLink(targetName) {
@@ -42,11 +58,11 @@ class Activity extends React.PureComponent {
   }
 
   getDataText() {
-    const { action, subjectUsers, subjectGroups, target, content } = this.props
+    const { action, subjectGroups, target, content } = this.props
     return {
       actorNames: this.actorText(),
       targetName: target.name,
-      subjects: insertCommas(subjectUsers, subjectGroups),
+      subjects: insertCommas(this.renameYourself(), subjectGroups),
       targetType: pluralize.singular(target.internalType),
       roleName: this.isRoleAction() && action.split('_')[1],
       message: action === 'commented' && commentPreview(content)
@@ -72,27 +88,27 @@ class Activity extends React.PureComponent {
     switch (action) {
     case 'archived':
       return (
-        <p>
-          <strong className="actor">{actorNames}</strong>
+        <ActivityText>
+          <strong className="actor">{actorNames}</strong>{` `}
           has archived <strong className="target">{targetName}</strong>
-        </p>)
+        </ActivityText>)
     case 'added_editor':
     case 'added_member':
     case 'added_admin':
       return (
-        <p>
-          <strong className="actor">{actorNames}</strong> has made
-          <strong className="subjects">{subjects}</strong>
-          {roleArticle(roleName)} <strong className="roleName">{roleName}</strong>
+        <ActivityText>
+          <strong className="actor">{actorNames}</strong> has made{` `}
+          <strong className="subjects">{subjects}</strong>{` `}
+          {roleArticle(roleName)} <strong className="roleName">{roleName}</strong>{` `}
         of the {this.targetLink(targetName)}
-        </p>)
+        </ActivityText>)
     case 'commented':
       return (
-        <p>
-          <strong className="actor">{actorNames}</strong> commented on
-          {this.targetLink(targetName)}:
+        <ActivityText>
+          <strong className="actor">{actorNames}</strong> commented on{` `}
+          {this.targetLink(targetName)}:{` `}
           <span className="message">{message}</span>
-        </p>)
+        </ActivityText>)
 
     default:
       return ''

@@ -54,3 +54,12 @@ export const CircledIcon = styled.button`
   }
 `
 CircledIcon.displayName = 'StyledCircledIcon'
+
+export const NotificationButton = styled.button`
+  background-color: ${v.colors.orange};
+  border-radius: 50%;
+  display: inline-block;
+  height: 12px;
+  width: 12px;
+`
+NotificationButton.displayName = 'NotificationButton'

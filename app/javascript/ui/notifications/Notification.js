@@ -1,20 +1,39 @@
 import { PropTypes as MobxPropTypes } from 'mobx-react'
-import { Fragment } from 'react'
 import pluralize from 'pluralize'
 import { apiStore } from '~/stores'
+import { Flex } from 'reflexbox'
 import styled from 'styled-components'
 
 import Activity from '~/ui/notifications/Activity'
 import InlineLoader from '~/ui/layout/InlineLoader'
+import Moment from '~/ui/global/Moment'
+import { NotificationButton } from '~/ui/global/styled/buttons'
+import Tooltip from '~/ui/global/Tooltip'
+import v from '~/utils/variables'
 
 function pluralTypeName(name) {
   return pluralize(name).toLowerCase()
 }
 
 const StyledContainer = styled.div`
-  margin: 10px;
-  min-height: 80px;
+  background: ${v.colors.activityDarkestBlue};
+  box-sizing: border-box;
+  margin-left: 10px;
+  margin-right: 10px;
+  margin-top: 4px;
+  min-height: 75px;
+  padding: 12px;
   position: relative;
+`
+StyledContainer.displayName = 'StyledNotification'
+
+const ButtonContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  margin-left: 10px;
+  margin-right: 9px;
+  margin-top: 20px;
+  width: 12px;
 `
 
 class Notification extends React.PureComponent {
@@ -64,18 +83,29 @@ class Notification extends React.PureComponent {
       content = <InlineLoader />
     } else {
       content = (
-        <Fragment>
-          <button className="read" onClick={this.handleRead}>M</button>
-          <Activity
-            action={activity.action}
-            actors={this.combineActors()}
-            target={activity.target}
-            subjectUsers={activity.subjectUsers}
-            subjectGroups={activity.subjectGroups}
-            actorCount={notification.combined_activities_ids.length}
-            content={activity.content}
-          />
-        </Fragment>
+        <Flex>
+          <ButtonContainer>
+            <Tooltip
+              classes={{ tooltip: 'Tooltip' }}
+              title="Dismiss"
+              placement="bottom"
+            >
+              <NotificationButton className="read" onClick={this.handleRead} />
+            </Tooltip>
+          </ButtonContainer>
+          <div>
+            <Moment date={notification.created_at} />
+            <Activity
+              action={activity.action}
+              actors={this.combineActors()}
+              target={activity.target}
+              subjectUsers={activity.subject_users}
+              subjectGroups={activity.subject_groups}
+              actorCount={notification.combined_activities_ids.length}
+              content={activity.content}
+            />
+          </div>
+        </Flex>
       )
     }
     return (

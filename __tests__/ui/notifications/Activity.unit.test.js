@@ -1,5 +1,5 @@
 import Activity from '~/ui/notifications/Activity'
-import { uiStore, routingStore } from '~/stores'
+import { apiStore, uiStore, routingStore } from '~/stores'
 
 import {
   fakeActivity,
@@ -121,6 +121,23 @@ describe('Activity', () => {
       it('should link to the record for the comment thread', () => {
         const link = findPart('target')
         expect(link.props().to).toEqual('/collections/18')
+      })
+    })
+
+    describe('with current user as subject', () => {
+      beforeEach(() => {
+        const currentUser = { id: 3, name: 'Com' }
+        apiStore.currentUserId = currentUser.id
+        apiStore.currentUser = currentUser
+        props.action = 'added_member'
+        props.subjectUsers = [
+          currentUser
+        ]
+        wrapper.setProps(props)
+      })
+
+      it('should replace the user name as "you"', () => {
+        expect(findPart('subjects').text()).toEqual('you')
       })
     })
 
