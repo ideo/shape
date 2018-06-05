@@ -1,55 +1,56 @@
 module Roles
   class Inheritance
     def initialize(parent)
-      @parent_roles = role_identifiers(parent.roles)
+      @parent = parent
     end
 
-    def inherit_from_parent?(child, new_role_identifiers = [])
+    def inherit_from_parent?(child, add_user_ids: [], role_name: '')
       # Yes if there are no child roles yet
       return true if child.roles.empty?
 
-      proposed_roles = proposed_role_identifiers(child, new_role_identifiers)
-      should_inherit?(proposed_roles)
+      if add_user_ids.empty? && role_name.blank?
+        # generic case: check that both Editors and Viewers would inherit
+        inherit_role_from_parent?(child, role_name: Role::EDITOR) &&
+          inherit_role_from_parent?(child, role_name: Role::VIEWER)
+      elsif role_name
+        inherit_role_from_parent?(child, add_user_ids: add_user_ids, role_name: role_name)
+      else
+        false
+      end
     end
 
-    # if inherit is false, then the child is "private"
+    # if inherit is false for either role, then the child is "private"
     def private_child?(child)
       !inherit_from_parent?(child)
     end
 
     private
 
-    attr_reader :parent_roles
+    def inherit_role_from_parent?(child, add_user_ids: [], role_name:)
+      @parent_allowed_user_ids = allowed_user_ids(@parent, role_name)
+      @child_allowed_user_ids = allowed_user_ids(child, role_name)
+      proposed_user_ids = (@child_allowed_user_ids + add_user_ids).uniq
+      should_inherit?(proposed_user_ids)
+    end
 
     # Tests to see if children permissions are same or more permissive than parent
     # If so, apply roles. If not, ignore this object.
-    def should_inherit?(proposed_roles)
-      # Yes if they have the same roles
-      return true if @parent_roles == proposed_roles
-
-      # No if parent has more roles than child
-      return false if (@parent_roles - proposed_roles).size.positive?
-
-      # Yes if child has more roles than parent,
-      #   but all of parents' roles are included in the child
-      intersection = @parent_roles & proposed_roles
-      return true if (@parent_roles - intersection).size.zero?
-
-      # Otherwise No
-      false
+    def should_inherit?(proposed_user_ids)
+      # We need to check that the proposed_roles will be fully represented
+      #  in the parent, e.g.
+      #  TRUE: We are proposing [A, B, C] as editors, and [A, B, C ... (any others)] are parent editors
+      #  FALSE: We are proposing [A, B, C] as editors, and [A, D] are parent editors
+      intersection = @parent_allowed_user_ids & proposed_user_ids
+      (@parent_allowed_user_ids - intersection).empty?
     end
 
-    def proposed_role_identifiers(child, new_role_identifiers)
-      (role_identifiers(child.roles) + new_role_identifiers).uniq
-    end
-
-    # Pass in roles to exclude in the scenario that you're adding them to children,
-    # and the parent will already have them -- so if you compare inheritance,
-    # the parent wouldn't have the same roles as children
-    def role_identifiers(roles)
-      roles.map do |role|
-        (role.user_identifiers + role.group_identifiers)
-      end.flatten.compact.uniq
+    def allowed_user_ids(resource, role_name)
+      if role_name == Role::EDITOR
+        resource.editor_user_ids
+      else
+        # include both editors and viewers
+        resource.allowed_user_ids
+      end
     end
   end
 end

@@ -47,8 +47,12 @@ class Api::V1::RolesController < Api::V1::BaseController
   # /users/:id/roles/:id
   # /groups/:id/roles/:id
   def destroy
-    if remove_role(role: @role, user: @user, group: @group, is_switching:
-                  json_api_params[:is_switching])
+    if remove_role(
+      role: @role,
+      user: @user,
+      group: @group,
+      is_switching: json_api_params[:is_switching],
+    )
       render jsonapi: @role.resource.roles.reload, include: %i[users groups resource]
     else
       render_api_errors remove_roles.errors
