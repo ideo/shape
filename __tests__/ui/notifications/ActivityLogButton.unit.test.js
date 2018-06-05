@@ -33,7 +33,6 @@ describe('ActivityLogButton', () => {
       const count = wrapper.find('.count')
       expect(count.exists()).toBeTruthy()
       expect(component.activityCount).toEqual(3)
-      expect(count.text()).toEqual('3')
     })
   })
 

@@ -8,9 +8,9 @@ import styled from 'styled-components'
 import { CloseButton } from '~/ui/global/styled/buttons'
 import NotificationIcon from '~/ui/icons/NotificationIcon'
 import NotificationsContainer from '~/ui/notifications/NotificationsContainer'
+import { ActivityCount } from '~/ui/notifications/ActivityLogButton'
 import CommentIcon from '~/ui/icons/CommentIcon'
 import CommentThreadContainer from '~/ui/threads/CommentThreadContainer'
-
 import v from '~/utils/variables'
 
 const MIN_WIDTH = 319
@@ -67,24 +67,6 @@ const Action = styled.button`
     color: white;
   }
 `
-
-const ActivityCount = styled.span`
-  width: 12px;
-  top: 0;
-  position: absolute;
-  height: 12px;
-  line-height: 1;
-  left: -5px;
-  justify-content: center;
-  font-family: ${v.fonts.sans};
-  font-size: 0.625rem;
-  color: white;
-  display: flex;
-  border-radius: 50%;
-  background-color: ${v.colors.orange};
-  align-items: center;
-`
-ActivityCount.displayName = 'ActivityCount'
 
 @inject('apiStore', 'uiStore')
 @observer
@@ -284,7 +266,7 @@ class ActivityLogBox extends React.Component {
               >
                 <NotificationIcon />
                 {apiStore.unreadNotificationsCount > 0 && (
-                  <ActivityCount>
+                  <ActivityCount size="sm">
                     {apiStore.unreadNotificationsCount}
                   </ActivityCount>
                 )}
@@ -295,7 +277,7 @@ class ActivityLogBox extends React.Component {
               >
                 <CommentIcon />
                 {apiStore.unreadCommentsCount > 0 && (
-                  <ActivityCount>
+                  <ActivityCount size="sm">
                     {apiStore.unreadCommentsCount}
                   </ActivityCount>
                 )}

@@ -40,6 +40,7 @@ export const CircledIcon = styled.button`
   display: flex;
   height: 32px;
   justify-content: center;
+  position: relative;
   width: 32px;
   ${props => props.active &&
     `background-color: ${v.colors.gray};`}
