@@ -44,7 +44,7 @@ describe('Activity', () => {
 
       it('should render the message with actor and target', () => {
         expect(wrapper.find('.actor').text()).toEqual(fakeUser.name)
-        expect(findPart('target').props().children).toEqual('Plants')
+        expect(findPart('target').text()).toEqual('“Plants”')
       })
 
       it('should not render a link to the target', () => {
@@ -95,6 +95,7 @@ describe('Activity', () => {
     })
 
     describe('with a comment', () => {
+
       beforeEach(() => {
         props.action = 'commented'
         props.content = 'some content'

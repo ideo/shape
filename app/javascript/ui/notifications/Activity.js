@@ -3,6 +3,7 @@ import PropTypes from 'prop-types'
 import pluralize from 'pluralize'
 import styled from 'styled-components'
 
+import { Anchor } from '~/ui/global/styled/typography'
 import Link from '~/ui/global/Link'
 import { apiStore, uiStore, routingStore } from '~/stores'
 import v from '~/utils/variables'
@@ -51,7 +52,7 @@ class Activity extends React.PureComponent {
     const { id, internalType } = target
     if (!target.name) return ''
     if (internalType === 'groups') {
-      return <button className="target" onClick={() => uiStore.openGroup(id)}>{targetName}</button>
+      return <Anchor className="target" onClick={() => uiStore.openGroup(id)}>{targetName}</Anchor>
     }
     const link = routingStore.pathTo(internalType, id)
     return <Link className="target" to={link}>{targetName}</Link>
@@ -90,7 +91,7 @@ class Activity extends React.PureComponent {
       return (
         <ActivityText>
           <strong className="actor">{actorNames}</strong>{` `}
-          has archived <strong className="target">{targetName}</strong>
+          has archived <strong className="target">&ldquo;{targetName}&rdquo;</strong>
         </ActivityText>)
     case 'added_editor':
     case 'added_member':
@@ -100,7 +101,7 @@ class Activity extends React.PureComponent {
           <strong className="actor">{actorNames}</strong> has made{` `}
           <strong className="subjects">{subjects}</strong>{` `}
           {roleArticle(roleName)} <strong className="roleName">{roleName}</strong>{` `}
-        of the {this.targetLink(targetName)}
+        of {this.targetLink(targetName)}
         </ActivityText>)
     case 'commented':
       return (

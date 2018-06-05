@@ -1,5 +1,6 @@
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 
+import { ActivityContainer, FadeHeader } from '~/ui/global/styled/layout'
 import Notification from '~/ui/notifications/Notification'
 
 @inject('apiStore')
@@ -18,11 +19,12 @@ class NotificationsContainer extends React.Component {
   render() {
     const { notifications } = this
     return (
-      <div>
+      <ActivityContainer>
+        <FadeHeader />
         { notifications.map(notification => (
           <Notification notification={notification} key={notification.id} />
         ))}
-      </div>
+      </ActivityContainer>
     )
   }
 }

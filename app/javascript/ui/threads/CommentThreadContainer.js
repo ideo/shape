@@ -2,20 +2,12 @@ import { observable, observe, runInAction } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import { Element as ScrollElement, scroller } from 'react-scroll'
 import VisibilitySensor from 'react-visibility-sensor'
-import styled from 'styled-components'
 import FlipMove from 'react-flip-move'
 import _ from 'lodash'
 
+import { ActivityContainer } from '~/ui/global/styled/layout'
 import InlineLoader from '~/ui/layout/InlineLoader'
 import CommentThread from './CommentThread'
-
-const StyledCommentThreadContainer = styled.div`
-  margin-top: -2px;
-  overflow-y: scroll;
-  overflow-x: hidden;
-  height: 100%;
-  position: relative;
-`
 
 @inject('apiStore', 'uiStore')
 @observer
@@ -204,7 +196,7 @@ class CommentThreadContainer extends React.Component {
   render() {
     const { uiStore } = this.props
     return (
-      <StyledCommentThreadContainer id={this.scrollOpts.containerId}>
+      <ActivityContainer id={this.scrollOpts.containerId}>
         { this.loadingThreads && <InlineLoader fixed background="none" /> }
         <FlipMove
           disableAllAnimations={!!uiStore.expandedThreadKey}
@@ -224,7 +216,7 @@ class CommentThreadContainer extends React.Component {
             style={{ height: '5px' }}
           />
         </VisibilitySensor>
-      </StyledCommentThreadContainer>
+      </ActivityContainer>
     )
   }
 }

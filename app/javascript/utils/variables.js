@@ -72,6 +72,7 @@ export default {
     gridCard: 150,
     gridCardTop: 151,
     itemClose: 10,
+    floatOverContent: 2,
     gridCardBg: 1,
   },
 
