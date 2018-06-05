@@ -1,4 +1,4 @@
-import { PropTypes as MobxPropTypes } from 'mobx-react'
+import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import pluralize from 'pluralize'
 import { apiStore } from '~/stores'
 import { Flex } from 'reflexbox'
@@ -36,7 +36,8 @@ const ButtonContainer = styled.div`
   width: 12px;
 `
 
-class Notification extends React.PureComponent {
+@observer
+class Notification extends React.Component {
   componentWillMount() {
     const { notification } = this.props
     const { activity } = notification
@@ -45,9 +46,11 @@ class Notification extends React.PureComponent {
     if (!target) {
       apiStore.fetch(targetType, activity.target_id).then(res => {
         activity.assignRef('target', res.data)
+        // TODO hack to re-render the UI.
+        notification.id = notification.id
       }).catch((err) => {
         console.warn(err)
-        // Create a fake target in this strange usecase
+        // Create a fake target in this strange usecase to remove loading
         activity.assignRef('target', { name: 'Unknown', internalType: targetType })
       })
     } else {

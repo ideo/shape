@@ -87,7 +87,6 @@ describe('Activity', () => {
 
         it('should be a link that opens the group menu', () => {
           const link = findPart('target')
-          expect(link.type()).toEqual('button')
           link.simulate('click')
           expect(uiStore.openGroup).toHaveBeenCalledWith(24)
         })
@@ -95,7 +94,6 @@ describe('Activity', () => {
     })
 
     describe('with a comment', () => {
-
       beforeEach(() => {
         props.action = 'commented'
         props.content = 'some content'

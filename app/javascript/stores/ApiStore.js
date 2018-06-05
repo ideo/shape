@@ -108,7 +108,7 @@ class ApiStore extends Store {
     this.addCurrentCommentThread(thread.id)
   }
 
-  get unreadNotifications() {
+  @computed get unreadNotifications() {
     return this.findAll('notifications')
       .filter(notification => !notification.read)
   }
