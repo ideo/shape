@@ -46,8 +46,6 @@ class Notification extends React.Component {
     if (!target) {
       apiStore.fetch(targetType, activity.target_id).then(res => {
         activity.assignRef('target', res.data)
-        // TODO hack to re-render the UI.
-        notification.id = notification.id
       }).catch((err) => {
         console.warn(err)
         // Create a fake target in this strange usecase to remove loading
@@ -80,12 +78,8 @@ class Notification extends React.Component {
 
   render() {
     const { notification } = this.props
-    const { activity } = notification
     let content
-    if (!Array.isArray(activity.subject_users)) {
-      console.log('aslk;df', activity)
-    }
-    if (!activity.target) {
+    if (!notification.activity.target) {
       content = <InlineLoader />
     } else {
       content = (
@@ -102,13 +96,13 @@ class Notification extends React.Component {
           <div>
             <Moment date={notification.created_at} />
             <Activity
-              action={activity.action}
+              action={notification.activity.action}
               actors={this.combineActors()}
-              target={activity.target}
-              subjectUsers={activity.subject_users}
-              subjectGroups={activity.subject_groups}
+              target={notification.activity.target}
+              subjectUsers={notification.activity.subject_users}
+              subjectGroups={notification.activity.subject_groups}
               actorCount={notification.combined_activities_ids.length}
-              content={activity.content}
+              content={notification.activity.content}
             />
           </div>
         </Flex>
