@@ -5,7 +5,15 @@ class Notification < ApplicationRecord
   after_create :store_in_firestore
   after_destroy :remove_from_firestore
 
+  def self.relationships_for_firestore
+    [
+      activity: [:actor, :subject_users, :subject_groups]
+    ]
+  end
+
   def serialized_for_firestore
+    include = Notification.relationships_for_firestore
+    include = [activity: [:actor, :subject_users, :subject_groups, :target]]  if Activity.actions[:archived]
     renderer = JSONAPI::Serializable::Renderer.new
     renderer.render(
       self,
@@ -13,8 +21,12 @@ class Notification < ApplicationRecord
                Notification: SerializableNotification,
                User: SerializableUser,
                Group: SerializableGroup,
+               Collection: SerializableSimpleCollection,
+               'Item::VideoItem': SerializableSimpleItem,
+               'Item::ImageItem': SerializableSimpleItem,
+               'Item::TextItem': SerializableSimpleItem,
              },
-             include: [activity: [:actor, :subject_users, :subject_groups ]],
+             include: include,
     )
   end
 
