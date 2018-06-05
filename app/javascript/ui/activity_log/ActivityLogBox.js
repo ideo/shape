@@ -60,12 +60,31 @@ const Action = styled.button`
   color: ${props => (props.active ? 'white' : v.colors.cloudy)};
   height: 19px;
   margin-right: 10px;
+  position: relative;
   width: 19px;
 
   &:hover {
     color: white;
   }
 `
+
+const ActivityCount = styled.span`
+  width: 12px;
+  top: 0;
+  position: absolute;
+  height: 12px;
+  line-height: 1;
+  left: -5px;
+  justify-content: center;
+  font-family: ${v.fonts.sans};
+  font-size: 0.625rem;
+  color: white;
+  display: flex;
+  border-radius: 50%;
+  background-color: ${v.colors.orange};
+  align-items: center;
+`
+ActivityCount.displayName = 'ActivityCount'
 
 @inject('apiStore', 'uiStore')
 @observer
@@ -92,8 +111,6 @@ class ActivityLogBox extends React.Component {
     this.position.w = existingPosition.w || DEFAULT.w
     this.position.h = existingPosition.h || DEFAULT.h
     this.position.x = existingPosition.x || this.defaultX
-    // this.props.apiStore.fetchThreads()
-    // this.props.apiStore.fetchNotifications()
   }
 
   componentWillUnmount() {
@@ -220,7 +237,7 @@ class ActivityLogBox extends React.Component {
   }
 
   render() {
-    const { uiStore } = this.props
+    const { apiStore, uiStore } = this.props
     if (!uiStore.activityLogOpen) return null
     return (
       <Rnd
@@ -266,18 +283,28 @@ class ActivityLogBox extends React.Component {
                 onClick={this.handleNotifications}
               >
                 <NotificationIcon />
+                {apiStore.unreadNotificationsCount > 0 && (
+                  <ActivityCount>
+                    {apiStore.unreadNotificationsCount}
+                  </ActivityCount>
+                )}
               </Action>
               <Action
                 active={this.currentPage === 'comments'}
                 onClick={this.handleComments}
               >
                 <CommentIcon />
+                {apiStore.unreadCommentsCount > 0 && (
+                  <ActivityCount>
+                    {apiStore.unreadCommentsCount}
+                  </ActivityCount>
+                )}
               </Action>
               <CloseButton size="lg" onClick={this.handleClose} />
             </StyledHeader>
-            { this.currentPage === 'comments' ?
-              this.renderComments() :
-              this.renderNotifications()
+            { this.currentPage === 'comments'
+              ? this.renderComments()
+              : this.renderNotifications()
             }
           </StyledActivityLog>
         </div>

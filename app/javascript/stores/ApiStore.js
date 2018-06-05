@@ -118,8 +118,8 @@ class ApiStore extends Store {
   }
 
   @computed get unreadCommentsCount() {
-    if (!this.threads) return 0
-    return this.threads.reduce((acc, thread) =>
+    if (!this.currentThreads) return 0
+    return this.currentThreads.reduce((acc, thread) =>
       acc + thread.unreadCount
       , 0)
   }
