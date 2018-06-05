@@ -82,6 +82,9 @@ class Notification extends React.Component {
     const { notification } = this.props
     const { activity } = notification
     let content
+    if (!Array.isArray(activity.subject_users)) {
+      console.log('aslk;df', activity)
+    }
     if (!activity.target) {
       content = <InlineLoader />
     } else {

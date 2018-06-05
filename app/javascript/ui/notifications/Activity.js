@@ -1,4 +1,5 @@
 import _ from 'lodash'
+import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import PropTypes from 'prop-types'
 import pluralize from 'pluralize'
 import styled from 'styled-components'
@@ -134,12 +135,8 @@ Activity.propTypes = {
     name: PropTypes.string,
     internalType: PropTypes.string,
   }).isRequired,
-  subjectUsers: PropTypes.arrayOf(PropTypes.shape({
-    name: PropTypes.string,
-  })),
-  subjectGroups: PropTypes.arrayOf(PropTypes.shape({
-    name: PropTypes.string,
-  })),
+  subjectUsers: MobxPropTypes.arrayOrObservableArray,
+  subjectGroups: MobxPropTypes.arrayOrObservableArray,
   actorCount: PropTypes.number,
   content: PropTypes.string,
 }
