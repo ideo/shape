@@ -53,7 +53,7 @@ RSpec.describe ActivityAndNotificationBuilder, type: :service do
     context 'when a subject user is also the actor' do
       let(:subject_users) { [actor] }
 
-      it 'should not notifiy you if you are the actor' do
+      it 'should not notify you if you are the actor' do
         builder.call
         expect { builder.call }.to change(Notification, :count).by(0)
       end
@@ -77,6 +77,7 @@ RSpec.describe ActivityAndNotificationBuilder, type: :service do
 
       before do
         actors.each do |user|
+          # 2 different users commented on the target
           ActivityAndNotificationBuilder.new(
             actor: user,
             target: target,
@@ -88,6 +89,7 @@ RSpec.describe ActivityAndNotificationBuilder, type: :service do
 
       it 'destroys the previous 3 notifications' do
         expect(Notification.count).to eq 2
+        # now one more user comments on the same target
         expect { builder.call }.to change(Notification, :count).by(-1)
       end
 

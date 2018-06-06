@@ -1,5 +1,5 @@
 import Activity from '~/ui/notifications/Activity'
-import { uiStore, routingStore } from '~/stores'
+import { apiStore, uiStore, routingStore } from '~/stores'
 
 import {
   fakeActivity,
@@ -44,7 +44,7 @@ describe('Activity', () => {
 
       it('should render the message with actor and target', () => {
         expect(wrapper.find('.actor').text()).toEqual(fakeUser.name)
-        expect(findPart('target').props().children).toEqual('Plants')
+        expect(findPart('target').text()).toEqual('“Plants”')
       })
 
       it('should not render a link to the target', () => {
@@ -87,7 +87,6 @@ describe('Activity', () => {
 
         it('should be a link that opens the group menu', () => {
           const link = findPart('target')
-          expect(link.type()).toEqual('button')
           link.simulate('click')
           expect(uiStore.openGroup).toHaveBeenCalledWith(24)
         })
@@ -121,6 +120,23 @@ describe('Activity', () => {
       it('should link to the record for the comment thread', () => {
         const link = findPart('target')
         expect(link.props().to).toEqual('/collections/18')
+      })
+    })
+
+    describe('with current user as subject', () => {
+      beforeEach(() => {
+        const currentUser = { id: 3, name: 'Com' }
+        apiStore.currentUserId = currentUser.id
+        apiStore.currentUser = currentUser
+        props.action = 'added_member'
+        props.subjectUsers = [
+          currentUser
+        ]
+        wrapper.setProps(props)
+      })
+
+      it('should replace the user name as "you"', () => {
+        expect(findPart('subjects').text()).toEqual('you')
       })
     })
 

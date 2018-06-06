@@ -38,6 +38,15 @@ export class FirebaseClient {
         querySnapshot.forEach(doc => {
           apiStore.syncFromFirestore(doc.data())
         })
+        const changes = querySnapshot.docChanges()
+        if (changes) {
+          changes.forEach(change => {
+            // remove all notifications that were deleted
+            if (change.type === 'removed') {
+              apiStore.remove('notifications', change.doc.id)
+            }
+          })
+        }
       }, err => {
         console.warn(err)
       })

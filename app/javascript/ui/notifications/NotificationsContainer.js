@@ -1,5 +1,6 @@
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 
+import { ActivityContainer } from '~/ui/global/styled/layout'
 import Notification from '~/ui/notifications/Notification'
 
 @inject('apiStore')
@@ -7,23 +8,22 @@ import Notification from '~/ui/notifications/Notification'
 class NotificationsContainer extends React.Component {
   get notifications() {
     const { apiStore } = this.props
-    return apiStore
-      .findAll('notifications')
-      .filter(notification => !notification.read) || []
+    return apiStore.unreadNotifications
   }
 
   unreadCount() {
-    return this.notifications.length
+    const { apiStore } = this.props
+    return apiStore.unreadNotificationsCount
   }
 
   render() {
     const { notifications } = this
     return (
-      <div>
+      <ActivityContainer>
         { notifications.map(notification => (
           <Notification notification={notification} key={notification.id} />
         ))}
-      </div>
+      </ActivityContainer>
     )
   }
 }

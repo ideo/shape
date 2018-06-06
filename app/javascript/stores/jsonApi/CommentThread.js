@@ -16,6 +16,9 @@ class CommentThread extends BaseRecord {
 
   @computed get unreadCount() {
     const { users_thread } = this
+
+    if (this.id === 121) console.log(users_thread)
+
     if (!users_thread) return 0
     return users_thread.unread_count
   }
@@ -100,6 +103,8 @@ CommentThread.type = 'comment_threads'
 
 CommentThread.defaults = {
   unread_comments: [],
+  // Set this undefined by default so assignRef will pick up the change
+  users_thread: undefined,
 }
 
 export default CommentThread

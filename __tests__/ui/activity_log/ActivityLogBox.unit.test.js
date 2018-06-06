@@ -1,13 +1,17 @@
 import ActivityLogBox, { POSITION_KEY, PAGE_KEY } from '~/ui/activity_log/ActivityLogBox'
 import localStorage from 'mobx-localstorage'
 
+import {
+  fakeNotification,
+} from '#/mocks/data'
+
 import fakeUiStore from '#/mocks/fakeUiStore'
 import fakeApiStore from '#/mocks/fakeApiStore'
 
 jest.mock('mobx-localstorage')
 
 describe('ActivityLogBox', () => {
-  let props, wrapper, component, localStorageStore
+  let props, wrapper, component, localStorageStore, reRender
   const fakeEv = { preventDefault: jest.fn() }
 
   beforeEach(() => {
@@ -23,21 +27,52 @@ describe('ActivityLogBox', () => {
     props = { uiStore, apiStore }
     localStorage.clear()
     document.body.innerHTML = '<div class="Grid"></div>'
-    wrapper = shallow(
-      <ActivityLogBox.wrappedComponent {...props} />
-    )
-    component = wrapper.instance()
+    reRender = function() {
+      wrapper = shallow(
+        <ActivityLogBox.wrappedComponent {...props} />
+      )
+      component = wrapper.instance()
+    }
+    reRender()
   })
 
   afterEach(() => {
     document.body.innerHTML = ''
   })
 
+  describe('render()', () => {
+    beforeEach(() => {
+      props.uiStore.activityLogOpen = true
+      props.apiStore.unreadNotificationsCount = 2
+      props.apiStore.unreadNotifications = [fakeNotification, fakeNotification]
+      props.apiStore.unreadCommentsCount = 1
+      reRender()
+    })
+
+    it('should show the unread comments and notifications', () => {
+      expect(wrapper.find('ActivityCount').exists()).toBeTruthy()
+      expect(wrapper.find('ActivityCount').length).toEqual(2)
+    })
+
+    describe('with no unread comments or notifications', () => {
+      beforeEach(() => {
+        props.apiStore.unreadNotificationsCount = 0
+        props.apiStore.unreadNotifications = []
+        props.apiStore.unreadCommentsCount = 0
+        reRender()
+      })
+
+      it('should not show the activity count', () => {
+        expect(wrapper.find('ActivityCount').exists()).toBeFalsy()
+      })
+    })
+  })
+
   describe('handleClose()', () => {
     it('should close the activity log in the UI store', () => {
       props.uiStore.update('activityLogOpen', true)
       component.handleClose(fakeEv)
-      expect(props.uiStore.activityLogOpen).toBeFalsy()
+      expect(props.uiStore.update).toHaveBeenCalled()
     })
   })
 

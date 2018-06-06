@@ -4,7 +4,6 @@ import _ from 'lodash'
 import moment from 'moment-mini'
 
 import Activity from './jsonApi/Activity'
-import firestoreClient from '~/vendor/firestore'
 import Collection from './jsonApi/Collection'
 import CollectionCard from './jsonApi/CollectionCard'
 import Role from './jsonApi/Role'
@@ -86,26 +85,33 @@ class ApiStore extends Store {
     this.add(roles, 'roles')
   }
 
-  // async fetchThreads() {
-  //   // This is actually fetching the current user's / current org threads
-  //   const res = await this.fetchAll('comment_threads')
-  //   const threads = res.data
-  //   const threadIds = []
-  //   threads.forEach((thread) => {
-  //     thread.importComments(thread.unread_comments, { unread: true })
-  //     threadIds.push(thread.id)
-  //   })
-  //   runInAction(() => {
-  //     // NOTE: we aren't currently doing pagination here, but when we do...
-  //     // will probably do some kind of union/merge rather than replace
-  //     this.currentCommentThreadIds.replace(threadIds)
-  //   })
-  // }
-
   importUsersThread({ usersThread, thread, comments } = {}) {
+    if (thread.id === 121) console.log('iut', usersThread)
     thread.assignRef('users_thread', usersThread)
     thread.importComments(comments)
     this.addCurrentCommentThread(thread.id)
+  }
+
+  @computed get unreadNotifications() {
+    return _.reverse(_.sortBy(
+      this.findAll('notifications').filter(notification => !notification.read),
+      'created_at'
+    ))
+  }
+
+  @computed get unreadNotificationsCount() {
+    return this.unreadNotifications.length
+  }
+
+  @computed get unreadCommentsCount() {
+    if (!this.currentThreads) return 0
+    return this.currentThreads.reduce((acc, thread) =>
+      acc + thread.unreadCount
+      , 0)
+  }
+
+  @computed get unreadActivityCount() {
+    return this.unreadCommentsCount + this.unreadNotificationsCount
   }
 
   syncFromFirestore(data) {

@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types'
 import { Flex } from 'reflexbox'
+import hexToRgba from '~/utils/hexToRgba'
 import styled from 'styled-components'
 import v from '~/utils/variables'
 
@@ -76,3 +77,23 @@ export const MaxWidthContainer = styled.div`
   margin: 0 auto;
 `
 MaxWidthContainer.displayName = 'MaxWidthContainer'
+
+export const ActivityContainer = styled.div`
+  margin-top: -2px;
+  overflow-y: scroll;
+  overflow-x: hidden;
+  margin-bottom: 10px;
+  height: 100%;
+  position: relative;
+`
+ActivityContainer.displayName = 'ActivityContainer'
+
+export const FadeHeader = styled.div`
+  border-radius: 1px;
+  background: linear-gradient(${v.colors.activityDarkBlue} 0, ${v.colors.activityDarkBlue} 40%, ${hexToRgba(v.colors.activityDarkBlue, 0)} 100%);
+  height: 27px;
+  position: fixed;
+  top: ${v.zIndex.floatOverContent};
+  width: 100%;
+  z-index: 100;
+`
