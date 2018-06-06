@@ -22,14 +22,14 @@ class ActivityAndNotificationBuilder
   end
 
   def call
-    @activity = create_activity
-    create_notifications(@activity)
+    create_activity
+    create_notifications if @activity
   end
 
   private
 
   def create_activity
-    Activity.create(
+    @activity = Activity.create(
       actor: @actor,
       subject_users: @subject_users,
       subject_groups: @subject_groups,
@@ -40,19 +40,23 @@ class ActivityAndNotificationBuilder
     )
   end
 
-  def create_notifications(activity)
-    # TODO: this comes from roles/shared_methods
+  def create_notifications
+    # TODO: just pass all user_ids to this service rather than computing them here?
+    # NOTE: this comes from roles/shared_methods
     unless (group_user_ids = @subject_groups.try(:user_ids))
       group_user_ids = Group.where(id: @subject_groups.pluck(:id)).user_ids
     end
     all_users = @subject_users + User.where(id: group_user_ids)
     all_users.uniq.each do |user|
       next if user == @actor
+      if @combine
+        combined = combine_existing_notifications(user)
+        next if combined
+      end
       Notification.create(
-        activity: activity,
+        activity: @activity,
         user: user,
       )
-      combine_existing_notifications(user) if @combine
     end
   end
 
@@ -71,10 +75,11 @@ class ActivityAndNotificationBuilder
   end
 
   def combine_existing_notifications(user)
-    # Find similar notifications based on target and action (multiple comments) TODO: don't run this for each user
+    # Find similar notifications based on target and action (multiple comments)
+    # TODO: possible not to run these queries for each user?
     similar_activities = find_similar_activities
     similar_notifications = find_similar_notifications(user, similar_activities)
-    if similar_notifications.count > 2
+    if similar_notifications.count > 1
       activity_ids = similar_notifications.map(&:activity).map(&:id)
     elsif similar_notifications.first.combined_activities_ids.count.positive?
       activity_ids = similar_notifications.first.combined_activities_ids
@@ -82,11 +87,12 @@ class ActivityAndNotificationBuilder
       return
     end
     # Condense the existing 3 down to one notification
-    Notification.create(
-      activity: activity,
+    created = Notification.create(
+      activity: @activity,
       user: user,
-      combined_activities_ids: activity_ids,
+      combined_activities_ids: (activity_ids + [@activity.id]),
     )
-    similar_notifications.destroy_all
+    similar_notifications.where.not(id: created.id).destroy_all
+    created
   end
 end

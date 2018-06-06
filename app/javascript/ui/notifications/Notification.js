@@ -67,8 +67,7 @@ class Notification extends React.Component {
     if (!notification.combined_activities_ids.length) {
       return [notification.activity.actor]
     }
-    return notification.combined_activities.map(activity =>
-      activity.actor)
+    return notification.combined_activities.map(activity => activity.actor)
   }
 
   handleRead = (ev) => {

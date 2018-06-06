@@ -5,15 +5,20 @@ class Notification < ApplicationRecord
   after_create :store_in_firestore
   after_destroy :remove_from_firestore
 
-  def self.relationships_for_firestore
-    [
-      activity: [:actor, :subject_users, :subject_groups]
-    ]
+  def relationships_for_firestore
+    if activity.archived?
+      [
+        activity: %i[actor subject_users subject_groups target],
+      ]
+    else
+      [
+        activity: %i[actor subject_users subject_groups],
+        combined_activities: %i[actor],
+      ]
+    end
   end
 
   def serialized_for_firestore
-    include = Notification.relationships_for_firestore
-    include = [activity: [:actor, :subject_users, :subject_groups, :target]]  if Activity.actions[:archived]
     renderer = JSONAPI::Serializable::Renderer.new
     renderer.render(
       self,
@@ -24,9 +29,8 @@ class Notification < ApplicationRecord
                Collection: SerializableSimpleCollection,
                'Item::VideoItem': SerializableSimpleItem,
                'Item::ImageItem': SerializableSimpleItem,
-               'Item::TextItem': SerializableSimpleItem,
-             },
-             include: include,
+               'Item::TextItem': SerializableSimpleItem },
+      include: relationships_for_firestore,
     )
   end
 
