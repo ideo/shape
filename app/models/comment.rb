@@ -8,12 +8,12 @@ class Comment < ApplicationRecord
   after_create :store_in_firestore
 
   def mentions
-    return unless draftjs_data.present?
     mentions = {
       users: [],
       groups: [],
     }
-    draftjs_data['entityMap'].each_pair do |_k, v|
+    entity_map = draftjs_data.try(:[], 'entityMap') || {}
+    entity_map.each_pair do |_k, v|
       entity = Hashie::Mash.new(v)
       next unless entity.type == 'mention'
       id, type = entity.data.mention.id.split('__')

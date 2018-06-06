@@ -39,7 +39,7 @@ class Api::V1::CommentThreadsController < Api::V1::BaseController
   private
 
   def thread_relations
-    [:record, unread_comments: [:author]]
+    [:record]
   end
 
   def comment_thread_params
