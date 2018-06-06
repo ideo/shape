@@ -1,3 +1,4 @@
+# extends our default SerializableUser
 class SerializableCurrentUser < SerializableUser
   # adds some fields that only the current user should see for themself
   attributes :current_user_collection_id, :terms_accepted, :show_helper
