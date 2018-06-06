@@ -1,5 +1,6 @@
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import { Switch, Route, withRouter } from 'react-router-dom'
+import { MuiThemeProvider, createMuiTheme } from 'material-ui/styles'
 import WindowSizeListener from 'react-window-size-listener'
 import styled from 'styled-components'
 
@@ -46,6 +47,12 @@ class Routes extends React.Component {
     apiStore.loadCurrentUserAndGroups().then(() => {
       initDoorbell(apiStore.currentUser)
     })
+    this.theme = createMuiTheme({
+      typography: {
+        // Use the Shape font instead of the default Roboto font.
+        fontFamily: v.fonts.sans,
+      },
+    })
   }
 
   handleWindowResize = ({ windowWidth }) => {
@@ -66,28 +73,30 @@ class Routes extends React.Component {
 
     return (
       <AppWrapper blur={displayTermsPopup} id="AppWrapper">
-        {/* Global components are rendered here */}
-        <WindowSizeListener onResize={this.handleWindowResize} />
-        <DialogWrapper />
+        <MuiThemeProvider theme={this.theme}>
+          {/* Global components are rendered here */}
+          <WindowSizeListener onResize={this.handleWindowResize} />
+          <DialogWrapper />
 
-        <Header />
-        <FixedBoundary className="fixed_boundary" />
-        <FixedActivityLogWrapper>
-          <ActivityLogBox />
-        </FixedActivityLogWrapper>
-        {displayTermsPopup &&
-          <TermsOfUseModal currentUser={apiStore.currentUser} />
-        }
+          <Header />
+          <FixedBoundary className="fixed_boundary" />
+          <FixedActivityLogWrapper>
+            <ActivityLogBox />
+          </FixedActivityLogWrapper>
+          {displayTermsPopup &&
+            <TermsOfUseModal currentUser={apiStore.currentUser} />
+          }
 
-        {/* Switch will stop when it finds the first matching path */}
-        <Switch>
-          <Route exact path="/" component={CollectionPage} />
-          <Route path="/collections/:id" component={CollectionPage} />
-          <Route path="/items/:id" component={ItemPage} />
-          <Route path="/search" component={SearchPage} />
-          <Route path="/terms" component={TermsPage} />
-          <Route path="/settings" component={SettingsPage} />
-        </Switch>
+          {/* Switch will stop when it finds the first matching path */}
+          <Switch>
+            <Route exact path="/" component={CollectionPage} />
+            <Route path="/collections/:id" component={CollectionPage} />
+            <Route path="/items/:id" component={ItemPage} />
+            <Route path="/search" component={SearchPage} />
+            <Route path="/terms" component={TermsPage} />
+            <Route path="/settings" component={SettingsPage} />
+          </Switch>
+        </MuiThemeProvider>
       </AppWrapper>
     )
   }

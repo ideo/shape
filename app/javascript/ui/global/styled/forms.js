@@ -165,6 +165,12 @@ export const Select = styled(MuiSelect)`
     background-color: transparent;
     &:focus { background-color: transparent; }
     &:hover { background-color: transparent; }
+
+    li {
+      font-family: ${v.fonts.sans};
+      font-size: 1rem;
+      font-weight: ${v.weights.book};
+    }
   }
 `
 Select.displayName = 'StyledSelect'
