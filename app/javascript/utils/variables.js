@@ -71,6 +71,8 @@ export default {
     cardDragging: 160,
     gridCard: 150,
     gridCardTop: 151,
+    commentMentions: 100,
+    commentHeader: 10,
     itemClose: 10,
     floatOverContent: 2,
     gridCardBg: 1,

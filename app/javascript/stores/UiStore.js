@@ -63,6 +63,7 @@ export default class UiStore {
   @observable searchText = ''
   @observable activityLogOpen = false
   @observable activityLogForceWidth = null
+  @observable activityLogPosition = { x: 0, y: 0, w: 1, h: 1 }
 
   // Comments + Threads
   @observable commentsOpen = false

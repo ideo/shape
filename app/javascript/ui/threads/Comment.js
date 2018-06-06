@@ -1,5 +1,9 @@
+import { toJS } from 'mobx'
 import { PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
+import { EditorState, convertFromRaw } from 'draft-js'
+import Editor from 'draft-js-plugins-editor'
+import createMentionPlugin from 'draft-js-mention-plugin'
 
 import v from '~/utils/variables'
 import { DisplayText } from '~/ui/global/styled/typography'
@@ -24,12 +28,45 @@ const StyledComment = styled.div`
 `
 
 class Comment extends React.Component {
+  constructor(props) {
+    super(props)
+    this.mentionPlugin = createMentionPlugin({
+      mentionComponent: (mentionProps) => (
+        <strong>
+          @{mentionProps.mention.handle}
+        </strong>
+      )
+    })
+    this.state = {
+      editorState: EditorState.createEmpty(),
+    }
+  }
+
+  componentWillMount() {
+    const { comment } = this.props
+    if (comment.draftjs_data) {
+      const contentState = convertFromRaw(toJS(comment.draftjs_data))
+      const editorState = EditorState.createWithContent(contentState)
+      this.setState({ editorState })
+    }
+  }
+
   renderMessage() {
     const { comment } = this.props
-    if (typeof comment.message === 'string') {
+    if (!comment.draftjs_data) {
       return comment.message
     }
-    return []
+    const plugins = [this.mentionPlugin]
+    return (
+      <Editor
+        readOnly
+        editorState={this.state.editorState}
+        // NOTE: this onChange is necessary for draft-js-plugins to decorate properly!
+        // see https://github.com/draft-js-plugins/draft-js-plugins/issues/530#issuecomment-258736772
+        onChange={(editorState) => this.setState({ editorState })}
+        plugins={plugins}
+      />
+    )
   }
 
   render() {
@@ -50,9 +87,9 @@ class Comment extends React.Component {
             <Moment date={comment.updated_at} />
           </span>
         </InlineRow>
-        <p className="message">
+        <div className="message">
           { this.renderMessage() }
-        </p>
+        </div>
       </StyledComment>
     )
   }

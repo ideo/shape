@@ -78,6 +78,7 @@ class ActivityLogBox extends React.Component {
   constructor(props) {
     super(props)
     this.draggableRef = React.createRef()
+    this.position = props.uiStore.activityLogPosition
     this.disposer = observe(props.uiStore, 'activityLogOpen', change => {
       if (this.isOffscreen()) {
         this.setToDefaultPosition()
@@ -146,6 +147,7 @@ class ActivityLogBox extends React.Component {
   handleClose = (ev) => {
     const { uiStore } = this.props
     uiStore.update('activityLogOpen', false)
+    uiStore.expandThread(null)
   }
 
   handleNotifications = (ev) => {

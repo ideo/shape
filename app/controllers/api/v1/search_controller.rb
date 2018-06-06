@@ -49,9 +49,12 @@ class Api::V1::SearchController < Api::V1::BaseController
     Searchkick.search(
       query,
       index_name: [User, Group],
+      match: :word_start,
+      fields: %w[handle^5 name],
       where: {
         organization_ids: [current_organization.id],
       },
+      per_page: 6,
     )
   end
 

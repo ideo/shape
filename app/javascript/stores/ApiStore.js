@@ -79,6 +79,10 @@ class ApiStore extends Store {
     }
   }
 
+  searchUsersAndGroups(query) {
+    return this.request(`search/users_and_groups?query=${query}`)
+  }
+
   async fetchRoles(group) {
     const res = await this.request(`groups/${group.id}/roles`, 'GET')
     const roles = res.data

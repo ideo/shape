@@ -4,6 +4,8 @@ import { MenuItem } from 'material-ui/Menu'
 import AutosizeInput from 'react-input-autosize'
 import TextareaAutosize from 'react-autosize-textarea'
 import styled from 'styled-components'
+
+import hexToRgba from '~/utils/hexToRgba'
 import v from '~/utils/variables'
 
 /** @component */
@@ -239,6 +241,36 @@ export const CommentForm = styled.form`
     width: 18px;
     height: 18px;
   }
+  &.reply {
+    /* NOTE: 'sticky' is not fully browser supported */
+    ${props => props.expanded && `
+      z-index: ${v.zIndex.commentMentions};
+      position: sticky;
+      bottom: 0;
+    `}
+    ${props => !props.expanded && `
+      display: none;
+    `}
+    /* ---- */
+    width: calc(100% - 10px);
+    border-top: 4px solid ${v.colors.activityDarkBlue};
+    background: ${v.colors.activityDarkBlue};
+    background: linear-gradient(
+      ${hexToRgba(v.colors.activityDarkBlue, 0)} 0,
+      ${v.colors.activityDarkBlue} 10%,
+      ${v.colors.activityDarkBlue} 100%
+    );
+    .textarea-input {
+      background: ${v.colors.activityMedBlue};
+      margin: 0 5px 0 68px;
+      width: calc(100% - 68px);
+    }
+    textarea {
+      width: calc(100% - 40px);
+      color: white;
+    }
+  }
+
 `
 CommentForm.displayName = 'CommentForm'
 

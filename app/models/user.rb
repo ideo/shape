@@ -64,7 +64,7 @@ class User < ApplicationRecord
 
   # Searchkick Config
   searchkick callbacks: :async, word_start: %i[name handle]
-  scope :search_import, -> { includes(:roles) }
+  scope :search_import, -> { active.includes(:roles) }
 
   def search_data
     {
@@ -73,6 +73,10 @@ class User < ApplicationRecord
       email: email,
       organization_ids: organizations.map(&:id),
     }
+  end
+
+  def should_index?
+    active?
   end
 
   def self.all_active_except(user_id)

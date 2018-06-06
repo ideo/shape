@@ -1,7 +1,8 @@
 class CommentCreator < SimpleService
-  def initialize(comment_thread:, message:, author:)
+  def initialize(comment_thread:, message:, draftjs_data:, author:)
     @comment_thread = comment_thread
     @message = message
+    @draftjs_data = draftjs_data
     @author = author
     @comment = nil
   end
@@ -17,6 +18,7 @@ class CommentCreator < SimpleService
   def create_comment
     @comment = @comment_thread.comments.create(
       message: @message,
+      draftjs_data: @draftjs_data,
       author: @author,
     )
   end

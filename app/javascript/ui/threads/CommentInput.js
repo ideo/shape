@@ -1,81 +1,84 @@
+import _ from 'lodash'
 import PropTypes from 'prop-types'
+import { observable, action } from 'mobx'
+import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 // import { EditorState, convertToRaw } from 'draft-js'
 import Editor from 'draft-js-plugins-editor'
-import createMentionPlugin, { defaultSuggestionsFilter } from 'draft-js-mention-plugin'
-import styled from 'styled-components'
-import 'draft-js-mention-plugin/lib/plugin.css'
+import createMentionPlugin from 'draft-js-mention-plugin'
 
-const StyledDiv = styled.div`
-  cursor: text;
-  padding: 10px;
-  padding-right: 45px;
-  font-size: 1rem;
+import { uiStore } from '~/stores'
+import { StyledCommentInput, CustomMentionSuggestion } from './CustomCommentMentions'
 
-  .public-DraftEditor-content {
-    min-height: 40px;
+const positionSuggestions = ({ decoratorRect, state, props }) => {
+  let transform
+  let transition
+  let top = '-36px'
+
+  if (state.isActive && props.suggestions.length > 0) {
+    transform = `scaleY(1)`
+    transition = 'all 0.25s cubic-bezier(.3,1.2,.2,1)'
+    const { y } = uiStore.activityLogPosition
+    top = `${decoratorRect.top - (y + (45 * (props.suggestions.length + 1)))}px`
+  } else if (state.isActive) {
+    transform = 'scaleY(0)'
+    transition = 'all 0.25s cubic-bezier(.3,1,.2,1)'
   }
-`
 
-const mentions = [
-  {
-    id: 1,
-    type: 'user',
-    name: 'Matthew Russell',
-    handle: 'matthew',
-    avatar: 'https://pbs.twimg.com/profile_images/517863945/mattsailing_400x400.jpg',
-  },
-  {
-    name: 'Julian Krispel-Samsel',
-    handle: 'julian',
-    avatar: 'https://avatars2.githubusercontent.com/u/1188186?v=3&s=400',
-  },
-  {
-    name: 'Jyoti Puri',
-    handle: 'jyoti99',
-    avatar: 'https://avatars0.githubusercontent.com/u/2182307?v=3&s=400',
-  },
-  {
-    name: 'Max Stoiber',
-    handle: 'maxymax',
-    avatar: 'https://pbs.twimg.com/profile_images/763033229993574400/6frGyDyA_400x400.jpg',
-  },
-  {
-    name: 'Nik Graf',
-    handle: 'nikko',
-    avatar: 'https://avatars0.githubusercontent.com/u/223045?v=3&s=400',
-  },
-  {
-    name: 'Pascal Brandt',
-    handle: 'pascalb',
-    avatar: 'https://pbs.twimg.com/profile_images/688487813025640448/E6O6I011_400x400.png',
-  },
-]
+  return {
+    transform,
+    transition,
+    top,
+  }
+}
 
+@inject('apiStore')
+@observer
 class CommentInput extends React.Component {
+  @observable suggestions = []
+
   constructor(props) {
     super(props)
+    this.initMentionPlugin()
+    this.searchUsersAndGroups = _.debounce(this._searchUsersAndGroups, 300)
+  }
+
+  initMentionPlugin() {
     this.mentionPlugin = createMentionPlugin({
       mentionComponent: (mentionProps) => (
         <strong>
           @{mentionProps.mention.handle}
         </strong>
-      )
+      ),
+      positionSuggestions,
     })
   }
 
-  state = {
-    suggestions: mentions,
+  @action handleClose = () => {
+    this.props.onCloseSuggestions()
+    this.suggestions = []
   }
 
   onSearchChange = ({ value }) => {
-    this.setState({
-      // TODO: replace default search to also search on handle
-      suggestions: defaultSuggestionsFilter(value, mentions),
-    })
+    this.searchUsersAndGroups(value)
   }
 
-  onAddMention = () => {
-    // get the mention object selected
+  _searchUsersAndGroups = async (query) => {
+    const { apiStore } = this.props
+    const res = await apiStore.searchUsersAndGroups(query)
+    this.updateSuggestions(res.data)
+  }
+
+  @action updateSuggestions = (data) => {
+    this.suggestions = data.map(d => (
+      {
+        // this gets used as the key so needs to be unique for users/groups
+        id: `${d.id}-${d.internalType}`,
+        name: d.name,
+        handle: d.handle,
+        // depends if user or group
+        avatar: d.pic_url_square || d.filestack_file_url
+      }
+    ))
   }
 
   focus = () => {
@@ -83,31 +86,49 @@ class CommentInput extends React.Component {
   }
 
   render() {
-    const { onChange, editorState } = this.props
+    const {
+      onChange,
+      onOpenSuggestions,
+      handleReturn,
+      editorState
+    } = this.props
     const { MentionSuggestions } = this.mentionPlugin
     const plugins = [this.mentionPlugin]
 
     return (
-      <StyledDiv onClick={this.focus}>
+      <StyledCommentInput onClick={this.focus}>
         <Editor
           editorState={editorState}
           onChange={onChange}
+          handleReturn={handleReturn}
           plugins={plugins}
-          ref={(element) => { this.editor = element }}
+          ref={(element) => {
+            this.editor = element
+            this.props.setEditor(element)
+          }}
         />
         <MentionSuggestions
           onSearchChange={this.onSearchChange}
-          suggestions={this.state.suggestions}
-          onAddMention={this.onAddMention}
+          onOpen={onOpenSuggestions}
+          onClose={this.handleClose}
+          suggestions={this.suggestions.toJS()}
+          entryComponent={CustomMentionSuggestion}
         />
-      </StyledDiv>
+      </StyledCommentInput>
     )
   }
 }
 
 CommentInput.propTypes = {
   onChange: PropTypes.func.isRequired,
+  onOpenSuggestions: PropTypes.func.isRequired,
+  onCloseSuggestions: PropTypes.func.isRequired,
+  handleReturn: PropTypes.func.isRequired,
+  setEditor: PropTypes.func.isRequired,
   editorState: PropTypes.object.isRequired,
+}
+CommentInput.wrappedComponent.propTypes = {
+  apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 
 export default CommentInput
