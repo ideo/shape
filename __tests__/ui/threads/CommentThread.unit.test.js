@@ -20,9 +20,10 @@ describe('CommentThread', () => {
     expect(wrapper.find('.name').text()).toContain(props.thread.record.name)
   })
 
-  it('renders a textarea', () => {
-    // NOTE: textarea is just shown/hidden via CSS so it should always "exist"
-    expect(wrapper.find('CommentTextarea').exists()).toBeTruthy()
+  it('renders a CommentEntryForm', () => {
+    // NOTE: textarea is just shown/hidden via "expanded" prop so it should always exist
+    expect(wrapper.find('CommentEntryForm').exists()).toBeTruthy()
+    expect(wrapper.find('CommentEntryForm').props().expanded).toEqual(props.expanded)
   })
 
   describe('with unexpanded thread', () => {

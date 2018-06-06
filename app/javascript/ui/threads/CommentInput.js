@@ -95,6 +95,7 @@ class CommentInput extends React.Component {
       editorState
     } = this.props
     const { MentionSuggestions } = this.mentionPlugin
+    MentionSuggestions.displayName = 'MentionSuggestions'
     const plugins = [this.mentionPlugin]
 
     return (
@@ -132,5 +133,7 @@ CommentInput.propTypes = {
 CommentInput.wrappedComponent.propTypes = {
   apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }
+
+CommentInput.displayName = 'CommentInput'
 
 export default CommentInput

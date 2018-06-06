@@ -71,14 +71,16 @@ const Action = styled.button`
 @inject('apiStore', 'uiStore')
 @observer
 class ActivityLogBox extends React.Component {
-  @observable position = { x: 0, y: 0, w: MIN_WIDTH, h: MIN_HEIGHT }
   @observable currentPage = 'comments'
   disposer = null
 
   constructor(props) {
     super(props)
     this.draggableRef = React.createRef()
+    // attach observable position to UiStore so other components can know where the ALB is
     this.position = props.uiStore.activityLogPosition
+    this.position.w = MIN_WIDTH
+    this.position.h = MIN_HEIGHT
     this.disposer = observe(props.uiStore, 'activityLogOpen', change => {
       if (this.isOffscreen()) {
         this.setToDefaultPosition()
