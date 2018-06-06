@@ -44,12 +44,14 @@ class CommentInput extends React.Component {
 
   initMentionPlugin() {
     this.mentionPlugin = createMentionPlugin({
-      mentionComponent: (mentionProps) => (
+      mentionComponent: ({ mention }) => (
         <strong>
-          @{mentionProps.mention.handle}
+          @{mention.handle}
         </strong>
       ),
       positionSuggestions,
+      // treat the entire "@xyz" as an all-or-nothing token
+      entityMutability: 'IMMUTABLE',
     })
   }
 
@@ -72,7 +74,7 @@ class CommentInput extends React.Component {
     this.suggestions = data.map(d => (
       {
         // this gets used as the key so needs to be unique for users/groups
-        id: `${d.id}-${d.internalType}`,
+        id: `${d.id}__${d.internalType}`,
         name: d.name,
         handle: d.handle,
         // depends if user or group

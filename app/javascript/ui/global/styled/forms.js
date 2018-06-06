@@ -243,15 +243,9 @@ export const CommentForm = styled.form`
   }
   &.reply {
     /* NOTE: 'sticky' is not fully browser supported */
-    ${props => props.expanded && `
-      z-index: ${v.zIndex.commentMentions};
-      position: sticky;
-      bottom: 0;
-    `}
-    ${props => !props.expanded && `
-      display: none;
-    `}
-    /* ---- */
+    z-index: ${v.zIndex.commentMentions};
+    position: sticky;
+    bottom: 0;
     width: calc(100% - 10px);
     border-top: 4px solid ${v.colors.activityDarkBlue};
     background: ${v.colors.activityDarkBlue};

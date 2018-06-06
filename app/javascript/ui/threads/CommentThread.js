@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types'
-import { EditorState, convertToRaw } from 'draft-js'
-import { observable, action, runInAction, computed } from 'mobx'
+import { EditorState } from 'draft-js'
+import { observable, action, computed } from 'mobx'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 import Dotdotdot from 'react-dotdotdot'

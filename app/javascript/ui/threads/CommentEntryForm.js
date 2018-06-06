@@ -25,6 +25,8 @@ class CommentEntryForm extends React.Component {
 
   componentWillReceiveProps({ expanded }) {
     this.focusTextArea(expanded)
+    // NOTE: maybe preferred to leave written + unsent messages in the comment box?
+    // if (!expanded) this.resetEditorState()
   }
 
   focusTextArea = (expanded) => {
@@ -46,6 +48,12 @@ class CommentEntryForm extends React.Component {
 
   setEditor = (editor) => {
     this.editor = editor
+  }
+
+  resetEditorState() {
+    this.setState({
+      editorState: EditorState.push(this.state.editorState, ContentState.createFromText(''))
+    })
   }
 
   @action handleOpenSuggestions = () => {
@@ -78,20 +86,15 @@ class CommentEntryForm extends React.Component {
       this.commentData.draftjs_data = {}
       this.updating = true
     })
-    this.setState({
-      editorState: EditorState.push(this.state.editorState, ContentState.createFromText(''))
-    })
-  }
-
-  handleAddMention = (id, display) => {
-    // console.log('mentioned', id, display)
+    this.resetEditorState()
   }
 
   render() {
     const { expanded } = this.props
+    if (!expanded) return ''
 
     return (
-      <CommentForm className="reply" expanded={expanded} onSubmit={this.handleSubmit}>
+      <CommentForm className="reply" onSubmit={this.handleSubmit}>
         <div className="textarea-input">
           <CommentInput
             editorState={this.state.editorState}

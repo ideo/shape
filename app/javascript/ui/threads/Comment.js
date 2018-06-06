@@ -31,11 +31,11 @@ class Comment extends React.Component {
   constructor(props) {
     super(props)
     this.mentionPlugin = createMentionPlugin({
-      mentionComponent: (mentionProps) => (
+      mentionComponent: ({ mention }) => (
         <strong>
-          @{mentionProps.mention.handle}
+          @{mention.handle}
         </strong>
-      )
+      ),
     })
     this.state = {
       editorState: EditorState.createEmpty(),

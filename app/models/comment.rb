@@ -7,6 +7,24 @@ class Comment < ApplicationRecord
 
   after_create :store_in_firestore
 
+  def mentions
+    return unless draftjs_data.present?
+    mentions = {
+      users: [],
+      groups: [],
+    }
+    draftjs_data['entityMap'].each_pair do |_k, v|
+      entity = Hashie::Mash.new(v)
+      next unless entity.type == 'mention'
+      id, type = entity.data.mention.id.split('__')
+      mentions[type.to_sym] << id.to_i
+    end
+    {
+      user_ids: mentions[:users].uniq,
+      group_ids: mentions[:groups].uniq,
+    }
+  end
+
   def serialized_for_firestore
     renderer = JSONAPI::Serializable::Renderer.new
     renderer.render(

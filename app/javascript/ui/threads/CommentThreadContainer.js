@@ -156,7 +156,6 @@ class CommentThreadContainer extends React.Component {
       scroller.scrollTo(`thread-${nextIdx}`, {
         ...this.scrollOpts,
         duration,
-        // 70px seems to be from height of CommentThread header?
         offset: -1 * this.contentHeight(),
       })
     }, 50)
