@@ -20,7 +20,7 @@ class Notification < ApplicationRecord
       class: { Activity: SerializableActivity,
                Notification: SerializableNotification,
                User: SerializableUser,
-               Group: SerializableGroup,
+               Group: SerializableSimpleGroup,
                Collection: SerializableSimpleCollection,
                'Item::VideoItem': SerializableSimpleItem,
                'Item::ImageItem': SerializableSimpleItem,
