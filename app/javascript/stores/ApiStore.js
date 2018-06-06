@@ -86,14 +86,17 @@ class ApiStore extends Store {
   }
 
   importUsersThread({ usersThread, thread, comments } = {}) {
+    if (thread.id === 121) console.log('iut', usersThread)
     thread.assignRef('users_thread', usersThread)
     thread.importComments(comments)
     this.addCurrentCommentThread(thread.id)
   }
 
   @computed get unreadNotifications() {
-    return this.findAll('notifications')
-      .filter(notification => !notification.read)
+    return _.reverse(_.sortBy(
+      this.findAll('notifications').filter(notification => !notification.read),
+      'created_at'
+    ))
   }
 
   @computed get unreadNotificationsCount() {

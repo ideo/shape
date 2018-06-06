@@ -5,6 +5,7 @@
     "read": { "type": "boolean" },
     "created_at": { "type": "date" },
     "combined_activities_ids": { "type": ["array", "[]"] },
+    "combined_actor_count": { "type": "integer" },
     "activity_id": { "type": "integer" },
     "user_id": { "type": "integer" },
     "identifier": { "type": "string" }

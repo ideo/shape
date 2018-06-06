@@ -212,7 +212,7 @@ export const fakeNotification = {
   type: 'notifications',
   read: false,
   activity: fakeActivity,
-  combined_activities: [],
+  combined_actors: [],
   combined_activities_ids: [],
   user: fakeUser,
   ...fakeJsonApiAttrs,

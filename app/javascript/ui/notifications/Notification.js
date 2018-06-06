@@ -62,14 +62,6 @@ class Notification extends React.Component {
     notification.save()
   }
 
-  combineActors() {
-    const { notification } = this.props
-    if (!notification.combined_activities_ids.length) {
-      return [notification.activity.actor]
-    }
-    return notification.combined_activities.map(activity => activity.actor)
-  }
-
   handleRead = (ev) => {
     ev.preventDefault()
     this.updateRead()
@@ -96,11 +88,11 @@ class Notification extends React.Component {
             <Moment date={notification.created_at} />
             <Activity
               action={notification.activity.action}
-              actors={this.combineActors()}
+              actors={notification.combined_actors}
               target={notification.activity.target}
               subjectUsers={notification.activity.subject_users}
               subjectGroups={notification.activity.subject_groups}
-              actorCount={notification.combined_activities_ids.length}
+              actorCount={notification.combined_actor_count}
               content={notification.activity.content}
             />
           </div>

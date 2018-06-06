@@ -128,9 +128,7 @@ class Activity extends React.PureComponent {
 
 Activity.propTypes = {
   action: PropTypes.string.isRequired,
-  actors: PropTypes.arrayOf(PropTypes.shape({
-    name: PropTypes.string,
-  })).isRequired,
+  actors: MobxPropTypes.arrayOrObservableArray.isRequired,
   target: PropTypes.shape({
     name: PropTypes.string,
     internalType: PropTypes.string,

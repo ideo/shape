@@ -83,7 +83,7 @@ class CommentThreadContainer extends React.Component {
       const nextIdx = idx + 1
       runInAction(() => {
         if (this.visibleThreads[nextIdx]) {
-          if (expandedThread.unreadCount) {
+          if (expandedThread.unreadCount || expandedThread.latestUnreadComments.length) {
             expandedThread.API_markViewed()
           }
           this.bottomOfExpandedThread = true
