@@ -4,6 +4,8 @@ class HomeController < ApplicationController
   before_action :set_omniauth_state
 
   def index
+    # for someone without admin access who tries to go to /sidekiq
+    return redirect_to root_url if params[:path] == 'sidekiq'
   end
 
   def login
