@@ -112,7 +112,7 @@ class CommentEntryForm extends React.Component {
     if (!expanded) return ''
 
     return (
-      <CommentForm className="reply" onSubmit={this.handleSubmit}>
+      <CommentForm onSubmit={this.handleSubmit}>
         <div className="textarea-input">
           <CommentInput
             editorState={this.state.editorState}

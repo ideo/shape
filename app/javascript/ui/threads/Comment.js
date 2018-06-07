@@ -40,9 +40,9 @@ class Comment extends React.Component {
 
   componentWillMount() {
     const { comment } = this.props
-    const draftjs_data = toJS(comment.draftjs_data)
-    if (!_.isEmpty(draftjs_data)) {
-      const contentState = convertFromRaw(draftjs_data)
+    const draftjsData = toJS(comment.draftjs_data)
+    if (!_.isEmpty(draftjsData)) {
+      const contentState = convertFromRaw(draftjsData)
       const editorState = EditorState.createWithContent(contentState)
       this.setState({ editorState })
     }
@@ -50,8 +50,9 @@ class Comment extends React.Component {
 
   renderMessage() {
     const { comment } = this.props
-    const draftjs_data = toJS(comment.draftjs_data)
-    if (_.isEmpty(draftjs_data)) {
+    if (_.isEmpty(toJS(comment.draftjs_data))) {
+      // fallback only necessary for supporting older comments before we added draftjs
+      // otherwise this use case will go away
       return comment.message
     }
     const plugins = [this.mentionPlugin]
