@@ -13,13 +13,6 @@ describe User, type: :model do
     it { should validate_presence_of(:provider) }
     it { should validate_presence_of(:email) }
     it { should validate_uniqueness_of(:uid).scoped_to(:provider) }
-
-    it 'should not validate uniqueness of email' do
-      email = 'email@me.com'
-      create(:user, email: email, uid: 1)
-      # should allow me to create a second user w/ unique uid, but same email
-      expect(create(:user, email: email, uid: 2)).to be_truthy
-    end
   end
 
   context 'callbacks' do
@@ -118,6 +111,14 @@ describe User, type: :model do
       end
     end
 
+    context 'with pending user found via email' do
+      let!(:email_matching_user) { create(:user, :pending, email: auth.info.email) }
+
+      it 'finds matching user' do
+        expect(from_omniauth.id).to eq email_matching_user.id
+      end
+    end
+
     context 'without existing user' do
       it 'sets up new user record' do
         expect(from_omniauth.new_record?).to be true
@@ -160,11 +161,9 @@ describe User, type: :model do
 
     it 'should include name, email, organization_ids' do
       expect(user.search_data).to eq(
-        {
-          name: user.name,
-          email: user.email,
-          organization_ids: [],
-        }
+        name: user.name,
+        email: user.email,
+        organization_ids: [],
       )
     end
 

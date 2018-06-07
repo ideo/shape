@@ -92,6 +92,11 @@ class Role < ApplicationRecord
     [name, resource_identifier].select(&:present?).join('_')
   end
 
+  # includes users with this role and group->users with this role
+  def all_user_ids
+    (user_ids + groups.map(&:user_id)).flatten.uniq
+  end
+
   def user_identifiers
     ids = persisted? ? user_ids : users_roles.map(&:user_id)
     ids.map do |user_id|
