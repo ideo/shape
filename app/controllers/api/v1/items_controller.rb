@@ -42,13 +42,6 @@ class Api::V1::ItemsController < Api::V1::BaseController
 
   def archive
     if @item.archive!
-      ActivityAndNotificationBuilder.new(
-        actor: current_user,
-        target: @item,
-        action: Activity.actions[:archived],
-        subject_users: @item.editors[:users],
-        subject_groups: @item.editors[:groups],
-      ).call
       render jsonapi: @item.reload
     else
       render_api_errors @item.errors
