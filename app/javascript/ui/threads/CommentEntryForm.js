@@ -30,6 +30,10 @@ class CommentEntryForm extends React.Component {
     // if (!expanded) this.resetEditorState()
   }
 
+  componentWillUnmount() {
+    this.editor = null
+  }
+
   focusTextArea = (expanded) => {
     // NOTE: draft-js-plugins need timeout, even with 0 delay, see:
     // https://github.com/draft-js-plugins/draft-js-plugins/issues/800#issuecomment-315950836
@@ -51,7 +55,11 @@ class CommentEntryForm extends React.Component {
     })
   }
 
-  setEditor = (editor) => {
+  setEditor = (editor, { unset = false } = {}) => {
+    if (unset) {
+      this.editor = null
+      return
+    }
     if (this.editor) return
     this.editor = editor
     this.focusTextArea(this.props.expanded)

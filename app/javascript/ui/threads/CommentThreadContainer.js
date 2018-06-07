@@ -1,3 +1,4 @@
+import { Fragment } from 'react'
 import { observable, observe, runInAction } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import { Element as ScrollElement, scroller } from 'react-scroll'
@@ -39,7 +40,6 @@ class CommentThreadContainer extends React.Component {
         const { expandedThread } = this
         if (!expandedThread) return
         this.disposers.expandedComments = expandedThread.comments.observe((commentChange) => {
-          // console.log('COMMENT_CHANGE', commentChange, this.bottomOfExpandedThread)
           const lastComment = _.last(expandedThread.comments)
           // if last comment is unpersisted it means I just added it; scroll me down
           if (this.bottomOfExpandedThread || !lastComment.__persisted) {
@@ -123,6 +123,14 @@ class CommentThreadContainer extends React.Component {
     return document.getElementById(this.scrollOpts.containerId)
   }
 
+  get showJumpToThreadButton() {
+    const { uiStore } = this.props
+    return (uiStore.viewingRecord &&
+      (uiStore.viewingRecord.isNormalCollection ||
+      uiStore.viewingRecord.internalType === 'items')
+    )
+  }
+
   get expandedThread() {
     const { uiStore } = this.props
     return this.threads.filter(t => t.key === uiStore.expandedThreadKey)[0]
@@ -170,6 +178,14 @@ class CommentThreadContainer extends React.Component {
     return uiStore.expandedThreadKey === key
   }
 
+  jumpToCurrentThread = () => {
+    const { apiStore, uiStore } = this.props
+    const thread = apiStore.findThreadForRecord(uiStore.viewingRecord)
+    if (!thread) return
+    uiStore.expandThread(thread.key)
+    this.scrollToTopOfNextThread(thread)
+  }
+
   renderThreads = () => (
     this.threads.map((thread, i) => (
       <ScrollElement name={`thread-${i}`} key={thread.key}>
@@ -195,27 +211,40 @@ class CommentThreadContainer extends React.Component {
   render() {
     const { uiStore } = this.props
     return (
-      <ActivityContainer id={this.scrollOpts.containerId}>
-        { this.loadingThreads && <InlineLoader fixed background="none" /> }
-        <FlipMove
-          disableAllAnimations={!!uiStore.expandedThreadKey}
-        >
-          {this.renderThreads()}
-        </FlipMove>
-        <VisibilitySensor
-          offset={{
-            top: 10,
-          }}
-          partialVisibility
-          containment={this.containerDiv}
-          onChange={this.handleVisibilityChange(this.threads.length)}
-        >
-          <ScrollElement
-            name={`thread-${this.threads.length}`}
-            style={{ height: '5px' }}
-          />
-        </VisibilitySensor>
-      </ActivityContainer>
+      <Fragment>
+        {this.showJumpToThreadButton &&
+          <button onClick={this.jumpToCurrentThread}>
+            <h3 style={{ textAlign: 'center' }}>
+              Go to {uiStore.viewingRecord.name}
+            </h3>
+          </button>
+        }
+        {!this.showJumpToThreadButton &&
+          // take up the same amount of space as the button
+          <div style={{ height: '2rem' }} />
+        }
+        <ActivityContainer id={this.scrollOpts.containerId}>
+          { this.loadingThreads && <InlineLoader fixed background="none" /> }
+          <FlipMove
+            disableAllAnimations={!!uiStore.expandedThreadKey}
+          >
+            {this.renderThreads()}
+          </FlipMove>
+          <VisibilitySensor
+            offset={{
+              top: 10,
+            }}
+            partialVisibility
+            containment={this.containerDiv}
+            onChange={this.handleVisibilityChange(this.threads.length)}
+          >
+            <ScrollElement
+              name={`thread-${this.threads.length}`}
+              style={{ height: '5px' }}
+            />
+          </VisibilitySensor>
+        </ActivityContainer>
+      </Fragment>
     )
   }
 }

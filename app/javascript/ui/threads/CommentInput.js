@@ -42,6 +42,10 @@ class CommentInput extends React.Component {
     this.searchUsersAndGroups = _.debounce(this._searchUsersAndGroups, 300)
   }
 
+  componentWillUnmount() {
+    this.props.setEditor(null, { unset: true })
+  }
+
   initMentionPlugin() {
     this.mentionPlugin = createMentionPlugin({
       positionSuggestions,
@@ -95,12 +99,13 @@ class CommentInput extends React.Component {
     const plugins = [this.mentionPlugin]
 
     return (
-      <StyledCommentInput onClick={this.focus}>
+      <StyledCommentInput editing onClick={this.focus}>
         <Editor
           editorState={editorState}
           onChange={onChange}
           handleReturn={handleReturn}
           plugins={plugins}
+          placeholder="Add comment"
           ref={(element) => {
             this.editor = element
             this.props.setEditor(element)

@@ -1,4 +1,3 @@
-import { Fragment } from 'react'
 import Rnd from 'react-rnd'
 import localStorage from 'mobx-localstorage'
 import { observable, observe, action } from 'mobx'
@@ -39,10 +38,6 @@ const StyledActivityLog = styled.div`
   width: 100%;
   display: flex;
   flex-direction: column;
-
-  > h3 {
-    text-align: center;
-  }
 `
 
 const StyledHeader = styled.div`
@@ -162,21 +157,6 @@ class ActivityLogBox extends React.Component {
     this.changePage('comments')
   }
 
-  get showJumpToThreadButton() {
-    const { uiStore } = this.props
-    return (uiStore.viewingRecord &&
-      (uiStore.viewingRecord.isNormalCollection ||
-      uiStore.viewingRecord.internalType === 'items')
-    )
-  }
-
-  jumpToCurrentThread = () => {
-    const { apiStore, uiStore } = this.props
-    const thread = apiStore.findThreadForRecord(uiStore.viewingRecord)
-    if (!thread) return
-    uiStore.expandThread(thread.key)
-  }
-
   get mobileProps() {
     const { uiStore } = this.props
     if (!uiStore.activityLogForceWidth) return {}
@@ -197,30 +177,13 @@ class ActivityLogBox extends React.Component {
     }
   }
 
-  renderComments() {
-    const { uiStore } = this.props
-    return (
-      <Fragment>
-        {this.showJumpToThreadButton &&
-          <button onClick={this.jumpToCurrentThread}>
-            <h3>Go to {uiStore.viewingRecord.name}</h3>
-          </button>
-        }
-        {!this.showJumpToThreadButton &&
-          // take up the same amount of space as the button
-          <div style={{ height: '2rem' }} />
-        }
+  renderComments = () => (
+    <CommentThreadContainer />
+  )
 
-        <CommentThreadContainer />
-      </Fragment>
-    )
-  }
-
-  renderNotifications() {
-    return (
-      <NotificationsContainer />
-    )
-  }
+  renderNotifications = () => (
+    <NotificationsContainer />
+  )
 
   render() {
     const { apiStore, uiStore } = this.props

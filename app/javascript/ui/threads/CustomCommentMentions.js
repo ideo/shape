@@ -10,7 +10,13 @@ export const StyledCommentInput = styled.div`
   font-size: 1rem;
 
   .public-DraftEditor-content {
-    min-height: 40px;
+    min-height: ${props => (props.editing ? '25px' : '15px')};
+  }
+
+  .public-DraftEditorPlaceholder-root {
+    color: ${v.colors.gray};
+    position: absolute;
+    z-index: 1
   }
 
   .draftJsMentionPlugin__mention__29BEd {
