@@ -26,7 +26,6 @@ class PageWithApi extends React.Component {
   componentWillUnmount() {
     this.unmounted = true
     uiStore.setViewingCollection(null)
-    uiStore.setViewingItem(null)
   }
 
   @action updateError(err) {
