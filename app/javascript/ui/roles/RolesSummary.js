@@ -27,10 +27,7 @@ const StyledAvatarGroup = styled.div`
   .editor,
   .viewer {
     display: inline-block;
-    margin-right: 12px;
-    &:last-of-type {
-      margin-right: 0;
-    }
+    margin-right: 0;
   }
 `
 StyledAvatarGroup.displayName = 'StyledAvatarGroup'
@@ -55,7 +52,7 @@ const StyledSeparator = styled.div`
 const StyledAddUserBtn = styled.div`
   display: inline-block;
   vertical-align: top;
-  margin-right: 12px;
+  margin-right: 0;
   width: 30px;
   height: 30px;
   border-radius: 30px;
