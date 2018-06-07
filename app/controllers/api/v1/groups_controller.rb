@@ -39,8 +39,7 @@ class Api::V1::GroupsController < Api::V1::BaseController
         actor: current_user,
         target: @group,
         action: Activity.actions[:archived],
-        subject_users: @group.members[:users] + @group.admins[:users],
-        subject_groups: [],
+        subject_user_ids: @group.members[:users].pluck(:id) + @group.admins[:users].pluck(:id),
       ).call
       render jsonapi: @group.reload
     else

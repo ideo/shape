@@ -38,8 +38,8 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
         actor: current_user,
         target: @collection_card.record,
         action: Activity.actions[:archived],
-        subject_users: @collection_card.record.editors[:users],
-        subject_groups: @collection_card.record.editors[:groups],
+        subject_user_ids: @collection_card.record.editors[:users].pluck(:id),
+        subject_group_ids: @collection_card.record.editors[:groups].pluck(:id),
       ).call
       render jsonapi: @collection_card.reload, include: [:parent, record: [:filestack_file]]
     else

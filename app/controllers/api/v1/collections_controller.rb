@@ -58,8 +58,8 @@ class Api::V1::CollectionsController < Api::V1::BaseController
         actor: current_user,
         target: @collection,
         action: Activity.actions[:archived],
-        subject_users: @collection.editors[:users],
-        subject_groups: @collection.editors[:groups],
+        subject_user_ids: @collection.editors[:users].pluck(:id),
+        subject_group_ids: @collection.editors[:groups].pluck(:id),
       ).call
       render jsonapi: @collection.reload
     else

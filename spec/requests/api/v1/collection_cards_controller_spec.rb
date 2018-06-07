@@ -241,8 +241,8 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
         actor: @user,
         target: collection_card.record,
         action: Activity.actions[:archived],
-        subject_users: [],
-        subject_groups: [],
+        subject_user_ids: [],
+        subject_group_ids: [],
       )
       patch(path)
     end

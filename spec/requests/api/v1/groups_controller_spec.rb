@@ -183,8 +183,7 @@ describe Api::V1::GroupsController, type: :request, json: true, auth: true do
         actor: @user,
         target: group,
         action: Activity.actions[:archived],
-        subject_users: members << user,
-        subject_groups: [],
+        subject_user_ids: (members << user).pluck(:id),
       )
       patch(path)
     end

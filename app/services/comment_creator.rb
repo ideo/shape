@@ -43,5 +43,12 @@ class CommentCreator < SimpleService
     mentions[:group_ids].each do |group_id|
       @comment_thread.add_group_follower!(group_id)
     end
+    ActivityAndNotificationBuilder.new(
+      actor: @author,
+      target: @comment,
+      action: Activity.actions[:mentioned],
+      subject_user_ids: mentions[:user_ids],
+      subject_group_ids: mentions[:group_ids],
+    ).call
   end
 end

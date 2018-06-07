@@ -19,8 +19,8 @@ class Api::V1::CommentsController < Api::V1::BaseController
         actor: current_user,
         target: @comment_thread.record,
         action: Activity.actions[:commented],
-        subject_users: @comment_thread.users_threads.map(&:user),
-        subject_groups: @comment_thread.groups_threads.map(&:group),
+        subject_user_ids: @comment_thread.users_threads.pluck(:user_id),
+        subject_group_ids: @comment_thread.groups_threads.pluck(:group_id),
         combine: true,
         content: @comment.message,
       ).call

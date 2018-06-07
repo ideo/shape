@@ -326,8 +326,8 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
         actor: @user,
         target: collection,
         action: Activity.actions[:archived],
-        subject_users: [user],
-        subject_groups: [],
+        subject_user_ids: [user.id],
+        subject_group_ids: [],
       )
       patch(path)
     end

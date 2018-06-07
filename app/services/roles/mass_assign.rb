@@ -102,8 +102,8 @@ module Roles
         actor: @invited_by,
         target: @object,
         action: action,
-        subject_users: @added_users,
-        subject_groups: @added_groups,
+        subject_user_ids: @added_users.pluck(:id),
+        subject_group_ids: @added_groups.pluck(:id),
       )
       builder.call
     end

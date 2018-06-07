@@ -14,8 +14,8 @@ RSpec.describe ActivityAndNotificationBuilder, type: :service do
       actor: actor,
       target: target,
       action: action,
-      subject_users: subject_users,
-      subject_groups: subject_groups,
+      subject_user_ids: subject_users.map(&:id),
+      subject_group_ids: subject_groups.map(&:id),
       combine: combine,
       content: content,
     )
@@ -26,7 +26,7 @@ RSpec.describe ActivityAndNotificationBuilder, type: :service do
       expect { builder.call }.to change(Activity, :count).by(1)
     end
 
-    context 'with muliple users' do
+    context 'with multiple users' do
       let(:subject_users) { create_list(:user, 2) }
 
       it 'creates notifications for each user' do
@@ -82,7 +82,7 @@ RSpec.describe ActivityAndNotificationBuilder, type: :service do
             actor: user,
             target: target,
             action: action,
-            subject_users: subject_users,
+            subject_user_ids: subject_users.map(&:id),
           ).call
         end
       end

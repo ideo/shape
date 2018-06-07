@@ -14,13 +14,15 @@ class Activity < ApplicationRecord
   has_many :notifications, dependent: :destroy
   belongs_to :organization
 
-  enum action: %i[
-    archived
-    added_editor
-    added_member
-    added_admin
-    commented
-  ]
+  # add explicit values so it's not tied to the order of the array
+  enum action: {
+    archived: 0,
+    added_editor: 1,
+    added_member: 2,
+    added_admin: 3,
+    commented: 4,
+    mentioned: 5,
+  }
 
   def self.role_name_to_action(role_name)
     case role_name
