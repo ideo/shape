@@ -6,9 +6,12 @@ class Notification < ApplicationRecord
   after_destroy :remove_from_firestore
 
   def combined_actor_ids(limit: nil)
+    # make this method universal to support both combined and individual activities
+    activity_ids = combined_activities_ids
+    activity_ids = [activity.id] if activity_ids.empty?
     Activity
       .select(:actor_id, 'max(created_at) as created')
-      .where(id: combined_activities_ids)
+      .where(id: activity_ids)
       .order('created DESC')
       .group(:actor_id)
       .limit(limit)

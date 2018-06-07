@@ -193,6 +193,7 @@ export const fakeThread = {
   latestUnreadComments: [
     fakeComment, fakeComment
   ],
+  API_saveComment: jest.fn().mockReturnValue(Promise.resolve({})),
 }
 export const fakeActivity = {
   id: 1,

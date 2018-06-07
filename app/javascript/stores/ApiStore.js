@@ -79,6 +79,10 @@ class ApiStore extends Store {
     }
   }
 
+  searchUsersAndGroups(query) {
+    return this.request(`search/users_and_groups?query=${query}`)
+  }
+
   async fetchRoles(group) {
     const res = await this.request(`groups/${group.id}/roles`, 'GET')
     const roles = res.data
@@ -86,7 +90,6 @@ class ApiStore extends Store {
   }
 
   importUsersThread({ usersThread, thread, comments } = {}) {
-    if (thread.id === 121) console.log('iut', usersThread)
     thread.assignRef('users_thread', usersThread)
     thread.importComments(comments)
     this.addCurrentCommentThread(thread.id)

@@ -47,10 +47,6 @@ class User < ApplicationRecord
   validates :uid, :provider, presence: true, if: :active?
   validates :uid, uniqueness: { scope: :provider }, if: :active?
 
-  searchkick callbacks: :async, word_start: [:name]
-
-  scope :search_import, -> { includes(:roles) }
-
   attribute :pic_url_square,
             :string,
             default: 'https://d3none3dlnlrde.cloudfront.net/assets/users/avatars/missing/square.jpg'
@@ -66,12 +62,21 @@ class User < ApplicationRecord
     false
   end
 
+  # Searchkick Config
+  searchkick callbacks: :async, word_start: %i[name handle]
+  scope :search_import, -> { active.includes(:roles) }
+
   def search_data
     {
       name: name,
+      handle: handle,
       email: email,
       organization_ids: organizations.map(&:id),
     }
+  end
+
+  def should_index?
+    active?
   end
 
   def self.all_active_except(user_id)

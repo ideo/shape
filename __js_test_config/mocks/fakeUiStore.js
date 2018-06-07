@@ -22,6 +22,12 @@ const fakeUiStore = {
     onClose: jest.fn(),
   },
   activityLogOpen: false,
+  activityLogPosition: {
+    x: 0,
+    y: 0,
+    h: 1,
+    w: 1,
+  },
   scroll: {
     scrollToTop: jest.fn(),
     scrollToBottom: jest.fn(),

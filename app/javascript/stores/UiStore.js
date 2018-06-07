@@ -63,6 +63,7 @@ export default class UiStore {
   @observable searchText = ''
   @observable activityLogOpen = false
   @observable activityLogForceWidth = null
+  @observable activityLogPosition = { x: 0, y: 0, w: 1, h: 1 }
 
   // Comments + Threads
   @observable commentsOpen = false
@@ -308,7 +309,7 @@ export default class UiStore {
   }
   // --- BCT + GridCard properties />
 
-  @action expandThread(key, { reset = true } = {}) {
+  @action expandThread(key, { reset = false } = {}) {
     // reset it first, that way if it's expanded offscreen, it will get re-opened/scrolled to
     if (reset) this.expandedThreadKey = null
     this.expandedThreadKey = key

@@ -1,4 +1,3 @@
-import { Fragment } from 'react'
 import Rnd from 'react-rnd'
 import localStorage from 'mobx-localstorage'
 import { observable, observe, action } from 'mobx'
@@ -39,10 +38,6 @@ const StyledActivityLog = styled.div`
   width: 100%;
   display: flex;
   flex-direction: column;
-
-  > h3 {
-    text-align: center;
-  }
 `
 
 const StyledHeader = styled.div`
@@ -71,13 +66,16 @@ const Action = styled.button`
 @inject('apiStore', 'uiStore')
 @observer
 class ActivityLogBox extends React.Component {
-  @observable position = { x: 0, y: 0, w: MIN_WIDTH, h: MIN_HEIGHT }
   @observable currentPage = 'comments'
   disposer = null
 
   constructor(props) {
     super(props)
     this.draggableRef = React.createRef()
+    // attach observable position to UiStore so other components can know where the ALB is
+    this.position = props.uiStore.activityLogPosition
+    this.position.w = MIN_WIDTH
+    this.position.h = MIN_HEIGHT
     this.disposer = observe(props.uiStore, 'activityLogOpen', change => {
       if (this.isOffscreen()) {
         this.setToDefaultPosition()
@@ -146,6 +144,7 @@ class ActivityLogBox extends React.Component {
   handleClose = (ev) => {
     const { uiStore } = this.props
     uiStore.update('activityLogOpen', false)
+    uiStore.expandThread(null)
   }
 
   handleNotifications = (ev) => {
@@ -156,21 +155,6 @@ class ActivityLogBox extends React.Component {
   handleComments = (ev) => {
     ev.preventDefault()
     this.changePage('comments')
-  }
-
-  get showJumpToThreadButton() {
-    const { uiStore } = this.props
-    return (uiStore.viewingRecord &&
-      (uiStore.viewingRecord.isNormalCollection ||
-      uiStore.viewingRecord.internalType === 'items')
-    )
-  }
-
-  jumpToCurrentThread = () => {
-    const { apiStore, uiStore } = this.props
-    const thread = apiStore.findThreadForRecord(uiStore.viewingRecord)
-    if (!thread) return
-    uiStore.expandThread(thread.key)
   }
 
   get mobileProps() {
@@ -193,30 +177,13 @@ class ActivityLogBox extends React.Component {
     }
   }
 
-  renderComments() {
-    const { uiStore } = this.props
-    return (
-      <Fragment>
-        {this.showJumpToThreadButton &&
-          <button onClick={this.jumpToCurrentThread}>
-            <h3>Go to {uiStore.viewingRecord.name}</h3>
-          </button>
-        }
-        {!this.showJumpToThreadButton &&
-          // take up the same amount of space as the button
-          <div style={{ height: '2rem' }} />
-        }
+  renderComments = () => (
+    <CommentThreadContainer />
+  )
 
-        <CommentThreadContainer />
-      </Fragment>
-    )
-  }
-
-  renderNotifications() {
-    return (
-      <NotificationsContainer />
-    )
-  }
+  renderNotifications = () => (
+    <NotificationsContainer />
+  )
 
   render() {
     const { apiStore, uiStore } = this.props

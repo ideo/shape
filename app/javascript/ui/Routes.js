@@ -43,17 +43,18 @@ const FixedActivityLogWrapper = styled.div`
 @inject('apiStore', 'uiStore', 'routingStore')
 @observer
 class Routes extends React.Component {
+  theme = createMuiTheme({
+    typography: {
+      // Use the Shape font instead of the default Roboto font.
+      fontFamily: v.fonts.sans,
+    },
+  })
+
   componentDidMount() {
     const { apiStore } = this.props
     apiStore.loadCurrentUserAndGroups().then(() => {
       initDoorbell(apiStore.currentUser)
       firebaseClient.authenticate(apiStore.currentUser.google_auth_token)
-    })
-    this.theme = createMuiTheme({
-      typography: {
-        // Use the Shape font instead of the default Roboto font.
-        fontFamily: v.fonts.sans,
-      },
     })
   }
 

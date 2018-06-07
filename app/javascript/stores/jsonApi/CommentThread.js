@@ -16,9 +16,6 @@ class CommentThread extends BaseRecord {
 
   @computed get unreadCount() {
     const { users_thread } = this
-
-    if (this.id === 121) console.log(users_thread)
-
     if (!users_thread) return 0
     return users_thread.unread_count
   }
@@ -50,7 +47,7 @@ class CommentThread extends BaseRecord {
     this.importComments(res.data)
   }
 
-  async API_saveComment(message) {
+  async API_saveComment(commentData) {
     if (!this.__persisted) {
       // if there's no id, then first we have to create the comment_thread
       await this.API_create()
@@ -66,11 +63,11 @@ class CommentThread extends BaseRecord {
     // dynamically set the endpoint to belong to this thread
     Comment.endpoint = `comment_threads/${this.id}/comments`
     // create an unsaved comment so that we can see it immediately
-    const comment = new Comment({ message }, this.apiStore)
+    const comment = new Comment(commentData, this.apiStore)
     comment.assignRef('author', this.apiStore.currentUser)
     this.apiStore.add(comment)
     this.importComments([comment], { created: true })
-    // this will create the comment and retrieve the updated thread
+    // this will create the comment in the API
     return comment.save()
   }
 

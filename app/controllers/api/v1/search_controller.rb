@@ -11,6 +11,18 @@ class Api::V1::SearchController < Api::V1::BaseController
     )
   end
 
+  def users_and_groups
+    results = search_users_and_groups(params[:query])
+    render(
+      meta: {
+        page: page,
+        total: results.total_count,
+        size: results.size,
+      },
+      jsonapi: results,
+    )
+  end
+
   private
 
   def page
@@ -30,6 +42,19 @@ class Api::V1::SearchController < Api::V1::BaseController
       },
       per_page: 10,
       page: page,
+    )
+  end
+
+  def search_users_and_groups(query)
+    Searchkick.search(
+      query,
+      index_name: [User, Group],
+      match: :word_start,
+      fields: %w[handle^5 name],
+      where: {
+        organization_ids: [current_organization.id],
+      },
+      per_page: 6,
     )
   end
 

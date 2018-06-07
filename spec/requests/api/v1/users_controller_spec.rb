@@ -59,7 +59,7 @@ describe Api::V1::UsersController, type: :request, json: true, auth: true do
       expect(assigns(:current_user)).to eq(user)
     end
 
-    it 'matches User schema' do
+    it 'matches User schema for current user (with personal attributes)' do
       get(path)
       expect(json['data']['attributes']).to match_json_schema('user_me')
     end

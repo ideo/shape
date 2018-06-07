@@ -82,7 +82,10 @@ Rails.application.routes.draw do
           get 'user_notifications'
         end
       end
-      get :search, to: 'search#search', as: :search
+      scope :search do
+        get '/', to: 'search#search', as: :search
+        get 'users_and_groups', to: 'search#users_and_groups', as: :search_users_and_groups
+      end
     end
   end
 

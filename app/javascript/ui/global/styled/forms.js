@@ -4,6 +4,8 @@ import { MenuItem } from 'material-ui/Menu'
 import AutosizeInput from 'react-input-autosize'
 import TextareaAutosize from 'react-autosize-textarea'
 import styled from 'styled-components'
+
+import hexToRgba from '~/utils/hexToRgba'
 import v from '~/utils/variables'
 
 /** @component */
@@ -231,7 +233,18 @@ EditAvatarButton.displayName = 'EditAvatarButton'
 export const CommentForm = styled.form`
   min-height: 50px;
   position: relative;
-
+  /* NOTE: 'sticky' is not fully browser supported */
+  z-index: ${v.zIndex.commentMentions};
+  position: sticky;
+  bottom: 0;
+  width: calc(100% - 10px);
+  border-top: 4px solid ${v.colors.activityDarkBlue};
+  background: ${v.colors.activityDarkBlue};
+  background: linear-gradient(
+    ${hexToRgba(v.colors.activityDarkBlue, 0)} 0,
+    ${v.colors.activityDarkBlue} 10%,
+    ${v.colors.activityDarkBlue} 100%
+  );
   button {
     position: absolute;
     right: 18px;
@@ -239,8 +252,16 @@ export const CommentForm = styled.form`
     width: 18px;
     height: 18px;
   }
+  .textarea-input {
+    background: ${v.colors.activityMedBlue};
+    margin: 0 5px 0 68px;
+    width: calc(100% - 68px);
+  }
+
 `
-const StyledCommentTextarea = styled.div`
+CommentForm.displayName = 'CommentForm'
+
+export const StyledCommentTextarea = styled.div`
   textarea {
     resize: none;
     padding: 10px;

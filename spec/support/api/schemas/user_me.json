@@ -7,6 +7,7 @@
     "email": { "type": "string" },
     "status": { "type": "string" },
     "pic_url_square": { "type": "string" },
+    "handle": { "type": "string" },
     "current_user_collection_id": { "type": ["integer", "null"] },
     "created_at": { "type": "date" },
     "terms_accepted": { "type": "boolean" },
