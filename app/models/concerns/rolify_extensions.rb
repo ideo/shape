@@ -36,28 +36,37 @@ module RolifyExtensions
   # Rolify was super slow in adding roles once there became thousands,
   # so we wrote our own method
   def add_role(role_name, resource = nil)
-    begin
-      role = Role.find_or_create(role_name, resource)
-      existing = existing_resource_role_for_self(role)
-      # if we're adding someone as editor who's previously a viewer
-      should_upgrade = (role_name == Role::EDITOR && existing && existing.name.to_sym == Role::VIEWER)
-      # this will re-start the add_role process, after first removing user's viewer role
-      return upgrade_to_editor_role(resource) if should_upgrade
-      return existing if existing.present?
-      if is_a?(User)
-        role.users << self
-      elsif is_a?(Group)
-        role.groups << self
-      else
-        raise "RolifyExtension: Unsupported model '#{self.class.name}' for add_role"
-      end
-      after_role_update(role)
+    role = Role.find_or_create(role_name, resource)
+    return add_resource_role(role, resource) if resource.present?
+    return role unless is_a?(User)
+    # otherwise if no resource, just create a UsersRole linking to the role
+    UsersRole.find_or_create_by(role: role, user: self)
+    role
+  # rubocop:disable Lint/HandleExceptions
+  rescue ActiveRecord::RecordNotUnique
+    # rescue if we already added user - as it doesn't matter
+    # rubocop:enable Lint/HandleExceptions
+  end
 
-    # rubocop:disable Lint/HandleExceptions
-    rescue ActiveRecord::RecordNotUnique
-      # rescue if we already added user - as it doesn't matter
-      # rubocop:enable Lint/HandleExceptions
+  def add_resource_role(role, resource)
+    existing = existing_resource_role_for_self(role)
+    # if we're adding someone as editor who's previously a viewer
+    should_upgrade = (
+      role.name.to_sym == Role::EDITOR &&
+      existing &&
+      existing.name.to_sym == Role::VIEWER
+    )
+    # this will re-start the add_role process, after first removing user's viewer role
+    return upgrade_to_editor_role(resource) if should_upgrade
+    return existing if existing.present?
+    if is_a?(User)
+      role.users << self
+    elsif is_a?(Group)
+      role.groups << self
+    else
+      raise "RolifyExtension: Unsupported model '#{self.class.name}' for add_role"
     end
+    after_role_update(role)
     role
   end
 

@@ -1,4 +1,5 @@
 import EditableName from '~/ui/pages/shared/EditableName'
+import fakeUiStore from '#/mocks/fakeUiStore'
 
 let wrapper, props
 
@@ -9,34 +10,23 @@ describe('EditableName', () => {
         name: 'Amazing Collection',
         updateNameHandler: jest.fn(),
         canEdit: true,
+        uiStore: fakeUiStore,
       }
       wrapper = shallow(
-        <EditableName {...props} />
+        <EditableName.wrappedComponent {...props} />
       )
     })
 
     it('renders name', () => {
       expect(wrapper.render().text()).toMatch(/Amazing Collection/)
     })
-
-    it('shows editable field when clicked', () => {
-      wrapper.find('Heading1').simulate('click', { stopPropagation: jest.fn() })
-      expect(wrapper.find('AutosizeInput').exists()).toEqual(true)
-      expect(wrapper.find('AutosizeInput').props().value).toEqual(props.name)
-      expect(wrapper.find('Heading1').exists()).toEqual(false)
-    })
   })
 
   describe('when editing', () => {
     beforeEach(() => {
-      props = {
-        name: 'Amazing Collection',
-        updateNameHandler: jest.fn(),
-        canEdit: true,
-        editing: true,
-      }
+      props.uiStore.editingName = true
       wrapper = shallow(
-        <EditableName {...props} />
+        <EditableName.wrappedComponent {...props} canEdit />
       )
     })
 
@@ -60,20 +50,13 @@ describe('EditableName', () => {
       wrapper.find('AutosizeInput').simulate('keyPress', {
         key: 'Enter'
       })
-      expect(wrapper.find('Heading1').exists()).toEqual(true)
+      expect(props.uiStore.update).toHaveBeenCalledWith('editingName', false)
     })
   })
 
   describe('if canEdit is false', () => {
     beforeEach(() => {
-      props = {
-        name: 'Amazing Collection',
-        updateNameHandler: jest.fn(),
-        canEdit: false,
-      }
-      wrapper = shallow(
-        <EditableName {...props} />
-      )
+      wrapper.setProps({ ...props, canEdit: false })
     })
 
     it('renders name', () => {

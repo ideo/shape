@@ -67,6 +67,7 @@ export default class UiStore {
   @observable commentsOpen = false
   // marked by thread.key (so it works for new records as well)
   @observable expandedThreadKey = null
+  @observable editingName = false
 
   @action popupAlert(props = {}) {
     _.assign(this.dialogConfig, {

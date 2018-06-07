@@ -51,6 +51,7 @@ const fakeUiStore = {
   organizationMenuPage: 'organizationMenuPage',
   expandedThreadKey: null,
   expandThread: jest.fn(),
+  editingName: false,
 }
 
 export default fakeUiStore
