@@ -59,6 +59,7 @@ const fakeUiStore = {
   expandedThreadKey: null,
   expandThread: jest.fn(),
   openGroup: jest.fn(),
+  editingName: false,
 }
 
 export default fakeUiStore

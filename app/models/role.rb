@@ -33,7 +33,7 @@ class Role < ApplicationRecord
   end
 
   def self.find_or_create(role_name, resource = nil)
-    return Role.find_or_create_by(name: role_name) if resource.blank?
+    return Role.find_or_create_by(name: role_name, resource: nil) if resource.blank?
 
     Role.find_or_create_by(
       name: role_name,

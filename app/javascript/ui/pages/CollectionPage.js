@@ -1,5 +1,6 @@
 import { Fragment } from 'react'
 import ReactRouterPropTypes from 'react-router-prop-types'
+import { observable } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 
 import PageError from '~/ui/global/PageError'
