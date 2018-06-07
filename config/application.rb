@@ -27,5 +27,8 @@ module Shape
 
     # ActionCable settings
     config.action_cable.url = ENV.fetch('ACTION_CABLE_URL') { 'ws://localhost:3000/cable' }
+
+    # for serving gzipped assets
+    config.middleware.use Rack::Deflater
   end
 end
