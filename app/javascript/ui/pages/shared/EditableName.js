@@ -1,3 +1,5 @@
+import { action, observable } from 'mobx'
+import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import PropTypes from 'prop-types'
 import AutosizeInput from 'react-input-autosize'
 import styled from 'styled-components'
@@ -42,22 +44,26 @@ const StyledEditableName = styled.div`
 `
 StyledEditableName.displayName = 'StyledEditableName'
 
+@inject('uiStore')
+@observer
 class EditableName extends React.Component {
+  @observable name = ''
+
   constructor(props) {
     super(props)
     this.saveName = _.debounce(this._saveName, 1000)
-    this.state = {
-      name: props.name,
-      editing: props.editing,
-    }
+    const { name } = props
+    this.setName(name)
   }
 
   // navigating between collections may trigger this instead of didMount
-  componentWillReceiveProps(nextProps) {
-    this.setState({
-      name: nextProps.name,
-      editing: nextProps.editing,
-    })
+  componentWillReceiveProps({ name }) {
+    this.setName(name)
+  }
+
+  componentWillUnmount() {
+    const { uiStore } = this.props
+    uiStore.update('editingName', false)
   }
 
   onNameFieldKeypress = (e) => {
@@ -66,32 +72,38 @@ class EditableName extends React.Component {
     }
   }
 
+  @action setName(name) {
+    this.name = name
+  }
+
   onNameChange = (e) => {
-    const name = e.target.value
-    this.setState({ name }, () => this.saveName())
+    this.setName(e.target.value)
+    this.saveName()
   }
 
-  startEditingName = (e) => {
+  @action startEditingName = (e) => {
     e.stopPropagation()
-    this.setState({ editing: true })
+    const { uiStore } = this.props
+    uiStore.update('editingName', true)
   }
 
-  stopEditingName = () => {
+  @action stopEditingName = () => {
     // Ensure that save is called if user presses enter
     this.saveName.flush()
-    this.setState({ editing: false })
+    const { uiStore } = this.props
+    uiStore.update('editingName', false)
   }
 
   _saveName = () => {
-    const { updateNameHandler } = this.props
-    const { name } = this.state
-    updateNameHandler(name)
+    this.props.updateNameHandler(this.name)
   }
 
   render() {
-    const { canEdit, TextWrapper, fontSize } = this.props
-    const { name, editing } = this.state
-    if (canEdit && editing) {
+    const { canEdit, TextWrapper, fontSize, uiStore } = this.props
+    const { name } = this
+    const { editingName } = uiStore
+
+    if (canEdit && editingName) {
       const clickHandlers = [
         () => this.stopEditingName()
       ]
@@ -132,17 +144,21 @@ class EditableName extends React.Component {
 EditableName.propTypes = {
   name: PropTypes.string.isRequired,
   updateNameHandler: PropTypes.func.isRequired,
-  editing: PropTypes.bool,
   canEdit: PropTypes.bool,
   TextWrapper: PropTypes.element,
   fontSize: PropTypes.number,
 }
 
+EditableName.wrappedComponent.propTypes = {
+  uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
+}
+
 EditableName.defaultProps = {
-  editing: false,
   canEdit: false,
   TextWrapper: null,
   fontSize: 2.25,
 }
+
+EditableName.displayName = 'EditableName'
 
 export default EditableName
