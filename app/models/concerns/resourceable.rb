@@ -41,6 +41,16 @@ module Resourceable
         { users: role.users, groups: role.groups }
       end
     end
+
+    # really meant to be used on an AR Relation, where `select` is just the relevant records
+    def user_ids
+      identifiers = select(:id).map(&:resource_identifier)
+      UsersRole
+        .joins(:role)
+        .where(Role.arel_table[:resource_identifier].in(identifiers))
+        .pluck(:user_id)
+        .uniq
+    end
   end
 
   def can_edit?(user_or_group)
@@ -60,6 +70,41 @@ module Resourceable
 
   def resource_identifier
     Role.object_identifier(self)
+  end
+
+  # combine all attached user_ids using self.user_ids method
+  def user_ids
+    self.class.where(id: id).user_ids
+  end
+
+  def editor_user_ids
+    role_user_ids(Role::EDITOR)
+  end
+
+  def viewer_user_ids
+    role_user_ids(Role::VIEWER)
+  end
+
+  # get all [role] users, both individual and via group, for this item/collection
+  def role_user_ids(role_name)
+    return unless editable_and_viewable?
+    user_ids_for_role = UsersRole
+                        .joins(:role)
+                        .where(Role.arel_table[:resource_identifier].eq(resource_identifier))
+                        .where(Role.arel_table[:name].eq(role_name))
+                        .pluck(:user_id)
+                        .uniq
+    group_ids = send(role_name.to_s.pluralize)[:groups].pluck(:id)
+    (user_ids_for_role + Group.where(id: group_ids).user_ids).uniq
+  end
+
+  def allowed_user_ids
+    (editor_user_ids + viewer_user_ids).uniq
+  end
+
+  def editable_and_viewable?
+    # right now just for Collections/Items
+    self.class.edit_role == Role::EDITOR && self.class.view_role = Role::VIEWER
   end
 
   # NOTE: This should only ever be called on a newly created record, e.g. in CollectionCardBuilder

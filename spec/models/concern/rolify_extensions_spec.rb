@@ -114,5 +114,20 @@ describe RolifyExtensions, type: :concern do
         user.add_role(Role::VIEWER, collection)
       }.to not_change(user.users_roles, :count)
     end
+
+    it 'upgrades to editor role if already an viewer' do
+      # initial role should add
+      expect {
+        user.add_role(Role::VIEWER, collection)
+      }.to change(user.users_roles, :count)
+      expect(collection.can_edit?(user)).to be false
+
+      # further additions should not change the count
+      expect {
+        user.add_role(Role::EDITOR, collection)
+      }.to not_change(user.users_roles, :count)
+      user.reload
+      expect(collection.can_edit?(user)).to be true
+    end
   end
 end

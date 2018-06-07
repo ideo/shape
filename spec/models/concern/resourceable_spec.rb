@@ -92,4 +92,31 @@ describe Resourceable, type: :concern do
       end
     end
   end
+
+  context 'getting all editors and viewers' do
+    let(:group_members) { create_list(:user, 2) }
+    let(:group) { create(:group, add_members: group_members) }
+
+    describe '#editor_user_ids' do
+      before do
+        user.add_role(Role::EDITOR, collection)
+        group.add_role(Role::EDITOR, collection)
+      end
+
+      it 'gets all the editor user ids including group members' do
+        expect(collection.editor_user_ids).to match_array([user.id] + group_members.map(&:id))
+      end
+    end
+
+    describe '#viewer_user_ids' do
+      before do
+        user.add_role(Role::VIEWER, collection)
+        group.add_role(Role::VIEWER, collection)
+      end
+
+      it 'gets all the viewer user ids including group members' do
+        expect(collection.viewer_user_ids).to match_array([user.id] + group_members.map(&:id))
+      end
+    end
+  end
 end

@@ -28,7 +28,7 @@ class User < ApplicationRecord
            through: :users_threads
 
   has_many :organizations, -> { distinct }, through: :groups
-  has_many :users_roles
+  has_many :users_roles, dependent: :destroy
   has_many :comments, foreign_key: :author_id
 
   belongs_to :current_organization,
@@ -38,7 +38,7 @@ class User < ApplicationRecord
              class_name: 'Collection',
              optional: true
 
-  validates :email, presence: true
+  validates :email, presence: true, uniqueness: true
   validates :uid, :provider, presence: true, if: :active?
   validates :uid, uniqueness: { scope: :provider }, if: :active?
 
@@ -77,7 +77,8 @@ class User < ApplicationRecord
     user = where(provider: auth.provider, uid: auth.uid).first
 
     unless user
-      user = pending_user || User.new
+      # if not found, look up by same email
+      user = pending_user || User.find_or_initialize_by(email: auth.info.email)
       user.status = User.statuses[:active]
       user.invitation_token = nil
       user.password = Devise.friendly_token(40)

@@ -51,26 +51,25 @@ RSpec.describe Roles::Inheritance, type: :service do
       end
     end
 
-    context 'same users, different role' do
+    context 'same users, lesser role' do
       before do
         add_roles(Role::EDITOR, editors, collection)
         add_roles(Role::VIEWER, editors, item)
-        expect(inheritance.inherit_from_parent?(item)).to be false
-      end
-
-      it 'return false' do
-        expect(inheritance.inherit_from_parent?(item)).to be false
-      end
-    end
-
-    context 'same users, different roles' do
-      before do
-        add_roles(Role::EDITOR, editors, collection)
-        add_roles(Role::VIEWER, viewers, item)
       end
 
       it 'returns false' do
         expect(inheritance.inherit_from_parent?(item)).to be false
+      end
+    end
+
+    context 'same users, higher role' do
+      before do
+        add_roles(Role::VIEWER, editors, collection)
+        add_roles(Role::EDITOR, editors, item)
+      end
+
+      it 'returns true' do
+        expect(inheritance.inherit_from_parent?(item)).to be true
       end
     end
 
@@ -106,8 +105,29 @@ RSpec.describe Roles::Inheritance, type: :service do
 
       it 'returns true for child' do
         add_roles(Role::VIEWER, addtl_viewer, collection)
-        new_user_role_identifiers = [Role.identifier(role_name: Role::VIEWER, user_id: addtl_viewer.id)]
-        expect(inheritance.inherit_from_parent?(item, new_user_role_identifiers)).to be true
+        add_user_ids = [addtl_viewer.id]
+        inherit = inheritance.inherit_from_parent?(
+          item,
+          add_user_ids: add_user_ids,
+          role_name: Role::VIEWER,
+        )
+        expect(inherit).to be true
+      end
+    end
+
+    context 'with group members' do
+      context 'group includes same users' do
+        let(:group_members) { editors }
+        let(:group) { create(:group, add_members: group_members) }
+
+        before do
+          add_roles(Role::EDITOR, editors, collection)
+          add_roles(Role::EDITOR, group, item)
+        end
+
+        it 'should return true because group members == editors' do
+          expect(inheritance.inherit_from_parent?(item)).to be true
+        end
       end
     end
   end
