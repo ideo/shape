@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types'
-import { observable, action, runInAction } from 'mobx'
+import { toJS, observable, action, runInAction } from 'mobx'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import { EditorState, ContentState, convertToRaw } from 'draft-js'
 
@@ -15,6 +15,7 @@ class CommentEntryForm extends React.Component {
   }
   @observable suggestionsOpen = false
   @observable updating = false
+  // @observable editorState = EditorState.createEmpty()
   state = {
     editorState: EditorState.createEmpty()
   }
@@ -30,9 +31,12 @@ class CommentEntryForm extends React.Component {
   }
 
   focusTextArea = (expanded) => {
-    if (expanded && this.editor) {
+    // NOTE: draft-js-plugins need timeout, even with 0 delay, see:
+    // https://github.com/draft-js-plugins/draft-js-plugins/issues/800#issuecomment-315950836
+    setTimeout(() => {
+      if (!expanded || !this.editor) return
       this.editor.focus()
-    }
+    })
   }
 
   @action handleInputChange = (editorState) => {
@@ -41,16 +45,20 @@ class CommentEntryForm extends React.Component {
     const message = content.getPlainText()
     this.commentData.message = message
     this.commentData.draftjs_data = convertToRaw(content)
+    // this.editorState = editorState
     this.setState({
       editorState
     })
   }
 
   setEditor = (editor) => {
+    if (this.editor) return
     this.editor = editor
+    this.focusTextArea(this.props.expanded)
   }
 
   resetEditorState() {
+    // this.editorState = EditorState.push(this.state.editorState, ContentState.createFromText(''))
     this.setState({
       editorState: EditorState.push(this.state.editorState, ContentState.createFromText(''))
     })
@@ -75,9 +83,11 @@ class CommentEntryForm extends React.Component {
 
   handleSubmit = (e) => {
     e.preventDefault()
-    if (!this.commentData.message) return
+    const rawData = toJS(this.commentData)
+    // don't allow submit of empty comment
+    if (!rawData.message) return
     const { thread } = this.props
-    thread.API_saveComment(this.commentData).then(() => {
+    thread.API_saveComment(rawData).then(() => {
       this.props.afterSubmit()
       this.updating = false
     })

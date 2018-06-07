@@ -16,9 +16,6 @@ class CommentThread extends BaseRecord {
 
   @computed get unreadCount() {
     const { users_thread } = this
-
-    if (this.id === 121) console.log(users_thread)
-
     if (!users_thread) return 0
     return users_thread.unread_count
   }

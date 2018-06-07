@@ -13,27 +13,29 @@ export const StyledCommentInput = styled.div`
     min-height: 40px;
   }
 
-  .draftJsMentionPlugin__mention__29BEd, .draftJsMentionPlugin__mention__29BEd:visited {
-    color: #575f67;
-    cursor: pointer;
+  .draftJsMentionPlugin__mention__29BEd {
+    /* &:visited */
+    font-weight: 700;
     display: inline-block;
-    background: #e6f3ff;
     padding-left: 2px;
     padding-right: 2px;
     border-radius: 2px;
     text-decoration: none;
+
+    /*
+    &:hover, &:focus {
+      cursor: pointer;
+      color: #677584;
+      background: #edf5fd;
+      outline: 0;
+    }
+    &:active {
+      color: #222;
+      background: #455261;
+    }
+    */
   }
 
-  .draftJsMentionPlugin__mention__29BEd:hover, .draftJsMentionPlugin__mention__29BEd:focus {
-    color: #677584;
-    background: #edf5fd;
-    outline: 0;
-  }
-
-  .draftJsMentionPlugin__mention__29BEd:active {
-    color: #222;
-    background: #455261;
-  }
   .draftJsMentionPlugin__mentionSuggestionsEntry__3mSwm {
     color: #444;
     padding: 7px 10px 3px 10px;
@@ -145,11 +147,11 @@ export const CustomMentionSuggestion = (props) => {
 
         <div className="mentionSuggestionsEntryContainerRight">
           <div className="mentionSuggestionsEntryText">
-            @{mention.handle}
+            {mention.name}
           </div>
 
           <div className="mentionSuggestionsEntryTitle">
-            {mention.name}
+            {mention.full_name}
           </div>
         </div>
       </div>

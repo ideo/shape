@@ -1,3 +1,4 @@
+import _ from 'lodash'
 import { toJS } from 'mobx'
 import { PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
@@ -10,8 +11,9 @@ import { DisplayText } from '~/ui/global/styled/typography'
 import { InlineRow } from '~/ui/global/styled/layout'
 import Moment from '~/ui/global/Moment'
 import UserAvatar from '~/ui/users/UserAvatar'
+import { StyledCommentInput } from './CustomCommentMentions'
 
-const StyledComment = styled.div`
+const StyledComment = StyledCommentInput.extend`
   padding: 10px;
   margin-bottom: 5px;
   background: ${props => (props.unread ? v.colors.activityLightBlue : v.colors.activityMedBlue)};
@@ -30,13 +32,7 @@ const StyledComment = styled.div`
 class Comment extends React.Component {
   constructor(props) {
     super(props)
-    this.mentionPlugin = createMentionPlugin({
-      mentionComponent: ({ mention }) => (
-        <strong>
-          @{mention.handle}
-        </strong>
-      ),
-    })
+    this.mentionPlugin = createMentionPlugin()
     this.state = {
       editorState: EditorState.createEmpty(),
     }
@@ -44,8 +40,9 @@ class Comment extends React.Component {
 
   componentWillMount() {
     const { comment } = this.props
-    if (comment.draftjs_data) {
-      const contentState = convertFromRaw(toJS(comment.draftjs_data))
+    const draftjs_data = toJS(comment.draftjs_data)
+    if (!_.isEmpty(draftjs_data)) {
+      const contentState = convertFromRaw(draftjs_data)
       const editorState = EditorState.createWithContent(contentState)
       this.setState({ editorState })
     }
@@ -53,7 +50,8 @@ class Comment extends React.Component {
 
   renderMessage() {
     const { comment } = this.props
-    if (!comment.draftjs_data) {
+    const draftjs_data = toJS(comment.draftjs_data)
+    if (_.isEmpty(draftjs_data)) {
       return comment.message
     }
     const plugins = [this.mentionPlugin]

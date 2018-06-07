@@ -15,4 +15,8 @@ class Comment extends BaseRecord {
 
 Comment.type = 'comments'
 
+Comment.defaults = {
+  draftjs_data: {}
+}
+
 export default Comment

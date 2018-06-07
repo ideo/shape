@@ -44,11 +44,6 @@ class CommentInput extends React.Component {
 
   initMentionPlugin() {
     this.mentionPlugin = createMentionPlugin({
-      mentionComponent: ({ mention }) => (
-        <strong>
-          @{mention.handle}
-        </strong>
-      ),
       positionSuggestions,
       // treat the entire "@xyz" as an all-or-nothing token
       entityMutability: 'IMMUTABLE',
@@ -75,8 +70,9 @@ class CommentInput extends React.Component {
       {
         // this gets used as the key so needs to be unique for users/groups
         id: `${d.id}__${d.internalType}`,
-        name: d.name,
-        handle: d.handle,
+        // "name" is how it renders the mention so we insert the handle here
+        name: `@${d.handle}`,
+        full_name: d.name,
         // depends if user or group
         avatar: d.pic_url_square || d.filestack_file_url
       }
@@ -128,7 +124,7 @@ CommentInput.propTypes = {
   onCloseSuggestions: PropTypes.func.isRequired,
   handleReturn: PropTypes.func.isRequired,
   setEditor: PropTypes.func.isRequired,
-  editorState: PropTypes.object.isRequired,
+  editorState: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 CommentInput.wrappedComponent.propTypes = {
   apiStore: MobxPropTypes.objectOrObservableObject.isRequired,

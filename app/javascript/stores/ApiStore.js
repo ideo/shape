@@ -90,7 +90,6 @@ class ApiStore extends Store {
   }
 
   importUsersThread({ usersThread, thread, comments } = {}) {
-    if (thread.id === 121) console.log('iut', usersThread)
     thread.assignRef('users_thread', usersThread)
     thread.importComments(comments)
     this.addCurrentCommentThread(thread.id)
