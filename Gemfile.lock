@@ -1,4 +1,11 @@
 GIT
+  remote: https://github.com/ideo/heroku-deflater.git
+  revision: 04e492f84812b988f5c97df7d14c1b5d8730e81c
+  specs:
+    heroku-deflater (0.6.3)
+      rack (>= 1.4.5)
+
+GIT
   remote: https://github.com/ideo/omniauth-ideo.git
   revision: 0c50f15ffca98148716a76a3fa4929284d07bd8f
   specs:
@@ -240,6 +247,7 @@ GEM
       pry (>= 0.10.4)
     puma (3.11.3)
     rack (2.0.4)
+    rack-cors (1.0.2)
     rack-protection (2.0.1)
       rack
     rack-proxy (0.6.4)
@@ -424,6 +432,7 @@ DEPENDENCIES
   filestack
   guard
   guard-rspec
+  heroku-deflater!
   httparty
   jbuilder (~> 2.5)
   json-schema
@@ -436,6 +445,7 @@ DEPENDENCIES
   pg (~> 0.21)
   pry-rails
   puma (~> 3.11)
+  rack-cors (~> 1.0.1)
   rack-rewrite (~> 1.5)
   rails (~> 5.1.4)
   rails-controller-testing

@@ -12,6 +12,11 @@ class HomeController < ApplicationController
   end
 
   def sign_up
+    @user_was_signed_in = false
+    if user_signed_in?
+      sign_out :user
+      @user_was_signed_in = true
+    end
     # might be nil which is ok
     @email = params[:email]
   end
