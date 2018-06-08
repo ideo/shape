@@ -2,9 +2,6 @@ class FirestoreBatchDeleter
   include Sidekiq::Worker
 
   def perform(objects)
-    puts '***** -> FirestoreBatchDeleter'
-    puts objects.inspect
-    puts '*****'
     delete_objects_from_firestore(objects)
   end
 

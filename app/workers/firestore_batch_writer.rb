@@ -2,9 +2,6 @@ class FirestoreBatchWriter
   include Sidekiq::Worker
 
   def perform(objects)
-    puts '***** -> FirestoreBatchWriter'
-    puts objects.inspect
-    puts '*****'
     @objects = retrieve_objects(objects)
     save_objects_in_firestore
   end
