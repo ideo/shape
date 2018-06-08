@@ -31,6 +31,10 @@ class Avatar extends React.Component {
     this.setUrl(props.url)
   }
 
+  componentWillReceiveProps({ url }) {
+    this.setUrl(url)
+  }
+
   @action setUrl(url) {
     this.url = url
   }

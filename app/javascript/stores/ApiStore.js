@@ -22,12 +22,12 @@ class ApiStore extends Store {
     return this.find('users', this.currentUserId)
   }
 
-  get currentUserOrganizationId() {
+  @computed get currentUserOrganizationId() {
     if (!this.currentUser.current_organization) return null
     return this.currentUser.current_organization.id
   }
 
-  get currentUserOrganization() {
+  @computed get currentUserOrganization() {
     return this.currentUser.current_organization
   }
 
