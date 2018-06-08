@@ -32,6 +32,10 @@ const ActivityText = styled.p`
   line-height: 1.25;
   margin-bottom: 0;
 `
+const ActivityButton = styled.button`
+  display: block;
+  text-align: left;
+`
 
 class Activity extends React.PureComponent {
   actorText() {
@@ -57,6 +61,23 @@ class Activity extends React.PureComponent {
     }
     const link = routingStore.pathTo(internalType, id)
     return <Link className="target" to={link}>{targetName}</Link>
+  }
+
+  handleClick = async (e) => {
+    e.preventDefault()
+    const { action, target, handleRead } = this.props
+    const { id, internalType } = target
+    handleRead(e)
+    if (internalType === 'groups') {
+      uiStore.openGroup(id)
+      return
+    }
+    routingStore.routeTo(internalType, id)
+    if (_.includes(['commented', 'mentioned'], action)) {
+      const thread = await apiStore.findOrBuildCommentThread(target)
+      uiStore.update('activityLogPage', 'comments')
+      uiStore.expandThread(thread.key)
+    }
   }
 
   getDataText() {
@@ -126,12 +147,9 @@ class Activity extends React.PureComponent {
 
   render() {
     return (
-      <div>
-
-        {/* TODO: make entire Activity clickable -- take you to the thing + potentially open the relevant thread */}
-
+      <ActivityButton onClick={this.handleClick}>
         { this.getMessageText() }
-      </div>
+      </ActivityButton>
     )
   }
 }
@@ -147,6 +165,7 @@ Activity.propTypes = {
   subjectGroups: MobxPropTypes.arrayOrObservableArray,
   actorCount: PropTypes.number,
   content: PropTypes.string,
+  handleRead: PropTypes.func.isRequired,
 }
 
 Activity.defaultProps = {

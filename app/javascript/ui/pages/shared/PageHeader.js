@@ -58,11 +58,11 @@ class PageHeader extends React.Component {
         />
       )
     }
+    // 2. CommentIcon (toggle ActivityLog)
+    elements.push(
+      <ActivityLogButton key="activity" />
+    )
     if (this.hasActions) {
-      // 2. CommentIcon (toggle ActivityLog)
-      elements.push(
-        <ActivityLogButton key="activity" />
-      )
       // 3. PageMenu actions
       elements.push(
         <PageMenu
