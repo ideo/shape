@@ -60,6 +60,7 @@ const fakeUiStore = {
   expandThread: jest.fn(),
   openGroup: jest.fn(),
   editingName: false,
+  activityLogPage: 'comments',
 }
 
 export default fakeUiStore
