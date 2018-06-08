@@ -325,9 +325,6 @@ class MovableGridCard extends React.PureComponent {
 
           size={{ width, height }}
           position={{ x: xPos, y: yPos }}
-          style={{
-            transform: `translate3d(${xPos}px, ${yPos}px, 0)`
-          }}
           default={{ width, height, x: xPos, y: yPos }}
           // NOTE: disabling dragging for touchscreens because of conflict with touch scrolling
           disableDragging={!canEditCollection || uiStore.isTouchDevice}
