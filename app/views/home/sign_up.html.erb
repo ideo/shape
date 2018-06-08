@@ -1,3 +1,9 @@
 <script>
-  IdeoSSO.signUp('<%= @email %>');
+  <% if @user_was_signed_in %>
+    IdeoSSO.logout('/login').then(function() {
+      IdeoSSO.signUp('<%= @email %>');
+    })
+  <% else %>
+    IdeoSSO.signUp('<%= @email %>');
+  <% end %>
 </script>

@@ -66,6 +66,8 @@ gem 'acts-as-taggable-on'
 
 # middleware for 301 redirects
 gem 'rack-rewrite', '~> 1.5'
+# for CORS requests (specifically for CDN handling)
+gem 'rack-cors', '~> 1.0.1'
 
 # Filestack API Wrapper
 gem 'filestack'
@@ -126,6 +128,10 @@ group :test do
   gem 'fakeredis', require: 'fakeredis/rspec'
   gem 'shoulda-matchers', '~> 3.1'
   gem 'json-schema'
+end
+
+group :production do
+  gem 'heroku-deflater', github: 'ideo/heroku-deflater'
 end
 
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem

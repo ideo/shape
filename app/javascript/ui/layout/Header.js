@@ -63,9 +63,13 @@ class Header extends React.Component {
   handleLogout = async () => {
     const { apiStore } = this.props
     await apiStore.request('/sessions', 'DELETE')
-    // Log user out of IDEO network
-    // Redirec to /login once done
-    IdeoSSO.logout('/login')
+    try {
+      // Log user out of IDEO network
+      // Redirect to /login once done
+      await IdeoSSO.logout('/login')
+    } catch (e) {
+      window.location = '/login'
+    }
   }
 
   get clickHandlers() {
