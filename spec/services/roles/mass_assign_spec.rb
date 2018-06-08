@@ -117,17 +117,9 @@ RSpec.describe Roles::MassAssign, type: :service do
       let(:invited_by) { create(:user) }
       let(:new_role) { true }
       let(:role_name) { Role::EDITOR.to_s }
-      let(:instance_double) do
-        double('ActivityAndNotificationBuilder')
-      end
-
-      before do
-        allow(ActivityAndNotificationBuilder).to receive(:new).and_return(instance_double)
-        allow(instance_double).to receive(:call).and_return(true)
-      end
 
       it 'should call the activity and notification builder' do
-        expect(ActivityAndNotificationBuilder).to receive(:new).with(
+        expect(ActivityAndNotificationBuilder).to receive(:call).with(
           actor: invited_by,
           target: object,
           action: Activity.actions[:added_editor],
@@ -238,6 +230,7 @@ RSpec.describe Roles::MassAssign, type: :service do
             invited_to_type: object.class.name,
             invited_to_id: object.id,
           )
+          expect(ActivityAndNotificationBuilder).to receive(:call)
           assign_role.call
         end
       end

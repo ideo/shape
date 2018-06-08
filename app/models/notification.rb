@@ -4,9 +4,6 @@ class Notification < ApplicationRecord
   belongs_to :activity
   belongs_to :user
 
-  # after_create :store_in_firestore
-  # after_destroy :remove_from_firestore
-
   def combined_actor_ids(limit: nil)
     # make this method universal to support both combined and individual activities
     activity_ids = combined_activities_ids
@@ -30,7 +27,7 @@ class Notification < ApplicationRecord
   end
 
   def relationships_for_firestore
-    if activity.archived?
+    if try(:activity).try(:target).try(:archived?)
       [
         activity: %i[actor subject_users subject_groups target],
       ]

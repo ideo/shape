@@ -207,16 +207,8 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
   end
 
   describe 'PATCH #archive' do
-    let!(:collection_card) { create(:collection_card_image, parent: collection) }
+    let!(:collection_card) { create(:collection_card_collection, parent: collection) }
     let(:path) { "/api/v1/collection_cards/#{collection_card.id}/archive" }
-    let(:instance_double) do
-      double('ActivityAndNotificationBuilder')
-    end
-
-    before do
-      allow(ActivityAndNotificationBuilder).to receive(:new).and_return(instance_double)
-      allow(instance_double).to receive(:call).and_return(true)
-    end
 
     it 'returns a 200' do
       patch(path)
@@ -237,7 +229,7 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
     it 'notifies the users and groups' do
       collection_card.archived = true
       collection_card.record.archived = true
-      expect(ActivityAndNotificationBuilder).to receive(:new).with(
+      expect(ActivityAndNotificationBuilder).to receive(:call).with(
         actor: @user,
         target: collection_card.record,
         action: Activity.actions[:archived],
