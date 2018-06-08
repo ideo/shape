@@ -99,11 +99,6 @@ class CommentThread < ApplicationRecord
     )
   end
 
-  def store_in_firestore
-    # TODO: background job
-    FirestoreClient.new.write("comment_threads/#{id}", serialized_for_firestore)
-  end
-
   # TODO: when to call firestore deletions....
   def delete_from_firestore
     FirestoreClient.client.batch do |batch|

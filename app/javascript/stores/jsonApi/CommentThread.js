@@ -56,6 +56,8 @@ class CommentThread extends BaseRecord {
         return false
       }
     }
+    // can just call this without awaiting the result
+    this.API_markViewed()
     // make sure we're following this thread in our activity log
     this.apiStore.addCurrentCommentThread(this.id)
     // simulate the updated_at update so that the thread will move to most recent
@@ -75,7 +77,9 @@ class CommentThread extends BaseRecord {
     const apiPath = `comment_threads/${this.id}/view`
     // simulate backend effect
     this.comments.forEach(comment => comment.markAsRead())
-    this.users_thread.unread_count = 0
+    if (this.users_thread) {
+      this.users_thread.unread_count = 0
+    }
     return this.apiStore.request(apiPath, 'POST')
   }
 

@@ -1,39 +1,33 @@
 class FirestoreBatchWriter
   include Sidekiq::Worker
 
-  # action = 'save' or 'delete'
-  def perform(objects, action = 'save')
-    # expects objects in the form of "klass" => "id"
+  def perform(objects)
+    puts '***** -> FirestoreBatchWriter'
+    puts objects.inspect
+    puts '*****'
     @objects = retrieve_objects(objects)
-    if action == 'save'
-      store_objects_in_firestore
-    elsif action == 'delete'
-      delete_objects_in_firestore
-    end
+    save_objects_in_firestore
   end
 
   private
 
+  # expects objects in the form of ["klass", "id"]
   def retrieve_objects(objects)
     objects.map do |klass, id|
-      klass.classify.constantize.find(id)
-    end
-  end
-
-  def store_objects_in_firestore
-    FirestoreClient.client.batch do |batch|
-      @objects.each do |object|
-        next unless object.is_a?(Firestoreable)
-        object.store_in_batch(batch)
+      begin
+        klass.classify.constantize.find(id)
+      rescue ActiveRecord::RecordNotFound
+        # record has already been deleted, no prob...
+        logger.debug 'record already deleted.'
       end
     end
   end
 
-  def delete_objects_in_firestore
+  def save_objects_in_firestore
     FirestoreClient.client.batch do |batch|
       @objects.each do |object|
         next unless object.is_a?(Firestoreable)
-        object.delete_in_batch(batch)
+        object.store_in_batch(batch)
       end
     end
   end

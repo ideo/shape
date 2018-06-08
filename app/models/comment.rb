@@ -7,8 +7,6 @@ class Comment < ApplicationRecord
 
   validates :message, presence: true
 
-  after_create :store_in_firestore
-
   def mentions
     mentions = {
       users: [],

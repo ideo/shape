@@ -15,15 +15,6 @@ class Api::V1::CommentsController < Api::V1::BaseController
       author: current_user,
     )
     if @comment
-      ActivityAndNotificationBuilder.new(
-        actor: current_user,
-        target: @comment_thread.record,
-        action: Activity.actions[:commented],
-        subject_user_ids: @comment_thread.users_threads.pluck(:user_id),
-        subject_group_ids: @comment_thread.groups_threads.pluck(:group_id),
-        combine: true,
-        content: @comment.message,
-      ).call
       head :no_content
     else
       render jsonapi: @comment.errors

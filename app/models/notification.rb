@@ -1,4 +1,6 @@
 class Notification < ApplicationRecord
+  include Firestoreable
+
   belongs_to :activity
   belongs_to :user
 
@@ -54,10 +56,6 @@ class Notification < ApplicationRecord
                'Item::TextItem': SerializableSimpleItem },
       include: relationships_for_firestore,
     )
-  end
-
-  def store_in_firestore
-    FirestoreClient.new.write("notifications/#{id}", serialized_for_firestore)
   end
 
   def remove_from_firestore

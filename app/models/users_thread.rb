@@ -1,4 +1,6 @@
 class UsersThread < ApplicationRecord
+  include Firestoreable
+
   belongs_to :user
   belongs_to :comment_thread
 
@@ -25,10 +27,5 @@ class UsersThread < ApplicationRecord
       self,
       class: { UsersThread: SerializableUsersThread },
     )
-  end
-
-  def store_in_firestore
-    # TODO: background job
-    FirestoreClient.new.write("users_threads/#{id}", serialized_for_firestore)
   end
 end

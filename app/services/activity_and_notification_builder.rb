@@ -1,4 +1,4 @@
-class ActivityAndNotificationBuilder
+class ActivityAndNotificationBuilder < SimpleService
   attr_reader :errors, :activity
 
   def initialize(
@@ -19,11 +19,15 @@ class ActivityAndNotificationBuilder
     @content = content
     @errors = []
     @activity = nil
+    @created_notifications = []
   end
 
   def call
     create_activity
-    create_notifications if @activity
+    if @activity
+      create_notifications
+      store_in_firestore
+    end
   end
 
   private
@@ -47,13 +51,16 @@ class ActivityAndNotificationBuilder
     all_user_ids.uniq.each do |user_id|
       next if user_id == @actor.id
       if @combine
-        combined = combine_existing_notifications(user_id)
-        next if combined
+        if (notif = combine_existing_notifications(user_id))
+          @created_notifications << notif
+          next
+        end
       end
-      Notification.create(
+      notif = Notification.create(
         activity: @activity,
         user_id: user_id,
       )
+      @created_notifications << notif if notif
     end
   end
 
@@ -91,5 +98,12 @@ class ActivityAndNotificationBuilder
     )
     similar_notifications.where.not(id: created.id).destroy_all
     created
+  end
+
+  def store_in_firestore
+    return unless @created_notifications.present?
+    FirestoreBatchWriter.perform_async(
+      @created_notifications.compact.map(&:batch_job_identifier),
+    )
   end
 end

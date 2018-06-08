@@ -54,13 +54,13 @@ class Api::V1::CollectionsController < Api::V1::BaseController
 
   def archive
     if @collection.archive!
-      ActivityAndNotificationBuilder.new(
+      ActivityAndNotificationBuilder.call(
         actor: current_user,
         target: @collection,
         action: Activity.actions[:archived],
         subject_user_ids: @collection.editors[:users].pluck(:id),
         subject_group_ids: @collection.editors[:groups].pluck(:id),
-      ).call
+      )
       render jsonapi: @collection.reload
     else
       render_api_errors @collection.errors
