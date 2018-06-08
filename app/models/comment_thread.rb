@@ -1,5 +1,7 @@
 class CommentThread < ApplicationRecord
   include HasActivities
+  include Firestoreable
+
   belongs_to :record,
              polymorphic: true
   # org comes from the item/collection, but cached on here for easy lookup
@@ -102,6 +104,7 @@ class CommentThread < ApplicationRecord
     FirestoreClient.new.write("comment_threads/#{id}", serialized_for_firestore)
   end
 
+  # TODO: when to call firestore deletions....
   def delete_from_firestore
     FirestoreClient.client.batch do |batch|
       batch.delete("comment_threads/#{id}")

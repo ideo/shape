@@ -1,6 +1,6 @@
 import Rnd from 'react-rnd'
 import localStorage from 'mobx-localstorage'
-import { observe, action } from 'mobx'
+import { observe, runInAction, action } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 
@@ -73,8 +73,12 @@ class ActivityLogBox extends React.Component {
     this.draggableRef = React.createRef()
     // attach observable position to UiStore so other components can know where the ALB is
     this.position = props.uiStore.activityLogPosition
-    this.position.w = MIN_WIDTH
-    this.position.h = MIN_HEIGHT
+    runInAction(() => {
+      if (this.position.w < MIN_WIDTH || this.position.h < MIN_HEIGHT) {
+        this.position.w = DEFAULT.w
+        this.position.h = DEFAULT.h
+      }
+    })
     this.disposer = observe(props.uiStore, 'activityLogOpen', change => {
       if (this.isOffscreen()) {
         this.setToDefaultPosition()

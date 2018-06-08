@@ -25,7 +25,7 @@ function roleArticle(nextWord) {
 
 const MAX_ACTORS = 3
 
-const ActivityText = styled.p`
+export const ActivityText = styled.p`
   color: ${v.colors.cararra};
   font-family: ${v.fonts.sans};
   font-size: 1rem;

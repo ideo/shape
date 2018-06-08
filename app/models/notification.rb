@@ -2,8 +2,8 @@ class Notification < ApplicationRecord
   belongs_to :activity
   belongs_to :user
 
-  after_create :store_in_firestore
-  after_destroy :remove_from_firestore
+  # after_create :store_in_firestore
+  # after_destroy :remove_from_firestore
 
   def combined_actor_ids(limit: nil)
     # make this method universal to support both combined and individual activities
