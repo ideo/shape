@@ -45,10 +45,11 @@ class CommentCreator < SimpleService
     end
     ActivityAndNotificationBuilder.new(
       actor: @author,
-      target: @comment,
+      target: @comment_thread.record,
       action: Activity.actions[:mentioned],
       subject_user_ids: mentions[:user_ids],
       subject_group_ids: mentions[:group_ids],
+      content: @comment.message,
     ).call
   end
 end

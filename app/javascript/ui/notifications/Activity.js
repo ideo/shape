@@ -67,7 +67,7 @@ class Activity extends React.PureComponent {
       subjects: insertCommas(this.renameYourself(), subjectGroups),
       targetType: pluralize.singular(target.internalType),
       roleName: this.isRoleAction() && action.split('_')[1],
-      message: action === 'commented' && commentPreview(content)
+      message: content ? commentPreview(content) : '',
     }
   }
 
@@ -111,6 +111,13 @@ class Activity extends React.PureComponent {
           {this.targetLink(targetName)}:{` `}
           <span className="message">{message}</span>
         </ActivityText>)
+    case 'mentioned':
+      return (
+        <ActivityText>
+          <strong className="actor">{actorNames}</strong> mentioned you in a comment for {` `}
+          {this.targetLink(targetName)}:{` `}
+          <span className="message">{message}</span>
+        </ActivityText>)
 
     default:
       return ''
@@ -120,6 +127,9 @@ class Activity extends React.PureComponent {
   render() {
     return (
       <div>
+
+        {/* TODO: make entire Activity clickable -- take you to the thing + potentially open the relevant thread */}
+
         { this.getMessageText() }
       </div>
     )
