@@ -99,6 +99,7 @@ class User < ApplicationRecord
 
     # Update user on every auth
     user.email = auth.info.email
+    user.handle = auth.info.username
     user.first_name = auth.info.first_name
     user.last_name = auth.info.last_name
     user.pic_url_square = auth.info.picture
@@ -136,6 +137,7 @@ class User < ApplicationRecord
     self.last_name = params[:last_name] if params[:last_name].present?
     self.email = params[:email] if params[:email].present?
     self.pic_url_square = params[:picture] if params[:picture].present?
+    self.handle = params[:username] if params[:username].present?
     save
   end
 
