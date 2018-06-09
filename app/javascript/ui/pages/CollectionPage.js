@@ -85,7 +85,7 @@ class CollectionPage extends PageWithApi {
 
     const { collection } = this
     const { uiStore } = this.props
-    if (!collection) return <Loader />
+    if (!collection || collection.can_edit === undefined) return <Loader />
     const { movingCardIds, cardAction } = uiStore
     // only tell the Grid to hide "movingCards" if we're moving and not linking
     const uiMovingCardIds = cardAction === 'move' ? movingCardIds : []

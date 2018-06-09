@@ -19,10 +19,13 @@ const fakeApiStore = ({ findResult = '', findAllResult = [], requestResult = '' 
     loadCurrentUser: jest.fn(),
     loadCurrentUserGroups: jest.fn().mockReturnValue(Promise.resolve()),
     loadCurrentUserAndGroups: jest.fn().mockReturnValue(Promise.resolve()),
+    searchUsersAndGroups: jest.fn().mockReturnValue(Promise.resolve({ data: [] })),
     setCurrentUserId: jest.fn(),
     findOrganizationById: jest.fn().mockReturnValue({ name: 'abc' }),
     fetchThreads: jest.fn().mockReturnValue(Promise.resolve()),
+    fetchNotifications: jest.fn().mockReturnValue(Promise.resolve()),
     findOrBuildCommentThread: jest.fn().mockReturnValue(Promise.resolve()),
+    unreadActivityCount: 0,
     currentUserId: 1,
     currentUser: {
       id: 1,
@@ -44,6 +47,7 @@ const fakeApiStore = ({ findResult = '', findAllResult = [], requestResult = '' 
         name: 'test org',
       }
     },
+    unreadNotifications: [ ],
     currentThreads: [
       {
         id: 1,

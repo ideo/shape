@@ -33,17 +33,22 @@ module Roles
     def call
       return false unless valid_object_and_role_name?
       assign_role_to_users
-      setup_org_membership if @invited_by && @new_role
-      notify_users if @invited_by && @new_role
+      setup_org_membership if newly_invited?
+      notify_users if newly_invited?
       assign_role_to_groups
       add_editors_as_comment_thread_followers
       add_group_members_as_comment_thread_followers
       link_to_shared_collections if @new_role
       add_roles_to_children if @propagate_to_children
+      create_activities_and_notifications if newly_invited?
       failed_users.blank? && failed_groups.blank?
     end
 
     private
+
+    def newly_invited?
+      @invited_by && @new_role
+    end
 
     def assign_role_to_users
       @users.each do |user|
@@ -88,6 +93,18 @@ module Roles
       else
         AddRolesToChildrenWorker.perform_async(*params)
       end
+    end
+
+    def create_activities_and_notifications
+      action = Activity.role_name_to_action(@role_name.to_sym)
+      return if action.nil?
+      ActivityAndNotificationBuilder.call(
+        actor: @invited_by,
+        target: @object,
+        action: action,
+        subject_user_ids: @added_users.pluck(:id),
+        subject_group_ids: @added_groups.pluck(:id),
+      )
     end
 
     def add_editors_as_comment_thread_followers

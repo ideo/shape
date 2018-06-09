@@ -31,6 +31,11 @@ class User < ApplicationRecord
   has_many :users_roles, dependent: :destroy
   has_many :comments, foreign_key: :author_id
 
+  has_many :activities_as_actor, as: :actor, class_name: 'Activity'
+  has_many :activities_as_subject, through: :activity_subjects, class_name: 'Activity'
+  has_many :activity_subjects, as: :subject
+  has_many :notifications
+
   belongs_to :current_organization,
              class_name: 'Organization',
              optional: true
@@ -41,10 +46,6 @@ class User < ApplicationRecord
   validates :email, presence: true, uniqueness: true
   validates :uid, :provider, presence: true, if: :active?
   validates :uid, uniqueness: { scope: :provider }, if: :active?
-
-  searchkick callbacks: :async, word_start: [:name]
-
-  scope :search_import, -> { includes(:roles) }
 
   attribute :pic_url_square,
             :string,
@@ -61,12 +62,21 @@ class User < ApplicationRecord
     false
   end
 
+  # Searchkick Config
+  searchkick callbacks: :async, word_start: %i[name handle]
+  scope :search_import, -> { active.includes(:roles) }
+
   def search_data
     {
       name: name,
+      handle: handle,
       email: email,
       organization_ids: organizations.map(&:id),
     }
+  end
+
+  def should_index?
+    active?
   end
 
   def self.all_active_except(user_id)
@@ -133,6 +143,12 @@ class User < ApplicationRecord
     [first_name, last_name].compact.join(' ')
   end
 
+  def self.basic_api_fields
+    %i[
+      id first_name last_name email status pic_url_square
+    ]
+  end
+
   def switch_to_organization(organization = nil)
     if organization.blank?
       self.current_organization = self.current_user_collection = nil
@@ -187,6 +203,17 @@ class User < ApplicationRecord
       groups = groups.reject { |g| g == organization.guest_group }
     end
     groups.compact.uniq
+  end
+
+  def unread_notifications
+    Notification
+      .joins(:activity)
+      .where(Activity.arel_table[:organization_id].eq(
+               current_organization_id))
+      .where(
+        user: self,
+        read: false,
+      )
   end
 
   private

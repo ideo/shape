@@ -5,6 +5,19 @@ import {
   fakeUser
 } from '#/mocks/data'
 
+jest.mock('firebase/auth')
+jest.mock('firebase/app', () => (
+  {
+    firestore: jest.fn().mockReturnValue({ settings: jest.fn() }),
+    initializeApp: jest.fn(),
+    auth: jest.fn()
+      .mockReturnValue({
+        signInWithCustomToken: jest.fn(),
+        onAuthStateChanged: jest.fn(),
+      }),
+  }
+))
+
 let props, wrapper, requestResult, apiStore, uiStore, routingStore
 beforeEach(() => {
   requestResult = { data: fakeUser }
@@ -35,6 +48,8 @@ describe('Routes', () => {
     it('does not display the TermsOfUseModal', () => {
       expect(wrapper.find('TermsOfUseModal').exists()).toBeFalsy()
     })
+
+
   })
 
   describe('with terms not yet accepted', () => {

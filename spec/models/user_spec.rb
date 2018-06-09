@@ -159,10 +159,11 @@ describe User, type: :model do
     let!(:user) { create(:user) }
     let(:organizations) { create_list(:organization, 2) }
 
-    it 'should include name, email, organization_ids' do
+    it 'should include name, email, handle, organization_ids' do
       expect(user.search_data).to eq(
         name: user.name,
         email: user.email,
+        handle: user.handle,
         organization_ids: [],
       )
     end

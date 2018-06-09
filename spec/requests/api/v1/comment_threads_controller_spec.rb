@@ -25,15 +25,8 @@ describe Api::V1::CommentThreadsController, type: :request, json: true, auth: tr
       expect(response.status).to eq(200)
     end
 
-    it 'matches JSON schema for thread and unread comments' do
+    it 'matches JSON schema for thread' do
       expect(json['data'].first['attributes']).to match_json_schema('comment_thread')
-      comment = json['included'].select { |i| i['type'] == 'comments' }.first
-      expect(comment['attributes']).to match_json_schema('comment')
-    end
-
-    it 'shows unread comment count' do
-      thread = json['data'].select { |i| i['attributes']['id'].to_i == comment_threads.first.id }.first
-      expect(thread['attributes']['unread_count']).to eq 1
     end
   end
 
@@ -53,10 +46,8 @@ describe Api::V1::CommentThreadsController, type: :request, json: true, auth: tr
         expect(response.status).to eq(200)
       end
 
-      it 'matches JSON schema for thread and unread comments' do
+      it 'matches JSON schema for thread' do
         expect(json['data']['attributes']).to match_json_schema('comment_thread')
-        comment = json['included'].select { |i| i['type'] == 'comments' }.first
-        expect(comment['attributes']).to match_json_schema('comment')
       end
     end
 

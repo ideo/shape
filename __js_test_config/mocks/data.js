@@ -2,6 +2,7 @@ import _ from 'lodash'
 
 const fakeJsonApiAttrs = {
   assign: jest.fn(),
+  assignRef: jest.fn(),
   save: jest.fn(),
 }
 
@@ -189,7 +190,31 @@ export const fakeThread = {
   comments: [
     fakeComment, fakeComment, fakeComment
   ],
-  unread_comments: [
+  latestUnreadComments: [
     fakeComment, fakeComment
   ],
+  API_saveComment: jest.fn().mockReturnValue(Promise.resolve({})),
+}
+export const fakeActivity = {
+  id: 1,
+  type: 'activities',
+  action: 'archived',
+  actor: fakeUser,
+  created_at: new Date(),
+  subject_users: [],
+  subject_groups: [],
+  target: fakeCollection,
+  target_type: 'Collection',
+  target_id: fakeCollection.id,
+  ...fakeJsonApiAttrs,
+}
+export const fakeNotification = {
+  id: 1,
+  type: 'notifications',
+  read: false,
+  activity: fakeActivity,
+  combined_actors: [],
+  combined_activities_ids: [],
+  user: fakeUser,
+  ...fakeJsonApiAttrs,
 }

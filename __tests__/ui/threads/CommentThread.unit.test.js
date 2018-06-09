@@ -20,15 +20,16 @@ describe('CommentThread', () => {
     expect(wrapper.find('.name').text()).toContain(props.thread.record.name)
   })
 
-  it('renders a textarea', () => {
-    // NOTE: textarea is just shown/hidden via CSS so it should always "exist"
-    expect(wrapper.find('CommentTextarea').exists()).toBeTruthy()
+  it('renders a CommentEntryForm', () => {
+    // NOTE: textarea is just shown/hidden via "expanded" prop so it should always exist
+    expect(wrapper.find('CommentEntryForm').exists()).toBeTruthy()
+    expect(wrapper.find('CommentEntryForm').props().expanded).toEqual(props.expanded)
   })
 
   describe('with unexpanded thread', () => {
     it('renders unread comments if thread is unexpanded', () => {
-      // fakeThread has 2 unread_comments
-      expect(wrapper.find('Comment').length).toEqual(props.thread.unread_comments.length)
+      // fakeThread has 2 latestUnreadComments
+      expect(wrapper.find('Comment').length).toEqual(props.thread.latestUnreadComments.length)
     })
   })
 

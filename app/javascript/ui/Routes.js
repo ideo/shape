@@ -16,6 +16,7 @@ import Loader from '~/ui/layout/Loader'
 import ActivityLogBox from '~/ui/activity_log/ActivityLogBox'
 import initDoorbell from '~/vendor/doorbell'
 import v from '~/utils/variables'
+import firebaseClient from '~/vendor/firestore'
 
 const AppWrapper = styled.div`
   /* used by terms of use modal to blur the whole site */
@@ -42,16 +43,18 @@ const FixedActivityLogWrapper = styled.div`
 @inject('apiStore', 'uiStore', 'routingStore')
 @observer
 class Routes extends React.Component {
+  theme = createMuiTheme({
+    typography: {
+      // Use the Shape font instead of the default Roboto font.
+      fontFamily: v.fonts.sans,
+    },
+  })
+
   componentDidMount() {
     const { apiStore } = this.props
     apiStore.loadCurrentUserAndGroups().then(() => {
       initDoorbell(apiStore.currentUser)
-    })
-    this.theme = createMuiTheme({
-      typography: {
-        // Use the Shape font instead of the default Roboto font.
-        fontFamily: v.fonts.sans,
-      },
+      firebaseClient.authenticate(apiStore.currentUser.google_auth_token)
     })
   }
 

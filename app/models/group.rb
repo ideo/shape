@@ -2,6 +2,7 @@ class Group < ApplicationRecord
   include Resourceable
   include HasFilestackFile
   include Archivable
+  include HasActivities
   after_archive :after_archive_group
 
   prepend RolifyExtensions # Prepend so it can call rolify methods using super
@@ -29,6 +30,9 @@ class Group < ApplicationRecord
              optional: true
   has_many :groups_threads
 
+  has_many :activities_as_subject, through: :activity_subjects, class_name: 'Activity'
+  has_many :activity_subjects, as: :subject
+
   before_validation :set_handle_if_none, on: :create
 
   validates :name, presence: true
@@ -40,6 +44,18 @@ class Group < ApplicationRecord
   validates :handle,
             format: { with: /[a-zA-Z0-9\-\_]+/ },
             if: :validate_handle?
+
+  # Searchkick Config
+  searchkick callbacks: :async, word_start: %i[name handle]
+
+  def search_data
+    {
+      name: name,
+      handle: handle,
+      # listing this way makes it easier to search Users/Groups together
+      organization_ids: [organization_id],
+    }
+  end
 
   # Default for .roles are those where a
   # user is admin/member of this group
@@ -57,16 +73,6 @@ class Group < ApplicationRecord
       .where.not(resource_id: current_shared_collection_id)
       .joins(:groups_roles)
       .where(GroupsRole.arel_table[:group_id].in(id))
-  end
-
-  # really meant to be used on an AR Relation, where `select` is just the relevant records
-  def self.user_ids
-    identifiers = select(:id).map(&:resource_identifier)
-    UsersRole
-      .joins(:role)
-      .where(Role.arel_table[:resource_identifier].in(identifiers))
-      .pluck(:user_id)
-      .uniq
   end
 
   # Roles where a user is admin/viewer of this group
@@ -94,11 +100,6 @@ class Group < ApplicationRecord
     return true if guest? && organization.primary_group.can_edit?(user)
     # otherwise pass through to the normal resourceable method
     resourceable_can_edit?(user)
-  end
-
-  # combine admins + members using Group.user_ids method
-  def user_ids
-    self.class.where(id: id).user_ids
   end
 
   private

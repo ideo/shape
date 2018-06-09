@@ -1,13 +1,19 @@
+import _ from 'lodash'
+import { toJS } from 'mobx'
 import { PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
+import { EditorState, convertFromRaw } from 'draft-js'
+import Editor from 'draft-js-plugins-editor'
+import createMentionPlugin from 'draft-js-mention-plugin'
 
 import v from '~/utils/variables'
 import { DisplayText } from '~/ui/global/styled/typography'
 import { InlineRow } from '~/ui/global/styled/layout'
 import Moment from '~/ui/global/Moment'
 import UserAvatar from '~/ui/users/UserAvatar'
+import { StyledCommentInput } from './CustomCommentMentions'
 
-const StyledComment = styled.div`
+const StyledComment = StyledCommentInput.extend`
   padding: 10px;
   margin-bottom: 5px;
   background: ${props => (props.unread ? v.colors.activityLightBlue : v.colors.activityMedBlue)};
@@ -24,8 +30,47 @@ const StyledComment = styled.div`
 `
 
 class Comment extends React.Component {
+  constructor(props) {
+    super(props)
+    this.mentionPlugin = createMentionPlugin()
+    this.state = {
+      editorState: EditorState.createEmpty(),
+    }
+  }
+
+  componentWillMount() {
+    const { comment } = this.props
+    const draftjsData = toJS(comment.draftjs_data)
+    if (!_.isEmpty(draftjsData)) {
+      const contentState = convertFromRaw(draftjsData)
+      const editorState = EditorState.createWithContent(contentState)
+      this.setState({ editorState })
+    }
+  }
+
+  renderMessage() {
+    const { comment } = this.props
+    if (_.isEmpty(toJS(comment.draftjs_data))) {
+      // fallback only necessary for supporting older comments before we added draftjs
+      // otherwise this use case will go away
+      return comment.message
+    }
+    const plugins = [this.mentionPlugin]
+    return (
+      <Editor
+        readOnly
+        editorState={this.state.editorState}
+        // NOTE: this onChange is necessary for draft-js-plugins to decorate properly!
+        // see https://github.com/draft-js-plugins/draft-js-plugins/issues/530#issuecomment-258736772
+        onChange={(editorState) => this.setState({ editorState })}
+        plugins={plugins}
+      />
+    )
+  }
+
   render() {
     const { comment } = this.props
+
     return (
       <StyledComment unread={comment.unread}>
         <InlineRow align="center">
@@ -41,9 +86,9 @@ class Comment extends React.Component {
             <Moment date={comment.updated_at} />
           </span>
         </InlineRow>
-        <p className="message">
-          { comment.message }
-        </p>
+        <div className="message">
+          { this.renderMessage() }
+        </div>
       </StyledComment>
     )
   }

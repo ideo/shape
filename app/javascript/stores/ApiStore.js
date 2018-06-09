@@ -1,22 +1,25 @@
-import { action, runInAction, observable, computed } from 'mobx'
+import { action, observable, computed } from 'mobx'
 import { Store } from 'mobx-jsonapi-store'
 import _ from 'lodash'
 import moment from 'moment-mini'
 
+import Activity from './jsonApi/Activity'
 import Collection from './jsonApi/Collection'
 import CollectionCard from './jsonApi/CollectionCard'
 import Role from './jsonApi/Role'
 import FilestackFile from './jsonApi/FilestackFile'
 import Group from './jsonApi/Group'
 import Item from './jsonApi/Item'
+import Notification from './jsonApi/Notification'
 import Organization from './jsonApi/Organization'
 import User from './jsonApi/User'
 import Comment from './jsonApi/Comment'
 import CommentThread from './jsonApi/CommentThread'
+import UsersThread from './jsonApi/UsersThread'
 
 class ApiStore extends Store {
   @observable currentUserId = null
-  @observable currentUserThreadIds = []
+  @observable currentCommentThreadIds = []
   @observable currentPageThreadKey = null
 
   @action setCurrentUserId(id) {
@@ -27,10 +30,10 @@ class ApiStore extends Store {
     this.currentPageThreadKey = key
   }
 
-  @action addCurrentUserThread(id) {
+  @action addCurrentCommentThread(id) {
     // no need to do anything if we're already on this thread
-    if (this.currentUserThreadIds.indexOf(id) > -1) return
-    this.currentUserThreadIds.push(id)
+    if (this.currentCommentThreadIds.indexOf(id) > -1) return
+    this.currentCommentThreadIds.push(id)
   }
 
   @computed get currentUser() {
@@ -76,26 +79,59 @@ class ApiStore extends Store {
     }
   }
 
+  searchUsersAndGroups(query) {
+    return this.request(`search/users_and_groups?query=${query}`)
+  }
+
   async fetchRoles(group) {
     const res = await this.request(`groups/${group.id}/roles`, 'GET')
     const roles = res.data
     this.add(roles, 'roles')
   }
 
-  async fetchThreads() {
-    // This is actually fetching the current user's / current org threads
-    const res = await this.fetchAll('comment_threads')
-    const threads = res.data
-    const threadIds = []
-    threads.forEach((thread) => {
-      thread.importComments(thread.unread_comments, { unread: true })
-      threadIds.push(thread.id)
+  importUsersThread({ usersThread, thread, comments } = {}) {
+    thread.assignRef('users_thread', usersThread)
+    thread.importComments(comments)
+    this.addCurrentCommentThread(thread.id)
+  }
+
+  @computed get unreadNotifications() {
+    return _.reverse(_.sortBy(
+      this.findAll('notifications').filter(notification => !notification.read),
+      'created_at'
+    ))
+  }
+
+  @computed get unreadNotificationsCount() {
+    return this.unreadNotifications.length
+  }
+
+  @computed get unreadCommentsCount() {
+    if (!this.currentThreads) return 0
+    return this.currentThreads.reduce((acc, thread) =>
+      acc + thread.unreadCount
+      , 0)
+  }
+
+  @computed get unreadActivityCount() {
+    return this.unreadCommentsCount + this.unreadNotificationsCount
+  }
+
+  syncFromFirestore(data) {
+    const timeFields = ['created_at', 'updated_at', 'last_viewed_at']
+    _.each(data.data.attributes, (v, k) => {
+      if (_.includes(timeFields, k)) {
+        data.data.attributes[k] = v.toDate()
+      }
     })
-    runInAction(() => {
-      // NOTE: we aren't currently doing pagination here, but when we do...
-      // will probably do some kind of union/merge rather than replace
-      this.currentUserThreadIds.replace(threadIds)
+    _.each(data.included, d => {
+      _.each(d.attributes, (v, k) => {
+        if (_.includes(timeFields, k)) {
+          d.attributes[k] = v.toDate()
+        }
+      })
     })
+    return this.sync(data)
   }
 
   findThreadForRecord(record) {
@@ -130,7 +166,7 @@ class ApiStore extends Store {
         )
         if (res.data && res.data.id) {
           thread = res.data
-          thread.importComments(thread.unread_comments, { unread: true })
+          // thread.importComments(thread.unread_comments, { unread: true })
         } else {
           // if still not found, set up a new empty record
           thread = new CommentThread({
@@ -157,9 +193,14 @@ class ApiStore extends Store {
         if (!t.record || !t.record.id) return false
         // include the current page thread even if you're not following
         if (t.key === this.currentPageThreadKey) return true
-        return this.currentUserThreadIds.indexOf(t.id) > -1
+        return this.currentCommentThreadIds.indexOf(t.id) > -1
       }
     )
+  }
+
+  async fetchNotifications() {
+    const res = await this.fetchAll('notifications')
+    return res.data
   }
 
   // -- override mobx-jsonapi-store --
@@ -182,6 +223,7 @@ class ApiStore extends Store {
   }
 }
 ApiStore.types = [
+  Activity,
   Collection,
   CollectionCard,
   FilestackFile,
@@ -192,6 +234,8 @@ ApiStore.types = [
   User,
   Comment,
   CommentThread,
+  Notification,
+  UsersThread,
 ]
 
 export default ApiStore

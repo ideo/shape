@@ -22,6 +22,12 @@ const fakeUiStore = {
     onClose: jest.fn(),
   },
   activityLogOpen: false,
+  activityLogPosition: {
+    x: 0,
+    y: 0,
+    h: 1,
+    w: 1,
+  },
   scroll: {
     scrollToTop: jest.fn(),
     scrollToBottom: jest.fn(),
@@ -49,9 +55,12 @@ const fakeUiStore = {
   cardAction: 'move',
   blurContent: false,
   organizationMenuPage: 'organizationMenuPage',
+  organizationMenuGroupId: null,
   expandedThreadKey: null,
   expandThread: jest.fn(),
+  openGroup: jest.fn(),
   editingName: false,
+  activityLogPage: 'comments',
 }
 
 export default fakeUiStore

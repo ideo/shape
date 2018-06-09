@@ -1,10 +1,12 @@
 import PropTypes from 'prop-types'
-import { observable, action, runInAction } from 'mobx'
+import { EditorState } from 'draft-js'
+import { observable, action, computed } from 'mobx'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
-import _ from 'lodash'
 import styled from 'styled-components'
 import Dotdotdot from 'react-dotdotdot'
+// import { Mention, MentionsInput } from 'react-mentions'
 
+import { routingStore } from '~/stores'
 import Link from '~/ui/global/Link'
 import CollectionIcon from '~/ui/icons/CollectionIcon'
 import CommentIconFilled from '~/ui/icons/CommentIconFilled'
@@ -12,17 +14,15 @@ import TextIcon from '~/ui/icons/TextIcon'
 import v, { ITEM_TYPES } from '~/utils/variables'
 import hexToRgba from '~/utils/hexToRgba'
 import Moment from '~/ui/global/Moment'
-import ReturnArrowIcon from '~/ui/icons/ReturnArrowIcon'
-import { CommentForm, CommentTextarea } from '~/ui/global/styled/forms'
 import Comment from './Comment'
-import { routingStore } from '~/stores'
+import CommentEntryForm from './CommentEntryForm'
 
 const StyledCommentThread = styled.div`
   .title {
     position: relative;
     top: 0;
-    z-index: 50;
-    /* NOTE: just for prototyping, not fully browser supported */
+    z-index: ${v.zIndex.commentHeader};
+    /* NOTE: 'sticky' is not fully browser supported */
     ${props => props.expanded && `
       position: sticky;
     `}
@@ -51,34 +51,6 @@ const StyledCommentThread = styled.div`
       margin-bottom: -40px;
       min-height: 40px;
     `}
-  }
-  form.reply {
-    /* NOTE: just for prototyping, not fully browser supported */
-    ${props => props.expanded && `
-      position: sticky;
-      bottom: 0;
-    `}
-    ${props => !props.expanded && `
-      display: none;
-    `}
-    /* ---- */
-    width: calc(100% - 10px);
-    border-top: 4px solid ${v.colors.activityDarkBlue};
-    background: ${v.colors.activityDarkBlue};
-    background: linear-gradient(
-      ${hexToRgba(v.colors.activityDarkBlue, 0)} 0,
-      ${v.colors.activityDarkBlue} 10%,
-      ${v.colors.activityDarkBlue} 100%
-    );
-    .textarea-input {
-      background: ${v.colors.activityMedBlue};
-      margin: 0 5px 0 68px;
-      width: calc(100% - 68px);
-    }
-    textarea {
-      width: calc(100% - 40px);
-      color: white;
-    }
   }
 `
 
@@ -139,23 +111,15 @@ ThumbnailHolder.displayName = 'ThumbnailHolder'
 
 @observer
 class CommentThread extends React.Component {
-  @observable message = ''
+  @observable commentData = {
+    message: '',
+    draftjs_data: {},
+  }
+  @observable editorState = EditorState.createEmpty()
   @observable titleLines = 1
-  // we store this locally so that it can fade out after unread == 0,
-  // but we still display the old number
-  @observable unreadCount = 0
 
   componentDidMount() {
-    this.focusTextArea(this.props.expanded)
     this.countLines()
-    runInAction(() => {
-      const { thread } = this.props
-      this.unreadCount = thread.unread_count
-    })
-  }
-
-  componentWillReceiveProps({ expanded }) {
-    this.focusTextArea(expanded)
   }
 
   @action countLines = () => {
@@ -164,38 +128,14 @@ class CommentThread extends React.Component {
     }
   }
 
-  focusTextArea = (expanded) => {
-    if (expanded && this.textarea) {
-      // NOTE: for some reason needs to delay before focus? because of animated scroll?
-      setTimeout(() => {
-        if (this.textarea) this.textarea.focus()
-      }, 50)
-    }
-  }
-
-  get comments() {
+  @computed get comments() {
     const { expanded, thread } = this.props
     let { comments } = thread
     // for un-expanded thread, only take the unread comments
     if (!expanded) {
-      comments = thread.unread_comments
+      comments = thread.latestUnreadComments
     }
-    comments = _.sortBy(comments, ['updated_at'])
     return comments
-  }
-
-  @action handleTextChange = (ev) => {
-    this.message = ev.target.value
-  }
-
-  handleSubmit = async (e) => {
-    e.preventDefault()
-    const { thread } = this.props
-    await thread.API_saveComment(this.message)
-    runInAction(() => {
-      this.message = ''
-    })
-    this.props.afterSubmit()
   }
 
   objectLink() {
@@ -221,11 +161,9 @@ class CommentThread extends React.Component {
         content = <img src={record.filestack_file_url} alt="Text" />
       }
     } else {
-      // eslint-disable-next-line
+      content = <CollectionIcon viewBox="50 50 170 170" />
       if (record.cover.image_url) {
-        content = <img src={record.cover.image_url} alt="Collection" />
-      } else {
-        content = <CollectionIcon viewBox="50 50 170 170" />
+        content = <img src={record.cover.image_url} alt={record.name} />
       }
     }
     return (
@@ -238,9 +176,9 @@ class CommentThread extends React.Component {
   renderUnreadCount = () => {
     const { thread } = this.props
     return (
-      <span className={`unread ${thread.unread_count && 'show-unread'}`}>
+      <span className={`unread ${thread.unreadCount && 'show-unread'}`}>
         <span className="inner">
-          { this.unreadCount }
+          { thread.unreadCount }
           <CommentIconFilled />
         </span>
       </span>
@@ -248,8 +186,8 @@ class CommentThread extends React.Component {
   }
 
   renderComments = () => (
-    this.comments.map(comment => (
-      <Comment key={comment.id} comment={comment} />
+    this.comments.map((comment, i) => (
+      <Comment key={comment.id || `comment-new-${i}`} comment={comment} />
     ))
   )
 
@@ -277,20 +215,11 @@ class CommentThread extends React.Component {
         <div className="comments">
           { this.renderComments() }
         </div>
-        <CommentForm className="reply" onSubmit={this.handleSubmit}>
-          <div className="textarea-input">
-            <CommentTextarea
-              placeholder="add comment"
-              value={this.message}
-              onChange={this.handleTextChange}
-              innerRef={(input) => { this.textarea = input }}
-              maxRows={6}
-            />
-          </div>
-          <button>
-            <ReturnArrowIcon />
-          </button>
-        </CommentForm>
+        <CommentEntryForm
+          expanded={expanded}
+          thread={thread}
+          afterSubmit={this.props.afterSubmit}
+        />
       </StyledCommentThread>
     )
   }

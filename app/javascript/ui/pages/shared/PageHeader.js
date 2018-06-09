@@ -3,13 +3,12 @@ import { Fragment } from 'react'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import { Flex, Box } from 'reflexbox'
 
+import ActivityLogButton from '~/ui/notifications/ActivityLogButton'
 import Breadcrumb from '~/ui/layout/Breadcrumb'
-import CommentIcon from '~/ui/icons/CommentIcon'
 import EditableName from '~/ui/pages/shared/EditableName'
 import Roles from '~/ui/grid/Roles'
 import RolesSummary from '~/ui/roles/RolesSummary'
 import PageMenu from '~/ui/pages/shared/PageMenu'
-import { CircledIcon } from '~/ui/global/styled/buttons'
 import { FixedHeader, MaxWidthContainer } from '~/ui/global/styled/layout'
 import { StyledTitleAndRoles } from '~/ui/pages/shared/styled'
 import v from '~/utils/variables'
@@ -39,21 +38,10 @@ class PageHeader extends React.Component {
     uiStore.update('rolesMenuOpen', true)
   }
 
-  toggleActivityLog() {
-    const { uiStore } = this.props
-    const val = !uiStore.activityLogOpen
-    uiStore.update('activityLogOpen', val)
-  }
-
   updateRecordName = (name) => {
     const { record } = this.props
     record.name = name
     record.save()
-  }
-
-  handleComments = (ev) => {
-    ev.preventDefault()
-    this.toggleActivityLog()
   }
 
   get actions() {
@@ -70,17 +58,11 @@ class PageHeader extends React.Component {
         />
       )
     }
+    // 2. CommentIcon (toggle ActivityLog)
+    elements.push(
+      <ActivityLogButton key="activity" />
+    )
     if (this.hasActions) {
-      // 2. CommentIcon (toggle ActivityLog)
-      elements.push(
-        <CircledIcon
-          key="comments"
-          active={uiStore.activityLogOpen}
-          onClick={this.handleComments}
-        >
-          <CommentIcon />
-        </CircledIcon>
-      )
       // 3. PageMenu actions
       elements.push(
         <PageMenu

@@ -1,4 +1,7 @@
 class CommentThread < ApplicationRecord
+  include HasActivities
+  include Firestoreable
+
   belongs_to :record,
              polymorphic: true
   # org comes from the item/collection, but cached on here for easy lookup
@@ -33,6 +36,7 @@ class CommentThread < ApplicationRecord
     ut = users_threads.where(user_id: user.id).first
     return unless ut.present?
     ut.update_last_viewed!
+    ut.store_in_firestore
   end
 
   # NOTE: add/remove_follower methods will only get called for editors of the record
@@ -78,6 +82,34 @@ class CommentThread < ApplicationRecord
     return false if record.archived?
     # anyone who can view the record can contribute to the comment thread
     record.can_view?(user)
+  end
+
+  def serialized_for_firestore
+    renderer = JSONAPI::Serializable::Renderer.new
+    renderer.render(
+      self,
+      class: {
+        CommentThread: SerializableCommentThread,
+        Collection: SerializableSimpleCollection,
+        'Item::VideoItem': SerializableSimpleItem,
+        'Item::ImageItem': SerializableSimpleItem,
+        'Item::TextItem': SerializableSimpleItem,
+      },
+      include: %i[record],
+    )
+  end
+
+  # TODO: when to call firestore deletions....
+  def delete_from_firestore
+    FirestoreClient.client.batch do |batch|
+      batch.delete("comment_threads/#{id}")
+      users_threads.each do |ut|
+        batch.delete("users_threads/#{ut.id}")
+      end
+      comments.each do |c|
+        batch.delete("comments/#{c.id}")
+      end
+    end
   end
 
   private

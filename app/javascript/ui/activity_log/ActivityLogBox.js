@@ -1,14 +1,15 @@
 import Rnd from 'react-rnd'
 import localStorage from 'mobx-localstorage'
-import { observable, observe, action } from 'mobx'
+import { observe, runInAction, action } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 
 import { CloseButton } from '~/ui/global/styled/buttons'
 import NotificationIcon from '~/ui/icons/NotificationIcon'
+import NotificationsContainer from '~/ui/notifications/NotificationsContainer'
+import { ActivityCount } from '~/ui/notifications/ActivityLogButton'
 import CommentIcon from '~/ui/icons/CommentIcon'
 import CommentThreadContainer from '~/ui/threads/CommentThreadContainer'
-
 import v from '~/utils/variables'
 
 const MIN_WIDTH = 319
@@ -21,7 +22,7 @@ const MOBILE_Y = 300
 const DEFAULT = {
   x: 0,
   y: 180,
-  w: MIN_WIDTH,
+  w: MIN_WIDTH + 100,
   h: MIN_HEIGHT,
 }
 
@@ -37,10 +38,6 @@ const StyledActivityLog = styled.div`
   width: 100%;
   display: flex;
   flex-direction: column;
-
-  > h3 {
-    text-align: center;
-  }
 `
 
 const StyledHeader = styled.div`
@@ -58,6 +55,7 @@ const Action = styled.button`
   color: ${props => (props.active ? 'white' : v.colors.cloudy)};
   height: 19px;
   margin-right: 10px;
+  position: relative;
   width: 19px;
 
   &:hover {
@@ -68,13 +66,19 @@ const Action = styled.button`
 @inject('apiStore', 'uiStore')
 @observer
 class ActivityLogBox extends React.Component {
-  @observable position = { x: 0, y: 0, w: MIN_WIDTH, h: MIN_HEIGHT }
-  @observable currentPage = 'comments'
   disposer = null
 
   constructor(props) {
     super(props)
     this.draggableRef = React.createRef()
+    // attach observable position to UiStore so other components can know where the ALB is
+    this.position = props.uiStore.activityLogPosition
+    runInAction(() => {
+      if (this.position.w < MIN_WIDTH || this.position.h < MIN_HEIGHT) {
+        this.position.w = DEFAULT.w
+        this.position.h = DEFAULT.h
+      }
+    })
     this.disposer = observe(props.uiStore, 'activityLogOpen', change => {
       if (this.isOffscreen()) {
         this.setToDefaultPosition()
@@ -83,19 +87,24 @@ class ActivityLogBox extends React.Component {
   }
 
   @action componentDidMount() {
+    const { uiStore } = this.props
     const existingPosition = localStorage.getItem(POSITION_KEY) || { }
     const existingPage = localStorage.getItem(PAGE_KEY)
-    this.currentPage = existingPage || 'comments'
+    uiStore.update('activityLogPage', existingPage || 'comments')
     this.position.y = existingPosition.y || DEFAULT.y
     this.position.w = existingPosition.w || DEFAULT.w
     this.position.h = existingPosition.h || DEFAULT.h
     this.position.x = existingPosition.x || this.defaultX
-    this.props.apiStore.fetchThreads()
   }
 
   componentWillUnmount() {
     // cancel the observer
     this.disposer()
+  }
+
+  get currentPage() {
+    const { uiStore } = this.props
+    return uiStore.activityLogPage
   }
 
   get defaultX() {
@@ -123,7 +132,8 @@ class ActivityLogBox extends React.Component {
   }
 
   @action changePage(page) {
-    this.currentPage = page
+    const { uiStore } = this.props
+    uiStore.update('activityLogPage', page)
     localStorage.setItem(PAGE_KEY, page)
   }
 
@@ -144,6 +154,7 @@ class ActivityLogBox extends React.Component {
   handleClose = (ev) => {
     const { uiStore } = this.props
     uiStore.update('activityLogOpen', false)
+    uiStore.expandThread(null)
   }
 
   handleNotifications = (ev) => {
@@ -154,21 +165,6 @@ class ActivityLogBox extends React.Component {
   handleComments = (ev) => {
     ev.preventDefault()
     this.changePage('comments')
-  }
-
-  get showJumpToThreadButton() {
-    const { uiStore } = this.props
-    return (uiStore.viewingRecord &&
-      (uiStore.viewingRecord.isNormalCollection ||
-      uiStore.viewingRecord.internalType === 'items')
-    )
-  }
-
-  jumpToCurrentThread = () => {
-    const { apiStore, uiStore } = this.props
-    const thread = apiStore.findThreadForRecord(uiStore.viewingRecord)
-    if (!thread) return
-    uiStore.expandThread(thread.key)
   }
 
   get mobileProps() {
@@ -191,8 +187,16 @@ class ActivityLogBox extends React.Component {
     }
   }
 
+  renderComments = () => (
+    <CommentThreadContainer />
+  )
+
+  renderNotifications = () => (
+    <NotificationsContainer />
+  )
+
   render() {
-    const { uiStore } = this.props
+    const { apiStore, uiStore } = this.props
     if (!uiStore.activityLogOpen) return null
     return (
       <Rnd
@@ -238,27 +242,29 @@ class ActivityLogBox extends React.Component {
                 onClick={this.handleNotifications}
               >
                 <NotificationIcon />
+                {apiStore.unreadNotificationsCount > 0 && (
+                  <ActivityCount size="sm">
+                    {apiStore.unreadNotificationsCount}
+                  </ActivityCount>
+                )}
               </Action>
               <Action
                 active={this.currentPage === 'comments'}
                 onClick={this.handleComments}
               >
                 <CommentIcon />
+                {apiStore.unreadCommentsCount > 0 && (
+                  <ActivityCount size="sm">
+                    {apiStore.unreadCommentsCount}
+                  </ActivityCount>
+                )}
               </Action>
               <CloseButton size="lg" onClick={this.handleClose} />
             </StyledHeader>
-            {this.showJumpToThreadButton &&
-              <button onClick={this.jumpToCurrentThread}>
-                <h3>Go to {uiStore.viewingRecord.name}</h3>
-              </button>
+            { this.currentPage === 'comments'
+              ? this.renderComments()
+              : this.renderNotifications()
             }
-            {!this.showJumpToThreadButton &&
-              // take up the same amount of space as the button
-              <div style={{ height: '2rem' }} />
-            }
-
-            <CommentThreadContainer />
-
           </StyledActivityLog>
         </div>
       </Rnd>

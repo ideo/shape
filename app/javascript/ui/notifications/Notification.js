@@ -1,23 +1,43 @@
-import { PropTypes as MobxPropTypes } from 'mobx-react'
-import { Fragment } from 'react'
+import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import pluralize from 'pluralize'
 import { apiStore } from '~/stores'
+import { Flex } from 'reflexbox'
 import styled from 'styled-components'
 
 import Activity from '~/ui/notifications/Activity'
 import InlineLoader from '~/ui/layout/InlineLoader'
+import Moment from '~/ui/global/Moment'
+import { NotificationButton } from '~/ui/global/styled/buttons'
+import Tooltip from '~/ui/global/Tooltip'
+import v from '~/utils/variables'
 
 function pluralTypeName(name) {
   return pluralize(name).toLowerCase()
 }
 
 const StyledContainer = styled.div`
-  margin: 10px;
-  min-height: 80px;
+  background: ${v.colors.activityDarkestBlue};
+  box-sizing: border-box;
+  margin-left: 10px;
+  margin-right: 10px;
+  margin-top: 4px;
+  min-height: 75px;
+  padding: 12px;
   position: relative;
 `
+StyledContainer.displayName = 'StyledNotification'
 
-class Notification extends React.PureComponent {
+const ButtonContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  margin-left: 10px;
+  margin-right: 9px;
+  margin-top: 20px;
+  width: 12px;
+`
+
+@observer
+class Notification extends React.Component {
   componentWillMount() {
     const { notification } = this.props
     const { activity } = notification
@@ -28,7 +48,7 @@ class Notification extends React.PureComponent {
         activity.assignRef('target', res.data)
       }).catch((err) => {
         console.warn(err)
-        // Create a fake target in this strange usecase
+        // Create a fake target in this strange usecase to remove loading
         activity.assignRef('target', { name: 'Unknown', internalType: targetType })
       })
     } else {
@@ -42,15 +62,6 @@ class Notification extends React.PureComponent {
     notification.save()
   }
 
-  combineActors() {
-    const { notification } = this.props
-    if (!notification.combined_activities_ids.length) {
-      return [notification.activity.actor]
-    }
-    return notification.combined_activities.map(activity =>
-      activity.actor)
-  }
-
   handleRead = (ev) => {
     ev.preventDefault()
     this.updateRead()
@@ -58,24 +69,35 @@ class Notification extends React.PureComponent {
 
   render() {
     const { notification } = this.props
-    const { activity } = notification
     let content
-    if (!activity.target) {
+    if (!notification.activity.target) {
       content = <InlineLoader />
     } else {
       content = (
-        <Fragment>
-          <button className="read" onClick={this.handleRead}>M</button>
-          <Activity
-            action={activity.action}
-            actors={this.combineActors()}
-            target={activity.target}
-            subjectUsers={activity.subjectUsers}
-            subjectGroups={activity.subjectGroups}
-            actorCount={notification.combined_activities_ids.length}
-            content={activity.content}
-          />
-        </Fragment>
+        <Flex>
+          <ButtonContainer>
+            <Tooltip
+              classes={{ tooltip: 'Tooltip' }}
+              title="Dismiss"
+              placement="bottom"
+            >
+              <NotificationButton className="read" onClick={this.handleRead} />
+            </Tooltip>
+          </ButtonContainer>
+          <div>
+            <Moment date={notification.created_at} />
+            <Activity
+              action={notification.activity.action}
+              actors={notification.combined_actors}
+              target={notification.activity.target}
+              subjectUsers={notification.activity.subject_users}
+              subjectGroups={notification.activity.subject_groups}
+              actorCount={notification.combined_actor_count}
+              content={notification.activity.content}
+              handleRead={this.handleRead}
+            />
+          </div>
+        </Flex>
       )
     }
     return (

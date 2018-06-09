@@ -37,6 +37,7 @@ export default {
     activityLightBlue: '#73808f',
     activityMedBlue: '#5a6a7c',
     activityDarkBlue: '#3f526a',
+    activityDarkestBlue: '#242d37',
     aquaHaze: '#f0f4f6',
     gray: '#c6c1bf',
     cloudy: '#a89f9b',
@@ -70,7 +71,10 @@ export default {
     cardDragging: 160,
     gridCard: 150,
     gridCardTop: 151,
+    commentMentions: 100,
+    commentHeader: 10,
     itemClose: 10,
+    floatOverContent: 2,
     gridCardBg: 1,
   },
 
