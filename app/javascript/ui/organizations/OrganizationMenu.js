@@ -208,7 +208,9 @@ class OrganizationMenu extends React.Component {
         content = <Loader height="350px" fadeIn="none" />
       } else {
         if (uiStore.organizationMenuGroupId) {
-          this.editGroup = apiStore.find('groups', uiStore.organizationMenuGroupId)
+          runInAction(() => {
+            this.editGroup = apiStore.find('groups', uiStore.organizationMenuGroupId)
+          })
         }
         content = this.renderEditRoles()
       }

@@ -17,5 +17,5 @@ production:
 :enabled: true
 :schedule:
   searchkick_reindex_worker:
-      cron: '0 /5 * * * *'  # Runs every 5 minutes
-      class: SearchkickReindexWorker
+    every: '5m'
+    class: SearchkickReindexWorker

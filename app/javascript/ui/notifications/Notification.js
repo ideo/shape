@@ -94,6 +94,7 @@ class Notification extends React.Component {
               subjectGroups={notification.activity.subject_groups}
               actorCount={notification.combined_actor_count}
               content={notification.activity.content}
+              handleRead={this.handleRead}
             />
           </div>
         </Flex>

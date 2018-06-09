@@ -117,22 +117,14 @@ RSpec.describe Roles::MassAssign, type: :service do
       let(:invited_by) { create(:user) }
       let(:new_role) { true }
       let(:role_name) { Role::EDITOR.to_s }
-      let(:instance_double) do
-        double('ActivityAndNotificationBuilder')
-      end
-
-      before do
-        allow(ActivityAndNotificationBuilder).to receive(:new).and_return(instance_double)
-        allow(instance_double).to receive(:call).and_return(true)
-      end
 
       it 'should call the activity and notification builder' do
-        expect(ActivityAndNotificationBuilder).to receive(:new).with(
+        expect(ActivityAndNotificationBuilder).to receive(:call).with(
           actor: invited_by,
           target: object,
           action: Activity.actions[:added_editor],
-          subject_users: users,
-          subject_groups: groups,
+          subject_user_ids: users.pluck(:id),
+          subject_group_ids: groups.pluck(:id),
         )
         assign_role.call
       end
@@ -142,9 +134,11 @@ RSpec.describe Roles::MassAssign, type: :service do
       let(:new_role) { true }
 
       it 'adds links to user collections' do
-        all_group_users = groups.reduce([]) {
-          |accg, group| accg + group.roles.reduce([]) {
-            |accr, role| accr + role.users } }
+        all_group_users = groups.reduce([]) { |accg, group|
+          accg + group.roles.reduce([]) { |accr, role|
+                   accr + role.users
+                 }
+        }
         expect(LinkToSharedCollectionsWorker).to receive(:perform_async).with(
           (users + all_group_users).map(&:id),
           groups.map(&:id),
@@ -160,7 +154,7 @@ RSpec.describe Roles::MassAssign, type: :service do
 
         it 'should only pass unique ids to create links' do
           expect(LinkToSharedCollectionsWorker).to receive(:perform_async).with(
-            (users).map(&:id),
+            users.map(&:id),
             groups.map(&:id),
             [object.id],
             [],
@@ -179,7 +173,7 @@ RSpec.describe Roles::MassAssign, type: :service do
 
         it 'should not link to any primary groups' do
           expect(LinkToSharedCollectionsWorker).to receive(:perform_async).with(
-            (users).map(&:id),
+            users.map(&:id),
             [],
             [object.id],
             [],
@@ -198,13 +192,15 @@ RSpec.describe Roles::MassAssign, type: :service do
         let!(:comment_thread) { create(:item_comment_thread) }
         let!(:groups_thread) { create(:groups_thread, group: object, comment_thread: comment_thread) }
         let(:thread_ids) { object.groups_threads.pluck(:comment_thread_id) }
-        let!(:link) { create(:collection_card_link,
-                             parent: object.current_shared_collection,
-                             collection: linked_collection)}
+        let!(:link) {
+          create(:collection_card_link,
+                 parent: object.current_shared_collection,
+                 collection: linked_collection)
+        }
 
         it 'should link all the group\'s shared collection cards' do
           expect(LinkToSharedCollectionsWorker).to receive(:perform_async).with(
-            (users).map(&:id),
+            users.map(&:id),
             [],
             [linked_collection.id],
             [],
@@ -234,6 +230,7 @@ RSpec.describe Roles::MassAssign, type: :service do
             invited_to_type: object.class.name,
             invited_to_id: object.id,
           )
+          expect(ActivityAndNotificationBuilder).to receive(:call)
           assign_role.call
         end
       end

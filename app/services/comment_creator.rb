@@ -12,7 +12,8 @@ class CommentCreator < SimpleService
     if @comment
       add_author_as_follower_of_thread
       add_mentioned_users_as_follower_of_thread
-      # TODO: create notifications for mentions
+      @comment.store_in_firestore
+      create_notifications
     end
     @comment
   end
@@ -43,5 +44,35 @@ class CommentCreator < SimpleService
     mentions[:group_ids].each do |group_id|
       @comment_thread.add_group_follower!(group_id)
     end
+  end
+
+  def create_notifications
+    mentions = @comment.mentions
+    if mentions[:user_ids].present? || mentions[:group_ids].present?
+      ActivityAndNotificationBuilder.call(
+        actor: @author,
+        target: @comment_thread.record,
+        action: Activity.actions[:mentioned],
+        subject_user_ids: mentions[:user_ids],
+        subject_group_ids: mentions[:group_ids],
+        combine: true,
+        content: @comment.message,
+      )
+    end
+
+    # if people were notified of the mention, don't need to also notify of the comment
+    users = @comment.comment_thread.users_threads.pluck(:user_id)
+    unmentioned_users = (users - mentions[:user_ids])
+    groups = @comment.comment_thread.groups_threads.pluck(:group_id)
+    unmentioned_groups = (groups - mentions[:group_ids])
+    ActivityAndNotificationBuilder.call(
+      actor: @author,
+      target: @comment_thread.record,
+      action: Activity.actions[:commented],
+      subject_user_ids: unmentioned_users,
+      subject_group_ids: unmentioned_groups,
+      combine: true,
+      content: @comment.message,
+    )
   end
 end

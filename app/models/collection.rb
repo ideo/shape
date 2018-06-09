@@ -244,6 +244,11 @@ class Collection < ApplicationRecord
     name
   end
 
+  def resourceable_class
+    # Use top-level class since this is an STI model
+    Collection
+  end
+
   def recalculate_child_breadcrumbs_async
     BreadcrumbRecalculationWorker.perform_async(id)
   end

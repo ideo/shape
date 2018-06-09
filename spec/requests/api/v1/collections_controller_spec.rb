@@ -289,15 +289,7 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
     let(:collection_card) do
       create(:collection_card_text, order: 0, width: 1, parent: collection)
     end
-    let(:instance_double) do
-      double('ActivityAndNotificationBuilder')
-    end
     let(:path) { "/api/v1/collections/#{collection.id}/archive" }
-
-    before do
-      allow(ActivityAndNotificationBuilder).to receive(:new).and_return(instance_double)
-      allow(instance_double).to receive(:call).and_return(true)
-    end
 
     it 'returns a 200' do
       patch(path)
@@ -322,12 +314,12 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
     end
 
     it 'should call the activity and notification builder' do
-      expect(ActivityAndNotificationBuilder).to receive(:new).with(
+      expect(ActivityAndNotificationBuilder).to receive(:call).with(
         actor: @user,
         target: collection,
         action: Activity.actions[:archived],
-        subject_users: [user],
-        subject_groups: [],
+        subject_user_ids: [user.id],
+        subject_group_ids: [],
       )
       patch(path)
     end

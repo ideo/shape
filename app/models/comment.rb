@@ -1,11 +1,11 @@
 class Comment < ApplicationRecord
+  include Firestoreable
+
   paginates_per 50
   belongs_to :comment_thread, touch: true
   belongs_to :author, class_name: 'User'
 
   validates :message, presence: true
-
-  after_create :store_in_firestore
 
   def mentions
     mentions = {
@@ -35,16 +35,15 @@ class Comment < ApplicationRecord
     )
   end
 
-  def store_in_firestore
-    # TODO: background job
-    FirestoreClient.client.batch do |batch|
-      batch.set("comments/#{id}", serialized_for_firestore)
-      # store comment_thread to update its `updated_at`
-      batch.set("comment_threads/#{comment_thread.id}", comment_thread.serialized_for_firestore)
-      # ping all the users threads so they get an updated unread_count
-      comment_thread.users_threads.each do |ut|
-        batch.set("users_threads/#{ut.id}", ut.serialized_for_firestore)
-      end
+  # override Firestoreable method to include related records
+  def store_in_batch(batch)
+    # store the comment
+    batch.set(firestore_doc_id, serialized_for_firestore)
+    # store comment_thread to update its `updated_at`
+    comment_thread.store_in_batch(batch)
+    # ping all the users threads so they get an updated unread_count
+    comment_thread.users_threads.each do |ut|
+      ut.store_in_batch(batch)
     end
   end
 end

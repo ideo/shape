@@ -25,12 +25,16 @@ function roleArticle(nextWord) {
 
 const MAX_ACTORS = 3
 
-const ActivityText = styled.p`
+export const ActivityText = styled.p`
   color: ${v.colors.cararra};
   font-family: ${v.fonts.sans};
   font-size: 1rem;
   line-height: 1.25;
   margin-bottom: 0;
+`
+const ActivityButton = styled.button`
+  display: block;
+  text-align: left;
 `
 
 class Activity extends React.PureComponent {
@@ -59,6 +63,23 @@ class Activity extends React.PureComponent {
     return <Link className="target" to={link}>{targetName}</Link>
   }
 
+  handleClick = async (e) => {
+    e.preventDefault()
+    const { action, target, handleRead } = this.props
+    const { id, internalType } = target
+    handleRead(e)
+    if (internalType === 'groups') {
+      uiStore.openGroup(id)
+      return
+    }
+    routingStore.routeTo(internalType, id)
+    if (_.includes(['commented', 'mentioned'], action)) {
+      const thread = await apiStore.findOrBuildCommentThread(target)
+      uiStore.update('activityLogPage', 'comments')
+      uiStore.expandThread(thread.key)
+    }
+  }
+
   getDataText() {
     const { action, subjectGroups, target, content } = this.props
     return {
@@ -67,7 +88,7 @@ class Activity extends React.PureComponent {
       subjects: insertCommas(this.renameYourself(), subjectGroups),
       targetType: pluralize.singular(target.internalType),
       roleName: this.isRoleAction() && action.split('_')[1],
-      message: action === 'commented' && commentPreview(content)
+      message: content ? commentPreview(content) : '',
     }
   }
 
@@ -111,6 +132,13 @@ class Activity extends React.PureComponent {
           {this.targetLink(targetName)}:{` `}
           <span className="message">{message}</span>
         </ActivityText>)
+    case 'mentioned':
+      return (
+        <ActivityText>
+          <strong className="actor">{actorNames}</strong> mentioned you in a comment for {` `}
+          {this.targetLink(targetName)}:{` `}
+          <span className="message">{message}</span>
+        </ActivityText>)
 
     default:
       return ''
@@ -119,9 +147,9 @@ class Activity extends React.PureComponent {
 
   render() {
     return (
-      <div>
+      <ActivityButton onClick={this.handleClick}>
         { this.getMessageText() }
-      </div>
+      </ActivityButton>
     )
   }
 }
@@ -137,6 +165,7 @@ Activity.propTypes = {
   subjectGroups: MobxPropTypes.arrayOrObservableArray,
   actorCount: PropTypes.number,
   content: PropTypes.string,
+  handleRead: PropTypes.func.isRequired,
 }
 
 Activity.defaultProps = {

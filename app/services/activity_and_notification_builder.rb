@@ -1,29 +1,33 @@
-class ActivityAndNotificationBuilder
+class ActivityAndNotificationBuilder < SimpleService
   attr_reader :errors, :activity
 
   def initialize(
     actor:,
     target:,
     action:,
-    subject_users: [],
-    subject_groups: [],
+    subject_user_ids: [],
+    subject_group_ids: [],
     combine: false,
     content: nil
   )
     @actor = actor
     @target = target
     @action = action
-    @subject_users = subject_users
-    @subject_groups = subject_groups
+    @subject_user_ids = subject_user_ids
+    @subject_group_ids = subject_group_ids
     @combine = combine
     @content = content
     @errors = []
     @activity = nil
+    @created_notifications = []
   end
 
   def call
     create_activity
-    create_notifications if @activity
+    if @activity
+      create_notifications
+      store_in_firestore
+    end
   end
 
   private
@@ -31,8 +35,8 @@ class ActivityAndNotificationBuilder
   def create_activity
     @activity = Activity.create(
       actor: @actor,
-      subject_users: @subject_users,
-      subject_groups: @subject_groups,
+      subject_user_ids: @subject_user_ids,
+      subject_group_ids: @subject_group_ids,
       target: @target,
       action: @action,
       organization: @actor.current_organization,
@@ -41,22 +45,22 @@ class ActivityAndNotificationBuilder
   end
 
   def create_notifications
-    # TODO: just pass all user_ids to this service rather than computing them here?
     # NOTE: this comes from roles/shared_methods
-    unless (group_user_ids = @subject_groups.try(:user_ids))
-      group_user_ids = Group.where(id: @subject_groups.pluck(:id)).user_ids
-    end
-    all_users = @subject_users + User.where(id: group_user_ids)
-    all_users.uniq.each do |user|
-      next if user == @actor
+    group_user_ids = Group.where(id: @subject_group_ids).user_ids
+    all_user_ids = @subject_user_ids + group_user_ids
+    all_user_ids.uniq.each do |user_id|
+      next if user_id == @actor.id
       if @combine
-        combined = combine_existing_notifications(user)
-        next if combined
+        if (notif = combine_existing_notifications(user_id))
+          @created_notifications << notif
+          next
+        end
       end
-      Notification.create(
+      notif = Notification.create(
         activity: @activity,
-        user: user,
+        user_id: user_id,
       )
+      @created_notifications << notif if notif
     end
   end
 
@@ -66,19 +70,19 @@ class ActivityAndNotificationBuilder
              action: @action)
   end
 
-  def find_similar_notifications(user, similar_activities)
+  def find_similar_notifications(user_id, similar_activities)
     Notification.where(
       activity_id: similar_activities.map(&:id),
-      user: user,
+      user: user_id,
       read: false,
     )
   end
 
-  def combine_existing_notifications(user)
+  def combine_existing_notifications(user_id)
     # Find similar notifications based on target and action (multiple comments)
     # TODO: possible not to run these queries for each user?
     similar_activities = find_similar_activities
-    similar_notifications = find_similar_notifications(user, similar_activities)
+    similar_notifications = find_similar_notifications(user_id, similar_activities)
     return if similar_notifications.empty?
     activity_ids = []
     if similar_notifications.first.combined_activities_ids.count.positive?
@@ -89,10 +93,17 @@ class ActivityAndNotificationBuilder
     # Condense the existing 3 down to one notification
     created = Notification.create(
       activity: @activity,
-      user: user,
+      user_id: user_id,
       combined_activities_ids: (activity_ids + [@activity.id]),
     )
     similar_notifications.where.not(id: created.id).destroy_all
     created
+  end
+
+  def store_in_firestore
+    return unless @created_notifications.present?
+    FirestoreBatchWriter.perform_async(
+      @created_notifications.compact.map(&:batch_job_identifier),
+    )
   end
 end

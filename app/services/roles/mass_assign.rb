@@ -98,14 +98,13 @@ module Roles
     def create_activities_and_notifications
       action = Activity.role_name_to_action(@role_name.to_sym)
       return if action.nil?
-      builder = ActivityAndNotificationBuilder.new(
+      ActivityAndNotificationBuilder.call(
         actor: @invited_by,
         target: @object,
         action: action,
-        subject_users: @added_users,
-        subject_groups: @added_groups,
+        subject_user_ids: @added_users.pluck(:id),
+        subject_group_ids: @added_groups.pluck(:id),
       )
-      builder.call
     end
 
     def add_editors_as_comment_thread_followers

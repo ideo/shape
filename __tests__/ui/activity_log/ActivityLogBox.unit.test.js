@@ -25,6 +25,7 @@ describe('ActivityLogBox', () => {
     }
     localStorage.getItem = (key) => localStorageStore[key]
     props = { uiStore, apiStore }
+    uiStore.update.mockClear()
     localStorage.clear()
     document.body.innerHTML = '<div class="Grid"></div>'
     reRender = function() {
@@ -83,7 +84,7 @@ describe('ActivityLogBox', () => {
     })
 
     it('should set current page to default comments page', () => {
-      expect(component.currentPage).toEqual('comments')
+      expect(props.uiStore.update).toHaveBeenCalledWith('activityLogPage', 'comments')
     })
 
     describe('with an existing position set in local storage', () => {
@@ -103,8 +104,8 @@ describe('ActivityLogBox', () => {
         expect(component.position).toEqual(pos)
       })
 
-      it('should use the page value from local storage', () => {
-        expect(component.currentPage).toEqual('notifications')
+      it('should update uiStore with the page value from local storage', () => {
+        expect(props.uiStore.update).toHaveBeenCalledWith('activityLogPage', 'notifications')
       })
     })
   })
@@ -146,12 +147,8 @@ describe('ActivityLogBox', () => {
       component.changePage('notifications')
     })
 
-    afterEach(() => {
-      component.currentPage = 'comments'
-    })
-
-    it('should update the currentPage', () => {
-      expect(component.currentPage).toEqual('notifications')
+    it('should update the currentPage in uiStore', () => {
+      expect(props.uiStore.update).toHaveBeenCalledWith('activityLogPage', 'notifications')
     })
 
     it('should set the local storage key for page', () => {

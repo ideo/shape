@@ -38,8 +38,6 @@ describe Api::V1::CommentsController, type: :request, json: true, auth: true do
     }
 
     before do
-      allow(ActivityAndNotificationBuilder).to receive(:new).and_return(instance_double)
-      allow(instance_double).to receive(:call).and_return(true)
       user.add_role(Role::EDITOR, comment_thread.record)
     end
 
@@ -55,12 +53,12 @@ describe Api::V1::CommentsController, type: :request, json: true, auth: true do
     end
 
     it 'creates an activity and notifications for the content' do
-      expect(ActivityAndNotificationBuilder).to receive(:new).with(
+      expect(ActivityAndNotificationBuilder).to receive(:call).with(
         actor: @user,
         target: comment_thread.record,
         action: Activity.actions[:commented],
-        subject_users: [user],
-        subject_groups: [],
+        subject_user_ids: [user.id],
+        subject_group_ids: [],
         combine: true,
         content: 'heyo',
       )

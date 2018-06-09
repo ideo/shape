@@ -230,19 +230,16 @@ class CommentThreadContainer extends React.Component {
           >
             {this.renderThreads()}
           </FlipMove>
-          <VisibilitySensor
-            offset={{
-              top: 10,
-            }}
-            partialVisibility
-            containment={this.containerDiv}
-            onChange={this.handleVisibilityChange(this.threads.length)}
-          >
-            <ScrollElement
-              name={`thread-${this.threads.length}`}
-              style={{ height: '5px' }}
-            />
-          </VisibilitySensor>
+          <ScrollElement name={`thread-${this.threads.length}`}>
+            <VisibilitySensor
+              partialVisibility
+              containment={this.containerDiv}
+              onChange={this.handleVisibilityChange(this.threads.length)}
+            >
+              {/* placeholder so that "bottomOfExpandedThread" will get triggered */}
+              <div style={{ height: '5px', position: 'relative', top: '-10px' }} />
+            </VisibilitySensor>
+          </ScrollElement>
         </ActivityContainer>
       </Fragment>
     )

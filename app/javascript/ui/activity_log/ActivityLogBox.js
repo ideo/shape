@@ -1,6 +1,6 @@
 import Rnd from 'react-rnd'
 import localStorage from 'mobx-localstorage'
-import { observable, observe, action } from 'mobx'
+import { observe, runInAction, action } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 
@@ -22,7 +22,7 @@ const MOBILE_Y = 300
 const DEFAULT = {
   x: 0,
   y: 180,
-  w: MIN_WIDTH,
+  w: MIN_WIDTH + 100,
   h: MIN_HEIGHT,
 }
 
@@ -66,7 +66,6 @@ const Action = styled.button`
 @inject('apiStore', 'uiStore')
 @observer
 class ActivityLogBox extends React.Component {
-  @observable currentPage = 'comments'
   disposer = null
 
   constructor(props) {
@@ -74,8 +73,12 @@ class ActivityLogBox extends React.Component {
     this.draggableRef = React.createRef()
     // attach observable position to UiStore so other components can know where the ALB is
     this.position = props.uiStore.activityLogPosition
-    this.position.w = MIN_WIDTH
-    this.position.h = MIN_HEIGHT
+    runInAction(() => {
+      if (this.position.w < MIN_WIDTH || this.position.h < MIN_HEIGHT) {
+        this.position.w = DEFAULT.w
+        this.position.h = DEFAULT.h
+      }
+    })
     this.disposer = observe(props.uiStore, 'activityLogOpen', change => {
       if (this.isOffscreen()) {
         this.setToDefaultPosition()
@@ -84,9 +87,10 @@ class ActivityLogBox extends React.Component {
   }
 
   @action componentDidMount() {
+    const { uiStore } = this.props
     const existingPosition = localStorage.getItem(POSITION_KEY) || { }
     const existingPage = localStorage.getItem(PAGE_KEY)
-    this.currentPage = existingPage || 'comments'
+    uiStore.update('activityLogPage', existingPage || 'comments')
     this.position.y = existingPosition.y || DEFAULT.y
     this.position.w = existingPosition.w || DEFAULT.w
     this.position.h = existingPosition.h || DEFAULT.h
@@ -96,6 +100,11 @@ class ActivityLogBox extends React.Component {
   componentWillUnmount() {
     // cancel the observer
     this.disposer()
+  }
+
+  get currentPage() {
+    const { uiStore } = this.props
+    return uiStore.activityLogPage
   }
 
   get defaultX() {
@@ -123,7 +132,8 @@ class ActivityLogBox extends React.Component {
   }
 
   @action changePage(page) {
-    this.currentPage = page
+    const { uiStore } = this.props
+    uiStore.update('activityLogPage', page)
     localStorage.setItem(PAGE_KEY, page)
   }
 

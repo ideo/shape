@@ -64,6 +64,7 @@ export default class UiStore {
   @observable activityLogOpen = false
   @observable activityLogForceWidth = null
   @observable activityLogPosition = { x: 0, y: 0, w: 1, h: 1 }
+  @observable activityLogPage = 'comments'
 
   // Comments + Threads
   @observable commentsOpen = false
