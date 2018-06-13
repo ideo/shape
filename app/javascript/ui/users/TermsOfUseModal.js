@@ -40,14 +40,14 @@ const StyledDialog = styled(Dialog)`
     font-size: 1rem;
     font-family: ${v.fonts.serif};
     &--error {
-      color: ${v.colors.error};
+      color: ${v.colors.orange};
     }
   }
   .checkbox--color {
-    color: ${v.colors.blue};
+    color: ${v.colors.pacificBlue};
   }
   .checkbox--error {
-    color: ${v.colors.error};
+    color: ${v.colors.orange};
   }
 
   .footer {

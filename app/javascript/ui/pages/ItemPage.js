@@ -1,7 +1,6 @@
 import { Fragment } from 'react'
 import ReactRouterPropTypes from 'react-router-prop-types'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
-import { Flex, Box } from 'reflexbox'
 import styled from 'styled-components'
 import { Link } from 'react-router-dom'
 
@@ -10,18 +9,14 @@ import ActionCableConsumer from '~/utils/ActionCableConsumer'
 import PageWithApi from '~/ui/pages/PageWithApi'
 import PageContainer from '~/ui/layout/PageContainer'
 import Loader from '~/ui/layout/Loader'
-import Header from '~/ui/layout/Header'
-import Breadcrumb from '~/ui/layout/Breadcrumb'
 import TextItem from '~/ui/items/TextItem'
 import ImageItem from '~/ui/items/ImageItem'
 import VideoItem from '~/ui/items/VideoItem'
+import PageHeader from '~/ui/pages/shared/PageHeader'
 import CloseIcon from '~/ui/icons/CloseIcon'
 import v, { ITEM_TYPES } from '~/utils/variables'
-import EditableName from './shared/EditableName'
-import PageMenu from './shared/PageMenu'
-import { StyledTitleAndRoles } from './shared/styled'
 
-const ItemPageContainer = styled.main`
+const ItemPageContainer = styled.div`
   background: white;
   min-height: 75vh;
   position: relative;
@@ -74,9 +69,12 @@ class ItemPage extends PageWithApi {
   }
 
   onAPILoad = (response) => {
+    const { apiStore, uiStore } = this.props
     const item = response.data
     this.setState({ item })
+    uiStore.setViewingItem(item)
     if (item.parent) item.parent.checkCurrentOrg()
+    apiStore.findOrBuildCommentThread(item)
   }
 
   updateItem = (itemTextData) => {
@@ -132,32 +130,12 @@ class ItemPage extends PageWithApi {
     // this.error comes from PageWithApi
     if (this.error) return <PageError error={this.error} />
 
-    const { uiStore } = this.props
     const { item } = this.state
     if (!item) return <Loader />
 
     return (
       <Fragment>
-        <Header>
-          <Breadcrumb items={item.breadcrumb} />
-          <StyledTitleAndRoles justify="space-between">
-            <Box className="title">
-              <EditableName
-                name={item.name}
-                updateNameHandler={this.updateItemName}
-                canEdit={item.can_edit}
-              />
-            </Box>
-            <Flex align="baseline" className="item-page">
-              <PageMenu
-                record={item}
-                canEdit={item.can_edit}
-                menuOpen={uiStore.pageMenuOpen}
-                disablePermissions
-              />
-            </Flex>
-          </StyledTitleAndRoles>
-        </Header>
+        <PageHeader record={item} />
         <ItemPageContainer>
           <PageContainer>
             {/* TODO: calculate item container size? */}

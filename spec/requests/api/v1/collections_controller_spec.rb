@@ -313,6 +313,17 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
       expect(collection_card.reload.archived?).to eq(true)
     end
 
+    it 'should call the activity and notification builder' do
+      expect(ActivityAndNotificationBuilder).to receive(:call).with(
+        actor: @user,
+        target: collection,
+        action: Activity.actions[:archived],
+        subject_user_ids: [user.id],
+        subject_group_ids: [],
+      )
+      patch(path)
+    end
+
     context 'without edit access' do
       before do
         user.remove_role(Role::EDITOR, collection)

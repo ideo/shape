@@ -3,6 +3,7 @@ import styled from 'styled-components'
 import v from '~/utils/variables'
 
 const Tooltip = styled(MuiTooltip)`
+  position: relative;
   .Tooltip {
     font-size: 0.75rem;
     font-family: ${v.fonts.sans};

@@ -172,6 +172,17 @@ describe Api::V1::GroupsController, type: :request, json: true, auth: true do
       expect(group.reload.roles_to_resources.count).to eq(0)
     end
 
+    it 'notifies the editors that the item was archived' do
+      group.archived = true
+      expect(ActivityAndNotificationBuilder).to receive(:call).with(
+        actor: @user,
+        target: group,
+        action: Activity.actions[:archived],
+        subject_user_ids: (members << user).pluck(:id),
+      )
+      patch(path)
+    end
+
     context 'without admin access' do
       before do
         user.remove_role(Role::ADMIN, group)

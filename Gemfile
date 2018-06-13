@@ -33,7 +33,6 @@ gem 'jbuilder', '~> 2.5'
 
 # Devise for auth
 gem 'devise'
-gem 'omniauth-oauth2'
 gem 'omniauth-ideo', git: 'https://github.com/ideo/omniauth-ideo.git'
 
 # Webpacker
@@ -86,6 +85,12 @@ gem 'dalli', '~> 2.7'
 
 gem 'bootsnap', require: false
 
+# easy pagination
+gem 'kaminari', '~> 1.1'
+
+# google auth + firestore
+gem 'google-cloud-firestore', '~> 0.21.0'
+gem 'jwt', '~> 1.5'
 
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console

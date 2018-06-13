@@ -10,6 +10,7 @@ export const KEYS = {
 }
 
 export default {
+  globalHeaderHeight: 73,
   headerHeight: 192,
   headerHeightCompact: 100,
   maxWidth: 1320,
@@ -32,13 +33,17 @@ export default {
     cararra: '#f2f1ee',
     desert: '#f5f4f3',
     cyan: '#c0dbde',
-    blue: '#00a0e0',
+    pacificBlue: '#00a0e0',
+    activityLightBlue: '#73808f',
+    activityMedBlue: '#5a6a7c',
+    activityDarkBlue: '#3f526a',
+    activityDarkestBlue: '#242d37',
     aquaHaze: '#f0f4f6',
     gray: '#c6c1bf',
     cloudy: '#a89f9b',
     sirocco: '#6a7c7e',
     blackLava: '#120f0e',
-    error: '#d66742',
+    orange: '#d66742',
   },
 
   iconSizes: {
@@ -58,13 +63,18 @@ export default {
   zIndex: {
     aboveClickWrapper: 501,
     clickWrapper: 500,
+    activityLog: 201,
     popoutMenu: 201,
-    header: 200,
+    globalHeader: 200,
+    pageHeader: 199,
     scrollIndicator: 200,
     cardDragging: 160,
     gridCard: 150,
     gridCardTop: 151,
+    commentMentions: 100,
+    commentHeader: 10,
     itemClose: 10,
+    floatOverContent: 2,
     gridCardBg: 1,
   },
 

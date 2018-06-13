@@ -2,6 +2,7 @@ class Group < ApplicationRecord
   include Resourceable
   include HasFilestackFile
   include Archivable
+  include HasActivities
   after_archive :after_archive_group
 
   prepend RolifyExtensions # Prepend so it can call rolify methods using super
@@ -27,6 +28,10 @@ class Group < ApplicationRecord
   belongs_to :current_shared_collection,
              class_name: 'Collection',
              optional: true
+  has_many :groups_threads
+
+  has_many :activities_as_subject, through: :activity_subjects, class_name: 'Activity'
+  has_many :activity_subjects, as: :subject
 
   before_validation :set_handle_if_none, on: :create
 
@@ -39,6 +44,18 @@ class Group < ApplicationRecord
   validates :handle,
             format: { with: /[a-zA-Z0-9\-\_]+/ },
             if: :validate_handle?
+
+  # Searchkick Config
+  searchkick callbacks: :async, word_start: %i[name handle]
+
+  def search_data
+    {
+      name: name,
+      handle: handle,
+      # listing this way makes it easier to search Users/Groups together
+      organization_ids: [organization_id],
+    }
+  end
 
   # Default for .roles are those where a
   # user is admin/member of this group
@@ -56,16 +73,6 @@ class Group < ApplicationRecord
       .where.not(resource_id: current_shared_collection_id)
       .joins(:groups_roles)
       .where(GroupsRole.arel_table[:group_id].in(id))
-  end
-
-  # really meant to be used on an AR Relation, where `select` is just the relevant records
-  def self.user_ids
-    identifiers = select(:id).map(&:resource_identifier)
-    UsersRole
-      .joins(:role)
-      .where(Role.arel_table[:resource_identifier].in(identifiers))
-      .pluck(:user_id)
-      .uniq
   end
 
   # Roles where a user is admin/viewer of this group
@@ -121,6 +128,7 @@ class Group < ApplicationRecord
   def after_archive_group
     remove_group_from_resources
     archive_group_handle
+    unfollow_group_users_from_group_threads
   end
 
   def remove_group_from_resources
@@ -140,5 +148,14 @@ class Group < ApplicationRecord
 
   def archive_group_handle
     update(handle: "#{handle}-archived-#{Time.now.to_i}")
+  end
+
+  def unfollow_group_users_from_group_threads
+    thread_ids = groups_threads.pluck(:comment_thread_id)
+    return if thread_ids.empty?
+    RemoveCommentThreadFollowers.perform_async(
+      thread_ids,
+      user_ids,
+    )
   end
 end

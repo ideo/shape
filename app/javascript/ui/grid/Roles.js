@@ -12,15 +12,15 @@ class Roles extends React.Component {
   }
 
   onSave = (res) => {
-    const { apiStore, collection } = this.props
+    const { apiStore, record } = this.props
     // TODO why is the API sometimes returning an {} vs [] here?
     let formattedRes = res.data
     if (!_.isArray(res.data)) formattedRes = [res.data]
-    apiStore.find('collections', collection.id).roles = formattedRes
+    apiStore.find(record.internalType, record.id).roles = formattedRes
   }
 
   render() {
-    const { roles, uiStore, collection } = this.props
+    const { roles, uiStore, record } = this.props
 
     return (
       <Modal
@@ -29,9 +29,9 @@ class Roles extends React.Component {
         open={uiStore.rolesMenuOpen}
       >
         <RolesMenu
-          canEdit={collection.can_edit}
-          ownerId={collection.id}
-          ownerType="collections"
+          canEdit={record.can_edit}
+          ownerId={record.id}
+          ownerType={record.internalType}
           title="Shared with"
           roles={roles}
           onSave={this.onSave}
@@ -42,7 +42,7 @@ class Roles extends React.Component {
 }
 
 Roles.propTypes = {
-  collection: MobxPropTypes.objectOrObservableObject.isRequired,
+  record: MobxPropTypes.objectOrObservableObject.isRequired,
   roles: MobxPropTypes.arrayOrObservableArray,
 }
 Roles.wrappedComponent.propTypes = {
