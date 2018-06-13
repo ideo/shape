@@ -68,6 +68,10 @@ class CommentThreadContainer extends React.Component {
     })
   }
 
+  componentDidMount() {
+    this.jumpToCurrentThread()
+  }
+
   componentWillUnmount() {
     // cancel the observers
     _.each(this.disposers, disposer => disposer())
@@ -125,10 +129,12 @@ class CommentThreadContainer extends React.Component {
 
   get showJumpToThreadButton() {
     const { uiStore } = this.props
+    const { expandedThread } = this
     return (uiStore.viewingRecord &&
         (uiStore.viewingRecord.isNormalCollection ||
         uiStore.viewingRecord.internalType === 'items')
     ) &&
+      expandedThread &&
       uiStore.viewingRecord !== this.expandedThread.record
   }
 
