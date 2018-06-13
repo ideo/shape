@@ -4,6 +4,7 @@ class Item < ApplicationRecord
   include Archivable
   include HasFilestackFile
   include RealtimeEditorsViewers
+  include HasActivities
 
   resourceable roles: [Role::EDITOR, Role::VIEWER],
                edit_role: Role::EDITOR,
@@ -11,6 +12,7 @@ class Item < ApplicationRecord
 
   archivable as: :parent_collection_card,
              with: %i[cards_linked_to_this_item]
+  after_archive :remove_comment_followers!
 
   acts_as_taggable
 
@@ -26,9 +28,13 @@ class Item < ApplicationRecord
            class_name: 'CollectionCard::Link',
            inverse_of: :item
 
+  has_many :activities,
+           as: :object_acted_upon
+
   delegate :parent, to: :parent_collection_card, allow_nil: true
   delegate :organization, to: :parent, allow_nil: true
   belongs_to :cloned_from, class_name: 'Item', optional: true
+  has_one :comment_thread, as: :record, dependent: :destroy
 
   before_validation :format_url, if: :saved_change_to_url?
   before_create :generate_name, unless: :name?
@@ -131,6 +137,11 @@ class Item < ApplicationRecord
       self.cached_tag_list = self.tag_list
     end
     cached_attributes
+  end
+
+  def remove_comment_followers!
+    return unless comment_thread.present?
+    RemoveCommentThreadFollowers.perform_async(comment_thread.id)
   end
 
   private

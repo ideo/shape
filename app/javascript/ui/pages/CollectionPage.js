@@ -2,21 +2,14 @@ import { Fragment } from 'react'
 import ReactRouterPropTypes from 'react-router-prop-types'
 import { observable } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
-import { Flex, Box } from 'reflexbox'
 
 import PageError from '~/ui/global/PageError'
 import PageWithApi from '~/ui/pages/PageWithApi'
 import Loader from '~/ui/layout/Loader'
-import Header from '~/ui/layout/Header'
 import PageContainer from '~/ui/layout/PageContainer'
 import CollectionGrid from '~/ui/grid/CollectionGrid'
-import Breadcrumb from '~/ui/layout/Breadcrumb'
 import MoveModal from '~/ui/grid/MoveModal'
-import RolesSummary from '~/ui/roles/RolesSummary'
-import Roles from '~/ui/grid/Roles'
-import EditableName from './shared/EditableName'
-import PageMenu from './shared/PageMenu'
-import { StyledTitleAndRoles } from './shared/styled'
+import PageHeader from '~/ui/pages/shared/PageHeader'
 
 const isHomepage = ({ path }) => path === '/'
 
@@ -29,11 +22,6 @@ class CollectionPage extends PageWithApi {
     if (nextProps.match.params.id !== this.props.match.params.id) {
       this.props.uiStore.closeBlankContentTool()
     }
-  }
-
-  componentWillUnmount() {
-    const { uiStore } = this.props
-    uiStore.setViewingCollection(null)
   }
 
   get isHomepage() {
@@ -64,19 +52,20 @@ class CollectionPage extends PageWithApi {
   }
 
   onAPILoad = (response) => {
+    this.updateError(null)
     const collection = response.data
-    const { uiStore } = this.props
+    const { apiStore, uiStore } = this.props
     uiStore.setViewingCollection(collection)
     // setViewingCollection has to happen first bc we use it in openBlankContentTool
     if (!collection.collection_cards.length) {
       uiStore.openBlankContentTool()
     }
     collection.checkCurrentOrg()
-  }
-
-  showObjectRoleDialog = () => {
-    const { uiStore } = this.props
-    uiStore.update('rolesMenuOpen', true)
+    if (collection.isNormalCollection) {
+      apiStore.findOrBuildCommentThread(collection)
+    } else {
+      apiStore.clearUnpersistedThreads()
+    }
   }
 
   updateCollection = () => {
@@ -96,8 +85,7 @@ class CollectionPage extends PageWithApi {
 
     const { collection } = this
     const { uiStore } = this.props
-    if (!collection) return <Loader />
-    const breadcrumb = this.isHomepage ? [] : collection.breadcrumb
+    if (!collection || collection.can_edit === undefined) return <Loader />
     const { movingCardIds, cardAction } = uiStore
     // only tell the Grid to hide "movingCards" if we're moving and not linking
     const uiMovingCardIds = cardAction === 'move' ? movingCardIds : []
@@ -106,39 +94,11 @@ class CollectionPage extends PageWithApi {
 
     return (
       <Fragment>
-        <Header>
-          <Breadcrumb items={breadcrumb} />
-          <StyledTitleAndRoles justify="space-between">
-            <Box className="title">
-              <EditableName
-                name={collection.name}
-                updateNameHandler={this.updateCollectionName}
-                canEdit={collection.can_edit && !this.collection.isUserCollection}
-              />
-            </Box>
-            <Flex align="baseline">
-              {this.collection.isNormalCollection &&
-                <Fragment>
-                  <RolesSummary
-                    handleClick={this.showObjectRoleDialog}
-                    roles={collection.roles}
-                    canEdit={collection.can_edit}
-                  />
-                  <PageMenu
-                    record={collection}
-                    menuOpen={uiStore.pageMenuOpen}
-                    canEdit={collection.can_edit}
-                  />
-                </Fragment>
-              }
-            </Flex>
-          </StyledTitleAndRoles>
-        </Header>
+        <PageHeader
+          record={collection}
+          isHomepage={this.isHomepage}
+        />
         <PageContainer>
-          <Roles
-            collection={collection}
-            roles={collection.roles}
-          />
           <CollectionGrid
             // pull in cols, gridW, gridH, gutter
             {...uiStore.gridSettings}

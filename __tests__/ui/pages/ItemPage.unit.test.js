@@ -38,11 +38,4 @@ describe('ItemPage', () => {
   it('renders the ItemPageContainer', () => {
     expect(wrapper.find('ItemPageContainer').exists()).toEqual(true)
   })
-
-  it('displays the item name', () => {
-    // apply the state to re-render
-    wrapper.update()
-    expect(wrapper.find('EditableName').exists()).toEqual(true)
-    expect(wrapper.find('EditableName').props().name).toEqual(item.name)
-  })
 })

@@ -37,53 +37,8 @@ describe('CollectionPage', () => {
     expect(apiStore.find).toBeCalledWith('collections', match.params.id)
   })
 
-  it('displays the collection name', () => {
-    expect(wrapper.find('EditableName').exists()).toEqual(true)
-    expect(wrapper.find('EditableName').props().name).toEqual(collection.name)
-  })
-
-  it('passes canEdit = false to EditableName', () => {
-    expect(wrapper.find('EditableName').props().canEdit).toEqual(false)
-  })
-
-  it('passes canEdit = false to RolesSummary', () => {
-    expect(wrapper.find('RolesSummary').props().canEdit).toEqual(false)
-  })
-
   it('passes collection to the CollectionGrid', () => {
     const grid = wrapper.find('CollectionGrid')
     expect(grid.props().collection).toBe(collection)
-  })
-
-  it('shows the roles edit menu on click of roles summary add button', () => {
-    wrapper.instance().showObjectRoleDialog()
-    expect(uiStore.update).toHaveBeenCalledWith('rolesMenuOpen', true)
-  })
-
-  describe('as editor', () => {
-    beforeEach(() => {
-      collection.can_edit = true
-      wrapper = shallow(
-        <CollectionPage.wrappedComponent {...props} />
-      )
-    })
-
-    it('passes canEdit = true to EditableName', () => {
-      expect(wrapper.find('EditableName').props().canEdit).toEqual(true)
-    })
-
-    it('passes canEdit = true to RolesSummary', () => {
-      expect(wrapper.find('RolesSummary').props().canEdit).toEqual(true)
-    })
-
-    it('passes canEdit = false to EditableName if it is a UserCollection', () => {
-      collection.isUserCollection = true
-      wrapper = shallow(
-        <CollectionPage.wrappedComponent {...props} />
-      )
-      // set it back for any later tests
-      collection.isUserCollection = false
-      expect(wrapper.find('EditableName').props().canEdit).toEqual(false)
-    })
   })
 })

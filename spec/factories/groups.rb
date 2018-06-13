@@ -6,10 +6,7 @@ FactoryBot.define do
     end
     organization
     name { Faker::Team.name }
-    # Sequence necessary to get unique handles
-    sequence(:handle) do |n|
-      "#{n}-#{Faker::Dessert.flavor.parameterize.gsub(/\w+/, '')}"
-    end
+    handle { Faker::Internet.unique.slug }
 
     after(:create) do |group, evaluator|
       if evaluator.add_admins.present?

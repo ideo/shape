@@ -1,5 +1,5 @@
 FactoryBot.define do
-  factory :user do
+  factory :user, aliases: %i[author] do
     transient do
       add_to_org nil
     end
@@ -7,6 +7,7 @@ FactoryBot.define do
     email { Faker::Internet.unique.email }
     first_name { Faker::Name.first_name }
     last_name { Faker::Name.last_name }
+    handle { Faker::Internet.unique.slug }
     uid { SecureRandom.hex(15) }
     provider 'ideo'
     pic_url_square 'https://a3-images.myspacecdn.com/images03/1/240e42b5d9ce48a78983961e7fcb3c39/600x600.jpg'

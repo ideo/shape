@@ -2,6 +2,7 @@ import _ from 'lodash'
 
 const fakeJsonApiAttrs = {
   assign: jest.fn(),
+  assignRef: jest.fn(),
   save: jest.fn(),
 }
 
@@ -13,6 +14,7 @@ export const fakeTextItemAttrs = {
   breadcrumb: [['collections', 1, 'Some collection'], ['items', 1, 'my item']],
   parentPath: '/',
   can_edit: false,
+  internalType: 'items',
 }
 export const fakeTextItem = {
   ...fakeTextItemAttrs,
@@ -103,6 +105,8 @@ export const fakeCollection = {
   cardIds: _.map(fakeCards, c => c.id),
   API_archive: jest.fn(),
   checkCurrentOrg: jest.fn(),
+  internalType: 'collections',
+  ...fakeJsonApiAttrs,
 }
 export const fakeGroupAttrs = {
   id: 1,
@@ -132,6 +136,7 @@ export const fakeUserAttrs = {
   id: 1,
   first_name: 'Oprah',
   last_name: 'Winfrey',
+  name: 'Oprah Winfrey',
   email: 'oprah@winfrey.com',
   pic_url_square: 'https://filestackcdn.com/abc123',
   groups: [],
@@ -170,4 +175,46 @@ export const fakePosition = {
   yPos: 0,
   height: 1,
   width: 1,
+}
+export const fakeComment = {
+  id: 1,
+  author: fakeUser,
+  message: 'This is my message to the world.',
+  updated_at: new Date(),
+}
+export const fakeThread = {
+  id: 1,
+  record: fakeCollection,
+  key: 'collection-1',
+  unread_count: 2,
+  comments: [
+    fakeComment, fakeComment, fakeComment
+  ],
+  latestUnreadComments: [
+    fakeComment, fakeComment
+  ],
+  API_saveComment: jest.fn().mockReturnValue(Promise.resolve({})),
+}
+export const fakeActivity = {
+  id: 1,
+  type: 'activities',
+  action: 'archived',
+  actor: fakeUser,
+  created_at: new Date(),
+  subject_users: [],
+  subject_groups: [],
+  target: fakeCollection,
+  target_type: 'Collection',
+  target_id: fakeCollection.id,
+  ...fakeJsonApiAttrs,
+}
+export const fakeNotification = {
+  id: 1,
+  type: 'notifications',
+  read: false,
+  activity: fakeActivity,
+  combined_actors: [],
+  combined_activities_ids: [],
+  user: fakeUser,
+  ...fakeJsonApiAttrs,
 }

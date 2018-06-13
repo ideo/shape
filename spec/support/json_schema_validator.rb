@@ -20,9 +20,6 @@ class JSONSchemaValidator
 
   def all_schemas
     Dir.glob("#{dir}/*.json").map do |fullpath|
-      ext = File.extname(fullpath)
-      filename = File.basename(fullpath)
-      name = File.basename(fullpath, ext)
       json = JSON.parse(File.read(fullpath))
 
       JSON::Schema.new(json, fullpath)

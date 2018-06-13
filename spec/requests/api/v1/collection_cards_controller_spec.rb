@@ -207,7 +207,7 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
   end
 
   describe 'PATCH #archive' do
-    let!(:collection_card) { create(:collection_card, parent: collection) }
+    let!(:collection_card) { create(:collection_card_collection, parent: collection) }
     let(:path) { "/api/v1/collection_cards/#{collection_card.id}/archive" }
 
     it 'returns a 200' do
@@ -225,10 +225,25 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
       patch(path)
       expect(collection_card.reload.archived).to eq(true)
     end
+
+    it 'notifies the users and groups' do
+      collection_card.archived = true
+      collection_card.record.archived = true
+      expect(ActivityAndNotificationBuilder).to receive(:call).with(
+        actor: @user,
+        target: collection_card.record,
+        action: Activity.actions[:archived],
+        subject_user_ids: [],
+        subject_group_ids: [],
+      )
+      patch(path)
+    end
   end
 
   describe 'PATCH #move' do
-    let!(:from_collection) { create(:collection, num_cards: 3, add_editors: [user]) }
+    let!(:from_collection) do
+      create(:collection, organization: to_collection.organization, num_cards: 3, add_editors: [user])
+    end
     let!(:moving_cards) { from_collection.collection_cards.first(2) }
     let!(:unmoved_card) { from_collection.collection_cards.last }
     let(:path) { '/api/v1/collection_cards/move' }

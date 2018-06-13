@@ -2,12 +2,14 @@ class Collection < ApplicationRecord
   include Breadcrumbable
   include Resourceable
   include Archivable
+  include HasActivities
   resourceable roles: [Role::EDITOR, Role::VIEWER],
                edit_role: Role::EDITOR,
                view_role: Role::VIEWER
 
   archivable as: :parent_collection_card,
              with: %i[collection_cards cards_linked_to_this_collection]
+  after_archive :remove_comment_followers!
   acts_as_taggable
 
   store_accessor :cached_attributes,
@@ -17,6 +19,7 @@ class Collection < ApplicationRecord
   after_save :touch_related_cards, if: :saved_change_to_updated_at?
   after_commit :reindex_sync, on: :create
   after_commit :recalculate_child_breadcrumbs_async, if: :saved_change_to_name?
+  after_commit :update_comment_thread_in_firestore
 
   # all cards including archived (i.e. undo default :collection_cards scope)
   has_many :all_collection_cards,
@@ -64,6 +67,8 @@ class Collection < ApplicationRecord
   has_many :items_and_linked_items,
            through: :collection_cards,
            source: :item
+
+  has_one :comment_thread, as: :record, dependent: :destroy
 
   delegate :parent, to: :parent_collection_card, allow_nil: true
 
@@ -145,7 +150,7 @@ class Collection < ApplicationRecord
       roles: %i[users groups resource],
       collection_cards: [
         :parent,
-        record: %i[filestack_file],
+        record: [:filestack_file],
       ],
     ]
   end
@@ -159,7 +164,7 @@ class Collection < ApplicationRecord
       collection_cards: [
         :parent,
         :collection,
-        item: %i[filestack_file],
+        item: [:filestack_file],
       ],
     ]
   end
@@ -239,6 +244,11 @@ class Collection < ApplicationRecord
     name
   end
 
+  def resourceable_class
+    # Use top-level class since this is an STI model
+    Collection
+  end
+
   def recalculate_child_breadcrumbs_async
     BreadcrumbRecalculationWorker.perform_async(id)
   end
@@ -316,6 +326,11 @@ class Collection < ApplicationRecord
       "/roles_#{roles.maximum(:updated_at).to_i}"
   end
 
+  def remove_comment_followers!
+    return unless comment_thread.present?
+    RemoveCommentThreadFollowers.perform_async(comment_thread.id)
+  end
+
   private
 
   def organization_blank?
@@ -341,5 +356,11 @@ class Collection < ApplicationRecord
     return true if organization.present?
     return true unless parent_collection.present?
     self.organization_id = parent_collection.organization_id
+  end
+
+  def update_comment_thread_in_firestore
+    return unless comment_thread.present?
+    return unless saved_change_to_name? || saved_change_to_cached_attributes?
+    comment_thread.store_in_firestore
   end
 end

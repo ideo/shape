@@ -21,6 +21,13 @@ const fakeUiStore = {
     cancelText: 'Cancel',
     onClose: jest.fn(),
   },
+  activityLogOpen: false,
+  activityLogPosition: {
+    x: 0,
+    y: 0,
+    h: 1,
+    w: 1,
+  },
   scroll: {
     scrollToTop: jest.fn(),
     scrollToBottom: jest.fn(),
@@ -33,9 +40,11 @@ const fakeUiStore = {
   selectedCardIds: [],
   selectCardId: jest.fn(),
   setViewingCollection: jest.fn(),
+  setViewingItem: jest.fn(),
   viewingCollection: null,
   movingFromCollectionId: null,
   movingCardIds: [],
+  activityLogOpen: false,
   openMoveMenu: jest.fn(),
   update: jest.fn(),
   alert: jest.fn(),
@@ -46,7 +55,12 @@ const fakeUiStore = {
   cardAction: 'move',
   blurContent: false,
   organizationMenuPage: 'organizationMenuPage',
+  organizationMenuGroupId: null,
+  expandedThreadKey: null,
+  expandThread: jest.fn(),
+  openGroup: jest.fn(),
   editingName: false,
+  activityLogPage: 'comments',
 }
 
 export default fakeUiStore

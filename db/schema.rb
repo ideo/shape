@@ -10,11 +10,35 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180518214410) do
+ActiveRecord::Schema.define(version: 20180604225632) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
   enable_extension "pg_stat_statements"
+
+  create_table "activities", force: :cascade do |t|
+    t.bigint "actor_id"
+    t.string "target_type"
+    t.bigint "target_id"
+    t.integer "action"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "organization_id"
+    t.text "content"
+    t.index ["actor_id"], name: "index_activities_on_actor_id"
+    t.index ["organization_id"], name: "index_activities_on_organization_id"
+    t.index ["target_type", "target_id"], name: "index_activities_on_target_type_and_target_id"
+  end
+
+  create_table "activity_subjects", force: :cascade do |t|
+    t.bigint "activity_id"
+    t.string "subject_type"
+    t.bigint "subject_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["activity_id"], name: "index_activity_subjects_on_activity_id"
+    t.index ["subject_type", "subject_id"], name: "index_activity_subjects_on_subject_type_and_subject_id"
+  end
 
   create_table "collection_cards", force: :cascade do |t|
     t.integer "order", null: false
@@ -45,6 +69,26 @@ ActiveRecord::Schema.define(version: 20180518214410) do
     t.jsonb "cached_attributes"
     t.index ["cloned_from_id"], name: "index_collections_on_cloned_from_id"
     t.index ["organization_id"], name: "index_collections_on_organization_id"
+  end
+
+  create_table "comment_threads", force: :cascade do |t|
+    t.integer "record_id"
+    t.string "record_type"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "organization_id"
+    t.index ["organization_id"], name: "index_comment_threads_on_organization_id"
+    t.index ["record_id"], name: "index_comment_threads_on_record_id", unique: true
+  end
+
+  create_table "comments", force: :cascade do |t|
+    t.integer "comment_thread_id"
+    t.integer "author_id"
+    t.text "message"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.jsonb "draftjs_data"
+    t.index ["comment_thread_id"], name: "index_comments_on_comment_thread_id"
   end
 
   create_table "filestack_files", force: :cascade do |t|
@@ -78,6 +122,13 @@ ActiveRecord::Schema.define(version: 20180518214410) do
     t.index ["role_id"], name: "index_groups_roles_on_role_id"
   end
 
+  create_table "groups_threads", force: :cascade do |t|
+    t.bigint "group_id"
+    t.bigint "comment_thread_id"
+    t.datetime "created_at", null: false
+    t.index ["group_id", "comment_thread_id"], name: "by_groups_comment_thread", unique: true
+  end
+
   create_table "items", force: :cascade do |t|
     t.string "name"
     t.string "type"
@@ -94,6 +145,17 @@ ActiveRecord::Schema.define(version: 20180518214410) do
     t.string "thumbnail_url"
     t.jsonb "cached_attributes"
     t.index ["cloned_from_id"], name: "index_items_on_cloned_from_id"
+  end
+
+  create_table "notifications", force: :cascade do |t|
+    t.boolean "read", default: false
+    t.bigint "activity_id"
+    t.bigint "user_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.integer "combined_activities_ids", default: [], array: true
+    t.index ["activity_id"], name: "index_notifications_on_activity_id"
+    t.index ["user_id"], name: "index_notifications_on_user_id"
   end
 
   create_table "organizations", force: :cascade do |t|
@@ -165,7 +227,9 @@ ActiveRecord::Schema.define(version: 20180518214410) do
     t.integer "current_user_collection_id"
     t.boolean "terms_accepted", default: false
     t.boolean "show_helper", default: true
+    t.string "handle"
     t.index ["email"], name: "index_users_on_email"
+    t.index ["handle"], name: "index_users_on_handle", unique: true
     t.index ["invitation_token"], name: "index_users_on_invitation_token"
     t.index ["provider", "uid"], name: "index_users_on_provider_and_uid", unique: true
   end
@@ -176,6 +240,14 @@ ActiveRecord::Schema.define(version: 20180518214410) do
     t.index ["role_id"], name: "index_users_roles_on_role_id"
     t.index ["user_id", "role_id"], name: "index_users_roles_on_user_id_and_role_id", unique: true
     t.index ["user_id"], name: "index_users_roles_on_user_id"
+  end
+
+  create_table "users_threads", force: :cascade do |t|
+    t.bigint "user_id"
+    t.bigint "comment_thread_id"
+    t.datetime "last_viewed_at"
+    t.datetime "created_at", null: false
+    t.index ["user_id", "comment_thread_id"], name: "by_users_comment_thread", unique: true
   end
 
   add_foreign_key "collections", "organizations"

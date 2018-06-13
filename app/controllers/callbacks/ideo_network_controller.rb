@@ -43,6 +43,7 @@ class Callbacks::IdeoNetworkController < ApplicationController
       :last_name,
       :email,
       :picture,
+      :username,
     )
   end
 

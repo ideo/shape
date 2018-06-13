@@ -1,4 +1,3 @@
-import { apiStore } from '~/stores'
 import Collection from '~/stores/jsonApi/Collection'
 
 import fakeApiStore from '#/mocks/fakeApiStore'
@@ -7,6 +6,11 @@ import {
   fakeRole,
   fakeUser,
 } from '#/mocks/data'
+
+// https://stackoverflow.com/questions/47402005/jest-mock-how-to-mock-es6-class-default-import-using-factory-parameter/47502477#47502477
+jest.mock('../../../app/javascript/stores/ApiStore', () => (
+  jest.fn().mockImplementation(() => {})
+))
 
 describe('Collection', () => {
   let collection

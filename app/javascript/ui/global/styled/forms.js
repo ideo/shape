@@ -2,7 +2,10 @@ import Chip from 'material-ui/Chip'
 import MuiSelect from 'material-ui/Select'
 import { MenuItem } from 'material-ui/Menu'
 import AutosizeInput from 'react-input-autosize'
+import TextareaAutosize from 'react-autosize-textarea'
 import styled from 'styled-components'
+
+import hexToRgba from '~/utils/hexToRgba'
 import v from '~/utils/variables'
 
 /** @component */
@@ -164,6 +167,12 @@ export const Select = styled(MuiSelect)`
     background-color: transparent;
     &:focus { background-color: transparent; }
     &:hover { background-color: transparent; }
+
+    li {
+      font-family: ${v.fonts.sans};
+      font-size: 1rem;
+      font-weight: ${v.weights.book};
+    }
   }
 `
 Select.displayName = 'StyledSelect'
@@ -217,5 +226,68 @@ export const EditAvatarButton = styled.button`
     cursor: pointer;
     opacity: 0.75;
     `
-}
+}`
+EditAvatarButton.displayName = 'EditAvatarButton'
+
+/** @component */
+export const CommentForm = styled.form`
+  min-height: 50px;
+  position: relative;
+  /* NOTE: 'sticky' is not fully browser supported */
+  z-index: ${v.zIndex.commentMentions};
+  position: sticky;
+  bottom: 0;
+  width: calc(100% - 10px);
+  border-top: 4px solid ${v.colors.activityDarkBlue};
+  background: ${v.colors.activityDarkBlue};
+  background: linear-gradient(
+    ${hexToRgba(v.colors.activityDarkBlue, 0)} 0,
+    ${v.colors.activityDarkBlue} 10%,
+    ${v.colors.activityDarkBlue} 100%
+  );
+  button {
+    position: absolute;
+    right: 18px;
+    top: 14px;
+    width: 18px;
+    height: 18px;
+  }
+  .textarea-input {
+    background: ${v.colors.activityMedBlue};
+    margin: 0 5px 0 68px;
+    width: calc(100% - 68px);
+  }
+
 `
+CommentForm.displayName = 'CommentForm'
+
+export const StyledCommentTextarea = styled.div`
+  textarea {
+    resize: none;
+    padding: 10px;
+    font-size: 1rem;
+    font-family: ${v.fonts.serif};
+    border: none;
+    background: none;
+
+    :focus {
+      border: none;
+      outline: none;
+    }
+    ::placeholder {
+      color: ${v.colors.gray};
+    }
+    /* TODO: cross-browser friendly way to hide scrollbar?
+      note this is only for a really long comment (>6 rows) */
+    ::-webkit-scrollbar {
+      background: none;
+    }
+  }
+`
+
+/** @component */
+export const CommentTextarea = props => (
+  <StyledCommentTextarea>
+    <TextareaAutosize {...props} />
+  </StyledCommentTextarea>
+)

@@ -6,7 +6,10 @@ class Api::V1::UsersController < Api::V1::BaseController
     # show all other active users in the system
     # i.e. like Trello, is not limited to your org but anyone who's registered
     @users = User.all_active_except(current_user.id)
-    render jsonapi: @users
+    render jsonapi: @users, fields:
+      {
+        users: User.basic_api_fields,
+      }
   end
 
   load_and_authorize_resource only: %i[show]
@@ -23,7 +26,11 @@ class Api::V1::UsersController < Api::V1::BaseController
       :groups,
       organizations: %i[primary_group],
       current_organization: %i[primary_group guest_group],
-    ]
+    ], class: {
+      User: SerializableCurrentUser,
+      Group: SerializableGroup,
+      Organization: SerializableOrganization,
+    }
   end
 
   def search
@@ -66,10 +73,6 @@ class Api::V1::UsersController < Api::V1::BaseController
   def load_and_authorize_organization
     @organization = Organization.find(json_api_params[:organization_id])
     authorize! :read, @organization
-  end
-
-  def json_api_params
-    params[:_jsonapi]
   end
 
   def user_params

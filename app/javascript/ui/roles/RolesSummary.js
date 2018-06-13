@@ -11,6 +11,7 @@ const AVATAR_SIZE = 30
 
 const StyledRolesSummary = styled.div`
   position: relative;
+  top: 5px;
   @media only screen and (max-width: ${v.responsive.medBreakpoint}px) {
     min-height: 50px;
     .roles-summary--inner {
@@ -26,10 +27,7 @@ const StyledAvatarGroup = styled.div`
   .editor,
   .viewer {
     display: inline-block;
-    margin-right: 12px;
-    &:last-of-type {
-      margin-right: 0;
-    }
+    margin-right: 0;
   }
 `
 StyledAvatarGroup.displayName = 'StyledAvatarGroup'
@@ -54,7 +52,7 @@ const StyledSeparator = styled.div`
 const StyledAddUserBtn = styled.div`
   display: inline-block;
   vertical-align: top;
-  margin-right: 12px;
+  margin-right: 0;
   width: 30px;
   height: 30px;
   border-radius: 30px;
@@ -174,13 +172,13 @@ class RolesSummary extends React.Component {
 }
 
 RolesSummary.propTypes = {
-  roles: MobxPropTypes.arrayOrObservableArray.isRequired,
+  roles: MobxPropTypes.arrayOrObservableArray,
   handleClick: PropTypes.func.isRequired,
   canEdit: PropTypes.bool,
 }
 
 RolesSummary.defaultProps = {
-  className: '',
+  roles: [],
   canEdit: false,
 }
 

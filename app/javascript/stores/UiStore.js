@@ -1,6 +1,7 @@
 import _ from 'lodash'
 import { animateScroll } from 'react-scroll'
 import { observable, action, computed } from 'mobx'
+import v from '~/utils/variables'
 
 export default class UiStore {
   // store this for usage by other components
@@ -15,6 +16,7 @@ export default class UiStore {
   @observable blankContentToolState = { ...this.defaultBCTState }
   @observable openCardMenuId = false
   @observable organizationMenuPage = null
+  @observable organizationMenuGroupId = null
   @observable rolesMenuOpen = false
   @observable isTouchDevice = (
     // https://hacks.mozilla.org/2013/04/detecting-touch-its-the-why-not-the-how/
@@ -39,6 +41,7 @@ export default class UiStore {
   }
   @observable gridSettings = { ...this.defaultGridSettings }
   @observable viewingCollection = null
+  @observable viewingItem = null
   @observable selectedCardIds = []
   @observable isLoading = false
   @observable movingCardIds = []
@@ -58,6 +61,15 @@ export default class UiStore {
   @observable blurContent = false
   @observable orgCreated = false
   @observable searchText = ''
+  @observable activityLogOpen = false
+  @observable activityLogForceWidth = null
+  @observable activityLogPosition = { x: 0, y: 0, w: 1, h: 1 }
+  @observable activityLogPage = 'comments'
+
+  // Comments + Threads
+  @observable commentsOpen = false
+  // marked by thread.key (so it works for new records as well)
+  @observable expandedThreadKey = null
   @observable editingName = false
 
   @action popupAlert(props = {}) {
@@ -134,10 +146,23 @@ export default class UiStore {
     return !!this.organizationMenuPage
   }
 
+  @action openGroup(groupId) {
+    this.organizationMenuPage = 'editRoles'
+    this.organizationMenuGroupId = groupId
+ }
+
   // --- grid properties
   @computed get gridMaxW() {
     const grid = this.gridSettings
     return (grid.gridW * grid.cols) + (grid.gutter * (grid.cols - 1))
+  }
+
+  @action updateActivityLogWidth(width) {
+    if (width <= v.responsive.smallBreakpoint) {
+      this.activityLogForceWidth = width
+    } else {
+      this.activityLogForceWidth = null
+    }
   }
 
   gridWidthFor(virtualCols) {
@@ -220,6 +245,15 @@ export default class UiStore {
     this.deselectCards()
   }
 
+  @action setViewingItem(item = null) {
+    this.viewingItem = item
+  }
+
+  get viewingRecord() {
+    // only one should be present at a time depending on what page you're on
+    return this.viewingCollection || this.viewingItem
+  }
+
   @action toggleSelectedCardId(cardId) {
     if (this.isSelected(cardId)) {
       this.selectedCardIds.remove(cardId)
@@ -276,4 +310,10 @@ export default class UiStore {
     return this.selectedCardIds.findIndex(id => id === cardId) > -1
   }
   // --- BCT + GridCard properties />
+
+  @action expandThread(key, { reset = false } = {}) {
+    // reset it first, that way if it's expanded offscreen, it will get re-opened/scrolled to
+    if (reset) this.expandedThreadKey = null
+    this.expandedThreadKey = key
+  }
 }
