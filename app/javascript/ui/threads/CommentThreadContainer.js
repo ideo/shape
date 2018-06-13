@@ -126,9 +126,10 @@ class CommentThreadContainer extends React.Component {
   get showJumpToThreadButton() {
     const { uiStore } = this.props
     return (uiStore.viewingRecord &&
-      (uiStore.viewingRecord.isNormalCollection ||
-      uiStore.viewingRecord.internalType === 'items')
-    )
+        (uiStore.viewingRecord.isNormalCollection ||
+        uiStore.viewingRecord.internalType === 'items')
+    ) &&
+      uiStore.viewingRecord !== this.expandedThread.record
   }
 
   get expandedThread() {
@@ -213,7 +214,7 @@ class CommentThreadContainer extends React.Component {
     return (
       <Fragment>
         {this.showJumpToThreadButton &&
-          <button onClick={this.jumpToCurrentThread}>
+          <button onClick={this.jumpToCurrentThread} className="jumpToThread">
             <h3 style={{ textAlign: 'center' }}>
               Go to {uiStore.viewingRecord.name}
             </h3>
