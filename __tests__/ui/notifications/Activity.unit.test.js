@@ -23,6 +23,7 @@ describe('Activity', () => {
       subjectUsers: fakeActivity.subject_users,
       subjectGroups: fakeActivity.subject_groups,
       actorCount: 1,
+      handleRead: jest.fn(),
     }
     wrapper = shallow(
       <Activity {...props} />
