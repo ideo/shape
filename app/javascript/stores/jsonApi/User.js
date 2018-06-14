@@ -35,7 +35,7 @@ class User extends BaseRecord {
       'POST',
       { organization_id: organizationId }
     )
-    await this.apiStore.loadCurrentUserGroups()
+    await this.apiStore.loadCurrentUserAndGroups()
     if (backToHomepage) {
       routingStore.routeTo('/')
     }
