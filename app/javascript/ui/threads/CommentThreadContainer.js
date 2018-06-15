@@ -235,11 +235,6 @@ class CommentThreadContainer extends React.Component {
     const { uiStore } = this.props
     return (
       <Fragment>
-        <div>
-          {this.trackedNotifications.map(notification => (
-            <Notification notification={notification} key={notification.id} style='alert' />
-          ))}
-        </div>
         {this.showJumpToThreadButton &&
           <button onClick={this.jumpToCurrentThread} className="jumpToThread">
             <h3 style={{ textAlign: 'center' }}>
@@ -251,6 +246,11 @@ class CommentThreadContainer extends React.Component {
           // take up the same amount of space as the button
           <div style={{ height: '2rem' }} />
         }
+        <div>
+          {this.trackedNotifications.map(notification => (
+            <Notification notification={notification} key={notification.id} style='alert' />
+          ))}
+        </div>
         <ActivityContainer id={this.scrollOpts.containerId}>
           { this.loadingThreads && <InlineLoader fixed background="none" /> }
           <FlipMove
