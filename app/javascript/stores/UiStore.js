@@ -71,6 +71,7 @@ export default class UiStore {
   // marked by thread.key (so it works for new records as well)
   @observable expandedThreadKey = null
   @observable editingName = false
+  @observable trackedRecords = new Map()
 
   @action popupAlert(props = {}) {
     _.assign(this.dialogConfig, {
@@ -315,5 +316,22 @@ export default class UiStore {
     // reset it first, that way if it's expanded offscreen, it will get re-opened/scrolled to
     if (reset) this.expandedThreadKey = null
     this.expandedThreadKey = key
+  }
+
+  trackEvent(event, record) {
+    this.trackRecord(record.identifier)
+    if (record.internalType === 'items') {
+      this.trackRecord(record.parent.identifier)
+    }
+  }
+
+  @action trackRecord(identifier) {
+    const TIMEOUT = 15 * 1000 * 50
+    if (this.trackedRecords.has(identifier)) {
+      clearTimeout(this.trackedRecords.get(identifier))
+    }
+    this.trackedRecords.set(identifier, setTimeout(() => {
+      this.trackedRecords[identifier] = null
+    }, TIMEOUT))
   }
 }

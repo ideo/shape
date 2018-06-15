@@ -5,10 +5,16 @@ import { Element as ScrollElement, scroller } from 'react-scroll'
 import VisibilitySensor from 'react-visibility-sensor'
 import FlipMove from 'react-flip-move'
 import _ from 'lodash'
+import pluralize from 'pluralize'
 
 import { ActivityContainer } from '~/ui/global/styled/layout'
-import InlineLoader from '~/ui/layout/InlineLoader'
 import CommentThread from './CommentThread'
+import InlineLoader from '~/ui/layout/InlineLoader'
+import Notification from '~/ui/notifications/Notification'
+
+function pluralTypeName(name) {
+  return pluralize(name).toLowerCase()
+}
 
 @inject('apiStore', 'uiStore')
 @observer
@@ -143,6 +149,16 @@ class CommentThreadContainer extends React.Component {
     return this.threads.filter(t => t.key === uiStore.expandedThreadKey)[0]
   }
 
+  get trackedNotifications() {
+    const { apiStore, uiStore } = this.props
+    const notifications = apiStore.unreadNotifications
+    return notifications.filter(notification => {
+      const { activity } = notification
+      const identifier = `${pluralTypeName(activity.target_type)}${activity.target_id}`
+      return uiStore.trackedRecords.get(identifier)
+    })
+  }
+
   contentHeight = () => (
     this.containerDiv.clientHeight
   )
@@ -219,6 +235,11 @@ class CommentThreadContainer extends React.Component {
     const { uiStore } = this.props
     return (
       <Fragment>
+        <div>
+          {this.trackedNotifications.map(notification => (
+            <Notification notification={notification} key={notification.id} style='alert' />
+          ))}
+        </div>
         {this.showJumpToThreadButton &&
           <button onClick={this.jumpToCurrentThread} className="jumpToThread">
             <h3 style={{ textAlign: 'center' }}>

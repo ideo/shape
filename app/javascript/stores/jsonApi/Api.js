@@ -10,6 +10,7 @@ const archive = (type, obj) => {
       redirect = routingStore.pathTo(klass, id)
     }
     routingStore.push(redirect)
+    uiStore.trackEvent('archive', obj)
   }
 
   uiStore.confirm({
