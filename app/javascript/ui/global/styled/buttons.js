@@ -61,6 +61,7 @@ CircledIcon.displayName = 'StyledCircledIcon'
 export const NotificationButton = styled.button`
   background-color: ${props => (props.read ? v.colors.gray : v.colors.orange)};
   border-radius: 50%;
+  cursor: ${props => (props.read ? 'default' : 'pointer')};
   display: inline-block;
   height: 12px;
   transition: ${v.transitionWithDelay};

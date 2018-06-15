@@ -29,7 +29,7 @@ const StyledContainer = styled.div`
   padding: ${props => (props.isDefault ? '12px' : '8px 32px')};
   position: relative;
   transition: ${v.transitionWithDelay};
-  width: 100%;
+  width: calc(100% - 20px);
 
   &.show-read {
     opacity: 0;
@@ -127,9 +127,16 @@ class Notification extends React.Component {
           classes={{ tooltip: 'Tooltip' }}
           title="Dismiss"
           placement="bottom"
+          disableTriggerHover={notification.read}
+          disableTriggerFocus={notification.read}
+          disableTriggerTouch={notification.read}
         >
           { this.isDefaultStyle
-            ? <NotificationButton className="read" onClick={this.handleRead} read={notification.read} />
+            ? (<NotificationButton
+              className="read"
+              onClick={!notification.read && this.handleRead}
+              read={notification.read}
+            />)
             : <CloseButton className="read" onClick={this.handleRead} color={v.colors.white} />
           }
         </Tooltip>
