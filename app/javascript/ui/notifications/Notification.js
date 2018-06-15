@@ -1,8 +1,10 @@
 import PropTypes from 'prop-types'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
+import { observable, action, runInAction } from 'mobx'
 import pluralize from 'pluralize'
 import { apiStore } from '~/stores'
 import { Flex } from 'reflexbox'
+import sleep from '~/utils/sleep'
 import styled from 'styled-components'
 
 import Activity from '~/ui/notifications/Activity'
@@ -20,15 +22,20 @@ function pluralTypeName(name) {
 const StyledContainer = styled.div`
   background: ${props => (props.isDefault ? v.colors.activityDarkestBlue : v.colors.orange)};
   box-sizing: border-box;
-  margin-left: 10px;
-  margin-right: 10px;
+  margin-left: ${props => (props.isDefault ? 10 : 0)}px;
+  margin-right: ${props => (props.isDefault ? 10 : 0)}px;
   margin-top: 4px;
-  min-height: ${props => (props.isDefault ? 75 : 60)}px;
+  min-height: ${props => (props.isDefault ? 75 : 62)}px;
   padding: ${props => (props.isDefault ? '12px' : '8px 32px')};
   position: relative;
+  transition: ${v.transitionWithDelay};
+  width: 100%;
+
+  &.show-read {
+    opacity: 0;
+  }
 
   ${props => !props.isDefault && (`
-    max-height: 23444px;
     a {
       color: white;
     }
@@ -58,6 +65,8 @@ const ButtonContainer = styled.div`
 
 @observer
 class Notification extends React.Component {
+  @observable fadeInProgress = true
+  @observable shown = false
   componentWillMount() {
     const { notification } = this.props
     const { activity } = notification
@@ -76,10 +85,21 @@ class Notification extends React.Component {
     }
   }
 
+  @action componentDidMount() {
+    this.fadeInProgress = false
+    sleep(3000).then(() => {
+      runInAction(() => { this.shown = true })
+    })
+  }
+
   updateRead() {
     const { notification } = this.props
-    notification.read = true
-    notification.save()
+    runInAction(() => { this.fadeInProgress = true })
+    sleep(500).then(() => {
+      notification.read = true
+      notification.save()
+      sleep(500).then(runInAction(() => { this.fadeInProgress = false }))
+    })
   }
 
   handleRead = (ev) => {
@@ -88,14 +108,19 @@ class Notification extends React.Component {
   }
 
   get isDefaultStyle() {
-    return this.props.style === 'default'
+    return this.props.styleType === 'default'
   }
 
   get styledTextColor() {
-    if (this.props.style === 'alert') return v.colors.white
+    if (this.props.styleType === 'alert') return v.colors.white
+  }
+
+  get shouldHide() {
+    return (this.fadeInProgress || (this.props.hideShown && this.shown))
   }
 
   get renderButton() {
+    const { notification } = this.props
     return (
       <ButtonContainer isDefault={this.isDefaultStyle}>
         <Tooltip
@@ -104,7 +129,7 @@ class Notification extends React.Component {
           placement="bottom"
         >
           { this.isDefaultStyle
-            ? <NotificationButton className="read" onClick={this.handleRead} />
+            ? <NotificationButton className="read" onClick={this.handleRead} read={notification.read} />
             : <CloseButton className="read" onClick={this.handleRead} color={v.colors.white} />
           }
         </Tooltip>
@@ -115,6 +140,7 @@ class Notification extends React.Component {
   render() {
     const { notification } = this.props
     let content
+    // Don't display notifications that have been shown already
     if (!notification.activity.target) {
       content = <InlineLoader />
     } else {
@@ -141,7 +167,7 @@ class Notification extends React.Component {
       )
     }
     return (
-      <StyledContainer isDefault={this.isDefaultStyle}>
+      <StyledContainer isDefault={this.isDefaultStyle} className={`${this.shouldHide && 'show-read'}`}>
         {content}
       </StyledContainer>
     )
@@ -150,10 +176,12 @@ class Notification extends React.Component {
 
 Notification.propTypes = {
   notification: MobxPropTypes.objectOrObservableObject.isRequired,
-  style: PropTypes.oneOf(['default', 'alert']),
+  styleType: PropTypes.oneOf(['default', 'alert']),
+  hideShown: PropTypes.bool,
 }
 Notification.defaultProps = {
-  style: 'default'
+  styleType: 'default',
+  hideShown: false,
 }
 
 export default Notification

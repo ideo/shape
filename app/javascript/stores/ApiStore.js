@@ -102,6 +102,10 @@ class ApiStore extends Store {
     ))
   }
 
+  @computed get notifications() {
+    return this.findAll('notifications')
+  }
+
   @computed get unreadNotificationsCount() {
     return this.unreadNotifications.length
   }

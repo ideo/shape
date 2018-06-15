@@ -59,10 +59,11 @@ export const CircledIcon = styled.button`
 CircledIcon.displayName = 'StyledCircledIcon'
 
 export const NotificationButton = styled.button`
-  background-color: ${v.colors.orange};
+  background-color: ${props => (props.read ? v.colors.gray : v.colors.orange)};
   border-radius: 50%;
   display: inline-block;
   height: 12px;
+  transition: ${v.transitionWithDelay};
   width: 12px;
 `
 NotificationButton.displayName = 'NotificationButton'
