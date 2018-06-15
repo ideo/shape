@@ -41,4 +41,32 @@ describe('CollectionPage', () => {
     const grid = wrapper.find('CollectionGrid')
     expect(grid.props().collection).toBe(collection)
   })
+
+  describe('updateCollectionName', () => {
+    beforeEach(() => {
+      wrapper.instance().updateCollectionName('great')
+    })
+
+    it('should set the collection name to passed in value', () => {
+      expect(collection.name).toEqual('great')
+    })
+
+    it('should track an event for updating the collection', () => {
+      expect(uiStore.trackEvent).toHaveBeenCalledWith('update', collection)
+    })
+  })
+
+  describe('updateCollection', () => {
+    beforeEach(() => {
+      wrapper.instance().updateCollection()
+    })
+
+    it('should update the collection cards through api', () => {
+      expect(collection.API_updateCards).toHaveBeenCalled()
+    })
+
+    it('should track an event for updating the collection', () => {
+      expect(uiStore.trackEvent).toHaveBeenCalledWith('update', collection)
+    })
+  })
 })
