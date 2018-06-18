@@ -67,6 +67,13 @@ class Notification extends React.Component {
     this.updateRead()
   }
 
+  get actors() {
+    const { notification } = this.props
+    return notification.combined_actors.length
+      ? notification.combined_actors
+      : [notification.activity.actor]
+  }
+
   render() {
     const { notification } = this.props
     let content
@@ -88,7 +95,7 @@ class Notification extends React.Component {
             <Moment date={notification.created_at} />
             <Activity
               action={notification.activity.action}
-              actors={notification.combined_actors}
+              actors={this.actors}
               target={notification.activity.target}
               subjectUsers={notification.activity.subject_users}
               subjectGroups={notification.activity.subject_groups}
