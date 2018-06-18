@@ -104,7 +104,7 @@ class Routes extends React.Component {
               render={() => <SettingsPage><OrganizationSettings /></SettingsPage>}
             />
             <Route
-              path="/notification_settings"
+              path="/user_settings"
               render={() => <SettingsPage><UserSettings /></SettingsPage>}
             />
           </Switch>
