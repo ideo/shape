@@ -15,6 +15,8 @@ import TermsOfUseModal from '~/ui/users/TermsOfUseModal'
 import Loader from '~/ui/layout/Loader'
 import ActivityLogBox from '~/ui/activity_log/ActivityLogBox'
 import initDoorbell from '~/vendor/doorbell'
+import OrganizationSettings from '~/ui/organizations/OrganizationSettings'
+import UserSettings from '~/ui/users/UserSettings'
 import v from '~/utils/variables'
 import firebaseClient from '~/vendor/firestore'
 
@@ -97,7 +99,14 @@ class Routes extends React.Component {
             <Route path="/items/:id" component={ItemPage} />
             <Route path="/search" component={SearchPage} />
             <Route path="/terms" component={TermsPage} />
-            <Route path="/settings" component={SettingsPage} />
+            <Route
+              path="/settings"
+              render={() => <SettingsPage><OrganizationSettings /></SettingsPage>}
+            />
+            <Route
+              path="/notification_settings"
+              render={() => <SettingsPage><UserSettings /></SettingsPage>}
+            />
           </Switch>
         </MuiThemeProvider>
       </AppWrapper>
