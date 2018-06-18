@@ -40,7 +40,7 @@ StyledAvatarAndDropdown.displayName = 'StyledAvatarAndDropdown'
 //   max-width: 1320px;
 // `
 
-@inject('apiStore')
+@inject('apiStore', 'routingStore')
 @observer
 class Header extends React.Component {
   state = {
@@ -58,6 +58,11 @@ class Header extends React.Component {
 
   handleAccountSettings = () => {
     window.open(IdeoSSO.profileUrl, '_blank')
+  }
+
+  handleNotificationSettings = () => {
+    this.props.routingStore.routeTo('/user_settings')
+    this.setState({ userDropdownOpen: false })
   }
 
   handleLogout = async () => {
@@ -82,7 +87,8 @@ class Header extends React.Component {
   get userMenuItems() {
     return [
       { name: 'Account Settings', icon: <SettingsIcon />, onClick: this.handleAccountSettings },
-      { name: 'Logout', icon: <LeaveIcon />, onClick: this.handleLogout }
+      { name: 'Notification Settings', icon: <SettingsIcon />, onClick: this.handleNotificationSettings },
+      { name: 'Logout', icon: <LeaveIcon />, onClick: this.handleLogout },
     ]
   }
 
@@ -159,6 +165,7 @@ class Header extends React.Component {
 
 Header.wrappedComponent.propTypes = {
   apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
+  routingStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 
 export default Header
