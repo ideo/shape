@@ -24,7 +24,7 @@ module Roles
       unfollow_comment_thread
       unfollow_groups_comment_threads
       remove_links_from_shared_collections if @remove_link
-      remove_org_membership
+      remove_org_membership if @remove_link
       remove_roles_from_children
     end
 
