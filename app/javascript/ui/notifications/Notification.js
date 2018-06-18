@@ -119,6 +119,13 @@ class Notification extends React.Component {
     return (this.fadeInProgress || (this.props.hideShown && this.shown))
   }
 
+  get actors() {
+    const { notification } = this.props
+    return notification.combined_actors.length
+      ? notification.combined_actors
+      : [notification.activity.actor]
+  }
+
   get renderButton() {
     const { notification } = this.props
     return (
@@ -160,7 +167,7 @@ class Notification extends React.Component {
             )}
             <Activity
               action={notification.activity.action}
-              actors={notification.combined_actors}
+              actors={this.actors}
               target={notification.activity.target}
               subjectUsers={notification.activity.subject_users}
               subjectGroups={notification.activity.subject_groups}
