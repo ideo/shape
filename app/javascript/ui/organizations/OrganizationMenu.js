@@ -62,6 +62,12 @@ class OrganizationMenu extends React.Component {
     this.changePage('organizationPeople')
   }
 
+  afterGroupSave = (group) => {
+    if (!group.is_primary) return
+    const { apiStore, organization } = this.props
+    apiStore.fetch('groups', organization.guest_group.id)
+  }
+
   createOrganization = async (organizationData) => {
     const { apiStore, uiStore } = this.props
     const newOrg = new Organization(organizationData, apiStore)
@@ -141,7 +147,10 @@ class OrganizationMenu extends React.Component {
       <GroupModify
         onGroupRoles={this.onGroupRoles(editGroup)}
         group={editGroup}
-        onSave={this.saveOrganization}
+        onSave={(group) => {
+          this.saveOrganization(group)
+          this.afterGroupSave(group)
+        }}
         groupType="Organization"
       />
     )
@@ -177,7 +186,7 @@ class OrganizationMenu extends React.Component {
     return (
       <GroupTitle
         group={this.editGroup}
-        onSave={this.onGroupSave}
+        onSave={this.afterGroupSave}
         canEdit={this.editGroup.can_edit}
       />
     )
