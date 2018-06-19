@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types'
-import trackError from '~/utils/trackError'
+import { trackErrorSpecify } from '~/utils/trackError'
 import v from '~/utils/variables'
 
 class ErrorBoundary extends React.Component {
@@ -11,7 +11,7 @@ class ErrorBoundary extends React.Component {
   componentDidCatch(error, errorInfo) {
     this.setState({ error })
     const source = errorInfo.componentStack.split('\n')[1]
-    trackError(source, error.message, error.name, error.stack.split('\n'))
+    trackErrorSpecify(source, error.message, error.name, error.stack.split('\n'))
   }
 
   render() {

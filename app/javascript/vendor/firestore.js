@@ -5,6 +5,7 @@ import 'firebase/firestore'
 import { observe } from 'mobx'
 
 import { apiStore } from '~/stores'
+import trackError from '~/utils/trackError'
 
 let db = {}
 if (process.env.GOOGLE_CLOUD_BROWSER_KEY) {
@@ -74,7 +75,7 @@ export class FirebaseClient {
           })
         }
       }, err => {
-        console.warn(err)
+        trackError(err, { name: 'Firestore:Notifications' })
       })
     this.listeners.push(this.notificationsListener)
   }
@@ -89,7 +90,7 @@ export class FirebaseClient {
           this.subscribeToThread(usersThread)
         })
       }, error => {
-        console.warn('listen_for_ut', error)
+        trackError(error, { name: 'Firestore:UserThreads' })
       })
     this.listeners.push(this.userThreadListener)
   }
@@ -125,7 +126,7 @@ export class FirebaseClient {
             })
           })
       }, error => {
-        console.warn('comment_threads', error)
+        trackError(error, { name: 'Firestore:CommentThreads' })
       })
     this.listeners.push(this.commentThreadsListener)
     this.listeners.push(this.commentsListener)

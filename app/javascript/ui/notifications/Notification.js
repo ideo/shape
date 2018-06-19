@@ -4,6 +4,7 @@ import { apiStore } from '~/stores'
 import { Flex } from 'reflexbox'
 import styled from 'styled-components'
 
+import trackError from '~/utils/trackError'
 import Activity from '~/ui/notifications/Activity'
 import InlineLoader from '~/ui/layout/InlineLoader'
 import Moment from '~/ui/global/Moment'
@@ -47,9 +48,9 @@ class Notification extends React.Component {
       apiStore.fetch(targetType, activity.target_id).then(res => {
         activity.assignRef('target', res.data)
       }).catch((err) => {
-        console.warn(err)
         // Create a fake target in this strange usecase to remove loading
         activity.assignRef('target', { name: 'Unknown', internalType: targetType })
+        trackError(err, { name: 'Notification:Mount' })
       })
     } else {
       activity.assignRef('target', target)

@@ -1,5 +1,13 @@
+export default function trackError(err, opts = {}) {
+  trackErrorSpecify(
+    opts.source || 'Any',
+    opts.message || err.message,
+    opts.name || err.name,
+    err.stack.split('\n')
+  )
+}
 
-export default function trackError(source, message, name, backtrace) {
+export function trackErrorSpecify(source, message, name, backtrace) {
   const data = {
     action: source,
     message,
