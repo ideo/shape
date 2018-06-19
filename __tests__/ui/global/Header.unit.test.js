@@ -1,6 +1,7 @@
 import Header from '~/ui/layout/Header'
 
 import fakeApiStore from '#/mocks/fakeApiStore'
+import fakeRoutingStore from '#/mocks/fakeRoutingStore'
 
 import {
   fakeGroup
@@ -13,7 +14,8 @@ let wrapper, props
 describe('Header', () => {
   beforeEach(() => {
     props = {
-      apiStore: fakeApiStore()
+      apiStore: fakeApiStore(),
+      routingStore: fakeRoutingStore,
     }
     props.apiStore.currentUser.current_organization.primary_group = group
     wrapper = shallow(

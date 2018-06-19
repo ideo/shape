@@ -12,6 +12,7 @@
     "created_at": { "type": "date" },
     "terms_accepted": { "type": "boolean" },
     "show_helper": { "type": "boolean" },
+    "notify_through_email": { "type": "boolean" },
     "google_auth_token": { "type": "string" }
   },
   "required": ["id", "email", "first_name", "last_name", "status"]

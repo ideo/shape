@@ -242,6 +242,20 @@ RSpec.describe Roles::MassAssign, type: :service do
           assign_role.call
         end
       end
+
+      context 'with a user who has turned off notifications' do
+        let!(:user) { create(:user, add_to_org: organization) }
+        let!(:users) { [user] }
+
+        before do
+          user.update(notify_through_email: false)
+        end
+
+        it 'should not send an email' do
+          expect(InvitationMailer).not_to receive(:invite)
+          assign_role.call
+        end
+      end
     end
   end
 end
