@@ -41,6 +41,7 @@ class ApiStore extends Store {
   }
 
   @computed get currentUserOrganizationId() {
+    if (!this.currentUser) return null
     if (!this.currentUser.current_organization) return null
     return this.currentUser.current_organization.id
   }
