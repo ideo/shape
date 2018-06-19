@@ -35,13 +35,15 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
   def archive
     if @collection_card.archive!
       if @collection_card.record.is_a?(Collection)
-        ActivityAndNotificationBuilder.call(
-          actor: current_user,
-          target: @collection_card.record,
-          action: Activity.actions[:archived],
-          subject_user_ids: @collection_card.record.editors[:users].pluck(:id),
-          subject_group_ids: @collection_card.record.editors[:groups].pluck(:id),
-        )
+        if !@collection_card.link?
+          ActivityAndNotificationBuilder.call(
+            actor: current_user,
+            target: @collection_card.record,
+            action: Activity.actions[:archived],
+            subject_user_ids: @collection_card.record.editors[:users].pluck(:id),
+            subject_group_ids: @collection_card.record.editors[:groups].pluck(:id),
+          )
+        end
       end
       render jsonapi: @collection_card.reload, include: [:parent, record: [:filestack_file]]
     else
