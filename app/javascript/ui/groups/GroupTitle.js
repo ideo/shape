@@ -62,11 +62,11 @@ class GroupTitle extends React.Component {
     this.toggleEditing()
   }
 
-  handleSave = (ev) => {
+  handleSave = async (ev) => {
     const { group, onSave } = this.props
     ev.preventDefault()
-    group.save()
     this.toggleEditing()
+    await group.save()
     if (onSave) onSave(group)
   }
 

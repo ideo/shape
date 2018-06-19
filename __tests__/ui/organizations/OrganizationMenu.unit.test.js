@@ -29,6 +29,11 @@ describe('OrganizationMenu', () => {
           name: 'Space',
           handle: 'space',
           filestack_file_url: 'space.jpg',
+          is_primary: true,
+        },
+        guest_group: {
+          id: 11,
+          is_guest: true,
         }
       },
       userGroups: [
@@ -110,6 +115,18 @@ describe('OrganizationMenu', () => {
 
       it('should modify the group roles after synced', () => {
         expect(props.uiStore.update).toHaveBeenCalledWith('organizationMenuPage', 'editRoles')
+      })
+    })
+  })
+
+  describe('afterGroupSave', () => {
+    describe('with a primary group', () => {
+      beforeEach(() => {
+        component.afterGroupSave(props.organization.primary_group)
+      })
+
+      it('should fetch the guest group', () => {
+        expect(props.apiStore.fetch).toHaveBeenCalledWith('groups', 11)
       })
     })
   })

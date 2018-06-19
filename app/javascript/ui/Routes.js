@@ -16,6 +16,8 @@ import SettingsPage from '~/ui/pages/SettingsPage'
 import TermsPage from '~/ui/pages/TermsPage'
 import TermsOfUseModal from '~/ui/users/TermsOfUseModal'
 import initDoorbell from '~/vendor/doorbell'
+import OrganizationSettings from '~/ui/organizations/OrganizationSettings'
+import UserSettings from '~/ui/users/UserSettings'
 import v from '~/utils/variables'
 import firebaseClient from '~/vendor/firestore'
 
@@ -91,7 +93,6 @@ class Routes extends React.Component {
             {displayTermsPopup &&
               <TermsOfUseModal currentUser={apiStore.currentUser} />
             }
-
             {/* Switch will stop when it finds the first matching path */}
             <Switch>
               <Route exact path="/" component={CollectionPage} />
@@ -99,7 +100,14 @@ class Routes extends React.Component {
               <Route path="/items/:id" component={ItemPage} />
               <Route path="/search" component={SearchPage} />
               <Route path="/terms" component={TermsPage} />
-              <Route path="/settings" component={SettingsPage} />
+              <Route
+                path="/settings"
+                render={() => <SettingsPage><OrganizationSettings /></SettingsPage>}
+              />
+              <Route
+                path="/user_settings"
+                render={() => <SettingsPage><UserSettings /></SettingsPage>}
+              />
             </Switch>
           </MuiThemeProvider>
         </ErrorBoundary>
