@@ -33,9 +33,9 @@ export class FirebaseClient {
     })
   }
 
-  startListening(uid) {
-    this.listenForUsersThreads(uid || apiStore.currentUser.id)
-    this.listenForUserNotifications(uid || apiStore.currentUser.id)
+  startListening() {
+    this.listenForUsersThreads(apiStore.currentUser.id)
+    this.listenForUserNotifications(apiStore.currentUser.id)
   }
 
   stopListening() {
@@ -51,7 +51,7 @@ export class FirebaseClient {
     firebase.auth().signInWithCustomToken(token)
     firebase.auth().onAuthStateChanged(user => {
       if (user) {
-        this.startListening(user.uid)
+        this.startListening()
       }
     })
   }
