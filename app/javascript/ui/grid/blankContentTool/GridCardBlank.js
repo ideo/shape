@@ -14,6 +14,7 @@ import { StyledGridCard } from '~/ui/grid/GridCard'
 import InlineLoader from '~/ui/layout/InlineLoader'
 import { CloseButton } from '~/ui/global/styled/buttons'
 import bctIcons from '~/assets/bct_icons.png'
+import Tooltip from '~/ui/global/Tooltip'
 
 import CollectionCreator from './CollectionCreator'
 import TextItemCreator from './TextItemCreator'
@@ -361,37 +362,61 @@ class GridCardBlank extends React.Component {
         <Flex className="foreground" align="center" justify="space-between">
           {(!isReplacing && (!creating || creating === 'collection')) &&
             <Box>
-              <BctButton
-                creating={creating === 'collection'}
-                onClick={this.startCreatingCollection}
+              <Tooltip
+                classes={{ tooltip: 'Tooltip' }}
+                title="Create collection"
+                placement="bottom"
               >
-                <AddCollectionIcon width={size} height={size} color="white" />
-              </BctButton>
+                <BctButton
+                  creating={creating === 'collection'}
+                  onClick={this.startCreatingCollection}
+                >
+                  <AddCollectionIcon width={size} height={size} color="white" />
+                </BctButton>
+              </Tooltip>
             </Box>
           }
           {!creating &&
             <Box>
-              <BctButton onClick={this.pickImage}>
-                <AddImageIcon width={size} height={size} color="white" />
-              </BctButton>
+              <Tooltip
+                classes={{ tooltip: 'Tooltip' }}
+                title="Add image"
+                placement="bottom"
+              >
+                <BctButton onClick={this.pickImage}>
+                  <AddImageIcon width={size} height={size} color="white" />
+                </BctButton>
+              </Tooltip>
             </Box>
           }
           {(!creating || creating === 'video') &&
             <Box>
-              <BctButton
-                creating={creating === 'video'}
-                onClick={this.startCreatingVideo}
+              <Tooltip
+                classes={{ tooltip: 'Tooltip' }}
+                title="Link video"
+                placement="bottom"
               >
-                <AddVideoIcon width={size} height={size} color="white" />
-              </BctButton>
+                <BctButton
+                  creating={creating === 'video'}
+                  onClick={this.startCreatingVideo}
+                >
+                  <AddVideoIcon width={size} height={size} color="white" />
+                </BctButton>
+              </Tooltip>
             </Box>
           }
           {(!isReplacing && !creating) &&
-            <Box>
-              <BctButton onClick={this.startCreatingText}>
-                <AddTextIcon width={size} height={size} color="white" />
-              </BctButton>
-            </Box>
+            <Tooltip
+              classes={{ tooltip: 'Tooltip' }}
+              title="Add text box"
+              placement="bottom"
+            >
+              <Box>
+                <BctButton onClick={this.startCreatingText}>
+                  <AddTextIcon width={size} height={size} color="white" />
+                </BctButton>
+              </Box>
+            </Tooltip>
           }
         </Flex>
         {inner}
