@@ -148,6 +148,8 @@ export const fakeUserAttrs = {
   terms_accepted: true,
   isCurrentUser: jest.fn(),
   switchOrganization: jest.fn(),
+  API_updateCurrentUser: jest.fn(),
+  notify_through_email: true,
 }
 export const fakeActionCableUser = {
   id: 99,

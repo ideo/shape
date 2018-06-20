@@ -18,6 +18,7 @@ class Group < ApplicationRecord
   alias resourceable_can_view? can_view?
   alias resourceable_can_edit? can_edit?
 
+  after_update :update_organization
   after_create :create_shared_collection
 
   rolify after_add: :after_role_update,
@@ -157,5 +158,10 @@ class Group < ApplicationRecord
       thread_ids,
       user_ids,
     )
+  end
+
+  def update_organization
+    return if !self.primary?
+    organization.update(name: name)
   end
 end

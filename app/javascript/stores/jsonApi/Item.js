@@ -1,4 +1,5 @@
 import { routingStore } from '~/stores'
+import trackError from '~/utils/trackError'
 import Api from './Api'
 import BaseRecord from './BaseRecord'
 
@@ -31,9 +32,8 @@ class Item extends BaseRecord {
     return apiStore.request(`items/${this.id}`, 'PATCH', {
       data,
     })
-      .catch(err => { console.warn(err) })
+      .catch(err => { trackError(err, { name: 'item:update' }) })
   }
-
   API_archive() {
     return Api.archive('items', this)
   }

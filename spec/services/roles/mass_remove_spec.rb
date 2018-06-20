@@ -66,6 +66,7 @@ RSpec.describe Roles::MassRemove, type: :service do
 
     context 'with remove_link true' do
       let!(:remove_link) { true }
+      let!(:object) { organization.primary_group }
 
       it 'removes links from user collections' do
         expect(UnlinkFromSharedCollectionsWorker).to receive(:perform_async).with(
@@ -74,6 +75,11 @@ RSpec.describe Roles::MassRemove, type: :service do
           [collection.id],
           [],
         )
+        mass_remove.call
+      end
+
+      it 'does not remove the user from the organization' do
+        expect(organization).to_not receive(:remove_user_membership)
         mass_remove.call
       end
 
