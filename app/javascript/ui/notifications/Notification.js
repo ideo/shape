@@ -30,7 +30,7 @@ const StyledContainer = styled.div`
   padding: ${props => (props.isDefault ? '12px' : '8px 32px')};
   position: relative;
   transition: ${v.transitionWithDelay};
-  width: calc(100% - 20px);
+  width: calc(100% - ${props => (props.isDefault ? '20px' : '0px')});
 
   &.show-read {
     opacity: 0;
