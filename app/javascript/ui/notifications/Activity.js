@@ -37,6 +37,11 @@ const ActivityButton = styled.button`
   text-align: left;
 `
 
+const CommentText = styled.span`
+  display: block;
+  margin-top: 7px;
+`
+
 class Activity extends React.PureComponent {
   actorText() {
     const { actors, actorCount } = this.props
@@ -129,15 +134,19 @@ class Activity extends React.PureComponent {
       return (
         <ActivityText>
           <strong className="actor">{actorNames}</strong> commented on{` `}
-          {this.targetLink(targetName)}:{` `}
-          <span className="message">{message}</span>
+          {this.targetLink(targetName)}
+          <CommentText>
+            &ldquo;<span className="message">{message}</span>&rdquo;
+          </CommentText>
         </ActivityText>)
     case 'mentioned':
       return (
         <ActivityText>
           <strong className="actor">{actorNames}</strong> mentioned you in a comment for {` `}
-          {this.targetLink(targetName)}:{` `}
-          <span className="message">{message}</span>
+          {this.targetLink(targetName)}{` `}
+          <CommentText>
+            &ldquo;<span className="message">{message}</span>&rdquo;
+          </CommentText>
         </ActivityText>)
 
     default:

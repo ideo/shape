@@ -38,4 +38,18 @@ describe('ItemPage', () => {
   it('renders the ItemPageContainer', () => {
     expect(wrapper.find('ItemPageContainer').exists()).toEqual(true)
   })
+
+  describe('updateItemName', () => {
+    beforeEach(() => {
+      wrapper.instance().updateItemName('puppy')
+    })
+
+    it('should update the item with the name passed in', () => {
+      expect(item.name).toEqual('puppy')
+    })
+
+    it('should track an event for updating an item', () => {
+      expect(uiStore.trackEvent).toHaveBeenCalledWith('update', item)
+    })
+  })
 })

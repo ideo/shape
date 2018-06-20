@@ -79,6 +79,7 @@ class CollectionCard extends BaseRecord {
       if (!isReplacing) {
         await this.apiStore.fetch('collections', this.parent.id, true)
         uiStore.closeBlankContentTool()
+        uiStore.trackEvent('create', this.parent)
       }
     } catch (e) {
       uiStore.defaultAlertError()
@@ -113,7 +114,12 @@ class CollectionCard extends BaseRecord {
         if (collection.collection_cards.length === 0) {
           uiStore.openBlankContentTool()
         }
-        if (isReplacing) uiStore.closeBlankContentTool()
+        if (isReplacing) {
+          uiStore.closeBlankContentTool()
+          uiStore.trackEvent('update', this.record)
+        } else {
+          uiStore.trackEvent('archive', collection)
+        }
 
         return true
       } catch (e) {

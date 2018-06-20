@@ -18,6 +18,10 @@ class BaseRecord extends Record {
     return _.capitalize(_.camelCase(name))
   }
 
+  get identifier() {
+    return `${this.internalType}${this.id}`
+  }
+
   rawAttributes() {
     return super.toJsonApi().attributes
   }

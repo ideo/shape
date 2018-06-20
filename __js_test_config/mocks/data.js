@@ -21,6 +21,7 @@ export const fakeTextItem = {
   rawAttributes: jest.fn().mockReturnValue(fakeTextItemAttrs),
   getRecordType: jest.fn().mockReturnValue('items'),
   toJS: jest.fn().mockReturnValue(fakeTextItemAttrs),
+  ...fakeJsonApiAttrs,
 }
 export const fakeVideoItemAttrs = {
   id: 2,
@@ -61,6 +62,7 @@ export const fakeItemCard = {
   API_create: jest.fn(),
   API_archive: jest.fn(),
   API_linkToMyCollection: jest.fn(),
+  ...fakeJsonApiAttrs,
 }
 export const fakeCollectionCard = {
   id: 11,
@@ -104,6 +106,7 @@ export const fakeCollection = {
   // This is a computed property on the collection store
   cardIds: _.map(fakeCards, c => c.id),
   API_archive: jest.fn(),
+  API_updateCards: jest.fn(),
   checkCurrentOrg: jest.fn(),
   internalType: 'collections',
   ...fakeJsonApiAttrs,

@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types'
 import moment from 'moment-mini'
 import styled from 'styled-components'
 import v from '~/utils/variables'
@@ -10,7 +11,7 @@ function defaultFormat(time) {
 }
 
 const StyledDate = styled.span`
-  color: ${v.colors.cloudy};
+  color: ${props => props.color};
   display: inline-block;
   font-family: ${v.fonts.sans};
   font-size: 0.75rem;
@@ -22,5 +23,11 @@ const Moment = ({ date } = {}) => (
     {moment(date).format(defaultFormat(date))}
   </StyledDate>
 )
+Moment.propTypes = {
+  color: PropTypes.oneOf(Object.values(v.colors)),
+}
+Moment.defaultProps = {
+  color: v.colors.cloudy,
+}
 
 export default Moment

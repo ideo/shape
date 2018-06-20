@@ -9,7 +9,7 @@ export const TopRightButton = styled.button`
   position: absolute;
   top: ${props => (props.size === 'sm' ? '5px' : '12px')};
   right: ${props => (props.size === 'sm' ? '10px' : '12px')};
-  color: ${v.colors.cloudy};
+  color: ${props => props.color};
   .icon {
     width: ${props => (props.size === 'sm' ? '12px' : '15px')};
     height: ${props => (props.size === 'sm' ? '12px' : '15px')};
@@ -21,17 +21,19 @@ export const TopRightButton = styled.button`
 `
 TopRightButton.displayName = 'TopRightButton'
 
-export const CloseButton = ({ onClick, size }) => (
-  <TopRightButton onClick={onClick} size={size}>
+export const CloseButton = ({ onClick, size, color }) => (
+  <TopRightButton onClick={onClick} size={size} color={color}>
     <CloseIcon />
   </TopRightButton>
 )
 CloseButton.propTypes = {
   size: PropTypes.oneOf(['sm', 'lg']),
   onClick: PropTypes.func.isRequired,
+  color: PropTypes.oneOf(Object.values(v.colors)),
 }
 CloseButton.defaultProps = {
   size: 'sm',
+  color: v.colors.cloudy,
 }
 
 export const CircledIcon = styled.button`
@@ -57,10 +59,12 @@ export const CircledIcon = styled.button`
 CircledIcon.displayName = 'StyledCircledIcon'
 
 export const NotificationButton = styled.button`
-  background-color: ${v.colors.orange};
+  background-color: ${props => (props.read ? v.colors.gray : v.colors.orange)};
   border-radius: 50%;
+  cursor: ${props => (props.read ? 'default' : 'pointer')};
   display: inline-block;
   height: 12px;
+  transition: ${v.transitionWithDelay};
   width: 12px;
 `
 NotificationButton.displayName = 'NotificationButton'

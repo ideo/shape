@@ -36,6 +36,7 @@ class CommentThread extends BaseRecord {
       await this.save()
       // now that we have a real id, update what's expanded
       uiStore.expandThread(this.key, { reset: false })
+      uiStore.trackEvent('create', this.record)
     } catch (e) {
       uiStore.defaultAlertError()
     }
@@ -70,6 +71,7 @@ class CommentThread extends BaseRecord {
     this.apiStore.add(comment)
     this.importComments([comment], { created: true })
     // this will create the comment in the API
+    uiStore.trackEvent('create', this.record)
     return comment.save()
   }
 

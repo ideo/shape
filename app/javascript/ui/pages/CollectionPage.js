@@ -72,11 +72,15 @@ class CollectionPage extends PageWithApi {
     // TODO: what if there's no collection?
     // calling .save() will receive any API updates and sync them
     this.collection.API_updateCards()
+    const { uiStore } = this.props
+    uiStore.trackEvent('update', this.collection)
   }
 
   updateCollectionName = (name) => {
     this.collection.name = name
     this.collection.save()
+    const { uiStore } = this.props
+    uiStore.trackEvent('update', this.collection)
   }
 
   render() {
