@@ -4,16 +4,17 @@ import { MuiThemeProvider, createMuiTheme } from 'material-ui/styles'
 import WindowSizeListener from 'react-window-size-listener'
 import styled from 'styled-components'
 
-import DialogWrapper from '~/ui/global/modals/DialogWrapper'
-import CollectionPage from '~/ui/pages/CollectionPage'
-import ItemPage from '~/ui/pages/ItemPage'
-import SearchPage from '~/ui/pages/SearchPage'
-import TermsPage from '~/ui/pages/TermsPage'
-import Header from '~/ui/layout/Header'
-import SettingsPage from '~/ui/pages/SettingsPage'
-import TermsOfUseModal from '~/ui/users/TermsOfUseModal'
-import Loader from '~/ui/layout/Loader'
 import ActivityLogBox from '~/ui/activity_log/ActivityLogBox'
+import CollectionPage from '~/ui/pages/CollectionPage'
+import DialogWrapper from '~/ui/global/modals/DialogWrapper'
+import ErrorBoundary from '~/ui/global/ErrorBoundary'
+import Header from '~/ui/layout/Header'
+import ItemPage from '~/ui/pages/ItemPage'
+import Loader from '~/ui/layout/Loader'
+import SearchPage from '~/ui/pages/SearchPage'
+import SettingsPage from '~/ui/pages/SettingsPage'
+import TermsPage from '~/ui/pages/TermsPage'
+import TermsOfUseModal from '~/ui/users/TermsOfUseModal'
 import initDoorbell from '~/vendor/doorbell'
 import OrganizationSettings from '~/ui/organizations/OrganizationSettings'
 import UserSettings from '~/ui/users/UserSettings'
@@ -78,37 +79,38 @@ class Routes extends React.Component {
 
     return (
       <AppWrapper blur={displayTermsPopup} id="AppWrapper">
-        <MuiThemeProvider theme={this.theme}>
-          {/* Global components are rendered here */}
-          <WindowSizeListener onResize={this.handleWindowResize} />
-          <DialogWrapper />
+        <ErrorBoundary>
+          <MuiThemeProvider theme={this.theme}>
+            {/* Global components are rendered here */}
+            <WindowSizeListener onResize={this.handleWindowResize} />
+            <DialogWrapper />
 
-          <Header />
-          <FixedBoundary className="fixed_boundary" />
-          <FixedActivityLogWrapper>
-            <ActivityLogBox />
-          </FixedActivityLogWrapper>
-          {displayTermsPopup &&
-            <TermsOfUseModal currentUser={apiStore.currentUser} />
-          }
-
-          {/* Switch will stop when it finds the first matching path */}
-          <Switch>
-            <Route exact path="/" component={CollectionPage} />
-            <Route path="/collections/:id" component={CollectionPage} />
-            <Route path="/items/:id" component={ItemPage} />
-            <Route path="/search" component={SearchPage} />
-            <Route path="/terms" component={TermsPage} />
-            <Route
-              path="/settings"
-              render={() => <SettingsPage><OrganizationSettings /></SettingsPage>}
-            />
-            <Route
-              path="/user_settings"
-              render={() => <SettingsPage><UserSettings /></SettingsPage>}
-            />
-          </Switch>
-        </MuiThemeProvider>
+            <Header />
+            <FixedBoundary className="fixed_boundary" />
+            <FixedActivityLogWrapper>
+              <ActivityLogBox />
+            </FixedActivityLogWrapper>
+            {displayTermsPopup &&
+              <TermsOfUseModal currentUser={apiStore.currentUser} />
+            }
+            {/* Switch will stop when it finds the first matching path */}
+            <Switch>
+              <Route exact path="/" component={CollectionPage} />
+              <Route path="/collections/:id" component={CollectionPage} />
+              <Route path="/items/:id" component={ItemPage} />
+              <Route path="/search" component={SearchPage} />
+              <Route path="/terms" component={TermsPage} />
+              <Route
+                path="/settings"
+                render={() => <SettingsPage><OrganizationSettings /></SettingsPage>}
+              />
+              <Route
+                path="/user_settings"
+                render={() => <SettingsPage><UserSettings /></SettingsPage>}
+              />
+            </Switch>
+          </MuiThemeProvider>
+        </ErrorBoundary>
       </AppWrapper>
     )
   }

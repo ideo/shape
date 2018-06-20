@@ -1,8 +1,11 @@
+import _ from 'lodash'
 import firebase from 'firebase/app'
 import 'firebase/auth'
 import 'firebase/firestore'
+import { observe } from 'mobx'
 
 import { apiStore } from '~/stores'
+import trackError from '~/utils/trackError'
 
 let db = {}
 if (process.env.GOOGLE_CLOUD_BROWSER_KEY) {
@@ -19,20 +22,44 @@ if (process.env.GOOGLE_CLOUD_BROWSER_KEY) {
 
 export class FirebaseClient {
   subscribedThreadIds = []
+  constructor() {
+    this.listeners = []
+    this.disposer = observe(apiStore, 'currentUserOrganizationId', (change) => {
+      if (change.type === 'update' &&
+        change.oldValue &&
+        change.newValue !== change.oldValue) {
+        this.stopListening()
+        this.startListening()
+      }
+    })
+  }
+
+  startListening() {
+    this.listenForUsersThreads(apiStore.currentUser.id)
+    this.listenForUserNotifications(apiStore.currentUser.id)
+  }
+
+  stopListening() {
+    this.listeners.forEach(listener => { _.isFunction(listener) && listener() })
+    this.listeners = []
+    apiStore.removeAll('notifications')
+    apiStore.removeAll('user_threads')
+    apiStore.removeAll('comment_threads')
+    apiStore.removeAll('comments')
+  }
 
   authenticate = (token) => {
     firebase.auth().signInWithCustomToken(token)
     firebase.auth().onAuthStateChanged(user => {
       if (user) {
-        this.listenForUsersThreads(user.uid)
-        this.listenForUserNotifications(user.uid)
+        this.startListening()
       }
     })
   }
 
   listenForUserNotifications = (userId) => {
     const orgId = apiStore.currentUserOrganizationId
-    db.collection('notifications')
+    this.notificationsListener = db.collection('notifications')
       .where('data.attributes.identifier', '==', `${orgId}_${userId}`)
       .onSnapshot(querySnapshot => {
         querySnapshot.forEach(doc => {
@@ -48,13 +75,14 @@ export class FirebaseClient {
           })
         }
       }, err => {
-        console.warn(err)
+        trackError(err, { name: 'Firestore:Notifications' })
       })
+    this.listeners.push(this.notificationsListener)
   }
 
   listenForUsersThreads = (userId) => {
     const orgId = apiStore.currentUserOrganizationId
-    db.collection('users_threads')
+    this.userThreadListener = db.collection('users_threads')
       .where('data.attributes.identifier', '==', `${orgId}_${userId}`)
       .onSnapshot(querySnapshot => {
         querySnapshot.forEach(doc => {
@@ -62,12 +90,13 @@ export class FirebaseClient {
           this.subscribeToThread(usersThread)
         })
       }, error => {
-        console.warn('listen_for_ut', error)
+        trackError(error, { name: 'Firestore:UserThreads' })
       })
+    this.listeners.push(this.userThreadListener)
   }
 
   commentsForThread = (threadId) => (
-    db.collection('comments')
+    this.commentsListener = db.collection('comments')
       .where('data.attributes.comment_thread_id', '==', parseInt(threadId))
       .orderBy('data.attributes.updated_at', 'desc')
   )
@@ -78,10 +107,10 @@ export class FirebaseClient {
     if (this.subscribedThreadIds.indexOf(threadId) > -1) return
     this.subscribedThreadIds.push(threadId)
     const threadUid = threadId.toString()
-    db.collection('comment_threads').doc(threadUid)
+    this.commentThreadsListener = db.collection('comment_threads').doc(threadUid)
       .onSnapshot(threadDoc => {
         const thread = apiStore.syncFromFirestore(threadDoc.data())
-        this.commentsForThread(threadUid)
+        this.commentsListener = this.commentsForThread(threadUid)
           .limit(3)
           .get()
           .then(snapshots => {
@@ -97,8 +126,10 @@ export class FirebaseClient {
             })
           })
       }, error => {
-        console.warn('comment_threads', error)
+        trackError(error, { name: 'Firestore:CommentThreads' })
       })
+    this.listeners.push(this.commentThreadsListener)
+    this.listeners.push(this.commentsListener)
   }
 }
 

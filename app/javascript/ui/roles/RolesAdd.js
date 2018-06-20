@@ -3,6 +3,7 @@ import PropTypes from 'prop-types'
 import { observable, action } from 'mobx'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
+import trackError from '~/utils/trackError'
 import {
   FormButton,
   FormActionsContainer,
@@ -52,7 +53,7 @@ class RolesAdd extends React.Component {
         .filter(selected => selected.internalType === 'groups')
         .find(selected => selected.id === entity.id)
     } else {
-      console.warn('Selected entity can only be user or group')
+      trackError(new Error(), { name: 'EntityNotUserOrGroup', message: 'Selected entity can only be user or group' })
     }
     if (!existing) {
       this.selectedUsers.push(entity)
