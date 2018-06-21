@@ -1,6 +1,8 @@
+import PropTypes from 'prop-types'
 import styled from 'styled-components'
 
 import v from '~/utils/variables'
+import ExpandIcon from '~/ui/icons/ExpandIcon'
 
 const StyledButton = styled.button`
   color: ${v.colors.cloudy};
@@ -14,16 +16,27 @@ const StyledButton = styled.button`
   }
 `
 
-const TextItemToolbar = () => (
-  <div id="quill-toolbar">
+const TextItemToolbar = (props) => (
+  <div id="quill-toolbar" style={{ marginBottom: '10px' }}>
     <span className="ql-formats">
       <StyledButton className="ql-header ql-format-reg" value="">T</StyledButton>
       {/* when using H2, quill inserts its own SVG -- couldn't figure out a way around */}
       <StyledButton className="ql-header ql-format-large" value="3">T</StyledButton>
       {/* quill inserts ql-link SVG */}
       <StyledButton className="ql-link" />
+      {props.onExpand && (
+        <StyledButton onClick={props.onExpand}>
+          <ExpandIcon />
+        </StyledButton>
+      )}
     </span>
   </div>
 )
+TextItemToolbar.propTypes = {
+  onExpand: PropTypes.func,
+}
+TextItemToolbar.defaultProps = {
+  onExpand: null,
+}
 
 export default TextItemToolbar

@@ -13,7 +13,7 @@ import EditorPill from '~/ui/items/EditorPill'
 const UNLOCK_IN_MILLISECONDS = 5000
 
 const StyledContainer = styled.div`
-  padding: 2rem 0.5rem;
+  ${props => props.fullPageView && `padding: 2rem 0.5rem;`}
   .editor-pill {
     position: absolute;
     top: 20px;
@@ -74,6 +74,7 @@ class TextItem extends React.Component {
       const { editor } = this.reactQuillRef
       overrideHeadersFromClipboard(editor)
       this.attachQuillRefs()
+      this.quillEditor.focus()
     }
     this.subscribeToItemEditingChannel()
   }
@@ -158,11 +159,20 @@ class TextItem extends React.Component {
     }
   }
 
-  onEditorBlur = () => {
-    // If they click outside of editor, release the lock immediately
-    if (!this.ignoreBlurEvent) {
-      this.unlockEditingIfOtherViewers()
-    }
+  onEditorBlur = (range, source, editor) => {
+    setTimeout(() => {
+      console.log('oneditorblur', this.quillEditor.hasFocus())
+      if (!this.quillEditor.hasFocus()) {
+        // If they click outside of editor, release the lock immediately
+        if (!this.ignoreBlurEvent) {
+          this.unlockEditingIfOtherViewers()
+        }
+        if (!this.props.fullPageView) {
+          const { onCancel } = this.props
+          onCancel()
+        }
+      }
+    }, 10)
   }
 
   onEditorFocus = () => {
@@ -224,7 +234,6 @@ class TextItem extends React.Component {
 
   get textData() {
     const { item } = this.props
-    // console.log(item.toJS().text_data)
     return item.toJS().text_data
   }
 
@@ -263,6 +272,7 @@ class TextItem extends React.Component {
   }
 
   render() {
+    const { fullPageView, onExpand } = this.props
     const { locked } = this.state
     let quillProps = {}
     if (this.canEdit) {
@@ -287,8 +297,8 @@ class TextItem extends React.Component {
     }
 
     return (
-      <StyledContainer>
-        { this.canEdit && <TextItemToolbar /> }
+      <StyledContainer className="no-drag" fullPageView={fullPageView} onClick={() => console.log('TextItemContainerclick')}>
+        { this.canEdit && <TextItemToolbar onExpand={onExpand} /> }
         {this.renderEditorPill}
         <ReactQuill
           {...quillProps}
@@ -305,6 +315,14 @@ TextItem.propTypes = {
   currentUserId: PropTypes.number.isRequired,
   onUpdatedData: PropTypes.func.isRequired,
   onSave: PropTypes.func.isRequired,
+  onCancel: PropTypes.func,
+  fullPageView: PropTypes.bool,
+  onExpand: PropTypes.func,
+}
+TextItem.defaultProps = {
+  fullPageView: false,
+  onExpand: null,
+  onCancel: () => {},
 }
 
 export default TextItem

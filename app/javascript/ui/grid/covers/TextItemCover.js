@@ -3,8 +3,12 @@ import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import ReactQuill from 'react-quill'
 import styled from 'styled-components'
 
-import v from '~/utils/variables'
+import ActionCableConsumer from '~/utils/ActionCableConsumer'
+import InlineLoader from '~/ui/layout/InlineLoader'
+import TextItem from '~/ui/items/TextItem'
 import PaddedCardCover from './PaddedCardCover'
+import { apiStore, routingStore } from '~/stores'
+import v from '~/utils/variables'
 
 const StyledReadMore = styled.div`
   z-index: ${v.zIndex.gridCard};
@@ -26,16 +30,51 @@ StyledReadMore.displayName = 'StyledReadMore'
 @observer
 class TextItemCover extends React.Component {
   state = {
-    readMore: false
+    item: null,
+    readMore: false,
+    isEditing: false,
+    loading: false,
   }
 
   componentDidMount() {
-    const { height } = this.props
+    const { height, item } = this.props
     this.checkTextAreaHeight(height)
+    this.setState({ item })
   }
 
   componentWillReceiveProps({ height }) {
     this.checkTextAreaHeight(height)
+  }
+
+  handleEdit = (ev) => {
+    // If already editing, pass event down
+    if (this.state.isEditing) {
+      ev.stopPropagation()
+      return
+    }
+    ev.stopPropagation()
+    this.setState({ isEditing: true })
+  }
+
+  expand = () => {
+    const { item } = this.props
+    routingStore.routeTo('items', item.id)
+  }
+
+  textChange = (itemTextData) => {
+    const { item } = this.state
+    item.text_data = itemTextData
+    this.setState({ item })
+  }
+
+  blur = () => {
+    this.setState({ isEditing: false })
+  }
+
+  save = async (item, { cancel_sync = true } = {}) => {
+    this.setState({ loading: true })
+    await item.API_updateWithoutSync({ cancel_sync })
+    this.setState({ isEditing: false, loading: false, item })
   }
 
   checkTextAreaHeight = (height) => {
@@ -49,9 +88,24 @@ class TextItemCover extends React.Component {
     }
   }
 
-  render() {
+  renderEditing() {
+    const { item } = this.state
+    console.log('blank render', item.text_data)
+    return (
+      <TextItem
+        item={item}
+        actionCableConsumer={ActionCableConsumer}
+        currentUserId={apiStore.currentUser.id}
+        onUpdatedData={this.textChange}
+        onSave={this.save}
+        onExpand={item.id ? this.expand : null}
+        onCancel={this.blur}
+      />
+    )
+  }
+
+  renderDefault() {
     const { item } = this.props
-    // we have to convert the item to a normal JS object for Quill to be happy
     const textData = item.toJS().text_data
     const quillProps = {
       // ref is used to get the height of the div in checkTextAreaHeight
@@ -61,16 +115,27 @@ class TextItemCover extends React.Component {
     }
 
     return (
-      <div>
-        <PaddedCardCover>
-          <ReactQuill
-            {...quillProps}
-            value={textData}
-          />
-        </PaddedCardCover>
-        {/* readMore is a sibling to the cover itself */}
-        { this.state.readMore && <StyledReadMore>read more...</StyledReadMore> }
-      </div>
+      <ReactQuill
+        {...quillProps}
+        value={textData}
+      />
+    )
+  }
+
+  render() {
+    const { isEditing } = this.state
+    const content = isEditing
+      ? this.renderEditing()
+      : this.renderDefault()
+    return (
+      <PaddedCardCover
+        style={{ height: '100%' }}
+        class="cancelGridClick"
+        onClick={this.handleEdit}
+      >
+        { this.state.loading && <InlineLoader /> }
+        {content}
+      </PaddedCardCover>
     )
   }
 }

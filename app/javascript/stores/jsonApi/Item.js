@@ -43,5 +43,9 @@ class Item extends BaseRecord {
   }
 }
 Item.type = 'items'
+Item.defaults = {
+  text_data: '',
+  can_edit: false,
+}
 
 export default Item

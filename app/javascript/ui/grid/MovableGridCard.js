@@ -65,6 +65,7 @@ class MovableGridCard extends React.PureComponent {
   }
 
   handleStart = (e, data) => {
+    console.log('ondragstart')
     // initialOffset tracks the coordinates *within* the card where you clicked,
     // e.g. bottom left corner of the card itself
     const initialOffsetX = (e.screenX - e.target.getBoundingClientRect().x)
@@ -76,6 +77,7 @@ class MovableGridCard extends React.PureComponent {
   }
 
   handleDrag = (e, data, dX, dY) => {
+    console.log('ondrag')
     const { position } = this.props
     // x, y represent the current drag position
     const { x, y } = data
