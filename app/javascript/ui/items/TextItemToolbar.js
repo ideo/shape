@@ -16,12 +16,21 @@ const StyledButton = styled.button`
   }
 `
 
+const styles = {
+  top: '-16px',
+  background: 'white',
+  position: 'sticky',
+  marginBottom: '20px',
+  zIndex: 100,
+}
+
 const TextItemToolbar = (props) => (
-  <div id="quill-toolbar" style={{ marginBottom: '20px', position: 'sticky' }}>
+  <div id="quill-toolbar" style={styles}>
     <span className="ql-formats">
       <StyledButton className="ql-header ql-format-reg" value="">T</StyledButton>
       {/* when using H2, quill inserts its own SVG -- couldn't figure out a way around */}
       <StyledButton className="ql-header ql-format-large" value="3">T</StyledButton>
+      <StyledButton className="ql-header ql-format-huge" value="1">T</StyledButton>
       {/* quill inserts ql-link SVG */}
       <StyledButton className="ql-link" />
       {props.onExpand && (
