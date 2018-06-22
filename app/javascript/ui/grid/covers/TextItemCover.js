@@ -13,7 +13,7 @@ import v from '~/utils/variables'
 const StyledReadMore = styled.div`
   z-index: ${v.zIndex.gridCard};
   position: absolute;
-  bottom: 0;
+  bottom: 30px;
   width: 100%;
   text-align: center;
   padding: 0.5rem;
@@ -135,6 +135,7 @@ class TextItemCover extends React.Component {
       >
         { this.state.loading && <InlineLoader /> }
         {content}
+        { this.state.readMore && <StyledReadMore>read more...</StyledReadMore> }
       </PaddedCardCover>
     )
   }
