@@ -129,13 +129,13 @@ class TextItemCover extends React.Component {
       : this.renderDefault()
     return (
       <PaddedCardCover
-        style={{ height: '100%' }}
+        style={{ height: '100%', overflow: isEditing ? 'scroll' : 'hidden' }}
         class="cancelGridClick"
         onClick={this.handleEdit}
       >
         { this.state.loading && <InlineLoader /> }
         {content}
-        { this.state.readMore && <StyledReadMore>read more...</StyledReadMore> }
+        { (this.state.readMore && !isEditing) && <StyledReadMore>read more...</StyledReadMore> }
       </PaddedCardCover>
     )
   }
