@@ -7,7 +7,7 @@ import ActionCableConsumer from '~/utils/ActionCableConsumer'
 import InlineLoader from '~/ui/layout/InlineLoader'
 import TextItem from '~/ui/items/TextItem'
 import PaddedCardCover from './PaddedCardCover'
-import { apiStore, routingStore } from '~/stores'
+import { apiStore, routingStore, uiStore } from '~/stores'
 import v from '~/utils/variables'
 
 const StyledReadMore = styled.div`
@@ -48,6 +48,7 @@ class TextItemCover extends React.Component {
 
   handleEdit = (ev) => {
     // If already editing, pass event down
+    if (uiStore.dragging) return
     if (this.state.isEditing) {
       ev.stopPropagation()
       return
@@ -90,7 +91,6 @@ class TextItemCover extends React.Component {
 
   renderEditing() {
     const { item } = this.state
-    console.log('blank render', item.text_data)
     return (
       <TextItem
         item={item}

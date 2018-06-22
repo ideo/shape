@@ -20,6 +20,9 @@ const StyledContainer = styled.div`
     left: 50%;
     transform: translateX(-50%);
   }
+  *::selection {
+    background: highlight !important;
+  }
 `
 
 const remapHeaderToH3 = (node, delta) => {
@@ -74,7 +77,7 @@ class TextItem extends React.Component {
       const { editor } = this.reactQuillRef
       overrideHeadersFromClipboard(editor)
       this.attachQuillRefs()
-      this.quillEditor.focus()
+      if (!this.props.fullPageView) this.startEditing()
     }
     this.subscribeToItemEditingChannel()
   }
@@ -160,19 +163,14 @@ class TextItem extends React.Component {
   }
 
   onEditorBlur = (range, source, editor) => {
-    setTimeout(() => {
-      console.log('oneditorblur', this.quillEditor.hasFocus())
-      if (!this.quillEditor.hasFocus()) {
-        // If they click outside of editor, release the lock immediately
-        if (!this.ignoreBlurEvent) {
-          this.unlockEditingIfOtherViewers()
-        }
-        if (!this.props.fullPageView) {
-          const { onCancel } = this.props
-          onCancel()
-        }
-      }
-    }, 10)
+    // If they click outside of editor, release the lock immediately
+    if (!this.ignoreBlurEvent) {
+      this.unlockEditingIfOtherViewers()
+    }
+    if (!this.props.fullPageView) {
+      const { onCancel } = this.props
+      onCancel()
+    }
   }
 
   onEditorFocus = () => {
@@ -206,6 +204,10 @@ class TextItem extends React.Component {
     } else {
       this.channel.perform('stop_editing', { id: item.id, data: this.textData })
     }
+  }
+
+  handleTab = () => {
+    this.quillEditor.blur()
   }
 
   unlockEditingIfOtherViewers = () => {
@@ -248,11 +250,12 @@ class TextItem extends React.Component {
   }
 
   _onKeyUp = async (content, delta, source, editor) => {
-    const { item, onSave } = this.props
+    const { item, onSave, fullPageView } = this.props
     const { quillEditor } = this
     item.content = quillEditor.root.innerHTML
     item.text_data = quillEditor.getContents()
 
+    if (!fullPageView && this.quillEditor.hasFocus()) return
     await onSave(item, { cancel_sync: !this.leaving })
     if (this.broadcastStoppedEditingAfterSave) {
       this.broadcastEditingState({ editing: false })
@@ -286,6 +289,7 @@ class TextItem extends React.Component {
         readOnly: locked,
         modules: {
           toolbar: '#quill-toolbar',
+          keyboard: { bindings: { tab: { key: 9, handler: () => this.handleTab() } } },
         },
       }
     } else {
@@ -297,10 +301,11 @@ class TextItem extends React.Component {
     }
 
     return (
-      <StyledContainer className="no-drag" fullPageView={fullPageView} onClick={() => console.log('TextItemContainerclick')}>
+      <StyledContainer className="no-drag" fullPageView={fullPageView} key="contain">
         { this.canEdit && <TextItemToolbar onExpand={onExpand} /> }
         {this.renderEditorPill}
         <ReactQuill
+          key="react_quill"
           {...quillProps}
           value={this.textData}
         />

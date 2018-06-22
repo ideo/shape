@@ -72,6 +72,15 @@ export default class UiStore {
   @observable expandedThreadKey = null
   @observable editingName = false
   @observable trackedRecords = new Map()
+  @observable dragging = false
+
+  @action startDragging() {
+    this.dragging = true
+  }
+
+  @action stopDragging() {
+    this.dragging = false
+  }
 
   @action popupAlert(props = {}) {
     _.assign(this.dialogConfig, {

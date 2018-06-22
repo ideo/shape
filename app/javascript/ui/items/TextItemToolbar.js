@@ -17,7 +17,7 @@ const StyledButton = styled.button`
 `
 
 const TextItemToolbar = (props) => (
-  <div id="quill-toolbar" style={{ marginBottom: '10px' }}>
+  <div id="quill-toolbar" style={{ marginBottom: '20px', position: 'sticky' }}>
     <span className="ql-formats">
       <StyledButton className="ql-header ql-format-reg" value="">T</StyledButton>
       {/* when using H2, quill inserts its own SVG -- couldn't figure out a way around */}

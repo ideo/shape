@@ -65,7 +65,6 @@ class MovableGridCard extends React.PureComponent {
   }
 
   handleStart = (e, data) => {
-    console.log('ondragstart')
     // initialOffset tracks the coordinates *within* the card where you clicked,
     // e.g. bottom left corner of the card itself
     const initialOffsetX = (e.screenX - e.target.getBoundingClientRect().x)
@@ -77,7 +76,6 @@ class MovableGridCard extends React.PureComponent {
   }
 
   handleDrag = (e, data, dX, dY) => {
-    console.log('ondrag')
     const { position } = this.props
     // x, y represent the current drag position
     const { x, y } = data
@@ -88,6 +86,7 @@ class MovableGridCard extends React.PureComponent {
     if (!this.state.dragging) {
       uiStore.resetSelectionAndBCT()
       uiStore.closeMoveMenu()
+      uiStore.startDragging()
       this.setState({
         dragging: true,
         moveComplete: false,
@@ -103,12 +102,13 @@ class MovableGridCard extends React.PureComponent {
     this.props.onDrag(this.props.card.id, dragPosition)
   }
 
-  handleStop = () => {
+  handleStop = (ev) => {
     this.props.onDragOrResizeStop(this.props.card.id)
     this.setState({ dragging: false, resizing: false })
     const timeoutId = setTimeout(() => {
       // have this item remain "on top" while it animates back
       this.setState({ moveComplete: true })
+      uiStore.stopDragging()
     }, 350)
     this.setState({ timeoutId })
   }
@@ -118,6 +118,7 @@ class MovableGridCard extends React.PureComponent {
       this.setState({ resizing: true, moveComplete: false })
       uiStore.resetSelectionAndBCT()
       uiStore.closeMoveMenu()
+      document.querySelector('.ql-editor p').focus()
     }
     const { gridW, gridH, cols } = uiStore.gridSettings
     const { card } = this.props
@@ -132,6 +133,7 @@ class MovableGridCard extends React.PureComponent {
     // always max out height at 2
     newSize.height = Math.max(Math.min(newSize.height, 2), 1)
     this.props.onResize(this.props.card.id, newSize)
+    document.querySelector('.ql-editor p').focus()
   }
 
   // this function gets passed down to the card, so it can place the onClick handler
