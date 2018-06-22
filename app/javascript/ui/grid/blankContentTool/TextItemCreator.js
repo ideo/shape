@@ -3,8 +3,12 @@ import ReactQuill from 'react-quill'
 import _ from 'lodash'
 import styled from 'styled-components'
 
+import ActionCableConsumer from '~/utils/ActionCableConsumer'
+import Item from '~/stores/jsonApi/Item'
 import { overrideHeadersFromClipboard } from '~/ui/items/TextItem'
 import v, { ITEM_TYPES, KEYS } from '~/utils/variables'
+import { apiStore, routingStore } from '~/stores'
+import TextItem from '~/ui/items/TextItem'
 
 const StyledTextItemCreator = styled.div`
   padding: 1rem;
@@ -23,33 +27,30 @@ class TextItemCreator extends React.Component {
     super(props)
     // see: https://github.com/quilljs/quill/issues/1134#issuecomment-265065953
     this.onTextChange = _.debounce(this._onTextChange, 1000)
+    this.item = new Item()
+    this.item.can_edit = true
   }
 
   componentDidMount() {
-    if (!this.quillEditor) return
-    this.quillEditor.focus()
-    const { editor } = this.quillEditor
-    overrideHeadersFromClipboard(editor)
   }
 
-  _onTextChange = (content, delta, source, editor) => {
-    const textData = editor.getContents()
-    this.setState({
-      inputText: content,
-      textData,
-    })
+  _onTextChange = (itemTextData) => {
+    this.item.text_data = itemTextData
+  }
+
+  expand() {
+    routingStore.routeTo('items', this.item.id)
   }
 
   createTextItem = () => {
-    this.quillEditor.blur()
     if (this.props.loading) return
     // make sure to capture last text change before saving
     this.onTextChange.flush()
     this.props.createCard({
       item_attributes: {
         // name will get created in Rails
-        content: this.state.inputText,
-        text_data: this.state.textData,
+        content: this.item.content,
+        text_data: this.item.text_data,
         type: ITEM_TYPES.TEXT,
       }
     })
@@ -73,15 +74,13 @@ class TextItemCreator extends React.Component {
 
     return (
       <StyledTextItemCreator height={this.props.height}>
-        <ReactQuill
-          ref={(c) => { this.quillEditor = c }}
-          formats={v.quillDefaults.formats}
-          placeholder="Add your text"
-          onChange={this.onTextChange}
-          theme={null}
-          modules={{
-            keyboard: { bindings }
-          }}
+        <TextItem
+          item={this.item}
+          actionCableConsumer={ActionCableConsumer}
+          currentUserId={apiStore.currentUser.id}
+          onUpdatedData={this.onTextChange}
+          onSave={this.createTextItem}
+          onExpand={this.item.id ? this.expand : null}
         />
       </StyledTextItemCreator>
     )
