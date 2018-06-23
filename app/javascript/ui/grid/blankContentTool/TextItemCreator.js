@@ -39,7 +39,7 @@ class TextItemCreator extends React.Component {
     routingStore.routeTo('items', this.item.id)
   }
 
-  createTextItem = () => {
+  createTextItem = (item) => {
     if (this.props.loading) return
     // make sure to capture last text change before saving
     this.onTextChange.flush()

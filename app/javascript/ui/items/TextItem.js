@@ -172,7 +172,6 @@ class TextItem extends React.Component {
     }
     if (!this.props.fullPageView) {
       const { onCancel } = this.props
-      console.log('editor on cancel')
       onCancel()
     }
   }
@@ -257,9 +256,7 @@ class TextItem extends React.Component {
     const { item, onSave, fullPageView } = this.props
     const { quillEditor } = this
     item.content = quillEditor.root.innerHTML
-    setTimeout(() => {
-      item.text_data = quillEditor.getContents()
-    }, 1)
+    item.text_data = quillEditor.getContents()
 
     if (!fullPageView && this.quillEditor.hasFocus()) return
     await onSave(item, { cancel_sync: !this.leaving })
