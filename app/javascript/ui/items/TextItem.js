@@ -79,6 +79,7 @@ class TextItem extends React.Component {
       overrideHeadersFromClipboard(editor)
       this.attachQuillRefs()
       if (!this.props.fullPageView) this.startEditing()
+      this.quillEditor.focus()
     }
     this.subscribeToItemEditingChannel()
   }
