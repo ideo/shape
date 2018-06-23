@@ -1,4 +1,5 @@
 import PropTypes from 'prop-types'
+import ReactDOM from 'react-dom'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import ReactQuill from 'react-quill'
 import styled from 'styled-components'
@@ -14,6 +15,7 @@ const StyledReadMore = styled.div`
   z-index: ${v.zIndex.gridCard};
   position: absolute;
   bottom: 30px;
+  left: 0;
   width: 100%;
   text-align: center;
   padding: 0.5rem;
@@ -70,12 +72,16 @@ class TextItemCover extends React.Component {
 
   blur = () => {
     this.setState({ isEditing: false })
+    const node = ReactDOM.findDOMNode(this);
+    node.scrollTop = 0
   }
 
   save = async (item, { cancel_sync = true } = {}) => {
     this.setState({ loading: true })
     await item.API_updateWithoutSync({ cancel_sync })
     this.setState({ isEditing: false, loading: false, item })
+    const node = ReactDOM.findDOMNode(this);
+    node.scrollTop = 0
   }
 
   checkTextAreaHeight = (height) => {
@@ -135,7 +141,7 @@ class TextItemCover extends React.Component {
       >
         { this.state.loading && <InlineLoader /> }
         {content}
-        { (this.state.readMore && !isEditing) && <StyledReadMore>read more...</StyledReadMore> }
+        { (this.state.readMore && !isEditing) && <StyledReadMore onClick={this.expand}>read more...</StyledReadMore> }
       </PaddedCardCover>
     )
   }

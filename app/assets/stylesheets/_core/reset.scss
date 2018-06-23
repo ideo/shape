@@ -177,3 +177,20 @@ button {
     outline: 0;
   }
 }
+
+// Quill specific rules
+// TODO: move
+.ql-header {
+  display: block;
+  align-self: flex-end;
+}
+
+.ql-format-huge {
+  svg {
+    display: none !important;
+  }
+
+  &:before {
+    content: 'T';
+  }
+}

@@ -302,7 +302,7 @@ class TextItem extends React.Component {
 
     return (
       <StyledContainer className="no-drag" fullPageView={fullPageView} key="contain">
-        { this.canEdit && <TextItemToolbar onExpand={onExpand} /> }
+        { this.canEdit && <TextItemToolbar fullPageView={fullPageView} onExpand={onExpand} /> }
         {this.renderEditorPill}
         <ReactQuill
           key="react_quill"

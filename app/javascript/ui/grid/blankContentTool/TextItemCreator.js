@@ -31,9 +31,6 @@ class TextItemCreator extends React.Component {
     this.item.can_edit = true
   }
 
-  componentDidMount() {
-  }
-
   _onTextChange = (itemTextData) => {
     this.item.text_data = itemTextData
   }
