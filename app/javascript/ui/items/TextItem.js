@@ -23,6 +23,7 @@ const StyledContainer = styled.div`
 
     ${props => !props.fullPageView && (`
       bottom: 0;
+      padding: 10px;
       position: absolute;
       top: 0;
       z-index: 10000;
@@ -86,9 +87,14 @@ class TextItem extends React.Component {
       overrideHeadersFromClipboard(editor)
       this.attachQuillRefs()
       if (!this.props.fullPageView) this.startEditing()
-      this.quillEditor.focus()
     }
     this.subscribeToItemEditingChannel()
+    setTimeout(() => {
+      const { currentEditor } = this.state
+      const { currentUserId } = this.props
+      if (currentEditor && currentEditor.id === currentUserId) return
+      this.quillEditor.focus()
+    }, 350)
   }
 
   componentDidUpdate() {
