@@ -92,7 +92,7 @@ class TextItem extends React.Component {
     setTimeout(() => {
       const { currentEditor } = this.state
       const { currentUserId } = this.props
-      if (currentEditor && currentEditor.id === currentUserId) return
+      if (currentEditor && currentEditor.id !== currentUserId) return
       this.quillEditor.focus()
     }, 350)
   }

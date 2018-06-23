@@ -23,9 +23,11 @@ const StyledButton = styled.button`
 function styles(props) {
   const styles = []
   if (!props.fullPageView) {
-    styles.top = '-16px'
+    styles.top = '0'
     styles.background = 'white'
-    styles.position = 'sticky'
+    styles.paddingTop = '5px'
+    styles.position = 'fixed'
+    styles.height = '26px'
     styles.marginBottom = '20px'
     styles.zIndex = 100
   }
