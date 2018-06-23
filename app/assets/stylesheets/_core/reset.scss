@@ -180,6 +180,9 @@ button {
 
 // Quill specific rules
 // TODO: move
+.quill {
+  height: calc(100% - 30px);
+}
 .ql-toolbar {
   width: calc(100% - 30px);
 }
