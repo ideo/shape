@@ -180,6 +180,13 @@ button {
 
 // Quill specific rules
 // TODO: move
+.ql-toolbar {
+  width: calc(100% - 30px);
+}
+.ql-tooltip.ql-editing {
+  left: calc(50% - 150px) !important;
+  position: fixed;
+}
 .ql-header {
   display: block;
   align-self: flex-end;

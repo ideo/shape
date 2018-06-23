@@ -28,8 +28,6 @@ function styles(props) {
     styles.position = 'sticky'
     styles.marginBottom = '20px'
     styles.zIndex = 100
-  } else {
-    styles.paddingTop = '20px'
   }
   return styles
 }

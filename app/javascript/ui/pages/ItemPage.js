@@ -102,6 +102,7 @@ class ItemPage extends PageWithApi {
           currentUserId={currentUserId}
           onUpdatedData={this.updateItem}
           onSave={this.save}
+          fullPageView
         />
       )
     case ITEM_TYPES.IMAGE:

@@ -163,12 +163,16 @@ class TextItem extends React.Component {
   }
 
   onEditorBlur = (range, source, editor) => {
+    // Check if something is being linked, which causes a blur event
+    const linker = this.quillEditor.container.querySelector('.ql-tooltip.ql-editing')
+    if (linker) return
     // If they click outside of editor, release the lock immediately
     if (!this.ignoreBlurEvent) {
       this.unlockEditingIfOtherViewers()
     }
     if (!this.props.fullPageView) {
       const { onCancel } = this.props
+      console.log('editor on cancel')
       onCancel()
     }
   }
@@ -253,7 +257,9 @@ class TextItem extends React.Component {
     const { item, onSave, fullPageView } = this.props
     const { quillEditor } = this
     item.content = quillEditor.root.innerHTML
-    item.text_data = quillEditor.getContents()
+    setTimeout(() => {
+      item.text_data = quillEditor.getContents()
+    }, 1)
 
     if (!fullPageView && this.quillEditor.hasFocus()) return
     await onSave(item, { cancel_sync: !this.leaving })
@@ -289,7 +295,6 @@ class TextItem extends React.Component {
         readOnly: locked,
         modules: {
           toolbar: '#quill-toolbar',
-          keyboard: { bindings: { tab: { key: 9, handler: () => this.handleTab() } } },
         },
       }
     } else {
@@ -301,11 +306,10 @@ class TextItem extends React.Component {
     }
 
     return (
-      <StyledContainer className="no-drag" fullPageView={fullPageView} key="contain">
+      <StyledContainer className="no-drag" fullPageView={fullPageView}>
         { this.canEdit && <TextItemToolbar fullPageView={fullPageView} onExpand={onExpand} /> }
         {this.renderEditorPill}
         <ReactQuill
-          key="react_quill"
           {...quillProps}
           value={this.textData}
         />
