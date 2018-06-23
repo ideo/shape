@@ -1,4 +1,5 @@
 import PropTypes from 'prop-types'
+import { observable, observe, runInAction } from 'mobx'
 import ReactQuill from 'react-quill'
 import _ from 'lodash'
 import styled from 'styled-components'
@@ -7,7 +8,7 @@ import ActionCableConsumer from '~/utils/ActionCableConsumer'
 import Item from '~/stores/jsonApi/Item'
 import { overrideHeadersFromClipboard } from '~/ui/items/TextItem'
 import v, { ITEM_TYPES, KEYS } from '~/utils/variables'
-import { apiStore, routingStore } from '~/stores'
+import { apiStore, routingStore, uiStore } from '~/stores'
 import TextItem from '~/ui/items/TextItem'
 
 const StyledTextItemCreator = styled.div`
@@ -29,6 +30,14 @@ class TextItemCreator extends React.Component {
     this.onTextChange = _.debounce(this._onTextChange, 1000)
     this.item = new Item()
     this.item.can_edit = true
+  }
+
+  componentDidMount() {
+    runInAction(() => uiStore.update('newTextEditing', true))
+  }
+
+  componentWillUnmount() {
+    runInAction(() => uiStore.update('newTextEditing', false))
   }
 
   _onTextChange = (itemTextData) => {
