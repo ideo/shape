@@ -20,6 +20,13 @@ const StyledContainer = styled.div`
     top: 20px;
     left: 50%;
     transform: translateX(-50%);
+
+    ${props => !props.fullPageView && (`
+      bottom: 0;
+      position: absolute;
+      top: 0;
+      z-index: 10000;
+    `)}
   }
   *::selection {
     background: highlight !important;
