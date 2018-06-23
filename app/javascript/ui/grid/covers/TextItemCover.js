@@ -14,7 +14,7 @@ import v from '~/utils/variables'
 const StyledReadMore = styled.div`
   z-index: ${v.zIndex.gridCard};
   position: absolute;
-  bottom: 30px;
+  bottom: 0;
   left: 0;
   width: 100%;
   text-align: center;
@@ -72,7 +72,8 @@ class TextItemCover extends React.Component {
 
   blur = () => {
     this.setState({ isEditing: false })
-    const node = ReactDOM.findDOMNode(this);
+    const node = ReactDOM.findDOMNode(this)
+    console.log('node', node)
     node.scrollTop = 0
   }
 
@@ -135,7 +136,7 @@ class TextItemCover extends React.Component {
       : this.renderDefault()
     return (
       <PaddedCardCover
-        style={{ height: '100%', overflow: isEditing ? 'scroll' : 'hidden' }}
+        style={{ height: 'calc(100% - 30px)', overflow: isEditing ? 'scroll' : 'hidden' }}
         class="cancelGridClick"
         onClick={this.handleEdit}
       >
