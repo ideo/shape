@@ -27,7 +27,7 @@ function styles(props) {
     styles.background = 'white'
     styles.paddingTop = '5px'
     styles.position = 'fixed'
-    styles.height = '26px'
+    styles.height = '32px'
     styles.marginBottom = '20px'
     styles.zIndex = 100
   }

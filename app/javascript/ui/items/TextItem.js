@@ -15,6 +15,7 @@ const UNLOCK_IN_MILLISECONDS = 5000
 const StyledContainer = styled.div`
   ${props => props.fullPageView && `padding: 2rem 0.5rem;`}
   ${props => !props.fullPageView && `height: 100%;` }
+  padding-top: 25px;
   .editor-pill {
     position: absolute;
     top: 20px;
