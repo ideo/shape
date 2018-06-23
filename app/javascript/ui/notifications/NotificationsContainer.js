@@ -1,4 +1,5 @@
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
+import _ from 'lodash'
 
 import { ActivityContainer } from '~/ui/global/styled/layout'
 import { ActivityText } from '~/ui/notifications/Activity'
@@ -14,7 +15,7 @@ const NoActivityText = ActivityText.extend`
 class NotificationsContainer extends React.Component {
   get notifications() {
     const { apiStore } = this.props
-    return apiStore.unreadNotifications
+    return _.orderBy(apiStore.notifications, ['read', 'created_at'], ['asc', 'desc'])
   }
 
   unreadCount() {

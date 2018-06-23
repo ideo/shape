@@ -3,6 +3,7 @@ import { Store } from 'mobx-jsonapi-store'
 import _ from 'lodash'
 import moment from 'moment-mini'
 
+import trackError from '~/utils/trackError'
 import Activity from './jsonApi/Activity'
 import Collection from './jsonApi/Collection'
 import CollectionCard from './jsonApi/CollectionCard'
@@ -41,6 +42,7 @@ class ApiStore extends Store {
   }
 
   @computed get currentUserOrganizationId() {
+    if (!this.currentUser) return null
     if (!this.currentUser.current_organization) return null
     return this.currentUser.current_organization.id
   }
@@ -63,7 +65,7 @@ class ApiStore extends Store {
       const res = await this.request('users/me')
       this.setCurrentUserId(res.data.id)
     } catch (e) {
-      console.warn(e)
+      trackError(e, { source: 'loadCurrentUser', name: 'fetchUser' })
     }
   }
 
@@ -75,7 +77,7 @@ class ApiStore extends Store {
       }
       groups.map(group => this.fetchRoles(group))
     } catch (e) {
-      console.warn(e)
+      trackError(e, { source: 'loadCurrentUserGroups', name: 'fetchGroups' })
     }
   }
 
@@ -100,6 +102,10 @@ class ApiStore extends Store {
       this.findAll('notifications').filter(notification => !notification.read),
       'created_at'
     ))
+  }
+
+  @computed get notifications() {
+    return this.findAll('notifications')
   }
 
   @computed get unreadNotificationsCount() {
@@ -178,7 +184,7 @@ class ApiStore extends Store {
           this.add(thread)
         }
       } catch (e) {
-        console.warn(e)
+        trackError(e, { source: 'findOrBuildCommentThread', name: 'fetchThreads' })
       }
     }
     this.setCurrentPageThreadKey(thread.key)

@@ -1,5 +1,6 @@
 import Notification from '~/ui/notifications/Notification'
-
+import v from '~/utils/variables'
+import sleep from '~/utils/sleep'
 import { apiStore } from '~/stores'
 
 import {
@@ -7,6 +8,7 @@ import {
 } from '#/mocks/data'
 
 jest.mock('../../../app/javascript/stores')
+jest.mock('../../../app/javascript/utils/sleep')
 
 describe('Notification', () => {
   let props
@@ -28,6 +30,16 @@ describe('Notification', () => {
     reRender()
   })
 
+  describe('componentDidMount', () => {
+    it('should set fade in progress to false', () => {
+      expect(component.fadeInProgress).toBeFalsy()
+    })
+
+    it('should set shown to true', () => {
+      expect(component.shown).toBeTruthy()
+    })
+  })
+
   describe('handleRead', () => {
     beforeEach(() => {
       wrapper.find('.read').simulate('click', { preventDefault: jest.fn() })
@@ -36,9 +48,37 @@ describe('Notification', () => {
     it('should set the notification to read', () => {
       expect(fakeNotification.read).toBeTruthy()
     })
+
+    it('should set fade in progress to false', () => {
+      expect(component.fadeInProgress).toBeFalsy()
+    })
   })
 
   describe('render', () => {
+    describe('with the alert style type', () => {
+      beforeEach(() => {
+        wrapper.setProps({ styleType: 'alert', ...props })
+      })
+
+      it('should show a close button rather then notification button', () => {
+        expect(wrapper.find('CloseButton').exists()).toBeTruthy()
+      })
+
+      it('should should not render the date', () => {
+        expect(wrapper.find('Moment').exists()).toBeFalsy()
+      })
+
+      it('should change the styles', () => {
+        const ele = wrapper.find('StyledNotification')
+        expect(ele).toHaveStyleRule(
+          'background', v.colors.orange
+        )
+        expect(ele).toHaveStyleRule(
+          'margin-right', '0px'
+        )
+      })
+    })
+
     describe('with a notification with no target yet', () => {
       beforeEach(() => {
         apiStore.find.mockReturnValue(null)

@@ -1,6 +1,8 @@
+import PropTypes from 'prop-types'
 import styled from 'styled-components'
 
 import v from '~/utils/variables'
+import ExpandIcon from '~/ui/icons/ExpandIcon'
 
 const StyledButton = styled.button`
   color: ${v.colors.cloudy};
@@ -12,18 +14,51 @@ const StyledButton = styled.button`
     font-size: 1.1rem;
     font-family: ${v.fonts.sans};
   }
+  &.ql-format-huge {
+    font-size: 1.3rem;
+    font-family: ${v.fonts.sans};
+  }
 `
 
-const TextItemToolbar = () => (
-  <div id="quill-toolbar">
+function styles(props) {
+  const styles = []
+  if (!props.fullPageView) {
+    styles.top = '0'
+    styles.background = 'white'
+    styles.paddingTop = '5px'
+    styles.position = 'fixed'
+    styles.height = '32px'
+    styles.marginBottom = '20px'
+    styles.zIndex = 100
+  }
+  return styles
+}
+
+const TextItemToolbar = (props) => (
+  <div id="quill-toolbar" style={styles(props)}>
     <span className="ql-formats">
       <StyledButton className="ql-header ql-format-reg" value="">T</StyledButton>
       {/* when using H2, quill inserts its own SVG -- couldn't figure out a way around */}
       <StyledButton className="ql-header ql-format-large" value="3">T</StyledButton>
+      <StyledButton className="ql-header ql-format-huge" value="1">
+        T</StyledButton>
       {/* quill inserts ql-link SVG */}
       <StyledButton className="ql-link" />
+      {props.onExpand && (
+        <StyledButton onClick={props.onExpand}>
+          <ExpandIcon />
+        </StyledButton>
+      )}
     </span>
   </div>
 )
+TextItemToolbar.propTypes = {
+  onExpand: PropTypes.func,
+  fullPageView: PropTypes.bool,
+}
+TextItemToolbar.defaultProps = {
+  onExpand: null,
+  fullPageView: false,
+}
 
 export default TextItemToolbar

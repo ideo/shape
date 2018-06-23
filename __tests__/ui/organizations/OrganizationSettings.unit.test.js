@@ -1,4 +1,4 @@
-import SettingsPage from '~/ui/pages/SettingsPage'
+import OrganizationSettings from '~/ui/organizations/OrganizationSettings'
 import fakeApiStore from '#/mocks/fakeApiStore'
 
 let wrapper, component, apiStore, routingStore, props, organization
@@ -10,12 +10,12 @@ beforeEach(() => {
   props = { apiStore, routingStore }
 })
 
-describe('SettingsPage', () => {
+describe('OrganizationSettings', () => {
   describe('without edit capabilities', () => {
     beforeEach(() => {
       organization.primary_group.can_edit = false
       wrapper = shallow(
-        <SettingsPage.wrappedComponent {...props} />
+        <OrganizationSettings.wrappedComponent {...props} />
       )
     })
 
@@ -28,13 +28,13 @@ describe('SettingsPage', () => {
     beforeEach(() => {
       organization.primary_group.can_edit = true
       wrapper = shallow(
-        <SettingsPage.wrappedComponent {...props} />
+        <OrganizationSettings.wrappedComponent {...props} />
       )
       component = wrapper.instance()
     })
 
     it('renders the page with TagEditor for domain whitelist', () => {
-      expect(wrapper.find('SimpleHeading1').exists()).toBeTruthy()
+      expect(wrapper.find('Heading2').exists()).toBeTruthy()
       expect(wrapper.find('TagEditor').props().record).toEqual(organization)
       expect(wrapper.find('TagEditor').props().tagField).toEqual('domain_whitelist')
     })

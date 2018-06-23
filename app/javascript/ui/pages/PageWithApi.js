@@ -1,6 +1,7 @@
 import _ from 'lodash'
 import { action, observable } from 'mobx'
 import { animateScroll as scroll } from 'react-scroll'
+import trackError from '~/utils/trackError'
 
 import { uiStore, routingStore } from '~/stores'
 
@@ -51,8 +52,8 @@ class PageWithApi extends React.Component {
       .catch(err => {
         uiStore.update('isLoading', false)
         this.updateError(err)
-        console.warn('API error!', err)
         if (!routingStore.location.pathname === '/') routingStore.routeTo('/')
+        trackError(err, { name: 'PageApiFetch' })
       })
   }
 }

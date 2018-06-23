@@ -52,7 +52,9 @@ class Api::V1::UsersController < Api::V1::BaseController
   # since you the only user you can update via the API is yourself, this keeps it simple
   def update_current_user
     if current_user.update(user_params)
-      render jsonapi: current_user
+      render jsonapi: current_user, class: {
+        User: SerializableCurrentUser,
+      }
     else
       render_api_errors current_user.errors
     end
@@ -80,6 +82,7 @@ class Api::V1::UsersController < Api::V1::BaseController
       # these are the only fields you would update via the API
       :terms_accepted,
       :show_helper,
+      :notify_through_email,
     )
   end
 

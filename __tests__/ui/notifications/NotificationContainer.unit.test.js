@@ -36,4 +36,24 @@ describe('NotificationsContainer', () => {
       expect(component.unreadCount()).toEqual(2)
     })
   })
+
+  describe('notifications', () => {
+    let notifications
+
+    beforeEach(() => {
+      props.apiStore.notifications = [
+        { id: 1, read: false, created_at: new Date('May 4 1977 12:30') },
+        { id: 2, read: false, created_at: new Date('April 20 2017 12:30') },
+        { id: 3, read: true, created_at: new Date() },
+      ]
+      wrapper.setProps(props)
+      notifications = component.notifications
+    })
+
+    it('should order by read and created at', () => {
+      expect(notifications[0].id).toEqual(2)
+      expect(notifications[1].id).toEqual(1)
+      expect(notifications[2].id).toEqual(3)
+    })
+  })
 })

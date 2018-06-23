@@ -102,6 +102,7 @@ class ItemPage extends PageWithApi {
           currentUserId={currentUserId}
           onUpdatedData={this.updateItem}
           onSave={this.save}
+          fullPageView
         />
       )
     case ITEM_TYPES.IMAGE:
@@ -124,6 +125,8 @@ class ItemPage extends PageWithApi {
     const { item } = this.state
     item.name = name
     item.save()
+    const { uiStore } = this.props
+    uiStore.trackEvent('update', item)
   }
 
   render() {

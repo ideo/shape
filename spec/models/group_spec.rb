@@ -12,6 +12,22 @@ RSpec.describe Group, type: :model do
     it { should belong_to :filestack_file }
   end
 
+  context 'is primary group' do
+    before do
+      organization.primary_group_id = group.id
+    end
+
+    context 'after update' do
+      before do
+        group.update(name: '12345')
+      end
+
+      it 'should update the organization name' do
+        expect(organization.name).to eq('12345')
+      end
+    end
+  end
+
   context 'with users in roles' do
     let!(:admins) { create_list(:user, 3) }
     let!(:members) { create_list(:user, 3) }

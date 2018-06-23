@@ -44,6 +44,7 @@ export default {
     sirocco: '#6a7c7e',
     blackLava: '#120f0e',
     orange: '#d66742',
+    white: '#ffffff',
   },
 
   iconSizes: {
