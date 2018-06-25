@@ -1,4 +1,5 @@
 import PropTypes from 'prop-types'
+import { Fragment } from 'react'
 import ReactDOM from 'react-dom'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import ReactQuill from 'react-quill'
@@ -73,7 +74,6 @@ class TextItemCover extends React.Component {
   blur = () => {
     this.setState({ isEditing: false })
     const node = ReactDOM.findDOMNode(this)
-    console.log('node', node)
     node.scrollTop = 0
   }
 

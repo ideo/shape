@@ -183,7 +183,7 @@ button {
 .quill {
 }
 .ql-toolbar {
-  width: calc(100% - 30px);
+  width: calc(100% - 70px);
 }
 .ql-tooltip.ql-editing {
   left: calc(50% - 150px) !important;
@@ -191,7 +191,6 @@ button {
 }
 .ql-header {
   display: block;
-  align-self: flex-end;
 }
 
 .ql-format-huge {
@@ -202,4 +201,14 @@ button {
   &:before {
     content: 'T';
   }
+}
+.ql-snow .ql-formats {
+  align-items: flex-end;
+  display: flex;
+}
+.ql-snow.ql-toolbar button {
+  height: auto;
+}
+.ql-formats > .ql-link {
+  margin-bottom: 3px;
 }

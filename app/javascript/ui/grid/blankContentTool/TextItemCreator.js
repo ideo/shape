@@ -32,14 +32,6 @@ class TextItemCreator extends React.Component {
     this.item.can_edit = true
   }
 
-  componentDidMount() {
-    runInAction(() => uiStore.update('newTextEditing', true))
-  }
-
-  componentWillUnmount() {
-    runInAction(() => uiStore.update('newTextEditing', false))
-  }
-
   _onTextChange = (itemTextData) => {
     this.item.text_data = itemTextData
   }
@@ -48,10 +40,20 @@ class TextItemCreator extends React.Component {
     routingStore.routeTo('items', this.item.id)
   }
 
+  onCancel = (item) => {
+    console.log('item content', item.content)
+    if (item.content) {
+      this.createTextItem(item)
+    } else {
+      this.props.closeBlankContentTool()
+    }
+  }
+
   createTextItem = (item) => {
     if (this.props.loading) return
     // make sure to capture last text change before saving
     this.onTextChange.flush()
+    console.log('createtextitem', this.props)
     this.props.createCard({
       item_attributes: {
         // name will get created in Rails
@@ -65,10 +67,6 @@ class TextItemCreator extends React.Component {
   render() {
     // re-bind enter to create the item instead of doing a linebreak
     const bindings = {
-      enter: {
-        key: KEYS.ENTER,
-        handler: this.createTextItem,
-      },
       esc: {
         key: KEYS.ESC,
         handler: () => {
@@ -85,6 +83,7 @@ class TextItemCreator extends React.Component {
           actionCableConsumer={ActionCableConsumer}
           currentUserId={apiStore.currentUser.id}
           onUpdatedData={this.onTextChange}
+          onCancel={this.onCancel}
           onSave={this.createTextItem}
           onExpand={this.item.id ? this.expand : null}
         />

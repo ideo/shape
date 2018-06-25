@@ -5,8 +5,9 @@ import ReactQuill from 'react-quill'
 import styled from 'styled-components'
 
 import v from '~/utils/variables'
-import TextItemToolbar from '~/ui/items/TextItemToolbar'
+import { CloseButton } from '~/ui/global/styled/buttons'
 import EditorPill from '~/ui/items/EditorPill'
+import TextItemToolbar from '~/ui/items/TextItemToolbar'
 
 // How long to wait before unlocking editor due to inactivity
 // Only used if there are other viewers
@@ -188,7 +189,8 @@ class TextItem extends React.Component {
     }
     if (!this.props.fullPageView) {
       const { onCancel } = this.props
-      onCancel()
+      const item = this.getCurrentText()
+      onCancel(item)
     }
   }
 
@@ -197,6 +199,20 @@ class TextItem extends React.Component {
     // Ignore any events while editor is locked
     if (locked) return
     this.startEditing()
+  }
+
+  cancel = () => {
+    const { onCancel } = this.props
+    const item = this.getCurrentText()
+    onCancel(item)
+  }
+
+  getCurrentText() {
+    const { item } = this.props
+    const { quillEditor } = this
+    item.content = quillEditor.root.innerHTML
+    item.text_data = quillEditor.getContents()
+    return item
   }
 
   startEditing = () => {
@@ -321,6 +337,7 @@ class TextItem extends React.Component {
     return (
       <StyledContainer className="no-drag" fullPageView={fullPageView}>
         { this.canEdit && <TextItemToolbar fullPageView={fullPageView} onExpand={onExpand} /> }
+        { this.canEdit && <CloseButton onClick={this.cancel} /> }
         {this.renderEditorPill}
         <ReactQuill
           {...quillProps}
