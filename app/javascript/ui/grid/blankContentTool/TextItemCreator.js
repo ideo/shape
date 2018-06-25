@@ -41,8 +41,7 @@ class TextItemCreator extends React.Component {
   }
 
   onCancel = (item) => {
-    console.log('item content', item.content)
-    if (item.content) {
+    if (item.justText) {
       this.createTextItem(item)
     } else {
       this.props.closeBlankContentTool()
@@ -53,7 +52,6 @@ class TextItemCreator extends React.Component {
     if (this.props.loading) return
     // make sure to capture last text change before saving
     this.onTextChange.flush()
-    console.log('createtextitem', this.props)
     this.props.createCard({
       item_attributes: {
         // name will get created in Rails

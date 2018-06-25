@@ -1,6 +1,7 @@
 import PropTypes from 'prop-types'
 import { Fragment } from 'react'
 import ReactDOM from 'react-dom'
+import { runInAction } from 'mobx'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import ReactQuill from 'react-quill'
 import styled from 'styled-components'
@@ -58,6 +59,9 @@ class TextItemCover extends React.Component {
     }
     ev.stopPropagation()
     this.setState({ isEditing: true })
+    runInAction(() => {
+      uiStore.update('textEditingItem', this.state.item)
+    })
   }
 
   expand = () => {
@@ -73,6 +77,8 @@ class TextItemCover extends React.Component {
 
   blur = () => {
     this.setState({ isEditing: false })
+    runInAction(() => { uiStore.update('textEditingItem', null) })
+    // TODO figure out why ref wasn't working
     const node = ReactDOM.findDOMNode(this)
     node.scrollTop = 0
   }
@@ -81,6 +87,8 @@ class TextItemCover extends React.Component {
     this.setState({ loading: true })
     await item.API_updateWithoutSync({ cancel_sync })
     this.setState({ isEditing: false, loading: false, item })
+    runInAction(() => { uiStore.update('textEditingItem', null) })
+    // TODO figure out why ref wasn't working
     const node = ReactDOM.findDOMNode(this);
     node.scrollTop = 0
   }

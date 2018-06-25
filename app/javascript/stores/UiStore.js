@@ -73,6 +73,7 @@ export default class UiStore {
   @observable editingName = false
   @observable trackedRecords = new Map()
   @observable dragging = false
+  @observable textEditingItem = null
 
   @action startDragging() {
     this.dragging = true

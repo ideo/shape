@@ -181,9 +181,11 @@ button {
 // Quill specific rules
 // TODO: move
 .quill {
+  height: calc(100% - 20px);
 }
 .ql-toolbar {
-  width: calc(100% - 70px);
+  margin-left: -5px;
+  width: calc(100% - 55px);
 }
 .ql-tooltip.ql-editing {
   left: calc(50% - 150px) !important;
@@ -211,4 +213,7 @@ button {
 }
 .ql-formats > .ql-link {
   margin-bottom: 3px;
+}
+.ql-snow .ql-stroke {
+  stroke-width: 1.5px;
 }

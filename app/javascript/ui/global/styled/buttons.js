@@ -7,8 +7,8 @@ import v from '~/utils/variables'
 /** @component */
 export const TopRightButton = styled.button`
   position: absolute;
-  top: ${props => (props.size === 'sm' ? '5px' : '12px')};
-  right: ${props => (props.size === 'sm' ? '10px' : '12px')};
+  top: ${props => (props.size === 'sm' ? '10px' : '12px')};
+  right: ${props => (props.size === 'sm' ? '15px' : '12px')};
   color: ${props => props.color};
   .icon {
     width: ${props => (props.size === 'sm' ? '12px' : '15px')};
