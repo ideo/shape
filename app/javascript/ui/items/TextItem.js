@@ -15,7 +15,6 @@ const UNLOCK_IN_MILLISECONDS = 5000
 
 const StyledContainer = styled.div`
   ${props => props.fullPageView && `padding: 2rem 0.5rem;`}
-  ${props => !props.fullPageView && `height: 100%;` }
   padding-top: 25px;
   .editor-pill {
     position: absolute;
@@ -337,7 +336,7 @@ class TextItem extends React.Component {
     return (
       <StyledContainer className="no-drag" fullPageView={fullPageView}>
         { this.canEdit && <TextItemToolbar fullPageView={fullPageView} onExpand={onExpand} /> }
-        { this.canEdit && <CloseButton onClick={this.cancel} /> }
+        <CloseButton onClick={this.cancel} size={fullPageView ? 'lg' : 'sm'} position={fullPageView ? 'absolute' : 'fixed'} />
         {this.renderEditorPill}
         <ReactQuill
           {...quillProps}

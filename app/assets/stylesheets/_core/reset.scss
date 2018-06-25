@@ -181,7 +181,6 @@ button {
 // Quill specific rules
 // TODO: move
 .quill {
-  height: calc(100% - 20px);
 }
 .ql-toolbar {
   margin-left: -5px;
@@ -216,4 +215,7 @@ button {
 }
 .ql-snow .ql-stroke {
   stroke-width: 1.5px;
+}
+.ql-editor {
+  min-height: 100px;
 }
