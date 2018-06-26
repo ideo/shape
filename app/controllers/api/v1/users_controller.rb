@@ -25,7 +25,7 @@ class Api::V1::UsersController < Api::V1::BaseController
     render jsonapi: current_user, include: [
       :groups,
       organizations: %i[primary_group],
-      current_organization: %i[primary_group guest_group],
+      current_organization: %i[primary_group guest_group admin_group],
     ], class: {
       User: SerializableCurrentUser,
       Group: SerializableGroup,
