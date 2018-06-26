@@ -247,3 +247,4 @@ class User < ApplicationRecord
     sync_groups_after(role, :remove_role)
   end
 end
+

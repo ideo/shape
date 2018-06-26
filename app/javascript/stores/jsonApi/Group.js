@@ -19,7 +19,7 @@ class Group extends BaseRecord {
   }
 
   get isOrgGroup() {
-    return this.is_primary || this.is_guest
+    return this.is_primary || this.is_guest || this.is_admin
   }
 
   API_archive() {

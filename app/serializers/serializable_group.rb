@@ -7,6 +7,9 @@ class SerializableGroup < BaseJsonSerializer
   attribute :is_guest do
     @object.guest?
   end
+  attribute :is_admin do
+    @object.admin?
+  end
   attribute :filestack_file_url do
     if @object.filestack_file_url.present?
       @object.filestack_file_url

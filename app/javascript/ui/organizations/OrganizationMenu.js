@@ -66,6 +66,7 @@ class OrganizationMenu extends React.Component {
     if (!group.is_primary) return
     const { apiStore, organization } = this.props
     apiStore.fetch('groups', organization.guest_group.id)
+    apiStore.fetch('groups', organization.admin_group.id)
   }
 
   createOrganization = async (organizationData) => {
