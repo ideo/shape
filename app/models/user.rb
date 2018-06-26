@@ -226,4 +226,24 @@ class User < ApplicationRecord
     resource = role.resource
     resource.reindex if Searchkick.callbacks? && resource.searchable?
   end
+
+  def sync_groups_after(role, action)
+    return unless role.resource.is_a?(Group)
+    group = role.resource
+    if group.primary? && role.name == Role::ADMIN.to_s
+      send(action, Role::ADMIN, group.organization.admin_group) unless
+        has_role?(Role::ADMIN, group.organization.admin_group)
+    elsif group.admin?
+      send(action, Role::ADMIN, group.organization.primary_group) unless
+        has_role?(Role::ADMIN, group.organization.admin_group)
+    end
+  end
+
+  def sync_groups_after_adding(role)
+    sync_groups_after(role, :add_role)
+  end
+
+  def sync_groups_after_removing(role)
+    sync_groups_after(role, :remove_role)
+  end
 end

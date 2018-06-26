@@ -66,6 +66,7 @@ module RolifyExtensions
     else
       raise "RolifyExtension: Unsupported model '#{self.class.name}' for add_role"
     end
+    sync_groups_after_adding(role) if is_a?(User)
     after_role_update(role)
     role
   end
@@ -82,6 +83,7 @@ module RolifyExtensions
     else
       raise "RolifyExtension: Unsupported model '#{self.class.name}' for remove_role"
     end
+    sync_groups_after_removing(role) if is_a?(User)
     after_role_update(role)
     role
   end
