@@ -129,6 +129,8 @@ export const fakeOrganizationAttrs = {
   id: 1,
   name: 'TestOrg',
   primary_group: fakeGroup,
+  guest_group: fakeGroup,
+  admin_group: fakeGroup,
 }
 export const fakeOrganization = {
   ...fakeOrganizationAttrs,
