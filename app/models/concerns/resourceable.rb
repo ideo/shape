@@ -5,6 +5,7 @@ module Resourceable
     resourcify
     class_attribute :resourceable_roles
     class_attribute :edit_role
+    class_attribute :content_edit_role
     class_attribute :view_role
   end
 
@@ -21,8 +22,9 @@ module Resourceable
         end
       end
 
-      self.edit_role = args[:edit_role].to_sym if args[:edit_role].present?
-      self.view_role = args[:view_role].to_sym if args[:view_role].present?
+      %i[edit view content_edit].each do |role_type|
+        send("#{role_type}=", args[role_type].to_sym) if args[role_type].present?
+      end
     end
 
     def define_dynamic_role_method(role_name)
@@ -58,8 +60,15 @@ module Resourceable
     user_or_group.has_role_by_identifier?(self.class.edit_role, resource_identifier)
   end
 
+  def can_edit_content?(user_or_group)
+    return true if can_edit?(user_or_group)
+    return false if self.class.content_edit_role.blank?
+    user_or_group.has_role_by_identifier?(self.class.content_edit_role, resource_identifier)
+  end
+
   def can_view?(user_or_group)
     return true if can_edit?(user_or_group)
+    return true if can_edit_content?(user_or_group)
     raise_role_name_not_set(:view_role) if self.class.view_role.blank?
     user_or_group.has_role_by_identifier?(self.class.view_role, resource_identifier)
   end

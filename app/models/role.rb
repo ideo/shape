@@ -19,6 +19,7 @@ class Role < ApplicationRecord
 
   VIEWER = :viewer
   EDITOR = :editor
+  CONTENT_EDITOR = :content_editor
   MEMBER = :member
   ADMIN = :admin
 
