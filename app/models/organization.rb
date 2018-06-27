@@ -19,7 +19,6 @@ class Organization < ApplicationRecord
              optional: true
 
   after_create :create_groups
-  after_create :create_templates
   before_update :parse_domain_whitelist
   after_update :update_group_names, if: :saved_change_to_name?
   after_update :check_guests_for_domain_match, if: :saved_change_to_domain_whitelist?
@@ -113,6 +112,21 @@ class Organization < ApplicationRecord
     ).uniq.count
   end
 
+  def setup_templates(user)
+    # Create templates collection
+    collection = create_template_collection(
+      name: template_collection_name,
+      organization: self,
+    )
+    admin_group.add_role(Role::EDITOR, collection)
+    LinkToSharedCollectionsWorker.new.perform(
+      [user.id],
+      [admin_group.id],
+      [collection.id],
+      [],
+    )
+  end
+
   private
 
   def parse_domain_whitelist
@@ -137,15 +151,6 @@ class Organization < ApplicationRecord
     create_admin_group(name: admin_group_name, organization: self, handle:
                        admin_group_handle)
     save # Save primary group attr
-  end
-
-  def create_templates
-    # Create templates collection
-    collection = create_template_collection(
-      name: template_collection_name,
-      organization: self,
-    )
-    admin_group.add_role(Role::VIEWER, collection)
   end
 
   def update_group_names

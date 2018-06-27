@@ -70,7 +70,7 @@ class OrganizationMenu extends React.Component {
   }
 
   createOrganization = async (organizationData) => {
-    const { apiStore, uiStore } = this.props
+    const { apiStore, uiStore, onClose } = this.props
     const newOrg = new Organization(organizationData, apiStore)
     try {
       this.isLoading = true
@@ -79,6 +79,7 @@ class OrganizationMenu extends React.Component {
         { backToHomepage: true })
       this.isLoading = false
       uiStore.update('orgCreated', true)
+      onClose()
     } catch (err) {
       this.isLoading = false
       uiStore.alert(err.error[0])

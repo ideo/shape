@@ -38,14 +38,6 @@ describe Organization, type: :model do
       end
     end
 
-    describe '#initialize_template_collection' do
-      it 'should create a template collection for the org' do
-        expect(organization.template_collection.persisted?).to be true
-        expect(organization.template_collection.name).to eq(
-          "#{organization.name} Templates")
-      end
-    end
-
     describe '#update_group_names' do
       it 'should update primary group if name changes' do
         expect(organization.primary_group.name).not_to eq('Org 2.0')
@@ -227,6 +219,26 @@ describe Organization, type: :model do
 
     it 'should count the number of users' do
       expect(organization.user_count).to eq 2
+    end
+  end
+
+  describe '#setup_templates' do
+    let(:organization) { create(:organization) }
+    let(:user) { create(:user) }
+
+    before do
+      organization.setup_templates(user)
+    end
+
+    it 'should create a template collection for the org' do
+      expect(organization.template_collection.persisted?).to be true
+      expect(organization.template_collection.name).to eq(
+        "#{organization.name} Templates")
+    end
+
+    it 'should add the admin group as the editor role' do
+      expect(organization.admin_group.has_role?(Role::EDITOR,
+             organization.template_collection)).to be true
     end
   end
 end
