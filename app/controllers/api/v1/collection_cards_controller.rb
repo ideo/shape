@@ -35,7 +35,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
   def archive
     if @collection_card.archive!
       if @collection_card.record.is_a?(Collection)
-        if !@collection_card.link?
+        unless @collection_card.link?
           ActivityAndNotificationBuilder.call(
             actor: current_user,
             target: @collection_card.record,
@@ -100,15 +100,15 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
 
   def load_and_authorize_parent_collection
     @collection = Collection.find(collection_card_params[:parent_id])
-    authorize! :manage, @collection
+    authorize! :content_edit, @collection
   end
 
   def load_and_authorize_moving_collections
     @from_collection = Collection.find(json_api_params[:from_id])
     @cards = @from_collection.collection_cards.where(id: json_api_params[:collection_card_ids])
     @to_collection = Collection.find(json_api_params[:to_id])
-    authorize! :manage, @from_collection
-    authorize! :manage, @to_collection
+    authorize! :content_edit, @from_collection
+    authorize! :content_edit, @to_collection
   end
 
   # almost the same as above but needs to authorize read access for each card's record
@@ -119,7 +119,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
       authorize! :read, card.record
     end
     @to_collection = Collection.find(json_api_params[:to_id])
-    authorize! :manage, @to_collection
+    authorize! :content_edit, @to_collection
   end
 
   def collection_card_params

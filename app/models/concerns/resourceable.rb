@@ -22,7 +22,7 @@ module Resourceable
         end
       end
 
-      %i[edit view content_edit].each do |role_type|
+      %i[edit_role view_role content_edit_role].each do |role_type|
         send("#{role_type}=", args[role_type].to_sym) if args[role_type].present?
       end
     end
