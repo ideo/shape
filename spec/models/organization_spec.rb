@@ -38,6 +38,14 @@ describe Organization, type: :model do
       end
     end
 
+    describe '#initialize_template_collection' do
+      it 'should create a template collection for the org' do
+        expect(organization.template_collection.persisted?).to be true
+        expect(organization.template_collection.name).to eq(
+          "#{organization.name} Templates")
+      end
+    end
+
     describe '#update_group_names' do
       it 'should update primary group if name changes' do
         expect(organization.primary_group.name).not_to eq('Org 2.0')
