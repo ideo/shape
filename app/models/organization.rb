@@ -15,6 +15,7 @@ class Organization < ApplicationRecord
              optional: true
   belongs_to :template_collection,
              class_name: 'Collection',
+             dependent: :destroy,
              optional: true
 
   after_create :create_groups
