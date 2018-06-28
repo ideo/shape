@@ -96,6 +96,13 @@ class Organization < ApplicationRecord
   def admin_group_handle
     "#{handle}-admins"
   end
+  
+  def user_count
+    (
+      primary_group.user_ids +
+      guest_group.user_ids
+    ).uniq.count
+  end
 
   private
 

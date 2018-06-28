@@ -99,7 +99,11 @@ class User < ApplicationRecord
 
     # Update user on every auth
     user.email = auth.info.email
-    user.handle = auth.info.username
+    if auth.info.username.present?
+      user.handle = auth.info.username
+    elsif user.handle.blank?
+      user.generate_handle
+    end
     user.first_name = auth.info.first_name
     user.last_name = auth.info.last_name
     user.pic_url_square = auth.info.picture
@@ -139,6 +143,19 @@ class User < ApplicationRecord
     self.pic_url_square = params[:picture] if params[:picture].present?
     self.handle = params[:username] if params[:username].present?
     save
+  end
+
+  def generate_handle
+    test_handle = name.downcase.delete ' '
+    new_handle = test_handle
+    existing = User.find_by_handle(test_handle)
+    i = 0
+    while existing
+      i += 1
+      new_handle = "#{test_handle}-#{i}"
+      existing = User.find_by_handle(new_handle)
+    end
+    self.handle = new_handle
   end
 
   def name
