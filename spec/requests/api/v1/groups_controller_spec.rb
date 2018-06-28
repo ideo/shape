@@ -63,7 +63,7 @@ describe Api::V1::GroupsController, type: :request, json: true, auth: true do
     context 'without org admin access' do
       before do
         user.remove_role(Role::ADMIN, user.current_organization.primary_group)
-        user.remove_role(Role::ADMIN, user.current_organization.admin_groupr)
+        user.remove_role(Role::ADMIN, user.current_organization.admin_group)
       end
 
       it 'returns a 401 if user is not an org admin' do
