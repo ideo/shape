@@ -127,11 +127,12 @@ class RolesMenu extends React.Component {
     )
   }
 
-  // TODO needs to check group roles too
-  currentUserCheck(user) {
+  notCurrentUser(entity) {
+    // TODO: needs to check group roles too
+    if (entity.internalType === 'groups') return true
     const { apiStore } = this.props
     const { currentUser } = apiStore
-    return (currentUser.id !== user.id)
+    return currentUser.id !== entity.id
   }
 
   render() {
@@ -157,7 +158,7 @@ class RolesMenu extends React.Component {
         <Heading3>{title}</Heading3>
         { sortedRoleEntities.map(combined =>
           (<RoleSelect
-            enabled={canEdit && this.currentUserCheck(combined.entity, combined.role)}
+            enabled={canEdit && this.notCurrentUser(combined.entity, combined.role)}
             key={`${combined.entity.id}_${combined.entity.internalType}_r${combined.role.id}`}
             role={combined.role}
             roleTypes={roleTypes}
