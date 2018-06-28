@@ -439,7 +439,7 @@ class GridCardBlank extends React.Component {
           {this.renderInner()}
         </StyledGridCardInner>
         { this.state.loading && <InlineLoader /> }
-        { !this.emptyState && !this.state.creating === 'text' &&
+        { !this.emptyState && this.state.creating !== 'text' &&
           <CloseButton onClick={this.closeBlankContentTool} />
         }
       </StyledGridCardBlank>
