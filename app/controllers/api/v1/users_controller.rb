@@ -49,7 +49,7 @@ class Api::V1::UsersController < Api::V1::BaseController
     end
   end
 
-  # since you the only user you can update via the API is yourself, this keeps it simple
+  # since the only user you can update via the API is yourself, this keeps it simple
   def update_current_user
     if current_user.update(user_params)
       render jsonapi: current_user, class: {
