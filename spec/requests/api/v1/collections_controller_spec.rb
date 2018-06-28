@@ -258,7 +258,7 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
       context 'updating collection cards attributes' do
         it 'returns a 200' do
           patch(path, params: params)
-          expect(response.status).to eq(401)
+          expect(response.status).to eq(200)
         end
       end
     end

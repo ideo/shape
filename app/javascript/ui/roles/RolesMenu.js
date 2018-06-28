@@ -157,6 +157,8 @@ class RolesMenu extends React.Component {
       <div>
         <Heading3>{title}</Heading3>
         { sortedRoleEntities.map(combined =>
+          // NOTE: content_editor is a "hidden" role for now
+          combined.role.name !== 'content_editor' &&
           (<RoleSelect
             enabled={canEdit && this.notCurrentUser(combined.entity, combined.role)}
             key={`${combined.entity.id}_${combined.entity.internalType}_r${combined.role.id}`}

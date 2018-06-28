@@ -39,7 +39,7 @@ class Ability
       can %i[read duplicate], Collection do |collection|
         collection.can_view?(user)
       end
-      can :content_edit, Collection do |collection|
+      can :edit_content, Collection do |collection|
         collection.can_edit_content?(user)
       end
       can :manage, Collection do |collection|

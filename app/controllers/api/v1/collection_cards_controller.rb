@@ -100,15 +100,15 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
 
   def load_and_authorize_parent_collection
     @collection = Collection.find(collection_card_params[:parent_id])
-    authorize! :content_edit, @collection
+    authorize! :edit_content, @collection
   end
 
   def load_and_authorize_moving_collections
     @from_collection = Collection.find(json_api_params[:from_id])
     @cards = @from_collection.collection_cards.where(id: json_api_params[:collection_card_ids])
     @to_collection = Collection.find(json_api_params[:to_id])
-    authorize! :content_edit, @from_collection
-    authorize! :content_edit, @to_collection
+    authorize! :edit_content, @from_collection
+    authorize! :edit_content, @to_collection
   end
 
   # almost the same as above but needs to authorize read access for each card's record
@@ -119,7 +119,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
       authorize! :read, card.record
     end
     @to_collection = Collection.find(json_api_params[:to_id])
-    authorize! :content_edit, @to_collection
+    authorize! :edit_content, @to_collection
   end
 
   def collection_card_params
