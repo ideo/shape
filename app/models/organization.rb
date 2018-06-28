@@ -85,6 +85,13 @@ class Organization < ApplicationRecord
     "#{handle}-guest"
   end
 
+  def user_count
+    (
+      primary_group.user_ids +
+      guest_group.user_ids
+    ).uniq.count
+  end
+
   private
 
   def parse_domain_whitelist

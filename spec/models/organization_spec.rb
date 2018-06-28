@@ -197,4 +197,14 @@ describe Organization, type: :model do
       end
     end
   end
+
+  describe '#user_count' do
+    let(:member) { create(:user) }
+    let(:guest) { create(:user) }
+    let(:organization) { create(:organization, member: member, guest: guest) }
+
+    it 'should count the number of users' do
+      expect(organization.user_count).to eq 2
+    end
+  end
 end
