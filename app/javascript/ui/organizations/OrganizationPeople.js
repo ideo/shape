@@ -45,8 +45,6 @@ class OrganizationPeople extends React.PureComponent {
 
     const orgMember = (userGroups.indexOf(primaryGroup) > -1)
     const showGuests = orgMember && !!guestGroup.groupRoles.length
-    const showAdmins = !!orgMember
-    console.log('render', adminGroup)
 
     return (
       <Fragment>
@@ -70,7 +68,7 @@ class OrganizationPeople extends React.PureComponent {
             </button>
           </Row>
         }
-        { showAdmins &&
+        { orgMember &&
           <Row>
             <button className="orgEdit" onClick={this.props.onGroupRoles(adminGroup)}>
               <DisplayText>{ adminGroup.name }</DisplayText>
