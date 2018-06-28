@@ -41,5 +41,9 @@ class SerializableCollection < BaseJsonSerializer
     @current_ability.can?(:edit, @object)
   end
 
+  attribute :is_org_template_collection do
+    @object.org_templates?
+  end
+
   has_many :roles
 end
