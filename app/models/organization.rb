@@ -125,6 +125,7 @@ class Organization < ApplicationRecord
       [collection.id],
       [],
     )
+    return collection
   end
 
   private

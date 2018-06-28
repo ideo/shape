@@ -320,6 +320,10 @@ class Collection < ApplicationRecord
     parent.is_a? Collection::UserCollection
   end
 
+  def org_templates?
+    organization.template_collection_id == id
+  end
+
   def cache_key
     "#{jsonapi_cache_key}" \
       "/cards_#{collection_cards.maximum(:updated_at).to_i}" \
