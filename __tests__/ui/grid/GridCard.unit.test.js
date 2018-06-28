@@ -20,14 +20,18 @@ const props = {
   isSharedCollection: false,
 }
 
-let wrapper
+let wrapper, rerender
 describe('GridCard', () => {
   describe('with item', () => {
     beforeEach(() => {
       props.record.can_edit = false
-      wrapper = shallow(
-        <GridCard {...props} />
-      )
+      rerender = function() {
+        wrapper = shallow(
+          <GridCard {...props} />
+        )
+        return wrapper
+      }
+      rerender()
     })
 
     it('renders a StyledGridCard with passed in dragging prop', () => {
@@ -56,6 +60,7 @@ describe('GridCard', () => {
         props.record.can_edit = true
         props.canEditCollection = true
         wrapper.setProps(props)
+        rerender()
       })
 
       it('passes canEdit to menu', () => {
@@ -73,7 +78,7 @@ describe('GridCard', () => {
         props.record.can_edit = true
         props.canEditCollection = true
         props.card.position = { x: 0 }
-        wrapper.setProps(props)
+        rerender()
       })
 
       it('renders hotspot to the left and right', () => {
@@ -85,7 +90,7 @@ describe('GridCard', () => {
     describe('as link', () => {
       beforeEach(() => {
         props.card.link = true
-        wrapper.setProps(props)
+        rerender()
       })
 
       it('renders the link icon', () => {
@@ -101,7 +106,7 @@ describe('GridCard', () => {
       props.canEditCollection = false
       props.record = fakeCollection
       props.record.can_edit = false
-      wrapper.setProps(props)
+      rerender()
     })
 
     it('renders the collection cover', () => {
@@ -125,7 +130,7 @@ describe('GridCard', () => {
       beforeEach(() => {
         props.record.can_edit = true
         props.canEditCollection = true
-        wrapper.setProps(props)
+        rerender()
       })
 
       it('passes canEdit to menu', () => {
@@ -142,7 +147,7 @@ describe('GridCard', () => {
       beforeEach(() => {
         props.isSharedCollection = true
         props.canEditCollection = false
-        wrapper.setProps(props)
+        rerender()
       })
 
       it('renders selection circle and card menu, but no hotspot', () => {
@@ -157,7 +162,7 @@ describe('GridCard', () => {
         props.isSharedCollection = false
         props.canEditCollection = true
         props.record.isSharedCollection = true
-        wrapper.setProps(props)
+        rerender()
       })
 
       it('does not render CardMenu', () => {
@@ -168,7 +173,7 @@ describe('GridCard', () => {
     describe('as reference', () => {
       beforeEach(() => {
         props.card.link = true
-        wrapper.setProps(props)
+        rerender()
       })
 
       it('has linked collection icon', () => {
