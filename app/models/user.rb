@@ -248,11 +248,11 @@ class User < ApplicationRecord
     return unless role.resource.is_a?(Group)
     group = role.resource
     if group.primary? && role.name == Role::ADMIN.to_s
-      send(action, Role::ADMIN, group.organization.admin_group) unless
+      send(action, Role::ADMIN, group.organization.admin_group) if
         has_role?(Role::ADMIN, group.organization.admin_group)
     elsif group.admin?
-      send(action, Role::ADMIN, group.organization.primary_group) unless
-        has_role?(Role::ADMIN, group.organization.admin_group)
+      send(action, Role::ADMIN, group.organization.primary_group) if
+        has_role?(Role::ADMIN, group.organization.primary_group)
     end
   end
 
