@@ -38,8 +38,11 @@ class SerializableCollection < BaseJsonSerializer
   end
 
   attribute :can_edit do
-    @current_ability.can?(:edit, @object) ||
-      @current_ability.can?(:edit_content, @object)
+    @current_ability.can?(:edit, @object)
+  end
+
+  attribute :can_edit_content do
+    @current_ability.can?(:edit_content, @object)
   end
 
   has_many :roles

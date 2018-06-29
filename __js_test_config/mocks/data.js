@@ -93,6 +93,7 @@ export const fakeCollection = {
   roles: [],
   tag_list: ['prototype', 'blockchain'],
   can_edit: false,
+  can_edit_content: false,
   isSharedCollection: false,
   isUserCollection: false,
   isNormalCollection: true,
