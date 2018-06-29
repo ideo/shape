@@ -12,8 +12,7 @@ import TextItem from '~/ui/items/TextItem'
 import ImageItem from '~/ui/items/ImageItem'
 import VideoItem from '~/ui/items/VideoItem'
 import PageHeader from '~/ui/pages/shared/PageHeader'
-import CloseIcon from '~/ui/icons/CloseIcon'
-import v, { ITEM_TYPES } from '~/utils/variables'
+import { ITEM_TYPES } from '~/utils/variables'
 
 const ItemPageContainer = styled.div`
   background: white;
@@ -50,7 +49,6 @@ class ItemPage extends PageWithApi {
   updateItem = (itemTextData) => {
     const { item } = this.state
     item.text_data = itemTextData
-
     this.setState({ item })
   }
 

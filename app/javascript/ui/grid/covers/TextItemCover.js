@@ -1,17 +1,16 @@
 import PropTypes from 'prop-types'
-import { Fragment } from 'react'
 import ReactDOM from 'react-dom'
 import { computed } from 'mobx'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import ReactQuill from 'react-quill'
 import styled from 'styled-components'
 
+import { apiStore, routingStore, uiStore } from '~/stores'
+import v from '~/utils/variables'
 import ActionCableConsumer from '~/utils/ActionCableConsumer'
 import InlineLoader from '~/ui/layout/InlineLoader'
 import TextItem from '~/ui/items/TextItem'
 import PaddedCardCover from './PaddedCardCover'
-import { apiStore, routingStore, uiStore } from '~/stores'
-import v from '~/utils/variables'
 
 const StyledReadMore = styled.div`
   z-index: ${v.zIndex.gridCard};
@@ -33,6 +32,11 @@ StyledReadMore.displayName = 'StyledReadMore'
 
 @observer
 class TextItemCover extends React.Component {
+  constructor(props) {
+    super(props)
+    this.unmounted = false
+  }
+
   state = {
     item: null,
     readMore: false,
@@ -47,6 +51,10 @@ class TextItemCover extends React.Component {
 
   componentWillReceiveProps({ height }) {
     this.checkTextAreaHeight(height)
+  }
+
+  componentWillUnmount() {
+    this.unmounted = true
   }
 
   @computed get isEditing() {
@@ -77,7 +85,6 @@ class TextItemCover extends React.Component {
   }
 
   blur = () => {
-    console.log('blur textitemcover')
     uiStore.update('textEditingItem', null)
     // TODO figure out why ref wasn't working
     const node = ReactDOM.findDOMNode(this)
@@ -87,8 +94,13 @@ class TextItemCover extends React.Component {
   save = async (item, { cancel_sync = true } = {}) => {
     this.setState({ loading: true })
     await item.API_updateWithoutSync({ cancel_sync })
+    if (uiStore.textEditingItem && uiStore.textEditingItem.id === item.id) {
+      uiStore.update('textEditingItem', null)
+    }
+    if (this.unmounted) {
+      return
+    }
     this.setState({ loading: false, item })
-    uiStore.update('textEditingItem', null)
     // TODO figure out why ref wasn't working
     const node = ReactDOM.findDOMNode(this)
     node.scrollTop = 0
@@ -107,6 +119,7 @@ class TextItemCover extends React.Component {
 
   renderEditing() {
     const { item } = this.state
+    if (!item) return ''
     return (
       <TextItem
         item={item}
@@ -148,7 +161,7 @@ class TextItemCover extends React.Component {
         style={{
           height: 'calc(100% - 30px)',
           overflowX: 'hidden',
-          overflowY: isEditing ? 'scroll' : 'hidden'
+          overflowY: isEditing ? 'auto' : 'hidden'
         }}
         class="cancelGridClick"
         onClick={this.handleEdit}

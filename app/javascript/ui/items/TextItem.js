@@ -31,7 +31,8 @@ const StyledContainer = styled.div`
     `)}
   }
   ${props => !props.fullPageView && (`
-    .ql-tooltip.ql-editing {
+    .ql-tooltip.ql-editing,
+    .ql-tooltip.ql-flip {
       left: calc(50% - 150px) !important;
       top: -20px !important;
       position: fixed;
@@ -83,11 +84,13 @@ class TextItem extends React.Component {
     this.cancelKeyUp = false
     this.isEditing = false
     this.numViewers = 0
+    this.readyToSave = false
+    this.linkerInterval = null
   }
 
   state = {
     currentEditor: null,
-    locked: false
+    locked: false,
   }
 
   componentDidMount() {
@@ -112,10 +115,14 @@ class TextItem extends React.Component {
   }
 
   componentWillUnmount() {
-    console.log('ready to save')
+    const { item, onSave } = this.props
     if (this.unlockTimeout) clearTimeout(this.unlockTimeout)
     this.leaving = true
     this.debouncedOnKeyUp.flush()
+    if (this.linkerInterval) clearInterval(this.linkerInterval)
+    if (this.readyToSave) {
+      onSave(item)
+    }
     this.channel.unsubscribe()
   }
 
@@ -150,6 +157,8 @@ class TextItem extends React.Component {
     // Store this internally, not forcing a re-render if user is editing
     // As it only affects internal state about whether to unlock
     this.numViewers = data.num_viewers
+
+    if (this.numViewers === 0) return
 
     // Set null if it is an empty object
     if (_.isEmpty(broadcastEditor)) broadcastEditor = null
@@ -189,16 +198,29 @@ class TextItem extends React.Component {
   }
 
   onEditorBlur = (range, source, editor) => {
+    const { fullPageView, onCancel } = this.props
     // Check if something is being linked, which causes a blur event
-    const linker = this.quillEditor.container.querySelector('.ql-tooltip.ql-editing:not(.ql-hidden)')
-    console.log('blur editor', linker)
-    if (linker) return
+    const linker = this.quillEditor.container.querySelector('.ql-tooltip:not(.ql-hidden)')
+    if (linker) {
+      // we need to determine if the linker has gone from visible to hidden
+      // at that point we perform the same onCancel as for the onBlur
+      this.linkerInterval = setInterval(() => {
+        const linkerHidden = linker.classList.contains('ql-hidden')
+        if (linkerHidden && !fullPageView) {
+          clearInterval(this.linkerInterval)
+          if (!this.quillEditor.hasFocus()) {
+            const item = this.getCurrentText()
+            onCancel(item)
+          }
+        }
+      }, 200)
+      return
+    }
     // If they click outside of editor, release the lock immediately
     if (!this.ignoreBlurEvent) {
       this.unlockEditingIfOtherViewers()
     }
-    if (!this.props.fullPageView) {
-      const { onCancel } = this.props
+    if (!fullPageView) {
       const item = this.getCurrentText()
       onCancel(item)
     }
@@ -299,10 +321,12 @@ class TextItem extends React.Component {
     const { quillEditor } = this
     item.content = quillEditor.root.innerHTML
     item.text_data = quillEditor.getContents()
-
-    console.log('hasFocus check', this.quillEditor.hasFocus())
-    if (!fullPageView && this.quillEditor.hasFocus()) return
-    await onSave(item, { cancel_sync: !this.leaving })
+    if (fullPageView) {
+      await onSave(item, { cancel_sync: !this.leaving })
+    } else {
+      this.readyToSave = true
+      if (this.quillEditor.hasFocus()) return
+    }
     if (this.broadcastStoppedEditingAfterSave) {
       this.broadcastEditingState({ editing: false })
       this.broadcastStoppedEditingAfterSave = false
