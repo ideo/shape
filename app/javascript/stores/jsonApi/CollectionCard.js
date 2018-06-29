@@ -108,8 +108,9 @@ class CollectionCard extends BaseRecord {
     const onAgree = async () => {
       const collection = this.parent
       try {
+        collection.removeCard(this)
+        console.log('request archive', this.id)
         await this.apiStore.request(`collection_cards/${this.id}/archive`, 'PATCH')
-        await this.apiStore.fetch('collections', collection.id, true)
 
         if (collection.collection_cards.length === 0) {
           uiStore.openBlankContentTool()
@@ -124,6 +125,8 @@ class CollectionCard extends BaseRecord {
         return true
       } catch (e) {
         uiStore.defaultAlertError()
+      } finally {
+        this.apiStore.fetch('collections', collection.id, true)
       }
       return false
     }
