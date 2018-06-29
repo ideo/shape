@@ -104,7 +104,7 @@ class Organization < ApplicationRecord
   def admin_group_handle
     "#{handle}-admins"
   end
-  
+
   def user_count
     (
       primary_group.user_ids +
@@ -125,7 +125,7 @@ class Organization < ApplicationRecord
       [collection.id],
       [],
     )
-    return collection
+    collection
   end
 
   private

@@ -12,7 +12,7 @@ RSpec.describe Roles::MassRemove, type: :service do
   let(:groups) { create_list(:group, 1) }
   let(:role_name) { Role::EDITOR }
   let(:remove_from_children_sync) { true }
-  let(:remove_link) { false }
+  let(:fully_remove) { false }
   let(:mass_remove) do
     Roles::MassRemove.new(
       object: collection,
@@ -20,7 +20,7 @@ RSpec.describe Roles::MassRemove, type: :service do
       users: users,
       groups: groups,
       remove_from_children_sync: remove_from_children_sync,
-      remove_link: remove_link,
+      fully_remove: fully_remove,
     )
   end
 
@@ -64,8 +64,8 @@ RSpec.describe Roles::MassRemove, type: :service do
       expect(group.has_role?(role_name, subcollection)).to be false
     end
 
-    context 'with remove_link true' do
-      let!(:remove_link) { true }
+    context 'with fully_remove true' do
+      let!(:fully_remove) { true }
       let!(:object) { organization.primary_group }
 
       it 'removes links from user collections' do
@@ -100,7 +100,7 @@ RSpec.describe Roles::MassRemove, type: :service do
 
       context 'when the object is a group' do
         let!(:organization) { create(:organization) }
-        let!(:role_name) { :admin }
+        let!(:role_name) { :member }
         let!(:user) { create(:user, add_to_org: organization) }
         let!(:users) { [user] }
         let!(:linked_collection) { create(:collection) }
@@ -121,7 +121,7 @@ RSpec.describe Roles::MassRemove, type: :service do
             users: users,
             groups: groups,
             remove_from_children_sync: remove_from_children_sync,
-            remove_link: remove_link,
+            fully_remove: fully_remove,
           )
         end
 
@@ -145,9 +145,22 @@ RSpec.describe Roles::MassRemove, type: :service do
 
         context 'when the object is a primary group' do
           let!(:object) { organization.primary_group }
+          let(:fully_remove) { true }
 
-          it 'should link all the groups shared collection cards' do
+          it 'should remove the user from the organization' do
             expect(organization).to receive(:remove_user_membership).with(
+              user,
+            )
+            mass_remove.call
+          end
+        end
+
+        context 'when the object is a guest group, but user is a primary member' do
+          let!(:object) { organization.guest_group }
+          let(:fully_remove) { true }
+
+          it 'should not remove the user from the organization' do
+            expect(organization).to_not receive(:remove_user_membership).with(
               user,
             )
             mass_remove.call

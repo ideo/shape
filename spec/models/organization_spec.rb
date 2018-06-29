@@ -237,7 +237,7 @@ describe Organization, type: :model do
     end
 
     it 'should add the admin group as the editor role' do
-      expect(organization.admin_group.has_role?(Role::EDITOR,
+      expect(organization.admin_group.has_role?(Role::CONTENT_EDITOR,
              organization.template_collection)).to be true
     end
   end

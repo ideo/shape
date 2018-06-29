@@ -201,12 +201,12 @@ describe('RolesMenu', () => {
     })
   })
 
-  describe('currentUserCheck', () => {
+  describe('notCurrentUser', () => {
     describe('on a role that belongs to the current user', () => {
       it('should return false', () => {
         apiStore.currentUser.id = 3
         const user = { id: 3 }
-        expect(component.currentUserCheck(user)).toBeFalsy()
+        expect(component.notCurrentUser(user)).toBeFalsy()
       })
     })
 
@@ -214,7 +214,7 @@ describe('RolesMenu', () => {
       it('should return true', () => {
         apiStore.currentUser.id = 4
         const user = { id: 3 }
-        expect(component.currentUserCheck(user)).toBeTruthy()
+        expect(component.notCurrentUser(user)).toBeTruthy()
       })
     })
   })

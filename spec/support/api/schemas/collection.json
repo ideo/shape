@@ -8,6 +8,7 @@
     "updated_at": { "type": "date" },
     "breadcrumb": { "type": ["array", "null"] },
     "can_edit": { "type": ["boolean"] },
+    "can_edit_content": { "type": ["boolean"] },
     "tag_list": { "type": ["array", "null"] },
     "cover": { "type": ["object"] },
     "organization_id": { "type": "integer" },

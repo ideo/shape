@@ -5,6 +5,7 @@ FactoryBot.define do
       record_type :text
       card_relation :primary
       add_editors []
+      add_content_editors []
       add_viewers []
     end
 
@@ -40,7 +41,11 @@ FactoryBot.define do
           user.add_role(Role::EDITOR, collection)
         end
       end
-
+      if evaluator.add_content_editors.present?
+        evaluator.add_content_editors.each do |user|
+          user.add_role(Role::CONTENT_EDITOR, collection)
+        end
+      end
       if evaluator.add_viewers.present?
         evaluator.add_viewers.each do |user|
           user.add_role(Role::VIEWER, collection)
