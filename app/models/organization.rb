@@ -118,7 +118,7 @@ class Organization < ApplicationRecord
       name: template_collection_name,
       organization: self,
     )
-    admin_group.add_role(Role::EDITOR, collection)
+    admin_group.add_role(Role::CONTENT_EDITOR, collection)
     LinkToSharedCollectionsWorker.new.perform(
       [user.id],
       [admin_group.id],

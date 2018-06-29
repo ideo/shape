@@ -232,13 +232,16 @@ describe Organization, type: :model do
 
     it 'should create a template collection for the org' do
       expect(organization.template_collection.persisted?).to be true
-      expect(organization.template_collection.name).to eq(
-        "#{organization.name} Templates")
+      expect(organization.template_collection.name).to eq("#{organization.name} Templates")
     end
 
     it 'should add the admin group as the editor role' do
-      expect(organization.admin_group.has_role?(Role::CONTENT_EDITOR,
-             organization.template_collection)).to be true
+      expect(
+        organization.admin_group.has_role?(
+          Role::CONTENT_EDITOR,
+          organization.template_collection,
+        ),
+      ).to be true
     end
   end
 end
