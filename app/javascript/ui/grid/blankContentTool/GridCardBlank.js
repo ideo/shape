@@ -296,7 +296,6 @@ class GridCardBlank extends React.Component {
 
   closeBlankContentTool = () => {
     const { uiStore } = this.props
-    if (uiStore.newTextEditing) return
     if (uiStore.blankContentToolState.emptyCollection) {
       this.setState({ creating: null })
       // have to re-create the DropPane
@@ -429,6 +428,7 @@ class GridCardBlank extends React.Component {
   render() {
     const { uiStore } = this.props
     const { gridSettings, blankContentToolState } = uiStore
+    const { creating } = this.state
     return (
       <StyledGridCardBlank emptyState={this.emptyState}>
         <StyledGridCardInner
@@ -439,7 +439,7 @@ class GridCardBlank extends React.Component {
           {this.renderInner()}
         </StyledGridCardInner>
         { this.state.loading && <InlineLoader /> }
-        { !this.emptyState &&
+        { !this.emptyState && this.state.creating !== 'text' &&
           <CloseButton onClick={this.closeBlankContentTool} />
         }
       </StyledGridCardBlank>

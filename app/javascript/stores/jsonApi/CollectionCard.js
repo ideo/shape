@@ -75,9 +75,9 @@ class CollectionCard extends BaseRecord {
 
   async API_create({ isReplacing = false } = {}) {
     try {
-      await this.apiStore.request('collection_cards', 'POST', { data: this.toJsonApi() })
+      const res = await this.apiStore.request('collection_cards', 'POST', { data: this.toJsonApi() })
       if (!isReplacing) {
-        await this.apiStore.fetch('collections', this.parent.id, true)
+        this.parent.addCard(res.data)
         uiStore.closeBlankContentTool()
         uiStore.trackEvent('create', this.parent)
       }

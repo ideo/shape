@@ -16,7 +16,10 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
     builder = CollectionCardBuilder.new(params: collection_card_params,
                                         parent_collection: @collection,
                                         user: current_user)
+
     if builder.create
+      # reload the user's roles
+      current_user.reload.reset_cached_roles!
       render jsonapi: builder.collection_card, include: [:parent, record: [:filestack_file]]
     else
       render_api_errors builder.errors

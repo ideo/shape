@@ -14,6 +14,7 @@ class PageWithApi extends React.Component {
   componentDidMount() {
     scroll.scrollToTop({ duration: 0 })
     uiStore.resetSelectionAndBCT()
+    uiStore.update('textEditingItem', null)
     // this will get called on initial render
     this.fetchData(this.props)
   }

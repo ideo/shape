@@ -5,8 +5,9 @@ import ReactQuill from 'react-quill'
 import styled from 'styled-components'
 
 import v from '~/utils/variables'
-import TextItemToolbar from '~/ui/items/TextItemToolbar'
+import { CloseButton } from '~/ui/global/styled/buttons'
 import EditorPill from '~/ui/items/EditorPill'
+import TextItemToolbar from '~/ui/items/TextItemToolbar'
 
 // How long to wait before unlocking editor due to inactivity
 // Only used if there are other viewers
@@ -14,7 +15,6 @@ const UNLOCK_IN_MILLISECONDS = 5000
 
 const StyledContainer = styled.div`
   ${props => props.fullPageView && `padding: 2rem 0.5rem;`}
-  ${props => !props.fullPageView && `height: 100%;` }
   padding-top: 25px;
   .editor-pill {
     position: absolute;
@@ -30,6 +30,16 @@ const StyledContainer = styled.div`
       z-index: 10000;
     `)}
   }
+  ${props => !props.fullPageView && (`
+    .ql-tooltip.ql-editing,
+    .ql-tooltip.ql-flip {
+      left: calc(50% - 150px) !important;
+      top: -20px !important;
+      position: fixed;
+      z-index: 10000;
+    }
+  `)}
+
   *::selection {
     background: highlight !important;
   }
@@ -74,11 +84,13 @@ class TextItem extends React.Component {
     this.cancelKeyUp = false
     this.isEditing = false
     this.numViewers = 0
+    this.readyToSave = false
+    this.linkerInterval = null
   }
 
   state = {
     currentEditor: null,
-    locked: false
+    locked: false,
   }
 
   componentDidMount() {
@@ -103,9 +115,14 @@ class TextItem extends React.Component {
   }
 
   componentWillUnmount() {
+    const { item, onSave } = this.props
     if (this.unlockTimeout) clearTimeout(this.unlockTimeout)
     this.leaving = true
     this.debouncedOnKeyUp.flush()
+    if (this.linkerInterval) clearInterval(this.linkerInterval)
+    if (this.readyToSave) {
+      onSave(item)
+    }
     this.channel.unsubscribe()
   }
 
@@ -140,6 +157,8 @@ class TextItem extends React.Component {
     // Store this internally, not forcing a re-render if user is editing
     // As it only affects internal state about whether to unlock
     this.numViewers = data.num_viewers
+
+    if (this.numViewers === 0) return
 
     // Set null if it is an empty object
     if (_.isEmpty(broadcastEditor)) broadcastEditor = null
@@ -179,16 +198,45 @@ class TextItem extends React.Component {
   }
 
   onEditorBlur = (range, source, editor) => {
+    const { fullPageView, onCancel } = this.props
     // Check if something is being linked, which causes a blur event
-    const linker = this.quillEditor.container.querySelector('.ql-tooltip.ql-editing')
-    if (linker) return
+    const linker = this.quillEditor.container.querySelector('.ql-tooltip:not(.ql-hidden)')
+    if (linker) {
+      // we need to determine if the linker has gone from visible to hidden
+      // at that point we perform the same onCancel as for the onBlur
+      this.linkerInterval = setInterval(() => {
+        const linkerHidden = linker.classList.contains('ql-hidden')
+        if (linkerHidden && !fullPageView) {
+          clearInterval(this.linkerInterval)
+          if (!this.quillEditor.hasFocus()) {
+            const item = this.getCurrentText()
+            onCancel(item)
+          }
+        }
+      }, 200)
+      return
+    }
     // If they click outside of editor, release the lock immediately
     if (!this.ignoreBlurEvent) {
       this.unlockEditingIfOtherViewers()
     }
-    if (!this.props.fullPageView) {
-      const { onCancel } = this.props
-      onCancel()
+    if (!fullPageView) {
+      const item = this.getCurrentText()
+      if (!item.id) {
+        onCancel(item)
+        return
+      }
+      setTimeout(() => {
+        const selection = editor.getSelection()
+        if (selection) {
+          // we just pasted... so blur + refocus to stay within the editor
+          this.quillEditor.blur()
+          this.quillEditor.focus()
+        } else {
+          // otherwise we actually did blur
+          onCancel(item)
+        }
+      }, 100)
     }
   }
 
@@ -197,6 +245,20 @@ class TextItem extends React.Component {
     // Ignore any events while editor is locked
     if (locked) return
     this.startEditing()
+  }
+
+  cancel = (ev) => {
+    const { onCancel } = this.props
+    const item = this.getCurrentText()
+    onCancel(item, ev)
+  }
+
+  getCurrentText() {
+    const { item } = this.props
+    const { quillEditor } = this
+    item.content = quillEditor.root.innerHTML
+    item.text_data = quillEditor.getContents()
+    return item
   }
 
   startEditing = () => {
@@ -273,9 +335,12 @@ class TextItem extends React.Component {
     const { quillEditor } = this
     item.content = quillEditor.root.innerHTML
     item.text_data = quillEditor.getContents()
-
-    if (!fullPageView && this.quillEditor.hasFocus()) return
-    await onSave(item, { cancel_sync: !this.leaving })
+    if (fullPageView) {
+      await onSave(item, { cancel_sync: !this.leaving })
+    } else {
+      this.readyToSave = true
+      if (this.quillEditor.hasFocus()) return
+    }
     if (this.broadcastStoppedEditingAfterSave) {
       this.broadcastEditingState({ editing: false })
       this.broadcastStoppedEditingAfterSave = false
@@ -321,6 +386,7 @@ class TextItem extends React.Component {
     return (
       <StyledContainer className="no-drag" fullPageView={fullPageView}>
         { this.canEdit && <TextItemToolbar fullPageView={fullPageView} onExpand={onExpand} /> }
+        <CloseButton onClick={this.cancel} size={fullPageView ? 'lg' : 'sm'} position={fullPageView ? 'absolute' : 'fixed'} />
         {this.renderEditorPill}
         <ReactQuill
           {...quillProps}
