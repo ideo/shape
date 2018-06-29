@@ -84,8 +84,19 @@ class TextItemCover extends React.Component {
     this.setState({ item })
   }
 
-  blur = () => {
-    uiStore.update('textEditingItem', null)
+  clearTextEditingItem = () => {
+    const { item } = this.state
+    if (uiStore.textEditingItem && uiStore.textEditingItem.id === item.id) {
+      uiStore.update('textEditingItem', null)
+    }
+  }
+
+  blur = (item, ev) => {
+    if (this.unmounted) {
+      return
+    }
+    if (ev) ev.stopPropagation()
+    this.clearTextEditingItem()
     // TODO figure out why ref wasn't working
     const node = ReactDOM.findDOMNode(this)
     node.scrollTop = 0
@@ -94,9 +105,7 @@ class TextItemCover extends React.Component {
   save = async (item, { cancel_sync = true } = {}) => {
     this.setState({ loading: true })
     await item.API_updateWithoutSync({ cancel_sync })
-    if (uiStore.textEditingItem && uiStore.textEditingItem.id === item.id) {
-      uiStore.update('textEditingItem', null)
-    }
+    this.clearTextEditingItem()
     if (this.unmounted) {
       return
     }
@@ -167,8 +176,12 @@ class TextItemCover extends React.Component {
         onClick={this.handleEdit}
       >
         { this.state.loading && <InlineLoader /> }
-        {content}
-        { (this.state.readMore && !isEditing) && <StyledReadMore onClick={this.expand}>read more...</StyledReadMore> }
+        { content }
+        {(this.state.readMore && !isEditing) && (
+          <StyledReadMore onClick={this.expand}>
+            read more...
+          </StyledReadMore>
+        )}
       </PaddedCardCover>
     )
   }

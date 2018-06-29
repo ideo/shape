@@ -222,7 +222,21 @@ class TextItem extends React.Component {
     }
     if (!fullPageView) {
       const item = this.getCurrentText()
-      onCancel(item)
+      if (!item.id) {
+        onCancel(item)
+        return
+      }
+      setTimeout(() => {
+        const selection = editor.getSelection()
+        if (selection) {
+          // we just pasted... so blur + refocus to stay within the editor
+          this.quillEditor.blur()
+          this.quillEditor.focus()
+        } else {
+          // otherwise we actually did blur
+          onCancel(item)
+        }
+      }, 100)
     }
   }
 
@@ -233,10 +247,10 @@ class TextItem extends React.Component {
     this.startEditing()
   }
 
-  cancel = () => {
+  cancel = (ev) => {
     const { onCancel } = this.props
     const item = this.getCurrentText()
-    onCancel(item)
+    onCancel(item, ev)
   }
 
   getCurrentText() {
