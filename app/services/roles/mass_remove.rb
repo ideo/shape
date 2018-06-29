@@ -9,11 +9,11 @@ module Roles
                    users: [],
                    groups: [],
                    remove_from_children_sync: false,
-                   remove_link: false)
+                   fully_remove: false)
       @object = object
       @role_name = role_name
       @remove_from_children_sync = remove_from_children_sync
-      @remove_link = remove_link
+      @fully_remove = fully_remove
       @users = users
       @groups = groups
       @errors = []
@@ -23,8 +23,8 @@ module Roles
       remove_role_from_object(@object)
       unfollow_comment_thread
       unfollow_groups_comment_threads
-      remove_links_from_shared_collections if @remove_link
-      remove_org_membership if @remove_link
+      remove_links_from_shared_collections if @fully_remove
+      remove_org_membership if @fully_remove
       remove_roles_from_children
     end
 
@@ -108,6 +108,10 @@ module Roles
     def remove_org_membership
       return unless @object.is_a?(Group) && (@object.guest? || @object.primary?)
       @users.each do |user|
+        # if someone is in both primary + guest for whatever reason, removing them
+        # from one shouldn't kick them out of the whole org
+        next if @object.organization.primary_group.can_view?(user) ||
+                @object.organization.guest_group.can_view?(user)
         @object.organization.remove_user_membership(user)
       end
     end

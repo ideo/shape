@@ -19,6 +19,10 @@ class Collection extends BaseRecord {
     return this.type === 'Collection::SharedWithMeCollection'
   }
 
+  get isOrgTemplateCollection() {
+    return this.is_org_template_collection
+  }
+
   get isNormalCollection() {
     return !this.isUserCollection && !this.isSharedCollection
   }

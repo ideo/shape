@@ -14,6 +14,7 @@ class OrganizationBuilder
       update_primary_group!
       add_role
       setup_user_membership_and_collections
+      create_templates
     end
     true
   rescue ActiveRecord::RecordInvalid
@@ -34,5 +35,10 @@ class OrganizationBuilder
 
   def setup_user_membership_and_collections
     @organization.setup_user_membership_and_collections(@user)
+  end
+
+  def create_templates
+    # Create templates after membership has been setup correctly
+    @organization.setup_templates(@user)
   end
 end

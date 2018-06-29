@@ -268,6 +268,16 @@ describe Collection, type: :model do
     end
   end
 
+  describe '#org_templates?' do
+    let!(:user) { create(:user) }
+    let!(:organization) { create(:organization) }
+    let!(:collection) { organization.setup_templates(user) }
+
+    it 'should be true if its org template collection id is itself' do
+      expect(collection.org_templates?).to be true
+    end
+  end
+
   context 'caching and stored attributes' do
     describe '#recalculate_child_breadcrumbs_async' do
       let(:collection) { create(:collection) }

@@ -3,8 +3,9 @@ class Collection < ApplicationRecord
   include Resourceable
   include Archivable
   include HasActivities
-  resourceable roles: [Role::EDITOR, Role::VIEWER],
+  resourceable roles: [Role::EDITOR, Role::CONTENT_EDITOR, Role::VIEWER],
                edit_role: Role::EDITOR,
+               content_edit_role: Role::CONTENT_EDITOR,
                view_role: Role::VIEWER
 
   archivable as: :parent_collection_card,
@@ -318,6 +319,10 @@ class Collection < ApplicationRecord
 
   def parent_is_user_collection?
     parent.is_a? Collection::UserCollection
+  end
+
+  def org_templates?
+    organization.template_collection_id == id
   end
 
   def cache_key

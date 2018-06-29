@@ -8,9 +8,11 @@
     "updated_at": { "type": "date" },
     "breadcrumb": { "type": ["array", "null"] },
     "can_edit": { "type": ["boolean"] },
+    "can_edit_content": { "type": ["boolean"] },
     "tag_list": { "type": ["array", "null"] },
     "cover": { "type": ["object"] },
-    "organization_id": { "type": "integer" }
+    "organization_id": { "type": "integer" },
+    "is_org_template_collection": { "type": ["boolean"] }
   },
   "required": ["id", "name", "type", "created_at", "cover"]
 }
