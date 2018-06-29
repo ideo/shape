@@ -30,6 +30,15 @@ const StyledContainer = styled.div`
       z-index: 10000;
     `)}
   }
+  ${props => !props.fullPageView && (`
+    .ql-tooltip.ql-editing {
+      left: calc(50% - 150px) !important;
+      top: -20px !important;
+      position: fixed;
+      z-index: 10000;
+    }
+  `)}
+
   *::selection {
     background: highlight !important;
   }
@@ -103,6 +112,7 @@ class TextItem extends React.Component {
   }
 
   componentWillUnmount() {
+    console.log('ready to save')
     if (this.unlockTimeout) clearTimeout(this.unlockTimeout)
     this.leaving = true
     this.debouncedOnKeyUp.flush()
@@ -180,7 +190,8 @@ class TextItem extends React.Component {
 
   onEditorBlur = (range, source, editor) => {
     // Check if something is being linked, which causes a blur event
-    const linker = this.quillEditor.container.querySelector('.ql-tooltip.ql-editing')
+    const linker = this.quillEditor.container.querySelector('.ql-tooltip.ql-editing:not(.ql-hidden)')
+    console.log('blur editor', linker)
     if (linker) return
     // If they click outside of editor, release the lock immediately
     if (!this.ignoreBlurEvent) {
@@ -289,6 +300,7 @@ class TextItem extends React.Component {
     item.content = quillEditor.root.innerHTML
     item.text_data = quillEditor.getContents()
 
+    console.log('hasFocus check', this.quillEditor.hasFocus())
     if (!fullPageView && this.quillEditor.hasFocus()) return
     await onSave(item, { cancel_sync: !this.leaving })
     if (this.broadcastStoppedEditingAfterSave) {

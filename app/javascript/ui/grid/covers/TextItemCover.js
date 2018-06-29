@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types'
 import { Fragment } from 'react'
 import ReactDOM from 'react-dom'
-import { runInAction } from 'mobx'
+import { computed } from 'mobx'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import ReactQuill from 'react-quill'
 import styled from 'styled-components'
@@ -36,7 +36,6 @@ class TextItemCover extends React.Component {
   state = {
     item: null,
     readMore: false,
-    isEditing: false,
     loading: false,
   }
 
@@ -50,18 +49,20 @@ class TextItemCover extends React.Component {
     this.checkTextAreaHeight(height)
   }
 
+  @computed get isEditing() {
+    const { item } = this.props
+    return uiStore.textEditingItem === item
+  }
+
   handleEdit = (ev) => {
     // If already editing, pass event down
     if (uiStore.dragging) return
-    if (this.state.isEditing) {
+    if (this.isEditing) {
       ev.stopPropagation()
       return
     }
     ev.stopPropagation()
-    this.setState({ isEditing: true })
-    runInAction(() => {
-      uiStore.update('textEditingItem', this.state.item)
-    })
+    uiStore.update('textEditingItem', this.state.item)
   }
 
   expand = () => {
@@ -76,8 +77,8 @@ class TextItemCover extends React.Component {
   }
 
   blur = () => {
-    this.setState({ isEditing: false })
-    runInAction(() => { uiStore.update('textEditingItem', null) })
+    console.log('blur textitemcover')
+    uiStore.update('textEditingItem', null)
     // TODO figure out why ref wasn't working
     const node = ReactDOM.findDOMNode(this)
     node.scrollTop = 0
@@ -86,10 +87,10 @@ class TextItemCover extends React.Component {
   save = async (item, { cancel_sync = true } = {}) => {
     this.setState({ loading: true })
     await item.API_updateWithoutSync({ cancel_sync })
-    this.setState({ isEditing: false, loading: false, item })
-    runInAction(() => { uiStore.update('textEditingItem', null) })
+    this.setState({ loading: false, item })
+    uiStore.update('textEditingItem', null)
     // TODO figure out why ref wasn't working
-    const node = ReactDOM.findDOMNode(this);
+    const node = ReactDOM.findDOMNode(this)
     node.scrollTop = 0
   }
 
@@ -138,13 +139,17 @@ class TextItemCover extends React.Component {
   }
 
   render() {
-    const { isEditing } = this.state
+    const { isEditing } = this
     const content = isEditing
       ? this.renderEditing()
       : this.renderDefault()
     return (
       <PaddedCardCover
-        style={{ height: 'calc(100% - 30px)', overflow: isEditing ? 'scroll' : 'hidden' }}
+        style={{
+          height: 'calc(100% - 30px)',
+          overflowX: 'hidden',
+          overflowY: isEditing ? 'scroll' : 'hidden'
+        }}
         class="cancelGridClick"
         onClick={this.handleEdit}
       >
