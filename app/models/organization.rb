@@ -149,8 +149,7 @@ class Organization < ApplicationRecord
   def create_groups
     create_primary_group(name: name, organization: self)
     create_guest_group(name: guest_group_name, organization: self, handle: guest_group_handle)
-    create_admin_group(name: admin_group_name, organization: self, handle:
-                       admin_group_handle)
+    create_admin_group(name: admin_group_name, organization: self, handle: admin_group_handle)
     save # Save primary group attr
   end
 
