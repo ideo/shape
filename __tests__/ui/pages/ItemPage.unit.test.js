@@ -1,6 +1,7 @@
 import ItemPage from '~/ui/pages/ItemPage'
 import fakeApiStore from '#/mocks/fakeApiStore'
 import fakeUiStore from '#/mocks/fakeUiStore'
+import fakeRoutingStore from '#/mocks/fakeRoutingStore'
 import {
   fakeTextItem
 } from '#/mocks/data'
@@ -9,6 +10,7 @@ let wrapper, match, apiStore, component
 let props
 const item = fakeTextItem
 const uiStore = fakeUiStore
+const routingStore = fakeRoutingStore
 const { id } = item
 
 beforeEach(() => {
@@ -18,7 +20,7 @@ beforeEach(() => {
     requestResult: { data: item },
   })
   apiStore.items = [item]
-  props = { apiStore, match, uiStore }
+  props = { apiStore, match, uiStore, routingStore }
 
   wrapper = shallow(
     <ItemPage.wrappedComponent {...props} />
