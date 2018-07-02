@@ -136,14 +136,15 @@ describe('RolesMenu', () => {
     })
 
     describe('when is not switching', () => {
+      const fakeData = {}
       beforeEach(async () => {
         component.filterSearchableItems = jest.fn()
-        role.API_delete.mockReturnValue = Promise.resolve({})
+        role.API_delete.mockReturnValue = Promise.resolve(fakeData)
         await component.deleteRoles(role, user, { isSwitching: false })
       })
 
       it('should call the onSave prop after the request is done', () => {
-        expect(props.onSave).toHaveBeenCalledWith({})
+        expect(props.onSave).toHaveBeenCalledWith(fakeData, { roleName: fakeRole.name })
       })
 
       it('should filter the searchable items', () => {
