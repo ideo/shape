@@ -122,6 +122,7 @@ class Organization < ApplicationRecord
       name: template_collection_name,
       organization: self,
     )
+    # Create default profile template and add it to the templates collection
     profile_template = create_profile_template(
       name: 'Profile',
       organization: self,

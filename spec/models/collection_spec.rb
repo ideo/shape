@@ -274,7 +274,8 @@ describe Collection, type: :model do
     let!(:collection) { organization.setup_templates(user) }
 
     it 'should be true if its org template collection id is itself' do
-      expect(collection.org_templates?).to be true
+      expect(organization.template_collection_id).to eq(collection.id)
+      expect(collection.reload.org_templates?).to be true
     end
   end
 
