@@ -17,6 +17,10 @@ class Organization < ApplicationRecord
              class_name: 'Collection',
              dependent: :destroy,
              optional: true
+  belongs_to :profile_template,
+             class_name: 'Collection::MasterTemplateCollection',
+             dependent: :destroy,
+             optional: true
 
   after_create :create_groups
   before_update :parse_domain_whitelist
@@ -118,14 +122,26 @@ class Organization < ApplicationRecord
       name: template_collection_name,
       organization: self,
     )
+    profile_template = create_profile_template(
+      name: 'Profile',
+      organization: self,
+    )
+    CollectionCard::Primary.create(
+      order: 1,
+      width: 1,
+      height: 1,
+      parent: collection,
+      collection: profile_template,
+    )
     admin_group.add_role(Role::CONTENT_EDITOR, collection)
+    admin_group.add_role(Role::CONTENT_EDITOR, profile_template)
     LinkToSharedCollectionsWorker.new.perform(
       [user.id],
       [admin_group.id],
       [collection.id],
       [],
     )
-    collection
+    collection.reload
   end
 
   private

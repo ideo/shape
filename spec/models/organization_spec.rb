@@ -225,10 +225,7 @@ describe Organization, type: :model do
   describe '#setup_templates' do
     let(:organization) { create(:organization) }
     let(:user) { create(:user) }
-
-    before do
-      organization.setup_templates(user)
-    end
+    let!(:template_collection) { organization.setup_templates(user) }
 
     it 'should create a template collection for the org' do
       expect(organization.template_collection.persisted?).to be true
@@ -242,6 +239,11 @@ describe Organization, type: :model do
           organization.template_collection,
         ),
       ).to be true
+    end
+
+    it 'should create a profile template in the templates collection' do
+      expect(template_collection.children.count).to be 1
+      expect(template_collection.collections.first.type).to eq 'Collection::MasterTemplateCollection'
     end
   end
 end
