@@ -127,6 +127,7 @@ class Organization < ApplicationRecord
       name: 'Profile',
       organization: self,
     )
+    profile_template.setup_profile_template
     CollectionCard::Primary.create(
       order: 1,
       width: 1,
@@ -136,6 +137,7 @@ class Organization < ApplicationRecord
     )
     admin_group.add_role(Role::CONTENT_EDITOR, collection)
     admin_group.add_role(Role::CONTENT_EDITOR, profile_template)
+    profile_template.items.each { |i| admin_group.add_role(Role::CONTENT_EDITOR, i)}
     LinkToSharedCollectionsWorker.new.perform(
       [user.id],
       [admin_group.id],

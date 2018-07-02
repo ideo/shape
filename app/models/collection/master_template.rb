@@ -19,7 +19,13 @@ class Collection
     def setup_profile_template
       photo = Item::ImageItem.create(
         name: 'Default profile',
-        filestack_file: FilestackFile.create_from_url('https://cdn.filestackcontent.com/j5dVggcYTq4afTEdLqJD')
+        filestack_file: FilestackFile.create(
+          handle: 'Qs0v5CCTt2DiqlG8grVH',
+          mimetype: 'image/png',
+          size: 15945,
+          filename: 'default_profile.png',
+          url: 'https://cdn.filestackcontent.com/Qs0v5CCTt2DiqlG8grVH',
+        ),
       )
       text = Item::TextItem.create(
         name: 'Biography',
