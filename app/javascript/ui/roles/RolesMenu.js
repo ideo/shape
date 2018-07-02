@@ -80,7 +80,7 @@ class RolesMenu extends React.Component {
           window.location.reload()
         }
         if (!opts.isSwitching) {
-          const saveReturn = this.props.onSave(res)
+          const saveReturn = this.props.onSave(res, { roleName: role.name })
           this.filterSearchableItems()
           return saveReturn
         }
@@ -103,7 +103,7 @@ class RolesMenu extends React.Component {
     }
     return apiStore.request(`${ownerType}/${ownerId}/roles`, 'POST', data)
       .then(res => {
-        const saveReturn = onSave(res)
+        const saveReturn = onSave(res, { roleName })
         this.filterSearchableItems()
         return saveReturn
       })
@@ -127,15 +127,23 @@ class RolesMenu extends React.Component {
     )
   }
 
-  // TODO needs to check group roles too
-  currentUserCheck(user) {
+  notCurrentUser(entity) {
+    // TODO: needs to check group roles too
+    if (entity.internalType === 'groups') return true
     const { apiStore } = this.props
     const { currentUser } = apiStore
-    return (currentUser.id !== user.id)
+    return currentUser.id !== entity.id
   }
 
   render() {
-    const { addCallout, canEdit, roles, ownerType, title } = this.props
+    const {
+      addCallout,
+      canEdit,
+      roles,
+      ownerType,
+      title,
+      fixedRole,
+    } = this.props
     const roleEntities = []
     roles.forEach((role) => {
       role.users.forEach((user) => {
@@ -152,12 +160,18 @@ class RolesMenu extends React.Component {
       ? ['member', 'admin']
       : ['editor', 'viewer']
 
+    // ability to restrict the selection to only one role type
+    // e.g. "admin" is the only selection for Org Admins group
+    const addRoleTypes = fixedRole ? [fixedRole] : roleTypes
+
     return (
       <div>
         <Heading3>{title}</Heading3>
         { sortedRoleEntities.map(combined =>
+          // NOTE: content_editor is a "hidden" role for now
+          combined.role.name !== 'content_editor' &&
           (<RoleSelect
-            enabled={canEdit && this.currentUserCheck(combined.entity, combined.role)}
+            enabled={canEdit && this.notCurrentUser(combined.entity, combined.role)}
             key={`${combined.entity.id}_${combined.entity.internalType}_r${combined.role.id}`}
             role={combined.role}
             roleTypes={roleTypes}
@@ -172,7 +186,7 @@ class RolesMenu extends React.Component {
             <Heading3>{addCallout}</Heading3>
             <RolesAdd
               searchableItems={this.searchableItems}
-              roleTypes={roleTypes}
+              roleTypes={addRoleTypes}
               onCreateRoles={this.createRoles}
               onCreateUsers={this.onCreateUsers}
             />
@@ -187,6 +201,7 @@ RolesMenu.propTypes = {
   canEdit: PropTypes.bool,
   ownerId: PropTypes.number.isRequired,
   ownerType: PropTypes.string.isRequired,
+  fixedRole: PropTypes.string,
   roles: MobxPropTypes.arrayOrObservableArray,
   title: PropTypes.string,
   addCallout: PropTypes.string,
@@ -198,6 +213,7 @@ RolesMenu.wrappedComponent.propTypes = {
 }
 RolesMenu.defaultProps = {
   canEdit: false,
+  fixedRole: null,
   roles: [],
   title: 'Shared with',
   addCallout: 'Add groups or people:'

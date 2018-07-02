@@ -3,8 +3,9 @@ class Collection < ApplicationRecord
   include Resourceable
   include Archivable
   include HasActivities
-  resourceable roles: [Role::EDITOR, Role::VIEWER],
+  resourceable roles: [Role::EDITOR, Role::CONTENT_EDITOR, Role::VIEWER],
                edit_role: Role::EDITOR,
+               content_edit_role: Role::CONTENT_EDITOR,
                view_role: Role::VIEWER
 
   archivable as: :parent_collection_card,
@@ -207,12 +208,12 @@ class Collection < ApplicationRecord
     parent.roles.each do |role|
       c.roles << role.duplicate!(assign_resource: c)
     end
-    # NOTE: different from parent_is_user_collection? since `parent` is passed in
+    # NOTE: different from `parent_is_user_collection?` since `parent` is passed in
     if parent.is_a? Collection::UserCollection
       c.allow_primary_group_view_access
     end
     # make sure duplicate creator becomes an editor
-    for_user.upgrade_to_editor_role(c)
+    for_user.upgrade_to_edit_role(c)
 
     CollectionCardDuplicationWorker.perform_async(
       collection_cards.map(&:id),
@@ -318,6 +319,10 @@ class Collection < ApplicationRecord
 
   def parent_is_user_collection?
     parent.is_a? Collection::UserCollection
+  end
+
+  def org_templates?
+    organization.template_collection_id == id
   end
 
   def cache_key

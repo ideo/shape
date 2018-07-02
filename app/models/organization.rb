@@ -9,6 +9,14 @@ class Organization < ApplicationRecord
              class_name: 'Group',
              dependent: :destroy,
              optional: true
+  belongs_to :admin_group,
+             class_name: 'Group',
+             dependent: :destroy,
+             optional: true
+  belongs_to :template_collection,
+             class_name: 'Collection',
+             dependent: :destroy,
+             optional: true
 
   after_create :create_groups
   before_update :parse_domain_whitelist
@@ -22,11 +30,11 @@ class Organization < ApplicationRecord
   validates :name, presence: true
 
   def can_view?(user)
-    primary_group.can_view?(user) || guest_group.can_view?(user)
+    primary_group.can_view?(user) || admin_group.can_view?(user) || guest_group.can_view?(user)
   end
 
   def can_edit?(user)
-    primary_group.can_edit?(user) || guest_group.can_edit?(user)
+    primary_group.can_edit?(user) || admin_group.can_edit?(user) || guest_group.can_edit?(user)
   end
 
   def self.create_for_user(user)
@@ -81,8 +89,20 @@ class Organization < ApplicationRecord
     "#{name} Guests"
   end
 
+  def admin_group_name
+    "#{name} Admins"
+  end
+
+  def template_collection_name
+    "#{name} Templates"
+  end
+
   def guest_group_handle
     "#{handle}-guest"
+  end
+
+  def admin_group_handle
+    "#{handle}-admins"
   end
 
   def user_count
@@ -90,6 +110,22 @@ class Organization < ApplicationRecord
       primary_group.user_ids +
       guest_group.user_ids
     ).uniq.count
+  end
+
+  def setup_templates(user)
+    # Create templates collection
+    collection = create_template_collection(
+      name: template_collection_name,
+      organization: self,
+    )
+    admin_group.add_role(Role::CONTENT_EDITOR, collection)
+    LinkToSharedCollectionsWorker.new.perform(
+      [user.id],
+      [admin_group.id],
+      [collection.id],
+      [],
+    )
+    collection
   end
 
   private
@@ -113,11 +149,13 @@ class Organization < ApplicationRecord
   def create_groups
     create_primary_group(name: name, organization: self)
     create_guest_group(name: guest_group_name, organization: self, handle: guest_group_handle)
+    create_admin_group(name: admin_group_name, organization: self, handle: admin_group_handle)
     save # Save primary group attr
   end
 
   def update_group_names
     primary_group.update_attributes(name: name)
     guest_group.update_attributes(name: guest_group_name, handle: guest_group_handle)
+    admin_group.update_attributes(name: admin_group_name, handle: admin_group_handle)
   end
 end

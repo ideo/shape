@@ -1,6 +1,6 @@
 import { Fragment } from 'react'
 import PropTypes from 'prop-types'
-import { PropTypes as MobxPropTypes } from 'mobx-react'
+import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 import { FormSpacer, TextButton } from '~/ui/global/styled/forms'
 import { Row, RowItemRight } from '~/ui/global/styled/layout'
@@ -11,7 +11,8 @@ const RemoveIconHolder = styled.button`
   width: 16px;
 `
 
-class OrganizationPeople extends React.PureComponent {
+@observer
+class OrganizationPeople extends React.Component {
   renderUserGroups = () => {
     const { userGroups } = this.props
     const groups = userGroups.filter(g => g.isNormalGroup)
@@ -41,9 +42,12 @@ class OrganizationPeople extends React.PureComponent {
     const { organization, userGroups } = this.props
     const primaryGroup = organization.primary_group
     const guestGroup = organization.guest_group
+    const adminGroup = organization.admin_group
 
     const orgMember = (userGroups.indexOf(primaryGroup) > -1)
     const showGuests = orgMember && !!guestGroup.groupRoles.length
+    // TODO: Only show AdminGroup to Admins
+    const showAdmins = orgMember && !!adminGroup.groupRoles.length
 
     return (
       <Fragment>
@@ -64,6 +68,13 @@ class OrganizationPeople extends React.PureComponent {
           <Row>
             <button className="orgEdit" onClick={this.props.onGroupRoles(guestGroup)}>
               <DisplayText>{ guestGroup.name }</DisplayText>
+            </button>
+          </Row>
+        }
+        { showAdmins &&
+          <Row>
+            <button className="orgEdit" onClick={this.props.onGroupRoles(adminGroup)}>
+              <DisplayText>{ adminGroup.name }</DisplayText>
             </button>
           </Row>
         }

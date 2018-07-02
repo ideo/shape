@@ -6,6 +6,7 @@
     "handle": { "type": ["string", "null"] },
     "is_primary": { "type": "boolean" },
     "is_guest": { "type": "boolean" },
+    "is_admin": { "type": "boolean" },
     "can_edit": { "type": "boolean" },
     "filestack_file_url": { "type": ["string", "null"] }
   },

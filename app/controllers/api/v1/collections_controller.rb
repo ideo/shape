@@ -2,7 +2,9 @@ class Api::V1::CollectionsController < Api::V1::BaseController
   deserializable_resource :collection, class: DeserializableCollection, only: %i[create update]
   load_and_authorize_resource :organization, only: [:create]
   load_and_authorize_resource :collection_card, only: [:create]
-  load_and_authorize_resource except: %i[me]
+  load_and_authorize_resource except: %i[me update]
+  # NOTE: these have to be in the following order
+  before_action :load_and_authorize_collection_update, only: %i[update]
   before_action :load_collection_with_cards, only: %i[show update archive]
 
   def show
@@ -68,6 +70,15 @@ class Api::V1::CollectionsController < Api::V1::BaseController
   end
 
   private
+
+  def load_and_authorize_collection_update
+    @collection = Collection.find(params[:id])
+    if collection_params[:name].present? && collection_params[:name] != @collection.name
+      authorize! :manage, @collection
+    else
+      authorize! :edit_content, @collection
+    end
+  end
 
   def render_collection(include: nil)
     # include collection_cards for UI to receive any updates

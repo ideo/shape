@@ -30,6 +30,14 @@ describe Organization, type: :model do
       end
     end
 
+    describe '#initialize_admin_group' do
+      it 'should create admin group with same name as org + Admins' do
+        expect(organization.admin_group.persisted?).to be true
+        expect(organization.admin_group.name).to eq("#{organization.name} Admins")
+        expect(organization.admin_group.handle).to eq("#{organization.name.parameterize}-admins")
+      end
+    end
+
     describe '#update_group_names' do
       it 'should update primary group if name changes' do
         expect(organization.primary_group.name).not_to eq('Org 2.0')
@@ -41,6 +49,12 @@ describe Organization, type: :model do
         expect(organization.guest_group.name).not_to eq('Org 2.0 Guests')
         organization.update_attributes(name: 'Org 2.0')
         expect(organization.guest_group.reload.name).to eq('Org 2.0 Guests')
+      end
+
+      it 'should update admin group if name changes' do
+        expect(organization.admin_group.name).not_to eq('Org 2.0 Admins')
+        organization.update_attributes(name: 'Org 2.0')
+        expect(organization.admin_group.reload.name).to eq('Org 2.0 Admins')
       end
     end
 
@@ -205,6 +219,29 @@ describe Organization, type: :model do
 
     it 'should count the number of users' do
       expect(organization.user_count).to eq 2
+    end
+  end
+
+  describe '#setup_templates' do
+    let(:organization) { create(:organization) }
+    let(:user) { create(:user) }
+
+    before do
+      organization.setup_templates(user)
+    end
+
+    it 'should create a template collection for the org' do
+      expect(organization.template_collection.persisted?).to be true
+      expect(organization.template_collection.name).to eq("#{organization.name} Templates")
+    end
+
+    it 'should add the admin group as the editor role' do
+      expect(
+        organization.admin_group.has_role?(
+          Role::CONTENT_EDITOR,
+          organization.template_collection,
+        ),
+      ).to be true
     end
   end
 end

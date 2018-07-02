@@ -39,10 +39,10 @@ const DisplayTextPadded = DisplayText.extend`
 `
 
 class RoleSelect extends React.Component {
-  get isGuestGroup() {
+  get isGuestOrAdminGroup() {
     const { role } = this.props
     if (role.resource && role.resource.internalType === 'groups') {
-      return role.resource.is_guest
+      return role.resource.isGuestOrAdmin
     }
     return false
   }
@@ -79,7 +79,9 @@ class RoleSelect extends React.Component {
 
   onRoleSelect = (ev) => {
     ev.preventDefault()
-    return this.deleteRole().then(() => this.createRole(ev.target.value))
+    // switching the dropdown calls a delete and then create role
+    return this.deleteRole().then(() =>
+      this.createRole(ev.target.value))
   }
 
   createRole(roleName, isSwitching = true) {
@@ -113,7 +115,7 @@ class RoleSelect extends React.Component {
   render() {
     const { enabled, role, roleTypes, entity } = this.props
     let select
-    if (!this.isGuestGroup && enabled) {
+    if (!this.isGuestOrAdminGroup && enabled) {
       select = (
         <Select
           classes={{ root: 'select', selectMenu: 'selectMenu' }}
@@ -140,7 +142,9 @@ class RoleSelect extends React.Component {
 
     // TODO remove duplication with RolesAdd role select menu
     const url = entity.pic_url_square || entity.filestack_file_url
-    const showLeaveIcon = (enabled || entity.id === apiStore.currentUserId)
+    const showLeaveIcon = (
+      enabled || (entity.internalType === 'users' && entity.id === apiStore.currentUserId)
+    )
     return (
       <Row>
         <span>

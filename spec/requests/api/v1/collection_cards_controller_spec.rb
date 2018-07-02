@@ -67,7 +67,20 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
       json_api_params('collection_cards', raw_params.reject { |k| k == :item_attributes })
     end
 
+    context 'without content editor access' do
+      let(:user) { create(:user, add_to_org: create(:organization)) }
+
+      it 'returns a 401' do
+        post(path, params: params)
+        expect(response.status).to eq(401)
+      end
+    end
+
     context 'success' do
+      let(:collection) do
+        create(:collection, add_content_editors: [user], organization: user.current_organization)
+      end
+
       it 'returns a 200' do
         post(path, params: params)
         expect(response.status).to eq(200)
@@ -258,7 +271,7 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
     let(:params_at_end) { raw_params.merge(placement: 'end').to_json }
     let(:params) { raw_params.to_json }
 
-    describe 'without manage access for to_collection' do
+    describe 'without content editor access for to_collection' do
       let(:to_collection) { create(:collection) }
 
       it 'returns a 401' do
@@ -267,7 +280,7 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
       end
     end
 
-    describe 'with manage access for to_collection' do
+    describe 'with content editor access for to_collection' do
       let(:editor) { create(:user) }
       let(:viewer) { create(:user) }
       let(:to_collection) do
@@ -334,7 +347,7 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
     end
     let(:params) { raw_params.to_json }
 
-    describe 'without manage access for to_collection' do
+    describe 'without content editor access for to_collection' do
       let(:to_collection) { create(:collection) }
 
       it 'returns a 401' do
@@ -355,7 +368,7 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
       end
     end
 
-    describe 'with manage access for to_collection and view access for cards in from_collection' do
+    describe 'with content editor access for to_collection and view access for cards in from_collection' do
       let(:editor) { create(:user) }
       let(:viewer) { create(:user) }
       let(:to_collection) do
@@ -399,7 +412,7 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
     end
     let(:params) { raw_params.to_json }
 
-    describe 'without manage access for to_collection' do
+    describe 'without content editor access for to_collection' do
       let(:to_collection) { create(:collection) }
 
       it 'returns a 401' do
@@ -420,7 +433,7 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
       end
     end
 
-    describe 'with manage access for to_collection and view access for cards in from_collection' do
+    describe 'with content editor access for to_collection and view access for cards in from_collection' do
       let(:editor) { create(:user) }
       let(:viewer) { create(:user) }
       let(:to_collection) do

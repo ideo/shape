@@ -228,7 +228,8 @@ class User < ApplicationRecord
     Notification
       .joins(:activity)
       .where(Activity.arel_table[:organization_id].eq(
-               current_organization_id))
+               current_organization_id,
+      ))
       .where(
         user: self,
         read: false,
@@ -242,5 +243,31 @@ class User < ApplicationRecord
     # Reindex record if it is a searchkick model
     resource = role.resource
     resource.reindex if Searchkick.callbacks? && resource.searchable?
+  end
+
+  def sync_groups_after_adding(role)
+    return unless role.resource.is_a?(Group)
+    group = role.resource
+    if group.primary? && role.name == Role::ADMIN.to_s
+      add_role(Role::ADMIN, group.organization.admin_group) unless
+        has_role?(Role::ADMIN, group.organization.admin_group)
+    elsif group.admin?
+      add_role(Role::ADMIN, group.organization.primary_group) unless
+        has_role?(Role::ADMIN, group.organization.primary_group)
+    end
+  end
+
+  def sync_groups_after_removing(role)
+    return unless role.resource.is_a?(Group)
+    group = role.resource
+    if group.primary? && role.name == Role::ADMIN.to_s
+      remove_role(Role::ADMIN, group.organization.admin_group) if
+        has_role?(Role::ADMIN, group.organization.admin_group)
+    elsif group.admin? && has_role?(Role::ADMIN, group.organization.primary_group)
+      # if removing them from the admin group,
+      # convert them back to a normal member of the org
+      remove_role(Role::ADMIN, group.organization.primary_group)
+      add_role(Role::MEMBER, group.organization.primary_group)
+    end
   end
 end

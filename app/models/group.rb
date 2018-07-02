@@ -89,6 +89,10 @@ class Group < ApplicationRecord
     organization.guest_group_id == id
   end
 
+  def admin?
+    organization.admin_group_id == id
+  end
+
   def can_view?(user)
     # NOTE: guest group access can be granted via primary_group membership
     return true if guest? && organization.primary_group.can_view?(user)

@@ -11,6 +11,7 @@ class CommentThread extends BaseRecord {
   @computed get key() {
     // include __persisted as part of the key,
     // because when we .save() the unpersisted and persisted both temporarily exist
+    if (!this.record) return 'none'
     return `thread-${this.record.className}-${this.record.id}${this.__persisted ? '' : '-new'}`
   }
 

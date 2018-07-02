@@ -38,7 +38,7 @@ describe Resourceable, type: :concern do
   end
 
   describe '#can_edit?' do
-    it 'return false' do
+    it 'returns false' do
       expect(collection.can_edit?(user)).to be false
     end
 
@@ -53,12 +53,38 @@ describe Resourceable, type: :concern do
     end
   end
 
+  describe '#can_edit_content?' do
+    it 'returns false' do
+      expect(collection.can_edit_content?(user)).to be false
+    end
+
+    context 'as content editor' do
+      before do
+        user.add_role(Role::CONTENT_EDITOR, collection)
+      end
+
+      it 'returns true' do
+        expect(collection.can_edit_content?(user)).to be true
+      end
+    end
+
+    context 'as editor' do
+      before do
+        user.add_role(Role::EDITOR, collection)
+      end
+
+      it 'returns true' do
+        expect(collection.can_edit_content?(user)).to be true
+      end
+    end
+  end
+
   describe '#can_view?' do
-    it 'return false for user' do
+    it 'returns false for user' do
       expect(collection.can_view?(user)).to be false
     end
 
-    it 'return false for group' do
+    it 'returns false for group' do
       expect(collection.can_view?(group)).to be false
     end
 

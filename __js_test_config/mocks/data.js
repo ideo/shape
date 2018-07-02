@@ -93,6 +93,7 @@ export const fakeCollection = {
   roles: [],
   tag_list: ['prototype', 'blockchain'],
   can_edit: false,
+  can_edit_content: false,
   isSharedCollection: false,
   isUserCollection: false,
   isNormalCollection: true,
@@ -129,6 +130,8 @@ export const fakeOrganizationAttrs = {
   id: 1,
   name: 'TestOrg',
   primary_group: fakeGroup,
+  guest_group: fakeGroup,
+  admin_group: fakeGroup,
 }
 export const fakeOrganization = {
   ...fakeOrganizationAttrs,
