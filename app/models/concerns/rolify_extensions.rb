@@ -50,14 +50,14 @@ module RolifyExtensions
 
   def add_resource_role(role, resource)
     existing = existing_resource_role_for_self(role)
-    # if we're adding someone as editor who's previously a viewer
+    # if we're adding someone as editor/admin who's previously a viewer/member
     should_upgrade = (
-      role.name.to_sym == Role::EDITOR &&
+      role.name.to_sym == resource.class.edit_role &&
       existing &&
-      existing.name.to_sym == Role::VIEWER
+      existing.name.to_sym == resource.class.view_role
     )
     # this will re-start the add_role process, after first removing user's viewer role
-    return upgrade_to_editor_role(resource) if should_upgrade
+    return upgrade_to_edit_role(resource) if should_upgrade
     return existing if existing.present?
     if is_a?(User)
       role.users << self
@@ -105,12 +105,12 @@ module RolifyExtensions
     found
   end
 
-  def upgrade_to_editor_role(resource)
+  def upgrade_to_edit_role(resource)
     return unless is_a? User
-    role = Role.for_resource(resource).where(name: Role::VIEWER).first
+    role = Role.for_resource(resource).where(name: resource.class.view_role).first
     # `remove_role` will too aggressively destroy the entire role, so just remove the user
     role.users.destroy(self) if role.present?
-    add_role(Role::EDITOR, resource)
+    add_role(resource.class.edit_role, resource)
   end
 
   # This includes all roles a user explicitly has

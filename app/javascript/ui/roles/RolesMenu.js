@@ -80,7 +80,7 @@ class RolesMenu extends React.Component {
           window.location.reload()
         }
         if (!opts.isSwitching) {
-          const saveReturn = this.props.onSave(res)
+          const saveReturn = this.props.onSave(res, { roleName: role.name })
           this.filterSearchableItems()
           return saveReturn
         }
@@ -103,7 +103,7 @@ class RolesMenu extends React.Component {
     }
     return apiStore.request(`${ownerType}/${ownerId}/roles`, 'POST', data)
       .then(res => {
-        const saveReturn = onSave(res)
+        const saveReturn = onSave(res, { roleName })
         this.filterSearchableItems()
         return saveReturn
       })
@@ -136,7 +136,14 @@ class RolesMenu extends React.Component {
   }
 
   render() {
-    const { addCallout, canEdit, roles, ownerType, title } = this.props
+    const {
+      addCallout,
+      canEdit,
+      roles,
+      ownerType,
+      title,
+      fixedRole,
+    } = this.props
     const roleEntities = []
     roles.forEach((role) => {
       role.users.forEach((user) => {
@@ -152,6 +159,10 @@ class RolesMenu extends React.Component {
     const roleTypes = ownerType === 'groups'
       ? ['member', 'admin']
       : ['editor', 'viewer']
+
+    // ability to restrict the selection to only one role type
+    // e.g. "admin" is the only selection for Org Admins group
+    const addRoleTypes = fixedRole ? [fixedRole] : roleTypes
 
     return (
       <div>
@@ -175,7 +186,7 @@ class RolesMenu extends React.Component {
             <Heading3>{addCallout}</Heading3>
             <RolesAdd
               searchableItems={this.searchableItems}
-              roleTypes={roleTypes}
+              roleTypes={addRoleTypes}
               onCreateRoles={this.createRoles}
               onCreateUsers={this.onCreateUsers}
             />
@@ -190,6 +201,7 @@ RolesMenu.propTypes = {
   canEdit: PropTypes.bool,
   ownerId: PropTypes.number.isRequired,
   ownerType: PropTypes.string.isRequired,
+  fixedRole: PropTypes.string,
   roles: MobxPropTypes.arrayOrObservableArray,
   title: PropTypes.string,
   addCallout: PropTypes.string,
@@ -201,6 +213,7 @@ RolesMenu.wrappedComponent.propTypes = {
 }
 RolesMenu.defaultProps = {
   canEdit: false,
+  fixedRole: null,
   roles: [],
   title: 'Shared with',
   addCallout: 'Add groups or people:'
