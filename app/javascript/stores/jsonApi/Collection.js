@@ -11,6 +11,11 @@ class Collection extends BaseRecord {
     return this.collection_cards.map(card => card.id)
   }
 
+  @action removeCard(card) {
+    this.collection_cards.splice(this.collection_cards.indexOf(card), 1)
+    this._reorderCards()
+  }
+
   get isUserCollection() {
     return this.type === 'Collection::UserCollection'
   }

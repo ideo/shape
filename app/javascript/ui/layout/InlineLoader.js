@@ -23,6 +23,7 @@ const InlineLoader = ({ fixed, background }) => (
     <Loader fadeIn="half" height="30px" size={30} />
   </StyledFlex>
 )
+InlineLoader.displayName = 'InlineLoader'
 
 InlineLoader.propTypes = {
   fixed: PropTypes.bool,

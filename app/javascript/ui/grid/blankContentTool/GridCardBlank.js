@@ -202,7 +202,7 @@ class GridCardBlank extends React.Component {
   }
 
   createDropPane = () => {
-    if (this.canceled) return
+    if (this.canceled || this.state.creating) return
     FilestackUpload.makeDropPane({
       id: 'dropzone',
       onProgress: (pct) => {
@@ -342,8 +342,11 @@ class GridCardBlank extends React.Component {
         <BctDropzone droppingFile={this.state.droppingFile} id="dropzone">
           {!this.state.loading && !this.state.droppingFile &&
             <div className="text">
-              <img src={bctIcons} alt="Vimeo, picture, youtube icons"
-                style={{ width: '80px' }} />
+              <img
+                src={bctIcons}
+                alt="dropzone icons"
+                style={{ width: '80px' }}
+              />
               <div className="top">Drag &amp; Drop</div>
               <div className="or">or</div>
               <div className="bottom">Browse</div>
