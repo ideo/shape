@@ -202,7 +202,7 @@ class GridCardBlank extends React.Component {
   }
 
   createDropPane = () => {
-    if (this.canceled) return
+    if (this.canceled || this.state.creating) return
     FilestackUpload.makeDropPane({
       id: 'dropzone',
       onProgress: (pct) => {
