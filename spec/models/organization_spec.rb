@@ -243,7 +243,7 @@ describe Organization, type: :model do
 
     it 'should create a profile template in the templates collection' do
       expect(template_collection.children.count).to be 1
-      expect(template_collection.collections.first.type).to eq 'Collection::MasterTemplateCollection'
+      expect(template_collection.collections.first.type).to eq 'Collection::MasterTemplate'
     end
   end
 end

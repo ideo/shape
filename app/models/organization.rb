@@ -18,7 +18,7 @@ class Organization < ApplicationRecord
              dependent: :destroy,
              optional: true
   belongs_to :profile_template,
-             class_name: 'Collection::MasterTemplateCollection',
+             class_name: 'Collection::MasterTemplate',
              dependent: :destroy,
              optional: true
 
@@ -142,6 +142,7 @@ class Organization < ApplicationRecord
       [collection.id],
       [],
     )
+    save
     collection.reload
   end
 

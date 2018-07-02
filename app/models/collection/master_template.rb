@@ -11,9 +11,5 @@ class Collection
     def breadcrumbable?
       false
     end
-
-    def profile_template?
-      organization.template_collection_id == id
-    end
   end
 end
