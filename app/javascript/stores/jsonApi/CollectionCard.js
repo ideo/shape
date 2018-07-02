@@ -109,7 +109,6 @@ class CollectionCard extends BaseRecord {
       const collection = this.parent
       try {
         collection.removeCard(this)
-        console.log('request archive', this.id)
         await this.apiStore.request(`collection_cards/${this.id}/archive`, 'PATCH')
 
         if (collection.collection_cards.length === 0) {
