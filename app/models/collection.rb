@@ -208,12 +208,12 @@ class Collection < ApplicationRecord
     parent.roles.each do |role|
       c.roles << role.duplicate!(assign_resource: c)
     end
-    # NOTE: different from parent_is_user_collection? since `parent` is passed in
+    # NOTE: different from `parent_is_user_collection?` since `parent` is passed in
     if parent.is_a? Collection::UserCollection
       c.allow_primary_group_view_access
     end
     # make sure duplicate creator becomes an editor
-    for_user.upgrade_to_editor_role(c)
+    for_user.upgrade_to_edit_role(c)
 
     CollectionCardDuplicationWorker.perform_async(
       collection_cards.map(&:id),
