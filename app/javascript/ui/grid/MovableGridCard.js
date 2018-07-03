@@ -307,6 +307,7 @@ class MovableGridCard extends React.PureComponent {
       isUserCollection,
       isSharedCollection,
     }
+    console.log('rnd', card.isPinned)
 
     return (
       <StyledCardWrapper dragging={!moveComplete}>
@@ -331,7 +332,7 @@ class MovableGridCard extends React.PureComponent {
           position={{ x: xPos, y: yPos }}
           default={{ width, height, x: xPos, y: yPos }}
           // NOTE: disabling dragging for touchscreens because of conflict with touch scrolling
-          disableDragging={!canEditCollection || uiStore.isTouchDevice}
+          disableDragging={!canEditCollection || uiStore.isTouchDevice || card.isPinned}
           enableResizing={{
             bottomRight: canEditCollection,
             bottom: false,
