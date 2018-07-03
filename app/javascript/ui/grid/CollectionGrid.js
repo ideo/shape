@@ -166,6 +166,7 @@ class CollectionGrid extends React.Component {
     const stateCards = [...this.state.cards]
     const placeholder = _.find(stateCards, { id: placeholderKey })
     const hoveringOver = this.findOverlap(cardId, dragPosition)
+    if (hoveringOver && hoveringOver.card.isPinned) return
     if (!placeholder) {
       this.createPlaceholderCard(positionedCard)
     } else if (hoveringOver) {
@@ -262,6 +263,7 @@ class CollectionGrid extends React.Component {
           order,
           distance,
           direction,
+          card,
           record
         }
       }
