@@ -6,9 +6,9 @@ import v from '~/utils/variables'
 
 /** @component */
 export const TopRightButton = styled.button`
-  position: absolute;
-  top: ${props => (props.size === 'sm' ? '5px' : '12px')};
-  right: ${props => (props.size === 'sm' ? '10px' : '12px')};
+  position: ${props => props.position};
+  top: ${props => (props.size === 'sm' ? '10px' : '12px')};
+  right: ${props => (props.size === 'sm' ? '15px' : '12px')};
   color: ${props => props.color};
   .icon {
     width: ${props => (props.size === 'sm' ? '12px' : '15px')};
@@ -21,19 +21,21 @@ export const TopRightButton = styled.button`
 `
 TopRightButton.displayName = 'TopRightButton'
 
-export const CloseButton = ({ onClick, size, color }) => (
-  <TopRightButton onClick={onClick} size={size} color={color}>
+export const CloseButton = ({ onClick, size, color, position }) => (
+  <TopRightButton onClick={onClick} size={size} color={color} position={position}>
     <CloseIcon />
   </TopRightButton>
 )
 CloseButton.propTypes = {
   size: PropTypes.oneOf(['sm', 'lg']),
   onClick: PropTypes.func.isRequired,
+  position: PropTypes.oneOf(['absolute', 'fixed']),
   color: PropTypes.oneOf(Object.values(v.colors)),
 }
 CloseButton.defaultProps = {
   size: 'sm',
   color: v.colors.cloudy,
+  position: 'absolute',
 }
 
 export const CircledIcon = styled.button`

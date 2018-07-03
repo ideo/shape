@@ -1,5 +1,5 @@
 import _ from 'lodash'
-import { computed } from 'mobx'
+import { computed, action } from 'mobx'
 
 import Api from './Api'
 import BaseRecord from './BaseRecord'
@@ -9,6 +9,11 @@ class Collection extends BaseRecord {
 
   @computed get cardIds() {
     return this.collection_cards.map(card => card.id)
+  }
+
+  @action removeCard(card) {
+    this.collection_cards.splice(this.collection_cards.indexOf(card), 1)
+    this._reorderCards()
   }
 
   get isUserCollection() {
@@ -29,6 +34,11 @@ class Collection extends BaseRecord {
 
   get isEmpty() {
     return this.collection_cards.length === 0
+  }
+
+  @action addCard(card) {
+    this.collection_cards.unshift(card)
+    this._reorderCards()
   }
 
   API_archive() {

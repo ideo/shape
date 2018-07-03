@@ -87,12 +87,10 @@ class Api::V1::CollectionsController < Api::V1::BaseController
   end
 
   def load_collection_with_cards
-    # item/collection will turn into "record" when serialized
-    @collection = Rails.cache.fetch(@collection.cache_key) do
-      Collection.where(id: params[:id])
-                .includes(Collection.default_relationships_for_cache_query)
-                .first
-    end
+    @collection = Collection
+                  .where(id: params[:id])
+                  .includes(Collection.default_relationships_for_cache_query)
+                  .first
   end
 
   def collection_params

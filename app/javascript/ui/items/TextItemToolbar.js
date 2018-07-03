@@ -20,18 +20,24 @@ const StyledButton = styled.button`
   }
 `
 
+const IconButton = styled(StyledButton)`
+  margin-bottom: 1px;
+  margin-left: auto;
+  width: 25px !important;
+`
+
 function styles(props) {
-  const styles = []
+  const allStyles = []
   if (!props.fullPageView) {
-    styles.top = '0'
-    styles.background = 'white'
-    styles.paddingTop = '5px'
-    styles.position = 'fixed'
-    styles.height = '32px'
-    styles.marginBottom = '20px'
-    styles.zIndex = 100
+    allStyles.top = '0'
+    allStyles.background = 'white'
+    allStyles.paddingTop = '5px'
+    allStyles.position = 'fixed'
+    allStyles.height = '32px'
+    allStyles.marginBottom = '20px'
+    allStyles.zIndex = 100
   }
-  return styles
+  return allStyles
 }
 
 const TextItemToolbar = (props) => (
@@ -45,9 +51,9 @@ const TextItemToolbar = (props) => (
       {/* quill inserts ql-link SVG */}
       <StyledButton className="ql-link" />
       {props.onExpand && (
-        <StyledButton onClick={props.onExpand}>
+        <IconButton onClick={props.onExpand}>
           <ExpandIcon />
-        </StyledButton>
+        </IconButton>
       )}
     </span>
   </div>

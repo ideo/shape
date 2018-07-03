@@ -1,11 +1,13 @@
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
+import { observable, action, runInAction } from 'mobx'
 import styled from 'styled-components'
-import Snackbar, { SnackbarContent } from 'material-ui/Snackbar'
-import Tooltip from '~/ui/global/Tooltip'
 
 import v from '~/utils/variables'
-import MoveArrowIcon from '~/ui/icons/MoveArrowIcon'
 import CloseIcon from '~/ui/icons/CloseIcon'
+import InlineLoader from '~/ui/layout/InlineLoader'
+import MoveArrowIcon from '~/ui/icons/MoveArrowIcon'
+import Snackbar, { SnackbarContent } from 'material-ui/Snackbar'
+import Tooltip from '~/ui/global/Tooltip'
 
 const StyledSnackbar = styled(Snackbar)`
   &.Snackbar {
@@ -26,6 +28,14 @@ const StyledSnackbarContent = styled(SnackbarContent)`
     padding: 15px 30px;
     width: 100%;
   }
+`
+
+// TODO share styles
+const SnackbarBackground = styled.div`
+  background-color: ${v.colors.cloudy};
+  min-height: 36px;
+  padding: 15px 30px;
+  width: 100%;
 `
 
 // This text is different from other typography
@@ -52,6 +62,8 @@ const CloseIconHolder = styled.span`
 @inject('uiStore', 'apiStore')
 @observer
 class MoveModal extends React.Component {
+  @observable isLoading = false
+
   handleClose = (ev) => {
     ev.preventDefault()
     const { uiStore } = this.props
@@ -87,6 +99,7 @@ class MoveModal extends React.Component {
       placement,
     }
     try {
+      runInAction(() => { this.isLoading = true })
       let successMessage
       if (uiStore.cardAction === 'move') {
         await apiStore.request('collection_cards/move', 'PATCH', data)
@@ -101,6 +114,7 @@ class MoveModal extends React.Component {
         await apiStore.request(`collections/${collectionId}`)
         successMessage = 'Items successfully duplicated!'
       }
+      runInAction(() => { this.isLoading = false })
       uiStore.alertOk(successMessage)
       uiStore.resetSelectionAndBCT()
       uiStore.closeMoveMenu()
@@ -110,6 +124,7 @@ class MoveModal extends React.Component {
         uiStore.scroll.scrollToBottom()
       }
     } catch (e) {
+      runInAction(() => { this.isLoading = false })
       uiStore.alert('You cannot move a collection within itself')
     }
   }
@@ -137,47 +152,49 @@ class MoveModal extends React.Component {
             classes={{ root: 'Snackbar', }}
             open
           >
-            <StyledSnackbarContent
-              classes={{ root: 'SnackbarContent', }}
-              message={
-                <StyledMoveText id="message-id">{moveMessage}</StyledMoveText>
-              }
-              action={[
-                <IconHolder key="moveup">
-                  <Tooltip
-                    classes={{ tooltip: 'Tooltip' }}
-                    title="Place at top"
-                    placement="top"
-                  >
-                    <button onClick={this.handleMoveToBeginning}>
-                      <MoveArrowIcon direction="up" />
-                    </button>
-                  </Tooltip>
-                </IconHolder>,
-                <IconHolder key="movedown">
-                  <Tooltip
-                    classes={{ tooltip: 'Tooltip' }}
-                    title="Place at bottom"
-                    placement="top"
-                  >
-                    <button onClick={this.handleMoveToEnd}>
-                      <MoveArrowIcon direction="down" />
-                    </button>
-                  </Tooltip>
-                </IconHolder>,
-                <CloseIconHolder key="close">
-                  <Tooltip
-                    classes={{ tooltip: 'Tooltip' }}
-                    title="Cancel"
-                    placement="top"
-                  >
-                    <button onClick={this.handleClose}>
-                      <CloseIcon />
-                    </button>
-                  </Tooltip>
-                </CloseIconHolder>,
-              ]}
-            />
+            {this.isLoading ? <SnackbarBackground><InlineLoader /></SnackbarBackground> : (
+              <StyledSnackbarContent
+                classes={{ root: 'SnackbarContent', }}
+                message={
+                  <StyledMoveText id="message-id">{moveMessage}</StyledMoveText>
+                }
+                action={[
+                  <IconHolder key="moveup">
+                    <Tooltip
+                      classes={{ tooltip: 'Tooltip' }}
+                      title="Place at top"
+                      placement="top"
+                    >
+                      <button onClick={this.handleMoveToBeginning}>
+                        <MoveArrowIcon direction="up" />
+                      </button>
+                    </Tooltip>
+                  </IconHolder>,
+                  <IconHolder key="movedown">
+                    <Tooltip
+                      classes={{ tooltip: 'Tooltip' }}
+                      title="Place at bottom"
+                      placement="top"
+                    >
+                      <button onClick={this.handleMoveToEnd}>
+                        <MoveArrowIcon direction="down" />
+                      </button>
+                    </Tooltip>
+                  </IconHolder>,
+                  <CloseIconHolder key="close">
+                    <Tooltip
+                      classes={{ tooltip: 'Tooltip' }}
+                      title="Cancel"
+                      placement="top"
+                    >
+                      <button onClick={this.handleClose}>
+                        <CloseIcon />
+                      </button>
+                    </Tooltip>
+                  </CloseIconHolder>,
+                ]}
+              />
+            )}
           </StyledSnackbar>
         )}
       </div>

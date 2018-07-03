@@ -202,7 +202,7 @@ class GridCardBlank extends React.Component {
   }
 
   createDropPane = () => {
-    if (this.canceled) return
+    if (this.canceled || this.state.creating) return
     FilestackUpload.makeDropPane({
       id: 'dropzone',
       onProgress: (pct) => {
@@ -296,7 +296,6 @@ class GridCardBlank extends React.Component {
 
   closeBlankContentTool = () => {
     const { uiStore } = this.props
-    if (uiStore.newTextEditing) return
     if (uiStore.blankContentToolState.emptyCollection) {
       this.setState({ creating: null })
       // have to re-create the DropPane
@@ -343,8 +342,11 @@ class GridCardBlank extends React.Component {
         <BctDropzone droppingFile={this.state.droppingFile} id="dropzone">
           {!this.state.loading && !this.state.droppingFile &&
             <div className="text">
-              <img src={bctIcons} alt="Vimeo, picture, youtube icons"
-                style={{ width: '80px' }} />
+              <img
+                src={bctIcons}
+                alt="dropzone icons"
+                style={{ width: '80px' }}
+              />
               <div className="top">Drag &amp; Drop</div>
               <div className="or">or</div>
               <div className="bottom">Browse</div>
@@ -429,6 +431,7 @@ class GridCardBlank extends React.Component {
   render() {
     const { uiStore } = this.props
     const { gridSettings, blankContentToolState } = uiStore
+    const { creating } = this.state
     return (
       <StyledGridCardBlank emptyState={this.emptyState}>
         <StyledGridCardInner
@@ -439,7 +442,7 @@ class GridCardBlank extends React.Component {
           {this.renderInner()}
         </StyledGridCardInner>
         { this.state.loading && <InlineLoader /> }
-        { !this.emptyState &&
+        { !this.emptyState && this.state.creating !== 'text' &&
           <CloseButton onClick={this.closeBlankContentTool} />
         }
       </StyledGridCardBlank>

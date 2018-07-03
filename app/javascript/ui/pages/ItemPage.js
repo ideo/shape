@@ -2,7 +2,6 @@ import { Fragment } from 'react'
 import ReactRouterPropTypes from 'react-router-prop-types'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
-import { Link } from 'react-router-dom'
 
 import PageError from '~/ui/global/PageError'
 import ActionCableConsumer from '~/utils/ActionCableConsumer'
@@ -13,8 +12,7 @@ import TextItem from '~/ui/items/TextItem'
 import ImageItem from '~/ui/items/ImageItem'
 import VideoItem from '~/ui/items/VideoItem'
 import PageHeader from '~/ui/pages/shared/PageHeader'
-import CloseIcon from '~/ui/icons/CloseIcon'
-import v, { ITEM_TYPES } from '~/utils/variables'
+import { ITEM_TYPES } from '~/utils/variables'
 
 const ItemPageContainer = styled.div`
   background: white;
@@ -23,36 +21,7 @@ const ItemPageContainer = styled.div`
 `
 ItemPageContainer.displayName = 'ItemPageContainer'
 
-const StyledRightColumn = styled.div`
-  position: absolute;
-  top: 2rem;
-  right: 2rem;
-`
-
-const CloseLink = styled(Link)`
-  /* add the .close class for more specificity to override quill theme-snow */
-  text-decoration: none;
-  color: ${v.colors.cloudy};
-  &:hover {
-    color: black;
-  }
-  padding: 0;
-  height: auto;
-  position: fixed;
-  width: 100%;
-  top: 200px;
-  z-index: ${v.zIndex.itemClose};
-  .icon {
-    position: relative;
-    right: 28px;
-    padding: 0.5rem;
-    background: rgba(255, 255, 255, 0.95);
-    width: 12px;
-    height: 12px;
-  }
-`
-
-@inject('apiStore', 'uiStore')
+@inject('apiStore', 'uiStore', 'routingStore')
 @observer
 class ItemPage extends PageWithApi {
   state = {
@@ -80,13 +49,17 @@ class ItemPage extends PageWithApi {
   updateItem = (itemTextData) => {
     const { item } = this.state
     item.text_data = itemTextData
-
     this.setState({ item })
   }
 
   save = (item, { cancel_sync = true } = {}) => (
     item.API_updateWithoutSync({ cancel_sync })
   )
+
+  cancel = (item) => {
+    this.save(item)
+    this.props.routingStore.push(item.parentPath)
+  }
 
   // could be smarter or broken out once we want to do different things per type
   get content() {
@@ -102,6 +75,7 @@ class ItemPage extends PageWithApi {
           currentUserId={currentUserId}
           onUpdatedData={this.updateItem}
           onSave={this.save}
+          onCancel={this.cancel}
           fullPageView
         />
       )
@@ -143,11 +117,6 @@ class ItemPage extends PageWithApi {
           <PageContainer>
             {/* TODO: calculate item container size? */}
             {this.content}
-            <StyledRightColumn>
-              <CloseLink to={item.parentPath}>
-                <CloseIcon />
-              </CloseLink>
-            </StyledRightColumn>
           </PageContainer>
         </ItemPageContainer>
       </Fragment>
@@ -161,6 +130,7 @@ ItemPage.propTypes = {
 ItemPage.wrappedComponent.propTypes = {
   apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
+  routingStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 
 export default ItemPage

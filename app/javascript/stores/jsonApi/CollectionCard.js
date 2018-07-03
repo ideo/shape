@@ -75,9 +75,9 @@ class CollectionCard extends BaseRecord {
 
   async API_create({ isReplacing = false } = {}) {
     try {
-      await this.apiStore.request('collection_cards', 'POST', { data: this.toJsonApi() })
+      const res = await this.apiStore.request('collection_cards', 'POST', { data: this.toJsonApi() })
       if (!isReplacing) {
-        await this.apiStore.fetch('collections', this.parent.id, true)
+        this.parent.addCard(res.data)
         uiStore.closeBlankContentTool()
         uiStore.trackEvent('create', this.parent)
       }
@@ -108,8 +108,8 @@ class CollectionCard extends BaseRecord {
     const onAgree = async () => {
       const collection = this.parent
       try {
+        collection.removeCard(this)
         await this.apiStore.request(`collection_cards/${this.id}/archive`, 'PATCH')
-        await this.apiStore.fetch('collections', collection.id, true)
 
         if (collection.collection_cards.length === 0) {
           uiStore.openBlankContentTool()
@@ -124,6 +124,8 @@ class CollectionCard extends BaseRecord {
         return true
       } catch (e) {
         uiStore.defaultAlertError()
+      } finally {
+        this.apiStore.fetch('collections', collection.id, true)
       }
       return false
     }
