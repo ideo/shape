@@ -12,7 +12,8 @@
     "tag_list": { "type": ["array", "null"] },
     "cover": { "type": ["object"] },
     "organization_id": { "type": "integer" },
-    "is_org_template_collection": { "type": ["boolean"] }
+    "is_org_template_collection": { "type": ["boolean"] },
+    "is_profile_collection": { "type": ["boolean"] }
   },
   "required": ["id", "name", "type", "created_at", "cover"]
 }
