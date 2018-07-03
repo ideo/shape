@@ -23,6 +23,10 @@ class Collection extends BaseRecord {
     return this.type === 'Collection::MasterTemplate'
   }
 
+  get isProfile() {
+    return this.is_profile_template
+  }
+
   get isOrgTemplateCollection() {
     return this.is_org_template_collection
   }

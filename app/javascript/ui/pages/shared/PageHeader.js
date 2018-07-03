@@ -10,6 +10,7 @@ import Roles from '~/ui/grid/Roles'
 import RolesSummary from '~/ui/roles/RolesSummary'
 import PageMenu from '~/ui/pages/shared/PageMenu'
 import { FixedHeader, MaxWidthContainer } from '~/ui/global/styled/layout'
+import { SubduedHeading1 } from '~/ui/global/styled/typography'
 import { StyledTitleAndRoles } from '~/ui/pages/shared/styled'
 import v from '~/utils/variables'
 
@@ -76,6 +77,23 @@ class PageHeader extends React.Component {
     return elements
   }
 
+  get collectionIcon() {
+    const { record } = this.props
+    if (record.isProfile) {
+      return <div></div>
+    }
+    return null
+  }
+
+  get collectionTypeName() {
+    const { record } = this.props
+    if (record.isMasterTemplate) {
+      console.log('record', record)
+      return <SubduedHeading1>template</SubduedHeading1>
+    }
+    return null
+  }
+
   render() {
     const { record, isHomepage } = this.props
     const breadcrumb = isHomepage ? [] : record.breadcrumb
@@ -90,11 +108,13 @@ class PageHeader extends React.Component {
           <div>
             <StyledTitleAndRoles justify="space-between">
               <Box className="title">
+                { this.collectionIcon }
                 <EditableName
                   name={record.name}
                   updateNameHandler={this.updateRecordName}
                   canEdit={this.canEdit}
                 />
+                { this.collectionTypeName }
               </Box>
               <Flex align="flex-end" style={{ height: '60px', marginTop: '-10px' }}>
                 <Fragment>
