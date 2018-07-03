@@ -21,6 +21,10 @@ class Organization < ApplicationRecord
              class_name: 'Collection::MasterTemplate',
              dependent: :destroy,
              optional: true
+  belongs_to :profile_collection,
+             class_name: 'Collection',
+             dependent: :destroy,
+             optional: true
 
   after_create :create_groups
   before_update :parse_domain_whitelist
@@ -101,6 +105,10 @@ class Organization < ApplicationRecord
     "#{name} Templates"
   end
 
+  def profile_collection_name
+    'People'
+  end
+
   def guest_group_handle
     "#{handle}-guest"
   end
@@ -116,12 +124,18 @@ class Organization < ApplicationRecord
     ).uniq.count
   end
 
-  def setup_templates(user)
+  def setup_templates_and_collections
     # Create templates collection
     collection = create_template_collection(
       name: template_collection_name,
       organization: self,
     )
+    # Create profile collection (directory of user profiles)
+    profile_collection = create_profile_collection(
+      name: profile_collection_name,
+      organization: self,
+    )
+    primary_group.add_role(Role::VIEWER, profile_collection)
     # Create default profile template and add it to the templates collection
     profile_template = create_profile_template(
       name: 'Profile',
@@ -137,12 +151,9 @@ class Organization < ApplicationRecord
     )
     admin_group.add_role(Role::CONTENT_EDITOR, collection)
     admin_group.add_role(Role::CONTENT_EDITOR, profile_template)
-    profile_template.items.each do |i|
-      admin_group.add_role(Role::CONTENT_EDITOR, i)
-      user.add_role(Role::CONTENT_EDITOR, i)
-    end
+    profile_template.items.each { |i| admin_group.add_role(Role::CONTENT_EDITOR, i) }
     LinkToSharedCollectionsWorker.new.perform(
-      [user.id],
+      [],
       [admin_group.id],
       [collection.id],
       [],

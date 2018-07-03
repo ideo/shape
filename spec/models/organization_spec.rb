@@ -225,7 +225,7 @@ describe Organization, type: :model do
   describe '#setup_templates' do
     let(:organization) { create(:organization) }
     let(:user) { create(:user) }
-    let!(:template_collection) { organization.setup_templates(user) }
+    let!(:template_collection) { organization.setup_templates_and_collections }
 
     it 'should create a template collection for the org' do
       expect(organization.template_collection.persisted?).to be true

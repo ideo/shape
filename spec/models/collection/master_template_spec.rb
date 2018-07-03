@@ -3,8 +3,7 @@ require 'rails_helper'
 describe Collection::MasterTemplate, type: :model do
   describe '#profile_template?' do
     let!(:organization) { create(:organization) }
-    let(:user) { create(:user) }
-    let!(:template_collection) { organization.setup_templates(user) }
+    let!(:template_collection) { organization.setup_templates_and_collections }
     let!(:profile_template) { organization.profile_template }
 
     it 'should return true if its the orgs profile template' do
