@@ -6,7 +6,10 @@ module RolifyExtensions
     @has_role_by_identifier ||= Hash.new do |h, key|
       role_name = key.first
       resource_identifier = key.last
-      role = roles.where(name: role_name, resource_identifier: resource_identifier).first
+      role = rolify_roles.where(
+        name: role_name,
+        resource_identifier: resource_identifier,
+      ).first
       if is_a?(User)
         h[key] = role.present? || role_via_org_groups(role_name, resource_identifier).present?
       elsif is_a?(Group)

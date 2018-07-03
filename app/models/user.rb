@@ -4,6 +4,8 @@ class User < ApplicationRecord
   rolify after_add: :after_role_update,
          after_remove: :after_role_update,
          strict: true
+  # alias created just to give equivalent method on users/groups
+  alias rolify_roles roles
 
   devise :database_authenticatable, :registerable, :trackable,
          :rememberable, :validatable, :omniauthable,
