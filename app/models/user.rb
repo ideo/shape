@@ -4,6 +4,8 @@ class User < ApplicationRecord
   rolify after_add: :after_role_update,
          after_remove: :after_role_update,
          strict: true
+  # alias created just to give equivalent method on users/groups
+  alias rolify_roles roles
 
   devise :database_authenticatable, :registerable, :trackable,
          :rememberable, :validatable, :omniauthable,
@@ -209,6 +211,13 @@ class User < ApplicationRecord
     Role.joins(:groups_roles)
         .where(GroupsRole.arel_table[:group_id].in(org_group_ids))
         .map(&:identifier)
+  end
+
+  def role_via_org_groups(name, resource_identifier)
+    Role.where(name: name, resource_identifier: resource_identifier)
+        .joins(:groups_roles)
+        .where(GroupsRole.arel_table[:group_id].in(current_org_group_ids))
+        .first
   end
 
   def current_org_groups_and_special_groups

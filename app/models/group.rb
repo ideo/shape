@@ -24,6 +24,8 @@ class Group < ApplicationRecord
   rolify after_add: :after_role_update,
          after_remove: :after_role_update,
          strict: true
+  # roles method gets overridden so we alias it here
+  alias rolify_roles roles
 
   belongs_to :organization
   belongs_to :current_shared_collection,
