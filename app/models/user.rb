@@ -211,6 +211,13 @@ class User < ApplicationRecord
         .map(&:identifier)
   end
 
+  def role_via_org_groups(name, resource_identifier)
+    Role.where(name: name, resource_identifier: resource_identifier)
+        .joins(:groups_roles)
+        .where(GroupsRole.arel_table[:group_id].in(current_org_group_ids))
+        .first
+  end
+
   def current_org_groups_and_special_groups
     groups = current_org_groups.to_a
     organization = current_organization

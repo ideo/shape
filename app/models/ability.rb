@@ -10,7 +10,8 @@ class Ability
     alias_action :create, :update, :destroy, to: :modify
 
     # NOTE: `super_admin` role is not something that exists yet
-    if user.has_cached_role?(:super_admin)
+    # -- not using has_cached_role? because it assumes ALL roles are preloaded
+    if user.has_role?(:super_admin)
       can :read, :all
       can :manage, :all
 
