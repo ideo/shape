@@ -181,7 +181,7 @@ class GridCard extends React.Component {
         {canEditCollection && firstCardInRow &&
           <GridCardHotspot card={card} dragging={dragging} position="left" />
         }
-        {!record.isSharedCollection &&
+        {(!record.isSharedCollection && !record.isOrgTemplateCollection) &&
           <StyledTopRightActions>
             {this.isSelectable &&
               <SelectionCircle cardId={card.id} />

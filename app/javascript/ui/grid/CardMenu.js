@@ -91,13 +91,14 @@ class CardMenu extends React.Component {
   get menuItems() {
     const { canEdit, canReplace, uiStore } = this.props
     let items = []
-    const isUserCollection = uiStore.viewingCollection &&
-      uiStore.viewingCollection.isUserCollection
+    const isSpecialCollection = uiStore.viewingCollection &&
+      (uiStore.viewingCollection.isUserCollection ||
+       uiStore.viewingCollection.isOrgTemplateCollection)
     const actions = [
       { name: 'Duplicate', icon: <DuplicateIcon />, onClick: this.duplicateCard },
       { name: 'Move', icon: <MoveIcon />, onClick: this.moveCard },
       { name: 'Link', icon: <LinkIcon />, onClick: this.linkCard },
-      ...(!isUserCollection
+      ...(!isSpecialCollection
         ? [{ name: 'Add to My Collection', icon: <AddIntoIcon />, onClick: this.addToMyCollection }]
         : []),
       { name: 'Archive', icon: <ArchiveIcon />, onClick: this.archiveCard },
