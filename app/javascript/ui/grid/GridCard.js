@@ -9,11 +9,13 @@ import ImageItemCover from '~/ui/grid/covers/ImageItemCover'
 import VideoItemCover from '~/ui/grid/covers/VideoItemCover'
 import CollectionCover from '~/ui/grid/covers/CollectionCover'
 
-import CollectionIcon from '~/ui/icons/CollectionIcon'
-import LinkedCollectionIcon from '~/ui/icons/LinkedCollectionIcon'
-import LinkIcon from '~/ui/icons/LinkIcon'
 import CardMenu from '~/ui/grid/CardMenu'
+import CollectionIcon from '~/ui/icons/CollectionIcon'
+import LinkIcon from '~/ui/icons/LinkIcon'
+import LinkedCollectionIcon from '~/ui/icons/LinkedCollectionIcon'
+import RequiredCollectionIcon from '~/ui/icons/RequiredCollectionIcon'
 import SelectionCircle from '~/ui/grid/SelectionCircle'
+import Tooltip from '~/ui/global/Tooltip'
 import v, { ITEM_TYPES } from '~/utils/variables'
 
 export const StyledGridCard = styled.div`
@@ -140,6 +142,16 @@ class GridCard extends React.Component {
     if (cardType === 'collections') {
       if (card.link) {
         icon = <LinkedCollectionIcon />
+      } else if (card.record.isRequired) {
+        icon = (
+          <Tooltip
+            classes={{ tooltip: 'Tooltip' }}
+            title={'required template'}
+            placement="top"
+          >
+            <RequiredCollectionIcon />
+          </Tooltip>
+        )
       } else {
         icon = <CollectionIcon />
       }

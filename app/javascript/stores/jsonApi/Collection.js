@@ -19,12 +19,20 @@ class Collection extends BaseRecord {
     return this.type === 'Collection::SharedWithMeCollection'
   }
 
+  get isMasterTemplate() {
+    return this.type === 'Collection::MasterTemplate'
+  }
+
   get isOrgTemplateCollection() {
     return this.is_org_template_collection
   }
 
   get isNormalCollection() {
     return !this.isUserCollection && !this.isSharedCollection
+  }
+
+  get isRequired() {
+    return this.is_profile_template
   }
 
   get isEmpty() {
