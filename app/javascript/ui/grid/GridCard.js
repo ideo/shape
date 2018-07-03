@@ -14,6 +14,7 @@ import CollectionIcon from '~/ui/icons/CollectionIcon'
 import LinkIcon from '~/ui/icons/LinkIcon'
 import LinkedCollectionIcon from '~/ui/icons/LinkedCollectionIcon'
 import RequiredCollectionIcon from '~/ui/icons/RequiredCollectionIcon'
+import PinnedIcon from '~/ui/icons/PinnedIcon'
 import SelectionCircle from '~/ui/grid/SelectionCircle'
 import Tooltip from '~/ui/global/Tooltip'
 import v, { ITEM_TYPES } from '~/utils/variables'
@@ -158,6 +159,8 @@ class GridCard extends React.Component {
     } else if (card.link) {
       small = true
       icon = <LinkIcon />
+    } else if (card.isPinned) {
+      icon = <PinnedIcon />
     }
 
     if (!icon) return ''
