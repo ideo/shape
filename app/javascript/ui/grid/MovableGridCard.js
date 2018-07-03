@@ -244,6 +244,7 @@ class MovableGridCard extends React.PureComponent {
       canEditCollection,
       isUserCollection,
       isSharedCollection,
+      lastPinnedCard,
     } = this.props
 
     let {
@@ -306,8 +307,8 @@ class MovableGridCard extends React.PureComponent {
       canEditCollection,
       isUserCollection,
       isSharedCollection,
+      lastPinnedCard,
     }
-    console.log('rnd', card.isPinned)
 
     return (
       <StyledCardWrapper dragging={!moveComplete}>
@@ -389,6 +390,11 @@ MovableGridCard.propTypes = {
   onDragOrResizeStop: PropTypes.func.isRequired,
   routeTo: PropTypes.func.isRequired,
   menuOpen: PropTypes.bool.isRequired,
+  lastPinnedCard: PropTypes.bool,
+}
+
+MovableGridCard.defaultProps = {
+  lastPinnedCard: false,
 }
 
 export default MovableGridCard

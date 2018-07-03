@@ -466,10 +466,12 @@ class CollectionGrid extends React.Component {
       routingStore,
       uiStore,
     } = this.props
+    let i = 0
     // unnecessary? we seem to need to preserve the array order
     // in order to not re-draw divs (make transform animation work)
     // so that's why we do this second pass to actually create the divs in their original order
     _.each(this.state.cards, card => {
+      i += 1
       let record = {}
       let { cardType } = card
       if (!_.includes(['placeholder', 'blank', 'empty'], cardType)) {
@@ -498,6 +500,7 @@ class CollectionGrid extends React.Component {
           routeTo={routingStore.routeTo}
           parent={collection}
           menuOpen={openCardMenuId === card.id}
+          lastPinnedCard={card.isPinned && i === this.state.cards.length - 1}
         />
       )
     })

@@ -184,16 +184,17 @@ class GridCard extends React.Component {
       canEditCollection,
       dragging,
       menuOpen,
+      lastPinnedCard
     } = this.props
 
     const firstCardInRow = card.position && card.position.x === 0
 
     return (
       <StyledGridCard dragging={dragging}>
-        {canEditCollection &&
+        {canEditCollection && (!card.isPinned || lastPinnedCard) &&
           <GridCardHotspot card={card} dragging={dragging} />
         }
-        {canEditCollection && firstCardInRow &&
+        {canEditCollection && firstCardInRow && !card.isPinned &&
           <GridCardHotspot card={card} dragging={dragging} position="left" />
         }
         {(!record.isSharedCollection && !record.isOrgTemplateCollection) &&
@@ -230,6 +231,11 @@ GridCard.propTypes = {
   dragging: PropTypes.bool.isRequired,
   handleClick: PropTypes.func.isRequired,
   menuOpen: PropTypes.bool.isRequired,
+  lastPinnedCard: PropTypes.bool,
+}
+
+GridCard.defaultProps = {
+  lastPinnedCard: false,
 }
 
 export default GridCard
