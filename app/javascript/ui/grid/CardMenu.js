@@ -89,11 +89,12 @@ class CardMenu extends React.Component {
   }
 
   get menuItems() {
-    const { canEdit, canReplace, uiStore } = this.props
+    const { canEdit, card, canReplace, uiStore } = this.props
     let items = []
     const isSpecialCollection = uiStore.viewingCollection &&
       (uiStore.viewingCollection.isUserCollection ||
-       uiStore.viewingCollection.isOrgTemplateCollection)
+        uiStore.viewingCollection.isOrgTemplateCollection
+      )
     const actions = [
       { name: 'Duplicate', icon: <DuplicateIcon />, onClick: this.duplicateCard },
       { name: 'Move', icon: <MoveIcon />, onClick: this.moveCard },
@@ -110,7 +111,7 @@ class CardMenu extends React.Component {
       }
     })
 
-    if (canEdit) {
+    if (canEdit || !card.isPinned) {
       // Replace action is added later if this.props.canReplace
       items = _.reject(actions, { name: 'Replace' })
     } else {
