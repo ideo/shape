@@ -111,7 +111,7 @@ class CardMenu extends React.Component {
       }
     })
 
-    if (canEdit && !card.isPinned) {
+    if (canEdit || !card.isPinned) {
       // Replace action is added later if this.props.canReplace
       items = _.reject(actions, { name: 'Replace' })
     } else {

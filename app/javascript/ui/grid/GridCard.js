@@ -191,10 +191,10 @@ class GridCard extends React.Component {
 
     return (
       <StyledGridCard dragging={dragging}>
-        {canEditCollection && (!card.isPinned || lastPinnedCard) &&
+        {canEditCollection || (!card.isPinned || lastPinnedCard) &&
           <GridCardHotspot card={card} dragging={dragging} />
         }
-        {canEditCollection && firstCardInRow && !card.isPinned &&
+        {(canEditCollection && firstCardInRow) || !card.isPinned &&
           <GridCardHotspot card={card} dragging={dragging} position="left" />
         }
         {(!record.isSharedCollection && !record.isOrgTemplateCollection) &&
