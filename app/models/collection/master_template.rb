@@ -17,8 +17,8 @@ class Collection
       )
       text = Item::TextItem.create(
         name: 'Biography',
-        content: '<h3>BIOGRAPHY</h3><p>Tell us about yourself by typing over this text.&nbsp;</p><h3>Expertise</h3><p>Write some of  the things you are an expert in</p><h3>Location</h3><p>San Francisco, CA</p>',
-        text_data: '"{"ops":[{"insert":"BIOGRAPHY"},{"insert":"\n","attributes":{"header":3}},{"insert":"Tell us about yourself by typing over this text. \nExpertise"},{"insert":"\n","attributes":{"header":3}},{"insert":"Write some of  the things you are an expert in\nLocation"},{"insert":"\n","attributes":{"header":3}},{"insert":"San Francisco, CA\n"}]}"',
+        content: '<h3>BIOGRAPHY</h3><p>Tell us about yourself by typing over this text.</p><h3>EXPERTISE</h3><p>vacuum tubes, calligraphy</p><h3>LOCATION</h3><p>Metropolis</p>',
+        text_data: {"ops":[{"insert":"BIOGRAPHY"},{"insert":"\n","attributes":{"header":3}},{"insert":"Tell us about yourself by typing over this text.\nEXPERTISE"},{"insert":"\n","attributes":{"header":3}},{"insert":"vacuum tubes, calligraphy\nLOCATION"},{"insert":"\n","attributes":{"header":3}},{"insert":"Metropolis\n"}]},
       )
       CollectionCard::Primary.create(
         order: 0,
@@ -26,6 +26,7 @@ class Collection
         height: 1,
         parent: self,
         item: photo,
+        pinned: true,
       )
       CollectionCard::Primary.create(
         order: 1,
@@ -33,6 +34,7 @@ class Collection
         height: 2,
         parent: self,
         item: text,
+        pinned: true,
       )
       save
     end
