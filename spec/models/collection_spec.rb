@@ -111,6 +111,15 @@ describe Collection, type: :model do
       expect(duplicate.parent_collection_card).to be_nil
     end
 
+    context 'with archived collection' do
+      let!(:collection) { create(:collection, num_cards: 5, archived: true, tag_list: %w[Prototype Other]) }
+
+      it 'creates a duplicate that is not archived' do
+        expect(collection.archived?).to be true
+        expect(duplicate.archived?).to be false
+      end
+    end
+
     context 'with copy_parent_card true' do
       let!(:copy_parent_card) { true }
 
@@ -269,12 +278,28 @@ describe Collection, type: :model do
   end
 
   describe '#org_templates?' do
-    let!(:user) { create(:user) }
-    let!(:organization) { create(:organization) }
-    let!(:collection) { organization.setup_templates(user) }
+    let(:organization) { create(:organization) }
+    let(:collection) { create(:collection, organization: organization) }
 
-    it 'should be true if its org template collection id is itself' do
+    before do
+      organization.template_collection_id = collection.id
+    end
+
+    it 'should be true if the org template collection id is itself' do
       expect(collection.org_templates?).to be true
+    end
+  end
+
+  describe '#profiles?' do
+    let(:organization) { create(:organization) }
+    let(:collection) { create(:collection, organization: organization) }
+
+    before do
+      organization.profile_collection_id = collection.id
+    end
+
+    it 'should be true if the org profile collection id is itself' do
+      expect(collection.profiles?).to be true
     end
   end
 

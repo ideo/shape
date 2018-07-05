@@ -1,7 +1,7 @@
 import { observable, action } from 'mobx'
 import { observer } from 'mobx-react'
 import PropTypes from 'prop-types'
-import MuiAvatar from 'material-ui/Avatar'
+import MuiAvatar from '@material-ui/core/Avatar'
 import styled from 'styled-components'
 
 import Tooltip from '~/ui/global/Tooltip'

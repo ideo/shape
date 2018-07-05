@@ -90,6 +90,7 @@ class CardMenu extends React.Component {
 
   get menuItems() {
     const { canEdit, card, canReplace, uiStore } = this.props
+
     let items = []
     const isSpecialCollection = uiStore.viewingCollection &&
       (uiStore.viewingCollection.isUserCollection ||
@@ -111,7 +112,7 @@ class CardMenu extends React.Component {
       }
     })
 
-    if (canEdit || !card.isPinned) {
+    if (canEdit && !card.isPinnedAndLocked) {
       // Replace action is added later if this.props.canReplace
       items = _.reject(actions, { name: 'Replace' })
     } else {

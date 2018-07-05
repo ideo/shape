@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180703175717) do
+ActiveRecord::Schema.define(version: 20180703192353) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -171,6 +171,7 @@ ActiveRecord::Schema.define(version: 20180703175717) do
     t.integer "admin_group_id"
     t.integer "template_collection_id"
     t.integer "profile_template_id"
+    t.integer "profile_collection_id"
   end
 
   create_table "roles", force: :cascade do |t|

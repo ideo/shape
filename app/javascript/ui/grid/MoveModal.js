@@ -1,6 +1,7 @@
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
-import Snackbar, { SnackbarContent } from 'material-ui/Snackbar'
+import Snackbar from '@material-ui/core/Snackbar'
+import SnackbarContent from '@material-ui/core/SnackbarContent'
 import Tooltip from '~/ui/global/Tooltip'
 
 import v from '~/utils/variables'
@@ -76,7 +77,7 @@ class MoveModal extends React.Component {
       return
     }
     const collectionId = uiStore.viewingCollection.id
-    if (!uiStore.viewingCollection.can_edit) {
+    if (!uiStore.viewingCollection.can_edit_content) {
       uiStore.alert('You don\'t have permission to move items to this collection')
       return
     }

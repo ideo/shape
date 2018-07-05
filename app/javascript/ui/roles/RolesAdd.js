@@ -15,7 +15,7 @@ import {
 } from '~/ui/global/styled/layout'
 import AutoComplete from '~/ui/global/AutoComplete'
 import PillList from '~/ui/global/PillList'
-import { MenuItem } from 'material-ui/Menu'
+import MenuItem from '@material-ui/core/MenuItem'
 
 const RightAligner = styled.span`
   margin-right: 30px;

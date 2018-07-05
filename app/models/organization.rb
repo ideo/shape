@@ -21,6 +21,10 @@ class Organization < ApplicationRecord
              class_name: 'Collection::MasterTemplate',
              dependent: :destroy,
              optional: true
+  belongs_to :profile_collection,
+             class_name: 'Collection',
+             dependent: :destroy,
+             optional: true
 
   after_create :create_groups
   before_update :parse_domain_whitelist
@@ -97,10 +101,6 @@ class Organization < ApplicationRecord
     "#{name} Admins"
   end
 
-  def template_collection_name
-    "#{name} Templates"
-  end
-
   def guest_group_handle
     "#{handle}-guest"
   end
@@ -114,41 +114,6 @@ class Organization < ApplicationRecord
       primary_group.user_ids +
       guest_group.user_ids
     ).uniq.count
-  end
-
-  def setup_templates(user)
-    # Create templates collection
-    collection = create_template_collection(
-      name: template_collection_name,
-      organization: self,
-    )
-    # Create default profile template and add it to the templates collection
-    profile_template = create_profile_template(
-      name: 'Profile',
-      organization: self,
-    )
-    profile_template.setup_profile_template
-    CollectionCard::Primary.create(
-      order: 1,
-      width: 1,
-      height: 1,
-      parent: collection,
-      collection: profile_template,
-    )
-    admin_group.add_role(Role::CONTENT_EDITOR, collection)
-    admin_group.add_role(Role::CONTENT_EDITOR, profile_template)
-    profile_template.items.each do |i|
-      admin_group.add_role(Role::CONTENT_EDITOR, i)
-      user.add_role(Role::CONTENT_EDITOR, i)
-    end
-    LinkToSharedCollectionsWorker.new.perform(
-      [user.id],
-      [admin_group.id],
-      [collection.id],
-      [],
-    )
-    save
-    collection
   end
 
   private

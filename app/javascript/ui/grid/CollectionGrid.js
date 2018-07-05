@@ -166,7 +166,8 @@ class CollectionGrid extends React.Component {
     const stateCards = [...this.state.cards]
     const placeholder = _.find(stateCards, { id: placeholderKey })
     const hoveringOver = this.findOverlap(cardId, dragPosition)
-    if (!this.props.canEditCollection || (hoveringOver && hoveringOver.card.isPinned)) return
+    if (!this.props.canEditCollection) return
+    if (hoveringOver && hoveringOver.card.isPinnedAndLocked) return
     if (!placeholder) {
       this.createPlaceholderCard(positionedCard)
     } else if (hoveringOver) {
@@ -502,7 +503,7 @@ class CollectionGrid extends React.Component {
           routeTo={routingStore.routeTo}
           parent={collection}
           menuOpen={openCardMenuId === card.id}
-          lastPinnedCard={card.isPinned && i === this.state.cards.length - 1}
+          lastPinnedCard={card.isPinnedAndLocked && i === this.state.cards.length - 1}
         />
       )
     })
