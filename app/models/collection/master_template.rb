@@ -10,7 +10,7 @@ class Collection
         filestack_file: FilestackFile.create(
           handle: 'Qs0v5CCTt2DiqlG8grVH',
           mimetype: 'image/png',
-          size: 15945,
+          size: 15_945,
           filename: 'default_profile.png',
           url: 'https://cdn.filestackcontent.com/Qs0v5CCTt2DiqlG8grVH',
         ),
@@ -18,7 +18,7 @@ class Collection
       text = Item::TextItem.create(
         name: 'Biography',
         content: '<h3>BIOGRAPHY</h3><p>Tell us about yourself by typing over this text.</p><h3>EXPERTISE</h3><p>vacuum tubes, calligraphy</p><h3>LOCATION</h3><p>Metropolis</p>',
-        text_data: {"ops":[{"insert":"BIOGRAPHY"},{"insert":"\n","attributes":{"header":3}},{"insert":"Tell us about yourself by typing over this text.\nEXPERTISE"},{"insert":"\n","attributes":{"header":3}},{"insert":"vacuum tubes, calligraphy\nLOCATION"},{"insert":"\n","attributes":{"header":3}},{"insert":"Metropolis\n"}]},
+        text_data: { "ops": [{ "insert": 'BIOGRAPHY' }, { "insert": "\n", "attributes": { "header": 3 } }, { "insert": "Tell us about yourself by typing over this text.\nEXPERTISE" }, { "insert": "\n", "attributes": { "header": 3 } }, { "insert": "vacuum tubes, calligraphy\nLOCATION" }, { "insert": "\n", "attributes": { "header": 3 } }, { "insert": "Metropolis\n" }] },
       )
       CollectionCard::Primary.create(
         order: 0,

@@ -136,10 +136,10 @@ class Organization < ApplicationRecord
       collection: profile_template,
     )
     admin_group.add_role(Role::CONTENT_EDITOR, collection)
-    admin_group.add_role(Role::EDITOR, profile_template)
+    admin_group.add_role(Role::CONTENT_EDITOR, profile_template)
     profile_template.items.each do |i|
-      admin_group.add_role(Role::EDITOR, i)
-      user.add_role(Role::EDITOR, i)
+      admin_group.add_role(Role::CONTENT_EDITOR, i)
+      user.add_role(Role::CONTENT_EDITOR, i)
     end
     LinkToSharedCollectionsWorker.new.perform(
       [user.id],
@@ -148,7 +148,7 @@ class Organization < ApplicationRecord
       [],
     )
     save
-    collection.reload
+    collection
   end
 
   private

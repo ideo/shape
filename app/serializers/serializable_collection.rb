@@ -50,7 +50,7 @@ class SerializableCollection < BaseJsonSerializer
   end
 
   attribute :is_profile_template do
-    @object.is_a? Collection::MasterTemplate and @object.profile_template?
+    @object.profile_template?
   end
 
   has_many :roles
