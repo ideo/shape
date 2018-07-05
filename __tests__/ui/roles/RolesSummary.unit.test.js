@@ -105,10 +105,10 @@ describe('RolesSummary', () => {
     })
   })
 
-  describe('with no viewers or editors', () => {
+  describe('with no viewers or editors and canEdit', () => {
     beforeEach(() => {
       wrapper = shallow(
-        <RolesSummary {...emptyProps} />
+        <RolesSummary {...emptyProps} canEdit />
       )
     })
 

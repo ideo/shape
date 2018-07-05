@@ -1,7 +1,7 @@
 import _ from 'lodash'
 import PropTypes from 'prop-types'
 import { PropTypes as MobxPropTypes } from 'mobx-react'
-import { MenuItem } from 'material-ui/Menu'
+import MenuItem from '@material-ui/core/MenuItem'
 import styled from 'styled-components'
 import {
   DisplayText,

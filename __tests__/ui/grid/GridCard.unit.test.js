@@ -7,6 +7,8 @@ import {
   fakeTextItem,
 } from '#/mocks/data'
 
+
+
 const props = {
   card: fakeItemCard,
   cardType: 'items',

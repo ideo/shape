@@ -85,6 +85,7 @@ class MovableGridCard extends React.PureComponent {
     }
     if (!this.state.dragging) {
       uiStore.resetSelectionAndBCT()
+      // close the MoveMenu to prevent weird behaviors
       uiStore.closeMoveMenu()
       uiStore.startDragging()
       this.setState({
@@ -117,6 +118,7 @@ class MovableGridCard extends React.PureComponent {
     if (!this.state.resizing) {
       this.setState({ resizing: true, moveComplete: false })
       uiStore.resetSelectionAndBCT()
+      // close the MoveMenu to prevent weird behaviors
       uiStore.closeMoveMenu()
       document.querySelector('.ql-editor p').focus()
     }

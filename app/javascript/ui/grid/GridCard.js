@@ -91,9 +91,6 @@ class GridCard extends React.Component {
 
   get canReplace() {
     const { record } = this.props
-    if (!record.can_edit_content) {
-      console.log(record.id, record)
-    }
     if (!record.can_edit_content) return false
     return (this.isItem && _.includes([ITEM_TYPES.IMAGE, ITEM_TYPES.VIDEO], record.type))
   }
@@ -141,20 +138,22 @@ class GridCard extends React.Component {
   }
 
   get renderIcon() {
-    const { card, cardType } = this.props
+    const { card, record, cardType } = this.props
     let icon
     let small = false
     if (cardType === 'collections') {
       if (card.link) {
         icon = <LinkedCollectionIcon />
-      } else if (card.record.isRequired) {
+      } else if (record.isRequired) {
+        const type = record.isMasterTemplate ? 'template' : 'collection'
         icon = (
           <Tooltip
-            classes={{ tooltip: 'Tooltip' }}
-            title={'required template'}
+            title={`required ${type}`}
             placement="top"
           >
-            <RequiredCollectionIcon />
+            <div>
+              <RequiredCollectionIcon />
+            </div>
           </Tooltip>
         )
       } else {
@@ -170,7 +169,8 @@ class GridCard extends React.Component {
     if (!icon) return ''
 
     return (
-      <StyledBottomLeftIcon small={small}>
+      // needs to handle the same click otherwise clicking the icon does nothing
+      <StyledBottomLeftIcon small={small} onClick={this.handleClick}>
         {icon}
       </StyledBottomLeftIcon>
     )
