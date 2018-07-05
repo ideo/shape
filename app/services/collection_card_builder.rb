@@ -21,6 +21,9 @@ class CollectionCardBuilder
       return false
     end
 
+    # NOTE: for now you can *only* create pinned cards in a master template
+    @collection_card.pinned = true if @collection_card.master_template_card?
+
     # TODO: rollback transaction if these later actions fail; add errors, return false
     @collection_card.save.tap do |result|
       if result

@@ -58,6 +58,9 @@ class Ability
       can %i[read duplicate], Item do |item|
         item.can_view?(user)
       end
+      can :edit_content, Item do |item|
+        item.can_edit_content?(user)
+      end
       can :manage, Item do |item|
         item.can_edit?(user)
       end

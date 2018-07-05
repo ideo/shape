@@ -84,6 +84,17 @@ RSpec.describe CollectionCardBuilder, type: :service do
           expect(organization.primary_group.has_role?(Role::VIEWER, builder.collection_card.collection)).to be true
         end
       end
+
+      describe 'creating card in a MasterTemplate' do
+        let(:parent) do
+          create(:master_template, organization: organization, add_editors: [user])
+        end
+
+        it 'should create a pinned card by default' do
+          expect(builder.create).to be true
+          expect(builder.collection_card.pinned?).to be true
+        end
+      end
     end
 
     context 'success creating card with item' do
