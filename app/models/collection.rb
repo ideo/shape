@@ -329,6 +329,10 @@ class Collection < ApplicationRecord
     organization.profile_collection_id == id
   end
 
+  def profile_template?
+    false
+  end
+
   def cache_key
     "#{jsonapi_cache_key}" \
       "/cards_#{collection_cards.maximum(:updated_at).to_i}" \

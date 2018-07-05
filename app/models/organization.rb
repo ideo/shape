@@ -101,14 +101,6 @@ class Organization < ApplicationRecord
     "#{name} Admins"
   end
 
-  def template_collection_name
-    "#{name} Templates"
-  end
-
-  def profile_collection_name
-    'People'
-  end
-
   def guest_group_handle
     "#{handle}-guest"
   end
@@ -122,44 +114,6 @@ class Organization < ApplicationRecord
       primary_group.user_ids +
       guest_group.user_ids
     ).uniq.count
-  end
-
-  def setup_templates_and_collections
-    # Create templates collection
-    collection = create_template_collection(
-      name: template_collection_name,
-      organization: self,
-    )
-    # Create profile collection (directory of user profiles)
-    profile_collection = create_profile_collection(
-      name: profile_collection_name,
-      organization: self,
-    )
-    primary_group.add_role(Role::VIEWER, profile_collection)
-    # Create default profile template and add it to the templates collection
-    profile_template = create_profile_template(
-      name: 'Profile',
-      organization: self,
-    )
-    profile_template.setup_profile_template
-    CollectionCard::Primary.create(
-      order: 1,
-      width: 1,
-      height: 1,
-      parent: collection,
-      collection: profile_template,
-    )
-    admin_group.add_role(Role::CONTENT_EDITOR, collection)
-    admin_group.add_role(Role::CONTENT_EDITOR, profile_template)
-    profile_template.items.each { |i| admin_group.add_role(Role::CONTENT_EDITOR, i) }
-    LinkToSharedCollectionsWorker.new.perform(
-      [],
-      [admin_group.id],
-      [collection.id],
-      [],
-    )
-    save
-    collection
   end
 
   private

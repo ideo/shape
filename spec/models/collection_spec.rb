@@ -269,10 +269,14 @@ describe Collection, type: :model do
   end
 
   describe '#org_templates?' do
-    let!(:organization) { create(:organization) }
-    let!(:collection) { organization.setup_templates_and_collections }
+    let(:organization) { create(:organization) }
+    let(:collection) { create(:collection, organization: organization) }
 
-    it 'should be true if its org template collection id is itself' do
+    before do
+      organization.template_collection_id = collection.id
+    end
+
+    it 'should be true if the org template collection id is itself' do
       expect(collection.org_templates?).to be true
     end
   end
