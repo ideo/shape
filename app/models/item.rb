@@ -6,7 +6,7 @@ class Item < ApplicationRecord
   include RealtimeEditorsViewers
   include HasActivities
 
-  resourceable roles: [Role::EDITOR, Role::VIEWER],
+  resourceable roles: [Role::EDITOR, Role::CONTENT_EDITOR, Role::VIEWER],
                edit_role: Role::EDITOR,
                content_edit_role: Role::CONTENT_EDITOR,
                view_role: Role::VIEWER

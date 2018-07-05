@@ -45,7 +45,6 @@ class OrganizationTemplates < SimpleService
     )
     @org.admin_group.add_role(Role::CONTENT_EDITOR, profile_template)
     setup_profile_template_items
-    profile_template
   end
 
   def setup_profile_template_items
@@ -81,8 +80,8 @@ class OrganizationTemplates < SimpleService
       item: text,
       pinned: true,
     )
-    @org.profile_template.items.each do |i|
-      @org.admin_group.add_role(Role::CONTENT_EDITOR, i)
+    [photo, text].each do |item|
+      @org.admin_group.add_role(Role::CONTENT_EDITOR, item)
     end
   end
 
