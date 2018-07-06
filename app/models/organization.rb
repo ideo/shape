@@ -14,7 +14,7 @@ class Organization < ApplicationRecord
              dependent: :destroy,
              optional: true
   belongs_to :template_collection,
-             class_name: 'Collection',
+             class_name: 'Collection::Global',
              dependent: :destroy,
              optional: true
   belongs_to :profile_template,
@@ -22,7 +22,7 @@ class Organization < ApplicationRecord
              dependent: :destroy,
              optional: true
   belongs_to :profile_collection,
-             class_name: 'Collection',
+             class_name: 'Collection::Global',
              dependent: :destroy,
              optional: true
 

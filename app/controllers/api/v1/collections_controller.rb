@@ -89,7 +89,7 @@ class Api::V1::CollectionsController < Api::V1::BaseController
   def load_collection_with_cards
     @collection = Collection
                   .where(id: params[:id])
-                  .includes(Collection.default_relationships_for_cache_query)
+                  .includes(Collection.default_relationships_for_query)
                   .first
   end
 
