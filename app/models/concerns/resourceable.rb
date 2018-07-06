@@ -121,7 +121,11 @@ module Resourceable
     return false unless parent.present?
     return false if roles.present?
     parent.roles.each do |role|
-      role.duplicate!(assign_resource: self)
+      new_role = role.duplicate!(assign_resource: self, dont_save: true)
+      # special case: CONTENT_EDITOR is a special role (for now).
+      # when creating child content, CONTENT_EDITORS become EDITORS
+      new_role.name = Role::EDITOR if new_role.name.to_sym == Role::CONTENT_EDITOR
+      new_role.save
     end
   end
 

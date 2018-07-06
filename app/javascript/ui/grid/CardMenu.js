@@ -92,17 +92,11 @@ class CardMenu extends React.Component {
     const { canEdit, card, canReplace, uiStore } = this.props
 
     let items = []
-    const isSpecialCollection = uiStore.viewingCollection &&
-      (uiStore.viewingCollection.isUserCollection ||
-        uiStore.viewingCollection.isOrgTemplateCollection
-      )
     const actions = [
       { name: 'Duplicate', icon: <DuplicateIcon />, onClick: this.duplicateCard },
       { name: 'Move', icon: <MoveIcon />, onClick: this.moveCard },
       { name: 'Link', icon: <LinkIcon />, onClick: this.linkCard },
-      ...(!isSpecialCollection
-        ? [{ name: 'Add to My Collection', icon: <AddIntoIcon />, onClick: this.addToMyCollection }]
-        : []),
+      { name: 'Add to My Collection', icon: <AddIntoIcon />, onClick: this.addToMyCollection },
       { name: 'Archive', icon: <ArchiveIcon />, onClick: this.archiveCard },
       { name: 'Replace', icon: <ReplaceIcon />, onClick: this.replaceCard },
     ]
@@ -122,6 +116,14 @@ class CardMenu extends React.Component {
         'Add to My Collection',
       ]
       items = _.filter(actions, a => _.includes(viewActions, a.name))
+    }
+
+    if (uiStore.viewingCollection) {
+      const coll = uiStore.viewingCollection
+      // Remove Add To My Collection menu item for special collections
+      if (coll.isUserCollection || coll.isOrgTemplateCollection || coll.isMasterTemplate) {
+        items = _.reject(items, { name: 'Add to My Collection' })
+      }
     }
 
     if (canReplace) {

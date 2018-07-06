@@ -89,7 +89,7 @@ class PageHeader extends React.Component {
 
   get collectionIcon() {
     const { record } = this.props
-    if (record.isProfile) {
+    if (record.isProfileTemplate) {
       return <IconHolder><ProfileIcon /></IconHolder>
     }
     return null

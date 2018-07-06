@@ -81,7 +81,7 @@ class OrganizationTemplates < SimpleService
       pinned: true,
     )
     [photo, text].each do |item|
-      @org.admin_group.add_role(Role::CONTENT_EDITOR, item)
+      @org.admin_group.add_role(Role::EDITOR, item)
     end
   end
 

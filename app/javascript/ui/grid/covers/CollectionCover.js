@@ -99,7 +99,7 @@ class CollectionCover extends React.Component {
     return (
       <StyledCollectionCover
         url={cover.image_url}
-        isSpecialCollection={collection.isSharedCollection || collection.isOrgTemplateCollection}
+        isSpecialCollection={collection.isSpecialCollection}
       >
         <StyledCardContent
           height={height}

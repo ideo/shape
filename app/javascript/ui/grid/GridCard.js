@@ -204,8 +204,7 @@ class GridCard extends React.Component {
           <GridCardHotspot card={card} dragging={dragging} position="left" />
         }
         {(
-          !record.isSharedCollection &&
-          !record.isOrgTemplateCollection &&
+          !record.menuDisabled &&
           uiStore.textEditingItem !== record
         ) &&
           <StyledTopRightActions>

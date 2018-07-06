@@ -51,16 +51,16 @@ RSpec.describe OrganizationTemplates, type: :service do
         expect(profile_template.collection_cards.count).to eq 2
       end
 
-      it 'should add the admin group as the content editor role of the items' do
+      it 'should add the admin group as editor of the items' do
         expect(
           organization.admin_group.has_role?(
-            Role::CONTENT_EDITOR,
+            Role::EDITOR,
             profile_template.items.first,
           ),
         ).to be true
         expect(
           organization.admin_group.has_role?(
-            Role::CONTENT_EDITOR,
+            Role::EDITOR,
             profile_template.items.last,
           ),
         ).to be true

@@ -119,6 +119,33 @@ describe Resourceable, type: :concern do
     end
   end
 
+  describe '#inherit_roles_from_parent!' do
+    let(:other_user) { create(:user) }
+    let(:card) { create(:collection_card_text, parent: collection) }
+    let(:item) { card.item }
+
+    before do
+      item.inherit_roles_from_parent!
+    end
+
+    context 'with editors and viewers' do
+      let(:collection) { create(:collection, add_editors: [user], add_viewers: [other_user]) }
+
+      it 'should copy roles from parent to newly created child' do
+        expect(item.editors[:users]).to match_array(collection.editors[:users])
+        expect(item.viewers[:users]).to match_array(collection.viewers[:users])
+      end
+    end
+
+    context 'with content editors' do
+      let(:collection) { create(:collection, add_content_editors: [user]) }
+
+      it 'should make the content editors into editors of the child content' do
+        expect(item.editors[:users]).to match_array(collection.content_editors[:users])
+      end
+    end
+  end
+
   context 'getting all editors and viewers' do
     let(:group_members) { create_list(:user, 2) }
     let(:group) { create(:group, add_members: group_members) }
