@@ -109,6 +109,7 @@ class Organization < ApplicationRecord
     "#{handle}-admins"
   end
 
+  # used for reporting purposes
   def user_count
     (
       primary_group.user_ids +
