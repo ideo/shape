@@ -9,9 +9,10 @@ class Group extends BaseRecord {
   // However we have the related roles in the apiStore so we can just look them up.
   get groupRoles() {
     const { apiStore } = this
-    // Some roles in the Api store don't have a resource included
-    return apiStore.findAll('roles').filter(role =>
-      role.resource && role.resource.id === this.id)
+    return apiStore.findAll('roles').filter(
+      // Some roles in the Api store don't have a resource included
+      role => role.resource && role.resource === this
+    )
   }
 
   get isNormalGroup() {
