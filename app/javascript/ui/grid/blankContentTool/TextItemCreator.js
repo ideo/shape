@@ -32,20 +32,20 @@ class TextItemCreator extends React.Component {
     this.item.can_edit = true
   }
 
-  componentDidMount() {
-    runInAction(() => uiStore.update('newTextEditing', true))
-  }
-
-  componentWillUnmount() {
-    runInAction(() => uiStore.update('newTextEditing', false))
-  }
-
   _onTextChange = (itemTextData) => {
     this.item.text_data = itemTextData
   }
 
   expand() {
     routingStore.routeTo('items', this.item.id)
+  }
+
+  onCancel = (item) => {
+    if (item.justText) {
+      this.createTextItem(item)
+    } else {
+      this.props.closeBlankContentTool()
+    }
   }
 
   createTextItem = (item) => {
@@ -64,30 +64,43 @@ class TextItemCreator extends React.Component {
 
   render() {
     // re-bind enter to create the item instead of doing a linebreak
-    const bindings = {
-      enter: {
-        key: KEYS.ENTER,
-        handler: this.createTextItem,
-      },
-      esc: {
-        key: KEYS.ESC,
-        handler: () => {
-          this.onTextChange.cancel()
-          this.props.closeBlankContentTool()
-        },
-      },
+    // const bindings = {
+    //   esc: {
+    //     key: KEYS.ESC,
+    //     handler: () => {
+    //       this.onTextChange.cancel()
+    //       this.props.closeBlankContentTool()
+    //     },
+    //   },
+    // }
+
+    const quillProps = {
+      readOnly: true,
+      theme: null,
     }
+
+    const { item } = this
+    const textData = item.text_data ? item.toJS().text_data : null
 
     return (
       <StyledTextItemCreator height={this.props.height}>
-        <TextItem
-          item={this.item}
-          actionCableConsumer={ActionCableConsumer}
-          currentUserId={apiStore.currentUser.id}
-          onUpdatedData={this.onTextChange}
-          onSave={this.createTextItem}
-          onExpand={this.item.id ? this.expand : null}
-        />
+        { !this.props.loading &&
+          <TextItem
+            item={item}
+            actionCableConsumer={ActionCableConsumer}
+            currentUserId={apiStore.currentUser.id}
+            onUpdatedData={this.onTextChange}
+            onCancel={this.onCancel}
+            onSave={this.createTextItem}
+            onExpand={item.id ? this.expand : null}
+          />
+        }
+        { this.props.loading &&
+          <ReactQuill
+            {...quillProps}
+            value={textData}
+          />
+        }
       </StyledTextItemCreator>
     )
   }

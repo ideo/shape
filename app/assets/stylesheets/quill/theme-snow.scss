@@ -2,9 +2,18 @@
 
 $dark: #06c;
 
-.ql-toolbar {
-  margin-bottom: 2rem;
+// custom ---
+.ql-snow .ql-formats {
+  align-items: flex-end;
+  display: flex;
 }
+.ql-snow.ql-toolbar button {
+  height: auto;
+}
+.ql-snow .ql-stroke {
+  stroke-width: 1.5px;
+}
+// ----
 
 .ql-snow {
   &.ql-toolbar:after, .ql-toolbar:after {

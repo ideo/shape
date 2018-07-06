@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types'
-import { PropTypes as MobxPropTypes } from 'mobx-react'
+import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import _ from 'lodash'
 import styled from 'styled-components'
 
@@ -17,6 +17,7 @@ import RequiredCollectionIcon from '~/ui/icons/RequiredCollectionIcon'
 import PinnedIcon from '~/ui/icons/PinnedIcon'
 import SelectionCircle from '~/ui/grid/SelectionCircle'
 import Tooltip from '~/ui/global/Tooltip'
+import { uiStore } from '~/stores'
 import v, { ITEM_TYPES } from '~/utils/variables'
 
 export const StyledGridCard = styled.div`
@@ -80,6 +81,7 @@ export const StyledTopRightActions = styled.div`
 `
 StyledTopRightActions.displayName = 'StyledTopRightActions'
 
+@observer
 class GridCard extends React.Component {
   get canEditCard() {
     const { isSharedCollection, canEditCollection, card, record } = this.props
@@ -201,7 +203,11 @@ class GridCard extends React.Component {
         {(canEditCollection && firstCardInRow && !card.isPinnedAndLocked) &&
           <GridCardHotspot card={card} dragging={dragging} position="left" />
         }
-        {(!record.isSharedCollection && !record.isOrgTemplateCollection) &&
+        {(
+          !record.isSharedCollection &&
+          !record.isOrgTemplateCollection &&
+          uiStore.textEditingItem !== record
+        ) &&
           <StyledTopRightActions>
             {this.isSelectable &&
               <SelectionCircle cardId={card.id} />

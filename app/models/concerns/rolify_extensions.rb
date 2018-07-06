@@ -2,15 +2,26 @@ module RolifyExtensions
   extend ActiveSupport::Concern
 
   def has_role_by_identifier?(role_name, resource_identifier)
-    cached_roles_by_identifier.include?(
-      Role.identifier(
-        role_name: role_name,
+    # https://www.justinweiss.com/articles/4-simple-memoization-patterns-in-ruby-and-one-gem/
+    @has_role_by_identifier ||= Hash.new do |h, key|
+      role_name = key.first
+      resource_identifier = key.last
+      role = rolify_roles.where(
+        name: role_name,
         resource_identifier: resource_identifier,
-      )
-    )
+      ).first
+      if is_a?(User)
+        h[key] = role.present? || role_via_org_groups(role_name, resource_identifier).present?
+      elsif is_a?(Group)
+        h[key] = role.present?
+      else
+        raise "RolifyExtension: Unsupported model '#{self.class.name}' for cached_roles_by_identifier"
+      end
+    end
+    @has_role_by_identifier[[role_name, resource_identifier]]
   end
 
-  # Override rolify has_role? and add_role methods to ensure
+  # Override rolify `has_role?` and `add_role` methods to ensure
   # we always pass root class, not STI child class - which it can't handle
   def has_role?(role_name, resource = nil)
     has_role = if resource.blank?
@@ -113,21 +124,7 @@ module RolifyExtensions
     add_role(resource.class.edit_role, resource)
   end
 
-  # This includes all roles a user explicitly has
-  # And all roles they get through their group membership
-  def cached_roles_by_identifier
-    @cached_roles_by_identifier ||= begin
-      if is_a?(User)
-        (roles.map(&:identifier) + current_org_groups_roles_identifiers)
-      elsif is_a?(Group)
-        roles_to_resources.map(&:identifier)
-      else
-        raise "RolifyExtension: Unsupported model '#{self.class.name}' for cached_roles_by_identifier"
-      end
-    end.uniq
-  end
-
   def reset_cached_roles!
-    @cached_roles_by_identifier = nil
+    @has_role_by_identifier = nil
   end
 end

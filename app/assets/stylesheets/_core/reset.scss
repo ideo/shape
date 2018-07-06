@@ -178,29 +178,3 @@ button {
     outline: 0;
   }
 }
-
-// Quill specific rules
-// TODO: move
-.quill {
-}
-.ql-toolbar {
-  width: calc(100% - 30px);
-}
-.ql-tooltip.ql-editing {
-  left: calc(50% - 150px) !important;
-  position: fixed;
-}
-.ql-header {
-  display: block;
-  align-self: flex-end;
-}
-
-.ql-format-huge {
-  svg {
-    display: none !important;
-  }
-
-  &:before {
-    content: 'T';
-  }
-}

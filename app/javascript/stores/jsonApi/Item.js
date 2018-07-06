@@ -16,6 +16,13 @@ class Item extends BaseRecord {
     'filestack_file_attributes',
   ]
 
+  get justText() {
+    const temp = document.createElement('div')
+    temp.innerHTML = this.content
+    const sanitized = temp.textContent || temp.innerText
+    return sanitized.replace(/(?:\r\n|\r|\n)/g, '')
+  }
+
   get parentPath() {
     if (this.breadcrumb && this.breadcrumb.length > 1) {
       const [type, id] = this.breadcrumb[this.breadcrumb.length - 2]
