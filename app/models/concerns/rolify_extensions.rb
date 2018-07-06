@@ -1,12 +1,12 @@
 module RolifyExtensions
   extend ActiveSupport::Concern
 
-  def has_role_by_identifier?(role_name, resource_identifier)
+  def has_role_by_identifier?(role_name, resource_identifier, role = nil)
     # https://www.justinweiss.com/articles/4-simple-memoization-patterns-in-ruby-and-one-gem/
     @has_role_by_identifier ||= Hash.new do |h, key|
       role_name = key.first
       resource_identifier = key.last
-      role = rolify_roles.where(
+      role ||= rolify_roles.where(
         name: role_name,
         resource_identifier: resource_identifier,
       ).first
@@ -19,6 +19,19 @@ module RolifyExtensions
       end
     end
     @has_role_by_identifier[[role_name, resource_identifier]]
+  end
+
+  def prepopulate_roles_for(role_name, resources)
+    return unless @has_role_by_identifier.present?
+    resource_identifiers = resources.map(&:resource_identifier)
+    roles = rolify_roles.where(
+      name: role_name,
+      resource_identifier: resource_identifiers,
+    )
+    resources.each do |resource|
+      has_role_by_identifier?(role_name, resource.resource_identifier, roles.select{|r| r.resource_identifier == resource.resource_identifier})
+    end
+    @has_role_by_identifier
   end
 
   # Override rolify `has_role?` and `add_role` methods to ensure

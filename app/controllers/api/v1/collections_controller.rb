@@ -8,6 +8,8 @@ class Api::V1::CollectionsController < Api::V1::BaseController
   before_action :load_collection_with_cards, only: %i[show update archive]
 
   def show
+    # current_user.prepopulate_roles_for(Role::EDITOR, @collection.children)
+    # current_user.prepopulate_roles_for(Role::VIEWER, @collection.children)
     render_collection
   end
 
