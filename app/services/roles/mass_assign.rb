@@ -139,7 +139,8 @@ module Roles
 
     def notify_users
       @added_users.each do |user|
-        next if !user.notify_through_email
+        # skip people who have opted out
+        next unless user.notify_through_email
         InvitationMailer.invite(
           user_id: user.id,
           invited_by_id: @invited_by.id,
