@@ -13,6 +13,8 @@ class ActivityAndNotificationBuilder < SimpleService
     @actor = actor
     @target = target
     @action = action
+    # "subjects" can also refer to the people meant to be notified,
+    # e.g. in the case of "archive" it will be all the admins of that record
     @subject_user_ids = subject_user_ids
     @subject_group_ids = subject_group_ids
     @combine = combine

@@ -22,7 +22,7 @@ Rails.application.routes.draw do
         resources :collection_cards, only: :index
         resources :roles, only: %i[index create destroy], shallow: true
       end
-      resources :collection_cards, shallow: true do
+      resources :collection_cards, shallow: true, except: :show do
         collection do
           patch 'move'
           post 'link'
