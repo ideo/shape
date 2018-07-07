@@ -28,9 +28,6 @@ Rails.application.routes.draw do
           post 'link'
           post 'duplicate'
         end
-        # member do
-        #   post 'duplicate'
-        # end
         resources :items, shallow: true, except: :index do
           member do
             post 'duplicate'
@@ -38,7 +35,6 @@ Rails.application.routes.draw do
           end
           resources :roles, only: %i[index create]
         end
-        resources :collections, only: :create
         member do
           patch 'archive'
         end

@@ -69,35 +69,9 @@ describe Api::V1::ItemsController, type: :request, json: true, auth: true do
         get(path)
         expect(json['data']['attributes']['breadcrumb']).to match_array([
           ['collections', collection.id, collection.name],
-          ['items', item.id, item.name]
+          ['items', item.id, item.name],
         ])
       end
-    end
-  end
-
-  describe 'POST #create' do
-    let!(:collection) { create(:collection, add_editors: [user]) }
-    let!(:collection_card) { create(:collection_card, parent: collection) }
-    let(:path) { "/api/v1/collection_cards/#{collection_card.id}/items" }
-    let(:params) {
-      json_api_params(
-        'items',
-        {
-          type: 'Item::TextItem',
-          content: 'A is for Apples',
-          text_data: { ops: [{ insert: 'A is for Apples.' }] },
-        }
-      )
-    }
-
-    it 'returns a 200' do
-      post(path, params: params)
-      expect(response.status).to eq(200)
-    end
-
-    it 'matches JSON schema' do
-      post(path, params: params)
-      expect(json['data']['attributes']).to match_json_schema('item')
     end
   end
 
@@ -111,9 +85,7 @@ describe Api::V1::ItemsController, type: :request, json: true, auth: true do
     let(:params) {
       json_api_params(
         'items',
-        {
-          content: 'The wheels on the bus...'
-        }
+        content: 'The wheels on the bus...',
       )
     }
 
@@ -143,7 +115,7 @@ describe Api::V1::ItemsController, type: :request, json: true, auth: true do
         json_api_params(
           'items',
           { content: 'The wheels on the bus...' },
-          { cancel_sync: true },
+          cancel_sync: true,
         )
       }
 
