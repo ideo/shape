@@ -9,7 +9,7 @@
       <div class="email-inner">
         <div class="email-header">
           <a class="email-header__logo" href="<%= ENV['BASE_HOST']%>" title="Shape">
-            <img src="https://s3-us-west-2.amazonaws.com/assets.shape.space/logo_2x.png" />
+            <img alt="Shape" src="https://s3-us-west-2.amazonaws.com/assets.shape.space/logo_2x.png" />
           </a>
         </div>
 
@@ -22,7 +22,9 @@
           <div class="email-footer__why">You are receiving this email because you have an account or have been invited to Shape.</div>
 
           <div>
-            <a href="https://shape.space/user_settings">Unsubscribe</a>
+            <a href="<%= "#{root_url}user_settings" %>">
+              Unsubscribe
+            </a>
           </div>
 
           <div class="email-footer__copyright">&copy; 2018 IDEO</div>
