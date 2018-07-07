@@ -181,23 +181,6 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
         expect(response.status).to eq(400)
       end
     end
-
-    context 'as sub-collection' do
-      let!(:collection) { create(:collection, organization: organization, add_editors: [user]) }
-      let!(:collection_card) { create(:collection_card, parent: collection) }
-      let(:path) { "/api/v1/collection_cards/#{collection_card.id}/collections" }
-
-      it 'returns a 200' do
-        post(path, params: params)
-        expect(response.status).to eq(200)
-      end
-
-      it 'has collection as parent' do
-        post(path, params: params)
-        id = json['data']['attributes']['id']
-        expect(Collection.find(id).parent).to eq(collection)
-      end
-    end
   end
 
   describe 'PATCH #update' do
