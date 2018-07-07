@@ -15,7 +15,7 @@ RSpec.describe InvitationMailer, type: :mailer do
     end
 
     it 'renders the headers' do
-      expect(mail.subject).to eq('Your invitation to Shape.')
+      expect(mail.subject).to eq("Your invitation to \"#{collection.name}\" on Shape")
       expect(mail.to).to eq([user.email])
     end
 
