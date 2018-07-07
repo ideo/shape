@@ -23,6 +23,9 @@ $sentinel-lt-font: 'Sentinel-Light', 'Sentinel', Palatino, Georgia, serif;
     color: $color-gray-tundora;
     text-decoration: none;
   }
+  a.underlined {
+    text-decoration: underline;
+  }
 
   h1 {
     font-size: 40px;
@@ -131,6 +134,7 @@ $sentinel-lt-font: 'Sentinel-Light', 'Sentinel', Palatino, Georgia, serif;
 
   .email-footer__why {
     font-size: 15px;
+    margin-bottom: 6px;
   }
 
   .email-footer__links {
