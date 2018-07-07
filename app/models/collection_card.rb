@@ -17,8 +17,8 @@ class CollectionCard < ApplicationRecord
 
   validate :parent_is_not_readonly, on: :create
 
-  delegate :can_edit?, to: :parent, allow_nil: true
-  delegate :can_view?, to: :parent, allow_nil: true
+  delegate :can_edit?, to: :record, allow_nil: true
+  delegate :can_view?, to: :record, allow_nil: true
 
   scope :ordered, -> { order(order: :asc) }
 

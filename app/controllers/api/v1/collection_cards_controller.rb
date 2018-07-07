@@ -7,10 +7,6 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
     render jsonapi: @collection.collection_cards
   end
 
-  def show
-    render jsonapi: @collection_card
-  end
-
   before_action :load_and_authorize_parent_collection, only: %i[create]
   def create
     builder = CollectionCardBuilder.new(params: collection_card_params,
@@ -37,16 +33,15 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
 
   def archive
     if @collection_card.archive!
-      if @collection_card.record.is_a?(Collection)
-        unless @collection_card.link?
-          ActivityAndNotificationBuilder.call(
-            actor: current_user,
-            target: @collection_card.record,
-            action: Activity.actions[:archived],
-            subject_user_ids: @collection_card.record.editors[:users].pluck(:id),
-            subject_group_ids: @collection_card.record.editors[:groups].pluck(:id),
-          )
-        end
+      # only notify for archiving of collections (and not link cards)
+      if @collection_card.collection.present? && !@collection_card.link?
+        ActivityAndNotificationBuilder.call(
+          actor: current_user,
+          target: @collection_card.record,
+          action: Activity.actions[:archived],
+          subject_user_ids: @collection_card.record.editors[:users].pluck(:id),
+          subject_group_ids: @collection_card.record.editors[:groups].pluck(:id),
+        )
       end
       render jsonapi: @collection_card.reload, include: [:parent, record: [:filestack_file]]
     else
