@@ -83,13 +83,17 @@ class MoveModal extends React.Component {
 
   moveCards = async (placement) => {
     const { uiStore, apiStore } = this.props
+    const { viewingCollection } = uiStore
     // Viewing collection might not be set, such as on the search page
-    if (!uiStore.viewingCollection) {
+    if (!viewingCollection) {
       uiStore.alert('You can\'t move an item here')
       return
     }
-    const collectionId = uiStore.viewingCollection.id
-    if (!uiStore.viewingCollection.can_edit_content) {
+    const collectionId = viewingCollection.id
+    const movingFromCollection = apiStore.find('collections', uiStore.movingFromCollectionId)
+    if (!viewingCollection.can_edit_content || (
+      movingFromCollection.isMasterTemplate && !viewingCollection.isMasterTemplate
+    )) {
       uiStore.alert('You don\'t have permission to move items to this collection')
       return
     }

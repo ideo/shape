@@ -71,6 +71,17 @@ RSpec.describe OrganizationTemplates, type: :service do
         expect(profile_template.items.first.type).to eq 'Item::ImageItem'
         expect(profile_template.items.last.type).to eq 'Item::TextItem'
       end
+
+      it 'should calculate the breadcrumb for the items' do
+        item = profile_template.items.first
+        expect(item.breadcrumb).to match_array(
+          [
+            ['Collection', template_collection.id, template_collection.name],
+            ['Collection', profile_template.id, profile_template.name],
+            ['Item', item.id, item.name],
+          ],
+        )
+      end
     end
 
     context 'with profiles collection' do
