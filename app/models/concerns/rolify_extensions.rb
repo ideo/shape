@@ -1,12 +1,12 @@
 module RolifyExtensions
   extend ActiveSupport::Concern
 
-  def has_role_by_identifier?(role_name, resource_identifier, role = nil)
+  def has_role_by_identifier?(role_name, resource_identifier)
     # https://www.justinweiss.com/articles/4-simple-memoization-patterns-in-ruby-and-one-gem/
     @has_role_by_identifier ||= Hash.new do |h, key|
       role_name = key.first
       resource_identifier = key.last
-      role ||= rolify_roles.where(
+      role = rolify_roles.where(
         name: role_name,
         resource_identifier: resource_identifier,
       ).first
@@ -18,19 +18,31 @@ module RolifyExtensions
         raise "RolifyExtension: Unsupported model '#{self.class.name}' for cached_roles_by_identifier"
       end
     end
-    @has_role_by_identifier[[role_name, resource_identifier]]
+    @has_role_by_identifier[[role_name.to_s, resource_identifier]]
   end
 
-  def prepopulate_roles_for(role_name, resources)
-    return unless @has_role_by_identifier.present?
+  def precache_roles_for(role_names, resources)
+    return unless @has_role_by_identifier.present? && is_a?(User)
     resource_identifiers = resources.map(&:resource_identifier)
     roles = rolify_roles.where(
-      name: role_name,
+      name: role_names,
       resource_identifier: resource_identifiers,
     )
-    resources.each do |resource|
-      has_role_by_identifier?(role_name, resource.resource_identifier, roles.select{|r| r.resource_identifier == resource.resource_identifier})
+    roles += role_via_org_groups(role_names, resource_identifiers)
+
+    found = {}
+    roles.each do |role|
+      @has_role_by_identifier[[role.name, role.resource_identifier]] = true
+      found[[role.name, role.resource_identifier]] = true
     end
+    role_names.each do |role_name|
+      resource_identifiers.each do |r|
+        unless found[[role_name.to_s, r]]
+          @has_role_by_identifier[[role_name.to_s, r]] = false
+        end
+      end
+    end
+
     @has_role_by_identifier
   end
 
