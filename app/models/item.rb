@@ -84,7 +84,7 @@ class Item < ApplicationRecord
     parent.roles.each do |role|
       i.roles << role.duplicate!(assign_resource: i)
     end
-    for_user.upgrade_to_edit_role(i)
+    for_user.upgrade_to_edit_role(i) unless parent.is_a? Collection::UserProfile
 
     # Method from HasFilestackFile
     filestack_file_duplicate!(i)

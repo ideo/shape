@@ -38,6 +38,11 @@ class User < ApplicationRecord
   has_many :activity_subjects, as: :subject
   has_many :notifications
 
+  has_many :user_profiles,
+           class_name: 'Collection::UserProfile',
+           inverse_of: :created_by,
+           foreign_key: :created_by_id
+
   belongs_to :current_organization,
              class_name: 'Organization',
              optional: true

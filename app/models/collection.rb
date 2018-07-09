@@ -80,6 +80,7 @@ class Collection < ApplicationRecord
   belongs_to :organization
   belongs_to :cloned_from, class_name: 'Collection', optional: true
   belongs_to :created_by, class_name: 'User', optional: true
+  belongs_to :template, class_name: 'Collection::MasterTemplate', optional: true
 
   validates :name, presence: true, if: :base_collection_type?
   before_validation :inherit_parent_organization_id, on: :create
@@ -216,7 +217,7 @@ class Collection < ApplicationRecord
       c.allow_primary_group_view_access
     end
     # make sure duplicate creator becomes an editor
-    for_user.upgrade_to_edit_role(c)
+    for_user.upgrade_to_edit_role(c) unless parent.is_a? Collection::UserProfile
 
     CollectionCardDuplicationWorker.perform_async(
       collection_cards.map(&:id),

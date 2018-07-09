@@ -1,6 +1,10 @@
 require 'rails_helper'
 
 describe Collection::MasterTemplate, type: :model do
+  context 'associations' do
+    it { should have_many :templated_collections }
+  end
+
   describe '#profile_template?' do
     let(:organization) { create(:organization) }
     let(:profile_template) { organization.profile_template }
