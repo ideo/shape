@@ -41,7 +41,7 @@ describe('MoveModal', () => {
   describe('moveCards', () => {
     describe('on an uneditable collection', () => {
       beforeEach(() => {
-        props.uiStore.viewingCollection.can_edit = false
+        props.uiStore.viewingCollection.can_edit_content = false
         wrapper.setProps(props)
         component.moveCards('top')
       })
@@ -57,7 +57,7 @@ describe('MoveModal', () => {
 
     describe('on a collection nested inside itself', () => {
       beforeEach(() => {
-        props.uiStore.viewingCollection.can_edit = true
+        props.uiStore.viewingCollection.can_edit_content = true
         props.apiStore.request.mockReturnValue(Promise.reject())
         wrapper.setProps(props)
       })
@@ -79,7 +79,7 @@ describe('MoveModal', () => {
         props.uiStore.cardAction = 'move'
         props.uiStore.viewingCollection = {
           id: 4,
-          can_edit: true,
+          can_edit_content: true,
         }
         wrapper.setProps(props)
         component = wrapper.instance()
@@ -120,7 +120,7 @@ describe('MoveModal', () => {
         props.uiStore.cardAction = 'link'
         props.uiStore.viewingCollection = {
           id: 4,
-          can_edit: true,
+          can_edit_content: true,
         }
         wrapper.setProps(props)
         component = wrapper.instance()

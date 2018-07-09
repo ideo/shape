@@ -9,10 +9,9 @@ import styled from 'styled-components'
 
 import trackError from '~/utils/trackError'
 import Activity from '~/ui/notifications/Activity'
-import { CloseButton } from '~/ui/global/styled/buttons'
 import InlineLoader from '~/ui/layout/InlineLoader'
 import Moment from '~/ui/global/Moment'
-import { NotificationButton } from '~/ui/global/styled/buttons'
+import { CloseButton, NotificationButton } from '~/ui/global/styled/buttons'
 import Tooltip from '~/ui/global/Tooltip'
 import v from '~/utils/variables'
 
@@ -142,7 +141,7 @@ class Notification extends React.Component {
           { this.isDefaultStyle
             ? (<NotificationButton
               className="read"
-              onClick={!notification.read && this.handleRead}
+              onClick={!notification.read ? this.handleRead : () => null}
               read={notification.read}
             />)
             : <CloseButton className="read" onClick={this.handleRead} color={v.colors.white} />

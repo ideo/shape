@@ -111,6 +111,15 @@ describe Collection, type: :model do
       expect(duplicate.parent_collection_card).to be_nil
     end
 
+    context 'with archived collection' do
+      let!(:collection) { create(:collection, num_cards: 5, archived: true, tag_list: %w[Prototype Other]) }
+
+      it 'creates a duplicate that is not archived' do
+        expect(collection.archived?).to be true
+        expect(duplicate.archived?).to be false
+      end
+    end
+
     context 'with copy_parent_card true' do
       let!(:copy_parent_card) { true }
 
@@ -265,16 +274,6 @@ describe Collection, type: :model do
 
     it 'includes all group_ids' do
       expect(collection.search_data[:group_ids]).to match_array(groups.map(&:id))
-    end
-  end
-
-  describe '#org_templates?' do
-    let!(:user) { create(:user) }
-    let!(:organization) { create(:organization) }
-    let!(:collection) { organization.setup_templates(user) }
-
-    it 'should be true if its org template collection id is itself' do
-      expect(collection.org_templates?).to be true
     end
   end
 

@@ -9,11 +9,14 @@ import ImageItemCover from '~/ui/grid/covers/ImageItemCover'
 import VideoItemCover from '~/ui/grid/covers/VideoItemCover'
 import CollectionCover from '~/ui/grid/covers/CollectionCover'
 
-import CollectionIcon from '~/ui/icons/CollectionIcon'
-import LinkedCollectionIcon from '~/ui/icons/LinkedCollectionIcon'
-import LinkIcon from '~/ui/icons/LinkIcon'
 import CardMenu from '~/ui/grid/CardMenu'
+import CollectionIcon from '~/ui/icons/CollectionIcon'
+import LinkIcon from '~/ui/icons/LinkIcon'
+import LinkedCollectionIcon from '~/ui/icons/LinkedCollectionIcon'
+import RequiredCollectionIcon from '~/ui/icons/RequiredCollectionIcon'
+import PinnedIcon from '~/ui/icons/PinnedIcon'
 import SelectionCircle from '~/ui/grid/SelectionCircle'
+import Tooltip from '~/ui/global/Tooltip'
 import { uiStore } from '~/stores'
 import v, { ITEM_TYPES } from '~/utils/variables'
 
@@ -90,6 +93,7 @@ class GridCard extends React.Component {
 
   get canReplace() {
     const { record } = this.props
+    if (!record.can_edit_content) return false
     return (this.isItem && _.includes([ITEM_TYPES.IMAGE, ITEM_TYPES.VIDEO], record.type))
   }
 
@@ -136,24 +140,39 @@ class GridCard extends React.Component {
   }
 
   get renderIcon() {
-    const { card, cardType } = this.props
+    const { card, record, cardType } = this.props
     let icon
     let small = false
     if (cardType === 'collections') {
       if (card.link) {
         icon = <LinkedCollectionIcon />
+      } else if (record.isRequired) {
+        const type = record.isMasterTemplate ? 'template' : 'collection'
+        icon = (
+          <Tooltip
+            title={`required ${type}`}
+            placement="top"
+          >
+            <div>
+              <RequiredCollectionIcon />
+            </div>
+          </Tooltip>
+        )
       } else {
         icon = <CollectionIcon />
       }
     } else if (card.link) {
       small = true
       icon = <LinkIcon />
+    } else if (card.isPinned) {
+      icon = <PinnedIcon />
     }
 
     if (!icon) return ''
 
     return (
-      <StyledBottomLeftIcon small={small}>
+      // needs to handle the same click otherwise clicking the icon does nothing
+      <StyledBottomLeftIcon small={small} onClick={this.handleClick}>
         {icon}
       </StyledBottomLeftIcon>
     )
@@ -171,20 +190,23 @@ class GridCard extends React.Component {
       canEditCollection,
       dragging,
       menuOpen,
+      lastPinnedCard
     } = this.props
 
     const firstCardInRow = card.position && card.position.x === 0
 
     return (
       <StyledGridCard dragging={dragging}>
-        {canEditCollection &&
+        {(canEditCollection && (!card.isPinnedAndLocked || lastPinnedCard)) &&
           <GridCardHotspot card={card} dragging={dragging} />
         }
-        {canEditCollection && firstCardInRow &&
+        {(canEditCollection && firstCardInRow && !card.isPinnedAndLocked) &&
           <GridCardHotspot card={card} dragging={dragging} position="left" />
         }
-        {!record.isSharedCollection &&
-          uiStore.textEditingItem !== record &&
+        {(
+          !record.menuDisabled &&
+          uiStore.textEditingItem !== record
+        ) &&
           <StyledTopRightActions>
             {this.isSelectable &&
               <SelectionCircle cardId={card.id} />
@@ -218,6 +240,11 @@ GridCard.propTypes = {
   dragging: PropTypes.bool.isRequired,
   handleClick: PropTypes.func.isRequired,
   menuOpen: PropTypes.bool.isRequired,
+  lastPinnedCard: PropTypes.bool,
+}
+
+GridCard.defaultProps = {
+  lastPinnedCard: false,
 }
 
 export default GridCard

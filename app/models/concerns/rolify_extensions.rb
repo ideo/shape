@@ -18,7 +18,32 @@ module RolifyExtensions
         raise "RolifyExtension: Unsupported model '#{self.class.name}' for cached_roles_by_identifier"
       end
     end
-    @has_role_by_identifier[[role_name, resource_identifier]]
+    @has_role_by_identifier[[role_name.to_s, resource_identifier]]
+  end
+
+  def precache_roles_for(role_names, resources)
+    return unless @has_role_by_identifier.present? && is_a?(User)
+    resource_identifiers = resources.map(&:resource_identifier)
+    roles = rolify_roles.where(
+      name: role_names,
+      resource_identifier: resource_identifiers,
+    )
+    roles += role_via_org_groups(role_names, resource_identifiers)
+
+    found = {}
+    roles.each do |role|
+      @has_role_by_identifier[[role.name, role.resource_identifier]] = true
+      found[[role.name, role.resource_identifier]] = true
+    end
+    role_names.each do |role_name|
+      resource_identifiers.each do |r|
+        unless found[[role_name.to_s, r]]
+          @has_role_by_identifier[[role_name.to_s, r]] = false
+        end
+      end
+    end
+
+    @has_role_by_identifier
   end
 
   # Override rolify `has_role?` and `add_role` methods to ensure

@@ -39,6 +39,6 @@ class OrganizationBuilder
 
   def create_templates
     # Create templates after membership has been setup correctly
-    @organization.setup_templates(@user)
+    OrganizationTemplates.call(@organization)
   end
 end

@@ -2,6 +2,7 @@ import PropTypes from 'prop-types'
 import { Fragment } from 'react'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import { Flex, Box } from 'reflexbox'
+import styled from 'styled-components'
 
 import ActivityLogButton from '~/ui/notifications/ActivityLogButton'
 import Breadcrumb from '~/ui/layout/Breadcrumb'
@@ -9,7 +10,9 @@ import EditableName from '~/ui/pages/shared/EditableName'
 import Roles from '~/ui/grid/Roles'
 import RolesSummary from '~/ui/roles/RolesSummary'
 import PageMenu from '~/ui/pages/shared/PageMenu'
+import ProfileIcon from '~/ui/icons/ProfileIcon'
 import { FixedHeader, MaxWidthContainer } from '~/ui/global/styled/layout'
+import { SubduedHeading1 } from '~/ui/global/styled/typography'
 import { StyledTitleAndRoles } from '~/ui/pages/shared/styled'
 import v from '~/utils/variables'
 
@@ -17,6 +20,14 @@ import v from '~/utils/variables'
 const FixedPageHeader = FixedHeader.extend`
   top: ${v.globalHeaderHeight}px;
   z-index: ${v.zIndex.pageHeader};
+`
+
+const IconHolder = styled.span`
+  display: inline-block;
+  height: 30px;
+  margin-right: 10px;
+  margin-top: 16px;
+  width: 30px;
 `
 
 @inject('uiStore')
@@ -76,6 +87,22 @@ class PageHeader extends React.Component {
     return elements
   }
 
+  get collectionIcon() {
+    const { record } = this.props
+    if (record.isProfileTemplate) {
+      return <IconHolder><ProfileIcon /></IconHolder>
+    }
+    return null
+  }
+
+  get collectionTypeName() {
+    const { record } = this.props
+    if (record.isMasterTemplate) {
+      return <SubduedHeading1>template</SubduedHeading1>
+    }
+    return null
+  }
+
   render() {
     const { record, isHomepage } = this.props
     const breadcrumb = isHomepage ? [] : record.breadcrumb
@@ -90,11 +117,13 @@ class PageHeader extends React.Component {
           <div>
             <StyledTitleAndRoles justify="space-between">
               <Box className="title">
+                { this.collectionIcon }
                 <EditableName
                   name={record.name}
                   updateNameHandler={this.updateRecordName}
                   canEdit={this.canEdit}
                 />
+                { this.collectionTypeName }
               </Box>
               <Flex align="flex-end" style={{ height: '60px', marginTop: '-10px' }}>
                 <Fragment>

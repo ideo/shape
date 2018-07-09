@@ -14,7 +14,8 @@ class Collection < ApplicationRecord
   acts_as_taggable
 
   store_accessor :cached_attributes,
-                 :cached_cover, :cached_tag_list
+                 :cached_cover, :cached_tag_list,
+                 :cached_org_properties
 
   # callbacks
   after_save :touch_related_cards, if: :saved_change_to_updated_at?
@@ -68,6 +69,9 @@ class Collection < ApplicationRecord
   has_many :items_and_linked_items,
            through: :collection_cards,
            source: :item
+  has_many :collections_and_linked_collections,
+           through: :collection_cards,
+           source: :collection
 
   has_one :comment_thread, as: :record, dependent: :destroy
 
@@ -157,7 +161,7 @@ class Collection < ApplicationRecord
   end
 
   # similar to above but requires `collection/item` instead of `record`
-  def self.default_relationships_for_cache_query
+  def self.default_relationships_for_query
     [
       :created_by,
       roles: %i[users groups resource],
@@ -226,6 +230,10 @@ class Collection < ApplicationRecord
 
   def children
     (items + collections)
+  end
+
+  def children_and_linked_children
+    (items_and_linked_items + collections_and_linked_collections)
   end
 
   def searchable?
@@ -321,7 +329,15 @@ class Collection < ApplicationRecord
   end
 
   def org_templates?
-    organization.template_collection_id == id
+    false
+  end
+
+  def profiles?
+    false
+  end
+
+  def profile_template?
+    false
   end
 
   def cache_key

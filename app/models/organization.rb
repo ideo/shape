@@ -14,7 +14,15 @@ class Organization < ApplicationRecord
              dependent: :destroy,
              optional: true
   belongs_to :template_collection,
-             class_name: 'Collection',
+             class_name: 'Collection::Global',
+             dependent: :destroy,
+             optional: true
+  belongs_to :profile_template,
+             class_name: 'Collection::MasterTemplate',
+             dependent: :destroy,
+             optional: true
+  belongs_to :profile_collection,
+             class_name: 'Collection::Global',
              dependent: :destroy,
              optional: true
 
@@ -93,10 +101,6 @@ class Organization < ApplicationRecord
     "#{name} Admins"
   end
 
-  def template_collection_name
-    "#{name} Templates"
-  end
-
   def guest_group_handle
     "#{handle}-guest"
   end
@@ -111,22 +115,6 @@ class Organization < ApplicationRecord
       primary_group.user_ids +
       guest_group.user_ids
     ).uniq.count
-  end
-
-  def setup_templates(user)
-    # Create templates collection
-    collection = create_template_collection(
-      name: template_collection_name,
-      organization: self,
-    )
-    admin_group.add_role(Role::CONTENT_EDITOR, collection)
-    LinkToSharedCollectionsWorker.new.perform(
-      [user.id],
-      [admin_group.id],
-      [collection.id],
-      [],
-    )
-    collection
   end
 
   private

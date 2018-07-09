@@ -24,12 +24,45 @@ class Collection extends BaseRecord {
     return this.type === 'Collection::SharedWithMeCollection'
   }
 
+  get isMasterTemplate() {
+    return this.type === 'Collection::MasterTemplate'
+  }
+
+  get isProfileTemplate() {
+    return this.is_profile_template
+  }
+
+  get isProfileCollection() {
+    return this.is_profile_collection
+  }
+
   get isOrgTemplateCollection() {
     return this.is_org_template_collection
   }
 
+  // disable cardMenu actions for certain collections
+  get menuDisabled() {
+    return this.isSharedCollection ||
+      this.isOrgTemplateCollection ||
+      this.isProfileTemplate
+  }
+
+  // this marks it with the "sirocco" special color
+  // NOTE: could also use Collection::Global -- except OrgTemplates is not "special"?
+  get isSpecialCollection() {
+    return this.isSharedCollection ||
+      this.isProfileTemplate
+  }
+
   get isNormalCollection() {
-    return !this.isUserCollection && !this.isSharedCollection
+    return !this.isUserCollection &&
+      !this.isSharedCollection &&
+      !this.isProfileCollection &&
+      !this.isProfileTemplate
+  }
+
+  get isRequired() {
+    return this.is_profile_template
   }
 
   get isEmpty() {

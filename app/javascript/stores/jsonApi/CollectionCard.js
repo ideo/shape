@@ -33,6 +33,20 @@ class CollectionCard extends BaseRecord {
     return this.record.type === ITEM_TYPES.TEXT
   }
 
+  get isPinned() {
+    return this.pinned
+  }
+
+  get isPinnedInTemplate() {
+    // pinned within a template is something you can pin / un-pin
+    return this.pinned && this.parent.type === 'Collection::MasterTemplate'
+  }
+
+  get isPinnedAndLocked() {
+    // pinned in a collection means it is locked in that place
+    return this.pinned && this.parent.type !== 'Collection::MasterTemplate'
+  }
+
   // This sets max W/H based on number of visible columns. Used by Grid + CollectionCover.
   // e.g. "maxWidth" might temporarily be 2 cols even though this card.width == 4
   @action calculateMaxSize(cols) {

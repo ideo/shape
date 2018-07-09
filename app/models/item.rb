@@ -6,8 +6,9 @@ class Item < ApplicationRecord
   include RealtimeEditorsViewers
   include HasActivities
 
-  resourceable roles: [Role::EDITOR, Role::VIEWER],
+  resourceable roles: [Role::EDITOR, Role::CONTENT_EDITOR, Role::VIEWER],
                edit_role: Role::EDITOR,
+               content_edit_role: Role::CONTENT_EDITOR,
                view_role: Role::VIEWER
 
   archivable as: :parent_collection_card,
@@ -22,14 +23,13 @@ class Item < ApplicationRecord
   # The card that 'holds' this item and determines its breadcrumb
   has_one :parent_collection_card,
           class_name: 'CollectionCard::Primary',
-          inverse_of: :item
+          inverse_of: :item,
+          dependent: :destroy
 
   has_many :cards_linked_to_this_item,
            class_name: 'CollectionCard::Link',
-           inverse_of: :item
-
-  has_many :activities,
-           as: :object_acted_upon
+           inverse_of: :item,
+           dependent: :destroy
 
   delegate :parent, to: :parent_collection_card, allow_nil: true
   delegate :organization, to: :parent, allow_nil: true

@@ -49,5 +49,13 @@ class SerializableCollection < BaseJsonSerializer
     @object.org_templates?
   end
 
+  attribute :is_profile_template do
+    @object.profile_template?
+  end
+
+  attribute :is_profile_collection do
+    @object.profiles?
+  end
+
   has_many :roles
 end

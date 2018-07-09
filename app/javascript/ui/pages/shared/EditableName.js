@@ -10,6 +10,8 @@ import { Heading1 } from '~/ui/global/styled/typography'
 import ClickWrapper from '~/ui/layout/ClickWrapper'
 
 const StyledName = styled.div`
+  display: inline-block;
+  vertical-align: top;
   h1 {
     overflow: hidden;
     text-overflow: ellipsis;

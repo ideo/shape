@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180627183820) do
+ActiveRecord::Schema.define(version: 20180703192353) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -51,6 +51,8 @@ ActiveRecord::Schema.define(version: 20180627183820) do
     t.datetime "updated_at", null: false
     t.boolean "archived", default: false
     t.string "type"
+    t.boolean "pinned", default: false
+    t.integer "templated_from"
     t.index ["collection_id"], name: "index_collection_cards_on_collection_id"
     t.index ["item_id"], name: "index_collection_cards_on_item_id"
     t.index ["parent_id"], name: "index_collection_cards_on_parent_id"
@@ -168,6 +170,8 @@ ActiveRecord::Schema.define(version: 20180627183820) do
     t.jsonb "domain_whitelist", default: []
     t.integer "admin_group_id"
     t.integer "template_collection_id"
+    t.integer "profile_template_id"
+    t.integer "profile_collection_id"
   end
 
   create_table "roles", force: :cascade do |t|

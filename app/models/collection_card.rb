@@ -4,6 +4,8 @@ class CollectionCard < ApplicationRecord
   belongs_to :parent, class_name: 'Collection'
   belongs_to :collection, optional: true
   belongs_to :item, optional: true
+  belongs_to :templated_from, class_name: 'CollectionCard', optional: true
+
   # this really is only appropriate for CollectionCard::Primary but defined globally here
   accepts_nested_attributes_for :collection, :item
 
@@ -22,6 +24,7 @@ class CollectionCard < ApplicationRecord
 
   amoeba do
     enable
+    # don't recognize any relations, easiest way to turn them all off
     recognize []
   end
 
@@ -48,6 +51,8 @@ class CollectionCard < ApplicationRecord
       )
     end
     cc = amoeba_dup
+    # automatically pin when duplicating other pinned template cards
+    cc.pinned = pinned? && master_template_card?
     # defaults to self.parent, unless one is passed in
     cc.parent = parent
     # place card at beginning or end
@@ -87,6 +92,11 @@ class CollectionCard < ApplicationRecord
 
   def link?
     is_a? CollectionCard::Link
+  end
+
+  def master_template_card?
+    # does this card live in a MasterTemplate?
+    parent.is_a? Collection::MasterTemplate
   end
 
   def copy_into_new_link_card

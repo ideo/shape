@@ -102,6 +102,7 @@ class RolesSummary extends React.Component {
     const { editors, viewers } = this.viewersAndEditorsLimited
     // If there aren't any editors or viewers, render with add user button
     // If there aren't any editors but are viewers, don't render label/button
+    if (editors.length === 0 && !this.props.canEdit) return ''
     if (editors.length === 0 && viewers.length > 0) return ''
 
     const editorAvatars = editors.map(editor => (
