@@ -14,7 +14,7 @@ class Collection < ApplicationRecord
   acts_as_taggable
 
   store_accessor :cached_attributes,
-                 :cached_cover, :cached_tag_list,
+                 :cached_cover, :cached_tag_list, :cached_all_tags_list
                  :cached_org_properties
 
   # callbacks
@@ -318,6 +318,10 @@ class Collection < ApplicationRecord
 
   def cache_tag_list
     self.cached_tag_list = tag_list
+  end
+
+  def cache_all_tags_list
+    self.cached_all_tags_list = all_tags_list
   end
 
   def cache_cover

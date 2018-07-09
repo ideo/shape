@@ -95,10 +95,15 @@ class PageHeader extends React.Component {
     return null
   }
 
-  get collectionTypeName() {
+  get collectionTypeOrInheritedTags() {
     const { record } = this.props
     if (record.isMasterTemplate) {
-      return <SubduedHeading1>template</SubduedHeading1>
+      return <SubduedHeading1>#template</SubduedHeading1>
+    } else if (record.inherited_tag_list.length) {
+      return (
+        <SubduedHeading1>
+          { record.inherited_tag_list.map(tag => `#${tag}`).join(',') }
+        </SubduedHeading1>)
     }
     return null
   }
@@ -123,7 +128,7 @@ class PageHeader extends React.Component {
                   updateNameHandler={this.updateRecordName}
                   canEdit={this.canEdit}
                 />
-                { this.collectionTypeName }
+                { this.collectionTypeOrInheritedTags }
               </Box>
               <Flex align="flex-end" style={{ height: '60px', marginTop: '-10px' }}>
                 <Fragment>
