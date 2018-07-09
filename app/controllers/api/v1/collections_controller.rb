@@ -3,18 +3,12 @@ class Api::V1::CollectionsController < Api::V1::BaseController
   load_and_authorize_resource :organization, only: [:create]
   load_and_authorize_resource :collection_card, only: [:create]
   load_and_authorize_resource except: %i[me update]
+  before_action :check_cache, only: %i[show]
   # NOTE: these have to be in the following order
   before_action :load_and_authorize_collection_update, only: %i[update]
   before_action :load_collection_with_cards, only: %i[show update archive]
 
   def show
-    render_collection
-  end
-
-  # NOTE: Not currently used?
-  def me
-    # Gets the user collection for this user/org combo
-    @collection = current_user.current_user_collection
     render_collection
   end
 
@@ -71,6 +65,13 @@ class Api::V1::CollectionsController < Api::V1::BaseController
 
   private
 
+  def check_cache
+    fresh_when(
+      last_modified: @collection.updated_at.utc,
+      etag: @collection.cache_key,
+    )
+  end
+
   def load_and_authorize_collection_update
     @collection = Collection.find(params[:id])
     if collection_params[:name].present? && collection_params[:name] != @collection.name
@@ -91,6 +92,10 @@ class Api::V1::CollectionsController < Api::V1::BaseController
                   .where(id: params[:id])
                   .includes(Collection.default_relationships_for_query)
                   .first
+    current_user.precache_roles_for(
+      [Role::VIEWER, Role::CONTENT_EDITOR, Role::EDITOR],
+      @collection.children_and_linked_children,
+    )
   end
 
   def collection_params

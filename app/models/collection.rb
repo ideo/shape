@@ -69,6 +69,9 @@ class Collection < ApplicationRecord
   has_many :items_and_linked_items,
            through: :collection_cards,
            source: :item
+  has_many :collections_and_linked_collections,
+           through: :collection_cards,
+           source: :collection
 
   has_one :comment_thread, as: :record, dependent: :destroy
 
@@ -227,6 +230,10 @@ class Collection < ApplicationRecord
 
   def children
     (items + collections)
+  end
+
+  def children_and_linked_children
+    (items_and_linked_items + collections_and_linked_collections)
   end
 
   def searchable?
