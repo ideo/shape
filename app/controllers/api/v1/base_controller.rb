@@ -18,6 +18,7 @@ class Api::V1::BaseController < ApplicationController
       'Collection::SharedWithMeCollection': SerializableCollection,
       'Collection::MasterTemplate': SerializableCollection,
       'Collection::Global': SerializableCollection,
+      'Collection::UserProfile': SerializableCollection,
       'CollectionCard::Primary': SerializableCollectionCard,
       'CollectionCard::Link': SerializableCollectionCard,
     )

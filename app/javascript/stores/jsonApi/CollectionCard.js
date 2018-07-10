@@ -16,6 +16,8 @@ class CollectionCard extends BaseRecord {
     'item_id',
     'collection_attributes',
     'item_attributes',
+    // doesn't get saved to API but is needed for replacing
+    'replacing_id',
   ]
 
   @observable maxWidth = this.width
@@ -89,11 +91,17 @@ class CollectionCard extends BaseRecord {
 
   async API_create({ isReplacing = false } = {}) {
     try {
+      if (isReplacing) {
+        // NOTE: this should get replaced with a more explicit `collection_cards#replace` method
+        this.replacing_id = uiStore.blankContentToolState.replacingId
+      }
       const res = await this.apiStore.request('collection_cards', 'POST', { data: this.toJsonApi() })
       if (!isReplacing) {
         this.parent.addCard(res.data)
         uiStore.closeBlankContentTool()
         uiStore.trackEvent('create', this.parent)
+      } else {
+        this.replacing_id = null
       }
     } catch (e) {
       uiStore.defaultAlertError()

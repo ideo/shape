@@ -143,7 +143,10 @@ module RolifyExtensions
 
   def upgrade_to_edit_role(resource)
     return unless is_a? User
-    role = Role.for_resource(resource).where(name: resource.class.view_role).first
+    role = Role
+           .for_resource(resource)
+           .where.not(name: resource.class.edit_role)
+           .first
     # `remove_role` will too aggressively destroy the entire role, so just remove the user
     role.users.destroy(self) if role.present?
     add_role(resource.class.edit_role, resource)

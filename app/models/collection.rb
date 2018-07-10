@@ -217,7 +217,7 @@ class Collection < ApplicationRecord
       c.allow_primary_group_view_access
     end
     # make sure duplicate creator becomes an editor
-    for_user.upgrade_to_edit_role(c) unless parent.is_a? Collection::UserProfile
+    for_user.upgrade_to_edit_role(c)
 
     CollectionCardDuplicationWorker.perform_async(
       collection_cards.map(&:id),
@@ -284,6 +284,12 @@ class Collection < ApplicationRecord
   # convenience method if card order ever gets out of sync
   def reorder_cards!
     collection_cards.each_with_index do |card, i|
+      card.update_attribute(:order, i) unless card.order == i
+    end
+  end
+
+  def reorder_cards_by_collection_name!
+    all_collection_cards.active.includes(:collection).order('collections.name ASC').each_with_index do |card, i|
       card.update_attribute(:order, i) unless card.order == i
     end
   end

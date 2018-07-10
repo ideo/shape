@@ -129,6 +129,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
       :parent_id,
       :collection_id,
       :item_id,
+      :replacing_id, # not stored -- just to track replacing
       collection_attributes: %i[id name],
       item_attributes: [
         :id,

@@ -10,15 +10,16 @@ class Collection
     end
 
     # copy all the cards from this template into a new collection
-    def create_templated_cards(for_user:, parent:)
+    def setup_templated_collection(for_user:, collection:)
       # TODO: what if the template includes a collection of nested cards?
       # -- or linked cards?
       collection_cards.each do |cc|
         cc.duplicate!(
           for_user: for_user,
-          parent: parent,
+          parent: collection,
         )
       end
+      collection.update(template: self)
     end
   end
 end

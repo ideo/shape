@@ -2,6 +2,8 @@ class CollectionCardBuilder
   attr_reader :collection_card, :errors
 
   def initialize(params:, parent_collection: nil, user: nil, type: 'primary')
+    @replacing_id = params.delete(:replacing_id)
+    @replacing_card = nil
     @collection_card = parent_collection.send("#{type}_collection_cards").build(params)
     @errors = @collection_card.errors
     @user = user
@@ -9,20 +11,35 @@ class CollectionCardBuilder
   end
 
   def create
+    find_replacing_card if @replacing_id.present?
     hide_helper_for_user
-    create_collection_card
+    if @collection_card.record.present?
+      create_collection_card
+    else
+      @collection_card.errors.add(:record, "can't be blank")
+      false
+    end
   end
 
   private
 
-  def create_collection_card
-    if @collection_card.record.blank?
-      @collection_card.errors.add(:record, "can't be blank")
-      return false
-    end
+  def find_replacing_card
+    @replacing_card = CollectionCard.find(@replacing_id)
+  rescue ActiveRecord::RecordNotFound
+    @replacing_card = nil
+  end
 
+  def hide_helper_for_user
+    # if the user has "show_helper" then set it to false, now that they've created a card
+    return unless @user.try(:show_helper)
+    @user.update(show_helper: false)
+  end
+
+  def create_collection_card
     # NOTE: for now you can *only* create pinned cards in a master template
     @collection_card.pinned = true if @collection_card.master_template_card?
+    # also set as pinned if you were replacing a pinned card
+    @collection_card.pinned = true if @replacing_card.present? && @replacing_card.pinned?
 
     # TODO: rollback transaction if these later actions fail; add errors, return false
     @collection_card.save.tap do |result|
@@ -39,11 +56,5 @@ class CollectionCardBuilder
         record.reload.recalculate_breadcrumb!
       end
     end
-  end
-
-  def hide_helper_for_user
-    # if the user has "show_helper" then set it to false, now that they've created a card
-    return unless @user.try(:show_helper)
-    @user.update(show_helper: false)
   end
 end
