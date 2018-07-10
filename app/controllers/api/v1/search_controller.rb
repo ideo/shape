@@ -39,7 +39,9 @@ class Api::V1::SearchController < Api::V1::BaseController
       ],
     }
     where_clause[:tags] = {all: tags} if tags.count > 0
+    untagged_query = query.sub(/#\w+\s/, '')
     Collection.search(
+      untagged_query,
       fields: %w[name^5 tags^3 content],
       where: where_clause,
       per_page: 10,
