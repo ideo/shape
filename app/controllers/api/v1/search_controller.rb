@@ -30,17 +30,18 @@ class Api::V1::SearchController < Api::V1::BaseController
   end
 
   def search_collections(query)
-    tags = query.scan(/%23\w+/).flatten.map{ |tag| tag.gsub("%23", "") }
+    tags = query.scan(/#\w+/).flatten.map{ |tag| tag.gsub("#", "") }
+    where_clause = {
+      organization_id: current_organization.id,
+      _or: [
+        { user_ids: [current_user.id] },
+        { group_ids: current_user_current_group_ids },
+      ],
+    }
+    where_clause[:tags] = {all: tags} if tags.count > 0
     Collection.search(
       fields: %w[name^5 tags^3 content],
-      where: {
-        organization_id: current_organization.id,
-        _or: [
-          { user_ids: [current_user.id] },
-          { group_ids: current_user_current_group_ids },
-        ],
-        tags: {all: tags},
-      },
+      where: where_clause,
       per_page: 10,
       page: page,
     )
