@@ -39,7 +39,7 @@ class Api::V1::SearchController < Api::V1::BaseController
           { user_ids: [current_user.id] },
           { group_ids: current_user_current_group_ids },
         ],
-        tags: {all: ['profile']},
+        tags: {all: tags},
       },
       per_page: 10,
       page: page,
