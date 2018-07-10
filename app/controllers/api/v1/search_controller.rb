@@ -30,8 +30,8 @@ class Api::V1::SearchController < Api::V1::BaseController
   end
 
   def search_collections(query)
+    tags = query.scan(/%23\w+/).flatten.map{ |tag| tag.gsub("%23", "") }
     Collection.search(
-      query,
       fields: %w[name^5 tags^3 content],
       where: {
         organization_id: current_organization.id,
@@ -39,6 +39,7 @@ class Api::V1::SearchController < Api::V1::BaseController
           { user_ids: [current_user.id] },
           { group_ids: current_user_current_group_ids },
         ],
+        tags: {all: ['profile']},
       },
       per_page: 10,
       page: page,
