@@ -67,9 +67,7 @@ describe('GridCardBlank', () => {
       await wrapper.instance().createCard()
       expect(wrapper.state().loading).toBeTruthy()
       const newCard = CollectionCard.mock.instances[0]
-      expect(newCard.API_create).toHaveBeenCalledWith({ isReplacing: false })
-      // should not call archive
-      expect(replacingCard.API_archive).not.toHaveBeenCalled()
+      expect(newCard.API_create).toHaveBeenCalled()
     })
   })
 
@@ -122,13 +120,11 @@ describe('GridCardBlank', () => {
       expect(wrapper.find('VideoCreator').exists()).toBe(true)
     })
 
-    it('calls API_archive on replacingCard when creating', async () => {
+    it('calls API_replace with replacingId', async () => {
       await wrapper.instance().createCard()
       expect(wrapper.state().loading).toBeTruthy()
       const newCard = CollectionCard.mock.instances[0]
-      expect(newCard.API_create).toHaveBeenCalledWith({ isReplacing: true })
-      expect(replacingCard.API_archive).toHaveBeenCalledWith({ isReplacing: true })
-      expect(props.apiStore.find).toHaveBeenCalledWith('collection_cards', replacingId)
+      expect(newCard.API_replace).toHaveBeenCalledWith({ replacingId })
     })
   })
 })

@@ -16,8 +16,6 @@ class CollectionCard extends BaseRecord {
     'item_id',
     'collection_attributes',
     'item_attributes',
-    // doesn't get saved to API but is needed for replacing
-    'replacing_id',
   ]
 
   @observable maxWidth = this.width
@@ -89,20 +87,25 @@ class CollectionCard extends BaseRecord {
     })
   }
 
-  async API_create({ isReplacing = false } = {}) {
+  async API_create() {
     try {
-      if (isReplacing) {
-        // NOTE: this should get replaced with a more explicit `collection_cards#replace` method
-        this.replacing_id = uiStore.blankContentToolState.replacingId
-      }
       const res = await this.apiStore.request('collection_cards', 'POST', { data: this.toJsonApi() })
-      if (!isReplacing) {
-        this.parent.addCard(res.data)
-        uiStore.closeBlankContentTool()
-        uiStore.trackEvent('create', this.parent)
-      } else {
-        this.replacing_id = null
-      }
+      this.parent.addCard(res.data)
+      uiStore.closeBlankContentTool()
+      uiStore.trackEvent('create', this.parent)
+    } catch (e) {
+      uiStore.defaultAlertError()
+    }
+  }
+
+  async API_replace({ replacingId }) {
+    try {
+      const replacing = this.apiStore.find('collection_cards', replacingId)
+      const res = await this.apiStore.request(`collection_cards/${replacingId}/replace`, 'PATCH', { data: this.toJsonApi() })
+      this.parent.removeCard(replacing)
+      this.parent.addCard(res.data)
+      uiStore.closeBlankContentTool()
+      uiStore.trackEvent('replace', this.parent)
     } catch (e) {
       uiStore.defaultAlertError()
     }
@@ -136,13 +139,7 @@ class CollectionCard extends BaseRecord {
         if (collection.collection_cards.length === 0) {
           uiStore.openBlankContentTool()
         }
-        if (isReplacing) {
-          uiStore.closeBlankContentTool()
-          uiStore.trackEvent('update', this.record)
-        } else {
-          uiStore.trackEvent('archive', collection)
-        }
-
+        uiStore.trackEvent('archive', collection)
         return true
       } catch (e) {
         uiStore.defaultAlertError()
@@ -151,21 +148,19 @@ class CollectionCard extends BaseRecord {
       }
       return false
     }
-    if (!isReplacing) {
-      let prompt = 'Are you sure you want to archive this?'
-      const confirmText = 'Archive'
-      let iconName = 'Archive'
-      if (this.link) {
-        iconName = 'Link'
-        prompt = 'Are you sure you want to archive this link?'
-      }
-      uiStore.confirm({
-        prompt,
-        confirmText,
-        iconName,
-        onConfirm: onAgree,
-      })
-    } else onAgree()
+    let prompt = 'Are you sure you want to archive this?'
+    const confirmText = 'Archive'
+    let iconName = 'Archive'
+    if (this.link) {
+      iconName = 'Link'
+      prompt = 'Are you sure you want to archive this link?'
+    }
+    uiStore.confirm({
+      prompt,
+      confirmText,
+      iconName,
+      onConfirm: onAgree,
+    })
   }
 
   API_duplicate() {

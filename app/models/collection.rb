@@ -176,6 +176,8 @@ class Collection < ApplicationRecord
 
   amoeba do
     enable
+    # propagate to STI models
+    propagate
     nullify :breadcrumb
     nullify :created_by_id
     nullify :organization_id
@@ -184,7 +186,12 @@ class Collection < ApplicationRecord
     recognize []
   end
 
-  def duplicate!(for_user:, copy_parent_card: false, parent: self.parent)
+  def duplicate!(
+    for_user:,
+    copy_parent_card: false,
+    parent: self.parent,
+    from_template: false
+  )
     # Clones collection and all embedded items/collections
     c = amoeba_dup
     c.cloned_from = self
@@ -216,8 +223,8 @@ class Collection < ApplicationRecord
     if parent.is_a? Collection::UserCollection
       c.allow_primary_group_view_access
     end
-    # make sure duplicate creator becomes an editor
-    for_user.upgrade_to_edit_role(c)
+    # upgrade to editor unless we're setting up a templated collection
+    for_user.upgrade_to_edit_role(c) unless from_template
 
     CollectionCardDuplicationWorker.perform_async(
       collection_cards.map(&:id),

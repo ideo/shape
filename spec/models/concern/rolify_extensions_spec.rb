@@ -164,4 +164,16 @@ describe RolifyExtensions, type: :concern do
       expect(collection.can_edit?(user)).to be true
     end
   end
+
+  describe '#upgrade_to_edit_role' do
+    before do
+      user.add_role(Role::CONTENT_EDITOR, collection)
+    end
+
+    it 'should remove content editor role and upgrade to editor' do
+      user.upgrade_to_edit_role(collection)
+      user.reload
+      expect(collection.can_edit?(user)).to be true
+    end
+  end
 end

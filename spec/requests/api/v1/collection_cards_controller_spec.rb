@@ -482,4 +482,64 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
       end
     end
   end
+
+  describe 'PATCH #replace' do
+    let(:collection) { create(:collection, organization: user.current_organization) }
+    let(:collection_card) { create(:collection_card_text, parent: collection) }
+    let(:path) { "/api/v1/collection_cards/#{collection_card.id}/replace" }
+    let(:raw_params) do
+      {
+        order: 1,
+        width: 3,
+        height: 1,
+        # parent_id is required to retrieve the parent collection without a nested route
+        parent_id: collection.id,
+        # create with a nested item
+        item_attributes: {
+          content: 'This is my item content',
+          text_data: { ops: [{ insert: 'This is my item content.' }] },
+          type: 'Item::TextItem',
+        },
+      }
+    end
+    let(:params) { json_api_params('collection_cards', raw_params) }
+
+    context 'with record and collection content edit access' do
+      before do
+        user.add_role(Role::CONTENT_EDITOR, collection_card.item)
+        user.add_role(Role::CONTENT_EDITOR, collection)
+      end
+
+      it 'returns a 200' do
+        patch(path, params: params)
+        expect(response.status).to eq(200)
+      end
+
+      it 'matches JSON schema' do
+        patch(path, params: params)
+        expect(json['data']['attributes']).to match_json_schema('collection_card')
+        expect(json['data']['attributes']['parent_id']).to eq collection.id
+      end
+
+      it 'archives the existing card' do
+        expect(collection_card.archived).to eq(false)
+        patch(path, params: params)
+        expect(collection_card.reload.archived).to eq(true)
+      end
+
+      it 'creates a new item' do
+        expect {
+          patch(path, params: params)
+        }.to change(Item, :count).by(1)
+      end
+    end
+
+    context 'without record edit access' do
+      it 'returns a 401' do
+        patch(path, params: params)
+        expect(response.status).to eq(401)
+      end
+    end
+  end
+
 end

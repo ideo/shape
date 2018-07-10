@@ -9,5 +9,10 @@ class CollectionCard
     belongs_to :item,
                optional: true,
                inverse_of: :cards_linked_to_this_item
+
+    def can_edit?(user_or_group)
+      # you can edit (meaning remove) a link card as long as you can content edit the parent collection
+      parent.can_edit_content?(user_or_group)
+    end
   end
 end
