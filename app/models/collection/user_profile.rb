@@ -6,6 +6,8 @@ class Collection
     # allows us to refer to the "created_by" as just the "user"
     alias_attribute :user, :created_by
 
+    after_save :update_user_cached_profiles
+
     def self.find_or_create_for_user(user:, organization:)
       profile = find_or_initialize_by(created_by: user, organization: organization)
       return profile if profile.persisted?
@@ -69,5 +71,13 @@ class Collection
       profile.cache_cover!
       profile
     end
+  end
+
+  private
+
+  def update_user_cached_profiles
+    user.cached_user_profiles ||= {}
+    user.cached_user_profiles[organization_id] = id
+    user.save
   end
 end

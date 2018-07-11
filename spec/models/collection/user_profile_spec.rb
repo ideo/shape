@@ -1,27 +1,38 @@
 require 'rails_helper'
 
 describe Collection::UserProfile, type: :model do
+  let(:organization) { create(:organization) }
+  let(:user) { create(:user, add_to_org: organization) }
+  let(:user_profile) do
+    Collection::UserProfile.find_or_create_for_user(
+      user: user,
+      organization: organization,
+    )
+  end
+
+  let(:template) do
+    create(:master_template, organization: organization, num_cards: 3, pin_cards: true)
+  end
+  let(:profiles) { create(:global_collection, organization: organization) }
+
+  before do
+    # configure the org to set up the necessary global collections
+    organization.update(
+      profile_template: template,
+      profile_collection: profiles,
+    )
+  end
+
+  context 'callbacks' do
+    describe 'update_user_cached_profiles' do
+      it 'should set the user.cached_user_profiles attribute' do
+        expect(user.cached_user_profiles).not_to be nil
+        expect(user.cached_user_profiles[organization.id.to_s]).to eq user_profile.id
+      end
+    end
+  end
+
   describe '.find_or_create_for_user' do
-    let(:organization) { create(:organization) }
-    let(:template) { create(:master_template, organization: organization, num_cards: 3) }
-    let(:profiles) { create(:global_collection, organization: organization) }
-    let(:user) { create(:user, add_to_org: organization) }
-    let(:user_profile) do
-      Collection::UserProfile.find_or_create_for_user(
-        user: user,
-        organization: organization,
-      )
-    end
-
-    before do
-      organization.update(
-        profile_template: template,
-        profile_collection: profiles,
-      )
-      template.collection_cards.update_all(pinned: true)
-      # user_profile.reload
-    end
-
     it 'should copy the cards from the org profile_template' do
       expect(user_profile.collection_cards.count).to eq 3
     end
