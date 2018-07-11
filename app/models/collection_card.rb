@@ -18,12 +18,17 @@ class CollectionCard < ApplicationRecord
   validate :parent_is_not_readonly, on: :create
 
   delegate :can_edit?, to: :record, allow_nil: true
+  delegate :can_edit_content?, to: :record, allow_nil: true
   delegate :can_view?, to: :record, allow_nil: true
 
   scope :ordered, -> { order(order: :asc) }
 
   amoeba do
     enable
+    # propagate to STI models
+    propagate
+    set pinned: false
+    nullify :templated_from_id
     # don't recognize any relations, easiest way to turn them all off
     recognize []
   end
@@ -51,8 +56,14 @@ class CollectionCard < ApplicationRecord
       )
     end
     cc = amoeba_dup
-    # automatically pin when duplicating other pinned template cards
-    cc.pinned = pinned? && master_template_card?
+    if master_template_card?
+      # automatically pin when duplicating other pinned template cards
+      cc.pinned = pinned?
+      # track the relation back to the original template card
+      cc.templated_from = self
+    else
+      cc.pinned = false
+    end
     # defaults to self.parent, unless one is passed in
     cc.parent = parent
     # place card at beginning or end
@@ -62,6 +73,7 @@ class CollectionCard < ApplicationRecord
       opts = {
         for_user: for_user,
         parent: parent,
+        from_template: master_template_card?,
       }
       cc.collection = collection.duplicate!(opts) if collection.present?
       cc.item = item.duplicate!(opts) if item.present?

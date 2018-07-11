@@ -59,7 +59,12 @@ class Item < ApplicationRecord
     []
   end
 
-  def duplicate!(for_user:, copy_parent_card: false, parent: self.parent)
+  def duplicate!(
+    for_user:,
+    copy_parent_card: false,
+    parent: self.parent,
+    from_template: false
+  )
     # Clones item
     i = amoeba_dup
     i.cloned_from = self
@@ -84,7 +89,8 @@ class Item < ApplicationRecord
     parent.roles.each do |role|
       i.roles << role.duplicate!(assign_resource: i)
     end
-    for_user.upgrade_to_edit_role(i)
+    # upgrade to editor unless we're setting up a templated collection
+    for_user.upgrade_to_edit_role(i) unless from_template
 
     # Method from HasFilestackFile
     filestack_file_duplicate!(i)

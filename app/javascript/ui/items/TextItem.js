@@ -348,7 +348,7 @@ class TextItem extends React.Component {
   }
 
   get canEdit() {
-    return this.props.item.can_edit
+    return this.props.item.can_edit_content
   }
 
   get renderEditorPill() {

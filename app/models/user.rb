@@ -38,6 +38,11 @@ class User < ApplicationRecord
   has_many :activity_subjects, as: :subject
   has_many :notifications
 
+  has_many :user_profiles,
+           class_name: 'Collection::UserProfile',
+           inverse_of: :created_by,
+           foreign_key: :created_by_id
+
   belongs_to :current_organization,
              class_name: 'Organization',
              optional: true
@@ -48,6 +53,12 @@ class User < ApplicationRecord
   validates :email, presence: true, uniqueness: true
   validates :uid, :provider, presence: true, if: :active?
   validates :uid, uniqueness: { scope: :provider }, if: :active?
+
+  after_save :update_profile_names, if: :saved_change_to_name?
+
+  def saved_change_to_name?
+    saved_change_to_first_name? || saved_change_to_last_name?
+  end
 
   attribute :pic_url_square,
             :string,
@@ -245,6 +256,13 @@ class User < ApplicationRecord
   end
 
   private
+
+  def update_profile_names
+    user_profiles.each do |profile|
+      # call full update rather than update_all which skips callbacks
+      profile.update(name: name)
+    end
+  end
 
   def after_role_update(role)
     reset_cached_roles!

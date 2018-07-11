@@ -19,6 +19,7 @@ describe Collection, type: :model do
     it { should have_one :parent_collection_card }
     it { should belong_to :cloned_from }
     it { should belong_to :organization }
+    it { should belong_to :template }
 
     describe '#collection_cards' do
       let!(:collection) { create(:collection, num_cards: 5) }

@@ -1,7 +1,7 @@
 class Api::V1::ItemsController < Api::V1::BaseController
   deserializable_resource :item, class: DeserializableItem, only: %i[create update]
   load_and_authorize_resource :collection_card, only: :create
-  load_and_authorize_resource
+  load_and_authorize_resource except: %i[update]
 
   def show
     render jsonapi: @item, include: [:filestack_file, :parent, roles: %i[users groups resource]]
@@ -15,6 +15,7 @@ class Api::V1::ItemsController < Api::V1::BaseController
     end
   end
 
+  before_action :load_and_authorize_item_update, only: %i[update]
   def update
     @item.attributes = item_params
     if @item.save
@@ -49,6 +50,15 @@ class Api::V1::ItemsController < Api::V1::BaseController
   end
 
   private
+
+  def load_and_authorize_item_update
+    @item = Item.find(params[:id])
+    if item_params[:name].present? && item_params[:name] != @item.name
+      authorize! :manage, @item
+    else
+      authorize! :edit_content, @item
+    end
+  end
 
   def item_params
     params.require(:item).permit(

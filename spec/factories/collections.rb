@@ -20,6 +20,7 @@ FactoryBot.define do
     factory :shared_with_me_collection, class: Collection::SharedWithMeCollection
     factory :master_template, class: Collection::MasterTemplate
     factory :global_collection, class: Collection::Global
+    factory :user_profile, class: Collection::UserProfile
 
     after(:build) do |collection, evaluator|
       if evaluator.num_cards > 0
