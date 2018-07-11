@@ -5,7 +5,7 @@ import styled from 'styled-components'
 
 import CloseIcon from '~/ui/icons/CloseIcon'
 import { Pill } from '~/ui/global/styled/forms'
-import UserAvatar from '~/ui/users/UserAvatar'
+import Avatar from '~/ui/global/Avatar'
 
 const ChipHolder = styled.div`
   display: flex;
@@ -37,10 +37,15 @@ class PillList extends React.Component {
       <ChipHolder>
         {itemList.map(item => {
           let avatar = null
-
           if (item.pic_url_square) {
-            // TODO want to use a generic avatar here
-            avatar = <UserAvatar className="avatar" size={38} user={item} />
+            avatar = (
+              <Avatar
+                className="avatar"
+                size={38}
+                title={item.name}
+                url={item.pic_url_square}
+              />
+            )
           }
 
           // This could be a user, a group or an unregistered user

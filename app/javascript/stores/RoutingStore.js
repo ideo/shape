@@ -1,4 +1,5 @@
 import { RouterStore } from 'mobx-react-router'
+import { uiStore } from '~/stores'
 
 // mobx-react-router with a couple of helper methods
 class RoutingStore extends RouterStore {
@@ -21,6 +22,9 @@ class RoutingStore extends RouterStore {
   }
 
   routeTo = (type, id = null) => {
+    // close the org/roles menus if either are open when we route to a new page
+    uiStore.update('organizationMenuPage', null)
+    uiStore.update('rolesMenuOpen', false)
     if (!id) {
       // in this case, type is a path like '/' or '/terms'
       this.push(type)

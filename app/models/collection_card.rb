@@ -22,6 +22,7 @@ class CollectionCard < ApplicationRecord
   delegate :can_view?, to: :record, allow_nil: true
 
   scope :ordered, -> { order(order: :asc) }
+  scope :pinned, -> { where(pinned: true) }
 
   amoeba do
     enable

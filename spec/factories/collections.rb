@@ -4,6 +4,7 @@ FactoryBot.define do
       num_cards 0
       record_type :text
       card_relation :primary
+      pin_cards false
       add_editors []
       add_content_editors []
       add_viewers []
@@ -30,7 +31,14 @@ FactoryBot.define do
           w = 3 if rand(1..4) == 4
           h = 2 if rand(1..4) == 4
           card_type = :"collection_card_#{evaluator.record_type}"
-          cc = build(card_type, parent: collection, order: (i - 1), width: w, height: h)
+          cc = build(
+            card_type,
+            parent: collection,
+            order: (i - 1),
+            width: w,
+            height: h,
+            pinned: evaluator.pin_cards,
+          )
           # e.g. primary_collection_cards or link_collection_cards
           card_relation = "#{evaluator.card_relation}_collection_cards"
           collection.send(card_relation) << cc

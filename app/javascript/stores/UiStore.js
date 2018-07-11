@@ -160,7 +160,7 @@ export default class UiStore {
   @action openGroup(groupId) {
     this.organizationMenuPage = 'editRoles'
     this.organizationMenuGroupId = groupId
- }
+  }
 
   // --- grid properties
   @computed get gridMaxW() {

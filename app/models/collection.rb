@@ -290,7 +290,7 @@ class Collection < ApplicationRecord
 
   # convenience method if card order ever gets out of sync
   def reorder_cards!
-    collection_cards.each_with_index do |card, i|
+    all_collection_cards.active.order(pinned: :desc, order: :asc).each_with_index do |card, i|
       card.update_attribute(:order, i) unless card.order == i
     end
   end

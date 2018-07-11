@@ -112,6 +112,8 @@ class RolesSummary extends React.Component {
         url={editor.pic_url_square || editor.filestack_file_url}
         size={AVATAR_SIZE}
         className="editor"
+        // user_profile_collection_id will be null if its a group
+        linkToCollectionId={editor.user_profile_collection_id}
         displayName
       />
     ))
@@ -136,6 +138,8 @@ class RolesSummary extends React.Component {
         url={viewer.pic_url_square || viewer.filestack_file_url}
         size={AVATAR_SIZE}
         className="viewer"
+        // user_profile_collection_id will be null if its a group
+        linkToCollectionId={viewer.user_profile_collection_id}
         displayName
       />
     ))
