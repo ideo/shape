@@ -122,7 +122,7 @@ class PageHeader extends React.Component {
   get collectionTypeName() {
     const { record } = this.props
     if (record.isMasterTemplate) {
-      return <SubduedHeading1>template</SubduedHeading1>
+      return <SubduedHeading1>#template</SubduedHeading1>
     }
     return null
   }

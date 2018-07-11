@@ -20,6 +20,20 @@ import Tooltip from '~/ui/global/Tooltip'
 import { uiStore } from '~/stores'
 import v, { ITEM_TYPES } from '~/utils/variables'
 
+const PinIconHolder = styled.div`
+  background-color: ${v.colors.blackLava};
+  border-radius: 50%;
+  height: 32px;
+  margin-top: 6px;
+  text-align: center;
+  width: 32px;
+
+  .icon {
+    height: 32px;
+    width: 26px;
+  }
+`
+
 export const StyledGridCard = styled.div`
   z-index: 1;
   position: relative;
@@ -165,7 +179,7 @@ class GridCard extends React.Component {
       small = true
       icon = <LinkIcon />
     } else if (card.isPinned) {
-      icon = <PinnedIcon />
+      icon = <PinIconHolder><PinnedIcon /></PinIconHolder>
     }
 
     if (!icon) return ''
