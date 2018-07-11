@@ -54,6 +54,12 @@ class User < ApplicationRecord
   validates :uid, :provider, presence: true, if: :active?
   validates :uid, uniqueness: { scope: :provider }, if: :active?
 
+  after_save :update_profile_names, if: :saved_change_to_name?
+
+  def saved_change_to_name?
+    saved_change_to_first_name? || saved_change_to_last_name?
+  end
+
   attribute :pic_url_square,
             :string,
             default: 'https://d3none3dlnlrde.cloudfront.net/assets/users/avatars/missing/square.jpg'
@@ -250,6 +256,13 @@ class User < ApplicationRecord
   end
 
   private
+
+  def update_profile_names
+    user_profiles.each do |profile|
+      # call full update rather than update_all which skips callbacks
+      profile.update(name: name)
+    end
+  end
 
   def after_role_update(role)
     reset_cached_roles!

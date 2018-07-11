@@ -47,6 +47,17 @@ describe User, type: :model do
         end
       end
     end
+
+    describe '#update_profile_names' do
+      let!(:profile) { create(:user_profile, created_by: user, name: 'My Profile') }
+
+      it 'should update all UserProfiles to match user name' do
+        user.reload # pick up user_profiles relation
+        user.update(first_name: 'Bill', last_name: 'Hader')
+        expect(user.user_profiles.first.id).to eq profile.id
+        expect(user.user_profiles.first.name).to eq 'Bill Hader'
+      end
+    end
   end
 
   describe '#add_role' do
