@@ -7,6 +7,9 @@ class User < ApplicationRecord
   # alias created just to give equivalent method on users/groups
   alias rolify_roles roles
 
+  store_accessor :cached_attributes,
+                 :cached_user_profiles
+
   devise :database_authenticatable, :registerable, :trackable,
          :rememberable, :validatable, :omniauthable,
          omniauth_providers: [:ideo]
