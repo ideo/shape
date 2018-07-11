@@ -6,7 +6,7 @@ class Collection
     # allows us to refer to the "created_by" as just the "user"
     alias_attribute :user, :created_by
 
-    def self.find_or_create_for(user:, organization:)
+    def self.find_or_create_for_user(user:, organization:)
       profile = find_or_initialize_by(created_by: user, organization: organization)
       return profile if profile.persisted?
 
@@ -31,6 +31,12 @@ class Collection
       organization.profile_template.setup_templated_collection(
         for_user: user,
         collection: profile,
+      )
+      # create the special profile tag for the profile collection
+      organization.profile_template.tag(
+        profile,
+        :with => 'profile',
+        :on => :tags
       )
       profile.collection_cards.where.not(item_id: nil).includes(:item).each do |card|
         next unless card.item.is_a? Item::ImageItem
