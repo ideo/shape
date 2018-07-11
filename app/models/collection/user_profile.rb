@@ -38,10 +38,13 @@ class Collection
       #   with: 'profile',
       #   on: :tags,
       # )
+
+      # replace the first image item with the user's pic_url_square
       profile.collection_cards.where.not(item_id: nil).includes(:item).each do |card|
         next unless card.item.is_a? Item::ImageItem
         item = card.item
         item.update(
+          # TODO: set up a non "FilestackFile" way of creating an image card?
           filestack_file: FilestackFile.create(
             handle: 'none',
             mimetype: 'image/jpg',

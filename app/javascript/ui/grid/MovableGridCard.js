@@ -268,7 +268,7 @@ class MovableGridCard extends React.PureComponent {
       return this.renderEmpty({ beginningOfRow: card.position.x === 0 })
     }
 
-    const { gridW, gridH } = uiStore.gridSettings
+    const { gridW, gridH, cols } = uiStore.gridSettings
     const minWidth = gridW * 0.8
     const minHeight = gridH * 0.8
     // need to always set Rnd maxWidth to 4 columns instead of `cols`
@@ -337,7 +337,7 @@ class MovableGridCard extends React.PureComponent {
           disableDragging={
             !canEditCollection ||
             // NOTE: disabling dragging for touchscreens because of conflict with touch scrolling
-            uiStore.isTouchDevice ||
+            (uiStore.isTouchDevice && cols === 1) ||
             card.isPinnedAndLocked
           }
           enableResizing={{

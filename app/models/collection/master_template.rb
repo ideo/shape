@@ -3,7 +3,7 @@ class Collection
     acts_as_tagger
     has_many :templated_collections,
              class_name: 'Collection',
-             foreign_key: :templated_from_id,
+             foreign_key: :template_id,
              inverse_of: :template
 
     def profile_template?
@@ -21,6 +21,28 @@ class Collection
         )
       end
       collection.update(template: self)
+    end
+
+    def update_templated_collections
+      templated_collections.each do |templated|
+        collection_cards.pinned.each do |pin|
+          # this will iterate in order...
+          cc = templated.collection_cards.where(templated_from: pin).first
+          if cc.nil?
+            pin.duplicate!(
+              for_user: templated.created_by,
+              parent: templated,
+            )
+          else
+            cc.update(
+              order: pin.order,
+              height: pin.height,
+              width: pin.width,
+            )
+          end
+        end
+        templated.reorder_cards!
+      end
     end
   end
 end

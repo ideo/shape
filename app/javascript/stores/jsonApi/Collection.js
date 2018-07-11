@@ -28,6 +28,15 @@ class Collection extends BaseRecord {
     return this.type === 'Collection::MasterTemplate'
   }
 
+  get isUserProfile() {
+    return this.type === 'Collection::UserProfile'
+  }
+
+  get isCurrentUserProfile() {
+    if (!this.isUserProfile) return false
+    return this.id === this.apiStore.currentUser.user_profile_collection_id
+  }
+
   get isProfileTemplate() {
     return this.is_profile_template
   }

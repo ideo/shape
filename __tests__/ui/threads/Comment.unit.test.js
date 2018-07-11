@@ -14,7 +14,7 @@ describe('Comment', () => {
 
   it('renders the author name and avatar', () => {
     expect(wrapper.find('.author').children().text()).toContain(props.comment.author.name)
-    expect(wrapper.find('UserAvatar').props().user).toEqual(props.comment.author)
+    expect(wrapper.find('Avatar').props().url).toEqual(props.comment.author.pic_url_square)
   })
 
   it('renders the message', () => {

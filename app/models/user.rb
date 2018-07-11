@@ -255,6 +255,10 @@ class User < ApplicationRecord
       )
   end
 
+  def user_profile_for_org(organization_id)
+    user_profiles.where(organization_id: organization_id).first
+  end
+
   private
 
   def update_profile_names

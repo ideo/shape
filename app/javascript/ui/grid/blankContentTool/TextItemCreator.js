@@ -29,7 +29,7 @@ class TextItemCreator extends React.Component {
     // see: https://github.com/quilljs/quill/issues/1134#issuecomment-265065953
     this.onTextChange = _.debounce(this._onTextChange, 1000)
     this.item = new Item()
-    this.item.can_edit = true
+    this.item.can_edit_content = true
   }
 
   _onTextChange = (itemTextData) => {
