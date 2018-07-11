@@ -54,8 +54,7 @@ describe User, type: :model do
       it 'should update all UserProfiles to match user name' do
         user.reload # pick up user_profiles relation
         user.update(first_name: 'Bill', last_name: 'Hader')
-        expect(user.user_profiles.first.id).to eq profile.id
-        expect(user.user_profiles.first.name).to eq 'Bill Hader'
+        expect(profile.reload.name).to eq 'Bill Hader'
       end
     end
   end

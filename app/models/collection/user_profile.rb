@@ -33,11 +33,11 @@ class Collection
         collection: profile,
       )
       # create the special profile tag for the profile collection
-      organization.profile_template.tag(
-        profile,
-        :with => 'profile',
-        :on => :tags
-      )
+      # organization.profile_template.tag(
+      #   profile,
+      #   with: 'profile',
+      #   on: :tags,
+      # )
       profile.collection_cards.where.not(item_id: nil).includes(:item).each do |card|
         next unless card.item.is_a? Item::ImageItem
         item = card.item

@@ -1,13 +1,13 @@
 require 'rails_helper'
 
 describe Collection::UserProfile, type: :model do
-  describe '.find_or_create_for' do
+  describe '.find_or_create_for_user' do
     let(:organization) { create(:organization) }
     let(:template) { create(:master_template, organization: organization, num_cards: 3) }
     let(:profiles) { create(:global_collection, organization: organization) }
     let(:user) { create(:user, add_to_org: organization) }
     let(:user_profile) do
-      Collection::UserProfile.find_or_create_for(
+      Collection::UserProfile.find_or_create_for_user(
         user: user,
         organization: organization,
       )
