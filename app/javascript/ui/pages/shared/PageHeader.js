@@ -10,11 +10,14 @@ import EditableName from '~/ui/pages/shared/EditableName'
 import Roles from '~/ui/grid/Roles'
 import RolesSummary from '~/ui/roles/RolesSummary'
 import PageMenu from '~/ui/pages/shared/PageMenu'
+import EditPencilIcon from '~/ui/icons/EditPencilIcon'
 import ProfileIcon from '~/ui/icons/ProfileIcon'
 import { FixedHeader, MaxWidthContainer } from '~/ui/global/styled/layout'
 import { SubduedHeading1 } from '~/ui/global/styled/typography'
 import { StyledTitleAndRoles } from '~/ui/pages/shared/styled'
 import v from '~/utils/variables'
+
+/* global IdeoSSO */
 
 // NOTE: Header and PageHeader create sibling <header> elements on the page
 const FixedPageHeader = FixedHeader.extend`
@@ -29,6 +32,20 @@ const IconHolder = styled.span`
   margin-top: 16px;
   width: 30px;
 `
+
+const EditIconHolder = styled.button`
+  &.edit-icon {
+    cursor: pointer;
+    display: none;
+    margin-top: 20px;
+    margin-left: 15px;
+    svg {
+      fill: ${v.colors.gray};
+      width: 20px;
+    }
+  }
+`
+EditIconHolder.displayName = 'EditIconHolder'
 
 @inject('uiStore')
 @observer
@@ -53,6 +70,13 @@ class PageHeader extends React.Component {
     const { record } = this.props
     record.name = name
     record.save()
+  }
+
+  handleTitleClick = () => {
+    const { record } = this.props
+    if (record.isCurrentUserProfile) {
+      window.open(IdeoSSO.profileUrl, '_blank')
+    }
   }
 
   get actions() {
@@ -115,7 +139,11 @@ class PageHeader extends React.Component {
           />
           <Breadcrumb items={breadcrumb} />
           <div>
-            <StyledTitleAndRoles justify="space-between">
+            <StyledTitleAndRoles
+              className={record.isCurrentUserProfile ? 'user-profile' : ''}
+              onClick={this.handleTitleClick}
+              justify="space-between"
+            >
               <Box className="title">
                 { this.collectionIcon }
                 <EditableName
@@ -123,6 +151,11 @@ class PageHeader extends React.Component {
                   updateNameHandler={this.updateRecordName}
                   canEdit={this.canEdit}
                 />
+                { record.isCurrentUserProfile && (
+                  <EditIconHolder className="edit-icon">
+                    <EditPencilIcon />
+                  </EditIconHolder>
+                )}
                 { this.collectionTypeName }
               </Box>
               <Flex align="flex-end" style={{ height: '60px', marginTop: '-10px' }}>
