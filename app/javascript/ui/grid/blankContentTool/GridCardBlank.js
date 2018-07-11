@@ -285,8 +285,6 @@ class GridCardBlank extends React.Component {
     card.parent = parent // Assign parent so store can get access to it
     this.setState({ loading: true }, async () => {
       if (isReplacing) {
-        // const cardToReplace = apiStore.find('collection_cards', replacingId)
-        // await cardToReplace.API_archive({ isReplacing })
         await card.API_replace({ replacingId })
       } else {
         await card.API_create()
