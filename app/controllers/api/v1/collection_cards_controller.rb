@@ -11,7 +11,8 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
   def create
     builder = CollectionCardBuilder.new(params: collection_card_params,
                                         parent_collection: @collection,
-                                        user: current_user)
+                                        user: current_user,
+                                        replacing_card: @replacing_card)
 
     if builder.create
       # reload the user's roles
@@ -42,7 +43,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
 
   before_action :load_and_authorize_replacing_card, only: %i[replace]
   def replace
-    if @collection_card.archive!
+    if @replacing_card.archive!
       create
     else
       render_api_errors @collection_card.errors
@@ -121,8 +122,8 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
   end
 
   def load_and_authorize_replacing_card
-    @collection_card = CollectionCard.find(params[:id])
-    authorize! :edit_content, @collection_card.record
+    @replacing_card = CollectionCard.find(params[:id])
+    authorize! :edit_content, @replacing_card.record
   end
 
   def create_archive_notification

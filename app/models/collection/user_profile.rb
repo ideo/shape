@@ -32,6 +32,20 @@ class Collection
         for_user: user,
         collection: profile,
       )
+      profile.collection_cards.where.not(item_id: nil).includes(:item).each do |card|
+        next unless card.item.is_a? Item::ImageItem
+        item = card.item
+        item.update(
+          filestack_file: FilestackFile.create(
+            handle: 'none',
+            mimetype: 'image/jpg',
+            size: 15_945,
+            filename: 'profile.jpg',
+            url: user.pic_url_square,
+          ),
+        )
+        break
+      end
 
       # create the card in My Collection
       uc = user.current_user_collection(organization.id)
@@ -43,6 +57,7 @@ class Collection
       # in case they had been shared other cards already, push those after
       uc.reorder_cards!
 
+      profile.cache_cover!
       profile
     end
   end
