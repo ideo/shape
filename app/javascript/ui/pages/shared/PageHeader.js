@@ -28,7 +28,7 @@ const FixedPageHeader = FixedHeader.extend`
 
 const IconHolder = styled.span`
   color: ${v.colors.cloudy};
-  display: inline-block;
+  display: block;
   height: 30px;
   ${props => (props.align === 'left' ? 'margin-right: 10px;' : 'margin-left: 10px;')}
   margin-top: 16px;
@@ -144,7 +144,7 @@ class PageHeader extends React.Component {
               className={record.isCurrentUserProfile ? 'user-profile' : ''}
               justify="space-between"
             >
-              <Box className="title" onClick={this.handleTitleClick}>
+              <Flex align="flex-start" className="title" onClick={this.handleTitleClick}>
                 { this.collectionIcon }
                 <EditableName
                   name={record.name}
@@ -153,7 +153,7 @@ class PageHeader extends React.Component {
                 />
                 { this.collectionTypeIcon }
                 { this.collectionTypeOrInheritedTags }
-              </Box>
+              </Flex>
               <Flex align="flex-end" style={{ height: '60px', marginTop: '-10px' }}>
                 <Fragment>
                   { this.actions }

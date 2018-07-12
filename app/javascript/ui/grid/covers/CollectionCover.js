@@ -1,10 +1,19 @@
 import PropTypes from 'prop-types'
+import { Fragment } from 'react'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 import Dotdotdot from 'react-dotdotdot'
 
 import v from '~/utils/variables'
 import hexToRgba from '~/utils/hexToRgba'
+import ProfileIcon from '~/ui/icons/ProfileIcon'
+
+const IconHolder = styled.span`
+  display: inline-block;
+  height: 27px;
+  vertical-align: text-top;
+  width: 27px;
+`
 
 const StyledCollectionCover = styled.div`
   width: 100%;
@@ -52,7 +61,7 @@ const StyledCardContent = styled.div`
   }
   .top, .bottom {
     position: absolute;
-    right: 1rem;
+    right: 1.5rem;
     width: ${props => calcSectionWidth(props)};
     height: ${props => calcSectionHeight(props)};
   }
@@ -88,9 +97,40 @@ const StyledCardContent = styled.div`
 `
 StyledCardContent.displayName = 'StyledCardContent'
 
+function splitName(name) {
+  return name.split(' ')
+}
+
 @inject('uiStore')
 @observer
 class CollectionCover extends React.Component {
+  get icon() {
+    const { collection } = this.props
+    if (collection.isUserProfile) {
+      return (<Fragment>&nbsp;
+        <IconHolder><ProfileIcon /></IconHolder>
+      </Fragment>)
+    }
+    return null
+  }
+
+  get name() {
+    const { collection } = this.props
+    if (collection.isUserProfile) {
+      const nameParts = splitName(collection.name)
+      if (!nameParts) return collection.name
+      const lastName = nameParts.pop()
+      const name = (
+        <Fragment>
+          {nameParts.join(' ')}{' '}<span style={{ whiteSpace: 'nowrap' }}>
+            {lastName}&nbsp;<IconHolder><ProfileIcon /></IconHolder></span>
+        </Fragment>
+      )
+      return name
+    }
+    return collection.name
+  }
+
   render() {
     const { height, width, collection, uiStore } = this.props
     const { cover } = collection
@@ -111,7 +151,7 @@ class CollectionCover extends React.Component {
           <div className="top">
             <h3>
               <Dotdotdot clamp={height > 1 ? 6 : 3}>
-                {collection.name}
+                {this.name}
               </Dotdotdot>
             </h3>
           </div>

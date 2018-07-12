@@ -1,4 +1,5 @@
 import PropTypes from 'prop-types'
+import { Fragment } from 'react'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import _ from 'lodash'
 import styled from 'styled-components'
@@ -21,16 +22,22 @@ import { uiStore } from '~/stores'
 import v, { ITEM_TYPES } from '~/utils/variables'
 
 const PinIconHolder = styled.div`
-  background-color: ${v.colors.blackLava};
+  background-color: ${props => (props.locked ? 'transparent' : v.colors.blackLava)};
   border-radius: 50%;
-  height: 32px;
-  margin-top: 6px;
+  height: 24px;
+  margin-left: 10px;
+  margin-top: 10px;
   text-align: center;
-  width: 32px;
+  width: 24px;
 
   .icon {
-    height: 32px;
-    width: 26px;
+    height: 25px;
+    width: 25px;
+
+    svg {
+      margin-right: 1px;
+      width: 80%;
+    }
   }
 `
 
@@ -53,8 +60,9 @@ export const StyledBottomLeftIcon = styled.div`
   left: 0.25rem;
   bottom: 0;
   color: ${v.colors.gray};
-  width: 45px;
+  width: ${props => (props.iconAmount === 2 ? 75 : 45)}px;
   height: 45px;
+  display: flex;
   /* LinkIcon appears larger than CollectionIcon so we need to make it smaller */
   ${props => props.small && `
     width: 18px;
@@ -157,6 +165,7 @@ class GridCard extends React.Component {
     const { card, record, cardType } = this.props
     let icon
     let small = false
+    let iconAmount = 1
     if (cardType === 'collections') {
       if (card.link) {
         icon = <LinkedCollectionIcon />
@@ -175,18 +184,26 @@ class GridCard extends React.Component {
       } else {
         icon = <CollectionIcon />
       }
+
+      if (card.isPinned) {
+        icon = (<Fragment>
+          <PinIconHolder locked={card.isPinnedAndLocked}><PinnedIcon /></PinIconHolder>
+          {icon}
+        </Fragment>)
+        iconAmount = 2
+      }
     } else if (card.link) {
       small = true
       icon = <LinkIcon />
     } else if (card.isPinned) {
-      icon = <PinIconHolder><PinnedIcon /></PinIconHolder>
+      icon = <PinIconHolder locked={card.isPinnedAndLocked}><PinnedIcon /></PinIconHolder>
     }
 
     if (!icon) return ''
 
     return (
       // needs to handle the same click otherwise clicking the icon does nothing
-      <StyledBottomLeftIcon small={small} onClick={this.handleClick}>
+      <StyledBottomLeftIcon small={small} onClick={this.handleClick} iconAmount={iconAmount}>
         {icon}
       </StyledBottomLeftIcon>
     )
