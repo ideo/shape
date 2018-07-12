@@ -21,10 +21,11 @@ import { uiStore } from '~/stores'
 import v, { ITEM_TYPES } from '~/utils/variables'
 
 const PinIconHolder = styled.div`
-  background-color: ${v.colors.blackLava};
+  background-color: ${props => (props.locked ? 'transparent' : v.colors.blackLava)};
   border-radius: 50%;
   height: 32px;
-  margin-top: 6px;
+  margin-left: 7px;
+  margin-top: 4px;
   text-align: center;
   width: 32px;
 
@@ -179,7 +180,7 @@ class GridCard extends React.Component {
       small = true
       icon = <LinkIcon />
     } else if (card.isPinned) {
-      icon = <PinIconHolder><PinnedIcon /></PinIconHolder>
+      icon = <PinIconHolder locked={card.isPinnedAndLocked}><PinnedIcon /></PinIconHolder>
     }
 
     if (!icon) return ''
