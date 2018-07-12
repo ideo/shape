@@ -187,7 +187,14 @@ class GridCard extends React.Component {
 
       if (card.isPinned) {
         icon = (<Fragment>
-          <PinIconHolder locked={card.isPinnedAndLocked}><PinnedIcon /></PinIconHolder>
+          <Tooltip
+            title="pinned"
+            placement="top"
+          >
+            <PinIconHolder locked={card.isPinnedAndLocked}>
+              <PinnedIcon />
+            </PinIconHolder>
+          </Tooltip>
           {icon}
         </Fragment>)
         iconAmount = 2
@@ -196,7 +203,16 @@ class GridCard extends React.Component {
       small = true
       icon = <LinkIcon />
     } else if (card.isPinned) {
-      icon = <PinIconHolder locked={card.isPinnedAndLocked}><PinnedIcon /></PinIconHolder>
+      icon = (
+        <Tooltip
+          title="pinned"
+          placement="top"
+        >
+          <PinIconHolder locked={card.isPinnedAndLocked}>
+            <PinnedIcon />
+          </PinIconHolder>
+        </Tooltip>
+      )
     }
 
     if (!icon) return ''
