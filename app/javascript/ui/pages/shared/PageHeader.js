@@ -10,7 +10,9 @@ import EditableName from '~/ui/pages/shared/EditableName'
 import Roles from '~/ui/grid/Roles'
 import RolesSummary from '~/ui/roles/RolesSummary'
 import PageMenu from '~/ui/pages/shared/PageMenu'
+import FilledProfileIcon from '~/ui/icons/FilledProfileIcon'
 import ProfileIcon from '~/ui/icons/ProfileIcon'
+import SystemIcon from '~/ui/icons/SystemIcon'
 import { FixedHeader, MaxWidthContainer } from '~/ui/global/styled/layout'
 import { SubduedHeading1 } from '~/ui/global/styled/typography'
 import { StyledTitleAndRoles } from '~/ui/pages/shared/styled'
@@ -25,9 +27,10 @@ const FixedPageHeader = FixedHeader.extend`
 `
 
 const IconHolder = styled.span`
+  color: ${v.colors.cloudy};
   display: inline-block;
   height: 30px;
-  margin-right: 10px;
+  ${props => (props.align === 'left' ? 'margin-right: 10px;' : 'margin-left: 10px;')}
   margin-top: 16px;
   width: 30px;
 `
@@ -99,7 +102,7 @@ class PageHeader extends React.Component {
   get collectionIcon() {
     const { record } = this.props
     if (record.isProfileTemplate) {
-      return <IconHolder><ProfileIcon /></IconHolder>
+      return <IconHolder align="left"><FilledProfileIcon /></IconHolder>
     }
     return null
   }
@@ -111,6 +114,16 @@ class PageHeader extends React.Component {
         <SubduedHeading1>
           { record.inherited_tag_list.map(tag => `#${tag}`).join(',') }
         </SubduedHeading1>)
+    }
+    return null
+  }
+
+  get collectionTypeIcon() {
+    const { record } = this.props
+    if (record.isUserProfile) {
+      return <IconHolder align="right"><ProfileIcon /></IconHolder>
+    } else if (record.isProfileCollection) {
+      return <IconHolder align="right"><SystemIcon /></IconHolder>
     }
     return null
   }
@@ -139,7 +152,7 @@ class PageHeader extends React.Component {
                   canEdit={this.canEdit}
                 />
                 { this.collectionTypeOrInheritedTags }
-                { this.collectionTypeName }
+                { this.collectionTypeIcon }
               </Box>
               <Flex align="flex-end" style={{ height: '60px', marginTop: '-10px' }}>
                 <Fragment>

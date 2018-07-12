@@ -71,7 +71,7 @@ class Collection extends BaseRecord {
   }
 
   get isRequired() {
-    return this.is_profile_template
+    return this.is_profile_template || this.isUserProfile
   }
 
   get isEmpty() {
