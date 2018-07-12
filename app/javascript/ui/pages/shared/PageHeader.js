@@ -10,7 +10,6 @@ import EditableName from '~/ui/pages/shared/EditableName'
 import Roles from '~/ui/grid/Roles'
 import RolesSummary from '~/ui/roles/RolesSummary'
 import PageMenu from '~/ui/pages/shared/PageMenu'
-import EditPencilIcon from '~/ui/icons/EditPencilIcon'
 import FilledProfileIcon from '~/ui/icons/FilledProfileIcon'
 import ProfileIcon from '~/ui/icons/ProfileIcon'
 import SystemIcon from '~/ui/icons/SystemIcon'
@@ -35,20 +34,6 @@ const IconHolder = styled.span`
   margin-top: 16px;
   width: 30px;
 `
-
-const EditIconHolder = styled.button`
-  &.edit-icon {
-    cursor: pointer;
-    display: none;
-    margin-top: 20px;
-    margin-left: 15px;
-    svg {
-      fill: ${v.colors.gray};
-      width: 20px;
-    }
-  }
-`
-EditIconHolder.displayName = 'EditIconHolder'
 
 @inject('uiStore')
 @observer
@@ -122,10 +107,13 @@ class PageHeader extends React.Component {
     return null
   }
 
-  get collectionTypeName() {
+  get collectionTypeOrInheritedTags() {
     const { record } = this.props
-    if (record.isMasterTemplate) {
-      return <SubduedHeading1>#template</SubduedHeading1>
+    if (record.inherited_tag_list.length) {
+      return (
+        <SubduedHeading1>
+          { record.inherited_tag_list.map(tag => `#${tag}`).join(',') }
+        </SubduedHeading1>)
     }
     return null
   }
@@ -154,23 +142,17 @@ class PageHeader extends React.Component {
           <div>
             <StyledTitleAndRoles
               className={record.isCurrentUserProfile ? 'user-profile' : ''}
-              onClick={this.handleTitleClick}
               justify="space-between"
             >
-              <Box className="title">
+              <Box className="title" onClick={this.handleTitleClick}>
                 { this.collectionIcon }
                 <EditableName
                   name={record.name}
                   updateNameHandler={this.updateRecordName}
                   canEdit={this.canEdit}
                 />
-                { record.isCurrentUserProfile && (
-                  <EditIconHolder className="edit-icon">
-                    <EditPencilIcon />
-                  </EditIconHolder>
-                )}
                 { this.collectionTypeIcon }
-                { this.collectionTypeName }
+                { this.collectionTypeOrInheritedTags }
               </Box>
               <Flex align="flex-end" style={{ height: '60px', marginTop: '-10px' }}>
                 <Fragment>

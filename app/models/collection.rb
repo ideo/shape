@@ -14,7 +14,8 @@ class Collection < ApplicationRecord
   acts_as_taggable
 
   store_accessor :cached_attributes,
-                 :cached_cover, :cached_tag_list,
+                 :cached_cover, :cached_tag_list, :cached_all_tags_list,
+                 :cached_owned_tag_list,
                  :cached_org_properties
 
   # callbacks
@@ -129,7 +130,8 @@ class Collection < ApplicationRecord
   end
 
   def all_tag_names
-    (tag_list + items.map(&:tag_list)).uniq
+    # We include item tags because you currently can't search for items
+    (all_tags_list + items.map(&:tag_list)).uniq
   end
 
   def search_content
@@ -316,8 +318,32 @@ class Collection < ApplicationRecord
     cards_linked_to_this_collection.update_all(updated_at: updated_at)
   end
 
+  def owned_tag_list
+    all_tags_list - tag_list
+  end
+
   def cache_tag_list
     self.cached_tag_list = tag_list
+  end
+
+  def cache_owned_tag_list
+    self.cached_owned_tag_list = owned_tag_list
+  end
+
+  def cache_all_tags_list
+    self.cached_all_tags_list = all_tags_list
+  end
+
+  # these all get called from CollectionUpdater
+  def update_cached_tag_lists
+    cache_tag_list if tag_list != cached_tag_list
+    cache_all_tags_list if all_tags_list != cached_all_tags_list
+    cache_owned_tag_list if owned_tag_list != cached_owned_tag_list
+  end
+
+  def display_cover?
+    # overridden in some STI classes
+    true
   end
 
   def cache_cover

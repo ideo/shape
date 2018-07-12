@@ -6,8 +6,6 @@ class Collection
     # allows us to refer to the "created_by" as just the "user"
     alias_attribute :user, :created_by
 
-    after_save :update_user_cached_profiles
-
     def self.find_or_create_for_user(user:, organization:)
       profile = find_or_initialize_by(created_by: user, organization: organization)
       return profile if profile.persisted?
@@ -35,11 +33,11 @@ class Collection
         collection: profile,
       )
       # create the special profile tag for the profile collection
-      # organization.profile_template.tag(
-      #   profile,
-      #   with: 'profile',
-      #   on: :tags,
-      # )
+      organization.profile_template.tag(
+        profile,
+        with: 'profile',
+        on: :tags,
+      )
 
       # replace the first image item with the user's pic_url_square
       profile.collection_cards.where.not(item_id: nil).includes(:item).each do |card|
@@ -68,14 +66,14 @@ class Collection
       # in case they had been shared other cards already, push those after
       uc.reorder_cards!
 
+      profile.reload.update_cached_tag_lists
       profile.cache_cover!
+      profile.update_user_cached_profiles!
       profile
     end
   end
 
-  private
-
-  def update_user_cached_profiles
+  def update_user_cached_profiles!
     user.cached_user_profiles ||= {}
     user.cached_user_profiles[organization_id] = id
     user.save

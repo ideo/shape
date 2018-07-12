@@ -1,5 +1,6 @@
 class Collection
   class MasterTemplate < Collection
+    acts_as_tagger
     has_many :templated_collections,
              class_name: 'Collection',
              foreign_key: :template_id,
