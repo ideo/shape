@@ -1,10 +1,19 @@
 import PropTypes from 'prop-types'
+import { Fragment } from 'react'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 import Dotdotdot from 'react-dotdotdot'
 
 import v from '~/utils/variables'
 import hexToRgba from '~/utils/hexToRgba'
+import ProfileIcon from '~/ui/icons/ProfileIcon'
+
+const IconHolder = styled.span`
+  display: inline-block;
+  height: 27px;
+  vertical-align: text-top;
+  width: 27px;
+`
 
 const StyledCollectionCover = styled.div`
   width: 100%;
@@ -91,6 +100,16 @@ StyledCardContent.displayName = 'StyledCardContent'
 @inject('uiStore')
 @observer
 class CollectionCover extends React.Component {
+  get icon() {
+    const { collection } = this.props
+    if (collection.isUserProfile) {
+      return (<Fragment>&nbsp;
+        <IconHolder><ProfileIcon /></IconHolder>
+      </Fragment>)
+    }
+    return null
+  }
+
   render() {
     const { height, width, collection, uiStore } = this.props
     const { cover } = collection
@@ -111,7 +130,7 @@ class CollectionCover extends React.Component {
           <div className="top">
             <h3>
               <Dotdotdot clamp={height > 1 ? 6 : 3}>
-                {collection.name}
+                {collection.name}{this.icon}
               </Dotdotdot>
             </h3>
           </div>
