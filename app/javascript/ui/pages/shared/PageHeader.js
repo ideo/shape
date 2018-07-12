@@ -11,6 +11,7 @@ import Roles from '~/ui/grid/Roles'
 import RolesSummary from '~/ui/roles/RolesSummary'
 import PageMenu from '~/ui/pages/shared/PageMenu'
 import EditPencilIcon from '~/ui/icons/EditPencilIcon'
+import FilledProfileIcon from '~/ui/icons/FilledProfileIcon'
 import ProfileIcon from '~/ui/icons/ProfileIcon'
 import SystemIcon from '~/ui/icons/SystemIcon'
 import { FixedHeader, MaxWidthContainer } from '~/ui/global/styled/layout'
@@ -116,7 +117,7 @@ class PageHeader extends React.Component {
   get collectionIcon() {
     const { record } = this.props
     if (record.isProfileTemplate) {
-      return <IconHolder align="left"><ProfileIcon /></IconHolder>
+      return <IconHolder align="left"><FilledProfileIcon /></IconHolder>
     }
     return null
   }
