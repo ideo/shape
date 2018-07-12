@@ -61,7 +61,7 @@ const StyledCardContent = styled.div`
   }
   .top, .bottom {
     position: absolute;
-    right: 1rem;
+    right: 1.5rem;
     width: ${props => calcSectionWidth(props)};
     height: ${props => calcSectionHeight(props)};
   }
