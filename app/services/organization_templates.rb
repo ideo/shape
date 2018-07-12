@@ -63,8 +63,8 @@ class OrganizationTemplates < SimpleService
         handle: 'Qs0v5CCTt2DiqlG8grVH',
         mimetype: 'image/png',
         size: 15_945,
-        filename: 'default_profile.png',
-        url: 'https://cdn.filestackcontent.com/Qs0v5CCTt2DiqlG8grVH',
+        filename: 'mustache_man.png',
+        url: 'https://cdn.filestackcontent.com/mgHQ3TGEQ42W2EU82nQ8',
       ),
     )
     text = Item::TextItem.create(
