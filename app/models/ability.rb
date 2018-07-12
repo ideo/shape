@@ -43,8 +43,14 @@ class Ability
       can :edit_content, Collection do |collection|
         collection.can_edit_content?(user)
       end
+      can :edit_name, Collection do |collection|
+        collection.can_edit_content?(user) &&
+          !collection.system_required?
+      end
       can :manage, Collection do |collection|
-        collection.can_edit?(user)
+        collection.can_edit?(user) &&
+          !collection.system_required? &&
+          !collection.pinned_and_locked?
       end
 
       can :create, CollectionCard
@@ -63,7 +69,8 @@ class Ability
         item.can_edit_content?(user)
       end
       can :manage, Item do |item|
-        item.can_edit?(user)
+        item.can_edit?(user) &&
+          !item.pinned_and_locked?
       end
 
       can :create, CommentThread

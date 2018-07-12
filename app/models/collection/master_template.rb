@@ -10,6 +10,10 @@ class Collection
       organization.profile_template_id == id
     end
 
+    def system_required?
+      profile_template?
+    end
+
     # copy all the cards from this template into a new collection
     def setup_templated_collection(for_user:, collection:)
       # TODO: what if the template includes a collection of nested cards?

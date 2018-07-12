@@ -30,7 +30,7 @@ class Api::V1::SearchController < Api::V1::BaseController
   end
 
   def search_collections(query)
-    tags = query.scan(/#\w+/).flatten.map{ |tag| tag.gsub("#", "") }
+    tags = query.scan(/#\w+/).flatten.map { |tag| tag.delete('#') }
     where_clause = {
       organization_id: current_organization.id,
       _or: [
@@ -38,7 +38,7 @@ class Api::V1::SearchController < Api::V1::BaseController
         { group_ids: current_user_current_group_ids },
       ],
     }
-    where_clause[:tags] = {all: tags} if tags.count > 0
+    where_clause[:tags] = { all: tags } if tags.count.positive?
     untagged_query = query.sub(/#\w+\s/, '')
     Collection.search(
       untagged_query,

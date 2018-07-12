@@ -89,7 +89,7 @@ class SearchBar extends React.Component {
   _search = (query) => {
     const { routingStore } = this.props
     if (!query || query === '') return routingStore.leaveSearch()
-    return routingStore.routeTo('search', query.replace('#', '%23'))
+    return routingStore.routeTo('search', query.replace(/#/g, '%23'))
   }
 
   @action updateFocus = (val) => {

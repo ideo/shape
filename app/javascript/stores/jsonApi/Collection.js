@@ -65,9 +65,7 @@ class Collection extends BaseRecord {
 
   get isNormalCollection() {
     return !this.isUserCollection &&
-      !this.isSharedCollection &&
-      !this.isProfileCollection &&
-      !this.isProfileTemplate
+      !this.isSharedCollection
   }
 
   get isRequired() {

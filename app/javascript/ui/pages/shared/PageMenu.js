@@ -59,7 +59,7 @@ class PageMenu extends React.PureComponent {
   }
 
   render() {
-    const { menuOpen, record } = this.props
+    const { menuOpen, record, canEditContent } = this.props
 
     return (
       <Fragment>
@@ -71,7 +71,7 @@ class PageMenu extends React.PureComponent {
           menuOpen={menuOpen}
         />
 
-        <TagEditorModal canEdit={this.props.canEdit} record={record} />
+        <TagEditorModal canEdit={canEditContent} record={record} />
       </Fragment>
     )
   }
@@ -81,11 +81,13 @@ PageMenu.propTypes = {
   record: MobxPropTypes.objectOrObservableObject.isRequired,
   menuOpen: PropTypes.bool,
   canEdit: PropTypes.bool,
+  canEditContent: PropTypes.bool,
   disablePermissions: PropTypes.bool,
 }
 PageMenu.defaultProps = {
   menuOpen: false,
   canEdit: false,
+  canEditContent: false,
   disablePermissions: false,
 }
 

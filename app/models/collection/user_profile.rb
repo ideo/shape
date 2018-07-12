@@ -6,6 +6,10 @@ class Collection
     # allows us to refer to the "created_by" as just the "user"
     alias_attribute :user, :created_by
 
+    def system_required?
+      true
+    end
+
     def self.find_or_create_for_user(user:, organization:)
       profile = find_or_initialize_by(created_by: user, organization: organization)
       return profile if profile.persisted?
@@ -23,10 +27,10 @@ class Collection
       # sort alphabetically by name
       profile_collection.reorder_cards_by_collection_name!
 
-      user.add_role(Role::CONTENT_EDITOR, profile.becomes(Collection))
+      user.add_role(Role::EDITOR, profile.becomes(Collection))
       # add org primary group as viewer... admins also as content editor
       organization.primary_group.add_role(Role::VIEWER, profile.becomes(Collection))
-      organization.admin_group.add_role(Role::CONTENT_EDITOR, profile.becomes(Collection))
+      organization.admin_group.add_role(Role::EDITOR, profile.becomes(Collection))
       # create the templated cards from the Profile Template
       organization.profile_template.setup_templated_collection(
         for_user: user,

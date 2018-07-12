@@ -31,10 +31,10 @@ RSpec.describe OrganizationTemplates, type: :service do
         expect(organization.template_collection.name).to eq("#{organization.name} Templates")
       end
 
-      it 'should add the admin group as the content editor role' do
+      it 'should add the admin group as editor' do
         expect(
           organization.admin_group.has_role?(
-            Role::CONTENT_EDITOR,
+            Role::EDITOR,
             organization.template_collection,
           ),
         ).to be true
@@ -64,6 +64,10 @@ RSpec.describe OrganizationTemplates, type: :service do
             profile_template.items.last,
           ),
         ).to be true
+      end
+
+      it 'should add the #template tag' do
+        expect(profile_template.cached_owned_tag_list).to match_array(['template'])
       end
 
       it 'should create a image item and a text item' do

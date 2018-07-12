@@ -41,11 +41,9 @@ describe Collection::UserProfile, type: :model do
       expect(user_profile.name).to eq user.name
     end
 
-    it 'should set the user as content editor of profile and items' do
-      expect(user_profile.can_edit?(user)).to be false
-      expect(user_profile.can_edit_content?(user)).to be true
-      expect(user_profile.collection_cards.first.record.can_edit?(user)).to be false
-      expect(user_profile.collection_cards.first.record.can_edit_content?(user)).to be true
+    it 'should set the user as editor of profile and items' do
+      expect(user_profile.can_edit?(user)).to be true
+      expect(user_profile.collection_cards.first.record.can_edit?(user)).to be true
     end
 
     it 'should copy the pinned status of the template cards' do

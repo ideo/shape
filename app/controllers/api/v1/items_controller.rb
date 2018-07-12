@@ -53,11 +53,7 @@ class Api::V1::ItemsController < Api::V1::BaseController
 
   def load_and_authorize_item_update
     @item = Item.find(params[:id])
-    if item_params[:name].present? && item_params[:name] != @item.name
-      authorize! :manage, @item
-    else
-      authorize! :edit_content, @item
-    end
+    authorize! :edit_content, @item
   end
 
   def item_params

@@ -6,6 +6,10 @@ class SerializableCollection < BaseJsonSerializer
   attributes :id, :created_at, :updated_at, :name, :organization_id
   has_one :parent_collection_card
 
+  attribute :system_required do
+    @object.system_required?
+  end
+
   attribute :tag_list do
     @object.cached_tag_list || []
   end
@@ -59,6 +63,11 @@ class SerializableCollection < BaseJsonSerializer
 
   attribute :is_profile_collection do
     @object.profiles?
+  end
+
+  attribute :pinned_and_locked do
+    # might be nil, particularly in tests
+    @object.pinned_and_locked? || false
   end
 
   has_many :roles
