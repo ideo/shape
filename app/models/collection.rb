@@ -334,6 +334,18 @@ class Collection < ApplicationRecord
     self.cached_all_tags_list = all_tags_list
   end
 
+  # these all get called from CollectionUpdater
+  def update_cached_tag_lists
+    cache_tag_list if tag_list != cached_tag_list
+    cache_all_tags_list if all_tags_list != cached_all_tags_list
+    cache_owned_tag_list if owned_tag_list != cached_owned_tag_list
+  end
+
+  def display_cover?
+    # overridden in some STI classes
+    true
+  end
+
   def cache_cover
     self.cached_cover = CollectionCover.call(self)
   end

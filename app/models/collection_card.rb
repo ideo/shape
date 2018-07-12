@@ -176,7 +176,7 @@ class CollectionCard < ApplicationRecord
 
   def should_update_parent_collection_cover?
     collection = try(:parent)
-    return unless collection.present? && collection.base_collection_type?
+    return unless collection.present? && collection.display_cover?
     cover = collection.cached_cover
     cover.blank? ||
       cover['card_ids'].blank? ||

@@ -24,7 +24,7 @@ describe Collection::UserProfile, type: :model do
   end
 
   context 'callbacks' do
-    describe 'update_user_cached_profiles' do
+    describe 'update_user_cached_profiles!' do
       it 'should set the user.cached_user_profiles attribute' do
         expect(user.cached_user_profiles).not_to be nil
         expect(user.cached_user_profiles[organization.id.to_s]).to eq user_profile.id
@@ -67,6 +67,10 @@ describe Collection::UserProfile, type: :model do
       expect(
         user.current_user_collection.collection_cards.last.is_a?(CollectionCard::Link),
       ).to be true
+    end
+
+    it 'should add the #profile tag' do
+      expect(user_profile.cached_owned_tag_list).to match_array(['profile'])
     end
   end
 end

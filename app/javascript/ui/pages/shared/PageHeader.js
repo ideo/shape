@@ -10,7 +10,6 @@ import EditableName from '~/ui/pages/shared/EditableName'
 import Roles from '~/ui/grid/Roles'
 import RolesSummary from '~/ui/roles/RolesSummary'
 import PageMenu from '~/ui/pages/shared/PageMenu'
-import EditPencilIcon from '~/ui/icons/EditPencilIcon'
 import ProfileIcon from '~/ui/icons/ProfileIcon'
 import { FixedHeader, MaxWidthContainer } from '~/ui/global/styled/layout'
 import { SubduedHeading1 } from '~/ui/global/styled/typography'
@@ -32,20 +31,6 @@ const IconHolder = styled.span`
   margin-top: 16px;
   width: 30px;
 `
-
-const EditIconHolder = styled.button`
-  &.edit-icon {
-    cursor: pointer;
-    display: none;
-    margin-top: 20px;
-    margin-left: 15px;
-    svg {
-      fill: ${v.colors.gray};
-      width: 20px;
-    }
-  }
-`
-EditIconHolder.displayName = 'EditIconHolder'
 
 @inject('uiStore')
 @observer
@@ -121,9 +106,7 @@ class PageHeader extends React.Component {
 
   get collectionTypeOrInheritedTags() {
     const { record } = this.props
-    if (record.isMasterTemplate) {
-      return <SubduedHeading1>#template</SubduedHeading1>
-    } else if (record.inherited_tag_list.length) {
+    if (record.inherited_tag_list.length) {
       return (
         <SubduedHeading1>
           { record.inherited_tag_list.map(tag => `#${tag}`).join(',') }
@@ -146,10 +129,9 @@ class PageHeader extends React.Component {
           <div>
             <StyledTitleAndRoles
               className={record.isCurrentUserProfile ? 'user-profile' : ''}
-              onClick={this.handleTitleClick}
               justify="space-between"
             >
-              <Box className="title">
+              <Box className="title" onClick={this.handleTitleClick}>
                 { this.collectionIcon }
                 <EditableName
                   name={record.name}
@@ -157,11 +139,6 @@ class PageHeader extends React.Component {
                   canEdit={this.canEdit}
                 />
                 { this.collectionTypeOrInheritedTags }
-                { record.isCurrentUserProfile && (
-                  <EditIconHolder className="edit-icon">
-                    <EditPencilIcon />
-                  </EditIconHolder>
-                )}
                 { this.collectionTypeName }
               </Box>
               <Flex align="flex-end" style={{ height: '60px', marginTop: '-10px' }}>
