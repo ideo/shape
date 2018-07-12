@@ -151,8 +151,8 @@ class PageHeader extends React.Component {
                   updateNameHandler={this.updateRecordName}
                   canEdit={this.canEdit}
                 />
-                { this.collectionTypeOrInheritedTags }
                 { this.collectionTypeIcon }
+                { this.collectionTypeOrInheritedTags }
               </Box>
               <Flex align="flex-end" style={{ height: '60px', marginTop: '-10px' }}>
                 <Fragment>
