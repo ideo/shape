@@ -2,6 +2,7 @@ import PropTypes from 'prop-types'
 import { Fragment } from 'react'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import { Flex, Box } from 'reflexbox'
+import styled from 'styled-components'
 
 import ActivityLogButton from '~/ui/notifications/ActivityLogButton'
 import Breadcrumb from '~/ui/layout/Breadcrumb'
@@ -9,14 +10,29 @@ import EditableName from '~/ui/pages/shared/EditableName'
 import Roles from '~/ui/grid/Roles'
 import RolesSummary from '~/ui/roles/RolesSummary'
 import PageMenu from '~/ui/pages/shared/PageMenu'
+import FilledProfileIcon from '~/ui/icons/FilledProfileIcon'
+import ProfileIcon from '~/ui/icons/ProfileIcon'
+import SystemIcon from '~/ui/icons/SystemIcon'
 import { FixedHeader, MaxWidthContainer } from '~/ui/global/styled/layout'
+import { SubduedHeading1 } from '~/ui/global/styled/typography'
 import { StyledTitleAndRoles } from '~/ui/pages/shared/styled'
 import v from '~/utils/variables'
+
+/* global IdeoSSO */
 
 // NOTE: Header and PageHeader create sibling <header> elements on the page
 const FixedPageHeader = FixedHeader.extend`
   top: ${v.globalHeaderHeight}px;
   z-index: ${v.zIndex.pageHeader};
+`
+
+const IconHolder = styled.span`
+  color: ${v.colors.cloudy};
+  display: inline-block;
+  height: 30px;
+  ${props => (props.align === 'left' ? 'margin-right: 10px;' : 'margin-left: 10px;')}
+  margin-top: 16px;
+  width: 30px;
 `
 
 @inject('uiStore')
@@ -42,6 +58,13 @@ class PageHeader extends React.Component {
     const { record } = this.props
     record.name = name
     record.save()
+  }
+
+  handleTitleClick = () => {
+    const { record } = this.props
+    if (record.isCurrentUserProfile) {
+      window.open(IdeoSSO.profileUrl, '_blank')
+    }
   }
 
   get actions() {
@@ -76,6 +99,35 @@ class PageHeader extends React.Component {
     return elements
   }
 
+  get collectionIcon() {
+    const { record } = this.props
+    if (record.isProfileTemplate) {
+      return <IconHolder align="left"><FilledProfileIcon /></IconHolder>
+    }
+    return null
+  }
+
+  get collectionTypeOrInheritedTags() {
+    const { record } = this.props
+    if (record.inherited_tag_list.length) {
+      return (
+        <SubduedHeading1>
+          { record.inherited_tag_list.map(tag => `#${tag}`).join(',') }
+        </SubduedHeading1>)
+    }
+    return null
+  }
+
+  get collectionTypeIcon() {
+    const { record } = this.props
+    if (record.isUserProfile) {
+      return <IconHolder align="right"><ProfileIcon /></IconHolder>
+    } else if (record.isProfileCollection) {
+      return <IconHolder align="right"><SystemIcon /></IconHolder>
+    }
+    return null
+  }
+
   render() {
     const { record, isHomepage } = this.props
     const breadcrumb = isHomepage ? [] : record.breadcrumb
@@ -88,13 +140,19 @@ class PageHeader extends React.Component {
           />
           <Breadcrumb items={breadcrumb} />
           <div>
-            <StyledTitleAndRoles justify="space-between">
-              <Box className="title">
+            <StyledTitleAndRoles
+              className={record.isCurrentUserProfile ? 'user-profile' : ''}
+              justify="space-between"
+            >
+              <Box className="title" onClick={this.handleTitleClick}>
+                { this.collectionIcon }
                 <EditableName
                   name={record.name}
                   updateNameHandler={this.updateRecordName}
                   canEdit={this.canEdit}
                 />
+                { this.collectionTypeIcon }
+                { this.collectionTypeOrInheritedTags }
               </Box>
               <Flex align="flex-end" style={{ height: '60px', marginTop: '-10px' }}>
                 <Fragment>

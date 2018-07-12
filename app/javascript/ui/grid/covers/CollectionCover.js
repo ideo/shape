@@ -9,7 +9,7 @@ import hexToRgba from '~/utils/hexToRgba'
 const StyledCollectionCover = styled.div`
   width: 100%;
   height: 100%;
-  background: ${props => (props.isSharedCollection ? v.colors.sirocco : v.colors.gray)};
+  background: ${props => (props.isSpecialCollection ? v.colors.sirocco : v.colors.gray)};
   color: white;
   position: relative;
   overflow: hidden;
@@ -99,7 +99,7 @@ class CollectionCover extends React.Component {
     return (
       <StyledCollectionCover
         url={cover.image_url}
-        isSharedCollection={collection.isSharedCollection}
+        isSpecialCollection={collection.isSpecialCollection}
       >
         <StyledCardContent
           height={height}

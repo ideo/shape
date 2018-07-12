@@ -10,7 +10,9 @@
     "thumbnail_url": { "type": ["string", "null"] },
     "breadcrumb": { "type": ["array", "null"] },
     "can_edit": { "type": ["boolean"] },
+    "can_edit_content": { "type": ["boolean"] },
     "tag_list": { "type": ["array", "null"] },
+    "inherited_tag_list": { "type": ["array", "null"] },
     "filestack_file_url": { "type": ["string", "null"] }
   },
   "required": ["id", "type"]

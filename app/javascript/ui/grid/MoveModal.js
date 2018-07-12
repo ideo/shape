@@ -1,13 +1,14 @@
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
-import { observable, action, runInAction } from 'mobx'
+import { observable, runInAction } from 'mobx'
 import styled from 'styled-components'
+import Snackbar from '@material-ui/core/Snackbar'
+import SnackbarContent from '@material-ui/core/SnackbarContent'
 
+import Tooltip from '~/ui/global/Tooltip'
 import v from '~/utils/variables'
 import CloseIcon from '~/ui/icons/CloseIcon'
 import InlineLoader from '~/ui/layout/InlineLoader'
 import MoveArrowIcon from '~/ui/icons/MoveArrowIcon'
-import Snackbar, { SnackbarContent } from 'material-ui/Snackbar'
-import Tooltip from '~/ui/global/Tooltip'
 
 const StyledSnackbar = styled(Snackbar)`
   &.Snackbar {
@@ -82,13 +83,18 @@ class MoveModal extends React.Component {
 
   moveCards = async (placement) => {
     const { uiStore, apiStore } = this.props
+    const { viewingCollection } = uiStore
     // Viewing collection might not be set, such as on the search page
-    if (!uiStore.viewingCollection) {
+    if (!viewingCollection) {
       uiStore.alert('You can\'t move an item here')
       return
     }
-    const collectionId = uiStore.viewingCollection.id
-    if (!uiStore.viewingCollection.can_edit) {
+    const collectionId = viewingCollection.id
+    const movingFromCollection = apiStore.find('collections', uiStore.movingFromCollectionId)
+    if (!viewingCollection.can_edit_content || (
+      // don't allow moving cards from templates to non-templates
+      movingFromCollection.isMasterTemplate && !viewingCollection.isMasterTemplate
+    )) {
       uiStore.alert('You don\'t have permission to move items to this collection')
       return
     }

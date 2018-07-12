@@ -10,6 +10,10 @@ class SerializableCollection < BaseJsonSerializer
     @object.cached_tag_list || []
   end
 
+  attribute :inherited_tag_list do
+    @object.cached_owned_tag_list || []
+  end
+
   attribute :cover do
     @object.cached_cover || {}
   end
@@ -39,6 +43,22 @@ class SerializableCollection < BaseJsonSerializer
 
   attribute :can_edit do
     @current_ability.can?(:edit, @object)
+  end
+
+  attribute :can_edit_content do
+    @current_ability.can?(:edit_content, @object)
+  end
+
+  attribute :is_org_template_collection do
+    @object.org_templates?
+  end
+
+  attribute :is_profile_template do
+    @object.profile_template?
+  end
+
+  attribute :is_profile_collection do
+    @object.profiles?
   end
 
   has_many :roles

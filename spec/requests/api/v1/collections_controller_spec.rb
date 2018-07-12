@@ -26,7 +26,7 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
       collection.recalculate_breadcrumb!
       get(path)
       expect(json['data']['attributes']['breadcrumb']).to match_array([
-        ['collections', collection.id, collection.name]
+        ['collections', collection.id, collection.name],
       ])
     end
 
@@ -121,40 +121,13 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
     end
   end
 
-  describe 'GET #me' do
-    let!(:organization) { user.current_organization }
-    let!(:org_2) { create(:organization, member: user) }
-    let(:path) { '/api/v1/collections/me' }
-    let(:user_collection) { user.collections.user.where(organization_id: organization.id).first }
-    let(:shared_with_me_collection) { user_collection.collections.shared_with_me.first }
-    let(:collection_cards_json) { json_included_objects_of_type('collection_cards') }
-    let(:collections_json) { json_included_objects_of_type('collections') }
-
-    it 'returns a 200' do
-      get(path)
-      expect(response.status).to eq(200)
-    end
-
-    it 'returns their user collection for this org' do
-      get(path)
-      expect(json['data']['attributes']['id']).to eq(user_collection.id)
-    end
-
-    it 'includes the shared-with-me subcollection' do
-      get(path)
-      expect(collections_json.first['id'].to_i).to eq(shared_with_me_collection.id)
-    end
-  end
-
   describe 'POST #create' do
     let!(:organization) { create(:organization) }
     let(:path) { "/api/v1/organizations/#{organization.id}/collections" }
     let(:params) {
       json_api_params(
         'collections',
-        {
-          'name': 'What a wonderful life'
-        }
+        name: 'What a wonderful life',
       )
     }
 
@@ -175,7 +148,7 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
     end
 
     context 'with errors' do
-      let(:path) { "/api/v1/collections" }
+      let(:path) { '/api/v1/collections' }
 
       it 'returns a 400' do
         # because of the new path, will get an "organization can't be blank" error
@@ -197,20 +170,56 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
         name: 'Who let the dogs out?',
         collection_cards_attributes: [
           {
-            id: collection_card.id, order: 1, width: 3
-          }
-        ]
+            id: collection_card.id,
+            order: 1,
+            width: 3,
+          },
+        ],
       }
     }
     let(:params) {
       json_api_params(
         'collections',
-        raw_params
+        raw_params,
       )
     }
 
     before do
       user.add_role(Role::VIEWER, collection_card.item)
+    end
+
+    context 'as content editor' do
+      before do
+        user.remove_role(Role::EDITOR, collection)
+        user.add_role(Role::CONTENT_EDITOR, collection)
+      end
+
+      context 'updating collection attributes' do
+        it 'returns a 401' do
+          patch(path, params: params)
+          expect(response.status).to eq(401)
+        end
+      end
+
+      context 'updating collection cards attributes' do
+        let(:raw_params) {
+          {
+            id: collection.id,
+            collection_cards_attributes: [
+              {
+                id: collection_card.id,
+                order: 1,
+                width: 3,
+              },
+            ],
+          }
+        }
+
+        it 'returns a 200' do
+          patch(path, params: params)
+          expect(response.status).to eq(200)
+        end
+      end
     end
 
     it 'returns a 200' do
@@ -242,7 +251,7 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
         json_api_params(
           'collections',
           raw_params,
-          { cancel_sync: true }
+          cancel_sync: true,
         )
       }
 
@@ -298,6 +307,7 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
     context 'without edit access' do
       before do
         user.remove_role(Role::EDITOR, collection)
+        user.add_role(Role::CONTENT_EDITOR, collection)
       end
 
       it 'rejects non-editors' do

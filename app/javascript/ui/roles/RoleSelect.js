@@ -1,7 +1,7 @@
 import _ from 'lodash'
 import PropTypes from 'prop-types'
 import { PropTypes as MobxPropTypes } from 'mobx-react'
-import { MenuItem } from 'material-ui/Menu'
+import MenuItem from '@material-ui/core/MenuItem'
 import styled from 'styled-components'
 import {
   DisplayText,
@@ -39,10 +39,10 @@ const DisplayTextPadded = DisplayText.extend`
 `
 
 class RoleSelect extends React.Component {
-  get isGuestGroup() {
+  get isGuestOrAdminGroup() {
     const { role } = this.props
     if (role.resource && role.resource.internalType === 'groups') {
-      return role.resource.is_guest
+      return role.resource.isGuestOrAdmin
     }
     return false
   }
@@ -79,7 +79,9 @@ class RoleSelect extends React.Component {
 
   onRoleSelect = (ev) => {
     ev.preventDefault()
-    return this.deleteRole().then(() => this.createRole(ev.target.value))
+    // switching the dropdown calls a delete and then create role
+    return this.deleteRole().then(() =>
+      this.createRole(ev.target.value))
   }
 
   createRole(roleName, isSwitching = true) {
@@ -113,7 +115,7 @@ class RoleSelect extends React.Component {
   render() {
     const { enabled, role, roleTypes, entity } = this.props
     let select
-    if (!this.isGuestGroup && enabled) {
+    if (!this.isGuestOrAdminGroup && enabled) {
       select = (
         <Select
           classes={{ root: 'select', selectMenu: 'selectMenu' }}
@@ -150,6 +152,8 @@ class RoleSelect extends React.Component {
             key={entity.id}
             url={url}
             size={38}
+            // user_profile_collection_id will be null if its a group
+            linkToCollectionId={entity.user_profile_collection_id}
           />
         </span>
         <RowItemLeft>

@@ -19,6 +19,7 @@ describe Collection, type: :model do
     it { should have_one :parent_collection_card }
     it { should belong_to :cloned_from }
     it { should belong_to :organization }
+    it { should belong_to :template }
 
     describe '#collection_cards' do
       let!(:collection) { create(:collection, num_cards: 5) }
@@ -109,6 +110,15 @@ describe Collection, type: :model do
 
     it 'does not duplicate if no flag passed' do
       expect(duplicate.parent_collection_card).to be_nil
+    end
+
+    context 'with archived collection' do
+      let!(:collection) { create(:collection, num_cards: 5, archived: true, tag_list: %w[Prototype Other]) }
+
+      it 'creates a duplicate that is not archived' do
+        expect(collection.archived?).to be true
+        expect(duplicate.archived?).to be false
+      end
     end
 
     context 'with copy_parent_card true' do

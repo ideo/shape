@@ -1,6 +1,6 @@
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import { Switch, Route, withRouter } from 'react-router-dom'
-import { MuiThemeProvider, createMuiTheme } from 'material-ui/styles'
+import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles'
 import WindowSizeListener from 'react-window-size-listener'
 import styled from 'styled-components'
 

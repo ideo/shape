@@ -30,6 +30,14 @@ describe Organization, type: :model do
       end
     end
 
+    describe '#initialize_admin_group' do
+      it 'should create admin group with same name as org + Admins' do
+        expect(organization.admin_group.persisted?).to be true
+        expect(organization.admin_group.name).to eq("#{organization.name} Admins")
+        expect(organization.admin_group.handle).to eq("#{organization.name.parameterize}-admins")
+      end
+    end
+
     describe '#update_group_names' do
       it 'should update primary group if name changes' do
         expect(organization.primary_group.name).not_to eq('Org 2.0')
@@ -41,6 +49,12 @@ describe Organization, type: :model do
         expect(organization.guest_group.name).not_to eq('Org 2.0 Guests')
         organization.update_attributes(name: 'Org 2.0')
         expect(organization.guest_group.reload.name).to eq('Org 2.0 Guests')
+      end
+
+      it 'should update admin group if name changes' do
+        expect(organization.admin_group.name).not_to eq('Org 2.0 Admins')
+        organization.update_attributes(name: 'Org 2.0')
+        expect(organization.admin_group.reload.name).to eq('Org 2.0 Admins')
       end
     end
 

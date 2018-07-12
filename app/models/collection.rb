@@ -3,8 +3,9 @@ class Collection < ApplicationRecord
   include Resourceable
   include Archivable
   include HasActivities
-  resourceable roles: [Role::EDITOR, Role::VIEWER],
+  resourceable roles: [Role::EDITOR, Role::CONTENT_EDITOR, Role::VIEWER],
                edit_role: Role::EDITOR,
+               content_edit_role: Role::CONTENT_EDITOR,
                view_role: Role::VIEWER
 
   archivable as: :parent_collection_card,
@@ -13,7 +14,9 @@ class Collection < ApplicationRecord
   acts_as_taggable
 
   store_accessor :cached_attributes,
-                 :cached_cover, :cached_tag_list
+                 :cached_cover, :cached_tag_list, :cached_all_tags_list,
+                 :cached_owned_tag_list,
+                 :cached_org_properties
 
   # callbacks
   after_save :touch_related_cards, if: :saved_change_to_updated_at?
@@ -67,6 +70,9 @@ class Collection < ApplicationRecord
   has_many :items_and_linked_items,
            through: :collection_cards,
            source: :item
+  has_many :collections_and_linked_collections,
+           through: :collection_cards,
+           source: :collection
 
   has_one :comment_thread, as: :record, dependent: :destroy
 
@@ -75,6 +81,7 @@ class Collection < ApplicationRecord
   belongs_to :organization
   belongs_to :cloned_from, class_name: 'Collection', optional: true
   belongs_to :created_by, class_name: 'User', optional: true
+  belongs_to :template, class_name: 'Collection::MasterTemplate', optional: true
 
   validates :name, presence: true, if: :base_collection_type?
   before_validation :inherit_parent_organization_id, on: :create
@@ -123,7 +130,8 @@ class Collection < ApplicationRecord
   end
 
   def all_tag_names
-    (tag_list + items.map(&:tag_list)).uniq
+    # We include item tags because you currently can't search for items
+    (all_tags_list + items.map(&:tag_list)).uniq
   end
 
   def search_content
@@ -156,7 +164,7 @@ class Collection < ApplicationRecord
   end
 
   # similar to above but requires `collection/item` instead of `record`
-  def self.default_relationships_for_cache_query
+  def self.default_relationships_for_query
     [
       :created_by,
       roles: %i[users groups resource],
@@ -170,6 +178,8 @@ class Collection < ApplicationRecord
 
   amoeba do
     enable
+    # propagate to STI models
+    propagate
     nullify :breadcrumb
     nullify :created_by_id
     nullify :organization_id
@@ -178,7 +188,12 @@ class Collection < ApplicationRecord
     recognize []
   end
 
-  def duplicate!(for_user:, copy_parent_card: false, parent: self.parent)
+  def duplicate!(
+    for_user:,
+    copy_parent_card: false,
+    parent: self.parent,
+    from_template: false
+  )
     # Clones collection and all embedded items/collections
     c = amoeba_dup
     c.cloned_from = self
@@ -206,12 +221,12 @@ class Collection < ApplicationRecord
     parent.roles.each do |role|
       c.roles << role.duplicate!(assign_resource: c)
     end
-    # NOTE: different from parent_is_user_collection? since `parent` is passed in
+    # NOTE: different from `parent_is_user_collection?` since `parent` is passed in
     if parent.is_a? Collection::UserCollection
       c.allow_primary_group_view_access
     end
-    # make sure duplicate creator becomes an editor
-    for_user.upgrade_to_editor_role(c)
+    # upgrade to editor unless we're setting up a templated collection
+    for_user.upgrade_to_edit_role(c) unless from_template
 
     CollectionCardDuplicationWorker.perform_async(
       collection_cards.map(&:id),
@@ -225,6 +240,10 @@ class Collection < ApplicationRecord
 
   def children
     (items + collections)
+  end
+
+  def children_and_linked_children
+    (items_and_linked_items + collections_and_linked_collections)
   end
 
   def searchable?
@@ -273,7 +292,13 @@ class Collection < ApplicationRecord
 
   # convenience method if card order ever gets out of sync
   def reorder_cards!
-    collection_cards.each_with_index do |card, i|
+    all_collection_cards.active.order(pinned: :desc, order: :asc).each_with_index do |card, i|
+      card.update_attribute(:order, i) unless card.order == i
+    end
+  end
+
+  def reorder_cards_by_collection_name!
+    all_collection_cards.active.includes(:collection).order('collections.name ASC').each_with_index do |card, i|
       card.update_attribute(:order, i) unless card.order == i
     end
   end
@@ -293,8 +318,32 @@ class Collection < ApplicationRecord
     cards_linked_to_this_collection.update_all(updated_at: updated_at)
   end
 
+  def owned_tag_list
+    all_tags_list - tag_list
+  end
+
   def cache_tag_list
     self.cached_tag_list = tag_list
+  end
+
+  def cache_owned_tag_list
+    self.cached_owned_tag_list = owned_tag_list
+  end
+
+  def cache_all_tags_list
+    self.cached_all_tags_list = all_tags_list
+  end
+
+  # these all get called from CollectionUpdater
+  def update_cached_tag_lists
+    cache_tag_list if tag_list != cached_tag_list
+    cache_all_tags_list if all_tags_list != cached_all_tags_list
+    cache_owned_tag_list if owned_tag_list != cached_owned_tag_list
+  end
+
+  def display_cover?
+    # overridden in some STI classes
+    true
   end
 
   def cache_cover
@@ -317,6 +366,18 @@ class Collection < ApplicationRecord
 
   def parent_is_user_collection?
     parent.is_a? Collection::UserCollection
+  end
+
+  def org_templates?
+    false
+  end
+
+  def profiles?
+    false
+  end
+
+  def profile_template?
+    false
   end
 
   def cache_key

@@ -284,10 +284,10 @@ class GridCardBlank extends React.Component {
     const card = new CollectionCard(attrs, apiStore)
     card.parent = parent // Assign parent so store can get access to it
     this.setState({ loading: true }, async () => {
-      await card.API_create({ isReplacing })
       if (isReplacing) {
-        const cardToReplace = apiStore.find('collection_cards', replacingId)
-        await cardToReplace.API_archive({ isReplacing })
+        await card.API_replace({ replacingId })
+      } else {
+        await card.API_create()
       }
       // NOTE: closeBlankContentTool() will automatically get called
       // in CollectionCard after the async actions are complete

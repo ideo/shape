@@ -16,6 +16,7 @@ RSpec.describe RemoveUserRolesFromOrganizationWorker, type: :worker do
       end
       user.add_role(Role::EDITOR, orphaned_item)
       user.add_role(Role::MEMBER, group)
+      user.add_role(Role::ADMIN, organization.admin_group)
       RemoveUserRolesFromOrganizationWorker.new.perform(
         organization.id,
         user.id,
@@ -38,6 +39,7 @@ RSpec.describe RemoveUserRolesFromOrganizationWorker, type: :worker do
 
     it 'should remove all user roles from groups' do
       expect(user.has_role?(Role::MEMBER, group)).to be false
+      expect(user.has_role?(Role::ADMIN, organization.admin_group)).to be false
     end
   end
 end

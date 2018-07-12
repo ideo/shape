@@ -1,4 +1,3 @@
-import PropTypes from 'prop-types'
 import styled from 'styled-components'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import { Flex, Box } from 'reflexbox'
@@ -7,6 +6,7 @@ import Logo from '~/ui/layout/Logo'
 import PlainLink from '~/ui/global/PlainLink'
 import SearchBar from '~/ui/layout/SearchBar'
 import Avatar from '~/ui/global/Avatar'
+import ProfileIcon from '~/ui/icons/ProfileIcon'
 import SettingsIcon from '~/ui/icons/SettingsIcon'
 import OrganizationDropdown from '~/ui/organizations/OrganizationDropdown'
 import LeaveIcon from '~/ui/icons/LeaveIcon'
@@ -56,6 +56,11 @@ class Header extends React.Component {
     this.setState({ userDropdownOpen: open })
   }
 
+  handleMyProfile = () => {
+    const { apiStore, routingStore } = this.props
+    routingStore.routeTo('collections', apiStore.currentUser.user_profile_collection_id)
+  }
+
   handleAccountSettings = () => {
     window.open(IdeoSSO.profileUrl, '_blank')
   }
@@ -85,11 +90,18 @@ class Header extends React.Component {
   }
 
   get userMenuItems() {
-    return [
+    const { apiStore } = this.props
+    const items = [
       { name: 'Account Settings', icon: <SettingsIcon />, onClick: this.handleAccountSettings },
       { name: 'Notification Settings', icon: <SettingsIcon />, onClick: this.handleNotificationSettings },
       { name: 'Logout', icon: <LeaveIcon />, onClick: this.handleLogout },
     ]
+    if (apiStore.currentUser.user_profile_collection_id) {
+      items.unshift(
+        { name: 'My Profile', icon: <ProfileIcon />, onClick: this.handleMyProfile }
+      )
+    }
+    return items
   }
 
   get renderOrgDropdown() {

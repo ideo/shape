@@ -40,6 +40,9 @@ class Ability
       can %i[read duplicate], Collection do |collection|
         collection.can_view?(user)
       end
+      can :edit_content, Collection do |collection|
+        collection.can_edit_content?(user)
+      end
       can :manage, Collection do |collection|
         collection.can_edit?(user)
       end
@@ -55,6 +58,9 @@ class Ability
       can :create, Item
       can %i[read duplicate], Item do |item|
         item.can_view?(user)
+      end
+      can :edit_content, Item do |item|
+        item.can_edit_content?(user)
       end
       can :manage, Item do |item|
         item.can_edit?(user)

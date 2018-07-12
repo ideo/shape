@@ -34,6 +34,10 @@ describe('OrganizationMenu', () => {
         guest_group: {
           id: 11,
           is_guest: true,
+        },
+        admin_group: {
+          id: 12,
+          is_admin: true,
         }
       },
       userGroups: [

@@ -18,7 +18,32 @@ module RolifyExtensions
         raise "RolifyExtension: Unsupported model '#{self.class.name}' for cached_roles_by_identifier"
       end
     end
-    @has_role_by_identifier[[role_name, resource_identifier]]
+    @has_role_by_identifier[[role_name.to_s, resource_identifier]]
+  end
+
+  def precache_roles_for(role_names, resources)
+    return unless @has_role_by_identifier.present? && is_a?(User)
+    resource_identifiers = resources.map(&:resource_identifier)
+    roles = rolify_roles.where(
+      name: role_names,
+      resource_identifier: resource_identifiers,
+    )
+    roles += role_via_org_groups(role_names, resource_identifiers)
+
+    found = {}
+    roles.each do |role|
+      @has_role_by_identifier[[role.name, role.resource_identifier]] = true
+      found[[role.name, role.resource_identifier]] = true
+    end
+    role_names.each do |role_name|
+      resource_identifiers.each do |r|
+        unless found[[role_name.to_s, r]]
+          @has_role_by_identifier[[role_name.to_s, r]] = false
+        end
+      end
+    end
+
+    @has_role_by_identifier
   end
 
   # Override rolify `has_role?` and `add_role` methods to ensure
@@ -61,14 +86,14 @@ module RolifyExtensions
 
   def add_resource_role(role, resource)
     existing = existing_resource_role_for_self(role)
-    # if we're adding someone as editor who's previously a viewer
+    # if we're adding someone as editor/admin who's previously a different role
     should_upgrade = (
-      role.name.to_sym == Role::EDITOR &&
+      role.name.to_sym == resource.class.edit_role &&
       existing &&
-      existing.name.to_sym == Role::VIEWER
+      existing.name.to_sym != resource.class.edit_role
     )
     # this will re-start the add_role process, after first removing user's viewer role
-    return upgrade_to_editor_role(resource) if should_upgrade
+    return upgrade_to_edit_role(resource) if should_upgrade
     return existing if existing.present?
     if is_a?(User)
       role.users << self
@@ -77,6 +102,7 @@ module RolifyExtensions
     else
       raise "RolifyExtension: Unsupported model '#{self.class.name}' for add_role"
     end
+    sync_groups_after_adding(role) if is_a?(User)
     after_role_update(role)
     role
   end
@@ -93,6 +119,7 @@ module RolifyExtensions
     else
       raise "RolifyExtension: Unsupported model '#{self.class.name}' for remove_role"
     end
+    sync_groups_after_removing(role) if is_a?(User)
     after_role_update(role)
     role
   end
@@ -114,12 +141,16 @@ module RolifyExtensions
     found
   end
 
-  def upgrade_to_editor_role(resource)
+  def upgrade_to_edit_role(resource)
     return unless is_a? User
-    role = Role.for_resource(resource).where(name: Role::VIEWER).first
-    # `remove_role` will too aggressively destroy the entire role, so just remove the user
-    role.users.destroy(self) if role.present?
-    add_role(Role::EDITOR, resource)
+    other_roles = Role
+                  .for_resource(resource)
+                  .where.not(name: resource.class.edit_role)
+    other_roles.each do |role|
+      # `remove_role` will too aggressively destroy the entire role, so just remove the user
+      role.users.destroy(self) if role.present?
+    end
+    add_role(resource.class.edit_role, resource)
   end
 
   def reset_cached_roles!

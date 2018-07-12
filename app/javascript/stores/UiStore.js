@@ -160,7 +160,7 @@ export default class UiStore {
   @action openGroup(groupId) {
     this.organizationMenuPage = 'editRoles'
     this.organizationMenuGroupId = groupId
- }
+  }
 
   // --- grid properties
   @computed get gridMaxW() {
@@ -328,9 +328,10 @@ export default class UiStore {
     this.expandedThreadKey = key
   }
 
+  // after performing an action (event), track following the record for notifications
   trackEvent(event, record) {
     this.trackRecord(record.identifier)
-    if (record.internalType === 'items') {
+    if (record.internalType === 'items' && record.parent) {
       this.trackRecord(record.parent.identifier)
     }
   }

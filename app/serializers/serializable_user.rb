@@ -9,4 +9,9 @@ class SerializableUser < BaseJsonSerializer
   has_many :groups do
     data { @object.current_org_groups_and_special_groups }
   end
+
+  attribute :user_profile_collection_id do
+    hash = @object.cached_user_profiles || {}
+    hash[@current_user.current_organization_id.to_s]
+  end
 end

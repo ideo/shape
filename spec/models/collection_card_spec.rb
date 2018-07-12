@@ -90,6 +90,25 @@ RSpec.describe CollectionCard, type: :model do
       duplicate
     end
 
+    context 'with pinned card from regular collection' do
+      let!(:collection_card) { create(:collection_card_text, pinned: true) }
+
+      it 'should set pinned to false on the duplicate' do
+        expect(collection_card.pinned?).to be true
+        expect(duplicate.pinned?).to be false
+      end
+    end
+
+    context 'with pinned card from master template' do
+      let(:template) { create(:master_template) }
+      let!(:collection_card) { create(:collection_card_text, pinned: true, parent: template) }
+
+      it 'should set pinned to true on the duplicate' do
+        expect(collection_card.pinned?).to be true
+        expect(duplicate.pinned?).to be true
+      end
+    end
+
     context 'with linked card and duplicate_linked_records = true' do
       let(:parent_collection_card) { create(:collection_card_collection) }
       let(:collection) { parent_collection_card.collection }
@@ -158,7 +177,7 @@ RSpec.describe CollectionCard, type: :model do
       let!(:collection_card_collection) { create(:collection_card, collection: shared_with_me_collection) }
       let(:duplicate) do
         collection_card_collection.duplicate!(
-          for_user: user
+          for_user: user,
         )
       end
 

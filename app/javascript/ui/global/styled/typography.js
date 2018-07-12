@@ -56,6 +56,17 @@ export const DisplayText = styled.span`
 `
 DisplayText.displayName = 'StyledDisplayText'
 
+export const SubduedHeading1 = styled.h1`
+  color: ${v.colors.gray};
+  display: inline-block;
+  font-weight: 300;
+  margin-bottom: 0;
+  margin-left: 20px;
+  padding-top: 8px;
+  text-transform: none;
+`
+SubduedHeading1.displayName = 'SubduedHeading1'
+
 /** @component */
 export const SubduedText = DisplayText.extend`
   color: ${v.colors.cloudy};

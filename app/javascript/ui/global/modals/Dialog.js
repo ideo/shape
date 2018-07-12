@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types'
 import styled from 'styled-components'
-import MuiDialog from 'material-ui/Dialog'
+import MuiDialog from '@material-ui/core/Dialog'
 
 import v from '~/utils/variables'
 import ICONS from '~/ui/icons/dialogIcons'
