@@ -23,15 +23,15 @@ import v, { ITEM_TYPES } from '~/utils/variables'
 const PinIconHolder = styled.div`
   background-color: ${props => (props.locked ? 'transparent' : v.colors.blackLava)};
   border-radius: 50%;
-  height: 32px;
-  margin-left: 7px;
-  margin-top: 4px;
+  height: 24px;
+  margin-left: 10px;
+  margin-top: 10px;
   text-align: center;
-  width: 32px;
+  width: 24px;
 
   .icon {
-    height: 32px;
-    width: 26px;
+    height: 25px;
+    width: 20px;
   }
 `
 

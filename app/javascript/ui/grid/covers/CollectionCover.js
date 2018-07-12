@@ -97,6 +97,10 @@ const StyledCardContent = styled.div`
 `
 StyledCardContent.displayName = 'StyledCardContent'
 
+function splitName(name) {
+  return name.split(' ')
+}
+
 @inject('uiStore')
 @observer
 class CollectionCover extends React.Component {
@@ -108,6 +112,25 @@ class CollectionCover extends React.Component {
       </Fragment>)
     }
     return null
+  }
+
+  get name() {
+    const { collection } = this.props
+    if (collection.isUserProfile) {
+      const nameParts = splitName(collection.name)
+      console.log('name parts', nameParts)
+      if (!nameParts) return collection.name
+      const lastName = nameParts.pop()
+      const name = (
+        <Fragment>
+          {nameParts.join(' ')}{' '}<span style={{ whiteSpace: 'nowrap' }}>
+            {lastName}&nbsp;<IconHolder><ProfileIcon /></IconHolder></span>
+        </Fragment>
+      )
+      return name
+    } else {
+      return collection.name
+    }
   }
 
   render() {
@@ -130,7 +153,7 @@ class CollectionCover extends React.Component {
           <div className="top">
             <h3>
               <Dotdotdot clamp={height > 1 ? 6 : 3}>
-                {collection.name}{this.icon}
+                {this.name}
               </Dotdotdot>
             </h3>
           </div>
