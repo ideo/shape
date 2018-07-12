@@ -92,7 +92,7 @@ class Collection < ApplicationRecord
   scope :not_custom_type, -> { where(type: nil) }
   scope :user, -> { where(type: 'Collection::UserCollection') }
   scope :shared_with_me, -> { where(type: 'Collection::SharedWithMeCollection') }
-  scope :searchable, -> { where.not(type: unsearchable_types) }
+  scope :searchable, -> { where.not(type: unsearchable_types).or(where(type: nil)) }
 
   accepts_nested_attributes_for :collection_cards
 
