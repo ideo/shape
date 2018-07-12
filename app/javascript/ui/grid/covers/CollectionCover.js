@@ -118,7 +118,6 @@ class CollectionCover extends React.Component {
     const { collection } = this.props
     if (collection.isUserProfile) {
       const nameParts = splitName(collection.name)
-      console.log('name parts', nameParts)
       if (!nameParts) return collection.name
       const lastName = nameParts.pop()
       const name = (

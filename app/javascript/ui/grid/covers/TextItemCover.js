@@ -63,11 +63,13 @@ class TextItemCover extends React.Component {
   }
 
   handleEdit = (ev) => {
+    const { item } = this.props
+    if (!item.can_edit_content) return ev.stopPropagation()
     // If already editing, pass event down
-    if (uiStore.dragging) return
+    if (uiStore.dragging) return false
     if (this.isEditing) {
       ev.stopPropagation()
-      return
+      return false
     }
     ev.stopPropagation()
     uiStore.update('textEditingItem', this.state.item)
@@ -161,6 +163,7 @@ class TextItemCover extends React.Component {
   }
 
   render() {
+    const { item } = this.props
     const { isEditing } = this
     const content = isEditing
       ? this.renderEditing()
