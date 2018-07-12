@@ -194,7 +194,9 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
         user.add_role(Role::CONTENT_EDITOR, collection)
       end
 
-      context 'updating collection attributes' do
+      context 'updating collection name on a system_required collection' do
+        let(:collection) { create(:user_profile) }
+
         it 'returns a 401' do
           patch(path, params: params)
           expect(response.status).to eq(401)

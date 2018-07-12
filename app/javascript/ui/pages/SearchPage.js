@@ -48,8 +48,7 @@ class SearchPage extends PageWithApi {
   searchQuery = (props, opts = {}) => {
     let query = queryString.parse(props.location.search).q
     if (!query) return ''
-    console.log('search query', query)
-    if (opts.url) query = query.replace(/\s/g, '+').replace('#', '%23')
+    if (opts.url) query = query.replace(/\s/g, '+').replace(/#/g, '%23')
     return query
   }
 

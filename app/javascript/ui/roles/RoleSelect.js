@@ -143,7 +143,11 @@ class RoleSelect extends React.Component {
     // TODO remove duplication with RolesAdd role select menu
     const url = entity.pic_url_square || entity.filestack_file_url
     const showLeaveIcon = (
-      enabled || (entity.internalType === 'users' && entity.id === apiStore.currentUserId)
+      enabled || (
+        entity.isCurrentUser &&
+        !role.resource.system_required &&
+        !role.resource.pinned_and_locked
+      )
     )
     return (
       <Row>

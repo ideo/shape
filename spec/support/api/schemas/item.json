@@ -13,7 +13,8 @@
     "can_edit_content": { "type": ["boolean"] },
     "tag_list": { "type": ["array", "null"] },
     "inherited_tag_list": { "type": ["array", "null"] },
-    "filestack_file_url": { "type": ["string", "null"] }
+    "filestack_file_url": { "type": ["string", "null"] },
+    "pinned_and_locked": { "type": ["boolean"] }
   },
   "required": ["id", "type"]
 }

@@ -75,7 +75,7 @@ class Api::V1::CollectionsController < Api::V1::BaseController
   def load_and_authorize_collection_update
     @collection = Collection.find(params[:id])
     if collection_params[:name].present? && collection_params[:name] != @collection.name
-      authorize! :manage, @collection
+      authorize! :edit_name, @collection
     else
       authorize! :edit_content, @collection
     end

@@ -47,6 +47,10 @@ class Collection
       false
     end
 
+    def system_required?
+      true
+    end
+
     def name
       'Shared with Me'
     end

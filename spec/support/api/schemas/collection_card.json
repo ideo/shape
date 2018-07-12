@@ -8,7 +8,8 @@
     "height": { "type": "integer" },
     "type": { "type": "string" },
     "link": { "type": "boolean" },
-    "pinned": { "type": "boolean" }
+    "pinned": { "type": "boolean" },
+    "pinned_and_locked": { "type": "boolean" }
   },
   "required": ["id", "order", "width", "height", "type", "link"]
 }

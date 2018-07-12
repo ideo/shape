@@ -14,7 +14,8 @@ class Collection < ApplicationRecord
   acts_as_taggable
 
   store_accessor :cached_attributes,
-                 :cached_cover, :cached_tag_list, :cached_all_tags_list,
+                 :cached_cover,
+                 :cached_tag_list,
                  :cached_owned_tag_list,
                  :cached_org_properties
 
@@ -76,7 +77,8 @@ class Collection < ApplicationRecord
 
   has_one :comment_thread, as: :record, dependent: :destroy
 
-  delegate :parent, to: :parent_collection_card, allow_nil: true
+  delegate :parent, :pinned, :pinned?, :pinned_and_locked?,
+           to: :parent_collection_card, allow_nil: true
 
   belongs_to :organization
   belongs_to :cloned_from, class_name: 'Collection', optional: true
@@ -90,6 +92,7 @@ class Collection < ApplicationRecord
   scope :not_custom_type, -> { where(type: nil) }
   scope :user, -> { where(type: 'Collection::UserCollection') }
   scope :shared_with_me, -> { where(type: 'Collection::SharedWithMeCollection') }
+  scope :searchable, -> { where.not(type: unsearchable_types).or(where(type: nil)) }
 
   accepts_nested_attributes_for :collection_cards
 
@@ -100,7 +103,7 @@ class Collection < ApplicationRecord
   # active == don't index archived collections
   # where(type: nil) == don't index User/SharedWithMe collections
   scope :search_import, -> do
-    active.where(type: nil).includes(
+    active.searchable.includes(
       [
         {
           items: %i[
@@ -112,6 +115,13 @@ class Collection < ApplicationRecord
         :taggings,
       ],
     )
+  end
+
+  def self.unsearchable_types
+    [
+      'Collection::UserCollection',
+      'Collection::SharedWithMeCollection',
+    ]
   end
 
   # By default all string fields are searchable
@@ -226,7 +236,7 @@ class Collection < ApplicationRecord
       c.allow_primary_group_view_access
     end
     # upgrade to editor unless we're setting up a templated collection
-    for_user.upgrade_to_edit_role(c) unless from_template
+    for_user.upgrade_to_edit_role(c)
 
     CollectionCardDuplicationWorker.perform_async(
       collection_cards.map(&:id),
@@ -255,6 +265,10 @@ class Collection < ApplicationRecord
   end
 
   def read_only?
+    false
+  end
+
+  def system_required?
     false
   end
 
@@ -330,14 +344,9 @@ class Collection < ApplicationRecord
     self.cached_owned_tag_list = owned_tag_list
   end
 
-  def cache_all_tags_list
-    self.cached_all_tags_list = all_tags_list
-  end
-
   # these all get called from CollectionUpdater
   def update_cached_tag_lists
     cache_tag_list if tag_list != cached_tag_list
-    cache_all_tags_list if all_tags_list != cached_all_tags_list
     cache_owned_tag_list if owned_tag_list != cached_owned_tag_list
   end
 
@@ -382,6 +391,7 @@ class Collection < ApplicationRecord
 
   def cache_key
     "#{jsonapi_cache_key}" \
+      "/#{ActiveRecord::Migrator.current_version}" \
       "/cards_#{collection_cards.maximum(:updated_at).to_i}" \
       "/roles_#{roles.maximum(:updated_at).to_i}"
   end

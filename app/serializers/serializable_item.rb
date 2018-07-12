@@ -34,5 +34,10 @@ class SerializableItem < BaseJsonSerializer
     @current_ability.can?(:edit_content, @object)
   end
 
+  attribute :pinned_and_locked do
+    # might be nil, particularly in tests
+    @object.pinned_and_locked? || false
+  end
+
   has_many :roles
 end

@@ -112,6 +112,10 @@ class CollectionCard < ApplicationRecord
     parent.is_a? Collection::MasterTemplate
   end
 
+  def pinned_and_locked?
+    pinned? && !master_template_card?
+  end
+
   def copy_into_new_link_card
     amoeba_dup.becomes!(CollectionCard::Link)
   end

@@ -40,8 +40,7 @@ const IconHolder = styled.span`
 class PageHeader extends React.Component {
   get canEdit() {
     const { record } = this.props
-    if (record.internalType === 'items') return record.can_edit
-    return record.can_edit && !record.isUserCollection
+    return record.can_edit_content && !record.system_required
   }
 
   get hasActions() {
@@ -93,6 +92,7 @@ class PageHeader extends React.Component {
           record={record}
           menuOpen={uiStore.pageMenuOpen}
           canEdit={record.can_edit}
+          canEditContent={record.can_edit_content}
         />
       )
     }

@@ -20,7 +20,7 @@ class OrganizationTemplates < SimpleService
       organization: @org,
     )
 
-    @org.admin_group.add_role(Role::CONTENT_EDITOR, template_collection)
+    @org.admin_group.add_role(Role::EDITOR, template_collection)
     LinkToSharedCollectionsWorker.new.perform(
       [@org.admin_group.user_ids],
       [@org.admin_group.id],
@@ -43,7 +43,14 @@ class OrganizationTemplates < SimpleService
       parent: @org.template_collection,
       collection: profile_template,
     )
-    @org.admin_group.add_role(Role::CONTENT_EDITOR, profile_template)
+    @org.admin_group.add_role(Role::EDITOR, profile_template)
+    # create the special profile tag for the profile collection
+    profile_template.tag(
+      profile_template,
+      with: 'template',
+      on: :tags,
+    )
+    profile_template.reload.update_cached_tag_lists
     profile_template.recalculate_breadcrumb!
     setup_profile_template_items
   end
@@ -109,5 +116,6 @@ class OrganizationTemplates < SimpleService
       organization: @org,
     )
     @org.primary_group.add_role(Role::VIEWER, @org.profile_collection)
+    @org.guest_group.add_role(Role::VIEWER, @org.profile_collection)
   end
 end

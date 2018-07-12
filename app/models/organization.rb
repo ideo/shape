@@ -112,6 +112,13 @@ class Organization < ApplicationRecord
     "#{handle}-admins"
   end
 
+  def all_users
+    User.where(id: (
+      primary_group.user_ids +
+      guest_group.user_ids
+    ))
+  end
+
   # used for reporting purposes
   def user_count
     (
