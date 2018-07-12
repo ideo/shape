@@ -12,6 +12,7 @@ import RolesSummary from '~/ui/roles/RolesSummary'
 import PageMenu from '~/ui/pages/shared/PageMenu'
 import EditPencilIcon from '~/ui/icons/EditPencilIcon'
 import ProfileIcon from '~/ui/icons/ProfileIcon'
+import SystemIcon from '~/ui/icons/SystemIcon'
 import { FixedHeader, MaxWidthContainer } from '~/ui/global/styled/layout'
 import { SubduedHeading1 } from '~/ui/global/styled/typography'
 import { StyledTitleAndRoles } from '~/ui/pages/shared/styled'
@@ -26,9 +27,10 @@ const FixedPageHeader = FixedHeader.extend`
 `
 
 const IconHolder = styled.span`
+  color: ${v.colors.cloudy};
   display: inline-block;
   height: 30px;
-  margin-right: 10px;
+  ${props => (props.align === 'left' ? 'margin-right: 10px;' : 'margin-left: 10px;')}
   margin-top: 16px;
   width: 30px;
 `
@@ -114,7 +116,7 @@ class PageHeader extends React.Component {
   get collectionIcon() {
     const { record } = this.props
     if (record.isProfileTemplate) {
-      return <IconHolder><ProfileIcon /></IconHolder>
+      return <IconHolder align="left"><ProfileIcon /></IconHolder>
     }
     return null
   }
@@ -123,6 +125,16 @@ class PageHeader extends React.Component {
     const { record } = this.props
     if (record.isMasterTemplate) {
       return <SubduedHeading1>#template</SubduedHeading1>
+    }
+    return null
+  }
+
+  get collectionTypeIcon() {
+    const { record } = this.props
+    if (record.isUserProfile) {
+      return <IconHolder align="right"><ProfileIcon /></IconHolder>
+    } else if (record.isProfileCollection) {
+      return <IconHolder align="right"><SystemIcon /></IconHolder>
     }
     return null
   }
@@ -156,6 +168,7 @@ class PageHeader extends React.Component {
                     <EditPencilIcon />
                   </EditIconHolder>
                 )}
+                { this.collectionTypeIcon }
                 { this.collectionTypeName }
               </Box>
               <Flex align="flex-end" style={{ height: '60px', marginTop: '-10px' }}>
