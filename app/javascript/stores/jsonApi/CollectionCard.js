@@ -37,14 +37,10 @@ class CollectionCard extends BaseRecord {
     return this.pinned
   }
 
-  get isPinnedInTemplate() {
-    // pinned within a template is something you can pin / un-pin
-    return this.pinned && this.parent.type === 'Collection::MasterTemplate'
-  }
-
   get isPinnedAndLocked() {
     // pinned in a collection means it is locked in that place
-    return this.pinned && this.parent.type !== 'Collection::MasterTemplate'
+    // i.e. pinned in a templated collection
+    return this.pinned_and_locked
   }
 
   // This sets max W/H based on number of visible columns. Used by Grid + CollectionCover.

@@ -109,5 +109,6 @@ class OrganizationTemplates < SimpleService
       organization: @org,
     )
     @org.primary_group.add_role(Role::VIEWER, @org.profile_collection)
+    @org.guest_group.add_role(Role::VIEWER, @org.profile_collection)
   end
 end

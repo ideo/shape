@@ -31,8 +31,8 @@ class Item < ApplicationRecord
            inverse_of: :item,
            dependent: :destroy
 
-  delegate :parent, to: :parent_collection_card, allow_nil: true
-  delegate :pinned, :pinned?, to: :parent_collection_card, allow_nil: true
+  delegate :parent, :pinned, :pinned?, :pinned_and_locked?,
+           to: :parent_collection_card, allow_nil: true
   delegate :organization, to: :parent, allow_nil: true
   belongs_to :cloned_from, class_name: 'Item', optional: true
   has_one :comment_thread, as: :record, dependent: :destroy

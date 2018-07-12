@@ -76,15 +76,8 @@ class Collection < ApplicationRecord
 
   has_one :comment_thread, as: :record, dependent: :destroy
 
-  delegate :parent, to: :parent_collection_card, allow_nil: true
-  delegate :pinned, :pinned?, to: :parent_collection_card, allow_nil: true
-
-  # --
-  def locked?
-    return false if parent_collection_card.master_template_card?
-    pinned?
-  end
-  # --
+  delegate :parent, :pinned, :pinned?, :pinned_and_locked?,
+           to: :parent_collection_card, allow_nil: true
 
   belongs_to :organization
   belongs_to :cloned_from, class_name: 'Collection', optional: true
@@ -390,6 +383,7 @@ class Collection < ApplicationRecord
 
   def cache_key
     "#{jsonapi_cache_key}" \
+      "/#{ActiveRecord::Migrator.current_version}" \
       "/cards_#{collection_cards.maximum(:updated_at).to_i}" \
       "/roles_#{roles.maximum(:updated_at).to_i}"
   end
