@@ -32,6 +32,7 @@ class Item < ApplicationRecord
            dependent: :destroy
 
   delegate :parent, to: :parent_collection_card, allow_nil: true
+  delegate :pinned, :pinned?, to: :parent_collection_card, allow_nil: true
   delegate :organization, to: :parent, allow_nil: true
   belongs_to :cloned_from, class_name: 'Item', optional: true
   has_one :comment_thread, as: :record, dependent: :destroy
@@ -90,7 +91,7 @@ class Item < ApplicationRecord
       i.roles << role.duplicate!(assign_resource: i)
     end
     # upgrade to editor unless we're setting up a templated collection
-    for_user.upgrade_to_edit_role(i) unless from_template
+    for_user.upgrade_to_edit_role(i)
 
     # Method from HasFilestackFile
     filestack_file_duplicate!(i)

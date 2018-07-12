@@ -77,6 +77,14 @@ class Collection < ApplicationRecord
   has_one :comment_thread, as: :record, dependent: :destroy
 
   delegate :parent, to: :parent_collection_card, allow_nil: true
+  delegate :pinned, :pinned?, to: :parent_collection_card, allow_nil: true
+
+  # --
+  def locked?
+    return false if parent_collection_card.master_template_card?
+    pinned?
+  end
+  # --
 
   belongs_to :organization
   belongs_to :cloned_from, class_name: 'Collection', optional: true
@@ -226,7 +234,7 @@ class Collection < ApplicationRecord
       c.allow_primary_group_view_access
     end
     # upgrade to editor unless we're setting up a templated collection
-    for_user.upgrade_to_edit_role(c) unless from_template
+    for_user.upgrade_to_edit_role(c)
 
     CollectionCardDuplicationWorker.perform_async(
       collection_cards.map(&:id),
