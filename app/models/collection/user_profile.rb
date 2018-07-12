@@ -44,13 +44,16 @@ class Collection
 
       # create the card in My Collection
       uc = user.current_user_collection(organization.id)
-      uc.link_collection_cards.create(
-        collection: profile,
-        # put it after SharedWithMe
-        order: 1,
-      )
-      # in case they had been shared other cards already, push those after
-      uc.reorder_cards!
+      # just as a catch...
+      if uc.present?
+        uc.link_collection_cards.create(
+          collection: profile,
+          # put it after SharedWithMe
+          order: 1,
+        )
+        # in case they had been shared other cards already, push those after
+        uc.reorder_cards!
+      end
 
       profile.reload.update_cached_tag_lists
       profile.cache_cover!

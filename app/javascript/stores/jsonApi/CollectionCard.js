@@ -37,6 +37,10 @@ class CollectionCard extends BaseRecord {
     return this.pinned
   }
 
+  get isPinnedInTemplate() {
+    return this.pinned && !this.pinned_and_locked
+  }
+
   get isPinnedAndLocked() {
     // pinned in a collection means it is locked in that place
     // i.e. pinned in a templated collection

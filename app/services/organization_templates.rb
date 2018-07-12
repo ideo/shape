@@ -44,6 +44,13 @@ class OrganizationTemplates < SimpleService
       collection: profile_template,
     )
     @org.admin_group.add_role(Role::CONTENT_EDITOR, profile_template)
+    # create the special profile tag for the profile collection
+    profile_template.tag(
+      profile_template,
+      with: 'template',
+      on: :tags,
+    )
+    profile_template.reload.update_cached_tag_lists
     profile_template.recalculate_breadcrumb!
     setup_profile_template_items
   end
