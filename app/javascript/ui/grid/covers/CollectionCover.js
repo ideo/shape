@@ -127,9 +127,8 @@ class CollectionCover extends React.Component {
         </Fragment>
       )
       return name
-    } else {
-      return collection.name
     }
+    return collection.name
   }
 
   render() {

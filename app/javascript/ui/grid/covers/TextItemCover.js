@@ -73,6 +73,7 @@ class TextItemCover extends React.Component {
     }
     ev.stopPropagation()
     uiStore.update('textEditingItem', this.state.item)
+    return null
   }
 
   expand = () => {
