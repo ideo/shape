@@ -40,21 +40,7 @@ class Collection
       )
 
       # replace the first image item with the user's pic_url_square
-      profile.collection_cards.where.not(item_id: nil).includes(:item).each do |card|
-        next unless card.item.is_a? Item::ImageItem
-        item = card.item
-        item.update(
-          # TODO: set up a non "FilestackFile" way of creating an image card?
-          filestack_file: FilestackFile.create(
-            handle: 'none',
-            mimetype: 'image/jpg',
-            size: 15_945,
-            filename: 'profile.jpg',
-            url: user.pic_url_square,
-          ),
-        )
-        break
-      end
+      profile.replace_placeholder_with_user_pic!
 
       # create the card in My Collection
       uc = user.current_user_collection(organization.id)
@@ -77,5 +63,23 @@ class Collection
     user.cached_user_profiles ||= {}
     user.cached_user_profiles[organization_id] = id
     user.save
+  end
+
+  def replace_placeholder_with_user_pic!
+    collection_cards.pinned.where.not(item_id: nil).includes(:item).each do |card|
+      next unless card.item.is_a? Item::ImageItem
+      item = card.item
+      item.update(
+        # TODO: set up a non "FilestackFile" way of creating an image card?
+        filestack_file: FilestackFile.create(
+          handle: 'none',
+          mimetype: 'image/jpg',
+          size: 15_945,
+          filename: 'profile.jpg',
+          url: user.pic_url_square,
+        ),
+      )
+      break
+    end
   end
 end
