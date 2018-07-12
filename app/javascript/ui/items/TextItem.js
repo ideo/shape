@@ -106,6 +106,7 @@ class TextItem extends React.Component {
       const { currentEditor } = this.state
       const { currentUserId } = this.props
       if (currentEditor && currentEditor.id !== currentUserId) return
+      if (!this.canEdit) return
       this.quillEditor.focus()
     }, 350)
   }
@@ -118,12 +119,13 @@ class TextItem extends React.Component {
     const { item, onSave } = this.props
     if (this.unlockTimeout) clearTimeout(this.unlockTimeout)
     this.leaving = true
+    this.channel.unsubscribe()
+    if (!this.canEdit) return
     this.debouncedOnKeyUp.flush()
     if (this.linkerInterval) clearInterval(this.linkerInterval)
     if (this.readyToSave) {
       onSave(item)
     }
-    this.channel.unsubscribe()
   }
 
   attachQuillRefs = () => {
@@ -249,8 +251,9 @@ class TextItem extends React.Component {
 
   cancel = (ev) => {
     const { onCancel } = this.props
+    if (!this.canEdit) return onCancel(this.props.item, ev)
     const item = this.getCurrentText()
-    onCancel(item, ev)
+    return onCancel(item, ev)
   }
 
   getCurrentText() {

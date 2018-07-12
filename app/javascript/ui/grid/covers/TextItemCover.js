@@ -64,7 +64,7 @@ class TextItemCover extends React.Component {
 
   handleEdit = (ev) => {
     const { item } = this.props
-    if (!item.can_edit_content) return ev.stopPropagation()
+    if (!item.can_edit_content) return false
     // If already editing, pass event down
     if (uiStore.dragging) return false
     if (this.isEditing) {
