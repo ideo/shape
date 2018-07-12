@@ -28,8 +28,16 @@ module Archivable
       connection.add_column table_name, :archived, :boolean, default: false
     end
 
+    def add_archived_at_column!
+      connection.add_column table_name, :archived_at, :datetime
+    end
+
     def remove_archived_column!
       connection.remove_column table_name, :archived
+    end
+
+    def remove_archived_at_column!
+      connection.remove_column table_name, :archived_at
     end
   end
 
@@ -72,6 +80,6 @@ module Archivable
   end
 
   def archive_self!
-    update(archived: true)
+    update(archived: true, archived_at: Time.now)
   end
 end
