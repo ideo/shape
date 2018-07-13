@@ -58,7 +58,8 @@ class Collection extends BaseRecord {
   // NOTE: could also use Collection::Global -- except OrgTemplates is not "special"?
   get isSpecialCollection() {
     return this.isSharedCollection ||
-      this.isProfileTemplate
+      this.isProfileTemplate ||
+      this.isProfileCollection
   }
 
   get isNormalCollection() {
