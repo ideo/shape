@@ -135,4 +135,23 @@ describe('CardMenu', () => {
       expect(_.map(popout.props().menuItems, i => i.name)).toEqual(actions)
     })
   })
+
+  describe('as editor of a system required record', () => {
+    beforeEach(() => {
+      actions = ['Move', 'Link', 'Add to My Collection']
+      props.canEdit = true
+      props.canReplace = false
+      props.card.record.system_required = true
+      props.card.isPinnedAndLocked = false
+      wrapper = shallow(
+        <CardMenu.wrappedComponent {...props} />
+      )
+    })
+
+    it('creates a PopoutMenu with Duplicate and Link viewer actions', () => {
+      const popout = wrapper.find('PopoutMenu').at(0)
+      expect(popout.props().menuItems.length).toEqual(actions.length)
+      expect(_.map(popout.props().menuItems, i => i.name)).toEqual(actions)
+    })
+  })
 })

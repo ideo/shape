@@ -42,17 +42,23 @@ class PageMenu extends React.PureComponent {
   }
 
   get menuItems() {
-    let items = [
-      { name: 'Duplicate', icon: <DuplicateIcon />, onClick: this.duplicateRecord },
+    const { canEdit, disablePermissions, record } = this.props
+    let items = []
+    if (!record.system_required) {
+      items.push(
+        { name: 'Duplicate', icon: <DuplicateIcon />, onClick: this.duplicateRecord },
+      )
+    }
+    items.push(
       { name: 'Tags', icon: <TagIcon />, onClick: this.showTags },
       { name: 'Permissions', icon: <PermissionsIcon />, onClick: this.showRolesMenu },
-    ]
-    if (this.props.canEdit) {
+    )
+    if (canEdit) {
       items.push(
         { name: 'Archive', icon: <ArchiveIcon />, onClick: this.archiveRecord },
       )
     }
-    if (this.props.disablePermissions) {
+    if (disablePermissions) {
       items = _.reject(items, { name: 'Permissions' })
     }
     return items

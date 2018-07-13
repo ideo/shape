@@ -51,9 +51,7 @@ class Collection extends BaseRecord {
 
   // disable cardMenu actions for certain collections
   get menuDisabled() {
-    return this.isSharedCollection ||
-      this.isOrgTemplateCollection ||
-      this.isProfileTemplate
+    return this.isSharedCollection
   }
 
   // this marks it with the "sirocco" special color
