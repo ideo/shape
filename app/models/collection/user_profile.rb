@@ -76,20 +76,23 @@ class Collection
   end
 
   def replace_placeholder_with_user_pic!
-    collection_cards.pinned.where.not(item_id: nil).includes(:item).each do |card|
-      next unless card.item.is_a? Item::ImageItem
-      item = card.item
-      item.update(
-        # TODO: set up a non "FilestackFile" way of creating an image card?
-        filestack_file: FilestackFile.create(
-          handle: 'none',
-          mimetype: 'image/jpg',
-          size: 15_945,
-          filename: 'profile.jpg',
-          url: user.pic_url_square,
-        ),
-      )
-      break
-    end
+    return if user.pic_url_square == User::DEFAULT_PIC_URL
+    card = collection_cards
+           .pinned
+           .joins(:item)
+           .where('items.type = ?', 'Item::ImageItem')
+           .first
+    return unless card.present?
+    item = card.item
+    item.update(
+      # TODO: set up a non "FilestackFile" way of creating an image card?
+      filestack_file: FilestackFile.create(
+        handle: 'none',
+        mimetype: 'image/jpg',
+        size: 15_945,
+        filename: 'profile.jpg',
+        url: user.pic_url_square,
+      ),
+    )
   end
 end

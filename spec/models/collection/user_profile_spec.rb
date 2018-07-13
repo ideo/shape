@@ -11,7 +11,7 @@ describe Collection::UserProfile, type: :model do
   end
 
   let(:template) do
-    create(:master_template, organization: organization, num_cards: 3, pin_cards: true)
+    create(:master_template, organization: organization, num_cards: 3, record_type: :image, pin_cards: true)
   end
   let(:profiles) { create(:global_collection, organization: organization) }
 
@@ -69,6 +69,23 @@ describe Collection::UserProfile, type: :model do
 
     it 'should add the #profile tag' do
       expect(user_profile.cached_owned_tag_list).to match_array(['profile'])
+    end
+
+    context 'profile image' do
+      it 'should replace the first image with the user.pic_url_square' do
+        placeholder = template.collection_cards.first.item.image_url
+        expect(user_profile.collection_cards.first.item.image_url).not_to eq placeholder
+        expect(user_profile.collection_cards.first.item.image_url).to eq user.pic_url_square
+      end
+
+      context 'with default user image' do
+        let(:user) { create(:user, add_to_org: organization, pic_url_square: nil) }
+
+        it 'should not replace the first image with the user.pic_url_square' do
+          placeholder = template.collection_cards.first.item.image_url
+          expect(user_profile.collection_cards.first.item.image_url).to eq placeholder
+        end
+      end
     end
   end
 end
