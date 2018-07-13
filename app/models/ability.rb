@@ -37,8 +37,12 @@ class Ability
       end
 
       can :create, Collection
-      can %i[read duplicate], Collection do |collection|
+      can :read, Collection do |collection|
         collection.can_view?(user)
+      end
+      can :duplicate, Collection do |collection|
+        collection.can_view?(user) &&
+          !collection.system_required?
       end
       can :edit_content, Collection do |collection|
         collection.can_edit_content?(user)
@@ -54,8 +58,12 @@ class Ability
       end
 
       can :create, CollectionCard
-      can %i[read duplicate], CollectionCard do |collection_card|
+      can :read, CollectionCard do |collection_card|
         collection_card.can_view?(user)
+      end
+      can :duplicate, CollectionCard do |collection_card|
+        collection_card.can_view?(user) &&
+          !collection_card.system_required?
       end
       can :manage, CollectionCard do |collection_card|
         collection_card.can_edit?(user)

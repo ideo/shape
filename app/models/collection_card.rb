@@ -23,6 +23,7 @@ class CollectionCard < ApplicationRecord
 
   scope :ordered, -> { order(order: :asc) }
   scope :pinned, -> { where(pinned: true) }
+  scope :unpinned, -> { where(pinned: false) }
 
   amoeba do
     enable
@@ -68,13 +69,20 @@ class CollectionCard < ApplicationRecord
     # defaults to self.parent, unless one is passed in
     cc.parent = parent
     # place card at beginning or end
-    cc.order = placement == 'beginning' ? 0 : parent.collection_cards.count
+    if placement == 'beginning'
+      if parent.template.present?
+        cc.order = parent.collection_cards.pinned.count
+      else
+        cc.order = 0
+      end
+    else
+      cc.order = parent.collection_cards.count
+    end
 
     unless shallow || link?
       opts = {
         for_user: for_user,
         parent: parent,
-        from_template: master_template_card?,
       }
       cc.collection = collection.duplicate!(opts) if collection.present?
       cc.item = item.duplicate!(opts) if item.present?
@@ -118,6 +126,10 @@ class CollectionCard < ApplicationRecord
 
   def copy_into_new_link_card
     amoeba_dup.becomes!(CollectionCard::Link)
+  end
+
+  def system_required?
+    collection.present? && collection.system_required?
   end
 
   # Increment the order by 1 of all cards >= specified order
