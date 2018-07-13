@@ -187,15 +187,9 @@ class GridCard extends React.Component {
 
       if (card.isPinned) {
         icon = (<Fragment>
-          <Tooltip
-            title="pinned"
-            placement="top"
-          >
-            <PinIconHolder locked={card.isPinnedAndLocked}>
-              <PinnedIcon />
-            </PinIconHolder>
-          </Tooltip>
+          { !card.isPinnedAndLocked && this.renderPin() }
           {icon}
+          { card.isPinnedAndLocked && this.renderPin() }
         </Fragment>)
         iconAmount = 2
       }
@@ -203,16 +197,7 @@ class GridCard extends React.Component {
       small = true
       icon = <LinkIcon />
     } else if (card.isPinned) {
-      icon = (
-        <Tooltip
-          title="pinned"
-          placement="top"
-        >
-          <PinIconHolder locked={card.isPinnedAndLocked}>
-            <PinnedIcon />
-          </PinIconHolder>
-        </Tooltip>
-      )
+      icon = this.renderPin()
     }
 
     if (!icon) return ''
@@ -222,6 +207,21 @@ class GridCard extends React.Component {
       <StyledBottomLeftIcon small={small} onClick={this.handleClick} iconAmount={iconAmount}>
         {icon}
       </StyledBottomLeftIcon>
+    )
+  }
+
+  renderPin() {
+    const { card } = this.props
+    const hoverClass = card.isPinnedAndLocked && 'show-on-hover'
+    return (
+      <Tooltip
+        title="pinned"
+        placement="top"
+      >
+        <PinIconHolder className={hoverClass} locked={card.isPinnedAndLocked}>
+          <PinnedIcon />
+        </PinIconHolder>
+      </Tooltip>
     )
   }
 
