@@ -88,13 +88,7 @@ class CommentThread < ApplicationRecord
     renderer = JSONAPI::Serializable::Renderer.new
     renderer.render(
       self,
-      class: {
-        CommentThread: SerializableCommentThread,
-        Collection: SerializableSimpleCollection,
-        'Item::VideoItem': SerializableSimpleItem,
-        'Item::ImageItem': SerializableSimpleItem,
-        'Item::TextItem': SerializableSimpleItem,
-      },
+      class: Firestoreable::JSONAPI_CLASS_MAPPINGS,
       include: %i[record],
     )
   end

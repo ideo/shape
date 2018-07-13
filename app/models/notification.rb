@@ -43,14 +43,7 @@ class Notification < ApplicationRecord
     renderer = JSONAPI::Serializable::Renderer.new
     renderer.render(
       self,
-      class: { Activity: SerializableActivity,
-               Notification: SerializableNotification,
-               User: SerializableUser,
-               Group: SerializableSimpleGroup,
-               Collection: SerializableSimpleCollection,
-               'Item::VideoItem': SerializableSimpleItem,
-               'Item::ImageItem': SerializableSimpleItem,
-               'Item::TextItem': SerializableSimpleItem },
+      class: Firestoreable::JSONAPI_CLASS_MAPPINGS,
       include: relationships_for_firestore,
     )
   end

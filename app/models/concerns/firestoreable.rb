@@ -1,6 +1,21 @@
 module Firestoreable
   extend ActiveSupport::Concern
 
+  JSONAPI_CLASS_MAPPINGS = {
+    Activity: SerializableActivity,
+    Notification: SerializableNotification,
+    User: SerializableUser,
+    Group: SerializableSimpleGroup,
+    Collection: SerializableSimpleCollection,
+    CommentThread: SerializableCommentThread,
+    'Collection::MasterTemplate': SerializableSimpleCollection,
+    'Collection::Global': SerializableSimpleCollection,
+    'Collection::UserProfile': SerializableSimpleCollection,
+    'Item::VideoItem': SerializableSimpleItem,
+    'Item::ImageItem': SerializableSimpleItem,
+    'Item::TextItem': SerializableSimpleItem,
+  }.freeze
+
   included do
     after_destroy :delete_from_firestore
   end
