@@ -104,16 +104,6 @@ function splitName(name) {
 @inject('uiStore')
 @observer
 class CollectionCover extends React.Component {
-  get icon() {
-    const { collection } = this.props
-    if (collection.isUserProfile) {
-      return (<Fragment>&nbsp;
-        <IconHolder><ProfileIcon /></IconHolder>
-      </Fragment>)
-    }
-    return null
-  }
-
   get name() {
     const { collection } = this.props
     if (collection.isUserProfile) {

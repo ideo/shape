@@ -101,6 +101,9 @@ Rails.application.routes.draw do
   # catch all mailer preview paths
   get '/rails/mailers/*path' => 'rails/mailers#preview'
 
+  # custom URL for GCI
+  get '/earlychildhood', to: redirect('/collections/4764')
+
   # catch all HTML route requests, send to frontend
   get '*path', to: 'home#index', constraints: ->(req) { req.format == :html || req.format == '*/*' }
 end
