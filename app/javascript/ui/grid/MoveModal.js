@@ -93,7 +93,9 @@ class MoveModal extends React.Component {
     const movingFromCollection = apiStore.find('collections', uiStore.movingFromCollectionId)
     if (!viewingCollection.can_edit_content || (
       // don't allow moving cards from templates to non-templates
-      movingFromCollection.isMasterTemplate && !viewingCollection.isMasterTemplate
+      movingFromCollection &&
+      movingFromCollection.isMasterTemplate &&
+      !viewingCollection.isMasterTemplate
     )) {
       uiStore.alert('You don\'t have permission to move items to this collection')
       return
