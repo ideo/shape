@@ -63,11 +63,6 @@ class User < ApplicationRecord
     saved_change_to_first_name? || saved_change_to_last_name?
   end
 
-  DEFAULT_PIC_URL = 'https://d3none3dlnlrde.cloudfront.net/assets/users/avatars/missing/square.jpg'.freeze
-  attribute :pic_url_square,
-            :string,
-            default: DEFAULT_PIC_URL
-
   enum status: {
     active: 0,
     pending: 1,

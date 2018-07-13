@@ -76,7 +76,7 @@ class Collection
   end
 
   def replace_placeholder_with_user_pic!
-    return if user.pic_url_square == User::DEFAULT_PIC_URL
+    return if user.pic_url_square.blank?
     card = collection_cards
            .pinned
            .joins(:item)
