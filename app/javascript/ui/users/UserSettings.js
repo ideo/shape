@@ -1,11 +1,8 @@
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 
 import { Heading2 } from '~/ui/global/styled/typography'
-import Header from '~/ui/layout/Header'
-import { MenuItem } from 'material-ui/Menu'
+import MenuItem from '@material-ui/core/MenuItem'
 import { Label, Select } from '~/ui/global/styled/forms'
-import PageContainer from '~/ui/layout/PageContainer'
-import TagEditor from '~/ui/pages/shared/TagEditor'
 
 @inject('apiStore', 'uiStore')
 @observer

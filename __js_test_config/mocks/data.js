@@ -14,6 +14,7 @@ export const fakeTextItemAttrs = {
   breadcrumb: [['collections', 1, 'Some collection'], ['items', 1, 'my item']],
   parentPath: '/',
   can_edit: false,
+  inherited_tag_list: [],
   internalType: 'items',
 }
 export const fakeTextItem = {
@@ -29,6 +30,7 @@ export const fakeVideoItemAttrs = {
   name: 'Crazy Honey Badger',
   url: 'https://www.youtube.com/watch?v=4r7wHMg5Yjg',
   thumbnail_url: 'https://img.youtube.com/vi/4r7wHMg5Yjg/hqdefault.jpg',
+  inherited_tag_list: [],
   can_edit: false,
 }
 export const fakeVideoItem = {
@@ -44,6 +46,7 @@ export const fakeImageItemAttrs = {
     id: 1,
     url: 'https://www.nasa.gov/sites/default/files/styles/full_width_feature/public/thumbnails/image/iss052e023801_0.jpg',
   },
+  inherited_tag_list: [],
   can_edit: false,
 }
 export const fakeImageItem = {
@@ -71,8 +74,8 @@ export const fakeCollectionCard = {
   width: 1,
   maxWidth: 1,
   maxHeight: 1,
-  record: fakeCollection,
-  item: fakeCollection,
+  record: {},
+  item: {},
   reference: false,
   beginReplacing: jest.fn(),
   API_create: jest.fn(),
@@ -92,7 +95,9 @@ export const fakeCollection = {
   breadcrumb: [],
   roles: [],
   tag_list: ['prototype', 'blockchain'],
+  inherited_tag_list: [],
   can_edit: false,
+  can_edit_content: false,
   isSharedCollection: false,
   isUserCollection: false,
   isNormalCollection: true,
@@ -129,6 +134,8 @@ export const fakeOrganizationAttrs = {
   id: 1,
   name: 'TestOrg',
   primary_group: fakeGroup,
+  guest_group: fakeGroup,
+  admin_group: fakeGroup,
 }
 export const fakeOrganization = {
   ...fakeOrganizationAttrs,

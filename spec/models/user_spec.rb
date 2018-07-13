@@ -26,6 +26,36 @@ describe User, type: :model do
         expect(user).to receive(:reset_cached_roles!)
         user.add_role(Role::MEMBER, org_group)
       end
+
+      context 'with a user being added to admin group' do
+        before do
+          user.add_role(Role::ADMIN, org.primary_group)
+        end
+
+        it 'should add the user as an admin to the primary group' do
+          expect(user.has_role?(Role::ADMIN, org.admin_group)).to be true
+        end
+      end
+
+      context 'with a user being added as admin to primary group' do
+        before do
+          user.add_role(Role::ADMIN, org.primary_group)
+        end
+
+        it 'should add the user as an admin to the admin group' do
+          expect(user.has_role?(Role::ADMIN, org.admin_group)).to be true
+        end
+      end
+    end
+
+    describe '#update_profile_names' do
+      let!(:profile) { create(:user_profile, created_by: user, name: 'My Profile') }
+
+      it 'should update all UserProfiles to match user name' do
+        user.reload # pick up user_profiles relation
+        user.update(first_name: 'Bill', last_name: 'Hader')
+        expect(profile.reload.name).to eq 'Bill Hader'
+      end
     end
   end
 
@@ -292,7 +322,7 @@ describe User, type: :model do
 
       it 'allows access to the guest group for org members' do
         expect(user.current_org_groups_and_special_groups).to match_array([group_in_org_member, org.primary_group, org.guest_group])
-        expect(admin.current_org_groups_and_special_groups).to match_array([org.primary_group, org.guest_group])
+        expect(admin.current_org_groups_and_special_groups).to match_array([org.primary_group, org.guest_group, org.admin_group])
       end
     end
   end

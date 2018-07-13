@@ -10,6 +10,8 @@ module Roles
 
       if add_user_ids.empty? && role_name.blank?
         # generic case: check that both Editors and Viewers would inherit
+        # NOTE: Role::CONTENT_EDITOR is not yet represented here, because it's
+        # not a selectable role on the frontend.
         inherit_role_from_parent?(child, role_name: Role::EDITOR) &&
           inherit_role_from_parent?(child, role_name: Role::VIEWER)
       elsif role_name

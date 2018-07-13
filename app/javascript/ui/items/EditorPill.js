@@ -2,7 +2,7 @@ import PropTypes from 'prop-types'
 import styled from 'styled-components'
 
 import v from '~/utils/variables'
-import UserAvatar from '~/ui/users/UserAvatar'
+import Avatar from '~/ui/global/Avatar'
 
 const StyledEditorPill = styled.div`
   min-width: 400px;
@@ -30,8 +30,9 @@ class EditorPill extends React.PureComponent {
     const { editor, className } = this.props
     return (
       <StyledEditorPill className={className}>
-        <UserAvatar
-          user={editor}
+        <Avatar
+          title={editor.name}
+          url={editor.pic_url_square}
           size={38}
           className="editor"
         />

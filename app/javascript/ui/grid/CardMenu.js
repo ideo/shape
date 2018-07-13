@@ -89,17 +89,14 @@ class CardMenu extends React.Component {
   }
 
   get menuItems() {
-    const { canEdit, canReplace, uiStore } = this.props
+    const { canEdit, card, canReplace, uiStore } = this.props
+
     let items = []
-    const isUserCollection = uiStore.viewingCollection &&
-      uiStore.viewingCollection.isUserCollection
     const actions = [
       { name: 'Duplicate', icon: <DuplicateIcon />, onClick: this.duplicateCard },
       { name: 'Move', icon: <MoveIcon />, onClick: this.moveCard },
       { name: 'Link', icon: <LinkIcon />, onClick: this.linkCard },
-      ...(!isUserCollection
-        ? [{ name: 'Add to My Collection', icon: <AddIntoIcon />, onClick: this.addToMyCollection }]
-        : []),
+      { name: 'Add to My Collection', icon: <AddIntoIcon />, onClick: this.addToMyCollection },
       { name: 'Archive', icon: <ArchiveIcon />, onClick: this.archiveCard },
       { name: 'Replace', icon: <ReplaceIcon />, onClick: this.replaceCard },
     ]
@@ -109,7 +106,7 @@ class CardMenu extends React.Component {
       }
     })
 
-    if (canEdit) {
+    if (canEdit && !card.isPinnedAndLocked) {
       // Replace action is added later if this.props.canReplace
       items = _.reject(actions, { name: 'Replace' })
     } else {
@@ -119,6 +116,21 @@ class CardMenu extends React.Component {
         'Add to My Collection',
       ]
       items = _.filter(actions, a => _.includes(viewActions, a.name))
+    }
+
+    // if record is system required, we always remove these actions
+    if (card.record && card.record.system_required) {
+      items = _.reject(items, a => (
+        _.includes(['Duplicate', 'Archive'], a.name)
+      ))
+    }
+
+    if (uiStore.viewingCollection) {
+      const coll = uiStore.viewingCollection
+      // Remove Add To My Collection menu item for special collections
+      if (coll.isUserCollection) {
+        items = _.reject(items, { name: 'Add to My Collection' })
+      }
     }
 
     if (canReplace) {

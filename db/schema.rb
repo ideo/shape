@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180618224154) do
+ActiveRecord::Schema.define(version: 20180711224359) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -51,9 +51,12 @@ ActiveRecord::Schema.define(version: 20180618224154) do
     t.datetime "updated_at", null: false
     t.boolean "archived", default: false
     t.string "type"
+    t.boolean "pinned", default: false
+    t.integer "templated_from_id"
     t.index ["collection_id"], name: "index_collection_cards_on_collection_id"
     t.index ["item_id"], name: "index_collection_cards_on_item_id"
     t.index ["parent_id"], name: "index_collection_cards_on_parent_id"
+    t.index ["templated_from_id"], name: "index_collection_cards_on_templated_from_id"
   end
 
   create_table "collections", force: :cascade do |t|
@@ -67,6 +70,7 @@ ActiveRecord::Schema.define(version: 20180618224154) do
     t.boolean "archived", default: false
     t.integer "created_by_id"
     t.jsonb "cached_attributes"
+    t.integer "template_id"
     t.index ["cloned_from_id"], name: "index_collections_on_cloned_from_id"
     t.index ["organization_id"], name: "index_collections_on_organization_id"
   end
@@ -166,6 +170,10 @@ ActiveRecord::Schema.define(version: 20180618224154) do
     t.integer "filestack_file_id"
     t.integer "guest_group_id"
     t.jsonb "domain_whitelist", default: []
+    t.integer "admin_group_id"
+    t.integer "template_collection_id"
+    t.integer "profile_template_id"
+    t.integer "profile_collection_id"
   end
 
   create_table "roles", force: :cascade do |t|
@@ -229,6 +237,7 @@ ActiveRecord::Schema.define(version: 20180618224154) do
     t.boolean "show_helper", default: true
     t.string "handle"
     t.boolean "notify_through_email", default: true
+    t.jsonb "cached_attributes"
     t.index ["email"], name: "index_users_on_email"
     t.index ["handle"], name: "index_users_on_handle", unique: true
     t.index ["invitation_token"], name: "index_users_on_invitation_token"

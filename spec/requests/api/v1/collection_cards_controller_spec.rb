@@ -5,6 +5,9 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
   let(:collection) do
     create(:collection, add_editors: [user], organization: user.current_organization)
   end
+  let(:subcollection) do
+    create(:collection, add_editors: [user], organization: user.current_organization)
+  end
 
   before do
     @user.reload
@@ -13,6 +16,10 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
   describe 'GET #index' do
     let!(:collection) { create(:collection, num_cards: 5, add_editors: [user]) }
     let(:path) { "/api/v1/collections/#{collection.id}/collection_cards" }
+
+    before do
+      collection.items.each { |i| user.add_role(Role::VIEWER, i) }
+    end
 
     it 'returns a 200' do
       get(path)
@@ -27,21 +34,6 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
     it 'includes all collection cards' do
       get(path)
       expect(json['data'].map { |cc| cc['id'].to_i }).to match_array(collection.collection_card_ids)
-    end
-  end
-
-  describe 'GET #show' do
-    let!(:collection_card) { create(:collection_card, parent: collection) }
-    let(:path) { "/api/v1/collection_cards/#{collection_card.id}" }
-
-    it 'returns a 200' do
-      get(path)
-      expect(response.status).to eq(200)
-    end
-
-    it 'matches JSON schema' do
-      get(path)
-      expect(json['data']['attributes']).to match_json_schema('collection_card')
     end
   end
 
@@ -67,7 +59,20 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
       json_api_params('collection_cards', raw_params.reject { |k| k == :item_attributes })
     end
 
+    context 'without content editor access' do
+      let(:user) { create(:user, add_to_org: create(:organization)) }
+
+      it 'returns a 401' do
+        post(path, params: params)
+        expect(response.status).to eq(401)
+      end
+    end
+
     context 'success' do
+      let(:collection) do
+        create(:collection, add_content_editors: [user], organization: user.current_organization)
+      end
+
       it 'returns a 200' do
         post(path, params: params)
         expect(response.status).to eq(200)
@@ -178,7 +183,7 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
   end
 
   describe 'PATCH #update' do
-    let!(:collection_card) { create(:collection_card, parent: collection) }
+    let!(:collection_card) { create(:collection_card_text, parent: collection) }
     let(:path) { "/api/v1/collection_cards/#{collection_card.id}" }
     let(:params) {
       json_api_params(
@@ -189,20 +194,33 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
       )
     }
 
-    it 'returns a 200' do
-      patch(path, params: params)
-      expect(response.status).to eq(200)
+    context 'with record edit access' do
+      before do
+        user.add_role(Role::EDITOR, collection_card.item)
+      end
+
+      it 'returns a 200' do
+        patch(path, params: params)
+        expect(response.status).to eq(200)
+      end
+
+      it 'matches JSON schema' do
+        patch(path, params: params)
+        expect(json['data']['attributes']).to match_json_schema('collection_card')
+      end
+
+      it 'updates the content' do
+        expect(collection_card.order).not_to eq(2)
+        patch(path, params: params)
+        expect(collection_card.reload.order).to eq(2)
+      end
     end
 
-    it 'matches JSON schema' do
-      patch(path, params: params)
-      expect(json['data']['attributes']).to match_json_schema('collection_card')
-    end
-
-    it 'updates the content' do
-      expect(collection_card.order).not_to eq(2)
-      patch(path, params: params)
-      expect(collection_card.reload.order).to eq(2)
+    context 'without record edit access' do
+      it 'returns a 401' do
+        patch(path, params: params)
+        expect(response.status).to eq(401)
+      end
     end
   end
 
@@ -210,33 +228,46 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
     let!(:collection_card) { create(:collection_card_collection, parent: collection) }
     let(:path) { "/api/v1/collection_cards/#{collection_card.id}/archive" }
 
-    it 'returns a 200' do
-      patch(path)
-      expect(response.status).to eq(200)
+    context 'with record edit access' do
+      before do
+        user.add_role(Role::EDITOR, collection_card.collection)
+      end
+
+      it 'returns a 200' do
+        patch(path)
+        expect(response.status).to eq(200)
+      end
+
+      it 'matches JSON schema' do
+        patch(path)
+        expect(json['data']['attributes']).to match_json_schema('collection_card')
+      end
+
+      it 'updates the content' do
+        expect(collection_card.archived).to eq(false)
+        patch(path)
+        expect(collection_card.reload.archived).to eq(true)
+      end
+
+      it 'notifies the users and groups' do
+        collection_card.archived = true
+        collection_card.record.archived = true
+        expect(ActivityAndNotificationBuilder).to receive(:call).with(
+          actor: @user,
+          target: collection_card.record,
+          action: Activity.actions[:archived],
+          subject_user_ids: [@user.id],
+          subject_group_ids: [],
+        )
+        patch(path)
+      end
     end
 
-    it 'matches JSON schema' do
-      patch(path)
-      expect(json['data']['attributes']).to match_json_schema('collection_card')
-    end
-
-    it 'updates the content' do
-      expect(collection_card.archived).to eq(false)
-      patch(path)
-      expect(collection_card.reload.archived).to eq(true)
-    end
-
-    it 'notifies the users and groups' do
-      collection_card.archived = true
-      collection_card.record.archived = true
-      expect(ActivityAndNotificationBuilder).to receive(:call).with(
-        actor: @user,
-        target: collection_card.record,
-        action: Activity.actions[:archived],
-        subject_user_ids: [],
-        subject_group_ids: [],
-      )
-      patch(path)
+    context 'without record edit access' do
+      it 'returns a 401' do
+        patch(path)
+        expect(response.status).to eq(401)
+      end
     end
   end
 
@@ -258,7 +289,7 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
     let(:params_at_end) { raw_params.merge(placement: 'end').to_json }
     let(:params) { raw_params.to_json }
 
-    describe 'without manage access for to_collection' do
+    describe 'without content editor access for to_collection' do
       let(:to_collection) { create(:collection) }
 
       it 'returns a 401' do
@@ -267,7 +298,7 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
       end
     end
 
-    describe 'with manage access for to_collection' do
+    describe 'with content editor access for to_collection' do
       let(:editor) { create(:user) }
       let(:viewer) { create(:user) }
       let(:to_collection) do
@@ -334,7 +365,7 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
     end
     let(:params) { raw_params.to_json }
 
-    describe 'without manage access for to_collection' do
+    describe 'without content editor access for to_collection' do
       let(:to_collection) { create(:collection) }
 
       it 'returns a 401' do
@@ -355,7 +386,7 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
       end
     end
 
-    describe 'with manage access for to_collection and view access for cards in from_collection' do
+    describe 'with content editor access for to_collection and view access for cards in from_collection' do
       let(:editor) { create(:user) }
       let(:viewer) { create(:user) }
       let(:to_collection) do
@@ -399,7 +430,7 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
     end
     let(:params) { raw_params.to_json }
 
-    describe 'without manage access for to_collection' do
+    describe 'without content editor access for to_collection' do
       let(:to_collection) { create(:collection) }
 
       it 'returns a 401' do
@@ -420,7 +451,7 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
       end
     end
 
-    describe 'with manage access for to_collection and view access for cards in from_collection' do
+    describe 'with content editor access for to_collection and view access for cards in from_collection' do
       let(:editor) { create(:user) }
       let(:viewer) { create(:user) }
       let(:to_collection) do
@@ -451,4 +482,64 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
       end
     end
   end
+
+  describe 'PATCH #replace' do
+    let(:collection) { create(:collection, organization: user.current_organization) }
+    let(:collection_card) { create(:collection_card_text, parent: collection) }
+    let(:path) { "/api/v1/collection_cards/#{collection_card.id}/replace" }
+    let(:raw_params) do
+      {
+        order: 1,
+        width: 3,
+        height: 1,
+        # parent_id is required to retrieve the parent collection without a nested route
+        parent_id: collection.id,
+        # create with a nested item
+        item_attributes: {
+          content: 'This is my item content',
+          text_data: { ops: [{ insert: 'This is my item content.' }] },
+          type: 'Item::TextItem',
+        },
+      }
+    end
+    let(:params) { json_api_params('collection_cards', raw_params) }
+
+    context 'with record and collection content edit access' do
+      before do
+        user.add_role(Role::CONTENT_EDITOR, collection_card.item)
+        user.add_role(Role::CONTENT_EDITOR, collection)
+      end
+
+      it 'returns a 200' do
+        patch(path, params: params)
+        expect(response.status).to eq(200)
+      end
+
+      it 'matches JSON schema' do
+        patch(path, params: params)
+        expect(json['data']['attributes']).to match_json_schema('collection_card')
+        expect(json['data']['attributes']['parent_id']).to eq collection.id
+      end
+
+      it 'archives the existing card' do
+        expect(collection_card.archived).to eq(false)
+        patch(path, params: params)
+        expect(collection_card.reload.archived).to eq(true)
+      end
+
+      it 'creates a new item' do
+        expect {
+          patch(path, params: params)
+        }.to change(Item, :count).by(1)
+      end
+    end
+
+    context 'without record edit access' do
+      it 'returns a 401' do
+        patch(path, params: params)
+        expect(response.status).to eq(401)
+      end
+    end
+  end
+
 end

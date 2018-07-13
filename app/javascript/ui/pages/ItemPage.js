@@ -57,7 +57,7 @@ class ItemPage extends PageWithApi {
   )
 
   cancel = (item) => {
-    this.save(item)
+    if (item.can_edit_content) this.save(item)
     this.props.routingStore.push(item.parentPath)
   }
 

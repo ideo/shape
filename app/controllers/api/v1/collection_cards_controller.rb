@@ -1,21 +1,18 @@
 class Api::V1::CollectionCardsController < Api::V1::BaseController
-  deserializable_resource :collection_card, class: DeserializableCollectionCard, only: %i[create update]
-  load_and_authorize_resource except: %i[move]
+  deserializable_resource :collection_card, class: DeserializableCollectionCard, only: %i[create update replace]
+  load_and_authorize_resource except: %i[move replace]
+  before_action :load_and_authorize_parent_collection, only: %i[create replace]
 
   load_and_authorize_resource :collection, only: %i[index]
   def index
     render jsonapi: @collection.collection_cards
   end
 
-  def show
-    render jsonapi: @collection_card
-  end
-
-  before_action :load_and_authorize_parent_collection, only: %i[create]
   def create
     builder = CollectionCardBuilder.new(params: collection_card_params,
                                         parent_collection: @collection,
-                                        user: current_user)
+                                        user: current_user,
+                                        replacing_card: @replacing_card)
 
     if builder.create
       # reload the user's roles
@@ -37,18 +34,17 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
 
   def archive
     if @collection_card.archive!
-      if @collection_card.record.is_a?(Collection)
-        if !@collection_card.link?
-          ActivityAndNotificationBuilder.call(
-            actor: current_user,
-            target: @collection_card.record,
-            action: Activity.actions[:archived],
-            subject_user_ids: @collection_card.record.editors[:users].pluck(:id),
-            subject_group_ids: @collection_card.record.editors[:groups].pluck(:id),
-          )
-        end
-      end
+      create_archive_notification
       render jsonapi: @collection_card.reload, include: [:parent, record: [:filestack_file]]
+    else
+      render_api_errors @collection_card.errors
+    end
+  end
+
+  before_action :load_and_authorize_replacing_card, only: %i[replace]
+  def replace
+    if @replacing_card.archive!
+      create
     else
       render_api_errors @collection_card.errors
     end
@@ -103,15 +99,15 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
 
   def load_and_authorize_parent_collection
     @collection = Collection.find(collection_card_params[:parent_id])
-    authorize! :manage, @collection
+    authorize! :edit_content, @collection
   end
 
   def load_and_authorize_moving_collections
     @from_collection = Collection.find(json_api_params[:from_id])
     @cards = @from_collection.collection_cards.where(id: json_api_params[:collection_card_ids])
     @to_collection = Collection.find(json_api_params[:to_id])
-    authorize! :manage, @from_collection
-    authorize! :manage, @to_collection
+    authorize! :edit_content, @from_collection
+    authorize! :edit_content, @to_collection
   end
 
   # almost the same as above but needs to authorize read access for each card's record
@@ -122,7 +118,24 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
       authorize! :read, card.record
     end
     @to_collection = Collection.find(json_api_params[:to_id])
-    authorize! :manage, @to_collection
+    authorize! :edit_content, @to_collection
+  end
+
+  def load_and_authorize_replacing_card
+    @replacing_card = CollectionCard.find(params[:id])
+    authorize! :edit_content, @replacing_card.record
+  end
+
+  def create_archive_notification
+    # only notify for archiving of collections (and not link cards)
+    return unless @collection_card.collection.present? && !@collection_card.link?
+    ActivityAndNotificationBuilder.call(
+      actor: current_user,
+      target: @collection_card.record,
+      action: Activity.actions[:archived],
+      subject_user_ids: @collection_card.record.editors[:users].pluck(:id),
+      subject_group_ids: @collection_card.record.editors[:groups].pluck(:id),
+    )
   end
 
   def collection_card_params

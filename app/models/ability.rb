@@ -37,16 +37,33 @@ class Ability
       end
 
       can :create, Collection
-      can %i[read duplicate], Collection do |collection|
+      can :read, Collection do |collection|
         collection.can_view?(user)
       end
+      can :duplicate, Collection do |collection|
+        collection.can_view?(user) &&
+          !collection.system_required?
+      end
+      can :edit_content, Collection do |collection|
+        collection.can_edit_content?(user)
+      end
+      can :edit_name, Collection do |collection|
+        collection.can_edit_content?(user) &&
+          !collection.system_required?
+      end
       can :manage, Collection do |collection|
-        collection.can_edit?(user)
+        collection.can_edit?(user) &&
+          !collection.system_required? &&
+          !collection.pinned_and_locked?
       end
 
       can :create, CollectionCard
-      can %i[read duplicate], CollectionCard do |collection_card|
+      can :read, CollectionCard do |collection_card|
         collection_card.can_view?(user)
+      end
+      can :duplicate, CollectionCard do |collection_card|
+        collection_card.can_view?(user) &&
+          !collection_card.system_required?
       end
       can :manage, CollectionCard do |collection_card|
         collection_card.can_edit?(user)
@@ -56,8 +73,12 @@ class Ability
       can %i[read duplicate], Item do |item|
         item.can_view?(user)
       end
+      can :edit_content, Item do |item|
+        item.can_edit_content?(user)
+      end
       can :manage, Item do |item|
-        item.can_edit?(user)
+        item.can_edit?(user) &&
+          !item.pinned_and_locked?
       end
 
       can :create, CommentThread

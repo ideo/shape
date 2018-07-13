@@ -80,7 +80,7 @@ describe('TextItem', () => {
 
   describe('can edit', () => {
     beforeEach(() => {
-      props.item.can_edit = true
+      props.item.can_edit_content = true
       props.item.parentPath = '/collections/99'
       wrapper = shallow(
         <TextItem {...props} />

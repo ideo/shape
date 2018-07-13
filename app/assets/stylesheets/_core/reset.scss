@@ -169,6 +169,7 @@ button {
   -webkit-user-select: none; /* for button */
   -moz-user-select: none;
   -ms-user-select: none;
+  user-select: none;
   &::-moz-focus-inner {
     border: 0;
     padding: 0;

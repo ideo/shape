@@ -1,4 +1,5 @@
 import PropTypes from 'prop-types'
+import { Fragment } from 'react'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import _ from 'lodash'
 import styled from 'styled-components'
@@ -9,13 +10,36 @@ import ImageItemCover from '~/ui/grid/covers/ImageItemCover'
 import VideoItemCover from '~/ui/grid/covers/VideoItemCover'
 import CollectionCover from '~/ui/grid/covers/CollectionCover'
 
-import CollectionIcon from '~/ui/icons/CollectionIcon'
-import LinkedCollectionIcon from '~/ui/icons/LinkedCollectionIcon'
-import LinkIcon from '~/ui/icons/LinkIcon'
 import CardMenu from '~/ui/grid/CardMenu'
+import CollectionIcon from '~/ui/icons/CollectionIcon'
+import LinkIcon from '~/ui/icons/LinkIcon'
+import LinkedCollectionIcon from '~/ui/icons/LinkedCollectionIcon'
+import RequiredCollectionIcon from '~/ui/icons/RequiredCollectionIcon'
+import PinnedIcon from '~/ui/icons/PinnedIcon'
 import SelectionCircle from '~/ui/grid/SelectionCircle'
+import Tooltip from '~/ui/global/Tooltip'
 import { uiStore } from '~/stores'
 import v, { ITEM_TYPES } from '~/utils/variables'
+
+const PinIconHolder = styled.div`
+  background-color: ${props => (props.locked ? 'transparent' : v.colors.blackLava)};
+  border-radius: 50%;
+  height: 24px;
+  margin-left: 10px;
+  margin-top: 10px;
+  text-align: center;
+  width: 24px;
+
+  .icon {
+    height: 25px;
+    width: 25px;
+
+    svg {
+      margin-right: 1px;
+      width: 80%;
+    }
+  }
+`
 
 export const StyledGridCard = styled.div`
   z-index: 1;
@@ -36,8 +60,9 @@ export const StyledBottomLeftIcon = styled.div`
   left: 0.25rem;
   bottom: 0;
   color: ${v.colors.gray};
-  width: 45px;
+  width: ${props => (props.iconAmount === 2 ? 75 : 45)}px;
   height: 45px;
+  display: flex;
   /* LinkIcon appears larger than CollectionIcon so we need to make it smaller */
   ${props => props.small && `
     width: 18px;
@@ -90,6 +115,7 @@ class GridCard extends React.Component {
 
   get canReplace() {
     const { record } = this.props
+    if (!record.can_edit_content) return false
     return (this.isItem && _.includes([ITEM_TYPES.IMAGE, ITEM_TYPES.VIDEO], record.type))
   }
 
@@ -136,26 +162,66 @@ class GridCard extends React.Component {
   }
 
   get renderIcon() {
-    const { card, cardType } = this.props
+    const { card, record, cardType } = this.props
     let icon
     let small = false
+    let iconAmount = 1
     if (cardType === 'collections') {
       if (card.link) {
         icon = <LinkedCollectionIcon />
+      } else if (record.isRequired) {
+        const type = record.isMasterTemplate ? 'template' : 'collection'
+        icon = (
+          <Tooltip
+            title={`required ${type}`}
+            placement="top"
+          >
+            <div>
+              <RequiredCollectionIcon />
+            </div>
+          </Tooltip>
+        )
       } else {
         icon = <CollectionIcon />
+      }
+
+      if (card.isPinned) {
+        icon = (<Fragment>
+          { !card.isPinnedAndLocked && this.renderPin() }
+          {icon}
+          { card.isPinnedAndLocked && this.renderPin() }
+        </Fragment>)
+        iconAmount = 2
       }
     } else if (card.link) {
       small = true
       icon = <LinkIcon />
+    } else if (card.isPinned) {
+      icon = this.renderPin()
     }
 
     if (!icon) return ''
 
     return (
-      <StyledBottomLeftIcon small={small}>
+      // needs to handle the same click otherwise clicking the icon does nothing
+      <StyledBottomLeftIcon small={small} onClick={this.handleClick} iconAmount={iconAmount}>
         {icon}
       </StyledBottomLeftIcon>
+    )
+  }
+
+  renderPin() {
+    const { card } = this.props
+    const hoverClass = card.isPinnedAndLocked && 'show-on-hover'
+    return (
+      <Tooltip
+        title="pinned"
+        placement="top"
+      >
+        <PinIconHolder className={hoverClass} locked={card.isPinnedAndLocked}>
+          <PinnedIcon />
+        </PinIconHolder>
+      </Tooltip>
     )
   }
 
@@ -171,20 +237,23 @@ class GridCard extends React.Component {
       canEditCollection,
       dragging,
       menuOpen,
+      lastPinnedCard
     } = this.props
 
     const firstCardInRow = card.position && card.position.x === 0
 
     return (
       <StyledGridCard dragging={dragging}>
-        {canEditCollection &&
+        {(canEditCollection && (!card.isPinnedAndLocked || lastPinnedCard)) &&
           <GridCardHotspot card={card} dragging={dragging} />
         }
-        {canEditCollection && firstCardInRow &&
+        {(canEditCollection && firstCardInRow && !card.isPinnedAndLocked) &&
           <GridCardHotspot card={card} dragging={dragging} position="left" />
         }
-        {!record.isSharedCollection &&
-          uiStore.textEditingItem !== record &&
+        {(
+          !record.menuDisabled &&
+          uiStore.textEditingItem !== record
+        ) &&
           <StyledTopRightActions>
             {this.isSelectable &&
               <SelectionCircle cardId={card.id} />
@@ -218,6 +287,11 @@ GridCard.propTypes = {
   dragging: PropTypes.bool.isRequired,
   handleClick: PropTypes.func.isRequired,
   menuOpen: PropTypes.bool.isRequired,
+  lastPinnedCard: PropTypes.bool,
+}
+
+GridCard.defaultProps = {
+  lastPinnedCard: false,
 }
 
 export default GridCard

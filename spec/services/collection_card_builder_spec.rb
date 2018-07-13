@@ -84,6 +84,17 @@ RSpec.describe CollectionCardBuilder, type: :service do
           expect(organization.primary_group.has_role?(Role::VIEWER, builder.collection_card.collection)).to be true
         end
       end
+
+      describe 'creating card in a MasterTemplate' do
+        let(:parent) do
+          create(:master_template, organization: organization, add_editors: [user])
+        end
+
+        it 'should create a pinned card by default' do
+          expect(builder.create).to be true
+          expect(builder.collection_card.pinned?).to be true
+        end
+      end
     end
 
     context 'success creating card with item' do
@@ -121,6 +132,32 @@ RSpec.describe CollectionCardBuilder, type: :service do
         # parent's cover hasn't been generated so should_update_parent_collection_cover? == true
         expect_any_instance_of(Collection).to receive(:cache_cover!)
         expect(builder.create).to be true
+      end
+    end
+
+    context 'replacing a card' do
+      let(:replacing_card) { create(:collection_card_text, pinned: true, templated_from_id: 99) }
+      let(:builder) do
+        CollectionCardBuilder.new(
+          params: params.merge(
+            item_attributes: {
+              name: 'My item name',
+              content: 'My Text Content goes here',
+              text_data: { ops: [] },
+              type: 'Item::TextItem',
+            },
+          ),
+          parent_collection: parent,
+          user: user,
+          replacing_card: replacing_card,
+        )
+      end
+
+      it 'should copy pinned and templated_from_id attributes from replacing_card' do
+        expect(builder.create).to be true
+        created_card = builder.collection_card
+        expect(created_card.pinned).to be true
+        expect(created_card.templated_from_id).to eq 99
       end
     end
 

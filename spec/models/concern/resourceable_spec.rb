@@ -38,7 +38,7 @@ describe Resourceable, type: :concern do
   end
 
   describe '#can_edit?' do
-    it 'return false' do
+    it 'returns false' do
       expect(collection.can_edit?(user)).to be false
     end
 
@@ -53,12 +53,38 @@ describe Resourceable, type: :concern do
     end
   end
 
+  describe '#can_edit_content?' do
+    it 'returns false' do
+      expect(collection.can_edit_content?(user)).to be false
+    end
+
+    context 'as content editor' do
+      before do
+        user.add_role(Role::CONTENT_EDITOR, collection)
+      end
+
+      it 'returns true' do
+        expect(collection.can_edit_content?(user)).to be true
+      end
+    end
+
+    context 'as editor' do
+      before do
+        user.add_role(Role::EDITOR, collection)
+      end
+
+      it 'returns true' do
+        expect(collection.can_edit_content?(user)).to be true
+      end
+    end
+  end
+
   describe '#can_view?' do
-    it 'return false for user' do
+    it 'returns false for user' do
       expect(collection.can_view?(user)).to be false
     end
 
-    it 'return false for group' do
+    it 'returns false for group' do
       expect(collection.can_view?(group)).to be false
     end
 
@@ -89,6 +115,33 @@ describe Resourceable, type: :concern do
 
       it 'returns true for group' do
         expect(collection.can_view?(group)).to be true
+      end
+    end
+  end
+
+  describe '#inherit_roles_from_parent!' do
+    let(:other_user) { create(:user) }
+    let(:card) { create(:collection_card_text, parent: collection) }
+    let(:item) { card.item }
+
+    before do
+      item.inherit_roles_from_parent!
+    end
+
+    context 'with editors and viewers' do
+      let(:collection) { create(:collection, add_editors: [user], add_viewers: [other_user]) }
+
+      it 'should copy roles from parent to newly created child' do
+        expect(item.editors[:users]).to match_array(collection.editors[:users])
+        expect(item.viewers[:users]).to match_array(collection.viewers[:users])
+      end
+    end
+
+    context 'with content editors' do
+      let(:collection) { create(:collection, add_content_editors: [user]) }
+
+      it 'should make the content editors into editors of the child content' do
+        expect(item.editors[:users]).to match_array(collection.content_editors[:users])
       end
     end
   end

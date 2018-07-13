@@ -4,7 +4,9 @@ FactoryBot.define do
       num_cards 0
       record_type :text
       card_relation :primary
+      pin_cards false
       add_editors []
+      add_content_editors []
       add_viewers []
     end
 
@@ -17,6 +19,9 @@ FactoryBot.define do
 
     factory :user_collection, class: Collection::UserCollection
     factory :shared_with_me_collection, class: Collection::SharedWithMeCollection
+    factory :master_template, class: Collection::MasterTemplate
+    factory :global_collection, class: Collection::Global
+    factory :user_profile, class: Collection::UserProfile
 
     after(:build) do |collection, evaluator|
       if evaluator.num_cards > 0
@@ -26,7 +31,14 @@ FactoryBot.define do
           w = 3 if rand(1..4) == 4
           h = 2 if rand(1..4) == 4
           card_type = :"collection_card_#{evaluator.record_type}"
-          cc = build(card_type, parent: collection, order: (i - 1), width: w, height: h)
+          cc = build(
+            card_type,
+            parent: collection,
+            order: (i - 1),
+            width: w,
+            height: h,
+            pinned: evaluator.pin_cards,
+          )
           # e.g. primary_collection_cards or link_collection_cards
           card_relation = "#{evaluator.card_relation}_collection_cards"
           collection.send(card_relation) << cc
@@ -40,7 +52,11 @@ FactoryBot.define do
           user.add_role(Role::EDITOR, collection)
         end
       end
-
+      if evaluator.add_content_editors.present?
+        evaluator.add_content_editors.each do |user|
+          user.add_role(Role::CONTENT_EDITOR, collection)
+        end
+      end
       if evaluator.add_viewers.present?
         evaluator.add_viewers.each do |user|
           user.add_role(Role::VIEWER, collection)

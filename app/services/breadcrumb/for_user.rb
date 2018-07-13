@@ -1,7 +1,8 @@
 module Breadcrumb
   class ForUser
-    CONTENT_VIEW_ROLE = Role::VIEWER
-    CONTENT_EDIT_ROLE = Role::EDITOR
+    VIEW_ROLE = Role::VIEWER
+    CONTENT_EDIT_ROLE = Role::CONTENT_EDITOR
+    EDIT_ROLE = Role::EDITOR
 
     def initialize(breadcrumb, user)
       @breadcrumb = breadcrumb
@@ -10,8 +11,9 @@ module Breadcrumb
 
     def viewable
       @viewable ||= select_breadcrumb_items_cascading do |item|
-        user_can?(CONTENT_VIEW_ROLE, item) ||
-          user_can?(CONTENT_EDIT_ROLE, item)
+        user_can?(VIEW_ROLE, item) ||
+          user_can?(CONTENT_EDIT_ROLE, item) ||
+          user_can?(EDIT_ROLE, item)
       end
     end
 
@@ -70,6 +72,7 @@ module Breadcrumb
       item.first(2).join('_')
     end
 
+    # we directly look up has_role_by_identifier for the breadcrumb, e.g. ["Collection", 4, "Name"]
     def user_can?(role_name, breadcrumb_item)
       resource_identifier = resource_identifier_for_breadcrumb_item(breadcrumb_item)
       user.has_role_by_identifier?(role_name, resource_identifier)

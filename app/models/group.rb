@@ -91,6 +91,10 @@ class Group < ApplicationRecord
     organization.guest_group_id == id
   end
 
+  def admin?
+    organization.admin_group_id == id
+  end
+
   def can_view?(user)
     # NOTE: guest group access can be granted via primary_group membership
     return true if guest? && organization.primary_group.can_view?(user)
@@ -117,7 +121,7 @@ class Group < ApplicationRecord
   def after_role_update(role)
     resource = role.resource
     # Reindex record if it is a searchkick model
-    resource.reindex if Searchkick.callbacks? && resource.searchable?
+    resource.reindex if resource && Searchkick.callbacks? && resource.searchable?
   end
 
   def validate_handle?

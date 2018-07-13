@@ -12,9 +12,6 @@ Rails.application.routes.draw do
   namespace :api do
     namespace :v1 do
       resources :collections, except: %i[index] do
-        collection do
-          get 'me'
-        end
         member do
           post 'duplicate'
           patch 'archive'
@@ -22,25 +19,22 @@ Rails.application.routes.draw do
         resources :collection_cards, only: :index
         resources :roles, only: %i[index create destroy], shallow: true
       end
-      resources :collection_cards, shallow: true do
+      resources :collection_cards, shallow: true, except: :show do
+        member do
+          patch 'archive'
+          patch 'replace'
+        end
         collection do
           patch 'move'
           post 'link'
           post 'duplicate'
         end
-        # member do
-        #   post 'duplicate'
-        # end
         resources :items, shallow: true, except: :index do
           member do
             post 'duplicate'
             patch 'archive'
           end
           resources :roles, only: %i[index create]
-        end
-        resources :collections, only: :create
-        member do
-          patch 'archive'
         end
       end
       resources :groups, except: :delete do

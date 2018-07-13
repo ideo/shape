@@ -17,5 +17,5 @@ production:
 :enabled: true
 :schedule:
   searchkick_reindex_worker:
-    every: '5m'
+    every: '1m'
     class: SearchkickReindexWorker

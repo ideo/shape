@@ -25,6 +25,9 @@ export const StyledTitleAndRoles = styled(Flex)`
   .item-page .page-menu {
     top: 35px;
   }
+  &.user-profile .title {
+    cursor: pointer;
+  }
 `
 
 export default {

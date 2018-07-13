@@ -33,6 +33,15 @@ class Collection
       false
     end
 
+    def display_cover?
+      # you never see the cover of a "My Collection"
+      false
+    end
+
+    def system_required?
+      true
+    end
+
     def shared_with_me_collection
       collections.shared_with_me.first
     end

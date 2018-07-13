@@ -7,6 +7,12 @@ class SerializableItem < BaseJsonSerializer
   attribute :tag_list do
     @object.cached_tag_list || []
   end
+
+  attribute :inherited_tag_list do
+    # Only being used for collections right now, here for consistency
+    []
+  end
+
   attribute :filestack_file_url do
     @object.cached_filestack_file_url || ''
   end
@@ -22,6 +28,15 @@ class SerializableItem < BaseJsonSerializer
 
   attribute :can_edit do
     @current_ability.can?(:edit, @object)
+  end
+
+  attribute :can_edit_content do
+    @current_ability.can?(:edit_content, @object)
+  end
+
+  attribute :pinned_and_locked do
+    # might be nil, particularly in tests
+    @object.pinned_and_locked? || false
   end
 
   has_many :roles

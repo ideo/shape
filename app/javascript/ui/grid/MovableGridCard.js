@@ -85,6 +85,7 @@ class MovableGridCard extends React.PureComponent {
     }
     if (!this.state.dragging) {
       uiStore.resetSelectionAndBCT()
+      // close the MoveMenu to prevent weird behaviors
       uiStore.closeMoveMenu()
       uiStore.startDragging()
       this.setState({
@@ -117,6 +118,7 @@ class MovableGridCard extends React.PureComponent {
     if (!this.state.resizing) {
       this.setState({ resizing: true, moveComplete: false })
       uiStore.resetSelectionAndBCT()
+      // close the MoveMenu to prevent weird behaviors
       uiStore.closeMoveMenu()
       document.querySelector('.ql-editor p').focus()
     }
@@ -244,6 +246,7 @@ class MovableGridCard extends React.PureComponent {
       canEditCollection,
       isUserCollection,
       isSharedCollection,
+      lastPinnedCard,
     } = this.props
 
     let {
@@ -306,6 +309,7 @@ class MovableGridCard extends React.PureComponent {
       canEditCollection,
       isUserCollection,
       isSharedCollection,
+      lastPinnedCard,
     }
 
     return (
@@ -330,10 +334,14 @@ class MovableGridCard extends React.PureComponent {
           size={{ width, height }}
           position={{ x: xPos, y: yPos }}
           default={{ width, height, x: xPos, y: yPos }}
-          // NOTE: disabling dragging for touchscreens because of conflict with touch scrolling
-          disableDragging={!canEditCollection || (uiStore.isTouchDevice && cols === 1)}
+          disableDragging={
+            !canEditCollection ||
+            // NOTE: disabling dragging for touchscreens because of conflict with touch scrolling
+            (uiStore.isTouchDevice && cols === 1) ||
+            card.isPinnedAndLocked
+          }
           enableResizing={{
-            bottomRight: canEditCollection,
+            bottomRight: canEditCollection && !card.isPinnedAndLocked,
             bottom: false,
             bottomLeft: false,
             left: false,
@@ -388,6 +396,11 @@ MovableGridCard.propTypes = {
   onDragOrResizeStop: PropTypes.func.isRequired,
   routeTo: PropTypes.func.isRequired,
   menuOpen: PropTypes.bool.isRequired,
+  lastPinnedCard: PropTypes.bool,
+}
+
+MovableGridCard.defaultProps = {
+  lastPinnedCard: false,
 }
 
 export default MovableGridCard

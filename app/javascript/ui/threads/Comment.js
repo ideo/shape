@@ -1,7 +1,6 @@
 import _ from 'lodash'
 import { toJS } from 'mobx'
 import { PropTypes as MobxPropTypes } from 'mobx-react'
-import styled from 'styled-components'
 import { EditorState, convertFromRaw } from 'draft-js'
 import Editor from 'draft-js-plugins-editor'
 import createMentionPlugin from 'draft-js-mention-plugin'
@@ -10,7 +9,7 @@ import v from '~/utils/variables'
 import { DisplayText } from '~/ui/global/styled/typography'
 import { InlineRow } from '~/ui/global/styled/layout'
 import Moment from '~/ui/global/Moment'
-import UserAvatar from '~/ui/users/UserAvatar'
+import Avatar from '~/ui/global/Avatar'
 import { StyledCommentInput } from './CustomCommentMentions'
 
 const StyledComment = StyledCommentInput.extend`
@@ -70,12 +69,15 @@ class Comment extends React.Component {
 
   render() {
     const { comment } = this.props
+    const { author } = comment
 
     return (
       <StyledComment unread={comment.unread}>
         <InlineRow align="center">
-          <UserAvatar
-            user={comment.author}
+          <Avatar
+            title={author.name}
+            url={author.pic_url_square}
+            linkToCollectionId={author.user_profile_collection_id}
             size={32}
             className="author-img"
           />

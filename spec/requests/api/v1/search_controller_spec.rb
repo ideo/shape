@@ -77,6 +77,12 @@ describe Api::V1::SearchController, type: :request, json: true, auth: true, sear
         get(path, params: { query: 'bananas' })
         expect(json['data']).to be_empty
       end
+
+      it 'returns the collection when hashtags are in the query' do
+        get(path, params: { query: '#blockchain' })
+        expect(json['data'].size).to eq(1)
+        expect(json['data'].first['id'].to_i).to eq(collection_with_tags.id)
+      end
     end
 
     context 'if user cannot view collection' do

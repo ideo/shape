@@ -7,6 +7,8 @@ import {
   fakeTextItem,
 } from '#/mocks/data'
 
+
+
 const props = {
   card: fakeItemCard,
   cardType: 'items',
@@ -157,11 +159,11 @@ describe('GridCard', () => {
       })
     })
 
-    describe('with SharedCollection card', () => {
+    describe('with SharedCollection card (menuDisabled = true)', () => {
       beforeEach(() => {
         props.isSharedCollection = false
         props.canEditCollection = true
-        props.record.isSharedCollection = true
+        props.record.menuDisabled = true
         rerender()
       })
 

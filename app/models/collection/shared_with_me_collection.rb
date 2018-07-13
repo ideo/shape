@@ -42,6 +42,15 @@ class Collection
       false
     end
 
+    def display_cover?
+      # should always just be the generic "Shared With Me" card tile
+      false
+    end
+
+    def system_required?
+      true
+    end
+
     def name
       'Shared with Me'
     end

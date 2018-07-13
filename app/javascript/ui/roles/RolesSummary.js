@@ -102,6 +102,7 @@ class RolesSummary extends React.Component {
     const { editors, viewers } = this.viewersAndEditorsLimited
     // If there aren't any editors or viewers, render with add user button
     // If there aren't any editors but are viewers, don't render label/button
+    if (editors.length === 0 && !this.props.canEdit) return ''
     if (editors.length === 0 && viewers.length > 0) return ''
 
     const editorAvatars = editors.map(editor => (
@@ -111,6 +112,8 @@ class RolesSummary extends React.Component {
         url={editor.pic_url_square || editor.filestack_file_url}
         size={AVATAR_SIZE}
         className="editor"
+        // user_profile_collection_id will be null if its a group
+        linkToCollectionId={editor.user_profile_collection_id}
         displayName
       />
     ))
@@ -135,6 +138,8 @@ class RolesSummary extends React.Component {
         url={viewer.pic_url_square || viewer.filestack_file_url}
         size={AVATAR_SIZE}
         className="viewer"
+        // user_profile_collection_id will be null if its a group
+        linkToCollectionId={viewer.user_profile_collection_id}
         displayName
       />
     ))

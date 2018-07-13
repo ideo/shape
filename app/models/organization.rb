@@ -9,6 +9,22 @@ class Organization < ApplicationRecord
              class_name: 'Group',
              dependent: :destroy,
              optional: true
+  belongs_to :admin_group,
+             class_name: 'Group',
+             dependent: :destroy,
+             optional: true
+  belongs_to :template_collection,
+             class_name: 'Collection::Global',
+             dependent: :destroy,
+             optional: true
+  belongs_to :profile_template,
+             class_name: 'Collection::MasterTemplate',
+             dependent: :destroy,
+             optional: true
+  belongs_to :profile_collection,
+             class_name: 'Collection::Global',
+             dependent: :destroy,
+             optional: true
 
   after_create :create_groups
   before_update :parse_domain_whitelist
@@ -22,11 +38,11 @@ class Organization < ApplicationRecord
   validates :name, presence: true
 
   def can_view?(user)
-    primary_group.can_view?(user) || guest_group.can_view?(user)
+    primary_group.can_view?(user) || admin_group.can_view?(user) || guest_group.can_view?(user)
   end
 
   def can_edit?(user)
-    primary_group.can_edit?(user) || guest_group.can_edit?(user)
+    primary_group.can_edit?(user) || admin_group.can_edit?(user) || guest_group.can_edit?(user)
   end
 
   def self.create_for_user(user)
@@ -63,6 +79,11 @@ class Organization < ApplicationRecord
   end
 
   def setup_user_membership(user)
+    # make sure they have a User Profile
+    if profile_template.present? && user.active?
+      Collection::UserProfile.find_or_create_for_user(user: user, organization: self)
+    end
+
     if matches_domain_whitelist?(user)
       # add them as an org member
       user.add_role(Role::MEMBER, primary_group)
@@ -81,8 +102,23 @@ class Organization < ApplicationRecord
     "#{name} Guests"
   end
 
+  def admin_group_name
+    "#{name} Admins"
+  end
+
   def guest_group_handle
     "#{handle}-guest"
+  end
+
+  def admin_group_handle
+    "#{handle}-admins"
+  end
+
+  def all_active_users
+    User.active.where(id: (
+      primary_group.user_ids +
+      guest_group.user_ids
+    ))
   end
 
   # used for reporting purposes
@@ -114,11 +150,13 @@ class Organization < ApplicationRecord
   def create_groups
     create_primary_group(name: name, organization: self)
     create_guest_group(name: guest_group_name, organization: self, handle: guest_group_handle)
+    create_admin_group(name: admin_group_name, organization: self, handle: admin_group_handle)
     save # Save primary group attr
   end
 
   def update_group_names
     primary_group.update_attributes(name: name)
     guest_group.update_attributes(name: guest_group_name, handle: guest_group_handle)
+    admin_group.update_attributes(name: admin_group_name, handle: admin_group_handle)
   end
 end

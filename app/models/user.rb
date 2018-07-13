@@ -7,6 +7,9 @@ class User < ApplicationRecord
   # alias created just to give equivalent method on users/groups
   alias rolify_roles roles
 
+  store_accessor :cached_attributes,
+                 :cached_user_profiles
+
   devise :database_authenticatable, :registerable, :trackable,
          :rememberable, :validatable, :omniauthable,
          omniauth_providers: [:ideo]
@@ -38,6 +41,11 @@ class User < ApplicationRecord
   has_many :activity_subjects, as: :subject
   has_many :notifications
 
+  has_many :user_profiles,
+           class_name: 'Collection::UserProfile',
+           inverse_of: :created_by,
+           foreign_key: :created_by_id
+
   belongs_to :current_organization,
              class_name: 'Organization',
              optional: true
@@ -48,6 +56,12 @@ class User < ApplicationRecord
   validates :email, presence: true, uniqueness: true
   validates :uid, :provider, presence: true, if: :active?
   validates :uid, uniqueness: { scope: :provider }, if: :active?
+
+  after_save :update_profile_names, if: :saved_change_to_name?
+
+  def saved_change_to_name?
+    saved_change_to_first_name? || saved_change_to_last_name?
+  end
 
   attribute :pic_url_square,
             :string,
@@ -217,7 +231,6 @@ class User < ApplicationRecord
     Role.where(name: name, resource_identifier: resource_identifier)
         .joins(:groups_roles)
         .where(GroupsRole.arel_table[:group_id].in(current_org_group_ids))
-        .first
   end
 
   def current_org_groups_and_special_groups
@@ -237,19 +250,57 @@ class User < ApplicationRecord
     Notification
       .joins(:activity)
       .where(Activity.arel_table[:organization_id].eq(
-               current_organization_id))
+               current_organization_id,
+      ))
       .where(
         user: self,
         read: false,
       )
   end
 
+  def user_profile_for_org(organization_id)
+    user_profiles.where(organization_id: organization_id).first
+  end
+
   private
+
+  def update_profile_names
+    user_profiles.each do |profile|
+      # call full update rather than update_all which skips callbacks
+      profile.update(name: name)
+    end
+  end
 
   def after_role_update(role)
     reset_cached_roles!
     # Reindex record if it is a searchkick model
     resource = role.resource
-    resource.reindex if Searchkick.callbacks? && resource.searchable?
+    resource.reindex if resource && Searchkick.callbacks? && resource.searchable?
+  end
+
+  def sync_groups_after_adding(role)
+    return unless role.resource.is_a?(Group)
+    group = role.resource
+    if group.primary? && role.name == Role::ADMIN.to_s
+      add_role(Role::ADMIN, group.organization.admin_group) unless
+        has_role?(Role::ADMIN, group.organization.admin_group)
+    elsif group.admin?
+      add_role(Role::ADMIN, group.organization.primary_group) unless
+        has_role?(Role::ADMIN, group.organization.primary_group)
+    end
+  end
+
+  def sync_groups_after_removing(role)
+    return unless role.resource.is_a?(Group)
+    group = role.resource
+    if group.primary? && role.name == Role::ADMIN.to_s
+      remove_role(Role::ADMIN, group.organization.admin_group) if
+        has_role?(Role::ADMIN, group.organization.admin_group)
+    elsif group.admin? && has_role?(Role::ADMIN, group.organization.primary_group)
+      # if removing them from the admin group,
+      # convert them back to a normal member of the org
+      remove_role(Role::ADMIN, group.organization.primary_group)
+      add_role(Role::MEMBER, group.organization.primary_group)
+    end
   end
 end
