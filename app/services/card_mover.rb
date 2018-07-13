@@ -29,7 +29,8 @@ class CardMover
 
   def move_cards
     # get original cards in the destination
-    existing_cards = @to_collection.collection_cards.to_a
+    pinned_cards = @to_collection.collection_cards.pinned.to_a
+    existing_cards = @to_collection.collection_cards.unpinned.to_a
     # track if we should update their collection covers
     @should_update_from_cover = false
     @should_update_to_cover = false
@@ -46,9 +47,9 @@ class CardMover
     joined_cards = []
     # created joined array with moving_cards either at beginning or end
     if @placement == 'beginning'
-      joined_cards = (@moving_cards + existing_cards)
+      joined_cards = (pinned_cards + @moving_cards + existing_cards)
     else
-      joined_cards = (existing_cards + @moving_cards)
+      joined_cards = (pinned_cards + existing_cards + @moving_cards)
     end
     # uniq the array because we may be moving within the same collection
     joined_cards.uniq!

@@ -118,10 +118,17 @@ class CardMenu extends React.Component {
       items = _.filter(actions, a => _.includes(viewActions, a.name))
     }
 
+    // if record is system required, we always remove these actions
+    if (card.record && card.record.system_required) {
+      items = _.reject(items, a => (
+        _.includes(['Duplicate', 'Archive'], a.name)
+      ))
+    }
+
     if (uiStore.viewingCollection) {
       const coll = uiStore.viewingCollection
       // Remove Add To My Collection menu item for special collections
-      if (coll.isUserCollection || coll.isOrgTemplateCollection || coll.isMasterTemplate) {
+      if (coll.isUserCollection) {
         items = _.reject(items, { name: 'Add to My Collection' })
       }
     }

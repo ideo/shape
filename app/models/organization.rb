@@ -56,9 +56,6 @@ class Organization < ApplicationRecord
   def setup_user_membership_and_collections(user)
     # make sure they're on the org
     Collection::UserCollection.find_or_create_for_user(user, self)
-    if profile_template.present?
-      Collection::UserProfile.find_or_create_for_user(user: user, organization: self)
-    end
     setup_user_membership(user)
   end
 
@@ -82,6 +79,11 @@ class Organization < ApplicationRecord
   end
 
   def setup_user_membership(user)
+    # make sure they have a User Profile
+    if profile_template.present? && user.active?
+      Collection::UserProfile.find_or_create_for_user(user: user, organization: self)
+    end
+
     if matches_domain_whitelist?(user)
       # add them as an org member
       user.add_role(Role::MEMBER, primary_group)
@@ -112,8 +114,8 @@ class Organization < ApplicationRecord
     "#{handle}-admins"
   end
 
-  def all_users
-    User.where(id: (
+  def all_active_users
+    User.active.where(id: (
       primary_group.user_ids +
       guest_group.user_ids
     ))

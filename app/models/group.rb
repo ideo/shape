@@ -121,7 +121,7 @@ class Group < ApplicationRecord
   def after_role_update(role)
     resource = role.resource
     # Reindex record if it is a searchkick model
-    resource.reindex if Searchkick.callbacks? && resource.searchable?
+    resource.reindex if resource && Searchkick.callbacks? && resource.searchable?
   end
 
   def validate_handle?

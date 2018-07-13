@@ -17,7 +17,9 @@ class Collection
       # set collection name to user's name
       profile.name = user.name
       # save to persist the record
-      profile.save
+      saved = profile.save
+      # if some error happened here
+      return false unless saved
 
       profile_collection = organization.profile_collection
       profile_collection.primary_collection_cards.create(
@@ -30,6 +32,7 @@ class Collection
       user.add_role(Role::EDITOR, profile.becomes(Collection))
       # add org primary group as viewer... admins also as content editor
       organization.primary_group.add_role(Role::VIEWER, profile.becomes(Collection))
+      organization.guest_group.add_role(Role::VIEWER, profile.becomes(Collection))
       organization.admin_group.add_role(Role::EDITOR, profile.becomes(Collection))
       # create the templated cards from the Profile Template
       organization.profile_template.setup_templated_collection(

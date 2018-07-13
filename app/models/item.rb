@@ -63,8 +63,7 @@ class Item < ApplicationRecord
   def duplicate!(
     for_user:,
     copy_parent_card: false,
-    parent: self.parent,
-    from_template: false
+    parent: self.parent
   )
     # Clones item
     i = amoeba_dup

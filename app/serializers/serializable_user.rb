@@ -11,7 +11,11 @@ class SerializableUser < BaseJsonSerializer
   end
 
   attribute :user_profile_collection_id do
-    hash = @object.cached_user_profiles || {}
-    hash[@current_user.current_organization_id.to_s]
+    if @current_user.blank?
+      nil
+    else
+      hash = @object.cached_user_profiles || {}
+      hash[@current_user.current_organization_id.to_s]
+    end
   end
 end
