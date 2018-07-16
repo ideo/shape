@@ -26,7 +26,7 @@ class ActivityAndNotificationBuilder < SimpleService
 
   def call
     create_activity
-    if @activity
+    if @activity && @activity.should_notify?
       create_notifications
       store_in_firestore
     end
