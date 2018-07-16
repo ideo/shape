@@ -49,7 +49,7 @@ class Collection
         on: :tags,
       )
 
-      # replace the first image item with the user's pic_url_square
+      # replace the first image item with the user's network pic
       profile.replace_placeholder_with_user_pic!
 
       # create the card in My Collection
@@ -79,7 +79,7 @@ class Collection
   end
 
   def replace_placeholder_with_user_pic!
-    return if user.pic_url_square == User::DEFAULT_PIC_URL
+    return if user.picture_medium.blank?
     card = collection_cards
            .pinned
            .joins(:item)
@@ -94,9 +94,10 @@ class Collection
         mimetype: 'image/jpg',
         size: 15_945,
         filename: 'profile.jpg',
-        url: user.pic_url_square,
+        url: user.picture_medium,
       ),
     )
+    cache_cover!
   end
 
   def unarchive_and_reset_permissions!
