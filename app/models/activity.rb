@@ -40,13 +40,13 @@ class Activity < ApplicationRecord
   end
 
   def should_notify?
-    [
-      Activity.actions[:archived],
-      Activity.actions[:added_editor],
-      Activity.actions[:added_member],
-      Activity.actions[:added_admin],
-      Activity.actions[:commented],
-      Activity.actions[:mentioned],
-    ].include? action
+    %w[
+      archived
+      added_editor
+      added_member
+      added_admin
+      commented
+      mentioned
+    ].include? action.to_s
   end
 end
