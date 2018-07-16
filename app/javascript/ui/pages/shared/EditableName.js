@@ -113,7 +113,7 @@ class EditableName extends React.Component {
       const mid = parseInt((this.name.length - truncateAmount) / 2)
       const firstPart = this.name.slice(0, mid)
       const secondPart = this.name.slice(mid + truncateAmount, this.name.length - 1)
-      this.truncatedName = `${firstPart}...${secondPart}`
+      this.truncatedName = `${firstPart}…${secondPart}`
       return this.truncatedName
     }
     return this.name
