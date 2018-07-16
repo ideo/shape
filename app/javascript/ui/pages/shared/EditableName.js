@@ -100,9 +100,27 @@ class EditableName extends React.Component {
     this.props.updateNameHandler(this.name)
   }
 
+  truncateName() {
+    // Estimation of width based on current font size
+    const width = this.name.length * 25
+    let screenWidth = window.innerWidth ||
+      document.documentElement.clientWidth ||
+      document.body.clientWidth
+    if (screenWidth > v.maxWidth) screenWidth = v.maxWidth
+    const diff = width - (screenWidth - 400)
+    if (diff > 0) {
+      const truncateAmount = parseInt(diff / 25)
+      const mid = parseInt((this.name.length - truncateAmount) / 2)
+      const firstPart = this.name.slice(0, mid)
+      const secondPart = this.name.slice(mid + truncateAmount, this.name.length - 1)
+      this.truncatedName = `${firstPart}...${secondPart}`
+      return this.truncatedName
+    }
+    return this.name
+  }
+
   render() {
     const { canEdit, TextWrapper, fontSize, uiStore } = this.props
-    const { name } = this
     const { editingName } = uiStore
 
     if (canEdit && editingName) {
@@ -115,7 +133,7 @@ class EditableName extends React.Component {
             maxLength={40}
             className="input__name"
             style={{ fontSize }}
-            value={name}
+            value={this.name}
             onChange={this.onNameChange}
             onKeyPress={this.onNameFieldKeypress}
           />
@@ -124,14 +142,14 @@ class EditableName extends React.Component {
       )
     }
     let nameEl = (
-      <Heading1 onClick={canEdit ? this.startEditingName : null}>
-        {name}
+      <Heading1 ref={this.textRef} onClick={canEdit ? this.startEditingName : null}>
+        {this.truncateName()}
       </Heading1>
     )
     if (TextWrapper) {
       nameEl = (
         <button onClick={canEdit ? this.startEditingName : null}>
-          <TextWrapper>{name}</TextWrapper>
+          <TextWrapper>{this.truncateName()}</TextWrapper>
         </button>
       )
     }
