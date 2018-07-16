@@ -9,6 +9,7 @@ class Api::V1::CollectionsController < Api::V1::BaseController
   before_action :load_collection_with_cards, only: %i[show update archive]
 
   def show
+    log_organization_view_activity
     render_collection
   end
 
@@ -103,6 +104,19 @@ class Api::V1::CollectionsController < Api::V1::BaseController
       :name,
       :tag_list,
       collection_cards_attributes: %i[id order width height],
+    )
+  end
+
+  def log_organization_view_activity
+    # Find if already logged view for this user of this org
+    previous = Activity.where(actor: current_user, target: @organization.primary_group, action: Activity.actions[:joined])
+    return if previous.present?
+    ActivityAndNotificationBuilder.call(
+      actor: current_user,
+      target: @organization.primary_group,
+      action: Activity.actions[:joined],
+      subject_user_ids: @organization.members[:users].pluck(:id) + @organization.guests[:users].pluck(:id),
+      subject_group_ids: @organization.members[:groups].pluck(:id) + @organization.guests[:groups].pluck(:id),
     )
   end
 end

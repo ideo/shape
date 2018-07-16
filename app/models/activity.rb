@@ -22,6 +22,10 @@ class Activity < ApplicationRecord
     added_admin: 3,
     commented: 4,
     mentioned: 5,
+    created: 6,
+    edited: 7,
+    replaced: 8,
+    joined: 9,
   }
 
   def self.role_name_to_action(role_name)
@@ -33,5 +37,16 @@ class Activity < ApplicationRecord
     when Role::ADMIN
       Activity.actions[:added_admin]
     end
+  end
+
+  def should_notify
+    [
+      self.action.archived,
+      self.action.added_editor,
+      self.action.added_member,
+      self.action.added_admin,
+      self.action.commented,
+      self.action.mentioned,
+    ].include? action
   end
 end
