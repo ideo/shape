@@ -26,35 +26,40 @@ let wrapper, rerender
 describe('GridCard', () => {
   describe('with item', () => {
     beforeEach(() => {
-      props.record.can_edit = false
       rerender = function() {
         wrapper = shallow(
           <GridCard {...props} />
         )
         return wrapper
       }
-      rerender()
     })
 
-    it('renders a StyledGridCard with passed in dragging prop', () => {
-      expect(wrapper.find('StyledGridCard').props().dragging).toBe(props.dragging)
-    })
+    describe('as viewer', () => {
+      beforeEach(() => {
+        props.record.can_edit = false
+        rerender()
+      })
 
-    it('renders a StyledGridCardInner with passed in onClick prop', () => {
-      expect(wrapper.find('StyledGridCardInner').props().onClick).toEqual(wrapper.instance().handleClick)
-    })
+      it('renders a StyledGridCard with passed in dragging prop', () => {
+        expect(wrapper.find('StyledGridCard').props().dragging).toBe(props.dragging)
+      })
 
-    it('does not render link icon if card is primary', () => {
-      expect(wrapper.find('StyledGridCard').find('LinkIcon').exists()).toBe(false)
-    })
+      it('renders a StyledGridCardInner with passed in onClick prop', () => {
+        expect(wrapper.find('StyledGridCardInner').props().onClick).toEqual(wrapper.instance().handleClick)
+      })
 
-    it('renders menu', () => {
-      expect(wrapper.find('CardMenu').exists()).toBe(true)
-    })
+      it('does not render link icon if card is primary', () => {
+        expect(wrapper.find('StyledGridCard').find('LinkIcon').exists()).toBe(false)
+      })
 
-    it('does not render selection circle or hotspot', () => {
-      expect(wrapper.find('SelectionCircle').exists()).toBe(false)
-      expect(wrapper.find('GridCardHotspot').exists()).toBe(false)
+      it('renders menu', () => {
+        expect(wrapper.find('CardMenu').exists()).toBe(true)
+      })
+
+      it('renders selection circle without hotspot', () => {
+        expect(wrapper.find('SelectionCircle').exists()).toBe(true)
+        expect(wrapper.find('GridCardHotspot').exists()).toBe(false)
+      })
     })
 
     describe('as editor', () => {
@@ -102,30 +107,32 @@ describe('GridCard', () => {
   })
 
   describe('with collection', () => {
-    beforeEach(() => {
-      props.cardType = 'collections'
-      props.card = fakeCollectionCard
-      props.canEditCollection = false
-      props.record = fakeCollection
-      props.record.can_edit = false
-      rerender()
-    })
+    describe('as viewer', () => {
+      beforeEach(() => {
+        props.cardType = 'collections'
+        props.card = fakeCollectionCard
+        props.canEditCollection = false
+        props.record = fakeCollection
+        props.record.can_edit = false
+        rerender()
+      })
 
-    it('renders the collection cover', () => {
-      expect(wrapper.find('CollectionCover').props().collection).toEqual(fakeCollection)
-    })
+      it('renders the collection cover', () => {
+        expect(wrapper.find('CollectionCover').props().collection).toEqual(fakeCollection)
+      })
 
-    it('renders the collection icon', () => {
-      expect(wrapper.find('StyledGridCard').find('CollectionIcon').exists()).toBe(true)
-    })
+      it('renders the collection icon', () => {
+        expect(wrapper.find('StyledGridCard').find('CollectionIcon').exists()).toBe(true)
+      })
 
-    it('renders menu and selection circle', () => {
-      expect(wrapper.find('CardMenu').exists()).toBe(true)
-    })
+      it('renders menu and selection circle', () => {
+        expect(wrapper.find('CardMenu').exists()).toBe(true)
+      })
 
-    it('does not render selection circle or hotspot', () => {
-      expect(wrapper.find('SelectionCircle').exists()).toBe(false)
-      expect(wrapper.find('GridCardHotspot').exists()).toBe(false)
+      it('renders selection circle without hotspot', () => {
+        expect(wrapper.find('SelectionCircle').exists()).toBe(true)
+        expect(wrapper.find('GridCardHotspot').exists()).toBe(false)
+      })
     })
 
     describe('as editor', () => {
