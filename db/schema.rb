@@ -54,6 +54,7 @@ ActiveRecord::Schema.define(version: 20180712013914) do
     t.boolean "pinned", default: false
     t.integer "templated_from_id"
     t.datetime "archived_at"
+    t.string "archive_batch"
     t.index ["collection_id"], name: "index_collection_cards_on_collection_id"
     t.index ["item_id"], name: "index_collection_cards_on_item_id"
     t.index ["parent_id"], name: "index_collection_cards_on_parent_id"
@@ -73,6 +74,7 @@ ActiveRecord::Schema.define(version: 20180712013914) do
     t.jsonb "cached_attributes"
     t.integer "template_id"
     t.datetime "archived_at"
+    t.string "archive_batch"
     t.index ["cloned_from_id"], name: "index_collections_on_cloned_from_id"
     t.index ["organization_id"], name: "index_collections_on_organization_id"
   end
@@ -117,6 +119,7 @@ ActiveRecord::Schema.define(version: 20180712013914) do
     t.boolean "archived", default: false
     t.integer "current_shared_collection_id"
     t.datetime "archived_at"
+    t.string "archive_batch"
     t.index ["handle"], name: "index_groups_on_handle"
     t.index ["organization_id"], name: "index_groups_on_organization_id"
   end
@@ -152,6 +155,7 @@ ActiveRecord::Schema.define(version: 20180712013914) do
     t.string "thumbnail_url"
     t.jsonb "cached_attributes"
     t.datetime "archived_at"
+    t.string "archive_batch"
     t.index ["cloned_from_id"], name: "index_items_on_cloned_from_id"
   end
 

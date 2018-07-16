@@ -180,6 +180,18 @@ class CollectionCard < ApplicationRecord
     record.try(:remove_comment_followers!)
   end
 
+  # gets called by child STI classes
+  def after_unarchive_card
+    if should_update_parent_collection_cover?
+      # regenerate parent collection cover if archived card was relevant
+      parent.cache_cover!
+    else
+      # touch parent to bust cache
+      parent.touch
+    end
+    parent.reorder_cards!
+  end
+
   def self.with_record(record)
     if record.is_a?(Item)
       where(item_id: record.id)

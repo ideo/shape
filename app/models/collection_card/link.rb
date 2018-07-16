@@ -2,6 +2,7 @@ class CollectionCard
   class Link < CollectionCard
     archivable
     after_archive :after_archive_card
+    after_unarchive :after_unarchive_card
 
     belongs_to :collection,
                optional: true,

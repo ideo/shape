@@ -5,6 +5,7 @@ describe Archivable, type: :concern do
     expect(Item.ancestors).to include(Archivable)
     expect(Collection.ancestors).to include(Archivable)
     expect(CollectionCard.ancestors).to include(Archivable)
+    expect(Group.ancestors).to include(Archivable)
   end
 
   describe 'scopes' do
@@ -72,6 +73,42 @@ describe Archivable, type: :concern do
         # should not archive the collection
         expect(collection.archived?).to be false
         expect(collection_card_link.archived?).to be true
+      end
+    end
+
+    describe '#unarchive!' do
+      let(:parent) { create(:collection, num_cards: 3) }
+      let(:collection_card) { create(:collection_card, parent: parent, order: 3) }
+      let!(:collection) { create(:collection, num_cards: 2, parent_collection_card: collection_card) }
+
+      before do
+        parent.reorder_cards!
+      end
+
+      it 'can be unarchived' do
+        collection.archive!
+        expect(collection.reload.archived?).to be true
+        collection.unarchive!
+        expect(collection.reload.archived?).to be false
+      end
+
+      it 'will retain its original place in the collection' do
+        expect(parent.collection_cards.map(&:order)).to match_array([0, 1, 2, 3])
+        collection.archive!
+        expect(parent.reload.collection_cards.map(&:order)).to match_array([0, 1, 2])
+        collection.unarchive!
+        expect(parent.reload.collection_cards.map(&:order)).to match_array([0, 1, 2, 3])
+      end
+
+      it 'will unarchive related items' do
+        expect {
+          collection.archive!
+        }.to change(Item.archived, :count).by(2)
+        expect(collection_card.reload.archived?).to be true
+        expect {
+          collection.unarchive!
+        }.to change(Item.active, :count).by(2)
+        expect(collection_card.reload.active?).to be true
       end
     end
   end

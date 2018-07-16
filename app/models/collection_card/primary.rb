@@ -2,6 +2,7 @@ class CollectionCard
   class Primary < CollectionCard
     archivable with: %i[collection item]
     after_archive :after_archive_card
+    after_unarchive :after_unarchive_card
 
     belongs_to :collection,
                optional: true,
