@@ -391,6 +391,7 @@ class Collection < ApplicationRecord
   def cache_key
     "#{jsonapi_cache_key}" \
       "/#{ActiveRecord::Migrator.current_version}" \
+      "/#{ENV['HEROKU_RELEASE_VERSION']}" \
       "/cards_#{collection_cards.maximum(:updated_at).to_i}" \
       "/roles_#{roles.maximum(:updated_at).to_i}"
   end
