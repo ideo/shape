@@ -5,7 +5,7 @@ describe Users::OmniauthCallbacksController, type: :request do
     let!(:organization) { create(:organization) }
     let!(:user) { build(:user) }
     let(:email) { user.email }
-    let(:pic_url_square) { user.pic_url_square }
+    let(:picture) { user.picture }
     let(:first_name) { user.first_name }
     let(:path) { '/users/auth/ideo/callback' }
 
@@ -18,7 +18,14 @@ describe Users::OmniauthCallbacksController, type: :request do
           first_name: first_name,
           last_name: user.last_name,
           email: email,
-          picture: pic_url_square,
+          picture: picture,
+        },
+        extra: {
+          raw_info: {
+            picture: picture,
+            picture_medium: "#{picture}_md",
+            picture_large: "#{picture}_lg",
+          },
         },
       )
       Rails.application.env_config['devise.mapping'] = Devise.mappings[:user]
@@ -47,7 +54,7 @@ describe Users::OmniauthCallbacksController, type: :request do
 
     context 'with updated email and pic' do
       let!(:email) { 'newemail@user.com' }
-      let!(:pic_url_square) { 'newpic.jpg' }
+      let!(:picture) { 'newpic.jpg' }
       let!(:first_name) { 'Barney' }
 
       before do
@@ -56,36 +63,26 @@ describe Users::OmniauthCallbacksController, type: :request do
 
       it 'should update the user' do
         expect(user.email).not_to eq(email)
-        expect(user.pic_url_square).not_to eq(pic_url_square)
+        expect(user.picture).not_to eq(picture)
         expect(user.first_name).not_to eq(first_name)
 
         post(path)
         user.reload
 
         expect(user.email).to eq(email)
-        expect(user.pic_url_square).to eq(pic_url_square)
+        expect(user.picture).to eq(picture)
         expect(user.first_name).to eq(first_name)
       end
     end
 
     context 'with ideo auth domain matching current organization' do
-      let!(:organization) { create(:organization, domain_whitelist: ['company.org']) }
+      let!(:organization) { create(:organization, domain_whitelist: ['mycompany.org']) }
       let!(:user) { build(:user, current_organization: organization, email: 'personal@hotmail.com') }
 
       before do
         # should add to guest group
         organization.setup_user_membership(user)
-        OmniAuth.config.mock_auth[:ideo] = OmniAuth::AuthHash.new(
-          provider: 'ideo',
-          uid: user.uid,
-          info: {
-            first_name: first_name,
-            last_name: user.last_name,
-            email: 'user@company.org',
-            picture: pic_url_square,
-          },
-        )
-        Rails.application.env_config['devise.mapping'] = Devise.mappings[:user]
+        OmniAuth.config.mock_auth[:ideo].info.email = 'user@mycompany.org'
         Rails.application.env_config['omniauth.auth'] = OmniAuth.config.mock_auth[:ideo]
       end
 
