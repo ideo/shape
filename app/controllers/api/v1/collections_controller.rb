@@ -1,6 +1,6 @@
 class Api::V1::CollectionsController < Api::V1::BaseController
   deserializable_resource :collection, class: DeserializableCollection, only: %i[create update]
-  load_and_authorize_resource :organization, only: [:create]
+  load_and_authorize_resource :organization, only:[:create]
   load_and_authorize_resource :collection_card, only: [:create]
   load_and_authorize_resource except: %i[me update]
   before_action :check_cache, only: %i[show]
@@ -109,14 +109,15 @@ class Api::V1::CollectionsController < Api::V1::BaseController
 
   def log_organization_view_activity
     # Find if already logged view for this user of this org
-    previous = Activity.where(actor: current_user, target: @organization.primary_group, action: Activity.actions[:joined])
+    organization = current_user.current_organization
+    previous = Activity.where(actor: current_user, target: organization.primary_group, action: Activity.actions[:joined])
     return if previous.present?
     ActivityAndNotificationBuilder.call(
       actor: current_user,
-      target: @organization.primary_group,
+      target: organization.primary_group,
       action: Activity.actions[:joined],
-      subject_user_ids: @organization.members[:users].pluck(:id) + @organization.guests[:users].pluck(:id),
-      subject_group_ids: @organization.members[:groups].pluck(:id) + @organization.guests[:groups].pluck(:id),
+      subject_user_ids: organization.members[:users].pluck(:id) + organization.admins[:users].pluck(:id),
+      subject_group_ids: organization.members[:groups].pluck(:id) + organization.admins[:groups].pluck(:id),
     )
   end
 end
