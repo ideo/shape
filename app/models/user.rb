@@ -10,6 +10,12 @@ class User < ApplicationRecord
   store_accessor :cached_attributes,
                  :cached_user_profiles
 
+  # list out all attributes here that we want to cache from Network
+  store_accessor :network_data,
+                 :picture,
+                 :picture_medium,
+                 :picture_large
+
   devise :database_authenticatable, :registerable, :trackable,
          :rememberable, :validatable, :omniauthable,
          omniauth_providers: [:ideo]
@@ -75,7 +81,9 @@ class User < ApplicationRecord
   end
 
   # Searchkick Config
-  searchkick callbacks: :async, word_start: %i[name handle]
+  searchkick callbacks: false, word_start: %i[name handle]
+  after_commit :reindex
+  alias searchkick_reindex reindex
   scope :search_import, -> { active.includes(:roles) }
 
   def search_data
@@ -89,6 +97,18 @@ class User < ApplicationRecord
 
   def should_index?
     active?
+  end
+
+  def should_reindex?
+    # called after_commit
+    (previous_changes.keys & %w[name handle email]).present?
+  end
+
+  def reindex
+    return unless should_reindex?
+    Searchkick.callbacks(:async) do
+      searchkick_reindex
+    end
   end
 
   def self.all_active_except(user_id)
@@ -118,7 +138,9 @@ class User < ApplicationRecord
     end
     user.first_name = auth.info.first_name
     user.last_name = auth.info.last_name
-    user.pic_url_square = auth.info.picture
+    %w[picture picture_medium picture_large].each do |field|
+      user.network_data[field] = auth.extra.raw_info.try(field)
+    end
 
     user
   end
@@ -144,15 +166,14 @@ class User < ApplicationRecord
     {
       id: id,
       name: name,
-      pic_url_square: pic_url_square,
+      pic_url_square: picture,
     }
   end
 
   def update_from_network_profile(params)
-    self.first_name = params[:first_name] if params[:first_name].present?
-    self.last_name = params[:last_name] if params[:last_name].present?
-    self.email = params[:email] if params[:email].present?
-    self.pic_url_square = params[:picture] if params[:picture].present?
+    %i[first_name last_name email picture picture_large].each do |field|
+      send("#{field}=", params[field]) if params[field].present?
+    end
     self.handle = params[:username] if params[:username].present?
     save
   end
@@ -271,6 +292,10 @@ class User < ApplicationRecord
     reset_cached_roles!
     # Reindex record if it is a searchkick model
     resource = role.resource
+    if role.resource.is_a?(Group) && role.resource.primary?
+      # user added/removed from an org should update search index
+      reindex
+    end
     resource.reindex if resource && Searchkick.callbacks? && resource.searchable?
   end
 

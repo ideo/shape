@@ -72,16 +72,16 @@ describe Collection::UserProfile, type: :model do
     end
 
     context 'profile image' do
-      it 'should replace the first image with the user.pic_url_square' do
+      it 'should replace the first image with the user.picture_medium' do
         placeholder = template.collection_cards.first.item.image_url
         expect(user_profile.collection_cards.first.item.image_url).not_to eq placeholder
-        expect(user_profile.collection_cards.first.item.image_url).to eq user.pic_url_square
+        expect(user_profile.collection_cards.first.item.image_url).to eq user.picture_medium
       end
 
       context 'with default user image' do
-        let(:user) { create(:user, add_to_org: organization, pic_url_square: nil) }
+        let(:user) { create(:user, add_to_org: organization, picture_medium: nil) }
 
-        it 'should not replace the first image with the user.pic_url_square' do
+        it 'should not replace the first image with the user.picture_medium' do
           placeholder = template.collection_cards.first.item.image_url
           expect(user_profile.collection_cards.first.item.image_url).to eq placeholder
         end
