@@ -42,6 +42,17 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
       expect(json['data']['attributes']['can_edit']).to eq(false)
     end
 
+    it 'logs a joined activity for the current user and org' do
+      expect(ActivityAndNotificationBuilder).to receive(:call).with(
+        actor: @user,
+        target: @user.current_organization.primary_group,
+        action: Activity.actions[:joined],
+        subject_user_ids: [@user.id],
+        subject_group_ids: [],
+      )
+      get(path)
+    end
+
     context 'with editor' do
       let!(:collection) {
         create(:collection, num_cards: 5, add_editors: [user])
