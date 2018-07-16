@@ -101,11 +101,10 @@ class EditableName extends React.Component {
   }
 
   truncateName() {
+    const { uiStore } = this.props
     // Estimation of width based on current font size
     const width = this.name.length * 25
-    let screenWidth = window.innerWidth ||
-      document.documentElement.clientWidth ||
-      document.body.clientWidth
+    let screenWidth = uiStore.windowWidth
     if (screenWidth > v.maxWidth) screenWidth = v.maxWidth
     const diff = width - (screenWidth - 400)
     if (diff > 0) {
