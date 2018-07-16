@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180711224359) do
+ActiveRecord::Schema.define(version: 20180716164125) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -218,7 +218,6 @@ ActiveRecord::Schema.define(version: 20180711224359) do
     t.string "encrypted_password", default: "", null: false
     t.string "first_name"
     t.string "last_name"
-    t.string "pic_url_square"
     t.datetime "remember_created_at"
     t.integer "sign_in_count", default: 0, null: false
     t.datetime "current_sign_in_at"
@@ -238,6 +237,7 @@ ActiveRecord::Schema.define(version: 20180711224359) do
     t.string "handle"
     t.boolean "notify_through_email", default: true
     t.jsonb "cached_attributes"
+    t.jsonb "network_data", default: {}
     t.index ["email"], name: "index_users_on_email"
     t.index ["handle"], name: "index_users_on_handle", unique: true
     t.index ["invitation_token"], name: "index_users_on_invitation_token"

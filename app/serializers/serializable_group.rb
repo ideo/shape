@@ -14,7 +14,7 @@ class SerializableGroup < BaseJsonSerializer
     if @object.filestack_file_url.present?
       @object.filestack_file_url
     else
-      'https://cdn.filestackcontent.com/i4iKADquTQCWMAvyz02R'
+      'https://s3-us-west-2.amazonaws.com/assets.shape.space/group-avatar.png'
     end
   end
   has_many :roles
