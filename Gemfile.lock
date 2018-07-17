@@ -138,6 +138,8 @@ GEM
       progress_bar
       unirest (~> 1.1.2)
     formatador (0.2.5)
+    friendly_id (5.1.0)
+      activerecord (>= 4.0.0)
     globalid (0.4.1)
       activesupport (>= 4.2.0)
     google-cloud-core (1.2.0)
@@ -472,6 +474,7 @@ DEPENDENCIES
   faker (~> 1.8.7)
   fakeredis
   filestack
+  friendly_id (~> 5.1.0)
   google-cloud-firestore (~> 0.21.0)
   guard
   guard-rspec

@@ -15,14 +15,19 @@ class PageWithApi extends React.Component {
     scroll.scrollToTop({ duration: 0 })
     uiStore.resetSelectionAndBCT()
     uiStore.update('textEditingItem', null)
+
     // this will get called on initial render
-    this.fetchData(this.props)
+    if (this.checkOrg(this.props)) {
+      this.fetchData(this.props)
+    }
   }
 
   componentWillReceiveProps(nextProps) {
     // this will get called e.g. if you switch between CollectionPages
     // (component does not "re-mount" between routes, but the props change)
-    this.fetchData(nextProps)
+    if (this.checkOrg(nextProps)) {
+      this.fetchData(nextProps)
+    }
   }
 
   componentWillUnmount() {
@@ -32,6 +37,29 @@ class PageWithApi extends React.Component {
 
   @action updateError(err) {
     this.error = err
+  }
+
+  checkOrg = ({ match, apiStore }) => {
+    const path = `${routingStore.location.pathname}${routingStore.location.search}`
+    if (
+      match.path !== '/' &&
+      match.path !== '/:org' &&
+      !match.path.match(/^(\/:org)?\/search/ig) &&
+      !match.path.match(/^\/collections|items/ig)
+    ) {
+      // escape if we're not on homepage, search, or /collections/items
+      return true
+    }
+    if (!match.params.org) {
+      routingStore.routeTo(`/${apiStore.currentOrgSlug}${path}`)
+      return false
+    } else if (match.params.org !== apiStore.currentOrgSlug) {
+      apiStore.currentUser.switchOrganization(
+        match.params.org, { redirectPath: path }
+      )
+      return false
+    }
+    return true
   }
 
   // to be overridden in child class
@@ -53,7 +81,6 @@ class PageWithApi extends React.Component {
       .catch(err => {
         uiStore.update('isLoading', false)
         this.updateError(err)
-        if (!routingStore.location.pathname === '/') routingStore.routeTo('/')
         trackError(err, { name: 'PageApiFetch' })
       })
   }

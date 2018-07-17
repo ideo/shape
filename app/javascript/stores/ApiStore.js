@@ -51,6 +51,10 @@ class ApiStore extends Store {
     return this.currentUser.current_organization
   }
 
+  @computed get currentOrgSlug() {
+    return this.currentUserOrganization.slug
+  }
+
   findOrganizationById(id) {
     return _.first(this.currentUser.organizations.filter(org => org.id === id))
   }

@@ -9,7 +9,7 @@ class OrganizationSettings extends React.Component {
   componentDidMount() {
     // kick out if you're not an org admin (i.e. primary_group admin)
     if (!this.organization.primary_group.can_edit) {
-      this.props.routingStore.routeTo('/')
+      this.props.routingStore.routeTo('homepage')
     }
   }
 

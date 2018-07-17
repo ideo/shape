@@ -1,4 +1,4 @@
-import { PropTypes as MobxPropTypes } from 'mobx-react'
+import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 import { Link } from 'react-router-dom'
 
@@ -45,7 +45,8 @@ const StyledBreadcrumb = styled.div`
 
 StyledBreadcrumb.displayName = 'StyledBreadcrumb'
 
-class Breadcrumb extends React.PureComponent {
+@observer
+class Breadcrumb extends React.Component {
   breadcrumbItem = (item) => {
     const [klass, id, name] = item
     const path = routingStore.pathTo(klass, id)
@@ -64,7 +65,7 @@ class Breadcrumb extends React.PureComponent {
     return (
       <StyledBreadcrumb>
         <span className="crumb" key="myCollection">
-          <Link to="/">My Collection</Link>
+          <Link to={routingStore.pathTo('homepage')}>My Collection</Link>
         </span>
         {links}
       </StyledBreadcrumb>

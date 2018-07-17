@@ -76,7 +76,7 @@ class RolesMenu extends React.Component {
       .then(res => {
         // We should do a page reload to get the correct user's new org
         if (opts.organizationChange) {
-          this.props.routingStore.routeTo('/')
+          this.props.routingStore.routeTo('homepage')
           window.location.reload()
         }
         if (!opts.isSwitching) {

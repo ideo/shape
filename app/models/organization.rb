@@ -1,4 +1,7 @@
 class Organization < ApplicationRecord
+  extend FriendlyId
+  friendly_id :slug_candidates, use: %i[slugged finders history]
+
   has_many :collections, dependent: :destroy
   has_many :groups, dependent: :destroy
   belongs_to :primary_group,
@@ -112,6 +115,16 @@ class Organization < ApplicationRecord
 
   def admin_group_handle
     "#{handle}-admins"
+  end
+
+  def slug_candidates
+    [
+      :handle,
+      [:handle, 1],
+      [:handle, 2],
+      [:handle, 3],
+      %i[handle id],
+    ]
   end
 
   def all_active_users

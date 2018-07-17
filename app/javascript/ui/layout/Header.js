@@ -128,7 +128,7 @@ class Header extends React.Component {
   }
 
   render() {
-    const { apiStore } = this.props
+    const { apiStore, routingStore } = this.props
     const { currentUser } = apiStore
     const { userDropdownOpen, orgDropdownOpen } = this.state
     const primaryGroup = currentUser.current_organization.primary_group
@@ -138,7 +138,7 @@ class Header extends React.Component {
 
           <Flex align="center" justify="space-between">
             <Box>
-              <PlainLink to="/">
+              <PlainLink to={routingStore.pathTo('homepage')}>
                 <Logo />
               </PlainLink>
             </Box>

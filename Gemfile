@@ -92,6 +92,9 @@ gem 'kaminari', '~> 1.1'
 gem 'google-cloud-firestore', '~> 0.21.0'
 gem 'jwt', '~> 1.5'
 
+# looking up records by slug
+gem 'friendly_id', '~> 5.1.0'
+
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
   gem 'byebug', platforms: [:mri, :mingw, :x64_mingw]

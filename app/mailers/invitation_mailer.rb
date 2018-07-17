@@ -6,6 +6,11 @@ class InvitationMailer < ApplicationMailer
     @invited_to = invited_to_type.safe_constantize.find(invited_to_id)
     invited_to_url = frontend_url_for(@invited_to)
 
+    if @invited_to.is_a?(Group) && !@invited_to.org_group?
+      # only include the org name if it's not one of the main org groups
+      @org_name = @invited_to.organization.name
+    end
+
     if @user.pending?
       @url = accept_invitation_url(token: @user.invitation_token, redirect: invited_to_url)
     else
