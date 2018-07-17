@@ -1,9 +1,13 @@
+import axios from 'axios'
 import filestack from 'filestack-js'
 
 const API_KEY = process.env.FILESTACK_API_KEY
 
 const imageUploadConfig = {
-  accept: 'image/*',
+  accept: [
+    'image/*',
+    'application/pdf',
+  ],
   maxFiles: 1,
   imageMax: [1200, 1200],
   transformations: {
@@ -27,14 +31,24 @@ class FilestackUpload {
   static async pickImage({ onSuccess, onFailure } = {}) {
     const resp = await this.client.pick(imageUploadConfig)
     if (resp.filesUploaded.length > 0) {
-      const img = resp.filesUploaded[0]
+      const file = resp.filesUploaded[0]
       const fileAttrs = {
-        handle: img.handle,
-        filename: img.filename,
-        size: img.size,
-        mimetype: img.mimetype,
+        handle: file.handle,
+        filename: file.filename,
+        size: file.size,
+        mimetype: file.mimetype,
+        url: file.url,
+        docInfo: null,
       }
-      fileAttrs.url = this.transformedUrl(img.url)
+      if (file.mimetype !== 'application/pdf') {
+        fileAttrs.url = this.transformedUrl(file.handle)
+      } else {
+        const docinfoUrl = this.client.transform(file.handle, {
+          output: { docinfo: true },
+        })
+        const docResp = await axios.get(docinfoUrl)
+        fileAttrs.docinfo = docResp.data
+      }
 
       // Could re-upload the image at this point if we wanted to... for now we're
       // just saving the transform url e.g. https://process.filestackapi.com/resize...
@@ -48,8 +62,8 @@ class FilestackUpload {
     return resp
   }
 
-  static transformedUrl(url) {
-    return this.client.transform(url, {
+  static transformedUrl(handle) {
+    return this.client.transform(handle, {
       resize: { fit: 'max', width: 1200 },
       rotate: { deg: 'exif' },
     })

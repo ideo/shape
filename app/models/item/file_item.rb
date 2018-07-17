@@ -1,6 +1,5 @@
-# TODO: deprecate in favor of FileItem...
 class Item
-  class ImageItem < Item
+  class FileItem < Item
     has_filestack_file_options required: true
 
     def cache_attributes

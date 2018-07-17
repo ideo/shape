@@ -220,6 +220,7 @@ class GridCardBlank extends React.Component {
         this.setState({ loading: true, droppingFile: false })
       },
       onSuccess: (res) => {
+        // TODO: merge this logic with FilestackUpload so that they both support images and files
         if (res.length > 0) {
           const img = res[0]
           img.url = FilestackUpload.transformedUrl(img.url)
@@ -246,16 +247,17 @@ class GridCardBlank extends React.Component {
     this.setState({ creating: 'video' })
   }
 
-  createCardWith = (img) => {
+  createCardWith = (file) => {
     const attrs = {
       item_attributes: {
-        type: ITEM_TYPES.IMAGE,
+        type: ITEM_TYPES.FILE,
         filestack_file_attributes: {
-          url: img.url,
-          handle: img.handle,
-          filename: img.filename,
-          size: img.size,
-          mimetype: img.mimetype,
+          url: file.url,
+          handle: file.handle,
+          filename: file.filename,
+          size: file.size,
+          mimetype: file.mimetype,
+          docinfo: file.docinfo,
         },
       },
     }

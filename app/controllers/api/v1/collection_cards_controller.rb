@@ -158,17 +158,18 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
         :type,
         :name,
         :content,
-        { text_data: {} },
         :url,
         :thumbnail_url,
         :image,
         :archived,
-        filestack_file_attributes: %i[
-          url
-          handle
-          filename
-          size
-          mimetype
+        text_data: {},
+        filestack_file_attributes: [
+          :url,
+          :handle,
+          :filename,
+          :size,
+          :mimetype,
+          docinfo: {},
         ],
       ],
     )

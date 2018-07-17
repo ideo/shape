@@ -116,7 +116,9 @@ class GridCard extends React.Component {
   get canReplace() {
     const { record } = this.props
     if (!record.can_edit_content) return false
-    return (this.isItem && _.includes([ITEM_TYPES.IMAGE, ITEM_TYPES.VIDEO], record.type))
+    return (
+      this.isItem && _.includes([ITEM_TYPES.IMAGE, ITEM_TYPES.FILE, ITEM_TYPES.VIDEO], record.type)
+    )
   }
 
   get isItem() {
@@ -134,13 +136,15 @@ class GridCard extends React.Component {
       case ITEM_TYPES.TEXT:
         return <TextItemCover item={record} height={height} />
       case ITEM_TYPES.IMAGE:
+      case ITEM_TYPES.FILE:
+        // TODO: pass more filestack file attributes to the record
+        // TODO: further branching based on record.mimetype...
         return <ImageItemCover item={record} />
       case ITEM_TYPES.VIDEO:
         return <VideoItemCover item={record} dragging={this.props.dragging} />
       default:
         return (
           <div>
-            [{card.order}] &nbsp;
             {record.content}
           </div>
         )

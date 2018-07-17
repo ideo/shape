@@ -14,6 +14,7 @@ class Api::V1::BaseController < ApplicationController
       'Item::VideoItem': SerializableItem,
       'Item::ImageItem': SerializableItem,
       'Item::TextItem': SerializableItem,
+      'Item::FileItem': SerializableItem,
       'Collection::UserCollection': SerializableCollection,
       'Collection::SharedWithMeCollection': SerializableCollection,
       'Collection::MasterTemplate': SerializableCollection,
