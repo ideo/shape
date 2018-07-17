@@ -41,7 +41,7 @@ class FilestackUpload {
         docInfo: null,
       }
       if (file.mimetype !== 'application/pdf') {
-        fileAttrs.url = this.transformedUrl(file.handle)
+        fileAttrs.url = this.transformedImageUrl(file.handle)
       } else {
         const docinfoUrl = this.client.transform(file.handle, {
           output: { docinfo: true },
@@ -62,7 +62,14 @@ class FilestackUpload {
     return resp
   }
 
-  static transformedUrl(handle) {
+  static pdfCoverUrl(handle) {
+    return this.client.transform(handle, {
+      output: { format: 'png' },
+      resize: { fit: 'max', width: 400 },
+    })
+  }
+
+  static transformedImageUrl(handle) {
     return this.client.transform(handle, {
       resize: { fit: 'max', width: 1200 },
       rotate: { deg: 'exif' },

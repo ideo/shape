@@ -6,6 +6,7 @@ import styled from 'styled-components'
 
 import GridCardHotspot from '~/ui/grid/GridCardHotspot'
 import TextItemCover from '~/ui/grid/covers/TextItemCover'
+import PdfFileItemCover from '~/ui/grid/covers/PdfFileItemCover'
 import ImageItemCover from '~/ui/grid/covers/ImageItemCover'
 import VideoItemCover from '~/ui/grid/covers/VideoItemCover'
 import CollectionCover from '~/ui/grid/covers/CollectionCover'
@@ -135,11 +136,17 @@ class GridCard extends React.Component {
       switch (record.type) {
       case ITEM_TYPES.TEXT:
         return <TextItemCover item={record} height={height} />
-      case ITEM_TYPES.IMAGE:
+      case ITEM_TYPES.IMAGE: // TODO: <-- this one will get removed
       case ITEM_TYPES.FILE:
         // TODO: pass more filestack file attributes to the record
         // TODO: further branching based on record.mimetype...
-        return <ImageItemCover item={record} />
+        console.log(record.filestack_file.filename)
+        switch (record.filestack_file.mimetype) {
+        case 'application/pdf':
+          return <PdfFileItemCover item={record} />
+        default:
+          return <ImageItemCover item={record} />
+        }
       case ITEM_TYPES.VIDEO:
         return <VideoItemCover item={record} dragging={this.props.dragging} />
       default:

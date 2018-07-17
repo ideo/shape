@@ -1,4 +1,4 @@
 class SerializableFilestackFile < BaseJsonSerializer
   type 'filestack_files'
-  attributes :url, :handle, :size, :mimetype
+  attributes :filename, :url, :handle, :size, :mimetype, :docinfo
 end
