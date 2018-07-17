@@ -112,6 +112,7 @@ class Routes extends React.Component {
                 render={() => <SettingsPage><UserSettings /></SettingsPage>}
               />
               {/* catch routes that we don't understand */}
+              {/* TODO: refactor PageError to be a more standalone 404 page */}
               <Route exact path="/:org/:not_found" render={() => (<Redirect to="/" />)} />
               {/* have to put this last to catch all org slugs */}
               <Route exact path="/:org" component={CollectionPage} />
