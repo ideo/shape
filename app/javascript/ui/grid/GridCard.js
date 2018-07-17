@@ -127,10 +127,6 @@ class GridCard extends React.Component {
     return this.props.cardType === 'collections'
   }
 
-  get isSelectable() {
-    return (this.props.isSharedCollection || this.canEditCard)
-  }
-
   get renderInner() {
     const { card, record, height } = this.props
     if (this.isItem) {
@@ -255,9 +251,7 @@ class GridCard extends React.Component {
           uiStore.textEditingItem !== record
         ) &&
           <StyledTopRightActions>
-            {this.isSelectable &&
-              <SelectionCircle cardId={card.id} />
-            }
+            <SelectionCircle cardId={card.id} />
             <CardMenu
               className="show-on-hover card-menu"
               card={card}

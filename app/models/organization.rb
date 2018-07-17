@@ -63,6 +63,8 @@ class Organization < ApplicationRecord
   def remove_user_membership(user)
     # asynchronously remove all other roles e.g. collections, items, groups
     Roles::RemoveUserRolesFromOrganization.call(self, user)
+    profile = Collection::UserProfile.find_by(user: user, organization: self)
+    profile.archive! if profile.present?
 
     if user.organizations.count.zero?
       Organization.create_for_user(user)

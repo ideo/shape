@@ -12,7 +12,11 @@ class Collection
 
     def self.find_or_create_for_user(user:, organization:)
       profile = find_or_initialize_by(created_by: user, organization: organization)
-      return profile if profile.persisted?
+      if profile.persisted?
+        # since we're calling this from setup_user_membership, we would want to unarchive
+        profile.unarchive_and_reset_permissions! if profile.archived?
+        return profile
+      end
 
       # set collection name to user's name
       profile.name = user.name
@@ -26,8 +30,7 @@ class Collection
         collection: profile,
         order: profile_collection.collection_cards.count,
       )
-      # sort alphabetically by name
-      profile_collection.reorder_cards_by_collection_name!
+      profile_collection.reorder_cards!
 
       user.add_role(Role::EDITOR, profile.becomes(Collection))
       # add org primary group as viewer... admins also as content editor
@@ -95,5 +98,17 @@ class Collection
       ),
     )
     cache_cover!
+  end
+
+  def unarchive_and_reset_permissions!
+    unarchive!
+    user.add_role(Role::EDITOR, becomes(Collection))
+    AddRolesToChildrenWorker.perform_async(
+      [user.id],
+      [],
+      Role::EDITOR,
+      id,
+      self.class.base_class.name,
+    )
   end
 end

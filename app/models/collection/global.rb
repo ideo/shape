@@ -15,5 +15,11 @@ class Collection
       # NOTE: could search all its children if they're required but seems like overkill?
       org_templates? && collection_ids.include?(organization.profile_template_id)
     end
+
+    def reorder_cards!
+      return super.reorder_cards! unless profiles?
+      # profiles collection reorders alphabetically
+      reorder_cards_by_collection_name!
+    end
   end
 end
