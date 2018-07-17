@@ -105,11 +105,13 @@ class EditableName extends React.Component {
     const screenWidth = Math.min(uiStore.windowWidth, v.maxWidth)
     // Estimation of width based on current font size
     const fontSizeMultiplier = screenWidth > v.responsive.smallBreakpoint ? 25 : 10
-    const marginRightPadding = screenWidth > v.responsive.smallBreakpoint ? 500 : 200
+    let marginRightPadding = screenWidth > v.responsive.medBreakpoint ? 500 : 250
+    if (screenWidth > v.responsive.largeBreakpoint) marginRightPadding = 400
     const width = this.name.length * fontSizeMultiplier
     const diff = width - (screenWidth - marginRightPadding)
-    if (diff > 0) {
-      const truncateAmount = parseInt(diff / fontSizeMultiplier)
+    const truncateAmount = parseInt(diff / fontSizeMultiplier)
+    // check if there is more than 1 letter to truncate
+    if (truncateAmount > 1) {
       const mid = parseInt((this.name.length - truncateAmount) / 2)
       const firstPart = this.name.slice(0, mid)
       const secondPart = this.name.slice(mid + truncateAmount, this.name.length)
