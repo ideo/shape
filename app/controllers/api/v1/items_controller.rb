@@ -75,9 +75,7 @@ class Api::V1::ItemsController < Api::V1::BaseController
     ActivityAndNotificationBuilder.call(
       actor: current_user,
       target: @item,
-      action: Activity.actions[:edited],
-      subject_user_ids: @item.editors[:users].pluck(:id),
-      subject_group_ids: @item.editors[:groups].pluck(:id),
+      action: :edited,
       content: @item.content,
     )
   end

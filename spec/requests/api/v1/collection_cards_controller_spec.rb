@@ -98,7 +98,7 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
         expect(ActivityAndNotificationBuilder).to receive(:call).with(
           actor: @user,
           target: anything,
-          action: Activity.actions[:created],
+          action: :created,
           subject_user_ids: [@user.id],
           subject_group_ids: [],
         )
@@ -266,7 +266,7 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
         expect(ActivityAndNotificationBuilder).to receive(:call).with(
           actor: @user,
           target: collection_card.record,
-          action: Activity.actions[:archived],
+          action: :archived,
           subject_user_ids: [@user.id],
           subject_group_ids: [],
         )
@@ -548,7 +548,7 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
         expect(ActivityAndNotificationBuilder).to receive(:call).with(
           actor: @user,
           target: anything,
-          action: Activity.actions[:replaced],
+          action: :replaced,
           subject_user_ids: [@user.id],
           subject_group_ids: [],
         )

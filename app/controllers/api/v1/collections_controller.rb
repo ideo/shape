@@ -54,7 +54,7 @@ class Api::V1::CollectionsController < Api::V1::BaseController
       ActivityAndNotificationBuilder.call(
         actor: current_user,
         target: @collection,
-        action: Activity.actions[:archived],
+        action: :archived,
         subject_user_ids: @collection.editors[:users].pluck(:id),
         subject_group_ids: @collection.editors[:groups].pluck(:id),
       )
@@ -110,14 +110,12 @@ class Api::V1::CollectionsController < Api::V1::BaseController
   def log_organization_view_activity
     # Find if already logged view for this user of this org
     organization = current_user.current_organization
-    previous = Activity.where(actor: current_user, target: organization.primary_group, action: Activity.actions[:joined])
+    previous = Activity.where(actor: current_user, target: organization.primary_group, action: :joined)
     return if previous.present?
     ActivityAndNotificationBuilder.call(
       actor: current_user,
       target: organization.primary_group,
-      action: Activity.actions[:joined],
-      subject_user_ids: organization.members[:users].pluck(:id) + organization.admins[:users].pluck(:id),
-      subject_group_ids: organization.members[:groups].pluck(:id) + organization.admins[:groups].pluck(:id),
+      action: :joined,
     )
   end
 end

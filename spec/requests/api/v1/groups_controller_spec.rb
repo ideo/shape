@@ -177,7 +177,7 @@ describe Api::V1::GroupsController, type: :request, json: true, auth: true do
       expect(ActivityAndNotificationBuilder).to receive(:call).with(
         actor: @user,
         target: group,
-        action: Activity.actions[:archived],
+        action: :archived,
         subject_user_ids: (members << user).pluck(:id),
       )
       patch(path)

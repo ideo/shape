@@ -4,7 +4,7 @@ RSpec.describe ActivityAndNotificationBuilder, type: :service do
   let(:organization) { create(:organization) }
   let(:actor) { create(:user, add_to_org: organization) }
   let(:target) { create(:collection) }
-  let(:action) { Activity.actions[:archived] }
+  let(:action) { :archived }
   let(:subject_users) { create_list(:user, 1) }
   let(:subject_groups) { [] }
   let(:combine) { false }
@@ -70,7 +70,7 @@ RSpec.describe ActivityAndNotificationBuilder, type: :service do
 
     context 'when combining' do
       let(:combine) { true }
-      let(:action) { Activity.actions[:commented] }
+      let(:action) { :commented }
       let(:actor2) { create(:user, add_to_org: organization) }
       let(:actor3) { create(:user, add_to_org: organization) }
       let(:actors) { [actor2, actor3] }

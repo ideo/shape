@@ -56,7 +56,7 @@ describe Api::V1::CommentsController, type: :request, json: true, auth: true do
       expect(ActivityAndNotificationBuilder).to receive(:call).with(
         actor: @user,
         target: comment_thread.record,
-        action: Activity.actions[:commented],
+        action: :commented,
         subject_user_ids: [user.id],
         subject_group_ids: [],
         combine: true,

@@ -114,9 +114,7 @@ describe Api::V1::ItemsController, type: :request, json: true, auth: true do
       expect(ActivityAndNotificationBuilder).to receive(:call).with(
         actor: @user,
         target: item,
-        action: Activity.actions[:edited],
-        subject_user_ids: [@user.id],
-        subject_group_ids: [],
+        action: :edited,
         content: anything,
       )
       patch(path, params: params)

@@ -46,9 +46,7 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
       expect(ActivityAndNotificationBuilder).to receive(:call).with(
         actor: @user,
         target: @user.current_organization.primary_group,
-        action: Activity.actions[:joined],
-        subject_user_ids: [@user.id],
-        subject_group_ids: [],
+        action: :joined,
       )
       get(path)
     end
@@ -310,7 +308,7 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
       expect(ActivityAndNotificationBuilder).to receive(:call).with(
         actor: @user,
         target: collection,
-        action: Activity.actions[:archived],
+        action: :archived,
         subject_user_ids: [user.id],
         subject_group_ids: [],
       )

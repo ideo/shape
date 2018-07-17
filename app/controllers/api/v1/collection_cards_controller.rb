@@ -18,9 +18,9 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
       # reload the user's roles
       current_user.reload.reset_cached_roles!
       if @replacing_card.present?
-        create_notification(builder.collection_card, Activity.actions[:replaced])
+        create_notification(builder.collection_card, :replaced)
       else
-        create_notification(builder.collection_card, Activity.actions[:created])
+        create_notification(builder.collection_card, :created)
       end
       render jsonapi: builder.collection_card, include: [:parent, record: [:filestack_file]]
     else
@@ -39,7 +39,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
 
   def archive
     if @collection_card.archive!
-      create_notification(@collection_card, Activity.actions[:archived])
+      create_notification(@collection_card, :archived)
       render jsonapi: @collection_card.reload, include: [:parent, record: [:filestack_file]]
     else
       render_api_errors @collection_card.errors
