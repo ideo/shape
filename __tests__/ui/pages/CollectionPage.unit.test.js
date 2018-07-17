@@ -44,6 +44,39 @@ describe('CollectionPage', () => {
     expect(grid.props().collection).toBe(collection)
   })
 
+  // this is a function in PageWithApi
+  describe('checkOrg', () => {
+    describe('when the route match.params.org does not match apiStore.currentOrgSlug', () => {
+      beforeEach(() => {
+        props.match.params.org = 'different-slug'
+        wrapper = shallow(
+          <CollectionPage.wrappedComponent {...props} />
+        )
+      })
+
+      it('calls routingStore to make sure /:org namespace is in the path', () => {
+        expect(apiStore.currentUser.switchOrganization).toHaveBeenCalledWith(
+          'different-slug',
+          { redirectPath: routingStore.location.pathname }
+        )
+      })
+    })
+    describe('when the route does not have match.params.org', () => {
+      beforeEach(() => {
+        props.match.params.org = null
+        wrapper = shallow(
+          <CollectionPage.wrappedComponent {...props} />
+        )
+      })
+
+      it('calls routingStore to make sure /:org namespace is in the path', () => {
+        expect(routingStore.routeTo).toHaveBeenCalledWith(
+          `/${apiStore.currentOrgSlug}${routingStore.location.pathname}`
+        )
+      })
+    })
+  })
+
   describe('updateCollectionName', () => {
     beforeEach(() => {
       wrapper.instance().updateCollectionName('great')

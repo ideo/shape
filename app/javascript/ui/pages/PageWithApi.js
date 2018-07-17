@@ -12,6 +12,7 @@ class PageWithApi extends React.Component {
   @observable error = null
 
   componentDidMount() {
+    // eslint-disable-next-line
     const { uiStore } = this.props
     scroll.scrollToTop({ duration: 0 })
     uiStore.resetSelectionAndBCT()
