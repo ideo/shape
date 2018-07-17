@@ -3,7 +3,7 @@ import { action, observable } from 'mobx'
 import { animateScroll as scroll } from 'react-scroll'
 import trackError from '~/utils/trackError'
 
-import { uiStore, routingStore } from '~/stores'
+// import { uiStore, routingStore } from '~/stores'
 
 // used as an "interface" class for CollectionPage / ItemPage / SearchPage
 // NOTE: extending classes is not a recommended React approach, could consider refactoring to HOC
@@ -12,6 +12,7 @@ class PageWithApi extends React.Component {
   @observable error = null
 
   componentDidMount() {
+    const { uiStore } = this.props
     scroll.scrollToTop({ duration: 0 })
     uiStore.resetSelectionAndBCT()
     uiStore.update('textEditingItem', null)
@@ -31,6 +32,7 @@ class PageWithApi extends React.Component {
   }
 
   componentWillUnmount() {
+    const { uiStore } = this.props
     this.unmounted = true
     uiStore.setViewingCollection(null)
   }
@@ -39,7 +41,7 @@ class PageWithApi extends React.Component {
     this.error = err
   }
 
-  checkOrg = ({ match, apiStore }) => {
+  checkOrg = ({ match, apiStore, routingStore }) => {
     const path = `${routingStore.location.pathname}${routingStore.location.search}`
     if (
       match.path !== '/' &&
@@ -68,7 +70,7 @@ class PageWithApi extends React.Component {
 
   fetchData = (props) => {
     if (!_.isFunction(this.requestPath)) return null
-    const { apiStore } = props
+    const { apiStore, uiStore } = props
     uiStore.update('isLoading', true)
     return apiStore.request(this.requestPath(props))
       .then(response => {

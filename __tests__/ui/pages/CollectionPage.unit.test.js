@@ -1,6 +1,7 @@
 import CollectionPage from '~/ui/pages/CollectionPage'
 import fakeApiStore from '#/mocks/fakeApiStore'
 import fakeUiStore from '#/mocks/fakeUiStore'
+import fakeRoutingStore from '#/mocks/fakeRoutingStore'
 import {
   fakeCollection
 } from '#/mocks/data'
@@ -12,11 +13,10 @@ const collections = [
   Object.assign({}, fakeCollection, { id: 3 }),
 ]
 const collection = collections[0]
-let wrapper, match, apiStore, uiStore
+let wrapper, match, apiStore, uiStore, routingStore
 let props
 
 beforeEach(() => {
-  match = { params: { id }, path: '/collections/1', url: '/collections/1' }
   apiStore = fakeApiStore({
     findResult: collection,
     findAllResult: collections,
@@ -24,7 +24,9 @@ beforeEach(() => {
   })
   apiStore.collections = collections
   uiStore = fakeUiStore
-  props = { apiStore, uiStore, match }
+  routingStore = fakeRoutingStore
+  match = { params: { id, org: apiStore.currentOrgSlug }, path: '/collections/1', url: '/collections/1' }
+  props = { apiStore, uiStore, routingStore, match }
 
   wrapper = shallow(
     <CollectionPage.wrappedComponent {...props} />

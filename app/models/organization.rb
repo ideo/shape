@@ -36,7 +36,7 @@ class Organization < ApplicationRecord
 
   delegate :admins, to: :primary_group
   delegate :members, to: :primary_group
-  delegate :handle, to: :primary_group
+  delegate :handle, to: :primary_group, allow_nil: true
 
   validates :name, presence: true
 

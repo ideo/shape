@@ -20,7 +20,7 @@ describe('OrganizationSettings', () => {
     })
 
     it('kicks you out back to the homepage', () => {
-      expect(routingStore.routeTo).toBeCalledWith('/')
+      expect(routingStore.routeTo).toBeCalledWith('homepage')
     })
   })
 

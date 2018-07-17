@@ -116,6 +116,7 @@ class SearchPage extends PageWithApi {
 }
 
 SearchPage.propTypes = {
+  match: ReactRouterPropTypes.location.isRequired,
   location: ReactRouterPropTypes.location.isRequired,
 }
 SearchPage.wrappedComponent.propTypes = {

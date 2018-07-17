@@ -151,7 +151,7 @@ describe('OrganizationMenu', () => {
 
     it('should switch to the new organization', () => {
       expect(props.apiStore.currentUser.switchOrganization).toHaveBeenCalledWith(
-        3, { backToHomepage: true }
+        3, { redirectPath: 'homepage' }
       )
     })
 

@@ -76,7 +76,7 @@ class OrganizationMenu extends React.Component {
       this.isLoading = true
       await newOrg.save()
       await apiStore.currentUser.switchOrganization(newOrg.id,
-        { backToHomepage: true })
+        { redirectPath: 'homepage' })
       this.isLoading = false
       uiStore.update('orgCreated', true)
       onClose()

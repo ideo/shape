@@ -29,7 +29,7 @@ class User extends BaseRecord {
     return this.API_updateCurrentUser({ show_helper: false })
   }
 
-  async switchOrganization(organizationId, { backToHomepage = false, redirectPath = null } = {}) {
+  async switchOrganization(organizationId, { redirectPath = null, redirectId = null } = {}) {
     try {
       await this.apiStore.request(
         'users/switch_org',
@@ -37,10 +37,8 @@ class User extends BaseRecord {
         { organization_id: organizationId }
       )
       await this.apiStore.loadCurrentUserAndGroups()
-      if (backToHomepage) {
-        routingStore.routeTo('homepage')
-      } else if (redirectPath) {
-        routingStore.routeTo(redirectPath)
+      if (redirectPath) {
+        routingStore.routeTo(redirectPath, redirectId)
       }
     } catch (e) {
       if (e.status === 404) {
