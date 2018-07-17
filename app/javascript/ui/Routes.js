@@ -66,6 +66,7 @@ class Routes extends React.Component {
     const { uiStore } = this.props
     uiStore.updateColumnsToFit(windowWidth)
     uiStore.updateActivityLogWidth(windowWidth)
+    uiStore.update('windowWidth', windowWidth)
   }
 
   render() {

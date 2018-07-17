@@ -33,6 +33,11 @@ const IconHolder = styled.span`
   ${props => (props.align === 'left' ? 'margin-right: 10px;' : 'margin-left: 10px;')}
   margin-top: 16px;
   width: 30px;
+
+  @media only screen and (max-width: ${v.responsive.smallBreakpoint}px) {
+    height: 36px;
+    width: 20px;
+  }
 `
 
 @inject('uiStore')

@@ -100,9 +100,29 @@ class EditableName extends React.Component {
     this.props.updateNameHandler(this.name)
   }
 
+  truncateName() {
+    const { uiStore } = this.props
+    const screenWidth = Math.min(uiStore.windowWidth, v.maxWidth)
+    // Estimation of width based on current font size
+    const fontSizeMultiplier = screenWidth > v.responsive.smallBreakpoint ? 25 : 10
+    let marginRightPadding = screenWidth > v.responsive.medBreakpoint ? 500 : 250
+    if (screenWidth > v.responsive.largeBreakpoint) marginRightPadding = 400
+    const width = this.name.length * fontSizeMultiplier
+    const diff = width - (screenWidth - marginRightPadding)
+    const truncateAmount = parseInt(diff / fontSizeMultiplier)
+    // check if there is more than 1 letter to truncate
+    if (truncateAmount > 1) {
+      const mid = parseInt((this.name.length - truncateAmount) / 2)
+      const firstPart = this.name.slice(0, mid)
+      const secondPart = this.name.slice(mid + truncateAmount, this.name.length)
+      this.truncatedName = `${firstPart}…${secondPart}`
+      return this.truncatedName
+    }
+    return this.name
+  }
+
   render() {
     const { canEdit, TextWrapper, fontSize, uiStore } = this.props
-    const { name } = this
     const { editingName } = uiStore
 
     if (canEdit && editingName) {
@@ -115,7 +135,7 @@ class EditableName extends React.Component {
             maxLength={40}
             className="input__name"
             style={{ fontSize }}
-            value={name}
+            value={this.name}
             onChange={this.onNameChange}
             onKeyPress={this.onNameFieldKeypress}
           />
@@ -124,14 +144,14 @@ class EditableName extends React.Component {
       )
     }
     let nameEl = (
-      <Heading1 onClick={canEdit ? this.startEditingName : null}>
-        {name}
+      <Heading1 ref={this.textRef} onClick={canEdit ? this.startEditingName : null}>
+        {this.truncateName()}
       </Heading1>
     )
     if (TextWrapper) {
       nameEl = (
         <button onClick={canEdit ? this.startEditingName : null}>
-          <TextWrapper>{name}</TextWrapper>
+          <TextWrapper>{this.truncateName()}</TextWrapper>
         </button>
       )
     }
