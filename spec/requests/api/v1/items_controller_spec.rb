@@ -110,6 +110,16 @@ describe Api::V1::ItemsController, type: :request, json: true, auth: true do
       expect(parent.updated_at).to be > parent.created_at
     end
 
+    it 'creates an activity' do
+      expect(ActivityAndNotificationBuilder).to receive(:call).with(
+        actor: @user,
+        target: item,
+        action: :edited,
+        content: anything,
+      )
+      patch(path, params: params)
+    end
+
     context 'with cancel_sync == true' do
       let(:params) {
         json_api_params(

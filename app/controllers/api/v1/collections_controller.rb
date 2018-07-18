@@ -1,6 +1,6 @@
 class Api::V1::CollectionsController < Api::V1::BaseController
   deserializable_resource :collection, class: DeserializableCollection, only: %i[create update]
-  load_and_authorize_resource :organization, only: [:create]
+  load_and_authorize_resource :organization, only:[:create]
   load_and_authorize_resource :collection_card, only: [:create]
   load_and_authorize_resource except: %i[me update]
   before_action :check_cache, only: %i[show]
@@ -9,6 +9,7 @@ class Api::V1::CollectionsController < Api::V1::BaseController
   before_action :load_collection_with_cards, only: %i[show update archive]
 
   def show
+    log_organization_view_activity
     render_collection
   end
 
@@ -53,7 +54,7 @@ class Api::V1::CollectionsController < Api::V1::BaseController
       ActivityAndNotificationBuilder.call(
         actor: current_user,
         target: @collection,
-        action: Activity.actions[:archived],
+        action: :archived,
         subject_user_ids: @collection.editors[:users].pluck(:id),
         subject_group_ids: @collection.editors[:groups].pluck(:id),
       )
@@ -103,6 +104,18 @@ class Api::V1::CollectionsController < Api::V1::BaseController
       :name,
       :tag_list,
       collection_cards_attributes: %i[id order width height],
+    )
+  end
+
+  def log_organization_view_activity
+    # Find if already logged view for this user of this org
+    organization = current_user.current_organization
+    previous = Activity.where(actor: current_user, target: organization.primary_group, action: :joined)
+    return if previous.present?
+    ActivityAndNotificationBuilder.call(
+      actor: current_user,
+      target: organization.primary_group,
+      action: :joined,
     )
   end
 end

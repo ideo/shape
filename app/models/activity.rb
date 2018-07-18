@@ -22,16 +22,31 @@ class Activity < ApplicationRecord
     added_admin: 3,
     commented: 4,
     mentioned: 5,
+    created: 6,
+    edited: 7,
+    replaced: 8,
+    joined: 9,
   }
 
   def self.role_name_to_action(role_name)
     case role_name
     when Role::EDITOR
-      Activity.actions[:added_editor]
+      :added_editor
     when Role::MEMBER
-      Activity.actions[:added_member]
+      :added_member
     when Role::ADMIN
-      Activity.actions[:added_admin]
+      :added_admin
     end
+  end
+
+  def should_notify?
+    %w[
+      archived
+      added_editor
+      added_member
+      added_admin
+      commented
+      mentioned
+    ].include? action.to_s
   end
 end

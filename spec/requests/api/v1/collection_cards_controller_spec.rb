@@ -93,6 +93,17 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
         post(path, params: params)
         expect(CollectionCard.find(json['data']['attributes']['id']).parent).to eq(collection)
       end
+
+      it 'creates an activity' do
+        expect(ActivityAndNotificationBuilder).to receive(:call).with(
+          actor: @user,
+          target: anything,
+          action: :created,
+          subject_user_ids: [@user.id],
+          subject_group_ids: [],
+        )
+        post(path, params: params)
+      end
     end
 
     context 'with errors' do
@@ -255,7 +266,7 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
         expect(ActivityAndNotificationBuilder).to receive(:call).with(
           actor: @user,
           target: collection_card.record,
-          action: Activity.actions[:archived],
+          action: :archived,
           subject_user_ids: [@user.id],
           subject_group_ids: [],
         )
@@ -531,6 +542,17 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
         expect {
           patch(path, params: params)
         }.to change(Item, :count).by(1)
+      end
+
+      it 'creates an activity' do
+        expect(ActivityAndNotificationBuilder).to receive(:call).with(
+          actor: @user,
+          target: anything,
+          action: :replaced,
+          subject_user_ids: [@user.id],
+          subject_group_ids: [],
+        )
+        patch(path, params: params)
       end
     end
 

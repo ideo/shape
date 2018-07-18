@@ -19,6 +19,7 @@ class Api::V1::ItemsController < Api::V1::BaseController
   def update
     @item.attributes = item_params
     if @item.save
+      create_edit_notification
       # cancel_sync means we don't want to render the item JSON
       return if @cancel_sync
       @item.stopped_editing(current_user) if @item.is_a?(Item::TextItem)
@@ -67,6 +68,15 @@ class Api::V1::ItemsController < Api::V1::BaseController
       :archived,
       :tag_list,
       filestack_file_attributes: Item.filestack_file_attributes_whitelist,
+    )
+  end
+
+  def create_edit_notification
+    ActivityAndNotificationBuilder.call(
+      actor: current_user,
+      target: @item,
+      action: :edited,
+      content: @item.content,
     )
   end
 end

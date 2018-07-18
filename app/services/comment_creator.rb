@@ -52,7 +52,7 @@ class CommentCreator < SimpleService
       ActivityAndNotificationBuilder.call(
         actor: @author,
         target: @comment_thread.record,
-        action: Activity.actions[:mentioned],
+        action: :mentioned,
         subject_user_ids: mentions[:user_ids],
         subject_group_ids: mentions[:group_ids],
         combine: true,
@@ -68,7 +68,7 @@ class CommentCreator < SimpleService
     ActivityAndNotificationBuilder.call(
       actor: @author,
       target: @comment_thread.record,
-      action: Activity.actions[:commented],
+      action: :commented,
       subject_user_ids: unmentioned_users,
       subject_group_ids: unmentioned_groups,
       combine: true,
