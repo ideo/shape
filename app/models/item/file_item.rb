@@ -2,6 +2,10 @@ class Item
   class FileItem < Item
     has_filestack_file_options required: true
 
+    def image_url
+      filestack_file_url
+    end
+
     # TODO: may get rid of this since we're returning the related filestack record?
     def cache_attributes
       if cached_filestack_file_url != filestack_file_url
