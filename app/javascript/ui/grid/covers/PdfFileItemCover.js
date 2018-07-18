@@ -20,7 +20,6 @@ export const StyledPdfCover = styled.div`
 StyledPdfCover.displayName = 'StyledPdfCover'
 
 export const StyledCoverImg = styled.img`
-  /* TODO: optimize for 3d transform? */
   transform: rotate(-8deg) translateX(${props => props.x}) translateY(${props => props.y}) translateZ(0);
   transform-origin: 0 0;
   width: ${props => (props.orientation === 'portrait' ? 85 : 95)}%;

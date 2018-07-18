@@ -6,7 +6,7 @@ import { Flex, Box } from 'reflexbox'
 import CollectionCard from '~/stores/jsonApi/CollectionCard'
 import AddTextIcon from '~/ui/icons/AddTextIcon'
 import AddCollectionIcon from '~/ui/icons/AddCollectionIcon'
-import AddImageIcon from '~/ui/icons/AddImageIcon'
+import AddFileIcon from '~/ui/icons/AddFileIcon'
 import AddVideoIcon from '~/ui/icons/AddVideoIcon'
 import v, { ITEM_TYPES } from '~/utils/variables'
 import FilestackUpload from '~/utils/FilestackUpload'
@@ -381,15 +381,28 @@ class GridCardBlank extends React.Component {
               </Tooltip>
             </Box>
           }
+          {(!isReplacing && !creating) &&
+            <Tooltip
+              classes={{ tooltip: 'Tooltip' }}
+              title="Add text box"
+              placement="bottom"
+            >
+              <Box>
+                <BctButton onClick={this.startCreatingText}>
+                  <AddTextIcon width={size} height={size} color="white" />
+                </BctButton>
+              </Box>
+            </Tooltip>
+          }
           {!creating &&
             <Box>
               <Tooltip
                 classes={{ tooltip: 'Tooltip' }}
-                title="Add image"
+                title="Add file"
                 placement="bottom"
               >
                 <BctButton onClick={this.pickImage}>
-                  <AddImageIcon width={size} height={size} color="white" />
+                  <AddFileIcon width={size} height={size} color="white" />
                 </BctButton>
               </Tooltip>
             </Box>
@@ -409,19 +422,6 @@ class GridCardBlank extends React.Component {
                 </BctButton>
               </Tooltip>
             </Box>
-          }
-          {(!isReplacing && !creating) &&
-            <Tooltip
-              classes={{ tooltip: 'Tooltip' }}
-              title="Add text box"
-              placement="bottom"
-            >
-              <Box>
-                <BctButton onClick={this.startCreatingText}>
-                  <AddTextIcon width={size} height={size} color="white" />
-                </BctButton>
-              </Box>
-            </Tooltip>
           }
         </Flex>
         {inner}
