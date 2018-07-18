@@ -1,5 +1,5 @@
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
-import { Switch, Route, withRouter } from 'react-router-dom'
+import { Switch, Route, Redirect, withRouter } from 'react-router-dom'
 import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles'
 import WindowSizeListener from 'react-window-size-listener'
 import styled from 'styled-components'
@@ -66,6 +66,7 @@ class Routes extends React.Component {
     const { uiStore } = this.props
     uiStore.updateColumnsToFit(windowWidth)
     uiStore.updateActivityLogWidth(windowWidth)
+    uiStore.update('windowWidth', windowWidth)
   }
 
   render() {
@@ -97,8 +98,11 @@ class Routes extends React.Component {
             <Switch>
               <Route exact path="/" component={CollectionPage} />
               <Route path="/collections/:id" component={CollectionPage} />
+              <Route path="/:org/collections/:id" component={CollectionPage} />
               <Route path="/items/:id" component={ItemPage} />
+              <Route path="/:org/items/:id" component={ItemPage} />
               <Route path="/search" component={SearchPage} />
+              <Route path="/:org/search" component={SearchPage} />
               <Route path="/terms" component={TermsPage} />
               <Route
                 path="/settings"
@@ -108,6 +112,11 @@ class Routes extends React.Component {
                 path="/user_settings"
                 render={() => <SettingsPage><UserSettings /></SettingsPage>}
               />
+              {/* catch routes that we don't understand */}
+              {/* TODO: refactor PageError to be a more standalone 404 page */}
+              <Route exact path="/:org/:not_found" render={() => (<Redirect to="/" />)} />
+              {/* have to put this last to catch all org slugs */}
+              <Route exact path="/:org" component={CollectionPage} />
             </Switch>
           </MuiThemeProvider>
         </ErrorBoundary>

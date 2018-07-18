@@ -72,19 +72,43 @@ describe Collection::UserProfile, type: :model do
     end
 
     context 'profile image' do
-      it 'should replace the first image with the user.pic_url_square' do
+      it 'should replace the first image with the user.picture_medium' do
         placeholder = template.collection_cards.first.item.image_url
         expect(user_profile.collection_cards.first.item.image_url).not_to eq placeholder
-        expect(user_profile.collection_cards.first.item.image_url).to eq user.pic_url_square
+        expect(user_profile.collection_cards.first.item.image_url).to eq user.picture_medium
       end
 
       context 'with default user image' do
-        let(:user) { create(:user, add_to_org: organization, pic_url_square: nil) }
+        let(:user) { create(:user, add_to_org: organization, picture_medium: nil) }
 
-        it 'should not replace the first image with the user.pic_url_square' do
+        it 'should not replace the first image with the user.picture_medium' do
           placeholder = template.collection_cards.first.item.image_url
           expect(user_profile.collection_cards.first.item.image_url).to eq placeholder
         end
+      end
+    end
+
+    context 'un-archiving a member' do
+      before do
+        user_profile.archive!
+      end
+
+      it 'should un-archive the profile and re-add user as editor' do
+        expect(user_profile.archived?).to be true
+        expect(AddRolesToChildrenWorker).to receive(:perform_async).with(
+          [user.id],
+          [],
+          Role::EDITOR,
+          user_profile.id,
+          'Collection',
+        )
+        found = Collection::UserProfile.find_or_create_for_user(
+          user: user,
+          organization: organization,
+        )
+        expect(user_profile.reload.archived?).to be false
+        # make sure it found the same one
+        expect(found.id).to eq user_profile.id
       end
     end
   end

@@ -64,6 +64,11 @@ export const SubduedHeading1 = styled.h1`
   margin-left: 20px;
   padding-top: 8px;
   text-transform: none;
+
+  @media only screen and (max-width: ${v.responsive.smallBreakpoint}px) {
+    font-size: 1.5rem;
+    padding-top: 20px;
+  }
 `
 SubduedHeading1.displayName = 'SubduedHeading1'
 

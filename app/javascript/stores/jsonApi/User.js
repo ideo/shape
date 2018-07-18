@@ -29,15 +29,21 @@ class User extends BaseRecord {
     return this.API_updateCurrentUser({ show_helper: false })
   }
 
-  async switchOrganization(organizationId, { backToHomepage = false } = {}) {
-    await this.apiStore.request(
-      'users/switch_org',
-      'POST',
-      { organization_id: organizationId }
-    )
-    await this.apiStore.loadCurrentUserAndGroups()
-    if (backToHomepage) {
-      routingStore.routeTo('/')
+  async switchOrganization(organizationId, { redirectPath = null, redirectId = null } = {}) {
+    try {
+      await this.apiStore.request(
+        'users/switch_org',
+        'POST',
+        { organization_id: organizationId }
+      )
+      await this.apiStore.loadCurrentUserAndGroups()
+      if (redirectPath) {
+        routingStore.routeTo(redirectPath, redirectId)
+      }
+    } catch (e) {
+      if (e.status === 404) {
+        routingStore.routeTo('homepage')
+      }
     }
   }
 }

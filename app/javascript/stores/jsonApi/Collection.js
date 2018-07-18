@@ -16,6 +16,10 @@ class Collection extends BaseRecord {
     this._reorderCards()
   }
 
+  get organization() {
+    return this.apiStore.find('organizations', this.organization_id)
+  }
+
   get isUserCollection() {
     return this.type === 'Collection::UserCollection'
   }

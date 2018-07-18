@@ -4,7 +4,6 @@ import { observable, action, computed } from 'mobx'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 import Dotdotdot from 'react-dotdotdot'
-// import { Mention, MentionsInput } from 'react-mentions'
 
 import { routingStore } from '~/stores'
 import Link from '~/ui/global/Link'
@@ -147,7 +146,7 @@ class CommentThread extends React.Component {
     } else if (record.internalType === 'items') {
       return routingStore.pathTo('items', record.id)
     }
-    return '/'
+    return routingStore.pathTo('homepage')
   }
 
   renderThumbnail() {

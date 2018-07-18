@@ -42,13 +42,19 @@ class ApiStore extends Store {
   }
 
   @computed get currentUserOrganizationId() {
-    if (!this.currentUser) return null
-    if (!this.currentUser.current_organization) return null
-    return this.currentUser.current_organization.id
+    const org = this.currentUserOrganization
+    if (!org) return null
+    return org.id
   }
 
   @computed get currentUserOrganization() {
+    if (!this.currentUser) return null
+    if (!this.currentUser.current_organization) return null
     return this.currentUser.current_organization
+  }
+
+  @computed get currentOrgSlug() {
+    return this.currentUserOrganization.slug
   }
 
   findOrganizationById(id) {

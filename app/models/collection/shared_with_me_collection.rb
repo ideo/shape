@@ -9,7 +9,11 @@ class Collection
     def self.find_or_create_for_collection(parent_collection, user)
       existing = parent_collection.collections.shared_with_me.first
 
-      return existing if existing.present?
+      if existing.present?
+        # make sure user is Viewer e.g. if they were re-added to org
+        user.add_role(Role::VIEWER, collection.becomes(Collection))
+        return existing
+      end
 
       collection = create(
         organization: parent_collection.organization,

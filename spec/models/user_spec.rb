@@ -22,9 +22,14 @@ describe User, type: :model do
     let(:org_2_group) { org_2.guest_group }
 
     describe '#after_add_role' do
-      it 'should reset cached roles' do
+      it 'should reset cached roles and reindex user' do
         expect(user).to receive(:reset_cached_roles!)
         user.add_role(Role::MEMBER, org_group)
+      end
+
+      it 'should reindex user if added to primary group' do
+        expect(user).to receive(:reindex)
+        user.add_role(Role::MEMBER, org.primary_group)
       end
 
       context 'with a user being added to admin group' do
@@ -117,6 +122,13 @@ describe User, type: :model do
           last_name: Faker::Name.last_name,
           image: 'http://pic.url.net',
         },
+        extra: {
+          raw_info: {
+            picture: 'http://pic.url.net',
+            picture_medium: 'http://pic.url.net/med',
+            picture_large: 'http://pic.url.net/lg',
+          },
+        },
       )
     end
     let(:from_omniauth) { User.from_omniauth(auth, pending_user) }
@@ -129,6 +141,9 @@ describe User, type: :model do
         expect(from_omniauth.email).to eq auth.info.email
         expect(from_omniauth.first_name).to eq auth.info.first_name
         expect(from_omniauth.last_name).to eq auth.info.last_name
+        expect(from_omniauth.picture).to eq auth.extra.raw_info.picture
+        expect(from_omniauth.picture_medium).to eq auth.extra.raw_info.picture_medium
+        expect(from_omniauth.picture_large).to eq auth.extra.raw_info.picture_large
       end
     end
 

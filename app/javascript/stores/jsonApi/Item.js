@@ -28,7 +28,7 @@ class Item extends BaseRecord {
       const [type, id] = this.breadcrumb[this.breadcrumb.length - 2]
       return routingStore.pathTo(type, id)
     }
-    return '/'
+    return routingStore.pathTo('homepage')
   }
 
   API_updateWithoutSync({ cancel_sync } = {}) {

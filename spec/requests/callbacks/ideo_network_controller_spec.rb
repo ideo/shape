@@ -10,7 +10,7 @@ describe 'Ideo Profile API Requests' do
         first_name: user.first_name,
         last_name: user.last_name,
         email: user.email,
-        picture: user.pic_url_square,
+        picture: user.picture,
       }
     end
     # These are the headers the request from profile.ideo.com will have
@@ -44,7 +44,7 @@ describe 'Ideo Profile API Requests' do
         expect(user.first_name).not_to eq('Fancy')
         expect(user.last_name).not_to eq('Newname')
         expect(user.email).not_to eq('fancy@newname.com')
-        expect(user.pic_url_square).not_to eq('newpic.jpg')
+        expect(user.picture).not_to eq('newpic.jpg')
 
         post(
           '/callbacks/ideo_network/users',
@@ -68,7 +68,7 @@ describe 'Ideo Profile API Requests' do
         expect(user.first_name).to eq('Fancy')
         expect(user.last_name).to eq('Newname')
         expect(user.email).to eq('fancy@newname.com')
-        expect(user.pic_url_square).to eq('newpic.jpg')
+        expect(user.picture).to eq('newpic.jpg')
       end
     end
 

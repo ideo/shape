@@ -3,7 +3,7 @@
 </div>
 
 <div class='p'>
-  <%= @invited_by.name %> has invited you to join "<%= @invited_to.name %>" on Shape.
+  <%= @invited_by.name %> has invited you to join<%= @org_name ? " #{@org_name}'s" : '' %> "<%= @invited_to.name %>"<%= @org_name ? ' group ' : '' %>on Shape.
   <br/>
 
   <div class='email-link'>

@@ -165,6 +165,7 @@ class Collection < ApplicationRecord
   def self.default_relationships_for_api
     [
       :created_by,
+      :organization,
       roles: %i[users groups resource],
       collection_cards: [
         :parent,
@@ -177,6 +178,7 @@ class Collection < ApplicationRecord
   def self.default_relationships_for_query
     [
       :created_by,
+      :organization,
       roles: %i[users groups resource],
       collection_cards: [
         :parent,
@@ -391,6 +393,7 @@ class Collection < ApplicationRecord
   def cache_key
     "#{jsonapi_cache_key}" \
       "/#{ActiveRecord::Migrator.current_version}" \
+      "/#{ENV['HEROKU_RELEASE_VERSION']}" \
       "/cards_#{collection_cards.maximum(:updated_at).to_i}" \
       "/roles_#{roles.maximum(:updated_at).to_i}"
   end

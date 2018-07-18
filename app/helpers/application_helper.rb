@@ -1,7 +1,7 @@
 module ApplicationHelper
   # NOTE: this is somewhat similar to RoutingStore.js by necessity
   def frontend_url_for(obj)
-    url = root_url
+    url = "#{root_url}#{obj.organization.slug}/"
     if obj.is_a? Collection
       url += "collections/#{obj.id}"
     elsif obj.is_a? Item

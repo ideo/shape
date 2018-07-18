@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180711224359) do
+ActiveRecord::Schema.define(version: 20180716215945) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -53,6 +53,8 @@ ActiveRecord::Schema.define(version: 20180711224359) do
     t.string "type"
     t.boolean "pinned", default: false
     t.integer "templated_from_id"
+    t.datetime "archived_at"
+    t.string "archive_batch"
     t.index ["collection_id"], name: "index_collection_cards_on_collection_id"
     t.index ["item_id"], name: "index_collection_cards_on_item_id"
     t.index ["parent_id"], name: "index_collection_cards_on_parent_id"
@@ -71,6 +73,8 @@ ActiveRecord::Schema.define(version: 20180711224359) do
     t.integer "created_by_id"
     t.jsonb "cached_attributes"
     t.integer "template_id"
+    t.datetime "archived_at"
+    t.string "archive_batch"
     t.index ["cloned_from_id"], name: "index_collections_on_cloned_from_id"
     t.index ["organization_id"], name: "index_collections_on_organization_id"
   end
@@ -105,6 +109,18 @@ ActiveRecord::Schema.define(version: 20180711224359) do
     t.datetime "updated_at", null: false
   end
 
+  create_table "friendly_id_slugs", force: :cascade do |t|
+    t.string "slug", null: false
+    t.integer "sluggable_id", null: false
+    t.string "sluggable_type", limit: 50
+    t.string "scope"
+    t.datetime "created_at"
+    t.index ["slug", "sluggable_type", "scope"], name: "index_friendly_id_slugs_on_slug_and_sluggable_type_and_scope", unique: true
+    t.index ["slug", "sluggable_type"], name: "index_friendly_id_slugs_on_slug_and_sluggable_type"
+    t.index ["sluggable_id"], name: "index_friendly_id_slugs_on_sluggable_id"
+    t.index ["sluggable_type"], name: "index_friendly_id_slugs_on_sluggable_type"
+  end
+
   create_table "groups", force: :cascade do |t|
     t.string "name"
     t.bigint "organization_id"
@@ -114,6 +130,8 @@ ActiveRecord::Schema.define(version: 20180711224359) do
     t.integer "filestack_file_id"
     t.boolean "archived", default: false
     t.integer "current_shared_collection_id"
+    t.datetime "archived_at"
+    t.string "archive_batch"
     t.index ["handle"], name: "index_groups_on_handle"
     t.index ["organization_id"], name: "index_groups_on_organization_id"
   end
@@ -148,6 +166,8 @@ ActiveRecord::Schema.define(version: 20180711224359) do
     t.jsonb "text_data"
     t.string "thumbnail_url"
     t.jsonb "cached_attributes"
+    t.datetime "archived_at"
+    t.string "archive_batch"
     t.index ["cloned_from_id"], name: "index_items_on_cloned_from_id"
   end
 
@@ -174,6 +194,8 @@ ActiveRecord::Schema.define(version: 20180711224359) do
     t.integer "template_collection_id"
     t.integer "profile_template_id"
     t.integer "profile_collection_id"
+    t.string "slug"
+    t.index ["slug"], name: "index_organizations_on_slug", unique: true
   end
 
   create_table "roles", force: :cascade do |t|
@@ -218,7 +240,6 @@ ActiveRecord::Schema.define(version: 20180711224359) do
     t.string "encrypted_password", default: "", null: false
     t.string "first_name"
     t.string "last_name"
-    t.string "pic_url_square"
     t.datetime "remember_created_at"
     t.integer "sign_in_count", default: 0, null: false
     t.datetime "current_sign_in_at"
@@ -238,6 +259,7 @@ ActiveRecord::Schema.define(version: 20180711224359) do
     t.string "handle"
     t.boolean "notify_through_email", default: true
     t.jsonb "cached_attributes"
+    t.jsonb "network_data", default: {}
     t.index ["email"], name: "index_users_on_email"
     t.index ["handle"], name: "index_users_on_handle", unique: true
     t.index ["invitation_token"], name: "index_users_on_invitation_token"

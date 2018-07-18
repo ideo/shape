@@ -38,7 +38,7 @@ class Api::V1::GroupsController < Api::V1::BaseController
       ActivityAndNotificationBuilder.call(
         actor: current_user,
         target: @group,
-        action: Activity.actions[:archived],
+        action: :archived,
         subject_user_ids: @group.members[:users].pluck(:id) + @group.admins[:users].pluck(:id),
       )
       render jsonapi: @group.reload

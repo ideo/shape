@@ -1,18 +1,28 @@
 import SearchPage from '~/ui/pages/SearchPage'
 import fakeApiStore from '#/mocks/fakeApiStore'
 import fakeUiStore from '#/mocks/fakeUiStore'
+import fakeRoutingStore from '#/mocks/fakeRoutingStore'
 
-let wrapper, location, apiStore, uiStore, routingStore, props
+let wrapper, location, match, apiStore, uiStore, routingStore, props
 const query = 'stuff'
 
 beforeEach(() => {
-  location = { search: `?q=${query}`, pathname: `/search?q=${query}` }
   apiStore = fakeApiStore({
     requestResult: { data: [], meta: { page: 1 } }
   })
   uiStore = fakeUiStore
-  routingStore = {}
-  props = { apiStore, uiStore, routingStore, location }
+  routingStore = fakeRoutingStore
+  location = {
+    search: `?q=${query}`,
+    pathname: `/${apiStore.currentUserOrganization.slug}/search?q=${query}`
+  }
+  match = {
+    path: '/search',
+    params: {
+      org: apiStore.currentUserOrganization.slug,
+    },
+  }
+  props = { apiStore, uiStore, routingStore, location, match }
 
   wrapper = shallow(
     <SearchPage.wrappedComponent {...props} />

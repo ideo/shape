@@ -12,7 +12,11 @@ class Collection
 
     def self.find_or_create_for_user(user:, organization:)
       profile = find_or_initialize_by(created_by: user, organization: organization)
-      return profile if profile.persisted?
+      if profile.persisted?
+        # since we're calling this from setup_user_membership, we would want to unarchive
+        profile.unarchive_and_reset_permissions! if profile.archived?
+        return profile
+      end
 
       # set collection name to user's name
       profile.name = user.name
@@ -26,8 +30,7 @@ class Collection
         collection: profile,
         order: profile_collection.collection_cards.count,
       )
-      # sort alphabetically by name
-      profile_collection.reorder_cards_by_collection_name!
+      profile_collection.reorder_cards!
 
       user.add_role(Role::EDITOR, profile.becomes(Collection))
       # add org primary group as viewer... admins also as content editor
@@ -46,7 +49,7 @@ class Collection
         on: :tags,
       )
 
-      # replace the first image item with the user's pic_url_square
+      # replace the first image item with the user's network pic
       profile.replace_placeholder_with_user_pic!
 
       # create the card in My Collection
@@ -76,7 +79,7 @@ class Collection
   end
 
   def replace_placeholder_with_user_pic!
-    return if user.pic_url_square == User::DEFAULT_PIC_URL
+    return if user.picture_medium.blank?
     card = collection_cards
            .pinned
            .joins(:item)
@@ -91,8 +94,21 @@ class Collection
         mimetype: 'image/jpg',
         size: 15_945,
         filename: 'profile.jpg',
-        url: user.pic_url_square,
+        url: user.picture_medium,
       ),
+    )
+    cache_cover!
+  end
+
+  def unarchive_and_reset_permissions!
+    unarchive!
+    user.add_role(Role::EDITOR, becomes(Collection))
+    AddRolesToChildrenWorker.perform_async(
+      [user.id],
+      [],
+      Role::EDITOR,
+      id,
+      self.class.base_class.name,
     )
   end
 end

@@ -17,6 +17,11 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
     if builder.create
       # reload the user's roles
       current_user.reload.reset_cached_roles!
+      if @replacing_card.present?
+        create_notification(builder.collection_card, :replaced)
+      else
+        create_notification(builder.collection_card, :created)
+      end
       render jsonapi: builder.collection_card, include: [:parent, record: [:filestack_file]]
     else
       render_api_errors builder.errors
@@ -34,7 +39,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
 
   def archive
     if @collection_card.archive!
-      create_archive_notification
+      create_notification(@collection_card, :archived)
       render jsonapi: @collection_card.reload, include: [:parent, record: [:filestack_file]]
     else
       render_api_errors @collection_card.errors
@@ -126,15 +131,15 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
     authorize! :edit_content, @replacing_card.record
   end
 
-  def create_archive_notification
+  def create_notification(card, action)
     # only notify for archiving of collections (and not link cards)
-    return unless @collection_card.collection.present? && !@collection_card.link?
+    return unless !card.link?
     ActivityAndNotificationBuilder.call(
       actor: current_user,
-      target: @collection_card.record,
-      action: Activity.actions[:archived],
-      subject_user_ids: @collection_card.record.editors[:users].pluck(:id),
-      subject_group_ids: @collection_card.record.editors[:groups].pluck(:id),
+      target: card.record,
+      action: action,
+      subject_user_ids: card.record.editors[:users].pluck(:id),
+      subject_group_ids: card.record.editors[:groups].pluck(:id),
     )
   end
 

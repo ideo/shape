@@ -1,4 +1,7 @@
 class Organization < ApplicationRecord
+  extend FriendlyId
+  friendly_id :slug_candidates, use: %i[slugged finders history]
+
   has_many :collections, dependent: :destroy
   has_many :groups, dependent: :destroy
   belongs_to :primary_group,
@@ -33,7 +36,7 @@ class Organization < ApplicationRecord
 
   delegate :admins, to: :primary_group
   delegate :members, to: :primary_group
-  delegate :handle, to: :primary_group
+  delegate :handle, to: :primary_group, allow_nil: true
 
   validates :name, presence: true
 
@@ -63,6 +66,8 @@ class Organization < ApplicationRecord
   def remove_user_membership(user)
     # asynchronously remove all other roles e.g. collections, items, groups
     Roles::RemoveUserRolesFromOrganization.call(self, user)
+    profile = Collection::UserProfile.find_by(user: user, organization: self)
+    profile.archive! if profile.present?
 
     if user.organizations.count.zero?
       Organization.create_for_user(user)
@@ -112,6 +117,16 @@ class Organization < ApplicationRecord
 
   def admin_group_handle
     "#{handle}-admins"
+  end
+
+  def slug_candidates
+    [
+      :handle,
+      [:handle, 1],
+      [:handle, 2],
+      [:handle, 3],
+      %i[handle id],
+    ]
   end
 
   def all_active_users

@@ -122,7 +122,7 @@ RSpec.describe Roles::MassAssign, type: :service do
         expect(ActivityAndNotificationBuilder).to receive(:call).with(
           actor: invited_by,
           target: object,
-          action: Activity.actions[:added_editor],
+          action: :added_editor,
           subject_user_ids: users.pluck(:id),
           subject_group_ids: groups.pluck(:id),
         )

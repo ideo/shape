@@ -95,6 +95,10 @@ class Group < ApplicationRecord
     organization.admin_group_id == id
   end
 
+  def org_group?
+    [primary?, guest?, admin?].any?
+  end
+
   def can_view?(user)
     # NOTE: guest group access can be granted via primary_group membership
     return true if guest? && organization.primary_group.can_view?(user)
@@ -167,7 +171,9 @@ class Group < ApplicationRecord
   end
 
   def update_organization
-    return if !self.primary?
+    return unless primary?
+    # regenerate the org's slug if we're changing the primary handle
+    organization.slug = nil if saved_change_to_handle?
     organization.update(name: name)
   end
 end

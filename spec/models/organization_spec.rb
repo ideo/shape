@@ -181,6 +181,7 @@ describe Organization, type: :model do
     before do
       user.add_role(Role::MEMBER, other_org.primary_group)
       other_org.setup_user_membership(user)
+      # NOTE: because this call is mocked, we are not *actually* removing them from the org
       allow(Roles::RemoveUserRolesFromOrganization).to receive(:call).and_return(true)
     end
 
@@ -192,9 +193,31 @@ describe Organization, type: :model do
       organization.remove_user_membership(user)
     end
 
-    it 'should switch to their first organizaiton' do
+    it 'should switch to their first organization' do
       organization.remove_user_membership(user)
       expect(user.current_organization).to eq other_org
+    end
+
+    context 'with user profile' do
+      let!(:profile) { create(:user_profile, organization: organization, user: user) }
+
+      before do
+        # profile_template needs to be present for Collection::UserProfile methods to be called
+        organization.update(
+          profile_template: create(:master_template),
+        )
+      end
+
+      it 'should archive their profile' do
+        organization.remove_user_membership(user)
+        expect(profile.reload.archived).to be true
+      end
+
+      it 'should unarchive their profile if they rejoin' do
+        organization.remove_user_membership(user)
+        organization.setup_user_membership(user)
+        expect(profile.reload.archived).to be false
+      end
     end
 
     context 'for a user where this was their only organization' do
