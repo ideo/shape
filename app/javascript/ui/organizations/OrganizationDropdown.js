@@ -44,7 +44,7 @@ class OrganizationDropdown extends React.Component {
     // close the menu
     onItemClick()
     const switchOrg = () => {
-      apiStore.currentUser.switchOrganization(orgId, { backToHomepage: true })
+      apiStore.currentUser.switchOrganization(orgId, { redirectPath: 'homepage' })
     }
     if (uiStore.isMovingCards) {
       const currentOrgName = apiStore.currentUserOrganization.name

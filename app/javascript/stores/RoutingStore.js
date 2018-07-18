@@ -1,21 +1,25 @@
 import { RouterStore } from 'mobx-react-router'
-import { uiStore } from '~/stores'
+import { apiStore, uiStore } from '~/stores'
 
 // mobx-react-router with a couple of helper methods
 class RoutingStore extends RouterStore {
   previousPageBeforeSearch = null
 
-  pathTo = (type, id) => {
+  slug = () => apiStore.currentOrgSlug
+
+  pathTo = (type, id = null) => {
     switch (type) {
     case 'collections':
-      return `/collections/${id}`
+      return `/${this.slug()}/collections/${id}`
     case 'items':
-      return `/items/${id}`
+      return `/${this.slug()}/items/${id}`
     case 'search':
       // `id` means query in this case
       // if no query, then go back to homepage (e.g. clearing out your search)
-      if (!id) return '/'
-      return `/search?q=${id.replace(/\s/g, '+')}`
+      if (!id) return this.pathTo('homepage')
+      return `/${this.slug()}/search?q=${id.replace(/\s/g, '+')}`
+    case 'homepage':
+      return `/${this.slug()}`
     default:
       return ''
     }
@@ -25,7 +29,7 @@ class RoutingStore extends RouterStore {
     // close the org/roles menus if either are open when we route to a new page
     uiStore.update('organizationMenuPage', null)
     uiStore.update('rolesMenuOpen', false)
-    if (!id) {
+    if (!id && type !== 'homepage') {
       // in this case, type is a path like '/' or '/terms'
       this.push(type)
       return

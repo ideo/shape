@@ -10,9 +10,9 @@ import CollectionGrid from '~/ui/grid/CollectionGrid'
 import MoveModal from '~/ui/grid/MoveModal'
 import PageHeader from '~/ui/pages/shared/PageHeader'
 
-const isHomepage = ({ path }) => path === '/'
+const isHomepage = ({ params }) => (params.org && !params.id)
 
-@inject('apiStore', 'uiStore')
+@inject('apiStore', 'uiStore', 'routingStore')
 @observer
 class CollectionPage extends PageWithApi {
   componentWillReceiveProps(nextProps) {
@@ -131,6 +131,7 @@ CollectionPage.propTypes = {
 CollectionPage.wrappedComponent.propTypes = {
   apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
+  routingStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 
 export default CollectionPage

@@ -133,6 +133,7 @@ export const fakeGroup = {
 export const fakeOrganizationAttrs = {
   id: 1,
   name: 'TestOrg',
+  slug: 'test-org',
   primary_group: fakeGroup,
   guest_group: fakeGroup,
   admin_group: fakeGroup,

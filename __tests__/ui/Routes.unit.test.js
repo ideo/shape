@@ -48,8 +48,6 @@ describe('Routes', () => {
     it('does not display the TermsOfUseModal', () => {
       expect(wrapper.find('TermsOfUseModal').exists()).toBeFalsy()
     })
-
-
   })
 
   describe('with terms not yet accepted', () => {

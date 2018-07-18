@@ -1,6 +1,7 @@
 import CollectionPage from '~/ui/pages/CollectionPage'
 import fakeApiStore from '#/mocks/fakeApiStore'
 import fakeUiStore from '#/mocks/fakeUiStore'
+import fakeRoutingStore from '#/mocks/fakeRoutingStore'
 import {
   fakeCollection
 } from '#/mocks/data'
@@ -12,11 +13,10 @@ const collections = [
   Object.assign({}, fakeCollection, { id: 3 }),
 ]
 const collection = collections[0]
-let wrapper, match, apiStore, uiStore
+let wrapper, match, apiStore, uiStore, routingStore
 let props
 
 beforeEach(() => {
-  match = { params: { id }, path: '/collections/1', url: '/collections/1' }
   apiStore = fakeApiStore({
     findResult: collection,
     findAllResult: collections,
@@ -24,7 +24,9 @@ beforeEach(() => {
   })
   apiStore.collections = collections
   uiStore = fakeUiStore
-  props = { apiStore, uiStore, match }
+  routingStore = fakeRoutingStore
+  match = { params: { id, org: apiStore.currentOrgSlug }, path: '/collections/1', url: '/collections/1' }
+  props = { apiStore, uiStore, routingStore, match }
 
   wrapper = shallow(
     <CollectionPage.wrappedComponent {...props} />
@@ -40,6 +42,39 @@ describe('CollectionPage', () => {
   it('passes collection to the CollectionGrid', () => {
     const grid = wrapper.find('CollectionGrid')
     expect(grid.props().collection).toBe(collection)
+  })
+
+  // this is a function in PageWithApi
+  describe('checkOrg', () => {
+    describe('when the route match.params.org does not match apiStore.currentOrgSlug', () => {
+      beforeEach(() => {
+        props.match.params.org = 'different-slug'
+        wrapper = shallow(
+          <CollectionPage.wrappedComponent {...props} />
+        )
+      })
+
+      it('calls routingStore to make sure /:org namespace is in the path', () => {
+        expect(apiStore.currentUser.switchOrganization).toHaveBeenCalledWith(
+          'different-slug',
+          { redirectPath: routingStore.location.pathname }
+        )
+      })
+    })
+    describe('when the route does not have match.params.org', () => {
+      beforeEach(() => {
+        props.match.params.org = null
+        wrapper = shallow(
+          <CollectionPage.wrappedComponent {...props} />
+        )
+      })
+
+      it('calls routingStore to make sure /:org namespace is in the path', () => {
+        expect(routingStore.routeTo).toHaveBeenCalledWith(
+          `/${apiStore.currentOrgSlug}${routingStore.location.pathname}`
+        )
+      })
+    })
   })
 
   describe('updateCollectionName', () => {

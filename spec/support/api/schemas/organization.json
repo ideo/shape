@@ -3,6 +3,7 @@
   "properties": {
     "id": { "type": "integer" },
     "name": { "type": "string" },
+    "slug": { "type": "string" },
     "domain_whitelist": { "type": "array" }
   },
   "required": ["id", "name"]

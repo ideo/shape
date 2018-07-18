@@ -1,8 +1,12 @@
 import CommentThread from '~/ui/threads/CommentThread'
 import { fakeThread } from '#/mocks/data'
 import { ITEM_TYPES } from '~/utils/variables'
+import { routingStore } from '~/stores'
+
+jest.mock('../../../app/javascript/stores')
 
 let wrapper, props
+
 describe('CommentThread', () => {
   beforeEach(() => {
     props = {
@@ -76,7 +80,7 @@ describe('CommentThread', () => {
       })
 
       it('should be a link to the collection', () => {
-        expect(link.props().to).toEqual('/collections/5')
+        expect(routingStore.pathTo).toHaveBeenCalledWith('collections', 5)
       })
 
       it('should render the collection icon', () => {
@@ -110,7 +114,7 @@ describe('CommentThread', () => {
       })
 
       it('should be a link to the item', () => {
-        expect(link.props().to).toEqual('/items/2')
+        expect(routingStore.pathTo).toHaveBeenCalledWith('items', 2)
       })
 
       it('should render the filestack file url', () => {

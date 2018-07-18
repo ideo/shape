@@ -14,11 +14,11 @@ const routingStore = fakeRoutingStore
 const { id } = item
 
 beforeEach(() => {
-  match = { params: { id }, path: `/items/${id}`, url: `/items/${id}` }
   apiStore = fakeApiStore({
     findResult: item,
     requestResult: { data: item },
   })
+  match = { params: { id, org: apiStore.currentOrgSlug }, path: `/items/${id}`, url: `/items/${id}` }
   apiStore.items = [item]
   props = { apiStore, match, uiStore, routingStore }
 

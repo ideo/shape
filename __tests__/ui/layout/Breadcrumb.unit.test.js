@@ -1,5 +1,7 @@
 import Breadcrumb from '~/ui/layout/Breadcrumb'
 
+jest.mock('../../../app/javascript/stores')
+
 const props = {
   items: [
     ['Collection', 1, 'Outer Space'],

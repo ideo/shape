@@ -94,7 +94,7 @@ describe('OrganizationDropdown', () => {
     it('should call switchOrganization on currentUser', () => {
       component.handleSwitchOrg(orgId)(fakeEv)
       expect(props.apiStore.currentUser.switchOrganization).toHaveBeenCalledWith(
-        orgId, { backToHomepage: true }
+        orgId, { redirectPath: 'homepage' }
       )
     })
 

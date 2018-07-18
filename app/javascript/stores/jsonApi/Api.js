@@ -26,7 +26,7 @@ const duplicate = async (type, obj) => {
     // this will duplicate the card into My Collection
     await obj.apiStore.request(`${type}/${obj.id}/duplicate`, 'POST')
     // send to My Collection to view created duplicate
-    routingStore.routeTo('/')
+    routingStore.routeTo('homepage')
     uiStore.alertOk('Your duplicate has been created in My Collection')
     uiStore.scroll.scrollToBottom()
   } catch (e) {

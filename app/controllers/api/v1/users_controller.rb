@@ -73,7 +73,7 @@ class Api::V1::UsersController < Api::V1::BaseController
   private
 
   def load_and_authorize_organization
-    @organization = Organization.find(json_api_params[:organization_id])
+    @organization = Organization.friendly.find(json_api_params[:organization_id])
     authorize! :read, @organization
   end
 
