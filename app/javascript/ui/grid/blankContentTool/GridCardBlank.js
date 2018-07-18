@@ -219,12 +219,10 @@ class GridCardBlank extends React.Component {
         if (this.state.loading) return
         this.setState({ loading: true, droppingFile: false })
       },
-      onSuccess: (res) => {
-        // TODO: merge this logic with FilestackUpload so that they both support images and files
+      onSuccess: async (res) => {
         if (res.length > 0) {
-          const img = res[0]
-          img.url = FilestackUpload.transformedUrl(img.url)
-          this.createCardWith(img)
+          const file = await FilestackUpload.processFile(res)
+          this.createCardWith(file)
         }
       }
     })

@@ -10,21 +10,27 @@ export const StyledPdfCover = styled.div`
   background: ${v.colors.gray};
 
   .filename {
-    font-family: ${v.fonts.sans};
-    color: ${v.colors.gray};
-    position: absolute;
     bottom: 10px;
-    background: white;
+    color: ${v.colors.gray};
+    font-family: ${v.fonts.sans};
+    font-size: 1rem;
+    font-weight: 500;
+    position: absolute;
   }
 `
 StyledPdfCover.displayName = 'StyledPdfCover'
 
-export const StyledCoverImg = styled.img`
+export const ImageContainer = styled.div`
+  border-radius: 12px;
+  overflow: hidden;
   transform: rotate(-8deg) translateX(${props => props.x}) translateY(${props => props.y}) translateZ(0);
   transform-origin: 0 0;
   width: ${props => (props.orientation === 'portrait' ? 85 : 95)}%;
+  img {
+    width: 100%;
+  }
 `
-StyledCoverImg.displayName = 'StyledCoverImg'
+ImageContainer.displayName = 'StyledImageContainer'
 
 @observer
 class PdfFileItemCover extends React.Component {
@@ -55,12 +61,13 @@ class PdfFileItemCover extends React.Component {
     const { coverX, coverY, orientation } = this.calculateCoverTranslation()
     return (
       <StyledPdfCover>
-        <StyledCoverImg
-          src={pdfCoverUrl}
+        <ImageContainer
           x={`${coverX}px`}
           y={`${coverY}px`}
           orientation={orientation}
-        />
+        >
+          <img src={pdfCoverUrl} />
+        </ImageContainer>
         <div className="filename">
           { filestack_file.filename }
         </div>

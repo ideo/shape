@@ -28,33 +28,32 @@ class FilestackUpload {
     return filestack.init(API_KEY)
   }
 
+  static async processFile(filesUploaded) {
+    const file = filesUploaded[0]
+    const fileAttrs = {
+      handle: file.handle,
+      filename: file.filename,
+      size: file.size,
+      mimetype: file.mimetype,
+      url: file.url,
+      docInfo: null,
+    }
+    if (file.mimetype !== 'application/pdf') {
+      fileAttrs.url = this.transformedImageUrl(file.handle)
+    } else {
+      const docinfoUrl = this.client.transform(file.handle, {
+        output: { docinfo: true },
+      })
+      const docResp = await axios.get(docinfoUrl)
+      fileAttrs.docinfo = docResp.data
+    }
+    return fileAttrs
+  }
+
   static async pickImage({ onSuccess, onFailure } = {}) {
     const resp = await this.client.pick(imageUploadConfig)
     if (resp.filesUploaded.length > 0) {
-      const file = resp.filesUploaded[0]
-      const fileAttrs = {
-        handle: file.handle,
-        filename: file.filename,
-        size: file.size,
-        mimetype: file.mimetype,
-        url: file.url,
-        docInfo: null,
-      }
-      if (file.mimetype !== 'application/pdf') {
-        fileAttrs.url = this.transformedImageUrl(file.handle)
-      } else {
-        const docinfoUrl = this.client.transform(file.handle, {
-          output: { docinfo: true },
-        })
-        const docResp = await axios.get(docinfoUrl)
-        fileAttrs.docinfo = docResp.data
-      }
-
-      // Could re-upload the image at this point if we wanted to... for now we're
-      // just saving the transform url e.g. https://process.filestackapi.com/resize...
-      // const newResp = await this.client.storeURL(newUrl)
-      // fileAttrs.url = newResp.url
-
+      const fileAttrs = await this.processFile(resp.filesUploaded)
       if (onSuccess) onSuccess(fileAttrs)
     } else if (onFailure) {
       onFailure(resp.filesFailed)
