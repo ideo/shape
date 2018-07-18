@@ -12,7 +12,6 @@ class Api::V1::BaseController < ApplicationController
   def jsonapi_class
     super.merge(
       'Item::VideoItem': SerializableItem,
-      'Item::ImageItem': SerializableItem,
       'Item::TextItem': SerializableItem,
       'Item::FileItem': SerializableItem,
       'Collection::UserCollection': SerializableCollection,

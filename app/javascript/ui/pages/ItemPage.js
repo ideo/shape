@@ -79,7 +79,7 @@ class ItemPage extends PageWithApi {
           fullPageView
         />
       )
-    case ITEM_TYPES.IMAGE:
+    case ITEM_TYPES.FILE:
       return <ImageItem item={item} backgroundSize="contain" />
     case ITEM_TYPES.VIDEO:
       return <VideoItem item={item} />

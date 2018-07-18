@@ -136,16 +136,17 @@ class GridCard extends React.Component {
       switch (record.type) {
       case ITEM_TYPES.TEXT:
         return <TextItemCover item={record} height={height} />
-      case ITEM_TYPES.IMAGE: // TODO: <-- this one will get removed
-      case ITEM_TYPES.FILE:
-        // TODO: pass more filestack file attributes to the record
-        // TODO: further branching based on record.mimetype...
-        switch (record.filestack_file.mimetype) {
-        case 'application/pdf':
+      case ITEM_TYPES.FILE: {
+        if (record.filestack_file.mimetype === 'application/pdf') {
           return <PdfFileItemCover item={record} />
-        default:
+        }
+        const mimeBaseType = record.filestack_file.mimetype.split('/')[0]
+        if (mimeBaseType === 'image') {
           return <ImageItemCover item={record} />
         }
+        // TODO do base file type here
+        return <ImageItemCover item={record} />
+      }
       case ITEM_TYPES.VIDEO:
         return <VideoItemCover item={record} dragging={this.props.dragging} />
       default:

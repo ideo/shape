@@ -113,12 +113,12 @@ class Item < ApplicationRecord
   end
 
   def image_url
-    # overridden by VideoItem / ImageItem
+    # overridden by VideoItem / FileItem
     nil
   end
 
   def generate_name
-    # overridden by TextItem / ImageItem
+    # overridden by TextItem / FileItem
     true
   end
 

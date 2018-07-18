@@ -83,7 +83,7 @@ class Collection
     card = collection_cards
            .pinned
            .joins(:item)
-           .where('items.type = ?', 'Item::ImageItem')
+           .where('items.type = ?', 'Item::FileItem')
            .first
     return unless card.present?
     item = card.item

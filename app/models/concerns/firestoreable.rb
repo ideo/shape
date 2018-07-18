@@ -13,7 +13,6 @@ module Firestoreable
     'Collection::Global': SerializableSimpleCollection,
     'Collection::UserProfile': SerializableSimpleCollection,
     'Item::VideoItem': SerializableSimpleItem,
-    'Item::ImageItem': SerializableSimpleItem,
     'Item::TextItem': SerializableSimpleItem,
     'Item::FileItem': SerializableSimpleItem,
   }.freeze
