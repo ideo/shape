@@ -140,7 +140,6 @@ class GridCard extends React.Component {
       case ITEM_TYPES.FILE:
         // TODO: pass more filestack file attributes to the record
         // TODO: further branching based on record.mimetype...
-        console.log(record.filestack_file.filename)
         switch (record.filestack_file.mimetype) {
         case 'application/pdf':
           return <PdfFileItemCover item={record} />
@@ -233,7 +232,13 @@ class GridCard extends React.Component {
   }
 
   handleClick = (e) => {
-    if (this.props.dragging) return
+    const { dragging, record } = this.props
+    if (dragging) return
+    if (record.type === ITEM_TYPES.FILE && record.filestack_file.mimetype === 'application/pdf') {
+      // TODO: will replace with preview
+      window.open(record.filestack_file.url, '_blank')
+      return
+    }
     this.props.handleClick(e)
   }
 
