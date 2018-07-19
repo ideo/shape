@@ -1,6 +1,7 @@
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 import v from '~/utils/variables'
+import CornerIcon from '~/ui/icons/CornerIcon'
 import { uiStore } from '~/stores'
 
 export const StyledPdfCover = styled.div`
@@ -27,7 +28,11 @@ StyledPdfCover.displayName = 'StyledPdfCover'
 
 export const ImageContainer = styled.div`
   border-radius: 12px;
+  clip-path: ${props => (props.orientation === 'landscape' ?
+    'polygon(0 0,0 100%,100% 100%,100% 23.5%,83% 0)' :
+    'polygon(0 0,0 100%,100% 100%,100% 14.35%,81.5% 0)')};
   overflow: hidden;
+  position: relative;
   transform: rotate(-8deg) translateX(${props => props.x}) translateY(${props => props.y}) translateZ(0);
   transform-origin: 0 0;
   width: ${props => (props.orientation === 'portrait' ? 85 : 95)}%;
@@ -36,6 +41,15 @@ export const ImageContainer = styled.div`
   }
 `
 ImageContainer.displayName = 'StyledImageContainer'
+
+const CornerContainer = styled.div`
+  color: gray;
+  height: 50px;
+  position: absolute;
+  right: 0;
+  top: -1px;
+  width: 50px;
+`
 
 @observer
 class PdfFileItemCover extends React.Component {
@@ -62,6 +76,7 @@ class PdfFileItemCover extends React.Component {
     const { item } = this.props
     const { filestack_file, pdfCoverUrl } = item
     const { coverX, coverY, orientation } = this.calculateCoverTranslation()
+    console.log('orient', orientation)
     return (
       <StyledPdfCover>
         <ImageContainer
@@ -69,6 +84,9 @@ class PdfFileItemCover extends React.Component {
           y={`${coverY}px`}
           orientation={orientation}
         >
+          <CornerContainer>
+            <CornerIcon />
+          </CornerContainer>
           <img src={pdfCoverUrl} />
         </ImageContainer>
         <div className="filename">

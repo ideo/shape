@@ -1,6 +1,7 @@
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 import v from '~/utils/variables'
+import CornerIcon from '~/ui/icons/CornerIcon'
 import { uiStore } from '~/stores'
 
 // TODO styled cover shared with pdf cover
@@ -30,14 +31,26 @@ export const FileContainer = styled.div`
   background-color: ${v.colors.blackLava};
   border-radius: 12px;
   height: 100%;
+  overflow: hidden;
+  position: relative;
   transform: rotate(8deg) translateX(30px) translateZ(0);
   transform-origin: 0 0;
   width: 90%;
+  clip-path: polygon(0 0,0 100%,100% 100%,100% 32%,72% 0);
   img {
     width: 100%;
   }
 `
 FileContainer.displayName = 'StyledImageContainer'
+
+const CornerContainer = styled.div`
+  color: gray;
+  height: 80px;
+  position: absolute;
+  right: 0;
+  top: -1px;
+  width: 80px;
+`
 
 @observer
 class PdfFileItemCover extends React.Component {
@@ -46,7 +59,11 @@ class PdfFileItemCover extends React.Component {
     const { filestack_file } = item
     return (
       <StyledCover>
-        <FileContainer />
+        <FileContainer>
+          <CornerContainer>
+            <CornerIcon />
+          </CornerContainer>
+        </FileContainer>
         <div className="filename">
           { filestack_file.filename }
         </div>
