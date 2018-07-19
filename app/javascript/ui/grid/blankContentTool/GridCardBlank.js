@@ -371,6 +371,7 @@ class GridCardBlank extends React.Component {
                 placement="bottom"
               >
                 <BctButton
+                  className="createCollection"
                   creating={creating === 'collection'}
                   onClick={this.startCreatingCollection}
                 >
@@ -386,7 +387,7 @@ class GridCardBlank extends React.Component {
               placement="bottom"
             >
               <Box>
-                <BctButton onClick={this.startCreatingText}>
+                <BctButton className="createText" onClick={this.startCreatingText}>
                   <AddTextIcon width={size} height={size} color="white" />
                 </BctButton>
               </Box>
@@ -399,7 +400,7 @@ class GridCardBlank extends React.Component {
                 title="Add file"
                 placement="bottom"
               >
-                <BctButton onClick={this.pickImage}>
+                <BctButton className="createFile" onClick={this.pickImage}>
                   <AddFileIcon width={size} height={size} color="white" />
                 </BctButton>
               </Tooltip>
@@ -413,6 +414,7 @@ class GridCardBlank extends React.Component {
                 placement="bottom"
               >
                 <BctButton
+                  className="createVideo"
                   creating={creating === 'video'}
                   onClick={this.startCreatingVideo}
                 >
