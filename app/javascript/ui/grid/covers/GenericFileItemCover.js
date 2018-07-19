@@ -3,6 +3,7 @@ import styled from 'styled-components'
 import v from '~/utils/variables'
 import CornerIcon from '~/ui/icons/CornerIcon'
 import { uiStore } from '~/stores'
+import FileIcon from '~/ui/grid/covers/FileIcon'
 
 // TODO styled cover shared with pdf cover
 export const StyledCover = styled.div`
@@ -12,6 +13,8 @@ export const StyledCover = styled.div`
   background: ${v.colors.gray};
 
   .filename {
+    display: flex;
+    align-items: center;
     bottom: 10px;
     color: ${v.colors.gray};
     font-family: ${v.fonts.sans};
@@ -65,6 +68,7 @@ class PdfFileItemCover extends React.Component {
           </CornerContainer>
         </FileContainer>
         <div className="filename">
+          <FileIcon mimeType={item.filestack_file.mimetype} />
           { filestack_file.filename }
         </div>
       </StyledCover>

@@ -2,6 +2,7 @@ import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 import v from '~/utils/variables'
 import CornerIcon from '~/ui/icons/CornerIcon'
+import FileIcon from '~/ui/grid/covers/FileIcon'
 import { uiStore } from '~/stores'
 
 export const StyledPdfCover = styled.div`
@@ -11,11 +12,14 @@ export const StyledPdfCover = styled.div`
   background: ${v.colors.gray};
 
   .filename {
+    display: flex;
+    align-items: center;
     bottom: 10px;
     color: ${v.colors.gray};
     font-family: ${v.fonts.sans};
     font-size: 1rem;
     font-weight: 500;
+    left: 15px;
     position: absolute;
   }
 
@@ -89,6 +93,7 @@ class PdfFileItemCover extends React.Component {
           <img src={pdfCoverUrl} />
         </ImageContainer>
         <div className="filename">
+          <FileIcon mimeType={item.filestack_file.mimetype} />
           { filestack_file.filename }
         </div>
       </StyledPdfCover>
