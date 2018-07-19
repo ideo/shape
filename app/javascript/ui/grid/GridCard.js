@@ -256,7 +256,7 @@ class GridCard extends React.Component {
   handleClick = (e) => {
     const { dragging, record } = this.props
     if (dragging) return
-    if (record.type === ITEM_TYPES.FILE && record.filestack_file.mimetype === 'application/pdf') {
+    if (record.type === ITEM_TYPES.FILE && (record.mimeBaseType !== 'image')) {
       // TODO: will replace with preview
       window.open(record.filestack_file.url, '_blank')
       return
