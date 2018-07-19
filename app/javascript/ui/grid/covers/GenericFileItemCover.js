@@ -3,6 +3,7 @@ import styled from 'styled-components'
 import v from '~/utils/variables'
 import { uiStore } from '~/stores'
 
+// TODO styled cover shared with pdf cover
 export const StyledCover = styled.div`
   position: relative;
   width: 100%;
@@ -17,6 +18,10 @@ export const StyledCover = styled.div`
     font-weight: 500;
     left: 15px;
     position: absolute;
+  }
+
+  .card-menu {
+    color: ${v.colors.blackLava};
   }
 `
 StyledCover.displayName = 'StyledCover'

@@ -17,6 +17,11 @@ export const StyledPdfCover = styled.div`
     font-weight: 500;
     position: absolute;
   }
+
+  .card-menu {
+    border-color: ${v.colors.blackLava};
+    color: ${v.colors.blackLava};
+  }
 `
 StyledPdfCover.displayName = 'StyledPdfCover'
 

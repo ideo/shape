@@ -95,13 +95,22 @@ export const StyledTopRightActions = styled.div`
   top: 0.35rem;
   right: 0.25rem;
   z-index: ${v.zIndex.gridCardTop};
+  .show-on-hover {
+    color: ${props => props.color};
+    border-color: ${props => props.color};
+  }
+  .selected {
+    border-color: ${props => props.color};
+    background-color: ${props => props.color};
+  }
   .card-menu {
     margin-top: 0.25rem;
     display: inline-block;
     vertical-align: top;
     z-index: ${v.zIndex.gridCardTop};
-    color: ${v.colors.gray};
+    color: ${props => props.color};
   }
+  /
 `
 StyledTopRightActions.displayName = 'StyledTopRightActions'
 
@@ -165,6 +174,19 @@ class GridCard extends React.Component {
       )
     }
     return <div />
+  }
+
+  get actionsColor() {
+    const { record } = this.props
+    if (this.isItem) {
+      switch (record.type) {
+      case ITEM_TYPES.FILE:
+        return v.colors.blackLava
+      default:
+        return v.colors.gray
+      }
+    }
+    return v.colors.gray
   }
 
   get renderIcon() {
@@ -266,7 +288,7 @@ class GridCard extends React.Component {
           !record.menuDisabled &&
           uiStore.textEditingItem !== record
         ) &&
-          <StyledTopRightActions>
+          <StyledTopRightActions color={this.actionsColor}>
             <SelectionCircle cardId={card.id} />
             <CardMenu
               className="show-on-hover card-menu"
