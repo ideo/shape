@@ -36,7 +36,6 @@ ImageContainer.displayName = 'StyledImageContainer'
 class PdfFileItemCover extends React.Component {
   calculateCoverTranslation = () => {
     const { item } = this.props
-    console.log(item, item.filestack_file.docinfo)
     const { dimensions } = item.filestack_file.docinfo
     const { gridW, gridH } = uiStore.gridSettings
     let coverX = gridW * 0.01
@@ -51,7 +50,6 @@ class PdfFileItemCover extends React.Component {
       coverX = gridW * -0.05
       coverY = (gridH * 1.1) - height
     }
-    console.log({ gridW, coverX, coverY, orientation })
     return { coverX, coverY, orientation }
   }
 

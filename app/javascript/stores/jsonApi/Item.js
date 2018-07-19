@@ -36,6 +36,10 @@ class Item extends BaseRecord {
     return FilestackUpload.pdfCoverUrl(this.filestack_file.handle)
   }
 
+  get mimeBaseType() {
+    return this.filestack_file.mimetype.split('/')[0]
+  }
+
   API_updateWithoutSync({ cancel_sync } = {}) {
     const { apiStore } = this
     const data = this.toJsonApi()

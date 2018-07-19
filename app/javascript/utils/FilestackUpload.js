@@ -5,8 +5,12 @@ const API_KEY = process.env.FILESTACK_API_KEY
 
 const imageUploadConfig = {
   accept: [
+    '.pdf',
     'image/*',
-    'application/pdf',
+    'application/*',
+    'text/*',
+    '.docx',
+    '.ppt',
   ],
   maxFiles: 1,
   imageMax: [1200, 1200],
@@ -38,9 +42,9 @@ class FilestackUpload {
       url: file.url,
       docInfo: null,
     }
-    if (file.mimetype !== 'application/pdf') {
+    if (file.mimetype.split('/')[0] === 'image') {
       fileAttrs.url = this.transformedImageUrl(file.handle)
-    } else {
+    } else if (file.mimetype === 'application/pdf') {
       const docinfoUrl = this.client.transform(file.handle, {
         output: { docinfo: true },
       })

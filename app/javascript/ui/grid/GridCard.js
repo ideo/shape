@@ -9,6 +9,7 @@ import TextItemCover from '~/ui/grid/covers/TextItemCover'
 import PdfFileItemCover from '~/ui/grid/covers/PdfFileItemCover'
 import ImageItemCover from '~/ui/grid/covers/ImageItemCover'
 import VideoItemCover from '~/ui/grid/covers/VideoItemCover'
+import GenericFileItemCover from '~/ui/grid/covers/GenericFileItemCover'
 import CollectionCover from '~/ui/grid/covers/CollectionCover'
 
 import CardMenu from '~/ui/grid/CardMenu'
@@ -140,12 +141,10 @@ class GridCard extends React.Component {
         if (record.filestack_file.mimetype === 'application/pdf') {
           return <PdfFileItemCover item={record} />
         }
-        const mimeBaseType = record.filestack_file.mimetype.split('/')[0]
-        if (mimeBaseType === 'image') {
+        if (record.mimeBaseType === 'image') {
           return <ImageItemCover item={record} />
         }
-        // TODO do base file type here
-        return <ImageItemCover item={record} />
+        return <GenericFileItemCover item={record} />
       }
       case ITEM_TYPES.VIDEO:
         return <VideoItemCover item={record} dragging={this.props.dragging} />
