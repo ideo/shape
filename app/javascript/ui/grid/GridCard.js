@@ -15,6 +15,7 @@ import CollectionCover from '~/ui/grid/covers/CollectionCover'
 import CardMenu from '~/ui/grid/CardMenu'
 import CollectionIcon from '~/ui/icons/CollectionIcon'
 import LinkIcon from '~/ui/icons/LinkIcon'
+import Download from '~/ui/grid/Download'
 import LinkedCollectionIcon from '~/ui/icons/LinkedCollectionIcon'
 import RequiredCollectionIcon from '~/ui/icons/RequiredCollectionIcon'
 import PinnedIcon from '~/ui/icons/PinnedIcon'
@@ -289,6 +290,9 @@ class GridCard extends React.Component {
           uiStore.textEditingItem !== record
         ) &&
           <StyledTopRightActions color={this.actionsColor}>
+            { record.isDownloadable && (
+              <Download file={record.filestack_file} />
+            )}
             <SelectionCircle cardId={card.id} />
             <CardMenu
               className="show-on-hover card-menu"

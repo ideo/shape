@@ -44,6 +44,14 @@ class Item extends BaseRecord {
     return this.filestack_file && this.filestack_file.mimetype !== 'image/*'
   }
 
+  get isPdfFile() {
+    return this.filestack_file && this.filestack_file.mimetype === 'application/pdf'
+  }
+
+  get isDownloadable() {
+    return this.isGenericFile || this.isPdfFile
+  }
+
   API_updateWithoutSync({ cancel_sync } = {}) {
     const { apiStore } = this
     const data = this.toJsonApi()
