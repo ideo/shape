@@ -23,7 +23,7 @@
       "__js_test_config"
     ],
     "moduleNameMapper": {
-      ".+\\.(css|styl|less|sass|scss|png|jpg|ttf|woff|woff2)$": "identity-obj-proxy"
+      ".+\\.(css|styl|less|sass|scss|png|jpg|svg|ttf|woff|woff2)$": "identity-obj-proxy"
     },
     "testPathIgnorePatterns": [
       "/config/webpack/"

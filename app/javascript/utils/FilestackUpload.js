@@ -79,6 +79,11 @@ class FilestackUpload {
     })
   }
 
+  static preview(handle, id) {
+    console.log('handle', handle)
+    return this.client.preview('WBVeP019TZirWWZLFO7u', { id })
+  }
+
   static makeDropPane(opts = {}) {
     const config = Object.assign({}, dropPaneDefaults, opts)
     return this.client.makeDropPane(config)

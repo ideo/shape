@@ -16,6 +16,7 @@ import CardMenu from '~/ui/grid/CardMenu'
 import CollectionIcon from '~/ui/icons/CollectionIcon'
 import LinkIcon from '~/ui/icons/LinkIcon'
 import Download from '~/ui/grid/Download'
+import FilestackUpload from '~/utils/FilestackUpload'
 import LinkedCollectionIcon from '~/ui/icons/LinkedCollectionIcon'
 import RequiredCollectionIcon from '~/ui/icons/RequiredCollectionIcon'
 import PinnedIcon from '~/ui/icons/PinnedIcon'
@@ -257,7 +258,10 @@ class GridCard extends React.Component {
   handleClick = (e) => {
     const { dragging, record } = this.props
     if (dragging) return
-    if (record.type === ITEM_TYPES.FILE && (record.mimeBaseType !== 'image')) {
+    if (record.isPdfFile) {
+      FilestackUpload.preview(record.filestack_file.handle, 'filePreview')
+      return
+    } else if (record.isGenericFile) {
       // TODO: will replace with preview
       window.open(record.filestack_file.url, '_blank')
       return

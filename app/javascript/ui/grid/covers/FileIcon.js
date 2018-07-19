@@ -10,9 +10,10 @@ import SketchSvg from '~/ui/icons/files/sketch.svg'
 import XlsSvg from '~/ui/icons/files/xls.svg'
 import FileSvg from '~/ui/icons/files/file.svg'
 import PdfSvg from '~/ui/icons/files/pdf.svg'
+import v from '~/utils/variables'
 
 const IconHolder = styled.div`
-  background-color: white;
+  background-color: ${v.colors.cararra};
   border-radius: 50%;
   box-sizing: content-box;
   color: black;
