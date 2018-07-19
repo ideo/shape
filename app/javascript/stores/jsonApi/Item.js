@@ -41,7 +41,7 @@ class Item extends BaseRecord {
   }
 
   get isGenericFile() {
-    return this.filestack_file.mimetype !== 'image/*'
+    return this.filestack_file && this.filestack_file.mimetype !== 'image/*'
   }
 
   API_updateWithoutSync({ cancel_sync } = {}) {
