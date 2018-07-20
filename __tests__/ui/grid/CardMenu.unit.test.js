@@ -154,4 +154,20 @@ describe('CardMenu', () => {
       expect(_.map(popout.props().menuItems, i => i.name)).toEqual(actions)
     })
   })
+
+  describe('with a generic file as item', () => {
+    beforeEach(() => {
+      props.canEdit = true
+      props.card.record.isDownloadable = true
+      wrapper = shallow(
+        <CardMenu.wrappedComponent {...props} />
+      )
+      component = wrapper.instance()
+    })
+
+    it('creates a PopoutMenu with at least download action', () => {
+      const popout = wrapper.find('PopoutMenu').at(0)
+      expect(_.map(popout.props().menuItems, i => i.name)).toContain('Download')
+    })
+  })
 })
