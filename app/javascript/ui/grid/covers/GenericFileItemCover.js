@@ -56,7 +56,7 @@ const CornerContainer = styled.div`
 `
 
 @observer
-class PdfFileItemCover extends React.Component {
+class GenericFileItemCover extends React.Component {
   render() {
     const { item } = this.props
     const { filestack_file } = item
@@ -76,8 +76,8 @@ class PdfFileItemCover extends React.Component {
   }
 }
 
-PdfFileItemCover.propTypes = {
+GenericFileItemCover.propTypes = {
   item: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 
-export default PdfFileItemCover
+export default GenericFileItemCover

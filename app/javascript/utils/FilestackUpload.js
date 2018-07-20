@@ -80,7 +80,6 @@ class FilestackUpload {
   }
 
   static preview(handle, id) {
-    console.log('handle', handle)
     return this.client.preview('WBVeP019TZirWWZLFO7u', { id })
   }
 
