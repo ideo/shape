@@ -11,16 +11,24 @@ export const StyledPdfCover = styled.div`
   height: 100%;
   background: ${v.colors.gray};
 
-  .filename {
-    display: flex;
+  .fileInfo {
     align-items: center;
     bottom: 10px;
     color: ${v.colors.gray};
+    display: flex;
     font-family: ${v.fonts.sans};
     font-size: 1rem;
     font-weight: 500;
     left: 15px;
+    max-height: 32px;
     position: absolute;
+  }
+
+  .fileName {
+    display: inline-block;
+    max-height: 32px;
+    overflow: hidden;
+    white-space: nowrap;
   }
 
   .card-menu {
@@ -33,8 +41,8 @@ StyledPdfCover.displayName = 'StyledPdfCover'
 export const ImageContainer = styled.div`
   border-radius: 12px;
   clip-path: ${props => (props.orientation === 'landscape' ?
-    'polygon(0 0,0 100%,100% 100%,100% 23.5%,83% 0)' :
-    'polygon(0 0,0 100%,100% 100%,100% 14.35%,81.5% 0)')};
+    'polygon(0 0,0 100%,100% 100%,100% 52px,245px 0)' :
+    'polygon(0 0,0 100%,100% 100%,100% 15%,80% 0)')};
   overflow: hidden;
   position: relative;
   transform: rotate(-8deg) translateX(${props => props.x}) translateY(${props => props.y}) translateZ(0);
@@ -48,11 +56,11 @@ ImageContainer.displayName = 'StyledImageContainer'
 
 const CornerContainer = styled.div`
   color: gray;
-  height: 50px;
+  height: 54px;
   position: absolute;
   right: 0;
-  top: -1px;
-  width: 50px;
+  top: -3px;
+  width: 54px;
 `
 
 @observer
@@ -92,9 +100,9 @@ class PdfFileItemCover extends React.Component {
           </CornerContainer>
           <img src={pdfCoverUrl} />
         </ImageContainer>
-        <div className="filename">
+        <div className="fileInfo">
           <FileIcon mimeType={item.filestack_file.mimetype} />
-          { filestack_file.filename }
+          <span className="fileName">{ filestack_file.filename }</span>
         </div>
       </StyledPdfCover>
     )
