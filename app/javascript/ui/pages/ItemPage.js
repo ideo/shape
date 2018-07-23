@@ -57,7 +57,8 @@ class ItemPage extends PageWithApi {
     item.API_updateWithoutSync({ cancel_sync })
   )
 
-  cancel = (item) => {
+  cancel = () => {
+    const { item } = this.state
     if (item.can_edit_content) this.save(item)
     this.props.routingStore.push(item.parentPath)
   }
@@ -81,7 +82,7 @@ class ItemPage extends PageWithApi {
         />
       )
     case ITEM_TYPES.FILE:
-      return <ImageItem item={item} backgroundSize="contain" />
+      return <ImageItem onCancel={this.cancel} item={item} backgroundSize="contain" />
     case ITEM_TYPES.VIDEO:
       return <VideoItem item={item} />
     default:
