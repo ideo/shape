@@ -181,12 +181,10 @@ class GridCard extends React.Component {
   get actionsColor() {
     const { record } = this.props
     if (this.isItem) {
-      switch (record.type) {
-      case ITEM_TYPES.FILE:
+      if (record.isGenericFile) {
         return v.colors.blackLava
-      default:
-        return v.colors.gray
       }
+      return v.colors.gray
     }
     return v.colors.gray
   }
