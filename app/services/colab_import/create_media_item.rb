@@ -36,7 +36,7 @@ module ColabImport
       return unless UrlExists.new(url).call
 
       begin
-        @item = Item::ImageItem.create(
+        @item = Item::FileItem.create(
           name: name,
           filestack_file: FilestackFile.create_from_url(url)
         )

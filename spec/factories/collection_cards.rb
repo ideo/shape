@@ -4,7 +4,7 @@ FactoryBot.define do
     order 0
 
     factory :collection_card_image do
-      item factory: :image_item
+      item factory: :file_item
       collection nil
     end
 

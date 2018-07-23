@@ -40,7 +40,7 @@ export const fakeVideoItem = {
 }
 export const fakeImageItemAttrs = {
   id: 3,
-  type: 'Item::ImageItem',
+  type: 'Item::FileItem',
   name: 'Earth from Space',
   filestack_file: {
     id: 1,
@@ -51,6 +51,24 @@ export const fakeImageItemAttrs = {
 }
 export const fakeImageItem = {
   ...fakeImageItemAttrs,
+  rawAttributes: jest.fn().mockReturnValue(fakeTextItemAttrs),
+  getRecordType: jest.fn().mockReturnValue('items'),
+}
+export const fakeFileItemAttrs = {
+  id: 3,
+  type: 'Item::FileItem',
+  name: '',
+  filestack_file: {
+    id: 1,
+    url: 'https://www.nasa.gov/sites/default/files/styles/full_width_feature/public/thumbnails/image/iss052e023801_0.ppt',
+    handle: 'aaaaaa',
+    mimetype: 'application/vnd.powerpoint',
+  },
+  inherited_tag_list: [],
+  can_edit: false,
+}
+export const fakeFileItem = {
+  ...fakeFileItemAttrs,
   rawAttributes: jest.fn().mockReturnValue(fakeTextItemAttrs),
   getRecordType: jest.fn().mockReturnValue('items'),
 }

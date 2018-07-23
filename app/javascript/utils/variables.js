@@ -1,6 +1,6 @@
 export const ITEM_TYPES = {
   TEXT: 'Item::TextItem',
-  IMAGE: 'Item::ImageItem',
+  FILE: 'Item::FileItem',
   VIDEO: 'Item::VideoItem',
 }
 

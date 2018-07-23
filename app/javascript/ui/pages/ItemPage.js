@@ -8,6 +8,7 @@ import ActionCableConsumer from '~/utils/ActionCableConsumer'
 import PageWithApi from '~/ui/pages/PageWithApi'
 import PageContainer from '~/ui/layout/PageContainer'
 import Loader from '~/ui/layout/Loader'
+import FilePreview from '~/ui/grid/covers/FilePreview'
 import TextItem from '~/ui/items/TextItem'
 import ImageItem from '~/ui/items/ImageItem'
 import VideoItem from '~/ui/items/VideoItem'
@@ -79,7 +80,7 @@ class ItemPage extends PageWithApi {
           fullPageView
         />
       )
-    case ITEM_TYPES.IMAGE:
+    case ITEM_TYPES.FILE:
       return <ImageItem item={item} backgroundSize="contain" />
     case ITEM_TYPES.VIDEO:
       return <VideoItem item={item} />
@@ -109,6 +110,9 @@ class ItemPage extends PageWithApi {
 
     const { item } = this.state
     if (!item) return <Loader />
+    if (item.isPdfFile) {
+      return <FilePreview file={item.filestack_file} />
+    }
 
     return (
       <Fragment>

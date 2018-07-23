@@ -254,8 +254,8 @@ module ColabImport
       placeholder_image_url = random_placeholder_image_url(placeholder_image_name)
       # Previously I had tried destroying the item and creating a new one,
       # but then you have to copy over roles - so just clear out the item
-      item = card.item.becomes(Item::ImageItem)
-      item.type = 'Item::ImageItem'
+      item = card.item.becomes(Item::FileItem)
+      item.type = 'Item::FileItem'
       item.name = 'CoLab'
       item.breadcrumb = item.content = item.image = item.url = item.text_data = item.thumbnail_url = nil
       item.filestack_file = FilestackFile.create_from_url(placeholder_image_url)

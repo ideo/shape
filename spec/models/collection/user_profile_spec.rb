@@ -74,8 +74,8 @@ describe Collection::UserProfile, type: :model do
     context 'profile image' do
       it 'should replace the first image with the user.picture_medium' do
         placeholder = template.collection_cards.first.item.image_url
-        expect(user_profile.collection_cards.first.item.image_url).not_to eq placeholder
-        expect(user_profile.collection_cards.first.item.image_url).to eq user.picture_medium
+        expect(user_profile.collection_cards.first.item.filestack_file.url).not_to eq placeholder
+        expect(user_profile.collection_cards.first.item.filestack_file.url).to eq user.picture_medium
       end
 
       context 'with default user image' do

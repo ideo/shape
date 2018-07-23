@@ -125,7 +125,7 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
           # parent_id is required to retrieve the parent collection without a nested route
           'parent_id': collection.id,
           'item_attributes': {
-            'type': 'Item::ImageItem',
+            'type': 'Item::FileItem',
             'filestack_file_attributes': {
               'url': filestack_file.url,
               'handle': filestack_file.handle,

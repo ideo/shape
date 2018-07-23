@@ -6,13 +6,17 @@ import styled from 'styled-components'
 
 import GridCardHotspot from '~/ui/grid/GridCardHotspot'
 import TextItemCover from '~/ui/grid/covers/TextItemCover'
+import PdfFileItemCover from '~/ui/grid/covers/PdfFileItemCover'
 import ImageItemCover from '~/ui/grid/covers/ImageItemCover'
 import VideoItemCover from '~/ui/grid/covers/VideoItemCover'
+import GenericFileItemCover from '~/ui/grid/covers/GenericFileItemCover'
 import CollectionCover from '~/ui/grid/covers/CollectionCover'
 
 import CardMenu from '~/ui/grid/CardMenu'
 import CollectionIcon from '~/ui/icons/CollectionIcon'
 import LinkIcon from '~/ui/icons/LinkIcon'
+import Download from '~/ui/grid/Download'
+import FilestackUpload from '~/utils/FilestackUpload'
 import LinkedCollectionIcon from '~/ui/icons/LinkedCollectionIcon'
 import RequiredCollectionIcon from '~/ui/icons/RequiredCollectionIcon'
 import PinnedIcon from '~/ui/icons/PinnedIcon'
@@ -93,13 +97,22 @@ export const StyledTopRightActions = styled.div`
   top: 0.35rem;
   right: 0.25rem;
   z-index: ${v.zIndex.gridCardTop};
+  .show-on-hover {
+    color: ${props => props.color};
+    border-color: ${props => props.color};
+  }
+  .selected {
+    border-color: ${props => props.color};
+    background-color: ${props => props.color};
+  }
   .card-menu {
     margin-top: 0.25rem;
     display: inline-block;
     vertical-align: top;
     z-index: ${v.zIndex.gridCardTop};
-    color: ${v.colors.gray};
+    color: ${props => props.color};
   }
+  /
 `
 StyledTopRightActions.displayName = 'StyledTopRightActions'
 
@@ -116,7 +129,9 @@ class GridCard extends React.Component {
   get canReplace() {
     const { record } = this.props
     if (!record.can_edit_content) return false
-    return (this.isItem && _.includes([ITEM_TYPES.IMAGE, ITEM_TYPES.VIDEO], record.type))
+    return (
+      this.isItem && _.includes([ITEM_TYPES.IMAGE, ITEM_TYPES.FILE, ITEM_TYPES.VIDEO], record.type)
+    )
   }
 
   get isItem() {
@@ -133,14 +148,21 @@ class GridCard extends React.Component {
       switch (record.type) {
       case ITEM_TYPES.TEXT:
         return <TextItemCover item={record} height={height} />
-      case ITEM_TYPES.IMAGE:
-        return <ImageItemCover item={record} />
+      case ITEM_TYPES.FILE: {
+        console.log('asdfasdf', record.filestack_file.mimetype === 'application/pdf')
+        if (record.filestack_file.mimetype === 'application/pdf') {
+          return <PdfFileItemCover item={record} />
+        }
+        if (record.mimeBaseType === 'image') {
+          return <ImageItemCover item={record} />
+        }
+        return <GenericFileItemCover item={record} />
+      }
       case ITEM_TYPES.VIDEO:
         return <VideoItemCover item={record} dragging={this.props.dragging} />
       default:
         return (
           <div>
-            [{card.order}] &nbsp;
             {record.content}
           </div>
         )
@@ -155,6 +177,19 @@ class GridCard extends React.Component {
       )
     }
     return <div />
+  }
+
+  get actionsColor() {
+    const { record } = this.props
+    if (this.isItem) {
+      switch (record.type) {
+      case ITEM_TYPES.FILE:
+        return v.colors.blackLava
+      default:
+        return v.colors.gray
+      }
+    }
+    return v.colors.gray
   }
 
   get renderIcon() {
@@ -222,7 +257,16 @@ class GridCard extends React.Component {
   }
 
   handleClick = (e) => {
-    if (this.props.dragging) return
+    const { dragging, record } = this.props
+    if (dragging) return
+    if (record.isPdfFile) {
+      FilestackUpload.preview(record.filestack_file.handle, 'filePreview')
+      return
+    } else if (record.isGenericFile) {
+      // TODO: will replace with preview
+      window.open(record.filestack_file.url, '_blank')
+      return
+    }
     this.props.handleClick(e)
   }
 
@@ -250,7 +294,10 @@ class GridCard extends React.Component {
           !record.menuDisabled &&
           uiStore.textEditingItem !== record
         ) &&
-          <StyledTopRightActions>
+          <StyledTopRightActions color={this.actionsColor}>
+            { record.isDownloadable && (
+              <Download file={record.filestack_file} />
+            )}
             <SelectionCircle cardId={card.id} />
             <CardMenu
               className="show-on-hover card-menu"

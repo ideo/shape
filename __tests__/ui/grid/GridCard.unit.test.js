@@ -4,10 +4,9 @@ import {
   fakeItemCard,
   fakeCollectionCard,
   fakeCollection,
+  fakeFileItem,
   fakeTextItem,
 } from '#/mocks/data'
-
-
 
 const props = {
   card: fakeItemCard,
@@ -187,6 +186,34 @@ describe('GridCard', () => {
 
       it('has linked collection icon', () => {
         expect(wrapper.find('StyledGridCard').find('LinkedCollectionIcon').exists()).toBe(true)
+      })
+    })
+
+    describe('with a pdf file', () => {
+      beforeEach(() => {
+        props.card.record = fakeFileItem
+        props.record = fakeFileItem
+        fakeFileItem.filestack_file.mimetype = 'application/pdf'
+        props.cardType = 'items'
+        rerender()
+      })
+
+      it('renders a generic file cover', () => {
+        expect(wrapper.find('PdfFileItemCover').exists()).toBeTruthy()
+      })
+    })
+
+    describe('with a generic file', () => {
+      beforeEach(() => {
+        props.card.record = fakeFileItem
+        props.record = fakeFileItem
+        fakeFileItem.filestack_file.mimetype = 'application/vnd.powerpoint'
+        props.cardType = 'items'
+        rerender()
+      })
+
+      it('renders a generic file cover', () => {
+        expect(wrapper.find('GenericFileItemCover').exists()).toBeTruthy()
       })
     })
   })

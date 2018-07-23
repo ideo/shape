@@ -18,6 +18,7 @@ class SerializableItem < BaseJsonSerializer
   end
 
   has_one :parent
+  belongs_to :filestack_file
 
   attribute :breadcrumb do
     Breadcrumb::ForUser.new(

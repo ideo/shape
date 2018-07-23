@@ -1,6 +1,7 @@
 module Firestoreable
   extend ActiveSupport::Concern
 
+  # similar to what's in base_controller except we sometimes use the simple serializers here
   JSONAPI_CLASS_MAPPINGS = {
     Activity: SerializableActivity,
     Notification: SerializableNotification,
@@ -12,8 +13,8 @@ module Firestoreable
     'Collection::Global': SerializableSimpleCollection,
     'Collection::UserProfile': SerializableSimpleCollection,
     'Item::VideoItem': SerializableSimpleItem,
-    'Item::ImageItem': SerializableSimpleItem,
     'Item::TextItem': SerializableSimpleItem,
+    'Item::FileItem': SerializableSimpleItem,
   }.freeze
 
   included do

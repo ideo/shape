@@ -341,7 +341,8 @@ class MovableGridCard extends React.PureComponent {
             card.isPinnedAndLocked
           }
           enableResizing={{
-            bottomRight: canEditCollection && !card.isPinnedAndLocked,
+            bottomRight: canEditCollection && !card.isPinnedAndLocked &&
+              !card.record.isGenericFile,
             bottom: false,
             bottomLeft: false,
             left: false,
