@@ -262,6 +262,9 @@ class GridCard extends React.Component {
     if (record.isPdfFile) {
       FilestackUpload.preview(record.filestack_file.handle, 'filePreview')
       return
+    } else if (record.mimeBaseType === 'image') {
+      this.props.handleClick(e)
+      return
     } else if (record.isGenericFile) {
       // TODO: will replace with preview
       window.open(record.filestack_file.url, '_blank')
