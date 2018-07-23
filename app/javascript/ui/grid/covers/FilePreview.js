@@ -1,32 +1,53 @@
 import PropTypes from 'prop-types'
+import { when } from 'mobx'
+import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 import v from '~/utils/variables'
 
 import FilestackUpload from '~/utils/FilestackUpload'
+import Modal from '~/ui/global/modals/Modal'
+import { uiStore } from '~/stores'
 
 const PreviewContainer = styled.div`
   height: ${props => props.height}px;
   width: ${props => props.width}px;
 `
 
+@observer
 class FilePreview extends React.Component {
   componentDidMount() {
-    const { file } = this.props
-    return FilestackUpload.preview(file.handle, 'filePreview')
+    when(
+      () => uiStore.previewingFile,
+      () => {
+        //FilestackUpload.preview(uiStore.previewingFile, 'filePreview')
+      }
+    )
+  }
+
+  componentDidUpdate() {
+    if (uiStore.previewingFile) {
+      setTimeout(() => {
+        FilestackUpload.preview(uiStore.previewingFile, 'filePreview')
+      }, 50)
+    }
+  }
+
+  handleClose = (ev) => {
+    uiStore.closePreview()
   }
 
   render() {
     return (
-      <PreviewContainer width={1000} height={600} id="filePreview">
-      </PreviewContainer>
+      <Modal
+        title=""
+        onClose={this.handleClose}
+        open={!!uiStore.previewingFile}
+        noStyling
+      >
+        <PreviewContainer width={1000} height={600} id="filePreview" />
+      </Modal>
     )
   }
-}
-
-FilePreview.propTypes = {
-  file: PropTypes.shape({
-    url: PropTypes.string,
-  }).isRequired,
 }
 
 export default FilePreview

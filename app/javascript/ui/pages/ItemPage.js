@@ -110,13 +110,11 @@ class ItemPage extends PageWithApi {
 
     const { item } = this.state
     if (!item) return <Loader />
-    if (item.isPdfFile) {
-      return <FilePreview file={item.filestack_file} />
-    }
 
     return (
       <Fragment>
         <PageHeader record={item} />
+        <FilePreview />
         <ItemPageContainer>
           <PageContainer>
             {/* TODO: calculate item container size? */}

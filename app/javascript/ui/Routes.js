@@ -2,6 +2,7 @@ import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import { Switch, Route, Redirect, withRouter } from 'react-router-dom'
 import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles'
 import WindowSizeListener from 'react-window-size-listener'
+import FilePreview from '~/ui/grid/covers/FilePreview'
 import styled from 'styled-components'
 
 import ActivityLogBox from '~/ui/activity_log/ActivityLogBox'
@@ -70,7 +71,7 @@ class Routes extends React.Component {
   }
 
   render() {
-    const { apiStore, routingStore } = this.props
+    const { apiStore, routingStore, uiStore } = this.props
     if (!apiStore.currentUser) {
       return <Loader />
     }
@@ -79,7 +80,7 @@ class Routes extends React.Component {
     )
 
     return (
-      <AppWrapper blur={displayTermsPopup} id="AppWrapper">
+      <AppWrapper blur={displayTermsPopup || uiStore.blurContent} id="AppWrapper">
         <ErrorBoundary>
           <MuiThemeProvider theme={this.theme}>
             {/* Global components are rendered here */}
@@ -88,6 +89,7 @@ class Routes extends React.Component {
 
             <Header />
             <FixedBoundary className="fixed_boundary" />
+            <FilePreview />
             <FixedActivityLogWrapper>
               <ActivityLogBox />
             </FixedActivityLogWrapper>

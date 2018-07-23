@@ -149,7 +149,6 @@ class GridCard extends React.Component {
       case ITEM_TYPES.TEXT:
         return <TextItemCover item={record} height={height} />
       case ITEM_TYPES.FILE: {
-        console.log('asdfasdf', record.filestack_file.mimetype === 'application/pdf')
         if (record.filestack_file.mimetype === 'application/pdf') {
           return <PdfFileItemCover item={record} />
         }
@@ -260,7 +259,10 @@ class GridCard extends React.Component {
     const { dragging, record } = this.props
     if (dragging) return
     if (record.isPdfFile) {
-      FilestackUpload.preview(record.filestack_file.handle, 'filePreview')
+      uiStore.previewFile(record.filestack_file.handle)
+      return
+    } else if (record.mimeBaseType === 'image') {
+      this.props.handleClick(e)
       return
     } else if (record.isGenericFile) {
       // TODO: will replace with preview

@@ -1,6 +1,7 @@
 import _ from 'lodash'
 import { animateScroll } from 'react-scroll'
 import { observable, action, computed } from 'mobx'
+
 import v from '~/utils/variables'
 
 export default class UiStore {
@@ -75,6 +76,7 @@ export default class UiStore {
   @observable trackedRecords = new Map()
   @observable dragging = false
   @observable textEditingItem = null
+  @observable previewingFile = null
 
   @action startDragging() {
     this.dragging = true
@@ -175,6 +177,16 @@ export default class UiStore {
     } else {
       this.activityLogForceWidth = null
     }
+  }
+
+  @action previewFile(handle) {
+    this.previewingFile = handle
+    this.blurContent = true
+  }
+
+  @action closePreview() {
+    this.previewingFile = null
+    this.blurContent = false
   }
 
   gridWidthFor(virtualCols) {

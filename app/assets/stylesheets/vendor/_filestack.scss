@@ -1,0 +1,65 @@
+body {
+  background-color: transparent;
+}
+
+#filestackBranding {
+  visibility: hidden;
+}
+
+.indicatorWrapper,
+#numPages,
+#scaleSelectContainer,
+#toolbarViewerMiddle,
+#toolbarViewerRight,
+#sidebarToggle,
+#filestackBranding--bottom,
+#viewFind {
+  display: none;
+}
+html[dir='ltr'] #toolbarContainer,
+html[dir='ltr'] #viewerContainer,
+.findbar,
+.secondaryToolbar {
+  box-shadow: none;
+  background-color: transparent;
+}
+
+.pdfViewer .page {
+  background-color: transparent;
+  border-color: transparent;
+}
+
+.toolbarButton.pageDown,
+.toolbarButton.pageUp {
+  background-color: transparent;
+  border: none;
+  position: fixed;
+  width: 49px;
+  height: 49px;
+  opacity: 1.0;
+  top: 50%;
+
+  svg {
+    display: none;
+  }
+
+  &:hover {
+    background-color: transparent;
+    border: none;
+    opacity: 0.8;
+  }
+}
+
+.toolbarButton.pageDown {
+  right: 20px;
+  background-image: url(https://cdn.filestackcontent.com/x3EsynT5OVCxSmv30ODw);
+  background-repeat: no-repeat;
+  left: 20px;
+}
+
+.toolbarButton.pageUp {
+  left: 20px;
+  background-image: url(https://cdn.filestackcontent.com/fmWrIC92SYSTqciPzrSB);
+  background-repeat: no-repeat;
+  left: 20px;
+}

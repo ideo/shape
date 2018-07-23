@@ -12,10 +12,21 @@ import ArrowIcon from '~/ui/icons/ArrowIcon'
 import CloseIcon from '~/ui/icons/CloseIcon'
 
 const StyledDialog = styled(Dialog)`
+  ${props => props.noStyling && `
+    background-color: transparent;
+  `}
+
   .modal__paper {
     border-left: 17px solid ${v.colors.blackLava};
     max-width: 760px;
     width: 100%;
+
+    ${props => props.noStyling && `
+      background-color: transparent;
+      border-left: none;
+      box-shadow: none;
+      overflow: hidden;
+    `}
   }
 `
 
@@ -64,7 +75,7 @@ class Modal extends React.Component {
   }
 
   render() {
-    const { children, onBack, open, title } = this.props
+    const { children, noStyling, onBack, open, title } = this.props
     let wrappedTitle = title
     if (typeof title === 'string') {
       wrappedTitle = <StyledHeading2>{title}</StyledHeading2>
@@ -79,13 +90,14 @@ class Modal extends React.Component {
         onBackdropClick={this.handleClose}
         aria-labelledby={title}
         BackdropProps={{ invisible: true }}
+        noStyling={noStyling}
       >
         { _.isFunction(onBack) && (
           <BackIconHolder onClick={onBack}><ArrowIcon /></BackIconHolder>
         )}
-        <ModalCloseButton onClick={this.handleClose}>
+        {!noStyling && (<ModalCloseButton onClick={this.handleClose}>
           <CloseIcon />
-        </ModalCloseButton>
+        </ModalCloseButton>)}
         <PaddedContent onBack={onBack}>
           <StyledDialogTitle disableTypography id="sharing">
             {wrappedTitle}
@@ -104,12 +116,14 @@ Modal.propTypes = {
   children: PropTypes.node,
   open: PropTypes.bool,
   onBack: PropTypes.func,
+  noStyling: PropTypes.bool,
 }
 
 Modal.defaultProps = {
   children: <div />,
   open: false,
   onBack: null,
+  noStyling: false,
 }
 
 export default Modal
