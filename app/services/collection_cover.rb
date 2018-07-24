@@ -46,7 +46,7 @@ class CollectionCover < SimpleService
   end
 
   def first_media_item
-    first_shareable_item(type: ['Item::ImageItem', 'Item::VideoItem'])
+    first_shareable_item(type: ['Item::FileItem', 'Item::VideoItem'])
   end
 
   def first_text_item

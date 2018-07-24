@@ -220,7 +220,7 @@ class CollectionCard < ApplicationRecord
   end
 
   def media_card?
-    record.is_a?(Item::VideoItem) || record.is_a?(Item::ImageItem)
+    record.is_a?(Item::VideoItem) || record.is_a?(Item::FileItem)
   end
 
   private

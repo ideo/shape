@@ -48,10 +48,10 @@ export const StyledMenu = styled.ul`
 `
 
 export const StyledMenuToggle = styled.button`
-  padding: 0 5px;
+  padding: 2px 5px 0;
   .icon {
-    width: 16px;
-    height: 16px;
+    width: 14px;
+    height: 14px;
   }
 `
 StyledMenuToggle.displayName = 'StyledMenuToggle'

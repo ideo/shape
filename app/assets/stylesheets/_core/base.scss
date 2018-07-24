@@ -45,4 +45,8 @@ p {
 strong {
   font-weight: 500;
 }
-svg { pointer-events: none; }
+svg {
+  height: 100%;
+  pointer-events: none;
+  width: 100%;
+}

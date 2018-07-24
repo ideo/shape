@@ -14,6 +14,31 @@ const addBabelPolyfill = env => {
   return env
 }
 
+const addReactSVGLoader = env => {
+  const babelLoader = env.loaders.get('babel')
+
+  env.loaders.insert(
+    'svg',
+    {
+      test: /\.svg$/,
+      use: babelLoader.use.concat([
+        {
+          loader: 'react-svg-loader',
+          options: {
+            jsx: true, // true outputs JSX tags
+          },
+        },
+      ]),
+    },
+    {after: 'file'}
+  )
+
+  const fileLoader = env.loaders.get('file')
+  fileLoader.exclude = /\.(svg)$/i
+
+  return env
+}
+
 const provideReact = env => {
   env.plugins.set('Provide', new webpack.ProvidePlugin({
     React: 'react'
@@ -23,6 +48,7 @@ const provideReact = env => {
 
 const updateEnvironment = flow(
   addBabelPolyfill,
+  addReactSVGLoader,
   provideReact,
 )
 

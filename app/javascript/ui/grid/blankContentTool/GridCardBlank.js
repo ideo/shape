@@ -6,7 +6,7 @@ import { Flex, Box } from 'reflexbox'
 import CollectionCard from '~/stores/jsonApi/CollectionCard'
 import AddTextIcon from '~/ui/icons/AddTextIcon'
 import AddCollectionIcon from '~/ui/icons/AddCollectionIcon'
-import AddImageIcon from '~/ui/icons/AddImageIcon'
+import AddFileIcon from '~/ui/icons/AddFileIcon'
 import AddVideoIcon from '~/ui/icons/AddVideoIcon'
 import v, { ITEM_TYPES } from '~/utils/variables'
 import FilestackUpload from '~/utils/FilestackUpload'
@@ -219,11 +219,10 @@ class GridCardBlank extends React.Component {
         if (this.state.loading) return
         this.setState({ loading: true, droppingFile: false })
       },
-      onSuccess: (res) => {
+      onSuccess: async (res) => {
         if (res.length > 0) {
-          const img = res[0]
-          img.url = FilestackUpload.transformedUrl(img.url)
-          this.createCardWith(img)
+          const file = await FilestackUpload.processFile(res)
+          this.createCardWith(file)
         }
       }
     })
@@ -246,16 +245,17 @@ class GridCardBlank extends React.Component {
     this.setState({ creating: 'video' })
   }
 
-  createCardWith = (img) => {
+  createCardWith = (file) => {
     const attrs = {
       item_attributes: {
-        type: ITEM_TYPES.IMAGE,
+        type: ITEM_TYPES.FILE,
         filestack_file_attributes: {
-          url: img.url,
-          handle: img.handle,
-          filename: img.filename,
-          size: img.size,
-          mimetype: img.mimetype,
+          url: file.url,
+          handle: file.handle,
+          filename: file.filename,
+          size: file.size,
+          mimetype: file.mimetype,
+          docinfo: file.docinfo,
         },
       },
     }
@@ -371,6 +371,7 @@ class GridCardBlank extends React.Component {
                 placement="bottom"
               >
                 <BctButton
+                  className="createCollection"
                   creating={creating === 'collection'}
                   onClick={this.startCreatingCollection}
                 >
@@ -379,15 +380,28 @@ class GridCardBlank extends React.Component {
               </Tooltip>
             </Box>
           }
+          {(!isReplacing && !creating) &&
+            <Tooltip
+              classes={{ tooltip: 'Tooltip' }}
+              title="Add text box"
+              placement="bottom"
+            >
+              <Box>
+                <BctButton className="createText" onClick={this.startCreatingText}>
+                  <AddTextIcon width={size} height={size} color="white" />
+                </BctButton>
+              </Box>
+            </Tooltip>
+          }
           {!creating &&
             <Box>
               <Tooltip
                 classes={{ tooltip: 'Tooltip' }}
-                title="Add image"
+                title="Add file"
                 placement="bottom"
               >
-                <BctButton onClick={this.pickImage}>
-                  <AddImageIcon width={size} height={size} color="white" />
+                <BctButton className="createFile" onClick={this.pickImage}>
+                  <AddFileIcon width={size} height={size} color="white" />
                 </BctButton>
               </Tooltip>
             </Box>
@@ -400,6 +414,7 @@ class GridCardBlank extends React.Component {
                 placement="bottom"
               >
                 <BctButton
+                  className="createVideo"
                   creating={creating === 'video'}
                   onClick={this.startCreatingVideo}
                 >
@@ -407,19 +422,6 @@ class GridCardBlank extends React.Component {
                 </BctButton>
               </Tooltip>
             </Box>
-          }
-          {(!isReplacing && !creating) &&
-            <Tooltip
-              classes={{ tooltip: 'Tooltip' }}
-              title="Add text box"
-              placement="bottom"
-            >
-              <Box>
-                <BctButton onClick={this.startCreatingText}>
-                  <AddTextIcon width={size} height={size} color="white" />
-                </BctButton>
-              </Box>
-            </Tooltip>
           }
         </Flex>
         {inner}

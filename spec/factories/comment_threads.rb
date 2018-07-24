@@ -8,7 +8,7 @@ FactoryBot.define do
     end
 
     factory :item_comment_thread do
-      record factory: :image_item
+      record factory: :file_item
       record_type 'Item'
     end
 

@@ -57,7 +57,7 @@ class OrganizationTemplates < SimpleService
 
   def setup_profile_template_items
     return if @org.profile_template.items.any?
-    photo = Item::ImageItem.create(
+    photo = Item::FileItem.create(
       name: 'Default profile',
       filestack_file: FilestackFile.create(
         handle: 'Qs0v5CCTt2DiqlG8grVH',

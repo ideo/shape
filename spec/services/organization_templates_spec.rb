@@ -72,7 +72,7 @@ RSpec.describe OrganizationTemplates, type: :service do
 
       it 'should create a image item and a text item' do
         expect(profile_template.items.count).to eq 2
-        expect(profile_template.items.first.type).to eq 'Item::ImageItem'
+        expect(profile_template.items.first.type).to eq 'Item::FileItem'
         expect(profile_template.items.last.type).to eq 'Item::TextItem'
       end
 

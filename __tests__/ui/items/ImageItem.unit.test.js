@@ -6,6 +6,7 @@ import {
 
 const props = {
   item: fakeImageItem,
+  onCancel: jest.fn(),
 }
 
 let wrapper

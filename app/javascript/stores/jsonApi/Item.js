@@ -1,5 +1,6 @@
 import { routingStore } from '~/stores'
 import trackError from '~/utils/trackError'
+import FilestackUpload from '~/utils/FilestackUpload'
 import Api from './Api'
 import BaseRecord from './BaseRecord'
 
@@ -29,6 +30,26 @@ class Item extends BaseRecord {
       return routingStore.pathTo(type, id)
     }
     return routingStore.pathTo('homepage')
+  }
+
+  get pdfCoverUrl() {
+    return FilestackUpload.pdfCoverUrl(this.filestack_file.handle)
+  }
+
+  get mimeBaseType() {
+    return this.filestack_file.mimetype.split('/')[0]
+  }
+
+  get isGenericFile() {
+    return this.filestack_file && this.mimeBaseType !== 'image'
+  }
+
+  get isPdfFile() {
+    return this.filestack_file && this.filestack_file.mimetype === 'application/pdf'
+  }
+
+  get isDownloadable() {
+    return this.isGenericFile || this.isPdfFile
   }
 
   API_updateWithoutSync({ cancel_sync } = {}) {

@@ -5,6 +5,7 @@ import _ from 'lodash'
 
 import PopoutMenu from '~/ui/global/PopoutMenu'
 import ArchiveIcon from '~/ui/icons/ArchiveIcon'
+import DownloadIcon from '~/ui/icons/DownloadIcon'
 import DuplicateIcon from '~/ui/icons/DuplicateIcon'
 import ReplaceIcon from '~/ui/icons/ReplaceIcon'
 import MoveIcon from '~/ui/icons/MoveIcon'
@@ -64,6 +65,14 @@ class CardMenu extends React.Component {
     this.callCardAction('Archive', 'API_archive')
   }
 
+  downloadCard = () => {
+    const { card } = this.props
+    const { record } = card
+    if (record.filestack_file) {
+      window.open(record.filestack_file.url, '_blank')
+    }
+  }
+
   handleMouseLeave = () => {
     if (this.props.menuOpen) {
       this.props.uiStore.update('openCardMenuId', false)
@@ -93,12 +102,13 @@ class CardMenu extends React.Component {
 
     let items = []
     const actions = [
-      { name: 'Duplicate', icon: <DuplicateIcon />, onClick: this.duplicateCard },
-      { name: 'Move', icon: <MoveIcon />, onClick: this.moveCard },
-      { name: 'Link', icon: <LinkIcon />, onClick: this.linkCard },
-      { name: 'Add to My Collection', icon: <AddIntoIcon />, onClick: this.addToMyCollection },
-      { name: 'Archive', icon: <ArchiveIcon />, onClick: this.archiveCard },
-      { name: 'Replace', icon: <ReplaceIcon />, onClick: this.replaceCard },
+      { name: 'Duplicate', iconRight: <DuplicateIcon />, onClick: this.duplicateCard },
+      { name: 'Move', iconRight: <MoveIcon />, onClick: this.moveCard },
+      { name: 'Link', iconRight: <LinkIcon />, onClick: this.linkCard },
+      { name: 'Add to My Collection', iconRight: <AddIntoIcon />, onClick: this.addToMyCollection },
+      { name: 'Archive', iconRight: <ArchiveIcon />, onClick: this.archiveCard },
+      { name: 'Download', iconRight: <DownloadIcon />, onClick: this.downloadCard },
+      { name: 'Replace', iconRight: <ReplaceIcon />, onClick: this.replaceCard },
     ]
     actions.forEach(actionItem => {
       if (actionItem.name === this.itemLoading) {
@@ -114,6 +124,7 @@ class CardMenu extends React.Component {
         'Duplicate',
         'Link',
         'Add to My Collection',
+        'Download',
       ]
       items = _.filter(actions, a => _.includes(viewActions, a.name))
     }
@@ -132,6 +143,10 @@ class CardMenu extends React.Component {
       if (coll.isUserCollection) {
         items = _.reject(items, { name: 'Add to My Collection' })
       }
+    }
+
+    if (!card.record.isDownloadable) {
+      items = _.reject(items, { name: 'Download' })
     }
 
     if (canReplace) {

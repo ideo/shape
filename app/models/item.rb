@@ -18,7 +18,8 @@ class Item < ApplicationRecord
   acts_as_taggable
 
   store_accessor :cached_attributes,
-                 :cached_tag_list, :cached_filestack_file_url
+                 :cached_tag_list, :cached_filestack_file_url,
+                 :cached_filestack_file_info
 
   # The card that 'holds' this item and determines its breadcrumb
   has_one :parent_collection_card,
@@ -112,12 +113,12 @@ class Item < ApplicationRecord
   end
 
   def image_url
-    # overridden by VideoItem / ImageItem
+    # overridden by VideoItem / FileItem
     nil
   end
 
   def generate_name
-    # overridden by TextItem / ImageItem
+    # overridden by TextItem / FileItem
     true
   end
 
