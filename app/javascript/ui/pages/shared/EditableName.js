@@ -8,14 +8,11 @@ import _ from 'lodash'
 import v from '~/utils/variables'
 import { Heading1 } from '~/ui/global/styled/typography'
 import ClickWrapper from '~/ui/layout/ClickWrapper'
+import Truncator from '~/ui/global/Truncator'
 
 const StyledName = styled.div`
   display: inline-block;
   vertical-align: top;
-  h1 {
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
 `
 StyledName.displayName = 'StyledName'
 
@@ -145,14 +142,16 @@ class EditableName extends React.Component {
       )
     }
     let nameEl = (
-      <Heading1 ref={this.textRef} onClick={canEdit ? this.startEditingName : null}>
-        {this.truncateName()}
-      </Heading1>
+      <Truncator paddingRight={200}>
+        <Heading1 ref={this.textRef} onClick={canEdit ? this.startEditingName : null}>
+        {this.name}
+        </Heading1>
+      </Truncator>
     )
     if (TextWrapper) {
       nameEl = (
         <button onClick={canEdit ? this.startEditingName : null}>
-          <TextWrapper>{this.truncateName()}</TextWrapper>
+          <Truncator><TextWrapper>{this.name}</TextWrapper></Truncator>
         </button>
       )
     }
