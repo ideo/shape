@@ -4,6 +4,7 @@ import v from '~/utils/variables'
 import CornerIcon from '~/ui/icons/CornerIcon'
 import FileIcon from '~/ui/grid/covers/FileIcon'
 import { uiStore } from '~/stores'
+import Truncator from '~/ui/global/Truncator'
 
 export const StyledPdfCover = styled.div`
   position: relative;
@@ -22,13 +23,12 @@ export const StyledPdfCover = styled.div`
     left: 15px;
     max-height: 32px;
     position: absolute;
+    width: 100%;
   }
 
   .fileName {
     display: inline-block;
-    max-height: 32px;
-    overflow: hidden;
-    white-space: nowrap;
+    width: 75%;
   }
 
   .card-menu {
@@ -102,7 +102,9 @@ class PdfFileItemCover extends React.Component {
         </ImageContainer>
         <div className="fileInfo">
           <FileIcon mimeType={item.filestack_file.mimetype} />
-          <span className="fileName">{ filestack_file.filename }</span>
+          <div className="fileName">
+            <Truncator text={ filestack_file.filename } paddingRight={10} />
+          </div>
         </div>
       </StyledPdfCover>
     )
