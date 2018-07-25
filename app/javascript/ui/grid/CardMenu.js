@@ -145,7 +145,7 @@ class CardMenu extends React.Component {
       }
     }
 
-    if (!card.record.isDownloadable) {
+    if (card.record && !card.record.isDownloadable) {
       items = _.reject(items, { name: 'Download' })
     }
 
