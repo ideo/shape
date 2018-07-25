@@ -6,7 +6,8 @@ class Truncator extends React.Component {
     this.elRef = React.createRef()
     this.state = {
       truncated: false,
-      alteredText: ''
+      alteredText: props.text,
+      passes: 0,
     }
   }
 
@@ -14,8 +15,14 @@ class Truncator extends React.Component {
     this.truncate()
   }
 
+  componentDidUpdate(prevProps, prevState, snapshot) {
+    if (this.state.passes < 2) {
+      this.truncate()
+    }
+  }
+
   truncate() {
-    const { text } = this.props
+    const text = this.state.alteredText
     const el = this.elRef.current
     const width = el.offsetWidth
     const overage = el.scrollWidth - el.offsetWidth
@@ -29,17 +36,17 @@ class Truncator extends React.Component {
       const first = text.slice(0, mid)
       const rest = text.slice(mid + lettersToRemove, text.length)
       const truncated = `${first}…${rest}`
-      this.setState({ alteredText: truncated, truncated: true })
+      this.setState({ alteredText: truncated, truncated: true, passes: this.state.passes += 1 })
     } else {
-      this.setState({ alteredText: text, truncated: true })
+      this.setState({ alteredText: text, truncated: true, passes: this.state.passes += 1 })
     }
   }
 
   get mainStyles() {
     const { paddingRight } = this.props
-    const { truncated } = this.state
+    const { passes } = this.state
 
-    if (truncated) return {}
+    if (passes > 1) return {}
     return {
       overflowX: 'scroll',
       maxWidth: `calc(100% - ${paddingRight}px)`,
