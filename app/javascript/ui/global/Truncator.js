@@ -1,3 +1,4 @@
+import _ from 'lodash'
 import PropTypes from 'prop-types'
 
 class Truncator extends React.Component {
@@ -7,49 +8,58 @@ class Truncator extends React.Component {
     this.state = {
       truncated: false,
       alteredText: props.text,
-      passes: 0,
     }
+
+    this.setElRef = el => {
+      this.elRef = el
+    };
+
+    this.onResize = _.debounce(this._onResize, 100)
   }
 
   componentDidMount() {
     this.truncate()
+    window.addEventListener("resize", this.onResize)
   }
 
-  componentDidUpdate(prevProps, prevState, snapshot) {
-    if (this.state.passes < 2) {
-      this.truncate()
-    }
+  componentWillUnmount() {
+    window.removeEventListener("resize", this.onResize)
   }
 
-  truncate() {
-    const text = this.state.alteredText
-    const el = this.elRef.current
+  _onResize = () => {
+    this.setState({ truncated: false }, () => { this.truncate() })
+  }
+
+  truncate = () => {
+    const { text } = this.props
+    const el = this.elRef
+    if (!el) return
     const width = el.offsetWidth
     const overage = el.scrollWidth - el.offsetWidth
-    const typefaceModifier = width / text.length
+    const typefaceModifier = el.scrollWidth / text.length
     let lettersToRemove = parseInt(overage / typefaceModifier) + 1
     if (lettersToRemove > 1) {
       if (lettersToRemove > text.length) {
-        lettersToRemove = (width / typefaceModifier) * 0.65
+        lettersToRemove = text.length - (width / typefaceModifier)
       }
       const mid = parseInt((text.length - lettersToRemove) / 2)
       const first = text.slice(0, mid)
       const rest = text.slice(mid + lettersToRemove, text.length)
       const truncated = `${first}…${rest}`
-      this.setState({ alteredText: truncated, truncated: true, passes: this.state.passes += 1 })
+      this.setState({ alteredText: truncated, truncated: true })
     } else {
-      this.setState({ alteredText: text, truncated: true, passes: this.state.passes += 1 })
+      this.setState({ alteredText: text, truncated: true })
     }
   }
 
   get mainStyles() {
-    const { paddingRight } = this.props
-    const { passes } = this.state
+    const { extraSpacing } = this.props
+    const { truncated } = this.state
 
-    if (passes > 1) return {}
+    if (truncated) return {}
     return {
       overflowX: 'scroll',
-      maxWidth: `calc(100% - ${paddingRight}px)`,
+      maxWidth: `calc(100% - ${extraSpacing}px)`,
       width: '100%',
       whiteSpace: 'nowrap'
     }
@@ -59,7 +69,7 @@ class Truncator extends React.Component {
     const { text } = this.props
     const { alteredText, truncated } = this.state
     return (
-      <div style={this.mainStyles} ref={this.elRef}>
+      <div style={this.mainStyles} ref={this.setElRef}>
         { truncated ? alteredText : text }
       </div>
     )
@@ -68,12 +78,10 @@ class Truncator extends React.Component {
 
 Truncator.propTypes = {
   text: PropTypes.string.isRequired,
-  children: PropTypes.node,
-  paddingRight: PropTypes.number,
+  extraSpacing: PropTypes.number,
 }
 Truncator.defaultProps = {
-  children: null,
-  paddingRight: 0,
+  extraSpacing: 0,
 }
 
 export default Truncator

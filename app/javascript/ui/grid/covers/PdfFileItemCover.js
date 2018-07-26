@@ -23,12 +23,13 @@ export const StyledPdfCover = styled.div`
     left: 15px;
     max-height: 32px;
     position: absolute;
-    width: 100%;
+    width: 95%;
   }
 
   .fileName {
     display: inline-block;
     width: 75%;
+    white-space: nowrap;
   }
 
   .card-menu {
@@ -103,7 +104,7 @@ class PdfFileItemCover extends React.Component {
         <div className="fileInfo">
           <FileIcon mimeType={item.filestack_file.mimetype} />
           <div className="fileName">
-            <Truncator text={ filestack_file.filename } />
+            <Truncator extraSpacing={15} text={ filestack_file.filename } />
           </div>
         </div>
       </StyledPdfCover>
