@@ -24,6 +24,7 @@ const StyledComment = StyledCommentInput.extend`
   }
 
   .message {
+    font-family: ${v.fonts.sans};
     margin-top: 5px;
   }
 `
