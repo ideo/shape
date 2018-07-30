@@ -6,10 +6,10 @@ import styled from 'styled-components'
 
 import ActivityLogButton from '~/ui/notifications/ActivityLogButton'
 import Breadcrumb from '~/ui/layout/Breadcrumb'
+import CardMenu from '~/ui/grid/CardMenu'
 import EditableName from '~/ui/pages/shared/EditableName'
 import Roles from '~/ui/grid/Roles'
 import RolesSummary from '~/ui/roles/RolesSummary'
-import PageMenu from '~/ui/pages/shared/PageMenu'
 import FilledProfileIcon from '~/ui/icons/FilledProfileIcon'
 import ProfileIcon from '~/ui/icons/ProfileIcon'
 import SystemIcon from '~/ui/icons/SystemIcon'
@@ -40,7 +40,7 @@ const IconHolder = styled.span`
   }
 `
 
-@inject('uiStore')
+@inject('routingStore', 'uiStore')
 @observer
 class PageHeader extends React.Component {
   get canEdit() {
@@ -62,6 +62,21 @@ class PageHeader extends React.Component {
     const { record } = this.props
     record.name = name
     record.save()
+  }
+
+  openMenu = () => {
+    const { uiStore } = this.props
+    uiStore.update('pageMenuOpen', true)
+  }
+
+  closeMenu = () => {
+    const { uiStore } = this.props
+    uiStore.update('pageMenuOpen', false)
+  }
+
+  routeForMove = () => {
+    const { record, routingStore } = this.props
+    return routingStore.routeTo('collections', record.parent.id)
   }
 
   handleTitleClick = () => {
@@ -90,14 +105,17 @@ class PageHeader extends React.Component {
       <ActivityLogButton key="activity" />
     )
     if (this.hasActions) {
-      // 3. PageMenu actions
+      // 3. CardMenu actions
       elements.push(
-        <PageMenu
-          key="menu"
-          record={record}
-          menuOpen={uiStore.pageMenuOpen}
+        <CardMenu
+          className="card-menu"
+          card={record.parent_collection_card}
           canEdit={record.can_edit}
-          canEditContent={record.can_edit_content}
+          canReplace={record.can_edit}
+          menuOpen={uiStore.pageMenuOpen}
+          onOpen={this.openMenu}
+          onLeave={this.closeMenu}
+          onMoveStart={this.routeForMove}
         />
       )
     }

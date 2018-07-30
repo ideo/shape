@@ -3,16 +3,17 @@ import ReactRouterPropTypes from 'react-router-prop-types'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 
-import PageError from '~/ui/global/PageError'
 import ActionCableConsumer from '~/utils/ActionCableConsumer'
-import PageWithApi from '~/ui/pages/PageWithApi'
-import PageContainer from '~/ui/layout/PageContainer'
-import Loader from '~/ui/layout/Loader'
 import FilePreview from '~/ui/grid/covers/FilePreview'
-import TextItem from '~/ui/items/TextItem'
 import ImageItem from '~/ui/items/ImageItem'
-import VideoItem from '~/ui/items/VideoItem'
+import Loader from '~/ui/layout/Loader'
+import MoveModal from '~/ui/grid/MoveModal'
+import PageContainer from '~/ui/layout/PageContainer'
 import PageHeader from '~/ui/pages/shared/PageHeader'
+import PageWithApi from '~/ui/pages/PageWithApi'
+import PageError from '~/ui/global/PageError'
+import TextItem from '~/ui/items/TextItem'
+import VideoItem from '~/ui/items/VideoItem'
 import { ITEM_TYPES } from '~/utils/variables'
 
 const ItemPageContainer = styled.div`
@@ -122,6 +123,7 @@ class ItemPage extends PageWithApi {
           <PageContainer>
             {/* TODO: calculate item container size? */}
             {this.content}
+            <MoveModal />
           </PageContainer>
         </ItemPageContainer>
       </Fragment>

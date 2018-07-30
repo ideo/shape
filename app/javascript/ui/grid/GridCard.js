@@ -253,6 +253,21 @@ class GridCard extends React.Component {
     )
   }
 
+  openMenu = () => {
+    const { card } = this.props
+    if (this.props.menuOpen) {
+      uiStore.update('openCardMenuId', false)
+    } else {
+      uiStore.update('openCardMenuId', card.id)
+    }
+  }
+
+  closeMenu = () => {
+    if (this.props.menuOpen) {
+      uiStore.update('openCardMenuId', false)
+    }
+  }
+
   handleClick = (e) => {
     const { dragging, record } = this.props
     if (dragging) return
@@ -305,6 +320,8 @@ class GridCard extends React.Component {
               canEdit={this.canEditCard}
               canReplace={this.canReplace}
               menuOpen={menuOpen}
+              onOpen={this.openMenu}
+              onLeave={this.closeMenu}
             />
           </StyledTopRightActions>
         }

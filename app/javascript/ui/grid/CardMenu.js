@@ -17,10 +17,6 @@ import AddIntoIcon from '~/ui/icons/AddIntoIcon'
 class CardMenu extends React.Component {
   @observable itemLoading = ''
 
-  get cardId() {
-    return this.props.card.id
-  }
-
   @action setLoading(name = '') {
     this.itemLoading = name
   }
@@ -40,7 +36,8 @@ class CardMenu extends React.Component {
   }
 
   openMoveMenu = cardAction => {
-    const { card, uiStore } = this.props
+    const { card, onMoveStart, uiStore } = this.props
+    if (onMoveStart) onMoveStart()
     uiStore.selectCardId(card.id)
     uiStore.openMoveMenu({ from: this.viewingCollectionId, cardAction })
   }
@@ -74,19 +71,12 @@ class CardMenu extends React.Component {
   }
 
   handleMouseLeave = () => {
-    if (this.props.menuOpen) {
-      this.props.uiStore.update('openCardMenuId', false)
-    }
+    this.props.onLeave()
   }
 
   toggleOpen = (e) => {
     e.stopPropagation()
-    const { uiStore } = this.props
-    if (this.props.menuOpen) {
-      uiStore.update('openCardMenuId', false)
-    } else {
-      uiStore.update('openCardMenuId', this.cardId)
-    }
+    this.props.onOpen()
   }
 
   // Viewing collection could be null if on the search page
@@ -176,9 +166,13 @@ CardMenu.propTypes = {
   menuOpen: PropTypes.bool.isRequired,
   canEdit: PropTypes.bool.isRequired,
   canReplace: PropTypes.bool.isRequired,
+  onOpen: PropTypes.func.isRequired,
+  onLeave: PropTypes.func.isRequired,
+  onMoveStart: PropTypes.func,
 }
 CardMenu.wrappedComponent.propTypes = {
   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
+  onMoveStart: null,
 }
 CardMenu.displayName = 'CardMenu'
 

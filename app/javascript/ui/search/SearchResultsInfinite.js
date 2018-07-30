@@ -85,6 +85,14 @@ class SearchResultsInfinite extends React.Component {
     this.markFirstVisible(first)
   }
 
+  openMenu = (cardId) => {
+    uiStore.update('openCardMenuId', cardId)
+  }
+
+  closeMenu = () => {
+    uiStore.update('openCardMenuId', false)
+  }
+
   handleVisibilityChange = index => isVisible => {
     this.setVisible(index, isVisible)
     this.computeFirstVisible()
@@ -151,6 +159,8 @@ class SearchResultsInfinite extends React.Component {
                       canEdit={false}
                       canReplace={false}
                       menuOpen={uiStore.openCardMenuId === card.id}
+                      onOpen={this.openMenu(card.id)}
+                      onLeave={this.closeMenu}
                     />
                   </StyledTopRightActions>
                   <StyledBottomLeftIcon>
