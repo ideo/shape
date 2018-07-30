@@ -39,12 +39,13 @@ class ItemPage extends PageWithApi {
   }
 
   onAPILoad = (response) => {
-    const { apiStore, uiStore } = this.props
+    const { apiStore, uiStore, location } = this.props
     const item = response.data
     this.setState({ item })
     uiStore.setViewingItem(item)
     if (item.parent) item.parent.checkCurrentOrg()
     apiStore.findOrBuildCommentThread(item)
+    uiStore.openOptionalMenus(location.search)
   }
 
   updateItem = (itemTextData) => {
@@ -131,6 +132,7 @@ class ItemPage extends PageWithApi {
 
 ItemPage.propTypes = {
   match: ReactRouterPropTypes.match.isRequired,
+  location: ReactRouterPropTypes.location.isRequired,
 }
 ItemPage.wrappedComponent.propTypes = {
   apiStore: MobxPropTypes.objectOrObservableObject.isRequired,

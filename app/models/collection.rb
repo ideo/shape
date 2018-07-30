@@ -403,6 +403,10 @@ class Collection < ApplicationRecord
     RemoveCommentThreadFollowers.perform_async(comment_thread.id)
   end
 
+  def jsonapi_type_name
+    'collections'
+  end
+
   private
 
   def organization_blank?

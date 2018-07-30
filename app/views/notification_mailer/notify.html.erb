@@ -12,7 +12,7 @@
         <div class="CommentThread__StyledHeader">
           <a
             class="Link"
-            href="https://shape.space/<%= comment_thread.record.type %>/<%= comment_thread.record.id %>"
+            href="https://shape.space/<%= comment_thread.record.jsonapi_type_name %>/<%= comment_thread.record.id %>?open=comments"
           >
             <span class="CommentThread__ThumbnailHolder">
               <% if comment_thread.record.cached_cover && comment_thread.record.cached_cover["image_url"] %>
@@ -67,31 +67,35 @@
 </div>
 <div class="Notification__Container">
   <% @notifications.first(6).each do |notification| %>
-    <div class="Notification">
-      <div class="Rfx">
-        <div class="Notification__ButtonContainer">
-          <button class="buttons__NotificationButton"></button>
-        </div>
-        <div>
-          <span class="Moment">
-            <%= notification.created_at.strftime('%b %e - %l:%M %p') %>
-          </span>
-          <button class="Activity__ActivityButton">
-            <p class="Activity__ActivityText">
-            <% case notification.activity.action %>
-            <% when "added_editor", "added_member", "added_admin" %>
-              <span class="bold"><%= notification.activity.actor.name %></span> has made <span class="bold"><%= notification.activity.subjects.map(&:name).join(', ') %></span> a(n) <%= notification.activity.action.to_s.split('_')[1] %> of <%= notification.activity.target.name %>
-            <% when "archived" %>
-              <span class="bold"><%= notification.activity.actor.name %></span> has archived <span class="bold"><%= notification.activity.target.name %></span>
-            <% when "commented" %>
-              <span class="bold"><%= notification.activity.actor.name %></span> commented on <%= notification.activity.target.name %>
-            <% when "mentioned" %>
-              <span class="bold"><%= notification.activity.actor.name %></span> mentioned you in a comment for <%= notification.activity.target.name %>
-            <% end %>
-            </p>
-          </button>
+    <a
+      href="https://shape.space/<%= notification.activity.target.jsonapi_type_name %>/<%= notification.activity.target.id %>?open=notifications"
+    >
+      <div class="Notification">
+        <div class="Rfx">
+          <div class="Notification__ButtonContainer">
+            <button class="buttons__NotificationButton"></button>
+          </div>
+          <div>
+            <span class="Moment">
+              <%= notification.created_at.strftime('%b %e - %l:%M %p') %>
+            </span>
+            <button class="Activity__ActivityButton">
+              <p class="Activity__ActivityText">
+              <% case notification.activity.action %>
+              <% when "added_editor", "added_member", "added_admin" %>
+                <span class="bold"><%= notification.activity.actor.name %></span> has made <span class="bold"><%= notification.activity.subjects.map(&:name).join(', ') %></span> a(n) <%= notification.activity.action.to_s.split('_')[1] %> of <%= notification.activity.target.name %>
+              <% when "archived" %>
+                <span class="bold"><%= notification.activity.actor.name %></span> has archived <span class="bold"><%= notification.activity.target.name %></span>
+              <% when "commented" %>
+                <span class="bold"><%= notification.activity.actor.name %></span> commented on <%= notification.activity.target.name %>
+              <% when "mentioned" %>
+                <span class="bold"><%= notification.activity.actor.name %></span> mentioned you in a comment for <span class="bold"><%= notification.activity.target.name %></span>
+              <% end %>
+              </p>
+            </button>
+          </div>
         </div>
       </div>
-    </div>
+    </a>
   <% end %>
 </div>

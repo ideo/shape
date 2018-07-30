@@ -1,6 +1,7 @@
 import _ from 'lodash'
 import { animateScroll } from 'react-scroll'
 import { observable, action, computed } from 'mobx'
+import queryString from 'query-string'
 import v from '~/utils/variables'
 
 export default class UiStore {
@@ -287,6 +288,25 @@ export default class UiStore {
 
   @action deselectCards() {
     this.selectedCardIds.replace([])
+  }
+
+  @action openOptionalMenus(params) {
+    const opts = queryString.parse(params)
+    if (opts) {
+      switch (opts.open) {
+      case 'comments':
+        this.activityLogPage = 'comments'
+        this.activityLogOpen = true
+        break
+      case 'notifications':
+        this.activityLogPage = 'notifications'
+        this.activityLogOpen = true
+        break
+      default:
+        break
+      }
+    }
+
   }
 
   // TODO: add a unit test for this
