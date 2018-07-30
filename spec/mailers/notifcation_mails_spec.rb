@@ -1,16 +1,15 @@
 require 'rails_helper'
 
-RSpec.describe InvitationMailer, type: :mailer do
+RSpec.describe NotificationMailer, type: :mailer do
   describe '#invite' do
-    let(:user) { create(:user, :pending) }
-    let(:invited_by) { create(:user) }
-    let(:organization) { create(:organization) }
+    let(:user) { create(:user) }
+    let!(:notifications) { [create(:notification, user: user)] }
+    let!(:comment_threads) { create_list(:collection_comment_thread, 2, add_followers: [user]) }
     let(:mail) do
-      InvitationMailer.invite(
+      NotificationMailer.notify(
         user_id: user.id,
-        invited_by_id: invited_by.id,
-        invited_to_type: invited_to.class.name,
-        invited_to_id: invited_to.id,
+        notification_ids: notifications.map(&:id),
+        comment_thread_ids: comment_threads.map(&:id),
       )
     end
 
@@ -18,27 +17,12 @@ RSpec.describe InvitationMailer, type: :mailer do
       let(:invited_to) { create(:collection) }
 
       it 'renders the headers' do
-        expect(mail.subject).to eq("Your invitation to \"#{invited_to.name}\" on Shape")
+        expect(mail.subject).to eq("#{notifications.count} new notifications on Shape")
         expect(mail.to).to eq([user.email])
       end
 
       it 'renders the body' do
-        expect(mail.body.encoded).to match("#{invited_by.name} has invited you to join \"#{invited_to.name}\"")
-      end
-    end
-
-    context 'with a group' do
-      let(:invited_to) { create(:group, organization: organization) }
-
-      it 'renders the headers' do
-        expect(mail.subject).to eq("Your invitation to \"#{invited_to.name}\" on Shape")
-        expect(mail.to).to eq([user.email])
-      end
-
-      it 'renders the body' do
-        expect(mail.body.encoded).to match(
-          "#{invited_by.name} has invited you to join #{organization.name}'s \"#{invited_to.name}\" group",
-        )
+        expect(mail.body.encoded).to match("Your collaborators and teammates have updates for you. Check out what's been going on since you've been gone!")
       end
     end
   end
