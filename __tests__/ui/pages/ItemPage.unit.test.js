@@ -5,6 +5,7 @@ import fakeRoutingStore from '#/mocks/fakeRoutingStore'
 import {
   fakeTextItem
 } from '#/mocks/data'
+jest.mock('../../../app/javascript/stores')
 
 let wrapper, match, apiStore, component
 let props
@@ -39,6 +40,7 @@ describe('ItemPage', () => {
 
   it('renders the ItemPageContainer', () => {
     expect(wrapper.find('ItemPageContainer').exists()).toEqual(true)
+
   })
 
   describe('updateItemName', () => {
