@@ -105,13 +105,15 @@ class PageHeader extends React.Component {
       <ActivityLogButton key="activity" />
     )
     if (this.hasActions && record.parent_collection_card) {
+      // TODO hacky way to include the record on the card link
+      record.parent_collection_card.record = record
       // 3. CardMenu actions
       elements.push(
         <CardMenu
           className="card-menu"
           card={record.parent_collection_card}
           canEdit={record.can_edit}
-          canReplace={record.can_edit}
+          canReplace={record.can_edit && record.internalType === 'items'}
           menuOpen={uiStore.pageMenuOpen}
           onOpen={this.openMenu}
           onLeave={this.closeMenu}

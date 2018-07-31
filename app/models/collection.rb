@@ -166,6 +166,7 @@ class Collection < ApplicationRecord
     [
       :created_by,
       :organization,
+      :parent_collection_card,
       roles: %i[users groups resource],
       collection_cards: [
         :parent,
@@ -179,6 +180,7 @@ class Collection < ApplicationRecord
     [
       :created_by,
       :organization,
+      :parent_collection_card,
       roles: %i[users groups resource],
       collection_cards: [
         :parent,
