@@ -5,19 +5,6 @@ const fakeJsonApiAttrs = {
   assignRef: jest.fn(),
   save: jest.fn(),
 }
-export const fakeItemCard = {
-  id: 10,
-  order: 0,
-  height: 1,
-  width: 1,
-  maxWidth: 1,
-  record: fakeTextItem,
-  item: fakeTextItem,
-  API_create: jest.fn(),
-  API_archive: jest.fn(),
-  API_linkToMyCollection: jest.fn(),
-  ...fakeJsonApiAttrs,
-}
 export const fakeCollectionCard = {
   id: 11,
   order: 1,
@@ -34,10 +21,6 @@ export const fakeCollectionCard = {
   API_duplicate: jest.fn(),
   API_linkToMyCollection: jest.fn(),
 }
-
-const fakeCards = [
-  fakeItemCard, fakeItemCard, fakeItemCard
-]
 
 export const fakeTextItemAttrs = {
   id: 1,
@@ -109,6 +92,24 @@ export const fakeFileItem = {
   rawAttributes: jest.fn().mockReturnValue(fakeTextItemAttrs),
   getRecordType: jest.fn().mockReturnValue('items'),
 }
+
+export const fakeItemCard = {
+  id: 10,
+  order: 0,
+  height: 1,
+  width: 1,
+  maxWidth: 1,
+  record: fakeTextItem,
+  item: fakeTextItem,
+  API_create: jest.fn(),
+  API_archive: jest.fn(),
+  API_linkToMyCollection: jest.fn(),
+  ...fakeJsonApiAttrs,
+}
+
+const fakeCards = [
+  fakeItemCard, fakeItemCard, fakeItemCard
+]
 
 export const fakeCollection = {
   id: 1,

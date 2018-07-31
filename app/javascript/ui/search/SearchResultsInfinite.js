@@ -159,7 +159,7 @@ class SearchResultsInfinite extends React.Component {
                       canEdit={false}
                       canReplace={false}
                       menuOpen={uiStore.openCardMenuId === card.id}
-                      onOpen={this.openMenu(card.id)}
+                      onOpen={this.openMenu.bind(this, card.id)}
                       onLeave={this.closeMenu}
                     />
                   </StyledTopRightActions>

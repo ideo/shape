@@ -1,4 +1,5 @@
 import CollectionGrid from '~/ui/grid/CollectionGrid'
+
 import fakeUiStore from '#/mocks/fakeUiStore'
 
 import {
