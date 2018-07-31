@@ -3,14 +3,15 @@ import { action, observable } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import _ from 'lodash'
 
-import PopoutMenu from '~/ui/global/PopoutMenu'
+import AddIntoIcon from '~/ui/icons/AddIntoIcon'
 import ArchiveIcon from '~/ui/icons/ArchiveIcon'
 import DownloadIcon from '~/ui/icons/DownloadIcon'
 import DuplicateIcon from '~/ui/icons/DuplicateIcon'
-import ReplaceIcon from '~/ui/icons/ReplaceIcon'
-import MoveIcon from '~/ui/icons/MoveIcon'
 import LinkIcon from '~/ui/icons/LinkIcon'
-import AddIntoIcon from '~/ui/icons/AddIntoIcon'
+import MoveIcon from '~/ui/icons/MoveIcon'
+import ReplaceIcon from '~/ui/icons/ReplaceIcon'
+import PopoutMenu from '~/ui/global/PopoutMenu'
+import TagIcon from '~/ui/icons/TagIcon'
 
 @inject('uiStore')
 @observer
@@ -58,8 +59,15 @@ class CardMenu extends React.Component {
     this.callCardAction('Add to My Collection', 'API_linkToMyCollection')
   }
 
-  archiveCard = () => {
-    this.callCardAction('Archive', 'API_archive')
+  archiveCard = async () => {
+    const { afterArchive } = this.props
+    await this.callCardAction('Archive', 'API_archive')
+    if (afterArchive) afterArchive()
+  }
+
+  showTags = () => {
+    const { card, uiStore } = this.props
+    uiStore.update('tagsModalOpenId', card.id)
   }
 
   downloadCard = () => {
@@ -96,9 +104,10 @@ class CardMenu extends React.Component {
       { name: 'Move', iconRight: <MoveIcon />, onClick: this.moveCard },
       { name: 'Link', iconRight: <LinkIcon />, onClick: this.linkCard },
       { name: 'Add to My Collection', iconRight: <AddIntoIcon />, onClick: this.addToMyCollection },
-      { name: 'Archive', iconRight: <ArchiveIcon />, onClick: this.archiveCard },
       { name: 'Download', iconRight: <DownloadIcon />, onClick: this.downloadCard },
       { name: 'Replace', iconRight: <ReplaceIcon />, onClick: this.replaceCard },
+      { name: 'Tags', iconRight: <TagIcon />, onClick: this.showTags },
+      { name: 'Archive', iconRight: <ArchiveIcon />, onClick: this.archiveCard },
     ]
     actions.forEach(actionItem => {
       if (actionItem.name === this.itemLoading) {
@@ -169,15 +178,17 @@ CardMenu.propTypes = {
   onOpen: PropTypes.func.isRequired,
   onLeave: PropTypes.func.isRequired,
   onMoveStart: PropTypes.func,
+  afterArchive: PropTypes.func
 }
 CardMenu.wrappedComponent.propTypes = {
   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
-  onMoveStart: null,
 }
 CardMenu.displayName = 'CardMenu'
 
 CardMenu.defaultProps = {
-  className: 'card-menu'
+  className: 'card-menu',
+  onMoveStart: null,
+  afterArchive: null,
 }
 
 export default CardMenu

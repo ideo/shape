@@ -8,13 +8,13 @@ import Modal from '~/ui/global/modals/Modal'
 @observer
 class TagEditorModal extends React.Component {
   render() {
-    const { record, canEdit, uiStore } = this.props
+    const { record, canEdit, uiStore, open } = this.props
 
     return (
       <Modal
-        onClose={() => uiStore.update('tagsModalOpen', false)}
+        onClose={() => uiStore.update('tagsModalOpenId', null)}
         title="Tags"
-        open={uiStore.tagsModalOpen}
+        open={open}
       >
         <TagEditor
           canEdit={canEdit}
@@ -30,12 +30,14 @@ class TagEditorModal extends React.Component {
 TagEditorModal.propTypes = {
   record: MobxPropTypes.objectOrObservableObject.isRequired,
   canEdit: PropTypes.bool,
+  open: PropTypes.bool,
 }
 TagEditorModal.wrappedComponent.propTypes = {
   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 TagEditorModal.defaultProps = {
   canEdit: false,
+  open: false,
 }
 
 export default TagEditorModal

@@ -5,6 +5,7 @@ import styled from 'styled-components'
 
 import ActionCableConsumer from '~/utils/ActionCableConsumer'
 import FilePreview from '~/ui/grid/covers/FilePreview'
+import GridCardBlank from '~/ui/grid/blankContentTool/GridCardBlank'
 import ImageItem from '~/ui/items/ImageItem'
 import Loader from '~/ui/layout/Loader'
 import MoveModal from '~/ui/grid/MoveModal'
@@ -98,6 +99,11 @@ class ItemPage extends PageWithApi {
     return `items/${match.params.id}`
   }
 
+  reroute = (card) => {
+    const { routingStore } = this.props
+    routingStore.routeTo('items', card.record.id)
+  }
+
   updateItemName = (name) => {
     const { item } = this.state
     item.name = name
@@ -107,6 +113,7 @@ class ItemPage extends PageWithApi {
   }
 
   render() {
+    const { uiStore } = this.props
     // this.error comes from PageWithApi
     if (this.error) return <PageError error={this.error} />
 
@@ -116,15 +123,21 @@ class ItemPage extends PageWithApi {
       return <FilePreview file={item.filestack_file} />
     }
 
+    const { replacingId } = uiStore.blankContentToolState
+
     return (
       <Fragment>
         <PageHeader record={item} />
         <ItemPageContainer>
-          <PageContainer>
-            {/* TODO: calculate item container size? */}
-            {this.content}
-            <MoveModal />
-          </PageContainer>
+            <PageContainer>
+              { item.parent_collection_card && replacingId === item.parent_collection_card.id ?
+                <GridCardBlank height={1} parent={item.parent} afterCreate={this.reroute} />  : (
+                <div>
+                  {this.content}
+                  <MoveModal />
+                </div>
+              )}
+            </PageContainer>
         </ItemPageContainer>
       </Fragment>
     )

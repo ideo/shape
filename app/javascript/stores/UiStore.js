@@ -25,7 +25,7 @@ export default class UiStore {
      (navigator.msMaxTouchPoints > 0)
   )
   @observable pageMenuOpen = false
-  @observable tagsModalOpen = false
+  @observable tagsModalOpenId = null
   defaultGridSettings = {
     // layout will track we are at "size 3" i.e. "small 4 cols" even though cols === 4
     layoutSize: 4,

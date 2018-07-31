@@ -269,7 +269,7 @@ class GridCardBlank extends React.Component {
   }
 
   createCard = (nested = {}) => {
-    const { parent, apiStore, uiStore } = this.props
+    const { afterCreate, parent, apiStore, uiStore } = this.props
     const { order, width, height, replacingId } = uiStore.blankContentToolState
     const isReplacing = !!replacingId
     const attrs = {
@@ -284,11 +284,16 @@ class GridCardBlank extends React.Component {
     const card = new CollectionCard(attrs, apiStore)
     card.parent = parent // Assign parent so store can get access to it
     this.setState({ loading: true }, async () => {
+      let newCard
       if (isReplacing) {
-        await card.API_replace({ replacingId })
+        console.log('before replace')
+        newCard = await card.API_replace({ replacingId })
+        console.log('after replace')
       } else {
-        await card.API_create()
+        newCard = await card.API_create()
       }
+      console.log('newCard', newCard)
+      if (afterCreate) afterCreate(newCard)
       // NOTE: closeBlankContentTool() will automatically get called
       // in CollectionCard after the async actions are complete
     })
@@ -456,10 +461,14 @@ GridCardBlank.propTypes = {
   // parent is the parent collection
   parent: MobxPropTypes.objectOrObservableObject.isRequired,
   height: PropTypes.number.isRequired,
+  afterCreate: PropTypes.func,
 }
 GridCardBlank.wrappedComponent.propTypes = {
   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
   apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
+}
+GridCardBlank.defaultProps = {
+  afterCreate: null,
 }
 
 // give a name to the injected component for unit tests

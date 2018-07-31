@@ -13,6 +13,7 @@ import RolesSummary from '~/ui/roles/RolesSummary'
 import FilledProfileIcon from '~/ui/icons/FilledProfileIcon'
 import ProfileIcon from '~/ui/icons/ProfileIcon'
 import SystemIcon from '~/ui/icons/SystemIcon'
+import TagEditorModal from '~/ui/pages/shared/TagEditorModal'
 import { FixedHeader, MaxWidthContainer } from '~/ui/global/styled/layout'
 import { SubduedHeading1 } from '~/ui/global/styled/typography'
 import { StyledTitleAndRoles } from '~/ui/pages/shared/styled'
@@ -74,7 +75,7 @@ class PageHeader extends React.Component {
     uiStore.update('pageMenuOpen', false)
   }
 
-  routeForMove = () => {
+  routeBack = () => {
     const { record, routingStore } = this.props
     return routingStore.routeTo('collections', record.parent.id)
   }
@@ -104,7 +105,7 @@ class PageHeader extends React.Component {
     elements.push(
       <ActivityLogButton key="activity" />
     )
-    if (this.hasActions) {
+    if (this.hasActions && record.parent_collection_card) {
       // 3. CardMenu actions
       elements.push(
         <CardMenu
@@ -115,7 +116,8 @@ class PageHeader extends React.Component {
           menuOpen={uiStore.pageMenuOpen}
           onOpen={this.openMenu}
           onLeave={this.closeMenu}
-          onMoveStart={this.routeForMove}
+          onMoveStart={this.routeBack}
+          afterArchive={this.routeBack}
         />
       )
     }
@@ -152,8 +154,10 @@ class PageHeader extends React.Component {
   }
 
   render() {
-    const { record, isHomepage } = this.props
+    const { record, isHomepage, uiStore } = this.props
     const breadcrumb = isHomepage ? [] : record.breadcrumb
+    const tagEditorOpen = record.parent_collection_card &&
+      uiStore.tagsModalOpenId === record.parent_collection_card.id
     return (
       <FixedPageHeader>
         <MaxWidthContainer>
@@ -185,6 +189,7 @@ class PageHeader extends React.Component {
             </StyledTitleAndRoles>
           </div>
         </MaxWidthContainer>
+        <TagEditorModal canEdit={this.canEdit} record={record} open={tagEditorOpen} />
       </FixedPageHeader>
     )
   }

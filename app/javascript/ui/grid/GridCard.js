@@ -21,6 +21,7 @@ import LinkedCollectionIcon from '~/ui/icons/LinkedCollectionIcon'
 import RequiredCollectionIcon from '~/ui/icons/RequiredCollectionIcon'
 import PinnedIcon from '~/ui/icons/PinnedIcon'
 import SelectionCircle from '~/ui/grid/SelectionCircle'
+import TagEditorModal from '~/ui/pages/shared/TagEditorModal'
 import Tooltip from '~/ui/global/Tooltip'
 import { uiStore } from '~/stores'
 import v, { ITEM_TYPES } from '~/utils/variables'
@@ -296,6 +297,7 @@ class GridCard extends React.Component {
     } = this.props
 
     const firstCardInRow = card.position && card.position.x === 0
+    const tagEditorOpen = uiStore.tagsModalOpenId === card.id
 
     return (
       <StyledGridCard dragging={dragging}>
@@ -330,6 +332,7 @@ class GridCard extends React.Component {
         <StyledGridCardInner onClick={this.handleClick}>
           {this.renderInner}
         </StyledGridCardInner>
+        <TagEditorModal canEdit={this.canEditCard} record={record} open={tagEditorOpen} />
       </StyledGridCard>
     )
   }
