@@ -18,7 +18,6 @@ import { FixedHeader, MaxWidthContainer } from '~/ui/global/styled/layout'
 import { SubduedHeading1 } from '~/ui/global/styled/typography'
 import { StyledTitleAndRoles } from '~/ui/pages/shared/styled'
 import v from '~/utils/variables'
-
 /* global IdeoSSO */
 
 // NOTE: Header and PageHeader create sibling <header> elements on the page

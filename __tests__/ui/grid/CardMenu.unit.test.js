@@ -25,6 +25,7 @@ describe('CardMenu', () => {
         'Move',
         'Link',
         'Add to My Collection',
+        'Tags',
         'Archive',
         'Replace',
       ]

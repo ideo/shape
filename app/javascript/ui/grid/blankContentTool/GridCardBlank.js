@@ -286,13 +286,10 @@ class GridCardBlank extends React.Component {
     this.setState({ loading: true }, async () => {
       let newCard
       if (isReplacing) {
-        console.log('before replace')
         newCard = await card.API_replace({ replacingId })
-        console.log('after replace')
       } else {
         newCard = await card.API_create()
       }
-      console.log('newCard', newCard)
       if (afterCreate) afterCreate(newCard)
       // NOTE: closeBlankContentTool() will automatically get called
       // in CollectionCard after the async actions are complete

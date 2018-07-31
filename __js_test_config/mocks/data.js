@@ -5,73 +5,6 @@ const fakeJsonApiAttrs = {
   assignRef: jest.fn(),
   save: jest.fn(),
 }
-
-export const fakeTextItemAttrs = {
-  id: 1,
-  type: 'Item::TextItem',
-  name: 'My Cool Item',
-  text_data: 'This is the content for the item and it contains multiple sentences. Like this one.',
-  breadcrumb: [['collections', 1, 'Some collection'], ['items', 1, 'my item']],
-  parentPath: '/',
-  can_edit: false,
-  inherited_tag_list: [],
-  internalType: 'items',
-}
-export const fakeTextItem = {
-  ...fakeTextItemAttrs,
-  rawAttributes: jest.fn().mockReturnValue(fakeTextItemAttrs),
-  getRecordType: jest.fn().mockReturnValue('items'),
-  toJS: jest.fn().mockReturnValue(fakeTextItemAttrs),
-  ...fakeJsonApiAttrs,
-}
-export const fakeVideoItemAttrs = {
-  id: 2,
-  type: 'Item::VideoItem',
-  name: 'Crazy Honey Badger',
-  url: 'https://www.youtube.com/watch?v=4r7wHMg5Yjg',
-  thumbnail_url: 'https://img.youtube.com/vi/4r7wHMg5Yjg/hqdefault.jpg',
-  inherited_tag_list: [],
-  can_edit: false,
-}
-export const fakeVideoItem = {
-  ...fakeVideoItemAttrs,
-  rawAttributes: jest.fn().mockReturnValue(fakeTextItemAttrs),
-  getRecordType: jest.fn().mockReturnValue('items'),
-}
-export const fakeImageItemAttrs = {
-  id: 3,
-  type: 'Item::FileItem',
-  name: 'Earth from Space',
-  filestack_file: {
-    id: 1,
-    url: 'https://www.nasa.gov/sites/default/files/styles/full_width_feature/public/thumbnails/image/iss052e023801_0.jpg',
-  },
-  inherited_tag_list: [],
-  can_edit: false,
-}
-export const fakeImageItem = {
-  ...fakeImageItemAttrs,
-  rawAttributes: jest.fn().mockReturnValue(fakeTextItemAttrs),
-  getRecordType: jest.fn().mockReturnValue('items'),
-}
-export const fakeFileItemAttrs = {
-  id: 3,
-  type: 'Item::FileItem',
-  name: '',
-  filestack_file: {
-    id: 1,
-    url: 'https://www.nasa.gov/sites/default/files/styles/full_width_feature/public/thumbnails/image/iss052e023801_0.ppt',
-    handle: 'aaaaaa',
-    mimetype: 'application/vnd.powerpoint',
-  },
-  inherited_tag_list: [],
-  can_edit: false,
-}
-export const fakeFileItem = {
-  ...fakeFileItemAttrs,
-  rawAttributes: jest.fn().mockReturnValue(fakeTextItemAttrs),
-  getRecordType: jest.fn().mockReturnValue('items'),
-}
 export const fakeItemCard = {
   id: 10,
   order: 0,
@@ -105,6 +38,77 @@ export const fakeCollectionCard = {
 const fakeCards = [
   fakeItemCard, fakeItemCard, fakeItemCard
 ]
+
+export const fakeTextItemAttrs = {
+  id: 1,
+  type: 'Item::TextItem',
+  name: 'My Cool Item',
+  text_data: 'This is the content for the item and it contains multiple sentences. Like this one.',
+  breadcrumb: [['collections', 1, 'Some collection'], ['items', 1, 'my item']],
+  parentPath: '/',
+  can_edit: false,
+  inherited_tag_list: [],
+  internalType: 'items',
+  parent_collection_card: fakeCollectionCard,
+}
+export const fakeTextItem = {
+  ...fakeTextItemAttrs,
+  rawAttributes: jest.fn().mockReturnValue(fakeTextItemAttrs),
+  getRecordType: jest.fn().mockReturnValue('items'),
+  toJS: jest.fn().mockReturnValue(fakeTextItemAttrs),
+  ...fakeJsonApiAttrs,
+}
+export const fakeVideoItemAttrs = {
+  id: 2,
+  type: 'Item::VideoItem',
+  name: 'Crazy Honey Badger',
+  url: 'https://www.youtube.com/watch?v=4r7wHMg5Yjg',
+  thumbnail_url: 'https://img.youtube.com/vi/4r7wHMg5Yjg/hqdefault.jpg',
+  inherited_tag_list: [],
+  can_edit: false,
+  parent_collection_card: fakeCollectionCard,
+}
+export const fakeVideoItem = {
+  ...fakeVideoItemAttrs,
+  rawAttributes: jest.fn().mockReturnValue(fakeTextItemAttrs),
+  getRecordType: jest.fn().mockReturnValue('items'),
+}
+export const fakeImageItemAttrs = {
+  id: 3,
+  type: 'Item::FileItem',
+  name: 'Earth from Space',
+  filestack_file: {
+    id: 1,
+    url: 'https://www.nasa.gov/sites/default/files/styles/full_width_feature/public/thumbnails/image/iss052e023801_0.jpg',
+  },
+  inherited_tag_list: [],
+  can_edit: false,
+  parent_collection_card: fakeCollectionCard,
+}
+export const fakeImageItem = {
+  ...fakeImageItemAttrs,
+  rawAttributes: jest.fn().mockReturnValue(fakeTextItemAttrs),
+  getRecordType: jest.fn().mockReturnValue('items'),
+}
+export const fakeFileItemAttrs = {
+  id: 3,
+  type: 'Item::FileItem',
+  name: '',
+  filestack_file: {
+    id: 1,
+    url: 'https://www.nasa.gov/sites/default/files/styles/full_width_feature/public/thumbnails/image/iss052e023801_0.ppt',
+    handle: 'aaaaaa',
+    mimetype: 'application/vnd.powerpoint',
+  },
+  inherited_tag_list: [],
+  can_edit: false,
+  parent_collection_card: fakeCollectionCard,
+}
+export const fakeFileItem = {
+  ...fakeFileItemAttrs,
+  rawAttributes: jest.fn().mockReturnValue(fakeTextItemAttrs),
+  getRecordType: jest.fn().mockReturnValue('items'),
+}
 
 export const fakeCollection = {
   id: 1,

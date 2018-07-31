@@ -131,6 +131,7 @@ class CardMenu extends React.Component {
     // if record is system required, we always remove these actions
     if (card.record && card.record.system_required) {
       items = _.reject(items, { name: 'Duplicate' })
+      items = _.reject(items, { name: 'Tags' })
       if (!card.link) {
         items = _.reject(items, { name: 'Archive' })
       }

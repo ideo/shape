@@ -89,7 +89,7 @@ describe('PageHeader', () => {
         expect(wrapper.find('RolesSummary').exists()).toBeFalsy()
       })
 
-      it('should not render the page menu', () => {
+      it('should not render the card menu', () => {
         expect(wrapper.find('CardMenu').exists()).toBeFalsy()
       })
     })
