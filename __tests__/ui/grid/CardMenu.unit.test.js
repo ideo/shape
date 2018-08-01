@@ -26,6 +26,7 @@ describe('CardMenu', () => {
         'Link',
         'Add to My Collection',
         'Tags',
+        'Permissions',
         'Archive',
         'Replace',
       ]
@@ -139,7 +140,7 @@ describe('CardMenu', () => {
 
   describe('as editor of a system required record', () => {
     beforeEach(() => {
-      actions = ['Move', 'Link', 'Add to My Collection']
+      actions = ['Move', 'Link', 'Add to My Collection', 'Permissions']
       props.canEdit = true
       props.canReplace = false
       props.card.record.system_required = true
