@@ -29,7 +29,8 @@ class NotificationMailerWorker
 
   def notifications_for_user(user)
     user.notifications.where(
-      read: false,
+      read: [false, nil],
+    ).where(
       Notification.arel_table[:created_at].lt(user.last_notification_mail_sent)
     )
   end

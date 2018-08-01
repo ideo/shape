@@ -1,6 +1,6 @@
 require 'sidekiq-scheduler'
 
-class NotificationMailerWorker
+class NotificationMentionMailerWorker
   include Sidekiq::Worker
 
   def perform
@@ -42,7 +42,10 @@ class NotificationMailerWorker
   def notifications_for_user(user)
     user.notifications.where(
       read: false,
-      Notification.arel_table[:created_at].lt(user.last_notification_mail_sent)
+    ).where(
+      Notification.arel_table[:created_at].lt(
+        user.last_notification_mail_sent
+      ),
     )
   end
 end
