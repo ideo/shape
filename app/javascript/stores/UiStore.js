@@ -306,7 +306,6 @@ export default class UiStore {
         break
       }
     }
-
   }
 
   // TODO: add a unit test for this
