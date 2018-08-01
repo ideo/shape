@@ -12,18 +12,18 @@ class Truncator extends React.Component {
 
     this.setElRef = el => {
       this.elRef = el
-    };
+    }
 
     this.onResize = _.debounce(this._onResize, 100)
   }
 
   componentDidMount() {
     this.truncate()
-    window.addEventListener("resize", this.onResize)
+    window.addEventListener('resize', this.onResize)
   }
 
   componentWillUnmount() {
-    window.removeEventListener("resize", this.onResize)
+    window.removeEventListener('resize', this.onResize)
   }
 
   _onResize = () => {

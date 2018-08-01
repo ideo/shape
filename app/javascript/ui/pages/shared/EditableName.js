@@ -142,14 +142,14 @@ class EditableName extends React.Component {
       )
     }
     let nameEl = (
-        <Heading1 ref={this.textRef} onClick={canEdit ? this.startEditingName : null}>
-          <Truncator paddingRight={200} text={this.name} />
-        </Heading1>
+      <Heading1 ref={this.textRef} onClick={canEdit ? this.startEditingName : null}>
+        <Truncator paddingRight={200} text={this.name} />
+      </Heading1>
     )
     if (TextWrapper) {
       nameEl = (
         <button onClick={canEdit ? this.startEditingName : null}>
-          <TextWrapper><Truncator text={this.name} paddingRight={150}></Truncator></TextWrapper>
+          <TextWrapper><Truncator text={this.name} paddingRight={150} /></TextWrapper>
         </button>
       )
     }

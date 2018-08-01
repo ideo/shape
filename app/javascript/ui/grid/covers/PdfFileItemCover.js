@@ -41,9 +41,9 @@ StyledPdfCover.displayName = 'StyledPdfCover'
 
 export const ImageContainer = styled.div`
   border-radius: 12px;
-  clip-path: ${props => (props.orientation === 'landscape' ?
-    'polygon(0 0,0 100%,100% 100%,100% 52px,245px 0)' :
-    'polygon(0 0,0 100%,100% 100%,100% 53px,214px 0)')};
+  clip-path: ${props => (props.orientation === 'landscape'
+    ? 'polygon(0 0,0 100%,100% 100%,100% 52px,245px 0)'
+    : 'polygon(0 0,0 100%,100% 100%,100% 53px,214px 0)')};
   overflow: hidden;
   position: relative;
   transform: rotate(-8deg) translateX(${props => props.x}) translateY(${props => props.y}) translateZ(0);
@@ -99,12 +99,12 @@ class PdfFileItemCover extends React.Component {
           <CornerContainer>
             <CornerIcon />
           </CornerContainer>
-          <img src={pdfCoverUrl} />
+          <img src={pdfCoverUrl} alt="Pdf cover" />
         </ImageContainer>
         <div className="fileInfo">
           <FileIcon mimeType={item.filestack_file.mimetype} />
           <div className="fileName">
-            <Truncator extraSpacing={15} text={ filestack_file.filename } />
+            <Truncator extraSpacing={15} text={filestack_file.filename} />
           </div>
         </div>
       </StyledPdfCover>
