@@ -108,7 +108,7 @@ class CollectionCard extends BaseRecord {
       uiStore.trackEvent('replace', this.parent)
       return res.data
     } catch (e) {
-      uiStore.defaultAlertError()
+      return uiStore.defaultAlertError()
     }
   }
 
@@ -146,8 +146,8 @@ class CollectionCard extends BaseRecord {
         onConfirm: resolve,
       })
     })
-    const s = await popupAgreed
 
+    await popupAgreed
     const collection = this.parent
     try {
       collection.removeCard(this)

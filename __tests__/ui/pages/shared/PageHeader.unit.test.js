@@ -1,8 +1,6 @@
 import PageHeader from '~/ui/pages/shared/PageHeader'
 import fakeUiStore from '#/mocks/fakeUiStore'
 import {
-
-
   fakeTextItem,
   fakeCollection,
 } from '#/mocks/data'
@@ -91,7 +89,6 @@ describe('PageHeader', () => {
 
       it('should not render the card menu', () => {
         expect(wrapper.find('CardMenu').exists()).toBeFalsy()
-
       })
     })
   })

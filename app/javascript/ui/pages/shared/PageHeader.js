@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types'
 import { Fragment } from 'react'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
-import { Flex, Box } from 'reflexbox'
+import { Flex } from 'reflexbox'
 import styled from 'styled-components'
 
 import ActivityLogButton from '~/ui/notifications/ActivityLogButton'
@@ -204,6 +204,7 @@ PageHeader.propTypes = {
 
 PageHeader.wrappedComponent.propTypes = {
   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
+  routingStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 
 PageHeader.defaultProps = {

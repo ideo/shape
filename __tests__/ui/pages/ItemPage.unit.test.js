@@ -2,9 +2,8 @@ import ItemPage from '~/ui/pages/ItemPage'
 import fakeApiStore from '#/mocks/fakeApiStore'
 import fakeUiStore from '#/mocks/fakeUiStore'
 import fakeRoutingStore from '#/mocks/fakeRoutingStore'
-import {
-  fakeTextItem
-} from '#/mocks/data'
+import { fakeTextItem } from '#/mocks/data'
+
 jest.mock('../../../app/javascript/stores')
 
 let wrapper, match, apiStore, component
@@ -40,7 +39,6 @@ describe('ItemPage', () => {
 
   it('renders the ItemPageContainer', () => {
     expect(wrapper.find('ItemPageContainer').exists()).toEqual(true)
-
   })
 
   describe('updateItemName', () => {
