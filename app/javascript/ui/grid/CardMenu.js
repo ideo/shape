@@ -10,6 +10,7 @@ import DuplicateIcon from '~/ui/icons/DuplicateIcon'
 import LinkIcon from '~/ui/icons/LinkIcon'
 import MoveIcon from '~/ui/icons/MoveIcon'
 import ReplaceIcon from '~/ui/icons/ReplaceIcon'
+import PermissionsIcon from '~/ui/icons/PermissionsIcon'
 import PopoutMenu from '~/ui/global/PopoutMenu'
 import TagIcon from '~/ui/icons/TagIcon'
 
@@ -78,6 +79,11 @@ class CardMenu extends React.Component {
     }
   }
 
+  showRolesMenu = () => {
+    const { uiStore, card } = this.props
+    uiStore.update('rolesMenuOpen', card.record.id)
+  }
+
   handleMouseLeave = () => {
     this.props.onLeave()
   }
@@ -107,6 +113,7 @@ class CardMenu extends React.Component {
       { name: 'Download', iconRight: <DownloadIcon />, onClick: this.downloadCard },
       { name: 'Replace', iconRight: <ReplaceIcon />, onClick: this.replaceCard },
       { name: 'Tags', iconRight: <TagIcon />, onClick: this.showTags },
+      { name: 'Permissions', iconRight: <PermissionsIcon />, onClick: this.showRolesMenu },
       { name: 'Archive', iconRight: <ArchiveIcon />, onClick: this.archiveCard },
     ]
     actions.forEach(actionItem => {

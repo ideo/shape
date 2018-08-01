@@ -4,6 +4,7 @@ import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import _ from 'lodash'
 
 import Loader from '~/ui/layout/Loader'
+import Roles from '~/ui/grid/Roles'
 import MovableGridCard from '~/ui/grid/MovableGridCard'
 import CollectionCard from '~/stores/jsonApi/CollectionCard'
 
@@ -510,14 +511,27 @@ class CollectionGrid extends React.Component {
     return grid
   }
 
+  get rolesMenuRecord() {
+    const { collection, uiStore } = this.props
+    return collection.collection_cards
+      .map(card => card.record)
+      .find(record => record.id === uiStore.rolesMenuOpen)
+  }
+
   render() {
-    const { uiStore } = this.props
+    const { collection, uiStore } = this.props
     if (uiStore.isLoading) return <Loader />
 
     const { cardIds } = this.props.collection
     // Rendering cardIds so that grid re-renders when they change
     return (
       <div className="Grid" data-card-ids={cardIds}>
+        { uiStore.rolesMenuOpen && (
+          <Roles
+            record={this.rolesMenuRecord}
+            roles={this.rolesMenuRecord.roles}
+          />
+        )}
         { this.renderPositionedCards() }
       </div>
     )
