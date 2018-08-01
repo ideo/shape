@@ -91,6 +91,7 @@ describe('PageHeader', () => {
 
       it('should not render the card menu', () => {
         expect(wrapper.find('CardMenu').exists()).toBeFalsy()
+
       })
     })
   })

@@ -50,8 +50,8 @@ class PageHeader extends React.Component {
 
   get hasActions() {
     const { record } = this.props
-    return record.internalType === 'items' || !record.isUserCollection ||
-      !record.isSharedCollection
+    return record.internalType === 'items' || (!record.isUserCollection &&
+      !record.isSharedCollection)
   }
 
   showObjectRoleDialog = () => {
