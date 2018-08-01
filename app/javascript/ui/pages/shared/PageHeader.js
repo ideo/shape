@@ -75,9 +75,16 @@ class PageHeader extends React.Component {
     uiStore.update('pageMenuOpen', false)
   }
 
-  routeBack = () => {
+  routeBack = ({ type }) => {
     const { record, routingStore } = this.props
-    return routingStore.routeTo('collections', record.parent.id)
+    if (record.internalType === 'items' || type === 'move') {
+      if (record.parent_collection_card.parent_id) {
+        routingStore.routeTo('collections',
+          record.parent_collection_card.parent_id)
+      } else {
+        routingStore.routeTo('homepage')
+      }
+    }
   }
 
   handleTitleClick = () => {
@@ -118,7 +125,7 @@ class PageHeader extends React.Component {
           menuOpen={uiStore.pageMenuOpen}
           onOpen={this.openMenu}
           onLeave={this.closeMenu}
-          onMoveStart={this.routeBack}
+          onMoveMenu={this.routeBack}
           afterArchive={this.routeBack}
         />
       )

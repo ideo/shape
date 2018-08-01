@@ -38,8 +38,8 @@ class CardMenu extends React.Component {
   }
 
   openMoveMenu = cardAction => {
-    const { card, onMoveStart, uiStore } = this.props
-    if (onMoveStart) onMoveStart()
+    const { card, onMoveMenu, uiStore } = this.props
+    if (onMoveMenu) onMoveMenu({ type: cardAction })
     uiStore.selectCardId(card.id)
     uiStore.openMoveMenu({ from: this.viewingCollectionId, cardAction })
   }
@@ -185,7 +185,7 @@ CardMenu.propTypes = {
   canReplace: PropTypes.bool.isRequired,
   onOpen: PropTypes.func.isRequired,
   onLeave: PropTypes.func.isRequired,
-  onMoveStart: PropTypes.func,
+  onMoveMenu: PropTypes.func,
   afterArchive: PropTypes.func
 }
 CardMenu.wrappedComponent.propTypes = {
@@ -195,7 +195,7 @@ CardMenu.displayName = 'CardMenu'
 
 CardMenu.defaultProps = {
   className: 'card-menu',
-  onMoveStart: null,
+  onMoveMenu: null,
   afterArchive: null,
 }
 
