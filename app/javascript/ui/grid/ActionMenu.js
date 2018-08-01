@@ -16,7 +16,7 @@ import TagIcon from '~/ui/icons/TagIcon'
 
 @inject('uiStore')
 @observer
-class CardMenu extends React.Component {
+class ActionMenu extends React.Component {
   @observable itemLoading = ''
 
   @action setLoading(name = '') {
@@ -177,7 +177,7 @@ class CardMenu extends React.Component {
   }
 }
 
-CardMenu.propTypes = {
+ActionMenu.propTypes = {
   card: MobxPropTypes.objectOrObservableObject.isRequired,
   className: PropTypes.string,
   menuOpen: PropTypes.bool.isRequired,
@@ -188,15 +188,15 @@ CardMenu.propTypes = {
   onMoveMenu: PropTypes.func,
   afterArchive: PropTypes.func
 }
-CardMenu.wrappedComponent.propTypes = {
+ActionMenu.wrappedComponent.propTypes = {
   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }
-CardMenu.displayName = 'CardMenu'
+ActionMenu.displayName = 'ActionMenu'
 
-CardMenu.defaultProps = {
+ActionMenu.defaultProps = {
   className: 'card-menu',
   onMoveMenu: null,
   afterArchive: null,
 }
 
-export default CardMenu
+export default ActionMenu

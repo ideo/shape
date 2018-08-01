@@ -56,7 +56,7 @@ describe('PageHeader', () => {
       })
 
       it('should render the page menu', () => {
-        expect(wrapper.find('CardMenu').exists()).toBeTruthy()
+        expect(wrapper.find('ActionMenu').exists()).toBeTruthy()
       })
     })
 
@@ -88,7 +88,7 @@ describe('PageHeader', () => {
       })
 
       it('should not render the card menu', () => {
-        expect(wrapper.find('CardMenu').exists()).toBeFalsy()
+        expect(wrapper.find('ActionMenu').exists()).toBeFalsy()
       })
     })
   })

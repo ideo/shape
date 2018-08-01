@@ -52,7 +52,7 @@ describe('GridCard', () => {
       })
 
       it('renders menu', () => {
-        expect(wrapper.find('CardMenu').exists()).toBe(true)
+        expect(wrapper.find('ActionMenu').exists()).toBe(true)
       })
 
       it('renders selection circle without hotspot', () => {
@@ -70,7 +70,7 @@ describe('GridCard', () => {
       })
 
       it('passes canEdit to menu', () => {
-        expect(wrapper.find('CardMenu').props().canEdit).toBe(true)
+        expect(wrapper.find('ActionMenu').props().canEdit).toBe(true)
       })
 
       it('renders selection circle and hotspot', () => {
@@ -125,7 +125,7 @@ describe('GridCard', () => {
       })
 
       it('renders menu and selection circle', () => {
-        expect(wrapper.find('CardMenu').exists()).toBe(true)
+        expect(wrapper.find('ActionMenu').exists()).toBe(true)
       })
 
       it('renders selection circle without hotspot', () => {
@@ -142,7 +142,7 @@ describe('GridCard', () => {
       })
 
       it('passes canEdit to menu', () => {
-        expect(wrapper.find('CardMenu').props().canEdit).toBe(true)
+        expect(wrapper.find('ActionMenu').props().canEdit).toBe(true)
       })
 
       it('renders selection circle and hotspot', () => {
@@ -160,7 +160,7 @@ describe('GridCard', () => {
 
       it('renders selection circle and card menu, but no hotspot', () => {
         expect(wrapper.find('SelectionCircle').exists()).toBe(true)
-        expect(wrapper.find('CardMenu').exists()).toBe(true)
+        expect(wrapper.find('ActionMenu').exists()).toBe(true)
         expect(wrapper.find('GridCardHotspot').exists()).toBe(false)
       })
     })
@@ -173,8 +173,8 @@ describe('GridCard', () => {
         rerender()
       })
 
-      it('does not render CardMenu', () => {
-        expect(wrapper.find('CardMenu').exists()).toBe(false)
+      it('does not render ActionMenu', () => {
+        expect(wrapper.find('ActionMenu').exists()).toBe(false)
       })
     })
 

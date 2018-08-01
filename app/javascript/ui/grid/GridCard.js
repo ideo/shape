@@ -12,7 +12,7 @@ import VideoItemCover from '~/ui/grid/covers/VideoItemCover'
 import GenericFileItemCover from '~/ui/grid/covers/GenericFileItemCover'
 import CollectionCover from '~/ui/grid/covers/CollectionCover'
 
-import CardMenu from '~/ui/grid/CardMenu'
+import ActionMenu from '~/ui/grid/ActionMenu'
 import CollectionIcon from '~/ui/icons/CollectionIcon'
 import LinkIcon from '~/ui/icons/LinkIcon'
 import Download from '~/ui/grid/Download'
@@ -316,7 +316,7 @@ class GridCard extends React.Component {
               <Download file={record.filestack_file} />
             )}
             <SelectionCircle cardId={card.id} />
-            <CardMenu
+            <ActionMenu
               className="show-on-hover card-menu"
               card={card}
               canEdit={this.canEditCard}

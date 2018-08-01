@@ -6,7 +6,7 @@ import styled from 'styled-components'
 
 import ActivityLogButton from '~/ui/notifications/ActivityLogButton'
 import Breadcrumb from '~/ui/layout/Breadcrumb'
-import CardMenu from '~/ui/grid/CardMenu'
+import ActionMenu from '~/ui/grid/ActionMenu'
 import EditableName from '~/ui/pages/shared/EditableName'
 import Roles from '~/ui/grid/Roles'
 import RolesSummary from '~/ui/roles/RolesSummary'
@@ -115,9 +115,9 @@ class PageHeader extends React.Component {
     if (this.hasActions && record.parent_collection_card) {
       // TODO hacky way to include the record on the card link
       record.parent_collection_card.record = record
-      // 3. CardMenu actions
+      // 3. ActionMenu actions
       elements.push(
-        <CardMenu
+        <ActionMenu
           className="card-menu"
           card={record.parent_collection_card}
           canEdit={record.can_edit}

@@ -12,7 +12,7 @@ import CollectionCard from '~/stores/jsonApi/CollectionCard'
 import v from '~/utils/variables'
 import Breadcrumb from '~/ui/layout/Breadcrumb'
 import Loader from '~/ui/layout/Loader'
-import CardMenu from '~/ui/grid/CardMenu'
+import ActionMenu from '~/ui/grid/ActionMenu'
 import SelectionCircle from '~/ui/grid/SelectionCircle'
 import CollectionCover from '~/ui/grid/covers/CollectionCover'
 import CollectionIcon from '~/ui/icons/CollectionIcon'
@@ -120,7 +120,7 @@ class SearchResultsInfinite extends React.Component {
 
     const results = (
       searchResults.map((collection, i) => {
-        // CardMenu is rendered as if we were operating on the parent_collection_card
+        // ActionMenu is rendered as if we were operating on the parent_collection_card
         let card = collection.parent_collection_card
         if (!collection.parent_collection_card) {
           // catch for special/global templates that don't have a parent card
@@ -153,7 +153,7 @@ class SearchResultsInfinite extends React.Component {
                 >
                   <StyledTopRightActions className="show-on-hover">
                     <SelectionCircle cardId={card.id} />
-                    <CardMenu
+                    <ActionMenu
                       className="show-on-hover card-menu"
                       card={card}
                       canEdit={false}

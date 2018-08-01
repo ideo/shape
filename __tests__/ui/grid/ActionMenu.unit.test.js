@@ -1,5 +1,5 @@
 import _ from 'lodash'
-import CardMenu from '~/ui/grid/CardMenu'
+import ActionMenu from '~/ui/grid/ActionMenu'
 import fakeUiStore from '#/mocks/fakeUiStore'
 import {
   fakeCollection,
@@ -17,7 +17,7 @@ const props = {
 }
 
 let wrapper, allActions, actions, component
-describe('CardMenu', () => {
+describe('ActionMenu', () => {
   describe('as editor', () => {
     beforeEach(() => {
       allActions = [
@@ -33,7 +33,7 @@ describe('CardMenu', () => {
       actions = _.without(allActions, 'Replace')
       props.canEdit = true
       wrapper = shallow(
-        <CardMenu.wrappedComponent {...props} />
+        <ActionMenu.wrappedComponent {...props} />
       )
       component = wrapper.instance()
       props.uiStore.selectCardId.mockClear()
@@ -49,7 +49,7 @@ describe('CardMenu', () => {
     it('creates a PopoutMenu with editable actions including replace if canReplace', () => {
       props.canReplace = true
       wrapper = shallow(
-        <CardMenu.wrappedComponent {...props} />
+        <ActionMenu.wrappedComponent {...props} />
       )
       const popout = wrapper.find('PopoutMenu').at(0)
       expect(popout.props().menuItems.length).toEqual(allActions.length)
@@ -110,7 +110,7 @@ describe('CardMenu', () => {
       props.canReplace = true
       props.card.isPinnedAndLocked = true
       wrapper = shallow(
-        <CardMenu.wrappedComponent {...props} />
+        <ActionMenu.wrappedComponent {...props} />
       )
     })
 
@@ -127,7 +127,7 @@ describe('CardMenu', () => {
       props.canEdit = false
       props.canReplace = false
       wrapper = shallow(
-        <CardMenu.wrappedComponent {...props} />
+        <ActionMenu.wrappedComponent {...props} />
       )
     })
 
@@ -146,7 +146,7 @@ describe('CardMenu', () => {
       props.card.record.system_required = true
       props.card.isPinnedAndLocked = false
       wrapper = shallow(
-        <CardMenu.wrappedComponent {...props} />
+        <ActionMenu.wrappedComponent {...props} />
       )
     })
 
@@ -162,7 +162,7 @@ describe('CardMenu', () => {
       props.canEdit = true
       props.card.record.isDownloadable = true
       wrapper = shallow(
-        <CardMenu.wrappedComponent {...props} />
+        <ActionMenu.wrappedComponent {...props} />
       )
       component = wrapper.instance()
     })
