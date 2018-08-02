@@ -41,7 +41,7 @@ const StyledCommentThread = styled.div`
     font-size: 0.75rem;
   }
   .comments {
-    margin: 0 10px 0 68px;
+    margin: 5px 10px 0 10px;
     ${props => !props.expanded && `
       z-index: 0;
       position: relative;
