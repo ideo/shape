@@ -4,8 +4,17 @@ class NotificationMailerPreview < ActionMailer::Preview
     u = User.first
     NotificationMailer.notify(
       user_id: u.id,
-      notification_ids: u.notifications.first(10).map(&:id),
-      comment_thread_ids: u.comment_threads.first(10).map(&:id),
+      last_notification_mail_sent: 30.days.ago,
+      notification_ids: u.notifications.last(10).map(&:id),
+      comment_thread_ids: u.comment_threads.last(10).map(&:id),
     )
+  end
+
+  # alt method that utilizes our NotificationDigest service
+  def notify_via_service
+    u = User.first
+    u.update(last_notification_mail_sent: 30.days.ago)
+    service = NotificationDigest.new(type: :notifications)
+    service.notify_user(u, deliver: false)
   end
 end

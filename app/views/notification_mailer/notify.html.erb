@@ -2,71 +2,78 @@
   Your collaborators and teammates have updates for you. Check out what's been going on since you've been gone!
 </div>
 
-<div class="header">
-  New comments
-</div>
-<div>
-  <% @comment_threads.first(3).each do |comment_thread| %>
-    <div class="CommentThread">
-      <div class="CommentThread__title">
-        <div class="CommentThread__StyledHeader">
+<% if @comment_threads.present? %>
+  <div class="header">
+    New comments
+  </div>
+  <div>
+    <% @comment_threads.each do |comment_thread| %>
+      <div class="CommentThread">
+        <div class="CommentThread__title">
           <a
-            class="Link"
+            class="CommentThread__StyledHeader"
             href="<%= frontend_url_for(comment_thread.record) %>?open=comments"
           >
-            <span class="CommentThread__ThumbnailHolder">
-              <% if comment_thread.record.cached_cover && comment_thread.record.cached_cover["image_url"] %>
+              <span class="CommentThread__ThumbnailHolder">
+                <% if comment_thread.record.is_a? Collection %>
+                  <% if comment_thread.record.cached_cover && comment_thread.record.cached_cover["image_url"] %>
+                    <img
+                      src="<%= comment_thread.record.cached_cover["image_url"] %>"
+                      alt="<%= comment_thread.record.name %>"
+                    >
+                  <% end %>
+                <% elsif comment_thread.record.filestack_file_url.present? %>
                 <img
-                  src="<%= comment_thread.record.cached_cover["image_url"] %>"
+                  src="<%= comment_thread.record.filestack_file_url %>"
                   alt="<%= comment_thread.record.name %>"
                 >
-              <% end %>
-            </span>
-          </a>
-          <div style="overflow: hidden; text-overflow: ellipsis; -webkit-box-orient: vertical; display: -webkit-box; -webkit-line-clamp: 2;">
-            <span class="name"><%= comment_thread.record.name %></span>
-          </div>
-          <span class="CommentThread_timestamp">
-            <span class="Moment">
-              <%= comment_thread.updated_at.strftime('%b %e - %l:%M %p') %>
-            </span>
-          </span>
-        </div>
-      </div>
-      <div class="Comments">
-      <% comment_thread.comments.first(2).each do |comment| %>
-        <div class="CustomCommentMentions__StyledCommentInput">
-          <div class="layout__InlineRow">
-            <div class="Avatar__StyledAvatar" cursor="initial">
-              <img
-                alt="<%= comment.author.name %>"
-                src="<%= comment.author.picture %>"
-              >
+                <% end %>
+              </span>
+            <div style="overflow: hidden; text-overflow: ellipsis; -webkit-box-orient: vertical; display: -webkit-box; -webkit-line-clamp: 2;">
+              <span class="name"><%= comment_thread.record.name %></span>
             </div>
-            <span class="author typography__DisplayText">
-              <%= comment.author.name %>
-            </span>
-            <span class="timestamp">
+            <span class="CommentThread_timestamp">
               <span class="Moment">
-                <%= comment.updated_at.strftime('%b %e - %l:%M %p') %>
+                <%= comment_thread.updated_at.strftime('%b %e - %l:%M %p') %>
               </span>
             </span>
-          </div>
-          <div class="message">
-            <span data-text="true"><%= comment.message %></span>
-          </div>
+          </a>
         </div>
-      <% end %>
+        <div class="Comments">
+        <% comment_thread.comments.where('created_at > ?', @last_notification_mail_sent).each do |comment| %>
+          <div class="CustomCommentMentions__StyledCommentInput">
+            <div class="layout__InlineRow">
+              <div class="Avatar__StyledAvatar" cursor="initial">
+                <img
+                  alt="<%= comment.author.name %>"
+                  src="<%= comment.author.picture %>"
+                >
+              </div>
+              <span class="author typography__DisplayText">
+                <%= comment.author.name %>
+              </span>
+              <span class="timestamp">
+                <span class="Moment">
+                  <%= comment.updated_at.strftime('%b %e - %l:%M %p') %>
+                </span>
+              </span>
+            </div>
+            <div class="message">
+              <span data-text="true"><%= comment.message %></span>
+            </div>
+          </div>
+        <% end %>
+        </div>
       </div>
-    </div>
-  <% end %>
-</div>
+    <% end %>
+  </div>
+<% end %>
 
 <div class="header">
   Notifications
 </div>
 <div class="Notification__Container">
-  <% @notifications.first(6).each do |notification| %>
+  <% @notifications.each do |notification| %>
     <a
       href="<%= notification.activity.action != 'archived' ? frontend_url_for(notification.activity.target) : root_url %>?open=notifications"
     >

@@ -13,6 +13,22 @@ class NotificationDigest < SimpleService
     notify_users
   end
 
+  # public method used in notification_mailer_preview
+  def notify_user(user, deliver: true)
+    notification_ids = notifications_for_user(user)
+    comment_thread_ids = comment_threads_for_user(user)
+    return if notification_ids.count.zero? && comment_thread_ids.count.zero?
+    mailer = NotificationMailer.notify(
+      user_id: user.id,
+      last_notification_mail_sent: user.last_notification_mail_sent,
+      notification_ids: notification_ids,
+      comment_thread_ids: comment_thread_ids,
+    )
+    mailer.deliver_later if deliver
+    user.update(last_notification_mail_sent: Time.now)
+    mailer
+  end
+
   private
 
   def collect_users
@@ -51,15 +67,7 @@ class NotificationDigest < SimpleService
 
   def notify_users
     @users.find_each do |user|
-      notification_ids = notifications_for_user(user)
-      comment_thread_ids = comment_threads_for_user(user)
-      next if notification_ids.count.zero? && comment_thread_ids.count.zero?
-      NotificationMailer.notify(
-        user_id: user.id,
-        notification_ids: notification_ids,
-        comment_thread_ids: comment_thread_ids,
-      )
-      user.update(last_notification_mail_sent: Time.now)
+      notify_user(user)
     end
   end
 
