@@ -12,7 +12,7 @@
         <div class="CommentThread__StyledHeader">
           <a
             class="Link"
-            href="https://shape.space/<%= comment_thread.record.jsonapi_type_name %>/<%= comment_thread.record.id %>?open=comments"
+            href="<%= frontend_url_for(comment_thread.record) %>?open=comments"
           >
             <span class="CommentThread__ThumbnailHolder">
               <% if comment_thread.record.cached_cover && comment_thread.record.cached_cover["image_url"] %>
@@ -68,7 +68,7 @@
 <div class="Notification__Container">
   <% @notifications.first(6).each do |notification| %>
     <a
-      href="https://shape.space/<%= notification.activity.target.jsonapi_type_name %>/<%= notification.activity.target.id %>?open=notifications"
+      href="<%= notification.activity.action != 'archived' ? frontend_url_for(notification.activity.target) : root_url %>?open=notifications"
     >
       <div class="Notification">
         <div class="Rfx">

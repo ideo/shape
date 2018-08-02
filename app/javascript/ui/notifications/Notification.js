@@ -113,6 +113,7 @@ class Notification extends React.Component {
 
   get styledTextColor() {
     if (this.props.styleType === 'alert') return v.colors.white
+    return null
   }
 
   get shouldHide() {

@@ -20,7 +20,7 @@ production:
     every: '1m'
     class: SearchkickReindexWorker
   notification_mention_mailer:
-    every: '4h'
+    every: '5m'
     class: NotificationMentionMailerWorker
   notification_mailer:
     every: '4h'

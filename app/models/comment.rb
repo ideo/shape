@@ -19,10 +19,10 @@ class Comment < ApplicationRecord
       id, type = entity.data.mention.id.split('__')
       mentions[type.to_sym] << id.to_i
     end
-    {
+    Hashie::Mash.new(
       user_ids: mentions[:users].uniq,
       group_ids: mentions[:groups].uniq,
-    }
+    )
   end
 
   def serialized_for_firestore
