@@ -4,6 +4,8 @@ import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import _ from 'lodash'
 
 import AddIntoIcon from '~/ui/icons/AddIntoIcon'
+import Activity from '~/stores/jsonApi/Activity'
+import PopoutMenu from '~/ui/global/PopoutMenu'
 import ArchiveIcon from '~/ui/icons/ArchiveIcon'
 import DownloadIcon from '~/ui/icons/DownloadIcon'
 import DuplicateIcon from '~/ui/icons/DuplicateIcon'
@@ -14,7 +16,7 @@ import PermissionsIcon from '~/ui/icons/PermissionsIcon'
 import PopoutMenu from '~/ui/global/PopoutMenu'
 import TagIcon from '~/ui/icons/TagIcon'
 
-@inject('uiStore')
+@inject('apiStore', 'uiStore')
 @observer
 class ActionMenu extends React.Component {
   @observable itemLoading = ''
@@ -72,9 +74,10 @@ class ActionMenu extends React.Component {
   }
 
   downloadCard = () => {
-    const { card } = this.props
+    const { card, apiStore } = this.props
     const { record } = card
     if (record.filestack_file) {
+      Activity.trackActivity('download', record)
       window.open(record.filestack_file.url, '_blank')
     }
   }
@@ -205,6 +208,7 @@ ActionMenu.propTypes = {
   afterArchive: PropTypes.func
 }
 ActionMenu.wrappedComponent.propTypes = {
+  apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 ActionMenu.displayName = 'ActionMenu'

@@ -1,0 +1,2 @@
+class DeserializableActivity < BaseJsonDeserializer
+end

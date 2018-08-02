@@ -306,7 +306,8 @@ class GridCard extends React.Component {
         ) &&
           <StyledTopRightActions color={this.actionsColor}>
             { record.isDownloadable && (
-              <Download file={record.filestack_file} />
+              <Download record={record}
+              />
             )}
             <SelectionCircle cardId={card.id} />
             <ActionMenu
