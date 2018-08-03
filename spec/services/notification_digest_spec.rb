@@ -10,8 +10,11 @@ RSpec.describe NotificationDigest, type: :service do
   end
 
   before do
-    allow(NotificationMailer).to receive(:notify).and_return(true)
+    mail_double = double('mail')
+    allow(NotificationMailer).to receive(:notify).and_return(mail_double)
+    allow(mail_double).to receive(:deliver_later).and_return(true)
     User.update_all(last_notification_mail_sent: 1.day.ago)
+    user.reload # pick up model change from update_all
   end
 
   describe '#call' do
@@ -25,6 +28,7 @@ RSpec.describe NotificationDigest, type: :service do
           user_id: user.id,
           notification_ids: [notification.id],
           comment_thread_ids: [],
+          last_notification_mail_sent: user.last_notification_mail_sent,
         )
         digest_service.call
       end
@@ -48,6 +52,7 @@ RSpec.describe NotificationDigest, type: :service do
             user_id: user.id,
             notification_ids: [notification.id],
             comment_thread_ids: [],
+            last_notification_mail_sent: user.last_notification_mail_sent,
           )
           digest_service.call
         end
@@ -69,12 +74,14 @@ RSpec.describe NotificationDigest, type: :service do
           user_id: user.id,
           notification_ids: [],
           comment_thread_ids: [comment_thread.id],
+          last_notification_mail_sent: user.last_notification_mail_sent,
         )
         # ...and other_user
         expect(NotificationMailer).to receive(:notify).with(
           user_id: other_user.id,
           notification_ids: [],
           comment_thread_ids: [comment_thread.id],
+          last_notification_mail_sent: user.last_notification_mail_sent,
         )
         digest_service.call
       end
