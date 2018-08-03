@@ -2,13 +2,20 @@ import _ from 'lodash'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import Modal from '~/ui/global/modals/Modal'
 import RolesMenu from '~/ui/roles/RolesMenu'
-import { apiStore } from '~/stores'
 
 @inject('apiStore', 'uiStore')
 @observer
 class Roles extends React.Component {
   componentDidMount() {
-    const { roles, record } = this.props
+    this.fetchRoles()
+  }
+
+  componentDidUpdate() {
+    this.fetchRoles()
+  }
+
+  fetchRoles() {
+    const { apiStore, roles, record } = this.props
     if (!roles.length) {
       apiStore.fetch(record.internalType, record.id)
     }
@@ -29,10 +36,11 @@ class Roles extends React.Component {
 
   render() {
     const { roles, uiStore, record } = this.props
+    const title = `Sharing: ${record.name}`
 
     return (
       <Modal
-        title="Sharing"
+        title={title}
         onClose={this.handleClose}
         open={!!uiStore.rolesMenuOpen}
       >

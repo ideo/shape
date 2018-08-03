@@ -19,7 +19,7 @@ const apiStore = observable({
   currentUserOrganizationId: 1,
 })
 const uiStore = observable({
-  rolesMenuOpen: false,
+  rolesMenuOpen: null,
   update: jest.fn()
 })
 let props

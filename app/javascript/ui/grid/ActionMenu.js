@@ -81,7 +81,7 @@ class ActionMenu extends React.Component {
 
   showRolesMenu = () => {
     const { uiStore, card } = this.props
-    uiStore.update('rolesMenuOpen', card.record.id)
+    uiStore.update('rolesMenuOpen', card.record)
   }
 
   handleMouseLeave = () => {

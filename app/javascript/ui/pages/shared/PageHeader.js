@@ -55,8 +55,8 @@ class PageHeader extends React.Component {
   }
 
   showObjectRoleDialog = () => {
-    const { uiStore } = this.props
-    uiStore.update('rolesMenuOpen', true)
+    const { uiStore, record } = this.props
+    uiStore.update('rolesMenuOpen', record)
   }
 
   updateRecordName = (name) => {
@@ -169,12 +169,14 @@ class PageHeader extends React.Component {
     const breadcrumb = isHomepage ? [] : record.breadcrumb
     const tagEditorOpen = record.parent_collection_card &&
       uiStore.tagsModalOpenId === record.parent_collection_card.id
+
+    const rolesRecord = uiStore.rolesMenuOpen ? uiStore.rolesMenuOpen : record
     return (
       <FixedPageHeader>
         <MaxWidthContainer>
           <Roles
-            record={record}
-            roles={record.roles}
+            record={rolesRecord}
+            roles={rolesRecord.roles}
           />
           <Breadcrumb items={breadcrumb} />
           <div>

@@ -112,13 +112,13 @@ describe('PageHeader', () => {
   describe('showObjectRoleDialog', () => {
     beforeEach(() => {
       props.uiStore.update.mockClear()
-      props.uiStore.rolesMenuOpen = false
+      props.uiStore.rolesMenuOpen = null
       component.showObjectRoleDialog()
     })
 
     it('should open the roles menu in the ui store', () => {
       expect(props.uiStore.update).toHaveBeenCalledWith(
-        'rolesMenuOpen', true
+        'rolesMenuOpen', props.record
       )
     })
   })

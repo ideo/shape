@@ -17,7 +17,7 @@ export default class UiStore {
   @observable openCardMenuId = false
   @observable organizationMenuPage = null
   @observable organizationMenuGroupId = null
-  @observable rolesMenuOpen = false
+  @observable rolesMenuOpen = null
   @observable isTouchDevice = (
     // https://hacks.mozilla.org/2013/04/detecting-touch-its-the-why-not-the-how/
     ('ontouchstart' in window) ||
@@ -130,7 +130,7 @@ export default class UiStore {
   }
 
   @action closeRolesMenu() {
-    this.rolesMenuOpen = false
+    this.rolesMenuOpen = null
   }
 
   @action openMoveMenu({ from: fromCollectionId, cardAction }) {
