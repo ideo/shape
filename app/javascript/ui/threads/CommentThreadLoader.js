@@ -1,7 +1,30 @@
 import { observable, action } from 'mobx'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
+import styled from 'styled-components'
 
 import InlineLoader from '~/ui/layout/InlineLoader'
+import RefreshIcon from '~/ui/icons/RefreshIcon'
+import v from '~/utils/variables'
+
+const StyledCommentThreadLoader = styled.button`
+  text-transform: uppercase;
+  height: 80px;
+  position: relative;
+  margin-bottom: 5px;
+  background: ${props => (props.disabled ? v.colors.cloudy : v.colors.activityMedBlue)};
+  font-family: ${v.fonts.sans};
+  width: 100%;
+
+  .refreshIcon {
+    display: inline-block;
+    height: 15px;
+    width: 35px;
+  }
+
+  .text {
+    margin-top: 25px;
+  }
+`
 
 @observer
 class CommentThreadLoader extends React.Component {
@@ -22,9 +45,19 @@ class CommentThreadLoader extends React.Component {
     return (
       <div>
         { this.loading && <InlineLoader fixed background="none" /> }
-        <button onClick={this.loadMore} style={{ background: 'blue', padding: '20px' }}>
-          Click me for more
-        </button>
+        <StyledCommentThreadLoader
+          disabled={this.loading}
+          onClick={this.loadMore}
+        >
+          <div className="text">
+            <span className="refreshIcon">
+              <RefreshIcon />
+            </span>
+            <span>
+              Show more
+            </span>
+          </div>
+        </StyledCommentThreadLoader>
       </div>
     )
   }
