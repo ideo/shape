@@ -15,7 +15,7 @@ New comments
   <%= notification.created_at.strftime('%b %e - %l:%M %p') %>
   <% case notification.activity.action %>
   <% when "added_editor", "added_member", "added_admin" %>
-   <%= notification.activity.actor.name %> has made <%= notification.activity.subjects.map(&:name).join(', ') %> a(n) <%= notification.activity.action.to_s.split('_')[1] %> of <%= notification.activity.target.name %>
+   <%= notification.activity.actor.name %> has made <%= notification.activity.subject_users.map(&:name).join(', ') %> a(n) <%= notification.activity.action.to_s.split('_')[1] %> of <%= notification.activity.target.name %>
   <% when "archived" %>
     <%= notification.activity.actor.name %> has archived <%= notification.activity.target.name %>
   <% when "commented" %>

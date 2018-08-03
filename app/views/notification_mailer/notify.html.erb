@@ -90,7 +90,10 @@
               <p class="Activity__ActivityText">
               <% case notification.activity.action %>
               <% when "added_editor", "added_member", "added_admin" %>
-                <span class="bold"><%= notification.activity.actor.name %></span> has made <span class="bold"><%= notification.activity.subjects.map(&:name).join(', ') %></span> a(n) <%= notification.activity.action.to_s.split('_')[1] %> of <%= notification.activity.target.name %>
+                <span class="bold"><%= notification.activity.actor.name %></span>
+                has made
+                <span class="bold"><%= notification.activity.subject_users.map(&:name).join(', ') %></span>
+                a(n) <%= notification.activity.action.to_s.split('_')[1] %> of <%= notification.activity.target.name %>
               <% when "archived" %>
                 <span class="bold"><%= notification.activity.actor.name %></span> has archived <span class="bold"><%= notification.activity.target.name %></span>
               <% when "commented" %>

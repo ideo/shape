@@ -11,6 +11,7 @@ class NotificationMailerPreview < ActionMailer::Preview
   end
 
   # alt method that utilizes our NotificationDigest service
+  # this requires the user to actually have "new" things from the last 30 days
   def notify_via_service
     u = User.first
     u.update(last_notification_mail_sent: 30.days.ago)

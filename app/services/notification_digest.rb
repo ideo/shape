@@ -15,6 +15,9 @@ class NotificationDigest < SimpleService
 
   # public method used in notification_mailer_preview
   def notify_user(user, deliver: true)
+    if user.last_notification_mail_sent.nil?
+      user.update(last_notification_mail_sent: 1.day.ago)
+    end
     notification_ids = notifications_for_user(user)
     comment_thread_ids = comment_threads_for_user(user)
     return if notification_ids.count.zero? && comment_thread_ids.count.zero?
@@ -75,6 +78,11 @@ class NotificationDigest < SimpleService
     # gather comment threads with new activity since the last notification mail
     user.users_threads
         .joins(:comment_thread)
+        .where(
+          CommentThread.arel_table[:updated_at].gt(
+            UsersThread.arel_table[:last_viewed_at],
+          ),
+        )
         .where(
           CommentThread.arel_table[:updated_at].gt(
             user.last_notification_mail_sent,
