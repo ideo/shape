@@ -4,6 +4,7 @@ import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import _ from 'lodash'
 
 import Loader from '~/ui/layout/Loader'
+import Roles from '~/ui/grid/Roles'
 import MovableGridCard from '~/ui/grid/MovableGridCard'
 import CollectionCard from '~/stores/jsonApi/CollectionCard'
 

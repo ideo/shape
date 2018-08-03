@@ -3,16 +3,18 @@ import ReactRouterPropTypes from 'react-router-prop-types'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 
-import PageError from '~/ui/global/PageError'
 import ActionCableConsumer from '~/utils/ActionCableConsumer'
-import PageWithApi from '~/ui/pages/PageWithApi'
-import PageContainer from '~/ui/layout/PageContainer'
-import Loader from '~/ui/layout/Loader'
 import FilePreview from '~/ui/grid/covers/FilePreview'
-import TextItem from '~/ui/items/TextItem'
+import GridCardBlank from '~/ui/grid/blankContentTool/GridCardBlank'
 import ImageItem from '~/ui/items/ImageItem'
-import VideoItem from '~/ui/items/VideoItem'
+import Loader from '~/ui/layout/Loader'
+import MoveModal from '~/ui/grid/MoveModal'
+import PageContainer from '~/ui/layout/PageContainer'
 import PageHeader from '~/ui/pages/shared/PageHeader'
+import PageWithApi from '~/ui/pages/PageWithApi'
+import PageError from '~/ui/global/PageError'
+import TextItem from '~/ui/items/TextItem'
+import VideoItem from '~/ui/items/VideoItem'
 import { ITEM_TYPES } from '~/utils/variables'
 
 const ItemPageContainer = styled.div`
@@ -98,6 +100,11 @@ class ItemPage extends PageWithApi {
     return `items/${match.params.id}`
   }
 
+  reroute = (card) => {
+    const { routingStore } = this.props
+    routingStore.routeTo('items', card.record.id)
+  }
+
   updateItemName = (name) => {
     const { item } = this.state
     item.name = name
@@ -107,6 +114,7 @@ class ItemPage extends PageWithApi {
   }
 
   render() {
+    const { uiStore } = this.props
     // this.error comes from PageWithApi
     if (this.error) return <PageError error={this.error} />
 
@@ -116,13 +124,21 @@ class ItemPage extends PageWithApi {
       return <FilePreview file={item.filestack_file} />
     }
 
+    const { replacingId } = uiStore.blankContentToolState
+
     return (
       <Fragment>
         <PageHeader record={item} />
         <ItemPageContainer>
           <PageContainer>
-            {/* TODO: calculate item container size? */}
-            {this.content}
+            { item.parent_collection_card && replacingId === item.parent_collection_card.id
+              ? <GridCardBlank height={1} parent={item.parent} afterCreate={this.reroute} />
+              : (
+                <div>
+                  {this.content}
+                  <MoveModal />
+                </div>
+              )}
           </PageContainer>
         </ItemPageContainer>
       </Fragment>

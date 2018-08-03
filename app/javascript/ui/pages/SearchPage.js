@@ -1,5 +1,4 @@
 import { Fragment } from 'react'
-import ReactRouterPropTypes from 'react-router-prop-types'
 import { action, observable } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import queryString from 'query-string'
@@ -115,10 +114,6 @@ class SearchPage extends PageWithApi {
   }
 }
 
-SearchPage.propTypes = {
-  match: ReactRouterPropTypes.location.isRequired,
-  location: ReactRouterPropTypes.location.isRequired,
-}
 SearchPage.wrappedComponent.propTypes = {
   apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }

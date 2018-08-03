@@ -3,7 +3,7 @@ import { routingStore, uiStore } from '~/stores'
 const archive = (type, obj) => {
   const onAgree = async () => {
     await obj.apiStore.request(`${type}/${obj.id}/archive`, 'PATCH')
-    // NOTE: should we handle the redirect here, or in the PageMenu/etc?
+    // NOTE: should we handle the redirect here, or in the ActionMenu/etc?
     let redirect = '/'
     if (obj.breadcrumb.length >= 2) {
       const [klass, id] = obj.breadcrumb[obj.breadcrumb.length - 2]

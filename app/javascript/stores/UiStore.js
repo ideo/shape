@@ -18,7 +18,7 @@ export default class UiStore {
   @observable openCardMenuId = false
   @observable organizationMenuPage = null
   @observable organizationMenuGroupId = null
-  @observable rolesMenuOpen = false
+  @observable rolesMenuOpen = null
   @observable isTouchDevice = (
     // https://hacks.mozilla.org/2013/04/detecting-touch-its-the-why-not-the-how/
     ('ontouchstart' in window) ||
@@ -26,7 +26,7 @@ export default class UiStore {
      (navigator.msMaxTouchPoints > 0)
   )
   @observable pageMenuOpen = false
-  @observable tagsModalOpen = false
+  @observable tagsModalOpenId = null
   defaultGridSettings = {
     // layout will track we are at "size 3" i.e. "small 4 cols" even though cols === 4
     layoutSize: 4,
@@ -131,10 +131,11 @@ export default class UiStore {
   }
 
   @action closeRolesMenu() {
-    this.rolesMenuOpen = false
+    this.rolesMenuOpen = null
   }
 
   @action openMoveMenu({ from: fromCollectionId, cardAction }) {
+    this.pageMenuOpen = false
     this.openCardMenuId = false
     // On move, copy over selected cards to moving cards
     this.movingFromCollectionId = fromCollectionId

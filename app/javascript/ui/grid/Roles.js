@@ -6,6 +6,21 @@ import RolesMenu from '~/ui/roles/RolesMenu'
 @inject('apiStore', 'uiStore')
 @observer
 class Roles extends React.Component {
+  componentDidMount() {
+    this.fetchRoles()
+  }
+
+  componentDidUpdate() {
+    this.fetchRoles()
+  }
+
+  fetchRoles() {
+    const { apiStore, roles, record } = this.props
+    if (!roles.length) {
+      apiStore.fetch(record.internalType, record.id)
+    }
+  }
+
   handleClose = (ev) => {
     const { uiStore } = this.props
     uiStore.closeRolesMenu()
@@ -21,12 +36,13 @@ class Roles extends React.Component {
 
   render() {
     const { roles, uiStore, record } = this.props
+    const title = `Sharing: ${record.name}`
 
     return (
       <Modal
-        title="Sharing"
+        title={title}
         onClose={this.handleClose}
-        open={uiStore.rolesMenuOpen}
+        open={!!uiStore.rolesMenuOpen}
       >
         <RolesMenu
           canEdit={record.can_edit}

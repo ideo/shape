@@ -5,6 +5,22 @@ const fakeJsonApiAttrs = {
   assignRef: jest.fn(),
   save: jest.fn(),
 }
+export const fakeCollectionCard = {
+  id: 11,
+  order: 1,
+  height: 1,
+  width: 1,
+  maxWidth: 1,
+  maxHeight: 1,
+  record: {},
+  item: {},
+  reference: false,
+  beginReplacing: jest.fn(),
+  API_create: jest.fn(),
+  API_archive: jest.fn(),
+  API_duplicate: jest.fn(),
+  API_linkToMyCollection: jest.fn(),
+}
 
 export const fakeTextItemAttrs = {
   id: 1,
@@ -16,6 +32,7 @@ export const fakeTextItemAttrs = {
   can_edit: false,
   inherited_tag_list: [],
   internalType: 'items',
+  parent_collection_card: fakeCollectionCard,
 }
 export const fakeTextItem = {
   ...fakeTextItemAttrs,
@@ -32,6 +49,7 @@ export const fakeVideoItemAttrs = {
   thumbnail_url: 'https://img.youtube.com/vi/4r7wHMg5Yjg/hqdefault.jpg',
   inherited_tag_list: [],
   can_edit: false,
+  parent_collection_card: fakeCollectionCard,
 }
 export const fakeVideoItem = {
   ...fakeVideoItemAttrs,
@@ -48,6 +66,7 @@ export const fakeImageItemAttrs = {
   },
   inherited_tag_list: [],
   can_edit: false,
+  parent_collection_card: fakeCollectionCard,
 }
 export const fakeImageItem = {
   ...fakeImageItemAttrs,
@@ -66,12 +85,14 @@ export const fakeFileItemAttrs = {
   },
   inherited_tag_list: [],
   can_edit: false,
+  parent_collection_card: fakeCollectionCard,
 }
 export const fakeFileItem = {
   ...fakeFileItemAttrs,
   rawAttributes: jest.fn().mockReturnValue(fakeTextItemAttrs),
   getRecordType: jest.fn().mockReturnValue('items'),
 }
+
 export const fakeItemCard = {
   id: 10,
   order: 0,
@@ -84,22 +105,6 @@ export const fakeItemCard = {
   API_archive: jest.fn(),
   API_linkToMyCollection: jest.fn(),
   ...fakeJsonApiAttrs,
-}
-export const fakeCollectionCard = {
-  id: 11,
-  order: 1,
-  height: 1,
-  width: 1,
-  maxWidth: 1,
-  maxHeight: 1,
-  record: {},
-  item: {},
-  reference: false,
-  beginReplacing: jest.fn(),
-  API_create: jest.fn(),
-  API_archive: jest.fn(),
-  API_duplicate: jest.fn(),
-  API_linkToMyCollection: jest.fn(),
 }
 
 const fakeCards = [

@@ -39,8 +39,7 @@ const fakeUiStore = {
   isLoading: false,
   selectedCardIds: [],
   selectCardId: jest.fn(),
-  setViewingCollection: jest.fn(),
-  setViewingItem: jest.fn(),
+  setViewingCollection: jest.fn(), setViewingItem: jest.fn(),
   viewingCollection: null,
   movingFromCollectionId: null,
   movingCardIds: [],
@@ -62,6 +61,7 @@ const fakeUiStore = {
   trackedRecords: {},
   editingName: false,
   activityLogPage: 'comments',
+  pageMenuOpen: false,
 }
 
 export default fakeUiStore

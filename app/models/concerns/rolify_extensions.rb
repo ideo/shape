@@ -108,8 +108,11 @@ module RolifyExtensions
   end
 
   def remove_role(role_name, resource = nil)
-    return super(role_name) if resource.blank?
-    role = Role.for_resource(resource).where(name: role_name).first
+    if resource.blank?
+      role = Role.where(name: role_name, resource: nil).first
+    else
+      role = Role.for_resource(resource).where(name: role_name).first
+    end
     return [] unless role.present?
     # `remove_role` will too aggressively destroy the entire role, so just remove objects directly
     if is_a?(User)
@@ -119,6 +122,7 @@ module RolifyExtensions
     else
       raise "RolifyExtension: Unsupported model '#{self.class.name}' for remove_role"
     end
+    return role if resource.blank?
     sync_groups_after_removing(role) if is_a?(User)
     after_role_update(role)
     role

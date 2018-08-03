@@ -3,23 +3,21 @@ import { action, observable } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import _ from 'lodash'
 
-import PopoutMenu from '~/ui/global/PopoutMenu'
+import AddIntoIcon from '~/ui/icons/AddIntoIcon'
 import ArchiveIcon from '~/ui/icons/ArchiveIcon'
 import DownloadIcon from '~/ui/icons/DownloadIcon'
 import DuplicateIcon from '~/ui/icons/DuplicateIcon'
-import ReplaceIcon from '~/ui/icons/ReplaceIcon'
-import MoveIcon from '~/ui/icons/MoveIcon'
 import LinkIcon from '~/ui/icons/LinkIcon'
-import AddIntoIcon from '~/ui/icons/AddIntoIcon'
+import MoveIcon from '~/ui/icons/MoveIcon'
+import ReplaceIcon from '~/ui/icons/ReplaceIcon'
+import PermissionsIcon from '~/ui/icons/PermissionsIcon'
+import PopoutMenu from '~/ui/global/PopoutMenu'
+import TagIcon from '~/ui/icons/TagIcon'
 
 @inject('uiStore')
 @observer
-class CardMenu extends React.Component {
+class ActionMenu extends React.Component {
   @observable itemLoading = ''
-
-  get cardId() {
-    return this.props.card.id
-  }
 
   @action setLoading(name = '') {
     this.itemLoading = name
@@ -40,9 +38,10 @@ class CardMenu extends React.Component {
   }
 
   openMoveMenu = cardAction => {
-    const { card, uiStore } = this.props
+    const { card, onMoveMenu, uiStore } = this.props
+    if (onMoveMenu) onMoveMenu({ type: cardAction })
     uiStore.selectCardId(card.id)
-    uiStore.openMoveMenu({ from: this.viewingCollectionId, cardAction })
+    uiStore.openMoveMenu({ from: this.movingFromCollectionId, cardAction })
   }
 
   duplicateCard = () => {
@@ -61,8 +60,15 @@ class CardMenu extends React.Component {
     this.callCardAction('Add to My Collection', 'API_linkToMyCollection')
   }
 
-  archiveCard = () => {
-    this.callCardAction('Archive', 'API_archive')
+  archiveCard = async () => {
+    const { afterArchive } = this.props
+    await this.callCardAction('Archive', 'API_archive')
+    if (afterArchive) afterArchive()
+  }
+
+  showTags = () => {
+    const { card, uiStore } = this.props
+    uiStore.update('tagsModalOpenId', card.id)
   }
 
   downloadCard = () => {
@@ -73,41 +79,48 @@ class CardMenu extends React.Component {
     }
   }
 
+  showRolesMenu = () => {
+    const { uiStore, card } = this.props
+    uiStore.update('rolesMenuOpen', card.record)
+  }
+
   handleMouseLeave = () => {
-    if (this.props.menuOpen) {
-      this.props.uiStore.update('openCardMenuId', false)
-    }
+    this.props.onLeave()
   }
 
   toggleOpen = (e) => {
     e.stopPropagation()
-    const { uiStore } = this.props
-    if (this.props.menuOpen) {
-      uiStore.update('openCardMenuId', false)
-    } else {
-      uiStore.update('openCardMenuId', this.cardId)
-    }
+    this.props.onOpen()
   }
 
-  // Viewing collection could be null if on the search page
-  get viewingCollectionId() {
-    const { card, uiStore } = this.props
-    return uiStore.viewingCollection
-      ? uiStore.viewingCollection.id
-      : card.parent_id
+  get movingFromCollectionId() {
+    const { card, uiStore, location } = this.props
+    // For PageMenu we're moving "from" the parent collection
+    // Viewing collection could also be null if on the search page
+    if (location === 'PageMenu' || !uiStore.viewingCollection) {
+      return card.parent_id
+    }
+    return uiStore.viewingCollection.id
   }
 
   get menuItems() {
-    const { canEdit, card, canReplace, uiStore } = this.props
+    const {
+      canEdit,
+      card,
+      canReplace,
+      location,
+      uiStore,
+    } = this.props
 
-    let items = []
     const actions = [
       { name: 'Duplicate', iconRight: <DuplicateIcon />, onClick: this.duplicateCard },
       { name: 'Move', iconRight: <MoveIcon />, onClick: this.moveCard },
       { name: 'Link', iconRight: <LinkIcon />, onClick: this.linkCard },
       { name: 'Add to My Collection', iconRight: <AddIntoIcon />, onClick: this.addToMyCollection },
-      { name: 'Archive', iconRight: <ArchiveIcon />, onClick: this.archiveCard },
       { name: 'Download', iconRight: <DownloadIcon />, onClick: this.downloadCard },
+      { name: 'Tags', iconRight: <TagIcon />, onClick: this.showTags },
+      { name: 'Permissions', iconRight: <PermissionsIcon />, onClick: this.showRolesMenu },
+      { name: 'Archive', iconRight: <ArchiveIcon />, onClick: this.archiveCard },
       { name: 'Replace', iconRight: <ReplaceIcon />, onClick: this.replaceCard },
     ]
     actions.forEach(actionItem => {
@@ -115,10 +128,14 @@ class CardMenu extends React.Component {
         actionItem.loading = true
       }
     })
+    let items = [...actions]
 
     if (canEdit && !card.isPinnedAndLocked) {
       // Replace action is added later if this.props.canReplace
-      items = _.reject(actions, { name: 'Replace' })
+      items = _.reject(items, { name: 'Replace' })
+      if (!card.can_move) {
+        items = _.reject(items, { name: 'Move' })
+      }
     } else {
       const viewActions = [
         'Duplicate',
@@ -126,12 +143,17 @@ class CardMenu extends React.Component {
         'Add to My Collection',
         'Download',
       ]
-      items = _.filter(actions, a => _.includes(viewActions, a.name))
+      if (location !== 'Search') {
+        viewActions.push('Tags')
+        viewActions.push('Permissions')
+      }
+      items = _.filter(items, a => _.includes(viewActions, a.name))
     }
 
     // if record is system required, we always remove these actions
     if (card.record && card.record.system_required) {
       items = _.reject(items, { name: 'Duplicate' })
+      items = _.reject(items, { name: 'Tags' })
       if (!card.link) {
         items = _.reject(items, { name: 'Archive' })
       }
@@ -145,7 +167,7 @@ class CardMenu extends React.Component {
       }
     }
 
-    if (card.record && !card.record.isDownloadable) {
+    if (!card.record || !card.record.isDownloadable) {
       items = _.reject(items, { name: 'Download' })
     }
 
@@ -170,20 +192,28 @@ class CardMenu extends React.Component {
   }
 }
 
-CardMenu.propTypes = {
+ActionMenu.propTypes = {
   card: MobxPropTypes.objectOrObservableObject.isRequired,
   className: PropTypes.string,
+  location: PropTypes.string.isRequired,
   menuOpen: PropTypes.bool.isRequired,
   canEdit: PropTypes.bool.isRequired,
-  canReplace: PropTypes.bool.isRequired,
+  canReplace: PropTypes.bool,
+  onOpen: PropTypes.func.isRequired,
+  onLeave: PropTypes.func.isRequired,
+  onMoveMenu: PropTypes.func,
+  afterArchive: PropTypes.func
 }
-CardMenu.wrappedComponent.propTypes = {
+ActionMenu.wrappedComponent.propTypes = {
   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }
-CardMenu.displayName = 'CardMenu'
+ActionMenu.displayName = 'ActionMenu'
 
-CardMenu.defaultProps = {
-  className: 'card-menu'
+ActionMenu.defaultProps = {
+  className: 'card-menu',
+  onMoveMenu: null,
+  afterArchive: null,
+  canReplace: false,
 }
 
-export default CardMenu
+export default ActionMenu

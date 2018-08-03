@@ -1,8 +1,7 @@
 import PageHeader from '~/ui/pages/shared/PageHeader'
 import fakeUiStore from '#/mocks/fakeUiStore'
+import fakeRoutingStore from '#/mocks/fakeRoutingStore'
 import {
-
-
   fakeTextItem,
   fakeCollection,
 } from '#/mocks/data'
@@ -12,9 +11,10 @@ describe('PageHeader', () => {
 
   beforeEach(() => {
     const uiStore = fakeUiStore
+    const routingStore = fakeRoutingStore
     fakeCollection.isNormalCollection = true
     fakeCollection.breadcrumb = [{ id: 12 }]
-    props = { record: fakeCollection, uiStore }
+    props = { record: fakeCollection, uiStore, routingStore }
 
     wrapper = shallow(
       <PageHeader.wrappedComponent {...props} />
@@ -58,7 +58,7 @@ describe('PageHeader', () => {
       })
 
       it('should render the page menu', () => {
-        expect(wrapper.find('PageMenu').exists()).toBeTruthy()
+        expect(wrapper.find('ActionMenu').exists()).toBeTruthy()
       })
     })
 
@@ -89,8 +89,8 @@ describe('PageHeader', () => {
         expect(wrapper.find('RolesSummary').exists()).toBeFalsy()
       })
 
-      it('should not render the page menu', () => {
-        expect(wrapper.find('PageMenu').exists()).toBeFalsy()
+      it('should not render the card menu', () => {
+        expect(wrapper.find('ActionMenu').exists()).toBeFalsy()
       })
     })
   })
@@ -112,13 +112,13 @@ describe('PageHeader', () => {
   describe('showObjectRoleDialog', () => {
     beforeEach(() => {
       props.uiStore.update.mockClear()
-      props.uiStore.rolesMenuOpen = false
+      props.uiStore.rolesMenuOpen = null
       component.showObjectRoleDialog()
     })
 
     it('should open the roles menu in the ui store', () => {
       expect(props.uiStore.update).toHaveBeenCalledWith(
-        'rolesMenuOpen', true
+        'rolesMenuOpen', props.record
       )
     })
   })

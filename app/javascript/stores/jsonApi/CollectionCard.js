@@ -106,8 +106,9 @@ class CollectionCard extends BaseRecord {
       this.parent.addCard(res.data)
       uiStore.closeBlankContentTool()
       uiStore.trackEvent('replace', this.parent)
+      return res.data
     } catch (e) {
-      uiStore.defaultAlertError()
+      return uiStore.defaultAlertError()
     }
   }
 
@@ -130,37 +131,39 @@ class CollectionCard extends BaseRecord {
   }
 
   async API_archive({ isReplacing = false } = {}) {
-    const onAgree = async () => {
-      const collection = this.parent
-      try {
-        collection.removeCard(this)
-        await this.apiStore.request(`collection_cards/${this.id}/archive`, 'PATCH')
-
-        if (collection.collection_cards.length === 0) {
-          uiStore.openBlankContentTool()
-        }
-        uiStore.trackEvent('archive', collection)
-        return true
-      } catch (e) {
-        uiStore.defaultAlertError()
-      } finally {
-        this.apiStore.fetch('collections', collection.id, true)
+    const popupAgreed = new Promise((resolve, reject) => {
+      let prompt = 'Are you sure you want to archive this?'
+      const confirmText = 'Archive'
+      let iconName = 'Archive'
+      if (this.link) {
+        iconName = 'Link'
+        prompt = 'Are you sure you want to archive this link?'
       }
-      return false
-    }
-    let prompt = 'Are you sure you want to archive this?'
-    const confirmText = 'Archive'
-    let iconName = 'Archive'
-    if (this.link) {
-      iconName = 'Link'
-      prompt = 'Are you sure you want to archive this link?'
-    }
-    uiStore.confirm({
-      prompt,
-      confirmText,
-      iconName,
-      onConfirm: onAgree,
+      uiStore.confirm({
+        prompt,
+        confirmText,
+        iconName,
+        onConfirm: resolve,
+      })
     })
+
+    await popupAgreed
+    const collection = this.parent
+    try {
+      collection.removeCard(this)
+      await this.apiStore.request(`collection_cards/${this.id}/archive`, 'PATCH')
+
+      if (collection.collection_cards.length === 0) {
+        uiStore.openBlankContentTool()
+      }
+      uiStore.trackEvent('archive', collection)
+      return true
+    } catch (e) {
+      uiStore.defaultAlertError()
+    } finally {
+      this.apiStore.fetch('collections', collection.id, true)
+    }
+    return false
   }
 
   API_duplicate() {

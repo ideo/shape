@@ -3,8 +3,6 @@ import { action, observable } from 'mobx'
 import { animateScroll as scroll } from 'react-scroll'
 import trackError from '~/utils/trackError'
 
-// import { uiStore, routingStore } from '~/stores'
-
 // used as an "interface" class for CollectionPage / ItemPage / SearchPage
 // NOTE: extending classes is not a recommended React approach, could consider refactoring to HOC
 class PageWithApi extends React.Component {

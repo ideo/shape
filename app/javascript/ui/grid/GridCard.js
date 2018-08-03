@@ -1,7 +1,6 @@
 import PropTypes from 'prop-types'
 import { Fragment } from 'react'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
-import _ from 'lodash'
 import styled from 'styled-components'
 
 import GridCardHotspot from '~/ui/grid/GridCardHotspot'
@@ -12,7 +11,7 @@ import VideoItemCover from '~/ui/grid/covers/VideoItemCover'
 import GenericFileItemCover from '~/ui/grid/covers/GenericFileItemCover'
 import CollectionCover from '~/ui/grid/covers/CollectionCover'
 
-import CardMenu from '~/ui/grid/CardMenu'
+import ActionMenu from '~/ui/grid/ActionMenu'
 import CollectionIcon from '~/ui/icons/CollectionIcon'
 import LinkIcon from '~/ui/icons/LinkIcon'
 import Download from '~/ui/grid/Download'
@@ -21,6 +20,7 @@ import LinkedCollectionIcon from '~/ui/icons/LinkedCollectionIcon'
 import RequiredCollectionIcon from '~/ui/icons/RequiredCollectionIcon'
 import PinnedIcon from '~/ui/icons/PinnedIcon'
 import SelectionCircle from '~/ui/grid/SelectionCircle'
+import TagEditorModal from '~/ui/pages/shared/TagEditorModal'
 import Tooltip from '~/ui/global/Tooltip'
 import { uiStore } from '~/stores'
 import v, { ITEM_TYPES } from '~/utils/variables'
@@ -112,8 +112,10 @@ export const StyledTopRightActions = styled.div`
     z-index: ${v.zIndex.gridCardTop};
     color: ${props => props.color};
   }
-  /
 `
+StyledTopRightActions.defaultProps = {
+  color: v.colors.gray
+}
 StyledTopRightActions.displayName = 'StyledTopRightActions'
 
 @observer
@@ -124,14 +126,6 @@ class GridCard extends React.Component {
     // you can always edit your link cards, regardless of record.can_edit
     if (canEditCollection && card.link) return true
     return record.can_edit
-  }
-
-  get canReplace() {
-    const { record } = this.props
-    if (!record.can_edit_content) return false
-    return (
-      this.isItem && _.includes([ITEM_TYPES.IMAGE, ITEM_TYPES.FILE, ITEM_TYPES.VIDEO], record.type)
-    )
   }
 
   get isItem() {
@@ -253,6 +247,21 @@ class GridCard extends React.Component {
     )
   }
 
+  openMenu = () => {
+    const { card } = this.props
+    if (this.props.menuOpen) {
+      uiStore.update('openCardMenuId', false)
+    } else {
+      uiStore.update('openCardMenuId', card.id)
+    }
+  }
+
+  closeMenu = () => {
+    if (this.props.menuOpen) {
+      uiStore.update('openCardMenuId', false)
+    }
+  }
+
   handleClick = (e) => {
     const { dragging, record } = this.props
     if (dragging) return
@@ -281,6 +290,7 @@ class GridCard extends React.Component {
     } = this.props
 
     const firstCardInRow = card.position && card.position.x === 0
+    const tagEditorOpen = uiStore.tagsModalOpenId === card.id
 
     return (
       <StyledGridCard dragging={dragging}>
@@ -299,12 +309,15 @@ class GridCard extends React.Component {
               <Download file={record.filestack_file} />
             )}
             <SelectionCircle cardId={card.id} />
-            <CardMenu
+            <ActionMenu
+              location="GridCard"
               className="show-on-hover card-menu"
               card={card}
               canEdit={this.canEditCard}
-              canReplace={this.canReplace}
+              canReplace={record.canReplace}
               menuOpen={menuOpen}
+              onOpen={this.openMenu}
+              onLeave={this.closeMenu}
             />
           </StyledTopRightActions>
         }
@@ -313,6 +326,7 @@ class GridCard extends React.Component {
         <StyledGridCardInner onClick={this.handleClick}>
           {this.renderInner}
         </StyledGridCardInner>
+        <TagEditorModal canEdit={this.canEditCard} record={record} open={tagEditorOpen} />
       </StyledGridCard>
     )
   }
