@@ -1,7 +1,6 @@
 import PropTypes from 'prop-types'
 import { Fragment } from 'react'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
-import _ from 'lodash'
 import styled from 'styled-components'
 
 import GridCardHotspot from '~/ui/grid/GridCardHotspot'
@@ -113,8 +112,10 @@ export const StyledTopRightActions = styled.div`
     z-index: ${v.zIndex.gridCardTop};
     color: ${props => props.color};
   }
-  /
 `
+StyledTopRightActions.defaultProps = {
+  color: v.colors.gray
+}
 StyledTopRightActions.displayName = 'StyledTopRightActions'
 
 @observer
@@ -125,14 +126,6 @@ class GridCard extends React.Component {
     // you can always edit your link cards, regardless of record.can_edit
     if (canEditCollection && card.link) return true
     return record.can_edit
-  }
-
-  get canReplace() {
-    const { record } = this.props
-    if (!record.can_edit_content) return false
-    return (
-      this.isItem && _.includes([ITEM_TYPES.IMAGE, ITEM_TYPES.FILE, ITEM_TYPES.VIDEO], record.type)
-    )
   }
 
   get isItem() {
@@ -317,10 +310,11 @@ class GridCard extends React.Component {
             )}
             <SelectionCircle cardId={card.id} />
             <ActionMenu
+              location="GridCard"
               className="show-on-hover card-menu"
               card={card}
               canEdit={this.canEditCard}
-              canReplace={this.canReplace}
+              canReplace={record.canReplace}
               menuOpen={menuOpen}
               onOpen={this.openMenu}
               onLeave={this.closeMenu}

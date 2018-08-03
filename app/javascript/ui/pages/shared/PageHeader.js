@@ -118,10 +118,12 @@ class PageHeader extends React.Component {
       // 3. ActionMenu actions
       elements.push(
         <ActionMenu
+          key="action-menu"
+          location="PageMenu"
           className="card-menu"
           card={record.parent_collection_card}
           canEdit={record.can_edit}
-          canReplace={record.can_edit && record.internalType === 'items'}
+          canReplace={record.canReplace}
           menuOpen={uiStore.pageMenuOpen}
           onOpen={this.openMenu}
           onLeave={this.closeMenu}

@@ -20,7 +20,7 @@ class Collection < ApplicationRecord
                  :cached_org_properties
 
   # callbacks
-  after_save :touch_related_cards, if: :saved_change_to_updated_at?
+  after_commit :touch_related_cards, if: :saved_change_to_updated_at?
   after_commit :reindex_sync, on: :create
   after_commit :recalculate_child_breadcrumbs_async, if: :saved_change_to_name?
   after_commit :update_comment_thread_in_firestore

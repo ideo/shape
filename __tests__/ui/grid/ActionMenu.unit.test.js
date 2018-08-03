@@ -7,6 +7,7 @@ import {
 } from '#/mocks/data'
 
 const card = fakeCollectionCard
+card.can_move = true
 const uiStore = { ...fakeUiStore, viewingCollection: fakeCollection }
 const props = {
   card,
@@ -31,9 +32,12 @@ describe('ActionMenu', () => {
         'Replace',
       ]
       actions = _.without(allActions, 'Replace')
-      props.canEdit = true
+      props.card.isPinnedAndLocked = false
       wrapper = shallow(
-        <ActionMenu.wrappedComponent {...props} />
+        <ActionMenu.wrappedComponent
+          {...props}
+          canEdit
+        />
       )
       component = wrapper.instance()
       props.uiStore.selectCardId.mockClear()
@@ -47,9 +51,12 @@ describe('ActionMenu', () => {
     })
 
     it('creates a PopoutMenu with editable actions including replace if canReplace', () => {
-      props.canReplace = true
       wrapper = shallow(
-        <ActionMenu.wrappedComponent {...props} />
+        <ActionMenu.wrappedComponent
+          {...props}
+          canReplace
+          canEdit
+        />
       )
       const popout = wrapper.find('PopoutMenu').at(0)
       expect(popout.props().menuItems.length).toEqual(allActions.length)
@@ -105,12 +112,21 @@ describe('ActionMenu', () => {
 
   describe('as content editor with pinned card', () => {
     beforeEach(() => {
-      actions = ['Duplicate', 'Link', 'Add to My Collection', 'Replace']
-      props.canEdit = true
-      props.canReplace = true
+      actions = [
+        'Duplicate',
+        'Link',
+        'Add to My Collection',
+        'Tags',
+        'Permissions',
+        'Replace',
+      ]
       props.card.isPinnedAndLocked = true
       wrapper = shallow(
-        <ActionMenu.wrappedComponent {...props} />
+        <ActionMenu.wrappedComponent
+          {...props}
+          canEdit
+          canReplace
+        />
       )
     })
 
@@ -123,15 +139,23 @@ describe('ActionMenu', () => {
 
   describe('as viewer', () => {
     beforeEach(() => {
-      actions = ['Duplicate', 'Link', 'Add to My Collection']
-      props.canEdit = false
-      props.canReplace = false
+      actions = [
+        'Duplicate',
+        'Link',
+        'Add to My Collection',
+        'Tags',
+        'Permissions',
+      ]
       wrapper = shallow(
-        <ActionMenu.wrappedComponent {...props} />
+        <ActionMenu.wrappedComponent
+          {...props}
+          canEdit={false}
+          canReplace={false}
+        />
       )
     })
 
-    it('creates a PopoutMenu with Duplicate and Link viewer actions', () => {
+    it('creates a PopoutMenu with all viewer actions', () => {
       const popout = wrapper.find('PopoutMenu').at(0)
       expect(popout.props().menuItems.length).toEqual(actions.length)
       expect(_.map(popout.props().menuItems, i => i.name)).toEqual(actions)
@@ -141,16 +165,53 @@ describe('ActionMenu', () => {
   describe('as editor of a system required record', () => {
     beforeEach(() => {
       actions = ['Move', 'Link', 'Add to My Collection', 'Permissions']
-      props.canEdit = true
-      props.canReplace = false
       props.card.record.system_required = true
       props.card.isPinnedAndLocked = false
       wrapper = shallow(
-        <ActionMenu.wrappedComponent {...props} />
+        <ActionMenu.wrappedComponent
+          {...props}
+          canEdit
+          canReplace={false}
+        />
       )
+    })
+    afterEach(() => {
+      props.card.record.system_required = false
     })
 
     it('creates a PopoutMenu with Duplicate and Link viewer actions', () => {
+      const popout = wrapper.find('PopoutMenu').at(0)
+      expect(popout.props().menuItems.length).toEqual(actions.length)
+      expect(_.map(popout.props().menuItems, i => i.name)).toEqual(actions)
+    })
+  })
+
+  describe('as editor of a record that you cannot move (no editor access to parent)', () => {
+    beforeEach(() => {
+      actions = [
+        'Duplicate',
+        'Link',
+        'Add to My Collection',
+        'Tags',
+        'Permissions',
+        'Archive',
+      ]
+      props.card.can_move = false
+      props.card.record.name = 'haho'
+      wrapper = shallow(
+        <ActionMenu.wrappedComponent
+          {...props}
+          canEdit
+          canReplace={false}
+        />
+      )
+    })
+    afterEach(() => {
+      props.card.record.name = 'smaho'
+      props.card.can_move = true
+    })
+
+    it('creates a PopoutMenu without Move action', () => {
       const popout = wrapper.find('PopoutMenu').at(0)
       expect(popout.props().menuItems.length).toEqual(actions.length)
       expect(_.map(popout.props().menuItems, i => i.name)).toEqual(actions)

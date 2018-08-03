@@ -85,7 +85,7 @@ class SearchResultsInfinite extends React.Component {
     this.markFirstVisible(first)
   }
 
-  openMenu = (cardId) => {
+  openMenu = cardId => () => {
     uiStore.update('openCardMenuId', cardId)
   }
 
@@ -154,12 +154,13 @@ class SearchResultsInfinite extends React.Component {
                   <StyledTopRightActions className="show-on-hover">
                     <SelectionCircle cardId={card.id} />
                     <ActionMenu
+                      location="Search"
                       className="show-on-hover card-menu"
                       card={card}
                       canEdit={false}
                       canReplace={false}
                       menuOpen={uiStore.openCardMenuId === card.id}
-                      onOpen={this.openMenu.bind(this, card.id)}
+                      onOpen={this.openMenu(card.id)}
                       onLeave={this.closeMenu}
                     />
                   </StyledTopRightActions>

@@ -1,6 +1,6 @@
 class Api::V1::CollectionsController < Api::V1::BaseController
   deserializable_resource :collection, class: DeserializableCollection, only: %i[create update]
-  load_and_authorize_resource :organization, only:[:create]
+  load_and_authorize_resource :organization, only: [:create]
   load_and_authorize_resource :collection_card, only: [:create]
   load_and_authorize_resource except: %i[me update]
   before_action :check_cache, only: %i[show]

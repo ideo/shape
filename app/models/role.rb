@@ -10,6 +10,7 @@ class Role < ApplicationRecord
              optional: true
 
   before_save :set_resource_identifier
+  after_commit :update_resource_collection_card
 
   validates :resource_type,
             inclusion: { in: Rolify.resource_types },
@@ -116,5 +117,13 @@ class Role < ApplicationRecord
 
   def set_resource_identifier
     self.resource_identifier = resource_identifier
+  end
+
+  # necessary for busting collection cache e.g. when you update a role of a sub-collection
+  def update_resource_collection_card
+    return unless resource.present?
+    card = resource.try(:parent_collection_card)
+    return unless card.present?
+    card.touch
   end
 end

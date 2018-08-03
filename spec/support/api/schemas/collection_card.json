@@ -8,6 +8,7 @@
     "height": { "type": "integer" },
     "type": { "type": "string" },
     "link": { "type": "boolean" },
+    "can_move": { "type": "boolean" },
     "pinned": { "type": "boolean" },
     "pinned_and_locked": { "type": "boolean" }
   },

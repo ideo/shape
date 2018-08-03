@@ -1,5 +1,6 @@
 import PageHeader from '~/ui/pages/shared/PageHeader'
 import fakeUiStore from '#/mocks/fakeUiStore'
+import fakeRoutingStore from '#/mocks/fakeRoutingStore'
 import {
   fakeTextItem,
   fakeCollection,
@@ -10,9 +11,10 @@ describe('PageHeader', () => {
 
   beforeEach(() => {
     const uiStore = fakeUiStore
+    const routingStore = fakeRoutingStore
     fakeCollection.isNormalCollection = true
     fakeCollection.breadcrumb = [{ id: 12 }]
-    props = { record: fakeCollection, uiStore }
+    props = { record: fakeCollection, uiStore, routingStore }
 
     wrapper = shallow(
       <PageHeader.wrappedComponent {...props} />

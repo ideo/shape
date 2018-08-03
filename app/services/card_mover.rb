@@ -6,7 +6,7 @@ class CardMover
     to_collection:,
     cards:,
     placement: 'beginning',
-    card_action: 'move'
+    card_action: 'move' # 'move' or 'link'
   )
     @from_collection = from_collection
     @to_collection = to_collection
@@ -67,6 +67,7 @@ class CardMover
 
   def recalculate_cached_values
     unless @card_action == 'link' || @from_collection == @to_collection
+      @from_collection.touch
       @from_collection.reload.reorder_cards!
     end
     @from_collection.cache_cover! if @should_update_from_cover
@@ -82,8 +83,10 @@ class CardMover
   end
 
   def to_collection_invalid
+    # these only apply for moving actions
+    return unless @card_action == 'move'
     # Not allowed to move between organizations
-    if @card_action == 'move' && @to_collection.organization_id != @from_collection.organization_id
+    if @to_collection.organization_id != @from_collection.organization_id
       @errors << 'You can\'t move a collection to a different organization.'
       return true
     end
