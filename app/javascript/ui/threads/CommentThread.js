@@ -15,6 +15,7 @@ import hexToRgba from '~/utils/hexToRgba'
 import Moment from '~/ui/global/Moment'
 import Comment from './Comment'
 import CommentEntryForm from './CommentEntryForm'
+import CommentThreadLoader from './CommentThreadLoader'
 
 const StyledCommentThread = styled.div`
   .title {
@@ -211,6 +212,9 @@ class CommentThread extends React.Component {
             { this.renderUnreadCount() }
           </StyledHeader>
         </button>
+        { thread.hasMore && expanded &&
+          <CommentThreadLoader thread={thread} />
+        }
         <div className="comments">
           { this.renderComments() }
         </div>
