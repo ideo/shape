@@ -8,7 +8,7 @@ RSpec.describe NotificationMailer, type: :mailer do
     let(:mail) do
       NotificationMailer.notify(
         user_id: user.id,
-        last_notification_mail_sent: 1.day.ago,
+        last_notification_mail_sent: 1.day.ago.to_i,
         notification_ids: notifications.map(&:id),
         comment_thread_ids: comment_threads.map(&:id),
       )

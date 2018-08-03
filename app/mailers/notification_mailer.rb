@@ -3,7 +3,8 @@ class NotificationMailer < ApplicationMailer
 
   def notify(user_id:, last_notification_mail_sent:, notification_ids:, comment_thread_ids:)
     # this is passed in because by the time we look up the user, the value will have been changed
-    @last_notification_mail_sent = last_notification_mail_sent
+    # serialized as unix timestamp so we convert back to Time
+    @last_notification_mail_sent = Time.at(last_notification_mail_sent)
     @user = User.find(user_id)
     @notifications = Notification
                      .where(id: notification_ids)
