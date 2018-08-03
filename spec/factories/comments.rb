@@ -18,5 +18,25 @@ FactoryBot.define do
         ],
       }
     end
+
+    transient do
+      add_mentions []
+    end
+
+    after(:build) do |comment, evaluator|
+      if evaluator.add_mentions.present?
+        evaluator.add_mentions.each_with_index do |mention, i|
+          comment.draftjs_data['entityMap'][i] = {
+            type: 'mention',
+            data: {
+              mention: {
+                id: "#{mention.id}__users",
+                name: '@username',
+              },
+            },
+          }
+        end
+      end
+    end
   end
 end

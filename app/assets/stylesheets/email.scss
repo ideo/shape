@@ -6,7 +6,7 @@ $color-gray-bg: #f0f2f4;
 $color-gray-boulder: #787878;
 $color-gray-tundora: #4A4A4A;
 $color-blacklava: #120f0e;
-$header-font: 'Gotham', 'Arial Black', Arial, Helvetica, sans-serif;
+$header-font: 'Gotham', 'Verdana', sans-serif;
 $sentinel-font: 'Sentinel', Palatino, Georgia, serif;
 $sentinel-lt-font: 'Sentinel-Light', 'Sentinel', Palatino, Georgia, serif;
 
@@ -17,7 +17,8 @@ $sentinel-lt-font: 'Sentinel-Light', 'Sentinel', Palatino, Georgia, serif;
   max-width: 710px;
   margin: 0 auto;
   background-color: $color-gray-bg;
-  color: $color-blacklava;
+   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale; color: $color-blacklava;
 
   a, a:visited {
     color: $color-gray-tundora;
@@ -150,4 +151,222 @@ $sentinel-lt-font: 'Sentinel-Light', 'Sentinel', Palatino, Georgia, serif;
   .email-footer__address {
     margin-top: 5px;
   }
+}
+
+// Invite mailer
+.header {
+  color: #120F0E;
+  font-family: $header-font;
+  font-size: 22px;
+  font-weight: 600;
+  height: 26px;
+  letter-spacing: 2px;
+  line-height: 26px;
+  margin-bottom: 15px;
+  margin-top: 30px;
+  text-transform: uppercase;
+  width: 390px;
+}
+button {
+  background: none;
+  border: 0;
+  color: inherit;
+  cursor: pointer;
+  font: inherit;
+  line-height: normal;
+  overflow: visible;
+  padding: 0;
+  -webkit-appearance: button;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+.Notification__Container {
+  background-color: #3f526a;
+  border-radius: 2px;
+  padding-top: 5px;
+  padding-bottom: 10px;
+}
+
+.Notification {
+  background: #242d37;
+  box-sizing: border-box;
+  color: white;
+  margin-left: 10px;
+  margin-right: 10px;
+  margin-top: 4px;
+  min-height: 75px;
+  padding: 12px;
+  position: relative;
+  -webkit-transition: all 0.3s 0.2s;
+  transition: all 0.3s 0.2s;
+  width: calc(100% - 20px);
+}
+
+.bold {
+  font-weight: 700;
+}
+
+.Rfx {
+  display: flex;
+}
+
+.Notification__ButtonContainer {
+  display: flex;
+  justify-content: center;
+  margin-left: 10px;
+  margin-right: 9px;
+  margin-top: 20px;
+  width: 12px;
+}
+
+.buttons__NotificationButton {
+  background-color: #d66742;
+  border-radius: 50%;
+  cursor: pointer;
+  display: inline-block;
+  height: 12px;
+  -webkit-transition: all 0.3s 0.2s;
+  transition: all 0.3s 0.2s;
+  width: 12px;
+}
+
+.Moment {
+  color: white;
+  display: inline-block;
+  font-family: $header-font;
+  font-size: 0.75rem;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.Activity__ActivityButton {
+  display: block;
+  text-align: left;
+}
+
+.Activity__ActivityText {
+  color: #f2f1ee;
+  font-family: $header-font;
+  font-size: 1rem;
+  font-weight: 300;
+  line-height: 1.25;
+  margin-bottom: 0;
+  margin-top: 3px;
+
+  span {
+    font-family: $header-font;
+  }
+}
+
+.CommentThread {
+  background-color: #3f526a;
+  margin-bottom: 25px;
+  padding: 10px 0;
+}
+.CommentThread__StyledHeader {
+  align-items: flex-start;
+  color: white !important;
+  display: flex;
+  height: 70px;
+  font-family: $header-font;
+  font-size: 23px;
+  .name {
+    text-transform: uppercase;
+  }
+}
+
+.CommentThread__title {
+  background-color: #3f526a;
+  color: white;
+  font-family: $header-font;
+  font-weight: 500;
+  font-size: 0.75rem;
+  padding: 10px 10px 0 10px;
+  text-align: left;
+  .Link {
+    margin-right: 8px;
+    text-decoration: none;
+  }
+}
+
+
+.CommentThread__ThumbnailHolder {
+  display: block;
+  flex-shrink: 0;
+  height: 50px;
+  width: 50px;
+  margin-right: 8px;
+
+  img {
+    flex-shrink: 0;
+    height: 100%;
+    object-fit: cover;
+    width: 100%;
+  }
+}
+
+.CommentThread_timestamp {
+  font-family: $header-font;
+  margin-left: auto;
+}
+
+.Comments {
+  font-family: $header-font;
+  margin: 5px 10px 0 10px;
+}
+
+.CustomCommentMentions__StyledCommentInput {
+  color: white;
+  cursor: text;
+  padding: 10px;
+  padding-right: 45px;
+  font-size: 1rem;
+  font-family: $header-font;
+  padding: 10px;
+  margin-bottom: 5px;
+  background: #5a6a7c;
+  transition: background 1s 0.5s ease;
+
+  .timestamp {
+    display: inline-block;
+    margin-left: 10px;
+  }
+
+  .message {
+    color: white;
+    display: block;
+    margin-left: 5px;
+    margin-top: 10px;
+  }
+}
+
+.layout__InlineRow {
+  align-items: center;
+  display: flex;
+}
+
+.Avatar__StyledAvatar {
+  width: 32px;
+  margin-left: 5px;
+  margin-right: 5px;
+  height: 32px;
+  cursor: initial;
+
+  img {
+    width: 100%;
+    height: 100%;
+    text-align: center;
+    object-fit: cover;
+    border-radius: 50%;
+  }
+}
+
+.typography__DisplayText {
+  color: white;
+  font-weight: 400;
+  font-family: $header-font;
+  font-size: 1rem;
 }

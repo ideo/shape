@@ -53,7 +53,7 @@ class CollectionPage extends PageWithApi {
   onAPILoad = (response) => {
     this.updateError(null)
     const collection = response.data
-    const { apiStore, uiStore } = this.props
+    const { apiStore, uiStore, location } = this.props
     uiStore.setViewingCollection(collection)
     // setViewingCollection has to happen first bc we use it in openBlankContentTool
     if (!collection.collection_cards.length) {
@@ -65,6 +65,7 @@ class CollectionPage extends PageWithApi {
     } else {
       apiStore.clearUnpersistedThreads()
     }
+    uiStore.openOptionalMenus(location.search)
   }
 
   updateCollection = () => {
@@ -127,6 +128,7 @@ class CollectionPage extends PageWithApi {
 
 CollectionPage.propTypes = {
   match: ReactRouterPropTypes.match.isRequired,
+  location: ReactRouterPropTypes.location.isRequired,
 }
 CollectionPage.wrappedComponent.propTypes = {
   apiStore: MobxPropTypes.objectOrObservableObject.isRequired,

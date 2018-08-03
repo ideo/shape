@@ -77,7 +77,9 @@ class Activity extends React.PureComponent {
       uiStore.openGroup(id)
       return
     }
-    routingStore.routeTo(internalType, id)
+    if (action !== 'archived') {
+      routingStore.routeTo(internalType, id)
+    }
     if (_.includes(['commented', 'mentioned'], action)) {
       const thread = await apiStore.findOrBuildCommentThread(target)
       uiStore.update('activityLogPage', 'comments')

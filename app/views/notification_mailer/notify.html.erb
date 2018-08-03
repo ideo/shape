@@ -1,0 +1,108 @@
+<div class='p'>
+  Your collaborators and teammates have updates for you. Check out what's been going on since you've been gone!
+</div>
+
+<% if @comment_threads.present? %>
+  <div class="header">
+    New comments
+  </div>
+  <div>
+    <% @comment_threads.each do |comment_thread| %>
+      <div class="CommentThread">
+        <div class="CommentThread__title">
+          <a
+            class="CommentThread__StyledHeader"
+            href="<%= frontend_url_for(comment_thread.record) %>?open=comments"
+          >
+              <span class="CommentThread__ThumbnailHolder">
+                <% if comment_thread.record.is_a? Collection %>
+                  <% if comment_thread.record.cached_cover && comment_thread.record.cached_cover["image_url"] %>
+                    <img
+                      src="<%= comment_thread.record.cached_cover["image_url"] %>"
+                      alt="<%= comment_thread.record.name %>"
+                    >
+                  <% end %>
+                <% elsif comment_thread.record.filestack_file_url.present? %>
+                <img
+                  src="<%= comment_thread.record.filestack_file_url %>"
+                  alt="<%= comment_thread.record.name %>"
+                >
+                <% end %>
+              </span>
+            <div style="overflow: hidden; text-overflow: ellipsis; -webkit-box-orient: vertical; display: -webkit-box; -webkit-line-clamp: 2;">
+              <span class="name"><%= comment_thread.record.name %></span>
+            </div>
+            <span class="CommentThread_timestamp">
+              <span class="Moment">
+                <%= comment_thread.updated_at.strftime('%b %e - %l:%M %p') %>
+              </span>
+            </span>
+          </a>
+        </div>
+        <div class="Comments">
+        <% comment_thread.comments.where('created_at > ?', @last_notification_mail_sent).each do |comment| %>
+          <div class="CustomCommentMentions__StyledCommentInput">
+            <div class="layout__InlineRow">
+              <div class="Avatar__StyledAvatar" cursor="initial">
+                <img
+                  alt="<%= comment.author.name %>"
+                  src="<%= comment.author.picture %>"
+                >
+              </div>
+              <span class="author typography__DisplayText">
+                <%= comment.author.name %>
+              </span>
+              <span class="timestamp">
+                <span class="Moment">
+                  <%= comment.updated_at.strftime('%b %e - %l:%M %p') %>
+                </span>
+              </span>
+            </div>
+            <div class="message">
+              <span data-text="true"><%= comment.message %></span>
+            </div>
+          </div>
+        <% end %>
+        </div>
+      </div>
+    <% end %>
+  </div>
+<% end %>
+
+<div class="header">
+  Notifications
+</div>
+<div class="Notification__Container">
+  <% @notifications.each do |notification| %>
+    <a
+      href="<%= notification.activity.action != 'archived' ? frontend_url_for(notification.activity.target) : root_url %>?open=notifications"
+    >
+      <div class="Notification">
+        <div class="Rfx">
+          <div class="Notification__ButtonContainer">
+            <button class="buttons__NotificationButton"></button>
+          </div>
+          <div>
+            <span class="Moment">
+              <%= notification.created_at.strftime('%b %e - %l:%M %p') %>
+            </span>
+            <button class="Activity__ActivityButton">
+              <p class="Activity__ActivityText">
+              <% case notification.activity.action %>
+              <% when "added_editor", "added_member", "added_admin" %>
+                <span class="bold"><%= notification.activity.actor.name %></span> has made <span class="bold"><%= notification.activity.subjects.map(&:name).join(', ') %></span> a(n) <%= notification.activity.action.to_s.split('_')[1] %> of <%= notification.activity.target.name %>
+              <% when "archived" %>
+                <span class="bold"><%= notification.activity.actor.name %></span> has archived <span class="bold"><%= notification.activity.target.name %></span>
+              <% when "commented" %>
+                <span class="bold"><%= notification.activity.actor.name %></span> commented on <%= notification.activity.target.name %>
+              <% when "mentioned" %>
+                <span class="bold"><%= notification.activity.actor.name %></span> mentioned you in a comment for <span class="bold"><%= notification.activity.target.name %></span>
+              <% end %>
+              </p>
+            </button>
+          </div>
+        </div>
+      </div>
+    </a>
+  <% end %>
+</div>
