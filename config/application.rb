@@ -30,5 +30,7 @@ module Shape
 
     # for serving gzipped assets
     config.middleware.use Rack::Deflater
+
+    ::IDEO_PRODUCTS_GROUP_ID = 27
   end
 end
