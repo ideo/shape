@@ -5,7 +5,8 @@ import { uiStore } from '~/stores'
 import BaseRecord from './BaseRecord'
 import Comment from './Comment'
 
-const PER_PAGE = 5
+// should always be the same as paginates_per in comment.rb
+const PER_PAGE = 50
 
 class CommentThread extends BaseRecord {
   @observable comments = []

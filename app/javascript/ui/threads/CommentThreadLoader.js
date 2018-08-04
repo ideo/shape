@@ -1,18 +1,17 @@
 import { observable, action } from 'mobx'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
-import styled from 'styled-components'
+// import styled from 'styled-components'
 
+import { TextButton } from '~/ui/global/styled/forms'
 import InlineLoader from '~/ui/layout/InlineLoader'
 import RefreshIcon from '~/ui/icons/RefreshIcon'
 import v from '~/utils/variables'
 
-const StyledCommentThreadLoader = styled.button`
-  text-transform: uppercase;
+const StyledCommentThreadLoader = TextButton.extend`
   height: 80px;
   position: relative;
   margin-bottom: 5px;
   background: ${props => (props.disabled ? v.colors.cloudy : v.colors.activityMedBlue)};
-  font-family: ${v.fonts.sans};
   width: 100%;
 
   .refreshIcon {

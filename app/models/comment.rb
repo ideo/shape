@@ -1,7 +1,7 @@
 class Comment < ApplicationRecord
   include Firestoreable
 
-  paginates_per 5
+  paginates_per 50
   belongs_to :comment_thread, touch: true
   belongs_to :author, class_name: 'User'
 
