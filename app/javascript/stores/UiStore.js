@@ -307,6 +307,7 @@ export default class UiStore {
         break
       }
     }
+    return opts.open
   }
 
   // TODO: add a unit test for this

@@ -50,7 +50,7 @@ class CollectionPage extends PageWithApi {
     return `collections/${match.params.id}`
   }
 
-  onAPILoad = (response) => {
+  onAPILoad = async (response) => {
     this.updateError(null)
     const collection = response.data
     const { apiStore, uiStore, location } = this.props
@@ -61,11 +61,14 @@ class CollectionPage extends PageWithApi {
     }
     collection.checkCurrentOrg()
     if (collection.isNormalCollection) {
-      apiStore.findOrBuildCommentThread(collection)
+      const thread = await apiStore.findOrBuildCommentThread(collection)
+      const menu = uiStore.openOptionalMenus(location.search)
+      if (menu === 'comments') {
+        uiStore.expandThread(thread.key)
+      }
     } else {
       apiStore.clearUnpersistedThreads()
     }
-    uiStore.openOptionalMenus(location.search)
   }
 
   updateCollection = () => {

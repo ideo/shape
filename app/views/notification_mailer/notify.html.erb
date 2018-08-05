@@ -59,7 +59,9 @@
               </span>
             </div>
             <div class="message">
-              <span data-text="true"><%= comment.message %></span>
+              <a class="c-white" href="<%= frontend_url_for(comment_thread.record) %>?open=comments">
+                <span><%= comment.message %></span>
+              </a>
             </div>
           </div>
         <% end %>
@@ -80,13 +82,13 @@
       <div class="Notification">
         <div class="Rfx">
           <div class="Notification__ButtonContainer">
-            <button class="buttons__NotificationButton"></button>
+            <div class="buttons__NotificationButton"></div>
           </div>
           <div>
             <span class="Moment">
               <%= notification.created_at.strftime('%b %e - %l:%M %p') %>
             </span>
-            <button class="Activity__ActivityButton">
+            <div class="Activity__ActivityButton">
               <p class="Activity__ActivityText">
               <% case notification.activity.action %>
               <% when "added_editor", "added_member", "added_admin" %>
@@ -102,7 +104,7 @@
                 <span class="bold"><%= notification.activity.actor.name %></span> mentioned you in a comment for <span class="bold"><%= notification.activity.target.name %></span>
               <% end %>
               </p>
-            </button>
+            </div>
           </div>
         </div>
       </div>

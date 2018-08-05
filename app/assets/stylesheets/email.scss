@@ -10,6 +10,10 @@ $header-font: 'Gotham', 'Verdana', sans-serif;
 $sentinel-font: 'Sentinel', Palatino, Georgia, serif;
 $sentinel-lt-font: 'Sentinel-Light', 'Sentinel', Palatino, Georgia, serif;
 
+.c-white {
+  color: white;
+}
+
 .email-wrapper {
   font-family: $sentinel-lt-font;
   font-size: 14px;
@@ -21,7 +25,6 @@ $sentinel-lt-font: 'Sentinel-Light', 'Sentinel', Palatino, Georgia, serif;
   -moz-osx-font-smoothing: grayscale; color: $color-blacklava;
 
   a, a:visited {
-    color: $color-gray-tundora;
     text-decoration: none;
   }
   a.underlined {
@@ -268,7 +271,7 @@ button {
 }
 .CommentThread__StyledHeader {
   align-items: flex-start;
-  color: white !important;
+  color: white;
   display: flex;
   height: 70px;
   font-family: $header-font;
