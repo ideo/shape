@@ -9,11 +9,6 @@ class Truncator extends React.Component {
       truncated: false,
       alteredText: props.text,
     }
-
-    this.setElRef = el => {
-      this.elRef = el
-    }
-
     this.onResize = _.debounce(this._onResize, 100)
   }
 
@@ -69,7 +64,7 @@ class Truncator extends React.Component {
     const { text } = this.props
     const { alteredText, truncated } = this.state
     return (
-      <div style={this.mainStyles} ref={this.setElRef}>
+      <div style={this.mainStyles} ref={(el) => (this.elRef = el)}>
         { truncated ? alteredText : text }
       </div>
     )
