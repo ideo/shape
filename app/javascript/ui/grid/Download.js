@@ -20,7 +20,7 @@ class Download extends React.Component {
     const { record } = this.props
     const file = record.filestack_file
     if (file.url) {
-      Activity.trackActivity('download', record)
+      Activity.trackActivity('downloaded', record)
       window.open(file.url, '_blank')
     }
   }

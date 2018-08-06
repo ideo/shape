@@ -16,7 +16,7 @@ import PermissionsIcon from '~/ui/icons/PermissionsIcon'
 import PopoutMenu from '~/ui/global/PopoutMenu'
 import TagIcon from '~/ui/icons/TagIcon'
 
-@inject('apiStore', 'uiStore')
+@inject('uiStore')
 @observer
 class ActionMenu extends React.Component {
   @observable itemLoading = ''
@@ -74,10 +74,10 @@ class ActionMenu extends React.Component {
   }
 
   downloadCard = () => {
-    const { card, apiStore } = this.props
+    const { card } = this.props
     const { record } = card
     if (record.filestack_file) {
-      Activity.trackActivity('download', record)
+      Activity.trackActivity('downloaded', record)
       window.open(record.filestack_file.url, '_blank')
     }
   }
@@ -208,7 +208,6 @@ ActionMenu.propTypes = {
   afterArchive: PropTypes.func
 }
 ActionMenu.wrappedComponent.propTypes = {
-  apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 ActionMenu.displayName = 'ActionMenu'
