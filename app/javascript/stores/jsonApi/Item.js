@@ -1,6 +1,8 @@
+import _ from 'lodash'
 import { routingStore } from '~/stores'
 import trackError from '~/utils/trackError'
 import FilestackUpload from '~/utils/FilestackUpload'
+import { ITEM_TYPES } from '~/utils/variables'
 import Api from './Api'
 import BaseRecord from './BaseRecord'
 
@@ -30,6 +32,13 @@ class Item extends BaseRecord {
       return routingStore.pathTo(type, id)
     }
     return routingStore.pathTo('homepage')
+  }
+
+  get canReplace() {
+    if (!this.can_edit_content) return false
+    return (
+      _.includes([ITEM_TYPES.IMAGE, ITEM_TYPES.FILE, ITEM_TYPES.VIDEO], this.type)
+    )
   }
 
   get pdfCoverUrl() {

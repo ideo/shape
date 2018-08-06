@@ -3,6 +3,7 @@ class SerializableItem < BaseJsonSerializer
   type 'items'
   attributes :id, :type, :name, :content, :text_data,
              :url, :thumbnail_url
+  has_one :parent_collection_card
 
   attribute :tag_list do
     @object.cached_tag_list || []

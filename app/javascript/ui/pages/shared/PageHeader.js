@@ -1,23 +1,23 @@
 import PropTypes from 'prop-types'
 import { Fragment } from 'react'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
-import { Flex, Box } from 'reflexbox'
+import { Flex } from 'reflexbox'
 import styled from 'styled-components'
 
 import ActivityLogButton from '~/ui/notifications/ActivityLogButton'
 import Breadcrumb from '~/ui/layout/Breadcrumb'
+import ActionMenu from '~/ui/grid/ActionMenu'
 import EditableName from '~/ui/pages/shared/EditableName'
 import Roles from '~/ui/grid/Roles'
 import RolesSummary from '~/ui/roles/RolesSummary'
-import PageMenu from '~/ui/pages/shared/PageMenu'
 import FilledProfileIcon from '~/ui/icons/FilledProfileIcon'
 import ProfileIcon from '~/ui/icons/ProfileIcon'
 import SystemIcon from '~/ui/icons/SystemIcon'
+import TagEditorModal from '~/ui/pages/shared/TagEditorModal'
 import { FixedHeader, MaxWidthContainer } from '~/ui/global/styled/layout'
 import { SubduedHeading1 } from '~/ui/global/styled/typography'
 import { StyledTitleAndRoles } from '~/ui/pages/shared/styled'
 import v from '~/utils/variables'
-
 /* global IdeoSSO */
 
 // NOTE: Header and PageHeader create sibling <header> elements on the page
@@ -40,7 +40,7 @@ const IconHolder = styled.span`
   }
 `
 
-@inject('uiStore')
+@inject('routingStore', 'uiStore')
 @observer
 class PageHeader extends React.Component {
   get canEdit() {
@@ -50,18 +50,41 @@ class PageHeader extends React.Component {
 
   get hasActions() {
     const { record } = this.props
-    return record.internalType === 'items' || record.isNormalCollection
+    return record.internalType === 'items' || (!record.isUserCollection &&
+      !record.isSharedCollection)
   }
 
   showObjectRoleDialog = () => {
-    const { uiStore } = this.props
-    uiStore.update('rolesMenuOpen', true)
+    const { uiStore, record } = this.props
+    uiStore.update('rolesMenuOpen', record)
   }
 
   updateRecordName = (name) => {
     const { record } = this.props
     record.name = name
     record.save()
+  }
+
+  openMenu = () => {
+    const { uiStore } = this.props
+    uiStore.update('pageMenuOpen', true)
+  }
+
+  closeMenu = () => {
+    const { uiStore } = this.props
+    uiStore.update('pageMenuOpen', false)
+  }
+
+  routeBack = ({ type }) => {
+    const { record, routingStore } = this.props
+    if (record.internalType === 'items' || type === 'move') {
+      if (record.parent_collection_card.parent_id) {
+        routingStore.routeTo('collections',
+          record.parent_collection_card.parent_id)
+      } else {
+        routingStore.routeTo('homepage')
+      }
+    }
   }
 
   handleTitleClick = () => {
@@ -89,15 +112,23 @@ class PageHeader extends React.Component {
     elements.push(
       <ActivityLogButton key="activity" />
     )
-    if (this.hasActions) {
-      // 3. PageMenu actions
+    if (this.hasActions && record.parent_collection_card) {
+      // TODO hacky way to include the record on the card link
+      record.parent_collection_card.record = record
+      // 3. ActionMenu actions
       elements.push(
-        <PageMenu
-          key="menu"
-          record={record}
-          menuOpen={uiStore.pageMenuOpen}
+        <ActionMenu
+          key="action-menu"
+          location="PageMenu"
+          className="card-menu"
+          card={record.parent_collection_card}
           canEdit={record.can_edit}
-          canEditContent={record.can_edit_content}
+          canReplace={record.canReplace}
+          menuOpen={uiStore.pageMenuOpen}
+          onOpen={this.openMenu}
+          onLeave={this.closeMenu}
+          onMoveMenu={this.routeBack}
+          afterArchive={this.routeBack}
         />
       )
     }
@@ -134,14 +165,18 @@ class PageHeader extends React.Component {
   }
 
   render() {
-    const { record, isHomepage } = this.props
+    const { record, isHomepage, uiStore } = this.props
     const breadcrumb = isHomepage ? [] : record.breadcrumb
+    const tagEditorOpen = record.parent_collection_card &&
+      uiStore.tagsModalOpenId === record.parent_collection_card.id
+
+    const rolesRecord = uiStore.rolesMenuOpen ? uiStore.rolesMenuOpen : record
     return (
       <FixedPageHeader>
         <MaxWidthContainer>
           <Roles
-            record={record}
-            roles={record.roles}
+            record={rolesRecord}
+            roles={rolesRecord.roles}
           />
           <Breadcrumb items={breadcrumb} />
           <div>
@@ -167,6 +202,7 @@ class PageHeader extends React.Component {
             </StyledTitleAndRoles>
           </div>
         </MaxWidthContainer>
+        <TagEditorModal canEdit={this.canEdit} record={record} open={tagEditorOpen} />
       </FixedPageHeader>
     )
   }
@@ -179,6 +215,7 @@ PageHeader.propTypes = {
 
 PageHeader.wrappedComponent.propTypes = {
   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
+  routingStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 
 PageHeader.defaultProps = {

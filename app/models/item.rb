@@ -44,6 +44,7 @@ class Item < ApplicationRecord
   validates :type, presence: true
 
   before_save :cache_attributes
+  after_commit :touch_related_cards, if: :saved_change_to_updated_at?
   after_commit :reindex_parent_collection
   after_commit :update_parent_collection_if_needed
 
@@ -149,6 +150,11 @@ class Item < ApplicationRecord
   def remove_comment_followers!
     return unless comment_thread.present?
     RemoveCommentThreadFollowers.perform_async(comment_thread.id)
+  end
+
+  def touch_related_cards
+    try(:parent_collection_card).try(:touch)
+    cards_linked_to_this_item.update_all(updated_at: updated_at)
   end
 
   private

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180717214927) do
+ActiveRecord::Schema.define(version: 20180727160754) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -108,18 +108,6 @@ ActiveRecord::Schema.define(version: 20180717214927) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.jsonb "docinfo"
-  end
-
-  create_table "friendly_id_slugs", force: :cascade do |t|
-    t.string "slug", null: false
-    t.integer "sluggable_id", null: false
-    t.string "sluggable_type", limit: 50
-    t.string "scope"
-    t.datetime "created_at"
-    t.index ["slug", "sluggable_type", "scope"], name: "index_friendly_id_slugs_on_slug_and_sluggable_type_and_scope", unique: true
-    t.index ["slug", "sluggable_type"], name: "index_friendly_id_slugs_on_slug_and_sluggable_type"
-    t.index ["sluggable_id"], name: "index_friendly_id_slugs_on_sluggable_id"
-    t.index ["sluggable_type"], name: "index_friendly_id_slugs_on_sluggable_type"
   end
 
   create_table "friendly_id_slugs", force: :cascade do |t|
@@ -273,6 +261,7 @@ ActiveRecord::Schema.define(version: 20180717214927) do
     t.boolean "notify_through_email", default: true
     t.jsonb "cached_attributes"
     t.jsonb "network_data", default: {}
+    t.datetime "last_notification_mail_sent"
     t.index ["email"], name: "index_users_on_email"
     t.index ["handle"], name: "index_users_on_handle", unique: true
     t.index ["invitation_token"], name: "index_users_on_invitation_token"

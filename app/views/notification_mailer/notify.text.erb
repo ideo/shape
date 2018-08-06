@@ -1,0 +1,26 @@
+Your collaborators and teammates have updates for you. Check out what's been going on since you've been gone!
+
+New comments
+<% @comment_threads.first(3).each do |comment_thread| %>
+  <%= comment_thread.record.name %>
+  <%= comment_thread.updated_at.strftime('%b %e - %l:%M %p') %>
+  <% comment_thread.comments.first(2).each do |comment| %>
+    <%= comment.author.name %>
+    <%= comment.updated_at.strftime('%b %e - %l:%M %p') %>
+    <%= comment.message %>
+  <% end %>
+<% end %>
+
+<% @notifications.first(6).each do |notification| %>
+  <%= notification.created_at.strftime('%b %e - %l:%M %p') %>
+  <% case notification.activity.action %>
+  <% when "added_editor", "added_member", "added_admin" %>
+   <%= notification.activity.actor.name %> has made <%= notification.activity.subject_users.map(&:name).join(', ') %> a(n) <%= notification.activity.action.to_s.split('_')[1] %> of <%= notification.activity.target.name %>
+  <% when "archived" %>
+    <%= notification.activity.actor.name %> has archived <%= notification.activity.target.name %>
+  <% when "commented" %>
+    <%= notification.activity.actor.name %> commented on <%= notification.activity.target.name %>
+  <% when "mentioned" %>
+    <%= notification.activity.actor.name %> mentioned you in a comment for <%= notification.activity.target.name %>
+  <% end %>
+<% end %>

@@ -254,8 +254,9 @@ export const CommentForm = styled.form`
   }
   .textarea-input {
     background: ${v.colors.activityMedBlue};
-    margin: 0 5px 0 68px;
-    width: calc(100% - 68px);
+    font-family: ${v.fonts.sans};
+    margin: 0 5px 0 10px;
+    width: calc(100% - 10px);
   }
 
 `

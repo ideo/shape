@@ -50,10 +50,10 @@ class CollectionPage extends PageWithApi {
     return `collections/${match.params.id}`
   }
 
-  onAPILoad = (response) => {
+  onAPILoad = async (response) => {
     this.updateError(null)
     const collection = response.data
-    const { apiStore, uiStore } = this.props
+    const { apiStore, uiStore, location } = this.props
     uiStore.setViewingCollection(collection)
     // setViewingCollection has to happen first bc we use it in openBlankContentTool
     if (!collection.collection_cards.length) {
@@ -61,7 +61,11 @@ class CollectionPage extends PageWithApi {
     }
     collection.checkCurrentOrg()
     if (collection.isNormalCollection) {
-      apiStore.findOrBuildCommentThread(collection)
+      const thread = await apiStore.findOrBuildCommentThread(collection)
+      const menu = uiStore.openOptionalMenus(location.search)
+      if (menu === 'comments') {
+        uiStore.expandThread(thread.key)
+      }
     } else {
       apiStore.clearUnpersistedThreads()
     }
@@ -127,6 +131,7 @@ class CollectionPage extends PageWithApi {
 
 CollectionPage.propTypes = {
   match: ReactRouterPropTypes.match.isRequired,
+  location: ReactRouterPropTypes.location.isRequired,
 }
 CollectionPage.wrappedComponent.propTypes = {
   apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
