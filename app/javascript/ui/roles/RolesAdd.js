@@ -3,7 +3,10 @@ import PropTypes from 'prop-types'
 import { observable, action } from 'mobx'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
+import MenuItem from '@material-ui/core/MenuItem'
+
 import trackError from '~/utils/trackError'
+import isEmail from '~/utils/isEmail'
 import {
   FormButton,
   FormActionsContainer,
@@ -15,7 +18,7 @@ import {
 } from '~/ui/global/styled/layout'
 import AutoComplete from '~/ui/global/AutoComplete'
 import PillList from '~/ui/global/PillList'
-import MenuItem from '@material-ui/core/MenuItem'
+import EmailCSVUploader from '~/ui/global/EmailCSVUploader'
 
 const RightAligner = styled.span`
   margin-right: 30px;
@@ -38,12 +41,18 @@ class RolesAdd extends React.Component {
   onUserSelected = (data) => {
     let existing = null
     let entity = data
-    // TODO: also do email validation on entered input?
-    const isEmail = !data.id
+    // check if the input is just an email string e.g. "person@email.com"
+    const emailInput = !data.id
+    if (emailInput && !isEmail(data.custom)) {
+      // try filtering out for emails within the string
+      // NOTE: this will re-call onUserSelected
+      this.handleEmailInput(_.filter(data.custom.match(/[^\s,]+/g), isEmail))
+      return
+    }
 
-    if (data.internalType === 'users' || isEmail) {
-      if (isEmail) {
-        entity = Object.assign({}, { name: data.custom, email: data.custom })
+    if (data.internalType === 'users' || emailInput) {
+      if (emailInput) {
+        entity = { name: data.custom, email: data.custom, internalType: 'users' }
       }
       existing = this.selectedUsers
         .filter(selected => selected.internalType === 'users')
@@ -99,6 +108,14 @@ class RolesAdd extends React.Component {
     this.selectedUsers = []
   }
 
+  handleEmailInput = (emails) => {
+    _.each(emails, email => {
+      this.onUserSelected({
+        custom: email,
+      })
+    })
+  }
+
   mapItems() {
     const { searchableItems } = this.props
     return searchableItems.map(item => {
@@ -117,7 +134,7 @@ class RolesAdd extends React.Component {
   render() {
     const { roleTypes } = this.props
     return (
-      <div>
+      <div style={{ marginBottom: '1rem' }}>
         { this.selectedUsers.length > 0 && (
           <PillList
             itemList={this.selectedUsers}
@@ -148,6 +165,11 @@ class RolesAdd extends React.Component {
               </Select>
             </RowItemRight>
           </RightAligner>
+        </Row>
+        <Row style={{ marginBottom: '4rem' }}>
+          <EmailCSVUploader
+            onComplete={this.handleEmailInput}
+          />
         </Row>
         <FormActionsContainer>
           <FormButton

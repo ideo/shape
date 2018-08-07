@@ -32,6 +32,7 @@ module.exports = {
     "mount": true,
     "relPath": true,
     "localStorage": true,
+    "FileReader": true,
   },
   settings: {
     "import/resolver": {
