@@ -4,7 +4,6 @@ class NotificationMailerPreview < ActionMailer::Preview
     u = User.first
     NotificationMailer.notify(
       user_id: u.id,
-      last_notification_mail_sent: 30.days.ago,
       notification_ids: u.notifications.last(10).map(&:id),
       comment_thread_ids: u.comment_threads.last(10).map(&:id),
     )
