@@ -3,7 +3,6 @@ import { observable, runInAction } from 'mobx'
 import styled from 'styled-components'
 import Snackbar from '@material-ui/core/Snackbar'
 import SnackbarContent from '@material-ui/core/SnackbarContent'
-
 import Tooltip from '~/ui/global/Tooltip'
 import v from '~/utils/variables'
 import CloseIcon from '~/ui/icons/CloseIcon'
@@ -53,11 +52,21 @@ const IconHolder = styled.span`
   margin-left: 40px;
   margin-top: 8px;
   width: 16px;
+
+  button {
+    height: 19px;
+    width: 16px;
+  }
 `
 
 const CloseIconHolder = styled.span`
   margin-left: 60px;
   width: 16px;
+
+  button {
+    height: 19px;
+    width: 16px;
+  }
 `
 
 @inject('uiStore', 'apiStore')
