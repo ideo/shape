@@ -134,7 +134,7 @@ class RolesAdd extends React.Component {
       [...created.data, ...fullUsers], this.selectedRole
     )
     this.setLoading(false)
-    this.reset()
+    this.resetSelectedUsers()
     return roles
   }
 
@@ -144,7 +144,7 @@ class RolesAdd extends React.Component {
   }
 
   @action
-  reset() {
+  resetSelectedUsers = () => {
     this.selectedUsers = []
   }
 
@@ -171,17 +171,35 @@ class RolesAdd extends React.Component {
     })
   }
 
+  renderPillList = () => {
+    const count = this.selectedUsers.length
+    if (count) {
+      if (count > 100) {
+        return (
+          <PillList
+            itemList={[{
+              name: `${count} people pending invitation`
+            }]}
+            onItemDelete={this.resetSelectedUsers}
+          />
+        )
+      }
+      return (
+        <PillList
+          itemList={this.selectedUsers}
+          onItemDelete={this.onUserDelete}
+        />
+      )
+    }
+    return ''
+  }
+
   render() {
     const { roleTypes } = this.props
     return (
       <div style={{ marginBottom: '1rem' }}>
         {this.loading && <InlineLoader /> }
-        { this.selectedUsers.length > 0 && (
-          <PillList
-            itemList={this.selectedUsers}
-            onItemDelete={this.onUserDelete}
-          />)
-        }
+        {this.renderPillList()}
         <Row>
           <AutoComplete
             options={this.mapItems()}
