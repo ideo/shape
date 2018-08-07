@@ -23,6 +23,5 @@ production:
     every: '5m'
     class: NotificationMentionMailerWorker
   notification_mailer:
-    # run on the :15 minute mark, every 4 hrs
-    cron: '15 */4 * * * *'
+    every: '4h'
     class: NotificationMailerWorker
