@@ -8,9 +8,9 @@ import _ from 'lodash'
 import pluralize from 'pluralize'
 
 import { ActivityContainer } from '~/ui/global/styled/layout'
-import CommentThread from './CommentThread'
 import InlineLoader from '~/ui/layout/InlineLoader'
 import Notification from '~/ui/notifications/Notification'
+import CommentThread from './CommentThread'
 
 function pluralTypeName(name) {
   return pluralize(name).toLowerCase()
@@ -37,9 +37,7 @@ class CommentThreadContainer extends React.Component {
 
   constructor(props) {
     super(props)
-    this.disposers = {
-
-    }
+    this.disposers = {}
     this.disposers.expanded = observe(props.uiStore, 'expandedThreadKey', (change) => {
       if (change.newValue) {
         this.handleExpandedThreadChange(change.newValue, change.oldValue)
@@ -48,7 +46,7 @@ class CommentThreadContainer extends React.Component {
         this.disposers.expandedComments = expandedThread.comments.observe((commentChange) => {
           const lastComment = _.last(expandedThread.comments)
           // if last comment is unpersisted it means I just added it; scroll me down
-          if (this.bottomOfExpandedThread || !lastComment.__persisted) {
+          if (this.bottomOfExpandedThread || (lastComment && !lastComment.__persisted)) {
             this.scrollToTopOfNextThread(expandedThread, { duration: 0 })
           }
         })
@@ -248,7 +246,7 @@ class CommentThreadContainer extends React.Component {
         }
         <div style={{ position: 'absolute', top: '62px', zIndex: 500, width: '100%' }}>
           {this.trackedNotifications.map(notification => (
-            <Notification notification={notification} key={notification.id} styleType='alert' hideShown />
+            <Notification notification={notification} key={notification.id} styleType="alert" hideShown />
           ))}
         </div>
         <ActivityContainer id={this.scrollOpts.containerId}>

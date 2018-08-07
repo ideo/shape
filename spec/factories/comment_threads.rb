@@ -1,6 +1,6 @@
 FactoryBot.define do
   factory :comment_thread do
-    organization
+    organization factory: :organization_without_groups
     transient do
       num_comments 0
       add_followers []

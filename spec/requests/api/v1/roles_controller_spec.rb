@@ -32,6 +32,7 @@ describe Api::V1::RolesController, type: :request, json: true, auth: true do
   end
 
   describe 'POST #create' do
+    let(:organization) { create(:organization) }
     let(:users) { create_list(:user, 3) }
     let(:user_ids) { users.map(&:id) }
     let(:users_json) { json_included_objects_of_type('users') }
@@ -45,7 +46,7 @@ describe Api::V1::RolesController, type: :request, json: true, auth: true do
     }
 
     context 'on a collection' do
-      let!(:collection) { create(:collection, add_editors: [user]) }
+      let!(:collection) { create(:collection, organization: organization, add_editors: [user]) }
       let(:path) { "/api/v1/collections/#{collection.id}/roles" }
 
       it 'returns a 200' do
@@ -78,7 +79,7 @@ describe Api::V1::RolesController, type: :request, json: true, auth: true do
     context 'on an item' do
       let!(:item) { create(:text_item, add_editors: [user]) }
       # item also needs a collection w/ an org in order to assign permissions
-      let!(:collection) { create(:collection) }
+      let!(:collection) { create(:collection, organization: organization) }
       let!(:collection_card) { create(:collection_card, item: item, parent: collection) }
       let(:path) { "/api/v1/items/#{item.id}/roles" }
 
@@ -94,7 +95,7 @@ describe Api::V1::RolesController, type: :request, json: true, auth: true do
     end
 
     context 'on an group' do
-      let!(:group) { create(:group, add_admins: [user]) }
+      let!(:group) { create(:group, organization: organization, add_admins: [user]) }
       let(:path) { "/api/v1/groups/#{group.id}/roles" }
       let!(:role_name) { 'member' }
 
