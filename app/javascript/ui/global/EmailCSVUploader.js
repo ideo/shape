@@ -10,7 +10,6 @@ class EmailCSVUploader extends React.Component {
     const emails = _.uniq(_.filter(_.flattenDeep(csvData), d => (
       d && _.isString(d) && isEmail(d)
     )))
-    console.log(emails)
     onComplete(emails)
   }
 

@@ -25,7 +25,7 @@ const StyledUploader = styled.div`
 
 class CSVUploader extends React.Component {
   state = {
-    fileInputValue: null,
+    fileInputValue: '',
   }
 
   handleFileUpload = e => {
@@ -39,9 +39,9 @@ class CSVUploader extends React.Component {
         error: err => console.warn('csv parse error', err)
       })
       onFileLoaded(csvData.data, filename)
-      this.setState({ fileInputValue: null })
     }
     reader.readAsText(e.target.files[0])
+    // clear out input
     this.setState({ fileInputValue: '' })
   }
 

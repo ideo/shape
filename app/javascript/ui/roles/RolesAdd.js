@@ -45,11 +45,10 @@ class RolesAdd extends React.Component {
     const emailInput = !data.id
     if (emailInput && !isEmail(data.custom)) {
       // try filtering out for emails within the string
-      // NOTE: this will re-call onUserSelected
+      // NOTE: this will re-call onUserSelected with any valid emails
       this.handleEmailInput(_.filter(data.custom.match(/[^\s,]+/g), isEmail))
       return
     }
-
     if (data.internalType === 'users' || emailInput) {
       if (emailInput) {
         entity = { name: data.custom, email: data.custom, internalType: 'users' }

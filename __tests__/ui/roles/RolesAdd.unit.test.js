@@ -83,12 +83,12 @@ describe('RolesAdd', () => {
     })
 
     describe('for a new user', () => {
-      const newUserData = { custom: 'm@m.m', internalType: 'users' }
+      const newUserData = { custom: 'm@m.com', internalType: 'users' }
       let existingUsers
 
       beforeEach(() => {
         existingUsers = [
-          { name: 'r@r.r', email: 'r@r.r', internalType: 'users' }
+          { name: 'r@r.com', email: 'r@r.com', internalType: 'users' }
         ]
         component.selectedUsers = existingUsers
       })
@@ -96,14 +96,27 @@ describe('RolesAdd', () => {
       it('should add the user with a name and email', () => {
         component.onUserSelected(newUserData)
         expect(component.selectedUsers[1]).toEqual({
-          name: 'm@m.m',
-          email: 'm@m.m'
+          name: 'm@m.com',
+          email: 'm@m.com',
+          internalType: 'users',
         })
       })
 
       it('should not add the same email twice', () => {
-        const anotherUser = { custom: 'r@r.r', internalType: 'users' }
+        const anotherUser = { custom: 'r@r.com', internalType: 'users' }
         component.onUserSelected(anotherUser)
+        expect(component.selectedUsers.length).toEqual(1)
+      })
+
+      it('should parse out emails from input', () => {
+        component.onUserSelected({ custom: '<jim> jim@email.com, jane@doe.net' })
+        expect(component.selectedUsers.length).toEqual(3)
+        expect(component.selectedUsers[1].email).toEqual('jim@email.com')
+        expect(component.selectedUsers[2].email).toEqual('jane@doe.net')
+      })
+
+      it('should reject input that is not a valid email', () => {
+        component.onUserSelected({ custom: '<jim>jim smith' })
         expect(component.selectedUsers.length).toEqual(1)
       })
     })
@@ -125,11 +138,11 @@ describe('RolesAdd', () => {
     describe('with users', () => {
       it('should map users with email as the value', () => {
         props.searchableItems = [
-          { id: 3, name: 'user', email: 'user@u.u', internalType: 'users' }
+          { id: 3, name: 'user', email: 'user@u.com', internalType: 'users' }
         ]
         wrapper.setProps(props)
         expect(wrapper.instance().mapItems()[0]).toEqual(
-          { value: 'user@u.u', label: 'user', data: props.searchableItems[0] }
+          { value: 'user@u.com', label: 'user', data: props.searchableItems[0] }
         )
       })
     })
