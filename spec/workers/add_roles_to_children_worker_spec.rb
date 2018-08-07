@@ -2,9 +2,9 @@ require 'rails_helper'
 
 RSpec.describe AddRolesToChildrenWorker, type: :worker do
   describe '#perform' do
-    let(:collection) { create(:collection, num_cards: 3) }
-    let(:users_to_add) { create_list(:user, 3) }
-    let(:groups_to_add) { create_list(:group, 3) }
+    let(:collection) { create(:collection, num_cards: 1) }
+    let(:users_to_add) { create_list(:user, 2) }
+    let(:groups_to_add) { create_list(:group, 1) }
     let(:role_name) { Role::EDITOR }
     let(:instance_double) do
       double('Roles::AddToChildren')
