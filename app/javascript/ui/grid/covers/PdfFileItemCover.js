@@ -104,7 +104,11 @@ class PdfFileItemCover extends React.Component {
         <div className="fileInfo">
           <FileIcon mimeType={item.filestack_file.mimetype} />
           <div className="fileName">
-            <Truncator extraSpacing={15} text={filestack_file.filename} />
+            <Truncator
+              text={filestack_file.filename}
+              key={filestack_file.filename}
+              extraSpacing={15}
+            />
           </div>
         </div>
       </StyledPdfCover>

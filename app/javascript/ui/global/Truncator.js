@@ -21,6 +21,10 @@ class Truncator extends React.Component {
     window.removeEventListener('resize', this.onResize)
   }
 
+  componentWillReceiveProps(nextProps) {
+    this.truncate()
+  }
+
   _onResize = () => {
     this.setState({ truncated: false }, () => { this.truncate() })
   }
@@ -48,16 +52,20 @@ class Truncator extends React.Component {
   }
 
   get mainStyles() {
-    const { extraSpacing } = this.props
+    const { extraSpacing, minWidth } = this.props
     const { truncated } = this.state
 
     if (truncated) return {}
-    return {
+    const styles = {
       overflowX: 'scroll',
       maxWidth: `calc(100% - ${extraSpacing}px)`,
       width: '100%',
       whiteSpace: 'nowrap'
     }
+    if (minWidth > 0) {
+      styles.minWidth = `${minWidth - extraSpacing}px`
+    }
+    return styles
   }
 
   render() {
@@ -74,9 +82,11 @@ class Truncator extends React.Component {
 Truncator.propTypes = {
   text: PropTypes.string.isRequired,
   extraSpacing: PropTypes.number,
+  minWidth: PropTypes.number,
 }
 Truncator.defaultProps = {
   extraSpacing: 0,
+  minWidth: 0,
 }
 
 export default Truncator

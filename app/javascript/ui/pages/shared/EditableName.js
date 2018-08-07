@@ -11,13 +11,13 @@ import ClickWrapper from '~/ui/layout/ClickWrapper'
 import Truncator from '~/ui/global/Truncator'
 
 const StyledName = styled.div`
-  display: inline-block;
+  display: block;
   vertical-align: top;
 `
 StyledName.displayName = 'StyledName'
 
 const StyledEditableName = styled.div`
-  display: inline-block;
+  display: block;
   .input__name {
     width: 30vw;
     margin-bottom: 0.5rem;
@@ -97,28 +97,6 @@ class EditableName extends React.Component {
     this.props.updateNameHandler(this.name)
   }
 
-  truncateName() {
-    const { uiStore } = this.props
-    if (!this.name) return ''
-    const screenWidth = Math.min(uiStore.windowWidth, v.maxWidth)
-    // Estimation of width based on current font size
-    const fontSizeMultiplier = screenWidth > v.responsive.smallBreakpoint ? 25 : 10
-    let marginRightPadding = screenWidth > v.responsive.medBreakpoint ? 500 : 250
-    if (screenWidth > v.responsive.largeBreakpoint) marginRightPadding = 400
-    const width = this.name.length * fontSizeMultiplier
-    const diff = width - (screenWidth - marginRightPadding)
-    const truncateAmount = parseInt(diff / fontSizeMultiplier)
-    // check if there is more than 1 letter to truncate
-    if (truncateAmount > 1) {
-      const mid = parseInt((this.name.length - truncateAmount) / 2)
-      const firstPart = this.name.slice(0, mid)
-      const secondPart = this.name.slice(mid + truncateAmount, this.name.length)
-      this.truncatedName = `${firstPart}…${secondPart}`
-      return this.truncatedName
-    }
-    return this.name
-  }
-
   render() {
     const { canEdit, TextWrapper, fontSize, uiStore } = this.props
     const { editingName } = uiStore
@@ -146,7 +124,11 @@ class EditableName extends React.Component {
         ref={this.textRef}
         onClick={canEdit ? this.startEditingName : null}
       >
-        <Truncator extraSpacing={200} text={this.name} />
+        <Truncator
+          text={this.name}
+          key={this.name}
+          extraSpacing={200}
+          minWidth={v.maxWidth - 500} />
       </Heading1>
     )
     return (
