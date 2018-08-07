@@ -5,7 +5,6 @@ import _ from 'lodash'
 
 import AddIntoIcon from '~/ui/icons/AddIntoIcon'
 import Activity from '~/stores/jsonApi/Activity'
-import PopoutMenu from '~/ui/global/PopoutMenu'
 import ArchiveIcon from '~/ui/icons/ArchiveIcon'
 import DownloadIcon from '~/ui/icons/DownloadIcon'
 import DuplicateIcon from '~/ui/icons/DuplicateIcon'
