@@ -19,9 +19,9 @@ production:
   searchkick_reindex_worker:
     every: '1m'
     class: SearchkickReindexWorker
-  notification_mention_mailer:
-    every: '5m'
-    class: NotificationMentionMailerWorker
-  notification_mailer:
-    every: '4h'
-    class: NotificationMailerWorker
+  # notification_mention_mailer:
+  #   every: '5m'
+  #   class: NotificationMentionMailerWorker
+  # notification_mailer:
+  #   every: '4h'
+  #   class: NotificationMailerWorker
