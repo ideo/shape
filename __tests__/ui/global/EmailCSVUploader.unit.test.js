@@ -26,7 +26,7 @@ describe('EmailCSVUploader', () => {
     ]
     component.parseEmails(csvData)
     expect(props.onComplete).toHaveBeenCalledWith([
-      // should find the unique 3 email values in order
+      // should find the 4 unique email values in order
       'jane@doe.com',
       'v@b.net',
       'a@bb.com',
