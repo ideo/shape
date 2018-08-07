@@ -14,6 +14,7 @@ describe('RolesAdd', () => {
       onCreateUsers: jest.fn(),
       onCreateRoles: jest.fn(),
       onSearch: jest.fn(),
+      ownerType: 'collections',
     }
     wrapper = mount(
       <RolesAdd {...props} />

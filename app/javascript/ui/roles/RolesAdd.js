@@ -19,6 +19,8 @@ import {
 import AutoComplete from '~/ui/global/AutoComplete'
 import PillList from '~/ui/global/PillList'
 import EmailCSVUploader from '~/ui/global/EmailCSVUploader'
+import InlineLoader from '~/ui/layout/InlineLoader'
+import { uiStore } from '~/stores'
 
 const RightAligner = styled.span`
   margin-right: 30px;
@@ -30,6 +32,7 @@ RightAligner.displayName = 'StyledRightAligner'
 class RolesAdd extends React.Component {
   @observable selectedUsers = []
   @observable selectedRole = ''
+  @observable loading = false
 
   constructor(props) {
     super(props)
@@ -73,12 +76,48 @@ class RolesAdd extends React.Component {
     this.selectedUsers.remove(entity)
   }
 
+  @action
+  setLoading = value => {
+    this.loading = value
+  }
+
   onUserSearch = (searchTerm) =>
     this.props.onSearch(searchTerm).then((res) =>
       res.data.map((user) =>
         ({ value: user.email, label: user.name, data: user })))
 
-  handleSave = async (ev) => {
+  confirmSave = () => {
+    const { ownerType } = this.props
+    if (this.selectedUsers.length > 10) {
+      const confirmOpts = {
+        prompt: '',
+        cancelText: 'Cancel',
+        confirmText: 'Continue',
+        onConfirm: this.handleSave,
+      }
+      if (ownerType === 'groups') {
+        confirmOpts.prompt = `
+          Are you sure you want to add ${this.selectedUsers.length} users to this group?
+        `
+      } else {
+        confirmOpts.prompt = `
+          Are you sure you want to add ${this.selectedUsers.length}
+          users to ${uiStore.viewingRecord.name}?
+          Large numbers of users may be better managed by adding them to a group.
+        `
+        confirmOpts.cancelText = 'Go to People and Groups'
+        confirmOpts.onCancel = () => {
+          uiStore.closeRolesMenu()
+          uiStore.update('organizationMenuPage', 'organizationPeople')
+        }
+      }
+      uiStore.confirm(confirmOpts)
+      return
+    }
+    this.handleSave()
+  }
+
+  handleSave = async () => {
     const emails = this.selectedUsers
       .filter((selected) => !selected.id)
       .map((selected) => selected.email)
@@ -87,12 +126,14 @@ class RolesAdd extends React.Component {
       .filter((selected) => !!selected.id)
 
     let created = { data: [] }
+    this.setLoading(true)
     if (emails.length) {
       created = await this.props.onCreateUsers(emails)
     }
     const roles = await this.props.onCreateRoles(
       [...created.data, ...fullUsers], this.selectedRole
     )
+    this.setLoading(false)
     this.reset()
     return roles
   }
@@ -134,6 +175,7 @@ class RolesAdd extends React.Component {
     const { roleTypes } = this.props
     return (
       <div style={{ marginBottom: '1rem' }}>
+        {this.loading && <InlineLoader /> }
         { this.selectedUsers.length > 0 && (
           <PillList
             itemList={this.selectedUsers}
@@ -172,7 +214,7 @@ class RolesAdd extends React.Component {
         </Row>
         <FormActionsContainer>
           <FormButton
-            onClick={this.handleSave}
+            onClick={this.confirmSave}
             disabled={this.selectedUsers.length === 0}
           >
             Add
@@ -189,6 +231,7 @@ RolesAdd.propTypes = {
   onCreateRoles: PropTypes.func.isRequired,
   onCreateUsers: PropTypes.func.isRequired,
   onSearch: PropTypes.func,
+  ownerType: PropTypes.string.isRequired,
 }
 RolesAdd.defaultProps = {
   onSearch: () => {}

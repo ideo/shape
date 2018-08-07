@@ -189,6 +189,7 @@ class RolesMenu extends React.Component {
               roleTypes={addRoleTypes}
               onCreateRoles={this.createRoles}
               onCreateUsers={this.onCreateUsers}
+              ownerType={ownerType}
             />
           </div>
         }

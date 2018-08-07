@@ -3,6 +3,7 @@ import PropTypes from 'prop-types'
 import Papa from 'papaparse'
 import styled from 'styled-components'
 import UploadIcon from '~/ui/icons/UploadIcon'
+import InlineLoader from '~/ui/layout/InlineLoader'
 import v from '~/utils/variables'
 
 const StyledUploader = styled.div`
@@ -15,6 +16,7 @@ const StyledUploader = styled.div`
     margin-right: 8px;
   }
   label {
+    cursor: pointer;
     display: flex;
     align-items: flex-start;
   }
@@ -26,6 +28,7 @@ const StyledUploader = styled.div`
 class CSVUploader extends React.Component {
   state = {
     fileInputValue: '',
+    loading: false,
   }
 
   handleFileUpload = e => {
@@ -39,15 +42,17 @@ class CSVUploader extends React.Component {
         error: err => console.warn('csv parse error', err)
       })
       onFileLoaded(csvData.data, filename)
+      this.setState({ loading: false })
     }
     reader.readAsText(e.target.files[0])
     // clear out input
-    this.setState({ fileInputValue: '' })
+    this.setState({ fileInputValue: '', loading: true })
   }
 
   render() {
     return (
       <StyledUploader>
+        {this.state.loading && <InlineLoader /> }
         <label htmlFor="csv-upload">
           <UploadIcon />
           <span>
@@ -55,6 +60,7 @@ class CSVUploader extends React.Component {
           </span>
         </label>
         <input
+          disabled={this.state.loading}
           type="file"
           id="csv-upload"
           accept="text/csv"

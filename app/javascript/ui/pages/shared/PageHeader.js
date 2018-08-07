@@ -8,7 +8,7 @@ import ActivityLogButton from '~/ui/notifications/ActivityLogButton'
 import Breadcrumb from '~/ui/layout/Breadcrumb'
 import ActionMenu from '~/ui/grid/ActionMenu'
 import EditableName from '~/ui/pages/shared/EditableName'
-import Roles from '~/ui/grid/Roles'
+import RolesModal from '~/ui/roles/RolesModal'
 import RolesSummary from '~/ui/roles/RolesSummary'
 import FilledProfileIcon from '~/ui/icons/FilledProfileIcon'
 import ProfileIcon from '~/ui/icons/ProfileIcon'
@@ -174,7 +174,7 @@ class PageHeader extends React.Component {
     return (
       <FixedPageHeader>
         <MaxWidthContainer>
-          <Roles
+          <RolesModal
             record={rolesRecord}
             roles={rolesRecord.roles}
           />

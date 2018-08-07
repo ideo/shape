@@ -5,7 +5,7 @@ import RolesMenu from '~/ui/roles/RolesMenu'
 
 @inject('apiStore', 'uiStore')
 @observer
-class Roles extends React.Component {
+class RolesModal extends React.Component {
   componentDidMount() {
     this.fetchRoles()
   }
@@ -57,16 +57,16 @@ class Roles extends React.Component {
   }
 }
 
-Roles.propTypes = {
+RolesModal.propTypes = {
   record: MobxPropTypes.objectOrObservableObject.isRequired,
   roles: MobxPropTypes.arrayOrObservableArray,
 }
-Roles.wrappedComponent.propTypes = {
+RolesModal.wrappedComponent.propTypes = {
   apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }
-Roles.defaultProps = {
+RolesModal.defaultProps = {
   roles: [],
 }
 
-export default Roles
+export default RolesModal
