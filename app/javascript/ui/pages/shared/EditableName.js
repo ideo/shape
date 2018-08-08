@@ -103,7 +103,7 @@ class EditableName extends React.Component {
 
     let extraTruncatorSpacing = 250
     if (uiStore.windowWidth < v.responsive.smallBreakpoint) {
-      extraTruncatorSpacing = 300
+      extraTruncatorSpacing = 400
     } else if (uiStore.windowWidth < v.responsive.medBreakpoint) {
       extraTruncatorSpacing = 600
     } else if (uiStore.windowWidth < v.responsive.largeBreakpoint) {
