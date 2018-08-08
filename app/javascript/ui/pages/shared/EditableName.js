@@ -103,11 +103,11 @@ class EditableName extends React.Component {
 
     let extraTruncatorSpacing = 250
     if (uiStore.windowWidth < v.responsive.smallBreakpoint) {
-      extraTruncatorSpacing = 400
+      extraTruncatorSpacing = 340
     } else if (uiStore.windowWidth < v.responsive.medBreakpoint) {
-      extraTruncatorSpacing = 600
+      extraTruncatorSpacing = 520
     } else if (uiStore.windowWidth < v.responsive.largeBreakpoint) {
-      extraTruncatorSpacing = 440
+      extraTruncatorSpacing = 460
     }
 
     if (canEdit && editingName) {
@@ -137,7 +137,7 @@ class EditableName extends React.Component {
           text={this.name}
           key={this.name}
           extraSpacing={extraTruncatorSpacing}
-          minWidth={Math.min((v.maxWidth - 600), uiStore.windowWidth)} />
+          minWidth={Math.min((v.maxWidth - 300), uiStore.windowWidth)} />
       </Heading1>
     )
     return (
