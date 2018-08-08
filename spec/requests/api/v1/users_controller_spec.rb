@@ -22,9 +22,9 @@ describe Api::V1::UsersController, type: :request, json: true, auth: true do
       expect(response.status).to eq(200)
     end
 
-    it 'includes all active users in the system, not including current user' do
+    it 'includes all active users in the organization, not including current user' do
       get(path)
-      expect(json_object_ids).to match_array((org_users + other_org_users).map(&:id))
+      expect(json_object_ids).to match_array(org_users.map(&:id))
     end
   end
 

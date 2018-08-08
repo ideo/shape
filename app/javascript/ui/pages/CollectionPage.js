@@ -62,9 +62,11 @@ class CollectionPage extends PageWithApi {
     collection.checkCurrentOrg()
     if (collection.isNormalCollection) {
       const thread = await apiStore.findOrBuildCommentThread(collection)
-      const menu = uiStore.openOptionalMenus(location.search)
-      if (menu === 'comments') {
-        uiStore.expandThread(thread.key)
+      if (location.search) {
+        const menu = uiStore.openOptionalMenus(location.search)
+        if (menu === 'comments') {
+          uiStore.expandThread(thread.key)
+        }
       }
     } else {
       apiStore.clearUnpersistedThreads()

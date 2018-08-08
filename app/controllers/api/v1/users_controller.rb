@@ -5,7 +5,7 @@ class Api::V1::UsersController < Api::V1::BaseController
   def index
     # show all other active users in the system
     # i.e. like Trello, is not limited to your org but anyone who's registered
-    @users = User.all_active_except(current_user.id)
+    @users = User.all_active_except(current_user.id, in_org: @organization)
     render jsonapi: @users, fields:
       {
         users: User.basic_api_fields,

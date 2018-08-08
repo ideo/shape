@@ -57,6 +57,7 @@ const fakeUiStore = {
   expandedThreadKey: null,
   expandThread: jest.fn(),
   openGroup: jest.fn(),
+  openOptionalMenus: jest.fn(),
   trackEvent: jest.fn(),
   trackedRecords: {},
   editingName: false,

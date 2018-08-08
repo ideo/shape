@@ -26,7 +26,13 @@ beforeEach(() => {
   uiStore = fakeUiStore
   routingStore = fakeRoutingStore
   match = { params: { id, org: apiStore.currentOrgSlug }, path: '/collections/1', url: '/collections/1' }
-  props = { apiStore, uiStore, routingStore, match }
+  props = {
+    apiStore,
+    uiStore,
+    routingStore,
+    match,
+    location: { search: '' },
+  }
 
   wrapper = shallow(
     <CollectionPage.wrappedComponent {...props} />
@@ -102,6 +108,18 @@ describe('CollectionPage', () => {
 
     it('should track an event for updating the collection', () => {
       expect(uiStore.trackEvent).toHaveBeenCalledWith('update', collection)
+    })
+  })
+
+  describe('with params ?open=comments', () => {
+    beforeEach(() => {
+      wrapper = shallow(
+        <CollectionPage.wrappedComponent {...props} location={{ search: '?open=comments' }} />
+      )
+    })
+
+    it('should call uiStore to open the comments', () => {
+      expect(uiStore.openOptionalMenus).toHaveBeenCalledWith('?open=comments')
     })
   })
 })
