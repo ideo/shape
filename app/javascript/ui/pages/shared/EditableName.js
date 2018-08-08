@@ -101,6 +101,15 @@ class EditableName extends React.Component {
     const { canEdit, TextWrapper, fontSize, uiStore } = this.props
     const { editingName } = uiStore
 
+    let extraTruncatorSpacing = 250
+    if (uiStore.windowWidth < v.responsive.smallBreakpoint) {
+      extraTruncatorSpacing = 300
+    } else if (uiStore.windowWidth < v.responsive.medBreakpoint) {
+      extraTruncatorSpacing = 600
+    } else if (uiStore.windowWidth < v.responsive.largeBreakpoint) {
+      extraTruncatorSpacing = 440
+    }
+
     if (canEdit && editingName) {
       const clickHandlers = [
         () => this.stopEditingName()
@@ -127,8 +136,8 @@ class EditableName extends React.Component {
         <Truncator
           text={this.name}
           key={this.name}
-          extraSpacing={200}
-          minWidth={v.maxWidth - 500} />
+          extraSpacing={extraTruncatorSpacing}
+          minWidth={Math.min((v.maxWidth - 600), uiStore.windowWidth)} />
       </Heading1>
     )
     return (
