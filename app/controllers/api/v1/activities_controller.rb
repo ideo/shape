@@ -22,7 +22,7 @@ class Api::V1::ActivitiesController < Api::V1::BaseController
     params.require(:activity).permit(
       :action,
       :target_type,
-      :target_id
+      :target_id,
     )
   end
 end

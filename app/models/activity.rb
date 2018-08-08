@@ -50,4 +50,10 @@ class Activity < ApplicationRecord
       mentioned
     ].include? action.to_s
   end
+
+  def no_subjects?
+    %w[
+      downloaded
+    ].include? action.to_s
+  end
 end
