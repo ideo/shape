@@ -21,11 +21,11 @@ Rails.application.routes.draw do
       end
       resources :collection_cards, shallow: true, except: :show do
         member do
-          patch 'archive'
           patch 'replace'
         end
         collection do
           patch 'move'
+          patch 'archive'
           post 'link'
           post 'duplicate'
         end

@@ -4,7 +4,7 @@ import Dialog from './Dialog'
 
 class ConfirmationDialog extends React.PureComponent {
   handleCancel = (ev) => {
-    ev.preventDefault()
+    if (ev) ev.preventDefault()
     const { onCancel } = this.props
     if (onCancel) onCancel()
     this.props.onClose()
@@ -27,7 +27,12 @@ class ConfirmationDialog extends React.PureComponent {
       prompt,
     } = this.props
 
-    const modalProps = { ...this.props, open: this.isOpen, maxWidth: 'sm' }
+    const modalProps = {
+      ...this.props,
+      onClose: this.handleCancel,
+      open: this.isOpen,
+      maxWidth: 'sm',
+    }
 
     return (
       <Dialog {...modalProps}>

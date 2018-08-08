@@ -130,12 +130,35 @@ class CollectionCard extends BaseRecord {
     }
   }
 
+  reselectOnlyEditableCards(cardIds) {
+    const filteredCardIds =
+      this.apiStore.findAll('collection_cards').filter(card => (
+        (cardIds.indexOf(card.id) > -1) && (card.record && card.record.can_edit)
+      )).map(card => card.id)
+    const removedCount = (uiStore.selectedCardIds.length - filteredCardIds.length)
+    uiStore.reselectCardIds(filteredCardIds)
+    return removedCount
+  }
+
   async API_archive({ isReplacing = false } = {}) {
+    const { selectedCardIds } = uiStore
     const popupAgreed = new Promise((resolve, reject) => {
       let prompt = 'Are you sure you want to archive this?'
       const confirmText = 'Archive'
       let iconName = 'Archive'
-      if (this.link) {
+      // check if multiple cards were selected
+      if (selectedCardIds.length > 1) {
+        const removedCount = this.reselectOnlyEditableCards(selectedCardIds)
+        prompt = 'Are you sure you want to archive '
+        if (uiStore.selectedCardIds.length > 1) {
+          prompt += `these ${selectedCardIds.length} objects?`
+        } else {
+          prompt += 'this?'
+        }
+        if (removedCount) {
+          prompt += ` ${removedCount} object${(removedCount > 1) ? 's were' : ' was'} not selected due to insufficient permissions.`
+        }
+      } else if (this.link) {
         iconName = 'Link'
         prompt = 'Are you sure you want to archive this link?'
       }
@@ -143,15 +166,20 @@ class CollectionCard extends BaseRecord {
         prompt,
         confirmText,
         iconName,
-        onConfirm: resolve,
+        onCancel: () => resolve(false),
+        onConfirm: () => resolve(true),
       })
     })
 
-    await popupAgreed
+    const agreed = await popupAgreed
+    if (!agreed) return false
+
     const collection = this.parent
     try {
-      collection.removeCard(this)
-      await this.apiStore.request(`collection_cards/${this.id}/archive`, 'PATCH')
+      collection.removeCardIds(selectedCardIds)
+      await this.apiStore.request(`collection_cards/archive`, 'PATCH', {
+        card_ids: selectedCardIds
+      })
 
       if (collection.collection_cards.length === 0) {
         uiStore.openBlankContentTool()
@@ -159,9 +187,9 @@ class CollectionCard extends BaseRecord {
       uiStore.trackEvent('archive', collection)
       return true
     } catch (e) {
-      uiStore.defaultAlertError()
-    } finally {
+      // re-fetch collection
       this.apiStore.fetch('collections', collection.id, true)
+      uiStore.defaultAlertError()
     }
     return false
   }
