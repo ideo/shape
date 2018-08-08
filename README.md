@@ -32,10 +32,7 @@ cp .env.example .env
 Create the database and migrate:
 
 ```
-rails db:create
-rails db:migrate
-# if you want to seed some fake data
-rails db:seed
+rails db:setup
 ```
 
 Run tests:
@@ -58,7 +55,11 @@ yarn test
 ```
 bin/webpack-dev-server
 ```
-1. Run your rails server:
+2. Run your sidekiq worker:
+```
+bundle exec sidekiq -e ${RACK_ENV:-development} -C config/sidekiq.yml
+```
+3. Run your rails server:
 ```
 bin/rails s
 ```
@@ -76,6 +77,6 @@ Run dev script:
 ./dev.sh
 ```
 This will open separate tabs to:
-  1. Run the webpack dev server
+  1. Run the webpack dev server and sidekiq worker
   1. Run the rails server
   1. Open atom in the project directory
