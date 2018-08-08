@@ -26,24 +26,26 @@ class ActivityAndNotificationBuilder < SimpleService
 
   def call
     create_activity
-    if @activity && @activity.should_notify?
-      create_notifications
-      store_in_firestore
-    end
+    return unless @activity&.should_notify?
+    create_notifications
+    store_in_firestore
   end
 
   private
 
   def create_activity
-    @activity = Activity.create(
+    @activity = Activity.new(
       actor: @actor,
-      subject_user_ids: @subject_user_ids,
-      subject_group_ids: @subject_group_ids,
       target: @target,
       action: @action,
       organization: @actor.current_organization,
       content: @content,
     )
+    unless @activity.no_subjects?
+      @activity.subject_user_ids = @subject_user_ids
+      @activity.subject_group_ids = @subject_group_ids
+    end
+    @activity.save
   end
 
   def create_notifications

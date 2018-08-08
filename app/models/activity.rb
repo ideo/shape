@@ -26,6 +26,7 @@ class Activity < ApplicationRecord
     edited: 7,
     replaced: 8,
     joined: 9,
+    downloaded: 10,
   }
 
   def self.role_name_to_action(role_name)
@@ -47,6 +48,12 @@ class Activity < ApplicationRecord
       added_admin
       commented
       mentioned
+    ].include? action.to_s
+  end
+
+  def no_subjects?
+    %w[
+      downloaded
     ].include? action.to_s
   end
 end
