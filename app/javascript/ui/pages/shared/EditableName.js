@@ -98,7 +98,7 @@ class EditableName extends React.Component {
   }
 
   render() {
-    const { canEdit, TextWrapper, fontSize, uiStore } = this.props
+    const { canEdit, fontSize, uiStore } = this.props
     const { editingName } = uiStore
 
     let extraTruncatorSpacing = 250
@@ -128,7 +128,7 @@ class EditableName extends React.Component {
         </StyledEditableName>
       )
     }
-    let nameEl = (
+    const nameEl = (
       <Heading1
         ref={this.textRef}
         onClick={canEdit ? this.startEditingName : null}
@@ -137,7 +137,8 @@ class EditableName extends React.Component {
           text={this.name}
           key={this.name}
           extraSpacing={extraTruncatorSpacing}
-          minWidth={Math.min((v.maxWidth - 300), uiStore.windowWidth)} />
+          minWidth={Math.min((v.maxWidth - 300), uiStore.windowWidth)}
+        />
       </Heading1>
     )
     return (
@@ -152,7 +153,6 @@ EditableName.propTypes = {
   name: PropTypes.string.isRequired,
   updateNameHandler: PropTypes.func.isRequired,
   canEdit: PropTypes.bool,
-  TextWrapper: PropTypes.element,
   fontSize: PropTypes.number,
 }
 
@@ -162,7 +162,6 @@ EditableName.wrappedComponent.propTypes = {
 
 EditableName.defaultProps = {
   canEdit: false,
-  TextWrapper: null,
   fontSize: 2.25,
 }
 
