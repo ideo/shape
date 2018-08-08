@@ -156,6 +156,8 @@ class CommentThreadContainer extends React.Component {
       const { activity } = notification
       const identifier = `${pluralTypeName(activity.target_type)}${activity.target_id}`
       return uiStore.trackedRecords.get(identifier)
+    }).filter(notification => {
+      return new Date(notification.created_at).getTime() > Date.now() - 30 * 1000
     })
   }
 
