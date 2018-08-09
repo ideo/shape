@@ -8,7 +8,6 @@ import _ from 'lodash'
 import v from '~/utils/variables'
 import { Heading1 } from '~/ui/global/styled/typography'
 import ClickWrapper from '~/ui/layout/ClickWrapper'
-import Truncator from '~/ui/global/Truncator'
 
 const StyledName = styled.div`
   display: block;
@@ -128,15 +127,6 @@ class EditableName extends React.Component {
   render() {
     const { canEdit, fontSize, uiStore } = this.props
     const { editingName } = uiStore
-
-    let extraTruncatorSpacing = 250
-    if (uiStore.windowWidth < v.responsive.smallBreakpoint) {
-      extraTruncatorSpacing = 340
-    } else if (uiStore.windowWidth < v.responsive.medBreakpoint) {
-      extraTruncatorSpacing = 520
-    } else if (uiStore.windowWidth < v.responsive.largeBreakpoint) {
-      extraTruncatorSpacing = 460
-    }
 
     if (canEdit && editingName) {
       const clickHandlers = [

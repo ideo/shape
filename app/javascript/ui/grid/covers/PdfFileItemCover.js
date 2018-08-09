@@ -1,10 +1,10 @@
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
+import Truncator from 'react-truncator'
 import v from '~/utils/variables'
 import CornerIcon from '~/ui/icons/CornerIcon'
 import FileIcon from '~/ui/grid/covers/FileIcon'
 import { uiStore } from '~/stores'
-import Truncator from '~/ui/global/Truncator'
 
 export const StyledPdfCover = styled.div`
   position: relative;
@@ -107,7 +107,7 @@ class PdfFileItemCover extends React.Component {
             <Truncator
               text={filestack_file.filename}
               key={filestack_file.filename}
-              extraSpacing={15}
+              extraSpacing={25}
             />
           </div>
         </div>
