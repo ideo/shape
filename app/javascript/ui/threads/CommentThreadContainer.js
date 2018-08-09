@@ -151,7 +151,7 @@ class CommentThreadContainer extends React.Component {
 
   get trackedNotifications() {
     const { apiStore, uiStore } = this.props
-    const notifications = apiStore.unreadNotifications
+    const notifications = apiStore.recentNotifications
     return notifications.filter(notification => {
       const { activity } = notification
       const identifier = `${pluralTypeName(activity.target_type)}${activity.target_id}`
