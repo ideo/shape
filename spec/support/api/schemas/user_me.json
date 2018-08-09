@@ -13,6 +13,7 @@
     "created_at": { "type": "date" },
     "terms_accepted": { "type": "boolean" },
     "show_helper": { "type": "boolean" },
+    "show_move_helper": { "type": "boolean" },
     "notify_through_email": { "type": "boolean" },
     "google_auth_token": { "type": "string" }
   },
