@@ -32,6 +32,26 @@ RSpec.describe ActivityAndNotificationBuilder, type: :service do
       it 'creates notifications for each user' do
         expect { builder.call }.to change(Notification, :count).by(2)
       end
+
+      it 'creates activity subjects for each user' do
+        expect { builder.call }.to change(ActivitySubject, :count).by(2)
+      end
+
+      context 'with action that does not notify' do
+        let(:action) { :edited }
+
+        it 'does not create notifications' do
+          expect { builder.call }.not_to change(Notification, :count)
+        end
+      end
+
+      context 'with action that does not have subjects' do
+        let(:action) { :downloaded }
+
+        it 'does not create activity subjects' do
+          expect { builder.call }.not_to change(ActivitySubject, :count)
+        end
+      end
     end
 
     context 'with a user and a group' do

@@ -11,11 +11,8 @@ FactoryBot.define do
     end
 
     name { Faker::Company.buzzword }
-    organization
-
-    trait :subcollection do
-      organization nil
-    end
+    # don't automatically call the `create_groups` callback when building a fake org for this collection
+    organization factory: :organization_without_groups
 
     factory :user_collection, class: Collection::UserCollection
     factory :shared_with_me_collection, class: Collection::SharedWithMeCollection

@@ -28,7 +28,6 @@ RSpec.describe NotificationDigest, type: :service do
           user_id: user.id,
           notification_ids: [notification.id],
           comment_thread_ids: [],
-          last_notification_mail_sent: user.last_notification_mail_sent.to_i,
         )
         digest_service.call
       end
@@ -52,7 +51,6 @@ RSpec.describe NotificationDigest, type: :service do
             user_id: user.id,
             notification_ids: [notification.id],
             comment_thread_ids: [],
-            last_notification_mail_sent: user.last_notification_mail_sent.to_i,
           )
           digest_service.call
         end
@@ -74,14 +72,12 @@ RSpec.describe NotificationDigest, type: :service do
           user_id: user.id,
           notification_ids: [],
           comment_thread_ids: [comment_thread.id],
-          last_notification_mail_sent: user.last_notification_mail_sent.to_i,
         )
         # ...and other_user
         expect(NotificationMailer).to receive(:notify).with(
           user_id: other_user.id,
           notification_ids: [],
           comment_thread_ids: [comment_thread.id],
-          last_notification_mail_sent: user.last_notification_mail_sent.to_i,
         )
         digest_service.call
       end

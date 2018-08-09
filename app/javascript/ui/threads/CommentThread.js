@@ -15,6 +15,7 @@ import hexToRgba from '~/utils/hexToRgba'
 import Moment from '~/ui/global/Moment'
 import Comment from './Comment'
 import CommentEntryForm from './CommentEntryForm'
+import CommentThreadLoader from './CommentThreadLoader'
 
 const StyledCommentThread = styled.div`
   .title {
@@ -42,7 +43,7 @@ const StyledCommentThread = styled.div`
   }
   .comments {
     margin: 5px 10px 0 10px;
-    ${props => !props.expanded && `
+    ${props => (!props.expanded || props.hasMore) && `
       z-index: 0;
       position: relative;
       top: -40px;
@@ -194,7 +195,7 @@ class CommentThread extends React.Component {
     const { thread, expanded } = this.props
 
     return (
-      <StyledCommentThread expanded={expanded}>
+      <StyledCommentThread hasMore={thread.hasMore} expanded={expanded}>
         <button className="title" onClick={this.props.onClick}>
           <StyledHeader lines={this.titleLines}>
             { this.renderThumbnail() }
@@ -212,6 +213,9 @@ class CommentThread extends React.Component {
           </StyledHeader>
         </button>
         <div className="comments">
+          { thread.hasMore && expanded &&
+            <CommentThreadLoader thread={thread} />
+          }
           { this.renderComments() }
         </div>
         <CommentEntryForm

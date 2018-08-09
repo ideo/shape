@@ -105,8 +105,9 @@ describe Api::V1::ItemsController, type: :request, json: true, auth: true do
       expect(item.reload.content).to eq('The wheels on the bus...')
     end
 
-    it 'updates the parent' do
+    it 'touches the parent (after_commit)' do
       patch(path, params: params)
+      parent.reload
       expect(parent.updated_at).to be > parent.created_at
     end
 

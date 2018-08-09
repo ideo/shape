@@ -78,7 +78,7 @@ const ITEM_HEIGHT = 48
 const styles = theme => ({
   root: {
     flexGrow: 1,
-    height: 140,
+    height: 30,
   },
   chip: {
     margin: theme.spacing.unit / 4,
