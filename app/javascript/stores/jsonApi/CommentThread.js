@@ -1,12 +1,16 @@
-import { observable, action, computed } from 'mobx'
+import { observable, action, computed, runInAction } from 'mobx'
 import _ from 'lodash'
 
 import { uiStore } from '~/stores'
 import BaseRecord from './BaseRecord'
 import Comment from './Comment'
 
+// should always be the same as paginates_per in comment.rb
+const PER_PAGE = 50
+
 class CommentThread extends BaseRecord {
   @observable comments = []
+  @observable links = {}
 
   @computed get key() {
     // include __persisted as part of the key,
@@ -32,6 +36,11 @@ class CommentThread extends BaseRecord {
     return comments
   }
 
+  @computed get hasMore() {
+    // if there is a "next" page link that means there are more comments
+    return !!this.links.next
+  }
+
   async API_create() {
     try {
       await this.save()
@@ -43,9 +52,19 @@ class CommentThread extends BaseRecord {
     }
   }
 
-  async API_fetchComments({ page = 1 } = {}) {
+  // use next param to get the "next page" of comments
+  async API_fetchComments({ next = false } = {}) {
+    const page = next ? this.links.next : 1
+    // if we had previously loaded additional pages, return it to the state
+    // where we just have the first page worth of comments
+    if (page === 1 && this.comments.length > PER_PAGE) {
+      this.comments.replace(
+        this.comments.toJS().slice(PER_PAGE * -1)
+      )
+    }
     const apiPath = `comment_threads/${this.id}/comments?page=${page}`
     const res = await this.apiStore.request(apiPath, 'GET')
+    runInAction(() => { this.links = res.links })
     this.importComments(res.data)
   }
 

@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types'
 import { Fragment } from 'react'
+import { observable, action } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import { Flex } from 'reflexbox'
 import styled from 'styled-components'
@@ -8,7 +9,7 @@ import ActivityLogButton from '~/ui/notifications/ActivityLogButton'
 import Breadcrumb from '~/ui/layout/Breadcrumb'
 import ActionMenu from '~/ui/grid/ActionMenu'
 import EditableName from '~/ui/pages/shared/EditableName'
-import Roles from '~/ui/grid/Roles'
+import RolesModal from '~/ui/roles/RolesModal'
 import RolesSummary from '~/ui/roles/RolesSummary'
 import FilledProfileIcon from '~/ui/icons/FilledProfileIcon'
 import ProfileIcon from '~/ui/icons/ProfileIcon'
@@ -43,6 +44,8 @@ const IconHolder = styled.span`
 @inject('routingStore', 'uiStore')
 @observer
 class PageHeader extends React.Component {
+  @observable iconAndTagsWidth = 0
+
   get canEdit() {
     const { record } = this.props
     return record.can_edit_content && !record.system_required
@@ -52,6 +55,11 @@ class PageHeader extends React.Component {
     const { record } = this.props
     return record.internalType === 'items' || (!record.isUserCollection &&
       !record.isSharedCollection)
+  }
+
+  @action updateIconAndTagsWidth(ref) {
+    if (!ref) return
+    this.iconAndTagsWidth = ref.offsetWidth
   }
 
   showObjectRoleDialog = () => {
@@ -174,7 +182,7 @@ class PageHeader extends React.Component {
     return (
       <FixedPageHeader>
         <MaxWidthContainer>
-          <Roles
+          <RolesModal
             record={rolesRecord}
             roles={rolesRecord.roles}
           />
@@ -190,9 +198,17 @@ class PageHeader extends React.Component {
                   name={record.name}
                   updateNameHandler={this.updateRecordName}
                   canEdit={this.canEdit}
+                  extraWidth={this.iconAndTagsWidth}
                 />
-                { this.collectionTypeIcon }
-                { this.collectionTypeOrInheritedTags }
+                <div
+                  style={{ display: 'flex' }}
+                  ref={(ref) => {
+                    this.updateIconAndTagsWidth(ref)
+                  }}
+                >
+                  { this.collectionTypeIcon }
+                  { this.collectionTypeOrInheritedTags }
+                </div>
               </Flex>
               <Flex align="flex-end" style={{ height: '60px', marginTop: '-10px' }}>
                 <Fragment>

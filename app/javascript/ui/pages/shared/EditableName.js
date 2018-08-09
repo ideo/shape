@@ -97,6 +97,34 @@ class EditableName extends React.Component {
     this.props.updateNameHandler(this.name)
   }
 
+  truncateName() {
+    const { extraWidth, uiStore } = this.props
+    if (!this.name) return ''
+    const screenWidth = Math.min(uiStore.windowWidth, v.maxWidth)
+    // Estimation of width based on current font size
+    const fontSizeMultiplier = screenWidth > v.responsive.smallBreakpoint ? 25 : 10
+    let marginRightPadding = screenWidth > v.responsive.medBreakpoint ? 500 : 250
+    if (screenWidth > v.responsive.largeBreakpoint) marginRightPadding = 400
+    if (extraWidth) marginRightPadding += extraWidth
+    let width = this.name.length * fontSizeMultiplier
+    // NOTE: this isn't really doing anything yet, but could be used to
+    // calculate the "true width" of the H1
+    if (this.textRef && this.name === this.truncatedName) {
+      width = this.textRef.offsetWidth
+    }
+    const diff = width - (screenWidth - marginRightPadding)
+    const truncateAmount = parseInt(diff / fontSizeMultiplier)
+    // check if there is more than 1 letter to truncate
+    if (truncateAmount > 1) {
+      const mid = parseInt((this.name.length - truncateAmount) / 2)
+      const firstPart = this.name.slice(0, mid)
+      const secondPart = this.name.slice(mid + truncateAmount, this.name.length)
+      this.truncatedName = `${firstPart}…${secondPart}`
+      return this.truncatedName
+    }
+    return this.name
+  }
+
   render() {
     const { canEdit, fontSize, uiStore } = this.props
     const { editingName } = uiStore
@@ -128,22 +156,16 @@ class EditableName extends React.Component {
         </StyledEditableName>
       )
     }
-    const nameEl = (
-      <Heading1
-        ref={this.textRef}
-        onClick={canEdit ? this.startEditingName : null}
-      >
-        <Truncator
-          text={this.name}
-          key={this.name}
-          extraSpacing={extraTruncatorSpacing}
-          minWidth={Math.min((v.maxWidth - 300), uiStore.windowWidth)}
-        />
-      </Heading1>
-    )
     return (
       <StyledName>
-        {nameEl}
+        <Heading1
+          innerRef={(ref) => {
+            this.textRef = ref
+          }}
+          onClick={canEdit ? this.startEditingName : null}
+        >
+          {this.truncateName()}
+        </Heading1>
       </StyledName>
     )
   }
@@ -154,6 +176,7 @@ EditableName.propTypes = {
   updateNameHandler: PropTypes.func.isRequired,
   canEdit: PropTypes.bool,
   fontSize: PropTypes.number,
+  extraWidth: PropTypes.number,
 }
 
 EditableName.wrappedComponent.propTypes = {
@@ -163,6 +186,7 @@ EditableName.wrappedComponent.propTypes = {
 EditableName.defaultProps = {
   canEdit: false,
   fontSize: 2.25,
+  extraWidth: 0,
 }
 
 EditableName.displayName = 'EditableName'

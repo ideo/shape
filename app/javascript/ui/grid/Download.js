@@ -1,6 +1,7 @@
-import PropTypes from 'prop-types'
+import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 
+import Activity from '~/stores/jsonApi/Activity'
 import DownloadIcon from '~/ui/icons/DownloadIcon'
 import Tooltip from '~/ui/global/Tooltip'
 
@@ -16,8 +17,10 @@ const IconHolder = styled.button`
 class Download extends React.Component {
   download = (ev) => {
     ev.preventDefault()
-    const { file } = this.props
+    const { record } = this.props
+    const file = record.filestack_file
     if (file.url) {
+      Activity.trackActivity('downloaded', record)
       window.open(file.url, '_blank')
     }
   }
@@ -37,9 +40,7 @@ class Download extends React.Component {
   }
 }
 Download.propTypes = {
-  file: PropTypes.shape({
-    url: PropTypes.string
-  }).isRequired,
+  record: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 
 export default Download

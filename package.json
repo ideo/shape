@@ -60,6 +60,7 @@
     "mobx-react-intl": "^1.4.0",
     "mobx-react-router": "^4.0.1",
     "moment-mini": "^2.19.4",
+    "papaparse": "^4.6.0",
     "parameterize": "^0.1.0",
     "pluralize": "^7.0.0",
     "prop-types": "^15.6.1",
