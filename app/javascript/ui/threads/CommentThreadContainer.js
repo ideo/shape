@@ -250,7 +250,7 @@ class CommentThreadContainer extends React.Component {
         }
         <div style={{ position: 'absolute', top: '62px', zIndex: 500, width: '100%' }}>
           {this.trackedNotifications.map(notification => (
-            <Notification notification={notification} key={notification.id} styleType='alert' hideShown />
+            <Notification notification={notification} key={notification.id} styleType='alert' />
           ))}
         </div>
         <ActivityContainer id={this.scrollOpts.containerId}>

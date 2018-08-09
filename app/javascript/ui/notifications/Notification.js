@@ -66,7 +66,6 @@ const ButtonContainer = styled.div`
 @observer
 class Notification extends React.Component {
   @observable fadeInProgress = true
-  @observable shown = false
   componentWillMount() {
     const { notification } = this.props
     const { activity } = notification
@@ -87,9 +86,6 @@ class Notification extends React.Component {
 
   @action componentDidMount() {
     this.fadeInProgress = false
-    sleep(3000).then(() => {
-      runInAction(() => { this.shown = true })
-    })
   }
 
   updateRead() {
@@ -117,7 +113,7 @@ class Notification extends React.Component {
   }
 
   get shouldHide() {
-    return (this.fadeInProgress || (this.props.hideShown && this.shown))
+    return (this.fadeInProgress)
   }
 
   get actors() {
@@ -192,11 +188,9 @@ class Notification extends React.Component {
 Notification.propTypes = {
   notification: MobxPropTypes.objectOrObservableObject.isRequired,
   styleType: PropTypes.oneOf(['default', 'alert']),
-  hideShown: PropTypes.bool,
 }
 Notification.defaultProps = {
   styleType: 'default',
-  hideShown: false,
 }
 
 export default Notification
