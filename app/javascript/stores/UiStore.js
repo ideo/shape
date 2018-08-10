@@ -58,7 +58,7 @@ export default class UiStore {
     cancelText: 'Cancel',
     onClose: () => this.closeDialog(),
   }
-  @observable dialogConfig = {...this.defaultDialogProps}
+  @observable dialogConfig = { ...this.defaultDialogProps }
   @observable blurContent = false
   @observable orgCreated = false
   @observable searchText = ''
