@@ -47,11 +47,6 @@ describe Users::OmniauthCallbacksController, type: :request do
       expect(User.find_by_uid(user.uid)).not_to be_nil
     end
 
-    it 'should create org for user' do
-      expect { post(path) }.to change(Organization, :count).by(1)
-      expect(User.find_by_uid(user.uid).current_organization).not_to be_nil
-    end
-
     context 'with updated email and pic' do
       let!(:email) { 'newemail@user.com' }
       let!(:picture) { 'newpic.jpg' }

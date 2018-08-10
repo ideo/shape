@@ -1,5 +1,6 @@
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
+import Truncator from 'react-truncator'
 import v from '~/utils/variables'
 import CornerIcon from '~/ui/icons/CornerIcon'
 import { uiStore } from '~/stores'
@@ -69,7 +70,11 @@ class GenericFileItemCover extends React.Component {
         </FileContainer>
         <div className="filename">
           <FileIcon mimeType={item.filestack_file.mimetype} />
-          { filestack_file.filename }
+          <Truncator
+            text={filestack_file.filename}
+            key={filestack_file.filename}
+            extraSpacing={25}
+          />
         </div>
       </StyledCover>
     )

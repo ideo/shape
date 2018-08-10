@@ -35,15 +35,16 @@ export class FirebaseClient {
   }
 
   startListening() {
-    this.listenForUsersThreads(apiStore.currentUser.id)
-    this.listenForUserNotifications(apiStore.currentUser.id)
+    if (!apiStore.currentUserId) return
+    this.listenForUsersThreads(apiStore.currentUserId)
+    this.listenForUserNotifications(apiStore.currentUserId)
   }
 
   stopListening() {
     this.listeners.forEach(listener => { _.isFunction(listener) && listener() })
     this.listeners = []
     apiStore.removeAll('notifications')
-    apiStore.removeAll('user_threads')
+    apiStore.removeAll('users_threads')
     apiStore.removeAll('comment_threads')
     apiStore.removeAll('comments')
   }

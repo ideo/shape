@@ -122,9 +122,11 @@ class Organization < ApplicationRecord
   def slug_candidates
     [
       :handle,
+      :name,
       [:handle, 1],
+      [:name, 1],
       [:handle, 2],
-      [:handle, 3],
+      [:name, 2],
       %i[handle id],
     ]
   end
