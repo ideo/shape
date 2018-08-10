@@ -80,9 +80,11 @@ class Modal extends React.Component {
         aria-labelledby={title}
         BackdropProps={{ invisible: true }}
       >
+        {/* onBack is an optional button */}
         { _.isFunction(onBack) &&
           <BackIconHolder onClick={onBack}><ArrowIcon /></BackIconHolder>
         }
+        {/* if onClose is not supplied, then the modal is "locked" until user takes an action */}
         { _.isFunction(onClose) &&
           <ModalCloseButton onClick={this.handleClose}>
             <CloseIcon />
