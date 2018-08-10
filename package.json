@@ -84,6 +84,7 @@
     "react-select": "^1.2.1",
     "react-svg-loader": "^2.1.0",
     "react-tag-autocomplete": "^5.5.1",
+    "react-truncator": "^0.0.1",
     "react-visibility-sensor": "^3.11.0",
     "react-window-size-listener": "^1.2.1",
     "reflexbox": "^3.0.1",

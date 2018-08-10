@@ -10,17 +10,13 @@ import { Heading1 } from '~/ui/global/styled/typography'
 import ClickWrapper from '~/ui/layout/ClickWrapper'
 
 const StyledName = styled.div`
-  display: inline-block;
+  display: block;
   vertical-align: top;
-  h1 {
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
 `
 StyledName.displayName = 'StyledName'
 
 const StyledEditableName = styled.div`
-  display: inline-block;
+  display: block;
   .input__name {
     width: 30vw;
     margin-bottom: 0.5rem;

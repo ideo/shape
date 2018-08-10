@@ -1,5 +1,6 @@
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
+import Truncator from 'react-truncator'
 import v from '~/utils/variables'
 import CornerIcon from '~/ui/icons/CornerIcon'
 import FileIcon from '~/ui/grid/covers/FileIcon'
@@ -22,12 +23,12 @@ export const StyledPdfCover = styled.div`
     left: 15px;
     max-height: 32px;
     position: absolute;
+    width: 95%;
   }
 
   .fileName {
     display: inline-block;
-    max-height: 32px;
-    overflow: hidden;
+    width: 75%;
     white-space: nowrap;
   }
 
@@ -40,9 +41,9 @@ StyledPdfCover.displayName = 'StyledPdfCover'
 
 export const ImageContainer = styled.div`
   border-radius: 12px;
-  clip-path: ${props => (props.orientation === 'landscape' ?
-    'polygon(0 0,0 100%,100% 100%,100% 52px,245px 0)' :
-    'polygon(0 0,0 100%,100% 100%,100% 53px,214px 0)')};
+  clip-path: ${props => (props.orientation === 'landscape'
+    ? 'polygon(0 0,0 100%,100% 100%,100% 52px,245px 0)'
+    : 'polygon(0 0,0 100%,100% 100%,100% 53px,214px 0)')};
   overflow: hidden;
   position: relative;
   transform: rotate(-8deg) translateX(${props => props.x}) translateY(${props => props.y}) translateZ(0);
@@ -98,11 +99,17 @@ class PdfFileItemCover extends React.Component {
           <CornerContainer>
             <CornerIcon />
           </CornerContainer>
-          <img src={pdfCoverUrl} />
+          <img src={pdfCoverUrl} alt="Pdf cover" />
         </ImageContainer>
         <div className="fileInfo">
           <FileIcon mimeType={item.filestack_file.mimetype} />
-          <span className="fileName">{ filestack_file.filename }</span>
+          <div className="fileName">
+            <Truncator
+              text={filestack_file.filename}
+              key={filestack_file.filename}
+              extraSpacing={25}
+            />
+          </div>
         </div>
       </StyledPdfCover>
     )
