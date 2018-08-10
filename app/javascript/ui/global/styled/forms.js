@@ -1,6 +1,7 @@
 import Chip from '@material-ui/core/Chip'
 import MuiSelect from '@material-ui/core/Select'
 import MenuItem from '@material-ui/core/MenuItem'
+import MuiCheckbox from '@material-ui/core/Checkbox'
 import AutosizeInput from 'react-input-autosize'
 import TextareaAutosize from 'react-autosize-textarea'
 import styled from 'styled-components'
@@ -176,6 +177,14 @@ export const Select = styled(MuiSelect)`
   }
 `
 Select.displayName = 'StyledSelect'
+
+/** @component */
+export const Checkbox = styled(MuiCheckbox)`
+  &.checkbox--error {
+    color: ${v.colors.orange};
+  }
+`
+Checkbox.displayName = 'StyledCheckbox'
 
 /** @component */
 export const SelectOption = styled(MenuItem)`
