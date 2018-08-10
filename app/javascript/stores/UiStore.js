@@ -144,10 +144,10 @@ export default class UiStore {
     this.movingCardIds.replace([...this.selectedCardIds])
   }
 
-  @action closeMoveMenu() {
+  @action closeMoveMenu({ deselect = true } = {}) {
     this.movingCardIds.replace([])
     this.movingFromCollectionId = null
-    this.deselectCards()
+    if (deselect) this.deselectCards()
   }
 
   @computed get isMovingCards() {
@@ -281,6 +281,10 @@ export default class UiStore {
     if (!this.isSelected(cardId)) {
       this.selectedCardIds.push(cardId)
     }
+  }
+
+  @action reselectCardIds(cardIds) {
+    this.selectedCardIds.replace(cardIds)
   }
 
   @computed get collectionCardIds() {
