@@ -149,13 +149,14 @@ class CommentThreadContainer extends React.Component {
 
   get trackedNotifications() {
     const { apiStore, uiStore } = this.props
-    const notifications = apiStore.recentNotifications
+    const notifications = Array.from(apiStore.recentNotifications.values())
     return notifications.filter(notification => {
+      // notification may have been cleared out
+      if (!notification) return false
       const { activity } = notification
+      if (activity.action === 'mentioned') return true
       const identifier = `${pluralTypeName(activity.target_type)}${activity.target_id}`
       return uiStore.trackedRecords.get(identifier)
-    }).filter(notification => {
-      return new Date(notification.created_at).getTime() > Date.now() - 10 * 1000
     })
   }
 
@@ -248,7 +249,7 @@ class CommentThreadContainer extends React.Component {
         }
         <div style={{ position: 'absolute', top: '62px', zIndex: 500, width: '100%' }}>
           {this.trackedNotifications.map(notification => (
-            <Notification notification={notification} key={notification.id} styleType='alert' />
+            <Notification notification={notification} key={notification.id} styleType="alert" />
           ))}
         </div>
         <ActivityContainer id={this.scrollOpts.containerId}>

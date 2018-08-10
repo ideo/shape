@@ -113,7 +113,7 @@ class Notification extends React.Component {
   }
 
   get shouldHide() {
-    return (this.fadeInProgress)
+    return this.fadeInProgress
   }
 
   get actors() {
