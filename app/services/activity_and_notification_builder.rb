@@ -7,6 +7,8 @@ class ActivityAndNotificationBuilder < SimpleService
     action:,
     subject_user_ids: [],
     subject_group_ids: [],
+    omit_user_ids: [],
+    omit_group_ids: [],
     combine: false,
     content: nil
   )
@@ -17,6 +19,8 @@ class ActivityAndNotificationBuilder < SimpleService
     # e.g. in the case of "archive" it will be all the admins of that record
     @subject_user_ids = subject_user_ids
     @subject_group_ids = subject_group_ids
+    @omit_user_ids = omit_user_ids
+    @omit_group_ids = omit_group_ids
     @combine = combine
     @content = content
     @errors = []
@@ -51,9 +55,11 @@ class ActivityAndNotificationBuilder < SimpleService
   def create_notifications
     # NOTE: this comes from roles/shared_methods
     group_user_ids = Group.where(id: @subject_group_ids).user_ids
+    @omit_user_ids += Group.where(id: @omit_group_ids).user_ids
     all_user_ids = @subject_user_ids + group_user_ids
     all_user_ids.uniq.each do |user_id|
       next if user_id == @actor.id
+      next if @omit_user_ids.include? user_id
       if @combine
         if (notif = combine_existing_notifications(user_id))
           @created_notifications << notif
