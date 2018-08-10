@@ -53,7 +53,7 @@ const fakeApiStore = ({ findResult = '', findAllResult = [], requestResult = '' 
       }
     },
     unreadNotifications: [],
-    recentNotifications: [],
+    recentNotifications: new Map(),
     currentThreads: [
       {
         id: 1,
