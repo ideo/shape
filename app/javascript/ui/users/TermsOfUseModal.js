@@ -43,7 +43,7 @@ const StyledDialog = styled(Dialog)`
     }
   }
   .checkbox--color {
-    color: ${v.colors.pacificBlue};
+    color: ${v.colors.pacificBlue} !important;
   }
   .checkbox--error {
     color: ${v.colors.orange};
@@ -116,7 +116,7 @@ class TermsOfUseModal extends React.Component {
                   <Checkbox
                     classes={{
                       checked: 'checkbox--color',
-                      default: displayError ? 'checkbox--error' : ''
+                      root: displayError ? 'checkbox--error' : ''
                     }}
                     checked={this.termsChecked}
                     onChange={this.handleTermsCheck}

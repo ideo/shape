@@ -215,7 +215,7 @@ class OrganizationMenu extends React.Component {
   }
 
   render() {
-    const { open, uiStore, apiStore } = this.props
+    const { open, uiStore, apiStore, locked } = this.props
     let content, title, onBack, onEdit
     switch (this.currentPage) {
     case 'addGroup':
@@ -225,7 +225,7 @@ class OrganizationMenu extends React.Component {
       break
     case 'newOrganization':
       title = 'New Organization'
-      onBack = this.goBack
+      onBack = locked ? null : this.goBack
       content = this.renderCreateOrganization()
       break
     case 'editOrganization':
@@ -262,7 +262,7 @@ class OrganizationMenu extends React.Component {
     return (
       <Modal
         title={title}
-        onClose={this.handleClose}
+        onClose={locked ? null : this.handleClose}
         onBack={onBack}
         onEdit={onEdit}
         open={open}
@@ -277,6 +277,8 @@ OrganizationMenu.propTypes = {
   organization: MobxPropTypes.objectOrObservableObject.isRequired,
   userGroups: MobxPropTypes.arrayOrObservableArray.isRequired,
   open: PropTypes.bool,
+  // `locked` is for when you're required to setup your initial org
+  locked: PropTypes.bool,
   onClose: PropTypes.func.isRequired,
 }
 OrganizationMenu.wrappedComponent.propTypes = {
@@ -284,7 +286,8 @@ OrganizationMenu.wrappedComponent.propTypes = {
   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 OrganizationMenu.defaultProps = {
-  open: false
+  open: false,
+  locked: false,
 }
 
 export default OrganizationMenu

@@ -5,9 +5,20 @@ class OrganizationTemplates < SimpleService
 
   def call
     setup_template_collection
+    share_template_collection
     setup_profile_template
     setup_profile_collection
     @org.save
+  end
+
+  # this also gets used in OrganizationBuilder
+  def share_template_collection
+    LinkToSharedCollectionsWorker.new.perform(
+      [@org.admin_group.user_ids],
+      [@org.admin_group.id],
+      [@org.template_collection.id],
+      [],
+    )
   end
 
   private
@@ -21,12 +32,6 @@ class OrganizationTemplates < SimpleService
     )
 
     @org.admin_group.add_role(Role::EDITOR, template_collection)
-    LinkToSharedCollectionsWorker.new.perform(
-      [@org.admin_group.user_ids],
-      [@org.admin_group.id],
-      [template_collection.id],
-      [],
-    )
   end
 
   def setup_profile_template

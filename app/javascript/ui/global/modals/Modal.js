@@ -59,11 +59,12 @@ const BackIconHolder = styled.button`
 class Modal extends React.Component {
   handleClose = (ev) => {
     ev.preventDefault()
-    this.props.onClose()
+    const { onClose } = this.props
+    if (onClose) onClose()
   }
 
   render() {
-    const { children, onBack, open, title } = this.props
+    const { children, onBack, onClose, open, title } = this.props
     let wrappedTitle = title
     if (typeof title === 'string') {
       wrappedTitle = <StyledHeading2>{title}</StyledHeading2>
@@ -79,12 +80,14 @@ class Modal extends React.Component {
         aria-labelledby={title}
         BackdropProps={{ invisible: true }}
       >
-        { _.isFunction(onBack) && (
+        { _.isFunction(onBack) &&
           <BackIconHolder onClick={onBack}><ArrowIcon /></BackIconHolder>
-        )}
-        <ModalCloseButton onClick={this.handleClose}>
-          <CloseIcon />
-        </ModalCloseButton>
+        }
+        { _.isFunction(onClose) &&
+          <ModalCloseButton onClick={this.handleClose}>
+            <CloseIcon />
+          </ModalCloseButton>
+        }
         {/*
           NOTE: DialogTitle / DialogContent need to be direct children of Dialog
           for built-in scrolling to work (where title remains fixed at top)
@@ -106,7 +109,7 @@ class Modal extends React.Component {
   }
 }
 Modal.propTypes = {
-  onClose: PropTypes.func.isRequired,
+  onClose: PropTypes.func,
   title: PropTypes.node.isRequired,
   children: PropTypes.node,
   open: PropTypes.bool,
@@ -114,6 +117,7 @@ Modal.propTypes = {
 }
 
 Modal.defaultProps = {
+  onClose: null,
   children: <div />,
   open: false,
   onBack: null,

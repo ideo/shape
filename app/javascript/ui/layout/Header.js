@@ -9,11 +9,13 @@ import Avatar from '~/ui/global/Avatar'
 import ProfileIcon from '~/ui/icons/ProfileIcon'
 import SettingsIcon from '~/ui/icons/SettingsIcon'
 import OrganizationDropdown from '~/ui/organizations/OrganizationDropdown'
+import OrganizationMenu from '~/ui/organizations/OrganizationMenu'
 import LeaveIcon from '~/ui/icons/LeaveIcon'
 import PopoutMenu from '~/ui/global/PopoutMenu'
 import ClickWrapper from '~/ui/layout/ClickWrapper'
 import { FixedHeader, MaxWidthContainer } from '~/ui/global/styled/layout'
 import v from '~/utils/variables'
+import { uiStore } from '~/stores'
 
 /* global IdeoSSO */
 
@@ -130,6 +132,21 @@ class Header extends React.Component {
   render() {
     const { apiStore, routingStore } = this.props
     const { currentUser } = apiStore
+    if (!currentUser.current_organization) {
+      if (!currentUser.terms_accepted) return ''
+      // user needs to set up their Org, will see the Org popup before proceeding
+      return (
+        <div>
+          <OrganizationMenu
+            organization={{}}
+            userGroups={[]}
+            onClose={() => null}
+            open={uiStore.organizationMenuOpen}
+            locked
+          />
+        </div>
+      )
+    }
     const { userDropdownOpen, orgDropdownOpen } = this.state
     const primaryGroup = currentUser.current_organization.primary_group
     return (
