@@ -160,6 +160,10 @@ export default class UiStore {
     return !!this.organizationMenuPage
   }
 
+  @action openOrgCreateModal() {
+    this.organizationMenuPage = 'newOrganization'
+  }
+
   @action openGroup(groupId) {
     this.organizationMenuPage = 'editRoles'
     this.organizationMenuGroupId = groupId
