@@ -59,6 +59,8 @@ describe Api::V1::CommentsController, type: :request, json: true, auth: true do
         action: :commented,
         subject_user_ids: [user.id],
         subject_group_ids: [],
+        omit_user_ids: [],
+        omit_group_ids: [],
         combine: true,
         content: 'heyo',
       )
