@@ -37,13 +37,13 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
     end
   end
 
+  before_action :load_and_authorize_cards, only: %i[archive]
   def archive
-    if @collection_card.archive!
-      create_notification(@collection_card, :archived)
-      render jsonapi: @collection_card.reload, include: [:parent, record: [:filestack_file]]
-    else
-      render_api_errors @collection_card.errors
-    end
+    CollectionCardArchiveWorker.perform_async(
+      @collection_cards.pluck(:id),
+      current_user.id,
+    )
+    render json: { archived: true }
   end
 
   before_action :load_and_authorize_replacing_card, only: %i[replace]
@@ -129,6 +129,13 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
   def load_and_authorize_replacing_card
     @replacing_card = CollectionCard.find(params[:id])
     authorize! :edit_content, @replacing_card.record
+  end
+
+  def load_and_authorize_cards
+    @collection_cards = CollectionCard.where(id: json_api_params[:card_ids])
+    @collection_cards.each do |cc|
+      authorize! :edit, cc
+    end
   end
 
   def create_notification(card, action)

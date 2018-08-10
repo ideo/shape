@@ -16,6 +16,13 @@ class Collection extends BaseRecord {
     this._reorderCards()
   }
 
+  @action removeCardIds(cardIds) {
+    this.collection_cards.filter(card => (
+      cardIds.indexOf(card.id) > -1
+    )).forEach(card => this.collection_cards.splice(this.collection_cards.indexOf(card), 1))
+    this._reorderCards()
+  }
+
   get organization() {
     return this.apiStore.find('organizations', this.organization_id)
   }
