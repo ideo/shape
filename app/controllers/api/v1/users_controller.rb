@@ -82,6 +82,7 @@ class Api::V1::UsersController < Api::V1::BaseController
       # these are the only fields you would update via the API
       :terms_accepted,
       :show_helper,
+      :show_move_helper,
       :notify_through_email,
     )
   end

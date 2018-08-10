@@ -3,13 +3,13 @@ import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 import Dialog from '@material-ui/core/Dialog'
 import DialogContent from '@material-ui/core/DialogContent'
-import Checkbox from '@material-ui/core/Checkbox'
 import FormControl from '@material-ui/core/FormControl'
 import FormControlLabel from '@material-ui/core/FormControlLabel'
 import FormHelperText from '@material-ui/core/FormHelperText'
 
 import {
   FormButton,
+  Checkbox,
 } from '~/ui/global/styled/forms'
 import { Heading1, Anchor } from '~/ui/global/styled/typography'
 import Link from '~/ui/global/Link'
@@ -42,13 +42,6 @@ const StyledDialog = styled(Dialog)`
       color: ${v.colors.orange};
     }
   }
-  .checkbox--color {
-    color: ${v.colors.pacificBlue} !important;
-  }
-  .checkbox--error {
-    color: ${v.colors.orange};
-  }
-
   .footer {
     text-align: center;
     img {
@@ -115,7 +108,6 @@ class TermsOfUseModal extends React.Component {
                 control={
                   <Checkbox
                     classes={{
-                      checked: 'checkbox--color',
                       root: displayError ? 'checkbox--error' : ''
                     }}
                     checked={this.termsChecked}
