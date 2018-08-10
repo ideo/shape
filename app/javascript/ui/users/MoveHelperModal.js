@@ -33,6 +33,7 @@ const StyledDialog = styled(Dialog)`
     width: 100%;
   }
 `
+StyledDialog.displayName = 'StyledDialog'
 
 @observer
 class MoveHelperModal extends React.Component {
@@ -49,11 +50,7 @@ class MoveHelperModal extends React.Component {
     const { currentUser } = this.props
     this.submitted = true
     if (this.dontShowChecked) {
-      this.isLoading = true
       currentUser.API_hideMoveHelper()
-        .finally(() => {
-          runInAction(() => { this.isLoading = false })
-        })
     }
   }
 
