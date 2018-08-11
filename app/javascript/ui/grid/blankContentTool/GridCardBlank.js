@@ -8,6 +8,7 @@ import AddTextIcon from '~/ui/icons/AddTextIcon'
 import AddCollectionIcon from '~/ui/icons/AddCollectionIcon'
 import AddFileIcon from '~/ui/icons/AddFileIcon'
 import AddVideoIcon from '~/ui/icons/AddVideoIcon'
+import LinkIcon from '~/ui/icons/LinkIcon'
 import v, { ITEM_TYPES } from '~/utils/variables'
 import FilestackUpload from '~/utils/FilestackUpload'
 import { StyledGridCard } from '~/ui/grid/GridCard'
@@ -41,11 +42,16 @@ const StyledGridCardInner = styled.div`
 `
 const StyledBlankCreationTool = styled.div`
   padding: 2rem;
+  position: relative;
   .foreground {
     position: relative;
     z-index: ${v.zIndex.gridCard};
     left: ${props => (props.replacing ? '25%' : 'auto')};
     width: ${props => (props.replacing ? '50%' : 'auto')};
+    &.foreground-bottom {
+      position: absolute;
+      bottom: -55%;
+    }
   }
   transition: ${v.transitionWithDelay};
   /* handle "small 4-col" layout i.e. layoutSize == 3 */
@@ -233,16 +239,8 @@ class GridCardBlank extends React.Component {
     return uiStore.blankContentToolState.emptyCollection && !this.state.creating
   }
 
-  startCreatingCollection = () => {
-    this.setState({ creating: 'collection' })
-  }
-
-  startCreatingText = () => {
-    this.setState({ creating: 'text' })
-  }
-
-  startCreatingVideo = () => {
-    this.setState({ creating: 'video' })
+  startCreating = type => () => {
+    this.setState({ creating: type })
   }
 
   createCardWith = (file) => {
@@ -364,7 +362,7 @@ class GridCardBlank extends React.Component {
     const size = v.iconSizes.bct
     return (
       <StyledBlankCreationTool replacing={isReplacing && !creating}>
-        <Flex className="foreground" align="center" justify="space-between">
+        <Flex className="foreground" justify="space-between">
           {(!isReplacing && (!creating || creating === 'collection')) &&
             <Box>
               <Tooltip
@@ -375,7 +373,7 @@ class GridCardBlank extends React.Component {
                 <BctButton
                   className="createCollection"
                   creating={creating === 'collection'}
-                  onClick={this.startCreatingCollection}
+                  onClick={this.startCreating('collection')}
                 >
                   <AddCollectionIcon width={size} height={size} color="white" />
                 </BctButton>
@@ -408,6 +406,25 @@ class GridCardBlank extends React.Component {
               </Tooltip>
             </Box>
           }
+          {(!creating || creating === 'link') &&
+            <Box>
+              <Tooltip
+                classes={{ tooltip: 'Tooltip' }}
+                title="Add URL"
+                placement="bottom"
+              >
+                <BctButton
+                  className="createLink"
+                  creating={creating === 'link'}
+                  onClick={this.startCreating('link')}
+                >
+                  <LinkIcon width={size} height={size} color="white" />
+                </BctButton>
+              </Tooltip>
+            </Box>
+          }
+        </Flex>
+        <Flex className={`foreground ${!creating ? 'foreground-bottom' : ''}`} justify="space-between">
           {(!creating || creating === 'video') &&
             <Box>
               <Tooltip
@@ -418,7 +435,7 @@ class GridCardBlank extends React.Component {
                 <BctButton
                   className="createVideo"
                   creating={creating === 'video'}
-                  onClick={this.startCreatingVideo}
+                  onClick={this.startCreating('video')}
                 >
                   <AddVideoIcon width={size} height={size} color="white" />
                 </BctButton>
