@@ -48,7 +48,7 @@ class GridCardIconWithName extends React.PureComponent {
         <Truncator
           text={text}
           key={text}
-          extraSpacing={60}
+          extraSpacing={65}
           debug={true}
         />
       </Container>

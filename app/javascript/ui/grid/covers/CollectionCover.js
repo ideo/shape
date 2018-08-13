@@ -5,6 +5,7 @@ import styled from 'styled-components'
 import Dotdotdot from 'react-dotdotdot'
 
 import v from '~/utils/variables'
+import { CardHeading } from '~/ui/global/styled/typography'
 import hexToRgba from '~/utils/hexToRgba'
 import ProfileIcon from '~/ui/icons/ProfileIcon'
 
@@ -81,19 +82,6 @@ const StyledCardContent = styled.div`
     padding-right: 2rem;
   `
   )}
-  h3 {
-    text-transform: uppercase;
-    font-size: 2rem;
-    margin-bottom: 0.25rem;
-    line-height: 1.2;
-    /* transition size change, with 0.25s delay */
-    transition: all 0.33s 0.25s;
-    @media only screen
-      and (min-width: ${v.responsive.medBreakpoint}px)
-      and (max-width: ${v.responsive.largeBreakpoint}px) {
-      font-size: 1.6rem;
-    }
-  }
 `
 StyledCardContent.displayName = 'StyledCardContent'
 
@@ -139,11 +127,11 @@ class CollectionCover extends React.Component {
         >
           <div className="overlay" />
           <div className="top">
-            <h3>
+            <CardHeading>
               <Dotdotdot clamp={height > 1 ? 6 : 3}>
                 {this.name}
               </Dotdotdot>
-            </h3>
+            </CardHeading>
           </div>
           <div className="bottom">
             <Dotdotdot clamp="auto">

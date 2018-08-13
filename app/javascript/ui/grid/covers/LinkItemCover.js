@@ -8,6 +8,7 @@ import v from '~/utils/variables'
 import hexToRgba from '~/utils/hexToRgba'
 import { StyledImageCover } from './ImageItemCover'
 import GridCardIconWithName from '~/ui/grid/shared'
+import { CardHeading } from '~/ui/global/styled/typography'
 
 const StyledLinkCover = styled.div`
   color: ${v.colors.cararra};
@@ -76,7 +77,7 @@ class LinkItemCover extends React.PureComponent {
         <StyledImageCover url={thumbnail_url}>
           <Flex className="inner" align="center" justify="center">
             <Box>
-              <h2 className="name">{truncatedName}</h2>
+              <CardHeading className="name">{truncatedName}</CardHeading>
               <p className="content">{truncatedContent}</p>
               <GridCardIconWithName
                 text={url}
