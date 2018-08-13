@@ -4,7 +4,7 @@ import Truncator from 'react-truncator'
 import v from '~/utils/variables'
 import CornerIcon from '~/ui/icons/CornerIcon'
 import { uiStore } from '~/stores'
-import { GridIconHolder } from '~/ui/grid/shared'
+import GridCardIconWithName from '~/ui/grid/shared'
 import FileIcon from '~/ui/grid/covers/FileIcon'
 
 // TODO styled cover shared with pdf cover
