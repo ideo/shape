@@ -80,14 +80,3 @@ class Api::V1::ItemsController < Api::V1::BaseController
     )
   end
 end
-
- Item.create(
-   name: "Goal",
-   type: "Item::LinkItem"
-   content: "The best soccer news on the web",
-   archived: false,
-   url: "https://goal.com",
-   icon_url: "http://www.goal.com/rebuild-beta-assets/favicons/favicon.ico",
- )
-
- Item.create(name: "Goal",type: "Item::LinkItem",content: "The best soccer news on the web",archived: false,url: "https://goal.com",icon_url: "http://www.goal.com/rebuild-beta-assets/favicons/favicon.ico",)

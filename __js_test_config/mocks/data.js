@@ -73,6 +73,23 @@ export const fakeImageItem = {
   rawAttributes: jest.fn().mockReturnValue(fakeTextItemAttrs),
   getRecordType: jest.fn().mockReturnValue('items'),
 }
+export const fakeLinkItemAttrs = {
+  id: 3,
+  type: 'Item::LinkItem',
+  name: 'Independent.uk',
+  content: 'The best news under the sun',
+  icon_url: 'http://icon.jpg',
+  thumbnail_url: 'http://thumb.jpg',
+  url: 'http://independente.co.uk',
+  inherited_tag_list: [],
+  can_edit: false,
+  parent_collection_card: fakeCollectionCard,
+}
+export const fakeLinkItem = {
+  ...fakeLinkItemAttrs,
+  rawAttributes: jest.fn().mockReturnValue(fakeLinkItemAttrs),
+  getRecordType: jest.fn().mockReturnValue('items'),
+}
 export const fakeFileItemAttrs = {
   id: 3,
   type: 'Item::FileItem',

@@ -4,6 +4,7 @@ import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 
 import GridCardHotspot from '~/ui/grid/GridCardHotspot'
+import LinkItemCover from '~/ui/grid/covers/LinkItemCover'
 import TextItemCover from '~/ui/grid/covers/TextItemCover'
 import PdfFileItemCover from '~/ui/grid/covers/PdfFileItemCover'
 import ImageItemCover from '~/ui/grid/covers/ImageItemCover'
@@ -153,6 +154,8 @@ class GridCard extends React.Component {
       }
       case ITEM_TYPES.VIDEO:
         return <VideoItemCover item={record} dragging={this.props.dragging} />
+      case ITEM_TYPES.LINK:
+        return <LinkItemCover item={record} dragging={this.props.dragging} />
       default:
         return (
           <div>
