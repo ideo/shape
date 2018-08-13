@@ -11,6 +11,7 @@ import GridCardIconWithName from '~/ui/grid/shared'
 
 const StyledLinkCover = styled.div`
   color: ${v.colors.cararra};
+  cursor: pointer;
   width: 100%;
   height: 100%;
   .inner {
@@ -58,12 +59,20 @@ class LinkItemCover extends React.PureComponent {
     }
   }
 
+  handleClick = (ev) => {
+    const { item } = this.props
+    const { url } = item
+    ev.preventDefault()
+    Object.assign(document.createElement('a'), { target: '_blank', href: url})
+      .click()
+  }
+
   render() {
     const { item } = this.props
     const { name, content, url, thumbnail_url, icon_url } = item
     const { truncatedName, truncatedContent } = this.clamp()
     return (
-      <StyledLinkCover>
+      <StyledLinkCover onClick={this.handleClick}>
         <StyledImageCover url={thumbnail_url}>
           <Flex className="inner" align="center" justify="center">
             <Box>
