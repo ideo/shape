@@ -2,6 +2,7 @@ export const ITEM_TYPES = {
   TEXT: 'Item::TextItem',
   FILE: 'Item::FileItem',
   VIDEO: 'Item::VideoItem',
+  LINK: 'Item::LinkItem',
 }
 
 export const KEYS = {

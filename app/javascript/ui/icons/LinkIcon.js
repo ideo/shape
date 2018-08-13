@@ -1,8 +1,9 @@
+import PropTypes from 'prop-types'
 import Icon from './Icon'
 
-const LinkIcon = () => (
+const LinkIcon = ({ viewBox }) => (
   <Icon fill>
-    <svg viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg">
+    <svg viewBox={viewBox} xmlns="http://www.w3.org/2000/svg">
       <defs>
         <path d="M6.123 10.315a.72.72 0 0 0-.035 1.037.758.758 0 0 0 .548.231.758.758 0 0 0 .514-.198L11.8 7.13a.72.72 0 0 0 .035-1.036.764.764 0 0 0-1.062-.034l-4.65 4.255z" id="a" />
         <path d="M9.659 1.644L7.08 4.142a.722.722 0 0 0-.003 1.037.764.764 0 0 0 1.063.004l2.566-2.488c1.37-1.278 3.529-1.312 4.812-.076.588.568.907 1.358.896 2.224-.01.877-.366 1.702-.976 2.262L12.601 9.71a.721.721 0 0 0-.033 1.036.762.762 0 0 0 1.062.032l2.839-2.606c.905-.831 1.433-2.039 1.448-3.312.016-1.25-.474-2.448-1.343-3.285-1.855-1.789-4.952-1.762-6.915.068z" id="b" />
@@ -22,5 +23,13 @@ const LinkIcon = () => (
     </svg>
   </Icon>
 )
+
+LinkIcon.propTypes = {
+  viewBox: PropTypes.string,
+}
+
+LinkIcon.defaultProps = {
+  viewBox: '0 0 18 18'
+}
 
 export default LinkIcon

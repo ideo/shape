@@ -20,9 +20,10 @@ import Tooltip from '~/ui/global/Tooltip'
 import CollectionCreator from './CollectionCreator'
 import TextItemCreator from './TextItemCreator'
 import VideoCreator from './VideoCreator'
+import LinkCreator from './LinkCreator'
 
 const StyledGridCardBlank = StyledGridCard.extend`
-  background: ${props => (props.emptyState ? 'transparent' : 'white')};
+  background: transparent;
   cursor: auto;
   position: relative;
   button {
@@ -47,10 +48,9 @@ const StyledBlankCreationTool = styled.div`
     position: relative;
     z-index: ${v.zIndex.gridCard};
     left: ${props => (props.replacing ? '25%' : 'auto')};
-    width: ${props => (props.replacing ? '50%' : 'auto')};
+    width: ${props => (props.replacing ? '50%' : '100%')};
     &.foreground-bottom {
-      position: absolute;
-      bottom: -55%;
+      top: 120px;
     }
   }
   transition: ${v.transitionWithDelay};
@@ -59,6 +59,10 @@ const StyledBlankCreationTool = styled.div`
     and (min-width: ${v.responsive.medBreakpoint}px)
     and (max-width: ${v.responsive.largeBreakpoint}px) {
     padding: 1.5rem 1.33rem;
+
+    .foreground.foreground-bottom {
+      top: 90px;
+    }
   }
 `
 
@@ -71,7 +75,7 @@ const BctBackground = styled.div`
   height: 175px;
   border-radius: 50%;
   border: 8px solid ${v.colors.cyan};
-  background: ${props => (props.emptyState ? v.colors.aquaHaze : v.colors.desert)};
+  background: ${v.colors.aquaHaze};
   transition: ${v.transitionWithDelay};
   /* handle "small 4-col" layout i.e. layoutSize == 3 */
   @media only screen
@@ -126,7 +130,7 @@ const BctDropzone = styled.div`
     font-weight: 500;
     font-size: 1rem;
     position: absolute;
-    top: 70px;
+    top: 55px;
     left: 38px;
     .top, .bottom {
       text-transform: uppercase;
@@ -175,7 +179,7 @@ const BctDropzone = styled.div`
     width: 135px;
     left: 50px;
     .text {
-      top: 50px;
+      top: 40px;
       left: 25px;
       font-size: 0.9rem;
     }
@@ -184,8 +188,43 @@ const BctDropzone = styled.div`
       height: 120px;
     }
   }
-
 `
+
+const BctButtonBox = ({
+  type,
+  tooltip,
+  size,
+  creating,
+  onClick,
+  Icon,
+}) => (
+  <Box>
+    <Tooltip
+      classes={{ tooltip: 'Tooltip' }}
+      title={tooltip}
+      placement="bottom"
+    >
+      <BctButton
+        creating={creating === type}
+        onClick={onClick}
+      >
+        <Icon width={size} height={size} color="white" />
+      </BctButton>
+    </Tooltip>
+  </Box>
+)
+
+BctButtonBox.propTypes = {
+  type: PropTypes.string.isRequired,
+  tooltip: PropTypes.string.isRequired,
+  size: PropTypes.number.isRequired,
+  creating: PropTypes.string,
+  onClick: PropTypes.func.isRequired,
+  Icon: PropTypes.func.isRequired,
+}
+BctButtonBox.defaultProps = {
+  creating: '',
+}
 
 @inject('uiStore', 'apiStore')
 @observer
@@ -326,6 +365,15 @@ class GridCardBlank extends React.Component {
         />
       )
       break
+    case 'link':
+      inner = (
+        <LinkCreator
+          loading={this.state.loading}
+          createCard={this.createCard}
+          closeBlankContentTool={this.closeBlankContentTool}
+        />
+      )
+      break
     case 'text':
       // TextItemCreator is the only one that `returns`
       // since it doesn't use the BctBackground
@@ -358,93 +406,77 @@ class GridCardBlank extends React.Component {
 
     const isReplacing = !!this.props.uiStore.blankContentToolState.replacingId
     const { creating } = this.state
-
     const size = v.iconSizes.bct
+
+    const videoBctBox = (
+      <BctButtonBox
+        tooltip="Link video"
+        type="video"
+        creating={creating}
+        size={size}
+        onClick={this.startCreating('video')}
+        Icon={AddVideoIcon}
+      />
+    )
+
     return (
       <StyledBlankCreationTool replacing={isReplacing && !creating}>
         <Flex className="foreground" justify="space-between">
           {(!isReplacing && (!creating || creating === 'collection')) &&
-            <Box>
-              <Tooltip
-                classes={{ tooltip: 'Tooltip' }}
-                title="Create collection"
-                placement="bottom"
-              >
-                <BctButton
-                  className="createCollection"
-                  creating={creating === 'collection'}
-                  onClick={this.startCreating('collection')}
-                >
-                  <AddCollectionIcon width={size} height={size} color="white" />
-                </BctButton>
-              </Tooltip>
-            </Box>
+            <BctButtonBox
+              tooltip="Create collection"
+              type="collection"
+              creating={creating}
+              size={size}
+              onClick={this.startCreating('collection')}
+              Icon={AddCollectionIcon}
+            />
           }
           {(!isReplacing && !creating) &&
-            <Tooltip
-              classes={{ tooltip: 'Tooltip' }}
-              title="Add text box"
-              placement="bottom"
-            >
-              <Box>
-                <BctButton className="createText" onClick={this.startCreatingText}>
-                  <AddTextIcon width={size} height={size} color="white" />
-                </BctButton>
-              </Box>
-            </Tooltip>
+            <BctButtonBox
+              tooltip="Add text box"
+              type="text"
+              creating={creating}
+              size={size}
+              onClick={this.startCreating('text')}
+              Icon={AddTextIcon}
+            />
           }
           {!creating &&
-            <Box>
-              <Tooltip
-                classes={{ tooltip: 'Tooltip' }}
-                title="Add file"
-                placement="bottom"
-              >
-                <BctButton className="createFile" onClick={this.pickImage}>
-                  <AddFileIcon width={size} height={size} color="white" />
-                </BctButton>
-              </Tooltip>
-            </Box>
+            <BctButtonBox
+              tooltip="Add file"
+              type="file"
+              creating={creating}
+              size={size}
+              onClick={this.pickImage}
+              Icon={AddFileIcon}
+            />
           }
-          {(!creating || creating === 'link') &&
-            <Box>
-              <Tooltip
-                classes={{ tooltip: 'Tooltip' }}
-                title="Add URL"
-                placement="bottom"
-              >
-                <BctButton
-                  className="createLink"
-                  creating={creating === 'link'}
-                  onClick={this.startCreating('link')}
-                >
-                  <LinkIcon width={size} height={size} color="white" />
-                </BctButton>
-              </Tooltip>
-            </Box>
+          {(!isReplacing && (!creating || creating === 'link')) &&
+            <BctButtonBox
+              tooltip="Add URL"
+              type="link"
+              creating={creating}
+              size={size}
+              onClick={this.startCreating('link')}
+              Icon={() => <LinkIcon viewBox={'-11 -11 40 40'} />}
+            />
+          }
+          {isReplacing &&
+            videoBctBox
           }
         </Flex>
-        <Flex className={`foreground ${!creating ? 'foreground-bottom' : ''}`} justify="space-between">
-          {(!creating || creating === 'video') &&
-            <Box>
-              <Tooltip
-                classes={{ tooltip: 'Tooltip' }}
-                title="Link video"
-                placement="bottom"
-              >
-                <BctButton
-                  className="createVideo"
-                  creating={creating === 'video'}
-                  onClick={this.startCreating('video')}
-                >
-                  <AddVideoIcon width={size} height={size} color="white" />
-                </BctButton>
-              </Tooltip>
-            </Box>
+        <Flex
+          className={`foreground ${!creating ? 'foreground-bottom' : ''}`}
+          align={creating ? '' : 'center'}
+          justify={creating ? 'space-between' : 'center'}
+        >
+          {(!isReplacing && (!creating || creating === 'video')) &&
+            videoBctBox
           }
         </Flex>
         {inner}
-        <BctBackground emptyState={this.emptyState} />
+        <BctBackground />
       </StyledBlankCreationTool>
     )
   }
@@ -454,7 +486,7 @@ class GridCardBlank extends React.Component {
     const { gridSettings, blankContentToolState } = uiStore
     const { creating } = this.state
     return (
-      <StyledGridCardBlank emptyState={this.emptyState}>
+      <StyledGridCardBlank>
         <StyledGridCardInner
           height={blankContentToolState.height}
           gridW={gridSettings.gridW}
