@@ -49,7 +49,7 @@ class LinkItemCover extends React.PureComponent {
       const second = name.slice(name.length - (desiredLength / 2), name.length)
       truncatedName = `${first}… ${second}`
     } else {
-      const desiredLength = 60 - 1 // one extra char for ellipsis
+      const desiredLength = 80 - 1 // one extra char for ellipsis
       const first = content.slice(0, desiredLength)
       truncatedContent = `${first}…`
       truncatedName = name
