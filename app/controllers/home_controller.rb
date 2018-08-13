@@ -1,6 +1,6 @@
 # Serve up static pages
 class HomeController < ApplicationController
-  before_action :authenticate_user!, except: %i[login sign_up login_as]
+  before_action :authenticate_user!, except: %i[login sign_up login_as marketing]
   before_action :set_omniauth_state
 
   def index
@@ -8,6 +8,10 @@ class HomeController < ApplicationController
     return redirect_to root_url if params[:path] == 'sidekiq'
   end
 
+  def marketing
+    render :action => 'index'
+  end
+ 
   def login
   end
 
