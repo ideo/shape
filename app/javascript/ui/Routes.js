@@ -12,6 +12,7 @@ import HomePage from '~/ui/pages/HomePage'
 import CollectionPage from '~/ui/pages/CollectionPage'
 import ItemPage from '~/ui/pages/ItemPage'
 import Loader from '~/ui/layout/Loader'
+import MarketingPage from '~/ui/pages/MarketingPage'
 import SearchPage from '~/ui/pages/SearchPage'
 import SettingsPage from '~/ui/pages/SettingsPage'
 import TermsPage from '~/ui/pages/TermsPage'
@@ -62,12 +63,20 @@ class Routes extends React.Component {
     }
   })
 
+  componentWillMount() {
+    this.handleAsAnonymousUser()
+  }
+
   componentDidMount() {
     const { apiStore } = this.props
-    apiStore.loadCurrentUserAndGroups().then(() => {
-      initDoorbell(apiStore.currentUser)
-      firebaseClient.authenticate(apiStore.currentUser.google_auth_token)
-    })
+    const isAnonymous = this.state.isAnonymous
+
+    if(!isAnonymous) {
+      apiStore.loadCurrentUserAndGroups().then(() => {
+        initDoorbell(apiStore.currentUser)
+        firebaseClient.authenticate(apiStore.currentUser.google_auth_token)
+      })
+    } // Later, we're going to need to use firestore anonymous here for anonymous pages
   }
 
   handleWindowResize = ({ windowWidth }) => {
@@ -78,13 +87,30 @@ class Routes extends React.Component {
     uiStore.update('windowWidth', windowWidth)
   }
 
+  handleAsAnonymousUser(){
+    const { apiStore, routingStore } = this.props
+    /// even if logged in, you're anonymous for marketing site
+    if (routingStore.pathContains('/marketing')){
+      this.setState({isAnonymous: true})
+    } else {
+      this.setState({isAnonymous: false})
+    }
+  }
+
   render() {
     const { apiStore, routingStore } = this.props
-    if (!apiStore.currentUser) {
+
+    const isAnonymous = this.state.isAnonymous
+
+    if (!isAnonymous && !apiStore.currentUser) {
       return <Loader />
     }
+
     const displayTermsPopup = (
-      !apiStore.currentUser.terms_accepted && !routingStore.pathContains('/terms')
+      !isAnonymous && (
+        !apiStore.currentUser.terms_accepted
+        && !routingStore.pathContains('/terms')
+      )
     )
 
     return (
@@ -95,7 +121,8 @@ class Routes extends React.Component {
             <WindowSizeListener onResize={this.handleWindowResize} />
             <DialogWrapper />
 
-            <Header />
+            {!isAnonymous && <Header />
+            }
             <FixedBoundary className="fixed_boundary" />
             <FixedActivityLogWrapper>
               <ActivityLogBox />
@@ -106,6 +133,7 @@ class Routes extends React.Component {
             {/* Switch will stop when it finds the first matching path */}
             <Switch>
               <Route exact path="/" component={HomePage} />
+              <Route path="/marketing" component={MarketingPage} />
               {/* These routes are doubled up so that the non-org route
                 will route you to the org one */}
               <Route path="/collections/:id" component={CollectionPage} />
