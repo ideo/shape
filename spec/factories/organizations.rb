@@ -8,6 +8,15 @@ FactoryBot.define do
 
     name { Faker::Company.name }
 
+    # by default org has a `create_groups` callback with a lot of overhead.
+    # this allows a simpler version of create(:organization)
+    factory :organization_without_groups do
+      before(:create) do |org|
+        # idea from https://stackoverflow.com/a/35562805/260495
+        org.define_singleton_method(:create_groups) {}
+      end
+    end
+
     after(:create) do |org, evaluator|
       [Role::ADMIN, Role::MEMBER].each do |role|
         user = evaluator.send(role)

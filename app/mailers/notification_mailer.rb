@@ -1,11 +1,11 @@
 class NotificationMailer < ApplicationMailer
   add_template_helper ApplicationHelper
 
-  def notify(user_id:, last_notification_mail_sent:, notification_ids:, comment_thread_ids:)
-    # this is passed in because by the time we look up the user, the value will have been changed
-    # serialized as unix timestamp so we convert back to Time
-    @last_notification_mail_sent = Time.at(last_notification_mail_sent)
+  def notify(user_id:, notification_ids:, comment_thread_ids:)
     @user = User.find(user_id)
+    # preserve this value because we're about to update it
+    @last_notification_mail_sent = @user.last_notification_mail_sent
+    @user.update(last_notification_mail_sent: Time.now)
     @notifications = Notification
                      .where(id: notification_ids)
                      .order(created_at: :desc)

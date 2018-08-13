@@ -147,6 +147,7 @@ class ApiStore extends Store {
   }
 
   findThreadForRecord(record) {
+    if (!record) return null
     let thread = null
     // look within our local store
     this.findAll('comment_threads').forEach(ct => {

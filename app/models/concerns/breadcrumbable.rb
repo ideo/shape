@@ -38,10 +38,9 @@ module Breadcrumbable
     Breadcrumb::Builder.for_object(self)
   end
 
+  # really just an alias for save since before_update will call calculate_breadcrumb
   def recalculate_breadcrumb!
-    calculate_breadcrumb
     save
-    breadcrumb
   end
 
   def breadcrumb_contains?(object: nil, id: nil, klass: nil)

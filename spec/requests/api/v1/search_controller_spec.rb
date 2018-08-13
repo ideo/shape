@@ -37,7 +37,7 @@ describe Api::V1::SearchController, type: :request, json: true, auth: true, sear
       Collection.reindex
       Collection.searchkick_index.refresh
       # Let ElasticSearch indexing finish (even though it seems to be synchronous)
-      sleep 0.5 if ENV['CODESHIP']
+      ENV['CODESHIP'] ? sleep(0.5) : sleep(0.1)
     end
 
     context 'if user can view collection' do

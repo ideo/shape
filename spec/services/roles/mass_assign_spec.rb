@@ -2,7 +2,7 @@ require 'rails_helper'
 
 RSpec.describe Roles::MassAssign, type: :service do
   let(:organization) { create(:organization) }
-  let(:object) { create(:collection, num_cards: 2) }
+  let(:object) { create(:collection, organization: organization, num_cards: 2) }
   let(:users) { create_list(:user, 3) }
   let(:groups) { create_list(:group, 3) }
   let(:role_name) { :editor }
