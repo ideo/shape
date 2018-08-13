@@ -265,9 +265,18 @@ class GridCard extends React.Component {
     }
   }
 
+  linkOffsite(url) {
+    Object.assign(document.createElement('a'), { target: '_blank', href: url})
+      .click()
+  }
+
   handleClick = (e) => {
     const { dragging, record } = this.props
     if (dragging) return
+    if (record.type === ITEM_TYPES.LINK) {
+      this.linkOffsite(record.url)
+      return
+    }
     if (record.isPdfFile) {
       FilestackUpload.preview(record.filestack_file.handle, 'filePreview')
       return
@@ -276,10 +285,9 @@ class GridCard extends React.Component {
       return
     } else if (record.isGenericFile) {
       // TODO: will replace with preview
-      window.open(record.filestack_file.url, '_blank')
+      this.linkOffsite(record.filestack_file.url)
       return
-    }
-    this.props.handleClick(e)
+    }     this.props.handleClick(e)
   }
 
   render() {
