@@ -11,6 +11,7 @@
     "test": "jest --watch"
   },
   "jest": {
+    "testURL": "http://localhost",
     "roots": [
       "<rootDir>/__tests__",
       "<rootDir>/app/javascript"
