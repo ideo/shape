@@ -49,7 +49,6 @@ class GridCardIconWithName extends React.PureComponent {
           text={text}
           key={text}
           extraSpacing={65}
-          debug={true}
         />
       </Container>
     )
