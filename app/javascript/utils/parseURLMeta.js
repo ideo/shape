@@ -9,6 +9,20 @@ const parseURLMeta = async (urlStr) => {
   // add scheme e.g. if someone typed "www.url.com"
   if (!parsed.protocol) url = `http://${url}`
   parsed = parse(url)
+  if (!parsed || typeof parsed !== 'object') return false
+
+  const { hostname, pathname } = parsed
+  if (hostname.match(/shape\.space/i) ||
+    (process.env.SHAPE_APP === 'localhost' && hostname.match(/localhost/i))) {
+    const match = pathname.match(/\/(collections|items)\/(\d+)/)
+    if (match) {
+      return {
+        shapeLink: true,
+        recordType: match[1].slice(0, -1), // cut off the 's'
+        recordId: match[2],
+      }
+    }
+  }
 
   const parser = new DOMParser()
   const proxy = process.env.CORS_PROXY_URL || 'https://cors-anywhere-cdolzdpypb.now.sh/'

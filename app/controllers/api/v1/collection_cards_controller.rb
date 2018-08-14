@@ -9,7 +9,12 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
   end
 
   def create
-    builder = CollectionCardBuilder.new(params: collection_card_params,
+    card_params = collection_card_params
+    type = card_params.delete(:type) || 'primary'
+    # CollectionCardBuilder type expects 'primary' or 'link'
+    type = 'link' if type == 'CollectionCard::Link'
+    builder = CollectionCardBuilder.new(params: card_params,
+                                        type: type,
                                         parent_collection: @collection,
                                         user: current_user,
                                         replacing_card: @replacing_card)
@@ -159,6 +164,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
       :parent_id,
       :collection_id,
       :item_id,
+      :type,
       collection_attributes: %i[id name],
       item_attributes: [
         :id,

@@ -169,6 +169,7 @@ class GridCard extends React.Component {
           width={card.maxWidth}
           height={card.maxHeight}
           collection={record}
+          dragging={this.props.dragging}
         />
       )
     }

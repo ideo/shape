@@ -15,7 +15,7 @@ class LinkCreator extends React.Component {
       meta: {},
     }
     this.canceled = false
-    this.parseMetadata = _.debounce(this._parseMetadata, 1000)
+    this.parseMetadata = _.debounce(this._parseMetadata, 500)
   }
 
   componentWillUnmount() {
@@ -36,7 +36,7 @@ class LinkCreator extends React.Component {
     const meta = await parseURLMeta(url)
     if (this.canceled) return
     this.setState({ loading: false })
-    if (meta && meta.title) {
+    if (meta && (meta.title || meta.shapeLink)) {
       this.setState({
         meta,
         urlValid: true
@@ -50,7 +50,7 @@ class LinkCreator extends React.Component {
     e.preventDefault()
     if (!this.state.urlValid) return
     const { url, meta } = this.state
-    const attrs = {
+    let attrs = {
       item_attributes: {
         type: ITEM_TYPES.LINK,
         url,
@@ -60,6 +60,13 @@ class LinkCreator extends React.Component {
         icon_url: meta.icon,
       },
     }
+    if (meta.shapeLink) {
+      attrs = {
+        type: 'CollectionCard::Link',
+      }
+      attrs[`${meta.recordType}_id`] = meta.recordId
+    }
+    console.log('creating', attrs)
     this.props.createCard(attrs)
   }
 

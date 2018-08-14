@@ -16,7 +16,7 @@ class VideoCreator extends React.Component {
       thumbnailUrl: '',
     }
     this.canceled = false
-    this.lookupVideoAPI = _.debounce(this._lookupVideoAPI, 1000)
+    this.lookupVideoAPI = _.debounce(this._lookupVideoAPI, 500)
   }
 
   componentWillUnmount() {
