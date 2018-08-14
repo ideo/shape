@@ -36,7 +36,7 @@ describe('LinkItemCover', () => {
         rerender()
       })
 
-      it('should clamp the content down to 60 characters', () => {
+      it('should clamp the content down to 80 characters', () => {
         expect(wrapper.find('.content').text().length).toEqual(80)
       })
     })
@@ -54,7 +54,7 @@ describe('LinkItemCover', () => {
       })
 
       it('should clamp the name to 40 characters', () => {
-        expect(wrapper.find('.name').text().length).toEqual(40)
+        expect(wrapper.find('.name').dive().text().length).toEqual(40)
       })
     })
   })
