@@ -33,7 +33,7 @@ const IconHolder = styled.div`
     width: 100%;
     object-fit: cover;
     position: absolute;
-    top: 0;
+    top: 0
   }
 `
 
@@ -48,7 +48,7 @@ class GridCardIconWithName extends React.PureComponent {
         <Truncator
           text={text}
           key={text}
-          extraSpacing={65}
+          extraSpacing={80}
         />
       </Container>
     )

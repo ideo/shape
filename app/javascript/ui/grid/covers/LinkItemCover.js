@@ -17,8 +17,10 @@ const StyledLinkCover = styled.div`
   width: 100%;
   height: 100%;
   .inner {
+    box-sizing: border-box;
     height: 100%;
-    padding: 0 20px;
+    padding: 20px 20px;
+    padding-bottom: 60px;
     button {
       border: none;
       background: ${hexToRgba(v.colors.cyan, 0.75)};
@@ -43,8 +45,7 @@ class LinkItemCover extends React.PureComponent {
     const { name, content } = item
     let truncatedName = name || ''
     let truncatedContent = content || ''
-    if (!name) return { truncatedName, truncatedContent }
-    if (name.length > 32) {
+    if (name && name.length > 32) {
       // In this case, the title will be over 3 lines, so don't display
       // any content and truncate the title somewhat in the middle
       truncatedContent = ''
@@ -52,7 +53,7 @@ class LinkItemCover extends React.PureComponent {
       const first = name.slice(0, (desiredLength / 2))
       const second = name.slice(name.length - (desiredLength / 2), name.length)
       truncatedName = `${first}… ${second}`
-    } else {
+    } else  if (content && content.length > 40) {
       const desiredLength = 80 - 1 // one extra char for ellipsis
       const first = content.slice(0, desiredLength)
       truncatedContent = `${first}…`
@@ -71,7 +72,7 @@ class LinkItemCover extends React.PureComponent {
       <StyledLinkCover>
         <StyledImageCover url={thumbnail_url}>
           <Flex className="inner" align="center" justify="center">
-            <Box>
+            <Box style={{ width: '100%' }}>
               <CardHeading className="name">{truncatedName}</CardHeading>
               <p className="content">{truncatedContent}</p>
               <GridCardIconWithName

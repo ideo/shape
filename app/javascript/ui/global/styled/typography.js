@@ -127,6 +127,7 @@ export const CardHeading = styled.h2`
   font-size: 2.25rem;
   line-height: 2.5rem;
   margin-bottom: 0.25rem;
+  max-width: 100%;
   text-transform: none;
   transition: all 0.33s 0.25s;
 
