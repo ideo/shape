@@ -122,3 +122,18 @@ export const Anchor = styled.a`
   }
 `
 Anchor.displayName = 'StyledAnchor'
+
+export const CardHeading = styled.h2`
+  font-size: 2.25rem;
+  line-height: 2.5rem;
+  margin-bottom: 0.25rem;
+  text-transform: none;
+  transition: all 0.33s 0.25s;
+
+  @media only screen
+    and (min-width: ${v.responsive.medBreakpoint}px)
+    and (max-width: ${v.responsive.largeBreakpoint}px) {
+    font-size: 2rem;
+  }
+`
+CardHeading.displayName = 'CardHeading'

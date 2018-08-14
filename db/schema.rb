@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180809214501) do
+ActiveRecord::Schema.define(version: 20180810231839) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -155,7 +155,6 @@ ActiveRecord::Schema.define(version: 20180809214501) do
   create_table "items", force: :cascade do |t|
     t.string "name"
     t.string "type"
-    t.string "image"
     t.text "content"
     t.bigint "cloned_from_id"
     t.boolean "archived", default: false
@@ -169,6 +168,7 @@ ActiveRecord::Schema.define(version: 20180809214501) do
     t.jsonb "cached_attributes"
     t.datetime "archived_at"
     t.string "archive_batch"
+    t.string "icon_url"
     t.index ["cloned_from_id"], name: "index_items_on_cloned_from_id"
   end
 
