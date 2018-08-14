@@ -8058,9 +8058,9 @@ react-transition-group@^2.2.1:
     prop-types "^15.5.8"
     warning "^3.0.0"
 
-react-truncator@^0.0.1:
-  version "0.0.1"
-  resolved "https://registry.yarnpkg.com/react-truncator/-/react-truncator-0.0.1.tgz#3ff35e334970be8c77c6a3a48ed60acfccb963ad"
+react-truncator@^0.0.3:
+  version "0.0.3"
+  resolved "https://registry.yarnpkg.com/react-truncator/-/react-truncator-0.0.3.tgz#327e1383df79c2901cc0ab67e8ee138a6fdd7108"
   dependencies:
     babel-plugin-transform-class-properties "^6.24.1"
     lodash "^4.17.10"
