@@ -38,6 +38,8 @@ const StyledCardWrapper = styled.div`
   }
   &:hover {
     z-index: ${v.zIndex.gridCard};
+  }
+  &:hover, &.touch-device {
     .show-on-hover {
       /* don't show hover items while dragging */
       opacity: ${props => (props.dragging ? 0 : 1)};
@@ -311,7 +313,10 @@ class MovableGridCard extends React.PureComponent {
     }
 
     return (
-      <StyledCardWrapper dragging={!moveComplete}>
+      <StyledCardWrapper
+        className={uiStore.isTouchDevice ? 'touch-device' : ''}
+        dragging={!moveComplete}
+      >
         <Rnd
           bounds={null}
           onDragStart={this.handleStart}
