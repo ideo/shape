@@ -141,8 +141,8 @@ class Item < ApplicationRecord
   end
 
   def cache_attributes
-    if self.cached_tag_list != self.tag_list
-      self.cached_tag_list = self.tag_list
+    if cached_tag_list != tag_list
+      self.cached_tag_list = tag_list
     end
     cached_attributes
   end

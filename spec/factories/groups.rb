@@ -4,7 +4,7 @@ FactoryBot.define do
       add_admins []
       add_members []
     end
-    organization
+    organization factory: :organization_without_groups
     name { Faker::Team.name }
     handle { Faker::Internet.unique.slug }
 

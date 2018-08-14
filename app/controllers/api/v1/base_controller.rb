@@ -37,6 +37,19 @@ class Api::V1::BaseController < ApplicationController
     params[:_jsonapi] || {}
   end
 
+  def jsonapi_pagination(collection)
+    # check for pagination being enabled
+    return unless (current_page = collection.try(:current_page))
+    # NOTE: we are not following JSONAPI format, instead
+    # just returning the page number rather than absolute URL
+    {
+      first: 1,
+      last: collection.total_pages,
+      prev: collection.first_page? ? nil : current_page - 1,
+      next: collection.last_page? ? nil : current_page + 1,
+    }
+  end
+
   def render_api_errors(errors)
     render jsonapi_errors: errors, status: :bad_request
   end

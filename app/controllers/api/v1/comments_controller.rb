@@ -3,7 +3,8 @@ class Api::V1::CommentsController < Api::V1::BaseController
   def index
     # mark comments as read
     @comment_thread.viewed_by!(current_user)
-    render jsonapi: @comment_thread.comments.includes(:author).page(params[:page]), include: [
+    paginated_comments = @comment_thread.comments.includes(:author).page(params[:page])
+    render jsonapi: paginated_comments, include: [
       :author,
     ]
   end

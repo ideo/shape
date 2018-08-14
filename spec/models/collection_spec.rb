@@ -65,23 +65,15 @@ describe Collection, type: :model do
 
   describe '#allow_primary_group_view_access' do
     let!(:organization) { create(:organization) }
-    let!(:user_collection) { create(:user_collection, organization: organization) }
-    let!(:collection_card) { create(:collection_card, parent: user_collection) }
-    let(:collection) { create(:collection, organization: nil, parent_collection_card: collection_card) }
-    let!(:new_collection_card) { create(:collection_card_collection, parent: collection) }
-    let(:new_collection) { new_collection_card.collection }
+    # organization: nil == allow organization to inherit
+    let(:collection) { create(:collection, organization: organization) }
 
     before do
       collection.allow_primary_group_view_access
-      new_collection.allow_primary_group_view_access
     end
 
-    it 'gives view access to its organization\'s primary group if created in a UserCollection' do
+    it 'gives view access to its organization\'s primary group' do
       expect(organization.primary_group.has_role?(Role::VIEWER, collection)).to be true
-    end
-
-    it 'does not give view access to primary group if created in a different collection' do
-      expect(organization.primary_group.has_role?(Role::VIEWER, new_collection)).to be false
     end
   end
 
