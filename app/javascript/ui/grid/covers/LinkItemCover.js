@@ -11,6 +11,7 @@ import GridCardIconWithName from '~/ui/grid/shared'
 import { CardHeading } from '~/ui/global/styled/typography'
 
 const StyledLinkCover = styled.div`
+  background: ${v.colors.blackLava};
   color: ${v.colors.cararra};
   cursor: pointer;
   width: 100%;
