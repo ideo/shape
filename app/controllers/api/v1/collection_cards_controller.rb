@@ -167,6 +167,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
         :content,
         :url,
         :thumbnail_url,
+        :icon_url,
         :image,
         :archived,
         text_data: {},

@@ -36,7 +36,7 @@ class LinkCreator extends React.Component {
     const meta = await parseURLMeta(url)
     if (this.canceled) return
     this.setState({ loading: false })
-    if (meta) {
+    if (meta && meta.title) {
       this.setState({
         meta,
         urlValid: true

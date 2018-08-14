@@ -265,9 +265,10 @@ class GridCard extends React.Component {
     }
   }
 
-  linkOffsite(url) {
-    Object.assign(document.createElement('a'), { target: '_blank', href: url})
-      .click()
+  linkOffsite = (url) => {
+    Object.assign(
+      document.createElement('a'), { target: '_blank', href: url }
+    ).click()
   }
 
   handleClick = (e) => {
@@ -287,7 +288,8 @@ class GridCard extends React.Component {
       // TODO: will replace with preview
       this.linkOffsite(record.filestack_file.url)
       return
-    }     this.props.handleClick(e)
+    }
+    this.props.handleClick(e)
   }
 
   render() {
@@ -317,8 +319,7 @@ class GridCard extends React.Component {
         ) &&
           <StyledTopRightActions color={this.actionsColor}>
             { record.isDownloadable && (
-              <Download record={record}
-              />
+              <Download record={record} />
             )}
             <SelectionCircle cardId={card.id} />
             <ActionMenu
