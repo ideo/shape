@@ -9,6 +9,7 @@ import hexToRgba from '~/utils/hexToRgba'
 import { StyledImageCover } from './ImageItemCover'
 import GridCardIconWithName from '~/ui/grid/shared'
 import { CardHeading } from '~/ui/global/styled/typography'
+import { uiStore } from '~/stores'
 
 const StyledLinkCover = styled.div`
   background: ${v.colors.blackLava};
@@ -41,20 +42,24 @@ StyledLinkCover.displayName = 'StyledLinkCover'
 
 class LinkItemCover extends React.PureComponent {
   clamp() {
+    const desiredNameLen = uiStore.windowWidth > v.responsive.largeBreakpoint ?
+      40 : 28
+    const desiredContentLen = uiStore.windowWidth > v.responsive.largeBreakpoint ?
+      80 : 40
     const { item } = this.props
     const { name, content } = item
     let truncatedName = name || ''
     let truncatedContent = content || ''
-    if (name && name.length > 32) {
+    if (name && name.length > desiredNameLen) {
       // In this case, the title will be over 3 lines, so don't display
       // any content and truncate the title somewhat in the middle
       truncatedContent = ''
-      const desiredLength = 40 - 2 // two extra chars for ellipsis and space
+      const desiredLength = desiredNameLen - 2 // two extra chars for ellipsis and space
       const first = name.slice(0, (desiredLength / 2))
       const second = name.slice(name.length - (desiredLength / 2), name.length)
       truncatedName = `${first}… ${second}`
-    } else  if (content && content.length > 40) {
-      const desiredLength = 80 - 1 // one extra char for ellipsis
+    } else  if (content && content.length > desiredContentLen) {
+      const desiredLength = desiredContentLen - 1 // one extra char for ellipsis
       const first = content.slice(0, desiredLength)
       truncatedContent = `${first}…`
       truncatedName = name

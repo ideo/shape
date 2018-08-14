@@ -19,7 +19,7 @@ export default {
     horizontal: '2rem',
   },
 
-  // breakpoint sizes
+  // Keep in sync with assets/stylesheets/core/base.scss
   responsive: {
     // based on going from 2 -> 1 column
     smallBreakpoint: 645,

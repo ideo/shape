@@ -1,3 +1,9 @@
+
+// Keep in sync with utils/variables.js
+$smallBreakpoint: 645px;
+$medBreakpoint: 1060px;
+$largeBreakpoint: 1308px;
+
 body {
   background: #f2f1ee;
   // mainly for grid, so that you can't drag off to the right forever
@@ -20,11 +26,19 @@ h1 {
   margin-bottom: 1rem;
 }
 
+// Keep in sync with ui/global/styled/typography:CardHeading
 .quill h1 {
-  font-size: 3rem;
-  font-weight: 300;
-  line-height: 3.5rem;
+  font-size: 2.25rem;
+  line-height: 2.5rem;
+  margin-bottom: 0.25rem;
   text-transform: none;
+
+  @media only screen
+    and (min-width: $medBreakpoint)
+    and (max-width: $largeBreakpoint) {
+    font-size: 2rem;
+    line-height: 2.2rem;
+  }
 }
 
 h2 {

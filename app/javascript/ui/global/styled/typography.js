@@ -123,6 +123,7 @@ export const Anchor = styled.a`
 `
 Anchor.displayName = 'StyledAnchor'
 
+// Keep in sync with assets/stylesheets/core/base.scss:quill h1
 export const CardHeading = styled.h2`
   font-size: 2.25rem;
   line-height: 2.5rem;
@@ -135,6 +136,7 @@ export const CardHeading = styled.h2`
     and (min-width: ${v.responsive.medBreakpoint}px)
     and (max-width: ${v.responsive.largeBreakpoint}px) {
     font-size: 2rem;
+    line-height: 2.2rem;
   }
 `
 CardHeading.displayName = 'CardHeading'
