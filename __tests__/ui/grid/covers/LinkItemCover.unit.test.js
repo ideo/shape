@@ -1,4 +1,7 @@
 import LinkItemCover from '~/ui/grid/covers/LinkItemCover'
+import { uiStore } from '~/stores'
+
+jest.mock('../../../../app/javascript/stores')
 
 import {
   fakeLinkItem,
@@ -36,12 +39,30 @@ describe('LinkItemCover', () => {
         rerender()
       })
 
-      it('should clamp the content down to 80 characters', () => {
-        expect(wrapper.find('.content').text().length).toEqual(80)
+      describe('on the middle breakpoint', () => {
+        beforeEach(() => {
+          uiStore.windowWidth = 1090
+          rerender()
+        })
+
+        it('should clamp the content down to 40 characters', () => {
+          expect(wrapper.find('.content').text().length).toEqual(40)
+        })
+      })
+
+      describe('on the large breakpoint', () => {
+        beforeEach(() => {
+          uiStore.windowWidth = 2000
+          rerender()
+        })
+
+        it('should clamp the content down to 80 characters', () => {
+          expect(wrapper.find('.content').text().length).toEqual(80)
+        })
       })
     })
 
-    describe('with a name longer then 32 characters', () => {
+    describe('with a name longer then 30 characters', () => {
       beforeEach(() => {
         props.item.name = 'Soccer News, Live Scores, Results & Transfers | Goal.com US'
         props.item.content = 'The latest soccer news, live scores, results, rumours, transfers'
@@ -53,8 +74,26 @@ describe('LinkItemCover', () => {
         expect(wrapper.find('.content').text()).toEqual('')
       })
 
-      it('should clamp the name to 40 characters', () => {
-        expect(wrapper.find('.name').dive().text().length).toEqual(40)
+      describe('on the middle breakpoint', () => {
+        beforeEach(() => {
+          uiStore.windowWidth = 1090
+          rerender()
+        })
+
+        it('should clamp the name to 28 characters', () => {
+          expect(wrapper.find('.name').dive().text().length).toEqual(28)
+        })
+      })
+
+      describe('on the large breakpoint', () => {
+        beforeEach(() => {
+          uiStore.windowWidth = 2090
+          rerender()
+        })
+
+        it('should clamp the name to 40 characters', () => {
+          expect(wrapper.find('.name').dive().text().length).toEqual(40)
+        })
       })
     })
   })
