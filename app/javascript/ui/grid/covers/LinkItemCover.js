@@ -41,7 +41,9 @@ class LinkItemCover extends React.PureComponent {
   clamp() {
     const { item } = this.props
     const { name, content } = item
-    let truncatedName, truncatedContent
+    let truncatedName = name || ''
+    let truncatedContent = content || ''
+    if (!name) return { truncatedName, truncatedContent }
     if (name.length > 32) {
       // In this case, the title will be over 3 lines, so don't display
       // any content and truncate the title somewhat in the middle
