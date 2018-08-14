@@ -1,4 +1,4 @@
-import { action, observable, computed } from 'mobx'
+import { action, runInAction, observable, computed } from 'mobx'
 import { Store } from 'mobx-jsonapi-store'
 import _ from 'lodash'
 import moment from 'moment-mini'
@@ -23,6 +23,7 @@ class ApiStore extends Store {
   @observable currentUserOrganizationId = null
   @observable currentCommentThreadIds = []
   @observable currentPageThreadKey = null
+  @observable recentNotifications = new Map()
 
   @action setCurrentUserId(id) {
     this.currentUserId = id
@@ -116,6 +117,16 @@ class ApiStore extends Store {
 
   @computed get unreadNotificationsCount() {
     return this.unreadNotifications.length
+  }
+
+  @action addRecentNotification(notification) {
+    if (this.recentNotifications.has(notification.id)) return
+    if (!notification.read) {
+      this.recentNotifications.set(notification.id, notification)
+    }
+    setTimeout(() => {
+      runInAction(() => { this.recentNotifications.set(notification.id, null) })
+    }, 3000)
   }
 
   @computed get unreadCommentsCount() {

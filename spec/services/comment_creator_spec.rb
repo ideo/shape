@@ -1,15 +1,15 @@
 require 'rails_helper'
 
 RSpec.describe CommentCreator, type: :service do
-  let(:comment_thread) { create(:item_comment_thread) }
+  let(:followers) { create_list(:user, 2) }
+  let(:comment_thread) { create(:item_comment_thread, add_followers: followers) }
   let(:message) { 'This is my message to you.' }
   let(:author) { create(:user) }
   let(:mentioned) { create(:user) }
   let(:mentioned_group) { create(:group) }
   let(:comment) { comment_thread.comments.first }
-
-  before do
-    CommentCreator.call(
+  let(:comment_creator) do
+    CommentCreator.new(
       comment_thread: comment_thread,
       author: author,
       message: message,
@@ -42,21 +42,55 @@ RSpec.describe CommentCreator, type: :service do
   end
 
   describe '#call' do
-    it 'should create a comment' do
-      expect(comment_thread.comments.count).to be 1
-      expect(comment.persisted?).to be true
+    context 'with results of CommentCreator' do
+      before do
+        comment_creator.call
+      end
+
+      it 'should create a comment' do
+        expect(comment_thread.comments.count).to be 1
+        expect(comment.persisted?).to be true
+      end
+
+      it 'should add user as a follower' do
+        expect(author.comment_threads).to include(comment_thread)
+      end
+
+      it 'should add all mentioned users as followers' do
+        expect(mentioned.comment_threads).to include(comment_thread)
+      end
+
+      it 'should add all mentioned groups as followers' do
+        expect(mentioned_group.groups_threads.pluck(:comment_thread_id)).to include(comment_thread.id)
+      end
     end
 
-    it 'should add user as a follower' do
-      expect(author.comment_threads).to include(comment_thread)
-    end
+    context 'with notifications' do
+      it 'should send comment notifications to all followers' do
+        expect(ActivityAndNotificationBuilder).to receive(:call).with(
+          actor: author,
+          target: comment_thread.record,
+          action: :mentioned,
+          subject_user_ids: [mentioned.id],
+          subject_group_ids: [mentioned_group.id],
+          combine: true,
+          content: message,
+        )
 
-    it 'should add all mentioned users as followers' do
-      expect(mentioned.comment_threads).to include(comment_thread)
-    end
+        expect(ActivityAndNotificationBuilder).to receive(:call).with(
+          actor: author,
+          target: comment_thread.record,
+          action: :commented,
+          subject_user_ids: (followers.pluck(:id) + [author.id]),
+          subject_group_ids: [],
+          omit_user_ids: [mentioned.id],
+          omit_group_ids: [mentioned_group.id],
+          combine: true,
+          content: message,
+        )
 
-    it 'should add all mentioned groups as followers' do
-      expect(mentioned_group.groups_threads.pluck(:comment_thread_id)).to include(comment_thread.id)
+        comment_creator.call
+      end
     end
   end
 end
