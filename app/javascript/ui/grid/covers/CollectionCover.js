@@ -165,10 +165,13 @@ CollectionCover.propTypes = {
   width: PropTypes.number.isRequired,
   height: PropTypes.number.isRequired,
   collection: MobxPropTypes.objectOrObservableObject.isRequired,
-  dragging: PropTypes.bool.isRequired,
+  dragging: PropTypes.bool,
 }
 CollectionCover.wrappedComponent.propTypes = {
   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
+}
+CollectionCover.defaultProps = {
+  dragging: false,
 }
 
 CollectionCover.displayName = 'CollectionCover'

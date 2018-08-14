@@ -11,6 +11,7 @@ const PlainLink = styled(Link)`
     user-drag: none;
   `}
 `
+PlainLink.displayName = 'PlainLink'
 
 /** @component */
 export default PlainLink

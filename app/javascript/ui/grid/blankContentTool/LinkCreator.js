@@ -66,7 +66,6 @@ class LinkCreator extends React.Component {
       }
       attrs[`${meta.recordType}_id`] = meta.recordId
     }
-    console.log('creating', attrs)
     this.props.createCard(attrs)
   }
 
