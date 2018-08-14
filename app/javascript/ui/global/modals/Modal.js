@@ -17,6 +17,9 @@ const StyledDialog = styled(Dialog)`
     max-width: 760px;
     width: 100%;
   }
+  .modal__padding {
+    padding-left: 45px;
+  }
 `
 
 const StyledDialogTitle = styled(DialogTitle)`
@@ -53,10 +56,6 @@ const BackIconHolder = styled.button`
   }
 `
 
-const PaddedContent = styled.div`
-  padding: 0 20px;
-`
-
 class Modal extends React.Component {
   handleClose = (ev) => {
     ev.preventDefault()
@@ -86,14 +85,22 @@ class Modal extends React.Component {
         <ModalCloseButton onClick={this.handleClose}>
           <CloseIcon />
         </ModalCloseButton>
-        <PaddedContent onBack={onBack}>
-          <StyledDialogTitle disableTypography id="sharing">
-            {wrappedTitle}
-          </StyledDialogTitle>
-          <DialogContent>
-            { children }
-          </DialogContent>
-        </PaddedContent>
+        {/*
+          NOTE: DialogTitle / DialogContent need to be direct children of Dialog
+          for built-in scrolling to work (where title remains fixed at top)
+        */}
+        <StyledDialogTitle
+          classes={{ root: 'modal__padding' }}
+          disableTypography
+          id="sharing"
+        >
+          {wrappedTitle}
+        </StyledDialogTitle>
+        <DialogContent
+          classes={{ root: 'modal__padding' }}
+        >
+          { children }
+        </DialogContent>
       </StyledDialog>
     )
   }

@@ -9,6 +9,8 @@ nvm install 8.9.4
 brew install yarn
 curl -L https://get.rvm.io | bash -s stable --auto-dotfiles --autolibs=enable --rails
 brew install postgresql
+brew install redis
+brew install heroku/brew/heroku
 ```
 
 Clone the app and install the gems:
@@ -64,11 +66,13 @@ bin/rails s
 ```
 
 ### Use ttab for quick dev environment setup
-
+### Best to install foreman when not in root of a project
 Install ttab and foreman:
 ```
 npm install -g ttab
+pushd /
 gem install foreman
+popd
 ```
 
 Run dev script:
@@ -79,3 +83,4 @@ This will open separate tabs to:
   1. Run the webpack dev server
   1. Run the rails server
   1. Open atom in the project directory
+And will open your browser (may need to refresh page after initial webpack)

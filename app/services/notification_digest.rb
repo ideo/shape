@@ -23,7 +23,6 @@ class NotificationDigest < SimpleService
     return if notification_ids.count.zero? && comment_thread_ids.count.zero?
     mailer = NotificationMailer.notify(
       user_id: user.id,
-      last_notification_mail_sent: user.last_notification_mail_sent.to_i,
       notification_ids: notification_ids,
       comment_thread_ids: comment_thread_ids,
     )
