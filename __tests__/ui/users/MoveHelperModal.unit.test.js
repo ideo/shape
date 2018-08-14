@@ -37,7 +37,6 @@ describe('MoveHelperModal', () => {
       })
 
       it('should update the current user', () => {
-        console.log('fuck', props.currentUser.API_hideMoveHelper().then)
         expect(props.currentUser.API_hideMoveHelper).toHaveBeenCalled()
       })
     })
