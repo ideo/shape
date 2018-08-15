@@ -45,7 +45,6 @@ Rails.application.configure do
   # config.action_dispatch.x_sendfile_header = 'X-Sendfile' # for Apache
   # config.action_dispatch.x_sendfile_header = 'X-Accel-Redirect' # for NGINX
 
-
   # Force all access to the app over SSL, use Strict-Transport-Security, and use secure cookies.
   config.force_ssl = true
 
@@ -69,9 +68,11 @@ Rails.application.configure do
   # config.active_job.queue_name_prefix = "ideo-sso-demo_#{Rails.env}"
   config.action_mailer.perform_caching = false
 
-  app_uri = URI.parse(ENV['BASE_HOST'])
-  config.action_mailer.default_url_options = { host: app_uri.host }
-  config.action_mailer.delivery_method = :smtp
+  if ENV['BASE_HOST'].present?
+    app_uri = URI.parse(ENV['BASE_HOST'])
+    config.action_mailer.default_url_options = { host: app_uri.host }
+    config.action_mailer.delivery_method = :smtp
+  end
 
   # Asset host must be nil for Roadie inline to work
   config.action_mailer.asset_host = nil
@@ -124,10 +125,12 @@ Rails.application.configure do
   config.active_record.dump_schema_after_migration = false
 
   # redirect all URLs that do not match BASE_HOST
-  config.middleware.insert_before(Rack::Runtime, Rack::Rewrite) do
-    uri = URI.parse(ENV['BASE_HOST'])
-    r301 %r{.*}, "//#{uri.host}$&", if: Proc.new { |rack_env|
-      rack_env['SERVER_NAME'] != uri.host
-    }
+  if ENV['BASE_HOST'].present?
+    config.middleware.insert_before(Rack::Runtime, Rack::Rewrite) do
+      uri = URI.parse(ENV['BASE_HOST'])
+      r301 %r{.*}, "//#{uri.host}$&", if: Proc.new { |rack_env|
+        rack_env['SERVER_NAME'] != uri.host
+      }
+    end
   end
 end
