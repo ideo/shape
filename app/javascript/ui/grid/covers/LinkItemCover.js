@@ -1,15 +1,14 @@
-import PropTypes from 'prop-types'
 import { PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 import { Flex, Box } from 'reflexbox'
-import Dotdotdot from 'react-dotdotdot'
 
 import v from '~/utils/variables'
 import hexToRgba from '~/utils/hexToRgba'
-import { StyledImageCover } from './ImageItemCover'
 import GridCardIconWithName from '~/ui/grid/shared'
 import { CardHeading } from '~/ui/global/styled/typography'
+import LinkIcon from '~/ui/icons/LinkIcon'
 import { uiStore } from '~/stores'
+import { StyledImageCover } from './ImageItemCover'
 
 const StyledLinkCover = styled.div`
   background: ${v.colors.blackLava};
@@ -41,11 +40,15 @@ const StyledLinkCover = styled.div`
 StyledLinkCover.displayName = 'StyledLinkCover'
 
 class LinkItemCover extends React.PureComponent {
+  state = {
+    iconError: false,
+  }
+
   clamp() {
-    const desiredNameLen = uiStore.windowWidth > v.responsive.largeBreakpoint ?
-      40 : 28
-    const desiredContentLen = uiStore.windowWidth > v.responsive.largeBreakpoint ?
-      80 : 40
+    const desiredNameLen = uiStore.windowWidth > v.responsive.largeBreakpoint
+      ? 40 : 28
+    const desiredContentLen = uiStore.windowWidth > v.responsive.largeBreakpoint
+      ? 80 : 40
     const { item } = this.props
     const { name, content } = item
     let truncatedName = name || ''
@@ -58,7 +61,7 @@ class LinkItemCover extends React.PureComponent {
       const first = name.slice(0, (desiredLength / 2))
       const second = name.slice(name.length - (desiredLength / 2), name.length)
       truncatedName = `${first}… ${second}`
-    } else  if (content && content.length > desiredContentLen) {
+    } else if (content && content.length > desiredContentLen) {
       const desiredLength = desiredContentLen - 1 // one extra char for ellipsis
       const first = content.slice(0, desiredLength)
       truncatedContent = `${first}…`
@@ -69,9 +72,26 @@ class LinkItemCover extends React.PureComponent {
     }
   }
 
+  get icon() {
+    const { item } = this.props
+    if (!this.state.iconError && item.icon_url) {
+      return (
+        <img
+          onError={() => this.setState({ iconError: true })}
+          alt="link icon"
+          src={item.icon_url}
+        />
+      )
+    }
+    return (
+      // fallback if the icon didn't work
+      <LinkIcon />
+    )
+  }
+
   render() {
     const { item } = this.props
-    const { name, content, url, thumbnail_url, icon_url } = item
+    const { url, thumbnail_url } = item
     const { truncatedName, truncatedContent } = this.clamp()
     return (
       <StyledLinkCover>
@@ -82,7 +102,7 @@ class LinkItemCover extends React.PureComponent {
               <p className="content">{truncatedContent}</p>
               <GridCardIconWithName
                 text={url}
-                icon={<img src={icon_url} />}
+                icon={this.icon}
               />
             </Box>
           </Flex>
@@ -94,7 +114,6 @@ class LinkItemCover extends React.PureComponent {
 
 LinkItemCover.propTypes = {
   item: MobxPropTypes.objectOrObservableObject.isRequired,
-  dragging: PropTypes.bool.isRequired,
 }
 
 export default LinkItemCover
