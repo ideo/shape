@@ -33,13 +33,10 @@ describe('Routes', () => {
   describe('with terms accepted', () => {
     beforeEach(() => {
       props.apiStore.currentUser.terms_accepted = true
-      props.isAnonymous = false
-      props.routingStore.pathContains = jest.fn().mockReturnValue(false)
       wrapper = shallow(
         <Routes.wrappedComponent {...props} />
       )
     })
-
     it('makes an API call to fetch the user', () => {
       expect(apiStore.loadCurrentUserAndGroups).toHaveBeenCalled()
     })
@@ -70,29 +67,4 @@ describe('Routes', () => {
       expect(wrapper.find('TermsOfUseModal').exists()).toBeTruthy()
     })
   })
-
-  describe('with anonymous user', () => {
-    beforeEach(() => {
-      props.apiStore.currentUser.terms_accepted = true
-      props.routingStore.pathContains = jest.fn().mockReturnValue(true)
-      props.isAnonymous = true
-      wrapper = shallow(
-        <Routes.wrappedComponent {...props} />
-      )
-    })
-
-    
-    it('makes NO API call to fetch the user', () => {
-      expect(apiStore.loadCurrentUserAndGroups).not.toBeCalled()
-    })
-
-    it('does not blur the content if terms have been accepted', () => {
-      expect(wrapper.find('AppWrapper').props().blur).toBeFalsy()
-    })
-
-    it('does not display the TermsOfUseModal', () => {
-      expect(wrapper.find('TermsOfUseModal').exists()).toBeFalsy()
-    })
-  })
-
 })
