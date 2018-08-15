@@ -33,7 +33,7 @@ export default {
   colors: {
     cararra: '#f2f1ee',
     desert: '#f5f4f3',
-    cyan: '#c0dbde',
+    cyan: '#b4cdd4',
     pacificBlue: '#00a0e0',
     activityLightBlue: '#73808f',
     activityMedBlue: '#5a6a7c',

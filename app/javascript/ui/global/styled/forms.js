@@ -46,7 +46,7 @@ export const FormButton = styled.button`
   text-transform: uppercase;
   font-family: ${v.fonts.sans};
   font-size: 1rem;
-  font-weight: 500;
+  font-weight: ${v.weights.medium};
   letter-spacing: 0.09375rem;
   height: 40px;
   cursor: pointer;
