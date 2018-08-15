@@ -67,6 +67,7 @@ RSpec.describe OrganizationTemplates, type: :service do
       end
 
       it 'should add the #template tag' do
+        # this happens via templateable concern
         expect(profile_template.cached_owned_tag_list).to match_array(['template'])
       end
 

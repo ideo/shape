@@ -20,6 +20,16 @@ describe Templateable, type: :concern do
     end
   end
 
+  context 'callbacks' do
+    describe '#add_template_tag' do
+      let(:collection) { create(:collection, master_template: true) }
+
+      it 'should give the #template tag if it is a master_template' do
+        expect(collection.cached_owned_tag_list).to match_array(['template'])
+      end
+    end
+  end
+
   describe '#setup_templated_collection' do
     let(:user) { create(:user) }
     let(:template) { create(:collection, master_template: true, num_cards: 3, add_editors: [user]) }

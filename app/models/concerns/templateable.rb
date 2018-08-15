@@ -7,6 +7,8 @@ module Templateable
              class_name: 'Collection',
              foreign_key: :template_id,
              inverse_of: :template
+
+    after_create :add_template_tag, if: :master_template?
   end
 
   def profile_template?
@@ -56,5 +58,15 @@ module Templateable
       end
     end
     templated.reorder_cards!
+  end
+
+  def add_template_tag
+    # create the special #template tag
+    tag(
+      self,
+      with: 'template',
+      on: :tags,
+    )
+    update_cached_tag_lists
   end
 end
