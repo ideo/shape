@@ -3,7 +3,9 @@ class SerializableCollection < BaseJsonSerializer
 
   type 'collections'
 
-  attributes :id, :created_at, :updated_at, :name, :organization_id
+  attributes :id, :created_at, :updated_at, :name, :organization_id,
+             :master_template
+
   has_one :parent_collection_card
 
   attribute :system_required do

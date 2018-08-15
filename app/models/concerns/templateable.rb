@@ -34,23 +34,27 @@ module Templateable
 
   def update_templated_collections
     templated_collections.each do |templated|
-      collection_cards.pinned.each do |pin|
-        # this will iterate in order...
-        cc = templated.collection_cards.where(templated_from: pin).first
-        if cc.nil?
-          pin.duplicate!(
-            for_user: templated.created_by,
-            parent: templated,
-          )
-        else
-          cc.update(
-            order: pin.order,
-            height: pin.height,
-            width: pin.width,
-          )
-        end
-      end
-      templated.reorder_cards!
+      update_templated_collection(templated)
     end
+  end
+
+  def update_templated_collection(templated)
+    collection_cards.pinned.each do |pin|
+      # this will iterate in order...
+      cc = templated.collection_cards.where(templated_from: pin).first
+      if cc.nil?
+        pin.duplicate!(
+          for_user: templated.created_by,
+          parent: templated,
+        )
+      else
+        cc.update(
+          order: pin.order,
+          height: pin.height,
+          width: pin.width,
+        )
+      end
+    end
+    templated.reorder_cards!
   end
 end

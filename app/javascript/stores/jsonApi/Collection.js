@@ -36,7 +36,7 @@ class Collection extends BaseRecord {
   }
 
   get isMasterTemplate() {
-    return this.type === 'Collection::MasterTemplate'
+    return this.master_template
   }
 
   get isUserProfile() {
