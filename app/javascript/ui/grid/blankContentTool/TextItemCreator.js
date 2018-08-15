@@ -12,6 +12,7 @@ import { apiStore, routingStore, uiStore } from '~/stores'
 import TextItem from '~/ui/items/TextItem'
 
 const StyledTextItemCreator = styled.div`
+  background: white;
   padding: 1rem;
   height: calc(${props => props.height}px - 2rem);
   overflow-y: scroll;

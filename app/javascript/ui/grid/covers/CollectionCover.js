@@ -5,8 +5,11 @@ import styled from 'styled-components'
 import Dotdotdot from 'react-dotdotdot'
 
 import v from '~/utils/variables'
+import PlainLink from '~/ui/global/PlainLink'
+import { CardHeading } from '~/ui/global/styled/typography'
 import hexToRgba from '~/utils/hexToRgba'
 import ProfileIcon from '~/ui/icons/ProfileIcon'
+import { routingStore } from '~/stores'
 
 const IconHolder = styled.span`
   display: inline-block;
@@ -36,9 +39,9 @@ StyledCollectionCover.displayName = 'StyledCollectionCover'
 const pad = 16
 const calcSectionWidth = (props) => {
   if (props.width === 4) {
-    return `${props.gridW * 2}px`
+    return `${props.gridW * 2 - (props.gutter * 1)}px`
   } else if (props.width > 1) {
-    return `${props.gridW - props.gutter}px`
+    return `${props.gridW - (props.gutter * 2)}px`
   }
   return `calc(100% - ${props.gutter * 2}px)`
 }
@@ -81,19 +84,6 @@ const StyledCardContent = styled.div`
     padding-right: 2rem;
   `
   )}
-  h3 {
-    text-transform: uppercase;
-    font-size: 2rem;
-    margin-bottom: 0.25rem;
-    line-height: 1.2;
-    /* transition size change, with 0.25s delay */
-    transition: all 0.33s 0.25s;
-    @media only screen
-      and (min-width: ${v.responsive.medBreakpoint}px)
-      and (max-width: ${v.responsive.largeBreakpoint}px) {
-      font-size: 1.6rem;
-    }
-  }
 `
 StyledCardContent.displayName = 'StyledCardContent'
 
@@ -121,6 +111,15 @@ class CollectionCover extends React.Component {
     return collection.name
   }
 
+  handleClick = (e) => {
+    const { dragging } = this.props
+    if (dragging) {
+      e.preventDefault()
+      return false
+    }
+    return true
+  }
+
   render() {
     const { height, width, collection, uiStore } = this.props
     const { cover } = collection
@@ -139,11 +138,17 @@ class CollectionCover extends React.Component {
         >
           <div className="overlay" />
           <div className="top">
-            <h3>
+            <CardHeading>
               <Dotdotdot clamp={height > 1 ? 6 : 3}>
-                {this.name}
+                <PlainLink
+                  noSelect
+                  onClick={this.handleClick}
+                  to={routingStore.pathTo('collections', collection.id)}
+                >
+                  {this.name}
+                </PlainLink>
               </Dotdotdot>
-            </h3>
+            </CardHeading>
           </div>
           <div className="bottom">
             <Dotdotdot clamp="auto">
@@ -160,9 +165,13 @@ CollectionCover.propTypes = {
   width: PropTypes.number.isRequired,
   height: PropTypes.number.isRequired,
   collection: MobxPropTypes.objectOrObservableObject.isRequired,
+  dragging: PropTypes.bool,
 }
 CollectionCover.wrappedComponent.propTypes = {
   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
+}
+CollectionCover.defaultProps = {
+  dragging: false,
 }
 
 CollectionCover.displayName = 'CollectionCover'

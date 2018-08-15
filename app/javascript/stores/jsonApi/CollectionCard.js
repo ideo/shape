@@ -7,6 +7,7 @@ import BaseRecord from './BaseRecord'
 
 class CollectionCard extends BaseRecord {
   attributesForAPI = [
+    'type',
     'order',
     'width',
     'height',

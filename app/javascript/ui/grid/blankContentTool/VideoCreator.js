@@ -1,26 +1,9 @@
-import PropTypes from 'prop-types'
-import styled from 'styled-components'
 import _ from 'lodash'
+import PropTypes from 'prop-types'
 
-import { TextField, FormButton } from '~/ui/global/styled/forms'
-import PaddedCardCover from '~/ui/grid/covers/PaddedCardCover'
 import VideoUrl from '~/utils/VideoUrl'
-import { ITEM_TYPES, KEYS } from '~/utils/variables'
-
-const ValidIndicator = styled.div`
-  position: absolute;
-  top: 18px;
-  right: -24px;
-  font-size: 1.25rem;
-  font-weight: bold;
-  width: 20px;
-  &.valid {
-    color: green;
-  }
-  &.invalid {
-    color: red;
-  }
-`
+import { ITEM_TYPES } from '~/utils/variables'
+import GenericLinkCreator from './GenericLinkCreator'
 
 class VideoCreator extends React.Component {
   constructor(props) {
@@ -33,7 +16,7 @@ class VideoCreator extends React.Component {
       thumbnailUrl: '',
     }
     this.canceled = false
-    this.lookupVideoAPI = _.debounce(this._lookupVideoAPI, 1000)
+    this.lookupVideoAPI = _.debounce(this._lookupVideoAPI, 500)
   }
 
   componentWillUnmount() {
@@ -46,12 +29,6 @@ class VideoCreator extends React.Component {
       loading: true,
     })
     this.lookupVideoAPI(e.target.value)
-  }
-
-  handleKeyDown = (e) => {
-    if (e.keyCode === KEYS.ESC) {
-      this.props.closeBlankContentTool()
-    }
   }
 
   _lookupVideoAPI = async (url) => {
@@ -88,35 +65,19 @@ class VideoCreator extends React.Component {
   }
 
   render() {
-    let validIndicator = <ValidIndicator />
-    const { videoUrl, urlValid, loading } = this.state
-
-    if (videoUrl.length > 3) {
-      validIndicator = (
-        <ValidIndicator className={urlValid ? 'valid' : 'invalid'}>
-          {!loading && (urlValid ? '✔' : 'x')}
-          {loading && '...'}
-        </ValidIndicator>
-      )
-    }
+    const { videoUrl, urlValid } = this.state
+    const loading = this.props.loading || this.state.loading
 
     return (
-      <PaddedCardCover>
-        <form className="form" onSubmit={this.createVideoItem}>
-          <TextField
-            placeholder="Video URL"
-            value={videoUrl}
-            onChange={this.onVideoUrlChange}
-            onKeyDown={this.handleKeyDown}
-          />
-          {validIndicator}
-          <FormButton
-            disabled={this.props.loading || this.state.loading}
-          >
-            Add
-          </FormButton>
-        </form>
-      </PaddedCardCover>
+      <GenericLinkCreator
+        url={videoUrl}
+        urlValid={urlValid}
+        placeholder="Video URL"
+        onSubmit={this.createVideoItem}
+        onChange={this.onVideoUrlChange}
+        onClose={this.props.closeBlankContentTool}
+        loading={loading}
+      />
     )
   }
 }
