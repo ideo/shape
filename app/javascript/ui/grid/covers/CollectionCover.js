@@ -142,7 +142,7 @@ class CollectionCover extends React.Component {
             <PositionedCardHeading>
               <Dotdotdot clamp={height > 1 ? 6 : 3}>
                 <PlainLink
-                  noSelect
+                  className="no-select"
                   onClick={this.handleClick}
                   to={routingStore.pathTo('collections', collection.id)}
                 >

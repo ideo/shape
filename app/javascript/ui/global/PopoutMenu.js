@@ -2,6 +2,7 @@ import PropTypes from 'prop-types'
 import styled from 'styled-components'
 
 import MenuIcon from '~/ui/icons/MenuIcon'
+import { BctButton } from '~/ui/grid/blankContentTool/GridCardBlank'
 import v from '~/utils/variables'
 
 export const StyledMenuButtonWrapper = styled.div`
@@ -117,19 +118,25 @@ class PopoutMenu extends React.PureComponent {
       onMouseLeave,
       onClick,
       width,
+      buttonStyle,
     } = this.props
+
+    const isBct = buttonStyle === 'bct'
+    const MenuToggle = isBct ? BctButton : StyledMenuToggle
     return (
       <StyledMenuButtonWrapper
         className={`${className} ${menuOpen && ' open'}`}
         role="presentation"
         onMouseLeave={onMouseLeave}
       >
-        <StyledMenuToggle
+        <MenuToggle
           onClick={onClick}
           className="menu-toggle"
         >
-          <MenuIcon />
-        </StyledMenuToggle>
+          <MenuIcon
+            viewBox={isBct ? '-11 -11 26 40' : '0 0 5 18'}
+          />
+        </MenuToggle>
         <StyledMenuWrapper className="menu-wrapper">
           <StyledMenu width={width}>
             {this.renderMenuItems}
@@ -146,6 +153,7 @@ PopoutMenu.propTypes = {
   className: PropTypes.string,
   width: PropTypes.number,
   menuOpen: PropTypes.bool,
+  buttonStyle: PropTypes.string,
   menuItems: PropTypes.arrayOf(PropTypes.shape({
     name: PropTypes.string,
     iconLeft: PropTypes.element,
@@ -161,6 +169,7 @@ PopoutMenu.defaultProps = {
   onClick: () => null,
   className: '',
   menuOpen: false,
+  buttonStyle: '',
   width: 200,
 }
 

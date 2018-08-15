@@ -9,6 +9,7 @@ import AddCollectionIcon from '~/ui/icons/AddCollectionIcon'
 import AddFileIcon from '~/ui/icons/AddFileIcon'
 import AddVideoIcon from '~/ui/icons/AddVideoIcon'
 import LinkIcon from '~/ui/icons/LinkIcon'
+import TemplateIcon from '~/ui/icons/TemplateIcon'
 import v, { ITEM_TYPES } from '~/utils/variables'
 import FilestackUpload from '~/utils/FilestackUpload'
 import { StyledGridCard } from '~/ui/grid/GridCard'
@@ -16,6 +17,7 @@ import InlineLoader from '~/ui/layout/InlineLoader'
 import { CloseButton } from '~/ui/global/styled/buttons'
 import bctIcons from '~/assets/bct_icons.png'
 import Tooltip from '~/ui/global/Tooltip'
+import PopoutMenu from '~/ui/global/PopoutMenu'
 
 import CollectionCreator from './CollectionCreator'
 import TextItemCreator from './TextItemCreator'
@@ -88,7 +90,7 @@ const BctBackground = styled.div`
 `
 BctBackground.displayName = 'BctBackground'
 
-const BctButton = styled.button`
+export const BctButton = styled.button`
   position: relative;
   width: 47px;
   height: 47px;
@@ -197,6 +199,7 @@ const BctButtonBox = ({
   creating,
   onClick,
   Icon,
+  Menu,
 }) => (
   <Box>
     <Tooltip
@@ -208,22 +211,31 @@ const BctButtonBox = ({
         creating={creating === type}
         onClick={onClick}
       >
-        <Icon width={size} height={size} color="white" />
+        { Icon &&
+          <Icon width={size} height={size} color="white" />
+        }
+        { Menu &&
+          <Menu />
+        }
       </BctButton>
     </Tooltip>
   </Box>
 )
 
 BctButtonBox.propTypes = {
-  type: PropTypes.string.isRequired,
+  type: PropTypes.string,
   tooltip: PropTypes.string.isRequired,
   size: PropTypes.number.isRequired,
   creating: PropTypes.string,
   onClick: PropTypes.func.isRequired,
-  Icon: PropTypes.func.isRequired,
+  Icon: PropTypes.func,
+  Menu: PropTypes.func,
 }
 BctButtonBox.defaultProps = {
   creating: '',
+  type: '',
+  Icon: null,
+  Menu: null,
 }
 
 @inject('uiStore', 'apiStore')
@@ -233,6 +245,7 @@ class GridCardBlank extends React.Component {
     creating: null,
     loading: false,
     droppingFile: false,
+    bctMenuOpen: false,
   }
 
   componentDidMount() {
@@ -342,6 +355,12 @@ class GridCardBlank extends React.Component {
     } else {
       this.props.uiStore.closeBlankContentTool()
     }
+  }
+
+  toggleBctMenu = () => {
+    this.setState(({ bctMenuOpen }) => (
+      { bctMenuOpen: !bctMenuOpen }
+    ))
   }
 
   renderInner = () => {
@@ -459,9 +478,10 @@ class GridCardBlank extends React.Component {
               creating={creating}
               size={size}
               onClick={this.startCreating('link')}
-              Icon={() => <LinkIcon viewBox={'-11 -11 40 40'} />}
+              Icon={() => <LinkIcon viewBox="-11 -11 40 40" />}
             />
           }
+          {/* videoBctBox shows up on the top row when replacing */}
           {isReplacing &&
             videoBctBox
           }
@@ -474,6 +494,15 @@ class GridCardBlank extends React.Component {
           {(!isReplacing && (!creating || creating === 'video')) &&
             videoBctBox
           }
+          <PopoutMenu
+            buttonStyle="bct"
+            // width={100}
+            menuOpen={this.state.bctMenuOpen}
+            onClick={this.toggleBctMenu}
+            menuItems={[
+              { name: 'Create Template', iconRight: <TemplateIcon />, onClick: this.startCreating('template') }
+            ]}
+          />
         </Flex>
         {inner}
         <BctBackground />
