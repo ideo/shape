@@ -70,10 +70,6 @@ const StyledCardContent = styled.div`
   }
   .top {
     top: ${pad}px;
-    h3 {
-      position: absolute;
-      bottom: 0;
-    }
   }
   .bottom {
     bottom: ${props => (props.height === 1 ? `${pad / 2}` : pad)}px;
@@ -86,6 +82,11 @@ const StyledCardContent = styled.div`
   )}
 `
 StyledCardContent.displayName = 'StyledCardContent'
+
+const PositionedCardHeading = CardHeading.extend`
+  position: absolute;
+  bottom: 0;
+`
 
 function splitName(name) {
   return name.split(' ')
@@ -138,7 +139,7 @@ class CollectionCover extends React.Component {
         >
           <div className="overlay" />
           <div className="top">
-            <CardHeading>
+            <PositionedCardHeading>
               <Dotdotdot clamp={height > 1 ? 6 : 3}>
                 <PlainLink
                   noSelect
@@ -148,7 +149,7 @@ class CollectionCover extends React.Component {
                   {this.name}
                 </PlainLink>
               </Dotdotdot>
-            </CardHeading>
+            </PositionedCardHeading>
           </div>
           <div className="bottom">
             <Dotdotdot clamp="auto">
