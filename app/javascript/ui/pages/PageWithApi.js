@@ -51,6 +51,11 @@ class PageWithApi extends React.Component {
       // escape if we're not on homepage, search, or /collections/items
       return true
     }
+    if (match.path !== '/' && !apiStore.currentOrgSlug) {
+      // no org available, e.g. we need to set up a new org
+      routingStore.routeTo('/')
+      return false
+    }
     if (!match.params.org) {
       routingStore.routeTo(`/${apiStore.currentOrgSlug}${path}`)
       return false

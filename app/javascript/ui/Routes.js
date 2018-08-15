@@ -5,10 +5,11 @@ import WindowSizeListener from 'react-window-size-listener'
 import styled from 'styled-components'
 
 import ActivityLogBox from '~/ui/activity_log/ActivityLogBox'
-import CollectionPage from '~/ui/pages/CollectionPage'
 import DialogWrapper from '~/ui/global/modals/DialogWrapper'
 import ErrorBoundary from '~/ui/global/ErrorBoundary'
 import Header from '~/ui/layout/Header'
+import HomePage from '~/ui/pages/HomePage'
+import CollectionPage from '~/ui/pages/CollectionPage'
 import ItemPage from '~/ui/pages/ItemPage'
 import Loader from '~/ui/layout/Loader'
 import MarketingPage from '~/ui/pages/MarketingPage'
@@ -52,6 +53,14 @@ class Routes extends React.Component {
       // Use the Shape font instead of the default Roboto font.
       fontFamily: v.fonts.sans,
     },
+    palette: {
+      primary: {
+        main: v.colors.sirocco,
+      },
+      secondary: {
+        main: v.colors.pacificBlue,
+      },
+    }
   })
 
   componentWillMount() {
@@ -92,14 +101,14 @@ class Routes extends React.Component {
     const { apiStore, routingStore } = this.props
 
     const isAnonymous = this.state.isAnonymous
-    
+
     if (!isAnonymous && !apiStore.currentUser) {
       return <Loader />
     }
 
     const displayTermsPopup = (
       !isAnonymous && (
-        !apiStore.currentUser.terms_accepted 
+        !apiStore.currentUser.terms_accepted
         && !routingStore.pathContains('/terms')
       )
     )
@@ -123,8 +132,9 @@ class Routes extends React.Component {
             }
             {/* Switch will stop when it finds the first matching path */}
             <Switch>
-              <Route exact path="/" component={CollectionPage} />
-              <Route path="/marketing" component={MarketingPage} />
+              <Route exact path="/" component={HomePage} />
+              {/* These routes are doubled up so that the non-org route
+                will route you to the org one */}
               <Route path="/collections/:id" component={CollectionPage} />
               <Route path="/:org/collections/:id" component={CollectionPage} />
               <Route path="/items/:id" component={ItemPage} />

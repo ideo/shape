@@ -35,7 +35,6 @@
   },
   "dependencies": {
     "@material-ui/core": "^1.5.0",
-    "@material-ui/icons": "^2.0.2",
     "@rails/webpacker": "~3.2.1",
     "actioncable": "^5.2.0",
     "axios": "^0.18.0",
@@ -62,6 +61,7 @@
     "mobx-react-intl": "^1.4.0",
     "mobx-react-router": "^4.0.1",
     "moment-mini": "^2.19.4",
+    "papaparse": "^4.6.0",
     "parameterize": "^0.1.0",
     "pluralize": "^7.0.0",
     "prop-types": "^15.6.2",
@@ -85,15 +85,14 @@
     "react-select": "^1.2.1",
     "react-svg-loader": "^2.1.0",
     "react-tag-autocomplete": "^5.5.1",
+    "react-truncator": "^0.0.1",
     "react-visibility-sensor": "^3.11.0",
     "react-window-size-listener": "^1.2.1",
     "reflexbox": "^3.0.1",
-    "resolve-url-loader": "^2.3.0",
     "styled-components": "^3.2.1",
     "styled-loaders-react": "ideo/styled-loaders-react",
     "svg-react-loader": "^0.4.5",
     "webpack": "^3.11.0",
-    "webpack-cli": "^3.1.0",
     "whatwg-fetch": "^2.0.4"
   },
   "devDependencies": {
@@ -138,7 +137,6 @@
     "webpack-dev-server": "^2.11.1"
   },
   "resolutions": {
-    "react-draggable": "git+https://git@github.com/ideo/react-draggable.git#3.0.5-beta.1",
-    "**/styled-components": "3.2.1"
+    "react-draggable": "git+https://git@github.com/ideo/react-draggable.git#3.0.5-beta.1"
   }
 }

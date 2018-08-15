@@ -1,4 +1,4 @@
-import { action, observable, computed } from 'mobx'
+import { action, runInAction, observable, computed } from 'mobx'
 import { Store } from 'mobx-jsonapi-store'
 import _ from 'lodash'
 import moment from 'moment-mini'
@@ -20,11 +20,17 @@ import UsersThread from './jsonApi/UsersThread'
 
 class ApiStore extends Store {
   @observable currentUserId = null
+  @observable currentUserOrganizationId = null
   @observable currentCommentThreadIds = []
   @observable currentPageThreadKey = null
+  @observable recentNotifications = new Map()
 
   @action setCurrentUserId(id) {
     this.currentUserId = id
+  }
+
+  @action setCurrentUserOrganizationId(id) {
+    this.currentUserOrganizationId = id
   }
 
   @action setCurrentPageThreadKey(key) {
@@ -41,19 +47,12 @@ class ApiStore extends Store {
     return this.find('users', this.currentUserId)
   }
 
-  @computed get currentUserOrganizationId() {
-    const org = this.currentUserOrganization
-    if (!org) return null
-    return org.id
-  }
-
   @computed get currentUserOrganization() {
-    if (!this.currentUser) return null
-    if (!this.currentUser.current_organization) return null
-    return this.currentUser.current_organization
+    return this.find('organizations', this.currentUserOrganizationId)
   }
 
   @computed get currentOrgSlug() {
+    if (!this.currentUserOrganization) return ''
     return this.currentUserOrganization.slug
   }
 
@@ -70,6 +69,8 @@ class ApiStore extends Store {
     try {
       const res = await this.request('users/me')
       this.setCurrentUserId(res.data.id)
+      const { current_organization } = this.currentUser
+      this.setCurrentUserOrganizationId(current_organization ? current_organization.id : null)
     } catch (e) {
       trackError(e, { source: 'loadCurrentUser', name: 'fetchUser' })
     }
@@ -116,6 +117,16 @@ class ApiStore extends Store {
 
   @computed get unreadNotificationsCount() {
     return this.unreadNotifications.length
+  }
+
+  @action addRecentNotification(notification) {
+    if (this.recentNotifications.has(notification.id)) return
+    if (!notification.read) {
+      this.recentNotifications.set(notification.id, notification)
+    }
+    setTimeout(() => {
+      runInAction(() => { this.recentNotifications.set(notification.id, null) })
+    }, 3000)
   }
 
   @computed get unreadCommentsCount() {

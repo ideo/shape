@@ -20,7 +20,13 @@ beforeEach(() => {
   })
   match = { params: { id, org: apiStore.currentOrgSlug }, path: `/items/${id}`, url: `/items/${id}` }
   apiStore.items = [item]
-  props = { apiStore, match, uiStore, routingStore }
+  props = {
+    apiStore,
+    uiStore,
+    routingStore,
+    match,
+    location: { search: '' },
+  }
 
   wrapper = shallow(
     <ItemPage.wrappedComponent {...props} />
@@ -52,6 +58,18 @@ describe('ItemPage', () => {
 
     it('should track an event for updating an item', () => {
       expect(uiStore.trackEvent).toHaveBeenCalledWith('update', item)
+    })
+  })
+
+  describe('with params ?open=comments', () => {
+    beforeEach(() => {
+      wrapper = shallow(
+        <ItemPage.wrappedComponent {...props} location={{ search: '?open=comments' }} />
+      )
+    })
+
+    it('should call uiStore to open the comments', () => {
+      expect(uiStore.openOptionalMenus).toHaveBeenCalledWith('?open=comments')
     })
   })
 })

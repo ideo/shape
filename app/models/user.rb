@@ -111,8 +111,12 @@ class User < ApplicationRecord
     end
   end
 
-  def self.all_active_except(user_id)
-    active.where.not(id: user_id).order(first_name: :asc)
+  def self.all_active_except(user_id, in_org: nil)
+    users = active.where.not(id: user_id).order(first_name: :asc)
+    if in_org
+      users = users.where(id: in_org.primary_group.user_ids)
+    end
+    users
   end
 
   def self.from_omniauth(auth, pending_user)
@@ -252,6 +256,7 @@ class User < ApplicationRecord
 
   def current_org_groups_and_special_groups
     groups = current_org_groups.to_a
+    return [] if groups.blank?
     organization = current_organization
     if groups.include?(organization.primary_group)
       # org members get to see the guest group

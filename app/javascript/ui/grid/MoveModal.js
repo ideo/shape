@@ -3,12 +3,12 @@ import { observable, runInAction } from 'mobx'
 import styled from 'styled-components'
 import Snackbar from '@material-ui/core/Snackbar'
 import SnackbarContent from '@material-ui/core/SnackbarContent'
-
-import Tooltip from '~/ui/global/Tooltip'
-import v from '~/utils/variables'
 import CloseIcon from '~/ui/icons/CloseIcon'
 import InlineLoader from '~/ui/layout/InlineLoader'
 import MoveArrowIcon from '~/ui/icons/MoveArrowIcon'
+import MoveHelperModal from '~/ui/users/MoveHelperModal'
+import Tooltip from '~/ui/global/Tooltip'
+import v from '~/utils/variables'
 
 const StyledSnackbar = styled(Snackbar)`
   &.Snackbar {
@@ -53,11 +53,21 @@ const IconHolder = styled.span`
   margin-left: 40px;
   margin-top: 8px;
   width: 16px;
+
+  button {
+    height: 19px;
+    width: 16px;
+  }
 `
 
 const CloseIconHolder = styled.span`
   margin-left: 60px;
   width: 16px;
+
+  button {
+    height: 19px;
+    width: 16px;
+  }
 `
 
 @inject('uiStore', 'apiStore')
@@ -146,7 +156,7 @@ class MoveModal extends React.Component {
   }
 
   render() {
-    const { uiStore } = this.props
+    const { apiStore, uiStore } = this.props
     const { cardAction } = uiStore
     const amount = uiStore.movingCardIds.length
     const moveMessage = cardAction === 'move'
@@ -156,54 +166,59 @@ class MoveModal extends React.Component {
     return (
       <div>
         { uiStore.movingCardIds.length > 0 && (
-          <StyledSnackbar
-            classes={{ root: 'Snackbar', }}
-            open
-          >
-            {this.isLoading ? <SnackbarBackground><InlineLoader /></SnackbarBackground> : (
-              <StyledSnackbarContent
-                classes={{ root: 'SnackbarContent', }}
-                message={
-                  <StyledMoveText id="message-id">{moveMessage}</StyledMoveText>
-                }
-                action={[
-                  <IconHolder key="moveup">
-                    <Tooltip
-                      classes={{ tooltip: 'Tooltip' }}
-                      title="Place at top"
-                      placement="top"
-                    >
-                      <button onClick={this.handleMoveToBeginning}>
-                        <MoveArrowIcon direction="up" />
-                      </button>
-                    </Tooltip>
-                  </IconHolder>,
-                  <IconHolder key="movedown">
-                    <Tooltip
-                      classes={{ tooltip: 'Tooltip' }}
-                      title="Place at bottom"
-                      placement="top"
-                    >
-                      <button onClick={this.handleMoveToEnd}>
-                        <MoveArrowIcon direction="down" />
-                      </button>
-                    </Tooltip>
-                  </IconHolder>,
-                  <CloseIconHolder key="close">
-                    <Tooltip
-                      classes={{ tooltip: 'Tooltip' }}
-                      title="Cancel"
-                      placement="top"
-                    >
-                      <button onClick={this.handleClose}>
-                        <CloseIcon />
-                      </button>
-                    </Tooltip>
-                  </CloseIconHolder>,
-                ]}
-              />
-            )}
-          </StyledSnackbar>
+          <div>
+            <StyledSnackbar
+              classes={{ root: 'Snackbar', }}
+              open
+            >
+              {this.isLoading ? <SnackbarBackground><InlineLoader /></SnackbarBackground> : (
+                <StyledSnackbarContent
+                  classes={{ root: 'SnackbarContent', }}
+                  message={
+                    <StyledMoveText id="message-id">{moveMessage}</StyledMoveText>
+                  }
+                  action={[
+                    <IconHolder key="moveup">
+                      <Tooltip
+                        classes={{ tooltip: 'Tooltip' }}
+                        title="Place at top"
+                        placement="top"
+                      >
+                        <button onClick={this.handleMoveToBeginning}>
+                          <MoveArrowIcon direction="up" />
+                        </button>
+                      </Tooltip>
+                    </IconHolder>,
+                    <IconHolder key="movedown">
+                      <Tooltip
+                        classes={{ tooltip: 'Tooltip' }}
+                        title="Place at bottom"
+                        placement="top"
+                      >
+                        <button onClick={this.handleMoveToEnd}>
+                          <MoveArrowIcon direction="down" />
+                        </button>
+                      </Tooltip>
+                    </IconHolder>,
+                    <CloseIconHolder key="close">
+                      <Tooltip
+                        classes={{ tooltip: 'Tooltip' }}
+                        title="Cancel"
+                        placement="top"
+                      >
+                        <button onClick={this.handleClose}>
+                          <CloseIcon />
+                        </button>
+                      </Tooltip>
+                    </CloseIconHolder>,
+                  ]}
+                />
+              )}
+            </StyledSnackbar>
+            { apiStore.currentUser.show_move_helper &&
+              <MoveHelperModal currentUser={apiStore.currentUser} />
+            }
+          </div>
         )}
       </div>
     )

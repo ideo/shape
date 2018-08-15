@@ -1,20 +1,15 @@
-import React from "react";
-import PropTypes from "prop-types";
-
-import Button from '@material-ui/core/Button';
-import AppBar from '@material-ui/core/AppBar';
-import Toolbar from '@material-ui/core/Toolbar';
-import MenuIcon from '@material-ui/icons/Menu';
-import Typography from '@material-ui/core/Typography';
-
-import ReactMarkdown from 'react-markdown'
+import { Fragment } from 'react'
+import PropTypes from 'prop-types'
+import Button from '@material-ui/core/Button'
+import AppBar from '@material-ui/core/AppBar'
+import Toolbar from '@material-ui/core/Toolbar'
+import Typography from '@material-ui/core/Typography'
 import styled from 'styled-components'
 
 import v from '~/utils/variables'
 import PageContainer from '~/ui/layout/PageContainer'
 import { Heading1 } from '~/ui/global/styled/typography'
 import { Heading2 } from '~/ui/global/styled/typography'
-
 
 const styles = {
   rightToolbar: {

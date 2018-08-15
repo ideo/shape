@@ -10,7 +10,7 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
   end
 
   before do
-    @user.reload
+    user.reload
   end
 
   describe 'GET #index' do
@@ -96,10 +96,10 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
 
       it 'creates an activity' do
         expect(ActivityAndNotificationBuilder).to receive(:call).with(
-          actor: @user,
+          actor: user,
           target: anything,
           action: :created,
-          subject_user_ids: [@user.id],
+          subject_user_ids: [user.id],
           subject_group_ids: [],
         )
         post(path, params: params)
@@ -235,48 +235,35 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
     end
   end
 
-  describe 'PATCH #archive' do
-    let!(:collection_card) { create(:collection_card_collection, parent: collection) }
-    let(:path) { "/api/v1/collection_cards/#{collection_card.id}/archive" }
+  describe 'PATCH #archive', only: true do
+    let!(:collection_cards) { create_list(:collection_card_collection, 3, parent: collection) }
+    let(:path) { '/api/v1/collection_cards/archive' }
+    let(:params) { { card_ids: collection_cards.map(&:id) }.to_json }
 
     context 'with record edit access' do
       before do
-        user.add_role(Role::EDITOR, collection_card.collection)
+        collection_cards.each do |card|
+          user.add_role(Role::EDITOR, card.collection)
+        end
       end
 
       it 'returns a 200' do
-        patch(path)
+        patch(path, params: params)
         expect(response.status).to eq(200)
       end
 
-      it 'matches JSON schema' do
-        patch(path)
-        expect(json['data']['attributes']).to match_json_schema('collection_card')
-      end
-
-      it 'updates the content' do
-        expect(collection_card.archived).to eq(false)
-        patch(path)
-        expect(collection_card.reload.archived).to eq(true)
-      end
-
-      it 'notifies the users and groups' do
-        collection_card.archived = true
-        collection_card.record.archived = true
-        expect(ActivityAndNotificationBuilder).to receive(:call).with(
-          actor: @user,
-          target: collection_card.record,
-          action: :archived,
-          subject_user_ids: [@user.id],
-          subject_group_ids: [],
+      it 'calls the Archive worker' do
+        expect(CollectionCardArchiveWorker).to receive(:perform_async).with(
+          collection_cards.map(&:id),
+          user.id,
         )
-        patch(path)
+        patch(path, params: params)
       end
     end
 
     context 'without record edit access' do
       it 'returns a 401' do
-        patch(path)
+        patch(path, params: params)
         expect(response.status).to eq(401)
       end
     end
@@ -546,10 +533,10 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
 
       it 'creates an activity' do
         expect(ActivityAndNotificationBuilder).to receive(:call).with(
-          actor: @user,
+          actor: user,
           target: anything,
           action: :replaced,
-          subject_user_ids: [@user.id],
+          subject_user_ids: [user.id],
           subject_group_ids: [],
         )
         patch(path, params: params)

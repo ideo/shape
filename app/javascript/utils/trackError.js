@@ -20,7 +20,8 @@ export function trackErrorSpecify(source, message, name, backtrace) {
       vendor: navigator.vendor,
     }
   }
-  console.log('error tr', data)
+  console.warn('error tr', data)
+  if (!process.env.APPSIGNAL_PUSH_API_KEY) return
   const xhr = new window.XMLHttpRequest()
   xhr.open('POST', '/appsignal_error_catcher', true)
   xhr.setRequestHeader('Content-Type', 'application/json; charset=UTF-8')

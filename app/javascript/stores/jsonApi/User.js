@@ -29,6 +29,10 @@ class User extends BaseRecord {
     return this.API_updateCurrentUser({ show_helper: false })
   }
 
+  API_hideMoveHelper() {
+    return this.API_updateCurrentUser({ show_move_helper: false })
+  }
+
   async switchOrganization(organizationId, { redirectPath = null, redirectId = null } = {}) {
     try {
       await this.apiStore.request(

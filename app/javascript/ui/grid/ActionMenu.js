@@ -4,6 +4,7 @@ import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import _ from 'lodash'
 
 import AddIntoIcon from '~/ui/icons/AddIntoIcon'
+import Activity from '~/stores/jsonApi/Activity'
 import ArchiveIcon from '~/ui/icons/ArchiveIcon'
 import DownloadIcon from '~/ui/icons/DownloadIcon'
 import DuplicateIcon from '~/ui/icons/DuplicateIcon'
@@ -23,9 +24,14 @@ class ActionMenu extends React.Component {
     this.itemLoading = name
   }
 
-  callCardAction = async(name, methodName) => {
+  callCardAction = async (name, methodName) => {
     const { uiStore, card } = this.props
-    uiStore.closeMoveMenu()
+    if (methodName === 'API_archive') {
+      uiStore.selectCardId(card.id)
+      uiStore.closeMoveMenu({ deselect: false })
+    } else {
+      uiStore.closeMoveMenu({ deselect: true })
+    }
     this.setLoading(name)
     await card[methodName]()
     this.setLoading()
@@ -75,6 +81,7 @@ class ActionMenu extends React.Component {
     const { card } = this.props
     const { record } = card
     if (record.filestack_file) {
+      Activity.trackActivity('downloaded', record)
       window.open(record.filestack_file.url, '_blank')
     }
   }

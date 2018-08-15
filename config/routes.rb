@@ -1,16 +1,23 @@
 Rails.application.routes.draw do
-   devise_for :users, controllers: {
+  devise_for :users, controllers: {
     omniauth_callbacks: 'users/omniauth_callbacks',
     sessions: 'users/login_redirect',
     registrations: 'users/login_redirect',
   }
 
-  root to: 'home#index', constraints: ->(req) { req.format == :html || req.format == '*/*' }
+  unauthenticated do
+    root to: 'home#marketing'
+  end
+
+  authenticated :user do
+    root to: 'home#index', constraints: ->(req) { req.format == :html || req.format == '*/*' }
+  end
 
   mount ActionCable.server => '/cable'
 
   namespace :api do
     namespace :v1 do
+      resources :activities, only: %i[create]
       resources :collections, except: %i[index] do
         member do
           post 'duplicate'
@@ -21,11 +28,11 @@ Rails.application.routes.draw do
       end
       resources :collection_cards, shallow: true, except: :show do
         member do
-          patch 'archive'
           patch 'replace'
         end
         collection do
           patch 'move'
+          patch 'archive'
           post 'link'
           post 'duplicate'
         end
@@ -98,7 +105,7 @@ Rails.application.routes.draw do
   get :login_as, to: 'home#login_as', as: :login_as
   get :sign_up, to: 'home#sign_up', as: :sign_up
 
-  get '/marketing', to: 'home#marketing'
+  # get '/marketing', to: 'home#marketing'
 
   # catch all mailer preview paths
   get '/rails/mailers/*path' => 'rails/mailers#preview'

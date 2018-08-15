@@ -38,6 +38,12 @@ RSpec.describe OrganizationBuilder, type: :service do
       it 'should update the primary group attributes' do
         expect(organization.primary_group.handle).to eq('an-org')
       end
+
+      it 'should create the templates' do
+        expect(OrganizationTemplates).to receive(:call).with(organization)
+        builder.save
+        expect(user.user_profile_for_org(organization.id)).not_to be nil
+      end
     end
 
     context 'with invalid params' do

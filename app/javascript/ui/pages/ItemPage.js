@@ -40,14 +40,19 @@ class ItemPage extends PageWithApi {
     }
   }
 
-  onAPILoad = (response) => {
+  onAPILoad = async (response) => {
     const { apiStore, uiStore, location } = this.props
     const item = response.data
     this.setState({ item })
     uiStore.setViewingItem(item)
     if (item.parent) item.parent.checkCurrentOrg()
-    apiStore.findOrBuildCommentThread(item)
-    uiStore.openOptionalMenus(location.search)
+    const thread = await apiStore.findOrBuildCommentThread(item)
+    if (location.search) {
+      const menu = uiStore.openOptionalMenus(location.search)
+      if (menu === 'comments') {
+        uiStore.expandThread(thread.key)
+      }
+    }
   }
 
   updateItem = (itemTextData) => {

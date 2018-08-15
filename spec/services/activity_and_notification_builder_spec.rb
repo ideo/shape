@@ -7,6 +7,8 @@ RSpec.describe ActivityAndNotificationBuilder, type: :service do
   let(:action) { :archived }
   let(:subject_users) { create_list(:user, 1) }
   let(:subject_groups) { [] }
+  let(:omit_user_ids) { [] }
+  let(:omit_group_ids) { [] }
   let(:combine) { false }
   let(:content) { nil }
   let(:builder) do
@@ -16,6 +18,8 @@ RSpec.describe ActivityAndNotificationBuilder, type: :service do
       action: action,
       subject_user_ids: subject_users.map(&:id),
       subject_group_ids: subject_groups.map(&:id),
+      omit_user_ids: omit_user_ids,
+      omit_group_ids: omit_group_ids,
       combine: combine,
       content: content,
     )
@@ -32,6 +36,26 @@ RSpec.describe ActivityAndNotificationBuilder, type: :service do
       it 'creates notifications for each user' do
         expect { builder.call }.to change(Notification, :count).by(2)
       end
+
+      it 'creates activity subjects for each user' do
+        expect { builder.call }.to change(ActivitySubject, :count).by(2)
+      end
+
+      context 'with action that does not notify' do
+        let(:action) { :edited }
+
+        it 'does not create notifications' do
+          expect { builder.call }.not_to change(Notification, :count)
+        end
+      end
+
+      context 'with action that does not have subjects' do
+        let(:action) { :downloaded }
+
+        it 'does not create activity subjects' do
+          expect { builder.call }.not_to change(ActivitySubject, :count)
+        end
+      end
     end
 
     context 'with a user and a group' do
@@ -39,6 +63,27 @@ RSpec.describe ActivityAndNotificationBuilder, type: :service do
 
       it 'creates notifications for each user and each user in group' do
         expect { builder.call }.to change(Notification, :count).by(2)
+      end
+
+      context 'with an omitted user' do
+        let(:users) { create_list(:user, 2) }
+        let(:subject_groups) { [create(:group, add_members: users)] }
+        let(:omit_user_ids) { [users.first.id] }
+
+        it 'should not notify the omitted user' do
+          expect { builder.call }.to change(Notification, :count).by(2)
+          expect(users.first.notifications.count).to eq 0
+          expect(users.second.notifications.count).to eq 1
+        end
+      end
+
+      context 'with an omitted group' do
+        let(:omit_group_ids) { [subject_groups.first.id] }
+
+        it 'should not notify the omitted group' do
+          # should just notify the original user (not in the group)
+          expect { builder.call }.to change(Notification, :count).by(1)
+        end
       end
     end
 

@@ -3,7 +3,10 @@ import PropTypes from 'prop-types'
 import { observable, action } from 'mobx'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
+import MenuItem from '@material-ui/core/MenuItem'
+
 import trackError from '~/utils/trackError'
+import isEmail from '~/utils/isEmail'
 import {
   FormButton,
   FormActionsContainer,
@@ -15,7 +18,9 @@ import {
 } from '~/ui/global/styled/layout'
 import AutoComplete from '~/ui/global/AutoComplete'
 import PillList from '~/ui/global/PillList'
-import MenuItem from '@material-ui/core/MenuItem'
+import EmailCSVUploader from '~/ui/global/EmailCSVUploader'
+import InlineLoader from '~/ui/layout/InlineLoader'
+import { uiStore } from '~/stores'
 
 const RightAligner = styled.span`
   margin-right: 30px;
@@ -27,6 +32,7 @@ RightAligner.displayName = 'StyledRightAligner'
 class RolesAdd extends React.Component {
   @observable selectedUsers = []
   @observable selectedRole = ''
+  @observable loading = false
 
   constructor(props) {
     super(props)
@@ -38,12 +44,17 @@ class RolesAdd extends React.Component {
   onUserSelected = (data) => {
     let existing = null
     let entity = data
-    // TODO: also do email validation on entered input?
-    const isEmail = !data.id
-
-    if (data.internalType === 'users' || isEmail) {
-      if (isEmail) {
-        entity = Object.assign({}, { name: data.custom, email: data.custom })
+    // check if the input is just an email string e.g. "person@email.com"
+    const emailInput = !data.id
+    if (emailInput && !isEmail(data.custom)) {
+      // try filtering out for emails within the string
+      // NOTE: this will re-call onUserSelected with any valid emails
+      this.handleEmailInput(_.filter(data.custom.match(/[^\s,]+/g), isEmail))
+      return
+    }
+    if (data.internalType === 'users' || emailInput) {
+      if (emailInput) {
+        entity = { name: data.custom, email: data.custom, internalType: 'users' }
       }
       existing = this.selectedUsers
         .filter(selected => selected.internalType === 'users')
@@ -65,12 +76,48 @@ class RolesAdd extends React.Component {
     this.selectedUsers.remove(entity)
   }
 
+  @action
+  setLoading = value => {
+    this.loading = value
+  }
+
   onUserSearch = (searchTerm) =>
     this.props.onSearch(searchTerm).then((res) =>
       res.data.map((user) =>
         ({ value: user.email, label: user.name, data: user })))
 
-  handleSave = async (ev) => {
+  confirmSave = () => {
+    const { ownerType } = this.props
+    if (this.selectedUsers.length > 10) {
+      const confirmOpts = {
+        prompt: '',
+        cancelText: 'Cancel',
+        confirmText: 'Continue',
+        onConfirm: this.handleSave,
+      }
+      if (ownerType === 'groups') {
+        confirmOpts.prompt = `
+          Are you sure you want to add ${this.selectedUsers.length} users to this group?
+        `
+      } else {
+        confirmOpts.prompt = `
+          Are you sure you want to add ${this.selectedUsers.length}
+          users to ${uiStore.viewingRecord.name}?
+          Large numbers of users may be better managed by adding them to a group.
+        `
+        confirmOpts.cancelText = 'Go to People and Groups'
+        confirmOpts.onCancel = () => {
+          uiStore.closeRolesMenu()
+          uiStore.update('organizationMenuPage', 'organizationPeople')
+        }
+      }
+      uiStore.confirm(confirmOpts)
+      return
+    }
+    this.handleSave()
+  }
+
+  handleSave = async () => {
     const emails = this.selectedUsers
       .filter((selected) => !selected.id)
       .map((selected) => selected.email)
@@ -79,13 +126,15 @@ class RolesAdd extends React.Component {
       .filter((selected) => !!selected.id)
 
     let created = { data: [] }
+    this.setLoading(true)
     if (emails.length) {
       created = await this.props.onCreateUsers(emails)
     }
     const roles = await this.props.onCreateRoles(
       [...created.data, ...fullUsers], this.selectedRole
     )
-    this.reset()
+    this.setLoading(false)
+    this.resetSelectedUsers()
     return roles
   }
 
@@ -95,8 +144,16 @@ class RolesAdd extends React.Component {
   }
 
   @action
-  reset() {
+  resetSelectedUsers = () => {
     this.selectedUsers = []
+  }
+
+  handleEmailInput = (emails) => {
+    _.each(emails, email => {
+      this.onUserSelected({
+        custom: email,
+      })
+    })
   }
 
   mapItems() {
@@ -114,16 +171,35 @@ class RolesAdd extends React.Component {
     })
   }
 
+  renderPillList = () => {
+    const count = this.selectedUsers.length
+    if (count) {
+      if (count > 100) {
+        return (
+          <PillList
+            itemList={[{
+              name: `${count} people pending invitation`
+            }]}
+            onItemDelete={this.resetSelectedUsers}
+          />
+        )
+      }
+      return (
+        <PillList
+          itemList={this.selectedUsers}
+          onItemDelete={this.onUserDelete}
+        />
+      )
+    }
+    return ''
+  }
+
   render() {
     const { roleTypes } = this.props
     return (
-      <div>
-        { this.selectedUsers.length > 0 && (
-          <PillList
-            itemList={this.selectedUsers}
-            onItemDelete={this.onUserDelete}
-          />)
-        }
+      <div style={{ marginBottom: '1rem' }}>
+        {this.loading && <InlineLoader /> }
+        {this.renderPillList()}
         <Row>
           <AutoComplete
             options={this.mapItems()}
@@ -149,9 +225,14 @@ class RolesAdd extends React.Component {
             </RowItemRight>
           </RightAligner>
         </Row>
+        <Row style={{ marginBottom: '4rem' }}>
+          <EmailCSVUploader
+            onComplete={this.handleEmailInput}
+          />
+        </Row>
         <FormActionsContainer>
           <FormButton
-            onClick={this.handleSave}
+            onClick={this.confirmSave}
             disabled={this.selectedUsers.length === 0}
           >
             Add
@@ -168,6 +249,7 @@ RolesAdd.propTypes = {
   onCreateRoles: PropTypes.func.isRequired,
   onCreateUsers: PropTypes.func.isRequired,
   onSearch: PropTypes.func,
+  ownerType: PropTypes.string.isRequired,
 }
 RolesAdd.defaultProps = {
   onSearch: () => {}
