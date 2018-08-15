@@ -4,7 +4,6 @@ import PropTypes from "prop-types";
 import Button from '@material-ui/core/Button';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
-import MenuIcon from '@material-ui/icons/Menu';
 import Typography from '@material-ui/core/Typography';
 
 import ReactMarkdown from 'react-markdown'
@@ -75,7 +74,6 @@ class MarketingPage extends React.PureComponent {
     return (
       <React.Fragment>
           <PatternedBack>
-
           <AppBar position="static" style={{background: 'transparent',  boxShadow: 'none'}}>
             <Toolbar>
                 <Button>ABOUT</Button>

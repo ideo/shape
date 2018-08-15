@@ -9,9 +9,8 @@ class HomeController < ApplicationController
   end
 
   def marketing
-    render :action => 'index'
   end
- 
+
   def login
   end
 
