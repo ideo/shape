@@ -117,7 +117,7 @@ class CollectionCard < ApplicationRecord
 
   def master_template_card?
     # does this card live in a MasterTemplate?
-    parent.is_a? Collection::MasterTemplate
+    parent.master_template?
   end
 
   def pinned_and_locked?

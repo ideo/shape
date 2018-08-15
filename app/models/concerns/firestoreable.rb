@@ -9,7 +9,6 @@ module Firestoreable
     Group: SerializableSimpleGroup,
     Collection: SerializableSimpleCollection,
     CommentThread: SerializableCommentThread,
-    'Collection::MasterTemplate': SerializableSimpleCollection,
     'Collection::Global': SerializableSimpleCollection,
     'Collection::UserProfile': SerializableSimpleCollection,
     'Item::VideoItem': SerializableSimpleItem,

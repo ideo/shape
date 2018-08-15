@@ -1,23 +1,18 @@
 require 'rails_helper'
 
-describe Collection::MasterTemplate, type: :model do
-  context 'associations' do
-    it { should have_many :templated_collections }
-  end
-
+describe Templateable, type: :concern do
   describe '#profile_template?' do
     let(:organization) { create(:organization) }
     let(:profile_template) { organization.profile_template }
 
     before do
-      organization.create_profile_template(
+      organization.create_profile_master_template(
         name: 'profile template',
-        organization: organization,
       )
     end
 
     it 'should be a MasterTemplate' do
-      expect(profile_template.type).to eq 'Collection::MasterTemplate'
+      expect(profile_template.master_template?).to be true
     end
 
     it 'should return true if it\'s the org\'s profile template' do
@@ -27,7 +22,7 @@ describe Collection::MasterTemplate, type: :model do
 
   describe '#setup_templated_collection' do
     let(:user) { create(:user) }
-    let(:template) { create(:master_template, num_cards: 3, add_editors: [user]) }
+    let(:template) { create(:collection, master_template: true, num_cards: 3, add_editors: [user]) }
     let(:collection) { create(:collection) }
 
     before do
@@ -48,7 +43,7 @@ describe Collection::MasterTemplate, type: :model do
 
   describe '#update_templated_collections' do
     let(:user) { create(:user) }
-    let!(:template) { create(:master_template, num_cards: 3, pin_cards: true) }
+    let!(:template) { create(:collection, master_template: true, num_cards: 3, pin_cards: true) }
     let!(:templated_collection) { create(:collection, template: template, created_by: user) }
 
     context 'with new collections' do

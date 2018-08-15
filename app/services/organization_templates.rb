@@ -32,9 +32,8 @@ class OrganizationTemplates < SimpleService
   def setup_profile_template
     return if @org.profile_template.present?
     # Create default profile template and add it to the templates collection
-    profile_template = @org.create_profile_template(
+    profile_template = @org.create_profile_master_template(
       name: 'Profile',
-      organization: @org,
     )
     CollectionCard::Primary.create(
       order: 1,
