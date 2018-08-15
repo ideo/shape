@@ -59,6 +59,7 @@ export default {
   weights: {
     book: 400,
     medium: 500,
+    bold: 700,
   },
 
   zIndex: {

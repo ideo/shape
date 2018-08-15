@@ -80,7 +80,7 @@ class Routes extends React.Component {
 
   handleAsAnonymousUser(){
     const { apiStore, routingStore } = this.props
-    /// even if logged in, you're anonymous for marketing site
+    // even if logged in, you're anonymous for marketing site
     if (routingStore.pathContains('/marketing')){
       this.setState({isAnonymous: true})
     } else {
