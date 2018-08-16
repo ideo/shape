@@ -17,6 +17,9 @@ Rails.application.routes.draw do
           post 'duplicate'
           patch 'archive'
         end
+        collection do
+          post 'create_template'
+        end
         resources :collection_cards, only: :index
         resources :roles, only: %i[index create destroy], shallow: true
       end

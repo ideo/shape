@@ -141,7 +141,12 @@ export default class UiStore {
     this.movingFromCollectionId = fromCollectionId
     // cardAction can be 'move' or 'link'
     this.cardAction = cardAction || 'move'
-    this.movingCardIds.replace([...this.selectedCardIds])
+    if (this.cardAction === 'useTemplate') {
+      // fake the selected card because we aren't moving an existing card
+      this.movingCardIds.replace(['template'])
+    } else {
+      this.movingCardIds.replace([...this.selectedCardIds])
+    }
   }
 
   @action closeMoveMenu({ deselect = true } = {}) {

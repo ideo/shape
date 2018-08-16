@@ -19,6 +19,7 @@ import TagEditorModal from '~/ui/pages/shared/TagEditorModal'
 import { FixedHeader, MaxWidthContainer } from '~/ui/global/styled/layout'
 import { SubduedHeading1 } from '~/ui/global/styled/typography'
 import { StyledTitleAndRoles } from '~/ui/pages/shared/styled'
+import { FormButton } from '~/ui/global/styled/forms'
 import v from '~/utils/variables'
 /* global IdeoSSO */
 
@@ -144,6 +145,20 @@ class PageHeader extends React.Component {
     return elements
   }
 
+  get isTemplateCollection() {
+    const { record } = this.props
+    // profile template does not get the "Use Template" CTA button
+    return (record.isMasterTemplate && !record.isProfileTemplate)
+  }
+
+  openMoveMenuForTemplate = () => {
+    const { record, uiStore } = this.props
+    uiStore.openMoveMenu({
+      from: record.id,
+      cardAction: 'useTemplate',
+    })
+  }
+
   get collectionIcon() {
     const { record } = this.props
     if (record.isProfileTemplate) {
@@ -212,6 +227,15 @@ class PageHeader extends React.Component {
                   { this.collectionTypeIcon }
                   { this.collectionTypeOrInheritedTags }
                 </div>
+                {this.isTemplateCollection &&
+                  <FormButton
+                    color="blue"
+                    style={{ marginLeft: 10, marginTop: 10 }}
+                    onClick={this.openMoveMenuForTemplate}
+                  >
+                    Use Template
+                  </FormButton>
+                }
               </Flex>
               <Flex align="flex-end" style={{ height: '60px', marginTop: '-10px' }}>
                 <Fragment>

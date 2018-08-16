@@ -6,7 +6,7 @@ RSpec.describe CollectionBuilder, type: :service do
   let(:collection_card) { create(:collection_card, parent: collection) }
   let(:params) {
     {
-      'name': 'My Fancy Collection'
+      'name': 'My Fancy Collection',
     }
   }
 
@@ -25,7 +25,6 @@ RSpec.describe CollectionBuilder, type: :service do
       it 'should be true' do
         expect(builder.save).to be true
       end
-
     end
 
     context 'for sub-collection' do

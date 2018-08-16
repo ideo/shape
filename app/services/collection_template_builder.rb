@@ -1,4 +1,4 @@
-class CollectionBuilder
+class CollectionTemplateBuilder
   attr_reader :collection, :errors
 
   def initialize(params:, organization: nil, parent_card: nil, created_by: nil)
