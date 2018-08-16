@@ -2,6 +2,7 @@ import PropTypes from 'prop-types'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 import { Flex, Box } from 'reflexbox'
+import FlipMove from 'react-flip-move'
 
 import CollectionCard from '~/stores/jsonApi/CollectionCard'
 import AddTextIcon from '~/ui/icons/AddTextIcon'
@@ -53,6 +54,9 @@ const StyledBlankCreationTool = styled.div`
     width: ${props => (props.replacing ? '50%' : '100%')};
     &.foreground-bottom {
       top: 120px;
+      /* width is smaller because there are only 2 bottom buttons; can change if we add more */
+      width: 70%;
+      margin: 0 auto;
     }
   }
   transition: ${v.transitionWithDelay};
@@ -481,18 +485,32 @@ class GridCardBlank extends React.Component {
             videoBctBox
           }
           {creating && creating === 'template' &&
-            <BctButtonBox
-              type="template"
-              creating={creating}
-              size={size}
-              Icon={TemplateIcon}
-            />
+            <FlipMove
+              appearAnimation={{
+                from: {
+                  transform: 'rotate(180deg) translateY(80px)',
+                  transformOrigin: '120px 140px',
+                },
+                to: {
+                  transform: 'none',
+                  transformOrigin: '120px 140px',
+                },
+              }}
+            >
+              <div>
+                <BctButtonBox
+                  type="template"
+                  creating={creating}
+                  size={size}
+                  Icon={() => <TemplateIcon viewBox="-5 -5 60 60" />}
+                />
+              </div>
+            </FlipMove>
           }
         </Flex>
         <Flex
           className={`foreground ${!creating ? 'foreground-bottom' : ''}`}
-          align={creating ? '' : 'center'}
-          justify={creating ? 'space-between' : 'center'}
+          justify={creating ? 'space-between' : 'space-evenly'}
         >
           {(!isReplacing && (!creating || creating === 'video')) &&
             videoBctBox
@@ -502,6 +520,7 @@ class GridCardBlank extends React.Component {
               buttonStyle="bct"
               menuOpen={this.state.bctMenuOpen}
               onClick={this.toggleBctMenu}
+              direction="right"
               menuItems={[
                 { name: 'Create Template', iconRight: <TemplateIcon />, onClick: this.startCreating('template') }
               ]}

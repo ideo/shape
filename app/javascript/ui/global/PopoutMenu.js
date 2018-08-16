@@ -38,7 +38,10 @@ export const StyledMenuWrapper = styled.div`
   position: absolute;
   padding: 10px;
   top: 14px;
-  right: -32px;
+  ${props => (props.direction === 'right'
+    ? 'left: 0; top: 42px;'
+    : 'right: -32px;'
+  )}
 `
 StyledMenuWrapper.displayName = 'StyledMenuWrapper'
 
@@ -120,6 +123,7 @@ class PopoutMenu extends React.PureComponent {
       onClick,
       width,
       buttonStyle,
+      direction,
     } = this.props
 
     const isBct = buttonStyle === 'bct'
@@ -139,7 +143,7 @@ class PopoutMenu extends React.PureComponent {
             viewBox={isBct ? '-11 -11 26 40' : '0 0 5 18'}
           />
         </MenuToggle>
-        <StyledMenuWrapper className="menu-wrapper">
+        <StyledMenuWrapper direction={direction} className="menu-wrapper">
           <StyledMenu width={width}>
             {this.renderMenuItems}
           </StyledMenu>
@@ -165,6 +169,7 @@ PopoutMenu.propTypes = {
     noBorder: PropTypes.bool,
     loading: PropTypes.bool,
   })).isRequired,
+  direction: PropTypes.string,
 }
 
 PopoutMenu.defaultProps = {
@@ -175,6 +180,7 @@ PopoutMenu.defaultProps = {
   disabled: false,
   buttonStyle: '',
   width: 200,
+  direction: 'left',
 }
 
 export default PopoutMenu
