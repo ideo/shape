@@ -92,21 +92,22 @@ class SearchBar extends React.Component {
   }
 
   clearSearch = () => {
-    this.updateSearchText('')
     const { onClear } = this.props
     onClear && onClear()
   }
 
   focusOnSearchInput = () => {
+    const { value } = this.props
     const { searchInput } = this
     searchInput.focus()
     // clear out value
     searchInput.value = ''
     // re-input value so that cursor is now at the end of the text
-    searchInput.value = this.searchText
+    searchInput.value = value
   }
 
   render() {
+    const { value } = this.props
     return (
       <StyledSearchBar focused={this.props.focused || this.focused}>
         <span className="search">
@@ -116,12 +117,12 @@ class SearchBar extends React.Component {
           ref={(input) => { this.searchInput = input }}
           type="text"
           placeholder="search..."
-          value={this.searchText}
+          value={value}
           onFocus={this.handleFocus(true)}
           onBlur={this.handleFocus(false)}
           onChange={this.handleTextChange}
         />
-        {this.searchText &&
+        {value &&
           <button onClick={this.clearSearch} className="close">
             <CloseIcon />
           </button>
@@ -132,9 +133,10 @@ class SearchBar extends React.Component {
 }
 
 SearchBar.propTypes = {
+  value: PropTypes.string.isRequired,
+  onChange: PropTypes.func.isRequired,
+  onClear: PropTypes.func.isRequired,
   focused: PropTypes.bool,
-  onChange: PropTypes.func,
-  onClear: PropTypes.func,
 }
 
 SearchBar.defaultProps = {

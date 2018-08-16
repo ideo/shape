@@ -34,15 +34,6 @@ class GlobalSearchBar extends React.Component {
 
   clearSearch = () => this.updateSearchText('')
 
-  focusOnSearchInput = () => {
-    const { searchInput } = this
-    searchInput.focus()
-    // clear out value
-    searchInput.value = ''
-    // re-input value so that cursor is now at the end of the text
-    searchInput.value = this.searchText
-  }
-
   render() {
     const { routingStore } = this.props
     return (
