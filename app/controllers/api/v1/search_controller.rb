@@ -35,7 +35,7 @@ class Api::V1::SearchController < Api::V1::BaseController
       organization_id: current_organization.id,
     }
     if !current_user.has_role?(Role::SUPER_ADMIN)
-      where_clause[:or] = [
+      where_clause[:_or] = [
         { user_ids: [current_user.id] },
         { group_ids: current_user_current_group_ids },
       ]
