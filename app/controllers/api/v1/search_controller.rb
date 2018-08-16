@@ -33,11 +33,13 @@ class Api::V1::SearchController < Api::V1::BaseController
     tags = query.scan(/#\w+/).flatten.map { |tag| tag.delete('#') }
     where_clause = {
       organization_id: current_organization.id,
-      _or: [
+    }
+    if !current_user.has_role?(Role::SUPER_ADMIN)
+      where_clause[:or] = [
         { user_ids: [current_user.id] },
         { group_ids: current_user_current_group_ids },
-      ],
-    }
+      ]
+    end
     where_clause[:tags] = { all: tags } if tags.count.positive?
     untagged_query = query.sub(/#\w+\s/, '')
     Collection.search(

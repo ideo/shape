@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types'
 import _ from 'lodash'
 import { action, observable } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
@@ -6,7 +7,6 @@ import styled from 'styled-components'
 import v from '~/utils/variables'
 import SearchIcon from '~/ui/icons/SearchIcon'
 import CloseIcon from '~/ui/icons/CloseIcon'
-
 const StyledSearchBar = styled.div`
   border-bottom: 1px solid ${props => (props.focused ? v.colors.blackLava : v.colors.cloudy)};
   color: ${props => (props.focused ? v.colors.blackLava : v.colors.cloudy)};
@@ -64,32 +64,21 @@ const StyledSearchBar = styled.div`
 `
 StyledSearchBar.displayName = 'StyledSearchBar'
 
-@inject('routingStore', 'uiStore') // needed for routeTo method
 @observer
 class SearchBar extends React.Component {
   @observable focused = false
 
   constructor(props) {
     super(props)
-    this.search = _.debounce(this._search, 300)
   }
 
   componentDidMount() {
     const { routingStore } = this.props
-    if (routingStore.pathContains('/search')) {
+    // TODO How to do this?
+    // if (routingStore.pathContains('/search')) {
       // if we're on the search page, focus on the search input box
-      this.focusOnSearchInput()
-    }
-  }
-
-  get searchText() {
-    return this.props.uiStore.searchText
-  }
-
-  _search = (query) => {
-    const { routingStore } = this.props
-    if (!query || query === '') return routingStore.leaveSearch()
-    return routingStore.routeTo('search', query.replace(/#/g, '%23'))
+    // this.focusOnSearchInput()
+    // }
   }
 
   @action updateFocus = (val) => {
@@ -98,17 +87,15 @@ class SearchBar extends React.Component {
 
   handleFocus = val => () => this.updateFocus(val)
 
-  updateSearchText = (text) => {
-    this.props.uiStore.update('searchText', text)
-    // perform a debounced search
-    this.search(this.searchText)
-  }
-
   handleTextChange = (ev) => {
-    this.updateSearchText(ev.target.value)
+    this.props.onChange(ev.target.value)
   }
 
-  clearSearch = () => this.updateSearchText('')
+  clearSearch = () => {
+    this.updateSearchText('')
+    const { onClear } = this.props
+    onClear && onClear()
+  }
 
   focusOnSearchInput = () => {
     const { searchInput } = this
@@ -121,7 +108,7 @@ class SearchBar extends React.Component {
 
   render() {
     return (
-      <StyledSearchBar focused={this.focused}>
+      <StyledSearchBar focused={this.props.focused || this.focused}>
         <span className="search">
           <SearchIcon />
         </span>
@@ -144,9 +131,14 @@ class SearchBar extends React.Component {
   }
 }
 
-SearchBar.wrappedComponent.propTypes = {
-  routingStore: MobxPropTypes.objectOrObservableObject.isRequired,
-  uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
+SearchBar.propTypes = {
+  focused: PropTypes.bool,
+  onChange: PropTypes.func,
+  onClear: PropTypes.func,
+}
+
+SearchBar.defaultProps = {
+  focused: false,
 }
 
 export default SearchBar

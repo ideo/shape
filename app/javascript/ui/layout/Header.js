@@ -4,7 +4,7 @@ import { Flex, Box } from 'reflexbox'
 
 import Logo from '~/ui/layout/Logo'
 import PlainLink from '~/ui/global/PlainLink'
-import SearchBar from '~/ui/layout/SearchBar'
+import GlobalSearch from '~/ui/layout/GlobalSearch'
 import Avatar from '~/ui/global/Avatar'
 import ProfileIcon from '~/ui/icons/ProfileIcon'
 import SettingsIcon from '~/ui/icons/SettingsIcon'
@@ -161,7 +161,7 @@ class Header extends React.Component {
             </Box>
 
             <Box flex>
-              <SearchBar className="search-bar" />
+              <GlobalSearch className="search-bar" />
               <StyledAvatarAndDropdown>
                 {this.renderOrgDropdown}
                 <button className="orgBtn" onClick={this.handleOrgClick(true)}>
