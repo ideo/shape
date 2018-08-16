@@ -130,6 +130,8 @@ export const CardHeading = Heading1.extend`
     and (min-width: ${v.responsive.medBreakpoint}px)
     and (max-width: ${v.responsive.largeBreakpoint}px) {
     padding: 0;
+    font-size: 1.75rem;
+    line-height: 2rem;
   }
 `
 CardHeading.displayName = 'CardHeading'
