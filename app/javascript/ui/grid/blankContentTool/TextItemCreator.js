@@ -1,14 +1,12 @@
 import PropTypes from 'prop-types'
-import { observable, observe, runInAction } from 'mobx'
 import ReactQuill from 'react-quill'
 import _ from 'lodash'
 import styled from 'styled-components'
 
 import ActionCableConsumer from '~/utils/ActionCableConsumer'
 import Item from '~/stores/jsonApi/Item'
-import { overrideHeadersFromClipboard } from '~/ui/items/TextItem'
-import v, { ITEM_TYPES, KEYS } from '~/utils/variables'
-import { apiStore, routingStore, uiStore } from '~/stores'
+import { ITEM_TYPES } from '~/utils/variables'
+import { apiStore, routingStore } from '~/stores'
 import TextItem from '~/ui/items/TextItem'
 
 const StyledTextItemCreator = styled.div`

@@ -1,12 +1,11 @@
 import PropTypes from 'prop-types'
-import _ from 'lodash'
 import { action, observable } from 'mobx'
-import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
+import { observer } from 'mobx-react'
 import styled from 'styled-components'
-
 import v from '~/utils/variables'
 import SearchIcon from '~/ui/icons/SearchIcon'
 import CloseIcon from '~/ui/icons/CloseIcon'
+
 const StyledSearchBar = styled.div`
   border-bottom: 1px solid ${props => (props.focused ? v.colors.blackLava : v.colors.cloudy)};
   color: ${props => (props.focused ? v.colors.blackLava : v.colors.cloudy)};
@@ -67,19 +66,6 @@ StyledSearchBar.displayName = 'StyledSearchBar'
 @observer
 class SearchBar extends React.Component {
   @observable focused = false
-
-  constructor(props) {
-    super(props)
-  }
-
-  componentDidMount() {
-    const { routingStore } = this.props
-    // TODO How to do this?
-    // if (routingStore.pathContains('/search')) {
-      // if we're on the search page, focus on the search input box
-    // this.focusOnSearchInput()
-    // }
-  }
 
   @action updateFocus = (val) => {
     this.focused = val

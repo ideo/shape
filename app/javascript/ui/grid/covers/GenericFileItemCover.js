@@ -1,9 +1,7 @@
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
-import Truncator from 'react-truncator'
 import v from '~/utils/variables'
 import CornerIcon from '~/ui/icons/CornerIcon'
-import { uiStore } from '~/stores'
 import GridCardIconWithName from '~/ui/grid/shared'
 import FileIcon from '~/ui/grid/covers/FileIcon'
 

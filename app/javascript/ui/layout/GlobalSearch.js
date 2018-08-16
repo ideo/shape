@@ -1,5 +1,4 @@
 import _ from 'lodash'
-import { action, observable } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 
 import SearchBar from '~/ui/layout/SearchBar'

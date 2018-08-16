@@ -189,7 +189,6 @@ PopoutMenu.propTypes = {
     noBorder: PropTypes.bool,
     loading: PropTypes.bool,
   })).isRequired,
-  showSearch: PropTypes.bool,
 }
 
 PopoutMenu.defaultProps = {

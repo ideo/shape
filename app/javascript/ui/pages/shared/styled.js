@@ -1,8 +1,6 @@
 import { Flex } from 'reflexbox'
 import styled from 'styled-components'
 
-import v from '~/utils/variables'
-
 export const StyledTitleAndRoles = styled(Flex)`
   .page-menu {
     position: relative;
