@@ -387,6 +387,11 @@ class Collection < ApplicationRecord
     false
   end
 
+  # is this collection made from a template?
+  def templated?
+    template_id.present?
+  end
+
   def cache_key
     "#{jsonapi_cache_key}" \
       "/#{ActiveRecord::Migrator.current_version}" \

@@ -115,6 +115,7 @@ class PopoutMenu extends React.PureComponent {
     const {
       className,
       menuOpen,
+      disabled,
       onMouseLeave,
       onClick,
       width,
@@ -130,6 +131,7 @@ class PopoutMenu extends React.PureComponent {
         onMouseLeave={onMouseLeave}
       >
         <MenuToggle
+          disabled={disabled}
           onClick={onClick}
           className="menu-toggle"
         >
@@ -153,6 +155,7 @@ PopoutMenu.propTypes = {
   className: PropTypes.string,
   width: PropTypes.number,
   menuOpen: PropTypes.bool,
+  disabled: PropTypes.bool,
   buttonStyle: PropTypes.string,
   menuItems: PropTypes.arrayOf(PropTypes.shape({
     name: PropTypes.string,
@@ -169,6 +172,7 @@ PopoutMenu.defaultProps = {
   onClick: () => null,
   className: '',
   menuOpen: false,
+  disabled: false,
   buttonStyle: '',
   width: 200,
 }

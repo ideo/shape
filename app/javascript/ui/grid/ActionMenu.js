@@ -69,7 +69,7 @@ class ActionMenu extends React.Component {
   archiveCard = async () => {
     const { afterArchive } = this.props
     await this.callCardAction('Archive', 'API_archive')
-    if (afterArchive) afterArchive()
+    if (afterArchive) afterArchive({ type: 'archive' })
   }
 
   showTags = () => {

@@ -13,6 +13,7 @@ import RolesModal from '~/ui/roles/RolesModal'
 import RolesSummary from '~/ui/roles/RolesSummary'
 import FilledProfileIcon from '~/ui/icons/FilledProfileIcon'
 import ProfileIcon from '~/ui/icons/ProfileIcon'
+import TemplateIcon from '~/ui/icons/TemplateIcon'
 import SystemIcon from '~/ui/icons/SystemIcon'
 import TagEditorModal from '~/ui/pages/shared/TagEditorModal'
 import { FixedHeader, MaxWidthContainer } from '~/ui/global/styled/layout'
@@ -85,7 +86,7 @@ class PageHeader extends React.Component {
 
   routeBack = ({ type }) => {
     const { record, routingStore } = this.props
-    if (record.internalType === 'items' || type === 'move') {
+    if (record.internalType === 'items' || type === 'move' || type === 'archive') {
       if (record.parent_collection_card.parent_id) {
         routingStore.routeTo('collections',
           record.parent_collection_card.parent_id)
@@ -147,6 +148,8 @@ class PageHeader extends React.Component {
     const { record } = this.props
     if (record.isProfileTemplate) {
       return <IconHolder align="left"><FilledProfileIcon /></IconHolder>
+    } else if (record.isMasterTemplate) {
+      return <IconHolder align="left"><TemplateIcon circled /></IconHolder>
     }
     return null
   }

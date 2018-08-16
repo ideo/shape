@@ -68,5 +68,7 @@ module Templateable
       on: :tags,
     )
     update_cached_tag_lists
+    # no good way around saving a 2nd time after_create
+    save
   end
 end

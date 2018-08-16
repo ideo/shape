@@ -199,7 +199,6 @@ const BctButtonBox = ({
   creating,
   onClick,
   Icon,
-  Menu,
 }) => (
   <Box>
     <Tooltip
@@ -211,12 +210,7 @@ const BctButtonBox = ({
         creating={creating === type}
         onClick={onClick}
       >
-        { Icon &&
-          <Icon width={size} height={size} color="white" />
-        }
-        { Menu &&
-          <Menu />
-        }
+        <Icon width={size} height={size} color="white" />
       </BctButton>
     </Tooltip>
   </Box>
@@ -224,18 +218,17 @@ const BctButtonBox = ({
 
 BctButtonBox.propTypes = {
   type: PropTypes.string,
-  tooltip: PropTypes.string.isRequired,
+  tooltip: PropTypes.string,
   size: PropTypes.number.isRequired,
   creating: PropTypes.string,
-  onClick: PropTypes.func.isRequired,
-  Icon: PropTypes.func,
-  Menu: PropTypes.func,
+  onClick: PropTypes.func,
+  Icon: PropTypes.func.isRequired,
 }
 BctButtonBox.defaultProps = {
+  onClick: () => null,
+  tooltip: '',
   creating: '',
   type: '',
-  Icon: null,
-  Menu: null,
 }
 
 @inject('uiStore', 'apiStore')
@@ -292,7 +285,7 @@ class GridCardBlank extends React.Component {
   }
 
   startCreating = type => () => {
-    this.setState({ creating: type })
+    this.setState({ creating: type, bctMenuOpen: false })
   }
 
   createCardWith = (file) => {
@@ -367,8 +360,10 @@ class GridCardBlank extends React.Component {
     let inner
     switch (this.state.creating) {
     case 'collection':
+    case 'template':
       inner = (
         <CollectionCreator
+          template={this.state.creating === 'template'}
           loading={this.state.loading}
           createCard={this.createCard}
           closeBlankContentTool={this.closeBlankContentTool}
@@ -485,6 +480,14 @@ class GridCardBlank extends React.Component {
           {isReplacing &&
             videoBctBox
           }
+          {creating && creating === 'template' &&
+            <BctButtonBox
+              type="template"
+              creating={creating}
+              size={size}
+              Icon={TemplateIcon}
+            />
+          }
         </Flex>
         <Flex
           className={`foreground ${!creating ? 'foreground-bottom' : ''}`}
@@ -494,15 +497,16 @@ class GridCardBlank extends React.Component {
           {(!isReplacing && (!creating || creating === 'video')) &&
             videoBctBox
           }
-          <PopoutMenu
-            buttonStyle="bct"
-            // width={100}
-            menuOpen={this.state.bctMenuOpen}
-            onClick={this.toggleBctMenu}
-            menuItems={[
-              { name: 'Create Template', iconRight: <TemplateIcon />, onClick: this.startCreating('template') }
-            ]}
-          />
+          {(!isReplacing && !creating) &&
+            <PopoutMenu
+              buttonStyle="bct"
+              menuOpen={this.state.bctMenuOpen}
+              onClick={this.toggleBctMenu}
+              menuItems={[
+                { name: 'Create Template', iconRight: <TemplateIcon />, onClick: this.startCreating('template') }
+              ]}
+            />
+          }
         </Flex>
         {inner}
         <BctBackground />

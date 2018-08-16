@@ -25,7 +25,7 @@ describe Templateable, type: :concern do
       let(:collection) { create(:collection, master_template: true) }
 
       it 'should give the #template tag if it is a master_template' do
-        expect(collection.cached_owned_tag_list).to match_array(['template'])
+        expect(collection.reload.cached_owned_tag_list).to match_array(['template'])
       end
     end
   end

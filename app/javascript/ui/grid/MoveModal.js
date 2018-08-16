@@ -93,7 +93,7 @@ class MoveModal extends React.Component {
 
   moveCards = async (placement) => {
     const { uiStore, apiStore } = this.props
-    const { viewingCollection } = uiStore
+    const { viewingCollection, cardAction } = uiStore
     // Viewing collection might not be set, such as on the search page
     if (!viewingCollection) {
       uiStore.alert('You can\'t move an item here')
@@ -101,13 +101,17 @@ class MoveModal extends React.Component {
     }
     const collectionId = viewingCollection.id
     const movingFromCollection = apiStore.find('collections', uiStore.movingFromCollectionId)
-    if (!viewingCollection.can_edit_content || (
+    if (!viewingCollection.can_edit_content) {
+      uiStore.alert('You don\'t have permission to move items to this collection')
+      return
+    } else if (
       // don't allow moving cards from templates to non-templates
+      cardAction === 'move' &&
       movingFromCollection &&
       movingFromCollection.isMasterTemplate &&
       !viewingCollection.isMasterTemplate
-    )) {
-      uiStore.alert('You don\'t have permission to move items to this collection')
+    ) {
+      uiStore.alert('You can\'t move pinned template items out of a template')
       return
     }
     const data = {
@@ -119,13 +123,13 @@ class MoveModal extends React.Component {
     try {
       runInAction(() => { this.isLoading = true })
       let successMessage
-      if (uiStore.cardAction === 'move') {
+      if (cardAction === 'move') {
         await apiStore.request('collection_cards/move', 'PATCH', data)
         successMessage = 'Items successfully moved!'
-      } else if (uiStore.cardAction === 'link') {
+      } else if (cardAction === 'link') {
         await apiStore.request('collection_cards/link', 'POST', data)
         successMessage = 'Items successfully linked!'
-      } else if (uiStore.cardAction === 'duplicate') {
+      } else if (cardAction === 'duplicate') {
         await apiStore.request('collection_cards/duplicate', 'POST', data)
         // have to re-fetch here because the duplicate method wasn't re-rendering
         // see note in collection_cards_controller#duplicate

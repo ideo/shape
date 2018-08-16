@@ -193,48 +193,6 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
     end
   end
 
-  describe 'PATCH #update' do
-    let!(:collection_card) { create(:collection_card_text, parent: collection) }
-    let(:path) { "/api/v1/collection_cards/#{collection_card.id}" }
-    let(:params) {
-      json_api_params(
-        'collection_cards',
-        order: 2,
-        width: 1,
-        height: 3,
-      )
-    }
-
-    context 'with record edit access' do
-      before do
-        user.add_role(Role::EDITOR, collection_card.item)
-      end
-
-      it 'returns a 200' do
-        patch(path, params: params)
-        expect(response.status).to eq(200)
-      end
-
-      it 'matches JSON schema' do
-        patch(path, params: params)
-        expect(json['data']['attributes']).to match_json_schema('collection_card')
-      end
-
-      it 'updates the content' do
-        expect(collection_card.order).not_to eq(2)
-        patch(path, params: params)
-        expect(collection_card.reload.order).to eq(2)
-      end
-    end
-
-    context 'without record edit access' do
-      it 'returns a 401' do
-        patch(path, params: params)
-        expect(response.status).to eq(401)
-      end
-    end
-  end
-
   describe 'PATCH #archive', only: true do
     let!(:collection_cards) { create_list(:collection_card_collection, 3, parent: collection) }
     let(:path) { '/api/v1/collection_cards/archive' }
