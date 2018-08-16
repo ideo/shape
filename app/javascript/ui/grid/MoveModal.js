@@ -114,7 +114,7 @@ class MoveModal extends React.Component {
       uiStore.alert('You can\'t move pinned template items out of a template')
       return
     }
-    const data = {
+    let data = {
       to_id: collectionId,
       from_id: uiStore.movingFromCollectionId,
       collection_card_ids: uiStore.movingCardIds,
@@ -123,18 +123,32 @@ class MoveModal extends React.Component {
     try {
       runInAction(() => { this.isLoading = true })
       let successMessage
-      if (cardAction === 'move') {
+      switch (cardAction) {
+      case 'move':
         await apiStore.request('collection_cards/move', 'PATCH', data)
         successMessage = 'Items successfully moved!'
-      } else if (cardAction === 'link') {
+        break
+      case 'link':
         await apiStore.request('collection_cards/link', 'POST', data)
         successMessage = 'Items successfully linked!'
-      } else if (cardAction === 'duplicate') {
+        break
+      case 'duplicate':
         await apiStore.request('collection_cards/duplicate', 'POST', data)
         // have to re-fetch here because the duplicate method wasn't re-rendering
         // see note in collection_cards_controller#duplicate
         await apiStore.request(`collections/${collectionId}`)
         successMessage = 'Items successfully duplicated!'
+        break
+      case 'useTemplate':
+        data = {
+          parent_id: data.to_id,
+          template_id: data.from_id,
+          placement,
+        }
+        await apiStore.request('collections/create_template', 'POST', data)
+        break
+      default:
+        return
       }
       runInAction(() => { this.isLoading = false })
       uiStore.alertOk(successMessage)
