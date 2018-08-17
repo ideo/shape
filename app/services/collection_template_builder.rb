@@ -13,6 +13,8 @@ class CollectionTemplateBuilder
 
   def call
     return false unless create_collection
+    place_collection_in_parent
+    @collection
   end
 
   private
@@ -23,14 +25,26 @@ class CollectionTemplateBuilder
       return false
     end
 
+    # NOTE: Any issue with creating the template instance in a different org from the template?
     @collection = @template.templated_collections.create(
       name: "My #{@template.name}",
-      organization: @template.organization,
+      organization: @parent.organization,
     )
+    @created_by.add_role(Role::EDITOR, @collection)
     @template.setup_templated_collection(
       for_user: @created_by,
       collection: @collection,
     )
     @collection
+  end
+
+  def place_collection_in_parent
+    card = @parent.primary_collection_cards.create(
+      width: 1,
+      height: 1,
+      collection: @collection,
+      order: @placement == 'beginning' ? 0 : @parent.collection_cards.count,
+    )
+    card.increment_card_orders! if @placement == 'beginning'
   end
 end

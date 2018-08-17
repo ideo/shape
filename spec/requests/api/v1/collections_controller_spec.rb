@@ -130,39 +130,50 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
     end
   end
 
-  describe 'POST #create' do
-    let!(:organization) { create(:organization) }
-    let(:path) { "/api/v1/organizations/#{organization.id}/collections" }
-    let(:params) {
-      json_api_params(
-        'collections',
-        name: 'What a wonderful life',
-      )
-    }
-
-    before do
-      user.add_role(Role::MEMBER, organization.primary_group)
+  describe 'POST #create_template' do
+    let(:organization) { create(:organization) }
+    let(:template) { create(:collection, master_template: true, organization: organization) }
+    let(:to_collection) { create(:collection, organization: organization) }
+    let(:path) { '/api/v1/collections/create_template' }
+    let(:raw_params) do
+      {
+        parent_id: to_collection.id,
+        template_id: template.id,
+        placement: 'beginning',
+      }
     end
+    let(:params) { raw_params.to_json }
+    let(:instance_double) { double('builder') }
 
     context 'success' do
-      it 'returns a 200' do
+      before do
+        user.add_role(Role::EDITOR, to_collection)
+        user.add_role(Role::VIEWER, template)
+        allow(instance_double).to receive(:call).and_return(true)
+        allow(instance_double).to receive(:collection).and_return(create(:collection))
+      end
+
+      it 'calls the CollectionTemplateBuilder' do
+        expect(CollectionTemplateBuilder).to receive(:new).with(
+          parent: to_collection,
+          template: template,
+          placement: 'beginning',
+          created_by: user,
+        ).and_return(instance_double)
         post(path, params: params)
-        expect(response.status).to eq(200)
       end
 
       it 'matches Collection schema' do
         post(path, params: params)
+        expect(response.status).to eq(200)
         expect(json['data']['attributes']).to match_json_schema('collection')
       end
     end
 
-    context 'with errors' do
-      let(:path) { '/api/v1/collections' }
-
-      it 'returns a 400' do
-        # because of the new path, will get an "organization can't be blank" error
+    context 'without permission' do
+      it 'returns a 401' do
         post(path, params: params)
-        expect(response.status).to eq(400)
+        expect(response.status).to eq(401)
       end
     end
   end

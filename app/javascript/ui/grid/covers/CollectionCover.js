@@ -9,6 +9,7 @@ import PlainLink from '~/ui/global/PlainLink'
 import { CardHeading } from '~/ui/global/styled/typography'
 import hexToRgba from '~/utils/hexToRgba'
 import ProfileIcon from '~/ui/icons/ProfileIcon'
+import FilledProfileIcon from '~/ui/icons/FilledProfileIcon'
 import TemplateIcon from '~/ui/icons/TemplateIcon'
 import { routingStore } from '~/stores'
 
@@ -103,8 +104,10 @@ class CollectionCover extends React.Component {
       if (!nameParts) return collection.name
       const lastName = nameParts.pop()
       let icon = <ProfileIcon />
-      if (collection.isMasterTemplate) {
-        icon = <TemplateIcon circled />
+      if (collection.isProfileTemplate) {
+        icon = <FilledProfileIcon />
+      } else if (collection.isMasterTemplate) {
+        icon = <TemplateIcon circled filled />
       }
       return (
         <Fragment>

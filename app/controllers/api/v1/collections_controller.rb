@@ -2,17 +2,17 @@ class Api::V1::CollectionsController < Api::V1::BaseController
   deserializable_resource :collection, class: DeserializableCollection, only: %i[update]
   load_and_authorize_resource :collection_card, only: [:create]
   load_and_authorize_resource except: %i[me update]
-  before_action :check_cache, only: %i[show]
-  before_action :load_and_authorize_template, only: %i[create_template]
   # NOTE: these have to be in the following order
   before_action :load_and_authorize_collection_update, only: %i[update]
   before_action :load_collection_with_cards, only: %i[show update archive]
 
+  before_action :check_cache, only: %i[show]
   def show
     log_organization_view_activity
     render_collection
   end
 
+  before_action :load_and_authorize_template_and_parent, only: %i[create_template]
   def create_template
     builder = CollectionTemplateBuilder.new(
       parent: @parent_collection,
@@ -21,7 +21,7 @@ class Api::V1::CollectionsController < Api::V1::BaseController
       created_by: current_user,
     )
 
-    if builder.save
+    if builder.call
       render jsonapi: builder.collection
     else
       render_api_errors builder.errors
@@ -75,7 +75,7 @@ class Api::V1::CollectionsController < Api::V1::BaseController
     )
   end
 
-  def load_and_authorize_parent
+  def load_and_authorize_template_and_parent
     @parent_collection = Collection.find(json_api_params[:parent_id])
     # we are creating a template in this collection so authorize edit_content
     authorize! :edit_content, @parent_collection

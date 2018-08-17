@@ -9,6 +9,7 @@ import MoveArrowIcon from '~/ui/icons/MoveArrowIcon'
 import MoveHelperModal from '~/ui/users/MoveHelperModal'
 import Tooltip from '~/ui/global/Tooltip'
 import v from '~/utils/variables'
+import { routingStore } from '~/stores'
 
 const StyledSnackbar = styled(Snackbar)`
   &.Snackbar {
@@ -120,6 +121,7 @@ class MoveModal extends React.Component {
       collection_card_ids: uiStore.movingCardIds,
       placement,
     }
+    let afterMove = null
     try {
       runInAction(() => { this.isLoading = true })
       let successMessage
@@ -139,14 +141,19 @@ class MoveModal extends React.Component {
         await apiStore.request(`collections/${collectionId}`)
         successMessage = 'Items successfully duplicated!'
         break
-      case 'useTemplate':
+      case 'useTemplate': {
         data = {
           parent_id: data.to_id,
           template_id: data.from_id,
           placement,
         }
-        await apiStore.request('collections/create_template', 'POST', data)
+        const res = await apiStore.request('collections/create_template', 'POST', data)
+        successMessage = 'Your template instance has been created!'
+        afterMove = () => {
+          routingStore.routeTo('collections', res.data.id)
+        }
         break
+      }
       default:
         return
       }
@@ -159,6 +166,7 @@ class MoveModal extends React.Component {
       } else {
         uiStore.scroll.scrollToBottom()
       }
+      if (afterMove) afterMove()
     } catch (e) {
       runInAction(() => { this.isLoading = false })
       uiStore.alert('You cannot move a collection within itself')

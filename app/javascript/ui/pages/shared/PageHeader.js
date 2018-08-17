@@ -164,7 +164,7 @@ class PageHeader extends React.Component {
     if (record.isProfileTemplate) {
       return <IconHolder align="left"><FilledProfileIcon /></IconHolder>
     } else if (record.isMasterTemplate) {
-      return <IconHolder align="left"><TemplateIcon circled /></IconHolder>
+      return <IconHolder align="left"><TemplateIcon circled filled /></IconHolder>
     }
     return null
   }
