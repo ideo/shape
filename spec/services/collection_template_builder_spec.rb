@@ -45,6 +45,10 @@ RSpec.describe CollectionTemplateBuilder, type: :service do
       expect(collection.breadcrumb.length).to eq 2
     end
 
+    it 'should tag the collection instance with the template name' do
+      expect(collection.owned_tag_list).to include(template.name.parameterize)
+    end
+
     context 'without a proper template' do
       let(:template) { create(:collection) }
 

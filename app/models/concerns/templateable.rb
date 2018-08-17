@@ -9,6 +9,7 @@ module Templateable
              inverse_of: :template
 
     after_create :add_template_tag, if: :master_template?
+    after_create :add_template_instance_tag, if: :templated?
   end
 
   def profile_template?
@@ -70,5 +71,22 @@ module Templateable
     update_cached_tag_lists
     # no good way around saving a 2nd time after_create
     save
+  end
+
+  def add_template_instance_tag
+    # create the special #template tag
+    tag(
+      self,
+      with: template.name.parameterize,
+      on: :tags,
+    )
+    update_cached_tag_lists
+    # no good way around saving a 2nd time after_create
+    save
+  end
+
+  # is this collection made from a template?
+  def templated?
+    template_id.present?
   end
 end

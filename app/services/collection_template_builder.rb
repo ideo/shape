@@ -14,6 +14,8 @@ class CollectionTemplateBuilder
   def call
     return false unless create_collection
     place_collection_in_parent
+    # re-save to capture new breadcrumb + tag lists
+    @collection.save
     @collection
   end
 
@@ -46,6 +48,5 @@ class CollectionTemplateBuilder
       order: @placement == 'beginning' ? 0 : @parent.collection_cards.count,
     )
     card.increment_card_orders! if @placement == 'beginning'
-    @collection.recalculate_breadcrumb!
   end
 end
