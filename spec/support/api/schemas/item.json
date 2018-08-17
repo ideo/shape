@@ -8,6 +8,7 @@
     "text_data": { "type": "object" },
     "url": { "type": ["string", "null"] },
     "thumbnail_url": { "type": ["string", "null"] },
+    "icon_url": { "type": ["string", "null"] },
     "breadcrumb": { "type": ["array", "null"] },
     "can_edit": { "type": ["boolean"] },
     "can_edit_content": { "type": ["boolean"] },

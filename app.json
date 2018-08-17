@@ -6,5 +6,52 @@
       "url": "heroku/nodejs",
       "url": "heroku/ruby"
     }
-  ]
+  ],
+  "addons": [
+    "heroku-postgresql",
+    "rediscloud",
+    "bonsai",
+    "sengrid"
+  ],
+  "env": {
+    "DOORBELL_ACCOUNT_ID": {
+      "required": true
+    },
+    "DOORBELL_API_KEY": {
+      "required": true
+    },
+    "FILESTACK_API_KEY": {
+      "required": true
+    },
+    "FILESTACK_API_SECRET": {
+      "required": true
+    },
+    "IDEO_NETWORK_CALLBACK_SECRET": {
+      "required": true
+    },
+    "IDEO_SSO_CLIENT_ID": {
+      "required": true
+    },
+    "IDEO_SSO_CLIENT_SECRET": {
+      "required": true
+    },
+    "IDEO_SSO_ENV": {
+      "required": true
+    },
+    "IDEO_SSO_HOST": {
+      "required": true
+    },
+    "IDEO_SSO_REDIRECT_PATH": {
+      "required": true
+    },
+    "VIMEO_V3_API_KEY": {
+      "required": true
+    },
+    "YOUTUBE_V3_API_KEY": {
+      "required": true
+    },
+    "GOOGLE_CLOUD_BROWSER_KEY": {
+      "required": true
+    }
+  }
 }

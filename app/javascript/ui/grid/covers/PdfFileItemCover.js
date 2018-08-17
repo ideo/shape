@@ -1,7 +1,9 @@
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
+import Truncator from 'react-truncator'
 import v from '~/utils/variables'
 import CornerIcon from '~/ui/icons/CornerIcon'
+import GridCardIconWithName from '~/ui/grid/shared'
 import FileIcon from '~/ui/grid/covers/FileIcon'
 import { uiStore } from '~/stores'
 
@@ -13,21 +15,21 @@ export const StyledPdfCover = styled.div`
 
   .fileInfo {
     align-items: center;
-    bottom: 10px;
+    bottom: 0;
     color: ${v.colors.gray};
     display: flex;
     font-family: ${v.fonts.sans};
     font-size: 1rem;
     font-weight: 500;
-    left: 15px;
+    left: 0;
     max-height: 32px;
     position: absolute;
+    width: 95%;
   }
 
   .fileName {
     display: inline-block;
-    max-height: 32px;
-    overflow: hidden;
+    width: 75%;
     white-space: nowrap;
   }
 
@@ -40,9 +42,9 @@ StyledPdfCover.displayName = 'StyledPdfCover'
 
 export const ImageContainer = styled.div`
   border-radius: 12px;
-  clip-path: ${props => (props.orientation === 'landscape' ?
-    'polygon(0 0,0 100%,100% 100%,100% 52px,245px 0)' :
-    'polygon(0 0,0 100%,100% 100%,100% 53px,214px 0)')};
+  clip-path: ${props => (props.orientation === 'landscape'
+    ? 'polygon(0 0,0 100%,100% 100%,100% 52px,245px 0)'
+    : 'polygon(0 0,0 100%,100% 100%,100% 53px,214px 0)')};
   overflow: hidden;
   position: relative;
   transform: rotate(-8deg) translateX(${props => props.x}) translateY(${props => props.y}) translateZ(0);
@@ -98,11 +100,13 @@ class PdfFileItemCover extends React.Component {
           <CornerContainer>
             <CornerIcon />
           </CornerContainer>
-          <img src={pdfCoverUrl} />
+          <img src={pdfCoverUrl} alt="Pdf cover" />
         </ImageContainer>
         <div className="fileInfo">
-          <FileIcon mimeType={item.filestack_file.mimetype} />
-          <span className="fileName">{ filestack_file.filename }</span>
+          <GridCardIconWithName
+            text={filestack_file.filename}
+            icon={<FileIcon mimeType={item.filestack_file.mimetype} />}
+          />
         </div>
       </StyledPdfCover>
     )

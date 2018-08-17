@@ -12,17 +12,6 @@ import FileSvg from '~/ui/icons/files/file.svg'
 import PdfSvg from '~/ui/icons/files/pdf.svg'
 import v from '~/utils/variables'
 
-const IconHolder = styled.div`
-  background-color: ${v.colors.cararra};
-  border-radius: 50%;
-  box-sizing: content-box;
-  color: black;
-  height: 18px;
-  margin-right: 22px;
-  padding: 7px;
-  width: 18px;
-`
-
 class FileIcon extends React.PureComponent {
   get svg() {
     const { mimeType } = this.props
@@ -51,9 +40,7 @@ class FileIcon extends React.PureComponent {
   }
 
   render() {
-    return (
-      <IconHolder>{this.svg}</IconHolder>
-    )
+    return this.svg
   }
 }
 FileIcon.propTypes = {

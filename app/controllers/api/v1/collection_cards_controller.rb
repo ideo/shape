@@ -9,7 +9,12 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
   end
 
   def create
-    builder = CollectionCardBuilder.new(params: collection_card_params,
+    card_params = collection_card_params
+    type = card_params.delete(:type) || 'primary'
+    # CollectionCardBuilder type expects 'primary' or 'link'
+    type = 'link' if type == 'CollectionCard::Link'
+    builder = CollectionCardBuilder.new(params: card_params,
+                                        type: type,
                                         parent_collection: @collection,
                                         user: current_user,
                                         replacing_card: @replacing_card)
@@ -37,13 +42,13 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
     end
   end
 
+  before_action :load_and_authorize_cards, only: %i[archive]
   def archive
-    if @collection_card.archive!
-      create_notification(@collection_card, :archived)
-      render jsonapi: @collection_card.reload, include: [:parent, record: [:filestack_file]]
-    else
-      render_api_errors @collection_card.errors
-    end
+    CollectionCardArchiveWorker.perform_async(
+      @collection_cards.pluck(:id),
+      current_user.id,
+    )
+    render json: { archived: true }
   end
 
   before_action :load_and_authorize_replacing_card, only: %i[replace]
@@ -131,6 +136,13 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
     authorize! :edit_content, @replacing_card.record
   end
 
+  def load_and_authorize_cards
+    @collection_cards = CollectionCard.where(id: json_api_params[:card_ids])
+    @collection_cards.each do |cc|
+      authorize! :edit, cc
+    end
+  end
+
   def create_notification(card, action)
     # only notify for archiving of collections (and not link cards)
     return if card.link?
@@ -152,6 +164,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
       :parent_id,
       :collection_id,
       :item_id,
+      :type,
       collection_attributes: %i[id name],
       item_attributes: [
         :id,
@@ -160,6 +173,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
         :content,
         :url,
         :thumbnail_url,
+        :icon_url,
         :image,
         :archived,
         text_data: {},

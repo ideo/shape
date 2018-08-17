@@ -256,6 +256,7 @@ class User < ApplicationRecord
 
   def current_org_groups_and_special_groups
     groups = current_org_groups.to_a
+    return [] if groups.blank?
     organization = current_organization
     if groups.include?(organization.primary_group)
       # org members get to see the guest group

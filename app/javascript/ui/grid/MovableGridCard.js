@@ -38,6 +38,8 @@ const StyledCardWrapper = styled.div`
   }
   &:hover {
     z-index: ${v.zIndex.gridCard};
+  }
+  &:hover, &.touch-device {
     .show-on-hover {
       /* don't show hover items while dragging */
       opacity: ${props => (props.dragging ? 0 : 1)};
@@ -120,7 +122,6 @@ class MovableGridCard extends React.PureComponent {
       uiStore.resetSelectionAndBCT()
       // close the MoveMenu to prevent weird behaviors
       uiStore.closeMoveMenu()
-      document.querySelector('.ql-editor p').focus()
     }
     const { gridW, gridH, cols } = uiStore.gridSettings
     const { card } = this.props
@@ -135,7 +136,6 @@ class MovableGridCard extends React.PureComponent {
     // always max out height at 2
     newSize.height = Math.max(Math.min(newSize.height, 2), 1)
     this.props.onResize(this.props.card.id, newSize)
-    document.querySelector('.ql-editor p').focus()
   }
 
   // this function gets passed down to the card, so it can place the onClick handler
@@ -313,7 +313,10 @@ class MovableGridCard extends React.PureComponent {
     }
 
     return (
-      <StyledCardWrapper dragging={!moveComplete}>
+      <StyledCardWrapper
+        className={uiStore.isTouchDevice ? 'touch-device' : ''}
+        dragging={!moveComplete}
+      >
         <Rnd
           bounds={null}
           onDragStart={this.handleStart}

@@ -4,6 +4,7 @@ import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 
 import GridCardHotspot from '~/ui/grid/GridCardHotspot'
+import LinkItemCover from '~/ui/grid/covers/LinkItemCover'
 import TextItemCover from '~/ui/grid/covers/TextItemCover'
 import PdfFileItemCover from '~/ui/grid/covers/PdfFileItemCover'
 import ImageItemCover from '~/ui/grid/covers/ImageItemCover'
@@ -153,6 +154,8 @@ class GridCard extends React.Component {
       }
       case ITEM_TYPES.VIDEO:
         return <VideoItemCover item={record} dragging={this.props.dragging} />
+      case ITEM_TYPES.LINK:
+        return <LinkItemCover item={record} dragging={this.props.dragging} />
       default:
         return (
           <div>
@@ -166,6 +169,7 @@ class GridCard extends React.Component {
           width={card.maxWidth}
           height={card.maxHeight}
           collection={record}
+          dragging={this.props.dragging}
         />
       )
     }
@@ -262,9 +266,19 @@ class GridCard extends React.Component {
     }
   }
 
+  linkOffsite = (url) => {
+    Object.assign(
+      document.createElement('a'), { target: '_blank', href: url }
+    ).click()
+  }
+
   handleClick = (e) => {
     const { dragging, record } = this.props
     if (dragging) return
+    if (record.type === ITEM_TYPES.LINK) {
+      this.linkOffsite(record.url)
+      return
+    }
     if (record.isPdfFile) {
       FilestackUpload.preview(record.filestack_file.handle, 'filePreview')
       return
@@ -273,7 +287,7 @@ class GridCard extends React.Component {
       return
     } else if (record.isGenericFile) {
       // TODO: will replace with preview
-      window.open(record.filestack_file.url, '_blank')
+      this.linkOffsite(record.filestack_file.url)
       return
     }
     this.props.handleClick(e)
@@ -306,8 +320,7 @@ class GridCard extends React.Component {
         ) &&
           <StyledTopRightActions color={this.actionsColor}>
             { record.isDownloadable && (
-              <Download record={record}
-              />
+              <Download record={record} />
             )}
             <SelectionCircle cardId={card.id} />
             <ActionMenu

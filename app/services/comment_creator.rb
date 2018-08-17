@@ -71,6 +71,10 @@ class CommentCreator < SimpleService
       action: :commented,
       subject_user_ids: unmentioned_users,
       subject_group_ids: unmentioned_groups,
+      # specifically skip over any mentioned users, for ex.
+      # if they would have received a notification via their group(s)
+      omit_user_ids: mentions[:user_ids],
+      omit_group_ids: mentions[:group_ids],
       combine: true,
       content: @comment.message,
     )

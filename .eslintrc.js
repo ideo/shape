@@ -33,6 +33,7 @@ module.exports = {
     "relPath": true,
     "localStorage": true,
     "FileReader": true,
+    "DOMParser": true,
   },
   settings: {
     "import/resolver": {

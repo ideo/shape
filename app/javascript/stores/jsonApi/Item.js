@@ -46,7 +46,7 @@ class Item extends BaseRecord {
   }
 
   get mimeBaseType() {
-    return this.filestack_file.mimetype.split('/')[0]
+    return this.filestack_file && this.filestack_file.mimetype.split('/')[0]
   }
 
   get isGenericFile() {

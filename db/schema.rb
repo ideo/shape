@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180727160754) do
+ActiveRecord::Schema.define(version: 20180810231839) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -155,7 +155,6 @@ ActiveRecord::Schema.define(version: 20180727160754) do
   create_table "items", force: :cascade do |t|
     t.string "name"
     t.string "type"
-    t.string "image"
     t.text "content"
     t.bigint "cloned_from_id"
     t.boolean "archived", default: false
@@ -169,6 +168,7 @@ ActiveRecord::Schema.define(version: 20180727160754) do
     t.jsonb "cached_attributes"
     t.datetime "archived_at"
     t.string "archive_batch"
+    t.string "icon_url"
     t.index ["cloned_from_id"], name: "index_items_on_cloned_from_id"
   end
 
@@ -262,6 +262,7 @@ ActiveRecord::Schema.define(version: 20180727160754) do
     t.jsonb "cached_attributes"
     t.jsonb "network_data", default: {}
     t.datetime "last_notification_mail_sent"
+    t.boolean "show_move_helper", default: true
     t.index ["email"], name: "index_users_on_email"
     t.index ["handle"], name: "index_users_on_handle", unique: true
     t.index ["invitation_token"], name: "index_users_on_invitation_token"

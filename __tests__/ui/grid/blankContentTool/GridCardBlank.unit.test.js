@@ -12,7 +12,7 @@ jest.mock('../../../../app/javascript/utils/FilestackUpload')
 // in order to mock our way past `new CollectionCard(attrs, apiStore)`
 jest.mock('../../../../app/javascript/stores/jsonApi/CollectionCard')
 
-let props, wrapper, replacingCard
+let props, wrapper, replacingCard, component
 beforeEach(() => {
   CollectionCard.mockClear()
   replacingCard = fakeCollectionCard
@@ -25,6 +25,7 @@ beforeEach(() => {
   wrapper = shallow(
     <GridCardBlank.wrappedComponent {...props} />
   )
+  component = wrapper.instance()
   FilestackUpload.pickImage = jest.fn()
     .mockReturnValue(Promise.resolve({ filesUploaded: [] }))
 })
@@ -32,35 +33,46 @@ beforeEach(() => {
 describe('GridCardBlank', () => {
   describe('when creating a new card', () => {
     it('renders the content creation buttons', () => {
-      expect(wrapper.find('BctButton').length).toBe(4)
+      expect(wrapper.find('BctButtonBox').length).toBe(5)
     })
 
     it('renders the close button', () => {
       expect(wrapper.find('CloseButton').exists()).toBeTruthy()
     })
 
-    it('opens CollectionCreator when clicking button 1', () => {
-      wrapper.find('.createCollection').at(0).simulate('click')
+    it('opens CollectionCreator with onClick handler', () => {
+      component.startCreating('collection')()
+      wrapper.update()
       expect(wrapper.state().creating).toEqual('collection')
       expect(wrapper.find('CollectionCreator').exists()).toBe(true)
     })
 
-    it('triggers FilestackUpload when clicking button 2', () => {
-      wrapper.find('.createFile').at(0).simulate('click')
+    it('triggers FilestackUpload with onClick handler', () => {
+      component.pickImage()
+      wrapper.update()
       expect(wrapper.state().creating).toEqual(null)
       expect(FilestackUpload.pickImage).toHaveBeenCalled()
     })
 
-    it('opens VideoCreator when clicking button 3', () => {
-      wrapper.find('.createVideo').at(0).simulate('click')
+    it('opens VideoCreator with onClick handler', () => {
+      component.startCreating('video')()
+      wrapper.update()
       expect(wrapper.state().creating).toEqual('video')
       expect(wrapper.find('VideoCreator').exists()).toBe(true)
     })
 
-    it('opens TextItemCreator when clicking button 4', () => {
-      wrapper.find('.createText').at(0).simulate('click')
+    it('opens TextItemCreator with onClick handler', () => {
+      component.startCreating('text')()
+      wrapper.update()
       expect(wrapper.state().creating).toEqual('text')
       expect(wrapper.find('TextItemCreator').exists()).toBe(true)
+    })
+
+    it('opens LinkCreator with onClick handler', () => {
+      component.startCreating('link')()
+      wrapper.update()
+      expect(wrapper.state().creating).toEqual('link')
+      expect(wrapper.find('LinkCreator').exists()).toBe(true)
     })
 
     it('calls API_create when creating', async () => {
@@ -105,19 +117,7 @@ describe('GridCardBlank', () => {
 
     it('only renders video and image content creation buttons', () => {
       // only render video + image buttons
-      expect(wrapper.find('BctButton').length).toBe(2)
-    })
-
-    it('triggers FilestackUpload when clicking button 1', () => {
-      wrapper.find('BctButton').at(0).simulate('click')
-      expect(wrapper.state().creating).toEqual(null)
-      expect(FilestackUpload.pickImage).toHaveBeenCalled()
-    })
-
-    it('opens VideoCreator when clicking button 2', () => {
-      wrapper.find('BctButton').at(1).simulate('click')
-      expect(wrapper.state().creating).toEqual('video')
-      expect(wrapper.find('VideoCreator').exists()).toBe(true)
+      expect(wrapper.find('BctButtonBox').length).toBe(2)
     })
 
     it('calls API_replace with replacingId', async () => {

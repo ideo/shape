@@ -34,10 +34,6 @@ describe('Notification', () => {
     it('should set fade in progress to false', () => {
       expect(component.fadeInProgress).toBeFalsy()
     })
-
-    it('should set shown to true', () => {
-      expect(component.shown).toBeTruthy()
-    })
   })
 
   describe('handleRead', () => {
