@@ -83,6 +83,7 @@ class Api::V1::UsersController < Api::V1::BaseController
       :terms_accepted,
       :show_helper,
       :show_move_helper,
+      :show_template_helper,
       :notify_through_email,
     )
   end

@@ -197,7 +197,7 @@ export const fakeUserAttrs = {
   isCurrentUser: jest.fn(),
   switchOrganization: jest.fn(),
   API_updateCurrentUser: jest.fn(),
-  API_hideMoveHelper: jest.fn().mockReturnValue(Promise.resolve({})),
+  API_hideHelper: jest.fn().mockReturnValue(Promise.resolve({})),
   notify_through_email: true,
   show_move_modal: false,
 }

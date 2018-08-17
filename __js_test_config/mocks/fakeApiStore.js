@@ -40,7 +40,7 @@ const fakeApiStore = ({ findResult = '', findAllResult = [], requestResult = '' 
       groups: [],
       terms_accepted: true,
       switchOrganization: jest.fn(),
-      API_hideHotEdgeHelper: jest.fn(),
+      API_hideHelper: jest.fn(),
     },
     // NOTE: important that this matches currentUserOrganization.slug
     currentOrgSlug: 'org-slug',

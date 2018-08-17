@@ -181,13 +181,46 @@ class MoveModal extends React.Component {
     this.moveCards('end')
   }
 
-  render() {
-    const { apiStore, uiStore } = this.props
-    const { cardAction } = uiStore
+  get moveMessage() {
+    const { uiStore } = this.props
+    const { cardAction, templateName } = uiStore
     const amount = uiStore.movingCardIds.length
-    const moveMessage = cardAction === 'move'
-      ? `${amount} in transit`
-      : `${amount} selected to ${cardAction}`
+    let message = ''
+    if (cardAction === 'move') {
+      message = `${amount} in transit`
+    } else if (cardAction === 'useTemplate') {
+      message = `${templateName} in transit`
+    } else {
+      message = `${amount} selected to ${cardAction}`
+    }
+    return message
+  }
+
+  get moveHelper() {
+    const { uiStore, apiStore } = this.props
+    const { cardAction, templateName } = uiStore
+    const helperProps = {
+      type: 'move',
+    }
+    if (cardAction === 'useTemplate') {
+      if (!apiStore.currentUser.show_template_helper) {
+        return null
+      }
+      helperProps.recordName = templateName
+      helperProps.type = 'template'
+    } else if (!apiStore.currentUser.show_move_helper) {
+      return null
+    }
+    return (
+      <MoveHelperModal
+        currentUser={apiStore.currentUser}
+        {...helperProps}
+      />
+    )
+  }
+
+  render() {
+    const { uiStore } = this.props
 
     return (
       <div>
@@ -201,7 +234,7 @@ class MoveModal extends React.Component {
                 <StyledSnackbarContent
                   classes={{ root: 'SnackbarContent', }}
                   message={
-                    <StyledMoveText id="message-id">{moveMessage}</StyledMoveText>
+                    <StyledMoveText id="message-id">{this.moveMessage}</StyledMoveText>
                   }
                   action={[
                     <IconHolder key="moveup">
@@ -241,9 +274,7 @@ class MoveModal extends React.Component {
                 />
               )}
             </StyledSnackbar>
-            { apiStore.currentUser.show_move_helper &&
-              <MoveHelperModal currentUser={apiStore.currentUser} />
-            }
+            { this.moveHelper }
           </div>
         )}
       </div>

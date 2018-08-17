@@ -46,5 +46,6 @@ class CollectionTemplateBuilder
       order: @placement == 'beginning' ? 0 : @parent.collection_cards.count,
     )
     card.increment_card_orders! if @placement == 'beginning'
+    @collection.recalculate_breadcrumb!
   end
 end
