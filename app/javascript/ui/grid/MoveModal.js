@@ -9,7 +9,6 @@ import MoveArrowIcon from '~/ui/icons/MoveArrowIcon'
 import MoveHelperModal from '~/ui/users/MoveHelperModal'
 import Tooltip from '~/ui/global/Tooltip'
 import v from '~/utils/variables'
-import { routingStore } from '~/stores'
 
 const StyledSnackbar = styled(Snackbar)`
   &.Snackbar {
@@ -148,6 +147,8 @@ class MoveModal extends React.Component {
         }
         await apiStore.createTemplateInstance(data)
         successMessage = 'Your template instance has been created!'
+        // refresh the current collection to get the new template
+        await apiStore.request(`collections/${collectionId}`)
         break
       }
       default:
