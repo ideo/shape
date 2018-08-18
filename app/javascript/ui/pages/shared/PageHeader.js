@@ -172,9 +172,13 @@ class PageHeader extends React.Component {
   get collectionTypeOrInheritedTags() {
     const { record } = this.props
     if (record.inherited_tag_list.length) {
+      let tagList = record.inherited_tag_list.map(tag => `#${tag}`).join(',')
+      if (tagList.length > 24) {
+        tagList = `${tagList.slice(0, 21)}...`
+      }
       return (
         <SubduedHeading1>
-          { record.inherited_tag_list.map(tag => `#${tag}`).join(',') }
+          { tagList }
         </SubduedHeading1>)
     }
     return null

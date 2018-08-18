@@ -101,17 +101,13 @@ class MoveModal extends React.Component {
     }
     const collectionId = viewingCollection.id
     const movingFromCollection = apiStore.find('collections', uiStore.movingFromCollectionId)
-    if (!viewingCollection.can_edit_content) {
-      uiStore.alert('You don\'t have permission to move items to this collection')
-      return
-    } else if (
-      // don't allow moving cards from templates to non-templates
-      cardAction === 'move' &&
-      movingFromCollection &&
-      movingFromCollection.isMasterTemplate &&
-      !viewingCollection.isMasterTemplate
-    ) {
-      uiStore.alert('You can\'t move pinned template items out of a template')
+    const error = this.moveErrors({
+      viewingCollection,
+      movingFromCollection,
+      cardAction,
+    })
+    if (error) {
+      uiStore.alert(error)
       return
     }
     let data = {
@@ -167,6 +163,26 @@ class MoveModal extends React.Component {
       runInAction(() => { this.isLoading = false })
       uiStore.alert('You cannot move a collection within itself')
     }
+  }
+
+  moveErrors = ({ viewingCollection, movingFromCollection, cardAction }) => {
+    if (!viewingCollection.can_edit_content) {
+      return 'You don\'t have permission to move items to this collection'
+    } else if (
+      // don't allow moving cards from templates to non-templates
+      cardAction === 'move' &&
+      movingFromCollection &&
+      movingFromCollection.isMasterTemplate &&
+      !viewingCollection.isMasterTemplate
+    ) {
+      return 'You can\'t move pinned template items out of a template'
+    } else if (
+      cardAction === 'useTemplate' &&
+      viewingCollection.id === movingFromCollection.id
+    ) {
+      return 'You can\'t create a template inside itself'
+    }
+    return ''
   }
 
   handleMoveToBeginning = () => {
