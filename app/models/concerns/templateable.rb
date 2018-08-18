@@ -24,15 +24,14 @@ module Templateable
 
   # copy all the cards from this template into a new collection
   def setup_templated_collection(for_user:, collection:)
-    # TODO: what if the template includes a collection of nested cards?
-    # -- or linked cards?
+    # important that this is first so that the collection knows it is "templated"
+    collection.update(template: self)
     collection_cards.each do |cc|
       cc.duplicate!(
         for_user: for_user,
         parent: collection,
       )
     end
-    collection.update(template: self)
   end
 
   def update_templated_collections

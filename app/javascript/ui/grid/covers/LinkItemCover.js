@@ -4,7 +4,7 @@ import { Flex, Box } from 'reflexbox'
 
 import v from '~/utils/variables'
 import hexToRgba from '~/utils/hexToRgba'
-import GridCardIconWithName from '~/ui/grid/shared'
+import { GridCardIconWithName } from '~/ui/grid/shared'
 import { CardHeading } from '~/ui/global/styled/typography'
 import LinkIcon from '~/ui/icons/LinkIcon'
 import { uiStore } from '~/stores'

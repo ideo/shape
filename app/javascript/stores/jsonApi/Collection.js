@@ -1,7 +1,6 @@
 import _ from 'lodash'
 import { computed, action } from 'mobx'
 
-import Api from './Api'
 import BaseRecord from './BaseRecord'
 
 class Collection extends BaseRecord {
@@ -89,14 +88,6 @@ class Collection extends BaseRecord {
   @action addCard(card) {
     this.collection_cards.unshift(card)
     this._reorderCards()
-  }
-
-  API_archive() {
-    return Api.archive('collections', this)
-  }
-
-  API_duplicate() {
-    return Api.duplicate('collections', this)
   }
 
   API_updateCards() {

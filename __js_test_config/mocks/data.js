@@ -138,6 +138,7 @@ export const fakeCollection = {
   inherited_tag_list: [],
   can_edit: false,
   can_edit_content: false,
+  master_template: false,
   isSharedCollection: false,
   isUserCollection: false,
   isNormalCollection: true,

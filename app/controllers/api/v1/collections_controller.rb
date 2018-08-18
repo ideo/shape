@@ -4,7 +4,7 @@ class Api::V1::CollectionsController < Api::V1::BaseController
   load_and_authorize_resource except: %i[me update]
   # NOTE: these have to be in the following order
   before_action :load_and_authorize_collection_update, only: %i[update]
-  before_action :load_collection_with_cards, only: %i[show update archive]
+  before_action :load_collection_with_cards, only: %i[show update]
 
   before_action :check_cache, only: %i[show]
   def show
@@ -22,7 +22,7 @@ class Api::V1::CollectionsController < Api::V1::BaseController
     )
 
     if builder.call
-      render jsonapi: builder.collection
+      render jsonapi: builder.collection, include: [:parent]
     else
       render_api_errors builder.errors
     end
@@ -33,34 +33,6 @@ class Api::V1::CollectionsController < Api::V1::BaseController
     if updated
       return if @cancel_sync
       render_collection
-    else
-      render_api_errors @collection.errors
-    end
-  end
-
-  def duplicate
-    duplicate = @collection.duplicate!(
-      for_user: current_user,
-      copy_parent_card: true,
-      parent: current_user.current_user_collection,
-    )
-    if duplicate.persisted?
-      render jsonapi: duplicate, include: [:parent]
-    else
-      render_api_errors duplicate.errors
-    end
-  end
-
-  def archive
-    if @collection.archive!
-      ActivityAndNotificationBuilder.call(
-        actor: current_user,
-        target: @collection,
-        action: :archived,
-        subject_user_ids: @collection.editors[:users].pluck(:id),
-        subject_group_ids: @collection.editors[:groups].pluck(:id),
-      )
-      render jsonapi: @collection.reload
     else
       render_api_errors @collection.errors
     end

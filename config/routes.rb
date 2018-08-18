@@ -14,7 +14,6 @@ Rails.application.routes.draw do
       resources :activities, only: %i[create]
       resources :collections, except: %i[index] do
         member do
-          post 'duplicate'
           patch 'archive'
         end
         collection do

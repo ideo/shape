@@ -44,6 +44,7 @@ class CollectionTemplateBuilder
     card = @parent.primary_collection_cards.create(
       width: 1,
       height: 1,
+      pinned: @parent.master_template?,
       collection: @collection,
       order: @placement == 'beginning' ? 0 : @parent.collection_cards.count,
     )

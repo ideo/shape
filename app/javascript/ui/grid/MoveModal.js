@@ -121,7 +121,6 @@ class MoveModal extends React.Component {
       collection_card_ids: uiStore.movingCardIds,
       placement,
     }
-    let afterMove = null
     try {
       runInAction(() => { this.isLoading = true })
       let successMessage
@@ -147,11 +146,8 @@ class MoveModal extends React.Component {
           template_id: data.from_id,
           placement,
         }
-        const res = await apiStore.request('collections/create_template', 'POST', data)
+        await apiStore.createTemplateInstance(data)
         successMessage = 'Your template instance has been created!'
-        afterMove = () => {
-          routingStore.routeTo('collections', res.data.id)
-        }
         break
       }
       default:
@@ -166,7 +162,6 @@ class MoveModal extends React.Component {
       } else {
         uiStore.scroll.scrollToBottom()
       }
-      if (afterMove) afterMove()
     } catch (e) {
       runInAction(() => { this.isLoading = false })
       uiStore.alert('You cannot move a collection within itself')

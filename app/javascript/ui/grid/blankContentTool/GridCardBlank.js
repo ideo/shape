@@ -13,7 +13,7 @@ import LinkIcon from '~/ui/icons/LinkIcon'
 import TemplateIcon from '~/ui/icons/TemplateIcon'
 import v, { ITEM_TYPES } from '~/utils/variables'
 import FilestackUpload from '~/utils/FilestackUpload'
-import { StyledGridCard } from '~/ui/grid/GridCard'
+import { StyledGridCard, BctButton } from '~/ui/grid/shared'
 import InlineLoader from '~/ui/layout/InlineLoader'
 import { CloseButton } from '~/ui/global/styled/buttons'
 import bctIcons from '~/assets/bct_icons.png'
@@ -93,36 +93,6 @@ const BctBackground = styled.div`
   }
 `
 BctBackground.displayName = 'BctBackground'
-
-export const BctButton = styled.button`
-  position: relative;
-  width: 47px;
-  height: 47px;
-  border-radius: 50%;
-  background: ${v.colors.blackLava};
-  color: white;
-
-  left: ${props => (props.creating ? '100px' : 0)};
-  @media only screen
-    and (min-width: ${v.responsive.medBreakpoint}px)
-    and (max-width: ${v.responsive.largeBreakpoint}px) {
-    left: ${props => (props.creating ? '80px' : 0)};
-  }
-  transform: ${props => (props.creating ? 'rotate(360deg)' : 'none')};
-
-  &:hover {
-    background-color: ${v.colors.cloudy};
-  }
-
-  .icon {
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: 47px;
-    height: 47px;
-  }
-`
-BctButton.displayName = 'BctButton'
 
 const BctDropzone = styled.div`
   position: absolute;

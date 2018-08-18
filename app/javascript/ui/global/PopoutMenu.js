@@ -2,7 +2,7 @@ import PropTypes from 'prop-types'
 import styled from 'styled-components'
 
 import MenuIcon from '~/ui/icons/MenuIcon'
-import { BctButton } from '~/ui/grid/blankContentTool/GridCardBlank'
+import { BctButton } from '~/ui/grid/shared'
 import v from '~/utils/variables'
 
 export const StyledMenuButtonWrapper = styled.div`

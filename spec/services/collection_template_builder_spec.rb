@@ -49,6 +49,14 @@ RSpec.describe CollectionTemplateBuilder, type: :service do
       expect(collection.owned_tag_list).to include(template.name.parameterize)
     end
 
+    context 'when parent is a master_template' do
+      let(:parent) { create(:collection, master_template: true) }
+
+      it 'should pin the collection instance' do
+        expect(collection.parent_collection_card.pinned?).to be true
+      end
+    end
+
     context 'without a proper template' do
       let(:template) { create(:collection) }
 
