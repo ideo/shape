@@ -5,6 +5,7 @@
     "name": { "type": "string" },
     "type": { "type": "string" },
     "master_template": { "type": ["boolean"] },
+    "template_id": { "type": ["integer"] },
     "created_at": { "type": "date" },
     "updated_at": { "type": "date" },
     "breadcrumb": { "type": ["array", "null"] },

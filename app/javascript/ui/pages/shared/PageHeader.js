@@ -190,6 +190,8 @@ class PageHeader extends React.Component {
       return <IconHolder align="right"><ProfileIcon /></IconHolder>
     } else if (record.isProfileCollection) {
       return <IconHolder align="right"><SystemIcon /></IconHolder>
+    } else if (record.isTemplate) {
+      return <IconHolder align="right"><TemplateIcon circled /></IconHolder>
     }
     return null
   }

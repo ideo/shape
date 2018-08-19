@@ -38,6 +38,10 @@ class Collection extends BaseRecord {
     return this.master_template
   }
 
+  get isTemplate() {
+    return !!this.template_id
+  }
+
   get isUserProfile() {
     return this.type === 'Collection::UserProfile'
   }
