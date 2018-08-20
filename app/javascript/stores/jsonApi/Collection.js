@@ -38,6 +38,11 @@ class Collection extends BaseRecord {
     return this.master_template
   }
 
+  get isUsableTemplate() {
+    // you aren't allowed to use the profile template
+    return this.isMasterTemplate && !this.isProfileTemplate
+  }
+
   get isTemplated() {
     return !!this.template_id
   }

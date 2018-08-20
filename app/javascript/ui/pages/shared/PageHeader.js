@@ -145,12 +145,6 @@ class PageHeader extends React.Component {
     return elements
   }
 
-  get isTemplateCollection() {
-    const { record } = this.props
-    // profile template does not get the "Use Template" CTA button
-    return (record.isMasterTemplate && !record.isProfileTemplate)
-  }
-
   openMoveMenuForTemplate = () => {
     const { record, uiStore } = this.props
     uiStore.openMoveMenu({
@@ -233,7 +227,7 @@ class PageHeader extends React.Component {
                   { this.collectionTypeIcon }
                   { this.collectionTypeOrInheritedTags }
                 </div>
-                {this.isTemplateCollection &&
+                {record.isUsableTemplate &&
                   <FormButton
                     color="blue"
                     style={{ marginLeft: 10, marginTop: 10 }}

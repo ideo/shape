@@ -229,8 +229,6 @@ class ApiStore extends Store {
 
   async createTemplateInstance(data) {
     return this.request('collections/create_template', 'POST', data)
-    // should be the collection you're currently viewing
-    // const parent = this.find('collections', data.parent_id)
   }
 
   // -- override mobx-jsonapi-store --
