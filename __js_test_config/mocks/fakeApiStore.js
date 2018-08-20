@@ -26,6 +26,7 @@ const fakeApiStore = ({ findResult = '', findAllResult = [], requestResult = '' 
     fetchNotifications: jest.fn().mockReturnValue(Promise.resolve()),
     findOrBuildCommentThread: jest.fn().mockReturnValue(Promise.resolve()),
     findThreadForRecord: jest.fn(),
+    createTemplateInstance: jest.fn(),
     unreadActivityCount: 0,
     currentUserId: 1,
     currentUser: {
