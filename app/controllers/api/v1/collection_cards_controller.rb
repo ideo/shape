@@ -70,6 +70,8 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
       card_action: @card_action || 'move',
     )
     if mover.call
+      @from_collection.edited(current_user)
+      @to_collection.edited(current_user)
       # NOTE: even though this action is in CollectionCardsController, it returns the to_collection
       # so that it can be easily re-rendered on the page
       render jsonapi: @to_collection.reload, include: Collection.default_relationships_for_api

@@ -8,6 +8,7 @@ import v from '~/utils/variables'
 import { CloseButton } from '~/ui/global/styled/buttons'
 import EditorPill from '~/ui/items/EditorPill'
 import TextItemToolbar from '~/ui/items/TextItemToolbar'
+import ChannelManager from '~/utils/ChannelManager'
 
 // How long to wait before unlocking editor due to inactivity
 // Only used if there are other viewers
@@ -134,13 +135,13 @@ class TextItem extends React.Component {
     this.quillEditor = this.reactQuillRef.getEditor()
   }
 
+  get channelName() {
+    return 'ItemEditingChannel'
+  }
+
   subscribeToItemEditingChannel = () => {
     const { item, actionCableConsumer } = this.props
-    this.channel = actionCableConsumer.subscriptions.create(
-      {
-        channel: 'ItemEditingChannel',
-        id: item.id
-      },
+    this.channel = ChannelManager.subscribe(this.channelName, item.id,
       {
         connected: () => {},
         disconnected: this.channelDisconnected,

@@ -9,18 +9,48 @@ import PageContainer from '~/ui/layout/PageContainer'
 import CollectionGrid from '~/ui/grid/CollectionGrid'
 import MoveModal from '~/ui/grid/MoveModal'
 import PageHeader from '~/ui/pages/shared/PageHeader'
+import ChannelManager from '~/utils/ChannelManager'
 
 const isHomepage = ({ params }) => (params.org && !params.id)
 
 @inject('apiStore', 'uiStore', 'routingStore')
 @observer
 class CollectionPage extends PageWithApi {
+  componentWillMount() {
+    this.subscribeToChannel(this.props.match.params.id)
+  }
+
   componentWillReceiveProps(nextProps) {
     super.componentWillReceiveProps(nextProps)
     // when navigating between collections, close BCT
-    if (nextProps.match.params.id !== this.props.match.params.id) {
+    const previousId = this.props.match.params.id
+    const currentId = nextProps.match.params.id
+    if (currentId !== previousId) {
+      ChannelManager.unsubscribeAllFromChannel(this.channelName)
+      this.subscribeToChannel(currentId)
       this.props.uiStore.closeBlankContentTool()
     }
+  }
+
+  subscribeToChannel(id) {
+    ChannelManager.subscribe(this.channelName, id,
+      {
+        channelConnected: () => { console.log('conn', arguments) },
+        channelReceivedData: this.receivedChannelData,
+        channelDisconnected: () => { console.log('dscn', arguments) },
+        channelRejected: () => { console.log('rjct', arguments) },
+      })
+    console.log(ChannelManager.channels)
+  }
+
+  receivedChannelData = async (data) => {
+    const { apiStore } = this.props
+    const currentId = this.props.match.params.id
+    apiStore.request(this.requestPath(this.props))
+  }
+
+  get channelName() {
+    return 'CollectionViewingChannel'
   }
 
   get isHomepage() {

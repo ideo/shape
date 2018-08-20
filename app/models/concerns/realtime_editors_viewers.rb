@@ -23,6 +23,10 @@ module RealtimeEditorsViewers
     publish_to_channel unless dont_notify
   end
 
+  def edited(user, dont_notify: false)
+    publish_to_channel unless dont_notify
+  end
+
   def stream_name
     editing_cache_key
   end
@@ -39,7 +43,7 @@ module RealtimeEditorsViewers
     User.find(user_id).as_json
   end
 
-  def publish_to_channel
+  def publish_to_channel()
     data = {
       current_editor: currently_editing_user_as_json,
       num_viewers: num_viewers,
