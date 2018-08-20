@@ -1,10 +1,7 @@
 import PropTypes from 'prop-types'
-import { runInAction, observable } from 'mobx'
-import { observer } from 'mobx-react'
 import styled from 'styled-components'
 
 import MenuIcon from '~/ui/icons/MenuIcon'
-import SearchBar from '~/ui/layout/SearchBar'
 import v from '~/utils/variables'
 
 export const StyledMenuButtonWrapper = styled.div`
@@ -94,45 +91,36 @@ export const StyledMenuItem = styled.li`
 `
 StyledMenuItem.displayName = 'StyledMenuItem'
 
-const StyledSearchHolder = styled.div`
-  padding: 10px;
-`
-
-@observer
 class PopoutMenu extends React.Component {
-  @observable searchText = ''
-
   get renderMenuItems() {
-    return this.props.menuItems
-      .filter(item => {
-        if (this.props.menuItems.length <= 10) return item
-        if (this.searchText === '') return item
-        return item.name.toLowerCase().match(this.searchText.toLowerCase())
-      })
-      .slice(0, 10)
-      .map(item => {
-        const { name, iconLeft, iconRight, onClick, loading } = item
-        return (
-          <StyledMenuItem key={name} noBorder={item.noBorder} loading={loading}>
-            <button
-              onClick={loading ? () => null : onClick}
-              className={`menu-${name.toLowerCase()}`}
-            >
-              {iconLeft}
-              {name}
-              {iconRight}
-            </button>
-          </StyledMenuItem>
-        )
-      })
-  }
-
-  handleSearchChange = (text) => {
-    runInAction(() => { this.searchText = text })
-  }
-
-  clearSearch = () => {
-    runInAction(() => { this.searchText = '' })
+    const groupedItems = _.groupBy(this.props.menuItems, 'group')
+    const { groupExtraComponent } = this.props
+    let rendered = []
+    for (let groupName in groupedItems) {
+      console.log('snsame', groupedItems[groupName])
+      rendered.push(
+        <div className={groupName} key={groupName}>
+          { groupExtraComponent[groupName] }
+          { groupedItems[groupName].map(item => {
+            const { name, iconLeft, iconRight, onClick, loading } = item
+            if (name === 'Joshua Lavra Organization') console.log('joshjoshn')
+            return (
+              <StyledMenuItem key={name} noBorder={item.noBorder} loading={loading}>
+                <button
+                  onClick={loading ? () => null : onClick}
+                  className={`menu-${name}`}
+                >
+                  {iconLeft}
+                  {name}
+                  {iconRight}
+                </button>
+              </StyledMenuItem>
+            )
+          })}
+        </div>
+      )
+    }
+    return rendered
   }
 
   render() {
@@ -158,15 +146,6 @@ class PopoutMenu extends React.Component {
         </StyledMenuToggle>
         <StyledMenuWrapper className="menu-wrapper">
           <StyledMenu width={width}>
-            { menuItems.length > 10 &&
-              <StyledSearchHolder>
-                <SearchBar
-                  value={this.searchText}
-                  onChange={this.handleSearchChange}
-                  onClear={this.clearSearch}
-                />
-              </StyledSearchHolder>
-            }
             {this.renderMenuItems}
           </StyledMenu>
         </StyledMenuWrapper>
@@ -188,7 +167,11 @@ PopoutMenu.propTypes = {
     onClick: PropTypes.func,
     noBorder: PropTypes.bool,
     loading: PropTypes.bool,
+    group: PropTypes.string,
   })).isRequired,
+  groupExtraComponent: PropTypes.shape({
+    component: PropTypes.node,
+  }),
 }
 
 PopoutMenu.defaultProps = {
@@ -198,6 +181,7 @@ PopoutMenu.defaultProps = {
   menuOpen: false,
   width: 200,
   showSearch: false,
+  groupExtraComponent: {},
 }
 
 export default PopoutMenu

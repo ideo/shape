@@ -2,8 +2,11 @@ import PropTypes from 'prop-types'
 import PopoutMenu from '~/ui/global/PopoutMenu'
 import styled from 'styled-components'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
-import OrganizationMenu from '~/ui/organizations/OrganizationMenu'
+import { runInAction, observable } from 'mobx'
+
 import Avatar from '~/ui/global/Avatar'
+import OrganizationMenu from '~/ui/organizations/OrganizationMenu'
+import SearchBar from '~/ui/layout/SearchBar'
 
 const IconHolder = styled.span`
   .org_avatar {
@@ -17,9 +20,26 @@ const IconHolder = styled.span`
 `
 IconHolder.displayName = 'StyledIconHolder'
 
+const TruncatedPopoutMenu = styled(PopoutMenu)`
+  .organizations {
+    max-height: 60vh;
+    overflow-y: scroll;
+  }
+`
+
+const StyledSearchHolder = styled.div`
+  padding: 10px;
+`
+function fuzzyMatch(str, pattern){
+  pattern = pattern.split("").reduce(function(a,b){ return a+".*"+b; });
+  return (new RegExp(pattern)).test(str);
+};
+
 @inject('apiStore', 'uiStore', 'routingStore')
 @observer
 class OrganizationDropdown extends React.Component {
+  @observable searchText = ''
+
   openOrgMenu = (page = 'organizationPeople') => {
     this.props.uiStore.update('organizationMenuPage', page)
     // then close dropdown
@@ -75,11 +95,24 @@ class OrganizationDropdown extends React.Component {
     this.props.routingStore.routeTo('/terms')
   }
 
+  handleSearchChange = (text) => {
+    runInAction(() => { this.searchText = text })
+  }
+
+  clearSearch = () => {
+    runInAction(() => { this.searchText = '' })
+  }
+
   get organizationItems() {
     const { apiStore } = this.props
-    return apiStore.currentUser.organizations
+    const orgItems = apiStore.currentUser.organizations
       .filter(org => org.id !== this.currentOrganization.id)
       .sort((orgA, orgB) => orgA.name.localeCompare(orgB.name))
+      .filter(org => {
+        if (apiStore.currentUser.organizations.length <= 10) return org
+        if (this.searchText === '') return org
+        return fuzzyMatch(org.name.toLowerCase(), this.searchText.toLowerCase())
+      })
       .map(org => {
         const avatar = (
           <IconHolder>
@@ -96,8 +129,10 @@ class OrganizationDropdown extends React.Component {
           iconLeft: avatar,
           onClick: this.handleSwitchOrg(org.id),
           noBorder: true,
+          group: 'organizations',
         }
       })
+    return orgItems.length > 0 ? orgItems : [{ group: 'organizations' }]
   }
 
   get currentOrganization() {
@@ -108,13 +143,13 @@ class OrganizationDropdown extends React.Component {
   get menuItems() {
     const userCanEdit = this.currentOrganization.primary_group.can_edit
     const items = [
-      { name: 'People & Groups', onClick: this.handleOrgPeople },
+      { name: 'People & Groups', onClick: this.handleOrgPeople, group: '1' },
       ...this.organizationItems,
-      { name: 'New Organization', onClick: this.handleNewOrg },
+      { name: 'New Organization', onClick: this.handleNewOrg, group: 'z' },
       ...(userCanEdit
-        ? [{ name: 'Settings', onClick: this.handleOrgSettings }]
+        ? [{ name: 'Settings', onClick: this.handleOrgSettings, group: 'z' }]
         : []),
-      { name: 'Legal', onClick: this.handleLegal },
+      { name: 'Legal', onClick: this.handleLegal, group: 'z' },
     ]
     return items
   }
@@ -123,11 +158,21 @@ class OrganizationDropdown extends React.Component {
     const { apiStore, uiStore } = this.props
     return (
       <div>
-        <PopoutMenu
+        <TruncatedPopoutMenu
           className="org-menu"
           width={220}
           menuItems={this.menuItems}
           menuOpen={this.props.open}
+          groupExtraComponent={{
+            'organizations': apiStore.currentUser.organizations.length > 10 &&
+            <StyledSearchHolder>
+              <SearchBar
+                value={this.searchText}
+                onChange={this.handleSearchChange}
+                onClear={this.clearSearch}
+              />
+            </StyledSearchHolder>
+          }}
         />
         <OrganizationMenu
           organization={this.currentOrganization}
