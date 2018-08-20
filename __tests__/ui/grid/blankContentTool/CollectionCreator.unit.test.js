@@ -6,7 +6,7 @@ describe('MovableGridCard', () => {
   beforeEach(() => {
     props = {
       loading: false,
-      template: false,
+      type: 'collection',
       createCard: jest.fn(),
       closeBlankContentTool: jest.fn()
     }
@@ -18,20 +18,20 @@ describe('MovableGridCard', () => {
   })
 
   it('renders a BctTextField', () => {
-    expect(wrapper.find('BctTextField').exists()).toBeTruthy()
+    expect(wrapper.find('BctTextField').props().placeholder).toEqual('Collection name')
     expect(wrapper.find('BctTextField').props().autoFocus).toBeTruthy()
   })
 
   describe('createCollection', () => {
     it('calls createCard with input name', () => {
       component.state = {
-        inputText: 'Collection Name',
+        inputText: 'New Projects',
       }
       component.createCollection(e)
       expect(props.createCard).toHaveBeenCalledWith({
         collection_attributes: {
           name: component.state.inputText,
-          master_template: props.template,
+          master_template: false,
         },
       })
     })

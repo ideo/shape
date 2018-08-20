@@ -2,7 +2,6 @@ import PropTypes from 'prop-types'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 import { Flex } from 'reflexbox'
-import FlipMove from 'react-flip-move'
 
 import CollectionCard from '~/stores/jsonApi/CollectionCard'
 import AddTextIcon from '~/ui/icons/AddTextIcon'
@@ -295,14 +294,18 @@ class GridCardBlank extends React.Component {
 
   renderInner = () => {
     let inner
-    switch (this.state.creating) {
+    const { creating, loading, droppingFile } = this.state
+    const isReplacing = !!this.props.uiStore.blankContentToolState.replacingId
+    const size = v.iconSizes.bct
+
+    switch (creating) {
     case 'collection':
     case 'template':
     case 'submissionBox':
       inner = (
         <CollectionCreator
-          template={this.state.creating === 'template'}
-          loading={this.state.loading}
+          type={creating}
+          loading={loading}
           createCard={this.createCard}
           closeBlankContentTool={this.closeBlankContentTool}
         />
@@ -311,7 +314,7 @@ class GridCardBlank extends React.Component {
     case 'video':
       inner = (
         <VideoCreator
-          loading={this.state.loading}
+          loading={loading}
           createCard={this.createCard}
           closeBlankContentTool={this.closeBlankContentTool}
         />
@@ -320,7 +323,7 @@ class GridCardBlank extends React.Component {
     case 'link':
       inner = (
         <LinkCreator
-          loading={this.state.loading}
+          loading={loading}
           createCard={this.createCard}
           closeBlankContentTool={this.closeBlankContentTool}
         />
@@ -331,7 +334,7 @@ class GridCardBlank extends React.Component {
       // since it doesn't use the BctBackground
       return (
         <TextItemCreator
-          loading={this.state.loading}
+          loading={loading}
           height={this.props.height}
           createCard={this.createCard}
           closeBlankContentTool={this.closeBlankContentTool}
@@ -339,8 +342,8 @@ class GridCardBlank extends React.Component {
       )
     default:
       inner = (
-        <BctDropzone droppingFile={this.state.droppingFile} id="dropzone">
-          {!this.state.loading && !this.state.droppingFile &&
+        <BctDropzone droppingFile={droppingFile} id="dropzone">
+          {!loading && !droppingFile &&
             <div className="text">
               <img
                 src={bctIcons}
@@ -355,10 +358,6 @@ class GridCardBlank extends React.Component {
         </BctDropzone>
       )
     }
-
-    const isReplacing = !!this.props.uiStore.blankContentToolState.replacingId
-    const { creating } = this.state
-    const size = v.iconSizes.bct
 
     const videoBctBox = (
       <BctButtonBox

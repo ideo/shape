@@ -1,3 +1,4 @@
+import _ from 'lodash'
 import PropTypes from 'prop-types'
 
 import { BctTextField, FormButton } from '~/ui/global/styled/forms'
@@ -24,24 +25,29 @@ class CollectionCreator extends React.Component {
   createCollection = (e) => {
     e.preventDefault()
     if (!this.state.inputText) return
-    const { createCard, template } = this.props
+    const { createCard, type } = this.props
     createCard({
       // `collection` is the collection being created within the card
       collection_attributes: {
         name: this.state.inputText,
-        master_template: template,
+        master_template: type === 'template',
       }
     })
   }
 
+  get typeName() {
+    const { type } = this.props
+    // e.g. 'submissionBox' -> 'Submission Box'
+    return _.startCase(type)
+  }
+
   render() {
-    const { template } = this.props
     return (
       <PaddedCardCover>
         <form className="form" onSubmit={this.createCollection}>
           <BctTextField
             autoFocus
-            placeholder={`${template ? 'Template' : 'Collection'} name`}
+            placeholder={`${this.typeName} name`}
             value={this.state.inputText}
             onChange={this.onInputChange}
             onKeyDown={this.handleKeyDown}
@@ -60,12 +66,16 @@ class CollectionCreator extends React.Component {
 
 CollectionCreator.propTypes = {
   loading: PropTypes.bool.isRequired,
-  template: PropTypes.bool,
+  type: PropTypes.oneOf([
+    'collection',
+    'template',
+    'submissionBox',
+  ]),
   createCard: PropTypes.func.isRequired,
   closeBlankContentTool: PropTypes.func.isRequired,
 }
 CollectionCreator.defaultProps = {
-  template: false,
+  type: 'collection',
 }
 
 export default CollectionCreator
