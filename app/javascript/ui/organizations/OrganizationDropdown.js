@@ -79,6 +79,7 @@ class OrganizationDropdown extends React.Component {
     const { apiStore } = this.props
     return apiStore.currentUser.organizations
       .filter(org => org.id !== this.currentOrganization.id)
+      .sort((orgA, orgB) => orgA.name.localeCompare(orgB.name))
       .map(org => {
         const avatar = (
           <IconHolder>
