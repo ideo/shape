@@ -1,12 +1,8 @@
 import PropTypes from 'prop-types'
 
-import { TextField, FormButton } from '~/ui/global/styled/forms'
+import { BCTTextField, FormButton } from '~/ui/global/styled/forms'
 import PaddedCardCover from '~/ui/grid/covers/PaddedCardCover'
-import v, { KEYS } from '~/utils/variables'
-
-const SpecialBGTextField = TextField.extend`
-  background: ${v.colors.cararra};
-`
+import { KEYS } from '~/utils/variables'
 
 class CollectionCreator extends React.Component {
   state = {
@@ -43,7 +39,8 @@ class CollectionCreator extends React.Component {
     return (
       <PaddedCardCover>
         <form className="form" onSubmit={this.createCollection}>
-          <SpecialBGTextField
+          <BCTTextField
+            autoFocus
             placeholder={`${template ? 'Template' : 'Collection'} name`}
             value={this.state.inputText}
             onChange={this.onInputChange}

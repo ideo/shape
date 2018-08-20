@@ -111,6 +111,12 @@ export const TextField = styled.input`
 TextField.displayName = 'StyledTextField'
 
 /** @component */
+export const BCTTextField = TextField.extend`
+  background: ${v.colors.cararra};
+`
+BCTTextField.displayName = 'BCTTextField'
+
+/** @component */
 export const FormSpacer = styled.div`
   margin-bottom: 55px;
 `
