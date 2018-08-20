@@ -11,6 +11,7 @@ import AddFileIcon from '~/ui/icons/AddFileIcon'
 import AddVideoIcon from '~/ui/icons/AddVideoIcon'
 import LinkIcon from '~/ui/icons/LinkIcon'
 import TemplateIcon from '~/ui/icons/TemplateIcon'
+import SubmissionBoxIcon from '~/ui/icons/SubmissionBoxIcon'
 import v, { ITEM_TYPES } from '~/utils/variables'
 import FilestackUpload from '~/utils/FilestackUpload'
 import { StyledGridCard, BctButton } from '~/ui/grid/shared'
@@ -55,7 +56,7 @@ const StyledBlankCreationTool = styled.div`
     &.foreground-bottom {
       top: 120px;
       /* width is smaller because there are only 2 bottom buttons; can change if we add more */
-      width: 70%;
+      width: 85%;
       margin: 0 auto;
     }
   }
@@ -484,6 +485,14 @@ class GridCardBlank extends React.Component {
         >
           {(!isReplacing && (!creating || creating === 'video')) &&
             videoBctBox
+          }
+          {(!isReplacing && !creating) &&
+            <BctButtonBox
+              tooltip="Create submission box"
+              type="submissionBox"
+              size={size}
+              Icon={() => <SubmissionBoxIcon viewBox="-5 0 60 60" />}
+            />
           }
           {(!isReplacing && !creating) &&
             <PopoutMenu
