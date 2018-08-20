@@ -99,7 +99,7 @@ function splitName(name) {
 class CollectionCover extends React.Component {
   get name() {
     const { collection } = this.props
-    if (collection.isTemplate || collection.isMasterTemplate) {
+    if (collection.isTemplated || collection.isMasterTemplate) {
       const nameParts = splitName(collection.name)
       if (!nameParts) return collection.name
       const lastName = nameParts.pop()
@@ -110,7 +110,7 @@ class CollectionCover extends React.Component {
         icon = <TemplateIcon circled filled />
       } else if (collection.isUserProfile) {
         icon = <ProfileIcon />
-      } else if (collection.isTemplate) {
+      } else if (collection.isTemplated) {
         icon = <TemplateIcon circled />
       }
       return (

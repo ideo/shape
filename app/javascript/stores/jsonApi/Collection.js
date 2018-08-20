@@ -38,7 +38,7 @@ class Collection extends BaseRecord {
     return this.master_template
   }
 
-  get isTemplate() {
+  get isTemplated() {
     return !!this.template_id
   }
 
