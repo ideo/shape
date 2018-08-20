@@ -14,13 +14,15 @@ Rails.application.routes.draw do
       resources :activities, only: %i[create]
       resources :collections, except: %i[index] do
         member do
-          post 'duplicate'
           patch 'archive'
+        end
+        collection do
+          post 'create_template'
         end
         resources :collection_cards, only: :index
         resources :roles, only: %i[index create destroy], shallow: true
       end
-      resources :collection_cards, shallow: true, except: :show do
+      resources :collection_cards, shallow: true, except: %i[show update] do
         member do
           patch 'replace'
         end

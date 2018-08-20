@@ -138,6 +138,7 @@ export const fakeCollection = {
   inherited_tag_list: [],
   can_edit: false,
   can_edit_content: false,
+  master_template: false,
   isSharedCollection: false,
   isUserCollection: false,
   isNormalCollection: true,
@@ -197,7 +198,7 @@ export const fakeUserAttrs = {
   isCurrentUser: jest.fn(),
   switchOrganization: jest.fn(),
   API_updateCurrentUser: jest.fn(),
-  API_hideMoveHelper: jest.fn().mockReturnValue(Promise.resolve({})),
+  API_hideHelper: jest.fn().mockReturnValue(Promise.resolve({})),
   notify_through_email: true,
   show_move_modal: false,
 }

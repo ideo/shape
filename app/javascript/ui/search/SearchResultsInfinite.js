@@ -16,7 +16,7 @@ import ActionMenu from '~/ui/grid/ActionMenu'
 import SelectionCircle from '~/ui/grid/SelectionCircle'
 import CollectionCover from '~/ui/grid/covers/CollectionCover'
 import CollectionIcon from '~/ui/icons/CollectionIcon'
-import { StyledTopRightActions, StyledBottomLeftIcon } from '~/ui/grid/GridCard'
+import { StyledTopRightActions, StyledBottomLeftIcon } from '~/ui/grid/shared'
 
 const StyledSearchResult = styled.div`
   height: ${props => props.gridH}px;

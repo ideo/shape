@@ -58,10 +58,10 @@ describe('MovableGridCard', () => {
     expect(wrapper.find('HotspotHelperGraphic').exists()).toBeFalsy()
   })
 
-  it('calls API_hideHotEdgeHelper when closing the helper', () => {
+  it('calls API_hideHelper when closing the helper', () => {
     shallowRender()
     component.hideHelper()
     expect(apiStore.currentUser.show_helper).toBeFalsy()
-    expect(apiStore.currentUser.API_hideHotEdgeHelper).toHaveBeenCalled()
+    expect(apiStore.currentUser.API_hideHelper).toHaveBeenCalled()
   })
 })

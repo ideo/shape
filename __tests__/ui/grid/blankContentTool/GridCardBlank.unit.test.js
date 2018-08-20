@@ -11,6 +11,8 @@ import {
 jest.mock('../../../../app/javascript/utils/FilestackUpload')
 // in order to mock our way past `new CollectionCard(attrs, apiStore)`
 jest.mock('../../../../app/javascript/stores/jsonApi/CollectionCard')
+// solving a mysterious `property 'type' of undefined` error that traces to Item.js -> routingStore
+jest.mock('../../../../app/javascript/stores/index')
 
 let props, wrapper, replacingCard, component
 beforeEach(() => {

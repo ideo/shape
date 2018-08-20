@@ -204,7 +204,7 @@ describe Organization, type: :model do
       before do
         # profile_template needs to be present for Collection::UserProfile methods to be called
         organization.update(
-          profile_template: create(:master_template),
+          profile_template: create(:collection, master_template: true),
         )
       end
 

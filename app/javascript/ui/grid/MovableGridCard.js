@@ -214,6 +214,8 @@ class MovableGridCard extends React.PureComponent {
 
     return (
       <FlipMove
+        // z-index is important because BCT has a popoutMenu
+        style={{ zIndex: v.zIndex.gridCard }}
         easing="ease-out"
         appearAnimation={{
           from: {
