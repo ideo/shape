@@ -486,11 +486,13 @@ class GridCardBlank extends React.Component {
           {(!isReplacing && (!creating || creating === 'video')) &&
             videoBctBox
           }
-          {(!isReplacing && !creating) &&
+          {(!isReplacing && (!creating || creating === 'submissionBox')) &&
             <BctButtonBox
               tooltip="Create submission box"
               type="submissionBox"
+              creating={creating}
               size={size}
+              onClick={this.startCreating('submissionBox')}
               Icon={() => <SubmissionBoxIcon viewBox="-5 0 60 60" />}
             />
           }
