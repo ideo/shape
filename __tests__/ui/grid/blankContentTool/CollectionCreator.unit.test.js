@@ -17,9 +17,9 @@ describe('MovableGridCard', () => {
     component = wrapper.instance()
   })
 
-  it('renders a BCTTextField', () => {
-    expect(wrapper.find('BCTTextField').exists()).toBeTruthy()
-    expect(wrapper.find('BCTTextField').props().autoFocus).toBeTruthy()
+  it('renders a BctTextField', () => {
+    expect(wrapper.find('BctTextField').exists()).toBeTruthy()
+    expect(wrapper.find('BctTextField').props().autoFocus).toBeTruthy()
   })
 
   describe('createCollection', () => {
