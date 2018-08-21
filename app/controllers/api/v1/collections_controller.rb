@@ -28,10 +28,10 @@ class Api::V1::CollectionsController < Api::V1::BaseController
     end
   end
 
+  after_action :broadcast_collection_updates, only: %i[update]
   def update
     updated = CollectionUpdater.call(@collection, collection_params)
     if updated
-      @collection.edited(current_user)
       return if @cancel_sync
       render_collection
     else
@@ -100,5 +100,9 @@ class Api::V1::CollectionsController < Api::V1::BaseController
       target: organization.primary_group,
       action: :joined,
     )
+  end
+
+  def broadcast_collection_updates
+    CollectionUpdateBroadcaster.call(@collection, current_user)
   end
 end
