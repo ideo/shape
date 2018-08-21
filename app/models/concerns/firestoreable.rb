@@ -10,6 +10,7 @@ module Firestoreable
     Collection: SerializableSimpleCollection,
     CommentThread: SerializableCommentThread,
     'Collection::Global': SerializableSimpleCollection,
+    'Collection::SubmissionBox': SerializableSimpleCollection,
     'Collection::UserProfile': SerializableSimpleCollection,
     'Item::VideoItem': SerializableSimpleItem,
     'Item::TextItem': SerializableSimpleItem,
