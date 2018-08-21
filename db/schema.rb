@@ -183,6 +183,7 @@ ActiveRecord::Schema.define(version: 20180830052131) do
     t.datetime "archived_at"
     t.string "archive_batch"
     t.string "icon_url"
+    t.index ["breadcrumb"], name: "index_items_on_breadcrumb", using: :gin
     t.index ["cloned_from_id"], name: "index_items_on_cloned_from_id"
   end
 
