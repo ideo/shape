@@ -7,6 +7,9 @@ module Templateable
              class_name: 'Collection',
              foreign_key: :template_id,
              inverse_of: :template
+    belongs_to :template,
+               class_name: 'Collection',
+               optional: true
 
     after_create :add_template_tag, if: :master_template?
     after_create :add_template_instance_tag, if: :templated?

@@ -85,7 +85,6 @@ class Collection < ApplicationRecord
   belongs_to :organization
   belongs_to :cloned_from, class_name: 'Collection', optional: true
   belongs_to :created_by, class_name: 'User', optional: true
-  belongs_to :template, class_name: 'Collection', optional: true
 
   validates :name, presence: true, if: :base_collection_type?
   before_validation :inherit_parent_organization_id, on: :create
