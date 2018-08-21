@@ -86,15 +86,13 @@ class OrganizationPeople extends React.Component {
     const { organization } = this.props
     return (
       <div>
-        {organization.primary_group.can_edit &&
-          <Row>
-            <RowItemRight>
-              <TextButton onClick={this.props.onGroupAdd}>
-                + New Group
-              </TextButton>
-            </RowItemRight>
-          </Row>
-        }
+        <Row>
+          <RowItemRight>
+            <TextButton onClick={this.props.onGroupAdd}>
+              + New Group
+            </TextButton>
+          </RowItemRight>
+        </Row>
         {this.renderYourOrganization()}
         <FormSpacer />
         <Heading3>

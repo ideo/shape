@@ -1,5 +1,5 @@
-import MovableGridCard from '~/ui/grid/MovableGridCard'
 import _ from 'lodash'
+import MovableGridCard from '~/ui/grid/MovableGridCard'
 
 import {
   fakeItemCard,

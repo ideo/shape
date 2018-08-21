@@ -16,13 +16,13 @@ export const StyledIcon = styled.span`
 `
 StyledIcon.displayName = 'StyledIcon'
 
-const Icon = (props) => (
+const Icon = ({ stroke, fill, children }) => (
   <StyledIcon
     className="icon"
-    hasStroke={props.stroke}
-    hasFill={props.fill}
+    hasStroke={stroke}
+    hasFill={fill}
   >
-    {props.children}
+    {children}
   </StyledIcon>
 )
 

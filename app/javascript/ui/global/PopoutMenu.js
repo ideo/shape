@@ -2,6 +2,7 @@ import PropTypes from 'prop-types'
 import styled from 'styled-components'
 
 import MenuIcon from '~/ui/icons/MenuIcon'
+import { BctButton } from '~/ui/grid/shared'
 import v from '~/utils/variables'
 
 export const StyledMenuButtonWrapper = styled.div`
@@ -37,7 +38,10 @@ export const StyledMenuWrapper = styled.div`
   position: absolute;
   padding: 10px;
   top: 14px;
-  right: -32px;
+  ${props => (props.direction === 'right'
+    ? 'left: 0; top: 42px;'
+    : 'right: -32px;'
+  )}
 `
 StyledMenuWrapper.displayName = 'StyledMenuWrapper'
 
@@ -126,23 +130,32 @@ class PopoutMenu extends React.Component {
       className,
       menuItems,
       menuOpen,
+      disabled,
       onMouseLeave,
       onClick,
       width,
+      buttonStyle,
+      direction,
     } = this.props
+
+    const isBct = buttonStyle === 'bct'
+    const MenuToggle = isBct ? BctButton : StyledMenuToggle
     return (
       <StyledMenuButtonWrapper
         className={`${className} ${menuOpen && ' open'}`}
         role="presentation"
         onMouseLeave={onMouseLeave}
       >
-        <StyledMenuToggle
+        <MenuToggle
+          disabled={disabled}
           onClick={onClick}
           className="menu-toggle"
         >
-          <MenuIcon />
-        </StyledMenuToggle>
-        <StyledMenuWrapper className="menu-wrapper">
+          <MenuIcon
+            viewBox={isBct ? '-11 -11 26 40' : '0 0 5 18'}
+          />
+        </MenuToggle>
+        <StyledMenuWrapper direction={direction} className="menu-wrapper">
           <StyledMenu width={width}>
             {this.renderMenuItems}
           </StyledMenu>
@@ -158,6 +171,8 @@ PopoutMenu.propTypes = {
   className: PropTypes.string,
   width: PropTypes.number,
   menuOpen: PropTypes.bool,
+  disabled: PropTypes.bool,
+  buttonStyle: PropTypes.string,
   menuItems: PropTypes.arrayOf(PropTypes.shape({
     name: PropTypes.string,
     iconLeft: PropTypes.element,
@@ -170,6 +185,7 @@ PopoutMenu.propTypes = {
   groupExtraComponent: PropTypes.shape({
     component: PropTypes.node,
   }),
+  direction: PropTypes.string,
 }
 
 PopoutMenu.defaultProps = {
@@ -177,9 +193,12 @@ PopoutMenu.defaultProps = {
   onClick: () => null,
   className: '',
   menuOpen: false,
+  disabled: false,
+  buttonStyle: '',
   width: 200,
   showSearch: false,
   groupExtraComponent: {},
+  direction: 'left',
 }
 
 export default PopoutMenu

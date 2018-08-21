@@ -3,29 +3,23 @@ import v from '~/utils/variables'
 
 /** @component */
 export const Heading1 = styled.h1`
+  color: ${v.colors.blackLava};
   font-family: ${v.fonts.sans};
   font-size: 2.25rem;
-  font-weight: ${v.weights.medium};
-  letter-spacing: 2px;
-  color: black;
+  font-weight: ${v.weights.book};
+  line-height: 2.5rem;
   margin-bottom: 0.5rem;
   margin-top: 0.5rem;
+  text-transform: none;
   white-space: ${props => (props.wrapLine ? 'normal' : 'nowrap')}; /* better this way for responsive? */
-  text-transform: uppercase;
 
   @media only screen and (max-width: ${v.responsive.smallBreakpoint}px) {
     padding: 1rem 0;
-    font-size: 1.5rem;
+    font-size: 2rem;
+    line-height: 2.2rem;
   }
 `
 Heading1.displayName = 'Heading1'
-
-/** @component */
-export const SimpleHeading1 = Heading1.extend`
-  margin-bottom: 2rem;
-  text-transform: none;
-`
-SimpleHeading1.displayName = 'SimpleHeading1'
 
 /** @component */
 export const Heading2 = styled.h2`
@@ -124,19 +118,20 @@ export const Anchor = styled.a`
 Anchor.displayName = 'StyledAnchor'
 
 // Keep in sync with assets/stylesheets/core/base.scss:quill h1
-export const CardHeading = styled.h2`
-  font-size: 2.25rem;
-  line-height: 2.5rem;
+export const CardHeading = Heading1.extend`
+  color: ${v.colors.cararra}
   margin-bottom: 0.25rem;
+  margin-top: 0;
   max-width: 100%;
-  text-transform: none;
   transition: all 0.33s 0.25s;
+  white-space: normal;
 
   @media only screen
     and (min-width: ${v.responsive.medBreakpoint}px)
     and (max-width: ${v.responsive.largeBreakpoint}px) {
-    font-size: 2rem;
-    line-height: 2.2rem;
+    padding: 0;
+    font-size: 1.75rem;
+    line-height: 2rem;
   }
 `
 CardHeading.displayName = 'CardHeading'

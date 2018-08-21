@@ -3,6 +3,8 @@ class Collection < ApplicationRecord
   include Resourceable
   include Archivable
   include HasActivities
+  include Templateable
+
   resourceable roles: [Role::EDITOR, Role::CONTENT_EDITOR, Role::VIEWER],
                edit_role: Role::EDITOR,
                content_edit_role: Role::CONTENT_EDITOR,
@@ -83,7 +85,7 @@ class Collection < ApplicationRecord
   belongs_to :organization
   belongs_to :cloned_from, class_name: 'Collection', optional: true
   belongs_to :created_by, class_name: 'User', optional: true
-  belongs_to :template, class_name: 'Collection::MasterTemplate', optional: true
+  belongs_to :template, class_name: 'Collection', optional: true
 
   validates :name, presence: true, if: :base_collection_type?
   before_validation :inherit_parent_organization_id, on: :create
@@ -93,6 +95,7 @@ class Collection < ApplicationRecord
   scope :user, -> { where(type: 'Collection::UserCollection') }
   scope :shared_with_me, -> { where(type: 'Collection::SharedWithMeCollection') }
   scope :searchable, -> { where.not(type: unsearchable_types).or(where(type: nil)) }
+  scope :master_template, -> { where(master_template: true) }
 
   accepts_nested_attributes_for :collection_cards
 
@@ -271,10 +274,6 @@ class Collection < ApplicationRecord
     false
   end
 
-  def system_required?
-    false
-  end
-
   def breadcrumb_title
     name
   end
@@ -385,10 +384,6 @@ class Collection < ApplicationRecord
   end
 
   def profiles?
-    false
-  end
-
-  def profile_template?
     false
   end
 

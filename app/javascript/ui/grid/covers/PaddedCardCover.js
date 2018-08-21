@@ -13,9 +13,6 @@ const PaddedCardCover = styled.div`
       padding-top: 5px;
       margin-bottom: 10px;
     }
-    button {
-      font-size: 0.8rem;
-    }
   }
 `
 

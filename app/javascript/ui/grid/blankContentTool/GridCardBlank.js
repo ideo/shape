@@ -2,6 +2,7 @@ import PropTypes from 'prop-types'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 import { Flex, Box } from 'reflexbox'
+import FlipMove from 'react-flip-move'
 
 import CollectionCard from '~/stores/jsonApi/CollectionCard'
 import AddTextIcon from '~/ui/icons/AddTextIcon'
@@ -9,13 +10,15 @@ import AddCollectionIcon from '~/ui/icons/AddCollectionIcon'
 import AddFileIcon from '~/ui/icons/AddFileIcon'
 import AddVideoIcon from '~/ui/icons/AddVideoIcon'
 import LinkIcon from '~/ui/icons/LinkIcon'
+import TemplateIcon from '~/ui/icons/TemplateIcon'
 import v, { ITEM_TYPES } from '~/utils/variables'
 import FilestackUpload from '~/utils/FilestackUpload'
-import { StyledGridCard } from '~/ui/grid/GridCard'
+import { StyledGridCard, BctButton } from '~/ui/grid/shared'
 import InlineLoader from '~/ui/layout/InlineLoader'
 import { CloseButton } from '~/ui/global/styled/buttons'
 import bctIcons from '~/assets/bct_icons.png'
 import Tooltip from '~/ui/global/Tooltip'
+import PopoutMenu from '~/ui/global/PopoutMenu'
 
 import CollectionCreator from './CollectionCreator'
 import TextItemCreator from './TextItemCreator'
@@ -51,6 +54,9 @@ const StyledBlankCreationTool = styled.div`
     width: ${props => (props.replacing ? '50%' : '100%')};
     &.foreground-bottom {
       top: 120px;
+      /* width is smaller because there are only 2 bottom buttons; can change if we add more */
+      width: 70%;
+      margin: 0 auto;
     }
   }
   transition: ${v.transitionWithDelay};
@@ -87,36 +93,6 @@ const BctBackground = styled.div`
   }
 `
 BctBackground.displayName = 'BctBackground'
-
-const BctButton = styled.button`
-  position: relative;
-  width: 47px;
-  height: 47px;
-  border-radius: 50%;
-  background: ${v.colors.blackLava};
-  color: white;
-
-  left: ${props => (props.creating ? '100px' : 0)};
-  @media only screen
-    and (min-width: ${v.responsive.medBreakpoint}px)
-    and (max-width: ${v.responsive.largeBreakpoint}px) {
-    left: ${props => (props.creating ? '80px' : 0)};
-  }
-  transform: ${props => (props.creating ? 'rotate(360deg)' : 'none')};
-
-  &:hover {
-    background-color: ${v.colors.cloudy};
-  }
-
-  .icon {
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: 47px;
-    height: 47px;
-  }
-`
-BctButton.displayName = 'BctButton'
 
 const BctDropzone = styled.div`
   position: absolute;
@@ -215,15 +191,18 @@ const BctButtonBox = ({
 )
 
 BctButtonBox.propTypes = {
-  type: PropTypes.string.isRequired,
-  tooltip: PropTypes.string.isRequired,
+  type: PropTypes.string,
+  tooltip: PropTypes.string,
   size: PropTypes.number.isRequired,
   creating: PropTypes.string,
-  onClick: PropTypes.func.isRequired,
+  onClick: PropTypes.func,
   Icon: PropTypes.func.isRequired,
 }
 BctButtonBox.defaultProps = {
+  onClick: () => null,
+  tooltip: '',
   creating: '',
+  type: '',
 }
 
 @inject('uiStore', 'apiStore')
@@ -233,6 +212,7 @@ class GridCardBlank extends React.Component {
     creating: null,
     loading: false,
     droppingFile: false,
+    bctMenuOpen: false,
   }
 
   componentDidMount() {
@@ -279,7 +259,7 @@ class GridCardBlank extends React.Component {
   }
 
   startCreating = type => () => {
-    this.setState({ creating: type })
+    this.setState({ creating: type, bctMenuOpen: false })
   }
 
   createCardWith = (file) => {
@@ -344,12 +324,20 @@ class GridCardBlank extends React.Component {
     }
   }
 
+  toggleBctMenu = () => {
+    this.setState(({ bctMenuOpen }) => (
+      { bctMenuOpen: !bctMenuOpen }
+    ))
+  }
+
   renderInner = () => {
     let inner
     switch (this.state.creating) {
     case 'collection':
+    case 'template':
       inner = (
         <CollectionCreator
+          template={this.state.creating === 'template'}
           loading={this.state.loading}
           createCard={this.createCard}
           closeBlankContentTool={this.closeBlankContentTool}
@@ -459,20 +447,54 @@ class GridCardBlank extends React.Component {
               creating={creating}
               size={size}
               onClick={this.startCreating('link')}
-              Icon={() => <LinkIcon viewBox={'-11 -11 40 40'} />}
+              Icon={() => <LinkIcon viewBox="-11 -11 40 40" />}
             />
           }
+          {/* videoBctBox shows up on the top row when replacing */}
           {isReplacing &&
             videoBctBox
+          }
+          {creating && creating === 'template' &&
+            <FlipMove
+              appearAnimation={{
+                from: {
+                  transform: 'rotate(180deg) translateY(80px)',
+                  transformOrigin: '120px 140px',
+                },
+                to: {
+                  transform: 'none',
+                  transformOrigin: '120px 140px',
+                },
+              }}
+            >
+              <div>
+                <BctButtonBox
+                  type="template"
+                  creating={creating}
+                  size={size}
+                  Icon={() => <TemplateIcon viewBox="-5 -5 60 60" />}
+                />
+              </div>
+            </FlipMove>
           }
         </Flex>
         <Flex
           className={`foreground ${!creating ? 'foreground-bottom' : ''}`}
-          align={creating ? '' : 'center'}
-          justify={creating ? 'space-between' : 'center'}
+          justify={creating ? 'space-between' : 'space-evenly'}
         >
           {(!isReplacing && (!creating || creating === 'video')) &&
             videoBctBox
+          }
+          {(!isReplacing && !creating) &&
+            <PopoutMenu
+              buttonStyle="bct"
+              menuOpen={this.state.bctMenuOpen}
+              onClick={this.toggleBctMenu}
+              direction="right"
+              menuItems={[
+                { name: 'Create Template', iconRight: <TemplateIcon />, onClick: this.startCreating('template') }
+              ]}
+            />
           }
         </Flex>
         {inner}

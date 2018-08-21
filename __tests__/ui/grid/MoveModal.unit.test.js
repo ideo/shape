@@ -38,6 +38,49 @@ describe('MoveModal', () => {
     })
   })
 
+  describe('moveErrors', () => {
+    describe('without permission', () => {
+      it('should return an error message', () => {
+        const message = component.moveErrors({
+          viewingCollection: { can_edit_content: false },
+          movingFromCollection: {},
+          cardAction: '',
+        })
+        expect(message).toEqual('You don\'t have permission to move items to this collection')
+      })
+    })
+    describe('moving pinned items out of a template', () => {
+      it('should return an error message', () => {
+        const message = component.moveErrors({
+          viewingCollection: { isMasterTemplate: false, can_edit_content: true },
+          movingFromCollection: { isMasterTemplate: true },
+          cardAction: 'move',
+        })
+        expect(message).toEqual('You can\'t move pinned template items out of a template')
+      })
+    })
+    describe('trying to create a template inside itself', () => {
+      it('should return an error message', () => {
+        const message = component.moveErrors({
+          viewingCollection: { id: 1, can_edit_content: true },
+          movingFromCollection: { id: 1 },
+          cardAction: 'useTemplate',
+        })
+        expect(message).toEqual('You can\'t create a template inside itself')
+      })
+    })
+    describe('with edit access and no issues', () => {
+      it('should not return an error message', () => {
+        const message = component.moveErrors({
+          viewingCollection: { id: 3, can_edit_content: true },
+          movingFromCollection: { id: 1 },
+          cardAction: 'move',
+        })
+        expect(message).toBeFalsy()
+      })
+    })
+  })
+
   describe('moveCards', () => {
     describe('on an uneditable collection', () => {
       beforeEach(() => {
@@ -148,6 +191,45 @@ describe('MoveModal', () => {
       it('should deselect the cards', async () => {
         await component.moveCards('beginning')
         expect(props.uiStore.resetSelectionAndBCT).toHaveBeenCalled()
+      })
+    })
+
+    describe('creating a template', () => {
+      beforeEach(() => {
+        props.apiStore.currentUser = fakeUser
+        props.apiStore.request = jest.fn().mockReturnValue(Promise.resolve())
+        props.uiStore.movingFromCollectionId = 3
+        props.uiStore.cardAction = 'useTemplate'
+        props.uiStore.viewingCollection = {
+          id: 4,
+          can_edit_content: true,
+        }
+        wrapper.setProps(props)
+        component = wrapper.instance()
+      })
+
+      it('should request the api to create the template', async () => {
+        await component.moveCards('beginning')
+        expect(props.apiStore.createTemplateInstance).toHaveBeenCalledWith(
+          {
+            parent_id: props.uiStore.viewingCollection.id,
+            template_id: props.uiStore.movingFromCollectionId,
+            placement: 'beginning',
+          }
+        )
+        // expect the collection to reload
+        expect(props.apiStore.request).toHaveBeenCalledWith(
+          `collections/${props.uiStore.viewingCollection.id}`
+        )
+      })
+
+      it('should show a success message', () => {
+        expect(uiStore.alertOk).toHaveBeenCalledWith('Your template instance has been created!')
+      })
+
+      it('should close the move menu', async () => {
+        await component.moveCards('beginning')
+        expect(props.uiStore.closeMoveMenu).toHaveBeenCalled()
       })
     })
   })

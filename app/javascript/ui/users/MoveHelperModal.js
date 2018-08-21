@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types'
 import { observable, action } from 'mobx'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
@@ -47,11 +48,29 @@ class MoveHelperModal extends React.Component {
 
   @action handleSubmit = (e) => {
     e.preventDefault()
-    const { currentUser } = this.props
+    const { currentUser, type } = this.props
     this.submitted = true
     if (this.dontShowChecked) {
-      currentUser.API_hideMoveHelper()
+      currentUser.API_hideHelper(type)
     }
+  }
+
+  get helperText() {
+    const { type, recordName } = this.props
+    let text = ''
+    if (type === 'move') {
+      text = `
+        Did you know when moving, duplicating, or linking items,
+        you can navigate to another collection to place the items there?
+      `
+    } else if (type === 'template') {
+      text = `
+        Did you know? You can navigate to wherever you would like to place
+        "${recordName}", and use the up or down arrows to place it at the top or
+        bottom of the collection.
+      `
+    }
+    return text
   }
 
   render() {
@@ -71,8 +90,7 @@ class MoveHelperModal extends React.Component {
               style={{ width: '410px', marginBottom: '40px' }}
             />
             <SpecialDisplayHeading>
-              Did you know when moving, duplicating, or linking items, {' '}
-              you can navigate to another collection to place the items there?
+              {this.helperText}
             </SpecialDisplayHeading>
             <FormControl
               component="fieldset"
@@ -106,6 +124,12 @@ class MoveHelperModal extends React.Component {
 
 MoveHelperModal.propTypes = {
   currentUser: MobxPropTypes.objectOrObservableObject.isRequired,
+  recordName: PropTypes.string,
+  type: PropTypes.string,
+}
+MoveHelperModal.defaultProps = {
+  type: 'move', // types are 'move' or 'template'
+  recordName: null,
 }
 
 export default MoveHelperModal

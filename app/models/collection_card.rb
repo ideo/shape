@@ -29,7 +29,6 @@ class CollectionCard < ApplicationRecord
     enable
     # propagate to STI models
     propagate
-    set pinned: false
     nullify :templated_from_id
     # don't recognize any relations, easiest way to turn them all off
     recognize []
@@ -58,12 +57,11 @@ class CollectionCard < ApplicationRecord
       )
     end
     cc = amoeba_dup
-    if master_template_card?
-      # automatically pin when duplicating other pinned template cards
-      cc.pinned = pinned?
-      # track the relation back to the original template card
+    if master_template_card? && parent.templated?
+      # if we're cloning from template -> templated collection
       cc.templated_from = self
-    else
+    elsif !(parent.templated? || parent.master_template?)
+      # copying into a normal (non templated) collection, it should never be pinned
       cc.pinned = false
     end
     # defaults to self.parent, unless one is passed in
@@ -117,7 +115,7 @@ class CollectionCard < ApplicationRecord
 
   def master_template_card?
     # does this card live in a MasterTemplate?
-    parent.is_a? Collection::MasterTemplate
+    parent.master_template?
   end
 
   def pinned_and_locked?

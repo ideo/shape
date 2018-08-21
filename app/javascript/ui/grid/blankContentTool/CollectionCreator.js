@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types'
 
-import { TextField, FormButton } from '~/ui/global/styled/forms'
+import { BCTTextField, FormButton } from '~/ui/global/styled/forms'
 import PaddedCardCover from '~/ui/grid/covers/PaddedCardCover'
 import { KEYS } from '~/utils/variables'
 
@@ -24,20 +24,24 @@ class CollectionCreator extends React.Component {
   createCollection = (e) => {
     e.preventDefault()
     if (!this.state.inputText) return
-    this.props.createCard({
+    const { createCard, template } = this.props
+    createCard({
       // `collection` is the collection being created within the card
       collection_attributes: {
         name: this.state.inputText,
+        master_template: template,
       }
     })
   }
 
   render() {
+    const { template } = this.props
     return (
       <PaddedCardCover>
         <form className="form" onSubmit={this.createCollection}>
-          <TextField
-            placeholder="Collection name"
+          <BCTTextField
+            autoFocus
+            placeholder={`${template ? 'Template' : 'Collection'} name`}
             value={this.state.inputText}
             onChange={this.onInputChange}
             onKeyDown={this.handleKeyDown}
@@ -56,8 +60,12 @@ class CollectionCreator extends React.Component {
 
 CollectionCreator.propTypes = {
   loading: PropTypes.bool.isRequired,
+  template: PropTypes.bool,
   createCard: PropTypes.func.isRequired,
   closeBlankContentTool: PropTypes.func.isRequired,
+}
+CollectionCreator.defaultProps = {
+  template: false,
 }
 
 export default CollectionCreator
