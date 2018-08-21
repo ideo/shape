@@ -20,6 +20,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
                                         replacing_card: @replacing_card)
 
     if builder.create
+      @collection.edited(current_user)
       # reload the user's roles
       current_user.reload.reset_cached_roles!
       if @replacing_card.present?
@@ -48,6 +49,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
       @collection_cards.pluck(:id),
       current_user.id,
     )
+    @collection_cards.first.parent.edited(current_user)
     render json: { archived: true }
   end
 

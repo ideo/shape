@@ -29,6 +29,7 @@ class Api::V1::CollectionsController < Api::V1::BaseController
   def update
     updated = CollectionUpdater.call(@collection, collection_params)
     if updated
+      @collection.edited(current_user)
       return if @cancel_sync
       render_collection
     else
@@ -51,6 +52,7 @@ class Api::V1::CollectionsController < Api::V1::BaseController
 
   def archive
     if @collection.archive!
+      @collection.parent.edited(current_user)
       ActivityAndNotificationBuilder.call(
         actor: current_user,
         target: @collection,

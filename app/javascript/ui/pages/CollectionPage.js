@@ -16,6 +16,11 @@ const isHomepage = ({ params }) => (params.org && !params.id)
 @inject('apiStore', 'uiStore', 'routingStore')
 @observer
 class CollectionPage extends PageWithApi {
+  constructor(props) {
+    super(props)
+    this.reloadData = _.debounce(this._reloadData, 3000)
+  }
+
   componentWillMount() {
     this.subscribeToChannel(this.props.match.params.id)
   }
@@ -35,18 +40,23 @@ class CollectionPage extends PageWithApi {
   subscribeToChannel(id) {
     ChannelManager.subscribe(this.channelName, id,
       {
-        channelConnected: () => { console.log('conn', arguments) },
+        channelConnected: () => { /* console.log('conn', arguments) */ },
         channelReceivedData: this.receivedChannelData,
-        channelDisconnected: () => { console.log('dscn', arguments) },
-        channelRejected: () => { console.log('rjct', arguments) },
+        channelDisconnected: () => { /* console.log('dscn', arguments) */ },
+        channelRejected: () => { /* console.log('rjct', arguments) */ },
       })
-    console.log(ChannelManager.channels)
   }
 
   receivedChannelData = async (data) => {
-    const { apiStore } = this.props
     const currentId = this.props.match.params.id
-    apiStore.request(this.requestPath(this.props))
+    if (parseInt(data.record_id, 0) === parseInt(currentId, 0)) {
+      this.reloadData()
+    }
+  }
+
+  _reloadData() {
+    const { apiStore } = this.props
+    return apiStore.request(this.requestPath(this.props))
   }
 
   get channelName() {
