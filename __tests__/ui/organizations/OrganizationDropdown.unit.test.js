@@ -1,5 +1,4 @@
 import OrganizationDropdown from '~/ui/organizations/OrganizationDropdown'
-
 import {
   fakeOrganization,
 } from '#/mocks/data'
@@ -31,7 +30,6 @@ describe('OrganizationDropdown', () => {
     }
     itemNames = [
       'People & Groups',
-      ...[otherFakeOrg.primary_group.name],
       'New Organization',
       'Settings',
       'Legal'
@@ -66,12 +64,17 @@ describe('OrganizationDropdown', () => {
 
   describe('menuItems', () => {
     it('should add organizations to the list of items', () => {
-      expect(component.menuItems[1].name).toEqual(otherFakeOrg.primary_group.name)
-      expect(component.menuItems[1].iconLeft).toBeTruthy()
+      expect(component.menuItems.organizations[0].name).toEqual(otherFakeOrg.primary_group.name)
+      expect(component.menuItems.organizations[0].iconLeft).toBeTruthy()
     })
 
     it('should not add your current organization to list of items', () => {
-      expect(component.menuItems.map(item => item.name)).toEqual(itemNames)
+      expect(component.menuItems.organizations.indexOf(otherFakeOrg.primary_group.name)).toEqual(-1)
+    })
+
+    it('should have all other menu items', () => {
+      const items = component.menuItems.top.concat(component.menuItems.bottom)
+      expect(items.map(i => i.name)).toEqual(itemNames)
     })
 
     describe('if current user is not an org admin', () => {
@@ -80,7 +83,7 @@ describe('OrganizationDropdown', () => {
       })
 
       it('should not show the settings link', () => {
-        expect(component.menuItems.find(
+        expect(component.menuItems.bottom.find(
           item => item.name === 'Settings'
         )).toBeFalsy()
       })

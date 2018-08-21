@@ -97,18 +97,28 @@ export const StyledMenuItem = styled.li`
 StyledMenuItem.displayName = 'StyledMenuItem'
 
 class PopoutMenu extends React.Component {
+  get groupedMenuItems() {
+    const { menuItems } = this.props
+    let { groupedMenuItems } = this.props
+    if (_.isEmpty(groupedMenuItems)) {
+      // just put the menuItems into a group by default
+      groupedMenuItems = { main: menuItems }
+    }
+    return groupedMenuItems
+  }
+
   get renderMenuItems() {
-    const groupedItems = _.groupBy(this.props.menuItems, 'group')
     const { groupExtraComponent } = this.props
+    const { groupedMenuItems } = this
     let rendered = []
-    for (let groupName in groupedItems) {
+    Object.keys(groupedMenuItems).forEach((groupName, i) => {
       rendered.push(
         <div className={groupName} key={groupName}>
           { groupExtraComponent[groupName] }
-          { groupedItems[groupName].map(item => {
+          { groupedMenuItems[groupName].map((item, i) => {
             const { name, iconLeft, iconRight, onClick, loading } = item
             return (
-              <StyledMenuItem key={name} noBorder={item.noBorder} loading={loading}>
+              <StyledMenuItem key={`${name}-${i}`} noBorder={item.noBorder} loading={loading}>
                 <button
                   onClick={loading ? () => null : onClick}
                   className={`menu-${name}`}
@@ -122,14 +132,13 @@ class PopoutMenu extends React.Component {
           })}
         </div>
       )
-    }
+    })
     return rendered
   }
 
   render() {
     const {
       className,
-      menuItems,
       menuOpen,
       disabled,
       onMouseLeave,
@@ -166,6 +175,15 @@ class PopoutMenu extends React.Component {
   }
 }
 
+const propTypeMenuItem = PropTypes.arrayOf(PropTypes.shape({
+  name: PropTypes.string,
+  iconLeft: PropTypes.element,
+  iconRight: PropTypes.element,
+  onClick: PropTypes.func,
+  noBorder: PropTypes.bool,
+  loading: PropTypes.bool,
+}))
+
 PopoutMenu.propTypes = {
   onMouseLeave: PropTypes.func,
   onClick: PropTypes.func,
@@ -174,15 +192,12 @@ PopoutMenu.propTypes = {
   menuOpen: PropTypes.bool,
   disabled: PropTypes.bool,
   buttonStyle: PropTypes.string,
-  menuItems: PropTypes.arrayOf(PropTypes.shape({
-    name: PropTypes.string,
-    iconLeft: PropTypes.element,
-    iconRight: PropTypes.element,
-    onClick: PropTypes.func,
-    noBorder: PropTypes.bool,
-    loading: PropTypes.bool,
-    group: PropTypes.string,
-  })).isRequired,
+  menuItems: propTypeMenuItem,
+  groupedMenuItems: PropTypes.shape({
+    top: propTypeMenuItem,
+    organizations: propTypeMenuItem,
+    bottom: propTypeMenuItem,
+  }),
   groupExtraComponent: PropTypes.shape({
     component: PropTypes.node,
   }),
@@ -192,12 +207,14 @@ PopoutMenu.propTypes = {
 PopoutMenu.defaultProps = {
   onMouseLeave: () => null,
   onClick: () => null,
+  // you need one or the other between menuItems / groupedMenuItems
+  menuItems: [],
+  groupedMenuItems: {},
   className: '',
   menuOpen: false,
   disabled: false,
   buttonStyle: '',
   width: 200,
-  showSearch: false,
   groupExtraComponent: {},
   direction: 'left',
 }

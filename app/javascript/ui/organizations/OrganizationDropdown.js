@@ -24,16 +24,18 @@ const TruncatedPopoutMenu = styled(PopoutMenu)`
   .organizations {
     max-height: 60vh;
     overflow-y: scroll;
+    overflow-x: hidden;
   }
 `
 
 const StyledSearchHolder = styled.div`
   padding: 10px;
 `
-function fuzzyMatch(str, pattern){
-  pattern = pattern.split("").reduce(function(a,b){ return a+".*"+b; });
-  return (new RegExp(pattern)).test(str);
-};
+
+function fuzzyMatch(str, pattern) {
+  const rx = pattern.split('').reduce((a, b) => `${a}.*${b}`)
+  return (new RegExp(rx)).test(str)
+}
 
 @inject('apiStore', 'uiStore', 'routingStore')
 @observer
@@ -129,10 +131,9 @@ class OrganizationDropdown extends React.Component {
           iconLeft: avatar,
           onClick: this.handleSwitchOrg(org.id),
           noBorder: true,
-          group: 'organizations',
         }
       })
-    return orgItems.length > 0 ? orgItems : [{ group: 'organizations' }]
+    return orgItems
   }
 
   get currentOrganization() {
@@ -142,15 +143,20 @@ class OrganizationDropdown extends React.Component {
 
   get menuItems() {
     const userCanEdit = this.currentOrganization.primary_group.can_edit
-    const items = [
-      { name: 'People & Groups', onClick: this.handleOrgPeople, group: '1' },
-      ...this.organizationItems,
-      { name: 'New Organization', onClick: this.handleNewOrg, group: 'z' },
-      ...(userCanEdit
-        ? [{ name: 'Settings', onClick: this.handleOrgSettings, group: 'z' }]
-        : []),
-      { name: 'Legal', onClick: this.handleLegal, group: 'z' },
-    ]
+    const items = {
+      top: [
+        { name: 'People & Groups', onClick: this.handleOrgPeople }
+      ],
+      organizations: [
+        ...this.organizationItems
+      ],
+      bottom: [
+        { name: 'New Organization', onClick: this.handleNewOrg },
+        { name: 'Legal', onClick: this.handleLegal }
+      ]
+    }
+    // put this in the middle at index 1
+    if (userCanEdit) items.bottom.splice(1, 0, { name: 'Settings', onClick: this.handleOrgSettings })
     return items
   }
 
@@ -161,10 +167,10 @@ class OrganizationDropdown extends React.Component {
         <TruncatedPopoutMenu
           className="org-menu"
           width={220}
-          menuItems={this.menuItems}
+          groupedMenuItems={this.menuItems}
           menuOpen={this.props.open}
           groupExtraComponent={{
-            'organizations': apiStore.currentUser.organizations.length > 10 &&
+            organizations: apiStore.currentUser.organizations.length > 10 &&
             <StyledSearchHolder>
               <SearchBar
                 value={this.searchText}
