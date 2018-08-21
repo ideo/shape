@@ -8,6 +8,7 @@ const props = {
     { name: 'Do Stuff', iconRight: <div className="icon" />, onClick: jest.fn() },
     { name: 'Do Stuff', iconLeft: <div className="icon" />, onClick: jest.fn(), noBorder: true },
   ],
+
   menuOpen: false,
   noBorder: true,
 }
