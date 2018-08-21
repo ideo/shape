@@ -110,15 +110,22 @@ class PopoutMenu extends React.Component {
   get renderMenuItems() {
     const { groupExtraComponent } = this.props
     const { groupedMenuItems } = this
-    let rendered = []
-    Object.keys(groupedMenuItems).forEach((groupName, i) => {
+    const rendered = []
+    Object.keys(groupedMenuItems).forEach((groupName) => {
       rendered.push(
         <div className={groupName} key={groupName}>
           { groupExtraComponent[groupName] }
           { groupedMenuItems[groupName].map((item, i) => {
-            const { name, iconLeft, iconRight, onClick, loading } = item
+            const {
+              id,
+              name,
+              iconLeft,
+              iconRight,
+              onClick,
+              loading
+            } = item
             return (
-              <StyledMenuItem key={`${name}-${i}`} noBorder={item.noBorder} loading={loading}>
+              <StyledMenuItem key={`${name}-${id || ''}`} noBorder={item.noBorder} loading={loading}>
                 <button
                   onClick={loading ? () => null : onClick}
                   className={`menu-${name}`}

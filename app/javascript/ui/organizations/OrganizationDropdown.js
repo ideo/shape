@@ -127,6 +127,7 @@ class OrganizationDropdown extends React.Component {
           </IconHolder>
         )
         return {
+          id: org.id,
           name: org.primary_group.name,
           iconLeft: avatar,
           onClick: this.handleSwitchOrg(org.id),
