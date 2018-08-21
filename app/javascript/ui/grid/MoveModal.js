@@ -93,7 +93,7 @@ class MoveModal extends React.Component {
 
   moveCards = async (placement) => {
     const { uiStore, apiStore } = this.props
-    const { viewingCollection } = uiStore
+    const { viewingCollection, cardAction } = uiStore
     // Viewing collection might not be set, such as on the search page
     if (!viewingCollection) {
       uiStore.alert('You can\'t move an item here')
@@ -101,16 +101,16 @@ class MoveModal extends React.Component {
     }
     const collectionId = viewingCollection.id
     const movingFromCollection = apiStore.find('collections', uiStore.movingFromCollectionId)
-    if (!viewingCollection.can_edit_content || (
-      // don't allow moving cards from templates to non-templates
-      movingFromCollection &&
-      movingFromCollection.isMasterTemplate &&
-      !viewingCollection.isMasterTemplate
-    )) {
-      uiStore.alert('You don\'t have permission to move items to this collection')
+    const error = this.moveErrors({
+      viewingCollection,
+      movingFromCollection,
+      cardAction,
+    })
+    if (error) {
+      uiStore.alert(error)
       return
     }
-    const data = {
+    let data = {
       to_id: collectionId,
       from_id: uiStore.movingFromCollectionId,
       collection_card_ids: uiStore.movingCardIds,
@@ -119,18 +119,36 @@ class MoveModal extends React.Component {
     try {
       runInAction(() => { this.isLoading = true })
       let successMessage
-      if (uiStore.cardAction === 'move') {
+      switch (cardAction) {
+      case 'move':
         await apiStore.request('collection_cards/move', 'PATCH', data)
         successMessage = 'Items successfully moved!'
-      } else if (uiStore.cardAction === 'link') {
+        break
+      case 'link':
         await apiStore.request('collection_cards/link', 'POST', data)
         successMessage = 'Items successfully linked!'
-      } else if (uiStore.cardAction === 'duplicate') {
+        break
+      case 'duplicate':
         await apiStore.request('collection_cards/duplicate', 'POST', data)
         // have to re-fetch here because the duplicate method wasn't re-rendering
         // see note in collection_cards_controller#duplicate
         await apiStore.request(`collections/${collectionId}`)
         successMessage = 'Items successfully duplicated!'
+        break
+      case 'useTemplate': {
+        data = {
+          parent_id: data.to_id,
+          template_id: data.from_id,
+          placement,
+        }
+        await apiStore.createTemplateInstance(data)
+        successMessage = 'Your template instance has been created!'
+        // refresh the current collection to get the new template
+        await apiStore.request(`collections/${collectionId}`)
+        break
+      }
+      default:
+        return
       }
       runInAction(() => { this.isLoading = false })
       uiStore.alertOk(successMessage)
@@ -147,6 +165,26 @@ class MoveModal extends React.Component {
     }
   }
 
+  moveErrors = ({ viewingCollection, movingFromCollection, cardAction }) => {
+    if (!viewingCollection.can_edit_content) {
+      return 'You don\'t have permission to move items to this collection'
+    } else if (
+      // don't allow moving cards from templates to non-templates
+      cardAction === 'move' &&
+      movingFromCollection &&
+      movingFromCollection.isMasterTemplate &&
+      !viewingCollection.isMasterTemplate
+    ) {
+      return 'You can\'t move pinned template items out of a template'
+    } else if (
+      cardAction === 'useTemplate' &&
+      viewingCollection.id === movingFromCollection.id
+    ) {
+      return 'You can\'t create a template inside itself'
+    }
+    return ''
+  }
+
   handleMoveToBeginning = () => {
     this.moveCards('beginning')
   }
@@ -155,13 +193,46 @@ class MoveModal extends React.Component {
     this.moveCards('end')
   }
 
-  render() {
-    const { apiStore, uiStore } = this.props
-    const { cardAction } = uiStore
+  get moveMessage() {
+    const { uiStore } = this.props
+    const { cardAction, templateName } = uiStore
     const amount = uiStore.movingCardIds.length
-    const moveMessage = cardAction === 'move'
-      ? `${amount} in transit`
-      : `${amount} selected to ${cardAction}`
+    let message = ''
+    if (cardAction === 'move') {
+      message = `${amount} in transit`
+    } else if (cardAction === 'useTemplate') {
+      message = `${templateName} in transit`
+    } else {
+      message = `${amount} selected to ${cardAction}`
+    }
+    return message
+  }
+
+  get moveHelper() {
+    const { uiStore, apiStore } = this.props
+    const { cardAction, templateName } = uiStore
+    const helperProps = {
+      type: 'move',
+    }
+    if (cardAction === 'useTemplate') {
+      if (!apiStore.currentUser.show_template_helper) {
+        return null
+      }
+      helperProps.recordName = templateName
+      helperProps.type = 'template'
+    } else if (!apiStore.currentUser.show_move_helper) {
+      return null
+    }
+    return (
+      <MoveHelperModal
+        currentUser={apiStore.currentUser}
+        {...helperProps}
+      />
+    )
+  }
+
+  render() {
+    const { uiStore } = this.props
 
     return (
       <div>
@@ -175,7 +246,7 @@ class MoveModal extends React.Component {
                 <StyledSnackbarContent
                   classes={{ root: 'SnackbarContent', }}
                   message={
-                    <StyledMoveText id="message-id">{moveMessage}</StyledMoveText>
+                    <StyledMoveText id="message-id">{this.moveMessage}</StyledMoveText>
                   }
                   action={[
                     <IconHolder key="moveup">
@@ -215,9 +286,7 @@ class MoveModal extends React.Component {
                 />
               )}
             </StyledSnackbar>
-            { apiStore.currentUser.show_move_helper &&
-              <MoveHelperModal currentUser={apiStore.currentUser} />
-            }
+            { this.moveHelper }
           </div>
         )}
       </div>

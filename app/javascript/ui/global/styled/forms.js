@@ -53,9 +53,10 @@ export const FormButton = styled.button`
   color: white;
   border-radius: 20px;
   border: none;
-  background-color: ${v.colors.blackLava};
+  background-color: ${props => (props.color === 'blue' ? v.colors.ctaButtonBlue : v.colors.blackLava)};
+  transition: all 0.3s;
   &:hover, &:focus {
-    background-color: ${v.colors.cloudy};
+    background-color: ${props => (props.color === 'blue' ? v.colors.ctaButtonBlueHover : v.colors.cloudy)};
   }
   ${props => props.disabled &&
       `background-color: white;
@@ -108,6 +109,12 @@ export const TextField = styled.input`
   }
 `
 TextField.displayName = 'StyledTextField'
+
+/** @component */
+export const BCTTextField = TextField.extend`
+  background: ${v.colors.cararra};
+`
+BCTTextField.displayName = 'BCTTextField'
 
 /** @component */
 export const FormSpacer = styled.div`

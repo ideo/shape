@@ -11,7 +11,14 @@ describe Collection::UserProfile, type: :model do
   end
 
   let(:template) do
-    create(:master_template, organization: organization, num_cards: 3, record_type: :image, pin_cards: true)
+    create(
+      :collection,
+      master_template: true,
+      organization: organization,
+      num_cards: 3,
+      record_type: :image,
+      pin_cards: true,
+    )
   end
   let(:profiles) { create(:global_collection, organization: organization) }
 

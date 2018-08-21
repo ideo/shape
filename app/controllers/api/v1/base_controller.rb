@@ -17,7 +17,6 @@ class Api::V1::BaseController < ApplicationController
       'Item::LinkItem': SerializableItem,
       'Collection::UserCollection': SerializableCollection,
       'Collection::SharedWithMeCollection': SerializableCollection,
-      'Collection::MasterTemplate': SerializableCollection,
       'Collection::Global': SerializableCollection,
       'Collection::UserProfile': SerializableCollection,
       'CollectionCard::Primary': SerializableCollectionCard,

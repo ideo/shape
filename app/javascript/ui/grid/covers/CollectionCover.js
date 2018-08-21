@@ -9,6 +9,8 @@ import PlainLink from '~/ui/global/PlainLink'
 import { CardHeading } from '~/ui/global/styled/typography'
 import hexToRgba from '~/utils/hexToRgba'
 import ProfileIcon from '~/ui/icons/ProfileIcon'
+import FilledProfileIcon from '~/ui/icons/FilledProfileIcon'
+import TemplateIcon from '~/ui/icons/TemplateIcon'
 import { routingStore } from '~/stores'
 
 const IconHolder = styled.span`
@@ -97,17 +99,28 @@ function splitName(name) {
 class CollectionCover extends React.Component {
   get name() {
     const { collection } = this.props
-    if (collection.isUserProfile) {
+    if (collection.isTemplated || collection.isMasterTemplate) {
       const nameParts = splitName(collection.name)
       if (!nameParts) return collection.name
       const lastName = nameParts.pop()
-      const name = (
+      let icon
+      if (collection.isProfileTemplate) {
+        icon = <FilledProfileIcon />
+      } else if (collection.isMasterTemplate) {
+        icon = <TemplateIcon circled filled />
+      } else if (collection.isUserProfile) {
+        icon = <ProfileIcon />
+      } else if (collection.isTemplated) {
+        icon = <TemplateIcon circled />
+      }
+      return (
         <Fragment>
-          {nameParts.join(' ')}{' '}<span style={{ whiteSpace: 'nowrap' }}>
-            {lastName}&nbsp;<IconHolder><ProfileIcon /></IconHolder></span>
+          {nameParts.join(' ')}{' '}
+          <span style={{ whiteSpace: 'nowrap' }}>
+            {lastName}&nbsp;<IconHolder>{icon}</IconHolder>
+          </span>
         </Fragment>
       )
-      return name
     }
     return collection.name
   }
@@ -142,7 +155,7 @@ class CollectionCover extends React.Component {
             <PositionedCardHeading>
               <Dotdotdot clamp={height > 1 ? 6 : 3}>
                 <PlainLink
-                  noSelect
+                  className="no-select"
                   onClick={this.handleClick}
                   to={routingStore.pathTo('collections', collection.id)}
                 >
