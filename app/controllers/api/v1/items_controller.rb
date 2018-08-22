@@ -44,7 +44,7 @@ class Api::V1::ItemsController < Api::V1::BaseController
 
   def archive
     if @item.archive!
-      @item.parent.edited(current_user)
+      CollectionUpdateBroadcaster.call(@item.parent, current_user)
       render jsonapi: @item.reload
     else
       render_api_errors @item.errors

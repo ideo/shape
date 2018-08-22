@@ -78,10 +78,6 @@ describe('CollectionPage', () => {
         expect(uiStore.closeBlankContentTool).toHaveBeenCalled()
       })
     })
-
-    describe('on the same collection', () => {
-
-    })
   })
 
   // this is a function in PageWithApi
