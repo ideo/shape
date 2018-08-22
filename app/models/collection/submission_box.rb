@@ -12,6 +12,13 @@ class Collection
       file: 3,
     }
 
+    def setup_submissions_collection
+      build_submissions_collection(
+        name: "#{name} Submissions",
+        organization: organization,
+      )
+    end
+
     private
 
     def submission_template_is_a_master_template

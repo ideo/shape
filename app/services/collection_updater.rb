@@ -6,10 +6,10 @@ class CollectionUpdater < SimpleService
 
   def call
     assign_attributes
+    build_submissions_collection_if_needed
     @collection.save.tap do |result|
       # caching collection cover needs to happen after cards have been updated
       cache_collection_cover_if_needed if result
-      build_submissions_collection_if_needed if result
     end
   end
 
@@ -33,8 +33,9 @@ class CollectionUpdater < SimpleService
   end
 
   def build_submissions_collection_if_needed
-    return unless @collection.saved_change_to_submission_box_type?
+    return unless @collection.is_a? Collection::SubmissionBox
+    return unless @collection.will_save_change_to_submission_box_type?
     return unless @collection.submissions_collection_id.nil?
-    @collection.create_submissions_collection(name: 'Hello', organization: @collection.organization)
+    @collection.setup_submissions_collection
   end
 end
