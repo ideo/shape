@@ -78,12 +78,12 @@ ActiveRecord::Schema.define(version: 20180822181719) do
     t.boolean "master_template", default: false
     t.integer "submission_template_id"
     t.integer "submission_box_type"
-    t.bigint "submissions_collection_id"
+    t.bigint "submission_box_id"
     t.index ["breadcrumb"], name: "index_collections_on_breadcrumb", using: :gin
     t.index ["cloned_from_id"], name: "index_collections_on_cloned_from_id"
     t.index ["organization_id"], name: "index_collections_on_organization_id"
+    t.index ["submission_box_id"], name: "index_collections_on_submission_box_id"
     t.index ["submission_template_id"], name: "index_collections_on_submission_template_id"
-    t.index ["submissions_collection_id"], name: "index_collections_on_submissions_collection_id"
     t.index ["template_id"], name: "index_collections_on_template_id"
   end
 

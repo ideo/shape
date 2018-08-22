@@ -3,7 +3,7 @@ require 'rails_helper'
 describe Collection::SubmissionBox, type: :model do
   context 'associations' do
     it { should belong_to :submission_template }
-    it { should belong_to :submissions_collection }
+    it { should have_one :submissions_collection }
   end
 
   context 'validations' do

@@ -35,7 +35,7 @@ class CollectionUpdater < SimpleService
   def build_submissions_collection_if_needed
     return unless @collection.is_a? Collection::SubmissionBox
     return unless @collection.will_save_change_to_submission_box_type?
-    return unless @collection.submissions_collection_id.nil?
+    return unless @collection.submissions_collection.nil?
     @collection.setup_submissions_collection
   end
 end

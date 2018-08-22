@@ -1,7 +1,9 @@
 class Collection
   class SubmissionBox < Collection
     belongs_to :submission_template, class_name: 'Collection', optional: true
-    belongs_to :submissions_collection, class_name: 'Collection', optional: true
+    has_one :submissions_collection,
+            class_name: 'Collection::SubmissionsCollection',
+            dependent: :destroy
 
     validate :submission_template_is_a_master_template
 
