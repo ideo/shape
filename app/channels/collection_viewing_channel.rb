@@ -7,9 +7,9 @@ class CollectionViewingChannel < ApplicationCable::Channel
     stream_from collection.stream_name
   end
 
-  def edited(user)
+  def edited
     collection = Collection.find(params[:id])
-    collection.edited(current_user)
+    collection.started_editing(current_user)
   end
 
   def unsubscribed
@@ -17,4 +17,3 @@ class CollectionViewingChannel < ApplicationCable::Channel
     collection.stopped_viewing(current_user, dont_notify: true)
   end
 end
-
