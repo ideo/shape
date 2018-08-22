@@ -43,7 +43,7 @@ module RealtimeEditorsViewers
     User.find(user_id).as_json
   end
 
-  def publish_to_channel()
+  def publish_to_channel
     data = {
       current_editor: currently_editing_user_as_json,
       num_viewers: num_viewers,
