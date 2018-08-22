@@ -23,10 +23,6 @@ module RealtimeEditorsViewers
     publish_to_channel unless dont_notify
   end
 
-  def edited(user, dont_notify: false)
-    publish_to_channel unless dont_notify
-  end
-
   def stream_name
     editing_cache_key
   end

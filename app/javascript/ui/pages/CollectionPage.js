@@ -1,5 +1,7 @@
+import _ from 'lodash'
 import { Fragment } from 'react'
 import ReactRouterPropTypes from 'react-router-prop-types'
+import { observable, action } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 
 import PageError from '~/ui/global/PageError'
@@ -10,12 +12,19 @@ import CollectionGrid from '~/ui/grid/CollectionGrid'
 import MoveModal from '~/ui/grid/MoveModal'
 import PageHeader from '~/ui/pages/shared/PageHeader'
 import ChannelManager from '~/utils/ChannelManager'
+import {
+  StyledSnackbar,
+  StyledSnackbarContent,
+} from '~/ui/global/styled/material-ui'
 
 const isHomepage = ({ params }) => (params.org && !params.id)
 
 @inject('apiStore', 'uiStore', 'routingStore')
 @observer
 class CollectionPage extends PageWithApi {
+  @observable editor = null
+  channelName = 'CollectionViewingChannel'
+
   constructor(props) {
     super(props)
     this.reloadData = _.debounce(this._reloadData, 3000)
@@ -40,27 +49,26 @@ class CollectionPage extends PageWithApi {
   subscribeToChannel(id) {
     ChannelManager.subscribe(this.channelName, id,
       {
-        channelConnected: () => { /* console.log('conn', arguments) */ },
         channelReceivedData: this.receivedChannelData,
-        channelDisconnected: () => { /* console.log('dscn', arguments) */ },
-        channelRejected: () => { /* console.log('rjct', arguments) */ },
       })
+  }
+
+  @action setEditor = (editor) => {
+    this.editor = editor
+    setTimeout(() => this.setEditor(null), 3000)
   }
 
   receivedChannelData = async (data) => {
     const currentId = this.props.match.params.id
-    if (parseInt(data.record_id, 0) === parseInt(currentId, 0)) {
+    if (data.record_id.toString() === currentId.toString()) {
       this.reloadData()
+      this.setEditor(data.current_editor)
     }
   }
 
   _reloadData() {
     const { apiStore } = this.props
     return apiStore.request(this.requestPath(this.props))
-  }
-
-  get channelName() {
-    return 'CollectionViewingChannel'
   }
 
   get isHomepage() {

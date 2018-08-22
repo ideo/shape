@@ -72,6 +72,8 @@ export const overrideHeadersFromClipboard = (editor) => {
 // receive no editor present event: unlock text box
 
 class TextItem extends React.Component {
+  channelName = 'ItemEditingChannel'
+
   constructor(props) {
     super(props)
     this.debouncedOnKeyUp = _.debounce(this._onKeyUp, 2000)
@@ -135,20 +137,13 @@ class TextItem extends React.Component {
     this.quillEditor = this.reactQuillRef.getEditor()
   }
 
-  get channelName() {
-    return 'ItemEditingChannel'
-  }
-
   subscribeToItemEditingChannel = () => {
-    const { item, actionCableConsumer } = this.props
+    const { item } = this.props
     this.channel = ChannelManager.subscribe(this.channelName, item.id,
       {
-        connected: () => {},
-        disconnected: this.channelDisconnected,
-        received: this.channelReceivedData,
-        rejected: () => {},
-      }
-    )
+        channelDisconnected: this.channelDisconnected,
+        channelReceivedData: this.channelReceivedData,
+      })
   }
 
   channelReceivedData = async (data) => {

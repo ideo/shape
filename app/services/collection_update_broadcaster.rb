@@ -1,10 +1,11 @@
 class CollectionUpdateBroadcaster < SimpleService
-  def initialize(collection, updater)
+  def initialize(collection, user)
     @collection = collection
-    @updater = updater
+    @user = user
   end
 
   def call
-    @collection.edited(@updater)
+    # edited method comes from RealtimeEditorsViewers concern
+    @collection.started_editing(@user)
   end
 end
