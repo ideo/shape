@@ -1,10 +1,10 @@
 class CollectionUpdateBroadcaster < SimpleService
   def initialize(collection, updater)
     @collection = collection
-    @updator = updater
+    @updater = updater
   end
 
   def call
-    @collection.edited(@updator)
+    @collection.edited(@updater)
   end
 end
