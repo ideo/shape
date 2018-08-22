@@ -7,7 +7,7 @@ class Collection
       template: 0,
       text: 1,
       link: 2,
-      file: 2,
+      file: 3,
     }
 
     private

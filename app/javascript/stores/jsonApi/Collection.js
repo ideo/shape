@@ -4,7 +4,7 @@ import { computed, action } from 'mobx'
 import BaseRecord from './BaseRecord'
 
 class Collection extends BaseRecord {
-  attributesForAPI = ['name', 'tag_list']
+  attributesForAPI = ['name', 'tag_list', 'submission_template_id', 'submission_box_type']
 
   @computed get cardIds() {
     return this.collection_cards.map(card => card.id)
@@ -32,6 +32,16 @@ class Collection extends BaseRecord {
 
   get isSharedCollection() {
     return this.type === 'Collection::SharedWithMeCollection'
+  }
+
+  get isSubmissionBox() {
+    return this.type === 'Collection::SubmissionBox'
+  }
+
+  get requiresSubmissionBoxSetup() {
+    if (!this.isSubmissionBox) return false
+    // if type is null then it requires setup
+    return !this.submission_box_type
   }
 
   get isMasterTemplate() {

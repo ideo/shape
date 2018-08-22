@@ -85,6 +85,8 @@ class Api::V1::CollectionsController < Api::V1::BaseController
     params.require(:collection).permit(
       :name,
       :tag_list,
+      :submission_template_id,
+      :submission_box_type,
       collection_cards_attributes: %i[id order width height],
     )
   end

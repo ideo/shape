@@ -95,7 +95,7 @@ const StyledHeader = styled.div`
   }
 `
 
-const ThumbnailHolder = styled.span`
+export const ThumbnailHolder = styled.span`
   display: block;
   flex-shrink: 0;
   height: 50px;

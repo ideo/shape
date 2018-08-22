@@ -4,6 +4,7 @@ import PropTypes from 'prop-types'
 import { BctTextField, FormButton } from '~/ui/global/styled/forms'
 import PaddedCardCover from '~/ui/grid/covers/PaddedCardCover'
 import { KEYS } from '~/utils/variables'
+import { routingStore } from '~/stores'
 
 class CollectionCreator extends React.Component {
   state = {
@@ -35,6 +36,12 @@ class CollectionCreator extends React.Component {
         master_template: type === 'template',
         type: dbType,
       }
+    },
+    {
+      // if creating a submissionBox we route you to finish setting up the collection
+      afterCreate: type === 'submissionBox'
+        ? (card) => routingStore.routeTo('collections', card.record.id)
+        : null,
     })
   }
 

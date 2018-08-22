@@ -9,6 +9,7 @@ import PageContainer from '~/ui/layout/PageContainer'
 import CollectionGrid from '~/ui/grid/CollectionGrid'
 import MoveModal from '~/ui/grid/MoveModal'
 import PageHeader from '~/ui/pages/shared/PageHeader'
+import SubmissionBoxSetupModal from '~/ui/submission_box/SubmissionBoxSetupModal'
 
 const isHomepage = ({ params }) => (params.org && !params.id)
 
@@ -124,6 +125,11 @@ class CollectionPage extends PageWithApi {
             movingCards={uiStore.movingCardIds.length}
             sortBy={sortBy}
           />
+          {collection.requiresSubmissionBoxSetup &&
+            <SubmissionBoxSetupModal
+              collection={collection}
+            />
+          }
           <MoveModal />
         </PageContainer>
       </Fragment>

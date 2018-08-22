@@ -247,7 +247,7 @@ class GridCardBlank extends React.Component {
     })
   }
 
-  createCard = (nested = {}) => {
+  createCard = (nested = {}, options = {}) => {
     const { afterCreate, parent, apiStore, uiStore } = this.props
     const { order, width, height, replacingId } = uiStore.blankContentToolState
     const isReplacing = !!replacingId
@@ -269,7 +269,10 @@ class GridCardBlank extends React.Component {
       } else {
         newCard = await card.API_create()
       }
+      // afterCreate can come passed down from props
       if (afterCreate) afterCreate(newCard)
+      // or separately from the createCard action (e.g. CollectionCreator)
+      if (options.afterCreate) options.afterCreate(newCard)
       // NOTE: closeBlankContentTool() will automatically get called
       // in CollectionCard after the async actions are complete
     })

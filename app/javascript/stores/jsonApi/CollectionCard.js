@@ -94,8 +94,10 @@ class CollectionCard extends BaseRecord {
       this.parent.addCard(res.data)
       uiStore.closeBlankContentTool()
       uiStore.trackEvent('create', this.parent)
+      return res.data
     } catch (e) {
       uiStore.defaultAlertError()
+      return false
     }
   }
 
