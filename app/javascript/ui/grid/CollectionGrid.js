@@ -350,12 +350,13 @@ class CollectionGrid extends React.Component {
       gutter,
       cols,
       sortBy,
+      addEmptyCard,
     } = opts.props
     let row = 0
     const matrix = []
     // create an empty row
     matrix.push(_.fill(Array(cols), null))
-    this.addEmptyCard(cards)
+    if (addEmptyCard) this.addEmptyCard(cards)
     const sortedCards = _.sortBy(cards, sortBy)
     _.each(sortedCards, (card, i) => {
       // we don't actually want to "re-position" the dragging card
@@ -581,10 +582,14 @@ CollectionGrid.propTypes = {
   cardIds: MobxPropTypes.arrayOrObservableArray.isRequired,
   canEditCollection: PropTypes.bool.isRequired,
   movingCardIds: MobxPropTypes.arrayOrObservableArray.isRequired,
+  addEmptyCard: PropTypes.bool,
 }
 CollectionGrid.wrappedComponent.propTypes = {
   routingStore: MobxPropTypes.objectOrObservableObject.isRequired,
   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
+}
+CollectionGrid.defaultProps = {
+  addEmtpyCard: true,
 }
 CollectionGrid.displayName = 'CollectionGrid'
 

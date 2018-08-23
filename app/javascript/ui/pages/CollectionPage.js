@@ -154,6 +154,7 @@ class CollectionPage extends PageWithApi {
             // passing length prop seems to properly trigger a re-render
             movingCards={uiStore.movingCardIds.length}
             sortBy={sortBy}
+            addEmptyCard={!collection.submissions_collection}
           />
           {collection.requiresSubmissionBoxSetup &&
             <SubmissionBoxSetupModal
