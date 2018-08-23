@@ -283,4 +283,41 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
       end
     end
   end
+
+  describe 'DELETE #destroy', only: true do
+    let(:path) { "/api/v1/collections/#{collection.id}" }
+
+    context 'with a normal collection' do
+      let!(:collection) { create(:collection, add_editors: [user]) }
+
+      it 'should not allow the destroy action' do
+        delete(path)
+        expect(response.status).to eq(401)
+      end
+    end
+
+    context 'with an incomplete SubmissionBox' do
+      let!(:collection) { create(:submission_box, add_editors: [user]) }
+
+      it 'should allow the destroy action' do
+        delete(path)
+        expect(response.status).to eq(200)
+      end
+
+      it 'should not allow the destroy action unless user is an editor' do
+        user.remove_role(Role::EDITOR, collection)
+        delete(path)
+        expect(response.status).to eq(401)
+      end
+    end
+
+    context 'with an existing SubmissionBox' do
+      let!(:collection) { create(:submission_box, add_editors: [user], submission_box_type: :file) }
+
+      it 'should not allow the destroy action' do
+        delete(path)
+        expect(response.status).to eq(401)
+      end
+    end
+  end
 end

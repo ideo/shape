@@ -35,7 +35,7 @@ const SubmissionBoxRowText = RowItemLeft.extend`
   padding-top: 0.75rem;
 `
 
-@inject('apiStore', 'uiStore')
+@inject('apiStore', 'uiStore', 'routingStore')
 @observer
 class SubmissionBoxSetupModal extends React.Component {
   @observable templates = []
@@ -53,17 +53,36 @@ class SubmissionBoxSetupModal extends React.Component {
   }
 
   handleClose = (ev) => {
-    const { uiStore } = this.props
-    uiStore.alert('no way!')
+    const { apiStore, uiStore, routingStore, collection } = this.props
+    // Note that the meaning of "cancel" and "confirm" are sort of reversed in this context.
+    // "cancel" means cancel creating the SubmissionBox, which will delete it and go back.
+    // "confirm" means do nothing so that you can continue with setup.
+    uiStore.confirm({
+      iconName: 'Alert',
+      prompt: `Closing the submission settings without choosing a submission format
+               will delete this submission box.`,
+      confirmText: 'Choose',
+      cancelText: 'Delete',
+      onCancel: async () => {
+        await apiStore.request(`collections/${collection.id}`, 'DELETE')
+        if (collection.parent_collection_card.parent_id) {
+          routingStore.routeTo('collections',
+            collection.parent_collection_card.parent_id)
+        } else {
+          routingStore.routeTo('homepage')
+        }
+      },
+      onConfirm: () => uiStore.closeDialog(),
+    })
   }
 
-  updateCollection = async (attrs = {}) => {
+  updateCollection = (attrs = {}) => {
     const { collection } = this.props
     Object.keys(attrs).forEach(key => {
       collection[key] = attrs[key]
     })
-    const res = await collection.save()
-    console.log(res)
+    // can 'await' this call if we want to show any loading indicator?
+    collection.save()
   }
 
   chooseTemplate = templateId => () => {
@@ -149,6 +168,7 @@ SubmissionBoxSetupModal.propTypes = {
 SubmissionBoxSetupModal.wrappedComponent.propTypes = {
   apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
+  routingStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 
 export default SubmissionBoxSetupModal

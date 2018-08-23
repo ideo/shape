@@ -386,6 +386,11 @@ class Collection < ApplicationRecord
     false
   end
 
+  def destroyable?
+    # currently the only destroyable type is an incomplete SubmissionBox
+    false
+  end
+
   def cache_key
     "#{jsonapi_cache_key}" \
       "/#{ActiveRecord::Migrator.current_version}" \

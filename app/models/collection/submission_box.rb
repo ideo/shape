@@ -21,6 +21,11 @@ class Collection
       )
     end
 
+    def destroyable?
+      # destroyable if it hasn't finished setting up
+      submission_box_type.nil?
+    end
+
     private
 
     def submission_template_is_a_master_template
