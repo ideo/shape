@@ -169,6 +169,7 @@ class Collection < ApplicationRecord
       :created_by,
       :organization,
       :parent_collection_card,
+      :submissions_collection,
       roles: %i[users groups resource],
       collection_cards: [
         :parent,
@@ -275,6 +276,10 @@ class Collection < ApplicationRecord
 
   def breadcrumb_title
     name
+  end
+
+  def submissions_collection
+    nil
   end
 
   def resourceable_class

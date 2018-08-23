@@ -1,8 +1,7 @@
 class Api::V1::CollectionsController < Api::V1::BaseController
   deserializable_resource :collection, class: DeserializableCollection, only: %i[update]
   load_and_authorize_resource :collection_card, only: [:create]
-  load_and_authorize_resource except: %i[me update destroy]
-  before_action :load_and_authorize_collection_destroy, only: %i[destroy]
+  load_and_authorize_resource except: %i[me update]
   # NOTE: these have to be in the following order
   before_action :load_and_authorize_collection_update, only: %i[update]
   before_action :load_collection_with_cards, only: %i[show update]
@@ -39,14 +38,6 @@ class Api::V1::CollectionsController < Api::V1::BaseController
     end
   end
 
-  def destroy
-    if @collection.destroy
-      render json: { success: true }
-    else
-      render_api_errors @collection.errors
-    end
-  end
-
   private
 
   def check_cache
@@ -71,15 +62,6 @@ class Api::V1::CollectionsController < Api::V1::BaseController
     else
       authorize! :edit_content, @collection
     end
-  end
-
-  def load_and_authorize_collection_destroy
-    @collection = Collection.find(params[:id])
-    # you can only destroy a submission box that hasn't been set up yet
-    unless @collection.destroyable?
-      head(401)
-    end
-    authorize! :manage, @collection
   end
 
   def render_collection(include: nil)

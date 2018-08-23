@@ -102,6 +102,16 @@ class CollectionPage extends PageWithApi {
     // SharedCollection has special behavior where it sorts by most recently updated
     const sortBy = collection.isSharedCollection ? 'updated_at' : 'order'
 
+    const submissionBCTState = {
+      order: 0,
+      width: 1,
+      height: 1,
+      emptyCollection: true,
+      type: 'submission',
+      parent_id: collection.submissions_collection && collection.submissions_collection.id,
+      template_id: collection.submission_template_id,
+    }
+
     return (
       <Fragment>
         <PageHeader
@@ -131,6 +141,25 @@ class CollectionPage extends PageWithApi {
             />
           }
           <MoveModal />
+          { collection.submissions_collection && (
+            <div>
+              <hr />
+              <CollectionGrid
+                {...uiStore.gridSettings}
+                updateCollection={this.updateCollection}
+                collection={collection.submissions_collection}
+                canEditCollection={true}
+                // Pass in cardIds so grid will re-render when they change
+                cardIds={collection.submissions_collection.cardIds}
+                // Pass in BCT state so grid will re-render when open/closed
+                blankContentToolState={submissionBCTState}
+                movingCardIds={[]}
+                // passing length prop seems to properly trigger a re-render
+                movingCards={false}
+                sortBy={sortBy}
+              />
+            </div>
+          )}
         </PageContainer>
       </Fragment>
     )

@@ -19,6 +19,7 @@ class Api::V1::BaseController < ApplicationController
       'Collection::SharedWithMeCollection': SerializableCollection,
       'Collection::Global': SerializableCollection,
       'Collection::SubmissionBox': SerializableCollection,
+      'Collection::SubmissionsCollection': SerializableCollection,
       'Collection::UserProfile': SerializableCollection,
       'CollectionCard::Primary': SerializableCollectionCard,
       'CollectionCard::Link': SerializableCollectionCard,

@@ -45,16 +45,26 @@ class CollectionGrid extends React.Component {
   }
 
   componentDidMount() {
-    this.positionCards(this.props.collection.collection_cards)
+    const cards = this.condtionallyAddBct(this.props)
+    this.positionCards(cards)
   }
 
   componentWillReceiveProps(nextProps) {
+    const cards = this.condtionallyAddBct(nextProps)
+    this.positionCards(cards, { props: nextProps })
+  }
+
+  componentWillUnmount() {
+    this.clearDragTimeout()
+  }
+
+  condtionallyAddBct(props) {
     const {
       blankContentToolState,
       collection,
       cardIds,
       movingCardIds,
-    } = nextProps
+    } = props
     // convert observableArray values into a "normal" JS array (equivalent of .toJS())
     // for the sake of later calculations/manipulations
     const cards = [...collection.collection_cards]
@@ -65,7 +75,14 @@ class CollectionGrid extends React.Component {
     if (blankContentToolState && blankContentToolState.order !== null) {
       // make the BCT appear to the right of the current card
       let { order } = blankContentToolState
-      const { width, height, replacingId } = blankContentToolState
+      const {
+        height,
+        replacingId,
+        parent_id,
+        template_id,
+        type,
+        width,
+      } = blankContentToolState
       if (replacingId) {
         // remove the card being replaced from our current state cards
         _.remove(cards, { id: replacingId })
@@ -78,9 +95,12 @@ class CollectionGrid extends React.Component {
         id: 'blank',
         num: 0,
         cardType: 'blank',
+        blankType: type,
         width,
         height,
         order,
+        parent_id,
+        template_id,
       }
       // If we already have a BCT open, find it in our cards
       const blankFound = _.find(this.state.cards, { cardType: 'blank' })
@@ -101,11 +121,7 @@ class CollectionGrid extends React.Component {
         cards.unshift(blankCard)
       }
     }
-    this.positionCards(cards, { props: nextProps })
-  }
-
-  componentWillUnmount() {
-    this.clearDragTimeout()
+    return cards
   }
 
   // --------------------------
