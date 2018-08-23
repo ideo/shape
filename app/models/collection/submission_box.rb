@@ -26,6 +26,12 @@ class Collection
       submission_box_type.nil?
     end
 
+    # this override is so that Roles::AddToChildren will also add the same roles
+    # to all the submissions (which are technically children of the submissions_collection)
+    def children
+      (items + collections + submissions_collection.children)
+    end
+
     private
 
     def submission_template_is_a_master_template

@@ -32,9 +32,9 @@ class CollectionTemplateBuilder
       name: "My #{@template.name}",
       organization: @parent.organization,
     )
-    @created_by.add_role(Role::EDITOR, @collection)
     # make sure to assign these permissions before the template cards are generated
     assign_submission_permissions
+    @created_by.add_role(Role::EDITOR, @collection)
     @template.setup_templated_collection(
       for_user: @created_by,
       collection: @collection,
@@ -46,6 +46,8 @@ class CollectionTemplateBuilder
     # this only applies to submissions into a submissions collection
     return unless @parent.is_a? Collection::SubmissionsCollection
     # all the roles come from the submission box (editors, viewers)
+    # NOTE: this will create Viewer/Editor roles so make sure this runs before
+    # calling any `add_role` functions e.g. @created_by.add_role... above
     @parent.submission_box.roles.each do |role|
       role.duplicate!(assign_resource: @collection)
     end
