@@ -16,6 +16,7 @@ import {
   ThumbnailHolder
 } from '~/ui/threads/CommentThread'
 import { BctButton } from '~/ui/grid/shared'
+import AlertIcon from '~/ui/icons/AlertIcon'
 import AddTextIcon from '~/ui/icons/AddTextIcon'
 import AddFileIcon from '~/ui/icons/AddFileIcon'
 import LinkIcon from '~/ui/icons/LinkIcon'
@@ -101,11 +102,18 @@ class SubmissionBoxSetupModal extends React.Component {
   titleContent = () => (
     <div>
       <Heading2>Submission Box Settings</Heading2>
-      <p>
-        <SmallHelperText>
-          Anyone invited to this collection box will be able to yadda yadda doodly doo.
-        </SmallHelperText>
-      </p>
+      <Row>
+        <span style={{ display: 'inline-block', height: '25px', width: '25px', color: v.colors.gray }}>
+          <AlertIcon />
+        </span>
+        <RowItemLeft>
+          <SmallHelperText>
+            Anyone invited to this collection box will be able to instantly create
+            their own instance of the template that you choose. Use one of our
+            templates or create your own.
+          </SmallHelperText>
+        </RowItemLeft>
+      </Row>
       <Heading3>Submission Format</Heading3>
     </div>
   )
