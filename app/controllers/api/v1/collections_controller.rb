@@ -49,11 +49,14 @@ class Api::V1::CollectionsController < Api::V1::BaseController
 
   def load_and_authorize_template_and_parent
     @parent_collection = Collection.find(json_api_params[:parent_id])
+    @template_collection = Collection.find(json_api_params[:template_id])
+    if @parent_collection.is_a?(Collection::SubmissionsCollection)
+      # if adding to a SubmissionsCollection, you only need to have viewer/"participant" access
+      authorize! :read, @parent_collection
+      return
+    end
     # we are creating a template in this collection so authorize edit_content
     authorize! :edit_content, @parent_collection
-    @template_collection = Collection.find(json_api_params[:template_id])
-    # whatever template is chosen for a SubmissionBox is allowed by everyone
-    return true if @parent_collection.is_a?(Collection::SubmissionsCollection)
     authorize! :read, @template_collection
   end
 
