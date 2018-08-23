@@ -4,6 +4,7 @@
       "env",
       {
         "test": {
+          "modules": "commonjs"
         },
         "development": {
           "modules": false
@@ -27,28 +28,29 @@
     ],
     "react"
   ],
-  "env": {
-    "development": {
-      "plugins": ["babel-plugin-styled-components"]
-    }
-  },
   "plugins": [
-    ["lodash"],
-    ["transform-decorators-legacy"],
-    ["transform-class-properties"],
-    ["babel-plugin-root-import", [{
-      "rootPathPrefix": "#",
-      "rootPathSuffix": "__js_test_config"
-    }, {
-      "rootPathPrefix": "~",
-      "rootPathSuffix": "app/javascript"
-    }]],
+    "lodash",
+    "syntax-dynamic-import",
+    "transform-decorators-legacy",
+    "transform-object-rest-spread",
+    "transform-class-properties",
+    ["module-resolver", {
+      "extensions": [".js", ".jsx", ".ts", ".tsx"],
+      "alias": {
+        "~stylesheets": "./app/assets/stylesheets",
+        "~images": "./app/assets/images",
+        "~helpers": "./__tests__/helpers",
+        "~fonts": "./app/assets/fonts",
+        "~": "./app/javascript",
+        "^~(.+)": "./app/javascript/src/\\1",
+        "#": "./__js_test_config"
+      }
+    }],
     ["react-intl", {
       "messagesDir": "./build/messages/"
     }],
-    "syntax-dynamic-import",
-    "transform-object-rest-spread",
     ["transform-runtime", {
+      "helpers": false,
       "polyfill": false,
       "regenerator": true
     }],
@@ -58,5 +60,18 @@
         "spec": true
       }
     ]
-  ]
+  ],
+  "env": {
+    "development": {
+      "plugins": "babel-plugin-styled-components"
+    },
+    "production": {
+      "plugins": [
+        "lodash",
+        ["styled-components", {
+          "displayName": false
+        }]
+      ]
+    }
+  }
 }

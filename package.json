@@ -31,7 +31,28 @@
     ],
     "snapshotSerializers": [
       "enzyme-to-json/serializer"
-    ]
+    ],
+    "resetMocks": true,
+    "automock": false,
+    "moduleFileExtensions": [
+      "js",
+      "jsx",
+      "json",
+      "ts",
+      "tsx"
+    ],
+    "transformIgnorePatterns": [
+      "/node_modules/"
+    ],
+    "moduleDirectories": [
+      "node_modules",
+      "app/javascript/src",
+      "__tests__",
+      "<rootDir>"
+    ],
+    "transform": {
+      "^.+\\.js$": "babel-jest"
+    }
   },
   "dependencies": {
     "@material-ui/core": "^1.5.0",
@@ -39,6 +60,7 @@
     "actioncable": "^5.2.0",
     "axios": "^0.18.0",
     "babel-plugin-lodash": "^3.3.2",
+    "babel-plugin-module-resolver": "^3.1.1",
     "babel-plugin-react-intl": "^2.4.0",
     "babel-plugin-root-import": "~5.1.0",
     "babel-plugin-transform-decorators-legacy": "^1.3.4",
@@ -116,6 +138,7 @@
     "eslint-config-airbnb": "~16.1.0",
     "eslint-config-standard": "10.2.1",
     "eslint-config-standard-react": "5.0.0",
+    "eslint-import-resolver-babel-module": "^4.0.0",
     "eslint-import-resolver-babel-plugin-root-import": "bingqichen/eslint-import-resolver-babel-plugin-root-import",
     "eslint-plugin-import": "~2.8.0",
     "eslint-plugin-jest": "^21.7.0",

@@ -38,6 +38,7 @@ module.exports = {
   settings: {
     "import/resolver": {
       "babel-plugin-root-import": {},
+      "babel-module": {},
       "node": {}
     },
     "import/core-modules": ["styled-jsx/css"]
