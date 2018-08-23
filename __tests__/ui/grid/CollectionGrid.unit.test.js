@@ -33,7 +33,7 @@ beforeEach(() => {
 
 describe('CollectionGrid', () => {
   it('renders the Grid with draggable collection cards', () => {
-    expect(wrapper.find('.Grid').exists()).toBe(true)
+    expect(wrapper.find('StyledGrid').exists()).toBe(true)
     expect(wrapper.find('MovableGridCard').at(0).props().cardType).toBe('items')
     expect(wrapper.find('MovableGridCard').at(0).props().record).toBe(fakeTextItem)
     // 3 cards + 1 empty card

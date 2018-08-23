@@ -19,6 +19,7 @@ const StyledGrid = styled.div`
     transition: all 0.5s;
   }
 `
+StyledGrid.displayName = 'StyledGrid'
 
 const calculateDistance = (pos1, pos2) => {
   // pythagoras!
