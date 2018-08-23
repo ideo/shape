@@ -19,7 +19,7 @@ import { BctButton } from '~/ui/grid/shared'
 import AlertIcon from '~/ui/icons/AlertIcon'
 import AddTextIcon from '~/ui/icons/AddTextIcon'
 import AddFileIcon from '~/ui/icons/AddFileIcon'
-import LinkIcon from '~/ui/icons/LinkIcon'
+import AddLinkIcon from '~/ui/icons/AddLinkIcon'
 import Modal from '~/ui/global/modals/Modal'
 import v from '~/utils/variables'
 
@@ -121,7 +121,7 @@ class SubmissionBoxSetupModal extends React.Component {
   get itemRows() {
     const types = [
       { name: 'text', Icon: AddTextIcon },
-      { name: 'link', Icon: () => <LinkIcon viewBox="-11 -11 40 40" /> },
+      { name: 'link', Icon: AddLinkIcon },
       { name: 'file', Icon: AddFileIcon },
     ]
     return types.map(type => (

@@ -10,6 +10,7 @@ import { CardHeading } from '~/ui/global/styled/typography'
 import hexToRgba from '~/utils/hexToRgba'
 import ProfileIcon from '~/ui/icons/ProfileIcon'
 import FilledProfileIcon from '~/ui/icons/FilledProfileIcon'
+import SubmissionBoxIconLg from '~/ui/icons/SubmissionBoxIconLg'
 import TemplateIcon from '~/ui/icons/TemplateIcon'
 import { routingStore } from '~/stores'
 
@@ -99,7 +100,12 @@ function splitName(name) {
 class CollectionCover extends React.Component {
   get name() {
     const { collection } = this.props
-    if (collection.isTemplated || collection.isMasterTemplate) {
+    const hasIcon = (
+      collection.isTemplated ||
+      collection.isMasterTemplate ||
+      collection.isSubmissionBox
+    )
+    if (hasIcon) {
       const nameParts = splitName(collection.name)
       if (!nameParts) return collection.name
       const lastName = nameParts.pop()
@@ -112,6 +118,8 @@ class CollectionCover extends React.Component {
         icon = <ProfileIcon />
       } else if (collection.isTemplated) {
         icon = <TemplateIcon circled />
+      } else if (collection.isSubmissionBox) {
+        icon = <SubmissionBoxIconLg />
       }
       return (
         <Fragment>

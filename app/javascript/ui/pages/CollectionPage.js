@@ -28,6 +28,12 @@ class CollectionPage extends PageWithApi {
   }
 
   @action setLoadingSubmissions = val => {
+    const { submissions_collection } = this.collection
+    if (submissions_collection && submissions_collection.cardIds.length) {
+      // if submissions_collection is preloaded with some cards, no need to show loader
+      this.loadingSubmissions = false
+      return
+    }
     this.loadingSubmissions = val
   }
 

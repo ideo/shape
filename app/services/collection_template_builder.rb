@@ -14,8 +14,8 @@ class CollectionTemplateBuilder
   def call
     return false unless create_collection
     place_collection_in_parent
-    # re-save to capture new breadcrumb + tag lists
-    @collection.save
+    # re-save to capture cover, new breadcrumb + tag lists
+    @collection.cache_cover!
     @collection
   end
 
