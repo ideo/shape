@@ -69,6 +69,9 @@ class CollectionPage extends PageWithApi {
           uiStore.expandThread(thread.key)
         }
       }
+      if (collection.isSubmissionBox) {
+        apiStore.fetch('collections', collection.submissions_collection.id, true)
+      }
     } else {
       apiStore.clearUnpersistedThreads()
     }

@@ -52,6 +52,8 @@ class Api::V1::CollectionsController < Api::V1::BaseController
     # we are creating a template in this collection so authorize edit_content
     authorize! :edit_content, @parent_collection
     @template_collection = Collection.find(json_api_params[:template_id])
+    # whatever template is chosen for a SubmissionBox is allowed by everyone
+    return true if @parent_collection.is_a?(Collection::SubmissionsCollection)
     authorize! :read, @template_collection
   end
 

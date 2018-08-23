@@ -5,8 +5,20 @@ class Collection
     delegate :can_view?, to: :submission_box
 
     # override Resourceable methods
+    def can_edit_content?(user_or_group)
+      can_view?(user_or_group)
+    end
+
+    # override Resourceable methods
     def can_edit?(_user_or_group)
       false
+    end
+
+    private
+
+    # override to mimic the submission_box breadcrumb
+    def calculate_breadcrumb
+      self.breadcrumb = submission_box.breadcrumb
     end
   end
 end
