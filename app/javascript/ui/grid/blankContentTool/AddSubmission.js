@@ -85,7 +85,6 @@ class AddSubmission extends React.Component {
 
   handleSubmission = async (ev) => {
     ev.preventDefault()
-    console.log('props', this.props)
     const { parent_id, template_id } = this.props
     const templateData = {
       parent_id,

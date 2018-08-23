@@ -148,7 +148,7 @@ class CollectionPage extends PageWithApi {
                 {...uiStore.gridSettings}
                 updateCollection={this.updateCollection}
                 collection={collection.submissions_collection}
-                canEditCollection={true}
+                canEditCollection={false}
                 // Pass in cardIds so grid will re-render when they change
                 cardIds={collection.submissions_collection.cardIds}
                 // Pass in BCT state so grid will re-render when open/closed
