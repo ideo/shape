@@ -1,13 +1,10 @@
 import PropTypes from 'prop-types'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
-import { Flex } from 'reflexbox'
 
-import CollectionCard from '~/stores/jsonApi/CollectionCard'
 import v, { ITEM_TYPES } from '~/utils/variables'
 import { StyledGridCard } from '~/ui/grid/shared'
 import InlineLoader from '~/ui/layout/InlineLoader'
-import { CloseButton } from '~/ui/global/styled/buttons'
 import { apiStore, routingStore } from '~/stores'
 
 const StyledAddSubmission = StyledGridCard.extend`
@@ -49,8 +46,7 @@ class AddSubmission extends React.Component {
   state = {
     creating: null,
     loading: false,
-    droppingFile: false,
-    bctMenuOpen: false,
+    // droppingFile: false,
   }
 
   componentWillUnmount() {
@@ -63,7 +59,7 @@ class AddSubmission extends React.Component {
   }
 
   startCreating = type => () => {
-    this.setState({ creating: type, bctMenuOpen: false })
+    this.setState({ creating: type })
   }
 
   createCardWith = (file) => {
@@ -97,9 +93,9 @@ class AddSubmission extends React.Component {
 
   renderInner = () => {
     let inner
-    const { creating, loading, droppingFile } = this.state
-    const isReplacing = !!this.props.uiStore.blankContentToolState.replacingId
-    const size = v.iconSizes.bct
+    // const { creating, loading, droppingFile } = this.state
+    // const isReplacing = !!this.props.uiStore.blankContentToolState.replacingId
+    // const size = v.iconSizes.bct
 
     // When they selected text, link or file item, render the grid card blank
     // sending initial type? Or render the creators?
@@ -125,7 +121,7 @@ class AddSubmission extends React.Component {
   render() {
     const { uiStore } = this.props
     const { gridSettings, blankContentToolState } = uiStore
-    const { creating } = this.state
+    // const { creating } = this.state
     return (
       <StyledAddSubmission>
         <StyledGridCardInner
@@ -143,16 +139,17 @@ class AddSubmission extends React.Component {
 
 AddSubmission.propTypes = {
   // parent is the parent collection
-  parent: MobxPropTypes.objectOrObservableObject.isRequired,
+  // parent: MobxPropTypes.objectOrObservableObject.isRequired,
+  // afterCreate: PropTypes.func,
+  parent_id: PropTypes.number.isRequired,
   template_id: PropTypes.number.isRequired,
-  afterCreate: PropTypes.func,
 }
 AddSubmission.wrappedComponent.propTypes = {
   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
-  apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
+  // apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 AddSubmission.defaultProps = {
-  afterCreate: null,
+  // afterCreate: null,
 }
 
 // give a name to the injected component for unit tests

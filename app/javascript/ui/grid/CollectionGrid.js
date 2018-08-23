@@ -2,10 +2,23 @@ import PropTypes from 'prop-types'
 import { action } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import _ from 'lodash'
+import styled from 'styled-components'
 
 import Loader from '~/ui/layout/Loader'
 import MovableGridCard from '~/ui/grid/MovableGridCard'
 import CollectionCard from '~/stores/jsonApi/CollectionCard'
+
+const StyledGrid = styled.div`
+  min-height: ${props => props.minHeight}px;
+  position: relative;
+  width: 100%;
+  transition: all 0.5s;
+
+  .react-draggable-dragged:not(.react-draggable-dragging) {
+    /* this is to transition the draggable back to its original spot when you let go */
+    transition: all 0.5s;
+  }
+`
 
 const calculateDistance = (pos1, pos2) => {
   // pythagoras!
@@ -38,6 +51,7 @@ class CollectionGrid extends React.Component {
     super(props)
     this.state = {
       cards: [],
+      rows: 1,
       hoveringOver: { order: null },
       timeoutId: null,
       transitioning: false,
@@ -475,7 +489,10 @@ class CollectionGrid extends React.Component {
       }
     })
     // update cards in state
-    this.setState({ cards })
+    this.setState({
+      cards,
+      rows: matrix.length,
+    })
   }
 
   renderPositionedCards = () => {
@@ -529,14 +546,18 @@ class CollectionGrid extends React.Component {
 
   render() {
     const { uiStore } = this.props
+    const { gridSettings } = uiStore
+    const { rows } = this.state
     if (uiStore.isLoading) return <Loader />
+
+    const minHeight = rows * (gridSettings.gridH + gridSettings.gutter)
 
     const { cardIds } = this.props.collection
     // Rendering cardIds so that grid re-renders when they change
     return (
-      <div className="Grid" data-card-ids={cardIds}>
+      <StyledGrid data-card-ids={cardIds} minHeight={minHeight}>
         { this.renderPositionedCards() }
-      </div>
+      </StyledGrid>
     )
   }
 }
