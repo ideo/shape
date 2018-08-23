@@ -1,5 +1,5 @@
 import { Fragment } from 'react'
-import { Flex, Box } from 'reflexbox'
+import { Box } from 'reflexbox'
 
 import { MarketingBack,
   MarketingGradientTop,
@@ -14,7 +14,8 @@ import { MarketingBack,
   InvertMarketingContent,
   InvertMarketingH1,
   InvertMarketingH2,
-  InvertMarketingLinkMail
+  InvertMarketingLinkMail,
+  MarketingFlex,
 } from '~/ui/global/styled/marketing.js'
 import poweredByIdeo from '~/assets/Powered-by-IDEO-Inverted.png'
 import MarketingMenu from '~/ui/pages/SubComponents/MarketingMenu.js'
@@ -30,7 +31,7 @@ class MarketingPage extends React.PureComponent {
             <MarketingMenu />
             <MarketingBetaSticker />
 
-            <Flex
+            <MarketingFlex
               align="center"
               justify="center"
               column
@@ -49,9 +50,9 @@ class MarketingPage extends React.PureComponent {
                 </MarketingTagLine>
               </Box>
               <Box w={[null, 1 / 5]} />
-            </Flex>
+            </MarketingFlex>
 
-            <Flex
+            <MarketingFlex
               align="center"
               justify="center"
               wrap
@@ -69,10 +70,10 @@ class MarketingPage extends React.PureComponent {
                 </a>
               </Box>
               <Box w={[null, 1 / 6]} auto />
-            </Flex>
+            </MarketingFlex>
           </MarketingGradientTop>
 
-          <Flex
+          <MarketingFlex
             align="center"
             justify="center"
             wrap
@@ -81,11 +82,11 @@ class MarketingPage extends React.PureComponent {
             <Box w={1} justify="center" >
               <ProductDescriptions />
             </Box>
-          </Flex>
+          </MarketingFlex>
         </MarketingBack>
 
         <MarketingFooter>
-          <Flex
+          <MarketingFlex
             align="center"
             justify="center"
             wrap
@@ -128,7 +129,6 @@ class MarketingPage extends React.PureComponent {
             </Box>
 
             <Box w={1} py={16}>
-              <SubscribeEmail />
               <InvertMarketingLink href="https://www.ideo.com/" rel="noopener noreferrer" target="_blank">
                 <img src={poweredByIdeo} alt="Powered by IDEO" />
               </InvertMarketingLink>
@@ -141,9 +141,8 @@ class MarketingPage extends React.PureComponent {
             <Box w={1 / 8} />
             <Box w={3 / 8}><section align="left">&copy; 2018</section></Box>
 
-          </Flex>
+          </MarketingFlex>
         </MarketingFooter>
-
       </Fragment>
     )
   }

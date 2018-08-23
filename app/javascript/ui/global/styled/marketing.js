@@ -1,6 +1,7 @@
 import styled from 'styled-components'
 import v from '~/utils/variables'
 import { Heading1, Heading2, Anchor } from '~/ui/global/styled/typography'
+import { ReflexProvider, Flex } from 'reflexbox'
 
 /** @component */
 export const MarketingFooter = styled.div`
@@ -48,6 +49,7 @@ export const MarketingGradientTop = MarketingBack.extend`
 /** @component */
 export const MarketingH1 = styled(Heading1)`
   color: black;
+  font-size: 2rem;
   font-family: ${v.fonts.sans};
   font-weight: ${v.weights.bold};
   letter-spacing: 0px;
@@ -64,7 +66,7 @@ export const MarketingH2 = styled(Heading2)`
 color: black;
 font-family: ${v.fonts.sans};
 font-weight: ${v.weights.book};
-font-size: 1.5rem;
+font-size: 1.25rem;
 letter-spacing: 0px;
 white-space: normal;
 `
@@ -172,3 +174,17 @@ export const MarketingShapeLogo = styled.img.attrs({
   width: 60%;
   max-width: 100%;
 `
+
+const space = [0, 8, 16, 32, 64]
+const breakpoints = [40, 52, 64]
+
+export function MarketingFlex(props) {
+  return (
+    <ReflexProvider
+      space={space}
+      breakpoints={breakpoints}
+    >
+      <Flex {...props} />
+    </ReflexProvider>
+  )
+}

@@ -1,9 +1,10 @@
 import styled from 'styled-components'
 import PropTypes from 'prop-types'
-import { Flex, Box } from 'reflexbox'
+import { Box } from 'reflexbox'
 import {
   MarketingContent,
   MarketingH1,
+  MarketingFlex,
 } from '~/ui/global/styled/marketing.js'
 
 const StyledProductDescription = styled(MarketingContent)`
@@ -18,32 +19,36 @@ const Description = styled(MarketingContent)`
   word-wrap:break-word;
 `
 
-const ImageDisplay = styled(MarketingContent)`
+const ImageDisplay = styled.img`
+  object-fit: scale-down;
+  max-width: 100%;
+  max-height: 100%;
+  height: auto;
 `
 
 class ProductDescription extends React.PureComponent {
   render() {
     return (
       <StyledProductDescription id={this.props.id} order={this.props.order}>
-        <Flex
+        <MarketingFlex
           w={1}
           mt={4}
           mb={4}
-          align={this.props.order % 2 === 1 ? 'flex-start' : 'flex-end'}
+          align={['flex-start', (this.props.order % 2 === 1 ? 'flex-start' : 'flex-end')]}
+          justify="space-evenly"
+          wrap
         >
-          <Box w={1 / 20} order={0} />
 
-          <Box w={3 / 10} order={this.props.order % 2 === 1 ? 1 : 2}>
+          <Box w={[1, 3 / 10]} order={[2, (this.props.order % 2 === 1 ? 1 : 2)]}>
             <Title>{this.props.title}</Title>
             <Description>{this.props.description}</Description>
           </Box>
 
-          <Box w={15 / 20} order={this.props.order % 2 === 1 ? 2 : 1}>
-            <ImageDisplay><img src={this.props.imageUrl} alt={this.props.title} width="80%" /></ImageDisplay>
+          <Box w={[1, 6 / 10]} order={[1, (this.props.order % 2 === 1 ? 2 : 1)]}>
+            <ImageDisplay src={this.props.imageUrl} alt={this.props.title} />
           </Box>
 
-          <Box w={1 / 20} order={3} />
-        </Flex>
+        </MarketingFlex>
       </StyledProductDescription>
     )
   }
