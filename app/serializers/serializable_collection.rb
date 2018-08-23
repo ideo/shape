@@ -9,6 +9,7 @@ class SerializableCollection < BaseJsonSerializer
 
   has_one :parent_collection_card
   belongs_to :submissions_collection
+  belongs_to :submission_template
 
   attribute :system_required do
     @object.system_required?

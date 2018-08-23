@@ -1,4 +1,5 @@
 import { Fragment } from 'react'
+import pluralize from 'pluralize'
 import ReactRouterPropTypes from 'react-router-prop-types'
 import { observable, action } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
@@ -7,6 +8,7 @@ import PageError from '~/ui/global/PageError'
 import PageWithApi from '~/ui/pages/PageWithApi'
 import Loader from '~/ui/layout/Loader'
 import PageContainer from '~/ui/layout/PageContainer'
+import PageSeparator from '~/ui/global/PageSeprator'
 import CollectionGrid from '~/ui/grid/CollectionGrid'
 import MoveModal from '~/ui/grid/MoveModal'
 import PageHeader from '~/ui/pages/shared/PageHeader'
@@ -160,27 +162,36 @@ class CollectionPage extends PageWithApi {
           }
           <MoveModal />
           { collection.submissions_collection && (
-            this.loadingSubmissions
-              ? <Loader />
-              : (
-                <div>
-                  <hr />
-                  <CollectionGrid
-                    {...uiStore.gridSettings}
-                    updateCollection={this.updateCollection}
-                    collection={collection.submissions_collection}
-                    canEditCollection={false}
-                    // Pass in cardIds so grid will re-render when they change
-                    cardIds={collection.submissions_collection.cardIds}
-                    // Pass in BCT state so grid will re-render when open/closed
-                    blankContentToolState={submissionBCTState}
-                    movingCardIds={[]}
-                    // passing length prop seems to properly trigger a re-render
-                    movingCards={false}
-                    sortBy={sortBy}
-                  />
-                </div>
-              ))}
+            <div>
+              { this.loadingSubmissions
+                ? <Loader />
+                : (
+                  <div>
+                    <PageSeparator title={(
+                      <h3>
+                        {collection.submissions_collection.collection_cards.length}
+                        {' '}
+                        {pluralize(collection.submission_template.name)}
+                      </h3>
+                    )} />
+                    <CollectionGrid
+                      {...uiStore.gridSettings}
+                      updateCollection={this.updateCollection}
+                      collection={collection.submissions_collection}
+                      canEditCollection={false}
+                      // Pass in cardIds so grid will re-render when they change
+                      cardIds={collection.submissions_collection.cardIds}
+                      // Pass in BCT state so grid will re-render when open/closed
+                      blankContentToolState={submissionBCTState}
+                      movingCardIds={[]}
+                      // passing length prop seems to properly trigger a re-render
+                      movingCards={false}
+                      sortBy={sortBy}
+                    />
+                  </div>
+                )}
+            </div>
+          )}
         </PageContainer>
       </Fragment>
     )

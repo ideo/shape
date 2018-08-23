@@ -9,6 +9,7 @@ import MovableGridCard from '~/ui/grid/MovableGridCard'
 import CollectionCard from '~/stores/jsonApi/CollectionCard'
 
 const StyledGrid = styled.div`
+  margin-top: 50px;
   min-height: ${props => props.minHeight}px;
   position: relative;
   width: 100%;

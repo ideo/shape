@@ -170,6 +170,7 @@ class Collection < ApplicationRecord
       :organization,
       :parent_collection_card,
       :submissions_collection,
+      :submission_template,
       roles: %i[users groups resource],
       collection_cards: [
         :parent,
@@ -279,6 +280,10 @@ class Collection < ApplicationRecord
   end
 
   def submissions_collection
+    nil
+  end
+
+  def submission_template
     nil
   end
 
