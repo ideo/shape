@@ -13,6 +13,7 @@ export default class UiStore {
     height: null,
     replacingId: null,
     emptyCollection: false,
+    collectionId: null,
   }
   @observable blankContentToolState = { ...this.defaultBCTState }
   @observable openCardMenuId = false
@@ -244,6 +245,7 @@ export default class UiStore {
 
   // --- BCT + GridCard properties
   @action openBlankContentTool(options = {}) {
+    const { viewingCollection } = this
     this.deselectCards()
     this.openCardMenuId = false
     this.blankContentToolState = {
@@ -251,8 +253,9 @@ export default class UiStore {
       order: 0,
       width: 1,
       height: 1,
-      emptyCollection: this.viewingCollection && this.viewingCollection.isEmpty,
-      ...options
+      emptyCollection: viewingCollection && viewingCollection.isEmpty,
+      collectionId: viewingCollection && viewingCollection.id,
+      ...options,
     }
   }
 

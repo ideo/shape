@@ -47,7 +47,6 @@ class AddSubmission extends React.Component {
   state = {
     creating: null,
     loading: false,
-    // droppingFile: false,
   }
 
   componentWillUnmount() {
@@ -82,9 +81,10 @@ class AddSubmission extends React.Component {
 
   handleSubmission = async (ev) => {
     ev.preventDefault()
-    const { parent_id, template } = this.props
+    const { parent_id, submissionSettings } = this.props
+    const { type, template } = submissionSettings
     // TODO: non-template types currently not supported
-    if (!template) return
+    if (type !== 'template' || !template) return
     const templateData = {
       template_id: template.id,
       parent_id,
@@ -97,7 +97,7 @@ class AddSubmission extends React.Component {
   }
 
   renderInner = () => {
-    const { template, uiStore } = this.props
+    const { uiStore } = this.props
     const { viewingCollection } = uiStore
     if (!viewingCollection) return ''
     let inner
@@ -133,7 +133,7 @@ class AddSubmission extends React.Component {
   render() {
     const { uiStore } = this.props
     const { gridSettings, blankContentToolState } = uiStore
-    // const { creating } = this.state
+
     return (
       <StyledAddSubmission>
         <StyledGridCardInner
@@ -149,19 +149,14 @@ class AddSubmission extends React.Component {
 }
 
 AddSubmission.propTypes = {
-  // parent is the parent collection
-  // parent: MobxPropTypes.objectOrObservableObject.isRequired,
-  // afterCreate: PropTypes.func,
   parent_id: PropTypes.number.isRequired,
-  template: MobxPropTypes.objectOrObservableObject,
+  submissionSettings: PropTypes.shape({
+    type: PropTypes.string,
+    template: MobxPropTypes.objectOrObservableObject,
+  }).isRequired,
 }
 AddSubmission.wrappedComponent.propTypes = {
   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
-  // apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
-}
-AddSubmission.defaultProps = {
-  // afterCreate: null,
-  template: null,
 }
 
 // give a name to the injected component for unit tests

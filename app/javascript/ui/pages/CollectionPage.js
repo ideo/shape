@@ -130,25 +130,24 @@ class CollectionPage extends PageWithApi {
   render() {
     // this.error comes from PageWithApi
     if (this.error) return <PageError error={this.error} />
-
     const { collection } = this
-    const { uiStore } = this.props
+    // for some reason collection can come through as an object, but not some fields like can_edit,
+    // which indicates it hasn't finished loading everything
     if (!collection || collection.can_edit === undefined) return <Loader />
+
+    const { uiStore } = this.props
+    // submissions_collection will only exist for submission boxes
+    const { submissions_collection } = collection
+    const {
+      blankContentToolState,
+      submissionBoxSettingsOpen,
+      gridSettings,
+    } = uiStore
     const { movingCardIds, cardAction } = uiStore
     // only tell the Grid to hide "movingCards" if we're moving and not linking
     const uiMovingCardIds = cardAction === 'move' ? movingCardIds : []
     // SharedCollection has special behavior where it sorts by most recently updated
     const sortBy = collection.isSharedCollection ? 'updated_at' : 'order'
-
-    const submissionBCTState = {
-      order: 0,
-      width: 1,
-      height: 1,
-      emptyCollection: true,
-      type: 'submission',
-      parent_id: collection.submissions_collection && collection.submissions_collection.id,
-      template: collection.submission_template,
-    }
 
     return (
       <Fragment>
@@ -159,28 +158,29 @@ class CollectionPage extends PageWithApi {
         <PageContainer>
           <CollectionGrid
             // pull in cols, gridW, gridH, gutter
-            {...uiStore.gridSettings}
-            gridSettings={uiStore.gridSettings}
+            {...gridSettings}
+            gridSettings={gridSettings}
             updateCollection={this.updateCollection}
             collection={collection}
             canEditCollection={collection.can_edit_content}
             // Pass in cardIds so grid will re-render when they change
             cardIds={collection.cardIds}
             // Pass in BCT state so grid will re-render when open/closed
-            blankContentToolState={uiStore.blankContentToolState}
+            blankContentToolState={blankContentToolState}
             movingCardIds={uiMovingCardIds}
             // passing length prop seems to properly trigger a re-render
             movingCards={uiStore.movingCardIds.length}
             sortBy={sortBy}
-            addEmptyCard={!collection.submissions_collection}
+            // don't add the extra row for submission box
+            addEmptyCard={!collection.isSubmissionBox}
           />
-          {(collection.requiresSubmissionBoxSettings || uiStore.submissionBoxSettingsOpen) &&
+          {(collection.requiresSubmissionBoxSettings || submissionBoxSettingsOpen) &&
             <SubmissionBoxSettingsModal
               collection={collection}
             />
           }
           <MoveModal />
-          { collection.submissions_collection && (
+          { submissions_collection && (
             <div>
               { this.loadingSubmissions
                 ? <Loader />
@@ -188,16 +188,23 @@ class CollectionPage extends PageWithApi {
                   <div>
                     {this.submissionsPageSeparator}
                     <CollectionGrid
-                      {...uiStore.gridSettings}
+                      {...gridSettings}
                       updateCollection={this.updateCollection}
-                      collection={collection.submissions_collection}
+                      collection={submissions_collection}
                       canEditCollection={false}
                       // Pass in cardIds so grid will re-render when they change
-                      cardIds={collection.submissions_collection.cardIds}
+                      cardIds={submissions_collection.cardIds}
                       // Pass in BCT state so grid will re-render when open/closed
-                      blankContentToolState={submissionBCTState}
+                      blankContentToolState={
+                        blankContentToolState.collectionId === submissions_collection.id
+                          ? blankContentToolState
+                          : {}
+                      }
+                      submissionSettings={{
+                        type: collection.submission_box_type,
+                        template: collection.submission_template,
+                      }}
                       movingCardIds={[]}
-                      // passing length prop seems to properly trigger a re-render
                       movingCards={false}
                       sortBy={sortBy}
                     />

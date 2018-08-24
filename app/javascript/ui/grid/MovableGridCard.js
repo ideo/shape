@@ -219,7 +219,7 @@ class MovableGridCard extends React.PureComponent {
       cardElement = (
         <AddSubmission
           parent_id={card.parent_id}
-          template={card.template}
+          submissionSettings={card.submissionSettings}
         />
       )
     }

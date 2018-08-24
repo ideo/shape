@@ -61,31 +61,39 @@ class CollectionGrid extends React.Component {
   }
 
   componentDidMount() {
-    const cards = this.condtionallyAddBct(this.props)
-    this.positionCards(cards)
+    this.initialize(this.props)
   }
 
   componentWillReceiveProps(nextProps) {
-    const cards = this.condtionallyAddBct(nextProps)
-    this.positionCards(cards, { props: nextProps })
+    this.initialize(nextProps)
   }
 
   componentWillUnmount() {
     this.clearDragTimeout()
   }
 
-  condtionallyAddBct(props) {
+  initialize(props) {
+    const cards = this.positionMovingCardsAndBCT(props)
+    this.positionCards(cards, { props })
+  }
+
+  positionMovingCardsAndBCT(props) {
     const {
       blankContentToolState,
       collection,
       cardIds,
       movingCardIds,
+      submissionSettings,
     } = props
     // convert observableArray values into a "normal" JS array (equivalent of .toJS())
     // for the sake of later calculations/manipulations
     const cards = [...collection.collection_cards]
     if (movingCardIds) {
+      // remove any cards we're moving to make them appear "picked up"
       _.each(movingCardIds, id => _.remove(cards, { id }))
+    }
+    if (submissionSettings) {
+      this.addSubmissionCard(cards)
     }
     // If we have a BCT open...
     if (blankContentToolState && blankContentToolState.order !== null) {
@@ -94,8 +102,6 @@ class CollectionGrid extends React.Component {
       const {
         height,
         replacingId,
-        parent_id,
-        template,
         type,
         width,
       } = blankContentToolState
@@ -115,8 +121,6 @@ class CollectionGrid extends React.Component {
         width,
         height,
         order,
-        parent_id,
-        template,
       }
       // If we already have a BCT open, find it in our cards
       const blankFound = _.find(this.state.cards, { cardType: 'blank' })
@@ -139,6 +143,23 @@ class CollectionGrid extends React.Component {
       }
     }
     return cards
+  }
+
+  addSubmissionCard = (cards) => {
+    const { collection, submissionSettings } = this.props
+    if (_.find(cards, { id: 'submission' })) return
+    const addSubmissionCard = {
+      order: 0,
+      width: 1,
+      height: 1,
+      emptyCollection: true,
+      id: 'submission',
+      cardType: 'blank',
+      blankType: 'submission',
+      parent_id: collection.id,
+      submissionSettings: submissionSettings,
+    }
+    cards.unshift(addSubmissionCard)
   }
 
   // --------------------------
@@ -578,18 +599,24 @@ CollectionGrid.propTypes = {
   ...gridConfigProps,
   updateCollection: PropTypes.func.isRequired,
   collection: MobxPropTypes.objectOrObservableObject.isRequired,
-  blankContentToolState: MobxPropTypes.objectOrObservableObject.isRequired,
+  blankContentToolState: MobxPropTypes.objectOrObservableObject,
   cardIds: MobxPropTypes.arrayOrObservableArray.isRequired,
   canEditCollection: PropTypes.bool.isRequired,
   movingCardIds: MobxPropTypes.arrayOrObservableArray.isRequired,
   addEmptyCard: PropTypes.bool,
+  submissionSettings: PropTypes.shape({
+    type: PropTypes.string,
+    template: MobxPropTypes.objectOrObservableObject,
+  }),
 }
 CollectionGrid.wrappedComponent.propTypes = {
   routingStore: MobxPropTypes.objectOrObservableObject.isRequired,
   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 CollectionGrid.defaultProps = {
-  addEmtpyCard: true,
+  addEmptyCard: true,
+  submissionSettings: null,
+  blankContentToolState: {},
 }
 CollectionGrid.displayName = 'CollectionGrid'
 
