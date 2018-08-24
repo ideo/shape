@@ -1,3 +1,4 @@
+import _ from 'lodash'
 import PropTypes from 'prop-types'
 import styled from 'styled-components'
 
@@ -95,23 +96,51 @@ export const StyledMenuItem = styled.li`
 `
 StyledMenuItem.displayName = 'StyledMenuItem'
 
-class PopoutMenu extends React.PureComponent {
+class PopoutMenu extends React.Component {
+  get groupedMenuItems() {
+    const { menuItems } = this.props
+    let { groupedMenuItems } = this.props
+    if (_.isEmpty(groupedMenuItems)) {
+      // just put the menuItems into a group by default
+      groupedMenuItems = { main: menuItems }
+    }
+    return groupedMenuItems
+  }
+
   get renderMenuItems() {
-    return this.props.menuItems.map(item => {
-      const { name, iconLeft, iconRight, onClick, loading } = item
-      return (
-        <StyledMenuItem key={name} noBorder={item.noBorder} loading={loading}>
-          <button
-            onClick={loading ? () => null : onClick}
-            className={`menu-${name.toLowerCase()}`}
-          >
-            {iconLeft}
-            {name}
-            {iconRight}
-          </button>
-        </StyledMenuItem>
+    const { groupExtraComponent } = this.props
+    const { groupedMenuItems } = this
+    const rendered = []
+    Object.keys(groupedMenuItems).forEach((groupName) => {
+      rendered.push(
+        <div className={groupName} key={groupName}>
+          { groupExtraComponent[groupName] }
+          { groupedMenuItems[groupName].map((item, i) => {
+            const {
+              id,
+              name,
+              iconLeft,
+              iconRight,
+              onClick,
+              loading
+            } = item
+            return (
+              <StyledMenuItem key={`${name}-${id || ''}`} noBorder={item.noBorder} loading={loading}>
+                <button
+                  onClick={loading ? () => null : onClick}
+                  className={`menu-${name}`}
+                >
+                  {iconLeft}
+                  {name}
+                  {iconRight}
+                </button>
+              </StyledMenuItem>
+            )
+          })}
+        </div>
       )
     })
+    return rendered
   }
 
   render() {
@@ -153,6 +182,15 @@ class PopoutMenu extends React.PureComponent {
   }
 }
 
+const propTypeMenuItem = PropTypes.arrayOf(PropTypes.shape({
+  name: PropTypes.string,
+  iconLeft: PropTypes.element,
+  iconRight: PropTypes.element,
+  onClick: PropTypes.func,
+  noBorder: PropTypes.bool,
+  loading: PropTypes.bool,
+}))
+
 PopoutMenu.propTypes = {
   onMouseLeave: PropTypes.func,
   onClick: PropTypes.func,
@@ -161,25 +199,30 @@ PopoutMenu.propTypes = {
   menuOpen: PropTypes.bool,
   disabled: PropTypes.bool,
   buttonStyle: PropTypes.string,
-  menuItems: PropTypes.arrayOf(PropTypes.shape({
-    name: PropTypes.string,
-    iconLeft: PropTypes.element,
-    iconRight: PropTypes.element,
-    onClick: PropTypes.func,
-    noBorder: PropTypes.bool,
-    loading: PropTypes.bool,
-  })).isRequired,
+  menuItems: propTypeMenuItem,
+  groupedMenuItems: PropTypes.shape({
+    top: propTypeMenuItem,
+    organizations: propTypeMenuItem,
+    bottom: propTypeMenuItem,
+  }),
+  groupExtraComponent: PropTypes.shape({
+    component: PropTypes.node,
+  }),
   direction: PropTypes.string,
 }
 
 PopoutMenu.defaultProps = {
   onMouseLeave: () => null,
   onClick: () => null,
+  // you need one or the other between menuItems / groupedMenuItems
+  menuItems: [],
+  groupedMenuItems: {},
   className: '',
   menuOpen: false,
   disabled: false,
   buttonStyle: '',
   width: 200,
+  groupExtraComponent: {},
   direction: 'left',
 }
 

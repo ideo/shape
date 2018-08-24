@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types'
 
-import { BCTTextField, FormButton } from '~/ui/global/styled/forms'
+import { BctTextField, FormButton } from '~/ui/global/styled/forms'
 import PaddedCardCover from '~/ui/grid/covers/PaddedCardCover'
 import { KEYS } from '~/utils/variables'
 import ValidIndicator from './ValidIndicator'
@@ -33,7 +33,7 @@ const GenericLinkCreator = ({
   return (
     <PaddedCardCover>
       <form className="form" onSubmit={onSubmit}>
-        <BCTTextField
+        <BctTextField
           autoFocus
           placeholder={placeholder}
           value={url}

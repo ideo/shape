@@ -174,6 +174,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
       :type,
       collection_attributes: %i[
         id
+        type
         name
         template_id
         master_template

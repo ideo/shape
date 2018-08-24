@@ -1,29 +1,30 @@
 import PropTypes from 'prop-types'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
-import { Flex, Box } from 'reflexbox'
-import FlipMove from 'react-flip-move'
+import { Flex } from 'reflexbox'
 
 import CollectionCard from '~/stores/jsonApi/CollectionCard'
 import AddTextIcon from '~/ui/icons/AddTextIcon'
 import AddCollectionIcon from '~/ui/icons/AddCollectionIcon'
 import AddFileIcon from '~/ui/icons/AddFileIcon'
 import AddVideoIcon from '~/ui/icons/AddVideoIcon'
-import LinkIcon from '~/ui/icons/LinkIcon'
+import AddLinkIcon from '~/ui/icons/AddLinkIcon'
 import TemplateIcon from '~/ui/icons/TemplateIcon'
+import SubmissionBoxIcon from '~/ui/icons/SubmissionBoxIcon'
 import v, { ITEM_TYPES } from '~/utils/variables'
 import FilestackUpload from '~/utils/FilestackUpload'
-import { StyledGridCard, BctButton } from '~/ui/grid/shared'
+import { StyledGridCard } from '~/ui/grid/shared'
 import InlineLoader from '~/ui/layout/InlineLoader'
 import { CloseButton } from '~/ui/global/styled/buttons'
 import bctIcons from '~/assets/bct_icons.png'
-import Tooltip from '~/ui/global/Tooltip'
 import PopoutMenu from '~/ui/global/PopoutMenu'
 
 import CollectionCreator from './CollectionCreator'
 import TextItemCreator from './TextItemCreator'
 import VideoCreator from './VideoCreator'
 import LinkCreator from './LinkCreator'
+import BctButtonBox from './BctButtonBox'
+import BctButtonRotation from './BctButtonRotation'
 
 const StyledGridCardBlank = StyledGridCard.extend`
   background: transparent;
@@ -55,7 +56,7 @@ const StyledBlankCreationTool = styled.div`
     &.foreground-bottom {
       top: 120px;
       /* width is smaller because there are only 2 bottom buttons; can change if we add more */
-      width: 70%;
+      width: 85%;
       margin: 0 auto;
     }
   }
@@ -167,45 +168,6 @@ const BctDropzone = styled.div`
   }
 `
 
-const BctButtonBox = ({
-  type,
-  tooltip,
-  size,
-  creating,
-  onClick,
-  Icon,
-}) => (
-  <Box>
-    <Tooltip
-      classes={{ tooltip: 'Tooltip' }}
-      title={tooltip}
-      placement="bottom"
-    >
-      <BctButton
-        creating={creating === type}
-        onClick={onClick}
-      >
-        <Icon width={size} height={size} color="white" />
-      </BctButton>
-    </Tooltip>
-  </Box>
-)
-
-BctButtonBox.propTypes = {
-  type: PropTypes.string,
-  tooltip: PropTypes.string,
-  size: PropTypes.number.isRequired,
-  creating: PropTypes.string,
-  onClick: PropTypes.func,
-  Icon: PropTypes.func.isRequired,
-}
-BctButtonBox.defaultProps = {
-  onClick: () => null,
-  tooltip: '',
-  creating: '',
-  type: '',
-}
-
 @inject('uiStore', 'apiStore')
 @observer
 class GridCardBlank extends React.Component {
@@ -286,7 +248,7 @@ class GridCardBlank extends React.Component {
     })
   }
 
-  createCard = (nested = {}) => {
+  createCard = (nested = {}, options = {}) => {
     const { afterCreate, parent, apiStore, uiStore } = this.props
     const { order, width, height, replacingId } = uiStore.blankContentToolState
     const isReplacing = !!replacingId
@@ -308,7 +270,10 @@ class GridCardBlank extends React.Component {
       } else {
         newCard = await card.API_create()
       }
+      // afterCreate can come passed down from props
       if (afterCreate) afterCreate(newCard)
+      // or separately from the createCard action (e.g. CollectionCreator)
+      if (options.afterCreate) options.afterCreate(newCard)
       // NOTE: closeBlankContentTool() will automatically get called
       // in CollectionCard after the async actions are complete
     })
@@ -333,13 +298,18 @@ class GridCardBlank extends React.Component {
 
   renderInner = () => {
     let inner
-    switch (this.state.creating) {
+    const { creating, loading, droppingFile } = this.state
+    const isReplacing = !!this.props.uiStore.blankContentToolState.replacingId
+    const size = v.iconSizes.bct
+
+    switch (creating) {
     case 'collection':
     case 'template':
+    case 'submissionBox':
       inner = (
         <CollectionCreator
-          template={this.state.creating === 'template'}
-          loading={this.state.loading}
+          type={creating}
+          loading={loading}
           createCard={this.createCard}
           closeBlankContentTool={this.closeBlankContentTool}
         />
@@ -348,7 +318,7 @@ class GridCardBlank extends React.Component {
     case 'video':
       inner = (
         <VideoCreator
-          loading={this.state.loading}
+          loading={loading}
           createCard={this.createCard}
           closeBlankContentTool={this.closeBlankContentTool}
         />
@@ -357,7 +327,7 @@ class GridCardBlank extends React.Component {
     case 'link':
       inner = (
         <LinkCreator
-          loading={this.state.loading}
+          loading={loading}
           createCard={this.createCard}
           closeBlankContentTool={this.closeBlankContentTool}
         />
@@ -368,7 +338,7 @@ class GridCardBlank extends React.Component {
       // since it doesn't use the BctBackground
       return (
         <TextItemCreator
-          loading={this.state.loading}
+          loading={loading}
           height={this.props.height}
           createCard={this.createCard}
           closeBlankContentTool={this.closeBlankContentTool}
@@ -376,8 +346,8 @@ class GridCardBlank extends React.Component {
       )
     default:
       inner = (
-        <BctDropzone droppingFile={this.state.droppingFile} id="dropzone">
-          {!this.state.loading && !this.state.droppingFile &&
+        <BctDropzone droppingFile={droppingFile} id="dropzone">
+          {!loading && !droppingFile &&
             <div className="text">
               <img
                 src={bctIcons}
@@ -393,10 +363,6 @@ class GridCardBlank extends React.Component {
       )
     }
 
-    const isReplacing = !!this.props.uiStore.blankContentToolState.replacingId
-    const { creating } = this.state
-    const size = v.iconSizes.bct
-
     const videoBctBox = (
       <BctButtonBox
         tooltip="Link video"
@@ -405,6 +371,16 @@ class GridCardBlank extends React.Component {
         size={size}
         onClick={this.startCreating('video')}
         Icon={AddVideoIcon}
+      />
+    )
+    const submissionBctBox = (
+      <BctButtonBox
+        tooltip="Create submission box"
+        type="submissionBox"
+        creating={creating}
+        size={size}
+        onClick={this.startCreating('submissionBox')}
+        Icon={SubmissionBoxIcon}
       />
     )
 
@@ -448,45 +424,38 @@ class GridCardBlank extends React.Component {
               creating={creating}
               size={size}
               onClick={this.startCreating('link')}
-              Icon={() => <LinkIcon viewBox="-11 -11 40 40" />}
+              Icon={AddLinkIcon}
             />
           }
-          {/* videoBctBox shows up on the top row when replacing */}
-          {isReplacing &&
-            videoBctBox
+          {(isReplacing || creating === 'video') &&
+            <BctButtonRotation disabled={isReplacing}>
+              {videoBctBox}
+            </BctButtonRotation>
           }
-          {creating && creating === 'template' &&
-            <FlipMove
-              appearAnimation={{
-                from: {
-                  transform: 'rotate(180deg) translateY(80px)',
-                  transformOrigin: '120px 140px',
-                },
-                to: {
-                  transform: 'none',
-                  transformOrigin: '120px 140px',
-                },
-              }}
-            >
-              <div>
-                <BctButtonBox
-                  type="template"
-                  creating={creating}
-                  size={size}
-                  Icon={() => <TemplateIcon viewBox="-5 -5 60 60" />}
-                />
-              </div>
-            </FlipMove>
+          {creating === 'submissionBox' &&
+            <BctButtonRotation>
+              {submissionBctBox}
+            </BctButtonRotation>
+          }
+          {creating === 'template' &&
+            <BctButtonRotation>
+              <BctButtonBox
+                type="template"
+                creating={creating}
+                size={size}
+                Icon={() => <TemplateIcon viewBox="-5 -5 60 60" />}
+              />
+            </BctButtonRotation>
           }
         </Flex>
-        <Flex
-          className={`foreground ${!creating ? 'foreground-bottom' : ''}`}
-          justify={creating ? 'space-between' : 'space-evenly'}
-        >
-          {(!isReplacing && (!creating || creating === 'video')) &&
-            videoBctBox
-          }
-          {(!isReplacing && !creating) &&
+
+        {(!isReplacing && !creating) &&
+          <Flex
+            className="foreground foreground-bottom"
+            justify="space-evenly"
+          >
+            {videoBctBox}
+            {submissionBctBox}
             <PopoutMenu
               buttonStyle="bct"
               menuOpen={this.state.bctMenuOpen}
@@ -496,8 +465,8 @@ class GridCardBlank extends React.Component {
                 { name: 'Create Template', iconRight: <TemplateIcon />, onClick: this.startCreating('template') }
               ]}
             />
-          }
-        </Flex>
+          </Flex>
+        }
         {inner}
         <BctBackground />
       </StyledBlankCreationTool>

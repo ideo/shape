@@ -64,7 +64,14 @@ class Modal extends React.Component {
   }
 
   render() {
-    const { children, onBack, onClose, open, title } = this.props
+    const {
+      children,
+      onBack,
+      onClose,
+      open,
+      title,
+      disableBackdropClick
+    } = this.props
     let wrappedTitle = title
     if (typeof title === 'string') {
       wrappedTitle = <StyledHeading2>{title}</StyledHeading2>
@@ -76,7 +83,7 @@ class Modal extends React.Component {
         disableAutoFocus
         open={open}
         onClose={this.handleclose}
-        onBackdropClick={this.handleClose}
+        onBackdropClick={disableBackdropClick ? null : this.handleClose}
         aria-labelledby={title}
         BackdropProps={{ invisible: true }}
       >
@@ -116,6 +123,7 @@ Modal.propTypes = {
   children: PropTypes.node,
   open: PropTypes.bool,
   onBack: PropTypes.func,
+  disableBackdropClick: PropTypes.bool,
 }
 
 Modal.defaultProps = {
@@ -123,6 +131,7 @@ Modal.defaultProps = {
   children: <div />,
   open: false,
   onBack: null,
+  disableBackdropClick: false,
 }
 
 export default Modal

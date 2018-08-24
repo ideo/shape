@@ -6,7 +6,7 @@ describe('MovableGridCard', () => {
   beforeEach(() => {
     props = {
       loading: false,
-      template: false,
+      type: 'collection',
       createCard: jest.fn(),
       closeBlankContentTool: jest.fn()
     }
@@ -17,22 +17,52 @@ describe('MovableGridCard', () => {
     component = wrapper.instance()
   })
 
-  it('renders a BCTTextField', () => {
-    expect(wrapper.find('BCTTextField').exists()).toBeTruthy()
-    expect(wrapper.find('BCTTextField').props().autoFocus).toBeTruthy()
+  it('renders a BctTextField', () => {
+    expect(wrapper.find('BctTextField').props().placeholder).toEqual('Collection name')
+    expect(wrapper.find('BctTextField').props().autoFocus).toBeTruthy()
   })
 
   describe('createCollection', () => {
     it('calls createCard with input name', () => {
       component.state = {
-        inputText: 'Collection Name',
+        inputText: 'New Projects',
       }
       component.createCollection(e)
       expect(props.createCard).toHaveBeenCalledWith({
         collection_attributes: {
           name: component.state.inputText,
-          master_template: props.template,
+          master_template: false,
+          type: 'Collection',
         },
+      }, {
+        afterCreate: null,
+      })
+    })
+
+    describe('with SubmissionBox', () => {
+      beforeEach(() => {
+        props.type = 'submissionBox'
+        props.createCard.mockClear()
+        wrapper = shallow(
+          <CollectionCreator {...props} />
+        )
+        component = wrapper.instance()
+      })
+
+      it('calls createCard with input name', () => {
+        component.state = {
+          inputText: 'Challenge #1',
+        }
+        component.createCollection(e)
+        expect(props.createCard).toHaveBeenCalledWith({
+          collection_attributes: {
+            name: component.state.inputText,
+            master_template: false,
+            type: 'Collection::SubmissionBox',
+          },
+        }, {
+          afterCreate: expect.any(Function),
+        })
       })
     })
   })

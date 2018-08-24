@@ -1,6 +1,5 @@
 import PropTypes from 'prop-types'
 import styled from 'styled-components'
-import v from '~/utils/variables'
 
 import FilestackUpload from '~/utils/FilestackUpload'
 
@@ -17,8 +16,7 @@ class FilePreview extends React.Component {
 
   render() {
     return (
-      <PreviewContainer width={1000} height={600} id="filePreview">
-      </PreviewContainer>
+      <PreviewContainer width={1000} height={600} id="filePreview" />
     )
   }
 }

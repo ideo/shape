@@ -86,7 +86,6 @@ class Collection < ApplicationRecord
   belongs_to :organization
   belongs_to :cloned_from, class_name: 'Collection', optional: true
   belongs_to :created_by, class_name: 'User', optional: true
-  belongs_to :template, class_name: 'Collection', optional: true
 
   validates :name, presence: true, if: :base_collection_type?
   before_validation :inherit_parent_organization_id, on: :create
@@ -171,6 +170,8 @@ class Collection < ApplicationRecord
       :created_by,
       :organization,
       :parent_collection_card,
+      :submissions_collection,
+      :submission_template,
       roles: %i[users groups resource],
       collection_cards: [
         :parent,
@@ -279,6 +280,14 @@ class Collection < ApplicationRecord
     name
   end
 
+  def submissions_collection
+    nil
+  end
+
+  def submission_template
+    nil
+  end
+
   def resourceable_class
     # Use top-level class since this is an STI model
     Collection
@@ -385,6 +394,11 @@ class Collection < ApplicationRecord
   end
 
   def profiles?
+    false
+  end
+
+  def destroyable?
+    # currently the only destroyable type is an incomplete SubmissionBox
     false
   end
 
