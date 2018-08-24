@@ -31,6 +31,9 @@ const SubmissionBoxRow = Row.extend`
   &:hover {
     background: ${v.colors.desert};
   }
+  &.selected {
+    background: ${v.colors.cyan};
+  }
 `
 const SubmissionBoxRowText = RowItemLeft.extend`
   padding-top: 0.75rem;
@@ -38,7 +41,7 @@ const SubmissionBoxRowText = RowItemLeft.extend`
 
 @inject('apiStore', 'uiStore', 'routingStore')
 @observer
-class SubmissionBoxSetupModal extends React.Component {
+class SubmissionBoxSettingsModal extends React.Component {
   @observable templates = []
 
   async componentDidMount() {
@@ -53,8 +56,19 @@ class SubmissionBoxSetupModal extends React.Component {
     })
   }
 
+  get locked() {
+    const { uiStore } = this.props
+    // if the modal is open via CollectionPage and not from uiStore, that means
+    // settings are required and the modal is locked open (cannot close)
+    return !uiStore.submissionBoxSettingsOpen
+  }
+
   handleClose = (ev) => {
     const { apiStore, uiStore, routingStore, collection } = this.props
+    if (!this.locked) {
+      uiStore.update('submissionBoxSettingsOpen', false)
+      return
+    }
     // Note that the meaning of "cancel" and "confirm" are sort of reversed in this context.
     // "cancel" means cancel creating the SubmissionBox, which will delete it and go back.
     // "confirm" means do nothing so that you can continue with setup.
@@ -77,25 +91,45 @@ class SubmissionBoxSetupModal extends React.Component {
     })
   }
 
-  updateCollection = (attrs = {}) => {
-    const { collection } = this.props
+  updateCollection = async (attrs = {}) => {
+    const { collection, uiStore } = this.props
     Object.keys(attrs).forEach(key => {
       collection[key] = attrs[key]
     })
-    // can 'await' this call if we want to show any loading indicator?
-    collection.save()
+    await collection.save()
+    uiStore.update('submissionBoxSettingsOpen', false)
+  }
+
+  confirmSubmissionTemplateChange = (callback) => {
+    const { uiStore } = this.props
+    uiStore.confirm({
+      iconName: 'Alert',
+      prompt: `Are you sure?
+              There are already {X}.
+              New submissions will be {Y}`,
+      confirmText: 'Continue',
+      cancelText: 'Cancel',
+      onConfirm: () => callback(),
+      onCancel: () => uiStore.closeDialog(),
+    })
   }
 
   chooseTemplate = templateId => () => {
-    this.updateCollection({
-      submission_template_id: templateId,
-      submission_box_type: 'template',
+    this.confirmSubmissionTemplateChange(() => {
+      this.updateCollection({
+        submission_template_id: templateId,
+        submission_box_type: 'template',
+      })
     })
   }
 
   chooseSubmissionBoxType = type => () => {
-    this.updateCollection({
-      submission_box_type: type,
+    this.confirmSubmissionTemplateChange(() => {
+      this.props.collection.submission_template = null
+      this.updateCollection({
+        submission_template_id: null,
+        submission_box_type: type,
+      })
     })
   }
 
@@ -124,8 +158,10 @@ class SubmissionBoxSetupModal extends React.Component {
       { name: 'link', Icon: AddLinkIcon },
       { name: 'file', Icon: AddFileIcon },
     ]
+    const { submission_box_type } = this.props.collection
     return types.map(type => (
       <SubmissionBoxRow
+        className={`${submission_box_type === type.name ? 'selected' : ''}`}
         key={type.name}
         noSpacing
         onClick={this.chooseSubmissionBoxType(type.name)}
@@ -141,17 +177,19 @@ class SubmissionBoxSetupModal extends React.Component {
   }
 
   render() {
+    const { submission_template_id } = this.props.collection
     return (
       <Modal
         title={this.titleContent()}
         onClose={this.handleClose}
-        disableBackdropClick
+        disableBackdropClick={this.locked}
         open
       >
         <div>
           { this.itemRows }
           {this.templates.map(template => (
             <SubmissionBoxRow
+              className={`${submission_template_id === template.id ? 'selected' : ''}`}
               key={template.id}
               noSpacing
               onClick={this.chooseTemplate(template.id)}
@@ -170,13 +208,13 @@ class SubmissionBoxSetupModal extends React.Component {
   }
 }
 
-SubmissionBoxSetupModal.propTypes = {
+SubmissionBoxSettingsModal.propTypes = {
   collection: MobxPropTypes.objectOrObservableObject.isRequired,
 }
-SubmissionBoxSetupModal.wrappedComponent.propTypes = {
+SubmissionBoxSettingsModal.wrappedComponent.propTypes = {
   apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
   routingStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 
-export default SubmissionBoxSetupModal
+export default SubmissionBoxSettingsModal

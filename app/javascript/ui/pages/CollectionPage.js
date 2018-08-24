@@ -8,11 +8,11 @@ import PageError from '~/ui/global/PageError'
 import PageWithApi from '~/ui/pages/PageWithApi'
 import Loader from '~/ui/layout/Loader'
 import PageContainer from '~/ui/layout/PageContainer'
-import PageSeparator from '~/ui/global/PageSeprator'
+import PageSeparator from '~/ui/global/PageSeparator'
 import CollectionGrid from '~/ui/grid/CollectionGrid'
 import MoveModal from '~/ui/grid/MoveModal'
 import PageHeader from '~/ui/pages/shared/PageHeader'
-import SubmissionBoxSetupModal from '~/ui/submission_box/SubmissionBoxSetupModal'
+import SubmissionBoxSettingsModal from '~/ui/submission_box/SubmissionBoxSettingsModal'
 
 const isHomepage = ({ params }) => (params.org && !params.id)
 
@@ -109,6 +109,24 @@ class CollectionPage extends PageWithApi {
     uiStore.trackEvent('update', this.collection)
   }
 
+  get submissionsPageSeparator() {
+    const { collection } = this
+    const { submissionTypeName } = collection
+    return (
+      <PageSeparator title={(
+        <h3>
+          {collection.submissions_collection.collection_cards.length}
+          {' '}
+          {collection.submissions_collection.collection_cards.length === 1
+            ? submissionTypeName
+            : pluralize(submissionTypeName)
+          }
+        </h3>
+      )}
+      />
+    )
+  }
+
   render() {
     // this.error comes from PageWithApi
     if (this.error) return <PageError error={this.error} />
@@ -156,8 +174,8 @@ class CollectionPage extends PageWithApi {
             sortBy={sortBy}
             addEmptyCard={!collection.submissions_collection}
           />
-          {collection.requiresSubmissionBoxSetup &&
-            <SubmissionBoxSetupModal
+          {(collection.requiresSubmissionBoxSettings || uiStore.submissionBoxSettingsOpen) &&
+            <SubmissionBoxSettingsModal
               collection={collection}
             />
           }
@@ -168,16 +186,7 @@ class CollectionPage extends PageWithApi {
                 ? <Loader />
                 : (
                   <div>
-                    <PageSeparator title={(
-                      <h3>
-                        {collection.submissions_collection.collection_cards.length}
-                        {' '}
-                        {collection.submissions_collection.collection_cards.length === 1 ?
-                          collection.submission_template.name :
-                          pluralize(collection.submission_template.name)
-                        }
-                      </h3>
-                    )} />
+                    {this.submissionsPageSeparator}
                     <CollectionGrid
                       {...uiStore.gridSettings}
                       updateCollection={this.updateCollection}
