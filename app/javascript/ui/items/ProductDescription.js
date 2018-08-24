@@ -11,12 +11,15 @@ const StyledProductDescription = styled(MarketingContent)`
 `
 
 const Title = styled(MarketingH1)`
+  text-transform: none;
   text-align: left;
   word-wrap:break-word;
+  line-height: 30px;
 `
 const Description = styled(MarketingContent)`
   text-align: left;
   word-wrap:break-word;
+  line-height: 25px;
 `
 
 const ImageDisplay = styled.img`

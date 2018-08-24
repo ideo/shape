@@ -10,6 +10,7 @@ import { MarketingFlex } from '~/ui/global/styled/marketing.js'
 import PropTypes from 'prop-types'
 import { scroller } from 'react-scroll'
 
+// TODO: responsive mobile menu (hidden on mobile for now)
 const NavLink = styled.button`
   font-weight: ${v.weights.medium};
   font-family: ${v.fonts.sans};
@@ -18,10 +19,17 @@ const NavLink = styled.button`
   margin: 1em;
   padding: 6px 12px;
   cursor: pointer;
+  text-transform: uppercase;
 
   &:hover {
     color: ${v.colors.gray};
   }
+
+  display: none;
+  @media only screen and (min-width: ${v.responsive.medBreakpoint}px) {
+      display: inline;
+  }
+
 `
 const NavMenu = styled.div`{
     position: relative;

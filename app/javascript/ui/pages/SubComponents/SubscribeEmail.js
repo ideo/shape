@@ -17,16 +17,17 @@ const SubscribeInput = styled.input`
 
 const SubscribeButton = styled.button`
   align: left;
-  font-weight: ${v.weights.book};
+  font-weight: ${v.weights.medium};
   font-family: ${v.fonts.sans};
-  font-size: 1rem;
+  font-size: 14px;
   color: white;
   margin: 1em;
   padding: 12px 12px;
   cursor: pointer;
-  letter-spacing: 1.5px;
+  letter-spacing: 0.5px;
   border-radius: 4px;
   border: 2px solid white;
+  text-transform: uppercase;
 
   &:hover {
     color: ${v.colors.blackLava};

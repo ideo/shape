@@ -81,12 +81,12 @@ class MarketingPage extends React.Component {
               <Box w={[null, 1 / 6]} auto />
               <Box w={[1, 2 / 6]} auto>
                 <a href="https://profile.ideo.com/">
-                  <MarketingCallToAction>GET EARLY ACCESS</MarketingCallToAction>
+                  <MarketingCallToAction>Get Early Access</MarketingCallToAction>
                 </a>
               </Box>
               <Box w={[1, 2 / 6]} auto>
                 <a href="https://profile.ideo.com/">
-                  <MarketingVideoLink>WATCH THE VIDEO</MarketingVideoLink>
+                  <MarketingVideoLink>Watch the Video</MarketingVideoLink>
                 </a>
               </Box>
               <Box w={[null, 1 / 6]} auto />
