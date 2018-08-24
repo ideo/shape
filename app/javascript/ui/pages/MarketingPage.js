@@ -40,8 +40,8 @@ class MarketingPage extends React.Component {
       <Fragment>
         <MarketingBack>
           <MarketingGradientTop>
-            <MarketingMenu isBigLogoVisible={this.state.isLogoVisible} />
             <ScrollElement name="TopAnchor" />
+            <MarketingMenu isBigLogoVisible={this.state.isLogoVisible} />
             <MarketingBetaSticker />
 
             <MarketingFlex

@@ -2,18 +2,7 @@ import styled from 'styled-components'
 import v from '~/utils/variables'
 import { Heading1, Heading2, Anchor } from '~/ui/global/styled/typography'
 import { ReflexProvider, Flex } from 'reflexbox'
-
 import organicGridPillGray from '~/assets/organic_grid_pill_gray.png'
-
-/** @component */
-export const MarketingFooter = styled.div`
-  text-align: center;
-  background: ${v.colors.activityLightBlue};
-  font-family: ${v.fonts.sans};
-  color: white;
-  font-size: 1rem;
-  padding: 50px 0;
-`
 
 /** @component */
 export const MarketingBack = styled.div`
@@ -22,17 +11,25 @@ export const MarketingBack = styled.div`
   width: 100%;
   border: none;
   overflow: auto;
-  color: rgb(247, 247, 247);
+  color: ${v.colors.nearwhite};
   background: white;
-  margin-left: 0px;
-  margin-right: 0px;
-  padding-top: 2rem;
+  padding-top: 50px;
 `
-// TODO: remove browser-prefixes
+
 /** @component */
 export const MarketingGradientTop = MarketingBack.extend`
-  background-image: url(${organicGridPillGray});
-  padding-bottom: 50px;
+  background: linear-gradient(to bottom, transparent 0%, ${v.colors.nearwhite} 100%) ,url(${organicGridPillGray});
+  padding-bottom: 40px;
+`
+
+/** @component */
+export const MarketingFooter = styled.div`
+  text-align: center;
+  background: ${v.colors.activityLightBlue};
+  font-family: ${v.fonts.sans};
+  color: ${v.colors.desert};
+  font-size: 1rem;
+  padding: 50px 0;
 `
 
 /** @component */
@@ -47,7 +44,7 @@ export const MarketingH1 = styled(Heading1)`
 
 /** @component */
 export const InvertMarketingH1 = styled(MarketingH1)`
-  color: white;
+  color: ${v.colors.desert};
   text-transform: none;
 `
 
@@ -63,7 +60,7 @@ white-space: normal;
 
 /** @component */
 export const InvertMarketingH2 = styled(Heading2)`
-  color: #f5f4f3;
+  color: ${v.colors.desert};
   text-transform: none;
   letter-spacing: 0;
 `
@@ -73,7 +70,7 @@ export const MarketingTagLine = styled(MarketingH2)`
   color: black;
   text-transform: none;
   font-family: ${v.fonts.serif};
-  font-weight: ${v.weights.book};  
+  font-weight: ${v.weights.book};
   font-size: 24px;
 
   @media only screen and (min-width: ${v.responsive.smallBreakpoint}px) {
@@ -99,9 +96,9 @@ export const MarketingContentLink = styled.button`
 
 /** @component */
 export const MarketingCallToAction = styled(MarketingContentLink)`
-  background-color: #fcf113;
+  background-color: ${v.colors.cautionYellow};
   border-radius: 4px;
-  border: 1px solid #fcf113; 
+  border: 1px solid ${v.colors.cautionYellow};
   letter-spacing: 0.5px;
   text-transform: uppercase;
   font-size: 14px;
@@ -133,12 +130,12 @@ export const MarketingContent = styled.div`
   font-weight: ${v.weights.book};
 `
 export const InvertMarketingContent = styled(MarketingContent)`
-  color: white;
+  color: ${v.colors.desert};
 `
 
 /** @component */
 export const MarketingStyledLink = styled(Anchor)`
-    color: white;
+    color: ${v.colors.desert};
     letter-spacing: -0.2px;
     font-size: 1rem;
     font-family: ${v.fonts.sans};
@@ -147,15 +144,15 @@ export const MarketingStyledLink = styled(Anchor)`
 
 /** @component */
 export const InvertMarketingLink = styled(MarketingStyledLink)`
-    color: #f5f4f3;
+  color: ${v.colors.desert};
 `
 
 /** @component */
 export const InvertMarketingLinkMail = styled(Anchor)`
-    color: #f5f4f3;
-    letter-spacing: -0.2px;
-    font-size: 32px;
-    font-family: ${v.fonts.serif};
+  color: ${v.colors.desert};
+  letter-spacing: -0.2px;
+  font-size: 32px;
+  font-family: ${v.fonts.serif};
 `
 
 /** @component */
@@ -165,7 +162,7 @@ export const MarketingBetaSticker = styled.img.attrs({
   alt: 'In Beta!';
   width: 100%;
   max-width: 126px;
-  top: 50px;
+  top: 100px;
   right: 0;
   position: absolute;
 

@@ -45,6 +45,8 @@ export default {
     blackLava: '#120f0e',
     orange: '#d66742',
     white: '#ffffff',
+    nearwhite: '#f7f7f7',
+    cautionYellow: '#fcf113',
   },
 
   iconSizes: {

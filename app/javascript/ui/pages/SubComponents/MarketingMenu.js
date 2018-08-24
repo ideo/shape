@@ -10,7 +10,6 @@ import { MarketingFlex } from '~/ui/global/styled/marketing.js'
 import PropTypes from 'prop-types'
 import { scroller } from 'react-scroll'
 
-// TODO: responsive mobile menu (hidden on mobile for now)
 const NavLink = styled.button`
   font-weight: ${v.weights.medium};
   font-family: ${v.fonts.sans};
@@ -24,11 +23,7 @@ const NavLink = styled.button`
   &:hover {
     color: ${v.colors.gray};
   }
-
-  display: none;
-  @media only screen and (min-width: ${v.responsive.medBreakpoint}px) {
-      display: inline;
-  }
+}
 
 `
 const NavMenu = styled.div`{
@@ -63,7 +58,7 @@ function handleScrollToContent() {
     duration: 1500,
     delay: 100,
     smooth: true,
-    offset: 50,
+    offset: 0,
   })
 }
 
@@ -72,7 +67,7 @@ function handleScrollToFooter() {
     duration: 1500,
     delay: 100,
     smooth: true,
-    offset: 50,
+    offset: 0,
   })
 }
 
@@ -81,7 +76,7 @@ function handleScrollToTop() {
     duration: 1500,
     delay: 100,
     smooth: true,
-    offset: -50,
+    offset: -150,
   })
 }
 
@@ -150,9 +145,9 @@ class MarketingMenu extends React.PureComponent {
     this.setState({ logoClass: this.props.isBigLogoVisible ? 'small-not-visible' : 'small-visible' })
   }
 
-  toggleDrawer = (open) => () => {
+  toggleDrawer = (isOpen) => () => {
     this.setState({
-      drawerState: open,
+      drawerState: isOpen,
     })
   }
 
@@ -217,7 +212,7 @@ class MarketingMenu extends React.PureComponent {
 
               <Box w={1 / 4}>
                 <section align="right">
-                  <NavMenu role="button" onClick={this.toggleDrawer('left', true)} />
+                  <NavMenu role="button" onClick={this.toggleDrawer(true)} />
                 </section>
               </Box>
 
