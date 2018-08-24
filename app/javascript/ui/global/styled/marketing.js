@@ -3,6 +3,8 @@ import v from '~/utils/variables'
 import { Heading1, Heading2, Anchor } from '~/ui/global/styled/typography'
 import { ReflexProvider, Flex } from 'reflexbox'
 
+import organicGridPillGray from '~/assets/organic_grid_pill_gray.png'
+
 /** @component */
 export const MarketingFooter = styled.div`
   text-align: center;
@@ -10,6 +12,7 @@ export const MarketingFooter = styled.div`
   font-family: ${v.fonts.sans};
   color: white;
   font-size: 1rem;
+  padding: 50px 0;
 `
 
 /** @component */
@@ -27,23 +30,7 @@ export const MarketingBack = styled.div`
 // TODO: remove browser-prefixes
 /** @component */
 export const MarketingGradientTop = MarketingBack.extend`
-  background-repeat;
-  background: -webkit-linear-gradient(-90deg, rgba(255,255,255,0.9) 0, rgba(255,255,255,1) 100%), -webkit-radial-gradient(rgba(90,90,90,1) 0, rgb(255,255,255) 15%, rgba(0,0,0,0) 16%, rgba(0,0,0,0) 100%), -webkit-radial-gradient(rgba(90,90,90,1) 0, rgb(255,255,255) 15%, rgba(0,0,0,0) 16%, rgba(0,0,0,0) 100%), -webkit-radial-gradient(rgba(90,90,90,1) 0, rgb(255,255,255) 15%, rgba(0,0,0,0) 16%, rgba(0,0,0,0) 100%), -webkit-radial-gradient(rgba(90,90,90,1) 0, rgb(255,255,255) 15%, rgba(0,0,0,0) 16%, rgba(0,0,0,0) 100%), -webkit-radial-gradient(rgba(90,90,90,1) 0, rgb(255,255,255) 15%, rgba(0,0,0,0) 16%, rgba(0,0,0,0) 100%), rgba(255,255,255,1);
-
-  background: -moz-linear-gradient(180deg, rgba(255,255,255,0.9) 0, rgba(255,255,255,1) 100%), -moz-radial-gradient(rgba(90,90,90,1) 0, rgb(255,255,255) 15%, rgba(0,0,0,0) 16%, rgba(0,0,0,0) 100%), -moz-radial-gradient(rgba(90,90,90,1) 0, rgb(255,255,255) 15%, rgba(0,0,0,0) 16%, rgba(0,0,0,0) 100%), -moz-radial-gradient(rgba(90,90,90,1) 0, rgb(255,255,255) 15%, rgba(0,0,0,0) 16%, rgba(0,0,0,0) 100%), -moz-radial-gradient(rgba(90,90,90,1) 0, rgb(255,255,255) 15%, rgba(0,0,0,0) 16%, rgba(0,0,0,0) 100%), -moz-radial-gradient(rgba(90,90,90,1) 0, rgb(255,255,255) 15%, rgba(0,0,0,0) 16%, rgba(0,0,0,0) 100%), rgba(255,255,255,1);
-
-  background: linear-gradient(180deg, rgba(255,255,255,0.9) 0 rgba(255,255,255,1) 100%), radial-gradient(rgba(90,90,90,1) 0, rgb(255,255,255) 15%, rgba(0,0,0,0) 16%, rgba(0,0,0,0) 100%), radial-gradient(rgba(90,90,90,1) 0, rgb(255,255,255) 15%, rgba(0,0,0,0) 16%, rgba(0,0,0,0) 100%), radial-gradient(rgba(90,90,90,1) 0, rgb(255,255,255) 15%, rgba(0,0,0,0) 16%, rgba(0,0,0,0) 100%), radial-gradient(rgba(90,90,90,1) 0, rgb(255,255,255) 15%, rgba(0,0,0,0) 16%, rgba(0,0,0,0) 100%), radial-gradient(rgba(90,90,90,1) 0, rgb(255,255,255) 15%, rgba(0,0,0,0) 16%, rgba(0,0,0,0) 100%), rgba(255,255,255,1);
-
-  background-position: 50% 50%, 43px 48px, 14px 24px, 49px 28px, 34px 36px, 36px 14px;
-
-  -webkit-background-origin: padding-box;
-  background-origin: padding-box;
-
-  -webkit-background-clip: border-box;
-  background-clip: border-box;
-
-  -webkit-background-size: auto auto, 30px 40px, 40px 30px, 50px 40px, 30px 40px, 40px 30px;
-  background-size: auto auto, 30px 40px, 40px 30px, 50px 40px, 30px 40px, 40px 30px;
+  background-image: url(${organicGridPillGray});
 `
 
 /** @component */
@@ -59,6 +46,7 @@ export const MarketingH1 = styled(Heading1)`
 /** @component */
 export const InvertMarketingH1 = styled(MarketingH1)`
   color: white;
+  text-transform: none;
 `
 
 /** @component */
@@ -73,14 +61,22 @@ white-space: normal;
 
 /** @component */
 export const InvertMarketingH2 = styled(Heading2)`
-  color: white;
+  color: #f5f4f3;
+  text-transform: none;
+  letter-spacing: 0;
 `
 
 /** @component */
 export const MarketingTagLine = styled(MarketingH2)`
   color: black;
+  text-transform: none;
   font-family: ${v.fonts.serif};
-  font-weight: ${v.weights.medium};
+  font-weight: ${v.weights.book};  
+  font-size: 24px;
+
+  @media only screen and (min-width: ${v.responsive.smallBreakpoint}px) {
+      font-size: 32px;
+  }
 `
 
 /** @component */
@@ -103,13 +99,21 @@ export const MarketingContentLink = styled.button`
 export const MarketingCallToAction = styled(MarketingContentLink)`
   background-color: #fcf113;
   border-radius: 4px;
-  border: 1px solid #fcf113;
+  border: 1px solid #fcf113; 
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  font-size: 14px;
+  font-weight: ${v.weights.medium};
 `
 
 /** @component */
 export const MarketingVideoLink = styled(MarketingContentLink)`
   border-radius: 4px;
   border: 2px solid black;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  font-size: 14px;
+  font-weight: ${v.weights.medium};
 `
 
 /** @component */
@@ -141,14 +145,14 @@ export const MarketingStyledLink = styled(Anchor)`
 
 /** @component */
 export const InvertMarketingLink = styled(MarketingStyledLink)`
-    color: white;
+    color: #f5f4f3;
 `
 
 /** @component */
 export const InvertMarketingLinkMail = styled(Anchor)`
-    color: white;
+    color: #f5f4f3;
     letter-spacing: -0.2px;
-    font-size: 2.25rem;
+    font-size: 32px;
     font-family: ${v.fonts.serif};
 `
 
@@ -157,12 +161,18 @@ export const MarketingBetaSticker = styled.img.attrs({
   src: 'https://firebasestorage.googleapis.com/v0/b/shape-marketing.appspot.com/o/marketing%2Fcommon%2Fbeta-stick-2.png?alt=media&token=72957149-16e5-4c70-aa80-3a5ac129fa34'
 })`
   alt: 'In Beta!';
-  max-width: 100%;
-  float: right;
+  width: 100%;
+  max-width: 126px;
+  top: 50px;
+  right: 0;
+  position: absolute;
 
-  @media only screen and (max-width: ${v.responsive.smallBreakpoint}px) {
-    width: 40%;
-    height: 40%;
+  @media only screen and (min-width: ${v.responsive.smallBreakpoint}px) {
+      max-width: 244px;
+  }
+  @media only screen and (min-width: ${v.responsive.medBreakpoint}px) {
+      top: 75px;
+      max-width: 322px;
   }
 `
 
@@ -171,8 +181,9 @@ export const MarketingShapeLogo = styled.img.attrs({
   src: 'https://s3-us-west-2.amazonaws.com/assets.shape.space/logo.svg'
 })`
   alt: 'Shape';
-  width: 60%;
-  max-width: 100%;
+  width: 100%;
+  max-width: 410px;
+  margin-top: 40px;
 `
 
 const space = [0, 8, 16, 32, 64]
