@@ -3,7 +3,6 @@ import { routingStore } from '~/stores'
 import trackError from '~/utils/trackError'
 import FilestackUpload from '~/utils/FilestackUpload'
 import { ITEM_TYPES } from '~/utils/variables'
-import Api from './Api'
 import BaseRecord from './BaseRecord'
 
 class Item extends BaseRecord {
@@ -70,13 +69,6 @@ class Item extends BaseRecord {
       data,
     })
       .catch(err => { trackError(err, { name: 'item:update' }) })
-  }
-  API_archive() {
-    return Api.archive('items', this)
-  }
-
-  API_duplicate() {
-    return Api.duplicate('items', this)
   }
 }
 Item.type = 'items'

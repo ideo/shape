@@ -1,4 +1,4 @@
-import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
+import { PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 
 import Activity from '~/stores/jsonApi/Activity'

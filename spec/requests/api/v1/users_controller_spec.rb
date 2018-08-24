@@ -167,12 +167,14 @@ describe Api::V1::UsersController, type: :request, json: true, auth: true do
         {
           terms_accepted: true,
           show_helper: false,
-        }
+          show_move_helper: false,
+          show_template_helper: false,
+        },
       }.to_json
     end
 
     before do
-      @user.update_attributes(terms_accepted: false, show_helper: true)
+      user.update_attributes(terms_accepted: false, show_helper: true)
     end
 
     it 'returns a 200' do
@@ -181,15 +183,20 @@ describe Api::V1::UsersController, type: :request, json: true, auth: true do
     end
 
     it 'updates terms_accepted for current_user' do
-      expect(@user.terms_accepted).to be false
+      expect(user.terms_accepted).to be false
       patch(path, params: params)
-      expect(@user.reload.terms_accepted).to be true
+      expect(user.reload.terms_accepted).to be true
     end
 
-    it 'updates show_helper for current_user' do
-      expect(@user.show_helper).to be true
+    it 'updates show_helpers for current_user' do
+      expect(user.show_helper).to be true
+      expect(user.show_move_helper).to be true
+      expect(user.show_template_helper).to be true
       patch(path, params: params)
-      expect(@user.reload.show_helper).to be false
+      user.reload
+      expect(user.show_helper).to be false
+      expect(user.show_move_helper).to be false
+      expect(user.show_template_helper).to be false
     end
   end
 
@@ -209,8 +216,9 @@ describe Api::V1::UsersController, type: :request, json: true, auth: true do
     end
 
     it 'it switches the users current org' do
-      expect(@user).to receive(:switch_to_organization).with(
-        switch_organization)
+      expect(user).to receive(:switch_to_organization).with(
+        switch_organization,
+      )
       post(path, params: params)
     end
   end

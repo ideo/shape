@@ -6,10 +6,10 @@ const PlainLink = styled(Link)`
   font-size: inherit;
   text-decoration: none;
 
-  ${props => props.noSelect && `
+  &.no-select {
     user-select: none;
     user-drag: none;
-  `}
+  }
 `
 PlainLink.displayName = 'PlainLink'
 

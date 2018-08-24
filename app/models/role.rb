@@ -23,6 +23,7 @@ class Role < ApplicationRecord
   CONTENT_EDITOR = :content_editor
   MEMBER = :member
   ADMIN = :admin
+  SUPER_ADMIN = :super_admin
 
   amoeba do
     enable

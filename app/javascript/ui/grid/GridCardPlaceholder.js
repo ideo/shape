@@ -1,5 +1,5 @@
 import v from '~/utils/variables'
-import { StyledGridCard } from './GridCard'
+import { StyledGridCard } from './shared'
 
 const GridCardPlaceholder = StyledGridCard.extend`
   background: ${v.colors.cyan};

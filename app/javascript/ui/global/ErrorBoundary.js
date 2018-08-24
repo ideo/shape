@@ -18,11 +18,12 @@ class ErrorBoundary extends React.Component {
     if (this.state.error) {
       return (
         <div style={{
-          maxWidth: v.maxWidth,
-          margin: '0 auto',
-          marginTop: v.headerHeight,
-          textAlign: 'center',
-        }}>
+            maxWidth: v.maxWidth,
+            margin: '0 auto',
+            marginTop: v.headerHeight,
+            textAlign: 'center',
+          }}
+        >
           <h3>We're sorry — something's gone wrong.</h3>
         </div>
       )

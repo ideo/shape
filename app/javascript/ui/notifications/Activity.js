@@ -1,5 +1,5 @@
 import _ from 'lodash'
-import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
+import { PropTypes as MobxPropTypes } from 'mobx-react'
 import PropTypes from 'prop-types'
 import pluralize from 'pluralize'
 import styled from 'styled-components'

@@ -25,6 +25,12 @@ import TagEditorModal from '~/ui/pages/shared/TagEditorModal'
 import Tooltip from '~/ui/global/Tooltip'
 import { uiStore } from '~/stores'
 import v, { ITEM_TYPES } from '~/utils/variables'
+import {
+  StyledGridCard,
+  StyledBottomLeftIcon,
+  StyledGridCardInner,
+  StyledTopRightActions,
+} from './shared'
 
 const PinIconHolder = styled.div`
   background-color: ${props => (props.locked ? 'transparent' : v.colors.blackLava)};
@@ -45,79 +51,6 @@ const PinIconHolder = styled.div`
     }
   }
 `
-
-export const StyledGridCard = styled.div`
-  z-index: 1;
-  position: relative;
-  height: 100%;
-  width: 100%;
-  background: white;
-  padding: 0;
-  cursor: ${props => (props.dragging ? 'grabbing' : 'pointer')};
-  box-shadow: ${props => (props.dragging ? '1px 1px 5px 2px rgba(0, 0, 0, 0.25)' : '')};
-  opacity: ${props => (props.dragging ? '0.95' : '1')};
-`
-StyledGridCard.displayName = 'StyledGridCard'
-
-export const StyledBottomLeftIcon = styled.div`
-  position: absolute;
-  z-index: ${v.zIndex.gridCard};
-  left: 0.25rem;
-  bottom: 0;
-  color: ${v.colors.gray};
-  width: ${props => (props.iconAmount === 2 ? 75 : 45)}px;
-  height: 45px;
-  display: flex;
-  /* LinkIcon appears larger than CollectionIcon so we need to make it smaller */
-  ${props => props.small && `
-    width: 18px;
-    height: 18px;
-    bottom: 0.75rem;
-    left: 0.75rem;
-  `}
-`
-StyledBottomLeftIcon.displayName = 'StyledBottomLeftIcon'
-
-const StyledGridCardInner = styled.div`
-  position: relative;
-  height: 100%;
-  overflow: hidden;
-  z-index: 1;
-  /*
-  // related to userSelectHack from Rnd / Draggable
-  // disable blue text selection on Draggables
-  // https://github.com/bokuweb/react-rnd/issues/199
-  */
-  *::-moz-selection {background: transparent;}
-  *::selection {background: transparent;}
-`
-StyledGridCardInner.displayName = 'StyledGridCardInner'
-
-export const StyledTopRightActions = styled.div`
-  position: absolute;
-  top: 0.35rem;
-  right: 0.25rem;
-  z-index: ${v.zIndex.gridCardTop};
-  .show-on-hover {
-    color: ${props => props.color};
-    border-color: ${props => props.color};
-  }
-  .selected {
-    border-color: ${props => props.color};
-    background-color: ${props => props.color};
-  }
-  .card-menu {
-    margin-top: 0.25rem;
-    display: inline-block;
-    vertical-align: top;
-    z-index: ${v.zIndex.gridCardTop};
-    color: ${props => props.color};
-  }
-`
-StyledTopRightActions.defaultProps = {
-  color: v.colors.gray
-}
-StyledTopRightActions.displayName = 'StyledTopRightActions'
 
 @observer
 class GridCard extends React.Component {

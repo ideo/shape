@@ -11,6 +11,7 @@ import PositionedGridCard from '~/ui/grid/PositionedGridCard'
 import GridCard from '~/ui/grid/GridCard'
 import GridCardPlaceholder from '~/ui/grid/GridCardPlaceholder'
 import GridCardBlank from '~/ui/grid/blankContentTool/GridCardBlank'
+import AddSubmission from '~/ui/grid/blankContentTool/AddSubmission'
 import GridCardEmpty from '~/ui/grid/GridCardEmpty'
 import ResizeIcon from '~/ui/icons/ResizeIcon'
 
@@ -204,16 +205,29 @@ class MovableGridCard extends React.PureComponent {
   )
 
   renderBlank = () => {
-    const { parent } = this.props
+    const { card, parent } = this.props
     const styleProps = this.styleProps()
     const {
       height,
       xPos,
       yPos
     } = styleProps
+    const { blankType } = this.props.card
+
+    let cardElement = <GridCardBlank height={height} parent={parent} />
+    if (blankType === 'submission') {
+      cardElement = (
+        <AddSubmission
+          parent_id={card.parent_id}
+          template={card.template}
+        />
+      )
+    }
 
     return (
       <FlipMove
+        // z-index is important because BCT has a popoutMenu
+        style={{ zIndex: v.zIndex.gridCard }}
         easing="ease-out"
         appearAnimation={{
           from: {
@@ -228,7 +242,7 @@ class MovableGridCard extends React.PureComponent {
       >
         <div>
           <PositionedGridCard {...styleProps}>
-            <GridCardBlank height={height} parent={parent} />
+            {cardElement}
           </PositionedGridCard>
         </div>
       </FlipMove>

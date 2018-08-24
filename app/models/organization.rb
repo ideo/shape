@@ -21,7 +21,7 @@ class Organization < ApplicationRecord
              dependent: :destroy,
              optional: true
   belongs_to :profile_template,
-             class_name: 'Collection::MasterTemplate',
+             class_name: 'Collection',
              dependent: :destroy,
              optional: true
   belongs_to :profile_collection,
@@ -144,6 +144,15 @@ class Organization < ApplicationRecord
       primary_group.user_ids +
       guest_group.user_ids
     ).uniq.count
+  end
+
+  def create_profile_master_template(attrs = {})
+    create_profile_template(
+      attrs.merge(
+        organization: self,
+        master_template: true,
+      ),
+    )
   end
 
   private

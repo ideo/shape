@@ -100,7 +100,7 @@ RSpec.describe CollectionCard, type: :model do
     end
 
     context 'with pinned card from master template' do
-      let(:template) { create(:master_template) }
+      let(:template) { create(:collection, master_template: true) }
       let!(:collection_card) { create(:collection_card_text, pinned: true, parent: template) }
 
       it 'should set pinned to true on the duplicate' do

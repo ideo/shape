@@ -63,6 +63,7 @@ const fakeUiStore = {
   editingName: false,
   activityLogPage: 'comments',
   pageMenuOpen: false,
+  searchText: '',
 }
 
 export default fakeUiStore

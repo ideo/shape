@@ -26,6 +26,7 @@ const fakeApiStore = ({ findResult = '', findAllResult = [], requestResult = '' 
     fetchNotifications: jest.fn().mockReturnValue(Promise.resolve()),
     findOrBuildCommentThread: jest.fn().mockReturnValue(Promise.resolve()),
     findThreadForRecord: jest.fn(),
+    createTemplateInstance: jest.fn(),
     unreadActivityCount: 0,
     currentUserId: 1,
     currentUser: {
@@ -40,7 +41,7 @@ const fakeApiStore = ({ findResult = '', findAllResult = [], requestResult = '' 
       groups: [],
       terms_accepted: true,
       switchOrganization: jest.fn(),
-      API_hideHotEdgeHelper: jest.fn(),
+      API_hideHelper: jest.fn(),
     },
     // NOTE: important that this matches currentUserOrganization.slug
     currentOrgSlug: 'org-slug',

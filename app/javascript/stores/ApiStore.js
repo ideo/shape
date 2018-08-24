@@ -227,6 +227,10 @@ class ApiStore extends Store {
     return res.data
   }
 
+  async createTemplateInstance(data) {
+    return this.request('collections/create_template', 'POST', data)
+  }
+
   // -- override mobx-jsonapi-store --
   __updateRelationships(obj) {
     const record = this.find(obj.type, obj.id)

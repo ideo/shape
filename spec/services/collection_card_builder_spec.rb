@@ -87,7 +87,7 @@ RSpec.describe CollectionCardBuilder, type: :service do
 
       describe 'creating card in a MasterTemplate' do
         let(:parent) do
-          create(:master_template, organization: organization, add_editors: [user])
+          create(:collection, master_template: true, organization: organization, add_editors: [user])
         end
 
         it 'should create a pinned card by default' do

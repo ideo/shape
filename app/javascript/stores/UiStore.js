@@ -48,6 +48,7 @@ export default class UiStore {
   @observable movingCardIds = []
   @observable movingFromCollectionId = null
   @observable cardAction = 'move'
+  @observable templateName = ''
   defaultDialogProps = {
     open: null, // track whether "info" or "confirm" dialog are open, or none
     prompt: null,
@@ -141,10 +142,20 @@ export default class UiStore {
     this.movingFromCollectionId = fromCollectionId
     // cardAction can be 'move' or 'link'
     this.cardAction = cardAction || 'move'
-    this.movingCardIds.replace([...this.selectedCardIds])
+    if (this.cardAction === 'useTemplate') {
+      // fake the selected card to trigger the menu open,
+      // because we aren't really moving an existing card
+      this.movingCardIds.replace(['template'])
+      // store the name e.g. "CoLab Prototype in transit"
+      this.templateName = this.viewingCollection.name
+    } else {
+      this.movingCardIds.replace([...this.selectedCardIds])
+      this.templateName = ''
+    }
   }
 
   @action closeMoveMenu({ deselect = true } = {}) {
+    this.templateName = ''
     this.movingCardIds.replace([])
     this.movingFromCollectionId = null
     if (deselect) this.deselectCards()

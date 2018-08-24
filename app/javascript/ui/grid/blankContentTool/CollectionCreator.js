@@ -1,12 +1,10 @@
+import _ from 'lodash'
 import PropTypes from 'prop-types'
 
-import { TextField, FormButton } from '~/ui/global/styled/forms'
+import { BctTextField, FormButton } from '~/ui/global/styled/forms'
 import PaddedCardCover from '~/ui/grid/covers/PaddedCardCover'
-import v, { KEYS } from '~/utils/variables'
-
-const SpecialBGTextField = TextField.extend`
-  background: ${v.colors.cararra};
-`
+import { KEYS } from '~/utils/variables'
+import { routingStore } from '~/stores'
 
 class CollectionCreator extends React.Component {
   state = {
@@ -28,20 +26,38 @@ class CollectionCreator extends React.Component {
   createCollection = (e) => {
     e.preventDefault()
     if (!this.state.inputText) return
-    this.props.createCard({
+    const { createCard, type } = this.props
+    let dbType = 'Collection'
+    if (type === 'submissionBox') dbType += '::SubmissionBox'
+    createCard({
       // `collection` is the collection being created within the card
       collection_attributes: {
         name: this.state.inputText,
+        master_template: type === 'template',
+        type: dbType,
       }
+    },
+    {
+      // if creating a submissionBox we route you to finish setting up the collection
+      afterCreate: type === 'submissionBox'
+        ? (card) => routingStore.routeTo('collections', card.record.id)
+        : null,
     })
+  }
+
+  get typeName() {
+    const { type } = this.props
+    // e.g. 'submissionBox' -> 'Submission Box'
+    return _.startCase(type)
   }
 
   render() {
     return (
       <PaddedCardCover>
         <form className="form" onSubmit={this.createCollection}>
-          <SpecialBGTextField
-            placeholder="Collection name"
+          <BctTextField
+            autoFocus
+            placeholder={`${this.typeName} name`}
             value={this.state.inputText}
             onChange={this.onInputChange}
             onKeyDown={this.handleKeyDown}
@@ -60,8 +76,16 @@ class CollectionCreator extends React.Component {
 
 CollectionCreator.propTypes = {
   loading: PropTypes.bool.isRequired,
+  type: PropTypes.oneOf([
+    'collection',
+    'template',
+    'submissionBox',
+  ]),
   createCard: PropTypes.func.isRequired,
   closeBlankContentTool: PropTypes.func.isRequired,
+}
+CollectionCreator.defaultProps = {
+  type: 'collection',
 }
 
 export default CollectionCreator

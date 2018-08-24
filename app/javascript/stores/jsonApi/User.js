@@ -25,8 +25,14 @@ class User extends BaseRecord {
     return this.API_updateCurrentUser({ terms_accepted: true })
   }
 
-  API_hideHotEdgeHelper() {
-    return this.API_updateCurrentUser({ show_helper: false })
+  API_hideHelper(type = '') {
+    let show_helper = 'show_helper'
+    if (['template', 'move'].indexOf(type) > -1) {
+      show_helper = `show_${type}_helper`
+    }
+    // set it ahead of time so the helper immediately disappears
+    this[show_helper] = false
+    return this.API_updateCurrentUser({ [show_helper]: false })
   }
 
   API_hideMoveHelper() {
