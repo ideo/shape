@@ -7,7 +7,7 @@ const StyledHr = styled.div`
   background-color: ${v.colors.blackLava};
   display: block;
   flex-grow: 1;
-  height: 3px;
+  height: 1px;
   line-height: 0;
   width: 100%;
 `
