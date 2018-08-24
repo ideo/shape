@@ -37,6 +37,6 @@ describe('CollectionGrid', () => {
     expect(wrapper.find('MovableGridCard').at(0).props().cardType).toBe('items')
     expect(wrapper.find('MovableGridCard').at(0).props().record).toBe(fakeTextItem)
     // 3 cards + 1 empty card
-    expect(wrapper.find('MovableGridCard').length).toBe(4)
+    expect(wrapper.find('MovableGridCard').length).toBe(3)
   })
 })
