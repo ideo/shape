@@ -31,6 +31,7 @@ export const MarketingBack = styled.div`
 /** @component */
 export const MarketingGradientTop = MarketingBack.extend`
   background-image: url(${organicGridPillGray});
+  padding-bottom: 50px;
 `
 
 /** @component */
