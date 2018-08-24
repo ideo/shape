@@ -44,7 +44,7 @@ AlertDialog.defaultProps = {
   ...Dialog.defaultProps,
   prompt: '',
   open: '',
-  iconName: 'Alert',
+  iconName: 'Info',
   fadeOutTime: 2000,
 }
 

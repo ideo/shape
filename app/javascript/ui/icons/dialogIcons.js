@@ -4,6 +4,7 @@ import CloseIcon from '~/ui/icons/CloseIcon'
 import LeaveIcon from '~/ui/icons/LeaveIcon'
 import OkIcon from '~/ui/icons/OkIcon'
 import AlertIcon from '~/ui/icons/AlertIcon'
+import InfoIcon from '~/ui/icons/InfoIcon'
 import LinkIcon from '~/ui/icons/LinkIcon'
 
 export default {
@@ -13,5 +14,6 @@ export default {
   LeaveIcon,
   OkIcon,
   AlertIcon,
+  InfoIcon,
   LinkIcon,
 }
