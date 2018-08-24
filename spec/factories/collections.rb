@@ -19,6 +19,7 @@ FactoryBot.define do
     factory :global_collection, class: Collection::Global
     factory :user_profile, class: Collection::UserProfile
     factory :submission_box, class: Collection::SubmissionBox
+    factory :submissions_collection, class: Collection::SubmissionsCollection
 
     after(:build) do |collection, evaluator|
       if evaluator.num_cards > 0

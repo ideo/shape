@@ -29,7 +29,7 @@ class CollectionTemplateBuilder
 
     # NOTE: Any issue with creating the template instance in a different org from the template?
     @collection = @template.templated_collections.create(
-      name: "My #{@template.name}",
+      name: created_template_name,
       organization: @parent.organization,
     )
     # make sure to assign these permissions before the template cards are generated
@@ -40,6 +40,14 @@ class CollectionTemplateBuilder
       collection: @collection,
     )
     @collection
+  end
+
+  def created_template_name
+    if @parent.is_a? Collection::SubmissionsCollection
+      "#{@created_by.first_name}'s #{@template.name}"
+    else
+      "My #{@template.name}"
+    end
   end
 
   def assign_submission_permissions

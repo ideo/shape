@@ -49,6 +49,19 @@ RSpec.describe CollectionTemplateBuilder, type: :service do
       expect(collection.owned_tag_list).to include(template.name.parameterize)
     end
 
+    context 'when parent is a submissions_collection' do
+      let(:submission_box) { create(:submission_box, add_editors: [user]) }
+      let(:parent) { create(:submissions_collection, submission_box: submission_box) }
+
+      it 'should create a new collection that is linked to the template' do
+        expect(collection.name).to eq "#{user.first_name}'s #{template.name}"
+      end
+
+      it 'should assign permissions from the submission_box' do
+        expect(collection.can_edit?(user)).to be true
+      end
+    end
+
     context 'when parent is a master_template' do
       let(:parent) { create(:collection, master_template: true) }
 
