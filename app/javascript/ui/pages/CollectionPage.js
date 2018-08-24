@@ -172,7 +172,10 @@ class CollectionPage extends PageWithApi {
                       <h3>
                         {collection.submissions_collection.collection_cards.length}
                         {' '}
-                        {pluralize(collection.submission_template.name)}
+                        {collection.submissions_collection.collection_cards.length === 1 ?
+                          collection.submission_template.name :
+                          pluralize(collection.submission_template.name)
+                        }
                       </h3>
                     )} />
                     <CollectionGrid
