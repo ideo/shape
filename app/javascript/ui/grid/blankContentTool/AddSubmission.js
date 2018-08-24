@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
+import pluralize from 'pluralize'
 import styled from 'styled-components'
 
 import v, { ITEM_TYPES } from '~/utils/variables'
@@ -81,10 +82,10 @@ class AddSubmission extends React.Component {
 
   handleSubmission = async (ev) => {
     ev.preventDefault()
-    const { parent_id, template_id } = this.props
+    const { parent_id, template } = this.props
     const templateData = {
+      template_id: template.id,
       parent_id,
-      template_id,
       placement: 'beginning',
     }
     const res = await apiStore.createTemplateInstance(templateData)
@@ -92,6 +93,7 @@ class AddSubmission extends React.Component {
   }
 
   renderInner = () => {
+    const { template } = this.props
     let inner
     // const { creating, loading, droppingFile } = this.state
     // const isReplacing = !!this.props.uiStore.blankContentToolState.replacingId
@@ -109,7 +111,7 @@ class AddSubmission extends React.Component {
 
     return (
       <StyledBlankCreationTool>
-        <h3>Add a new concept</h3>
+        <h3>Add a new {pluralize.singular(template.name)}</h3>
         <SubmissionButton onClick={this.handleSubmission}>
           &#43;
         </SubmissionButton>
@@ -142,7 +144,7 @@ AddSubmission.propTypes = {
   // parent: MobxPropTypes.objectOrObservableObject.isRequired,
   // afterCreate: PropTypes.func,
   parent_id: PropTypes.number.isRequired,
-  template_id: PropTypes.number.isRequired,
+  template: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 AddSubmission.wrappedComponent.propTypes = {
   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,

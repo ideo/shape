@@ -129,7 +129,7 @@ class CollectionPage extends PageWithApi {
       emptyCollection: true,
       type: 'submission',
       parent_id: collection.submissions_collection && collection.submissions_collection.id,
-      template_id: collection.submission_template_id,
+      template: collection.submission_template,
     }
 
     return (

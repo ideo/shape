@@ -95,7 +95,7 @@ class CollectionGrid extends React.Component {
         height,
         replacingId,
         parent_id,
-        template_id,
+        template,
         type,
         width,
       } = blankContentToolState
@@ -116,7 +116,7 @@ class CollectionGrid extends React.Component {
         height,
         order,
         parent_id,
-        template_id,
+        template,
       }
       // If we already have a BCT open, find it in our cards
       const blankFound = _.find(this.state.cards, { cardType: 'blank' })
