@@ -107,6 +107,14 @@ export const SubText = styled.span`
 SubText.displayName = 'StyledSubText'
 
 /** @component */
+export const SmallHelperText = styled.span`
+  color: ${v.colors.gray};
+  font-family: ${v.fonts.sans};
+  font-size: 0.75rem;
+`
+SmallHelperText.displayName = 'SmallHelperText'
+
+/** @component */
 export const Anchor = styled.a`
   cursor: pointer;
   color: ${v.colors.pacificBlue};

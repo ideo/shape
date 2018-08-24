@@ -8,7 +8,7 @@ import AddTextIcon from '~/ui/icons/AddTextIcon'
 import AddCollectionIcon from '~/ui/icons/AddCollectionIcon'
 import AddFileIcon from '~/ui/icons/AddFileIcon'
 import AddVideoIcon from '~/ui/icons/AddVideoIcon'
-import AddLinkIcon from '~/ui/icons/AddLinkIcon'
+import LinkIcon from '~/ui/icons/LinkIcon'
 import TemplateIcon from '~/ui/icons/TemplateIcon'
 import SubmissionBoxIcon from '~/ui/icons/SubmissionBoxIcon'
 import v, { ITEM_TYPES } from '~/utils/variables'
@@ -379,7 +379,7 @@ class GridCardBlank extends React.Component {
         creating={creating}
         size={size}
         onClick={this.startCreating('submissionBox')}
-        Icon={SubmissionBoxIcon}
+        Icon={() => <SubmissionBoxIcon viewBox="-5 0 60 60" />}
       />
     )
 
@@ -423,7 +423,7 @@ class GridCardBlank extends React.Component {
               creating={creating}
               size={size}
               onClick={this.startCreating('link')}
-              Icon={AddLinkIcon}
+              Icon={() => <LinkIcon viewBox="-11 -11 40 40" />}
             />
           }
           {(isReplacing || creating === 'video') &&

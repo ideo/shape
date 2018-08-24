@@ -15,6 +15,7 @@ import FilledProfileIcon from '~/ui/icons/FilledProfileIcon'
 import ProfileIcon from '~/ui/icons/ProfileIcon'
 import TemplateIcon from '~/ui/icons/TemplateIcon'
 import SystemIcon from '~/ui/icons/SystemIcon'
+import SubmissionBoxIconLg from '~/ui/icons/SubmissionBoxIconLg'
 import TagEditorModal from '~/ui/pages/shared/TagEditorModal'
 import { FixedHeader, MaxWidthContainer } from '~/ui/global/styled/layout'
 import { SubduedHeading1 } from '~/ui/global/styled/typography'
@@ -180,12 +181,18 @@ class PageHeader extends React.Component {
 
   get collectionTypeIcon() {
     const { record } = this.props
+    let icon = ''
     if (record.isUserProfile) {
-      return <IconHolder align="right"><ProfileIcon /></IconHolder>
+      icon = <ProfileIcon />
     } else if (record.isProfileCollection) {
-      return <IconHolder align="right"><SystemIcon /></IconHolder>
+      icon = <SystemIcon />
     } else if (record.isTemplated) {
-      return <IconHolder align="right"><TemplateIcon circled /></IconHolder>
+      icon = <TemplateIcon circled />
+    } else if (record.isSubmissionBox) {
+      icon = <SubmissionBoxIconLg />
+    }
+    if (icon) {
+      return <IconHolder align="right">{ icon }</IconHolder>
     }
     return null
   }

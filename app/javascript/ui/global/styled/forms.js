@@ -111,10 +111,10 @@ export const TextField = styled.input`
 TextField.displayName = 'StyledTextField'
 
 /** @component */
-export const BCTTextField = TextField.extend`
+export const BctTextField = TextField.extend`
   background: ${v.colors.cararra};
 `
-BCTTextField.displayName = 'BCTTextField'
+BctTextField.displayName = 'BctTextField'
 
 /** @component */
 export const FormSpacer = styled.div`

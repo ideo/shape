@@ -14,8 +14,8 @@ class CollectionTemplateBuilder
   def call
     return false unless create_collection
     place_collection_in_parent
-    # re-save to capture new breadcrumb + tag lists
-    @collection.save
+    # re-save to capture cover, new breadcrumb + tag lists
+    @collection.cache_cover!
     @collection
   end
 
@@ -32,12 +32,25 @@ class CollectionTemplateBuilder
       name: "My #{@template.name}",
       organization: @parent.organization,
     )
+    # make sure to assign these permissions before the template cards are generated
+    assign_submission_permissions
     @created_by.add_role(Role::EDITOR, @collection)
     @template.setup_templated_collection(
       for_user: @created_by,
       collection: @collection,
     )
     @collection
+  end
+
+  def assign_submission_permissions
+    # this only applies to submissions into a submissions collection
+    return unless @parent.is_a? Collection::SubmissionsCollection
+    # all the roles come from the submission box (editors, viewers)
+    # NOTE: this will create Viewer/Editor roles so make sure this runs before
+    # calling any `add_role` functions e.g. @created_by.add_role... above
+    @parent.submission_box.roles.each do |role|
+      role.duplicate!(assign_resource: @collection)
+    end
   end
 
   def place_collection_in_parent
