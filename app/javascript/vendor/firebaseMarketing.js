@@ -12,6 +12,33 @@ const config = {
   messagingSenderId: '386968419386'
 }
 
+/*
+{
+  "$id": "https://shape.ideo.com/productDescription.schema.json",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "description:": "Product descriptions for the ideo Shape marketing site",
+  "type": "object",
+  "properties": {
+    "productDescription": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string"
+    },
+    "imageUrl": {
+      "type": "string"
+    },
+    "order": {
+      "type": "number"
+      "minimum": -99,
+      "maximum": 99
+    },
+    "title": {
+      "type": "string"
+    },
+}
+*/
+
 firebase.initializeApp(config)
 let db = {}
 db = firebase.firestore()

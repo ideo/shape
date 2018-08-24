@@ -23,6 +23,7 @@ export const MarketingBack = styled.div`
   background: white;
   margin-left: 0px;
   margin-right: 0px;
+  padding-top: 2rem;
 `
 // TODO: remove browser-prefixes
 /** @component */
@@ -168,6 +169,7 @@ export const MarketingBetaSticker = styled.img.attrs({
 
 /** @component */
 export const MarketingShapeLogo = styled.img.attrs({
+  ref: 'MarketingShapeLogo',
   src: 'https://s3-us-west-2.amazonaws.com/assets.shape.space/logo.svg'
 })`
   alt: 'Shape';

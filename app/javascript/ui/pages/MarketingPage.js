@@ -2,33 +2,46 @@ import { Fragment } from 'react'
 import { Box } from 'reflexbox'
 
 import { MarketingBack,
-  MarketingGradientTop,
   MarketingFooter,
-  MarketingTagLine,
   MarketingHeavyCTA,
-  MarketingVideoLink,
-  MarketingShapeLogo,
-  MarketingBetaSticker,
-  MarketingCallToAction,
   InvertMarketingLink,
   InvertMarketingContent,
   InvertMarketingH1,
   InvertMarketingH2,
   InvertMarketingLinkMail,
   MarketingFlex,
+  MarketingTagLine,
+  MarketingVideoLink,
+  MarketingShapeLogo,
+  MarketingBetaSticker,
+  MarketingCallToAction,
+  MarketingGradientTop,
 } from '~/ui/global/styled/marketing.js'
 import poweredByIdeo from '~/assets/Powered-by-IDEO-Inverted.png'
 import MarketingMenu from '~/ui/pages/SubComponents/MarketingMenu.js'
 import SubscribeEmail from '~/ui/pages/SubComponents/SubscribeEmail.js'
 import ProductDescriptions from '~/ui/pages/SubComponents/ProductDescriptions.js'
+import { Element as ScrollElement } from 'react-scroll'
+import VisibilitySensor from 'react-visibility-sensor'
 
-class MarketingPage extends React.PureComponent {
+class MarketingPage extends React.Component {
+  constructor(props) {
+    super(props)
+    this.state = { isLogoVisible: true }
+    this.handleLogoVisibility = this.handleLogoVisibility.bind(this)
+  }
+
+  handleLogoVisibility(isVisible) {
+    this.setState({ isLogoVisible: isVisible })
+  }
+
   render() {
     return (
       <Fragment>
         <MarketingBack>
           <MarketingGradientTop>
-            <MarketingMenu />
+            <MarketingMenu isBigLogoVisible={this.state.isLogoVisible} />
+            <ScrollElement name="TopAnchor" />
             <MarketingBetaSticker />
 
             <MarketingFlex
@@ -39,7 +52,14 @@ class MarketingPage extends React.PureComponent {
             >
               <Box w={[null, 1 / 5]} />
               <Box w={[1, 3 / 5]} >
-                <MarketingShapeLogo />
+                <VisibilitySensor
+                  partialVisibility
+                  scrollCheck
+                  intervalDelay={300}
+                  onChange={this.handleLogoVisibility}
+                >
+                  <MarketingShapeLogo />
+                </VisibilitySensor>
               </Box>
               <Box w={[null, 1 / 5]} />
 
@@ -80,6 +100,7 @@ class MarketingPage extends React.PureComponent {
             w={1}
           >
             <Box w={1} justify="center" >
+              <ScrollElement name="ContentAnchor" />
               <ProductDescriptions />
             </Box>
           </MarketingFlex>
@@ -103,6 +124,7 @@ class MarketingPage extends React.PureComponent {
               </InvertMarketingH2>
             </Box>
 
+            <ScrollElement name="FooterAnchor" />
             <Box w={1} py={32}>
               <a href="https://profile.ideo.com/">
                 <MarketingHeavyCTA href="https://profile.ideo.com">GET EARLY ACCESS</MarketingHeavyCTA>
