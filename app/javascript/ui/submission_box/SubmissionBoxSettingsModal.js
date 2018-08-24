@@ -1,4 +1,5 @@
 import _ from 'lodash'
+import pluralize from 'pluralize'
 import { observable, runInAction } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 // import styled from 'styled-components'
@@ -100,31 +101,37 @@ class SubmissionBoxSettingsModal extends React.Component {
     uiStore.update('submissionBoxSettingsOpen', false)
   }
 
-  confirmSubmissionTemplateChange = (callback) => {
-    const { uiStore } = this.props
-    uiStore.confirm({
-      iconName: 'Alert',
-      prompt: `Are you sure?
-              There are already {X}.
-              New submissions will be {Y}`,
-      confirmText: 'Continue',
-      cancelText: 'Cancel',
-      onConfirm: () => callback(),
-      onCancel: () => uiStore.closeDialog(),
-    })
+  confirmSubmissionTemplateChange = ({ type, template } = {}, callback) => {
+    const { uiStore, collection } = this.props
+    if (collection.countSubmissions) {
+      uiStore.confirm({
+        iconName: 'Alert',
+        prompt: `Are you sure?
+                There are already ${collection.countSubmissions} submissions.
+                New submissions will be
+                ${template ? pluralize(template.name) : pluralize(`${type} item`)}.`,
+        confirmText: 'Continue',
+        cancelText: 'Cancel',
+        onConfirm: () => callback(),
+        onCancel: () => uiStore.closeDialog(),
+      })
+      return
+    }
+    // otherwise just go straight to the callback if no submissions
+    callback()
   }
 
-  chooseTemplate = templateId => () => {
-    this.confirmSubmissionTemplateChange(() => {
+  chooseTemplate = template => () => {
+    this.confirmSubmissionTemplateChange({ template }, () => {
       this.updateCollection({
-        submission_template_id: templateId,
+        submission_template_id: template.id,
         submission_box_type: 'template',
       })
     })
   }
 
   chooseSubmissionBoxType = type => () => {
-    this.confirmSubmissionTemplateChange(() => {
+    this.confirmSubmissionTemplateChange({ type }, () => {
       this.props.collection.submission_template = null
       this.updateCollection({
         submission_template_id: null,
@@ -192,7 +199,7 @@ class SubmissionBoxSettingsModal extends React.Component {
               className={`${submission_template_id === template.id ? 'selected' : ''}`}
               key={template.id}
               noSpacing
-              onClick={this.chooseTemplate(template.id)}
+              onClick={this.chooseTemplate(template)}
             >
               <ThumbnailHolder>
                 <img src={template.cover.image_url} alt={template.name} />

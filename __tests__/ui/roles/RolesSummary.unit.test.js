@@ -35,17 +35,33 @@ describe('RolesSummary', () => {
     })
 
     it('renders editors', () => {
-      expect(wrapper.render().text()).toMatch(/editors/i)
+      expect(wrapper.find('StyledRoleTitle').at(0).render().text()).toMatch(/editors/i)
       expect(wrapper.find('[className="editor"]').length).toEqual(2)
     })
 
     it('renders viewers', () => {
-      expect(wrapper.render().text()).toMatch(/viewers/i)
+      expect(wrapper.find('StyledRoleTitle').at(1).render().text()).toMatch(/viewers/i)
       expect(wrapper.find('[className="viewer"]').length).toEqual(2)
     })
 
     it('does not render StyledAddUserBtn by default', () => {
       expect(wrapper.find('StyledAddUserBtn').exists()).toBe(false)
+    })
+  })
+
+  describe('with custom label', () => {
+    beforeEach(() => {
+      const newProps = {
+        roles: [editorRole, { ...viewerRole, label: 'participant' }],
+        handleClick: jest.fn()
+      }
+      wrapper = shallow(
+        <RolesSummary {...newProps} />
+      )
+    })
+
+    it('renders viewers with custom label', () => {
+      expect(wrapper.find('StyledRoleTitle').at(1).render().text()).toMatch(/participants/i)
     })
   })
 

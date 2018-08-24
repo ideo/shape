@@ -97,6 +97,13 @@ class RoleSelect extends React.Component {
     return this.props.onDelete(role, entity, { isSwitching, organizationChange })
   }
 
+  labelFor = (roleType) => {
+    const { roleLabels } = this.props
+    // either return the override label (if present) or just the passed in name
+    // e.g. for labeling "Viewer" as "Participant"
+    return _.startCase(roleLabels[roleType] || roleType)
+  }
+
   renderName() {
     const { entity } = this.props
     let nameDisplay = entity.name
@@ -127,7 +134,7 @@ class RoleSelect extends React.Component {
         >
           { roleTypes.map(roleType =>
             (<MenuItem key={roleType} value={roleType}>
-              {_.startCase(roleType)}
+              {this.labelFor(roleType)}
             </MenuItem>))
           }
         </Select>
@@ -135,7 +142,7 @@ class RoleSelect extends React.Component {
     } else {
       select = (
         <DisplayTextPadded>
-          {_.startCase(role.name)}
+          {this.labelFor(role.name)}
         </DisplayTextPadded>
       )
     }
@@ -197,12 +204,17 @@ RoleSelect.propTypes = {
   role: MobxPropTypes.objectOrObservableObject.isRequired,
   roleTypes: PropTypes.arrayOf(PropTypes.string).isRequired,
   entity: MobxPropTypes.objectOrObservableObject.isRequired,
+  roleLabels: PropTypes.shape({
+    editor: PropTypes.string,
+    viewer: PropTypes.string,
+  }),
   onDelete: PropTypes.func.isRequired,
   onCreate: PropTypes.func.isRequired,
-  enabled: PropTypes.bool
+  enabled: PropTypes.bool,
 }
 RoleSelect.defaultProps = {
-  enabled: true
+  enabled: true,
+  roleLabels: {},
 }
 
 export default RoleSelect

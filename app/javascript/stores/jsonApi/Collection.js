@@ -49,6 +49,12 @@ class Collection extends BaseRecord {
     return submission_template ? submission_template.name : 'Submission'
   }
 
+  get countSubmissions() {
+    if (!this.isSubmissionBox) return 0
+    const { submissions_collection } = this
+    return submissions_collection ? submissions_collection.collection_cards.length : 0
+  }
+
   get isMasterTemplate() {
     return this.master_template
   }
