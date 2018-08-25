@@ -146,6 +146,7 @@ class CollectionGrid extends React.Component {
   }
 
   addSubmissionCard = (cards) => {
+
     const { collection, submissionSettings } = this.props
     if (_.find(cards, { id: 'submission' })) return
     const addSubmissionCard = {
@@ -157,7 +158,7 @@ class CollectionGrid extends React.Component {
       cardType: 'blank',
       blankType: 'submission',
       parent_id: collection.id,
-      submissionSettings: submissionSettings,
+      submissionSettings,
     }
     cards.unshift(addSubmissionCard)
   }
@@ -616,7 +617,7 @@ CollectionGrid.wrappedComponent.propTypes = {
 CollectionGrid.defaultProps = {
   addEmptyCard: true,
   submissionSettings: null,
-  blankContentToolState: {},
+  blankContentToolState: null,
 }
 CollectionGrid.displayName = 'CollectionGrid'
 

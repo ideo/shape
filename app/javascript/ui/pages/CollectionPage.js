@@ -19,24 +19,26 @@ const isHomepage = ({ params }) => (params.org && !params.id)
 @inject('apiStore', 'uiStore', 'routingStore')
 @observer
 class CollectionPage extends PageWithApi {
-  @observable loadingSubmissions = false
+  @observable loadedSubmissions = false
 
   componentWillReceiveProps(nextProps) {
     super.componentWillReceiveProps(nextProps)
     // when navigating between collections, close BCT
     if (nextProps.match.params.id !== this.props.match.params.id) {
       this.props.uiStore.closeBlankContentTool()
+      // reset loadedSubmissions
+      this.setLoadedSubmissions(false)
     }
   }
 
-  @action setLoadingSubmissions = val => {
+  @action setLoadedSubmissions = val => {
     const { submissions_collection } = this.collection
     if (submissions_collection && submissions_collection.cardIds.length) {
       // if submissions_collection is preloaded with some cards, no need to show loader
-      this.loadingSubmissions = false
+      this.loadedSubmissions = true
       return
     }
-    this.loadingSubmissions = val
+    this.loadedSubmissions = val
   }
 
   get isHomepage() {
@@ -85,9 +87,9 @@ class CollectionPage extends PageWithApi {
         }
       }
       if (collection.isSubmissionBox && collection.submissions_collection) {
-        this.setLoadingSubmissions(true)
+        this.setLoadedSubmissions(false)
         await apiStore.fetch('collections', collection.submissions_collection.id, true)
-        this.setLoadingSubmissions(false)
+        this.setLoadedSubmissions(true)
       }
     } else {
       apiStore.clearUnpersistedThreads()
@@ -182,7 +184,7 @@ class CollectionPage extends PageWithApi {
           <MoveModal />
           { submissions_collection && (
             <div>
-              { this.loadingSubmissions
+              { !this.loadedSubmissions
                 ? <Loader />
                 : (
                   <div>
@@ -198,7 +200,7 @@ class CollectionPage extends PageWithApi {
                       blankContentToolState={
                         blankContentToolState.collectionId === submissions_collection.id
                           ? blankContentToolState
-                          : {}
+                          : null
                       }
                       submissionSettings={{
                         type: collection.submission_box_type,
