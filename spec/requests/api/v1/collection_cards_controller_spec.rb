@@ -245,7 +245,7 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
     let(:params_at_end) { raw_params.merge(placement: 'end').to_json }
     let(:params) { raw_params.to_json }
 
-    describe 'without content editor access for to_collection' do
+    context 'without content editor access for to_collection' do
       let(:to_collection) { create(:collection) }
 
       it 'returns a 401' do
@@ -254,7 +254,7 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
       end
     end
 
-    describe 'with content editor access for to_collection' do
+    context 'with content editor access for to_collection' do
       let(:editor) { create(:user) }
       let(:viewer) { create(:user) }
       let(:to_collection) do
@@ -321,7 +321,7 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
     end
     let(:params) { raw_params.to_json }
 
-    describe 'without content editor access for to_collection' do
+    context 'without content editor access for to_collection' do
       let(:to_collection) { create(:collection) }
 
       it 'returns a 401' do
@@ -330,7 +330,7 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
       end
     end
 
-    describe 'without view access for cards in from_collection' do
+    context 'without view access for cards in from_collection' do
       let(:to_collection) do
         create(:collection, num_cards: 3, add_editors: [user])
       end
@@ -342,7 +342,7 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
       end
     end
 
-    describe 'with content editor access for to_collection and view access for cards in from_collection' do
+    context 'with content editor access for to_collection and view access for cards in from_collection' do
       let(:editor) { create(:user) }
       let(:viewer) { create(:user) }
       let(:to_collection) do
@@ -386,7 +386,7 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
     end
     let(:params) { raw_params.to_json }
 
-    describe 'without content editor access for to_collection' do
+    context 'without content editor access for to_collection' do
       let(:to_collection) { create(:collection) }
 
       it 'returns a 401' do
@@ -395,7 +395,7 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
       end
     end
 
-    describe 'without view access for cards in from_collection' do
+    context 'without view access for cards in from_collection' do
       let(:to_collection) do
         create(:collection, num_cards: 3, add_editors: [user])
       end
@@ -407,7 +407,24 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
       end
     end
 
-    describe 'with content editor access for to_collection and view access for cards in from_collection' do
+    context 'trying to duplicate inside of itself' do
+      let(:from_collection) { create(:collection, add_editors: [user]) }
+      let(:parent_card) { create(:collection_card, collection: from_collection) }
+      let(:moving_cards) { [parent_card] }
+      let(:to_collection) { create(:collection, add_editors: [user], parent_collection: from_collection) }
+
+      before do
+        from_collection.recalculate_breadcrumb!
+        to_collection.recalculate_breadcrumb!
+      end
+
+      it 'returns a 400' do
+        post(path, params: params)
+        expect(response.status).to eq(400)
+      end
+    end
+
+    context 'with content editor access for to_collection and view access for cards in from_collection' do
       let(:editor) { create(:user) }
       let(:viewer) { create(:user) }
       let(:to_collection) do

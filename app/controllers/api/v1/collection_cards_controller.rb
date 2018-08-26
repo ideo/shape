@@ -76,6 +76,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
     move
   end
 
+  before_action :check_valid_duplication, only: %i[duplicate]
   def duplicate
     placement = json_api_params[:placement]
     should_update_cover = false
@@ -132,6 +133,16 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
     @collection_cards.each do |cc|
       authorize! :edit, cc
     end
+  end
+
+  def check_valid_duplication
+    @cards.each do |card|
+      record = card.record
+      if @to_collection.breadcrumb_contains?(klass: record.class.base_class.name, id: record.id)
+        @errors = 'You can\'t move a collection inside of itself.'
+      end
+    end
+    @errors ? head(400) : true
   end
 
   def create_notification(card, action)
