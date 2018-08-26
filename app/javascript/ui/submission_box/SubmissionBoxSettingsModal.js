@@ -99,6 +99,7 @@ class SubmissionBoxSettingsModal extends React.Component {
     })
     await collection.save()
     uiStore.update('submissionBoxSettingsOpen', false)
+    uiStore.update('loadedSubmissions', true)
   }
 
   confirmSubmissionTemplateChange = ({ type, template } = {}, callback) => {

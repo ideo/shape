@@ -1,7 +1,6 @@
 import { Fragment } from 'react'
 import pluralize from 'pluralize'
 import ReactRouterPropTypes from 'react-router-prop-types'
-import { observable, action } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 
 import PageError from '~/ui/global/PageError'
@@ -19,26 +18,27 @@ const isHomepage = ({ params }) => (params.org && !params.id)
 @inject('apiStore', 'uiStore', 'routingStore')
 @observer
 class CollectionPage extends PageWithApi {
-  @observable loadedSubmissions = false
-
   componentWillReceiveProps(nextProps) {
     super.componentWillReceiveProps(nextProps)
     // when navigating between collections, close BCT
-    if (nextProps.match.params.id !== this.props.match.params.id) {
-      this.props.uiStore.closeBlankContentTool()
+    const { uiStore, match } = this.props
+    if (nextProps.match.params.id !== match.params.id) {
+      uiStore.closeBlankContentTool()
       // reset loadedSubmissions
       this.setLoadedSubmissions(false)
     }
   }
 
-  @action setLoadedSubmissions = val => {
+  setLoadedSubmissions = val => {
+    const { uiStore } = this.props
+    if (!this.collection) return
     const { submissions_collection } = this.collection
     if (submissions_collection && submissions_collection.cardIds.length) {
       // if submissions_collection is preloaded with some cards, no need to show loader
-      this.loadedSubmissions = true
+      uiStore.update('loadedSubmissions', true)
       return
     }
-    this.loadedSubmissions = val
+    uiStore.update('loadedSubmissions', val)
   }
 
   get isHomepage() {
@@ -113,13 +113,14 @@ class CollectionPage extends PageWithApi {
 
   get submissionsPageSeparator() {
     const { collection } = this
-    const { submissionTypeName } = collection
+    const { submissionTypeName, submissions_collection } = collection
+    if (!submissions_collection) return ''
     return (
       <PageSeparator title={(
         <h3>
-          {collection.submissions_collection.collection_cards.length}
+          {submissions_collection.collection_cards.length}
           {' '}
-          {collection.submissions_collection.collection_cards.length === 1
+          {submissions_collection.collection_cards.length === 1
             ? submissionTypeName
             : pluralize(submissionTypeName)
           }
@@ -139,11 +140,12 @@ class CollectionPage extends PageWithApi {
 
     const { uiStore } = this.props
     // submissions_collection will only exist for submission boxes
-    const { submissions_collection } = collection
+    const { submissions_collection, isSubmissionBox } = collection
     const {
       blankContentToolState,
       submissionBoxSettingsOpen,
       gridSettings,
+      loadedSubmissions,
     } = uiStore
     const { movingCardIds, cardAction } = uiStore
     // only tell the Grid to hide "movingCards" if we're moving and not linking
@@ -174,7 +176,7 @@ class CollectionPage extends PageWithApi {
             movingCards={uiStore.movingCardIds.length}
             sortBy={sortBy}
             // don't add the extra row for submission box
-            addEmptyCard={!collection.isSubmissionBox}
+            addEmptyCard={!isSubmissionBox}
           />
           {(collection.requiresSubmissionBoxSettings || submissionBoxSettingsOpen) &&
             <SubmissionBoxSettingsModal
@@ -182,9 +184,9 @@ class CollectionPage extends PageWithApi {
             />
           }
           <MoveModal />
-          { submissions_collection && (
+          { isSubmissionBox && collection.submission_box_type && (
             <div>
-              { !this.loadedSubmissions
+              { !loadedSubmissions
                 ? <Loader />
                 : (
                   <div>
@@ -197,11 +199,7 @@ class CollectionPage extends PageWithApi {
                       // Pass in cardIds so grid will re-render when they change
                       cardIds={submissions_collection.cardIds}
                       // Pass in BCT state so grid will re-render when open/closed
-                      blankContentToolState={
-                        blankContentToolState.collectionId === submissions_collection.id
-                          ? blankContentToolState
-                          : null
-                      }
+                      blankContentToolState={blankContentToolState}
                       submissionSettings={{
                         type: collection.submission_box_type,
                         template: collection.submission_template,

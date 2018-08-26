@@ -101,6 +101,11 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
 
   def load_and_authorize_parent_collection
     @collection = Collection.find(collection_card_params[:parent_id])
+    if @collection.is_a?(Collection::SubmissionsCollection)
+      # if adding to a SubmissionsCollection, you only need to have viewer/"participant" access
+      authorize! :read, @collection
+      return
+    end
     authorize! :edit_content, @collection
   end
 

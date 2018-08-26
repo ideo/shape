@@ -14,6 +14,7 @@ export default class UiStore {
     replacingId: null,
     emptyCollection: false,
     collectionId: null,
+    blankType: null,
   }
   @observable blankContentToolState = { ...this.defaultBCTState }
   @observable openCardMenuId = false
@@ -29,6 +30,7 @@ export default class UiStore {
   @observable pageMenuOpen = false
   @observable tagsModalOpenId = null
   @observable submissionBoxSettingsOpen = null
+  @observable loadedSubmissions = false
   defaultGridSettings = {
     // layout will track we are at "size 3" i.e. "small 4 cols" even though cols === 4
     layoutSize: 4,

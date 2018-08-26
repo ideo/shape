@@ -157,7 +157,7 @@ Collection.type = 'collections'
 Collection.defaults = {
   // set as array so it's never `undefined`
   collection_cards: [],
-  roles: []
+  roles: [],
 }
 
 export default Collection

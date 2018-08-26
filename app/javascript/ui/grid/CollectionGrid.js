@@ -84,6 +84,7 @@ class CollectionGrid extends React.Component {
       cardIds,
       movingCardIds,
       submissionSettings,
+      canEditCollection,
     } = props
     // convert observableArray values into a "normal" JS array (equivalent of .toJS())
     // for the sake of later calculations/manipulations
@@ -95,14 +96,18 @@ class CollectionGrid extends React.Component {
     if (submissionSettings) {
       this.addSubmissionCard(cards)
     }
-    // If we have a BCT open...
-    if (blankContentToolState && blankContentToolState.order !== null) {
+    const bctOpen = (
+      blankContentToolState &&
+      blankContentToolState.order !== null &&
+      blankContentToolState.collectionId === collection.id
+    )
+    if (bctOpen) {
       // make the BCT appear to the right of the current card
       let { order } = blankContentToolState
       const {
         height,
         replacingId,
-        type,
+        blankType,
         width,
       } = blankContentToolState
       if (replacingId) {
@@ -117,7 +122,7 @@ class CollectionGrid extends React.Component {
         id: 'blank',
         num: 0,
         cardType: 'blank',
-        blankType: type,
+        blankType,
         width,
         height,
         order,
@@ -136,8 +141,7 @@ class CollectionGrid extends React.Component {
       // NOTE: how reliable is this length check for indicating a newly added card?
       const previousLength = this.props.cardIds.length
       const cardJustAdded = cardIds.length === previousLength + 1
-      if ((this.props.canEditCollection && !cardJustAdded) ||
-        blankCard.blankType === 'submission') {
+      if ((canEditCollection && !cardJustAdded) || blankCard.blankType) {
         // Add the BCT to the array of cards to be positioned, if they can edit
         cards.unshift(blankCard)
       }
@@ -146,17 +150,15 @@ class CollectionGrid extends React.Component {
   }
 
   addSubmissionCard = (cards) => {
-
     const { collection, submissionSettings } = this.props
     if (_.find(cards, { id: 'submission' })) return
     const addSubmissionCard = {
-      order: 0,
+      // this card is -1, BCT that gets added is 0
+      order: -1,
       width: 1,
       height: 1,
-      emptyCollection: true,
       id: 'submission',
-      cardType: 'blank',
-      blankType: 'submission',
+      cardType: 'submission',
       parent_id: collection.id,
       submissionSettings,
     }

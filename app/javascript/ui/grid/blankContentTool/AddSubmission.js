@@ -81,19 +81,25 @@ class AddSubmission extends React.Component {
 
   handleSubmission = async (ev) => {
     ev.preventDefault()
-    const { parent_id, submissionSettings } = this.props
+    const { uiStore, parent_id, submissionSettings } = this.props
     const { type, template } = submissionSettings
-    // TODO: non-template types currently not supported
-    if (type !== 'template' || !template) return
-    const templateData = {
-      template_id: template.id,
-      parent_id,
-      placement: 'beginning',
+    if (type === 'template' && template) {
+      const templateData = {
+        template_id: template.id,
+        parent_id,
+        placement: 'beginning',
+      }
+      this.setState({ loading: true })
+      const res = await apiStore.createTemplateInstance(templateData)
+      this.setState({ loading: false })
+      routingStore.routeTo('collections', res.data.id)
+    } else {
+      uiStore.openBlankContentTool({
+        order: 0,
+        collectionId: parent_id,
+        blankType: type,
+      })
     }
-    this.setState({ loading: true })
-    const res = await apiStore.createTemplateInstance(templateData)
-    this.setState({ loading: false })
-    routingStore.routeTo('collections', res.data.id)
   }
 
   renderInner = () => {

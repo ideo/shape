@@ -5,7 +5,8 @@ RSpec.describe CollectionTemplateBuilder, type: :service do
   let(:template) do
     create(:collection, organization: organization, master_template: true, num_cards: 2, pin_cards: true)
   end
-  let(:parent) { create(:collection, num_cards: 2, organization: organization) }
+  let(:viewer) { create(:user) }
+  let(:parent) { create(:collection, num_cards: 2, organization: organization, add_viewers: [viewer]) }
   let(:user) { create(:user) }
   let(:builder) do
     CollectionTemplateBuilder.new(
@@ -26,6 +27,11 @@ RSpec.describe CollectionTemplateBuilder, type: :service do
     it 'should give the creator editor access to collection and its items' do
       expect(collection.can_edit?(user)).to be true
       expect(collection.collection_cards.first.record.can_edit?(user)).to be true
+    end
+
+    it 'should give parent collection users the same access to collection and its items' do
+      expect(collection.can_view?(viewer)).to be true
+      expect(collection.collection_cards.first.record.can_view?(viewer)).to be true
     end
 
     it 'should create a new collection that copies the pinned cards from the template' do
@@ -50,7 +56,7 @@ RSpec.describe CollectionTemplateBuilder, type: :service do
     end
 
     context 'when parent is a submissions_collection' do
-      let(:submission_box) { create(:submission_box, add_editors: [user]) }
+      let(:submission_box) { create(:submission_box, add_editors: [user], add_viewers: [viewer]) }
       let(:parent) { create(:submissions_collection, submission_box: submission_box) }
 
       it 'should create a new collection that is linked to the template' do
@@ -59,6 +65,9 @@ RSpec.describe CollectionTemplateBuilder, type: :service do
 
       it 'should assign permissions from the submission_box' do
         expect(collection.can_edit?(user)).to be true
+        expect(collection.collection_cards.first.record.can_edit?(user)).to be true
+        expect(collection.can_view?(viewer)).to be true
+        expect(collection.collection_cards.first.record.can_view?(viewer)).to be true
       end
     end
 
