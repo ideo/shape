@@ -74,7 +74,7 @@ module Breadcrumb
 
     # we directly look up has_role_by_identifier for the breadcrumb, e.g. ["Collection", 4, "Name"]
     def user_can?(role_name, breadcrumb_item)
-      return true if user.has_role? :super_admin
+      return true if user.has_cached_role?(Role::SUPER_ADMIN)
       resource_identifier = resource_identifier_for_breadcrumb_item(breadcrumb_item)
       user.has_role_by_identifier?(role_name, resource_identifier)
     end

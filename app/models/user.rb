@@ -285,7 +285,7 @@ class User < ApplicationRecord
   end
 
   def organizations
-    return super unless has_role?(Role::SUPER_ADMIN)
+    return super unless has_cached_role?(Role::SUPER_ADMIN)
     Organization.all
   end
 
