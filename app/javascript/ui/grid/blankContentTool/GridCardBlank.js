@@ -174,7 +174,7 @@ class GridCardBlank extends React.Component {
     super(props)
     const { preselected } = props
     this.state = {
-      creating: preselected,
+      creating: preselected || null,
       loading: false,
       droppingFile: false,
       bctMenuOpen: false,
