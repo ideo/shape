@@ -1,0 +1,3 @@
+[submodule "app/javascript/ui/shared"]
+	path = app/javascript/ui/shared
+	url = git@github.com:ideo/network-react-components.git
