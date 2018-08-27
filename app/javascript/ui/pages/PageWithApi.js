@@ -25,7 +25,7 @@ class PageWithApi extends React.Component {
   componentWillReceiveProps(nextProps) {
     // this will get called e.g. if you switch between CollectionPages
     // (component does not "re-mount" between routes, but the props change)
-    if (this.checkOrg(nextProps)) {
+    if (this.checkOrg(nextProps) && this.requiresFetch(nextProps)) {
       this.fetchData(nextProps)
     }
   }
@@ -38,6 +38,14 @@ class PageWithApi extends React.Component {
 
   @action updateError(err) {
     this.error = err
+  }
+
+  requiresFetch = ({ match }) => {
+    // eslint-disable-next-line react/prop-types
+    if (this.props.match && this.props.match.url === match.url) {
+      return false
+    }
+    return true
   }
 
   checkOrg = ({ match, apiStore, routingStore }) => {

@@ -38,10 +38,21 @@ class Collection extends BaseRecord {
     return this.type === 'Collection::SubmissionBox'
   }
 
-  get requiresSubmissionBoxSetup() {
+  get requiresSubmissionBoxSettings() {
     if (!this.isSubmissionBox) return false
     // if type is null then it requires setup
     return !this.submission_box_type
+  }
+
+  get submissionTypeName() {
+    const { submission_template } = this
+    return submission_template ? submission_template.name : 'Submission'
+  }
+
+  get countSubmissions() {
+    if (!this.isSubmissionBox) return 0
+    const { submissions_collection } = this
+    return submissions_collection ? submissions_collection.collection_cards.length : 0
   }
 
   get isMasterTemplate() {
@@ -146,7 +157,7 @@ Collection.type = 'collections'
 Collection.defaults = {
   // set as array so it's never `undefined`
   collection_cards: [],
-  roles: []
+  roles: [],
 }
 
 export default Collection

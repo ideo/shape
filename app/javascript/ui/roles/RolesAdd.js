@@ -81,11 +81,6 @@ class RolesAdd extends React.Component {
     this.loading = value
   }
 
-  onUserSearch = (searchTerm) =>
-    this.props.onSearch(searchTerm).then((res) =>
-      res.data.map((user) =>
-        ({ value: user.email, label: user.name, data: user })))
-
   confirmSave = () => {
     const { ownerType } = this.props
     if (this.selectedUsers.length > 10) {
@@ -171,6 +166,13 @@ class RolesAdd extends React.Component {
     })
   }
 
+  labelFor = (roleType) => {
+    const { roleLabels } = this.props
+    // either return the override label (if present) or just the passed in name
+    // e.g. for labeling "Viewer" as "Participant"
+    return _.startCase(roleLabels[roleType] || roleType)
+  }
+
   renderPillList = () => {
     const count = this.selectedUsers.length
     if (count) {
@@ -203,7 +205,6 @@ class RolesAdd extends React.Component {
         <Row>
           <AutoComplete
             options={this.mapItems()}
-            onInputChange={this.onUserSearch}
             onOptionSelect={this.onUserSelected}
           />
           <RightAligner>
@@ -218,7 +219,7 @@ class RolesAdd extends React.Component {
               >
                 { roleTypes.map(roleType =>
                   (<MenuItem key={roleType} value={roleType}>
-                    {_.startCase(roleType)}
+                    {this.labelFor(roleType)}
                   </MenuItem>))
                 }
               </Select>
@@ -246,13 +247,16 @@ class RolesAdd extends React.Component {
 RolesAdd.propTypes = {
   searchableItems: MobxPropTypes.arrayOrObservableArray.isRequired,
   roleTypes: PropTypes.arrayOf(PropTypes.string).isRequired,
+  roleLabels: PropTypes.shape({
+    editor: PropTypes.string,
+    viewer: PropTypes.string,
+  }),
   onCreateRoles: PropTypes.func.isRequired,
   onCreateUsers: PropTypes.func.isRequired,
-  onSearch: PropTypes.func,
   ownerType: PropTypes.string.isRequired,
 }
 RolesAdd.defaultProps = {
-  onSearch: () => {}
+  roleLabels: {},
 }
 
 export default RolesAdd

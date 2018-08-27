@@ -48,6 +48,7 @@ class RolesModal extends React.Component {
           canEdit={record.can_edit}
           ownerId={record.id}
           ownerType={record.internalType}
+          submissionBox={record.isSubmissionBox}
           title="Shared with"
           roles={roles}
           onSave={this.onSave}

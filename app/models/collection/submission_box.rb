@@ -21,6 +21,11 @@ class Collection
       )
     end
 
+    def setup_submissions_collection!
+      setup_submissions_collection
+      submissions_collection.save
+    end
+
     def destroyable?
       # destroyable if it hasn't finished setting up
       submission_box_type.nil?
