@@ -1,0 +1,42 @@
+{
+  "compilerOptions": {
+    "allowJs": false,
+    "allowSyntheticDefaultImports": true,
+    "baseUrl": ".",
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "jsx": "react",
+    "lib": ["es2016", "dom", "es2017.object"],
+    "moduleResolution": "Node",
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitReturns": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "outDir": "build",
+    "pretty": true,
+    "skipLibCheck": true,
+    "sourceMap": true,
+    "strict": true,
+    "strictPropertyInitialization": false,
+    "target": "es6",
+    "plugins": [
+      {
+        "name": "typescript-styled-plugin"
+      }
+    ],
+    "paths": {
+      "~helpers/*": ["__tests__/helpers/*"],
+      "~images/*": ["app/assets/images/*"],
+      "~stylesheets/*": ["app/assets/stylesheets/*"],
+      "~fonts/*": ["app/assets/fonts/*"],
+      "~shared/*": ["app/javascript/src/shared/*"],
+      "~*": ["app/javascript/src/*", "types/*"]
+    }
+  },
+  "include": [
+    "./app/javascript/**/*",
+    "./__tests__/**/*",
+    "./types/**/*",
+    "./styleguidist/**/*"
+  ]
+}
