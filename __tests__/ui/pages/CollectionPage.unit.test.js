@@ -6,6 +6,8 @@ import {
   fakeCollection
 } from '#/mocks/data'
 
+jest.mock('../../../app/javascript/stores')
+
 const id = 1
 const collections = [
   Object.assign({}, fakeCollection, { id: 1 }),
