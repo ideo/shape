@@ -7,6 +7,7 @@ import v, { ITEM_TYPES } from '~/utils/variables'
 import { StyledGridCard } from '~/ui/grid/shared'
 import InlineLoader from '~/ui/layout/InlineLoader'
 import { apiStore, routingStore } from '~/stores'
+import Collection from '~/stores/jsonApi/Collection'
 
 const StyledAddSubmission = StyledGridCard.extend`
   background: transparent;
@@ -79,27 +80,10 @@ class AddSubmission extends React.Component {
     this.createCard(attrs)
   }
 
-  handleSubmission = async (ev) => {
+  handleSubmission = (ev) => {
     ev.preventDefault()
     const { uiStore, parent_id, submissionSettings } = this.props
-    const { type, template } = submissionSettings
-    if (type === 'template' && template) {
-      const templateData = {
-        template_id: template.id,
-        parent_id,
-        placement: 'beginning',
-      }
-      this.setState({ loading: true })
-      const res = await apiStore.createTemplateInstance(templateData)
-      this.setState({ loading: false })
-      routingStore.routeTo('collections', res.data.id)
-    } else {
-      uiStore.openBlankContentTool({
-        order: 0,
-        collectionId: parent_id,
-        blankType: type,
-      })
-    }
+    Collection.createSubmission(parent_id, submissionSettings)
   }
 
   renderInner = () => {
