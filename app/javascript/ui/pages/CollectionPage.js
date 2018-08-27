@@ -3,14 +3,17 @@ import pluralize from 'pluralize'
 import ReactRouterPropTypes from 'react-router-prop-types'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 
-import PageError from '~/ui/global/PageError'
-import PageWithApi from '~/ui/pages/PageWithApi'
-import Loader from '~/ui/layout/Loader'
-import PageContainer from '~/ui/layout/PageContainer'
-import PageSeparator from '~/ui/global/PageSeparator'
+import Collection from '~/stores/jsonApi/Collection'
 import CollectionGrid from '~/ui/grid/CollectionGrid'
+import FloatingActionButton from '~/ui/global/FloatingActionButton'
+import Loader from '~/ui/layout/Loader'
 import MoveModal from '~/ui/grid/MoveModal'
+import PageContainer from '~/ui/layout/PageContainer'
+import PageError from '~/ui/global/PageError'
 import PageHeader from '~/ui/pages/shared/PageHeader'
+import PageSeparator from '~/ui/global/PageSeparator'
+import PageWithApi from '~/ui/pages/PageWithApi'
+import PlusIcon from '~/ui/icons/PlusIcon'
 import SubmissionBoxSettingsModal from '~/ui/submission_box/SubmissionBoxSettingsModal'
 
 const isHomepage = ({ params }) => (params.org && !params.id)
@@ -96,6 +99,16 @@ class CollectionPage extends PageWithApi {
     }
   }
 
+  onAddSubmission = (ev) => {
+    ev.preventDefault()
+    const { id } = this.collection.submissions_collection
+    const submissionSettings = {
+      type: this.collection.submission_box_type,
+      template: this.collection.submission_template,
+    }
+    Collection.createSubmission(id, submissionSettings)
+  }
+
   updateCollection = () => {
     // TODO: what if there's no collection?
     // calling .save() will receive any API updates and sync them
@@ -151,6 +164,7 @@ class CollectionPage extends PageWithApi {
     // only tell the Grid to hide "movingCards" if we're moving and not linking
     const uiMovingCardIds = cardAction === 'move' ? movingCardIds : []
     // SharedCollection has special behavior where it sorts by most recently updated
+    const { submissionTypeName } = collection
     const sortBy = collection.isSharedCollection ? 'updated_at' : 'order'
 
     return (
@@ -210,6 +224,11 @@ class CollectionPage extends PageWithApi {
                     />
                   </div>
                 )}
+              <FloatingActionButton
+                toolTip={`Add ${submissionTypeName}`}
+                onClick={this.onAddSubmission}
+                icon={<PlusIcon />}
+             />
             </div>
           )}
         </PageContainer>
