@@ -285,7 +285,8 @@ class GridCardBlank extends React.Component {
 
   closeBlankContentTool = () => {
     const { uiStore } = this.props
-    if (uiStore.blankContentToolState.emptyCollection) {
+    if (uiStore.blankContentToolState.emptyCollection &&
+        !this.props.preselected) {
       this.setState({ creating: null })
       // have to re-create the DropPane
       this.createDropPane()
