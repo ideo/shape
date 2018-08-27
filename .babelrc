@@ -37,10 +37,7 @@
     ["module-resolver", {
       "extensions": [".js", ".jsx", ".ts", ".tsx"],
       "alias": {
-        "~stylesheets": "./app/assets/stylesheets",
-        "~images": "./app/assets/images",
-        "~helpers": "./__tests__/helpers",
-        "~fonts": "./app/assets/fonts",
+        "~shared": "./app/javascript/ui/shared",
         "~": "./app/javascript",
         "^~(.+)": "./app/javascript/src/\\1",
         "#": "./__js_test_config"
