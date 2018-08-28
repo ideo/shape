@@ -2,9 +2,8 @@ module HasFilestackFile
   extend ActiveSupport::Concern
 
   included do
-    belongs_to :filestack_file,
-               dependent: :destroy,
-               optional: true
+    # Removing `dependent: :destroy` because multiple items can share the same filestack_file reference
+    belongs_to :filestack_file, optional: true
 
     accepts_nested_attributes_for :filestack_file
 

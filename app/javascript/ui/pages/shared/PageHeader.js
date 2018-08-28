@@ -135,6 +135,7 @@ class PageHeader extends React.Component {
           card={record.parent_collection_card}
           canEdit={record.can_edit}
           canReplace={record.canReplace}
+          submissionBox={record.isSubmissionBox}
           menuOpen={uiStore.pageMenuOpen}
           onOpen={this.openMenu}
           onLeave={this.closeMenu}

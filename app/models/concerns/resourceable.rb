@@ -56,7 +56,7 @@ module Resourceable
   end
 
   def can_edit?(user_or_group)
-    return true if user_or_group.has_role?(Role::SUPER_ADMIN)
+    return true if user_or_group.has_cached_role?(Role::SUPER_ADMIN)
     raise_role_name_not_set(:edit_role) if self.class.edit_role.blank?
     user_or_group.has_role_by_identifier?(self.class.edit_role, resource_identifier)
   end
@@ -118,10 +118,15 @@ module Resourceable
   end
 
   # NOTE: This should only ever be called on a newly created record, e.g. in CollectionCardBuilder
-  def inherit_roles_from_parent!
+  def inherit_roles_from_parent!(parent = self.parent)
     return false unless parent.present?
     return false if roles.present?
-    parent.roles.each do |role|
+    if parent.is_a? Collection::SubmissionsCollection
+      role_parent = parent.submission_box
+    else
+      role_parent = parent
+    end
+    role_parent.roles.each do |role|
       new_role = role.duplicate!(assign_resource: self, dont_save: true)
       # special case: CONTENT_EDITOR is a special role (for now).
       # when creating child content, CONTENT_EDITORS become EDITORS

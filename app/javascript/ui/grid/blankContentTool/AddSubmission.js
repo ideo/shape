@@ -7,6 +7,7 @@ import v, { ITEM_TYPES } from '~/utils/variables'
 import { StyledGridCard } from '~/ui/grid/shared'
 import InlineLoader from '~/ui/layout/InlineLoader'
 import { apiStore, routingStore } from '~/stores'
+import Collection from '~/stores/jsonApi/Collection'
 
 const StyledAddSubmission = StyledGridCard.extend`
   background: transparent;
@@ -47,7 +48,6 @@ class AddSubmission extends React.Component {
   state = {
     creating: null,
     loading: false,
-    // droppingFile: false,
   }
 
   componentWillUnmount() {
@@ -80,20 +80,16 @@ class AddSubmission extends React.Component {
     this.createCard(attrs)
   }
 
-  handleSubmission = async (ev) => {
+  handleSubmission = (ev) => {
     ev.preventDefault()
-    const { parent_id, template } = this.props
-    const templateData = {
-      template_id: template.id,
-      parent_id,
-      placement: 'beginning',
-    }
-    const res = await apiStore.createTemplateInstance(templateData)
-    routingStore.routeTo('collections', res.data.id)
+    const { uiStore, parent_id, submissionSettings } = this.props
+    Collection.createSubmission(parent_id, submissionSettings)
   }
 
   renderInner = () => {
-    const { template } = this.props
+    const { uiStore } = this.props
+    const { viewingCollection } = uiStore
+    if (!viewingCollection) return ''
     let inner
     // const { creating, loading, droppingFile } = this.state
     // const isReplacing = !!this.props.uiStore.blankContentToolState.replacingId
@@ -111,8 +107,12 @@ class AddSubmission extends React.Component {
 
     return (
       <StyledBlankCreationTool>
-        <h3>Add a new {pluralize.singular(template.name)}</h3>
-        <SubmissionButton onClick={this.handleSubmission}>
+        <h3>Add a new {pluralize.singular(viewingCollection.submissionTypeName)}</h3>
+        { this.state.loading && <InlineLoader /> }
+        <SubmissionButton
+          disabled={this.loading}
+          onClick={this.handleSubmission}
+        >
           &#43;
         </SubmissionButton>
         {inner}
@@ -123,7 +123,7 @@ class AddSubmission extends React.Component {
   render() {
     const { uiStore } = this.props
     const { gridSettings, blankContentToolState } = uiStore
-    // const { creating } = this.state
+
     return (
       <StyledAddSubmission>
         <StyledGridCardInner
@@ -133,25 +133,20 @@ class AddSubmission extends React.Component {
         >
           {this.renderInner()}
         </StyledGridCardInner>
-        { this.state.loading && <InlineLoader /> }
       </StyledAddSubmission>
     )
   }
 }
 
 AddSubmission.propTypes = {
-  // parent is the parent collection
-  // parent: MobxPropTypes.objectOrObservableObject.isRequired,
-  // afterCreate: PropTypes.func,
   parent_id: PropTypes.number.isRequired,
-  template: MobxPropTypes.objectOrObservableObject.isRequired,
+  submissionSettings: PropTypes.shape({
+    type: PropTypes.string,
+    template: MobxPropTypes.objectOrObservableObject,
+  }).isRequired,
 }
 AddSubmission.wrappedComponent.propTypes = {
   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
-  // apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
-}
-AddSubmission.defaultProps = {
-  // afterCreate: null,
 }
 
 // give a name to the injected component for unit tests
