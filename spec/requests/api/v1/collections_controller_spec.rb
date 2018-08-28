@@ -268,6 +268,14 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
       expect(collection_card.reload.order).to eq(1)
     end
 
+    it 'broadcasts collection updates' do
+      expect(CollectionUpdateBroadcaster).to receive(:call).with(
+        collection,
+        user,
+      )
+      patch(path, params: params)
+    end
+
     context 'with cancel_sync == true' do
       let(:params) {
         json_api_params(

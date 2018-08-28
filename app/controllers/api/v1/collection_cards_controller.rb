@@ -8,6 +8,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
     render jsonapi: @collection.collection_cards
   end
 
+  after_action :broadcast_collection_create_updates, only: %i[create]
   def create
     card_params = collection_card_params
     type = card_params.delete(:type) || 'primary'
@@ -34,6 +35,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
   end
 
   before_action :load_and_authorize_cards, only: %i[archive]
+  after_action :broadcast_collection_archive_updates, only: %i[archive]
   def archive
     CollectionCardArchiveWorker.perform_async(
       @collection_cards.pluck(:id),
@@ -52,6 +54,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
   end
 
   before_action :load_and_authorize_moving_collections, only: %i[move]
+  after_action :broadcast_moving_collection_updates, only: %i[move]
   def move
     mover = CardMover.new(
       from_collection: @from_collection,
@@ -160,6 +163,19 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
       subject_user_ids: card.record.editors[:users].pluck(:id),
       subject_group_ids: card.record.editors[:groups].pluck(:id),
     )
+  end
+
+  def broadcast_moving_collection_updates
+    CollectionUpdateBroadcaster.call(@from_collection, current_user)
+    CollectionUpdateBroadcaster.call(@to_collection, current_user)
+  end
+
+  def broadcast_collection_create_updates
+    CollectionUpdateBroadcaster.call(@collection, current_user)
+  end
+
+  def broadcast_collection_archive_updates
+    CollectionUpdateBroadcaster.call(@collection_cards.first.parent, current_user)
   end
 
   def collection_card_params

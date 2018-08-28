@@ -2,6 +2,7 @@ class Collection < ApplicationRecord
   include Breadcrumbable
   include Resourceable
   include Archivable
+  include RealtimeEditorsViewers
   include HasActivities
   include Templateable
 

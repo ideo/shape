@@ -1,43 +1,18 @@
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import { observable, runInAction } from 'mobx'
 import styled from 'styled-components'
-import Snackbar from '@material-ui/core/Snackbar'
-import SnackbarContent from '@material-ui/core/SnackbarContent'
+
 import CloseIcon from '~/ui/icons/CloseIcon'
 import InlineLoader from '~/ui/layout/InlineLoader'
 import MoveArrowIcon from '~/ui/icons/MoveArrowIcon'
 import MoveHelperModal from '~/ui/users/MoveHelperModal'
 import Tooltip from '~/ui/global/Tooltip'
 import v from '~/utils/variables'
-
-const StyledSnackbar = styled(Snackbar)`
-  &.Snackbar {
-    width: 100%;
-    top: auto;
-    max-width: 673px;
-    margin-bottom: 35px;
-    flex-grow: 1;
-    color: white;
-    background-color: transparent;
-  }
-`
-
-const StyledSnackbarContent = styled(SnackbarContent)`
-  &.SnackbarContent {
-    background-color: ${v.colors.cloudy};
-    max-width: none;
-    padding: 15px 30px;
-    width: 100%;
-  }
-`
-
-// TODO share styles
-const SnackbarBackground = styled.div`
-  background-color: ${v.colors.cloudy};
-  min-height: 36px;
-  padding: 15px 30px;
-  width: 100%;
-`
+import {
+  StyledSnackbar,
+  StyledSnackbarContent,
+  SnackbarBackground,
+} from '~/ui/global/styled/material-ui'
 
 // This text is different from other typography
 const StyledMoveText = styled.span`
