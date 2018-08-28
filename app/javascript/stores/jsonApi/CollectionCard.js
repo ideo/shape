@@ -17,6 +17,7 @@ class CollectionCard extends BaseRecord {
     'item_id',
     'collection_attributes',
     'item_attributes',
+    'image_contain',
   ]
 
   @observable maxWidth = this.width

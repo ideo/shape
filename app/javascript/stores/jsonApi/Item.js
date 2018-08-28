@@ -60,6 +60,10 @@ class Item extends BaseRecord {
     return this.isGenericFile || this.isPdfFile
   }
 
+  get isImage() {
+    return this.filestack_file && this.mimeBaseType === 'image'
+  }
+
   API_updateWithoutSync({ cancel_sync } = {}) {
     const { apiStore } = this
     const data = this.toJsonApi()

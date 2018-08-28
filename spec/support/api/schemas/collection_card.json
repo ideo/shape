@@ -10,7 +10,8 @@
     "link": { "type": "boolean" },
     "can_move": { "type": "boolean" },
     "pinned": { "type": "boolean" },
-    "pinned_and_locked": { "type": "boolean" }
+    "pinned_and_locked": { "type": "boolean" },
+    "image_contain": { "type": "boolean" }
   },
   "required": ["id", "order", "width", "height", "type", "link"]
 }

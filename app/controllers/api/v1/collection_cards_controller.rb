@@ -33,6 +33,15 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
     end
   end
 
+  def update
+    @collection_card.attributes = collection_card_params
+    if @collection_card.save
+      render jsonapi: @collection_card
+    else
+      render_api_errors @collection_card.errors
+    end
+  end
+
   before_action :load_and_authorize_cards, only: %i[archive]
   def archive
     CollectionCardArchiveWorker.perform_async(
@@ -172,6 +181,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
       :collection_id,
       :item_id,
       :type,
+      :image_contain,
       collection_attributes: %i[
         id
         type
