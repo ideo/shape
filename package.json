@@ -108,6 +108,7 @@
     "react-router-prop-types": "^0.0.3",
     "react-scroll": "^1.7.7",
     "react-select": "^1.2.1",
+    "react-stripe-elements": "2.0.0",
     "react-svg-loader": "^2.1.0",
     "react-tag-autocomplete": "^5.5.1",
     "react-truncator": "^0.0.3",

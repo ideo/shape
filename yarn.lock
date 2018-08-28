@@ -9149,6 +9149,12 @@ react-select@^1.2.1:
     prop-types "^15.5.8"
     react-input-autosize "^2.1.2"
 
+react-stripe-elements@2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/react-stripe-elements/-/react-stripe-elements-2.0.0.tgz#5bfd881ad13e18a3255eff49f63ababf3861d216"
+  dependencies:
+    prop-types "^15.5.10"
+
 react-styleguidist@^7.0.9:
   version "7.0.9"
   resolved "https://registry.yarnpkg.com/react-styleguidist/-/react-styleguidist-7.0.9.tgz#57b851ac61231ec4b2d1085869b42d841ff25ed8"
