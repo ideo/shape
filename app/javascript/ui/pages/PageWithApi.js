@@ -40,9 +40,13 @@ class PageWithApi extends React.Component {
     this.error = err
   }
 
-  requiresFetch = ({ match }) => {
-    // eslint-disable-next-line react/prop-types
-    if (this.props.match && this.props.match.url === match.url) {
+  requiresFetch = ({ location, match }) => {
+    const prevProps = { ...this.props }
+    const prevMatch = prevProps.match || {}
+    const prevLocation = prevProps.location || {}
+    // check if URL and search params have actually changed
+    if (prevMatch.url === match.url && prevLocation.search === location.search) {
+      // if no change, then no need to re-fetch data
       return false
     }
     return true

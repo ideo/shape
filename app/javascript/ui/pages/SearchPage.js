@@ -36,6 +36,10 @@ class SearchPage extends PageWithApi {
     if (this.searchQuery(nextProps) !== this.searchQuery(this.props)) {
       this.searchResults.replace([])
     }
+    if (!this.searchQuery(nextProps)) {
+      nextProps.routingStore.leaveSearch()
+      return
+    }
     super.componentWillReceiveProps(nextProps)
   }
 
