@@ -39,6 +39,10 @@ class Collection extends BaseRecord {
     return this.type === 'Collection::SubmissionBox'
   }
 
+  get isSubmissionsCollection() {
+    return this.type === 'Collection::SubmissionsCollection'
+  }
+
   get requiresSubmissionBoxSettings() {
     if (!this.isSubmissionBox) return false
     // if type is null then it requires setup
@@ -161,7 +165,9 @@ class Collection extends BaseRecord {
         parent_id,
         placement: 'beginning',
       }
+      uiStore.update('isLoading', true)
       const res = await apiStore.createTemplateInstance(templateData)
+      uiStore.update('isLoading', false)
       routingStore.routeTo('collections', res.data.id)
     } else {
       uiStore.openBlankContentTool({
