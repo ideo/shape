@@ -36,7 +36,7 @@ class Api::V1::SearchController < Api::V1::BaseController
       organization_id: current_organization.id,
     }
     # super_admin has access to everything regardless of user/group_ids
-    unless current_user.has_role?(Role::SUPER_ADMIN)
+    unless current_user.has_cached_role?(Role::SUPER_ADMIN)
       where_clause[:_or] = [
         { user_ids: [current_user.id] },
         { group_ids: current_user_current_group_ids },

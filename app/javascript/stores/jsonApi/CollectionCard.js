@@ -191,7 +191,9 @@ class CollectionCard extends BaseRecord {
       return true
     } catch (e) {
       // re-fetch collection
-      this.apiStore.fetch('collections', collection.id, true)
+      if (collection) {
+        this.apiStore.fetch('collections', collection.id, true)
+      }
       uiStore.defaultAlertError()
     }
     return false

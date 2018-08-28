@@ -2,23 +2,27 @@ import _ from 'lodash'
 import { Fragment } from 'react'
 import pluralize from 'pluralize'
 import ReactRouterPropTypes from 'react-router-prop-types'
-import { observable, action } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 
-import PageError from '~/ui/global/PageError'
-import PageWithApi from '~/ui/pages/PageWithApi'
-import Loader from '~/ui/layout/Loader'
-import PageContainer from '~/ui/layout/PageContainer'
-import PageSeparator from '~/ui/global/PageSeprator'
-import CollectionGrid from '~/ui/grid/CollectionGrid'
-import MoveModal from '~/ui/grid/MoveModal'
-import PageHeader from '~/ui/pages/shared/PageHeader'
 import ChannelManager from '~/utils/ChannelManager'
+import Collection from '~/stores/jsonApi/Collection'
+import CollectionGrid from '~/ui/grid/CollectionGrid'
+import FloatingActionButton from '~/ui/global/FloatingActionButton'
+import Loader from '~/ui/layout/Loader'
+import MoveModal from '~/ui/grid/MoveModal'
+import PageContainer from '~/ui/layout/PageContainer'
+import PageError from '~/ui/global/PageError'
+import PageHeader from '~/ui/pages/shared/PageHeader'
+import PageSeparator from '~/ui/global/PageSeparator'
+import PageWithApi from '~/ui/pages/PageWithApi'
+import PlusIcon from '~/ui/icons/PlusIcon'
+import SubmissionBoxSetupModal from '~/ui/submission_box/SubmissionBoxSetupModal'
+import SubmissionBoxSettingsModal from '~/ui/submission_box/SubmissionBoxSettingsModal'
 import {
   StyledSnackbar,
   StyledSnackbarContent,
 } from '~/ui/global/styled/material-ui'
-import SubmissionBoxSetupModal from '~/ui/submission_box/SubmissionBoxSetupModal'
+
 const isHomepage = ({ params }) => (params.org && !params.id)
 
 @inject('apiStore', 'uiStore', 'routingStore')
@@ -47,6 +51,7 @@ class CollectionPage extends PageWithApi {
       ChannelManager.unsubscribeAllFromChannel(this.channelName)
       this.subscribeToChannel(currentId)
       this.props.uiStore.closeBlankContentTool()
+      this.setLoadedSubmissions(false)
     }
   }
 
@@ -79,13 +84,15 @@ class CollectionPage extends PageWithApi {
   }
 
   @action setLoadingSubmissions = val => {
+    const { uiStore } = this.props
+    if (!this.collection) return
     const { submissions_collection } = this.collection
     if (submissions_collection && submissions_collection.cardIds.length) {
       // if submissions_collection is preloaded with some cards, no need to show loader
-      this.loadingSubmissions = false
+      uiStore.update('loadedSubmissions', true)
       return
     }
-    this.loadingSubmissions = val
+    uiStore.update('loadedSubmissions', val)
   }
 
   get isHomepage() {
@@ -134,13 +141,23 @@ class CollectionPage extends PageWithApi {
         }
       }
       if (collection.isSubmissionBox && collection.submissions_collection) {
-        this.setLoadingSubmissions(true)
+        this.setLoadedSubmissions(false)
         await apiStore.fetch('collections', collection.submissions_collection.id, true)
-        this.setLoadingSubmissions(false)
+        this.setLoadedSubmissions(true)
       }
     } else {
       apiStore.clearUnpersistedThreads()
     }
+  }
+
+  onAddSubmission = (ev) => {
+    ev.preventDefault()
+    const { id } = this.collection.submissions_collection
+    const submissionSettings = {
+      type: this.collection.submission_box_type,
+      template: this.collection.submission_template,
+    }
+    Collection.createSubmission(id, submissionSettings)
   }
 
   updateCollection = () => {
@@ -158,28 +175,48 @@ class CollectionPage extends PageWithApi {
     uiStore.trackEvent('update', this.collection)
   }
 
+  get submissionsPageSeparator() {
+    const { collection } = this
+    const { submissionTypeName, submissions_collection } = collection
+    if (!submissions_collection) return ''
+    return (
+      <PageSeparator title={(
+        <h3>
+          {submissions_collection.collection_cards.length}
+          {' '}
+          {submissions_collection.collection_cards.length === 1
+            ? submissionTypeName
+            : pluralize(submissionTypeName)
+          }
+        </h3>
+      )}
+      />
+    )
+  }
+
   render() {
     // this.error comes from PageWithApi
     if (this.error) return <PageError error={this.error} />
-
     const { collection } = this
-    const { uiStore } = this.props
+    // for some reason collection can come through as an object, but not some fields like can_edit,
+    // which indicates it hasn't finished loading everything
     if (!collection || collection.can_edit === undefined) return <Loader />
+
+    const { uiStore } = this.props
+    // submissions_collection will only exist for submission boxes
+    const { submissions_collection, isSubmissionBox } = collection
+    const {
+      blankContentToolState,
+      submissionBoxSettingsOpen,
+      gridSettings,
+      loadedSubmissions,
+    } = uiStore
     const { movingCardIds, cardAction } = uiStore
     // only tell the Grid to hide "movingCards" if we're moving and not linking
     const uiMovingCardIds = cardAction === 'move' ? movingCardIds : []
     // SharedCollection has special behavior where it sorts by most recently updated
+    const { submissionTypeName } = collection
     const sortBy = collection.isSharedCollection ? 'updated_at' : 'order'
-
-    const submissionBCTState = {
-      order: 0,
-      width: 1,
-      height: 1,
-      emptyCollection: true,
-      type: 'submission',
-      parent_id: collection.submissions_collection && collection.submissions_collection.id,
-      template: collection.submission_template,
-    }
 
     return (
       <Fragment>
@@ -190,59 +227,59 @@ class CollectionPage extends PageWithApi {
         <PageContainer>
           <CollectionGrid
             // pull in cols, gridW, gridH, gutter
-            {...uiStore.gridSettings}
-            gridSettings={uiStore.gridSettings}
+            {...gridSettings}
+            gridSettings={gridSettings}
             updateCollection={this.updateCollection}
             collection={collection}
             canEditCollection={collection.can_edit_content}
             // Pass in cardIds so grid will re-render when they change
             cardIds={collection.cardIds}
             // Pass in BCT state so grid will re-render when open/closed
-            blankContentToolState={uiStore.blankContentToolState}
+            blankContentToolState={blankContentToolState}
             movingCardIds={uiMovingCardIds}
             // passing length prop seems to properly trigger a re-render
             movingCards={uiStore.movingCardIds.length}
             sortBy={sortBy}
-            addEmptyCard={!collection.submissions_collection}
+            // don't add the extra row for submission box
+            addEmptyCard={!isSubmissionBox}
           />
-          {collection.requiresSubmissionBoxSetup &&
-            <SubmissionBoxSetupModal
+          {(collection.requiresSubmissionBoxSettings || submissionBoxSettingsOpen) &&
+            <SubmissionBoxSettingsModal
               collection={collection}
             />
           }
           <MoveModal />
-          { collection.submissions_collection && (
+          { isSubmissionBox && collection.submission_box_type && (
             <div>
-              { this.loadingSubmissions
+              { !loadedSubmissions
                 ? <Loader />
                 : (
                   <div>
-                    <PageSeparator title={(
-                      <h3>
-                        {collection.submissions_collection.collection_cards.length}
-                        {' '}
-                        {collection.submissions_collection.collection_cards.length === 1 ?
-                          collection.submission_template.name :
-                          pluralize(collection.submission_template.name)
-                        }
-                      </h3>
-                    )} />
+                    {this.submissionsPageSeparator}
                     <CollectionGrid
-                      {...uiStore.gridSettings}
+                      {...gridSettings}
                       updateCollection={this.updateCollection}
-                      collection={collection.submissions_collection}
+                      collection={submissions_collection}
                       canEditCollection={false}
                       // Pass in cardIds so grid will re-render when they change
-                      cardIds={collection.submissions_collection.cardIds}
+                      cardIds={submissions_collection.cardIds}
                       // Pass in BCT state so grid will re-render when open/closed
-                      blankContentToolState={submissionBCTState}
+                      blankContentToolState={blankContentToolState}
+                      submissionSettings={{
+                        type: collection.submission_box_type,
+                        template: collection.submission_template,
+                      }}
                       movingCardIds={[]}
-                      // passing length prop seems to properly trigger a re-render
                       movingCards={false}
                       sortBy={sortBy}
                     />
                   </div>
                 )}
+              <FloatingActionButton
+                toolTip={`Add ${submissionTypeName}`}
+                onClick={this.onAddSubmission}
+                icon={<PlusIcon />}
+              />
             </div>
           )}
         </PageContainer>

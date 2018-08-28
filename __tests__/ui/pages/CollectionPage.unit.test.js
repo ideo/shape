@@ -8,6 +8,7 @@ import {
 } from '#/mocks/data'
 
 jest.mock('../../../app/javascript/utils/ChannelManager')
+jest.mock('../../../app/javascript/stores')
 
 const id = 1
 const collections = [

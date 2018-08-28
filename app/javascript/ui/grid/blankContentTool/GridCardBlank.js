@@ -171,11 +171,15 @@ const BctDropzone = styled.div`
 @inject('uiStore', 'apiStore')
 @observer
 class GridCardBlank extends React.Component {
-  state = {
-    creating: null,
-    loading: false,
-    droppingFile: false,
-    bctMenuOpen: false,
+  constructor(props) {
+    super(props)
+    const { preselected } = props
+    this.state = {
+      creating: preselected || null,
+      loading: false,
+      droppingFile: false,
+      bctMenuOpen: false,
+    }
   }
 
   componentDidMount() {
@@ -190,7 +194,8 @@ class GridCardBlank extends React.Component {
   }
 
   createDropPane = () => {
-    if (this.canceled || this.state.creating) return
+    const { creating } = this.state
+    if (this.canceled || (creating && creating !== 'file')) return
     FilestackUpload.makeDropPane({
       id: 'dropzone',
       onProgress: (pct) => {
@@ -281,7 +286,8 @@ class GridCardBlank extends React.Component {
 
   closeBlankContentTool = () => {
     const { uiStore } = this.props
-    if (uiStore.blankContentToolState.emptyCollection) {
+    if (uiStore.blankContentToolState.emptyCollection &&
+        !this.props.preselected) {
       this.setState({ creating: null })
       // have to re-create the DropPane
       this.createDropPane()
@@ -407,7 +413,7 @@ class GridCardBlank extends React.Component {
               Icon={AddTextIcon}
             />
           }
-          {!creating &&
+          {(!creating || creating === 'file') &&
             <BctButtonBox
               tooltip="Add file"
               type="file"
@@ -500,6 +506,7 @@ GridCardBlank.propTypes = {
   parent: MobxPropTypes.objectOrObservableObject.isRequired,
   height: PropTypes.number.isRequired,
   afterCreate: PropTypes.func,
+  preselected: PropTypes.string,
 }
 GridCardBlank.wrappedComponent.propTypes = {
   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
@@ -507,6 +514,7 @@ GridCardBlank.wrappedComponent.propTypes = {
 }
 GridCardBlank.defaultProps = {
   afterCreate: null,
+  preselected: null,
 }
 
 // give a name to the injected component for unit tests

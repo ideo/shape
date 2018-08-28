@@ -29,11 +29,13 @@ class CollectionTemplateBuilder
 
     # NOTE: Any issue with creating the template instance in a different org from the template?
     @collection = @template.templated_collections.create(
-      name: "My #{@template.name}",
+      name: created_template_name,
       organization: @parent.organization,
     )
     # make sure to assign these permissions before the template cards are generated
-    assign_submission_permissions
+    @collection.inherit_roles_from_parent!(@parent)
+    # capture newly added roles
+    @collection.reload
     @created_by.add_role(Role::EDITOR, @collection)
     @template.setup_templated_collection(
       for_user: @created_by,
@@ -42,14 +44,11 @@ class CollectionTemplateBuilder
     @collection
   end
 
-  def assign_submission_permissions
-    # this only applies to submissions into a submissions collection
-    return unless @parent.is_a? Collection::SubmissionsCollection
-    # all the roles come from the submission box (editors, viewers)
-    # NOTE: this will create Viewer/Editor roles so make sure this runs before
-    # calling any `add_role` functions e.g. @created_by.add_role... above
-    @parent.submission_box.roles.each do |role|
-      role.duplicate!(assign_resource: @collection)
+  def created_template_name
+    if @parent.is_a? Collection::SubmissionsCollection
+      "#{@created_by.first_name}'s #{@template.name}"
+    else
+      "My #{@template.name}"
     end
   end
 
@@ -62,5 +61,6 @@ class CollectionTemplateBuilder
       order: @placement == 'beginning' ? 0 : @parent.collection_cards.count,
     )
     card.increment_card_orders! if @placement == 'beginning'
+    @collection.recalculate_child_breadcrumbs_async
   end
 end

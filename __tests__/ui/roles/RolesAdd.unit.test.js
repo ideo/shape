@@ -21,33 +21,6 @@ describe('RolesAdd', () => {
     )
   })
 
-  describe('onUserSearch', () => {
-    const user = { id: 2, name: 'Uncle Leo', email: 'leo@leo.l' }
-    let component
-
-    beforeEach(() => {
-      component = wrapper.instance()
-    })
-
-    describe('when a user is found', () => {
-      beforeEach(() => {
-        props.onSearch.mockReturnValue(Promise.resolve(
-          { data: [user] }
-        ))
-      })
-
-      it('should pass the search term to the parent component', () => {
-        component.onUserSearch('term')
-        expect(props.onSearch).toHaveBeenCalledWith('term')
-      })
-
-      it('should map the data with a value and a user', () => {
-        expect(component.onUserSearch('leo'))
-          .resolves.toEqual([{ value: user.email, label: user.name, data: user }])
-      })
-    })
-  })
-
   describe('onUserSelected', () => {
     let component
 

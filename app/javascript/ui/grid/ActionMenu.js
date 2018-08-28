@@ -12,6 +12,7 @@ import LinkIcon from '~/ui/icons/LinkIcon'
 import MoveIcon from '~/ui/icons/MoveIcon'
 import ReplaceIcon from '~/ui/icons/ReplaceIcon'
 import PermissionsIcon from '~/ui/icons/PermissionsIcon'
+import SubmissionBoxIconSm from '~/ui/icons/SubmissionBoxIconSm'
 import PopoutMenu from '~/ui/global/PopoutMenu'
 import TagIcon from '~/ui/icons/TagIcon'
 
@@ -100,6 +101,11 @@ class ActionMenu extends React.Component {
     this.props.onOpen()
   }
 
+  openSubmissionBoxSettings = () => {
+    const { uiStore } = this.props
+    uiStore.update('submissionBoxSettingsOpen', true)
+  }
+
   get movingFromCollectionId() {
     const { card, uiStore, location } = this.props
     // For PageMenu we're moving "from" the parent collection
@@ -115,6 +121,7 @@ class ActionMenu extends React.Component {
       canEdit,
       card,
       canReplace,
+      submissionBox,
       location,
       uiStore,
     } = this.props
@@ -137,6 +144,13 @@ class ActionMenu extends React.Component {
     })
     let items = [...actions]
 
+    if (submissionBox) {
+      items.unshift({
+        name: 'Sub. Box Settings',
+        iconRight: <SubmissionBoxIconSm />,
+        onClick: this.openSubmissionBoxSettings,
+      })
+    }
     if (canEdit && !card.isPinnedAndLocked) {
       // Replace action is added later if this.props.canReplace
       items = _.reject(items, { name: 'Replace' })
@@ -206,10 +220,11 @@ ActionMenu.propTypes = {
   menuOpen: PropTypes.bool.isRequired,
   canEdit: PropTypes.bool.isRequired,
   canReplace: PropTypes.bool,
+  submissionBox: PropTypes.bool,
   onOpen: PropTypes.func.isRequired,
   onLeave: PropTypes.func.isRequired,
   onMoveMenu: PropTypes.func,
-  afterArchive: PropTypes.func
+  afterArchive: PropTypes.func,
 }
 ActionMenu.wrappedComponent.propTypes = {
   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
@@ -221,6 +236,7 @@ ActionMenu.defaultProps = {
   onMoveMenu: null,
   afterArchive: null,
   canReplace: false,
+  submissionBox: false,
 }
 
 export default ActionMenu
