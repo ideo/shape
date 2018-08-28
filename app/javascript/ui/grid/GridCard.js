@@ -81,7 +81,7 @@ class GridCard extends React.Component {
           return <PdfFileItemCover item={record} />
         }
         if (record.mimeBaseType === 'image') {
-          return <ImageItemCover item={record} />
+          return <ImageItemCover item={record} contain={card.image_contain} />
         }
         return <GenericFileItemCover item={record} />
       }
