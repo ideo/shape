@@ -7215,15 +7215,16 @@ mobx-react-router@^4.0.1:
   version "4.0.1"
   resolved "https://registry.yarnpkg.com/mobx-react-router/-/mobx-react-router-4.0.1.tgz#72f67b5c637d187595415500e8afa5cddb2231ab"
 
-mobx-react@^4.3.5:
-  version "4.4.1"
-  resolved "https://registry.yarnpkg.com/mobx-react/-/mobx-react-4.4.1.tgz#7cc793b55bbb7485f1febd18c1913c581c124edc"
+mobx-react@^5.0.0:
+  version "5.2.5"
+  resolved "https://registry.yarnpkg.com/mobx-react/-/mobx-react-5.2.5.tgz#fc44ac17e1798f6b590f064b831d8a1d89850ef0"
   dependencies:
-    hoist-non-react-statics "^2.3.1"
+    hoist-non-react-statics "^2.5.0"
+    react-lifecycles-compat "^3.0.2"
 
-mobx@^3.4.1:
-  version "3.5.1"
-  resolved "https://registry.yarnpkg.com/mobx/-/mobx-3.5.1.tgz#8e682ec535cf44e04005b9e37e2df66acc975a42"
+mobx@^4.4.0:
+  version "4.4.0"
+  resolved "https://registry.yarnpkg.com/mobx/-/mobx-4.4.0.tgz#7fd1b7879cac642988acc0e6e2351e93e3970d12"
 
 moment-mini@^2.19.4:
   version "2.19.4"

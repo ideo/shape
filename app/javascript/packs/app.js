@@ -1,7 +1,7 @@
 /* eslint global-require: 0 */
 import ReactDOM from 'react-dom'
 import createBrowserHistory from 'history/createBrowserHistory'
-import { useStrict } from 'mobx'
+import { configure } from 'mobx'
 import { Provider } from 'mobx-react'
 import { syncHistoryWithStore } from 'mobx-react-router'
 import { MobxIntlProvider } from 'mobx-react-intl'
@@ -11,7 +11,7 @@ import Routes from '~/ui/Routes'
 import stores, { routingStore } from '~/stores'
 
 // Enable MobX Strict functionality -- requires explicit @actions
-useStrict(true)
+configure({ enforceActions: true })
 
 const browserHistory = createBrowserHistory()
 const history = syncHistoryWithStore(browserHistory, routingStore)
