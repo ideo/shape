@@ -8,9 +8,11 @@ const ButtonWrapper = styled.button`
   height: 27px;
   width: 27px;
 `
+ButtonWrapper.displayName = 'ButtonWrapper'
 
 class ContainImage extends React.Component {
   toggleSelected = (ev) => {
+    ev.preventDefault()
     const { card } = this.props
     card.image_contain = !card.image_contain
     card.save()
@@ -23,7 +25,7 @@ class ContainImage extends React.Component {
     return (
       <Tooltip
         classes={{ tooltip: 'Tooltip' }}
-        title={!image_contain ? 'fill tile with image' : 'show whole image'}
+        title={!image_contain ? 'show whole image' : 'fill tile with image'}
         placement="top"
       >
         <ButtonWrapper className="show-on-hover" onClick={this.toggleSelected}>
