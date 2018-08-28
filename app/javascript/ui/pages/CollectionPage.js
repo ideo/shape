@@ -1,8 +1,11 @@
+import _ from 'lodash'
 import { Fragment } from 'react'
 import pluralize from 'pluralize'
 import ReactRouterPropTypes from 'react-router-prop-types'
+import { action, observable } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 
+import ChannelManager from '~/utils/ChannelManager'
 import Collection from '~/stores/jsonApi/Collection'
 import CollectionGrid from '~/ui/grid/CollectionGrid'
 import FloatingActionButton from '~/ui/global/FloatingActionButton'
@@ -21,18 +24,65 @@ const isHomepage = ({ params }) => (params.org && !params.id)
 @inject('apiStore', 'uiStore', 'routingStore')
 @observer
 class CollectionPage extends PageWithApi {
+  @observable loadingSubmissions = false
+  @observable editor = null
+
+  channelName = 'CollectionViewingChannel'
+
+  constructor(props) {
+    super(props)
+    this.reloadData = _.debounce(this._reloadData, 3000)
+  }
+
+  componentWillMount() {
+    this.subscribeToChannel(this.props.match.params.id)
+  }
+
   componentWillReceiveProps(nextProps) {
     super.componentWillReceiveProps(nextProps)
     // when navigating between collections, close BCT
-    const { uiStore, match } = this.props
-    if (nextProps.match.params.id !== match.params.id) {
-      uiStore.closeBlankContentTool()
-      // reset loadedSubmissions
+    const previousId = this.props.match.params.id
+    const currentId = nextProps.match.params.id
+    if (currentId !== previousId) {
+      ChannelManager.unsubscribeAllFromChannel(this.channelName)
+      this.subscribeToChannel(currentId)
+      this.props.uiStore.closeBlankContentTool()
       this.setLoadedSubmissions(false)
     }
   }
 
-  setLoadedSubmissions = val => {
+  subscribeToChannel(id) {
+    ChannelManager.subscribe(this.channelName, id,
+      {
+        channelReceivedData: this.receivedChannelData,
+      })
+  }
+
+  @action setEditor = (editor) => {
+    this.editor = editor
+    setTimeout(() => this.setEditor(null), 3000)
+  }
+
+  receivedChannelData = async (data) => {
+    const currentId = this.props.match.params.id
+    if (data.record_id.toString() === currentId.toString()) {
+      this.reloadData()
+      this.setEditor(data.current_editor)
+    }
+  }
+
+  async _reloadData() {
+    const { apiStore } = this.props
+    await apiStore.fetch('collections', this.collection.id, true)
+    if (this.collection.submissions_collection) {
+      this.setLoadedSubmissions(true)
+      await apiStore.fetch('collections', this.collection.submissions_collection.id, true)
+      apiStore.request(this.requestPath(this.props))
+      this.setLoadedSubmissions(false)
+    }
+  }
+
+  @action setLoadedSubmissions = val => {
     const { uiStore } = this.props
     if (!this.collection) return
     const { submissions_collection } = this.collection
