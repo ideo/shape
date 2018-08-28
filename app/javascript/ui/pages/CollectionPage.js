@@ -228,7 +228,7 @@ class CollectionPage extends PageWithApi {
                 toolTip={`Add ${submissionTypeName}`}
                 onClick={this.onAddSubmission}
                 icon={<PlusIcon />}
-             />
+              />
             </div>
           )}
         </PageContainer>

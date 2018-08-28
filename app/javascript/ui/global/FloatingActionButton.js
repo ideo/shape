@@ -46,7 +46,7 @@ class FloatingActionButton extends React.Component {
   }
 }
 FloatingActionButton.propTypes = {
-  toolTip: PropTypes.string,
+  toolTip: PropTypes.string.isRequired,
   onClick: PropTypes.func.isRequired,
   text: PropTypes.string,
   icon: PropTypes.string,
