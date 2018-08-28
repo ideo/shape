@@ -34,17 +34,10 @@ describe('ContainImage', () => {
       })
     })
 
-    describe('when image is not contained', () => {
-      beforeEach(() => {
-        props.card.image_contain = false
-        wrapper.setProps(props)
-      })
-
-      it('should show the show whole image tooltip', () => {
-        expect(wrapper.find('WithStyles(Tooltip)').props().title).toEqual(
-          'show whole image'
-        )
-      })
+    it('should show the show whole image tooltip', () => {
+      expect(wrapper.find('WithStyles(Tooltip)').props().title).toEqual(
+        'show whole image'
+      )
     })
   })
 
