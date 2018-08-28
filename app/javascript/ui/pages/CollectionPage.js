@@ -2,6 +2,7 @@ import _ from 'lodash'
 import { Fragment } from 'react'
 import pluralize from 'pluralize'
 import ReactRouterPropTypes from 'react-router-prop-types'
+import { action, observable } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 
 import ChannelManager from '~/utils/ChannelManager'
@@ -16,12 +17,7 @@ import PageHeader from '~/ui/pages/shared/PageHeader'
 import PageSeparator from '~/ui/global/PageSeparator'
 import PageWithApi from '~/ui/pages/PageWithApi'
 import PlusIcon from '~/ui/icons/PlusIcon'
-import SubmissionBoxSetupModal from '~/ui/submission_box/SubmissionBoxSetupModal'
 import SubmissionBoxSettingsModal from '~/ui/submission_box/SubmissionBoxSettingsModal'
-import {
-  StyledSnackbar,
-  StyledSnackbarContent,
-} from '~/ui/global/styled/material-ui'
 
 const isHomepage = ({ params }) => (params.org && !params.id)
 
@@ -75,15 +71,18 @@ class CollectionPage extends PageWithApi {
     }
   }
 
-  _reloadData() {
+  async _reloadData() {
     const { apiStore } = this.props
-    this.setLoadingSubmissions(true)
-    await apiStore.fetch('collections', collection.submissions_collection.id, true)
-    apiStore.request(this.requestPath(this.props))
-    this.setLoadingSubmissions(false)
+    await apiStore.fetch('collections', this.collection.id, true)
+    if (this.collection.submissions_collection) {
+      this.setLoadedSubmissions(true)
+      await apiStore.fetch('collections', this.collection.submissions_collection.id, true)
+      apiStore.request(this.requestPath(this.props))
+      this.setLoadedSubmissions(false)
+    }
   }
 
-  @action setLoadingSubmissions = val => {
+  @action setLoadedSubmissions = val => {
     const { uiStore } = this.props
     if (!this.collection) return
     const { submissions_collection } = this.collection
