@@ -75,6 +75,7 @@
     "get-video-id": "^3.0.0",
     "hex-rgb": "^2.0.0",
     "history": "^4.7.2",
+    "i18n-iso-countries": "3.7.3",
     "lodash": "~4.17.4",
     "mime-types": "^2.1.19",
     "mobx": "^3.4.1",
