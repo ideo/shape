@@ -143,7 +143,7 @@ class CollectionCover extends React.Component {
   }
 
   render() {
-    const { height, width, collection, uiStore } = this.props
+    const { height, width, collection, uiStore, onClick } = this.props
     const { cover } = collection
     const { gridW, gutter } = uiStore.gridSettings
 
@@ -151,6 +151,8 @@ class CollectionCover extends React.Component {
       <StyledCollectionCover
         url={cover.image_url}
         isSpecialCollection={collection.isSpecialCollection}
+        // onClick can be null, is used by SearchResultsInfinite
+        onClick={onClick}
       >
         <StyledCardContent
           height={height}
@@ -188,12 +190,14 @@ CollectionCover.propTypes = {
   height: PropTypes.number.isRequired,
   collection: MobxPropTypes.objectOrObservableObject.isRequired,
   dragging: PropTypes.bool,
+  onClick: PropTypes.func,
 }
 CollectionCover.wrappedComponent.propTypes = {
   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 CollectionCover.defaultProps = {
   dragging: false,
+  onClick: null,
 }
 
 CollectionCover.displayName = 'CollectionCover'

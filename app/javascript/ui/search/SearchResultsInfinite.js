@@ -48,11 +48,6 @@ const StyledScrollIndicator = styled.div`
   z-index: ${v.zIndex.scrollIndicator};
 `
 
-const StyledLink = styled.a`
-  text-decoration: none;
-`
-StyledLink.displayName = 'StyledLink'
-
 @observer
 class SearchResultsInfinite extends React.Component {
   visibleItems = observable.map({})
@@ -167,13 +162,12 @@ class SearchResultsInfinite extends React.Component {
                   <StyledBottomLeftIcon>
                     <CollectionIcon />
                   </StyledBottomLeftIcon>
-                  <StyledLink onClick={this.routeToCollection(collection.id)}>
-                    <CollectionCover
-                      collection={collection}
-                      width={gridSettings.cols}
-                      height={1}
-                    />
-                  </StyledLink>
+                  <CollectionCover
+                    onClick={this.routeToCollection(collection.id)}
+                    collection={collection}
+                    width={gridSettings.cols}
+                    height={1}
+                  />
                 </StyledSearchResult>
               </div>
             </VisibilitySensor>
