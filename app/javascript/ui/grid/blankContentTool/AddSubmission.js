@@ -3,10 +3,9 @@ import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import pluralize from 'pluralize'
 import styled from 'styled-components'
 
-import v, { ITEM_TYPES } from '~/utils/variables'
+import v from '~/utils/variables'
 import { StyledGridCard } from '~/ui/grid/shared'
 import InlineLoader from '~/ui/layout/InlineLoader'
-import { apiStore, routingStore } from '~/stores'
 import Collection from '~/stores/jsonApi/Collection'
 
 const StyledAddSubmission = StyledGridCard.extend`
@@ -15,6 +14,8 @@ const StyledAddSubmission = StyledGridCard.extend`
   position: relative;
   text-align: center;
 `
+StyledAddSubmission.displayName = 'StyledAddSubmission'
+
 // width of card is constrained by gridW
 // vertical position is adjusted by gridH / 2 if card is 2 rows tall
 const StyledGridCardInner = styled.div`
@@ -23,11 +24,13 @@ const StyledGridCardInner = styled.div`
   position: relative;
   top: ${props => (props.height > 1 ? (props.gridH / 2) : 0)}px;
 `
+StyledGridCardInner.displayName = 'StyledGridCardInner'
 
 const StyledBlankCreationTool = styled.div`
   padding: 34px 42px;
   position: relative;
 `
+StyledBlankCreationTool.displayName = 'StyledBlankCreationTool'
 
 const SubmissionButton = styled.button`
   background-color: ${v.colors.ctaButtonBlue};
@@ -41,48 +44,19 @@ const SubmissionButton = styled.button`
   width: 47px;
   vertical-align: middle;
 `
+SubmissionButton.displayName = 'SubmissionButton'
 
 @inject('uiStore', 'apiStore')
 @observer
 class AddSubmission extends React.Component {
   state = {
-    creating: null,
     loading: false,
-  }
-
-  componentWillUnmount() {
-    this.canceled = true
-  }
-
-  get emptyState() {
-    const { uiStore } = this.props
-    return uiStore.blankContentToolState.emptyCollection && !this.state.creating
-  }
-
-  startCreating = type => () => {
-    this.setState({ creating: type })
-  }
-
-  createCardWith = (file) => {
-    const attrs = {
-      item_attributes: {
-        type: ITEM_TYPES.FILE,
-        filestack_file_attributes: {
-          url: file.url,
-          handle: file.handle,
-          filename: file.filename,
-          size: file.size,
-          mimetype: file.mimetype,
-          docinfo: file.docinfo,
-        },
-      },
-    }
-    this.createCard(attrs)
   }
 
   handleSubmission = (ev) => {
     ev.preventDefault()
-    const { uiStore, parent_id, submissionSettings } = this.props
+    const { parent_id, submissionSettings } = this.props
+    //  TODO figure out how to put loading state even when calling this
     Collection.createSubmission(parent_id, submissionSettings)
   }
 
@@ -90,24 +64,12 @@ class AddSubmission extends React.Component {
     const { uiStore } = this.props
     const { viewingCollection } = uiStore
     if (!viewingCollection) return ''
-    let inner
-    // const { creating, loading, droppingFile } = this.state
-    // const isReplacing = !!this.props.uiStore.blankContentToolState.replacingId
-    // const size = v.iconSizes.bct
-
-    // When they selected text, link or file item, render the grid card blank
-    // sending initial type? Or render the creators?
-    //
-    // if (template_type !== 'template') {
-    // inner = <GridCardBlank
-    //  parent={parent}
-    //  initialCreator={template_type}
-    //  afterCreate={this.something}
-    // />
 
     return (
       <StyledBlankCreationTool>
-        <h3>Add a new {pluralize.singular(viewingCollection.submissionTypeName)}</h3>
+        <h3>
+          Add a new {pluralize.singular(viewingCollection.submissionTypeName)}
+        </h3>
         { this.state.loading && <InlineLoader /> }
         <SubmissionButton
           disabled={this.loading}
@@ -115,7 +77,6 @@ class AddSubmission extends React.Component {
         >
           &#43;
         </SubmissionButton>
-        {inner}
       </StyledBlankCreationTool>
     )
   }

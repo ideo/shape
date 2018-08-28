@@ -1,8 +1,8 @@
 import _ from 'lodash'
 import { computed, action } from 'mobx'
 
-import BaseRecord from './BaseRecord'
 import { apiStore, routingStore, uiStore } from '~/stores'
+import BaseRecord from './BaseRecord'
 
 class Collection extends BaseRecord {
   attributesForAPI = ['name', 'tag_list', 'submission_template_id', 'submission_box_type']
