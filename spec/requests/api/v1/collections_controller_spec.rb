@@ -300,7 +300,7 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
     end
   end
 
-  describe 'DELETE #destroy', only: true do
+  describe 'DELETE #destroy' do
     let(:path) { "/api/v1/collections/#{collection.id}" }
 
     context 'with a normal collection' do

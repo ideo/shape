@@ -201,7 +201,7 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
     end
   end
 
-  describe 'PATCH #archive', only: true do
+  describe 'PATCH #archive' do
     let!(:collection_cards) { create_list(:collection_card_collection, 3, parent: collection) }
     let(:path) { '/api/v1/collection_cards/archive' }
     let(:params) { { card_ids: collection_cards.map(&:id) }.to_json }
@@ -481,6 +481,61 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
         # names should match, in same order
         expect(first_cards.map(&:item).map(&:name)).to eq moving_cards.map(&:item).map(&:name)
         expect(to_collection.collection_cards.first.primary?).to be true
+      end
+    end
+  end
+
+  describe 'PATCH #update' do
+    let(:collection) { create(:collection, organization: user.current_organization) }
+    let(:collection_card) { create(:collection_card_text, parent: collection) }
+    let(:path) { "/api/v1/collection_cards/#{collection_card.id}" }
+    let(:raw_params) do
+      {
+        image_contain: true,
+      }
+    end
+    let(:params) { json_api_params('collection_cards', raw_params) }
+
+    before do
+      user.add_role(Role::EDITOR, collection_card.item)
+      user.add_role(Role::EDITOR, collection)
+    end
+
+    it 'returns a 200' do
+      patch(path, params: params)
+      expect(response.status).to eq(200)
+    end
+
+    it 'matches JSON schema' do
+      patch(path, params: params)
+      expect(json['data']['attributes']).to match_json_schema('collection_card')
+      expect(json['data']['attributes']['parent_id']).to eq collection.id
+    end
+
+    it 'updates the card, such as the image_contain property' do
+      patch(path, params: params)
+      expect(json['data']['attributes']['image_contain']).to eq true
+      expect(collection_card.reload.image_contain).to be true
+    end
+
+    it 'broadcasts collection updates' do
+      expect(CollectionUpdateBroadcaster).to receive(:call).with(
+        collection,
+        user,
+      )
+      patch(path, params: params)
+    end
+
+    context 'without content editor access on the parent collection' do
+      let(:user) { create(:user, add_to_org: create(:organization)) }
+
+      before do
+        user.add_role(Role::EDITOR, collection_card.item)
+      end
+
+      it 'returns a 401' do
+        patch(path, params: params)
+        expect(response.status).to eq(401)
       end
     end
   end
