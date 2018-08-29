@@ -1,4 +1,5 @@
 import CollectionPage from '~/ui/pages/CollectionPage'
+import ChannelManager from '~/utils/ChannelManager'
 import fakeApiStore from '#/mocks/fakeApiStore'
 import fakeUiStore from '#/mocks/fakeUiStore'
 import fakeRoutingStore from '#/mocks/fakeRoutingStore'
@@ -6,6 +7,7 @@ import {
   fakeCollection
 } from '#/mocks/data'
 
+jest.mock('../../../app/javascript/utils/ChannelManager')
 jest.mock('../../../app/javascript/stores')
 
 const id = 1
@@ -50,6 +52,33 @@ describe('CollectionPage', () => {
   it('passes collection to the CollectionGrid', () => {
     const grid = wrapper.find('CollectionGrid')
     expect(grid.props().collection).toBe(collection)
+  })
+
+  describe('componentWillReceiveProps()', () => {
+    describe('on a different collection', () => {
+      beforeEach(() => {
+        match = {
+          params: { id: 155 },
+          path: '/collections/155',
+          url: '/collections/155'
+        }
+        wrapper.setProps({ match })
+      })
+
+      it('should unsubscribe from all collection channels', () => {
+        expect(ChannelManager.unsubscribeAllFromChannel).toHaveBeenCalledWith(
+          'CollectionViewingChannel'
+        )
+      })
+
+      it('should subscribe with the channel manager', () => {
+        expect(ChannelManager.subscribe).toHaveBeenCalled()
+      })
+
+      it('should close the blank content tool', () => {
+        expect(uiStore.closeBlankContentTool).toHaveBeenCalled()
+      })
+    })
   })
 
   // this is a function in PageWithApi
@@ -110,6 +139,26 @@ describe('CollectionPage', () => {
 
     it('should track an event for updating the collection', () => {
       expect(uiStore.trackEvent).toHaveBeenCalledWith('update', collection)
+    })
+  })
+
+  describe('subscribeToChannel()', () => {
+    it('should subscribe with the channel manager', () => {
+      expect(ChannelManager.subscribe).toHaveBeenCalled()
+    })
+  })
+
+  describe('receivedChannelData()', () => {
+    describe('when an update happens on the current collection', () => {
+      beforeEach(() => {
+        props.match.params.id = 15
+        wrapper.setProps(props)
+        wrapper.instance().receivedChannelData({ record_id: 15 })
+      })
+
+      it('should reload the data', () => {
+        expect(apiStore.request).toHaveBeenCalled()
+      })
     })
   })
 

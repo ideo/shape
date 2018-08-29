@@ -168,6 +168,14 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
         expect(response.status).to eq(200)
         expect(json['data']['attributes']).to match_json_schema('collection')
       end
+
+      it 'broadcasts collection updates' do
+        expect(CollectionUpdateBroadcaster).to receive(:call).with(
+          to_collection,
+          user,
+        )
+        post(path, params: params)
+      end
     end
 
     context 'without permission' do
@@ -266,6 +274,14 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
       patch(path, params: params)
       expect(collection_card.reload.width).to eq(3)
       expect(collection_card.reload.order).to eq(1)
+    end
+
+    it 'broadcasts collection updates' do
+      expect(CollectionUpdateBroadcaster).to receive(:call).with(
+        collection,
+        user,
+      )
+      patch(path, params: params)
     end
 
     context 'with cancel_sync == true' do

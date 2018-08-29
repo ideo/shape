@@ -1,6 +1,5 @@
 import PropTypes from 'prop-types'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
-import pluralize from 'pluralize'
 import styled from 'styled-components'
 
 import v from '~/utils/variables'
@@ -68,7 +67,7 @@ class AddSubmission extends React.Component {
     return (
       <StyledBlankCreationTool>
         <h3>
-          Add a new {pluralize.singular(viewingCollection.submissionTypeName)}
+          Add a new {viewingCollection.submissionTypeName}
         </h3>
         { this.state.loading && <InlineLoader /> }
         <SubmissionButton

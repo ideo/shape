@@ -104,6 +104,14 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
         )
         post(path, params: params)
       end
+
+      it 'broadcasts collection updates' do
+        expect(CollectionUpdateBroadcaster).to receive(:call).with(
+          collection,
+          user,
+        )
+        post(path, params: params)
+      end
     end
 
     context 'with errors' do
@@ -217,6 +225,14 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
         )
         patch(path, params: params)
       end
+
+      it 'broadcasts collection updates' do
+        expect(CollectionUpdateBroadcaster).to receive(:call).with(
+          collection,
+          user,
+        )
+        patch(path, params: params)
+      end
     end
 
     context 'without record edit access' do
@@ -303,6 +319,11 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
         expect(moving_cards.first.record.editors[:users].last).to eq editor
         expect(moving_cards.first.record.viewers[:users].last).to eq viewer
       end
+
+      it 'broadcasts collection updates' do
+        expect(CollectionUpdateBroadcaster).to receive(:call).twice
+        patch(path, params: params)
+      end
     end
   end
 
@@ -367,6 +388,14 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
         # newly linked cards should link to the original moving_cards' items
         expect(to_collection.collection_cards.first(2).map(&:item)).to match_array moving_cards.map(&:item)
         expect(to_collection.collection_cards.first.link?).to be true
+      end
+
+      it 'broadcasts collection updates' do
+        expect(CollectionUpdateBroadcaster).to receive(:call).with(
+          to_collection,
+          user,
+        )
+        post(path, params: params)
       end
     end
   end
@@ -516,6 +545,14 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
         )
         patch(path, params: params)
       end
+
+      it 'broadcasts collection updates' do
+        expect(CollectionUpdateBroadcaster).to receive(:call).with(
+          collection,
+          user,
+        )
+        patch(path, params: params)
+      end
     end
 
     context 'without record edit access' do
@@ -525,5 +562,4 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
       end
     end
   end
-
 end

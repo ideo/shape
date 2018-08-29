@@ -86,7 +86,7 @@ class PageHeader extends React.Component {
     uiStore.update('pageMenuOpen', false)
   }
 
-  routeBack = ({ type }) => {
+  routeBack = ({ type } = {}) => {
     const { record, routingStore } = this.props
     if (record.internalType === 'items' || type === 'move' || type === 'archive') {
       if (record.parent_collection_card.parent_id) {

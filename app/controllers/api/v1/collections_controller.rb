@@ -14,6 +14,7 @@ class Api::V1::CollectionsController < Api::V1::BaseController
   end
 
   before_action :load_and_authorize_template_and_parent, only: %i[create_template]
+  after_action :broadcast_parent_collection_updates, only: %i[create_template]
   def create_template
     builder = CollectionTemplateBuilder.new(
       parent: @parent_collection,
@@ -29,6 +30,7 @@ class Api::V1::CollectionsController < Api::V1::BaseController
     end
   end
 
+  after_action :broadcast_collection_updates, only: %i[update]
   def update
     updated = CollectionUpdater.call(@collection, collection_params)
     if updated
@@ -124,5 +126,13 @@ class Api::V1::CollectionsController < Api::V1::BaseController
       target: organization.primary_group,
       action: :joined,
     )
+  end
+
+  def broadcast_collection_updates
+    CollectionUpdateBroadcaster.call(@collection, current_user)
+  end
+
+  def broadcast_parent_collection_updates
+    CollectionUpdateBroadcaster.call(@parent_collection, current_user)
   end
 end

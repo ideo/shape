@@ -44,7 +44,7 @@ class RoutingStore extends RouterStore {
   )
 
   updatePreviousPageBeforeSearch(page) {
-    if (page.pathname !== '/search') {
+    if (page.pathname.indexOf('/search') === -1) {
       this.previousPageBeforeSearch = page.pathname
     }
   }

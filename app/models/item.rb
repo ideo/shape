@@ -157,6 +157,10 @@ class Item < ApplicationRecord
     cards_linked_to_this_item.update_all(updated_at: updated_at)
   end
 
+  def jsonapi_type_name
+    'items'
+  end
+
   private
 
   def reindex_parent_collection

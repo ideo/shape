@@ -84,6 +84,7 @@ const BctBackground = styled.div`
   border: 8px solid ${v.colors.cyan};
   background: ${v.colors.aquaHaze};
   transition: ${v.transitionWithDelay};
+
   /* handle "small 4-col" layout i.e. layoutSize == 3 */
   @media only screen
     and (min-width: ${v.responsive.medBreakpoint}px)
