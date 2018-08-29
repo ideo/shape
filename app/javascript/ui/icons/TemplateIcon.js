@@ -2,9 +2,9 @@ import PropTypes from 'prop-types'
 import v from '~/utils/variables'
 import Icon from './Icon'
 
-const TemplateIcon = ({ circled, filled, viewBox }) => {
+const TemplateIcon = ({ circled, filled, viewBox, size }) => {
   let svg = (
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox={size === 'small' ? '6 6 20 20' : '0 0 32 32'}>
       <path d="M23.1,9.6H8.9c-0.7,0-1.2,0.5-1.2,1.2v10.3c0,0.7,0.5,1.2,1.2,1.2h14.3c0.7,0,1.2-0.5,1.2-1.2V10.8
         C24.4,10.2,23.8,9.6,23.1,9.6z M23.1,17.1h-3.8v-6.2l3.8,0V17.1z M18,13.6h-3.8v-2.7l3.8,0V13.6z M14.2,14.9H18v6.3l-3.8,0V14.9z
         M8.9,10.9l4,0v10.2l-3.9,0L8.9,10.9z M19.3,21.1v-2.8h3.8v2.7L19.3,21.1z"
@@ -37,11 +37,13 @@ TemplateIcon.propTypes = {
   circled: PropTypes.bool,
   filled: PropTypes.bool,
   viewBox: PropTypes.string,
+  size: PropTypes.string,
 }
 TemplateIcon.defaultProps = {
   circled: false,
   filled: false,
   viewBox: '0 0 50 50',
+  size: 'normal',
 }
 
 export default TemplateIcon

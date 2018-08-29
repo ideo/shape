@@ -468,7 +468,7 @@ class GridCardBlank extends React.Component {
               onClick={this.toggleBctMenu}
               direction="right"
               menuItems={[
-                { name: 'Create Template', iconRight: <TemplateIcon />, onClick: this.startCreating('template') }
+                { name: 'Create Template', iconRight: <TemplateIcon size="small" />, onClick: this.startCreating('template') }
               ]}
             />
           </Flex>
