@@ -30,14 +30,14 @@ const ModalCloseButton = styled.button`
 ModalCloseButton.displayName = 'ModalCloseButton'
 
 const CenteredPaddedContent = styled.div`
-  padding: 20px;
-  padding-bottom: 25px;
+  padding: 30px 20px;
   text-align: center;
 `
 
 const IconHolder = styled.span`
   width: 84px;
-  margin-bottom: 20px;
+  margin-top: 25px;
+  margin-bottom: 30px;
   display: inline-block;
 `
 

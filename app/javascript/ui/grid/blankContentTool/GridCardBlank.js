@@ -248,8 +248,14 @@ class GridCardBlank extends React.Component {
   }
 
   pickImages = () => {
-    FilestackUpload.pickImages({
-      onSuccess: (files) => files.forEach(file => this.createCardWith(file))
+    const { uiStore } = this.props
+    const { replacingId } = uiStore.blankContentToolState
+    const filestackMethod = !replacingId ? FilestackUpload.pickImages
+      : FilestackUpload.pickImage
+    filestackMethod({
+      onSuccess: (files) => (
+        !replacingId ? files.forEach(file => this.createCardWith(file))
+          : this.createCardWith(files))
     })
   }
 

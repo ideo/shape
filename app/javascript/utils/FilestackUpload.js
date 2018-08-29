@@ -64,11 +64,11 @@ class FilestackUpload {
   }
 
   static async pickImage(opts = {}) {
-    return this.pickOneOrMore({ multiple: false, ...opts })
+    return FilestackUpload.pickOneOrMore({ multiple: false, ...opts })
   }
 
   static async pickImages(opts = {}) {
-    return this.pickOneOrMore({ multiple: true, ...opts })
+    return FilestackUpload.pickOneOrMore({ multiple: true, ...opts })
   }
 
   static async pickOneOrMore({ onSuccess, onFailure, multiple } = {}) {
