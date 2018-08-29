@@ -121,6 +121,14 @@ describe Api::V1::ItemsController, type: :request, json: true, auth: true do
       patch(path, params: params)
     end
 
+    it 'broadcasts collection updates' do
+      expect(CollectionUpdateBroadcaster).to receive(:call).with(
+        parent,
+        user,
+      )
+      patch(path, params: params)
+    end
+
     context 'with cancel_sync == true' do
       let(:params) {
         json_api_params(

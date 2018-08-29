@@ -18,11 +18,6 @@ const StyledContainer = styled.div`
   ${props => props.fullPageView && `padding: 2rem 0.5rem;`}
   padding-top: 25px;
   .editor-pill {
-    position: absolute;
-    top: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-
     ${props => !props.fullPageView && (`
       bottom: 0;
       padding: 10px;
@@ -122,9 +117,9 @@ class TextItem extends React.Component {
     const { item, onSave } = this.props
     if (this.unlockTimeout) clearTimeout(this.unlockTimeout)
     this.leaving = true
-    this.channel.unsubscribe()
     if (!this.canEdit) return
     this.debouncedOnKeyUp.flush()
+    ChannelManager.unsubscribeAllFromChannel(this.channelName)
     if (this.linkerInterval) clearInterval(this.linkerInterval)
     if (this.readyToSave) {
       onSave(item)

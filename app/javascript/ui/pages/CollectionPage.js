@@ -18,6 +18,7 @@ import PageSeparator from '~/ui/global/PageSeparator'
 import PageWithApi from '~/ui/pages/PageWithApi'
 import PlusIcon from '~/ui/icons/PlusIcon'
 import SubmissionBoxSettingsModal from '~/ui/submission_box/SubmissionBoxSettingsModal'
+import EditorPill from '~/ui/items/EditorPill'
 
 const isHomepage = ({ params }) => (params.org && !params.id)
 
@@ -25,13 +26,14 @@ const isHomepage = ({ params }) => (params.org && !params.id)
 @observer
 class CollectionPage extends PageWithApi {
   @observable loadingSubmissions = false
-  @observable editor = null
+  @observable currentEditor = {}
 
+  editorTimeout = null
   channelName = 'CollectionViewingChannel'
 
   constructor(props) {
     super(props)
-    this.reloadData = _.debounce(this._reloadData, 3000)
+    this.reloadData = _.debounce(this._reloadData, 1500)
   }
 
   componentWillMount() {
@@ -51,6 +53,11 @@ class CollectionPage extends PageWithApi {
     }
   }
 
+  componentWillUnmount() {
+    super.componentWillUnmount()
+    ChannelManager.unsubscribeAllFromChannel(this.channelName)
+  }
+
   subscribeToChannel(id) {
     ChannelManager.subscribe(this.channelName, id,
       {
@@ -59,15 +66,26 @@ class CollectionPage extends PageWithApi {
   }
 
   @action setEditor = (editor) => {
-    this.editor = editor
-    setTimeout(() => this.setEditor(null), 3000)
+    this.currentEditor = editor
+    if (this.editorTimeout) clearTimeout(this.editorTimeout)
+    // this.unmounted comes from PageWithApi
+    if (this.unmounted || _.isEmpty(editor)) return
+    this.editorTimeout = setTimeout(() => this.setEditor({}), 4000)
   }
 
   receivedChannelData = async (data) => {
-    const currentId = this.props.match.params.id
-    if (data.record_id.toString() === currentId.toString()) {
-      this.reloadData()
+    const { apiStore } = this.props
+    const { collection } = this
+    const currentId = collection.id.toString()
+    const submissions = collection.submissions_collection
+    const submissionsId = submissions ? submissions.id.toString() : ''
+    if (_.compact([currentId, submissionsId]).indexOf(data.record_id.toString()) > -1) {
       this.setEditor(data.current_editor)
+      if (_.isEmpty(data.current_editor) || data.current_editor.id === apiStore.currentUserId) {
+        // don't reload your own updates
+        return
+      }
+      this.reloadData()
     }
   }
 
@@ -149,6 +167,8 @@ class CollectionPage extends PageWithApi {
         this.setLoadedSubmissions(false)
         await apiStore.fetch('collections', collection.submissions_collection.id, true)
         this.setLoadedSubmissions(true)
+        // Also subscribe to updates for the submission boxes
+        this.subscribeToChannel(collection.submissions_collection.id)
       }
     } else {
       apiStore.clearUnpersistedThreads()
@@ -199,10 +219,26 @@ class CollectionPage extends PageWithApi {
     )
   }
 
+  get renderEditorPill() {
+    const { currentEditor } = this
+    const { currentUserId } = this.props.apiStore
+    let hidden = ''
+    if (_.isEmpty(currentEditor) || currentEditor.id === currentUserId) hidden = 'hidden'
+    return (
+      <EditorPill className={`editor-pill ${hidden}`} editor={currentEditor} />
+    )
+  }
+
   render() {
     // this.error comes from PageWithApi
     if (this.error) return <PageError error={this.error} />
     const { collection } = this
+    // for some reason collection can come through as an object, but not some fields like can_edit,
+    // which indicates it hasn't finished loading everything
+    if (!collection || collection.can_edit === undefined) {
+      return <Loader />
+    }
+
     const { uiStore } = this.props
     const {
       blankContentToolState,
@@ -211,12 +247,6 @@ class CollectionPage extends PageWithApi {
       loadedSubmissions,
       isLoading,
     } = uiStore
-
-    // for some reason collection can come through as an object, but not some fields like can_edit,
-    // which indicates it hasn't finished loading everything
-    if (!collection || collection.can_edit === undefined) {
-      return <Loader />
-    }
 
     // submissions_collection will only exist for submission boxes
     const { submissions_collection, isSubmissionBox } = collection
@@ -235,6 +265,7 @@ class CollectionPage extends PageWithApi {
         />
         { !isLoading &&
           <PageContainer>
+            { this.renderEditorPill }
             <CollectionGrid
               // pull in cols, gridW, gridH, gutter
               {...gridSettings}

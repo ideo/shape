@@ -32,7 +32,6 @@ describe('GridCardBlank', () => {
 
   describe('render()', () => {
     it('should say the submission type name', () => {
-      console.log(wrapper.debug())
       expect(
         wrapper.find('StyledBlankCreationTool h3').text()
       ).toEqual('Add a new text')

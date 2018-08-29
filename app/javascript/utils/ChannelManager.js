@@ -23,7 +23,7 @@ class ChannelManager {
     return channel
   }
 
-  channelId = (channel, recordId) => (
+  channelId = (channel, recordId = 'home') => (
     `${channel}_${recordId}`
   )
 
@@ -32,13 +32,13 @@ class ChannelManager {
   }
 
   unsubscribeAllFromChannel(channelName) {
-    for (let channelId in this.channels) {
+    Object.keys(this.channels).forEach(channelId => {
       if (channelId.split('_')[0] === channelName) {
         const channel = this.channels[channelId]
         channel.unsubscribe()
         delete this.channels[channelId]
       }
-    }
+    })
   }
 }
 

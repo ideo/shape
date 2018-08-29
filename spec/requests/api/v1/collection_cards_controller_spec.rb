@@ -389,6 +389,14 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
         expect(to_collection.collection_cards.first(2).map(&:item)).to match_array moving_cards.map(&:item)
         expect(to_collection.collection_cards.first.link?).to be true
       end
+
+      it 'broadcasts collection updates' do
+        expect(CollectionUpdateBroadcaster).to receive(:call).with(
+          to_collection,
+          user,
+        )
+        post(path, params: params)
+      end
     end
   end
 
@@ -537,6 +545,14 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
         )
         patch(path, params: params)
       end
+
+      it 'broadcasts collection updates' do
+        expect(CollectionUpdateBroadcaster).to receive(:call).with(
+          collection,
+          user,
+        )
+        patch(path, params: params)
+      end
     end
 
     context 'without record edit access' do
@@ -546,5 +562,4 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
       end
     end
   end
-
 end

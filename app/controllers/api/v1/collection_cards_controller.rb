@@ -45,6 +45,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
   end
 
   before_action :load_and_authorize_replacing_card, only: %i[replace]
+  after_action :broadcast_replacing_updates, only: %i[replace]
   def replace
     if @replacing_card.archive!
       create
@@ -54,14 +55,15 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
   end
 
   before_action :load_and_authorize_moving_collections, only: %i[move]
-  after_action :broadcast_moving_collection_updates, only: %i[move]
+  after_action :broadcast_moving_collection_updates, only: %i[move link]
   def move
+    @card_action ||= 'move'
     mover = CardMover.new(
       from_collection: @from_collection,
       to_collection: @to_collection,
       cards: @cards,
       placement: json_api_params[:placement],
-      card_action: @card_action || 'move',
+      card_action: @card_action,
     )
     if mover.call
       # NOTE: even though this action is in CollectionCardsController, it returns the to_collection
@@ -165,8 +167,15 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
     )
   end
 
+  def broadcast_replacing_updates
+    return unless @replacing_card.parent.present?
+    CollectionUpdateBroadcaster.call(@replacing_card.parent, current_user)
+  end
+
   def broadcast_moving_collection_updates
-    CollectionUpdateBroadcaster.call(@from_collection, current_user)
+    if @card_action == 'move'
+      CollectionUpdateBroadcaster.call(@from_collection, current_user)
+    end
     CollectionUpdateBroadcaster.call(@to_collection, current_user)
   end
 

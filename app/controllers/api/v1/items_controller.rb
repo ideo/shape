@@ -20,9 +20,12 @@ class Api::V1::ItemsController < Api::V1::BaseController
     @item.attributes = item_params
     if @item.save
       create_edit_notification
+      CollectionUpdateBroadcaster.call(@item.parent, current_user)
       # cancel_sync means we don't want to render the item JSON
       return if @cancel_sync
-      @item.stopped_editing(current_user) if @item.is_a?(Item::TextItem)
+      if @item.is_a?(Item::TextItem)
+        @item.stopped_editing(current_user)
+      end
       render jsonapi: @item
     else
       render_api_errors @item.errors

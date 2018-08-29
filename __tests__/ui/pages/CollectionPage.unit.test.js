@@ -57,7 +57,7 @@ describe('CollectionPage', () => {
   describe('componentWillReceiveProps()', () => {
     describe('on a different collection', () => {
       beforeEach(() => {
-        const match = {
+        match = {
           params: { id: 155 },
           path: '/collections/155',
           url: '/collections/155'
