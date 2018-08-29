@@ -49,7 +49,7 @@ FloatingActionButton.propTypes = {
   toolTip: PropTypes.string.isRequired,
   onClick: PropTypes.func.isRequired,
   text: PropTypes.string,
-  icon: PropTypes.string,
+  icon: PropTypes.node,
 }
 
 FloatingActionButton.defaultProps = {

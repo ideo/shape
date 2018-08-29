@@ -8,6 +8,7 @@ import v from '~/utils/variables'
 import { CloseButton } from '~/ui/global/styled/buttons'
 import EditorPill from '~/ui/items/EditorPill'
 import TextItemToolbar from '~/ui/items/TextItemToolbar'
+import ChannelManager from '~/utils/ChannelManager'
 
 // How long to wait before unlocking editor due to inactivity
 // Only used if there are other viewers
@@ -17,11 +18,6 @@ const StyledContainer = styled.div`
   ${props => props.fullPageView && `padding: 2rem 0.5rem;`}
   padding-top: 25px;
   .editor-pill {
-    position: absolute;
-    top: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-
     ${props => !props.fullPageView && (`
       bottom: 0;
       padding: 10px;
@@ -71,6 +67,8 @@ export const overrideHeadersFromClipboard = (editor) => {
 // receive no editor present event: unlock text box
 
 class TextItem extends React.Component {
+  channelName = 'ItemEditingChannel'
+
   constructor(props) {
     super(props)
     this.debouncedOnKeyUp = _.debounce(this._onKeyUp, 2000)
@@ -119,9 +117,9 @@ class TextItem extends React.Component {
     const { item, onSave } = this.props
     if (this.unlockTimeout) clearTimeout(this.unlockTimeout)
     this.leaving = true
-    this.channel.unsubscribe()
     if (!this.canEdit) return
     this.debouncedOnKeyUp.flush()
+    ChannelManager.unsubscribeAllFromChannel(this.channelName)
     if (this.linkerInterval) clearInterval(this.linkerInterval)
     if (this.readyToSave) {
       onSave(item)
@@ -135,19 +133,12 @@ class TextItem extends React.Component {
   }
 
   subscribeToItemEditingChannel = () => {
-    const { item, actionCableConsumer } = this.props
-    this.channel = actionCableConsumer.subscriptions.create(
+    const { item } = this.props
+    this.channel = ChannelManager.subscribe(this.channelName, item.id,
       {
-        channel: 'ItemEditingChannel',
-        id: item.id
-      },
-      {
-        connected: () => {},
-        disconnected: this.channelDisconnected,
-        received: this.channelReceivedData,
-        rejected: () => {},
-      }
-    )
+        channelDisconnected: this.channelDisconnected,
+        channelReceivedData: this.channelReceivedData,
+      })
   }
 
   channelReceivedData = async (data) => {

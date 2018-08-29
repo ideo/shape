@@ -33,10 +33,10 @@ const FixedPageHeader = FixedHeader.extend`
 const IconHolder = styled.span`
   color: ${v.colors.cloudy};
   display: block;
-  height: 30px;
-  ${props => (props.align === 'left' ? 'margin-right: 10px;' : 'margin-left: 10px;')}
-  margin-top: 16px;
-  width: 30px;
+  height: 32px;
+  ${props => (props.align === 'left' ? 'margin-right: 12px;' : 'margin-left: 6px;')}
+  margin-top: 14px;
+  width: 32px;
 
   @media only screen and (max-width: ${v.responsive.smallBreakpoint}px) {
     height: 36px;
@@ -86,7 +86,7 @@ class PageHeader extends React.Component {
     uiStore.update('pageMenuOpen', false)
   }
 
-  routeBack = ({ type }) => {
+  routeBack = ({ type } = {}) => {
     const { record, routingStore } = this.props
     if (record.internalType === 'items' || type === 'move' || type === 'archive') {
       if (record.parent_collection_card.parent_id) {
@@ -238,7 +238,7 @@ class PageHeader extends React.Component {
                 {record.isUsableTemplate &&
                   <FormButton
                     color="blue"
-                    style={{ marginLeft: 10, marginTop: 10 }}
+                    style={{ marginLeft: 30, marginTop: 10 }}
                     onClick={this.openMoveMenuForTemplate}
                   >
                     Use Template

@@ -1,8 +1,7 @@
 import _ from 'lodash'
 import pluralize from 'pluralize'
-import { observable, runInAction } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
-// import styled from 'styled-components'
+import styled from 'styled-components'
 
 import {
   Heading2,
@@ -21,6 +20,7 @@ import AlertIcon from '~/ui/icons/AlertIcon'
 import AddTextIcon from '~/ui/icons/AddTextIcon'
 import AddFileIcon from '~/ui/icons/AddFileIcon'
 import AddLinkIcon from '~/ui/icons/AddLinkIcon'
+import TemplateIcon from '~/ui/icons/TemplateIcon'
 import Modal from '~/ui/global/modals/Modal'
 import v from '~/utils/variables'
 
@@ -40,21 +40,20 @@ const SubmissionBoxRowText = RowItemLeft.extend`
   padding-top: 0.75rem;
 `
 
+const StyledTitleContent = styled.div`
+  border-bottom: 1px solid ${v.colors.gray};
+`
+
 @inject('apiStore', 'uiStore', 'routingStore')
 @observer
 class SubmissionBoxSettingsModal extends React.Component {
-  @observable templates = []
-
-  async componentDidMount() {
+  componentDidMount() {
     const { apiStore } = this.props
-    const other = ''
-    let q = `#template ${other}`
-    q = _.trim(q).replace(/\s/g, '+').replace(/#/g, '%23')
-    // TODO: pagination?
-    const res = await apiStore.request(`search?query=${q}`)
-    runInAction(() => {
-      this.templates = res.data.filter(c => c.isUsableTemplate)
-    })
+    apiStore.fetchUsableTemplates()
+  }
+
+  get templates() {
+    return this.props.apiStore.usableTemplates
   }
 
   get locked() {
@@ -141,8 +140,62 @@ class SubmissionBoxSettingsModal extends React.Component {
     })
   }
 
+  submissionBoxRowForItem = (typeName) => {
+    const types = [
+      { name: 'text', Icon: AddTextIcon },
+      { name: 'link', Icon: AddLinkIcon },
+      { name: 'file', Icon: AddFileIcon },
+    ]
+    const type = _.find(types, t => t.name === typeName)
+    return (
+      <SubmissionBoxRow
+        key={type.name}
+        noSpacing
+        onClick={this.chooseSubmissionBoxType(type.name)}
+      >
+        <BctButton>
+          <type.Icon />
+        </BctButton>
+        <SubmissionBoxRowText>
+          {_.startCase(type.name)} Item
+        </SubmissionBoxRowText>
+      </SubmissionBoxRow>
+    )
+  }
+
+  submissionBoxRowForTemplate = (template) => (
+    <SubmissionBoxRow
+      key={template.id}
+      noSpacing
+      onClick={this.chooseTemplate(template)}
+    >
+      <ThumbnailHolder>
+        { template.cover.image_url &&
+          <img src={template.cover.image_url} alt={template.name} />
+        }
+        { !template.cover.image_url &&
+          <TemplateIcon circled filled />
+        }
+      </ThumbnailHolder>
+      <SubmissionBoxRowText>
+        { template.name }
+      </SubmissionBoxRowText>
+    </SubmissionBoxRow>
+  )
+
+  selectedOption = () => {
+    const { submission_template_id, submission_box_type } = this.props.collection
+    const template = this.templates.find(t => t.id === submission_template_id)
+    if (template) {
+      return this.submissionBoxRowForTemplate(template)
+    } else if (submission_box_type && submission_box_type !== 'template') {
+      return this.submissionBoxRowForItem(submission_box_type)
+    }
+    return ''
+  }
+
   titleContent = () => (
-    <div>
+    <StyledTitleContent>
       <Heading2>Submission Box Settings</Heading2>
       <Row>
         <span style={{ display: 'inline-block', height: '25px', width: '25px', color: v.colors.gray }}>
@@ -157,30 +210,15 @@ class SubmissionBoxSettingsModal extends React.Component {
         </RowItemLeft>
       </Row>
       <Heading3>Submission Format</Heading3>
-    </div>
+      { this.selectedOption() }
+    </StyledTitleContent>
   )
 
   get itemRows() {
-    const types = [
-      { name: 'text', Icon: AddTextIcon },
-      { name: 'link', Icon: AddLinkIcon },
-      { name: 'file', Icon: AddFileIcon },
-    ]
     const { submission_box_type } = this.props.collection
-    return types.map(type => (
-      <SubmissionBoxRow
-        className={`${submission_box_type === type.name ? 'selected' : ''}`}
-        key={type.name}
-        noSpacing
-        onClick={this.chooseSubmissionBoxType(type.name)}
-      >
-        <BctButton>
-          <type.Icon />
-        </BctButton>
-        <SubmissionBoxRowText>
-          {_.startCase(type.name)} Item
-        </SubmissionBoxRowText>
-      </SubmissionBoxRow>
+    const types = ['text', 'link', 'file']
+    return _.filter(types, t => t !== submission_box_type).map(type => (
+      this.submissionBoxRowForItem(type)
     ))
   }
 
@@ -195,21 +233,11 @@ class SubmissionBoxSettingsModal extends React.Component {
       >
         <div>
           { this.itemRows }
-          {this.templates.map(template => (
-            <SubmissionBoxRow
-              className={`${submission_template_id === template.id ? 'selected' : ''}`}
-              key={template.id}
-              noSpacing
-              onClick={this.chooseTemplate(template)}
-            >
-              <ThumbnailHolder>
-                <img src={template.cover.image_url} alt={template.name} />
-              </ThumbnailHolder>
-              <SubmissionBoxRowText>
-                { template.name }
-              </SubmissionBoxRowText>
-            </SubmissionBoxRow>
-          ))}
+          {this.templates.map(template =>
+            submission_template_id !== template.id && (
+              this.submissionBoxRowForTemplate(template)
+            ))
+          }
         </div>
       </Modal>
     )
