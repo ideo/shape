@@ -169,10 +169,11 @@ class GroupTitle extends React.Component {
 GroupTitle.propTypes = {
   group: MobxPropTypes.objectOrObservableObject.isRequired,
   onSave: PropTypes.func,
-  canEdit: PropTypes.bool.isRequired,
+  canEdit: PropTypes.bool,
 }
 GroupTitle.defaultProps = {
   onSave: null,
+  canEdit: false,
 }
 
 export default GroupTitle

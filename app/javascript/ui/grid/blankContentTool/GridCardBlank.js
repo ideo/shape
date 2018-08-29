@@ -214,8 +214,8 @@ class GridCardBlank extends React.Component {
       },
       onSuccess: async (res) => {
         if (res.length > 0) {
-          const file = await FilestackUpload.processFile(res)
-          this.createCardWith(file)
+          const files = await FilestackUpload.processFiles(res)
+          files.forEach(file => this.createCardWith(file))
         }
       }
     })
@@ -247,9 +247,9 @@ class GridCardBlank extends React.Component {
     this.createCard(attrs)
   }
 
-  pickImage = () => {
-    FilestackUpload.pickImage({
-      onSuccess: (img) => this.createCardWith(img)
+  pickImages = () => {
+    FilestackUpload.pickImages({
+      onSuccess: (files) => files.forEach(file => this.createCardWith(file))
     })
   }
 
@@ -419,7 +419,7 @@ class GridCardBlank extends React.Component {
               type="file"
               creating={creating}
               size={size}
-              onClick={this.pickImage}
+              onClick={this.pickImages}
               Icon={AddFileIcon}
             />
           }
