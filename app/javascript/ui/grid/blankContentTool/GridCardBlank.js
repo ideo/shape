@@ -449,7 +449,7 @@ class GridCardBlank extends React.Component {
                 type="template"
                 creating={creating}
                 size={size}
-                Icon={() => <TemplateIcon viewBox="-5 -5 60 60" />}
+                Icon={TemplateIcon}
               />
             </BctButtonRotation>
           }
