@@ -138,14 +138,6 @@ class Organization < ApplicationRecord
     ))
   end
 
-  # used for reporting purposes
-  def user_count
-    (
-      primary_group.user_ids +
-      guest_group.user_ids
-    ).uniq.count
-  end
-
   def create_profile_master_template(attrs = {})
     create_profile_template(
       attrs.merge(

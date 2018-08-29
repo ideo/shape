@@ -235,13 +235,13 @@ describe Organization, type: :model do
     end
   end
 
-  describe '#user_count' do
+  describe '#all_active_users' do
     let(:member) { create(:user) }
     let(:guest) { create(:user) }
     let(:organization) { create(:organization, member: member, guest: guest) }
 
     it 'should count the number of users' do
-      expect(organization.user_count).to eq 2
+      expect(organization.all_active_users.count).to eq 2
     end
   end
 end
