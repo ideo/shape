@@ -50,7 +50,7 @@ describe('GridCardBlank', () => {
     })
 
     it('triggers FilestackUpload with onClick handler', () => {
-      component.pickImage()
+      component.pickImages()
       wrapper.update()
       expect(wrapper.state().creating).toEqual(null)
       expect(FilestackUpload.pickImages).toHaveBeenCalled()

@@ -14,6 +14,7 @@ const imageUploadConfig = {
   ],
   maxFiles: 1,
   imageMax: [1200, 1200],
+  maxSize: 25 * 1024 * 1024,
   transformations: {
     crop: {
       aspectRatio: 5 / 4
