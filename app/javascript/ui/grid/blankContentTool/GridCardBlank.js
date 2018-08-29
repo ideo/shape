@@ -68,7 +68,7 @@ const StyledBlankCreationTool = styled.div`
     padding: 1.5rem 1.33rem;
 
     .foreground.foreground-bottom {
-      top: 90px;
+      top: 80px;
     }
   }
 `
@@ -157,9 +157,9 @@ const BctDropzone = styled.div`
     width: 135px;
     left: 50px;
     .text {
-      top: 40px;
-      left: 25px;
-      font-size: 0.9rem;
+      top: 35px;
+      left: 28px;
+      font-size: 0.8rem;
     }
     .fsp-drop-pane__container {
       width: 120px;
