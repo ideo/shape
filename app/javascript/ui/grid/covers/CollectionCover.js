@@ -16,8 +16,9 @@ import { routingStore } from '~/stores'
 
 const IconHolder = styled.span`
   display: inline-block;
-  height: 27px;
-  vertical-align: text-top;
+  line-height: 31px;
+  margin-right: 5px;
+  vertical-align: middle;
   width: 27px;
 `
 
@@ -109,23 +110,26 @@ class CollectionCover extends React.Component {
       const nameParts = splitName(collection.name)
       if (!nameParts) return collection.name
       const lastName = nameParts.pop()
-      let icon
+      let leftIcon
+      let rightIcon
       if (collection.isProfileTemplate) {
-        icon = <FilledProfileIcon />
+        rightIcon = <FilledProfileIcon />
       } else if (collection.isMasterTemplate) {
-        icon = <TemplateIcon circled filled />
+        leftIcon = <TemplateIcon circled filled />
       } else if (collection.isUserProfile) {
-        icon = <ProfileIcon />
+        rightIcon = <ProfileIcon />
       } else if (collection.isTemplated) {
-        icon = <TemplateIcon circled />
+        rightIcon = <TemplateIcon circled />
       } else if (collection.isSubmissionBox) {
-        icon = <SubmissionBoxIconLg />
+        rightIcon = <SubmissionBoxIconLg />
       }
       return (
         <Fragment>
+          { leftIcon && <IconHolder>{leftIcon}</IconHolder> }
           {nameParts.join(' ')}{' '}
           <span style={{ whiteSpace: 'nowrap' }}>
-            {lastName}&nbsp;<IconHolder>{icon}</IconHolder>
+            {lastName}&nbsp;
+            { rightIcon && <IconHolder>{rightIcon}</IconHolder> }
           </span>
         </Fragment>
       )

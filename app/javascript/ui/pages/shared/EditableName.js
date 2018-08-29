@@ -18,7 +18,6 @@ StyledName.displayName = 'StyledName'
 const StyledEditableName = styled.div`
   display: block;
   .input__name {
-    width: 30vw;
     margin-bottom: 0.5rem;
     margin-top: 0.5rem;
     input {
