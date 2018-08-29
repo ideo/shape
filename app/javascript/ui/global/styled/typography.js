@@ -55,7 +55,7 @@ export const SubduedHeading1 = styled.h1`
   display: inline-block;
   font-weight: 300;
   margin-bottom: 0;
-  margin-left: 20px;
+  margin-left: 16px;
   padding-top: 8px;
   text-transform: none;
 
