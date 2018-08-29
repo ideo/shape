@@ -256,7 +256,7 @@ class GridCard extends React.Component {
             { record.isDownloadable && (
               <Download record={record} />
             )}
-            { record.isImage && (
+            { record.isImage && this.canEditCard && (
               <ContainImage card={card} />
             )}
             <SelectionCircle cardId={card.id} />
