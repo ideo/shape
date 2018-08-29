@@ -53,7 +53,7 @@ describe('GridCardBlank', () => {
       component.pickImage()
       wrapper.update()
       expect(wrapper.state().creating).toEqual(null)
-      expect(FilestackUpload.pickImage).toHaveBeenCalled()
+      expect(FilestackUpload.pickImages).toHaveBeenCalled()
     })
 
     it('opens VideoCreator with onClick handler', () => {
