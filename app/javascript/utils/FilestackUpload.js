@@ -102,7 +102,7 @@ class FilestackUpload {
 
   static makeDropPane(opts = {}) {
     const config = Object.assign({}, dropPaneDefaults, opts)
-    return this.client.makeDropPane(config)
+    return this.client.makeDropPane(config, multiImageUploadConfig)
   }
 }
 
