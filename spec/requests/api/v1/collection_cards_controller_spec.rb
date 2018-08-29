@@ -201,7 +201,7 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
     end
   end
 
-  describe 'PATCH #archive', only: true do
+  describe 'PATCH #archive' do
     let!(:collection_cards) { create_list(:collection_card_collection, 3, parent: collection) }
     let(:path) { '/api/v1/collection_cards/archive' }
     let(:params) { { card_ids: collection_cards.map(&:id) }.to_json }
@@ -491,9 +491,6 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
     let(:path) { "/api/v1/collection_cards/#{collection_card.id}" }
     let(:raw_params) do
       {
-        order: 1,
-        width: 3,
-        height: 1,
         image_contain: true,
       }
     end
@@ -519,6 +516,27 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
       patch(path, params: params)
       expect(json['data']['attributes']['image_contain']).to eq true
       expect(collection_card.reload.image_contain).to be true
+    end
+
+    it 'broadcasts collection updates' do
+      expect(CollectionUpdateBroadcaster).to receive(:call).with(
+        collection,
+        user,
+      )
+      patch(path, params: params)
+    end
+
+    context 'without content editor access on the parent collection' do
+      let(:user) { create(:user, add_to_org: create(:organization)) }
+
+      before do
+        user.add_role(Role::EDITOR, collection_card.item)
+      end
+
+      it 'returns a 401' do
+        patch(path, params: params)
+        expect(response.status).to eq(401)
+      end
     end
   end
 

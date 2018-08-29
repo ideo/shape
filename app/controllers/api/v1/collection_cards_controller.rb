@@ -2,13 +2,14 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
   deserializable_resource :collection_card, class: DeserializableCollectionCard, only: %i[create update replace]
   load_and_authorize_resource except: %i[move replace]
   before_action :load_and_authorize_parent_collection, only: %i[create replace]
+  before_action :load_and_authorize_parent_collection_for_update, only: %i[update]
+  after_action :broadcast_collection_create_updates, only: %i[create update]
 
   load_and_authorize_resource :collection, only: %i[index]
   def index
     render jsonapi: @collection.collection_cards
   end
 
-  after_action :broadcast_collection_create_updates, only: %i[create]
   def create
     card_params = collection_card_params
     type = card_params.delete(:type) || 'primary'
@@ -35,7 +36,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
   end
 
   def update
-    @collection_card.attributes = collection_card_params
+    @collection_card.attributes = collection_card_update_params
     if @collection_card.save
       render jsonapi: @collection_card
     else
@@ -123,6 +124,11 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
     authorize! :edit_content, @collection
   end
 
+  def load_and_authorize_parent_collection_for_update
+    @collection = @collection_card.parent
+    authorize! :edit_content, @collection
+  end
+
   def load_and_authorize_moving_collections
     @from_collection = Collection.find(json_api_params[:from_id])
     @cards = CollectionCard.where(id: json_api_params[:collection_card_ids])
@@ -194,6 +200,14 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
 
   def broadcast_collection_archive_updates
     CollectionUpdateBroadcaster.call(@collection_cards.first.parent, current_user)
+  end
+
+  def collection_card_update_params
+    params.require(:collection_card).permit(
+      :width,
+      :height,
+      :image_contain,
+    )
   end
 
   def collection_card_params
