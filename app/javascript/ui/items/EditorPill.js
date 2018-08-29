@@ -7,7 +7,7 @@ import Avatar from '~/ui/global/Avatar'
 
 const StyledEditorPill = styled.div`
   position: fixed;
-  top: ${v.headerHeight}px;
+  top: ${v.headerHeight - 25}px;
   left: 50%;
   transform: translateX(-50%);
   z-index: ${v.zIndex.pageHeader};
@@ -20,9 +20,12 @@ const StyledEditorPill = styled.div`
   color: white;
 
   opacity: 1;
-  transition: all 0.3s;
+  transition: min-height 0.3s ease-out, opacity 0.3s ease-out;
   &.hidden {
     opacity: 0;
+    min-height: 1px;
+    transition: min-height 0.3s ease-out, opacity 0.3s ease-out, z-index 0.5s 0.5s;
+    z-index: -1;
   }
   .editor {
     display: inline-block;
