@@ -35,6 +35,7 @@ FriendlyId.defaults do |config|
     javascripts
     images
 
+    passthru
     collections
     items
     search
