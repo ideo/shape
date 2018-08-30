@@ -1,5 +1,6 @@
 'use strict'
 
+const webpack = require('webpack')
 const {environment} = require('@rails/webpacker')
 const path = require('path')
 const {castArray, identity, flow, mapValues} = require('lodash/fp')
@@ -93,8 +94,16 @@ const addIdeoSSOExternal = env => {
   return env
 }
 
+const addReactGlobal = env => {
+  env.plugins.insert('Provide', new webpack.ProvidePlugin({
+    React: 'react'
+  }))
+  return env
+}
+
 const updateEnvironment = flow(
   DEV ? addReactHotLoader : identity,
+  addReactGlobal,
   addReactSVGLoader,
   addBabelPolyfill,
   addTypescriptLoader,
