@@ -61,6 +61,7 @@ export default class UiStore {
     iconName: null,
     confirmText: 'OK',
     cancelText: 'Cancel',
+    fadeOutTime: undefined,
     onClose: () => this.closeDialog(),
   }
   @observable dialogConfig = { ...this.defaultDialogProps }
