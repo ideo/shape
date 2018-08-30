@@ -482,7 +482,7 @@ class CollectionGrid extends React.Component {
         if (card.record) {
           ({ record } = card)
           // getRecordType gets either 'items' or 'collections'
-          cardType = card.record.getRecordType()
+          cardType = card.record.internalType
         }
       }
       const { openCardMenuId } = uiStore
