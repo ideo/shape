@@ -34,8 +34,9 @@ class ActionMenu extends React.Component {
       uiStore.closeMoveMenu({ deselect: true })
     }
     this.setLoading(name)
-    await card[methodName]()
+    const result = await card[methodName]()
     this.setLoading()
+    return result
   }
 
   replaceCard = () => {
@@ -69,8 +70,8 @@ class ActionMenu extends React.Component {
 
   archiveCard = async () => {
     const { afterArchive } = this.props
-    await this.callCardAction('Archive', 'API_archive')
-    if (afterArchive) afterArchive({ type: 'archive' })
+    const result = await this.callCardAction('Archive', 'API_archive')
+    if (afterArchive && result) afterArchive({ type: 'archive' })
   }
 
   showTags = () => {

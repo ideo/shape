@@ -180,15 +180,17 @@ class CollectionCard extends BaseRecord {
 
     const collection = this.parent
     try {
-      collection.removeCardIds(selectedCardIds)
       await this.apiStore.request(`collection_cards/archive`, 'PATCH', {
         card_ids: selectedCardIds
       })
-
-      if (collection.collection_cards.length === 0) {
-        uiStore.openBlankContentTool()
+      // collection may be undefined e.g. if we're archiving from the header actionmenu
+      if (collection) {
+        collection.removeCardIds(selectedCardIds)
+        uiStore.trackEvent('archive', collection)
+        if (collection.collection_cards.length === 0) {
+          uiStore.openBlankContentTool()
+        }
       }
-      uiStore.trackEvent('archive', collection)
       return true
     } catch (e) {
       // re-fetch collection
