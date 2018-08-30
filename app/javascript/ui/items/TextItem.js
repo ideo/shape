@@ -320,7 +320,7 @@ class TextItem extends React.Component {
 
   get textData() {
     const { item } = this.props
-    return item.toJS().text_data
+    return item.toJSON().text_data
   }
 
   onKeyUp = (content, delta, source, editor) => {

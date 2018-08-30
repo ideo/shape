@@ -79,7 +79,7 @@ class TextItemCreator extends React.Component {
     }
 
     const { item } = this
-    const textData = item.text_data ? item.toJS().text_data : null
+    const textData = item.text_data ? item.toJSON().text_data : null
 
     return (
       <StyledTextItemCreator height={this.props.height}>
