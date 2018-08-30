@@ -1,10 +1,16 @@
 import _ from 'lodash'
 import { computed, action } from 'mobx'
+import { prop } from 'datx'
 
 import BaseRecord from './BaseRecord'
+import CollectionCard from './CollectionCard'
+import Role from './Role'
 
 class Collection extends BaseRecord {
   attributesForAPI = ['name', 'tag_list']
+
+  @prop.toMany(CollectionCard) collection_card
+  @prop.toMany(Role) role
 
   @computed get cardIds() {
     return this.collection_cards.map(card => card.id)
@@ -132,11 +138,5 @@ class Collection extends BaseRecord {
   }
 }
 Collection.type = 'collections'
-
-Collection.defaults = {
-  // set as array so it's never `undefined`
-  collection_cards: [],
-  roles: []
-}
 
 export default Collection
