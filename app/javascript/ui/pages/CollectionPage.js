@@ -29,7 +29,6 @@ class CollectionPage extends PageWithApi {
 
   get collection() {
     const { match, apiStore } = this.props
-    if (!apiStore.collections.length) return null
     if (this.isHomepage) {
       return apiStore.find('collections', apiStore.currentUser.current_user_collection_id)
     }
