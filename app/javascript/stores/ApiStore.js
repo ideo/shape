@@ -1,5 +1,6 @@
 import { action, runInAction, observable, computed } from 'mobx'
-import { Store } from 'mobx-jsonapi-store'
+import { Collection as datxCollection, assignModel } from 'datx'
+import { jsonapi } from 'datx-jsonapi'
 import _ from 'lodash'
 import moment from 'moment-mini'
 
@@ -18,7 +19,7 @@ import Comment from './jsonApi/Comment'
 import CommentThread from './jsonApi/CommentThread'
 import UsersThread from './jsonApi/UsersThread'
 
-class ApiStore extends Store {
+class ApiStore extends jsonapi(datxCollection) {
   @observable currentUserId = null
   @observable currentUserOrganizationId = null
   @observable currentCommentThreadIds = []
@@ -232,23 +233,24 @@ class ApiStore extends Store {
   }
 
   // -- override mobx-jsonapi-store --
-  __updateRelationships(obj) {
-    const record = this.find(obj.type, obj.id)
-    const refs = obj.relationships ? Object.keys(obj.relationships) : []
-    refs.forEach((ref) => {
-      const items = obj.relationships[ref].data
-      if (items instanceof Array && items.length < 1) {
-        /* NOTE: special case, if relationship data comes back with an empty array
-         * we have to manually empty the array, while also assigning the proper type
-         */
-        const possibleTypes = _.map(ApiStore.types, model => model.type)
-        if (possibleTypes.indexOf(ref) > -1) {
-          record.assignRef(ref, observable([]), ref)
-        }
-      }
-    })
-    super.__updateRelationships(obj)
-  }
+  // __updateRelationships(obj) {
+  //   const record = this.find(obj.type, obj.id)
+  //   const refs = obj.relationships ? Object.keys(obj.relationships) : []
+  //   refs.forEach((ref) => {
+  //     const items = obj.relationships[ref].data
+  //     if (items instanceof Array && items.length < 1) {
+  //       /* NOTE: special case, if relationship data comes back with an empty array
+  //        * we have to manually empty the array, while also assigning the proper type
+  //        */
+  //       const possibleTypes = _.map(ApiStore.types, model => model.type)
+  //       if (possibleTypes.indexOf(ref) > -1) {
+  //         assignModel(record, ref, observable([]))
+  //         // record.assignRef(ref, observable([]), ref)
+  //       }
+  //     }
+  //   })
+  //   super.__updateRelationships(obj)
+  // }
 }
 ApiStore.types = [
   Activity,

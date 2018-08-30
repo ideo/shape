@@ -1,15 +1,14 @@
-import { Record } from 'mobx-jsonapi-store'
+import { Model } from 'datx'
+import { jsonapi, modelToJsonApi } from 'datx-jsonapi'
 import _ from 'lodash'
 
-class BaseRecord extends Record {
+class BaseRecord extends jsonapi(Model) {
   get apiStore() {
-    // alias to reference the apiStore, also to be less confusing about "collection"
-    // which comes from mobx-collection-store
-    return this.__collection
+    return this.meta.collection
   }
 
   get internalType() {
-    return this.__internal.type
+    return this.meta.type
   }
 
   get className() {
@@ -23,12 +22,12 @@ class BaseRecord extends Record {
   }
 
   rawAttributes() {
-    return super.toJsonApi().attributes
+    return modelToJsonApi(this).attributes
   }
 
   // override to allow whitelist of attributes when sending to the API
   toJsonApi() {
-    const data = super.toJsonApi()
+    const data = modelToJsonApi(this)
     if (this.attributesForAPI) {
       data.attributes = _.pick(data.attributes, this.attributesForAPI)
     }

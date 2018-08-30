@@ -10,7 +10,7 @@ import Routes from '~/ui/Routes'
 import stores, { routingStore } from '~/stores'
 
 // Enable MobX Strict functionality -- requires explicit @actions
-configure({ enforceActions: true })
+configure({ enforceActions: 'observed' })
 
 const browserHistory = createBrowserHistory()
 const history = syncHistoryWithStore(browserHistory, routingStore)
