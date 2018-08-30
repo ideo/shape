@@ -100,7 +100,7 @@ class ApiStore extends jsonapi(datxCollection) {
   }
 
   importUsersThread({ usersThread, thread, comments } = {}) {
-    thread.assignRef('users_thread', usersThread)
+    assignModel(thread, 'users_thread', usersThread)
     thread.importComments(comments)
     this.addCurrentCommentThread(thread.id)
   }
@@ -199,7 +199,7 @@ class ApiStore extends jsonapi(datxCollection) {
             record_type: record.className,
             updated_at: new Date()
           }, this)
-          thread.assignRef('record', record)
+          assignModel(thread, 'record', record)
           this.add(thread)
         }
       } catch (e) {
