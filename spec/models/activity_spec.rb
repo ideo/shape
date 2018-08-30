@@ -10,4 +10,12 @@ RSpec.describe Activity, type: :model do
     it { should have_many :subject_groups }
     it { should have_many :notifications }
   end
+
+  describe 'self.map_move_action' do
+    it 'should map move action strings with activity actions' do
+      expect(Activity.map_move_action('move')).to eq :moved
+      expect(Activity.map_move_action('link')).to eq :linked
+      expect(Activity.map_move_action('duplicate')).to eq :duplicated
+    end
+  end
 end

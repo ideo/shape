@@ -78,8 +78,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
     if mover.call
       @cards.map do |card|
         create_notification(card,
-                            Activity.map_move_action(@card_action),
-                            @from_collection)
+                            Activity.map_move_action(@card_action))
       end
       # NOTE: even though this action is in CollectionCardsController, it returns the to_collection
       # so that it can be easily re-rendered on the page
@@ -110,6 +109,8 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
         duplicate_linked_records: true,
       )
       should_update_cover ||= dup.should_update_parent_collection_cover?
+      @from_collection = Collection.find(json_api_params[:from_id])
+      create_notification(card, :duplicated)
     end
     @to_collection.cache_cover! if should_update_cover
     # NOTE: for some odd reason the json api refuses to render the newly created cards here,
@@ -175,7 +176,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
     @errors ? head(400) : true
   end
 
-  def create_notification(card, action, source)
+  def create_notification(card, action)
     # only notify for archiving of collections (and not link cards)
     return if card.link?
     ActivityAndNotificationBuilder.call(
@@ -184,7 +185,8 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
       action: action,
       subject_user_ids: card.record.editors[:users].pluck(:id),
       subject_group_ids: card.record.editors[:groups].pluck(:id),
-      source: source,
+      source: @from_collection,
+      destination: @to_collection,
     )
   end
 

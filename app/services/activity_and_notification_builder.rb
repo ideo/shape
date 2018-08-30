@@ -11,7 +11,8 @@ class ActivityAndNotificationBuilder < SimpleService
     omit_group_ids: [],
     combine: false,
     content: nil,
-    source: nil
+    source: nil,
+    destination: nil
   )
     @actor = actor
     @target = target
@@ -25,6 +26,7 @@ class ActivityAndNotificationBuilder < SimpleService
     @combine = combine
     @content = content
     @source = source
+    @destination = destination
     @errors = []
     @activity = nil
     @created_notifications = []
@@ -47,6 +49,7 @@ class ActivityAndNotificationBuilder < SimpleService
       organization: @actor.current_organization,
       content: @content,
       source: @source,
+      destination: @destination,
     )
     unless @activity.no_subjects?
       @activity.subject_user_ids = @subject_user_ids

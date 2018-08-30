@@ -13,7 +13,8 @@ class Activity < ApplicationRecord
   belongs_to :target, polymorphic: true
   has_many :notifications, dependent: :destroy
   belongs_to :organization
-  belongs_to :source, polymorphic: true
+  belongs_to :source, polymorphic: true, optional: true
+  belongs_to :destination, polymorphic: true, optional: true
 
   # add explicit values so it's not tied to the order of the array
   enum action: {

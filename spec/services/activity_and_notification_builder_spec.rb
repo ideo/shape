@@ -11,6 +11,8 @@ RSpec.describe ActivityAndNotificationBuilder, type: :service do
   let(:omit_group_ids) { [] }
   let(:combine) { false }
   let(:content) { nil }
+  let(:source) { nil }
+  let(:destination) { nil }
   let(:builder) do
     ActivityAndNotificationBuilder.new(
       actor: actor,
@@ -22,6 +24,8 @@ RSpec.describe ActivityAndNotificationBuilder, type: :service do
       omit_group_ids: omit_group_ids,
       combine: combine,
       content: content,
+      source: source,
+      destination: destination,
     )
   end
 
@@ -110,6 +114,17 @@ RSpec.describe ActivityAndNotificationBuilder, type: :service do
       it 'adds the content to the activity' do
         builder.call
         expect(Activity.last.content).to eq('hello content')
+      end
+    end
+
+    context 'with source and destination' do
+      let!(:source) { create(:collection) }
+      let!(:destination) { create(:collection) }
+
+      it 'adds the content to the activity' do
+        builder.call
+        expect(Activity.last.source).to eq(source)
+        expect(Activity.last.destination).to eq(destination)
       end
     end
 
