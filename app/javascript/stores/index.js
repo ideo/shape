@@ -1,6 +1,5 @@
 import { config as jsonApiConfig } from 'mobx-jsonapi-store'
 
-import locale from './Locale'
 import ApiStore from './ApiStore'
 import RoutingStore from './RoutingStore'
 import UiStore from './UiStore'
@@ -20,6 +19,4 @@ export default {
   routingStore,
   apiStore,
   uiStore,
-  // needs to be named "locale"
-  locale
 }

@@ -7191,16 +7191,6 @@ mkdirp@0.5.x, "mkdirp@>=0.5 0", mkdirp@^0.5, mkdirp@^0.5.0, mkdirp@^0.5.1, mkdir
   dependencies:
     minimist "0.0.8"
 
-mobx-collection-store@^2.0.0:
-  version "2.0.0"
-  resolved "https://registry.yarnpkg.com/mobx-collection-store/-/mobx-collection-store-2.0.0.tgz#893451fc2ab94be69875946218d6db6cded70946"
-
-mobx-jsonapi-store@^4.2.2:
-  version "4.2.2"
-  resolved "https://registry.yarnpkg.com/mobx-jsonapi-store/-/mobx-jsonapi-store-4.2.2.tgz#9b7ded05fe8d7495dadf172d1537397553ce0522"
-  dependencies:
-    mobx-collection-store "^2.0.0"
-
 mobx-localstorage@^0.1.7:
   version "0.1.7"
   resolved "https://registry.yarnpkg.com/mobx-localstorage/-/mobx-localstorage-0.1.7.tgz#c0c64366769f390ca4a333f41912eae00cd4a9de"
