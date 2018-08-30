@@ -1,5 +1,5 @@
 import { action, runInAction, observable, computed } from 'mobx'
-import { Collection as datxCollection, assignModel } from 'datx'
+import { Collection as datxCollection, assignModel, ReferenceType, getModelMetaKey } from 'datx'
 import { jsonapi } from 'datx-jsonapi'
 import _ from 'lodash'
 import moment from 'moment-mini'
@@ -199,7 +199,10 @@ class ApiStore extends jsonapi(datxCollection) {
             record_type: record.className,
             updated_at: new Date()
           }, this)
-          assignModel(thread, 'record', record)
+          thread.addReference('record', record, {
+            model: record.className === 'Collection' ? Collection : Item,
+            type: ReferenceType.TO_ONE,
+          })
           this.add(thread)
         }
       } catch (e) {
@@ -247,8 +250,6 @@ class ApiStore extends jsonapi(datxCollection) {
         if (possibleTypes.indexOf(ref) > -1) {
           console.log('ASSIGNING MODEL', record, ref)
           assignModel(record, ref, observable([]))
-          // record.addReference(ref, obeservable([]))
-          // record.assignRef(ref, observable([]), ref)
         } else {
           console.log('not worrying about ref:', ref)
         }
