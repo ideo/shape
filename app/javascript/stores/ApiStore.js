@@ -233,24 +233,29 @@ class ApiStore extends jsonapi(datxCollection) {
   }
 
   // -- override mobx-jsonapi-store --
-  // __updateRelationships(obj) {
-  //   const record = this.find(obj.type, obj.id)
-  //   const refs = obj.relationships ? Object.keys(obj.relationships) : []
-  //   refs.forEach((ref) => {
-  //     const items = obj.relationships[ref].data
-  //     if (items instanceof Array && items.length < 1) {
-  //       /* NOTE: special case, if relationship data comes back with an empty array
-  //        * we have to manually empty the array, while also assigning the proper type
-  //        */
-  //       const possibleTypes = _.map(ApiStore.types, model => model.type)
-  //       if (possibleTypes.indexOf(ref) > -1) {
-  //         assignModel(record, ref, observable([]))
-  //         // record.assignRef(ref, observable([]), ref)
-  //       }
-  //     }
-  //   })
-  //   super.__updateRelationships(obj)
-  // }
+  __updateRelationships(obj) {
+    const record = this.find(obj.type, obj.id)
+    const refs = obj.relationships ? Object.keys(obj.relationships) : []
+    refs.forEach((ref) => {
+      const items = obj.relationships[ref].data
+      console.log(obj.type, obj.id, ref, items)
+      if (items instanceof Array && items.length < 1) {
+        /* NOTE: special case, if relationship data comes back with an empty array
+         * we have to manually empty the array, while also assigning the proper type
+         */
+        const possibleTypes = _.map(ApiStore.types, model => model.type)
+        if (possibleTypes.indexOf(ref) > -1) {
+          console.log('ASSIGNING MODEL', record, ref)
+          assignModel(record, ref, observable([]))
+          // record.addReference(ref, obeservable([]))
+          // record.assignRef(ref, observable([]), ref)
+        } else {
+          console.log('not worrying about ref:', ref)
+        }
+      }
+    })
+    super.__updateRelationships(obj)
+  }
 }
 ApiStore.types = [
   Activity,
