@@ -2,7 +2,6 @@ import { observable, action, computed, runInAction } from 'mobx'
 import _ from 'lodash'
 
 import { uiStore } from '~/stores'
-import { prop } from 'datx'
 import BaseRecord from './BaseRecord'
 import Comment from './Comment'
 
@@ -10,10 +9,7 @@ import Comment from './Comment'
 const PER_PAGE = 50
 
 class CommentThread extends BaseRecord {
-
-  @prop.toMany(Comment) unread_comment
-  @prop users_thread
-
+  static type = 'comment_threads'
   @observable comments = []
   @observable links = {}
 
@@ -126,7 +122,5 @@ class CommentThread extends BaseRecord {
     this.comments.replace(newComments)
   }
 }
-
-CommentThread.type = 'comment_threads'
 
 export default CommentThread

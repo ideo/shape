@@ -1,16 +1,11 @@
 import _ from 'lodash'
 import { computed, action } from 'mobx'
-import { prop } from 'datx'
 
 import BaseRecord from './BaseRecord'
-import CollectionCard from './CollectionCard'
-import Role from './Role'
 
 class Collection extends BaseRecord {
+  static type = 'collections'
   attributesForAPI = ['name', 'tag_list']
-
-  @prop.toMany(CollectionCard) collection_card
-  @prop.toMany(Role) role
 
   @computed get cardIds() {
     return this.collection_cards.map(card => card.id)
@@ -26,6 +21,10 @@ class Collection extends BaseRecord {
       cardIds.indexOf(card.id) > -1
     )).forEach(card => this.collection_cards.splice(this.collection_cards.indexOf(card), 1))
     this._reorderCards()
+  }
+
+  get collection_cards() {
+    return super.collection_cards || []
   }
 
   get organization() {
@@ -137,6 +136,5 @@ class Collection extends BaseRecord {
     }
   }
 }
-Collection.type = 'collections'
 
 export default Collection

@@ -4,9 +4,7 @@ import User from './User'
 import Group from './Group'
 
 class Role extends BaseRecord {
-  @prop.toMany(User) user
-  @prop.toMany(Group) group
-
+  static type = 'roles'
   static endpoint(collectionId) {
     return `collections/${collectionId}/roles`
   }
@@ -43,6 +41,5 @@ class Role extends BaseRecord {
       })
   }
 }
-Role.type = 'roles'
 
 export default Role

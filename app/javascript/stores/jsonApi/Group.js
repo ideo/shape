@@ -1,12 +1,9 @@
 import { uiStore } from '~/stores'
 import BaseRecord from './BaseRecord'
-import { prop } from 'datx'
-import Role from './Role'
 
 class Group extends BaseRecord {
+  static type = 'groups'
   attributesForAPI = ['name', 'handle', 'filestack_file_attributes']
-
-  @prop.toMany(Role) role
 
   // NOTE: Because we're never directly hitting the groups/{id} API endpoint,
   // group.roles relationship never gets set up.
@@ -53,7 +50,5 @@ class Group extends BaseRecord {
     return onAgree
   }
 }
-
-Group.type = 'groups'
 
 export default Group
