@@ -69,7 +69,7 @@ class Collection < ApplicationRecord
           inverse_of: :collection,
           dependent: :destroy
 
-  has_many :items, through: :primary_collection_cards
+  has_many :items, through: :primary_collection_cards, dependent: :destroy
   has_many :collections, through: :primary_collection_cards
   has_many :items_and_linked_items,
            through: :collection_cards,

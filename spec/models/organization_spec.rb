@@ -9,6 +9,21 @@ describe Organization, type: :model do
     it { should have_many :collections }
     it { should have_many :groups }
     it { should belong_to :primary_group }
+
+    describe '#destroy' do
+      let!(:organization) { create(:organization) }
+      let!(:collection_list) { create_list(:collection, 2, organization: organization, num_cards: 3) }
+      let(:collections) { organization.collections }
+      let(:items) { organization.items }
+
+      it 'should destroy all related cards and items' do
+        expect(collections.count).to be >= 2
+        expect(items.count).to eq 6
+        organization.destroy
+        expect(collections.count).to eq 0
+        expect(items.count).to eq 0
+      end
+    end
   end
 
   context 'callbacks' do

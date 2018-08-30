@@ -3,6 +3,7 @@ class Organization < ApplicationRecord
   friendly_id :slug_candidates, use: %i[slugged finders history]
 
   has_many :collections, dependent: :destroy
+  has_many :items, through: :collections, dependent: :destroy
   has_many :groups, dependent: :destroy
   belongs_to :primary_group,
              class_name: 'Group',
