@@ -76,6 +76,11 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
       card_action: @card_action,
     )
     if mover.call
+      @cards.map do |card|
+        create_notification(card,
+                            Activity.map_move_action(@card_action),
+                            @from_collection)
+      end
       # NOTE: even though this action is in CollectionCardsController, it returns the to_collection
       # so that it can be easily re-rendered on the page
       render jsonapi: @to_collection.reload, include: Collection.default_relationships_for_api
@@ -170,7 +175,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
     @errors ? head(400) : true
   end
 
-  def create_notification(card, action)
+  def create_notification(card, action, source)
     # only notify for archiving of collections (and not link cards)
     return if card.link?
     ActivityAndNotificationBuilder.call(
@@ -179,6 +184,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
       action: action,
       subject_user_ids: card.record.editors[:users].pluck(:id),
       subject_group_ids: card.record.editors[:groups].pluck(:id),
+      source: source,
     )
   end
 

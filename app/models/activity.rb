@@ -13,6 +13,7 @@ class Activity < ApplicationRecord
   belongs_to :target, polymorphic: true
   has_many :notifications, dependent: :destroy
   belongs_to :organization
+  belongs_to :source, polymorphic: true
 
   # add explicit values so it's not tied to the order of the array
   enum action: {
@@ -27,7 +28,21 @@ class Activity < ApplicationRecord
     replaced: 8,
     joined: 9,
     downloaded: 10,
+    moved: 11,
+    linked: 12,
+    duplicated: 13,
   }
+
+  def self.map_move_action(move_action)
+    case move_action
+    when 'move'
+      :moved
+    when 'link'
+      :linked
+    when 'duplicate'
+      :duplicated
+    end
+  end
 
   def self.role_name_to_action(role_name)
     case role_name
