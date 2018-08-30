@@ -52,7 +52,7 @@ const PromptText = styled.span`
 `
 
 class Dialog extends React.PureComponent {
-  handleClose = async (ev) => {
+  handleClose = (ev) => {
     ev.preventDefault()
     this.props.onClose()
   }

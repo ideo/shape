@@ -1,3 +1,4 @@
+import _ from 'lodash'
 import PropTypes from 'prop-types'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
@@ -12,7 +13,7 @@ import AddLinkIcon from '~/ui/icons/AddLinkIcon'
 import TemplateIcon from '~/ui/icons/TemplateIcon'
 import SubmissionBoxIcon from '~/ui/icons/SubmissionBoxIcon'
 import v, { ITEM_TYPES } from '~/utils/variables'
-import FilestackUpload from '~/utils/FilestackUpload'
+import FilestackUpload, { MAX_SIZE } from '~/utils/FilestackUpload'
 import { StyledGridCard } from '~/ui/grid/shared'
 import InlineLoader from '~/ui/layout/InlineLoader'
 import { CloseButton } from '~/ui/global/styled/buttons'
@@ -195,8 +196,14 @@ class GridCardBlank extends React.Component {
 
   createDropPane = () => {
     const { creating } = this.state
+    const { uiStore } = this.props
+    const { replacingId } = uiStore.blankContentToolState
     if (this.canceled || (creating && creating !== 'file')) return
-    FilestackUpload.makeDropPane({
+    const uploadOpts = {}
+    if (replacingId) {
+      uploadOpts.maxFiles = 1
+    }
+    const dropPaneOpts = {
       id: 'dropzone',
       onProgress: (pct) => {
         if (this.state.loading) return
@@ -208,17 +215,34 @@ class GridCardBlank extends React.Component {
       onDragLeave: () => {
         this.setState({ droppingFile: false })
       },
-      onDrop: () => {
+      onDrop: (ev) => {
         if (this.state.loading) return
-        this.setState({ loading: true, droppingFile: false })
+        const { files } = ev.dataTransfer
+        const filesThatFit = _.filter(files, f => f.size < MAX_SIZE)
+        if (filesThatFit.length) {
+          this.setState({ loading: true, droppingFile: false })
+        } else {
+          this.setState({ loading: false, droppingFile: false })
+        }
+        if (filesThatFit.length < files.length) {
+          uiStore.popupAlert({
+            prompt: `
+              ${filesThatFit.length} file(s) were successfully added.
+              ${files.length - filesThatFit.length} file(s) were over 25MB and could not
+              be added.
+            `,
+            fadeOutTime: 6000,
+          })
+        }
       },
       onSuccess: async (res) => {
         if (res.length > 0) {
           const files = await FilestackUpload.processFiles(res)
           files.forEach(file => this.createCardWith(file))
         }
-      }
-    })
+      },
+    }
+    FilestackUpload.makeDropPane(dropPaneOpts, uploadOpts)
   }
 
   get emptyState() {
@@ -310,7 +334,7 @@ class GridCardBlank extends React.Component {
 
   renderInner = () => {
     let inner
-    const { creating, loading, droppingFile } = this.state
+    const { creating, loading, droppingFile, sizeError } = this.state
     const isReplacing = !!this.props.uiStore.blankContentToolState.replacingId
     const size = v.iconSizes.bct
 

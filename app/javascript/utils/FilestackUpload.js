@@ -3,6 +3,8 @@ import filestack from 'filestack-js'
 
 const API_KEY = process.env.FILESTACK_API_KEY
 
+export const MAX_SIZE = 0.5 * 1024 * 1024
+
 const imageUploadConfig = {
   accept: [
     '.pdf',
@@ -14,7 +16,7 @@ const imageUploadConfig = {
   ],
   maxFiles: 1,
   imageMax: [1200, 1200],
-  maxSize: 25 * 1024 * 1024,
+  maxSize: MAX_SIZE,
   transformations: {
     crop: {
       aspectRatio: 5 / 4
@@ -101,9 +103,10 @@ class FilestackUpload {
     return this.client.preview('WBVeP019TZirWWZLFO7u', { id })
   }
 
-  static makeDropPane(opts = {}) {
+  static makeDropPane(opts = {}, uploadOpts = {}) {
     const config = Object.assign({}, dropPaneDefaults, opts)
-    return this.client.makeDropPane(config, multiImageUploadConfig)
+    const uploadConfig = Object.assign({}, multiImageUploadConfig, uploadOpts)
+    return this.client.makeDropPane(config, uploadConfig)
   }
 }
 
