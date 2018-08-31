@@ -1,8 +1,7 @@
 import PropTypes from 'prop-types'
 import styled from 'styled-components'
-import { hamburgerSVG } from '~/assets/hamburger.svg'
 
-// TODO: local svg is not loading to/from webpacker. Will SMH when I figureout why.
+// TODO: local svg is not loading to/from webpacker. Will SMH when I figure out why.
 const StyledHamburger = styled.div`
   margin-bottom: 15px;
   width: ${props => props.width}px;
