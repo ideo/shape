@@ -1,5 +1,5 @@
 import { action, runInAction, observable, computed } from 'mobx'
-import { Collection as datxCollection, assignModel, ReferenceType, getModelMetaKey } from 'datx'
+import { Collection as datxCollection, assignModel, ReferenceType } from 'datx'
 import { jsonapi } from 'datx-jsonapi'
 import _ from 'lodash'
 import moment from 'moment-mini'
@@ -100,7 +100,10 @@ class ApiStore extends jsonapi(datxCollection) {
   }
 
   importUsersThread({ usersThread, thread, comments } = {}) {
-    assignModel(thread, 'users_thread', usersThread)
+    thread.addReference('users_thread', usersThread, {
+      model: UsersThread,
+      type: ReferenceType.TO_ONE,
+    })
     thread.importComments(comments)
     this.addCurrentCommentThread(thread.id)
   }
@@ -241,17 +244,13 @@ class ApiStore extends jsonapi(datxCollection) {
     const refs = obj.relationships ? Object.keys(obj.relationships) : []
     refs.forEach((ref) => {
       const items = obj.relationships[ref].data
-      console.log(obj.type, obj.id, ref, items)
       if (items instanceof Array && items.length < 1) {
         /* NOTE: special case, if relationship data comes back with an empty array
          * we have to manually empty the array, while also assigning the proper type
          */
         const possibleTypes = _.map(ApiStore.types, model => model.type)
         if (possibleTypes.indexOf(ref) > -1) {
-          console.log('ASSIGNING MODEL', record, ref)
           assignModel(record, ref, observable([]))
-        } else {
-          console.log('not worrying about ref:', ref)
         }
       }
     })
