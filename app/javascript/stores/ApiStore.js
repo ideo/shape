@@ -26,6 +26,10 @@ class ApiStore extends jsonapi(datxCollection) {
   @observable currentPageThreadKey = null
   @observable recentNotifications = new Map()
 
+  fetch(type, id, skipCache) {
+    return super.fetch(type, id, {skipCache})
+  }
+
   @action setCurrentUserId(id) {
     this.currentUserId = id
   }
