@@ -76,6 +76,10 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
       card_action: @card_action,
     )
     if mover.call
+      @cards.map do |card|
+        create_notification(card,
+                            Activity.map_move_action(@card_action))
+      end
       # NOTE: even though this action is in CollectionCardsController, it returns the to_collection
       # so that it can be easily re-rendered on the page
       render jsonapi: @to_collection.reload, include: Collection.default_relationships_for_api
@@ -105,6 +109,8 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
         duplicate_linked_records: true,
       )
       should_update_cover ||= dup.should_update_parent_collection_cover?
+      @from_collection = Collection.find(json_api_params[:from_id])
+      create_notification(card, :duplicated)
     end
     @to_collection.cache_cover! if should_update_cover
     # NOTE: for some odd reason the json api refuses to render the newly created cards here,
@@ -179,6 +185,8 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
       action: action,
       subject_user_ids: card.record.editors[:users].pluck(:id),
       subject_group_ids: card.record.editors[:groups].pluck(:id),
+      source: @from_collection,
+      destination: @to_collection,
     )
   end
 

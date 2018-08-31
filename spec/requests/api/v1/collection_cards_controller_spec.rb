@@ -101,6 +101,8 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
           action: :created,
           subject_user_ids: [user.id],
           subject_group_ids: [],
+          source: nil,
+          destination: nil,
         )
         post(path, params: params)
       end
@@ -322,6 +324,11 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
 
       it 'broadcasts collection updates' do
         expect(CollectionUpdateBroadcaster).to receive(:call).twice
+        patch(path, params: params)
+      end
+
+      it 'creates an activity' do
+        expect(ActivityAndNotificationBuilder).to receive(:call).twice
         patch(path, params: params)
       end
     end
@@ -597,6 +604,8 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
           action: :replaced,
           subject_user_ids: [user.id],
           subject_group_ids: [],
+          source: nil,
+          destination: nil,
         )
         patch(path, params: params)
       end
