@@ -200,7 +200,7 @@ class RolesMenu extends React.Component {
 
 RolesMenu.propTypes = {
   canEdit: PropTypes.bool,
-  ownerId: PropTypes.number.isRequired,
+  ownerId: PropTypes.string.isRequired,
   ownerType: PropTypes.string.isRequired,
   fixedRole: PropTypes.string,
   roles: MobxPropTypes.arrayOrObservableArray,

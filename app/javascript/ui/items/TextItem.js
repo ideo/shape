@@ -403,7 +403,7 @@ class TextItem extends React.Component {
 TextItem.propTypes = {
   item: MobxPropTypes.objectOrObservableObject.isRequired,
   actionCableConsumer: MobxPropTypes.objectOrObservableObject.isRequired,
-  currentUserId: PropTypes.number.isRequired,
+  currentUserId: PropTypes.string.isRequired,
   onUpdatedData: PropTypes.func.isRequired,
   onSave: PropTypes.func.isRequired,
   onCancel: PropTypes.func,

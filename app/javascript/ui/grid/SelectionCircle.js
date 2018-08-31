@@ -44,7 +44,7 @@ class SelectionCircle extends React.Component {
 }
 
 SelectionCircle.propTypes = {
-  cardId: PropTypes.number.isRequired,
+  cardId: PropTypes.string.isRequired,
 }
 SelectionCircle.wrappedComponent.propTypes = {
   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
