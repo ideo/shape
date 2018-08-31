@@ -3,7 +3,9 @@
   "description": "The future of work is here.",
   "buildpacks": [
     {
-      "url": "heroku/nodejs",
+      "url": "heroku/nodejs"
+    },
+    {
       "url": "heroku/ruby"
     }
   ],
