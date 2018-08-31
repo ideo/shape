@@ -1,13 +1,13 @@
 export default function trackError(err, opts = {}) {
+  if (process.env.NODE_ENV === 'development') {
+    console.error(err)
+  }
   trackErrorSpecify(
     opts.source || 'Any',
     opts.message || err.message,
     opts.name || err.name,
     err.stack.split('\n')
   )
-  if (process.env.NODE_ENV === 'development') {
-    console.error(err)
-  }
 }
 
 export function trackErrorSpecify(source, message, name, backtrace) {
