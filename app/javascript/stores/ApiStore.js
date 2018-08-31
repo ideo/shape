@@ -173,7 +173,7 @@ class ApiStore extends jsonapi(datxCollection) {
     return thread
   }
 
-  clearUnpersistedThreads() {
+  @action clearUnpersistedThreads() {
     this.findAll('comment_threads').forEach(ct => {
       // remove any old threads that didn't get persisted
       if (!ct.__persisted) {
