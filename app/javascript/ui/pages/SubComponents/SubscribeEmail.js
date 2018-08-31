@@ -3,7 +3,7 @@ import { Flex, Box } from 'reflexbox'
 import v from '~/utils/variables'
 
 const SubscribeInput = styled.input`
-  width: 90%;
+  width: 180px;
   font-weight: ${v.weights.book};
   font-family: ${v.fonts.sans};
   font-size: 1rem;
@@ -11,8 +11,14 @@ const SubscribeInput = styled.input`
   padding: 12px 12px;
   cursor: pointer;
   letter-spacing: 1.5px;
-  border-radius: 4px;
+  border-radius: 2px;
   border: 2px solid white;
+  margin-right: -7.6px;
+
+  @media only screen and (min-width: ${v.responsive.smallBreakpoint}px) {
+    width: 320.3px;
+    margin-right: -4px;
+  }
 `
 
 const SubscribeButton = styled.button`
@@ -53,14 +59,6 @@ class SubscribeEmail extends React.Component {
           target="_blank"
           noValidate
         >
-          <Flex
-            align="center"
-            justify="center"
-            wrap
-            w={1}
-          >
-            <Box w={[1 / 8, 2 / 8]} />
-            <Box w={[4 / 8, 3 / 8]}>
               <input type="hidden" name="u" value="2f039cb306f0565682c88c494" />
               <input type="hidden" name="id" value="b141f584d3" />
               <SubscribeInput
@@ -73,16 +71,12 @@ class SubscribeEmail extends React.Component {
                 autoCapitalize="off"
                 autoCorrect="off"
               />
-            </Box>
-            <Box w={[2 / 8, 1 / 8]}>
               <SubscribeButton
                 id="mc-embedded-subscribe"
                 type="submit"
               >
                 Subscribe
               </SubscribeButton>
-            </Box>
-            <Box w={[1 / 8, 2 / 8]} />
             <div style={{ position: 'absolute', left: '-5000px' }} aria-hidden="true" aria-label="Please leave the following three fields empty">
               <label htmlFor="b_name">
                 Name:
@@ -99,7 +93,6 @@ class SubscribeEmail extends React.Component {
                 <textarea name="b_comment" tabIndex="-1" placeholder="Please comment" id="b_comment" />
               </label>
             </div>
-          </Flex>
         </form>
       </div>
     )

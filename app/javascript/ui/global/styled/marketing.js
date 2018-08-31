@@ -4,6 +4,7 @@ import { Heading1, Heading2, Anchor } from '~/ui/global/styled/typography'
 import { ReflexProvider, Flex } from 'reflexbox'
 import organicGridPillGray from '~/assets/organic_grid_pill_gray.png'
 
+
 /** @component */
 export const MarketingBack = styled.div`
   text-align: center;
@@ -13,14 +14,22 @@ export const MarketingBack = styled.div`
   overflow: auto;
   color: ${v.colors.nearwhite};
   background: white;
-  padding-top: 50px;
+  padding-top: 0px;
 `
+MarketingBack.displayName = 'StyledMarketingBack'
 
 /** @component */
 export const MarketingGradientTop = MarketingBack.extend`
-  background: linear-gradient(to bottom, transparent 0%, ${v.colors.nearwhite} 100%) ,url(${organicGridPillGray});
+  background: linear-gradient(
+      to bottom, transparent 0%, ${v.colors.white} 100%)
+      ,url(${organicGridPillGray})
+      , no-repeat
+      , right
+      , top;
+  background-size: 200%;
   padding-bottom: 40px;
 `
+MarketingGradientTop.displayName = 'StyledMarketingGradientTop'
 
 /** @component */
 export const MarketingFooter = styled.div`
@@ -29,8 +38,55 @@ export const MarketingFooter = styled.div`
   font-family: ${v.fonts.sans};
   color: ${v.colors.desert};
   font-size: 1rem;
-  padding: 50px 0;
+  padding-top: 50px;
+  padding-bottom: 22px;
+  padding-right: 24px;
+  padding-left: 24px;
+  
+  @media only screen and (min-width: ${v.responsive.smallBreakpoint}px) {
+    padding-left: 0px;
+    padding-right: 0px;
+  }
 `
+MarketingFooter.displayName = 'StyledMarketingFooter'
+
+/** @component */
+export const ResponsiveInlineBlock = styled(Flex)`
+  & > * {
+    display: block;
+    margin: auto;
+  }
+
+  @media only screen and (min-width: ${v.responsive.smallBreakpoint}px) {
+    display: inline-block;
+    margin-right: 20px;
+  }
+`
+ResponsiveInlineBlock.displayName = 'StyledResponsiveInlineBlock'
+
+export const ResponsivePadInlineBlock = styled(ResponsiveInlineBlock)`
+  & > * {
+    margin-bottom: 13px;
+  }
+`
+ResponsivePadInlineBlock.displayName = 'StyledResponsivePadInlineBlock'
+
+export const DesktopSpacer = styled.span`
+  display: none;
+
+  @media only screen and (min-width: ${v.responsive.smallBreakpoint}px) {
+    display: inline-block;
+  }
+`
+DesktopSpacer.displayName = 'StyledDesktopSpacer'
+
+
+/** @component */
+export const Center = styled.span`
+  text-align: center;
+  margin: auto;
+`
+Center.displayName = 'StyledCenter'
 
 /** @component */
 export const MarketingH1 = styled(Heading1)`
@@ -40,30 +96,34 @@ export const MarketingH1 = styled(Heading1)`
   font-weight: ${v.weights.bold};
   letter-spacing: 0px;
   white-space: normal;
+  text-align: center;
 `
+MarketingH1.displayName = 'StyledMarketingH1'
 
 /** @component */
 export const InvertMarketingH1 = styled(MarketingH1)`
   color: ${v.colors.desert};
   text-transform: none;
 `
+InvertMarketingH1.displayName = 'StyledInvertMarketingH1'
 
 /** @component */
 export const MarketingH2 = styled(Heading2)`
-color: black;
-font-family: ${v.fonts.sans};
-font-weight: ${v.weights.book};
-font-size: 1.25rem;
-letter-spacing: 0px;
-white-space: normal;
+  color: black;
+  font-family: ${v.fonts.sans};
+  font-weight: ${v.weights.book};
+  font-size: 1.25rem;
+  letter-spacing: 0;
+  white-space: normal;
 `
+MarketingH2.displayName = 'StyledMarketingH2'
 
 /** @component */
-export const InvertMarketingH2 = styled(Heading2)`
+export const InvertMarketingH2 = styled(MarketingH2)`
   color: ${v.colors.desert};
   text-transform: none;
-  letter-spacing: 0;
 `
+InvertMarketingH2.displayName = 'StyledInvertMarketingH2'
 
 /** @component */
 export const MarketingTagLine = styled(MarketingH2)`
@@ -72,11 +132,14 @@ export const MarketingTagLine = styled(MarketingH2)`
   font-family: ${v.fonts.serif};
   font-weight: ${v.weights.book};
   font-size: 24px;
+  max-width: 600px;
+  margin: auto;
 
   @media only screen and (min-width: ${v.responsive.smallBreakpoint}px) {
       font-size: 32px;
   }
 `
+MarketingTagLine.displayName = 'StyledMarketingTagLine'
 
 /** @component */
 export const MarketingContentLink = styled.button`
@@ -84,15 +147,17 @@ export const MarketingContentLink = styled.button`
   font-family: ${v.fonts.sans};
   font-size: 1rem;
   color: black;
-  margin: 1em;
+  margin: 8px;
   padding: 12px 12px;
   cursor: pointer;
   letter-spacing: 1.5px;
 
   &:hover {
-    color: ${v.colors.gray};
+    color: ${v.colors.white};
+    background-color: black;
   }
 `
+MarketingContentLink.displayName = 'StyledMarketingContentLink'
 
 /** @component */
 export const MarketingCallToAction = styled(MarketingContentLink)`
@@ -104,6 +169,7 @@ export const MarketingCallToAction = styled(MarketingContentLink)`
   font-size: 14px;
   font-weight: ${v.weights.medium};
 `
+MarketingCallToAction.displayName = 'StyledMarketingCallToAction'
 
 /** @component */
 export const MarketingVideoLink = styled(MarketingContentLink)`
@@ -114,12 +180,16 @@ export const MarketingVideoLink = styled(MarketingContentLink)`
   font-size: 14px;
   font-weight: ${v.weights.medium};
 `
+MarketingVideoLink.displayName = 'StyledMarketingVideoLink'
 
 /** @component */
 export const MarketingHeavyCTA = styled(MarketingCallToAction)`
   font-weight: ${v.weights.bold};
   font-family: ${v.fonts.sans};
+  margin-top: 68px;
+  margin-bottom: 68px;
 `
+MarketingHeavyCTA.displayName = 'StyledMarketingHeavyCTA'
 
 /** @component */
 export const MarketingContent = styled.div`
@@ -129,9 +199,12 @@ export const MarketingContent = styled.div`
   font-family: ${v.fonts.sans};
   font-weight: ${v.weights.book};
 `
+MarketingContent.displayName = 'StyledMarketingContent'
+
 export const InvertMarketingContent = styled(MarketingContent)`
   color: ${v.colors.desert};
 `
+InvertMarketingContent.displayName = 'StyledInvertMarketingContent'
 
 /** @component */
 export const MarketingStyledLink = styled(Anchor)`
@@ -141,11 +214,13 @@ export const MarketingStyledLink = styled(Anchor)`
     font-family: ${v.fonts.sans};
     font-weight: ${v.weights.book};
 `
+MarketingStyledLink.displayName = 'StyledMarketingStyledLink'
 
 /** @component */
 export const InvertMarketingLink = styled(MarketingStyledLink)`
   color: ${v.colors.desert};
 `
+InvertMarketingLink.displayName = 'StyledInvertMarketingLink'
 
 /** @component */
 export const InvertMarketingLinkMail = styled(Anchor)`
@@ -154,6 +229,7 @@ export const InvertMarketingLinkMail = styled(Anchor)`
   font-size: 32px;
   font-family: ${v.fonts.serif};
 `
+InvertMarketingLinkMail.displayName = 'StyledInvertMarketingLinkMail'
 
 /** @component */
 export const MarketingBetaSticker = styled.img.attrs({
@@ -162,7 +238,7 @@ export const MarketingBetaSticker = styled.img.attrs({
   alt: 'In Beta!';
   width: 100%;
   max-width: 126px;
-  top: 100px;
+  top: 80px;
   right: 0;
   position: absolute;
 
@@ -170,10 +246,11 @@ export const MarketingBetaSticker = styled.img.attrs({
       max-width: 244px;
   }
   @media only screen and (min-width: ${v.responsive.medBreakpoint}px) {
-      top: 75px;
+      top: 126px;
       max-width: 322px;
   }
 `
+MarketingBetaSticker.displayName = 'StyledMarketingBetaSticker'
 
 /** @component */
 export const MarketingShapeLogo = styled.img.attrs({
@@ -182,9 +259,17 @@ export const MarketingShapeLogo = styled.img.attrs({
 })`
   alt: 'Shape';
   width: 100%;
-  max-width: 410px;
-  margin-top: 40px;
+  max-width: 256px;
+  margin-top: 120px;
+
+  @media only screen and (min-width: ${v.responsive.smallBreakpoint}px) {
+      max-width: 410px;
+  }
+  @media only screen and (min-width: ${v.responsive.medBreakpoint}px) {
+      margin-top: 126px;
+  }
 `
+MarketingShapeLogo.displayName = 'StyledMarketingShapeLogo'
 
 const space = [0, 8, 16, 32, 64]
 const breakpoints = [40, 52, 64]

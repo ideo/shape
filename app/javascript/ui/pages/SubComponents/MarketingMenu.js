@@ -6,9 +6,11 @@ import Drawer from '@material-ui/core/Drawer'
 import { Box } from 'reflexbox'
 import v from '~/utils/variables'
 import Logo from '~/ui/layout/Logo.js'
+import Hamburger from '~/ui/layout/Hamburger.js'
 import { MarketingFlex } from '~/ui/global/styled/marketing.js'
 import PropTypes from 'prop-types'
 import { scroller } from 'react-scroll'
+import VisibilitySensor from 'react-visibility-sensor'
 
 const NavLink = styled.button`
   font-weight: ${v.weights.medium};
@@ -21,36 +23,49 @@ const NavLink = styled.button`
   text-transform: uppercase;
 
   &:hover {
-    color: ${v.colors.gray};
+    box-shadow: 0px 2px 4px ${v.colors.gray};
   }
 }
-
-`
-const NavMenu = styled.div`{
-    position: relative;
-    padding-left: 1.25em;
-    top: -1.2em;
-    left: 3em;
-  }
-  &:before {
-    content: "";
-    position: absolute;
-    top: 0.25em;
-    left: 0;
-    width: 1em;
-    height: 0.125em;
-    border-top: 0.375em double #000;
-    border-bottom: 0.125em solid #000;
-  }
 `
 
 const ToggleLogo = styled(Logo)`
-  &.small-visible {
+  &.after-break {
     opacity: 1;
   }
-  &.small-not-visible {
+  &.before-break {
     opacity: 0;
   }
+`
+
+const MenuBar = styled(AppBar)`
+  &.top{
+    background: transparent;
+    position: static;
+    box-shadow: none;
+  }
+
+  &.after-top{
+    background: white;
+    position: fixed;
+    box-shadow: none;
+    transform: translateY(-100%);
+    transition-property: all;
+    transition-duration: .5s;
+    transition-timing-function: cubic-bezier(0, 1, 0.5, 1);
+    overflow-y: hidden;
+  }
+
+  &.after-break {
+    background: white;
+    position: fixed;
+    box-shadow: none;
+    transform: translateY(0);
+    transition-property: all;
+    transition-duration: .5s;
+    transition-timing-function: cubic-bezier(0, 1, 0.5, 1);
+    overflow-y: hidden;
+  }
+
 `
 
 function handleScrollToContent() {
@@ -117,23 +132,27 @@ class MarketingMenu extends React.PureComponent {
   constructor(props) {
     super(props)
     this.state = {
-      logoClass: 'small-not-visible',
+      logoClass: 'before-break',
+      menuClass: 'top',
+      isTopVisible: true,
       width: window.innerWidth,
       drawerState: false,
     }
   }
 
-  componentWillMount() {
+  componentWillMount = () => {
     window.addEventListener('resize', this.handleWindowSizeChange)
   }
 
-  componentDidUpdate(prevProps) {
-    if (this.props.isBigLogoVisible !== prevProps.isBigLogoVisible) {
+  componentDidUpdate = (prevProps, prevState) => {
+    if (this.state.isTopVisible !== prevState.isTopVisible) {
+      this.handleTopVisibilityChange()
+    } else if (this.props.isBigLogoVisible !== prevProps.isBigLogoVisible) {
       this.handleLogoVisibilityChange()
     }
   }
 
-  componentWillUnmount() {
+  componentWillUnmount = () => {
     window.removeEventListener('resize', this.handleWindowSizeChange)
   }
 
@@ -141,11 +160,22 @@ class MarketingMenu extends React.PureComponent {
     this.setState({ width: window.innerWidth })
   }
 
-  handleLogoVisibilityChange() {
-    this.setState({ logoClass: this.props.isBigLogoVisible ? 'small-not-visible' : 'small-visible' })
+  handleLogoVisibilityChange = () => {
+    this.setState({ 
+      logoClass: this.props.isBigLogoVisible ? 'before-break' : 'after-break'
+      , menuClass: this.props.isBigLogoVisible ? 'after-top' : 'after-break'
+    })
   }
 
-  toggleDrawer = (isOpen) => () => {
+  handleTopVisibilityChange = () => {
+    this.setState({ menuClass: this.state.isTopVisible ? 'top' : 'after-top' })
+  }
+
+  handleTopVisibility = (isVisible) => {
+    this.setState({ isTopVisible: isVisible })
+  }
+
+  toggleDrawer = (isOpen) => {
     this.setState({
       drawerState: isOpen,
     })
@@ -153,72 +183,79 @@ class MarketingMenu extends React.PureComponent {
 
   renderDesktop() {
     return (
-      <AppBar position="fixed" style={{ background: 'white', boxShadow: 'none' }}>
-        <Toolbar>
-          <MarketingFlex
-            align="center"
-            justify="center"
-            w={1}
-          >
-            <Box w={15 / 32}>
-              <section align="left">
-                <NavLink onClick={handleScrollToContent}>PRODUCT</NavLink>
-                <NavLink onClick={handleScrollToFooter}>PRICING</NavLink>
-              </section>
-            </Box>
-
-            <Box w={2 / 32}>
-              <section align="center" >
-                <button onClick={handleScrollToTop}>
-                  <ToggleLogo className={`ToggleLogo ${this.state.logoClass}`} width={48} />
-                </button>
-              </section>
-            </Box>
-
-            <Box w={15 / 32}>
-              <section align="right">
-                <NavLink onClick={handleScrollToFooter}>CONTACT</NavLink>
-                <a href="https://profile.ideo.com" rel="noopener noreferrer" target="_blank">
-                  <NavLink>LOGIN</NavLink>
-                </a>
-              </section>
-            </Box>
-
-          </MarketingFlex>
-        </Toolbar>
-      </AppBar>
-    )
-  }
-
-  renderMobile() {
-    return (
       <Fragment>
-        <AppBar position="fixed" style={{ background: 'white', boxShadow: 'none' }}>
+        <MenuBar className={`MenuBar ${this.state.menuClass}`}>
           <Toolbar>
             <MarketingFlex
               align="center"
               justify="center"
               w={1}
             >
-              <Box w={1 / 4}>
-                <section align="left" >
+              <Box w={15 / 32}>
+                <section align="left">
+                  <NavLink onClick={handleScrollToContent}>PRODUCT</NavLink>
+                  <NavLink onClick={handleScrollToFooter}>PRICING</NavLink>
+                </section>
+              </Box>
+
+              <Box w={2 / 32}>
+                <section align="center" >
                   <button onClick={handleScrollToTop}>
                     <ToggleLogo className={`ToggleLogo ${this.state.logoClass}`} width={48} />
                   </button>
                 </section>
               </Box>
 
-              <Box w={2 / 4} />
-
-              <Box w={1 / 4}>
+              <Box w={15 / 32}>
                 <section align="right">
-                  <NavMenu role="button" onClick={this.toggleDrawer(true)} />
+                  <NavLink onClick={handleScrollToFooter}>CONTACT</NavLink>
+                  <a href="https://profile.ideo.com" rel="noopener noreferrer" target="_blank">
+                    <NavLink>LOGIN</NavLink>
+                  </a>
                 </section>
               </Box>
 
             </MarketingFlex>
           </Toolbar>
-        </AppBar>
+        </MenuBar>
+        <VisibilitySensor
+          scrollCheck
+          intervalDelay={300}
+          onChange={this.handleTopVisibility}
+        />
+      </Fragment>
+    )
+  }
+
+  renderMobile() {
+    return (
+      <Fragment>
+        <MenuBar className={`MenuBar ${this.state.menuClass}`}>
+          <Toolbar disableGutters={true}>
+            <MarketingFlex
+              align="center"
+              w={1}
+            >
+              <Box ml={2}>
+                  <button onClick={handleScrollToTop}>
+                    <ToggleLogo className={`ToggleLogo ${this.state.logoClass}`} width={48} />
+                  </button>
+              </Box>
+
+              <Box ml='auto' mr={2}>
+                  <Hamburger role="button" onClick={this.toggleDrawer(true)}  float="right"/>
+              </Box>
+
+            </MarketingFlex>
+          </Toolbar>
+        </MenuBar>
+
+        <VisibilitySensor
+          scrollCheck
+          intervalDelay={300}
+          onChange={this.handleTopVisibility}
+        />
+
         <Drawer open={this.state.drawerState} onClose={this.toggleDrawer(false)}>
           <div
             tabIndex={0}
@@ -237,8 +274,7 @@ class MarketingMenu extends React.PureComponent {
     const { width } = this.state
     const isMobile = width <= v.responsive.smallBreakpoint
 
-    return (isMobile ? this.renderMobile() : this.renderDesktop()
-    )
+    return (isMobile ? this.renderMobile() : this.renderDesktop())
   }
 }
 

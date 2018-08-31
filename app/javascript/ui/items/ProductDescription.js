@@ -6,20 +6,28 @@ import {
   MarketingH1,
   MarketingFlex,
 } from '~/ui/global/styled/marketing.js'
+import v from '~/utils/variables'
 
 const StyledProductDescription = styled(MarketingContent)`
+  margin-left: 24px;
+  margin-right: 24px;
+  
+  @media only screen and (min-width: ${v.responsive.smallBreakpoint}px) {
+    margin-left: 0px;
+    margin-right: 0px;
+  }
 `
 
 const Title = styled(MarketingH1)`
   text-transform: none;
   text-align: left;
   word-wrap:break-word;
-  line-height: 30px;
+  line-height: 40px;
 `
 const Description = styled(MarketingContent)`
   text-align: left;
   word-wrap:break-word;
-  line-height: 25px;
+  line-height: 1.1em;
 `
 
 const ImageDisplay = styled.img`
@@ -27,6 +35,7 @@ const ImageDisplay = styled.img`
   max-width: 100%;
   max-height: 100%;
   height: auto;
+  box-shadow: 0px 2px 16px ${v.colors.gray};
 `
 
 class ProductDescription extends React.PureComponent {
@@ -41,15 +50,22 @@ class ProductDescription extends React.PureComponent {
           justify="space-evenly"
           wrap
         >
+          <Box w={[null, .08]} order={1} />
 
-          <Box w={[1, 3 / 10]} order={[2, (this.props.order % 2 === 1 ? 1 : 2)]}>
+          <Box w={[1, .21]} order={[4, (this.props.order % 2 === 1 ? 2 : 4)]}>
             <Title>{this.props.title}</Title>
             <Description>{this.props.description}</Description>
           </Box>
 
-          <Box w={[1, 6 / 10]} order={[1, (this.props.order % 2 === 1 ? 2 : 1)]}>
+          <Box w={[null, .09]} order={3} />
+
+
+          <Box w={[1, .54]} order={[2, (this.props.order % 2 === 1 ? 4 : 2)]}>
             <ImageDisplay src={this.props.imageUrl} alt={this.props.title} />
           </Box>
+
+          <Box w={[null, .08]} order={4} />
+
 
         </MarketingFlex>
       </StyledProductDescription>

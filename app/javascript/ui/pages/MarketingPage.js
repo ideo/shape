@@ -10,6 +10,10 @@ import { MarketingBack,
   InvertMarketingH2,
   InvertMarketingLinkMail,
   MarketingFlex,
+  ResponsiveInlineBlock,
+  ResponsivePadInlineBlock,
+  DesktopSpacer,
+  Center,
   MarketingTagLine,
   MarketingVideoLink,
   MarketingShapeLogo,
@@ -28,10 +32,9 @@ class MarketingPage extends React.Component {
   constructor(props) {
     super(props)
     this.state = { isLogoVisible: true }
-    this.handleLogoVisibility = this.handleLogoVisibility.bind(this)
   }
 
-  handleLogoVisibility(isVisible) {
+  handleLogoVisibility = (isVisible) => {
     this.setState({ isLogoVisible: isVisible })
   }
 
@@ -44,53 +47,34 @@ class MarketingPage extends React.Component {
             <MarketingMenu isBigLogoVisible={this.state.isLogoVisible} />
             <MarketingBetaSticker />
 
-            <MarketingFlex
-              align="center"
-              justify="center"
-              column
-              w={1}
-            >
-              <Box w={[null, 1 / 5]} />
-              <Box w={[1, 3 / 5]} >
-                <VisibilitySensor
-                  partialVisibility
-                  scrollCheck
-                  intervalDelay={300}
-                  onChange={this.handleLogoVisibility}
-                >
-                  <MarketingShapeLogo />
-                </VisibilitySensor>
-              </Box>
-              <Box w={[null, 1 / 5]} />
-
-              <Box w={[null, 1 / 5]} />
-              <Box w={[1, 3 / 5]} wrap>
+            <Center>
+              <VisibilitySensor
+                partialVisibility
+                scrollCheck
+                intervalDelay={300}
+                onChange={this.handleLogoVisibility}
+              >
+                <MarketingShapeLogo />
+              </VisibilitySensor>
                 <MarketingTagLine>
-                  A visual, collaborative space to build, test, and refine your ideas
-                </MarketingTagLine>
-              </Box>
-              <Box w={[null, 1 / 5]} />
-            </MarketingFlex>
+-                  A visual, collaborative space to build, test, and refine your ideas
+-                </MarketingTagLine>
+            </Center>
 
-            <MarketingFlex
-              align="center"
-              justify="center"
-              wrap
-              w={1}
-            >
-              <Box w={[null, 1 / 6]} auto />
-              <Box w={[1, 2 / 6]} auto>
+            <Center>
+              <ResponsiveInlineBlock>
                 <a href="https://profile.ideo.com/">
                   <MarketingCallToAction>Get Early Access</MarketingCallToAction>
                 </a>
-              </Box>
-              <Box w={[1, 2 / 6]} auto>
+              </ResponsiveInlineBlock>
+            </Center>
+            <Center>
+              <ResponsiveInlineBlock>
                 <a href="https://profile.ideo.com/">
                   <MarketingVideoLink>Watch the Video</MarketingVideoLink>
                 </a>
-              </Box>
-              <Box w={[null, 1 / 6]} auto />
-            </MarketingFlex>
+              </ResponsiveInlineBlock>
+            </Center>
           </MarketingGradientTop>
 
           <MarketingFlex
@@ -152,18 +136,29 @@ class MarketingPage extends React.Component {
 
             <Box w={1} py={16}>
               <InvertMarketingLink href="https://www.ideo.com/" rel="noopener noreferrer" target="_blank">
-                <img src={poweredByIdeo} alt="Powered by IDEO" />
+                <img src={poweredByIdeo} 
+                alt="Powered by IDEO" 
+                style={{width:'95px', paddingTop:'68px', paddingBottom:'40px'}} />
               </InvertMarketingLink>
             </Box>
-
-            <Box w={1 / 2} >
-              <section align="right"><InvertMarketingLink href="https://www.ideo.com/privacy">
-                Privacy and Cookie Policy</InvertMarketingLink></section>
-            </Box>
-            <Box w={1 / 8} />
-            <Box w={3 / 8}><section align="left">&copy; 2018</section></Box>
-
           </MarketingFlex>
+
+          <Center>
+            <ResponsivePadInlineBlock>
+              <InvertMarketingLink href="https://www.ideo.com/privacy">
+                Privacy and Cookie Policy
+              </InvertMarketingLink>
+            </ResponsivePadInlineBlock>
+          </Center>
+          <Center>
+            <ResponsivePadInlineBlock>
+              <InvertMarketingContent>
+                <DesktopSpacer style={{width:'80px'}}/>
+                &copy; 2018
+              </InvertMarketingContent>
+            </ResponsivePadInlineBlock>
+          </Center>
+
         </MarketingFooter>
       </Fragment>
     )
