@@ -13,6 +13,12 @@
     <script>
       IdeoSSO.init(<%= ideo_sso_init_params.to_json.html_safe %>)
     </script>
+
+    <% if Rails.env.production? %>
+      <!-- shape-support Zendesk Widget script -->
+      <script id="ze-snippet" src="https://static.zdassets.com/ekr/snippet.js?key=61bd2421-1297-4ecc-93d0-ddf2de346363"> </script>
+    <% end %>
+
     <%= stylesheet_link_tag 'application', media: 'all' %>
     <%= action_cable_meta_tag %>
   </head>
