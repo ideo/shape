@@ -1,8 +1,18 @@
-import { Model } from 'datx'
+import { Model, initModelRef } from 'datx'
 import { jsonapi, modelToJsonApi } from 'datx-jsonapi'
 import _ from 'lodash'
 
 class BaseRecord extends jsonapi(Model) {
+  constructor(...args) {
+    super(...args)
+    if (this.constructor.refDefaults) {
+      _.forEach(this.constructor.refDefaults, (v, k) => {
+        const {defaultValue, ...options} = v
+        initModelRef(this, k, options, defaultValue);
+      })
+    }
+  }
+
   get apiStore() {
     return this.meta.collection
   }

@@ -1,10 +1,13 @@
 import _ from 'lodash'
-import { computed, action } from 'mobx'
+import { computed, action, observable } from 'mobx'
+import { initModelRef, ReferenceType} from 'datx'
 
 import BaseRecord from './BaseRecord'
+import CollectionCard from './CollectionCard'
 
 class Collection extends BaseRecord {
   static type = 'collections'
+
   attributesForAPI = ['name', 'tag_list']
 
   @computed get cardIds() {
@@ -21,10 +24,6 @@ class Collection extends BaseRecord {
       cardIds.indexOf(card.id) > -1
     )).forEach(card => this.collection_cards.splice(this.collection_cards.indexOf(card), 1))
     this._reorderCards()
-  }
-
-  get collection_cards() {
-    return super.collection_cards || []
   }
 
   get organization() {
@@ -134,6 +133,14 @@ class Collection extends BaseRecord {
     if (this.organization_id !== currentUser.current_organization.id) {
       currentUser.switchOrganization(this.organization_id)
     }
+  }
+}
+
+Collection.refDefaults = {
+  collection_cards: {
+    model: CollectionCard,
+    type: ReferenceType.TO_MANY,
+    defaultValue: [],
   }
 }
 
