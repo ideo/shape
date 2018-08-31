@@ -2,8 +2,10 @@ import { observable, action, computed, runInAction } from 'mobx'
 import _ from 'lodash'
 
 import { uiStore } from '~/stores'
+import { ReferenceType } from 'datx'
 import BaseRecord from './BaseRecord'
 import Comment from './Comment'
+import User from './User'
 
 // should always be the same as paginates_per in comment.rb
 const PER_PAGE = 50
@@ -88,7 +90,10 @@ class CommentThread extends BaseRecord {
     Comment.endpoint = `comment_threads/${this.id}/comments`
     // create an unsaved comment so that we can see it immediately
     const comment = new Comment(commentData, this.apiStore)
-    comment.assignRef('author', this.apiStore.currentUser)
+    comment.addReference('author', this.apiStore.currentUser, {
+      model: User,
+      type: ReferenceType.TO_ONE,
+    })
     this.apiStore.add(comment)
     this.importComments([comment], { created: true })
     // this will create the comment in the API
