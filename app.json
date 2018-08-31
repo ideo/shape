@@ -16,12 +16,6 @@
     "sendgrid"
   ],
   "env": {
-    "DOORBELL_ACCOUNT_ID": {
-      "required": true
-    },
-    "DOORBELL_API_KEY": {
-      "required": true
-    },
     "FILESTACK_API_KEY": {
       "required": true
     },
