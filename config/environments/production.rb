@@ -68,6 +68,7 @@ Rails.application.configure do
   # config.active_job.queue_name_prefix = "ideo-sso-demo_#{Rails.env}"
   config.action_mailer.perform_caching = false
 
+  app_uri = 'https://www.shape.space' # default
   if ENV['BASE_HOST'].present?
     app_uri = URI.parse(ENV['BASE_HOST'])
     config.action_mailer.default_url_options = { host: app_uri.host }
