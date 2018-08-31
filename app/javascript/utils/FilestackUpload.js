@@ -3,7 +3,7 @@ import filestack from 'filestack-js'
 
 const API_KEY = process.env.FILESTACK_API_KEY
 
-export const MAX_SIZE = 0.5 * 1024 * 1024
+export const MAX_SIZE = 25 * 1024 * 1024
 
 const imageUploadConfig = {
   accept: [
