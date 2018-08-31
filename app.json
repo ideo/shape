@@ -11,7 +11,7 @@
     "heroku-postgresql",
     "rediscloud",
     "bonsai",
-    "sengrid"
+    "sendgrid"
   ],
   "env": {
     "DOORBELL_ACCOUNT_ID": {
