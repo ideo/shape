@@ -5,6 +5,7 @@ import styled from 'styled-components'
 import Dialog from '@material-ui/core/Dialog'
 import DialogContent from '@material-ui/core/DialogContent'
 import DialogTitle from '@material-ui/core/DialogTitle'
+import Fade from '@material-ui/core/Fade'
 
 import { Heading2 } from '~/ui/global/styled/typography'
 import v from '~/utils/variables'
@@ -55,6 +56,32 @@ const BackIconHolder = styled.button`
     margin-top: 5px;
   }
 `
+
+/*
+ * There's a current bug with MaterialUI on iOS where the background of the
+ * modal is scrollable along with the modal. This fix will override the back-
+ * drop event with a custom handler which feeds into the MaterialUI Dialog
+ * component.
+ *
+ * More information can be found in the Github issue:
+ * https://github.com/mui-org/material-ui/issues/5750#issuecomment-390187794
+ */
+function preventBackdropScroll(event) {
+  let { target } = event
+  while (target != null && target !== document.body) {
+    const { clientHeight, scrollHeight } = target
+    if (scrollHeight > clientHeight) return
+    target = target.parentElement
+  }
+  event.preventDefault()
+}
+
+export function disableOverflowScroll(node) {
+  node.addEventListener('touchmove', preventBackdropScroll)
+}
+
+Fade.defaultProps = { ...Fade.defaultProps, onEnter: disableOverflowScroll }
+Dialog.defaultProps = { ...Dialog.defaultProps, onEntered: disableOverflowScroll }
 
 class Modal extends React.Component {
   handleClose = (ev) => {

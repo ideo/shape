@@ -241,6 +241,10 @@ export const EditAvatarButton = styled.button`
     `
     cursor: pointer;
     opacity: 0.75;
+
+    .avatar {
+      cursor: pointer;
+    }
     `
 }`
 EditAvatarButton.displayName = 'EditAvatarButton'

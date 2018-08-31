@@ -85,12 +85,19 @@ class PdfFileItemCover extends React.Component {
     return { coverX, coverY, orientation }
   }
 
+  handleClick = (ev) => {
+    ev.preventDefault()
+    const { item } = this.props
+    const { filestack_file } = item
+    window.open(filestack_file.url, '_blank')
+  }
+
   render() {
     const { item } = this.props
     const { filestack_file, pdfCoverUrl } = item
     const { coverX, coverY, orientation } = this.calculateCoverTranslation()
     return (
-      <StyledPdfCover>
+      <StyledPdfCover onClick={this.handleClick}>
         <ImageContainer
           x={`${coverX}px`}
           y={`${coverY}px`}
