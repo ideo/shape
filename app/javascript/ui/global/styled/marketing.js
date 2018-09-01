@@ -21,12 +21,13 @@ MarketingBack.displayName = 'StyledMarketingBack'
 /** @component */
 export const MarketingGradientTop = MarketingBack.extend`
   background: linear-gradient(
-      to bottom, transparent 0%, ${v.colors.white} 100%)
-      ,url(${organicGridPillGray})
-      , no-repeat
-      , right
-      , top;
-  background-size: 200%;
+    to bottom, transparent 0%, ${v.colors.white} 100%)
+    ,url(${organicGridPillGray})
+    , no-repeat
+    , right
+    , top;
+  overflow: hidden;
+  position: relative;
   padding-bottom: 40px;
 `
 MarketingGradientTop.displayName = 'StyledMarketingGradientTop'
@@ -59,7 +60,7 @@ export const ResponsiveInlineBlock = styled(Flex)`
 
   @media only screen and (min-width: ${v.responsive.smallBreakpoint}px) {
     display: inline-block;
-    margin-right: 20px;
+    margin-right: 6px;
   }
 `
 ResponsiveInlineBlock.displayName = 'StyledResponsiveInlineBlock'
@@ -90,15 +91,27 @@ Center.displayName = 'StyledCenter'
 
 /** @component */
 export const MarketingH1 = styled(Heading1)`
+  font-weight: ${v.weights.book};
   color: black;
-  font-size: 2rem;
+  font-size: 24px;
   font-family: ${v.fonts.sans};
-  font-weight: ${v.weights.bold};
   letter-spacing: 0px;
   white-space: normal;
   text-align: center;
+  margin-bottom: 0;
+  margin-top: 0;
+
+  @media only screen and (min-width: ${v.responsive.smallBreakpoint}px) {
+      font-size: 32px;
+  }
 `
 MarketingH1.displayName = 'StyledMarketingH1'
+
+/** @component */
+export const MarketingH1Bold = styled(MarketingH1)`
+  font-weight: ${v.weights.bold};
+`
+MarketingH1Bold.displayName = 'StyledMarketingH1Bold'
 
 /** @component */
 export const InvertMarketingH1 = styled(MarketingH1)`
@@ -108,12 +121,21 @@ export const InvertMarketingH1 = styled(MarketingH1)`
 InvertMarketingH1.displayName = 'StyledInvertMarketingH1'
 
 /** @component */
+export const InvertMarketingH1Bold = styled(MarketingH1Bold)`
+  color: ${v.colors.desert};
+  text-transform: none;
+`
+InvertMarketingH1Bold.displayName = 'StyledInvertMarketingH1Bold'
+
+/** @component */
 export const MarketingH2 = styled(Heading2)`
   color: black;
   font-family: ${v.fonts.sans};
   font-weight: ${v.weights.book};
-  font-size: 1.25rem;
+  font-size: 24px;
   letter-spacing: 0;
+  margin-bottom: 0;
+  margin-top: 0;
   white-space: normal;
 `
 MarketingH2.displayName = 'StyledMarketingH2'
@@ -134,6 +156,7 @@ export const MarketingTagLine = styled(MarketingH2)`
   font-size: 24px;
   max-width: 600px;
   margin: auto;
+  margin-bottom: 60px;
 
   @media only screen and (min-width: ${v.responsive.smallBreakpoint}px) {
       font-size: 32px;
@@ -151,10 +174,13 @@ export const MarketingContentLink = styled.button`
   padding: 12px 12px;
   cursor: pointer;
   letter-spacing: 1.5px;
+  margin-top: 8px;
+  margin-bottom: 8px;
 
   &:hover {
     color: ${v.colors.white};
     background-color: black;
+    border-color: black;
   }
 `
 MarketingContentLink.displayName = 'StyledMarketingContentLink'
@@ -163,7 +189,8 @@ MarketingContentLink.displayName = 'StyledMarketingContentLink'
 export const MarketingCallToAction = styled(MarketingContentLink)`
   background-color: ${v.colors.cautionYellow};
   border-radius: 4px;
-  border: 1px solid ${v.colors.cautionYellow};
+  border: 2px solid ${v.colors.cautionYellow};
+  padding: 16px 18px;
   letter-spacing: 0.5px;
   text-transform: uppercase;
   font-size: 14px;
@@ -172,13 +199,10 @@ export const MarketingCallToAction = styled(MarketingContentLink)`
 MarketingCallToAction.displayName = 'StyledMarketingCallToAction'
 
 /** @component */
-export const MarketingVideoLink = styled(MarketingContentLink)`
-  border-radius: 4px;
+export const MarketingVideoLink = styled(MarketingCallToAction)`
+  background-color: white;
   border: 2px solid black;
-  letter-spacing: 0.5px;
-  text-transform: uppercase;
-  font-size: 14px;
-  font-weight: ${v.weights.medium};
+  padding: 16px 18px;
 `
 MarketingVideoLink.displayName = 'StyledMarketingVideoLink'
 
@@ -186,8 +210,13 @@ MarketingVideoLink.displayName = 'StyledMarketingVideoLink'
 export const MarketingHeavyCTA = styled(MarketingCallToAction)`
   font-weight: ${v.weights.bold};
   font-family: ${v.fonts.sans};
-  margin-top: 68px;
-  margin-bottom: 68px;
+  padding-left: 20px;
+  padding-right: 20px;
+  padding-top: 14px;
+  padding-bottom: 14px;
+  letter-spacing 1.5px;
+  margin-top: 36px;
+  margin-bottom: 36px;
 `
 MarketingHeavyCTA.displayName = 'StyledMarketingHeavyCTA'
 
@@ -195,22 +224,34 @@ MarketingHeavyCTA.displayName = 'StyledMarketingHeavyCTA'
 export const MarketingContent = styled.div`
   color: black;
   letter-spacing: -0.2px;
-  font-size: 1rem;
+  font-size: 18px;
   font-family: ${v.fonts.sans};
   font-weight: ${v.weights.book};
 `
 MarketingContent.displayName = 'StyledMarketingContent'
 
-export const InvertMarketingContent = styled(MarketingContent)`
+/** @component */
+export const InvertedCentered = styled(MarketingContent)`
   color: ${v.colors.desert};
+  margin: auto;
 `
-InvertMarketingContent.displayName = 'StyledInvertMarketingContent'
+InvertedCentered.displayName = 'StyledInverInvertedCentered'
+
+/** @component */
+export const InvertedFixedWidth = styled(InvertedCentered)`
+  width: 325px;
+
+  @media only screen and (min-width: ${v.responsive.smallBreakpoint}px) {
+    width: 456px;
+  }
+`
+InvertedFixedWidth.displayName = 'StyledInvertedFixedWidth'
 
 /** @component */
 export const MarketingStyledLink = styled(Anchor)`
     color: ${v.colors.desert};
     letter-spacing: -0.2px;
-    font-size: 1rem;
+    font-size: 18px;
     font-family: ${v.fonts.sans};
     font-weight: ${v.weights.book};
 `
@@ -228,6 +269,8 @@ export const InvertMarketingLinkMail = styled(Anchor)`
   letter-spacing: -0.2px;
   font-size: 32px;
   font-family: ${v.fonts.serif};
+  padding-bottom: 68px;
+  display:inline-block;
 `
 InvertMarketingLinkMail.displayName = 'StyledInvertMarketingLinkMail'
 
@@ -260,7 +303,8 @@ export const MarketingShapeLogo = styled.img.attrs({
   alt: 'Shape';
   width: 100%;
   max-width: 256px;
-  margin-top: 120px;
+  margin-top: 70px;
+  padding-bottom: 10px;
 
   @media only screen and (min-width: ${v.responsive.smallBreakpoint}px) {
       max-width: 410px;

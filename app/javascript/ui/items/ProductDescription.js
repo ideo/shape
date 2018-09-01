@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 import { Box } from 'reflexbox'
 import {
   MarketingContent,
-  MarketingH1,
+  MarketingH1Bold,
   MarketingFlex,
 } from '~/ui/global/styled/marketing.js'
 import v from '~/utils/variables'
@@ -11,23 +11,37 @@ import v from '~/utils/variables'
 const StyledProductDescription = styled(MarketingContent)`
   margin-left: 24px;
   margin-right: 24px;
+  padding-top: 0px;
+  padding-bottom: 0px;
   
   @media only screen and (min-width: ${v.responsive.smallBreakpoint}px) {
     margin-left: 0px;
     margin-right: 0px;
+    padding-top: 36px;
+    padding-bottom: 36px;
   }
 `
 
-const Title = styled(MarketingH1)`
+const Title = styled(MarketingH1Bold)`
   text-transform: none;
   text-align: left;
   word-wrap:break-word;
-  line-height: 40px;
+  line-height: 30px;
+
+  @media only screen and (min-width: ${v.responsive.smallBreakpoint}px) {
+    line-height: 40px;
+  }
 `
 const Description = styled(MarketingContent)`
   text-align: left;
   word-wrap:break-word;
-  line-height: 1.1em;
+  line-height: 25px;
+  font-size: 18px;
+
+  @media only screen and (min-width: ${v.responsive.smallBreakpoint}px) {
+    line-height: 1.4em;
+    font-size: 1.1em;
+  }
 `
 
 const ImageDisplay = styled.img`

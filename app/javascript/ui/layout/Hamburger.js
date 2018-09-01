@@ -23,8 +23,8 @@ StyledHamburger.propTypes = {
   height: PropTypes.number,
 }
 StyledHamburger.defaultProps = {
-  width: 30,
-  height: 30,
+  width: 44,
+  height: 44,
 }
 
 export default StyledHamburger

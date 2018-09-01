@@ -50,6 +50,7 @@ const config = {
       buttonTopLeft
       buttonTopRight
       contactHeader
+      contactHeader2
       footerHeader
       footerSubHeader
       subscriptionHeader
@@ -65,5 +66,24 @@ db.settings({
   // recommending setting for Firestore 5.0+
   timestampsInSnapshots: true
 })
+
+export function readFirebaseValue(collection, id) {
+  let db = {}
+  db = firebase.firestore()
+  const docRef = db.collection(collection).doc(id)
+
+  docRef.get().then( 
+    (doc) => {
+      if (doc.exists) {
+        return doc.data()['value']
+      } else {
+        // doc.data() will be undefined in this case
+        console.log("No such document %s", collection + '/' + id);
+      }
+    }
+  ).catch(function(error) {
+      console.log("Error getting document:", error);
+    })
+}
 
 export default firebase

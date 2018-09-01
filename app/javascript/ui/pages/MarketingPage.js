@@ -8,6 +8,7 @@ import { MarketingBack,
   InvertMarketingContent,
   InvertMarketingH1,
   InvertMarketingH2,
+  InvertMarketingH1Bold,
   InvertMarketingLinkMail,
   MarketingFlex,
   ResponsiveInlineBlock,
@@ -20,6 +21,8 @@ import { MarketingBack,
   MarketingBetaSticker,
   MarketingCallToAction,
   MarketingGradientTop,
+  InvertedCentered,
+  InvertedFixedWidth,
 } from '~/ui/global/styled/marketing.js'
 import poweredByIdeo from '~/assets/Powered-by-IDEO-Inverted.png'
 import MarketingMenu from '~/ui/pages/SubComponents/MarketingMenu.js'
@@ -27,15 +30,38 @@ import SubscribeEmail from '~/ui/pages/SubComponents/SubscribeEmail.js'
 import ProductDescriptions from '~/ui/pages/SubComponents/ProductDescriptions.js'
 import { Element as ScrollElement } from 'react-scroll'
 import VisibilitySensor from 'react-visibility-sensor'
+import firebase from '~/vendor/firebaseMarketing.js'
+
 
 class MarketingPage extends React.Component {
   constructor(props) {
     super(props)
-    this.state = { isLogoVisible: true }
+    const pageText = {}
+
+    this.state = { 
+      isLogoVisible: true
+      , pageTexts: pageText
+    }
   }
 
   handleLogoVisibility = (isVisible) => {
     this.setState({ isLogoVisible: isVisible })
+  }
+
+  componentDidMount() {
+    const textValues = {}
+    let db = {}
+    db = firebase.firestore()
+
+    db.collection('pageText').get()
+      .then((snapshot) => {
+        snapshot.forEach(pageText => {
+          const key = pageText.id
+          const value = pageText.data().value
+          textValues[key] = value
+        })
+        this.setState({ pageTexts: textValues })
+      })
   }
 
   render() {
@@ -57,21 +83,21 @@ class MarketingPage extends React.Component {
                 <MarketingShapeLogo />
               </VisibilitySensor>
                 <MarketingTagLine>
--                  A visual, collaborative space to build, test, and refine your ideas
--                </MarketingTagLine>
+                  {this.state.pageTexts.tagLine}
+                </MarketingTagLine>
             </Center>
 
             <Center>
               <ResponsiveInlineBlock>
                 <a href="https://profile.ideo.com/">
-                  <MarketingCallToAction>Get Early Access</MarketingCallToAction>
+                  <MarketingCallToAction>{this.state.pageTexts.buttonTopLeft}</MarketingCallToAction>
                 </a>
               </ResponsiveInlineBlock>
             </Center>
             <Center>
               <ResponsiveInlineBlock>
                 <a href="https://profile.ideo.com/">
-                  <MarketingVideoLink>Watch the Video</MarketingVideoLink>
+                  <MarketingVideoLink>{this.state.pageTexts.buttonTopRight}</MarketingVideoLink>
                 </a>
               </ResponsiveInlineBlock>
             </Center>
@@ -98,47 +124,51 @@ class MarketingPage extends React.Component {
             w={1}
           >
             <Box w={1}>
-              <InvertMarketingH1>
-                Access is just $5 / month per person.
-              </InvertMarketingH1>
+              <InvertMarketingH1Bold>
+                {this.state.pageTexts.footerHeader}
+              </InvertMarketingH1Bold>
             </Box>
             <Box w={1}>
-              <InvertMarketingH2>
-                The first month is on us.
-              </InvertMarketingH2>
+              <InvertMarketingH1>
+                {this.state.pageTexts.footerSubHeader}
+              </InvertMarketingH1>
             </Box>
 
             <ScrollElement name="FooterAnchor" />
             <Box w={1} py={32}>
               <a href="https://profile.ideo.com/">
-                <MarketingHeavyCTA href="https://profile.ideo.com">GET EARLY ACCESS</MarketingHeavyCTA>
+                <MarketingHeavyCTA href="https://profile.ideo.com">{this.state.pageTexts.buttonFooter}</MarketingHeavyCTA>
               </a>
             </Box>
 
-            <Box w={1} >
-              <InvertMarketingContent>
-                Curious to learn more? Drop us a line at:
-              </InvertMarketingContent>
-            </Box>
+            <ResponsivePadInlineBlock>
+              <InvertedCentered>
+                {this.state.pageTexts.contactHeader}
+              </InvertedCentered>
+            </ResponsivePadInlineBlock>
+            <ResponsivePadInlineBlock>
+              <InvertedCentered>
+                {this.state.pageTexts.contactHeader2}
+              </InvertedCentered>
+            </ResponsivePadInlineBlock>
 
             <Box w={1}>
               <InvertMarketingLinkMail href="mailto:hello@shape.space">hello@shape.space</InvertMarketingLinkMail>
             </Box>
 
-            <Box w={1} py={32} wrap>
-              <InvertMarketingContent>Stay current on new features and case studies by
-                signing up for our mailing list:</InvertMarketingContent>
+            <Box w={1} wrap>
+              <InvertedFixedWidth>{this.state.pageTexts.subscriptionHeader}</InvertedFixedWidth>
             </Box>
 
             <Box w={1}>
               <SubscribeEmail />
             </Box>
 
-            <Box w={1} py={16}>
+            <Box w={1}>
               <InvertMarketingLink href="https://www.ideo.com/" rel="noopener noreferrer" target="_blank">
                 <img src={poweredByIdeo} 
                 alt="Powered by IDEO" 
-                style={{width:'95px', paddingTop:'68px', paddingBottom:'40px'}} />
+                style={{width:'95px', paddingTop:'55px', paddingBottom:'30px'}} />
               </InvertMarketingLink>
             </Box>
           </MarketingFlex>
@@ -152,10 +182,10 @@ class MarketingPage extends React.Component {
           </Center>
           <Center>
             <ResponsivePadInlineBlock>
-              <InvertMarketingContent>
-                <DesktopSpacer style={{width:'80px'}}/>
+              <DesktopSpacer style={{width:'80px'}}/>
+              <InvertMarketingLink href="https://www.ideo.com/">
                 &copy; 2018
-              </InvertMarketingContent>
+              </InvertMarketingLink>
             </ResponsivePadInlineBlock>
           </Center>
 

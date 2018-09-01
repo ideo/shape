@@ -6,17 +6,24 @@ const SubscribeInput = styled.input`
   width: 180px;
   font-weight: ${v.weights.book};
   font-family: ${v.fonts.sans};
-  font-size: 1rem;
-  margin: 1em;
+  font-size: 16px;
   padding: 12px 12px;
   cursor: pointer;
   letter-spacing: 1.5px;
+  box-sizing: border-box;
   border-radius: 2px;
   border: 2px solid white;
-  margin-right: -7.6px;
+  margin: 4px;
+  margin-right: 0;
+
+  ::placeholder {
+    color: ${v.colors.placeholderGray};
+    opacity: 1;
+  }
 
   @media only screen and (min-width: ${v.responsive.smallBreakpoint}px) {
     width: 320.3px;
+    margin: 16px;
     margin-right: -4px;
   }
 `
@@ -27,8 +34,8 @@ const SubscribeButton = styled.button`
   font-family: ${v.fonts.sans};
   font-size: 14px;
   color: white;
-  margin: 1em;
-  padding: 12px 12px;
+  margin: 4px;
+  padding: 14px 14px;
   cursor: pointer;
   letter-spacing: 0.5px;
   border-radius: 4px;
@@ -36,7 +43,13 @@ const SubscribeButton = styled.button`
   text-transform: uppercase;
 
   &:hover {
-    color: ${v.colors.blackLava};
+    background-color: black;
+    border-color: black;
+  }
+
+  @media only screen and (min-width: ${v.responsive.smallBreakpoint}px) {
+    padding: 14px 20px;
+    margin: 14px;
   }
 `
 

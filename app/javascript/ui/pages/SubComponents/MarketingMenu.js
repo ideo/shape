@@ -15,16 +15,13 @@ import VisibilitySensor from 'react-visibility-sensor'
 const NavLink = styled.button`
   font-weight: ${v.weights.medium};
   font-family: ${v.fonts.sans};
-  font-size: 0.75rem;
+  font-size: 12px;
+  letter-spacing: 0.4px;
   color: black;
   margin: 1em;
   padding: 6px 12px;
   cursor: pointer;
   text-transform: uppercase;
-
-  &:hover {
-    box-shadow: 0px 2px 4px ${v.colors.gray};
-  }
 }
 `
 
@@ -37,7 +34,14 @@ const ToggleLogo = styled(Logo)`
   }
 `
 
+const MenuWrapper = styled.div`
+  height: 60px;
+`
+
 const MenuBar = styled(AppBar)`
+    padding-left: 24px;
+    padding-right: 24px;
+
   &.top{
     background: transparent;
     position: static;
@@ -64,6 +68,11 @@ const MenuBar = styled(AppBar)`
     transition-duration: .5s;
     transition-timing-function: cubic-bezier(0, 1, 0.5, 1);
     overflow-y: hidden;
+  }
+
+  @media only screen and (min-width: ${v.responsive.smallBreakpoint}px) {
+    padding-left: 75px;
+    padding-right: 75px;
   }
 
 `
@@ -175,15 +184,13 @@ class MarketingMenu extends React.PureComponent {
     this.setState({ isTopVisible: isVisible })
   }
 
-  toggleDrawer = (isOpen) => {
-    this.setState({
-      drawerState: isOpen,
-    })
+  toggleDrawer = (isOpen) => () => {
+      this.setState({ drawerState: isOpen })
   }
 
   renderDesktop() {
     return (
-      <Fragment>
+      <MenuWrapper>
         <MenuBar className={`MenuBar ${this.state.menuClass}`}>
           <Toolbar>
             <MarketingFlex
@@ -210,7 +217,7 @@ class MarketingMenu extends React.PureComponent {
                 <section align="right">
                   <NavLink onClick={handleScrollToFooter}>CONTACT</NavLink>
                   <a href="https://profile.ideo.com" rel="noopener noreferrer" target="_blank">
-                    <NavLink>LOGIN</NavLink>
+                  <NavLink>LOGIN</NavLink>
                   </a>
                 </section>
               </Box>
@@ -223,13 +230,13 @@ class MarketingMenu extends React.PureComponent {
           intervalDelay={300}
           onChange={this.handleTopVisibility}
         />
-      </Fragment>
+      </MenuWrapper>
     )
   }
 
   renderMobile() {
     return (
-      <Fragment>
+      <MenuWrapper>
         <MenuBar className={`MenuBar ${this.state.menuClass}`}>
           <Toolbar disableGutters={true}>
             <MarketingFlex
@@ -266,7 +273,7 @@ class MarketingMenu extends React.PureComponent {
             {MobileLinks}
           </div>
         </Drawer>
-      </Fragment>
+      </MenuWrapper>
     )
   }
 
