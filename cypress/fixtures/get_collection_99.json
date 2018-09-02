@@ -1,0 +1,221 @@
+{
+  "data": {
+    "id": "99",
+    "type": "collections",
+    "attributes": {
+      "id": 99,
+      "created_at": "2018-09-02T07:48:28.945Z",
+      "updated_at": "2018-09-02T07:49:24.332Z",
+      "name": "Hello World",
+      "organization_id": 1,
+      "master_template": false,
+      "template_id": null,
+      "submission_box_type": null,
+      "submission_box_id": null,
+      "submission_template_id": null,
+      "system_required": false,
+      "tag_list": [],
+      "inherited_tag_list": [],
+      "cover": {},
+      "type": "Collection",
+      "breadcrumb": [
+        [
+          "collections",
+          14,
+          "Cool Collection"
+        ],
+        [
+          "collections",
+          31,
+          "sub collection"
+        ],
+        [
+          "collections",
+          99,
+          "Hello World"
+        ]
+      ],
+      "can_edit": true,
+      "can_edit_content": true,
+      "is_org_template_collection": false,
+      "is_profile_template": false,
+      "is_profile_collection": false,
+      "pinned_and_locked": false
+    },
+    "relationships": {
+      "parent_collection_card": {
+        "data": {
+          "type": "collection_cards",
+          "id": "54023"
+        }
+      },
+      "submissions_collection": {
+        "data": null
+      },
+      "submission_template": {
+        "data": null
+      },
+      "organization": {
+        "data": {
+          "type": "organizations",
+          "id": "1"
+        }
+      },
+      "created_by": {
+        "data": {
+          "type": "users",
+          "id": "1"
+        }
+      },
+      "collection_cards": {
+        "data": []
+      },
+      "roles": {
+        "data": [
+          {
+            "type": "roles",
+            "id": "91821"
+          }
+        ]
+      }
+    }
+  },
+  "included": [
+    {
+      "id": "54023",
+      "type": "collection_cards",
+      "attributes": {
+        "id": 54023,
+        "order": 1,
+        "width": 1,
+        "height": 1,
+        "parent_id": 31,
+        "type": "CollectionCard::Primary",
+        "pinned": false,
+        "image_contain": false,
+        "pinned_and_locked": false,
+        "link": false,
+        "can_move": true
+      },
+      "relationships": {
+        "item": {
+          "meta": {
+            "included": false
+          }
+        },
+        "collection": {
+          "meta": {
+            "included": false
+          }
+        },
+        "parent": {
+          "meta": {
+            "included": false
+          }
+        },
+        "record": {
+          "meta": {
+            "included": false
+          }
+        },
+        "templated_from": {
+          "meta": {
+            "included": false
+          }
+        }
+      }
+    },
+    {
+      "id": "1",
+      "type": "organizations",
+      "attributes": {
+        "id": 1,
+        "name": "IDEO",
+        "domain_whitelist": [
+          "ideo.com",
+          "ideo.org"
+        ],
+        "slug": "ideo"
+      },
+      "relationships": {
+        "primary_group": {
+          "meta": {
+            "included": false
+          }
+        },
+        "guest_group": {
+          "meta": {
+            "included": false
+          }
+        },
+        "admin_group": {
+          "meta": {
+            "included": false
+          }
+        }
+      }
+    },
+    {
+      "id": "1",
+      "type": "users",
+      "attributes": {
+        "id": 1,
+        "first_name": "DK",
+        "last_name": "Tester",
+        "email": "dkaplan+test@ideo.com",
+        "created_at": "2018-02-23T22:13:15.361Z",
+        "status": "active",
+        "handle": "dktester",
+        "pic_url_square": "https://d3none3dlnlrde.cloudfront.net/assets/users/avatars/00udtbb7liHTcFR1v0h7/square-1518550685.jpg",
+        "user_profile_collection_id": 5181
+      },
+      "relationships": {
+        "current_organization": {
+          "meta": {
+            "included": false
+          }
+        },
+        "organizations": {
+          "meta": {
+            "included": false
+          }
+        },
+        "groups": {
+          "meta": {
+            "included": false
+          }
+        }
+      }
+    },
+    {
+      "id": "91821",
+      "type": "roles",
+      "attributes": {
+        "id": 91821,
+        "name": "editor"
+      },
+      "relationships": {
+        "users": {
+          "data": [
+            {
+              "type": "users",
+              "id": "1"
+            }
+          ]
+        },
+        "groups": {
+          "data": []
+        },
+        "resource": {
+          "data": {
+            "type": "collections",
+            "id": "99"
+          }
+        }
+      }
+    }
+  ],
+  "jsonapi": {
+    "version": "1.0"
+  }
+}

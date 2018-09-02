@@ -19,6 +19,7 @@ const BctButtonBox = ({
       placement="bottom"
     >
       <BctButton
+        data-cy={`BctButton-${type}`}
         creating={creating === type}
         onClick={onClick}
       >

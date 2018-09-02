@@ -57,12 +57,14 @@ class CollectionCreator extends React.Component {
         <form className="form" onSubmit={this.createCollection}>
           <BctTextField
             autoFocus
+            data-cy="CollectionCreatorTextField"
             placeholder={`${this.typeName} name`}
             value={this.state.inputText}
             onChange={this.onInputChange}
             onKeyDown={this.handleKeyDown}
           />
           <FormButton
+            data-cy="CollectionCreatorFormButton"
             disabled={this.props.loading}
             width={125}
           >
