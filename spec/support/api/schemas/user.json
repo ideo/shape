@@ -8,7 +8,7 @@
     "status": { "type": "string" },
     "pic_url_square": { "type": "string" },
     "handle": { "type": "string" },
-    "user_profile_collection_id": { "type": ["integer", "null"] },
+    "user_profile_collection_id": { "type": ["string", "null"] },
     "created_at": { "type": "date" }
   },
   "required": ["id", "email", "first_name", "last_name", "status"]
