@@ -56,8 +56,6 @@ const StyledBlankCreationTool = styled.div`
     width: ${props => (props.replacing ? '50%' : '100%')};
     &.foreground-bottom {
       top: 120px;
-      /* width is smaller because there are only 2 bottom buttons; can change if we add more */
-      width: 85%;
       margin: 0 auto;
     }
   }
@@ -334,12 +332,13 @@ class GridCardBlank extends React.Component {
 
   renderInner = () => {
     let inner
-    const { creating, loading, droppingFile, sizeError } = this.state
+    const { creating, loading, droppingFile } = this.state
     const isReplacing = !!this.props.uiStore.blankContentToolState.replacingId
     const size = v.iconSizes.bct
 
     switch (creating) {
     case 'collection':
+    case 'testCollection':
     case 'template':
     case 'submissionBox':
       inner = (
@@ -409,6 +408,16 @@ class GridCardBlank extends React.Component {
         Icon={AddVideoIcon}
       />
     )
+    const testBctBox = (
+      <BctButtonBox
+        tooltip="Create test"
+        type="testCollection"
+        creating={creating}
+        size={size}
+        onClick={this.startCreating('testCollection')}
+        Icon={AddCollectionIcon}
+      />
+    )
     const submissionBctBox = (
       <BctButtonBox
         tooltip="Create submission box"
@@ -468,6 +477,11 @@ class GridCardBlank extends React.Component {
               {videoBctBox}
             </BctButtonRotation>
           }
+          {creating === 'testCollection' &&
+            <BctButtonRotation>
+              {testBctBox}
+            </BctButtonRotation>
+          }
           {creating === 'submissionBox' &&
             <BctButtonRotation>
               {submissionBctBox}
@@ -488,10 +502,11 @@ class GridCardBlank extends React.Component {
         {(!isReplacing && !creating) &&
           <Flex
             className="foreground foreground-bottom"
-            justify="space-evenly"
+            justify="space-between"
           >
             {videoBctBox}
             {submissionBctBox}
+            {testBctBox}
             <PopoutMenu
               buttonStyle="bct"
               menuOpen={this.state.bctMenuOpen}

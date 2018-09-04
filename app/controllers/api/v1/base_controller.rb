@@ -18,6 +18,7 @@ class Api::V1::BaseController < ApplicationController
       'Collection::UserCollection': SerializableCollection,
       'Collection::SharedWithMeCollection': SerializableCollection,
       'Collection::Global': SerializableCollection,
+      'Collection::TestCollection': SerializableCollection,
       'Collection::SubmissionBox': SerializableCollection,
       'Collection::SubmissionsCollection': SerializableCollection,
       'Collection::UserProfile': SerializableCollection,
