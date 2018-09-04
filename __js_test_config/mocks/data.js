@@ -39,7 +39,7 @@ export const fakeTextItem = {
   ...fakeTextItemAttrs,
   rawAttributes: jest.fn().mockReturnValue(fakeTextItemAttrs),
   getRecordType: jest.fn().mockReturnValue('items'),
-  toJS: jest.fn().mockReturnValue(fakeTextItemAttrs),
+  toJSON: jest.fn().mockReturnValue(fakeTextItemAttrs),
   ...fakeJsonApiAttrs,
 }
 export const fakeVideoItemAttrs = {
