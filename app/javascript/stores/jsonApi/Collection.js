@@ -2,13 +2,14 @@ import _ from 'lodash'
 import { computed, action, observable } from 'mobx'
 import { initModelRef, ReferenceType} from 'datx'
 
+import { apiStore, routingStore, uiStore } from '~/stores'
 import BaseRecord from './BaseRecord'
 import CollectionCard from './CollectionCard'
 
 class Collection extends BaseRecord {
   static type = 'collections'
 
-  attributesForAPI = ['name', 'tag_list']
+  attributesForAPI = ['name', 'tag_list', 'submission_template_id', 'submission_box_type']
 
   @computed get cardIds() {
     return this.collection_cards.map(card => card.id)
@@ -36,6 +37,31 @@ class Collection extends BaseRecord {
 
   get isSharedCollection() {
     return this.type === 'Collection::SharedWithMeCollection'
+  }
+
+  get isSubmissionBox() {
+    return this.type === 'Collection::SubmissionBox'
+  }
+
+  get isSubmissionsCollection() {
+    return this.type === 'Collection::SubmissionsCollection'
+  }
+
+  get requiresSubmissionBoxSettings() {
+    if (!this.isSubmissionBox) return false
+    // if type is null then it requires setup
+    return !this.submission_box_type
+  }
+
+  get submissionTypeName() {
+    const { submission_template } = this
+    return submission_template ? submission_template.name : 'Submission'
+  }
+
+  get countSubmissions() {
+    if (!this.isSubmissionBox) return 0
+    const { submissions_collection } = this
+    return submissions_collection ? submissions_collection.collection_cards.length : 0
   }
 
   get isMasterTemplate() {
@@ -132,6 +158,27 @@ class Collection extends BaseRecord {
     if (!currentUser) return
     if (this.organization_id !== currentUser.current_organization.id) {
       currentUser.switchOrganization(this.organization_id)
+    }
+  }
+
+  static async createSubmission(parent_id, submissionSettings) {
+    const { type, template } = submissionSettings
+    if (type === 'template' && template) {
+      const templateData = {
+        template_id: template.id,
+        parent_id,
+        placement: 'beginning',
+      }
+      uiStore.update('isLoading', true)
+      const res = await apiStore.createTemplateInstance(templateData)
+      uiStore.update('isLoading', false)
+      routingStore.routeTo('collections', res.data.id)
+    } else {
+      uiStore.openBlankContentTool({
+        order: 0,
+        collectionId: parent_id,
+        blankType: type,
+      })
     }
   }
 }

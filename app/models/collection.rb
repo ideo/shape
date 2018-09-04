@@ -2,6 +2,7 @@ class Collection < ApplicationRecord
   include Breadcrumbable
   include Resourceable
   include Archivable
+  include RealtimeEditorsViewers
   include HasActivities
   include Templateable
 
@@ -68,7 +69,7 @@ class Collection < ApplicationRecord
           inverse_of: :collection,
           dependent: :destroy
 
-  has_many :items, through: :primary_collection_cards
+  has_many :items, through: :primary_collection_cards, dependent: :destroy
   has_many :collections, through: :primary_collection_cards
   has_many :items_and_linked_items,
            through: :collection_cards,
@@ -85,12 +86,11 @@ class Collection < ApplicationRecord
   belongs_to :organization
   belongs_to :cloned_from, class_name: 'Collection', optional: true
   belongs_to :created_by, class_name: 'User', optional: true
-  belongs_to :template, class_name: 'Collection', optional: true
 
   validates :name, presence: true, if: :base_collection_type?
   before_validation :inherit_parent_organization_id, on: :create
 
-  scope :root, -> { where.not(organization_id: nil) }
+  scope :root, -> { where('jsonb_array_length(breadcrumb) = 1') }
   scope :not_custom_type, -> { where(type: nil) }
   scope :user, -> { where(type: 'Collection::UserCollection') }
   scope :shared_with_me, -> { where(type: 'Collection::SharedWithMeCollection') }
@@ -170,6 +170,8 @@ class Collection < ApplicationRecord
       :created_by,
       :organization,
       :parent_collection_card,
+      :submissions_collection,
+      :submission_template,
       roles: %i[users groups resource],
       collection_cards: [
         :parent,
@@ -243,6 +245,7 @@ class Collection < ApplicationRecord
     end
     # upgrade to editor unless we're setting up a templated collection
     for_user.upgrade_to_edit_role(c)
+    c.setup_submissions_collection! if is_a?(Collection::SubmissionBox)
 
     CollectionCardDuplicationWorker.perform_async(
       collection_cards.map(&:id),
@@ -276,6 +279,14 @@ class Collection < ApplicationRecord
 
   def breadcrumb_title
     name
+  end
+
+  def submissions_collection
+    nil
+  end
+
+  def submission_template
+    nil
   end
 
   def resourceable_class
@@ -384,6 +395,11 @@ class Collection < ApplicationRecord
   end
 
   def profiles?
+    false
+  end
+
+  def destroyable?
+    # currently the only destroyable type is an incomplete SubmissionBox
     false
   end
 

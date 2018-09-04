@@ -14,8 +14,8 @@ class CollectionTemplateBuilder
   def call
     return false unless create_collection
     place_collection_in_parent
-    # re-save to capture new breadcrumb + tag lists
-    @collection.save
+    # re-save to capture cover, new breadcrumb + tag lists
+    @collection.cache_cover!
     @collection
   end
 
@@ -29,15 +29,27 @@ class CollectionTemplateBuilder
 
     # NOTE: Any issue with creating the template instance in a different org from the template?
     @collection = @template.templated_collections.create(
-      name: "My #{@template.name}",
+      name: created_template_name,
       organization: @parent.organization,
     )
+    # make sure to assign these permissions before the template cards are generated
+    @collection.inherit_roles_from_parent!(@parent)
+    # capture newly added roles
+    @collection.reload
     @created_by.add_role(Role::EDITOR, @collection)
     @template.setup_templated_collection(
       for_user: @created_by,
       collection: @collection,
     )
     @collection
+  end
+
+  def created_template_name
+    if @parent.is_a? Collection::SubmissionsCollection
+      "#{@created_by.first_name}'s #{@template.name}"
+    else
+      "My #{@template.name}"
+    end
   end
 
   def place_collection_in_parent
@@ -49,5 +61,6 @@ class CollectionTemplateBuilder
       order: @placement == 'beginning' ? 0 : @parent.collection_cards.count,
     )
     card.increment_card_orders! if @placement == 'beginning'
+    @collection.recalculate_child_breadcrumbs_async
   end
 end

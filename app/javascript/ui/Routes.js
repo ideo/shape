@@ -16,7 +16,7 @@ import SearchPage from '~/ui/pages/SearchPage'
 import SettingsPage from '~/ui/pages/SettingsPage'
 import TermsPage from '~/ui/pages/TermsPage'
 import TermsOfUseModal from '~/ui/users/TermsOfUseModal'
-import initDoorbell from '~/vendor/doorbell'
+import initZendesk from '~/vendor/zendesk'
 import OrganizationSettings from '~/ui/organizations/OrganizationSettings'
 import UserSettings from '~/ui/users/UserSettings'
 import v from '~/utils/variables'
@@ -65,7 +65,7 @@ class Routes extends React.Component {
   componentDidMount() {
     const { apiStore } = this.props
     apiStore.loadCurrentUserAndGroups().then(() => {
-      initDoorbell(apiStore.currentUser)
+      initZendesk(apiStore.currentUser)
       firebaseClient.authenticate(apiStore.currentUser.google_auth_token)
     })
   }

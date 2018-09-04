@@ -1,16 +1,20 @@
 import PropTypes from 'prop-types'
 
-import sleep from '~/utils/sleep'
 import Dialog from './Dialog'
 
 class AlertDialog extends React.PureComponent {
   componentWillReceiveProps({ fadeOutTime, open }) {
     if (open !== 'info') return
     if (fadeOutTime) {
-      sleep(fadeOutTime).then(() => {
+      this.timeout = setTimeout(() => {
         this.props.onClose()
-      })
+      }, fadeOutTime)
     }
+  }
+
+  handleClose = (ev) => {
+    if (this.timeout) clearTimeout(this.timeout)
+    this.props.onClose()
   }
 
   get isOpen() {
@@ -19,7 +23,7 @@ class AlertDialog extends React.PureComponent {
 
   render() {
     const { prompt } = this.props
-    const modalProps = { ...this.props, open: this.isOpen }
+    const modalProps = { ...this.props, onClose: this.handleClose, open: this.isOpen }
 
     return (
       <Dialog {...modalProps}>
@@ -44,8 +48,8 @@ AlertDialog.defaultProps = {
   ...Dialog.defaultProps,
   prompt: '',
   open: '',
-  iconName: 'Alert',
-  fadeOutTime: 2000,
+  iconName: 'Info',
+  fadeOutTime: 4000,
 }
 
 export default AlertDialog

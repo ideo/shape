@@ -35,7 +35,7 @@ beforeEach(() => {
 describe('GridCardBlank', () => {
   describe('when creating a new card', () => {
     it('renders the content creation buttons', () => {
-      expect(wrapper.find('BctButtonBox').length).toBe(5)
+      expect(wrapper.find('BctButtonBox').length).toBe(6)
     })
 
     it('renders the close button', () => {
@@ -50,10 +50,10 @@ describe('GridCardBlank', () => {
     })
 
     it('triggers FilestackUpload with onClick handler', () => {
-      component.pickImage()
+      component.pickImages()
       wrapper.update()
       expect(wrapper.state().creating).toEqual(null)
-      expect(FilestackUpload.pickImage).toHaveBeenCalled()
+      expect(FilestackUpload.pickImages).toHaveBeenCalled()
     })
 
     it('opens VideoCreator with onClick handler', () => {

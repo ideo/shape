@@ -15,6 +15,7 @@ import FilledProfileIcon from '~/ui/icons/FilledProfileIcon'
 import ProfileIcon from '~/ui/icons/ProfileIcon'
 import TemplateIcon from '~/ui/icons/TemplateIcon'
 import SystemIcon from '~/ui/icons/SystemIcon'
+import SubmissionBoxIconLg from '~/ui/icons/SubmissionBoxIconLg'
 import TagEditorModal from '~/ui/pages/shared/TagEditorModal'
 import { FixedHeader, MaxWidthContainer } from '~/ui/global/styled/layout'
 import { SubduedHeading1 } from '~/ui/global/styled/typography'
@@ -32,10 +33,10 @@ const FixedPageHeader = FixedHeader.extend`
 const IconHolder = styled.span`
   color: ${v.colors.cloudy};
   display: block;
-  height: 30px;
-  ${props => (props.align === 'left' ? 'margin-right: 10px;' : 'margin-left: 10px;')}
-  margin-top: 16px;
-  width: 30px;
+  height: 32px;
+  ${props => (props.align === 'left' ? 'margin-right: 12px;' : 'margin-left: 6px;')}
+  margin-top: 14px;
+  width: 32px;
 
   @media only screen and (max-width: ${v.responsive.smallBreakpoint}px) {
     height: 36px;
@@ -85,7 +86,7 @@ class PageHeader extends React.Component {
     uiStore.update('pageMenuOpen', false)
   }
 
-  routeBack = ({ type }) => {
+  routeBack = ({ type } = {}) => {
     const { record, routingStore } = this.props
     if (record.internalType === 'items' || type === 'move' || type === 'archive') {
       if (record.parent_collection_card.parent_id) {
@@ -134,6 +135,7 @@ class PageHeader extends React.Component {
           card={record.parent_collection_card}
           canEdit={record.can_edit}
           canReplace={record.canReplace}
+          submissionBox={record.isSubmissionBox}
           menuOpen={uiStore.pageMenuOpen}
           onOpen={this.openMenu}
           onLeave={this.closeMenu}
@@ -180,12 +182,18 @@ class PageHeader extends React.Component {
 
   get collectionTypeIcon() {
     const { record } = this.props
+    let icon = ''
     if (record.isUserProfile) {
-      return <IconHolder align="right"><ProfileIcon /></IconHolder>
+      icon = <ProfileIcon />
     } else if (record.isProfileCollection) {
-      return <IconHolder align="right"><SystemIcon /></IconHolder>
+      icon = <SystemIcon />
     } else if (record.isTemplated) {
-      return <IconHolder align="right"><TemplateIcon circled /></IconHolder>
+      icon = <TemplateIcon circled />
+    } else if (record.isSubmissionBox) {
+      icon = <SubmissionBoxIconLg />
+    }
+    if (icon) {
+      return <IconHolder align="right">{ icon }</IconHolder>
     }
     return null
   }
@@ -230,7 +238,7 @@ class PageHeader extends React.Component {
                 {record.isUsableTemplate &&
                   <FormButton
                     color="blue"
-                    style={{ marginLeft: 10, marginTop: 10 }}
+                    style={{ marginLeft: 30, marginTop: 10 }}
                     onClick={this.openMoveMenuForTemplate}
                   >
                     Use Template

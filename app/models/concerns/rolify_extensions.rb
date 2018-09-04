@@ -69,6 +69,13 @@ module RolifyExtensions
       .positive?
   end
 
+  def has_cached_role?(role_name)
+    @has_cached_role ||= Hash.new do |h, key|
+      h[key] = has_role?(role_name)
+    end
+    @has_cached_role[role_name.to_s]
+  end
+
   # Rolify was super slow in adding roles once there became thousands,
   # so we wrote our own method
   def add_role(role_name, resource = nil)

@@ -1,5 +1,5 @@
 module Breadcrumb
-  class Builder
+  class Builder < SimpleService
     def initialize(object)
       @object = object
       @breadcrumb = []

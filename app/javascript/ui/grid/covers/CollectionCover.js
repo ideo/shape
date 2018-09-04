@@ -10,13 +10,15 @@ import { CardHeading } from '~/ui/global/styled/typography'
 import hexToRgba from '~/utils/hexToRgba'
 import ProfileIcon from '~/ui/icons/ProfileIcon'
 import FilledProfileIcon from '~/ui/icons/FilledProfileIcon'
+import SubmissionBoxIconLg from '~/ui/icons/SubmissionBoxIconLg'
 import TemplateIcon from '~/ui/icons/TemplateIcon'
 import { routingStore } from '~/stores'
 
 const IconHolder = styled.span`
   display: inline-block;
-  height: 27px;
-  vertical-align: text-top;
+  line-height: 31px;
+  margin-right: 5px;
+  vertical-align: middle;
   width: 27px;
 `
 
@@ -99,25 +101,35 @@ function splitName(name) {
 class CollectionCover extends React.Component {
   get name() {
     const { collection } = this.props
-    if (collection.isTemplated || collection.isMasterTemplate) {
+    const hasIcon = (
+      collection.isTemplated ||
+      collection.isMasterTemplate ||
+      collection.isSubmissionBox
+    )
+    if (hasIcon) {
       const nameParts = splitName(collection.name)
       if (!nameParts) return collection.name
       const lastName = nameParts.pop()
-      let icon
+      let leftIcon
+      let rightIcon
       if (collection.isProfileTemplate) {
-        icon = <FilledProfileIcon />
+        rightIcon = <FilledProfileIcon />
       } else if (collection.isMasterTemplate) {
-        icon = <TemplateIcon circled filled />
+        leftIcon = <TemplateIcon circled filled />
       } else if (collection.isUserProfile) {
-        icon = <ProfileIcon />
+        rightIcon = <ProfileIcon />
       } else if (collection.isTemplated) {
-        icon = <TemplateIcon circled />
+        rightIcon = <TemplateIcon circled />
+      } else if (collection.isSubmissionBox) {
+        rightIcon = <SubmissionBoxIconLg />
       }
       return (
         <Fragment>
+          { leftIcon && <IconHolder>{leftIcon}</IconHolder> }
           {nameParts.join(' ')}{' '}
           <span style={{ whiteSpace: 'nowrap' }}>
-            {lastName}&nbsp;<IconHolder>{icon}</IconHolder>
+            {lastName}&nbsp;
+            { rightIcon && <IconHolder>{rightIcon}</IconHolder> }
           </span>
         </Fragment>
       )
@@ -135,7 +147,7 @@ class CollectionCover extends React.Component {
   }
 
   render() {
-    const { height, width, collection, uiStore } = this.props
+    const { height, width, collection, uiStore, onClick } = this.props
     const { cover } = collection
     const { gridW, gutter } = uiStore.gridSettings
 
@@ -143,6 +155,8 @@ class CollectionCover extends React.Component {
       <StyledCollectionCover
         url={cover.image_url}
         isSpecialCollection={collection.isSpecialCollection}
+        // onClick can be null, is used by SearchResultsInfinite
+        onClick={onClick}
       >
         <StyledCardContent
           height={height}
@@ -180,12 +194,14 @@ CollectionCover.propTypes = {
   height: PropTypes.number.isRequired,
   collection: MobxPropTypes.objectOrObservableObject.isRequired,
   dragging: PropTypes.bool,
+  onClick: PropTypes.func,
 }
 CollectionCover.wrappedComponent.propTypes = {
   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 CollectionCover.defaultProps = {
   dragging: false,
+  onClick: null,
 }
 
 CollectionCover.displayName = 'CollectionCover'

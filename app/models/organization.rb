@@ -3,6 +3,7 @@ class Organization < ApplicationRecord
   friendly_id :slug_candidates, use: %i[slugged finders history]
 
   has_many :collections, dependent: :destroy
+  has_many :items, through: :collections, dependent: :destroy
   has_many :groups, dependent: :destroy
   belongs_to :primary_group,
              class_name: 'Group',
@@ -136,14 +137,6 @@ class Organization < ApplicationRecord
       primary_group.user_ids +
       guest_group.user_ids
     ))
-  end
-
-  # used for reporting purposes
-  def user_count
-    (
-      primary_group.user_ids +
-      guest_group.user_ids
-    ).uniq.count
   end
 
   def create_profile_master_template(attrs = {})

@@ -23,4 +23,15 @@ describe('ImageItemCover', () => {
   it('passes the url to StyledImageCover', () => {
     expect(wrapper.find('StyledImageCover').props().url).toEqual(fakeImageItem.filestack_file_url)
   })
+
+  describe('when contain prop is true', () => {
+    beforeEach(() => {
+      wrapper.setProps({ contain: true, ...props })
+    })
+
+    it('will render the background as contained if passed in as prop', () => {
+      const cover = wrapper.find('StyledImageCover')
+      expect(cover).toHaveStyleRule('background-size', 'contain')
+    })
+  })
 })

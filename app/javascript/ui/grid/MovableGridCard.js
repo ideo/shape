@@ -11,6 +11,7 @@ import PositionedGridCard from '~/ui/grid/PositionedGridCard'
 import GridCard from '~/ui/grid/GridCard'
 import GridCardPlaceholder from '~/ui/grid/GridCardPlaceholder'
 import GridCardBlank from '~/ui/grid/blankContentTool/GridCardBlank'
+import AddSubmission from '~/ui/grid/blankContentTool/AddSubmission'
 import GridCardEmpty from '~/ui/grid/GridCardEmpty'
 import ResizeIcon from '~/ui/icons/ResizeIcon'
 
@@ -203,14 +204,31 @@ class MovableGridCard extends React.PureComponent {
     </PositionedGridCard>
   )
 
-  renderBlank = () => {
-    const { parent } = this.props
+  renderBlank = (cardType) => {
+    const { card, parent } = this.props
     const styleProps = this.styleProps()
     const {
       height,
       xPos,
       yPos
     } = styleProps
+    const { blankType } = card
+
+    let cardElement = (
+      <GridCardBlank
+        height={height}
+        parent={parent}
+        preselected={blankType}
+      />
+    )
+    if (cardType === 'submission') {
+      cardElement = (
+        <AddSubmission
+          parent_id={card.parent_id}
+          submissionSettings={card.submissionSettings}
+        />
+      )
+    }
 
     return (
       <FlipMove
@@ -230,7 +248,7 @@ class MovableGridCard extends React.PureComponent {
       >
         <div>
           <PositionedGridCard {...styleProps}>
-            <GridCardBlank height={height} parent={parent} />
+            {cardElement}
           </PositionedGridCard>
         </div>
       </FlipMove>
@@ -264,8 +282,8 @@ class MovableGridCard extends React.PureComponent {
 
     if (cardType === 'placeholder') {
       return this.renderPlaceholder()
-    } else if (cardType === 'blank') {
-      return this.renderBlank()
+    } else if (cardType === 'blank' || cardType === 'submission') {
+      return this.renderBlank(cardType)
     } else if (cardType === 'empty') {
       return this.renderEmpty({ beginningOfRow: card.position.x === 0 })
     }

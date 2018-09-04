@@ -55,7 +55,7 @@ export const SubduedHeading1 = styled.h1`
   display: inline-block;
   font-weight: 300;
   margin-bottom: 0;
-  margin-left: 20px;
+  margin-left: 16px;
   padding-top: 8px;
   text-transform: none;
 
@@ -105,6 +105,14 @@ export const SubText = styled.span`
   font-size: 0.75rem;
 `
 SubText.displayName = 'StyledSubText'
+
+/** @component */
+export const SmallHelperText = styled.span`
+  color: ${v.colors.gray};
+  font-family: ${v.fonts.sans};
+  font-size: 0.75rem;
+`
+SmallHelperText.displayName = 'SmallHelperText'
 
 /** @component */
 export const Anchor = styled.a`

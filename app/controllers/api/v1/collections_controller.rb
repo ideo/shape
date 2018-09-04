@@ -1,7 +1,8 @@
 class Api::V1::CollectionsController < Api::V1::BaseController
   deserializable_resource :collection, class: DeserializableCollection, only: %i[update]
   load_and_authorize_resource :collection_card, only: [:create]
-  load_and_authorize_resource except: %i[me update]
+  load_and_authorize_resource except: %i[me update destroy]
+  before_action :load_and_authorize_collection_destroy, only: %i[destroy]
   # NOTE: these have to be in the following order
   before_action :load_and_authorize_collection_update, only: %i[update]
   before_action :load_collection_with_cards, only: %i[show update]
@@ -13,6 +14,7 @@ class Api::V1::CollectionsController < Api::V1::BaseController
   end
 
   before_action :load_and_authorize_template_and_parent, only: %i[create_template]
+  after_action :broadcast_parent_collection_updates, only: %i[create_template]
   def create_template
     builder = CollectionTemplateBuilder.new(
       parent: @parent_collection,
@@ -28,11 +30,20 @@ class Api::V1::CollectionsController < Api::V1::BaseController
     end
   end
 
+  after_action :broadcast_collection_updates, only: %i[update]
   def update
     updated = CollectionUpdater.call(@collection, collection_params)
     if updated
       return if @cancel_sync
       render_collection
+    else
+      render_api_errors @collection.errors
+    end
+  end
+
+  def destroy
+    if @collection.destroy
+      render json: { success: true }
     else
       render_api_errors @collection.errors
     end
@@ -49,9 +60,14 @@ class Api::V1::CollectionsController < Api::V1::BaseController
 
   def load_and_authorize_template_and_parent
     @parent_collection = Collection.find(json_api_params[:parent_id])
+    @template_collection = Collection.find(json_api_params[:template_id])
+    if @parent_collection.is_a?(Collection::SubmissionsCollection)
+      # if adding to a SubmissionsCollection, you only need to have viewer/"participant" access
+      authorize! :read, @parent_collection
+      return
+    end
     # we are creating a template in this collection so authorize edit_content
     authorize! :edit_content, @parent_collection
-    @template_collection = Collection.find(json_api_params[:template_id])
     authorize! :read, @template_collection
   end
 
@@ -62,6 +78,15 @@ class Api::V1::CollectionsController < Api::V1::BaseController
     else
       authorize! :edit_content, @collection
     end
+  end
+
+  def load_and_authorize_collection_destroy
+    @collection = Collection.find(params[:id])
+    # you can only destroy a submission box that hasn't been set up yet
+    unless @collection.destroyable?
+      head(401)
+    end
+    authorize! :manage, @collection
   end
 
   def render_collection(include: nil)
@@ -85,6 +110,8 @@ class Api::V1::CollectionsController < Api::V1::BaseController
     params.require(:collection).permit(
       :name,
       :tag_list,
+      :submission_template_id,
+      :submission_box_type,
       collection_cards_attributes: %i[id order width height],
     )
   end
@@ -99,5 +126,13 @@ class Api::V1::CollectionsController < Api::V1::BaseController
       target: organization.primary_group,
       action: :joined,
     )
+  end
+
+  def broadcast_collection_updates
+    CollectionUpdateBroadcaster.call(@collection, current_user)
+  end
+
+  def broadcast_parent_collection_updates
+    CollectionUpdateBroadcaster.call(@parent_collection, current_user)
   end
 end

@@ -22,7 +22,7 @@ describe Collection, type: :model do
     it { should belong_to :template }
 
     describe '#collection_cards' do
-      let!(:collection) { create(:collection, num_cards: 5) }
+      let!(:collection) { create(:collection, num_cards: 3) }
       let(:collection_cards) { collection.collection_cards }
 
       it 'should find collection cards in order of order: :asc' do
@@ -49,6 +49,23 @@ describe Collection, type: :model do
             collection.update(name: 'Bobo') && card_linked_to_this_collection.reload
           }.to change(card_linked_to_this_collection, :updated_at)
         end
+      end
+    end
+
+    describe '#destroy' do
+      let(:user) { create(:user) }
+      let!(:collection) { create(:collection, num_cards: 3, add_editors: [user]) }
+      let(:items) { collection.items }
+      let(:collection_cards) { collection.collection_cards }
+
+      it 'should destroy all related cards and items' do
+        expect(collection.roles.count).to eq 1
+        expect(items.count).to eq 3
+        expect(collection_cards.count).to eq 3
+        collection.destroy
+        expect(collection.roles.count).to eq 0
+        expect(items.count).to eq 0
+        expect(collection_cards.count).to eq 0
       end
     end
   end
@@ -82,7 +99,7 @@ describe Collection, type: :model do
     let!(:parent_collection_user) { create(:user) }
     let!(:collection_user) { create(:user) }
     let!(:parent_collection) { create(:collection) }
-    let!(:collection) { create(:collection, num_cards: 5, tag_list: %w[Prototype Other]) }
+    let!(:collection) { create(:collection, num_cards: 3, tag_list: %w[Prototype Other]) }
     let!(:parent_collection_card) do
       create(:collection_card_collection, parent: parent_collection, collection: collection)
     end
@@ -105,7 +122,7 @@ describe Collection, type: :model do
     end
 
     context 'with archived collection' do
-      let!(:collection) { create(:collection, num_cards: 5, archived: true, tag_list: %w[Prototype Other]) }
+      let!(:collection) { create(:collection, num_cards: 3, archived: true, tag_list: %w[Prototype Other]) }
 
       it 'creates a duplicate that is not archived' do
         expect(collection.archived?).to be true

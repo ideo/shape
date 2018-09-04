@@ -20,6 +20,7 @@ export const fakeCollectionCard = {
   API_archive: jest.fn(),
   API_duplicate: jest.fn(),
   API_linkToMyCollection: jest.fn(),
+  ...fakeJsonApiAttrs,
 }
 
 export const fakeTextItemAttrs = {

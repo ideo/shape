@@ -3,6 +3,7 @@ import { Fragment } from 'react'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 
+import ContainImage from '~/ui/grid/ContainImage'
 import GridCardHotspot from '~/ui/grid/GridCardHotspot'
 import LinkItemCover from '~/ui/grid/covers/LinkItemCover'
 import TextItemCover from '~/ui/grid/covers/TextItemCover'
@@ -81,7 +82,7 @@ class GridCard extends React.Component {
           return <PdfFileItemCover item={record} />
         }
         if (record.mimeBaseType === 'image') {
-          return <ImageItemCover item={record} />
+          return <ImageItemCover item={record} contain={card.image_contain} />
         }
         return <GenericFileItemCover item={record} />
       }
@@ -254,6 +255,9 @@ class GridCard extends React.Component {
           <StyledTopRightActions color={this.actionsColor}>
             { record.isDownloadable && (
               <Download record={record} />
+            )}
+            { record.isImage && this.canEditCard && (
+              <ContainImage card={card} />
             )}
             <SelectionCircle cardId={card.id} />
             <ActionMenu

@@ -168,6 +168,14 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
         expect(response.status).to eq(200)
         expect(json['data']['attributes']).to match_json_schema('collection')
       end
+
+      it 'broadcasts collection updates' do
+        expect(CollectionUpdateBroadcaster).to receive(:call).with(
+          to_collection,
+          user,
+        )
+        post(path, params: params)
+      end
     end
 
     context 'without permission' do
@@ -268,6 +276,14 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
       expect(collection_card.reload.order).to eq(1)
     end
 
+    it 'broadcasts collection updates' do
+      expect(CollectionUpdateBroadcaster).to receive(:call).with(
+        collection,
+        user,
+      )
+      patch(path, params: params)
+    end
+
     context 'with cancel_sync == true' do
       let(:params) {
         json_api_params(
@@ -280,6 +296,43 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
       it 'returns a 204 no content' do
         patch(path, params: params)
         expect(response.status).to eq(204)
+      end
+    end
+  end
+
+  describe 'DELETE #destroy' do
+    let(:path) { "/api/v1/collections/#{collection.id}" }
+
+    context 'with a normal collection' do
+      let!(:collection) { create(:collection, add_editors: [user]) }
+
+      it 'should not allow the destroy action' do
+        delete(path)
+        expect(response.status).to eq(401)
+      end
+    end
+
+    context 'with an incomplete SubmissionBox' do
+      let!(:collection) { create(:submission_box, add_editors: [user]) }
+
+      it 'should allow the destroy action' do
+        delete(path)
+        expect(response.status).to eq(200)
+      end
+
+      it 'should not allow the destroy action unless user is an editor' do
+        user.remove_role(Role::EDITOR, collection)
+        delete(path)
+        expect(response.status).to eq(401)
+      end
+    end
+
+    context 'with an existing SubmissionBox' do
+      let!(:collection) { create(:submission_box, add_editors: [user], submission_box_type: :file) }
+
+      it 'should not allow the destroy action' do
+        delete(path)
+        expect(response.status).to eq(401)
       end
     end
   end

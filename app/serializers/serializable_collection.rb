@@ -4,9 +4,12 @@ class SerializableCollection < BaseJsonSerializer
   type 'collections'
 
   attributes :id, :created_at, :updated_at, :name, :organization_id,
-             :master_template, :template_id
+             :master_template, :template_id,
+             :submission_box_type, :submission_box_id, :submission_template_id
 
   has_one :parent_collection_card
+  belongs_to :submissions_collection
+  belongs_to :submission_template
 
   attribute :system_required do
     @object.system_required?

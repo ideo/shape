@@ -4,6 +4,9 @@ RSpec.describe CollectionPermissionResetter, type: :service do
   let(:organization) { create(:organization) }
   let(:collection) { create(:collection, num_cards: 5, organization: organization) }
   let(:items) { collection.items }
+  let!(:subcollection) do
+    create(:collection, num_cards: 5, organization: organization, parent_collection: collection)
+  end
   let(:user) { create(:user) }
   let(:user2) { create(:user) }
 
@@ -25,6 +28,8 @@ RSpec.describe CollectionPermissionResetter, type: :service do
       user2.reset_cached_roles!
       expect(items.all? { |i| i.can_edit?(user) }).to be true
       expect(items.all? { |i| i.can_view?(user2) }).to be true
+      expect(subcollection.items.all? { |i| i.can_edit?(user) }).to be true
+      expect(subcollection.items.all? { |i| i.can_view?(user2) }).to be true
     end
   end
 end

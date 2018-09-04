@@ -25,7 +25,7 @@ const parseURLMeta = async (urlStr) => {
   }
 
   const parser = new DOMParser()
-  const proxy = process.env.CORS_PROXY_URL || 'https://cors-anywhere-cdolzdpypb.now.sh/'
+  const proxy = '/passthru?url='
   try {
     const response = await axios.get(`${proxy}${url}`)
     const doc = parser.parseFromString(response.data, 'text/html')

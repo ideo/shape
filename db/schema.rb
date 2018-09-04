@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180817154020) do
+ActiveRecord::Schema.define(version: 20180831213853) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -25,8 +25,14 @@ ActiveRecord::Schema.define(version: 20180817154020) do
     t.datetime "updated_at", null: false
     t.bigint "organization_id"
     t.text "content"
+    t.string "source_type"
+    t.bigint "source_id"
+    t.string "destination_type"
+    t.bigint "destination_id"
     t.index ["actor_id"], name: "index_activities_on_actor_id"
+    t.index ["destination_type", "destination_id"], name: "index_activities_on_destination_type_and_destination_id"
     t.index ["organization_id"], name: "index_activities_on_organization_id"
+    t.index ["source_type", "source_id"], name: "index_activities_on_source_type_and_source_id"
     t.index ["target_type", "target_id"], name: "index_activities_on_target_type_and_target_id"
   end
 
@@ -55,6 +61,7 @@ ActiveRecord::Schema.define(version: 20180817154020) do
     t.integer "templated_from_id"
     t.datetime "archived_at"
     t.string "archive_batch"
+    t.boolean "image_contain", default: false
     t.index ["collection_id"], name: "index_collection_cards_on_collection_id"
     t.index ["item_id"], name: "index_collection_cards_on_item_id"
     t.index ["parent_id"], name: "index_collection_cards_on_parent_id"
@@ -76,8 +83,15 @@ ActiveRecord::Schema.define(version: 20180817154020) do
     t.datetime "archived_at"
     t.string "archive_batch"
     t.boolean "master_template", default: false
+    t.integer "submission_template_id"
+    t.integer "submission_box_type"
+    t.bigint "submission_box_id"
+    t.index ["breadcrumb"], name: "index_collections_on_breadcrumb", using: :gin
     t.index ["cloned_from_id"], name: "index_collections_on_cloned_from_id"
     t.index ["organization_id"], name: "index_collections_on_organization_id"
+    t.index ["submission_box_id"], name: "index_collections_on_submission_box_id"
+    t.index ["submission_template_id"], name: "index_collections_on_submission_template_id"
+    t.index ["template_id"], name: "index_collections_on_template_id"
   end
 
   create_table "comment_threads", force: :cascade do |t|
@@ -170,6 +184,7 @@ ActiveRecord::Schema.define(version: 20180817154020) do
     t.datetime "archived_at"
     t.string "archive_batch"
     t.string "icon_url"
+    t.index ["breadcrumb"], name: "index_items_on_breadcrumb", using: :gin
     t.index ["cloned_from_id"], name: "index_items_on_cloned_from_id"
   end
 

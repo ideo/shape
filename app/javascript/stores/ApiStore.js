@@ -25,6 +25,7 @@ class ApiStore extends jsonapi(datxCollection) {
   @observable currentCommentThreadIds = []
   @observable currentPageThreadKey = null
   @observable recentNotifications = new Map()
+  @observable usableTemplates = []
 
   fetch(type, id, skipCache) {
     return super.fetch(type, id, {skipCache})
@@ -240,6 +241,17 @@ class ApiStore extends jsonapi(datxCollection) {
 
   async createTemplateInstance(data) {
     return this.request('collections/create_template', 'POST', data)
+  }
+
+  async fetchUsableTemplates() {
+    const other = ''
+    let q = `#template ${other}`
+    q = _.trim(q).replace(/\s/g, '+').replace(/#/g, '%23')
+    // TODO: pagination?
+    const res = await this.request(`search?query=${q}`)
+    runInAction(() => {
+      this.usableTemplates = res.data.filter(c => c.isUsableTemplate)
+    })
   }
 
   // -- override mobx-jsonapi-store --

@@ -30,7 +30,7 @@ class Download extends React.Component {
       <Tooltip
         classes={{ tooltip: 'Tooltip' }}
         title="Download"
-        placement="bottom"
+        placement="top"
       >
         <IconHolder className="show-on-hover" onClick={this.download}>
           <DownloadIcon />

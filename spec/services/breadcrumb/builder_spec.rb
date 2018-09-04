@@ -5,7 +5,7 @@ RSpec.describe Breadcrumb::Builder, type: :service do
     let(:collection) { create(:collection, num_cards: 1) }
     let!(:item) { collection.items.first }
     let(:breadcrumb) do
-      Breadcrumb::Builder.new(item).call
+      Breadcrumb::Builder.call(item)
     end
 
     it 'should have breadcrumb from parent collection' do
@@ -31,7 +31,7 @@ RSpec.describe Breadcrumb::Builder, type: :service do
     context 'with subcollection' do
       let!(:card) { create(:collection_card_collection, parent: collection) }
       let(:subcollection) { card.collection }
-      let!(:item) { create(:collection_card_text, parent: subcollection).item }
+      let(:item) { create(:collection_card_text, parent: subcollection).item }
 
       before do
         subcollection.recalculate_breadcrumb!
@@ -55,6 +55,24 @@ RSpec.describe Breadcrumb::Builder, type: :service do
 
       it 'should have collection, subcollection and self' do
         expect(breadcrumb.size).to eq(3)
+      end
+    end
+
+    describe '.in_collection' do
+      let!(:subcollections) { create_list(:collection, 2, num_cards: 2, parent_collection: collection) }
+
+      before do
+        subcollections.each { |c| c.items.each(&:recalculate_breadcrumb!) }
+      end
+
+      it 'should find all subcollections in the tree' do
+        expect(Collection.in_collection(collection).count).to eq 2
+        expect(Collection.in_collection(collection)).to include(subcollections.first)
+      end
+
+      it 'should find all items in the tree' do
+        expect(Item.in_collection(collection).count).to eq 4
+        expect(Item.in_collection(collection)).to include(subcollections.first.items.first)
       end
     end
   end

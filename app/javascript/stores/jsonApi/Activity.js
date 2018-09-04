@@ -5,7 +5,6 @@ import Collection from '~/stores/jsonApi/Collection'
 import Item from '~/stores/jsonApi/Item'
 
 class Activity extends BaseRecord {
-
   @action setTarget(value) {
     const model = value.internalType === 'collections' ? Collection : Item
     this.addReference('target', value, {
@@ -14,20 +13,20 @@ class Activity extends BaseRecord {
     })
   }
 
-  static trackActivity(action, target) {
-    const activity = new Activity({
-      action: action,
-      target_id: target.id,
-      target_type: target.internalType,
-    }, this.apiStore)
-    activity.save()
-  }
-
   attributesForAPI = [
     'action',
     'target_type',
     'target_id',
   ]
+
+  static trackActivity(action, target) {
+    const activity = new Activity({
+      action,
+      target_id: target.id,
+      target_type: target.internalType,
+    }, this.apiStore)
+    activity.save()
+  }
 }
 
 Activity.type = 'activities'

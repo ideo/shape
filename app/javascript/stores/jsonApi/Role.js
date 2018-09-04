@@ -9,8 +9,12 @@ class Role extends BaseRecord {
     return `collections/${collectionId}/roles`
   }
 
-  canEdit() {
-    return this.name === 'editor' || this.name === 'admin'
+  get label() {
+    const { name, resource } = this
+    if (name === 'viewer' && resource && resource.isSubmissionBox) {
+      return 'participant'
+    }
+    return name
   }
 
   API_delete(entity, opts = {}) {

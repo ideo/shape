@@ -101,6 +101,16 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
           action: :created,
           subject_user_ids: [user.id],
           subject_group_ids: [],
+          source: nil,
+          destination: nil,
+        )
+        post(path, params: params)
+      end
+
+      it 'broadcasts collection updates' do
+        expect(CollectionUpdateBroadcaster).to receive(:call).with(
+          collection,
+          user,
         )
         post(path, params: params)
       end
@@ -193,7 +203,7 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
     end
   end
 
-  describe 'PATCH #archive', only: true do
+  describe 'PATCH #archive' do
     let!(:collection_cards) { create_list(:collection_card_collection, 3, parent: collection) }
     let(:path) { '/api/v1/collection_cards/archive' }
     let(:params) { { card_ids: collection_cards.map(&:id) }.to_json }
@@ -214,6 +224,14 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
         expect(CollectionCardArchiveWorker).to receive(:perform_async).with(
           collection_cards.map(&:id),
           user.id,
+        )
+        patch(path, params: params)
+      end
+
+      it 'broadcasts collection updates' do
+        expect(CollectionUpdateBroadcaster).to receive(:call).with(
+          collection,
+          user,
         )
         patch(path, params: params)
       end
@@ -245,7 +263,7 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
     let(:params_at_end) { raw_params.merge(placement: 'end').to_json }
     let(:params) { raw_params.to_json }
 
-    describe 'without content editor access for to_collection' do
+    context 'without content editor access for to_collection' do
       let(:to_collection) { create(:collection) }
 
       it 'returns a 401' do
@@ -254,7 +272,7 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
       end
     end
 
-    describe 'with content editor access for to_collection' do
+    context 'with content editor access for to_collection' do
       let(:editor) { create(:user) }
       let(:viewer) { create(:user) }
       let(:to_collection) do
@@ -303,6 +321,16 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
         expect(moving_cards.first.record.editors[:users].last).to eq editor
         expect(moving_cards.first.record.viewers[:users].last).to eq viewer
       end
+
+      it 'broadcasts collection updates' do
+        expect(CollectionUpdateBroadcaster).to receive(:call).twice
+        patch(path, params: params)
+      end
+
+      it 'creates an activity' do
+        expect(ActivityAndNotificationBuilder).to receive(:call).twice
+        patch(path, params: params)
+      end
     end
   end
 
@@ -321,7 +349,7 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
     end
     let(:params) { raw_params.to_json }
 
-    describe 'without content editor access for to_collection' do
+    context 'without content editor access for to_collection' do
       let(:to_collection) { create(:collection) }
 
       it 'returns a 401' do
@@ -330,7 +358,7 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
       end
     end
 
-    describe 'without view access for cards in from_collection' do
+    context 'without view access for cards in from_collection' do
       let(:to_collection) do
         create(:collection, num_cards: 3, add_editors: [user])
       end
@@ -342,7 +370,7 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
       end
     end
 
-    describe 'with content editor access for to_collection and view access for cards in from_collection' do
+    context 'with content editor access for to_collection and view access for cards in from_collection' do
       let(:editor) { create(:user) }
       let(:viewer) { create(:user) }
       let(:to_collection) do
@@ -368,6 +396,14 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
         expect(to_collection.collection_cards.first(2).map(&:item)).to match_array moving_cards.map(&:item)
         expect(to_collection.collection_cards.first.link?).to be true
       end
+
+      it 'broadcasts collection updates' do
+        expect(CollectionUpdateBroadcaster).to receive(:call).with(
+          to_collection,
+          user,
+        )
+        post(path, params: params)
+      end
     end
   end
 
@@ -386,7 +422,7 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
     end
     let(:params) { raw_params.to_json }
 
-    describe 'without content editor access for to_collection' do
+    context 'without content editor access for to_collection' do
       let(:to_collection) { create(:collection) }
 
       it 'returns a 401' do
@@ -395,7 +431,7 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
       end
     end
 
-    describe 'without view access for cards in from_collection' do
+    context 'without view access for cards in from_collection' do
       let(:to_collection) do
         create(:collection, num_cards: 3, add_editors: [user])
       end
@@ -407,7 +443,24 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
       end
     end
 
-    describe 'with content editor access for to_collection and view access for cards in from_collection' do
+    context 'trying to duplicate inside of itself' do
+      let(:from_collection) { create(:collection, add_editors: [user]) }
+      let(:parent_card) { create(:collection_card, collection: from_collection) }
+      let(:moving_cards) { [parent_card] }
+      let(:to_collection) { create(:collection, add_editors: [user], parent_collection: from_collection) }
+
+      before do
+        from_collection.recalculate_breadcrumb!
+        to_collection.recalculate_breadcrumb!
+      end
+
+      it 'returns a 400' do
+        post(path, params: params)
+        expect(response.status).to eq(400)
+      end
+    end
+
+    context 'with content editor access for to_collection and view access for cards in from_collection' do
       let(:editor) { create(:user) }
       let(:viewer) { create(:user) }
       let(:to_collection) do
@@ -435,6 +488,61 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
         # names should match, in same order
         expect(first_cards.map(&:item).map(&:name)).to eq moving_cards.map(&:item).map(&:name)
         expect(to_collection.collection_cards.first.primary?).to be true
+      end
+    end
+  end
+
+  describe 'PATCH #update' do
+    let(:collection) { create(:collection, organization: user.current_organization) }
+    let(:collection_card) { create(:collection_card_text, parent: collection) }
+    let(:path) { "/api/v1/collection_cards/#{collection_card.id}" }
+    let(:raw_params) do
+      {
+        image_contain: true,
+      }
+    end
+    let(:params) { json_api_params('collection_cards', raw_params) }
+
+    before do
+      user.add_role(Role::EDITOR, collection_card.item)
+      user.add_role(Role::EDITOR, collection)
+    end
+
+    it 'returns a 200' do
+      patch(path, params: params)
+      expect(response.status).to eq(200)
+    end
+
+    it 'matches JSON schema' do
+      patch(path, params: params)
+      expect(json['data']['attributes']).to match_json_schema('collection_card')
+      expect(json['data']['attributes']['parent_id']).to eq collection.id
+    end
+
+    it 'updates the card, such as the image_contain property' do
+      patch(path, params: params)
+      expect(json['data']['attributes']['image_contain']).to eq true
+      expect(collection_card.reload.image_contain).to be true
+    end
+
+    it 'broadcasts collection updates' do
+      expect(CollectionUpdateBroadcaster).to receive(:call).with(
+        collection,
+        user,
+      )
+      patch(path, params: params)
+    end
+
+    context 'without content editor access on the parent collection' do
+      let(:user) { create(:user, add_to_org: create(:organization)) }
+
+      before do
+        user.add_role(Role::EDITOR, collection_card.item)
+      end
+
+      it 'returns a 401' do
+        patch(path, params: params)
+        expect(response.status).to eq(401)
       end
     end
   end
@@ -496,6 +604,16 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
           action: :replaced,
           subject_user_ids: [user.id],
           subject_group_ids: [],
+          source: nil,
+          destination: nil,
+        )
+        patch(path, params: params)
+      end
+
+      it 'broadcasts collection updates' do
+        expect(CollectionUpdateBroadcaster).to receive(:call).with(
+          collection,
+          user,
         )
         patch(path, params: params)
       end
@@ -508,5 +626,4 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
       end
     end
   end
-
 end
