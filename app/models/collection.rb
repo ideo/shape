@@ -90,7 +90,7 @@ class Collection < ApplicationRecord
   validates :name, presence: true, if: :base_collection_type?
   before_validation :inherit_parent_organization_id, on: :create
 
-  scope :root, -> { where.not(organization_id: nil) }
+  scope :root, -> { where('jsonb_array_length(breadcrumb) = 1') }
   scope :not_custom_type, -> { where(type: nil) }
   scope :user, -> { where(type: 'Collection::UserCollection') }
   scope :shared_with_me, -> { where(type: 'Collection::SharedWithMeCollection') }

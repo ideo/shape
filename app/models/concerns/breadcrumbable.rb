@@ -14,10 +14,24 @@ module Breadcrumbable
 
     def add_breadcrumb_column!
       connection.add_column table_name, :breadcrumb, :jsonb
+      connection.add_index table_name, :breadcrumb, using: :gin
     end
 
     def remove_breadcrumb_column!
       connection.remove_column table_name, :breadcrumb
+    end
+
+    def in_collection(collection_or_id)
+      if collection_or_id.is_a?(Collection)
+        collection = collection_or_id
+      else
+        collection = Collection.find(collection_or_id)
+      end
+      scoped = active.where('breadcrumb @> ?', [collection.breadcrumb.last].to_s)
+      # in_collection should not return the collection itself
+      scoped = scoped.where.not(id: collection.id) if base_class == Collection
+      # order from the top of the tree down
+      scoped.order('jsonb_array_length(breadcrumb) ASC')
     end
   end
 
@@ -61,7 +75,7 @@ module Breadcrumbable
   private
 
   def calculate_breadcrumb
-    self.breadcrumb = Breadcrumb::Builder.new(self).call
+    self.breadcrumb = Breadcrumb::Builder.call(self)
   end
 
   def breadcrumb_for_user(user)
