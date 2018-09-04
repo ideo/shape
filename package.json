@@ -32,7 +32,7 @@
     "snapshotSerializers": [
       "enzyme-to-json/serializer"
     ],
-    "resetMocks": true,
+    "resetMocks": false,
     "automock": false,
     "moduleFileExtensions": [
       "js",
