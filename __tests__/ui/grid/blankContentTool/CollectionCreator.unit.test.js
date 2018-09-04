@@ -32,7 +32,7 @@ describe('MovableGridCard', () => {
         collection_attributes: {
           name: component.state.inputText,
           master_template: false,
-          type: 'Collection',
+          type: null,
         },
       }, {
         afterCreate: null,
