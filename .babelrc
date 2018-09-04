@@ -43,9 +43,6 @@
         "#": "./__js_test_config"
       }
     }],
-    ["react-intl", {
-      "messagesDir": "./build/messages/"
-    }],
     ["transform-runtime", {
       "helpers": false,
       "polyfill": false,
