@@ -175,6 +175,9 @@ class OrganizationMenu extends React.Component {
     } else if (this.editGroup.is_admin) {
       fixedRole = 'admin'
     }
+    if (!this.editGroup.id) {
+      return null
+    }
     return (
       <RolesMenu
         canEdit={this.editGroup.can_edit}
