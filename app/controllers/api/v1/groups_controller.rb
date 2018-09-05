@@ -50,7 +50,7 @@ class Api::V1::GroupsController < Api::V1::BaseController
   private
 
   def authorize_current_organization
-    authorize! :manage, current_organization
+    authorize! :read, current_organization
   end
 
   def group_params

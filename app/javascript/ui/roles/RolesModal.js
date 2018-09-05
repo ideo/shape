@@ -16,9 +16,15 @@ class RolesModal extends React.Component {
 
   fetchRoles() {
     const { apiStore, roles, record } = this.props
-    if (!roles.length) {
+    if (!roles.length && this.isOpen) {
+      // NOTE: this will re-fetch the entire collection/item in order to get the attached roles
       apiStore.fetch(record.internalType, record.id)
     }
+  }
+
+  get isOpen() {
+    const { uiStore } = this.props
+    return !!uiStore.rolesMenuOpen
   }
 
   handleClose = (ev) => {
@@ -35,19 +41,20 @@ class RolesModal extends React.Component {
   }
 
   render() {
-    const { roles, uiStore, record } = this.props
+    const { roles, record } = this.props
     const title = `Sharing: ${record.name}`
 
     return (
       <Modal
         title={title}
         onClose={this.handleClose}
-        open={!!uiStore.rolesMenuOpen}
+        open={this.isOpen}
       >
         <RolesMenu
           canEdit={record.can_edit}
           ownerId={record.id}
           ownerType={record.internalType}
+          submissionBox={record.isSubmissionBox}
           title="Shared with"
           roles={roles}
           onSave={this.onSave}

@@ -2,6 +2,7 @@ export const ITEM_TYPES = {
   TEXT: 'Item::TextItem',
   FILE: 'Item::FileItem',
   VIDEO: 'Item::VideoItem',
+  LINK: 'Item::LinkItem',
 }
 
 export const KEYS = {
@@ -18,7 +19,7 @@ export default {
     horizontal: '2rem',
   },
 
-  // breakpoint sizes
+  // Keep in sync with assets/stylesheets/core/base.scss
   responsive: {
     // based on going from 2 -> 1 column
     smallBreakpoint: 645,
@@ -32,12 +33,14 @@ export default {
   colors: {
     cararra: '#f2f1ee',
     desert: '#f5f4f3',
-    cyan: '#c0dbde',
+    cyan: '#b4cdd4',
     pacificBlue: '#00a0e0',
     activityLightBlue: '#73808f',
     activityMedBlue: '#5a6a7c',
     activityDarkBlue: '#3f526a',
     activityDarkestBlue: '#242d37',
+    ctaButtonBlue: '#5698ae',
+    ctaButtonBlueHover: '#35889e',
     aquaHaze: '#f0f4f6',
     gray: '#c6c1bf',
     cloudy: '#a89f9b',

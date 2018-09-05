@@ -143,6 +143,7 @@ class RolesMenu extends React.Component {
       ownerType,
       title,
       fixedRole,
+      submissionBox,
     } = this.props
     const roleEntities = []
     roles.forEach((role) => {
@@ -175,6 +176,7 @@ class RolesMenu extends React.Component {
             key={`${combined.entity.id}_${combined.entity.internalType}_r${combined.role.id}`}
             role={combined.role}
             roleTypes={roleTypes}
+            roleLabels={submissionBox ? { viewer: 'participant' } : {}}
             entity={combined.entity}
             onDelete={this.deleteRoles}
             onCreate={this.createRoles}
@@ -187,6 +189,7 @@ class RolesMenu extends React.Component {
             <RolesAdd
               searchableItems={this.searchableItems}
               roleTypes={addRoleTypes}
+              roleLabels={submissionBox ? { viewer: 'participant' } : {}}
               onCreateRoles={this.createRoles}
               onCreateUsers={this.onCreateUsers}
               ownerType={ownerType}
@@ -207,6 +210,7 @@ RolesMenu.propTypes = {
   title: PropTypes.string,
   addCallout: PropTypes.string,
   onSave: PropTypes.func.isRequired,
+  submissionBox: PropTypes.bool,
 }
 RolesMenu.wrappedComponent.propTypes = {
   apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
@@ -217,7 +221,8 @@ RolesMenu.defaultProps = {
   fixedRole: null,
   roles: [],
   title: 'Shared with',
-  addCallout: 'Add groups or people:'
+  addCallout: 'Add groups or people:',
+  submissionBox: false,
 }
 
 export default RolesMenu

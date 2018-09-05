@@ -1,9 +1,8 @@
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
-import Truncator from 'react-truncator'
 import v from '~/utils/variables'
 import CornerIcon from '~/ui/icons/CornerIcon'
-import { uiStore } from '~/stores'
+import { GridCardIconWithName } from '~/ui/grid/shared'
 import FileIcon from '~/ui/grid/covers/FileIcon'
 
 // TODO styled cover shared with pdf cover
@@ -12,19 +11,6 @@ export const StyledCover = styled.div`
   width: 100%;
   height: 100%;
   background: ${v.colors.gray};
-
-  .filename {
-    display: flex;
-    align-items: center;
-    bottom: 10px;
-    color: ${v.colors.gray};
-    font-family: ${v.fonts.sans};
-    font-size: 1rem;
-    font-weight: 500;
-    left: 15px;
-    position: absolute;
-  }
-
   .card-menu {
     color: ${v.colors.blackLava};
   }
@@ -68,14 +54,10 @@ class GenericFileItemCover extends React.Component {
             <CornerIcon />
           </CornerContainer>
         </FileContainer>
-        <div className="filename">
-          <FileIcon mimeType={item.filestack_file.mimetype} />
-          <Truncator
-            text={filestack_file.filename}
-            key={filestack_file.filename}
-            extraSpacing={25}
-          />
-        </div>
+        <GridCardIconWithName
+          text={filestack_file.filename}
+          icon={<FileIcon mimeType={item.filestack_file.mimetype} />}
+        />
       </StyledCover>
     )
   }

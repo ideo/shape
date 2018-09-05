@@ -32,9 +32,8 @@ class OrganizationTemplates < SimpleService
   def setup_profile_template
     return if @org.profile_template.present?
     # Create default profile template and add it to the templates collection
-    profile_template = @org.create_profile_template(
+    profile_template = @org.create_profile_master_template(
       name: 'Profile',
-      organization: @org,
     )
     CollectionCard::Primary.create(
       order: 1,
@@ -44,12 +43,6 @@ class OrganizationTemplates < SimpleService
       collection: profile_template,
     )
     @org.admin_group.add_role(Role::EDITOR, profile_template)
-    # create the special profile tag for the profile collection
-    profile_template.tag(
-      profile_template,
-      with: 'template',
-      on: :tags,
-    )
     profile_template.reload.update_cached_tag_lists
     profile_template.recalculate_breadcrumb!
     setup_profile_template_items

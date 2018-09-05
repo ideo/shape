@@ -9,9 +9,7 @@ class Ability
     # modify represents all the non-read-only actions
     alias_action :create, :update, :destroy, to: :modify
 
-    # NOTE: `super_admin` role is not something that exists yet
-    # -- not using has_cached_role? because it assumes ALL roles are preloaded
-    if user.has_role?(:super_admin)
+    if user.has_cached_role?(Role::SUPER_ADMIN)
       can :read, :all
       can :manage, :all
 

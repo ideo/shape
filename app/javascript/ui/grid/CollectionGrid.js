@@ -2,10 +2,25 @@ import PropTypes from 'prop-types'
 import { action } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import _ from 'lodash'
+import styled from 'styled-components'
 
 import Loader from '~/ui/layout/Loader'
 import MovableGridCard from '~/ui/grid/MovableGridCard'
 import CollectionCard from '~/stores/jsonApi/CollectionCard'
+
+const StyledGrid = styled.div`
+  margin-top: 50px;
+  min-height: ${props => props.minHeight}px;
+  position: relative;
+  width: 100%;
+  transition: all 0.5s;
+
+  .react-draggable-dragged:not(.react-draggable-dragging) {
+    /* this is to transition the draggable back to its original spot when you let go */
+    transition: all 0.5s;
+  }
+`
+StyledGrid.displayName = 'StyledGrid'
 
 const calculateDistance = (pos1, pos2) => {
   // pythagoras!
@@ -38,6 +53,7 @@ class CollectionGrid extends React.Component {
     super(props)
     this.state = {
       cards: [],
+      rows: 1,
       hoveringOver: { order: null },
       timeoutId: null,
       transitioning: false,
@@ -45,27 +61,55 @@ class CollectionGrid extends React.Component {
   }
 
   componentDidMount() {
-    this.positionCards(this.props.collection.collection_cards)
+    this.initialize(this.props)
   }
 
   componentWillReceiveProps(nextProps) {
+    this.initialize(nextProps)
+  }
+
+  componentWillUnmount() {
+    this.clearDragTimeout()
+  }
+
+  initialize(props) {
+    const cards = this.positionMovingCardsAndBCT(props)
+    this.positionCards(cards, { props })
+  }
+
+  positionMovingCardsAndBCT(props) {
     const {
       blankContentToolState,
       collection,
       cardIds,
       movingCardIds,
-    } = nextProps
+      submissionSettings,
+      canEditCollection,
+    } = props
     // convert observableArray values into a "normal" JS array (equivalent of .toJS())
     // for the sake of later calculations/manipulations
     const cards = [...collection.collection_cards]
     if (movingCardIds) {
+      // remove any cards we're moving to make them appear "picked up"
       _.each(movingCardIds, id => _.remove(cards, { id }))
     }
-    // If we have a BCT open...
-    if (blankContentToolState && blankContentToolState.order !== null) {
+    if (submissionSettings) {
+      this.addSubmissionCard(cards)
+    }
+    const bctOpen = (
+      blankContentToolState &&
+      blankContentToolState.order !== null &&
+      blankContentToolState.collectionId === collection.id
+    )
+    if (bctOpen) {
       // make the BCT appear to the right of the current card
       let { order } = blankContentToolState
-      const { width, height, replacingId } = blankContentToolState
+      const {
+        height,
+        replacingId,
+        blankType,
+        width,
+      } = blankContentToolState
       if (replacingId) {
         // remove the card being replaced from our current state cards
         _.remove(cards, { id: replacingId })
@@ -78,6 +122,7 @@ class CollectionGrid extends React.Component {
         id: 'blank',
         num: 0,
         cardType: 'blank',
+        blankType,
         width,
         height,
         order,
@@ -96,16 +141,28 @@ class CollectionGrid extends React.Component {
       // NOTE: how reliable is this length check for indicating a newly added card?
       const previousLength = this.props.cardIds.length
       const cardJustAdded = cardIds.length === previousLength + 1
-      if (this.props.canEditCollection && !cardJustAdded) {
+      if ((canEditCollection && !cardJustAdded) || blankCard.blankType) {
         // Add the BCT to the array of cards to be positioned, if they can edit
         cards.unshift(blankCard)
       }
     }
-    this.positionCards(cards, { props: nextProps })
+    return cards
   }
 
-  componentWillUnmount() {
-    this.clearDragTimeout()
+  addSubmissionCard = (cards) => {
+    const { collection, submissionSettings } = this.props
+    if (_.find(cards, { id: 'submission' })) return
+    const addSubmissionCard = {
+      // this card is -1, BCT that gets added is 0
+      order: -1,
+      width: 1,
+      height: 1,
+      id: 'submission',
+      cardType: 'submission',
+      parent_id: collection.id,
+      submissionSettings,
+    }
+    cards.unshift(addSubmissionCard)
   }
 
   // --------------------------
@@ -317,14 +374,14 @@ class CollectionGrid extends React.Component {
       gutter,
       cols,
       sortBy,
+      addEmptyCard,
     } = opts.props
     let row = 0
     const matrix = []
     // create an empty row
     matrix.push(_.fill(Array(cols), null))
-    this.addEmptyCard(cards)
+    if (addEmptyCard) this.addEmptyCard(cards)
     const sortedCards = _.sortBy(cards, sortBy)
-    this.addEmptyCard(cards)
     _.each(sortedCards, (card, i) => {
       // we don't actually want to "re-position" the dragging card
       // because its position is being determined by the drag (i.e. mouse cursor)
@@ -458,7 +515,10 @@ class CollectionGrid extends React.Component {
       }
     })
     // update cards in state
-    this.setState({ cards })
+    this.setState({
+      cards,
+      rows: matrix.length,
+    })
   }
 
   renderPositionedCards = () => {
@@ -512,14 +572,18 @@ class CollectionGrid extends React.Component {
 
   render() {
     const { uiStore } = this.props
+    const { gridSettings } = uiStore
+    const { rows } = this.state
     if (uiStore.isLoading) return <Loader />
+
+    const minHeight = rows * (gridSettings.gridH + gridSettings.gutter)
 
     const { cardIds } = this.props.collection
     // Rendering cardIds so that grid re-renders when they change
     return (
-      <div className="Grid" data-card-ids={cardIds}>
+      <StyledGrid data-card-ids={cardIds} minHeight={minHeight}>
         { this.renderPositionedCards() }
-      </div>
+      </StyledGrid>
     )
   }
 }
@@ -538,14 +602,24 @@ CollectionGrid.propTypes = {
   ...gridConfigProps,
   updateCollection: PropTypes.func.isRequired,
   collection: MobxPropTypes.objectOrObservableObject.isRequired,
-  blankContentToolState: MobxPropTypes.objectOrObservableObject.isRequired,
+  blankContentToolState: MobxPropTypes.objectOrObservableObject,
   cardIds: MobxPropTypes.arrayOrObservableArray.isRequired,
   canEditCollection: PropTypes.bool.isRequired,
   movingCardIds: MobxPropTypes.arrayOrObservableArray.isRequired,
+  addEmptyCard: PropTypes.bool,
+  submissionSettings: PropTypes.shape({
+    type: PropTypes.string,
+    template: MobxPropTypes.objectOrObservableObject,
+  }),
 }
 CollectionGrid.wrappedComponent.propTypes = {
   routingStore: MobxPropTypes.objectOrObservableObject.isRequired,
   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
+}
+CollectionGrid.defaultProps = {
+  addEmptyCard: true,
+  submissionSettings: null,
+  blankContentToolState: null,
 }
 CollectionGrid.displayName = 'CollectionGrid'
 

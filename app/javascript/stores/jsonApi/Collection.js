@@ -1,11 +1,11 @@
 import _ from 'lodash'
 import { computed, action } from 'mobx'
 
-import Api from './Api'
+import { apiStore, routingStore, uiStore } from '~/stores'
 import BaseRecord from './BaseRecord'
 
 class Collection extends BaseRecord {
-  attributesForAPI = ['name', 'tag_list']
+  attributesForAPI = ['name', 'tag_list', 'submission_template_id', 'submission_box_type']
 
   @computed get cardIds() {
     return this.collection_cards.map(card => card.id)
@@ -35,8 +35,42 @@ class Collection extends BaseRecord {
     return this.type === 'Collection::SharedWithMeCollection'
   }
 
+  get isSubmissionBox() {
+    return this.type === 'Collection::SubmissionBox'
+  }
+
+  get isSubmissionsCollection() {
+    return this.type === 'Collection::SubmissionsCollection'
+  }
+
+  get requiresSubmissionBoxSettings() {
+    if (!this.isSubmissionBox) return false
+    // if type is null then it requires setup
+    return !this.submission_box_type
+  }
+
+  get submissionTypeName() {
+    const { submission_template } = this
+    return submission_template ? submission_template.name : 'Submission'
+  }
+
+  get countSubmissions() {
+    if (!this.isSubmissionBox) return 0
+    const { submissions_collection } = this
+    return submissions_collection ? submissions_collection.collection_cards.length : 0
+  }
+
   get isMasterTemplate() {
-    return this.type === 'Collection::MasterTemplate'
+    return this.master_template
+  }
+
+  get isUsableTemplate() {
+    // you aren't allowed to use the profile template
+    return this.isMasterTemplate && !this.isProfileTemplate
+  }
+
+  get isTemplated() {
+    return !!this.template_id
   }
 
   get isUserProfile() {
@@ -91,14 +125,6 @@ class Collection extends BaseRecord {
     this._reorderCards()
   }
 
-  API_archive() {
-    return Api.archive('collections', this)
-  }
-
-  API_duplicate() {
-    return Api.duplicate('collections', this)
-  }
-
   API_updateCards() {
     this._reorderCards()
     const data = this.toJsonApi()
@@ -130,13 +156,34 @@ class Collection extends BaseRecord {
       currentUser.switchOrganization(this.organization_id)
     }
   }
+
+  static async createSubmission(parent_id, submissionSettings) {
+    const { type, template } = submissionSettings
+    if (type === 'template' && template) {
+      const templateData = {
+        template_id: template.id,
+        parent_id,
+        placement: 'beginning',
+      }
+      uiStore.update('isLoading', true)
+      const res = await apiStore.createTemplateInstance(templateData)
+      uiStore.update('isLoading', false)
+      routingStore.routeTo('collections', res.data.id)
+    } else {
+      uiStore.openBlankContentTool({
+        order: 0,
+        collectionId: parent_id,
+        blankType: type,
+      })
+    }
+  }
 }
 Collection.type = 'collections'
 
 Collection.defaults = {
   // set as array so it's never `undefined`
   collection_cards: [],
-  roles: []
+  roles: [],
 }
 
 export default Collection

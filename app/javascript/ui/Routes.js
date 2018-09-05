@@ -12,12 +12,11 @@ import HomePage from '~/ui/pages/HomePage'
 import CollectionPage from '~/ui/pages/CollectionPage'
 import ItemPage from '~/ui/pages/ItemPage'
 import Loader from '~/ui/layout/Loader'
-import MarketingPage from '~/ui/pages/MarketingPage'
 import SearchPage from '~/ui/pages/SearchPage'
 import SettingsPage from '~/ui/pages/SettingsPage'
 import TermsPage from '~/ui/pages/TermsPage'
 import TermsOfUseModal from '~/ui/users/TermsOfUseModal'
-import initDoorbell from '~/vendor/doorbell'
+import initZendesk from '~/vendor/zendesk'
 import OrganizationSettings from '~/ui/organizations/OrganizationSettings'
 import UserSettings from '~/ui/users/UserSettings'
 import v from '~/utils/variables'
@@ -63,20 +62,12 @@ class Routes extends React.Component {
     }
   })
 
-  componentWillMount() {
-    this.handleAsAnonymousUser()
-  }
-
   componentDidMount() {
     const { apiStore } = this.props
-    const isAnonymous = this.state.isAnonymous
-
-    if(!isAnonymous) {
-      apiStore.loadCurrentUserAndGroups().then(() => {
-        initDoorbell(apiStore.currentUser)
-        firebaseClient.authenticate(apiStore.currentUser.google_auth_token)
-      })
-    } // Later, we're going to need to use firestore anonymous here for anonymous pages
+    apiStore.loadCurrentUserAndGroups().then(() => {
+      initZendesk(apiStore.currentUser)
+      firebaseClient.authenticate(apiStore.currentUser.google_auth_token)
+    })
   }
 
   handleWindowResize = ({ windowWidth }) => {
@@ -87,30 +78,13 @@ class Routes extends React.Component {
     uiStore.update('windowWidth', windowWidth)
   }
 
-  handleAsAnonymousUser(){
-    const { apiStore, routingStore } = this.props
-    // even if logged in, you're anonymous for marketing site
-    if (routingStore.pathContains('/marketing')){
-      this.setState({isAnonymous: true})
-    } else {
-      this.setState({isAnonymous: false})
-    }
-  }
-
   render() {
     const { apiStore, routingStore } = this.props
-
-    const isAnonymous = this.state.isAnonymous
-
-    if (!isAnonymous && !apiStore.currentUser) {
+    if (!apiStore.currentUser) {
       return <Loader />
     }
-
     const displayTermsPopup = (
-      !isAnonymous && (
-        !apiStore.currentUser.terms_accepted
-        && !routingStore.pathContains('/terms')
-      )
+      !apiStore.currentUser.terms_accepted && !routingStore.pathContains('/terms')
     )
 
     return (
@@ -121,8 +95,7 @@ class Routes extends React.Component {
             <WindowSizeListener onResize={this.handleWindowResize} />
             <DialogWrapper />
 
-            {!isAnonymous && <Header />
-            }
+            <Header />
             <FixedBoundary className="fixed_boundary" />
             <FixedActivityLogWrapper>
               <ActivityLogBox />

@@ -130,39 +130,58 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
     end
   end
 
-  describe 'POST #create' do
-    let!(:organization) { create(:organization) }
-    let(:path) { "/api/v1/organizations/#{organization.id}/collections" }
-    let(:params) {
-      json_api_params(
-        'collections',
-        name: 'What a wonderful life',
-      )
-    }
-
-    before do
-      user.add_role(Role::MEMBER, organization.primary_group)
+  describe 'POST #create_template' do
+    let(:organization) { create(:organization) }
+    let(:template) { create(:collection, master_template: true, organization: organization) }
+    let(:to_collection) { create(:collection, organization: organization) }
+    let(:path) { '/api/v1/collections/create_template' }
+    let(:raw_params) do
+      {
+        parent_id: to_collection.id,
+        template_id: template.id,
+        placement: 'beginning',
+      }
     end
+    let(:params) { raw_params.to_json }
+    let(:instance_double) { double('builder') }
 
     context 'success' do
-      it 'returns a 200' do
+      before do
+        user.add_role(Role::EDITOR, to_collection)
+        user.add_role(Role::VIEWER, template)
+        allow(instance_double).to receive(:call).and_return(true)
+        allow(instance_double).to receive(:collection).and_return(create(:collection))
+      end
+
+      it 'calls the CollectionTemplateBuilder' do
+        expect(CollectionTemplateBuilder).to receive(:new).with(
+          parent: to_collection,
+          template: template,
+          placement: 'beginning',
+          created_by: user,
+        ).and_return(instance_double)
         post(path, params: params)
-        expect(response.status).to eq(200)
       end
 
       it 'matches Collection schema' do
         post(path, params: params)
+        expect(response.status).to eq(200)
         expect(json['data']['attributes']).to match_json_schema('collection')
+      end
+
+      it 'broadcasts collection updates' do
+        expect(CollectionUpdateBroadcaster).to receive(:call).with(
+          to_collection,
+          user,
+        )
+        post(path, params: params)
       end
     end
 
-    context 'with errors' do
-      let(:path) { '/api/v1/collections' }
-
-      it 'returns a 400' do
-        # because of the new path, will get an "organization can't be blank" error
+    context 'without permission' do
+      it 'returns a 401' do
         post(path, params: params)
-        expect(response.status).to eq(400)
+        expect(response.status).to eq(401)
       end
     end
   end
@@ -257,6 +276,14 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
       expect(collection_card.reload.order).to eq(1)
     end
 
+    it 'broadcasts collection updates' do
+      expect(CollectionUpdateBroadcaster).to receive(:call).with(
+        collection,
+        user,
+      )
+      patch(path, params: params)
+    end
+
     context 'with cancel_sync == true' do
       let(:params) {
         json_api_params(
@@ -273,77 +300,40 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
     end
   end
 
-  describe 'PATCH #archive' do
-    let!(:collection) { create(:collection, add_editors: [user]) }
-    # parent_collection_card is required to exist because it calls decrement_card_orders
-    let!(:parent_collection_card) { create(:collection_card, collection: collection) }
-    let(:collection_card) do
-      create(:collection_card_text, order: 0, width: 1, parent: collection)
-    end
-    let(:path) { "/api/v1/collections/#{collection.id}/archive" }
+  describe 'DELETE #destroy' do
+    let(:path) { "/api/v1/collections/#{collection.id}" }
 
-    it 'returns a 200' do
-      patch(path)
-      expect(response.status).to eq(200)
-    end
+    context 'with a normal collection' do
+      let!(:collection) { create(:collection, add_editors: [user]) }
 
-    it 'matches Collection schema' do
-      patch(path)
-      expect(json['data']['attributes']).to match_json_schema('collection')
-    end
-
-    it 'updates the archived status of the collection' do
-      expect(collection.active?).to eq(true)
-      patch(path)
-      expect(collection.reload.archived?).to eq(true)
-    end
-
-    it 'updates the archived status of the collection_card' do
-      expect(collection_card.active?).to eq(true)
-      patch(path)
-      expect(collection_card.reload.archived?).to eq(true)
-    end
-
-    it 'should call the activity and notification builder' do
-      expect(ActivityAndNotificationBuilder).to receive(:call).with(
-        actor: @user,
-        target: collection,
-        action: :archived,
-        subject_user_ids: [user.id],
-        subject_group_ids: [],
-      )
-      patch(path)
-    end
-
-    context 'without edit access' do
-      before do
-        user.remove_role(Role::EDITOR, collection)
-        user.add_role(Role::CONTENT_EDITOR, collection)
-      end
-
-      it 'rejects non-editors' do
-        patch(path)
+      it 'should not allow the destroy action' do
+        delete(path)
         expect(response.status).to eq(401)
       end
     end
-  end
 
-  describe 'POST #duplicate' do
-    let!(:collection) { create(:collection, add_editors: [user]) }
-    let(:path) { "/api/v1/collections/#{collection.id}/duplicate" }
+    context 'with an incomplete SubmissionBox' do
+      let!(:collection) { create(:submission_box, add_editors: [user]) }
 
-    it 'returns a 200' do
-      post(path)
-      expect(response.status).to eq(200)
+      it 'should allow the destroy action' do
+        delete(path)
+        expect(response.status).to eq(200)
+      end
+
+      it 'should not allow the destroy action unless user is an editor' do
+        user.remove_role(Role::EDITOR, collection)
+        delete(path)
+        expect(response.status).to eq(401)
+      end
     end
 
-    it 'creates new collection' do
-      expect { post(path) }.to change(Collection, :count).by(1)
-    end
+    context 'with an existing SubmissionBox' do
+      let!(:collection) { create(:submission_box, add_editors: [user], submission_box_type: :file) }
 
-    it 'returns new collection' do
-      post(path)
-      expect(json['data']['attributes']['id']).not_to eq(collection.id)
+      it 'should not allow the destroy action' do
+        delete(path)
+        expect(response.status).to eq(401)
+      end
     end
   end
 end

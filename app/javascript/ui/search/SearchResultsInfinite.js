@@ -16,7 +16,7 @@ import ActionMenu from '~/ui/grid/ActionMenu'
 import SelectionCircle from '~/ui/grid/SelectionCircle'
 import CollectionCover from '~/ui/grid/covers/CollectionCover'
 import CollectionIcon from '~/ui/icons/CollectionIcon'
-import { StyledTopRightActions, StyledBottomLeftIcon } from '~/ui/grid/GridCard'
+import { StyledTopRightActions, StyledBottomLeftIcon } from '~/ui/grid/shared'
 
 const StyledSearchResult = styled.div`
   height: ${props => props.gridH}px;
@@ -47,11 +47,6 @@ const StyledScrollIndicator = styled.div`
   background: ${props => (props.active ? v.colors.gray : v.colors.cloudy)};
   z-index: ${v.zIndex.scrollIndicator};
 `
-
-const StyledLink = styled.a`
-  text-decoration: none;
-`
-StyledLink.displayName = 'StyledLink'
 
 @observer
 class SearchResultsInfinite extends React.Component {
@@ -167,13 +162,12 @@ class SearchResultsInfinite extends React.Component {
                   <StyledBottomLeftIcon>
                     <CollectionIcon />
                   </StyledBottomLeftIcon>
-                  <StyledLink onClick={this.routeToCollection(collection.id)}>
-                    <CollectionCover
-                      collection={collection}
-                      width={gridSettings.cols}
-                      height={1}
-                    />
-                  </StyledLink>
+                  <CollectionCover
+                    onClick={this.routeToCollection(collection.id)}
+                    collection={collection}
+                    width={gridSettings.cols}
+                    height={1}
+                  />
                 </StyledSearchResult>
               </div>
             </VisibilitySensor>

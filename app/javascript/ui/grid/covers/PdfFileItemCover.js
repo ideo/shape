@@ -1,8 +1,8 @@
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
-import Truncator from 'react-truncator'
 import v from '~/utils/variables'
 import CornerIcon from '~/ui/icons/CornerIcon'
+import { GridCardIconWithName } from '~/ui/grid/shared'
 import FileIcon from '~/ui/grid/covers/FileIcon'
 import { uiStore } from '~/stores'
 
@@ -14,13 +14,13 @@ export const StyledPdfCover = styled.div`
 
   .fileInfo {
     align-items: center;
-    bottom: 10px;
+    bottom: 0;
     color: ${v.colors.gray};
     display: flex;
     font-family: ${v.fonts.sans};
     font-size: 1rem;
     font-weight: 500;
-    left: 15px;
+    left: 0;
     max-height: 32px;
     position: absolute;
     width: 95%;
@@ -85,12 +85,19 @@ class PdfFileItemCover extends React.Component {
     return { coverX, coverY, orientation }
   }
 
+  handleClick = (ev) => {
+    ev.preventDefault()
+    const { item } = this.props
+    const { filestack_file } = item
+    window.open(filestack_file.url, '_blank')
+  }
+
   render() {
     const { item } = this.props
     const { filestack_file, pdfCoverUrl } = item
     const { coverX, coverY, orientation } = this.calculateCoverTranslation()
     return (
-      <StyledPdfCover>
+      <StyledPdfCover onClick={this.handleClick}>
         <ImageContainer
           x={`${coverX}px`}
           y={`${coverY}px`}
@@ -102,14 +109,10 @@ class PdfFileItemCover extends React.Component {
           <img src={pdfCoverUrl} alt="Pdf cover" />
         </ImageContainer>
         <div className="fileInfo">
-          <FileIcon mimeType={item.filestack_file.mimetype} />
-          <div className="fileName">
-            <Truncator
-              text={filestack_file.filename}
-              key={filestack_file.filename}
-              extraSpacing={25}
-            />
-          </div>
+          <GridCardIconWithName
+            text={filestack_file.filename}
+            icon={<FileIcon mimeType={item.filestack_file.mimetype} />}
+          />
         </div>
       </StyledPdfCover>
     )

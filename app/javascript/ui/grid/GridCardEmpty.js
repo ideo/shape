@@ -40,9 +40,7 @@ class GridCardEmpty extends React.Component {
 
   hideHelper = () => {
     const { apiStore } = this.props
-    // set it ahead of time so the helper immediately disappears
-    apiStore.currentUser.show_helper = false
-    apiStore.currentUser.API_hideHotEdgeHelper()
+    apiStore.currentUser.API_hideHelper()
   }
 
   render() {

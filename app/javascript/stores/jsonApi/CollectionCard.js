@@ -7,6 +7,7 @@ import BaseRecord from './BaseRecord'
 
 class CollectionCard extends BaseRecord {
   attributesForAPI = [
+    'type',
     'order',
     'width',
     'height',
@@ -16,6 +17,7 @@ class CollectionCard extends BaseRecord {
     'item_id',
     'collection_attributes',
     'item_attributes',
+    'image_contain',
   ]
 
   @observable maxWidth = this.width
@@ -93,8 +95,10 @@ class CollectionCard extends BaseRecord {
       this.parent.addCard(res.data)
       uiStore.closeBlankContentTool()
       uiStore.trackEvent('create', this.parent)
+      return res.data
     } catch (e) {
       uiStore.defaultAlertError()
+      return false
     }
   }
 
@@ -176,19 +180,23 @@ class CollectionCard extends BaseRecord {
 
     const collection = this.parent
     try {
-      collection.removeCardIds(selectedCardIds)
       await this.apiStore.request(`collection_cards/archive`, 'PATCH', {
         card_ids: selectedCardIds
       })
-
-      if (collection.collection_cards.length === 0) {
-        uiStore.openBlankContentTool()
+      // collection may be undefined e.g. if we're archiving from the header actionmenu
+      if (collection) {
+        collection.removeCardIds(selectedCardIds)
+        uiStore.trackEvent('archive', collection)
+        if (collection.collection_cards.length === 0) {
+          uiStore.openBlankContentTool()
+        }
       }
-      uiStore.trackEvent('archive', collection)
       return true
     } catch (e) {
       // re-fetch collection
-      this.apiStore.fetch('collections', collection.id, true)
+      if (collection) {
+        this.apiStore.fetch('collections', collection.id, true)
+      }
       uiStore.defaultAlertError()
     }
     return false

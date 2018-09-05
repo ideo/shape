@@ -3,7 +3,9 @@ import { Fragment } from 'react'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 
+import ContainImage from '~/ui/grid/ContainImage'
 import GridCardHotspot from '~/ui/grid/GridCardHotspot'
+import LinkItemCover from '~/ui/grid/covers/LinkItemCover'
 import TextItemCover from '~/ui/grid/covers/TextItemCover'
 import PdfFileItemCover from '~/ui/grid/covers/PdfFileItemCover'
 import ImageItemCover from '~/ui/grid/covers/ImageItemCover'
@@ -24,6 +26,12 @@ import TagEditorModal from '~/ui/pages/shared/TagEditorModal'
 import Tooltip from '~/ui/global/Tooltip'
 import { uiStore } from '~/stores'
 import v, { ITEM_TYPES } from '~/utils/variables'
+import {
+  StyledGridCard,
+  StyledBottomLeftIcon,
+  StyledGridCardInner,
+  StyledTopRightActions,
+} from './shared'
 
 const PinIconHolder = styled.div`
   background-color: ${props => (props.locked ? 'transparent' : v.colors.blackLava)};
@@ -44,79 +52,6 @@ const PinIconHolder = styled.div`
     }
   }
 `
-
-export const StyledGridCard = styled.div`
-  z-index: 1;
-  position: relative;
-  height: 100%;
-  width: 100%;
-  background: white;
-  padding: 0;
-  cursor: ${props => (props.dragging ? 'grabbing' : 'pointer')};
-  box-shadow: ${props => (props.dragging ? '1px 1px 5px 2px rgba(0, 0, 0, 0.25)' : '')};
-  opacity: ${props => (props.dragging ? '0.95' : '1')};
-`
-StyledGridCard.displayName = 'StyledGridCard'
-
-export const StyledBottomLeftIcon = styled.div`
-  position: absolute;
-  z-index: ${v.zIndex.gridCard};
-  left: 0.25rem;
-  bottom: 0;
-  color: ${v.colors.gray};
-  width: ${props => (props.iconAmount === 2 ? 75 : 45)}px;
-  height: 45px;
-  display: flex;
-  /* LinkIcon appears larger than CollectionIcon so we need to make it smaller */
-  ${props => props.small && `
-    width: 18px;
-    height: 18px;
-    bottom: 0.75rem;
-    left: 0.75rem;
-  `}
-`
-StyledBottomLeftIcon.displayName = 'StyledBottomLeftIcon'
-
-const StyledGridCardInner = styled.div`
-  position: relative;
-  height: 100%;
-  overflow: hidden;
-  z-index: 1;
-  /*
-  // related to userSelectHack from Rnd / Draggable
-  // disable blue text selection on Draggables
-  // https://github.com/bokuweb/react-rnd/issues/199
-  */
-  *::-moz-selection {background: transparent;}
-  *::selection {background: transparent;}
-`
-StyledGridCardInner.displayName = 'StyledGridCardInner'
-
-export const StyledTopRightActions = styled.div`
-  position: absolute;
-  top: 0.35rem;
-  right: 0.25rem;
-  z-index: ${v.zIndex.gridCardTop};
-  .show-on-hover {
-    color: ${props => props.color};
-    border-color: ${props => props.color};
-  }
-  .selected {
-    border-color: ${props => props.color};
-    background-color: ${props => props.color};
-  }
-  .card-menu {
-    margin-top: 0.25rem;
-    display: inline-block;
-    vertical-align: top;
-    z-index: ${v.zIndex.gridCardTop};
-    color: ${props => props.color};
-  }
-`
-StyledTopRightActions.defaultProps = {
-  color: v.colors.gray
-}
-StyledTopRightActions.displayName = 'StyledTopRightActions'
 
 @observer
 class GridCard extends React.Component {
@@ -147,12 +82,14 @@ class GridCard extends React.Component {
           return <PdfFileItemCover item={record} />
         }
         if (record.mimeBaseType === 'image') {
-          return <ImageItemCover item={record} />
+          return <ImageItemCover item={record} contain={card.image_contain} />
         }
         return <GenericFileItemCover item={record} />
       }
       case ITEM_TYPES.VIDEO:
         return <VideoItemCover item={record} dragging={this.props.dragging} />
+      case ITEM_TYPES.LINK:
+        return <LinkItemCover item={record} dragging={this.props.dragging} />
       default:
         return (
           <div>
@@ -166,6 +103,7 @@ class GridCard extends React.Component {
           width={card.maxWidth}
           height={card.maxHeight}
           collection={record}
+          dragging={this.props.dragging}
         />
       )
     }
@@ -262,9 +200,19 @@ class GridCard extends React.Component {
     }
   }
 
+  linkOffsite = (url) => {
+    Object.assign(
+      document.createElement('a'), { target: '_blank', href: url }
+    ).click()
+  }
+
   handleClick = (e) => {
     const { dragging, record } = this.props
     if (dragging) return
+    if (record.type === ITEM_TYPES.LINK) {
+      this.linkOffsite(record.url)
+      return
+    }
     if (record.isPdfFile) {
       FilestackUpload.preview(record.filestack_file.handle, 'filePreview')
       return
@@ -273,7 +221,7 @@ class GridCard extends React.Component {
       return
     } else if (record.isGenericFile) {
       // TODO: will replace with preview
-      window.open(record.filestack_file.url, '_blank')
+      this.linkOffsite(record.filestack_file.url)
       return
     }
     this.props.handleClick(e)
@@ -306,8 +254,10 @@ class GridCard extends React.Component {
         ) &&
           <StyledTopRightActions color={this.actionsColor}>
             { record.isDownloadable && (
-              <Download record={record}
-              />
+              <Download record={record} />
+            )}
+            { record.isImage && this.canEditCard && (
+              <ContainImage card={card} />
             )}
             <SelectionCircle cardId={card.id} />
             <ActionMenu

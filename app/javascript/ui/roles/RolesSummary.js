@@ -2,6 +2,7 @@ import PropTypes from 'prop-types'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 import _ from 'lodash'
+import pluralize from 'pluralize'
 
 import v from '~/utils/variables'
 import Avatar from '~/ui/global/Avatar'
@@ -69,14 +70,14 @@ StyledAddUserBtn.displayName = 'StyledAddUserBtn'
 class RolesSummary extends React.Component {
   get editors() {
     const { roles } = this.props
-    const editorRole = roles.find(role => role.name === 'editor')
+    const editorRole = _.find(roles, { name: 'editor' })
     if (!editorRole) return []
     return [...editorRole.users, ...editorRole.groups]
   }
 
   get viewers() {
     const { roles } = this.props
-    const viewerRole = roles.find(role => role.name === 'viewer')
+    const viewerRole = _.find(roles, { name: 'viewer' })
     if (!viewerRole) return []
     return [...viewerRole.users, ...viewerRole.groups]
   }
@@ -96,6 +97,14 @@ class RolesSummary extends React.Component {
     }
 
     return { editors, viewers }
+  }
+
+  roleLabel = (roleName) => {
+    let label = roleName
+    const { roles } = this.props
+    const role = _.find(roles, { name: roleName })
+    if (role && role.label) ({ label } = role)
+    return pluralize(_.startCase(label))
   }
 
   get renderEditors() {
@@ -120,7 +129,7 @@ class RolesSummary extends React.Component {
 
     return (
       <StyledAvatarGroup align="right">
-        <StyledRoleTitle>Editors</StyledRoleTitle>
+        <StyledRoleTitle>{this.roleLabel('editor')}</StyledRoleTitle>
         {(editors.length > 0 || viewers.length === 0) ? this.addUserBtn : ''}
         {editorAvatars}
       </StyledAvatarGroup>
@@ -145,7 +154,7 @@ class RolesSummary extends React.Component {
     ))
     return (
       <StyledAvatarGroup>
-        <StyledRoleTitle>Viewers</StyledRoleTitle>
+        <StyledRoleTitle>{this.roleLabel('viewer')}</StyledRoleTitle>
         {editors.length === 0 ? this.addUserBtn : ''}
         {viewerAvatars}
       </StyledAvatarGroup>

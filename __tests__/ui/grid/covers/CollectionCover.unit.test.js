@@ -25,7 +25,7 @@ describe('CollectionCover', () => {
   })
 
   it('renders the collection name and cover text', () => {
-    expect(wrapper.find('Dotdotdot').at(0).children().text()).toContain(fakeCollection.name)
+    expect(wrapper.find('PlainLink').at(0).children().text()).toContain(fakeCollection.name)
     expect(wrapper.find('Dotdotdot').at(1).children().text()).toContain(cover.text)
   })
 })

@@ -13,6 +13,8 @@ export default class UiStore {
     height: null,
     replacingId: null,
     emptyCollection: false,
+    collectionId: null,
+    blankType: null,
   }
   @observable blankContentToolState = { ...this.defaultBCTState }
   @observable openCardMenuId = false
@@ -27,6 +29,8 @@ export default class UiStore {
   )
   @observable pageMenuOpen = false
   @observable tagsModalOpenId = null
+  @observable submissionBoxSettingsOpen = null
+  @observable loadedSubmissions = false
   defaultGridSettings = {
     // layout will track we are at "size 3" i.e. "small 4 cols" even though cols === 4
     layoutSize: 4,
@@ -48,6 +52,7 @@ export default class UiStore {
   @observable movingCardIds = []
   @observable movingFromCollectionId = null
   @observable cardAction = 'move'
+  @observable templateName = ''
   defaultDialogProps = {
     open: null, // track whether "info" or "confirm" dialog are open, or none
     prompt: null,
@@ -56,6 +61,7 @@ export default class UiStore {
     iconName: null,
     confirmText: 'OK',
     cancelText: 'Cancel',
+    fadeOutTime: undefined,
     onClose: () => this.closeDialog(),
   }
   @observable dialogConfig = { ...this.defaultDialogProps }
@@ -141,10 +147,20 @@ export default class UiStore {
     this.movingFromCollectionId = fromCollectionId
     // cardAction can be 'move' or 'link'
     this.cardAction = cardAction || 'move'
-    this.movingCardIds.replace([...this.selectedCardIds])
+    if (this.cardAction === 'useTemplate') {
+      // fake the selected card to trigger the menu open,
+      // because we aren't really moving an existing card
+      this.movingCardIds.replace(['template'])
+      // store the name e.g. "CoLab Prototype in transit"
+      this.templateName = this.viewingCollection.name
+    } else {
+      this.movingCardIds.replace([...this.selectedCardIds])
+      this.templateName = ''
+    }
   }
 
   @action closeMoveMenu({ deselect = true } = {}) {
+    this.templateName = ''
     this.movingCardIds.replace([])
     this.movingFromCollectionId = null
     if (deselect) this.deselectCards()
@@ -232,6 +248,7 @@ export default class UiStore {
 
   // --- BCT + GridCard properties
   @action openBlankContentTool(options = {}) {
+    const { viewingCollection } = this
     this.deselectCards()
     this.openCardMenuId = false
     this.blankContentToolState = {
@@ -239,8 +256,9 @@ export default class UiStore {
       order: 0,
       width: 1,
       height: 1,
-      emptyCollection: this.viewingCollection && this.viewingCollection.isEmpty,
-      ...options
+      emptyCollection: viewingCollection && viewingCollection.isEmpty,
+      collectionId: viewingCollection && viewingCollection.id,
+      ...options,
     }
   }
 
@@ -254,7 +272,14 @@ export default class UiStore {
   }
 
   @action closeBlankContentTool() {
-    this.blankContentToolState = { ...this.defaultBCTState }
+    const { viewingCollection } = this
+    if (viewingCollection && viewingCollection.isEmpty) {
+      // shouldn't be allowed to close BCT on empty collection, send back to default
+      // -- also helps with the setup of SubmissionBox where you can close the bottom BCT
+      this.openBlankContentTool()
+    } else {
+      this.blankContentToolState = { ...this.defaultBCTState }
+    }
   }
 
   @action setViewingCollection(collection = null) {

@@ -2,6 +2,7 @@ FactoryBot.define do
   factory :collection do
     transient do
       num_cards 0
+      parent_collection nil
       record_type :text
       card_relation :primary
       pin_cards false
@@ -16,9 +17,10 @@ FactoryBot.define do
 
     factory :user_collection, class: Collection::UserCollection
     factory :shared_with_me_collection, class: Collection::SharedWithMeCollection
-    factory :master_template, class: Collection::MasterTemplate
     factory :global_collection, class: Collection::Global
     factory :user_profile, class: Collection::UserProfile
+    factory :submission_box, class: Collection::SubmissionBox
+    factory :submissions_collection, class: Collection::SubmissionsCollection
 
     after(:build) do |collection, evaluator|
       if evaluator.num_cards > 0
@@ -40,6 +42,17 @@ FactoryBot.define do
           card_relation = "#{evaluator.card_relation}_collection_cards"
           collection.send(card_relation) << cc
         end
+      end
+
+      if evaluator.parent_collection
+        collection.parent_collection_card = build(
+          :collection_card,
+          parent: evaluator.parent_collection,
+          order: evaluator.parent_collection.collection_cards.count,
+          width: 1,
+          height: 1,
+          pinned: evaluator.pin_cards,
+        )
       end
     end
 

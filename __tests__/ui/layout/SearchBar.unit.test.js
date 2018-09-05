@@ -1,39 +1,57 @@
 import SearchBar from '~/ui/layout/SearchBar'
-import fakeUiStore from '#/mocks/fakeUiStore'
 
-let props, wrapper, component
+let props, wrapper, component, rerender
 describe('SearchBar', () => {
   beforeEach(() => {
-    const routingStore = {
-      pathTo: jest.fn(),
-      routeTo: jest.fn(),
-      pathContains: jest.fn(),
-    }
     props = {
-      routingStore,
-      uiStore: fakeUiStore,
+      value: '',
+      onChange: jest.fn(),
+      onClear: jest.fn(),
     }
-    wrapper = shallow(
-      <SearchBar.wrappedComponent {...props} />
-    )
+    rerender = () => {
+      wrapper = shallow(
+        <SearchBar {...props} />
+      )
+    }
+    rerender()
     component = wrapper.instance()
   })
 
-  it('renders the search icon', () => {
-    expect(wrapper.find('SearchIcon').exists()).toBeTruthy()
+  describe('render()', () => {
+    it('renders the search icon', () => {
+      expect(wrapper.find('SearchIcon').exists()).toBeTruthy()
+    })
+
+    it('renders the close button when there is search text', () => {
+      props.value = 'sdf'
+      rerender()
+      expect(wrapper.find('button.close').exists()).toBeTruthy()
+    })
   })
 
-  it('renders the close button when there is searchText', () => {
-    props.uiStore.searchText = 'hello'
-    wrapper = shallow(
-      <SearchBar.wrappedComponent {...props} />
-    )
-    expect(wrapper.find('button.close').exists()).toBeTruthy()
+  describe('clearSearch()', () => {
+    const fakeEv = { preventDefault: jest.fn() }
+    beforeEach(() => {
+      props.value = 'something'
+      rerender()
+      wrapper.find('.close').simulate('click', fakeEv)
+    })
+
+    it('calls the clear handler', () => {
+      expect(props.onClear).toHaveBeenCalled()
+    })
   })
 
-  it('updates the uiStore on text change', () => {
-    const ev = { target: { value: 'hello' } }
-    component.handleTextChange(ev)
-    expect(props.uiStore.update).toHaveBeenCalledWith('searchText', ev.target.value)
+  describe('onSearching', () => {
+    let value = 'test'
+
+    beforeEach(() => {
+      const ev = { target: { value } }
+      wrapper.find('input').simulate('change', ev)
+    })
+
+    it('should call the on change handler prop', () => {
+      expect(props.onChange).toHaveBeenCalledWith(value)
+    })
   })
 })

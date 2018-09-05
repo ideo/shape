@@ -13,6 +13,23 @@
     <script>
       IdeoSSO.init(<%= ideo_sso_init_params.to_json.html_safe %>)
     </script>
+
+    <% if ENV['ZENDESK_WIDGET_KEY'].present? %>
+      <!-- shape-support Zendesk Widget script -->
+      <script id="ze-snippet" src="https://static.zdassets.com/ekr/snippet.js?key=<%= ENV['ZENDESK_WIDGET_KEY'] %>"> </script>
+    <% end %>
+    <% if ENV['GOOGLE_ANALYTICS_ID'].present? %>
+      <!-- Global site tag (gtag.js) - Google Analytics -->
+      <script async src="https://www.googletagmanager.com/gtag/js?id=<%= ENV['GOOGLE_ANALYTICS_ID'] %>"></script>
+      <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+
+        gtag('config', '<%= ENV['GOOGLE_ANALYTICS_ID'] %>');
+      </script>
+    <% end %>
+
     <%= stylesheet_link_tag 'application', media: 'all' %>
     <%= action_cable_meta_tag %>
   </head>

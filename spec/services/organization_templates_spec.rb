@@ -44,7 +44,7 @@ RSpec.describe OrganizationTemplates, type: :service do
     context 'with profile template' do
       it 'should create a profile template in the templates collection' do
         expect(template_collection.children.count).to be 1
-        expect(template_collection.collections.first.type).to eq 'Collection::MasterTemplate'
+        expect(template_collection.collections.first.master_template?).to be true
       end
 
       it 'should create two collection cards' do
@@ -67,6 +67,7 @@ RSpec.describe OrganizationTemplates, type: :service do
       end
 
       it 'should add the #template tag' do
+        # this happens via templateable concern
         expect(profile_template.cached_owned_tag_list).to match_array(['template'])
       end
 

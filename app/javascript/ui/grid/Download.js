@@ -1,4 +1,4 @@
-import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
+import { PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 
 import Activity from '~/stores/jsonApi/Activity'
@@ -30,7 +30,7 @@ class Download extends React.Component {
       <Tooltip
         classes={{ tooltip: 'Tooltip' }}
         title="Download"
-        placement="bottom"
+        placement="top"
       >
         <IconHolder className="show-on-hover" onClick={this.download}>
           <DownloadIcon />

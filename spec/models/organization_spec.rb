@@ -9,6 +9,21 @@ describe Organization, type: :model do
     it { should have_many :collections }
     it { should have_many :groups }
     it { should belong_to :primary_group }
+
+    describe '#destroy' do
+      let!(:organization) { create(:organization) }
+      let!(:collection_list) { create_list(:collection, 2, organization: organization, num_cards: 3) }
+      let(:collections) { organization.collections }
+      let(:items) { organization.items }
+
+      it 'should destroy all related cards and items' do
+        expect(collections.count).to be >= 2
+        expect(items.count).to eq 6
+        organization.destroy
+        expect(collections.count).to eq 0
+        expect(items.count).to eq 0
+      end
+    end
   end
 
   context 'callbacks' do
@@ -204,7 +219,7 @@ describe Organization, type: :model do
       before do
         # profile_template needs to be present for Collection::UserProfile methods to be called
         organization.update(
-          profile_template: create(:master_template),
+          profile_template: create(:collection, master_template: true),
         )
       end
 
@@ -235,13 +250,13 @@ describe Organization, type: :model do
     end
   end
 
-  describe '#user_count' do
+  describe '#all_active_users' do
     let(:member) { create(:user) }
     let(:guest) { create(:user) }
     let(:organization) { create(:organization, member: member, guest: guest) }
 
     it 'should count the number of users' do
-      expect(organization.user_count).to eq 2
+      expect(organization.all_active_users.count).to eq 2
     end
   end
 end

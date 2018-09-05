@@ -5,13 +5,20 @@ import styled from 'styled-components'
 import Dotdotdot from 'react-dotdotdot'
 
 import v from '~/utils/variables'
+import PlainLink from '~/ui/global/PlainLink'
+import { CardHeading } from '~/ui/global/styled/typography'
 import hexToRgba from '~/utils/hexToRgba'
 import ProfileIcon from '~/ui/icons/ProfileIcon'
+import FilledProfileIcon from '~/ui/icons/FilledProfileIcon'
+import SubmissionBoxIconLg from '~/ui/icons/SubmissionBoxIconLg'
+import TemplateIcon from '~/ui/icons/TemplateIcon'
+import { routingStore } from '~/stores'
 
 const IconHolder = styled.span`
   display: inline-block;
-  height: 27px;
-  vertical-align: text-top;
+  line-height: 31px;
+  margin-right: 5px;
+  vertical-align: middle;
   width: 27px;
 `
 
@@ -36,9 +43,9 @@ StyledCollectionCover.displayName = 'StyledCollectionCover'
 const pad = 16
 const calcSectionWidth = (props) => {
   if (props.width === 4) {
-    return `${props.gridW * 2}px`
+    return `${props.gridW * 2 - (props.gutter * 1)}px`
   } else if (props.width > 1) {
-    return `${props.gridW - props.gutter}px`
+    return `${props.gridW - (props.gutter * 2)}px`
   }
   return `calc(100% - ${props.gutter * 2}px)`
 }
@@ -67,10 +74,6 @@ const StyledCardContent = styled.div`
   }
   .top {
     top: ${pad}px;
-    h3 {
-      position: absolute;
-      bottom: 0;
-    }
   }
   .bottom {
     bottom: ${props => (props.height === 1 ? `${pad / 2}` : pad)}px;
@@ -81,21 +84,13 @@ const StyledCardContent = styled.div`
     padding-right: 2rem;
   `
   )}
-  h3 {
-    text-transform: uppercase;
-    font-size: 2rem;
-    margin-bottom: 0.25rem;
-    line-height: 1.2;
-    /* transition size change, with 0.25s delay */
-    transition: all 0.33s 0.25s;
-    @media only screen
-      and (min-width: ${v.responsive.medBreakpoint}px)
-      and (max-width: ${v.responsive.largeBreakpoint}px) {
-      font-size: 1.6rem;
-    }
-  }
 `
 StyledCardContent.displayName = 'StyledCardContent'
+
+const PositionedCardHeading = CardHeading.extend`
+  position: absolute;
+  bottom: 0;
+`
 
 function splitName(name) {
   return name.split(' ')
@@ -106,23 +101,53 @@ function splitName(name) {
 class CollectionCover extends React.Component {
   get name() {
     const { collection } = this.props
-    if (collection.isUserProfile) {
+    const hasIcon = (
+      collection.isTemplated ||
+      collection.isMasterTemplate ||
+      collection.isSubmissionBox
+    )
+    if (hasIcon) {
       const nameParts = splitName(collection.name)
       if (!nameParts) return collection.name
       const lastName = nameParts.pop()
-      const name = (
+      let leftIcon
+      let rightIcon
+      if (collection.isProfileTemplate) {
+        rightIcon = <FilledProfileIcon />
+      } else if (collection.isMasterTemplate) {
+        leftIcon = <TemplateIcon circled filled />
+      } else if (collection.isUserProfile) {
+        rightIcon = <ProfileIcon />
+      } else if (collection.isTemplated) {
+        rightIcon = <TemplateIcon circled />
+      } else if (collection.isSubmissionBox) {
+        rightIcon = <SubmissionBoxIconLg />
+      }
+      return (
         <Fragment>
-          {nameParts.join(' ')}{' '}<span style={{ whiteSpace: 'nowrap' }}>
-            {lastName}&nbsp;<IconHolder><ProfileIcon /></IconHolder></span>
+          { leftIcon && <IconHolder>{leftIcon}</IconHolder> }
+          {nameParts.join(' ')}{' '}
+          <span style={{ whiteSpace: 'nowrap' }}>
+            {lastName}&nbsp;
+            { rightIcon && <IconHolder>{rightIcon}</IconHolder> }
+          </span>
         </Fragment>
       )
-      return name
     }
     return collection.name
   }
 
+  handleClick = (e) => {
+    const { dragging } = this.props
+    if (dragging) {
+      e.preventDefault()
+      return false
+    }
+    return true
+  }
+
   render() {
-    const { height, width, collection, uiStore } = this.props
+    const { height, width, collection, uiStore, onClick } = this.props
     const { cover } = collection
     const { gridW, gutter } = uiStore.gridSettings
 
@@ -130,6 +155,8 @@ class CollectionCover extends React.Component {
       <StyledCollectionCover
         url={cover.image_url}
         isSpecialCollection={collection.isSpecialCollection}
+        // onClick can be null, is used by SearchResultsInfinite
+        onClick={onClick}
       >
         <StyledCardContent
           height={height}
@@ -139,11 +166,17 @@ class CollectionCover extends React.Component {
         >
           <div className="overlay" />
           <div className="top">
-            <h3>
+            <PositionedCardHeading>
               <Dotdotdot clamp={height > 1 ? 6 : 3}>
-                {this.name}
+                <PlainLink
+                  className="no-select"
+                  onClick={this.handleClick}
+                  to={routingStore.pathTo('collections', collection.id)}
+                >
+                  {this.name}
+                </PlainLink>
               </Dotdotdot>
-            </h3>
+            </PositionedCardHeading>
           </div>
           <div className="bottom">
             <Dotdotdot clamp="auto">
@@ -160,9 +193,15 @@ CollectionCover.propTypes = {
   width: PropTypes.number.isRequired,
   height: PropTypes.number.isRequired,
   collection: MobxPropTypes.objectOrObservableObject.isRequired,
+  dragging: PropTypes.bool,
+  onClick: PropTypes.func,
 }
 CollectionCover.wrappedComponent.propTypes = {
   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
+}
+CollectionCover.defaultProps = {
+  dragging: false,
+  onClick: null,
 }
 
 CollectionCover.displayName = 'CollectionCover'

@@ -122,4 +122,25 @@ describe('PageHeader', () => {
       )
     })
   })
+
+  describe('with a MasterTemplate collection', () => {
+    beforeEach(() => {
+      props.record = fakeCollection
+      props.record.isMasterTemplate = true
+      props.record.isUsableTemplate = true
+      props.record.inherited_tag_list = ['template']
+      wrapper = shallow(
+        <PageHeader.wrappedComponent {...props} />
+      )
+    })
+
+    it('should show the template tag and icon', () => {
+      expect(wrapper.find('SubduedHeading1').children().text()).toEqual('#template')
+      expect(wrapper.find('TemplateIcon').exists()).toBeTruthy()
+    })
+
+    it('should show the template tag and icon', () => {
+      expect(wrapper.find('StyledFormButton').children().text()).toEqual('Use Template')
+    })
+  })
 })

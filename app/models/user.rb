@@ -284,6 +284,11 @@ class User < ApplicationRecord
     user_profiles.where(organization_id: organization_id).first
   end
 
+  def organizations
+    return super unless has_cached_role?(Role::SUPER_ADMIN)
+    Organization.all
+  end
+
   private
 
   def update_profile_names

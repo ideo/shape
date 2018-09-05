@@ -2,6 +2,8 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
   deserializable_resource :collection_card, class: DeserializableCollectionCard, only: %i[create update replace]
   load_and_authorize_resource except: %i[move replace]
   before_action :load_and_authorize_parent_collection, only: %i[create replace]
+  before_action :load_and_authorize_parent_collection_for_update, only: %i[update]
+  after_action :broadcast_collection_create_updates, only: %i[create update]
 
   load_and_authorize_resource :collection, only: %i[index]
   def index
@@ -9,7 +11,12 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
   end
 
   def create
-    builder = CollectionCardBuilder.new(params: collection_card_params,
+    card_params = collection_card_params
+    type = card_params.delete(:type) || 'primary'
+    # CollectionCardBuilder type expects 'primary' or 'link'
+    type = 'link' if type == 'CollectionCard::Link'
+    builder = CollectionCardBuilder.new(params: card_params,
+                                        type: type,
                                         parent_collection: @collection,
                                         user: current_user,
                                         replacing_card: @replacing_card)
@@ -29,7 +36,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
   end
 
   def update
-    @collection_card.attributes = collection_card_params
+    @collection_card.attributes = collection_card_update_params
     if @collection_card.save
       render jsonapi: @collection_card
     else
@@ -38,6 +45,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
   end
 
   before_action :load_and_authorize_cards, only: %i[archive]
+  after_action :broadcast_collection_archive_updates, only: %i[archive]
   def archive
     CollectionCardArchiveWorker.perform_async(
       @collection_cards.pluck(:id),
@@ -47,6 +55,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
   end
 
   before_action :load_and_authorize_replacing_card, only: %i[replace]
+  after_action :broadcast_replacing_updates, only: %i[replace]
   def replace
     if @replacing_card.archive!
       create
@@ -56,15 +65,21 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
   end
 
   before_action :load_and_authorize_moving_collections, only: %i[move]
+  after_action :broadcast_moving_collection_updates, only: %i[move link]
   def move
+    @card_action ||= 'move'
     mover = CardMover.new(
       from_collection: @from_collection,
       to_collection: @to_collection,
       cards: @cards,
       placement: json_api_params[:placement],
-      card_action: @card_action || 'move',
+      card_action: @card_action,
     )
     if mover.call
+      @cards.map do |card|
+        create_notification(card,
+                            Activity.map_move_action(@card_action))
+      end
       # NOTE: even though this action is in CollectionCardsController, it returns the to_collection
       # so that it can be easily re-rendered on the page
       render jsonapi: @to_collection.reload, include: Collection.default_relationships_for_api
@@ -80,6 +95,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
     move
   end
 
+  before_action :check_valid_duplication, only: %i[duplicate]
   def duplicate
     placement = json_api_params[:placement]
     should_update_cover = false
@@ -93,6 +109,8 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
         duplicate_linked_records: true,
       )
       should_update_cover ||= dup.should_update_parent_collection_cover?
+      @from_collection = Collection.find(json_api_params[:from_id])
+      create_notification(card, :duplicated)
     end
     @to_collection.cache_cover! if should_update_cover
     # NOTE: for some odd reason the json api refuses to render the newly created cards here,
@@ -104,6 +122,16 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
 
   def load_and_authorize_parent_collection
     @collection = Collection.find(collection_card_params[:parent_id])
+    if @collection.is_a?(Collection::SubmissionsCollection)
+      # if adding to a SubmissionsCollection, you only need to have viewer/"participant" access
+      authorize! :read, @collection
+      return
+    end
+    authorize! :edit_content, @collection
+  end
+
+  def load_and_authorize_parent_collection_for_update
+    @collection = @collection_card.parent
     authorize! :edit_content, @collection
   end
 
@@ -138,6 +166,16 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
     end
   end
 
+  def check_valid_duplication
+    @cards.each do |card|
+      record = card.record
+      if @to_collection.breadcrumb_contains?(klass: record.class.base_class.name, id: record.id)
+        @errors = 'You can\'t move a collection inside of itself.'
+      end
+    end
+    @errors ? head(400) : true
+  end
+
   def create_notification(card, action)
     # only notify for archiving of collections (and not link cards)
     return if card.link?
@@ -147,6 +185,36 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
       action: action,
       subject_user_ids: card.record.editors[:users].pluck(:id),
       subject_group_ids: card.record.editors[:groups].pluck(:id),
+      source: @from_collection,
+      destination: @to_collection,
+    )
+  end
+
+  def broadcast_replacing_updates
+    return unless @replacing_card.parent.present?
+    CollectionUpdateBroadcaster.call(@replacing_card.parent, current_user)
+  end
+
+  def broadcast_moving_collection_updates
+    if @card_action == 'move'
+      CollectionUpdateBroadcaster.call(@from_collection, current_user)
+    end
+    CollectionUpdateBroadcaster.call(@to_collection, current_user)
+  end
+
+  def broadcast_collection_create_updates
+    CollectionUpdateBroadcaster.call(@collection, current_user)
+  end
+
+  def broadcast_collection_archive_updates
+    CollectionUpdateBroadcaster.call(@collection_cards.first.parent, current_user)
+  end
+
+  def collection_card_update_params
+    params.require(:collection_card).permit(
+      :width,
+      :height,
+      :image_contain,
     )
   end
 
@@ -159,7 +227,15 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
       :parent_id,
       :collection_id,
       :item_id,
-      collection_attributes: %i[id name],
+      :type,
+      :image_contain,
+      collection_attributes: %i[
+        id
+        type
+        name
+        template_id
+        master_template
+      ],
       item_attributes: [
         :id,
         :type,
@@ -167,6 +243,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
         :content,
         :url,
         :thumbnail_url,
+        :icon_url,
         :image,
         :archived,
         text_data: {},

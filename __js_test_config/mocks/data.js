@@ -20,6 +20,7 @@ export const fakeCollectionCard = {
   API_archive: jest.fn(),
   API_duplicate: jest.fn(),
   API_linkToMyCollection: jest.fn(),
+  ...fakeJsonApiAttrs,
 }
 
 export const fakeTextItemAttrs = {
@@ -73,6 +74,23 @@ export const fakeImageItem = {
   rawAttributes: jest.fn().mockReturnValue(fakeTextItemAttrs),
   getRecordType: jest.fn().mockReturnValue('items'),
 }
+export const fakeLinkItemAttrs = {
+  id: 3,
+  type: 'Item::LinkItem',
+  name: 'Independent.uk',
+  content: 'The best news under the sun',
+  icon_url: 'http://icon.jpg',
+  thumbnail_url: 'http://thumb.jpg',
+  url: 'http://independente.co.uk',
+  inherited_tag_list: [],
+  can_edit: false,
+  parent_collection_card: fakeCollectionCard,
+}
+export const fakeLinkItem = {
+  ...fakeLinkItemAttrs,
+  rawAttributes: jest.fn().mockReturnValue(fakeLinkItemAttrs),
+  getRecordType: jest.fn().mockReturnValue('items'),
+}
 export const fakeFileItemAttrs = {
   id: 3,
   type: 'Item::FileItem',
@@ -121,6 +139,7 @@ export const fakeCollection = {
   inherited_tag_list: [],
   can_edit: false,
   can_edit_content: false,
+  master_template: false,
   isSharedCollection: false,
   isUserCollection: false,
   isNormalCollection: true,
@@ -180,7 +199,7 @@ export const fakeUserAttrs = {
   isCurrentUser: jest.fn(),
   switchOrganization: jest.fn(),
   API_updateCurrentUser: jest.fn(),
-  API_hideMoveHelper: jest.fn().mockReturnValue(Promise.resolve({})),
+  API_hideHelper: jest.fn().mockReturnValue(Promise.resolve({})),
   notify_through_email: true,
   show_move_modal: false,
 }

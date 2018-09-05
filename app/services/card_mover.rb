@@ -95,7 +95,7 @@ class CardMover
     @from_collection.recalculate_breadcrumb!
     @moving_cards.each do |card|
       record = card.record
-      if @to_collection.breadcrumb_contains?(klass: record.class.name, id: record.id)
+      if @to_collection.breadcrumb_contains?(klass: record.class.base_class.name, id: record.id)
         @errors << 'You can\'t move a collection inside of itself.'
         return true
       end

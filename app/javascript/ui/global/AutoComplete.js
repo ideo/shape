@@ -1,4 +1,3 @@
-import _ from 'lodash'
 import React from 'react'
 import PropTypes from 'prop-types'
 import styled from 'styled-components'
@@ -190,11 +189,6 @@ const styles = theme => ({
 })
 
 class AutoComplete extends React.Component {
-  constructor(props) {
-    super(props)
-    this.fireInputChange = _.debounce(this._fireInputChange, 250)
-  }
-
   state = {
     multi: null,
   }
@@ -209,14 +203,6 @@ class AutoComplete extends React.Component {
       fullOption = Object.assign({}, { data: { custom: fullOption.value } })
     }
     this.props.onOptionSelect(fullOption.data)
-  }
-
-  _fireInputChange = input => {
-    if (!input) {
-      return Promise.resolve({ options: [] })
-    }
-    return this.props.onInputChange(input).then((results) =>
-      ({ options: results }))
   }
 
   render() {
@@ -257,13 +243,11 @@ AutoComplete.propTypes = {
     value: PropTypes.string,
   })).isRequired,
   onOptionSelect: PropTypes.func.isRequired,
-  onInputChange: PropTypes.func,
   keepSelectedOptions: PropTypes.bool,
 }
 
 AutoComplete.defaultProps = {
   onSelect: () => {},
-  onInputChange: () => {},
   keepSelectedOptions: false,
 }
 

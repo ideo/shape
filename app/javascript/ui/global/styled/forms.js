@@ -46,16 +46,17 @@ export const FormButton = styled.button`
   text-transform: uppercase;
   font-family: ${v.fonts.sans};
   font-size: 1rem;
-  font-weight: 500;
+  font-weight: ${v.weights.medium};
   letter-spacing: 0.09375rem;
   height: 40px;
   cursor: pointer;
   color: white;
   border-radius: 20px;
   border: none;
-  background-color: ${v.colors.blackLava};
+  background-color: ${props => (props.color === 'blue' ? v.colors.ctaButtonBlue : v.colors.blackLava)};
+  transition: all 0.3s;
   &:hover, &:focus {
-    background-color: ${v.colors.cloudy};
+    background-color: ${props => (props.color === 'blue' ? v.colors.ctaButtonBlueHover : v.colors.cloudy)};
   }
   ${props => props.disabled &&
       `background-color: white;
@@ -108,6 +109,12 @@ export const TextField = styled.input`
   }
 `
 TextField.displayName = 'StyledTextField'
+
+/** @component */
+export const BctTextField = TextField.extend`
+  background: ${v.colors.cararra};
+`
+BctTextField.displayName = 'BctTextField'
 
 /** @component */
 export const FormSpacer = styled.div`
@@ -234,6 +241,10 @@ export const EditAvatarButton = styled.button`
     `
     cursor: pointer;
     opacity: 0.75;
+
+    .avatar {
+      cursor: pointer;
+    }
     `
 }`
 EditAvatarButton.displayName = 'EditAvatarButton'

@@ -24,6 +24,7 @@ class ApiStore extends Store {
   @observable currentCommentThreadIds = []
   @observable currentPageThreadKey = null
   @observable recentNotifications = new Map()
+  @observable usableTemplates = []
 
   @action setCurrentUserId(id) {
     this.currentUserId = id
@@ -225,6 +226,21 @@ class ApiStore extends Store {
   async fetchNotifications() {
     const res = await this.fetchAll('notifications')
     return res.data
+  }
+
+  async createTemplateInstance(data) {
+    return this.request('collections/create_template', 'POST', data)
+  }
+
+  async fetchUsableTemplates() {
+    const other = ''
+    let q = `#template ${other}`
+    q = _.trim(q).replace(/\s/g, '+').replace(/#/g, '%23')
+    // TODO: pagination?
+    const res = await this.request(`search?query=${q}`)
+    runInAction(() => {
+      this.usableTemplates = res.data.filter(c => c.isUsableTemplate)
+    })
   }
 
   // -- override mobx-jsonapi-store --

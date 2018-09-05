@@ -20,15 +20,18 @@ Rails.application.routes.draw do
       resources :activities, only: %i[create]
       resources :collections, except: %i[index] do
         member do
-          post 'duplicate'
           patch 'archive'
+        end
+        collection do
+          post 'create_template'
         end
         resources :collection_cards, only: :index
         resources :roles, only: %i[index create destroy], shallow: true
       end
-      resources :collection_cards, shallow: true, except: :show do
+      resources :collection_cards, shallow: true, except: %i[show] do
         member do
           patch 'replace'
+          patch 'update'
         end
         collection do
           patch 'move'
@@ -90,7 +93,7 @@ Rails.application.routes.draw do
     end
   end
 
-  authenticate :user, ->(u) { u.has_role?(:super_admin) } do
+  authenticate :user, ->(u) { u.has_cached_role?(Role::SUPER_ADMIN) } do
     require 'sidekiq/web'
     mount Sidekiq::Web => '/sidekiq'
   end
@@ -99,6 +102,7 @@ Rails.application.routes.draw do
     post 'ideo_network/users' => 'ideo_network#users'
   end
 
+  get 'passthru', to: 'urls#passthru'
   get 'invitations/:token', to: 'invitations#accept', as: :accept_invitation
 
   get :login, to: 'home#login', as: :login

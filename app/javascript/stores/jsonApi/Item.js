@@ -3,7 +3,6 @@ import { routingStore } from '~/stores'
 import trackError from '~/utils/trackError'
 import FilestackUpload from '~/utils/FilestackUpload'
 import { ITEM_TYPES } from '~/utils/variables'
-import Api from './Api'
 import BaseRecord from './BaseRecord'
 
 class Item extends BaseRecord {
@@ -46,7 +45,7 @@ class Item extends BaseRecord {
   }
 
   get mimeBaseType() {
-    return this.filestack_file.mimetype.split('/')[0]
+    return this.filestack_file && this.filestack_file.mimetype.split('/')[0]
   }
 
   get isGenericFile() {
@@ -61,6 +60,10 @@ class Item extends BaseRecord {
     return this.isGenericFile || this.isPdfFile
   }
 
+  get isImage() {
+    return this.filestack_file && this.mimeBaseType === 'image'
+  }
+
   API_updateWithoutSync({ cancel_sync } = {}) {
     const { apiStore } = this
     const data = this.toJsonApi()
@@ -70,13 +73,6 @@ class Item extends BaseRecord {
       data,
     })
       .catch(err => { trackError(err, { name: 'item:update' }) })
-  }
-  API_archive() {
-    return Api.archive('items', this)
-  }
-
-  API_duplicate() {
-    return Api.duplicate('items', this)
   }
 }
 Item.type = 'items'
