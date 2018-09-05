@@ -99,7 +99,7 @@ class ApiStore extends jsonapi(datxCollection) {
   }
 
   async fetchRoles(group) {
-    const res = await this.request(`groups/${group.id}/roles`, 'GET')
+    const res = await this.request(`groups/${group.meta.id}/roles`, 'GET')
     const roles = res.data
     this.add(roles, 'roles')
   }
@@ -270,7 +270,7 @@ class ApiStore extends jsonapi(datxCollection) {
         }
       }
     })
-    super.__updateRelationships(obj)
+    return super.__updateRelationships(obj)
   }
 }
 ApiStore.types = [

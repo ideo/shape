@@ -75,7 +75,7 @@ class OrganizationMenu extends React.Component {
     try {
       this.isLoading = true
       await newOrg.save()
-      await apiStore.currentUser.switchOrganization(newOrg.id,
+      await apiStore.currentUser.switchOrganization(newOrg.meta.id,
         { redirectPath: 'homepage' })
       this.isLoading = false
       uiStore.update('orgCreated', true)
@@ -178,7 +178,7 @@ class OrganizationMenu extends React.Component {
     return (
       <RolesMenu
         canEdit={this.editGroup.can_edit}
-        ownerId={this.editGroup.id}
+        ownerId={this.editGroup.meta.id}
         ownerType="groups"
         fixedRole={fixedRole}
         title="Members:"
