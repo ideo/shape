@@ -339,6 +339,15 @@ describe User, type: :model do
         expect(user.current_org_groups_and_special_groups).to match_array([group_in_org_member, org.primary_group, org.guest_group])
         expect(admin.current_org_groups_and_special_groups).to match_array([org.primary_group, org.guest_group, org.admin_group])
       end
+
+      context 'with super admin role' do
+        let(:super_admin) { create(:user, :super_admin, add_to_org: org) }
+
+        it 'shows all org groups' do
+          # 3 org groups and 2 more groups created above
+          expect(super_admin.current_org_groups_and_special_groups.length).to be 5
+        end
+      end
     end
   end
 

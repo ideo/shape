@@ -166,5 +166,6 @@ module RolifyExtensions
 
   def reset_cached_roles!
     @has_role_by_identifier = nil
+    @has_cached_role = nil
   end
 end
