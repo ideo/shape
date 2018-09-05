@@ -59,7 +59,7 @@ export default {
 
   fonts: {
     sans: "'Gotham', sans-serif",
-    serif: "'Sentinel', Serif",
+    serif: "'Sentinel', serif",
   },
 
   weights: {

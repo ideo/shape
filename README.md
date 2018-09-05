@@ -67,13 +67,9 @@ bin/rails s
 ```
 
 ### Use ttab for quick dev environment setup
-### Best to install foreman when not in root of a project
-Install ttab and foreman:
+Install ttab and [Heroku CLI](https://devcenter.heroku.com/articles/heroku-cli#download-and-install):
 ```
 npm install -g ttab
-pushd /
-gem install foreman
-popd
 ```
 
 Run dev script:
@@ -83,5 +79,5 @@ Run dev script:
 This will open separate tabs to:
   1. Run the webpack dev server and sidekiq worker
   1. Run the rails server
-  1. Open atom in the project directory
+  1. Open [Atom](https://atom.io/) in the project directory
 And will open your browser (may need to refresh page after initial webpack)
