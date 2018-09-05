@@ -81,7 +81,7 @@ class CollectionPage extends PageWithApi {
     const submissionsId = submissions ? submissions.id.toString() : ''
     if (_.compact([currentId, submissionsId]).indexOf(data.record_id.toString()) > -1) {
       this.setEditor(data.current_editor)
-      if (_.isEmpty(data.current_editor) || data.current_editor.id === apiStore.currentUserId) {
+      if (_.isEmpty(data.current_editor) || data.current_editor.id.toString() === apiStore.currentUserId) {
         // don't reload your own updates
         return
       }
