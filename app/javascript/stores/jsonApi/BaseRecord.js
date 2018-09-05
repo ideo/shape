@@ -13,6 +13,10 @@ class BaseRecord extends jsonapi(Model) {
     }
   }
 
+  get persisted() {
+    return !!this.meta.id
+  }
+
   get apiStore() {
     return this.meta.collection
   }
