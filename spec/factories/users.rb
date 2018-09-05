@@ -39,5 +39,12 @@ FactoryBot.define do
       provider nil
       uid nil
     end
+
+    trait :super_admin do
+      after(:create) do |user|
+        user.add_role(:super_admin)
+        user.reset_cached_roles!
+      end
+    end
   end
 end
