@@ -11,6 +11,7 @@ import AddFileIcon from '~/ui/icons/AddFileIcon'
 import AddVideoIcon from '~/ui/icons/AddVideoIcon'
 import AddLinkIcon from '~/ui/icons/AddLinkIcon'
 import TemplateIcon from '~/ui/icons/TemplateIcon'
+import TestCollectionIcon from '~/ui/icons/TestCollectionIcon'
 import SubmissionBoxIcon from '~/ui/icons/SubmissionBoxIcon'
 import v, { ITEM_TYPES } from '~/utils/variables'
 import FilestackUpload, { MAX_SIZE } from '~/utils/FilestackUpload'
@@ -415,7 +416,7 @@ class GridCardBlank extends React.Component {
         creating={creating}
         size={size}
         onClick={this.startCreating('testCollection')}
-        Icon={AddCollectionIcon}
+        Icon={() => <TestCollectionIcon size="small" />}
       />
     )
     const submissionBctBox = (

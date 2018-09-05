@@ -43,6 +43,10 @@ class Collection extends BaseRecord {
     return this.type === 'Collection::SubmissionsCollection'
   }
 
+  get isTestCollection() {
+    return this.type === 'Collection::TestCollection'
+  }
+
   get requiresSubmissionBoxSettings() {
     if (!this.isSubmissionBox) return false
     // if type is null then it requires setup

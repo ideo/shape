@@ -14,7 +14,7 @@ describe('PageHeader', () => {
     const routingStore = fakeRoutingStore
     fakeCollection.isNormalCollection = true
     fakeCollection.breadcrumb = [{ id: 12 }]
-    props = { record: fakeCollection, uiStore, routingStore }
+    props = { record: { ...fakeCollection }, uiStore, routingStore }
 
     wrapper = shallow(
       <PageHeader.wrappedComponent {...props} />
@@ -139,8 +139,25 @@ describe('PageHeader', () => {
       expect(wrapper.find('TemplateIcon').exists()).toBeTruthy()
     })
 
-    it('should show the template tag and icon', () => {
+    it('should show the Use Template button', () => {
       expect(wrapper.find('StyledFormButton').children().text()).toEqual('Use Template')
+    })
+  })
+
+  describe('with a TestCollection', () => {
+    beforeEach(() => {
+      props.record = fakeCollection
+      props.record.isTestCollection = true
+      props.record.isUsableTemplate = false
+      props.record.inherited_tag_list = ['test']
+      wrapper = shallow(
+        <PageHeader.wrappedComponent {...props} />
+      )
+    })
+
+    it('should show the template tag and icon', () => {
+      expect(wrapper.find('SubduedHeading1').children().text()).toEqual('#test')
+      expect(wrapper.find('TestCollectionIcon').exists()).toBeTruthy()
     })
   })
 })

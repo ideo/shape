@@ -12,6 +12,7 @@ import ProfileIcon from '~/ui/icons/ProfileIcon'
 import FilledProfileIcon from '~/ui/icons/FilledProfileIcon'
 import SubmissionBoxIconLg from '~/ui/icons/SubmissionBoxIconLg'
 import TemplateIcon from '~/ui/icons/TemplateIcon'
+import TestCollectionIcon from '~/ui/icons/TestCollectionIcon'
 import { routingStore } from '~/stores'
 
 const IconHolder = styled.span`
@@ -104,7 +105,8 @@ class CollectionCover extends React.Component {
     const hasIcon = (
       collection.isTemplated ||
       collection.isMasterTemplate ||
-      collection.isSubmissionBox
+      collection.isSubmissionBox ||
+      collection.isTestCollection
     )
     if (hasIcon) {
       const nameParts = splitName(collection.name)
@@ -122,6 +124,8 @@ class CollectionCover extends React.Component {
         rightIcon = <TemplateIcon circled />
       } else if (collection.isSubmissionBox) {
         rightIcon = <SubmissionBoxIconLg />
+      } else if (collection.isTestCollection) {
+        rightIcon = <TestCollectionIcon />
       }
       return (
         <Fragment>
