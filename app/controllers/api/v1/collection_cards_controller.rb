@@ -207,6 +207,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
   end
 
   def broadcast_collection_archive_updates
+    return unless @collection_cards.first.present?
     CollectionUpdateBroadcaster.call(@collection_cards.first.parent, current_user)
   end
 
