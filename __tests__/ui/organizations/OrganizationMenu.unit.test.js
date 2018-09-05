@@ -142,7 +142,9 @@ describe('OrganizationMenu', () => {
       saveFn = jest.fn().mockReturnValue(Promise.resolve({}))
       Organization.mockImplementation(() =>
         ({
-          id: 3,
+          meta: {
+            id: 3,
+          },
           save: saveFn,
           assign: jest.fn(),
         }))
