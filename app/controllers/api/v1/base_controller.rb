@@ -15,6 +15,7 @@ class Api::V1::BaseController < ApplicationController
       'Item::TextItem': SerializableItem,
       'Item::FileItem': SerializableItem,
       'Item::LinkItem': SerializableItem,
+      'Item::QuestionItem': SerializableItem,
       'Collection::UserCollection': SerializableCollection,
       'Collection::SharedWithMeCollection': SerializableCollection,
       'Collection::Global': SerializableCollection,

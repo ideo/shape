@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180831213853) do
+ActiveRecord::Schema.define(version: 20180905223105) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -184,6 +184,7 @@ ActiveRecord::Schema.define(version: 20180831213853) do
     t.datetime "archived_at"
     t.string "archive_batch"
     t.string "icon_url"
+    t.integer "question_type"
     t.index ["breadcrumb"], name: "index_items_on_breadcrumb", using: :gin
     t.index ["cloned_from_id"], name: "index_items_on_cloned_from_id"
   end
@@ -224,15 +225,6 @@ ActiveRecord::Schema.define(version: 20180831213853) do
     t.datetime "updated_at", null: false
     t.index ["question_id"], name: "index_question_answers_on_question_id"
     t.index ["survey_response_id"], name: "index_question_answers_on_survey_response_id"
-  end
-
-  create_table "questions", force: :cascade do |t|
-    t.bigint "test_collection_id"
-    t.integer "question_type"
-    t.integer "order"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["test_collection_id"], name: "index_questions_on_test_collection_id"
   end
 
   create_table "roles", force: :cascade do |t|
