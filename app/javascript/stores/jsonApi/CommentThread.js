@@ -19,7 +19,7 @@ class CommentThread extends BaseRecord {
     // include __persisted as part of the key,
     // because when we .save() the unpersisted and persisted both temporarily exist
     if (!this.record) return 'none'
-    return `thread-${this.record.className}-${this.record.id}${this.__persisted ? '' : '-new'}`
+    return `thread-${this.record.className}-${this.record.id}${this.meta.id ? '' : '-new'}`
   }
 
   @computed get unreadCount() {
@@ -72,10 +72,10 @@ class CommentThread extends BaseRecord {
   }
 
   async API_saveComment(commentData) {
-    if (!this.__persisted) {
+    if (!this.meta.id) {
       // if there's no id, then first we have to create the comment_thread
       await this.API_create()
-      if (!this.__persisted) {
+      if (!this.meta.id) {
         // error if that still didn't work...
         return false
       }
