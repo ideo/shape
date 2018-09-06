@@ -1,7 +1,6 @@
 {
   "type": "object",
   "properties": {
-    "id": { "type": "integer" },
     "first_name": { "type": "string" },
     "last_name": { "type": "string" },
     "email": { "type": "string" },
@@ -18,5 +17,5 @@
     "notify_through_email": { "type": "boolean" },
     "google_auth_token": { "type": "string" }
   },
-  "required": ["id", "email", "first_name", "last_name", "status"]
+  "required": ["email", "first_name", "last_name", "status"]
 }

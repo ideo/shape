@@ -1,9 +1,8 @@
 {
   "type": "object",
   "properties": {
-    "id": { "type": "integer" },
     "message": { "type": "string" },
     "updated_at": { "type": "date" }
   },
-  "required": ["id", "message", "updated_at"]
+  "required": ["message", "updated_at"]
 }
