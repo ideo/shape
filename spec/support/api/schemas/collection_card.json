@@ -7,6 +7,7 @@
     "width": { "type": "integer" },
     "height": { "type": "integer" },
     "type": { "type": "string" },
+    "card_question_type": { "type": ["string", "null"] },
     "link": { "type": "boolean" },
     "can_move": { "type": "boolean" },
     "pinned": { "type": "boolean" },
