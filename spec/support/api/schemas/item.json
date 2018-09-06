@@ -15,7 +15,8 @@
     "tag_list": { "type": ["array", "null"] },
     "inherited_tag_list": { "type": ["array", "null"] },
     "filestack_file_url": { "type": ["string", "null"] },
-    "pinned_and_locked": { "type": ["boolean"] }
+    "pinned_and_locked": { "type": ["boolean"] },
+    "question_type": { "type": ["string", "null"] }
   },
   "required": ["id", "type"]
 }
