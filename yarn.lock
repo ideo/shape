@@ -3087,21 +3087,21 @@ dateformat@^3.0.3:
   resolved "https://registry.yarnpkg.com/dateformat/-/dateformat-3.0.3.tgz#a6e37499a4d9a9cf85ef5872044d62901c9889ae"
 
 datx-jsonapi@^0.11.4:
-  version "0.11.4"
-  resolved "https://registry.yarnpkg.com/datx-jsonapi/-/datx-jsonapi-0.11.4.tgz#681a97c6641c2bdcfda190bb6d0400a8d8781b8b"
+  version "0.11.5"
+  resolved "https://registry.yarnpkg.com/datx-jsonapi/-/datx-jsonapi-0.11.5.tgz#2a12b25708c3705fb01928f70ea97732696cf76f"
   dependencies:
-    datx "^0.11.4"
-    datx-utils "^0.11.3"
+    datx "^0.11.5"
+    datx-utils "^0.11.5"
 
-datx-utils@^0.11.3:
-  version "0.11.3"
-  resolved "https://registry.yarnpkg.com/datx-utils/-/datx-utils-0.11.3.tgz#bbdea12beffe3ad64c9db2344645ce2b06fd4ef5"
+datx-utils@^0.11.5:
+  version "0.11.5"
+  resolved "https://registry.yarnpkg.com/datx-utils/-/datx-utils-0.11.5.tgz#d88ff159ea98fc0809b330d3b485bf67a623d8df"
 
-datx@^0.11.4:
-  version "0.11.4"
-  resolved "https://registry.yarnpkg.com/datx/-/datx-0.11.4.tgz#6e8b94775bb0f3ac1a73f09530f4dfe64543ae6d"
+datx@^0.11.4, datx@^0.11.5:
+  version "0.11.5"
+  resolved "https://registry.yarnpkg.com/datx/-/datx-0.11.5.tgz#a4c306b27c77e2da9841f1b3438bf475b6eec2b9"
   dependencies:
-    datx-utils "^0.11.3"
+    datx-utils "^0.11.5"
 
 debounce@^1.1.0:
   version "1.1.0"
