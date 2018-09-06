@@ -24,7 +24,7 @@ class Collection
         order: 1,
         item_attributes: {
           type: 'Item::QuestionItem',
-          question_type: :blank_media,
+          question_type: :media,
         },
       )
     end

@@ -14,6 +14,7 @@ class TestDesigner extends React.Component {
         return (
           <TestQuestionEditor
             key={card.id}
+            card={card}
             item={card.record}
             position={position}
           />

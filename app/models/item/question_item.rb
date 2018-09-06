@@ -7,7 +7,7 @@ class Item
       useful: 1,
       open: 2,
       end: 3,
-      blank_media: 4,
+      media: 4,
     }
   end
 end
