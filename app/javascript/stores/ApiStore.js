@@ -45,8 +45,6 @@ class ApiStore extends jsonapi(datxCollection) {
 
   @action addCurrentCommentThread(id) {
     // no need to do anything if we're already on this thread
-    console.log(typeof id, id, this.currentCommentThreadIds.toJSON(), this.currentCommentThreadIds.indexOf(id))
-
     if (this.currentCommentThreadIds.indexOf(id) > -1) return
     this.currentCommentThreadIds.push(id)
   }
@@ -106,7 +104,7 @@ class ApiStore extends jsonapi(datxCollection) {
     this.add(roles, 'roles')
   }
 
-  importUsersThread({ usersThread, thread, comments } = {}) {
+  @action importUsersThread({ usersThread, thread, comments } = {}) {
     thread.addReference('users_thread', usersThread, {
       model: UsersThread,
       type: ReferenceType.TO_ONE,
