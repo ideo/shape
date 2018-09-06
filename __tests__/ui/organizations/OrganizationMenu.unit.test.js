@@ -101,7 +101,6 @@ describe('OrganizationMenu', () => {
 
       beforeEach(async () => {
         newGroup = {
-          id: 5,
           name: 'newgroup',
           handle: 'ng',
           filestack_file_url: 'new.jpg'
@@ -142,9 +141,7 @@ describe('OrganizationMenu', () => {
       saveFn = jest.fn().mockReturnValue(Promise.resolve({}))
       Organization.mockImplementation(() =>
         ({
-          meta: {
-            id: 3,
-          },
+          id: 3,
           save: saveFn,
           assign: jest.fn(),
         }))
