@@ -91,7 +91,7 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
 
       it 'has collection as parent' do
         post(path, params: params)
-        expect(CollectionCard.find(json['data']['attributes']['id']).parent).to eq(collection)
+        expect(CollectionCard.find(json['data']['id']).parent).to eq(collection)
       end
 
       it 'creates an activity' do
