@@ -8,6 +8,7 @@ class Item
       open: 2,
       end: 3,
       media: 4,
+      description: 5,
     }
   end
 end

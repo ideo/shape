@@ -11,13 +11,12 @@ const selectOptions = [
 
 class TestQuestionEditor extends React.Component {
   handleSelectChange = (ev) => {
-    console.log(ev.target.value)
+    // console.log(ev.target.value)
     // TODO: call replace on the card with the new type??
   }
 
   renderQuestionSelectForm() {
     const { card } = this.props
-    console.log(card.card_question_type)
     return (
       <select
         value={card.card_question_type}
@@ -39,6 +38,7 @@ class TestQuestionEditor extends React.Component {
     const { card, item } = this.props
     switch (card.card_question_type) {
     case 'context':
+    case 'useful':
       return (
         <div>
           How satisfied are you with your current solution?
@@ -53,6 +53,10 @@ class TestQuestionEditor extends React.Component {
         )
       }
       return 'your media is ready sir!'
+    case 'description':
+      return (
+        <textarea />
+      )
     default:
       return ''
     }

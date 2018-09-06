@@ -2,11 +2,11 @@ import { PropTypes as MobxPropTypes } from 'mobx-react'
 
 import TestQuestionEditor from './TestQuestionEditor'
 
-class TestDesigner extends React.Component {
+class TestDesigner extends React.PureComponent {
   render() {
     const { collection } = this.props
     const cardCount = collection.collection_cards.length
-    return (
+    const inner = (
       collection.collection_cards.map((card, i) => {
         let position
         if (i === 0) position = 'beginning'
@@ -20,6 +20,12 @@ class TestDesigner extends React.Component {
           />
         )
       })
+    )
+
+    return (
+      <div>
+        { inner }
+      </div>
     )
   }
 }

@@ -17,14 +17,21 @@ class Collection
         order: 0,
         item_attributes: {
           type: 'Item::QuestionItem',
-          question_type: :context,
+          question_type: :media,
         },
       )
       primary_collection_cards.build(
         order: 1,
         item_attributes: {
           type: 'Item::QuestionItem',
-          question_type: :media,
+          question_type: :description,
+        },
+      )
+      primary_collection_cards.build(
+        order: 2,
+        item_attributes: {
+          type: 'Item::QuestionItem',
+          question_type: :useful,
         },
       )
     end
