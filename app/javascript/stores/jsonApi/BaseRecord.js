@@ -1,3 +1,4 @@
+import { computed } from 'mobx'
 import { Model, initModelRef } from 'datx'
 import { jsonapi, modelToJsonApi } from 'datx-jsonapi'
 import _ from 'lodash'
@@ -13,8 +14,12 @@ class BaseRecord extends jsonapi(Model) {
     }
   }
 
+  @computed get id() {
+    return this.meta.id
+  }
+
   get persisted() {
-    return !!this.meta.id
+    return !!this.id && this.id > 0
   }
 
   get apiStore() {

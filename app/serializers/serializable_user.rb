@@ -1,6 +1,6 @@
 class SerializableUser < BaseJsonSerializer
   type 'users'
-  attributes :id, :first_name, :last_name, :email,
+  attributes :first_name, :last_name, :email,
              :created_at, :status,
              :handle
 

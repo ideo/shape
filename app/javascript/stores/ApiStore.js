@@ -45,6 +45,8 @@ class ApiStore extends jsonapi(datxCollection) {
 
   @action addCurrentCommentThread(id) {
     // no need to do anything if we're already on this thread
+    console.log(typeof id, id, this.currentCommentThreadIds.toJSON(), this.currentCommentThreadIds.indexOf(id))
+
     if (this.currentCommentThreadIds.indexOf(id) > -1) return
     this.currentCommentThreadIds.push(id)
   }
@@ -99,7 +101,7 @@ class ApiStore extends jsonapi(datxCollection) {
   }
 
   async fetchRoles(group) {
-    const res = await this.request(`groups/${group.meta.id}/roles`, 'GET')
+    const res = await this.request(`groups/${group.id}/roles`, 'GET')
     const roles = res.data
     this.add(roles, 'roles')
   }
