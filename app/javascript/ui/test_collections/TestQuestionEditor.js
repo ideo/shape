@@ -94,22 +94,24 @@ class TestQuestionEditor extends React.Component {
     const { card, item } = this.props
     switch (card.card_question_type) {
     case 'context':
+      return (
+        <ScaleQuestion
+          questionText="How satisfied are you with your current solution?"
+        />
+      )
     case 'useful':
       return (
-        <QuestionPreviewHolder>
-          <ScaleQuestion
-            questionText="How satisfied are you with your current solution?"
-          />
-        </QuestionPreviewHolder>
+        <ScaleQuestion
+          questionText="How useful is this idea for you?"
+          emojiSeries="thumbs"
+        />
       )
     case 'media':
       if (item.type === 'Item::QuestionItem') {
         return (
-          <QuestionPreviewHolder>
-            <DisplayText>
-              Put some media here plz
-            </DisplayText>
-          </QuestionPreviewHolder>
+          <DisplayText>
+            Put some media here plz
+          </DisplayText>
         )
       }
       return 'your media is ready sir!'
@@ -129,7 +131,9 @@ class TestQuestionEditor extends React.Component {
           { this.renderQuestionSelectForm() }
         </QuestionFormHolder>
         <QuestionFormHolder>
-          { this.renderQuestion() }
+          <QuestionPreviewHolder>
+            { this.renderQuestion() }
+          </QuestionPreviewHolder>
         </QuestionFormHolder>
       </QuestionHolder>
     )

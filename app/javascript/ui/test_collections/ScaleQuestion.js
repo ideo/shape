@@ -29,6 +29,7 @@ const Scale = styled.div`
 `
 
 const EmojiHolder = styled.div`
+  align-items: center;
   display: flex;
   justify-content: space-around;
   margin-top: 10px;
@@ -41,8 +42,8 @@ class ScaleQuestion extends React.Component {
     case 'thumbs':
       return [
         { label: 'terrible', symbol: '👎' },
-        { label: 'bad', symbol: '👎' },
-        { label: 'good', symbol: '👍' },
+        { label: 'bad', scale: 0.6, symbol: '👎' },
+        { label: 'good', scale: 0.6, symbol: '👍' },
         { label: 'great', symbol: '👍' },
       ]
     case 'faces':
@@ -74,7 +75,11 @@ class ScaleQuestion extends React.Component {
           <EmojiHolder>
             { emojis.map(emoji => (
               <button onClick={this.vote(emoji.name)}>
-                <Emoji name={emoji.name} symbol={emoji.symbol} />
+                <Emoji
+                  name={emoji.name}
+                  symbol={emoji.symbol}
+                  scale={emoji.scale}
+                />
               </button>
             ))}
           </EmojiHolder>

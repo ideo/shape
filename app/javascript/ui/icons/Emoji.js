@@ -6,7 +6,7 @@ const Emoji = props => (
     role="img"
     aria-label={props.name ? props.name : ''}
     aria-hidden={props.name ? 'false' : 'true'}
-    style={{ fontSize: '32px' }}
+    style={{ fontSize: `${parseInt(32 * props.scale)}px` }}
   >
     {props.symbol}
   </span>
@@ -15,10 +15,12 @@ const Emoji = props => (
 Emoji.propTypes = {
   name: PropTypes.string,
   symbol: PropTypes.string,
+  scale: PropTypes.number,
 }
 Emoji.defaultProps = {
   name: null,
   symbol: null,
+  scale: 1,
 }
 
 export default Emoji
