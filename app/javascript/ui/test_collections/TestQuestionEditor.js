@@ -24,7 +24,7 @@ const QuestionSelectHolder = styled.div`
   margin-right: 20px;
   min-width: 300px;
 
-  // NOTE had to hack this rule in here to modify the MUI Input element
+  /* NOTE: had to hack this rule in here to modify the MUI Input element */
   > div {
     width: calc(100% - 30px);
   }
@@ -45,7 +45,7 @@ const QuestionHolder = styled.div`
   }
 `
 
-// TODO deal with new colros
+// TODO: deal with new colors
 const QuestionPreviewHolder = styled.div`
   border-color: ${v.colors.gray};
   border-left-width: 20px;

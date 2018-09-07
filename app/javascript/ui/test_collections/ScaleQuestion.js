@@ -41,10 +41,10 @@ class ScaleQuestion extends React.Component {
     switch (emojiSeries) {
     case 'thumbs':
       return [
-        { label: 'terrible', symbol: '👎' },
-        { label: 'bad', scale: 0.6, symbol: '👎' },
-        { label: 'good', scale: 0.6, symbol: '👍' },
-        { label: 'great', symbol: '👍' },
+        { name: 'terrible', symbol: '👎' },
+        { name: 'bad', scale: 0.6, symbol: '👎' },
+        { name: 'good', scale: 0.6, symbol: '👍' },
+        { name: 'great', symbol: '👍' },
       ]
     case 'faces':
     default:
@@ -57,7 +57,8 @@ class ScaleQuestion extends React.Component {
     }
   }
 
-  vote = (name) => {
+  vote = (name) => (ev) => {
+    console.log(name)
   }
 
   render() {
@@ -76,6 +77,7 @@ class ScaleQuestion extends React.Component {
             { emojis.map(emoji => (
               <button onClick={this.vote(emoji.name)}>
                 <Emoji
+                  key={emoji.name}
                   name={emoji.name}
                   symbol={emoji.symbol}
                   scale={emoji.scale}
