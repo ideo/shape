@@ -232,9 +232,11 @@ class CollectionPage extends PageWithApi {
     // this.error comes from PageWithApi
     if (this.error) return <PageError error={this.error} />
     const { collection } = this
-    // for some reason collection can come through as an object, but not some fields like can_edit,
-    // which indicates it hasn't finished loading everything
-    if (!collection || collection.can_edit === undefined) {
+    // NOTE: if we have first loaded the slimmer SerializableSimpleCollection via the CommentThread
+    // then some fields like `can_edit` will be undefined.
+    // So we check if the full Collection has loaded via the `can_edit` attr
+    // Also, checking meta.snapshot seems to load more consistently than just collection.can_edit
+    if (!collection || collection.meta.snapshot.can_edit === undefined) {
       return <Loader />
     }
 

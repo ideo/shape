@@ -156,6 +156,11 @@ export const fakeCollection = {
   API_updateCards: jest.fn(),
   checkCurrentOrg: jest.fn(),
   internalType: 'collections',
+  meta: {
+    snapshot: {
+      can_edit: false,
+    },
+  },
   ...fakeJsonApiAttrs,
 }
 export const fakeGroupAttrs = {

@@ -149,19 +149,25 @@ class ApiStore extends jsonapi(datxCollection) {
     return this.unreadCommentsCount + this.unreadNotificationsCount
   }
 
-  syncFromFirestore(data) {
+  massageFirestoreData = (data) => {
     const timeFields = ['created_at', 'updated_at', 'last_viewed_at']
-    _.each(data.data.attributes, (v, k) => {
+    // id should no longer be an attribute
+    delete data.attributes.id
+    _.each(data.attributes, (v, k) => {
       if (_.includes(timeFields, k)) {
-        data.data.attributes[k] = v.toDate()
+        data.attributes[k] = v.toDate()
+      }
+      if (k.indexOf('_id') > 0) {
+        data.attributes[k] = v ? v.toString() : v
       }
     })
-    _.each(data.included, d => {
-      _.each(d.attributes, (v, k) => {
-        if (_.includes(timeFields, k)) {
-          d.attributes[k] = v.toDate()
-        }
-      })
+    return data
+  }
+
+  syncFromFirestore(data) {
+    data.data = this.massageFirestoreData(data.data)
+    _.each(data.included, (v, k) => {
+      data.included[k] = this.massageFirestoreData(v)
     })
     return this.sync(data)
   }
@@ -252,6 +258,11 @@ class ApiStore extends jsonapi(datxCollection) {
     runInAction(() => {
       this.usableTemplates = res.data.filter(c => c.isUsableTemplate)
     })
+  }
+
+  remove(obj, id) {
+    console.log('REMOVING', typeof obj, obj.id, obj.meta.snapshot)
+    this.__removeModel(obj)
   }
 
   // -- override mobx-jsonapi-store --

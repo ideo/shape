@@ -156,7 +156,7 @@ class Collection extends BaseRecord {
   checkCurrentOrg() {
     const { currentUser } = this.apiStore
     if (!currentUser) return
-    if (this.organization_id !== currentUser.current_organization.id) {
+    if (this.organization_id.toString() !== currentUser.current_organization.id) {
       currentUser.switchOrganization(this.organization_id)
     }
   }

@@ -94,7 +94,6 @@ class CommentThread extends BaseRecord {
       model: User,
       type: ReferenceType.TO_ONE,
     })
-    this.apiStore.add(comment)
     this.importComments([comment], { created: true })
     // this will create the comment in the API
     uiStore.trackEvent('create', this.record)
@@ -114,7 +113,7 @@ class CommentThread extends BaseRecord {
   @action importComments(data, { created = false } = {}) {
     let newComments = _.union(this.comments.toJS(), data)
     // after we're done creating the temp comment, clear out any prev temp ones
-    if (!created) newComments = _.filter(newComments, c => c.id)
+    if (!created) newComments = _.filter(newComments, c => c.persisted)
     data.forEach(comment => {
       const { users_thread } = this
       if (comment.author_id !== this.apiStore.currentUserId &&
