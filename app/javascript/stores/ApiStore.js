@@ -31,6 +31,13 @@ class ApiStore extends jsonapi(datxCollection) {
     return super.fetch(type, id, {skipCache})
   }
 
+  request(path, method, data, options = {}) {
+    if (!options.hasOwnProperty('skipCache')) {
+      options.skipCache = true
+    }
+    return super.request(path, method, data, options)
+  }
+
   @action setCurrentUserId(id) {
     this.currentUserId = id
   }
