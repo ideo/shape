@@ -111,7 +111,6 @@ class OrganizationMenu extends React.Component {
   onRolesSave = (res, { roleName = '' } = {}) => {
     const { apiStore, organization } = this.props
     const { editGroup } = this
-    apiStore.sync(res)
     if (roleName === 'admin' && editGroup.isOrgGroup) {
       if (editGroup.is_primary) {
         // reload the admin group
