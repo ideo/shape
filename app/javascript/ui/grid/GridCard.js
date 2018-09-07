@@ -285,18 +285,24 @@ class GridCard extends React.Component {
 
 GridCard.propTypes = {
   card: MobxPropTypes.objectOrObservableObject.isRequired,
-  canEditCollection: PropTypes.bool.isRequired,
-  isSharedCollection: PropTypes.bool.isRequired,
   cardType: PropTypes.string.isRequired,
-  height: PropTypes.number.isRequired,
   record: MobxPropTypes.objectOrObservableObject.isRequired,
-  dragging: PropTypes.bool.isRequired,
-  handleClick: PropTypes.func.isRequired,
-  menuOpen: PropTypes.bool.isRequired,
+  height: PropTypes.number,
+  canEditCollection: PropTypes.bool,
+  isSharedCollection: PropTypes.bool,
+  handleClick: PropTypes.func,
+  dragging: PropTypes.bool,
+  menuOpen: PropTypes.bool,
   lastPinnedCard: PropTypes.bool,
 }
 
 GridCard.defaultProps = {
+  height: 1,
+  canEditCollection: false,
+  isSharedCollection: false,
+  handleClick: () => null,
+  dragging: false,
+  menuOpen: false,
   lastPinnedCard: false,
 }
 

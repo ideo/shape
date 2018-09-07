@@ -1,8 +1,9 @@
-import { PropTypes as MobxPropTypes } from 'mobx-react'
+import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 
 import TestQuestionEditor from './TestQuestionEditor'
 
-class TestDesigner extends React.PureComponent {
+@observer
+class TestDesigner extends React.Component {
   render() {
     const { collection } = this.props
     const cardCount = collection.collection_cards.length
@@ -14,6 +15,7 @@ class TestDesigner extends React.PureComponent {
         return (
           <TestQuestionEditor
             key={card.id}
+            parent={collection}
             card={card}
             item={card.record}
             position={position}

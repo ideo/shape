@@ -193,10 +193,16 @@ class GridCardBlank extends React.Component {
     this.canceled = true
   }
 
+  get replacingId() {
+    const { uiStore, replacingId } = this.props
+    if (replacingId) return replacingId
+    return uiStore.blankContentToolState.replacingId
+  }
+
   createDropPane = () => {
+    const { replacingId } = this
     const { creating } = this.state
     const { uiStore } = this.props
-    const { replacingId } = uiStore.blankContentToolState
     if (this.canceled || (creating && creating !== 'file')) return
     const uploadOpts = {}
     if (replacingId) {
@@ -271,8 +277,7 @@ class GridCardBlank extends React.Component {
   }
 
   pickImages = () => {
-    const { uiStore } = this.props
-    const { replacingId } = uiStore.blankContentToolState
+    const { replacingId } = this
     const filestackMethod = !replacingId ? FilestackUpload.pickImages
       : FilestackUpload.pickImage
     filestackMethod({
@@ -283,8 +288,9 @@ class GridCardBlank extends React.Component {
   }
 
   createCard = (nested = {}, options = {}) => {
+    const { replacingId } = this
     const { afterCreate, parent, apiStore, uiStore } = this.props
-    const { order, width, height, replacingId } = uiStore.blankContentToolState
+    const { order, width, height } = uiStore.blankContentToolState
     const isReplacing = !!replacingId
     const attrs = {
       order,
@@ -334,7 +340,7 @@ class GridCardBlank extends React.Component {
   renderInner = () => {
     let inner
     const { creating, loading, droppingFile } = this.state
-    const isReplacing = !!this.props.uiStore.blankContentToolState.replacingId
+    const isReplacing = !!this.replacingId
     const size = v.iconSizes.bct
 
     switch (creating) {
@@ -553,6 +559,7 @@ GridCardBlank.propTypes = {
   height: PropTypes.number.isRequired,
   afterCreate: PropTypes.func,
   preselected: PropTypes.string,
+  replacingId: PropTypes.number,
 }
 GridCardBlank.wrappedComponent.propTypes = {
   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
@@ -561,6 +568,7 @@ GridCardBlank.wrappedComponent.propTypes = {
 GridCardBlank.defaultProps = {
   afterCreate: null,
   preselected: null,
+  replacingId: null,
 }
 
 // give a name to the injected component for unit tests

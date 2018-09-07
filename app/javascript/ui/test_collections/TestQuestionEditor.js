@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types'
 import { PropTypes as MobxPropTypes } from 'mobx-react'
+import GridCardBlank from '~/ui/grid/blankContentTool/GridCardBlank'
 
 const selectOptions = [
   { value: 'context', label: 'Context Setting' },
@@ -35,7 +36,7 @@ class TestQuestionEditor extends React.Component {
   }
 
   renderQuestion() {
-    const { card, item } = this.props
+    const { parent, card, item } = this.props
     switch (card.card_question_type) {
     case 'context':
     case 'useful':
@@ -46,10 +47,13 @@ class TestQuestionEditor extends React.Component {
       )
     case 'media':
       if (item.type === 'Item::QuestionItem') {
+        // this case means it is set to "blank / add your media"
         return (
-          <div>
-            Put some media here plz
-          </div>
+          <GridCardBlank
+            parent={parent}
+            height={1}
+            replacingId={card.id}
+          />
         )
       }
       return 'your media is ready sir!'
@@ -73,6 +77,8 @@ class TestQuestionEditor extends React.Component {
 }
 
 TestQuestionEditor.propTypes = {
+  // parent is the parent collection
+  parent: MobxPropTypes.objectOrObservableObject.isRequired,
   card: MobxPropTypes.objectOrObservableObject.isRequired,
   item: MobxPropTypes.objectOrObservableObject.isRequired,
   position: PropTypes.string,

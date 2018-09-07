@@ -108,6 +108,16 @@ class Item < ApplicationRecord
     name
   end
 
+  alias resourceable_can_edit? can_edit?
+  def can_edit?(user_or_group)
+    if parent.present? && parent.is_a?(Collection::TestCollection)
+      # TestCollection items get their permission from parent
+      return parent.can_edit?(user_or_group)
+    end
+    # by default defer to original resourceable method
+    resourceable_can_edit?(user_or_group)
+  end
+
   def resourceable_class
     # Use top-level class since this is an STI model
     Item
