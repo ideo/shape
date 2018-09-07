@@ -50,6 +50,12 @@ export const DisplayText = styled.span`
 `
 DisplayText.displayName = 'StyledDisplayText'
 
+export const NumberListText = DisplayText.extend`
+  display: inline-block;
+  font-weight: ${v.weights.medium};
+  min-width: 22px;
+`
+
 export const SubduedHeading1 = styled.h1`
   color: ${v.colors.gray};
   display: inline-block;

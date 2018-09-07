@@ -1,6 +1,12 @@
-import PropTypes from 'prop-types'
 import { PropTypes as MobxPropTypes } from 'mobx-react'
+import styled from 'styled-components'
+import { Box } from 'reflexbox'
+
 import GridCardBlank from '~/ui/grid/blankContentTool/GridCardBlank'
+import ScaleQuestion from '~/ui/test_collections/ScaleQuestion'
+import { Select } from '~/ui/global/styled/forms'
+import { DisplayText, NumberListText } from '~/ui/global/styled/typography'
+import v from '~/utils/variables'
 
 const selectOptions = [
   { value: 'context', label: 'Context Setting' },
@@ -9,6 +15,50 @@ const selectOptions = [
   { value: 'useful', label: 'Useful' },
   { value: 'open', label: 'Open Response' },
 ]
+
+const QuestionFormHolder = styled(Box)`
+`
+
+const QuestionSelectHolder = styled.div`
+  margin-top: 10px;
+  margin-right: 20px;
+  min-width: 300px;
+
+  // NOTE had to hack this rule in here to modify the MUI Input element
+  > div {
+    width: calc(100% - 30px);
+  }
+
+  @media only screen
+    and (max-width: ${v.responsive.medBreakpoint}px) {
+    margin-bottom: 10px;
+  }
+`
+
+const QuestionHolder = styled.div`
+  display: flex;
+
+  @media only screen
+    and (max-width: ${v.responsive.medBreakpoint}px) {
+    flex-direction: column;
+    margin-bottom: 10px;
+  }
+`
+
+// TODO deal with new colros
+const QuestionPreviewHolder = styled.div`
+  border-color: ${v.colors.gray};
+  border-left-width: 20px;
+  border-right-width: 20px;
+  border-style: solid;
+
+  @media only screen
+    and (max-width: ${v.responsive.medBreakpoint}px) {
+    border-width: 0;
+    margin-left: 22px;
+    margin-right: 28px;
+  }
+`
 
 class TestQuestionEditor extends React.Component {
   handleSelectChange = (ev) => {
@@ -19,19 +69,25 @@ class TestQuestionEditor extends React.Component {
   renderQuestionSelectForm() {
     const { card } = this.props
     return (
-      <select
-        value={card.card_question_type}
-        onChange={this.handleSelectChange}
-      >
-        { selectOptions.map(opt => (
-          <option
-            key={opt.value}
-            value={opt.value}
-          >
-            {opt.label}
-          </option>
-        ))}
-      </select>
+      <QuestionSelectHolder>
+        <NumberListText>{card.order + 1}.</NumberListText>
+        <Select
+          classes={{ root: 'select fullWidth', selectMenu: 'selectMenu' }}
+          displayEmpty
+          name="role"
+          value={card.card_question_type}
+          onChange={this.handleSelectChange}
+        >
+          { selectOptions.map(opt => (
+            <option
+              key={opt.value}
+              value={opt.value}
+            >
+              {opt.label}
+            </option>
+          ))}
+        </Select>
+      </QuestionSelectHolder>
     )
   }
 
@@ -39,11 +95,17 @@ class TestQuestionEditor extends React.Component {
     const { parent, card, item } = this.props
     switch (card.card_question_type) {
     case 'context':
+      return (
+        <ScaleQuestion
+          questionText="How satisfied are you with your current solution?"
+        />
+      )
     case 'useful':
       return (
-        <div>
-          How satisfied are you with your current solution?
-        </div>
+        <ScaleQuestion
+          questionText="How useful is this idea for you?"
+          emojiSeries="thumbs"
+        />
       )
     case 'media':
       if (item.type === 'Item::QuestionItem') {
@@ -68,10 +130,16 @@ class TestQuestionEditor extends React.Component {
 
   render() {
     return (
-      <div>
-        { this.renderQuestionSelectForm() }
-        { this.renderQuestion() }
-      </div>
+      <QuestionHolder>
+        <QuestionFormHolder>
+          { this.renderQuestionSelectForm() }
+        </QuestionFormHolder>
+        <QuestionFormHolder>
+          <QuestionPreviewHolder>
+            { this.renderQuestion() }
+          </QuestionPreviewHolder>
+        </QuestionFormHolder>
+      </QuestionHolder>
     )
   }
 }
@@ -81,10 +149,5 @@ TestQuestionEditor.propTypes = {
   parent: MobxPropTypes.objectOrObservableObject.isRequired,
   card: MobxPropTypes.objectOrObservableObject.isRequired,
   item: MobxPropTypes.objectOrObservableObject.isRequired,
-  position: PropTypes.string,
 }
-TestQuestionEditor.defaultProps = {
-  position: null,
-}
-
 export default TestQuestionEditor
