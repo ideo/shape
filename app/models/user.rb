@@ -168,7 +168,7 @@ class User < ApplicationRecord
   # Simplified format, used by action cable
   def as_json(_options = {})
     {
-      id: id,
+      id: id.to_s,
       name: name,
       pic_url_square: picture,
     }

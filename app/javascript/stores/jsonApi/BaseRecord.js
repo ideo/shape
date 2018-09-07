@@ -8,8 +8,8 @@ class BaseRecord extends jsonapi(Model) {
     super(...args)
     if (this.constructor.refDefaults) {
       _.forEach(this.constructor.refDefaults, (v, k) => {
-        const {defaultValue, ...options} = v
-        initModelRef(this, k, options, defaultValue);
+        const { defaultValue, ...options } = v
+        initModelRef(this, k, options, defaultValue)
       })
     }
   }

@@ -76,12 +76,12 @@ class CollectionPage extends PageWithApi {
   receivedChannelData = async (data) => {
     const { apiStore } = this.props
     const { collection } = this
-    const currentId = collection.id.toString()
+    const currentId = collection.id
     const submissions = collection.submissions_collection
-    const submissionsId = submissions ? submissions.id.toString() : ''
-    if (_.compact([currentId, submissionsId]).indexOf(data.record_id.toString()) > -1) {
+    const submissionsId = submissions ? submissions.id : ''
+    if (_.compact([currentId, submissionsId]).indexOf(data.record_id) > -1) {
       this.setEditor(data.current_editor)
-      if (_.isEmpty(data.current_editor) || data.current_editor.id.toString() === apiStore.currentUserId) {
+      if (_.isEmpty(data.current_editor) || data.current_editor.id === apiStore.currentUserId) {
         // don't reload your own updates
         return
       }
