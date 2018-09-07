@@ -1,6 +1,21 @@
 import { PropTypes as MobxPropTypes } from 'mobx-react'
+import styled from 'styled-components'
 
+import v from '~/utils/variables'
 import TestQuestionEditor from './TestQuestionEditor'
+
+const TopThing = styled.div`
+  background-color: ${v.colors.gray};
+  border-radius: 7px 7px 0 0 ;
+  height: 16px;
+  margin-left: 320px;
+  width: 374px;
+
+  @media only screen
+    and (max-width: ${v.responsive.medBreakpoint}px) {
+    display: none;
+  }
+`
 
 class TestDesigner extends React.PureComponent {
   render() {
@@ -17,6 +32,7 @@ class TestDesigner extends React.PureComponent {
             card={card}
             item={card.record}
             position={position}
+            order={card.order}
           />
         )
       })
@@ -24,6 +40,7 @@ class TestDesigner extends React.PureComponent {
 
     return (
       <div>
+        <TopThing />
         { inner }
       </div>
     )

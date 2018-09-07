@@ -171,10 +171,15 @@ export const Select = styled(MuiSelect)`
     font-weight: ${v.weights.book};
   }
 
+  .fullWidth {
+    min-width: calc(100% - 30px);
+  }
+
   .selectMenu: {
     background-color: transparent;
     &:focus { background-color: transparent; }
     &:hover { background-color: transparent; }
+    vertical-align: baseline;
 
     li {
       font-family: ${v.fonts.sans};
