@@ -99,9 +99,8 @@ class OrganizationMenu extends React.Component {
     this.goToEditGroupRoles(newGroup)
     // because this is after async/await
     runInAction(() => { this.isLoading = true })
-    const res = await apiStore.fetchRoles(newGroup)
+    await apiStore.fetchRoles(newGroup)
     runInAction(() => { this.isLoading = false })
-    apiStore.sync(res)
   }
 
   onGroupRoles = group => () => {

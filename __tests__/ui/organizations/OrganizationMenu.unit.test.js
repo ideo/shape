@@ -82,19 +82,6 @@ describe('OrganizationMenu', () => {
     expect(component.editGroup).toEqual({})
   })
 
-  describe('onRolesSave', () => {
-    let res
-
-    beforeEach(() => {
-      res = { data: [{ id: 3 }] }
-      component.onRolesSave(res)
-    })
-
-    it('should remove all and add back roles to apiStore', () => {
-      expect(props.apiStore.sync).toHaveBeenCalledWith(res)
-    })
-  })
-
   describe('createGroup', () => {
     describe('on a newly created group', () => {
       let newGroup
