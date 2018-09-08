@@ -20,6 +20,7 @@ import PlusIcon from '~/ui/icons/PlusIcon'
 import SubmissionBoxSettingsModal from '~/ui/submission_box/SubmissionBoxSettingsModal'
 import EditorPill from '~/ui/items/EditorPill'
 import TestDesigner from '~/ui/test_collections/TestDesigner'
+import v from '~/utils/variables'
 
 const isHomepage = ({ params }) => (params.org && !params.id)
 
@@ -282,7 +283,7 @@ class CollectionPage extends PageWithApi {
   }
 
   loader = () => (
-    <div style={{ marginTop: 100 }}><Loader /></div>
+    <div style={{ marginTop: v.headerHeight }}><Loader /></div>
   )
 
   render() {
