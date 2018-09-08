@@ -75,9 +75,8 @@ class ScaleQuestion extends React.Component {
           <SmallHelperText>select your response below</SmallHelperText>
           <EmojiHolder>
             { emojis.map(emoji => (
-              <button onClick={this.vote(emoji.name)}>
+              <button key={emoji.name} onClick={this.vote(emoji.name)}>
                 <Emoji
-                  key={emoji.name}
                   name={emoji.name}
                   symbol={emoji.symbol}
                   scale={emoji.scale}

@@ -144,13 +144,13 @@ class Collection extends BaseRecord {
   }
 
   // after we reorder a single card, we want to make sure everything goes into sequential order
-  _reorderCards() {
+  @action _reorderCards() {
     if (this.collection_cards) {
-      return _.each(_.sortBy(this.collection_cards, 'order'), (card, i) => {
+      this.collection_cards.replace(_.sortBy(this.collection_cards, 'order'))
+      _.each(this.collection_cards, (card, i) => {
         card.order = i
       })
     }
-    return false
   }
 
   checkCurrentOrg() {

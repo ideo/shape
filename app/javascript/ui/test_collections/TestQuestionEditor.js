@@ -1,12 +1,14 @@
-import { PropTypes as MobxPropTypes } from 'mobx-react'
+import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 import { Box } from 'reflexbox'
 
+import GridCard from '~/ui/grid/GridCard'
 import GridCardBlank from '~/ui/grid/blankContentTool/GridCardBlank'
 import ScaleQuestion from '~/ui/test_collections/ScaleQuestion'
 import { Select } from '~/ui/global/styled/forms'
-import { DisplayText, NumberListText } from '~/ui/global/styled/typography'
+import { NumberListText } from '~/ui/global/styled/typography'
 import v from '~/utils/variables'
+import { uiStore } from '~/stores'
 
 const selectOptions = [
   { value: 'context', label: 'Context Setting' },
@@ -60,6 +62,12 @@ const QuestionPreviewHolder = styled.div`
   }
 `
 
+const QuestionCardWrapper = styled.div`
+  width: 334px;
+  height: 250px;
+`
+
+@observer
 class TestQuestionEditor extends React.Component {
   handleSelectChange = (ev) => {
     // console.log(ev.target.value)
@@ -93,6 +101,7 @@ class TestQuestionEditor extends React.Component {
 
   renderQuestion() {
     const { parent, card, item } = this.props
+    let inner
     switch (card.card_question_type) {
     case 'context':
       return (
@@ -108,17 +117,36 @@ class TestQuestionEditor extends React.Component {
         />
       )
     case 'media':
-      if (item.type === 'Item::QuestionItem') {
+      if (
+        item.type === 'Item::QuestionItem' ||
+        uiStore.blankContentToolState.replacingId === card.id
+      ) {
         // this case means it is set to "blank / add your media"
-        return (
+        inner = (
           <GridCardBlank
             parent={parent}
             height={1}
+            order={card.order}
             replacingId={card.id}
+            testCollectionCard
+          />
+        )
+      } else {
+        inner = (
+          <GridCard
+            card={card}
+            cardType="items"
+            record={card.record}
+            menuOpen={uiStore.openCardMenuId === card.id}
+            testCollectionCard
           />
         )
       }
-      return 'your media is ready sir!'
+      return (
+        <QuestionCardWrapper>
+          { inner }
+        </QuestionCardWrapper>
+      )
     case 'description':
       return (
         <textarea />

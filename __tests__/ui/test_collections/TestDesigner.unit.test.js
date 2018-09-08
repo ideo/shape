@@ -18,7 +18,7 @@ describe('TestDesigner', () => {
 
   it('passes position props for beginning and end', () => {
     expect(wrapper.find('TestQuestionEditor').get(0).props.position).toEqual('beginning')
-    expect(wrapper.find('TestQuestionEditor').get(1).props.position).toEqual(null)
+    expect(wrapper.find('TestQuestionEditor').get(1).props.position).toEqual(undefined)
     expect(wrapper.find('TestQuestionEditor').get(2).props.position).toEqual('end')
   })
 })

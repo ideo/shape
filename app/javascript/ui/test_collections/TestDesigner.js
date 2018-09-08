@@ -6,7 +6,7 @@ import TestQuestionEditor from './TestQuestionEditor'
 
 const TopThing = styled.div`
   background-color: ${v.colors.gray};
-  border-radius: 7px 7px 0 0 ;
+  border-radius: 7px 7px 0 0;
   height: 16px;
   margin-left: 320px;
   width: 374px;
@@ -15,6 +15,9 @@ const TopThing = styled.div`
     and (max-width: ${v.responsive.medBreakpoint}px) {
     display: none;
   }
+`
+const BottomThing = TopThing.extend`
+  border-radius: 0 0 7px 7px;
 `
 
 @observer
@@ -44,6 +47,7 @@ class TestDesigner extends React.Component {
       <div>
         <TopThing />
         { inner }
+        <BottomThing />
       </div>
     )
   }

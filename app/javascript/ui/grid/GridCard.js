@@ -234,7 +234,8 @@ class GridCard extends React.Component {
       canEditCollection,
       dragging,
       menuOpen,
-      lastPinnedCard
+      lastPinnedCard,
+      testCollectionCard,
     } = this.props
 
     const firstCardInRow = card.position && card.position.x === 0
@@ -259,7 +260,9 @@ class GridCard extends React.Component {
             { record.isImage && this.canEditCard && (
               <ContainImage card={card} />
             )}
-            <SelectionCircle cardId={card.id} />
+            { !testCollectionCard &&
+              <SelectionCircle cardId={card.id} />
+            }
             <ActionMenu
               location="GridCard"
               className="show-on-hover card-menu"
@@ -269,6 +272,7 @@ class GridCard extends React.Component {
               menuOpen={menuOpen}
               onOpen={this.openMenu}
               onLeave={this.closeMenu}
+              testCollectionCard={testCollectionCard}
             />
           </StyledTopRightActions>
         }
@@ -294,6 +298,7 @@ GridCard.propTypes = {
   dragging: PropTypes.bool,
   menuOpen: PropTypes.bool,
   lastPinnedCard: PropTypes.bool,
+  testCollectionCard: PropTypes.bool,
 }
 
 GridCard.defaultProps = {
@@ -304,6 +309,7 @@ GridCard.defaultProps = {
   dragging: false,
   menuOpen: false,
   lastPinnedCard: false,
+  testCollectionCard: false,
 }
 
 export default GridCard

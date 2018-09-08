@@ -29,7 +29,7 @@ import BctButtonBox from './BctButtonBox'
 import BctButtonRotation from './BctButtonRotation'
 
 const StyledGridCardBlank = StyledGridCard.extend`
-  background: transparent;
+  background: ${props => (props.blueBg ? v.colors.testLightBlueBg : 'transparent')};
   cursor: auto;
   position: relative;
   button {
@@ -289,8 +289,10 @@ class GridCardBlank extends React.Component {
 
   createCard = (nested = {}, options = {}) => {
     const { replacingId } = this
+    let { order } = this.props
     const { afterCreate, parent, apiStore, uiStore } = this.props
-    const { order, width, height } = uiStore.blankContentToolState
+    if (order === null) ({ order } = uiStore.blankContentToolState)
+    const { width, height } = uiStore.blankContentToolState
     const isReplacing = !!replacingId
     const attrs = {
       order,
@@ -532,11 +534,11 @@ class GridCardBlank extends React.Component {
   }
 
   render() {
-    const { uiStore } = this.props
+    const { testCollectionCard, uiStore } = this.props
     const { gridSettings, blankContentToolState } = uiStore
     const { creating } = this.state
     return (
-      <StyledGridCardBlank>
+      <StyledGridCardBlank blueBg={testCollectionCard}>
         <StyledGridCardInner
           height={blankContentToolState.height}
           gridW={gridSettings.gridW}
@@ -560,6 +562,8 @@ GridCardBlank.propTypes = {
   afterCreate: PropTypes.func,
   preselected: PropTypes.string,
   replacingId: PropTypes.number,
+  order: PropTypes.number,
+  testCollectionCard: PropTypes.bool,
 }
 GridCardBlank.wrappedComponent.propTypes = {
   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
@@ -569,6 +573,8 @@ GridCardBlank.defaultProps = {
   afterCreate: null,
   preselected: null,
   replacingId: null,
+  order: null,
+  testCollectionCard: false,
 }
 
 // give a name to the injected component for unit tests

@@ -124,6 +124,7 @@ class ActionMenu extends React.Component {
       canReplace,
       submissionBox,
       location,
+      testCollectionCard,
       uiStore,
     } = this.props
 
@@ -196,6 +197,12 @@ class ActionMenu extends React.Component {
     if (canReplace) {
       items.push(_.find(actions, { name: 'Replace' }))
     }
+
+    // last special case for test collection card
+    if (testCollectionCard) {
+      return _.filter(actions, { name: 'Replace' })
+    }
+
     return items
   }
 
@@ -226,6 +233,7 @@ ActionMenu.propTypes = {
   onLeave: PropTypes.func.isRequired,
   onMoveMenu: PropTypes.func,
   afterArchive: PropTypes.func,
+  testCollectionCard: PropTypes.bool,
 }
 ActionMenu.wrappedComponent.propTypes = {
   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
@@ -238,6 +246,7 @@ ActionMenu.defaultProps = {
   afterArchive: null,
   canReplace: false,
   submissionBox: false,
+  testCollectionCard: false,
 }
 
 export default ActionMenu
