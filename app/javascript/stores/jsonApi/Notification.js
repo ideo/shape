@@ -1,4 +1,4 @@
-import { ReferenceType} from 'datx'
+import { ReferenceType } from 'datx'
 import BaseRecord from './BaseRecord'
 import User from './User'
 

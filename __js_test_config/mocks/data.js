@@ -269,6 +269,7 @@ export const fakeActivity = {
   target: fakeCollection,
   target_type: 'Collection',
   target_id: fakeCollection.id,
+  setTarget: jest.fn(),
   ...fakeJsonApiAttrs,
 }
 export const fakeNotification = {
