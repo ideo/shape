@@ -131,9 +131,9 @@ class Notification extends React.Component {
           classes={{ tooltip: 'Tooltip' }}
           title="Dismiss"
           placement="bottom"
-          disableTriggerHover={notification.read}
-          disableTriggerFocus={notification.read}
-          disableTriggerTouch={notification.read}
+          disableHoverListener={notification.read}
+          disableFocusListener={notification.read}
+          disableTouchListener={notification.read}
         >
           { this.isDefaultStyle
             ? (<NotificationButton
