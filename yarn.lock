@@ -1201,12 +1201,6 @@ babel-plugin-react-svg@^2.1.0:
   version "2.1.0"
   resolved "https://registry.yarnpkg.com/babel-plugin-react-svg/-/babel-plugin-react-svg-2.1.0.tgz#169eeba1a20fa2dee3a71ff38eedd63d08e69487"
 
-babel-plugin-root-import@^5.1.0, babel-plugin-root-import@~5.1.0:
-  version "5.1.0"
-  resolved "https://registry.yarnpkg.com/babel-plugin-root-import/-/babel-plugin-root-import-5.1.0.tgz#80ea1cd5945b463a5e3f7e204a69478c573e328c"
-  dependencies:
-    slash "^1.0.0"
-
 babel-plugin-styled-components@^1.5.0:
   version "1.5.0"
   resolved "https://registry.yarnpkg.com/babel-plugin-styled-components/-/babel-plugin-styled-components-1.5.0.tgz#4549f28a19fb05170aa9ee429b4de0eac2d2401d"
@@ -3758,22 +3752,6 @@ eslint-import-resolver-babel-module@^4.0.0:
   dependencies:
     pkg-up "^2.0.0"
     resolve "^1.4.0"
-
-eslint-import-resolver-babel-plugin-root-import@bingqichen/eslint-import-resolver-babel-plugin-root-import:
-  version "0.0.11"
-  resolved "https://codeload.github.com/bingqichen/eslint-import-resolver-babel-plugin-root-import/tar.gz/8ec192984cb15ca598232f5260c4df02acd6d3e8"
-  dependencies:
-    babel-plugin-root-import "^5.1.0"
-    eslint-import-resolver-node "^0.2.1"
-    json5 "^0.5.0"
-
-eslint-import-resolver-node@^0.2.1:
-  version "0.2.3"
-  resolved "https://registry.yarnpkg.com/eslint-import-resolver-node/-/eslint-import-resolver-node-0.2.3.tgz#5add8106e8c928db2cba232bcd9efa846e3da16c"
-  dependencies:
-    debug "^2.2.0"
-    object-assign "^4.0.1"
-    resolve "^1.1.6"
 
 eslint-import-resolver-node@^0.3.1:
   version "0.3.2"
