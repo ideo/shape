@@ -255,6 +255,9 @@ class User < ApplicationRecord
   end
 
   def current_org_groups_and_special_groups
+    if has_cached_role?(Role::SUPER_ADMIN)
+      return current_organization.groups
+    end
     groups = current_org_groups.to_a
     return [] if groups.blank?
     organization = current_organization
@@ -284,6 +287,7 @@ class User < ApplicationRecord
     user_profiles.where(organization_id: organization_id).first
   end
 
+  # -- override has_many relation for SUPER_ADMIN purposes --
   def organizations
     return super unless has_cached_role?(Role::SUPER_ADMIN)
     Organization.all

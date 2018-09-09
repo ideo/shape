@@ -19,6 +19,7 @@ import PageWithApi from '~/ui/pages/PageWithApi'
 import PlusIcon from '~/ui/icons/PlusIcon'
 import SubmissionBoxSettingsModal from '~/ui/submission_box/SubmissionBoxSettingsModal'
 import EditorPill from '~/ui/items/EditorPill'
+import v from '~/utils/variables'
 
 const isHomepage = ({ params }) => (params.org && !params.id)
 
@@ -228,6 +229,10 @@ class CollectionPage extends PageWithApi {
     )
   }
 
+  loader = () => (
+    <div style={{ marginTop: v.headerHeight }}><Loader /></div>
+  )
+
   render() {
     // this.error comes from PageWithApi
     if (this.error) return <PageError error={this.error} />
@@ -237,7 +242,7 @@ class CollectionPage extends PageWithApi {
     // So we check if the full Collection has loaded via the `can_edit` attr
     // Also, checking meta.snapshot seems to load more consistently than just collection.can_edit
     if (!collection || collection.meta.snapshot.can_edit === undefined) {
-      return <Loader />
+      return this.loader()
     }
 
     const { uiStore } = this.props
@@ -327,7 +332,7 @@ class CollectionPage extends PageWithApi {
           </PageContainer>
         }
         { isLoading &&
-          <Loader />
+          this.loader()
         }
       </Fragment>
     )
