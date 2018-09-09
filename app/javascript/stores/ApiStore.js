@@ -28,7 +28,7 @@ class ApiStore extends jsonapi(datxCollection) {
   @observable usableTemplates = []
 
   fetch(type, id, skipCache) {
-    return super.fetch(type, id, {skipCache})
+    return super.fetch(type, id, { skipCache })
   }
 
   request(path, method, data, options = {}) {
@@ -267,12 +267,17 @@ class ApiStore extends jsonapi(datxCollection) {
     })
   }
 
+  // NOTE: had to override datx PureCollection, it looks like it is meant to do
+  // what's listed below but it was trying to do `this.find(obj, id)` with no id
   remove(obj, id) {
-    console.log('REMOVING', typeof obj, obj.id, obj.meta.snapshot)
-    this.__removeModel(obj)
+    if (typeof obj === 'object') {
+      this.__removeModel(obj)
+    } else {
+      super.remove(obj, id)
+    }
   }
 
-  // -- override mobx-jsonapi-store --
+  // -- override datx-jsonapi to deal with empty arrays --
   __updateRelationships(obj) {
     const record = this.find(obj.type, obj.id)
     const refs = obj.relationships ? Object.keys(obj.relationships) : []
