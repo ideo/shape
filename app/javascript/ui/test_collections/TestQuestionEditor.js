@@ -150,7 +150,7 @@ class TestQuestionEditor extends React.Component {
         </QuestionCardWrapper>
       )
     case 'description':
-      return <DescriptionQuestion />
+      return <DescriptionQuestion item={item} />
     case 'open':
       return (
         <OpenQuestion questionText={item.content} />
