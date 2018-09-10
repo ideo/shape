@@ -561,7 +561,7 @@ GridCardBlank.propTypes = {
   height: PropTypes.number.isRequired,
   afterCreate: PropTypes.func,
   preselected: PropTypes.string,
-  replacingId: PropTypes.number,
+  replacingId: PropTypes.string,
   order: PropTypes.number,
   testCollectionCard: PropTypes.bool,
 }
