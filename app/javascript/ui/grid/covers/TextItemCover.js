@@ -147,7 +147,7 @@ class TextItemCover extends React.Component {
 
   renderDefault() {
     const { item } = this.props
-    const textData = item.toJS().text_data
+    const textData = item.toJSON().text_data
     const quillProps = {
       // ref is used to get the height of the div in checkTextAreaHeight
       ref: c => { this.quillEditor = c },

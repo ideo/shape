@@ -1,4 +1,3 @@
-import { useStrict } from 'mobx'
 import RolesAdd from '~/ui/roles/RolesAdd'
 
 let props
@@ -6,7 +5,6 @@ let wrapper
 
 describe('RolesAdd', () => {
   beforeEach(() => {
-    useStrict(false)
     props = {
       searchableItems: [],
       roleTypes: ['viewer', 'editor'],

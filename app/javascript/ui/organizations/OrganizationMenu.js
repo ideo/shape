@@ -99,9 +99,8 @@ class OrganizationMenu extends React.Component {
     this.goToEditGroupRoles(newGroup)
     // because this is after async/await
     runInAction(() => { this.isLoading = true })
-    const res = await apiStore.fetchRoles(newGroup)
+    await apiStore.fetchRoles(newGroup)
     runInAction(() => { this.isLoading = false })
-    apiStore.sync(res)
   }
 
   onGroupRoles = group => () => {
@@ -111,7 +110,6 @@ class OrganizationMenu extends React.Component {
   onRolesSave = (res, { roleName = '' } = {}) => {
     const { apiStore, organization } = this.props
     const { editGroup } = this
-    apiStore.sync(res)
     if (roleName === 'admin' && editGroup.isOrgGroup) {
       if (editGroup.is_primary) {
         // reload the admin group
@@ -174,6 +172,9 @@ class OrganizationMenu extends React.Component {
       fixedRole = 'member'
     } else if (this.editGroup.is_admin) {
       fixedRole = 'admin'
+    }
+    if (!this.editGroup.id) {
+      return null
     }
     return (
       <RolesMenu

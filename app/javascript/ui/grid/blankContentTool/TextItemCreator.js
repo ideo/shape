@@ -27,7 +27,7 @@ class TextItemCreator extends React.Component {
     super(props)
     // see: https://github.com/quilljs/quill/issues/1134#issuecomment-265065953
     this.onTextChange = _.debounce(this._onTextChange, 1000)
-    this.item = new Item()
+    this.item = new Item({ text_data: {} })
     this.item.can_edit_content = true
   }
 
@@ -79,7 +79,7 @@ class TextItemCreator extends React.Component {
     }
 
     const { item } = this
-    const textData = item.text_data ? item.toJS().text_data : null
+    const textData = item.text_data ? item.toJSON().text_data : null
 
     return (
       <StyledTextItemCreator height={this.props.height}>

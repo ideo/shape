@@ -311,7 +311,7 @@ class TextItem extends React.Component {
 
   get textData() {
     const { item } = this.props
-    return item.toJS().text_data
+    return item.toJSON().text_data
   }
 
   onKeyUp = (content, delta, source, editor) => {
@@ -394,7 +394,7 @@ class TextItem extends React.Component {
 TextItem.propTypes = {
   item: MobxPropTypes.objectOrObservableObject.isRequired,
   actionCableConsumer: MobxPropTypes.objectOrObservableObject.isRequired,
-  currentUserId: PropTypes.number.isRequired,
+  currentUserId: PropTypes.string.isRequired,
   onUpdatedData: PropTypes.func.isRequired,
   onSave: PropTypes.func.isRequired,
   onCancel: PropTypes.func,

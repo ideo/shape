@@ -28,7 +28,12 @@ guard :rspec, cmd: 'spring rspec' do
   require 'guard/rspec/dsl'
   dsl = Guard::RSpec::Dsl.new(self)
 
-  # Feel free to open issues for suggestions and improvements
+  # only watch appropriate app directories
+  directories(%w[app lib config test spec])
+    .select { |d| Dir.exist?(d) ? d : UI.warning("Directory #{d} does not exist") }
+
+  # specifically ignore node_modules (avoid warnings w/ Listen)
+  ignore(/node_modules/)
 
   # RSpec files
   rspec = dsl.rspec

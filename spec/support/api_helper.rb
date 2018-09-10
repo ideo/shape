@@ -12,7 +12,7 @@ module ApiHelper
   end
 
   def json_object_ids
-    json['data'].map { |obj| obj['attributes']['id'].to_i }
+    json['data'].map { |obj| obj['id'].to_i }
   end
 
   def json_api_params(resource_name, attrs, merge_data = {})

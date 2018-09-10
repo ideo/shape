@@ -77,10 +77,10 @@ class CollectionPage extends PageWithApi {
   receivedChannelData = async (data) => {
     const { apiStore } = this.props
     const { collection } = this
-    const currentId = collection.id.toString()
+    const currentId = collection.id
     const submissions = collection.submissions_collection
-    const submissionsId = submissions ? submissions.id.toString() : ''
-    if (_.compact([currentId, submissionsId]).indexOf(data.record_id.toString()) > -1) {
+    const submissionsId = submissions ? submissions.id : ''
+    if (_.compact([currentId, submissionsId]).indexOf(data.record_id) > -1) {
       this.setEditor(data.current_editor)
       if (_.isEmpty(data.current_editor) || data.current_editor.id === apiStore.currentUserId) {
         // don't reload your own updates
@@ -119,7 +119,6 @@ class CollectionPage extends PageWithApi {
 
   get collection() {
     const { match, apiStore } = this.props
-    if (!apiStore.collections.length) return null
     if (this.isHomepage) {
       return apiStore.find('collections', apiStore.currentUser.current_user_collection_id)
     }
@@ -238,9 +237,11 @@ class CollectionPage extends PageWithApi {
     // this.error comes from PageWithApi
     if (this.error) return <PageError error={this.error} />
     const { collection } = this
-    // for some reason collection can come through as an object, but not some fields like can_edit,
-    // which indicates it hasn't finished loading everything
-    if (!collection || collection.can_edit === undefined) {
+    // NOTE: if we have first loaded the slimmer SerializableSimpleCollection via the CommentThread
+    // then some fields like `can_edit` will be undefined.
+    // So we check if the full Collection has loaded via the `can_edit` attr
+    // Also, checking meta.snapshot seems to load more consistently than just collection.can_edit
+    if (!collection || collection.meta.snapshot.can_edit === undefined) {
       return this.loader()
     }
 

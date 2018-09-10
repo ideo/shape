@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types'
 import { action } from 'mobx'
+import { updateModelId } from 'datx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import _ from 'lodash'
 import styled from 'styled-components'
@@ -262,12 +263,12 @@ class CollectionGrid extends React.Component {
       height,
       // better way to do this??
       order: original.order,
-      id: placeholderKey,
       originalId: original.id,
       cardType: 'placeholder',
       record: original.record,
     }
     const placeholder = new CollectionCard(data)
+    updateModelId(placeholder, placeholderKey)
     const newItems = _.concat(this.state.cards, placeholder)
     this.positionCards(newItems, { dragging: original.id })
   }
@@ -542,7 +543,7 @@ class CollectionGrid extends React.Component {
         if (card.record) {
           ({ record } = card)
           // getRecordType gets either 'items' or 'collections'
-          cardType = card.record.getRecordType()
+          cardType = card.record.internalType
         }
       }
       const { openCardMenuId } = uiStore

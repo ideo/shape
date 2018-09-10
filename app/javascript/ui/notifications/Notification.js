@@ -73,14 +73,14 @@ class Notification extends React.Component {
     const target = apiStore.find(targetType, activity.target_id)
     if (!target) {
       apiStore.fetch(targetType, activity.target_id).then(res => {
-        activity.assignRef('target', res.data)
+        activity.setTarget(res.data)
       }).catch((err) => {
         // Create a fake target in this strange usecase to remove loading
-        activity.assignRef('target', { name: 'Unknown', internalType: targetType })
+        activity.setTarget({ name: 'Unknown', internalType: targetType })
         trackError(err, { name: 'Notification:Mount' })
       })
     } else {
-      activity.assignRef('target', target)
+      activity.setTarget(target)
     }
   }
 
@@ -131,9 +131,9 @@ class Notification extends React.Component {
           classes={{ tooltip: 'Tooltip' }}
           title="Dismiss"
           placement="bottom"
-          disableTriggerHover={notification.read}
-          disableTriggerFocus={notification.read}
-          disableTriggerTouch={notification.read}
+          disableHoverListener={notification.read}
+          disableFocusListener={notification.read}
+          disableTouchListener={notification.read}
         >
           { this.isDefaultStyle
             ? (<NotificationButton

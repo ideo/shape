@@ -37,9 +37,10 @@ module.exports = {
   },
   settings: {
     "import/resolver": {
-      "babel-plugin-root-import": {},
+      "babel-module": {},
       "node": {}
     },
+    "module-resolver": {},
     "import/core-modules": ["styled-jsx/css"]
   },
   rules: {

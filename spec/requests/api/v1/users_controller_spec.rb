@@ -55,7 +55,7 @@ describe Api::V1::UsersController, type: :request, json: true, auth: true do
 
     it 'matches User ID' do
       get(path)
-      expect(json['data']['attributes']['id'].to_i).to eq(user.id)
+      expect(json['data']['id'].to_i).to eq(user.id)
       expect(assigns(:current_user)).to eq(user)
     end
 

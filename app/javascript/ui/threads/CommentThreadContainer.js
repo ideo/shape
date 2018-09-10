@@ -46,7 +46,7 @@ class CommentThreadContainer extends React.Component {
         this.disposers.expandedComments = expandedThread.comments.observe((commentChange) => {
           const lastComment = _.last(expandedThread.comments)
           // if last comment is unpersisted it means I just added it; scroll me down
-          if (this.bottomOfExpandedThread || (lastComment && !lastComment.__persisted)) {
+          if (this.bottomOfExpandedThread || (lastComment && !lastComment.persisted)) {
             this.scrollToTopOfNextThread(expandedThread, { duration: 0 })
           }
         })
@@ -106,7 +106,7 @@ class CommentThreadContainer extends React.Component {
     const thread = this.threads.filter(t => t.key === expandedThreadKey)[0]
     if (!thread) return
     // don't try to load comments of our newly constructed threads
-    if (thread.__persisted && thread.id && expandedThreadKey !== prevKey) {
+    if (thread.persisted && thread.id && expandedThreadKey !== prevKey) {
       runInAction(() => {
         this.loadingThreads = true
       })

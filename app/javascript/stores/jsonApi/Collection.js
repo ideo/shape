@@ -1,10 +1,14 @@
 import _ from 'lodash'
-import { computed, action } from 'mobx'
+import { computed, action, observable } from 'mobx'
+import { initModelRef, ReferenceType} from 'datx'
 
 import { apiStore, routingStore, uiStore } from '~/stores'
 import BaseRecord from './BaseRecord'
+import CollectionCard from './CollectionCard'
 
 class Collection extends BaseRecord {
+  static type = 'collections'
+
   attributesForAPI = ['name', 'tag_list', 'submission_template_id', 'submission_box_type']
 
   @computed get cardIds() {
@@ -152,7 +156,7 @@ class Collection extends BaseRecord {
   checkCurrentOrg() {
     const { currentUser } = this.apiStore
     if (!currentUser) return
-    if (this.organization_id !== currentUser.current_organization.id) {
+    if (this.organization_id.toString() !== currentUser.current_organization.id) {
       currentUser.switchOrganization(this.organization_id)
     }
   }
@@ -178,12 +182,13 @@ class Collection extends BaseRecord {
     }
   }
 }
-Collection.type = 'collections'
 
-Collection.defaults = {
-  // set as array so it's never `undefined`
-  collection_cards: [],
-  roles: [],
+Collection.refDefaults = {
+  collection_cards: {
+    model: CollectionCard,
+    type: ReferenceType.TO_MANY,
+    defaultValue: [],
+  }
 }
 
 export default Collection

@@ -19,7 +19,7 @@ describe('Collection', () => {
     collection = new Collection({
       name: 'fakeCollection',
       roles: [fakeRole],
-      organization_id: 4,
+      organization_id: "4",
     }, fakeApiStore())
   })
 
@@ -57,17 +57,26 @@ describe('Collection', () => {
 
   describe('checkCurrentOrg', () => {
     let user
-
-    beforeEach(() => {
-      user = fakeUser
-      user.current_organization = { id: 3 }
-      collection.__collection = { currentUser: user }
-      collection.checkCurrentOrg()
-    })
-
     describe('when the org id is different from the current users org', () => {
       it('should call switchOrganization on the collection', () => {
+        user = fakeUser
+        user.current_organization = { id: "3" }
+        collection.meta.collection.currentUser = user
+        collection.checkCurrentOrg()
         expect(user.switchOrganization).toHaveBeenCalledWith(
+          collection.organization_id,
+        )
+      })
+    })
+
+    describe('when the org id is the same as the current users org', () => {
+      it('should call switchOrganization on the collection', () => {
+        user.switchOrganization.mockClear()
+        user = fakeUser
+        user.current_organization = { id: "4" }
+        collection.meta.collection.currentUser = user
+        collection.checkCurrentOrg()
+        expect(user.switchOrganization).not.toHaveBeenCalledWith(
           collection.organization_id,
         )
       })

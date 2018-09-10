@@ -11,10 +11,6 @@ describe Api::V1::NotificationsController, type: :request, json: true, auth: tru
     let!(:outside_notification) { create(:notification, activity: activity) }
     let(:path) { '/api/v1/notifications/' }
 
-    before do
-
-    end
-
     it 'returns a 200' do
       get(path)
       expect(response.status).to eq(200)
