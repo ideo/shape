@@ -4,6 +4,7 @@ import { Box } from 'reflexbox'
 
 import GridCard from '~/ui/grid/GridCard'
 import GridCardBlank from '~/ui/grid/blankContentTool/GridCardBlank'
+import DescriptionQuestion from '~/ui/test_collections/DescriptionQuestion'
 import ScaleQuestion from '~/ui/test_collections/ScaleQuestion'
 import OpenQuestion from '~/ui/test_collections/OpenQuestion'
 import { Select } from '~/ui/global/styled/forms'
@@ -149,7 +150,7 @@ class TestQuestionEditor extends React.Component {
         </QuestionCardWrapper>
       )
     case 'description':
-      return (<textarea />)
+      return <DescriptionQuestion />
     case 'open':
       return (
         <OpenQuestion questionText={item.content} />
