@@ -2,6 +2,7 @@ import { uiStore } from '~/stores'
 import BaseRecord from './BaseRecord'
 
 class Group extends BaseRecord {
+  static type = 'groups'
   attributesForAPI = ['name', 'handle', 'filestack_file_attributes']
 
   // NOTE: Because we're never directly hitting the groups/{id} API endpoint,
@@ -48,13 +49,6 @@ class Group extends BaseRecord {
     })
     return onAgree
   }
-}
-
-Group.type = 'groups'
-
-Group.defaults = {
-  // set as array so it's never `undefined`
-  roles: [],
 }
 
 export default Group

@@ -1,4 +1,4 @@
-import { observable, useStrict } from 'mobx'
+import { observable, } from 'mobx'
 import RolesMenu from '~/ui/roles/RolesMenu'
 
 import {
@@ -31,7 +31,6 @@ describe('RolesMenu', () => {
   let component
 
   beforeEach(() => {
-    useStrict(false)
     const routingStore = {
       pathTo: jest.fn(),
       routeTo: jest.fn(),

@@ -43,7 +43,7 @@ module RealtimeEditorsViewers
     data = {
       current_editor: currently_editing_user_as_json,
       num_viewers: num_viewers,
-      record_id: id,
+      record_id: id.to_s,
       record_type: jsonapi_type_name,
     }
     if is_a?(Item::TextItem)

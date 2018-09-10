@@ -45,9 +45,9 @@ class OrganizationPeople extends React.Component {
     const adminGroup = organization.admin_group
 
     const orgMember = (userGroups.indexOf(primaryGroup) > -1)
-    const showGuests = orgMember && !!guestGroup.groupRoles.length
+    const showGuests = orgMember && guestGroup && !!guestGroup.groupRoles.length
     // TODO: Only show AdminGroup to Admins
-    const showAdmins = orgMember && !!adminGroup.groupRoles.length
+    const showAdmins = orgMember && adminGroup && !!adminGroup.groupRoles.length
 
     return (
       <Fragment>

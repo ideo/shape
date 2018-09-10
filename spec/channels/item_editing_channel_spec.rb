@@ -15,7 +15,7 @@ RSpec.describe ItemEditingChannel, type: :channel do
         current_editor: {},
         num_viewers: 1,
         item_text_data: item.text_data,
-        record_id: item.id,
+        record_id: item.id.to_s,
         record_type: 'items',
       )
     end
@@ -29,7 +29,7 @@ RSpec.describe ItemEditingChannel, type: :channel do
         current_editor: user.as_json,
         num_viewers: 1,
         item_text_data: item.text_data,
-        record_id: item.id,
+        record_id: item.id.to_s,
         record_type: 'items',
       )
     end
@@ -46,7 +46,7 @@ RSpec.describe ItemEditingChannel, type: :channel do
           current_editor: user.as_json,
           num_viewers: 2,
           item_text_data: item.text_data,
-          record_id: item.id,
+          record_id: item.id.to_s,
           record_type: 'items',
         )
       end
@@ -61,7 +61,7 @@ RSpec.describe ItemEditingChannel, type: :channel do
         current_editor: {},
         num_viewers: 1,
         item_text_data: item.text_data,
-        record_id: item.id,
+        record_id: item.id.to_s,
         record_type: 'items',
       )
     end
@@ -75,7 +75,7 @@ RSpec.describe ItemEditingChannel, type: :channel do
         current_editor: {},
         num_viewers: 0,
         item_text_data: item.text_data,
-        record_id: item.id,
+        record_id: item.id.to_s,
         record_type: 'items',
       )
     end

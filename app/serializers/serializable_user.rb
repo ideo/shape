@@ -1,6 +1,6 @@
 class SerializableUser < BaseJsonSerializer
   type 'users'
-  attributes :id, :first_name, :last_name, :email,
+  attributes :first_name, :last_name, :email,
              :created_at, :status,
              :handle
 
@@ -19,7 +19,7 @@ class SerializableUser < BaseJsonSerializer
       nil
     else
       hash = @object.cached_user_profiles || {}
-      hash[@current_user.current_organization_id.to_s]
+      hash[@current_user.current_organization_id.to_s].to_s
     end
   end
 end

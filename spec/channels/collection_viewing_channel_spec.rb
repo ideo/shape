@@ -16,7 +16,7 @@ RSpec.describe CollectionViewingChannel, type: :channel do
       expect { perform(:edited) }.to have_broadcasted_to(stream_name).with(
         current_editor: user.as_json,
         num_viewers: 1,
-        record_id: collection.id,
+        record_id: collection.id.to_s,
         record_type: 'collections',
       )
     end
@@ -32,7 +32,7 @@ RSpec.describe CollectionViewingChannel, type: :channel do
         expect { perform(:edited) }.to have_broadcasted_to(stream_name).with(
           current_editor: user.as_json,
           num_viewers: 2,
-          record_id: collection.id,
+          record_id: collection.id.to_s,
           record_type: 'collections',
         )
       end

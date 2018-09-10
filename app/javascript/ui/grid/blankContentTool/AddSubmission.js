@@ -99,7 +99,7 @@ class AddSubmission extends React.Component {
 }
 
 AddSubmission.propTypes = {
-  parent_id: PropTypes.number.isRequired,
+  parent_id: PropTypes.string.isRequired,
   submissionSettings: PropTypes.shape({
     type: PropTypes.string,
     template: MobxPropTypes.objectOrObservableObject,

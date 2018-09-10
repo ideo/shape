@@ -84,7 +84,7 @@ Avatar.propTypes = {
   size: PropTypes.number,
   className: PropTypes.string,
   displayName: PropTypes.bool,
-  linkToCollectionId: PropTypes.number,
+  linkToCollectionId: PropTypes.string,
 }
 Avatar.defaultProps = {
   url: 'https://d3none3dlnlrde.cloudfront.net/assets/users/avatars/missing/square.jpg',

@@ -1,4 +1,3 @@
-import { useStrict } from 'mobx'
 import GroupModify from '~/ui/groups/GroupModify'
 
 describe('GroupModify', () => {
@@ -8,7 +7,6 @@ describe('GroupModify', () => {
   let component
 
   beforeEach(() => {
-    useStrict(false)
     apiStore = {
       fetch: jest.fn().mockReturnValue(Promise.resolve()),
       request: jest.fn(),

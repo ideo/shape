@@ -1,4 +1,7 @@
 export default function trackError(err, opts = {}) {
+  if (process.env.NODE_ENV === 'development') {
+    console.error(err)
+  }
   trackErrorSpecify(
     opts.source || 'Any',
     opts.message || err.message,

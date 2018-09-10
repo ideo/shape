@@ -1,7 +1,6 @@
 {
   "type": "object",
   "properties": {
-    "id": { "type": "integer" },
     "name": { "type": "string" },
     "type": { "type": "string" },
     "master_template": { "type": ["boolean"] },
@@ -24,5 +23,5 @@
     "system_required": { "type": ["boolean"] },
     "pinned_and_locked": { "type": ["boolean"] }
   },
-  "required": ["id", "name", "type", "created_at", "cover"]
+  "required": ["name", "type", "created_at", "cover"]
 }
