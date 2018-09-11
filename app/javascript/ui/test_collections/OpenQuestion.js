@@ -63,6 +63,10 @@ class OpenQuestion extends React.Component {
 }
 
 OpenQuestion.propTypes = {
-  questionText: PropTypes.string.isRequired,
+  questionText: PropTypes.string,
 }
+OpenQuestion.defaultProps = {
+  questionText: '',
+}
+
 export default OpenQuestion
