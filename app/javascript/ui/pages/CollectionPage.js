@@ -6,7 +6,6 @@ import { action, observable } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 
 import ChannelManager from '~/utils/ChannelManager'
-import Collection from '~/stores/jsonApi/Collection'
 import CollectionGrid from '~/ui/grid/CollectionGrid'
 import FloatingActionButton from '~/ui/global/FloatingActionButton'
 import Loader from '~/ui/layout/Loader'
@@ -21,6 +20,7 @@ import SubmissionBoxSettingsModal from '~/ui/submission_box/SubmissionBoxSetting
 import EditorPill from '~/ui/items/EditorPill'
 import TestDesigner from '~/ui/test_collections/TestDesigner'
 import v from '~/utils/variables'
+import Collection from '~/stores/jsonApi/Collection'
 
 const isHomepage = ({ params }) => (params.org && !params.id)
 
@@ -277,7 +277,10 @@ class CollectionPage extends PageWithApi {
 
   renderTestDesigner() {
     return (
-      <TestDesigner collection={this.collection} />
+      <TestDesigner
+        collection={this.collection}
+        editing
+      />
     )
   }
 

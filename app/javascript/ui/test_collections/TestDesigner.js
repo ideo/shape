@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 
@@ -23,13 +24,16 @@ const BottomThing = TopThing.extend`
 @observer
 class TestDesigner extends React.Component {
   render() {
-    const { collection } = this.props
+    const { collection, editing } = this.props
     const cardCount = collection.collection_cards.length
     const inner = (
       collection.collection_cards.map((card, i) => {
         let position
         if (i === 0) position = 'beginning'
         if (i === cardCount - 1) position = 'end'
+        if (!editing) {
+          card.record.menuDisabled = true
+        }
         return (
           <TestQuestionEditor
             key={card.id}
@@ -38,6 +42,7 @@ class TestDesigner extends React.Component {
             item={card.record}
             position={position}
             order={card.order}
+            editing={editing}
           />
         )
       })
@@ -45,9 +50,9 @@ class TestDesigner extends React.Component {
 
     return (
       <div>
-        <TopThing />
-        { inner }
-        <BottomThing />
+        {editing && <TopThing />}
+        {inner}
+        {editing && <BottomThing />}
       </div>
     )
   }
@@ -55,6 +60,7 @@ class TestDesigner extends React.Component {
 
 TestDesigner.propTypes = {
   collection: MobxPropTypes.objectOrObservableObject.isRequired,
+  editing: PropTypes.bool.isRequired,
 }
 
 export default TestDesigner

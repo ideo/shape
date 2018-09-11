@@ -68,13 +68,13 @@ class ScaleQuestion extends React.Component {
       <div>
         <Question>
           <DisplayText>
-            { questionText }
+            {questionText}
           </DisplayText>
         </Question>
         <Scale>
           <SmallHelperText>select your response below</SmallHelperText>
           <EmojiHolder>
-            { emojis.map(emoji => (
+            {emojis.map(emoji => (
               <button key={emoji.name} onClick={this.vote(emoji.name)}>
                 <Emoji
                   name={emoji.name}

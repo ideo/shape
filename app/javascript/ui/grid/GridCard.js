@@ -147,9 +147,9 @@ class GridCard extends React.Component {
 
       if (card.isPinned) {
         icon = (<Fragment>
-          { !card.isPinnedAndLocked && this.renderPin() }
+          {!card.isPinnedAndLocked && this.renderPin()}
           {icon}
-          { card.isPinnedAndLocked && this.renderPin() }
+          {card.isPinnedAndLocked && this.renderPin()}
         </Fragment>)
         iconAmount = 2
       }
@@ -254,13 +254,13 @@ class GridCard extends React.Component {
           uiStore.textEditingItem !== record
         ) &&
           <StyledTopRightActions color={this.actionsColor}>
-            { record.isDownloadable && (
+            {record.isDownloadable && (
               <Download record={record} />
             )}
-            { record.isImage && this.canEditCard && (
+            {record.isImage && this.canEditCard && (
               <ContainImage card={card} />
             )}
-            { !testCollectionCard &&
+            {!testCollectionCard &&
               <SelectionCircle cardId={card.id} />
             }
             <ActionMenu

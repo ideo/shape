@@ -11,7 +11,7 @@ class SerializableCollectionCard < BaseJsonSerializer
     @object.is_a? CollectionCard::Link
   end
   attribute :can_move do
-    @current_ability.can?(:edit_content, @object.try(:parent))
+    @current_ability ? @current_ability.can?(:edit_content, @object.try(:parent)) : false
   end
 
   belongs_to :item

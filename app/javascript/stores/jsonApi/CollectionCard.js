@@ -181,7 +181,7 @@ class CollectionCard extends BaseRecord {
     const collection = this.parent
     try {
       await this.apiStore.request(`collection_cards/archive`, 'PATCH', {
-        card_ids: selectedCardIds
+        card_ids: selectedCardIds,
       })
       // collection may be undefined e.g. if we're archiving from the header actionmenu
       if (collection) {

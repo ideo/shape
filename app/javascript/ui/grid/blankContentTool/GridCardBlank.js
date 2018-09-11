@@ -4,7 +4,6 @@ import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 import { Flex } from 'reflexbox'
 
-import CollectionCard from '~/stores/jsonApi/CollectionCard'
 import AddTextIcon from '~/ui/icons/AddTextIcon'
 import AddCollectionIcon from '~/ui/icons/AddCollectionIcon'
 import AddFileIcon from '~/ui/icons/AddFileIcon'
@@ -20,6 +19,7 @@ import InlineLoader from '~/ui/layout/InlineLoader'
 import { CloseButton } from '~/ui/global/styled/buttons'
 import bctIcons from '~/assets/bct_icons.png'
 import PopoutMenu from '~/ui/global/PopoutMenu'
+import CollectionCard from '~/stores/jsonApi/CollectionCard'
 
 import CollectionCreator from './CollectionCreator'
 import TextItemCreator from './TextItemCreator'
@@ -283,7 +283,7 @@ class GridCardBlank extends React.Component {
     filestackMethod({
       onSuccess: (files) => (
         !replacingId ? files.forEach(file => this.createCardWith(file))
-          : this.createCardWith(files))
+          : this.createCardWith(files)),
     })
   }
 
@@ -522,7 +522,7 @@ class GridCardBlank extends React.Component {
               onClick={this.toggleBctMenu}
               direction="right"
               menuItems={[
-                { name: 'Create Template', iconRight: <TemplateIcon size="small" />, onClick: this.startCreating('template') }
+                { name: 'Create Template', iconRight: <TemplateIcon size="small" />, onClick: this.startCreating('template') },
               ]}
             />
           </Flex>
@@ -546,8 +546,8 @@ class GridCardBlank extends React.Component {
         >
           {this.renderInner()}
         </StyledGridCardInner>
-        { this.state.loading && <InlineLoader /> }
-        { !this.emptyState && creating !== 'text' &&
+        {this.state.loading && <InlineLoader />}
+        {!this.emptyState && creating !== 'text' &&
           <CloseButton onClick={this.closeBlankContentTool} />
         }
       </StyledGridCardBlank>

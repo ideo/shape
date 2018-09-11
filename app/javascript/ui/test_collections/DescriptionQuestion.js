@@ -67,10 +67,10 @@ class DescriptionQuestion extends React.Component {
           <TextInput
             onChange={this.handleChange}
             placeholder="Write Idea Description Here…"
-            value={item.content}
+            value={item.content || ''}
             onBlur={this.save}
           />
-          <StyledSmallText>{ this.state.countLeft }</StyledSmallText>
+          <StyledSmallText>{this.state.countLeft}</StyledSmallText>
         </TextInputHolder>
       </div>
     )

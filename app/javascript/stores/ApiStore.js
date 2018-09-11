@@ -27,7 +27,7 @@ class ApiStore extends jsonapi(datxCollection) {
   @observable recentNotifications = new Map()
   @observable usableTemplates = []
 
-  fetch(type, id, skipCache) {
+  fetch(type, id, skipCache = false) {
     return super.fetch(type, id, { skipCache })
   }
 
@@ -218,7 +218,7 @@ class ApiStore extends jsonapi(datxCollection) {
           thread = new CommentThread({
             record_id: record.id,
             record_type: record.className,
-            updated_at: new Date()
+            updated_at: new Date(),
           }, this)
           thread.addReference('record', record, {
             model: record.className === 'Collection' ? Collection : Item,

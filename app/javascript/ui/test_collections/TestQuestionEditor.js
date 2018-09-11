@@ -1,8 +1,8 @@
+import PropTypes from 'prop-types'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 import { Box } from 'reflexbox'
 
-import CollectionCard from '~/stores/jsonApi/CollectionCard'
 import GridCard from '~/ui/grid/GridCard'
 import GridCardBlank from '~/ui/grid/blankContentTool/GridCardBlank'
 import DescriptionQuestion from '~/ui/test_collections/DescriptionQuestion'
@@ -12,6 +12,8 @@ import { Select, SelectOption } from '~/ui/global/styled/forms'
 import { NumberListText } from '~/ui/global/styled/typography'
 import v, { ITEM_TYPES } from '~/utils/variables'
 import { apiStore, uiStore } from '~/stores'
+// NOTE: Always import these models after everything else, can lead to odd dependency!
+import CollectionCard from '~/stores/jsonApi/CollectionCard'
 
 const selectOptions = [
   { value: 'context', label: 'Context Setting' },
@@ -113,13 +115,14 @@ class TestQuestionEditor extends React.Component {
   }
 
   renderQuestion() {
-    const { parent, card, item } = this.props
+    const { parent, card, item, editing } = this.props
     let inner
     switch (card.card_question_type) {
     case 'context':
       return (
         <ScaleQuestion
           questionText="How satisfied are you with your current solution?"
+          editing={editing}
         />
       )
     case 'useful':
@@ -127,6 +130,7 @@ class TestQuestionEditor extends React.Component {
         <ScaleQuestion
           questionText="How useful is this idea for you?"
           emojiSeries="thumbs"
+          editing={editing}
         />
       )
     case 'media':
@@ -161,10 +165,21 @@ class TestQuestionEditor extends React.Component {
         </QuestionCardWrapper>
       )
     case 'description':
-      return <DescriptionQuestion item={item} />
+      if (editing) {
+        return (
+          <DescriptionQuestion
+            item={item}
+          />
+        )
+      }
+      return item.content
+
     case 'open':
       return (
-        <OpenQuestion questionText={item.content} />
+        <OpenQuestion
+          questionText={item.content}
+          editing={editing}
+        />
       )
     default:
       return ''
@@ -172,11 +187,14 @@ class TestQuestionEditor extends React.Component {
   }
 
   render() {
+    const { editing } = this.props
     return (
       <QuestionHolder>
-        <QuestionFormHolder>
-          {this.renderQuestionSelectForm()}
-        </QuestionFormHolder>
+        {editing &&
+          <QuestionFormHolder>
+            {this.renderQuestionSelectForm()}
+          </QuestionFormHolder>
+        }
         <QuestionFormHolder>
           <QuestionPreviewHolder>
             {this.renderQuestion()}
@@ -192,5 +210,6 @@ TestQuestionEditor.propTypes = {
   parent: MobxPropTypes.objectOrObservableObject.isRequired,
   card: MobxPropTypes.objectOrObservableObject.isRequired,
   item: MobxPropTypes.objectOrObservableObject.isRequired,
+  editing: PropTypes.bool.isRequired,
 }
 export default TestQuestionEditor

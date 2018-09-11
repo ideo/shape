@@ -16,6 +16,9 @@ module Firestoreable
     'Item::VideoItem': SerializableSimpleItem,
     'Item::TextItem': SerializableSimpleItem,
     'Item::FileItem': SerializableSimpleItem,
+    'Item::QuestionItem': SerializableSimpleItem,
+    'CollectionCard::Primary': SerializableCollectionCard,
+    'CollectionCard::Link': SerializableCollectionCard,
   }.freeze
 
   included do

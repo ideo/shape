@@ -1,18 +1,24 @@
 /* eslint global-require: 0 */
 import ReactDOM from 'react-dom'
-import TestSurvey from '~/ui/test_collections/TestSurvey'
+import TestSurveyPage from '~/ui/pages/TestSurveyPage'
+import { Provider } from 'mobx-react'
+import stores from '~/stores'
 
 if (module.hot) {
-  module.hot.accept('../ui/test_collections/TestSurvey', () => {
-    const HotApp = require('../ui/test_collections/TestSurvey').default
+  module.hot.accept('../ui/pages/TestSurveyPage', () => {
+    const HotApp = require('../ui/pages/TestSurveyPage').default
     ReactDOM.render(
-      <HotApp />,
+      <Provider {...stores}>
+        <HotApp />
+      </Provider>,
       document.getElementById('react-root')
     )
   })
 }
 
 ReactDOM.render(
-  <TestSurvey />,
+  <Provider {...stores}>
+    <TestSurveyPage />
+  </Provider>,
   document.getElementById('react-root')
 )

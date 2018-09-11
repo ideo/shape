@@ -8,5 +8,6 @@ class TestsController < ApplicationController
 
   def load_test_collection
     @collection = Collection::TestCollection.find(params[:id])
+    # TODO: reject if this collection is not "live/public"
   end
 end
