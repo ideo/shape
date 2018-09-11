@@ -99,7 +99,7 @@ class TestQuestionEditor extends React.Component {
           value={card.card_question_type}
           onChange={this.handleSelectChange}
         >
-          { selectOptions.map(opt => (
+          {selectOptions.map(opt => (
             <SelectOption
               key={opt.value}
               value={opt.value}
@@ -157,7 +157,7 @@ class TestQuestionEditor extends React.Component {
       }
       return (
         <QuestionCardWrapper>
-          { inner }
+          {inner}
         </QuestionCardWrapper>
       )
     case 'description':
@@ -175,11 +175,11 @@ class TestQuestionEditor extends React.Component {
     return (
       <QuestionHolder>
         <QuestionFormHolder>
-          { this.renderQuestionSelectForm() }
+          {this.renderQuestionSelectForm()}
         </QuestionFormHolder>
         <QuestionFormHolder>
           <QuestionPreviewHolder>
-            { this.renderQuestion() }
+            {this.renderQuestion()}
           </QuestionPreviewHolder>
         </QuestionFormHolder>
       </QuestionHolder>

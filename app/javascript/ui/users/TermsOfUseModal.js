@@ -84,7 +84,7 @@ class TermsOfUseModal extends React.Component {
         classes={{ paper: 'modal__paper' }}
         open
         BackdropProps={{
-          invisible: true
+          invisible: true,
         }}
       >
         <DialogContent>
@@ -108,7 +108,7 @@ class TermsOfUseModal extends React.Component {
                 control={
                   <Checkbox
                     classes={{
-                      root: displayError ? 'checkbox--error' : ''
+                      root: displayError ? 'checkbox--error' : '',
                     }}
                     checked={this.termsChecked}
                     onChange={this.handleTermsCheck}

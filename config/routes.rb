@@ -88,6 +88,8 @@ Rails.application.routes.draw do
     end
   end
 
+  resources :tests, only: %i[show]
+
   authenticate :user, ->(u) { u.has_cached_role?(Role::SUPER_ADMIN) } do
     require 'sidekiq/web'
     mount Sidekiq::Web => '/sidekiq'

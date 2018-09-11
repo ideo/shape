@@ -91,14 +91,14 @@ export default {
         // header: false means "normal" i.e. no formatting
         [{ header: [3, false] }],
         ['link'],
-      ]
-    }
+      ],
+    },
   },
 
   defaults: {
     video: {
       thumbnailUrl: 'https://cdn.filestackcontent.com/jh0ytCnkRm6CgTaVulwr',
       name: 'Video',
-    }
-  }
+    },
+  },
 }
