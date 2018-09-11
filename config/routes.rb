@@ -66,6 +66,7 @@ Rails.application.routes.draw do
         end
         resources :roles, only: %i[destroy]
       end
+      resources :question_answers, only: %i[create]
       resources :comment_threads, only: %i[index show create] do
         resources :comments, only: %i[index create]
         member do
