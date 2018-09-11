@@ -48,4 +48,21 @@ describe('TestDesigner', () => {
       expect(wrapper.find('GridCardBlank').exists()).toBeTruthy()
     })
   })
+
+  describe('with "description" type', () => {
+    beforeEach(() => {
+      props.card.card_question_type = 'description'
+      wrapper = shallow(
+        <TestQuestionEditor {...props} />
+      )
+    })
+
+    it('renders Select form with card_question_type selected', () => {
+      expect(wrapper.find('StyledSelect').props().value).toEqual('description')
+    })
+
+    it('renders DescriptionQuestion', () => {
+      expect(wrapper.find('DescriptionQuestion').props().item).toEqual(props.item)
+    })
+  })
 })

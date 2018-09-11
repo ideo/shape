@@ -5,7 +5,9 @@ import { Box } from 'reflexbox'
 import CollectionCard from '~/stores/jsonApi/CollectionCard'
 import GridCard from '~/ui/grid/GridCard'
 import GridCardBlank from '~/ui/grid/blankContentTool/GridCardBlank'
+import DescriptionQuestion from '~/ui/test_collections/DescriptionQuestion'
 import ScaleQuestion from '~/ui/test_collections/ScaleQuestion'
+import OpenQuestion from '~/ui/test_collections/OpenQuestion'
 import { Select, SelectOption } from '~/ui/global/styled/forms'
 import { NumberListText } from '~/ui/global/styled/typography'
 import v, { ITEM_TYPES } from '~/utils/variables'
@@ -159,8 +161,10 @@ class TestQuestionEditor extends React.Component {
         </QuestionCardWrapper>
       )
     case 'description':
+      return <DescriptionQuestion item={item} />
+    case 'open':
       return (
-        <textarea />
+        <OpenQuestion questionText={item.content} />
       )
     default:
       return ''
