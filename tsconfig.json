@@ -29,7 +29,7 @@
       "~images/*": ["app/assets/images/*"],
       "~stylesheets/*": ["app/assets/stylesheets/*"],
       "~fonts/*": ["app/assets/fonts/*"],
-      "~shared/*": ["app/javascript/src/shared/*"],
+      "~shared/*": ["app/javascript/ui/shared/*"],
       "~*": ["app/javascript/src/*", "types/*"]
     }
   },
