@@ -3,6 +3,7 @@ export const ITEM_TYPES = {
   FILE: 'Item::FileItem',
   VIDEO: 'Item::VideoItem',
   LINK: 'Item::LinkItem',
+  QUESTION: 'Item::QuestionItem',
 }
 
 export const KEYS = {

@@ -38,7 +38,7 @@ describe('MovableGridCard', () => {
     wrapper = shallow(
       <MovableGridCard {...props} />
     )
-    expect(wrapper.find('GridCardBlankHOC').exists()).toBeTruthy()
+    expect(wrapper.find('GridCardBlank').exists()).toBeTruthy()
   })
 
   it('renders an empty card if cardType is "empty"', () => {

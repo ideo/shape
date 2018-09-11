@@ -247,6 +247,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
         :icon_url,
         :image,
         :archived,
+        :question_type,
         text_data: {},
         filestack_file_attributes: [
           :url,

@@ -578,6 +578,6 @@ GridCardBlank.defaultProps = {
 }
 
 // give a name to the injected component for unit tests
-GridCardBlank.displayName = 'GridCardBlankHOC'
+GridCardBlank.displayName = 'GridCardBlank'
 
 export default GridCardBlank

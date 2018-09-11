@@ -55,6 +55,7 @@ export const NumberListText = DisplayText.extend`
   font-weight: ${v.weights.medium};
   min-width: 22px;
 `
+NumberListText.displayName = 'NumberListText'
 
 export const SubduedHeading1 = styled.h1`
   color: ${v.colors.gray};

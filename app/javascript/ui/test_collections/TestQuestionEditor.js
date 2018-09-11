@@ -2,13 +2,14 @@ import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 import { Box } from 'reflexbox'
 
+import CollectionCard from '~/stores/jsonApi/CollectionCard'
 import GridCard from '~/ui/grid/GridCard'
 import GridCardBlank from '~/ui/grid/blankContentTool/GridCardBlank'
 import ScaleQuestion from '~/ui/test_collections/ScaleQuestion'
-import { Select } from '~/ui/global/styled/forms'
+import { Select, SelectOption } from '~/ui/global/styled/forms'
 import { NumberListText } from '~/ui/global/styled/typography'
-import v from '~/utils/variables'
-import { uiStore } from '~/stores'
+import v, { ITEM_TYPES } from '~/utils/variables'
+import { apiStore, uiStore } from '~/stores'
 
 const selectOptions = [
   { value: 'context', label: 'Context Setting' },
@@ -70,8 +71,18 @@ const QuestionCardWrapper = styled.div`
 @observer
 class TestQuestionEditor extends React.Component {
   handleSelectChange = (ev) => {
-    // console.log(ev.target.value)
-    // TODO: call replace on the card with the new type??
+    const { card } = this.props
+    const attrs = {
+      item_attributes: {
+        type: ITEM_TYPES.QUESTION,
+        question_type: ev.target.value,
+      },
+      order: card.order,
+      parent_id: card.parent.id,
+    }
+    const newCard = new CollectionCard(attrs, apiStore)
+    newCard.parent = card.parent
+    newCard.API_replace({ replacingId: card.id })
   }
 
   renderQuestionSelectForm() {
@@ -87,12 +98,12 @@ class TestQuestionEditor extends React.Component {
           onChange={this.handleSelectChange}
         >
           { selectOptions.map(opt => (
-            <option
+            <SelectOption
               key={opt.value}
               value={opt.value}
             >
               {opt.label}
-            </option>
+            </SelectOption>
           ))}
         </Select>
       </QuestionSelectHolder>
