@@ -32,7 +32,7 @@ class ApiStore extends jsonapi(datxCollection) {
   }
 
   request(path, method, data, options = {}) {
-    if (!options.hasOwnProperty('skipCache')) {
+    if (!_.has(options, 'skipCache')) {
       options.skipCache = true
     }
     return super.request(path, method, data, options)

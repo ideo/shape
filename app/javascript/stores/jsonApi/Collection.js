@@ -1,6 +1,6 @@
 import _ from 'lodash'
-import { computed, action, observable } from 'mobx'
-import { initModelRef, ReferenceType} from 'datx'
+import { computed, action } from 'mobx'
+import { ReferenceType } from 'datx'
 
 import { apiStore, routingStore, uiStore } from '~/stores'
 import BaseRecord from './BaseRecord'
