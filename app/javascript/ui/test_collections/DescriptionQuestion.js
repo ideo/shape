@@ -43,7 +43,7 @@ class DescriptionQuestion extends React.Component {
     const len = item.content ? item.content.length : 0
     this.save = _.debounce(this._save, 1000)
     this.state = {
-      countLeft: MAX_LEN - len
+      countLeft: MAX_LEN - len,
     }
   }
 
