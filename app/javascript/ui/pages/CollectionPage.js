@@ -242,7 +242,7 @@ class CollectionPage extends PageWithApi {
 
     return (
       <div>
-        { !loadedSubmissions
+        {!loadedSubmissions
           ? <Loader />
           : (
             <div>
@@ -322,13 +322,13 @@ class CollectionPage extends PageWithApi {
           record={collection}
           isHomepage={this.isHomepage}
         />
-        { !isLoading &&
+        {!isLoading &&
           <PageContainer>
-            { this.renderEditorPill }
-            { requiresTestDesigner && (
+            {this.renderEditorPill}
+            {requiresTestDesigner && (
               this.renderTestDesigner()
             )}
-            { !requiresTestDesigner && (
+            {!requiresTestDesigner && (
               <CollectionGrid
                 // pull in cols, gridW, gridH, gutter
                 {...gridSettings}
@@ -354,12 +354,12 @@ class CollectionPage extends PageWithApi {
               />
             }
             <MoveModal />
-            { isSubmissionBox && collection.submission_box_type && (
+            {isSubmissionBox && collection.submission_box_type && (
               this.renderSubmissionsCollection()
             )}
           </PageContainer>
         }
-        { isLoading &&
+        {isLoading &&
           this.loader()
         }
       </Fragment>

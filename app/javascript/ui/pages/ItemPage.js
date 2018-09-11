@@ -28,7 +28,7 @@ ItemPageContainer.displayName = 'ItemPageContainer'
 @observer
 class ItemPage extends PageWithApi {
   state = {
-    item: null
+    item: null,
   }
 
   componentDidMount() {
@@ -136,7 +136,7 @@ class ItemPage extends PageWithApi {
         <PageHeader record={item} />
         <ItemPageContainer>
           <PageContainer>
-            { item.parent_collection_card && replacingId === item.parent_collection_card.id
+            {item.parent_collection_card && replacingId === item.parent_collection_card.id
               ? <GridCardBlank height={1} parent={item.parent} afterCreate={this.reroute} />
               : (
                 <div>
