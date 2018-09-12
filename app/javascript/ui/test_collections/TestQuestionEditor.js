@@ -1,46 +1,17 @@
 import PropTypes from 'prop-types'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
-import { Box } from 'reflexbox'
 
 import GridCard from '~/ui/grid/GridCard'
 import GridCardBlank from '~/ui/grid/blankContentTool/GridCardBlank'
 import DescriptionQuestion from '~/ui/test_collections/DescriptionQuestion'
 import ScaleQuestion from '~/ui/test_collections/ScaleQuestion'
 import OpenQuestion from '~/ui/test_collections/OpenQuestion'
-import { Select, SelectOption } from '~/ui/global/styled/forms'
-import { NumberListText } from '~/ui/global/styled/typography'
 import v, { ITEM_TYPES } from '~/utils/variables'
 import { apiStore, uiStore } from '~/stores'
 // NOTE: Always import these models after everything else, can lead to odd dependency!
 import CollectionCard from '~/stores/jsonApi/CollectionCard'
-
-const selectOptions = [
-  { value: 'context', label: 'Context Setting' },
-  { value: 'media', label: 'Photo or Video of Idea' },
-  { value: 'description', label: 'Idea Description' },
-  { value: 'useful', label: 'Useful' },
-  { value: 'open', label: 'Open Response' },
-]
-
-const QuestionFormHolder = styled(Box)`
-`
-
-const QuestionSelectHolder = styled.div`
-  margin-top: 10px;
-  margin-right: 20px;
-  min-width: 300px;
-
-  /* NOTE: had to hack this rule in here to modify the MUI Input element */
-  > div {
-    width: calc(100% - 30px);
-  }
-
-  @media only screen
-    and (max-width: ${v.responsive.medBreakpoint}px) {
-    margin-bottom: 10px;
-  }
-`
+import { QuestionText } from './shared'
 
 const QuestionHolder = styled.div`
   display: flex;
@@ -49,21 +20,6 @@ const QuestionHolder = styled.div`
     and (max-width: ${v.responsive.medBreakpoint}px) {
     flex-direction: column;
     margin-bottom: 10px;
-  }
-`
-
-// TODO: deal with new colors
-const QuestionPreviewHolder = styled.div`
-  border-color: ${v.colors.gray};
-  border-left-width: 20px;
-  border-right-width: 20px;
-  border-style: solid;
-
-  @media only screen
-    and (max-width: ${v.responsive.medBreakpoint}px) {
-    border-width: 0;
-    margin-left: 22px;
-    margin-right: 28px;
   }
 `
 
@@ -87,31 +43,6 @@ class TestQuestionEditor extends React.Component {
     const newCard = new CollectionCard(attrs, apiStore)
     newCard.parent = card.parent
     newCard.API_replace({ replacingId: card.id })
-  }
-
-  renderQuestionSelectForm() {
-    const { card } = this.props
-    return (
-      <QuestionSelectHolder>
-        <NumberListText>{card.order + 1}.</NumberListText>
-        <Select
-          classes={{ root: 'select fullWidth', selectMenu: 'selectMenu' }}
-          displayEmpty
-          name="role"
-          value={card.card_question_type}
-          onChange={this.handleSelectChange}
-        >
-          {selectOptions.map(opt => (
-            <SelectOption
-              key={opt.value}
-              value={opt.value}
-            >
-              {opt.label}
-            </SelectOption>
-          ))}
-        </Select>
-      </QuestionSelectHolder>
-    )
   }
 
   renderQuestion() {
@@ -172,7 +103,7 @@ class TestQuestionEditor extends React.Component {
           />
         )
       }
-      return item.content
+      return <QuestionText>{item.content}</QuestionText>
 
     case 'open':
       return (
@@ -187,19 +118,9 @@ class TestQuestionEditor extends React.Component {
   }
 
   render() {
-    const { editing } = this.props
     return (
       <QuestionHolder>
-        {editing &&
-          <QuestionFormHolder>
-            {this.renderQuestionSelectForm()}
-          </QuestionFormHolder>
-        }
-        <QuestionFormHolder>
-          <QuestionPreviewHolder>
-            {this.renderQuestion()}
-          </QuestionPreviewHolder>
-        </QuestionFormHolder>
+        {this.renderQuestion()}
       </QuestionHolder>
     )
   }

@@ -8,10 +8,7 @@ import { StyledCommentTextarea } from '~/ui/global/styled/forms'
 import v from '~/utils/variables'
 
 const TextInputHolder = StyledCommentTextarea.extend`
-  background-color: #9FC1CB;
   color: white;
-  padding-bottom: 6px;
-  width: 334px;
 `
 
 const TextInput = styled(TextareaAutosize)`

@@ -1,7 +1,10 @@
 import PropTypes from 'prop-types'
+import { Flex } from 'reflexbox'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 
+import { NumberListText } from '~/ui/global/styled/typography'
+import { Select, SelectOption } from '~/ui/global/styled/forms'
 import v from '~/utils/variables'
 import TestQuestionEditor from './TestQuestionEditor'
 
@@ -21,8 +24,73 @@ const BottomThing = TopThing.extend`
   border-radius: 0 0 7px 7px;
 `
 
+const TestQuestionHolder = styled.div`
+  background-color: ${props => (props.userEditable ? '#9FC1CB' : '#5698AE')};
+  border-color: ${props => (props.editing ? v.colors.gray : '#9ec1cc')};
+  border-bottom-width: 0;
+  border-left-width: ${props => (props.editing ? '20px' : '0')};
+  border-right-width: ${props => (props.editing ? '20px' : '0')};
+  border-style: solid;
+  border-top-width: ${props => (props.editing ? '6px' : 0)};
+  margin-bottom: ${props => (props.editing ? 0 : '6px')};
+  width: ${props => (props.editing ? '334px' : '100%')};
+
+  @media only screen
+    and (max-width: ${v.responsive.medBreakpoint}px) {
+    border-width: 0;
+    margin-left: 22px;
+    margin-right: 28px;
+  }
+
+  &:last {
+    margin-bottom: 0;
+  }
+`
+
+const QuestionSelectHolder = styled.div`
+  margin-top: 10px;
+  margin-right: 20px;
+  width: 300px;
+
+  @media only screen
+    and (max-width: ${v.responsive.medBreakpoint}px) {
+    margin-bottom: 10px;
+  }
+`
+const selectOptions = [
+  { value: 'context', label: 'Context Setting' },
+  { value: 'media', label: 'Photo or Video of Idea' },
+  { value: 'description', label: 'Idea Description' },
+  { value: 'useful', label: 'Useful' },
+  { value: 'open', label: 'Open Response' },
+]
+
 @observer
 class TestDesigner extends React.Component {
+  renderQuestionSelectForm(card) {
+    return (
+      <QuestionSelectHolder>
+        <NumberListText>{card.order + 1}.</NumberListText>
+        <Select
+          classes={{ root: 'select fullWidth', selectMenu: 'selectMenu' }}
+          displayEmpty
+          name="role"
+          value={card.card_question_type}
+          onChange={this.handleSelectChange}
+        >
+          {selectOptions.map(opt => (
+            <SelectOption
+              key={opt.value}
+              value={opt.value}
+            >
+              {opt.label}
+            </SelectOption>
+          ))}
+        </Select>
+      </QuestionSelectHolder>
+    )
+  }
+
   render() {
     const { collection, editing } = this.props
     const cardCount = collection.collection_cards.length
@@ -34,16 +102,25 @@ class TestDesigner extends React.Component {
         if (!editing) {
           card.record.menuDisabled = true
         }
+        const userEditable = editing &&
+          ['media', 'description'].includes(card.record.question_type)
         return (
-          <TestQuestionEditor
-            key={card.id}
-            parent={collection}
-            card={card}
-            item={card.record}
-            position={position}
-            order={card.order}
-            editing={editing}
-          />
+          <Flex>
+            {editing &&
+              this.renderQuestionSelectForm(card)
+            }
+            <TestQuestionHolder editing={editing} userEditable={userEditable}>
+              <TestQuestionEditor
+                key={card.id}
+                parent={collection}
+                card={card}
+                item={card.record}
+                position={position}
+                order={card.order}
+                editing={editing}
+              />
+            </TestQuestionHolder>
+          </Flex>
         )
       })
     )

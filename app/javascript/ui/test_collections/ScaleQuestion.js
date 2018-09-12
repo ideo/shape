@@ -7,21 +7,19 @@ import v from '~/utils/variables'
 
 // TODO deal with new colros
 const Question = styled.div`
-  background-color: #5698AE;
+  box-sizing: border-box;
   color: white;
+  margin-bottom: 6px;
   padding: 12px 12px 16px 12px;
-  width: 310px;
-
-  @media only screen
-    and (max-width: ${v.responsive.medBreakpoint}px) {
-    width: calc(100% - 23px);
-  }
+  width: 100%;
 `
 
 const Scale = styled.div`
   background-color: ${v.colors.desert};
+  box-sizing: border-box;
   color: #5698AE;
   padding: 7px 13px;
+  width: 100%;
 
   span {
     color: #5698AE;
@@ -58,14 +56,13 @@ class ScaleQuestion extends React.Component {
   }
 
   vote = (name) => (ev) => {
-    console.log(name)
   }
 
   render() {
     const { questionText } = this.props
     const emojis = this.emojiScale
     return (
-      <div>
+      <div style={{ width: '100%' }}>
         <Question>
           <DisplayText>
             {questionText}

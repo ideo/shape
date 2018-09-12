@@ -29,7 +29,7 @@ import BctButtonBox from './BctButtonBox'
 import BctButtonRotation from './BctButtonRotation'
 
 const StyledGridCardBlank = StyledGridCard.extend`
-  background: ${props => (props.blueBg ? v.colors.testLightBlueBg : 'transparent')};
+  background: transparent;
   cursor: auto;
   position: relative;
   button {
