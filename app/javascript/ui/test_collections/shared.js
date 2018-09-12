@@ -5,11 +5,12 @@ import v from '~/utils/variables'
 
 // TODO colors
 export const QuestionText = styled.p`
+  box-sizing: border-box;
   color: white !important;
   font-family: ${v.fonts.sans} !important;
   margin: 0;
   padding: 16px;
-  width: calc(100% - 20px);
+  width: 100%;
 `
 
 export const TestQuestionInput = css`
