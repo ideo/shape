@@ -10,6 +10,9 @@ class ErrorBoundary extends React.Component {
 
   componentDidCatch(error, errorInfo) {
     this.setState({ error })
+    if (process.env.NODE_ENV === 'development') {
+      console.error(error)
+    }
     const source = errorInfo.componentStack.split('\n')[1]
     trackErrorSpecify(source, error.message, error.name, error.stack.split('\n'))
   }
