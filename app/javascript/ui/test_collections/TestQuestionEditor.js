@@ -108,7 +108,7 @@ class TestQuestionEditor extends React.Component {
     case 'open':
       return (
         <OpenQuestion
-          questionText={item.content}
+          item={item}
           editing={editing}
         />
       )

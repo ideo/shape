@@ -9,6 +9,7 @@ import v from '~/utils/variables'
 
 const TextInputHolder = StyledCommentTextarea.extend`
   color: white;
+  padding: 6px;
 `
 
 const TextInput = styled(TextareaAutosize)`

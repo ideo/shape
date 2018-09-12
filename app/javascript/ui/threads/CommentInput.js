@@ -78,7 +78,7 @@ class CommentInput extends React.Component {
         name: `@${d.handle}`,
         full_name: d.name,
         // depends if user or group
-        avatar: d.pic_url_square || d.filestack_file_url
+        avatar: d.pic_url_square || d.filestack_file_url,
       }
     ))
   }
@@ -92,7 +92,7 @@ class CommentInput extends React.Component {
       onChange,
       onOpenSuggestions,
       handleReturn,
-      editorState
+      editorState,
     } = this.props
     const { MentionSuggestions } = this.mentionPlugin
     MentionSuggestions.displayName = 'MentionSuggestions'

@@ -7,9 +7,11 @@ import v from '~/utils/variables'
 
 // TODO deal with new colros
 const Question = styled.div`
+  border-color: ${props => (props.editing ? v.colors.gray : '#9ec1cc')};
+  border-bottom-style: solid;
+  border-bottom-width: 6px;
   box-sizing: border-box;
   color: white;
-  margin-bottom: 6px;
   padding: 12px 12px 16px 12px;
   width: 100%;
 `
@@ -59,11 +61,11 @@ class ScaleQuestion extends React.Component {
   }
 
   render() {
-    const { questionText } = this.props
+    const { editing, questionText } = this.props
     const emojis = this.emojiScale
     return (
       <div style={{ width: '100%' }}>
-        <Question>
+        <Question editing={editing}>
           <DisplayText>
             {questionText}
           </DisplayText>
@@ -72,7 +74,11 @@ class ScaleQuestion extends React.Component {
           <SmallHelperText>select your response below</SmallHelperText>
           <EmojiHolder>
             {emojis.map(emoji => (
-              <button key={emoji.name} onClick={this.vote(emoji.name)}>
+              <button
+                key={emoji.name}
+                onClick={this.vote(emoji.name)}
+                disabled={editing}
+              >
                 <Emoji
                   name={emoji.name}
                   symbol={emoji.symbol}
@@ -90,8 +96,10 @@ class ScaleQuestion extends React.Component {
 ScaleQuestion.propTypes = {
   questionText: PropTypes.string.isRequired,
   emojiSeries: PropTypes.oneOf(['faces', 'thumbs']),
+  editing: PropTypes.bool,
 }
 ScaleQuestion.defaultProps = {
   emojiSeries: 'faces',
+  editing: false,
 }
 export default ScaleQuestion
