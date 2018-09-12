@@ -7,6 +7,13 @@
     <%= csrf_meta_tags %>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <%= render partial: '/layouts/favicons' %>
+    <script>
+      window.CONFIG = {
+        stripeApiKey: '<%= stripe_js_api_key %>',
+        clientId: '<%= ideo_sso_client_id %>'
+      }
+    </script>
+    <script id="stripe-js" type="text/javascript" src="<%= stripe_js_sdk_url %>"></script>
     <script type="text/javascript"
       src="<%= ideo_sso_js_sdk_url %>">
     </script>
