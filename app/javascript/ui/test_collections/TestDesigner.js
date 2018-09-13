@@ -1,16 +1,19 @@
 import PropTypes from 'prop-types'
 import _ from 'lodash'
 import { Flex } from 'reflexbox'
+import { runInAction } from 'mobx'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 
 import { NumberListText } from '~/ui/global/styled/typography'
 import { Select, SelectOption } from '~/ui/global/styled/forms'
 import v, { ITEM_TYPES } from '~/utils/variables'
-import { apiStore } from '~/stores'
+import { apiStore, uiStore } from '~/stores/'
 // NOTE: Always import these models after everything else, can lead to odd dependency!
 import CollectionCard from '~/stores/jsonApi/CollectionCard'
 import SurveyResponse from '~/stores/jsonApi/SurveyResponse'
+import TrashIcon from '~/ui/icons/TrashIcon'
+import QuestionHotEdge from './QuestionHotEdge'
 import TestQuestionEditor from './TestQuestionEditor'
 
 const TopThing = styled.div`
@@ -62,7 +65,13 @@ const QuestionSelectHolder = styled.div`
     margin-bottom: 10px;
   }
 `
+
+const TrashButton = styled.button`
+  width: 26px;
+`
+
 const selectOptions = [
+  { value: null, label: 'select question type' },
   { value: 'context', label: 'Context Setting' },
   { value: 'media', label: 'Photo or Video of Idea' },
   { value: 'description', label: 'Idea Description' },
@@ -103,6 +112,38 @@ class TestDesigner extends React.Component {
     return surveyResponse
   }
 
+  handleTrash = (card) => {
+    card.destroy()
+    // TODO this is throwing a datx strict error for meta.persisted
+    runInAction(async () => {
+      await apiStore.request(`/collection_cards/${card.id}`, 'DELETE')
+      apiStore.fetch('collections', uiStore.viewingCollection.id)
+    })
+  }
+
+  handleNew = (card) => {
+    this.createNewQuestion(card.order + 0.5)
+  }
+
+  createNewQuestion = async (order) => {
+    const attrs = {
+      order,
+      width: 1,
+      height: 1,
+      parent_id: uiStore.viewingCollection.id,
+      item_attributes: {
+        type: ITEM_TYPES.QUESTION,
+      },
+    }
+    const card = new CollectionCard(attrs, apiStore)
+    card.parent = uiStore.viewingCollection
+    await card.API_create()
+  }
+
+  renderHotEdge(card) {
+    return <QuestionHotEdge onAdd={() => this.handleNew(card)} />
+  }
+
   renderQuestionSelectForm(card) {
     return (
       <QuestionSelectHolder>
@@ -113,16 +154,21 @@ class TestDesigner extends React.Component {
           name="role"
           value={card.card_question_type}
           onChange={this.handleSelectChange(card)}
+          onDefault={!card.card_question_type}
         >
           {selectOptions.map(opt => (
             <SelectOption
               key={opt.value}
               value={opt.value}
+              defaultOption={!opt.value}
             >
               {opt.label}
             </SelectOption>
           ))}
         </Select>
+        <TrashButton onClick={() => this.handleTrash(card)}>
+          <TrashIcon />
+        </TrashButton>
       </QuestionSelectHolder>
     )
   }
@@ -146,7 +192,13 @@ class TestDesigner extends React.Component {
         const userEditable = editing &&
           ['media', 'description'].includes(card.record.question_type)
         return (
-          <Flex key={card.id}>
+          <Flex
+            key={card.id}
+            style={{
+              width: editing ? '694px' : 'auto',
+              flexWrap: 'wrap',
+            }}
+          >
             {editing &&
               this.renderQuestionSelectForm(card)
             }
@@ -163,6 +215,9 @@ class TestDesigner extends React.Component {
                 editing={editing}
               />
             </TestQuestionHolder>
+            {editing &&
+              this.renderHotEdge(card)
+            }
           </Flex>
         )
       })

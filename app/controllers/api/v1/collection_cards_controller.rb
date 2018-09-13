@@ -35,6 +35,15 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
     end
   end
 
+  def destroy
+    if @collection_card.destroy
+      @collection_card.parent.reorder_cards!
+      head :no_content
+    else
+      render_api_errors @collection_card.errors
+    end
+  end
+
   def update
     @collection_card.attributes = collection_card_update_params
     if @collection_card.save

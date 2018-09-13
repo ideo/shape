@@ -169,6 +169,7 @@ export const Select = styled(MuiSelect)`
     font-family: ${v.fonts.sans};
     font-size: 1rem;
     font-weight: ${v.weights.book};
+    ${props => props.onDefault && `color: ${v.colors.gray};`}
   }
 
   .fullWidth {
@@ -180,6 +181,7 @@ export const Select = styled(MuiSelect)`
     &:focus { background-color: transparent; }
     &:hover { background-color: transparent; }
     vertical-align: baseline;
+    ${props => props.onDefault && `color: ${v.colors.gray};`}
 
     li {
       font-family: ${v.fonts.sans};
@@ -207,6 +209,7 @@ export const SelectOption = styled(MenuItem)`
     margin-bottom: 4px;
     margin-top: 4px;
     padding: 0 4px;
+    ${props => props.defaultOption && `color: ${v.colors.gray};`}
 
     &:hover: {
       opacity: 1.0

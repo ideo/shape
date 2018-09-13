@@ -424,7 +424,9 @@ class Collection < ApplicationRecord
     renderer = JSONAPI::Serializable::Renderer.new
     renderer.render(
       self,
-      class: Firestoreable::JSONAPI_CLASS_MAPPINGS,
+      class: Firestoreable::JSONAPI_CLASS_MAPPINGS.merge(
+        FilestackFile: SerializableFilestackFile,
+      ),
       include: {
         collection_cards: [
           :parent,

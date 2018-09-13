@@ -2,12 +2,21 @@ import _ from 'lodash'
 import PropTypes from 'prop-types'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import TextareaAutosize from 'react-autosize-textarea'
-import styled from 'styled-components'
+import styled, { css } from 'styled-components'
 
 import ReturnArrowIcon from '~/ui/icons/ReturnArrowIcon'
-import { DisplayText } from '~/ui/global/styled/typography'
 import v from '~/utils/variables'
-import { TestQuestionInput } from './shared'
+import { QuestionText, TestQuestionInput } from './shared'
+
+const QuestionSpacing = css`
+  border-bottom-color: ${props => (props.editable ? v.colors.gray : '#9ec1cc')};
+  border-bottom-style: solid;
+  border-bottom-width: 6px;
+`
+
+const QuestionTextWitSpacing = QuestionText.extend`
+  ${QuestionSpacing}
+`
 
 const TextInput = styled(TextareaAutosize)`
   ${TestQuestionInput}
@@ -15,9 +24,7 @@ const TextInput = styled(TextareaAutosize)`
 
 const EditTextInput = styled.input`
   ${TestQuestionInput}
-  border-bottom-color: ${props => (props.editable ? v.colors.gray : '#9ec1cc')};
-  border-bottom-style: solid;
-  border-bottom-width: 6px;
+  ${QuestionSpacing}
 `
 
 const TextEnterButton = styled.button`
@@ -62,9 +69,9 @@ class OpenQuestion extends React.Component {
       )
     } else {
       content = (
-        <DisplayText>
+        <QuestionTextWitSpacing>
           {item.content}
-        </DisplayText>
+        </QuestionTextWitSpacing>
       )
     }
     return content
