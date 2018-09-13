@@ -5,7 +5,10 @@ import styled from 'styled-components'
 
 import { NumberListText } from '~/ui/global/styled/typography'
 import { Select, SelectOption } from '~/ui/global/styled/forms'
-import v from '~/utils/variables'
+import v, { ITEM_TYPES } from '~/utils/variables'
+import { apiStore, uiStore } from '~/stores/'
+import CollectionCard from '~/stores/jsonApi/CollectionCard'
+import QuestionHotEdge from './QuestionHotEdge'
 import TestQuestionEditor from './TestQuestionEditor'
 
 const TopThing = styled.div`
@@ -57,6 +60,7 @@ const QuestionSelectHolder = styled.div`
     margin-bottom: 10px;
   }
 `
+
 const selectOptions = [
   { value: 'context', label: 'Context Setting' },
   { value: 'media', label: 'Photo or Video of Idea' },
@@ -67,6 +71,29 @@ const selectOptions = [
 
 @observer
 class TestDesigner extends React.Component {
+  handleNew = (card) => {
+    this.createNewQuestion(card.order + 0.5)
+  }
+
+  async createNewQuestion(order) {
+    const attrs = {
+      order,
+      width: 1,
+      height: 1,
+      parent_id: uiStore.viewingCollection.id,
+      item_attributes: {
+        type: ITEM_TYPES.QUESTION,
+      },
+    }
+    const card = new CollectionCard(attrs, apiStore)
+    card.parent = uiStore.viewingCollection
+    await card.API_create()
+  }
+
+  renderHotEdge(card) {
+    return <QuestionHotEdge onAdd={() => this.handleNew(card)} />
+  }
+
   renderQuestionSelectForm(card) {
     return (
       <QuestionSelectHolder>
@@ -105,7 +132,11 @@ class TestDesigner extends React.Component {
         const userEditable = editing &&
           ['media', 'description'].includes(card.record.question_type)
         return (
-          <Flex>
+          <Flex style={{
+            width: editing ? '694px' : 'auto',
+            flexWrap: 'wrap',
+          }}
+          >
             {editing &&
               this.renderQuestionSelectForm(card)
             }
@@ -120,6 +151,9 @@ class TestDesigner extends React.Component {
                 editing={editing}
               />
             </TestQuestionHolder>
+            {editing &&
+              this.renderHotEdge(card)
+            }
           </Flex>
         )
       })
