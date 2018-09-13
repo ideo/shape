@@ -55,14 +55,3 @@ class GciExport
     end
   end
 end
-
-
-
-# c = Collection.find 6449
-# puts c.collections.collect{|sc| "\"#{sc.name}\",#{sc.updated_at},https://www.shape.space/network-leads/collections/#{sc.id}"}
-
-# c = Collection.find 5177
-# puts c.collections.collect{|sc| "\"#{sc.name}\",#{sc.updated_at},https://www.shape.space/network-leads/collections/#{sc.id}, #{sc.created_by.last_sign_in_at}, #{sc.created_by.comments.count}" }
-
-
-# name,last_updated,url,last_login
