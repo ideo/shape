@@ -121,7 +121,6 @@ class CollectionCard extends BaseRecord {
     try {
       this.destroy()
       this.parent.removeCard(this)
-      console.log(_.map(this.parent.collection_cards, c => c.order))
       return
     } catch (e) {
       uiStore.defaultAlertError()

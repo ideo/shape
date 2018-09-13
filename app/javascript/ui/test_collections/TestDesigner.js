@@ -67,7 +67,10 @@ const QuestionSelectHolder = styled.div`
 `
 
 const TrashButton = styled.button`
+  position: relative;
+  top: 6px;
   width: 26px;
+  margin-left: 12px;
 `
 
 const selectOptions = [
@@ -143,7 +146,7 @@ class TestDesigner extends React.Component {
         <NumberListText>{card.order + 1}.</NumberListText>
         <Select
           classes={{
-            root: 'select fullWidth',
+            root: 'select fixedWidth',
             select: blank ? 'grayedOut' : '',
             selectMenu: 'selectMenu',
           }}
@@ -155,8 +158,11 @@ class TestDesigner extends React.Component {
           {selectOptions.map(opt => (
             <SelectOption
               key={opt.value}
+              classes={{
+                root: !opt.value ? 'grayedOut' : '',
+              }}
+              disabled={!opt.value}
               value={opt.value}
-              defaultOption={!opt.value}
             >
               {opt.label}
             </SelectOption>

@@ -178,6 +178,10 @@ export const Select = styled(MuiSelect)`
     min-width: calc(100% - 30px);
   }
 
+  .fixedWidth {
+    width: 240px;
+  }
+
   .selectMenu: {
     background-color: transparent;
     &:focus { background-color: transparent; }
@@ -211,13 +215,13 @@ export const SelectOption = styled(MenuItem)`
     margin-bottom: 4px;
     margin-top: 4px;
     padding: 0 4px;
-    ${props => props.defaultOption && `color: ${v.colors.gray};`}
-
     &:hover: {
       opacity: 1.0
     }
   }
-
+  &.grayedOut {
+    color: ${v.colors.gray};
+  }
 `
 SelectOption.displayName = 'StyledSelectOption'
 

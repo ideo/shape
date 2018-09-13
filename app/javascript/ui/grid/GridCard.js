@@ -242,7 +242,7 @@ class GridCard extends React.Component {
     const tagEditorOpen = uiStore.tagsModalOpenId === card.id
 
     return (
-      <StyledGridCard dragging={dragging}>
+      <StyledGridCard dragging={dragging} testCollectionCard={testCollectionCard}>
         {(canEditCollection && (!card.isPinnedAndLocked || lastPinnedCard)) &&
           <GridCardHotspot card={card} dragging={dragging} />
         }
