@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180905223105) do
+ActiveRecord::Schema.define(version: 20180912174042) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -227,15 +227,6 @@ ActiveRecord::Schema.define(version: 20180905223105) do
     t.index ["survey_response_id"], name: "index_question_answers_on_survey_response_id"
   end
 
-  create_table "questions", force: :cascade do |t|
-    t.bigint "test_collection_id"
-    t.integer "question_type"
-    t.integer "order"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["test_collection_id"], name: "index_questions_on_test_collection_id"
-  end
-
   create_table "roles", force: :cascade do |t|
     t.string "name"
     t.string "resource_type"
@@ -252,6 +243,8 @@ ActiveRecord::Schema.define(version: 20180905223105) do
     t.bigint "test_collection_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.text "session_uid"
+    t.index ["session_uid"], name: "index_survey_responses_on_session_uid", unique: true
     t.index ["test_collection_id"], name: "index_survey_responses_on_test_collection_id"
   end
 

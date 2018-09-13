@@ -1,4 +1,5 @@
 import PropTypes from 'prop-types'
+import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 
 import Emoji from '~/ui/icons/Emoji'
@@ -35,33 +36,44 @@ const EmojiHolder = styled.div`
   margin-top: 10px;
 `
 
+const StyledButton = styled.button`
+  opacity: ${props => (props.selected ? 1 : 0.5)};
+  transition: opacity 0.3s;
+  &:hover {
+    opacity: 1;
+  }
+`
+
+@observer
 class ScaleQuestion extends React.Component {
   get emojiScale() {
     const { emojiSeries } = this.props
     switch (emojiSeries) {
     case 'thumbs':
       return [
-        { name: 'terrible', symbol: '👎' },
-        { name: 'bad', scale: 0.6, symbol: '👎' },
-        { name: 'good', scale: 0.6, symbol: '👍' },
-        { name: 'great', symbol: '👍' },
+        { number: 1, name: 'terrible', symbol: '👎' },
+        { number: 2, name: 'bad', scale: 0.6, symbol: '👎' },
+        { number: 3, name: 'good', scale: 0.6, symbol: '👍' },
+        { number: 4, name: 'great', symbol: '👍' },
       ]
     case 'faces':
     default:
       return [
-        { name: 'terrible', symbol: '😡' },
-        { name: 'bad', symbol: '☹️' },
-        { name: 'good', symbol: '😊' },
-        { name: 'great', symbol: '😍' },
+        { number: 1, name: 'terrible', symbol: '😡' },
+        { number: 2, name: 'bad', symbol: '☹️' },
+        { number: 3, name: 'good', symbol: '😊' },
+        { number: 4, name: 'great', symbol: '😍' },
       ]
     }
   }
 
-  vote = (name) => (ev) => {
+  vote = (number) => (ev) => {
+    ev.preventDefault()
+    this.props.onAnswer({ number })
   }
 
   render() {
-    const { editing, questionText } = this.props
+    const { editing, questionAnswer, questionText } = this.props
     const emojis = this.emojiScale
     return (
       <div style={{ width: '100%' }}>
@@ -74,9 +86,11 @@ class ScaleQuestion extends React.Component {
           <SmallHelperText>select your response below</SmallHelperText>
           <EmojiHolder>
             {emojis.map(emoji => (
-              <button
+              <StyledButton
+                selected={questionAnswer && questionAnswer.answer_number === emoji.number}
                 key={emoji.name}
-                onClick={this.vote(emoji.name)}
+                onClick={this.vote(emoji.number)}
+                // "vote" button is disabled while editing
                 disabled={editing}
               >
                 <Emoji
@@ -84,7 +98,7 @@ class ScaleQuestion extends React.Component {
                   symbol={emoji.symbol}
                   scale={emoji.scale}
                 />
-              </button>
+              </StyledButton>
             ))}
           </EmojiHolder>
         </Scale>
@@ -94,12 +108,16 @@ class ScaleQuestion extends React.Component {
 }
 
 ScaleQuestion.propTypes = {
+  questionAnswer: MobxPropTypes.objectOrObservableObject,
   questionText: PropTypes.string.isRequired,
   emojiSeries: PropTypes.oneOf(['faces', 'thumbs']),
   editing: PropTypes.bool,
+  onAnswer: PropTypes.func,
 }
 ScaleQuestion.defaultProps = {
+  questionAnswer: null,
   emojiSeries: 'faces',
   editing: false,
+  onAnswer: () => null,
 }
 export default ScaleQuestion

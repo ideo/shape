@@ -1,6 +1,6 @@
 class Item
   class QuestionItem < Item
-    has_many :question_answers, inverse_of: :question
+    has_many :question_answers, inverse_of: :question, dependent: :destroy
 
     enum question_type: {
       context: 0,

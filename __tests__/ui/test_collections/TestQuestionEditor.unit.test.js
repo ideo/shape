@@ -12,6 +12,7 @@ describe('TestDesigner', () => {
       parent: fakeCollection,
       card: fakeItemCard,
       item: fakeQuestionItem,
+      editing: true,
     }
   })
 
@@ -21,10 +22,6 @@ describe('TestDesigner', () => {
       wrapper = shallow(
         <TestQuestionEditor {...props} />
       )
-    })
-
-    it('renders Select form with card_question_type selected', () => {
-      expect(wrapper.find('StyledSelect').props().value).toEqual('useful')
     })
 
     it('renders ScaleQuestion', () => {
@@ -40,10 +37,6 @@ describe('TestDesigner', () => {
       )
     })
 
-    it('renders Select form with card_question_type selected', () => {
-      expect(wrapper.find('StyledSelect').props().value).toEqual('media')
-    })
-
     it('renders GridCardBlank to insert media', () => {
       expect(wrapper.find('GridCardBlank').exists()).toBeTruthy()
     })
@@ -55,10 +48,6 @@ describe('TestDesigner', () => {
       wrapper = shallow(
         <TestQuestionEditor {...props} />
       )
-    })
-
-    it('renders Select form with card_question_type selected', () => {
-      expect(wrapper.find('StyledSelect').props().value).toEqual('description')
     })
 
     it('renders DescriptionQuestion', () => {

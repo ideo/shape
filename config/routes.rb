@@ -66,7 +66,6 @@ Rails.application.routes.draw do
         end
         resources :roles, only: %i[destroy]
       end
-      resources :question_answers, only: %i[create]
       resources :comment_threads, only: %i[index show create] do
         resources :comments, only: %i[index create]
         member do
@@ -84,6 +83,11 @@ Rails.application.routes.draw do
       scope :search do
         get '/', to: 'search#search', as: :search
         get 'users_and_groups', to: 'search#users_and_groups', as: :search_users_and_groups
+      end
+      # unauthenticated routes:
+      resources :survey_responses, only: %i[create] do
+        # not shallow because we always want to look up survey_response by session_uid
+        resources :question_answers, only: %i[create update]
       end
     end
   end

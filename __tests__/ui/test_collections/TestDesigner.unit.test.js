@@ -8,6 +8,7 @@ describe('TestDesigner', () => {
       collection: fakeCollection,
       editing: true,
     }
+    props.collection.collection_cards[0].card_question_type = 'useful'
     wrapper = shallow(
       <TestDesigner {...props} />
     )
@@ -15,6 +16,10 @@ describe('TestDesigner', () => {
 
   it('renders TestQuestionEditors for each card', () => {
     expect(wrapper.find('TestQuestionEditor').length).toEqual(fakeCollection.collection_cards.length)
+  })
+
+  it('renders Select form with card_question_type selected', () => {
+    expect(wrapper.find('StyledSelect').get(0).props.value).toEqual('useful')
   })
 
   it('passes position props for beginning and end', () => {

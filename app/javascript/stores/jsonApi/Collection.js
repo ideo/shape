@@ -192,7 +192,7 @@ Collection.refDefaults = {
     model: CollectionCard,
     type: ReferenceType.TO_MANY,
     defaultValue: [],
-  }
+  },
 }
 
 export default Collection

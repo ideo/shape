@@ -7,10 +7,9 @@ import GridCardBlank from '~/ui/grid/blankContentTool/GridCardBlank'
 import DescriptionQuestion from '~/ui/test_collections/DescriptionQuestion'
 import ScaleQuestion from '~/ui/test_collections/ScaleQuestion'
 import OpenQuestion from '~/ui/test_collections/OpenQuestion'
-import v, { ITEM_TYPES } from '~/utils/variables'
+import v from '~/utils/variables'
 import { apiStore, uiStore } from '~/stores'
-// NOTE: Always import these models after everything else, can lead to odd dependency!
-import CollectionCard from '~/stores/jsonApi/CollectionCard'
+import QuestionAnswer from '~/stores/jsonApi/QuestionAnswer'
 import { QuestionText } from './shared'
 
 const QuestionHolder = styled.div`
@@ -30,23 +29,35 @@ const QuestionCardWrapper = styled.div`
 
 @observer
 class TestQuestionEditor extends React.Component {
-  handleSelectChange = (ev) => {
-    const { card } = this.props
-    const attrs = {
-      item_attributes: {
-        type: ITEM_TYPES.QUESTION,
-        question_type: ev.target.value,
-      },
-      order: card.order,
-      parent_id: card.parent.id,
+  handleQuestionAnswer = async ({ text, number }) => {
+    const { item, editing, createSurveyResponse } = this.props
+    let { surveyResponse, questionAnswer } = this.props
+    // components should never trigger this when editing, but double-check here
+    if (editing) return
+
+    if (!questionAnswer) {
+      if (!surveyResponse) {
+        surveyResponse = await createSurveyResponse()
+      }
+      // create new answer if we didn't have one
+      questionAnswer = new QuestionAnswer({
+        question_id: item.id,
+        answer_text: text,
+        answer_number: number,
+      }, apiStore)
+      questionAnswer.survey_response = surveyResponse
+      await questionAnswer.API_create()
+    } else {
+      // update values on existing answer and save
+      await questionAnswer.API_update({
+        answer_text: text,
+        answer_number: number,
+      })
     }
-    const newCard = new CollectionCard(attrs, apiStore)
-    newCard.parent = card.parent
-    newCard.API_replace({ replacingId: card.id })
   }
 
   renderQuestion() {
-    const { parent, card, item, editing } = this.props
+    const { parent, card, item, editing, questionAnswer } = this.props
     let inner
     switch (card.card_question_type) {
     case 'context':
@@ -54,6 +65,8 @@ class TestQuestionEditor extends React.Component {
         <ScaleQuestion
           questionText="How satisfied are you with your current solution?"
           editing={editing}
+          questionAnswer={questionAnswer}
+          onAnswer={this.handleQuestionAnswer}
         />
       )
     case 'useful':
@@ -62,6 +75,8 @@ class TestQuestionEditor extends React.Component {
           questionText="How useful is this idea for you?"
           emojiSeries="thumbs"
           editing={editing}
+          questionAnswer={questionAnswer}
+          onAnswer={this.handleQuestionAnswer}
         />
       )
     case 'media':
@@ -110,6 +125,8 @@ class TestQuestionEditor extends React.Component {
         <OpenQuestion
           item={item}
           editing={editing}
+          questionAnswer={questionAnswer}
+          onAnswer={this.handleQuestionAnswer}
         />
       )
     default:
@@ -132,5 +149,15 @@ TestQuestionEditor.propTypes = {
   card: MobxPropTypes.objectOrObservableObject.isRequired,
   item: MobxPropTypes.objectOrObservableObject.isRequired,
   editing: PropTypes.bool.isRequired,
+  surveyResponse: MobxPropTypes.objectOrObservableObject,
+  questionAnswer: MobxPropTypes.objectOrObservableObject,
+  createSurveyResponse: PropTypes.func,
 }
+
+TestQuestionEditor.defaultProps = {
+  surveyResponse: null,
+  questionAnswer: null,
+  createSurveyResponse: null,
+}
+
 export default TestQuestionEditor

@@ -1,6 +1,6 @@
 class Collection
   class TestCollection < Collection
-    has_many :survey_responses
+    has_many :survey_responses, dependent: :destroy
 
     before_create :setup_test_cards
     after_create :add_test_tag
@@ -46,6 +46,12 @@ class Collection
       update_cached_tag_lists
       # no good way around saving a 2nd time after_create
       save
+    end
+
+    def create_uniq_survey_response
+      survey_responses.create(
+        session_uid: SecureRandom.uuid,
+      )
     end
   end
 end

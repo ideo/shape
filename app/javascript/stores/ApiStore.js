@@ -18,6 +18,8 @@ import User from './jsonApi/User'
 import Comment from './jsonApi/Comment'
 import CommentThread from './jsonApi/CommentThread'
 import UsersThread from './jsonApi/UsersThread'
+import SurveyResponse from './jsonApi/SurveyResponse'
+import QuestionAnswer from './jsonApi/QuestionAnswer'
 
 class ApiStore extends jsonapi(datxCollection) {
   @observable currentUserId = null
@@ -310,6 +312,8 @@ ApiStore.types = [
   CommentThread,
   Notification,
   UsersThread,
+  SurveyResponse,
+  QuestionAnswer,
 ]
 
 export default ApiStore
