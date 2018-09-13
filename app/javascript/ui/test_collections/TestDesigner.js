@@ -1,11 +1,16 @@
 import PropTypes from 'prop-types'
+import _ from 'lodash'
 import { Flex } from 'reflexbox'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 
 import { NumberListText } from '~/ui/global/styled/typography'
 import { Select, SelectOption } from '~/ui/global/styled/forms'
-import v from '~/utils/variables'
+import v, { ITEM_TYPES } from '~/utils/variables'
+import { apiStore } from '~/stores'
+// NOTE: Always import these models after everything else, can lead to odd dependency!
+import CollectionCard from '~/stores/jsonApi/CollectionCard'
+import SurveyResponse from '~/stores/jsonApi/SurveyResponse'
 import TestQuestionEditor from './TestQuestionEditor'
 
 const TopThing = styled.div`
@@ -67,6 +72,37 @@ const selectOptions = [
 
 @observer
 class TestDesigner extends React.Component {
+  state = {
+    surveyResponse: null,
+  }
+
+  handleSelectChange = (card) => async (ev) => {
+    const { collection } = this.props
+    const attrs = {
+      item_attributes: {
+        type: ITEM_TYPES.QUESTION,
+        question_type: ev.target.value,
+      },
+      order: card.order,
+      parent_id: collection.id,
+    }
+    const newCard = new CollectionCard(attrs, apiStore)
+    newCard.parent = collection
+    newCard.API_replace({ replacingId: card.id })
+  }
+
+  createSurveyResponse = async () => {
+    const { collection } = this.props
+    const newResponse = new SurveyResponse({
+      test_collection_id: collection.id,
+    }, apiStore)
+    const surveyResponse = await newResponse.save()
+    if (surveyResponse) {
+      this.setState({ surveyResponse })
+    }
+    return surveyResponse
+  }
+
   renderQuestionSelectForm(card) {
     return (
       <QuestionSelectHolder>
@@ -76,7 +112,7 @@ class TestDesigner extends React.Component {
           displayEmpty
           name="role"
           value={card.card_question_type}
-          onChange={this.handleSelectChange}
+          onChange={this.handleSelectChange(card)}
         >
           {selectOptions.map(opt => (
             <SelectOption
@@ -92,29 +128,36 @@ class TestDesigner extends React.Component {
   }
 
   render() {
+    const { surveyResponse } = this.state
     const { collection, editing } = this.props
     const cardCount = collection.collection_cards.length
     const inner = (
       collection.collection_cards.map((card, i) => {
-        let position
+        let position, questionAnswer
+        const item = card.record
         if (i === 0) position = 'beginning'
         if (i === cardCount - 1) position = 'end'
         if (!editing) {
           card.record.menuDisabled = true
+          if (surveyResponse) {
+            questionAnswer = _.find(surveyResponse.question_answers, { question_id: item.id })
+          }
         }
         const userEditable = editing &&
           ['media', 'description'].includes(card.record.question_type)
         return (
-          <Flex>
+          <Flex key={card.id}>
             {editing &&
               this.renderQuestionSelectForm(card)
             }
             <TestQuestionHolder editing={editing} userEditable={userEditable}>
               <TestQuestionEditor
-                key={card.id}
+                createSurveyResponse={this.createSurveyResponse}
+                surveyResponse={surveyResponse}
+                questionAnswer={questionAnswer}
                 parent={collection}
                 card={card}
-                item={card.record}
+                item={item}
                 position={position}
                 order={card.order}
                 editing={editing}

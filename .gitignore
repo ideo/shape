@@ -17,6 +17,7 @@
 !/log/.keep
 !/tmp/.keep
 
+.vscode
 .byebug_history
 
 /.env

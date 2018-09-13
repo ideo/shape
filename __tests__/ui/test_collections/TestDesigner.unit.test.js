@@ -6,6 +6,7 @@ describe('TestDesigner', () => {
   beforeEach(() => {
     props = {
       collection: fakeCollection,
+      editing: true,
     }
     wrapper = shallow(
       <TestDesigner {...props} />
