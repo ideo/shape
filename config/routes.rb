@@ -26,6 +26,7 @@ Rails.application.routes.draw do
         member do
           patch 'replace'
           patch 'update'
+          delete 'destroy'
         end
         collection do
           patch 'move'

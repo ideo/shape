@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types'
 import { Flex } from 'reflexbox'
+import { runInAction } from 'mobx'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 
@@ -8,6 +9,7 @@ import { Select, SelectOption } from '~/ui/global/styled/forms'
 import v, { ITEM_TYPES } from '~/utils/variables'
 import { apiStore, uiStore } from '~/stores/'
 import CollectionCard from '~/stores/jsonApi/CollectionCard'
+import TrashIcon from '~/ui/icons/TrashIcon'
 import QuestionHotEdge from './QuestionHotEdge'
 import TestQuestionEditor from './TestQuestionEditor'
 
@@ -61,6 +63,10 @@ const QuestionSelectHolder = styled.div`
   }
 `
 
+const TrashButton = styled.button`
+  width: 26px;
+`
+
 const selectOptions = [
   { value: null, label: 'select question type' },
   { value: 'context', label: 'Context Setting' },
@@ -72,6 +78,15 @@ const selectOptions = [
 
 @observer
 class TestDesigner extends React.Component {
+  handleTrash = (card) => {
+    card.destroy()
+    // TODO this is throwing a datx strict error for meta.persisted
+    runInAction(async () => {
+      await apiStore.request(`/collection_cards/${card.id}`, 'DELETE')
+      apiStore.fetch('collections', uiStore.viewingCollection.id)
+    })
+  }
+
   handleNew = (card) => {
     this.createNewQuestion(card.order + 0.5)
   }
@@ -117,6 +132,9 @@ class TestDesigner extends React.Component {
             </SelectOption>
           ))}
         </Select>
+        <TrashButton onClick={() => this.handleTrash(card)}>
+          <TrashIcon />
+        </TrashButton>
       </QuestionSelectHolder>
     )
   }
