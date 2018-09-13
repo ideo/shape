@@ -62,6 +62,7 @@ const QuestionSelectHolder = styled.div`
 `
 
 const selectOptions = [
+  { value: null, label: 'select question type' },
   { value: 'context', label: 'Context Setting' },
   { value: 'media', label: 'Photo or Video of Idea' },
   { value: 'description', label: 'Idea Description' },
@@ -104,11 +105,13 @@ class TestDesigner extends React.Component {
           name="role"
           value={card.card_question_type}
           onChange={this.handleSelectChange}
+          onDefault={!card.card_question_type}
         >
           {selectOptions.map(opt => (
             <SelectOption
               key={opt.value}
               value={opt.value}
+              defaultOption={!opt.value}
             >
               {opt.label}
             </SelectOption>

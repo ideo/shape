@@ -14,7 +14,7 @@ const HotEdge = styled.div`
 
 const HotEdgeVisuals = styled.div`
   opacity: ${props => (props.showing ? 1.0 : 0.0)};
-  transition: opacity 0.15s;
+  transition: opacity 0.20s;
   transition-timing-function: ease-in;
   visibility: ${props => (props.showing ? 'visible' : 'hidden')};
   z-index: 901;

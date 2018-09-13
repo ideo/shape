@@ -5,6 +5,7 @@ import styled from 'styled-components'
 import GridCard from '~/ui/grid/GridCard'
 import GridCardBlank from '~/ui/grid/blankContentTool/GridCardBlank'
 import DescriptionQuestion from '~/ui/test_collections/DescriptionQuestion'
+import NewQuestionGraphic from '~/ui/icons/NewQuestionGraphic'
 import ScaleQuestion from '~/ui/test_collections/ScaleQuestion'
 import OpenQuestion from '~/ui/test_collections/OpenQuestion'
 import v, { ITEM_TYPES } from '~/utils/variables'
@@ -15,6 +16,7 @@ import { QuestionText } from './shared'
 
 const QuestionHolder = styled.div`
   display: flex;
+  ${props => props.empty && 'margin-bottom: -6px;'}
 
   @media only screen
     and (max-width: ${v.responsive.medBreakpoint}px) {
@@ -113,13 +115,14 @@ class TestQuestionEditor extends React.Component {
         />
       )
     default:
-      return ''
+      return <NewQuestionGraphic />
     }
   }
 
   render() {
+    const { card } = this.props
     return (
-      <QuestionHolder>
+      <QuestionHolder empty={!card.card_question_type}>
         {this.renderQuestion()}
       </QuestionHolder>
     )
