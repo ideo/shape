@@ -1,9 +1,9 @@
 import PropTypes from 'prop-types'
 import _ from 'lodash'
 import { Flex } from 'reflexbox'
-import { runInAction } from 'mobx'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
+import FlipMove from 'react-flip-move'
 
 import { NumberListText } from '~/ui/global/styled/typography'
 import { Select, SelectOption } from '~/ui/global/styled/forms'
@@ -71,7 +71,7 @@ const TrashButton = styled.button`
 `
 
 const selectOptions = [
-  { value: null, label: 'select question type' },
+  { value: '', label: 'select question type' },
   { value: 'context', label: 'Context Setting' },
   { value: 'media', label: 'Photo or Video of Idea' },
   { value: 'description', label: 'Idea Description' },
@@ -85,19 +85,19 @@ class TestDesigner extends React.Component {
     surveyResponse: null,
   }
 
-  handleSelectChange = (card) => async (ev) => {
-    const { collection } = this.props
-    const attrs = {
-      item_attributes: {
-        type: ITEM_TYPES.QUESTION,
-        question_type: ev.target.value,
-      },
-      order: card.order,
-      parent_id: collection.id,
-    }
-    const newCard = new CollectionCard(attrs, apiStore)
-    newCard.parent = collection
-    newCard.API_replace({ replacingId: card.id })
+  handleSelectChange = (replacingCard) => (ev) => (
+    this.createNewQuestionCard({
+      replacingCard,
+      questionType: ev.target.value,
+    })
+  )
+
+  handleTrash = (card) => {
+    card.API_destroy()
+  }
+
+  handleNew = (card) => () => {
+    this.createNewQuestionCard({ order: card.order + 1 })
   }
 
   createSurveyResponse = async () => {
@@ -112,49 +112,45 @@ class TestDesigner extends React.Component {
     return surveyResponse
   }
 
-  handleTrash = (card) => {
-    card.destroy()
-    // TODO this is throwing a datx strict error for meta.persisted
-    runInAction(async () => {
-      await apiStore.request(`/collection_cards/${card.id}`, 'DELETE')
-      apiStore.fetch('collections', uiStore.viewingCollection.id)
-    })
-  }
-
-  handleNew = (card) => {
-    this.createNewQuestion(card.order + 0.5)
-  }
-
-  createNewQuestion = async (order) => {
+  createNewQuestionCard = async ({ replacingCard, order, questionType = '' }) => {
+    const { collection } = this.props
     const attrs = {
-      order,
-      width: 1,
-      height: 1,
-      parent_id: uiStore.viewingCollection.id,
       item_attributes: {
         type: ITEM_TYPES.QUESTION,
+        question_type: questionType,
       },
+      order: replacingCard ? replacingCard.order : order,
+      parent_id: collection.id,
     }
     const card = new CollectionCard(attrs, apiStore)
-    card.parent = uiStore.viewingCollection
-    await card.API_create()
+    card.parent = collection
+    if (replacingCard) {
+      return card.API_replace({ replacingId: replacingCard.id })
+    }
+    return card.API_create()
   }
 
   renderHotEdge(card) {
-    return <QuestionHotEdge onAdd={() => this.handleNew(card)} />
+    return (
+      <QuestionHotEdge onAdd={this.handleNew(card)} />
+    )
   }
 
   renderQuestionSelectForm(card) {
+    const blank = !card.card_question_type
     return (
       <QuestionSelectHolder>
         <NumberListText>{card.order + 1}.</NumberListText>
         <Select
-          classes={{ root: 'select fullWidth', selectMenu: 'selectMenu' }}
+          classes={{
+            root: 'select fullWidth',
+            select: blank ? 'grayedOut' : '',
+            selectMenu: 'selectMenu',
+          }}
           displayEmpty
           name="role"
-          value={card.card_question_type}
+          value={card.card_question_type || ''}
           onChange={this.handleSelectChange(card)}
-          onDefault={!card.card_question_type}
         >
           {selectOptions.map(opt => (
             <SelectOption
@@ -192,33 +188,39 @@ class TestDesigner extends React.Component {
         const userEditable = editing &&
           ['media', 'description'].includes(card.record.question_type)
         return (
-          <Flex
+          <FlipMove
+            appearAnimation="fade"
             key={card.id}
-            style={{
-              width: editing ? '694px' : 'auto',
-              flexWrap: 'wrap',
-            }}
           >
-            {editing &&
-              this.renderQuestionSelectForm(card)
-            }
-            <TestQuestionHolder editing={editing} userEditable={userEditable}>
-              <TestQuestionEditor
-                createSurveyResponse={this.createSurveyResponse}
-                surveyResponse={surveyResponse}
-                questionAnswer={questionAnswer}
-                parent={collection}
-                card={card}
-                item={item}
-                position={position}
-                order={card.order}
-                editing={editing}
-              />
-            </TestQuestionHolder>
-            {editing &&
-              this.renderHotEdge(card)
-            }
-          </Flex>
+            <div>
+              <Flex
+                style={{
+                  width: editing ? '694px' : 'auto',
+                  flexWrap: 'wrap',
+                }}
+              >
+                {editing &&
+                  this.renderQuestionSelectForm(card)
+                }
+                <TestQuestionHolder editing={editing} userEditable={userEditable}>
+                  <TestQuestionEditor
+                    createSurveyResponse={this.createSurveyResponse}
+                    surveyResponse={surveyResponse}
+                    questionAnswer={questionAnswer}
+                    parent={collection}
+                    card={card}
+                    item={item}
+                    position={position}
+                    order={card.order}
+                    editing={editing}
+                  />
+                </TestQuestionHolder>
+                {editing &&
+                  this.renderHotEdge(card)
+                }
+              </Flex>
+            </div>
+          </FlipMove>
         )
       })
     )

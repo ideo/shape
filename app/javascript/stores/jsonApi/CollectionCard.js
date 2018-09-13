@@ -1,3 +1,4 @@
+import _ from 'lodash'
 import { action, observable } from 'mobx'
 
 import { uiStore } from '~/stores'
@@ -113,6 +114,17 @@ class CollectionCard extends BaseRecord {
       return res.data
     } catch (e) {
       return uiStore.defaultAlertError()
+    }
+  }
+
+  async API_destroy() {
+    try {
+      this.destroy()
+      this.parent.removeCard(this)
+      console.log(_.map(this.parent.collection_cards, c => c.order))
+      return
+    } catch (e) {
+      uiStore.defaultAlertError()
     }
   }
 

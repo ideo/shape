@@ -169,7 +169,9 @@ export const Select = styled(MuiSelect)`
     font-family: ${v.fonts.sans};
     font-size: 1rem;
     font-weight: ${v.weights.book};
-    ${props => props.onDefault && `color: ${v.colors.gray};`}
+  }
+  .grayedOut {
+    color: ${v.colors.gray};
   }
 
   .fullWidth {
