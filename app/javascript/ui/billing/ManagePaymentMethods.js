@@ -1,34 +1,30 @@
-import { inject, observer } from 'mobx-react'
-import { observable, runInAction } from 'mobx'
-import { modelToJsonApi, saveModel } from 'datx-jsonapi'
-import { Heading1 } from '~/ui/global/styled/typography'
-import v from '~/utils/variables'
-import Header from '~/ui/layout/Header'
-import PageContainer from '~/ui/layout/PageContainer'
+import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
+import trackError from '~/utils/trackError'
 import PaymentMethods from '~shared/components/compounds/PaymentMethods'
 
 @inject('apiStore', 'networkStore')
 @observer
 class ManagePaymentMethods extends React.Component {
+
+  componentWillMount() {
+    this.loadPaymentMethods()
+  }
+
   async loadPaymentMethods() {
     const { apiStore, networkStore } = this.props
 
     try {
       await networkStore.loadOrganization(apiStore.currentUserOrganizationId)
       await networkStore.loadPaymentMethods(networkStore.organization.id)
-      // this.forceUpdate()
+      this.forceUpdate()
     } catch (e) {
-      console.log(e)
+      trackError(e)
     }
-  }
-
-  componentWillMount() {
-    this.loadPaymentMethods()
   }
 
   updatePaymentMethod = async paymentMethod => {
     await paymentMethod.save()
-    // this.forceUpdate()
+    this.forceUpdate()
   }
 
   makePaymentMethodDefault = async paymentMethod => {
@@ -38,12 +34,12 @@ class ManagePaymentMethods extends React.Component {
       this.props.networkStore.organization.id,
       true
     )
-    // this.forceUpdate()
+    this.forceUpdate()
   }
 
   destroyPaymentMethod = async paymentMethod => {
     await this.props.networkStore.remove(paymentMethod, true)
-    // this.forceUpdate()
+    this.forceUpdate()
   }
 
   tokenCreated = closeModal => async token => {
@@ -56,17 +52,11 @@ class ManagePaymentMethods extends React.Component {
   }
 
   render() {
-    // const paymentMethods = this.props.networkStore.findAll('payment_methods')
-    console.log('inner render', this.props.foo.length)
-    // this.props.foo.forEach(x => console.log(x.default))
-
-    this.props.foo.forEach(x => {
-      const jsonApi = modelToJsonApi(x)
-    })
+    const paymentMethods = this.props.networkStore.findAll('payment_methods')
 
     return (
       <PaymentMethods
-        paymentMethods={this.props.foo}
+        paymentMethods={paymentMethods}
         updatePaymentMethod={this.updatePaymentMethod}
         makePaymentMethodDefault={this.makePaymentMethodDefault}
         destroyPaymentMethod={this.destroyPaymentMethod}
@@ -75,5 +65,11 @@ class ManagePaymentMethods extends React.Component {
     )
   }
 }
+
+ManagePaymentMethods.wrappedComponent.propTypes = {
+  apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
+  networkStore: MobxPropTypes.objectOrObservableObject.isRequired,
+}
+
 
 export default ManagePaymentMethods
