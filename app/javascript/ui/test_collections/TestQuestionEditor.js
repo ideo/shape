@@ -8,7 +8,6 @@ import DescriptionQuestion from '~/ui/test_collections/DescriptionQuestion'
 import NewQuestionGraphic from '~/ui/icons/NewQuestionGraphic'
 import ScaleQuestion from '~/ui/test_collections/ScaleQuestion'
 import OpenQuestion from '~/ui/test_collections/OpenQuestion'
-import v from '~/utils/variables'
 import { apiStore, uiStore } from '~/stores'
 import QuestionAnswer from '~/stores/jsonApi/QuestionAnswer'
 import { QuestionText } from './shared'
@@ -16,12 +15,6 @@ import { QuestionText } from './shared'
 const QuestionHolder = styled.div`
   display: flex;
   ${props => props.empty && 'margin-bottom: -6px;'}
-
-  @media only screen
-    and (max-width: ${v.responsive.medBreakpoint}px) {
-    flex-direction: column;
-    margin-bottom: 10px;
-  }
 `
 
 const QuestionCardWrapper = styled.div`

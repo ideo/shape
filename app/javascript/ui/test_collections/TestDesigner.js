@@ -8,7 +8,7 @@ import FlipMove from 'react-flip-move'
 import { NumberListText } from '~/ui/global/styled/typography'
 import { Select, SelectOption } from '~/ui/global/styled/forms'
 import v, { ITEM_TYPES } from '~/utils/variables'
-import { apiStore, uiStore } from '~/stores/'
+import { apiStore } from '~/stores/'
 // NOTE: Always import these models after everything else, can lead to odd dependency!
 import CollectionCard from '~/stores/jsonApi/CollectionCard'
 import SurveyResponse from '~/stores/jsonApi/SurveyResponse'
@@ -33,8 +33,8 @@ const BottomThing = TopThing.extend`
 `
 
 const TestQuestionHolder = styled.div`
-  background-color: ${props => (props.userEditable ? '#9FC1CB' : '#5698AE')};
-  border-color: ${props => (props.editing ? v.colors.gray : '#9ec1cc')};
+  background-color: ${props => (props.userEditable ? v.colors.testLightBlueBg : v.colors.ctaButtonBlue)};
+  border-color: ${props => (props.editing ? v.colors.gray : v.colors.testLightBlueBg)};
   border-bottom-width: 0;
   border-left-width: ${props => (props.editing ? '20px' : '0')};
   border-right-width: ${props => (props.editing ? '20px' : '0')};
@@ -43,12 +43,15 @@ const TestQuestionHolder = styled.div`
   margin-bottom: ${props => (props.editing ? 0 : '6px')};
   width: ${props => (props.editing ? '334px' : '100%')};
 
-  @media only screen
-    and (max-width: ${v.responsive.medBreakpoint}px) {
-    border-width: 0;
-    margin-left: 22px;
-    margin-right: 28px;
-  }
+  /* this responsive resize only factors into the edit state */
+  ${props => props.editing && (`
+    @media only screen
+      and (max-width: ${v.responsive.medBreakpoint}px) {
+      border-width: 0;
+      margin-left: 22px;
+      margin-right: 28px;
+    }
+  `)}
 
   &:last {
     margin-bottom: 0;
@@ -62,7 +65,9 @@ const QuestionSelectHolder = styled.div`
 
   @media only screen
     and (max-width: ${v.responsive.medBreakpoint}px) {
-    margin-bottom: 10px;
+    margin-bottom: 20px;
+    width: auto;
+    max-width: 400px;
   }
 `
 

@@ -28,7 +28,7 @@ const TextInput = styled(TextareaAutosize)`
 `
 
 const StyledSmallText = SmallHelperText.extend`
-  color: #5698AE;
+  color: ${v.colors.ctaButtonBlue};
   margin-left: calc(100% - 35px);
 `
 
@@ -75,6 +75,7 @@ class DescriptionQuestion extends React.Component {
             onChange={this.handleChange}
             placeholder="Write Idea Description Here…"
             value={item.content || ''}
+            maxLength={MAX_LEN}
           />
           <StyledSmallText>{this.state.countLeft}</StyledSmallText>
         </TextInputHolder>

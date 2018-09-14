@@ -6,9 +6,8 @@ import Emoji from '~/ui/icons/Emoji'
 import { DisplayText, SmallHelperText } from '~/ui/global/styled/typography'
 import v from '~/utils/variables'
 
-// TODO deal with new colros
 const Question = styled.div`
-  border-color: ${props => (props.editing ? v.colors.gray : '#9ec1cc')};
+  border-color: ${props => (props.editing ? v.colors.gray : v.colors.testLightBlueBg)};
   border-bottom-style: solid;
   border-bottom-width: 6px;
   box-sizing: border-box;
@@ -20,12 +19,12 @@ const Question = styled.div`
 const Scale = styled.div`
   background-color: ${v.colors.desert};
   box-sizing: border-box;
-  color: #5698AE;
+  color: ${v.colors.ctaButtonBlue};
   padding: 7px 13px;
   width: 100%;
 
   span {
-    color: #5698AE;
+    color: ${v.colors.ctaButtonBlue};
   }
 `
 

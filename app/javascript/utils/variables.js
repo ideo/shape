@@ -35,6 +35,7 @@ export default {
     cararra: '#f2f1ee',
     desert: '#f5f4f3',
     cyan: '#b3cdd5',
+    cyanLt: '#c0dbde',
     testLightBlueBg: '#9ec1cc',
     pacificBlue: '#00a0e0',
     activityLightBlue: '#73808f',

@@ -2,6 +2,7 @@ import PropTypes from 'prop-types'
 import styled from 'styled-components'
 
 import PlusIcon from '~/ui/icons/PlusIcon'
+import v from '~/utils/variables'
 
 const HotEdge = styled.div`
   height: 0;
@@ -9,7 +10,13 @@ const HotEdge = styled.div`
   position: relative;
   top: -20px;
   width: 100%;
-  z-index: 900;
+  z-index: ${v.zIndex.floatOverContent};
+
+  @media only screen
+    and (max-width: ${v.responsive.medBreakpoint}px) {
+    margin-left: 0;
+    width: 376px;
+  }
 `
 
 const HotEdgeVisuals = styled.div`
@@ -17,11 +24,11 @@ const HotEdgeVisuals = styled.div`
   transition: opacity 0.20s;
   transition-timing-function: ease-in;
   visibility: ${props => (props.showing ? 'visible' : 'hidden')};
-  z-index: 901;
+  z-index: ${v.zIndex.floatOverContent + 1};
 `
 
 const VisualBar = styled.div`
-  background-color: #C0DBDE;
+  background-color: ${v.colors.cyanLt};
   height: 6px;
   left: 20px;
   position: absolute;
@@ -29,7 +36,7 @@ const VisualBar = styled.div`
   width: calc(100% - 40px);
 `
 const RoundAddButton = styled.button`
-  background-color: #C0DBDE;
+  background-color: ${v.colors.cyanLt};
   border-radius: 50%;
   color: white;
   height: 32px;
