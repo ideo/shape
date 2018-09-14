@@ -1,60 +1,22 @@
-import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
-import { observable, runInAction } from 'mobx'
+import { inject, observer } from 'mobx-react'
 import { Heading1 } from '~/ui/global/styled/typography'
 import v from '~/utils/variables'
 import Header from '~/ui/layout/Header'
 import PageContainer from '~/ui/layout/PageContainer'
-import PaymentMethods from '~shared/components/compounds/PaymentMethods'
-import { networkStore } from '~/stores'
+import ManagePaymentMethods from '~/ui/billing/ManagePaymentMethods'
 
-@inject('apiStore')
+@inject('networkStore')
 @observer
 class BillingPage extends React.Component {
-  @observable loaded = false
-  @observable paymentMethods = []
-
-  async loadPaymentMethods() {
-    try {
-      const networkOrganization = await networkStore.loadOrganization(this.props.apiStore.currentUserOrganizationId)
-      const paymentMethods = await networkStore.loadPaymentMethods(networkOrganization.id)
-      runInAction(() => {
-        this.paymentMethods = paymentMethods
-        this.loaded = true
-      })
-    } catch(e) {
-      console.log(e)
-    }
-  }
-
-  componentDidMount() {
-    this.loadPaymentMethods()
-  }
-
-  updatePaymentMethod() {
-  }
-
-  makePaymentMethodDefault() {
-  }
-
-  destroyPaymentMethod() {
-  }
-
-  tokenCreated() {
-  }
-
   render() {
+    const paymentMethods = this.props.networkStore.findAll('payment_methods')
+    console.log('outer render', paymentMethods.length)
     return (
       <div>
         <Header />
         <PageContainer marginTop={v.headerHeightCompact}>
           <Heading1>Billing</Heading1>
-          <PaymentMethods
-            paymentMethods={this.paymentMethods}
-            updatePaymentMethod={this.updatePaymentMethod}
-            makePaymentMethodDefault={this.makePaymentMethodDefault}
-            destroyPaymentMethod={this.destroyPaymentMethod}
-            tokenCreated={this.tokenCreated}
-            />
+          <ManagePaymentMethods foo={paymentMethods}/>
         </PageContainer>
       </div>
     )
