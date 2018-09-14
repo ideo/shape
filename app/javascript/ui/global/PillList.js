@@ -56,7 +56,11 @@ class PillList extends React.Component {
               avatar={avatar}
               label={item.name}
               onDelete={this.handleDelete(item)}
-              deleteIcon={<IconHolder><CloseIcon /></IconHolder>}
+              deleteIcon={
+                <IconHolder>
+                  <CloseIcon />
+                </IconHolder>
+              }
             />
           )
         })}

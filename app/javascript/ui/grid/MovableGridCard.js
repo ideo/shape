@@ -40,7 +40,8 @@ const StyledCardWrapper = styled.div`
   &:hover {
     z-index: ${v.zIndex.gridCard};
   }
-  &:hover, &.touch-device {
+  &:hover,
+  &.touch-device {
     .show-on-hover {
       /* don't show hover items while dragging */
       opacity: ${props => (props.dragging ? 0 : 1)};
@@ -70,8 +71,8 @@ class MovableGridCard extends React.PureComponent {
   handleStart = (e, data) => {
     // initialOffset tracks the coordinates *within* the card where you clicked,
     // e.g. bottom left corner of the card itself
-    const initialOffsetX = (e.screenX - e.target.getBoundingClientRect().x)
-    const initialOffsetY = (e.screenY - e.target.getBoundingClientRect().y)
+    const initialOffsetX = e.screenX - e.target.getBoundingClientRect().x
+    const initialOffsetY = e.screenY - e.target.getBoundingClientRect().y
     this.setState({
       initialOffsetX,
       initialOffsetY,
@@ -101,12 +102,12 @@ class MovableGridCard extends React.PureComponent {
       // divide by 2 to get center position of the card (instead of top left)
       dragX: x + position.width / 2,
       dragY: y + position.height / 2,
-      ...position
+      ...position,
     }
     this.props.onDrag(this.props.card.id, dragPosition)
   }
 
-  handleStop = (ev) => {
+  handleStop = ev => {
     this.props.onDragOrResizeStop(this.props.card.id)
     this.setState({ dragging: false, resizing: false })
     const timeoutId = setTimeout(() => {
@@ -129,8 +130,8 @@ class MovableGridCard extends React.PureComponent {
     const pad = 0.75
     const newSize = {
       // pad by some so that as you resize it doesn't immediately jump sizes
-      width: card.width + Math.floor((delta.width / gridW) + pad),
-      height: card.height + Math.floor((delta.height / gridH) + pad),
+      width: card.width + Math.floor(delta.width / gridW + pad),
+      height: card.height + Math.floor(delta.height / gridH + pad),
     }
     // e.g. if card.width is 4, but we're at 2 columns, max out at cardWidth = 2
     newSize.width = Math.max(Math.min(newSize.width, cols), 1)
@@ -140,7 +141,7 @@ class MovableGridCard extends React.PureComponent {
   }
 
   // this function gets passed down to the card, so it can place the onClick handler
-  handleClick = (e) => {
+  handleClick = e => {
     const { card, cardType, record } = this.props
     // TODO: make sure this is cross-browser compatible?
     if (e.metaKey || e.shiftKey) {
@@ -192,10 +193,7 @@ class MovableGridCard extends React.PureComponent {
   )
 
   renderEmpty = ({ beginningOfRow } = {}) => (
-    <PositionedGridCard
-      {...this.styleProps()}
-      transition={cardCSSTransition}
-    >
+    <PositionedGridCard {...this.styleProps()} transition={cardCSSTransition}>
       <GridCardEmpty
         card={this.props.card}
         dragging={this.state.dragging}
@@ -204,22 +202,14 @@ class MovableGridCard extends React.PureComponent {
     </PositionedGridCard>
   )
 
-  renderBlank = (cardType) => {
+  renderBlank = cardType => {
     const { card, parent } = this.props
     const styleProps = this.styleProps()
-    const {
-      height,
-      xPos,
-      yPos
-    } = styleProps
+    const { height, xPos, yPos } = styleProps
     const { blankType } = card
 
     let cardElement = (
-      <GridCardBlank
-        height={height}
-        parent={parent}
-        preselected={blankType}
-      />
+      <GridCardBlank height={height} parent={parent} preselected={blankType} />
     )
     if (cardType === 'submission') {
       cardElement = (
@@ -238,18 +228,16 @@ class MovableGridCard extends React.PureComponent {
         appearAnimation={{
           from: {
             transform: `scaleX(0) scaleY(0)`,
-            transformOrigin: `${xPos}px ${yPos}px`
+            transformOrigin: `${xPos}px ${yPos}px`,
           },
           to: {
             transform: `scaleX(1) scaleY(1)`,
-            transformOrigin: `${xPos}px ${yPos}px`
+            transformOrigin: `${xPos}px ${yPos}px`,
           },
         }}
       >
         <div>
-          <PositionedGridCard {...styleProps}>
-            {cardElement}
-          </PositionedGridCard>
+          <PositionedGridCard {...styleProps}>{cardElement}</PositionedGridCard>
         </div>
       </FlipMove>
     )
@@ -274,11 +262,7 @@ class MovableGridCard extends React.PureComponent {
       position: { width },
     } = this.props
 
-    const {
-      dragging,
-      resizing,
-      moveComplete
-    } = this.state
+    const { dragging, resizing, moveComplete } = this.state
 
     if (cardType === 'placeholder') {
       return this.renderPlaceholder()
@@ -342,18 +326,14 @@ class MovableGridCard extends React.PureComponent {
           onDragStart={this.handleStart}
           onDrag={this.handleDrag}
           onDragStop={this.handleStop}
-
           onResizeStart={this.handleStart}
           onResize={this.handleResize}
           onResizeStop={this.handleStop}
-
           minWidth={minWidth}
           minHeight={minHeight}
           maxWidth={maxWidth}
           maxHeight={maxHeight}
-
           cancel=".no-drag"
-
           size={{ width, height }}
           position={{ x: xPos, y: yPos }}
           default={{ width, height, x: xPos, y: yPos }}
@@ -364,7 +344,9 @@ class MovableGridCard extends React.PureComponent {
             card.isPinnedAndLocked
           }
           enableResizing={{
-            bottomRight: canEditCollection && !card.isPinnedAndLocked &&
+            bottomRight:
+              canEditCollection &&
+              !card.isPinnedAndLocked &&
               !card.record.isGenericFile,
             bottom: false,
             bottomLeft: false,
@@ -381,21 +363,21 @@ class MovableGridCard extends React.PureComponent {
                 <StyledResizeIcon menuOpen={menuOpen} className="show-on-hover">
                   <ResizeIcon />
                 </StyledResizeIcon>
-              )
-            }
+              ),
+            },
           }}
-
           style={{
             // animate grid items that are moving as they're being displaced
-            transition: ((dragging || resizing) ? 'none' : cardCSSTransition),
+            transition: dragging || resizing ? 'none' : cardCSSTransition,
           }}
-
         >
           <div
             style={{
               width: '100%',
               height: '100%',
-              transform: dragging ? `translate(${xAdjust}px, ${yAdjust}px) rotate(3deg)` : '',
+              transform: dragging
+                ? `translate(${xAdjust}px, ${yAdjust}px) rotate(3deg)`
+                : '',
             }}
           >
             <GridCard {...cardProps} />

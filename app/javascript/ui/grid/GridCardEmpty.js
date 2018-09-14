@@ -19,9 +19,8 @@ const StyledHotspotHelper = styled.div`
   svg {
     transition: ${v.transitionWithDelay};
     width: 90%;
-    @media only screen
-      and (min-width: ${v.responsive.medBreakpoint}px)
-      and (max-width: ${v.responsive.largeBreakpoint}px) {
+    @media only screen and (min-width: ${v.responsive
+        .medBreakpoint}px) and (max-width: ${v.responsive.largeBreakpoint}px) {
       width: 95%;
     }
   }
@@ -47,19 +46,15 @@ class GridCardEmpty extends React.Component {
     const { card, dragging, showHotspot } = this.props
     return (
       <StyledGridCardEmpty>
-        {showHotspot &&
-          <GridCardHotspot
-            card={card}
-            dragging={dragging}
-            position="left"
-          />
-        }
-        {this.showHelper &&
+        {showHotspot && (
+          <GridCardHotspot card={card} dragging={dragging} position="left" />
+        )}
+        {this.showHelper && (
           <StyledHotspotHelper>
             <HotspotHelperGraphic />
             <CloseButton onClick={this.hideHelper} />
           </StyledHotspotHelper>
-        }
+        )}
       </StyledGridCardEmpty>
     )
   }

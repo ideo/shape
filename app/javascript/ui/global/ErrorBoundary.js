@@ -11,20 +11,26 @@ class ErrorBoundary extends React.Component {
   componentDidCatch(error, errorInfo) {
     this.setState({ error })
     const source = errorInfo.componentStack.split('\n')[1]
-    trackErrorSpecify(source, error.message, error.name, error.stack.split('\n'))
+    trackErrorSpecify(
+      source,
+      error.message,
+      error.name,
+      error.stack.split('\n')
+    )
   }
 
   render() {
     if (this.state.error) {
       return (
-        <div style={{
+        <div
+          style={{
             maxWidth: v.maxWidth,
             margin: '0 auto',
             marginTop: v.headerHeight,
             textAlign: 'center',
           }}
         >
-          <h3>We're sorry — something's gone wrong.</h3>
+          <h3>{"We're sorry — something's gone wrong."}</h3>
         </div>
       )
     }

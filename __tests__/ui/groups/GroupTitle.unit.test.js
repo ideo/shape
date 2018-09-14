@@ -1,9 +1,7 @@
 import GroupTitle from '~/ui/groups/GroupTitle'
 import FilestackUpload from '~/utils/FilestackUpload'
 
-import {
-  fakeGroup,
-} from '#/mocks/data'
+import { fakeGroup } from '#/mocks/data'
 
 jest.mock('../../../app/javascript/utils/FilestackUpload')
 
@@ -12,7 +10,7 @@ let wrapper
 let component
 
 const fakeEvent = {
-  preventDefault: jest.fn()
+  preventDefault: jest.fn(),
 }
 
 describe('GroupTitle', () => {
@@ -22,11 +20,10 @@ describe('GroupTitle', () => {
       group: fakeGroup,
       canEdit: true,
     }
-    FilestackUpload.pickImage = jest.fn()
+    FilestackUpload.pickImage = jest
+      .fn()
       .mockReturnValue(Promise.resolve({ filesUploaded: [] }))
-    wrapper = shallow(
-      <GroupTitle {...props} />
-    )
+    wrapper = shallow(<GroupTitle {...props} />)
     component = wrapper.instance()
   })
 
@@ -70,7 +67,10 @@ describe('GroupTitle', () => {
     it('should assign filestack file attributes to passed in data', () => {
       const data = { url: 'hello.jpg' }
       component.updateGroupAvatar(data)
-      expect(props.group.assign).toHaveBeenCalledWith('filestack_file_attributes', data)
+      expect(props.group.assign).toHaveBeenCalledWith(
+        'filestack_file_attributes',
+        data
+      )
     })
   })
 

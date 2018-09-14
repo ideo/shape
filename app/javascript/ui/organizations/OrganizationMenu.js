@@ -13,8 +13,10 @@ import GroupTitle from '~/ui/groups/GroupTitle'
 @inject('apiStore', 'uiStore')
 @observer
 class OrganizationMenu extends React.Component {
-  @observable editGroup = {}
-  @observable isLoading = false
+  @observable
+  editGroup = {}
+  @observable
+  isLoading = false
 
   componentDidMount() {
     const { apiStore, uiStore } = this.props
@@ -37,46 +39,50 @@ class OrganizationMenu extends React.Component {
     uiStore.update('organizationMenuGroupId', null)
   }
 
-  @action goToEditGroupRoles(group) {
+  @action
+  goToEditGroupRoles(group) {
     this.changePage('editRoles')
     this.editGroup = group
   }
 
-  goToAddGroup = (ev) => {
+  goToAddGroup = ev => {
     this.changePage('addGroup')
   }
 
-  @action goToEditGroup(group) {
+  @action
+  goToEditGroup(group) {
     this.changePage('editGroup')
     this.editGroup = group
   }
 
-  @action goBack = () => {
+  @action
+  goBack = () => {
     this.changePage('organizationPeople')
     this.isLoading = false
     this.editGroup = {}
   }
 
-  saveOrganization = (primaryGroup) => {
+  saveOrganization = primaryGroup => {
     primaryGroup.save()
     this.changePage('organizationPeople')
   }
 
-  afterGroupSave = (group) => {
+  afterGroupSave = group => {
     if (!group.is_primary) return
     const { apiStore, organization } = this.props
     apiStore.fetch('groups', organization.guest_group.id)
     apiStore.fetch('groups', organization.admin_group.id)
   }
 
-  createOrganization = async (organizationData) => {
+  createOrganization = async organizationData => {
     const { apiStore, uiStore, onClose } = this.props
     const newOrg = new Organization(organizationData, apiStore)
     try {
       this.isLoading = true
       await newOrg.save()
-      await apiStore.currentUser.switchOrganization(newOrg.id,
-        { redirectPath: 'homepage' })
+      await apiStore.currentUser.switchOrganization(newOrg.id, {
+        redirectPath: 'homepage',
+      })
       this.isLoading = false
       uiStore.update('orgCreated', true)
       onClose()
@@ -86,7 +92,8 @@ class OrganizationMenu extends React.Component {
     }
   }
 
-  @action createGroup = async (groupData) => {
+  @action
+  createGroup = async groupData => {
     const { apiStore, uiStore } = this.props
     const newGroup = new Group(toJS(groupData), apiStore)
     try {
@@ -98,9 +105,13 @@ class OrganizationMenu extends React.Component {
     apiStore.loadCurrentUser()
     this.goToEditGroupRoles(newGroup)
     // because this is after async/await
-    runInAction(() => { this.isLoading = true })
+    runInAction(() => {
+      this.isLoading = true
+    })
     await apiStore.fetchRoles(newGroup)
-    runInAction(() => { this.isLoading = false })
+    runInAction(() => {
+      this.isLoading = false
+    })
   }
 
   onGroupRoles = group => () => {
@@ -121,7 +132,8 @@ class OrganizationMenu extends React.Component {
     }
   }
 
-  @action handleClose = (ev) => {
+  @action
+  handleClose = ev => {
     this.props.onClose()
     this.isLoading = false
     this.editGroup = {}
@@ -132,12 +144,7 @@ class OrganizationMenu extends React.Component {
   }
 
   renderAddGroup() {
-    return (
-      <GroupModify
-        group={{}}
-        onSave={this.createGroup}
-      />
-    )
+    return <GroupModify group={{}} onSave={this.createGroup} />
   }
 
   renderCreateOrganization() {
@@ -157,7 +164,7 @@ class OrganizationMenu extends React.Component {
       <GroupModify
         onGroupRoles={this.onGroupRoles(editGroup)}
         group={editGroup}
-        onSave={(group) => {
+        onSave={group => {
           this.saveOrganization(group)
           this.afterGroupSave(group)
         }}
@@ -186,7 +193,8 @@ class OrganizationMenu extends React.Component {
         addCallout="Add people:"
         roles={this.editGroup.groupRoles}
         onSave={this.onRolesSave}
-      />)
+      />
+    )
   }
 
   renderOrganizationPeople() {
@@ -203,9 +211,8 @@ class OrganizationMenu extends React.Component {
   }
 
   renderGroupTitle() {
-    const canEditTitle = (
+    const canEditTitle =
       this.editGroup.can_edit && !this.editGroup.isGuestOrAdmin
-    )
     return (
       <GroupTitle
         group={this.editGroup}
@@ -219,45 +226,48 @@ class OrganizationMenu extends React.Component {
     const { open, uiStore, apiStore, locked } = this.props
     let content, title, onBack, onEdit
     switch (this.currentPage) {
-    case 'addGroup':
-      content = this.renderAddGroup()
-      title = 'New Group'
-      onBack = this.goBack
-      break
-    case 'newOrganization':
-      title = 'New Organization'
-      onBack = locked ? null : this.goBack
-      content = this.renderCreateOrganization()
-      break
-    case 'editOrganization':
-      title = 'Your Organization'
-      onBack = this.goBack
-      content = this.renderEditOrganization()
-      break
-    case 'editRoles':
-      onBack = this.goBack
-      if (this.isLoading) {
-        content = <Loader height="350px" fadeIn="none" />
-      } else {
-        if (uiStore.organizationMenuGroupId) {
-          runInAction(() => {
-            this.editGroup = apiStore.find('groups', uiStore.organizationMenuGroupId)
-          })
+      case 'addGroup':
+        content = this.renderAddGroup()
+        title = 'New Group'
+        onBack = this.goBack
+        break
+      case 'newOrganization':
+        title = 'New Organization'
+        onBack = locked ? null : this.goBack
+        content = this.renderCreateOrganization()
+        break
+      case 'editOrganization':
+        title = 'Your Organization'
+        onBack = this.goBack
+        content = this.renderEditOrganization()
+        break
+      case 'editRoles':
+        onBack = this.goBack
+        if (this.isLoading) {
+          content = <Loader height="350px" fadeIn="none" />
+        } else {
+          if (uiStore.organizationMenuGroupId) {
+            runInAction(() => {
+              this.editGroup = apiStore.find(
+                'groups',
+                uiStore.organizationMenuGroupId
+              )
+            })
+          }
+          content = this.renderEditRoles()
         }
-        content = this.renderEditRoles()
-      }
-      if (this.editGroup.can_edit) {
-        onEdit = () => {
-          this.goToEditGroup(this.editGroup)
+        if (this.editGroup.can_edit) {
+          onEdit = () => {
+            this.goToEditGroup(this.editGroup)
+          }
         }
-      }
-      title = this.renderGroupTitle()
-      break
-    case 'organizationPeople':
-    default:
-      content = this.renderOrganizationPeople()
-      title = 'People & Groups'
-      break
+        title = this.renderGroupTitle()
+        break
+      case 'organizationPeople':
+      default:
+        content = this.renderOrganizationPeople()
+        title = 'People & Groups'
+        break
     }
 
     return (
@@ -268,7 +278,7 @@ class OrganizationMenu extends React.Component {
         onEdit={onEdit}
         open={open}
       >
-        { content }
+        {content}
       </Modal>
     )
   }

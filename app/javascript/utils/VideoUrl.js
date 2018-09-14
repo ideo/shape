@@ -22,7 +22,7 @@ class VideoUrl {
     const { service } = data
     let { id } = data
     if (service === 'vimeo' && !id) {
-      ({ id } = this.vimeoPrivate(url))
+      ;({ id } = this.vimeoPrivate(url))
     }
     retv.service = service
     retv.id = id
@@ -35,12 +35,12 @@ class VideoUrl {
   // to standardize video url format
   static normalizedUrl(service, id) {
     switch (service) {
-    case 'youtube':
-      return `https://www.youtube.com/watch?v=${id}`
-    case 'vimeo':
-      return `https://vimeo.com/${id}`
-    default:
-      return null
+      case 'youtube':
+        return `https://www.youtube.com/watch?v=${id}`
+      case 'vimeo':
+        return `https://vimeo.com/${id}`
+      default:
+        return null
     }
   }
 
@@ -75,14 +75,17 @@ class VideoUrl {
   }
 
   static async getYoutubeDetails(id) {
-    const apiUrl = `https://www.googleapis.com/youtube/v3/videos?part=snippet&id=${id}&key=${process.env.YOUTUBE_V3_API_KEY}`
+    const apiUrl = `https://www.googleapis.com/youtube/v3/videos?part=snippet&id=${id}&key=${
+      process.env.YOUTUBE_V3_API_KEY
+    }`
     try {
       const response = await axios.get(apiUrl)
       const data = response.data.items[0].snippet
       const thumbs = data.thumbnails
       // https://developers.google.com/youtube/v3/docs/thumbnails
       // maxres = 1280w, standard = 640w, high = 480w, medium=320w
-      const thumb = thumbs.maxres || thumbs.standard || thumbs.high || thumbs.medium
+      const thumb =
+        thumbs.maxres || thumbs.standard || thumbs.high || thumbs.medium
       return {
         name: data.title,
         // NOTE: Does "high" always exist? Do we have to check for sizes?
@@ -98,12 +101,15 @@ class VideoUrl {
     try {
       const config = {
         headers: {
-          Authorization: `Bearer ${process.env.VIMEO_V3_API_KEY}`
-        }
+          Authorization: `Bearer ${process.env.VIMEO_V3_API_KEY}`,
+        },
       }
       const response = await axios.get(apiUrl, config)
       const { data } = response
-      const thumbnail = _.find(_.reverse(data.pictures.sizes), i => i.width > 600)
+      const thumbnail = _.find(
+        _.reverse(data.pictures.sizes),
+        i => i.width > 600
+      )
       return {
         name: data.name,
         thumbnailUrl: thumbnail.link,
@@ -121,15 +127,15 @@ class VideoUrl {
 
     if (!service || !id) return false
     switch (service) {
-    case 'youtube':
-      // ensure no extra characters between youtube[...].com
-      return !/youtube(.+)\.com/.test(url)
-    case 'vimeo':
-      // ensure id is numeric (unless vimeo changes their format!)
-      // ensure id is not identifying a group/id
-      return /\d+/.test(id) && !/groups\/(\d+)$/.test(url)
-    default:
-      return true
+      case 'youtube':
+        // ensure no extra characters between youtube[...].com
+        return !/youtube(.+)\.com/.test(url)
+      case 'vimeo':
+        // ensure id is numeric (unless vimeo changes their format!)
+        // ensure id is not identifying a group/id
+        return /\d+/.test(id) && !/groups\/(\d+)$/.test(url)
+      default:
+        return true
     }
   }
 }

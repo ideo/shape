@@ -193,12 +193,13 @@ class AutoComplete extends React.Component {
     multi: null,
   }
 
-  handleChange = (multi) => {
+  handleChange = multi => {
     this.setState({
       multi,
     })
-    let fullOption = this.props.options.find((option) =>
-      option.value === multi || option.label === multi)
+    let fullOption = this.props.options.find(
+      option => option.value === multi || option.label === multi
+    )
     if (!fullOption || !fullOption.data) {
       fullOption = Object.assign({}, { data: { custom: fullOption.value } })
     }
@@ -238,10 +239,12 @@ AutoComplete.propTypes = {
     chip: PropTypes.string,
     '@global': PropTypes.string,
   }).isRequired,
-  options: PropTypes.arrayOf(PropTypes.shape({
-    label: PropTypes.string,
-    value: PropTypes.string,
-  })).isRequired,
+  options: PropTypes.arrayOf(
+    PropTypes.shape({
+      label: PropTypes.string,
+      value: PropTypes.string,
+    })
+  ).isRequired,
   onOptionSelect: PropTypes.func.isRequired,
   keepSelectedOptions: PropTypes.bool,
 }

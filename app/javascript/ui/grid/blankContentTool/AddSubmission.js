@@ -21,7 +21,7 @@ const StyledGridCardInner = styled.div`
   max-width: ${props => props.gridW}px;
   margin: 0 auto;
   position: relative;
-  top: ${props => (props.height > 1 ? (props.gridH / 2) : 0)}px;
+  top: ${props => (props.height > 1 ? props.gridH / 2 : 0)}px;
 `
 StyledGridCardInner.displayName = 'StyledGridCardInner'
 
@@ -52,7 +52,7 @@ class AddSubmission extends React.Component {
     loading: false,
   }
 
-  handleSubmission = (ev) => {
+  handleSubmission = ev => {
     ev.preventDefault()
     const { parent_id, submissionSettings } = this.props
     //  TODO figure out how to put loading state even when calling this
@@ -66,10 +66,8 @@ class AddSubmission extends React.Component {
 
     return (
       <StyledBlankCreationTool>
-        <h3>
-          Add a new {viewingCollection.submissionTypeName}
-        </h3>
-        { this.state.loading && <InlineLoader /> }
+        <h3>Add a new {viewingCollection.submissionTypeName}</h3>
+        {this.state.loading && <InlineLoader />}
         <SubmissionButton
           disabled={this.loading}
           onClick={this.handleSubmission}

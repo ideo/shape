@@ -10,9 +10,7 @@ describe('AlertDialog', () => {
       onClose: jest.fn(),
       open: '',
     }
-    wrapper = shallow(
-      <AlertDialog {...props} />
-    )
+    wrapper = shallow(<AlertDialog {...props} />)
     component = wrapper.instance()
   })
 

@@ -1,18 +1,12 @@
-import { observable, } from 'mobx'
+import { observable } from 'mobx'
 import RolesMenu from '~/ui/roles/RolesMenu'
 
-import {
-  fakeOrganization,
-  fakeUser,
-  fakeRole,
-} from '#/mocks/data'
+import { fakeOrganization, fakeUser, fakeRole } from '#/mocks/data'
 
 const apiStore = observable({
-  request: jest.fn()
-    .mockReturnValue(Promise.resolve({ data: [] })),
+  request: jest.fn().mockReturnValue(Promise.resolve({ data: [] })),
   fetchAll: jest.fn(),
-  find: jest.fn()
-    .mockReturnValue(Promise.resolve({ roles: [] })),
+  find: jest.fn().mockReturnValue(Promise.resolve({ roles: [] })),
   remove: jest.fn(),
   add: jest.fn(),
   currentUser: fakeUser,
@@ -20,7 +14,7 @@ const apiStore = observable({
 })
 const uiStore = observable({
   rolesMenuOpen: null,
-  update: jest.fn()
+  update: jest.fn(),
 })
 let props
 
@@ -44,9 +38,7 @@ describe('RolesMenu', () => {
       routingStore,
       onSave: jest.fn(),
     }
-    wrapper = shallow(
-      <RolesMenu.wrappedComponent {...props} />
-    )
+    wrapper = shallow(<RolesMenu.wrappedComponent {...props} />)
     component = wrapper.instance()
   })
 
@@ -58,10 +50,12 @@ describe('RolesMenu', () => {
 
     it('should request all the organization groups and users', () => {
       expect(apiStore.request).toHaveBeenCalledWith(
-        `organizations/${fakeOrganization.id}/users`, 'GET'
+        `organizations/${fakeOrganization.id}/users`,
+        'GET'
       )
       expect(apiStore.request).toHaveBeenCalledWith(
-        `organizations/${fakeOrganization.id}/groups`, 'GET'
+        `organizations/${fakeOrganization.id}/groups`,
+        'GET'
       )
     })
   })
@@ -104,7 +98,7 @@ describe('RolesMenu', () => {
 
   describe('onUserSearch', () => {
     describe('when a user is found', () => {
-      it('should api request the users search route', (done) => {
+      it('should api request the users search route', done => {
         component.onUserSearch('mary').then(() => {
           expect(apiStore.request).toHaveBeenCalledWith(
             'users/search?query=mary'
@@ -127,10 +121,9 @@ describe('RolesMenu', () => {
 
     describe('when switching a role', () => {
       it('should make an call role delete with the correct data', () => {
-        expect(role.API_delete).toHaveBeenCalledWith(
-          user,
-          { isSwitching: true },
-        )
+        expect(role.API_delete).toHaveBeenCalledWith(user, {
+          isSwitching: true,
+        })
       })
     })
 
@@ -143,7 +136,9 @@ describe('RolesMenu', () => {
       })
 
       it('should call the onSave prop after the request is done', () => {
-        expect(props.onSave).toHaveBeenCalledWith(fakeData, { roleName: fakeRole.name })
+        expect(props.onSave).toHaveBeenCalledWith(fakeData, {
+          roleName: fakeRole.name,
+        })
       })
 
       it('should filter the searchable items', () => {
@@ -158,7 +153,10 @@ describe('RolesMenu', () => {
       let opts
 
       beforeEach(async () => {
-        users = [{ id: 3, internalType: 'users' }, { id: 5, internalType: 'users' }]
+        users = [
+          { id: 3, internalType: 'users' },
+          { id: 5, internalType: 'users' },
+        ]
         opts = { isSwitching: true }
         apiStore.request.mockReturnValue(Promise.resolve({ data: [] }))
         apiStore.fetchAll.mockReturnValue(Promise.resolve({ data: [] }))
@@ -175,7 +173,7 @@ describe('RolesMenu', () => {
             user_ids: [3, 5],
             group_ids: [],
             is_switching: true,
-          },
+          }
         )
       })
 

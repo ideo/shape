@@ -3,9 +3,7 @@ import Header from '~/ui/layout/Header'
 import fakeApiStore from '#/mocks/fakeApiStore'
 import fakeRoutingStore from '#/mocks/fakeRoutingStore'
 
-import {
-  fakeGroup
-} from '#/mocks/data'
+import { fakeGroup } from '#/mocks/data'
 
 const group = fakeGroup
 
@@ -18,9 +16,7 @@ describe('Header', () => {
       routingStore: fakeRoutingStore,
     }
     props.apiStore.currentUser.current_organization.primary_group = group
-    wrapper = shallow(
-      <Header.wrappedComponent {...props} />
-    )
+    wrapper = shallow(<Header.wrappedComponent {...props} />)
   })
 
   it('renders the logo', () => {
@@ -54,9 +50,14 @@ describe('Header', () => {
     let settings, logout
 
     beforeEach(() => {
-      wrapper.find('.userBtn').first().simulate('click')
+      wrapper
+        .find('.userBtn')
+        .first()
+        .simulate('click')
       const menuProps = wrapper.find('PopoutMenu').props()
-      settings = menuProps.menuItems.find(item => item.name === 'Account Settings')
+      settings = menuProps.menuItems.find(
+        item => item.name === 'Account Settings'
+      )
       logout = menuProps.menuItems.find(item => item.name === 'Logout')
     })
 

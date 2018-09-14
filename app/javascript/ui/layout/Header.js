@@ -50,17 +50,20 @@ class Header extends React.Component {
     orgDropdownOpen: false,
   }
 
-  handleOrgClick = (open) => () => {
+  handleOrgClick = open => () => {
     this.setState({ orgDropdownOpen: open })
   }
 
-  handleUserClick = (open) => () => {
+  handleUserClick = open => () => {
     this.setState({ userDropdownOpen: open })
   }
 
   handleMyProfile = () => {
     const { apiStore, routingStore } = this.props
-    routingStore.routeTo('collections', apiStore.currentUser.user_profile_collection_id)
+    routingStore.routeTo(
+      'collections',
+      apiStore.currentUser.user_profile_collection_id
+    )
   }
 
   handleAccountSettings = () => {
@@ -85,23 +88,30 @@ class Header extends React.Component {
   }
 
   get clickHandlers() {
-    return [
-      this.handleUserClick(false),
-      this.handleOrgClick(false),
-    ]
+    return [this.handleUserClick(false), this.handleOrgClick(false)]
   }
 
   get userMenuItems() {
     const { apiStore } = this.props
     const items = [
-      { name: 'Account Settings', icon: <SettingsIcon />, onClick: this.handleAccountSettings },
-      { name: 'Notification Settings', icon: <SettingsIcon />, onClick: this.handleNotificationSettings },
+      {
+        name: 'Account Settings',
+        icon: <SettingsIcon />,
+        onClick: this.handleAccountSettings,
+      },
+      {
+        name: 'Notification Settings',
+        icon: <SettingsIcon />,
+        onClick: this.handleNotificationSettings,
+      },
       { name: 'Logout', icon: <LeaveIcon />, onClick: this.handleLogout },
     ]
     if (apiStore.currentUser.user_profile_collection_id) {
-      items.unshift(
-        { name: 'My Profile', icon: <ProfileIcon />, onClick: this.handleMyProfile }
-      )
+      items.unshift({
+        name: 'My Profile',
+        icon: <ProfileIcon />,
+        onClick: this.handleMyProfile,
+      })
     }
     return items
   }
@@ -152,7 +162,6 @@ class Header extends React.Component {
     return (
       <FixedHeader zIndex={v.zIndex.globalHeader}>
         <MaxWidthContainer>
-
           <Flex align="center" justify="space-between">
             <Box>
               <PlainLink to={routingStore.pathTo('homepage')}>
@@ -174,7 +183,10 @@ class Header extends React.Component {
               </StyledAvatarAndDropdown>
               <StyledAvatarAndDropdown>
                 {this.renderUserDropdown}
-                <button className="userBtn" onClick={this.handleUserClick(true)}>
+                <button
+                  className="userBtn"
+                  onClick={this.handleUserClick(true)}
+                >
                   <Avatar
                     title={currentUser.name}
                     url={currentUser.pic_url_square}
@@ -182,8 +194,9 @@ class Header extends React.Component {
                   />
                 </button>
               </StyledAvatarAndDropdown>
-              {(userDropdownOpen || orgDropdownOpen) &&
-                <ClickWrapper clickHandlers={this.clickHandlers} />}
+              {(userDropdownOpen || orgDropdownOpen) && (
+                <ClickWrapper clickHandlers={this.clickHandlers} />
+              )}
             </Box>
           </Flex>
         </MaxWidthContainer>

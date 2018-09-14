@@ -2,12 +2,8 @@ import _ from 'lodash'
 import PropTypes from 'prop-types'
 import { action, observable } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
-import {
-  Heading3,
-} from '~/ui/global/styled/typography'
-import {
-  FormSpacer,
-} from '~/ui/global/styled/forms'
+import { Heading3 } from '~/ui/global/styled/typography'
+import { FormSpacer } from '~/ui/global/styled/forms'
 import RolesAdd from '~/ui/roles/RolesAdd'
 import RoleSelect from '~/ui/roles/RoleSelect'
 import { uiStore } from '~/stores'
@@ -20,20 +16,23 @@ function sortUserOrGroup(a, b) {
 @inject('apiStore', 'routingStore')
 @observer
 class RolesMenu extends React.Component {
-  @observable searchableItems = []
+  @observable
+  searchableItems = []
 
   componentDidMount() {
     const { apiStore, ownerType } = this.props
     const organizationId = apiStore.currentUserOrganizationId
-    const req = (type) => this.props.apiStore.request(
-      `organizations/${organizationId}/${type}`,
-      'GET'
-    )
+    const req = type =>
+      this.props.apiStore.request(
+        `organizations/${organizationId}/${type}`,
+        'GET'
+      )
     // Groups should not be addable to other groups, return nothing for
     // consistency
-    const reqs = ownerType === 'groups'
-      ? [req('users'), Promise.resolve({ data: [] })]
-      : [req('users'), req('groups')]
+    const reqs =
+      ownerType === 'groups'
+        ? [req('users'), Promise.resolve({ data: [] })]
+        : [req('users'), req('groups')]
 
     Promise.all(reqs).then(res => {
       const users = res[0].data
@@ -54,77 +53,75 @@ class RolesMenu extends React.Component {
   filterSearchableUsers(userRoles) {
     const { roles } = this.props
     return _.reject(userRoles, userRole =>
-      roles.find(role =>
-        role.users.find(user =>
-          user.id === userRole.id)))
+      roles.find(role => role.users.find(user => user.id === userRole.id))
+    )
   }
 
   filterSearchableGroups(groupRoles) {
     const { roles } = this.props
     return _.reject(groupRoles, groupRole =>
-      roles.find(role =>
-        role.groups.find(group =>
-          group.id === groupRole.id)))
+      roles.find(role => role.groups.find(group => group.id === groupRole.id))
+    )
   }
 
-  @action setSearchableItems(items) {
+  @action
+  setSearchableItems(items) {
     this.searchableItems = items
   }
 
   deleteRoles = (role, entity, opts = {}) =>
-    role.API_delete(entity, opts)
-      .then(res => {
-        // We should do a page reload to get the correct user's new org
-        if (opts.organizationChange) {
-          this.props.routingStore.routeTo('homepage')
-          window.location.reload()
-        }
-        if (!opts.isSwitching) {
-          const saveReturn = this.props.onSave(res, { roleName: role.name })
-          this.filterSearchableItems()
-          return saveReturn
-        }
-        return {}
-      })
+    role.API_delete(entity, opts).then(res => {
+      // We should do a page reload to get the correct user's new org
+      if (opts.organizationChange) {
+        this.props.routingStore.routeTo('homepage')
+        window.location.reload()
+      }
+      if (!opts.isSwitching) {
+        const saveReturn = this.props.onSave(res, { roleName: role.name })
+        this.filterSearchableItems()
+        return saveReturn
+      }
+      return {}
+    })
 
   createRoles = (entities, roleName, opts = {}) => {
     const { apiStore, ownerId, ownerType, onSave } = this.props
     const userIds = entities
       .filter(entity => entity.internalType === 'users')
-      .map((user) => user.id)
+      .map(user => user.id)
     const groupIds = entities
       .filter(entity => entity.internalType === 'groups')
-      .map((group) => group.id)
+      .map(group => group.id)
     const data = {
       role: { name: roleName },
       group_ids: groupIds,
       user_ids: userIds,
       is_switching: opts.isSwitching,
     }
-    return apiStore.request(`${ownerType}/${ownerId}/roles`, 'POST', data)
+    return apiStore
+      .request(`${ownerType}/${ownerId}/roles`, 'POST', data)
       .then(res => {
         const saveReturn = onSave(res, { roleName })
         this.filterSearchableItems()
         return saveReturn
       })
-      .catch((err) => {
+      .catch(err => {
         uiStore.alert(err.error[0])
       })
   }
 
-  onCreateUsers = (emails) => {
+  onCreateUsers = emails => {
     const { apiStore } = this.props
-    return apiStore.request(`users/create_from_emails`, 'POST', { emails })
-      .catch((err) => {
+    return apiStore
+      .request(`users/create_from_emails`, 'POST', { emails })
+      .catch(err => {
         uiStore.alert(err.error[0])
       })
   }
 
-  onUserSearch = (searchTerm) => {
+  onUserSearch = searchTerm => {
     const { apiStore } = this.props
-    return apiStore.request(
-      `users/search?query=${searchTerm}`
-    )
+    return apiStore.request(`users/search?query=${searchTerm}`)
   }
 
   notCurrentUser(entity) {
@@ -146,20 +143,19 @@ class RolesMenu extends React.Component {
       submissionBox,
     } = this.props
     const roleEntities = []
-    roles.forEach((role) => {
-      role.users.forEach((user) => {
+    roles.forEach(role => {
+      role.users.forEach(user => {
         roleEntities.push(Object.assign({}, { role, entity: user }))
       })
       // TODO remove when implemented
       if (!role.groups) return
-      role.groups.forEach((group) => {
+      role.groups.forEach(group => {
         roleEntities.push(Object.assign({}, { role, entity: group }))
       })
     })
     const sortedRoleEntities = roleEntities.sort(sortUserOrGroup)
-    const roleTypes = ownerType === 'groups'
-      ? ['member', 'admin']
-      : ['editor', 'viewer']
+    const roleTypes =
+      ownerType === 'groups' ? ['member', 'admin'] : ['editor', 'viewer']
 
     // ability to restrict the selection to only one role type
     // e.g. "admin" is the only selection for Org Admins group
@@ -168,22 +164,28 @@ class RolesMenu extends React.Component {
     return (
       <div>
         <Heading3>{title}</Heading3>
-        { sortedRoleEntities.map(combined =>
-          // NOTE: content_editor is a "hidden" role for now
-          combined.role.name !== 'content_editor' &&
-          (<RoleSelect
-            enabled={canEdit && this.notCurrentUser(combined.entity, combined.role)}
-            key={`${combined.entity.id}_${combined.entity.internalType}_r${combined.role.id}`}
-            role={combined.role}
-            roleTypes={roleTypes}
-            roleLabels={submissionBox ? { viewer: 'participant' } : {}}
-            entity={combined.entity}
-            onDelete={this.deleteRoles}
-            onCreate={this.createRoles}
-          />))
-        }
+        {sortedRoleEntities.map(
+          combined =>
+            // NOTE: content_editor is a "hidden" role for now
+            combined.role.name !== 'content_editor' && (
+              <RoleSelect
+                enabled={
+                  canEdit && this.notCurrentUser(combined.entity, combined.role)
+                }
+                key={`${combined.entity.id}_${combined.entity.internalType}_r${
+                  combined.role.id
+                }`}
+                role={combined.role}
+                roleTypes={roleTypes}
+                roleLabels={submissionBox ? { viewer: 'participant' } : {}}
+                entity={combined.entity}
+                onDelete={this.deleteRoles}
+                onCreate={this.createRoles}
+              />
+            )
+        )}
         <FormSpacer />
-        {canEdit &&
+        {canEdit && (
           <div>
             <Heading3>{addCallout}</Heading3>
             <RolesAdd
@@ -195,7 +197,7 @@ class RolesMenu extends React.Component {
               ownerType={ownerType}
             />
           </div>
-        }
+        )}
       </div>
     )
   }

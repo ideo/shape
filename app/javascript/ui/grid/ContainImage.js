@@ -11,7 +11,7 @@ const ButtonWrapper = styled.button`
 ButtonWrapper.displayName = 'ButtonWrapper'
 
 class ContainImage extends React.Component {
-  toggleSelected = (ev) => {
+  toggleSelected = ev => {
     ev.preventDefault()
     const { card } = this.props
     card.image_contain = !card.image_contain

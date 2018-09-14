@@ -2,10 +2,7 @@ import CollectionGrid from '~/ui/grid/CollectionGrid'
 
 import fakeUiStore from '#/mocks/fakeUiStore'
 
-import {
-  fakeTextItem,
-  fakeCollection
-} from '#/mocks/data'
+import { fakeTextItem, fakeCollection } from '#/mocks/data'
 
 let props, wrapper
 beforeEach(() => {
@@ -23,19 +20,27 @@ beforeEach(() => {
     uiStore: fakeUiStore,
     routingStore: {
       routeTo: jest.fn(),
-      push: jest.fn()
-    }
+      push: jest.fn(),
+    },
   }
-  wrapper = shallow(
-    <CollectionGrid.wrappedComponent {...props} />
-  )
+  wrapper = shallow(<CollectionGrid.wrappedComponent {...props} />)
 })
 
 describe('CollectionGrid', () => {
   it('renders the Grid with draggable collection cards', () => {
     expect(wrapper.find('StyledGrid').exists()).toBe(true)
-    expect(wrapper.find('MovableGridCard').at(0).props().cardType).toBe('items')
-    expect(wrapper.find('MovableGridCard').at(0).props().record).toBe(fakeTextItem)
+    expect(
+      wrapper
+        .find('MovableGridCard')
+        .at(0)
+        .props().cardType
+    ).toBe('items')
+    expect(
+      wrapper
+        .find('MovableGridCard')
+        .at(0)
+        .props().record
+    ).toBe(fakeTextItem)
     // 3 cards + 1 empty card
     expect(wrapper.find('MovableGridCard').length).toBe(3)
   })

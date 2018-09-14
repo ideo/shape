@@ -16,9 +16,7 @@ describe('CommentInput', () => {
       editorState: EditorState.createEmpty(),
       apiStore,
     }
-    wrapper = shallow(
-      <CommentInput.wrappedComponent {...props} />
-    )
+    wrapper = shallow(<CommentInput.wrappedComponent {...props} />)
     component = wrapper.instance()
   })
 

@@ -14,19 +14,25 @@ beforeEach(() => {
     routeTo: jest.fn(),
   }
 
-  wrapper = shallow(
-    <SearchResultsInfinite {...props} />
-  )
+  wrapper = shallow(<SearchResultsInfinite {...props} />)
 })
 
 describe('SearchResultsInfinite', () => {
   it('displays the search results', () => {
     expect(wrapper.find('StyledSearchResult').length).toEqual(2)
-    expect(wrapper.find('CollectionCover').at(0).props().collection).toEqual(fakeCollection)
+    expect(
+      wrapper
+        .find('CollectionCover')
+        .at(0)
+        .props().collection
+    ).toEqual(fakeCollection)
   })
 
   it('routes to collection on click', () => {
-    wrapper.find('CollectionCover').at(0).simulate('click')
+    wrapper
+      .find('CollectionCover')
+      .at(0)
+      .simulate('click')
     expect(props.routeTo).toBeCalledWith('collections', fakeCollection.id)
   })
 })

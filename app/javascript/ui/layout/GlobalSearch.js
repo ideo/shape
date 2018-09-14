@@ -15,19 +15,19 @@ class GlobalSearchBar extends React.Component {
     return this.props.uiStore.searchText
   }
 
-  _search = (query) => {
+  _search = query => {
     const { routingStore } = this.props
     if (!query || query === '') return routingStore.leaveSearch()
     return routingStore.routeTo('search', query.replace(/#/g, '%23'))
   }
 
-  updateSearchText = (text) => {
+  updateSearchText = text => {
     this.props.uiStore.update('searchText', text)
     // perform a debounced search
     this.search(this.searchText)
   }
 
-  handleTextChange = (value) => {
+  handleTextChange = value => {
     this.updateSearchText(value)
   }
 

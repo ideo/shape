@@ -1,8 +1,5 @@
 import MoveModal from '~/ui/grid/MoveModal'
-import {
-  fakeCollection,
-  fakeUser
-} from '#/mocks/data'
+import { fakeCollection, fakeUser } from '#/mocks/data'
 
 import fakeApiStore from '#/mocks/fakeApiStore'
 import fakeUiStore from '#/mocks/fakeUiStore'
@@ -14,16 +11,14 @@ describe('MoveModal', () => {
     uiStore.viewingCollection = { id: 3 }
     props = {
       apiStore: fakeApiStore({
-        requestResult: { data: fakeCollection }
+        requestResult: { data: fakeCollection },
       }),
       uiStore,
     }
     props.apiStore.request = jest.fn()
     props.uiStore.alert.mockClear()
     props.uiStore.scroll.scrollToTop.mockClear()
-    wrapper = shallow(
-      <MoveModal.wrappedComponent {...props} />
-    )
+    wrapper = shallow(<MoveModal.wrappedComponent {...props} />)
     component = wrapper.instance()
   })
 
@@ -46,17 +41,24 @@ describe('MoveModal', () => {
           movingFromCollection: {},
           cardAction: '',
         })
-        expect(message).toEqual('You don\'t have permission to move items to this collection')
+        expect(message).toEqual(
+          "You don't have permission to move items to this collection"
+        )
       })
     })
     describe('moving pinned items out of a template', () => {
       it('should return an error message', () => {
         const message = component.moveErrors({
-          viewingCollection: { isMasterTemplate: false, can_edit_content: true },
+          viewingCollection: {
+            isMasterTemplate: false,
+            can_edit_content: true,
+          },
           movingFromCollection: { isMasterTemplate: true },
           cardAction: 'move',
         })
-        expect(message).toEqual('You can\'t move pinned template items out of a template')
+        expect(message).toEqual(
+          "You can't move pinned template items out of a template"
+        )
       })
     })
     describe('trying to create a template inside itself', () => {
@@ -66,7 +68,7 @@ describe('MoveModal', () => {
           movingFromCollection: { id: 1 },
           cardAction: 'useTemplate',
         })
-        expect(message).toEqual('You can\'t create a template inside itself')
+        expect(message).toEqual("You can't create a template inside itself")
       })
     })
     describe('with edit access and no issues', () => {
@@ -210,13 +212,11 @@ describe('MoveModal', () => {
 
       it('should request the api to create the template', async () => {
         await component.moveCards('beginning')
-        expect(props.apiStore.createTemplateInstance).toHaveBeenCalledWith(
-          {
-            parent_id: props.uiStore.viewingCollection.id,
-            template_id: props.uiStore.movingFromCollectionId,
-            placement: 'beginning',
-          }
-        )
+        expect(props.apiStore.createTemplateInstance).toHaveBeenCalledWith({
+          parent_id: props.uiStore.viewingCollection.id,
+          template_id: props.uiStore.movingFromCollectionId,
+          placement: 'beginning',
+        })
         // expect the collection to reload
         expect(props.apiStore.request).toHaveBeenCalledWith(
           `collections/${props.uiStore.viewingCollection.id}`
@@ -224,7 +224,9 @@ describe('MoveModal', () => {
       })
 
       it('should show a success message', () => {
-        expect(uiStore.alertOk).toHaveBeenCalledWith('Your template instance has been created!')
+        expect(uiStore.alertOk).toHaveBeenCalledWith(
+          'Your template instance has been created!'
+        )
       })
 
       it('should close the move menu', async () => {

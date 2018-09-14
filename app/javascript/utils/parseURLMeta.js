@@ -2,7 +2,7 @@ import axios from 'axios'
 import { getMetadata } from 'page-metadata-parser'
 import { parse } from 'url'
 
-const parseURLMeta = async (urlStr) => {
+const parseURLMeta = async urlStr => {
   if (!urlStr) return false
   let url = urlStr
   let parsed = parse(url)
@@ -12,8 +12,10 @@ const parseURLMeta = async (urlStr) => {
   if (!parsed || typeof parsed !== 'object') return false
 
   const { hostname, pathname } = parsed
-  if (hostname.match(/shape\.space/i) ||
-    (process.env.SHAPE_APP === 'localhost' && hostname.match(/localhost/i))) {
+  if (
+    hostname.match(/shape\.space/i) ||
+    (process.env.SHAPE_APP === 'localhost' && hostname.match(/localhost/i))
+  ) {
     const match = pathname.match(/\/(collections|items)\/(\d+)/)
     if (match) {
       return {

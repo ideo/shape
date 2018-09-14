@@ -16,5 +16,5 @@ export const StyledTitleAndRoles = styled(Flex)`
 `
 
 export default {
-  StyledTitleAndRoles
+  StyledTitleAndRoles,
 }
