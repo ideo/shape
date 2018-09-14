@@ -10,10 +10,11 @@ import v from '~/utils/variables'
 const TextInputHolder = StyledCommentTextarea.extend`
   color: white;
   padding: 6px;
+  background-color: ${props => (props.hasFocus ? v.colors.testLightBlueBg : v.colors.ctaButtonBlue)};
+  transition: background-color 0.2s;
 `
 
 const TextInput = styled(TextareaAutosize)`
-  background-color: #9FC1CB;
   color: white !important;
   font-family: ${v.fonts.sans} !important;
   min-height: 105px;
@@ -42,6 +43,7 @@ class DescriptionQuestion extends React.Component {
     this.save = _.debounce(this._save, 1000)
     this.state = {
       countLeft: MAX_LEN - len,
+      focused: false,
     }
   }
 
@@ -57,16 +59,22 @@ class DescriptionQuestion extends React.Component {
     this.save()
   }
 
+  handleBlur = () => {
+    this.save.flush()
+    this.setState({ focused: false })
+  }
+
   render() {
     const { item } = this.props
     return (
       <div>
-        <TextInputHolder>
+        <TextInputHolder hasFocus={this.state.focused}>
           <TextInput
+            onFocus={() => this.setState({ focused: true })}
+            onBlur={this.handleBlur}
             onChange={this.handleChange}
             placeholder="Write Idea Description Here…"
             value={item.content || ''}
-            onBlur={this.save}
           />
           <StyledSmallText>{this.state.countLeft}</StyledSmallText>
         </TextInputHolder>

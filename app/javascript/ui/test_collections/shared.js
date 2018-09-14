@@ -14,7 +14,7 @@ export const QuestionText = styled.p`
 `
 
 export const TestQuestionInput = css`
-  background-color: ${props => (props.editable ? '#9FC1CB' : '#5698AE')};
+  background-color: ${props => (props.editable ? v.colors.testLightBlueBg : v.colors.ctaButtonBlue)};
   border: 0;
   box-sizing: border-box;
   color: white !important;
