@@ -5,9 +5,7 @@ import { MarketingBack,
   MarketingFooter,
   MarketingHeavyCTA,
   InvertMarketingLink,
-  InvertMarketingContent,
   InvertMarketingH1,
-  InvertMarketingH2,
   InvertMarketingH1Bold,
   InvertMarketingLinkMail,
   MarketingFlex,
@@ -32,20 +30,15 @@ import { Element as ScrollElement } from 'react-scroll'
 import VisibilitySensor from 'react-visibility-sensor'
 import firebase from '~/vendor/firebaseMarketing.js'
 
-
 class MarketingPage extends React.Component {
   constructor(props) {
     super(props)
     const pageText = {}
 
-    this.state = { 
-      isLogoVisible: true
-      , pageTexts: pageText
+    this.state = {
+      isLogoVisible: true,
+      pageTexts: pageText,
     }
-  }
-
-  handleLogoVisibility = (isVisible) => {
-    this.setState({ isLogoVisible: isVisible })
   }
 
   componentDidMount() {
@@ -57,11 +50,15 @@ class MarketingPage extends React.Component {
       .then((snapshot) => {
         snapshot.forEach(pageText => {
           const key = pageText.id
-          const value = pageText.data().value
+          const { value } = pageText.data()
           textValues[key] = value
         })
         this.setState({ pageTexts: textValues })
       })
+  }
+
+  handleLogoVisibility = (isVisible) => {
+    this.setState({ isLogoVisible: isVisible })
   }
 
   render() {
@@ -82,25 +79,26 @@ class MarketingPage extends React.Component {
               >
                 <MarketingShapeLogo />
               </VisibilitySensor>
-                <MarketingTagLine>
-                  {this.state.pageTexts.tagLine}
-                </MarketingTagLine>
+              <MarketingTagLine>
+                {this.state.pageTexts.tagLine}
+              </MarketingTagLine>
             </Center>
 
             <Center>
               <ResponsiveInlineBlock>
-                <a href="https://profile.ideo.com/">
+                <a href="/login">
                   <MarketingCallToAction>{this.state.pageTexts.buttonTopLeft}</MarketingCallToAction>
                 </a>
               </ResponsiveInlineBlock>
             </Center>
+            {/*  -- VIDEO BUTTON DISABLED -- not ready yet
             <Center>
               <ResponsiveInlineBlock>
-                <a href="https://profile.ideo.com/">
+                <a href="/login">
                   <MarketingVideoLink>{this.state.pageTexts.buttonTopRight}</MarketingVideoLink>
                 </a>
               </ResponsiveInlineBlock>
-            </Center>
+            </Center> */}
           </MarketingGradientTop>
 
           <MarketingFlex
@@ -136,8 +134,8 @@ class MarketingPage extends React.Component {
 
             <ScrollElement name="FooterAnchor" />
             <Box w={1} py={32}>
-              <a href="https://profile.ideo.com/">
-                <MarketingHeavyCTA href="https://profile.ideo.com">{this.state.pageTexts.buttonFooter}</MarketingHeavyCTA>
+              <a href="/login">
+                <MarketingHeavyCTA href="/login">{this.state.pageTexts.buttonFooter}</MarketingHeavyCTA>
               </a>
             </Box>
 
@@ -166,9 +164,11 @@ class MarketingPage extends React.Component {
 
             <Box w={1}>
               <InvertMarketingLink href="https://www.ideo.com/" rel="noopener noreferrer" target="_blank">
-                <img src={poweredByIdeo} 
-                alt="Powered by IDEO" 
-                style={{width:'95px', paddingTop:'55px', paddingBottom:'30px'}} />
+                <img
+                  src={poweredByIdeo}
+                  alt="Powered by IDEO"
+                  style={{ width: '95px', paddingTop: '55px', paddingBottom: '30px' }}
+                />
               </InvertMarketingLink>
             </Box>
           </MarketingFlex>
@@ -182,7 +182,7 @@ class MarketingPage extends React.Component {
           </Center>
           <Center>
             <ResponsivePadInlineBlock>
-              <DesktopSpacer style={{width:'80px'}}/>
+              <DesktopSpacer style={{ width: '80px' }} />
               <InvertMarketingLink href="https://www.ideo.com/">
                 &copy; 2018
               </InvertMarketingLink>

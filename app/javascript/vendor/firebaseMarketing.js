@@ -1,16 +1,5 @@
-// javascript/vendor/firebaseMarketing.js
-import firebase from 'firebase'
-
-require('firebase/firestore')
-
-const config = {
-  apiKey: 'AIzaSyBPOo4mXov0P41asNqoBtbxfd6xYBJeYA8',
-  authDomain: 'shape-marketing.firebaseapp.com',
-  databaseURL: 'https://shape-marketing.firebaseio.com',
-  projectId: 'shape-marketing',
-  storageBucket: 'shape-marketing.appspot.com',
-  messagingSenderId: '386968419386'
-}
+import firebase from 'firebase/app'
+import 'firebase/firestore'
 
 /*
 {
@@ -59,31 +48,32 @@ const config = {
 
 */
 
-firebase.initializeApp(config)
+const config = process.env.GOOGLE_FIRESTORE_SHAPE_MARKETING
 let db = {}
-db = firebase.firestore()
-db.settings({
-  // recommending setting for Firestore 5.0+
-  timestampsInSnapshots: true
-})
+if (config) {
+  firebase.initializeApp(JSON.parse(config))
+  db = firebase.firestore()
+  db.settings({
+    // recommending setting for Firestore 5.0+
+    timestampsInSnapshots: true,
+  })
+}
 
 export function readFirebaseValue(collection, id) {
-  let db = {}
-  db = firebase.firestore()
   const docRef = db.collection(collection).doc(id)
 
-  docRef.get().then( 
+  docRef.get().then(
     (doc) => {
       if (doc.exists) {
-        return doc.data()['value']
-      } else {
-        // doc.data() will be undefined in this case
-        console.log("No such document %s", collection + '/' + id);
+        return doc.data().value
       }
+      // doc.data() will be undefined in this case
+      console.log('No such document %s', `${collection}/${id}`)
+      return false
     }
-  ).catch(function(error) {
-      console.log("Error getting document:", error);
-    })
+  ).catch((error) => {
+    console.log('Error getting document:', error)
+  })
 }
 
 export default firebase

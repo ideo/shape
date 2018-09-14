@@ -130,8 +130,8 @@ const MobileLinks = (
     </Box>
 
     <Box>
-      <a href="https://profile.ideo.com" rel="noopener noreferrer" target="_blank">
-        <NavLink align="left" >LOGIN</NavLink>
+      <a href="/login" rel="noopener noreferrer">
+        <NavLink align="left">LOGIN</NavLink>
       </a>
     </Box>
   </MarketingFlex>
@@ -170,9 +170,9 @@ class MarketingMenu extends React.PureComponent {
   }
 
   handleLogoVisibilityChange = () => {
-    this.setState({ 
-      logoClass: this.props.isBigLogoVisible ? 'before-break' : 'after-break'
-      , menuClass: this.props.isBigLogoVisible ? 'after-top' : 'after-break'
+    this.setState({
+      logoClass: this.props.isBigLogoVisible ? 'before-break' : 'after-break',
+      menuClass: this.props.isBigLogoVisible ? 'after-top' : 'after-break',
     })
   }
 
@@ -185,7 +185,7 @@ class MarketingMenu extends React.PureComponent {
   }
 
   toggleDrawer = (isOpen) => () => {
-      this.setState({ drawerState: isOpen })
+    this.setState({ drawerState: isOpen })
   }
 
   renderDesktop() {
@@ -216,8 +216,8 @@ class MarketingMenu extends React.PureComponent {
               <Box w={15 / 32}>
                 <section align="right">
                   <NavLink onClick={handleScrollToFooter}>CONTACT</NavLink>
-                  <a href="https://profile.ideo.com" rel="noopener noreferrer" target="_blank">
-                  <NavLink>LOGIN</NavLink>
+                  <a href="/login" rel="noopener noreferrer">
+                    <NavLink>LOGIN</NavLink>
                   </a>
                 </section>
               </Box>
@@ -238,19 +238,19 @@ class MarketingMenu extends React.PureComponent {
     return (
       <MenuWrapper>
         <MenuBar className={`MenuBar ${this.state.menuClass}`}>
-          <Toolbar disableGutters={true}>
+          <Toolbar disableGutters>
             <MarketingFlex
               align="center"
               w={1}
             >
               <Box ml={2}>
-                  <button onClick={handleScrollToTop}>
-                    <ToggleLogo className={`ToggleLogo ${this.state.logoClass}`} width={48} />
-                  </button>
+                <button onClick={handleScrollToTop}>
+                  <ToggleLogo className={`ToggleLogo ${this.state.logoClass}`} width={48} />
+                </button>
               </Box>
 
-              <Box ml='auto' mr={2}>
-                  <Hamburger role="button" onClick={this.toggleDrawer(true)}  float="right"/>
+              <Box ml="auto" mr={2}>
+                <Hamburger role="button" onClick={this.toggleDrawer(true)} float="right" />
               </Box>
 
             </MarketingFlex>
