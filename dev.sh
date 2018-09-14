@@ -1,4 +1,10 @@
 #!/bin/sh
+
+cd "$(dirname "$0")"
+DIR=$(pwd)
+
+$DIR/script/dev-setup
+
 if ! [ -x "$(command -v ttab)" ]; then
   echo 'Error: ttab is not installed. See: https://www.npmjs.com/package/ttab' >&2
   exit 1
