@@ -1,7 +1,8 @@
 module.exports = {
   plugins: [
     "react",
-    "jest"
+    "jest",
+    "prettier"
   ],
   env: {
     "jest/globals": true
@@ -9,7 +10,10 @@ module.exports = {
   extends: [
     "airbnb",
     "standard",
-    "standard-react"
+    "standard-react",
+    "plugin:prettier/recommended",
+    "prettier/react",
+    "prettier/standard"
   ],
   parser: "babel-eslint",
   parserOptions: {
@@ -61,6 +65,7 @@ module.exports = {
       "consistent": true,
       "minProperties": 6
     }],
+    "prettier/prettier": "error",
     "radix": ["error", "as-needed"],
     "semi" : [2, "never"],
     "space-before-function-paren": 0,
