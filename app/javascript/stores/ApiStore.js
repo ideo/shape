@@ -1,5 +1,6 @@
 import { action, runInAction, observable, computed } from 'mobx'
-import { Store } from 'mobx-jsonapi-store'
+import { Collection as datxCollection, assignModel, ReferenceType } from 'datx'
+import { jsonapi } from 'datx-jsonapi'
 import _ from 'lodash'
 import moment from 'moment-mini'
 
@@ -18,13 +19,24 @@ import Comment from './jsonApi/Comment'
 import CommentThread from './jsonApi/CommentThread'
 import UsersThread from './jsonApi/UsersThread'
 
-class ApiStore extends Store {
+class ApiStore extends jsonapi(datxCollection) {
   @observable currentUserId = null
   @observable currentUserOrganizationId = null
   @observable currentCommentThreadIds = []
   @observable currentPageThreadKey = null
   @observable recentNotifications = new Map()
   @observable usableTemplates = []
+
+  fetch(type, id, skipCache) {
+    return super.fetch(type, id, { skipCache })
+  }
+
+  request(path, method, data, options = {}) {
+    if (!options.hasOwnProperty('skipCache')) {
+      options.skipCache = true
+    }
+    return super.request(path, method, data, options)
+  }
 
   @action setCurrentUserId(id) {
     this.currentUserId = id
@@ -99,8 +111,11 @@ class ApiStore extends Store {
     this.add(roles, 'roles')
   }
 
-  importUsersThread({ usersThread, thread, comments } = {}) {
-    thread.assignRef('users_thread', usersThread)
+  @action importUsersThread({ usersThread, thread, comments } = {}) {
+    thread.addReference('users_thread', usersThread, {
+      model: UsersThread,
+      type: ReferenceType.TO_ONE,
+    })
     thread.importComments(comments)
     this.addCurrentCommentThread(thread.id)
   }
@@ -141,19 +156,25 @@ class ApiStore extends Store {
     return this.unreadCommentsCount + this.unreadNotificationsCount
   }
 
-  syncFromFirestore(data) {
+  massageFirestoreData = (data) => {
     const timeFields = ['created_at', 'updated_at', 'last_viewed_at']
-    _.each(data.data.attributes, (v, k) => {
+    // id should no longer be an attribute
+    delete data.attributes.id
+    _.each(data.attributes, (v, k) => {
       if (_.includes(timeFields, k)) {
-        data.data.attributes[k] = v.toDate()
+        data.attributes[k] = v.toDate()
+      }
+      if (k.indexOf('_id') > 0) {
+        data.attributes[k] = v ? v.toString() : v
       }
     })
-    _.each(data.included, d => {
-      _.each(d.attributes, (v, k) => {
-        if (_.includes(timeFields, k)) {
-          d.attributes[k] = v.toDate()
-        }
-      })
+    return data
+  }
+
+  syncFromFirestore(data) {
+    data.data = this.massageFirestoreData(data.data)
+    _.each(data.included, (v, k) => {
+      data.included[k] = this.massageFirestoreData(v)
     })
     return this.sync(data)
   }
@@ -170,11 +191,11 @@ class ApiStore extends Store {
     return thread
   }
 
-  clearUnpersistedThreads() {
+  @action clearUnpersistedThreads() {
     this.findAll('comment_threads').forEach(ct => {
       // remove any old threads that didn't get persisted
-      if (!ct.__persisted) {
-        this.__removeModels([ct])
+      if (!ct.persisted) {
+        this.__removeModel(ct)
       }
     })
   }
@@ -199,7 +220,10 @@ class ApiStore extends Store {
             record_type: record.className,
             updated_at: new Date()
           }, this)
-          thread.assignRef('record', record)
+          thread.addReference('record', record, {
+            model: record.className === 'Collection' ? Collection : Item,
+            type: ReferenceType.TO_ONE,
+          })
           this.add(thread)
         }
       } catch (e) {
@@ -243,7 +267,17 @@ class ApiStore extends Store {
     })
   }
 
-  // -- override mobx-jsonapi-store --
+  // NOTE: had to override datx PureCollection, it looks like it is meant to do
+  // what's listed below but it was trying to do `this.find(obj, id)` with no id
+  remove(obj, id) {
+    if (typeof obj === 'object') {
+      this.__removeModel(obj)
+    } else {
+      super.remove(obj, id)
+    }
+  }
+
+  // -- override datx-jsonapi to deal with empty arrays --
   __updateRelationships(obj) {
     const record = this.find(obj.type, obj.id)
     const refs = obj.relationships ? Object.keys(obj.relationships) : []
@@ -255,11 +289,11 @@ class ApiStore extends Store {
          */
         const possibleTypes = _.map(ApiStore.types, model => model.type)
         if (possibleTypes.indexOf(ref) > -1) {
-          record.assignRef(ref, observable([]), ref)
+          assignModel(record, ref, observable([]))
         }
       }
     })
-    super.__updateRelationships(obj)
+    return super.__updateRelationships(obj)
   }
 }
 ApiStore.types = [

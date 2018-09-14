@@ -28,9 +28,9 @@ const fakeApiStore = ({ findResult = '', findAllResult = [], requestResult = '' 
     findThreadForRecord: jest.fn(),
     createTemplateInstance: jest.fn(),
     unreadActivityCount: 0,
-    currentUserId: 1,
+    currentUserId: "1",
     currentUser: {
-      id: 1,
+      id: "1",
       current_user_collection_id: 99,
       current_organization: {
         name: 'test org'
@@ -46,7 +46,7 @@ const fakeApiStore = ({ findResult = '', findAllResult = [], requestResult = '' 
     // NOTE: important that this matches currentUserOrganization.slug
     currentOrgSlug: 'org-slug',
     currentUserOrganization: {
-      id: 1,
+      id: "1",
       slug: 'org-slug',
       name: 'test org',
       primary_group: {
@@ -57,13 +57,13 @@ const fakeApiStore = ({ findResult = '', findAllResult = [], requestResult = '' 
     recentNotifications: new Map(),
     currentThreads: [
       {
-        id: 1,
+        id: "1",
         key: 'abc-1',
         record: { name: 'abc' },
         comments: [],
       },
       {
-        id: 2,
+        id: "2",
         key: 'abc-2',
         record: { name: 'xyz' },
         comments: [],

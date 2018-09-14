@@ -42,7 +42,7 @@ class User < ApplicationRecord
   has_many :users_roles, dependent: :destroy
   has_many :comments, foreign_key: :author_id
 
-  has_many :activities_as_actor, as: :actor, class_name: 'Activity'
+  has_many :activities_as_actor, class_name: 'Activity', inverse_of: :actor, foreign_key: :actor_id
   has_many :activities_as_subject, through: :activity_subjects, class_name: 'Activity'
   has_many :activity_subjects, as: :subject
   has_many :notifications
@@ -168,7 +168,7 @@ class User < ApplicationRecord
   # Simplified format, used by action cable
   def as_json(_options = {})
     {
-      id: id,
+      id: id.to_s,
       name: name,
       pic_url_square: picture,
     }
@@ -255,6 +255,9 @@ class User < ApplicationRecord
   end
 
   def current_org_groups_and_special_groups
+    if has_cached_role?(Role::SUPER_ADMIN)
+      return current_organization.groups
+    end
     groups = current_org_groups.to_a
     return [] if groups.blank?
     organization = current_organization
@@ -284,6 +287,7 @@ class User < ApplicationRecord
     user_profiles.where(organization_id: organization_id).first
   end
 
+  # -- override has_many relation for SUPER_ADMIN purposes --
   def organizations
     return super unless has_cached_role?(Role::SUPER_ADMIN)
     Organization.all

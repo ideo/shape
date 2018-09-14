@@ -1,6 +1,10 @@
 import BaseRecord from './BaseRecord'
+import { prop } from 'datx'
+import User from './User'
+import Group from './Group'
 
 class Role extends BaseRecord {
+  static type = 'roles'
   static endpoint(collectionId) {
     return `collections/${collectionId}/roles`
   }
@@ -40,13 +44,6 @@ class Role extends BaseRecord {
         user_ids: this.users.map((user) => user.id)
       })
   }
-}
-Role.type = 'roles'
-
-Role.defaults = {
-  // set as array so it's never `undefined`
-  users: [],
-  groups: [],
 }
 
 export default Role

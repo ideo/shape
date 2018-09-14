@@ -2,21 +2,24 @@ import { observable, action, computed, runInAction } from 'mobx'
 import _ from 'lodash'
 
 import { uiStore } from '~/stores'
+import { ReferenceType } from 'datx'
 import BaseRecord from './BaseRecord'
 import Comment from './Comment'
+import User from './User'
 
 // should always be the same as paginates_per in comment.rb
 const PER_PAGE = 50
 
 class CommentThread extends BaseRecord {
+  static type = 'comment_threads'
   @observable comments = []
   @observable links = {}
 
   @computed get key() {
-    // include __persisted as part of the key,
+    // include persisted as part of the key,
     // because when we .save() the unpersisted and persisted both temporarily exist
     if (!this.record) return 'none'
-    return `thread-${this.record.className}-${this.record.id}${this.__persisted ? '' : '-new'}`
+    return `thread-${this.record.className}-${this.record.id}${this.persisted ? '' : '-new'}`
   }
 
   @computed get unreadCount() {
@@ -69,10 +72,10 @@ class CommentThread extends BaseRecord {
   }
 
   async API_saveComment(commentData) {
-    if (!this.__persisted) {
+    if (!this.persisted) {
       // if there's no id, then first we have to create the comment_thread
       await this.API_create()
-      if (!this.__persisted) {
+      if (!this.persisted) {
         // error if that still didn't work...
         return false
       }
@@ -87,8 +90,10 @@ class CommentThread extends BaseRecord {
     Comment.endpoint = `comment_threads/${this.id}/comments`
     // create an unsaved comment so that we can see it immediately
     const comment = new Comment(commentData, this.apiStore)
-    comment.assignRef('author', this.apiStore.currentUser)
-    this.apiStore.add(comment)
+    comment.addReference('author', this.apiStore.currentUser, {
+      model: User,
+      type: ReferenceType.TO_ONE,
+    })
     this.importComments([comment], { created: true })
     // this will create the comment in the API
     uiStore.trackEvent('create', this.record)
@@ -108,7 +113,7 @@ class CommentThread extends BaseRecord {
   @action importComments(data, { created = false } = {}) {
     let newComments = _.union(this.comments.toJS(), data)
     // after we're done creating the temp comment, clear out any prev temp ones
-    if (!created) newComments = _.filter(newComments, c => c.id)
+    if (!created) newComments = _.filter(newComments, c => c.persisted)
     data.forEach(comment => {
       const { users_thread } = this
       if (comment.author_id !== this.apiStore.currentUserId &&
@@ -120,14 +125,6 @@ class CommentThread extends BaseRecord {
     newComments = _.sortBy(newComments, ['updated_at'])
     this.comments.replace(newComments)
   }
-}
-
-CommentThread.type = 'comment_threads'
-
-CommentThread.defaults = {
-  unread_comments: [],
-  // Set this undefined by default so assignRef will pick up the change
-  users_thread: undefined,
 }
 
 export default CommentThread

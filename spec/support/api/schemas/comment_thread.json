@@ -1,8 +1,7 @@
 {
   "type": "object",
   "properties": {
-    "id": { "type": "integer" },
     "updated_at": { "type": "date" }
   },
-  "required": ["id", "updated_at"]
+  "required": ["updated_at"]
 }

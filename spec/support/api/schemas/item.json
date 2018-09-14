@@ -1,7 +1,6 @@
 {
   "type": "object",
   "properties": {
-    "id": { "type": "integer" },
     "type": { "type": "string" },
     "name": { "type": ["string", "null"] },
     "content": { "type": ["string", "null"] },
@@ -17,5 +16,5 @@
     "filestack_file_url": { "type": ["string", "null"] },
     "pinned_and_locked": { "type": ["boolean"] }
   },
-  "required": ["id", "type"]
+  "required": ["type"]
 }

@@ -1,15 +1,14 @@
 {
   "type": "object",
   "properties": {
-    "id": { "type": "integer" },
     "first_name": { "type": "string" },
     "last_name": { "type": "string" },
     "email": { "type": "string" },
     "status": { "type": "string" },
     "pic_url_square": { "type": "string" },
     "handle": { "type": "string" },
-    "user_profile_collection_id": { "type": ["integer", "null"] },
-    "current_user_collection_id": { "type": ["integer", "null"] },
+    "user_profile_collection_id": { "type": ["string", "null"] },
+    "current_user_collection_id": { "type": ["string", "null"] },
     "created_at": { "type": "date" },
     "terms_accepted": { "type": "boolean" },
     "show_helper": { "type": "boolean" },
@@ -18,5 +17,5 @@
     "notify_through_email": { "type": "boolean" },
     "google_auth_token": { "type": "string" }
   },
-  "required": ["id", "email", "first_name", "last_name", "status"]
+  "required": ["email", "first_name", "last_name", "status"]
 }

@@ -1,6 +1,5 @@
 import Notification from '~/ui/notifications/Notification'
 import v from '~/utils/variables'
-import sleep from '~/utils/sleep'
 import { apiStore } from '~/stores'
 
 import {
@@ -11,13 +10,11 @@ jest.mock('../../../app/javascript/stores')
 jest.mock('../../../app/javascript/utils/sleep')
 
 describe('Notification', () => {
-  let props
-  let wrapper
-  let component
-  let reRender
+  let props, wrapper, component, reRender, fakeData
 
   beforeEach(() => {
-    apiStore.fetch.mockReturnValue(Promise.resolve({ data: { name: '' } }))
+    fakeData = { name: '' }
+    apiStore.fetch.mockReturnValue(Promise.resolve({ data: fakeData }))
     props = {
       notification: fakeNotification
     }
@@ -30,6 +27,12 @@ describe('Notification', () => {
     reRender()
   })
 
+  describe('componentWillMount', () => {
+    it('should call apiStore.fetch to get the activity target, and set the target', () => {
+      expect(apiStore.fetch).toHaveBeenCalledWith('collections', fakeNotification.activity.target_id)
+      expect(fakeNotification.activity.setTarget).toHaveBeenCalledWith(fakeData)
+    })
+  })
   describe('componentDidMount', () => {
     it('should set fade in progress to false', () => {
       expect(component.fadeInProgress).toBeFalsy()

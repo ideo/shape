@@ -36,7 +36,7 @@ gem 'devise'
 gem 'omniauth-ideo', git: 'https://github.com/ideo/omniauth-ideo.git'
 
 # Webpacker
-gem 'webpacker', '~> 3.0'
+gem 'webpacker', '>= 4.0.x'
 
 # JSON serializer
 gem 'jsonapi-rails'

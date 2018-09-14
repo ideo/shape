@@ -120,7 +120,7 @@ describe Api::V1::CommentThreadsController, type: :request, json: true, auth: tr
 
       it 'creates a comment thread' do
         expect(json['data']['attributes']).to match_json_schema('comment_thread')
-        expect(json['data']['attributes']['id']).not_to be nil
+        expect(json['data']['id']).not_to be nil
       end
     end
 

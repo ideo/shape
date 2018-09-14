@@ -1,4 +1,3 @@
-import { useStrict } from 'mobx'
 import RoleSelect from '~/ui/roles/RoleSelect'
 
 import {
@@ -11,7 +10,6 @@ let component
 
 describe('RoleSelect', () => {
   beforeEach(() => {
-    useStrict(false)
     props = {
       role: fakeRole,
       roleTypes: ['viewer', 'editor'],

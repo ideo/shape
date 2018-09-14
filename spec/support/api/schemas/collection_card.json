@@ -1,7 +1,6 @@
 {
   "type": "object",
   "properties": {
-    "id": { "type": "integer" },
     "parent_id": { "type": "integer" },
     "order": { "type": "integer" },
     "width": { "type": "integer" },
@@ -13,5 +12,5 @@
     "pinned_and_locked": { "type": "boolean" },
     "image_contain": { "type": "boolean" }
   },
-  "required": ["id", "order", "width", "height", "type", "link"]
+  "required": ["order", "width", "height", "type", "link"]
 }

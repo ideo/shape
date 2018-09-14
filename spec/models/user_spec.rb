@@ -6,6 +6,13 @@ describe User, type: :model do
   context 'associations' do
     it { should belong_to :current_organization }
     it { should belong_to :current_user_collection }
+    it { should have_many :collections }
+    it { should have_many :groups }
+    it { should have_many :current_org_groups }
+    it { should have_many :organizations }
+    it { should have_many :comments }
+    it { should have_many :activities_as_actor }
+    it { should have_many :notifications }
   end
 
   context 'validations' do
@@ -338,6 +345,15 @@ describe User, type: :model do
       it 'allows access to the guest group for org members' do
         expect(user.current_org_groups_and_special_groups).to match_array([group_in_org_member, org.primary_group, org.guest_group])
         expect(admin.current_org_groups_and_special_groups).to match_array([org.primary_group, org.guest_group, org.admin_group])
+      end
+
+      context 'with super admin role' do
+        let(:super_admin) { create(:user, :super_admin, add_to_org: org) }
+
+        it 'shows all org groups' do
+          # 3 org groups and 2 more groups created above
+          expect(super_admin.current_org_groups_and_special_groups.length).to be 5
+        end
       end
     end
   end

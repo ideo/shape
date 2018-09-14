@@ -37,15 +37,17 @@ module.exports = {
   },
   settings: {
     "import/resolver": {
-      "babel-plugin-root-import": {},
+      "babel-module": {},
       "node": {}
     },
+    "module-resolver": {},
     "import/core-modules": ["styled-jsx/css"]
   },
   rules: {
     "arrow-parens": [0, "as-needed"],
+    // because of all of our rails API snake_case variables
     "camelcase": 0,
-    "comma-dangle": 0,
+    "comma-dangle": ["error", "always-multiline"],
     "function-paren-newline": ["error", "consistent"],
     "func-names": 0,
     "import/no-absolute-path": 0,
@@ -74,9 +76,6 @@ module.exports = {
     "react/jsx-curly-brace-presence": 0,
     "react/jsx-closing-tag-location": 0,
     "react/no-did-mount-set-state": 0,
-    // react/no-typos disabled until this is resolved:
-    // https://github.com/yannickcr/eslint-plugin-react/issues/1389
-    "react/no-typos": 0,
     "react/sort-comp": [1, {
       order: [
         'static-methods',

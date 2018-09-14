@@ -1,6 +1,6 @@
 class SerializableSimpleGroup < BaseJsonSerializer
   type 'groups'
-  attributes :id, :name, :handle
+  attributes :name, :handle
   attribute :is_primary do
     @object.primary?
   end
