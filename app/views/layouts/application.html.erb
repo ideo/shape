@@ -10,7 +10,8 @@
     <script>
       window.CONFIG = {
         stripeApiKey: '<%= stripe_js_api_key %>',
-        clientId: '<%= ideo_sso_client_id %>'
+        clientId: '<%= ideo_sso_client_id %>',
+        networkApiBaseUrl: '<%= ideo_sso_api_base_url %>'
       }
     </script>
     <script id="stripe-js" type="text/javascript" src="<%= stripe_js_sdk_url %>"></script>
