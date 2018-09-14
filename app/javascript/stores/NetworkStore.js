@@ -13,21 +13,25 @@ class NetworkStore extends jsonapi(Collection) {
 
   loadOrganization(external_id) {
     return this.fetchAll('organizations', {
-      filter: {external_id}
+      filter: { external_id },
     })
   }
 
   loadPaymentMethods(organization_id, skipCache = false) {
-    return this.fetchAll('payment_methods', {
-      sort: '-default,exp_year,exp_month',
-      filter: {organization_id},
-    }, {
-      skipCache,
-    })
+    return this.fetchAll(
+      'payment_methods',
+      {
+        sort: '-default,exp_year,exp_month',
+        filter: { organization_id },
+      },
+      {
+        skipCache,
+      }
+    )
   }
 
   createPaymentMethod(organization, token) {
-    const {card} = token
+    const { card } = token
     if (!card) {
       throw new Error('Missing card')
     }

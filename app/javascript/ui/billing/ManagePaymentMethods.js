@@ -5,7 +5,6 @@ import PaymentMethods from '~shared/components/compounds/PaymentMethods'
 @inject('apiStore', 'networkStore')
 @observer
 class ManagePaymentMethods extends React.Component {
-
   componentWillMount() {
     this.loadPaymentMethods()
   }
@@ -70,6 +69,5 @@ ManagePaymentMethods.wrappedComponent.propTypes = {
   apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
   networkStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }
-
 
 export default ManagePaymentMethods
