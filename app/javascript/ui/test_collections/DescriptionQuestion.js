@@ -1,38 +1,15 @@
 import _ from 'lodash'
+import PropTypes from 'prop-types'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
-import TextareaAutosize from 'react-autosize-textarea'
-import styled from 'styled-components'
 
 import { SmallHelperText } from '~/ui/global/styled/typography'
-import { StyledCommentTextarea } from '~/ui/global/styled/forms'
 import v from '~/utils/variables'
-
-const TextInputHolder = StyledCommentTextarea.extend`
-  color: white;
-  padding: 6px;
-  background-color: ${props => (props.hasFocus ? v.colors.testLightBlueBg : v.colors.ctaButtonBlue)};
-  transition: background-color 0.2s;
-`
-
-const TextInput = styled(TextareaAutosize)`
-  color: white !important;
-  font-family: ${v.fonts.sans} !important;
-  min-height: 105px;
-  width: calc(100% - 20px);
-
-  ::placeholder {
-    color: white !important;
-    opacity: 1;
-  }
-}
-`
+import { TextInputHolder, TextInput } from './shared'
 
 const StyledSmallText = SmallHelperText.extend`
   color: ${v.colors.ctaButtonBlue};
   margin-left: calc(100% - 35px);
 `
-
-const MAX_LEN = 500
 
 @observer
 class DescriptionQuestion extends React.Component {
@@ -42,7 +19,7 @@ class DescriptionQuestion extends React.Component {
     const len = item.content ? item.content.length : 0
     this.save = _.debounce(this._save, 1000)
     this.state = {
-      countLeft: MAX_LEN - len,
+      countLeft: props.maxLength - len,
       focused: false,
     }
   }
@@ -53,9 +30,9 @@ class DescriptionQuestion extends React.Component {
   }
 
   handleChange = (ev) => {
-    const { item } = this.props
+    const { item, maxLength } = this.props
     item.content = ev.target.value
-    this.setState({ countLeft: MAX_LEN - item.content.length })
+    this.setState({ countLeft: maxLength - item.content.length })
     this.save()
   }
 
@@ -65,17 +42,17 @@ class DescriptionQuestion extends React.Component {
   }
 
   render() {
-    const { item } = this.props
+    const { item, maxLength, placeholder } = this.props
     return (
       <div>
-        <TextInputHolder hasFocus={this.state.focused}>
+        <TextInputHolder hasFocus={this.state.focused || item.content === ''}>
           <TextInput
             onFocus={() => this.setState({ focused: true })}
             onBlur={this.handleBlur}
             onChange={this.handleChange}
-            placeholder="Write Idea Description Here…"
+            placeholder={placeholder}
             value={item.content || ''}
-            maxLength={MAX_LEN}
+            maxLength={maxLength}
           />
           <StyledSmallText>{this.state.countLeft}</StyledSmallText>
         </TextInputHolder>
@@ -85,5 +62,11 @@ class DescriptionQuestion extends React.Component {
 }
 DescriptionQuestion.propTypes = {
   item: MobxPropTypes.objectOrObservableObject.isRequired,
+  placeholder: PropTypes.string.isRequired,
+  maxLength: PropTypes.number,
 }
+DescriptionQuestion.defaultProps = {
+  maxLength: 500,
+}
+
 export default DescriptionQuestion

@@ -109,6 +109,7 @@ class TestQuestionEditor extends React.Component {
       if (editing) {
         return (
           <DescriptionQuestion
+            placeholder="Write idea description here…"
             item={item}
           />
         )

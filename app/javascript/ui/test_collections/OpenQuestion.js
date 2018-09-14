@@ -1,57 +1,67 @@
 import _ from 'lodash'
 import PropTypes from 'prop-types'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
-import TextareaAutosize from 'react-autosize-textarea'
+// import TextareaAutosize from 'react-autosize-textarea'
 import styled, { css } from 'styled-components'
 
 import ReturnArrowIcon from '~/ui/icons/ReturnArrowIcon'
 import v from '~/utils/variables'
-import { QuestionText, TestQuestionInput } from './shared'
+import DescriptionQuestion from './DescriptionQuestion'
+import { QuestionText, TextResponseHolder, TextInput } from './shared'
 
 const QuestionSpacing = css`
-  border-bottom-color: ${props => (props.editable ? v.colors.gray : '#9ec1cc')};
+  border-bottom-color: ${props => (props.editable ? v.colors.gray : v.colors.testLightBlueBg)};
   border-bottom-style: solid;
   border-bottom-width: 6px;
 `
 
-const QuestionTextWitSpacing = QuestionText.extend`
-  ${QuestionSpacing}
-`
-
-const TextInput = styled(TextareaAutosize)`
-  ${TestQuestionInput}
-`
-
-const EditTextInput = styled.input`
-  ${TestQuestionInput}
+const QuestionTextWithSpacing = QuestionText.extend`
   ${QuestionSpacing}
 `
 
 const TextEnterButton = styled.button`
-  color: #5698AE;
+  opacity: ${props => (props.focused ? 1 : 0)};
+  transition: opacity 0.3s;
+  color: ${v.colors.ctaButtonBlue};
   vertical-align: super;
-  width: 15px;
+  position: absolute;
+  right: 18px;
+  top: 14px;
+  width: 18px;
+  height: 18px;
+`
+
+const QuestionEntryForm = styled.form`
+  background: ${v.colors.desert};
 `
 
 @observer
 class OpenQuestion extends React.Component {
   constructor(props) {
     super(props)
-    this.saveEditing = _.debounce(this._saveEditing, 1000)
+    this.save = _.debounce(this._save, 1000)
+    this.state = {
+      response: '',
+      focused: false,
+    }
   }
 
-  _saveEditing = () => {
+  _save = () => {
     const { item } = this.props
     item.save()
   }
 
-  answer = (name) => (ev) => {
+  handleResponse = (ev) => {
+    this.setState({
+      response: ev.target.value,
+    })
   }
 
-  handleEditingChange = (ev) => {
-    const { item } = this.props
-    item.content = ev.target.value
-    this.saveEditing()
+  handleSubmit = (ev) => {
+    const { editing, onAnswer } = this.props
+    ev.preventDefault()
+    if (editing) return
+    onAnswer({ text: this.state.response })
   }
 
   renderQuestion() {
@@ -59,19 +69,17 @@ class OpenQuestion extends React.Component {
     let content
     if (editing) {
       content = (
-        <EditTextInput
-          editable
-          onChange={this.handleEditingChange}
-          placeholder="Write question here"
-          value={item.content || ''}
-          onBlur={this.save}
+        <DescriptionQuestion
+          item={item}
+          maxLength={100}
+          placeholder="Write question here…"
         />
       )
     } else {
       content = (
-        <QuestionTextWitSpacing>
+        <QuestionTextWithSpacing>
           {item.content}
-        </QuestionTextWitSpacing>
+        </QuestionTextWithSpacing>
       )
     }
     return content
@@ -82,12 +90,22 @@ class OpenQuestion extends React.Component {
     return (
       <div style={{ width: '100%' }}>
         {this.renderQuestion()}
-        <div>
-          <TextInput placeholder="Write response here" disabled={editing} />
-          <TextEnterButton onClick={this.answer}>
-            <ReturnArrowIcon />
-          </TextEnterButton>
-        </div>
+        <QuestionEntryForm onSubmit={this.handleSubmit}>
+          <TextResponseHolder>
+            <TextInput
+              onFocus={() => this.setState({ focused: true })}
+              onChange={this.handleResponse}
+              onBlur={() => this.setState({ focused: false })}
+              value={this.state.response}
+              color={v.colors.ctaButtonBlue}
+              placeholder="write response here"
+              disabled={editing}
+            />
+            <TextEnterButton focused={this.state.focused}>
+              <ReturnArrowIcon />
+            </TextEnterButton>
+          </TextResponseHolder>
+        </QuestionEntryForm>
       </div>
     )
   }
@@ -96,9 +114,11 @@ class OpenQuestion extends React.Component {
 OpenQuestion.propTypes = {
   item: MobxPropTypes.objectOrObservableObject.isRequired,
   editing: PropTypes.bool,
+  onAnswer: PropTypes.func,
 }
 OpenQuestion.defaultProps = {
   editing: false,
+  onAnswer: () => null,
 }
 
 export default OpenQuestion
