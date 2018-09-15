@@ -13,12 +13,12 @@ const StyledProductDescription = styled(MarketingContent)`
   margin-right: 24px;
   padding-top: 0px;
   padding-bottom: 0px;
-  
+
   @media only screen and (min-width: ${v.responsive.smallBreakpoint}px) {
     margin-left: 0px;
     margin-right: 0px;
     padding-top: 36px;
-    padding-bottom: 36px;
+    padding-bottom: 24px;
   }
 `
 
@@ -27,6 +27,7 @@ const Title = styled(MarketingH1Bold)`
   text-align: left;
   word-wrap:break-word;
   line-height: 30px;
+  margin-bottom: 16px;
 
   @media only screen and (min-width: ${v.responsive.smallBreakpoint}px) {
     line-height: 40px;
@@ -64,22 +65,20 @@ class ProductDescription extends React.PureComponent {
           justify="space-evenly"
           wrap
         >
-          <Box w={[null, .08]} order={1} />
+          <Box w={[null, 0.08]} order={1} />
 
-          <Box w={[1, .21]} order={[4, (this.props.order % 2 === 1 ? 2 : 4)]}>
+          <Box w={[1, 0.21]} order={[4, (this.props.order % 2 === 1 ? 2 : 4)]}>
             <Title>{this.props.title}</Title>
             <Description>{this.props.description}</Description>
           </Box>
 
-          <Box w={[null, .09]} order={3} />
+          <Box w={[null, 0.09]} order={3} />
 
-
-          <Box w={[1, .54]} order={[2, (this.props.order % 2 === 1 ? 4 : 2)]}>
+          <Box w={[1, 0.54]} order={[2, (this.props.order % 2 === 1 ? 4 : 2)]}>
             <ImageDisplay src={this.props.imageUrl} alt={this.props.title} />
           </Box>
 
-          <Box w={[null, .08]} order={4} />
-
+          <Box w={[null, 0.08]} order={4} />
 
         </MarketingFlex>
       </StyledProductDescription>

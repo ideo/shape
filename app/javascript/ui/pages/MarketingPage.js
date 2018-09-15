@@ -23,9 +23,9 @@ import { MarketingBack,
   InvertedFixedWidth,
 } from '~/ui/global/styled/marketing.js'
 import poweredByIdeo from '~/assets/Powered-by-IDEO-Inverted.png'
-import MarketingMenu from '~/ui/pages/SubComponents/MarketingMenu.js'
-import SubscribeEmail from '~/ui/pages/SubComponents/SubscribeEmail.js'
-import ProductDescriptions from '~/ui/pages/SubComponents/ProductDescriptions.js'
+import MarketingMenu from '~/ui/marketing/MarketingMenu.js'
+import SubscribeEmail from '~/ui/marketing/SubscribeEmail.js'
+import ProductDescriptions from '~/ui/marketing/ProductDescriptions.js'
 import { Element as ScrollElement } from 'react-scroll'
 // import VisibilitySensor from 'react-visibility-sensor'
 import firebase from '~/vendor/firebaseMarketing.js'

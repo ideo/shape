@@ -1,4 +1,4 @@
-import ProductDescription from '~/ui/items/ProductDescription.js'
+import ProductDescription from '~/ui/marketing/ProductDescription.js'
 import firebase from '~/vendor/firebaseMarketing.js'
 import styled from 'styled-components'
 import v from '~/utils/variables'
