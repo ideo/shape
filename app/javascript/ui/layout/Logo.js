@@ -25,7 +25,7 @@ const Logo = (props) => {
   const logoProps = { ...props }
   if (!logoProps.height) {
     // allow just width to be set, height will figure out based on aspect ratio
-    logoProps.height = Math.floor(logoProps.width / 1.62)
+    logoProps.height = Math.floor(logoProps.width / 1.57)
   }
   return <StyledLogo {...logoProps} title="Shape" />
 }

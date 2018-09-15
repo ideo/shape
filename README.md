@@ -9,6 +9,8 @@ nvm install 8.9.4
 brew install yarn
 curl -L https://get.rvm.io | bash -s stable --auto-dotfiles --autolibs=enable --rails
 brew install postgresql
+brew install redis
+brew install heroku/brew/heroku
 ```
 
 Clone the app and install the gems:
@@ -65,11 +67,9 @@ bin/rails s
 ```
 
 ### Use ttab for quick dev environment setup
-
-Install ttab and foreman:
+Install ttab and [Heroku CLI](https://devcenter.heroku.com/articles/heroku-cli#download-and-install):
 ```
 npm install -g ttab
-gem install foreman
 ```
 
 Run dev script:
@@ -79,4 +79,5 @@ Run dev script:
 This will open separate tabs to:
   1. Run the webpack dev server and sidekiq worker
   1. Run the rails server
-  1. Open atom in the project directory
+  1. Open [Atom](https://atom.io/) in the project directory
+And will open your browser (may need to refresh page after initial webpack)
