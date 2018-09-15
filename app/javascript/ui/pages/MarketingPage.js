@@ -14,7 +14,7 @@ import { MarketingBack,
   DesktopSpacer,
   Center,
   MarketingTagLine,
-  MarketingVideoLink,
+  // MarketingVideoLink,
   MarketingShapeLogo,
   MarketingBetaSticker,
   MarketingCallToAction,
@@ -27,7 +27,7 @@ import MarketingMenu from '~/ui/pages/SubComponents/MarketingMenu.js'
 import SubscribeEmail from '~/ui/pages/SubComponents/SubscribeEmail.js'
 import ProductDescriptions from '~/ui/pages/SubComponents/ProductDescriptions.js'
 import { Element as ScrollElement } from 'react-scroll'
-import VisibilitySensor from 'react-visibility-sensor'
+// import VisibilitySensor from 'react-visibility-sensor'
 import firebase from '~/vendor/firebaseMarketing.js'
 
 class MarketingPage extends React.Component {
@@ -36,7 +36,6 @@ class MarketingPage extends React.Component {
     const pageText = {}
 
     this.state = {
-      isLogoVisible: true,
       pageTexts: pageText,
     }
   }
@@ -57,28 +56,17 @@ class MarketingPage extends React.Component {
       })
   }
 
-  handleLogoVisibility = (isVisible) => {
-    this.setState({ isLogoVisible: isVisible })
-  }
-
   render() {
     return (
       <Fragment>
         <MarketingBack>
           <MarketingGradientTop>
             <ScrollElement name="TopAnchor" />
-            <MarketingMenu isBigLogoVisible={this.state.isLogoVisible} />
+            <MarketingMenu />
             <MarketingBetaSticker />
 
             <Center>
-              <VisibilitySensor
-                partialVisibility
-                scrollCheck
-                intervalDelay={300}
-                onChange={this.handleLogoVisibility}
-              >
-                <MarketingShapeLogo />
-              </VisibilitySensor>
+              <MarketingShapeLogo />
               <MarketingTagLine>
                 {this.state.pageTexts.tagLine}
               </MarketingTagLine>

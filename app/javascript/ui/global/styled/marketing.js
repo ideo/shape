@@ -4,7 +4,6 @@ import { Heading1, Heading2, Anchor } from '~/ui/global/styled/typography'
 import { ReflexProvider, Flex } from 'reflexbox'
 import organicGridPillGray from '~/assets/organic_grid_pill_gray.png'
 
-
 /** @component */
 export const MarketingBack = styled.div`
   text-align: center;
@@ -43,7 +42,7 @@ export const MarketingFooter = styled.div`
   padding-bottom: 22px;
   padding-right: 24px;
   padding-left: 24px;
-  
+
   @media only screen and (min-width: ${v.responsive.smallBreakpoint}px) {
     padding-left: 0px;
     padding-right: 0px;
@@ -80,7 +79,6 @@ export const DesktopSpacer = styled.span`
   }
 `
 DesktopSpacer.displayName = 'StyledDesktopSpacer'
-
 
 /** @component */
 export const Center = styled.span`
@@ -276,7 +274,7 @@ InvertMarketingLinkMail.displayName = 'StyledInvertMarketingLinkMail'
 
 /** @component */
 export const MarketingBetaSticker = styled.img.attrs({
-  src: 'https://firebasestorage.googleapis.com/v0/b/shape-marketing.appspot.com/o/marketing%2Fcommon%2Fbeta-stick-2.png?alt=media&token=72957149-16e5-4c70-aa80-3a5ac129fa34'
+  src: 'https://firebasestorage.googleapis.com/v0/b/shape-marketing.appspot.com/o/marketing%2Fcommon%2Fbeta-stick-2.png?alt=media&token=72957149-16e5-4c70-aa80-3a5ac129fa34',
 })`
   alt: 'In Beta!';
   width: 100%;
@@ -298,7 +296,7 @@ MarketingBetaSticker.displayName = 'StyledMarketingBetaSticker'
 /** @component */
 export const MarketingShapeLogo = styled.img.attrs({
   ref: 'MarketingShapeLogo',
-  src: 'https://s3-us-west-2.amazonaws.com/assets.shape.space/logo.svg'
+  src: 'https://s3-us-west-2.amazonaws.com/assets.shape.space/logo.svg',
 })`
   alt: 'Shape';
   width: 100%;
