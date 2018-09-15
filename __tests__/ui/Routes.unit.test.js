@@ -5,6 +5,7 @@ import {
   fakeUser
 } from '#/mocks/data'
 
+jest.mock('~shared/utils/countryOptions')
 jest.mock('firebase/auth')
 jest.mock('firebase/app', () => (
   {
