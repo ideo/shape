@@ -267,7 +267,7 @@ export const InvertMarketingLinkMail = styled(Anchor)`
   letter-spacing: -0.2px;
   font-size: 32px;
   font-family: ${v.fonts.serif};
-  padding-bottom: 68px;
+  margin-bottom: 68px;
   display:inline-block;
 `
 InvertMarketingLinkMail.displayName = 'StyledInvertMarketingLinkMail'
