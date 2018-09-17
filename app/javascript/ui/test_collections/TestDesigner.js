@@ -5,7 +5,7 @@ import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 import FlipMove from 'react-flip-move'
 
-import { NumberListText } from '~/ui/global/styled/typography'
+import { DisplayText, NumberListText } from '~/ui/global/styled/typography'
 import { Select, SelectOption } from '~/ui/global/styled/forms'
 import v, { ITEM_TYPES } from '~/utils/variables'
 import { apiStore } from '~/stores/'
@@ -149,33 +149,39 @@ class TestDesigner extends React.Component {
     return (
       <QuestionSelectHolder>
         <NumberListText>{card.order + 1}.</NumberListText>
-        <Select
-          classes={{
-            root: 'select fixedWidth',
-            select: blank ? 'grayedOut' : '',
-            selectMenu: 'selectMenu',
-          }}
-          displayEmpty
-          name="role"
-          value={card.card_question_type || ''}
-          onChange={this.handleSelectChange(card)}
-        >
-          {selectOptions.map(opt => (
-            <SelectOption
-              key={opt.value}
-              classes={{
-                root: !opt.value ? 'grayedOut' : '',
-              }}
-              disabled={!opt.value}
-              value={opt.value}
-            >
-              {opt.label}
-            </SelectOption>
-          ))}
-        </Select>
-        <TrashButton onClick={() => this.handleTrash(card)}>
-          <TrashIcon />
-        </TrashButton>
+        {card.card_question_type === 'finish' ? (
+          <DisplayText>End of Survey</DisplayText>
+        ) : (
+          <Select
+            classes={{
+              root: 'select fixedWidth',
+              select: blank ? 'grayedOut' : '',
+              selectMenu: 'selectMenu',
+            }}
+            displayEmpty
+            name="role"
+            value={card.card_question_type || ''}
+            onChange={this.handleSelectChange(card)}
+          >
+            {selectOptions.map(opt => (
+              <SelectOption
+                key={opt.value}
+                classes={{
+                  root: !opt.value ? 'grayedOut' : '',
+                }}
+                disabled={!opt.value}
+                value={opt.value}
+              >
+                {opt.label}
+              </SelectOption>
+            ))}
+          </Select>
+        )}
+        {card.card_question_type !== 'finish' && (
+          <TrashButton onClick={() => this.handleTrash(card)}>
+            <TrashIcon />
+          </TrashButton>
+        )}
       </QuestionSelectHolder>
     )
   }

@@ -34,6 +34,13 @@ class Collection
           question_type: :useful,
         },
       )
+      primary_collection_cards.build(
+        order: 3,
+        item_attributes: {
+          type: 'Item::QuestionItem',
+          question_type: :finish,
+        },
+      )
     end
 
     def add_test_tag
