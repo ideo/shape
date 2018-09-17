@@ -18,7 +18,7 @@ Row.propTypes = {
   align: PropTypes.oneOf(['flex-start', 'flex-end', 'center']),
 }
 Row.defaultProps = {
-  align: 'flex-start'
+  align: 'flex-start',
 }
 
 /** @component */

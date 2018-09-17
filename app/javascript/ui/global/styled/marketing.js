@@ -297,8 +297,8 @@ MarketingBetaSticker.displayName = 'StyledMarketingBetaSticker'
 export const MarketingShapeLogo = styled.img.attrs({
   ref: 'MarketingShapeLogo',
   src: 'https://s3-us-west-2.amazonaws.com/assets.shape.space/logo.svg',
+  alt: 'Shape',
 })`
-  alt: 'Shape';
   width: 100%;
   max-width: 256px;
   margin-top: 70px;
