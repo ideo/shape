@@ -51,6 +51,9 @@ export default {
     blackLava: '#120f0e',
     orange: '#d66742',
     white: '#ffffff',
+    nearwhite: '#f7f7f7',
+    cautionYellow: '#fcf113',
+    placeholderGray: "#bcbcbc",
   },
 
   iconSizes: {
@@ -65,6 +68,7 @@ export default {
   weights: {
     book: 400,
     medium: 500,
+    bold: 700,
   },
 
   zIndex: {
