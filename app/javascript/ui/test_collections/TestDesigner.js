@@ -232,7 +232,7 @@ class TestDesigner extends React.Component {
                     editing={editing}
                   />
                 </TestQuestionHolder>
-                {editing &&
+                {editing && card.card_question_type !== 'finish' &&
                   this.renderHotEdge(card)
                 }
               </Flex>
