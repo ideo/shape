@@ -5,7 +5,11 @@ class Collection
     before_create :setup_test_cards
     after_create :add_test_tag
 
-    # TODO: needs some status field to determine "launch state"?
+    enum test_status: {
+      draft: 0,
+      live: 1,
+      closed: 2,
+    }
 
     # override parent method to always include all cards (roles don't matter)
     def collection_cards_viewable_by(*)

@@ -40,8 +40,7 @@ class Api::V1::QuestionAnswersController < Api::V1::BaseController
 
   def load_survey_response
     @survey_response = SurveyResponse.find_by_session_uid(params[:survey_response_id])
-    # TODO: also reject when this collection is not "live/public"
-    head(401) unless @survey_response.present?
+    head(400) unless @survey_response.present? && @survey_response.test_collection.live?
   end
 
   def build_question_answer

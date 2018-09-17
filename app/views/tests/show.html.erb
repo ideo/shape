@@ -1,6 +1,16 @@
 <div id="react-root"></div>
+
+<% if @collection.live? %>
+
 <script>
 window.collectionData = <%= @collection.serialized_for_test_survey.to_json.html_safe %>
 </script>
-
 <%= javascript_pack_tag 'test-survey-app' %>
+
+<% else %>
+
+<div style="padding: 100px;">
+  <p>Sorry, this test has been closed.</p>
+</div>
+
+<% end %>

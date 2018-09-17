@@ -19,7 +19,6 @@ class Api::V1::SurveyResponsesController < Api::V1::BaseController
     # had to just use json_api_params
     id = json_api_params['data']['attributes']['test_collection_id']
     @collection = Collection::TestCollection.find(id)
-    # TODO: also reject when this collection is not "live/public"
-    head(401) unless @collection.present?
+    head(400) unless @collection.present? && @collection.live?
   end
 end
