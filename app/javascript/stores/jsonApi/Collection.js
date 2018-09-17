@@ -77,6 +77,10 @@ class Collection extends BaseRecord {
     return this.isMasterTemplate && !this.isProfileTemplate
   }
 
+  get isLaunchableTest() {
+    return this.isTestCollection && this.test_status === 'draft'
+  }
+
   get isTemplated() {
     return !!this.template_id
   }
@@ -163,6 +167,16 @@ class Collection extends BaseRecord {
     if (this.organization_id.toString() !== currentUser.current_organization.id) {
       currentUser.switchOrganization(this.organization_id)
     }
+  }
+
+  launchTest = () => {
+    uiStore.confirm({
+      prompt: 'Are you sure? Once you get your first response, you can no longer change your test.',
+      confirmText: 'Launch',
+      iconName: 'TestGraph',
+      onCancel: () => console.log('canceled'),
+      onConfirm: () => console.log('launched'),
+    })
   }
 
   static async createSubmission(parent_id, submissionSettings) {

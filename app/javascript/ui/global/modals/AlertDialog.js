@@ -29,7 +29,7 @@ class AlertDialog extends React.PureComponent {
       <Dialog {...modalProps}>
         <div>
           <p>
-            { prompt }
+            {prompt}
           </p>
         </div>
       </Dialog>

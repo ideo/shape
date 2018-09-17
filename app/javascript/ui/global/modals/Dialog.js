@@ -80,10 +80,10 @@ class Dialog extends React.PureComponent {
         </ModalCloseButton>
         <CenteredPaddedContent>
           <IconHolder>
-            { this.icon }
+            {this.icon}
           </IconHolder>
           <PromptText>
-            { children }
+            {children}
           </PromptText>
         </CenteredPaddedContent>
       </StyledDialog>
@@ -100,6 +100,7 @@ Dialog.propTypes = {
     'Leave',
     'Link',
     'Ok',
+    'TestGraph',
   ]),
   children: PropTypes.node.isRequired,
   open: PropTypes.bool.isRequired,

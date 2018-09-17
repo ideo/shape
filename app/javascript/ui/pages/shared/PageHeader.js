@@ -45,6 +45,11 @@ const IconHolder = styled.span`
   }
 `
 
+const HeaderFormButton = FormButton.extend`
+  margin-left: 30px;
+  margin-top: 10px;
+`
+
 @inject('routingStore', 'uiStore')
 @observer
 class PageHeader extends React.Component {
@@ -175,7 +180,7 @@ class PageHeader extends React.Component {
       }
       return (
         <SubduedHeading1>
-          { tagList }
+          {tagList}
         </SubduedHeading1>)
     }
     return null
@@ -196,7 +201,7 @@ class PageHeader extends React.Component {
       icon = <TestCollectionIcon />
     }
     if (icon) {
-      return <IconHolder align="right">{ icon }</IconHolder>
+      return <IconHolder align="right">{icon}</IconHolder>
     }
     return null
   }
@@ -222,7 +227,7 @@ class PageHeader extends React.Component {
               justify="space-between"
             >
               <Flex align="flex-start" className="title" onClick={this.handleTitleClick}>
-                { this.collectionIcon }
+                {this.collectionIcon}
                 <EditableName
                   name={record.name}
                   updateNameHandler={this.updateRecordName}
@@ -235,22 +240,28 @@ class PageHeader extends React.Component {
                     this.updateIconAndTagsWidth(ref)
                   }}
                 >
-                  { this.collectionTypeIcon }
-                  { this.collectionTypeOrInheritedTags }
+                  {this.collectionTypeIcon}
+                  {this.collectionTypeOrInheritedTags}
                 </div>
                 {record.isUsableTemplate &&
-                  <FormButton
+                  <HeaderFormButton
                     color="blue"
-                    style={{ marginLeft: 30, marginTop: 10 }}
                     onClick={this.openMoveMenuForTemplate}
                   >
                     Use Template
-                  </FormButton>
+                  </HeaderFormButton>
+                }
+                {record.isLaunchableTest &&
+                  <HeaderFormButton
+                    onClick={record.launchTest}
+                  >
+                    Launch
+                  </HeaderFormButton>
                 }
               </Flex>
               <Flex align="flex-end" style={{ height: '60px', marginTop: '-10px' }}>
                 <Fragment>
-                  { this.actions }
+                  {this.actions}
                 </Fragment>
               </Flex>
             </StyledTitleAndRoles>
