@@ -9,6 +9,7 @@ class Item
       end: 3,
       media: 4,
       description: 5,
+      finish: 6,
     }
   end
 end

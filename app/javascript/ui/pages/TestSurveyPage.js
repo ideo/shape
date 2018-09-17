@@ -3,11 +3,13 @@ import styled from 'styled-components'
 import v from '~/utils/variables'
 import Logo from '~/ui/layout/Logo'
 import TestDesigner from '~/ui/test_collections/TestDesigner'
+import dotbg from '~/assets/dotbg.png'
 import { apiStore } from '~/stores'
 // import Collection from '~/stores/jsonApi/Collection'
 
 const StyledBg = styled.div`
   background: #e3edee;
+  background-image: url(${dotbg});
   padding-top: 36px;
   min-height: 100vh;
 `

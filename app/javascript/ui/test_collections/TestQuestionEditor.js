@@ -5,6 +5,7 @@ import styled from 'styled-components'
 import GridCard from '~/ui/grid/GridCard'
 import GridCardBlank from '~/ui/grid/blankContentTool/GridCardBlank'
 import DescriptionQuestion from '~/ui/test_collections/DescriptionQuestion'
+import FinishQuestion from '~/ui/test_collections/FinishQuestion'
 import NewQuestionGraphic from '~/ui/icons/NewQuestionGraphic'
 import ScaleQuestion from '~/ui/test_collections/ScaleQuestion'
 import OpenQuestion from '~/ui/test_collections/OpenQuestion'
@@ -125,6 +126,8 @@ class TestQuestionEditor extends React.Component {
           onAnswer={this.handleQuestionAnswer}
         />
       )
+    case 'finish':
+      return <FinishQuestion />
     default:
       return <NewQuestionGraphic />
     }
