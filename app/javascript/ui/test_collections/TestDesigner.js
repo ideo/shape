@@ -108,6 +108,13 @@ class TestDesigner extends React.Component {
     this.createNewQuestionCard({ order: card.order + 1 })
   }
 
+  get canEdit() {
+    // props.editing means we are in "Test Design" mode -- however we could still be
+    // a "viewer" of the collection in which case canEdit == false
+    const { collection } = this.props
+    return collection.can_edit_content
+  }
+
   createSurveyResponse = async () => {
     const { collection } = this.props
     const newResponse = new SurveyResponse({
@@ -156,6 +163,7 @@ class TestDesigner extends React.Component {
             selectMenu: 'selectMenu',
           }}
           displayEmpty
+          disabled={!this.canEdit}
           name="role"
           value={card.card_question_type || ''}
           onChange={this.handleSelectChange(card)}
@@ -173,9 +181,11 @@ class TestDesigner extends React.Component {
             </SelectOption>
           ))}
         </Select>
-        <TrashButton onClick={() => this.handleTrash(card)}>
-          <TrashIcon />
-        </TrashButton>
+        {this.canEdit &&
+          <TrashButton onClick={() => this.handleTrash(card)}>
+            <TrashIcon />
+          </TrashButton>
+        }
       </QuestionSelectHolder>
     )
   }
@@ -224,9 +234,10 @@ class TestDesigner extends React.Component {
                     position={position}
                     order={card.order}
                     editing={editing}
+                    canEdit={this.canEdit}
                   />
                 </TestQuestionHolder>
-                {editing &&
+                {editing && this.canEdit &&
                   this.renderHotEdge(card)
                 }
               </Flex>

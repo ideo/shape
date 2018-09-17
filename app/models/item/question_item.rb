@@ -1,6 +1,6 @@
 class Item
   class QuestionItem < Item
-    has_many :question_answers, inverse_of: :question, dependent: :destroy
+    has_many :question_answers, inverse_of: :question, foreign_key: :question_id, dependent: :destroy
 
     enum question_type: {
       context: 0,
@@ -10,5 +10,9 @@ class Item
       media: 4,
       description: 5,
     }
+
+    def requires_roles?
+      false
+    end
   end
 end

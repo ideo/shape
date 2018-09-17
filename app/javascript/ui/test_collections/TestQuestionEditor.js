@@ -52,7 +52,9 @@ class TestQuestionEditor extends React.Component {
   }
 
   renderQuestion() {
-    const { parent, card, item, editing, questionAnswer } = this.props
+    const {
+      parent, card, item, editing, questionAnswer, canEdit,
+    } = this.props
     let inner
     switch (card.card_question_type) {
     case 'context':
@@ -111,6 +113,7 @@ class TestQuestionEditor extends React.Component {
           <DescriptionQuestion
             placeholder="Write idea description here…"
             item={item}
+            canEdit={canEdit}
           />
         )
       }
@@ -121,6 +124,7 @@ class TestQuestionEditor extends React.Component {
         <OpenQuestion
           item={item}
           editing={editing}
+          canEdit={canEdit}
           questionAnswer={questionAnswer}
           onAnswer={this.handleQuestionAnswer}
         />
@@ -149,12 +153,14 @@ TestQuestionEditor.propTypes = {
   surveyResponse: MobxPropTypes.objectOrObservableObject,
   questionAnswer: MobxPropTypes.objectOrObservableObject,
   createSurveyResponse: PropTypes.func,
+  canEdit: PropTypes.bool,
 }
 
 TestQuestionEditor.defaultProps = {
   surveyResponse: null,
   questionAnswer: null,
   createSurveyResponse: null,
+  canEdit: false,
 }
 
 export default TestQuestionEditor

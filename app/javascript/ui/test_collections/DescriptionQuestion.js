@@ -42,11 +42,12 @@ class DescriptionQuestion extends React.Component {
   }
 
   render() {
-    const { item, maxLength, placeholder } = this.props
+    const { item, maxLength, placeholder, canEdit } = this.props
     return (
       <div>
         <TextInputHolder hasFocus={this.state.focused || item.content === ''}>
           <TextInput
+            disabled={!canEdit}
             onFocus={() => this.setState({ focused: true })}
             onBlur={this.handleBlur}
             onChange={this.handleChange}
@@ -64,9 +65,11 @@ DescriptionQuestion.propTypes = {
   item: MobxPropTypes.objectOrObservableObject.isRequired,
   placeholder: PropTypes.string.isRequired,
   maxLength: PropTypes.number,
+  canEdit: PropTypes.bool,
 }
 DescriptionQuestion.defaultProps = {
   maxLength: 500,
+  canEdit: false,
 }
 
 export default DescriptionQuestion
