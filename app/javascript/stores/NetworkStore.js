@@ -81,6 +81,13 @@ class NetworkStore extends jsonapi(Collection) {
       sort: "period_start"
     });
   }
+
+  loadInvoice(invoice_id) {
+    this
+      .fetch('invoices', invoice_id, {
+        include: ['organization', 'invoice_items', 'payment_methods'],
+      })
+  }
 }
 
 export default NetworkStore;

@@ -11,7 +11,7 @@ const getRequestType = url => {
   const segments = url.split('/')
   let typeSegment = segments[segments.length - 1]
   // we want the last segment unless it is an id
-  if (typeSegment.match(/^\d+$/)) {
+  if (typeSegment.match(/^\d+/)) {
     typeSegment = segments[segments.length - 2]
   }
   // works for foo?bar=baz or foo

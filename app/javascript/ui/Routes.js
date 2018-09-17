@@ -16,6 +16,7 @@ import SearchPage from '~/ui/pages/SearchPage'
 import SettingsPage from '~/ui/pages/SettingsPage'
 import TermsPage from '~/ui/pages/TermsPage'
 import BillingPage from '~/ui/pages/BillingPage'
+import BillingStatement from '~/ui/pages/BillingStatement'
 import TermsOfUseModal from '~/ui/users/TermsOfUseModal'
 import initZendesk from '~/vendor/zendesk'
 import OrganizationSettings from '~/ui/organizations/OrganizationSettings'
@@ -117,6 +118,7 @@ class Routes extends React.Component {
               <Route path="/:org/search" component={SearchPage} />
               <Route path="/terms" component={TermsPage} />
               <Route path="/billing" component={BillingPage} />
+              <Route path="/print/invoices/:id" component={BillingStatement} />
               <Route
                 path="/settings"
                 render={() => <SettingsPage><OrganizationSettings /></SettingsPage>}
