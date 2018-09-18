@@ -4,6 +4,7 @@ import { observable, action } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import { Flex } from 'reflexbox'
 import styled from 'styled-components'
+import CopyToClipboard from 'react-copy-to-clipboard'
 
 import ActivityLogButton from '~/ui/notifications/ActivityLogButton'
 import Breadcrumb from '~/ui/layout/Breadcrumb'
@@ -15,6 +16,7 @@ import FilledProfileIcon from '~/ui/icons/FilledProfileIcon'
 import ProfileIcon from '~/ui/icons/ProfileIcon'
 import TemplateIcon from '~/ui/icons/TemplateIcon'
 import SystemIcon from '~/ui/icons/SystemIcon'
+import LinkIconSm from '~/ui/icons/LinkIconSm'
 import TestCollectionIcon from '~/ui/icons/TestCollectionIcon'
 import SubmissionBoxIconLg from '~/ui/icons/SubmissionBoxIconLg'
 import TagEditorModal from '~/ui/pages/shared/TagEditorModal'
@@ -48,6 +50,18 @@ const IconHolder = styled.span`
 const HeaderFormButton = FormButton.extend`
   margin-left: 30px;
   margin-top: 10px;
+`
+
+const LiveTestIndicator = styled.span`
+  display: inline-block;
+  color: ${v.colors.orange};
+  font-weight: 500;
+  font-size: 1rem;
+  font-family: ${v.fonts.sans};
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-left: 0.25rem;
+  padding-top: 1.33rem;
 `
 
 @inject('routingStore', 'uiStore')
@@ -173,6 +187,8 @@ class PageHeader extends React.Component {
 
   get collectionTypeOrInheritedTags() {
     const { record } = this.props
+    // not enough room to show in the header of a live Test
+    if (record.isLiveTest) return null
     if (record.inherited_tag_list.length) {
       let tagList = record.inherited_tag_list.map(tag => `#${tag}`).join(',')
       if (tagList.length > 24) {
@@ -197,7 +213,7 @@ class PageHeader extends React.Component {
       icon = <TemplateIcon circled />
     } else if (record.isSubmissionBox) {
       icon = <SubmissionBoxIconLg />
-    } else if (record.isTestCollection) {
+    } else if (record.isTestCollectionOrTestDesign) {
       icon = <TestCollectionIcon />
     }
     if (icon) {
@@ -241,6 +257,11 @@ class PageHeader extends React.Component {
                   }}
                 >
                   {this.collectionTypeIcon}
+                  {record.isLiveTest &&
+                    <LiveTestIndicator>
+                      Live
+                    </LiveTestIndicator>
+                  }
                   {this.collectionTypeOrInheritedTags}
                 </div>
                 {record.isUsableTemplate &&
@@ -255,8 +276,48 @@ class PageHeader extends React.Component {
                   <HeaderFormButton
                     onClick={record.launchTest}
                   >
-                    Launch
+                    Get Feedback
                   </HeaderFormButton>
+                }
+                {record.isLiveTest &&
+                  <Fragment>
+                    <CopyToClipboard
+                      text={record.publicTestURL}
+                      onCopy={() => null}
+                    >
+                      <HeaderFormButton
+                        width="200"
+                        color="hollow"
+                        onClick={() => uiStore.popupSnackbar({ message: 'Test link copied' })}
+                      >
+                        <span
+                          style={{
+                            display: 'inline-block',
+                            height: 30,
+                            width: 30,
+                            verticalAlign: 'middle',
+                          }}
+                        >
+                          <LinkIconSm size="small" />
+                        </span>
+                        <span
+                          style={{
+                            display: 'inline-block',
+                            verticalAlign: 'middle',
+                          }}
+                        >
+                          Get Test Link
+                        </span>
+                      </HeaderFormButton>
+                    </CopyToClipboard>
+                    <HeaderFormButton
+                      color="hollow"
+                      style={{ marginLeft: 10 }}
+                      onClick={() => console.log('stopped!')}
+                    >
+                      Stop Test
+                    </HeaderFormButton>
+                  </Fragment>
                 }
               </Flex>
               <Flex align="flex-end" style={{ height: '60px', marginTop: '-10px' }}>

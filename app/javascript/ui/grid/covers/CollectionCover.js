@@ -106,7 +106,7 @@ class CollectionCover extends React.Component {
       collection.isTemplated ||
       collection.isMasterTemplate ||
       collection.isSubmissionBox ||
-      collection.isTestCollection
+      collection.isTestCollectionOrTestDesign
     )
     if (hasIcon) {
       const nameParts = splitName(collection.name)
@@ -124,16 +124,16 @@ class CollectionCover extends React.Component {
         rightIcon = <TemplateIcon circled />
       } else if (collection.isSubmissionBox) {
         rightIcon = <SubmissionBoxIconLg />
-      } else if (collection.isTestCollection) {
+      } else if (collection.isTestCollectionOrTestDesign) {
         rightIcon = <TestCollectionIcon />
       }
       return (
         <Fragment>
-          { leftIcon && <IconHolder>{leftIcon}</IconHolder> }
+          {leftIcon && <IconHolder>{leftIcon}</IconHolder>}
           {nameParts.join(' ')}{' '}
           <span style={{ whiteSpace: 'nowrap' }}>
             {lastName}&nbsp;
-            { rightIcon && <IconHolder>{rightIcon}</IconHolder> }
+            {rightIcon && <IconHolder>{rightIcon}</IconHolder>}
           </span>
         </Fragment>
       )

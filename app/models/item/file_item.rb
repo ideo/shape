@@ -14,6 +14,11 @@ class Item
       super
     end
 
+    def requires_roles?
+      return false if parent.is_a? Collection::TestCollection
+      true
+    end
+
     private
 
     # on_create callback

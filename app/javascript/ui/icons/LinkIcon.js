@@ -29,7 +29,7 @@ LinkIcon.propTypes = {
 }
 
 LinkIcon.defaultProps = {
-  viewBox: '0 0 18 18'
+  viewBox: '0 0 18 18',
 }
 
 export default LinkIcon

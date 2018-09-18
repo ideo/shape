@@ -12,17 +12,8 @@ import {
   StyledSnackbar,
   StyledSnackbarContent,
   SnackbarBackground,
+  StyledSnackbarText,
 } from '~/ui/global/styled/material-ui'
-
-// This text is different from other typography
-const StyledMoveText = styled.span`
-  text-transform: uppercase;
-  font-family: ${v.fonts.sans};
-  font-size: 1rem;
-  font-weight: ${v.weights.book};
-  letter-spacing: 0.1rem;
-  color: white;
-`
 
 const IconHolder = styled.span`
   margin-left: 40px;
@@ -211,17 +202,17 @@ class MoveModal extends React.Component {
 
     return (
       <div>
-        { uiStore.movingCardIds.length > 0 && (
+        {uiStore.movingCardIds.length > 0 && (
           <div>
             <StyledSnackbar
-              classes={{ root: 'Snackbar', }}
+              classes={{ root: 'Snackbar' }}
               open
             >
               {this.isLoading ? <SnackbarBackground><InlineLoader /></SnackbarBackground> : (
                 <StyledSnackbarContent
-                  classes={{ root: 'SnackbarContent', }}
+                  classes={{ root: 'SnackbarContent' }}
                   message={
-                    <StyledMoveText id="message-id">{this.moveMessage}</StyledMoveText>
+                    <StyledSnackbarText id="message-id">{this.moveMessage}</StyledSnackbarText>
                   }
                   action={[
                     <IconHolder key="moveup">
@@ -261,7 +252,7 @@ class MoveModal extends React.Component {
                 />
               )}
             </StyledSnackbar>
-            { this.moveHelper }
+            {this.moveHelper}
           </div>
         )}
       </div>

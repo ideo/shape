@@ -1,6 +1,6 @@
 <div id="react-root"></div>
 
-<% if @collection.live? %>
+<% if @collection.live? && @collection.active? %>
 
 <script>
 window.collectionData = <%= @collection.serialized_for_test_survey.to_json.html_safe %>

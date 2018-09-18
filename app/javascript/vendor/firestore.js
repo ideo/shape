@@ -16,7 +16,7 @@ if (process.env.GOOGLE_CLOUD_BROWSER_KEY) {
   db = firebase.firestore()
   db.settings({
     // recommending setting for Firestore 5.0+
-    timestampsInSnapshots: true
+    timestampsInSnapshots: true,
   })
 }
 
@@ -131,6 +131,7 @@ export class FirebaseClient {
             })
           })
       }, error => {
+        console.log(threadId)
         trackError(error, { name: 'Firestore:CommentThreads' })
       })
     this.listeners.push(this.commentThreadsListener)

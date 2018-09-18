@@ -51,6 +51,14 @@ class Collection extends BaseRecord {
     return this.type === 'Collection::TestCollection'
   }
 
+  get isTestDesign() {
+    return this.type === 'Collection::TestDesign'
+  }
+
+  get isTestCollectionOrTestDesign() {
+    return this.isTestCollection || this.isTestDesign
+  }
+
   get requiresSubmissionBoxSettings() {
     if (!this.isSubmissionBox) return false
     // if type is null then it requires setup
@@ -79,6 +87,18 @@ class Collection extends BaseRecord {
 
   get isLaunchableTest() {
     return this.isTestCollection && this.test_status === 'draft'
+  }
+
+  get isLiveTest() {
+    return this.isTestCollectionOrTestDesign && this.test_status === 'live'
+  }
+
+  get publicTestURL() {
+    let collectionId = this.id
+    if (this.isTestDesign && this.parent_collection_card) {
+      collectionId = this.parent_collection_card.parent_id
+    }
+    return `${process.env.BASE_HOST}/tests/${collectionId}`
   }
 
   get isTemplated() {
@@ -174,9 +194,12 @@ class Collection extends BaseRecord {
       prompt: 'Are you sure? Once you get your first response, you can no longer change your test.',
       confirmText: 'Launch',
       iconName: 'TestGraph',
-      onCancel: () => console.log('canceled'),
-      onConfirm: () => console.log('launched'),
+      onConfirm: () => this.API_launchTest(),
     })
+  }
+
+  API_launchTest() {
+    this.apiStore.request(`collections/${this.id}/launch_test`, 'PATCH')
   }
 
   static async createSubmission(parent_id, submissionSettings) {

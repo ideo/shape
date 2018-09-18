@@ -50,10 +50,28 @@ export const FormButton = styled.button`
   letter-spacing: 0.09375rem;
   height: 40px;
   cursor: pointer;
-  color: white;
   border-radius: 20px;
-  border: none;
-  background-color: ${props => (props.color === 'blue' ? v.colors.ctaButtonBlue : v.colors.blackLava)};
+  color: ${props => {
+    switch (props.color) {
+    case 'hollow':
+      return v.colors.blackLava
+    default:
+      return 'white'
+    }
+  }};
+  background-color: ${props => {
+    switch (props.color) {
+    case 'blue':
+      return v.colors.ctaButtonBlue
+    case 'hollow':
+      return 'transparent'
+    default:
+      return v.colors.blackLava
+    }
+  }};
+  border: ${props => (
+    props.color === 'hollow' ? `1px solid ${v.colors.blackLava}` : 'none'
+  )};
   transition: all 0.3s;
   &:hover, &:focus {
     background-color: ${props => (props.color === 'blue' ? v.colors.ctaButtonBlueHover : v.colors.cloudy)};

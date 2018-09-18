@@ -309,15 +309,14 @@ class CollectionPage extends PageWithApi {
     } = uiStore
 
     // submissions_collection will only exist for submission boxes
-    const { isTestCollection, isSubmissionBox } = collection
+    const { isSubmissionBox } = collection
     const { movingCardIds, cardAction } = uiStore
     // only tell the Grid to hide "movingCards" if we're moving and not linking
     const uiMovingCardIds = cardAction === 'move' ? movingCardIds : []
     // SharedCollection has special behavior where it sorts by most recently updated
     const sortBy = collection.isSharedCollection ? 'updated_at' : 'order'
 
-    // TODO: some status of "unlaunched"?
-    const requiresTestDesigner = isTestCollection
+    const requiresTestDesigner = collection.isLaunchableTest || collection.isTestDesign
 
     return (
       <Fragment>
