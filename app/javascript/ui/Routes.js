@@ -3,6 +3,7 @@ import { Switch, Route, Redirect, withRouter } from 'react-router-dom'
 import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles'
 import WindowSizeListener from 'react-window-size-listener'
 import styled from 'styled-components'
+import {pxToRem} from '~shared/styles/utils'
 
 import ActivityLogBox from '~/ui/activity_log/ActivityLogBox'
 import DialogWrapper from '~/ui/global/modals/DialogWrapper'
@@ -53,6 +54,12 @@ class Routes extends React.Component {
     typography: {
       // Use the Shape font instead of the default Roboto font.
       fontFamily: v.fonts.sans,
+      // instructional
+      display2: {
+        fontSize: pxToRem(14),
+        letterSpacing: 'normal',
+        lineHeight: pxToRem(18),
+      },
     },
     palette: {
       primary: {
