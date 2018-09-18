@@ -1,7 +1,5 @@
 import OrganizationDropdown from '~/ui/organizations/OrganizationDropdown'
-import {
-  fakeOrganization,
-} from '#/mocks/data'
+import { fakeOrganization } from '#/mocks/data'
 import fakeUiStore from '#/mocks/fakeUiStore'
 import fakeApiStore from '#/mocks/fakeApiStore'
 
@@ -17,10 +15,7 @@ describe('OrganizationDropdown', () => {
     otherFakeOrg = Object.assign({}, fakeOrganization, { id: 999, name: 'new' })
     apiStore.currentUser.current_organization = fakeOrganization
     fakeOrganization.primary_group.can_edit = true
-    apiStore.currentUser.organizations = [
-      fakeOrganization,
-      otherFakeOrg,
-    ]
+    apiStore.currentUser.organizations = [fakeOrganization, otherFakeOrg]
     props = {
       open: true,
       onItemClick: jest.fn(),
@@ -28,15 +23,8 @@ describe('OrganizationDropdown', () => {
       routingStore,
       uiStore: fakeUiStore,
     }
-    itemNames = [
-      'People & Groups',
-      'New Organization',
-      'Settings',
-      'Legal'
-    ]
-    wrapper = shallow(
-      <OrganizationDropdown.wrappedComponent {...props} />
-    )
+    itemNames = ['People & Groups', 'New Organization', 'Settings', 'Legal']
+    wrapper = shallow(<OrganizationDropdown.wrappedComponent {...props} />)
     component = wrapper.instance()
     props.uiStore.alert.mockClear()
     props.uiStore.confirm.mockClear()
@@ -58,18 +46,27 @@ describe('OrganizationDropdown', () => {
     })
 
     it('sets organization page to passed in page name', () => {
-      expect(props.uiStore.update).toHaveBeenCalledWith('organizationMenuPage', 'organizationPeople')
+      expect(props.uiStore.update).toHaveBeenCalledWith(
+        'organizationMenuPage',
+        'organizationPeople'
+      )
     })
   })
 
   describe('menuItems', () => {
     it('should add organizations to the list of items', () => {
-      expect(component.menuItems.organizations[0].name).toEqual(otherFakeOrg.primary_group.name)
+      expect(component.menuItems.organizations[0].name).toEqual(
+        otherFakeOrg.primary_group.name
+      )
       expect(component.menuItems.organizations[0].iconLeft).toBeTruthy()
     })
 
     it('should not add your current organization to list of items', () => {
-      expect(component.menuItems.organizations.indexOf(otherFakeOrg.primary_group.name)).toEqual(-1)
+      expect(
+        component.menuItems.organizations.indexOf(
+          otherFakeOrg.primary_group.name
+        )
+      ).toEqual(-1)
     })
 
     it('should have all other menu items', () => {
@@ -83,9 +80,9 @@ describe('OrganizationDropdown', () => {
       })
 
       it('should not show the settings link', () => {
-        expect(component.menuItems.bottom.find(
-          item => item.name === 'Settings'
-        )).toBeFalsy()
+        expect(
+          component.menuItems.bottom.find(item => item.name === 'Settings')
+        ).toBeFalsy()
       })
     })
   })
@@ -96,9 +93,9 @@ describe('OrganizationDropdown', () => {
 
     it('should call switchOrganization on currentUser', () => {
       component.handleSwitchOrg(orgId)(fakeEv)
-      expect(props.apiStore.currentUser.switchOrganization).toHaveBeenCalledWith(
-        orgId, { redirectPath: 'homepage' }
-      )
+      expect(
+        props.apiStore.currentUser.switchOrganization
+      ).toHaveBeenCalledWith(orgId, { redirectPath: 'homepage' })
     })
 
     it('should call uiStore.confirm if trying to move cards between orgs', () => {

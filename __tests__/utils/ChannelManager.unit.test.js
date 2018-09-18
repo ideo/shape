@@ -4,8 +4,6 @@ import ChannelManager from '~/utils/ChannelManager'
 jest.mock('../../app/javascript/utils/ActionCableConsumer')
 
 describe('ChannelManager', () => {
-  const fakeEv = { preventDefault: jest.fn() }
-
   beforeEach(() => {
     ChannelManager.channels = {}
   })
@@ -31,7 +29,8 @@ describe('ChannelManager', () => {
 
     it('should create an action cable subscription', () => {
       expect(ActionCableConsumer.subscriptions.create).toHaveBeenCalledWith(
-        { channel: name,
+        {
+          channel: name,
           id,
         },
         {
@@ -55,7 +54,9 @@ describe('ChannelManager', () => {
       })
 
       it('should not add the channel twice', () => {
-        expect(ActionCableConsumer.subscriptions.create).toHaveBeenCalledTimes(1)
+        expect(ActionCableConsumer.subscriptions.create).toHaveBeenCalledTimes(
+          1
+        )
         expect(Object.keys(ChannelManager.channels).length).toEqual(1)
       })
     })
@@ -63,8 +64,9 @@ describe('ChannelManager', () => {
 
   describe('unsubscribeAllFromChannel()', () => {
     beforeEach(() => {
-      ActionCableConsumer.subscriptions.create.mockReturnValue(
-        { unsubscribe: jest.fn() })
+      ActionCableConsumer.subscriptions.create.mockReturnValue({
+        unsubscribe: jest.fn(),
+      })
       ChannelManager.channels = {}
       ChannelManager.subscribe('Item', 1)
       ChannelManager.subscribe('Item', 2)

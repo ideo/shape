@@ -27,12 +27,12 @@ class RolesModal extends React.Component {
     return !!uiStore.rolesMenuOpen
   }
 
-  handleClose = (ev) => {
+  handleClose = ev => {
     const { uiStore } = this.props
     uiStore.closeRolesMenu()
   }
 
-  onSave = (res) => {
+  onSave = res => {
     const { apiStore, record } = this.props
     // TODO why is the API sometimes returning an {} vs [] here?
     let formattedRes = res.data
@@ -45,11 +45,7 @@ class RolesModal extends React.Component {
     const title = `Sharing: ${record.name}`
 
     return (
-      <Modal
-        title={title}
-        onClose={this.handleClose}
-        open={this.isOpen}
-      >
+      <Modal title={title} onClose={this.handleClose} open={this.isOpen}>
         <RolesMenu
           canEdit={record.can_edit}
           ownerId={record.id}

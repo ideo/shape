@@ -8,8 +8,10 @@ import StyledReactTags from './StyledReactTags'
 
 @observer
 class TagEditor extends React.Component {
-  @observable tags = []
-  @observable error = ''
+  @observable
+  tags = []
+  @observable
+  error = ''
 
   constructor(props) {
     super(props)
@@ -29,10 +31,12 @@ class TagEditor extends React.Component {
     this.saveTags.flush()
   }
 
-  @action initTags = (tags) => {
+  @action
+  initTags = tags => {
     // `id` is used by react-tag-autocomplete, but otherwise doesn't hold any meaning
     this.tags = _.map([...tags], (t, i) => ({
-      id: i, name: t
+      id: i,
+      name: t,
     }))
   }
 
@@ -43,7 +47,8 @@ class TagEditor extends React.Component {
     if (afterSave) afterSave()
   }
 
-  @action handleAddition = (tag) => {
+  @action
+  handleAddition = tag => {
     const { validate } = this.props
     tag.name = tag.name.trim()
     this.error = ''
@@ -65,7 +70,8 @@ class TagEditor extends React.Component {
     }
   }
 
-  @action handleDelete = (i) => {
+  @action
+  handleDelete = i => {
     this.tags.remove(this.tags[i])
     this.saveTags()
   }
@@ -77,16 +83,10 @@ class TagEditor extends React.Component {
     }
     const inner = record[tagField].map(tag => (
       <div key={tag} className="react-tags__selected-tag read-only">
-        <span className="react-tags__selected-tag-name">
-          {tag}
-        </span>
+        <span className="react-tags__selected-tag-name">{tag}</span>
       </div>
     ))
-    return (
-      <div className="react-tags__selected">
-        {inner}
-      </div>
-    )
+    return <div className="react-tags__selected">{inner}</div>
   }
 
   render() {
@@ -95,7 +95,7 @@ class TagEditor extends React.Component {
     return (
       <StyledReactTags tagColor={tagColor}>
         {!canEdit && this.readOnlyTags()}
-        {canEdit &&
+        {canEdit && (
           <ReactTags
             tags={[...this.tags]}
             allowBackspace={false}
@@ -105,10 +105,8 @@ class TagEditor extends React.Component {
             handleDelete={this.handleDelete}
             allowNew
           />
-        }
-        {this.error &&
-          <div className="error">{this.error}</div>
-        }
+        )}
+        {this.error && <div className="error">{this.error}</div>}
       </StyledReactTags>
     )
   }

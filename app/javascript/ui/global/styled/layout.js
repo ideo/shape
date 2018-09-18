@@ -18,7 +18,7 @@ Row.propTypes = {
   align: PropTypes.oneOf(['flex-start', 'flex-end', 'center']),
 }
 Row.defaultProps = {
-  align: 'flex-start'
+  align: 'flex-start',
 }
 
 /** @component */
@@ -90,7 +90,11 @@ ActivityContainer.displayName = 'ActivityContainer'
 
 export const FadeHeader = styled.div`
   border-radius: 1px;
-  background: linear-gradient(${v.colors.activityDarkBlue} 0, ${v.colors.activityDarkBlue} 40%, ${hexToRgba(v.colors.activityDarkBlue, 0)} 100%);
+  background: linear-gradient(
+    ${v.colors.activityDarkBlue} 0,
+    ${v.colors.activityDarkBlue} 40%,
+    ${hexToRgba(v.colors.activityDarkBlue, 0)} 100%
+  );
   height: 27px;
   position: fixed;
   top: ${v.zIndex.floatOverContent};

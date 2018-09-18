@@ -57,12 +57,13 @@ class TextItemCover extends React.Component {
     this.unmounted = true
   }
 
-  @computed get isEditing() {
+  @computed
+  get isEditing() {
     const { item } = this.props
     return uiStore.textEditingItem === item
   }
 
-  handleEdit = (ev) => {
+  handleEdit = ev => {
     const { item } = this.props
     if (!item.can_edit_content) return false
     // If already editing, pass event down
@@ -81,7 +82,7 @@ class TextItemCover extends React.Component {
     routingStore.routeTo('items', item.id)
   }
 
-  textChange = (itemTextData) => {
+  textChange = itemTextData => {
     const { item } = this.state
     item.text_data = itemTextData
     this.setState({ item })
@@ -101,6 +102,7 @@ class TextItemCover extends React.Component {
     if (ev) ev.stopPropagation()
     this.clearTextEditingItem()
     // TODO figure out why ref wasn't working
+    // eslint-disable-next-line react/no-find-dom-node
     const node = ReactDOM.findDOMNode(this)
     node.scrollTop = 0
   }
@@ -114,11 +116,12 @@ class TextItemCover extends React.Component {
     }
     this.setState({ loading: false, item })
     // TODO figure out why ref wasn't working
+    // eslint-disable-next-line react/no-find-dom-node
     const node = ReactDOM.findDOMNode(this)
     node.scrollTop = 0
   }
 
-  checkTextAreaHeight = (height) => {
+  checkTextAreaHeight = height => {
     if (!this.quillEditor) return
     const textAreaHeight = this.quillEditor.getEditingArea().offsetHeight
     // render the Read More link if the text height exceeds viewable area
@@ -150,42 +153,35 @@ class TextItemCover extends React.Component {
     const textData = item.toJSON().text_data
     const quillProps = {
       // ref is used to get the height of the div in checkTextAreaHeight
-      ref: c => { this.quillEditor = c },
+      ref: c => {
+        this.quillEditor = c
+      },
       readOnly: true,
       theme: null,
     }
 
-    return (
-      <ReactQuill
-        {...quillProps}
-        value={textData}
-      />
-    )
+    return <ReactQuill {...quillProps} value={textData} />
   }
 
   render() {
-    const { item } = this.props
     const { isEditing } = this
-    const content = isEditing
-      ? this.renderEditing()
-      : this.renderDefault()
+    const content = isEditing ? this.renderEditing() : this.renderDefault()
     return (
       <PaddedCardCover
         style={{
           height: 'calc(100% - 30px)',
           overflowX: 'hidden',
-          overflowY: isEditing ? 'auto' : 'hidden'
+          overflowY: isEditing ? 'auto' : 'hidden',
         }}
         class="cancelGridClick"
         onClick={this.handleEdit}
       >
-        { this.state.loading && <InlineLoader /> }
-        { content }
-        {(this.state.readMore && !isEditing) && (
-          <StyledReadMore onClick={this.expand}>
-            read more...
-          </StyledReadMore>
-        )}
+        {this.state.loading && <InlineLoader />}
+        {content}
+        {this.state.readMore &&
+          !isEditing && (
+            <StyledReadMore onClick={this.expand}>read more...</StyledReadMore>
+          )}
       </PaddedCardCover>
     )
   }

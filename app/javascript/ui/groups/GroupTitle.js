@@ -7,7 +7,7 @@ import { SubduedTitle, Heading2 } from '~/ui/global/styled/typography'
 import {
   FormButton,
   StyledAutosizeInput,
-  EditAvatarButton
+  EditAvatarButton,
 } from '~/ui/global/styled/forms'
 import Avatar from '~/ui/global/Avatar'
 import EditPencilIcon from '~/ui/icons/EditPencilIcon'
@@ -35,18 +35,20 @@ EditIconHolder.displayName = 'EditIconHolder'
 
 @observer
 class GroupTitle extends React.Component {
-  @observable editing = false
+  @observable
+  editing = false
 
-  @action toggleEditing() {
+  @action
+  toggleEditing() {
     this.editing = !this.editing
   }
 
-  updateGroupName = (ev) => {
+  updateGroupName = ev => {
     const { group } = this.props
     group.name = ev.target.value
   }
 
-  updateGroupHandle = (ev) => {
+  updateGroupHandle = ev => {
     const { group } = this.props
     group.handle = ev.target.value
   }
@@ -57,12 +59,12 @@ class GroupTitle extends React.Component {
     group.assign('filestack_file_attributes', fileData)
   }
 
-  handleEdit = (ev) => {
+  handleEdit = ev => {
     ev.preventDefault()
     this.toggleEditing()
   }
 
-  handleSave = async (ev) => {
+  handleSave = async ev => {
     const { group, onSave } = this.props
     ev.preventDefault()
     this.toggleEditing()
@@ -70,21 +72,20 @@ class GroupTitle extends React.Component {
     if (onSave) onSave(group)
   }
 
-  handleInputKeys = (ev) => {
+  handleInputKeys = ev => {
     if (ev.key === 'Enter') this.handleSave(ev)
   }
 
-  handleAvatarEdit = (ev) => {
+  handleAvatarEdit = ev => {
     ev.preventDefault()
-    FilestackUpload
-      .pickImage({
-        onSuccess: (fileAttrs) => {
-          this.updateGroupAvatar(fileAttrs)
-        },
-        onFailure: (filesFailed) => {
-          uiStore.alert(`Failed to upload image: ${filesFailed}`)
-        }
-      })
+    FilestackUpload.pickImage({
+      onSuccess: fileAttrs => {
+        this.updateGroupAvatar(fileAttrs)
+      },
+      onFailure: filesFailed => {
+        uiStore.alert(`Failed to upload image: ${filesFailed}`)
+      },
+    })
   }
 
   renderAutosize(name, fontSize, handler) {
@@ -105,11 +106,7 @@ class GroupTitle extends React.Component {
     if (!this.props.canEdit) return ''
     if (this.editing) {
       return (
-        <FormButton
-          onClick={this.handleSave}
-          width={130}
-          type="submit"
-        >
+        <FormButton onClick={this.handleSave} width={130} type="submit">
           Save
         </FormButton>
       )
@@ -139,28 +136,20 @@ class GroupTitle extends React.Component {
           </EditAvatarButton>
         </RowItem>
         <StyledTitleItem>
-          { this.editing
-            ? (
-              this.renderAutosize(group.name, 1.5, this.updateGroupName)
-            )
-            : (
-              <Heading2>{group.name}</Heading2>
-            )
-          }
+          {this.editing ? (
+            this.renderAutosize(group.name, 1.5, this.updateGroupName)
+          ) : (
+            <Heading2>{group.name}</Heading2>
+          )}
         </StyledTitleItem>
         <StyledTitleItem>
-          { this.editing
-            ? (
-              this.renderAutosize(group.handle, 1, this.updateGroupHandle)
-            )
-            : (
-              <SubduedTitle>@{group.handle}</SubduedTitle>
-            )
-          }
+          {this.editing ? (
+            this.renderAutosize(group.handle, 1, this.updateGroupHandle)
+          ) : (
+            <SubduedTitle>@{group.handle}</SubduedTitle>
+          )}
         </StyledTitleItem>
-        <StyledTitleItem>
-          {this.renderControls()}
-        </StyledTitleItem>
+        <StyledTitleItem>{this.renderControls()}</StyledTitleItem>
       </Row>
     )
   }

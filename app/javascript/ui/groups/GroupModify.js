@@ -23,13 +23,15 @@ function transformToHandle(name) {
 
 @observer
 class GroupModify extends React.Component {
-  @observable editingGroup = {
+  @observable
+  editingGroup = {
     name: '',
     handle: '',
     filestack_file_url: '',
     filestack_file_attributes: null,
   }
-  @observable syncing = false
+  @observable
+  syncing = false
 
   constructor(props) {
     super(props)
@@ -43,7 +45,8 @@ class GroupModify extends React.Component {
     if (!group.id) this.setSyncing(true)
   }
 
-  @action setSyncing(val) {
+  @action
+  setSyncing(val) {
     this.syncing = val
   }
 
@@ -63,36 +66,35 @@ class GroupModify extends React.Component {
     this.editingGroup.filestack_file_attributes = fileAttrs
   }
 
-  handleNameChange = (ev) => {
+  handleNameChange = ev => {
     this.changeName(ev.target.value)
     if (this.syncing) this.changeHandle(transformToHandle(ev.target.value))
   }
 
-  handleHandleChange = (ev) => {
+  handleHandleChange = ev => {
     this.changeHandle(ev.target.value)
     this.setSyncing(false)
   }
 
-  handleRoles = (ev) => {
+  handleRoles = ev => {
     ev.preventDefault()
     const { onGroupRoles } = this.props
     if (onGroupRoles) onGroupRoles()
   }
 
-  handleImagePick = (ev) => {
+  handleImagePick = ev => {
     ev.preventDefault()
-    FilestackUpload
-      .pickImage({
-        onSuccess: (fileAttrs) => {
-          this.changeUrl(fileAttrs)
-        },
-        onFailure: (filesFailed) => {
-          uiStore.alert(`Failed to upload image: ${filesFailed}`)
-        }
-      })
+    FilestackUpload.pickImage({
+      onSuccess: fileAttrs => {
+        this.changeUrl(fileAttrs)
+      },
+      onFailure: filesFailed => {
+        uiStore.alert(`Failed to upload image: ${filesFailed}`)
+      },
+    })
   }
 
-  handleSave = (ev) => {
+  handleSave = ev => {
     ev.preventDefault()
     const { onSave } = this.props
     if (onSave) onSave(this.editingGroup)
@@ -101,9 +103,7 @@ class GroupModify extends React.Component {
   renderImagePicker() {
     let imagePicker = (
       <ImageField>
-        <span>
-          +
-        </span>
+        <span>+</span>
       </ImageField>
     )
     if (this.editingGroup.filestack_file_url) {
@@ -123,10 +123,8 @@ class GroupModify extends React.Component {
     return (
       <form>
         <FloatRight>
-          { group.id && (
-            <TextButton onClick={this.handleRoles}>
-              Members
-            </TextButton>
+          {group.id && (
+            <TextButton onClick={this.handleRoles}>Members</TextButton>
           )}
         </FloatRight>
         <FieldContainer>
@@ -152,16 +150,12 @@ class GroupModify extends React.Component {
         <FieldContainer>
           <Label htmlFor="groupAvatar">{groupType} Avatar</Label>
           <button onClick={this.handleImagePick} id="groupAvatar">
-            { this.renderImagePicker() }
+            {this.renderImagePicker()}
           </button>
         </FieldContainer>
         <FormActionsContainer>
-          <FormButton
-            onClick={this.handleSave}
-            width={190}
-            type="submit"
-          >
-            { groupType === 'Group' ? 'Add Members' : 'Save' }
+          <FormButton onClick={this.handleSave} width={190} type="submit">
+            {groupType === 'Group' ? 'Add Members' : 'Save'}
           </FormButton>
         </FormActionsContainer>
       </form>

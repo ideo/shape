@@ -8,12 +8,10 @@ describe('MovableGridCard', () => {
     props = {
       loading: false,
       createCard: jest.fn(),
-      closeBlankContentTool: jest.fn()
+      closeBlankContentTool: jest.fn(),
     }
     props.createCard.mockClear()
-    wrapper = shallow(
-      <VideoCreator {...props} />
-    )
+    wrapper = shallow(<VideoCreator {...props} />)
     component = wrapper.instance()
   })
 
@@ -26,7 +24,7 @@ describe('MovableGridCard', () => {
       videoUrl: 'https://www.youtube.com/watch?v=zDB3NvF9LSI',
       urlValid: true,
       name: 'Youtube Video',
-      thumbnailUrl: 'http://youtube.com/thumb'
+      thumbnailUrl: 'http://youtube.com/thumb',
     }
     component.createVideoItem(e)
     expect(props.createCard).toHaveBeenCalledWith({

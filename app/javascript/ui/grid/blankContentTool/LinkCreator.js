@@ -22,7 +22,7 @@ class LinkCreator extends React.Component {
     this.canceled = true
   }
 
-  onUrlChange = (e) => {
+  onUrlChange = e => {
     const url = e.target.value
     this.setState({
       url,
@@ -31,7 +31,7 @@ class LinkCreator extends React.Component {
     this.parseMetadata(url)
   }
 
-  _parseMetadata = async (url) => {
+  _parseMetadata = async url => {
     if (url.length <= 3) return
     const meta = await parseURLMeta(url)
     if (this.canceled) return
@@ -39,14 +39,14 @@ class LinkCreator extends React.Component {
     if (meta && (meta.title || meta.shapeLink)) {
       this.setState({
         meta,
-        urlValid: true
+        urlValid: true,
       })
     } else {
       this.setState({ urlValid: false })
     }
   }
 
-  createLinkItem = async (e) => {
+  createLinkItem = async e => {
     e.preventDefault()
     if (!this.state.urlValid) return
     const { url, meta } = this.state

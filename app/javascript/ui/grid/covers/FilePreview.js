@@ -15,9 +15,7 @@ class FilePreview extends React.Component {
   }
 
   render() {
-    return (
-      <PreviewContainer width={1000} height={600} id="filePreview" />
-    )
+    return <PreviewContainer width={1000} height={600} id="filePreview" />
   }
 }
 

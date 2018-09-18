@@ -3,14 +3,14 @@ import { FormActionsContainer, TextButton } from '~/ui/global/styled/forms'
 import Dialog from './Dialog'
 
 class ConfirmationDialog extends React.PureComponent {
-  handleCancel = (ev) => {
+  handleCancel = ev => {
     if (ev) ev.preventDefault()
     const { onCancel } = this.props
     if (onCancel) onCancel()
     this.props.onClose()
   }
 
-  handleConfirm = (ev) => {
+  handleConfirm = ev => {
     ev.preventDefault()
     this.props.onConfirm()
     this.props.onClose()
@@ -21,11 +21,7 @@ class ConfirmationDialog extends React.PureComponent {
   }
 
   render() {
-    const {
-      cancelText,
-      confirmText,
-      prompt,
-    } = this.props
+    const { cancelText, confirmText, prompt } = this.props
 
     const modalProps = {
       ...this.props,
@@ -37,9 +33,7 @@ class ConfirmationDialog extends React.PureComponent {
     return (
       <Dialog {...modalProps}>
         <form>
-          <p>
-            { prompt }
-          </p>
+          <p>{prompt}</p>
           <FormActionsContainer>
             <TextButton maxWidth={150} onClick={this.handleCancel}>
               {cancelText}

@@ -13,12 +13,8 @@ const rotation = {
 }
 
 const BctButtonRotation = ({ children, disabled }) => (
-  <FlipMove
-    appearAnimation={!disabled ? rotation : false}
-  >
-    <div>
-      { children }
-    </div>
+  <FlipMove appearAnimation={!disabled ? rotation : false}>
+    <div>{children}</div>
   </FlipMove>
 )
 

@@ -22,7 +22,12 @@ export const TopRightButton = styled.button`
 TopRightButton.displayName = 'TopRightButton'
 
 export const CloseButton = ({ onClick, size, color, position }) => (
-  <TopRightButton onClick={onClick} size={size} color={color} position={position}>
+  <TopRightButton
+    onClick={onClick}
+    size={size}
+    color={color}
+    position={position}
+  >
     <CloseIcon />
   </TopRightButton>
 )
@@ -46,10 +51,7 @@ export const CircledIcon = styled.button`
   justify-content: center;
   position: relative;
   width: 32px;
-  ${props => props.active &&
-    `background-color: ${v.colors.gray};`}
-
-  &:hover {
+  ${props => props.active && `background-color: ${v.colors.gray};`} &:hover {
     background-color: ${v.colors.gray};
   }
 

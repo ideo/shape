@@ -53,13 +53,17 @@ export const FormButton = styled.button`
   color: white;
   border-radius: 20px;
   border: none;
-  background-color: ${props => (props.color === 'blue' ? v.colors.ctaButtonBlue : v.colors.blackLava)};
+  background-color: ${props =>
+    props.color === 'blue' ? v.colors.ctaButtonBlue : v.colors.blackLava};
   transition: all 0.3s;
-  &:hover, &:focus {
-    background-color: ${props => (props.color === 'blue' ? v.colors.ctaButtonBlueHover : v.colors.cloudy)};
+  &:hover,
+  &:focus {
+    background-color: ${props =>
+      props.color === 'blue' ? v.colors.ctaButtonBlueHover : v.colors.cloudy};
   }
-  ${props => props.disabled &&
-      `background-color: white;
+  ${props =>
+    props.disabled &&
+    `background-color: white;
       border: 1px solid ${v.colors.gray};
       color:  ${v.colors.gray};
       cursor: initial;
@@ -102,9 +106,8 @@ export const TextField = styled.input`
     outline-width: 0;
   }
   /* handle "small 4-col" layout i.e. layoutSize == 3 */
-  @media only screen
-    and (min-width: ${v.responsive.medBreakpoint}px)
-    and (max-width: ${v.responsive.largeBreakpoint}px) {
+  @media only screen and (min-width: ${v.responsive
+      .medBreakpoint}px) and (max-width: ${v.responsive.largeBreakpoint}px) {
     width: 185px;
   }
 `
@@ -171,10 +174,14 @@ export const Select = styled(MuiSelect)`
     font-weight: ${v.weights.book};
   }
 
-  .selectMenu: {
+  .selectmenu: {
     background-color: transparent;
-    &:focus { background-color: transparent; }
-    &:hover { background-color: transparent; }
+    &:focus {
+      background-color: transparent;
+    }
+    &:hover {
+      background-color: transparent;
+    }
 
     li {
       font-family: ${v.fonts.sans};
@@ -204,10 +211,9 @@ export const SelectOption = styled(MenuItem)`
     padding: 0 4px;
 
     &:hover: {
-      opacity: 1.0
+      opacity: 1;
     }
   }
-
 `
 SelectOption.displayName = 'StyledSelectOption'
 
@@ -237,7 +243,8 @@ StyledAutosizeInput.displayName = 'StyledAutosizeInput'
 /** @component */
 export const EditAvatarButton = styled.button`
   cursor: auto;
-  ${props => props.canEdit &&
+  ${props =>
+    props.canEdit &&
     `
     cursor: pointer;
     opacity: 0.75;
@@ -245,8 +252,8 @@ export const EditAvatarButton = styled.button`
     .avatar {
       cursor: pointer;
     }
-    `
-}`
+    `};
+`
 EditAvatarButton.displayName = 'EditAvatarButton'
 
 /** @component */
@@ -278,7 +285,6 @@ export const CommentForm = styled.form`
     margin: 0 5px 0 10px;
     width: calc(100% - 10px);
   }
-
 `
 CommentForm.displayName = 'CommentForm'
 

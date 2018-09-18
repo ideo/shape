@@ -31,9 +31,8 @@ class Group extends BaseRecord {
   API_archive() {
     const onAgree = async () => {
       await this.apiStore.request(`groups/${this.id}/archive`, 'PATCH')
-      const roleForCurrentUser = role => (
+      const roleForCurrentUser = role =>
         role.users.find(user => user.id === this.apiStore.currentUserId)
-      )
       const { groupRoles } = this
       if (groupRoles.find(roleForCurrentUser)) {
         window.location.reload()

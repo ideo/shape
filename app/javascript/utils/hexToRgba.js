@@ -15,7 +15,11 @@ const validHexSize = new RegExp(`^${match3or4Hex}$|^${match6or8Hex}$`, 'i')
 
 function hexRgb(hexStr, options = {}) {
   let hex = hexStr
-  if (typeof hex !== 'string' || nonHexChars.test(hex) || !validHexSize.test(hex)) {
+  if (
+    typeof hex !== 'string' ||
+    nonHexChars.test(hex) ||
+    !validHexSize.test(hex)
+  ) {
     throw new TypeError('Expected a valid hex string')
   }
 
@@ -37,13 +41,15 @@ function hexRgb(hexStr, options = {}) {
   }
 
   const num = parseInt(hex, 16)
+  /* eslint-disable no-bitwise */
   const red = num >> 16
   const green = (num >> 8) & 255
   const blue = num & 255
+  /* eslint-enable no-bitwise */
 
-  return options.format === 'array' ?
-    [red, green, blue, alpha] :
-    {red, green, blue, alpha}
+  return options.format === 'array'
+    ? [red, green, blue, alpha]
+    : { red, green, blue, alpha }
 }
 
 export default function hexToRgba(hex, alpha = 1) {
