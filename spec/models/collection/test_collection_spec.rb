@@ -14,8 +14,8 @@ describe Collection::TestCollection, type: :model do
       end
 
       it 'should create the default setup with its attached cards and items' do
-        expect(test_collection.collection_cards.count).to eq 3
-        expect(test_collection.items.count).to eq 3
+        expect(test_collection.collection_cards.count).to eq 4
+        expect(test_collection.items.count).to eq 4
       end
     end
 
@@ -47,8 +47,10 @@ describe Collection::TestCollection, type: :model do
         it 'should create a TestDesign collection and move the questions into it' do
           expect(test_collection.test_design.present?).to be true
           # should have moved the 3 default cards into there
-          expect(test_collection.test_design.collection_cards.count).to eq 3
-          expect(test_collection.test_design.collection_cards.map(&:order)).to match_array([0, 1, 2])
+          expect(test_collection.test_design.collection_cards.count).to eq 4
+          expect(
+            test_collection.test_design.collection_cards.map(&:order),
+          ).to match_array([0, 1, 2, 3])
           # now the test_collection should just have the 1 card
           expect(test_collection.collection_cards.count).to eq 1
         end

@@ -11,6 +11,11 @@ class Collection
       closed: 2,
     }
 
+    # override parent method to always include all cards (roles don't matter)
+    def collection_cards_viewable_by(*)
+      collection_cards.includes(:item, :collection)
+    end
+
     def test_design
       # NOTE: there should only ever be one of these per TestCollection
       collections.where(type: 'Collection::TestDesign').first
@@ -97,6 +102,13 @@ class Collection
         item_attributes: {
           type: 'Item::QuestionItem',
           question_type: :useful,
+        },
+      )
+      primary_collection_cards.build(
+        order: 3,
+        item_attributes: {
+          type: 'Item::QuestionItem',
+          question_type: :finish,
         },
       )
     end

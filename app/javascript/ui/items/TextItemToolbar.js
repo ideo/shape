@@ -65,11 +65,9 @@ const TextItemToolbar = props => (
 )
 TextItemToolbar.propTypes = {
   onExpand: PropTypes.func,
-  fullPageView: PropTypes.bool,
 }
 TextItemToolbar.defaultProps = {
   onExpand: null,
-  fullPageView: false,
 }
 
 export default TextItemToolbar

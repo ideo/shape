@@ -7,7 +7,6 @@ import InlineLoader from '~/ui/layout/InlineLoader'
 import MoveArrowIcon from '~/ui/icons/MoveArrowIcon'
 import MoveHelperModal from '~/ui/users/MoveHelperModal'
 import Tooltip from '~/ui/global/Tooltip'
-import v from '~/utils/variables'
 import {
   StyledSnackbar,
   StyledSnackbarContent,
