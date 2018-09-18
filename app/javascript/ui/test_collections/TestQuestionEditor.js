@@ -15,7 +15,7 @@ import { QuestionText } from './shared'
 
 const QuestionHolder = styled.div`
   display: flex;
-  ${props => props.empty && 'margin-bottom: -6px;'}
+  ${props => props.empty && 'margin-bottom: -6px;'};
 `
 
 const QuestionCardWrapper = styled.div`
@@ -36,11 +36,14 @@ class TestQuestionEditor extends React.Component {
         surveyResponse = await createSurveyResponse()
       }
       // create new answer if we didn't have one
-      questionAnswer = new QuestionAnswer({
-        question_id: item.id,
-        answer_text: text,
-        answer_number: number,
-      }, apiStore)
+      questionAnswer = new QuestionAnswer(
+        {
+          question_id: item.id,
+          answer_text: text,
+          answer_number: number,
+        },
+        apiStore
+      )
       questionAnswer.survey_response = surveyResponse
       await questionAnswer.API_create()
     } else {
@@ -53,83 +56,81 @@ class TestQuestionEditor extends React.Component {
   }
 
   renderQuestion() {
-    const { parent, card, item, editing, questionAnswer } = this.props
+    const { parent, card, item, editing, questionAnswer, canEdit } = this.props
     let inner
     switch (card.card_question_type) {
-    case 'context':
-      return (
-        <ScaleQuestion
-          questionText="How satisfied are you with your current solution?"
-          editing={editing}
-          questionAnswer={questionAnswer}
-          onAnswer={this.handleQuestionAnswer}
-        />
-      )
-    case 'useful':
-      return (
-        <ScaleQuestion
-          questionText="How useful is this idea for you?"
-          emojiSeries="thumbs"
-          editing={editing}
-          questionAnswer={questionAnswer}
-          onAnswer={this.handleQuestionAnswer}
-        />
-      )
-    case 'media':
-      if (
-        item.type === 'Item::QuestionItem' ||
-        uiStore.blankContentToolState.replacingId === card.id
-      ) {
-        // this case means it is set to "blank / add your media"
-        inner = (
-          <GridCardBlank
-            parent={parent}
-            height={1}
-            order={card.order}
-            replacingId={card.id}
-            testCollectionCard
-          />
-        )
-      } else {
-        inner = (
-          <GridCard
-            card={card}
-            cardType="items"
-            record={card.record}
-            menuOpen={uiStore.openCardMenuId === card.id}
-            testCollectionCard
-          />
-        )
-      }
-      return (
-        <QuestionCardWrapper>
-          {inner}
-        </QuestionCardWrapper>
-      )
-    case 'description':
-      if (editing) {
+      case 'context':
         return (
-          <DescriptionQuestion
-            placeholder="Write idea description here…"
-            item={item}
+          <ScaleQuestion
+            questionText="How satisfied are you with your current solution?"
+            editing={editing}
+            questionAnswer={questionAnswer}
+            onAnswer={this.handleQuestionAnswer}
           />
         )
-      }
-      return <QuestionText>{item.content}</QuestionText>
+      case 'useful':
+        return (
+          <ScaleQuestion
+            questionText="How useful is this idea for you?"
+            emojiSeries="thumbs"
+            editing={editing}
+            questionAnswer={questionAnswer}
+            onAnswer={this.handleQuestionAnswer}
+          />
+        )
+      case 'media':
+        if (
+          item.type === 'Item::QuestionItem' ||
+          uiStore.blankContentToolState.replacingId === card.id
+        ) {
+          // this case means it is set to "blank / add your media"
+          inner = (
+            <GridCardBlank
+              parent={parent}
+              height={1}
+              order={card.order}
+              replacingId={card.id}
+              testCollectionCard
+            />
+          )
+        } else {
+          inner = (
+            <GridCard
+              card={card}
+              cardType="items"
+              record={card.record}
+              menuOpen={uiStore.openCardMenuId === card.id}
+              testCollectionCard
+            />
+          )
+        }
+        return <QuestionCardWrapper>{inner}</QuestionCardWrapper>
+      case 'description':
+        if (editing) {
+          return (
+            <DescriptionQuestion
+              placeholder="Write idea description here…"
+              item={item}
+              canEdit={canEdit}
+            />
+          )
+        }
+        return <QuestionText>{item.content}</QuestionText>
 
-    case 'open':
-      return (
-        <OpenQuestion
-          item={item}
-          editing={editing}
-          questionAnswer={questionAnswer}
-          onAnswer={this.handleQuestionAnswer}
-        />
-      )
-    case 'finish':
-      return <FinishQuestion />
-    default:
-      return <NewQuestionGraphic />
+      case 'open':
+        return (
+          <OpenQuestion
+            item={item}
+            editing={editing}
+            canEdit={canEdit}
+            questionAnswer={questionAnswer}
+            onAnswer={this.handleQuestionAnswer}
+          />
+        )
+      case 'finish':
+        return <FinishQuestion />
+      default:
+        return <NewQuestionGraphic />
     }
   }
 
@@ -152,12 +153,14 @@ TestQuestionEditor.propTypes = {
   surveyResponse: MobxPropTypes.objectOrObservableObject,
   questionAnswer: MobxPropTypes.objectOrObservableObject,
   createSurveyResponse: PropTypes.func,
+  canEdit: PropTypes.bool,
 }
 
 TestQuestionEditor.defaultProps = {
   surveyResponse: null,
   questionAnswer: null,
   createSurveyResponse: null,
+  canEdit: false,
 }
 
 export default TestQuestionEditor

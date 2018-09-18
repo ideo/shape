@@ -11,39 +11,42 @@ class CollectionCreator extends React.Component {
     inputText: '',
   }
 
-  onInputChange = (e) => {
+  onInputChange = e => {
     this.setState({
-      inputText: e.target.value
+      inputText: e.target.value,
     })
   }
 
-  handleKeyDown = (e) => {
+  handleKeyDown = e => {
     if (e.keyCode === KEYS.ESC) {
       this.props.closeBlankContentTool()
     }
   }
 
-  createCollection = (e) => {
+  createCollection = e => {
     e.preventDefault()
     if (!this.state.inputText) return
     const { createCard, type } = this.props
     let dbType = null
     if (type === 'submissionBox') dbType = 'Collection::SubmissionBox'
     else if (type === 'testCollection') dbType = 'Collection::TestCollection'
-    createCard({
-      // `collection` is the collection being created within the card
-      collection_attributes: {
-        name: this.state.inputText,
-        master_template: type === 'template',
-        type: dbType,
+    createCard(
+      {
+        // `collection` is the collection being created within the card
+        collection_attributes: {
+          name: this.state.inputText,
+          master_template: type === 'template',
+          type: dbType,
+        },
+      },
+      {
+        // if creating a submissionBox we route you to finish setting up the collection
+        afterCreate:
+          type === 'submissionBox'
+            ? card => routingStore.routeTo('collections', card.record.id)
+            : null,
       }
-    },
-    {
-      // if creating a submissionBox we route you to finish setting up the collection
-      afterCreate: type === 'submissionBox'
-        ? (card) => routingStore.routeTo('collections', card.record.id)
-        : null,
-    })
+    )
   }
 
   get typeName() {
@@ -63,10 +66,7 @@ class CollectionCreator extends React.Component {
             onChange={this.onInputChange}
             onKeyDown={this.handleKeyDown}
           />
-          <FormButton
-            disabled={this.props.loading}
-            width={125}
-          >
+          <FormButton disabled={this.props.loading} width={125}>
             Add
           </FormButton>
         </form>

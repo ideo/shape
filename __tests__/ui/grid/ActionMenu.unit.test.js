@@ -1,10 +1,7 @@
 import _ from 'lodash'
 import ActionMenu from '~/ui/grid/ActionMenu'
 import fakeUiStore from '#/mocks/fakeUiStore'
-import {
-  fakeCollection,
-  fakeCollectionCard,
-} from '#/mocks/data'
+import { fakeCollection, fakeCollectionCard } from '#/mocks/data'
 
 const card = fakeCollectionCard
 card.can_move = true
@@ -33,12 +30,7 @@ describe('ActionMenu', () => {
       ]
       actions = _.without(allActions, 'Replace')
       props.card.isPinnedAndLocked = false
-      wrapper = shallow(
-        <ActionMenu.wrappedComponent
-          {...props}
-          canEdit
-        />
-      )
+      wrapper = shallow(<ActionMenu.wrappedComponent {...props} canEdit />)
       component = wrapper.instance()
       props.uiStore.selectCardId.mockClear()
       props.uiStore.openMoveMenu.mockClear()
@@ -52,11 +44,7 @@ describe('ActionMenu', () => {
 
     it('creates a PopoutMenu with editable actions including replace if canReplace', () => {
       wrapper = shallow(
-        <ActionMenu.wrappedComponent
-          {...props}
-          canReplace
-          canEdit
-        />
+        <ActionMenu.wrappedComponent {...props} canReplace canEdit />
       )
       const popout = wrapper.find('PopoutMenu').at(0)
       expect(popout.props().menuItems.length).toEqual(allActions.length)
@@ -122,11 +110,7 @@ describe('ActionMenu', () => {
       ]
       props.card.isPinnedAndLocked = true
       wrapper = shallow(
-        <ActionMenu.wrappedComponent
-          {...props}
-          canEdit
-          canReplace
-        />
+        <ActionMenu.wrappedComponent {...props} canEdit canReplace />
       )
     })
 
@@ -168,11 +152,7 @@ describe('ActionMenu', () => {
       props.card.record.system_required = true
       props.card.isPinnedAndLocked = false
       wrapper = shallow(
-        <ActionMenu.wrappedComponent
-          {...props}
-          canEdit
-          canReplace={false}
-        />
+        <ActionMenu.wrappedComponent {...props} canEdit canReplace={false} />
       )
     })
     afterEach(() => {
@@ -199,11 +179,7 @@ describe('ActionMenu', () => {
       props.card.can_move = false
       props.card.record.name = 'haho'
       wrapper = shallow(
-        <ActionMenu.wrappedComponent
-          {...props}
-          canEdit
-          canReplace={false}
-        />
+        <ActionMenu.wrappedComponent {...props} canEdit canReplace={false} />
       )
     })
     afterEach(() => {
@@ -222,9 +198,7 @@ describe('ActionMenu', () => {
     beforeEach(() => {
       props.canEdit = true
       props.card.record.isDownloadable = true
-      wrapper = shallow(
-        <ActionMenu.wrappedComponent {...props} />
-      )
+      wrapper = shallow(<ActionMenu.wrappedComponent {...props} />)
       component = wrapper.instance()
     })
 

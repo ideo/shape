@@ -52,7 +52,7 @@ const PromptText = styled.span`
 `
 
 class Dialog extends React.PureComponent {
-  handleClose = (ev) => {
+  handleClose = ev => {
     ev.preventDefault()
     this.props.onClose()
   }
@@ -79,12 +79,8 @@ class Dialog extends React.PureComponent {
           <CloseIcon />
         </ModalCloseButton>
         <CenteredPaddedContent>
-          <IconHolder>
-            { this.icon }
-          </IconHolder>
-          <PromptText>
-            { children }
-          </PromptText>
+          <IconHolder>{this.icon}</IconHolder>
+          <PromptText>{children}</PromptText>
         </CenteredPaddedContent>
       </StyledDialog>
     )
@@ -100,6 +96,7 @@ Dialog.propTypes = {
     'Leave',
     'Link',
     'Ok',
+    'TestGraph',
   ]),
   children: PropTypes.node.isRequired,
   open: PropTypes.bool.isRequired,

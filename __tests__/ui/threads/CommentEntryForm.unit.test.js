@@ -9,9 +9,7 @@ describe('CommentEntryForm', () => {
       afterSubmit: jest.fn(),
       thread: fakeThread,
     }
-    wrapper = shallow(
-      <CommentEntryForm {...props} />
-    )
+    wrapper = shallow(<CommentEntryForm {...props} />)
     fakeThread.API_saveComment.mockClear()
     component = wrapper.instance()
   })

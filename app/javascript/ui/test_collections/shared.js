@@ -17,7 +17,8 @@ export const QuestionText = styled.p`
 export const TextInputHolder = StyledCommentTextarea.extend`
   color: white;
   padding: 6px;
-  background-color: ${props => (props.hasFocus ? v.colors.testLightBlueBg : v.colors.ctaButtonBlue)};
+  background-color: ${props =>
+    props.hasFocus ? v.colors.testLightBlueBg : v.colors.ctaButtonBlue};
   transition: background-color 0.2s;
 `
 
@@ -42,7 +43,8 @@ export const TextInput = styled(TextareaAutosize)`
 `
 
 export const TestQuestionInput = css`
-  background-color: ${props => (props.editable ? v.colors.testLightBlueBg : v.colors.ctaButtonBlue)};
+  background-color: ${props =>
+    props.editable ? v.colors.testLightBlueBg : v.colors.ctaButtonBlue};
   border: 0;
   box-sizing: border-box;
   color: white;

@@ -1,7 +1,5 @@
 import MoveHelperModal from '~/ui/users/MoveHelperModal'
-import {
-  fakeUser
-} from '#/mocks/data'
+import { fakeUser } from '#/mocks/data'
 
 let props, wrapper, component
 
@@ -11,9 +9,7 @@ describe('MoveHelperModal', () => {
     props = {
       currentUser: fakeUser,
     }
-    wrapper = shallow(
-      <MoveHelperModal {...props} />
-    )
+    wrapper = shallow(<MoveHelperModal {...props} />)
     component = wrapper.instance()
   })
 

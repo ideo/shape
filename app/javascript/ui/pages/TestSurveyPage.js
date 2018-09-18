@@ -40,21 +40,14 @@ class TestSurveyPage extends React.Component {
     let inner = ''
 
     if (collection) {
-      inner = (
-        <TestDesigner
-          collection={collection}
-          editing={false}
-        />
-      )
+      inner = <TestDesigner collection={collection} editing={false} />
     }
     return (
       <StyledBg>
         <LogoWrapper>
           <Logo />
         </LogoWrapper>
-        <StyledSurvey>
-          {inner}
-        </StyledSurvey>
+        <StyledSurvey>{inner}</StyledSurvey>
       </StyledBg>
     )
   }

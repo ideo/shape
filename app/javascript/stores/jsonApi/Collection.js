@@ -9,21 +9,31 @@ import CollectionCard from './CollectionCard'
 class Collection extends BaseRecord {
   static type = 'collections'
 
-  attributesForAPI = ['name', 'tag_list', 'submission_template_id', 'submission_box_type']
+  attributesForAPI = [
+    'name',
+    'tag_list',
+    'submission_template_id',
+    'submission_box_type',
+  ]
 
-  @computed get cardIds() {
+  @computed
+  get cardIds() {
     return this.collection_cards.map(card => card.id)
   }
 
-  @action removeCard(card) {
+  @action
+  removeCard(card) {
     this.collection_cards.splice(this.collection_cards.indexOf(card), 1)
     this._reorderCards()
   }
 
-  @action removeCardIds(cardIds) {
-    this.collection_cards.filter(card => (
-      cardIds.indexOf(card.id) > -1
-    )).forEach(card => this.collection_cards.splice(this.collection_cards.indexOf(card), 1))
+  @action
+  removeCardIds(cardIds) {
+    this.collection_cards
+      .filter(card => cardIds.indexOf(card.id) > -1)
+      .forEach(card =>
+        this.collection_cards.splice(this.collection_cards.indexOf(card), 1)
+      )
     this._reorderCards()
   }
 
@@ -51,6 +61,14 @@ class Collection extends BaseRecord {
     return this.type === 'Collection::TestCollection'
   }
 
+  get isTestDesign() {
+    return this.type === 'Collection::TestDesign'
+  }
+
+  get isTestCollectionOrTestDesign() {
+    return this.isTestCollection || this.isTestDesign
+  }
+
   get requiresSubmissionBoxSettings() {
     if (!this.isSubmissionBox) return false
     // if type is null then it requires setup
@@ -65,7 +83,9 @@ class Collection extends BaseRecord {
   get countSubmissions() {
     if (!this.isSubmissionBox) return 0
     const { submissions_collection } = this
-    return submissions_collection ? submissions_collection.collection_cards.length : 0
+    return submissions_collection
+      ? submissions_collection.collection_cards.length
+      : 0
   }
 
   get isMasterTemplate() {
@@ -75,6 +95,22 @@ class Collection extends BaseRecord {
   get isUsableTemplate() {
     // you aren't allowed to use the profile template
     return this.isMasterTemplate && !this.isProfileTemplate
+  }
+
+  get isLaunchableTest() {
+    return this.isTestCollection && this.test_status === 'draft'
+  }
+
+  get isLiveTest() {
+    return this.isTestCollectionOrTestDesign && this.test_status === 'live'
+  }
+
+  get publicTestURL() {
+    let collectionId = this.id
+    if (this.isTestDesign && this.parent_collection_card) {
+      collectionId = this.parent_collection_card.parent_id
+    }
+    return `${process.env.BASE_HOST}/tests/${collectionId}`
   }
 
   get isTemplated() {
@@ -110,14 +146,15 @@ class Collection extends BaseRecord {
   // this marks it with the "sirocco" special color
   // NOTE: could also use Collection::Global -- except OrgTemplates is not "special"?
   get isSpecialCollection() {
-    return this.isSharedCollection ||
+    return (
+      this.isSharedCollection ||
       this.isProfileTemplate ||
       this.isProfileCollection
+    )
   }
 
   get isNormalCollection() {
-    return !this.isUserCollection &&
-      !this.isSharedCollection
+    return !this.isUserCollection && !this.isSharedCollection
   }
 
   get isRequired() {
@@ -128,7 +165,8 @@ class Collection extends BaseRecord {
     return this.collection_cards.length === 0
   }
 
-  @action addCard(card) {
+  @action
+  addCard(card) {
     this.collection_cards.unshift(card)
     this._reorderCards()
   }
@@ -138,9 +176,10 @@ class Collection extends BaseRecord {
     const data = this.toJsonApi()
     delete data.relationships
     // attach nested attributes of cards
-    data.attributes.collection_cards_attributes = _.map(this.collection_cards, card => (
-      _.pick(card, ['id', 'order', 'width', 'height'])
-    ))
+    data.attributes.collection_cards_attributes = _.map(
+      this.collection_cards,
+      card => _.pick(card, ['id', 'order', 'width', 'height'])
+    )
     // we don't want to receive updates which are just going to try to re-render
     data.cancel_sync = true
     const apiPath = `collections/${this.id}`
@@ -148,7 +187,8 @@ class Collection extends BaseRecord {
   }
 
   // after we reorder a single card, we want to make sure everything goes into sequential order
-  @action _reorderCards() {
+  @action
+  _reorderCards() {
     if (this.collection_cards) {
       this.collection_cards.replace(_.sortBy(this.collection_cards, 'order'))
       _.each(this.collection_cards, (card, i) => {
@@ -160,9 +200,25 @@ class Collection extends BaseRecord {
   checkCurrentOrg() {
     const { currentUser } = this.apiStore
     if (!currentUser) return
-    if (this.organization_id.toString() !== currentUser.current_organization.id) {
+    if (
+      this.organization_id.toString() !== currentUser.current_organization.id
+    ) {
       currentUser.switchOrganization(this.organization_id)
     }
+  }
+
+  launchTest = () => {
+    uiStore.confirm({
+      prompt:
+        'Are you sure? Once you get your first response, you can no longer change your test.',
+      confirmText: 'Launch',
+      iconName: 'TestGraph',
+      onConfirm: () => this.API_launchTest(),
+    })
+  }
+
+  API_launchTest() {
+    this.apiStore.request(`collections/${this.id}/launch_test`, 'PATCH')
   }
 
   static async createSubmission(parent_id, submissionSettings) {

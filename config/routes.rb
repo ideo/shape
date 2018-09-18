@@ -20,7 +20,7 @@ Rails.application.routes.draw do
       resources :activities, only: %i[create]
       resources :collections, except: %i[index] do
         member do
-          patch 'archive'
+          patch 'launch_test'
         end
         collection do
           post 'create_template'

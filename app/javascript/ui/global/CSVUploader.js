@@ -39,7 +39,7 @@ class CSVUploader extends React.Component {
 
     reader.onload = event => {
       const csvData = Papa.parse(event.target.result, {
-        error: err => console.warn('csv parse error', err)
+        error: err => console.warn('csv parse error', err),
       })
       onFileLoaded(csvData.data, filename)
       this.setState({ loading: false })
@@ -52,12 +52,10 @@ class CSVUploader extends React.Component {
   render() {
     return (
       <StyledUploader>
-        {this.state.loading && <InlineLoader /> }
+        {this.state.loading && <InlineLoader />}
         <label htmlFor="csv-upload">
           <UploadIcon />
-          <span>
-            Upload .CSV
-          </span>
+          <span>Upload .CSV</span>
         </label>
         <input
           disabled={this.state.loading}
@@ -68,7 +66,6 @@ class CSVUploader extends React.Component {
           onChange={this.handleFileUpload}
         />
       </StyledUploader>
-
     )
   }
 }

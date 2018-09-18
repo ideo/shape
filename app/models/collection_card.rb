@@ -222,7 +222,7 @@ class CollectionCard < ApplicationRecord
   end
 
   def card_question_type
-    return nil unless parent.is_a? Collection::TestCollection
+    return nil unless parent.is_a?(Collection::TestCollection) || parent.is_a?(Collection::TestDesign)
     return nil unless item.present?
     case item.type
     when 'Item::QuestionItem'

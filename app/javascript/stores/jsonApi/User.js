@@ -12,9 +12,9 @@ class User extends BaseRecord {
 
   async API_updateCurrentUser(option) {
     try {
-      return await this.apiStore.request(
-        'users/update_current_user', 'PATCH', { user: option }
-      )
+      return await this.apiStore.request('users/update_current_user', 'PATCH', {
+        user: option,
+      })
     } catch (e) {
       uiStore.defaultAlertError()
       return e
@@ -39,13 +39,14 @@ class User extends BaseRecord {
     return this.API_updateCurrentUser({ show_move_helper: false })
   }
 
-  async switchOrganization(organizationId, { redirectPath = null, redirectId = null } = {}) {
+  async switchOrganization(
+    organizationId,
+    { redirectPath = null, redirectId = null } = {}
+  ) {
     try {
-      await this.apiStore.request(
-        'users/switch_org',
-        'POST',
-        { organization_id: organizationId }
-      )
+      await this.apiStore.request('users/switch_org', 'POST', {
+        organization_id: organizationId,
+      })
       await this.apiStore.loadCurrentUserAndGroups()
       if (redirectPath) {
         routingStore.routeTo(redirectPath, redirectId)

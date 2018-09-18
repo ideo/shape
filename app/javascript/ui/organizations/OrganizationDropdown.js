@@ -34,13 +34,14 @@ const StyledSearchHolder = styled.div`
 
 function fuzzyMatch(str, pattern) {
   const rx = pattern.split('').reduce((a, b) => `${a}.*${b}`)
-  return (new RegExp(rx)).test(str)
+  return new RegExp(rx).test(str)
 }
 
 @inject('apiStore', 'uiStore', 'routingStore')
 @observer
 class OrganizationDropdown extends React.Component {
-  @observable searchText = ''
+  @observable
+  searchText = ''
 
   openOrgMenu = (page = 'organizationPeople') => {
     this.props.uiStore.update('organizationMenuPage', page)
@@ -52,21 +53,23 @@ class OrganizationDropdown extends React.Component {
     this.props.uiStore.update('organizationMenuPage', null)
   }
 
-  handleOrgPeople = (ev) => {
+  handleOrgPeople = ev => {
     this.openOrgMenu('organizationPeople')
   }
 
-  handleNewOrg = (ev) => {
+  handleNewOrg = ev => {
     this.openOrgMenu('newOrganization')
   }
 
-  handleSwitchOrg = (orgId) => (ev) => {
+  handleSwitchOrg = orgId => ev => {
     ev.preventDefault()
     const { apiStore, uiStore, onItemClick } = this.props
     // close the menu
     onItemClick()
     const switchOrg = () => {
-      apiStore.currentUser.switchOrganization(orgId, { redirectPath: 'homepage' })
+      apiStore.currentUser.switchOrganization(orgId, {
+        redirectPath: 'homepage',
+      })
     }
     if (uiStore.isMovingCards) {
       const currentOrgName = apiStore.currentUserOrganization.name
@@ -87,22 +90,26 @@ class OrganizationDropdown extends React.Component {
     switchOrg()
   }
 
-  handleOrgSettings = (ev) => {
+  handleOrgSettings = ev => {
     this.props.onItemClick()
     this.props.routingStore.routeTo('/settings')
   }
 
-  handleLegal = (ev) => {
+  handleLegal = ev => {
     this.props.onItemClick()
     this.props.routingStore.routeTo('/terms')
   }
 
-  handleSearchChange = (text) => {
-    runInAction(() => { this.searchText = text })
+  handleSearchChange = text => {
+    runInAction(() => {
+      this.searchText = text
+    })
   }
 
   clearSearch = () => {
-    runInAction(() => { this.searchText = '' })
+    runInAction(() => {
+      this.searchText = ''
+    })
   }
 
   get organizationItems() {
@@ -145,19 +152,19 @@ class OrganizationDropdown extends React.Component {
   get menuItems() {
     const userCanEdit = this.currentOrganization.primary_group.can_edit
     const items = {
-      top: [
-        { name: 'People & Groups', onClick: this.handleOrgPeople }
-      ],
-      organizations: [
-        ...this.organizationItems
-      ],
+      top: [{ name: 'People & Groups', onClick: this.handleOrgPeople }],
+      organizations: [...this.organizationItems],
       bottom: [
         { name: 'New Organization', onClick: this.handleNewOrg },
-        { name: 'Legal', onClick: this.handleLegal }
-      ]
+        { name: 'Legal', onClick: this.handleLegal },
+      ],
     }
     // put this in the middle at index 1
-    if (userCanEdit) items.bottom.splice(1, 0, { name: 'Settings', onClick: this.handleOrgSettings })
+    if (userCanEdit)
+      items.bottom.splice(1, 0, {
+        name: 'Settings',
+        onClick: this.handleOrgSettings,
+      })
     return items
   }
 
@@ -171,14 +178,15 @@ class OrganizationDropdown extends React.Component {
           groupedMenuItems={this.menuItems}
           menuOpen={this.props.open}
           groupExtraComponent={{
-            organizations: apiStore.currentUser.organizations.length > 10 &&
-            <StyledSearchHolder>
-              <SearchBar
-                value={this.searchText}
-                onChange={this.handleSearchChange}
-                onClear={this.clearSearch}
-              />
-            </StyledSearchHolder>
+            organizations: apiStore.currentUser.organizations.length > 10 && (
+              <StyledSearchHolder>
+                <SearchBar
+                  value={this.searchText}
+                  onChange={this.handleSearchChange}
+                  onClear={this.clearSearch}
+                />
+              </StyledSearchHolder>
+            ),
           }}
         />
         <OrganizationMenu

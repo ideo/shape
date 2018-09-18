@@ -8,6 +8,7 @@ class TestsController < ApplicationController
 
   def load_test_collection
     @collection = Collection::TestCollection.find(params[:id])
-    # TODO: reject if this collection is not "live/public"
+  rescue ActiveRecord::RecordNotFound
+    redirect_to root_url
   end
 end

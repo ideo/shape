@@ -1,7 +1,9 @@
 import { Fragment } from 'react'
 import { Box } from 'reflexbox'
+import { Element as ScrollElement } from 'react-scroll'
 
-import { MarketingBack,
+import {
+  MarketingBack,
   MarketingFooter,
   MarketingHeavyCTA,
   InvertMarketingLink,
@@ -26,8 +28,6 @@ import poweredByIdeo from '~/assets/Powered-by-IDEO-Inverted.png'
 import MarketingMenu from '~/ui/marketing/MarketingMenu.js'
 import SubscribeEmail from '~/ui/marketing/SubscribeEmail.js'
 import ProductDescriptions from '~/ui/marketing/ProductDescriptions.js'
-import { Element as ScrollElement } from 'react-scroll'
-// import VisibilitySensor from 'react-visibility-sensor'
 import firebase from '~/vendor/firebaseMarketing.js'
 
 class MarketingPage extends React.Component {
@@ -45,8 +45,9 @@ class MarketingPage extends React.Component {
     let db = {}
     db = firebase.firestore()
 
-    db.collection('pageText').get()
-      .then((snapshot) => {
+    db.collection('pageText')
+      .get()
+      .then(snapshot => {
         snapshot.forEach(pageText => {
           const key = pageText.id
           const { value } = pageText.data()
@@ -75,7 +76,9 @@ class MarketingPage extends React.Component {
             <Center>
               <ResponsiveInlineBlock>
                 <a href="/login">
-                  <MarketingCallToAction>{this.state.pageTexts.buttonTopLeft}</MarketingCallToAction>
+                  <MarketingCallToAction>
+                    {this.state.pageTexts.buttonTopLeft}
+                  </MarketingCallToAction>
                 </a>
               </ResponsiveInlineBlock>
             </Center>
@@ -89,13 +92,8 @@ class MarketingPage extends React.Component {
             </Center> */}
           </MarketingGradientTop>
 
-          <MarketingFlex
-            align="center"
-            justify="center"
-            wrap
-            w={1}
-          >
-            <Box w={1} justify="center" >
+          <MarketingFlex align="center" justify="center" wrap w={1}>
+            <Box w={1} justify="center">
               <ScrollElement name="ContentAnchor" />
               <ProductDescriptions />
             </Box>
@@ -103,12 +101,8 @@ class MarketingPage extends React.Component {
         </MarketingBack>
 
         <MarketingFooter>
-          <MarketingFlex
-            align="center"
-            justify="center"
-            wrap
-            w={1}
-          >
+          <ScrollElement name="FooterAnchor" />
+          <MarketingFlex align="center" justify="center" wrap w={1}>
             <Box w={1}>
               <InvertMarketingH1Bold>
                 {this.state.pageTexts.footerHeader}
@@ -119,11 +113,11 @@ class MarketingPage extends React.Component {
                 {this.state.pageTexts.footerSubHeader}
               </InvertMarketingH1>
             </Box>
-
-            <ScrollElement name="FooterAnchor" />
             <Box w={1} py={32}>
               <a href="/login">
-                <MarketingHeavyCTA href="/login">{this.state.pageTexts.buttonFooter}</MarketingHeavyCTA>
+                <MarketingHeavyCTA href="/login">
+                  {this.state.pageTexts.buttonFooter}
+                </MarketingHeavyCTA>
               </a>
             </Box>
 
@@ -139,11 +133,15 @@ class MarketingPage extends React.Component {
             </ResponsivePadInlineBlock>
 
             <Box w={1}>
-              <InvertMarketingLinkMail href="mailto:hello@shape.space">hello@shape.space</InvertMarketingLinkMail>
+              <InvertMarketingLinkMail href="mailto:hello@shape.space">
+                hello@shape.space
+              </InvertMarketingLinkMail>
             </Box>
 
             <Box w={1} wrap>
-              <InvertedFixedWidth>{this.state.pageTexts.subscriptionHeader}</InvertedFixedWidth>
+              <InvertedFixedWidth>
+                {this.state.pageTexts.subscriptionHeader}
+              </InvertedFixedWidth>
             </Box>
 
             <Box w={1}>
@@ -151,11 +149,19 @@ class MarketingPage extends React.Component {
             </Box>
 
             <Box w={1}>
-              <InvertMarketingLink href="https://www.ideo.com/" rel="noopener noreferrer" target="_blank">
+              <InvertMarketingLink
+                href="https://www.ideo.com/"
+                rel="noopener noreferrer"
+                target="_blank"
+              >
                 <img
                   src={poweredByIdeo}
                   alt="Powered by IDEO"
-                  style={{ width: '95px', paddingTop: '55px', paddingBottom: '30px' }}
+                  style={{
+                    width: '95px',
+                    paddingTop: '55px',
+                    paddingBottom: '30px',
+                  }}
                 />
               </InvertMarketingLink>
             </Box>
@@ -172,11 +178,11 @@ class MarketingPage extends React.Component {
             <ResponsivePadInlineBlock>
               <DesktopSpacer style={{ width: '80px' }} />
               <InvertMarketingLink href="https://www.ideo.com/">
+                {/* https://github.com/evcohen/eslint-plugin-jsx-a11y/issues/388 */}
                 &copy; 2018
               </InvertMarketingLink>
             </ResponsivePadInlineBlock>
           </Center>
-
         </MarketingFooter>
       </Fragment>
     )

@@ -14,9 +14,12 @@ import SearchResultsInfinite from '~/ui/search/SearchResultsInfinite'
 @inject('apiStore', 'uiStore', 'routingStore')
 @observer
 class SearchPage extends PageWithApi {
-  @observable searchResults = []
-  @observable hasMore = false
-  @observable total = 0
+  @observable
+  searchResults = []
+  @observable
+  hasMore = false
+  @observable
+  total = 0
 
   componentDidMount() {
     const { uiStore, routingStore } = this.props
@@ -30,7 +33,8 @@ class SearchPage extends PageWithApi {
     super.componentDidMount()
   }
 
-  @action componentWillReceiveProps(nextProps) {
+  @action
+  componentWillReceiveProps(nextProps) {
     // i.e. you are on SearchPage and perform a new search
     // NOTE: important to do this here to "reset" infinite scroll!
     if (this.searchQuery(nextProps) !== this.searchQuery(this.props)) {
@@ -55,13 +59,14 @@ class SearchPage extends PageWithApi {
     return query
   }
 
-  requestPath = (props) => {
+  requestPath = props => {
     const q = this.searchQuery(props, { url: true })
     const page = props.page || 1
     return `search?query=${q}&page=${page}`
   }
 
-  @action onAPILoad = ({ data: results, meta }) => {
+  @action
+  onAPILoad = ({ data: results, meta }) => {
     if (meta.page === 1) {
       // reset if we are performing a new search starting at page 1
       this.searchResults.replace([])
@@ -72,12 +77,12 @@ class SearchPage extends PageWithApi {
     } else {
       const newResults = this.searchResults.concat(results)
       this.searchResults.replace(newResults)
-      this.hasMore = (meta.total > this.searchResults.length)
+      this.hasMore = meta.total > this.searchResults.length
       this.total = meta.total
     }
   }
 
-  handleInfiniteLoad = (page) => {
+  handleInfiniteLoad = page => {
     // for some reason it seems to trigger one extra page even when !hasMore
     if (!this.hasMore) return
     this.fetchData({ ...this.props, page })
@@ -89,7 +94,13 @@ class SearchPage extends PageWithApi {
       if (uiStore.isLoading) {
         return <Loader />
       }
-      return <div>No results found for &quot;{this.searchQuery(this.props)}&quot;.</div>
+      return (
+        <div>
+          No results found for &quot;
+          {this.searchQuery(this.props)}
+          &quot;.
+        </div>
+      )
     }
 
     return (

@@ -420,22 +420,6 @@ class Collection < ApplicationRecord
     'collections'
   end
 
-  def serialized_for_test_survey
-    renderer = JSONAPI::Serializable::Renderer.new
-    renderer.render(
-      self,
-      class: Firestoreable::JSONAPI_CLASS_MAPPINGS.merge(
-        FilestackFile: SerializableFilestackFile,
-      ),
-      include: {
-        collection_cards: [
-          :parent,
-          record: [:filestack_file],
-        ],
-      },
-    )
-  end
-
   private
 
   def organization_blank?

@@ -1,11 +1,9 @@
 import LinkItemCover from '~/ui/grid/covers/LinkItemCover'
 import { uiStore } from '~/stores'
 
-jest.mock('../../../../app/javascript/stores')
+import { fakeLinkItem } from '#/mocks/data'
 
-import {
-  fakeLinkItem,
-} from '#/mocks/data'
+jest.mock('../../../../app/javascript/stores')
 
 let props, wrapper, rerender
 describe('LinkItemCover', () => {
@@ -15,9 +13,7 @@ describe('LinkItemCover', () => {
       dragging: false,
     }
     rerender = () => {
-      wrapper = shallow(
-        <LinkItemCover {...props} />
-      )
+      wrapper = shallow(<LinkItemCover {...props} />)
     }
     rerender()
   })
@@ -27,14 +23,17 @@ describe('LinkItemCover', () => {
   })
 
   it('passes the thumbnail_url to StyledImageCover', () => {
-    expect(wrapper.find('StyledImageCover').props().url).toEqual(fakeLinkItem.thumbnail_url)
+    expect(wrapper.find('StyledImageCover').props().url).toEqual(
+      fakeLinkItem.thumbnail_url
+    )
   })
 
   describe('clamp', () => {
     describe('with a short name', () => {
       beforeEach(() => {
         props.item.name = 'The Verge '
-        props.item.content = 'E-sports like the Overwatch League, NBA 2K League, and the League of Legends Championship Series are looking to taking on the NBA and NFL with more structure and big-name owners.'
+        props.item.content =
+          'E-sports like the Overwatch League, NBA 2K League, and the League of Legends Championship Series are looking to taking on the NBA and NFL with more structure and big-name owners.'
         wrapper.setProps(props)
         rerender()
       })
@@ -64,8 +63,10 @@ describe('LinkItemCover', () => {
 
     describe('with a name longer then 30 characters', () => {
       beforeEach(() => {
-        props.item.name = 'Soccer News, Live Scores, Results & Transfers | Goal.com US'
-        props.item.content = 'The latest soccer news, live scores, results, rumours, transfers'
+        props.item.name =
+          'Soccer News, Live Scores, Results & Transfers | Goal.com US'
+        props.item.content =
+          'The latest soccer news, live scores, results, rumours, transfers'
         wrapper.setProps(props)
         rerender()
       })
@@ -81,7 +82,12 @@ describe('LinkItemCover', () => {
         })
 
         it('should clamp the name to 28 characters', () => {
-          expect(wrapper.find('.name').dive().text().length).toEqual(28)
+          expect(
+            wrapper
+              .find('.name')
+              .dive()
+              .text().length
+          ).toEqual(28)
         })
       })
 
@@ -92,7 +98,12 @@ describe('LinkItemCover', () => {
         })
 
         it('should clamp the name to 40 characters', () => {
-          expect(wrapper.find('.name').dive().text().length).toEqual(40)
+          expect(
+            wrapper
+              .find('.name')
+              .dive()
+              .text().length
+          ).toEqual(40)
         })
       })
     })

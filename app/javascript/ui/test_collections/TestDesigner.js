@@ -23,8 +23,7 @@ const TopThing = styled.div`
   margin-left: 320px;
   width: 374px;
 
-  @media only screen
-    and (max-width: ${v.responsive.medBreakpoint}px) {
+  @media only screen and (max-width: ${v.responsive.medBreakpoint}px) {
     display: none;
   }
 `
@@ -33,8 +32,10 @@ const BottomThing = TopThing.extend`
 `
 
 const TestQuestionHolder = styled.div`
-  background-color: ${props => (props.userEditable ? v.colors.testLightBlueBg : v.colors.ctaButtonBlue)};
-  border-color: ${props => (props.editing ? v.colors.gray : v.colors.testLightBlueBg)};
+  background-color: ${props =>
+    props.userEditable ? v.colors.testLightBlueBg : v.colors.ctaButtonBlue};
+  border-color: ${props =>
+    props.editing ? v.colors.gray : v.colors.testLightBlueBg};
   border-bottom-width: 0;
   border-left-width: ${props => (props.editing ? '20px' : '0')};
   border-right-width: ${props => (props.editing ? '20px' : '0')};
@@ -44,16 +45,16 @@ const TestQuestionHolder = styled.div`
   width: ${props => (props.editing ? '334px' : '100%')};
 
   /* this responsive resize only factors into the edit state */
-  ${props => props.editing && (`
+  ${props =>
+    props.editing &&
+    `
     @media only screen
       and (max-width: ${v.responsive.medBreakpoint}px) {
       border-width: 0;
       margin-left: 22px;
       margin-right: 28px;
     }
-  `)}
-
-  &:last {
+  `} &:last {
     margin-bottom: 0;
   }
 `
@@ -63,8 +64,7 @@ const QuestionSelectHolder = styled.div`
   margin-right: 20px;
   width: 300px;
 
-  @media only screen
-    and (max-width: ${v.responsive.medBreakpoint}px) {
+  @media only screen and (max-width: ${v.responsive.medBreakpoint}px) {
     margin-bottom: 20px;
     width: auto;
     max-width: 400px;
@@ -93,26 +93,35 @@ class TestDesigner extends React.Component {
     surveyResponse: null,
   }
 
-  handleSelectChange = (replacingCard) => (ev) => (
+  handleSelectChange = replacingCard => ev =>
     this.createNewQuestionCard({
       replacingCard,
       questionType: ev.target.value,
     })
-  )
 
-  handleTrash = (card) => {
+  handleTrash = card => {
     card.API_destroy()
   }
 
-  handleNew = (card) => () => {
+  handleNew = card => () => {
     this.createNewQuestionCard({ order: card.order + 1 })
+  }
+
+  get canEdit() {
+    // props.editing means we are in "Test Design" mode -- however we could still be
+    // a "viewer" of the collection in which case canEdit == false
+    const { collection } = this.props
+    return collection.can_edit_content
   }
 
   createSurveyResponse = async () => {
     const { collection } = this.props
-    const newResponse = new SurveyResponse({
-      test_collection_id: collection.id,
-    }, apiStore)
+    const newResponse = new SurveyResponse(
+      {
+        test_collection_id: collection.id,
+      },
+      apiStore
+    )
     const surveyResponse = await newResponse.save()
     if (surveyResponse) {
       this.setState({ surveyResponse })
@@ -120,7 +129,11 @@ class TestDesigner extends React.Component {
     return surveyResponse
   }
 
-  createNewQuestionCard = async ({ replacingCard, order, questionType = '' }) => {
+  createNewQuestionCard = async ({
+    replacingCard,
+    order,
+    questionType = '',
+  }) => {
     const { collection } = this.props
     const attrs = {
       item_attributes: {
@@ -139,9 +152,7 @@ class TestDesigner extends React.Component {
   }
 
   renderHotEdge(card) {
-    return (
-      <QuestionHotEdge onAdd={this.handleNew(card)} />
-    )
+    return <QuestionHotEdge onAdd={this.handleNew(card)} />
   }
 
   renderQuestionSelectForm(card) {
@@ -159,6 +170,7 @@ class TestDesigner extends React.Component {
               selectMenu: 'selectMenu',
             }}
             displayEmpty
+            disabled={!this.canEdit}
             name="role"
             value={card.card_question_type || ''}
             onChange={this.handleSelectChange(card)}
@@ -177,11 +189,12 @@ class TestDesigner extends React.Component {
             ))}
           </Select>
         )}
-        {card.card_question_type !== 'finish' && (
-          <TrashButton onClick={() => this.handleTrash(card)}>
-            <TrashIcon />
-          </TrashButton>
-        )}
+        {this.canEdit &&
+          card.card_question_type !== 'finish' && (
+            <TrashButton onClick={() => this.handleTrash(card)}>
+              <TrashIcon />
+            </TrashButton>
+          )}
       </QuestionSelectHolder>
     )
   }
@@ -190,57 +203,54 @@ class TestDesigner extends React.Component {
     const { surveyResponse } = this.state
     const { collection, editing } = this.props
     const cardCount = collection.collection_cards.length
-    const inner = (
-      collection.collection_cards.map((card, i) => {
-        let position, questionAnswer
-        const item = card.record
-        if (i === 0) position = 'beginning'
-        if (i === cardCount - 1) position = 'end'
-        if (!editing) {
-          card.record.menuDisabled = true
-          if (surveyResponse) {
-            questionAnswer = _.find(surveyResponse.question_answers, { question_id: item.id })
-          }
+    const inner = collection.collection_cards.map((card, i) => {
+      let position, questionAnswer
+      const item = card.record
+      if (i === 0) position = 'beginning'
+      if (i === cardCount - 1) position = 'end'
+      if (!editing) {
+        card.record.menuDisabled = true
+        if (surveyResponse) {
+          questionAnswer = _.find(surveyResponse.question_answers, {
+            question_id: item.id,
+          })
         }
-        const userEditable = editing &&
-          ['media', 'description'].includes(card.record.question_type)
-        return (
-          <FlipMove
-            appearAnimation="fade"
-            key={card.id}
-          >
-            <div>
-              <Flex
-                style={{
-                  width: editing ? '694px' : 'auto',
-                  flexWrap: 'wrap',
-                }}
-              >
-                {editing &&
-                  this.renderQuestionSelectForm(card)
-                }
-                <TestQuestionHolder editing={editing} userEditable={userEditable}>
-                  <TestQuestionEditor
-                    createSurveyResponse={this.createSurveyResponse}
-                    surveyResponse={surveyResponse}
-                    questionAnswer={questionAnswer}
-                    parent={collection}
-                    card={card}
-                    item={item}
-                    position={position}
-                    order={card.order}
-                    editing={editing}
-                  />
-                </TestQuestionHolder>
-                {editing && card.card_question_type !== 'finish' &&
-                  this.renderHotEdge(card)
-                }
-              </Flex>
-            </div>
-          </FlipMove>
-        )
-      })
-    )
+      }
+      const userEditable =
+        editing && ['media', 'description'].includes(card.record.question_type)
+      return (
+        <FlipMove appearAnimation="fade" key={card.id}>
+          <div>
+            <Flex
+              style={{
+                width: editing ? '694px' : 'auto',
+                flexWrap: 'wrap',
+              }}
+            >
+              {editing && this.renderQuestionSelectForm(card)}
+              <TestQuestionHolder editing={editing} userEditable={userEditable}>
+                <TestQuestionEditor
+                  createSurveyResponse={this.createSurveyResponse}
+                  surveyResponse={surveyResponse}
+                  questionAnswer={questionAnswer}
+                  parent={collection}
+                  card={card}
+                  item={item}
+                  position={position}
+                  order={card.order}
+                  editing={editing}
+                  canEdit={this.canEdit}
+                />
+              </TestQuestionHolder>
+              {editing &&
+                this.canEdit &&
+                card.card_question_type !== 'finish' &&
+                this.renderHotEdge(card)}
+            </Flex>
+          </div>
+        </FlipMove>
+      )
+    })
 
     return (
       <div>

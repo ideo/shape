@@ -53,7 +53,7 @@ export default {
     white: '#ffffff',
     nearwhite: '#f7f7f7',
     cautionYellow: '#fcf113',
-    placeholderGray: "#bcbcbc",
+    placeholderGray: '#bcbcbc',
   },
 
   iconSizes: {

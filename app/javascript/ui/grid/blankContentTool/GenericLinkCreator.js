@@ -16,15 +16,10 @@ const GenericLinkCreator = ({
 }) => {
   let validIndicator = ''
   if (url.length > 3) {
-    validIndicator = (
-      <ValidIndicator
-        valid={urlValid}
-        loading={loading}
-      />
-    )
+    validIndicator = <ValidIndicator valid={urlValid} loading={loading} />
   }
 
-  const handleKeyDown = (e) => {
+  const handleKeyDown = e => {
     if (e.keyCode === KEYS.ESC) {
       onClose()
     }
@@ -41,11 +36,7 @@ const GenericLinkCreator = ({
           onKeyDown={handleKeyDown}
         />
         {validIndicator}
-        <FormButton
-          disabled={loading}
-        >
-          Add
-        </FormButton>
+        <FormButton disabled={loading}>Add</FormButton>
       </form>
     </PaddedCardCover>
   )

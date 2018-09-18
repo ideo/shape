@@ -2,13 +2,16 @@ import { observable, action } from 'mobx'
 import BaseRecord from './BaseRecord'
 
 class Comment extends BaseRecord {
-  @observable unread = false
+  @observable
+  unread = false
 
-  @action markAsUnread() {
+  @action
+  markAsUnread() {
     this.unread = true
   }
 
-  @action markAsRead() {
+  @action
+  markAsRead() {
     this.unread = false
   }
 }
@@ -16,7 +19,7 @@ class Comment extends BaseRecord {
 Comment.type = 'comments'
 
 Comment.defaults = {
-  draftjs_data: {}
+  draftjs_data: {},
 }
 
 export default Comment

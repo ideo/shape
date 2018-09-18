@@ -7,7 +7,8 @@ import trackError from '~/utils/trackError'
 // NOTE: extending classes is not a recommended React approach, could consider refactoring to HOC
 class PageWithApi extends React.Component {
   unmounted = false
-  @observable error = null
+  @observable
+  error = null
 
   componentDidMount() {
     // eslint-disable-next-line react/prop-types
@@ -36,7 +37,8 @@ class PageWithApi extends React.Component {
     uiStore.setViewingCollection(null)
   }
 
-  @action updateError(err) {
+  @action
+  updateError(err) {
     this.error = err
   }
 
@@ -45,7 +47,10 @@ class PageWithApi extends React.Component {
     const prevMatch = prevProps.match || {}
     const prevLocation = prevProps.location || {}
     // check if URL and search params have actually changed
-    if (prevMatch.url === match.url && prevLocation.search === location.search) {
+    if (
+      prevMatch.url === match.url &&
+      prevLocation.search === location.search
+    ) {
       // if no change, then no need to re-fetch data
       return false
     }
@@ -53,12 +58,14 @@ class PageWithApi extends React.Component {
   }
 
   checkOrg = ({ match, apiStore, routingStore }) => {
-    const path = `${routingStore.location.pathname}${routingStore.location.search}`
+    const path = `${routingStore.location.pathname}${
+      routingStore.location.search
+    }`
     if (
       match.path !== '/' &&
       match.path !== '/:org' &&
-      !match.path.match(/^(\/:org)?\/search/ig) &&
-      !match.path.match(/^\/collections|items/ig)
+      !match.path.match(/^(\/:org)?\/search/gi) &&
+      !match.path.match(/^\/collections|items/gi)
     ) {
       // escape if we're not on homepage, search, or /collections/items
       return true
@@ -72,9 +79,9 @@ class PageWithApi extends React.Component {
       routingStore.routeTo(`/${apiStore.currentOrgSlug}${path}`)
       return false
     } else if (match.params.org !== apiStore.currentOrgSlug) {
-      apiStore.currentUser.switchOrganization(
-        match.params.org, { redirectPath: path }
-      )
+      apiStore.currentUser.switchOrganization(match.params.org, {
+        redirectPath: path,
+      })
       return false
     }
     return true
@@ -84,11 +91,12 @@ class PageWithApi extends React.Component {
   // onAPILoad = null
   // requestPath = null
 
-  fetchData = (props) => {
+  fetchData = props => {
     if (!_.isFunction(this.requestPath)) return null
     const { apiStore, uiStore } = props
     uiStore.update('isLoading', true)
-    return apiStore.request(this.requestPath(props))
+    return apiStore
+      .request(this.requestPath(props))
       .then(response => {
         uiStore.update('isLoading', false)
         if (this.unmounted) return

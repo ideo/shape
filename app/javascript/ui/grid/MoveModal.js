@@ -7,22 +7,12 @@ import InlineLoader from '~/ui/layout/InlineLoader'
 import MoveArrowIcon from '~/ui/icons/MoveArrowIcon'
 import MoveHelperModal from '~/ui/users/MoveHelperModal'
 import Tooltip from '~/ui/global/Tooltip'
-import v from '~/utils/variables'
 import {
   StyledSnackbar,
   StyledSnackbarContent,
   SnackbarBackground,
+  StyledSnackbarText,
 } from '~/ui/global/styled/material-ui'
-
-// This text is different from other typography
-const StyledMoveText = styled.span`
-  text-transform: uppercase;
-  font-family: ${v.fonts.sans};
-  font-size: 1rem;
-  font-weight: ${v.weights.book};
-  letter-spacing: 0.1rem;
-  color: white;
-`
 
 const IconHolder = styled.span`
   margin-left: 40px;
@@ -48,14 +38,17 @@ const CloseIconHolder = styled.span`
 @inject('uiStore', 'apiStore')
 @observer
 class MoveModal extends React.Component {
-  @observable isLoading = false
+  @observable
+  isLoading = false
 
-  handleClose = (ev) => {
+  handleClose = ev => {
     ev.preventDefault()
     const { uiStore } = this.props
     // Notify the user if they're on a different collection
-    if (uiStore.viewingCollection &&
-        uiStore.movingFromCollectionId !== uiStore.viewingCollection.id) {
+    if (
+      uiStore.viewingCollection &&
+      uiStore.movingFromCollectionId !== uiStore.viewingCollection.id
+    ) {
       if (uiStore.cardAction === 'move') {
         uiStore.alert(
           'Your items have been returned to their original location',
@@ -66,16 +59,19 @@ class MoveModal extends React.Component {
     uiStore.closeMoveMenu()
   }
 
-  moveCards = async (placement) => {
+  moveCards = async placement => {
     const { uiStore, apiStore } = this.props
     const { viewingCollection, cardAction } = uiStore
     // Viewing collection might not be set, such as on the search page
     if (!viewingCollection) {
-      uiStore.alert('You can\'t move an item here')
+      uiStore.alert("You can't move an item here")
       return
     }
     const collectionId = viewingCollection.id
-    const movingFromCollection = apiStore.find('collections', uiStore.movingFromCollectionId)
+    const movingFromCollection = apiStore.find(
+      'collections',
+      uiStore.movingFromCollectionId
+    )
     const error = this.moveErrors({
       viewingCollection,
       movingFromCollection,
@@ -92,40 +88,44 @@ class MoveModal extends React.Component {
       placement,
     }
     try {
-      runInAction(() => { this.isLoading = true })
+      runInAction(() => {
+        this.isLoading = true
+      })
       let successMessage
       switch (cardAction) {
-      case 'move':
-        await apiStore.request('collection_cards/move', 'PATCH', data)
-        successMessage = 'Items successfully moved!'
-        break
-      case 'link':
-        await apiStore.request('collection_cards/link', 'POST', data)
-        successMessage = 'Items successfully linked!'
-        break
-      case 'duplicate':
-        await apiStore.request('collection_cards/duplicate', 'POST', data)
-        // have to re-fetch here because the duplicate method wasn't re-rendering
-        // see note in collection_cards_controller#duplicate
-        await apiStore.request(`collections/${collectionId}`)
-        successMessage = 'Items successfully duplicated!'
-        break
-      case 'useTemplate': {
-        data = {
-          parent_id: data.to_id,
-          template_id: data.from_id,
-          placement,
+        case 'move':
+          await apiStore.request('collection_cards/move', 'PATCH', data)
+          successMessage = 'Items successfully moved!'
+          break
+        case 'link':
+          await apiStore.request('collection_cards/link', 'POST', data)
+          successMessage = 'Items successfully linked!'
+          break
+        case 'duplicate':
+          await apiStore.request('collection_cards/duplicate', 'POST', data)
+          // have to re-fetch here because the duplicate method wasn't re-rendering
+          // see note in collection_cards_controller#duplicate
+          await apiStore.request(`collections/${collectionId}`)
+          successMessage = 'Items successfully duplicated!'
+          break
+        case 'useTemplate': {
+          data = {
+            parent_id: data.to_id,
+            template_id: data.from_id,
+            placement,
+          }
+          await apiStore.createTemplateInstance(data)
+          successMessage = 'Your template instance has been created!'
+          // refresh the current collection to get the new template
+          await apiStore.request(`collections/${collectionId}`)
+          break
         }
-        await apiStore.createTemplateInstance(data)
-        successMessage = 'Your template instance has been created!'
-        // refresh the current collection to get the new template
-        await apiStore.request(`collections/${collectionId}`)
-        break
+        default:
+          return
       }
-      default:
-        return
-      }
-      runInAction(() => { this.isLoading = false })
+      runInAction(() => {
+        this.isLoading = false
+      })
       uiStore.alertOk(successMessage)
       uiStore.resetSelectionAndBCT()
       uiStore.closeMoveMenu()
@@ -135,14 +135,16 @@ class MoveModal extends React.Component {
         uiStore.scroll.scrollToBottom()
       }
     } catch (e) {
-      runInAction(() => { this.isLoading = false })
+      runInAction(() => {
+        this.isLoading = false
+      })
       uiStore.alert('You cannot move a collection within itself')
     }
   }
 
   moveErrors = ({ viewingCollection, movingFromCollection, cardAction }) => {
     if (!viewingCollection.can_edit_content) {
-      return 'You don\'t have permission to move items to this collection'
+      return "You don't have permission to move items to this collection"
     } else if (
       // don't allow moving cards from templates to non-templates
       cardAction === 'move' &&
@@ -150,12 +152,12 @@ class MoveModal extends React.Component {
       movingFromCollection.isMasterTemplate &&
       !viewingCollection.isMasterTemplate
     ) {
-      return 'You can\'t move pinned template items out of a template'
+      return "You can't move pinned template items out of a template"
     } else if (
       cardAction === 'useTemplate' &&
       viewingCollection.id === movingFromCollection.id
     ) {
-      return 'You can\'t create a template inside itself'
+      return "You can't create a template inside itself"
     }
     return ''
   }
@@ -199,10 +201,7 @@ class MoveModal extends React.Component {
       return null
     }
     return (
-      <MoveHelperModal
-        currentUser={apiStore.currentUser}
-        {...helperProps}
-      />
+      <MoveHelperModal currentUser={apiStore.currentUser} {...helperProps} />
     )
   }
 
@@ -211,17 +210,20 @@ class MoveModal extends React.Component {
 
     return (
       <div>
-        { uiStore.movingCardIds.length > 0 && (
+        {uiStore.movingCardIds.length > 0 && (
           <div>
-            <StyledSnackbar
-              classes={{ root: 'Snackbar', }}
-              open
-            >
-              {this.isLoading ? <SnackbarBackground><InlineLoader /></SnackbarBackground> : (
+            <StyledSnackbar classes={{ root: 'Snackbar' }} open>
+              {this.isLoading ? (
+                <SnackbarBackground>
+                  <InlineLoader />
+                </SnackbarBackground>
+              ) : (
                 <StyledSnackbarContent
-                  classes={{ root: 'SnackbarContent', }}
+                  classes={{ root: 'SnackbarContent' }}
                   message={
-                    <StyledMoveText id="message-id">{this.moveMessage}</StyledMoveText>
+                    <StyledSnackbarText id="message-id">
+                      {this.moveMessage}
+                    </StyledSnackbarText>
                   }
                   action={[
                     <IconHolder key="moveup">
@@ -261,7 +263,7 @@ class MoveModal extends React.Component {
                 />
               )}
             </StyledSnackbar>
-            { this.moveHelper }
+            {this.moveHelper}
           </div>
         )}
       </div>
@@ -269,13 +271,11 @@ class MoveModal extends React.Component {
   }
 }
 
-MoveModal.propTypes = {
-}
+MoveModal.propTypes = {}
 MoveModal.wrappedComponent.propTypes = {
   apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }
-MoveModal.defaultProps = {
-}
+MoveModal.defaultProps = {}
 
 export default MoveModal

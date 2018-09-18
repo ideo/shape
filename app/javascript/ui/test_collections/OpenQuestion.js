@@ -10,13 +10,14 @@ import DescriptionQuestion from './DescriptionQuestion'
 import { QuestionText, TextResponseHolder, TextInput } from './shared'
 
 const QuestionSpacing = css`
-  border-bottom-color: ${props => (props.editable ? v.colors.gray : v.colors.testLightBlueBg)};
+  border-bottom-color: ${props =>
+    props.editable ? v.colors.gray : v.colors.testLightBlueBg};
   border-bottom-style: solid;
   border-bottom-width: 6px;
 `
 
 const QuestionTextWithSpacing = QuestionText.extend`
-  ${QuestionSpacing}
+  ${QuestionSpacing};
 `
 
 const TextEnterButton = styled.button`
@@ -51,13 +52,13 @@ class OpenQuestion extends React.Component {
     item.save()
   }
 
-  handleResponse = (ev) => {
+  handleResponse = ev => {
     this.setState({
       response: ev.target.value,
     })
   }
 
-  handleSubmit = (ev) => {
+  handleSubmit = ev => {
     const { editing, onAnswer } = this.props
     ev.preventDefault()
     if (editing) return
@@ -65,7 +66,7 @@ class OpenQuestion extends React.Component {
   }
 
   renderQuestion() {
-    const { editing, item } = this.props
+    const { editing, item, canEdit } = this.props
     let content
     if (editing) {
       content = (
@@ -73,13 +74,12 @@ class OpenQuestion extends React.Component {
           item={item}
           maxLength={100}
           placeholder="Write question here…"
+          canEdit={canEdit}
         />
       )
     } else {
       content = (
-        <QuestionTextWithSpacing>
-          {item.content}
-        </QuestionTextWithSpacing>
+        <QuestionTextWithSpacing>{item.content}</QuestionTextWithSpacing>
       )
     }
     return content
@@ -115,10 +115,12 @@ OpenQuestion.propTypes = {
   item: MobxPropTypes.objectOrObservableObject.isRequired,
   editing: PropTypes.bool,
   onAnswer: PropTypes.func,
+  canEdit: PropTypes.bool,
 }
 OpenQuestion.defaultProps = {
   editing: false,
   onAnswer: () => null,
+  canEdit: false,
 }
 
 export default OpenQuestion
