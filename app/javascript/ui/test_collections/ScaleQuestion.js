@@ -16,6 +16,7 @@ const Question = styled.div`
   padding: 12px 12px 16px 12px;
   width: 100%;
 `
+Question.displayName = 'Question'
 
 const Scale = styled.div`
   background-color: ${v.colors.desert};
@@ -36,13 +37,14 @@ const EmojiHolder = styled.div`
   margin-top: 10px;
 `
 
-const StyledButton = styled.button`
+const EmojiButton = styled.button`
   opacity: ${props => (props.selected ? 1 : 0.5)};
   transition: opacity 0.3s;
   &:hover {
     opacity: 1;
   }
 `
+EmojiButton.displayName = 'EmojiButton'
 
 @observer
 class ScaleQuestion extends React.Component {
@@ -84,7 +86,7 @@ class ScaleQuestion extends React.Component {
           <SmallHelperText>select your response below</SmallHelperText>
           <EmojiHolder>
             {emojis.map(emoji => (
-              <StyledButton
+              <EmojiButton
                 // before any are selected they all should be "selected" aka full opacity
                 selected={
                   !questionAnswer ||
@@ -100,7 +102,7 @@ class ScaleQuestion extends React.Component {
                   symbol={emoji.symbol}
                   scale={emoji.scale}
                 />
-              </StyledButton>
+              </EmojiButton>
             ))}
           </EmojiHolder>
         </Scale>
