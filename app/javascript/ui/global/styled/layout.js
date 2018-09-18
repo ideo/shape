@@ -69,12 +69,19 @@ export const FixedHeader = styled.header`
   width: calc(100% - ${v.containerPadding.horizontal}*2);
   background: ${v.colors.cararra};
   padding: 1rem ${v.containerPadding.horizontal};
+  @media print {
+    display: none;
+  }
 `
 FixedHeader.displayName = 'FixedHeader'
 
 export const MaxWidthContainer = styled.div`
   max-width: ${v.maxWidth}px;
   margin: 0 auto;
+  @media print {
+    margin: 0;
+    max-width: none;
+  }
 `
 MaxWidthContainer.displayName = 'MaxWidthContainer'
 
