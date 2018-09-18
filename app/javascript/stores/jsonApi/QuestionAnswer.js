@@ -5,7 +5,9 @@ class QuestionAnswer extends BaseRecord {
     try {
       const id = this.persisted ? `/${this.id}` : ''
       const res = await this.apiStore.request(
-        `survey_responses/${this.survey_response.session_uid}/question_answers${id}`,
+        `survey_responses/${
+          this.survey_response.session_uid
+        }/question_answers${id}`,
         method,
         { data: this.toJsonApi() }
       )

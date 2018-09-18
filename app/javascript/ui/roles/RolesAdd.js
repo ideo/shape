@@ -12,10 +12,7 @@ import {
   FormActionsContainer,
   Select,
 } from '~/ui/global/styled/forms'
-import {
-  Row,
-  RowItemRight,
-} from '~/ui/global/styled/layout'
+import { Row, RowItemRight } from '~/ui/global/styled/layout'
 import AutoComplete from '~/ui/global/AutoComplete'
 import PillList from '~/ui/global/PillList'
 import EmailCSVUploader from '~/ui/global/EmailCSVUploader'
@@ -30,9 +27,12 @@ RightAligner.displayName = 'StyledRightAligner'
 
 @observer
 class RolesAdd extends React.Component {
-  @observable selectedUsers = []
-  @observable selectedRole = ''
-  @observable loading = false
+  @observable
+  selectedUsers = []
+  @observable
+  selectedRole = ''
+  @observable
+  loading = false
 
   constructor(props) {
     super(props)
@@ -41,7 +41,7 @@ class RolesAdd extends React.Component {
   }
 
   @action
-  onUserSelected = (data) => {
+  onUserSelected = data => {
     let existing = null
     let entity = data
     // check if the input is just an email string e.g. "person@email.com"
@@ -54,7 +54,11 @@ class RolesAdd extends React.Component {
     }
     if (data.internalType === 'users' || emailInput) {
       if (emailInput) {
-        entity = { name: data.custom, email: data.custom, internalType: 'users' }
+        entity = {
+          name: data.custom,
+          email: data.custom,
+          internalType: 'users',
+        }
       }
       existing = this.selectedUsers
         .filter(selected => selected.internalType === 'users')
@@ -64,7 +68,10 @@ class RolesAdd extends React.Component {
         .filter(selected => selected.internalType === 'groups')
         .find(selected => selected.id === entity.id)
     } else {
-      trackError(new Error(), { name: 'EntityNotUserOrGroup', message: 'Selected entity can only be user or group' })
+      trackError(new Error(), {
+        name: 'EntityNotUserOrGroup',
+        message: 'Selected entity can only be user or group',
+      })
     }
     if (!existing) {
       this.selectedUsers.push(entity)
@@ -72,7 +79,7 @@ class RolesAdd extends React.Component {
   }
 
   @action
-  onUserDelete = (entity) => {
+  onUserDelete = entity => {
     this.selectedUsers.remove(entity)
   }
 
@@ -92,7 +99,9 @@ class RolesAdd extends React.Component {
       }
       if (ownerType === 'groups') {
         confirmOpts.prompt = `
-          Are you sure you want to add ${this.selectedUsers.length} users to this group?
+          Are you sure you want to add ${
+            this.selectedUsers.length
+          } users to this group?
         `
       } else {
         confirmOpts.prompt = `
@@ -114,11 +123,10 @@ class RolesAdd extends React.Component {
 
   handleSave = async () => {
     const emails = this.selectedUsers
-      .filter((selected) => !selected.id)
-      .map((selected) => selected.email)
+      .filter(selected => !selected.id)
+      .map(selected => selected.email)
 
-    const fullUsers = this.selectedUsers
-      .filter((selected) => !!selected.id)
+    const fullUsers = this.selectedUsers.filter(selected => !!selected.id)
 
     let created = { data: [] }
     this.setLoading(true)
@@ -126,7 +134,8 @@ class RolesAdd extends React.Component {
       created = await this.props.onCreateUsers(emails)
     }
     const roles = await this.props.onCreateRoles(
-      [...created.data, ...fullUsers], this.selectedRole
+      [...created.data, ...fullUsers],
+      this.selectedRole
     )
     this.setLoading(false)
     this.resetSelectedUsers()
@@ -134,7 +143,7 @@ class RolesAdd extends React.Component {
   }
 
   @action
-  handleRoleSelect = (ev) => {
+  handleRoleSelect = ev => {
     this.selectedRole = ev.target.value
   }
 
@@ -143,7 +152,7 @@ class RolesAdd extends React.Component {
     this.selectedUsers = []
   }
 
-  handleEmailInput = (emails) => {
+  handleEmailInput = emails => {
     _.each(emails, email => {
       this.onUserSelected({
         custom: email,
@@ -160,13 +169,13 @@ class RolesAdd extends React.Component {
       } else if (item.internalType === 'groups') {
         value = item.handle || item.name
       } else {
-        console.warn('Can only search users and groups')
+        // console.warn('Can only search users and groups')
       }
       return { value, label: item.name, data: item }
     })
   }
 
-  labelFor = (roleType) => {
+  labelFor = roleType => {
     const { roleLabels } = this.props
     // either return the override label (if present) or just the passed in name
     // e.g. for labeling "Viewer" as "Participant"
@@ -179,9 +188,11 @@ class RolesAdd extends React.Component {
       if (count > 100) {
         return (
           <PillList
-            itemList={[{
-              name: `${count} people pending invitation`
-            }]}
+            itemList={[
+              {
+                name: `${count} people pending invitation`,
+              },
+            ]}
             onItemDelete={this.resetSelectedUsers}
           />
         )
@@ -200,7 +211,7 @@ class RolesAdd extends React.Component {
     const { roleTypes } = this.props
     return (
       <div style={{ marginBottom: '1rem' }}>
-        {this.loading && <InlineLoader /> }
+        {this.loading && <InlineLoader />}
         {this.renderPillList()}
         <Row>
           <AutoComplete
@@ -217,19 +228,17 @@ class RolesAdd extends React.Component {
                 onChange={this.handleRoleSelect}
                 value={this.selectedRole}
               >
-                { roleTypes.map(roleType =>
-                  (<MenuItem key={roleType} value={roleType}>
+                {roleTypes.map(roleType => (
+                  <MenuItem key={roleType} value={roleType}>
                     {this.labelFor(roleType)}
-                  </MenuItem>))
-                }
+                  </MenuItem>
+                ))}
               </Select>
             </RowItemRight>
           </RightAligner>
         </Row>
         <Row style={{ marginBottom: '4rem' }}>
-          <EmailCSVUploader
-            onComplete={this.handleEmailInput}
-          />
+          <EmailCSVUploader onComplete={this.handleEmailInput} />
         </Row>
         <FormActionsContainer>
           <FormButton

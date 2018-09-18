@@ -15,7 +15,7 @@ const IconHolder = styled.button`
 `
 
 class Download extends React.Component {
-  download = (ev) => {
+  download = ev => {
     ev.preventDefault()
     const { record } = this.props
     const file = record.filestack_file

@@ -23,10 +23,11 @@ const StyledCommentThread = styled.div`
     top: 0;
     z-index: ${v.zIndex.commentHeader};
     /* NOTE: 'sticky' is not fully browser supported */
-    ${props => props.expanded && `
+    ${props =>
+      props.expanded &&
+      `
       position: sticky;
-    `}
-    /* ---- */
+    `} /* ---- */
     display: block;
     width: 100%;
     background-color: ${v.colors.activityDarkBlue};
@@ -43,14 +44,16 @@ const StyledCommentThread = styled.div`
   }
   .comments {
     margin: 5px 10px 0 10px;
-    ${props => (!props.expanded || props.hasMore) && `
+    ${props =>
+      (!props.expanded || props.hasMore) &&
+      `
       z-index: 0;
       position: relative;
       top: -40px;
       overflow: hidden;
       margin-bottom: -40px;
       min-height: 40px;
-    `}
+    `};
   }
 `
 
@@ -100,7 +103,8 @@ export const ThumbnailHolder = styled.span`
   flex-shrink: 0;
   height: 50px;
   width: 50px;
-  img, svg {
+  img,
+  svg {
     flex-shrink: 0;
     height: 100%;
     object-fit: cover;
@@ -111,24 +115,29 @@ ThumbnailHolder.displayName = 'ThumbnailHolder'
 
 @observer
 class CommentThread extends React.Component {
-  @observable commentData = {
+  @observable
+  commentData = {
     message: '',
     draftjs_data: {},
   }
-  @observable editorState = EditorState.createEmpty()
-  @observable titleLines = 1
+  @observable
+  editorState = EditorState.createEmpty()
+  @observable
+  titleLines = 1
 
   componentDidMount() {
     this.countLines()
   }
 
-  @action countLines = () => {
+  @action
+  countLines = () => {
     if (this.title && this.title.offsetHeight > 24) {
       this.titleLines = 2
     }
   }
 
-  @computed get comments() {
+  @computed
+  get comments() {
     const { expanded, thread } = this.props
     let { comments } = thread
     // for un-expanded thread, only take the unread comments
@@ -178,18 +187,17 @@ class CommentThread extends React.Component {
     return (
       <span className={`unread ${thread.unreadCount && 'show-unread'}`}>
         <span className="inner">
-          { thread.unreadCount }
+          {thread.unreadCount}
           <CommentIconFilled />
         </span>
       </span>
     )
   }
 
-  renderComments = () => (
+  renderComments = () =>
     this.comments.map((comment, i) => (
       <Comment key={comment.id || `comment-new-${i}`} comment={comment} />
     ))
-  )
 
   render() {
     const { thread, expanded } = this.props
@@ -198,25 +206,27 @@ class CommentThread extends React.Component {
       <StyledCommentThread hasMore={thread.hasMore} expanded={expanded}>
         <button className="title" onClick={this.props.onClick}>
           <StyledHeader lines={this.titleLines}>
-            { this.renderThumbnail() }
+            {this.renderThumbnail()}
             <Dotdotdot clamp={2}>
-              <span className="name" ref={(r) => { this.title = r }}>
-                { thread.record.name }
+              <span
+                className="name"
+                ref={r => {
+                  this.title = r
+                }}
+              >
+                {thread.record.name}
               </span>
             </Dotdotdot>
             <span className="timestamp">
-              <Moment
-                date={thread.updated_at}
-              />
+              <Moment date={thread.updated_at} />
             </span>
-            { this.renderUnreadCount() }
+            {this.renderUnreadCount()}
           </StyledHeader>
         </button>
         <div className="comments">
-          { thread.hasMore && expanded &&
-            <CommentThreadLoader thread={thread} />
-          }
-          { this.renderComments() }
+          {thread.hasMore &&
+            expanded && <CommentThreadLoader thread={thread} />}
+          {this.renderComments()}
         </div>
         <CommentEntryForm
           expanded={expanded}

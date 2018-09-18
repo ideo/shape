@@ -29,7 +29,7 @@ class DescriptionQuestion extends React.Component {
     item.save()
   }
 
-  handleChange = (ev) => {
+  handleChange = ev => {
     const { item, maxLength } = this.props
     item.content = ev.target.value
     this.setState({ countLeft: maxLength - item.content.length })

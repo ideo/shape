@@ -32,7 +32,8 @@ export default styled.div`
     box-sizing: border-box;
     margin: 0 6px 6px 0;
     padding: 10px 12px;
-    background: ${props => (props.tagColor === 'white' ? 'white' : v.colors.cararra)};
+    background: ${props =>
+      props.tagColor === 'white' ? 'white' : v.colors.cararra};
     /* match the font styles */
     font-size: inherit;
     line-height: inherit;
@@ -44,7 +45,8 @@ export default styled.div`
     &.read-only:after {
       content: '';
     }
-    &:hover, &:focus {
+    &:hover,
+    &:focus {
       &:after {
         color: red;
       }
@@ -96,7 +98,7 @@ export default styled.div`
       padding: 0;
       list-style: none;
       background: white;
-      border: 1px solid #D1D1D1;
+      border: 1px solid #d1d1d1;
       border-radius: 2px;
       box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
     }

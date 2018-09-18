@@ -68,10 +68,10 @@ module.exports = {
     "react/jsx-filename-extension": 0,
     "react/prefer-stateless-function": 0,
     "react/jsx-curly-brace-presence": 0,
-    "react/jsx-curly-spacing": [2, {
-      "when": "never",
-      "children": true,
-    }],
+    // "react/jsx-curly-spacing": [2, {
+    //   "when": "never",
+    //   "children": true,
+    // }],
     "react/jsx-closing-tag-location": 0,
     "react/no-did-mount-set-state": 0,
     "react/sort-comp": [1, {

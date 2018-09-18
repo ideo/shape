@@ -15,12 +15,10 @@ configure({ enforceActions: 'observed' })
 const browserHistory = createBrowserHistory()
 const history = syncHistoryWithStore(browserHistory, routingStore)
 
-const RenderApp = (inner) => {
+const RenderApp = inner => {
   ReactDOM.render(
     <Provider {...stores}>
-      <Router history={history} >
-        {inner}
-      </Router>
+      <Router history={history}>{inner}</Router>
     </Provider>,
     document.getElementById('react-root')
   )

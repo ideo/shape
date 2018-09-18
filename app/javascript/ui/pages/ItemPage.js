@@ -40,7 +40,7 @@ class ItemPage extends PageWithApi {
     }
   }
 
-  onAPILoad = async (response) => {
+  onAPILoad = async response => {
     const { apiStore, uiStore, location } = this.props
     const item = response.data
     this.setState({ item })
@@ -55,15 +55,14 @@ class ItemPage extends PageWithApi {
     }
   }
 
-  updateItem = (itemTextData) => {
+  updateItem = itemTextData => {
     const { item } = this.state
     item.text_data = itemTextData
     this.setState({ item })
   }
 
-  save = (item, { cancel_sync = true } = {}) => (
+  save = (item, { cancel_sync = true } = {}) =>
     item.API_updateWithoutSync({ cancel_sync })
-  )
 
   cancel = () => {
     const { item } = this.state
@@ -77,40 +76,44 @@ class ItemPage extends PageWithApi {
     const { currentUserId } = this.props.apiStore
     // similar function as in GridCard, could extract?
     switch (item.type) {
-    case ITEM_TYPES.TEXT:
-      return (
-        <TextItem
-          item={item}
-          actionCableConsumer={ActionCableConsumer}
-          currentUserId={currentUserId}
-          onUpdatedData={this.updateItem}
-          onSave={this.save}
-          onCancel={this.cancel}
-          fullPageView
-        />
-      )
-    case ITEM_TYPES.FILE:
-      return <ImageItem onCancel={this.cancel} item={item} backgroundSize="contain" />
-    case ITEM_TYPES.VIDEO:
-      return <VideoItem item={item} />
-    default:
-      return (
-        <div>Item not found.</div>
-      )
+      case ITEM_TYPES.TEXT:
+        return (
+          <TextItem
+            item={item}
+            actionCableConsumer={ActionCableConsumer}
+            currentUserId={currentUserId}
+            onUpdatedData={this.updateItem}
+            onSave={this.save}
+            onCancel={this.cancel}
+            fullPageView
+          />
+        )
+      case ITEM_TYPES.FILE:
+        return (
+          <ImageItem
+            onCancel={this.cancel}
+            item={item}
+            backgroundSize="contain"
+          />
+        )
+      case ITEM_TYPES.VIDEO:
+        return <VideoItem item={item} />
+      default:
+        return <div>Item not found.</div>
     }
   }
 
-  requestPath = (props) => {
+  requestPath = props => {
     const { match } = props
     return `items/${match.params.id}`
   }
 
-  reroute = (card) => {
+  reroute = card => {
     const { routingStore } = this.props
     routingStore.routeTo('items', card.record.id)
   }
 
-  updateItemName = (name) => {
+  updateItemName = name => {
     const { item } = this.state
     item.name = name
     item.save()
@@ -136,14 +139,19 @@ class ItemPage extends PageWithApi {
         <PageHeader record={item} />
         <ItemPageContainer>
           <PageContainer>
-            {item.parent_collection_card && replacingId === item.parent_collection_card.id
-              ? <GridCardBlank height={1} parent={item.parent} afterCreate={this.reroute} />
-              : (
-                <div>
-                  {this.content}
-                  <MoveModal />
-                </div>
-              )}
+            {item.parent_collection_card &&
+            replacingId === item.parent_collection_card.id ? (
+              <GridCardBlank
+                height={1}
+                parent={item.parent}
+                afterCreate={this.reroute}
+              />
+            ) : (
+              <div>
+                {this.content}
+                <MoveModal />
+              </div>
+            )}
           </PageContainer>
         </ItemPageContainer>
       </Fragment>

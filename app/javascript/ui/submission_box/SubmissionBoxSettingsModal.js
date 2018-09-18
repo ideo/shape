@@ -8,13 +8,8 @@ import {
   Heading3,
   SmallHelperText,
 } from '~/ui/global/styled/typography'
-import {
-  Row,
-  RowItemLeft,
-} from '~/ui/global/styled/layout'
-import {
-  ThumbnailHolder
-} from '~/ui/threads/CommentThread'
+import { Row, RowItemLeft } from '~/ui/global/styled/layout'
+import { ThumbnailHolder } from '~/ui/threads/CommentThread'
 import { BctButton } from '~/ui/grid/shared'
 import AlertIcon from '~/ui/icons/AlertIcon'
 import AddTextIcon from '~/ui/icons/AddTextIcon'
@@ -63,7 +58,7 @@ class SubmissionBoxSettingsModal extends React.Component {
     return !uiStore.submissionBoxSettingsOpen
   }
 
-  handleClose = (ev) => {
+  handleClose = ev => {
     const { apiStore, uiStore, routingStore, collection } = this.props
     if (!this.locked) {
       uiStore.update('submissionBoxSettingsOpen', false)
@@ -81,8 +76,10 @@ class SubmissionBoxSettingsModal extends React.Component {
       onCancel: async () => {
         await apiStore.request(`collections/${collection.id}`, 'DELETE')
         if (collection.parent_collection_card.parent_id) {
-          routingStore.routeTo('collections',
-            collection.parent_collection_card.parent_id)
+          routingStore.routeTo(
+            'collections',
+            collection.parent_collection_card.parent_id
+          )
         } else {
           routingStore.routeTo('homepage')
         }
@@ -109,7 +106,11 @@ class SubmissionBoxSettingsModal extends React.Component {
         prompt: `Are you sure?
                 There are already ${collection.countSubmissions} submissions.
                 New submissions will be
-                ${template ? pluralize(template.name) : pluralize(`${type} item`)}.`,
+                ${
+                  template
+                    ? pluralize(template.name)
+                    : pluralize(`${type} item`)
+                }.`,
         confirmText: 'Continue',
         cancelText: 'Cancel',
         onConfirm: () => callback(),
@@ -140,7 +141,7 @@ class SubmissionBoxSettingsModal extends React.Component {
     })
   }
 
-  submissionBoxRowForItem = (typeName) => {
+  submissionBoxRowForItem = typeName => {
     const types = [
       { name: 'text', Icon: AddTextIcon },
       { name: 'link', Icon: AddLinkIcon },
@@ -163,28 +164,27 @@ class SubmissionBoxSettingsModal extends React.Component {
     )
   }
 
-  submissionBoxRowForTemplate = (template) => (
+  submissionBoxRowForTemplate = template => (
     <SubmissionBoxRow
       key={template.id}
       noSpacing
       onClick={this.chooseTemplate(template)}
     >
       <ThumbnailHolder>
-        { template.cover.image_url &&
+        {template.cover.image_url && (
           <img src={template.cover.image_url} alt={template.name} />
-        }
-        { !template.cover.image_url &&
-          <TemplateIcon circled filled />
-        }
+        )}
+        {!template.cover.image_url && <TemplateIcon circled filled />}
       </ThumbnailHolder>
-      <SubmissionBoxRowText>
-        { template.name }
-      </SubmissionBoxRowText>
+      <SubmissionBoxRowText>{template.name}</SubmissionBoxRowText>
     </SubmissionBoxRow>
   )
 
   selectedOption = () => {
-    const { submission_template_id, submission_box_type } = this.props.collection
+    const {
+      submission_template_id,
+      submission_box_type,
+    } = this.props.collection
     const template = this.templates.find(t => t.id === submission_template_id)
     if (template) {
       return this.submissionBoxRowForTemplate(template)
@@ -198,28 +198,35 @@ class SubmissionBoxSettingsModal extends React.Component {
     <StyledTitleContent>
       <Heading2>Submission Box Settings</Heading2>
       <Row>
-        <span style={{ display: 'inline-block', height: '25px', width: '25px', color: v.colors.gray }}>
+        <span
+          style={{
+            display: 'inline-block',
+            height: '25px',
+            width: '25px',
+            color: v.colors.gray,
+          }}
+        >
           <AlertIcon />
         </span>
         <RowItemLeft>
           <SmallHelperText>
-            Anyone invited to this collection box will be able to instantly create
-            their own instance of the template that you choose. Use one of our
-            templates or create your own.
+            Anyone invited to this collection box will be able to instantly
+            create their own instance of the template that you choose. Use one
+            of our templates or create your own.
           </SmallHelperText>
         </RowItemLeft>
       </Row>
       <Heading3>Submission Format</Heading3>
-      { this.selectedOption() }
+      {this.selectedOption()}
     </StyledTitleContent>
   )
 
   get itemRows() {
     const { submission_box_type } = this.props.collection
     const types = ['text', 'link', 'file']
-    return _.filter(types, t => t !== submission_box_type).map(type => (
+    return _.filter(types, t => t !== submission_box_type).map(type =>
       this.submissionBoxRowForItem(type)
-    ))
+    )
   }
 
   render() {
@@ -232,12 +239,12 @@ class SubmissionBoxSettingsModal extends React.Component {
         open
       >
         <div>
-          { this.itemRows }
-          {this.templates.map(template =>
-            submission_template_id !== template.id && (
+          {this.itemRows}
+          {this.templates.map(
+            template =>
+              submission_template_id !== template.id &&
               this.submissionBoxRowForTemplate(template)
-            ))
-          }
+          )}
         </div>
       </Modal>
     )

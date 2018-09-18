@@ -23,7 +23,7 @@ class VideoCreator extends React.Component {
     this.canceled = true
   }
 
-  onVideoUrlChange = (e) => {
+  onVideoUrlChange = e => {
     this.setState({
       videoUrl: e.target.value,
       loading: true,
@@ -31,7 +31,7 @@ class VideoCreator extends React.Component {
     this.lookupVideoAPI(e.target.value)
   }
 
-  _lookupVideoAPI = async (url) => {
+  _lookupVideoAPI = async url => {
     const { name, thumbnailUrl } = await VideoUrl.getAPIdetails(url)
     if (this.canceled) return
     this.setState({ loading: false })
@@ -42,11 +42,9 @@ class VideoCreator extends React.Component {
     }
   }
 
-  videoUrlIsValid = () => (
-    VideoUrl.isValid(this.state.videoUrl)
-  )
+  videoUrlIsValid = () => VideoUrl.isValid(this.state.videoUrl)
 
-  createVideoItem = (e) => {
+  createVideoItem = e => {
     e.preventDefault()
     if (this.videoUrlIsValid()) {
       // Get a normalized URL to make it easier to handle in our system

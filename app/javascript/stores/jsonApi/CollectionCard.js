@@ -1,4 +1,3 @@
-import _ from 'lodash'
 import { action, observable } from 'mobx'
 
 import { uiStore } from '~/stores'
@@ -21,14 +20,18 @@ class CollectionCard extends BaseRecord {
     'image_contain',
   ]
 
-  @observable maxWidth = this.width
-  @observable maxHeight = this.height
+  @observable
+  maxWidth = this.width
+  @observable
+  maxHeight = this.height
 
-  @action setMaxWidth(w) {
+  @action
+  setMaxWidth(w) {
     this.maxWidth = w
   }
 
-  @action setMaxHeight(h) {
+  @action
+  setMaxHeight(h) {
     this.maxHeight = h
   }
 
@@ -52,7 +55,8 @@ class CollectionCard extends BaseRecord {
 
   // This sets max W/H based on number of visible columns. Used by Grid + CollectionCover.
   // e.g. "maxWidth" might temporarily be 2 cols even though this card.width == 4
-  @action calculateMaxSize(cols) {
+  @action
+  calculateMaxSize(cols) {
     // max out width to the number of columns
     this.maxWidth = Math.min(cols, this.width)
     // generally only allow cards with height of 2 if we are displaying 4 columns
@@ -92,7 +96,9 @@ class CollectionCard extends BaseRecord {
 
   async API_create() {
     try {
-      const res = await this.apiStore.request('collection_cards', 'POST', { data: this.toJsonApi() })
+      const res = await this.apiStore.request('collection_cards', 'POST', {
+        data: this.toJsonApi(),
+      })
       this.parent.addCard(res.data)
       uiStore.closeBlankContentTool()
       uiStore.trackEvent('create', this.parent)
@@ -106,7 +112,11 @@ class CollectionCard extends BaseRecord {
   async API_replace({ replacingId }) {
     try {
       const replacing = this.apiStore.find('collection_cards', replacingId)
-      const res = await this.apiStore.request(`collection_cards/${replacingId}/replace`, 'PATCH', { data: this.toJsonApi() })
+      const res = await this.apiStore.request(
+        `collection_cards/${replacingId}/replace`,
+        'PATCH',
+        { data: this.toJsonApi() }
+      )
       this.parent.removeCard(replacing)
       this.parent.addCard(res.data)
       uiStore.closeBlankContentTool()
@@ -146,11 +156,14 @@ class CollectionCard extends BaseRecord {
   }
 
   reselectOnlyEditableCards(cardIds) {
-    const filteredCardIds =
-      this.apiStore.findAll('collection_cards').filter(card => (
-        (cardIds.indexOf(card.id) > -1) && (card.record && card.record.can_edit)
-      )).map(card => card.id)
-    const removedCount = (uiStore.selectedCardIds.length - filteredCardIds.length)
+    const filteredCardIds = this.apiStore
+      .findAll('collection_cards')
+      .filter(
+        card =>
+          cardIds.indexOf(card.id) > -1 && (card.record && card.record.can_edit)
+      )
+      .map(card => card.id)
+    const removedCount = uiStore.selectedCardIds.length - filteredCardIds.length
     uiStore.reselectCardIds(filteredCardIds)
     return removedCount
   }
@@ -171,7 +184,9 @@ class CollectionCard extends BaseRecord {
           prompt += 'this?'
         }
         if (removedCount) {
-          prompt += ` ${removedCount} object${(removedCount > 1) ? 's were' : ' was'} not selected due to insufficient permissions.`
+          prompt += ` ${removedCount} object${
+            removedCount > 1 ? 's were' : ' was'
+          } not selected due to insufficient permissions.`
         }
       } else if (this.link) {
         iconName = 'Link'

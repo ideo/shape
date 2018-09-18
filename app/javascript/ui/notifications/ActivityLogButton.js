@@ -42,7 +42,7 @@ class ActivityLogButton extends React.Component {
     uiStore.update('activityLogOpen', val)
   }
 
-  handleComments = (ev) => {
+  handleComments = ev => {
     ev.preventDefault()
     this.toggleActivityLog()
   }
@@ -56,9 +56,7 @@ class ActivityLogButton extends React.Component {
       >
         <CommentIcon />
         {this.activityCount > 0 && (
-          <ActivityCount className="count">
-            {this.activityCount}
-          </ActivityCount>
+          <ActivityCount className="count">{this.activityCount}</ActivityCount>
         )}
       </CircledIcon>
     )

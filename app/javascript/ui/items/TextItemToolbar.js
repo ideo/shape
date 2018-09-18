@@ -40,14 +40,19 @@ function styles(props) {
   return allStyles
 }
 
-const TextItemToolbar = (props) => (
+const TextItemToolbar = props => (
   <div id="quill-toolbar" style={styles(props)}>
     <span className="ql-formats">
-      <StyledButton className="ql-header ql-format-reg" value="">T</StyledButton>
+      <StyledButton className="ql-header ql-format-reg" value="">
+        T
+      </StyledButton>
       {/* when using H2, quill inserts its own SVG -- couldn't figure out a way around */}
-      <StyledButton className="ql-header ql-format-large" value="3">T</StyledButton>
+      <StyledButton className="ql-header ql-format-large" value="3">
+        T
+      </StyledButton>
       <StyledButton className="ql-header ql-format-huge" value="1">
-        T</StyledButton>
+        T
+      </StyledButton>
       {/* quill inserts ql-link SVG */}
       <StyledButton className="ql-link" />
       {props.onExpand && (

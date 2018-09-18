@@ -53,31 +53,33 @@ export const FormButton = styled.button`
   border-radius: 20px;
   color: ${props => {
     switch (props.color) {
-    case 'hollow':
-      return v.colors.blackLava
-    default:
-      return 'white'
+      case 'hollow':
+        return v.colors.blackLava
+      default:
+        return 'white'
     }
   }};
   background-color: ${props => {
     switch (props.color) {
-    case 'blue':
-      return v.colors.ctaButtonBlue
-    case 'hollow':
-      return 'transparent'
-    default:
-      return v.colors.blackLava
+      case 'blue':
+        return v.colors.ctaButtonBlue
+      case 'hollow':
+        return 'transparent'
+      default:
+        return v.colors.blackLava
     }
   }};
-  border: ${props => (
-    props.color === 'hollow' ? `1px solid ${v.colors.blackLava}` : 'none'
-  )};
+  border: ${props =>
+    props.color === 'hollow' ? `1px solid ${v.colors.blackLava}` : 'none'};
   transition: all 0.3s;
-  &:hover, &:focus {
-    background-color: ${props => (props.color === 'blue' ? v.colors.ctaButtonBlueHover : v.colors.cloudy)};
+  &:hover,
+  &:focus {
+    background-color: ${props =>
+      props.color === 'blue' ? v.colors.ctaButtonBlueHover : v.colors.cloudy};
   }
-  ${props => props.disabled &&
-      `background-color: white;
+  ${props =>
+    props.disabled &&
+    `background-color: white;
       border: 1px solid ${v.colors.gray};
       color:  ${v.colors.gray};
       cursor: initial;
@@ -120,9 +122,8 @@ export const TextField = styled.input`
     outline-width: 0;
   }
   /* handle "small 4-col" layout i.e. layoutSize == 3 */
-  @media only screen
-    and (min-width: ${v.responsive.medBreakpoint}px)
-    and (max-width: ${v.responsive.largeBreakpoint}px) {
+  @media only screen and (min-width: ${v.responsive
+      .medBreakpoint}px) and (max-width: ${v.responsive.largeBreakpoint}px) {
     width: 185px;
   }
 `
@@ -200,14 +201,16 @@ export const Select = styled(MuiSelect)`
     width: 240px;
   }
 
-  .selectMenu: {
+  .selectmenu: {
     background-color: transparent;
-    &:focus { background-color: transparent; }
-    &:hover { background-color: transparent; }
+    &:focus {
+      background-color: transparent;
+    }
+    &:hover {
+      background-color: transparent;
+    }
     vertical-align: baseline;
-    ${props => props.onDefault && `color: ${v.colors.gray};`}
-
-    li {
+    ${props => props.onDefault && `color: ${v.colors.gray};`} li {
       font-family: ${v.fonts.sans};
       font-size: 1rem;
       font-weight: ${v.weights.book};
@@ -234,7 +237,7 @@ export const SelectOption = styled(MenuItem)`
     margin-top: 4px;
     padding: 0 4px;
     &:hover: {
-      opacity: 1.0
+      opacity: 1;
     }
   }
   &.grayedOut {
@@ -269,7 +272,8 @@ StyledAutosizeInput.displayName = 'StyledAutosizeInput'
 /** @component */
 export const EditAvatarButton = styled.button`
   cursor: auto;
-  ${props => props.canEdit &&
+  ${props =>
+    props.canEdit &&
     `
     cursor: pointer;
     opacity: 0.75;
@@ -277,8 +281,8 @@ export const EditAvatarButton = styled.button`
     .avatar {
       cursor: pointer;
     }
-    `
-}`
+    `};
+`
 EditAvatarButton.displayName = 'EditAvatarButton'
 
 /** @component */
@@ -310,7 +314,6 @@ export const CommentForm = styled.form`
     margin: 0 5px 0 10px;
     width: calc(100% - 10px);
   }
-
 `
 CommentForm.displayName = 'CommentForm'
 

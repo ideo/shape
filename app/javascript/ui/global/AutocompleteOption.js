@@ -1,16 +1,9 @@
 import _ from 'lodash'
 import React from 'react'
 import PropTypes from 'prop-types'
-import {
-  Row,
-  RowItemLeft,
-} from '~/ui/global/styled/layout'
-import {
-  DisplayText,
-} from '~/ui/global/styled/typography'
-import {
-  SelectOption,
-} from '~/ui/global/styled/forms'
+import { Row, RowItemLeft } from '~/ui/global/styled/layout'
+import { DisplayText } from '~/ui/global/styled/typography'
+import { SelectOption } from '~/ui/global/styled/forms'
 import Avatar from '~/ui/global/Avatar'
 
 class AutocompleteOption extends React.Component {
@@ -19,9 +12,7 @@ class AutocompleteOption extends React.Component {
   }
 
   render() {
-    const {
-      children, isFocused, option, onFocus
-    } = this.props
+    const { children, isFocused, option, onFocus } = this.props
     let content = children
     if (!option.className) {
       const { data } = option
@@ -30,15 +21,11 @@ class AutocompleteOption extends React.Component {
       content = (
         <Row align="center" noSpacing>
           <span>
-            <Avatar
-              url={url}
-              title={data.name}
-              key={data.id}
-              size={38}
-            />
+            <Avatar url={url} title={data.name} key={data.id} size={38} />
           </span>
           <RowItemLeft>
-            <DisplayText>{name}</DisplayText><br />
+            <DisplayText>{name}</DisplayText>
+            <br />
           </RowItemLeft>
         </Row>
       )
@@ -53,7 +40,7 @@ class AutocompleteOption extends React.Component {
         onClick={this.handleClick}
         component="div"
       >
-        { content }
+        {content}
       </SelectOption>
     )
   }

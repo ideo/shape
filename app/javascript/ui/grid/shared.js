@@ -33,7 +33,7 @@ const IconHolder = styled.div`
     width: 100%;
     object-fit: cover;
     position: absolute;
-    top: 0
+    top: 0;
   }
 `
 
@@ -46,9 +46,8 @@ export const BctButton = styled.button`
   color: white;
 
   left: ${props => (props.creating ? '100px' : 0)};
-  @media only screen
-    and (min-width: ${v.responsive.medBreakpoint}px)
-    and (max-width: ${v.responsive.largeBreakpoint}px) {
+  @media only screen and (min-width: ${v.responsive
+      .medBreakpoint}px) and (max-width: ${v.responsive.largeBreakpoint}px) {
     left: ${props => (props.creating ? '80px' : 0)};
   }
   transform: ${props => (props.creating ? 'rotate(360deg)' : 'none')};
@@ -79,7 +78,8 @@ export const StyledGridCard = styled.div`
     else if (props.testCollectionCard) return 'auto'
     return 'pointer'
   }};
-  box-shadow: ${props => (props.dragging ? '1px 1px 5px 2px rgba(0, 0, 0, 0.25)' : '')};
+  box-shadow: ${props =>
+    props.dragging ? '1px 1px 5px 2px rgba(0, 0, 0, 0.25)' : ''};
   opacity: ${props => (props.dragging ? '0.95' : '1')};
 `
 StyledGridCard.displayName = 'StyledGridCard'
@@ -94,12 +94,14 @@ export const StyledBottomLeftIcon = styled.div`
   height: 45px;
   display: flex;
   /* LinkIcon appears larger than CollectionIcon so we need to make it smaller */
-  ${props => props.small && `
+  ${props =>
+    props.small &&
+    `
     width: 18px;
     height: 18px;
     bottom: 0.75rem;
     left: 0.75rem;
-  `}
+  `};
 `
 StyledBottomLeftIcon.displayName = 'StyledBottomLeftIcon'
 
@@ -113,8 +115,12 @@ export const StyledGridCardInner = styled.div`
   // disable blue text selection on Draggables
   // https://github.com/bokuweb/react-rnd/issues/199
   */
-  *::-moz-selection {background: transparent;}
-  *::selection {background: transparent;}
+  *::-moz-selection {
+    background: transparent;
+  }
+  *::selection {
+    background: transparent;
+  }
 `
 StyledGridCardInner.displayName = 'StyledGridCardInner'
 
@@ -149,14 +155,8 @@ export class GridCardIconWithName extends React.PureComponent {
     const { icon, text } = this.props
     return (
       <Container>
-        <IconHolder>
-          {icon}
-        </IconHolder>
-        <Truncator
-          text={text}
-          key={text}
-          extraSpacing={80}
-        />
+        <IconHolder>{icon}</IconHolder>
+        <Truncator text={text} key={text} extraSpacing={80} />
       </Container>
     )
   }

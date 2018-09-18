@@ -90,7 +90,11 @@ ActivityContainer.displayName = 'ActivityContainer'
 
 export const FadeHeader = styled.div`
   border-radius: 1px;
-  background: linear-gradient(${v.colors.activityDarkBlue} 0, ${v.colors.activityDarkBlue} 40%, ${hexToRgba(v.colors.activityDarkBlue, 0)} 100%);
+  background: linear-gradient(
+    ${v.colors.activityDarkBlue} 0,
+    ${v.colors.activityDarkBlue} 40%,
+    ${hexToRgba(v.colors.activityDarkBlue, 0)} 100%
+  );
   height: 27px;
   position: fixed;
   top: ${v.zIndex.floatOverContent};

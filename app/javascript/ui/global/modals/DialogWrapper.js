@@ -33,9 +33,7 @@ class DialogWrapper extends React.Component {
           <StyledSnackbarContent
             classes={{ root: 'SnackbarContent autoWidth' }}
             message={
-              <StyledSnackbarText>
-                {snackbarConfig.message}
-              </StyledSnackbarText>
+              <StyledSnackbarText>{snackbarConfig.message}</StyledSnackbarText>
             }
             action={
               <div style={{ height: '19px', width: '16px' }}>
@@ -45,7 +43,6 @@ class DialogWrapper extends React.Component {
               </div>
             }
           />
-
         </StyledSnackbar>
       </Fragment>
     )

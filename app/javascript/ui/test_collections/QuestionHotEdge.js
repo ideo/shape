@@ -12,8 +12,7 @@ const HotEdge = styled.div`
   width: 100%;
   z-index: ${v.zIndex.floatOverContent};
 
-  @media only screen
-    and (max-width: ${v.responsive.medBreakpoint}px) {
+  @media only screen and (max-width: ${v.responsive.medBreakpoint}px) {
     margin-left: 0;
     width: 376px;
   }
@@ -21,7 +20,7 @@ const HotEdge = styled.div`
 
 const HotEdgeVisuals = styled.div`
   opacity: ${props => (props.showing ? 1.0 : 0.0)};
-  transition: opacity 0.20s;
+  transition: opacity 0.2s;
   transition-timing-function: ease-in;
   visibility: ${props => (props.showing ? 'visible' : 'hidden')};
   z-index: ${v.zIndex.floatOverContent + 1};
@@ -63,16 +62,16 @@ const HotAreaButton = styled.button`
 class QuestionHotEdge extends React.Component {
   state = { showing: false }
 
-  handleAdd = (ev) => {
+  handleAdd = ev => {
     ev.preventDefault()
     this.props.onAdd()
   }
 
-  handleMouseOver = (ev) => {
+  handleMouseOver = ev => {
     this.setState({ showing: true })
   }
 
-  handleMouseOut = (ev) => {
+  handleMouseOut = ev => {
     this.setState({ showing: false })
   }
 

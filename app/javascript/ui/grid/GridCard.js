@@ -34,7 +34,8 @@ import {
 } from './shared'
 
 const PinIconHolder = styled.div`
-  background-color: ${props => (props.locked ? 'transparent' : v.colors.blackLava)};
+  background-color: ${props =>
+    props.locked ? 'transparent' : v.colors.blackLava};
   border-radius: 50%;
   height: 24px;
   margin-left: 10px;
@@ -75,27 +76,23 @@ class GridCard extends React.Component {
     const { card, record, height } = this.props
     if (this.isItem) {
       switch (record.type) {
-      case ITEM_TYPES.TEXT:
-        return <TextItemCover item={record} height={height} />
-      case ITEM_TYPES.FILE: {
-        if (record.filestack_file.mimetype === 'application/pdf') {
-          return <PdfFileItemCover item={record} />
+        case ITEM_TYPES.TEXT:
+          return <TextItemCover item={record} height={height} />
+        case ITEM_TYPES.FILE: {
+          if (record.filestack_file.mimetype === 'application/pdf') {
+            return <PdfFileItemCover item={record} />
+          }
+          if (record.mimeBaseType === 'image') {
+            return <ImageItemCover item={record} contain={card.image_contain} />
+          }
+          return <GenericFileItemCover item={record} />
         }
-        if (record.mimeBaseType === 'image') {
-          return <ImageItemCover item={record} contain={card.image_contain} />
-        }
-        return <GenericFileItemCover item={record} />
-      }
-      case ITEM_TYPES.VIDEO:
-        return <VideoItemCover item={record} dragging={this.props.dragging} />
-      case ITEM_TYPES.LINK:
-        return <LinkItemCover item={record} dragging={this.props.dragging} />
-      default:
-        return (
-          <div>
-            {record.content}
-          </div>
-        )
+        case ITEM_TYPES.VIDEO:
+          return <VideoItemCover item={record} dragging={this.props.dragging} />
+        case ITEM_TYPES.LINK:
+          return <LinkItemCover item={record} dragging={this.props.dragging} />
+        default:
+          return <div>{record.content}</div>
       }
     } else if (this.isCollection) {
       return (
@@ -132,10 +129,7 @@ class GridCard extends React.Component {
       } else if (record.isRequired) {
         const type = record.isMasterTemplate ? 'template' : 'collection'
         icon = (
-          <Tooltip
-            title={`required ${type}`}
-            placement="top"
-          >
+          <Tooltip title={`required ${type}`} placement="top">
             <div>
               <RequiredCollectionIcon />
             </div>
@@ -146,11 +140,13 @@ class GridCard extends React.Component {
       }
 
       if (card.isPinned) {
-        icon = (<Fragment>
-          {!card.isPinnedAndLocked && this.renderPin()}
-          {icon}
-          {card.isPinnedAndLocked && this.renderPin()}
-        </Fragment>)
+        icon = (
+          <Fragment>
+            {!card.isPinnedAndLocked && this.renderPin()}
+            {icon}
+            {card.isPinnedAndLocked && this.renderPin()}
+          </Fragment>
+        )
         iconAmount = 2
       }
     } else if (card.link) {
@@ -164,7 +160,11 @@ class GridCard extends React.Component {
 
     return (
       // needs to handle the same click otherwise clicking the icon does nothing
-      <StyledBottomLeftIcon small={small} onClick={this.handleClick} iconAmount={iconAmount}>
+      <StyledBottomLeftIcon
+        small={small}
+        onClick={this.handleClick}
+        iconAmount={iconAmount}
+      >
         {icon}
       </StyledBottomLeftIcon>
     )
@@ -174,10 +174,7 @@ class GridCard extends React.Component {
     const { card } = this.props
     const hoverClass = card.isPinnedAndLocked && 'show-on-hover'
     return (
-      <Tooltip
-        title="pinned"
-        placement="top"
-      >
+      <Tooltip title="pinned" placement="top">
         <PinIconHolder className={hoverClass} locked={card.isPinnedAndLocked}>
           <PinnedIcon />
         </PinIconHolder>
@@ -200,13 +197,14 @@ class GridCard extends React.Component {
     }
   }
 
-  linkOffsite = (url) => {
-    Object.assign(
-      document.createElement('a'), { target: '_blank', href: url }
-    ).click()
+  linkOffsite = url => {
+    Object.assign(document.createElement('a'), {
+      target: '_blank',
+      href: url,
+    }).click()
   }
 
-  handleClick = (e) => {
+  handleClick = e => {
     const { dragging, record } = this.props
     if (dragging) return
     if (record.type === ITEM_TYPES.LINK) {
@@ -242,46 +240,49 @@ class GridCard extends React.Component {
     const tagEditorOpen = uiStore.tagsModalOpenId === card.id
 
     return (
-      <StyledGridCard dragging={dragging} testCollectionCard={testCollectionCard}>
-        {(canEditCollection && (!card.isPinnedAndLocked || lastPinnedCard)) &&
-          <GridCardHotspot card={card} dragging={dragging} />
-        }
-        {(canEditCollection && firstCardInRow && !card.isPinnedAndLocked) &&
-          <GridCardHotspot card={card} dragging={dragging} position="left" />
-        }
-        {(
-          !record.menuDisabled &&
-          uiStore.textEditingItem !== record
-        ) &&
-          <StyledTopRightActions color={this.actionsColor}>
-            {record.isDownloadable && (
-              <Download record={record} />
-            )}
-            {record.isImage && this.canEditCard && (
-              <ContainImage card={card} />
-            )}
-            {!testCollectionCard &&
-              <SelectionCircle cardId={card.id} />
-            }
-            <ActionMenu
-              location="GridCard"
-              className="show-on-hover card-menu"
-              card={card}
-              canEdit={this.canEditCard}
-              canReplace={record.canReplace}
-              menuOpen={menuOpen}
-              onOpen={this.openMenu}
-              onLeave={this.closeMenu}
-              testCollectionCard={testCollectionCard}
-            />
-          </StyledTopRightActions>
-        }
+      <StyledGridCard
+        dragging={dragging}
+        testCollectionCard={testCollectionCard}
+      >
+        {canEditCollection &&
+          (!card.isPinnedAndLocked || lastPinnedCard) && (
+            <GridCardHotspot card={card} dragging={dragging} />
+          )}
+        {canEditCollection &&
+          firstCardInRow &&
+          !card.isPinnedAndLocked && (
+            <GridCardHotspot card={card} dragging={dragging} position="left" />
+          )}
+        {!record.menuDisabled &&
+          uiStore.textEditingItem !== record && (
+            <StyledTopRightActions color={this.actionsColor}>
+              {record.isDownloadable && <Download record={record} />}
+              {record.isImage &&
+                this.canEditCard && <ContainImage card={card} />}
+              {!testCollectionCard && <SelectionCircle cardId={card.id} />}
+              <ActionMenu
+                location="GridCard"
+                className="show-on-hover card-menu"
+                card={card}
+                canEdit={this.canEditCard}
+                canReplace={record.canReplace}
+                menuOpen={menuOpen}
+                onOpen={this.openMenu}
+                onLeave={this.closeMenu}
+                testCollectionCard={testCollectionCard}
+              />
+            </StyledTopRightActions>
+          )}
         {this.renderIcon}
         {/* onClick placed here so it's separate from hotspot click */}
         <StyledGridCardInner onClick={this.handleClick}>
           {this.renderInner}
         </StyledGridCardInner>
-        <TagEditorModal canEdit={this.canEditCard} record={record} open={tagEditorOpen} />
+        <TagEditorModal
+          canEdit={this.canEditCard}
+          record={record}
+          open={tagEditorOpen}
+        />
       </StyledGridCard>
     )
   }

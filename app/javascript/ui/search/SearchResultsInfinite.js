@@ -51,24 +51,25 @@ const StyledScrollIndicator = styled.div`
 @observer
 class SearchResultsInfinite extends React.Component {
   visibleItems = observable.map({})
-  @observable firstVisible = 1
-  @observable hovering = false
+  @observable
+  firstVisible = 1
+  @observable
+  hovering = false
 
   routeToCollection = id => () => {
     this.props.routeTo('collections', id)
   }
 
-  @action markFirstVisible = (index) => {
+  @action
+  markFirstVisible = index => {
     this.firstVisible = index
   }
 
-  @action setVisible = (index, isVisible) => (
-    this.visibleItems.set(index, isVisible)
-  )
+  @action
+  setVisible = (index, isVisible) => this.visibleItems.set(index, isVisible)
 
-  @action setHovering = (val) => (
-    this.hovering = val
-  )
+  @action
+  setHovering = val => (this.hovering = val)
 
   computeFirstVisible() {
     let first = 0
@@ -93,7 +94,7 @@ class SearchResultsInfinite extends React.Component {
     this.computeFirstVisible()
   }
 
-  handleMouseOver = (index, enter = true) => (ev) => {
+  handleMouseOver = (index, enter = true) => ev => {
     if (enter) {
       this.setHovering(true)
       this.markFirstVisible(index)
@@ -113,67 +114,63 @@ class SearchResultsInfinite extends React.Component {
       total,
     } = this.props
 
-    const results = (
-      searchResults.map((collection, i) => {
-        // ActionMenu is rendered as if we were operating on the parent_collection_card
-        let card = collection.parent_collection_card
-        if (!collection.parent_collection_card) {
-          // catch for special/global templates that don't have a parent card
-          card = new CollectionCard()
-          card.id = `card-${i}`
-        }
-        return (
-          <FlipMove
-            appearAnimation="fade"
-            key={collection.id}
+    const results = searchResults.map((collection, i) => {
+      // ActionMenu is rendered as if we were operating on the parent_collection_card
+      let card = collection.parent_collection_card
+      if (!collection.parent_collection_card) {
+        // catch for special/global templates that don't have a parent card
+        card = new CollectionCard()
+        card.id = `card-${i}`
+      }
+      return (
+        <FlipMove appearAnimation="fade" key={collection.id}>
+          <VisibilitySensor
+            partialVisibility
+            scrollCheck
+            intervalDelay={300}
+            onChange={this.handleVisibilityChange(i + 1)}
+            offset={{
+              top: v.headerHeightCompact + gridSettings.gridH / 2,
+            }}
           >
-            <VisibilitySensor
-              partialVisibility
-              scrollCheck
-              intervalDelay={300}
-              onChange={this.handleVisibilityChange(i + 1)}
-              offset={{
-                top: v.headerHeightCompact + (gridSettings.gridH / 2),
-              }}
-            >
-              <div>
-                <StyledBreadcrumb>
-                  <Breadcrumb items={collection.breadcrumb} />
-                </StyledBreadcrumb>
-                <StyledSearchResult
-                  {...gridSettings}
-                  gridMaxW={gridMaxW}
-                  onMouseEnter={this.handleMouseOver(i + 1)}
-                  onMouseLeave={this.handleMouseOver(i + 1, false)}
-                >
-                  <StyledTopRightActions className="show-on-hover">
-                    <SelectionCircle cardId={card.id} />
-                    <ActionMenu
-                      location="Search"
-                      className="show-on-hover card-menu"
-                      card={card}
-                      canEdit={false}
-                      canReplace={false}
-                      menuOpen={uiStore.openCardMenuId === card.id}
-                      onOpen={this.openMenu(card.id)}
-                      onLeave={this.closeMenu}
-                    />
-                  </StyledTopRightActions>
-                  <StyledBottomLeftIcon>
-                    <CollectionIcon />
-                  </StyledBottomLeftIcon>
-                  <CollectionCover
-                    onClick={this.routeToCollection(collection.id)}
-                    collection={collection}
-                    width={gridSettings.cols}
-                    height={1}
+            <div>
+              <StyledBreadcrumb>
+                <Breadcrumb items={collection.breadcrumb} />
+              </StyledBreadcrumb>
+              <StyledSearchResult
+                {...gridSettings}
+                gridMaxW={gridMaxW}
+                onMouseEnter={this.handleMouseOver(i + 1)}
+                onMouseLeave={this.handleMouseOver(i + 1, false)}
+              >
+                <StyledTopRightActions className="show-on-hover">
+                  <SelectionCircle cardId={card.id} />
+                  <ActionMenu
+                    location="Search"
+                    className="show-on-hover card-menu"
+                    card={card}
+                    canEdit={false}
+                    canReplace={false}
+                    menuOpen={uiStore.openCardMenuId === card.id}
+                    onOpen={this.openMenu(card.id)}
+                    onLeave={this.closeMenu}
                   />
-                </StyledSearchResult>
-              </div>
-            </VisibilitySensor>
-          </FlipMove>
-        )
-      }))
+                </StyledTopRightActions>
+                <StyledBottomLeftIcon>
+                  <CollectionIcon />
+                </StyledBottomLeftIcon>
+                <CollectionCover
+                  onClick={this.routeToCollection(collection.id)}
+                  collection={collection}
+                  width={gridSettings.cols}
+                  height={1}
+                />
+              </StyledSearchResult>
+            </div>
+          </VisibilitySensor>
+        </FlipMove>
+      )
+    })
     return (
       <Fragment>
         <StyledScrollIndicator active={this.hovering}>
@@ -183,9 +180,7 @@ class SearchResultsInfinite extends React.Component {
           useWindow
           pageStart={1}
           threshold={200} // px from bottom
-          loader={
-            <Loader height={'200px'} key="loader" />
-          }
+          loader={<Loader height={'200px'} key="loader" />}
           loadMore={loadMore}
           hasMore={hasMore}
         >

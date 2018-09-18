@@ -11,7 +11,8 @@ const StyledCommentThreadLoader = TextButton.extend`
   height: 80px;
   position: relative;
   margin-bottom: 5px;
-  background: ${props => (props.disabled ? v.colors.cloudy : v.colors.activityMedBlue)};
+  background: ${props =>
+    props.disabled ? v.colors.cloudy : v.colors.activityMedBlue};
   width: 100%;
 
   .refreshIcon {
@@ -27,9 +28,11 @@ const StyledCommentThreadLoader = TextButton.extend`
 
 @observer
 class CommentThreadLoader extends React.Component {
-  @observable loading = false
+  @observable
+  loading = false
 
-  @action setLoading = val => {
+  @action
+  setLoading = val => {
     this.loading = val
   }
 
@@ -43,7 +46,7 @@ class CommentThreadLoader extends React.Component {
   render() {
     return (
       <div>
-        { this.loading && <InlineLoader fixed background="none" /> }
+        {this.loading && <InlineLoader fixed background="none" />}
         <StyledCommentThreadLoader
           disabled={this.loading}
           onClick={this.loadMore}
@@ -52,9 +55,7 @@ class CommentThreadLoader extends React.Component {
             <span className="refreshIcon">
               <RefreshIcon />
             </span>
-            <span>
-              Show more
-            </span>
+            <span>Show more</span>
           </div>
         </StyledCommentThreadLoader>
       </div>

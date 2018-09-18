@@ -16,9 +16,7 @@ class ImageItemCover extends React.PureComponent {
   render() {
     const { contain, item } = this.props
     const { filestack_file_url } = item
-    return (
-      <StyledImageCover url={filestack_file_url} contain={contain} />
-    )
+    return <StyledImageCover url={filestack_file_url} contain={contain} />
   }
 }
 

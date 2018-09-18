@@ -1,4 +1,3 @@
-
 import Icon from './Icon'
 
 const ExpandIcon = () => (

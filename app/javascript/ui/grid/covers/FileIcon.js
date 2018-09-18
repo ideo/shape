@@ -18,24 +18,24 @@ class FileIcon extends React.PureComponent {
     const ext = mime.extension(mimeType)
 
     switch (ext) {
-    case 'pdf':
-      return <PdfSvg />
-    case 'ppt':
-      return <PptSvg />
-    case 'doc':
-    case 'docx':
-      return <DocSvg />
-    case 'xls':
-    case 'xlsx':
-      return <XlsSvg />
-    case 'sketch':
-      return <SketchSvg />
-    case 'ai':
-      return <AiSvg />
-    case 'ps':
-      return <PsSvg />
-    default:
-      return <FileSvg />
+      case 'pdf':
+        return <PdfSvg />
+      case 'ppt':
+        return <PptSvg />
+      case 'doc':
+      case 'docx':
+        return <DocSvg />
+      case 'xls':
+      case 'xlsx':
+        return <XlsSvg />
+      case 'sketch':
+        return <SketchSvg />
+      case 'ai':
+        return <AiSvg />
+      case 'ps':
+        return <PsSvg />
+      default:
+        return <FileSvg />
     }
   }
 

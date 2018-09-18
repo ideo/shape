@@ -11,7 +11,8 @@ export const Heading1 = styled.h1`
   margin-bottom: 0.5rem;
   margin-top: 0.5rem;
   text-transform: none;
-  white-space: ${props => (props.wrapLine ? 'normal' : 'nowrap')}; /* better this way for responsive? */
+  white-space: ${props =>
+    props.wrapLine ? 'normal' : 'nowrap'}; /* better this way for responsive? */
 
   @media only screen and (max-width: ${v.responsive.smallBreakpoint}px) {
     padding: 1rem 0;

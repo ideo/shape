@@ -41,12 +41,14 @@ StyledPdfCover.displayName = 'StyledPdfCover'
 
 export const ImageContainer = styled.div`
   border-radius: 12px;
-  clip-path: ${props => (props.orientation === 'landscape'
-    ? 'polygon(0 0,0 100%,100% 100%,100% 52px,245px 0)'
-    : 'polygon(0 0,0 100%,100% 100%,100% 53px,214px 0)')};
+  clip-path: ${props =>
+    props.orientation === 'landscape'
+      ? 'polygon(0 0,0 100%,100% 100%,100% 52px,245px 0)'
+      : 'polygon(0 0,0 100%,100% 100%,100% 53px,214px 0)'};
   overflow: hidden;
   position: relative;
-  transform: rotate(-8deg) translateX(${props => props.x}) translateY(${props => props.y}) translateZ(0);
+  transform: rotate(-8deg) translateX(${props => props.x})
+    translateY(${props => props.y}) translateZ(0);
   transform-origin: 0 0;
   width: ${props => (props.orientation === 'portrait' ? 85 : 95)}%;
   img {
@@ -80,12 +82,12 @@ class PdfFileItemCover extends React.Component {
       const height = dimensions.height / shrinkRatio
       orientation = 'landscape'
       coverX = gridW * -0.05
-      coverY = (gridH * 1.1) - height
+      coverY = gridH * 1.1 - height
     }
     return { coverX, coverY, orientation }
   }
 
-  handleClick = (ev) => {
+  handleClick = ev => {
     ev.preventDefault()
     const { item } = this.props
     const { filestack_file } = item

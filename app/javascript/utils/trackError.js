@@ -21,7 +21,7 @@ export function trackErrorSpecify(source, message, name, backtrace) {
       agent: navigator.userAgent,
       platform: navigator.platform,
       vendor: navigator.vendor,
-    }
+    },
   }
   console.warn('error tr', data)
   if (!process.env.APPSIGNAL_PUSH_API_KEY) return

@@ -6,22 +6,15 @@ const API_KEY = process.env.FILESTACK_API_KEY
 export const MAX_SIZE = 25 * 1024 * 1024
 
 const imageUploadConfig = {
-  accept: [
-    '.pdf',
-    'image/*',
-    'application/*',
-    'text/*',
-    '.docx',
-    '.ppt',
-  ],
+  accept: ['.pdf', 'image/*', 'application/*', 'text/*', '.docx', '.ppt'],
   maxFiles: 1,
   imageMax: [1200, 1200],
   maxSize: MAX_SIZE,
   transformations: {
     crop: {
-      aspectRatio: 5 / 4
-    }
-  }
+      aspectRatio: 5 / 4,
+    },
+  },
 }
 
 const multiImageUploadConfig = {
@@ -41,7 +34,7 @@ class FilestackUpload {
   }
 
   static async processFiles(filesUploaded) {
-    const filesAttrs = filesUploaded.map(async (file) => {
+    const filesAttrs = filesUploaded.map(async file => {
       const fileAttrs = {
         handle: file.handle,
         filename: file.filename,

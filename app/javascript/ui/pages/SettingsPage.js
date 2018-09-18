@@ -11,7 +11,7 @@ class SettingsPage extends React.PureComponent {
         <Header />
         <PageContainer marginTop={v.headerHeightCompact}>
           <Heading1>Settings</Heading1>
-          { this.props.children }
+          {this.props.children}
         </PageContainer>
       </div>
     )

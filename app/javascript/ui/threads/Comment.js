@@ -15,7 +15,8 @@ import { StyledCommentInput } from './CustomCommentMentions'
 const StyledComment = StyledCommentInput.extend`
   padding: 10px;
   margin-bottom: 5px;
-  background: ${props => (props.unread ? v.colors.activityLightBlue : v.colors.activityMedBlue)};
+  background: ${props =>
+    props.unread ? v.colors.activityLightBlue : v.colors.activityMedBlue};
 
   transition: background 1s 0.5s ease;
 
@@ -62,7 +63,7 @@ class Comment extends React.Component {
         editorState={this.state.editorState}
         // NOTE: this onChange is necessary for draft-js-plugins to decorate properly!
         // see https://github.com/draft-js-plugins/draft-js-plugins/issues/530#issuecomment-258736772
-        onChange={(editorState) => this.setState({ editorState })}
+        onChange={editorState => this.setState({ editorState })}
         plugins={plugins}
       />
     )
@@ -82,16 +83,12 @@ class Comment extends React.Component {
             size={32}
             className="author-img"
           />
-          <DisplayText className="author">
-            { comment.author.name }
-          </DisplayText>
+          <DisplayText className="author">{comment.author.name}</DisplayText>
           <span className="timestamp">
             <Moment date={comment.updated_at} />
           </span>
         </InlineRow>
-        <div className="message">
-          { this.renderMessage() }
-        </div>
+        <div className="message">{this.renderMessage()}</div>
       </StyledComment>
     )
   }

@@ -19,9 +19,7 @@ const StyledDate = styled.span`
 `
 
 const Moment = ({ date } = {}) => (
-  <StyledDate>
-    {moment(date).format(defaultFormat(date))}
-  </StyledDate>
+  <StyledDate>{moment(date).format(defaultFormat(date))}</StyledDate>
 )
 Moment.propTypes = {
   color: PropTypes.oneOf(Object.values(v.colors)),

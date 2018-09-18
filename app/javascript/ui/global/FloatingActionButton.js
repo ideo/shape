@@ -38,7 +38,8 @@ class FloatingActionButton extends React.Component {
           placement="top"
         >
           <StyledButton onClick={onClick}>
-            {icon}{text}
+            {icon}
+            {text}
           </StyledButton>
         </Tooltip>
       </FloatedPositioning>
