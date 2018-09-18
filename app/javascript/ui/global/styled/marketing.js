@@ -174,6 +174,7 @@ export const MarketingContentLink = styled.button`
   letter-spacing: 1.5px;
   margin-top: 8px;
   margin-bottom: 8px;
+  transition: background-color .15s ease,color .15s ease,border .15s ease;
 
   &:hover {
     color: ${v.colors.white};
