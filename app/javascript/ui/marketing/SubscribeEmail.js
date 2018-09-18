@@ -1,5 +1,4 @@
 import styled from 'styled-components'
-import { Flex, Box } from 'reflexbox'
 import v from '~/utils/variables'
 
 const SubscribeInput = styled.input`
@@ -29,7 +28,6 @@ const SubscribeInput = styled.input`
 `
 
 const SubscribeButton = styled.button`
-  align: left;
   font-weight: ${v.weights.medium};
   font-family: ${v.fonts.sans};
   font-size: 14px;
