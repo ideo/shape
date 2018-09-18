@@ -34,7 +34,7 @@ const createCypressTestArea = () => {
 
 before(() => {
   // clean out the DB before running the suite
-  cy.exec('rake cypress:db_setup')
+  cy.exec('bin/rake cypress:db_setup')
   createNamedRoutes()
   createCypressTestArea()
 })

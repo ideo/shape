@@ -1,3 +1,5 @@
+// cypress needs this polyfill
+import 'whatwg-fetch'
 import { config } from 'datx-jsonapi'
 
 import ApiStore from './ApiStore'
