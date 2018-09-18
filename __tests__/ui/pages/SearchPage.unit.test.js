@@ -8,13 +8,13 @@ const query = 'stuff'
 
 beforeEach(() => {
   apiStore = fakeApiStore({
-    requestResult: { data: [], meta: { page: 1 } }
+    requestResult: { data: [], meta: { page: 1 } },
   })
   uiStore = fakeUiStore
   routingStore = fakeRoutingStore
   location = {
     search: `?q=${query}`,
-    pathname: `/${apiStore.currentUserOrganization.slug}/search?q=${query}`
+    pathname: `/${apiStore.currentUserOrganization.slug}/search?q=${query}`,
   }
   match = {
     path: '/search',
@@ -24,9 +24,7 @@ beforeEach(() => {
   }
   props = { apiStore, uiStore, routingStore, location, match }
 
-  wrapper = shallow(
-    <SearchPage.wrappedComponent {...props} />
-  )
+  wrapper = shallow(<SearchPage.wrappedComponent {...props} />)
 })
 
 describe('SearchPage', () => {
@@ -35,7 +33,12 @@ describe('SearchPage', () => {
   })
 
   it('displays the "no results" message by default', () => {
-    expect(wrapper.find('PageContainer').children().at(0).text())
-      .toContain(`No results found for "${query}".`)
+    expect(
+      wrapper
+        .find('PageContainer')
+        .children()
+        .at(0)
+        .text()
+    ).toContain(`No results found for "${query}".`)
   })
 })

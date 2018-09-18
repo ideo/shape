@@ -7,14 +7,19 @@ describe('Comment', () => {
     props = {
       comment: fakeComment,
     }
-    wrapper = shallow(
-      <Comment {...props} />
-    )
+    wrapper = shallow(<Comment {...props} />)
   })
 
   it('renders the author name and avatar', () => {
-    expect(wrapper.find('.author').children().text()).toContain(props.comment.author.name)
-    expect(wrapper.find('Avatar').props().url).toEqual(props.comment.author.pic_url_square)
+    expect(
+      wrapper
+        .find('.author')
+        .children()
+        .text()
+    ).toContain(props.comment.author.name)
+    expect(wrapper.find('Avatar').props().url).toEqual(
+      props.comment.author.pic_url_square
+    )
   })
 
   it('renders the message', () => {
@@ -22,6 +27,8 @@ describe('Comment', () => {
   })
 
   it('renders the timestamp', () => {
-    expect(wrapper.find('Moment').props().date).toEqual(props.comment.updated_at)
+    expect(wrapper.find('Moment').props().date).toEqual(
+      props.comment.updated_at
+    )
   })
 })

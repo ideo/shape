@@ -1,9 +1,6 @@
 import NotificationsContainer from '~/ui/notifications/NotificationsContainer'
 
 import fakeApiStore from '#/mocks/fakeApiStore'
-import {
-  fakeNotification,
-} from '#/mocks/data'
 
 let props
 let wrapper
@@ -14,9 +11,7 @@ describe('NotificationsContainer', () => {
     props = {
       apiStore: fakeApiStore(),
     }
-    wrapper = shallow(
-      <NotificationsContainer.wrappedComponent {...props} />
-    )
+    wrapper = shallow(<NotificationsContainer.wrappedComponent {...props} />)
     component = wrapper.instance()
   })
 
@@ -47,7 +42,7 @@ describe('NotificationsContainer', () => {
         { id: 3, read: true, created_at: new Date() },
       ]
       wrapper.setProps(props)
-      notifications = component.notifications
+      ;({ notifications } = component)
     })
 
     it('should order by read and created at', () => {

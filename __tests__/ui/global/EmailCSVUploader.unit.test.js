@@ -7,9 +7,7 @@ const props = {
 let wrapper, component
 describe('EmailCSVUploader', () => {
   beforeEach(() => {
-    wrapper = shallow(
-      <EmailCSVUploader {...props} />
-    )
+    wrapper = shallow(<EmailCSVUploader {...props} />)
     component = wrapper.instance()
   })
 

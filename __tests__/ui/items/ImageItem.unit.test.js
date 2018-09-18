@@ -1,8 +1,6 @@
 import ImageItem from '~/ui/items/ImageItem'
 
-import {
-  fakeImageItem,
-} from '#/mocks/data'
+import { fakeImageItem } from '#/mocks/data'
 
 const props = {
   item: fakeImageItem,
@@ -12,9 +10,7 @@ const props = {
 let wrapper
 describe('ImageItem', () => {
   beforeEach(() => {
-    wrapper = shallow(
-      <ImageItem {...props} />
-    )
+    wrapper = shallow(<ImageItem {...props} />)
   })
 
   it('renders the StyledImage', () => {
@@ -22,7 +18,9 @@ describe('ImageItem', () => {
   })
 
   it('passes the url and alt text to StyledImage', () => {
-    expect(wrapper.find('StyledImage').props().src).toEqual(fakeImageItem.filestack_file_url)
+    expect(wrapper.find('StyledImage').props().src).toEqual(
+      fakeImageItem.filestack_file_url
+    )
     expect(wrapper.find('StyledImage').props().alt).toEqual(fakeImageItem.name)
   })
 })

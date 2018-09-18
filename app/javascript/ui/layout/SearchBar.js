@@ -7,7 +7,8 @@ import SearchIcon from '~/ui/icons/SearchIcon'
 import CloseIcon from '~/ui/icons/CloseIcon'
 
 const StyledSearchBar = styled.div`
-  border-bottom: 1px solid ${props => (props.focused ? v.colors.blackLava : v.colors.cloudy)};
+  border-bottom: 1px solid
+    ${props => (props.focused ? v.colors.blackLava : v.colors.cloudy)};
   color: ${props => (props.focused ? v.colors.blackLava : v.colors.cloudy)};
   height: 28px;
   margin-right: 16px;
@@ -65,15 +66,17 @@ StyledSearchBar.displayName = 'StyledSearchBar'
 
 @observer
 class SearchBar extends React.Component {
-  @observable focused = false
+  @observable
+  focused = false
 
-  @action updateFocus = (val) => {
+  @action
+  updateFocus = val => {
     this.focused = val
   }
 
   handleFocus = val => () => this.updateFocus(val)
 
-  handleTextChange = (ev) => {
+  handleTextChange = ev => {
     this.props.onChange(ev.target.value)
   }
 
@@ -100,7 +103,9 @@ class SearchBar extends React.Component {
           <SearchIcon />
         </span>
         <input
-          ref={(input) => { this.searchInput = input }}
+          ref={input => {
+            this.searchInput = input
+          }}
           type="text"
           placeholder="search..."
           value={value}
@@ -108,11 +113,11 @@ class SearchBar extends React.Component {
           onBlur={this.handleFocus(false)}
           onChange={this.handleTextChange}
         />
-        {value &&
+        {value && (
           <button onClick={this.clearSearch} className="close">
             <CloseIcon />
           </button>
-        }
+        )}
       </StyledSearchBar>
     )
   }

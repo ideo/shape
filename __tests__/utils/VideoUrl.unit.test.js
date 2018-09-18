@@ -22,27 +22,29 @@ const validVimeoUrls = [
 const invalidVimeoUrls = [
   'https://vimeo.com/channels/staffpicks',
   'https://vimeo.com/groups/12345678',
-  'https://vimeomeomeo.com/131244'
+  'https://vimeomeomeo.com/131244',
 ]
 
 describe('isValid', () => {
   describe('Youtube', () => {
     it('is true for all valid urls', () => {
-      validYoutubeUrls.forEach((url) => expect(VideoUrl.isValid(url)).toBe(true))
+      validYoutubeUrls.forEach(url => expect(VideoUrl.isValid(url)).toBe(true))
     })
 
     it('is false for all invalid urls', () => {
-      invalidYoutubeUrls.forEach((url) => expect(VideoUrl.isValid(url)).toBe(false))
+      invalidYoutubeUrls.forEach(url =>
+        expect(VideoUrl.isValid(url)).toBe(false)
+      )
     })
   })
 
   describe('Vimeo', () => {
     it('is true for all valid urls', () => {
-      validVimeoUrls.forEach((url) => expect(VideoUrl.isValid(url)).toBe(true))
+      validVimeoUrls.forEach(url => expect(VideoUrl.isValid(url)).toBe(true))
     })
 
     it('is false for all invalid urls', () => {
-      invalidVimeoUrls.forEach((url) => expect(VideoUrl.isValid(url)).toBe(false))
+      invalidVimeoUrls.forEach(url => expect(VideoUrl.isValid(url)).toBe(false))
     })
   })
 })

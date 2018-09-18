@@ -1,8 +1,6 @@
 import TagEditorModal from '~/ui/pages/shared/TagEditorModal'
 import fakeUiStore from '#/mocks/fakeUiStore'
-import {
-  fakeCollection
-} from '#/mocks/data'
+import { fakeCollection } from '#/mocks/data'
 
 let wrapper, props, uiStore, record
 describe('TagEditorModal', () => {
@@ -11,9 +9,7 @@ describe('TagEditorModal', () => {
     uiStore = fakeUiStore
     props = { record, uiStore, canEdit: true }
 
-    wrapper = shallow(
-      <TagEditorModal.wrappedComponent {...props} />
-    )
+    wrapper = shallow(<TagEditorModal.wrappedComponent {...props} />)
     wrapper.instance()
   })
 

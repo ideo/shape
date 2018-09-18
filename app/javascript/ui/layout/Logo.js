@@ -8,24 +8,25 @@ const StyledLogo = styled.div`
   /* NOTE: for the few browsers that don't support SVG, fallback to PNG will look bad for width > 83px */
   background-image: url('https://s3-us-west-2.amazonaws.com/assets.shape.space/logo_1x.png');
   background-image: url('https://s3-us-west-2.amazonaws.com/assets.shape.space/logo.svg');
-  ${props => props.height === 83 &&
+  ${props =>
+    props.height === 83 &&
     `background-image: url('https://s3-us-west-2.amazonaws.com/assets.shape.space/logo_1x.png');
     @media
     (-webkit-min-device-pixel-ratio: 2),
     (min-resolution: 192dpi) {
-      background-image: url('https://s3-us-west-2.amazonaws.com/assets.shape.space/logo.svg');`
-}
+      background-image: url('https://s3-us-west-2.amazonaws.com/assets.shape.space/logo.svg');`}
 }
   background-position: center;
   background-repeat: no-repeat;
   background-size: contain;
 `
 
-const Logo = (props) => {
+const Logo = props => {
   const logoProps = { ...props }
   if (!logoProps.height) {
     // allow just width to be set, height will figure out based on aspect ratio
-    logoProps.height = Math.floor(logoProps.width / 1.62)
+    // CAUTION: changing this ratio / height can affect the height of the global header
+    logoProps.height = Math.floor(logoProps.width / 1.6)
   }
   return <StyledLogo {...logoProps} title="Shape" />
 }

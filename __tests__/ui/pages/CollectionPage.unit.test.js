@@ -3,9 +3,7 @@ import ChannelManager from '~/utils/ChannelManager'
 import fakeApiStore from '#/mocks/fakeApiStore'
 import fakeUiStore from '#/mocks/fakeUiStore'
 import fakeRoutingStore from '#/mocks/fakeRoutingStore'
-import {
-  fakeCollection
-} from '#/mocks/data'
+import { fakeCollection } from '#/mocks/data'
 
 jest.mock('../../../app/javascript/utils/ChannelManager')
 jest.mock('../../../app/javascript/stores')
@@ -24,12 +22,16 @@ beforeEach(() => {
   apiStore = fakeApiStore({
     findResult: collection,
     findAllResult: collections,
-    requestResult: { data: collection }
+    requestResult: { data: collection },
   })
   apiStore.collections = collections
   uiStore = fakeUiStore
   routingStore = fakeRoutingStore
-  match = { params: { id, org: apiStore.currentOrgSlug }, path: '/collections/1', url: '/collections/1' }
+  match = {
+    params: { id, org: apiStore.currentOrgSlug },
+    path: '/collections/1',
+    url: '/collections/1',
+  }
   props = {
     apiStore,
     uiStore,
@@ -38,9 +40,7 @@ beforeEach(() => {
     location: { search: '' },
   }
 
-  wrapper = shallow(
-    <CollectionPage.wrappedComponent {...props} />
-  )
+  wrapper = shallow(<CollectionPage.wrappedComponent {...props} />)
 })
 
 describe('CollectionPage', () => {
@@ -60,7 +60,7 @@ describe('CollectionPage', () => {
         match = {
           params: { id: 155 },
           path: '/collections/155',
-          url: '/collections/155'
+          url: '/collections/155',
         }
         wrapper.setProps({ match })
       })
@@ -86,9 +86,7 @@ describe('CollectionPage', () => {
     describe('when the route match.params.org does not match apiStore.currentOrgSlug', () => {
       beforeEach(() => {
         props.match.params.org = 'different-slug'
-        wrapper = shallow(
-          <CollectionPage.wrappedComponent {...props} />
-        )
+        wrapper = shallow(<CollectionPage.wrappedComponent {...props} />)
       })
 
       it('calls routingStore to make sure /:org namespace is in the path', () => {
@@ -101,9 +99,7 @@ describe('CollectionPage', () => {
     describe('when the route does not have match.params.org', () => {
       beforeEach(() => {
         props.match.params.org = null
-        wrapper = shallow(
-          <CollectionPage.wrappedComponent {...props} />
-        )
+        wrapper = shallow(<CollectionPage.wrappedComponent {...props} />)
       })
 
       it('calls routingStore to make sure /:org namespace is in the path', () => {
@@ -165,7 +161,10 @@ describe('CollectionPage', () => {
   describe('with params ?open=comments', () => {
     beforeEach(() => {
       wrapper = shallow(
-        <CollectionPage.wrappedComponent {...props} location={{ search: '?open=comments' }} />
+        <CollectionPage.wrappedComponent
+          {...props}
+          location={{ search: '?open=comments' }}
+        />
       )
     })
 

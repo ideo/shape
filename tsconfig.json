@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "allowJs": false,
+    "allowJs": true,
     "allowSyntheticDefaultImports": true,
     "baseUrl": ".",
     "emitDecoratorMetadata": true,
@@ -30,7 +30,9 @@
       "~stylesheets/*": ["app/assets/stylesheets/*"],
       "~fonts/*": ["app/assets/fonts/*"],
       "~shared/*": ["app/javascript/ui/shared/*"],
-      "~*": ["app/javascript/src/*", "types/*"]
+      "~*": ["app/javascript/src/*", "types/*"],
+      "~/*": ["app/javascript/*"],
+      "#/*": ["__js_test_config/*"]
     }
   },
   "include": [

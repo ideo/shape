@@ -25,7 +25,8 @@ const StyledAvatar = styled(MuiAvatar)`
 
 @observer
 class Avatar extends React.Component {
-  @observable url = null
+  @observable
+  url = null
 
   constructor(props) {
     super(props)
@@ -36,7 +37,8 @@ class Avatar extends React.Component {
     this.setUrl(url)
   }
 
-  @action setUrl(url) {
+  @action
+  setUrl(url) {
     this.url = url
   }
 
@@ -51,7 +53,13 @@ class Avatar extends React.Component {
   }
 
   render() {
-    const { className, displayName, size, title, linkToCollectionId } = this.props
+    const {
+      className,
+      displayName,
+      size,
+      title,
+      linkToCollectionId,
+    } = this.props
     const renderAvatar = (
       <StyledAvatar
         alt={title}
@@ -60,7 +68,7 @@ class Avatar extends React.Component {
         src={this.url}
         imgProps={{ onError: this.onError }}
         onClick={this.handleClick}
-        cursor={(linkToCollectionId || displayName) ? 'pointer' : 'initial'}
+        cursor={linkToCollectionId || displayName ? 'pointer' : 'initial'}
       />
     )
     let content = renderAvatar
@@ -72,7 +80,8 @@ class Avatar extends React.Component {
           placement="bottom"
         >
           {renderAvatar}
-        </Tooltip>)
+        </Tooltip>
+      )
     }
     return content
   }
@@ -87,7 +96,8 @@ Avatar.propTypes = {
   linkToCollectionId: PropTypes.string,
 }
 Avatar.defaultProps = {
-  url: 'https://d3none3dlnlrde.cloudfront.net/assets/users/avatars/missing/square.jpg',
+  url:
+    'https://d3none3dlnlrde.cloudfront.net/assets/users/avatars/missing/square.jpg',
   size: 34,
   className: '',
   title: 'Avatar',

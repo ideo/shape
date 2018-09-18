@@ -14,9 +14,7 @@ describe('RolesAdd', () => {
       onSearch: jest.fn(),
       ownerType: 'collections',
     }
-    wrapper = mount(
-      <RolesAdd {...props} />
-    )
+    wrapper = mount(<RolesAdd {...props} />)
   })
 
   describe('onUserSelected', () => {
@@ -36,7 +34,7 @@ describe('RolesAdd', () => {
           id: 3,
           name: 'Mo',
           email: 'Mo@mo.com',
-          internalType: 'users'
+          internalType: 'users',
         }
         userDataExisting = {
           id: 4,
@@ -60,7 +58,7 @@ describe('RolesAdd', () => {
 
       beforeEach(() => {
         existingUsers = [
-          { name: 'r@r.com', email: 'r@r.com', internalType: 'users' }
+          { name: 'r@r.com', email: 'r@r.com', internalType: 'users' },
         ]
         component.selectedUsers = existingUsers
       })
@@ -81,7 +79,9 @@ describe('RolesAdd', () => {
       })
 
       it('should parse out emails from input', () => {
-        component.onUserSelected({ custom: '<jim> jim@email.com, jane@doe.net' })
+        component.onUserSelected({
+          custom: '<jim> jim@email.com, jane@doe.net',
+        })
         expect(component.selectedUsers.length).toEqual(3)
         expect(component.selectedUsers[1].email).toEqual('jim@email.com')
         expect(component.selectedUsers[2].email).toEqual('jane@doe.net')
@@ -98,24 +98,33 @@ describe('RolesAdd', () => {
     describe('with groups', () => {
       it('should map groups with handle as the value', () => {
         props.searchableItems = [
-          { id: 3, name: 'groupname', handle: 'group-name', internalType: 'groups' }
+          {
+            id: 3,
+            name: 'groupname',
+            handle: 'group-name',
+            internalType: 'groups',
+          },
         ]
         wrapper.setProps(props)
-        expect(wrapper.instance().mapItems()[0]).toEqual(
-          { value: 'group-name', label: 'groupname', data: props.searchableItems[0] }
-        )
+        expect(wrapper.instance().mapItems()[0]).toEqual({
+          value: 'group-name',
+          label: 'groupname',
+          data: props.searchableItems[0],
+        })
       })
     })
 
     describe('with users', () => {
       it('should map users with email as the value', () => {
         props.searchableItems = [
-          { id: 3, name: 'user', email: 'user@u.com', internalType: 'users' }
+          { id: 3, name: 'user', email: 'user@u.com', internalType: 'users' },
         ]
         wrapper.setProps(props)
-        expect(wrapper.instance().mapItems()[0]).toEqual(
-          { value: 'user@u.com', label: 'user', data: props.searchableItems[0] }
-        )
+        expect(wrapper.instance().mapItems()[0]).toEqual({
+          value: 'user@u.com',
+          label: 'user',
+          data: props.searchableItems[0],
+        })
       })
     })
   })
@@ -127,37 +136,35 @@ describe('RolesAdd', () => {
 
     beforeEach(() => {
       component = wrapper.instance()
-      unregisteredUsers = [
-        { email: 'name@name.com' },
-        { email: 'mo@mo.com' }
-      ]
+      unregisteredUsers = [{ email: 'name@name.com' }, { email: 'mo@mo.com' }]
       registeredUsers = [
         { id: 4, email: 'm@ideo.com', name: 'm' },
-        { id: 3, email: 't@ideo.com', name: 't' }
+        { id: 3, email: 't@ideo.com', name: 't' },
       ]
     })
 
     describe('with unregistered users', () => {
       beforeEach(() => {
         component.selectedUsers = unregisteredUsers
-        props.onCreateUsers.mockReturnValue(Promise.resolve(
-          { data: [{ id: 1 }] }
-        ))
+        props.onCreateUsers.mockReturnValue(
+          Promise.resolve({ data: [{ id: 1 }] })
+        )
       })
 
-      it('should send the emails to be created', (done) => {
+      it('should send the emails to be created', done => {
         component.handleSave().then(() => {
           expect(props.onCreateUsers).toHaveBeenCalledWith(
-            unregisteredUsers.map((user) => user.email)
+            unregisteredUsers.map(user => user.email)
           )
           done()
         })
       })
 
-      it('should send the new users to be created with selected role', (done) => {
+      it('should send the new users to be created with selected role', done => {
         component.handleSave().then(() => {
           expect(props.onCreateRoles).toHaveBeenCalledWith(
-            [{ id: 1 }], 'viewer'
+            [{ id: 1 }],
+            'viewer'
           )
           done()
         })
@@ -169,10 +176,11 @@ describe('RolesAdd', () => {
         component.selectedUsers = registeredUsers
       })
 
-      it('should send the new users to be created with selected role', (done) => {
+      it('should send the new users to be created with selected role', done => {
         component.handleSave().then(() => {
           expect(props.onCreateRoles).toHaveBeenCalledWith(
-            registeredUsers, 'viewer'
+            registeredUsers,
+            'viewer'
           )
           done()
         })

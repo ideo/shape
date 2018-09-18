@@ -1,6 +1,6 @@
 export default function trackError(err, opts = {}) {
   if (process.env.NODE_ENV === 'development') {
-    console.error(err)
+    console.error(err) // eslint-disable-line no-console
   }
   trackErrorSpecify(
     opts.source || 'Any',
@@ -21,9 +21,9 @@ export function trackErrorSpecify(source, message, name, backtrace) {
       agent: navigator.userAgent,
       platform: navigator.platform,
       vendor: navigator.vendor,
-    }
+    },
   }
-  console.warn('error tr', data)
+  console.warn('error tr', data) // eslint-disable-line no-console
   if (!process.env.APPSIGNAL_PUSH_API_KEY) return
   const xhr = new window.XMLHttpRequest()
   xhr.open('POST', '/appsignal_error_catcher', true)

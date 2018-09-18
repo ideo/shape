@@ -26,9 +26,7 @@ describe('GridCard', () => {
   describe('with item', () => {
     beforeEach(() => {
       rerender = function() {
-        wrapper = shallow(
-          <GridCard {...props} />
-        )
+        wrapper = shallow(<GridCard {...props} />)
         return wrapper
       }
     })
@@ -40,15 +38,24 @@ describe('GridCard', () => {
       })
 
       it('renders a StyledGridCard with passed in dragging prop', () => {
-        expect(wrapper.find('StyledGridCard').props().dragging).toBe(props.dragging)
+        expect(wrapper.find('StyledGridCard').props().dragging).toBe(
+          props.dragging
+        )
       })
 
       it('renders a StyledGridCardInner with passed in onClick prop', () => {
-        expect(wrapper.find('StyledGridCardInner').props().onClick).toEqual(wrapper.instance().handleClick)
+        expect(wrapper.find('StyledGridCardInner').props().onClick).toEqual(
+          wrapper.instance().handleClick
+        )
       })
 
       it('does not render link icon if card is primary', () => {
-        expect(wrapper.find('StyledGridCard').find('LinkIcon').exists()).toBe(false)
+        expect(
+          wrapper
+            .find('StyledGridCard')
+            .find('LinkIcon')
+            .exists()
+        ).toBe(false)
       })
 
       it('renders menu', () => {
@@ -88,8 +95,18 @@ describe('GridCard', () => {
       })
 
       it('renders hotspot to the left and right', () => {
-        expect(wrapper.find('GridCardHotspot').at(0).props().position).toBe('right')
-        expect(wrapper.find('GridCardHotspot').at(1).props().position).toBe('left')
+        expect(
+          wrapper
+            .find('GridCardHotspot')
+            .at(0)
+            .props().position
+        ).toBe('right')
+        expect(
+          wrapper
+            .find('GridCardHotspot')
+            .at(1)
+            .props().position
+        ).toBe('left')
       })
     })
 
@@ -100,7 +117,12 @@ describe('GridCard', () => {
       })
 
       it('renders the link icon', () => {
-        expect(wrapper.find('StyledGridCard').find('LinkIcon').exists()).toBe(true)
+        expect(
+          wrapper
+            .find('StyledGridCard')
+            .find('LinkIcon')
+            .exists()
+        ).toBe(true)
       })
     })
   })
@@ -117,11 +139,18 @@ describe('GridCard', () => {
       })
 
       it('renders the collection cover', () => {
-        expect(wrapper.find('CollectionCover').props().collection).toEqual(fakeCollection)
+        expect(wrapper.find('CollectionCover').props().collection).toEqual(
+          fakeCollection
+        )
       })
 
       it('renders the collection icon', () => {
-        expect(wrapper.find('StyledGridCard').find('CollectionIcon').exists()).toBe(true)
+        expect(
+          wrapper
+            .find('StyledGridCard')
+            .find('CollectionIcon')
+            .exists()
+        ).toBe(true)
       })
 
       it('renders menu and selection circle', () => {
@@ -185,7 +214,12 @@ describe('GridCard', () => {
       })
 
       it('has linked collection icon', () => {
-        expect(wrapper.find('StyledGridCard').find('LinkedCollectionIcon').exists()).toBe(true)
+        expect(
+          wrapper
+            .find('StyledGridCard')
+            .find('LinkedCollectionIcon')
+            .exists()
+        ).toBe(true)
       })
     })
 

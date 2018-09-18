@@ -4,24 +4,14 @@ import { Box } from 'reflexbox'
 import Tooltip from '~/ui/global/Tooltip'
 import { BctButton } from '~/ui/grid/shared'
 
-const BctButtonBox = ({
-  type,
-  tooltip,
-  size,
-  creating,
-  onClick,
-  Icon,
-}) => (
+const BctButtonBox = ({ type, tooltip, size, creating, onClick, Icon }) => (
   <Box>
     <Tooltip
       classes={{ tooltip: 'Tooltip' }}
       title={tooltip}
       placement="bottom"
     >
-      <BctButton
-        creating={creating === type}
-        onClick={onClick}
-      >
+      <BctButton creating={creating === type} onClick={onClick}>
         <Icon width={size} height={size} color="white" />
       </BctButton>
     </Tooltip>

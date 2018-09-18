@@ -6,6 +6,13 @@ describe User, type: :model do
   context 'associations' do
     it { should belong_to :current_organization }
     it { should belong_to :current_user_collection }
+    it { should have_many :collections }
+    it { should have_many :groups }
+    it { should have_many :current_org_groups }
+    it { should have_many :organizations }
+    it { should have_many :comments }
+    it { should have_many :activities_as_actor }
+    it { should have_many :notifications }
   end
 
   context 'validations' do

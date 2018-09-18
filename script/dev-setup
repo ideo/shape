@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+
+set -e
+
+cd "$(dirname "$0")/.."
+DIR=$(pwd)
+
+GIT_DIR=$(git rev-parse --git-dir)
+HOOK="$GIT_DIR/hooks/pre-commit"
+
+if [ ! -f "$HOOK" ]; then
+  $DIR/script/add-pre-commit-hook.sh
+fi
+
+if [ ! -f "$DIR/.env" ]; then
+  echo "Missing env file $DIR/.env !"
+  exit 1
+fi
+
+yarn install
+
+bundle install
+
+bin/rails db:migrate

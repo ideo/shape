@@ -9,19 +9,19 @@ class RoutingStore extends RouterStore {
 
   pathTo = (type, id = null) => {
     switch (type) {
-    case 'collections':
-      return `/${this.slug()}/collections/${id}`
-    case 'items':
-      return `/${this.slug()}/items/${id}`
-    case 'search':
-      // `id` means query in this case
-      // if no query, then go back to homepage (e.g. clearing out your search)
-      if (!id) return this.pathTo('homepage')
-      return `/${this.slug()}/search?q=${id.replace(/\s/g, '+')}`
-    case 'homepage':
-      return `/${this.slug()}`
-    default:
-      return ''
+      case 'collections':
+        return `/${this.slug()}/collections/${id}`
+      case 'items':
+        return `/${this.slug()}/items/${id}`
+      case 'search':
+        // `id` means query in this case
+        // if no query, then go back to homepage (e.g. clearing out your search)
+        if (!id) return this.pathTo('homepage')
+        return `/${this.slug()}/search?q=${id.replace(/\s/g, '+')}`
+      case 'homepage':
+        return `/${this.slug()}`
+      default:
+        return ''
     }
   }
 
@@ -39,9 +39,7 @@ class RoutingStore extends RouterStore {
     this.push(path)
   }
 
-  pathContains = (str) => (
-    this.location.pathname.indexOf(str) > -1
-  )
+  pathContains = str => this.location.pathname.indexOf(str) > -1
 
   updatePreviousPageBeforeSearch(page) {
     if (page.pathname.indexOf('/search') === -1) {

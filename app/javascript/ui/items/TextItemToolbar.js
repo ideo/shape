@@ -26,9 +26,9 @@ const IconButton = styled(StyledButton)`
   width: 25px !important;
 `
 
-function styles(props) {
+function styles(fullPageView) {
   const allStyles = []
-  if (!props.fullPageView) {
+  if (!fullPageView) {
     allStyles.top = '0'
     allStyles.background = 'white'
     allStyles.paddingTop = '5px'
@@ -40,14 +40,19 @@ function styles(props) {
   return allStyles
 }
 
-const TextItemToolbar = (props) => (
-  <div id="quill-toolbar" style={styles(props)}>
+const TextItemToolbar = props => (
+  <div id="quill-toolbar" style={styles(props.fullPageView)}>
     <span className="ql-formats">
-      <StyledButton className="ql-header ql-format-reg" value="">T</StyledButton>
+      <StyledButton className="ql-header ql-format-reg" value="">
+        T
+      </StyledButton>
       {/* when using H2, quill inserts its own SVG -- couldn't figure out a way around */}
-      <StyledButton className="ql-header ql-format-large" value="3">T</StyledButton>
+      <StyledButton className="ql-header ql-format-large" value="3">
+        T
+      </StyledButton>
       <StyledButton className="ql-header ql-format-huge" value="1">
-        T</StyledButton>
+        T
+      </StyledButton>
       {/* quill inserts ql-link SVG */}
       <StyledButton className="ql-link" />
       {props.onExpand && (

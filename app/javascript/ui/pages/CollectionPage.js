@@ -21,13 +21,15 @@ import SubmissionBoxSettingsModal from '~/ui/submission_box/SubmissionBoxSetting
 import EditorPill from '~/ui/items/EditorPill'
 import v from '~/utils/variables'
 
-const isHomepage = ({ params }) => (params.org && !params.id)
+const isHomepage = ({ params }) => params.org && !params.id
 
 @inject('apiStore', 'uiStore', 'routingStore')
 @observer
 class CollectionPage extends PageWithApi {
-  @observable loadingSubmissions = false
-  @observable currentEditor = {}
+  @observable
+  loadingSubmissions = false
+  @observable
+  currentEditor = {}
 
   editorTimeout = null
   channelName = 'CollectionViewingChannel'
@@ -60,13 +62,13 @@ class CollectionPage extends PageWithApi {
   }
 
   subscribeToChannel(id) {
-    ChannelManager.subscribe(this.channelName, id,
-      {
-        channelReceivedData: this.receivedChannelData,
-      })
+    ChannelManager.subscribe(this.channelName, id, {
+      channelReceivedData: this.receivedChannelData,
+    })
   }
 
-  @action setEditor = (editor) => {
+  @action
+  setEditor = editor => {
     this.currentEditor = editor
     if (this.editorTimeout) clearTimeout(this.editorTimeout)
     // this.unmounted comes from PageWithApi
@@ -74,7 +76,7 @@ class CollectionPage extends PageWithApi {
     this.editorTimeout = setTimeout(() => this.setEditor({}), 4000)
   }
 
-  receivedChannelData = async (data) => {
+  receivedChannelData = async data => {
     const { apiStore } = this.props
     const { collection } = this
     const currentId = collection.id
@@ -82,7 +84,10 @@ class CollectionPage extends PageWithApi {
     const submissionsId = submissions ? submissions.id : ''
     if (_.compact([currentId, submissionsId]).indexOf(data.record_id) > -1) {
       this.setEditor(data.current_editor)
-      if (_.isEmpty(data.current_editor) || data.current_editor.id === apiStore.currentUserId) {
+      if (
+        _.isEmpty(data.current_editor) ||
+        data.current_editor.id === apiStore.currentUserId
+      ) {
         // don't reload your own updates
         return
       }
@@ -95,13 +100,18 @@ class CollectionPage extends PageWithApi {
     await apiStore.fetch('collections', this.collection.id, true)
     if (this.collection.submissions_collection) {
       this.setLoadedSubmissions(true)
-      await apiStore.fetch('collections', this.collection.submissions_collection.id, true)
+      await apiStore.fetch(
+        'collections',
+        this.collection.submissions_collection.id,
+        true
+      )
       apiStore.request(this.requestPath(this.props))
       this.setLoadedSubmissions(false)
     }
   }
 
-  @action setLoadedSubmissions = val => {
+  @action
+  setLoadedSubmissions = val => {
     const { uiStore } = this.props
     if (!this.collection) return
     const { submissions_collection } = this.collection
@@ -120,18 +130,24 @@ class CollectionPage extends PageWithApi {
   get collection() {
     const { match, apiStore } = this.props
     if (this.isHomepage) {
-      return apiStore.find('collections', apiStore.currentUser.current_user_collection_id)
+      return apiStore.find(
+        'collections',
+        apiStore.currentUser.current_user_collection_id
+      )
     }
     return apiStore.find('collections', match.params.id)
   }
 
   get roles() {
     const { apiStore, match } = this.props
-    return apiStore.findAll('roles').filter((role) =>
-      role.resource && role.resource.id === parseInt(match.params.id))
+    return apiStore
+      .findAll('roles')
+      .filter(
+        role => role.resource && role.resource.id === parseInt(match.params.id)
+      )
   }
 
-  requestPath = (props) => {
+  requestPath = props => {
     const { match, apiStore } = props
     if (isHomepage(match)) {
       return `collections/${apiStore.currentUser.current_user_collection_id}`
@@ -139,7 +155,7 @@ class CollectionPage extends PageWithApi {
     return `collections/${match.params.id}`
   }
 
-  onAPILoad = async (response) => {
+  onAPILoad = async response => {
     this.updateError(null)
     const collection = response.data
     const { apiStore, uiStore, routingStore, location } = this.props
@@ -165,7 +181,11 @@ class CollectionPage extends PageWithApi {
       }
       if (collection.isSubmissionBox && collection.submissions_collection) {
         this.setLoadedSubmissions(false)
-        await apiStore.fetch('collections', collection.submissions_collection.id, true)
+        await apiStore.fetch(
+          'collections',
+          collection.submissions_collection.id,
+          true
+        )
         this.setLoadedSubmissions(true)
         // Also subscribe to updates for the submission boxes
         this.subscribeToChannel(collection.submissions_collection.id)
@@ -175,7 +195,7 @@ class CollectionPage extends PageWithApi {
     }
   }
 
-  onAddSubmission = (ev) => {
+  onAddSubmission = ev => {
     ev.preventDefault()
     const { id } = this.collection.submissions_collection
     const submissionSettings = {
@@ -193,7 +213,7 @@ class CollectionPage extends PageWithApi {
     uiStore.trackEvent('update', this.collection)
   }
 
-  updateCollectionName = (name) => {
+  updateCollectionName = name => {
     this.collection.name = name
     this.collection.save()
     const { uiStore } = this.props
@@ -205,16 +225,15 @@ class CollectionPage extends PageWithApi {
     const { submissionTypeName, submissions_collection } = collection
     if (!submissions_collection) return ''
     return (
-      <PageSeparator title={(
-        <h3>
-          {submissions_collection.collection_cards.length}
-          {' '}
-          {submissions_collection.collection_cards.length === 1
-            ? submissionTypeName
-            : pluralize(submissionTypeName)
-          }
-        </h3>
-      )}
+      <PageSeparator
+        title={
+          <h3>
+            {submissions_collection.collection_cards.length}{' '}
+            {submissions_collection.collection_cards.length === 1
+              ? submissionTypeName
+              : pluralize(submissionTypeName)}
+          </h3>
+        }
       />
     )
   }
@@ -223,14 +242,17 @@ class CollectionPage extends PageWithApi {
     const { currentEditor } = this
     const { currentUserId } = this.props.apiStore
     let hidden = ''
-    if (_.isEmpty(currentEditor) || currentEditor.id === currentUserId) hidden = 'hidden'
+    if (_.isEmpty(currentEditor) || currentEditor.id === currentUserId)
+      hidden = 'hidden'
     return (
       <EditorPill className={`editor-pill ${hidden}`} editor={currentEditor} />
     )
   }
 
   loader = () => (
-    <div style={{ marginTop: v.headerHeight }}><Loader /></div>
+    <div style={{ marginTop: v.headerHeight }}>
+      <Loader />
+    </div>
   )
 
   render() {
@@ -265,13 +287,10 @@ class CollectionPage extends PageWithApi {
 
     return (
       <Fragment>
-        <PageHeader
-          record={collection}
-          isHomepage={this.isHomepage}
-        />
-        { !isLoading &&
+        <PageHeader record={collection} isHomepage={this.isHomepage} />
+        {!isLoading && (
           <PageContainer>
-            { this.renderEditorPill }
+            {this.renderEditorPill}
             <CollectionGrid
               // pull in cols, gridW, gridH, gutter
               {...gridSettings}
@@ -290,17 +309,17 @@ class CollectionPage extends PageWithApi {
               // don't add the extra row for submission box
               addEmptyCard={!isSubmissionBox}
             />
-            {(collection.requiresSubmissionBoxSettings || submissionBoxSettingsOpen) &&
-              <SubmissionBoxSettingsModal
-                collection={collection}
-              />
-            }
+            {(collection.requiresSubmissionBoxSettings ||
+              submissionBoxSettingsOpen) && (
+              <SubmissionBoxSettingsModal collection={collection} />
+            )}
             <MoveModal />
-            { isSubmissionBox && collection.submission_box_type && (
-              <div>
-                { !loadedSubmissions
-                  ? <Loader />
-                  : (
+            {isSubmissionBox &&
+              collection.submission_box_type && (
+                <div>
+                  {!loadedSubmissions ? (
+                    <Loader />
+                  ) : (
                     <div>
                       {this.submissionsPageSeparator}
                       <CollectionGrid
@@ -322,18 +341,16 @@ class CollectionPage extends PageWithApi {
                       />
                     </div>
                   )}
-                <FloatingActionButton
-                  toolTip={`Add ${submissionTypeName}`}
-                  onClick={this.onAddSubmission}
-                  icon={<PlusIcon />}
-                />
-              </div>
-            )}
+                  <FloatingActionButton
+                    toolTip={`Add ${submissionTypeName}`}
+                    onClick={this.onAddSubmission}
+                    icon={<PlusIcon />}
+                  />
+                </div>
+              )}
           </PageContainer>
-        }
-        { isLoading &&
-          this.loader()
-        }
+        )}
+        {isLoading && this.loader()}
       </Fragment>
     )
   }

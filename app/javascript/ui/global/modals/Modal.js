@@ -81,10 +81,13 @@ export function disableOverflowScroll(node) {
 }
 
 Fade.defaultProps = { ...Fade.defaultProps, onEnter: disableOverflowScroll }
-Dialog.defaultProps = { ...Dialog.defaultProps, onEntered: disableOverflowScroll }
+Dialog.defaultProps = {
+  ...Dialog.defaultProps,
+  onEntered: disableOverflowScroll,
+}
 
 class Modal extends React.Component {
-  handleClose = (ev) => {
+  handleClose = ev => {
     ev.preventDefault()
     const { onClose } = this.props
     if (onClose) onClose()
@@ -97,7 +100,7 @@ class Modal extends React.Component {
       onClose,
       open,
       title,
-      disableBackdropClick
+      disableBackdropClick,
     } = this.props
     let wrappedTitle = title
     if (typeof title === 'string') {
@@ -115,15 +118,17 @@ class Modal extends React.Component {
         BackdropProps={{ invisible: true }}
       >
         {/* onBack is an optional button */}
-        { _.isFunction(onBack) &&
-          <BackIconHolder onClick={onBack}><ArrowIcon /></BackIconHolder>
-        }
+        {_.isFunction(onBack) && (
+          <BackIconHolder onClick={onBack}>
+            <ArrowIcon />
+          </BackIconHolder>
+        )}
         {/* if onClose is not supplied, then the modal is "locked" until user takes an action */}
-        { _.isFunction(onClose) &&
+        {_.isFunction(onClose) && (
           <ModalCloseButton onClick={this.handleClose}>
             <CloseIcon />
           </ModalCloseButton>
-        }
+        )}
         {/*
           NOTE: DialogTitle / DialogContent need to be direct children of Dialog
           for built-in scrolling to work (where title remains fixed at top)
@@ -135,10 +140,8 @@ class Modal extends React.Component {
         >
           {wrappedTitle}
         </StyledDialogTitle>
-        <DialogContent
-          classes={{ root: 'modal__padding' }}
-        >
-          { children }
+        <DialogContent classes={{ root: 'modal__padding' }}>
+          {children}
         </DialogContent>
       </StyledDialog>
     )

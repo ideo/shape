@@ -3,7 +3,7 @@ import { Switch, Route, Redirect, withRouter } from 'react-router-dom'
 import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles'
 import WindowSizeListener from 'react-window-size-listener'
 import styled from 'styled-components'
-import {pxToRem} from '~shared/styles/utils'
+import { pxToRem } from '~shared/styles/utils'
 
 import ActivityLogBox from '~/ui/activity_log/ActivityLogBox'
 import DialogWrapper from '~/ui/global/modals/DialogWrapper'
@@ -27,9 +27,11 @@ import firebaseClient from '~/vendor/firestore'
 
 const AppWrapper = styled.div`
   /* used by terms of use modal to blur the whole site */
-  ${props => props.blur && `
+  ${props =>
+    props.blur &&
+    `
     filter: blur(10px);
-  `}
+  `};
 `
 AppWrapper.displayName = 'AppWrapper'
 
@@ -68,7 +70,7 @@ class Routes extends React.Component {
       secondary: {
         main: v.colors.pacificBlue,
       },
-    }
+    },
   })
 
   componentDidMount() {
@@ -92,9 +94,9 @@ class Routes extends React.Component {
     if (!apiStore.currentUser) {
       return <Loader />
     }
-    const displayTermsPopup = (
-      !apiStore.currentUser.terms_accepted && !routingStore.pathContains('/terms')
-    )
+    const displayTermsPopup =
+      !apiStore.currentUser.terms_accepted &&
+      !routingStore.pathContains('/terms')
 
     return (
       <AppWrapper blur={displayTermsPopup} id="AppWrapper">
@@ -109,9 +111,9 @@ class Routes extends React.Component {
             <FixedActivityLogWrapper>
               <ActivityLogBox />
             </FixedActivityLogWrapper>
-            {displayTermsPopup &&
+            {displayTermsPopup && (
               <TermsOfUseModal currentUser={apiStore.currentUser} />
-            }
+            )}
             {/* Switch will stop when it finds the first matching path */}
             <Switch>
               <Route exact path="/" component={HomePage} />
@@ -128,15 +130,27 @@ class Routes extends React.Component {
               <Route path="/print/invoices/:id" component={BillingStatement} />
               <Route
                 path="/settings"
-                render={() => <SettingsPage><OrganizationSettings /></SettingsPage>}
+                render={() => (
+                  <SettingsPage>
+                    <OrganizationSettings />
+                  </SettingsPage>
+                )}
               />
               <Route
                 path="/user_settings"
-                render={() => <SettingsPage><UserSettings /></SettingsPage>}
+                render={() => (
+                  <SettingsPage>
+                    <UserSettings />
+                  </SettingsPage>
+                )}
               />
               {/* catch routes that we don't understand */}
               {/* TODO: refactor PageError to be a more standalone 404 page */}
-              <Route exact path="/:org/:not_found" render={() => (<Redirect to="/" />)} />
+              <Route
+                exact
+                path="/:org/:not_found"
+                render={() => <Redirect to="/" />}
+              />
               {/* have to put this last to catch all org slugs */}
               <Route exact path="/:org" component={CollectionPage} />
             </Switch>

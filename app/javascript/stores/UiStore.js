@@ -16,21 +16,30 @@ export default class UiStore {
     collectionId: null,
     blankType: null,
   }
-  @observable blankContentToolState = { ...this.defaultBCTState }
-  @observable openCardMenuId = false
-  @observable organizationMenuPage = null
-  @observable organizationMenuGroupId = null
-  @observable rolesMenuOpen = null
-  @observable isTouchDevice = (
+  @observable
+  blankContentToolState = { ...this.defaultBCTState }
+  @observable
+  openCardMenuId = false
+  @observable
+  organizationMenuPage = null
+  @observable
+  organizationMenuGroupId = null
+  @observable
+  rolesMenuOpen = null
+  @observable
+  isTouchDevice =
     // https://hacks.mozilla.org/2013/04/detecting-touch-its-the-why-not-the-how/
-    ('ontouchstart' in window) ||
-     (navigator.maxTouchPoints > 0) ||
-     (navigator.msMaxTouchPoints > 0)
-  )
-  @observable pageMenuOpen = false
-  @observable tagsModalOpenId = null
-  @observable submissionBoxSettingsOpen = null
-  @observable loadedSubmissions = false
+    'ontouchstart' in window ||
+    navigator.maxTouchPoints > 0 ||
+    navigator.msMaxTouchPoints > 0
+  @observable
+  pageMenuOpen = false
+  @observable
+  tagsModalOpenId = null
+  @observable
+  submissionBoxSettingsOpen = null
+  @observable
+  loadedSubmissions = false
   defaultGridSettings = {
     // layout will track we are at "size 3" i.e. "small 4 cols" even though cols === 4
     layoutSize: 4,
@@ -44,15 +53,24 @@ export default class UiStore {
     gridW: 250,
     gridH: 200,
   }
-  @observable gridSettings = { ...this.defaultGridSettings }
-  @observable viewingCollection = null
-  @observable viewingItem = null
-  @observable selectedCardIds = []
-  @observable isLoading = false
-  @observable movingCardIds = []
-  @observable movingFromCollectionId = null
-  @observable cardAction = 'move'
-  @observable templateName = ''
+  @observable
+  gridSettings = { ...this.defaultGridSettings }
+  @observable
+  viewingCollection = null
+  @observable
+  viewingItem = null
+  @observable
+  selectedCardIds = []
+  @observable
+  isLoading = false
+  @observable
+  movingCardIds = []
+  @observable
+  movingFromCollectionId = null
+  @observable
+  cardAction = 'move'
+  @observable
+  templateName = ''
   defaultDialogProps = {
     open: null, // track whether "info" or "confirm" dialog are open, or none
     prompt: null,
@@ -64,39 +82,57 @@ export default class UiStore {
     fadeOutTime: undefined,
     onClose: () => this.closeDialog(),
   }
-  @observable dialogConfig = { ...this.defaultDialogProps }
-  @observable blurContent = false
-  @observable orgCreated = false
-  @observable searchText = ''
-  @observable activityLogOpen = false
-  @observable activityLogForceWidth = null
-  @observable activityLogPosition = { x: 0, y: 0, w: 1, h: 1 }
-  @observable activityLogPage = 'comments'
-  @observable windowWidth = 0
+  @observable
+  dialogConfig = { ...this.defaultDialogProps }
+  @observable
+  blurContent = false
+  @observable
+  orgCreated = false
+  @observable
+  searchText = ''
+  @observable
+  activityLogOpen = false
+  @observable
+  activityLogForceWidth = null
+  @observable
+  activityLogPosition = { x: 0, y: 0, w: 1, h: 1 }
+  @observable
+  activityLogPage = 'comments'
+  @observable
+  windowWidth = 0
 
   // Comments + Threads
-  @observable commentsOpen = false
+  @observable
+  commentsOpen = false
   // marked by thread.key (so it works for new records as well)
-  @observable expandedThreadKey = null
-  @observable editingName = false
-  @observable trackedRecords = new Map()
-  @observable dragging = false
-  @observable textEditingItem = null
+  @observable
+  expandedThreadKey = null
+  @observable
+  editingName = false
+  @observable
+  trackedRecords = new Map()
+  @observable
+  dragging = false
+  @observable
+  textEditingItem = null
 
-  @action startDragging() {
+  @action
+  startDragging() {
     this.dragging = true
   }
 
-  @action stopDragging() {
+  @action
+  stopDragging() {
     this.dragging = false
   }
 
-  @action popupAlert(props = {}) {
+  @action
+  popupAlert(props = {}) {
     _.assign(this.dialogConfig, {
       ...this.defaultDialogProps,
       iconName: 'Alert',
       open: 'info',
-      ...props
+      ...props,
     })
   }
 
@@ -119,28 +155,33 @@ export default class UiStore {
     this.alert('There was an error performing this action.')
   }
 
-  @action confirm(props = {}) {
+  @action
+  confirm(props = {}) {
     _.assign(this.dialogConfig, {
       ...this.defaultDialogProps,
       open: 'confirm',
-      ...props
+      ...props,
     })
   }
 
-  @action closeDialog() {
+  @action
+  closeDialog() {
     this.dialogConfig.open = null
   }
 
   // default action for updating any basic UiStore value
-  @action update(name, value) {
+  @action
+  update(name, value) {
     this[name] = value
   }
 
-  @action closeRolesMenu() {
+  @action
+  closeRolesMenu() {
     this.rolesMenuOpen = null
   }
 
-  @action openMoveMenu({ from: fromCollectionId, cardAction }) {
+  @action
+  openMoveMenu({ from: fromCollectionId, cardAction }) {
     this.pageMenuOpen = false
     this.openCardMenuId = false
     // On move, copy over selected cards to moving cards
@@ -159,39 +200,46 @@ export default class UiStore {
     }
   }
 
-  @action closeMoveMenu({ deselect = true } = {}) {
+  @action
+  closeMoveMenu({ deselect = true } = {}) {
     this.templateName = ''
     this.movingCardIds.replace([])
     this.movingFromCollectionId = null
     if (deselect) this.deselectCards()
   }
 
-  @computed get isMovingCards() {
+  @computed
+  get isMovingCards() {
     return this.movingCardIds.length && this.cardAction === 'move'
   }
 
   // NOTE: because we aren't tracking a difference between "closed" and null,
   // OrgMenu will always default back to "People & Groups" while in the process of closing/fading
-  @computed get organizationMenuOpen() {
+  @computed
+  get organizationMenuOpen() {
     return !!this.organizationMenuPage
   }
 
-  @action openOrgCreateModal() {
+  @action
+  openOrgCreateModal() {
     this.organizationMenuPage = 'newOrganization'
   }
 
-  @action openGroup(groupId) {
+  @action
+  openGroup(groupId) {
     this.organizationMenuPage = 'editRoles'
     this.organizationMenuGroupId = groupId
   }
 
   // --- grid properties
-  @computed get gridMaxW() {
+  @computed
+  get gridMaxW() {
     const grid = this.gridSettings
-    return (grid.gridW * grid.cols) + (grid.gutter * (grid.cols - 1))
+    return grid.gridW * grid.cols + grid.gutter * (grid.cols - 1)
   }
 
-  @action updateActivityLogWidth(width) {
+  @action
+  updateActivityLogWidth(width) {
     if (width <= v.responsive.smallBreakpoint) {
       this.activityLogForceWidth = width
     } else {
@@ -203,19 +251,22 @@ export default class UiStore {
     let cols = virtualCols
     let { gridW, gutter } = this.defaultGridSettings
     if (virtualCols === 3) {
-      ({ gridW, gutter } = this.smallGridSettings)
+      ;({ gridW, gutter } = this.smallGridSettings)
       // the "3 col" layout is used as a breakpoint, however it actually renders with 4 cols
       cols = 4
     }
-    return (gridW * cols) + (gutter * (cols - 1))
+    return gridW * cols + gutter * (cols - 1)
   }
 
   gridHeightFor(cols, { useDefault = false } = {}) {
-    const { gridH, gutter } = useDefault ? this.defaultGridSettings : this.gridSettings
-    return (gridH * cols) + gutter
+    const { gridH, gutter } = useDefault
+      ? this.defaultGridSettings
+      : this.gridSettings
+    return gridH * cols + gutter
   }
 
-  @action updateColumnsToFit(windowWidth) {
+  @action
+  updateColumnsToFit(windowWidth) {
     let cols = null
     // shortcut for 4,3,2,1
     _.each(_.range(4, 0), numCols => {
@@ -247,7 +298,8 @@ export default class UiStore {
   // --- grid properties />
 
   // --- BCT + GridCard properties
-  @action openBlankContentTool(options = {}) {
+  @action
+  openBlankContentTool(options = {}) {
     const { viewingCollection } = this
     this.deselectCards()
     this.openCardMenuId = false
@@ -262,16 +314,19 @@ export default class UiStore {
     }
   }
 
-  @computed get blankContentToolIsOpen() {
+  @computed
+  get blankContentToolIsOpen() {
     return this.blankContentToolState.order !== null
   }
 
-  @action resetSelectionAndBCT() {
+  @action
+  resetSelectionAndBCT() {
     this.deselectCards()
     this.closeBlankContentTool()
   }
 
-  @action closeBlankContentTool() {
+  @action
+  closeBlankContentTool() {
     const { viewingCollection } = this
     if (viewingCollection && viewingCollection.isEmpty) {
       // shouldn't be allowed to close BCT on empty collection, send back to default
@@ -282,13 +337,15 @@ export default class UiStore {
     }
   }
 
-  @action setViewingCollection(collection = null) {
+  @action
+  setViewingCollection(collection = null) {
     // called when loading a new CollectionPage
     this.viewingCollection = collection
     this.deselectCards()
   }
 
-  @action setViewingItem(item = null) {
+  @action
+  setViewingItem(item = null) {
     this.viewingItem = item
   }
 
@@ -297,7 +354,8 @@ export default class UiStore {
     return this.viewingCollection || this.viewingItem
   }
 
-  @action toggleSelectedCardId(cardId) {
+  @action
+  toggleSelectedCardId(cardId) {
     if (this.isSelected(cardId)) {
       this.selectedCardIds.remove(cardId)
     } else {
@@ -306,45 +364,51 @@ export default class UiStore {
   }
 
   // For certain actions we want to force a toggle on
-  @action selectCardId(cardId) {
+  @action
+  selectCardId(cardId) {
     if (!this.isSelected(cardId)) {
       this.selectedCardIds.push(cardId)
     }
   }
 
-  @action reselectCardIds(cardIds) {
+  @action
+  reselectCardIds(cardIds) {
     this.selectedCardIds.replace(cardIds)
   }
 
-  @computed get collectionCardIds() {
+  @computed
+  get collectionCardIds() {
     return this.viewingCollection.cardIds
   }
 
-  @action deselectCards() {
+  @action
+  deselectCards() {
     this.selectedCardIds.replace([])
   }
 
-  @action openOptionalMenus(params) {
+  @action
+  openOptionalMenus(params) {
     const opts = queryString.parse(params)
     if (opts) {
       switch (opts.open) {
-      case 'comments':
-        this.activityLogPage = 'comments'
-        this.activityLogOpen = true
-        break
-      case 'notifications':
-        this.activityLogPage = 'notifications'
-        this.activityLogOpen = true
-        break
-      default:
-        break
+        case 'comments':
+          this.activityLogPage = 'comments'
+          this.activityLogOpen = true
+          break
+        case 'notifications':
+          this.activityLogPage = 'notifications'
+          this.activityLogOpen = true
+          break
+        default:
+          break
       }
     }
     return opts.open
   }
 
   // TODO: add a unit test for this
-  @action selectCardsUpTo(cardId) {
+  @action
+  selectCardsUpTo(cardId) {
     const selected = [...this.selectedCardIds]
     const cardIds = [...this.collectionCardIds]
     const lastSelected = _.last(selected)
@@ -352,7 +416,9 @@ export default class UiStore {
     let between = []
     if (lastSelected) {
       if (lastSelected === cardId) return
-      const lastIdx = this.collectionCardIds.findIndex(id => id === lastSelected)
+      const lastIdx = this.collectionCardIds.findIndex(
+        id => id === lastSelected
+      )
       const thisIdx = this.collectionCardIds.findIndex(id => id === cardId)
       if (lastIdx > thisIdx) {
         between = cardIds.slice(thisIdx, lastIdx)
@@ -377,7 +443,8 @@ export default class UiStore {
   }
   // --- BCT + GridCard properties />
 
-  @action expandThread(key, { reset = false } = {}) {
+  @action
+  expandThread(key, { reset = false } = {}) {
     // reset it first, that way if it's expanded offscreen, it will get re-opened/scrolled to
     if (reset) this.expandedThreadKey = null
     this.expandedThreadKey = key
@@ -391,13 +458,17 @@ export default class UiStore {
     }
   }
 
-  @action trackRecord(identifier) {
+  @action
+  trackRecord(identifier) {
     const TIMEOUT = 15 * 1000 * 50
     if (this.trackedRecords.has(identifier)) {
       clearTimeout(this.trackedRecords.get(identifier))
     }
-    this.trackedRecords.set(identifier, setTimeout(() => {
-      this.trackedRecords[identifier] = null
-    }, TIMEOUT))
+    this.trackedRecords.set(
+      identifier,
+      setTimeout(() => {
+        this.trackedRecords[identifier] = null
+      }, TIMEOUT)
+    )
   }
 }

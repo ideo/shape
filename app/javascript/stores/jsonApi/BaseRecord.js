@@ -14,7 +14,8 @@ class BaseRecord extends jsonapi(Model) {
     }
   }
 
-  @computed get id() {
+  @computed
+  get id() {
     return this.meta.id
   }
 
