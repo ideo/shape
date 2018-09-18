@@ -27,6 +27,7 @@ const Title = styled(MarketingH1Bold)`
   text-align: left;
   word-wrap:break-word;
   line-height: 30px;
+  margin-bottom: 10px;
 
   @media only screen and (min-width: ${v.responsive.smallBreakpoint}px) {
     line-height: 40px;
