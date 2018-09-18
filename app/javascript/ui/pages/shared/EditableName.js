@@ -44,7 +44,8 @@ StyledEditableName.displayName = 'StyledEditableName'
 @inject('uiStore')
 @observer
 class EditableName extends React.Component {
-  @observable name = ''
+  @observable
+  name = ''
 
   constructor(props) {
     super(props)
@@ -63,28 +64,31 @@ class EditableName extends React.Component {
     uiStore.update('editingName', false)
   }
 
-  onNameFieldKeypress = (e) => {
+  onNameFieldKeypress = e => {
     if (e.key === 'Enter') {
       this.stopEditingName()
     }
   }
 
-  @action setName(name) {
+  @action
+  setName(name) {
     this.name = name
   }
 
-  onNameChange = (e) => {
+  onNameChange = e => {
     this.setName(e.target.value)
     this.saveName()
   }
 
-  @action startEditingName = (e) => {
+  @action
+  startEditingName = e => {
     e.stopPropagation()
     const { uiStore } = this.props
     uiStore.update('editingName', true)
   }
 
-  @action stopEditingName = () => {
+  @action
+  stopEditingName = () => {
     // Ensure that save is called if user presses enter
     this.saveName.flush()
     const { uiStore } = this.props
@@ -100,8 +104,10 @@ class EditableName extends React.Component {
     if (!this.name) return ''
     const screenWidth = Math.min(uiStore.windowWidth, v.maxWidth)
     // Estimation of width based on current font size
-    const fontSizeMultiplier = screenWidth > v.responsive.smallBreakpoint ? 25 : 10
-    let marginRightPadding = screenWidth > v.responsive.medBreakpoint ? 500 : 250
+    const fontSizeMultiplier =
+      screenWidth > v.responsive.smallBreakpoint ? 25 : 10
+    let marginRightPadding =
+      screenWidth > v.responsive.medBreakpoint ? 500 : 250
     if (screenWidth > v.responsive.largeBreakpoint) marginRightPadding = 400
     if (extraWidth) marginRightPadding += extraWidth
     let width = this.name.length * fontSizeMultiplier
@@ -128,9 +134,7 @@ class EditableName extends React.Component {
     const { editingName } = uiStore
 
     if (canEdit && editingName) {
-      const clickHandlers = [
-        () => this.stopEditingName()
-      ]
+      const clickHandlers = [() => this.stopEditingName()]
       return (
         <StyledEditableName fontSize={fontSize}>
           <AutosizeInput
@@ -149,7 +153,7 @@ class EditableName extends React.Component {
       <StyledName>
         <Heading1
           data-cy="EditableNameHeading"
-          innerRef={(ref) => {
+          innerRef={ref => {
             this.textRef = ref
           }}
           onClick={canEdit ? this.startEditingName : null}

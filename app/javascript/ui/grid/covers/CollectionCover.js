@@ -25,34 +25,36 @@ const IconHolder = styled.span`
 const StyledCollectionCover = styled.div`
   width: 100%;
   height: 100%;
-  background: ${props => (props.isSpecialCollection ? v.colors.sirocco : v.colors.gray)};
+  background: ${props =>
+    props.isSpecialCollection ? v.colors.sirocco : v.colors.gray};
   color: white;
   position: relative;
   overflow: hidden;
-  ${props => (props.url && `
+  ${props =>
+    props.url &&
+    `
     background-image: url(${props.url});
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
     color: white;
-  `
-  )}
+  `};
 `
 StyledCollectionCover.displayName = 'StyledCollectionCover'
 
 const pad = 16
-const calcSectionWidth = (props) => {
+const calcSectionWidth = props => {
   if (props.width === 4) {
-    return `${props.gridW * 2 - (props.gutter * 1)}px`
+    return `${props.gridW * 2 - props.gutter * 1}px`
   } else if (props.width > 1) {
-    return `${props.gridW - (props.gutter * 2)}px`
+    return `${props.gridW - props.gutter * 2}px`
   }
   return `calc(100% - ${props.gutter * 2}px)`
 }
 
-const calcSectionHeight = (props) => {
+const calcSectionHeight = props => {
   if (props.height > 1) {
-    return `calc(50% - ${pad + (props.gutter / 2)}px)`
+    return `calc(50% - ${pad + props.gutter / 2}px)`
   }
   return `calc(50% - ${pad}px)`
 }
@@ -66,7 +68,8 @@ const StyledCardContent = styled.div`
     width: 100%;
     height: 100%;
   }
-  .top, .bottom {
+  .top,
+  .bottom {
     position: absolute;
     right: 1.5rem;
     width: ${props => calcSectionWidth(props)};
@@ -78,12 +81,13 @@ const StyledCardContent = styled.div`
   .bottom {
     bottom: ${props => (props.height === 1 ? `${pad / 2}` : pad)}px;
   }
-  ${props => (props.width > 1 && `
+  ${props =>
+    props.width > 1 &&
+    `
     top: 33%;
     left: 40%;
     padding-right: 2rem;
-  `
-  )}
+  `};
 `
 StyledCardContent.displayName = 'StyledCardContent'
 
@@ -101,11 +105,10 @@ function splitName(name) {
 class CollectionCover extends React.Component {
   get name() {
     const { collection } = this.props
-    const hasIcon = (
+    const hasIcon =
       collection.isTemplated ||
       collection.isMasterTemplate ||
       collection.isSubmissionBox
-    )
     if (hasIcon) {
       const nameParts = splitName(collection.name)
       if (!nameParts) return collection.name
@@ -125,11 +128,12 @@ class CollectionCover extends React.Component {
       }
       return (
         <Fragment>
-          { leftIcon && <IconHolder>{leftIcon}</IconHolder> }
+          {leftIcon && <IconHolder>{leftIcon}</IconHolder>}
           {nameParts.join(' ')}{' '}
           <span style={{ whiteSpace: 'nowrap' }}>
-            {lastName}&nbsp;
-            { rightIcon && <IconHolder>{rightIcon}</IconHolder> }
+            {lastName}
+            &nbsp;
+            {rightIcon && <IconHolder>{rightIcon}</IconHolder>}
           </span>
         </Fragment>
       )
@@ -137,7 +141,7 @@ class CollectionCover extends React.Component {
     return collection.name
   }
 
-  handleClick = (e) => {
+  handleClick = e => {
     const { dragging } = this.props
     if (dragging) {
       e.preventDefault()
@@ -180,9 +184,7 @@ class CollectionCover extends React.Component {
             </PositionedCardHeading>
           </div>
           <div className="bottom">
-            <Dotdotdot clamp="auto">
-              {cover.text}
-            </Dotdotdot>
+            <Dotdotdot clamp="auto">{cover.text}</Dotdotdot>
           </div>
         </StyledCardContent>
       </StyledCollectionCover>

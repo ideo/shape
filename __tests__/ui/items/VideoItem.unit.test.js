@@ -1,8 +1,6 @@
 import VideoItem from '~/ui/items/VideoItem'
 
-import {
-  fakeVideoItem,
-} from '#/mocks/data'
+import { fakeVideoItem } from '#/mocks/data'
 
 const props = {
   item: fakeVideoItem,
@@ -11,9 +9,7 @@ const props = {
 let wrapper
 describe('VideoItem', () => {
   beforeEach(() => {
-    wrapper = shallow(
-      <VideoItem {...props} />
-    )
+    wrapper = shallow(<VideoItem {...props} />)
   })
 
   it('renders the React player', () => {

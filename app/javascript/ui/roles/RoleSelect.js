@@ -3,14 +3,8 @@ import PropTypes from 'prop-types'
 import { PropTypes as MobxPropTypes } from 'mobx-react'
 import MenuItem from '@material-ui/core/MenuItem'
 import styled from 'styled-components'
-import {
-  DisplayText,
-  SubText
-} from '~/ui/global/styled/typography'
-import {
-  Row,
-  RowItemLeft,
-} from '~/ui/global/styled/layout'
+import { DisplayText, SubText } from '~/ui/global/styled/typography'
+import { Row, RowItemLeft } from '~/ui/global/styled/layout'
 import { Select } from '~/ui/global/styled/forms'
 import LeaveIcon from '~/ui/icons/LeaveIcon'
 import Tooltip from '~/ui/global/Tooltip'
@@ -50,13 +44,14 @@ class RoleSelect extends React.Component {
   get resourceType() {
     const { role } = this.props
     if (role.resource.internalType === 'groups') {
-      return (role.resource.is_primary || role.resource.is_guest)
-        ? 'organization' : 'group'
+      return role.resource.is_primary || role.resource.is_guest
+        ? 'organization'
+        : 'group'
     }
     return role.resource.internalType.slice(0, -1)
   }
 
-  onRoleRemove = (ev) => {
+  onRoleRemove = ev => {
     ev.preventDefault()
     const { entity } = this.props
     let prompt
@@ -77,11 +72,10 @@ class RoleSelect extends React.Component {
     })
   }
 
-  onRoleSelect = (ev) => {
+  onRoleSelect = ev => {
     ev.preventDefault()
     // switching the dropdown calls a delete and then create role
-    return this.deleteRole().then(() =>
-      this.createRole(ev.target.value))
+    return this.deleteRole().then(() => this.createRole(ev.target.value))
   }
 
   createRole(roleName, isSwitching = true) {
@@ -91,13 +85,15 @@ class RoleSelect extends React.Component {
 
   deleteRole = (isSwitching = true) => {
     const { role, entity } = this.props
-    const organizationChange = (
+    const organizationChange =
       this.resourceType === 'organization' && entity.isCurrentUser
-    )
-    return this.props.onDelete(role, entity, { isSwitching, organizationChange })
+    return this.props.onDelete(role, entity, {
+      isSwitching,
+      organizationChange,
+    })
   }
 
-  labelFor = (roleType) => {
+  labelFor = roleType => {
     const { roleLabels } = this.props
     // either return the override label (if present) or just the passed in name
     // e.g. for labeling "Viewer" as "Participant"
@@ -132,30 +128,24 @@ class RoleSelect extends React.Component {
           onChange={this.onRoleSelect}
           value={role.name}
         >
-          { roleTypes.map(roleType =>
-            (<MenuItem key={roleType} value={roleType}>
+          {roleTypes.map(roleType => (
+            <MenuItem key={roleType} value={roleType}>
               {this.labelFor(roleType)}
-            </MenuItem>))
-          }
+            </MenuItem>
+          ))}
         </Select>
       )
     } else {
-      select = (
-        <DisplayTextPadded>
-          {this.labelFor(role.name)}
-        </DisplayTextPadded>
-      )
+      select = <DisplayTextPadded>{this.labelFor(role.name)}</DisplayTextPadded>
     }
 
     // TODO remove duplication with RolesAdd role select menu
     const url = entity.pic_url_square || entity.filestack_file_url
-    const showLeaveIcon = (
-      enabled || (
-        entity.isCurrentUser &&
+    const showLeaveIcon =
+      enabled ||
+      (entity.isCurrentUser &&
         !role.resource.system_required &&
-        !role.resource.pinned_and_locked
-      )
-    )
+        !role.resource.pinned_and_locked)
     return (
       <Row>
         <span>
@@ -168,20 +158,20 @@ class RoleSelect extends React.Component {
           />
         </span>
         <RowItemLeft>
-          { entity.name && entity.name.trim().length > 0
-            ? (<div>
-              <DisplayText>{this.renderName()}</DisplayText><br />
-              <SubText>{entity.email}</SubText>
-            </div>)
-            : (<CenterAlignedSingleItem>
+          {entity.name && entity.name.trim().length > 0 ? (
+            <div>
               <DisplayText>{this.renderName()}</DisplayText>
-            </CenterAlignedSingleItem>)
-          }
+              <br />
+              <SubText>{entity.email}</SubText>
+            </div>
+          ) : (
+            <CenterAlignedSingleItem>
+              <DisplayText>{this.renderName()}</DisplayText>
+            </CenterAlignedSingleItem>
+          )}
         </RowItemLeft>
-        <MinRowItem>
-          {select}
-        </MinRowItem>
-        { showLeaveIcon &&
+        <MinRowItem>{select}</MinRowItem>
+        {showLeaveIcon && (
           <Tooltip
             classes={{ tooltip: 'Tooltip' }}
             title={entity.isCurrentUser ? 'Leave' : 'Remove'}
@@ -191,10 +181,8 @@ class RoleSelect extends React.Component {
               <LeaveIcon />
             </LeaveIconHolder>
           </Tooltip>
-        }
-        {!showLeaveIcon &&
-          <LeaveIconHolder enabled={false} />
-        }
+        )}
+        {!showLeaveIcon && <LeaveIconHolder enabled={false} />}
       </Row>
     )
   }

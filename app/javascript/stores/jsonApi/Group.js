@@ -2,6 +2,7 @@ import { uiStore } from '~/stores'
 import BaseRecord from './BaseRecord'
 
 class Group extends BaseRecord {
+  static type = 'groups'
   attributesForAPI = ['name', 'handle', 'filestack_file_attributes']
 
   // NOTE: Because we're never directly hitting the groups/{id} API endpoint,
@@ -30,9 +31,8 @@ class Group extends BaseRecord {
   API_archive() {
     const onAgree = async () => {
       await this.apiStore.request(`groups/${this.id}/archive`, 'PATCH')
-      const roleForCurrentUser = role => (
+      const roleForCurrentUser = role =>
         role.users.find(user => user.id === this.apiStore.currentUserId)
-      )
       const { groupRoles } = this
       if (groupRoles.find(roleForCurrentUser)) {
         window.location.reload()
@@ -48,13 +48,6 @@ class Group extends BaseRecord {
     })
     return onAgree
   }
-}
-
-Group.type = 'groups'
-
-Group.defaults = {
-  // set as array so it's never `undefined`
-  roles: [],
 }
 
 export default Group

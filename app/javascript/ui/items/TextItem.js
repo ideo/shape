@@ -15,18 +15,21 @@ import ChannelManager from '~/utils/ChannelManager'
 const UNLOCK_IN_MILLISECONDS = 5000
 
 const StyledContainer = styled.div`
-  ${props => props.fullPageView && `padding: 2rem 0.5rem;`}
-  padding-top: 25px;
+  ${props => props.fullPageView && `padding: 2rem 0.5rem;`} padding-top: 25px;
   .editor-pill {
-    ${props => !props.fullPageView && (`
+    ${props =>
+      !props.fullPageView &&
+      `
       bottom: 0;
       padding: 10px;
       position: absolute;
       top: 0;
       z-index: 10000;
-    `)}
+    `};
   }
-  ${props => !props.fullPageView && (`
+  ${props =>
+    !props.fullPageView &&
+    `
     .ql-tooltip.ql-editing,
     .ql-tooltip.ql-flip {
       left: calc(50% - 150px) !important;
@@ -34,19 +37,17 @@ const StyledContainer = styled.div`
       position: fixed;
       z-index: 10000;
     }
-  `)}
-
-  *::selection {
+  `} *::selection {
     background: highlight !important;
   }
 `
 
 const remapHeaderToH3 = (node, delta) => {
-  delta.map((op) => (op.attributes.header = 3))
+  delta.map(op => (op.attributes.header = 3))
   return delta
 }
 
-export const overrideHeadersFromClipboard = (editor) => {
+export const overrideHeadersFromClipboard = editor => {
   // change all non-H3 header attributes to H3, e.g. when copy/pasting
   editor.clipboard.addMatcher('H1', remapHeaderToH3)
   editor.clipboard.addMatcher('H2', remapHeaderToH3)
@@ -134,14 +135,13 @@ class TextItem extends React.Component {
 
   subscribeToItemEditingChannel = () => {
     const { item } = this.props
-    this.channel = ChannelManager.subscribe(this.channelName, item.id,
-      {
-        channelDisconnected: this.channelDisconnected,
-        channelReceivedData: this.channelReceivedData,
-      })
+    this.channel = ChannelManager.subscribe(this.channelName, item.id, {
+      channelDisconnected: this.channelDisconnected,
+      channelReceivedData: this.channelReceivedData,
+    })
   }
 
-  channelReceivedData = async (data) => {
+  channelReceivedData = async data => {
     const { currentUserId } = this.props
     const { currentEditor } = this.state
     let { locked } = this.state
@@ -158,7 +158,10 @@ class TextItem extends React.Component {
 
     // if no broadcast editor == somebody just finished
     // if currentEditor is not me, that means it's somebody else that just finished
-    if (!broadcastEditor && (!currentEditor || currentEditor.id !== currentUserId)) {
+    if (
+      !broadcastEditor &&
+      (!currentEditor || currentEditor.id !== currentUserId)
+    ) {
       this.cancelKeyUp = true
       this.props.onUpdatedData(data.item_text_data)
       this.cancelKeyUp = false
@@ -169,14 +172,19 @@ class TextItem extends React.Component {
     } else {
       locked = false
       // don't keep setting the state if you're editing
-      if (!locked && broadcastEditor && currentEditor && broadcastEditor.id === currentEditor.id) {
+      if (
+        !locked &&
+        broadcastEditor &&
+        currentEditor &&
+        broadcastEditor.id === currentEditor.id
+      ) {
         return
       }
     }
 
     this.setState({
       currentEditor: broadcastEditor,
-      locked
+      locked,
     })
   }
 
@@ -185,7 +193,7 @@ class TextItem extends React.Component {
     const { locked } = this.state
     if (locked) {
       this.setState({
-        locked: false
+        locked: false,
       })
     }
   }
@@ -193,7 +201,9 @@ class TextItem extends React.Component {
   onEditorBlur = (range, source, editor) => {
     const { fullPageView, onCancel } = this.props
     // Check if something is being linked, which causes a blur event
-    const linker = this.quillEditor.container.querySelector('.ql-tooltip:not(.ql-hidden)')
+    const linker = this.quillEditor.container.querySelector(
+      '.ql-tooltip:not(.ql-hidden)'
+    )
     if (linker) {
       // we need to determine if the linker has gone from visible to hidden
       // at that point we perform the same onCancel as for the onBlur
@@ -240,7 +250,7 @@ class TextItem extends React.Component {
     this.startEditing()
   }
 
-  cancel = (ev) => {
+  cancel = ev => {
     const { onCancel } = this.props
     if (!this.canEdit) return onCancel(this.props.item, ev)
     const item = this.getCurrentText()
@@ -275,7 +285,10 @@ class TextItem extends React.Component {
     if (!this.channel) return
     const { item } = this.props
     if (editing) {
-      this.channel.perform('start_editing', { id: item.id, data: this.textData })
+      this.channel.perform('start_editing', {
+        id: item.id,
+        data: this.textData,
+      })
     } else {
       this.channel.perform('stop_editing', { id: item.id, data: this.textData })
     }
@@ -311,7 +324,7 @@ class TextItem extends React.Component {
 
   get textData() {
     const { item } = this.props
-    return item.toJS().text_data
+    return item.toJSON().text_data
   }
 
   onKeyUp = (content, delta, source, editor) => {
@@ -359,7 +372,9 @@ class TextItem extends React.Component {
     if (this.canEdit) {
       quillProps = {
         ...v.quillDefaults,
-        ref: c => { this.reactQuillRef = c },
+        ref: c => {
+          this.reactQuillRef = c
+        },
         theme: 'snow',
         onChange: this.onKeyUp,
         onFocus: this.onEditorFocus,
@@ -379,13 +394,16 @@ class TextItem extends React.Component {
 
     return (
       <StyledContainer className="no-drag" fullPageView={fullPageView}>
-        { this.canEdit && <TextItemToolbar fullPageView={fullPageView} onExpand={onExpand} /> }
-        <CloseButton onClick={this.cancel} size={fullPageView ? 'lg' : 'sm'} position={fullPageView ? 'absolute' : 'fixed'} />
-        {this.renderEditorPill}
-        <ReactQuill
-          {...quillProps}
-          value={this.textData}
+        {this.canEdit && (
+          <TextItemToolbar fullPageView={fullPageView} onExpand={onExpand} />
+        )}
+        <CloseButton
+          onClick={this.cancel}
+          size={fullPageView ? 'lg' : 'sm'}
+          position={fullPageView ? 'absolute' : 'fixed'}
         />
+        {this.renderEditorPill}
+        <ReactQuill {...quillProps} value={this.textData} />
       </StyledContainer>
     )
   }
@@ -394,7 +412,7 @@ class TextItem extends React.Component {
 TextItem.propTypes = {
   item: MobxPropTypes.objectOrObservableObject.isRequired,
   actionCableConsumer: MobxPropTypes.objectOrObservableObject.isRequired,
-  currentUserId: PropTypes.number.isRequired,
+  currentUserId: PropTypes.string.isRequired,
   onUpdatedData: PropTypes.func.isRequired,
   onSave: PropTypes.func.isRequired,
   onCancel: PropTypes.func,

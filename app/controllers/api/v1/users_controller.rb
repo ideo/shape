@@ -64,7 +64,11 @@ class Api::V1::UsersController < Api::V1::BaseController
   def switch_org
     if current_user.switch_to_organization(@organization)
       render jsonapi: current_user, include:
-        [:groups, organizations: [:primary_group], current_organization: %i[primary_group guest_group]]
+        [:groups, organizations: [:primary_group], current_organization: %i[primary_group guest_group]], class: {
+          User: SerializableCurrentUser,
+          Group: SerializableGroup,
+          Organization: SerializableOrganization,
+      }
     else
       render_api_errors current_user.errors
     end

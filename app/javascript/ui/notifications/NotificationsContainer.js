@@ -15,7 +15,11 @@ const NoActivityText = ActivityText.extend`
 class NotificationsContainer extends React.Component {
   get notifications() {
     const { apiStore } = this.props
-    return _.orderBy(apiStore.notifications, ['read', 'created_at'], ['asc', 'desc'])
+    return _.orderBy(
+      apiStore.notifications,
+      ['read', 'created_at'],
+      ['asc', 'desc']
+    )
   }
 
   unreadCount() {
@@ -27,14 +31,14 @@ class NotificationsContainer extends React.Component {
     const { notifications } = this
     return (
       <ActivityContainer>
-        { notifications.map(notification => (
+        {notifications.map(notification => (
           <Notification notification={notification} key={notification.id} />
         ))}
-        { notifications.length === 0 &&
+        {notifications.length === 0 && (
           <NoActivityText>
             You don&apos;t have any new notifications.
           </NoActivityText>
-        }
+        )}
       </ActivityContainer>
     )
   }

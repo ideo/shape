@@ -32,7 +32,7 @@ const StyledLinkCover = styled.div`
       border-radius: 10px;
       cursor: pointer;
       &:hover {
-        background: ${v.colors.cyan}
+        background: ${v.colors.cyan};
       }
     }
   }
@@ -45,10 +45,10 @@ class LinkItemCover extends React.PureComponent {
   }
 
   clamp() {
-    const desiredNameLen = uiStore.windowWidth > v.responsive.largeBreakpoint
-      ? 40 : 28
-    const desiredContentLen = uiStore.windowWidth > v.responsive.largeBreakpoint
-      ? 80 : 40
+    const desiredNameLen =
+      uiStore.windowWidth > v.responsive.largeBreakpoint ? 40 : 28
+    const desiredContentLen =
+      uiStore.windowWidth > v.responsive.largeBreakpoint ? 80 : 40
     const { item } = this.props
     const { name, content } = item
     let truncatedName = name || ''
@@ -58,8 +58,8 @@ class LinkItemCover extends React.PureComponent {
       // any content and truncate the title somewhat in the middle
       truncatedContent = ''
       const desiredLength = desiredNameLen - 2 // two extra chars for ellipsis and space
-      const first = name.slice(0, (desiredLength / 2))
-      const second = name.slice(name.length - (desiredLength / 2), name.length)
+      const first = name.slice(0, desiredLength / 2)
+      const second = name.slice(name.length - desiredLength / 2, name.length)
       truncatedName = `${first}… ${second}`
     } else if (content && content.length > desiredContentLen) {
       const desiredLength = desiredContentLen - 1 // one extra char for ellipsis
@@ -68,7 +68,8 @@ class LinkItemCover extends React.PureComponent {
       truncatedName = name
     }
     return {
-      truncatedName, truncatedContent,
+      truncatedName,
+      truncatedContent,
     }
   }
 
@@ -100,10 +101,7 @@ class LinkItemCover extends React.PureComponent {
             <Box style={{ width: '100%' }}>
               <CardHeading className="name">{truncatedName}</CardHeading>
               <p className="content">{truncatedContent}</p>
-              <GridCardIconWithName
-                text={url}
-                icon={this.icon}
-              />
+              <GridCardIconWithName text={url} icon={this.icon} />
             </Box>
           </Flex>
         </StyledImageCover>

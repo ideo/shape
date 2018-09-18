@@ -4,9 +4,17 @@ const CommentIcon = () => (
   <Icon fill>
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50 50">
       <defs>
-        <path id="a" d="M42.4 6.1c2 0 3.7 1.5 3.7 3.5v22.5c0 1.9-1.7 3.5-3.7 3.5H24.2L13 44.8c-.3.2-.6.4-1 .4-.2 0-.5 0-.7-.1-.6-.3-.9-.8-.9-1.4v-8H8c-2 0-3.7-1.5-3.7-3.5V9.5C4.3 7.6 6 6.1 8 6.1h34.4z" />
+        <path
+          id="a"
+          d="M42.4 6.1c2 0 3.7 1.5 3.7 3.5v22.5c0 1.9-1.7 3.5-3.7 3.5H24.2L13 44.8c-.3.2-.6.4-1 .4-.2 0-.5 0-.7-.1-.6-.3-.9-.8-.9-1.4v-8H8c-2 0-3.7-1.5-3.7-3.5V9.5C4.3 7.6 6 6.1 8 6.1h34.4z"
+        />
       </defs>
-      <use xlinkHref="#a" overflow="visible" fillRule="evenodd" clipRule="evenodd" />
+      <use
+        xlinkHref="#a"
+        overflow="visible"
+        fillRule="evenodd"
+        clipRule="evenodd"
+      />
       <clipPath id="b">
         <use xlinkHref="#a" overflow="visible" />
       </clipPath>
@@ -29,7 +37,12 @@ const CommentIcon = () => (
           <defs>
             <path id="f" d="M-46 2.8h95.4v97.6H-46z" />
           </defs>
-          <use xlinkHref="#f" overflow="visible" fillRule="evenodd" clipRule="evenodd" />
+          <use
+            xlinkHref="#f"
+            overflow="visible"
+            fillRule="evenodd"
+            clipRule="evenodd"
+          />
           <clipPath id="g">
             <use xlinkHref="#f" overflow="visible" />
           </clipPath>

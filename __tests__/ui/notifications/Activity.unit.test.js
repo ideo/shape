@@ -1,10 +1,7 @@
 import Activity from '~/ui/notifications/Activity'
 import { apiStore, uiStore, routingStore } from '~/stores'
 
-import {
-  fakeActivity,
-  fakeUser,
-} from '#/mocks/data'
+import { fakeActivity, fakeUser } from '#/mocks/data'
 
 jest.mock('../../../app/javascript/stores')
 
@@ -14,8 +11,7 @@ let component
 
 describe('Activity', () => {
   beforeEach(() => {
-    routingStore.pathTo.mockImplementation((type, id) =>
-      `/${type}/${id}`)
+    routingStore.pathTo.mockImplementation((type, id) => `/${type}/${id}`)
     props = {
       action: fakeActivity.action,
       actors: [fakeActivity.actor],
@@ -25,9 +21,7 @@ describe('Activity', () => {
       actorCount: 1,
       handleRead: jest.fn(),
     }
-    wrapper = shallow(
-      <Activity {...props} />
-    )
+    wrapper = shallow(<Activity {...props} />)
     component = wrapper.instance()
   })
 
@@ -82,7 +76,11 @@ describe('Activity', () => {
       describe('with a group', () => {
         beforeEach(() => {
           props.subjectGroups = []
-          props.target = { id: 24, name: 'Pokemon lovers', internalType: 'groups' }
+          props.target = {
+            id: 24,
+            name: 'Pokemon lovers',
+            internalType: 'groups',
+          }
           wrapper.setProps(props)
         })
 
@@ -130,9 +128,7 @@ describe('Activity', () => {
         apiStore.currentUserId = currentUser.id
         apiStore.currentUser = currentUser
         props.action = 'added_member'
-        props.subjectUsers = [
-          currentUser
-        ]
+        props.subjectUsers = [currentUser]
         wrapper.setProps(props)
       })
 
@@ -166,10 +162,7 @@ describe('Activity', () => {
 
       describe('with more then 3 actors', () => {
         beforeEach(() => {
-          props.actors = [
-            ...props.actors,
-            { id: 201, name: 'Lia' },
-          ]
+          props.actors = [...props.actors, { id: 201, name: 'Lia' }]
           props.actorCount = 5
           wrapper.setProps(props)
           wrapper.update()

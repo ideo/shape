@@ -7,18 +7,14 @@ import isEmail from '~/utils/isEmail'
 class EmailCSVUploader extends React.Component {
   parseEmails = (csvData, filename) => {
     const { onComplete } = this.props
-    const emails = _.uniq(_.filter(_.flattenDeep(csvData), d => (
-      d && _.isString(d) && isEmail(d)
-    )))
+    const emails = _.uniq(
+      _.filter(_.flattenDeep(csvData), d => d && _.isString(d) && isEmail(d))
+    )
     onComplete(emails)
   }
 
   render() {
-    return (
-      <CSVUploader
-        onFileLoaded={this.parseEmails}
-      />
-    )
+    return <CSVUploader onFileLoaded={this.parseEmails} />
   }
 }
 

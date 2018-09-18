@@ -87,7 +87,7 @@ describe Api::V1::GroupsController, type: :request, json: true, auth: true do
 
       it 'adds the current user as an admin to the group' do
         post(path, params: params)
-        group = Group.find(json['data']['attributes']['id'])
+        group = Group.find(json['data']['id'])
         expect(group.admins[:users]).to match_array([current_user])
       end
 
@@ -98,7 +98,7 @@ describe Api::V1::GroupsController, type: :request, json: true, auth: true do
 
       it 'sets current org as group.organization' do
         post(path, params: params)
-        group = Group.find(json['data']['attributes']['id'])
+        group = Group.find(json['data']['id'])
         expect(group.organization).to eq(user.current_organization)
       end
     end

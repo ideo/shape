@@ -31,7 +31,7 @@ export const PAGE_KEY = 'ActivityLog:page'
 
 const StyledActivityLog = styled.div`
   background-color: ${v.colors.activityDarkBlue};
-  box-shadow: 0px 0px 24px -5px rgba(0,0,0,0.33);
+  box-shadow: 0px 0px 24px -5px rgba(0, 0, 0, 0.33);
   box-sizing: border-box;
   color: white;
   height: 100%;
@@ -86,9 +86,10 @@ class ActivityLogBox extends React.Component {
     })
   }
 
-  @action componentDidMount() {
+  @action
+  componentDidMount() {
     const { uiStore } = this.props
-    const existingPosition = localStorage.getItem(POSITION_KEY) || { }
+    const existingPosition = localStorage.getItem(POSITION_KEY) || {}
     const existingPage = localStorage.getItem(PAGE_KEY)
     uiStore.update('activityLogPage', existingPage || 'comments')
     this.position.y = existingPosition.y || DEFAULT.y
@@ -110,7 +111,9 @@ class ActivityLogBox extends React.Component {
   get defaultX() {
     let { x } = DEFAULT
     if (document.querySelector('#AppWrapper')) {
-      x += document.querySelector('#AppWrapper').getBoundingClientRect().right - this.position.w
+      x +=
+        document.querySelector('#AppWrapper').getBoundingClientRect().right -
+        this.position.w
     }
     return x
   }
@@ -122,7 +125,8 @@ class ActivityLogBox extends React.Component {
     })
   }
 
-  @action updatePosition({ x, y, w = this.position.w, h = this.position.h }) {
+  @action
+  updatePosition({ x, y, w = this.position.w, h = this.position.h }) {
     if (y < 0) return
     this.position.x = x
     this.position.y = y
@@ -131,7 +135,8 @@ class ActivityLogBox extends React.Component {
     localStorage.setItem(POSITION_KEY, this.position)
   }
 
-  @action changePage(page) {
+  @action
+  changePage(page) {
     const { uiStore } = this.props
     uiStore.update('activityLogPage', page)
     localStorage.setItem(PAGE_KEY, page)
@@ -141,8 +146,14 @@ class ActivityLogBox extends React.Component {
     const node = this.draggableRef.current
     if (!node) return false
     const rect = node.getBoundingClientRect()
-    const viewHeight = Math.max(document.documentElement.clientHeight, window.innerHeight)
-    const viewWidth = Math.max(document.documentElement.clientWidth, window.innerWidth)
+    const viewHeight = Math.max(
+      document.documentElement.clientHeight,
+      window.innerHeight
+    )
+    const viewWidth = Math.max(
+      document.documentElement.clientWidth,
+      window.innerWidth
+    )
     return !(
       rect.top >= 0 &&
       rect.left >= 0 &&
@@ -151,18 +162,18 @@ class ActivityLogBox extends React.Component {
     )
   }
 
-  handleClose = (ev) => {
+  handleClose = ev => {
     const { uiStore } = this.props
     uiStore.update('activityLogOpen', false)
     uiStore.expandThread(null)
   }
 
-  handleNotifications = (ev) => {
+  handleNotifications = ev => {
     ev.preventDefault()
     this.changePage('notifications')
   }
 
-  handleComments = (ev) => {
+  handleComments = ev => {
     ev.preventDefault()
     this.changePage('comments')
   }
@@ -187,13 +198,9 @@ class ActivityLogBox extends React.Component {
     }
   }
 
-  renderComments = () => (
-    <CommentThreadContainer />
-  )
+  renderComments = () => <CommentThreadContainer />
 
-  renderNotifications = () => (
-    <NotificationsContainer />
-  )
+  renderNotifications = () => <NotificationsContainer />
 
   render() {
     const { apiStore, uiStore } = this.props
@@ -224,7 +231,9 @@ class ActivityLogBox extends React.Component {
           right: true,
         }}
         disableDragging={false}
-        onDragStop={(ev, d) => { this.updatePosition(d) }}
+        onDragStop={(ev, d) => {
+          this.updatePosition(d)
+        }}
         onResize={(ev, dir, ref, delta, position) => {
           const fullPosition = Object.assign({}, position, {
             w: ref.offsetWidth,
@@ -261,10 +270,9 @@ class ActivityLogBox extends React.Component {
               </Action>
               <CloseButton size="lg" onClick={this.handleClose} />
             </StyledHeader>
-            { this.currentPage === 'comments'
+            {this.currentPage === 'comments'
               ? this.renderComments()
-              : this.renderNotifications()
-            }
+              : this.renderNotifications()}
           </StyledActivityLog>
         </div>
       </Rnd>

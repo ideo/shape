@@ -4,7 +4,11 @@ import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 import { FormSpacer, TextButton } from '~/ui/global/styled/forms'
 import { Row, RowItemRight } from '~/ui/global/styled/layout'
-import { Heading3, DisplayText, SubduedText } from '~/ui/global/styled/typography'
+import {
+  Heading3,
+  DisplayText,
+  SubduedText,
+} from '~/ui/global/styled/typography'
 import ArchiveIcon from '~/ui/icons/ArchiveIcon'
 
 const RemoveIconHolder = styled.button`
@@ -17,23 +21,18 @@ class OrganizationPeople extends React.Component {
     const { userGroups } = this.props
     const groups = userGroups.filter(g => g.isNormalGroup)
     if (!groups.length) {
-      return (
-        <SubduedText>You have not been added to any groups.</SubduedText>
-      )
+      return <SubduedText>You have not been added to any groups.</SubduedText>
     }
     return groups.map(group => (
       <Row key={group.id}>
-        <button
-          className="groupEdit"
-          onClick={this.props.onGroupRoles(group)}
-        >
+        <button className="groupEdit" onClick={this.props.onGroupRoles(group)}>
           <DisplayText>{group.name}</DisplayText>
         </button>
-        { group.can_edit &&
+        {group.can_edit && (
           <RemoveIconHolder onClick={this.props.onGroupRemove(group)}>
             <ArchiveIcon />
           </RemoveIconHolder>
-        }
+        )}
       </Row>
     ))
   }
@@ -44,61 +43,61 @@ class OrganizationPeople extends React.Component {
     const guestGroup = organization.guest_group
     const adminGroup = organization.admin_group
 
-    const orgMember = (userGroups.indexOf(primaryGroup) > -1)
-    const showGuests = orgMember && !!guestGroup.groupRoles.length
+    const orgMember = userGroups.indexOf(primaryGroup) > -1
+    const showGuests = orgMember && guestGroup && !!guestGroup.groupRoles.length
     // TODO: Only show AdminGroup to Admins
-    const showAdmins = orgMember && !!adminGroup.groupRoles.length
+    const showAdmins = orgMember && adminGroup && !!adminGroup.groupRoles.length
 
     return (
       <Fragment>
-        <Heading3>
-          Your Organization
-        </Heading3>
+        <Heading3>Your Organization</Heading3>
         <Row>
-          { orgMember &&
-            <button className="orgEdit" onClick={this.props.onGroupRoles(primaryGroup)}>
-              <DisplayText>{ primaryGroup.name }</DisplayText>
+          {orgMember && (
+            <button
+              className="orgEdit"
+              onClick={this.props.onGroupRoles(primaryGroup)}
+            >
+              <DisplayText>{primaryGroup.name}</DisplayText>
             </button>
-          }
-          { !orgMember &&
-            <DisplayText>{ primaryGroup.name }</DisplayText>
-          }
+          )}
+          {!orgMember && <DisplayText>{primaryGroup.name}</DisplayText>}
         </Row>
-        { showGuests &&
+        {showGuests && (
           <Row>
-            <button className="orgEdit" onClick={this.props.onGroupRoles(guestGroup)}>
-              <DisplayText>{ guestGroup.name }</DisplayText>
+            <button
+              className="orgEdit"
+              onClick={this.props.onGroupRoles(guestGroup)}
+            >
+              <DisplayText>{guestGroup.name}</DisplayText>
             </button>
           </Row>
-        }
-        { showAdmins &&
+        )}
+        {showAdmins && (
           <Row>
-            <button className="orgEdit" onClick={this.props.onGroupRoles(adminGroup)}>
-              <DisplayText>{ adminGroup.name }</DisplayText>
+            <button
+              className="orgEdit"
+              onClick={this.props.onGroupRoles(adminGroup)}
+            >
+              <DisplayText>{adminGroup.name}</DisplayText>
             </button>
           </Row>
-        }
+        )}
       </Fragment>
     )
   }
 
   render() {
-    const { organization } = this.props
     return (
       <div>
         <Row>
           <RowItemRight>
-            <TextButton onClick={this.props.onGroupAdd}>
-              + New Group
-            </TextButton>
+            <TextButton onClick={this.props.onGroupAdd}>+ New Group</TextButton>
           </RowItemRight>
         </Row>
         {this.renderYourOrganization()}
         <FormSpacer />
-        <Heading3>
-          Your Groups
-        </Heading3>
-        { this.renderUserGroups() }
+        <Heading3>Your Groups</Heading3>
+        {this.renderUserGroups()}
       </div>
     )
   }

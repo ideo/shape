@@ -6,7 +6,7 @@ const fakeJsonApiAttrs = {
   save: jest.fn(),
 }
 export const fakeCollectionCard = {
-  id: 11,
+  id: "11",
   order: 1,
   height: 1,
   width: 1,
@@ -24,7 +24,7 @@ export const fakeCollectionCard = {
 }
 
 export const fakeTextItemAttrs = {
-  id: 1,
+  id: "1",
   type: 'Item::TextItem',
   name: 'My Cool Item',
   text_data: 'This is the content for the item and it contains multiple sentences. Like this one.',
@@ -39,11 +39,11 @@ export const fakeTextItem = {
   ...fakeTextItemAttrs,
   rawAttributes: jest.fn().mockReturnValue(fakeTextItemAttrs),
   getRecordType: jest.fn().mockReturnValue('items'),
-  toJS: jest.fn().mockReturnValue(fakeTextItemAttrs),
+  toJSON: jest.fn().mockReturnValue(fakeTextItemAttrs),
   ...fakeJsonApiAttrs,
 }
 export const fakeVideoItemAttrs = {
-  id: 2,
+  id: "2",
   type: 'Item::VideoItem',
   name: 'Crazy Honey Badger',
   url: 'https://www.youtube.com/watch?v=4r7wHMg5Yjg',
@@ -58,11 +58,11 @@ export const fakeVideoItem = {
   getRecordType: jest.fn().mockReturnValue('items'),
 }
 export const fakeImageItemAttrs = {
-  id: 3,
+  id: "3",
   type: 'Item::FileItem',
   name: 'Earth from Space',
   filestack_file: {
-    id: 1,
+    id: "1",
     url: 'https://www.nasa.gov/sites/default/files/styles/full_width_feature/public/thumbnails/image/iss052e023801_0.jpg',
   },
   inherited_tag_list: [],
@@ -75,7 +75,7 @@ export const fakeImageItem = {
   getRecordType: jest.fn().mockReturnValue('items'),
 }
 export const fakeLinkItemAttrs = {
-  id: 3,
+  id: "3",
   type: 'Item::LinkItem',
   name: 'Independent.uk',
   content: 'The best news under the sun',
@@ -92,11 +92,11 @@ export const fakeLinkItem = {
   getRecordType: jest.fn().mockReturnValue('items'),
 }
 export const fakeFileItemAttrs = {
-  id: 3,
+  id: "3",
   type: 'Item::FileItem',
   name: '',
   filestack_file: {
-    id: 1,
+    id: "1",
     url: 'https://www.nasa.gov/sites/default/files/styles/full_width_feature/public/thumbnails/image/iss052e023801_0.ppt',
     handle: 'aaaaaa',
     mimetype: 'application/vnd.powerpoint',
@@ -112,7 +112,7 @@ export const fakeFileItem = {
 }
 
 export const fakeItemCard = {
-  id: 10,
+  id: "10",
   order: 0,
   height: 1,
   width: 1,
@@ -130,7 +130,7 @@ const fakeCards = [
 ]
 
 export const fakeCollection = {
-  id: 1,
+  id: "1",
   name: 'My Workspace X',
   type: 'Collection',
   breadcrumb: [],
@@ -156,10 +156,15 @@ export const fakeCollection = {
   API_updateCards: jest.fn(),
   checkCurrentOrg: jest.fn(),
   internalType: 'collections',
+  meta: {
+    snapshot: {
+      can_edit: false,
+    },
+  },
   ...fakeJsonApiAttrs,
 }
 export const fakeGroupAttrs = {
-  id: 1,
+  id: "1",
   name: 'IDEO Products',
   handle: 'ideo-products',
   filestack_file_url: 'https://cdn.filestackcontent.com/i4iKADquTQCWMAvyz02R',
@@ -173,7 +178,7 @@ export const fakeGroup = {
   getRecordType: jest.fn().mockReturnValue('groups'),
 }
 export const fakeOrganizationAttrs = {
-  id: 1,
+  id: "1",
   name: 'TestOrg',
   slug: 'test-org',
   primary_group: fakeGroup,
@@ -186,7 +191,7 @@ export const fakeOrganization = {
   getRecordType: jest.fn().mockReturnValue('organization'),
 }
 export const fakeUserAttrs = {
-  id: 1,
+  id: "1",
   first_name: 'Oprah',
   last_name: 'Winfrey',
   name: 'Oprah Winfrey',
@@ -204,7 +209,7 @@ export const fakeUserAttrs = {
   show_move_modal: false,
 }
 export const fakeActionCableUser = {
-  id: 99,
+  id: "99",
   name: 'Oprah Winfrey',
   pic_url_square: 'https://filestackcdn.com/abc123',
 }
@@ -214,11 +219,11 @@ export const fakeUser = {
   getRecordType: jest.fn().mockReturnValue('users'),
 }
 export const fakeRoleAttrs = {
-  id: 1,
+  id: "1",
   name: 'editor',
   users: [fakeUser, fakeUser],
   groups: [],
-  resource: { id: 1, type: 'collection', internalType: 'collection' },
+  resource: { id: "1", type: 'collection', internalType: 'collection' },
   API_delete: jest.fn().mockReturnValue(Promise.resolve({})),
 }
 export const fakeRole = {
@@ -234,13 +239,13 @@ export const fakePosition = {
   width: 1,
 }
 export const fakeComment = {
-  id: 1,
+  id: "1",
   author: fakeUser,
   message: 'This is my message to the world.',
   updated_at: new Date(),
 }
 export const fakeThread = {
-  id: 1,
+  id: "1",
   record: fakeCollection,
   key: 'collection-1',
   unread_count: 2,
@@ -254,7 +259,7 @@ export const fakeThread = {
   API_fetchComments: jest.fn().mockReturnValue(Promise.resolve({})),
 }
 export const fakeActivity = {
-  id: 1,
+  id: "1",
   type: 'activities',
   action: 'archived',
   actor: fakeUser,
@@ -264,10 +269,11 @@ export const fakeActivity = {
   target: fakeCollection,
   target_type: 'Collection',
   target_id: fakeCollection.id,
+  setTarget: jest.fn(),
   ...fakeJsonApiAttrs,
 }
 export const fakeNotification = {
-  id: 1,
+  id: "1",
   type: 'notifications',
   read: false,
   activity: fakeActivity,

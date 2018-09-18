@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types'
 import { action } from 'mobx'
+import { updateModelId } from 'datx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import _ from 'lodash'
 import styled from 'styled-components'
@@ -26,7 +27,7 @@ const calculateDistance = (pos1, pos2) => {
   // pythagoras!
   const a = pos2.x - pos1.x
   const b = pos2.y - pos1.y
-  return Math.sqrt((a * a) + (b * b))
+  return Math.sqrt(a * a + b * b)
 }
 
 const groupByConsecutive = (array, value) => {
@@ -96,20 +97,14 @@ class CollectionGrid extends React.Component {
     if (submissionSettings) {
       this.addSubmissionCard(cards)
     }
-    const bctOpen = (
+    const bctOpen =
       blankContentToolState &&
       blankContentToolState.order !== null &&
       blankContentToolState.collectionId === collection.id
-    )
     if (bctOpen) {
       // make the BCT appear to the right of the current card
       let { order } = blankContentToolState
-      const {
-        height,
-        replacingId,
-        blankType,
-        width,
-      } = blankContentToolState
+      const { height, replacingId, blankType, width } = blankContentToolState
       if (replacingId) {
         // remove the card being replaced from our current state cards
         _.remove(cards, { id: replacingId })
@@ -149,7 +144,7 @@ class CollectionGrid extends React.Component {
     return cards
   }
 
-  addSubmissionCard = (cards) => {
+  addSubmissionCard = cards => {
     const { collection, submissionSettings } = this.props
     if (_.find(cards, { id: 'submission' })) return
     const addSubmissionCard = {
@@ -176,7 +171,10 @@ class CollectionGrid extends React.Component {
 
     if (!placeholder) {
       this.createPlaceholderCard(positionedCard, newSize)
-    } else if (placeholder.width !== newSize.width || placeholder.height !== newSize.height) {
+    } else if (
+      placeholder.width !== newSize.width ||
+      placeholder.height !== newSize.height
+    ) {
       placeholder.width = newSize.width
       placeholder.height = newSize.height
       this.positionCards(stateCards, { dragging: positionedCard.id })
@@ -184,7 +182,8 @@ class CollectionGrid extends React.Component {
   }
 
   onDragOrResizeStop = () => {
-    const placeholder = _.find(this.state.cards, { cardType: 'placeholder' }) || {}
+    const placeholder =
+      _.find(this.state.cards, { cardType: 'placeholder' }) || {}
     const original = _.find(this.state.cards, { id: placeholder.originalId })
 
     this.clearDragTimeout()
@@ -196,7 +195,7 @@ class CollectionGrid extends React.Component {
     placeholderPosition.order = Math.ceil(placeholderPosition.order)
     const originalPosition = _.pick(original, fields)
 
-    const moved = (!_.isEqual(placeholderPosition, originalPosition))
+    const moved = !_.isEqual(placeholderPosition, originalPosition)
     if (moved) {
       // we want to update this card to match the placeholder
       const { order } = placeholder
@@ -230,16 +229,15 @@ class CollectionGrid extends React.Component {
     } else if (hoveringOver) {
       const { direction, order } = hoveringOver
       const newOrder = parseFloat(order) + (direction === 'left' ? -0.5 : 0.5)
-      const positionChanged = (
+      const positionChanged =
         hoveringOver.order !== this.state.hoveringOver.order ||
         newOrder !== placeholder.order
-      )
       if (positionChanged) {
         // NOTE: this will modify observable card attrs, for later save/update
         placeholder.order = newOrder
         this.positionCards(stateCards, {
           dragging: positionedCard.id,
-          hoveringOver: hoveringOver.order
+          hoveringOver: hoveringOver.order,
         })
         // set temporary transitioning state so that multiple changes can't
         // be triggered within milliseconds of each other, creating flicker
@@ -254,7 +252,10 @@ class CollectionGrid extends React.Component {
     }
   }
 
-  createPlaceholderCard = (original, { width = original.width, height = original.height } = {}) => {
+  createPlaceholderCard = (
+    original,
+    { width = original.width, height = original.height } = {}
+  ) => {
     const placeholderKey = `${original.id}-placeholder`
     const data = {
       position: original.position,
@@ -262,12 +263,12 @@ class CollectionGrid extends React.Component {
       height,
       // better way to do this??
       order: original.order,
-      id: placeholderKey,
       originalId: original.id,
       cardType: 'placeholder',
       record: original.record,
     }
     const placeholder = new CollectionCard(data)
+    updateModelId(placeholder, placeholderKey)
     const newItems = _.concat(this.state.cards, placeholder)
     this.positionCards(newItems, { dragging: original.id })
   }
@@ -276,14 +277,14 @@ class CollectionGrid extends React.Component {
     let hoveringOver = null
     const { dragX, dragY } = dragPosition
     const distances = _.map(this.state.cards, card => {
-      const placeholder = (
-        card.cardType === 'placeholder' ||
-        card.cardType === 'blank'
-      )
+      const placeholder =
+        card.cardType === 'placeholder' || card.cardType === 'blank'
       if (card.id === cardId || placeholder) return null
       // only run this check if we're within the reasonable row bounds
-      if (card.position.yPos <= (dragY + 15) &&
-          card.position.yPos + card.position.height >= (dragY - 15)) {
+      if (
+        card.position.yPos <= dragY + 15 &&
+        card.position.yPos + card.position.height >= dragY - 15
+      ) {
         const mousePos = { x: dragX, y: dragY }
         // const cardCenter = {
         //   x: card.position.xPos + (card.position.width / 2),
@@ -309,11 +310,19 @@ class CollectionGrid extends React.Component {
         const distanceTR = calculateDistance(mousePos, cardTR)
         const distanceBL = calculateDistance(mousePos, cardBL)
         const distanceBR = calculateDistance(mousePos, cardBR)
-        const distance = Math.min(distanceTL, distanceTR, distanceBL, distanceBR)
+        const distance = Math.min(
+          distanceTL,
+          distanceTR,
+          distanceBL,
+          distanceBR
+        )
         let direction = 'left'
-        if (dragY > card.position.yPos &&
-            ((distance === distanceBR || distance === distanceTR) ||
-            (dragY > (card.position.yPos + card.position.height)))) {
+        if (
+          dragY > card.position.yPos &&
+          (distance === distanceBR ||
+            distance === distanceTR ||
+            dragY > card.position.yPos + card.position.height)
+        ) {
           direction = 'right'
         }
         const { order, record } = card
@@ -322,7 +331,7 @@ class CollectionGrid extends React.Component {
           distance,
           direction,
           card,
-          record
+          record,
         }
       }
       return null
@@ -347,7 +356,7 @@ class CollectionGrid extends React.Component {
 
   // empty card acts as a spacer to always show the last row even if empty,
   // and to show a GridCardHotspot to the left when it's the first item in the empty row
-  addEmptyCard = (cards) => {
+  addEmptyCard = cards => {
     if (!this.props.canEditCollection) return
     if (_.find(cards, { id: 'empty' })) return
     let order = cards.length
@@ -364,18 +373,12 @@ class CollectionGrid extends React.Component {
   }
 
   // Sorts cards and sets state.cards after doing so
-  @action positionCards = (collectionCards = [], opts = {}) => {
+  @action
+  positionCards = (collectionCards = [], opts = {}) => {
     const cards = [...collectionCards]
     // props might get passed in e.g. nextProps for componentWillReceiveProps
     if (!opts.props) opts.props = this.props
-    const {
-      gridW,
-      gridH,
-      gutter,
-      cols,
-      sortBy,
-      addEmptyCard,
-    } = opts.props
+    const { gridW, gridH, gutter, cols, sortBy, addEmptyCard } = opts.props
     let row = 0
     const matrix = []
     // create an empty row
@@ -400,24 +403,25 @@ class CollectionGrid extends React.Component {
         let cardHeight = card.height
         if (card.calculateMaxSize) {
           // card.calculateMaxSize won't be defined for blank/placeholder cards
-          ({ cardWidth, cardHeight } = card.calculateMaxSize(cols))
+          ;({ cardWidth, cardHeight } = card.calculateMaxSize(cols))
         }
         // go through the row and see if there is an empty gap that fits cardWidth
         const gaps = groupByConsecutive(matrix[row], null)
         const maxGap = _.maxBy(gaps, 'length') || { length: 0 }
         if (maxGap.length >= cardWidth) {
-          [nextX] = maxGap
+          ;[nextX] = maxGap
           itFits = true
         } else {
           // 2-COLUMN SPECIAL CASE FOR TEXT CARD:
           // - card is (2+)x1 or 1x2 text item and there is a gap of 1 remaining on this row
           // - shrink card to 1x1 to fit on the row.
-          const shouldBackfillSmallGap = (
+          const shouldBackfillSmallGap =
             card.isTextItem &&
             // here we actually check against the card's original dimensions, not its constraints
-            ((card.width >= 2 && card.height === 1) || (card.height === 2 && card.width === 1)) &&
-            cols === 2 && maxGap.length === 1
-          )
+            ((card.width >= 2 && card.height === 1) ||
+              (card.height === 2 && card.width === 1)) &&
+            cols === 2 &&
+            maxGap.length === 1
           if (shouldBackfillSmallGap) {
             cardWidth = 1
             card.setMaxWidth(1)
@@ -426,7 +430,7 @@ class CollectionGrid extends React.Component {
               cardHeight = 1
               card.setMaxHeight(1)
             }
-            [nextX] = maxGap
+            ;[nextX] = maxGap
             itFits = true
           }
         }
@@ -442,38 +446,40 @@ class CollectionGrid extends React.Component {
         const prevCard = sortedCards[i - 1]
         const prevPrevCard = sortedCards[i - 2]
         if (!itFits && cols === 2) {
-          const canFitOneRow = (
-            prevCard && prevCard.isTextItem &&
-            maxGap.length > 0 && prevCard.position.x === 0 && prevCard.maxHeight === 1
-          )
-          const canFitTwoRows = (
-            prevCard && prevCard.isTextItem &&
+          const canFitOneRow =
+            prevCard &&
+            prevCard.isTextItem &&
+            maxGap.length > 0 &&
+            prevCard.position.x === 0 &&
+            prevCard.maxHeight === 1
+          const canFitTwoRows =
+            prevCard &&
+            prevCard.isTextItem &&
             prevCard.maxHeight === 2 &&
             row >= 1 &&
             matrix[row][1] === null &&
             matrix[row - 1][1] === null
-          )
-          const shouldShrinkOneRow = (
-            prevCard && prevCard.isTextItem &&
+          const shouldShrinkOneRow =
+            prevCard &&
+            prevCard.isTextItem &&
             prevCard.maxHeight === 2 &&
             matrix[row][0] === null
-          )
-          const shouldShrinkPrevPrevOneRow = (
-            prevPrevCard && prevPrevCard.isTextItem &&
+          const shouldShrinkPrevPrevOneRow =
+            prevPrevCard &&
+            prevPrevCard.isTextItem &&
             prevPrevCard.maxHeight === 2 &&
             matrix[row][1] === null
-          )
           if (canFitOneRow || canFitTwoRows) {
             prevCard.setMaxWidth(2)
-            prevCard.position.width = (2 * (gridW + gutter)) - gutter
+            prevCard.position.width = 2 * (gridW + gutter) - gutter
           } else if (shouldShrinkOneRow) {
             prevCard.setMaxHeight(1)
-            prevCard.position.height = (1 * (gridH + gutter)) - gutter
+            prevCard.position.height = 1 * (gridH + gutter) - gutter
             itFits = true
             nextX = 0
           } else if (shouldShrinkPrevPrevOneRow) {
             prevPrevCard.setMaxHeight(1)
-            prevPrevCard.position.height = (1 * (gridH + gutter)) - gutter
+            prevPrevCard.position.height = 1 * (gridH + gutter) - gutter
             itFits = true
             nextX = 0
           }
@@ -486,20 +492,20 @@ class CollectionGrid extends React.Component {
           filled = true
           position = {
             x: nextX,
-            y: row
+            y: row,
           }
           _.assign(position, {
             xPos: position.x * (gridW + gutter),
             yPos: position.y * (gridH + gutter),
-            width: (cardWidth * (gridW + gutter)) - gutter,
-            height: (cardHeight * (gridH + gutter)) - gutter,
+            width: cardWidth * (gridW + gutter) - gutter,
+            height: cardHeight * (gridH + gutter) - gutter,
           })
 
           // add position attrs to card
           card.position = position
           card.hoveringOver = false
           if (opts.hoveringOver) {
-            card.hoveringOver = (opts.hoveringOver === card.order)
+            card.hoveringOver = opts.hoveringOver === card.order
           }
 
           // fill rows and columns
@@ -523,12 +529,7 @@ class CollectionGrid extends React.Component {
 
   renderPositionedCards = () => {
     const grid = []
-    const {
-      collection,
-      canEditCollection,
-      routingStore,
-      uiStore,
-    } = this.props
+    const { collection, canEditCollection, routingStore, uiStore } = this.props
     let i = 0
     // unnecessary? we seem to need to preserve the array order
     // in order to not re-draw divs (make transform animation work)
@@ -540,9 +541,9 @@ class CollectionGrid extends React.Component {
       if (!_.includes(['placeholder', 'blank', 'empty'], cardType)) {
         // TODO: some kind of error catch if no record?
         if (card.record) {
-          ({ record } = card)
+          ;({ record } = card)
           // getRecordType gets either 'items' or 'collections'
-          cardType = card.record.getRecordType()
+          cardType = card.record.internalType
         }
       }
       const { openCardMenuId } = uiStore
@@ -563,7 +564,9 @@ class CollectionGrid extends React.Component {
           routeTo={routingStore.routeTo}
           parent={collection}
           menuOpen={openCardMenuId === card.id}
-          lastPinnedCard={card.isPinnedAndLocked && i === this.state.cards.length - 1}
+          lastPinnedCard={
+            card.isPinnedAndLocked && i === this.state.cards.length - 1
+          }
         />
       )
     })
@@ -582,7 +585,7 @@ class CollectionGrid extends React.Component {
     // Rendering cardIds so that grid re-renders when they change
     return (
       <StyledGrid data-card-ids={cardIds} minHeight={minHeight}>
-        { this.renderPositionedCards() }
+        {this.renderPositionedCards()}
       </StyledGrid>
     )
   }

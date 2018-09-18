@@ -12,15 +12,17 @@ class OrganizationSettings extends React.Component {
     return apiStore.currentUser
   }
 
-  handleEmailNotifications = (ev) => {
+  handleEmailNotifications = ev => {
     ev.preventDefault()
     const val = !!(ev.target.value === 'on')
     if (!val) {
       const { uiStore } = this.props
       uiStore.confirm({
-        prompt: 'Are you sure? You will no longer get email updates when you are added to content or mentioned in comments.',
+        prompt:
+          'Are you sure? You will no longer get email updates when you are added to content or mentioned in comments.',
         confirmText: 'Turn off',
-        onConfirm: () => this.user.API_updateCurrentUser({ notify_through_email: val })
+        onConfirm: () =>
+          this.user.API_updateCurrentUser({ notify_through_email: val }),
       })
     } else {
       this.user.API_updateCurrentUser({ notify_through_email: val })

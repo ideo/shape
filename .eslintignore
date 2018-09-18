@@ -1,2 +1,9 @@
 __js_test_config
 app/assets/javascripts/application.js
+node_modules
+vendor
+dist
+public
+styleguide
+**/*.min.js
+config

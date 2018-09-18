@@ -14,9 +14,7 @@ describe('ConfirmationDialog', () => {
       onConfirm: jest.fn(),
       confirmText: 'roger',
     }
-    wrapper = shallow(
-      <ConfirmationDialog {...props} />
-    )
+    wrapper = shallow(<ConfirmationDialog {...props} />)
     component = wrapper.instance()
   })
 

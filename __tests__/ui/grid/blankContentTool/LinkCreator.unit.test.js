@@ -8,12 +8,10 @@ describe('MovableGridCard', () => {
     props = {
       loading: false,
       createCard: jest.fn(),
-      closeBlankContentTool: jest.fn()
+      closeBlankContentTool: jest.fn(),
     }
     props.createCard.mockClear()
-    wrapper = shallow(
-      <LinkCreator {...props} />
-    )
+    wrapper = shallow(<LinkCreator {...props} />)
     component = wrapper.instance()
   })
 

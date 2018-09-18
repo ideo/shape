@@ -1,9 +1,6 @@
-import { useStrict } from 'mobx'
 import RoleSelect from '~/ui/roles/RoleSelect'
 
-import {
-  fakeRole
-} from '#/mocks/data'
+import { fakeRole } from '#/mocks/data'
 
 let props
 let wrapper
@@ -11,7 +8,6 @@ let component
 
 describe('RoleSelect', () => {
   beforeEach(() => {
-    useStrict(false)
     props = {
       role: fakeRole,
       roleTypes: ['viewer', 'editor'],
@@ -19,9 +15,7 @@ describe('RoleSelect', () => {
       onDelete: jest.fn(),
       onCreate: jest.fn(),
     }
-    wrapper = shallow(
-      <RoleSelect {...props} />
-    )
+    wrapper = shallow(<RoleSelect {...props} />)
     component = wrapper.instance()
   })
 
@@ -37,17 +31,20 @@ describe('RoleSelect', () => {
     const fakeSelectEvent = {
       preventDefault: jest.fn(),
       target: {
-        value: 'viewer'
-      }
+        value: 'viewer',
+      },
     }
 
-    it('should call delete role then create role', (done) => {
+    it('should call delete role then create role', done => {
       props.onDelete.mockReturnValue(Promise.resolve())
-      wrapper.instance().onRoleSelect(fakeSelectEvent).then(() => {
-        expect(props.onDelete).toHaveBeenCalled()
-        expect(props.onCreate).toHaveBeenCalled()
-        done()
-      })
+      wrapper
+        .instance()
+        .onRoleSelect(fakeSelectEvent)
+        .then(() => {
+          expect(props.onDelete).toHaveBeenCalled()
+          expect(props.onCreate).toHaveBeenCalled()
+          done()
+        })
     })
   })
 
@@ -57,7 +54,7 @@ describe('RoleSelect', () => {
       expect(props.onCreate).toHaveBeenCalledWith(
         [fakeRole.users[0]],
         'viewer',
-        { isSwitching: true },
+        { isSwitching: true }
       )
     })
   })
@@ -69,11 +66,10 @@ describe('RoleSelect', () => {
     })
 
     it('should call onDelete with the role and user/group', () => {
-      expect(props.onDelete).toHaveBeenCalledWith(
-        props.role,
-        props.entity,
-        { isSwitching: true, organizationChange: false },
-      )
+      expect(props.onDelete).toHaveBeenCalledWith(props.role, props.entity, {
+        isSwitching: true,
+        organizationChange: false,
+      })
     })
 
     describe('when deleting the current user from an org group', () => {
@@ -81,18 +77,17 @@ describe('RoleSelect', () => {
         props.entity.isCurrentUser = true
         props.role = {
           name: 'admin',
-          resource: { internalType: 'groups', is_primary: true }
+          resource: { internalType: 'groups', is_primary: true },
         }
         wrapper.setProps(props)
         component.deleteRole()
       })
 
       it('should pass the organizationChange option to the onDelete', () => {
-        expect(props.onDelete).toHaveBeenCalledWith(
-          props.role,
-          props.entity,
-          { isSwitching: true, organizationChange: true },
-        )
+        expect(props.onDelete).toHaveBeenCalledWith(props.role, props.entity, {
+          isSwitching: true,
+          organizationChange: true,
+        })
       })
     })
   })
@@ -109,12 +104,10 @@ describe('RoleSelect', () => {
     })
 
     it('should return organization when its a primary/guest group', () => {
-      updateRole(
-        {
-          name: 'admin',
-          resource: Object.assign({}, groupResource, { is_primary: true })
-        }
-      )
+      updateRole({
+        name: 'admin',
+        resource: Object.assign({}, groupResource, { is_primary: true }),
+      })
       expect(component.resourceType).toEqual('organization')
     })
 

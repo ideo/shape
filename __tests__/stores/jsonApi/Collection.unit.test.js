@@ -2,25 +2,25 @@ import Collection from '~/stores/jsonApi/Collection'
 
 import fakeApiStore from '#/mocks/fakeApiStore'
 
-import {
-  fakeRole,
-  fakeUser,
-} from '#/mocks/data'
+import { fakeRole, fakeUser } from '#/mocks/data'
 
 // https://stackoverflow.com/questions/47402005/jest-mock-how-to-mock-es6-class-default-import-using-factory-parameter/47502477#47502477
-jest.mock('../../../app/javascript/stores/ApiStore', () => (
+jest.mock('../../../app/javascript/stores/ApiStore', () =>
   jest.fn().mockImplementation(() => {})
-))
+)
 
 describe('Collection', () => {
   let collection
 
   beforeEach(() => {
-    collection = new Collection({
-      name: 'fakeCollection',
-      roles: [fakeRole],
-      organization_id: 4,
-    }, fakeApiStore())
+    collection = new Collection(
+      {
+        name: 'fakeCollection',
+        roles: [fakeRole],
+        organization_id: '4',
+      },
+      fakeApiStore()
+    )
   })
 
   describe('isNormalCollection', () => {
@@ -57,18 +57,27 @@ describe('Collection', () => {
 
   describe('checkCurrentOrg', () => {
     let user
-
-    beforeEach(() => {
-      user = fakeUser
-      user.current_organization = { id: 3 }
-      collection.__collection = { currentUser: user }
-      collection.checkCurrentOrg()
-    })
-
     describe('when the org id is different from the current users org', () => {
       it('should call switchOrganization on the collection', () => {
+        user = fakeUser
+        user.current_organization = { id: '3' }
+        collection.meta.collection.currentUser = user
+        collection.checkCurrentOrg()
         expect(user.switchOrganization).toHaveBeenCalledWith(
-          collection.organization_id,
+          collection.organization_id
+        )
+      })
+    })
+
+    describe('when the org id is the same as the current users org', () => {
+      it('should call switchOrganization on the collection', () => {
+        user.switchOrganization.mockClear()
+        user = fakeUser
+        user.current_organization = { id: '4' }
+        collection.meta.collection.currentUser = user
+        collection.checkCurrentOrg()
+        expect(user.switchOrganization).not.toHaveBeenCalledWith(
+          collection.organization_id
         )
       })
     })

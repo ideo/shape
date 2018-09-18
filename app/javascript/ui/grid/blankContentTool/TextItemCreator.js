@@ -27,11 +27,11 @@ class TextItemCreator extends React.Component {
     super(props)
     // see: https://github.com/quilljs/quill/issues/1134#issuecomment-265065953
     this.onTextChange = _.debounce(this._onTextChange, 1000)
-    this.item = new Item()
+    this.item = new Item({ text_data: {} })
     this.item.can_edit_content = true
   }
 
-  _onTextChange = (itemTextData) => {
+  _onTextChange = itemTextData => {
     this.item.text_data = itemTextData
   }
 
@@ -39,7 +39,7 @@ class TextItemCreator extends React.Component {
     routingStore.routeTo('items', this.item.id)
   }
 
-  onCancel = (item) => {
+  onCancel = item => {
     if (item.justText) {
       this.createTextItem(item)
     } else {
@@ -47,7 +47,7 @@ class TextItemCreator extends React.Component {
     }
   }
 
-  createTextItem = (item) => {
+  createTextItem = item => {
     if (this.props.loading) return
     // make sure to capture last text change before saving
     this.onTextChange.flush()
@@ -57,7 +57,7 @@ class TextItemCreator extends React.Component {
         content: this.item.content,
         text_data: this.item.text_data,
         type: ITEM_TYPES.TEXT,
-      }
+      },
     })
   }
 
@@ -79,11 +79,11 @@ class TextItemCreator extends React.Component {
     }
 
     const { item } = this
-    const textData = item.text_data ? item.toJS().text_data : null
+    const textData = item.text_data ? item.toJSON().text_data : null
 
     return (
       <StyledTextItemCreator height={this.props.height}>
-        { !this.props.loading &&
+        {!this.props.loading && (
           <TextItem
             item={item}
             actionCableConsumer={ActionCableConsumer}
@@ -93,13 +93,8 @@ class TextItemCreator extends React.Component {
             onSave={this.createTextItem}
             onExpand={item.id ? this.expand : null}
           />
-        }
-        { this.props.loading &&
-          <ReactQuill
-            {...quillProps}
-            value={textData}
-          />
-        }
+        )}
+        {this.props.loading && <ReactQuill {...quillProps} value={textData} />}
       </StyledTextItemCreator>
     )
   }

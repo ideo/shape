@@ -1,5 +1,6 @@
 import { action, runInAction, observable, computed } from 'mobx'
-import { Store } from 'mobx-jsonapi-store'
+import { Collection as datxCollection, assignModel, ReferenceType } from 'datx'
+import { jsonapi } from 'datx-jsonapi'
 import _ from 'lodash'
 import moment from 'moment-mini'
 
@@ -18,41 +19,65 @@ import Comment from './jsonApi/Comment'
 import CommentThread from './jsonApi/CommentThread'
 import UsersThread from './jsonApi/UsersThread'
 
-class ApiStore extends Store {
-  @observable currentUserId = null
-  @observable currentUserOrganizationId = null
-  @observable currentCommentThreadIds = []
-  @observable currentPageThreadKey = null
-  @observable recentNotifications = new Map()
-  @observable usableTemplates = []
+class ApiStore extends jsonapi(datxCollection) {
+  @observable
+  currentUserId = null
+  @observable
+  currentUserOrganizationId = null
+  @observable
+  currentCommentThreadIds = []
+  @observable
+  currentPageThreadKey = null
+  @observable
+  recentNotifications = new Map()
+  @observable
+  usableTemplates = []
 
-  @action setCurrentUserId(id) {
+  fetch(type, id, skipCache) {
+    return super.fetch(type, id, { skipCache })
+  }
+
+  request(path, method, data, options = {}) {
+    if (!Object.prototype.hasOwnProperty.call(options, 'skipCache')) {
+      options.skipCache = true
+    }
+    return super.request(path, method, data, options)
+  }
+
+  @action
+  setCurrentUserId(id) {
     this.currentUserId = id
   }
 
-  @action setCurrentUserOrganizationId(id) {
+  @action
+  setCurrentUserOrganizationId(id) {
     this.currentUserOrganizationId = id
   }
 
-  @action setCurrentPageThreadKey(key) {
+  @action
+  setCurrentPageThreadKey(key) {
     this.currentPageThreadKey = key
   }
 
-  @action addCurrentCommentThread(id) {
+  @action
+  addCurrentCommentThread(id) {
     // no need to do anything if we're already on this thread
     if (this.currentCommentThreadIds.indexOf(id) > -1) return
     this.currentCommentThreadIds.push(id)
   }
 
-  @computed get currentUser() {
+  @computed
+  get currentUser() {
     return this.find('users', this.currentUserId)
   }
 
-  @computed get currentUserOrganization() {
+  @computed
+  get currentUserOrganization() {
     return this.find('organizations', this.currentUserOrganizationId)
   }
 
-  @computed get currentOrgSlug() {
+  @computed
+  get currentOrgSlug() {
     if (!this.currentUserOrganization) return ''
     return this.currentUserOrganization.slug
   }
@@ -71,7 +96,9 @@ class ApiStore extends Store {
       const res = await this.request('users/me')
       this.setCurrentUserId(res.data.id)
       const { current_organization } = this.currentUser
-      this.setCurrentUserOrganizationId(current_organization ? current_organization.id : null)
+      this.setCurrentUserOrganizationId(
+        current_organization ? current_organization.id : null
+      )
     } catch (e) {
       trackError(e, { source: 'loadCurrentUser', name: 'fetchUser' })
     }
@@ -99,61 +126,84 @@ class ApiStore extends Store {
     this.add(roles, 'roles')
   }
 
+  @action
   importUsersThread({ usersThread, thread, comments } = {}) {
-    thread.assignRef('users_thread', usersThread)
+    thread.addReference('users_thread', usersThread, {
+      model: UsersThread,
+      type: ReferenceType.TO_ONE,
+    })
     thread.importComments(comments)
     this.addCurrentCommentThread(thread.id)
   }
 
-  @computed get unreadNotifications() {
-    return _.reverse(_.sortBy(
-      this.findAll('notifications').filter(notification => !notification.read),
-      'created_at'
-    ))
+  @computed
+  get unreadNotifications() {
+    return _.reverse(
+      _.sortBy(
+        this.findAll('notifications').filter(
+          notification => !notification.read
+        ),
+        'created_at'
+      )
+    )
   }
 
-  @computed get notifications() {
+  @computed
+  get notifications() {
     return this.findAll('notifications')
   }
 
-  @computed get unreadNotificationsCount() {
+  @computed
+  get unreadNotificationsCount() {
     return this.unreadNotifications.length
   }
 
-  @action addRecentNotification(notification) {
+  @action
+  addRecentNotification(notification) {
     if (this.recentNotifications.has(notification.id)) return
     if (!notification.read) {
       this.recentNotifications.set(notification.id, notification)
     }
     setTimeout(() => {
-      runInAction(() => { this.recentNotifications.set(notification.id, null) })
+      runInAction(() => {
+        this.recentNotifications.set(notification.id, null)
+      })
     }, 3000)
   }
 
-  @computed get unreadCommentsCount() {
+  @computed
+  get unreadCommentsCount() {
     if (!this.currentThreads) return 0
-    return this.currentThreads.reduce((acc, thread) =>
-      acc + thread.unreadCount
-      , 0)
+    return this.currentThreads.reduce(
+      (acc, thread) => acc + thread.unreadCount,
+      0
+    )
   }
 
-  @computed get unreadActivityCount() {
+  @computed
+  get unreadActivityCount() {
     return this.unreadCommentsCount + this.unreadNotificationsCount
   }
 
-  syncFromFirestore(data) {
+  massageFirestoreData = data => {
     const timeFields = ['created_at', 'updated_at', 'last_viewed_at']
-    _.each(data.data.attributes, (v, k) => {
+    // id should no longer be an attribute
+    delete data.attributes.id
+    _.each(data.attributes, (v, k) => {
       if (_.includes(timeFields, k)) {
-        data.data.attributes[k] = v.toDate()
+        data.attributes[k] = v.toDate()
+      }
+      if (k.indexOf('_id') > 0) {
+        data.attributes[k] = v ? v.toString() : v
       }
     })
-    _.each(data.included, d => {
-      _.each(d.attributes, (v, k) => {
-        if (_.includes(timeFields, k)) {
-          d.attributes[k] = v.toDate()
-        }
-      })
+    return data
+  }
+
+  syncFromFirestore(data) {
+    data.data = this.massageFirestoreData(data.data)
+    _.each(data.included, (v, k) => {
+      data.included[k] = this.massageFirestoreData(v)
     })
     return this.sync(data)
   }
@@ -170,11 +220,12 @@ class ApiStore extends Store {
     return thread
   }
 
+  @action
   clearUnpersistedThreads() {
     this.findAll('comment_threads').forEach(ct => {
       // remove any old threads that didn't get persisted
-      if (!ct.__persisted) {
-        this.__removeModels([ct])
+      if (!ct.persisted) {
+        this.__removeModel(ct)
       }
     })
   }
@@ -194,23 +245,33 @@ class ApiStore extends Store {
           // thread.importComments(thread.unread_comments, { unread: true })
         } else {
           // if still not found, set up a new empty record
-          thread = new CommentThread({
-            record_id: record.id,
-            record_type: record.className,
-            updated_at: new Date()
-          }, this)
-          thread.assignRef('record', record)
+          thread = new CommentThread(
+            {
+              record_id: record.id,
+              record_type: record.className,
+              updated_at: new Date(),
+            },
+            this
+          )
+          thread.addReference('record', record, {
+            model: record.className === 'Collection' ? Collection : Item,
+            type: ReferenceType.TO_ONE,
+          })
           this.add(thread)
         }
       } catch (e) {
-        trackError(e, { source: 'findOrBuildCommentThread', name: 'fetchThreads' })
+        trackError(e, {
+          source: 'findOrBuildCommentThread',
+          name: 'fetchThreads',
+        })
       }
     }
     this.setCurrentPageThreadKey(thread.key)
     return thread
   }
 
-  @computed get currentThreads() {
+  @computed
+  get currentThreads() {
     return _.filter(
       _.sortBy(this.findAll('comment_threads'), t => moment(t.updated_at)),
       t => {
@@ -235,7 +296,9 @@ class ApiStore extends Store {
   async fetchUsableTemplates() {
     const other = ''
     let q = `#template ${other}`
-    q = _.trim(q).replace(/\s/g, '+').replace(/#/g, '%23')
+    q = _.trim(q)
+      .replace(/\s/g, '+')
+      .replace(/#/g, '%23')
     // TODO: pagination?
     const res = await this.request(`search?query=${q}`)
     runInAction(() => {
@@ -243,11 +306,21 @@ class ApiStore extends Store {
     })
   }
 
-  // -- override mobx-jsonapi-store --
+  // NOTE: had to override datx PureCollection, it looks like it is meant to do
+  // what's listed below but it was trying to do `this.find(obj, id)` with no id
+  remove(obj, id) {
+    if (typeof obj === 'object') {
+      this.__removeModel(obj)
+    } else {
+      super.remove(obj, id)
+    }
+  }
+
+  // -- override datx-jsonapi to deal with empty arrays --
   __updateRelationships(obj) {
     const record = this.find(obj.type, obj.id)
     const refs = obj.relationships ? Object.keys(obj.relationships) : []
-    refs.forEach((ref) => {
+    refs.forEach(ref => {
       const items = obj.relationships[ref].data
       if (items instanceof Array && items.length < 1) {
         /* NOTE: special case, if relationship data comes back with an empty array
@@ -255,11 +328,11 @@ class ApiStore extends Store {
          */
         const possibleTypes = _.map(ApiStore.types, model => model.type)
         if (possibleTypes.indexOf(ref) > -1) {
-          record.assignRef(ref, observable([]), ref)
+          assignModel(record, ref, observable([]))
         }
       }
     })
-    super.__updateRelationships(obj)
+    return super.__updateRelationships(obj)
   }
 }
 ApiStore.types = [

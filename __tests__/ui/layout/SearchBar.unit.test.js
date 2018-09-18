@@ -1,6 +1,6 @@
 import SearchBar from '~/ui/layout/SearchBar'
 
-let props, wrapper, component, rerender
+let props, wrapper, rerender
 describe('SearchBar', () => {
   beforeEach(() => {
     props = {
@@ -9,12 +9,9 @@ describe('SearchBar', () => {
       onClear: jest.fn(),
     }
     rerender = () => {
-      wrapper = shallow(
-        <SearchBar {...props} />
-      )
+      wrapper = shallow(<SearchBar {...props} />)
     }
     rerender()
-    component = wrapper.instance()
   })
 
   describe('render()', () => {
@@ -43,7 +40,7 @@ describe('SearchBar', () => {
   })
 
   describe('onSearching', () => {
-    let value = 'test'
+    const value = 'test'
 
     beforeEach(() => {
       const ev = { target: { value } }

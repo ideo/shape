@@ -21,8 +21,10 @@ function pluralTypeName(name) {
 class CommentThreadContainer extends React.Component {
   prevScrollPosition = 0
   visibleThreads = observable.map({})
-  @observable bottomOfExpandedThread = false
-  @observable loadingThreads = false
+  @observable
+  bottomOfExpandedThread = false
+  @observable
+  loadingThreads = false
   disposers = {
     expanded: () => null,
     expandedComments: () => null,
@@ -38,38 +40,56 @@ class CommentThreadContainer extends React.Component {
   constructor(props) {
     super(props)
     this.disposers = {}
-    this.disposers.expanded = observe(props.uiStore, 'expandedThreadKey', (change) => {
-      if (change.newValue) {
-        this.handleExpandedThreadChange(change.newValue, change.oldValue)
+    this.disposers.expanded = observe(
+      props.uiStore,
+      'expandedThreadKey',
+      change => {
+        if (change.newValue) {
+          this.handleExpandedThreadChange(change.newValue, change.oldValue)
+          const { expandedThread } = this
+          if (!expandedThread) return
+          this.disposers.expandedComments = expandedThread.comments.observe(
+            commentChange => {
+              const lastComment = _.last(expandedThread.comments)
+              // if last comment is unpersisted it means I just added it; scroll me down
+              if (
+                this.bottomOfExpandedThread ||
+                (lastComment && !lastComment.persisted)
+              ) {
+                this.scrollToTopOfNextThread(expandedThread, { duration: 0 })
+              }
+            }
+          )
+        }
+      }
+    )
+    this.disposers.currentThreads = observe(
+      props.apiStore,
+      'currentThreads',
+      change => {
         const { expandedThread } = this
         if (!expandedThread) return
-        this.disposers.expandedComments = expandedThread.comments.observe((commentChange) => {
-          const lastComment = _.last(expandedThread.comments)
-          // if last comment is unpersisted it means I just added it; scroll me down
-          if (this.bottomOfExpandedThread || (lastComment && !lastComment.__persisted)) {
-            this.scrollToTopOfNextThread(expandedThread, { duration: 0 })
-          }
-        })
+        const oldThreads = change.oldValue
+        const newThreads = change.newValue
+        const oldIdx = oldThreads.indexOf(expandedThread)
+        const newIdx = newThreads.indexOf(expandedThread)
+        // if it didn't exist before, thread was newly created
+        if (oldIdx === -1) return
+        if (oldIdx !== newIdx) {
+          const top = document.getElementsByName(`thread-${oldIdx}`)[0]
+            .offsetTop
+          this.prevScrollPosition = this.containerDiv.scrollTop - top
+        } else if (
+          this.containerDiv.scrollTop === 0 &&
+          this.prevScrollPosition
+        ) {
+          const top = document.getElementsByName(`thread-${newIdx}`)[0]
+            .offsetTop
+          this.containerDiv.scrollTop = this.prevScrollPosition + top
+          this.prevScrollPosition = 0
+        }
       }
-    })
-    this.disposers.currentThreads = observe(props.apiStore, 'currentThreads', (change) => {
-      const { expandedThread } = this
-      if (!expandedThread) return
-      const oldThreads = change.oldValue
-      const newThreads = change.newValue
-      const oldIdx = oldThreads.indexOf(expandedThread)
-      const newIdx = newThreads.indexOf(expandedThread)
-      // if it didn't exist before, thread was newly created
-      if (oldIdx === -1) return
-      if (oldIdx !== newIdx) {
-        const top = document.getElementsByName(`thread-${oldIdx}`)[0].offsetTop
-        this.prevScrollPosition = this.containerDiv.scrollTop - top
-      } else if (this.containerDiv.scrollTop === 0 && this.prevScrollPosition) {
-        const top = document.getElementsByName(`thread-${newIdx}`)[0].offsetTop
-        this.containerDiv.scrollTop = this.prevScrollPosition + top
-        this.prevScrollPosition = 0
-      }
-    })
+    )
   }
 
   componentDidMount() {
@@ -91,7 +111,10 @@ class CommentThreadContainer extends React.Component {
       const nextIdx = idx + 1
       runInAction(() => {
         if (this.visibleThreads[nextIdx]) {
-          if (expandedThread.unreadCount || expandedThread.latestUnreadComments.length) {
+          if (
+            expandedThread.unreadCount ||
+            expandedThread.latestUnreadComments.length
+          ) {
             expandedThread.API_markViewed()
           }
           this.bottomOfExpandedThread = true
@@ -106,7 +129,7 @@ class CommentThreadContainer extends React.Component {
     const thread = this.threads.filter(t => t.key === expandedThreadKey)[0]
     if (!thread) return
     // don't try to load comments of our newly constructed threads
-    if (thread.__persisted && thread.id && expandedThreadKey !== prevKey) {
+    if (thread.persisted && thread.id && expandedThreadKey !== prevKey) {
       runInAction(() => {
         this.loadingThreads = true
       })
@@ -134,12 +157,13 @@ class CommentThreadContainer extends React.Component {
   get showJumpToThreadButton() {
     const { uiStore } = this.props
     const { expandedThread } = this
-    return (uiStore.viewingRecord &&
-        (uiStore.viewingRecord.isNormalCollection ||
-        uiStore.viewingRecord.internalType === 'items')
-    ) &&
+    return (
+      uiStore.viewingRecord &&
+      (uiStore.viewingRecord.isNormalCollection ||
+        uiStore.viewingRecord.internalType === 'items') &&
       expandedThread &&
       uiStore.viewingRecord !== this.expandedThread.record
+    )
   }
 
   get expandedThread() {
@@ -155,14 +179,14 @@ class CommentThreadContainer extends React.Component {
       if (!notification) return false
       const { activity } = notification
       if (activity.action === 'mentioned') return true
-      const identifier = `${pluralTypeName(activity.target_type)}${activity.target_id}`
+      const identifier = `${pluralTypeName(activity.target_type)}${
+        activity.target_id
+      }`
       return uiStore.trackedRecords.get(identifier)
     })
   }
 
-  contentHeight = () => (
-    this.containerDiv.clientHeight
-  )
+  contentHeight = () => this.containerDiv.clientHeight
 
   expandThread = thread => () => {
     const { uiStore } = this.props
@@ -179,7 +203,10 @@ class CommentThreadContainer extends React.Component {
     })
   }
 
-  scrollToTopOfNextThread = (thread, { duration = this.scrollOpts.duration } = {}) => {
+  scrollToTopOfNextThread = (
+    thread,
+    { duration = this.scrollOpts.duration } = {}
+  ) => {
     const idx = this.threads.indexOf(thread)
     const nextIdx = idx + 1
     // have to wait for this thread to expand so the next one is actually lower,
@@ -210,7 +237,7 @@ class CommentThreadContainer extends React.Component {
     this.scrollToTopOfNextThread(thread)
   }
 
-  renderThreads = () => (
+  renderThreads = () =>
     this.threads.map((thread, i) => (
       <ScrollElement name={`thread-${i}`} key={thread.key}>
         <VisibilitySensor
@@ -230,33 +257,41 @@ class CommentThreadContainer extends React.Component {
         </VisibilitySensor>
       </ScrollElement>
     ))
-  )
 
   render() {
     const { uiStore } = this.props
     return (
       <Fragment>
-        {this.showJumpToThreadButton &&
+        {this.showJumpToThreadButton && (
           <button onClick={this.jumpToCurrentThread} className="jumpToThread">
             <h3 style={{ textAlign: 'center' }}>
               Go to {uiStore.viewingRecord.name}
             </h3>
           </button>
-        }
-        {!this.showJumpToThreadButton &&
+        )}
+        {!this.showJumpToThreadButton && (
           // take up the same amount of space as the button
           <div style={{ height: '2rem' }} />
-        }
-        <div style={{ position: 'absolute', top: '62px', zIndex: 500, width: '100%' }}>
+        )}
+        <div
+          style={{
+            position: 'absolute',
+            top: '62px',
+            zIndex: 500,
+            width: '100%',
+          }}
+        >
           {this.trackedNotifications.map(notification => (
-            <Notification notification={notification} key={notification.id} styleType="alert" />
+            <Notification
+              notification={notification}
+              key={notification.id}
+              styleType="alert"
+            />
           ))}
         </div>
         <ActivityContainer id={this.scrollOpts.containerId}>
-          { this.loadingThreads && <InlineLoader fixed background="none" /> }
-          <FlipMove
-            disableAllAnimations={!!uiStore.expandedThreadKey}
-          >
+          {this.loadingThreads && <InlineLoader fixed background="none" />}
+          <FlipMove disableAllAnimations={!!uiStore.expandedThreadKey}>
             {this.renderThreads()}
           </FlipMove>
           <ScrollElement name={`thread-${this.threads.length}`}>
@@ -266,7 +301,9 @@ class CommentThreadContainer extends React.Component {
               onChange={this.handleVisibilityChange(this.threads.length)}
             >
               {/* placeholder so that "bottomOfExpandedThread" will get triggered */}
-              <div style={{ height: '5px', position: 'relative', top: '-10px' }} />
+              <div
+                style={{ height: '5px', position: 'relative', top: '-10px' }}
+              />
             </VisibilitySensor>
           </ScrollElement>
         </ActivityContainer>

@@ -24,7 +24,8 @@ const StyledEditorPill = styled.div`
   &.hidden {
     opacity: 0;
     min-height: 1px;
-    transition: min-height 0.3s ease-out, opacity 0.3s ease-out, z-index 0.5s 0.5s;
+    transition: min-height 0.3s ease-out, opacity 0.3s ease-out,
+      z-index 0.5s 0.5s;
     z-index: -1;
   }
   .editor {
@@ -47,7 +48,7 @@ class EditorPill extends React.PureComponent {
     const { editor, className } = this.props
     return (
       <StyledEditorPill className={className}>
-        { editor.name &&
+        {editor.name && (
           <Fragment>
             <Avatar
               title={editor.name}
@@ -55,11 +56,9 @@ class EditorPill extends React.PureComponent {
               size={38}
               className="editor"
             />
-            <div className="name">
-              {editor.name} (Editing...)
-            </div>
+            <div className="name">{editor.name} (Editing...)</div>
           </Fragment>
-        }
+        )}
       </StyledEditorPill>
     )
   }
@@ -70,11 +69,11 @@ EditorPill.propTypes = {
     name: PropTypes.string,
     pic_url_square: PropTypes.string,
   }).isRequired,
-  className: PropTypes.string
+  className: PropTypes.string,
 }
 
 EditorPill.defaultProps = {
-  className: ''
+  className: '',
 }
 
 export default EditorPill
