@@ -18,21 +18,17 @@ import './commands'
 
 const createNamedRoutes = () => {
   cy.server()
-  cy.route(
-    'POST',
-    '/api/v1/collection_cards',
-  ).as('apiCreateCollectionCard')
-  cy.route(
-    'GET',
-    '/api/v1/collections/*',
-  ).as('apiGetCollection')
+  cy.route('POST', '/api/v1/collection_cards').as('apiCreateCollectionCard')
+  cy.route('GET', '/api/v1/collections/*').as('apiGetCollection')
 }
 
 const createCypressTestArea = () => {
   // login, open BCT and create our test collection
   cy.login({ userId: 1 })
   cy.visit('/')
-  cy.locate('Hotspot').last().click()
+  cy.locate('Hotspot')
+    .last()
+    .click()
   cy.createCollection('Cypress Test Area')
 }
 
