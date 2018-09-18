@@ -76,7 +76,8 @@ class Collection
     private
 
     def setup_default_status_and_questions
-      self.test_status = :draft
+      # ||= mostly useful for unit tests, otherwise should be nil
+      self.test_status ||= :draft
       primary_collection_cards.build(
         order: 0,
         item_attributes: {

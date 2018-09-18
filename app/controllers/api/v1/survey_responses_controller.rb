@@ -19,6 +19,6 @@ class Api::V1::SurveyResponsesController < Api::V1::BaseController
     # had to just use json_api_params
     id = json_api_params['data']['attributes']['test_collection_id']
     @collection = Collection::TestCollection.find(id)
-    head(400) unless @collection.present? && @collection.live?
+    head(400) unless @collection.present? && @collection.live? && @collection.active?
   end
 end

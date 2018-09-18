@@ -142,6 +142,7 @@ class Item < ApplicationRecord
   end
 
   def update_parent_collection_if_needed
+    return if destroyed?
     collection = try(:parent)
     collection.touch if collection && saved_change_to_updated_at?
     return unless collection.present? && collection.cached_cover.present?
