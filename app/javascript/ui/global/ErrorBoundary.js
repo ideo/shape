@@ -11,6 +11,7 @@ class ErrorBoundary extends React.Component {
   componentDidCatch(error, errorInfo) {
     this.setState({ error })
     if (process.env.NODE_ENV === 'development') {
+      // eslint-disable-next-line no-console
       console.error(error)
     }
     const source = errorInfo.componentStack.split('\n')[1]

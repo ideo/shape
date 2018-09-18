@@ -178,7 +178,10 @@ class MarketingPage extends React.Component {
             <ResponsivePadInlineBlock>
               <DesktopSpacer style={{ width: '80px' }} />
               <InvertMarketingLink href="https://www.ideo.com/">
-                &copy; 2018
+                <span role="img" aria-label="copyright">
+                  &copy;
+                </span>{' '}
+                2018
               </InvertMarketingLink>
             </ResponsivePadInlineBlock>
           </Center>

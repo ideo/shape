@@ -35,7 +35,7 @@ class BillingStatement extends React.Component {
           invoice={invoice}
           organization={networkStore.organization}
           subscription={networkStore.subscription}
-          />
+        />
       </Box>
     ) : null
   }

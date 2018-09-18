@@ -13,11 +13,6 @@ const StyledHamburger = styled.div`
   background-size: contain;
 `
 
-const Hamburger = props => {
-  const hamburgerProps = { ...props }
-  return <StyledHamburger {...hamburgerProps} title="Menu" />
-}
-
 StyledHamburger.propTypes = {
   width: PropTypes.number,
   height: PropTypes.number,

@@ -1,5 +1,4 @@
 import styled from 'styled-components'
-import { Flex, Box } from 'reflexbox'
 import v from '~/utils/variables'
 
 const SubscribeInput = styled.input`
