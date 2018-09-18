@@ -1,8 +1,6 @@
 import CommentThreadLoader from '~/ui/threads/CommentThreadLoader'
 
-import {
-  fakeThread,
-} from '#/mocks/data'
+import { fakeThread } from '#/mocks/data'
 
 let wrapper, props, component
 describe('CommentThreadContainer', () => {
@@ -10,9 +8,7 @@ describe('CommentThreadContainer', () => {
     props = {
       thread: fakeThread,
     }
-    wrapper = shallow(
-      <CommentThreadLoader {...props} />
-    )
+    wrapper = shallow(<CommentThreadLoader {...props} />)
     component = wrapper.instance()
   })
 

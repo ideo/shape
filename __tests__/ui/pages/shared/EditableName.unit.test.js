@@ -12,9 +12,7 @@ describe('EditableName', () => {
         canEdit: true,
         uiStore: fakeUiStore,
       }
-      wrapper = shallow(
-        <EditableName.wrappedComponent {...props} />
-      )
+      wrapper = shallow(<EditableName.wrappedComponent {...props} />)
     })
 
     it('renders name', () => {
@@ -25,9 +23,7 @@ describe('EditableName', () => {
   describe('when editing', () => {
     beforeEach(() => {
       props.uiStore.editingName = true
-      wrapper = shallow(
-        <EditableName.wrappedComponent {...props} canEdit />
-      )
+      wrapper = shallow(<EditableName.wrappedComponent {...props} canEdit />)
     })
 
     it('shows editable field', () => {
@@ -38,7 +34,7 @@ describe('EditableName', () => {
 
     it('calls updateNameHandler with name after user edits name', () => {
       wrapper.find('AutosizeInput').simulate('change', {
-        target: { value: 'Stellar Collection' }
+        target: { value: 'Stellar Collection' },
       })
       // Flush debounced save so it is called
       wrapper.instance().saveName.flush()
@@ -48,7 +44,7 @@ describe('EditableName', () => {
 
     it('saves and returns to read-only name when enter is pressed in input', () => {
       wrapper.find('AutosizeInput').simulate('keyPress', {
-        key: 'Enter'
+        key: 'Enter',
       })
       expect(props.uiStore.update).toHaveBeenCalledWith('editingName', false)
     })

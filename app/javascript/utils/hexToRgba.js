@@ -41,9 +41,11 @@ function hexRgb(hexStr, options = {}) {
   }
 
   const num = parseInt(hex, 16)
+  /* eslint-disable no-bitwise */
   const red = num >> 16
   const green = (num >> 8) & 255
   const blue = num & 255
+  /* eslint-enable no-bitwise */
 
   return options.format === 'array'
     ? [red, green, blue, alpha]

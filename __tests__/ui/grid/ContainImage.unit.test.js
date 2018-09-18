@@ -1,7 +1,5 @@
 import ContainImage from '~/ui/grid/ContainImage'
-import {
-  fakeCollectionCard,
-} from '#/mocks/data'
+import { fakeCollectionCard } from '#/mocks/data'
 
 const card = fakeCollectionCard
 const props = {
@@ -14,9 +12,7 @@ let wrapper, component
 describe('ContainImage', () => {
   beforeEach(() => {
     props.card.image_contain = false
-    wrapper = shallow(
-      <ContainImage {...props} />
-    )
+    wrapper = shallow(<ContainImage {...props} />)
     component = wrapper.instance()
   })
 

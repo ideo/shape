@@ -2,9 +2,7 @@ import Notification from '~/ui/notifications/Notification'
 import v from '~/utils/variables'
 import { apiStore } from '~/stores'
 
-import {
-  fakeNotification,
-} from '#/mocks/data'
+import { fakeNotification } from '#/mocks/data'
 
 jest.mock('../../../app/javascript/stores')
 jest.mock('../../../app/javascript/utils/sleep')
@@ -16,12 +14,10 @@ describe('Notification', () => {
     fakeData = { name: '' }
     apiStore.fetch.mockReturnValue(Promise.resolve({ data: fakeData }))
     props = {
-      notification: fakeNotification
+      notification: fakeNotification,
     }
     reRender = function() {
-      wrapper = shallow(
-        <Notification {...props} />
-      )
+      wrapper = shallow(<Notification {...props} />)
       component = wrapper.instance()
     }
     reRender()
@@ -29,7 +25,10 @@ describe('Notification', () => {
 
   describe('componentWillMount', () => {
     it('should call apiStore.fetch to get the activity target, and set the target', () => {
-      expect(apiStore.fetch).toHaveBeenCalledWith('collections', fakeNotification.activity.target_id)
+      expect(apiStore.fetch).toHaveBeenCalledWith(
+        'collections',
+        fakeNotification.activity.target_id
+      )
       expect(fakeNotification.activity.setTarget).toHaveBeenCalledWith(fakeData)
     })
   })
@@ -69,12 +68,8 @@ describe('Notification', () => {
 
       it('should change the styles', () => {
         const ele = wrapper.find('StyledNotification')
-        expect(ele).toHaveStyleRule(
-          'background', v.colors.orange
-        )
-        expect(ele).toHaveStyleRule(
-          'margin-right', '0px'
-        )
+        expect(ele).toHaveStyleRule('background', v.colors.orange)
+        expect(ele).toHaveStyleRule('margin-right', '0px')
       })
     })
 

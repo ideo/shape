@@ -30,7 +30,7 @@ class ErrorBoundary extends React.Component {
             textAlign: 'center',
           }}
         >
-          <h3>We're sorry — something's gone wrong.</h3>
+          <h3>{"We're sorry — something's gone wrong."}</h3>
         </div>
       )
     }

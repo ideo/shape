@@ -1,7 +1,4 @@
 import BaseRecord from './BaseRecord'
-import { prop } from 'datx'
-import User from './User'
-import Group from './Group'
 
 class Role extends BaseRecord {
   static type = 'roles'

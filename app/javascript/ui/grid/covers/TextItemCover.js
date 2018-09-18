@@ -102,6 +102,7 @@ class TextItemCover extends React.Component {
     if (ev) ev.stopPropagation()
     this.clearTextEditingItem()
     // TODO figure out why ref wasn't working
+    // eslint-disable-next-line react/no-find-dom-node
     const node = ReactDOM.findDOMNode(this)
     node.scrollTop = 0
   }
@@ -115,6 +116,7 @@ class TextItemCover extends React.Component {
     }
     this.setState({ loading: false, item })
     // TODO figure out why ref wasn't working
+    // eslint-disable-next-line react/no-find-dom-node
     const node = ReactDOM.findDOMNode(this)
     node.scrollTop = 0
   }
@@ -162,7 +164,6 @@ class TextItemCover extends React.Component {
   }
 
   render() {
-    const { item } = this.props
     const { isEditing } = this
     const content = isEditing ? this.renderEditing() : this.renderDefault()
     return (

@@ -1,6 +1,5 @@
 import PropTypes from 'prop-types'
 import mime from 'mime-types'
-import styled from 'styled-components'
 
 import PptSvg from '~/ui/icons/files/ppt.svg'
 import DocSvg from '~/ui/icons/files/doc.svg'
@@ -10,7 +9,6 @@ import SketchSvg from '~/ui/icons/files/sketch.svg'
 import XlsSvg from '~/ui/icons/files/xls.svg'
 import FileSvg from '~/ui/icons/files/file.svg'
 import PdfSvg from '~/ui/icons/files/pdf.svg'
-import v from '~/utils/variables'
 
 class FileIcon extends React.PureComponent {
   get svg() {

@@ -1,8 +1,6 @@
 import ImageItemCover from '~/ui/grid/covers/ImageItemCover'
 
-import {
-  fakeImageItem,
-} from '#/mocks/data'
+import { fakeImageItem } from '#/mocks/data'
 
 const props = {
   item: fakeImageItem,
@@ -11,9 +9,7 @@ const props = {
 let wrapper
 describe('ImageItemCover', () => {
   beforeEach(() => {
-    wrapper = shallow(
-      <ImageItemCover {...props} />
-    )
+    wrapper = shallow(<ImageItemCover {...props} />)
   })
 
   it('renders the StyledImageItem', () => {
@@ -21,7 +17,9 @@ describe('ImageItemCover', () => {
   })
 
   it('passes the url to StyledImageCover', () => {
-    expect(wrapper.find('StyledImageCover').props().url).toEqual(fakeImageItem.filestack_file_url)
+    expect(wrapper.find('StyledImageCover').props().url).toEqual(
+      fakeImageItem.filestack_file_url
+    )
   })
 
   describe('when contain prop is true', () => {

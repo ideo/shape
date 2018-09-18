@@ -1,4 +1,3 @@
-import PropTypes from 'prop-types'
 import moment from 'moment-mini'
 import styled from 'styled-components'
 import v from '~/utils/variables'
@@ -21,11 +20,5 @@ const StyledDate = styled.span`
 const Moment = ({ date } = {}) => (
   <StyledDate>{moment(date).format(defaultFormat(date))}</StyledDate>
 )
-Moment.propTypes = {
-  color: PropTypes.oneOf(Object.values(v.colors)),
-}
-Moment.defaultProps = {
-  color: v.colors.cloudy,
-}
 
 export default Moment

@@ -33,11 +33,12 @@ ActivityCount.defaultProps = {
 
 @observer
 class ActivityLogButton extends React.Component {
+  // eslint-disable-next-line class-methods-use-this
   get activityCount() {
     return apiStore.unreadActivityCount
   }
 
-  toggleActivityLog() {
+  toggleActivityLog = () => {
     const val = !uiStore.activityLogOpen
     uiStore.update('activityLogOpen', val)
   }

@@ -8,17 +8,17 @@ describe('MovableGridCard', () => {
       loading: false,
       type: 'collection',
       createCard: jest.fn(),
-      closeBlankContentTool: jest.fn()
+      closeBlankContentTool: jest.fn(),
     }
     props.createCard.mockClear()
-    wrapper = shallow(
-      <CollectionCreator {...props} />
-    )
+    wrapper = shallow(<CollectionCreator {...props} />)
     component = wrapper.instance()
   })
 
   it('renders a BctTextField', () => {
-    expect(wrapper.find('BctTextField').props().placeholder).toEqual('Collection name')
+    expect(wrapper.find('BctTextField').props().placeholder).toEqual(
+      'Collection name'
+    )
     expect(wrapper.find('BctTextField').props().autoFocus).toBeTruthy()
   })
 
@@ -28,24 +28,25 @@ describe('MovableGridCard', () => {
         inputText: 'New Projects',
       }
       component.createCollection(e)
-      expect(props.createCard).toHaveBeenCalledWith({
-        collection_attributes: {
-          name: component.state.inputText,
-          master_template: false,
-          type: null,
+      expect(props.createCard).toHaveBeenCalledWith(
+        {
+          collection_attributes: {
+            name: component.state.inputText,
+            master_template: false,
+            type: null,
+          },
         },
-      }, {
-        afterCreate: null,
-      })
+        {
+          afterCreate: null,
+        }
+      )
     })
 
     describe('with SubmissionBox', () => {
       beforeEach(() => {
         props.type = 'submissionBox'
         props.createCard.mockClear()
-        wrapper = shallow(
-          <CollectionCreator {...props} />
-        )
+        wrapper = shallow(<CollectionCreator {...props} />)
         component = wrapper.instance()
       })
 
@@ -54,15 +55,18 @@ describe('MovableGridCard', () => {
           inputText: 'Challenge #1',
         }
         component.createCollection(e)
-        expect(props.createCard).toHaveBeenCalledWith({
-          collection_attributes: {
-            name: component.state.inputText,
-            master_template: false,
-            type: 'Collection::SubmissionBox',
+        expect(props.createCard).toHaveBeenCalledWith(
+          {
+            collection_attributes: {
+              name: component.state.inputText,
+              master_template: false,
+              type: 'Collection::SubmissionBox',
+            },
           },
-        }, {
-          afterCreate: expect.any(Function),
-        })
+          {
+            afterCreate: expect.any(Function),
+          }
+        )
       })
     })
 
@@ -70,9 +74,7 @@ describe('MovableGridCard', () => {
       beforeEach(() => {
         props.type = 'testCollection'
         props.createCard.mockClear()
-        wrapper = shallow(
-          <CollectionCreator {...props} />
-        )
+        wrapper = shallow(<CollectionCreator {...props} />)
         component = wrapper.instance()
       })
 
@@ -81,15 +83,18 @@ describe('MovableGridCard', () => {
           inputText: 'My New Test',
         }
         component.createCollection(e)
-        expect(props.createCard).toHaveBeenCalledWith({
-          collection_attributes: {
-            name: component.state.inputText,
-            master_template: false,
-            type: 'Collection::TestCollection',
+        expect(props.createCard).toHaveBeenCalledWith(
+          {
+            collection_attributes: {
+              name: component.state.inputText,
+              master_template: false,
+              type: 'Collection::TestCollection',
+            },
           },
-        }, {
-          afterCreate: null,
-        })
+          {
+            afterCreate: null,
+          }
+        )
       })
     })
   })

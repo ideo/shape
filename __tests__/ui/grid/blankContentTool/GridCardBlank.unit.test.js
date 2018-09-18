@@ -3,9 +3,7 @@ import CollectionCard from '~/stores/jsonApi/CollectionCard'
 import fakeApiStore from '#/mocks/fakeApiStore'
 import fakeUiStore from '#/mocks/fakeUiStore'
 import FilestackUpload from '~/utils/FilestackUpload'
-import {
-  fakeCollectionCard
-} from '#/mocks/data'
+import { fakeCollectionCard } from '#/mocks/data'
 
 // replace FilestackUpload with a mock, no need to hit actual filestack API
 jest.mock('../../../../app/javascript/utils/FilestackUpload')
@@ -24,11 +22,10 @@ beforeEach(() => {
     height: 100,
     parent: { id: 1 },
   }
-  wrapper = shallow(
-    <GridCardBlank.wrappedComponent {...props} />
-  )
+  wrapper = shallow(<GridCardBlank.wrappedComponent {...props} />)
   component = wrapper.instance()
-  FilestackUpload.pickImage = jest.fn()
+  FilestackUpload.pickImage = jest
+    .fn()
     .mockReturnValue(Promise.resolve({ filesUploaded: [] }))
 })
 
@@ -93,9 +90,7 @@ describe('GridCardBlank', () => {
         height: 1,
         emptyCollection: true,
       }
-      wrapper = shallow(
-        <GridCardBlank.wrappedComponent {...props} />
-      )
+      wrapper = shallow(<GridCardBlank.wrappedComponent {...props} />)
     })
 
     it('does not render the close button', () => {
@@ -112,9 +107,7 @@ describe('GridCardBlank', () => {
         height: 1,
         replacingId,
       }
-      wrapper = shallow(
-        <GridCardBlank.wrappedComponent {...props} />
-      )
+      wrapper = shallow(<GridCardBlank.wrappedComponent {...props} />)
     })
 
     it('only renders video and image content creation buttons', () => {
