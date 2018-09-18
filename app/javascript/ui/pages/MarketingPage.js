@@ -1,5 +1,6 @@
 import { Fragment } from 'react'
 import { Box } from 'reflexbox'
+import { Element as ScrollElement } from 'react-scroll'
 
 import { MarketingBack,
   MarketingFooter,
@@ -26,8 +27,6 @@ import poweredByIdeo from '~/assets/Powered-by-IDEO-Inverted.png'
 import MarketingMenu from '~/ui/marketing/MarketingMenu.js'
 import SubscribeEmail from '~/ui/marketing/SubscribeEmail.js'
 import ProductDescriptions from '~/ui/marketing/ProductDescriptions.js'
-import { Element as ScrollElement } from 'react-scroll'
-// import VisibilitySensor from 'react-visibility-sensor'
 import firebase from '~/vendor/firebaseMarketing.js'
 
 class MarketingPage extends React.Component {
@@ -103,6 +102,7 @@ class MarketingPage extends React.Component {
         </MarketingBack>
 
         <MarketingFooter>
+          <ScrollElement name="FooterAnchor" />
           <MarketingFlex
             align="center"
             justify="center"
@@ -119,8 +119,6 @@ class MarketingPage extends React.Component {
                 {this.state.pageTexts.footerSubHeader}
               </InvertMarketingH1>
             </Box>
-
-            <ScrollElement name="FooterAnchor" />
             <Box w={1} py={32}>
               <a href="/login">
                 <MarketingHeavyCTA href="/login">{this.state.pageTexts.buttonFooter}</MarketingHeavyCTA>
