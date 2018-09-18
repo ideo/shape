@@ -76,9 +76,8 @@ class Header extends React.Component {
     const { apiStore } = this.props
     await apiStore.request('/sessions', 'DELETE')
     try {
-      // Log user out of IDEO network
-      // Redirect to /login once done
-      await IdeoSSO.logout('/login')
+      // Log user out of IDEO network, back to homepage
+      await IdeoSSO.logout('/')
     } catch (e) {
       window.location = '/login'
     }

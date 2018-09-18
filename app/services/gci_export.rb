@@ -14,10 +14,15 @@ class GciExport
         'profile last update',
         'total comments by user',
         'other activities by user',
+        'profile comments',
+        'profile other activities',
         # 'days active in last 2 months',
       ]
       profiles.collections.find_each do |profile|
         user = profile.created_by
+        next unless user.present?
+        profile_items = Item.in_collection(profile)
+        item_activities_count = profile_items.collect{|i| i.activities.where.not(action: [:commented, :mentioned]).count }.sum
         row = [
           user.name,
           "https://www.shape.space/network-leads/collections/#{profile.id}",
@@ -25,7 +30,8 @@ class GciExport
           profile.updated_at,
           user.comments.count,
           user.activities_as_actor.where.not(action: [:commented, :mentioned]).count,
-          # user.activities_as_actor.where('created_at > ?', 2.month.ago).group_by{|x| x.created_at.strftime("%Y-%m-%d")}.count,
+          profile.try(:comment_thread).try(:comments).try(:count) || 0,
+          profile.activities.where.not(action: [:commented, :mentioned]).count + item_activities_count,
         ]
         csv << row
       end

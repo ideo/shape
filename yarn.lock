@@ -81,7 +81,7 @@
     lodash "^4.2.0"
     to-fast-properties "^2.0.0"
 
-"@firebase/app-types@0.3.2":
+"@firebase/app-types@0.3.2", "@firebase/app-types@^0.3.2":
   version "0.3.2"
   resolved "https://registry.yarnpkg.com/@firebase/app-types/-/app-types-0.3.2.tgz#a92dc544290e2893bd8c02a81e684dae3d8e7c85"
 
@@ -6797,13 +6797,15 @@ mkdirp@0.5.x, "mkdirp@>=0.5 0", mkdirp@^0.5, mkdirp@^0.5.0, mkdirp@^0.5.1, mkdir
   dependencies:
     minimist "0.0.8"
 
-mobx-localstorage@^0.1.7:
-  version "0.1.7"
-  resolved "https://registry.yarnpkg.com/mobx-localstorage/-/mobx-localstorage-0.1.7.tgz#c0c64366769f390ca4a333f41912eae00cd4a9de"
+mobx-localstorage@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/mobx-localstorage/-/mobx-localstorage-1.0.0.tgz#573d1a4094352be0059f4f81a99c4c15b71080f6"
+  dependencies:
+    reactive-localstorage "^0.0.2"
 
-mobx-react-router@^4.0.1:
-  version "4.0.1"
-  resolved "https://registry.yarnpkg.com/mobx-react-router/-/mobx-react-router-4.0.1.tgz#72f67b5c637d187595415500e8afa5cddb2231ab"
+mobx-react-router@^4.0.4:
+  version "4.0.5"
+  resolved "https://registry.yarnpkg.com/mobx-react-router/-/mobx-react-router-4.0.5.tgz#5f270eebceb64c256bc2f3c6bde8c5d88e76819e"
 
 mobx-react@^5.0.0:
   version "5.2.5"
@@ -8856,6 +8858,10 @@ react@^16.0.0, react@^16.4.2:
     loose-envify "^1.1.0"
     object-assign "^4.1.1"
     prop-types "^15.6.0"
+
+reactive-localstorage@^0.0.2:
+  version "0.0.2"
+  resolved "https://registry.yarnpkg.com/reactive-localstorage/-/reactive-localstorage-0.0.2.tgz#4ab8c5736d0ff4013f177dbbfba33742b7f0f34c"
 
 read-cache@^1.0.0:
   version "1.0.0"

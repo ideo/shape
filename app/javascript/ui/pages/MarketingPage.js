@@ -1,5 +1,6 @@
 import { Fragment } from 'react'
 import { Box } from 'reflexbox'
+import { Element as ScrollElement } from 'react-scroll'
 
 import { MarketingBack,
   MarketingFooter,
@@ -23,11 +24,9 @@ import { MarketingBack,
   InvertedFixedWidth,
 } from '~/ui/global/styled/marketing.js'
 import poweredByIdeo from '~/assets/Powered-by-IDEO-Inverted.png'
-import MarketingMenu from '~/ui/pages/SubComponents/MarketingMenu.js'
-import SubscribeEmail from '~/ui/pages/SubComponents/SubscribeEmail.js'
-import ProductDescriptions from '~/ui/pages/SubComponents/ProductDescriptions.js'
-import { Element as ScrollElement } from 'react-scroll'
-// import VisibilitySensor from 'react-visibility-sensor'
+import MarketingMenu from '~/ui/marketing/MarketingMenu.js'
+import SubscribeEmail from '~/ui/marketing/SubscribeEmail.js'
+import ProductDescriptions from '~/ui/marketing/ProductDescriptions.js'
 import firebase from '~/vendor/firebaseMarketing.js'
 
 class MarketingPage extends React.Component {
@@ -103,13 +102,14 @@ class MarketingPage extends React.Component {
         </MarketingBack>
 
         <MarketingFooter>
+          <ScrollElement name="FooterAnchor" />
           <MarketingFlex
             align="center"
             justify="center"
             wrap
             w={1}
           >
-            <Box w={1} mb={10}>
+            <Box w={1}>
               <InvertMarketingH1Bold>
                 {this.state.pageTexts.footerHeader}
               </InvertMarketingH1Bold>
@@ -119,11 +119,9 @@ class MarketingPage extends React.Component {
                 {this.state.pageTexts.footerSubHeader}
               </InvertMarketingH1>
             </Box>
-
-            <ScrollElement name="FooterAnchor" />
-            <Box w={1} py={[35, 46]} mb={5}>
+            <Box w={1} py={32}>
               <a href="/login">
-                <MarketingCallToAction href="/login">{this.state.pageTexts.buttonFooter}</MarketingCallToAction>
+                <MarketingHeavyCTA href="/login">{this.state.pageTexts.buttonFooter}</MarketingHeavyCTA>
               </a>
             </Box>
 
@@ -142,7 +140,7 @@ class MarketingPage extends React.Component {
               <InvertMarketingLinkMail href="mailto:hello@shape.space">hello@shape.space</InvertMarketingLinkMail>
             </Box>
 
-            <Box w={1} mb={8} wrap>
+            <Box w={1} wrap>
               <InvertedFixedWidth>{this.state.pageTexts.subscriptionHeader}</InvertedFixedWidth>
             </Box>
 

@@ -284,7 +284,7 @@ export const InvertMarketingLinkMail = styled(Anchor)`
   letter-spacing: -0.2px;
   font-size: 32px;
   font-family: ${v.fonts.serif};
-  padding-bottom: 68px;
+  margin-bottom: 68px;
   display:inline-block;
 `
 InvertMarketingLinkMail.displayName = 'StyledInvertMarketingLinkMail'
@@ -314,8 +314,8 @@ MarketingBetaSticker.displayName = 'StyledMarketingBetaSticker'
 export const MarketingShapeLogo = styled.img.attrs({
   ref: 'MarketingShapeLogo',
   src: 'https://s3-us-west-2.amazonaws.com/assets.shape.space/logo.svg',
+  alt: 'Shape',
 })`
-  alt: 'Shape';
   width: 100%;
   max-width: 256px;
   margin-top: 70px;

@@ -55,6 +55,7 @@
     }
   },
   "dependencies": {
+    "@firebase/app-types": "^0.3.2",
     "@material-ui/core": "^1.5.0",
     "@rails/webpacker": "4.0.0-pre.2",
     "actioncable": "^5.2.0",
@@ -83,9 +84,9 @@
     "lodash": "~4.17.4",
     "mime-types": "^2.1.19",
     "mobx": "^4.4.0",
-    "mobx-localstorage": "^0.1.7",
+    "mobx-localstorage": "^1.0.0",
     "mobx-react": "^5.0.0",
-    "mobx-react-router": "^4.0.1",
+    "mobx-react-router": "^4.0.4",
     "moment-mini": "^2.19.4",
     "page-metadata-parser": "^1.1.2",
     "papaparse": "^4.6.0",
