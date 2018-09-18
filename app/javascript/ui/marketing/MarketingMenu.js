@@ -103,7 +103,7 @@ function handleScrollToFooter() {
     duration: 1500,
     delay: 100,
     smooth: true,
-    offset: 0,
+    offset: -125,
   })
 }
 
@@ -144,7 +144,7 @@ const MobileLinks = (
 
     <Box>
       <a href="/login" rel="noopener noreferrer">
-        <NavLink align="left">LOGIN</NavLink>
+        <NavLink align="left">Login</NavLink>
       </a>
     </Box>
   </MarketingFlex>
@@ -182,8 +182,8 @@ class MarketingMenu extends React.PureComponent {
           <MarketingFlex align="center" justify="center" w={1}>
             <Box w={15 / 32}>
               <section align="left">
-                <NavLink onClick={handleScrollToContent}>PRODUCT</NavLink>
-                <NavLink onClick={handleScrollToFooter}>PRICING</NavLink>
+                <NavLink onClick={handleScrollToContent}>Product</NavLink>
+                <NavLink onClick={handleScrollToFooter}>Pricing</NavLink>
               </section>
             </Box>
 
@@ -197,9 +197,9 @@ class MarketingMenu extends React.PureComponent {
 
             <Box w={15 / 32}>
               <section align="right">
-                <NavLink onClick={handleScrollToFooter}>CONTACT</NavLink>
+                <NavLink onClick={handleScrollToFooter}>Contact</NavLink>
                 <a href="/login" rel="noopener noreferrer">
-                  <NavLink>LOGIN</NavLink>
+                  <NavLink>Login</NavLink>
                 </a>
               </section>
             </Box>
