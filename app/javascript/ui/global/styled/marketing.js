@@ -68,6 +68,11 @@ export const ResponsivePadInlineBlock = styled(ResponsiveInlineBlock)`
   & > * {
     margin-bottom: 13px;
   }
+
+  @media only screen and (max-width: ${v.responsive.smallBreakpoint}px) {
+    width: 100%;
+    margin-bottom: 4px;
+  }
 `
 ResponsivePadInlineBlock.displayName = 'StyledResponsivePadInlineBlock'
 
