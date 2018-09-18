@@ -46,7 +46,7 @@ class ManagePaymentMethods extends React.Component {
       this.props.networkStore.organization,
       token
     )
-    // this.forceUpdate()
+    this.forceUpdate()
     closeModal()
   }
 
