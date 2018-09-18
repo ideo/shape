@@ -179,10 +179,13 @@ class MarketingMenu extends React.PureComponent {
             w={1}
           >
             <Box w={15 / 32}>
-              <section align="left">
+              <MarketingFlex
+                align="center"
+                justify="flex-start"
+              >
                 <NavLink onClick={handleScrollToContent}>Product</NavLink>
                 <NavLink onClick={handleScrollToFooter}>Pricing</NavLink>
-              </section>
+              </MarketingFlex>
             </Box>
 
             <Box w={2 / 32}>
@@ -194,12 +197,15 @@ class MarketingMenu extends React.PureComponent {
             </Box>
 
             <Box w={15 / 32}>
-              <section align="right">
+              <MarketingFlex
+                align="center"
+                justify="flex-end"
+              >
                 <NavLink onClick={handleScrollToFooter}>Contact</NavLink>
                 <a href="/login" rel="noopener noreferrer">
                   <NavLink>Login</NavLink>
                 </a>
-              </section>
+              </MarketingFlex>
             </Box>
 
           </MarketingFlex>
