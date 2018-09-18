@@ -37,8 +37,10 @@ const IconHolder = styled.span`
   color: ${v.colors.cloudy};
   display: block;
   height: 32px;
-  ${props => (props.align === 'left' ? 'margin-right: 12px;' : 'margin-left: 6px;')}
-  margin-top: 14px;
+  ${props =>
+    props.align === 'left'
+      ? 'margin-right: 12px;'
+      : 'margin-left: 6px;'} margin-top: 14px;
   width: 32px;
 
   @media only screen and (max-width: ${v.responsive.smallBreakpoint}px) {
@@ -50,6 +52,7 @@ const IconHolder = styled.span`
 const HeaderFormButton = FormButton.extend`
   margin-left: 30px;
   margin-top: 10px;
+  font-size: 0.825rem;
 `
 
 const LiveTestIndicator = styled.span`
@@ -67,7 +70,8 @@ const LiveTestIndicator = styled.span`
 @inject('routingStore', 'uiStore')
 @observer
 class PageHeader extends React.Component {
-  @observable iconAndTagsWidth = 0
+  @observable
+  iconAndTagsWidth = 0
 
   get canEdit() {
     const { record } = this.props
@@ -76,11 +80,14 @@ class PageHeader extends React.Component {
 
   get hasActions() {
     const { record } = this.props
-    return record.internalType === 'items' || (!record.isUserCollection &&
-      !record.isSharedCollection)
+    return (
+      record.internalType === 'items' ||
+      (!record.isUserCollection && !record.isSharedCollection)
+    )
   }
 
-  @action updateIconAndTagsWidth(ref) {
+  @action
+  updateIconAndTagsWidth(ref) {
     if (!ref) return
     this.iconAndTagsWidth = ref.offsetWidth
   }
@@ -90,7 +97,7 @@ class PageHeader extends React.Component {
     uiStore.update('rolesMenuOpen', record)
   }
 
-  updateRecordName = (name) => {
+  updateRecordName = name => {
     const { record } = this.props
     record.name = name
     record.save()
@@ -108,10 +115,16 @@ class PageHeader extends React.Component {
 
   routeBack = ({ type } = {}) => {
     const { record, routingStore } = this.props
-    if (record.internalType === 'items' || type === 'move' || type === 'archive') {
+    if (
+      record.internalType === 'items' ||
+      type === 'move' ||
+      type === 'archive'
+    ) {
       if (record.parent_collection_card.parent_id) {
-        routingStore.routeTo('collections',
-          record.parent_collection_card.parent_id)
+        routingStore.routeTo(
+          'collections',
+          record.parent_collection_card.parent_id
+        )
       } else {
         routingStore.routeTo('homepage')
       }
@@ -140,9 +153,7 @@ class PageHeader extends React.Component {
       )
     }
     // 2. CommentIcon (toggle ActivityLog)
-    elements.push(
-      <ActivityLogButton key="activity" />
-    )
+    elements.push(<ActivityLogButton key="activity" />)
     if (this.hasActions && record.parent_collection_card) {
       // TODO hacky way to include the record on the card link
       record.parent_collection_card.record = record
@@ -178,9 +189,17 @@ class PageHeader extends React.Component {
   get collectionIcon() {
     const { record } = this.props
     if (record.isProfileTemplate) {
-      return <IconHolder align="left"><FilledProfileIcon /></IconHolder>
+      return (
+        <IconHolder align="left">
+          <FilledProfileIcon />
+        </IconHolder>
+      )
     } else if (record.isMasterTemplate) {
-      return <IconHolder align="left"><TemplateIcon circled filled /></IconHolder>
+      return (
+        <IconHolder align="left">
+          <TemplateIcon circled filled />
+        </IconHolder>
+      )
     }
     return null
   }
@@ -194,10 +213,7 @@ class PageHeader extends React.Component {
       if (tagList.length > 24) {
         tagList = `${tagList.slice(0, 21)}...`
       }
-      return (
-        <SubduedHeading1>
-          {tagList}
-        </SubduedHeading1>)
+      return <SubduedHeading1>{tagList}</SubduedHeading1>
     }
     return null
   }
@@ -225,24 +241,26 @@ class PageHeader extends React.Component {
   render() {
     const { record, isHomepage, uiStore } = this.props
     const breadcrumb = isHomepage ? [] : record.breadcrumb
-    const tagEditorOpen = record.parent_collection_card &&
+    const tagEditorOpen =
+      record.parent_collection_card &&
       uiStore.tagsModalOpenId === record.parent_collection_card.id
 
     const rolesRecord = uiStore.rolesMenuOpen ? uiStore.rolesMenuOpen : record
     return (
       <FixedPageHeader>
         <MaxWidthContainer>
-          <RolesModal
-            record={rolesRecord}
-            roles={rolesRecord.roles}
-          />
+          <RolesModal record={rolesRecord} roles={rolesRecord.roles} />
           <Breadcrumb items={breadcrumb} />
           <div>
             <StyledTitleAndRoles
               className={record.isCurrentUserProfile ? 'user-profile' : ''}
               justify="space-between"
             >
-              <Flex align="flex-start" className="title" onClick={this.handleTitleClick}>
+              <Flex
+                align="flex-start"
+                className="title"
+                onClick={this.handleTitleClick}
+              >
                 {this.collectionIcon}
                 <EditableName
                   name={record.name}
@@ -252,53 +270,52 @@ class PageHeader extends React.Component {
                 />
                 <div
                   style={{ display: 'flex' }}
-                  ref={(ref) => {
+                  ref={ref => {
                     this.updateIconAndTagsWidth(ref)
                   }}
                 >
                   {this.collectionTypeIcon}
-                  {record.isLiveTest &&
-                    <LiveTestIndicator>
-                      Live
-                    </LiveTestIndicator>
-                  }
+                  {record.isLiveTest && (
+                    <LiveTestIndicator>Live</LiveTestIndicator>
+                  )}
                   {this.collectionTypeOrInheritedTags}
                 </div>
-                {record.isUsableTemplate &&
+                {record.isUsableTemplate && (
                   <HeaderFormButton
+                    width="160"
                     color="blue"
                     onClick={this.openMoveMenuForTemplate}
                   >
                     Use Template
                   </HeaderFormButton>
-                }
-                {record.isLaunchableTest &&
-                  <HeaderFormButton
-                    onClick={record.launchTest}
-                  >
+                )}
+                {record.isLaunchableTest && (
+                  <HeaderFormButton onClick={record.launchTest}>
                     Get Feedback
                   </HeaderFormButton>
-                }
-                {record.isLiveTest &&
+                )}
+                {record.isLiveTest && (
                   <Fragment>
                     <CopyToClipboard
                       text={record.publicTestURL}
                       onCopy={() => null}
                     >
                       <HeaderFormButton
-                        width="200"
+                        width="140"
                         color="hollow"
-                        onClick={() => uiStore.popupSnackbar({ message: 'Test link copied' })}
+                        onClick={() =>
+                          uiStore.popupSnackbar({ message: 'Test link copied' })
+                        }
                       >
                         <span
                           style={{
                             display: 'inline-block',
-                            height: 30,
-                            width: 30,
+                            height: 24,
+                            width: 27,
                             verticalAlign: 'middle',
                           }}
                         >
-                          <LinkIconSm size="small" />
+                          <LinkIconSm />
                         </span>
                         <span
                           style={{
@@ -306,29 +323,35 @@ class PageHeader extends React.Component {
                             verticalAlign: 'middle',
                           }}
                         >
-                          Get Test Link
+                          Get Link
                         </span>
                       </HeaderFormButton>
                     </CopyToClipboard>
                     <HeaderFormButton
+                      width="170"
                       color="hollow"
                       style={{ marginLeft: 10 }}
                       onClick={() => console.log('stopped!')}
                     >
-                      Stop Test
+                      Stop Feedback
                     </HeaderFormButton>
                   </Fragment>
-                }
+                )}
               </Flex>
-              <Flex align="flex-end" style={{ height: '60px', marginTop: '-10px' }}>
-                <Fragment>
-                  {this.actions}
-                </Fragment>
+              <Flex
+                align="flex-end"
+                style={{ height: '60px', marginTop: '-10px' }}
+              >
+                <Fragment>{this.actions}</Fragment>
               </Flex>
             </StyledTitleAndRoles>
           </div>
         </MaxWidthContainer>
-        <TagEditorModal canEdit={this.canEdit} record={record} open={tagEditorOpen} />
+        <TagEditorModal
+          canEdit={this.canEdit}
+          record={record}
+          open={tagEditorOpen}
+        />
       </FixedPageHeader>
     )
   }

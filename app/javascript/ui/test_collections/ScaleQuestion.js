@@ -7,7 +7,8 @@ import { DisplayText, SmallHelperText } from '~/ui/global/styled/typography'
 import v from '~/utils/variables'
 
 const Question = styled.div`
-  border-color: ${props => (props.editing ? v.colors.gray : v.colors.testLightBlueBg)};
+  border-color: ${props =>
+    props.editing ? v.colors.gray : v.colors.testLightBlueBg};
   border-bottom-style: solid;
   border-bottom-width: 6px;
   box-sizing: border-box;
@@ -48,25 +49,25 @@ class ScaleQuestion extends React.Component {
   get emojiScale() {
     const { emojiSeries } = this.props
     switch (emojiSeries) {
-    case 'thumbs':
-      return [
-        { number: 1, name: 'terrible', symbol: '👎' },
-        { number: 2, name: 'bad', scale: 0.6, symbol: '👎' },
-        { number: 3, name: 'good', scale: 0.6, symbol: '👍' },
-        { number: 4, name: 'great', symbol: '👍' },
-      ]
-    case 'faces':
-    default:
-      return [
-        { number: 1, name: 'terrible', symbol: '😡' },
-        { number: 2, name: 'bad', symbol: '☹️' },
-        { number: 3, name: 'good', symbol: '😊' },
-        { number: 4, name: 'great', symbol: '😍' },
-      ]
+      case 'thumbs':
+        return [
+          { number: 1, name: 'terrible', symbol: '👎' },
+          { number: 2, name: 'bad', scale: 0.6, symbol: '👎' },
+          { number: 3, name: 'good', scale: 0.6, symbol: '👍' },
+          { number: 4, name: 'great', symbol: '👍' },
+        ]
+      case 'faces':
+      default:
+        return [
+          { number: 1, name: 'terrible', symbol: '😡' },
+          { number: 2, name: 'bad', symbol: '☹️' },
+          { number: 3, name: 'good', symbol: '😊' },
+          { number: 4, name: 'great', symbol: '😍' },
+        ]
     }
   }
 
-  vote = (number) => (ev) => {
+  vote = number => ev => {
     ev.preventDefault()
     this.props.onAnswer({ number })
   }
@@ -77,16 +78,18 @@ class ScaleQuestion extends React.Component {
     return (
       <div style={{ width: '100%' }}>
         <Question editing={editing}>
-          <DisplayText>
-            {questionText}
-          </DisplayText>
+          <DisplayText>{questionText}</DisplayText>
         </Question>
         <Scale>
           <SmallHelperText>select your response below</SmallHelperText>
           <EmojiHolder>
             {emojis.map(emoji => (
               <StyledButton
-                selected={questionAnswer && questionAnswer.answer_number === emoji.number}
+                // before any are selected they all should be "selected" aka full opacity
+                selected={
+                  !questionAnswer ||
+                  questionAnswer.answer_number === emoji.number
+                }
                 key={emoji.name}
                 onClick={this.vote(emoji.number)}
                 // "vote" button is disabled while editing
