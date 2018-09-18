@@ -100,7 +100,8 @@ class TestDesigner extends React.Component {
     })
 
   handleTrash = card => {
-    card.API_destroy()
+    // TODO: might *not* want to skipPrompt if the test is currently live
+    card.API_archiveSelf()
   }
 
   handleNew = card => () => {

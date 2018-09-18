@@ -168,6 +168,18 @@ class CollectionCard extends BaseRecord {
     return removedCount
   }
 
+  async API_archiveSelf() {
+    try {
+      this.apiStore.request(`collection_cards/archive`, 'PATCH', {
+        card_ids: [this.id],
+      })
+      this.parent.removeCard(this)
+      return
+    } catch (e) {
+      uiStore.defaultAlertError()
+    }
+  }
+
   async API_archive({ isReplacing = false } = {}) {
     const { selectedCardIds } = uiStore
     const popupAgreed = new Promise((resolve, reject) => {
