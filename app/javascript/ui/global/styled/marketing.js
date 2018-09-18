@@ -38,7 +38,7 @@ export const MarketingFooter = styled.div`
   font-family: ${v.fonts.sans};
   color: ${v.colors.desert};
   font-size: 1rem;
-  padding-top: 50px;
+  padding-top: 52px;
   padding-bottom: 22px;
   padding-right: 24px;
   padding-left: 24px;
@@ -46,6 +46,13 @@ export const MarketingFooter = styled.div`
   @media only screen and (min-width: ${v.responsive.smallBreakpoint}px) {
     padding-left: 0px;
     padding-right: 0px;
+  }
+
+  @media only screen and (max-width: ${v.responsive.smallBreakpoint}px) {
+    h1 {
+      line-height: 26px;
+      padding: 0;
+    }
   }
 `
 MarketingFooter.displayName = 'StyledMarketingFooter'
