@@ -6,6 +6,8 @@ Cypress.Commands.add('login', ({ userId } = {}) =>
   cy.request('GET', `/login_as?id=${userId}`)
 )
 
+Cypress.Commands.add('logout', () => cy.request('DELETE', '/api/v1/sessions'))
+
 Cypress.Commands.add('locate', selector => cy.get(`[data-cy=${selector}]`))
 
 Cypress.Commands.add('createCollection', collectionName => {
