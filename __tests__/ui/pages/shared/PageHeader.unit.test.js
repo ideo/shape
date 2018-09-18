@@ -149,7 +149,7 @@ describe('PageHeader', () => {
     it('should show the Use Template button', () => {
       expect(
         wrapper
-          .find('StyledFormButton')
+          .find('HeaderFormButton')
           .children()
           .text()
       ).toEqual('Use Template')
@@ -159,7 +159,7 @@ describe('PageHeader', () => {
   describe('with a TestCollection', () => {
     beforeEach(() => {
       props.record = fakeCollection
-      props.record.isTestCollection = true
+      props.record.isTestCollectionOrTestDesign = true
       props.record.isUsableTemplate = false
       props.record.inherited_tag_list = ['test']
       wrapper = shallow(<PageHeader.wrappedComponent {...props} />)
