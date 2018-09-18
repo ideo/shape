@@ -171,6 +171,10 @@ export const MarketingTagLine = styled(MarketingH2)`
   @media only screen and (min-width: ${v.responsive.smallBreakpoint}px) {
       font-size: 32px;
   }
+
+  @media only screen and (max-width: ${v.responsive.smallBreakpoint}px) {
+      padding: 0 24px;
+  }
 `
 MarketingTagLine.displayName = 'StyledMarketingTagLine'
 
