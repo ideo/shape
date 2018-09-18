@@ -165,7 +165,7 @@ class MarketingMenu extends React.PureComponent {
     this.setState({ width: window.innerWidth })
   }
 
-  toggleDrawer = (isOpen) => () => {
+  toggleDrawer = isOpen => () => {
     this.setState({ drawerState: isOpen })
   }
 
@@ -173,20 +173,20 @@ class MarketingMenu extends React.PureComponent {
     <Fragment>
       <MenuBar className="MenuBar top">
         <Toolbar>
-          <MarketingFlex
-            align="center"
-            justify="center"
-            w={1}
-          >
+          <MarketingFlex align="center" justify="center" w={1}>
             <Box w={15 / 32}>
-              <section align="left">
+              <MarketingFlex align="center" justify="flex-start">
                 <NavLink onClick={handleScrollToContent}>PRODUCT</NavLink>
                 <NavLink onClick={handleScrollToFooter}>PRICING</NavLink>
-              </section>
+              </MarketingFlex>
+              {/* <section align="left">
+                <NavLink onClick={handleScrollToContent}>PRODUCT</NavLink>
+                <NavLink onClick={handleScrollToFooter}>PRICING</NavLink>
+              </section> */}
             </Box>
 
             <Box w={2 / 32}>
-              <section align="center" >
+              <section align="center">
                 <button onClick={handleScrollToTop}>
                   <ToggleLogo className="ToggleLogo" width={48} />
                 </button>
@@ -194,14 +194,19 @@ class MarketingMenu extends React.PureComponent {
             </Box>
 
             <Box w={15 / 32}>
-              <section align="right">
+              <MarketingFlex align="center" justify="flex-end">
                 <NavLink onClick={handleScrollToFooter}>CONTACT</NavLink>
                 <a href="/login" rel="noopener noreferrer">
                   <NavLink>LOGIN</NavLink>
                 </a>
-              </section>
+              </MarketingFlex>
+              {/* <section align="right">
+                <NavLink onClick={handleScrollToFooter}>CONTACT</NavLink>
+                <a href="/login" rel="noopener noreferrer">
+                  <NavLink>LOGIN</NavLink>
+                </a>
+              </section> */}
             </Box>
-
           </MarketingFlex>
         </Toolbar>
       </MenuBar>
@@ -212,10 +217,7 @@ class MarketingMenu extends React.PureComponent {
     <Fragment>
       <MenuBar className={`MenuBar top`}>
         <Toolbar disableGutters>
-          <MarketingFlex
-            align="center"
-            w={1}
-          >
+          <MarketingFlex align="center" w={1}>
             <Box ml={2}>
               <button onClick={handleScrollToTop}>
                 <ToggleLogo className="ToggleLogo" width={48} />
@@ -225,7 +227,6 @@ class MarketingMenu extends React.PureComponent {
             <Box ml="auto" mr={2}>
               <Hamburger role="button" onClick={this.toggleDrawer(true)} float="right" />
             </Box>
-
           </MarketingFlex>
         </Toolbar>
       </MenuBar>
