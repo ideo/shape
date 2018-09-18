@@ -208,6 +208,10 @@ class Collection extends BaseRecord {
   }
 
   launchTest = () => {
+    if (!this.can_edit) {
+      uiStore.alert('Only editors are allowed to launch the test.')
+      return
+    }
     uiStore.confirm({
       prompt:
         'Are you sure? Once you get your first response, you can no longer change your test.',

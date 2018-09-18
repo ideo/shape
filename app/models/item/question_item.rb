@@ -13,6 +13,8 @@ class Item
     }
 
     def requires_roles?
+      # NOTE: QuestionItems defer their can_edit access to their parent collection.
+      # this is defined in item.rb as to be shared by Questions / FileItems
       false
     end
   end

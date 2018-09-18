@@ -290,11 +290,12 @@ class PageHeader extends React.Component {
                     Use Template
                   </HeaderFormButton>
                 )}
-                {record.isLaunchableTest && (
-                  <HeaderFormButton onClick={record.launchTest}>
-                    Get Feedback
-                  </HeaderFormButton>
-                )}
+                {record.isLaunchableTest &&
+                  record.can_edit && (
+                    <HeaderFormButton onClick={record.launchTest}>
+                      Get Feedback
+                    </HeaderFormButton>
+                  )}
                 {record.isLiveTest && (
                   <Fragment>
                     <CopyToClipboard

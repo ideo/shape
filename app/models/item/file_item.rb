@@ -15,7 +15,7 @@ class Item
     end
 
     def requires_roles?
-      return false if parent.is_a? Collection::TestCollection
+      return false if parent.test_collection?
       true
     end
 
