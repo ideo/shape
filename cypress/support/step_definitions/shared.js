@@ -16,7 +16,10 @@ Given('I visit the Test Area', () => {
     .click()
 })
 
-//
+Given('I logout and visit the Marketing Page', () => {
+  cy.logout()
+  cy.visit('/')
+})
 
 When('I create a collection named {string}', name => {
   cy.createCollection(name)
@@ -48,6 +51,10 @@ Then('I should see a collection card named {string}', name => {
 
 Then('I should see {string} in a {string}', (text, el) => {
   cy.locate(el).should('contain', text)
+})
+
+Then('I should see the element {string}', el => {
+  cy.locate(el).should('be.visible')
 })
 
 Then('the URL should match the captured URL', () => {
