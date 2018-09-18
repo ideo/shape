@@ -21,28 +21,28 @@ class ProductDescriptions extends React.PureComponent {
     db = firebase.firestore()
 
     const productDescriptions = []
-    db.collection('productDescriptions').orderBy('order').get()
-      .then((snapshot) => {
+    db.collection('productDescriptions')
+      .orderBy('order')
+      .get()
+      .then(snapshot => {
         snapshot.forEach(product => {
-          productDescriptions.push(<ProductDescription
-            key={product.id}
-            id={product.id}
-            order={product.data().order}
-            title={product.data().title}
-            description={product.data().description}
-            imageUrl={product.data().imageUrl}
-          />)
+          productDescriptions.push(
+            <ProductDescription
+              key={product.id}
+              id={product.id}
+              order={product.data().order}
+              title={product.data().title}
+              description={product.data().description}
+              imageUrl={product.data().imageUrl}
+            />
+          )
         })
         this.setState({ products: productDescriptions })
       })
   }
 
   render() {
-    return (
-      <Content>
-        {this.state.products}
-      </Content>
-    )
+    return <Content>{this.state.products}</Content>
   }
 }
 

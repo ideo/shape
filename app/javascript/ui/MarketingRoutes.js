@@ -18,7 +18,7 @@ class MarketingRoutes extends React.Component {
       secondary: {
         main: v.colors.pacificBlue,
       },
-    }
+    },
   })
 
   render() {

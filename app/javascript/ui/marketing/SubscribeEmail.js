@@ -1,5 +1,4 @@
 import styled from 'styled-components'
-import { Flex, Box } from 'reflexbox'
 import v from '~/utils/variables'
 
 const SubscribeInput = styled.input`
@@ -72,40 +71,62 @@ class SubscribeEmail extends React.Component {
           target="_blank"
           noValidate
         >
-              <input type="hidden" name="u" value="2f039cb306f0565682c88c494" />
-              <input type="hidden" name="id" value="b141f584d3" />
-              <SubscribeInput
-                id="mce-EMAIL"
-                name="EMAIL"
-                type="email"
-                placeholder="Email"
-                value={this.state.emailText}
-                onChange={(e) => { this.setState({ emailText: e.target.value }) }}
-                autoCapitalize="off"
-                autoCorrect="off"
+          <input type="hidden" name="u" value="2f039cb306f0565682c88c494" />
+          <input type="hidden" name="id" value="b141f584d3" />
+          <SubscribeInput
+            id="mce-EMAIL"
+            name="EMAIL"
+            type="email"
+            placeholder="Email"
+            value={this.state.emailText}
+            onChange={e => {
+              this.setState({ emailText: e.target.value })
+            }}
+            autoCapitalize="off"
+            autoCorrect="off"
+          />
+          <SubscribeButton id="mc-embedded-subscribe" type="submit">
+            Subscribe
+          </SubscribeButton>
+          <div
+            style={{ position: 'absolute', left: '-5000px' }}
+            aria-hidden="true"
+            aria-label="Please leave the following three fields empty"
+          >
+            <label htmlFor="b_name">
+              Name:
+              <input
+                type="text"
+                name="b_name"
+                tabIndex="-1"
+                value=""
+                placeholder="Freddie"
+                id="b_name"
               />
-              <SubscribeButton
-                id="mc-embedded-subscribe"
-                type="submit"
-              >
-                Subscribe
-              </SubscribeButton>
-            <div style={{ position: 'absolute', left: '-5000px' }} aria-hidden="true" aria-label="Please leave the following three fields empty">
-              <label htmlFor="b_name">
-                Name:
-                <input type="text" name="b_name" tabIndex="-1" value="" placeholder="Freddie" id="b_name" />
-              </label>
+            </label>
 
-              <label htmlFor="b_email">
-                Email:
-                <input type="email" name="b_email" tabIndex="-1" value="" placeholder="youremail@gmail.com" id="b_email" />
-              </label>
+            <label htmlFor="b_email">
+              Email:
+              <input
+                type="email"
+                name="b_email"
+                tabIndex="-1"
+                value=""
+                placeholder="youremail@gmail.com"
+                id="b_email"
+              />
+            </label>
 
-              <label htmlFor="b_comment">
-                Comment:
-                <textarea name="b_comment" tabIndex="-1" placeholder="Please comment" id="b_comment" />
-              </label>
-            </div>
+            <label htmlFor="b_comment">
+              Comment:
+              <textarea
+                name="b_comment"
+                tabIndex="-1"
+                placeholder="Please comment"
+                id="b_comment"
+              />
+            </label>
+          </div>
         </form>
       </div>
     )

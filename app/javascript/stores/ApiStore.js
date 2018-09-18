@@ -47,7 +47,7 @@ class ApiStore extends jsonapi(datxCollection) {
   @action
   setCurrentUserInfo({ id, organizationId }) {
     this.currentUserId = id
-    this.currentUserOrganizationId = organizationId ? organizationId : null
+    this.currentUserOrganizationId = organizationId || null
   }
 
   @action
