@@ -2,6 +2,8 @@ import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import ReactRouterPropTypes from 'react-router-prop-types'
 import PrintableInvoice from '~shared/components/compounds/PrintableInvoice'
 import trackError from '~/utils/trackError'
+import Box from '~shared/components/atoms/Box'
+import v from '~/utils/variables'
 
 @inject('apiStore', 'networkStore')
 @observer
@@ -28,11 +30,13 @@ class BillingStatement extends React.Component {
     const invoice = networkStore.find('invoices', match.params.id)
     const { organization, subscription } = networkStore
     return invoice && organization && subscription ? (
-      <PrintableInvoice
-        invoice={invoice}
-        organization={networkStore.organization}
-        subscription={networkStore.subscription}
-        />
+      <Box mt={v.headerHeightCompact}>
+        <PrintableInvoice
+          invoice={invoice}
+          organization={networkStore.organization}
+          subscription={networkStore.subscription}
+          />
+      </Box>
     ) : null
   }
 }
