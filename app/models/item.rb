@@ -44,9 +44,9 @@ class Item < ApplicationRecord
   validates :type, presence: true
 
   before_save :cache_attributes
-  after_commit :touch_related_cards, if: :saved_change_to_updated_at?
-  after_commit :reindex_parent_collection
-  after_commit :update_parent_collection_if_needed
+  after_commit :touch_related_cards, if: :saved_change_to_updated_at?, unless: :destroyed?
+  after_commit :reindex_parent_collection, unless: :destroyed?
+  after_commit :update_parent_collection_if_needed, unless: :destroyed?
 
   amoeba do
     enable

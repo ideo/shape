@@ -161,6 +161,7 @@ class CollectionCover extends React.Component {
 
     return (
       <StyledCollectionCover
+        data-cy="CollectionCover"
         url={cover.image_url}
         isSpecialCollection={collection.isSpecialCollection}
         // onClick can be null, is used by SearchResultsInfinite

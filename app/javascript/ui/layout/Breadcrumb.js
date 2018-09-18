@@ -61,7 +61,7 @@ class Breadcrumb extends React.Component {
     const { items } = this.props
     const links = items.map(item => this.breadcrumbItem(item))
     return (
-      <StyledBreadcrumb>
+      <StyledBreadcrumb data-cy="Breadcrumb">
         <span className="crumb" key="myCollection">
           <Link to={routingStore.pathTo('homepage')}>My Collection</Link>
         </span>
