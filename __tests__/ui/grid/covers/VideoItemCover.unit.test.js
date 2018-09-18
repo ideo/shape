@@ -1,8 +1,6 @@
 import VideoItemCover from '~/ui/grid/covers/VideoItemCover'
 
-import {
-  fakeVideoItem,
-} from '#/mocks/data'
+import { fakeVideoItem } from '#/mocks/data'
 
 const props = {
   item: fakeVideoItem,
@@ -12,9 +10,7 @@ const props = {
 let wrapper
 describe('VideoItemCover', () => {
   beforeEach(() => {
-    wrapper = shallow(
-      <VideoItemCover {...props} />
-    )
+    wrapper = shallow(<VideoItemCover {...props} />)
   })
 
   it('renders the StyledVideoCover', () => {
@@ -22,7 +18,9 @@ describe('VideoItemCover', () => {
   })
 
   it('passes the thumbnail_url to StyledImageCover', () => {
-    expect(wrapper.find('StyledImageCover').props().url).toEqual(fakeVideoItem.thumbnail_url)
+    expect(wrapper.find('StyledImageCover').props().url).toEqual(
+      fakeVideoItem.thumbnail_url
+    )
   })
 
   it('does not play ReactPlayer by default', () => {

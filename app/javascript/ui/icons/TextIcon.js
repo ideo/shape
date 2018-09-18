@@ -1,9 +1,13 @@
 import PropTypes from 'prop-types'
 import Icon from './Icon'
 
-const TextIcon = (props) => (
+const TextIcon = props => (
   <Icon fill>
-    <svg viewBox={props.viewBox} version="1.1" xmlns="http://www.w3.org/2000/svg">
+    <svg
+      viewBox={props.viewBox}
+      version="1.1"
+      xmlns="http://www.w3.org/2000/svg"
+    >
       <title>Text</title>
       <g>
         <g>
@@ -17,7 +21,7 @@ TextIcon.propTypes = {
   viewBox: PropTypes.string,
 }
 TextIcon.defaultProps = {
-  viewBox: '0 0 31 34'
+  viewBox: '0 0 31 34',
 }
 
 export default TextIcon

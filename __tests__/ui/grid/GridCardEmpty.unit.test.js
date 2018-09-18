@@ -23,9 +23,7 @@ describe('MovableGridCard', () => {
       apiStore,
     }
     shallowRender = (withProps = props) => {
-      wrapper = shallow(
-        <GridCardEmpty.wrappedComponent {...withProps} />
-      )
+      wrapper = shallow(<GridCardEmpty.wrappedComponent {...withProps} />)
       component = wrapper.instance()
     }
   })

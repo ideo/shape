@@ -1,8 +1,6 @@
 import TextItemCover from '~/ui/grid/covers/TextItemCover'
 
-import {
-  fakeTextItem,
-} from '#/mocks/data'
+import { fakeTextItem } from '#/mocks/data'
 
 const item = fakeTextItem
 const props = {
@@ -14,9 +12,7 @@ let wrapper
 describe('TextItemCover', () => {
   beforeEach(() => {
     props.editable = false
-    wrapper = shallow(
-      <TextItemCover {...props} />
-    )
+    wrapper = shallow(<TextItemCover {...props} />)
   })
 
   it('renders Quill with item.text_data', () => {
@@ -26,7 +22,7 @@ describe('TextItemCover', () => {
   it('renders Read More if text height exceeds the viewable area', () => {
     const inst = wrapper.instance()
     inst.quillEditor = {
-      getEditingArea: () => ({ offsetHeight: 900 })
+      getEditingArea: () => ({ offsetHeight: 900 }),
     }
     inst.componentDidMount()
     // force re-render to pick up state update
@@ -38,7 +34,7 @@ describe('TextItemCover', () => {
   it('does not render Read More if text height fits within the viewable area', () => {
     const inst = wrapper.instance()
     inst.quillEditor = {
-      getEditingArea: () => ({ offsetHeight: 50 })
+      getEditingArea: () => ({ offsetHeight: 50 }),
     }
     inst.componentDidMount()
     wrapper.update()

@@ -3,7 +3,11 @@ import Icon from './Icon'
 // Not technically an "icon", but we want to utilize the same SVG setup
 const HotspotHelperGraphic = () => (
   <Icon fill>
-    <svg data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 277.73 153.21">
+    <svg
+      data-name="Layer 1"
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 277.73 153.21"
+    >
       <defs>
         <clipPath id="a" transform="translate(-42.46 -65.79)">
           <path

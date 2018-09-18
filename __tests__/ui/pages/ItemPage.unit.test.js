@@ -18,7 +18,11 @@ beforeEach(() => {
     findResult: item,
     requestResult: { data: item },
   })
-  match = { params: { id, org: apiStore.currentOrgSlug }, path: `/items/${id}`, url: `/items/${id}` }
+  match = {
+    params: { id, org: apiStore.currentOrgSlug },
+    path: `/items/${id}`,
+    url: `/items/${id}`,
+  }
   apiStore.items = [item]
   props = {
     apiStore,
@@ -28,9 +32,7 @@ beforeEach(() => {
     location: { search: '' },
   }
 
-  wrapper = shallow(
-    <ItemPage.wrappedComponent {...props} />
-  )
+  wrapper = shallow(<ItemPage.wrappedComponent {...props} />)
   component = wrapper.instance()
 })
 
@@ -64,7 +66,10 @@ describe('ItemPage', () => {
   describe('with params ?open=comments', () => {
     beforeEach(() => {
       wrapper = shallow(
-        <ItemPage.wrappedComponent {...props} location={{ search: '?open=comments' }} />
+        <ItemPage.wrappedComponent
+          {...props}
+          location={{ search: '?open=comments' }}
+        />
       )
     })
 

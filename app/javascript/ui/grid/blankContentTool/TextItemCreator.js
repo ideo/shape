@@ -31,7 +31,7 @@ class TextItemCreator extends React.Component {
     this.item.can_edit_content = true
   }
 
-  _onTextChange = (itemTextData) => {
+  _onTextChange = itemTextData => {
     this.item.text_data = itemTextData
   }
 
@@ -39,7 +39,7 @@ class TextItemCreator extends React.Component {
     routingStore.routeTo('items', this.item.id)
   }
 
-  onCancel = (item) => {
+  onCancel = item => {
     if (item.justText) {
       this.createTextItem(item)
     } else {
@@ -47,7 +47,7 @@ class TextItemCreator extends React.Component {
     }
   }
 
-  createTextItem = (item) => {
+  createTextItem = item => {
     if (this.props.loading) return
     // make sure to capture last text change before saving
     this.onTextChange.flush()
@@ -57,7 +57,7 @@ class TextItemCreator extends React.Component {
         content: this.item.content,
         text_data: this.item.text_data,
         type: ITEM_TYPES.TEXT,
-      }
+      },
     })
   }
 
@@ -83,7 +83,7 @@ class TextItemCreator extends React.Component {
 
     return (
       <StyledTextItemCreator height={this.props.height}>
-        { !this.props.loading &&
+        {!this.props.loading && (
           <TextItem
             item={item}
             actionCableConsumer={ActionCableConsumer}
@@ -93,13 +93,8 @@ class TextItemCreator extends React.Component {
             onSave={this.createTextItem}
             onExpand={item.id ? this.expand : null}
           />
-        }
-        { this.props.loading &&
-          <ReactQuill
-            {...quillProps}
-            value={textData}
-          />
-        }
+        )}
+        {this.props.loading && <ReactQuill {...quillProps} value={textData} />}
       </StyledTextItemCreator>
     )
   }

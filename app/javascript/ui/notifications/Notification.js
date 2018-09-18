@@ -20,7 +20,8 @@ function pluralTypeName(name) {
 }
 
 const StyledContainer = styled.div`
-  background: ${props => (props.isDefault ? v.colors.activityDarkestBlue : v.colors.orange)};
+  background: ${props =>
+    props.isDefault ? v.colors.activityDarkestBlue : v.colors.orange};
   box-sizing: border-box;
   margin-left: ${props => (props.isDefault ? 10 : 0)}px;
   margin-right: ${props => (props.isDefault ? 10 : 0)}px;
@@ -35,7 +36,9 @@ const StyledContainer = styled.div`
     opacity: 0;
   }
 
-  ${props => !props.isDefault && (`
+  ${props =>
+    !props.isDefault &&
+    `
     a {
       color: white;
     }
@@ -43,7 +46,7 @@ const StyledContainer = styled.div`
     p {
       font-size: 14px;
     }
-  `)}
+  `};
 `
 StyledContainer.displayName = 'StyledNotification'
 
@@ -54,51 +57,64 @@ const ButtonContainer = styled.div`
   margin-right: 9px;
   margin-top: 20px;
   width: 12px;
-  ${props => !props.isDefault && (`
+  ${props =>
+    !props.isDefault &&
+    `
     justify-content: flex-end;
     margin-top: 0;
     position: absolute;
     right: -5px;
     top: 2px;
-  `)}
+  `};
 `
 
 @observer
 class Notification extends React.Component {
-  @observable fadeInProgress = true
+  @observable
+  fadeInProgress = true
   componentWillMount() {
     const { notification } = this.props
     const { activity } = notification
     const targetType = pluralTypeName(activity.target_type)
     const target = apiStore.find(targetType, activity.target_id)
     if (!target) {
-      apiStore.fetch(targetType, activity.target_id).then(res => {
-        activity.setTarget(res.data)
-      }).catch((err) => {
-        // Create a fake target in this strange usecase to remove loading
-        activity.setTarget({ name: 'Unknown', internalType: targetType })
-        trackError(err, { name: 'Notification:Mount' })
-      })
+      apiStore
+        .fetch(targetType, activity.target_id)
+        .then(res => {
+          activity.setTarget(res.data)
+        })
+        .catch(err => {
+          // Create a fake target in this strange usecase to remove loading
+          activity.setTarget({ name: 'Unknown', internalType: targetType })
+          trackError(err, { name: 'Notification:Mount' })
+        })
     } else {
       activity.setTarget(target)
     }
   }
 
-  @action componentDidMount() {
+  @action
+  componentDidMount() {
     this.fadeInProgress = false
   }
 
   updateRead() {
     const { notification } = this.props
-    runInAction(() => { this.fadeInProgress = true })
+    runInAction(() => {
+      this.fadeInProgress = true
+    })
     sleep(500).then(() => {
       notification.read = true
       notification.save()
-      sleep(500).then(runInAction(() => { this.fadeInProgress = false }))
+      sleep(500).then(
+        runInAction(() => {
+          this.fadeInProgress = false
+        })
+      )
     })
   }
 
-  handleRead = (ev) => {
+  handleRead = ev => {
     ev.preventDefault()
     this.updateRead()
   }
@@ -135,14 +151,19 @@ class Notification extends React.Component {
           disableFocusListener={notification.read}
           disableTouchListener={notification.read}
         >
-          { this.isDefaultStyle
-            ? (<NotificationButton
+          {this.isDefaultStyle ? (
+            <NotificationButton
               className="read"
               onClick={!notification.read ? this.handleRead : () => null}
               read={notification.read}
-            />)
-            : <CloseButton className="read" onClick={this.handleRead} color={v.colors.white} />
-          }
+            />
+          ) : (
+            <CloseButton
+              className="read"
+              onClick={this.handleRead}
+              color={v.colors.white}
+            />
+          )}
         </Tooltip>
       </ButtonContainer>
     )
@@ -160,7 +181,10 @@ class Notification extends React.Component {
           {this.isDefaultStyle && this.renderButton}
           <div>
             {this.isDefaultStyle && (
-              <Moment date={notification.created_at} color={this.styledTextColor} />
+              <Moment
+                date={notification.created_at}
+                color={this.styledTextColor}
+              />
             )}
             <Activity
               action={notification.activity.action}
@@ -178,7 +202,10 @@ class Notification extends React.Component {
       )
     }
     return (
-      <StyledContainer isDefault={this.isDefaultStyle} className={`${this.shouldHide && 'show-read'}`}>
+      <StyledContainer
+        isDefault={this.isDefaultStyle}
+        className={`${this.shouldHide && 'show-read'}`}
+      >
         {content}
       </StyledContainer>
     )

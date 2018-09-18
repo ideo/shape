@@ -7,10 +7,7 @@ import DialogContent from '@material-ui/core/DialogContent'
 import FormControl from '@material-ui/core/FormControl'
 import FormControlLabel from '@material-ui/core/FormControlLabel'
 
-import {
-  FormButton,
-  Checkbox,
-} from '~/ui/global/styled/forms'
+import { FormButton, Checkbox } from '~/ui/global/styled/forms'
 import v from '~/utils/variables'
 
 const SpecialDisplayHeading = styled.p`
@@ -38,15 +35,20 @@ StyledDialog.displayName = 'StyledDialog'
 
 @observer
 class MoveHelperModal extends React.Component {
-  @observable dontShowChecked = false
-  @observable isLoading = false
-  @observable submitted = false
+  @observable
+  dontShowChecked = false
+  @observable
+  isLoading = false
+  @observable
+  submitted = false
 
-  @action handleDontShowCheck = (event) => {
+  @action
+  handleDontShowCheck = event => {
     this.dontShowChecked = event.target.checked
   }
 
-  @action handleSubmit = (e) => {
+  @action
+  handleSubmit = e => {
     e.preventDefault()
     const { currentUser, type } = this.props
     this.submitted = true
@@ -79,7 +81,7 @@ class MoveHelperModal extends React.Component {
         classes={{ paper: 'modal__paper' }}
         open={!this.submitted}
         BackdropProps={{
-          invisible: true
+          invisible: true,
         }}
       >
         <DialogContent>
@@ -89,13 +91,8 @@ class MoveHelperModal extends React.Component {
               alt="Diagram showing moving items between multiple collections"
               style={{ width: '410px', marginBottom: '40px' }}
             />
-            <SpecialDisplayHeading>
-              {this.helperText}
-            </SpecialDisplayHeading>
-            <FormControl
-              component="fieldset"
-              required
-            >
+            <SpecialDisplayHeading>{this.helperText}</SpecialDisplayHeading>
+            <FormControl component="fieldset" required>
               <FormControlLabel
                 classes={{ label: 'form-control' }}
                 control={
@@ -111,9 +108,7 @@ class MoveHelperModal extends React.Component {
             </FormControl>
 
             <div className="button--center">
-              <FormButton disabled={this.isLoading}>
-                Close
-              </FormButton>
+              <FormButton disabled={this.isLoading}>Close</FormButton>
             </div>
           </form>
         </DialogContent>

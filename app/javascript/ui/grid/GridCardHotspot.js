@@ -12,14 +12,14 @@ const StyledHotspot = styled.div`
   opacity: 0;
   transition: all 100ms;
   /* e.g. "left: -27px;" */
-  ${props => `${props.position}: -27px;`}
-  right: -27px;
+  ${props => `${props.position}: -27px;`} right: -27px;
   height: 100%;
   width: 36px;
   z-index: 100;
 
   cursor: pointer;
-  &:hover, &.is-over {
+  &:hover,
+  &.is-over {
     opacity: ${props => (props.dragging ? 0 : 1)};
   }
 `
@@ -53,11 +53,13 @@ class GridCardHotspot extends React.Component {
   render() {
     const { dragging, uiStore, position } = this.props
     return (
-      <StyledHotspot position={position} dragging={dragging} onClick={this.clickHotspot}>
+      <StyledHotspot
+        position={position}
+        dragging={dragging}
+        onClick={this.clickHotspot}
+      >
         <HotspotLine gutter={uiStore.gridSettings.gutter} />
-        <StyledPlusIcon>
-          +
-        </StyledPlusIcon>
+        <StyledPlusIcon>+</StyledPlusIcon>
       </StyledHotspot>
     )
   }

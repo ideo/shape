@@ -1,9 +1,10 @@
-import ActivityLogBox, { POSITION_KEY, PAGE_KEY } from '~/ui/activity_log/ActivityLogBox'
+import ActivityLogBox, {
+  POSITION_KEY,
+  PAGE_KEY,
+} from '~/ui/activity_log/ActivityLogBox'
 import localStorage from 'mobx-localstorage'
 
-import {
-  fakeNotification,
-} from '#/mocks/data'
+import { fakeNotification } from '#/mocks/data'
 
 import fakeUiStore from '#/mocks/fakeUiStore'
 import fakeApiStore from '#/mocks/fakeApiStore'
@@ -23,15 +24,13 @@ describe('ActivityLogBox', () => {
     localStorage.setItem = (key, val) => {
       localStorageStore[key] = val
     }
-    localStorage.getItem = (key) => localStorageStore[key]
+    localStorage.getItem = key => localStorageStore[key]
     props = { uiStore, apiStore }
     uiStore.update.mockClear()
     localStorage.clear()
     document.body.innerHTML = '<div class="Grid"></div>'
     reRender = function() {
-      wrapper = shallow(
-        <ActivityLogBox.wrappedComponent {...props} />
-      )
+      wrapper = shallow(<ActivityLogBox.wrappedComponent {...props} />)
       component = wrapper.instance()
     }
     reRender()
@@ -84,7 +83,10 @@ describe('ActivityLogBox', () => {
     })
 
     it('should set current page to default comments page', () => {
-      expect(props.uiStore.update).toHaveBeenCalledWith('activityLogPage', 'comments')
+      expect(props.uiStore.update).toHaveBeenCalledWith(
+        'activityLogPage',
+        'comments'
+      )
     })
 
     describe('with an existing position set in local storage', () => {
@@ -94,9 +96,7 @@ describe('ActivityLogBox', () => {
         pos = { x: 2, y: 3, h: 4, w: 5 }
         localStorage.setItem(POSITION_KEY, pos)
         localStorage.setItem(PAGE_KEY, 'notifications')
-        wrapper = shallow(
-          <ActivityLogBox.wrappedComponent {...props} />
-        )
+        wrapper = shallow(<ActivityLogBox.wrappedComponent {...props} />)
         component = wrapper.instance()
       })
 
@@ -105,7 +105,10 @@ describe('ActivityLogBox', () => {
       })
 
       it('should update uiStore with the page value from local storage', () => {
-        expect(props.uiStore.update).toHaveBeenCalledWith('activityLogPage', 'notifications')
+        expect(props.uiStore.update).toHaveBeenCalledWith(
+          'activityLogPage',
+          'notifications'
+        )
       })
     })
   })
@@ -148,7 +151,10 @@ describe('ActivityLogBox', () => {
     })
 
     it('should update the currentPage in uiStore', () => {
-      expect(props.uiStore.update).toHaveBeenCalledWith('activityLogPage', 'notifications')
+      expect(props.uiStore.update).toHaveBeenCalledWith(
+        'activityLogPage',
+        'notifications'
+      )
     })
 
     it('should set the local storage key for page', () => {

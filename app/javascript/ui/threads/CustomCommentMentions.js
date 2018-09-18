@@ -16,7 +16,7 @@ export const StyledCommentInput = styled.div`
   .public-DraftEditorPlaceholder-root {
     color: ${v.colors.gray};
     position: absolute;
-    z-index: 1
+    z-index: 1;
   }
 
   .draftJsMentionPlugin__mention__29BEd {
@@ -45,7 +45,7 @@ export const StyledCommentInput = styled.div`
   .draftJsMentionPlugin__mentionSuggestionsEntry__3mSwm {
     color: #444;
     padding: 7px 10px 3px 10px;
-    transition: background-color 0.4s cubic-bezier(.27,1.27,.48,.56);
+    transition: background-color 0.4s cubic-bezier(0.27, 1.27, 0.48, 0.56);
   }
 
   .draftJsMentionPlugin__mentionSuggestionsEntry__3mSwm:active {
@@ -83,7 +83,7 @@ export const StyledCommentInput = styled.div`
     max-width: 440px;
     background: #fff;
     border-radius: 2px;
-    box-shadow: 0px 4px 30px 0px rgba(220,220,220,1);
+    box-shadow: 0px 4px 30px 0px rgba(220, 220, 220, 1);
     cursor: pointer;
     padding-top: 8px;
     padding-bottom: 8px;
@@ -92,12 +92,11 @@ export const StyledCommentInput = styled.div`
     display: flex;
     -webkit-box-orient: vertical;
     -webkit-box-direction: normal;
-            flex-direction: column;
+    flex-direction: column;
     box-sizing: border-box;
     -webkit-transform: scale(0);
-            transform: scale(0);
+    transform: scale(0);
   }
-
 
   .mentionSuggestionsEntryContainer {
     display: table;
@@ -131,7 +130,7 @@ export const StyledCommentInput = styled.div`
   }
 `
 
-export const CustomMentionSuggestion = (props) => {
+export const CustomMentionSuggestion = props => {
   const {
     mention, // eslint-disable-line react/prop-types
     theme, // eslint-disable-line react/prop-types
@@ -144,17 +143,11 @@ export const CustomMentionSuggestion = (props) => {
     <div {...parentProps}>
       <div className="mentionSuggestionsEntryContainer">
         <div className="mentionSuggestionsEntryContainerLeft">
-          <Avatar
-            title={mention.name}
-            url={mention.avatar}
-            size={30}
-          />
+          <Avatar title={mention.name} url={mention.avatar} size={30} />
         </div>
 
         <div className="mentionSuggestionsEntryContainerRight">
-          <div className="mentionSuggestionsEntryText">
-            {mention.name}
-          </div>
+          <div className="mentionSuggestionsEntryText">{mention.name}</div>
 
           <div className="mentionSuggestionsEntryTitle">
             {mention.full_name}

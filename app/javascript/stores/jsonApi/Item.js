@@ -35,8 +35,9 @@ class Item extends BaseRecord {
 
   get canReplace() {
     if (!this.can_edit_content) return false
-    return (
-      _.includes([ITEM_TYPES.IMAGE, ITEM_TYPES.FILE, ITEM_TYPES.VIDEO], this.type)
+    return _.includes(
+      [ITEM_TYPES.IMAGE, ITEM_TYPES.FILE, ITEM_TYPES.VIDEO],
+      this.type
     )
   }
 
@@ -53,7 +54,9 @@ class Item extends BaseRecord {
   }
 
   get isPdfFile() {
-    return this.filestack_file && this.filestack_file.mimetype === 'application/pdf'
+    return (
+      this.filestack_file && this.filestack_file.mimetype === 'application/pdf'
+    )
   }
 
   get isDownloadable() {
@@ -69,10 +72,13 @@ class Item extends BaseRecord {
     const data = this.toJsonApi()
     // Turn off syncing when saving the item to not reload the page
     if (cancel_sync) data.cancel_sync = true
-    return apiStore.request(`items/${this.id}`, 'PATCH', {
-      data,
-    })
-      .catch(err => { trackError(err, { name: 'item:update' }) })
+    return apiStore
+      .request(`items/${this.id}`, 'PATCH', {
+        data,
+      })
+      .catch(err => {
+        trackError(err, { name: 'item:update' })
+      })
   }
 }
 Item.type = 'items'

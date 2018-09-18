@@ -19,9 +19,11 @@ import TagIcon from '~/ui/icons/TagIcon'
 @inject('uiStore')
 @observer
 class ActionMenu extends React.Component {
-  @observable itemLoading = ''
+  @observable
+  itemLoading = ''
 
-  @action setLoading(name = '') {
+  @action
+  setLoading(name = '') {
     this.itemLoading = name
   }
 
@@ -97,7 +99,7 @@ class ActionMenu extends React.Component {
     this.props.onLeave()
   }
 
-  toggleOpen = (e) => {
+  toggleOpen = e => {
     e.stopPropagation()
     this.props.onOpen()
   }
@@ -128,15 +130,39 @@ class ActionMenu extends React.Component {
     } = this.props
 
     const actions = [
-      { name: 'Duplicate', iconRight: <DuplicateIcon />, onClick: this.duplicateCard },
+      {
+        name: 'Duplicate',
+        iconRight: <DuplicateIcon />,
+        onClick: this.duplicateCard,
+      },
       { name: 'Move', iconRight: <MoveIcon />, onClick: this.moveCard },
       { name: 'Link', iconRight: <LinkIcon />, onClick: this.linkCard },
-      { name: 'Add to My Collection', iconRight: <AddIntoIcon />, onClick: this.addToMyCollection },
-      { name: 'Download', iconRight: <DownloadIcon />, onClick: this.downloadCard },
+      {
+        name: 'Add to My Collection',
+        iconRight: <AddIntoIcon />,
+        onClick: this.addToMyCollection,
+      },
+      {
+        name: 'Download',
+        iconRight: <DownloadIcon />,
+        onClick: this.downloadCard,
+      },
       { name: 'Tags', iconRight: <TagIcon />, onClick: this.showTags },
-      { name: 'Permissions', iconRight: <PermissionsIcon />, onClick: this.showRolesMenu },
-      { name: 'Archive', iconRight: <ArchiveIcon />, onClick: this.archiveCard },
-      { name: 'Replace', iconRight: <ReplaceIcon />, onClick: this.replaceCard },
+      {
+        name: 'Permissions',
+        iconRight: <PermissionsIcon />,
+        onClick: this.showRolesMenu,
+      },
+      {
+        name: 'Archive',
+        iconRight: <ArchiveIcon />,
+        onClick: this.archiveCard,
+      },
+      {
+        name: 'Replace',
+        iconRight: <ReplaceIcon />,
+        onClick: this.replaceCard,
+      },
     ]
     actions.forEach(actionItem => {
       if (actionItem.name === this.itemLoading) {
