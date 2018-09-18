@@ -1,9 +1,5 @@
 import TestQuestionEditor from '~/ui/test_collections/TestQuestionEditor'
-import {
-  fakeCollection,
-  fakeItemCard,
-  fakeQuestionItem,
-} from '#/mocks/data'
+import { fakeCollection, fakeItemCard, fakeQuestionItem } from '#/mocks/data'
 
 let wrapper, props
 describe('TestDesigner', () => {
@@ -19,9 +15,7 @@ describe('TestDesigner', () => {
   describe('with "useful" type', () => {
     beforeEach(() => {
       props.card.card_question_type = 'useful'
-      wrapper = shallow(
-        <TestQuestionEditor {...props} />
-      )
+      wrapper = shallow(<TestQuestionEditor {...props} />)
     })
 
     it('renders ScaleQuestion', () => {
@@ -32,9 +26,7 @@ describe('TestDesigner', () => {
   describe('with "media" type', () => {
     beforeEach(() => {
       props.card.card_question_type = 'media'
-      wrapper = shallow(
-        <TestQuestionEditor {...props} />
-      )
+      wrapper = shallow(<TestQuestionEditor {...props} />)
     })
 
     it('renders GridCardBlank to insert media', () => {
@@ -45,13 +37,13 @@ describe('TestDesigner', () => {
   describe('with "description" type', () => {
     beforeEach(() => {
       props.card.card_question_type = 'description'
-      wrapper = shallow(
-        <TestQuestionEditor {...props} />
-      )
+      wrapper = shallow(<TestQuestionEditor {...props} />)
     })
 
     it('renders DescriptionQuestion', () => {
-      expect(wrapper.find('DescriptionQuestion').props().item).toEqual(props.item)
+      expect(wrapper.find('DescriptionQuestion').props().item).toEqual(
+        props.item
+      )
     })
   })
 })

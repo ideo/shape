@@ -41,6 +41,7 @@ export const TextInput = styled(TextareaAutosize)`
   }
 }
 `
+TextInput.displayName = 'TextInput'
 
 export const TestQuestionInput = css`
   background-color: ${props =>
