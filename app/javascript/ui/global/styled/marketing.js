@@ -162,14 +162,15 @@ export const MarketingTagLine = styled(MarketingH2)`
   font-size: 24px;
   max-width: 600px;
   margin: auto;
-  margin-bottom: 60px;
+  margin-bottom: 68px;
 
   @media only screen and (min-width: ${v.responsive.smallBreakpoint}px) {
     font-size: 32px;
   }
 
   @media only screen and (max-width: ${v.responsive.smallBreakpoint}px) {
-      padding: 0 24px;
+    padding: 0 24px;
+    margin-bottom: 76px;
   }
 `
 MarketingTagLine.displayName = 'StyledMarketingTagLine'
@@ -186,7 +187,7 @@ export const MarketingContentLink = styled.button`
   letter-spacing: 1.5px;
   margin-top: 8px;
   margin-bottom: 8px;
-  transition: background-color .15s ease,color .15s ease,border .15s ease;
+  transition: background-color 0.15s ease, color 0.15s ease, border 0.15s ease;
 
   &:hover {
     color: ${v.colors.white};
