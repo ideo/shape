@@ -178,7 +178,11 @@ class MarketingPage extends React.Component {
             <ResponsivePadInlineBlock>
               <DesktopSpacer style={{ width: '80px' }} />
               <InvertMarketingLink href="https://www.ideo.com/">
-                &copy; 2018
+                {/* Added span around &copy; in order to satisfy "jsx-a11y/accessible-emoji" */}
+                <span role="img" aria-label="Copyright Symbol">
+                  &copy;
+                </span>{' '}
+                2018
               </InvertMarketingLink>
             </ResponsivePadInlineBlock>
           </Center>
