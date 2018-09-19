@@ -118,7 +118,7 @@ const SelectWrapped = props => {
       components={{
         valueComponent: valueComponent(classes),
         DropdownIndicator,
-        optionComponent: Option,
+        Option,
       }}
       noOptionsMessage={() => 'No results found'}
       {...other}
