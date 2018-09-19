@@ -144,7 +144,7 @@ class MarketingPage extends React.Component {
               <InvertedFixedWidth>{this.state.pageTexts.subscriptionHeader}</InvertedFixedWidth>
             </Box>
 
-            <Box w={1}>
+            <Box w={1} mt={[8, 0]}>
               <SubscribeEmail />
             </Box>
 
