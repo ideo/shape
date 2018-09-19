@@ -15,7 +15,7 @@ const SearchIconContainer = styled.span`
   left: 0;
   position: absolute;
   width: 14px;
-  top: 10px;
+  top: 14px;
 
   .icon {
     width: 22px;
