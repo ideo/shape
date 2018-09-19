@@ -111,7 +111,7 @@ class MarketingPage extends React.Component {
             wrap
             w={1}
           >
-            <Box w={1}>
+            <Box w={1} mb={[10, 0]}>
               <InvertMarketingH1Bold>
                 {this.state.pageTexts.footerHeader}
               </InvertMarketingH1Bold>
@@ -121,9 +121,9 @@ class MarketingPage extends React.Component {
                 {this.state.pageTexts.footerSubHeader}
               </InvertMarketingH1>
             </Box>
-            <Box w={1} py={32}>
+            <Box w={1} py={48} mb={[10, 0]}>
               <a href="/login">
-                <MarketingHeavyCTA href="/login">{this.state.pageTexts.buttonFooter}</MarketingHeavyCTA>
+                <MarketingCallToAction href="/login">{this.state.pageTexts.buttonFooter}</MarketingCallToAction>
               </a>
             </Box>
 
