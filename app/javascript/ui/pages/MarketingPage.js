@@ -73,9 +73,11 @@ class MarketingPage extends React.Component {
 
             <Center>
               <ResponsiveInlineBlock>
-                <a href="/login">
-                  <MarketingCallToAction>{this.state.pageTexts.buttonTopLeft}</MarketingCallToAction>
-                </a>
+                <Box w={1} mb={[0, 68]}>
+                  <a href="/login">
+                    <MarketingCallToAction>{this.state.pageTexts.buttonTopLeft}</MarketingCallToAction>
+                  </a>
+                </Box>
               </ResponsiveInlineBlock>
             </Center>
             {/*  -- VIDEO BUTTON DISABLED -- not ready yet
