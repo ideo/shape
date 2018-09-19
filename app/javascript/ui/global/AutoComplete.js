@@ -84,10 +84,10 @@ const selectStyles = theme => ({
     top: `calc(100% + ${theme.spacing.unit}px)`,
     width: '370px',
     zIndex: 2,
-    maxHeight: ITEM_HEIGHT * 3.5,
   }),
   menuList: base => ({
     ...base,
+    maxHeight: `${ITEM_HEIGHT * 3.5}px`,
   }),
   multiValue: () => ({}),
   multiValueLabel: () => ({}),
@@ -95,9 +95,12 @@ const selectStyles = theme => ({
   noOptionsMessage: () => ({
     padding: theme.spacing.unit * 2,
   }),
-  option: base => ({
+  option: (base, state) => ({
     ...base,
-    background: '#DDD',
+    '&:hover': {
+      background: state.isFocused ? '#DDD' : '#EEE',
+    },
+    background: state.isFocused ? '#DDD' : '',
   }),
   placeholder: base => ({
     ...base,
