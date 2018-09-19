@@ -9,6 +9,7 @@
   "scripts": {
     "styleguide": "yarn styleguidist server",
     "test": "jest --watch",
+    "lint": "./node_modules/.bin/eslint .",
     "cypress": "./node_modules/.bin/cypress open"
   },
   "jest": {
