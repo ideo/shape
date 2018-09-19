@@ -34,7 +34,7 @@ export const MarketingFooter = styled.div`
   font-family: ${v.fonts.sans};
   color: ${v.colors.desert};
   font-size: 1rem;
-  padding-top: 52px;
+  padding-top: 56px;
   padding-bottom: 22px;
   padding-right: 24px;
   padding-left: 24px;

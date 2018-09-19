@@ -103,7 +103,7 @@ class MarketingPage extends React.Component {
         <MarketingFooter>
           <ScrollElement name="FooterAnchor" />
           <MarketingFlex align="center" justify="center" wrap w={1}>
-            <Box w={1} mb={[10, 0]}>
+            <Box w={1} mb={[10, '4px']}>
               <InvertMarketingH1Bold>
                 {this.state.pageTexts.footerHeader}
               </InvertMarketingH1Bold>
@@ -113,7 +113,7 @@ class MarketingPage extends React.Component {
                 {this.state.pageTexts.footerSubHeader}
               </InvertMarketingH1>
             </Box>
-            <Box w={1} py={48} mb={[10, 0]}>
+            <Box w={1} pt={[46, 65]} pb={[46, 74]} mb={[10, 0]}>
               <a href="/login">
                 <MarketingCallToAction href="/login">
                   {this.state.pageTexts.buttonFooter}
@@ -138,7 +138,7 @@ class MarketingPage extends React.Component {
               </InvertMarketingLinkMail>
             </Box>
 
-            <Box w={1} wrap>
+            <Box w={1} mt={(0, 5)} wrap>
               <InvertedFixedWidth>
                 {this.state.pageTexts.subscriptionHeader}
               </InvertedFixedWidth>
