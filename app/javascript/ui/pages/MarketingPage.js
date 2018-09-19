@@ -18,7 +18,7 @@ import {
   MarketingTagLine,
   // MarketingVideoLink,
   MarketingShapeLogo,
-  MarketingBetaSticker,
+  // MarketingBetaSticker,
   MarketingCallToAction,
   MarketingGradientTop,
   InvertedCentered,
@@ -28,6 +28,7 @@ import poweredByIdeo from '~/assets/Powered-by-IDEO-Inverted.png'
 import MarketingMenu from '~/ui/marketing/MarketingMenu.js'
 import SubscribeEmail from '~/ui/marketing/SubscribeEmail.js'
 import ProductDescriptions from '~/ui/marketing/ProductDescriptions.js'
+import BetaSticker from '~/ui/marketing/BetaSticker.js'
 import firebase from '~/vendor/firebaseMarketing.js'
 
 class MarketingPage extends React.Component {
@@ -64,7 +65,7 @@ class MarketingPage extends React.Component {
           <MarketingGradientTop>
             <ScrollElement name="TopAnchor" />
             <MarketingMenu />
-            <MarketingBetaSticker />
+            <BetaSticker />
 
             <Center>
               <MarketingShapeLogo />
