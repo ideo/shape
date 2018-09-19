@@ -205,7 +205,8 @@ export const MarketingCallToAction = styled(MarketingContentLink)`
   background-color: ${v.colors.cautionYellow};
   border-radius: 4px;
   border: 2px solid ${v.colors.cautionYellow};
-  padding: 16px 18px;
+  padding: 12px 16px;
+  margin: 0;
   letter-spacing: 0.5px;
   text-transform: uppercase;
   font-size: 14px;
