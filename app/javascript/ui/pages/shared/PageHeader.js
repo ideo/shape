@@ -55,6 +55,9 @@ const HeaderFormButton = FormButton.extend`
   font-size: 0.825rem;
 `
 HeaderFormButton.displayName = 'HeaderFormButton'
+HeaderFormButton.defaultProps = {
+  'data-cy': 'HeaderFormButton',
+}
 
 const LiveTestIndicator = styled.span`
   display: inline-block;

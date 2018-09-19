@@ -162,7 +162,7 @@ class TestDesigner extends React.Component {
       <QuestionSelectHolder>
         <NumberListText>{card.order + 1}.</NumberListText>
         {card.card_question_type === 'finish' ? (
-          <DisplayText data-cy="DisplayText">End of Survey</DisplayText>
+          <DisplayText>End of Survey</DisplayText>
         ) : (
           <Select
             classes={{

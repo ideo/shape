@@ -1,7 +1,7 @@
 Feature: Creating a Collection
 
   Scenario: Opening BCT to create a collection
-    Given I visit the Test Area
+    Given I login and visit the Test Area
     When I create a "normal" collection named "Hello World"
     Then I should see a collection card named "Hello World"
     When I navigate to the collection named "Hello World" via the "CollectionCover"

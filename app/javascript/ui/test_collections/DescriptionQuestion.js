@@ -47,6 +47,7 @@ class DescriptionQuestion extends React.Component {
       <div>
         <TextInputHolder hasFocus={this.state.focused || item.content === ''}>
           <TextInput
+            data-cy="DescriptionQuestionText"
             disabled={!canEdit}
             onFocus={() => this.setState({ focused: true })}
             onBlur={this.handleBlur}

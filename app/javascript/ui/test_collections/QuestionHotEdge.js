@@ -79,6 +79,7 @@ class QuestionHotEdge extends React.Component {
     return (
       <HotEdge>
         <HotAreaButton
+          data-cy="QuestionHotEdgeButton"
           onClick={this.handleAdd}
           onMouseEnter={this.handleMouseOver}
           onMouseLeave={this.handleMouseOut}
