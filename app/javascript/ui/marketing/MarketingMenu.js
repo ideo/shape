@@ -181,10 +181,7 @@ class MarketingMenu extends React.PureComponent {
         <Toolbar>
           <MarketingFlex align="center" justify="center" w={1}>
             <Box w={15 / 32}>
-              <MarketingFlex
-                align="center"
-                justify="flex-start"
-              >
+              <MarketingFlex align="center" justify="flex-start">
                 <NavLink onClick={handleScrollToContent}>Product</NavLink>
                 <NavLink onClick={handleScrollToFooter}>Pricing</NavLink>
               </MarketingFlex>
@@ -199,10 +196,7 @@ class MarketingMenu extends React.PureComponent {
             </Box>
 
             <Box w={15 / 32}>
-              <MarketingFlex
-                align="center"
-                justify="flex-end"
-              >
+              <MarketingFlex align="center" justify="flex-end">
                 <NavLink onClick={handleScrollToFooter}>Contact</NavLink>
                 <a href="/login" rel="noopener noreferrer">
                   <NavLink>Login</NavLink>
@@ -226,11 +220,12 @@ class MarketingMenu extends React.PureComponent {
               </button>
             </Box>
 
-            <Box ml="auto" mr={2}>
+            <Box ml="auto">
               <Hamburger
                 role="button"
                 onClick={this.toggleDrawer(true)}
                 float="right"
+                style={{ marginBottom: 0 }}
               />
             </Box>
           </MarketingFlex>
