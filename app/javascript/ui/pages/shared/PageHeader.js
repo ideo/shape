@@ -78,8 +78,8 @@ class PageHeader extends React.Component {
 
   updateRecordName = name => {
     const { record } = this.props
-    record.name = name
-    record.save()
+    // method exists on Item and Collection
+    record.API_updateName(name)
   }
 
   openMenu = () => {

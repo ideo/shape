@@ -213,13 +213,6 @@ class CollectionPage extends PageWithApi {
     uiStore.trackEvent('update', this.collection)
   }
 
-  updateCollectionName = name => {
-    this.collection.name = name
-    this.collection.save()
-    const { uiStore } = this.props
-    uiStore.trackEvent('update', this.collection)
-  }
-
   get submissionsPageSeparator() {
     const { collection } = this
     const { submissionTypeName, submissions_collection } = collection

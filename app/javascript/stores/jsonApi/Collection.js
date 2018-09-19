@@ -2,7 +2,7 @@ import _ from 'lodash'
 import { computed, action } from 'mobx'
 import { ReferenceType } from 'datx'
 
-import { apiStore, routingStore, uiStore } from '~/stores'
+import { apiStore, routingStore, uiStore, undoStore } from '~/stores'
 import BaseRecord from './BaseRecord'
 import CollectionCard from './CollectionCard'
 
@@ -143,8 +143,7 @@ class Collection extends BaseRecord {
     this._reorderCards()
   }
 
-  API_updateCards() {
-    this._reorderCards()
+  toJsonApiWithCards() {
     const data = this.toJsonApi()
     delete data.relationships
     // attach nested attributes of cards
@@ -152,7 +151,43 @@ class Collection extends BaseRecord {
       this.collection_cards,
       card => _.pick(card, ['id', 'order', 'width', 'height'])
     )
+    return data
+  }
+
+  API_updateCards() {
+    this._reorderCards()
+    const data = this.toJsonApiWithCards()
     // we don't want to receive updates which are just going to try to re-render
+    data.cancel_sync = true
+    const apiPath = `collections/${this.id}`
+    return this.apiStore.request(apiPath, 'PATCH', { data })
+  }
+
+  // API_updateWithoutSync
+  //   updateCollection...
+  //   push undo
+  //   cancel_sync
+
+  // API_undoChanges
+  //   updateCollection
+
+  // for now this is only used for updating the collection name
+  API_updateName(name) {
+    const previousName = this.name
+    this.name = name
+    undoStore.pushUndoAction({
+      apiCall: () => this.API_revertToSnapshot({ name: previousName }),
+      redirectPath: { type: 'collections', id: this.id },
+    })
+    const data = this.toJsonApi()
+    data.cancel_sync = true
+    const apiPath = `collections/${this.id}`
+    return this.apiStore.request(apiPath, 'PATCH', { data })
+  }
+
+  API_revertToSnapshot(snapshot = {}) {
+    _.assign(this, snapshot)
+    const data = this.toJsonApi()
     data.cancel_sync = true
     const apiPath = `collections/${this.id}`
     return this.apiStore.request(apiPath, 'PATCH', { data })

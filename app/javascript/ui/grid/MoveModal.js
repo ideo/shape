@@ -104,6 +104,7 @@ class MoveModal extends React.Component {
       let successMessage
       switch (cardAction) {
         case 'move':
+          // TODO: wrap in apiStore actions that push the appropriate undoActions
           await apiStore.request('collection_cards/move', 'PATCH', data)
           successMessage = 'Items successfully moved!'
           break

@@ -182,6 +182,8 @@ class CollectionGrid extends React.Component {
   }
 
   onDragOrResizeStop = () => {
+    const { collection } = this.props
+    console.log(collection.toJsonApiWithCards())
     const placeholder =
       _.find(this.state.cards, { cardType: 'placeholder' }) || {}
     const original = _.find(this.state.cards, { id: placeholder.originalId })

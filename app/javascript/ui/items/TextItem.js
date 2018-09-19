@@ -340,6 +340,7 @@ class TextItem extends React.Component {
   _onKeyUp = async (content, delta, source, editor) => {
     const { item, onSave, fullPageView } = this.props
     const { quillEditor } = this
+    // capture the fact that we want to undo
     item.content = quillEditor.root.innerHTML
     item.text_data = quillEditor.getContents()
     if (fullPageView) {
