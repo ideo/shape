@@ -319,8 +319,8 @@ export const MarketingShapeLogo = styled.img.attrs({
 })`
   width: 100%;
   max-width: 256px;
-  margin-top: 70px;
-  padding-bottom: 10px;
+  margin-top: 75px;
+  padding-bottom: 16px;
 
   @media only screen and (min-width: ${v.responsive.smallBreakpoint}px) {
       max-width: 410px;
