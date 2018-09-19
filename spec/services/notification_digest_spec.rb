@@ -58,26 +58,42 @@ RSpec.describe NotificationDigest, type: :service do
     end
 
     context 'with type = :mentions' do
+      let(:group_user) { create(:user) }
+      let(:group) { create(:group, add_admins: [group_user]) }
       let(:type) { :mentions }
       let!(:comment_thread) do
-        create(:item_comment_thread, organization: organization, add_followers: [user, other_user])
+        create(:item_comment_thread, organization: organization, add_followers: [user, other_user, group_user])
       end
       let!(:comment_with_mentions) do
-        create(:comment, add_mentions: [user, other_user], comment_thread: comment_thread)
+        create(:comment,
+               add_mentions: [user, other_user],
+               add_group_mentions: [group],
+               comment_thread: comment_thread)
+      end
+
+      before do
+        User.update_all(last_notification_mail_sent: 1.day.ago)
+        user.reload # pick up model change from update_all
       end
 
       it 'should send a notification digest for each user that has been recently mentioned' do
         # expect notification email to be sent to user
         expect(NotificationMailer).to receive(:notify).with(
           user_id: user.id,
-          notification_ids: [],
-          comment_thread_ids: [comment_thread.id],
+          notification_ids: anything,
+          comment_thread_ids: anything,
         )
         # ...and other_user
         expect(NotificationMailer).to receive(:notify).with(
           user_id: other_user.id,
-          notification_ids: [],
-          comment_thread_ids: [comment_thread.id],
+          notification_ids: anything,
+          comment_thread_ids: anything,
+        )
+        # ...and group user
+        expect(NotificationMailer).to receive(:notify).with(
+          user_id: group_user.id,
+          notification_ids: anything,
+          comment_thread_ids: anything,
         )
         digest_service.call
       end
