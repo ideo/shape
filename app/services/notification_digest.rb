@@ -72,9 +72,7 @@ class NotificationDigest < SimpleService
       mentioned_user_ids |= c.mentions[:user_ids]
     end
     mentioned_groups = Group.where(id: mentioned_group_ids)
-    unless (group_user_ids = mentioned_groups.try(:user_ids))
-      group_user_ids = Group.where(id: groups.pluck(:id)).user_ids
-    end
+    group_user_ids = mentioned_groups.try(:user_ids)
     mentioned_user_ids += group_user_ids
     User.where(id: mentioned_user_ids.uniq)
   end
