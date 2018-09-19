@@ -162,7 +162,7 @@ class TestDesigner extends React.Component {
       <QuestionSelectHolder>
         <NumberListText>{card.order + 1}.</NumberListText>
         {card.card_question_type === 'finish' ? (
-          <DisplayText>End of Survey</DisplayText>
+          <DisplayText data-cy="DisplayText">End of Survey</DisplayText>
         ) : (
           <Select
             classes={{
@@ -185,7 +185,7 @@ class TestDesigner extends React.Component {
                 disabled={!opt.value}
                 value={opt.value}
               >
-                {opt.label}
+                <span data-cy="QuestionSelectOption">{opt.label}</span>
               </SelectOption>
             ))}
           </Select>
