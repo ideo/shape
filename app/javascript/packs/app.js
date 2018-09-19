@@ -20,7 +20,7 @@ if (module.hot) {
     const HotRoutes = require('../ui/Routes').default
     ReactDOM.render(
       <Provider {...stores}>
-        <Router history={history} >
+        <Router history={history}>
           <HotRoutes />
         </Router>
       </Provider>,
@@ -31,7 +31,7 @@ if (module.hot) {
 
 ReactDOM.render(
   <Provider {...stores}>
-    <Router history={history} >
+    <Router history={history}>
       <Routes />
     </Router>
   </Provider>,

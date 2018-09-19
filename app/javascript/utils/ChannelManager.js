@@ -1,4 +1,3 @@
-
 import ActionCableConsumer from './ActionCableConsumer'
 
 class ChannelManager {
@@ -23,9 +22,7 @@ class ChannelManager {
     return channel
   }
 
-  channelId = (channel, recordId = 'home') => (
-    `${channel}_${recordId}`
-  )
+  channelId = (channel, recordId = 'home') => `${channel}_${recordId}`
 
   getChannel(channel, recordId) {
     return this.channels.find(this.channelId(channel, recordId))

@@ -10,7 +10,10 @@ import { apiStore, uiStore, routingStore } from '~/stores'
 import v from '~/utils/variables'
 
 function insertCommas(subjectUsers, subjectGroups) {
-  return (subjectUsers.map(u => u.name).concat(subjectGroups.map(g => g.name))).join(', ')
+  return subjectUsers
+    .map(u => u.name)
+    .concat(subjectGroups.map(g => g.name))
+    .join(', ')
 }
 
 function commentPreview(content) {
@@ -48,13 +51,16 @@ class Activity extends React.PureComponent {
     if (actors.length > MAX_ACTORS || actorCount > MAX_ACTORS) {
       return `${actorCount} people`
     }
-    return _.uniq(actors).map(actor => actor.name).join(', ')
+    return _.uniq(actors)
+      .map(actor => actor.name)
+      .join(', ')
   }
 
   renameYourself() {
     const { subjectUsers } = this.props
-    return subjectUsers.map(user => (user.id === apiStore.currentUserId
-      ? { name: 'you' } : user))
+    return subjectUsers.map(
+      user => (user.id === apiStore.currentUserId ? { name: 'you' } : user)
+    )
   }
 
   targetLink(targetName) {
@@ -62,13 +68,21 @@ class Activity extends React.PureComponent {
     const { id, internalType } = target
     if (!target.name) return ''
     if (internalType === 'groups') {
-      return <Anchor className="target" onClick={() => uiStore.openGroup(id)}>{targetName}</Anchor>
+      return (
+        <Anchor className="target" onClick={() => uiStore.openGroup(id)}>
+          {targetName}
+        </Anchor>
+      )
     }
     const link = routingStore.pathTo(internalType, id)
-    return <Link className="target" to={link}>{targetName}</Link>
+    return (
+      <Link className="target" to={link}>
+        {targetName}
+      </Link>
+    )
   }
 
-  handleClick = async (e) => {
+  handleClick = async e => {
     e.preventDefault()
     const { action, target, handleRead } = this.props
     const { id, internalType } = target
@@ -112,54 +126,75 @@ class Activity extends React.PureComponent {
       targetName,
       roleName,
       subjects,
-      message
+      message,
     } = this.getDataText()
 
     switch (action) {
-    case 'archived':
-      return (
-        <ActivityText>
-          <strong className="actor">{actorNames}</strong>{` `}
-          has archived <strong className="target">&ldquo;{targetName}&rdquo;</strong>
-        </ActivityText>)
-    case 'added_editor':
-    case 'added_member':
-    case 'added_admin':
-      return (
-        <ActivityText>
-          <strong className="actor">{actorNames}</strong> has made{` `}
-          <strong className="subjects">{subjects}</strong>{` `}
-          {roleArticle(roleName)} <strong className="roleName">{roleName}</strong>{` `}
-        of {this.targetLink(targetName)}
-        </ActivityText>)
-    case 'commented':
-      return (
-        <ActivityText>
-          <strong className="actor">{actorNames}</strong> commented on{` `}
-          {this.targetLink(targetName)}
-          <CommentText>
-            &ldquo;<span className="message">{message}</span>&rdquo;
-          </CommentText>
-        </ActivityText>)
-    case 'mentioned':
-      return (
-        <ActivityText>
-          <strong className="actor">{actorNames}</strong> mentioned you in a comment for {` `}
-          {this.targetLink(targetName)}{` `}
-          <CommentText>
-            &ldquo;<span className="message">{message}</span>&rdquo;
-          </CommentText>
-        </ActivityText>)
+      case 'archived':
+        return (
+          <ActivityText>
+            <strong className="actor">{actorNames}</strong>
+            {` `}
+            has archived{' '}
+            <strong className="target">
+              &ldquo;
+              {targetName}
+              &rdquo;
+            </strong>
+          </ActivityText>
+        )
+      case 'added_editor':
+      case 'added_member':
+      case 'added_admin':
+        return (
+          <ActivityText>
+            <strong className="actor">{actorNames}</strong> has made
+            {` `}
+            <strong className="subjects">{subjects}</strong>
+            {` `}
+            {roleArticle(roleName)}{' '}
+            <strong className="roleName">{roleName}</strong>
+            {` `}
+            of {this.targetLink(targetName)}
+          </ActivityText>
+        )
+      case 'commented':
+        return (
+          <ActivityText>
+            <strong className="actor">{actorNames}</strong> commented on
+            {` `}
+            {this.targetLink(targetName)}
+            <CommentText>
+              &ldquo;
+              <span className="message">{message}</span>
+              &rdquo;
+            </CommentText>
+          </ActivityText>
+        )
+      case 'mentioned':
+        return (
+          <ActivityText>
+            <strong className="actor">{actorNames}</strong> mentioned you in a
+            comment for {` `}
+            {this.targetLink(targetName)}
+            {` `}
+            <CommentText>
+              &ldquo;
+              <span className="message">{message}</span>
+              &rdquo;
+            </CommentText>
+          </ActivityText>
+        )
 
-    default:
-      return ''
+      default:
+        return ''
     }
   }
 
   render() {
     return (
       <ActivityButton onClick={this.handleClick}>
-        { this.getMessageText() }
+        {this.getMessageText()}
       </ActivityButton>
     )
   }

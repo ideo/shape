@@ -15,9 +15,7 @@ describe('CommentThread', () => {
       afterSubmit: jest.fn(),
       thread: fakeThread,
     }
-    wrapper = shallow(
-      <CommentThread {...props} />
-    )
+    wrapper = shallow(<CommentThread {...props} />)
   })
 
   it('renders a title with the record.name', () => {
@@ -27,13 +25,17 @@ describe('CommentThread', () => {
   it('renders a CommentEntryForm', () => {
     // NOTE: textarea is just shown/hidden via "expanded" prop so it should always exist
     expect(wrapper.find('CommentEntryForm').exists()).toBeTruthy()
-    expect(wrapper.find('CommentEntryForm').props().expanded).toEqual(props.expanded)
+    expect(wrapper.find('CommentEntryForm').props().expanded).toEqual(
+      props.expanded
+    )
   })
 
   describe('with unexpanded thread', () => {
     it('renders unread comments if thread is unexpanded', () => {
       // fakeThread has 2 latestUnreadComments
-      expect(wrapper.find('Comment').length).toEqual(props.thread.latestUnreadComments.length)
+      expect(wrapper.find('Comment').length).toEqual(
+        props.thread.latestUnreadComments.length
+      )
     })
   })
 
@@ -43,18 +45,17 @@ describe('CommentThread', () => {
         ...props,
         expanded: true,
       }
-      wrapper = shallow(
-        <CommentThread {...props} />
-      )
+      wrapper = shallow(<CommentThread {...props} />)
     })
 
     it('renders all the comments if thread is expanded', () => {
-      expect(wrapper.find('Comment').length).toEqual(props.thread.comments.length)
+      expect(wrapper.find('Comment').length).toEqual(
+        props.thread.comments.length
+      )
     })
   })
 
   describe('renderThumbnail', () => {
-    let link
     function setThreadRecord(record) {
       const thread = {
         ...fakeThread,
@@ -76,7 +77,6 @@ describe('CommentThread', () => {
 
       beforeEach(() => {
         setThreadRecord(collectionRecord)
-        link = wrapper.find('Link')
       })
 
       it('should be a link to the collection', () => {
@@ -84,13 +84,17 @@ describe('CommentThread', () => {
       })
 
       it('should render the collection icon', () => {
-        expect(wrapper.find('ThumbnailHolder CollectionIcon').exists()).toBeTruthy()
+        expect(
+          wrapper.find('ThumbnailHolder CollectionIcon').exists()
+        ).toBeTruthy()
       })
 
       describe('with a collection with a cover image', () => {
         beforeEach(() => {
-          setThreadRecord({ ...collectionRecord, ...{ cover: { image_url: 'hello' } } })
-          link = wrapper.find('Link')
+          setThreadRecord({
+            ...collectionRecord,
+            ...{ cover: { image_url: 'hello' } },
+          })
         })
 
         it('should render the filestack file url', () => {
@@ -110,7 +114,6 @@ describe('CommentThread', () => {
 
       beforeEach(() => {
         setThreadRecord(itemRecord)
-        link = wrapper.find('Link')
       })
 
       it('should be a link to the item', () => {
@@ -126,7 +129,6 @@ describe('CommentThread', () => {
       describe('with a text item', () => {
         beforeEach(() => {
           setThreadRecord({ ...itemRecord, type: ITEM_TYPES.TEXT })
-          link = wrapper.find('Link')
         })
 
         it('should render the TextIcon', () => {

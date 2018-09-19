@@ -29,8 +29,8 @@ class OrganizationSettings extends React.Component {
       <div>
         <Heading2>Official Domains</Heading2>
         <p>
-          Any new people added to {this.organization.name} without these email domains
-          will be considered guests.
+          Any new people added to {this.organization.name} without these email
+          domains will be considered guests.
         </p>
 
         <TagEditor

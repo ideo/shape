@@ -25,7 +25,7 @@ const StyledProductDescription = styled(MarketingContent)`
 const Title = styled(MarketingH1Bold)`
   text-transform: none;
   text-align: left;
-  word-wrap:break-word;
+  word-wrap: break-word;
   line-height: 30px;
   margin-bottom: 16px;
 
@@ -35,7 +35,7 @@ const Title = styled(MarketingH1Bold)`
 `
 const Description = styled(MarketingContent)`
   text-align: left;
-  word-wrap:break-word;
+  word-wrap: break-word;
   line-height: 25px;
   font-size: 18px;
 
@@ -61,25 +61,27 @@ class ProductDescription extends React.PureComponent {
           w={1}
           mt={4}
           mb={4}
-          align={['flex-start', (this.props.order % 2 === 1 ? 'flex-start' : 'flex-end')]}
+          align={[
+            'flex-start',
+            this.props.order % 2 === 1 ? 'flex-start' : 'flex-end',
+          ]}
           justify="space-evenly"
           wrap
         >
           <Box w={[null, 0.08]} order={1} />
 
-          <Box w={[1, 0.21]} order={[4, (this.props.order % 2 === 1 ? 2 : 4)]}>
+          <Box w={[1, 0.21]} order={[4, this.props.order % 2 === 1 ? 2 : 4]}>
             <Title>{this.props.title}</Title>
             <Description>{this.props.description}</Description>
           </Box>
 
           <Box w={[null, 0.09]} order={3} />
 
-          <Box w={[1, 0.54]} order={[2, (this.props.order % 2 === 1 ? 4 : 2)]}>
+          <Box w={[1, 0.54]} order={[2, this.props.order % 2 === 1 ? 4 : 2]}>
             <ImageDisplay src={this.props.imageUrl} alt={this.props.title} />
           </Box>
 
           <Box w={[null, 0.08]} order={4} />
-
         </MarketingFlex>
       </StyledProductDescription>
     )

@@ -39,10 +39,8 @@ export const StyledMenuWrapper = styled.div`
   position: absolute;
   padding: 10px;
   top: 14px;
-  ${props => (props.direction === 'right'
-    ? 'left: 0; top: 42px;'
-    : 'right: -32px;'
-  )}
+  ${props =>
+    props.direction === 'right' ? 'left: 0; top: 42px;' : 'right: -32px;'};
 `
 StyledMenuWrapper.displayName = 'StyledMenuWrapper'
 
@@ -111,21 +109,18 @@ class PopoutMenu extends React.Component {
     const { groupExtraComponent } = this.props
     const { groupedMenuItems } = this
     const rendered = []
-    Object.keys(groupedMenuItems).forEach((groupName) => {
+    Object.keys(groupedMenuItems).forEach(groupName => {
       rendered.push(
         <div className={groupName} key={groupName}>
-          { groupExtraComponent[groupName] }
-          { groupedMenuItems[groupName].map((item, i) => {
-            const {
-              id,
-              name,
-              iconLeft,
-              iconRight,
-              onClick,
-              loading
-            } = item
+          {groupExtraComponent[groupName]}
+          {groupedMenuItems[groupName].map((item, i) => {
+            const { id, name, iconLeft, iconRight, onClick, loading } = item
             return (
-              <StyledMenuItem key={`${name}-${id || ''}`} noBorder={item.noBorder} loading={loading}>
+              <StyledMenuItem
+                key={`${name}-${id || ''}`}
+                noBorder={item.noBorder}
+                loading={loading}
+              >
                 <button
                   onClick={loading ? () => null : onClick}
                   className={`menu-${name}`}
@@ -168,28 +163,26 @@ class PopoutMenu extends React.Component {
           onClick={onClick}
           className="menu-toggle"
         >
-          <MenuIcon
-            viewBox={isBct ? '-11 -11 26 40' : '0 0 5 18'}
-          />
+          <MenuIcon viewBox={isBct ? '-11 -11 26 40' : '0 0 5 18'} />
         </MenuToggle>
         <StyledMenuWrapper direction={direction} className="menu-wrapper">
-          <StyledMenu width={width}>
-            {this.renderMenuItems}
-          </StyledMenu>
+          <StyledMenu width={width}>{this.renderMenuItems}</StyledMenu>
         </StyledMenuWrapper>
       </StyledMenuButtonWrapper>
     )
   }
 }
 
-const propTypeMenuItem = PropTypes.arrayOf(PropTypes.shape({
-  name: PropTypes.string,
-  iconLeft: PropTypes.element,
-  iconRight: PropTypes.element,
-  onClick: PropTypes.func,
-  noBorder: PropTypes.bool,
-  loading: PropTypes.bool,
-}))
+const propTypeMenuItem = PropTypes.arrayOf(
+  PropTypes.shape({
+    name: PropTypes.string,
+    iconLeft: PropTypes.element,
+    iconRight: PropTypes.element,
+    onClick: PropTypes.func,
+    noBorder: PropTypes.bool,
+    loading: PropTypes.bool,
+  })
+)
 
 PopoutMenu.propTypes = {
   onMouseLeave: PropTypes.func,

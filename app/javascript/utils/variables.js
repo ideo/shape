@@ -50,7 +50,7 @@ export default {
     white: '#ffffff',
     nearwhite: '#f7f7f7',
     cautionYellow: '#fcf113',
-    placeholderGray: "#bcbcbc",
+    placeholderGray: '#bcbcbc',
   },
 
   iconSizes: {
@@ -93,14 +93,14 @@ export default {
         // header: false means "normal" i.e. no formatting
         [{ header: [3, false] }],
         ['link'],
-      ]
-    }
+      ],
+    },
   },
 
   defaults: {
     video: {
       thumbnailUrl: 'https://cdn.filestackcontent.com/jh0ytCnkRm6CgTaVulwr',
       name: 'Video',
-    }
-  }
+    },
+  },
 }

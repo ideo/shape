@@ -1,15 +1,21 @@
 module.exports = {
   plugins: [
     "react",
-    "jest"
+    "jest",
+    "cypress",
+    "prettier"
   ],
   env: {
-    "jest/globals": true
+    "jest/globals": true,
+    "cypress/globals": true,
   },
   extends: [
     "airbnb",
     "standard",
-    "standard-react"
+    "standard-react",
+    "plugin:prettier/recommended",
+    "prettier/react",
+    "prettier/standard"
   ],
   parser: "babel-eslint",
   parserOptions: {
@@ -47,24 +53,14 @@ module.exports = {
     "arrow-parens": [0, "as-needed"],
     // because of all of our rails API snake_case variables
     "camelcase": 0,
-    "comma-dangle": ["error", "always-multiline"],
-    "function-paren-newline": ["error", "consistent"],
     "func-names": 0,
     "import/no-absolute-path": 0,
     "import/extensions": 0,
-    "indent": ["error", 2],
     "no-param-reassign": ["error", { "props": false }],
     "no-underscore-dangle": 0,
-    "one-var-declaration-per-line": ["error", "initializations"],
-    "object-curly-newline": ["error", {
-      "multiline": true,
-      "consistent": true,
-      "minProperties": 6
-    }],
+    "prettier/prettier": "error",
     "radix": ["error", "as-needed"],
-    "semi" : [2, "never"],
     "space-before-function-paren": 0,
-    "jsx-quotes": ["warn", "prefer-double"],
     "jsx-a11y/anchor-is-valid": [ "error", {
       "components": [ "Link" ],
       "specialLink": [ "to", "hrefLeft", "hrefRight" ],

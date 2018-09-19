@@ -14,18 +14,14 @@ const StyledClickWrapper = styled.div`
 StyledClickWrapper.displayName = 'StyledClickWrapper'
 
 class ClickWrapper extends React.Component {
-  handleClick = (e) => {
+  handleClick = e => {
     this.props.clickHandlers.forEach(clickHandler => {
       clickHandler(e)
     })
   }
 
-  render () {
-    return (
-      <StyledClickWrapper
-        onClick={this.handleClick}
-      />
-    )
+  render() {
+    return <StyledClickWrapper onClick={this.handleClick} />
   }
 }
 

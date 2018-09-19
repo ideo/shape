@@ -46,8 +46,14 @@ const MenuWrapper = styled.div`
   }
 
   @keyframes appear {
-    from { background: transparent; transform: translateY(-100%); }
-    to { background: white; transform: translateY(0); }
+    from {
+      background: transparent;
+      transform: translateY(-100%);
+    }
+    to {
+      background: white;
+      transform: translateY(0);
+    }
   }
 
   .headroom--scrolled {
@@ -68,10 +74,10 @@ const MenuWrapper = styled.div`
 `
 
 const MenuBar = styled(AppBar)`
-    padding-left: 24px;
-    padding-right: 24px;
+  padding-left: 24px;
+  padding-right: 24px;
 
-  &.top{
+  &.top {
     background: transparent;
     position: static;
     box-shadow: none;
@@ -81,7 +87,6 @@ const MenuBar = styled(AppBar)`
     padding-left: 75px;
     padding-right: 75px;
   }
-
 `
 
 function handleScrollToContent() {
@@ -112,12 +117,7 @@ function handleScrollToTop() {
 }
 
 const MobileLinks = (
-  <MarketingFlex
-    align="left"
-    justify="left"
-    w={1}
-    column
-  >
+  <MarketingFlex align="left" justify="left" w={1} column>
     <Box>
       <NavLink align="center" onClick={handleScrollToTop}>
         <ToggleLogo className="ToggleLogo" width={48} />
@@ -125,15 +125,21 @@ const MobileLinks = (
     </Box>
 
     <Box>
-      <NavLink align="left" onClick={handleScrollToContent}>PRODUCT</NavLink>
+      <NavLink align="left" onClick={handleScrollToContent}>
+        PRODUCT
+      </NavLink>
     </Box>
 
     <Box>
-      <NavLink align="left" onClick={handleScrollToFooter}>PRICING</NavLink>
+      <NavLink align="left" onClick={handleScrollToFooter}>
+        PRICING
+      </NavLink>
     </Box>
 
     <Box>
-      <NavLink align="left" onClick={handleScrollToFooter}>CONTACT</NavLink>
+      <NavLink align="left" onClick={handleScrollToFooter}>
+        CONTACT
+      </NavLink>
     </Box>
 
     <Box>
@@ -165,7 +171,7 @@ class MarketingMenu extends React.PureComponent {
     this.setState({ width: window.innerWidth })
   }
 
-  toggleDrawer = (isOpen) => () => {
+  toggleDrawer = isOpen => () => {
     this.setState({ drawerState: isOpen })
   }
 
@@ -173,11 +179,7 @@ class MarketingMenu extends React.PureComponent {
     <Fragment>
       <MenuBar className="MenuBar top">
         <Toolbar>
-          <MarketingFlex
-            align="center"
-            justify="center"
-            w={1}
-          >
+          <MarketingFlex align="center" justify="center" w={1}>
             <Box w={15 / 32}>
               <MarketingFlex
                 align="center"
@@ -189,7 +191,7 @@ class MarketingMenu extends React.PureComponent {
             </Box>
 
             <Box w={2 / 32}>
-              <section align="center" >
+              <section align="center">
                 <button onClick={handleScrollToTop}>
                   <ToggleLogo className="ToggleLogo" width={48} />
                 </button>
@@ -207,7 +209,6 @@ class MarketingMenu extends React.PureComponent {
                 </a>
               </MarketingFlex>
             </Box>
-
           </MarketingFlex>
         </Toolbar>
       </MenuBar>
@@ -218,10 +219,7 @@ class MarketingMenu extends React.PureComponent {
     <Fragment>
       <MenuBar className={`MenuBar top`}>
         <Toolbar disableGutters>
-          <MarketingFlex
-            align="center"
-            w={1}
-          >
+          <MarketingFlex align="center" w={1}>
             <Box ml={2}>
               <button onClick={handleScrollToTop}>
                 <ToggleLogo className="ToggleLogo" width={48} />
@@ -229,9 +227,12 @@ class MarketingMenu extends React.PureComponent {
             </Box>
 
             <Box ml="auto" mr={2}>
-              <Hamburger role="button" onClick={this.toggleDrawer(true)} float="right" />
+              <Hamburger
+                role="button"
+                onClick={this.toggleDrawer(true)}
+                float="right"
+              />
             </Box>
-
           </MarketingFlex>
         </Toolbar>
       </MenuBar>
@@ -254,10 +255,7 @@ class MarketingMenu extends React.PureComponent {
 
     return (
       <MenuWrapper>
-        <Headroom
-          disableInlineStyles
-          pinStart={400}
-        >
+        <Headroom disableInlineStyles pinStart={400}>
           {isMobile ? this.renderMobile() : this.renderDesktop()}
         </Headroom>
       </MenuWrapper>

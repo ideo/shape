@@ -17,9 +17,7 @@ const StyledValidIndicator = styled.div`
 `
 
 const ValidIndicator = ({ valid, loading }) => (
-  <StyledValidIndicator
-    className={valid ? 'valid' : 'invalid'}
-  >
+  <StyledValidIndicator className={valid ? 'valid' : 'invalid'}>
     {!loading && (valid ? '✔' : 'x')}
     {loading && '...'}
   </StyledValidIndicator>

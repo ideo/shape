@@ -12,7 +12,7 @@ class AlertDialog extends React.PureComponent {
     }
   }
 
-  handleClose = (ev) => {
+  handleClose = ev => {
     if (this.timeout) clearTimeout(this.timeout)
     this.props.onClose()
   }
@@ -23,14 +23,16 @@ class AlertDialog extends React.PureComponent {
 
   render() {
     const { prompt } = this.props
-    const modalProps = { ...this.props, onClose: this.handleClose, open: this.isOpen }
+    const modalProps = {
+      ...this.props,
+      onClose: this.handleClose,
+      open: this.isOpen,
+    }
 
     return (
       <Dialog {...modalProps}>
         <div>
-          <p>
-            { prompt }
-          </p>
+          <p>{prompt}</p>
         </div>
       </Dialog>
     )

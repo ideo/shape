@@ -1,4 +1,3 @@
-
 export function parseUrl(urlStr) {
   const url = document.createElement('a')
   url.href = urlStr
@@ -6,5 +5,5 @@ export function parseUrl(urlStr) {
 }
 
 export default {
-  parseUrl
+  parseUrl,
 }

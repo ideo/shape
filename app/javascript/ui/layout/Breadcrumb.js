@@ -47,14 +47,12 @@ StyledBreadcrumb.displayName = 'StyledBreadcrumb'
 
 @observer
 class Breadcrumb extends React.Component {
-  breadcrumbItem = (item) => {
+  breadcrumbItem = item => {
     const [klass, id, name] = item
     const path = routingStore.pathTo(klass, id)
     return (
       <span className="crumb" key={path}>
-        <Link to={path}>
-          {name}
-        </Link>
+        <Link to={path}>{name}</Link>
       </span>
     )
   }
@@ -63,7 +61,7 @@ class Breadcrumb extends React.Component {
     const { items } = this.props
     const links = items.map(item => this.breadcrumbItem(item))
     return (
-      <StyledBreadcrumb>
+      <StyledBreadcrumb data-cy="Breadcrumb">
         <span className="crumb" key="myCollection">
           <Link to={routingStore.pathTo('homepage')}>My Collection</Link>
         </span>

@@ -26,7 +26,7 @@ export const FileContainer = styled.div`
   transform: rotate(8deg) translateX(30px) translateZ(0);
   transform-origin: 0 0;
   width: 90%;
-  clip-path: polygon(0 0,0 100%,100% 100%,100% 32%,72% 0);
+  clip-path: polygon(0 0, 0 100%, 100% 100%, 100% 32%, 72% 0);
   img {
     width: 100%;
   }

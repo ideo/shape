@@ -24,7 +24,7 @@ const StyledVideoCover = styled.div`
       border-radius: 10px;
       cursor: pointer;
       &:hover {
-        background: ${v.colors.cyan}
+        background: ${v.colors.cyan};
       }
     }
   }

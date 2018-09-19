@@ -11,8 +11,8 @@ describe('GroupModify', () => {
       fetch: jest.fn().mockReturnValue(Promise.resolve()),
       request: jest.fn(),
       currentUser: {
-        groups: []
-      }
+        groups: [],
+      },
     }
     props = {
       group: {
@@ -22,9 +22,7 @@ describe('GroupModify', () => {
       onGroupRoles: jest.fn(),
       apiStore,
     }
-    wrapper = shallow(
-      <GroupModify {...props} />
-    )
+    wrapper = shallow(<GroupModify {...props} />)
     component = wrapper.instance()
   })
 
@@ -50,17 +48,14 @@ describe('GroupModify', () => {
           filestack_file_url: 'test.jpg',
           assign: jest.fn(),
         }
-        wrapper = shallow(
-          <GroupModify {...props} />
-        )
+        wrapper = shallow(<GroupModify {...props} />)
         component = wrapper.instance()
       })
 
       it('should should copy the existing group attrs to editingGroup', () => {
         expect(component.editingGroup.name).toEqual('tester')
         expect(component.editingGroup.handle).toEqual('test-er')
-        expect(component.editingGroup.filestack_file_url)
-          .toEqual('test.jpg')
+        expect(component.editingGroup.filestack_file_url).toEqual('test.jpg')
       })
 
       it('should set syncing to false', () => {

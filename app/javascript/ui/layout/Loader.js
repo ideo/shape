@@ -20,10 +20,7 @@ class Loader extends React.PureComponent {
     return (
       <Flex style={{ height: containerHeight }} align="center" justify="center">
         <Box>
-          <StyledSpinner
-            color={v.colors.cloudy}
-            size={`${size}px`}
-          />
+          <StyledSpinner color={v.colors.cloudy} size={`${size}px`} />
         </Box>
       </Flex>
     )

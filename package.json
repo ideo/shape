@@ -8,7 +8,8 @@
   },
   "scripts": {
     "styleguide": "yarn styleguidist server",
-    "test": "jest --watch"
+    "test": "jest --watch",
+    "cypress": "./node_modules/.bin/cypress open"
   },
   "jest": {
     "testURL": "http://localhost",
@@ -74,6 +75,8 @@
     "draft-js": "^0.10.5",
     "draft-js-mention-plugin": "^3.0.4",
     "draft-js-plugins-editor": "^2.0.8",
+    "eslint-config-prettier": "^3.0.1",
+    "eslint-plugin-prettier": "^2.6.2",
     "filestack-js": "^0.11.2",
     "firebase": "^5.0.4",
     "formik": "0.11.11",
@@ -92,6 +95,7 @@
     "papaparse": "^4.6.0",
     "parameterize": "^0.1.0",
     "pluralize": "^7.0.0",
+    "prettier": "^1.14.2",
     "prop-types": "^15.6.2",
     "query-string": "5.1.0",
     "react": "^16.4.2",
@@ -125,7 +129,7 @@
     "ts-loader": "4.2.0",
     "typescript": "2.8.3",
     "webpack": "^4.17.1",
-    "whatwg-fetch": "^2.0.4"
+    "whatwg-fetch": "^3.0.0"
   },
   "devDependencies": {
     "babel-core": "^6.26.0",
@@ -135,6 +139,8 @@
     "babel-loader": "^7.1.2",
     "babel-preset-env": "^1.6.1",
     "babel-runtime": "~6.26.0",
+    "cypress": "^3.1.0",
+    "cypress-cucumber-preprocessor": "^1.4.0",
     "dotenv": "^5.0.1",
     "enzyme": "^3.3.0",
     "enzyme-adapter-react-16": "^1.1.1",
@@ -144,6 +150,7 @@
     "eslint-config-standard": "10.2.1",
     "eslint-config-standard-react": "5.0.0",
     "eslint-import-resolver-babel-module": "^4.0.0",
+    "eslint-plugin-cypress": "^2.0.1",
     "eslint-plugin-import": "~2.8.0",
     "eslint-plugin-jest": "^21.7.0",
     "eslint-plugin-jsx-a11y": "~6.0.3",

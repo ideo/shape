@@ -18,9 +18,7 @@ class HomePage extends React.Component {
   render() {
     if (!this.userHasOrg) {
       // User needs to set up their Org...
-      return (
-        <div />
-      )
+      return <div />
     }
     return (
       // Otherwise Home just renders the CollectionPage

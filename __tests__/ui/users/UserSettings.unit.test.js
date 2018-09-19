@@ -1,9 +1,7 @@
 import UserSettings from '~/ui/users/UserSettings'
 import fakeApiStore from '#/mocks/fakeApiStore'
 import fakeUiStore from '#/mocks/fakeUiStore'
-import {
-  fakeUser
-} from '#/mocks/data'
+import { fakeUser } from '#/mocks/data'
 
 let wrapper, component, apiStore, uiStore, props, organization
 
@@ -18,9 +16,7 @@ beforeEach(() => {
 describe('UserSettings', () => {
   beforeEach(() => {
     organization.primary_group.can_edit = true
-    wrapper = shallow(
-      <UserSettings.wrappedComponent {...props} />
-    )
+    wrapper = shallow(<UserSettings.wrappedComponent {...props} />)
     component = wrapper.instance()
   })
 

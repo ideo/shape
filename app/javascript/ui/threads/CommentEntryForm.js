@@ -9,15 +9,18 @@ import CommentInput from './CommentInput'
 
 @observer
 class CommentEntryForm extends React.Component {
-  @observable commentData = {
+  @observable
+  commentData = {
     message: '',
     draftjs_data: {},
   }
-  @observable suggestionsOpen = false
-  @observable updating = false
+  @observable
+  suggestionsOpen = false
+  @observable
+  updating = false
   // @observable editorState = EditorState.createEmpty()
   state = {
-    editorState: EditorState.createEmpty()
+    editorState: EditorState.createEmpty(),
   }
 
   componentDidMount() {
@@ -34,7 +37,7 @@ class CommentEntryForm extends React.Component {
     this.editor = null
   }
 
-  focusTextArea = (expanded) => {
+  focusTextArea = expanded => {
     // NOTE: draft-js-plugins need timeout, even with 0 delay, see:
     // https://github.com/draft-js-plugins/draft-js-plugins/issues/800#issuecomment-315950836
     setTimeout(() => {
@@ -43,7 +46,8 @@ class CommentEntryForm extends React.Component {
     })
   }
 
-  @action handleInputChange = (editorState) => {
+  @action
+  handleInputChange = editorState => {
     if (this.updating) return
     const content = editorState.getCurrentContent()
     const message = content.getPlainText()
@@ -51,7 +55,7 @@ class CommentEntryForm extends React.Component {
     this.commentData.draftjs_data = convertToRaw(content)
     // this.editorState = editorState
     this.setState({
-      editorState
+      editorState,
     })
   }
 
@@ -68,19 +72,24 @@ class CommentEntryForm extends React.Component {
   resetEditorState() {
     // this.editorState = EditorState.push(this.state.editorState, ContentState.createFromText(''))
     this.setState({
-      editorState: EditorState.push(this.state.editorState, ContentState.createFromText(''))
+      editorState: EditorState.push(
+        this.state.editorState,
+        ContentState.createFromText('')
+      ),
     })
   }
 
-  @action handleOpenSuggestions = () => {
+  @action
+  handleOpenSuggestions = () => {
     this.suggestionsOpen = true
   }
 
-  @action handleCloseSuggestions = () => {
+  @action
+  handleCloseSuggestions = () => {
     this.suggestionsOpen = false
   }
 
-  handleReturn = (e) => {
+  handleReturn = e => {
     if (!e.shiftKey && !this.suggestionsOpen) {
       // submit message
       this.handleSubmit(e)
@@ -89,7 +98,7 @@ class CommentEntryForm extends React.Component {
     return 'not-handled'
   }
 
-  handleSubmit = (e) => {
+  handleSubmit = e => {
     e.preventDefault()
     const rawData = toJS(this.commentData)
     // don't allow submit of empty comment

@@ -99,7 +99,7 @@ class RolesSummary extends React.Component {
     return { editors, viewers }
   }
 
-  roleLabel = (roleName) => {
+  roleLabel = roleName => {
     let label = roleName
     const { roles } = this.props
     const role = _.find(roles, { name: roleName })
@@ -130,7 +130,7 @@ class RolesSummary extends React.Component {
     return (
       <StyledAvatarGroup align="right">
         <StyledRoleTitle>{this.roleLabel('editor')}</StyledRoleTitle>
-        {(editors.length > 0 || viewers.length === 0) ? this.addUserBtn : ''}
+        {editors.length > 0 || viewers.length === 0 ? this.addUserBtn : ''}
         {editorAvatars}
       </StyledAvatarGroup>
     )
@@ -165,9 +165,7 @@ class RolesSummary extends React.Component {
     const { canEdit } = this.props
     if (!canEdit) return ''
     return (
-      <StyledAddUserBtn
-        onClick={this.props.handleClick}
-      >+</StyledAddUserBtn>
+      <StyledAddUserBtn onClick={this.props.handleClick}>+</StyledAddUserBtn>
     )
   }
 
@@ -177,7 +175,7 @@ class RolesSummary extends React.Component {
       <StyledRolesSummary>
         <div className="roles-summary--inner">
           {this.renderEditors}
-          {(editors.length > 0 && viewers.length > 0) ? <StyledSeparator /> : ''}
+          {editors.length > 0 && viewers.length > 0 ? <StyledSeparator /> : ''}
           {this.renderViewers}
         </div>
       </StyledRolesSummary>

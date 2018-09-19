@@ -10,18 +10,14 @@ export const StyledIcon = styled.span`
   svg {
     width: 100%;
     height: 100%;
-    ${props => (props.hasStroke ? 'stroke: currentColor;' : '')}
-    ${props => (props.hasFill ? 'fill: currentColor;' : '')}
+    ${props => (props.hasStroke ? 'stroke: currentColor;' : '')} ${props =>
+      props.hasFill ? 'fill: currentColor;' : ''};
   }
 `
 StyledIcon.displayName = 'StyledIcon'
 
 const Icon = ({ stroke, fill, children }) => (
-  <StyledIcon
-    className="icon"
-    hasStroke={stroke}
-    hasFill={fill}
-  >
+  <StyledIcon className="icon" hasStroke={stroke} hasFill={fill}>
     {children}
   </StyledIcon>
 )

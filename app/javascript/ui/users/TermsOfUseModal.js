@@ -7,10 +7,7 @@ import FormControl from '@material-ui/core/FormControl'
 import FormControlLabel from '@material-ui/core/FormControlLabel'
 import FormHelperText from '@material-ui/core/FormHelperText'
 
-import {
-  FormButton,
-  Checkbox,
-} from '~/ui/global/styled/forms'
+import { FormButton, Checkbox } from '~/ui/global/styled/forms'
 import { Heading1, Anchor } from '~/ui/global/styled/typography'
 import Link from '~/ui/global/Link'
 import Logo from '~/ui/layout/Logo'
@@ -55,24 +52,30 @@ const StyledLogo = styled(Logo)`
 
 @observer
 class TermsOfUseModal extends React.Component {
-  @observable termsChecked = false
-  @observable isLoading = false
-  @observable submitted = false
+  @observable
+  termsChecked = false
+  @observable
+  isLoading = false
+  @observable
+  submitted = false
 
-  @action handleTermsCheck = (event) => {
+  @action
+  handleTermsCheck = event => {
     this.termsChecked = event.target.checked
   }
 
-  @action handleSubmit = (e) => {
+  @action
+  handleSubmit = e => {
     e.preventDefault()
     this.submitted = true
     if (this.termsChecked) {
       const { currentUser } = this.props
       this.isLoading = true
-      currentUser.API_acceptTerms()
-        .finally(() => {
-          runInAction(() => { this.isLoading = false })
+      currentUser.API_acceptTerms().finally(() => {
+        runInAction(() => {
+          this.isLoading = false
         })
+      })
     }
   }
 
@@ -84,31 +87,29 @@ class TermsOfUseModal extends React.Component {
         classes={{ paper: 'modal__paper' }}
         open
         BackdropProps={{
-          invisible: true
+          invisible: true,
         }}
       >
         <DialogContent>
           <form onSubmit={this.handleSubmit}>
             <StyledLogo width={128} />
-            <Heading1 wrapLine>
-              Hello {currentUser.first_name}!
-            </Heading1>
+            <Heading1 wrapLine>Hello {currentUser.first_name}!</Heading1>
             <p>
-              Welcome to Shape. Before you proceed, please take a moment to review our{' '}
-              <Link target="_blank" to="/terms">Terms of Use</Link>.
+              Welcome to Shape. Before you proceed, please take a moment to
+              review our{' '}
+              <Link target="_blank" to="/terms">
+                Terms of Use
+              </Link>
+              .
             </p>
 
-            <FormControl
-              component="fieldset"
-              required
-              error={displayError}
-            >
+            <FormControl component="fieldset" required error={displayError}>
               <FormControlLabel
                 classes={{ label: 'form-control' }}
                 control={
                   <Checkbox
                     classes={{
-                      root: displayError ? 'checkbox--error' : ''
+                      root: displayError ? 'checkbox--error' : '',
                     }}
                     checked={this.termsChecked}
                     onChange={this.handleTermsCheck}
@@ -117,10 +118,8 @@ class TermsOfUseModal extends React.Component {
                 }
                 label="I agree to the Terms of Use."
               />
-              {!displayError &&
-                <div style={{ height: '54px' }} />
-              }
-              {displayError &&
+              {!displayError && <div style={{ height: '54px' }} />}
+              {displayError && (
                 <FormHelperText
                   classes={{
                     root: 'form-control',
@@ -129,20 +128,25 @@ class TermsOfUseModal extends React.Component {
                 >
                   Please indicate you agree to the Terms of Use.
                 </FormHelperText>
-              }
+              )}
             </FormControl>
 
             <div className="button--center">
-              <FormButton disabled={this.isLoading}>
-                Continue
-              </FormButton>
+              <FormButton disabled={this.isLoading}>Continue</FormButton>
             </div>
             <div className="footer">
               <p>
-                Questions? Contact us at <Anchor href="mailto:productsupport@ideo.com">productsupport@ideo.com</Anchor>
+                Questions? Contact us at{' '}
+                <Anchor href="mailto:productsupport@ideo.com">
+                  productsupport@ideo.com
+                </Anchor>
               </p>
 
-              <a href="https://www.ideo.com/" rel="noopener noreferrer" target="_blank">
+              <a
+                href="https://www.ideo.com/"
+                rel="noopener noreferrer"
+                target="_blank"
+              >
                 <img src={poweredByIdeo} alt="Powered by IDEO" />
               </a>
             </div>

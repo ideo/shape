@@ -9,20 +9,15 @@ let component
 
 describe('ActivityLogButton', () => {
   beforeEach(() => {
-    props = {
-    }
-    wrapper = shallow(
-      <ActivityLogButton {...props} />
-    )
+    props = {}
+    wrapper = shallow(<ActivityLogButton {...props} />)
     component = wrapper.instance()
   })
 
   describe('render', () => {
     beforeEach(() => {
       apiStore.unreadActivityCount = 3
-      wrapper = shallow(
-        <ActivityLogButton {...props} />
-      )
+      wrapper = shallow(<ActivityLogButton {...props} />)
     })
 
     afterEach(() => {
@@ -45,9 +40,7 @@ describe('ActivityLogButton', () => {
     })
 
     it('should open the activity log in the ui store', () => {
-      expect(uiStore.update).toHaveBeenCalledWith(
-        'activityLogOpen', true
-      )
+      expect(uiStore.update).toHaveBeenCalledWith('activityLogOpen', true)
     })
   })
 })

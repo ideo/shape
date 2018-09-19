@@ -19,12 +19,8 @@ MarketingBack.displayName = 'StyledMarketingBack'
 
 /** @component */
 export const MarketingGradientTop = MarketingBack.extend`
-  background: linear-gradient(
-    to bottom, transparent 0%, ${v.colors.white} 100%)
-    ,url(${organicGridPillGray})
-    , no-repeat
-    , right
-    , top;
+  background: linear-gradient(to bottom, transparent 0%, ${v.colors.white} 100%),
+    url(${organicGridPillGray}), no-repeat, right, top;
   overflow: hidden;
   position: relative;
   padding-bottom: 40px;
@@ -112,7 +108,7 @@ export const MarketingH1 = styled(Heading1)`
   margin-top: 0;
 
   @media only screen and (min-width: ${v.responsive.smallBreakpoint}px) {
-      font-size: 32px;
+    font-size: 32px;
   }
 `
 MarketingH1.displayName = 'StyledMarketingH1'
@@ -169,7 +165,7 @@ export const MarketingTagLine = styled(MarketingH2)`
   margin-bottom: 60px;
 
   @media only screen and (min-width: ${v.responsive.smallBreakpoint}px) {
-      font-size: 32px;
+    font-size: 32px;
   }
 
   @media only screen and (max-width: ${v.responsive.smallBreakpoint}px) {
@@ -265,11 +261,11 @@ InvertedFixedWidth.displayName = 'StyledInvertedFixedWidth'
 
 /** @component */
 export const MarketingStyledLink = styled(Anchor)`
-    color: ${v.colors.desert};
-    letter-spacing: -0.2px;
-    font-size: 18px;
-    font-family: ${v.fonts.sans};
-    font-weight: ${v.weights.book};
+  color: ${v.colors.desert};
+  letter-spacing: -0.2px;
+  font-size: 18px;
+  font-family: ${v.fonts.sans};
+  font-weight: ${v.weights.book};
 `
 MarketingStyledLink.displayName = 'StyledMarketingStyledLink'
 
@@ -286,13 +282,14 @@ export const InvertMarketingLinkMail = styled(Anchor)`
   font-size: 32px;
   font-family: ${v.fonts.serif};
   margin-bottom: 68px;
-  display:inline-block;
+  display: inline-block;
 `
 InvertMarketingLinkMail.displayName = 'StyledInvertMarketingLinkMail'
 
 /** @component */
 export const MarketingBetaSticker = styled.img.attrs({
-  src: 'https://firebasestorage.googleapis.com/v0/b/shape-marketing.appspot.com/o/marketing%2Fcommon%2Fbeta-stick-2.png?alt=media&token=72957149-16e5-4c70-aa80-3a5ac129fa34',
+  src:
+    'https://firebasestorage.googleapis.com/v0/b/shape-marketing.appspot.com/o/marketing%2Fcommon%2Fbeta-stick-2.png?alt=media&token=72957149-16e5-4c70-aa80-3a5ac129fa34',
 })`
   alt: 'In Beta!';
   width: 100%;
@@ -302,11 +299,11 @@ export const MarketingBetaSticker = styled.img.attrs({
   position: absolute;
 
   @media only screen and (min-width: ${v.responsive.smallBreakpoint}px) {
-      max-width: 244px;
+    max-width: 244px;
   }
   @media only screen and (min-width: ${v.responsive.medBreakpoint}px) {
-      top: 126px;
-      max-width: 322px;
+    top: 126px;
+    max-width: 322px;
   }
 `
 MarketingBetaSticker.displayName = 'StyledMarketingBetaSticker'
@@ -323,10 +320,10 @@ export const MarketingShapeLogo = styled.img.attrs({
   padding-bottom: 16px;
 
   @media only screen and (min-width: ${v.responsive.smallBreakpoint}px) {
-      max-width: 410px;
+    max-width: 410px;
   }
   @media only screen and (min-width: ${v.responsive.medBreakpoint}px) {
-      margin-top: 126px;
+    margin-top: 126px;
   }
 `
 MarketingShapeLogo.displayName = 'StyledMarketingShapeLogo'
@@ -336,10 +333,7 @@ const breakpoints = [40, 52, 64]
 
 export function MarketingFlex(props) {
   return (
-    <ReflexProvider
-      space={space}
-      breakpoints={breakpoints}
-    >
+    <ReflexProvider space={space} breakpoints={breakpoints}>
       <Flex {...props} />
     </ReflexProvider>
   )
