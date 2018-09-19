@@ -10,8 +10,7 @@ Given('I visit the Test Area', () => {
   // go to My Collection
   cy.visit('/')
   // navigate into collection
-  cy.locate('CollectionCover')
-    .contains('Cypress Test Area')
+  cy.locateWith('CollectionCover', 'Cypress Test Area')
     .last()
     .click()
 })

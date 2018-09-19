@@ -26,10 +26,14 @@ const createCypressTestArea = () => {
   // login, open BCT and create our test collection
   cy.login({ userId: 1 })
   cy.visit('/')
-  cy.locate('Hotspot')
+  cy.createCollection({ name: 'Cypress Test Area' })
+
+  // create single inner collection
+  cy.locateWith('CollectionCover', 'Cypress Test Area')
     .last()
     .click()
-  cy.createCollection('Cypress Test Area')
+  cy.wait('@apiGetCollection')
+  cy.createCollection({ name: 'Inner collection', empty: true })
 }
 
 before(() => {
