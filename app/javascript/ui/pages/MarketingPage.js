@@ -5,7 +5,7 @@ import { Element as ScrollElement } from 'react-scroll'
 import {
   MarketingBack,
   MarketingFooter,
-  MarketingHeavyCTA,
+  // MarketingHeavyCTA,
   InvertMarketingLink,
   InvertMarketingH1,
   InvertMarketingH1Bold,
