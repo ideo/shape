@@ -1,28 +1,28 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import styled from 'styled-components'
-import { withStyles } from '@material-ui/core/styles'
+import { withStyles, withTheme } from '@material-ui/core/styles'
 import Input from '@material-ui/core/Input'
 import Chip from '@material-ui/core/Chip'
 import Creatable from 'react-select/lib/Creatable'
+import { pick } from 'lodash'
 
 import Option from '~/ui/global/AutocompleteOption'
 import SearchIcon from '~/ui/icons/SearchIcon'
 
 const SearchIconContainer = styled.span`
   display: block;
-  left: 15px;
-  margin-left: -15px;
-  padding-top: 5px;
+  left: 0;
   position: absolute;
   width: 14px;
+  top: 10px;
 
   .icon {
     width: 22px;
   }
 `
 
-const arrowRenderer = () => (
+const DropdownIndicator = () => (
   <SearchIconContainer>
     <SearchIcon />
   </SearchIconContainer>
@@ -51,9 +51,12 @@ const valueComponent = classes => valueProps => {
   return <div className="Select-value">{children}</div>
 }
 
-const selectStyles = {
-  control: base => ({
-    ...base,
+const ITEM_HEIGHT = 48
+
+const selectStyles = theme => ({
+  clearIndicator: () => ({}),
+  container: () => ({}),
+  control: () => ({
     width: '370px',
     paddingLeft: '24px',
     display: 'flex',
@@ -65,44 +68,60 @@ const selectStyles = {
       boxShadow: 'none',
     },
   }),
-  noOptionsMessage: base => ({
-    ...base,
-    // padding: theme.spacing.unit * 2,
-  }),
+  dropdownIndicator: () => ({}),
+  group: () => ({}),
+  groupHeading: () => ({}),
+  indicatorsContainer: () => ({}),
+  indicatorSeparator: () => ({}),
   input: base => ({
     ...base,
-    display: 'inline-flex !important',
-    padding: 0,
-    height: 'auto',
-    width: '370px',
   }),
-}
+  loadingIndicator: () => ({}),
+  loadingMessage: () => ({}),
+  menu: base => ({
+    ...pick(base, ['position', 'width', 'zIndex']),
+    backgroundColor: 'white',
+    top: `calc(100% + ${theme.spacing.unit}px)`,
+    width: '370px',
+    zIndex: 2,
+    maxHeight: ITEM_HEIGHT * 3.5,
+  }),
+  menuList: base => ({
+    ...base,
+  }),
+  multiValue: () => ({}),
+  multiValueLabel: () => ({}),
+  multiValueRemove: () => ({}),
+  noOptionsMessage: () => ({
+    padding: theme.spacing.unit * 2,
+  }),
+  option: base => ({
+    ...base,
+    background: '#DDD',
+  }),
+  placeholder: base => ({
+    ...base,
+  }),
+  singleValue: () => ({}),
+  valueContainer: () => ({}),
+})
 
-function SelectWrapped(props) {
-  const { classes, ...other } = props
+const SelectWrapped = props => {
+  const { classes, theme, ...other } = props
   return (
     <Creatable
-      styles={selectStyles}
+      formatCreateLabel={inputValue => `Invite email ${inputValue}`}
+      styles={selectStyles(theme)}
       components={{
         valueComponent: valueComponent(classes),
-        arrowRenderer,
+        DropdownIndicator,
         optionComponent: Option,
       }}
-      noResultsText={'No results found'}
+      noOptionsMessage={() => 'No results found'}
       {...other}
     />
   )
 }
-
-SelectWrapped.propTypes = {
-  classes: PropTypes.shape({
-    root: PropTypes.string,
-    chip: PropTypes.string,
-    '@global': PropTypes.string,
-  }).isRequired,
-}
-
-// const ITEM_HEIGHT = 48
 
 const styles = theme => ({
   root: {
@@ -116,95 +135,17 @@ const styles = theme => ({
     paddingRight: '4px',
     paddingTop: 0,
   },
-  // We had to use a lot of global selectors in order to style react-select.
-  // We are waiting on https://github.com/JedWatson/react-select/issues/1679
-  // to provide a better implementation.
-  // Also, we had to reset the default style injected by the library.
-  // '@global': {
-  //   '.Select-multi-value-wrapper': {
-  //     flexGrow: 1,
-  //     display: 'flex',
-  //     flexWrap: 'wrap',
-  //   },
-  //   '.Select--multi .Select-input': {
-  //     width: '370px',
-  //     margin: 0,
-  //   },
-  //   '.Select-noresults': {
-  //     padding: theme.spacing.unit * 2,
-  //   },
-  //   '.Select-input': {
-  //     display: 'inline-flex !important',
-  //     padding: 0,
-  //     height: 'auto',
-  //     width: '370px',
-  //   },
-  //   '.Select-input input': {
-  //     background: 'transparent',
-  //     border: 0,
-  //     padding: 0,
-  //     cursor: 'default',
-  //     display: 'inline-block',
-  //     fontFamily: 'inherit',
-  //     fontSize: 'inherit',
-  //     margin: 0,
-  //     outline: 0,
-  //     width: '370px',
-  //   },
-  //   '.Select-placeholder, .Select--single .Select-value': {
-  //     position: 'absolute',
-  //     top: 0,
-  //     left: '24px',
-  //     right: 0,
-  //     bottom: 0,
-  //     display: 'flex',
-  //     alignItems: 'center',
-  //     padding: 0,
-  //   },
-  //   '.Select-placeholder': {
-  //     opacity: 0.42,
-  //     color: theme.palette.common.black,
-  //   },
-  //   '.Select-menu-outer': {
-  //     backgroundColor: 'white',
-  //     border: 'none',
-  //     boxShadow: 'none',
-  //     position: 'absolute',
-  //     left: 0,
-  //     top: `calc(100% + ${theme.spacing.unit}px)`,
-  //     width: '370px',
-  //     zIndex: 2,
-  //     maxHeight: ITEM_HEIGHT * 3.5,
-  //   },
-  //   '.Select.is-focused:not(.is-open) > .Select-control': {
-  //     boxShadow: 'none',
-  //   },
-  //   '.Select-menu': {
-  //     maxHeight: ITEM_HEIGHT * 3.5,
-  //     overflowY: 'auto',
-  //     width: '100%',
-  //   },
-  //   '.Select-menu div': {
-  //     boxSizing: 'content-box',
-  //   },
-  //   '.Select-arrow-zone, .Select-clear-zone': {
-  //     color: theme.palette.action.active,
-  //     cursor: 'pointer',
-  //     height: 21,
-  //     width: 21,
-  //     zIndex: 1,
-  //   },
-  //   // Only for screen readers. We can't use display none.
-  //   '.Select-aria-only': {
-  //     position: 'absolute',
-  //     overflow: 'hidden',
-  //     clip: 'rect(0 0 0 0)',
-  //     height: 1,
-  //     width: 1,
-  //     margin: -1,
-  //   },
-  // },
 })
+
+const SelectWrappedWithStyles = withTheme()(SelectWrapped)
+
+SelectWrapped.propTypes = {
+  classes: PropTypes.shape({
+    root: PropTypes.string,
+    chip: PropTypes.string,
+    '@global': PropTypes.string,
+  }).isRequired,
+}
 
 class AutoComplete extends React.Component {
   state = {
@@ -229,7 +170,7 @@ class AutoComplete extends React.Component {
     return (
       <div className={classes.root}>
         <Input
-          inputComponent={SelectWrapped}
+          inputComponent={SelectWrappedWithStyles}
           inputProps={{
             classes,
             multi: true,
