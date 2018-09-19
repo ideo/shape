@@ -1,16 +1,34 @@
 import { ReferenceType } from 'datx'
 import { action } from 'mobx'
+
+import trackError from '~/utils/trackError'
 import BaseRecord from './BaseRecord'
-import Collection from '~/stores/jsonApi/Collection'
-import Item from '~/stores/jsonApi/Item'
+import Collection from './Collection'
+import Item from './Item'
+import Group from './Group'
 
 class Activity extends BaseRecord {
   @action setTarget(value) {
-    const model = value.internalType === 'collections' ? Collection : Item
-    this.addReference('target', value, {
-      type: ReferenceType.TO_ONE,
-      model,
-    })
+    let model
+    switch (value.internalType) {
+    case 'groups':
+      model = Group
+      break
+    case 'items':
+      model = Item
+      break
+    case 'collections':
+    default:
+      model = Collection
+    }
+    try {
+      this.addReference('target', value, {
+        type: ReferenceType.TO_ONE,
+        model,
+      })
+    } catch (e) {
+      trackError(e, { source: 'Activity', name: 'setTarget' })
+    }
   }
 
   attributesForAPI = [
@@ -31,7 +49,7 @@ class Activity extends BaseRecord {
 
 Activity.type = 'activities'
 Activity.defaults = {
-  target: undefined
+  target: undefined,
 }
 
 export default Activity
