@@ -76,7 +76,7 @@ class NotificationDigest < SimpleService
       group_user_ids = Group.where(id: groups.pluck(:id)).user_ids
     end
     mentioned_user_ids += group_user_ids
-    User.where(id: mentioned_user_ids)
+    User.where(id: mentioned_user_ids.uniq)
   end
 
   def notify_users
