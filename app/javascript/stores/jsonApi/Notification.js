@@ -13,7 +13,7 @@ Notification.refDefaults = {
     model: User,
     type: ReferenceType.TO_MANY,
     defaultValue: [],
-  }
+  },
 }
 
 export default Notification
