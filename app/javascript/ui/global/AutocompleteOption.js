@@ -8,20 +8,20 @@ import Avatar from '~/ui/global/Avatar'
 
 class AutocompleteOption extends React.Component {
   handleClick = event => {
-    this.props.onSelect(this.props.option, event)
+    this.props.selectOption(this.props.data, event)
   }
 
   render() {
-    const { children, isFocused, option, onFocus } = this.props
+    const { children, isFocused, data, onFocus } = this.props
     let content = children
-    if (!option.className) {
-      const { data } = option
-      const url = data.pic_url_square || data.filestack_file_url
-      const name = _.trim(data.name) ? data.name : data.email
+    const user = data.data
+    if (user) {
+      const url = user.pic_url_square || user.filestack_file_url
+      const name = _.trim(user.name) ? user.name : user.email
       content = (
         <Row align="center" noSpacing>
           <span>
-            <Avatar url={url} title={data.name} key={data.id} size={38} />
+            <Avatar url={url} title={user.name} key={user.id} size={38} />
           </span>
           <RowItemLeft>
             <DisplayText>{name}</DisplayText>
@@ -49,17 +49,16 @@ class AutocompleteOption extends React.Component {
 AutocompleteOption.propTypes = {
   children: PropTypes.string,
   isFocused: PropTypes.bool,
-  option: PropTypes.shape({
-    className: PropTypes.string,
+  data: PropTypes.shape({
     data: PropTypes.object,
   }).isRequired,
-  onSelect: PropTypes.func,
+  selectOption: PropTypes.func,
   onFocus: PropTypes.func,
 }
 AutocompleteOption.defaultProps = {
   children: [],
   isFocused: false,
-  onSelect: () => {},
+  selectOption: () => {},
   onFocus: () => {},
 }
 export default AutocompleteOption
