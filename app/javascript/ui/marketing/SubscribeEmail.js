@@ -28,7 +28,6 @@ const SubscribeInput = styled.input`
 `
 
 const SubscribeButton = styled.button`
-  align: left;
   font-weight: ${v.weights.medium};
   font-family: ${v.fonts.sans};
   font-size: 14px;

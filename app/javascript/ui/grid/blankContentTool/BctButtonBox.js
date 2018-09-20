@@ -11,7 +11,11 @@ const BctButtonBox = ({ type, tooltip, size, creating, onClick, Icon }) => (
       title={tooltip}
       placement="bottom"
     >
-      <BctButton creating={creating === type} onClick={onClick}>
+      <BctButton
+        data-cy={`BctButton-${type}`}
+        creating={creating === type}
+        onClick={onClick}
+      >
         <Icon width={size} height={size} color="white" />
       </BctButton>
     </Tooltip>

@@ -67,7 +67,7 @@ class MarketingPage extends React.Component {
             <MarketingBetaSticker />
 
             <Center>
-              <MarketingShapeLogo />
+              <MarketingShapeLogo data-cy="MarketingShapeLogo" />
               <MarketingTagLine>
                 {this.state.pageTexts.tagLine}
               </MarketingTagLine>
@@ -178,10 +178,8 @@ class MarketingPage extends React.Component {
             <ResponsivePadInlineBlock>
               <DesktopSpacer style={{ width: '80px' }} />
               <InvertMarketingLink href="https://www.ideo.com/">
-                <span role="img" aria-label="copyright">
-                  &copy;
-                </span>{' '}
-                2018
+                {/* https://github.com/evcohen/eslint-plugin-jsx-a11y/issues/388 */}
+                &copy; 2018
               </InvertMarketingLink>
             </ResponsivePadInlineBlock>
           </Center>

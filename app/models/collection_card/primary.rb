@@ -6,10 +6,12 @@ class CollectionCard
 
     belongs_to :collection,
                optional: true,
-               inverse_of: :parent_collection_card
+               inverse_of: :parent_collection_card,
+               dependent: :destroy
     belongs_to :item,
                optional: true,
-               inverse_of: :parent_collection_card
+               inverse_of: :parent_collection_card,
+               dependent: :destroy
 
     validate :card_is_only_primary_card, if: :new_record?
 
