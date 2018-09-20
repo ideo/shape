@@ -18,7 +18,6 @@ export const fakeCollectionCard = {
   beginReplacing: jest.fn(),
   API_create: jest.fn(),
   API_archive: jest.fn(),
-  API_duplicate: jest.fn(),
   API_linkToMyCollection: jest.fn(),
   ...fakeJsonApiAttrs,
 }

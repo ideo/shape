@@ -1,11 +1,12 @@
 import _ from 'lodash'
-import { routingStore, undoStore } from '~/stores'
+import { routingStore } from '~/stores'
 import trackError from '~/utils/trackError'
 import FilestackUpload from '~/utils/FilestackUpload'
 import { ITEM_TYPES } from '~/utils/variables'
 import BaseRecord from './BaseRecord'
+import SharedRecordMixin from './SharedRecordMixin'
 
-class Item extends BaseRecord {
+class Item extends SharedRecordMixin(BaseRecord) {
   attributesForAPI = [
     'type',
     'name',
@@ -65,29 +66,6 @@ class Item extends BaseRecord {
 
   get isImage() {
     return this.filestack_file && this.mimeBaseType === 'image'
-  }
-
-  // almost identical to method on Collection.js
-  API_updateName(name, addUndo = true) {
-    const previousName = this.name
-    this.name = name
-    undoStore.pushUndoAction({
-      apiCall: () => this.API_revertToSnapshot({ name: previousName }),
-      redirectPath: { type: 'items', id: this.id },
-    })
-    const data = this.toJsonApi()
-    delete data.relationships
-    data.cancel_sync = true
-    const apiPath = `items/${this.id}`
-    return this.apiStore.request(apiPath, 'PATCH', { data })
-  }
-
-  API_revertToSnapshot(snapshot = {}) {
-    _.assign(this, snapshot)
-    const data = this.toJsonApi()
-    data.cancel_sync = true
-    const apiPath = `items/${this.id}`
-    return this.apiStore.request(apiPath, 'PATCH', { data })
   }
 
   API_updateWithoutSync({ cancel_sync } = {}) {

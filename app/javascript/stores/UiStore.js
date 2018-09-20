@@ -1,7 +1,8 @@
 import _ from 'lodash'
 import { animateScroll } from 'react-scroll'
-import { observable, action, computed } from 'mobx'
+import { observable, action, runInAction, computed } from 'mobx'
 import queryString from 'query-string'
+import sleep from '~/utils/sleep'
 import v from '~/utils/variables'
 
 export default class UiStore {
@@ -82,8 +83,16 @@ export default class UiStore {
     fadeOutTime: undefined,
     onClose: () => this.closeDialog(),
   }
+  defaultSnackbarProps = {
+    open: false,
+    message: '',
+    autoHideDuration: 4000,
+    onClose: () => this.closeSnackbar(),
+  }
   @observable
   dialogConfig = { ...this.defaultDialogProps }
+  @observable
+  snackbarConfig = { ...this.defaultSnackbarProps }
   @observable
   blurContent = false
   @observable
@@ -167,6 +176,28 @@ export default class UiStore {
   @action
   closeDialog() {
     this.dialogConfig.open = null
+  }
+
+  async popupSnackbar(props = {}) {
+    if (this.snackbarConfig.open) {
+      this.closeSnackbar()
+      // pause slightly between closing last snackbar and opening a new one
+      await sleep(350)
+    }
+    runInAction(() => {
+      _.assign(this.snackbarConfig, {
+        ...this.defaultSnackbarProps,
+        open: true,
+        ...props,
+      })
+    })
+  }
+
+  @action
+  closeSnackbar() {
+    _.assign(this.snackbarConfig, {
+      ...this.defaultSnackbarProps,
+    })
   }
 
   // default action for updating any basic UiStore value
@@ -319,6 +350,12 @@ export default class UiStore {
     return this.blankContentToolState.order !== null
   }
 
+  @computed
+  get cancelUndo() {
+    // certain UI states should prevent CTRL+Z from triggering an undo
+    return this.organizationMenuOpen || this.dialogConfig.open
+  }
+
   @action
   resetSelectionAndBCT() {
     this.deselectCards()
@@ -435,11 +472,6 @@ export default class UiStore {
     } else {
       this.selectedCardIds.replace([cardId])
     }
-  }
-
-  @computed
-  get cancelUndo() {
-    return this.organizationMenuOpen || this.dialogConfig.open
   }
 
   isSelected(cardId) {

@@ -20,8 +20,6 @@ export const apiStore = new ApiStore()
 export const uiStore = new UiStore()
 export const undoStore = new UndoStore()
 
-window.undoStore = undoStore
-
 export default {
   routingStore,
   apiStore,

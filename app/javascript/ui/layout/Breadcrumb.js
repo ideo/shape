@@ -2,7 +2,7 @@ import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 import { Link } from 'react-router-dom'
 
-import { routingStore } from '~/stores'
+import { routingStore, apiStore } from '~/stores'
 import v from '~/utils/variables'
 
 const BreadcrumbPadding = styled.div`
@@ -49,10 +49,15 @@ StyledBreadcrumb.displayName = 'StyledBreadcrumb'
 class Breadcrumb extends React.Component {
   breadcrumbItem = item => {
     const [klass, id, name] = item
+    let recordName = name
     const path = routingStore.pathTo(klass, id)
+    const record = apiStore.find(klass, id)
+    if (record) {
+      recordName = record.name
+    }
     return (
       <span className="crumb" key={path} data-cy="Breadcrumb">
-        <Link to={path}>{name}</Link>
+        <Link to={path}>{recordName}</Link>
       </span>
     )
   }

@@ -2,7 +2,6 @@ import { action, observable } from 'mobx'
 
 import { uiStore } from '~/stores'
 import { ITEM_TYPES } from '~/utils/variables'
-import Api from './Api'
 import BaseRecord from './BaseRecord'
 
 class CollectionCard extends BaseRecord {
@@ -216,10 +215,6 @@ class CollectionCard extends BaseRecord {
       uiStore.defaultAlertError()
     }
     return false
-  }
-
-  API_duplicate() {
-    return Api.duplicate('collection_cards', this)
   }
 }
 CollectionCard.type = 'collection_cards'

@@ -2,11 +2,12 @@ import _ from 'lodash'
 import { computed, action } from 'mobx'
 import { ReferenceType } from 'datx'
 
-import { apiStore, routingStore, uiStore, undoStore } from '~/stores'
+import { apiStore, routingStore, uiStore } from '~/stores'
 import BaseRecord from './BaseRecord'
 import CollectionCard from './CollectionCard'
+import SharedRecordMixin from './SharedRecordMixin'
 
-class Collection extends BaseRecord {
+class Collection extends SharedRecordMixin(BaseRecord) {
   static type = 'collections'
 
   attributesForAPI = [
@@ -162,40 +163,6 @@ class Collection extends BaseRecord {
     const apiPath = `collections/${this.id}`
     return this.apiStore.request(apiPath, 'PATCH', { data })
   }
-
-  // TODO: DRY up so that Item can use the same functions
-  API_updateName(name) {
-    const previousName = this.name
-    this.name = name
-    this.pushUndo({
-      snapshot: { name: previousName },
-      message: `Collection name "${name}" edit undone.`,
-    })
-    const data = this.toJsonApi()
-    data.cancel_sync = true
-    const apiPath = `collections/${this.id}`
-    return this.apiStore.request(apiPath, 'PATCH', { data })
-  }
-
-  API_revertTo({ snapshot, jsonData } = {}) {
-    let data = jsonData
-    if (snapshot) {
-      _.assign(this, snapshot)
-      data = this.toJsonApi()
-      data.cancel_sync = true
-    }
-    const apiPath = `collections/${this.id}`
-    return this.apiStore.request(apiPath, 'PATCH', { data })
-  }
-
-  pushUndo({ snapshot, jsonData, message = '' } = {}) {
-    undoStore.pushUndoAction({
-      message,
-      apiCall: () => this.API_revertTo({ snapshot, jsonData }),
-      redirectPath: { type: 'collections', id: this.id },
-    })
-  }
-  // -----
 
   // after we reorder a single card, we want to make sure everything goes into sequential order
   _reorderCards() {
