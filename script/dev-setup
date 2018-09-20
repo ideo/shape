@@ -12,6 +12,9 @@ if [ ! -f "$HOOK" ]; then
   $DIR/script/add-pre-commit-hook.sh
 fi
 
+git submodule init
+git submodule update
+
 if [ ! -f "$DIR/.env" ]; then
   echo "Missing env file $DIR/.env !"
   exit 1
