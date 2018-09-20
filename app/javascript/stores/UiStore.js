@@ -437,6 +437,11 @@ export default class UiStore {
     }
   }
 
+  @computed
+  get cancelUndo() {
+    return this.organizationMenuOpen || this.dialogConfig.open
+  }
+
   isSelected(cardId) {
     if (this.selectedCardIds.length === 0) return false
     return this.selectedCardIds.findIndex(id => id === cardId) > -1

@@ -154,6 +154,7 @@ export const fakeCollection = {
   cardIds: _.map(fakeCards, c => c.id),
   API_archive: jest.fn(),
   API_updateCards: jest.fn(),
+  API_updateName: jest.fn(),
   checkCurrentOrg: jest.fn(),
   internalType: 'collections',
   meta: {

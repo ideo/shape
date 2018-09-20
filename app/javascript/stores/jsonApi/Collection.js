@@ -163,21 +163,13 @@ class Collection extends BaseRecord {
     return this.apiStore.request(apiPath, 'PATCH', { data })
   }
 
-  // API_updateWithoutSync
-  //   updateCollection...
-  //   push undo
-  //   cancel_sync
-
-  // API_undoChanges
-  //   updateCollection
-
-  // for now this is only used for updating the collection name
+  // TODO: DRY up so that Item can use the same functions
   API_updateName(name) {
     const previousName = this.name
     this.name = name
-    undoStore.pushUndoAction({
-      apiCall: () => this.API_revertToSnapshot({ name: previousName }),
-      redirectPath: { type: 'collections', id: this.id },
+    this.pushUndo({
+      snapshot: { name: previousName },
+      message: `Collection name "${name}" edit undone.`,
     })
     const data = this.toJsonApi()
     data.cancel_sync = true
@@ -185,13 +177,25 @@ class Collection extends BaseRecord {
     return this.apiStore.request(apiPath, 'PATCH', { data })
   }
 
-  API_revertToSnapshot(snapshot = {}) {
-    _.assign(this, snapshot)
-    const data = this.toJsonApi()
-    data.cancel_sync = true
+  API_revertTo({ snapshot, jsonData } = {}) {
+    let data = jsonData
+    if (snapshot) {
+      _.assign(this, snapshot)
+      data = this.toJsonApi()
+      data.cancel_sync = true
+    }
     const apiPath = `collections/${this.id}`
     return this.apiStore.request(apiPath, 'PATCH', { data })
   }
+
+  pushUndo({ snapshot, jsonData, message = '' } = {}) {
+    undoStore.pushUndoAction({
+      message,
+      apiCall: () => this.API_revertTo({ snapshot, jsonData }),
+      redirectPath: { type: 'collections', id: this.id },
+    })
+  }
+  // -----
 
   // after we reorder a single card, we want to make sure everything goes into sequential order
   _reorderCards() {

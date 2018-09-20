@@ -183,7 +183,6 @@ class CollectionGrid extends React.Component {
 
   onDragOrResizeStop = () => {
     const { collection } = this.props
-    console.log(collection.toJsonApiWithCards())
     const placeholder =
       _.find(this.state.cards, { cardType: 'placeholder' }) || {}
     const original = _.find(this.state.cards, { id: placeholder.originalId })
@@ -205,6 +204,15 @@ class CollectionGrid extends React.Component {
       // just some double-checking validations
       if (height > 2) height = 2
       if (width > 4) width = 4
+      // set up action to undo
+      let undoMessage = 'Card move undone.'
+      if (original.height !== height || original.width !== width) {
+        undoMessage = 'Card resize undone.'
+      }
+      collection.pushUndo({
+        jsonData: collection.toJsonApiWithCards(),
+        message: undoMessage,
+      })
       _.assign(original, { order, width, height })
 
       // reorder cards and persist changes

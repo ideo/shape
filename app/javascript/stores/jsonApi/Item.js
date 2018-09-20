@@ -83,7 +83,6 @@ class Item extends BaseRecord {
   }
 
   API_revertToSnapshot(snapshot = {}) {
-    console.log('REVERT', snapshot)
     _.assign(this, snapshot)
     const data = this.toJsonApi()
     data.cancel_sync = true

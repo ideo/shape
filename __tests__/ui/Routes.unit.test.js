@@ -1,6 +1,7 @@
 import Routes from '~/ui/Routes'
 import fakeApiStore from '#/mocks/fakeApiStore'
 import fakeUiStore from '#/mocks/fakeUiStore'
+import fakeUndoStore from '#/mocks/fakeUndoStore'
 import { fakeUser } from '#/mocks/data'
 
 jest.mock('firebase/auth')
@@ -13,7 +14,7 @@ jest.mock('firebase/app', () => ({
   }),
 }))
 
-let props, wrapper, requestResult, apiStore, uiStore, routingStore
+let props, wrapper, requestResult, apiStore, uiStore, routingStore, undoStore
 beforeEach(() => {
   requestResult = { data: fakeUser }
   routingStore = {}
@@ -21,7 +22,8 @@ beforeEach(() => {
     requestResult,
   })
   uiStore = fakeUiStore
-  props = { apiStore, uiStore, routingStore }
+  undoStore = fakeUndoStore
+  props = { apiStore, uiStore, routingStore, undoStore }
 })
 
 describe('Routes', () => {

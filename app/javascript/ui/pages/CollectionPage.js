@@ -79,6 +79,8 @@ class CollectionPage extends PageWithApi {
   receivedChannelData = async data => {
     const { apiStore } = this.props
     const { collection } = this
+    // catch if receivedData happens after reload
+    if (!collection) return
     const currentId = collection.id
     const submissions = collection.submissions_collection
     const submissionsId = submissions ? submissions.id : ''
