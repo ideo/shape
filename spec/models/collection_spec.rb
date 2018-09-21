@@ -292,7 +292,10 @@ describe Collection, type: :model do
       let(:collection) { create(:collection) }
 
       it 'queues up BreadcrumbRecalculationWorker on name change' do
-        expect(BreadcrumbRecalculationWorker).to receive(:perform_async)
+        expect(BreadcrumbRecalculationWorker).to receive(:perform_async).with(
+          collection.id,
+          collection.breadcrumb_subtree_identifier_was,
+        )
         collection.update(name: 'New name')
       end
 
