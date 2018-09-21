@@ -71,7 +71,7 @@ RSpec.describe Breadcrumb::Builder, type: :service do
       end
 
       it 'should find all items in the tree' do
-        expect(Item.in_collection(collection).count).to eq 4
+        expect(Item.in_collection(collection).count).to eq 5
         expect(Item.in_collection(collection)).to include(subcollections.first.items.first)
       end
     end
