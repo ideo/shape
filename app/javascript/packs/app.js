@@ -15,25 +15,20 @@ configure({ enforceActions: 'observed' })
 const browserHistory = createBrowserHistory()
 const history = syncHistoryWithStore(browserHistory, routingStore)
 
+const RenderApp = inner => {
+  ReactDOM.render(
+    <Provider {...stores}>
+      <Router history={history}>{inner}</Router>
+    </Provider>,
+    document.getElementById('react-root')
+  )
+}
+
 if (module.hot) {
   module.hot.accept('../ui/Routes', () => {
     const HotRoutes = require('../ui/Routes').default
-    ReactDOM.render(
-      <Provider {...stores}>
-        <Router history={history}>
-          <HotRoutes />
-        </Router>
-      </Provider>,
-      document.getElementById('react-root')
-    )
+    RenderApp(<HotRoutes />)
   })
 }
 
-ReactDOM.render(
-  <Provider {...stores}>
-    <Router history={history}>
-      <Routes />
-    </Router>
-  </Provider>,
-  document.getElementById('react-root')
-)
+RenderApp(<Routes />)

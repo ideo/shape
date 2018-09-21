@@ -117,8 +117,14 @@ module Resourceable
     self.class.edit_role == Role::EDITOR && self.class.view_role = Role::VIEWER
   end
 
+  def requires_roles?
+    # can be overridden e.g. by QuestionItem
+    true
+  end
+
   # NOTE: This should only ever be called on a newly created record, e.g. in CollectionCardBuilder
   def inherit_roles_from_parent!(parent = self.parent)
+    return false unless requires_roles?
     return false unless parent.present?
     return false if roles.present?
     if parent.is_a? Collection::SubmissionsCollection

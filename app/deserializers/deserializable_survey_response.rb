@@ -1,0 +1,2 @@
+class DeserializableSurveyResponse < BaseJsonSerializer
+end

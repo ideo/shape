@@ -68,7 +68,7 @@ class MarketingPage extends React.Component {
             <BetaSticker />
 
             <Center>
-              <MarketingShapeLogo data-cy="MarketingShapeLogo" />
+              <MarketingShapeLogo />
               <MarketingTagLine>
                 {this.state.pageTexts.tagLine}
               </MarketingTagLine>
