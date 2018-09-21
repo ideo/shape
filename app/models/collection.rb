@@ -295,9 +295,10 @@ class Collection < ApplicationRecord
   end
 
   def recalculate_child_breadcrumbs_async
-    BreadcrumbRecalculationWorker.perform_async(id)
+    BreadcrumbRecalculationWorker.perform_async(id, breadcrumb_subtree_identifier_was)
   end
 
+  # Cards are explicitly passed in when moving them from another collection to this one
   def recalculate_child_breadcrumbs(cards = collection_cards)
     cards.each do |card|
       next if card.link?
@@ -305,7 +306,10 @@ class Collection < ApplicationRecord
         # have to reload in order to pick up new parent relationship
         card.item.reload.recalculate_breadcrumb!
       elsif card.collection_id.present?
-        BreadcrumbRecalculationWorker.perform_async(card.collection_id)
+        BreadcrumbRecalculationWorker.perform_async(
+          card.collection_id,
+          breadcrumb_subtree_identifier_was
+        )
       end
     end
   end

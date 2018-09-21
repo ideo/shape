@@ -10,21 +10,30 @@ RSpec.describe BreadcrumbRecalculationWorker, type: :worker do
 
     before do
       collection.update(name: new_name)
-      BreadcrumbRecalculationWorker.new.perform(collection.id)
-      collection.reload
     end
 
     it 'recalculates collection breadcrumb' do
-      expect(collection.breadcrumb.first).to match_array crumb
+      BreadcrumbRecalculationWorker.new.perform(collection.id, collection.breadcrumb_subtree_identifier_was)
+      expect(collection.reload.breadcrumb.first).to match_array crumb
     end
 
     it 'recalculates child item breadcrumbs synchronously' do
-      expect(collection.items.first.breadcrumb.first).to match_array crumb
+      BreadcrumbRecalculationWorker.new.perform(collection.id, collection.breadcrumb_subtree_identifier_was)
+      expect(collection.reload.items.first.breadcrumb.first).to match_array crumb
     end
 
-    it 'recalculates child collection breadcrumbs asynchronously' do
-      expect(BreadcrumbRecalculationWorker).to receive(:perform_async)
-      BreadcrumbRecalculationWorker.new.perform(collection.id)
+    it 'calls recursive method' do
+      expect_any_instance_of(Collection).to receive(
+        :recalculate_breadcrumb_tree!,
+      ).with(
+        subtree_identifier: collection.breadcrumb_subtree_identifier,
+        force_sync: true,
+      ).once
+
+      BreadcrumbRecalculationWorker.new.perform(
+        collection.id,
+        collection.breadcrumb_subtree_identifier
+      )
     end
   end
 end
