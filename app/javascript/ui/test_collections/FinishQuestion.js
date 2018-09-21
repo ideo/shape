@@ -8,16 +8,13 @@ const FinishedEmojiHolder = styled.div`
   text-align: center;
 `
 
-const FinishQuestion = (props) => (
+const FinishQuestion = props => (
   <div>
     <QuestionText>
-            You’re done! Thank you for taking the time to provide your opinion.
+      You’re done! Thank you for taking the time to provide your opinion.
     </QuestionText>
     <FinishedEmojiHolder>
-      <Emoji
-        name="Finished"
-        symbol="🎉"
-      />
+      <Emoji name="Finished" symbol="🎉" />
     </FinishedEmojiHolder>
   </div>
 )
