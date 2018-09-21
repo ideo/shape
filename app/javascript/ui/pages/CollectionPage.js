@@ -63,7 +63,6 @@ class CollectionPage extends PageWithApi {
   }
 
   componentWillMount() {
-    console.log('subscribe to channel', this.props.match.params.id)
     this.subscribeToChannel(this.props.match.params.id)
   }
 
