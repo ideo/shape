@@ -57,6 +57,11 @@ const StyledBlankCreationTool = styled.div`
     width: ${props => (props.replacing ? '50%' : '100%')};
     &.foreground-bottom {
       top: 120px;
+      /*
+       width is smaller because there are only 3 bottom buttons
+       TODO: remove width property when Tests are re-enabled
+      */
+      width: 85%;
       margin: 0 auto;
     }
   }
@@ -520,7 +525,8 @@ class GridCardBlank extends React.Component {
             >
               {videoBctBox}
               {submissionBctBox}
-              {testBctBox}
+              {/* DISABLING UNTIL TEST COLLECTIONS ARE READY */}
+              {/* {testBctBox} */}
               <PopoutMenu
                 buttonStyle="bct"
                 menuOpen={this.state.bctMenuOpen}
