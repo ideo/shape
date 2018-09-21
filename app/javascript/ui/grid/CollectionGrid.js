@@ -82,7 +82,7 @@ class CollectionGrid extends React.Component {
     const {
       blankContentToolState,
       collection,
-      cardIds,
+      cardProperties,
       movingCardIds,
       submissionSettings,
       canEditCollection,
@@ -134,8 +134,8 @@ class CollectionGrid extends React.Component {
         blankCard = { ...blankFound, order, width, height }
       }
       // NOTE: how reliable is this length check for indicating a newly added card?
-      const previousLength = this.props.cardIds.length
-      const cardJustAdded = cardIds.length === previousLength + 1
+      const previousLength = this.props.cardProperties.length
+      const cardJustAdded = cardProperties.length === previousLength + 1
       if ((canEditCollection && !cardJustAdded) || blankCard.blankType) {
         // Add the BCT to the array of cards to be positioned, if they can edit
         cards.unshift(blankCard)
