@@ -293,8 +293,10 @@ class CollectionPage extends PageWithApi {
               updateCollection={this.updateCollection}
               collection={collection}
               canEditCollection={collection.can_edit_content}
-              // Pass in cardIds so grid will re-render when they change
-              cardIds={collection.cardIds}
+              // Pass in cardProperties so grid will re-render when they change
+              cardProperties={collection.collection_cards.map(c =>
+                _.pick(c, ['id', 'order', 'width', 'height'])
+              )}
               // Pass in BCT state so grid will re-render when open/closed
               blankContentToolState={blankContentToolState}
               movingCardIds={uiMovingCardIds}

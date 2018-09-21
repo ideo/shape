@@ -19,21 +19,31 @@ const SharedRecordMixin = superclass =>
       return this.apiStore.request(apiPath, 'PATCH', { data })
     }
 
-    API_revertTo({ snapshot, jsonData } = {}) {
-      let data = jsonData
-      if (snapshot) {
+    API_revertTo({ snapshot } = {}) {
+      let data
+      // special case if you're undoing a card resize/move
+      if (snapshot.collection_cards_attributes) {
+        snapshot.collection_cards_attributes.forEach(cardData => {
+          const card = this.collection_cards.find(cc => cc.id === cardData.id)
+          if (card) {
+            _.assign(card, _.pick(cardData, ['order', 'width', 'height']))
+          }
+        })
+        this._reorderCards()
+        data = this.toJsonApiWithCards()
+      } else {
         _.assign(this, snapshot)
         data = this.toJsonApi()
-        data.cancel_sync = true
       }
+      data.cancel_sync = true
       const apiPath = `${this.internalType}/${this.id}`
       return this.apiStore.request(apiPath, 'PATCH', { data })
     }
 
-    pushUndo({ snapshot, jsonData, message = '' } = {}) {
+    pushUndo({ snapshot, message = '' } = {}) {
       undoStore.pushUndoAction({
         message,
-        apiCall: () => this.API_revertTo({ snapshot, jsonData }),
+        apiCall: () => this.API_revertTo({ snapshot }),
         redirectPath: { type: this.internalType, id: this.id },
       })
     }

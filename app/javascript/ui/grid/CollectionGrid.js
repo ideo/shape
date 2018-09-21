@@ -209,8 +209,11 @@ class CollectionGrid extends React.Component {
       if (original.height !== height || original.width !== width) {
         undoMessage = 'Card resize undone'
       }
+      // this works a little differently than the typical "undo" snapshot...
+      // we snapshot the collection_cards.attributes so that they can be reverted
+      const jsonData = collection.toJsonApiWithCards()
       collection.pushUndo({
-        jsonData: collection.toJsonApiWithCards(),
+        snapshot: jsonData.attributes,
         message: undoMessage,
       })
       _.assign(original, { order, width, height })
@@ -591,10 +594,8 @@ class CollectionGrid extends React.Component {
 
     const minHeight = rows * (gridSettings.gridH + gridSettings.gutter)
 
-    const { cardIds } = this.props.collection
-    // Rendering cardIds so that grid re-renders when they change
     return (
-      <StyledGrid data-card-ids={cardIds} minHeight={minHeight}>
+      <StyledGrid minHeight={minHeight}>
         {this.renderPositionedCards()}
       </StyledGrid>
     )
@@ -616,7 +617,7 @@ CollectionGrid.propTypes = {
   updateCollection: PropTypes.func.isRequired,
   collection: MobxPropTypes.objectOrObservableObject.isRequired,
   blankContentToolState: MobxPropTypes.objectOrObservableObject,
-  cardIds: MobxPropTypes.arrayOrObservableArray.isRequired,
+  cardProperties: MobxPropTypes.arrayOrObservableArray.isRequired,
   canEditCollection: PropTypes.bool.isRequired,
   movingCardIds: MobxPropTypes.arrayOrObservableArray.isRequired,
   addEmptyCard: PropTypes.bool,

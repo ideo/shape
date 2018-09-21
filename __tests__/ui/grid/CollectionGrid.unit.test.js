@@ -16,7 +16,7 @@ beforeEach(() => {
     gutter: 10,
     sortBy: 'order',
     updateCollection: jest.fn(),
-    cardIds: fakeCollection.cardIds,
+    cardProperties: [],
     uiStore: fakeUiStore,
     routingStore: {
       routeTo: jest.fn(),
