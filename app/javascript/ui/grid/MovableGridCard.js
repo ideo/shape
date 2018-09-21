@@ -69,20 +69,64 @@ class MovableGridCard extends React.PureComponent {
   }
 
   handleStart = (e, data) => {
+    this.scrolling = false
     // initialOffset tracks the coordinates *within* the card where you clicked,
     // e.g. bottom left corner of the card itself
     const initialOffsetX = e.screenX - e.target.getBoundingClientRect().x
     const initialOffsetY = e.screenY - e.target.getBoundingClientRect().y
+    document.body.style['overflow-y'] = 'hidden'
     this.setState({
       initialOffsetX,
       initialOffsetY,
     })
   }
 
+  scrollUp = timestamp => {
+    if (!this.scrolling) return
+    window.scrollBy(0, -1)
+    this.scrollingY -= 1
+
+    const { position } = this.props
+    this.rnd.updatePosition({
+      y: window.scrollY,
+    })
+    this.dragPosition.dragY = this.scrollingY + position.height / 2
+
+    window.requestAnimationFrame(this.scrollUp)
+  }
+
   handleDrag = (e, data, dX, dY) => {
     const { position } = this.props
     // x, y represent the current drag position
     const { x, y } = data
+    const relativePosition = data.node.getBoundingClientRect()
+    const rY = relativePosition.top
+
+    const rect = e.target.getBoundingClientRect()
+    const cX = e.clientX - rect.left // x position within the element.
+    const cY = e.clientY - rect.top // y position within the element.
+    const cursorPosition = { x: cX, y: cY }
+    this.cursorPosition = cursorPosition
+
+    console.log(
+      e.clientY,
+      200 + cursorPosition.y * 2,
+      rY < 200 && e.clientY < 200 + cursorPosition.y * 2
+    )
+    if (rY < 200 && e.clientY < 200 + cursorPosition.y * 2) {
+      // At top of page
+      this.scrollingY = y
+      this.scrolling = true
+      this.scrollUp(null)
+    } else {
+      if (this.scrolling) {
+        this.rnd.updatePosition({
+          x: e.clientX,
+          y: e.clientY,
+        })
+      }
+      this.scrolling = false
+    }
     // don't consider it to be "dragging" unless you've moved >10 px
     if (Math.abs(x - position.xPos) + Math.abs(y - position.yPos) < 10) {
       return
@@ -104,18 +148,23 @@ class MovableGridCard extends React.PureComponent {
       dragY: y + position.height / 2,
       ...position,
     }
+    this.dragPosition = dragPosition
     this.props.onDrag(this.props.card.id, dragPosition)
   }
 
   handleStop = ev => {
+    this.scrolling = false
+    document.body.style['overflow-y'] = 'auto'
     this.props.onDragOrResizeStop(this.props.card.id)
     this.setState({ dragging: false, resizing: false })
     const timeoutId = setTimeout(() => {
       // have this item remain "on top" while it animates back
       this.setState({ moveComplete: true })
       uiStore.stopDragging()
+      this.scrolling = false
     }, 350)
     this.setState({ timeoutId })
+    this.scrolling = false
   }
 
   handleResize = (e, dir, ref, delta, position) => {
@@ -138,10 +187,12 @@ class MovableGridCard extends React.PureComponent {
     // always max out height at 2
     newSize.height = Math.max(Math.min(newSize.height, 2), 1)
     this.props.onResize(this.props.card.id, newSize)
+    this.scrolling = false
   }
 
   // this function gets passed down to the card, so it can place the onClick handler
   handleClick = e => {
+    this.scrolling = false
     const { card, cardType, record } = this.props
     // TODO: make sure this is cross-browser compatible?
     if (e.metaKey || e.shiftKey) {
@@ -168,6 +219,7 @@ class MovableGridCard extends React.PureComponent {
     if (this.state.timeoutId) {
       clearTimeout(this.state.timeoutId)
     }
+    this.scrolling = false
   }
 
   styleProps = () => {
@@ -322,6 +374,9 @@ class MovableGridCard extends React.PureComponent {
         dragging={!moveComplete}
       >
         <Rnd
+          ref={c => {
+            this.rnd = c
+          }}
           bounds={null}
           onDragStart={this.handleStart}
           onDrag={this.handleDrag}
