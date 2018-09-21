@@ -424,6 +424,15 @@ class Collection < ApplicationRecord
     'collections'
   end
 
+  def mark_as_processing(processing: true, processing_message: nil)
+    update_columns(
+      processing: processing,
+      processing_message: processing_message,
+    )
+
+    processing_done unless processing
+  end
+
   def mark_subtree_as_processing(processing: true, processing_message: nil, subtree_identifier: nil)
     Collection.in_collection(self, subtree_identifier).update_all(
       processing: processing,
