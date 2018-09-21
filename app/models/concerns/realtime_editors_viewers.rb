@@ -3,24 +3,24 @@ module RealtimeEditorsViewers
 
   def started_editing(user, dont_notify: false)
     Cache.set(editing_cache_key, user.id, raw: true)
-    publish_to_channel unless dont_notify || num_viewers.zero?
+    publish_to_channel unless dont_notify
   end
 
   def stopped_editing(_user = nil, dont_notify: false)
     Cache.delete(editing_cache_key)
-    publish_to_channel unless dont_notify #|| num_viewers.zero?
+    publish_to_channel unless dont_notify
   end
 
   # Track viewers by user_id
   # Using an increment counter was prone to dupe issues (e.g. same user with two browser windows open)
   def started_viewing(user, dont_notify: false)
     Cache.set_add(viewing_cache_key, user.id)
-    publish_to_channel unless dont_notify || num_viewers.zero?
+    publish_to_channel unless dont_notify
   end
 
   def stopped_viewing(user, dont_notify: false)
     Cache.set_remove(viewing_cache_key, user.id)
-    publish_to_channel unless dont_notify || num_viewers.zero?
+    publish_to_channel unless dont_notify
   end
 
   def processing_done
@@ -44,7 +44,7 @@ module RealtimeEditorsViewers
   end
 
   def publish_to_channel(data = {})
-    data.merge(
+    data.merge!(
       current_editor: currently_editing_user_as_json,
       num_viewers: num_viewers,
       record_id: id.to_s,
