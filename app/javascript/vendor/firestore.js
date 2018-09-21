@@ -66,6 +66,7 @@ export class FirebaseClient {
     this.notificationsListener = db.collection('notifications')
       .where('data.attributes.identifier', '==', `${orgId}_${userId}`)
       .limit(50)
+      .orderBy('data.attributes.created_at', 'desc')
       .onSnapshot(querySnapshot => {
         querySnapshot.forEach(doc => {
           const record = apiStore.syncFromFirestore(doc.data())
