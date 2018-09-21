@@ -40,6 +40,25 @@ RSpec.describe CollectionCardDuplicationWorker, type: :worker do
         expect(duplicate.items.size).to eq(5)
         expect(duplicate.items.map(&:id)).not_to match_array(collection.items.map(&:id))
       end
+
+      it 'marks collection as processing' do
+        expect_any_instance_of(Collection).to receive(:update_attribute).with(:processing, true).once
+        expect_any_instance_of(Collection).to receive(:update_attribute).with(:processing, false).once
+        CollectionCardDuplicationWorker.new.perform(
+          card_ids,
+          user.id,
+          duplicate.id,
+        )
+      end
+
+      it 'broadcasts collection as stopped editing' do
+        expect_any_instance_of(Collection).to receive(:processing_done)
+        CollectionCardDuplicationWorker.new.perform(
+          card_ids,
+          user.id,
+          duplicate.id,
+        )
+      end
     end
 
     context 'with items you can\'t see' do

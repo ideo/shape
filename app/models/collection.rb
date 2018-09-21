@@ -424,6 +424,16 @@ class Collection < ApplicationRecord
     'collections'
   end
 
+  def mark_subtree_as_processing(processing: true, processing_message: nil, subtree_identifier: nil)
+    Collection.in_collection(self, subtree_identifier).update_all(
+      processing: processing,
+      processing_message: processing_message,
+    )
+
+    # Broadcast that this collection is no longer being edited
+    processing_done unless processing
+  end
+
   private
 
   def organization_blank?

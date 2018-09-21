@@ -4,6 +4,7 @@ import pluralize from 'pluralize'
 import ReactRouterPropTypes from 'react-router-prop-types'
 import { action, observable } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
+import styled from 'styled-components'
 
 import ChannelManager from '~/utils/ChannelManager'
 import Collection from '~/stores/jsonApi/Collection'
@@ -23,6 +24,28 @@ import v from '~/utils/variables'
 
 const isHomepage = ({ params }) => params.org && !params.id
 
+const ProcessingMessage = styled.div`
+  position: fixed;
+  top: ${v.headerHeight - 10}px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: ${v.zIndex.pageHeader};
+  min-width: 400px;
+  min-height: 40px;
+  border-radius: 5px;
+  background-color: ${v.colors.cloudy};
+  padding: 10px 20px;
+  color: white;
+  padding-left: 12px;
+  display: inline-block;
+  font-family: ${v.fonts.sans};
+  font-size: 1.1rem;
+  letter-spacing: 0.075rem;
+  vertical-align: top;
+  line-height: 40px;
+  text-transform: uppercase;
+`
+
 @inject('apiStore', 'uiStore', 'routingStore')
 @observer
 class CollectionPage extends PageWithApi {
@@ -40,6 +63,7 @@ class CollectionPage extends PageWithApi {
   }
 
   componentWillMount() {
+    console.log('subscribe to channel', this.props.match.params.id)
     this.subscribeToChannel(this.props.match.params.id)
   }
 
@@ -91,6 +115,9 @@ class CollectionPage extends PageWithApi {
         // don't reload your own updates
         return
       }
+      this.reloadData()
+    } else if (data.processing_done) {
+      // Background processing has finished on the collection, so reload it
       this.reloadData()
     }
   }
@@ -238,6 +265,18 @@ class CollectionPage extends PageWithApi {
     )
   }
 
+  get renderProcessingMessage() {
+    const { collection } = this
+    if (!collection || !collection.processing) return ''
+    return (
+      <ProcessingMessage>
+        {collection.processing_message
+          ? collection.processing_message
+          : 'Processing...'}
+      </ProcessingMessage>
+    )
+  }
+
   get renderEditorPill() {
     const { currentEditor } = this
     const { currentUserId } = this.props.apiStore
@@ -290,6 +329,7 @@ class CollectionPage extends PageWithApi {
         <PageHeader record={collection} isHomepage={this.isHomepage} />
         {!isLoading && (
           <PageContainer>
+            {this.renderProcessingMessage}
             {this.renderEditorPill}
             <CollectionGrid
               // pull in cols, gridW, gridH, gutter

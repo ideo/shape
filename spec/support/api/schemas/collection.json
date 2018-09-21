@@ -21,7 +21,9 @@
     "is_profile_template": { "type": ["boolean"] },
     "is_profile_collection": { "type": ["boolean"] },
     "system_required": { "type": ["boolean"] },
-    "pinned_and_locked": { "type": ["boolean"] }
+    "pinned_and_locked": { "type": ["boolean"] },
+    "processing": { "type": ["boolean"] },
+    "processing_message": { "type": ["string", "null"] }
   },
   "required": ["name", "type", "created_at", "cover"]
 }

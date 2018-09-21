@@ -35,5 +35,37 @@ RSpec.describe BreadcrumbRecalculationWorker, type: :worker do
         collection.breadcrumb_subtree_identifier
       )
     end
+
+    it 'marks subtree as processing' do
+      expect_any_instance_of(Collection).to receive(
+        :mark_subtree_as_processing
+      ).with(
+        processing: true,
+        subtree_identifier: collection.breadcrumb_subtree_identifier,
+      ).once
+
+      expect_any_instance_of(Collection).to receive(
+        :mark_subtree_as_processing
+      ).with(
+        processing: false,
+        subtree_identifier: collection.breadcrumb_subtree_identifier,
+      ).once
+
+      BreadcrumbRecalculationWorker.new.perform(
+        collection.id,
+        collection.breadcrumb_subtree_identifier
+      )
+    end
+
+    it 'broadcasts collection as editing' do
+      expect_any_instance_of(Collection).to receive(
+        :processing_done
+      ).once
+
+      BreadcrumbRecalculationWorker.new.perform(
+        collection.id,
+        collection.breadcrumb_subtree_identifier
+      )
+    end
   end
 end
