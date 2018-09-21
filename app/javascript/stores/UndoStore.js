@@ -3,6 +3,8 @@ import { observable, action } from 'mobx'
 import { routingStore, uiStore } from '~/stores'
 import sleep from '~/utils/sleep'
 
+const MAX_UNDOSTACK_LENGTH = 10
+
 export default class UndoStore {
   @observable
   stack = []
@@ -14,13 +16,16 @@ export default class UndoStore {
   @action
   pushUndoAction({ apiCall, redirectPath = null, message = '' }) {
     this.stack.push({ apiCall, redirectPath, message })
+    if (this.stack.length > MAX_UNDOSTACK_LENGTH) {
+      // only keep 10 items at a time
+      this.stack.shift()
+    }
   }
 
   @action
   async undoLastAction() {
     const undoAction = this.stack.pop()
     if (!undoAction) return
-    console.log('<UNDO>', undoAction.message)
     const { message } = undoAction
     uiStore.popupSnackbar({ message })
     this.currentlyUndoing = true

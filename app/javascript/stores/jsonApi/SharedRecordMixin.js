@@ -10,7 +10,7 @@ const SharedRecordMixin = superclass =>
       this.name = name
       this.pushUndo({
         snapshot: { name: previousName },
-        message: `${this.className} name edit undone.`,
+        message: `${this.className} name edit undone`,
       })
       const data = this.toJsonApi()
       // cancel sync so that name edits don't roundtrip and interfere with your <input>

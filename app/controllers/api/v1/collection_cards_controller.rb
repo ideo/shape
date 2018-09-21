@@ -112,6 +112,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
       @from_collection = Collection.find(json_api_params[:from_id])
       create_notification(card, :duplicated)
     end
+    @to_collection.reorder_cards!
     @to_collection.cache_cover! if should_update_cover
     # NOTE: for some odd reason the json api refuses to render the newly created cards here,
     # so we end up re-fetching the to_collection later in the front-end

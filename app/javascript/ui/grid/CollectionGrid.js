@@ -205,9 +205,9 @@ class CollectionGrid extends React.Component {
       if (height > 2) height = 2
       if (width > 4) width = 4
       // set up action to undo
-      let undoMessage = 'Card move undone.'
+      let undoMessage = 'Card move undone'
       if (original.height !== height || original.width !== width) {
-        undoMessage = 'Card resize undone.'
+        undoMessage = 'Card resize undone'
       }
       collection.pushUndo({
         jsonData: collection.toJsonApiWithCards(),

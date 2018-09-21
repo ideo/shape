@@ -489,6 +489,11 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
         expect(first_cards.map(&:item).map(&:name)).to eq moving_cards.map(&:item).map(&:name)
         expect(to_collection.collection_cards.first.primary?).to be true
       end
+
+      it 'calls reorder_cards! to make sure card orders are not wacky' do
+        expect_any_instance_of(Collection).to receive(:reorder_cards!)
+        post(path, params: params)
+      end
     end
   end
 

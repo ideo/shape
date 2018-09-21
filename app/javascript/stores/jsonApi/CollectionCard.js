@@ -206,6 +206,7 @@ class CollectionCard extends BaseRecord {
           uiStore.openBlankContentTool()
         }
       }
+      uiStore.deselectCards()
       return true
     } catch (e) {
       // re-fetch collection
