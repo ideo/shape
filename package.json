@@ -102,6 +102,8 @@
     "react": "^16.4.2",
     "react-autosize-textarea": "^3.0.3",
     "react-copy-to-clipboard": "^5.0.1",
+    "react-docgen": "^2.21.0",
+    "react-docgen-typescript": "^1.9.1",
     "react-dom": "^16.4.2",
     "react-dotdotdot": "^1.2.3",
     "react-flip-move": "~2.10.0",
