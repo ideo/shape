@@ -109,6 +109,20 @@ export const fakeFileItem = {
   rawAttributes: jest.fn().mockReturnValue(fakeTextItemAttrs),
   getRecordType: jest.fn().mockReturnValue('items'),
 }
+export const fakeQuestionItem = {
+  id: '3',
+  ...fakeTextItemAttrs,
+  type: 'Item::QuestionItem',
+  question_type: 'description',
+  rawAttributes: jest.fn().mockReturnValue(fakeTextItemAttrs),
+  getRecordType: jest.fn().mockReturnValue('items'),
+}
+
+export const fakeQuestionAnswer = {
+  answer_text: 'Great!',
+  answer_number: 1,
+  question_id: fakeQuestionItem.id,
+}
 
 export const fakeItemCard = {
   id: "10",

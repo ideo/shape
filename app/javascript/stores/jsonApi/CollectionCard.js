@@ -126,6 +126,16 @@ class CollectionCard extends BaseRecord {
     }
   }
 
+  async API_destroy() {
+    try {
+      this.destroy()
+      this.parent.removeCard(this)
+      return
+    } catch (e) {
+      uiStore.defaultAlertError()
+    }
+  }
+
   async API_linkToMyCollection() {
     const viewingCollectionId = uiStore.viewingCollection
       ? uiStore.viewingCollection.id
@@ -155,6 +165,18 @@ class CollectionCard extends BaseRecord {
     const removedCount = uiStore.selectedCardIds.length - filteredCardIds.length
     uiStore.reselectCardIds(filteredCardIds)
     return removedCount
+  }
+
+  async API_archiveSelf() {
+    try {
+      this.apiStore.request(`collection_cards/archive`, 'PATCH', {
+        card_ids: [this.id],
+      })
+      this.parent.removeCard(this)
+      return
+    } catch (e) {
+      uiStore.defaultAlertError()
+    }
   }
 
   async API_archive({ isReplacing = false } = {}) {

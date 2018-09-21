@@ -1,7 +1,7 @@
 __js_test_config
 app/assets/javascripts/application.js
 node_modules
-vendor
+./vendor/*
 dist
 public
 styleguide

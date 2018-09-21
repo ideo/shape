@@ -32,7 +32,7 @@ beforeEach(() => {
 describe('GridCardBlank', () => {
   describe('when creating a new card', () => {
     it('renders the content creation buttons', () => {
-      expect(wrapper.find('BctButtonBox').length).toBe(6)
+      expect(wrapper.find('BctButtonBox').length).toBe(7)
     })
 
     it('renders the close button', () => {

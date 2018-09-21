@@ -122,7 +122,9 @@ describe Organization, type: :model do
     end
 
     it 'has name: FirstName LastName Organization' do
-      expect(organization.name).to eq("#{user.first_name} #{user.last_name} Organization")
+      org_name = "#{user.first_name} #{user.last_name} Organization"
+      expect(organization.name).to eq(org_name)
+      expect(organization.slug).to eq(org_name.parameterize)
     end
 
     it 'adds user as admin of org\'s primary group' do

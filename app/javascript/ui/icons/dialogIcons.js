@@ -6,6 +6,7 @@ import OkIcon from '~/ui/icons/OkIcon'
 import AlertIcon from '~/ui/icons/AlertIcon'
 import InfoIcon from '~/ui/icons/InfoIcon'
 import LinkIcon from '~/ui/icons/LinkIcon'
+import TestGraphIcon from '~/ui/icons/TestGraphIcon'
 
 export default {
   ArchiveIcon,
@@ -16,4 +17,5 @@ export default {
   AlertIcon,
   InfoIcon,
   LinkIcon,
+  TestGraphIcon,
 }

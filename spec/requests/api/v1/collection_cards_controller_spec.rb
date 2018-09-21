@@ -622,6 +622,30 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
         )
         patch(path, params: params)
       end
+
+      context 'with question item params' do
+        let(:collection) { create(:test_collection, organization: user.current_organization) }
+        let(:raw_params) do
+          {
+            order: 2,
+            # parent_id is required to retrieve the parent collection without a nested route
+            parent_id: collection.id,
+            # create with a nested item
+            item_attributes: {
+              type: 'Item::QuestionItem',
+              content: 'This is my item content',
+              question_type: :description,
+            },
+          }
+        end
+
+        it 'creates a QuestionItem card' do
+          expect {
+            patch(path, params: params)
+          }.to change(Item::QuestionItem, :count).by(1)
+          expect(json['data']['attributes']['card_question_type']).to eq 'description'
+        end
+      end
     end
 
     context 'without record edit access' do
