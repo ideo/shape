@@ -83,3 +83,7 @@ function shaperelease {
     fi
   fi
 }
+
+function dev {
+  ./dev.sh $1 $2 $3 $4
+}
