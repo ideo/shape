@@ -18,6 +18,11 @@ FactoryBot.define do
       collection nil
     end
 
+    factory :collection_card_question do
+      item factory: :question_item
+      collection nil
+    end
+
     factory :collection_card_collection do
       collection factory: :collection, strategy: :build
       item nil

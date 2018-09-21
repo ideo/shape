@@ -9,4 +9,6 @@ class SerializableSimpleCollection < BaseJsonSerializer
   attribute :type do
     @object.type || @object.class.name
   end
+
+  has_many :collection_cards
 end

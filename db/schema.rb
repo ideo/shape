@@ -86,6 +86,7 @@ ActiveRecord::Schema.define(version: 20180921212427) do
     t.integer "submission_template_id"
     t.integer "submission_box_type"
     t.bigint "submission_box_id"
+    t.integer "test_status"
     t.boolean "processing", default: false
     t.string "processing_message"
     t.index ["breadcrumb"], name: "index_collections_on_breadcrumb", using: :gin
@@ -94,6 +95,7 @@ ActiveRecord::Schema.define(version: 20180921212427) do
     t.index ["submission_box_id"], name: "index_collections_on_submission_box_id"
     t.index ["submission_template_id"], name: "index_collections_on_submission_template_id"
     t.index ["template_id"], name: "index_collections_on_template_id"
+    t.index ["test_status"], name: "index_collections_on_test_status"
   end
 
   create_table "comment_threads", force: :cascade do |t|
@@ -186,6 +188,7 @@ ActiveRecord::Schema.define(version: 20180921212427) do
     t.datetime "archived_at"
     t.string "archive_batch"
     t.string "icon_url"
+    t.integer "question_type"
     t.index ["breadcrumb"], name: "index_items_on_breadcrumb", using: :gin
     t.index ["cloned_from_id"], name: "index_items_on_cloned_from_id"
   end
@@ -217,6 +220,17 @@ ActiveRecord::Schema.define(version: 20180921212427) do
     t.index ["slug"], name: "index_organizations_on_slug", unique: true
   end
 
+  create_table "question_answers", force: :cascade do |t|
+    t.bigint "survey_response_id"
+    t.bigint "question_id"
+    t.text "answer_text"
+    t.integer "answer_number"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["question_id"], name: "index_question_answers_on_question_id"
+    t.index ["survey_response_id"], name: "index_question_answers_on_survey_response_id"
+  end
+
   create_table "roles", force: :cascade do |t|
     t.string "name"
     t.string "resource_type"
@@ -227,6 +241,15 @@ ActiveRecord::Schema.define(version: 20180921212427) do
     t.index ["name", "resource_type", "resource_id"], name: "index_roles_on_name_and_resource_type_and_resource_id"
     t.index ["resource_identifier"], name: "index_roles_on_resource_identifier"
     t.index ["resource_type", "resource_id"], name: "index_roles_on_resource_type_and_resource_id"
+  end
+
+  create_table "survey_responses", force: :cascade do |t|
+    t.bigint "test_collection_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.text "session_uid"
+    t.index ["session_uid"], name: "index_survey_responses_on_session_uid", unique: true
+    t.index ["test_collection_id"], name: "index_survey_responses_on_test_collection_id"
   end
 
   create_table "taggings", id: :serial, force: :cascade do |t|

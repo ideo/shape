@@ -424,6 +424,10 @@ class Collection < ApplicationRecord
     'collections'
   end
 
+  def test_collection?
+    is_a?(Collection::TestCollection) || is_a?(Collection::TestDesign)
+  end
+
   def mark_as_processing(processing: true, processing_message: nil)
     update_columns(
       processing: processing,

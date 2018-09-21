@@ -110,6 +110,27 @@ class Item < ApplicationRecord
     name
   end
 
+  alias resourceable_can_edit? can_edit?
+  def can_edit?(user_or_group)
+    if parent.present? && parent.test_collection?
+      # TestCollection / TestDesign items get their permission from parent
+      return parent.can_edit?(user_or_group)
+    end
+    # by default defer to original resourceable method
+    resourceable_can_edit?(user_or_group)
+  end
+
+  # Any way to combine the above method... ?
+  alias resourceable_can_view? can_view?
+  def can_view?(user_or_group)
+    if parent.present? && parent.test_collection?
+      # TestCollection / TestDesign items get their permission from parent
+      return parent.can_view?(user_or_group)
+    end
+    # by default defer to original resourceable method
+    resourceable_can_view?(user_or_group)
+  end
+
   def resourceable_class
     # Use top-level class since this is an STI model
     Item
@@ -134,6 +155,7 @@ class Item < ApplicationRecord
   end
 
   def update_parent_collection_if_needed
+    return if destroyed?
     collection = try(:parent)
     collection.touch if collection && saved_change_to_updated_at?
     return unless collection.present? && collection.cached_cover.present?

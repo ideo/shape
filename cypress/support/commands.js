@@ -12,6 +12,10 @@ Cypress.Commands.add('locate', selector => cy.get(`[data-cy="${selector}"]`))
 Cypress.Commands.add('locateWith', (selector, text) =>
   cy.contains(`[data-cy="${selector}"]`, text)
 )
+Cypress.Commands.add('locateClass', selector => cy.get(`[class^=${selector}-]`))
+Cypress.Commands.add('locateWithClass', (selector, text) =>
+  cy.contains(`[class^="${selector}-"]`, text)
+)
 
 Cypress.Commands.add(
   'createCollection',
@@ -28,7 +32,7 @@ Cypress.Commands.add(
         break
     }
     if (!empty) {
-      cy.locate('Hotspot')
+      cy.locateClass('StyledHotspot')
         .last()
         .click()
     }

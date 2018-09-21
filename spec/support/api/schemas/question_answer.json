@@ -1,0 +1,8 @@
+{
+  "type": "object",
+  "properties": {
+    "question_id": { "type": "string" },
+    "answer_text": { "type": ["string", "null"] },
+    "answer_number": { "type": ["integer", "null"] }
+  }
+}
