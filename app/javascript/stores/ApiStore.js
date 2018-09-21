@@ -18,6 +18,7 @@ import User from './jsonApi/User'
 import Comment from './jsonApi/Comment'
 import CommentThread from './jsonApi/CommentThread'
 import UsersThread from './jsonApi/UsersThread'
+import { undoStore } from './index'
 
 class ApiStore extends jsonapi(datxCollection) {
   @observable
@@ -304,6 +305,26 @@ class ApiStore extends jsonapi(datxCollection) {
     runInAction(() => {
       this.usableTemplates = res.data.filter(c => c.isUsableTemplate)
     })
+  }
+
+  async moveCards(data) {
+    return this.request('collection_cards/move', 'PATCH', data)
+  }
+
+  async linkCards(data) {
+    return this.request('collection_cards/link', 'POST', data)
+  }
+
+  async duplicateCards(data) {
+    const res = await this.request('collection_cards/duplicate', 'POST', data)
+    // console.log(res)
+    undoStore.pushUndoAction({
+      message: 'Duplicate undone',
+      // TODO: archive the cards that we just added
+      // apiCall: () => ,
+      redirectPath: { type: 'collections', id: data.to_id },
+    })
+    return res
   }
 
   // NOTE: had to override datx PureCollection, it looks like it is meant to do

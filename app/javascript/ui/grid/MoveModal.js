@@ -105,15 +105,15 @@ class MoveModal extends React.Component {
       switch (cardAction) {
         case 'move':
           // TODO: wrap in apiStore actions that push the appropriate undoActions
-          await apiStore.request('collection_cards/move', 'PATCH', data)
+          await apiStore.moveCards(data)
           successMessage = 'Items successfully moved!'
           break
         case 'link':
-          await apiStore.request('collection_cards/link', 'POST', data)
+          await apiStore.linkCards(data)
           successMessage = 'Items successfully linked!'
           break
         case 'duplicate':
-          await apiStore.request('collection_cards/duplicate', 'POST', data)
+          await apiStore.duplicateCards(data)
           successMessage = 'Items successfully duplicated!'
           break
         case 'useTemplate': {

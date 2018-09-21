@@ -40,10 +40,14 @@ const SharedRecordMixin = superclass =>
       return this.apiStore.request(apiPath, 'PATCH', { data })
     }
 
-    pushUndo({ snapshot, message = '' } = {}) {
+    pushUndo({ snapshot, message = '', apiCall } = {}) {
+      let undoApiCall = apiCall
+      if (!apiCall) {
+        undoApiCall = () => this.API_revertTo({ snapshot })
+      }
       undoStore.pushUndoAction({
         message,
-        apiCall: () => this.API_revertTo({ snapshot }),
+        apiCall: undoApiCall,
         redirectPath: { type: this.internalType, id: this.id },
       })
     }
