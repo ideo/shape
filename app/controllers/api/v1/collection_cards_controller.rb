@@ -53,8 +53,8 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
     end
   end
 
-  before_action :load_and_authorize_cards, only: %i[archive]
-  after_action :broadcast_collection_archive_updates, only: %i[archive]
+  before_action :load_and_authorize_cards, only: %i[archive unarchive]
+  after_action :broadcast_collection_archive_updates, only: %i[archive unarchive]
   def archive
     CollectionCardArchiveWorker.perform_async(
       @collection_cards.pluck(:id),
@@ -62,6 +62,14 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
     )
     render json: { archived: true }
   end
+
+  def unarchive
+    @collection = Collection.find(json_api_params[:collection_snapshot][:id])
+    snapshot = json_api_params[:collection_snapshot].require(:attributes).permit(collection_cards_attributes: %i[id order width height])
+    @collection.unarchive_cards!(@collection_cards, snapshot)
+    render jsonapi: @collection.reload,
+           include: Collection.default_relationships_for_api
+end
 
   before_action :load_and_authorize_replacing_card, only: %i[replace]
   after_action :broadcast_replacing_updates, only: %i[replace]
@@ -91,7 +99,9 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
       end
       # NOTE: even though this action is in CollectionCardsController, it returns the to_collection
       # so that it can be easily re-rendered on the page
-      render jsonapi: @to_collection.reload, include: Collection.default_relationships_for_api
+      render jsonapi: @to_collection.reload,
+             include: Collection.default_relationships_for_api,
+             meta: { moving_cards: mover.moving_cards.pluck(:id).map(&:to_s) }
     else
       render json: { errors: mover.errors }, status: :bad_request
     end
@@ -129,7 +139,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
     # so we end up re-fetching the to_collection later in the front-end
     render jsonapi: @to_collection.reload,
            include: Collection.default_relationships_for_api,
-           meta: { new_cards: new_cards.map(&:id) }
+           meta: { new_cards: new_cards.pluck(:id).map(&:to_s) }
   end
 
   private

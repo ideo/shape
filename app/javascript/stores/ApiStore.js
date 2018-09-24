@@ -309,22 +309,53 @@ class ApiStore extends jsonapi(datxCollection) {
     })
   }
 
-  async moveCards(data) {
+  async archiveCards({ cardIds, collection, undoable = true }) {
+    const archiveResult = await this.request(
+      'collection_cards/archive',
+      'PATCH',
+      {
+        card_ids: cardIds,
+      }
+    )
+    if (undoable) {
+      const snapshot = collection.toJsonApiWithCards()
+      undoStore.pushUndoAction({
+        message: 'Archive undone',
+        apiCall: () => this.unarchiveCards({ cardIds, snapshot }),
+        redirectPath: { type: 'collections', id: collection.id },
+      })
+    }
+    collection.removeCardIds(cardIds)
+    return archiveResult
+  }
+
+  unarchiveCards({ cardIds, snapshot }) {
+    return this.request('collection_cards/unarchive', 'PATCH', {
+      card_ids: cardIds,
+      collection_snapshot: snapshot,
+    })
+  }
+
+  moveCards(data) {
     return this.request('collection_cards/move', 'PATCH', data)
   }
 
-  async linkCards(data) {
+  linkCards(data) {
     return this.request('collection_cards/link', 'POST', data)
   }
 
   async duplicateCards(data) {
     const res = await this.request('collection_cards/duplicate', 'POST', data)
-    // console.log(res)
+    const collection = this.find('collections', data.to_id)
     undoStore.pushUndoAction({
       message: 'Duplicate undone',
-      // TODO: archive the cards that we just added
-      // apiCall: () => ,
-      redirectPath: { type: 'collections', id: data.to_id },
+      apiCall: () =>
+        this.archiveCards({
+          cardIds: res.meta.new_cards,
+          collection,
+          undoable: false,
+        }),
+      redirectPath: { type: 'collections', id: collection.id },
     })
     return res
   }
