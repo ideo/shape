@@ -1,0 +1,2 @@
+class DeserializableQuestionAnswer < BaseJsonDeserializer
+end

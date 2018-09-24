@@ -3,6 +3,7 @@ export const ITEM_TYPES = {
   FILE: 'Item::FileItem',
   VIDEO: 'Item::VideoItem',
   LINK: 'Item::LinkItem',
+  QUESTION: 'Item::QuestionItem',
 }
 
 export const KEYS = {
@@ -33,7 +34,9 @@ export default {
   colors: {
     cararra: '#f2f1ee',
     desert: '#f5f4f3',
-    cyan: '#b4cdd4',
+    cyan: '#b3cdd5',
+    cyanLt: '#c0dbde',
+    testLightBlueBg: '#9ec1cc',
     pacificBlue: '#00a0e0',
     activityLightBlue: '#73808f',
     activityMedBlue: '#5a6a7c',

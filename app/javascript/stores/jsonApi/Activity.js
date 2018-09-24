@@ -34,10 +34,10 @@ class Activity extends BaseRecord {
 
   attributesForAPI = ['action', 'target_type', 'target_id']
 
-  static trackActivity(a, target) {
+  static trackActivity(actionName, target) {
     const activity = new Activity(
       {
-        action: a,
+        action: actionName,
         target_id: target.id,
         target_type: target.internalType,
       },

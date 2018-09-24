@@ -221,6 +221,19 @@ class CollectionCard < ApplicationRecord
     record.is_a?(Item::VideoItem) || record.is_a?(Item::FileItem)
   end
 
+  def card_question_type
+    return nil unless parent.is_a?(Collection::TestCollection) || parent.is_a?(Collection::TestDesign)
+    return nil unless item.present?
+    case item.type
+    when 'Item::QuestionItem'
+      return item.question_type
+    when 'Item::TextItem'
+      return 'description'
+    when 'Item::FileItem', 'Item::VideoItem'
+      return 'media'
+    end
+  end
+
   private
 
   def assign_default_height_and_width

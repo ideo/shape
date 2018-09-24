@@ -57,7 +57,11 @@
   ],
   "env": {
     "development": {
-      "plugins": "babel-plugin-styled-components"
+      "plugins": [
+        ["babel-plugin-styled-components", {
+          "fileName": false
+        }]
+      ]
     },
     "production": {
       "plugins": [

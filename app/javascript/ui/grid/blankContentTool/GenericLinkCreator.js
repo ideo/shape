@@ -29,6 +29,7 @@ const GenericLinkCreator = ({
     <PaddedCardCover>
       <form className="form" onSubmit={onSubmit}>
         <BctTextField
+          data-cy="BctTextField"
           autoFocus
           placeholder={placeholder}
           value={url}
@@ -36,7 +37,9 @@ const GenericLinkCreator = ({
           onKeyDown={handleKeyDown}
         />
         {validIndicator}
-        <FormButton disabled={loading}>Add</FormButton>
+        <FormButton disabled={loading} data-cy="LinkCreatorFormButton">
+          Add
+        </FormButton>
       </form>
     </PaddedCardCover>
   )
