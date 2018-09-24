@@ -6,6 +6,13 @@ GIT
       rack (>= 1.4.5)
 
 GIT
+  remote: https://github.com/ideo/network-api-ruby.git
+  revision: 6911e203903d4857f663de90d14275db75675d83
+  specs:
+    network-api-ruby (0.0.6)
+      json_api_client (~> 1.5, >= 1.5.3)
+
+GIT
   remote: https://github.com/ideo/omniauth-ideo.git
   revision: feaaed56e1eebc85c63807886523359a657fca61
   specs:
@@ -131,6 +138,8 @@ GEM
       redis (>= 3.2, < 5.0)
     faraday (0.12.2)
       multipart-post (>= 1.2, < 3)
+    faraday_middleware (0.12.2)
+      faraday (>= 0.7.4, < 1.0)
     ffi (1.9.23)
     filestack (2.2.1)
       mimemagic (~> 0.3.2)
@@ -201,6 +210,12 @@ GEM
     json (1.8.6)
     json-schema (2.6.2)
       addressable (~> 2.3.8)
+    json_api_client (1.5.3)
+      activemodel (>= 3.2.0)
+      activesupport (>= 3.2.0)
+      addressable (~> 2.2)
+      faraday (~> 0.9)
+      faraday_middleware (~> 0.9)
     jsonapi-deserializable (0.2.0)
     jsonapi-parser (0.1.1)
     jsonapi-rails (0.3.1)
@@ -486,6 +501,7 @@ DEPENDENCIES
   jwt (~> 1.5)
   kaminari (~> 1.1)
   listen (>= 3.0.5, < 3.2)
+  network-api-ruby!
   normalize-rails (~> 4.1)
   omniauth-ideo!
   pg (~> 0.21)

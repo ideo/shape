@@ -35,6 +35,9 @@ gem 'jbuilder', '~> 2.5'
 gem 'devise'
 gem 'omniauth-ideo', git: 'https://github.com/ideo/omniauth-ideo.git'
 
+# Consumer for IDEO Network JSON APIs
+gem 'network-api-ruby', git: 'https://github.com/ideo/network-api-ruby.git'
+
 # Webpacker
 gem 'webpacker', '>= 4.0.x'
 
