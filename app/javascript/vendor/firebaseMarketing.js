@@ -62,18 +62,19 @@ if (config) {
 export function readFirebaseValue(collection, id) {
   const docRef = db.collection(collection).doc(id)
 
-  docRef.get().then(
-    (doc) => {
+  docRef
+    .get()
+    .then(doc => {
       if (doc.exists) {
         return doc.data().value
       }
       // doc.data() will be undefined in this case
       console.log('No such document %s', `${collection}/${id}`)
       return false
-    }
-  ).catch((error) => {
-    console.log('Error getting document:', error)
-  })
+    })
+    .catch(error => {
+      console.log('Error getting document:', error)
+    })
 }
 
 export default firebase

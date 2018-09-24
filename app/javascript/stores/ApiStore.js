@@ -18,6 +18,8 @@ import User from './jsonApi/User'
 import Comment from './jsonApi/Comment'
 import CommentThread from './jsonApi/CommentThread'
 import UsersThread from './jsonApi/UsersThread'
+import SurveyResponse from './jsonApi/SurveyResponse'
+import QuestionAnswer from './jsonApi/QuestionAnswer'
 
 class ApiStore extends jsonapi(datxCollection) {
   @observable
@@ -33,12 +35,12 @@ class ApiStore extends jsonapi(datxCollection) {
   @observable
   usableTemplates = []
 
-  fetch(type, id, skipCache) {
+  fetch(type, id, skipCache = false) {
     return super.fetch(type, id, { skipCache })
   }
 
   request(path, method, data, options = {}) {
-    if (!Object.prototype.hasOwnProperty.call(options, 'skipCache')) {
+    if (!_.has(options, 'skipCache')) {
       options.skipCache = true
     }
     return super.request(path, method, data, options)
@@ -348,6 +350,8 @@ ApiStore.types = [
   CommentThread,
   Notification,
   UsersThread,
+  SurveyResponse,
+  QuestionAnswer,
 ]
 
 export default ApiStore

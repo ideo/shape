@@ -22,6 +22,10 @@ FactoryBot.define do
       thumbnail_url { Faker::Company.logo }
     end
 
+    factory :question_item, class: 'Item::QuestionItem' do
+      question_type :useful
+    end
+
     after(:create) do |item, evaluator|
       if evaluator.add_editors.present?
         evaluator.add_editors.each do |user|

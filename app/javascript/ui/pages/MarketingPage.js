@@ -5,7 +5,7 @@ import { Element as ScrollElement } from 'react-scroll'
 import {
   MarketingBack,
   MarketingFooter,
-  MarketingHeavyCTA,
+  // MarketingHeavyCTA,
   InvertMarketingLink,
   InvertMarketingH1,
   InvertMarketingH1Bold,
@@ -18,7 +18,7 @@ import {
   MarketingTagLine,
   // MarketingVideoLink,
   MarketingShapeLogo,
-  MarketingBetaSticker,
+  // MarketingBetaSticker,
   MarketingCallToAction,
   MarketingGradientTop,
   InvertedCentered,
@@ -28,6 +28,7 @@ import poweredByIdeo from '~/assets/Powered-by-IDEO-Inverted.png'
 import MarketingMenu from '~/ui/marketing/MarketingMenu.js'
 import SubscribeEmail from '~/ui/marketing/SubscribeEmail.js'
 import ProductDescriptions from '~/ui/marketing/ProductDescriptions.js'
+import BetaSticker from '~/ui/marketing/BetaSticker.js'
 import firebase from '~/vendor/firebaseMarketing.js'
 
 class MarketingPage extends React.Component {
@@ -64,10 +65,10 @@ class MarketingPage extends React.Component {
           <MarketingGradientTop>
             <ScrollElement name="TopAnchor" />
             <MarketingMenu />
-            <MarketingBetaSticker />
+            <BetaSticker />
 
             <Center>
-              <MarketingShapeLogo data-cy="MarketingShapeLogo" />
+              <MarketingShapeLogo />
               <MarketingTagLine>
                 {this.state.pageTexts.tagLine}
               </MarketingTagLine>
@@ -103,7 +104,7 @@ class MarketingPage extends React.Component {
         <MarketingFooter>
           <ScrollElement name="FooterAnchor" />
           <MarketingFlex align="center" justify="center" wrap w={1}>
-            <Box w={1}>
+            <Box w={1} mb={[10, '4px']}>
               <InvertMarketingH1Bold>
                 {this.state.pageTexts.footerHeader}
               </InvertMarketingH1Bold>
@@ -113,11 +114,11 @@ class MarketingPage extends React.Component {
                 {this.state.pageTexts.footerSubHeader}
               </InvertMarketingH1>
             </Box>
-            <Box w={1} py={32}>
+            <Box w={1} pt={[46, 65]} pb={[46, 74]} mb={[10, 0]}>
               <a href="/login">
-                <MarketingHeavyCTA href="/login">
+                <MarketingCallToAction href="/login">
                   {this.state.pageTexts.buttonFooter}
-                </MarketingHeavyCTA>
+                </MarketingCallToAction>
               </a>
             </Box>
 
@@ -138,13 +139,13 @@ class MarketingPage extends React.Component {
               </InvertMarketingLinkMail>
             </Box>
 
-            <Box w={1} wrap>
+            <Box w={1} mt={(0, 5)} wrap>
               <InvertedFixedWidth>
                 {this.state.pageTexts.subscriptionHeader}
               </InvertedFixedWidth>
             </Box>
 
-            <Box w={1}>
+            <Box w={1} mt={[8, 0]}>
               <SubscribeEmail />
             </Box>
 
@@ -178,8 +179,11 @@ class MarketingPage extends React.Component {
             <ResponsivePadInlineBlock>
               <DesktopSpacer style={{ width: '80px' }} />
               <InvertMarketingLink href="https://www.ideo.com/">
-                {/* https://github.com/evcohen/eslint-plugin-jsx-a11y/issues/388 */}
-                &copy; 2018
+                {/* Added span around &copy; in order to satisfy "jsx-a11y/accessible-emoji" */}
+                <span role="img" aria-label="Copyright Symbol">
+                  &copy;
+                </span>{' '}
+                2018
               </InvertMarketingLink>
             </ResponsivePadInlineBlock>
           </Center>

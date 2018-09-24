@@ -420,6 +420,10 @@ class Collection < ApplicationRecord
     'collections'
   end
 
+  def test_collection?
+    is_a?(Collection::TestCollection) || is_a?(Collection::TestDesign)
+  end
+
   private
 
   def organization_blank?
