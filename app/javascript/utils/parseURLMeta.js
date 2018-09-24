@@ -1,5 +1,5 @@
 import axios from 'axios'
-import metaDataParser from 'page-metadata-parser'
+import metaDataParser from '~/vendor/page-metadata-parser'
 import { parse } from 'url'
 
 const parseURLMeta = async urlStr => {
