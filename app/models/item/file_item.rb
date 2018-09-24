@@ -14,6 +14,11 @@ class Item
       super
     end
 
+    def requires_roles?
+      return false if parent.test_collection?
+      true
+    end
+
     private
 
     # on_create callback

@@ -51,7 +51,7 @@ class Breadcrumb extends React.Component {
     const [klass, id, name] = item
     const path = routingStore.pathTo(klass, id)
     return (
-      <span className="crumb" key={path}>
+      <span className="crumb" key={path} data-cy="Breadcrumb">
         <Link to={path}>{name}</Link>
       </span>
     )

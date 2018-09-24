@@ -152,6 +152,7 @@ class EditableName extends React.Component {
     return (
       <StyledName>
         <Heading1
+          data-cy="EditableNameHeading"
           innerRef={ref => {
             this.textRef = ref
           }}

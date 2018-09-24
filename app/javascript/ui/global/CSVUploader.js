@@ -39,7 +39,6 @@ class CSVUploader extends React.Component {
 
     reader.onload = event => {
       const csvData = Papa.parse(event.target.result, {
-        // eslint-disable-next-line no-console
         error: err => console.warn('csv parse error', err),
       })
       onFileLoaded(csvData.data, filename)

@@ -2,10 +2,12 @@ module.exports = {
   plugins: [
     "react",
     "jest",
+    "cypress",
     "prettier"
   ],
   env: {
-    "jest/globals": true
+    "jest/globals": true,
+    "cypress/globals": true,
   },
   extends: [
     "airbnb",

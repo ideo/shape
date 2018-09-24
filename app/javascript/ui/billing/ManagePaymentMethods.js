@@ -1,10 +1,15 @@
+import { observable, runInAction } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import trackError from '~/utils/trackError'
 import PaymentMethods from '~shared/components/compounds/PaymentMethods'
+import Loader from '~/ui/layout/Loader'
 
 @inject('apiStore', 'networkStore')
 @observer
 class ManagePaymentMethods extends React.Component {
+  @observable
+  loaded = false
+
   componentWillMount() {
     this.loadPaymentMethods()
   }
@@ -15,6 +20,7 @@ class ManagePaymentMethods extends React.Component {
     try {
       await networkStore.loadOrganization(apiStore.currentUserOrganizationId)
       await networkStore.loadPaymentMethods(networkStore.organization.id)
+      runInAction(() => (this.loaded = true))
       this.forceUpdate()
     } catch (e) {
       trackError(e)
@@ -46,11 +52,14 @@ class ManagePaymentMethods extends React.Component {
       this.props.networkStore.organization,
       token
     )
-    // this.forceUpdate()
+    this.forceUpdate()
     closeModal()
   }
 
   render() {
+    if (!this.loaded) {
+      return <Loader />
+    }
     const paymentMethods = this.props.networkStore.findAll('payment_methods')
 
     return (

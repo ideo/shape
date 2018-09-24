@@ -50,11 +50,27 @@ export const FormButton = styled.button`
   letter-spacing: 0.09375rem;
   height: 40px;
   cursor: pointer;
-  color: white;
   border-radius: 20px;
-  border: none;
-  background-color: ${props =>
-    props.color === 'blue' ? v.colors.ctaButtonBlue : v.colors.blackLava};
+  color: ${props => {
+    switch (props.color) {
+      case 'hollow':
+        return v.colors.blackLava
+      default:
+        return 'white'
+    }
+  }};
+  background-color: ${props => {
+    switch (props.color) {
+      case 'blue':
+        return v.colors.ctaButtonBlue
+      case 'hollow':
+        return 'transparent'
+      default:
+        return v.colors.blackLava
+    }
+  }};
+  border: ${props =>
+    props.color === 'hollow' ? `1px solid ${v.colors.blackLava}` : 'none'};
   transition: all 0.3s;
   &:hover,
   &:focus {
@@ -173,6 +189,17 @@ export const Select = styled(MuiSelect)`
     font-size: 1rem;
     font-weight: ${v.weights.book};
   }
+  .grayedOut {
+    color: ${v.colors.gray};
+  }
+
+  .fullWidth {
+    min-width: calc(100% - 30px);
+  }
+
+  .fixedWidth {
+    width: 240px;
+  }
 
   .selectmenu: {
     background-color: transparent;
@@ -182,8 +209,8 @@ export const Select = styled(MuiSelect)`
     &:hover {
       background-color: transparent;
     }
-
-    li {
+    vertical-align: baseline;
+    ${props => props.onDefault && `color: ${v.colors.gray};`} li {
       font-family: ${v.fonts.sans};
       font-size: 1rem;
       font-weight: ${v.weights.book};
@@ -209,10 +236,12 @@ export const SelectOption = styled(MenuItem)`
     margin-bottom: 4px;
     margin-top: 4px;
     padding: 0 4px;
-
     &:hover: {
       opacity: 1;
     }
+  }
+  &.grayedOut {
+    color: ${v.colors.gray};
   }
 `
 SelectOption.displayName = 'StyledSelectOption'

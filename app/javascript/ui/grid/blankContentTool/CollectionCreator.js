@@ -29,6 +29,7 @@ class CollectionCreator extends React.Component {
     const { createCard, type } = this.props
     let dbType = null
     if (type === 'submissionBox') dbType = 'Collection::SubmissionBox'
+    else if (type === 'testCollection') dbType = 'Collection::TestCollection'
     createCard(
       {
         // `collection` is the collection being created within the card
@@ -60,12 +61,17 @@ class CollectionCreator extends React.Component {
         <form className="form" onSubmit={this.createCollection}>
           <BctTextField
             autoFocus
+            data-cy="CollectionCreatorTextField"
             placeholder={`${this.typeName} name`}
             value={this.state.inputText}
             onChange={this.onInputChange}
             onKeyDown={this.handleKeyDown}
           />
-          <FormButton disabled={this.props.loading} width={125}>
+          <FormButton
+            data-cy="CollectionCreatorFormButton"
+            disabled={this.props.loading}
+            width={125}
+          >
             Add
           </FormButton>
         </form>
@@ -76,7 +82,12 @@ class CollectionCreator extends React.Component {
 
 CollectionCreator.propTypes = {
   loading: PropTypes.bool.isRequired,
-  type: PropTypes.oneOf(['collection', 'template', 'submissionBox']),
+  type: PropTypes.oneOf([
+    'collection',
+    'template',
+    'testCollection',
+    'submissionBox',
+  ]),
   createCard: PropTypes.func.isRequired,
   closeBlankContentTool: PropTypes.func.isRequired,
 }

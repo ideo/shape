@@ -130,7 +130,7 @@ class RoleSelect extends React.Component {
         >
           {roleTypes.map(roleType => (
             <MenuItem key={roleType} value={roleType}>
-              {this.labelFor(roleType)}
+              <DisplayText>{this.labelFor(roleType)}</DisplayText>
             </MenuItem>
           ))}
         </Select>
@@ -183,6 +183,11 @@ class RoleSelect extends React.Component {
           </Tooltip>
         )}
         {!showLeaveIcon && <LeaveIconHolder enabled={false} />}
+        {showLeaveIcon && (
+          <Tooltip>
+            <LeaveIcon />
+          </Tooltip>
+        )}
       </Row>
     )
   }

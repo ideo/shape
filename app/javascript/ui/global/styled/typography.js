@@ -48,8 +48,16 @@ export const DisplayText = styled.span`
   font-weight: ${v.weights.book};
   font-family: ${v.fonts.sans};
   font-size: 1rem;
+  text-transform: none;
 `
 DisplayText.displayName = 'StyledDisplayText'
+
+export const NumberListText = DisplayText.extend`
+  display: inline-block;
+  font-weight: ${v.weights.medium};
+  min-width: 22px;
+`
+NumberListText.displayName = 'NumberListText'
 
 export const SubduedHeading1 = styled.h1`
   color: ${v.colors.gray};

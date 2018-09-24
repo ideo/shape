@@ -1,10 +1,8 @@
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import { Switch, Route, Redirect, withRouter } from 'react-router-dom'
-import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles'
+import { MuiThemeProvider } from '@material-ui/core/styles'
 import WindowSizeListener from 'react-window-size-listener'
 import styled from 'styled-components'
-import { pxToRem } from '~shared/styles/utils'
-
 import ActivityLogBox from '~/ui/activity_log/ActivityLogBox'
 import DialogWrapper from '~/ui/global/modals/DialogWrapper'
 import ErrorBoundary from '~/ui/global/ErrorBoundary'
@@ -24,6 +22,7 @@ import OrganizationSettings from '~/ui/organizations/OrganizationSettings'
 import UserSettings from '~/ui/users/UserSettings'
 import v from '~/utils/variables'
 import firebaseClient from '~/vendor/firestore'
+import MuiTheme from '~/ui/global/MuiTheme'
 
 const AppWrapper = styled.div`
   /* used by terms of use modal to blur the whole site */
@@ -52,27 +51,6 @@ const FixedActivityLogWrapper = styled.div`
 @inject('apiStore', 'uiStore', 'routingStore')
 @observer
 class Routes extends React.Component {
-  theme = createMuiTheme({
-    typography: {
-      // Use the Shape font instead of the default Roboto font.
-      fontFamily: v.fonts.sans,
-      // instructional
-      display2: {
-        fontSize: pxToRem(14),
-        letterSpacing: 'normal',
-        lineHeight: pxToRem(18),
-      },
-    },
-    palette: {
-      primary: {
-        main: v.colors.sirocco,
-      },
-      secondary: {
-        main: v.colors.pacificBlue,
-      },
-    },
-  })
-
   componentDidMount() {
     const { apiStore } = this.props
     apiStore.loadCurrentUserAndGroups().then(() => {
@@ -101,7 +79,7 @@ class Routes extends React.Component {
     return (
       <AppWrapper blur={displayTermsPopup} id="AppWrapper">
         <ErrorBoundary>
-          <MuiThemeProvider theme={this.theme}>
+          <MuiThemeProvider theme={MuiTheme}>
             {/* Global components are rendered here */}
             <WindowSizeListener onResize={this.handleWindowResize} />
             <DialogWrapper />

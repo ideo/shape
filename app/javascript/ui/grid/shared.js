@@ -73,7 +73,11 @@ export const StyledGridCard = styled.div`
   width: 100%;
   background: white;
   padding: 0;
-  cursor: ${props => (props.dragging ? 'grabbing' : 'pointer')};
+  cursor: ${props => {
+    if (props.dragging) return 'grabbing'
+    else if (props.testCollectionCard) return 'auto'
+    return 'pointer'
+  }};
   box-shadow: ${props =>
     props.dragging ? '1px 1px 5px 2px rgba(0, 0, 0, 0.25)' : ''};
   opacity: ${props => (props.dragging ? '0.95' : '1')};

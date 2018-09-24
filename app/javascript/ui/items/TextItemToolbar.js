@@ -26,9 +26,9 @@ const IconButton = styled(StyledButton)`
   width: 25px !important;
 `
 
-function styles(fullPageView) {
+function styles(props) {
   const allStyles = []
-  if (!fullPageView) {
+  if (!props.fullPageView) {
     allStyles.top = '0'
     allStyles.background = 'white'
     allStyles.paddingTop = '5px'
@@ -41,7 +41,7 @@ function styles(fullPageView) {
 }
 
 const TextItemToolbar = props => (
-  <div id="quill-toolbar" style={styles(props.fullPageView)}>
+  <div id="quill-toolbar" style={styles(props)}>
     <span className="ql-formats">
       <StyledButton className="ql-header ql-format-reg" value="">
         T
@@ -65,11 +65,9 @@ const TextItemToolbar = props => (
 )
 TextItemToolbar.propTypes = {
   onExpand: PropTypes.func,
-  fullPageView: PropTypes.bool,
 }
 TextItemToolbar.defaultProps = {
   onExpand: null,
-  fullPageView: false,
 }
 
 export default TextItemToolbar

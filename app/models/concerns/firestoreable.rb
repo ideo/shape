@@ -10,11 +10,16 @@ module Firestoreable
     Collection: SerializableSimpleCollection,
     CommentThread: SerializableCommentThread,
     'Collection::Global': SerializableSimpleCollection,
+    'Collection::TestCollection': SerializableSimpleCollection,
+    'Collection::TestDesign': SerializableSimpleCollection,
     'Collection::SubmissionBox': SerializableSimpleCollection,
     'Collection::UserProfile': SerializableSimpleCollection,
     'Item::VideoItem': SerializableSimpleItem,
     'Item::TextItem': SerializableSimpleItem,
     'Item::FileItem': SerializableSimpleItem,
+    'Item::QuestionItem': SerializableSimpleItem,
+    'CollectionCard::Primary': SerializableCollectionCard,
+    'CollectionCard::Link': SerializableCollectionCard,
   }.freeze
 
   included do

@@ -23,10 +23,10 @@ class Collection < ApplicationRecord
                  :cached_org_properties
 
   # callbacks
-  after_commit :touch_related_cards, if: :saved_change_to_updated_at?
+  after_commit :touch_related_cards, if: :saved_change_to_updated_at?, unless: :destroyed?
   after_commit :reindex_sync, on: :create
-  after_commit :recalculate_child_breadcrumbs_async, if: :saved_change_to_name?
-  after_commit :update_comment_thread_in_firestore
+  after_commit :recalculate_child_breadcrumbs_async, if: :saved_change_to_name?, unless: :destroyed?
+  after_commit :update_comment_thread_in_firestore, unless: :destroyed?
 
   # all cards including archived (i.e. undo default :collection_cards scope)
   has_many :all_collection_cards,
@@ -69,7 +69,7 @@ class Collection < ApplicationRecord
           inverse_of: :collection,
           dependent: :destroy
 
-  has_many :items, through: :primary_collection_cards, dependent: :destroy
+  has_many :items, through: :primary_collection_cards
   has_many :collections, through: :primary_collection_cards
   has_many :items_and_linked_items,
            through: :collection_cards,
@@ -418,6 +418,10 @@ class Collection < ApplicationRecord
 
   def jsonapi_type_name
     'collections'
+  end
+
+  def test_collection?
+    is_a?(Collection::TestCollection) || is_a?(Collection::TestDesign)
   end
 
   private
