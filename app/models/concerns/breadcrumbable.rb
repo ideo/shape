@@ -21,16 +21,13 @@ module Breadcrumbable
       connection.remove_column table_name, :breadcrumb
     end
 
-    def in_collection(collection_or_id, subtree_identifier = nil)
+    def in_collection(collection_or_id)
       if collection_or_id.is_a?(Collection)
-        collection = collection_or_id
+        collection_id = collection_or_id.id
       else
-        collection = Collection.find(collection_or_id)
+        collection_id = collection_or_id
       end
-      subtree_identifier ||= collection.breadcrumb_subtree_identifier
-      scoped = active.where('breadcrumb @> ?', subtree_identifier)
-      # in_collection should not return the collection itself
-      scoped = scoped.where.not(id: collection.id) if base_class == Collection
+      scoped = active.where('breadcrumb @> ?', [collection_id].to_s)
       # order from the top of the tree down
       scoped.order('jsonb_array_length(breadcrumb) ASC')
     end
@@ -46,11 +43,6 @@ module Breadcrumbable
   def breadcrumb_viewable_by(user = nil)
     return [] if user.blank? || breadcrumb.nil?
     breadcrumb_for_user(user).viewable
-  end
-
-  # Returns the singular breadcrumb item for this object
-  def to_breadcrumb_item
-    Breadcrumb::Builder.for_object(self)
   end
 
   # really just an alias for save since before_update will call calculate_breadcrumb
@@ -72,37 +64,32 @@ module Breadcrumbable
   end
 
   # Loads all children and recalculates all at once
-  def recalculate_breadcrumb_tree!(subtree_identifier: nil, force_sync: false)
+  def recalculate_breadcrumb_tree!(force_sync: false)
     return recalculate_breadcrumb! unless is_a?(Collection)
-
-    child_collections = Collection.in_collection(self, subtree_identifier)
-    child_items = Item.in_collection(self, subtree_identifier)
-    num = child_collections.size + child_items.size
+    # start with self
+    recalculate_breadcrumb!
+    child_collections = Collection.in_collection(self)
+    child_items = Item.in_collection(self)
+    num = child_collections.count + child_items.count
 
     # If greater than 50 items, queue to worker
-    if num.size > 50 && !force_sync
-      BreadcrumbRecalculationWorker.perform_async(id, subtree_identifier)
+    if num > 50 && !force_sync
+      BreadcrumbRecalculationWorker.perform_async(id)
     else
+      puts 'BREADCRUMB TREE!'
+      puts num
+      puts '<<<<<>>>>>'
       # Otherwise perform immediately
-      child_collections.each(&:recalculate_breadcrumb!)
-      child_items.each(&:recalculate_breadcrumb!)
+      child_collections.find_each(&:recalculate_breadcrumb!)
+      child_items.find_each(&:recalculate_breadcrumb!)
+      puts child_items.first.reload.breadcrumb
     end
     true
   end
 
-  def breadcrumb_contains?(object: nil, id: nil, klass: nil)
-    found = false
-    if object
-      found = breadcrumb.include?(object.to_breadcrumb_item)
-    else
-      breadcrumb.each do |crumb|
-        if crumb[0] == klass && crumb[1] == id
-          found = true
-          break
-        end
-      end
-    end
-    found
+  def within_collection_or_self?(collection)
+    return true if collection == self
+    breadcrumb.include?(collection.id)
   end
 
   private
@@ -114,7 +101,7 @@ module Breadcrumbable
 
   def breadcrumb_for_user(user)
     Breadcrumb::ForUser.new(
-      breadcrumb,
+      self,
       user,
     )
   end

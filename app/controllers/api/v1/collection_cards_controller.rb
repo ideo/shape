@@ -177,8 +177,9 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
 
   def check_valid_duplication
     @cards.each do |card|
-      record = card.record
-      if @to_collection.breadcrumb_contains?(klass: record.class.base_class.name, id: record.id)
+      collection = card.collection
+      next unless collection.present?
+      if @to_collection.within_collection_or_self?(collection)
         @errors = 'You can\'t move a collection inside of itself.'
       end
     end

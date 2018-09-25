@@ -34,7 +34,7 @@ class SerializableCollection < BaseJsonSerializer
 
   attribute :breadcrumb do
     Breadcrumb::ForUser.new(
-      @object.breadcrumb,
+      @object,
       @current_user,
     ).viewable_to_api
   end

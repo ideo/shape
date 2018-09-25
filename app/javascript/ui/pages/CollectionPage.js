@@ -86,18 +86,14 @@ class CollectionPage extends PageWithApi {
     if (_.compact([currentId, submissionsId]).indexOf(data.record_id) > -1) {
       this.setEditor(data.current_editor)
       if (
-        _.isEmpty(data.current_editor) ||
-        data.current_editor.id === apiStore.currentUserId
+        !data.processing_done &&
+        (_.isEmpty(data.current_editor) ||
+          data.current_editor.id === apiStore.currentUserId)
       ) {
         // don't reload your own updates
         return
       }
       this.reloadData()
-    } else if (data.processing_done) {
-      // Background processing has finished on the collection, so reload it
-      this.reloadData()
-      const { uiStore } = this.props
-      uiStore.closeSnackbar()
     }
   }
 

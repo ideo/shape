@@ -1,32 +1,35 @@
 module Breadcrumb
   class ForUser
     VIEW_ROLE = Role::VIEWER
-    CONTENT_EDIT_ROLE = Role::CONTENT_EDITOR
     EDIT_ROLE = Role::EDITOR
 
-    def initialize(breadcrumb, user)
-      @breadcrumb = breadcrumb
+    def initialize(object, user)
+      @object = object
       @user = user
     end
 
     def viewable
       @viewable ||= select_breadcrumb_items_cascading do |item|
         user_can?(VIEW_ROLE, item) ||
-          user_can?(CONTENT_EDIT_ROLE, item) ||
           user_can?(EDIT_ROLE, item)
       end
     end
 
     def editable
       @editable ||= select_breadcrumb_items_cascading do |item|
-        user_can?(CONTENT_EDIT_ROLE, item)
+        user_can?(EDIT_ROLE, item)
       end
     end
 
-    # Transforms object class names to the types JSON API expects
+    # Transforms collection ids into breadcrumb with collection names
     def viewable_to_api
-      viewable.map do |item|
-        breadcrumb_item_for_api(item)
+      ids = viewable
+      collections = Collection
+                    .where(id: ids)
+                    .order("position(id::text in '#{ids.join(',')}')")
+                    .select(:id, :name)
+      (collections + [@object]).map do |object|
+        breadcrumb_item_for_api(object)
       end
     end
 
@@ -44,14 +47,12 @@ module Breadcrumb
 
     private
 
-    attr_reader :breadcrumb, :user
-
     # Iterates through breacrumb items and yields them to a block
     # The first item to yield true then triggers returning all subsequent items
     def select_breadcrumb_items_cascading
       can = false
 
-      breadcrumb.select do |breadcrumb_item|
+      @object.breadcrumb.select do |breadcrumb_item|
         # If we haven't reached an item they can view,
         # check to see if they can see it
         if can
@@ -63,20 +64,15 @@ module Breadcrumb
     end
 
     # API expects downcase, pluralized classname (e.g. 'collections')
-    def breadcrumb_item_for_api(item)
-      klass = item.shift.downcase.pluralize
-      [klass] + item
+    def breadcrumb_item_for_api(object)
+      klass = object.class.base_class.name.downcase.pluralize
+      [klass, object.id, object.name]
     end
 
-    def resource_identifier_for_breadcrumb_item(item)
-      item.first(2).join('_')
-    end
-
-    # we directly look up has_role_by_identifier for the breadcrumb, e.g. ["Collection", 4, "Name"]
+    # we directly look up has_role_by_identifier for the breadcrumb, e.g. [5] becomes "Collection_5"
     def user_can?(role_name, breadcrumb_item)
-      return true if user.has_cached_role?(Role::SUPER_ADMIN)
-      resource_identifier = resource_identifier_for_breadcrumb_item(breadcrumb_item)
-      user.has_role_by_identifier?(role_name, resource_identifier)
+      return true if @user.has_cached_role?(Role::SUPER_ADMIN)
+      @user.has_role_by_identifier?(role_name, "Collection_#{breadcrumb_item}")
     end
   end
 end

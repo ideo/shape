@@ -288,23 +288,6 @@ describe Collection, type: :model do
   end
 
   context 'caching and stored attributes' do
-    describe '#recalculate_child_breadcrumbs_async' do
-      let(:collection) { create(:collection) }
-
-      it 'queues up BreadcrumbRecalculationWorker on name change' do
-        expect(BreadcrumbRecalculationWorker).to receive(:perform_async).with(
-          collection.id,
-          collection.breadcrumb_subtree_identifier_was,
-        )
-        collection.update(name: 'New name')
-      end
-
-      it 'does not queue up BreadcrumbRecalculationWorker unless name change' do
-        expect(BreadcrumbRecalculationWorker).not_to receive(:perform_async)
-        collection.update(updated_at: Time.now)
-      end
-    end
-
     describe '#cache_key' do
       let(:user) { create(:user) }
       let(:collection) { create(:collection, num_cards: 2) }
