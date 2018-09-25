@@ -392,14 +392,5 @@ describe Collection, type: :model do
         collection.mark_as_processing(processing: processing)
       end
     end
-
-    def mark_as_processing(processing: true, processing_message: nil)
-      update_columns(
-        processing: processing,
-        processing_message: processing_message,
-      )
-
-      processing_done unless processing
-    end
   end
 end
