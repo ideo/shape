@@ -88,10 +88,17 @@ class MovableGridCard extends React.PureComponent {
   }
 
   scrollUp = timestamp => {
-    console.log('scrollup')
-    if (!this.scrolling) return
-    window.scrollBy(0, -1)
-    this.scrollingY -= 1
+    if (!this.scrolling) return null
+    if (window.scrollY < 10) {
+      this.rnd.updatePosition({
+        y: window.scrollY,
+      })
+      return window.requestAnimationFrame(this.scrollUp)
+    }
+    const scrollAmount = (this.relativeCursorPosition.y - this.scrollY) * 0.05
+
+    window.scrollBy(0, -scrollAmount)
+    this.scrollingY -= scrollAmount
 
     const { position } = this.props
     this.rnd.updatePosition({
@@ -99,15 +106,18 @@ class MovableGridCard extends React.PureComponent {
     })
     this.dragPosition.dragY = this.scrollingY + position.height / 2
 
-    window.requestAnimationFrame(this.scrollUp)
+    return window.requestAnimationFrame(this.scrollUp)
   }
 
   scrollDown = timestamp => {
     if (!this.scrolling) return
-    window.scrollBy(0, 1)
-    this.scrollingY += 1
+    const scrollAmount = (this.scrollY - this.relativeCursorPosition.y) * 0.1
+
+    window.scrollBy(0, scrollAmount)
+    this.scrollingY += scrollAmount
 
     const { position } = this.props
+    console.log(window.scrollY)
     this.rnd.updatePosition({
       y: window.scrollY + position.height + 5,
     })
@@ -124,13 +134,13 @@ class MovableGridCard extends React.PureComponent {
 
     const rect = e.target.getBoundingClientRect()
     const cY = e.clientY - rect.top // y position within the element.
+    this.scrollY = cY
 
-    console.log(rY + position.height, window.innerHeight)
-    if (rY < 200 && cY < this.relativeCursorPosition.y - 20) {
+    if (rY < 200 && cY < this.relativeCursorPosition.y) {
       // At top of page
       this.scrollingY = y
       this.scrolling = true
-      this.scrollUp(null)
+      this.scrollUp(null, cY)
     } else if (rY + position.height > window.innerHeight) {
       // At top of page
       this.scrollingY = y
