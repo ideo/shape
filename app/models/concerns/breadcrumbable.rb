@@ -76,13 +76,9 @@ module Breadcrumbable
     if num > 50 && !force_sync
       BreadcrumbRecalculationWorker.perform_async(id)
     else
-      puts 'BREADCRUMB TREE!'
-      puts num
-      puts '<<<<<>>>>>'
       # Otherwise perform immediately
       child_collections.find_each(&:recalculate_breadcrumb!)
       child_items.find_each(&:recalculate_breadcrumb!)
-      puts child_items.first.reload.breadcrumb
     end
     true
   end
