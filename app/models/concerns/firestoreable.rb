@@ -17,6 +17,7 @@ module Firestoreable
     'Item::VideoItem': SerializableSimpleItem,
     'Item::TextItem': SerializableSimpleItem,
     'Item::FileItem': SerializableSimpleItem,
+    'Item::LinkItem': SerializableSimpleItem,
     'Item::QuestionItem': SerializableSimpleItem,
     'CollectionCard::Primary': SerializableCollectionCard,
     'CollectionCard::Link': SerializableCollectionCard,
