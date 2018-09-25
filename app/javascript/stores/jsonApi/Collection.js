@@ -57,6 +57,18 @@ class Collection extends BaseRecord {
     return this.type === 'Collection::SubmissionsCollection'
   }
 
+  get isTestCollection() {
+    return this.type === 'Collection::TestCollection'
+  }
+
+  get isTestDesign() {
+    return this.type === 'Collection::TestDesign'
+  }
+
+  get isTestCollectionOrTestDesign() {
+    return this.isTestCollection || this.isTestDesign
+  }
+
   get requiresSubmissionBoxSettings() {
     if (!this.isSubmissionBox) return false
     // if type is null then it requires setup
@@ -83,6 +95,22 @@ class Collection extends BaseRecord {
   get isUsableTemplate() {
     // you aren't allowed to use the profile template
     return this.isMasterTemplate && !this.isProfileTemplate
+  }
+
+  get isLaunchableTest() {
+    return this.isTestCollection && this.test_status === 'draft'
+  }
+
+  get isLiveTest() {
+    return this.isTestCollectionOrTestDesign && this.test_status === 'live'
+  }
+
+  get publicTestURL() {
+    let collectionId = this.id
+    if (this.isTestDesign && this.parent_collection_card) {
+      collectionId = this.parent_collection_card.parent_id
+    }
+    return `${process.env.BASE_HOST}/tests/${collectionId}`
   }
 
   get isTemplated() {
@@ -159,13 +187,14 @@ class Collection extends BaseRecord {
   }
 
   // after we reorder a single card, we want to make sure everything goes into sequential order
+  @action
   _reorderCards() {
     if (this.collection_cards) {
-      return _.each(_.sortBy(this.collection_cards, 'order'), (card, i) => {
+      this.collection_cards.replace(_.sortBy(this.collection_cards, 'order'))
+      _.each(this.collection_cards, (card, i) => {
         card.order = i
       })
     }
-    return false
   }
 
   checkCurrentOrg() {
@@ -176,6 +205,24 @@ class Collection extends BaseRecord {
     ) {
       currentUser.switchOrganization(this.organization_id)
     }
+  }
+
+  launchTest = () => {
+    if (!this.can_edit) {
+      uiStore.alert('Only editors are allowed to launch the test.')
+      return
+    }
+    uiStore.confirm({
+      prompt:
+        'Are you sure? Once you get your first response, you can no longer change your test.',
+      confirmText: 'Launch',
+      iconName: 'TestGraph',
+      onConfirm: () => this.API_launchTest(),
+    })
+  }
+
+  API_launchTest() {
+    this.apiStore.request(`collections/${this.id}/launch_test`, 'PATCH')
   }
 
   static async createSubmission(parent_id, submissionSettings) {

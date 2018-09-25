@@ -8,6 +8,7 @@
     "submission_box_type": { "type": ["string", "null"] },
     "submission_template_id": { "type": ["integer", "null"] },
     "submission_box_id": { "type": ["integer", "null"] },
+    "test_status": { "type": ["string", "null"] },
     "created_at": { "type": "date" },
     "updated_at": { "type": "date" },
     "breadcrumb": { "type": ["array", "null"] },

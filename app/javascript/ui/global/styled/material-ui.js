@@ -7,7 +7,6 @@ import v from '~/utils/variables'
 export const StyledSnackbar = styled(Snackbar)`
   &.Snackbar {
     width: 100%;
-    top: auto;
     max-width: 673px;
     margin-bottom: 35px;
     flex-grow: 1;
@@ -24,6 +23,9 @@ export const StyledSnackbarContent = styled(SnackbarContent)`
     max-width: none;
     padding: 15px 30px;
     width: 100%;
+    &.autoWidth {
+      width: auto;
+    }
   }
 `
 StyledSnackbarContent.displayName = 'StyledSnackbarContent'
@@ -36,3 +38,14 @@ export const SnackbarBackground = styled.div`
   width: 100%;
 `
 SnackbarBackground.displayName = 'SnackbarBackground'
+
+// This text is different from other typography
+export const StyledSnackbarText = styled.span`
+  text-transform: uppercase;
+  font-family: ${v.fonts.sans};
+  font-size: 1rem;
+  font-weight: ${v.weights.book};
+  letter-spacing: 0.1rem;
+  color: white;
+`
+StyledSnackbarText.displayName = 'StyledSnackbarText'

@@ -4,13 +4,13 @@ import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 import { Flex } from 'reflexbox'
 
-import CollectionCard from '~/stores/jsonApi/CollectionCard'
 import AddTextIcon from '~/ui/icons/AddTextIcon'
 import AddCollectionIcon from '~/ui/icons/AddCollectionIcon'
 import AddFileIcon from '~/ui/icons/AddFileIcon'
 import AddVideoIcon from '~/ui/icons/AddVideoIcon'
 import AddLinkIcon from '~/ui/icons/AddLinkIcon'
 import TemplateIcon from '~/ui/icons/TemplateIcon'
+import TestCollectionIcon from '~/ui/icons/TestCollectionIcon'
 import SubmissionBoxIcon from '~/ui/icons/SubmissionBoxIcon'
 import v, { ITEM_TYPES } from '~/utils/variables'
 import FilestackUpload, { MAX_SIZE } from '~/utils/FilestackUpload'
@@ -19,6 +19,7 @@ import InlineLoader from '~/ui/layout/InlineLoader'
 import { CloseButton } from '~/ui/global/styled/buttons'
 import bctIcons from '~/assets/bct_icons.png'
 import PopoutMenu from '~/ui/global/PopoutMenu'
+import CollectionCard from '~/stores/jsonApi/CollectionCard'
 
 import CollectionCreator from './CollectionCreator'
 import TextItemCreator from './TextItemCreator'
@@ -56,7 +57,10 @@ const StyledBlankCreationTool = styled.div`
     width: ${props => (props.replacing ? '50%' : '100%')};
     &.foreground-bottom {
       top: 120px;
-      /* width is smaller because there are only 2 bottom buttons; can change if we add more */
+      /*
+       width is smaller because there are only 3 bottom buttons
+       TODO: remove width property when Tests are re-enabled
+      */
       width: 85%;
       margin: 0 auto;
     }
@@ -195,10 +199,16 @@ class GridCardBlank extends React.Component {
     this.canceled = true
   }
 
+  get replacingId() {
+    const { uiStore, replacingId } = this.props
+    if (replacingId) return replacingId
+    return uiStore.blankContentToolState.replacingId
+  }
+
   createDropPane = () => {
+    const { replacingId } = this
     const { creating } = this.state
     const { uiStore } = this.props
-    const { replacingId } = uiStore.blankContentToolState
     if (this.canceled || (creating && creating !== 'file')) return
     const uploadOpts = {}
     if (replacingId) {
@@ -274,8 +284,7 @@ class GridCardBlank extends React.Component {
   }
 
   pickImages = () => {
-    const { uiStore } = this.props
-    const { replacingId } = uiStore.blankContentToolState
+    const { replacingId } = this
     const filestackMethod = !replacingId
       ? FilestackUpload.pickImages
       : FilestackUpload.pickImage
@@ -288,8 +297,11 @@ class GridCardBlank extends React.Component {
   }
 
   createCard = (nested = {}, options = {}) => {
+    const { replacingId } = this
+    let { order } = this.props
     const { afterCreate, parent, apiStore, uiStore } = this.props
-    const { order, width, height, replacingId } = uiStore.blankContentToolState
+    if (order === null) ({ order } = uiStore.blankContentToolState)
+    const { width, height } = uiStore.blankContentToolState
     const isReplacing = !!replacingId
     const attrs = {
       order,
@@ -339,11 +351,12 @@ class GridCardBlank extends React.Component {
   renderInner = () => {
     let inner
     const { creating, loading, droppingFile } = this.state
-    const isReplacing = !!this.props.uiStore.blankContentToolState.replacingId
+    const isReplacing = !!this.replacingId
     const size = v.iconSizes.bct
 
     switch (creating) {
       case 'collection':
+      case 'testCollection':
       case 'template':
       case 'submissionBox':
         inner = (
@@ -414,6 +427,16 @@ class GridCardBlank extends React.Component {
         Icon={AddVideoIcon}
       />
     )
+    const testBctBox = (
+      <BctButtonBox
+        tooltip="Create test"
+        type="testCollection"
+        creating={creating}
+        size={size}
+        onClick={this.startCreating('testCollection')}
+        Icon={() => <TestCollectionIcon size="small" />}
+      />
+    )
     const submissionBctBox = (
       <BctButtonBox
         tooltip="Create submission box"
@@ -476,6 +499,9 @@ class GridCardBlank extends React.Component {
               {videoBctBox}
             </BctButtonRotation>
           )}
+          {creating === 'testCollection' && (
+            <BctButtonRotation>{testBctBox}</BctButtonRotation>
+          )}
           {creating === 'submissionBox' && (
             <BctButtonRotation>{submissionBctBox}</BctButtonRotation>
           )}
@@ -495,10 +521,12 @@ class GridCardBlank extends React.Component {
           !creating && (
             <Flex
               className="foreground foreground-bottom"
-              justify="space-evenly"
+              justify="space-between"
             >
               {videoBctBox}
               {submissionBctBox}
+              {/* DISABLING UNTIL TEST COLLECTIONS ARE READY */}
+              {/* {testBctBox} */}
               <PopoutMenu
                 buttonStyle="bct"
                 menuOpen={this.state.bctMenuOpen}
@@ -521,11 +549,11 @@ class GridCardBlank extends React.Component {
   }
 
   render() {
-    const { uiStore } = this.props
+    const { testCollectionCard, uiStore } = this.props
     const { gridSettings, blankContentToolState } = uiStore
     const { creating } = this.state
     return (
-      <StyledGridCardBlank>
+      <StyledGridCardBlank blueBg={testCollectionCard}>
         <StyledGridCardInner
           height={blankContentToolState.height}
           gridW={gridSettings.gridW}
@@ -549,6 +577,9 @@ GridCardBlank.propTypes = {
   height: PropTypes.number.isRequired,
   afterCreate: PropTypes.func,
   preselected: PropTypes.string,
+  replacingId: PropTypes.string,
+  order: PropTypes.number,
+  testCollectionCard: PropTypes.bool,
 }
 GridCardBlank.wrappedComponent.propTypes = {
   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
@@ -557,9 +588,12 @@ GridCardBlank.wrappedComponent.propTypes = {
 GridCardBlank.defaultProps = {
   afterCreate: null,
   preselected: null,
+  replacingId: null,
+  order: null,
+  testCollectionCard: false,
 }
 
 // give a name to the injected component for unit tests
-GridCardBlank.displayName = 'GridCardBlankHOC'
+GridCardBlank.displayName = 'GridCardBlank'
 
 export default GridCardBlank

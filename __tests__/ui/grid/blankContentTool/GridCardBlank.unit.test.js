@@ -32,6 +32,7 @@ beforeEach(() => {
 describe('GridCardBlank', () => {
   describe('when creating a new card', () => {
     it('renders the content creation buttons', () => {
+      // TODO: change back to 7 when test collections are enabled
       expect(wrapper.find('BctButtonBox').length).toBe(6)
     })
 

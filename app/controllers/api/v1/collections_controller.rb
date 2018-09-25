@@ -2,7 +2,6 @@ class Api::V1::CollectionsController < Api::V1::BaseController
   deserializable_resource :collection, class: DeserializableCollection, only: %i[update]
   load_and_authorize_resource :collection_card, only: [:create]
   load_and_authorize_resource except: %i[me update destroy]
-  before_action :load_and_authorize_collection_destroy, only: %i[destroy]
   # NOTE: these have to be in the following order
   before_action :load_and_authorize_collection_update, only: %i[update]
   before_action :load_collection_with_cards, only: %i[show update]
@@ -41,9 +40,19 @@ class Api::V1::CollectionsController < Api::V1::BaseController
     end
   end
 
+  before_action :load_and_authorize_collection_destroy, only: %i[destroy]
   def destroy
     if @collection.destroy
       render json: { success: true }
+    else
+      render_api_errors @collection.errors
+    end
+  end
+
+  before_action :load_and_authorize_test_collection_launch, only: %i[launch_test]
+  def launch_test
+    if @collection.launch_test!(initiated_by: current_user)
+      render_collection
     else
       render_api_errors @collection.errors
     end
@@ -104,6 +113,14 @@ class Api::V1::CollectionsController < Api::V1::BaseController
       [Role::VIEWER, Role::CONTENT_EDITOR, Role::EDITOR],
       @collection.children_and_linked_children,
     )
+  end
+
+  def load_and_authorize_test_collection_launch
+    @collection = Collection.find(params[:id])
+    unless @collection.is_a?(Collection::TestCollection) && @collection.draft?
+      head(401)
+    end
+    authorize! :manage, @collection
   end
 
   def collection_params

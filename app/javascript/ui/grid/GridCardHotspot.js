@@ -54,7 +54,6 @@ class GridCardHotspot extends React.Component {
     const { dragging, uiStore, position } = this.props
     return (
       <StyledHotspot
-        data-cy="Hotspot"
         position={position}
         dragging={dragging}
         onClick={this.clickHotspot}
