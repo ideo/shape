@@ -101,7 +101,9 @@ class Api::V1::CollectionsController < Api::V1::BaseController
   def render_collection(include: nil)
     # include collection_cards for UI to receive any updates
     include ||= Collection.default_relationships_for_api
-    render jsonapi: @collection, include: include
+    render jsonapi: @collection,
+           include: include,
+           expose: { current_record: @collection }
   end
 
   def load_collection_with_cards

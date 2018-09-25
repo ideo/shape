@@ -4,12 +4,14 @@ class Api::V1::ItemsController < Api::V1::BaseController
   load_and_authorize_resource except: %i[update]
 
   def show
-    render jsonapi: @item, include: [:filestack_file, :parent, :parent_collection_card, roles: %i[users groups resource]]
+    render jsonapi: @item,
+           include: [:filestack_file, :parent, :parent_collection_card, roles: %i[users groups resource]],
+           expose: { current_record: @item }
   end
 
   def create
     if @item.save
-      render jsonapi: @item, include: [roles: %i[users groups resource]]
+      render jsonapi: @item, include: [roles: %i[users groups resource]], expose: { current_record: @item }
     else
       render_api_errors @item.errors
     end
@@ -26,7 +28,7 @@ class Api::V1::ItemsController < Api::V1::BaseController
       if @item.is_a?(Item::TextItem)
         @item.stopped_editing(current_user)
       end
-      render jsonapi: @item
+      render jsonapi: @item, expose: { current_record: @item }
     else
       render_api_errors @item.errors
     end
@@ -39,7 +41,7 @@ class Api::V1::ItemsController < Api::V1::BaseController
       parent: current_user.current_user_collection,
     )
     if duplicate.persisted?
-      render jsonapi: duplicate, include: [:parent]
+      render jsonapi: duplicate, include: [:parent], expose: { current_record: @item }
     else
       render_api_errors duplicate.errors
     end

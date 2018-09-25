@@ -32,7 +32,7 @@ class SerializableCollection < BaseJsonSerializer
     @object.type || @object.class.name
   end
 
-  attribute :breadcrumb do
+  attribute :breadcrumb, if: -> { @object == @current_record } do
     Breadcrumb::ForUser.new(
       @object,
       @current_user,

@@ -2,7 +2,7 @@ import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 import { Link } from 'react-router-dom'
 
-import { routingStore } from '~/stores'
+import { apiStore, routingStore } from '~/stores'
 import v from '~/utils/variables'
 
 const BreadcrumbPadding = styled.div`
@@ -49,7 +49,13 @@ StyledBreadcrumb.displayName = 'StyledBreadcrumb'
 class Breadcrumb extends React.Component {
   breadcrumbItem = item => {
     const [klass, id, name] = item
-    const path = routingStore.pathTo(klass, id)
+    let path = routingStore.pathTo(klass, id)
+    if (
+      name === 'My Collection' &&
+      id === apiStore.currentUser.current_user_collection_id
+    ) {
+      path = routingStore.pathTo('homepage')
+    }
     return (
       <span className="crumb" key={path} data-cy="Breadcrumb">
         <Link to={path}>{name}</Link>
@@ -60,14 +66,7 @@ class Breadcrumb extends React.Component {
   renderItems = () => {
     const { items } = this.props
     const links = items.map(item => this.breadcrumbItem(item))
-    return (
-      <StyledBreadcrumb>
-        <span className="crumb" key="myCollection">
-          <Link to={routingStore.pathTo('homepage')}>My Collection</Link>
-        </span>
-        {links}
-      </StyledBreadcrumb>
-    )
+    return <StyledBreadcrumb>{links}</StyledBreadcrumb>
   }
 
   render() {
@@ -78,7 +77,10 @@ class Breadcrumb extends React.Component {
 }
 
 Breadcrumb.propTypes = {
-  items: MobxPropTypes.arrayOrObservableArray.isRequired,
+  items: MobxPropTypes.arrayOrObservableArray,
+}
+Breadcrumb.defaultProps = {
+  items: [],
 }
 
 export default Breadcrumb
