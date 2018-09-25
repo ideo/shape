@@ -71,9 +71,10 @@ export class FirebaseClient {
       .collection('notifications')
       .where('data.attributes.identifier', '==', `${orgId}_${userId}`)
       .limit(50)
-      .onSnapshot(
-        querySnapshot => {
-          querySnapshot.forEach(doc => {
+      .orderBy('data.attributes.created_at', 'desc')
+      .onSnapshot(querySnapshot => {
+        querySnapshot.forEach(
+          doc => {
             const record = apiStore.syncFromFirestore(doc.data())
             if (
               new Date(record.created_at).getTime() >
@@ -81,21 +82,21 @@ export class FirebaseClient {
             ) {
               apiStore.addRecentNotification(record)
             }
-          })
-          const changes = querySnapshot.docChanges()
-          if (changes) {
-            changes.forEach(change => {
-              // remove all notifications that were deleted
-              if (change.type === 'removed') {
-                apiStore.remove('notifications', change.doc.id)
-              }
-            })
+            const changes = querySnapshot.docChanges()
+            if (changes) {
+              changes.forEach(change => {
+                // remove all notifications that were deleted
+                if (change.type === 'removed') {
+                  apiStore.remove('notifications', change.doc.id)
+                }
+              })
+            }
+          },
+          err => {
+            trackError(err, { name: 'Firestore:Notifications' })
           }
-        },
-        err => {
-          trackError(err, { name: 'Firestore:Notifications' })
-        }
-      )
+        )
+      })
     this.listeners.push(this.notificationsListener)
   }
 
