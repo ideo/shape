@@ -74,6 +74,12 @@ class MovableGridCard extends React.PureComponent {
     // e.g. bottom left corner of the card itself
     const initialOffsetX = e.screenX - e.target.getBoundingClientRect().x
     const initialOffsetY = e.screenY - e.target.getBoundingClientRect().y
+
+    const rect = e.target.getBoundingClientRect()
+    const cX = e.clientX - rect.left // y position within the element.
+    const cY = e.clientY - rect.top // y position within the element.
+    this.relativeCursorPosition = { x: cX, y: cY + 8 }
+
     document.body.style['overflow-y'] = 'hidden'
     this.setState({
       initialOffsetX,
@@ -82,6 +88,7 @@ class MovableGridCard extends React.PureComponent {
   }
 
   scrollUp = timestamp => {
+    console.log('scrollup')
     if (!this.scrolling) return
     window.scrollBy(0, -1)
     this.scrollingY -= 1
@@ -95,6 +102,19 @@ class MovableGridCard extends React.PureComponent {
     window.requestAnimationFrame(this.scrollUp)
   }
 
+  scrollDown = timestamp => {
+    if (!this.scrolling) return
+    window.scrollBy(0, 1)
+    this.scrollingY += 1
+
+    const { position } = this.props
+    this.rnd.updatePosition({
+      y: window.scrollY + position.height + 5,
+    })
+
+    window.requestAnimationFrame(this.scrollDown)
+  }
+
   handleDrag = (e, data, dX, dY) => {
     const { position } = this.props
     // x, y represent the current drag position
@@ -103,18 +123,19 @@ class MovableGridCard extends React.PureComponent {
     const rY = relativePosition.top
 
     const rect = e.target.getBoundingClientRect()
-    const cX = e.clientX - rect.left // x position within the element.
     const cY = e.clientY - rect.top // y position within the element.
-    const cursorPosition = { x: cX, y: cY }
-    this.cursorPosition = cursorPosition
 
-    console.log(cY, position.height / 2 + 15)
-    // if (rY < 200 && e.clientY < rY + cY) {
-    if (rY < 200 && cY < position.height / 2 + 15) {
+    console.log(rY + position.height, window.innerHeight)
+    if (rY < 200 && cY < this.relativeCursorPosition.y - 20) {
       // At top of page
       this.scrollingY = y
       this.scrolling = true
       this.scrollUp(null)
+    } else if (rY + position.height > window.innerHeight) {
+      // At top of page
+      this.scrollingY = y
+      this.scrolling = true
+      this.scrollDown(null)
     } else {
       if (this.scrolling) {
         this.rnd.updatePosition({
