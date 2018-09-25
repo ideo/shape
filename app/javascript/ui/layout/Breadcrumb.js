@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 import { Link } from 'react-router-dom'
@@ -47,14 +48,20 @@ StyledBreadcrumb.displayName = 'StyledBreadcrumb'
 
 @observer
 class Breadcrumb extends React.Component {
+  componentDidMount() {
+    const { record, isHomepage } = this.props
+    if (isHomepage) return
+    // this will set record.inMyCollection = true/false
+    apiStore.checkInMyCollection(record)
+  }
+
   breadcrumbItem = item => {
     const [klass, id, name] = item
-    let path = routingStore.pathTo(klass, id)
-    if (
-      name === 'My Collection' &&
-      id === apiStore.currentUser.current_user_collection_id
-    ) {
+    let path
+    if (id === 'homepage') {
       path = routingStore.pathTo('homepage')
+    } else {
+      path = routingStore.pathTo(klass, id)
     }
     return (
       <span className="crumb" key={path} data-cy="Breadcrumb">
@@ -63,24 +70,41 @@ class Breadcrumb extends React.Component {
     )
   }
 
+  renderMyCollection = () => {
+    const { record } = this.props
+    if (!record.inMyCollection) return ''
+    return this.breadcrumbItem(['collections', 'homepage', 'My Collection'])
+  }
+
   renderItems = () => {
-    const { items } = this.props
-    const links = items.map(item => this.breadcrumbItem(item))
-    return <StyledBreadcrumb>{links}</StyledBreadcrumb>
+    const { record } = this.props
+    const links = record.breadcrumb.map(item => this.breadcrumbItem(item))
+    return (
+      <StyledBreadcrumb>
+        {this.renderMyCollection()}
+        {links}
+      </StyledBreadcrumb>
+    )
   }
 
   render() {
-    const { items } = this.props
-    if (items.length > 0) return this.renderItems()
+    const { record, isHomepage } = this.props
+    const { inMyCollection, breadcrumb } = record
+    if (
+      !isHomepage &&
+      // wait until we load this value before rendering
+      inMyCollection !== null &&
+      breadcrumb &&
+      breadcrumb.length > 0
+    )
+      return this.renderItems()
     return <BreadcrumbPadding />
   }
 }
 
 Breadcrumb.propTypes = {
-  items: MobxPropTypes.arrayOrObservableArray,
-}
-Breadcrumb.defaultProps = {
-  items: [],
+  record: MobxPropTypes.objectOrObservableObject.isRequired,
+  isHomepage: PropTypes.bool.isRequired,
 }
 
 export default Breadcrumb

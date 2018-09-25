@@ -23,17 +23,10 @@ module Breadcrumb
 
     def viewable_collections
       ids = viewable
-      collections = Collection
-                    .where(id: ids)
-                    .order("position(id::text in '#{ids.join(',')}')")
-                    .select(:id, :name)
-                    .to_a
-
-      if @user.in_my_collection?(@object)
-        collections = collections.unshift(@user.current_user_collection)
-      end
-
-      collections
+      Collection
+        .where(id: ids)
+        .order("position(id::text in '#{ids.join(',')}')")
+        .select(:id, :name)
     end
 
     # Transforms collection ids into breadcrumb with collection names

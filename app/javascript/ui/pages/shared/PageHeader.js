@@ -244,7 +244,6 @@ class PageHeader extends React.Component {
 
   render() {
     const { record, isHomepage, uiStore } = this.props
-    const breadcrumb = isHomepage ? [] : record.breadcrumb
     const tagEditorOpen =
       record.parent_collection_card &&
       uiStore.tagsModalOpenId === record.parent_collection_card.id
@@ -254,7 +253,12 @@ class PageHeader extends React.Component {
       <FixedPageHeader>
         <MaxWidthContainer>
           <RolesModal record={rolesRecord} roles={rolesRecord.roles} />
-          <Breadcrumb items={breadcrumb} />
+          <Breadcrumb
+            record={record}
+            isHomepage={isHomepage}
+            // re-mount every time the record / breadcrumb changes
+            key={`${record.identifier}_${record.breadcrumbSize}`}
+          />
           <div>
             <StyledTitleAndRoles
               className={record.isCurrentUserProfile ? 'user-profile' : ''}
