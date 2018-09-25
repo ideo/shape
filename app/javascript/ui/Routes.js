@@ -21,7 +21,7 @@ import OrganizationSettings from '~/ui/organizations/OrganizationSettings'
 import UserSettings from '~/ui/users/UserSettings'
 import v from '~/utils/variables'
 import firebaseClient from '~/vendor/firestore'
-import theme from '~/ui/theme'
+import MuiTheme from '~/ui/global/MuiTheme'
 
 const AppWrapper = styled.div`
   /* used by terms of use modal to blur the whole site */
@@ -78,7 +78,7 @@ class Routes extends React.Component {
     return (
       <AppWrapper blur={displayTermsPopup} id="AppWrapper">
         <ErrorBoundary>
-          <MuiThemeProvider theme={theme}>
+          <MuiThemeProvider theme={MuiTheme}>
             {/* Global components are rendered here */}
             <WindowSizeListener onResize={this.handleWindowResize} />
             <DialogWrapper />

@@ -17,7 +17,7 @@ const getComponentPathLine = componentPath => {
   return `import ${name} from ${dir}`
 }
 module.exports = {
-  title: 'cdelta Styleguide',
+  title: 'Shape Styleguide',
   showUsage: false,
   skipComponentsWithoutExample: true,
   getComponentPathLine,

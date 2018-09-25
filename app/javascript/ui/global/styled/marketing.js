@@ -34,7 +34,7 @@ export const MarketingFooter = styled.div`
   font-family: ${v.fonts.sans};
   color: ${v.colors.desert};
   font-size: 1rem;
-  padding-top: 50px;
+  padding-top: 56px;
   padding-bottom: 22px;
   padding-right: 24px;
   padding-left: 24px;
@@ -42,6 +42,13 @@ export const MarketingFooter = styled.div`
   @media only screen and (min-width: ${v.responsive.smallBreakpoint}px) {
     padding-left: 0px;
     padding-right: 0px;
+  }
+
+  @media only screen and (max-width: ${v.responsive.smallBreakpoint}px) {
+    h1 {
+      line-height: 26px;
+      padding: 0;
+    }
   }
 `
 MarketingFooter.displayName = 'StyledMarketingFooter'
@@ -63,6 +70,11 @@ ResponsiveInlineBlock.displayName = 'StyledResponsiveInlineBlock'
 export const ResponsivePadInlineBlock = styled(ResponsiveInlineBlock)`
   & > * {
     margin-bottom: 13px;
+  }
+
+  @media only screen and (max-width: ${v.responsive.smallBreakpoint}px) {
+    width: 100%;
+    margin-bottom: 4px;
   }
 `
 ResponsivePadInlineBlock.displayName = 'StyledResponsivePadInlineBlock'
@@ -150,10 +162,15 @@ export const MarketingTagLine = styled(MarketingH2)`
   font-size: 24px;
   max-width: 600px;
   margin: auto;
-  margin-bottom: 60px;
+  margin-bottom: 68px;
 
   @media only screen and (min-width: ${v.responsive.smallBreakpoint}px) {
     font-size: 32px;
+  }
+
+  @media only screen and (max-width: ${v.responsive.smallBreakpoint}px) {
+    padding: 0 24px;
+    margin-bottom: 76px;
   }
 `
 MarketingTagLine.displayName = 'StyledMarketingTagLine'
@@ -170,6 +187,7 @@ export const MarketingContentLink = styled.button`
   letter-spacing: 1.5px;
   margin-top: 8px;
   margin-bottom: 8px;
+  transition: background-color 0.15s ease, color 0.15s ease, border 0.15s ease;
 
   &:hover {
     color: ${v.colors.white};
@@ -184,7 +202,8 @@ export const MarketingCallToAction = styled(MarketingContentLink)`
   background-color: ${v.colors.cautionYellow};
   border-radius: 4px;
   border: 2px solid ${v.colors.cautionYellow};
-  padding: 16px 18px;
+  padding: 12px 16px;
+  margin: 0;
   letter-spacing: 0.5px;
   text-transform: uppercase;
   font-size: 14px;
@@ -298,8 +317,8 @@ export const MarketingShapeLogo = styled.img.attrs({
 })`
   width: 100%;
   max-width: 256px;
-  margin-top: 70px;
-  padding-bottom: 10px;
+  margin-top: 75px;
+  padding-bottom: 16px;
 
   @media only screen and (min-width: ${v.responsive.smallBreakpoint}px) {
     max-width: 410px;

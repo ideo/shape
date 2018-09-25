@@ -20,7 +20,7 @@ Rails.application.routes.draw do
       resources :activities, only: %i[create]
       resources :collections, except: %i[index] do
         member do
-          patch 'archive'
+          patch 'launch_test'
         end
         collection do
           post 'create_template'
@@ -32,6 +32,7 @@ Rails.application.routes.draw do
         member do
           patch 'replace'
           patch 'update'
+          delete 'destroy'
         end
         collection do
           patch 'move'
@@ -90,8 +91,15 @@ Rails.application.routes.draw do
         get '/', to: 'search#search', as: :search
         get 'users_and_groups', to: 'search#users_and_groups', as: :search_users_and_groups
       end
+      # unauthenticated routes:
+      resources :survey_responses, only: %i[create] do
+        # not shallow because we always want to look up survey_response by session_uid
+        resources :question_answers, only: %i[create update]
+      end
     end
   end
+
+  resources :tests, only: %i[show]
 
   authenticate :user, ->(u) { u.has_cached_role?(Role::SUPER_ADMIN) } do
     require 'sidekiq/web'

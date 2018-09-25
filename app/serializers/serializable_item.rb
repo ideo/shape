@@ -2,7 +2,7 @@ class SerializableItem < BaseJsonSerializer
   ROLES_LIMIT = 5
   type 'items'
   attributes :type, :name, :content, :text_data,
-             :url, :thumbnail_url, :icon_url
+             :url, :thumbnail_url, :icon_url, :question_type
   has_one :parent_collection_card
 
   attribute :tag_list do

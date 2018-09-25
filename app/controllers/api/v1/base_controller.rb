@@ -1,5 +1,5 @@
 class Api::V1::BaseController < ApplicationController
-  before_action :authenticate_user!
+  before_action :check_api_authentication!
   before_action :check_cancel_sync
 
   respond_to :json
@@ -15,9 +15,12 @@ class Api::V1::BaseController < ApplicationController
       'Item::TextItem': SerializableItem,
       'Item::FileItem': SerializableItem,
       'Item::LinkItem': SerializableItem,
+      'Item::QuestionItem': SerializableItem,
       'Collection::UserCollection': SerializableCollection,
       'Collection::SharedWithMeCollection': SerializableCollection,
       'Collection::Global': SerializableCollection,
+      'Collection::TestCollection': SerializableCollection,
+      'Collection::TestDesign': SerializableCollection,
       'Collection::SubmissionBox': SerializableCollection,
       'Collection::SubmissionsCollection': SerializableCollection,
       'Collection::UserProfile': SerializableCollection,
@@ -61,6 +64,10 @@ class Api::V1::BaseController < ApplicationController
   end
 
   private
+
+  def check_api_authentication!
+    head(401) unless user_signed_in?
+  end
 
   def current_organization
     @current_organization ||= current_user.try(:current_organization)

@@ -169,8 +169,7 @@ class RolesAdd extends React.Component {
       } else if (item.internalType === 'groups') {
         value = item.handle || item.name
       } else {
-        // eslint-disable-next-line no-console
-        console.warn('Can only search users and groups')
+        // console.warn('Can only search users and groups')
       }
       return { value, label: item.name, data: item }
     })

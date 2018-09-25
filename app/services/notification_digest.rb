@@ -63,13 +63,19 @@ class NotificationDigest < SimpleService
   def users_with_recent_mentions
     # Find all recent comments, collect user mentions
     mentioned_user_ids = []
+    mentioned_group_ids = []
     Comment.where(
       Comment.arel_table[:created_at].gt(@timeframe),
     ).each do |c|
       # use array union to gather unique user_ids
+      mentioned_group_ids |= c.mentions[:group_ids]
       mentioned_user_ids |= c.mentions[:user_ids]
     end
-    User.where(id: mentioned_user_ids)
+    mentioned_groups = Group.where(id: mentioned_group_ids)
+    group_user_ids = mentioned_groups.try(:user_ids)
+    return [] if group_user_ids.nil?
+    mentioned_user_ids += group_user_ids
+    User.where(id: mentioned_user_ids.uniq)
   end
 
   def notify_users
