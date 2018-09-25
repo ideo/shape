@@ -108,12 +108,9 @@ class MovableGridCard extends React.PureComponent {
     const cursorPosition = { x: cX, y: cY }
     this.cursorPosition = cursorPosition
 
-    console.log(
-      e.clientY,
-      200 + cursorPosition.y * 2,
-      rY < 200 && e.clientY < 200 + cursorPosition.y * 2
-    )
-    if (rY < 200 && e.clientY < 200 + cursorPosition.y * 2) {
+    console.log(cY, position.height / 2 + 15)
+    // if (rY < 200 && e.clientY < rY + cY) {
+    if (rY < 200 && cY < position.height / 2 + 15) {
       // At top of page
       this.scrollingY = y
       this.scrolling = true
