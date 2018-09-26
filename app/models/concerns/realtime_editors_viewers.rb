@@ -6,7 +6,7 @@ module RealtimeEditorsViewers
     publish_to_channel unless dont_notify
   end
 
-  def stopped_editing(_user, dont_notify: false)
+  def stopped_editing(_user = nil, dont_notify: false)
     Cache.delete(editing_cache_key)
     publish_to_channel unless dont_notify
   end
@@ -21,6 +21,10 @@ module RealtimeEditorsViewers
   def stopped_viewing(user, dont_notify: false)
     Cache.set_remove(viewing_cache_key, user.id)
     publish_to_channel unless dont_notify
+  end
+
+  def processing_done
+    publish_to_channel(processing_done: true)
   end
 
   def stream_name
@@ -39,13 +43,13 @@ module RealtimeEditorsViewers
     User.find(user_id).as_json
   end
 
-  def publish_to_channel
-    data = {
+  def publish_to_channel(data = {})
+    data.merge!(
       current_editor: currently_editing_user_as_json,
       num_viewers: num_viewers,
       record_id: id.to_s,
       record_type: jsonapi_type_name,
-    }
+    )
     if is_a?(Item::TextItem)
       data[:item_text_data] = text_data.as_json
     end

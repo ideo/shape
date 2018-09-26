@@ -1,28 +1,48 @@
 import Breadcrumb from '~/ui/layout/Breadcrumb'
+import { fakeCollection } from '#/mocks/data'
 
 jest.mock('../../../app/javascript/stores')
 
 const props = {
-  items: [
-    ['Collection', 1, 'Outer Space'],
-    ['Item', 5, 'Earth'],
-    ['Collection', 42, 'California'],
-  ],
+  record: fakeCollection,
+  isHomepage: false,
 }
-
-const emptyProps = {
-  items: [],
-}
+props.record.breadcrumb = [
+  ['collections', 1, 'My Workspace'],
+  ['collections', 99, 'Use Cases'],
+]
 
 let wrapper
 
 describe('StyledBreadcrumb', () => {
   beforeEach(() => {
+    props.record.inMyCollection = false
     wrapper = shallow(<Breadcrumb {...props} />)
   })
 
   it('renders each item as a link', () => {
-    expect(wrapper.find('Link')).toHaveLength(4)
+    expect(wrapper.find('Link')).toHaveLength(props.record.breadcrumb.length)
+  })
+
+  it('has all link titles', () => {
+    const titles = wrapper
+      .find('Link')
+      .children()
+      .map(link => link.text())
+    expect(titles).toEqual(['My Workspace', 'Use Cases'])
+  })
+})
+
+describe('In My Collection', () => {
+  beforeEach(() => {
+    props.record.inMyCollection = true
+    wrapper = shallow(<Breadcrumb {...props} />)
+  })
+
+  it('renders each item as a link', () => {
+    expect(wrapper.find('Link')).toHaveLength(
+      props.record.breadcrumb.length + 1
+    )
   })
 
   it('has My Collection, then all titles', () => {
@@ -30,21 +50,16 @@ describe('StyledBreadcrumb', () => {
       .find('Link')
       .children()
       .map(link => link.text())
-    expect(titles).toEqual([
-      'My Collection',
-      'Outer Space',
-      'Earth',
-      'California',
-    ])
+    expect(titles).toEqual(['My Collection', 'My Workspace', 'Use Cases'])
   })
 })
 
 describe('BreadcrumbPadding', () => {
   beforeEach(() => {
-    wrapper = shallow(<Breadcrumb {...emptyProps} />)
+    wrapper = shallow(<Breadcrumb {...props} isHomepage />)
   })
 
-  it('renders BreadcrumbPadding if items is empty', () => {
+  it('renders BreadcrumbPadding if isHomepage', () => {
     expect(wrapper.find('BreadcrumbPadding').exists()).toEqual(true)
   })
 })

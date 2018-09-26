@@ -9,14 +9,6 @@ module Breadcrumb
       calculate_breadcrumb
     end
 
-    def self.for_object(object)
-      [
-        object.class.base_class.to_s,
-        object.id,
-        object.breadcrumb_title,
-      ]
-    end
-
     private
 
     attr_reader :object, :breadcrumb
@@ -28,10 +20,9 @@ module Breadcrumb
 
     def build(object)
       return unless object.is_a?(Breadcrumbable) && object.breadcrumbable?
-      @breadcrumb << Breadcrumb::Builder.for_object(object)
       parent = object.parent
-      return unless parent.present? && parent.is_a?(Breadcrumbable)
-      @breadcrumb = (parent.breadcrumb + @breadcrumb)
+      return [] unless parent.present? && parent.is_a?(Breadcrumbable) && parent.breadcrumbable?
+      @breadcrumb = (parent.breadcrumb + [parent.id])
     end
   end
 end

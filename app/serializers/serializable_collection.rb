@@ -6,7 +6,7 @@ class SerializableCollection < BaseJsonSerializer
   attributes :created_at, :updated_at, :name, :organization_id,
              :master_template, :template_id,
              :submission_box_type, :submission_box_id, :submission_template_id,
-             :test_status
+             :test_status, :processing, :processing_message
 
   has_one :parent_collection_card
   belongs_to :submissions_collection
@@ -32,9 +32,9 @@ class SerializableCollection < BaseJsonSerializer
     @object.type || @object.class.name
   end
 
-  attribute :breadcrumb do
+  attribute :breadcrumb, if: -> { @object == @current_record } do
     Breadcrumb::ForUser.new(
-      @object.breadcrumb,
+      @object,
       @current_user,
     ).viewable_to_api
   end

@@ -86,8 +86,9 @@ class CollectionPage extends PageWithApi {
     if (_.compact([currentId, submissionsId]).indexOf(data.record_id) > -1) {
       this.setEditor(data.current_editor)
       if (
-        _.isEmpty(data.current_editor) ||
-        data.current_editor.id === apiStore.currentUserId
+        !data.processing_done &&
+        (_.isEmpty(data.current_editor) ||
+          data.current_editor.id === apiStore.currentUserId)
       ) {
         // don't reload your own updates
         return
@@ -193,6 +194,12 @@ class CollectionPage extends PageWithApi {
       }
     } else {
       apiStore.clearUnpersistedThreads()
+    }
+    if (collection.processing) {
+      const message = collection.processing_message
+        ? collection.processing_message
+        : 'Processing...'
+      uiStore.popupSnackbar({ message })
     }
   }
 

@@ -1,9 +1,10 @@
+import PropTypes from 'prop-types'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 import { Link } from 'react-router-dom'
 
+import { apiStore, routingStore } from '~/stores'
 import Tooltip from '~/ui/global/Tooltip'
-import { routingStore } from '~/stores'
 import v from '~/utils/variables'
 
 const BreadcrumbPadding = styled.div`
@@ -50,9 +51,25 @@ const TruncateIfGreaterThanOrEqualTo = 3
 
 @observer
 class Breadcrumb extends React.Component {
+  componentDidMount() {
+    const { record, isHomepage } = this.props
+    if (isHomepage) return
+    // this will set record.inMyCollection = true/false
+    apiStore.checkInMyCollection(record)
+  }
+
+  items() {
+    const { record } = this.props
+    const items = record.breadcrumb
+    if (record.inMyCollection) {
+      items.unshift(['collections', 'homepage', 'My Collection'])
+    }
+    return items
+  }
+
   widthForItemIndex = index => {
     // "My collection" makes it the actual length
-    const numItems = this.props.items.length + 1
+    const numItems = this.items.length + 1
     // If in the middle of the breadcrumb, make it tiny
     if (numItems >= TruncateIfGreaterThanOrEqualTo) {
       if (this.truncateToEllipses(index)) {
@@ -65,17 +82,19 @@ class Breadcrumb extends React.Component {
   }
 
   truncateToEllipses = index => {
-    const numItems = this.props.items.length
     if (numItems < TruncateIfGreaterThanOrEqualTo) return false
     if (index > 0 && index < numItems - 1) return true
     return false
   }
 
-  breadcrumbItem = (item, index) => {
+  breadcrumbItem = item => {
     const [klass, id, name] = item
-    const path = routingStore.pathTo(klass, id)
-    const ellipses = this.truncateToEllipses(index)
-    console.log(index, this.widthForItemIndex(index))
+    let path
+    if (id === 'homepage') {
+      path = routingStore.pathTo('homepage')
+    } else {
+      path = routingStore.pathTo(klass, id)
+    }
     return (
       <StyledBreadcrumbItem
         maxWidth={this.widthForItemIndex(index)}
@@ -89,33 +108,41 @@ class Breadcrumb extends React.Component {
     )
   }
 
+  renderMyCollection = () => {
+    const { record } = this.props
+    if (!record.inMyCollection) return ''
+    return this.breadcrumbItem(['collections', 'homepage', 'My Collection'])
+  }
+
   renderItems = () => {
-    const { items } = this.props
-    const links = items.map((item, index) =>
-      this.breadcrumbItem(item, index + 1)
-    )
+    const { record } = this.props
+    const links = record.breadcrumb.map(item => this.breadcrumbItem(item))
     return (
       <StyledBreadcrumbWrapper>
-        <StyledBreadcrumbItem
-          maxWidth={this.widthForItemIndex(0)}
-          key="myCollection"
-        >
-          <Link to={routingStore.pathTo('homepage')}>My Collection</Link>
-        </StyledBreadcrumbItem>
+        {this.renderMyCollection()}
         {links}
       </StyledBreadcrumbWrapper>
     )
   }
 
   render() {
-    const { items } = this.props
-    if (items.length > 0) return this.renderItems()
+    const { record, isHomepage } = this.props
+    const { inMyCollection, breadcrumb } = record
+    if (
+      !isHomepage &&
+      // wait until we load this value before rendering
+      inMyCollection !== null &&
+      breadcrumb &&
+      breadcrumb.length > 0
+    )
+      return this.renderItems()
     return <BreadcrumbPadding />
   }
 }
 
 Breadcrumb.propTypes = {
-  items: MobxPropTypes.arrayOrObservableArray.isRequired,
+  record: MobxPropTypes.objectOrObservableObject.isRequired,
+  isHomepage: PropTypes.bool.isRequired,
 }
 
 export default Breadcrumb

@@ -25,7 +25,6 @@ class Collection < ApplicationRecord
   # callbacks
   after_commit :touch_related_cards, if: :saved_change_to_updated_at?, unless: :destroyed?
   after_commit :reindex_sync, on: :create
-  after_commit :recalculate_child_breadcrumbs_async, if: :saved_change_to_name?, unless: :destroyed?
   after_commit :update_comment_thread_in_firestore, unless: :destroyed?
 
   # all cards including archived (i.e. undo default :collection_cards scope)
@@ -257,6 +256,8 @@ class Collection < ApplicationRecord
     c.reload
   end
 
+  # NOTE: this refers to the first level of children
+  # i.e. things directly in this collection
   def children
     (items + collections)
   end
@@ -298,6 +299,7 @@ class Collection < ApplicationRecord
     BreadcrumbRecalculationWorker.perform_async(id)
   end
 
+  # Cards are explicitly passed in when moving them from another collection to this one
   def recalculate_child_breadcrumbs(cards = collection_cards)
     cards.each do |card|
       next if card.link?
@@ -305,7 +307,9 @@ class Collection < ApplicationRecord
         # have to reload in order to pick up new parent relationship
         card.item.reload.recalculate_breadcrumb!
       elsif card.collection_id.present?
-        BreadcrumbRecalculationWorker.perform_async(card.collection_id)
+        BreadcrumbRecalculationWorker.perform_async(
+          card.collection.id,
+        )
       end
     end
   end
@@ -422,6 +426,29 @@ class Collection < ApplicationRecord
 
   def test_collection?
     is_a?(Collection::TestCollection) || is_a?(Collection::TestDesign)
+  end
+
+  def mark_as_processing(processing: true, processing_message: nil)
+    update(
+      processing: processing,
+      processing_message: processing_message,
+    )
+
+    processing_done unless processing
+  end
+
+  def mark_children_as_processing(processing: true, processing_message: nil)
+    # also mark self
+    mark_as_processing(processing: processing, processing_message: processing_message)
+    collections = Collection.in_collection(self)
+    collections.update_all(
+      processing: processing,
+      processing_message: processing_message,
+      updated_at: Time.now,
+    )
+
+    # Broadcast that this collection is no longer being edited
+    collections.each(&:processing_done) unless processing
   end
 
   private
