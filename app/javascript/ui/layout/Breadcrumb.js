@@ -81,11 +81,7 @@ class Breadcrumb extends React.Component {
     return `${(1 / numItems) * 100}%`
   }
 
-  truncateToEllipses = index => {
-    if (numItems < TruncateIfGreaterThanOrEqualTo) return false
-    if (index > 0 && index < numItems - 1) return true
-    return false
-  }
+  truncateToEllipses = index => false
 
   breadcrumbItem = item => {
     const [klass, id, name] = item
@@ -97,33 +93,22 @@ class Breadcrumb extends React.Component {
     }
     return (
       <StyledBreadcrumbItem
-        maxWidth={this.widthForItemIndex(index)}
+        maxWidth={this.widthForItem(item)}
         key={path}
         data-cy="Breadcrumb"
       >
         <Tooltip classes={{ tooltip: 'Tooltip' }} title={name} placement="top">
-          <Link to={path}>{ellipses ? '...' : name}</Link>
+          <Link to={path}>{name}</Link>
         </Tooltip>
       </StyledBreadcrumbItem>
     )
   }
 
-  renderMyCollection = () => {
-    const { record } = this.props
-    if (!record.inMyCollection) return ''
-    return this.breadcrumbItem(['collections', 'homepage', 'My Collection'])
-  }
-
-  renderItems = () => {
-    const { record } = this.props
-    const links = record.breadcrumb.map(item => this.breadcrumbItem(item))
-    return (
-      <StyledBreadcrumbWrapper>
-        {this.renderMyCollection()}
-        {links}
-      </StyledBreadcrumbWrapper>
-    )
-  }
+  renderItems = () => (
+    <StyledBreadcrumbWrapper>
+      {this.items.map(item => this.breadcrumbItem(item))}
+    </StyledBreadcrumbWrapper>
+  )
 
   render() {
     const { record, isHomepage } = this.props
