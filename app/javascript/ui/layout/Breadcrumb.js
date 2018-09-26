@@ -2,6 +2,7 @@ import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 import { Link } from 'react-router-dom'
 
+import Tooltip from '~/ui/global/Tooltip'
 import { routingStore } from '~/stores'
 import v from '~/utils/variables'
 
@@ -10,63 +11,99 @@ const BreadcrumbPadding = styled.div`
 `
 BreadcrumbPadding.displayName = 'BreadcrumbPadding'
 
-const StyledBreadcrumb = styled.div`
+const StyledBreadcrumbWrapper = styled.div`
   margin-top: 0.5rem;
   height: 1.2rem;
   white-space: nowrap; /* better this way for responsive? */
-  .crumb {
-    display: inline-block;
-    line-height: 1;
-    font-size: 1rem;
-    margin-right: 0.5rem;
-    font-weight: ${v.weights.book};
-    color: ${v.colors.cloudy};
-    letter-spacing: 1.1px;
-    font-family: ${v.fonts.sans};
+`
+StyledBreadcrumbWrapper.displayName = 'StyledBreadcrumb'
 
-    &::after {
-      position: relative;
-      top: -2px;
-      content: ' > ';
-    }
-    &:last-child::after {
-      content: '';
-    }
-    a {
-      color: ${v.colors.cloudy};
-      text-decoration: none;
-      display: inline-block;
-      max-width: 200px;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
+const StyledBreadcrumbItem = styled.div`
+  display: inline-block;
+  line-height: 1;
+  font-size: 1rem;
+  margin-right: 0.5rem;
+  font-weight: ${v.weights.book};
+  color: ${v.colors.cloudy};
+  letter-spacing: 1.1px;
+  font-family: ${v.fonts.sans};
+  max-width: ${props => props.maxWidth};
+  overflow: hidden;
+  text-overflow: ellipsis;
+
+  &::after {
+    position: relative;
+    top: -2px;
+    content: ' > ';
+  }
+  &:last-child::after {
+    content: '';
+  }
+  a {
+    color: ${v.colors.cloudy};
+    text-decoration: none;
+    display: inline-block;
   }
 `
 
-StyledBreadcrumb.displayName = 'StyledBreadcrumb'
+const TruncateIfGreaterThanOrEqualTo = 3
 
 @observer
 class Breadcrumb extends React.Component {
-  breadcrumbItem = item => {
+  widthForItemIndex = index => {
+    // "My collection" makes it the actual length
+    const numItems = this.props.items.length + 1
+    // If in the middle of the breadcrumb, make it tiny
+    if (numItems >= TruncateIfGreaterThanOrEqualTo) {
+      if (this.truncateToEllipses(index)) {
+        return '20px'
+      }
+      return '25%'
+    }
+    // Otherwise set percent width
+    return `${(1 / numItems) * 100}%`
+  }
+
+  truncateToEllipses = index => {
+    const numItems = this.props.items.length
+    if (numItems < TruncateIfGreaterThanOrEqualTo) return false
+    if (index > 0 && index < numItems - 1) return true
+    return false
+  }
+
+  breadcrumbItem = (item, index) => {
     const [klass, id, name] = item
     const path = routingStore.pathTo(klass, id)
+    const ellipses = this.truncateToEllipses(index)
+    console.log(index, this.widthForItemIndex(index))
     return (
-      <span className="crumb" key={path} data-cy="Breadcrumb">
-        <Link to={path}>{name}</Link>
-      </span>
+      <StyledBreadcrumbItem
+        maxWidth={this.widthForItemIndex(index)}
+        key={path}
+        data-cy="Breadcrumb"
+      >
+        <Tooltip classes={{ tooltip: 'Tooltip' }} title={name} placement="top">
+          <Link to={path}>{ellipses ? '...' : name}</Link>
+        </Tooltip>
+      </StyledBreadcrumbItem>
     )
   }
 
   renderItems = () => {
     const { items } = this.props
-    const links = items.map(item => this.breadcrumbItem(item))
+    const links = items.map((item, index) =>
+      this.breadcrumbItem(item, index + 1)
+    )
     return (
-      <StyledBreadcrumb>
-        <span className="crumb" key="myCollection">
+      <StyledBreadcrumbWrapper>
+        <StyledBreadcrumbItem
+          maxWidth={this.widthForItemIndex(0)}
+          key="myCollection"
+        >
           <Link to={routingStore.pathTo('homepage')}>My Collection</Link>
-        </span>
+        </StyledBreadcrumbItem>
         {links}
-      </StyledBreadcrumb>
+      </StyledBreadcrumbWrapper>
     )
   }
 
