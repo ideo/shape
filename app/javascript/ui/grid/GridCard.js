@@ -77,7 +77,13 @@ class GridCard extends React.Component {
     if (this.isItem) {
       switch (record.type) {
         case ITEM_TYPES.TEXT:
-          return <TextItemCover item={record} height={height} />
+          return (
+            <TextItemCover
+              item={record}
+              height={height}
+              dragging={this.props.dragging}
+            />
+          )
         case ITEM_TYPES.FILE: {
           if (record.filestack_file.mimetype === 'application/pdf') {
             return <PdfFileItemCover item={record} />

@@ -30,6 +30,13 @@ const AppWrapper = styled.div`
     `
     filter: blur(10px);
   `};
+  ${props =>
+    props.disableSelect &&
+    `
+    *::selection {
+      background: transparent;
+    }
+  `};
 `
 AppWrapper.displayName = 'AppWrapper'
 
@@ -67,7 +74,7 @@ class Routes extends React.Component {
   }
 
   render() {
-    const { apiStore, routingStore } = this.props
+    const { apiStore, routingStore, uiStore } = this.props
     if (!apiStore.currentUser) {
       return <Loader />
     }
@@ -75,8 +82,14 @@ class Routes extends React.Component {
       !apiStore.currentUser.terms_accepted &&
       !routingStore.pathContains('/terms')
 
+    const { dragging } = uiStore
+
     return (
-      <AppWrapper blur={displayTermsPopup} id="AppWrapper">
+      <AppWrapper
+        blur={displayTermsPopup}
+        disableSelect={dragging}
+        id="AppWrapper"
+      >
         <ErrorBoundary>
           <MuiThemeProvider theme={MuiTheme}>
             {/* Global components are rendered here */}

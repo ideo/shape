@@ -74,12 +74,12 @@ export default {
   zIndex: {
     aboveClickWrapper: 501,
     clickWrapper: 500,
+    cardDragging: 250,
     activityLog: 201,
     popoutMenu: 201,
     globalHeader: 200,
     pageHeader: 199,
     scrollIndicator: 200,
-    cardDragging: 160,
     gridCard: 150,
     gridCardTop: 151,
     commentMentions: 100,

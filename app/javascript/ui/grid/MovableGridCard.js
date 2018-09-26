@@ -32,13 +32,15 @@ const StyledResizeIcon = styled.div`
 `
 
 const StyledCardWrapper = styled.div`
+  z-index: ${props => (props.dragging ? v.zIndex.cardDragging : 0)};
   /* this is for both the ResizeIcon (in this component) and CardMenu (in GridCard) */
   .show-on-hover {
     opacity: 0;
     transition: opacity 0.25s;
   }
   &:hover {
-    z-index: ${v.zIndex.gridCard};
+    z-index: ${props =>
+      props.dragging ? v.zIndex.cardDragging : v.zIndex.gridCard};
   }
   &:hover,
   &.touch-device {
@@ -47,21 +49,33 @@ const StyledCardWrapper = styled.div`
       opacity: ${props => (props.dragging ? 0 : 1)};
     }
   }
-  z-index: ${props => (props.dragging ? v.zIndex.cardDragging + 1 : 0)};
 `
 
 const cardCSSTransition = 'transform 0.4s, width 0.25s, height 0.25s'
 
 class MovableGridCard extends React.PureComponent {
-  state = {
-    timeoutId: null,
-    // this is really just used so that it will reset when you finish dragging
-    dragging: false,
-    resizing: false,
-    moveComplete: true,
-    // track where on the page the mouse position is, e.g. if browser is stretched wide
-    initialOffsetX: 0,
-    initialOffsetY: 0,
+  constructor(props) {
+    super(props)
+    this.state = {
+      timeoutId: null,
+      // this is really just used so that it will reset when you finish dragging
+      dragging: false,
+      resizing: false,
+      moveComplete: true,
+      // track where on the page the mouse position is, e.g. if browser is stretched wide
+      initialOffsetX: 0,
+      initialOffsetY: 0,
+      x: props.position.xPos,
+      y: props.position.yPos,
+    }
+  }
+
+  componentWillReceiveProps({ position }) {
+    if (this.state.dragging) return
+    this.setState({
+      x: position.xPos,
+      y: position.yPos,
+    })
   }
 
   componentWillUnmount() {
@@ -87,23 +101,29 @@ class MovableGridCard extends React.PureComponent {
     })
   }
 
-  scrollUp = timestamp => {
+  scrollUp = (timestamp, clientY) => {
+    if (clientY) this.clientY = clientY
     if (!this.scrolling) return null
     if (window.scrollY < 10) {
-      this.rnd.updatePosition({
-        y: window.scrollY,
-      })
+      // this.rnd.updatePosition({
+      //   y: 0,
+      // })
       return window.requestAnimationFrame(this.scrollUp)
     }
-    const scrollAmount = (this.relativeCursorPosition.y - this.scrollY) * 0.05
+    // const scrollAmount = (this.relativeCursorPosition.y - this.scrollY) * 0.05
+    const scrollAmount = 1
 
     window.scrollBy(0, -scrollAmount)
     this.scrollingY -= scrollAmount
 
     const { position } = this.props
-    this.rnd.updatePosition({
-      y: window.scrollY,
-    })
+    // this.rnd.updatePosition({
+    //   y: window.scrollY - (this.clientY - 200 || 0),
+    // })
+    // console.log('setting', this.state.y - scrollAmount)
+    // this.setState({
+    //   y: this.state.y - scrollAmount,
+    // })
     this.dragPosition.dragY = this.scrollingY + position.height / 2
 
     return window.requestAnimationFrame(this.scrollUp)
@@ -114,26 +134,32 @@ class MovableGridCard extends React.PureComponent {
     const { position } = this.props
     const bottomPos = window.innerHeight + window.scrollY - 188
     if (window.innerHeight + window.scrollY >= document.body.offsetHeight) {
-      this.rnd.updatePosition({
-        y: bottomPos + position.height + 5,
-      })
+      // this.rnd.updatePosition({
+      //   y: bottomPos + position.height + 5,
+      // })
       return window.requestAnimationFrame(this.scrollDown)
     }
-    const scrollAmount = (this.scrollY - this.relativeCursorPosition.y) * 0.05
+    // const scrollAmount = (this.scrollY - this.relativeCursorPosition.y) * 0.05
+    const scrollAmount = 1
 
     window.scrollBy(0, scrollAmount)
     this.scrollingY += scrollAmount
 
-    console.log('sy', bottomPos - position.height)
-    this.rnd.updatePosition({
-      y: bottomPos - position.height,
-    })
+    // this.setState({
+    //   y: this.state.y + scrollAmount,
+    // })
+
+    // console.log('sy', bottomPos - position.height)
+    // this.rnd.updatePosition({
+    //   y: bottomPos - position.height,
+    // })
 
     return window.requestAnimationFrame(this.scrollDown)
   }
 
   handleDrag = (e, data, dX, dY) => {
     const { position } = this.props
+    const { initialOffsetX, initialOffsetY } = this.state
     // x, y represent the current drag position
     const { x, y } = data
     const relativePosition = data.node.getBoundingClientRect()
@@ -143,33 +169,44 @@ class MovableGridCard extends React.PureComponent {
     const cY = e.clientY - rect.top // y position within the element.
     this.scrollY = cY
 
-    console.log('ry', rY)
-    if (rY < 200 && cY < this.relativeCursorPosition.y) {
+    // console.log('ry', rY)
+    // console.log({ x, y })
+    if (e.clientY < 200) {
       // At top of page
       this.scrollingY = y
       this.scrolling = true
-      this.scrollUp(null, cY)
+      this.scrollUp(null, e.clientY)
     } else if (
-      rY + position.height > window.innerHeight &&
-      cY > this.relativeCursorPosition.y
+      // rY + position.height > window.innerHeight &&
+      // cY > this.relativeCursorPosition.y
+      e.clientY >
+      window.innerHeight - 200
     ) {
       // At top of page
       this.scrollingY = y
       this.scrolling = true
-      this.scrollDown(null)
+      this.scrollDown()
     } else {
       if (this.scrolling) {
-        this.rnd.updatePosition({
-          x: e.clientX,
-          y: e.clientY,
-        })
+        // this.rnd.updatePosition({
+        //   x: e.clientX,
+        //   y: e.clientY,
+        // })
       }
       this.scrolling = false
     }
+
     // don't consider it to be "dragging" unless you've moved >10 px
     if (Math.abs(x - position.xPos) + Math.abs(y - position.yPos) < 10) {
       return
     }
+    const cardX = e.pageX - 100
+    const cardY = e.pageY - 200
+    this.setState({
+      x: cardX - position.width / 2,
+      y: cardY - position.height / 2,
+    })
+
     if (!this.state.dragging) {
       uiStore.resetSelectionAndBCT()
       // close the MoveMenu to prevent weird behaviors
@@ -181,28 +218,32 @@ class MovableGridCard extends React.PureComponent {
       })
     }
     const dragPosition = {
-      // dragPosition indicates the x/y of the dragged element, relative to the grid
-      // divide by 2 to get center position of the card (instead of top left)
-      dragX: x + position.width / 2,
-      dragY: y + position.height / 2,
+      dragX: cardX,
+      dragY: cardY,
       ...position,
     }
+
     this.dragPosition = dragPosition
     this.props.onDrag(this.props.card.id, dragPosition)
   }
 
   handleStop = ev => {
+    const { position } = this.props
     this.scrolling = false
     document.body.style['overflow-y'] = 'auto'
     this.props.onDragOrResizeStop(this.props.card.id)
     this.setState({ dragging: false, resizing: false })
     const timeoutId = setTimeout(() => {
       // have this item remain "on top" while it animates back
-      this.setState({ moveComplete: true })
-      uiStore.stopDragging()
+      this.setState({
+        moveComplete: true,
+      })
       this.scrolling = false
     }, 350)
-    this.setState({ timeoutId })
+    uiStore.stopDragging()
+    this.setState({
+      timeoutId,
+    })
     this.scrolling = false
   }
 
@@ -353,7 +394,7 @@ class MovableGridCard extends React.PureComponent {
       position: { width },
     } = this.props
 
-    const { dragging, resizing, moveComplete } = this.state
+    const { dragging, resizing, moveComplete, x, y } = this.state
 
     if (cardType === 'placeholder') {
       return this.renderPlaceholder()
@@ -427,9 +468,10 @@ class MovableGridCard extends React.PureComponent {
           minHeight={minHeight}
           maxWidth={maxWidth}
           maxHeight={maxHeight}
+          dragAxis="none"
           cancel=".no-drag"
           size={{ width, height }}
-          position={{ x: xPos, y: yPos }}
+          position={{ x, y }}
           default={{ width, height, x: xPos, y: yPos }}
           disableDragging={
             !canEditCollection ||
