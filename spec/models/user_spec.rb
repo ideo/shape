@@ -437,7 +437,7 @@ describe User, type: :model do
     end
   end
 
-  describe '#in_my_collection', only: true do
+  describe '#in_my_collection' do
     let(:user_collection) { create(:user_collection) }
     let(:card_in_collection) { create(:collection_card_collection, parent: user_collection) }
     let(:link_in_collection) { create(:collection_card_link_collection, parent: user_collection) }

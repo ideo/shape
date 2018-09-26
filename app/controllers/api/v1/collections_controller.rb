@@ -23,7 +23,7 @@ class Api::V1::CollectionsController < Api::V1::BaseController
     )
 
     if builder.call
-      render jsonapi: builder.collection
+      render jsonapi: builder.collection, expose: { current_record: builder.collection }
     else
       render_api_errors builder.errors
     end

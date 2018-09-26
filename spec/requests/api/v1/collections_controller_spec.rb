@@ -88,7 +88,7 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
 
       it 'matches Item schema' do
         get(path)
-        expect(items_json.first['attributes']).to match_json_schema('item')
+        expect(items_json.first['attributes']).to match_json_schema('item', strict: false)
       end
 
       it 'includes viewers' do
@@ -125,7 +125,7 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
 
       it 'matches Collection schema' do
         get(path)
-        expect(collections_json.first['attributes']).to match_json_schema('collection')
+        expect(collections_json.first['attributes']).to match_json_schema('collection', strict: false)
       end
     end
   end
