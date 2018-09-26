@@ -1,0 +1,6 @@
+{
+  "type": "object",
+  "properties": {
+    "session_uid": { "type": "string" }
+  }
+}

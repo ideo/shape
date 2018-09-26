@@ -1,18 +1,32 @@
 /* global Then */
 
 Then('I should see a collection card named {string}', name => {
-  cy.locate('CollectionCover')
-    .contains(name)
+  cy.locateWith('CollectionCover', name)
     .last()
     .should('be.visible')
 })
 
 Then('I should see {string} in a {string}', (text, el) => {
-  cy.locate(el).should('contain', text)
+  cy.locateWith(el, text).should('be.visible')
 })
 
 Then('I should see the element {string}', el => {
   cy.locate(el).should('be.visible')
+})
+
+Then('I should see a {string} styled component', selector => {
+  cy.locateClass(selector).should('be.visible')
+})
+
+Then(
+  'I should see {string} in a {string} styled component',
+  (text, selector) => {
+    cy.locateWithClass(selector, text).should('be.visible')
+  }
+)
+
+Then('I should see {string} in a {string}', (text, selector) => {
+  cy.locateWith(selector, text).should('be.visible')
 })
 
 Then('the URL should match the captured URL', () => {

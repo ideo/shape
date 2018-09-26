@@ -3,15 +3,36 @@
 cd "$(dirname "$0")"
 DIR=$(pwd)
 
-$DIR/script/dev-setup
+# Usage: `./dev.sh [-e editor] [-s]`
+#  [-e editor] will open using your preferred editor
+#  [-s] will run all setup (bundle, yarn, db:migrate)
+
+EDITOR=${1:-atom}
+while [ "$1" != "" ]; do
+    case $1 in
+        -e | --editor )   shift
+                          EDITOR=${1:-atom}
+                          ;;
+        -s | --setup )    SETUP=${1:-false}
+                          ;;
+    esac
+    shift
+done
+
+if [ $SETUP ]; then
+  $DIR/script/dev-setup
+fi
 
 if ! [ -x "$(command -v ttab)" ]; then
   echo 'Error: ttab is not installed. See: https://www.npmjs.com/package/ttab' >&2
-  exit 1
+  echo 'using `heroku local -f Procfile.development`'
+  heroku local -f Procfile.development
+else
+  # echo 'Starting heroku local to run webpack-dev-server...'
+  ttab heroku local webpack -f Procfile.development
+  ttab heroku local worker -f Procfile.development
+  # echo 'Running rails server...'
+  ttab bin/rails server
+  # echo 'Opening code editor...'
+  ttab "$EDITOR . && open http://localhost:3000"
 fi
-# echo 'Running rails server...'
-ttab bin/rails server
-# echo 'Starting heroku local to run webpack-dev-server...'
-ttab heroku local webpack,worker -f Procfile.development
-# echo 'Opening atom...'
-ttab 'atom . && open http://localhost:3000'

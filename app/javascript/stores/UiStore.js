@@ -82,8 +82,16 @@ export default class UiStore {
     fadeOutTime: undefined,
     onClose: () => this.closeDialog(),
   }
+  defaultSnackbarProps = {
+    open: false,
+    autoHideDuration: 3500,
+    message: '',
+    onClose: () => this.closeSnackbar(),
+  }
   @observable
   dialogConfig = { ...this.defaultDialogProps }
+  @observable
+  snackbarConfig = { ...this.defaultSnackbarProps }
   @observable
   blurContent = false
   @observable
@@ -167,6 +175,22 @@ export default class UiStore {
   @action
   closeDialog() {
     this.dialogConfig.open = null
+  }
+
+  @action
+  popupSnackbar(props = {}) {
+    _.assign(this.snackbarConfig, {
+      ...this.defaultSnackbarProps,
+      open: true,
+      ...props,
+    })
+  }
+
+  @action
+  closeSnackbar() {
+    _.assign(this.snackbarConfig, {
+      ...this.defaultSnackbarProps,
+    })
   }
 
   // default action for updating any basic UiStore value

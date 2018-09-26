@@ -10,6 +10,7 @@ class Activity < ApplicationRecord
            source: :subject,
            source_type: 'Group'
 
+  # possible target types: Item, Collection, Group
   belongs_to :target, polymorphic: true
   has_many :notifications, dependent: :destroy
   belongs_to :organization

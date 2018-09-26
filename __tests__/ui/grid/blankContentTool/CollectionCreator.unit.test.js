@@ -69,5 +69,33 @@ describe('MovableGridCard', () => {
         )
       })
     })
+
+    describe('with TestCollection', () => {
+      beforeEach(() => {
+        props.type = 'testCollection'
+        props.createCard.mockClear()
+        wrapper = shallow(<CollectionCreator {...props} />)
+        component = wrapper.instance()
+      })
+
+      it('calls createCard with input name', () => {
+        component.state = {
+          inputText: 'My New Test',
+        }
+        component.createCollection(e)
+        expect(props.createCard).toHaveBeenCalledWith(
+          {
+            collection_attributes: {
+              name: component.state.inputText,
+              master_template: false,
+              type: 'Collection::TestCollection',
+            },
+          },
+          {
+            afterCreate: null,
+          }
+        )
+      })
+    })
   })
 })

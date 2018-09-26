@@ -7,22 +7,12 @@ import InlineLoader from '~/ui/layout/InlineLoader'
 import MoveArrowIcon from '~/ui/icons/MoveArrowIcon'
 import MoveHelperModal from '~/ui/users/MoveHelperModal'
 import Tooltip from '~/ui/global/Tooltip'
-import v from '~/utils/variables'
 import {
   StyledSnackbar,
   StyledSnackbarContent,
   SnackbarBackground,
+  StyledSnackbarText,
 } from '~/ui/global/styled/material-ui'
-
-// This text is different from other typography
-const StyledMoveText = styled.span`
-  text-transform: uppercase;
-  font-family: ${v.fonts.sans};
-  font-size: 1rem;
-  font-weight: ${v.weights.book};
-  letter-spacing: 0.1rem;
-  color: white;
-`
 
 const IconHolder = styled.span`
   margin-left: 40px;
@@ -231,9 +221,9 @@ class MoveModal extends React.Component {
                 <StyledSnackbarContent
                   classes={{ root: 'SnackbarContent' }}
                   message={
-                    <StyledMoveText id="message-id">
+                    <StyledSnackbarText id="message-id">
                       {this.moveMessage}
-                    </StyledMoveText>
+                    </StyledSnackbarText>
                   }
                   action={[
                     <IconHolder key="moveup">

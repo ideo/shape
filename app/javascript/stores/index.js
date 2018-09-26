@@ -1,4 +1,5 @@
-// cypress needs this polyfill
+// cypress + datx needs this fetch polyfill because of the Cypress.on('window:before:load') bug
+// (see cypress/support/commands.js)
 import 'whatwg-fetch'
 import { config } from 'datx-jsonapi'
 

@@ -1,22 +1,24 @@
 /* global Given */
 
-// NOTE: all steps assume the beforeEach -> login has already happened
-Given('I visit My Collection', () => {
-  // go to My Collection
+Given('I visit the Marketing Page', () => {
+  // don't login
   cy.visit('/')
 })
 
-Given('I visit the Test Area', () => {
+Given('I login and visit My Collection', () => {
+  cy.login({ userId: 1 })
   // go to My Collection
   cy.visit('/')
+  cy.wait('@apiGetCurrentUser')
+})
+
+Given('I login and visit the Test Area', () => {
+  cy.login({ userId: 1 })
+  // go to My Collection
+  cy.visit('/')
+  cy.wait('@apiGetCurrentUser')
   // navigate into collection
-  cy.locate('CollectionCover')
-    .contains('Cypress Test Area')
+  cy.locateWith('CollectionCover', 'Cypress Test Area')
     .last()
     .click()
-})
-
-Given('I logout and visit the Marketing Page', () => {
-  cy.logout()
-  cy.visit('/')
 })
