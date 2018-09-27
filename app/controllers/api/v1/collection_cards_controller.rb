@@ -65,11 +65,10 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
 
   def unarchive
     @collection = Collection.find(json_api_params[:collection_snapshot][:id])
-    snapshot = json_api_params[:collection_snapshot].require(:attributes).permit(collection_cards_attributes: %i[id order width height])
-    @collection.unarchive_cards!(@collection_cards, snapshot)
+    @collection.unarchive_cards!(@collection_cards, collection_snapshot_params)
     render jsonapi: @collection.reload,
            include: Collection.default_relationships_for_api
-end
+  end
 
   before_action :load_and_authorize_replacing_card, only: %i[replace]
   after_action :broadcast_replacing_updates, only: %i[replace]
@@ -240,6 +239,12 @@ end
       :width,
       :height,
       :image_contain,
+    )
+  end
+
+  def collection_snapshot_params
+    json_api_params[:collection_snapshot].require(:attributes).permit(
+      collection_cards_attributes: %i[id order width height],
     )
   end
 

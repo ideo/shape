@@ -245,6 +245,59 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
     end
   end
 
+  describe 'PATCH #unarchive' do
+    let!(:collection_cards) { create_list(:collection_card_collection, 3, parent: collection) }
+    let(:path) { '/api/v1/collection_cards/unarchive' }
+    let(:raw_params) do
+      {
+        card_ids: collection_cards.map(&:id),
+        collection_snapshot: {
+          id: collection.id,
+          attributes: {
+            collection_cards_attributes: collection_cards.map do |card|
+              { id: card.id, order: 0, width: 2, height: 1 }
+            end,
+          },
+        },
+      }
+    end
+    let(:params) { raw_params.to_json }
+
+    context 'with record edit access' do
+      before do
+        collection_cards.each do |card|
+          user.add_role(Role::EDITOR, card.collection)
+        end
+        allow(Collection).to receive(:find).and_return(collection)
+      end
+
+      it 'returns a 200' do
+        patch(path, params: params)
+        expect(response.status).to eq(200)
+      end
+
+      it 'calls unarchive_cards on the collection' do
+        expect(collection).to receive(:unarchive_cards!)
+        patch(path, params: params)
+      end
+
+      it 'broadcasts collection updates' do
+        expect(CollectionUpdateBroadcaster).to receive(:call).with(
+          collection,
+          user,
+        )
+        patch(path, params: params)
+      end
+    end
+
+    context 'without record edit access' do
+      it 'returns a 401' do
+        patch(path, params: params)
+        expect(response.status).to eq(401)
+      end
+    end
+  end
+
   describe 'PATCH #move' do
     let!(:from_collection) do
       create(:collection, organization: to_collection.organization, num_cards: 3, add_editors: [user])
