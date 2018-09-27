@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 import { Link } from 'react-router-dom'
-import { round, sumBy } from 'lodash'
+import { floor, round, sumBy } from 'lodash'
 
 import { apiStore, routingStore } from '~/stores'
 import Tooltip from '~/ui/global/Tooltip'
@@ -17,13 +17,14 @@ BreadcrumbPadding.displayName = 'BreadcrumbPadding'
 const StyledBreadcrumbWrapper = styled.div`
   margin-top: 0.5rem;
   height: 1.2rem;
-  white-space: nowrap; /* better this way for responsive? */
+  white-space: nowrap;
   line-height: 1;
   font-size: 1rem;
   font-family: ${v.fonts.sans};
   font-weight: ${v.weights.book};
   color: ${v.colors.cloudy};
   letter-spacing: 1.1px;
+  width: 80%;
 `
 StyledBreadcrumbWrapper.displayName = 'StyledBreadcrumb'
 
@@ -38,9 +39,6 @@ const StyledBreadcrumbCaret = styled.div`
 
 const StyledBreadcrumbItem = styled.div`
   display: inline-block;
-
-  overflow: hidden;
-  text-overflow: ellipsis;
   a {
     color: ${v.colors.cloudy};
     text-decoration: none;
@@ -52,8 +50,9 @@ const StyledBreadcrumbItem = styled.div`
 class Breadcrumb extends React.Component {
   constructor(props) {
     super(props)
+    this.breadcrumbWrapper = React.createRef()
     this.state = {
-      width: window.innerWidth,
+      maxChars: 80,
     }
   }
 
@@ -66,6 +65,7 @@ class Breadcrumb extends React.Component {
     if (isHomepage) return
     // this will set record.inMyCollection = true/false
     apiStore.checkInMyCollection(record)
+    this.handleWindowSizeChange()
   }
 
   componentWillUnmount = () => {
@@ -73,14 +73,10 @@ class Breadcrumb extends React.Component {
   }
 
   handleWindowSizeChange = () => {
-    this.setState({ width: window.innerWidth })
-  }
-
-  truncateIfGreaterThanChars = () => {
-    const { width } = this.state
-    const isMobile = width <= v.responsive.smallBreakpoint
-    if (isMobile) return 15
-    return 75
+    if (!this.breadcrumbWrapper || !this.breadcrumbWrapper.current) return
+    const width = this.breadcrumbWrapper.current.offsetWidth
+    // roughly .06 characters per pixel
+    this.setState({ maxChars: round(width * 0.06) })
   }
 
   items = () => {
@@ -91,7 +87,6 @@ class Breadcrumb extends React.Component {
         klass: 'collections',
         id: 'homepage',
         name: 'My Collection',
-        truncatedName: 'My Collection',
         ellipses: false,
       })
     }
@@ -100,44 +95,35 @@ class Breadcrumb extends React.Component {
         klass: item[0],
         id: item[1],
         name: item[2],
-        truncatedName: item[2],
         ellipses: false,
       })
     )
     return items
   }
 
-  totalTruncatedCharNames = items =>
-    sumBy(items, item => item.truncatedName.length)
-
-  truncationNeeded = items =>
-    this.totalTruncatedCharNames(items) > this.truncateIfGreaterThanChars()
+  totalTruncatedCharNames = items => sumBy(items, item => item.name.length)
 
   truncateItems = items => {
-    if (!this.truncationNeeded(items)) return items
-
-    // First do a pass and truncate down to 25 chars to see if we can reduce enough
-    items.forEach(item => {
-      if (item.name.length > 25)
-        item.truncatedName = `${item.name.slice(0, 24)}...`
-    })
-
     let charsToTruncate =
-      this.totalTruncatedCharNames(items) - this.truncateIfGreaterThanChars()
+      this.totalTruncatedCharNames(items) - this.state.maxChars
+
+    console.log('chars to truncate', charsToTruncate)
 
     if (charsToTruncate <= 0) return items
 
-    // If we're still too long, choose to move some names to only
-    // show ... in place of their name
+    // Item names are too long, show ... in place of their name
+    // Start at the midpoint, floor-ing to favor adding ellipses farther up the breadcrumb
+    let index = floor((items.length - 1) / 2)
+
+    // If event number of items, increment index first,
+    // otherwise if odd, decrement first
+    let increment = items.length % 2 === 0
     let jumpBy = 1
-    let increment = true
-    // Start at the midpoint
-    let index = round(items.length / 2) - 1
     while (charsToTruncate > 0) {
       // Continue marking for truncation until we reduce it to be short enough
       items[index].ellipses = true
-      // Subtract this item from chars to truncate (adding in 3 for ... chars)
-      charsToTruncate -= items[index].truncatedName.length + 3
+      // Subtract this item from chars to truncate (adding in 2 for ... chars)
+      charsToTruncate -= items[index].name.length + 2
       // Traverse on either side of midpoint
       index = increment ? index + jumpBy : index - jumpBy
       jumpBy += 1
@@ -149,29 +135,26 @@ class Breadcrumb extends React.Component {
   breadcrumbItem = (item, index) => {
     const numItems = this.items().length
     const showCaret = index < numItems - 1
-    let path, maxWidth
+    let path
     if (item.id === 'homepage') {
       path = routingStore.pathTo('homepage')
     } else {
       path = routingStore.pathTo(item.klass, item.id)
     }
-    if (item.ellipses) {
-      // If it marked for ellipses truncation, make it tiny
-      maxWidth = '35px'
-    } else {
-      // Otherwise set percent width
-      maxWidth = `${(1 / numItems) * 100}%`
-    }
     return (
       <Fragment key={path}>
-        <StyledBreadcrumbItem maxWidth={maxWidth} data-cy="Breadcrumb">
-          <Tooltip
-            classes={{ tooltip: 'Tooltip' }}
-            title={item.name}
-            placement="top"
-          >
-            <Link to={path}>{item.ellipses ? '...' : item.truncatedName}</Link>
-          </Tooltip>
+        <StyledBreadcrumbItem data-cy="Breadcrumb">
+          {item.ellipses ? (
+            <Tooltip
+              classes={{ tooltip: 'Tooltip' }}
+              title={item.name}
+              placement="top"
+            >
+              <Link to={path}>...</Link>
+            </Tooltip>
+          ) : (
+            <Link to={path}>{item.name}</Link>
+          )}
         </StyledBreadcrumbItem>
         {showCaret && <StyledBreadcrumbCaret>&#62;</StyledBreadcrumbCaret>}
       </Fragment>
@@ -190,7 +173,7 @@ class Breadcrumb extends React.Component {
     ) {
       const items = this.truncateItems(this.items())
       return (
-        <StyledBreadcrumbWrapper>
+        <StyledBreadcrumbWrapper ref={this.breadcrumbWrapper}>
           {items.map((item, index) => this.breadcrumbItem(item, index))}
         </StyledBreadcrumbWrapper>
       )
