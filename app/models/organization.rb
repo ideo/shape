@@ -206,27 +206,27 @@ class Organization < ApplicationRecord
 
   # Adds all admin users for this org to the network,
   # so they can administer payment methods + invoices
-  def add_roles_to_network
-    admin_group.user_ids.each do |user_id|
-      user = User.find(user_id)
-      NetworkOrganizationUserSyncWorker.perform_async(
-        user.uid, id, NetworkApi::Organization::ADMIN_ROLE, :add
-      )
-    end
-  end
+  # def add_roles_to_network
+  #   admin_group.user_ids.each do |user_id|
+  #     user = User.find(user_id)
+  #     NetworkOrganizationUserSyncWorker.perform_async(
+  #       user.uid, id, NetworkApi::Organization::ADMIN_ROLE, :add
+  #     )
+  #   end
+  # end
 
-  def network_subscription
-    return @network_subscription if @network_subscription.present?
-    if network_subscription_id.present?
-      @network_subscription = NetworkApi::Subscription.find(
-        network_subscription_id,
-      ).first
-    else
-      @network_subscription = NetworkApi::Subscription.where(
-        organization_id: network_organization.id,
-        active: true,
-      ).first
-    end
-  end
+  # def network_subscription
+  #   return @network_subscription if @network_subscription.present?
+  #   if network_subscription_id.present?
+  #     @network_subscription = NetworkApi::Subscription.find(
+  #       network_subscription_id,
+  #     ).first
+  #   else
+  #     @network_subscription = NetworkApi::Subscription.where(
+  #       organization_id: network_organization.id,
+  #       active: true,
+  #     ).first
+  #   end
+  # end
 
 end
