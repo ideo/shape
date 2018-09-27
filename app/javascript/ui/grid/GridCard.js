@@ -243,6 +243,10 @@ class GridCard extends React.Component {
       <StyledGridCard
         dragging={dragging}
         testCollectionCard={testCollectionCard}
+        // mostly for E2E checking purposes
+        data-width={card.width}
+        data-height={card.height}
+        data-order={card.order}
       >
         {canEditCollection &&
           (!card.isPinnedAndLocked || lastPinnedCard) && (

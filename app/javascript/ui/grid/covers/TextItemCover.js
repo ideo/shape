@@ -168,6 +168,7 @@ class TextItemCover extends React.Component {
     const content = isEditing ? this.renderEditing() : this.renderDefault()
     return (
       <PaddedCardCover
+        data-cy="TextItemCover"
         style={{
           height: 'calc(100% - 30px)',
           overflowX: 'hidden',

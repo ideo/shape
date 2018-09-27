@@ -208,10 +208,10 @@ class CollectionPage extends PageWithApi {
     Collection.createSubmission(id, submissionSettings)
   }
 
-  updateCollection = () => {
-    // TODO: what if there's no collection?
-    // calling .save() will receive any API updates and sync them
-    this.collection.API_updateCards()
+  updateCollection = ({ card, updates, undoMessage } = {}) => {
+    const { collection } = this
+    // this will assign the update attrs to the card and push an undo action
+    collection.API_updateCards({ card, updates, undoMessage })
     const { uiStore } = this.props
     uiStore.trackEvent('update', this.collection)
   }

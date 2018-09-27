@@ -182,7 +182,6 @@ class CollectionGrid extends React.Component {
   }
 
   onDragOrResizeStop = () => {
-    const { collection } = this.props
     const placeholder =
       _.find(this.state.cards, { cardType: 'placeholder' }) || {}
     const original = _.find(this.state.cards, { id: placeholder.originalId })
@@ -209,17 +208,12 @@ class CollectionGrid extends React.Component {
       if (original.height !== height || original.width !== width) {
         undoMessage = 'Card resize undone'
       }
-      // this works a little differently than the typical "undo" snapshot...
-      // we snapshot the collection_cards.attributes so that they can be reverted
-      const jsonData = collection.toJsonApiWithCards()
-      collection.pushUndo({
-        snapshot: jsonData.attributes,
-        message: undoMessage,
+      // this will assign the update attributes to the card
+      this.props.updateCollection({
+        card: original,
+        updates: { order, width, height },
+        undoMessage,
       })
-      _.assign(original, { order, width, height })
-
-      // reorder cards and persist changes
-      this.props.updateCollection()
       this.positionCards(this.props.collection.collection_cards)
     } else {
       // reset back to normal
