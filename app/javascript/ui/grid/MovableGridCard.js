@@ -71,7 +71,9 @@ class MovableGridCard extends React.PureComponent {
   }
 
   componentWillReceiveProps({ position }) {
-    if (this.state.dragging) return
+    if (this.state.dragging) {
+      return
+    }
     this.setState({
       x: position.xPos,
       y: position.yPos,
@@ -231,20 +233,21 @@ class MovableGridCard extends React.PureComponent {
     const { position } = this.props
     this.scrolling = false
     document.body.style['overflow-y'] = 'auto'
-    this.props.onDragOrResizeStop(this.props.card.id)
-    this.setState({ dragging: false, resizing: false })
-    const timeoutId = setTimeout(() => {
-      // have this item remain "on top" while it animates back
+    this.setState({ dragging: false, resizing: false }, () => {
+      this.props.onDragOrResizeStop(this.props.card.id)
+      const timeoutId = setTimeout(() => {
+        // have this item remain "on top" while it animates back
+        this.setState({
+          moveComplete: true,
+        })
+        this.scrolling = false
+      }, 350)
+      uiStore.stopDragging()
       this.setState({
-        moveComplete: true,
+        timeoutId,
       })
       this.scrolling = false
-    }, 350)
-    uiStore.stopDragging()
-    this.setState({
-      timeoutId,
     })
-    this.scrolling = false
   }
 
   handleResize = (e, dir, ref, delta, position) => {
