@@ -1,8 +1,9 @@
+import PropTypes from 'prop-types'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 import { Link } from 'react-router-dom'
 
-import { routingStore } from '~/stores'
+import { apiStore, routingStore } from '~/stores'
 import v from '~/utils/variables'
 
 const BreadcrumbPadding = styled.div`
@@ -47,9 +48,21 @@ StyledBreadcrumb.displayName = 'StyledBreadcrumb'
 
 @observer
 class Breadcrumb extends React.Component {
+  componentDidMount() {
+    const { record, isHomepage } = this.props
+    if (isHomepage) return
+    // this will set record.inMyCollection = true/false
+    apiStore.checkInMyCollection(record)
+  }
+
   breadcrumbItem = item => {
     const [klass, id, name] = item
-    const path = routingStore.pathTo(klass, id)
+    let path
+    if (id === 'homepage') {
+      path = routingStore.pathTo('homepage')
+    } else {
+      path = routingStore.pathTo(klass, id)
+    }
     return (
       <span className="crumb" key={path} data-cy="Breadcrumb">
         <Link to={path}>{name}</Link>
@@ -57,28 +70,41 @@ class Breadcrumb extends React.Component {
     )
   }
 
+  renderMyCollection = () => {
+    const { record } = this.props
+    if (!record.inMyCollection) return ''
+    return this.breadcrumbItem(['collections', 'homepage', 'My Collection'])
+  }
+
   renderItems = () => {
-    const { items } = this.props
-    const links = items.map(item => this.breadcrumbItem(item))
+    const { record } = this.props
+    const links = record.breadcrumb.map(item => this.breadcrumbItem(item))
     return (
       <StyledBreadcrumb>
-        <span className="crumb" key="myCollection">
-          <Link to={routingStore.pathTo('homepage')}>My Collection</Link>
-        </span>
+        {this.renderMyCollection()}
         {links}
       </StyledBreadcrumb>
     )
   }
 
   render() {
-    const { items } = this.props
-    if (items.length > 0) return this.renderItems()
+    const { record, isHomepage } = this.props
+    const { inMyCollection, breadcrumb } = record
+    if (
+      !isHomepage &&
+      // wait until we load this value before rendering
+      inMyCollection !== null &&
+      breadcrumb &&
+      breadcrumb.length > 0
+    )
+      return this.renderItems()
     return <BreadcrumbPadding />
   }
 }
 
 Breadcrumb.propTypes = {
-  items: MobxPropTypes.arrayOrObservableArray.isRequired,
+  record: MobxPropTypes.objectOrObservableObject.isRequired,
+  isHomepage: PropTypes.bool.isRequired,
 }
 
 export default Breadcrumb

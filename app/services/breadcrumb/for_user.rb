@@ -21,14 +21,17 @@ module Breadcrumb
       end
     end
 
+    def viewable_collections
+      ids = viewable
+      Collection
+        .where(id: ids)
+        .order("position(id::text in '#{ids.join(',')}')")
+        .select(:id, :name)
+    end
+
     # Transforms collection ids into breadcrumb with collection names
     def viewable_to_api
-      ids = viewable
-      collections = Collection
-                    .where(id: ids)
-                    .order("position(id::text in '#{ids.join(',')}')")
-                    .select(:id, :name)
-      (collections + [@object]).map do |object|
+      (viewable_collections + [@object]).map do |object|
         breadcrumb_item_for_api(object)
       end
     end

@@ -41,6 +41,11 @@ class BaseRecord extends jsonapi(Model) {
     return `${this.internalType}${this.id}`
   }
 
+  // applies to items/collections
+  get breadcrumbSize() {
+    return this.breadcrumb ? this.breadcrumb.length : 0
+  }
+
   rawAttributes() {
     return modelToJsonApi(this).attributes
   }
