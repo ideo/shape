@@ -114,6 +114,9 @@ describe Organization, type: :model do
   end
 
   describe '.create_for_user' do
+    before do
+      allow_any_instance_of(Organization).to receive(:create_network_organization)
+    end
     let!(:user) { create(:user) }
     let(:organization) { Organization.create_for_user(user) }
 
