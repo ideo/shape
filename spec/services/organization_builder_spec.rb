@@ -9,18 +9,20 @@ RSpec.describe OrganizationBuilder, type: :service do
     }
   }
 
+
   describe '#save' do
     let(:builder) {
       OrganizationBuilder.new(params,
                               user)
     }
     context 'with valid params' do
-      let!(:result) { builder.save }
-      let!(:organization) { builder.organization }
-
       before do
+        allow(builder.organization).to receive(:create_network_organization)
         user.switch_to_organization(organization)
       end
+
+      let!(:result) { builder.save }
+      let!(:organization) { builder.organization }
 
       it 'should return true' do
         expect(result).to be true
@@ -43,6 +45,10 @@ RSpec.describe OrganizationBuilder, type: :service do
         expect(OrganizationTemplates).to receive(:call).with(organization)
         builder.save
         expect(user.user_profile_for_org(organization.id)).not_to be nil
+      end
+
+      it 'should create the network organization' do
+        expect(organization).to have_received(:create_network_organization).with(user)
       end
     end
 
