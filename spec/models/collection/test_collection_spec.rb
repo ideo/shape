@@ -5,6 +5,7 @@ describe Collection::TestCollection, type: :model do
 
   context 'associations' do
     it { should have_many :survey_responses }
+    it { should have_many :question_items }
   end
 
   context 'callbacks' do

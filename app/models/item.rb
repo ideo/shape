@@ -38,6 +38,8 @@ class Item < ApplicationRecord
   belongs_to :cloned_from, class_name: 'Item', optional: true
   has_one :comment_thread, as: :record, dependent: :destroy
 
+  scope :questions, -> { where(type: 'Item::QuestionItem') }
+
   before_validation :format_url, if: :saved_change_to_url?
   before_create :generate_name, unless: :name?
 

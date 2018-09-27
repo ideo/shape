@@ -1,6 +1,10 @@
 class Collection
   class TestCollection < Collection
     has_many :survey_responses, dependent: :destroy
+    has_many :question_items,
+             -> { questions },
+             source: :item,
+             through: :primary_collection_cards
 
     before_create :setup_default_status_and_questions
     after_create :add_test_tag
