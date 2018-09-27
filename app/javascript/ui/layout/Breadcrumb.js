@@ -113,7 +113,7 @@ class Breadcrumb extends React.Component {
     this.totalNameLength(items) - this.state.maxChars
 
   truncateItems = items => {
-    let charsLeftToTruncate = charsToTruncateForItems(items)
+    let charsLeftToTruncate = this.charsToTruncateForItems(items)
     // If we are within allowable number of chars, return items
     if (charsLeftToTruncate <= 0) return items
 
@@ -122,7 +122,7 @@ class Breadcrumb extends React.Component {
       if (item.name.length > 25) item.truncatedName = item.name.slice(0, 24)
     })
 
-    charsLeftToTruncate = charsToTruncateForItems(items)
+    charsLeftToTruncate = this.charsToTruncateForItems(items)
 
     if (charsLeftToTruncate <= 0) return items
 
@@ -190,16 +190,18 @@ class Breadcrumb extends React.Component {
       inMyCollection !== null &&
       breadcrumb &&
       breadcrumb.length > 0
-    // We need ref to wrapper so we must render that
+    // We need a ref to wrapper so we always render that
     // Tried using innerRef on styled component but it isn't available on mount
     return (
       <div ref={this.breadcrumbWrapper} style={{ width: '80%' }}>
-        <StyledBreadcrumbWrapper>
-          {renderItems &&
-            this.truncateItems(this.items()).map((item, index) =>
+        {isHomepage && <BreadcrumbPadding />}
+        {renderItems && (
+          <StyledBreadcrumbWrapper>
+            {this.truncateItems(this.items()).map((item, index) =>
               this.breadcrumbItem(item, index)
             )}
-        </StyledBreadcrumbWrapper>
+          </StyledBreadcrumbWrapper>
+        )}
       </div>
     )
   }
