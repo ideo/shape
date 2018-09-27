@@ -77,6 +77,8 @@ RSpec.configure do |config|
 
   config.before(:each, auth: true) do
     user = log_in_as_user
+    # don't actually create a network organization
+    allow_any_instance_of(Organization).to receive(:create_network_organization)
     # Make sure user is part of org - all permissions needs it
     Organization.create_for_user(user)
     DatabaseCleaner.strategy = :transaction
