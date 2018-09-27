@@ -56,6 +56,14 @@ class Organization < ApplicationRecord
     builder.organization
   end
 
+  # def self.update_network_organization_name(organization_id)
+  #   organization = Organization.find(organization_id)
+  #   network_organization = organization.network_organization
+  #   return unless network_organization.present?
+  #   network_organization.name = organization.name
+  #   network_organization.save
+  # end
+
   # NOTE: this method can be called many times for the same org
   def setup_user_membership_and_collections(user)
     # make sure they're on the org
@@ -148,6 +156,23 @@ class Organization < ApplicationRecord
     )
   end
 
+  def network_organization
+    @network_organization ||= NetworkApi::Organization.find_by_external_id(id)
+  end
+
+  def find_or_create_on_network(admin = nil)
+    return network_organization if network_organization.present?
+    create_network_organization(admin)
+  end
+
+  def create_network_organization(admin = nil)
+    NetworkApi::Organization.create(
+      external_id: id,
+      name: name,
+      admin_user_uid: admin.try(:uid),
+    )
+  end
+
   private
 
   def parse_domain_whitelist
@@ -178,4 +203,30 @@ class Organization < ApplicationRecord
     guest_group.update_attributes(name: guest_group_name, handle: guest_group_handle)
     admin_group.update_attributes(name: admin_group_name, handle: admin_group_handle)
   end
+
+  # Adds all admin users for this org to the network,
+  # so they can administer payment methods + invoices
+  def add_roles_to_network
+    admin_group.user_ids.each do |user_id|
+      user = User.find(user_id)
+      NetworkOrganizationUserSyncWorker.perform_async(
+        user.uid, id, NetworkApi::Organization::ADMIN_ROLE, :add
+      )
+    end
+  end
+
+  def network_subscription
+    return @network_subscription if @network_subscription.present?
+    if network_subscription_id.present?
+      @network_subscription = NetworkApi::Subscription.find(
+        network_subscription_id,
+      ).first
+    else
+      @network_subscription = NetworkApi::Subscription.where(
+        organization_id: network_organization.id,
+        active: true,
+      ).first
+    end
+  end
+
 end
