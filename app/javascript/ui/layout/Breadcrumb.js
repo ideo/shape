@@ -24,7 +24,6 @@ const StyledBreadcrumbWrapper = styled.div`
   font-weight: ${v.weights.book};
   color: ${v.colors.cloudy};
   letter-spacing: 1.1px;
-  width: 80%;
 `
 StyledBreadcrumbWrapper.displayName = 'StyledBreadcrumb'
 
@@ -73,10 +72,10 @@ class Breadcrumb extends React.Component {
   }
 
   handleWindowSizeChange = () => {
-    if (!this.breadcrumbWrapper || !this.breadcrumbWrapper.current) return
+    if (!this.breadcrumbWrapper.current) return
     const width = this.breadcrumbWrapper.current.offsetWidth
-    // roughly .06 characters per pixel
-    this.setState({ maxChars: round(width * 0.06) })
+    // roughly .075 characters per pixel
+    this.setState({ maxChars: round(width * 0.075) })
   }
 
   items = () => {
@@ -101,13 +100,11 @@ class Breadcrumb extends React.Component {
     return items
   }
 
-  totalTruncatedCharNames = items => sumBy(items, item => item.name.length)
+  totalTruncatedNameLength = items => sumBy(items, item => item.name.length)
 
   truncateItems = items => {
     let charsToTruncate =
-      this.totalTruncatedCharNames(items) - this.state.maxChars
-
-    console.log('chars to truncate', charsToTruncate)
+      this.totalTruncatedNameLength(items) - this.state.maxChars
 
     if (charsToTruncate <= 0) return items
 
@@ -120,10 +117,12 @@ class Breadcrumb extends React.Component {
     let increment = items.length % 2 === 0
     let jumpBy = 1
     while (charsToTruncate > 0) {
-      // Continue marking for truncation until we reduce it to be short enough
-      items[index].ellipses = true
-      // Subtract this item from chars to truncate (adding in 2 for ... chars)
-      charsToTruncate -= items[index].name.length + 2
+      if (items[index].name !== 'My Collection') {
+        // Continue marking for truncation until we reduce it to be short enough
+        items[index].ellipses = true
+        // Subtract this item from chars to truncate (adding in 2 for ... chars)
+        charsToTruncate -= items[index].name.length + 2
+      }
       // Traverse on either side of midpoint
       index = increment ? index + jumpBy : index - jumpBy
       jumpBy += 1
@@ -164,21 +163,24 @@ class Breadcrumb extends React.Component {
   render() {
     const { record, isHomepage } = this.props
     const { inMyCollection, breadcrumb } = record
-    if (
+    const renderItems =
       !isHomepage &&
       // wait until we load this value before rendering
       inMyCollection !== null &&
       breadcrumb &&
       breadcrumb.length > 0
-    ) {
-      const items = this.truncateItems(this.items())
-      return (
-        <StyledBreadcrumbWrapper ref={this.breadcrumbWrapper}>
-          {items.map((item, index) => this.breadcrumbItem(item, index))}
+    // We need ref to wrapper so we must render that
+    // Tried using innerRef on styled component but it isn't available on mount
+    return (
+      <div ref={this.breadcrumbWrapper} style={{ width: '80%' }}>
+        <StyledBreadcrumbWrapper>
+          {renderItems &&
+            this.truncateItems(this.items()).map((item, index) =>
+              this.breadcrumbItem(item, index)
+            )}
         </StyledBreadcrumbWrapper>
-      )
-    }
-    return <BreadcrumbPadding />
+      </div>
+    )
   }
 }
 
