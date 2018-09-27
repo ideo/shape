@@ -86,6 +86,7 @@ class Breadcrumb extends React.Component {
         klass: 'collections',
         id: 'homepage',
         name: 'My Collection',
+        truncatedName: null,
         ellipses: false,
       })
     }
@@ -94,21 +95,38 @@ class Breadcrumb extends React.Component {
         klass: item[0],
         id: item[1],
         name: item[2],
+        truncatedName: null,
         ellipses: false,
       })
     )
     return items
   }
 
-  totalTruncatedNameLength = items => sumBy(items, item => item.name.length)
+  totalNameLength = items =>
+    sumBy(
+      items,
+      item =>
+        item.truncatedName ? item.truncatedName.length : item.name.length
+    )
+
+  charsToTruncateForItems = items =>
+    this.totalNameLength(items) - this.state.maxChars
 
   truncateItems = items => {
-    let charsToTruncate =
-      this.totalTruncatedNameLength(items) - this.state.maxChars
+    let charsLeftToTruncate = charsToTruncateForItems(items)
+    // If we are within allowable number of chars, return items
+    if (charsLeftToTruncate <= 0) return items
 
-    if (charsToTruncate <= 0) return items
+    // First try truncating any long items to 25 chars
+    items.forEach(item => {
+      if (item.name.length > 25) item.truncatedName = item.name.slice(0, 24)
+    })
 
-    // Item names are too long, show ... in place of their name
+    charsLeftToTruncate = charsToTruncateForItems(items)
+
+    if (charsLeftToTruncate <= 0) return items
+
+    // Item names are still too long, show ... in place of their name
     // Start at the midpoint, floor-ing to favor adding ellipses farther up the breadcrumb
     let index = floor((items.length - 1) / 2)
 
@@ -116,12 +134,12 @@ class Breadcrumb extends React.Component {
     // otherwise if odd, decrement first
     let increment = items.length % 2 === 0
     let jumpBy = 1
-    while (charsToTruncate > 0) {
+    while (charsLeftToTruncate > 0) {
       if (items[index].name !== 'My Collection') {
         // Continue marking for truncation until we reduce it to be short enough
         items[index].ellipses = true
         // Subtract this item from chars to truncate (adding in 2 for ... chars)
-        charsToTruncate -= items[index].name.length + 2
+        charsLeftToTruncate -= items[index].name.length + 2
       }
       // Traverse on either side of midpoint
       index = increment ? index + jumpBy : index - jumpBy
@@ -143,13 +161,16 @@ class Breadcrumb extends React.Component {
     return (
       <Fragment key={path}>
         <StyledBreadcrumbItem data-cy="Breadcrumb">
-          {item.ellipses ? (
+          {item.ellipses || item.truncatedName ? (
             <Tooltip
               classes={{ tooltip: 'Tooltip' }}
               title={item.name}
               placement="top"
             >
-              <Link to={path}>...</Link>
+              <Link to={path}>
+                {item.truncatedName}
+                ...
+              </Link>
             </Tooltip>
           ) : (
             <Link to={path}>{item.name}</Link>
