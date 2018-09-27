@@ -14,7 +14,7 @@ import CollectionCard from '~/stores/jsonApi/CollectionCard'
 import SurveyResponse from '~/stores/jsonApi/SurveyResponse'
 import TrashIcon from '~/ui/icons/TrashIcon'
 import QuestionHotEdge from './QuestionHotEdge'
-import TestQuestionEditor from './TestQuestionEditor'
+import TestQuestion from './TestQuestion'
 
 const TopThing = styled.div`
   background-color: ${v.colors.gray};
@@ -230,7 +230,7 @@ class TestDesigner extends React.Component {
             >
               {editing && this.renderQuestionSelectForm(card)}
               <TestQuestionHolder editing={editing} userEditable={userEditable}>
-                <TestQuestionEditor
+                <TestQuestion
                   createSurveyResponse={this.createSurveyResponse}
                   surveyResponse={surveyResponse}
                   questionAnswer={questionAnswer}
