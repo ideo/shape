@@ -13,7 +13,11 @@ const QuestionSpacing = css`
   border-bottom-color: ${props =>
     props.editing ? v.colors.gray : v.colors.testLightBlueBg};
   border-bottom-style: solid;
-  border-bottom-width: 6px;
+  border-bottom-width: 4px;
+`
+
+const QuestionSpacingContainer = styled.div`
+  ${QuestionSpacing};
 `
 
 const QuestionTextWithSpacing = QuestionText.extend`
@@ -72,12 +76,14 @@ class OpenQuestion extends React.Component {
     let content
     if (editing) {
       content = (
-        <DescriptionQuestion
-          item={item}
-          maxLength={100}
-          placeholder="Write question here…"
-          canEdit={canEdit}
-        />
+        <QuestionSpacingContainer editing={editing}>
+          <DescriptionQuestion
+            item={item}
+            maxLength={100}
+            placeholder="Write question here…"
+            canEdit={canEdit}
+          />
+        </QuestionSpacingContainer>
       )
     } else {
       content = (
