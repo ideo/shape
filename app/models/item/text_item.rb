@@ -4,6 +4,11 @@ class Item
     validates :text_data, presence: true
     has_one :question_answer, inverse_of: :open_response_item
 
+    def set_ops_from_plain_text(text)
+      text_data['ops'] = TextToQuillOps.call(text)
+      self.content = text
+    end
+
     # build up a plaintext string of all the text content, with elements separated by pipes "|"
     # e.g. "Mission Statement | How might we do x..."
     def plain_content(only_first_line: false)

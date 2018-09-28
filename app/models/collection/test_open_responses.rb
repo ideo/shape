@@ -1,5 +1,5 @@
 class Collection
   class TestOpenResponses < Collection
-    belongs_to :question_item, class: 'Item::QuestionItem'
+    belongs_to :question_item, class_name: 'Item::QuestionItem'
   end
 end

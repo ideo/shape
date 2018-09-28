@@ -9,15 +9,26 @@ class QuestionAnswer < ApplicationRecord
   delegate :completed?, to: :survey_response, prefix: true
 
   after_commit :update_survey_response, on: %i[create destroy]
-  after_save :update_open_response_item, if: :survey_response_completed?
+  before_save :update_open_response_item, if: :update_open_response_item?
+  before_destroy :destroy_open_response_item_and_card, if: :open_response_item_present?
 
   private
 
+  def open_response_item_present?
+    open_response_item.present?
+  end
+
+  def update_open_response_item?
+    survey_response_completed? &&
+      question.type_open? &&
+      (answer_text_changed? || open_response_item.blank?)
+  end
+
   def update_open_response_item
-    item = open_response_item || create_open_response_item
-    item.update_attributes(
-      ops: [],
-    )
+    item = open_response_item
+    return create_open_response_item if item.blank?
+    item.set_ops_from_plain_text(answer_text)
+    item.save
   end
 
   def create_open_response_item
@@ -25,16 +36,28 @@ class QuestionAnswer < ApplicationRecord
     card_params = {
       item_attributes: {
         type: 'Item::TextItem',
-        ops: [],
+        content: answer_text,
+        text_data: {
+          ops: TextToQuillOps.call(answer_text),
+        },
       },
     }
     builder = CollectionCardBuilder.new(
       params: card_params,
       parent_collection: question.test_open_responses_collection,
-      user: initiated_by,
+      user: question.test_open_responses_collection.created_by,
     )
-    builder.create
-    builder.collection_card.record
+    if builder.create
+      self.open_response_item = builder.collection_card.record
+    else
+      errors.add(:open_response_item, builder.errors.full_messages.join('. '))
+      throw :abort
+    end
+  end
+
+  def destroy_open_response_item_and_card
+    open_response_item.parent_collection_card.destroy.destroyed? &&
+      open_response_item.destroy.destroyed?
   end
 
   def update_survey_response

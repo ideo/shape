@@ -4,6 +4,7 @@ class Collection
     has_many :question_items,
              -> { questions },
              source: :item,
+             class_name: 'Item::QuestionItem',
              through: :primary_collection_cards
 
     before_create :setup_default_status_and_questions
@@ -37,23 +38,21 @@ class Collection
       end
       test_design_card_builder = build_test_design_collection_card(initiated_by)
       open_response_builders = build_open_response_collection_cards(initiated_by)
-      transction do
-        if test_design_card_builder.create
-          test_design = test_design_card_builder.collection_card.record
-          # move all the cards into the test design collection
-          collection_cards.where.not(id: builder.collection_card.id).each_with_index do |card, i|
+      transaction do
+        return false unless test_design_card_builder.create
+        test_design = test_design_card_builder.collection_card.record
+        # move all the cards into the test design collection
+        collection_cards
+          .where.not(
+            id: test_design_card_builder.collection_card.id,
+          )
+          .each_with_index do |card, i|
             card.update(parent_id: test_design.id, order: i)
           end
-          # Create open response collections
-          if open_response_builders.present?
-            raise ActiveRecord::Rollback unless open_response_builders.all?(&:create)
-          end
-          test_design.cache_cover!
-          update(test_status: :live)
-        else
-          # errors?
-          false
-        end
+        # Create open response collections
+        open_response_builders.all?(&:create) if open_response_builders.present?
+        test_design.cache_cover!
+        update(test_status: :live)
       end
     end
 
@@ -95,14 +94,16 @@ class Collection
     end
 
     def build_open_response_collection_cards(initiated_by)
-      question_items.where(question_type: :open).map do |open_question|
+      question_items
+        .type_open
+        .map do |open_question|
         card_params = {
           order: 0,
           collection_attributes: {
             name: "#{open_question.name} Responses",
             type: 'Collection::TestOpenResponses',
             question_item_id: open_question.id,
-          }
+          },
         }
         CollectionCardBuilder.new(
           params: card_params,
