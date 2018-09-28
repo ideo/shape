@@ -1,4 +1,6 @@
 class NetworkOrganizationUserSyncWorker
+  include Sidekiq::Worker
+
   def perform(user_uid, org_id, role_name, action)
     action = action.to_sym
     if action == :add
