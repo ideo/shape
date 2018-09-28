@@ -51,6 +51,8 @@ class Item < ApplicationRecord
   amoeba do
     enable
     recognize []
+    propagate
+    nullify :breadcrumb
   end
 
   def organization_id

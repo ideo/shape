@@ -1,5 +1,5 @@
 import _ from 'lodash'
-import { computed, action } from 'mobx'
+import { observable, computed, action } from 'mobx'
 import { ReferenceType } from 'datx'
 
 import { apiStore, routingStore, uiStore } from '~/stores'
@@ -8,6 +8,10 @@ import CollectionCard from './CollectionCard'
 
 class Collection extends BaseRecord {
   static type = 'collections'
+
+  // starts null before it is loaded
+  @observable
+  inMyCollection = null
 
   attributesForAPI = [
     'name',

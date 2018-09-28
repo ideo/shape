@@ -5,26 +5,45 @@ RSpec.describe BreadcrumbRecalculationWorker, type: :worker do
     let!(:collection) { create(:collection, num_cards: 5, breadcrumb: nil) }
     let!(:subcollection_card) { create(:collection_card_collection, parent: collection) }
     let!(:subcollection) { subcollection_card.collection }
-    let(:new_name) { 'My new name' }
-    let(:crumb) { ['Collection', collection.id, new_name] }
 
     before do
-      collection.update(name: new_name)
+      allow(Collection).to receive(:find).and_return(collection)
+    end
+
+    it 'calls recursive method' do
+      expect(collection).to receive(
+        :recalculate_breadcrumb_tree!,
+      ).with(
+        force_sync: true,
+      ).once
+
       BreadcrumbRecalculationWorker.new.perform(collection.id)
-      collection.reload
     end
 
-    it 'recalculates collection breadcrumb' do
-      expect(collection.breadcrumb.first).to match_array crumb
+    it 'marks subtree as processing' do
+      expect(collection).to receive(
+        :mark_children_processing_status,
+      ).with(
+        Collection.processing_statuses[:processing_breadcrumb],
+      ).once
+
+      expect(collection).to receive(
+        :mark_children_processing_status,
+      ).with(nil).once
+
+      BreadcrumbRecalculationWorker.new.perform(
+        collection.id,
+      )
     end
 
-    it 'recalculates child item breadcrumbs synchronously' do
-      expect(collection.items.first.breadcrumb.first).to match_array crumb
-    end
+    it 'broadcasts collection as editing' do
+      expect(collection).to receive(
+        :processing_done,
+      ).once
 
-    it 'recalculates child collection breadcrumbs asynchronously' do
-      expect(BreadcrumbRecalculationWorker).to receive(:perform_async)
-      BreadcrumbRecalculationWorker.new.perform(collection.id)
+      BreadcrumbRecalculationWorker.new.perform(
+        collection.id,
+      )
     end
   end
 end
