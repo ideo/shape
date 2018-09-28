@@ -91,11 +91,6 @@ class MovableGridCard extends React.PureComponent {
     const initialOffsetX = e.screenX - e.target.getBoundingClientRect().x
     const initialOffsetY = e.screenY - e.target.getBoundingClientRect().y
 
-    const rect = e.target.getBoundingClientRect()
-    const cX = e.clientX - rect.left // y position within the element.
-    const cY = e.clientY - rect.top // y position within the element.
-    this.relativeCursorPosition = { x: cX, y: cY + 8 }
-
     document.body.style['overflow-y'] = 'hidden'
     this.setState({
       initialOffsetX,
@@ -137,10 +132,6 @@ class MovableGridCard extends React.PureComponent {
     if (Math.abs(x - position.xPos) + Math.abs(y - position.yPos) < 10) {
       return
     }
-
-    const rect = e.target.getBoundingClientRect()
-    const relativeCursorPositionY = e.clientY - rect.top
-    this.scrollY = relativeCursorPositionY
 
     if (e.clientY < 200) {
       // At top of viewport
