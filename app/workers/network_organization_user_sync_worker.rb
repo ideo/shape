@@ -1,6 +1,4 @@
-class NetworkOrganizationUserSyncWorker
-  include Sidekiq::Worker
-
+class NetworkOrganizationUserSyncWorker < BaseWorker
   def perform(user_uid, org_id, role_name, action)
     start_worker_process do
       forkperform(user_uid, org_id, role_name, action)
@@ -27,7 +25,7 @@ class NetworkOrganizationUserSyncWorker
     )
     NetworkApi::UsersRole.create_by_uid(
       user_uid: user_uid,
-      role_id: network_role.id
+      role_id: network_role.id,
     )
   end
 
@@ -39,7 +37,7 @@ class NetworkOrganizationUserSyncWorker
     return true if network_role.blank?
     NetworkApi::UsersRole.remove_by_uid(
       user_uid: user_uid,
-      role_id: network_role.id
+      role_id: network_role.id,
     )
   end
 end
