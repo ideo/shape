@@ -52,6 +52,7 @@ const StyledCardWrapper = styled.div`
 `
 
 const cardCSSTransition = 'transform 0.4s, width 0.25s, height 0.25s'
+const TOP_SCROLL_TRIGGER = 210
 
 class MovableGridCard extends React.PureComponent {
   constructor(props) {
@@ -133,11 +134,11 @@ class MovableGridCard extends React.PureComponent {
       return
     }
 
-    if (e.clientY < 200) {
+    if (e.clientY < TOP_SCROLL_TRIGGER) {
       // At top of viewport
       this.scrolling = true
       this.scrollUp(null, e.clientY)
-    } else if (e.clientY > window.innerHeight - 200) {
+    } else if (e.clientY > window.innerHeight - TOP_SCROLL_TRIGGER) {
       // At bottom of viewport
       this.scrolling = true
       this.scrollDown()
@@ -147,7 +148,7 @@ class MovableGridCard extends React.PureComponent {
 
     const pageMargin = window.innerWidth - v.maxWidth
     const cardX = e.pageX - pageMargin / 2
-    const cardY = e.pageY - 200
+    const cardY = e.pageY - TOP_SCROLL_TRIGGER
     this.setState({
       x: cardX - position.width / 2,
       y: cardY - position.height / 2,
@@ -364,13 +365,13 @@ class MovableGridCard extends React.PureComponent {
     if (dragging) {
       // experiment -- shrink wide and tall cards for easier movement
       if (width > 500) {
-        if (this.state.initialOffsetX > 200) {
+        if (this.state.initialOffsetX > TOP_SCROLL_TRIGGER) {
           xAdjust = this.state.initialOffsetX * 0.25
         }
         width *= 0.8
       }
       if (height > 500) {
-        if (this.state.initialOffsetY > 200) {
+        if (this.state.initialOffsetY > TOP_SCROLL_TRIGGER) {
           yAdjust = this.state.initialOffsetY * 0.25
         }
         height *= 0.8
