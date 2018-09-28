@@ -29,6 +29,13 @@ ActiveRecord::Migration.maintain_test_schema!
 require 'sidekiq/testing'
 Sidekiq::Testing.fake!
 
+require 'vcr'
+VCR.configure do |config|
+  config.ignore_hosts '127.0.0.1', 'localhost'
+  config.cassette_library_dir = 'spec/fixtures/vcr_cassettes'
+  config.hook_into :webmock
+end
+
 # Use fake redis instance for tests
 require 'fakeredis/rspec'
 require 'action_cable/testing/rspec'
@@ -77,8 +84,6 @@ RSpec.configure do |config|
 
   config.before(:each, auth: true) do
     user = log_in_as_user
-    # don't actually create a network organization
-    allow_any_instance_of(Organization).to receive(:create_network_organization)
     # Make sure user is part of org - all permissions needs it
     Organization.create_for_user(user)
     DatabaseCleaner.strategy = :transaction
@@ -118,6 +123,26 @@ RSpec.configure do |config|
   #   c.example_status_persistence_file_path = "tmp/rspec_failures.txt"
   #   c.run_all_when_everything_filtered = true
   # end
+
+  # Add VCR to all tests
+  config.around(:each) do |example|
+    vcr_tag = example.metadata[:vcr]
+    options = vcr_tag.is_a?(Hash) ? vcr_tag : {
+      match_requests_on: [:host, :path],
+    }
+    path_data = [example.metadata[:description]]
+    parent = example.example_group
+    while parent != RSpec::ExampleGroups
+      path_data << parent.metadata[:description]
+      parent = parent.parent
+    end
+
+    name = path_data.map do |str|
+      str.underscore.delete('.').gsub(%r{[^\w\/]+}, '_').gsub(%r{\/$/}, '')
+    end.reverse.join('/')
+
+    VCR.use_cassette(name, options, &example)
+  end
 end
 
 # better readability and ability to chain "not changes"
