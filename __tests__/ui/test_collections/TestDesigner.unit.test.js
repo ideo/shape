@@ -6,8 +6,8 @@ describe('TestDesigner', () => {
   beforeEach(() => {
     props = {
       collection: fakeCollection,
-      editing: true,
     }
+    // very basic way to turn fakeCollection into a "test collection"
     props.collection.collection_cards[0].card_question_type = 'useful'
     wrapper = shallow(<TestDesigner {...props} />)
   })
