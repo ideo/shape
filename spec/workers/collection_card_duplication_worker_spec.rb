@@ -43,17 +43,14 @@ RSpec.describe CollectionCardDuplicationWorker, type: :worker do
 
       it 'marks collection as processing' do
         expect_any_instance_of(Collection).to receive(
-          :mark_as_processing,
+          :update_processing_status,
         ).with(
-          processing: true,
-          processing_message: 'Duplicating...',
+          Collection.processing_statuses[:duplicating]
         ).once
 
         expect_any_instance_of(Collection).to receive(
-          :mark_as_processing,
-        ).with(
-          processing: false,
-        ).once
+          :update_processing_status,
+        ).with(nil).once
 
         CollectionCardDuplicationWorker.new.perform(
           card_ids,
