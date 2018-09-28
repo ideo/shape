@@ -436,4 +436,26 @@ describe User, type: :model do
       end
     end
   end
+
+  context 'network admin management' do
+    let(:user) { create(:user) }
+
+    before do
+      allow(NetworkOrganizationUserSyncWorker).to receive(:perform_async)
+    end
+
+    describe '#add_network_admin' do
+      it 'uses the network api to add the user as org admin' do
+        user.add_network_admin
+        expect(NetworkOrganizationUserSyncWorker).to have_received(:perform_async).with(user.uid, user.id, NetworkApi::Organization::ADMIN_ROLE, :add)
+      end
+    end
+
+    describe '#remove_network_admin' do
+      it 'uses the network api to remove the user as org admin' do
+        user.remove_network_admin
+        expect(NetworkOrganizationUserSyncWorker).to have_received(:perform_async).with(user.uid, user.id, NetworkApi::Organization::ADMIN_ROLE, :remove)
+      end
+    end
+  end
 end

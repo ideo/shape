@@ -299,7 +299,21 @@ class User < ApplicationRecord
     Organization.all
   end
 
+  def add_network_admin
+    change_network_admin :add
+  end
+
+  def remove_network_admin
+    change_network_admin :remove
+  end
+
   private
+
+  def change_network_admin(action)
+    NetworkOrganizationUserSyncWorker.perform_async(
+      uid, id, NetworkApi::Organization::ADMIN_ROLE, action
+    )
+  end
 
   def update_profile_names
     user_profiles.each do |profile|
@@ -317,20 +331,6 @@ class User < ApplicationRecord
       reindex
     end
     resource.reindex if resource && Searchkick.callbacks? && resource.searchable?
-  end
-
-  def change_network_admin(action)
-    NetworkOrganizationUserSyncWorker.perform_async(
-      uid, id, NetworkApi::Organization::ADMIN_ROLE, action
-    )
-  end
-
-  def add_network_admin
-    change_network_admin :add
-  end
-
-  def remove_network_admin
-    change_network_admin :remove
   end
 
   def sync_groups_after_adding(role)
