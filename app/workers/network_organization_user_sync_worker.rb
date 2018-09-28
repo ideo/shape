@@ -1,11 +1,5 @@
-class NetworkOrganizationUserSyncWorker < BaseWorker
+class NetworkOrganizationUserSyncWorker
   def perform(user_uid, org_id, role_name, action)
-    start_worker_process do
-      forkperform(user_uid, org_id, role_name, action)
-    end
-  end
-
-  def forkperform(user_uid, org_id, role_name, action)
     action = action.to_sym
     if action == :add
       add_role(user_uid, org_id, role_name)
@@ -35,6 +29,7 @@ class NetworkOrganizationUserSyncWorker < BaseWorker
       network_organization.id, role_name
     )
     return true if network_role.blank?
+
     NetworkApi::UsersRole.remove_by_uid(
       user_uid: user_uid,
       role_id: network_role.id,

@@ -6,13 +6,6 @@ describe NetworkOrganizationUserSyncWorker do
   let(:user) { create(:user) }
 
   describe '#perform' do
-    it 'should call forkperform' do
-      expect(subject).to receive(:forkperform).once
-      subject.perform(user.id, organization.id, :admin, :add)
-    end
-  end
-
-  describe '#forkperform' do
     let(:network_org_id) { rand(10_000) }
     let(:network_role_id) { rand(10_000) }
     let(:network_users_role_id) { rand(10_000) }
@@ -58,14 +51,14 @@ describe NetworkOrganizationUserSyncWorker do
         expect(
           NetworkApi::Organization,
         ).to receive(:find_by_external_id).with(organization.id)
-        subject.forkperform(user.uid, organization.id, :admin, :add)
+        subject.perform(user.uid, organization.id, :admin, :add)
       end
 
       it 'finds or creates Network Role' do
         expect(
           NetworkApi::Role,
         ).to receive(:find_or_create_by_organization).with(network_org_id, :admin)
-        subject.forkperform(user.uid, organization.id, :admin, :add)
+        subject.perform(user.uid, organization.id, :admin, :add)
       end
 
       it 'creates Network UsersRole' do
@@ -75,7 +68,7 @@ describe NetworkOrganizationUserSyncWorker do
           user_uid: user.uid,
           role_id: network_role_id,
         )
-        subject.forkperform(user.uid, organization.id, :admin, :add)
+        subject.perform(user.uid, organization.id, :admin, :add)
       end
     end
 
@@ -89,14 +82,14 @@ describe NetworkOrganizationUserSyncWorker do
         expect(
           NetworkApi::Organization,
         ).to receive(:find_by_external_id).with(organization.id)
-        subject.forkperform(user.uid, organization.id, :admin, :remove)
+        subject.perform(user.uid, organization.id, :admin, :remove)
       end
 
       it 'finds Network Role' do
         expect(
           NetworkApi::Role,
         ).to receive(:find_by_organization).with(network_org_id, :admin)
-        subject.forkperform(user.uid, organization.id, :admin, :remove)
+        subject.perform(user.uid, organization.id, :admin, :remove)
       end
 
       it 'removes Network UsersRole' do
@@ -106,7 +99,7 @@ describe NetworkOrganizationUserSyncWorker do
           user_uid: user.uid,
           role_id: network_role_id,
         )
-        subject.forkperform(user.uid, organization.id, :admin, :remove)
+        subject.perform(user.uid, organization.id, :admin, :remove)
       end
     end
   end
