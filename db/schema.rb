@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180927190104) do
+ActiveRecord::Schema.define(version: 20180928000522) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -87,6 +87,7 @@ ActiveRecord::Schema.define(version: 20180927190104) do
     t.integer "submission_box_type"
     t.bigint "submission_box_id"
     t.integer "test_status"
+    t.integer "question_item_id"
     t.index ["breadcrumb"], name: "index_collections_on_breadcrumb", using: :gin
     t.index ["cloned_from_id"], name: "index_collections_on_cloned_from_id"
     t.index ["organization_id"], name: "index_collections_on_organization_id"
@@ -225,6 +226,7 @@ ActiveRecord::Schema.define(version: 20180927190104) do
     t.integer "answer_number"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "open_response_item_id"
     t.index ["question_id"], name: "index_question_answers_on_question_id"
     t.index ["survey_response_id"], name: "index_question_answers_on_survey_response_id"
   end

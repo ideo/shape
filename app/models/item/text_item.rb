@@ -2,6 +2,7 @@ class Item
   class TextItem < Item
     validates :content, presence: true
     validates :text_data, presence: true
+    has_one :question_answer, inverse_of: :open_response_item
 
     # build up a plaintext string of all the text content, with elements separated by pipes "|"
     # e.g. "Mission Statement | How might we do x..."

@@ -1,6 +1,7 @@
 class Item
   class QuestionItem < Item
     has_many :question_answers, inverse_of: :question, foreign_key: :question_id, dependent: :destroy
+    has_one :test_open_responses_collection, class_name: 'Collection::TestOpenResponses'
 
     enum question_type: {
       context: 0,
