@@ -12,12 +12,16 @@ props.record.breadcrumb = [
   ['collections', 99, 'Use Cases'],
 ]
 
-let wrapper
+let wrapper, titles
 
 describe('StyledBreadcrumb', () => {
   beforeEach(() => {
     props.record.inMyCollection = false
     wrapper = shallow(<Breadcrumb {...props} />)
+    titles = wrapper
+      .find('Link')
+      .children()
+      .map(link => link.text())
   })
 
   it('renders each item as a link', () => {
@@ -25,18 +29,43 @@ describe('StyledBreadcrumb', () => {
   })
 
   it('has all link titles', () => {
-    const titles = wrapper
+    expect(titles).toEqual(['My Workspace', 'Use Cases'])
+  })
+})
+
+describe('With Narrow Window', () => {
+  beforeEach(() => {
+    props.record.inMyCollection = true
+    props.breadcrumbWrapper = {
+      current: {
+        offsetWidth: 400,
+      },
+    }
+    wrapper = shallow(<Breadcrumb {...props} />)
+    titles = wrapper
       .find('Link')
       .children()
       .map(link => link.text())
-    expect(titles).toEqual(['My Workspace', 'Use Cases'])
+  })
+
+  it('truncates to ...', () => {
+    expect(titles).toEqual(['My Collection', '...', 'Use Cases'])
   })
 })
 
 describe('In My Collection', () => {
   beforeEach(() => {
     props.record.inMyCollection = true
+    props.breadcrumbWrapper = {
+      current: {
+        offsetWidth: 900,
+      },
+    }
     wrapper = shallow(<Breadcrumb {...props} />)
+    titles = wrapper
+      .find('Link')
+      .children()
+      .map(link => link.text())
   })
 
   it('renders each item as a link', () => {
@@ -46,10 +75,6 @@ describe('In My Collection', () => {
   })
 
   it('has My Collection, then all titles', () => {
-    const titles = wrapper
-      .find('Link')
-      .children()
-      .map(link => link.text())
     expect(titles).toEqual(['My Collection', 'My Workspace', 'Use Cases'])
   })
 })

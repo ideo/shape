@@ -49,7 +49,7 @@ const StyledBreadcrumbItem = styled.div`
 class Breadcrumb extends React.Component {
   constructor(props) {
     super(props)
-    this.breadcrumbWrapper = React.createRef()
+    this.breadcrumbWrapper = props.breadcrumbWrapper
   }
 
   componentDidMount() {
@@ -198,6 +198,11 @@ class Breadcrumb extends React.Component {
 Breadcrumb.propTypes = {
   record: MobxPropTypes.objectOrObservableObject.isRequired,
   isHomepage: PropTypes.bool.isRequired,
+  breadcrumbWrapper: PropTypes.oneOfType([PropTypes.element, PropTypes.object]),
+}
+
+Breadcrumb.defaultProps = {
+  breadcrumbWrapper: React.createRef(),
 }
 
 export default Breadcrumb
