@@ -264,4 +264,82 @@ describe Organization, type: :model do
       expect(organization.all_active_users.count).to eq 2
     end
   end
+
+  describe '#network_organization' do
+    let(:organization) { create(:organization) }
+    let(:network_organization) { double('network organization') }
+    before do
+      allow(NetworkApi::Organization).to receive(:find_by_external_id).with(organization.id).and_return(network_organization)
+    end
+
+    it 'uses the network api to find the organization' do
+      expect(organization.find_or_create_on_network).to equal(network_organization)
+    end
+
+    it 'caches the result' do
+      expect(NetworkApi::Organization).to receive(:find_by_external_id).once
+      organization.find_or_create_on_network
+      organization.find_or_create_on_network
+    end
+  end
+
+  describe '#create_network_organization' do
+    let!(:organization) { create(:organization) }
+
+    before do
+      allow(NetworkApi::Organization).to receive(:create)
+    end
+
+    context 'admin user passed' do
+      it 'creates the network organization' do
+        admin_user = create(:user)
+        organization.create_network_organization(admin_user)
+        expect(NetworkApi::Organization).to have_received(:create).with(
+          external_id: organization.id,
+          name: organization.name,
+          admin_user_uid: admin_user.uid,
+        )
+      end
+    end
+
+    context 'admin user not passed' do
+      it 'creates the network organization' do
+        organization.create_network_organization
+        expect(NetworkApi::Organization).to have_received(:create).with(
+          external_id: organization.id,
+          name: organization.name,
+          admin_user_uid: nil,
+        )
+      end
+    end
+  end
+
+  describe '#find_or_create_on_network' do
+    let!(:organization) { create(:organization) }
+    let!(:network_organization) { double('network_organization') }
+
+    before do
+      allow(NetworkApi::Organization).to receive(:create)
+    end
+
+    context 'network organization present' do
+      before do
+        allow(organization).to receive(:network_organization).and_return(network_organization)
+      end
+
+      it 'returns the existing network organization' do
+        allow(organization).to receive(:create_network_organization)
+        expect(organization.find_or_create_on_network).to eql(network_organization)
+        expect(organization).not_to have_received(:create_network_organization)
+      end
+    end
+
+    context 'network organization not present' do
+      it 'creates and returns a new network organization' do
+        allow(organization).to receive(:network_organization).and_return(nil)
+        allow(organization).to receive(:create_network_organization).and_return(network_organization)
+        expect(organization.find_or_create_on_network).to eql(network_organization)
+      end
+    end
+  end
 end

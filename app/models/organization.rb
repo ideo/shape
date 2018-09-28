@@ -160,11 +160,6 @@ class Organization < ApplicationRecord
     @network_organization ||= NetworkApi::Organization.find_by_external_id(id)
   end
 
-  def find_or_create_on_network(admin = nil)
-    return network_organization if network_organization.present?
-    create_network_organization(admin)
-  end
-
   def create_network_organization(admin = nil)
     NetworkApi::Organization.create(
       external_id: id,
@@ -173,10 +168,17 @@ class Organization < ApplicationRecord
     )
   end
 
+  def find_or_create_on_network(admin = nil)
+    return network_organization if network_organization.present?
+
+    create_network_organization(admin)
+  end
+
   private
 
   def parse_domain_whitelist
     return true unless will_save_change_to_domain_whitelist?
+
     if domain_whitelist.is_a?(String)
       # when saving from the frontend/API we just pass in a string list of domains,
       # so we split to save as an array
@@ -203,30 +205,4 @@ class Organization < ApplicationRecord
     guest_group.update_attributes(name: guest_group_name, handle: guest_group_handle)
     admin_group.update_attributes(name: admin_group_name, handle: admin_group_handle)
   end
-
-  # Adds all admin users for this org to the network,
-  # so they can administer payment methods + invoices
-  # def add_roles_to_network
-  #   admin_group.user_ids.each do |user_id|
-  #     user = User.find(user_id)
-  #     NetworkOrganizationUserSyncWorker.perform_async(
-  #       user.uid, id, NetworkApi::Organization::ADMIN_ROLE, :add
-  #     )
-  #   end
-  # end
-
-  # def network_subscription
-  #   return @network_subscription if @network_subscription.present?
-  #   if network_subscription_id.present?
-  #     @network_subscription = NetworkApi::Subscription.find(
-  #       network_subscription_id,
-  #     ).first
-  #   else
-  #     @network_subscription = NetworkApi::Subscription.where(
-  #       organization_id: network_organization.id,
-  #       active: true,
-  #     ).first
-  #   end
-  # end
-
 end
