@@ -98,6 +98,11 @@ class Collection < ApplicationRecord
 
   accepts_nested_attributes_for :collection_cards
 
+  enum processing_status: {
+    processing_breadcrumb: 1,
+    duplicating: 2,
+  }
+
   # Searchkick Config
   # Use queue to bulk reindex every 5m (with Sidekiq Scheduled Job/ActiveJob)
   searchkick callbacks: :queue
@@ -428,27 +433,25 @@ class Collection < ApplicationRecord
     is_a?(Collection::TestCollection) || is_a?(Collection::TestDesign)
   end
 
-  def mark_as_processing(processing: true, processing_message: nil)
+  def update_processing_status(status = nil)
     update(
-      processing: processing,
-      processing_message: processing_message,
+      processing_status: status,
     )
 
-    processing_done unless processing
+    processing_done if processing_status.nil?
   end
 
-  def mark_children_as_processing(processing: true, processing_message: nil)
+  def mark_children_processing_status(status = nil)
     # also mark self
-    mark_as_processing(processing: processing, processing_message: processing_message)
+    update_processing_status(status)
     collections = Collection.in_collection(self)
     collections.update_all(
-      processing: processing,
-      processing_message: processing_message,
+      processing_status: status,
       updated_at: Time.now,
     )
 
     # Broadcast that this collection is no longer being edited
-    collections.each(&:processing_done) unless processing
+    collections.each(&:processing_done) if processing_status.nil?
   end
 
   private

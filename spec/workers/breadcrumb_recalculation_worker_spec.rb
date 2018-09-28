@@ -22,16 +22,14 @@ RSpec.describe BreadcrumbRecalculationWorker, type: :worker do
 
     it 'marks subtree as processing' do
       expect(collection).to receive(
-        :mark_children_as_processing,
+        :mark_children_processing_status,
       ).with(
-        processing: true,
+        Collection.processing_statuses[:processing_breadcrumb],
       ).once
 
       expect(collection).to receive(
-        :mark_children_as_processing,
-      ).with(
-        processing: false,
-      ).once
+        :mark_children_processing_status,
+      ).with(nil).once
 
       BreadcrumbRecalculationWorker.new.perform(
         collection.id,

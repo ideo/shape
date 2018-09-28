@@ -6,7 +6,7 @@ class SerializableCollection < BaseJsonSerializer
   attributes :created_at, :updated_at, :name, :organization_id,
              :master_template, :template_id,
              :submission_box_type, :submission_box_id, :submission_template_id,
-             :test_status, :processing, :processing_message
+             :test_status
 
   has_one :parent_collection_card
   belongs_to :submissions_collection
@@ -37,6 +37,10 @@ class SerializableCollection < BaseJsonSerializer
       @object,
       @current_user,
     ).viewable_to_api
+  end
+
+  attribute :processing_status do
+    @object.processing_status.try(:titleize)
   end
 
   belongs_to :organization

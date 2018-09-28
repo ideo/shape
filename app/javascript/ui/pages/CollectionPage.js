@@ -195,10 +195,8 @@ class CollectionPage extends PageWithApi {
     } else {
       apiStore.clearUnpersistedThreads()
     }
-    if (collection.processing) {
-      const message = collection.processing_message
-        ? collection.processing_message
-        : 'Processing...'
+    if (collection.processing_status) {
+      const message = `${collection.processing_status}...`
       uiStore.popupSnackbar({ message })
     }
   }

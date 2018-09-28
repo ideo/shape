@@ -352,44 +352,37 @@ describe Collection, type: :model do
     end
   end
 
-  describe '#mark_as_processing' do
+  describe '#update_processing_status' do
     let(:collection) { create(:collection) }
 
-    context 'processing = true' do
+    context 'processing = :duplicating' do
       let(:processing) { true }
 
-      it 'marks collections as processing' do
-        expect(collection.processing).to be false
-        collection.mark_as_processing(processing: processing)
-        expect(collection.processing).to be true
+      it 'marks collections as duplicating' do
+        expect(collection.duplicating?).to be false
+        collection.update_processing_status(Collection.processing_statuses[:duplicating])
+        expect(collection.duplicating?).to be true
       end
     end
 
-    context 'processing = false' do
+    context 'processing = nil' do
       let(:processing) { false }
 
       before do
         collection.update_attributes(
-          processing: true,
-          processing_message: 'Duplicating...',
+          processing_status: Collection.processing_statuses[:duplicating],
         )
       end
 
       it 'marks collection as not processing' do
-        expect(collection.processing).to be true
-        collection.mark_as_processing(processing: processing)
-        expect(collection.processing).to be false
-      end
-
-      it 'sets processing_message to nil' do
-        expect(collection.processing_message).not_to be_nil
-        collection.mark_as_processing(processing: processing)
-        expect(collection.processing_message).to be_nil
+        expect(collection.duplicating?).to be true
+        collection.update_processing_status(nil)
+        expect(collection.duplicating?).to be false
       end
 
       it 'broadcasts processing has stopped' do
         expect(collection).to receive(:processing_done).once
-        collection.mark_as_processing(processing: processing)
+        collection.update_processing_status(nil)
       end
     end
   end
