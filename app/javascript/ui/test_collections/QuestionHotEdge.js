@@ -28,7 +28,7 @@ const HotEdgeVisuals = styled.div`
 
 const VisualBar = styled.div`
   background-color: ${v.colors.cyanLt};
-  height: 6px;
+  height: 10px;
   left: 20px;
   position: absolute;
   top: 20px;
@@ -41,7 +41,7 @@ const RoundAddButton = styled.button`
   height: 32px;
   left: calc(50% - 16px);
   position: absolute;
-  top: 6px;
+  top: 10px;
   width: 32px;
   z-index: 900;
 

@@ -68,3 +68,31 @@ TestQuestionInput.propTypes = {
 TestQuestionInput.defaultProps = {
   editable: false,
 }
+
+export const TestQuestionHolder = styled.div`
+  background-color: ${props =>
+    props.userEditable ? v.colors.testLightBlueBg : v.colors.ctaButtonBlue};
+  border-color: ${props =>
+    props.editing ? v.colors.gray : v.colors.testLightBlueBg};
+  border-bottom-width: 0;
+  border-left-width: ${props => (props.editing ? '20px' : '0')};
+  border-right-width: ${props => (props.editing ? '20px' : '0')};
+  border-style: solid;
+  border-top-width: ${props => (props.editing ? '10px' : 0)};
+  margin-bottom: ${props => (props.editing ? 0 : '10px')};
+  width: ${props => (props.editing ? '334px' : '100%')};
+
+  /* this responsive resize only factors into the edit state */
+  ${props =>
+    props.editing &&
+    `
+    @media only screen
+      and (max-width: ${v.responsive.medBreakpoint}px) {
+      border-width: 0;
+      margin-left: 22px;
+      margin-right: 28px;
+    }
+  `} &:last {
+    margin-bottom: 0;
+  }
+`

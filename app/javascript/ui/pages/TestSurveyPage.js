@@ -2,7 +2,7 @@ import styled from 'styled-components'
 
 import v from '~/utils/variables'
 import Logo from '~/ui/layout/Logo'
-import TestDesigner from '~/ui/test_collections/TestDesigner'
+import TestSurveyResponder from '~/ui/test_collections/TestSurveyResponder'
 import { apiStore } from '~/stores'
 // import Collection from '~/stores/jsonApi/Collection'
 
@@ -28,19 +28,16 @@ const StyledSurvey = styled.div`
 class TestSurveyPage extends React.Component {
   constructor(props) {
     super(props)
-    const collection = apiStore.sync(window.collectionData)
-    this.state = {
-      collection,
-    }
+    this.collection = apiStore.sync(window.collectionData)
   }
 
   render() {
-    const { collection } = this.state
+    const { collection } = this
     // now that collection is loaded synchronously, no need to display a loader here
     let inner = ''
 
     if (collection) {
-      inner = <TestDesigner collection={collection} editing={false} />
+      inner = <TestSurveyResponder collection={collection} editing={false} />
     }
     return (
       <StyledBg>
