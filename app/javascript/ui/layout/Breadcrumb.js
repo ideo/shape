@@ -50,13 +50,6 @@ class Breadcrumb extends React.Component {
   constructor(props) {
     super(props)
     this.breadcrumbWrapper = React.createRef()
-    this.state = {
-      maxChars: 80,
-    }
-  }
-
-  componentWillMount = () => {
-    window.addEventListener('resize', this.handleWindowSizeChange)
   }
 
   componentDidMount() {
@@ -64,18 +57,13 @@ class Breadcrumb extends React.Component {
     if (isHomepage) return
     // this will set record.inMyCollection = true/false
     apiStore.checkInMyCollection(record)
-    this.handleWindowSizeChange()
   }
 
-  componentWillUnmount = () => {
-    window.removeEventListener('resize', this.handleWindowSizeChange)
-  }
-
-  handleWindowSizeChange = () => {
-    if (!this.breadcrumbWrapper.current) return
+  calculateMaxChars = () => {
+    if (!this.breadcrumbWrapper.current) return 80
     const width = this.breadcrumbWrapper.current.offsetWidth
     // roughly .075 characters per pixel
-    this.setState({ maxChars: round(width * 0.075) })
+    return round(width * 0.075)
   }
 
   items = () => {
@@ -110,7 +98,7 @@ class Breadcrumb extends React.Component {
     )
 
   charsToTruncateForItems = items =>
-    this.totalNameLength(items) - this.state.maxChars
+    this.totalNameLength(items) - this.calculateMaxChars()
 
   truncateItems = items => {
     let charsLeftToTruncate = this.charsToTruncateForItems(items)
@@ -194,7 +182,7 @@ class Breadcrumb extends React.Component {
     // Tried using innerRef on styled component but it isn't available on mount
     return (
       <div ref={this.breadcrumbWrapper} style={{ width: '80%' }}>
-        {isHomepage && <BreadcrumbPadding />}
+        {!renderItems && <BreadcrumbPadding />}
         {renderItems && (
           <StyledBreadcrumbWrapper>
             {this.truncateItems(this.items()).map((item, index) =>
