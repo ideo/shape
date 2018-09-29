@@ -5,6 +5,7 @@ import ReactRouterPropTypes from 'react-router-prop-types'
 import { action, observable } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 
+import ClickWrapper from '~/ui/layout/ClickWrapper'
 import ChannelManager from '~/utils/ChannelManager'
 import CollectionGrid from '~/ui/grid/CollectionGrid'
 import FloatingActionButton from '~/ui/global/FloatingActionButton'
@@ -367,6 +368,7 @@ class CollectionPage extends PageWithApi {
             {isSubmissionBox &&
               collection.submission_box_type &&
               this.renderSubmissionsCollection()}
+            {uiStore.dragging && <ClickWrapper clickHandlers={[]} />}
           </PageContainer>
         )}
         {isLoading && this.loader()}
