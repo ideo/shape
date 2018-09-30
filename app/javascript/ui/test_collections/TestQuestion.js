@@ -24,7 +24,7 @@ const QuestionCardWrapper = styled.div`
 `
 
 @observer
-class TestQuestionEditor extends React.Component {
+class TestQuestion extends React.Component {
   handleQuestionAnswer = async ({ text, number }) => {
     const { item, editing, createSurveyResponse } = this.props
     let { surveyResponse, questionAnswer } = this.props
@@ -144,7 +144,7 @@ class TestQuestionEditor extends React.Component {
   }
 }
 
-TestQuestionEditor.propTypes = {
+TestQuestion.propTypes = {
   // parent is the parent collection
   parent: MobxPropTypes.objectOrObservableObject.isRequired,
   card: MobxPropTypes.objectOrObservableObject.isRequired,
@@ -156,11 +156,11 @@ TestQuestionEditor.propTypes = {
   canEdit: PropTypes.bool,
 }
 
-TestQuestionEditor.defaultProps = {
+TestQuestion.defaultProps = {
   surveyResponse: null,
   questionAnswer: null,
   createSurveyResponse: null,
   canEdit: false,
 }
 
-export default TestQuestionEditor
+export default TestQuestion

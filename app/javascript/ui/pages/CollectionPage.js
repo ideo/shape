@@ -292,7 +292,7 @@ class CollectionPage extends PageWithApi {
   }
 
   renderTestDesigner() {
-    return <TestDesigner collection={this.collection} editing />
+    return <TestDesigner collection={this.collection} />
   }
 
   loader = () => (
