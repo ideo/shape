@@ -1,7 +1,11 @@
 class Collection
   class TestCollection < Collection
     has_many :survey_responses, dependent: :destroy
-    has_many :question_items,
+    has_one :test_design, inverse_of: :test_collection
+    delegate :question_items, to: :test_design
+
+    # this relation exists before the items get moved to the test design
+    has_many :prelaunch_question_items,
              -> { questions },
              source: :item,
              class_name: 'Item::QuestionItem',
@@ -16,13 +20,8 @@ class Collection
       closed: 2,
     }
 
-    def test_design
-      # NOTE: there should only ever be one of these per TestCollection
-      collections.where(type: 'Collection::TestDesign').first
-    end
-
     def test_open_response_collections
-      collections.where(type: 'Collection::TestOpenResponses').first
+      collections.where(type: 'Collection::TestOpenResponses')
     end
 
     def create_uniq_survey_response
@@ -40,7 +39,7 @@ class Collection
       open_response_builders = build_open_response_collection_cards(initiated_by)
       transaction do
         return false unless test_design_card_builder.create
-        test_design = test_design_card_builder.collection_card.record
+        self.test_design = test_design_card_builder.collection_card.record
         # move all the cards into the test design collection
         collection_cards
           .where.not(
@@ -84,7 +83,8 @@ class Collection
         collection_attributes: {
           name: "#{name} Test Design",
           type: 'Collection::TestDesign',
-        }
+          test_collection_id: id,
+        },
       }
       CollectionCardBuilder.new(
         params: card_params,
@@ -94,9 +94,7 @@ class Collection
     end
 
     def build_open_response_collection_cards(initiated_by)
-      question_items
-        .type_open
-        .map do |open_question|
+      prelaunch_question_items.type_open.map do |open_question|
         card_params = {
           order: 0,
           collection_attributes: {
