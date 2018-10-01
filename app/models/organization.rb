@@ -33,6 +33,7 @@ class Organization < ApplicationRecord
   after_create :create_groups
   before_update :parse_domain_whitelist
   after_update :update_group_names, if: :saved_change_to_name?
+  after_update :update_network_name, if: :saved_change_to_name?
   after_update :check_guests_for_domain_match, if: :saved_change_to_domain_whitelist?
 
   delegate :admins, to: :primary_group
@@ -55,14 +56,6 @@ class Organization < ApplicationRecord
     builder.save
     builder.organization
   end
-
-  # def self.update_network_organization_name(organization_id)
-  #   organization = Organization.find(organization_id)
-  #   network_organization = organization.network_organization
-  #   return unless network_organization.present?
-  #   network_organization.name = organization.name
-  #   network_organization.save
-  # end
 
   # NOTE: this method can be called many times for the same org
   def setup_user_membership_and_collections(user)
@@ -143,7 +136,7 @@ class Organization < ApplicationRecord
   def all_active_users
     User.active.where(id: (
       primary_group.user_ids +
-      guest_group.user_ids
+        guest_group.user_ids
     ))
   end
 
@@ -204,5 +197,12 @@ class Organization < ApplicationRecord
     primary_group.update_attributes(name: name)
     guest_group.update_attributes(name: guest_group_name, handle: guest_group_handle)
     admin_group.update_attributes(name: admin_group_name, handle: admin_group_handle)
+  end
+
+  def update_network_name
+    return unless network_organization.present?
+
+    network_organization.name = name
+    network_organization.save
   end
 end
