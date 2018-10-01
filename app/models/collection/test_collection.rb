@@ -2,8 +2,6 @@ class Collection
   class TestCollection < Collection
     has_many :survey_responses, dependent: :destroy
     has_one :test_design, inverse_of: :test_collection
-    delegate :question_items, to: :test_design
-
     # this relation exists before the items get moved to the test design
     has_many :prelaunch_question_items,
              -> { questions },
@@ -19,6 +17,14 @@ class Collection
       live: 1,
       closed: 2,
     }
+
+    # alias method, will delegate to test_design if test is live
+    def question_items
+      if test_design.present?
+        return test_design.question_items
+      end
+      prelaunch_question_items
+    end
 
     def test_open_response_collections
       collections.where(type: 'Collection::TestOpenResponses')
@@ -94,7 +100,7 @@ class Collection
     end
 
     def build_open_response_collection_cards(initiated_by)
-      prelaunch_question_items.type_open.map do |open_question|
+      question_items.type_open.map do |open_question|
         card_params = {
           order: 0,
           collection_attributes: {

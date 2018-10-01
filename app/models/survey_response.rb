@@ -16,6 +16,7 @@ class SurveyResponse < ApplicationRecord
   end
 
   def question_answer_created_or_destroyed
+    # update(status: all_questions_answered? ? :completed : :in_progress)
     self.status = all_questions_answered? ? :completed : :in_progress
     self.updated_at = Time.current
     save

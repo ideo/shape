@@ -21,12 +21,17 @@ FactoryBot.define do
     factory :user_profile, class: Collection::UserProfile
     factory :submission_box, class: Collection::SubmissionBox
     factory :submissions_collection, class: Collection::SubmissionsCollection
-    factory :test_design, class: Collection::TestDesign
+    factory :test_design, class: Collection::TestDesign do
+      transient do
+        record_type :question
+      end
+    end
     factory :test_collection, class: Collection::TestCollection do
       transient do
         record_type :question
       end
     end
+    factory :test_open_responses_collection, class: Collection::TestOpenResponses
 
     after(:build) do |collection, evaluator|
       if evaluator.num_cards > 0
