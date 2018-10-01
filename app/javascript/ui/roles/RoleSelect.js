@@ -183,11 +183,6 @@ class RoleSelect extends React.Component {
           </Tooltip>
         )}
         {!showLeaveIcon && <LeaveIconHolder enabled={false} />}
-        {showLeaveIcon && (
-          <Tooltip>
-            <LeaveIcon />
-          </Tooltip>
-        )}
       </Row>
     )
   }

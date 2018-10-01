@@ -1,4 +1,5 @@
 import _ from 'lodash'
+import { observable } from 'mobx'
 import { routingStore } from '~/stores'
 import trackError from '~/utils/trackError'
 import FilestackUpload from '~/utils/FilestackUpload'
@@ -6,6 +7,10 @@ import { ITEM_TYPES } from '~/utils/variables'
 import BaseRecord from './BaseRecord'
 
 class Item extends BaseRecord {
+  // starts null before it is loaded
+  @observable
+  inMyCollection = null
+
   attributesForAPI = [
     'type',
     'name',

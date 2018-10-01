@@ -79,13 +79,7 @@ RSpec.describe OrganizationTemplates, type: :service do
 
       it 'should calculate the breadcrumb for the items' do
         item = profile_template.items.first
-        expect(item.breadcrumb).to match_array(
-          [
-            ['Collection', template_collection.id, template_collection.name],
-            ['Collection', profile_template.id, profile_template.name],
-            ['Item', item.id, item.name],
-          ],
-        )
+        expect(item.breadcrumb).to eq [template_collection.id, profile_template.id]
       end
     end
 

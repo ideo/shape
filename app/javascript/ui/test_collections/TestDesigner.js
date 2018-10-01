@@ -40,8 +40,8 @@ const TestQuestionHolder = styled.div`
   border-left-width: ${props => (props.editing ? '20px' : '0')};
   border-right-width: ${props => (props.editing ? '20px' : '0')};
   border-style: solid;
-  border-top-width: ${props => (props.editing ? '6px' : 0)};
-  margin-bottom: ${props => (props.editing ? 0 : '6px')};
+  border-top-width: ${props => (props.editing ? '10px' : 0)};
+  margin-bottom: ${props => (props.editing ? 0 : '10px')};
   width: ${props => (props.editing ? '334px' : '100%')};
 
   /* this responsive resize only factors into the edit state */

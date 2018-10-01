@@ -27,7 +27,7 @@ RSpec.describe Breadcrumb::ForUser, type: :service do
 
   describe '#viewable' do
     it 'returns empty breadcrumb if user has no access' do
-      expect(Breadcrumb::ForUser.new(item.breadcrumb, user).viewable).to eq([])
+      expect(Breadcrumb::ForUser.new(item, user).viewable).to eq([])
     end
 
     context 'with super admin access' do
@@ -36,10 +36,9 @@ RSpec.describe Breadcrumb::ForUser, type: :service do
       end
 
       it 'should return full breadcrumb' do
-        expect(Breadcrumb::ForUser.new(item.breadcrumb, user).viewable).to match_array([
-          collection_breadcrumb,
-          subcollection_breadcrumb,
-          item_breadcrumb,
+        expect(Breadcrumb::ForUser.new(item, user).viewable).to match_array([
+          collection.id,
+          subcollection.id,
         ])
       end
     end
@@ -50,10 +49,9 @@ RSpec.describe Breadcrumb::ForUser, type: :service do
       end
 
       it 'should return full breadcrumb' do
-        expect(Breadcrumb::ForUser.new(item.breadcrumb, user).viewable).to match_array([
-          collection_breadcrumb,
-          subcollection_breadcrumb,
-          item_breadcrumb,
+        expect(Breadcrumb::ForUser.new(item, user).viewable).to match_array([
+          collection.id,
+          subcollection.id,
         ])
       end
     end
@@ -64,10 +62,9 @@ RSpec.describe Breadcrumb::ForUser, type: :service do
       end
 
       it 'should return full breadcrumb' do
-        expect(Breadcrumb::ForUser.new(item.breadcrumb, user).viewable).to match_array([
-          collection_breadcrumb,
-          subcollection_breadcrumb,
-          item_breadcrumb,
+        expect(Breadcrumb::ForUser.new(item, user).viewable).to match_array([
+          collection.id,
+          subcollection.id,
         ])
       end
     end
@@ -78,9 +75,8 @@ RSpec.describe Breadcrumb::ForUser, type: :service do
       end
 
       it 'should return breadcrumb with direct ancestor and item' do
-        expect(Breadcrumb::ForUser.new(item.breadcrumb, user).viewable).to match_array([
-          subcollection_breadcrumb,
-          item_breadcrumb,
+        expect(Breadcrumb::ForUser.new(item, user).viewable).to match_array([
+          subcollection.id,
         ])
       end
     end
@@ -91,9 +87,7 @@ RSpec.describe Breadcrumb::ForUser, type: :service do
       end
 
       it 'should return breadcrumb with only item' do
-        expect(Breadcrumb::ForUser.new(item.breadcrumb, user).viewable).to match_array([
-          item_breadcrumb,
-        ])
+        expect(Breadcrumb::ForUser.new(item, user).viewable).to be_empty
       end
     end
   end
@@ -104,11 +98,11 @@ RSpec.describe Breadcrumb::ForUser, type: :service do
     end
 
     it 'should have full length breadcrumb' do
-      expect(Breadcrumb::ForUser.new(item.breadcrumb, user).viewable_to_api.size).to eq(3)
+      expect(Breadcrumb::ForUser.new(item, user).viewable_to_api.size).to eq(3)
     end
 
     it 'should have pluralize, underscored items' do
-      breadcrumb = Breadcrumb::ForUser.new(item.breadcrumb, user).viewable_to_api
+      breadcrumb = Breadcrumb::ForUser.new(item, user).viewable_to_api
       expect(breadcrumb.first[0]).to eq('collections')
       expect(breadcrumb.last[0]).to eq('items')
     end

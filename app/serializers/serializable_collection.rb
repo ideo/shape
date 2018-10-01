@@ -32,11 +32,15 @@ class SerializableCollection < BaseJsonSerializer
     @object.type || @object.class.name
   end
 
-  attribute :breadcrumb do
+  attribute :breadcrumb, if: -> { @object == @current_record } do
     Breadcrumb::ForUser.new(
-      @object.breadcrumb,
+      @object,
       @current_user,
     ).viewable_to_api
+  end
+
+  attribute :processing_status do
+    @object.processing_status.try(:titleize)
   end
 
   belongs_to :organization

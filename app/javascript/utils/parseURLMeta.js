@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { getMetadata } from 'page-metadata-parser'
+import metaDataParser from '~/vendor/page-metadata-parser'
 import { parse } from 'url'
 
 const parseURLMeta = async urlStr => {
@@ -31,7 +31,7 @@ const parseURLMeta = async urlStr => {
   try {
     const response = await axios.get(`${proxy}${url}`)
     const doc = parser.parseFromString(response.data, 'text/html')
-    const metadata = getMetadata(doc, url)
+    const metadata = metaDataParser.getMetadata(doc, url)
     return metadata
   } catch (e) {
     // will fail w/ 404 if link is invalid
