@@ -638,7 +638,7 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
           expect {
             patch(path, params: params)
           }.to change(Item::QuestionItem, :count).by(1)
-          expect(json['data']['attributes']['card_question_type']).to eq 'description'
+          expect(json['data']['attributes']['card_question_type']).to eq 'question_description'
         end
       end
     end

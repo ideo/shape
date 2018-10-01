@@ -6,13 +6,13 @@ class Item
     after_update :update_test_open_responses_collection, if: :update_test_open_responses_collection?
 
     enum question_type: {
-      context: 0,
-      useful: 1,
-      type_open: 2,
-      end: 3,
-      media: 4,
-      description: 5,
-      finish: 6,
+      question_context: 0,
+      question_useful: 1,
+      question_open: 2,
+      question_end: 3,
+      question_media: 4,
+      question_description: 5,
+      question_finish: 6,
     }
 
     def requires_roles?

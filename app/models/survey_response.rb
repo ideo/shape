@@ -31,7 +31,7 @@ class SurveyResponse < ApplicationRecord
       .where(
         Item::QuestionItem
           .arel_table[:question_type]
-          .eq(Item::QuestionItem.question_types[:type_open]),
+          .eq(Item::QuestionItem.question_types[:question_open]),
       ).each do |question_answer|
         next if question_answer.open_response_item.present?
         # Save will trigger the callback to create the item

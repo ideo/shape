@@ -50,11 +50,11 @@ const TrashButton = styled.button`
 
 const selectOptions = [
   { value: '', label: 'select question type' },
-  { value: 'context', label: 'Context Setting' },
-  { value: 'media', label: 'Photo or Video of Idea' },
-  { value: 'description', label: 'Idea Description' },
-  { value: 'useful', label: 'Useful' },
-  { value: 'open', label: 'Open Response' },
+  { value: 'question_context', label: 'Context Setting' },
+  { value: 'question_media', label: 'Photo or Video of Idea' },
+  { value: 'question_description', label: 'Idea Description' },
+  { value: 'question_useful', label: 'Useful' },
+  { value: 'question_open', label: 'Open Response' },
 ]
 
 @observer
@@ -111,7 +111,7 @@ class TestDesigner extends React.Component {
     return (
       <QuestionSelectHolder>
         <NumberListText>{card.order + 1}.</NumberListText>
-        {card.card_question_type === 'finish' ? (
+        {card.card_question_type === 'question_finish' ? (
           <DisplayText>End of Survey</DisplayText>
         ) : (
           <Select
@@ -141,7 +141,7 @@ class TestDesigner extends React.Component {
           </Select>
         )}
         {this.canEdit &&
-          card.card_question_type !== 'finish' && (
+          card.card_question_type !== 'question_finish' && (
             <TrashButton onClick={() => this.handleTrash(card)}>
               <TrashIcon />
             </TrashButton>
@@ -156,9 +156,9 @@ class TestDesigner extends React.Component {
     const inner = collection.collection_cards.map((card, i) => {
       let position
       const item = card.record
-      if (i === 0) position = 'beginning'
-      if (i === cardCount - 1) position = 'end'
-      const userEditable = ['media', 'description'].includes(
+      if (i === 0) position = 'type_beginning'
+      if (i === cardCount - 1) position = 'question_end'
+      const userEditable = ['question_media', 'question_description'].includes(
         card.record.question_type
       )
       return (
@@ -183,7 +183,7 @@ class TestDesigner extends React.Component {
                 />
               </TestQuestionHolder>
               {this.canEdit &&
-                card.card_question_type !== 'finish' &&
+                card.card_question_type !== 'question_finish' &&
                 this.renderHotEdge(card)}
             </Flex>
           </div>

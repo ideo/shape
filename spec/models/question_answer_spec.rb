@@ -20,7 +20,7 @@ RSpec.describe QuestionAnswer, type: :model do
     before do
       test_collection.question_items.each do |question|
         question.update(
-          question_type: Item::QuestionItem.question_types[:type_open],
+          question_type: Item::QuestionItem.question_types[:question_open],
         )
       end
       test_collection

@@ -70,7 +70,7 @@ describe Collection::TestCollection, type: :model do
         context 'with OpenResponse questions' do
           before do
             test_collection.prelaunch_question_items.each do |question|
-              question.question_type = :type_open
+              question.question_type = :question_open
               question.save
             end
           end

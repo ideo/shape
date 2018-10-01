@@ -20,7 +20,7 @@ class QuestionAnswer < ApplicationRecord
 
   def update_open_response_item?
     survey_response_completed? &&
-      question.type_open? &&
+      question.question_open? &&
       (answer_text_changed? || open_response_item.blank?)
   end
 

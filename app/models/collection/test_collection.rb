@@ -100,7 +100,7 @@ class Collection
     end
 
     def build_open_response_collection_cards(initiated_by)
-      question_items.type_open.map do |open_question|
+      question_items.question_open.map do |open_question|
         card_params = {
           order: 0,
           collection_attributes: {
@@ -124,28 +124,28 @@ class Collection
         order: 0,
         item_attributes: {
           type: 'Item::QuestionItem',
-          question_type: :media,
+          question_type: :question_media,
         },
       )
       primary_collection_cards.build(
         order: 1,
         item_attributes: {
           type: 'Item::QuestionItem',
-          question_type: :description,
+          question_type: :question_description,
         },
       )
       primary_collection_cards.build(
         order: 2,
         item_attributes: {
           type: 'Item::QuestionItem',
-          question_type: :useful,
+          question_type: :question_useful,
         },
       )
       primary_collection_cards.build(
         order: 3,
         item_attributes: {
           type: 'Item::QuestionItem',
-          question_type: :finish,
+          question_type: :question_finish,
         },
       )
     end

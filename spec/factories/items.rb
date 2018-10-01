@@ -23,7 +23,7 @@ FactoryBot.define do
     end
 
     factory :question_item, class: 'Item::QuestionItem' do
-      question_type :useful
+      question_type :question_useful
     end
 
     after(:create) do |item, evaluator|
