@@ -135,7 +135,7 @@ class SearchResultsInfinite extends React.Component {
           >
             <div>
               <StyledBreadcrumb>
-                <Breadcrumb items={collection.breadcrumb} />
+                <Breadcrumb record={collection} isHomepage={false} />
               </StyledBreadcrumb>
               <StyledSearchResult
                 {...gridSettings}

@@ -76,8 +76,10 @@ export default {
     clickWrapper: 500,
     activityLog: 201,
     popoutMenu: 201,
+    // NOTE: if globalHeader is > pageHeader
+    // then it will also be above the EditableName ClickWrapper
     globalHeader: 200,
-    pageHeader: 199,
+    pageHeader: 200,
     scrollIndicator: 200,
     cardDragging: 160,
     gridCard: 150,

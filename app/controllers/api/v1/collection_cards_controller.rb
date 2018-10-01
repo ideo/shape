@@ -22,14 +22,17 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
                                         replacing_card: @replacing_card)
 
     if builder.create
+      card = builder.collection_card
       # reload the user's roles
       current_user.reload.reset_cached_roles!
       if @replacing_card.present?
-        create_notification(builder.collection_card, :replaced)
+        create_notification(card, :replaced)
       else
-        create_notification(builder.collection_card, :created)
+        create_notification(card, :created)
       end
-      render jsonapi: builder.collection_card, include: [:parent, record: [:filestack_file]]
+      render jsonapi: card,
+             include: [:parent, record: [:filestack_file]],
+             expose: { current_record: card.record }
     else
       render_api_errors builder.errors
     end
@@ -100,7 +103,8 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
       # so that it can be easily re-rendered on the page
       render jsonapi: @to_collection.reload,
              include: Collection.default_relationships_for_api,
-             meta: { moving_cards: mover.moving_cards.pluck(:id).map(&:to_s) }
+             meta: { moving_cards: mover.moving_cards.pluck(:id).map(&:to_s) },
+             expose: { current_record: @to_collection }
     else
       render json: { errors: mover.errors }, status: :bad_request
     end
@@ -138,7 +142,8 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
     # so we end up re-fetching the to_collection later in the front-end
     render jsonapi: @to_collection.reload,
            include: Collection.default_relationships_for_api,
-           meta: { new_cards: new_cards.pluck(:id).map(&:to_s) }
+           meta: { new_cards: new_cards.pluck(:id).map(&:to_s) },
+           expose: { current_record: @to_collection }
   end
 
   private
@@ -191,8 +196,9 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
 
   def check_valid_duplication
     @cards.each do |card|
-      record = card.record
-      if @to_collection.breadcrumb_contains?(klass: record.class.base_class.name, id: record.id)
+      collection = card.collection
+      next unless collection.present?
+      if @to_collection.within_collection_or_self?(collection)
         @errors = 'You can\'t move a collection inside of itself.'
       end
     end

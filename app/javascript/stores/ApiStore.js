@@ -360,6 +360,15 @@ class ApiStore extends jsonapi(datxCollection) {
     return res
   }
 
+  async checkInMyCollection(record) {
+    const res = await this.request(
+      `${record.internalType}/${record.id}/in_my_collection`
+    )
+    runInAction(() => {
+      record.inMyCollection = res.__response.data
+    })
+  }
+
   // NOTE: had to override datx PureCollection, it looks like it is meant to do
   // what's listed below but it was trying to do `this.find(obj, id)` with no id
   remove(obj, id) {

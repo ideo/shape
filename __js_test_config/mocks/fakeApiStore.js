@@ -30,6 +30,7 @@ const fakeApiStore = ({ findResult = '', findAllResult = [], requestResult = '' 
     moveCards: jest.fn(),
     linkCards: jest.fn(),
     duplicateCards: jest.fn(),
+    checkInMyCollection: jest.fn(),
     unreadActivityCount: 0,
     currentUserId: "1",
     currentUser: {

@@ -10,7 +10,7 @@ const Question = styled.div`
   border-color: ${props =>
     props.editing ? v.colors.gray : v.colors.testLightBlueBg};
   border-bottom-style: solid;
-  border-bottom-width: 6px;
+  border-bottom-width: 4px;
   box-sizing: border-box;
   color: white;
   padding: 12px 12px 16px 12px;

@@ -59,6 +59,18 @@ module.exports = {
     "no-param-reassign": ["error", { "props": false }],
     "no-underscore-dangle": 0,
     "prettier/prettier": "error",
+    "prefer-destructuring": ["error", {
+      "VariableDeclarator": {
+        "array": true,
+        "object": true
+      },
+      "AssignmentExpression": {
+        "array": true,
+        "object": false
+      }
+    }, {
+      "enforceForRenamedProperties": false
+    }],
     "radix": ["error", "as-needed"],
     "space-before-function-paren": 0,
     "jsx-a11y/anchor-is-valid": [ "error", {

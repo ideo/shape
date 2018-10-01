@@ -9,23 +9,7 @@ RSpec.describe Breadcrumb::Builder, type: :service do
     end
 
     it 'should have breadcrumb from parent collection' do
-      expect(breadcrumb.first).to match_array([
-        'Collection',
-        collection.id,
-        collection.name,
-      ])
-    end
-
-    it 'should have breadcrumb for item' do
-      expect(breadcrumb.last).to match_array([
-        'Item',
-        item.id,
-        item.name,
-      ])
-    end
-
-    it 'should have parent and self' do
-      expect(breadcrumb.size).to eq(2)
+      expect(breadcrumb).to match_array([collection.id])
     end
 
     context 'with subcollection' do
@@ -37,24 +21,15 @@ RSpec.describe Breadcrumb::Builder, type: :service do
         subcollection.recalculate_breadcrumb!
       end
 
-      it 'should have breadcrumb for subcollection' do
-        expect(breadcrumb[1]).to match_array([
-          'Collection',
-          subcollection.id,
-          subcollection.name,
-        ])
-      end
-
       it 'should have breadcrumb for item' do
-        expect(breadcrumb.last).to match_array([
-          'Item',
-          item.id,
-          item.name,
+        expect(breadcrumb).to match_array([
+          collection.id,
+          subcollection.id,
         ])
       end
 
-      it 'should have collection, subcollection and self' do
-        expect(breadcrumb.size).to eq(3)
+      it 'should have collection and subcollection' do
+        expect(breadcrumb.size).to eq(2)
       end
     end
 
@@ -71,7 +46,7 @@ RSpec.describe Breadcrumb::Builder, type: :service do
       end
 
       it 'should find all items in the tree' do
-        expect(Item.in_collection(collection).count).to eq 4
+        expect(Item.in_collection(collection).count).to eq 5
         expect(Item.in_collection(collection)).to include(subcollections.first.items.first)
       end
     end

@@ -288,20 +288,6 @@ describe Collection, type: :model do
   end
 
   context 'caching and stored attributes' do
-    describe '#recalculate_child_breadcrumbs_async' do
-      let(:collection) { create(:collection) }
-
-      it 'queues up BreadcrumbRecalculationWorker on name change' do
-        expect(BreadcrumbRecalculationWorker).to receive(:perform_async)
-        collection.update(name: 'New name')
-      end
-
-      it 'does not queue up BreadcrumbRecalculationWorker unless name change' do
-        expect(BreadcrumbRecalculationWorker).not_to receive(:perform_async)
-        collection.update(updated_at: Time.now)
-      end
-    end
-
     describe '#cache_key' do
       let(:user) { create(:user) }
       let(:collection) { create(:collection, num_cards: 2) }
@@ -397,6 +383,41 @@ describe Collection, type: :model do
         cards.first.reload
         expect(cards.first.width).to eq 2
         expect(cards.first.order).to eq 3
+      end
+    end
+  end
+
+  describe '#update_processing_status' do
+    let(:collection) { create(:collection) }
+
+    context 'processing = :duplicating' do
+      let(:processing) { true }
+
+      it 'marks collections as duplicating' do
+        expect(collection.duplicating?).to be false
+        collection.update_processing_status(Collection.processing_statuses[:duplicating])
+        expect(collection.duplicating?).to be true
+      end
+    end
+
+    context 'processing = nil' do
+      let(:processing) { false }
+
+      before do
+        collection.update_attributes(
+          processing_status: Collection.processing_statuses[:duplicating],
+        )
+      end
+
+      it 'marks collection as not processing' do
+        expect(collection.duplicating?).to be true
+        collection.update_processing_status(nil)
+        expect(collection.duplicating?).to be false
+      end
+
+      it 'broadcasts processing has stopped' do
+        expect(collection).to receive(:processing_done).once
+        collection.update_processing_status(nil)
       end
     end
   end
