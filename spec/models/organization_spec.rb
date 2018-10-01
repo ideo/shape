@@ -343,21 +343,28 @@ describe Organization, type: :model do
   describe 'updating organization name' do
     let!(:organization) { create(:organization) }
     let!(:network_organization) { spy('network_organization') }
+
+    before do
+      allow(organization).to receive(:network_organization).and_return(network_organization)
+    end
+
     context 'network organization exists' do
       before do
-        allow(organization).to receive(:network_organization).and_return(network_organization)
+        allow(network_organization).to receive(:present?).and_return(true)
       end
       it 'updates the name on the network as well' do
-        expect(organization).to receive(:update_network_name)
-        organization.update_attribute(:name, 'new name')
+        expect(network_organization).to receive(:name=)
+        expect(network_organization).to receive(:save)
+        organization.update_attributes(name: 'new name')
       end
     end
     context 'network organization does not exist' do
       before do
-        allow(organization).to receive(:network_organization).and_return(nil)
+        allow(organization).to receive(:present?).and_return(false)
       end
       it 'does not try to update the network organization' do
-        expect(organization).not_to receive(:update_network_name)
+        expect(network_organization).not_to receive(:name=)
+        expect(network_organization).not_to receive(:save)
         organization.update_attribute(:name, 'new name')
       end
     end

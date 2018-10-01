@@ -32,8 +32,7 @@ class Organization < ApplicationRecord
 
   after_create :create_groups
   before_update :parse_domain_whitelist
-  after_update :update_group_names, if: :saved_change_to_name?
-  after_update :update_network_name, if: :saved_change_to_name?
+  after_update :update_network_name, :update_group_names, if: :saved_change_to_name?
   after_update :check_guests_for_domain_match, if: :saved_change_to_domain_whitelist?
 
   delegate :admins, to: :primary_group
@@ -200,7 +199,7 @@ class Organization < ApplicationRecord
   end
 
   def update_network_name
-    return unless network_organization.present?
+    return true unless network_organization.present?
 
     network_organization.name = name
     network_organization.save
