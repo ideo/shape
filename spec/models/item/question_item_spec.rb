@@ -8,7 +8,10 @@ RSpec.describe Item::QuestionItem, type: :model do
   context 'role access within a test collection' do
     let(:user) { create(:user) }
     let(:user2) { create(:user) }
-    let(:test_design) { create(:test_design, add_editors: [user], add_viewers: [user2]) }
+    let(:test_collection) { create(:test_collection) }
+    let(:test_design) do
+      create(:test_design, test_collection: test_collection, add_editors: [user], add_viewers: [user2])
+    end
     let(:question_card) { create(:collection_card_question, parent: test_design) }
     let(:question_item) { question_card.item }
 

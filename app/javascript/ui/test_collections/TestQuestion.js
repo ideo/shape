@@ -117,7 +117,7 @@ class TestQuestion extends React.Component {
         }
         return <QuestionText>{item.content}</QuestionText>
 
-      case 'open':
+      case 'type_open':
         return (
           <OpenQuestion
             item={item}

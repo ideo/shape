@@ -37,6 +37,7 @@ class Item < ApplicationRecord
   delegate :organization, to: :parent, allow_nil: true
   belongs_to :cloned_from, class_name: 'Item', optional: true
   has_one :comment_thread, as: :record, dependent: :destroy
+  has_one :question_item, class_name: 'Item::QuestionItem'
 
   scope :questions, -> { where(type: 'Item::QuestionItem') }
 

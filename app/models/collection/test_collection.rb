@@ -1,9 +1,12 @@
 class Collection
   class TestCollection < Collection
     has_many :survey_responses, dependent: :destroy
-    has_many :question_items,
+    has_one :test_design, inverse_of: :test_collection
+    # this relation exists before the items get moved to the test design
+    has_many :prelaunch_question_items,
              -> { questions },
              source: :item,
+             class_name: 'Item::QuestionItem',
              through: :primary_collection_cards
 
     before_create :setup_default_status_and_questions
@@ -15,9 +18,16 @@ class Collection
       closed: 2,
     }
 
-    def test_design
-      # NOTE: there should only ever be one of these per TestCollection
-      collections.where(type: 'Collection::TestDesign').first
+    # alias method, will delegate to test_design if test is live
+    def question_items
+      if test_design.present?
+        return test_design.question_items
+      end
+      prelaunch_question_items
+    end
+
+    def test_open_response_collections
+      collections.where(type: 'Collection::TestOpenResponses')
     end
 
     def create_uniq_survey_response
@@ -31,30 +41,23 @@ class Collection
         errors.add(:test_status, 'must be in draft mode in order to launch')
         return false
       end
-      # build the TestDesign collection and its card
-      card_params = {
-        order: 0,
-        collection_attributes: {
-          name: "#{name} Test Design",
-          type: 'Collection::TestDesign',
-        }
-      }
-      builder = CollectionCardBuilder.new(
-        params: card_params,
-        parent_collection: self,
-        user: initiated_by,
-      )
-      if builder.create
-        test_design = builder.collection_card.record
+      test_design_card_builder = build_test_design_collection_card(initiated_by)
+      open_response_builders = build_open_response_collection_cards(initiated_by)
+      transaction do
+        return false unless test_design_card_builder.create
+        self.test_design = test_design_card_builder.collection_card.record
         # move all the cards into the test design collection
-        collection_cards.where.not(id: builder.collection_card.id).each_with_index do |card, i|
-          card.update(parent_id: test_design.id, order: i)
-        end
+        collection_cards
+          .where.not(
+            id: test_design_card_builder.collection_card.id,
+          )
+          .each_with_index do |card, i|
+            card.update(parent_id: test_design.id, order: i)
+          end
+        # Create open response collections
+        open_response_builders.all?(&:create) if open_response_builders.present?
         test_design.cache_cover!
         update(test_status: :live)
-      else
-        # errors?
-        false
       end
     end
 
@@ -78,6 +81,41 @@ class Collection
     end
 
     private
+
+    def build_test_design_collection_card(initiated_by)
+      # build the TestDesign collection and its card
+      card_params = {
+        order: 0,
+        collection_attributes: {
+          name: "#{name} Test Design",
+          type: 'Collection::TestDesign',
+          test_collection_id: id,
+        },
+      }
+      CollectionCardBuilder.new(
+        params: card_params,
+        parent_collection: self,
+        user: initiated_by,
+      )
+    end
+
+    def build_open_response_collection_cards(initiated_by)
+      question_items.type_open.map do |open_question|
+        card_params = {
+          order: 0,
+          collection_attributes: {
+            name: "#{open_question.name} Responses",
+            type: 'Collection::TestOpenResponses',
+            question_item_id: open_question.id,
+          },
+        }
+        CollectionCardBuilder.new(
+          params: card_params,
+          parent_collection: self,
+          user: initiated_by,
+        )
+      end
+    end
 
     def setup_default_status_and_questions
       # ||= mostly useful for unit tests, otherwise should be nil
