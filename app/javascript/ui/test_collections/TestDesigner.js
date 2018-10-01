@@ -156,7 +156,7 @@ class TestDesigner extends React.Component {
     const inner = collection.collection_cards.map((card, i) => {
       let position
       const item = card.record
-      if (i === 0) position = 'type_beginning'
+      if (i === 0) position = 'question_beginning'
       if (i === cardCount - 1) position = 'question_end'
       const userEditable = ['question_media', 'question_description'].includes(
         card.record.question_type
