@@ -30,6 +30,14 @@ FactoryBot.define do
       transient do
         record_type :question
       end
+
+      trait :open_response_questions do
+        after(:create) do |collection|
+          collection.prelaunch_question_items.each do |item|
+            item.update(question_type: :type_open)
+          end
+        end
+      end
     end
     factory :test_open_responses_collection, class: Collection::TestOpenResponses
 

@@ -16,11 +16,13 @@ class SurveyResponse < ApplicationRecord
   end
 
   def question_answer_created_or_destroyed
-    # update(status: all_questions_answered? ? :completed : :in_progress)
-    self.status = all_questions_answered? ? :completed : :in_progress
-    self.updated_at = Time.current
-    save
+    update(
+      status: all_questions_answered? ? :completed : :in_progress,
+      updated_at: Time.current # Explicitly set in case status does not change
+    )
   end
+
+  private
 
   def create_open_response_items
     question_answers
