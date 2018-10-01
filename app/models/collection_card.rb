@@ -87,8 +87,7 @@ class CollectionCard < ApplicationRecord
     end
 
     return cc unless cc.save
-
-    # TODO: better way to get the correct breadcrumb upon initial duplication?
+    # now that the card exists, we can recalculate the breadcrumb
     cc.record.recalculate_breadcrumb!
     cc.increment_card_orders! if placement == 'beginning'
 

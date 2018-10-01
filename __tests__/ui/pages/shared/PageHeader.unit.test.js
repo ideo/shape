@@ -11,7 +11,12 @@ describe('PageHeader', () => {
     const routingStore = fakeRoutingStore
     fakeCollection.isNormalCollection = true
     fakeCollection.breadcrumb = [{ id: 12 }]
-    props = { record: { ...fakeCollection }, uiStore, routingStore }
+    props = {
+      record: { ...fakeCollection },
+      isHomepage: false,
+      uiStore,
+      routingStore,
+    }
 
     wrapper = shallow(<PageHeader.wrappedComponent {...props} />)
     component = wrapper.instance()
@@ -25,7 +30,7 @@ describe('PageHeader', () => {
       })
 
       it('should not render the breadcrumb', () => {
-        expect(wrapper.find('Breadcrumb').prop('items').length).toEqual(0)
+        expect(wrapper.find('Breadcrumb').prop('isHomepage')).toBeTruthy()
       })
 
       it('should render an EditableName with the record.name', () => {
@@ -43,9 +48,7 @@ describe('PageHeader', () => {
       })
 
       it('should render the breadcrumb', () => {
-        expect(wrapper.find('Breadcrumb').prop('items').length).toBeGreaterThan(
-          0
-        )
+        expect(wrapper.find('Breadcrumb').prop('record')).toEqual(fakeTextItem)
       })
 
       it('should not render the roles', () => {
@@ -63,8 +66,8 @@ describe('PageHeader', () => {
 
     describe('for a normal collection', () => {
       it('should render the breadcrumb', () => {
-        expect(wrapper.find('Breadcrumb').prop('items').length).toBeGreaterThan(
-          0
+        expect(wrapper.find('Breadcrumb').prop('record')).toEqual(
+          fakeCollection
         )
       })
 

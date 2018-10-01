@@ -4,17 +4,17 @@ FactoryBot.define do
     order 0
 
     factory :collection_card_image do
-      item factory: :file_item
+      item factory: :file_item, strategy: :build
       collection nil
     end
 
     factory :collection_card_video do
-      item factory: :video_item
+      item factory: :video_item, strategy: :build
       collection nil
     end
 
     factory :collection_card_text do
-      item factory: :text_item
+      item factory: :text_item, strategy: :build
       collection nil
     end
 
@@ -24,23 +24,23 @@ FactoryBot.define do
     end
 
     factory :collection_card_collection do
-      collection
+      collection factory: :collection, strategy: :build
       item nil
     end
 
     factory :collection_card_link, class: 'CollectionCard::Link' do
       factory :collection_card_link_image do
-        item factory: :image_item
+        item factory: :image_item, strategy: :build
         collection nil
       end
 
       factory :collection_card_link_video do
-        item factory: :video_item
+        item factory: :video_item, strategy: :build
         collection nil
       end
 
       factory :collection_card_link_text do
-        item factory: :text_item
+        item factory: :text_item, strategy: :build
         collection nil
       end
 

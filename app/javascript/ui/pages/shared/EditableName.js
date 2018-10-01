@@ -26,8 +26,6 @@ const StyledEditableName = styled.div`
       font-size: ${props => props.fontSize}rem;
       font-family: ${v.fonts.sans};
       font-weight: ${v.weights.medium};
-      letter-spacing: 0.125rem;
-      padding: 0.15rem 0 0.5rem 0;
       background-color: transparent;
       border-left: none;
       border-top: none;
@@ -100,15 +98,14 @@ class EditableName extends React.Component {
   }
 
   truncateName() {
-    const { extraWidth, uiStore } = this.props
+    const { extraWidth, actionsWidth, uiStore } = this.props
     if (!this.name) return ''
-    const screenWidth = Math.min(uiStore.windowWidth, v.maxWidth)
+    // 64 == account for 32px padding x2
+    const screenWidth = Math.min(uiStore.windowWidth - 64, v.maxWidth)
     // Estimation of width based on current font size
     const fontSizeMultiplier =
       screenWidth > v.responsive.smallBreakpoint ? 25 : 10
-    let marginRightPadding =
-      screenWidth > v.responsive.medBreakpoint ? 500 : 250
-    if (screenWidth > v.responsive.largeBreakpoint) marginRightPadding = 400
+    let marginRightPadding = actionsWidth + 30
     if (extraWidth) marginRightPadding += extraWidth
     let width = this.name.length * fontSizeMultiplier
     // NOTE: this isn't really doing anything yet, but could be used to
@@ -171,6 +168,7 @@ EditableName.propTypes = {
   canEdit: PropTypes.bool,
   fontSize: PropTypes.number,
   extraWidth: PropTypes.number,
+  actionsWidth: PropTypes.number,
 }
 
 EditableName.wrappedComponent.propTypes = {
@@ -181,6 +179,7 @@ EditableName.defaultProps = {
   canEdit: false,
   fontSize: 2.25,
   extraWidth: 0,
+  actionsWidth: 0,
 }
 
 EditableName.displayName = 'EditableName'
