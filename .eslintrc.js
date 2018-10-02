@@ -61,11 +61,14 @@ module.exports = {
     "prettier/prettier": "error",
     "prefer-destructuring": ["error", {
       "VariableDeclarator": {
-        "array": true,
+        "array": false,
         "object": true
       },
+      // this is the part we changed... annoying when it wants:
+      // ;({ variable } = object) -- instead of:
+      // variable = object.variable
       "AssignmentExpression": {
-        "array": true,
+        "array": false,
         "object": false
       }
     }, {
