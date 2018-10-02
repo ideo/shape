@@ -1,6 +1,13 @@
 class Collection
   class TestCollection < Collection
     has_many :survey_responses, dependent: :destroy
+    has_one :test_design, inverse_of: :test_collection
+    # this relation exists before the items get moved to the test design
+    has_many :prelaunch_question_items,
+             -> { questions },
+             source: :item,
+             class_name: 'Item::QuestionItem',
+             through: :primary_collection_cards
 
     before_create :setup_default_status_and_questions
     after_create :add_test_tag
@@ -11,9 +18,16 @@ class Collection
       closed: 2,
     }
 
-    def test_design
-      # NOTE: there should only ever be one of these per TestCollection
-      collections.where(type: 'Collection::TestDesign').first
+    # alias method, will delegate to test_design if test is live
+    def question_items
+      if test_design.present?
+        return test_design.question_items
+      end
+      prelaunch_question_items
+    end
+
+    def test_open_response_collections
+      collections.where(type: 'Collection::TestOpenResponses')
     end
 
     def create_uniq_survey_response
@@ -27,30 +41,21 @@ class Collection
         errors.add(:test_status, 'must be in draft mode in order to launch')
         return false
       end
-      # build the TestDesign collection and its card
-      card_params = {
-        order: 0,
-        collection_attributes: {
-          name: "#{name} Test Design",
-          type: 'Collection::TestDesign',
-        }
-      }
-      builder = CollectionCardBuilder.new(
-        params: card_params,
-        parent_collection: self,
-        user: initiated_by,
-      )
-      if builder.create
-        test_design = builder.collection_card.record
+      test_design_card_builder = build_test_design_collection_card(initiated_by)
+      transaction do
+        return false unless test_design_card_builder.create
+        self.test_design = test_design_card_builder.collection_card.record
         # move all the cards into the test design collection
-        collection_cards.where.not(id: builder.collection_card.id).each_with_index do |card, i|
-          card.update(parent_id: test_design.id, order: i)
-        end
+        collection_cards
+          .where.not(
+            id: test_design_card_builder.collection_card.id,
+          )
+          .each_with_index do |card, i|
+            card.update(parent_id: test_design.id, order: i)
+          end
+        create_open_response_collection_cards
         test_design.cache_cover!
         update(test_status: :live)
-      else
-        # errors?
-        false
       end
     end
 
@@ -73,7 +78,47 @@ class Collection
       )
     end
 
+    def create_open_response_collection_cards(open_question_items = nil)
+      build_open_response_collection_cards(open_question_items).all?(&:create)
+    end
+
     private
+
+    def build_test_design_collection_card(initiated_by)
+      # build the TestDesign collection and its card
+      card_params = {
+        order: 0,
+        collection_attributes: {
+          name: "#{name} Test Design",
+          type: 'Collection::TestDesign',
+          test_collection_id: id,
+        },
+      }
+      CollectionCardBuilder.new(
+        params: card_params,
+        parent_collection: self,
+        user: initiated_by,
+      )
+    end
+
+    def build_open_response_collection_cards(open_question_items = nil)
+      open_question_items ||= question_items.question_open
+      open_question_items.map do |open_question|
+        card_params = {
+          order: 0,
+          collection_attributes: {
+            name: "#{open_question.content} Responses",
+            type: 'Collection::TestOpenResponses',
+            question_item_id: open_question.id,
+          },
+        }
+        CollectionCardBuilder.new(
+          params: card_params,
+          parent_collection: self,
+          user: created_by,
+        )
+      end
+    end
 
     def setup_default_status_and_questions
       # ||= mostly useful for unit tests, otherwise should be nil
@@ -82,28 +127,28 @@ class Collection
         order: 0,
         item_attributes: {
           type: 'Item::QuestionItem',
-          question_type: :media,
+          question_type: :question_media,
         },
       )
       primary_collection_cards.build(
         order: 1,
         item_attributes: {
           type: 'Item::QuestionItem',
-          question_type: :description,
+          question_type: :question_description,
         },
       )
       primary_collection_cards.build(
         order: 2,
         item_attributes: {
           type: 'Item::QuestionItem',
-          question_type: :useful,
+          question_type: :question_useful,
         },
       )
       primary_collection_cards.build(
         order: 3,
         item_attributes: {
           type: 'Item::QuestionItem',
-          question_type: :finish,
+          question_type: :question_finish,
         },
       )
     end

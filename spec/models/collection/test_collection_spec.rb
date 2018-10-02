@@ -5,6 +5,8 @@ describe Collection::TestCollection, type: :model do
 
   context 'associations' do
     it { should have_many :survey_responses }
+    it { should have_many :prelaunch_question_items }
+    it { should have_one :test_design }
   end
 
   context 'callbacks' do
@@ -40,11 +42,10 @@ describe Collection::TestCollection, type: :model do
 
     describe '#launch_test!' do
       context 'with valid draft collection (default status)' do
-        before do
-          expect(test_collection.launch_test!(initiated_by: user)).to be true
-        end
-
         it 'should create a TestDesign collection and move the questions into it' do
+          expect(test_collection.test_design.present?).to be false
+          expect(test_collection.launch_test!(initiated_by: user)).to be true
+          expect(test_collection.test_design.created_by).to eq user
           expect(test_collection.test_design.present?).to be true
           # should have moved the 3 default cards into there
           expect(test_collection.test_design.collection_cards.count).to eq 4
@@ -56,7 +57,27 @@ describe Collection::TestCollection, type: :model do
         end
 
         it 'should update the status to "live"' do
+          expect(test_collection.launch_test!(initiated_by: user)).to be true
           expect(test_collection.live?).to be true
+        end
+
+        context 'with open response questions' do
+          let!(:test_collection) { create(:test_collection, :open_response_questions) }
+
+          it 'creates a TestOpenResponse collection for each item' do
+            expect {
+              test_collection.launch_test!(initiated_by: user)
+            }.to change(
+              Collection::TestOpenResponses, :count
+            ).by(test_collection.question_items.size)
+
+            expect(
+              test_collection
+                .test_design
+                .question_items
+                .all?(&:test_open_responses_collection),
+            ).to be true
+          end
         end
       end
 

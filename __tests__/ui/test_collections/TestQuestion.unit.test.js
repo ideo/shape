@@ -14,7 +14,7 @@ describe('TestQuestion', () => {
 
   describe('with "useful" type', () => {
     beforeEach(() => {
-      props.card.card_question_type = 'useful'
+      props.card.card_question_type = 'question_useful'
       wrapper = shallow(<TestQuestion {...props} />)
     })
 
@@ -25,7 +25,7 @@ describe('TestQuestion', () => {
 
   describe('with "media" type', () => {
     beforeEach(() => {
-      props.card.card_question_type = 'media'
+      props.card.card_question_type = 'question_media'
       wrapper = shallow(<TestQuestion {...props} />)
     })
 
@@ -36,7 +36,7 @@ describe('TestQuestion', () => {
 
   describe('with "description" type', () => {
     beforeEach(() => {
-      props.card.card_question_type = 'description'
+      props.card.card_question_type = 'question_description'
       wrapper = shallow(<TestQuestion {...props} />)
     })
 

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180921212427) do
+ActiveRecord::Schema.define(version: 20180928225725) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -87,6 +87,8 @@ ActiveRecord::Schema.define(version: 20180921212427) do
     t.integer "submission_box_type"
     t.bigint "submission_box_id"
     t.integer "test_status"
+    t.integer "question_item_id"
+    t.bigint "test_collection_id"
     t.integer "processing_status"
     t.index ["breadcrumb"], name: "index_collections_on_breadcrumb", using: :gin
     t.index ["cloned_from_id"], name: "index_collections_on_cloned_from_id"
@@ -226,6 +228,7 @@ ActiveRecord::Schema.define(version: 20180921212427) do
     t.integer "answer_number"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "open_response_item_id"
     t.index ["question_id"], name: "index_question_answers_on_question_id"
     t.index ["survey_response_id"], name: "index_question_answers_on_survey_response_id"
   end
@@ -247,6 +250,7 @@ ActiveRecord::Schema.define(version: 20180921212427) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.text "session_uid"
+    t.integer "status", default: 0
     t.index ["session_uid"], name: "index_survey_responses_on_session_uid", unique: true
     t.index ["test_collection_id"], name: "index_survey_responses_on_test_collection_id"
   end

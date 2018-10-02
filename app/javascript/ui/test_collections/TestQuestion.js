@@ -59,7 +59,7 @@ class TestQuestion extends React.Component {
     const { parent, card, item, editing, questionAnswer, canEdit } = this.props
     let inner
     switch (card.card_question_type) {
-      case 'context':
+      case 'question_context':
         return (
           <ScaleQuestion
             questionText="How satisfied are you with your current solution?"
@@ -68,7 +68,7 @@ class TestQuestion extends React.Component {
             onAnswer={this.handleQuestionAnswer}
           />
         )
-      case 'useful':
+      case 'question_useful':
         return (
           <ScaleQuestion
             questionText="How useful is this idea for you?"
@@ -79,6 +79,7 @@ class TestQuestion extends React.Component {
           />
         )
       case 'media':
+      case 'question_media':
         if (
           item.type === 'Item::QuestionItem' ||
           uiStore.blankContentToolState.replacingId === card.id
@@ -105,7 +106,7 @@ class TestQuestion extends React.Component {
           )
         }
         return <QuestionCardWrapper>{inner}</QuestionCardWrapper>
-      case 'description':
+      case 'question_description':
         if (editing) {
           return (
             <DescriptionQuestion
@@ -117,7 +118,7 @@ class TestQuestion extends React.Component {
         }
         return <QuestionText>{item.content}</QuestionText>
 
-      case 'open':
+      case 'question_open':
         return (
           <OpenQuestion
             item={item}
@@ -127,7 +128,7 @@ class TestQuestion extends React.Component {
             onAnswer={this.handleQuestionAnswer}
           />
         )
-      case 'finish':
+      case 'question_finish':
         return <FinishQuestion />
       default:
         return <NewQuestionGraphic />

@@ -11,7 +11,7 @@ describe('TestSurveyResponder', () => {
       collection: fakeCollection,
     }
     // very basic way to turn fakeCollection into a "test collection"
-    props.collection.collection_cards[0].card_question_type = 'useful'
+    props.collection.collection_cards[0].card_question_type = 'question_useful'
     wrapper = shallow(<TestSurveyResponder {...props} />)
     component = wrapper.instance()
   })
