@@ -66,30 +66,6 @@ describe Collection::TestCollection, type: :model do
             test_collection.launch_test!(initiated_by: user)
           }.not_to change(Collection::TestOpenResponses, :count)
         end
-
-        context 'with OpenResponse questions' do
-          before do
-            test_collection.prelaunch_question_items.each do |question|
-              question.question_type = :question_open
-              question.save
-            end
-          end
-
-          it 'creates a TestOpenResponse collection for each item' do
-            expect {
-              test_collection.launch_test!(initiated_by: user)
-            }.to change(
-              Collection::TestOpenResponses, :count
-            ).by(test_collection.prelaunch_question_items.size)
-
-            # now we can access test_collection.question_items delegated via test_design
-            expect(
-              test_collection
-                .question_items
-                .all?(&:test_open_responses_collection),
-            ).to be true
-          end
-        end
       end
 
       context 'with invalid collection' do

@@ -3,7 +3,12 @@ class Item
     has_many :question_answers, inverse_of: :question, foreign_key: :question_id, dependent: :destroy
     has_one :test_open_responses_collection, class_name: 'Collection::TestOpenResponses'
 
-    after_update :update_test_open_responses_collection, if: :update_test_open_responses_collection?
+    after_commit :notify_test_design_of_creation,
+                 on: :create,
+                 if: :notify_test_design_collection_of_creation?
+
+    after_update :update_test_open_responses_collection,
+                 if: :update_test_open_responses_collection?
 
     enum question_type: {
       question_context: 0,
@@ -22,6 +27,14 @@ class Item
     end
 
     private
+
+    def notify_test_design_collection_of_creation?
+      parent.is_a?(Collection::TestDesign)
+    end
+
+    def notify_test_design_of_creation
+      parent.question_item_created(self)
+    end
 
     def update_test_open_responses_collection?
       saved_change_to_name? && test_open_responses_collection.present?

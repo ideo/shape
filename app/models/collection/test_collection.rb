@@ -42,7 +42,6 @@ class Collection
         return false
       end
       test_design_card_builder = build_test_design_collection_card(initiated_by)
-      open_response_builders = build_open_response_collection_cards(initiated_by)
       transaction do
         return false unless test_design_card_builder.create
         self.test_design = test_design_card_builder.collection_card.record
@@ -54,8 +53,6 @@ class Collection
           .each_with_index do |card, i|
             card.update(parent_id: test_design.id, order: i)
           end
-        # Create open response collections
-        open_response_builders.all?(&:create) if open_response_builders.present?
         test_design.cache_cover!
         update(test_status: :live)
       end
@@ -97,24 +94,6 @@ class Collection
         parent_collection: self,
         user: initiated_by,
       )
-    end
-
-    def build_open_response_collection_cards(initiated_by)
-      question_items.question_open.map do |open_question|
-        card_params = {
-          order: 0,
-          collection_attributes: {
-            name: "#{open_question.name} Responses",
-            type: 'Collection::TestOpenResponses',
-            question_item_id: open_question.id,
-          },
-        }
-        CollectionCardBuilder.new(
-          params: card_params,
-          parent_collection: self,
-          user: initiated_by,
-        )
-      end
     end
 
     def setup_default_status_and_questions
