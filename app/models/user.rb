@@ -64,6 +64,7 @@ class User < ApplicationRecord
   validates :uid, uniqueness: { scope: :provider }, if: :active?
 
   after_save :update_profile_names, if: :saved_change_to_name?
+  after_save :update_mailing_list_subscription, if: :saved_change_to_mailing_list?
 
   def saved_change_to_name?
     saved_change_to_first_name? || saved_change_to_last_name?
@@ -101,7 +102,7 @@ class User < ApplicationRecord
 
   def should_reindex?
     # called after_commit
-    (previous_changes.keys & %w[name handle email]).present?
+    (saved_changes.keys & %w[first_name last_name handle email]).present?
   end
 
   def reindex
@@ -312,6 +313,11 @@ class User < ApplicationRecord
       # call full update rather than update_all which skips callbacks
       profile.update(name: name)
     end
+  end
+
+  # gets called via background worker
+  def update_mailing_list_subscription
+    MailchimpSubscriptionWorker.perform_async(id)
   end
 
   def after_role_update(role)
