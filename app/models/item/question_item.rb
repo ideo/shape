@@ -15,6 +15,11 @@ class Item
         question_type: Item::QuestionItem.unanswerable_question_types,
       )
     }
+    has_many :chart_items,
+             as: :data_source,
+             class_name: 'Item::ChartItem'
+
+    after_update :update_test_open_responses_collection, if: :update_test_open_responses_collection?
 
     enum question_type: {
       question_context: 0,

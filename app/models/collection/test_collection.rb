@@ -82,6 +82,27 @@ class Collection
       build_open_response_collection_cards(open_question_items).all?(&:create)
     end
 
+    def setup_response_graphs(initiated_by:)
+      chart_cards = []
+      question_items.each_with_index do |question, i|
+        if question.question_context? ||
+           question.question_useful?
+          chart_cards.push(
+            CollectionCardBuilder.new(
+            params: {
+              order: i + 1,
+              item_attributes: {
+                type: 'Item::ChartItem',
+                data_source: question,
+              },
+            },
+            parent_collection: self,
+            user: initiated_by,
+            ).create)
+        end
+      end
+    end
+
     private
 
     def build_test_design_collection_card(initiated_by)
