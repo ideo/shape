@@ -32,7 +32,7 @@ class Organization < ApplicationRecord
 
   after_create :create_groups
   before_update :parse_domain_whitelist
-  after_update :update_group_names, if: :saved_change_to_name?
+  after_update :update_network_name, :update_group_names, if: :saved_change_to_name?
   after_update :check_guests_for_domain_match, if: :saved_change_to_domain_whitelist?
 
   delegate :admins, to: :primary_group
@@ -135,7 +135,7 @@ class Organization < ApplicationRecord
   def all_active_users
     User.active.where(id: (
       primary_group.user_ids +
-      guest_group.user_ids
+        guest_group.user_ids
     ))
   end
 
@@ -148,10 +148,29 @@ class Organization < ApplicationRecord
     )
   end
 
+  def network_organization
+    @network_organization ||= NetworkApi::Organization.find_by_external_id(id)
+  end
+
+  def create_network_organization(admin = nil)
+    NetworkApi::Organization.create(
+      external_id: id,
+      name: name,
+      admin_user_uid: admin.try(:uid),
+    )
+  end
+
+  def find_or_create_on_network(admin = nil)
+    return network_organization if network_organization.present?
+
+    create_network_organization(admin)
+  end
+
   private
 
   def parse_domain_whitelist
     return true unless will_save_change_to_domain_whitelist?
+
     if domain_whitelist.is_a?(String)
       # when saving from the frontend/API we just pass in a string list of domains,
       # so we split to save as an array
@@ -177,5 +196,12 @@ class Organization < ApplicationRecord
     primary_group.update_attributes(name: name)
     guest_group.update_attributes(name: guest_group_name, handle: guest_group_handle)
     admin_group.update_attributes(name: admin_group_name, handle: admin_group_handle)
+  end
+
+  def update_network_name
+    return true unless network_organization.present?
+
+    network_organization.name = name
+    network_organization.save
   end
 end

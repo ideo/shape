@@ -54,19 +54,19 @@ describe Organization, type: :model do
     end
 
     describe '#update_group_names' do
-      it 'should update primary group if name changes' do
+      it 'should update primary group if name changes', :vcr do
         expect(organization.primary_group.name).not_to eq('Org 2.0')
         organization.update_attributes(name: 'Org 2.0')
         expect(organization.primary_group.reload.name).to eq('Org 2.0')
       end
 
-      it 'should update guest group if name changes' do
+      it 'should update guest group if name changes', :vcr do
         expect(organization.guest_group.name).not_to eq('Org 2.0 Guests')
         organization.update_attributes(name: 'Org 2.0')
         expect(organization.guest_group.reload.name).to eq('Org 2.0 Guests')
       end
 
-      it 'should update admin group if name changes' do
+      it 'should update admin group if name changes', :vcr do
         expect(organization.admin_group.name).not_to eq('Org 2.0 Admins')
         organization.update_attributes(name: 'Org 2.0')
         expect(organization.admin_group.reload.name).to eq('Org 2.0 Admins')
@@ -117,21 +117,21 @@ describe Organization, type: :model do
     let!(:user) { create(:user) }
     let(:organization) { Organization.create_for_user(user) }
 
-    it 'creates org' do
+    it 'creates org', :vcr do
       expect { organization }.to change(Organization, :count).by(1)
     end
 
-    it 'has name: FirstName LastName Organization' do
+    it 'has name: FirstName LastName Organization', :vcr do
       org_name = "#{user.first_name} #{user.last_name} Organization"
       expect(organization.name).to eq(org_name)
       expect(organization.slug).to eq(org_name.parameterize)
     end
 
-    it 'adds user as admin of org\'s primary group' do
+    it 'adds user as admin of org\'s primary group', :vcr do
       expect(organization.admins[:users]).to match_array([user])
     end
 
-    it 'sets user.current_organization' do
+    it 'sets user.current_organization', :vcr do
       organization
       expect(user.reload.current_organization).to eq(organization)
     end
@@ -141,7 +141,7 @@ describe Organization, type: :model do
         user.update_attributes(last_name: nil)
       end
 
-      it 'has name: FirstName Organization' do
+      it 'has name: FirstName Organization', :vcr do
         expect(organization.name).to eq("#{user.first_name} Organization")
       end
     end
@@ -259,6 +259,114 @@ describe Organization, type: :model do
 
     it 'should count the number of users' do
       expect(organization.all_active_users.count).to eq 2
+    end
+  end
+
+  describe '#network_organization' do
+    let(:organization) { create(:organization) }
+    let(:network_organization) { double('network organization') }
+    before do
+      allow(NetworkApi::Organization).to receive(:find_by_external_id).with(organization.id).and_return(network_organization)
+    end
+
+    it 'uses the network api to find the organization' do
+      expect(organization.find_or_create_on_network).to equal(network_organization)
+    end
+
+    it 'caches the result' do
+      expect(NetworkApi::Organization).to receive(:find_by_external_id).once
+      organization.find_or_create_on_network
+      organization.find_or_create_on_network
+    end
+  end
+
+  describe '#create_network_organization' do
+    let!(:organization) { create(:organization) }
+
+    before do
+      allow(NetworkApi::Organization).to receive(:create)
+    end
+
+    context 'admin user passed' do
+      it 'creates the network organization' do
+        admin_user = create(:user)
+        organization.create_network_organization(admin_user)
+        expect(NetworkApi::Organization).to have_received(:create).with(
+          external_id: organization.id,
+          name: organization.name,
+          admin_user_uid: admin_user.uid,
+        )
+      end
+    end
+
+    context 'admin user not passed' do
+      it 'creates the network organization' do
+        organization.create_network_organization
+        expect(NetworkApi::Organization).to have_received(:create).with(
+          external_id: organization.id,
+          name: organization.name,
+          admin_user_uid: nil,
+        )
+      end
+    end
+  end
+
+  describe '#find_or_create_on_network' do
+    let!(:organization) { create(:organization) }
+    let!(:network_organization) { double('network_organization') }
+
+    before do
+      allow(NetworkApi::Organization).to receive(:create)
+    end
+
+    context 'network organization present' do
+      before do
+        allow(organization).to receive(:network_organization).and_return(network_organization)
+      end
+
+      it 'returns the existing network organization' do
+        allow(organization).to receive(:create_network_organization)
+        expect(organization.find_or_create_on_network).to eql(network_organization)
+        expect(organization).not_to have_received(:create_network_organization)
+      end
+    end
+
+    context 'network organization not present' do
+      it 'creates and returns a new network organization' do
+        allow(organization).to receive(:network_organization).and_return(nil)
+        allow(organization).to receive(:create_network_organization).and_return(network_organization)
+        expect(organization.find_or_create_on_network).to eql(network_organization)
+      end
+    end
+  end
+
+  describe 'updating organization name' do
+    let!(:organization) { create(:organization) }
+    let!(:network_organization) { spy('network_organization') }
+
+    before do
+      allow(organization).to receive(:network_organization).and_return(network_organization)
+    end
+
+    context 'network organization exists' do
+      before do
+        allow(network_organization).to receive(:present?).and_return(true)
+      end
+      it 'updates the name on the network as well' do
+        expect(network_organization).to receive(:name=)
+        expect(network_organization).to receive(:save)
+        organization.update_attributes(name: 'new name')
+      end
+    end
+    context 'network organization does not exist' do
+      before do
+        allow(organization).to receive(:present?).and_return(false)
+      end
+      it 'does not try to update the network organization' do
+        expect(network_organization).not_to receive(:name=)
+        expect(network_organization).not_to receive(:save)
+        organization.update_attribute(:name, 'new name')
+      end
     end
   end
 end
