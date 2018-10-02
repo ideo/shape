@@ -64,7 +64,8 @@ class TextItemCover extends React.Component {
   }
 
   handleEdit = ev => {
-    const { item } = this.props
+    const { item, dragging } = this.props
+    if (dragging) return false
     if (!item.can_edit_content) return false
     // If already editing, pass event down
     if (uiStore.dragging) return false
@@ -189,6 +190,7 @@ class TextItemCover extends React.Component {
 
 TextItemCover.propTypes = {
   item: MobxPropTypes.objectOrObservableObject.isRequired,
+  dragging: PropTypes.bool.isRequired,
   height: PropTypes.number,
 }
 
