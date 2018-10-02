@@ -21,9 +21,9 @@ class SerializableItem < BaseJsonSerializer
   has_one :parent
   belongs_to :filestack_file
 
-  attribute :breadcrumb do
+  attribute :breadcrumb, if: -> { @object == @current_record } do
     Breadcrumb::ForUser.new(
-      @object.breadcrumb,
+      @object,
       @current_user,
     ).viewable_to_api
   end

@@ -1,7 +1,7 @@
 class Api::V1::CollectionsController < Api::V1::BaseController
   deserializable_resource :collection, class: DeserializableCollection, only: %i[update]
   load_and_authorize_resource :collection_card, only: [:create]
-  load_and_authorize_resource except: %i[me update destroy]
+  load_and_authorize_resource except: %i[me update destroy in_my_collection]
   # NOTE: these have to be in the following order
   before_action :load_and_authorize_collection_update, only: %i[update]
   before_action :load_collection_with_cards, only: %i[show update]
@@ -23,7 +23,7 @@ class Api::V1::CollectionsController < Api::V1::BaseController
     )
 
     if builder.call
-      render jsonapi: builder.collection
+      render jsonapi: builder.collection, expose: { current_record: builder.collection }
     else
       render_api_errors builder.errors
     end
@@ -56,6 +56,11 @@ class Api::V1::CollectionsController < Api::V1::BaseController
     else
       render_api_errors @collection.errors
     end
+  end
+
+  load_resource only: %i[in_my_collection]
+  def in_my_collection
+    render json: current_user.in_my_collection?(@collection)
   end
 
   private
@@ -101,7 +106,9 @@ class Api::V1::CollectionsController < Api::V1::BaseController
   def render_collection(include: nil)
     # include collection_cards for UI to receive any updates
     include ||= Collection.default_relationships_for_api
-    render jsonapi: @collection, include: include
+    render jsonapi: @collection,
+           include: include,
+           expose: { current_record: @collection }
   end
 
   def load_collection_with_cards
