@@ -98,7 +98,9 @@ class ApiStore extends jsonapi(datxCollection) {
       const currentUser = res.data
       this.setCurrentUserInfo({
         id: currentUser.id,
-        organizationId: currentUser.current_organization.id,
+        organizationId:
+          currentUser.current_organization &&
+          currentUser.current_organization.id,
       })
     } catch (e) {
       trackError(e, { source: 'loadCurrentUser', name: 'fetchUser' })
