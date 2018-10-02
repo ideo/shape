@@ -8,6 +8,7 @@ class MailchimpSubscription < SimpleService
   end
 
   def call
+    return unless ENV['MAILCHIMP_API_KEY'].present?
     @subscribe ? subscribe : unsubscribe
   end
 
