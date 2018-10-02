@@ -5,7 +5,7 @@ import { first } from 'lodash'
 import * as networkModels from '~shared/api.network.v1'
 
 class NetworkStore extends jsonapi(Collection) {
-  static types = Object.keys(networkModels).filter(x => x.type)
+  static types = Object.values(networkModels).filter(x => !!x.type)
 
   get organization() {
     return first(this.findAll('organizations'))
