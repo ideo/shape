@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180921212427) do
+ActiveRecord::Schema.define(version: 20181002172736) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -304,6 +304,7 @@ ActiveRecord::Schema.define(version: 20180921212427) do
     t.datetime "last_notification_mail_sent"
     t.boolean "show_move_helper", default: true
     t.boolean "show_template_helper", default: true
+    t.boolean "mailing_list", default: false
     t.index ["email"], name: "index_users_on_email"
     t.index ["handle"], name: "index_users_on_handle", unique: true
     t.index ["invitation_token"], name: "index_users_on_invitation_token"
