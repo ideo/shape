@@ -10,7 +10,7 @@ class User extends BaseRecord {
     return this.apiStore.currentUserId === this.id
   }
 
-  async API_updateCurrentUser(option) {
+  async API_updateCurrentUser(option = {}) {
     try {
       return await this.apiStore.request('users/update_current_user', 'PATCH', {
         user: option,

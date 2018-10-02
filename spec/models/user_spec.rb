@@ -72,9 +72,9 @@ describe User, type: :model do
 
     describe '#update_mailing_list_subscription' do
       it 'should call the MailchimpSubscriptionWorker if mailing_list value is changed' do
-        expect(MailchimpSubscriptionWorker).to receive(:perform_async)
+        expect(MailchimpSubscriptionWorker).to receive(:perform_async).with(user.id, true)
         user.update(mailing_list: true)
-        expect(MailchimpSubscriptionWorker).to receive(:perform_async)
+        expect(MailchimpSubscriptionWorker).to receive(:perform_async).with(user.id, false)
         user.update(mailing_list: false)
       end
 

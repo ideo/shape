@@ -2,13 +2,13 @@ class MailchimpSubscription < SimpleService
   LIST_ID = 'b141f584d3'.freeze
   SHAPE_ID = '9a0c2fe37c'.freeze
 
-  def initialize(user:)
+  def initialize(user:, subscribe:)
     @user = user
+    @subscribe = subscribe
   end
 
   def call
-    # based on `mailing_list` value this will either subscribe/unsubscribe them
-    @user.mailing_list ? subscribe : unsubscribe
+    @subscribe ? subscribe : unsubscribe
   end
 
   private
