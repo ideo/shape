@@ -8,11 +8,15 @@ class QuestionAnswer < ApplicationRecord
 
   delegate :completed?, to: :survey_response, prefix: true
 
-  after_commit :update_survey_response, on: %i[create destroy], if: :survey_response?
+  after_commit :update_survey_response, on: %i[create destroy], if: :survey_response_present?
   before_save :update_open_response_item, if: :update_open_response_item?
   before_destroy :destroy_open_response_item_and_card, if: :open_response_item_present?
 
   private
+
+  def survey_response_present?
+    survey_response.present?
+  end
 
   def open_response_item_present?
     open_response_item.present?

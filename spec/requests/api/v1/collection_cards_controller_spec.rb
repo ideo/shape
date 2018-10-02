@@ -629,7 +629,7 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
             item_attributes: {
               type: 'Item::QuestionItem',
               content: 'This is my item content',
-              question_type: :description,
+              question_type: :question_description,
             },
           }
         end
