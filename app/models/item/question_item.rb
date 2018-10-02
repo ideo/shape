@@ -27,7 +27,7 @@ class Item
     }
 
     def self.unanswerable_question_types
-      %i[question_media question_finish]
+      %i[question_media question_description question_finish]
     end
 
     def requires_roles?
