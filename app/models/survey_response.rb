@@ -12,7 +12,7 @@ class SurveyResponse < ApplicationRecord
   }
 
   def all_questions_answered?
-    question_items.pluck(:id).sort == question_answers.pluck(:question_id).sort
+    question_items.answerable.pluck(:id).sort == question_answers.pluck(:question_id).sort
   end
 
   def question_answer_created_or_destroyed

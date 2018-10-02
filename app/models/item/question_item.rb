@@ -10,6 +10,12 @@ class Item
     after_update :update_test_open_responses_collection,
                  if: :update_test_open_responses_collection?
 
+    scope :answerable, -> {
+      where.not(
+        question_type: Item::QuestionItem.unanswerable_question_types,
+      )
+    }
+
     enum question_type: {
       question_context: 0,
       question_useful: 1,
@@ -19,6 +25,10 @@ class Item
       question_description: 5,
       question_finish: 6,
     }
+
+    def self.unanswerable_question_types
+      %i[question_media question_finish]
+    end
 
     def requires_roles?
       # NOTE: QuestionItems defer their can_edit access to their parent collection.

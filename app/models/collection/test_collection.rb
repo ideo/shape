@@ -53,6 +53,7 @@ class Collection
           .each_with_index do |card, i|
             card.update(parent_id: test_design.id, order: i)
           end
+        create_open_response_collection_cards
         test_design.cache_cover!
         update(test_status: :live)
       end
@@ -77,6 +78,10 @@ class Collection
       )
     end
 
+    def create_open_response_collection_cards(open_question_items = nil)
+      build_open_response_collection_cards(open_question_items).all?(&:create)
+    end
+
     private
 
     def build_test_design_collection_card(initiated_by)
@@ -94,6 +99,25 @@ class Collection
         parent_collection: self,
         user: initiated_by,
       )
+    end
+
+    def build_open_response_collection_cards(open_question_items = nil)
+      open_question_items ||= question_items.question_open
+      open_question_items.map do |open_question|
+        card_params = {
+          order: 0,
+          collection_attributes: {
+            name: "#{open_question.content} Responses",
+            type: 'Collection::TestOpenResponses',
+            question_item_id: open_question.id,
+          },
+        }
+        CollectionCardBuilder.new(
+          params: card_params,
+          parent_collection: self,
+          user: created_by,
+        )
+      end
     end
 
     def setup_default_status_and_questions

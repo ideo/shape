@@ -61,10 +61,23 @@ describe Collection::TestCollection, type: :model do
           expect(test_collection.live?).to be true
         end
 
-        it 'does not create a TestOpenResponses collection' do
-          expect {
-            test_collection.launch_test!(initiated_by: user)
-          }.not_to change(Collection::TestOpenResponses, :count)
+        context 'with open response questions' do
+          let!(:test_collection) { create(:test_collection, :open_response_questions) }
+
+          it 'creates a TestOpenResponse collection for each item' do
+            expect {
+              test_collection.launch_test!(initiated_by: user)
+            }.to change(
+              Collection::TestOpenResponses, :count
+            ).by(test_collection.question_items.size)
+
+            expect(
+              test_collection
+                .test_design
+                .question_items
+                .all?(&:test_open_responses_collection),
+            ).to be true
+          end
         end
       end
 
