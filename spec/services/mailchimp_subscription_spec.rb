@@ -16,6 +16,7 @@ RSpec.describe MailchimpSubscription, type: :service do
             email_address: user.email,
             status: 'subscribed',
             merge_fields: { FNAME: user.first_name, LNAME: user.last_name },
+            interests: { MailchimpSubscription::SHAPE_ID => true },
           },
         )
         MailchimpSubscription.call(user: user)

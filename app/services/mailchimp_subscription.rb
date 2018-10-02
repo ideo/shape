@@ -26,6 +26,7 @@ class MailchimpSubscription < SimpleService
                 email_address: @user.email,
                 status: 'subscribed',
                 merge_fields: { FNAME: @user.first_name, LNAME: @user.last_name },
+                interests: { SHAPE_ID => true },
               })
   end
 
