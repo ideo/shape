@@ -20,6 +20,7 @@ import CommentThread from './jsonApi/CommentThread'
 import UsersThread from './jsonApi/UsersThread'
 import SurveyResponse from './jsonApi/SurveyResponse'
 import QuestionAnswer from './jsonApi/QuestionAnswer'
+import { undoStore } from './index'
 
 class ApiStore extends jsonapi(datxCollection) {
   @observable
@@ -42,6 +43,9 @@ class ApiStore extends jsonapi(datxCollection) {
   request(path, method, data, options = {}) {
     if (!_.has(options, 'skipCache')) {
       options.skipCache = true
+    }
+    if (undoStore.undoAfterRoute) {
+      undoStore.performUndoAfterRoute()
     }
     return super.request(path, method, data, options)
   }
@@ -305,6 +309,66 @@ class ApiStore extends jsonapi(datxCollection) {
     const res = await this.request(`search?query=${q}`)
     runInAction(() => {
       this.usableTemplates = res.data.filter(c => c.isUsableTemplate)
+    })
+  }
+
+  async archiveCards({ cardIds, collection, undoable = true }) {
+    const archiveResult = await this.request(
+      'collection_cards/archive',
+      'PATCH',
+      {
+        card_ids: cardIds,
+      }
+    )
+    if (undoable) {
+      const snapshot = collection.toJsonApiWithCards()
+      undoStore.pushUndoAction({
+        message: 'Archive undone',
+        apiCall: () => this.unarchiveCards({ cardIds, snapshot }),
+        redirectPath: { type: 'collections', id: collection.id },
+      })
+    }
+    collection.removeCardIds(cardIds)
+    return archiveResult
+  }
+
+  unarchiveCards({ cardIds, snapshot }) {
+    return this.request('collection_cards/unarchive', 'PATCH', {
+      card_ids: cardIds,
+      collection_snapshot: snapshot,
+    })
+  }
+
+  moveCards(data) {
+    return this.request('collection_cards/move', 'PATCH', data)
+  }
+
+  linkCards(data) {
+    return this.request('collection_cards/link', 'POST', data)
+  }
+
+  async duplicateCards(data) {
+    const res = await this.request('collection_cards/duplicate', 'POST', data)
+    const collection = this.find('collections', data.to_id)
+    undoStore.pushUndoAction({
+      message: 'Duplicate undone',
+      apiCall: () =>
+        this.archiveCards({
+          cardIds: res.meta.new_cards,
+          collection,
+          undoable: false,
+        }),
+      redirectPath: { type: 'collections', id: collection.id },
+    })
+    return res
+  }
+
+  async checkInMyCollection(record) {
+    const res = await this.request(
+      `${record.internalType}/${record.id}/in_my_collection`
+    )
+    runInAction(() => {
+      record.inMyCollection = res.__response.data
     })
   }
 

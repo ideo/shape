@@ -23,13 +23,11 @@ module Breadcrumbable
 
     def in_collection(collection_or_id)
       if collection_or_id.is_a?(Collection)
-        collection = collection_or_id
+        collection_id = collection_or_id.id
       else
-        collection = Collection.find(collection_or_id)
+        collection_id = collection_or_id
       end
-      scoped = active.where('breadcrumb @> ?', [collection.breadcrumb.last].to_s)
-      # in_collection should not return the collection itself
-      scoped = scoped.where.not(id: collection.id) if base_class == Collection
+      scoped = active.where('breadcrumb @> ?', [collection_id].to_s)
       # order from the top of the tree down
       scoped.order('jsonb_array_length(breadcrumb) ASC')
     end
@@ -47,40 +45,59 @@ module Breadcrumbable
     breadcrumb_for_user(user).viewable
   end
 
-  # Returns the singular breadcrumb item for this object
-  def to_breadcrumb_item
-    Breadcrumb::Builder.for_object(self)
-  end
-
   # really just an alias for save since before_update will call calculate_breadcrumb
   def recalculate_breadcrumb!
     save
   end
 
-  def breadcrumb_contains?(object: nil, id: nil, klass: nil)
-    found = false
-    if object
-      found = breadcrumb.include?(object.to_breadcrumb_item)
+  def breadcrumb_subtree_identifier
+    return if breadcrumb.blank?
+
+    [breadcrumb.last].to_s
+  end
+
+  def breadcrumb_subtree_identifier_was
+    was = @breadcrumb_was || breadcrumb_was
+    return if was.blank?
+
+    [was.last].to_s
+  end
+
+  # Loads all children and recalculates all at once
+  def recalculate_breadcrumb_tree!(force_sync: false)
+    return recalculate_breadcrumb! unless is_a?(Collection)
+    # start with self
+    recalculate_breadcrumb!
+    child_collections = Collection.in_collection(self)
+    child_items = Item.in_collection(self)
+    num = child_collections.count + child_items.count
+
+    # If greater than 50 items, queue to worker
+    if num > 50 && !force_sync
+      BreadcrumbRecalculationWorker.perform_async(id)
     else
-      breadcrumb.each do |crumb|
-        if crumb[0] == klass && crumb[1] == id
-          found = true
-          break
-        end
-      end
+      # Otherwise perform immediately
+      child_collections.find_each(&:recalculate_breadcrumb!)
+      child_items.find_each(&:recalculate_breadcrumb!)
     end
-    found
+    true
+  end
+
+  def within_collection_or_self?(collection)
+    return true if collection == self
+    breadcrumb.include?(collection.id)
   end
 
   private
 
   def calculate_breadcrumb
+    @breadcrumb_was = breadcrumb
     self.breadcrumb = Breadcrumb::Builder.call(self)
   end
 
   def breadcrumb_for_user(user)
     Breadcrumb::ForUser.new(
-      breadcrumb,
+      self,
       user,
     )
   end

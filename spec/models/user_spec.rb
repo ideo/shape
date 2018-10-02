@@ -436,4 +436,25 @@ describe User, type: :model do
       end
     end
   end
+
+  describe '#in_my_collection' do
+    let(:user_collection) { create(:user_collection) }
+    let(:card_in_collection) { create(:collection_card_collection, parent: user_collection) }
+    let(:link_in_collection) { create(:collection_card_link_collection, parent: user_collection) }
+    let(:card_not_in_collection) { create(:collection_card_collection) }
+
+    before do
+      allow(user).to receive(:current_user_collection).and_return(user_collection)
+    end
+
+    it 'should return true if collection is in user collection' do
+      expect(user.in_my_collection?(card_in_collection.collection)).to be true
+    end
+    it 'should return true if collection is linked into user collection' do
+      expect(user.in_my_collection?(link_in_collection.collection)).to be true
+    end
+    it 'should return false if collection is not in user collection' do
+      expect(user.in_my_collection?(card_not_in_collection.collection)).to be false
+    end
+  end
 end

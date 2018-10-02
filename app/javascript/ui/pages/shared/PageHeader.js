@@ -76,6 +76,8 @@ const LiveTestIndicator = styled.span`
 class PageHeader extends React.Component {
   @observable
   iconAndTagsWidth = 0
+  @observable
+  actionsWidth = 0
 
   get canEdit() {
     const { record } = this.props
@@ -92,8 +94,20 @@ class PageHeader extends React.Component {
 
   @action
   updateIconAndTagsWidth(ref) {
+    const { record } = this.props
     if (!ref) return
-    this.iconAndTagsWidth = ref.offsetWidth
+    let width = ref.offsetWidth
+    // account for header button (NOTE: what about others e.g. launch test?)
+    if (record.isUsableTemplate) width += 165
+    // account for profile/master icon at front
+    if (record.isProfileTemplate || record.isMasterTemplate) width += 40
+    this.iconAndTagsWidth = width
+  }
+
+  @action
+  updateActionsWidth(ref) {
+    if (!ref) return
+    this.actionsWidth = ref.offsetWidth
   }
 
   showObjectRoleDialog = () => {
@@ -103,8 +117,8 @@ class PageHeader extends React.Component {
 
   updateRecordName = name => {
     const { record } = this.props
-    record.name = name
-    record.save()
+    // method exists on Item and Collection
+    record.API_updateName(name)
   }
 
   openMenu = () => {
@@ -209,9 +223,10 @@ class PageHeader extends React.Component {
   }
 
   get collectionTypeOrInheritedTags() {
-    const { record } = this.props
+    const { record, uiStore } = this.props
     // not enough room to show in the header of a live Test
     if (record.isLiveTest) return null
+    if (uiStore.windowWidth < v.responsive.smallBreakpoint) return null
     if (record.inherited_tag_list.length) {
       let tagList = record.inherited_tag_list.map(tag => `#${tag}`).join(',')
       if (tagList.length > 24) {
@@ -244,17 +259,24 @@ class PageHeader extends React.Component {
 
   render() {
     const { record, isHomepage, uiStore } = this.props
-    const breadcrumb = isHomepage ? [] : record.breadcrumb
     const tagEditorOpen =
       record.parent_collection_card &&
       uiStore.tagsModalOpenId === record.parent_collection_card.id
 
     const rolesRecord = uiStore.rolesMenuOpen ? uiStore.rolesMenuOpen : record
+
     return (
       <FixedPageHeader>
         <MaxWidthContainer>
           <RolesModal record={rolesRecord} roles={rolesRecord.roles} />
-          <Breadcrumb items={breadcrumb} />
+          <Breadcrumb
+            record={record}
+            isHomepage={isHomepage}
+            // re-mount every time the record / breadcrumb changes
+            key={`${record.identifier}_${record.breadcrumbSize}`}
+            // force props update if windowWidth changes
+            windowWidth={uiStore.windowWidth}
+          />
           <div>
             <StyledTitleAndRoles
               className={record.isCurrentUserProfile ? 'user-profile' : ''}
@@ -271,7 +293,9 @@ class PageHeader extends React.Component {
                   updateNameHandler={this.updateRecordName}
                   canEdit={this.canEdit}
                   extraWidth={this.iconAndTagsWidth}
+                  actionsWidth={this.actionsWidth}
                 />
+                {/* Can't use <Flex> if we want to attach refs... */}
                 <div
                   style={{ display: 'flex' }}
                   ref={ref => {
@@ -343,12 +367,20 @@ class PageHeader extends React.Component {
                   </Fragment>
                 )}
               </Flex>
-              <Flex
-                align="flex-end"
-                style={{ height: '60px', marginTop: '-10px' }}
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'flex-end',
+                  whiteSpace: 'nowrap',
+                  height: '60px',
+                  marginTop: '-10px',
+                }}
+                ref={ref => {
+                  this.updateActionsWidth(ref)
+                }}
               >
                 <Fragment>{this.actions}</Fragment>
-              </Flex>
+              </div>
             </StyledTitleAndRoles>
           </div>
         </MaxWidthContainer>

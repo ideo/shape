@@ -1,5 +1,6 @@
 class CardMover
   attr_reader :errors
+  attr_reader :moving_cards
 
   def initialize(
     from_collection:,
@@ -94,8 +95,9 @@ class CardMover
     @to_collection.recalculate_breadcrumb!
     @from_collection.recalculate_breadcrumb!
     @moving_cards.each do |card|
-      record = card.record
-      if @to_collection.breadcrumb_contains?(klass: record.class.base_class.name, id: record.id)
+      collection = card.collection
+      next unless collection.present?
+      if @to_collection.within_collection_or_self?(collection)
         @errors << 'You can\'t move a collection inside of itself.'
         return true
       end

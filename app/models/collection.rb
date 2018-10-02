@@ -25,7 +25,6 @@ class Collection < ApplicationRecord
   # callbacks
   after_commit :touch_related_cards, if: :saved_change_to_updated_at?, unless: :destroyed?
   after_commit :reindex_sync, on: :create
-  after_commit :recalculate_child_breadcrumbs_async, if: :saved_change_to_name?, unless: :destroyed?
   after_commit :update_comment_thread_in_firestore, unless: :destroyed?
 
   # all cards including archived (i.e. undo default :collection_cards scope)
@@ -99,6 +98,11 @@ class Collection < ApplicationRecord
   scope :master_template, -> { where(master_template: true) }
 
   accepts_nested_attributes_for :collection_cards
+
+  enum processing_status: {
+    processing_breadcrumb: 1,
+    duplicating: 2,
+  }
 
   # Searchkick Config
   # Use queue to bulk reindex every 5m (with Sidekiq Scheduled Job/ActiveJob)
@@ -258,6 +262,8 @@ class Collection < ApplicationRecord
     c.reload
   end
 
+  # NOTE: this refers to the first level of children
+  # i.e. things directly in this collection
   def children
     (items + collections)
   end
@@ -299,6 +305,7 @@ class Collection < ApplicationRecord
     BreadcrumbRecalculationWorker.perform_async(id)
   end
 
+  # Cards are explicitly passed in when moving them from another collection to this one
   def recalculate_child_breadcrumbs(cards = collection_cards)
     cards.each do |card|
       next if card.link?
@@ -306,7 +313,9 @@ class Collection < ApplicationRecord
         # have to reload in order to pick up new parent relationship
         card.item.reload.recalculate_breadcrumb!
       elsif card.collection_id.present?
-        BreadcrumbRecalculationWorker.perform_async(card.collection_id)
+        BreadcrumbRecalculationWorker.perform_async(
+          card.collection.id,
+        )
       end
     end
   end
@@ -329,6 +338,11 @@ class Collection < ApplicationRecord
     all_collection_cards.active.includes(:collection).order('collections.name ASC').each_with_index do |card, i|
       card.update_attribute(:order, i) unless card.order == i
     end
+  end
+
+  def unarchive_cards!(cards, card_attrs_snapshot)
+    cards.each(&:unarchive!)
+    CollectionUpdater.call(self, card_attrs_snapshot)
   end
 
   def allow_primary_group_view_access
@@ -423,6 +437,27 @@ class Collection < ApplicationRecord
 
   def test_collection?
     is_a?(Collection::TestCollection) || is_a?(Collection::TestDesign)
+  end
+
+  def update_processing_status(status = nil)
+    update(
+      processing_status: status,
+    )
+
+    processing_done if processing_status.nil?
+  end
+
+  def mark_children_processing_status(status = nil)
+    # also mark self
+    update_processing_status(status)
+    collections = Collection.in_collection(self)
+    collections.update_all(
+      processing_status: status,
+      updated_at: Time.now,
+    )
+
+    # Broadcast that this collection is no longer being edited
+    collections.each(&:processing_done) if processing_status.nil?
   end
 
   private

@@ -3,6 +3,7 @@ require 'rails_helper'
 describe Breadcrumbable, type: :concern do
   it 'should have concern included' do
     expect(Item.ancestors).to include(Breadcrumbable)
+    expect(Collection.ancestors).to include(Breadcrumbable)
   end
 
   describe 'callbacks' do
@@ -17,65 +18,73 @@ describe Breadcrumbable, type: :concern do
       end
 
       it 'should populate breadcrumb from parent and self' do
-        expect(item.breadcrumb.first).to match_array(Breadcrumb::Builder.for_object(collection))
-
-        expect(item.breadcrumb.last).to match_array(Breadcrumb::Builder.for_object(item))
-      end
-
-      it 'should have parent and self' do
-        expect(item.breadcrumb.size).to eq(2)
+        expect(item.breadcrumb).to eq [collection.id]
       end
 
       it 'should not include user collection' do
         user_collection.recalculate_breadcrumb!
         user_collection_item.recalculate_breadcrumb!
         expect(user_collection.breadcrumb).to be_empty
-        expect(user_collection_item.breadcrumb.size).to eq(1)
+        expect(user_collection_item.breadcrumb).to be_empty
       end
     end
   end
 
-  describe '#breadcrumb_viewable_by' do
+  context 'with nested items' do
     let(:user) { create(:user) }
     let(:collection) { create(:collection, num_cards: 1) }
-    let!(:item) { collection.items.first }
+    let(:subcollection_card) { create(:collection_card_collection, parent: collection) }
+    let(:subcollection) { subcollection_card.collection }
+    let!(:subcollection_item_card) { create(:collection_card_text, parent: subcollection) }
+    let(:item) { subcollection.items.first }
 
-    before do
-      collection.recalculate_breadcrumb!
-      item.recalculate_breadcrumb!
-    end
-
-    it 'should return nothing if no permissions' do
-      expect(collection.breadcrumb_viewable_by(user)).to be_empty
-      expect(item.breadcrumb_viewable_by(user)).to be_empty
-    end
-
-    context 'with only item viewable' do
-      before do
-        user.add_role(Role::VIEWER, item)
-      end
-
-      it 'should be item' do
+    describe '#breadcrumb_viewable_by' do
+      it 'should return nothing if no permissions' do
         expect(collection.breadcrumb_viewable_by(user)).to be_empty
-        expect(item.breadcrumb_viewable_by(user)).to match_array([Breadcrumb::Builder.for_object(item)])
+        expect(item.breadcrumb_viewable_by(user)).to be_empty
+      end
+
+      context 'with only item viewable' do
+        before do
+          user.add_role(Role::VIEWER, subcollection)
+          user.add_role(Role::VIEWER, item)
+        end
+
+        it 'should be item' do
+          expect(collection.breadcrumb_viewable_by(user)).to be_empty
+          expect(item.breadcrumb_viewable_by(user)).to eq [subcollection.id]
+        end
+      end
+
+      context 'with item and collection viewable' do
+        before do
+          user.add_role(Role::VIEWER, collection)
+          user.add_role(Role::VIEWER, item)
+        end
+
+        it 'should be both if user added to collection and item' do
+          breadcrumb = item.breadcrumb_viewable_by(user)
+          expect(breadcrumb.first).to eq collection.id
+          expect(breadcrumb.last).to eq subcollection.id
+        end
       end
     end
 
-    context 'with item and collection viewable' do
-      before do
-        user.add_role(Role::VIEWER, collection)
-        user.add_role(Role::VIEWER, item)
-      end
+    describe '#recalculate_breadcrumb_tree!' do
+      let(:other_collection) { create(:collection) }
+      let!(:parent_collection_card) { create(:collection_card, parent: other_collection, collection: collection) }
 
-      it 'should be both if user added to collection and item' do
-        breadcrumb = item.breadcrumb_viewable_by(user)
-        expect(breadcrumb.first).to match_array(Breadcrumb::Builder.for_object(collection))
-        expect(breadcrumb.last).to match_array(Breadcrumb::Builder.for_object(item))
+      it 'updates breadcrumbs of all children' do
+        expect(subcollection.breadcrumb).to eq [collection.id]
+        expect(item.breadcrumb).to eq [collection.id, subcollection.id]
+        collection.recalculate_breadcrumb_tree!(force_sync: true)
+        expect(subcollection.reload.breadcrumb).to eq [other_collection.id, collection.id]
+        expect(item.reload.breadcrumb).to eq [other_collection.id, collection.id, subcollection.id]
       end
     end
   end
 
-  describe '#breadcrumb_contains?' do
+  describe '#within_collection_or_self?' do
     let(:collection) { create(:collection) }
     let(:collection_card) { create(:collection_card_collection, parent: collection) }
     let(:other_collection_card) { create(:collection_card_collection) }
@@ -89,22 +98,12 @@ describe Breadcrumbable, type: :concern do
     end
 
     it 'returns true if object is in the breadcrumb' do
-      expect(collection.breadcrumb_contains?(object: collection)).to be true
-      expect(subcollection.breadcrumb_contains?(object: collection)).to be true
-    end
-
-    it 'returns true if klass, id are in the breadcrumb' do
-      expect(collection.breadcrumb_contains?(klass: collection.class.name, id: collection.id)).to be true
-      expect(subcollection.breadcrumb_contains?(klass: collection.class.name, id: collection.id)).to be true
+      expect(collection.within_collection_or_self?(collection)).to be true
+      expect(subcollection.within_collection_or_self?(collection)).to be true
     end
 
     it 'returns false if object is not in the breadcrumb' do
-      expect(other_subcollection.breadcrumb_contains?(object: collection)).to be false
-    end
-
-    it 'returns false if klass, id are not in the breadcrumb' do
-      expect(other_subcollection.breadcrumb_contains?(klass: collection.class.name, id: collection.id)).to be false
+      expect(other_subcollection.within_collection_or_self?(collection)).to be false
     end
   end
-
 end

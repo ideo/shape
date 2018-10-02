@@ -21,6 +21,7 @@ Rails.application.routes.draw do
       resources :collections, except: %i[index] do
         member do
           patch 'launch_test'
+          get 'in_my_collection'
         end
         collection do
           post 'create_template'
@@ -37,6 +38,7 @@ Rails.application.routes.draw do
         collection do
           patch 'move'
           patch 'archive'
+          patch 'unarchive'
           post 'link'
           post 'duplicate'
         end
@@ -44,6 +46,7 @@ Rails.application.routes.draw do
           member do
             post 'duplicate'
             patch 'archive'
+            get 'in_my_collection'
           end
           resources :roles, only: %i[index create]
         end

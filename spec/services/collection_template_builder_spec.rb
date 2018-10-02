@@ -48,7 +48,8 @@ RSpec.describe CollectionTemplateBuilder, type: :service do
       expect(parent.primary_collection_cards.first.record).to eq collection
       expect(parent.primary_collection_cards.map(&:order)).to match_array [0, 1, 2]
       # breadcrumb should include parent collection and self
-      expect(collection.breadcrumb.length).to eq 2
+      expect(collection.breadcrumb).to match_array([parent.id])
+      expect(collection.items.first.breadcrumb).to match_array([parent.id, collection.id])
     end
 
     it 'should tag the collection instance with the template name' do

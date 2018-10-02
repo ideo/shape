@@ -21,12 +21,19 @@ export const TopRightButton = styled.button`
 `
 TopRightButton.displayName = 'TopRightButton'
 
-export const CloseButton = ({ onClick, size, color, position }) => (
+export const CloseButton = ({
+  onClick,
+  size,
+  color,
+  position,
+  ...otherProps
+}) => (
   <TopRightButton
     onClick={onClick}
     size={size}
     color={color}
     position={position}
+    {...otherProps}
   >
     <CloseIcon />
   </TopRightButton>
