@@ -123,5 +123,7 @@ When('I capture the current URL', () => {
 })
 
 When('I logout and visit the Marketing Page', () => {
-  cy.logout().then(() => cy.visit('/'))
+  cy.logout()
+  cy.wait(400)
+  cy.visit('/')
 })

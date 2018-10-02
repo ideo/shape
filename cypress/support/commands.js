@@ -9,7 +9,6 @@ Cypress.Commands.add('login', ({ userId } = {}) =>
 
 Cypress.Commands.add('logout', () => {
   cy.request('DELETE', '/api/v1/sessions')
-  cy.wait(100)
 })
 
 Cypress.Commands.add('locateWith', (selector, text) =>
