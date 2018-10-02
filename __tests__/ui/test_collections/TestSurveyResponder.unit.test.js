@@ -1,25 +1,56 @@
 import TestSurveyResponder from '~/ui/test_collections/TestSurveyResponder'
 import SurveyResponse from '~/stores/jsonApi/SurveyResponse'
-import { fakeCollection } from '#/mocks/data'
+import { fakeCollection, fakeItemCard, fakeQuestionAnswer } from '#/mocks/data'
 
 jest.mock('../../../app/javascript/stores/jsonApi/SurveyResponse')
 
 let wrapper, props, component
+const cardTypes = [
+  'question_media',
+  'question_context',
+  'question_useful',
+  'question_open',
+  'question_finish',
+]
+
 describe('TestSurveyResponder', () => {
   beforeEach(() => {
     props = {
       collection: fakeCollection,
     }
     // very basic way to turn fakeCollection into a "test collection"
-    props.collection.collection_cards[0].card_question_type = 'question_useful'
+    props.collection.collection_cards = []
+    cardTypes.forEach((type, i) => {
+      props.collection.collection_cards.push(
+        Object.assign({}, fakeItemCard, { card_question_type: type })
+      )
+    })
     wrapper = shallow(<TestSurveyResponder {...props} />)
     component = wrapper.instance()
   })
 
-  it('renders TestQuestions for each card', () => {
-    expect(wrapper.find('TestQuestion').length).toEqual(
-      fakeCollection.collection_cards.length
-    )
+  it('renders TestQuestions for each visible card', () => {
+    // Should render media and context question
+    expect(wrapper.find('TestQuestion').length).toEqual(2)
+  })
+
+  describe('after answering a question', () => {
+    beforeEach(() => {
+      const mockQuestionAnswerForCard = jest.fn()
+      mockQuestionAnswerForCard.mockReturnValue(fakeQuestionAnswer)
+      // This is kind of dirty to mock internals,
+      // but no easy way to simulate creating a response and saving answers
+      component.questionAnswerForCard = mockQuestionAnswerForCard
+      // Hack to get it to use the mock after shallow mount
+      // wrapper.update() or wrapper.instance().forceUpdate() did not work
+      wrapper.setState({})
+    })
+
+    it('renders additional question', () => {
+      expect(wrapper.find('TestQuestion').length).toEqual(
+        props.collection.collection_cards.length
+      )
+    })
   })
 
   describe('createSurveyResponse', () => {

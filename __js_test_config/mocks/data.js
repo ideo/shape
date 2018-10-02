@@ -296,3 +296,10 @@ export const fakeNotification = {
   user: fakeUser,
   ...fakeJsonApiAttrs,
 }
+export const fakeSurveyResponse = {
+  id: "1",
+  type: 'survey_responses',
+  status: 'in_progress',
+  question_answers: [],
+  ...fakeJsonApiAttrs,
+}
