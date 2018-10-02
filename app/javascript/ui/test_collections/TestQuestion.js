@@ -78,6 +78,7 @@ class TestQuestion extends React.Component {
             onAnswer={this.handleQuestionAnswer}
           />
         )
+      case 'media':
       case 'question_media':
         if (
           item.type === 'Item::QuestionItem' ||
