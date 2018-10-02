@@ -1,5 +1,7 @@
 class MailchimpSubscription < SimpleService
+  # this is the IDEO Products mailchimp mailing list
   LIST_ID = 'b141f584d3'.freeze
+  # this is for marking the Shape mailchimp "interest" value
   SHAPE_ID = '9a0c2fe37c'.freeze
 
   def initialize(user:, subscribe:)
