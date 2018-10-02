@@ -30,48 +30,72 @@ class TestSurveyResponder extends React.Component {
     return surveyResponse
   }
 
+  questionAnswerForCard = card => {
+    const { surveyResponse } = this.state
+    if (!surveyResponse) return
+    return _.find(surveyResponse.question_answers, {
+      question_id: card.record.id,
+    })
+  }
+
+  answerableCard = card =>
+    ['question_useful', 'question_open', 'question_context'].indexOf(
+      card.card_question_type
+    ) !== -1
+
+  viewableCards = () => {
+    const { collection } = this.props
+    let reachedLastVisibleCard = false
+    return collection.collection_cards.filter(card => {
+      // turn off the card's actionmenu (dot-dot-dot)
+      card.record.menuDisabled = true
+      if (reachedLastVisibleCard) {
+        return false
+      } else if (
+        !this.answerableCard(card) ||
+        this.questionAnswerForCard(card)
+      ) {
+        // If not answerable, or they already answered, show it
+        return true
+      }
+      reachedLastVisibleCard = true
+      return true
+    })
+  }
+
   render() {
     const { surveyResponse } = this.state
     const { collection } = this.props
-    const inner = collection.collection_cards.map((card, i) => {
-      let questionAnswer
-      const item = card.record
-      // turn off the card's actionmenu (dot-dot-dot)
-      card.record.menuDisabled = true
-      if (surveyResponse) {
-        questionAnswer = _.find(surveyResponse.question_answers, {
-          question_id: item.id,
-        })
-      }
-      return (
-        <FlipMove appearAnimation="fade" key={card.id}>
-          <div>
-            <Flex
-              style={{
-                width: 'auto',
-                flexWrap: 'wrap',
-              }}
-            >
-              <TestQuestionHolder editing={false} userEditable={false}>
-                <TestQuestion
-                  createSurveyResponse={this.createSurveyResponse}
-                  surveyResponse={surveyResponse}
-                  questionAnswer={questionAnswer}
-                  parent={collection}
-                  card={card}
-                  item={item}
-                  order={card.order}
-                  editing={false}
-                  canEdit={this.canEdit}
-                />
-              </TestQuestionHolder>
-            </Flex>
-          </div>
-        </FlipMove>
-      )
-    })
-
-    return <div>{inner}</div>
+    return (
+      <div>
+        {this.viewableCards().map(card => (
+          <FlipMove appearAnimation="fade" key={card.id}>
+            <div>
+              <Flex
+                style={{
+                  width: 'auto',
+                  flexWrap: 'wrap',
+                }}
+              >
+                <TestQuestionHolder editing={false} userEditable={false}>
+                  <TestQuestion
+                    createSurveyResponse={this.createSurveyResponse}
+                    surveyResponse={surveyResponse}
+                    questionAnswer={this.questionAnswerForCard(card)}
+                    parent={collection}
+                    card={card}
+                    item={card.record}
+                    order={card.order}
+                    editing={false}
+                    canEdit={this.canEdit}
+                  />
+                </TestQuestionHolder>
+              </Flex>
+            </div>
+          </FlipMove>
+        ))}
+      </div>
+    )
   }
 }
 
