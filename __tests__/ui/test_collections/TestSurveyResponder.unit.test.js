@@ -43,6 +43,7 @@ describe('TestSurveyResponder', () => {
       component.questionAnswerForCard = mockQuestionAnswerForCard
       // Hack to get it to use the mock after shallow mount
       // wrapper.update() or wrapper.instance().forceUpdate() did not work
+      // Issue: https://github.com/airbnb/enzyme/issues/1245
       wrapper.setState({})
     })
 
