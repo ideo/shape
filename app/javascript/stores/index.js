@@ -12,12 +12,25 @@ const isNetworkUrl = url => url.indexOf(IdeoSSO.baseApiUrl) === 0
 config.baseUrl = '/api/v1/'
 
 config.fetchReference = (url, opts) => {
-  if (isNetworkUrl(url)) {
+  const networkUrlIndex = url.indexOf(IdeoSSO.baseApiUrl)
+  let requestUrl = url
+  if (networkUrlIndex > 0) {
+    // gross hack, the datx-jsonapi model util saveModel does not read
+    // baseUrl, so we have to use endpoint, which when used in
+    // saveModel, appends to config.baseUrl, so we end up with a bad
+    // url like:
+    // "http://localhost:3000/api/v1/https://ideo-sso-profile-staging.herokuapp.com/api/v1/payment_methods"
+    // this removes the prefixed config.baseUrl
+    //
+    // see: https://github.com/infinum/datx/issues/80
+    requestUrl = url.slice(networkUrlIndex)
+  }
+  if (isNetworkUrl(requestUrl)) {
     opts.credentials = 'include'
   } else {
     opts.credentials = 'same-origin'
   }
-  return fetch(url, opts)
+  return fetch(requestUrl, opts)
 }
 
 config.transformRequest = options => {
