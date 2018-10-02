@@ -114,7 +114,10 @@ class MovableGridCard extends React.PureComponent {
 
   scrollDown = timestamp => {
     if (!this.scrolling) return null
-    if (window.innerHeight + window.scrollY >= document.body.offsetHeight) {
+    if (
+      window.innerHeight + window.scrollY >=
+      document.body.offsetHeight + uiStore.gridSettings.gridH
+    ) {
       return window.requestAnimationFrame(this.scrollDown)
     }
     const scrollAmount = 1
