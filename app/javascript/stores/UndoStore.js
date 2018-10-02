@@ -1,13 +1,14 @@
 import _ from 'lodash'
 import { observable, action } from 'mobx'
 import { routingStore, uiStore } from '~/stores'
-import sleep from '~/utils/sleep'
 
 const MAX_UNDOSTACK_LENGTH = 10
 
 export default class UndoStore {
   @observable
   stack = []
+  @observable
+  undoAfterRoute = null
 
   // block multiple requests from happening too quickly
   @observable
@@ -26,8 +27,6 @@ export default class UndoStore {
   async undoLastAction() {
     const undoAction = this.stack.pop()
     if (!undoAction) return
-    const { message } = undoAction
-    uiStore.popupSnackbar({ message })
     this.currentlyUndoing = true
     if (undoAction.redirectPath) {
       const { type, id } = undoAction.redirectPath
@@ -35,12 +34,26 @@ export default class UndoStore {
       // check if we don't have to redirect
       if (viewingRecord.internalType !== type || viewingRecord.id !== id) {
         routingStore.routeTo(type, id)
-        // wait a little bit so that we actually route to the next page
-        await sleep(350)
+        this.undoAfterRoute = undoAction
+        return
       }
     }
+    this.performUndo(undoAction)
+  }
+
+  @action
+  async performUndo(undoAction) {
+    const { message } = undoAction
+    uiStore.popupSnackbar({ message })
     await undoAction.apiCall()
     this.currentlyUndoing = false
+  }
+
+  @action
+  performUndoAfterRoute() {
+    const undoAction = this.undoAfterRoute
+    this.undoAfterRoute = null
+    return this.performUndo(undoAction)
   }
 
   captureUndoKeypress = e => {

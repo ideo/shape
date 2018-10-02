@@ -7,7 +7,10 @@ Cypress.Commands.add('login', ({ userId } = {}) =>
   cy.request('GET', `/login_as?id=${userId}`)
 )
 
-Cypress.Commands.add('logout', () => cy.request('DELETE', '/api/v1/sessions'))
+Cypress.Commands.add('logout', () => {
+  cy.request('DELETE', '/api/v1/sessions')
+  cy.wait(100)
+})
 
 Cypress.Commands.add('locateWith', (selector, text) =>
   cy.contains(`[data-cy="${selector}"]`, text)
@@ -55,7 +58,7 @@ Cypress.Commands.add(
     cy.locate('CollectionCreatorTextField').type(name, {
       force: true,
     })
-    cy.locate('CollectionCreatorFormButton').click()
+    cy.locate('CollectionCreatorFormButton').click({ force: true })
     cy.wait('@apiCreateCollectionCard')
     // waiting a tiny bit here seems to allow the new card to actually finish creating/rendering
     cy.wait(50)
@@ -77,7 +80,7 @@ Cypress.Commands.add('createTextItem', () => {
 Cypress.Commands.add('resizeCard', (pos, size) => {
   // size e.g. "2x1" so we split on 'x'
   const sizes = size.split('x')
-  const [width, height] = sizes
+  const [width, height] = _.map(sizes, Number)
   cy.window().then(win => {
     const collection = win.uiStore.viewingCollection
     const f = pos === 'last' ? _.last : _.first
@@ -88,6 +91,7 @@ Cypress.Commands.add('resizeCard', (pos, size) => {
       undoMessage: 'Card resize undone',
     })
     cy.wait('@apiUpdateCollection')
+    cy.wait(100)
   })
 })
 
@@ -105,8 +109,6 @@ Cypress.Commands.add('reorderFirstTwoCards', () => {
 })
 
 Cypress.Commands.add('undo', () => {
-  // clear past snackbar??
-  // cy.get('body').click()
   cy.window().then(win => {
     win.undoStore.captureUndoKeypress({
       code: 'KeyZ',
@@ -123,7 +125,7 @@ Cypress.Commands.add('selectBctType', ({ type, empty = false }) => {
   }
   cy.locate(`BctButton-${type}`)
     .first()
-    .click()
+    .click({ force: true })
 })
 
 // NOTE: https://stackoverflow.com/a/47537751/260495
