@@ -18,6 +18,7 @@ const createNamedRoutes = () => {
     'apiReplaceCollectionCard'
   )
   cy.route('GET', '/api/v1/collections/*').as('apiGetCollection')
+  cy.route('PATCH', '/api/v1/collections/*').as('apiUpdateCollection')
   cy.route('PATCH', '/api/v1/collections/*/launch_test').as('apiLaunchTest')
   // external routes
   cy.route('GET', '**/youtube/v3/videos*', 'fx:youtube-api').as('youtubeApi')

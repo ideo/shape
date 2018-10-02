@@ -5,8 +5,9 @@ import { ReferenceType } from 'datx'
 import { apiStore, routingStore, uiStore } from '~/stores'
 import BaseRecord from './BaseRecord'
 import CollectionCard from './CollectionCard'
+import SharedRecordMixin from './SharedRecordMixin'
 
-class Collection extends BaseRecord {
+class Collection extends SharedRecordMixin(BaseRecord) {
   static type = 'collections'
 
   // starts null before it is loaded
@@ -175,8 +176,7 @@ class Collection extends BaseRecord {
     this._reorderCards()
   }
 
-  API_updateCards() {
-    this._reorderCards()
+  toJsonApiWithCards() {
     const data = this.toJsonApi()
     delete data.relationships
     // attach nested attributes of cards
@@ -184,6 +184,22 @@ class Collection extends BaseRecord {
       this.collection_cards,
       card => _.pick(card, ['id', 'order', 'width', 'height'])
     )
+    return data
+  }
+
+  API_updateCards({ card, updates, undoMessage } = {}) {
+    // this works a little differently than the typical "undo" snapshot...
+    // we snapshot the collection_cards.attributes so that they can be reverted
+    const jsonData = this.toJsonApiWithCards()
+    this.pushUndo({
+      snapshot: jsonData.attributes,
+      message: undoMessage,
+    })
+    // now actually make the change to the card
+    _.assign(card, updates)
+
+    this._reorderCards()
+    const data = this.toJsonApiWithCards()
     // we don't want to receive updates which are just going to try to re-render
     data.cancel_sync = true
     const apiPath = `collections/${this.id}`

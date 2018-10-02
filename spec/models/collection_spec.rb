@@ -350,6 +350,41 @@ describe Collection, type: :model do
         expect(collection.cached_cover['text']).to eq 'Howdy doody.'
       end
     end
+
+    describe '#unarchive_cards!' do
+      let(:collection) { create(:collection, num_cards: 3) }
+      let(:cards) { collection.all_collection_cards }
+      let(:snapshot) do
+        {
+          id: collection.id,
+          attributes: {
+            collection_cards_attributes: cards.map do |card|
+              { id: card.id, order: 3, width: 2, height: 1 }
+            end,
+          },
+        }
+      end
+
+      before do
+        collection.archive!
+        expect(cards.first.archived?).to be true
+      end
+
+      it 'unarchives all cards' do
+        expect {
+          collection.unarchive_cards!(cards, snapshot)
+        }.to change(collection.collection_cards, :count).by(3)
+        expect(cards.first.reload.active?).to be true
+      end
+
+      it 'applies snapshot to revert the state' do
+        expect(cards.first.width).to eq 1 # default
+        collection.unarchive_cards!(cards, snapshot)
+        cards.first.reload
+        expect(cards.first.width).to eq 2
+        expect(cards.first.order).to eq 3
+      end
+    end
   end
 
   describe '#update_processing_status' do

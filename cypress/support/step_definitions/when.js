@@ -2,20 +2,50 @@
 
 const FLIPMOVE_DELAY = 350
 
-When(
-  'I create a {string} collection named {string}',
-  (collectionType, name) => {
-    cy.createCollection({ name, collectionType })
-  }
-)
+// ----------------------
+// Creating content (BCT)
+// ----------------------
+When('I create a {word} collection named {string}', (collectionType, name) => {
+  cy.createCollection({ name, collectionType })
+})
 
 When(
-  'I create a {string} collection named {string} in my empty collection',
+  'I create a {word} collection named {string} in my empty collection',
   (collectionType, name) => {
     cy.createCollection({ name, collectionType, empty: true })
   }
 )
 
+When('I create a text item', num => {
+  cy.createTextItem()
+})
+
+// ----------------------
+// Resizing/moving cards
+// ----------------------
+When('I resize the {word} card to {word}', (pos, size) => {
+  cy.resizeCard(pos, size)
+})
+
+When('I reorder the first two cards', () => {
+  cy.reorderFirstTwoCards()
+})
+
+When('I undo with CTRL+Z', () => {
+  cy.undo()
+})
+
+When('I close the snackbar', () => {
+  cy.locateDataOrClass('.MuiSnackbarContent-action')
+    .find('button')
+    .click()
+  // allow it to disappear
+  cy.wait(400)
+})
+
+// ----------------------
+// Test Collection setup
+// ----------------------
 When('I add a video', () => {
   // assumes BCT is already open
   cy.locate(`BctButton-video`)
@@ -44,7 +74,7 @@ When('I add an open response question', () => {
   cy.wait('@apiCreateCollectionCard')
   // have to wait for the flipmove fade-in
   cy.wait(FLIPMOVE_DELAY)
-  cy.locateClass('QuestionSelectHolder')
+  cy.locateDataOrClass('.QuestionSelectHolder')
     .eq(3)
     .find('.select')
     .click()
@@ -61,6 +91,9 @@ When('I add an open response question', () => {
     .type('What do you think about pizza?')
 })
 
+// ----------------------
+// Navigation
+// ----------------------
 When(
   'I navigate to the collection named {string} via the {string}',
   (name, el) => {
@@ -72,13 +105,17 @@ When(
 )
 
 When('I click the {string} containing {string}', (el, text) => {
-  cy.locateWith(el, text)
+  cy.locateDataOrClassWith(el, text)
     .first()
     .click()
 })
 
 When('I wait for {string} to finish', apiCall => {
   cy.wait(apiCall)
+})
+
+When('I wait for {int} second(s)', num => {
+  cy.wait(num * 1000)
 })
 
 When('I capture the current URL', () => {
