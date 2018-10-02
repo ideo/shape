@@ -44,6 +44,9 @@ class ApiStore extends jsonapi(datxCollection) {
     if (!_.has(options, 'skipCache')) {
       options.skipCache = true
     }
+    if (undoStore.undoAfterRoute) {
+      undoStore.performUndoAfterRoute()
+    }
     return super.request(path, method, data, options)
   }
 

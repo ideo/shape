@@ -33,6 +33,7 @@ Feature: Undo actions
     And I wait for 1 second
     When I undo with CTRL+Z
     And I wait for "@apiGetCollection" to finish
+    And I wait for "@apiGetInMyCollection" to finish
     # should navigate me back
     Then the URL should match the captured URL
     Then I should see "Card resize undone" in a ".MuiSnackbarContent-message"

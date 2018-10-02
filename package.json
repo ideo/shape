@@ -10,7 +10,8 @@
     "styleguide": "yarn styleguidist server",
     "test": "jest --watch",
     "lint": "./node_modules/.bin/eslint .",
-    "cypress": "./node_modules/.bin/cypress open"
+    "cypress": "./node_modules/.bin/cypress open",
+    "cypress-run": "./node_modules/.bin/cypress run"
   },
   "jest": {
     "testURL": "http://localhost",
