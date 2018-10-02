@@ -47,7 +47,7 @@ RSpec.describe SurveyResponse, type: :model do
       let!(:question_answer) do
         create(:question_answer,
                survey_response: survey_response,
-               question: survey_response.question_items.first)
+               question: survey_response.question_items.answerable.first)
       end
 
       it 'returns false' do
@@ -57,7 +57,7 @@ RSpec.describe SurveyResponse, type: :model do
 
     context 'all questions answered' do
       let!(:question_answers) do
-        survey_response.question_items.map do |question|
+        survey_response.question_items.answerable.map do |question|
           create(:question_answer,
                  survey_response: survey_response,
                  question: question)
@@ -85,7 +85,7 @@ RSpec.describe SurveyResponse, type: :model do
 
     context 'with all questions answered' do
       let!(:question_answers) do
-        survey_response.question_items.map do |question|
+        survey_response.question_items.answerable.map do |question|
           create(:question_answer,
                  survey_response: survey_response,
                  question: question)
