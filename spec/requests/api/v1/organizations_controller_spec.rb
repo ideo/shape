@@ -52,12 +52,12 @@ describe Api::V1::OrganizationsController, type: :request, json: true, auth: tru
       )
     }
 
-    it 'returns a 200' do
+    it 'returns a 200', :vcr do
       post(path, params: params)
       expect(response.status).to eq(200)
     end
 
-    it 'matches JSON schema' do
+    it 'matches JSON schema', :vcr do
       post(path, params: params)
       expect(json['data']['attributes']).to match_json_schema('organization')
     end
@@ -90,17 +90,17 @@ describe Api::V1::OrganizationsController, type: :request, json: true, auth: tru
       )
     }
 
-    it 'returns a 200' do
+    it 'returns a 200', :vcr do
       patch(path, params: params)
       expect(response.status).to eq(200)
     end
 
-    it 'matches JSON schema' do
+    it 'matches JSON schema', :vcr do
       patch(path, params: params)
       expect(json['data']['attributes']).to match_json_schema('organization')
     end
 
-    it 'updates the name' do
+    it 'updates the name', :vcr do
       expect(organization.name).not_to eq('Acme Inc 2.0')
       patch(path, params: params)
       expect(organization.reload.name).to eq('Acme Inc 2.0')

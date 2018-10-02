@@ -54,19 +54,19 @@ describe Organization, type: :model do
     end
 
     describe '#update_group_names' do
-      it 'should update primary group if name changes' do
+      it 'should update primary group if name changes', :vcr do
         expect(organization.primary_group.name).not_to eq('Org 2.0')
         organization.update_attributes(name: 'Org 2.0')
         expect(organization.primary_group.reload.name).to eq('Org 2.0')
       end
 
-      it 'should update guest group if name changes' do
+      it 'should update guest group if name changes', :vcr do
         expect(organization.guest_group.name).not_to eq('Org 2.0 Guests')
         organization.update_attributes(name: 'Org 2.0')
         expect(organization.guest_group.reload.name).to eq('Org 2.0 Guests')
       end
 
-      it 'should update admin group if name changes' do
+      it 'should update admin group if name changes', :vcr do
         expect(organization.admin_group.name).not_to eq('Org 2.0 Admins')
         organization.update_attributes(name: 'Org 2.0')
         expect(organization.admin_group.reload.name).to eq('Org 2.0 Admins')
@@ -117,21 +117,21 @@ describe Organization, type: :model do
     let!(:user) { create(:user) }
     let(:organization) { Organization.create_for_user(user) }
 
-    it 'creates org' do
+    it 'creates org', :vcr do
       expect { organization }.to change(Organization, :count).by(1)
     end
 
-    it 'has name: FirstName LastName Organization' do
+    it 'has name: FirstName LastName Organization', :vcr do
       org_name = "#{user.first_name} #{user.last_name} Organization"
       expect(organization.name).to eq(org_name)
       expect(organization.slug).to eq(org_name.parameterize)
     end
 
-    it 'adds user as admin of org\'s primary group' do
+    it 'adds user as admin of org\'s primary group', :vcr do
       expect(organization.admins[:users]).to match_array([user])
     end
 
-    it 'sets user.current_organization' do
+    it 'sets user.current_organization', :vcr do
       organization
       expect(user.reload.current_organization).to eq(organization)
     end
@@ -141,7 +141,7 @@ describe Organization, type: :model do
         user.update_attributes(last_name: nil)
       end
 
-      it 'has name: FirstName Organization' do
+      it 'has name: FirstName Organization', :vcr do
         expect(organization.name).to eq("#{user.first_name} Organization")
       end
     end

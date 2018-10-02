@@ -1,11 +1,12 @@
 ---
 http_interactions:
 - request:
-    method: get
-    uri: https://ideo-sso-profile-staging.herokuapp.com/api/v1/organizations?filter%5Bclient_id%5D=3695c5fe55ab3db6f9ee25f18c0ef2fe7025eb4717f1a031fd7824a5d8cddbb5&filter%5Bexternal_id%5D=730&page%5Bnumber%5D=1&page%5Bsize%5D=1
+    method: post
+    uri: https://ideo-sso-profile-staging.herokuapp.com/api/v1/organizations
     body:
-      encoding: US-ASCII
-      string: ''
+      encoding: UTF-8
+      string: '{"data":{"type":"organizations","attributes":{"external_id":"1","name":"Vivienne
+        Dicki Organization","admin_user_uid":"b4143545701713c402dcc2532ec8ea"}}}'
     headers:
       User-Agent:
       - Faraday v0.12.2
@@ -25,7 +26,7 @@ http_interactions:
       Server:
       - Cowboy
       Date:
-      - Tue, 02 Oct 2018 21:00:05 GMT
+      - Tue, 02 Oct 2018 21:02:57 GMT
       Connection:
       - keep-alive
       X-Frame-Options:
@@ -43,13 +44,13 @@ http_interactions:
       Content-Type:
       - application/vnd.api+json; charset=utf-8
       Etag:
-      - W/"9cb0f11ceff0010d135e52d64db2d726"
+      - W/"6ca671df60452c57717370116b2f8a29"
       Cache-Control:
       - max-age=0, private, must-revalidate
       X-Request-Id:
-      - 4bcfc2ee-45a2-479d-8ce5-ae0d04b6ab1a
+      - 89392011-9700-483f-ac16-debdd48df23b
       X-Runtime:
-      - '0.021827'
+      - '0.137363'
       Strict-Transport-Security:
       - max-age=31536000; includeSubDomains
       Vary:
@@ -60,7 +61,8 @@ http_interactions:
       - 1.1 vegur
     body:
       encoding: UTF-8
-      string: '{"data":[],"meta":{},"jsonapi":{"version":"1.0"}}'
+      string: '{"data":{"id":"186","type":"organizations","attributes":{"id":186,"name":"Savanna
+        Sporer Organization"},"relationships":{"applications":{"meta":{"included":false}},"application_organizations":{"meta":{"included":false}}}},"meta":{},"jsonapi":{"version":"1.0"}}'
     http_version: 
-  recorded_at: Tue, 02 Oct 2018 21:00:06 GMT
+  recorded_at: Tue, 02 Oct 2018 21:02:57 GMT
 recorded_with: VCR 4.0.0
