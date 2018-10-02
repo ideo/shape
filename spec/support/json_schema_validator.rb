@@ -4,8 +4,8 @@ class JSONSchemaValidator
     # add_schemas
   end
 
-  def validate!(schema_name, json)
-    JSON::Validator.validate!(schema_path(schema_name), json, strict: true)
+  def validate!(schema_name, json, opts = {})
+    JSON::Validator.validate!(schema_path(schema_name), json, opts)
   end
 
   private

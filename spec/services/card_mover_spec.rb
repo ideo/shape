@@ -62,7 +62,7 @@ RSpec.describe CardMover, type: :service do
           card_mover.call
         }.to change(card.item, :breadcrumb)
         # double check that breadcrumb is showing the new collection
-        expect(card.item.breadcrumb[0].last).to eq to_collection.name
+        expect(card.item.breadcrumb.first).to eq to_collection.id
       end
     end
 

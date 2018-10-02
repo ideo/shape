@@ -293,6 +293,18 @@ class User < ApplicationRecord
     Organization.all
   end
 
+  def in_my_collection?(item_or_collection)
+    uc = current_user_collection
+    @in_my_collection ||= (
+      uc.collections_and_linked_collections.select(:id, :name) + uc.items_and_linked_items.select(:id, :name)
+    ).map(&:resource_identifier)
+    if item_or_collection.breadcrumb.empty?
+      @in_my_collection.include? item_or_collection.resource_identifier
+    else
+      @in_my_collection.include? "Collection_#{item_or_collection.breadcrumb.first}"
+    end
+  end
+
   private
 
   def update_profile_names

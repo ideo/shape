@@ -1,7 +1,8 @@
 import _ from 'lodash'
 import { animateScroll } from 'react-scroll'
-import { observable, action, computed } from 'mobx'
+import { observable, action, runInAction, computed } from 'mobx'
 import queryString from 'query-string'
+import sleep from '~/utils/sleep'
 import v from '~/utils/variables'
 
 export default class UiStore {
@@ -84,8 +85,8 @@ export default class UiStore {
   }
   defaultSnackbarProps = {
     open: false,
-    autoHideDuration: 3500,
     message: '',
+    autoHideDuration: 4000,
     onClose: () => this.closeSnackbar(),
   }
   @observable
@@ -177,12 +178,18 @@ export default class UiStore {
     this.dialogConfig.open = null
   }
 
-  @action
-  popupSnackbar(props = {}) {
-    _.assign(this.snackbarConfig, {
-      ...this.defaultSnackbarProps,
-      open: true,
-      ...props,
+  async popupSnackbar(props = {}) {
+    if (this.snackbarConfig.open) {
+      this.closeSnackbar()
+      // pause slightly between closing last snackbar and opening a new one
+      await sleep(350)
+    }
+    runInAction(() => {
+      _.assign(this.snackbarConfig, {
+        ...this.defaultSnackbarProps,
+        open: true,
+        ...props,
+      })
     })
   }
 
@@ -341,6 +348,12 @@ export default class UiStore {
   @computed
   get blankContentToolIsOpen() {
     return this.blankContentToolState.order !== null
+  }
+
+  @computed
+  get cancelUndo() {
+    // certain UI states should prevent CTRL+Z from triggering an undo
+    return this.organizationMenuOpen || this.dialogConfig.open
   }
 
   @action

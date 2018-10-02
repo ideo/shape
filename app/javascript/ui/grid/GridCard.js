@@ -77,7 +77,13 @@ class GridCard extends React.Component {
     if (this.isItem) {
       switch (record.type) {
         case ITEM_TYPES.TEXT:
-          return <TextItemCover item={record} height={height} />
+          return (
+            <TextItemCover
+              item={record}
+              height={height}
+              dragging={this.props.dragging}
+            />
+          )
         case ITEM_TYPES.FILE: {
           if (record.filestack_file.mimetype === 'application/pdf') {
             return <PdfFileItemCover item={record} />
@@ -243,6 +249,10 @@ class GridCard extends React.Component {
       <StyledGridCard
         dragging={dragging}
         testCollectionCard={testCollectionCard}
+        // mostly for E2E checking purposes
+        data-width={card.width}
+        data-height={card.height}
+        data-order={card.order}
       >
         {canEditCollection &&
           (!card.isPinnedAndLocked || lastPinnedCard) && (

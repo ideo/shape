@@ -64,7 +64,8 @@ class TextItemCover extends React.Component {
   }
 
   handleEdit = ev => {
-    const { item } = this.props
+    const { item, dragging } = this.props
+    if (dragging) return false
     if (!item.can_edit_content) return false
     // If already editing, pass event down
     if (uiStore.dragging) return false
@@ -168,6 +169,7 @@ class TextItemCover extends React.Component {
     const content = isEditing ? this.renderEditing() : this.renderDefault()
     return (
       <PaddedCardCover
+        data-cy="TextItemCover"
         style={{
           height: 'calc(100% - 30px)',
           overflowX: 'hidden',
@@ -189,6 +191,7 @@ class TextItemCover extends React.Component {
 
 TextItemCover.propTypes = {
   item: MobxPropTypes.objectOrObservableObject.isRequired,
+  dragging: PropTypes.bool.isRequired,
   height: PropTypes.number,
 }
 

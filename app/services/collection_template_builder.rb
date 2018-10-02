@@ -14,6 +14,7 @@ class CollectionTemplateBuilder
   def call
     return false unless create_collection
     place_collection_in_parent
+    setup_template_cards
     # re-save to capture cover, new breadcrumb + tag lists
     @collection.cache_cover!
     @collection
@@ -37,11 +38,14 @@ class CollectionTemplateBuilder
     # capture newly added roles
     @collection.reload
     @created_by.add_role(Role::EDITOR, @collection)
+    @collection
+  end
+
+  def setup_template_cards
     @template.setup_templated_collection(
       for_user: @created_by,
       collection: @collection,
     )
-    @collection
   end
 
   def created_template_name
@@ -61,6 +65,6 @@ class CollectionTemplateBuilder
       order: @placement == 'beginning' ? 0 : @parent.collection_cards.count,
     )
     card.increment_card_orders! if @placement == 'beginning'
-    @collection.recalculate_child_breadcrumbs_async
+    @collection.recalculate_breadcrumb!
   end
 end
