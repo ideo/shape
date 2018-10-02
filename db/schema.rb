@@ -89,6 +89,7 @@ ActiveRecord::Schema.define(version: 20180928225725) do
     t.integer "test_status"
     t.integer "question_item_id"
     t.bigint "test_collection_id"
+    t.integer "processing_status"
     t.index ["breadcrumb"], name: "index_collections_on_breadcrumb", using: :gin
     t.index ["cloned_from_id"], name: "index_collections_on_cloned_from_id"
     t.index ["organization_id"], name: "index_collections_on_organization_id"

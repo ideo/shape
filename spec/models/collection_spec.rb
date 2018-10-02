@@ -288,20 +288,6 @@ describe Collection, type: :model do
   end
 
   context 'caching and stored attributes' do
-    describe '#recalculate_child_breadcrumbs_async' do
-      let(:collection) { create(:collection) }
-
-      it 'queues up BreadcrumbRecalculationWorker on name change' do
-        expect(BreadcrumbRecalculationWorker).to receive(:perform_async)
-        collection.update(name: 'New name')
-      end
-
-      it 'does not queue up BreadcrumbRecalculationWorker unless name change' do
-        expect(BreadcrumbRecalculationWorker).not_to receive(:perform_async)
-        collection.update(updated_at: Time.now)
-      end
-    end
-
     describe '#cache_key' do
       let(:user) { create(:user) }
       let(:collection) { create(:collection, num_cards: 2) }
@@ -362,6 +348,76 @@ describe Collection, type: :model do
         item.text_data = { ops: [{ insert: 'Howdy doody.' }] }
         collection.update_cover_text!(item)
         expect(collection.cached_cover['text']).to eq 'Howdy doody.'
+      end
+    end
+
+    describe '#unarchive_cards!' do
+      let(:collection) { create(:collection, num_cards: 3) }
+      let(:cards) { collection.all_collection_cards }
+      let(:snapshot) do
+        {
+          id: collection.id,
+          attributes: {
+            collection_cards_attributes: cards.map do |card|
+              { id: card.id, order: 3, width: 2, height: 1 }
+            end,
+          },
+        }
+      end
+
+      before do
+        collection.archive!
+        expect(cards.first.archived?).to be true
+      end
+
+      it 'unarchives all cards' do
+        expect {
+          collection.unarchive_cards!(cards, snapshot)
+        }.to change(collection.collection_cards, :count).by(3)
+        expect(cards.first.reload.active?).to be true
+      end
+
+      it 'applies snapshot to revert the state' do
+        expect(cards.first.width).to eq 1 # default
+        collection.unarchive_cards!(cards, snapshot)
+        cards.first.reload
+        expect(cards.first.width).to eq 2
+        expect(cards.first.order).to eq 3
+      end
+    end
+  end
+
+  describe '#update_processing_status' do
+    let(:collection) { create(:collection) }
+
+    context 'processing = :duplicating' do
+      let(:processing) { true }
+
+      it 'marks collections as duplicating' do
+        expect(collection.duplicating?).to be false
+        collection.update_processing_status(Collection.processing_statuses[:duplicating])
+        expect(collection.duplicating?).to be true
+      end
+    end
+
+    context 'processing = nil' do
+      let(:processing) { false }
+
+      before do
+        collection.update_attributes(
+          processing_status: Collection.processing_statuses[:duplicating],
+        )
+      end
+
+      it 'marks collection as not processing' do
+        expect(collection.duplicating?).to be true
+        collection.update_processing_status(nil)
+        expect(collection.duplicating?).to be false
+      end
+
+      it 'broadcasts processing has stopped' do
+        expect(collection).to receive(:processing_done).once
+        collection.update_processing_status(nil)
       end
     end
   end

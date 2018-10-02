@@ -82,7 +82,7 @@ class CollectionGrid extends React.Component {
     const {
       blankContentToolState,
       collection,
-      cardIds,
+      cardProperties,
       movingCardIds,
       submissionSettings,
       canEditCollection,
@@ -134,8 +134,8 @@ class CollectionGrid extends React.Component {
         blankCard = { ...blankFound, order, width, height }
       }
       // NOTE: how reliable is this length check for indicating a newly added card?
-      const previousLength = this.props.cardIds.length
-      const cardJustAdded = cardIds.length === previousLength + 1
+      const previousLength = this.props.cardProperties.length
+      const cardJustAdded = cardProperties.length === previousLength + 1
       if ((canEditCollection && !cardJustAdded) || blankCard.blankType) {
         // Add the BCT to the array of cards to be positioned, if they can edit
         cards.unshift(blankCard)
@@ -203,10 +203,17 @@ class CollectionGrid extends React.Component {
       // just some double-checking validations
       if (height > 2) height = 2
       if (width > 4) width = 4
-      _.assign(original, { order, width, height })
-
-      // reorder cards and persist changes
-      this.props.updateCollection()
+      // set up action to undo
+      let undoMessage = 'Card move undone'
+      if (original.height !== height || original.width !== width) {
+        undoMessage = 'Card resize undone'
+      }
+      // this will assign the update attributes to the card
+      this.props.updateCollection({
+        card: original,
+        updates: { order, width, height },
+        undoMessage,
+      })
       this.positionCards(this.props.collection.collection_cards)
     } else {
       // reset back to normal
@@ -581,10 +588,8 @@ class CollectionGrid extends React.Component {
 
     const minHeight = rows * (gridSettings.gridH + gridSettings.gutter)
 
-    const { cardIds } = this.props.collection
-    // Rendering cardIds so that grid re-renders when they change
     return (
-      <StyledGrid data-card-ids={cardIds} minHeight={minHeight}>
+      <StyledGrid minHeight={minHeight}>
         {this.renderPositionedCards()}
       </StyledGrid>
     )
@@ -606,7 +611,7 @@ CollectionGrid.propTypes = {
   updateCollection: PropTypes.func.isRequired,
   collection: MobxPropTypes.objectOrObservableObject.isRequired,
   blankContentToolState: MobxPropTypes.objectOrObservableObject,
-  cardIds: MobxPropTypes.arrayOrObservableArray.isRequired,
+  cardProperties: MobxPropTypes.arrayOrObservableArray.isRequired,
   canEditCollection: PropTypes.bool.isRequired,
   movingCardIds: MobxPropTypes.arrayOrObservableArray.isRequired,
   addEmptyCard: PropTypes.bool,

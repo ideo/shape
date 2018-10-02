@@ -94,18 +94,16 @@ class MoveModal extends React.Component {
       let successMessage
       switch (cardAction) {
         case 'move':
-          await apiStore.request('collection_cards/move', 'PATCH', data)
+          // TODO: wrap in apiStore actions that push the appropriate undoActions
+          await apiStore.moveCards(data)
           successMessage = 'Items successfully moved!'
           break
         case 'link':
-          await apiStore.request('collection_cards/link', 'POST', data)
+          await apiStore.linkCards(data)
           successMessage = 'Items successfully linked!'
           break
         case 'duplicate':
-          await apiStore.request('collection_cards/duplicate', 'POST', data)
-          // have to re-fetch here because the duplicate method wasn't re-rendering
-          // see note in collection_cards_controller#duplicate
-          await apiStore.request(`collections/${collectionId}`)
+          await apiStore.duplicateCards(data)
           successMessage = 'Items successfully duplicated!'
           break
         case 'useTemplate': {
@@ -117,7 +115,7 @@ class MoveModal extends React.Component {
           await apiStore.createTemplateInstance(data)
           successMessage = 'Your template instance has been created!'
           // refresh the current collection to get the new template
-          await apiStore.request(`collections/${collectionId}`)
+          await apiStore.fetch('collections', collectionId, true)
           break
         }
         default:

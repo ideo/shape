@@ -2,7 +2,7 @@ Feature: Creating a Test Collection
 
   Scenario: Adding the test collection via the BCT
     Given I login and visit the Test Area
-    When I create a "test" collection named "Feedback Prototype"
+    When I create a test collection named "Feedback Prototype"
     Then I should see a collection card named "Feedback Prototype"
     When I navigate to the collection named "Feedback Prototype" via the "CollectionCover"
     Then I should see "Feedback Prototype" in a "EditableNameHeading"
@@ -10,7 +10,7 @@ Feature: Creating a Test Collection
     Then I should see "Photo or Video of Idea" in a "QuestionSelectOption"
     Then I should see "Idea Description" in a "QuestionSelectOption"
     Then I should see "Useful" in a "QuestionSelectOption"
-    Then I should see "End of Survey" in a "DisplayText" styled component
+    Then I should see "End of Survey" in a ".DisplayText"
 
     # Scenario: Setting up the questions and launching the test
     When I add a video

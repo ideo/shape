@@ -56,11 +56,7 @@ RSpec.describe CollectionCardBuilder, type: :service do
       it 'should calculate the breadcrumb for the card\'s child collection' do
         expect(builder.create).to be true
         created_collection = builder.collection_card.collection
-        crumb = ['Collection', parent.id, parent.name]
-        expect(created_collection.breadcrumb.first).to eq crumb
-
-        crumb = ['Collection', created_collection.id, 'Cool Collection']
-        expect(created_collection.breadcrumb.last).to eq crumb
+        expect(created_collection.breadcrumb).to eq [parent.id]
       end
 
       it 'should not give the primary group view access to the collection by default' do
@@ -116,11 +112,7 @@ RSpec.describe CollectionCardBuilder, type: :service do
       it 'should calculate the breadcrumb for the card\'s child item' do
         expect(builder.create).to be true
         created_item = builder.collection_card.item
-        crumb = ['Collection', parent.id, parent.name]
-        expect(created_item.breadcrumb.first).to eq crumb
-
-        crumb = ['Item', created_item.id, 'My item name']
-        expect(created_item.breadcrumb.last).to eq crumb
+        expect(created_item.breadcrumb).to eq [parent.id]
       end
 
       it 'should increase order of additional cards' do
