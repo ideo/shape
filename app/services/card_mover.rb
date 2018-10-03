@@ -1,5 +1,6 @@
 class CardMover
   attr_reader :errors
+  attr_reader :moving_cards
 
   def initialize(
     from_collection:,

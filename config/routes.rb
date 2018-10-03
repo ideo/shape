@@ -38,6 +38,7 @@ Rails.application.routes.draw do
         collection do
           patch 'move'
           patch 'archive'
+          patch 'unarchive'
           post 'link'
           post 'duplicate'
         end

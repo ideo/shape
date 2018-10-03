@@ -103,7 +103,7 @@ describe('MoveModal', () => {
     describe('on a collection nested inside itself', () => {
       beforeEach(() => {
         props.uiStore.viewingCollection.can_edit_content = true
-        props.apiStore.request.mockReturnValue(Promise.reject())
+        props.apiStore.moveCards.mockReturnValue(Promise.reject())
         wrapper.setProps(props)
       })
 
@@ -132,16 +132,12 @@ describe('MoveModal', () => {
 
       it('should request the api to move the cards', async () => {
         await component.moveCards('beginning')
-        expect(props.apiStore.request).toHaveBeenCalledWith(
-          'collection_cards/move',
-          'PATCH',
-          {
-            to_id: props.uiStore.viewingCollection.id,
-            from_id: props.uiStore.movingFromCollectionId,
-            collection_card_ids: props.uiStore.movingCardIds,
-            placement: 'beginning',
-          }
-        )
+        expect(props.apiStore.moveCards).toHaveBeenCalledWith({
+          to_id: props.uiStore.viewingCollection.id,
+          from_id: props.uiStore.movingFromCollectionId,
+          collection_card_ids: props.uiStore.movingCardIds,
+          placement: 'beginning',
+        })
       })
 
       it('should close the move menu', async () => {
@@ -173,16 +169,12 @@ describe('MoveModal', () => {
 
       it('should request the api to link the cards', async () => {
         await component.moveCards('beginning')
-        expect(props.apiStore.request).toHaveBeenCalledWith(
-          'collection_cards/link',
-          'POST',
-          {
-            to_id: props.uiStore.viewingCollection.id,
-            from_id: props.uiStore.movingFromCollectionId,
-            collection_card_ids: props.uiStore.movingCardIds,
-            placement: 'beginning',
-          }
-        )
+        expect(props.apiStore.linkCards).toHaveBeenCalledWith({
+          to_id: props.uiStore.viewingCollection.id,
+          from_id: props.uiStore.movingFromCollectionId,
+          collection_card_ids: props.uiStore.movingCardIds,
+          placement: 'beginning',
+        })
       })
 
       it('should close the move menu', async () => {
@@ -218,8 +210,10 @@ describe('MoveModal', () => {
           placement: 'beginning',
         })
         // expect the collection to reload
-        expect(props.apiStore.request).toHaveBeenCalledWith(
-          `collections/${props.uiStore.viewingCollection.id}`
+        expect(props.apiStore.fetch).toHaveBeenCalledWith(
+          'collections',
+          props.uiStore.viewingCollection.id,
+          true
         )
       })
 

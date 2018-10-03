@@ -18,6 +18,10 @@ const createNamedRoutes = () => {
     'apiReplaceCollectionCard'
   )
   cy.route('GET', '/api/v1/collections/*').as('apiGetCollection')
+  cy.route('GET', '/api/v1/collections/*/in_my_collection').as(
+    'apiGetInMyCollection'
+  )
+  cy.route('PATCH', '/api/v1/collections/*').as('apiUpdateCollection')
   cy.route('PATCH', '/api/v1/collections/*/launch_test').as('apiLaunchTest')
   // external routes
   cy.route('GET', '**/youtube/v3/videos*', 'fx:youtube-api').as('youtubeApi')
@@ -32,16 +36,14 @@ const createCypressTestArea = () => {
   // create single inner collection
   cy.locateWith('CollectionCover', 'Cypress Test Area')
     .last()
-    .click()
+    .click({ force: true })
   cy.wait('@apiGetCollection')
   cy.createCollection({ name: 'Inner collection', empty: true })
-  // logout so that other tests can choose whether to login or not
-  cy.logout()
 }
 
 before(() => {
   // clean out the DB before running the suite
-  cy.exec('spring rake cypress:db_setup')
+  cy.exec('bin/spring rake cypress:db_setup')
   // have to do this initially in order to create the test area
   createNamedRoutes()
   createCypressTestArea()
@@ -50,4 +52,5 @@ before(() => {
 beforeEach(() => {
   // have to alias the routes every time
   createNamedRoutes()
+  cy.logout()
 })

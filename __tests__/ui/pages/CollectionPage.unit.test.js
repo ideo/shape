@@ -110,20 +110,6 @@ describe('CollectionPage', () => {
     })
   })
 
-  describe('updateCollectionName', () => {
-    beforeEach(() => {
-      wrapper.instance().updateCollectionName('great')
-    })
-
-    it('should set the collection name to passed in value', () => {
-      expect(collection.name).toEqual('great')
-    })
-
-    it('should track an event for updating the collection', () => {
-      expect(uiStore.trackEvent).toHaveBeenCalledWith('update', collection)
-    })
-  })
-
   describe('updateCollection', () => {
     beforeEach(() => {
       wrapper.instance().updateCollection()

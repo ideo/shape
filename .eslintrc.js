@@ -55,6 +55,25 @@ module.exports = {
     'no-param-reassign': ['error', { props: false }],
     'no-underscore-dangle': 0,
     'prettier/prettier': 'error',
+    'prefer-destructuring': [
+      'error',
+      {
+        VariableDeclarator: {
+          array: false,
+          object: true,
+        },
+        // this is the part we changed... annoying when it wants:
+        // ;({ variable } = object) -- instead of:
+        // variable = object.variable
+        AssignmentExpression: {
+          array: false,
+          object: false,
+        },
+      },
+      {
+        enforceForRenamedProperties: false,
+      },
+    ],
     radix: ['error', 'as-needed'],
     'space-before-function-paren': 0,
     'jsx-a11y/anchor-is-valid': [

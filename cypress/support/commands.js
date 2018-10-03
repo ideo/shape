@@ -1,3 +1,4 @@
+import _ from 'lodash'
 // For more comprehensive examples of custom
 // commands please read more here:
 // https://on.cypress.io/custom-commands
@@ -6,16 +7,36 @@ Cypress.Commands.add('login', ({ userId } = {}) =>
   cy.request('GET', `/login_as?id=${userId}`)
 )
 
-Cypress.Commands.add('logout', () => cy.request('DELETE', '/api/v1/sessions'))
+Cypress.Commands.add('logout', () => {
+  cy.request('DELETE', '/api/v1/sessions')
+})
 
-Cypress.Commands.add('locate', selector => cy.get(`[data-cy="${selector}"]`))
 Cypress.Commands.add('locateWith', (selector, text) =>
   cy.contains(`[data-cy="${selector}"]`, text)
 )
-Cypress.Commands.add('locateClass', selector => cy.get(`[class^=${selector}-]`))
-Cypress.Commands.add('locateWithClass', (selector, text) =>
+Cypress.Commands.add(
+  'locateDataOrClass',
+  { prevSubject: 'optional' },
+  (subject, selector) => {
+    let findSelector = `[data-cy="${selector}"]`
+    if (selector.indexOf('.') === 0) {
+      findSelector = `[class^="${selector.substring(1)}-"]`
+    }
+    if (subject) {
+      return subject.find(findSelector)
+    }
+    return cy.get(findSelector)
+  }
+)
+// basically alias now
+Cypress.Commands.add('locate', selector => cy.locateDataOrClass(selector))
+
+Cypress.Commands.add('locateClassWith', (selector, text) =>
   cy.contains(`[class^="${selector}-"]`, text)
 )
+Cypress.Commands.add('locateDataOrClassWith', (selector, text) => {
+  cy.locateDataOrClass(selector).contains(text)
+})
 
 Cypress.Commands.add(
   'createCollection',
@@ -31,22 +52,80 @@ Cypress.Commands.add(
         type = 'collection'
         break
     }
-    if (!empty) {
-      cy.locateClass('StyledHotspot')
-        .last()
-        .click()
-    }
-    cy.locate(`BctButton-${type}`)
-      .first()
-      .click()
+    cy.selectBctType({ type, empty })
     // force == don't care if it's "covered by tooltip"
     cy.locate('CollectionCreatorTextField').type(name, {
       force: true,
     })
-    cy.locate('CollectionCreatorFormButton').click()
+    cy.locate('CollectionCreatorFormButton').click({ force: true })
     cy.wait('@apiCreateCollectionCard')
+    // waiting a tiny bit here seems to allow the new card to actually finish creating/rendering
+    cy.wait(50)
   }
 )
+
+Cypress.Commands.add('createTextItem', () => {
+  cy.selectBctType({ type: 'text' })
+  cy.get('.ql-editor')
+    .first()
+    .type('la dee daaaaa')
+  cy.locate('TextItemClose')
+    .first()
+    .click({ force: true })
+  cy.wait('@apiCreateCollectionCard')
+  cy.wait(50)
+})
+
+Cypress.Commands.add('resizeCard', (pos, size) => {
+  // size e.g. "2x1" so we split on 'x'
+  const sizes = size.split('x')
+  const [width, height] = _.map(sizes, Number)
+  cy.window().then(win => {
+    const collection = win.uiStore.viewingCollection
+    const f = pos === 'last' ? _.last : _.first
+    const card = f(collection.collection_cards)
+    collection.API_updateCards({
+      card,
+      updates: { width, height },
+      undoMessage: 'Card resize undone',
+    })
+    cy.wait('@apiUpdateCollection')
+    cy.wait(100)
+  })
+})
+
+Cypress.Commands.add('reorderFirstTwoCards', () => {
+  cy.window().then(win => {
+    const collection = win.uiStore.viewingCollection
+    const card = _.first(collection.collection_cards)
+    collection.API_updateCards({
+      card,
+      updates: { order: 1.5 },
+      undoMessage: 'Card move undone',
+    })
+    cy.wait('@apiUpdateCollection')
+  })
+})
+
+Cypress.Commands.add('undo', () => {
+  cy.window().then(win => {
+    win.undoStore.captureUndoKeypress({
+      code: 'KeyZ',
+      ctrlKey: true,
+    })
+  })
+})
+
+Cypress.Commands.add('selectBctType', ({ type, empty = false }) => {
+  if (!empty) {
+    cy.locateDataOrClass('.StyledHotspot')
+      .last()
+      .click({ force: true })
+  }
+  cy.locate(`BctButton-${type}`)
+    .first()
+    .click({ force: true })
+})
 
 // NOTE: https://stackoverflow.com/a/47537751/260495
 // this hack is what allows cypress + fetch to work together, otherwise it doesn't

@@ -3,8 +3,6 @@ import { action, observable } from 'mobx'
 import { uiStore } from '~/stores'
 import { ITEM_TYPES } from '~/utils/variables'
 import { apiUrl } from '~/utils/url'
-
-import Api from './Api'
 import BaseRecord from './BaseRecord'
 
 class CollectionCard extends BaseRecord {
@@ -178,10 +176,10 @@ class CollectionCard extends BaseRecord {
 
   async API_archiveSelf() {
     try {
-      this.apiStore.request(`collection_cards/archive`, 'PATCH', {
-        card_ids: [this.id],
+      await this.apiStore.archiveCards({
+        cardIds: [this.id],
+        collection: this.parent,
       })
-      this.parent.removeCard(this)
       return
     } catch (e) {
       uiStore.defaultAlertError()
@@ -226,8 +224,10 @@ class CollectionCard extends BaseRecord {
 
     const collection = this.parent
     try {
-      await this.apiStore.request(`collection_cards/archive`, 'PATCH', {
-        card_ids: selectedCardIds,
+      await this.apiStore.archiveCards({
+        // turn into normal JS array
+        cardIds: selectedCardIds.toJS(),
+        collection,
       })
       // collection may be undefined e.g. if we're archiving from the header actionmenu
       if (collection) {
@@ -237,6 +237,7 @@ class CollectionCard extends BaseRecord {
           uiStore.openBlankContentTool()
         }
       }
+      uiStore.deselectCards()
       return true
     } catch (e) {
       // re-fetch collection
@@ -246,10 +247,6 @@ class CollectionCard extends BaseRecord {
       uiStore.defaultAlertError()
     }
     return false
-  }
-
-  API_duplicate() {
-    return Api.duplicate('collection_cards', this)
   }
 }
 
