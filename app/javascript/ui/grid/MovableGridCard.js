@@ -433,6 +433,7 @@ class MovableGridCard extends React.PureComponent {
             bottomRight:
               canEditCollection &&
               !card.isPinnedAndLocked &&
+              !card.record.isChart &&
               !card.record.isGenericFile,
             bottom: false,
             bottomLeft: false,
