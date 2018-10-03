@@ -3,6 +3,7 @@ import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import trackError from '~/utils/trackError'
 import PaymentMethods from '~shared/components/compounds/PaymentMethods'
 import Loader from '~/ui/layout/Loader'
+import EmptyList from '~/ui/billing/EmptyList'
 
 @inject('apiStore', 'networkStore')
 @observer
@@ -69,6 +70,9 @@ class ManagePaymentMethods extends React.Component {
         makePaymentMethodDefault={this.makePaymentMethodDefault}
         destroyPaymentMethod={this.destroyPaymentMethod}
         tokenCreated={this.tokenCreated}
+        NoPaymentMethodsComponent={() => (
+          <EmptyList>No payments methods currently on file</EmptyList>
+        )}
       />
     )
   }
