@@ -100,6 +100,7 @@
     "prettier": "^1.14.2",
     "prop-types": "^15.6.2",
     "query-string": "5.1.0",
+    "rails-erb-loader": "^5.5.0",
     "react": "^16.4.2",
     "react-autosize-textarea": "^3.0.3",
     "react-copy-to-clipboard": "^5.0.1",

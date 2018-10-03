@@ -2,6 +2,7 @@
 
 const webpack = require('webpack')
 const {environment} = require('@rails/webpacker')
+const erb =  require('./loaders/erb')
 const path = require('path')
 const {castArray, identity, flow, mapValues} = require('lodash/fp')
 
@@ -111,4 +112,5 @@ const updateEnvironment = flow(
   process.env.ANALYZE ? addBundleAnalyzerPlugin : identity
 )
 
+environment.loaders.append('erb', erb)
 module.exports = updateEnvironment(environment)

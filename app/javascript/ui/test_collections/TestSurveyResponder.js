@@ -8,6 +8,7 @@ import { apiStore } from '~/stores/'
 import SurveyResponse from '~/stores/jsonApi/SurveyResponse'
 import { TestQuestionHolder } from '~/ui/test_collections/shared'
 import TestQuestion from '~/ui/test_collections/TestQuestion'
+import { UNANSWERABLE_QUESTION_TYPES } from '~/utils/railsVariables'
 
 @observer
 class TestSurveyResponder extends React.Component {
@@ -39,9 +40,7 @@ class TestSurveyResponder extends React.Component {
   }
 
   answerableCard = card =>
-    ['question_useful', 'question_open', 'question_context'].indexOf(
-      card.card_question_type
-    ) !== -1
+    UNANSWERABLE_QUESTION_TYPES.indexOf(card.card_question_type) === -1
 
   viewableCards = () => {
     const { collection } = this.props

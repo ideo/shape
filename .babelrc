@@ -34,20 +34,26 @@
     "transform-decorators-legacy",
     "transform-object-rest-spread",
     "transform-class-properties",
-    ["module-resolver", {
-      "extensions": [".js", ".jsx", ".ts", ".tsx"],
-      "alias": {
-        "~shared": "./app/javascript/ui/shared",
-        "~": "./app/javascript",
-        "^~(.+)": "./app/javascript/src/\\1",
-        "#": "./__js_test_config"
+    [
+      "module-resolver",
+      {
+        "extensions": [".js", ".js.erb", ".jsx", ".ts", ".tsx"],
+        "alias": {
+          "~shared": "./app/javascript/ui/shared",
+          "~": "./app/javascript",
+          "^~(.+)": "./app/javascript/src/\\1",
+          "#": "./__js_test_config"
+        }
       }
-    }],
-    ["transform-runtime", {
-      "helpers": false,
-      "polyfill": false,
-      "regenerator": true
-    }],
+    ],
+    [
+      "transform-runtime",
+      {
+        "helpers": false,
+        "polyfill": false,
+        "regenerator": true
+      }
+    ],
     [
       "transform-class-properties",
       {
@@ -58,17 +64,23 @@
   "env": {
     "development": {
       "plugins": [
-        ["babel-plugin-styled-components", {
-          "fileName": false
-        }]
+        [
+          "babel-plugin-styled-components",
+          {
+            "fileName": false
+          }
+        ]
       ]
     },
     "production": {
       "plugins": [
         "lodash",
-        ["styled-components", {
-          "displayName": false
-        }]
+        [
+          "styled-components",
+          {
+            "displayName": false
+          }
+        ]
       ]
     }
   }
