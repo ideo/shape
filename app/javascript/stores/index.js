@@ -7,25 +7,19 @@ import NetworkStore from './NetworkStore'
 import RoutingStore from './RoutingStore'
 import UiStore from './UiStore'
 
-const isNetworkUrl = url => url.indexOf(IdeoSSO.baseApiUrl) === 0
+const isNetworkUrl = url => url.indexOf(IdeoSSO.baseApiUrl) > -1
 
-config.baseUrl = '/api/v1/'
+// important, see https://github.com/infinum/datx/issues/80
+// set to / instead of empty string to avoid situations like:
+// /:org-name/foo/1/api/v1/
+config.baseUrl = '/'
 
 config.fetchReference = (url, opts) => {
-  const networkUrlIndex = url.indexOf(IdeoSSO.baseApiUrl)
   let requestUrl = url
-  if (networkUrlIndex > 0) {
-    // gross hack, the datx-jsonapi model util saveModel does not read
-    // baseUrl, so we have to use endpoint, which when used in
-    // saveModel, appends to config.baseUrl, so we end up with a bad
-    // url like:
-    // "http://localhost:3000/api/v1/https://ideo-sso-profile-staging.herokuapp.com/api/v1/payment_methods"
-    // this removes the prefixed config.baseUrl
-    //
-    // see: https://github.com/infinum/datx/issues/80
-    requestUrl = url.slice(networkUrlIndex)
-  }
   if (isNetworkUrl(requestUrl)) {
+    // remove baseUrl / if it is at the start of a network url
+    // (happens when using utils saveModel / removeModel)
+    requestUrl = url.replace(/^\//, '')
     opts.credentials = 'include'
   } else {
     opts.credentials = 'same-origin'

@@ -3,11 +3,14 @@ import { observable, computed, action } from 'mobx'
 import { ReferenceType } from 'datx'
 
 import { apiStore, routingStore, uiStore } from '~/stores'
+import { apiUrl } from '~/utils/url'
+
 import BaseRecord from './BaseRecord'
 import CollectionCard from './CollectionCard'
 
 class Collection extends BaseRecord {
   static type = 'collections'
+  static endpoint = apiUrl('collections')
 
   // starts null before it is loaded
   @observable

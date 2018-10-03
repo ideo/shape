@@ -1,6 +1,7 @@
 import { action, runInAction, observable, computed } from 'mobx'
 import { Collection as datxCollection, assignModel, ReferenceType } from 'datx'
 import { jsonapi } from 'datx-jsonapi'
+import { apiUrl } from '~/utils/url'
 import _ from 'lodash'
 import moment from 'moment-mini'
 
@@ -43,7 +44,7 @@ class ApiStore extends jsonapi(datxCollection) {
     if (!_.has(options, 'skipCache')) {
       options.skipCache = true
     }
-    return super.request(path, method, data, options)
+    return super.request(apiUrl(path), method, data, options)
   }
 
   @action
