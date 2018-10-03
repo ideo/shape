@@ -32,7 +32,7 @@ class TestSurveyResponder extends React.Component {
 
   questionAnswerForCard = card => {
     const { surveyResponse } = this.state
-    if (!surveyResponse) return
+    if (!surveyResponse) return undefined
     return _.find(surveyResponse.question_answers, {
       question_id: card.record.id,
     })
