@@ -1,9 +1,9 @@
 'use strict'
 
 const webpack = require('webpack')
-const {environment} = require('@rails/webpacker')
+const { environment } = require('@rails/webpacker')
 const path = require('path')
-const {castArray, identity, flow, mapValues} = require('lodash/fp')
+const { castArray, identity, flow, mapValues } = require('lodash/fp')
 
 const DEV = process.env.RAILS_ENV === 'development'
 const root = p => path.resolve(__dirname, '..', '..', p)
@@ -46,7 +46,7 @@ const addReactSVGLoader = env => {
         },
       ]),
     },
-    {after: 'file'}
+    { after: 'file' }
   )
 
   const fileLoader = env.loaders.get('file')
@@ -56,7 +56,10 @@ const addReactSVGLoader = env => {
 }
 
 const prependBabelPolyfill = mapValues(
-  flow(castArray, prepend(path.resolve(__dirname, 'babelPolyfill.js')))
+  flow(
+    castArray,
+    prepend(path.resolve(__dirname, 'babelPolyfill.js'))
+  )
 )
 
 const addBabelPolyfill = env => {
@@ -71,7 +74,7 @@ const addTypescriptLoader = env => {
     use: [
       {
         loader: 'babel-loader',
-        options: {cacheDirectory: true},
+        options: { cacheDirectory: true },
       },
       {
         loader: 'ts-loader',
@@ -95,9 +98,12 @@ const addIdeoSSOExternal = env => {
 }
 
 const addReactGlobal = env => {
-  env.plugins.insert('Provide', new webpack.ProvidePlugin({
-    React: 'react'
-  }))
+  env.plugins.insert(
+    'Provide',
+    new webpack.ProvidePlugin({
+      React: 'react',
+    })
+  )
   return env
 }
 

@@ -5,7 +5,7 @@ import { first } from 'lodash'
 import * as networkModels from '~shared/api.network.v1'
 
 class NetworkStore extends jsonapi(Collection) {
-  static types = Object.keys(networkModels).filter(x => x.type)
+  static types = Object.values(networkModels).filter(x => !!x.type)
 
   firstResource(resourceName) {
     return first(this.findAll(resourceName))
@@ -19,10 +19,16 @@ class NetworkStore extends jsonapi(Collection) {
     return this.firstResource('subscriptions')
   }
 
-  loadOrganization(external_id) {
-    return this.fetchAll('organizations', {
-      filter: { external_id },
-    })
+  loadOrganization(external_id, skipCache = false) {
+    return this.fetchAll(
+      'organizations',
+      {
+        filter: { external_id },
+      },
+      {
+        skipCache,
+      }
+    )
   }
 
   loadPaymentMethods(organization_id, skipCache = false) {
@@ -50,16 +56,16 @@ class NetworkStore extends jsonapi(Collection) {
       throw new Error('Missing card address zip')
     }
 
-    const paymentMethod = new networkModels.CreatePaymentMethod(
-      token.id,
-      card.name,
-      card.exp_month,
-      card.exp_year,
-      card.address_zip,
-      card.country,
-      false
-    )
-    paymentMethod.organization_id = organization.id
+    const paymentMethod = new networkModels.PaymentMethod({
+      stripe_card_token: token.id,
+      name: card.name,
+      exp_month: card.exp_month,
+      exp_year: card.exp_year,
+      address_zip: card.address_zip,
+      address_country: card.country,
+      isDefault: false,
+      organization_id: organization.id,
+    })
     return saveModel(paymentMethod).then(() => this.add(paymentMethod))
   }
 

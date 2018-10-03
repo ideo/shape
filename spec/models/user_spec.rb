@@ -436,4 +436,47 @@ describe User, type: :model do
       end
     end
   end
+
+  context 'network admin management' do
+    let(:user) { create(:user) }
+
+    before do
+      allow(NetworkOrganizationUserSyncWorker).to receive(:perform_async)
+    end
+
+    describe '#add_network_admin' do
+      it 'uses the network api to add the user as org admin' do
+        user.add_network_admin
+        expect(NetworkOrganizationUserSyncWorker).to have_received(:perform_async).with(user.uid, user.id, NetworkApi::Organization::ADMIN_ROLE, :add)
+      end
+    end
+
+    describe '#remove_network_admin' do
+      it 'uses the network api to remove the user as org admin' do
+        user.remove_network_admin
+        expect(NetworkOrganizationUserSyncWorker).to have_received(:perform_async).with(user.uid, user.id, NetworkApi::Organization::ADMIN_ROLE, :remove)
+      end
+    end
+  end
+
+  describe '#in_my_collection' do
+    let(:user_collection) { create(:user_collection) }
+    let(:card_in_collection) { create(:collection_card_collection, parent: user_collection) }
+    let(:link_in_collection) { create(:collection_card_link_collection, parent: user_collection) }
+    let(:card_not_in_collection) { create(:collection_card_collection) }
+
+    before do
+      allow(user).to receive(:current_user_collection).and_return(user_collection)
+    end
+
+    it 'should return true if collection is in user collection' do
+      expect(user.in_my_collection?(card_in_collection.collection)).to be true
+    end
+    it 'should return true if collection is linked into user collection' do
+      expect(user.in_my_collection?(link_in_collection.collection)).to be true
+    end
+    it 'should return false if collection is not in user collection' do
+      expect(user.in_my_collection?(card_not_in_collection.collection)).to be false
+    end
+  end
 end

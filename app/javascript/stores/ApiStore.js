@@ -1,6 +1,7 @@
 import { action, runInAction, observable, computed } from 'mobx'
 import { Collection as datxCollection, assignModel, ReferenceType } from 'datx'
 import { jsonapi } from 'datx-jsonapi'
+import { apiUrl } from '~/utils/url'
 import _ from 'lodash'
 import moment from 'moment-mini'
 
@@ -48,7 +49,7 @@ class ApiStore extends jsonapi(datxCollection) {
     if (!_.has(options, 'skipCache')) {
       options.skipCache = true
     }
-    return super.request(path, method, data, options)
+    return super.request(apiUrl(path), method, data, options)
   }
 
   @action
@@ -103,7 +104,9 @@ class ApiStore extends jsonapi(datxCollection) {
       const currentUser = res.data
       this.setCurrentUserInfo({
         id: currentUser.id,
-        organizationId: currentUser.current_organization.id,
+        organizationId:
+          currentUser.current_organization &&
+          currentUser.current_organization.id,
       })
     } catch (e) {
       trackError(e, { source: 'loadCurrentUser', name: 'fetchUser' })
@@ -309,6 +312,15 @@ class ApiStore extends jsonapi(datxCollection) {
     const res = await this.request(`search?query=${q}`)
     runInAction(() => {
       this.usableTemplates = res.data.filter(c => c.isUsableTemplate)
+    })
+  }
+
+  async checkInMyCollection(record) {
+    const res = await this.request(
+      `${record.internalType}/${record.id}/in_my_collection`
+    )
+    runInAction(() => {
+      record.inMyCollection = res.__response.data
     })
   }
 

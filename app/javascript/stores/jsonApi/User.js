@@ -1,7 +1,12 @@
 import { routingStore, uiStore } from '~/stores'
+import { apiUrl } from '~/utils/url'
+
 import BaseRecord from './BaseRecord'
 
 class User extends BaseRecord {
+  static type = 'users'
+  static endpoint = apiUrl('users')
+
   get name() {
     return [this.first_name, this.last_name].join(' ')
   }
@@ -58,6 +63,5 @@ class User extends BaseRecord {
     }
   }
 }
-User.type = 'users'
 
 export default User

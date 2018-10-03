@@ -15,6 +15,7 @@ class OrganizationBuilder
       add_role
       setup_user_membership_and_collections
       create_templates
+      create_network_organization
     end
     true
   rescue ActiveRecord::RecordInvalid
@@ -42,5 +43,11 @@ class OrganizationBuilder
     OrganizationTemplates.call(@organization)
     # call this additionally to create the UserProfile after the templates have been created
     @organization.setup_user_membership(@user)
+  end
+
+  def create_network_organization
+    @organization.create_network_organization(@user)
+  rescue JsonApiClient::Errors::ApiError
+    raise ActiveRecord::Rollback
   end
 end

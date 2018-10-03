@@ -2,10 +2,15 @@ import { action, observable } from 'mobx'
 
 import { uiStore } from '~/stores'
 import { ITEM_TYPES } from '~/utils/variables'
+import { apiUrl } from '~/utils/url'
+
 import Api from './Api'
 import BaseRecord from './BaseRecord'
 
 class CollectionCard extends BaseRecord {
+  static type = 'collection_cards'
+  static endpoint = apiUrl('collection_cards')
+
   attributesForAPI = [
     'type',
     'order',
@@ -149,6 +154,9 @@ class CollectionCard extends BaseRecord {
     }
     try {
       await this.apiStore.request('collection_cards/link', 'POST', data)
+      if (!this.record.inMyCollection) {
+        this.apiStore.checkInMyCollection(this.record)
+      }
       uiStore.alertOk('Added to your collection')
     } catch (e) {
       uiStore.defaultAlertError()
@@ -244,6 +252,5 @@ class CollectionCard extends BaseRecord {
     return Api.duplicate('collection_cards', this)
   }
 }
-CollectionCard.type = 'collection_cards'
 
 export default CollectionCard
