@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types'
 
 const Emoji = props => (
-  <span
+  <tspan
     className="emoji"
     role="img"
     aria-label={props.name ? props.name : ''}
@@ -9,7 +9,7 @@ const Emoji = props => (
     style={{ fontSize: `${parseInt(32 * props.scale)}px` }}
   >
     {props.symbol}
-  </span>
+  </tspan>
 )
 
 Emoji.propTypes = {

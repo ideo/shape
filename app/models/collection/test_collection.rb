@@ -90,7 +90,9 @@ class Collection
           chart_cards.push(
             CollectionCardBuilder.new(
             params: {
-              order: i + 1,
+              order: i + 2,
+              height: 2,
+              width: 2,
               item_attributes: {
                 type: 'Item::ChartItem',
                 data_source: question,
