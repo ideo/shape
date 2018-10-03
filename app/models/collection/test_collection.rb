@@ -42,8 +42,10 @@ class Collection
         return false
       end
       test_design_card_builder = build_test_design_collection_card(initiated_by)
+      chart_card_builders = setup_response_graphs(initiated_by:initiated_by)
       transaction do
         return false unless test_design_card_builder.create
+        chart_card_builders.map(&:create)
         self.test_design = test_design_card_builder.collection_card.record
         # move all the cards into the test design collection
         collection_cards
@@ -80,29 +82,6 @@ class Collection
 
     def create_open_response_collection_cards(open_question_items = nil)
       build_open_response_collection_cards(open_question_items).all?(&:create)
-    end
-
-    def setup_response_graphs(initiated_by:)
-      chart_cards = []
-      question_items.each_with_index do |question, i|
-        if question.question_context? ||
-           question.question_useful?
-          chart_cards.push(
-            CollectionCardBuilder.new(
-            params: {
-              order: i + 2,
-              height: 2,
-              width: 2,
-              item_attributes: {
-                type: 'Item::ChartItem',
-                data_source: question,
-              },
-            },
-            parent_collection: self,
-            user: initiated_by,
-            ).create)
-        end
-      end
     end
 
     private
@@ -174,6 +153,30 @@ class Collection
           question_type: :question_finish,
         },
       )
+    end
+
+    def setup_response_graphs(initiated_by:)
+      chart_card_builders = []
+      question_items.each_with_index do |question, i|
+        if question.question_context? ||
+           question.question_useful?
+          chart_card_builders.push(
+            CollectionCardBuilder.new(
+            params: {
+              order: i + 2,
+              height: 2,
+              width: 2,
+              item_attributes: {
+                type: 'Item::ChartItem',
+                data_source: question,
+              },
+            },
+            parent_collection: self,
+            user: initiated_by,
+            ))
+        end
+      end
+      chart_card_builders
     end
 
     def add_test_tag
