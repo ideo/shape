@@ -49,9 +49,25 @@ class Api::V1::CollectionsController < Api::V1::BaseController
     end
   end
 
-  before_action :load_and_authorize_test_collection_launch, only: %i[launch_test]
+  before_action :load_and_authorize_test_collection, only: %i[launch_test stop_test relaunch_test]
   def launch_test
     if @collection.launch_test!(initiated_by: current_user)
+      render_collection
+    else
+      render_api_errors @collection.errors
+    end
+  end
+
+  def stop_test
+    if @collection.stop_test!
+      render_collection
+    else
+      render_api_errors @collection.errors
+    end
+  end
+
+  def relaunch_test
+    if @collection.relaunch_test!
       render_collection
     else
       render_api_errors @collection.errors
@@ -122,10 +138,13 @@ class Api::V1::CollectionsController < Api::V1::BaseController
     )
   end
 
-  def load_and_authorize_test_collection_launch
+  def load_and_authorize_test_collection
     @collection = Collection.find(params[:id])
-    unless @collection.is_a?(Collection::TestCollection) && @collection.draft?
-      head(401)
+    if @collection.is_a?(Collection::TestDesign)
+      @collection = @collection.test_collection
+    end
+    unless @collection.is_a?(Collection::TestCollection)
+      head(400)
     end
     authorize! :manage, @collection
   end

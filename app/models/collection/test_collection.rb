@@ -11,6 +11,7 @@ class Collection
 
     before_create :setup_default_status_and_questions
     after_create :add_test_tag
+    after_update :touch_test_design, if: :saved_change_to_test_status?
 
     enum test_status: {
       draft: 0,
@@ -57,6 +58,22 @@ class Collection
         test_design.cache_cover!
         update(test_status: :live)
       end
+    end
+
+    def stop_test!
+      unless live?
+        errors.add(:test_status, 'must be a live test in order to close')
+        return false
+      end
+      update(test_status: :closed)
+    end
+
+    def relaunch_test!
+      unless closed?
+        errors.add(:test_status, 'must be a closed test in order to relaunch')
+        return false
+      end
+      update(test_status: :live)
     end
 
     def serialized_for_test_survey
@@ -151,6 +168,10 @@ class Collection
           question_type: :question_finish,
         },
       )
+    end
+
+    def touch_test_design
+      test_design.touch
     end
 
     def add_test_tag
