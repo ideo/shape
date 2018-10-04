@@ -37,7 +37,7 @@
     [
       "module-resolver",
       {
-        "extensions": [".js", ".js.erb", ".jsx", ".ts", ".tsx"],
+        "extensions": [".js", ".jsx", ".ts", ".tsx"],
         "alias": {
           "~shared": "./app/javascript/ui/shared",
           "~": "./app/javascript",
