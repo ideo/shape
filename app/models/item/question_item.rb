@@ -26,10 +26,11 @@ class Item
       question_context: 0,
       question_useful: 1,
       question_open: 2,
-      question_end: 3,
       question_media: 4,
       question_description: 5,
       question_finish: 6,
+      question_clarity: 7,
+      question_excitement: 8,
     }
 
     def self.unanswerable_question_types
