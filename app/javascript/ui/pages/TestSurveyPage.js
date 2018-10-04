@@ -27,6 +27,37 @@ const StyledSurvey = styled.div`
   margin: 0 auto;
 `
 
+const StyledSurveyClosed = styled.div`
+  border-radius: 7px;
+  margin: 100px auto 0 auto;
+  background-color: ${v.colors.ctaButtonBlue};
+  width: 272px;
+  padding: 30px;
+  font-size: 1.25rem;
+  font-family: ${v.fonts.sans};
+  color: ${v.colors.white};
+  text-align: center;
+`
+
+const StyledClosedText = styled.div`
+  margin: 10px 0 40px 0;
+`
+
+const StyledHandsEmoji = styled.div`
+  margin-top: 20px;
+  font-size: 80px;
+`
+
+const LearnMoreLink = styled.a`
+  text-transform: uppercase;
+  font-weight: 500;
+  font-size: 1rem;
+  color: ${v.colors.white};
+  text-decoration: none;
+  display: block;
+`
+LearnMoreLink.displayName = 'LearnMoreLink'
+
 class TestSurveyPage extends React.Component {
   state = {
     surveyResponse: null,
@@ -51,25 +82,44 @@ class TestSurveyPage extends React.Component {
     return surveyResponse
   }
 
-  render() {
+  get renderSurvey() {
     const { collection, createSurveyResponse } = this
     const { surveyResponse } = this.state
-    // now that collection is loaded synchronously, no need to display a loader here
+    if (!collection) return null
+    if (collection.test_status === 'live') {
+      return (
+        <StyledSurvey>
+          <TestSurveyResponder
+            collection={collection}
+            surveyResponse={surveyResponse}
+            createSurveyResponse={createSurveyResponse}
+            editing={false}
+          />
+        </StyledSurvey>
+      )
+    }
+    return (
+      <StyledSurveyClosed>
+        <StyledHandsEmoji>
+          <span role="img" aria-label="Raising Hands">
+            🙌
+          </span>
+        </StyledHandsEmoji>
+        <StyledClosedText>
+          Thank you for stopping by! This feedback is now closed.
+        </StyledClosedText>
+        <LearnMoreLink href={'/'}>Learn More About Shape</LearnMoreLink>
+      </StyledSurveyClosed>
+    )
+  }
+
+  render() {
     return (
       <StyledBg>
         <LogoWrapper>
           <Logo />
         </LogoWrapper>
-        <StyledSurvey>
-          {collection && (
-            <TestSurveyResponder
-              collection={collection}
-              surveyResponse={surveyResponse}
-              createSurveyResponse={createSurveyResponse}
-              editing={false}
-            />
-          )}
-        </StyledSurvey>
+        {this.renderSurvey}
       </StyledBg>
     )
   }
