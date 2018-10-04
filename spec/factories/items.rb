@@ -26,6 +26,10 @@ FactoryBot.define do
       question_type :question_useful
     end
 
+    factory :chart_item, class: 'Item::ChartItem' do
+      data_source factory: :question_item
+    end
+
     after(:create) do |item, evaluator|
       if evaluator.add_editors.present?
         evaluator.add_editors.each do |user|
