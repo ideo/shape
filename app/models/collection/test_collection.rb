@@ -50,6 +50,10 @@ class Collection
       prelaunch_question_items
     end
 
+    def can_reopen?
+      closed? && test_design.present?
+    end
+
     def test_open_response_collections
       collections.where(type: 'Collection::TestOpenResponses')
     end
@@ -113,7 +117,7 @@ class Collection
       card_params = {
         order: 0,
         collection_attributes: {
-          name: "#{name} Test Design",
+          name: "#{name} Feedback Design",
           type: 'Collection::TestDesign',
           test_collection_id: id,
         },

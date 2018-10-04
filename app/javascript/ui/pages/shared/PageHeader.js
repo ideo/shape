@@ -266,7 +266,7 @@ class PageHeader extends React.Component {
             Get Feedback
           </HeaderFormButton>
         )
-      } else if (record.isClosedTest) {
+      } else if (record.isClosedTest && record.test_can_reopen) {
         return (
           <HeaderFormButton
             onClick={record.reopenTest}

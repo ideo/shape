@@ -28,7 +28,11 @@ class Api::V1::TestCollectionsController < Api::V1::BaseController
   private
 
   def load_and_authorize_test_collection
-    @collection = @test_collection = Collection::TestCollection.find(params[:id])
-    authorize! :manage, @test_collection
+    @collection = @test_collection = Collection::TestCollection.find_by(id: params[:id])
+    if @test_collection.blank?
+      head 404
+    else
+      authorize! :manage, @test_collection
+    end
   end
 end

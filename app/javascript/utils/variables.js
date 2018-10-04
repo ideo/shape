@@ -6,6 +6,11 @@ export const ITEM_TYPES = {
   QUESTION: 'Item::QuestionItem',
 }
 
+export const COLLECTION_TYPES = {
+  TEST: 'Collection::TestCollection',
+  TEST_DESIGN: 'Collection::TestDesign',
+}
+
 export const KEYS = {
   ENTER: 13,
   ESC: 27,
