@@ -42,8 +42,15 @@ describe Collection::TestCollection, type: :model do
 
     describe '#launch_test!' do
       context 'with valid draft collection (default status)' do
+        before do
+          media_question = test_collection.prelaunch_question_items.detect(&:question_media?)
+          media_question.update(url: 'something') unless media_question.nil?
+          description_question = test_collection.prelaunch_question_items.detect(&:question_description?)
+          description_question.update(content: 'something') unless description_question.nil?
+        end
         it 'should create a TestDesign collection and move the questions into it' do
           expect(test_collection.test_design.present?).to be false
+          expect(test_collection.errors).to match_array([])
           expect(test_collection.launch_test!(initiated_by: user)).to be true
           expect(test_collection.test_design.created_by).to eq user
           expect(test_collection.test_design.present?).to be true
@@ -79,6 +86,18 @@ describe Collection::TestCollection, type: :model do
             ).to be true
           end
         end
+
+        describe '#serialized_for_test_survey' do
+          before do
+            test_collection.launch_test!(initiated_by: user)
+          end
+
+          it 'should output its collection_cards from the test_design child collection' do
+            data = test_collection.serialized_for_test_survey
+            card_ids = test_collection.test_design.collection_cards.map(&:id).map(&:to_s)
+            expect(data[:data][:relationships][:collection_cards][:data].map{ |i| i[:id] }).to match_array(card_ids)
+          end
+        end
       end
 
       context 'with invalid collection' do
@@ -92,18 +111,16 @@ describe Collection::TestCollection, type: :model do
           expect(test_collection.errors).to match_array(['Test status must be in draft mode in order to launch'])
         end
       end
-    end
-
-    describe '#serialized_for_test_survey' do
-      before do
-        test_collection.launch_test!(initiated_by: user)
-      end
-
-      it 'should output its collection_cards from the test_design child collection' do
-        data = test_collection.serialized_for_test_survey
-        card_ids = test_collection.test_design.collection_cards.map(&:id).map(&:to_s)
-        expect(data[:data][:relationships][:collection_cards][:data].map{ |i| i[:id] }).to match_array(card_ids)
+      context 'with a collection with incomplete questions' do
+        it 'returns false with test_status errors' do
+          expect(test_collection.launch_test!(initiated_by: user)).to be false
+          expect(test_collection.errors).to match_array([
+            'Please add an image or video for your idea to question 1',
+            'Please add your idea description to question 2'
+          ])
+        end
       end
     end
+
   end
 end

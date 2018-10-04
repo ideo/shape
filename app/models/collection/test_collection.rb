@@ -36,9 +36,28 @@ class Collection
       )
     end
 
+    def test_completed?
+      complete = true
+      unless incomplete_media.count.zero?
+        errors.add(:base,
+                   "Please add an image or video for your idea to question #{incomplete_media.join(', ')}")
+        complete = false
+      end
+
+      unless incomplete_descriptions.count.zero?
+        errors.add(:base,
+                   "Please add your idea description to question #{incomplete_descriptions.join(', ')}")
+        complete = false
+      end
+      complete
+    end
+
     def launch_test!(initiated_by:)
       unless draft?
         errors.add(:test_status, 'must be in draft mode in order to launch')
+        return false
+      end
+      unless test_completed?
         return false
       end
       test_design_card_builder = build_test_design_collection_card(initiated_by)
@@ -163,6 +182,32 @@ class Collection
       update_cached_tag_lists
       # no good way around saving a 2nd time after_create
       save
+    end
+
+    # Return array of incomplete media items, with index of item
+    def incomplete_media
+      media_items = prelaunch_question_items.select(&:question_media?)
+      media_not_present = []
+      # TODO: cleanup logic here.
+      media_items.each do |item|
+        if item.filestack_file.nil? && item.url.nil?
+          if item.filestack_file.nil?
+            media_not_present.push(item.parent_collection_card.order + 1)
+            next
+          end
+          media_not_present.push(item.parent_collection_card.order + 1) if item.url.nil?
+        end
+      end
+      media_not_present
+    end
+
+    def incomplete_descriptions
+      description_items = prelaunch_question_items.select(&:question_description?)
+      description_not_present = []
+      description_items.each do |item|
+        description_not_present.push(item.parent_collection_card.order + 1) if item.content.nil?
+      end
+      description_not_present
     end
   end
 end
