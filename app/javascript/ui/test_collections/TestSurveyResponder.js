@@ -1,38 +1,29 @@
 import _ from 'lodash'
 import { Flex } from 'reflexbox'
+import PropTypes from 'prop-types'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import FlipMove from 'react-flip-move'
+import { Element as ScrollElement, scroller } from 'react-scroll'
 
-import { apiStore } from '~/stores/'
 // NOTE: Always import these models after everything else, can lead to odd dependency!
-import SurveyResponse from '~/stores/jsonApi/SurveyResponse'
 import { TestQuestionHolder } from '~/ui/test_collections/shared'
 import TestQuestion from '~/ui/test_collections/TestQuestion'
-import { UNANSWERABLE_QUESTION_TYPES } from '~/utils/railsVariables'
+
+const UNANSWERABLE_QUESTION_TYPES = [
+  'question_media',
+  'question_description',
+  'question_finish',
+]
 
 @observer
 class TestSurveyResponder extends React.Component {
-  state = {
-    surveyResponse: null,
-  }
-
-  createSurveyResponse = async () => {
-    const { collection } = this.props
-    const newResponse = new SurveyResponse(
-      {
-        test_collection_id: collection.id,
-      },
-      apiStore
-    )
-    const surveyResponse = await newResponse.save()
-    if (surveyResponse) {
-      this.setState({ surveyResponse })
-    }
-    return surveyResponse
+  constructor(props) {
+    super(props)
+    this.containerId = 'surveyResponse'
   }
 
   questionAnswerForCard = card => {
-    const { surveyResponse } = this.state
+    const { surveyResponse } = this.props
     if (!surveyResponse) return undefined
     return _.find(surveyResponse.question_answers, {
       question_id: card.record.id,
@@ -62,11 +53,30 @@ class TestSurveyResponder extends React.Component {
     })
   }
 
-  render() {
-    const { surveyResponse } = this.state
+  handleQuestionAnswerCreatedForCard = card => {
+    this.scrollToTopOfNextCard(card)
+  }
+
+  contentHeight = () => this.containerDiv.clientHeight
+
+  containerDiv = () => document.getElementById(this.containerId)
+
+  scrollToTopOfNextCard = card => {
     const { collection } = this.props
+    const index = collection.collection_cards.indexOf(card)
+    const nextCard = collection.collection_cards[index + 1]
+    if (!nextCard) return
+    scroller.scrollTo(`card-${nextCard.id}`, {
+      duration: 350,
+      container: this.containerId,
+      offset: -1 * this.contentHeight(),
+    })
+  }
+
+  render() {
+    const { collection, surveyResponse, createSurveyResponse } = this.props
     return (
-      <div>
+      <div id={this.containerId}>
         {this.viewableCards().map(card => (
           <FlipMove appearAnimation="fade" key={card.id}>
             <div>
@@ -77,17 +87,22 @@ class TestSurveyResponder extends React.Component {
                 }}
               >
                 <TestQuestionHolder editing={false} userEditable={false}>
-                  <TestQuestion
-                    createSurveyResponse={this.createSurveyResponse}
-                    surveyResponse={surveyResponse}
-                    questionAnswer={this.questionAnswerForCard(card)}
-                    parent={collection}
-                    card={card}
-                    item={card.record}
-                    order={card.order}
-                    editing={false}
-                    canEdit={this.canEdit}
-                  />
+                  <ScrollElement name={`card-${card.id}`}>
+                    <TestQuestion
+                      createSurveyResponse={createSurveyResponse}
+                      surveyResponse={surveyResponse}
+                      questionAnswer={this.questionAnswerForCard(card)}
+                      handleQuestionAnswerCreatedForCard={
+                        this.handleQuestionAnswerCreatedForCard
+                      }
+                      parent={collection}
+                      card={card}
+                      item={card.record}
+                      order={card.order}
+                      editing={false}
+                      canEdit={this.canEdit}
+                    />
+                  </ScrollElement>
                 </TestQuestionHolder>
               </Flex>
             </div>
@@ -100,6 +115,12 @@ class TestSurveyResponder extends React.Component {
 
 TestSurveyResponder.propTypes = {
   collection: MobxPropTypes.objectOrObservableObject.isRequired,
+  createSurveyResponse: PropTypes.func.isRequired,
+  surveyResponse: MobxPropTypes.objectOrObservableObject,
+}
+
+TestSurveyResponder.defaultProps = {
+  surveyResponse: undefined,
 }
 
 export default TestSurveyResponder

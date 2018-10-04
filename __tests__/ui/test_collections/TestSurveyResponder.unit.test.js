@@ -1,10 +1,15 @@
 import TestSurveyResponder from '~/ui/test_collections/TestSurveyResponder'
-import SurveyResponse from '~/stores/jsonApi/SurveyResponse'
-import { fakeCollection, fakeItemCard, fakeQuestionAnswer } from '#/mocks/data'
+import {
+  fakeCollection,
+  fakeQuestionItemCard,
+  fakeQuestionItem,
+  fakeSurveyResponse,
+  fakeQuestionAnswer,
+} from '#/mocks/data'
 
 jest.mock('../../../app/javascript/stores/jsonApi/SurveyResponse')
 
-let wrapper, props, component
+let wrapper, props
 const cardTypes = [
   'question_media',
   'question_context',
@@ -17,16 +22,22 @@ describe('TestSurveyResponder', () => {
   beforeEach(() => {
     props = {
       collection: fakeCollection,
+      createSurveyResponse: jest.fn(),
     }
     // very basic way to turn fakeCollection into a "test collection"
     props.collection.collection_cards = []
     cardTypes.forEach((type, i) => {
       props.collection.collection_cards.push(
-        Object.assign({}, fakeItemCard, { card_question_type: type })
+        Object.assign({}, fakeQuestionItemCard, {
+          card_question_type: type,
+          record: {
+            ...fakeQuestionItem,
+            id: `${i}`,
+          },
+        })
       )
     })
     wrapper = shallow(<TestSurveyResponder {...props} />)
-    component = wrapper.instance()
   })
 
   it('renders TestQuestions for each visible card', () => {
@@ -34,30 +45,24 @@ describe('TestSurveyResponder', () => {
     expect(wrapper.find('TestQuestion').length).toEqual(2)
   })
 
-  describe('after answering a question', () => {
+  describe('after creating SurveyResponse', () => {
     beforeEach(() => {
-      const mockQuestionAnswerForCard = jest.fn()
-      mockQuestionAnswerForCard.mockReturnValue(fakeQuestionAnswer)
-      // This is kind of dirty to mock internals,
-      // but no easy way to simulate creating a response and saving answers
-      component.questionAnswerForCard = mockQuestionAnswerForCard
-      // Hack to get it to use the mock after shallow mount
-      // wrapper.update() or wrapper.instance().forceUpdate() did not work
-      // Issue: https://github.com/airbnb/enzyme/issues/1245
-      wrapper.setState({})
+      props = {
+        collection: fakeCollection,
+        createSurveyResponse: jest.fn(),
+        surveyResponse: fakeSurveyResponse,
+      }
+      // Mock for answering the first context question
+      props.surveyResponse.question_answers = [
+        Object.assign({}, fakeQuestionAnswer, {
+          question_id: props.collection.collection_cards[1].record.id,
+        }),
+      ]
+      wrapper = shallow(<TestSurveyResponder {...props} />)
     })
 
     it('renders additional question', () => {
-      expect(wrapper.find('TestQuestion').length).toEqual(
-        props.collection.collection_cards.length
-      )
-    })
-  })
-
-  describe('createSurveyResponse', () => {
-    it('creates a new response', () => {
-      component.createSurveyResponse()
-      expect(SurveyResponse).toHaveBeenCalledTimes(1)
+      expect(wrapper.find('TestQuestion').length).toEqual(3)
     })
   })
 })

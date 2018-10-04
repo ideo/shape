@@ -26,7 +26,13 @@ const QuestionCardWrapper = styled.div`
 @observer
 class TestQuestion extends React.Component {
   handleQuestionAnswer = async ({ text, number }) => {
-    const { item, editing, createSurveyResponse } = this.props
+    const {
+      card,
+      item,
+      editing,
+      createSurveyResponse,
+      handleQuestionAnswerCreatedForCard,
+    } = this.props
     let { surveyResponse, questionAnswer } = this.props
     // components should never trigger this when editing, but double-check here
     if (editing) return
@@ -46,6 +52,7 @@ class TestQuestion extends React.Component {
       )
       questionAnswer.survey_response = surveyResponse
       await questionAnswer.API_create()
+      handleQuestionAnswerCreatedForCard(card)
     } else {
       // update values on existing answer and save
       await questionAnswer.API_update({
@@ -154,6 +161,7 @@ TestQuestion.propTypes = {
   surveyResponse: MobxPropTypes.objectOrObservableObject,
   questionAnswer: MobxPropTypes.objectOrObservableObject,
   createSurveyResponse: PropTypes.func,
+  handleQuestionAnswerCreatedForCard: PropTypes.func,
   canEdit: PropTypes.bool,
 }
 
@@ -161,6 +169,7 @@ TestQuestion.defaultProps = {
   surveyResponse: null,
   questionAnswer: null,
   createSurveyResponse: null,
+  handleQuestionAnswerCreatedForCard: null,
   canEdit: false,
 }
 

@@ -113,7 +113,7 @@ export const fakeQuestionItem = {
   id: '3',
   ...fakeTextItemAttrs,
   type: 'Item::QuestionItem',
-  question_type: 'description',
+  question_type: 'question_description',
   rawAttributes: jest.fn().mockReturnValue(fakeTextItemAttrs),
   getRecordType: jest.fn().mockReturnValue('items'),
 }
@@ -136,6 +136,12 @@ export const fakeItemCard = {
   API_archive: jest.fn(),
   API_linkToMyCollection: jest.fn(),
   ...fakeJsonApiAttrs,
+}
+
+export const fakeQuestionItemCard = {
+  ...fakeItemCard,
+  record: fakeQuestionItem,
+  card_question_type: fakeQuestionItem.question_type
 }
 
 const fakeCards = [

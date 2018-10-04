@@ -1,14 +1,16 @@
 import styled from 'styled-components'
+import { PropTypes as MobxPropTypes } from 'mobx-react'
 
 import v from '~/utils/variables'
 import Logo from '~/ui/layout/Logo'
 import TestSurveyResponder from '~/ui/test_collections/TestSurveyResponder'
 import { apiStore } from '~/stores'
-// import Collection from '~/stores/jsonApi/Collection'
+import SurveyResponse from '~/stores/jsonApi/SurveyResponse'
 
 const StyledBg = styled.div`
   background: #e3edee;
   padding-top: 36px;
+  padding-bottom: 70px;
   min-height: 100vh;
 `
 
@@ -26,28 +28,59 @@ const StyledSurvey = styled.div`
 `
 
 class TestSurveyPage extends React.Component {
+  state = {
+    surveyResponse: null,
+  }
+
   constructor(props) {
     super(props)
-    this.collection = apiStore.sync(window.collectionData)
+    this.collection = props.collection || apiStore.sync(window.collectionData)
+  }
+
+  createSurveyResponse = async () => {
+    const newResponse = new SurveyResponse(
+      {
+        test_collection_id: this.collection.id,
+      },
+      apiStore
+    )
+    const surveyResponse = await newResponse.save()
+    if (surveyResponse) {
+      this.setState({ surveyResponse })
+    }
+    return surveyResponse
   }
 
   render() {
-    const { collection } = this
+    const { collection, createSurveyResponse } = this
+    const { surveyResponse } = this.state
     // now that collection is loaded synchronously, no need to display a loader here
-    let inner = ''
-
-    if (collection) {
-      inner = <TestSurveyResponder collection={collection} editing={false} />
-    }
     return (
       <StyledBg>
         <LogoWrapper>
           <Logo />
         </LogoWrapper>
-        <StyledSurvey>{inner}</StyledSurvey>
+        <StyledSurvey>
+          {collection && (
+            <TestSurveyResponder
+              collection={collection}
+              surveyResponse={surveyResponse}
+              createSurveyResponse={createSurveyResponse}
+              editing={false}
+            />
+          )}
+        </StyledSurvey>
       </StyledBg>
     )
   }
+}
+
+TestSurveyPage.propTypes = {
+  collection: MobxPropTypes.objectOrObservableObject,
+}
+
+TestSurveyPage.defaultProps = {
+  collection: undefined,
 }
 
 export default TestSurveyPage
