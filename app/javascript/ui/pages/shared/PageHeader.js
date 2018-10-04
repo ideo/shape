@@ -257,6 +257,30 @@ class PageHeader extends React.Component {
     return null
   }
 
+  get launchTestButton() {
+    const { record } = this.props
+    if (record.can_edit && (record.isLaunchableTest || record.isClosedTest)) {
+      if (record.isLaunchableTest) {
+        return (
+          <HeaderFormButton onClick={record.launchTest}>
+            Get Feedback
+          </HeaderFormButton>
+        )
+      } else if (record.isClosedTest) {
+        return (
+          <HeaderFormButton
+            onClick={record.reopenTest}
+            color="hollow"
+            width="200"
+          >
+            Re-open Feedback
+          </HeaderFormButton>
+        )
+      }
+    }
+    return null
+  }
+
   render() {
     const { record, isHomepage, uiStore } = this.props
     const tagEditorOpen =
@@ -317,12 +341,7 @@ class PageHeader extends React.Component {
                     Use Template
                   </HeaderFormButton>
                 )}
-                {record.isLaunchableTest &&
-                  record.can_edit && (
-                    <HeaderFormButton onClick={record.launchTest}>
-                      Get Feedback
-                    </HeaderFormButton>
-                  )}
+                {this.launchTestButton}
                 {record.isLiveTest && (
                   <Fragment>
                     <CopyToClipboard
@@ -360,7 +379,7 @@ class PageHeader extends React.Component {
                       width="170"
                       color="hollow"
                       style={{ marginLeft: 10 }}
-                      onClick={() => console.log('stopped!')}
+                      onClick={record.closeTest}
                     >
                       Stop Feedback
                     </HeaderFormButton>

@@ -1,5 +1,7 @@
 class Collection
   class TestCollection < Collection
+    include AASM
+
     has_many :survey_responses, dependent: :destroy
     has_one :test_design, inverse_of: :test_collection
     # this relation exists before the items get moved to the test design
@@ -18,6 +20,28 @@ class Collection
       closed: 2,
     }
 
+    aasm column: :test_status, enum: true do
+      state :draft, initial: true
+      state :live
+      state :closed
+
+      error_on_all_events :aasm_event_failed
+
+      event :launch, before: proc { |**args|
+          create_test_design_and_move_cards!(initiated_by: args[:initiated_by])
+        } do
+        transitions from: :draft, to: :live
+      end
+
+      event :close do
+        transitions from: :live, to: :closed
+      end
+
+      event :reopen do
+        transitions from: :closed, to: :live
+      end
+    end
+
     # alias method, will delegate to test_design if test is live
     def question_items
       if test_design.present?
@@ -34,29 +58,6 @@ class Collection
       survey_responses.create(
         session_uid: SecureRandom.uuid,
       )
-    end
-
-    def launch_test!(initiated_by:)
-      unless draft?
-        errors.add(:test_status, 'must be in draft mode in order to launch')
-        return false
-      end
-      test_design_card_builder = build_test_design_collection_card(initiated_by)
-      transaction do
-        return false unless test_design_card_builder.create
-        self.test_design = test_design_card_builder.collection_card.record
-        # move all the cards into the test design collection
-        collection_cards
-          .where.not(
-            id: test_design_card_builder.collection_card.id,
-          )
-          .each_with_index do |card, i|
-            card.update(parent_id: test_design.id, order: i)
-          end
-        create_open_response_collection_cards
-        test_design.cache_cover!
-        update(test_status: :live)
-      end
     end
 
     def serialized_for_test_survey
@@ -83,6 +84,29 @@ class Collection
     end
 
     private
+
+    def aasm_event_failed(*args)
+      errors.add(:test_status, args[0].to_s.downcase)
+    end
+
+    def create_test_design_and_move_cards!(initiated_by:)
+      test_design_card_builder = build_test_design_collection_card(initiated_by)
+      transaction do
+        return false unless test_design_card_builder.create
+        self.test_design = test_design_card_builder.collection_card.record
+        # move all the cards into the test design collection
+        collection_cards
+          .where.not(
+            id: test_design_card_builder.collection_card.id,
+          )
+          .each_with_index do |card, i|
+            card.update(parent_id: test_design.id, order: i)
+          end
+        create_open_response_collection_cards
+        test_design.cache_cover!
+      end
+      true
+    end
 
     def build_test_design_collection_card(initiated_by)
       # build the TestDesign collection and its card

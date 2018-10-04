@@ -20,7 +20,6 @@ Rails.application.routes.draw do
       resources :activities, only: %i[create]
       resources :collections, except: %i[index] do
         member do
-          patch 'launch_test'
           get 'in_my_collection'
         end
         collection do
@@ -28,6 +27,13 @@ Rails.application.routes.draw do
         end
         resources :collection_cards, only: :index
         resources :roles, only: %i[index create destroy], shallow: true
+      end
+      resources :test_collections, only: [] do
+        member do
+          patch 'launch'
+          patch 'close'
+          patch 'reopen'
+        end
       end
       resources :collection_cards, shallow: true, except: %i[show] do
         member do
