@@ -48,6 +48,7 @@ describe Collection::TestCollection, type: :model do
           description_question = test_collection.prelaunch_question_items.detect(&:question_description?)
           description_question.update(content: 'something') unless description_question.nil?
         end
+
         it 'should create a TestDesign collection and move the questions into it' do
           expect(test_collection.test_design.present?).to be false
           expect(test_collection.errors).to match_array([])

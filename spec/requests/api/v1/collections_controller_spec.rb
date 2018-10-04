@@ -350,7 +350,7 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
     end
 
     context 'with a draft test collection' do
-      let!(:collection) { create(:test_collection, test_status: :draft, add_editors: [user]) }
+      let!(:collection) { create(:test_collection, :open_response_questions, test_status: :draft, add_editors: [user]) }
 
       it 'should allow the launch_test action' do
         patch(path)
