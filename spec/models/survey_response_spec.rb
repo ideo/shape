@@ -35,7 +35,7 @@ RSpec.describe SurveyResponse, type: :model do
   end
 
   describe '#all_questions_answered?' do
-    # will turn the 4 default cards into 4 answerable cards
+    # Turn the 4 default cards into 4 answerable cards
     let(:test_collection) { create(:test_collection, :answerable_questions) }
     let(:survey_response) { create(:survey_response, test_collection: test_collection) }
 

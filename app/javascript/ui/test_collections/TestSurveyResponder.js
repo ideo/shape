@@ -1,82 +1,126 @@
 import _ from 'lodash'
 import { Flex } from 'reflexbox'
+import PropTypes from 'prop-types'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import FlipMove from 'react-flip-move'
+import { Element as ScrollElement, scroller } from 'react-scroll'
 
-import { apiStore } from '~/stores/'
 // NOTE: Always import these models after everything else, can lead to odd dependency!
-import SurveyResponse from '~/stores/jsonApi/SurveyResponse'
 import { TestQuestionHolder } from '~/ui/test_collections/shared'
 import TestQuestion from '~/ui/test_collections/TestQuestion'
 
+const UNANSWERABLE_QUESTION_TYPES = [
+  'question_media',
+  'question_description',
+  'question_finish',
+]
+
 @observer
 class TestSurveyResponder extends React.Component {
-  state = {
-    surveyResponse: null,
+  constructor(props) {
+    super(props)
+    this.containerId = 'surveyResponse'
   }
 
-  createSurveyResponse = async () => {
+  questionAnswerForCard = card => {
+    const { surveyResponse } = this.props
+    if (!surveyResponse) return undefined
+    return _.find(surveyResponse.question_answers, {
+      question_id: card.record.id,
+    })
+  }
+
+  answerableCard = card =>
+    UNANSWERABLE_QUESTION_TYPES.indexOf(card.card_question_type) === -1
+
+  viewableCards = () => {
     const { collection } = this.props
-    const newResponse = new SurveyResponse(
-      {
-        test_collection_id: collection.id,
-      },
-      apiStore
-    )
-    const surveyResponse = await newResponse.save()
-    if (surveyResponse) {
-      this.setState({ surveyResponse })
-    }
-    return surveyResponse
+    let reachedLastVisibleCard = false
+    return collection.collection_cards.filter(card => {
+      // turn off the card's actionmenu (dot-dot-dot)
+      card.record.menuDisabled = true
+      if (reachedLastVisibleCard) {
+        return false
+      } else if (
+        !this.answerableCard(card) ||
+        this.questionAnswerForCard(card)
+      ) {
+        // If not answerable, or they already answered, show it
+        return true
+      }
+      reachedLastVisibleCard = true
+      return true
+    })
+  }
+
+  handleQuestionAnswerCreatedForCard = card => {
+    this.scrollToTopOfNextCard(card)
+  }
+
+  contentHeight = () => this.containerDiv.clientHeight
+
+  containerDiv = () => document.getElementById(this.containerId)
+
+  scrollToTopOfNextCard = card => {
+    const { collection } = this.props
+    const index = collection.collection_cards.indexOf(card)
+    const nextCard = collection.collection_cards[index + 1]
+    if (!nextCard) return
+    scroller.scrollTo(`card-${nextCard.id}`, {
+      duration: 350,
+      container: this.containerId,
+      offset: -1 * this.contentHeight(),
+    })
   }
 
   render() {
-    const { surveyResponse } = this.state
-    const { collection } = this.props
-    const inner = collection.collection_cards.map((card, i) => {
-      let questionAnswer
-      const item = card.record
-      // turn off the card's actionmenu (dot-dot-dot)
-      card.record.menuDisabled = true
-      if (surveyResponse) {
-        questionAnswer = _.find(surveyResponse.question_answers, {
-          question_id: item.id,
-        })
-      }
-      return (
-        <FlipMove appearAnimation="fade" key={card.id}>
-          <div>
-            <Flex
-              style={{
-                width: 'auto',
-                flexWrap: 'wrap',
-              }}
-            >
-              <TestQuestionHolder editing={false} userEditable={false}>
-                <TestQuestion
-                  createSurveyResponse={this.createSurveyResponse}
-                  surveyResponse={surveyResponse}
-                  questionAnswer={questionAnswer}
-                  parent={collection}
-                  card={card}
-                  item={item}
-                  order={card.order}
-                  editing={false}
-                  canEdit={this.canEdit}
-                />
-              </TestQuestionHolder>
-            </Flex>
-          </div>
-        </FlipMove>
-      )
-    })
-
-    return <div>{inner}</div>
+    const { collection, surveyResponse, createSurveyResponse } = this.props
+    return (
+      <div id={this.containerId}>
+        {this.viewableCards().map(card => (
+          <FlipMove appearAnimation="fade" key={card.id}>
+            <div>
+              <Flex
+                style={{
+                  width: 'auto',
+                  flexWrap: 'wrap',
+                }}
+              >
+                <TestQuestionHolder editing={false} userEditable={false}>
+                  <ScrollElement name={`card-${card.id}`}>
+                    <TestQuestion
+                      createSurveyResponse={createSurveyResponse}
+                      surveyResponse={surveyResponse}
+                      questionAnswer={this.questionAnswerForCard(card)}
+                      handleQuestionAnswerCreatedForCard={
+                        this.handleQuestionAnswerCreatedForCard
+                      }
+                      parent={collection}
+                      card={card}
+                      item={card.record}
+                      order={card.order}
+                      editing={false}
+                      canEdit={this.canEdit}
+                    />
+                  </ScrollElement>
+                </TestQuestionHolder>
+              </Flex>
+            </div>
+          </FlipMove>
+        ))}
+      </div>
+    )
   }
 }
 
 TestSurveyResponder.propTypes = {
   collection: MobxPropTypes.objectOrObservableObject.isRequired,
+  createSurveyResponse: PropTypes.func.isRequired,
+  surveyResponse: MobxPropTypes.objectOrObservableObject,
+}
+
+TestSurveyResponder.defaultProps = {
+  surveyResponse: undefined,
 }
 
 export default TestSurveyResponder

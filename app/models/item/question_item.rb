@@ -21,6 +21,12 @@ class Item
 
     after_update :update_test_open_responses_collection, if: :update_test_open_responses_collection?
 
+    scope :not_answerable, -> {
+      where(
+        question_type: Item::QuestionItem.unanswerable_question_types,
+      )
+    }
+
     enum question_type: {
       question_context: 0,
       question_useful: 1,
