@@ -4,7 +4,7 @@ import MenuItem from '@material-ui/core/MenuItem'
 import MuiCheckbox from '@material-ui/core/Checkbox'
 import AutosizeInput from 'react-input-autosize'
 import TextareaAutosize from 'react-autosize-textarea'
-import styled from 'styled-components'
+import styled, { css } from 'styled-components'
 
 import hexToRgba from '~/utils/hexToRgba'
 import v from '~/utils/variables'
@@ -28,8 +28,7 @@ export const FieldContainer = styled.div`
 `
 FieldContainer.displayName = 'StyledFieldContainer'
 
-/** @component */
-export const Label = styled.label`
+const LabelStyle = css`
   text-transform: uppercase;
   margin-bottom: 20px;
   font-family: ${v.fonts.sans};
@@ -37,6 +36,16 @@ export const Label = styled.label`
   font-weight: ${v.weights.medium};
   letter-spacing: 0.0625rem;
   display: block;
+`
+
+export const LabelText = styled.div`
+  ${LabelStyle};
+`
+LabelText.displayName = 'StyledLabelText'
+
+/** @component */
+export const Label = styled.label`
+  ${LabelStyle};
 `
 Label.displayName = 'StyledLabel'
 
