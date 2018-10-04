@@ -19,7 +19,6 @@ const Tick = props => {
   return <VictoryLabel {...props} style={{ fill: '#DE8F74', fontSize: 16 }} />
 }
 Tick.propTypes = {
-  index: PropTypes.number.isRequired,
   emojiScale: PropTypes.arrayOf(
     PropTypes.shape({
       name: PropTypes.string,
@@ -52,7 +51,6 @@ class ChartItemCover extends React.Component {
       (previous, key) => previous + item.chart_data[key],
       0
     )
-    console.log(total)
     _.forEach(item.chart_data, (value, key) => {
       formattedData.push({ scale: key, value: parseInt((value / total) * 100) })
     })
@@ -124,7 +122,7 @@ class ChartItemCover extends React.Component {
             data={this.formattedData}
             x="scale"
             y="value"
-            labels={d => console.log(d) || `${d.value}%`}
+            labels={d => `${d.value}%`}
             style={{
               data: { fill: '#DE8F74' },
               labels: {
