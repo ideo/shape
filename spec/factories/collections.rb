@@ -31,6 +31,14 @@ FactoryBot.define do
         record_type :question
       end
 
+      trait :answerable_questions do
+        after(:create) do |collection|
+          collection.prelaunch_question_items.each do |item|
+            item.update(question_type: :question_context)
+          end
+        end
+      end
+
       trait :open_response_questions do
         after(:create) do |collection|
           collection.prelaunch_question_items.each do |item|

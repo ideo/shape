@@ -35,19 +35,9 @@ RSpec.describe SurveyResponse, type: :model do
   end
 
   describe '#all_questions_answered?' do
-    let!(:survey_response) { create(:survey_response) }
-
-    before do
-      # Add another 'answerable' question so we can answer one
-      # question without response being complete
-      survey_response
-        .test_collection
-        .question_items
-        .not_answerable
-        .first.update_attributes(
-          question_type: :question_open,
-        )
-    end
+    # Turn the 4 default cards into 4 answerable cards
+    let(:test_collection) { create(:test_collection, :answerable_questions) }
+    let(:survey_response) { create(:survey_response, test_collection: test_collection) }
 
     context 'no questions answered' do
       it 'returns false' do
