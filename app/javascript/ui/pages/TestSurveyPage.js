@@ -38,6 +38,7 @@ const StyledSurveyClosed = styled.div`
   color: ${v.colors.white};
   text-align: center;
 `
+StyledSurveyClosed.displayName = 'StyledSurveyClosed'
 
 const StyledClosedText = styled.div`
   margin: 10px 0 40px 0;
