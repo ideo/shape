@@ -236,15 +236,6 @@ ActiveRecord::Schema.define(version: 20181002200246) do
     t.index ["survey_response_id"], name: "index_question_answers_on_survey_response_id"
   end
 
-  create_table "questions", force: :cascade do |t|
-    t.bigint "test_collection_id"
-    t.integer "question_type"
-    t.integer "order"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["test_collection_id"], name: "index_questions_on_test_collection_id"
-  end
-
   create_table "roles", force: :cascade do |t|
     t.string "name"
     t.string "resource_type"
