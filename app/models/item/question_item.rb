@@ -16,6 +16,12 @@ class Item
       )
     }
 
+    scope :not_answerable, -> {
+      where(
+        question_type: Item::QuestionItem.unanswerable_question_types,
+      )
+    }
+
     enum question_type: {
       question_context: 0,
       question_useful: 1,

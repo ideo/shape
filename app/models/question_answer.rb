@@ -25,6 +25,7 @@ class QuestionAnswer < ApplicationRecord
   def update_open_response_item?
     survey_response_completed? &&
       question.question_open? &&
+      question.test_open_responses_collection.present? &&
       (answer_text_changed? || open_response_item.blank?)
   end
 

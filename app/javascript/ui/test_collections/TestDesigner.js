@@ -158,9 +158,11 @@ class TestDesigner extends React.Component {
       const item = card.record
       if (i === 0) position = 'question_beginning'
       if (i === cardCount - 1) position = 'question_end'
-      const userEditable = ['question_media', 'question_description'].includes(
-        card.record.question_type
-      )
+      const userEditable = [
+        'media',
+        'question_media',
+        'question_description',
+      ].includes(card.record.question_type)
       return (
         <FlipMove appearAnimation="fade" key={card.id}>
           <div>
