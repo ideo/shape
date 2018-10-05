@@ -205,6 +205,7 @@ class Collection
         next unless question.question_context? ||
                     question.question_useful? ||
                     question.question_excitement? ||
+                    question.question_different? ||
                     question.question_clarity?
         chart_card_builders.push(
           CollectionCardBuilder.new(
