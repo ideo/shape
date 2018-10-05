@@ -22,7 +22,7 @@ class Collection
     private
 
     def close_test
-      test_collection.close!
+      test_collection.close! if test_collection.live?
     end
   end
 end

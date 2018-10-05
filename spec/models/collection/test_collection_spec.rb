@@ -1,6 +1,7 @@
 require 'rails_helper'
 
 describe Collection::TestCollection, type: :model do
+  let(:user) { create(:user) }
   let(:test_collection) { create(:test_collection) }
 
   context 'associations' do
@@ -30,129 +31,156 @@ describe Collection::TestCollection, type: :model do
 
   describe '#create_uniq_survey_response' do
     it 'should create a survey response with a unique session_uid' do
-      expect {
+      expect do
         test_collection.create_uniq_survey_response
-      }.to change(test_collection.survey_responses, :count).by(1)
+      end.to change(test_collection.survey_responses, :count).by(1)
       expect(test_collection.survey_responses.last.session_uid).not_to be nil
     end
   end
 
-  context 'launching a test' do
-    let(:user) { create(:user) }
+  context 'with a ready to launch test' do
+    let!(:test_collection) { create(:test_collection, :completed) }
 
-    describe '#launch!' do
-      context 'with valid draft collection (default status)' do
-        it 'should create a TestDesign collection and move the questions into it' do
-          expect(test_collection.test_design.present?).to be false
-          expect(test_collection.launch!(initiated_by: user)).to be true
-          expect(test_collection.test_design.created_by).to eq user
-          expect(test_collection.test_design.present?).to be true
-          # should have moved the default question cards into there
-          expect(
-            test_collection
-            .test_design
-            .collection_cards
-            .map(&:card_question_type)
-            .map(&:to_sym),
-          ).to eq(
-            Collection::TestCollection.default_question_types,
-          )
-          expect(
-            test_collection.test_design.collection_cards.map(&:order),
-          ).to eq([0, 1, 2, 3])
-          # now the test_collection should have the test design and chart item
-          expect(
-            test_collection
-            .collection_cards
-            .reload
-            .map { |card| card.record.class },
-          ).to match_array(
-            [
-              Collection::TestDesign,
-              Item::ChartItem,
-            ]
-          )
-        end
-
-        it 'should update the status to "live"' do
-          expect(test_collection.launch!(initiated_by: user)).to be true
-          expect(test_collection.live?).to be true
-        end
-
-        it 'should create a chart item for each scale question' do
-            expect {
-              test_collection.launch!(initiated_by: user)
-            }.to change(
-              Item::ChartItem, :count
-            ).by(test_collection.question_items.select { |q| q.question_context? || q.question_useful? }.size)
-        end
-
-        context 'with open response questions' do
-          let!(:test_collection) { create(:test_collection, :open_response_questions) }
-
-          it 'creates a TestOpenResponse collection for each item' do
-            expect {
-              test_collection.launch!(initiated_by: user)
-            }.to change(
-              Collection::TestOpenResponses, :count
-            ).by(test_collection.question_items.size)
-
+    context 'launching a test' do
+      describe '#launch!' do
+        context 'with valid draft collection (default status)' do
+          it 'should create a TestDesign collection and move the questions into it' do
+            expect(test_collection.test_design.present?).to be false
+            expect(test_collection.errors).to match_array([])
+            expect(test_collection.launch!(initiated_by: user)).to be true
+            expect(test_collection.test_design.created_by).to eq user
+            expect(test_collection.test_design.present?).to be true
+            # should have moved the default question cards into there
             expect(
               test_collection
-                .test_design
-                .question_items
-                .all?(&:test_open_responses_collection),
-            ).to be true
+              .test_design
+              .collection_cards
+              .map(&:card_question_type)
+              .map(&:to_sym),
+            ).to eq(
+              Collection::TestCollection.default_question_types,
+            )
+            expect(
+              test_collection.test_design.collection_cards.map(&:order),
+            ).to eq([0, 1, 2, 3])
+            # now the test_collection should have the test design and chart item
+            expect(
+              test_collection
+              .collection_cards
+              .reload
+              .map { |card| card.record.class },
+            ).to match_array(
+              [
+                Collection::TestDesign,
+                Item::ChartItem,
+              ],
+            )
+          end
+
+          it 'should update the status to "live"' do
+            expect(test_collection.launch!(initiated_by: user)).to be true
+            expect(test_collection.live?).to be true
+          end
+
+          it 'should create a chart item for each scale question' do
+            expect do
+              test_collection.launch!(initiated_by: user)
+            end.to change(
+              Item::ChartItem, :count
+            ).by(test_collection.question_items.select { |q| q.question_context? || q.question_useful? }.size)
+          end
+
+          context 'with open response questions' do
+            let!(:test_collection) { create(:test_collection, :open_response_questions) }
+
+            it 'creates a TestOpenResponse collection for each item' do
+              expect do
+                test_collection.launch!(initiated_by: user)
+              end.to change(
+                Collection::TestOpenResponses, :count
+              ).by(test_collection.question_items.size)
+
+              expect(
+                test_collection
+                  .test_design
+                  .question_items
+                  .all?(&:test_open_responses_collection),
+              ).to be true
+            end
+          end
+
+          describe '#serialized_for_test_survey' do
+            before do
+              test_collection.launch!(initiated_by: user)
+            end
+
+            it 'should output its collection_cards from the test_design child collection' do
+              data = test_collection.serialized_for_test_survey
+              card_ids = test_collection.test_design.collection_cards.map(&:id).map(&:to_s)
+              expect(data[:data][:relationships][:collection_cards][:data].map { |i| i[:id] }).to match_array(card_ids)
+            end
+          end
+        end
+
+        context 'with invalid collection' do
+          before do
+            # the before_create sets it as draft, so we do this after creation
+            test_collection.update(test_status: :live)
+          end
+
+          it 'returns false with test_status errors' do
+            expect(test_collection.launch!(initiated_by: user)).to be false
+            expect(test_collection.errors).to match_array(["You can't launch because the feedback is live"])
           end
         end
       end
 
-      context 'with invalid collection' do
+      describe '#close!' do
         before do
-          # the before_create sets it as draft, so we do this after creation
-          test_collection.update(test_status: :live)
+          test_collection.launch!(initiated_by: user)
         end
 
-        it 'returns false with test_status errors' do
-          expect(test_collection.launch!(initiated_by: user)).to be false
-          expect(test_collection.errors).to match_array(["Test status event 'launch' cannot transition from 'live'."])
+        it 'should set status as closed' do
+          expect(test_collection.close!).to be true
+          expect(test_collection.closed?).to be true
+        end
+      end
+
+      describe '#reopen!' do
+        before do
+          test_collection.launch!(initiated_by: user)
+          test_collection.close!
+        end
+
+        it 'should set status as live' do
+          expect(test_collection.reopen!).to be true
+          expect(test_collection.live?).to be true
+        end
+      end
+
+      describe '#serialized_for_test_survey' do
+        before do
+          test_collection.launch!(initiated_by: user)
+        end
+
+        it 'should output its collection_cards from the test_design child collection' do
+          data = test_collection.serialized_for_test_survey
+          card_ids = test_collection.test_design.collection_cards.map(&:id).map(&:to_s)
+          expect(data[:data][:relationships][:collection_cards][:data].map { |i| i[:id] }).to match_array(card_ids)
         end
       end
     end
+  end
 
-    describe '#close!' do
-      before do
-        test_collection.launch!(initiated_by: user)
-      end
+  context 'with a  non-ready test with incomplete questions' do
+    let(:test_collection) { create(:test_collection) }
 
-      it 'should set status as closed' do
-        expect(test_collection.close!).to be true
-        expect(test_collection.closed?).to be true
-      end
-    end
-
-    describe '#reopen!' do
-      before do
-        test_collection.launch!(initiated_by: user)
-        test_collection.close!
-      end
-
-      it 'should set status as live' do
-        expect(test_collection.reopen!).to be true
-        expect(test_collection.live?).to be true
-      end
-    end
-
-    describe '#serialized_for_test_survey' do
-      before do
-        test_collection.launch!(initiated_by: user)
-      end
-
-      it 'should output its collection_cards from the test_design child collection' do
-        data = test_collection.serialized_for_test_survey
-        card_ids = test_collection.test_design.collection_cards.map(&:id).map(&:to_s)
-        expect(data[:data][:relationships][:collection_cards][:data].map{ |i| i[:id] }).to match_array(card_ids)
-      end
+    it 'returns false with test_status errors' do
+      expect(test_collection.launch!(initiated_by: user)).to be false
+      expect(test_collection.errors).to match_array([
+        'Please add an image or video for your idea to question 1',
+        'Please add your idea description to question 2',
+      ])
     end
   end
 end

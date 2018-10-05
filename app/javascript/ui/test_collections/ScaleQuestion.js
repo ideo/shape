@@ -6,7 +6,7 @@ import Tooltip from '~/ui/global/Tooltip'
 import Emoji from '~/ui/icons/Emoji'
 import { DisplayText, SmallHelperText } from '~/ui/global/styled/typography'
 import v from '~/utils/variables'
-import emojiScales from '~/ui/test_collections/emojiScales'
+import { emojiSeriesMap } from './shared'
 
 const Question = styled.div`
   border-color: ${props =>
@@ -52,7 +52,7 @@ EmojiButton.displayName = 'EmojiButton'
 class ScaleQuestion extends React.Component {
   get emojiScale() {
     const { emojiSeries } = this.props
-    return emojiScales[emojiSeries]
+    return emojiSeriesMap[emojiSeries]
   }
 
   vote = number => ev => {
@@ -109,7 +109,7 @@ class ScaleQuestion extends React.Component {
 ScaleQuestion.propTypes = {
   questionAnswer: MobxPropTypes.objectOrObservableObject,
   questionText: PropTypes.string.isRequired,
-  emojiSeries: PropTypes.oneOf(Object.keys(emojiScales)).isRequired,
+  emojiSeries: PropTypes.oneOf(Object.keys(emojiSeriesMap)).isRequired,
   editing: PropTypes.bool,
   onAnswer: PropTypes.func,
 }

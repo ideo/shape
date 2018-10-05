@@ -236,13 +236,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
       uiStore.alert('Only editors are allowed to launch the test.')
       return
     }
-    uiStore.confirm({
-      prompt:
-        'Are you sure? Once you get your first response, you can no longer change your test.',
-      confirmText: 'Launch',
-      iconName: 'TestGraph',
-      onConfirm: () => this.API_launchTest(),
-    })
+    this.API_launchTest()
   }
   closeTest = async () => {
     await this.API_closeTest()
@@ -253,7 +247,16 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   }
 
   API_launchTest() {
-    this.apiStore.request(`test_collections/${this.id}/launch`, 'PATCH')
+    this.apiStore
+      .request(`test_collections/${this.id}/launch`, 'PATCH')
+      .catch(err => {
+        uiStore.popupAlert({
+          prompt: `You have questions that have not yet been finalized:\n
+           ${err.error.map(e => ` ${e.detail}`)}
+          `,
+          fadeOutTime: 10 * 1000,
+        })
+      })
   }
 
   API_closeTest() {

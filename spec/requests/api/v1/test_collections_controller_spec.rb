@@ -15,8 +15,8 @@ describe Api::V1::TestCollectionsController, type: :request, json: true, auth: t
       end
     end
 
-    context 'with a draft test collection' do
-      let!(:collection) { create(:test_collection, test_status: :draft, add_editors: [user]) }
+    context 'with a draft, ready test collection' do
+      let!(:collection) { create(:test_collection, :completed, test_status: :draft, add_editors: [user]) }
 
       it 'should allow the launch action' do
         patch(path)
@@ -61,7 +61,7 @@ describe Api::V1::TestCollectionsController, type: :request, json: true, auth: t
     let(:path) { "/api/v1/test_collections/#{collection.id}/reopen" }
 
     context 'with an already closed test collection' do
-      let!(:collection) { create(:test_collection, test_status: :closed, add_editors: [user]) }
+      let!(:collection) { create(:test_collection, :completed, test_status: :closed, add_editors: [user]) }
 
       it 'should allow the reopen action' do
         patch(path)
