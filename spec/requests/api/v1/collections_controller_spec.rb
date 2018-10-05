@@ -343,7 +343,7 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
     context 'with an already live test collection' do
       let!(:collection) { create(:test_collection, test_status: :live, add_editors: [user]) }
 
-      it 'should not allow the destroy action' do
+      it 'should not allow the launch action' do
         patch(path)
         expect(response.status).to eq(401)
       end
@@ -351,6 +351,20 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
 
     context 'with a draft test collection' do
       let!(:collection) { create(:test_collection, test_status: :draft, add_editors: [user]) }
+
+      it 'should allow the launch_test action' do
+        patch(path)
+        expect(response.status).to eq(200)
+      end
+
+      it 'should call the launch_test method on the collection' do
+        patch(path)
+        expect(collection.reload.test_status).to eq 'live'
+      end
+    end
+
+    context 'with a closed test collection' do
+      let!(:collection) { create(:test_collection, test_status: :closed, add_editors: [user]) }
 
       it 'should allow the launch_test action' do
         patch(path)

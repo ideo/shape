@@ -106,6 +106,10 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     return this.isTestCollection && this.test_status === 'draft'
   }
 
+  get isRelaunchableTest() {
+    return this.isTestCollection && this.test_status === 'closed'
+  }
+
   get isLiveTest() {
     return this.isTestCollectionOrTestDesign && this.test_status === 'live'
   }
@@ -227,6 +231,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     }
   }
 
+  // important for these to be arrow functions so that they can be called via onClick
   launchTest = () => {
     if (!this.can_edit) {
       uiStore.alert('Only editors are allowed to launch the test.')
@@ -243,6 +248,22 @@ class Collection extends SharedRecordMixin(BaseRecord) {
 
   API_launchTest() {
     this.apiStore.request(`collections/${this.id}/launch_test`, 'PATCH')
+  }
+
+  stopTest = () => {
+    this.API_stopTest()
+  }
+
+  API_stopTest() {
+    this.apiStore.request(`collections/${this.id}/stop_test`, 'PATCH')
+  }
+
+  relaunchTest = () => {
+    this.API_relaunchTest()
+  }
+
+  API_relaunchTest() {
+    this.apiStore.request(`collections/${this.id}/relaunch_test`, 'PATCH')
   }
 
   static async createSubmission(parent_id, submissionSettings) {

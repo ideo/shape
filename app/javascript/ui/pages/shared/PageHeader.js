@@ -323,6 +323,12 @@ class PageHeader extends React.Component {
                       Get Feedback
                     </HeaderFormButton>
                   )}
+                {record.isRelaunchableTest &&
+                  record.can_edit && (
+                    <HeaderFormButton onClick={record.relaunchTest}>
+                      Reopen Test
+                    </HeaderFormButton>
+                  )}
                 {record.isLiveTest && (
                   <Fragment>
                     <CopyToClipboard
@@ -356,14 +362,16 @@ class PageHeader extends React.Component {
                         </span>
                       </HeaderFormButton>
                     </CopyToClipboard>
-                    <HeaderFormButton
-                      width="170"
-                      color="hollow"
-                      style={{ marginLeft: 10 }}
-                      onClick={() => console.log('stopped!')}
-                    >
-                      Stop Feedback
-                    </HeaderFormButton>
+                    {record.can_edit && (
+                      <HeaderFormButton
+                        width="170"
+                        color="hollow"
+                        style={{ marginLeft: 10 }}
+                        onClick={record.stopTest}
+                      >
+                        Stop Feedback
+                      </HeaderFormButton>
+                    )}
                   </Fragment>
                 )}
               </Flex>

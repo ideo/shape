@@ -21,6 +21,8 @@ Rails.application.routes.draw do
       resources :collections, except: %i[index] do
         member do
           patch 'launch_test'
+          patch 'relaunch_test'
+          patch 'stop_test'
           get 'in_my_collection'
         end
         collection do
