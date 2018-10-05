@@ -91,7 +91,7 @@ class Collection
     private
 
     def touch_test_design
-      test_design.touch
+      test_design.try(:touch)
     end
 
     def aasm_event_failed(*args)
