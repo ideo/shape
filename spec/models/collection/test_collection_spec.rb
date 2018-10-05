@@ -39,12 +39,7 @@ describe Collection::TestCollection, type: :model do
   end
 
   context 'with a ready to launch test' do
-    before do
-      media_question = test_collection.prelaunch_question_items.detect(&:question_media?)
-      media_question&.update(url: 'something')
-      description_question = test_collection.prelaunch_question_items.detect(&:question_description?)
-      description_question&.update(content: 'something')
-    end
+    let!(:test_collection) { create(:test_collection, :completed) }
 
     context 'launching a test' do
       describe '#launch!' do
@@ -178,6 +173,8 @@ describe Collection::TestCollection, type: :model do
   end
 
   context 'with a  non-ready test with incomplete questions' do
+    let(:test_collection) { create(:test_collection) }
+
     it 'returns false with test_status errors' do
       expect(test_collection.launch!(initiated_by: user)).to be false
       expect(test_collection.errors).to match_array([

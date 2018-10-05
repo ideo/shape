@@ -40,7 +40,7 @@ class Collection
       end
 
       event :reopen do
-        transitions from: :closed, to: :live, guard: :test_completed?
+        transitions from: :closed, to: :live
       end
     end
 
