@@ -2,9 +2,11 @@ import PropTypes from 'prop-types'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 
+import Tooltip from '~/ui/global/Tooltip'
 import Emoji from '~/ui/icons/Emoji'
 import { DisplayText, SmallHelperText } from '~/ui/global/styled/typography'
 import v from '~/utils/variables'
+import emojiScales from '~/ui/test_collections/emojiScales'
 
 const Question = styled.div`
   border-color: ${props =>
@@ -50,23 +52,7 @@ EmojiButton.displayName = 'EmojiButton'
 class ScaleQuestion extends React.Component {
   get emojiScale() {
     const { emojiSeries } = this.props
-    switch (emojiSeries) {
-      case 'thumbs':
-        return [
-          { number: 1, name: 'terrible', symbol: '👎' },
-          { number: 2, name: 'bad', scale: 0.6, symbol: '👎' },
-          { number: 3, name: 'good', scale: 0.6, symbol: '👍' },
-          { number: 4, name: 'great', symbol: '👍' },
-        ]
-      case 'faces':
-      default:
-        return [
-          { number: 1, name: 'terrible', symbol: '😡' },
-          { number: 2, name: 'bad', symbol: '☹️' },
-          { number: 3, name: 'good', symbol: '😊' },
-          { number: 4, name: 'great', symbol: '😍' },
-        ]
-    }
+    return emojiScales[emojiSeries]
   }
 
   vote = number => ev => {
@@ -86,23 +72,32 @@ class ScaleQuestion extends React.Component {
           <SmallHelperText>select your response below</SmallHelperText>
           <EmojiHolder>
             {emojis.map(emoji => (
-              <EmojiButton
-                // before any are selected they all should be "selected" aka full opacity
-                selected={
-                  !questionAnswer ||
-                  questionAnswer.answer_number === emoji.number
-                }
-                key={emoji.name}
-                onClick={this.vote(emoji.number)}
-                // "vote" button is disabled while editing
-                disabled={editing}
+              <Tooltip
+                classes={{ tooltip: 'Tooltip' }}
+                title={emoji.name}
+                // bottom tooltip interferes with hotspot while editing
+                placement={editing ? 'top' : 'bottom'}
+                key={emoji.number}
               >
-                <Emoji
-                  name={emoji.name}
-                  symbol={emoji.symbol}
-                  scale={emoji.scale}
-                />
-              </EmojiButton>
+                <div>
+                  <EmojiButton
+                    // before any are selected they all should be "selected" aka full opacity
+                    selected={
+                      !questionAnswer ||
+                      questionAnswer.answer_number === emoji.number
+                    }
+                    onClick={this.vote(emoji.number)}
+                    // "vote" button is disabled while editing
+                    disabled={editing}
+                  >
+                    <Emoji
+                      name={emoji.name}
+                      symbol={emoji.symbol}
+                      scale={emoji.scale}
+                    />
+                  </EmojiButton>
+                </div>
+              </Tooltip>
             ))}
           </EmojiHolder>
         </Scale>
@@ -114,13 +109,12 @@ class ScaleQuestion extends React.Component {
 ScaleQuestion.propTypes = {
   questionAnswer: MobxPropTypes.objectOrObservableObject,
   questionText: PropTypes.string.isRequired,
-  emojiSeries: PropTypes.oneOf(['faces', 'thumbs']),
+  emojiSeries: PropTypes.oneOf(Object.keys(emojiScales)).isRequired,
   editing: PropTypes.bool,
   onAnswer: PropTypes.func,
 }
 ScaleQuestion.defaultProps = {
   questionAnswer: null,
-  emojiSeries: 'faces',
   editing: false,
   onAnswer: () => null,
 }

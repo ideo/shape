@@ -558,6 +558,7 @@ class GridCardBlank extends React.Component {
         </StyledGridCardInner>
         {this.state.loading && <InlineLoader />}
         {!this.emptyState &&
+          !testCollectionCard &&
           creating !== 'text' && (
             <CloseButton onClick={this.closeBlankContentTool} />
           )}
