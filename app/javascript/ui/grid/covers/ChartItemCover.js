@@ -8,6 +8,7 @@ import styled from 'styled-components'
 import { apiStore } from '~/stores'
 import { Heading1, Heading3 } from '~/ui/global/styled/typography'
 import v from '~/utils/variables'
+import { questionInformation } from '~/ui/test_collections/shared'
 
 const CoverContainer = styled.div`
   padding: 16px;
@@ -60,46 +61,16 @@ class ChartItemCover extends React.Component {
   }
 
   get mapQuestionType() {
-    // TODO combine this with Question
-    switch (this.question.question_type) {
-      case 'question_context':
-        return {
-          title: 'Category Satisfaction',
-          byline: 'How satisfied are you with your current solution?',
-        }
-      case 'question_useful':
-        return {
-          title: 'Usefulness',
-          byline: 'How useful is this idea for you?',
-        }
-
-      default:
-        return {}
-    }
+    const { questionTitle, questionText } = questionInformation(
+      this.question.question_type
+    )
+    return { questionTitle, questionText }
   }
 
   get emojiScale() {
     if (!this.question) return []
-    // TODO combine this with Question
-    switch (this.question.question_type) {
-      case 'question_context':
-        return [
-          { number: 1, name: 'terrible', symbol: '😡' },
-          { number: 2, name: 'bad', symbol: '☹️' },
-          { number: 3, name: 'good', symbol: '😊' },
-          { number: 4, name: 'great', symbol: '😍' },
-        ]
-      case 'question_useful':
-        return [
-          { number: 1, name: 'terrible', symbol: '👎' },
-          { number: 2, name: 'bad', scale: 0.6, symbol: '👎' },
-          { number: 3, name: 'good', scale: 0.6, symbol: '👍' },
-          { number: 4, name: 'great', symbol: '👍' },
-        ]
-
-      default:
-        return []
-    }
+    const { emojiSeries } = questionInformation(this.question.question_type)
+    return emojiSeries
   }
 
   render() {

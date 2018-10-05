@@ -11,7 +11,7 @@ import ScaleQuestion from '~/ui/test_collections/ScaleQuestion'
 import OpenQuestion from '~/ui/test_collections/OpenQuestion'
 import { apiStore, uiStore } from '~/stores'
 import QuestionAnswer from '~/stores/jsonApi/QuestionAnswer'
-import { QuestionText } from './shared'
+import { QuestionText, questionInformation } from './shared'
 
 const QuestionHolder = styled.div`
   display: flex;
@@ -64,28 +64,12 @@ class TestQuestion extends React.Component {
 
   renderQuestion() {
     const { parent, card, item, editing, questionAnswer, canEdit } = this.props
-    let inner, emojiSeries, questionText
+    let inner
 
-    // Have to do this initial switch/case to pluck out the emoji question settings
-    switch (card.card_question_type) {
-      case 'question_useful':
-        emojiSeries = 'usefulness'
-        questionText = 'How useful is this idea for you?'
-        break
-      case 'question_clarity':
-        emojiSeries = 'clarity'
-        questionText = 'How clear is this idea for you?'
-        break
-      case 'question_excitement':
-        emojiSeries = 'excitement'
-        questionText = 'How exciting is this idea for you?'
-        break
-      case 'question_context':
-      default:
-        emojiSeries = 'satisfaction'
-        questionText = 'How satisfied are you with your current solution?'
-        break
-    }
+    const { emojiSeries, questionText } = questionInformation(
+      card.question_type
+    )
+
     switch (card.card_question_type) {
       case 'question_useful':
       case 'question_clarity':

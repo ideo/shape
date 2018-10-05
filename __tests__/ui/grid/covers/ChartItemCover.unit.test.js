@@ -6,6 +6,7 @@ import { fakeChartItem } from '#/mocks/data'
 jest.mock('../../../../app/javascript/stores')
 
 let props, wrapper, rerender, component
+
 describe('ChartItemCover', () => {
   beforeEach(() => {
     props = {
