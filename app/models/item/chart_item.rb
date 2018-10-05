@@ -5,10 +5,12 @@ class Item
     def chart_data
       return unless data_source.is_a?(Item::QuestionItem)
       data = {}
-      completed_answers = data_source.question_answers
-                                     .select(&:survey_response_completed?)
-
-      completed_answers.each do |answer|
+      data_source
+        .question_answers
+        .joins(:survey_response)
+        .where(
+          SurveyResponse.arel_table[:status].eq(:completed),
+        ).each do |answer|
         unless data.key?(answer.answer_number)
           data[answer.answer_number] = 0
         end
