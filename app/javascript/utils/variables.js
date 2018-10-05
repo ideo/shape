@@ -60,6 +60,7 @@ export default {
     nearwhite: '#f7f7f7',
     cautionYellow: '#fcf113',
     placeholderGray: '#bcbcbc',
+    transparent: 'transparent',
   },
 
   iconSizes: {

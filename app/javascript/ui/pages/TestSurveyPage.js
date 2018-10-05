@@ -6,6 +6,7 @@ import Logo from '~/ui/layout/Logo'
 import TestSurveyResponder from '~/ui/test_collections/TestSurveyResponder'
 import { apiStore } from '~/stores'
 import SurveyResponse from '~/stores/jsonApi/SurveyResponse'
+import { LoudDisplayLink } from '~/ui/global/styled/typography'
 
 const StyledBg = styled.div`
   background: #e3edee;
@@ -27,6 +28,7 @@ const StyledSurvey = styled.div`
   margin: 0 auto;
 `
 
+// TODO move blue background, rounded-corner box to shared component
 const StyledSurveyClosed = styled.div`
   border-radius: 7px;
   margin: 100px auto 0 auto;
@@ -49,13 +51,8 @@ const StyledHandsEmoji = styled.div`
   font-size: 80px;
 `
 
-const LearnMoreLink = styled.a`
-  text-transform: uppercase;
-  font-weight: 500;
-  font-size: 1rem;
+const LearnMoreLink = LoudDisplayLink.extend`
   color: ${v.colors.white};
-  text-decoration: none;
-  display: block;
 `
 LearnMoreLink.displayName = 'LearnMoreLink'
 
