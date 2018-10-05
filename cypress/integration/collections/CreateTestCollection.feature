@@ -22,4 +22,4 @@ Feature: Creating a Test Collection
     When I click the "ConfirmButton" containing "Launch"
     And I wait for "@apiLaunchTest" to finish
     # assuming the collection cover is not truncated...
-    Then I should see a collection card named "Feedback Prototype Test Design"
+    Then I should see a collection card named "Feedback Prototype Feedback Design"

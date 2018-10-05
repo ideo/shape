@@ -4,6 +4,12 @@ export const ITEM_TYPES = {
   VIDEO: 'Item::VideoItem',
   LINK: 'Item::LinkItem',
   QUESTION: 'Item::QuestionItem',
+  CHART: 'Item::ChartItem',
+}
+
+export const COLLECTION_TYPES = {
+  TEST: 'Collection::TestCollection',
+  TEST_DESIGN: 'Collection::TestDesign',
 }
 
 export const KEYS = {
@@ -54,6 +60,7 @@ export default {
     nearwhite: '#f7f7f7',
     cautionYellow: '#fcf113',
     placeholderGray: '#bcbcbc',
+    transparent: 'transparent',
   },
 
   iconSizes: {

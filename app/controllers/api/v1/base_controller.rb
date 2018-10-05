@@ -16,6 +16,7 @@ class Api::V1::BaseController < ApplicationController
       'Item::FileItem': SerializableItem,
       'Item::LinkItem': SerializableItem,
       'Item::QuestionItem': SerializableItem,
+      'Item::ChartItem': SerializableItem,
       'Collection::UserCollection': SerializableCollection,
       'Collection::SharedWithMeCollection': SerializableCollection,
       'Collection::Global': SerializableCollection,
@@ -65,6 +66,14 @@ class Api::V1::BaseController < ApplicationController
   end
 
   private
+
+  def render_collection(include: nil)
+    # include collection_cards for UI to receive any updates
+    include ||= Collection.default_relationships_for_api
+    render jsonapi: @collection,
+           include: include,
+           expose: { current_record: @collection }
+  end
 
   def check_api_authentication!
     head(401) unless user_signed_in?

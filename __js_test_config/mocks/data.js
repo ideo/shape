@@ -90,6 +90,27 @@ export const fakeLinkItem = {
   rawAttributes: jest.fn().mockReturnValue(fakeLinkItemAttrs),
   getRecordType: jest.fn().mockReturnValue('items'),
 }
+export const fakeChartItemAttrs = {
+  id: "5",
+  type: 'Item::ChartItem',
+  name: '',
+  content: '',
+  chart_data: {
+    0: 3,
+    1: 6,
+    2: 1,
+    3: 8,
+  },
+  data_source_id: 3,
+  inherited_tag_list: [],
+  can_edit: false,
+  parent_collection_card: fakeCollectionCard,
+}
+export const fakeChartItem = {
+  ...fakeChartItemAttrs,
+  rawAttributes: jest.fn().mockReturnValue(fakeChartItemAttrs),
+  getRecordType: jest.fn().mockReturnValue('items'),
+}
 export const fakeFileItemAttrs = {
   id: "3",
   type: 'Item::FileItem',

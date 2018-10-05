@@ -336,31 +336,4 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
       end
     end
   end
-
-  describe 'PATCH #launch_test' do
-    let(:path) { "/api/v1/collections/#{collection.id}/launch_test" }
-
-    context 'with an already live test collection' do
-      let!(:collection) { create(:test_collection, test_status: :live, add_editors: [user]) }
-
-      it 'should not allow the destroy action' do
-        patch(path)
-        expect(response.status).to eq(401)
-      end
-    end
-
-    context 'with a draft test collection' do
-      let!(:collection) { create(:test_collection, :open_response_questions, test_status: :draft, add_editors: [user]) }
-
-      it 'should allow the launch_test action' do
-        patch(path)
-        expect(response.status).to eq(200)
-      end
-
-      it 'should call the launch_test method on the collection' do
-        patch(path)
-        expect(collection.reload.test_status).to eq 'live'
-      end
-    end
-  end
 end
