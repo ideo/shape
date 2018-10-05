@@ -43,6 +43,15 @@ class Collection
       end
     end
 
+    def self.default_question_types
+      %i[
+        question_media
+        question_description
+        question_useful
+        question_finish
+      ]
+    end
+
     # alias method, will delegate to test_design if test is live
     def question_items
       if test_design.present?
@@ -160,34 +169,17 @@ class Collection
     def setup_default_status_and_questions
       # ||= mostly useful for unit tests, otherwise should be nil
       self.test_status ||= :draft
-      primary_collection_cards.build(
-        order: 0,
-        item_attributes: {
-          type: 'Item::QuestionItem',
-          question_type: :question_media,
-        },
-      )
-      primary_collection_cards.build(
-        order: 1,
-        item_attributes: {
-          type: 'Item::QuestionItem',
-          question_type: :question_description,
-        },
-      )
-      primary_collection_cards.build(
-        order: 2,
-        item_attributes: {
-          type: 'Item::QuestionItem',
-          question_type: :question_useful,
-        },
-      )
-      primary_collection_cards.build(
-        order: 3,
-        item_attributes: {
-          type: 'Item::QuestionItem',
-          question_type: :question_finish,
-        },
-      )
+      self.class
+          .default_question_types
+          .each_with_index do |question_type, i|
+        primary_collection_cards.build(
+          order: i,
+          item_attributes: {
+            type: 'Item::QuestionItem',
+            question_type: question_type,
+          },
+        )
+      end
     end
 
     def setup_response_graphs(initiated_by:)
