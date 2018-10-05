@@ -1,7 +1,7 @@
 import { action, observable } from 'mobx'
 
 import { uiStore } from '~/stores'
-import { ITEM_TYPES } from '~/utils/variables'
+import { ITEM_TYPES, COLLECTION_TYPES } from '~/utils/variables'
 import BaseRecord from './BaseRecord'
 
 class CollectionCard extends BaseRecord {
@@ -32,6 +32,10 @@ class CollectionCard extends BaseRecord {
   @action
   setMaxHeight(h) {
     this.maxHeight = h
+  }
+
+  get isTestDesignCollection() {
+    return this.record.type === COLLECTION_TYPES.TEST_DESIGN
   }
 
   get isTextItem() {
@@ -184,6 +188,7 @@ class CollectionCard extends BaseRecord {
 
   async API_archive({ isReplacing = false } = {}) {
     const { selectedCardIds } = uiStore
+
     const popupAgreed = new Promise((resolve, reject) => {
       let prompt = 'Are you sure you want to archive this?'
       const confirmText = 'Archive'
@@ -205,6 +210,9 @@ class CollectionCard extends BaseRecord {
       } else if (this.link) {
         iconName = 'Link'
         prompt = 'Are you sure you want to archive this link?'
+      } else if (this.isTestDesignCollection) {
+        prompt = 'Are you sure you want to archive this test design?'
+        prompt += ' It will close your feedback.'
       }
       uiStore.confirm({
         prompt,
@@ -217,7 +225,6 @@ class CollectionCard extends BaseRecord {
 
     const agreed = await popupAgreed
     if (!agreed) return false
-
     const collection = this.parent
     try {
       await this.apiStore.archiveCards({

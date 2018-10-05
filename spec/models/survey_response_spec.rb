@@ -13,7 +13,7 @@ RSpec.describe SurveyResponse, type: :model do
       let(:author) { create(:user) }
 
       before do
-        test_collection.launch_test!(initiated_by: author)
+        test_collection.launch!(initiated_by: author)
       end
 
       it 'creates open response items for each open response question' do

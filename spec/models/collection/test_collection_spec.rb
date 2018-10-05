@@ -40,30 +40,48 @@ describe Collection::TestCollection, type: :model do
   context 'launching a test' do
     let(:user) { create(:user) }
 
-    describe '#launch_test!' do
+    describe '#launch!' do
       context 'with valid draft collection (default status)' do
         it 'should create a TestDesign collection and move the questions into it' do
           expect(test_collection.test_design.present?).to be false
-          expect(test_collection.launch_test!(initiated_by: user)).to be true
+          expect(test_collection.launch!(initiated_by: user)).to be true
           expect(test_collection.test_design.created_by).to eq user
           expect(test_collection.test_design.present?).to be true
-          # should have moved the 3 default cards into there
-          expect(test_collection.test_design.collection_cards.count).to eq 5
+          # should have moved the default question cards into there
+          expect(
+            test_collection
+            .test_design
+            .collection_cards
+            .map(&:card_question_type)
+            .map(&:to_sym),
+          ).to eq(
+            Collection::TestCollection.default_question_types,
+          )
           expect(
             test_collection.test_design.collection_cards.map(&:order),
-          ).to match_array([0, 1, 2, 3, 4])
-          # now the test_collection should just have the 1 card
-          expect(test_collection.collection_cards.count).to eq 1
+          ).to eq([0, 1, 2, 3])
+          # now the test_collection should have the test design and chart item
+          expect(
+            test_collection
+            .collection_cards
+            .reload
+            .map { |card| card.record.class },
+          ).to match_array(
+            [
+              Collection::TestDesign,
+              Item::ChartItem,
+            ]
+          )
         end
 
         it 'should update the status to "live"' do
-          expect(test_collection.launch_test!(initiated_by: user)).to be true
+          expect(test_collection.launch!(initiated_by: user)).to be true
           expect(test_collection.live?).to be true
         end
 
         it 'should create a chart item for each scale question' do
             expect {
-              test_collection.launch_test!(initiated_by: user)
+              test_collection.launch!(initiated_by: user)
             }.to change(
               Item::ChartItem, :count
             ).by(test_collection.question_items.select { |q| q.question_context? || q.question_useful? }.size)
@@ -74,7 +92,7 @@ describe Collection::TestCollection, type: :model do
 
           it 'creates a TestOpenResponse collection for each item' do
             expect {
-              test_collection.launch_test!(initiated_by: user)
+              test_collection.launch!(initiated_by: user)
             }.to change(
               Collection::TestOpenResponses, :count
             ).by(test_collection.question_items.size)
@@ -96,15 +114,38 @@ describe Collection::TestCollection, type: :model do
         end
 
         it 'returns false with test_status errors' do
-          expect(test_collection.launch_test!(initiated_by: user)).to be false
-          expect(test_collection.errors).to match_array(['Test status must be in draft mode in order to launch'])
+          expect(test_collection.launch!(initiated_by: user)).to be false
+          expect(test_collection.errors).to match_array(["Test status event 'launch' cannot transition from 'live'."])
         end
+      end
+    end
+
+    describe '#close!' do
+      before do
+        test_collection.launch!(initiated_by: user)
+      end
+
+      it 'should set status as closed' do
+        expect(test_collection.close!).to be true
+        expect(test_collection.closed?).to be true
+      end
+    end
+
+    describe '#reopen!' do
+      before do
+        test_collection.launch!(initiated_by: user)
+        test_collection.close!
+      end
+
+      it 'should set status as live' do
+        expect(test_collection.reopen!).to be true
+        expect(test_collection.live?).to be true
       end
     end
 
     describe '#serialized_for_test_survey' do
       before do
-        test_collection.launch_test!(initiated_by: user)
+        test_collection.launch!(initiated_by: user)
       end
 
       it 'should output its collection_cards from the test_design child collection' do

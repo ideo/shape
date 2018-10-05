@@ -7,6 +7,11 @@ export const ITEM_TYPES = {
   CHART: 'Item::ChartItem',
 }
 
+export const COLLECTION_TYPES = {
+  TEST: 'Collection::TestCollection',
+  TEST_DESIGN: 'Collection::TestDesign',
+}
+
 export const KEYS = {
   ENTER: 13,
   ESC: 27,
@@ -55,6 +60,7 @@ export default {
     nearwhite: '#f7f7f7',
     cautionYellow: '#fcf113',
     placeholderGray: '#bcbcbc',
+    transparent: 'transparent',
   },
 
   iconSizes: {

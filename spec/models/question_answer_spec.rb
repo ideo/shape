@@ -24,7 +24,7 @@ RSpec.describe QuestionAnswer, type: :model do
         )
       end
       test_collection
-        .launch_test!(initiated_by: user)
+        .launch!(initiated_by: user)
     end
 
     describe '#update_survey_response' do

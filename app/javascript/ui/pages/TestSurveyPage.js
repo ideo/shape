@@ -6,6 +6,7 @@ import Logo from '~/ui/layout/Logo'
 import TestSurveyResponder from '~/ui/test_collections/TestSurveyResponder'
 import { apiStore } from '~/stores'
 import SurveyResponse from '~/stores/jsonApi/SurveyResponse'
+import { LoudDisplayLink } from '~/ui/global/styled/typography'
 
 const StyledBg = styled.div`
   background: #e3edee;
@@ -26,6 +27,34 @@ const StyledSurvey = styled.div`
   width: 334px;
   margin: 0 auto;
 `
+
+// TODO move blue background, rounded-corner box to shared component
+const StyledSurveyClosed = styled.div`
+  border-radius: 7px;
+  margin: 100px auto 0 auto;
+  background-color: ${v.colors.ctaButtonBlue};
+  width: 272px;
+  padding: 30px;
+  font-size: 1.25rem;
+  font-family: ${v.fonts.sans};
+  color: ${v.colors.white};
+  text-align: center;
+`
+StyledSurveyClosed.displayName = 'StyledSurveyClosed'
+
+const StyledClosedText = styled.div`
+  margin: 10px 0 40px 0;
+`
+
+const StyledHandsEmoji = styled.div`
+  margin-top: 20px;
+  font-size: 80px;
+`
+
+const LearnMoreLink = LoudDisplayLink.extend`
+  color: ${v.colors.white};
+`
+LearnMoreLink.displayName = 'LearnMoreLink'
 
 class TestSurveyPage extends React.Component {
   state = {
@@ -51,25 +80,44 @@ class TestSurveyPage extends React.Component {
     return surveyResponse
   }
 
-  render() {
+  get renderSurvey() {
     const { collection, createSurveyResponse } = this
     const { surveyResponse } = this.state
-    // now that collection is loaded synchronously, no need to display a loader here
+    if (!collection) return null
+    if (collection.test_status === 'live') {
+      return (
+        <StyledSurvey>
+          <TestSurveyResponder
+            collection={collection}
+            surveyResponse={surveyResponse}
+            createSurveyResponse={createSurveyResponse}
+            editing={false}
+          />
+        </StyledSurvey>
+      )
+    }
+    return (
+      <StyledSurveyClosed>
+        <StyledHandsEmoji>
+          <span role="img" aria-label="Raising Hands">
+            🙌
+          </span>
+        </StyledHandsEmoji>
+        <StyledClosedText>
+          Thank you for stopping by! This feedback is now closed.
+        </StyledClosedText>
+        <LearnMoreLink href={'/'}>Learn More About Shape</LearnMoreLink>
+      </StyledSurveyClosed>
+    )
+  }
+
+  render() {
     return (
       <StyledBg>
         <LogoWrapper>
           <Logo />
         </LogoWrapper>
-        <StyledSurvey>
-          {collection && (
-            <TestSurveyResponder
-              collection={collection}
-              surveyResponse={surveyResponse}
-              createSurveyResponse={createSurveyResponse}
-              editing={false}
-            />
-          )}
-        </StyledSurvey>
+        {this.renderSurvey}
       </StyledBg>
     )
   }

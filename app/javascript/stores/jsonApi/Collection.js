@@ -110,6 +110,10 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     return this.isTestCollectionOrTestDesign && this.test_status === 'live'
   }
 
+  get isClosedTest() {
+    return this.isTestCollectionOrTestDesign && this.test_status === 'closed'
+  }
+
   get publicTestURL() {
     let collectionId = this.id
     if (this.isTestDesign && this.parent_collection_card) {
@@ -240,9 +244,24 @@ class Collection extends SharedRecordMixin(BaseRecord) {
       onConfirm: () => this.API_launchTest(),
     })
   }
+  closeTest = async () => {
+    await this.API_closeTest()
+  }
+
+  reopenTest = async () => {
+    await this.API_reopenTest()
+  }
 
   API_launchTest() {
-    this.apiStore.request(`collections/${this.id}/launch_test`, 'PATCH')
+    this.apiStore.request(`test_collections/${this.id}/launch`, 'PATCH')
+  }
+
+  API_closeTest() {
+    this.apiStore.request(`test_collections/${this.id}/close`, 'PATCH')
+  }
+
+  API_reopenTest() {
+    this.apiStore.request(`test_collections/${this.id}/reopen`, 'PATCH')
   }
 
   static async createSubmission(parent_id, submissionSettings) {

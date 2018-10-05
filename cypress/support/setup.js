@@ -22,7 +22,9 @@ const createNamedRoutes = () => {
     'apiGetInMyCollection'
   )
   cy.route('PATCH', '/api/v1/collections/*').as('apiUpdateCollection')
-  cy.route('PATCH', '/api/v1/collections/*/launch_test').as('apiLaunchTest')
+  cy.route('PATCH', '/api/v1/test_collections/*/launch').as('apiLaunchTest')
+  cy.route('PATCH', '/api/v1/test_collections/*/close').as('apiCloseTest')
+  cy.route('PATCH', '/api/v1/test_collections/*/reopen').as('apiReopenTest')
   // external routes
   cy.route('GET', '**/youtube/v3/videos*', 'fx:youtube-api').as('youtubeApi')
 }
