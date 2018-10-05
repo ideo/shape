@@ -8,12 +8,12 @@ describe Collection::TestDesign, type: :model do
 
   describe 'callbacks' do
     describe '#close_test' do
-      let!(:test_collection) { create(:test_collection) }
-      let!(:test_design) {
+      let!(:test_collection) { create(:test_collection, :completed) }
+      let!(:test_design) do
         test_collection.launch!(initiated_by: create(:user))
         # Need to call reload because test_collection relationship is stale
         test_collection.test_design.reload
-      }
+      end
 
       it 'closes test collection if archived' do
         expect(test_collection.live?).to be true
