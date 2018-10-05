@@ -77,8 +77,8 @@ class ChartItemCover extends React.Component {
       <CoverContainer>
         {this.question && (
           <div>
-            <Heading1>{this.mapQuestionType.title}</Heading1>
-            <Heading3>{this.mapQuestionType.byline}</Heading3>
+            <Heading1>{this.mapQuestionType.questionTitle}</Heading1>
+            <Heading3>{this.mapQuestionType.questionText}</Heading3>
           </div>
         )}
         <VictoryChart domainPadding={14}>
