@@ -54,7 +54,10 @@ class ChartItemCover extends React.Component {
       0
     )
     _.forEach(item.chart_data, (value, key) => {
-      formattedData.push({ scale: key, value: parseInt((value / total) * 100) })
+      formattedData.push({
+        scale: key,
+        value: value > 0 ? parseInt((value / total) * 100) : 0,
+      })
     })
     return formattedData
   }

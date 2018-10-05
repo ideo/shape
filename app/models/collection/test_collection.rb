@@ -203,7 +203,9 @@ class Collection
       chart_card_builders = []
       question_items.each_with_index do |question, i|
         next unless question.question_context? ||
-                    question.question_useful?
+                    question.question_useful? ||
+                    question.question_excitement? ||
+                    question.question_clarity?
         chart_card_builders.push(
           CollectionCardBuilder.new(
             params: {
