@@ -75,6 +75,7 @@ class TestQuestion extends React.Component {
       case 'question_clarity':
       case 'question_excitement':
       case 'question_context':
+      case 'question_different':
         return (
           <ScaleQuestion
             questionText={questionText}
