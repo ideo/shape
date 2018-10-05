@@ -138,7 +138,7 @@ export const questionInformation = questionType => {
     case 'question_useful':
       emojiSeriesName = 'usefulness'
       questionText = 'How useful is this idea for you?'
-      questionTitle = 'Usesfulness'
+      questionTitle = 'Usefulness'
       break
     case 'question_clarity':
       emojiSeriesName = 'clarity'
