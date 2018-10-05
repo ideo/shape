@@ -15,6 +15,7 @@
     "show_move_helper": { "type": "boolean" },
     "show_template_helper": { "type": "boolean" },
     "notify_through_email": { "type": "boolean" },
+    "mailing_list": { "type": "boolean" },
     "google_auth_token": { "type": "string" }
   },
   "required": ["email", "first_name", "last_name", "status"]

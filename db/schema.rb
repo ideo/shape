@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180921212427) do
+ActiveRecord::Schema.define(version: 20181005173335) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -87,6 +87,8 @@ ActiveRecord::Schema.define(version: 20180921212427) do
     t.integer "submission_box_type"
     t.bigint "submission_box_id"
     t.integer "test_status"
+    t.integer "question_item_id"
+    t.bigint "test_collection_id"
     t.integer "processing_status"
     t.index ["breadcrumb"], name: "index_collections_on_breadcrumb", using: :gin
     t.index ["cloned_from_id"], name: "index_collections_on_cloned_from_id"
@@ -188,8 +190,11 @@ ActiveRecord::Schema.define(version: 20180921212427) do
     t.string "archive_batch"
     t.string "icon_url"
     t.integer "question_type"
+    t.string "data_source_type"
+    t.bigint "data_source_id"
     t.index ["breadcrumb"], name: "index_items_on_breadcrumb", using: :gin
     t.index ["cloned_from_id"], name: "index_items_on_cloned_from_id"
+    t.index ["data_source_type", "data_source_id"], name: "index_items_on_data_source_type_and_data_source_id"
   end
 
   create_table "notifications", force: :cascade do |t|
@@ -226,6 +231,7 @@ ActiveRecord::Schema.define(version: 20180921212427) do
     t.integer "answer_number"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "open_response_item_id"
     t.index ["question_id"], name: "index_question_answers_on_question_id"
     t.index ["survey_response_id"], name: "index_question_answers_on_survey_response_id"
   end
@@ -247,6 +253,7 @@ ActiveRecord::Schema.define(version: 20180921212427) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.text "session_uid"
+    t.integer "status", default: 0
     t.index ["session_uid"], name: "index_survey_responses_on_session_uid", unique: true
     t.index ["test_collection_id"], name: "index_survey_responses_on_test_collection_id"
   end
@@ -304,6 +311,7 @@ ActiveRecord::Schema.define(version: 20180921212427) do
     t.datetime "last_notification_mail_sent"
     t.boolean "show_move_helper", default: true
     t.boolean "show_template_helper", default: true
+    t.boolean "mailing_list", default: false
     t.index ["email"], name: "index_users_on_email"
     t.index ["handle"], name: "index_users_on_handle", unique: true
     t.index ["invitation_token"], name: "index_users_on_invitation_token"

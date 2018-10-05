@@ -16,6 +16,8 @@ GIT
 GEM
   remote: https://rubygems.org/
   specs:
+    aasm (5.0.1)
+      concurrent-ruby (~> 1.0)
     action-cable-testing (0.3.0)
       actioncable (~> 5.0)
     actioncable (5.1.5)
@@ -140,6 +142,9 @@ GEM
     formatador (0.2.5)
     friendly_id (5.1.0)
       activerecord (>= 4.0.0)
+    gibbon (3.2.0)
+      faraday (>= 0.9.1)
+      multi_json (>= 1.11.0)
     globalid (0.4.1)
       activesupport (>= 4.2.0)
     google-cloud-core (1.2.0)
@@ -455,6 +460,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  aasm (~> 5.0)
   action-cable-testing
   acts-as-taggable-on
   amoeba
@@ -475,6 +481,7 @@ DEPENDENCIES
   fakeredis
   filestack
   friendly_id (~> 5.1.0)
+  gibbon (~> 3.2)
   google-cloud-firestore (~> 0.21.0)
   guard
   guard-rspec
@@ -517,4 +524,4 @@ RUBY VERSION
    ruby 2.4.3p205
 
 BUNDLED WITH
-   1.16.4
+   1.16.5

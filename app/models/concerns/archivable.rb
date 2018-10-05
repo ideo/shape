@@ -95,6 +95,10 @@ module Archivable
 
   private
 
+  def archived_on_previous_save?
+    saved_change_to_archived? && archived?
+  end
+
   def archive_relations!(batch)
     return unless self.class.archive_with.present?
     self.class.archive_with.each do |relation|

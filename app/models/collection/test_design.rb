@@ -1,5 +1,29 @@
 class Collection
   class TestDesign < Collection
-    delegate :test_status, to: :parent
+    belongs_to :test_collection, class_name: 'Collection::TestCollection'
+    delegate :can_reopen?, :test_status,
+             to: :test_collection
+
+    after_commit :close_test, if: :archived_on_previous_save?
+
+    has_many :question_items,
+             -> { questions },
+             source: :item,
+             class_name: 'Item::QuestionItem',
+             through: :primary_collection_cards
+
+    def question_item_created(question_item)
+      return unless question_item.question_open?
+      # Create open response collection for this new question item
+      test_collection.create_open_response_collection_cards(
+        open_question_items: [question_item],
+      )
+    end
+
+    private
+
+    def close_test
+      test_collection.close! if test_collection.live?
+    end
   end
 end

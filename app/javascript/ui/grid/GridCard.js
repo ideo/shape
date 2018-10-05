@@ -3,6 +3,7 @@ import { Fragment } from 'react'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 
+import ChartItemCover from '~/ui/grid/covers/ChartItemCover'
 import ContainImage from '~/ui/grid/ContainImage'
 import GridCardHotspot from '~/ui/grid/GridCardHotspot'
 import LinkItemCover from '~/ui/grid/covers/LinkItemCover'
@@ -97,6 +98,10 @@ class GridCard extends React.Component {
           return <VideoItemCover item={record} dragging={this.props.dragging} />
         case ITEM_TYPES.LINK:
           return <LinkItemCover item={record} dragging={this.props.dragging} />
+
+        case ITEM_TYPES.CHART:
+          return <ChartItemCover item={record} />
+
         default:
           return <div>{record.content}</div>
       }

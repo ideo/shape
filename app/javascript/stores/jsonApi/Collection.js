@@ -103,19 +103,19 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   }
 
   get isLaunchableTest() {
-    return this.isTestCollection && this.test_status === 'draft'
+    return this.isTestCollectionOrTestDesign && this.test_status === 'draft'
   }
 
   get isLiveTest() {
     return this.isTestCollectionOrTestDesign && this.test_status === 'live'
   }
 
+  get isClosedTest() {
+    return this.isTestCollectionOrTestDesign && this.test_status === 'closed'
+  }
+
   get publicTestURL() {
-    let collectionId = this.id
-    if (this.isTestDesign && this.parent_collection_card) {
-      collectionId = this.parent_collection_card.parent_id
-    }
-    return `${process.env.BASE_HOST}/tests/${collectionId}`
+    return `${process.env.BASE_HOST}/tests/${this.testCollectionId}`
   }
 
   get isTemplated() {
@@ -168,6 +168,14 @@ class Collection extends SharedRecordMixin(BaseRecord) {
 
   get isEmpty() {
     return this.collection_cards.length === 0
+  }
+
+  get testCollectionId() {
+    if (this.isTestCollection) return this.id
+    if (this.isTestDesign && this.parent_collection_card) {
+      return this.parent_collection_card.parent_id
+    }
+    return undefined
   }
 
   @action
@@ -232,17 +240,42 @@ class Collection extends SharedRecordMixin(BaseRecord) {
       uiStore.alert('Only editors are allowed to launch the test.')
       return
     }
-    uiStore.confirm({
-      prompt:
-        'Are you sure? Once you get your first response, you can no longer change your test.',
-      confirmText: 'Launch',
-      iconName: 'TestGraph',
-      onConfirm: () => this.API_launchTest(),
-    })
+    this.API_launchTest()
+  }
+
+  closeTest = async () => {
+    await this.API_closeTest()
+  }
+
+  reopenTest = async () => {
+    await this.API_reopenTest()
   }
 
   API_launchTest() {
-    this.apiStore.request(`collections/${this.id}/launch_test`, 'PATCH')
+    this.apiStore
+      .request(`test_collections/${this.testCollectionId}/launch`, 'PATCH')
+      .catch(err => {
+        uiStore.popupAlert({
+          prompt: `You have questions that have not yet been finalized:\n
+           ${err.error.map(e => ` ${e.detail}`)}
+          `,
+          fadeOutTime: 10 * 1000,
+        })
+      })
+  }
+
+  API_closeTest(collectionId) {
+    this.apiStore.request(
+      `test_collections/${this.testCollectionId}/close`,
+      'PATCH'
+    )
+  }
+
+  API_reopenTest() {
+    this.apiStore.request(
+      `test_collections/${this.testCollectionId}/reopen`,
+      'PATCH'
+    )
   }
 
   static async createSubmission(parent_id, submissionSettings) {

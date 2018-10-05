@@ -57,6 +57,7 @@ const HeaderFormButton = FormButton.extend`
 HeaderFormButton.displayName = 'HeaderFormButton'
 HeaderFormButton.defaultProps = {
   'data-cy': 'HeaderFormButton',
+  color: v.colors.blackLava,
 }
 
 const LiveTestIndicator = styled.span`
@@ -257,6 +258,30 @@ class PageHeader extends React.Component {
     return null
   }
 
+  get launchTestButton() {
+    const { record } = this.props
+    if (record.can_edit && (record.isLaunchableTest || record.isClosedTest)) {
+      if (record.isLaunchableTest) {
+        return (
+          <HeaderFormButton onClick={record.launchTest}>
+            Get Feedback
+          </HeaderFormButton>
+        )
+      } else if (record.isClosedTest && record.test_can_reopen) {
+        return (
+          <HeaderFormButton
+            onClick={record.reopenTest}
+            color={v.colors.transparent}
+            width="200"
+          >
+            Re-open Feedback
+          </HeaderFormButton>
+        )
+      }
+    }
+    return null
+  }
+
   render() {
     const { record, isHomepage, uiStore } = this.props
     const tagEditorOpen =
@@ -311,18 +336,13 @@ class PageHeader extends React.Component {
                 {record.isUsableTemplate && (
                   <HeaderFormButton
                     width="160"
-                    color="blue"
+                    color={v.colors.ctaButtonBlue}
                     onClick={this.openMoveMenuForTemplate}
                   >
                     Use Template
                   </HeaderFormButton>
                 )}
-                {record.isLaunchableTest &&
-                  record.can_edit && (
-                    <HeaderFormButton onClick={record.launchTest}>
-                      Get Feedback
-                    </HeaderFormButton>
-                  )}
+                {this.launchTestButton}
                 {record.isLiveTest && (
                   <Fragment>
                     <CopyToClipboard
@@ -331,7 +351,7 @@ class PageHeader extends React.Component {
                     >
                       <HeaderFormButton
                         width="140"
-                        color="hollow"
+                        color={v.colors.transparent}
                         onClick={() =>
                           uiStore.popupSnackbar({ message: 'Test link copied' })
                         }
@@ -358,9 +378,9 @@ class PageHeader extends React.Component {
                     </CopyToClipboard>
                     <HeaderFormButton
                       width="170"
-                      color="hollow"
+                      color={v.colors.transparent}
                       style={{ marginLeft: 10 }}
-                      onClick={() => console.log('stopped!')}
+                      onClick={record.closeTest}
                     >
                       Stop Feedback
                     </HeaderFormButton>
