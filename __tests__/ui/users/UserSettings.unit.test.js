@@ -45,4 +45,34 @@ describe('UserSettings', () => {
       expect(fakeUser.API_updateCurrentUser).toHaveBeenCalled()
     })
   })
+
+  describe('handleMailingListCheck', () => {
+    const ev = { target: {} }
+
+    describe('when unsubscribing', () => {
+      beforeEach(() => {
+        ev.target.checked = false
+        component.handleMailingListCheck(ev)
+      })
+
+      it("unsets the user's mailing list preference", () => {
+        expect(fakeUser.API_updateCurrentUser).toHaveBeenCalledWith({
+          mailing_list: false,
+        })
+        expect(uiStore.alert).toHaveBeenCalled()
+      })
+    })
+
+    beforeEach(() => {
+      ev.target.checked = true
+      component.handleMailingListCheck(ev)
+    })
+
+    it("sets the user's mailing list preference", () => {
+      expect(fakeUser.API_updateCurrentUser).toHaveBeenCalledWith({
+        mailing_list: true,
+      })
+      expect(uiStore.alert).toHaveBeenCalled()
+    })
+  })
 })

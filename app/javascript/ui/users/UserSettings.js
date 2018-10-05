@@ -1,8 +1,14 @@
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
-
-import { Heading2 } from '~/ui/global/styled/typography'
+import FormControl from '@material-ui/core/FormControl'
+import FormControlLabel from '@material-ui/core/FormControlLabel'
 import MenuItem from '@material-ui/core/MenuItem'
-import { Label, Select } from '~/ui/global/styled/forms'
+import styled from 'styled-components'
+
+import { Label, LabelText, Select, Checkbox } from '~/ui/global/styled/forms'
+
+const SettingsPageWrapper = styled.div`
+  margin-top: 40px;
+`
 
 @inject('apiStore', 'uiStore')
 @observer
@@ -29,14 +35,27 @@ class OrganizationSettings extends React.Component {
     }
   }
 
-  get value() {
+  handleMailingListCheck = async ev => {
+    const { uiStore } = this.props
+    const mailing_list = ev.target.checked
+    this.user.mailing_list = mailing_list
+    await this.user.API_updateCurrentUser({ mailing_list })
+    let message
+    if (mailing_list) {
+      message = 'You have been added to the mailing list'
+    } else {
+      message = 'You have been removed from the mailing list'
+    }
+    uiStore.alert(message, 'Mail')
+  }
+
+  get notifyValue() {
     return this.user.notify_through_email ? 'on' : 'off'
   }
 
   render() {
     return (
-      <div>
-        <Heading2>Notifications</Heading2>
+      <SettingsPageWrapper>
         <Label style={{ display: 'inline-block', marginRight: '25px' }}>
           Email notifications
         </Label>
@@ -46,7 +65,7 @@ class OrganizationSettings extends React.Component {
           disableUnderline
           name="email_notifications"
           onChange={this.handleEmailNotifications}
-          value={this.value}
+          value={this.notifyValue}
         >
           <MenuItem key="on" value="on">
             On
@@ -55,7 +74,33 @@ class OrganizationSettings extends React.Component {
             Off
           </MenuItem>
         </Select>
-      </div>
+
+        <div>
+          <FormControl component="fieldset">
+            <FormControlLabel
+              classes={{ label: 'form-control' }}
+              control={
+                <Checkbox
+                  checked={this.user.mailing_list}
+                  onChange={this.handleMailingListCheck}
+                  value="yes"
+                />
+              }
+              label={
+                <div>
+                  <LabelText
+                    style={{ display: 'block', marginTop: 15, marginBottom: 0 }}
+                  >
+                    Mailing List
+                  </LabelText>
+                  Stay current on new features and case studies by signing up
+                  for our mailing list
+                </div>
+              }
+            />
+          </FormControl>
+        </div>
+      </SettingsPageWrapper>
     )
   }
 }
