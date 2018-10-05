@@ -42,10 +42,8 @@ class Collection
         return false
       end
       test_design_card_builder = build_test_design_collection_card(initiated_by)
-      chart_card_builders = setup_response_graphs(initiated_by:initiated_by)
       transaction do
         return false unless test_design_card_builder.create
-        chart_card_builders.map(&:create)
         self.test_design = test_design_card_builder.collection_card.record
         # move all the cards into the test design collection
         collection_cards
@@ -56,6 +54,8 @@ class Collection
             card.update(parent_id: test_design.id, order: i)
           end
         create_open_response_collection_cards
+        chart_card_builders = setup_response_graphs(initiated_by: initiated_by)
+        chart_card_builders.map(&:create)
         test_design.cache_cover!
         update(test_status: :live)
       end
