@@ -57,6 +57,7 @@ const HeaderFormButton = FormButton.extend`
 HeaderFormButton.displayName = 'HeaderFormButton'
 HeaderFormButton.defaultProps = {
   'data-cy': 'HeaderFormButton',
+  color: v.colors.blackLava,
 }
 
 const LiveTestIndicator = styled.span`
@@ -270,7 +271,7 @@ class PageHeader extends React.Component {
         return (
           <HeaderFormButton
             onClick={record.reopenTest}
-            color="hollow"
+            color={v.colors.transparent}
             width="200"
           >
             Re-open Feedback
@@ -335,7 +336,7 @@ class PageHeader extends React.Component {
                 {record.isUsableTemplate && (
                   <HeaderFormButton
                     width="160"
-                    color="blue"
+                    color={v.colors.ctaButtonBlue}
                     onClick={this.openMoveMenuForTemplate}
                   >
                     Use Template
@@ -350,7 +351,7 @@ class PageHeader extends React.Component {
                     >
                       <HeaderFormButton
                         width="140"
-                        color="hollow"
+                        color={v.colors.transparent}
                         onClick={() =>
                           uiStore.popupSnackbar({ message: 'Test link copied' })
                         }
@@ -377,7 +378,7 @@ class PageHeader extends React.Component {
                     </CopyToClipboard>
                     <HeaderFormButton
                       width="170"
-                      color="hollow"
+                      color={v.colors.transparent}
                       style={{ marginLeft: 10 }}
                       onClick={record.closeTest}
                     >
