@@ -8,10 +8,12 @@ import FilestackUpload from '~/utils/FilestackUpload'
 import { ITEM_TYPES } from '~/utils/variables'
 
 import BaseRecord from './BaseRecord'
+import SharedRecordMixin from './SharedRecordMixin'
 
-class Item extends BaseRecord {
+class Item extends SharedRecordMixin(BaseRecord) {
   static type = 'items'
   static endpoint = apiUrl('items')
+
   // starts null before it is loaded
   @observable
   inMyCollection = null

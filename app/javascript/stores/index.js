@@ -6,6 +6,7 @@ import ApiStore from './ApiStore'
 import NetworkStore from './NetworkStore'
 import RoutingStore from './RoutingStore'
 import UiStore from './UiStore'
+import UndoStore from './UndoStore'
 
 const isNetworkUrl = url => url.indexOf(IdeoSSO.baseApiUrl) > -1
 
@@ -39,10 +40,12 @@ export const apiStore = new ApiStore()
 export const networkStore = new NetworkStore()
 export const routingStore = new RoutingStore()
 export const uiStore = new UiStore()
+export const undoStore = new UndoStore()
 
 export default {
   apiStore,
   networkStore,
   routingStore,
   uiStore,
+  undoStore,
 }

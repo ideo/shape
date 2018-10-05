@@ -398,6 +398,7 @@ class TextItem extends React.Component {
           <TextItemToolbar fullPageView={fullPageView} onExpand={onExpand} />
         )}
         <CloseButton
+          data-cy="TextItemClose"
           onClick={this.cancel}
           size={fullPageView ? 'lg' : 'sm'}
           position={fullPageView ? 'absolute' : 'fixed'}

@@ -56,14 +56,21 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
     end
   end
 
-  before_action :load_and_authorize_cards, only: %i[archive]
-  after_action :broadcast_collection_archive_updates, only: %i[archive]
+  before_action :load_and_authorize_cards, only: %i[archive unarchive]
+  after_action :broadcast_collection_archive_updates, only: %i[archive unarchive]
   def archive
     CollectionCardArchiveWorker.perform_async(
       @collection_cards.pluck(:id),
       current_user.id,
     )
     render json: { archived: true }
+  end
+
+  def unarchive
+    @collection = Collection.find(json_api_params[:collection_snapshot][:id])
+    @collection.unarchive_cards!(@collection_cards, collection_snapshot_params)
+    render jsonapi: @collection.reload,
+           include: Collection.default_relationships_for_api
   end
 
   before_action :load_and_authorize_replacing_card, only: %i[replace]
@@ -96,6 +103,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
       # so that it can be easily re-rendered on the page
       render jsonapi: @to_collection.reload,
              include: Collection.default_relationships_for_api,
+             meta: { moving_cards: mover.moving_cards.pluck(:id).map(&:to_s) },
              expose: { current_record: @to_collection }
     else
       render json: { errors: mover.errors }, status: :bad_request
@@ -115,6 +123,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
     should_update_cover = false
     # reverse cards for 'beginning' since they get duplicated one by one to the front
     @cards = @cards.reverse if placement == 'beginning'
+    new_cards = []
     @cards.each do |card|
       dup = card.duplicate!(
         for_user: current_user,
@@ -125,14 +134,17 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
       should_update_cover ||= dup.should_update_parent_collection_cover?
       @from_collection = Collection.find(json_api_params[:from_id])
       create_notification(card, :duplicated)
+      new_cards << dup
     end
+    @to_collection.reorder_cards!
     @to_collection.cache_cover! if should_update_cover
     # NOTE: for some odd reason the json api refuses to render the newly created cards here,
     # so we end up re-fetching the to_collection later in the front-end
     render jsonapi: @to_collection.reload,
            include: Collection.default_relationships_for_api,
+           meta: { new_cards: new_cards.pluck(:id).map(&:to_s) },
            expose: { current_record: @to_collection }
-end
+  end
 
   private
 
@@ -233,6 +245,12 @@ end
       :width,
       :height,
       :image_contain,
+    )
+  end
+
+  def collection_snapshot_params
+    json_api_params[:collection_snapshot].require(:attributes).permit(
+      collection_cards_attributes: %i[id order width height],
     )
   end
 

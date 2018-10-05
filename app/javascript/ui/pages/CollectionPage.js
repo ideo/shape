@@ -5,6 +5,7 @@ import ReactRouterPropTypes from 'react-router-prop-types'
 import { action, observable } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 
+import ClickWrapper from '~/ui/layout/ClickWrapper'
 import ChannelManager from '~/utils/ChannelManager'
 import CollectionGrid from '~/ui/grid/CollectionGrid'
 import FloatingActionButton from '~/ui/global/FloatingActionButton'
@@ -80,6 +81,8 @@ class CollectionPage extends PageWithApi {
   receivedChannelData = async data => {
     const { apiStore } = this.props
     const { collection } = this
+    // catch if receivedData happens after reload
+    if (!collection) return
     const currentId = collection.id
     const submissions = collection.submissions_collection
     const submissionsId = submissions ? submissions.id : ''
@@ -211,17 +214,10 @@ class CollectionPage extends PageWithApi {
     Collection.createSubmission(id, submissionSettings)
   }
 
-  updateCollection = () => {
-    // TODO: what if there's no collection?
-    // calling .save() will receive any API updates and sync them
-    this.collection.API_updateCards()
-    const { uiStore } = this.props
-    uiStore.trackEvent('update', this.collection)
-  }
-
-  updateCollectionName = name => {
-    this.collection.name = name
-    this.collection.save()
+  updateCollection = ({ card, updates, undoMessage } = {}) => {
+    const { collection } = this
+    // this will assign the update attrs to the card and push an undo action
+    collection.API_updateCards({ card, updates, undoMessage })
     const { uiStore } = this.props
     uiStore.trackEvent('update', this.collection)
   }
@@ -352,8 +348,10 @@ class CollectionPage extends PageWithApi {
                 updateCollection={this.updateCollection}
                 collection={collection}
                 canEditCollection={collection.can_edit_content}
-                // Pass in cardIds so grid will re-render when they change
-                cardIds={collection.cardIds}
+                // Pass in cardProperties so grid will re-render when they change
+                cardProperties={collection.collection_cards.map(c =>
+                  _.pick(c, ['id', 'order', 'width', 'height'])
+                )}
                 // Pass in BCT state so grid will re-render when open/closed
                 blankContentToolState={blankContentToolState}
                 movingCardIds={uiMovingCardIds}
@@ -372,6 +370,7 @@ class CollectionPage extends PageWithApi {
             {isSubmissionBox &&
               collection.submission_box_type &&
               this.renderSubmissionsCollection()}
+            {uiStore.dragging && <ClickWrapper clickHandlers={[]} />}
           </PageContainer>
         )}
         {isLoading && this.loader()}

@@ -48,15 +48,21 @@ const FixedActivityLogWrapper = styled.div`
 
 // withRouter allows it to respond automatically to routing changes in props
 @withRouter
-@inject('apiStore', 'uiStore', 'routingStore')
+@inject('apiStore', 'uiStore', 'routingStore', 'undoStore')
 @observer
 class Routes extends React.Component {
   componentDidMount() {
-    const { apiStore } = this.props
+    const { apiStore, undoStore } = this.props
     apiStore.loadCurrentUserAndGroups().then(() => {
       initZendesk(apiStore.currentUser)
       firebaseClient.authenticate(apiStore.currentUser.google_auth_token)
     })
+    document.addEventListener('keydown', undoStore.captureUndoKeypress)
+  }
+
+  componentWillUnmount() {
+    const { undoStore } = this.props
+    document.removeEventListener('keydown', undoStore.captureUndoKeypress)
   }
 
   handleWindowResize = ({ windowWidth }) => {
@@ -143,6 +149,7 @@ Routes.wrappedComponent.propTypes = {
   apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
   routingStore: MobxPropTypes.objectOrObservableObject.isRequired,
+  undoStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 
 export default Routes

@@ -115,9 +115,6 @@ export const StyledGridCardInner = styled.div`
   // disable blue text selection on Draggables
   // https://github.com/bokuweb/react-rnd/issues/199
   */
-  *::-moz-selection {
-    background: transparent;
-  }
   *::selection {
     background: transparent;
   }

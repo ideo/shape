@@ -78,15 +78,21 @@ class Breadcrumb extends React.Component {
         ellipses: false,
       })
     }
-    record.breadcrumb.map(item =>
-      items.push({
-        klass: item[0],
-        id: item[1],
-        name: item[2],
+    record.breadcrumb.map(item => {
+      const [klass, id, crumbName] = item
+      let name = crumbName
+      const crumbRecord = apiStore.find(klass, id)
+      if (crumbRecord) {
+        name = crumbRecord.name
+      }
+      return items.push({
+        klass,
+        id,
+        name,
         truncatedName: null,
         ellipses: false,
       })
-    )
+    })
     return items
   }
 

@@ -6,6 +6,7 @@ const item = fakeTextItem
 const props = {
   item,
   height: 200,
+  dragging: false,
 }
 
 let wrapper

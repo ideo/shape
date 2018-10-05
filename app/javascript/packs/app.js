@@ -8,6 +8,7 @@ import { Router } from 'react-router-dom'
 
 import Routes from '~/ui/Routes'
 import stores, { routingStore } from '~/stores'
+import '~/vendor/cypress'
 
 // Enable MobX Strict functionality -- requires explicit @actions
 configure({ enforceActions: 'observed' })

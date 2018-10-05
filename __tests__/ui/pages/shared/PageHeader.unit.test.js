@@ -106,12 +106,8 @@ describe('PageHeader', () => {
       component.updateRecordName('hello')
     })
 
-    it('should set the record name to the value passed in', () => {
-      expect(props.record.name).toEqual('hello')
-    })
-
-    it('should save the record', () => {
-      expect(props.record.save).toHaveBeenCalled()
+    it('should call API_updateName on the record', () => {
+      expect(props.record.API_updateName).toHaveBeenCalled()
     })
   })
 

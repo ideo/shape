@@ -339,6 +339,11 @@ class Collection < ApplicationRecord
     end
   end
 
+  def unarchive_cards!(cards, card_attrs_snapshot)
+    cards.each(&:unarchive!)
+    CollectionUpdater.call(self, card_attrs_snapshot)
+  end
+
   def allow_primary_group_view_access
     organization.primary_group.add_role(Role::VIEWER, self)
   end

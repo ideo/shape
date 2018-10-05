@@ -27,17 +27,13 @@ FactoryBot.define do
     after(:build) do |collection, evaluator|
       if evaluator.num_cards > 0
         1.upto(evaluator.num_cards) do |i|
-          w = 1
-          h = 1
-          w = 3 if rand(1..4) == 4
-          h = 2 if rand(1..4) == 4
           card_type = :"collection_card_#{evaluator.record_type}"
           cc = build(
             card_type,
             parent: collection,
             order: (i - 1),
-            width: w,
-            height: h,
+            width: 1,
+            height: 1,
             pinned: evaluator.pin_cards,
           )
           # e.g. primary_collection_cards or link_collection_cards

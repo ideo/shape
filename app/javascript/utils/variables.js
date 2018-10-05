@@ -74,14 +74,14 @@ export default {
   zIndex: {
     aboveClickWrapper: 501,
     clickWrapper: 500,
+    cardDragging: 250,
     activityLog: 201,
     popoutMenu: 201,
     // NOTE: if globalHeader is > pageHeader
     // then it will also be above the EditableName ClickWrapper
-    globalHeader: 200,
+    globalHeader: 201,
     pageHeader: 200,
     scrollIndicator: 200,
-    cardDragging: 160,
     gridCard: 150,
     gridCardTop: 151,
     commentMentions: 100,
