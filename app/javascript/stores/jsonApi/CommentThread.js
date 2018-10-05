@@ -1,8 +1,10 @@
 import { observable, action, computed, runInAction } from 'mobx'
 import _ from 'lodash'
+import { ReferenceType } from 'datx'
 
 import { uiStore } from '~/stores'
-import { ReferenceType } from 'datx'
+import { apiUrl } from '~/utils/url'
+
 import BaseRecord from './BaseRecord'
 import Comment from './Comment'
 import User from './User'
@@ -12,6 +14,8 @@ const PER_PAGE = 50
 
 class CommentThread extends BaseRecord {
   static type = 'comment_threads'
+  static endpoint = apiUrl('comment_threads')
+
   @observable
   comments = []
   @observable

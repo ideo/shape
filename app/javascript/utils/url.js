@@ -4,6 +4,11 @@ export function parseUrl(urlStr) {
   return url
 }
 
+export function apiUrl(path) {
+  return `api/v1/${path}`
+}
+
 export default {
+  apiUrl,
   parseUrl,
 }

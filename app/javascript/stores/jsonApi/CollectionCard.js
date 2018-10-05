@@ -2,9 +2,13 @@ import { action, observable } from 'mobx'
 
 import { uiStore } from '~/stores'
 import { ITEM_TYPES } from '~/utils/variables'
+import { apiUrl } from '~/utils/url'
 import BaseRecord from './BaseRecord'
 
 class CollectionCard extends BaseRecord {
+  static type = 'collection_cards'
+  static endpoint = apiUrl('collection_cards')
+
   attributesForAPI = [
     'type',
     'order',
@@ -245,6 +249,5 @@ class CollectionCard extends BaseRecord {
     return false
   }
 }
-CollectionCard.type = 'collection_cards'
 
 export default CollectionCard

@@ -1,13 +1,19 @@
 import _ from 'lodash'
 import { observable } from 'mobx'
+
+import { apiUrl } from '~/utils/url'
 import { routingStore } from '~/stores'
 import trackError from '~/utils/trackError'
 import FilestackUpload from '~/utils/FilestackUpload'
 import { ITEM_TYPES } from '~/utils/variables'
+
 import BaseRecord from './BaseRecord'
 import SharedRecordMixin from './SharedRecordMixin'
 
 class Item extends SharedRecordMixin(BaseRecord) {
+  static type = 'items'
+  static endpoint = apiUrl('items')
+
   // starts null before it is loaded
   @observable
   inMyCollection = null
@@ -87,7 +93,7 @@ class Item extends SharedRecordMixin(BaseRecord) {
       })
   }
 }
-Item.type = 'items'
+
 Item.defaults = {
   text_data: '',
   can_edit: false,

@@ -48,6 +48,7 @@ export const DisplayText = styled.span`
   font-weight: ${v.weights.book};
   font-family: ${v.fonts.sans};
   font-size: 1rem;
+  text-transform: none;
 `
 DisplayText.displayName = 'StyledDisplayText'
 
