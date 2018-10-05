@@ -64,7 +64,7 @@ class SerializableCollection < BaseJsonSerializer
   end
 
   attribute :test_can_reopen do
-    @object.is_a?(Collection::TestCollection) && @object.can_reopen?
+    @object.respond_to?(:can_reopen?) && @object.can_reopen?
   end
 
   attribute :is_org_template_collection do
