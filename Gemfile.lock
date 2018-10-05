@@ -142,6 +142,9 @@ GEM
     formatador (0.2.5)
     friendly_id (5.1.0)
       activerecord (>= 4.0.0)
+    gibbon (3.2.0)
+      faraday (>= 0.9.1)
+      multi_json (>= 1.11.0)
     globalid (0.4.1)
       activesupport (>= 4.2.0)
     google-cloud-core (1.2.0)
@@ -478,6 +481,7 @@ DEPENDENCIES
   fakeredis
   filestack
   friendly_id (~> 5.1.0)
+  gibbon (~> 3.2)
   google-cloud-firestore (~> 0.21.0)
   guard
   guard-rspec

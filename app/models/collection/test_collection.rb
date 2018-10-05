@@ -29,8 +29,9 @@ class Collection
       error_on_all_events :aasm_event_failed
 
       event :launch, before: proc { |**args|
-          create_test_design_and_move_cards!(initiated_by: args[:initiated_by])
-        } do
+                               return false unless test_completed?
+                               create_test_design_and_move_cards!(initiated_by: args[:initiated_by])
+                             } do
         transitions from: :draft, to: :live
       end
 
@@ -39,7 +40,7 @@ class Collection
       end
 
       event :reopen do
-        transitions from: :closed, to: :live
+        transitions from: :closed, to: :live, guard: :test_completed?
       end
     end
 
@@ -74,6 +75,22 @@ class Collection
       )
     end
 
+    def test_completed?
+      complete = true
+      unless incomplete_media_cards.count.zero?
+        errors.add(:base,
+                   "Please add an image or video for your idea to question #{incomplete_media_cards.map { |c| c.order + 1 }.to_sentence}")
+        complete = false
+      end
+
+      unless incomplete_description_cards.count.zero?
+        errors.add(:base,
+                   "Please add your idea description to question #{incomplete_description_cards.map { |c| c.order + 1 }.to_sentence}")
+        complete = false
+      end
+      complete
+    end
+
     def serialized_for_test_survey
       renderer = JSONAPI::Serializable::Renderer.new
       renderer.render(
@@ -100,14 +117,14 @@ class Collection
       ).all?(&:create)
     end
 
-    private
-
     def touch_test_design
       test_design.try(:touch)
     end
 
-    def aasm_event_failed(*args)
-      errors.add(:test_status, args[0].to_s.downcase)
+    def aasm_event_failed(event, current_state)
+      return if errors.present?
+      message = "You can't #{event} because the feedback is #{current_state}"
+      errors.add(:base, message)
     end
 
     def create_test_design_and_move_cards!(initiated_by:)
@@ -185,10 +202,10 @@ class Collection
     def setup_response_graphs(initiated_by:)
       chart_card_builders = []
       question_items.each_with_index do |question, i|
-        if question.question_context? ||
-           question.question_useful?
-          chart_card_builders.push(
-            CollectionCardBuilder.new(
+        next unless question.question_context? ||
+                    question.question_useful?
+        chart_card_builders.push(
+          CollectionCardBuilder.new(
             params: {
               order: i + 2,
               height: 2,
@@ -200,8 +217,8 @@ class Collection
             },
             parent_collection: self,
             user: initiated_by,
-            ))
-        end
+          ),
+        )
       end
       chart_card_builders
     end
@@ -216,6 +233,29 @@ class Collection
       update_cached_tag_lists
       # no good way around saving a 2nd time after_create
       save
+    end
+
+    # Return array of incomplete media items, with index of item
+    def incomplete_media_cards
+      table = Item::QuestionItem.arel_table
+      primary_collection_cards.joins(
+        :item,
+      ).where(table[:question_type].eq(:question_media))
+                              .where(
+                                table[:filestack_file_id].eq(nil).and(
+                                  table[:url].eq(nil),
+                                ),
+                              )
+    end
+
+    def incomplete_description_cards
+      table = Item::QuestionItem.arel_table
+      primary_collection_cards.joins(
+        :item,
+      ).where(table[:question_type].eq(:question_description))
+                              .where(
+                                table[:content].eq(nil),
+                              )
     end
   end
 end
