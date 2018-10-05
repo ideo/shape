@@ -1,6 +1,7 @@
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import trackError from '~/utils/trackError'
 import Invoices from '~shared/components/compounds/Invoices'
+import EmptyList from '~/ui/billing/EmptyList'
 
 @inject('apiStore', 'networkStore')
 @observer
@@ -26,7 +27,14 @@ class ManagePaymentMethods extends React.Component {
 
   render() {
     const invoices = this.props.networkStore.findAll('invoices')
-    return invoices.length < 1 ? null : <Invoices invoices={invoices} />
+    return (
+      <Invoices
+        invoices={invoices}
+        NoInvoicesComponent={() => (
+          <EmptyList>No previous billing statements to show</EmptyList>
+        )}
+      />
+    )
   }
 }
 
