@@ -14,6 +14,9 @@ const cardTypes = [
   'question_media',
   'question_context',
   'question_useful',
+  'question_different',
+  'question_clarity',
+  'question_excitement',
   'question_open',
   'question_finish',
 ]
