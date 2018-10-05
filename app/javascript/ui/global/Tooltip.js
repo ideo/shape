@@ -16,6 +16,7 @@ const styles = {
   },
 }
 
+@withStyles(styles)
 class Tooltip extends React.PureComponent {
   render() {
     const { classes, ...otherProps } = this.props
@@ -37,4 +38,6 @@ Tooltip.propTypes = {
   }).isRequired,
 }
 
-export default withStyles(styles)(Tooltip)
+Tooltip.displayName = 'Tooltip'
+
+export default Tooltip

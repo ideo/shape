@@ -62,29 +62,24 @@ export const FormButton = styled.button`
   border-radius: 20px;
   color: ${props => {
     switch (props.color) {
-      case 'hollow':
+      case v.colors.transparent:
         return v.colors.blackLava
       default:
         return 'white'
     }
   }};
-  background-color: ${props => {
-    switch (props.color) {
-      case 'blue':
-        return v.colors.ctaButtonBlue
-      case 'hollow':
-        return 'transparent'
-      default:
-        return v.colors.blackLava
-    }
-  }};
+  background-color: ${props => props.color};
   border: ${props =>
-    props.color === 'hollow' ? `1px solid ${v.colors.blackLava}` : 'none'};
+    props.color === v.colors.transparent
+      ? `1px solid ${v.colors.blackLava}`
+      : 'none'};
   transition: all 0.3s;
   &:hover,
   &:focus {
     background-color: ${props =>
-      props.color === 'blue' ? v.colors.ctaButtonBlueHover : v.colors.cloudy};
+      props.color === v.colors.ctaButtonBlue
+        ? v.colors.ctaButtonBlueHover
+        : v.colors.cloudy};
   }
   ${props =>
     props.disabled &&
@@ -98,6 +93,9 @@ export const FormButton = styled.button`
     `};
 `
 FormButton.displayName = 'StyledFormButton'
+FormButton.defaultProps = {
+  color: v.colors.blackLava,
+}
 
 /** @component */
 export const TextButton = styled.button`

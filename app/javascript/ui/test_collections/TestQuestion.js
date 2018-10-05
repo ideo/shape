@@ -11,7 +11,7 @@ import ScaleQuestion from '~/ui/test_collections/ScaleQuestion'
 import OpenQuestion from '~/ui/test_collections/OpenQuestion'
 import { apiStore, uiStore } from '~/stores'
 import QuestionAnswer from '~/stores/jsonApi/QuestionAnswer'
-import { QuestionText } from './shared'
+import { QuestionText, questionInformation } from './shared'
 
 const QuestionHolder = styled.div`
   display: flex;
@@ -24,9 +24,15 @@ const QuestionCardWrapper = styled.div`
 `
 
 @observer
-class TestQuestionEditor extends React.Component {
+class TestQuestion extends React.Component {
   handleQuestionAnswer = async ({ text, number }) => {
-    const { item, editing, createSurveyResponse } = this.props
+    const {
+      card,
+      item,
+      editing,
+      createSurveyResponse,
+      handleQuestionAnswerCreatedForCard,
+    } = this.props
     let { surveyResponse, questionAnswer } = this.props
     // components should never trigger this when editing, but double-check here
     if (editing) return
@@ -46,6 +52,7 @@ class TestQuestionEditor extends React.Component {
       )
       questionAnswer.survey_response = surveyResponse
       await questionAnswer.API_create()
+      handleQuestionAnswerCreatedForCard(card)
     } else {
       // update values on existing answer and save
       await questionAnswer.API_update({
@@ -58,27 +65,28 @@ class TestQuestionEditor extends React.Component {
   renderQuestion() {
     const { parent, card, item, editing, questionAnswer, canEdit } = this.props
     let inner
+
+    const { emojiSeriesName, questionText } = questionInformation(
+      item.question_type
+    )
+
     switch (card.card_question_type) {
-      case 'context':
+      case 'question_useful':
+      case 'question_clarity':
+      case 'question_excitement':
+      case 'question_context':
+      case 'question_different':
         return (
           <ScaleQuestion
-            questionText="How satisfied are you with your current solution?"
-            editing={editing}
-            questionAnswer={questionAnswer}
-            onAnswer={this.handleQuestionAnswer}
-          />
-        )
-      case 'useful':
-        return (
-          <ScaleQuestion
-            questionText="How useful is this idea for you?"
-            emojiSeries="thumbs"
+            questionText={questionText}
+            emojiSeries={emojiSeriesName}
             editing={editing}
             questionAnswer={questionAnswer}
             onAnswer={this.handleQuestionAnswer}
           />
         )
       case 'media':
+      case 'question_media':
         if (
           item.type === 'Item::QuestionItem' ||
           uiStore.blankContentToolState.replacingId === card.id
@@ -105,7 +113,7 @@ class TestQuestionEditor extends React.Component {
           )
         }
         return <QuestionCardWrapper>{inner}</QuestionCardWrapper>
-      case 'description':
+      case 'question_description':
         if (editing) {
           return (
             <DescriptionQuestion
@@ -117,7 +125,7 @@ class TestQuestionEditor extends React.Component {
         }
         return <QuestionText>{item.content}</QuestionText>
 
-      case 'open':
+      case 'question_open':
         return (
           <OpenQuestion
             item={item}
@@ -127,7 +135,7 @@ class TestQuestionEditor extends React.Component {
             onAnswer={this.handleQuestionAnswer}
           />
         )
-      case 'finish':
+      case 'question_finish':
         return <FinishQuestion />
       default:
         return <NewQuestionGraphic />
@@ -144,7 +152,7 @@ class TestQuestionEditor extends React.Component {
   }
 }
 
-TestQuestionEditor.propTypes = {
+TestQuestion.propTypes = {
   // parent is the parent collection
   parent: MobxPropTypes.objectOrObservableObject.isRequired,
   card: MobxPropTypes.objectOrObservableObject.isRequired,
@@ -153,14 +161,16 @@ TestQuestionEditor.propTypes = {
   surveyResponse: MobxPropTypes.objectOrObservableObject,
   questionAnswer: MobxPropTypes.objectOrObservableObject,
   createSurveyResponse: PropTypes.func,
+  handleQuestionAnswerCreatedForCard: PropTypes.func,
   canEdit: PropTypes.bool,
 }
 
-TestQuestionEditor.defaultProps = {
+TestQuestion.defaultProps = {
   surveyResponse: null,
   questionAnswer: null,
   createSurveyResponse: null,
+  handleQuestionAnswerCreatedForCard: null,
   canEdit: false,
 }
 
-export default TestQuestionEditor
+export default TestQuestion

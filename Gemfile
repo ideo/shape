@@ -95,6 +95,8 @@ gem 'jwt', '~> 1.5'
 # looking up records by slug
 gem 'friendly_id', '~> 5.1.0'
 
+# State machine for ruby classes
+gem 'aasm', '~> 5.0'
 # mailchimp API
 gem 'gibbon', '~> 3.2'
 

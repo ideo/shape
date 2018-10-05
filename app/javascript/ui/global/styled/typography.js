@@ -90,6 +90,13 @@ export const DisplayLink = styled.a`
 `
 DisplayLink.displayName = 'StyledDisplayLink'
 
+export const LoudDisplayLink = DisplayLink.extend`
+  text-transform: uppercase;
+  text-decoration: none;
+  font-weight: ${v.weights.medium};
+  display: block;
+`
+
 /** @component */
 export const SubduedTitle = styled.span`
   color: ${v.colors.gray};
