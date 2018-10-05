@@ -4,7 +4,7 @@ class Item
 
     def chart_data
       return unless data_source.is_a?(Item::QuestionItem)
-      data = {}
+      data = { 1 => 0, 2 => 0, 3 => 0, 4 => 0 }
       data_source
         .question_answers
         .joins(:survey_response)
@@ -17,15 +17,6 @@ class Item
         data[answer.answer_number] += 1
       end
       data
-    end
-
-    private
-
-    def cache_attributes
-      if cached_chart_data != chart_data
-        self.cached_chart_data = chart_data
-      end
-      cached_attributes
     end
   end
 end

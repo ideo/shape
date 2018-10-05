@@ -19,7 +19,7 @@ class Item < ApplicationRecord
 
   store_accessor :cached_attributes,
                  :cached_tag_list, :cached_filestack_file_url,
-                 :cached_filestack_file_info, :cached_chart_data
+                 :cached_filestack_file_info
 
   # The card that 'holds' this item and determines its breadcrumb
   has_one :parent_collection_card,
@@ -182,6 +182,10 @@ class Item < ApplicationRecord
   def touch_related_cards
     try(:parent_collection_card).try(:touch)
     cards_linked_to_this_item.update_all(updated_at: updated_at)
+  end
+
+  def chart_data
+    {}
   end
 
   def jsonapi_type_name
