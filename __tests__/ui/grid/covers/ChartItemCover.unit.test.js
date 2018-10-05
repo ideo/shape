@@ -20,9 +20,28 @@ describe('ChartItemCover', () => {
   })
 
   describe('render()', () => {
-    it('renders the question title and full question when there', () => {
+    it('does not render headings when the question is not there', () => {
       expect(wrapper.find('Heading1').exists()).toBe(false)
       expect(wrapper.find('Heading3').exists()).toBe(false)
+    })
+
+    describe('when question is fetched', () => {
+      beforeEach(() => {
+        apiStore.fetch.mockReturnValue(
+          Promise.resolve({
+            data: {
+              question_type: 'question_useful',
+            },
+          })
+        )
+        rerender()
+      })
+
+      it('does render the headings when the question is there', async () => {
+        // TODO not working yet
+        // expect(wrapper.find('Heading1').text()).toEqual('')
+        // expect(wrapper.find('Heading3').text()).toEqual('')
+      })
     })
 
     it('renders a victory bar chart with formatted data', () => {

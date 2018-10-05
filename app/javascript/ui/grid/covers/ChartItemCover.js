@@ -18,7 +18,6 @@ const Tick = props => {
   const emoji = props.emojiScale[props.index]
   if (!emoji) return <div />
   const fontSize = parseInt((emoji.scale || 1) * 24)
-  console.log('fz', fontSize)
   return <VictoryLabel {...props} style={{ fill: '#DE8F74', fontSize }} />
 }
 Tick.propTypes = {
