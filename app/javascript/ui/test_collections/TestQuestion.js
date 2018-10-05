@@ -66,7 +66,7 @@ class TestQuestion extends React.Component {
     const { parent, card, item, editing, questionAnswer, canEdit } = this.props
     let inner
 
-    const { emojiSeries, questionText } = questionInformation(
+    const { emojiSeriesName, questionText } = questionInformation(
       card.question_type
     )
 
@@ -78,7 +78,7 @@ class TestQuestion extends React.Component {
         return (
           <ScaleQuestion
             questionText={questionText}
-            emojiSeries={emojiSeries}
+            emojiSeries={emojiSeriesName}
             editing={editing}
             questionAnswer={questionAnswer}
             onAnswer={this.handleQuestionAnswer}
