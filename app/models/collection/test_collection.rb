@@ -13,6 +13,7 @@ class Collection
 
     before_create :setup_default_status_and_questions
     after_create :add_test_tag
+    after_update :touch_test_design, if: :saved_change_to_test_status?
 
     enum test_status: {
       draft: 0,
@@ -88,6 +89,10 @@ class Collection
     end
 
     private
+
+    def touch_test_design
+      test_design.touch
+    end
 
     def aasm_event_failed(*args)
       errors.add(:test_status, args[0].to_s.downcase)
