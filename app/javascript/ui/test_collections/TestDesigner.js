@@ -55,6 +55,8 @@ const selectOptions = [
   { value: 'question_description', label: 'Idea Description' },
   { value: 'question_useful', label: 'Useful' },
   { value: 'question_open', label: 'Open Response' },
+  { value: 'question_excitement', label: 'Excitement' },
+  { value: 'question_clarity', label: 'Clarity' },
 ]
 
 @observer

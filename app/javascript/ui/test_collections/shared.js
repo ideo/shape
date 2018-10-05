@@ -96,3 +96,67 @@ export const TestQuestionHolder = styled.div`
     margin-bottom: 0;
   }
 `
+
+export const emojiSeriesMap = {
+  usefulness: [
+    { number: 1, name: 'Very useless', symbol: '👎' },
+    { number: 2, name: 'Somewhat useless', scale: 0.6, symbol: '👎' },
+    { number: 3, name: 'Somewhat useful', scale: 0.6, symbol: '👍' },
+    { number: 4, name: 'Very useful', symbol: '👍' },
+  ],
+  satisfaction: [
+    { number: 1, name: 'Very unsatisfied', symbol: '😡' },
+    { number: 2, name: 'Somewhat unsatisfied', symbol: '☹️' },
+    { number: 3, name: 'Mostly Satisfied', symbol: '😊' },
+    { number: 4, name: 'Very satisfied', symbol: '😍' },
+  ],
+  clarity: [
+    { number: 1, name: 'Totally unclear', symbol: '🤷‍♀️' },
+    { number: 2, name: 'Somewhat unclear', symbol: '🕶' },
+    { number: 3, name: 'Mostly clear', symbol: '👓' },
+    { number: 4, name: 'Totally clear', symbol: '🔬' },
+  ],
+  excitement: [
+    { number: 1, name: 'Totally unexciting', symbol: '😴' },
+    { number: 2, name: 'Unexciting', symbol: '😔' },
+    { number: 3, name: 'Exciting', symbol: '🙂' },
+    { number: 4, name: 'Totally exciting', symbol: '😍' },
+  ],
+}
+
+export const questionInformation = questionType => {
+  let emojiSeriesName
+  let questionText
+  let questionTitle
+  switch (questionType) {
+    case 'question_useful':
+      emojiSeriesName = 'usefulness'
+      questionText = 'How useful is this idea for you?'
+      questionTitle = 'Usesfulness'
+      break
+    case 'question_clarity':
+      emojiSeriesName = 'clarity'
+      questionText = 'How clear is this idea for you?'
+      questionTitle = 'Clarity'
+      break
+    case 'question_excitement':
+      emojiSeriesName = 'excitement'
+      questionText = 'How exciting is this idea for you?'
+      questionTitle = 'Excitement'
+      break
+    case 'question_context':
+    default:
+      emojiSeriesName = 'satisfaction'
+      questionText = 'How satisfied are you with your current solution?'
+      questionTitle = 'Category Satisfaction'
+      break
+  }
+  const emojiSeries = emojiSeriesMap[emojiSeriesName]
+
+  return {
+    emojiSeries,
+    emojiSeriesName,
+    questionText,
+    questionTitle,
+  }
+}

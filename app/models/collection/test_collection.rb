@@ -84,8 +84,11 @@ class Collection
       )
     end
 
-    def create_open_response_collection_cards(open_question_items = nil)
-      build_open_response_collection_cards(open_question_items).all?(&:create)
+    def create_open_response_collection_cards(open_question_items: nil, initiated_by: nil)
+      build_open_response_collection_cards(
+        open_question_items: open_question_items,
+        initiated_by: initiated_by,
+      ).all?(&:create)
     end
 
     private
@@ -112,6 +115,7 @@ class Collection
             card.update(parent_id: test_design.id, order: i)
           end
         create_open_response_collection_cards
+        setup_response_graphs(initiated_by: initiated_by).each(&:create)
         test_design.cache_cover!
       end
       true
@@ -134,7 +138,7 @@ class Collection
       )
     end
 
-    def build_open_response_collection_cards(open_question_items = nil)
+    def build_open_response_collection_cards(open_question_items: nil, initiated_by: nil)
       open_question_items ||= question_items.question_open
       open_question_items.map do |open_question|
         card_params = {
@@ -148,7 +152,7 @@ class Collection
         CollectionCardBuilder.new(
           params: card_params,
           parent_collection: self,
-          user: created_by,
+          user: initiated_by,
         )
       end
     end
@@ -184,6 +188,30 @@ class Collection
           question_type: :question_finish,
         },
       )
+    end
+
+    def setup_response_graphs(initiated_by:)
+      chart_card_builders = []
+      question_items.each_with_index do |question, i|
+        if question.question_context? ||
+           question.question_useful?
+          chart_card_builders.push(
+            CollectionCardBuilder.new(
+            params: {
+              order: i + 2,
+              height: 2,
+              width: 2,
+              item_attributes: {
+                type: 'Item::ChartItem',
+                data_source: question,
+              },
+            },
+            parent_collection: self,
+            user: initiated_by,
+            ))
+        end
+      end
+      chart_card_builders
     end
 
     def add_test_tag

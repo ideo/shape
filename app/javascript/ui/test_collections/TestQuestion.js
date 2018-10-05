@@ -11,7 +11,7 @@ import ScaleQuestion from '~/ui/test_collections/ScaleQuestion'
 import OpenQuestion from '~/ui/test_collections/OpenQuestion'
 import { apiStore, uiStore } from '~/stores'
 import QuestionAnswer from '~/stores/jsonApi/QuestionAnswer'
-import { QuestionText } from './shared'
+import { QuestionText, questionInformation } from './shared'
 
 const QuestionHolder = styled.div`
   display: flex;
@@ -65,21 +65,20 @@ class TestQuestion extends React.Component {
   renderQuestion() {
     const { parent, card, item, editing, questionAnswer, canEdit } = this.props
     let inner
+
+    const { emojiSeriesName, questionText } = questionInformation(
+      item.question_type
+    )
+
     switch (card.card_question_type) {
+      case 'question_useful':
+      case 'question_clarity':
+      case 'question_excitement':
       case 'question_context':
         return (
           <ScaleQuestion
-            questionText="How satisfied are you with your current solution?"
-            editing={editing}
-            questionAnswer={questionAnswer}
-            onAnswer={this.handleQuestionAnswer}
-          />
-        )
-      case 'question_useful':
-        return (
-          <ScaleQuestion
-            questionText="How useful is this idea for you?"
-            emojiSeries="thumbs"
+            questionText={questionText}
+            emojiSeries={emojiSeriesName}
             editing={editing}
             questionAnswer={questionAnswer}
             onAnswer={this.handleQuestionAnswer}

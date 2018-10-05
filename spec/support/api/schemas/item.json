@@ -15,7 +15,10 @@
     "inherited_tag_list": { "type": ["array", "null"] },
     "filestack_file_url": { "type": ["string", "null"] },
     "pinned_and_locked": { "type": ["boolean"] },
-    "question_type": { "type": ["string", "null"] }
+    "question_type": { "type": ["string", "null"] },
+    "chart_data": { "type": ["object", "null"] },
+    "data_source_type": { "type": ["string", "null"] },
+    "data_source_id": { "type": ["number", "null"] }
   },
   "required": ["type"]
 }
