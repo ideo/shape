@@ -67,7 +67,7 @@ class TestQuestion extends React.Component {
     let inner
 
     const { emojiSeriesName, questionText } = questionInformation(
-      card.question_type
+      item.question_type
     )
 
     switch (card.card_question_type) {
