@@ -30,6 +30,7 @@ class Collection
 
       event :launch, before: proc { |**args|
                                return false unless test_completed?
+                               remove_incomplete_cards
                                create_test_design_and_move_cards!(initiated_by: args[:initiated_by])
                              } do
         transitions from: :draft, to: :live
@@ -259,6 +260,13 @@ class Collection
                               .where(
                                 table[:content].eq(nil),
                               )
+    end
+
+    def remove_incomplete_cards
+      table = Item::QuestionItem.arel_table
+      primary_collection_cards.joins(
+        :item,
+      ).where(table[:question_type].eq(nil)).destroy_all
     end
   end
 end
