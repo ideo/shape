@@ -48,10 +48,10 @@ describe Collection::TestCollection, type: :model do
           expect(test_collection.test_design.created_by).to eq user
           expect(test_collection.test_design.present?).to be true
           # should have moved the 3 default cards into there
-          expect(test_collection.test_design.collection_cards.count).to eq 4
+          expect(test_collection.test_design.collection_cards.count).to eq 5
           expect(
             test_collection.test_design.collection_cards.map(&:order),
-          ).to match_array([0, 1, 2, 3])
+          ).to match_array([0, 1, 2, 3, 4])
           # now the test_collection should just have the 1 card
           expect(test_collection.collection_cards.count).to eq 1
         end
@@ -59,6 +59,14 @@ describe Collection::TestCollection, type: :model do
         it 'should update the status to "live"' do
           expect(test_collection.launch_test!(initiated_by: user)).to be true
           expect(test_collection.live?).to be true
+        end
+
+        it 'should create a chart item for each scale question' do
+            expect {
+              test_collection.launch_test!(initiated_by: user)
+            }.to change(
+              Item::ChartItem, :count
+            ).by(test_collection.question_items.select { |q| q.question_context? || q.question_useful? }.size)
         end
 
         context 'with open response questions' do

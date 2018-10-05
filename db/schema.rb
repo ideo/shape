@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180928225725) do
+ActiveRecord::Schema.define(version: 20181002200246) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -190,8 +190,11 @@ ActiveRecord::Schema.define(version: 20180928225725) do
     t.string "archive_batch"
     t.string "icon_url"
     t.integer "question_type"
+    t.string "data_source_type"
+    t.bigint "data_source_id"
     t.index ["breadcrumb"], name: "index_items_on_breadcrumb", using: :gin
     t.index ["cloned_from_id"], name: "index_items_on_cloned_from_id"
+    t.index ["data_source_type", "data_source_id"], name: "index_items_on_data_source_type_and_data_source_id"
   end
 
   create_table "notifications", force: :cascade do |t|

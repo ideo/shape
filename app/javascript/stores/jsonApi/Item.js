@@ -73,6 +73,10 @@ class Item extends SharedRecordMixin(BaseRecord) {
     return this.filestack_file && this.mimeBaseType === 'image'
   }
 
+  get isChart() {
+    return this.type === ITEM_TYPES.CHART
+  }
+
   API_updateWithoutSync({ cancel_sync } = {}) {
     const { apiStore } = this
     const data = this.toJsonApi()

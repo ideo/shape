@@ -4,6 +4,7 @@ export const ITEM_TYPES = {
   VIDEO: 'Item::VideoItem',
   LINK: 'Item::LinkItem',
   QUESTION: 'Item::QuestionItem',
+  CHART: 'Item::ChartItem',
 }
 
 export const KEYS = {

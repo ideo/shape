@@ -19,6 +19,7 @@ module Firestoreable
     'Item::FileItem': SerializableSimpleItem,
     'Item::LinkItem': SerializableSimpleItem,
     'Item::QuestionItem': SerializableSimpleItem,
+    'Item::ChartItem': SerializableSimpleItem,
     'CollectionCard::Primary': SerializableCollectionCard,
     'CollectionCard::Link': SerializableCollectionCard,
   }.freeze

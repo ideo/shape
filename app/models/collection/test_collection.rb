@@ -54,6 +54,8 @@ class Collection
             card.update(parent_id: test_design.id, order: i)
           end
         create_open_response_collection_cards
+        chart_card_builders = setup_response_graphs(initiated_by: initiated_by)
+        chart_card_builders.map(&:create)
         test_design.cache_cover!
         update(test_status: :live)
       end
@@ -151,6 +153,30 @@ class Collection
           question_type: :question_finish,
         },
       )
+    end
+
+    def setup_response_graphs(initiated_by:)
+      chart_card_builders = []
+      question_items.each_with_index do |question, i|
+        if question.question_context? ||
+           question.question_useful?
+          chart_card_builders.push(
+            CollectionCardBuilder.new(
+            params: {
+              order: i + 2,
+              height: 2,
+              width: 2,
+              item_attributes: {
+                type: 'Item::ChartItem',
+                data_source: question,
+              },
+            },
+            parent_collection: self,
+            user: initiated_by,
+            ))
+        end
+      end
+      chart_card_builders
     end
 
     def add_test_tag
