@@ -128,9 +128,16 @@ export const emojiSeriesMap = {
     { number: 3, name: 'Different', symbol: '😲' },
     { number: 4, name: 'Very different', symbol: '🤯' },
   ],
+  category_satisfaction: [
+    { number: 1, name: 'Not at all different', symbol: '😏' },
+    { number: 2, name: 'Not very different', symbol: '😐' },
+    { number: 3, name: 'Different', symbol: '😲' },
+    { number: 4, name: 'Very different', symbol: '🤯' },
+  ],
 }
 
-export const questionInformation = questionType => {
+export const questionInformation = question => {
+  const { questionType } = question
   let emojiSeriesName
   let questionText
   let questionTitle
@@ -154,6 +161,11 @@ export const questionInformation = questionType => {
       emojiSeriesName = 'different'
       questionText = "How different is this idea from what you've seen before?"
       questionTitle = 'Different'
+      break
+    case 'question_category_satisfaction':
+      emojiSeriesName = 'category_satisfaction'
+      questionText = 'How satisifed are you with your current'
+      questionTitle = 'Category Satisfaction'
       break
     case 'question_context':
     default:

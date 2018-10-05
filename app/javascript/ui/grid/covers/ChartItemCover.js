@@ -60,15 +60,13 @@ class ChartItemCover extends React.Component {
   }
 
   get mapQuestionType() {
-    const { questionTitle, questionText } = questionInformation(
-      this.question.question_type
-    )
+    const { questionTitle, questionText } = questionInformation(this.question)
     return { questionTitle, questionText }
   }
 
   get emojiScale() {
     if (!this.question) return []
-    const { emojiSeries } = questionInformation(this.question.question_type)
+    const { emojiSeries } = questionInformation(this.question)
     return emojiSeries
   }
 

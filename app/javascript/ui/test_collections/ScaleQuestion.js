@@ -1,12 +1,13 @@
 import PropTypes from 'prop-types'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
+import { debounce } from 'lodash'
 
 import Tooltip from '~/ui/global/Tooltip'
 import Emoji from '~/ui/icons/Emoji'
 import { DisplayText, SmallHelperText } from '~/ui/global/styled/typography'
 import v from '~/utils/variables'
-import emojiScales from '~/ui/test_collections/emojiScales'
+import { emojiSeriesMap, questionInformation } from './shared'
 
 const Question = styled.div`
   border-color: ${props =>
@@ -50,9 +51,15 @@ EmojiButton.displayName = 'EmojiButton'
 
 @observer
 class ScaleQuestion extends React.Component {
-  get emojiScale() {
-    const { emojiSeries } = this.props
-    return emojiScales[emojiSeries]
+  constructor(props) {
+    super(props)
+    this.state = {
+      questionContent: props.question.content,
+    }
+    this.debouncedUpdateQuestionContent = debounce(
+      this.updateQuestionContent,
+      1000
+    )
   }
 
   vote = number => ev => {
@@ -60,13 +67,51 @@ class ScaleQuestion extends React.Component {
     this.props.onAnswer({ number })
   }
 
+  get hasEditableCategory() {
+    const { question, editing } = this.props
+    if (question.question_type === 'question_category_satisfaction' && editing)
+      return true
+    return false
+  }
+
+  handleChange = event => {
+    this.setState({ questionContent: event.target.value })
+    this.debouncedUpdateQuestionContent()
+  }
+
+  updateQuestionContent = () => {
+    const { questionContent } = this.state
+    const { question } = this.props
+    question.content = questionContent
+    question.save()
+  }
+
+  renderEditableCategory = questionText => {
+    const { questionContent } = this.state
+    return (
+      <DisplayText>
+        {questionText}
+        <input
+          type="text"
+          value={questionContent}
+          onChange={this.handleChange}
+        />
+      </DisplayText>
+    )
+  }
+
   render() {
-    const { editing, questionAnswer, questionText } = this.props
-    const emojis = this.emojiScale
+    const { question, editing, questionAnswer } = this.props
+    const { emojiSeriesName, questionText } = questionInformation(question)
+    const emojis = emojiSeriesMap[emojiSeriesName]
     return (
       <div style={{ width: '100%' }}>
         <Question editing={editing}>
-          <DisplayText>{questionText}</DisplayText>
+          {this.hasEditableCategory ? (
+            this.renderEditableCategory(questionText)
+          ) : (
+            <DisplayText>{questionText}</DisplayText>
+          )}
         </Question>
         <Scale>
           <SmallHelperText>select your response below</SmallHelperText>
@@ -107,9 +152,8 @@ class ScaleQuestion extends React.Component {
 }
 
 ScaleQuestion.propTypes = {
+  question: MobxPropTypes.objectOrObservableObject.isRequired,
   questionAnswer: MobxPropTypes.objectOrObservableObject,
-  questionText: PropTypes.string.isRequired,
-  emojiSeries: PropTypes.oneOf(Object.keys(emojiScales)).isRequired,
   editing: PropTypes.bool,
   onAnswer: PropTypes.func,
 }
