@@ -46,6 +46,15 @@ FactoryBot.define do
           end
         end
       end
+
+      trait :completed do
+        after(:create) do |collection|
+          media_question = collection.prelaunch_question_items.detect(&:question_media?)
+          media_question&.update(url: 'something')
+          description_question = collection.prelaunch_question_items.detect(&:question_description?)
+          description_question&.update(content: 'something')
+        end
+      end
     end
     factory :test_open_responses_collection, class: Collection::TestOpenResponses
 
