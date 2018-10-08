@@ -2,9 +2,8 @@
   "name": "Shape",
   "private": true,
   "engines": {
-    "node": "8.9.x",
-    "npm": "5.5.x",
-    "yarn": ">=1.10.0"
+    "node": "~8.9.1",
+    "yarn": "^1.10.0"
   },
   "scripts": {
     "styleguide": "yarn styleguidist server",
