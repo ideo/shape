@@ -72,9 +72,9 @@ export const StyledMenuItem = styled.li`
     font-weight: 300;
     font-size: 0.8rem;
     text-align: left;
-    border-bottom: solid ${v.colors.gray};
+    border-bottom: solid ${v.colors.commonMedium};
     border-bottom-width: ${props => (props.noBorder ? 0 : 1)}px;
-    color: ${v.colors.blackLava};
+    color: ${v.colors.black};
     .icon {
       top: 50%;
       transform: translateY(-50%);
@@ -88,7 +88,7 @@ export const StyledMenuItem = styled.li`
   &:hover,
   &:active {
     button {
-      border-left: 7px solid ${v.colors.blackLava};
+      border-left: 7px solid ${v.colors.black};
     }
   }
 `

@@ -25,7 +25,7 @@ const StyledReadMore = styled.div`
   font-size: 0.9rem;
 
   &:hover {
-    background: ${v.colors.desert};
+    background: ${v.colors.commonLightest};
   }
 `
 StyledReadMore.displayName = 'StyledReadMore'

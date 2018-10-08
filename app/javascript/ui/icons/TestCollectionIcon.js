@@ -28,7 +28,7 @@ const TestCollectionIcon = ({ size }) => (
         cy="-50.6"
         r="14"
         fill="none"
-        stroke={v.colors.orange}
+        stroke={v.colors.alert}
         strokeWidth="1.5"
         strokeMiterlimit="10"
       />
@@ -42,7 +42,7 @@ const TestCollectionIcon = ({ size }) => (
       <path d="M20.4 18.6v-3.9h-1.3v3.9h-1.3v-7.9h-1.3v7.9h-1.3v-4.8h-1.3v4.8h-1.3v-2.1h-1.3v2.1h-.9v1.3h11.2v-1.3z" />
       <path
         className="st4"
-        style={{ fill: v.colors.orange }}
+        style={{ fill: v.colors.alert }}
         d="M16 2C8.3 2 2 8.3 2 16s6.3 14 14 14 14-6.3 14-14S23.7 2 16 2zm0 23.3c-5.2 0-9.3-4.2-9.3-9.3 0-5.2 4.2-9.3 9.3-9.3s9.3 4.2 9.3 9.3c-.1 5.2-4.3 9.3-9.3 9.3z"
       />
       <g>
@@ -53,7 +53,7 @@ const TestCollectionIcon = ({ size }) => (
       </g>
       <path
         className="st4"
-        style={{ fill: v.colors.orange }}
+        style={{ fill: v.colors.alert }}
         d="M-28.8 0c-8.8 0-16 7.2-16 16s7.2 16 16 16 16-7.2 16-16-7.2-16-16-16zm0 26.6c-5.9 0-10.6-4.8-10.6-10.6 0-5.9 4.8-10.6 10.6-10.6s10.6 4.8 10.6 10.6c0 5.9-4.8 10.6-10.6 10.6z"
       />
       <g>
@@ -61,12 +61,12 @@ const TestCollectionIcon = ({ size }) => (
         <g id="XMLID_1_">
           <path
             className="st4"
-            style={{ fill: v.colors.orange }}
+            style={{ fill: v.colors.alert }}
             d="M19.3-35.4c-8.5 0-15.5-6.9-15.5-15.5s6.9-15.5 15.5-15.5 15.5 6.9 15.5 15.5-7 15.5-15.5 15.5zm0-26.7c-6.2 0-11.2 5-11.2 11.2s5 11.2 11.2 11.2 11.2-5 11.2-11.2-5-11.2-11.2-11.2z"
           />
           <path
             className="st4"
-            style={{ fill: v.colors.orange }}
+            style={{ fill: v.colors.alert }}
             d="M19.3-34.9c-8.8 0-16-7.2-16-16s7.2-16 16-16 16 7.2 16 16c.1 8.8-7.1 16-16 16zm0-30.9c-8.2 0-14.9 6.7-14.9 14.9S11.1-36 19.3-36s14.9-6.7 14.9-14.9-6.7-14.9-14.9-14.9zm0 26.6c-6.5 0-11.7-5.3-11.7-11.7 0-6.5 5.3-11.7 11.7-11.7 6.5 0 11.7 5.3 11.7 11.7 0 6.5-5.2 11.7-11.7 11.7zm0-22.3c-5.8 0-10.6 4.7-10.6 10.6 0 5.8 4.7 10.6 10.6 10.6 5.8 0 10.6-4.7 10.6-10.6 0-5.9-4.8-10.6-10.6-10.6z"
           />
         </g>

@@ -67,7 +67,7 @@ export const FixedHeader = styled.header`
   position: fixed;
   top: 0;
   width: calc(100% - ${v.containerPadding.horizontal}*2);
-  background: ${v.colors.cararra};
+  background: ${v.colors.commonLight};
   padding: 1rem ${v.containerPadding.horizontal};
 `
 FixedHeader.displayName = 'FixedHeader'
@@ -91,9 +91,9 @@ ActivityContainer.displayName = 'ActivityContainer'
 export const FadeHeader = styled.div`
   border-radius: 1px;
   background: linear-gradient(
-    ${v.colors.activityDarkBlue} 0,
-    ${v.colors.activityDarkBlue} 40%,
-    ${hexToRgba(v.colors.activityDarkBlue, 0)} 100%
+    ${v.colors.secondaryDark} 0,
+    ${v.colors.secondaryDark} 40%,
+    ${hexToRgba(v.colors.secondaryDark, 0)} 100%
   );
   height: 27px;
   position: fixed;

@@ -25,10 +25,10 @@ const SubmissionBoxRow = Row.extend`
   transition: background-color 0.3s;
   padding: 0.5rem 0;
   &:hover {
-    background: ${v.colors.desert};
+    background: ${v.colors.commonLightest};
   }
   &.selected {
-    background: ${v.colors.cyan};
+    background: ${v.colors.primaryLight};
   }
 `
 const SubmissionBoxRowText = RowItemLeft.extend`
@@ -36,7 +36,7 @@ const SubmissionBoxRowText = RowItemLeft.extend`
 `
 
 const StyledTitleContent = styled.div`
-  border-bottom: 1px solid ${v.colors.gray};
+  border-bottom: 1px solid ${v.colors.commonMedium};
 `
 
 @inject('apiStore', 'uiStore', 'routingStore')
@@ -203,7 +203,7 @@ class SubmissionBoxSettingsModal extends React.Component {
             display: 'inline-block',
             height: '25px',
             width: '25px',
-            color: v.colors.gray,
+            color: v.colors.commonMedium,
           }}
         >
           <AlertIcon />

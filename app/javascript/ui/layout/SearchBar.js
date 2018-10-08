@@ -8,8 +8,8 @@ import CloseIcon from '~/ui/icons/CloseIcon'
 
 const StyledSearchBar = styled.div`
   border-bottom: 1px solid
-    ${props => (props.focused ? v.colors.blackLava : v.colors.cloudy)};
-  color: ${props => (props.focused ? v.colors.blackLava : v.colors.cloudy)};
+    ${props => (props.focused ? v.colors.black : v.colors.commonDark)};
+  color: ${props => (props.focused ? v.colors.black : v.colors.commonDark)};
   height: 28px;
   margin-right: 16px;
   position: relative;
@@ -27,7 +27,7 @@ const StyledSearchBar = styled.div`
     outline: none;
     border: none;
     &::placeholder {
-      color: ${v.colors.cloudy};
+      color: ${v.colors.commonDark};
     }
   }
 
@@ -36,7 +36,7 @@ const StyledSearchBar = styled.div`
   }
 
   .search {
-    color: ${props => (props.focused ? v.colors.blackLava : v.colors.cloudy)};
+    color: ${props => (props.focused ? v.colors.black : v.colors.commonDark)};
     svg {
       display: inline;
       height: 18px;
@@ -50,7 +50,7 @@ const StyledSearchBar = styled.div`
     position: absolute;
     right: 2px;
     bottom: 7px;
-    color: ${v.colors.cloudy};
+    color: ${v.colors.commonDark};
     &:hover {
       color: black;
     }

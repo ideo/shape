@@ -19,7 +19,7 @@ StyledSnackbar.displayName = 'StyledSnackbar'
 /** @component */
 export const StyledSnackbarContent = styled(SnackbarContent)`
   &.SnackbarContent {
-    background-color: ${v.colors.cloudy};
+    background-color: ${v.colors.commonDark};
     max-width: none;
     padding: 15px 30px;
     width: 100%;
@@ -32,7 +32,7 @@ StyledSnackbarContent.displayName = 'StyledSnackbarContent'
 
 /** @component */
 export const SnackbarBackground = styled.div`
-  background-color: ${v.colors.cloudy};
+  background-color: ${v.colors.commonDark};
   min-height: 36px;
   padding: 15px 30px;
   width: 100%;
