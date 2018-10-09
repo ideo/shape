@@ -369,4 +369,27 @@ describe Organization, type: :model do
       end
     end
   end
+  describe '#calculate_active_users_count!' do
+    let(:pending_user) { create(:user, :recently_active, status: User.statuses[:pending], first_name: 'pending_user') }
+    let(:deleted_user) { create(:user, :recently_active, status: User.statuses[:deleted], first_name: 'deleted_user') }
+    let(:recently_active_user) { create(:user, :recently_active, first_name: 'recently_active_user') }
+    let(:recently_active_guest_user) { create(:user, :recently_active, first_name: 'recently_active_guest_user') }
+    let(:not_recently_active_user) { create(:user, :not_recently_active, first_name: 'not_recently_active_user') }
+    let(:not_recently_active_guest_user) { create(:user, :not_recently_active, first_name: 'not_recently_active_guest_user') }
+    let(:organization) { create(:organization) }
+
+    before do
+      pending_user.add_role(Role::MEMBER, organization.primary_group)
+      deleted_user.add_role(Role::MEMBER, organization.primary_group)
+      recently_active_user.add_role(Role::MEMBER, organization.primary_group)
+      recently_active_guest_user.add_role(Role::ADMIN, organization.guest_group)
+      not_recently_active_user.add_role(Role::MEMBER, organization.primary_group)
+      not_recently_active_guest_user.add_role(Role::ADMIN, organization.guest_group)
+    end
+
+    it 'updates active users count' do
+      organization.calculate_active_users_count!
+      expect(organization.active_users_count).to eql(2)
+    end
+  end
 end

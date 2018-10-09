@@ -2,6 +2,7 @@ class Organization < ApplicationRecord
   RECENTLY_ACTIVE_RANGE = 90.days
   DEFAULT_TRIAL_ENDS_AT = 90.days
   DEFAULT_TRIAL_USERS_COUNT = 25
+
   extend FriendlyId
   friendly_id :slug_candidates, use: %i[slugged finders history]
 
@@ -167,6 +168,13 @@ class Organization < ApplicationRecord
     return network_organization if network_organization.present?
 
     create_network_organization(admin)
+  end
+
+  def calculate_active_users_count!
+    count = all_active_users
+            .where('last_active_at > ?', RECENTLY_ACTIVE_RANGE.ago)
+            .count
+    update_attributes(active_users_count: count)
   end
 
   private
