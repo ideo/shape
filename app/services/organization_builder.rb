@@ -10,6 +10,8 @@ class OrganizationBuilder
 
   def save
     @organization.transaction do
+      @organization.trial_ends_at = Organization::DEFAULT_TRIAL_ENDS_AT.from_now
+      @organization.trial_users_count = Organization::DEFAULT_TRIAL_USERS_COUNT
       @organization.save!
       update_primary_group!
       add_role

@@ -9,7 +9,6 @@ RSpec.describe OrganizationBuilder, type: :service do
     }
   }
 
-
   describe '#save' do
     let(:builder) {
       OrganizationBuilder.new(params,
@@ -26,6 +25,15 @@ RSpec.describe OrganizationBuilder, type: :service do
 
       it 'should return true' do
         expect(result).to be true
+      end
+
+      it 'should set the trial ends at date' do
+        expect(organization.trial_ends_at).to be_within(1.second)
+          .of(Organization::DEFAULT_TRIAL_ENDS_AT.from_now)
+      end
+
+      it 'should set the default trial user count' do
+        expect(organization.trial_users_count).to eql(Organization::DEFAULT_TRIAL_USERS_COUNT)
       end
 
       it 'should add the user as an admin role' do

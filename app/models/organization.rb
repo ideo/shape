@@ -1,4 +1,6 @@
 class Organization < ApplicationRecord
+  DEFAULT_TRIAL_ENDS_AT = 90.days
+  DEFAULT_TRIAL_USERS_COUNT = 25
   extend FriendlyId
   friendly_id :slug_candidates, use: %i[slugged finders history]
 
