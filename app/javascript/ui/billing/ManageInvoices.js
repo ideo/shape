@@ -23,7 +23,6 @@ class ManagePaymentMethods extends React.Component {
       await networkStore.loadSubscription(networkStore.organization.id)
       if (networkStore.subscription) {
         await networkStore.loadInvoices(networkStore.subscription)
-        this.forceUpdate()
       }
       runInAction(() => (this.loaded = true))
     } catch (e) {
