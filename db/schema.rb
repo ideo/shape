@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20181009204421) do
+ActiveRecord::Schema.define(version: 20181009212705) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -217,6 +217,9 @@ ActiveRecord::Schema.define(version: 20181009204421) do
     t.integer "profile_collection_id"
     t.string "slug"
     t.string "network_subscription_id"
+    t.integer "active_users_count", default: 0, null: false
+    t.datetime "trial_ends_at"
+    t.integer "trial_users_count", default: 0, null: false
     t.index ["slug"], name: "index_organizations_on_slug", unique: true
   end
 
