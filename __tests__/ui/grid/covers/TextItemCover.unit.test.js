@@ -5,6 +5,7 @@ import { fakeTextItem } from '#/mocks/data'
 const item = fakeTextItem
 const props = {
   item,
+  dragging: false,
   height: 200,
 }
 

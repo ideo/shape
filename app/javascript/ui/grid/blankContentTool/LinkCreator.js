@@ -32,6 +32,8 @@ class LinkCreator extends React.Component {
   }
 
   _parseMetadata = async url => {
+    // TODO: VideoUrl.parse item to see if it is actually a video
+
     if (url.length <= 3) return
     const meta = await parseURLMeta(url)
     if (this.canceled) return

@@ -42,11 +42,10 @@ class VideoCreator extends React.Component {
     }
   }
 
-  videoUrlIsValid = () => VideoUrl.isValid(this.state.videoUrl)
-
   createVideoItem = e => {
+    const { videoUrl } = this.state
     e.preventDefault()
-    if (this.videoUrlIsValid()) {
+    if (VideoUrl.isValid(videoUrl)) {
       // Get a normalized URL to make it easier to handle in our system
       const { normalizedUrl } = VideoUrl.parse(this.state.videoUrl)
       const { name, thumbnailUrl } = this.state
