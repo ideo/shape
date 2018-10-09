@@ -204,7 +204,9 @@ describe Api::V1::UsersController, type: :request, json: true, auth: true do
     let!(:switch_organization) { create(:organization) }
     let!(:organization) { user.current_organization }
     let(:path) { '/api/v1/users/switch_org' }
-    let!(:params) { { organization_id: switch_organization.id }.to_json }
+    let!(:params) { { organization_id: switch_organization.id.to_s }.to_json }
+    # catch a use case where we had an error using Organization.friendly.find
+    let!(:bad_org) { create(:organization, slug: switch_organization.id) }
 
     before do
       user.add_role(Role::MEMBER, switch_organization.primary_group)
