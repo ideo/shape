@@ -142,8 +142,7 @@ class VideoUrl {
   }
 
   static async getVbrickDetails(id) {
-    // we use our passthru so that we can still read the response of a 401
-    const apiUrl = `/passthru?url=https://${VBRICK_DOMAIN}/api/v1/videos/${id}/details`
+    const apiUrl = `https://${VBRICK_DOMAIN}/api/v1/videos/${id}/details`
     try {
       const response = await axios.get(apiUrl)
       const { data } = response
@@ -153,12 +152,10 @@ class VideoUrl {
           thumbnailUrl: data.thumbnailUrl,
         }
       }
-      if (data.reason) {
-        // private video... what to do?
-        console.warn('private vbrick video detected')
-      }
       return {}
     } catch (e) {
+      // could be a 404, or a 401...
+      // until we have a vbrick login, hard to test how to respond to private/unauthorized
       return {}
     }
   }
