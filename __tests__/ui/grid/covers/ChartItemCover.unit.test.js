@@ -45,20 +45,43 @@ describe('ChartItemCover', () => {
     })
 
     it('renders a victory bar chart with formatted data', () => {
-      expect(wrapper.find('VictoryBar').props().data).toEqual(
-        component.formattedData
-      )
+      expect(
+        wrapper
+          .find('VictoryBar')
+          .first()
+          .props().data
+      ).toEqual(component.formattedData.datasets[0].data)
     })
   })
 
   describe('formattedData', () => {
     it('formats the data into an array as percentages of totals', () => {
-      expect(component.formattedData).toEqual([
-        { scale: '0', value: 16 },
-        { scale: '1', value: 33 },
-        { scale: '2', value: 5 },
-        { scale: '3', value: 44 },
-      ])
+      expect(component.formattedData).toEqual({
+        datasets: [
+          {
+            data: [
+              { answer: 1, percentage: 28 },
+              { answer: 2, percentage: 28 },
+              { answer: 3, percentage: 0 },
+              { answer: 4, percentage: 42 },
+            ],
+            label: 'Super test',
+            total: 7,
+            type: 'question_items',
+          },
+          {
+            data: [
+              { answer: 1, percentage: 10 },
+              { answer: 2, percentage: 20 },
+              { answer: 3, percentage: 40 },
+              { answer: 4, percentage: 30 },
+            ],
+            label: 'Super Org',
+            total: 50,
+            type: 'org_wide',
+          },
+        ],
+      })
     })
   })
 

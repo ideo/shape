@@ -1,9 +1,46 @@
 import PropTypes from 'prop-types'
+import objectAssignDeep from 'object-assign-deep'
 import styled, { css } from 'styled-components'
 import TextareaAutosize from 'react-autosize-textarea'
+import { VictoryTheme } from 'victory'
 
 import { StyledCommentTextarea } from '~/ui/global/styled/forms'
 import v from '~/utils/variables'
+
+const colorScale = ['#DE8F74', '#C0DBDE']
+const baseLabelStyles = {
+  fontFamily: v.fonts.sans,
+  fontSize: 14,
+  padding: 10,
+  fill: v.colors.black,
+  stroke: 'transparent',
+}
+export const theme = objectAssignDeep({}, VictoryTheme.grayscale, {
+  bar: {
+    style: {
+      labels: Object.assign({}, baseLabelStyles, {
+        fill: '#DE8F74',
+      }),
+    },
+  },
+  group: {
+    colorScale,
+  },
+  legend: {
+    colorScale,
+    fontSize: 14,
+    gutter: 10,
+    style: {
+      data: {
+        type: 'square',
+      },
+      labels: Object.assign({}, baseLabelStyles, {
+        fontSize: 10.5,
+      }),
+      title: baseLabelStyles,
+    },
+  },
+})
 
 export const QuestionText = styled.p`
   box-sizing: border-box;

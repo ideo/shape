@@ -1,14 +1,19 @@
-import _ from 'lodash'
 import PropTypes from 'prop-types'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import { observable, runInAction } from 'mobx'
-import { VictoryAxis, VictoryBar, VictoryChart, VictoryLabel } from 'victory'
+import {
+  VictoryAxis,
+  VictoryBar,
+  VictoryChart,
+  VictoryGroup,
+  VictoryLabel,
+  VictoryLegend,
+} from 'victory'
 import styled from 'styled-components'
 
 import { apiStore } from '~/stores'
 import { Heading1, Heading3 } from '~/ui/global/styled/typography'
-import v from '~/utils/variables'
-import { questionInformation } from '~/ui/test_collections/shared'
+import { questionInformation, theme } from '~/ui/test_collections/shared'
 
 const CoverContainer = styled.div`
   padding: 16px;
@@ -48,18 +53,18 @@ class ChartItemCover extends React.Component {
 
   get formattedData() {
     const { item } = this.props
-    const formattedData = []
-    const total = Object.keys(item.chart_data).reduce(
-      (previous, key) => previous + item.chart_data[key],
-      0
-    )
-    _.forEach(item.chart_data, (value, key) => {
-      formattedData.push({
-        scale: key,
-        value: value > 0 ? parseInt((value / total) * 100) : 0,
+    const raw = item.chart_data
+    const formatted = raw.datasets.map(set => {
+      const formattedPercentage = set.data.map(d => {
+        const percentage =
+          d.num_responses > 0
+            ? parseInt((d.num_responses / set.total) * 100)
+            : 0
+        return { percentage, answer: d.answer }
       })
+      return Object.assign({}, set, { data: formattedPercentage })
     })
-    return formattedData
+    return { datasets: formatted }
   }
 
   get mapQuestionType() {
@@ -84,29 +89,40 @@ class ChartItemCover extends React.Component {
             <Heading3>{this.mapQuestionType.questionText}</Heading3>
           </div>
         )}
-        <VictoryChart domainPadding={14}>
+        <VictoryChart domainPadding={14} domain={{ y: [0, 80] }} theme={theme}>
+          <VictoryLegend
+            x={4}
+            y={4}
+            borderPadding={0}
+            gutter={0}
+            orientation="vertical"
+            padding={0}
+            rowGutter={0}
+            data={[{ name: 'Age test' }, { name: 'IDEO Organization' }]}
+          />
           <VictoryAxis
             style={{
               axis: { stroke: 'transparent' },
             }}
-            tickValues={[0, 1, 2, 3]}
+            tickValues={[1, 2, 3, 4]}
             tickFormat={this.emojiScale.map(e => e.symbol)}
             tickLabelComponent={<Tick emojiScale={this.emojiScale} />}
           />
-          <VictoryBar
-            data={this.formattedData}
-            x="scale"
-            y="value"
-            labels={d => `${d.value}%`}
-            style={{
-              data: { fill: '#DE8F74' },
-              labels: {
-                fontFamily: v.fonts.sans,
-                fontSize: 16,
-                fill: '#DE8F74',
-              },
-            }}
-          />
+          <VictoryGroup offset={30}>
+            {this.formattedData.datasets.map(d => (
+              <VictoryBar
+                key={d.type}
+                padding={10}
+                data={d.data}
+                barWidth={30}
+                x="answer"
+                y="percentage"
+                labels={da =>
+                  d.type === 'question_items' ? `${da.percentage}%` : ''
+                }
+              />
+            ))}
+          </VictoryGroup>
         </VictoryChart>
       </CoverContainer>
     )
