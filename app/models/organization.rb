@@ -177,6 +177,33 @@ class Organization < ApplicationRecord
     update_attributes(active_users_count: count)
   end
 
+  def within_trial_period?
+    trial_ends_at > Time.current
+  end
+
+  def create_network_usage_record
+    calculate_active_users_count!
+    count = active_users_count
+
+    if within_trial_period?
+      return true unless count > DEFAULT_TRIAL_USERS_COUNT
+
+      count -= DEFAULT_TRIAL_USERS_COUNT
+    end
+
+    if NetworkApi::UsageRecord.create(
+      quantity: count,
+      timestamp: Time.current.end_of_day.to_i,
+      external_organization_id: id,
+    )
+      true
+    else
+      false
+    end
+  rescue JsonApiClient::Errors::ServerError
+    false
+  end
+
   private
 
   def parse_domain_whitelist

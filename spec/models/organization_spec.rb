@@ -369,6 +369,7 @@ describe Organization, type: :model do
       end
     end
   end
+
   describe '#calculate_active_users_count!' do
     let(:pending_user) { create(:user, :recently_active, status: User.statuses[:pending], first_name: 'pending_user') }
     let(:deleted_user) { create(:user, :recently_active, status: User.statuses[:deleted], first_name: 'deleted_user') }
@@ -390,6 +391,83 @@ describe Organization, type: :model do
     it 'updates active users count' do
       organization.calculate_active_users_count!
       expect(organization.active_users_count).to eql(2)
+    end
+  end
+
+  describe '#create_network_usage_record' do
+    let(:organization) { create(:organization) }
+    before do
+      allow(organization).to receive(:calculate_active_users_count!)
+    end
+
+    context 'within trial period with fewer users than limit' do
+      before do
+        organization.update_attributes(trial_ends_at: 1.day.from_now)
+      end
+      it 'does not create the network usage record' do
+        allow(NetworkApi::UsageRecord).to receive(:create)
+        expect(organization.create_network_usage_record).to be true
+        expect(NetworkApi::UsageRecord).not_to have_received(:create)
+      end
+    end
+
+    context 'within trial period with more users than limit' do
+      let(:active_users_count) { 100 }
+      let(:trial_users_count) { 50 }
+      before do
+        organization.update_attributes(trial_ends_at: 1.day.from_now, active_users_count: active_users_count)
+      end
+
+      it 'creates the network usage record, active_users_count - quantity trial user count' do
+        stub_const('Organization::DEFAULT_TRIAL_USERS_COUNT', trial_users_count)
+        allow(NetworkApi::UsageRecord).to receive(:create)
+        organization.create_network_usage_record
+        expect(NetworkApi::UsageRecord).to have_received(:create).with(
+          quantity: active_users_count - trial_users_count,
+          timestamp: Time.current.end_of_day.to_i,
+          external_organization_id: organization.id,
+        )
+      end
+    end
+
+    context 'outside of trial limit' do
+      before do
+        organization.update_attributes(trial_ends_at: 1.day.ago)
+        allow(NetworkApi::UsageRecord).to receive(:create)
+        allow(organization).to receive(:calculate_active_users_count!)
+      end
+
+      context 'usage record created successfully' do
+        it 'returns true' do
+          allow(organization).to receive(:active_users_count).and_return(123)
+          expect(organization).to receive(:calculate_active_users_count!)
+          allow(NetworkApi::UsageRecord).to receive(:create).and_return(true)
+          expect(organization.create_network_usage_record).to be true
+          expect(NetworkApi::UsageRecord).to have_received(:create).with(
+            quantity: 123,
+            timestamp: Time.current.end_of_day.to_i,
+            external_organization_id: organization.id,
+          )
+        end
+      end
+
+      context 'usage record not created successfully' do
+        it 'returns false' do
+          allow(organization).to receive(:calculate_active_users_count!)
+          allow(organization).to receive(:active_users_count).and_return('bad value')
+          allow(NetworkApi::UsageRecord).to receive(:create).and_return(false)
+          expect(organization.create_network_usage_record).to be false
+        end
+      end
+
+      context 'network error' do
+        it 'returns false' do
+          allow(organization).to receive(:active_users_count).and_return(123)
+          allow(NetworkApi::UsageRecord).to receive(:create)
+            .and_raise(JsonApiClient::Errors::ServerError.new('an error'))
+          expect(organization.create_network_usage_record).to be false
+        end
+      end
     end
   end
 end
