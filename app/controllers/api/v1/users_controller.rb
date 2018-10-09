@@ -22,6 +22,7 @@ class Api::V1::UsersController < Api::V1::BaseController
   end
 
   def me
+    current_user.update_attributes(last_active_at: Time.current)
     render jsonapi: current_user, include: [
       :groups,
       organizations: %i[primary_group],
@@ -68,7 +69,7 @@ class Api::V1::UsersController < Api::V1::BaseController
           User: SerializableCurrentUser,
           Group: SerializableGroup,
           Organization: SerializableOrganization,
-      }
+        }
     else
       render_api_errors current_user.errors
     end
