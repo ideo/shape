@@ -13,7 +13,11 @@ import styled from 'styled-components'
 
 import { apiStore } from '~/stores'
 import { Heading1, Heading3 } from '~/ui/global/styled/typography'
-import { questionInformation, theme } from '~/ui/test_collections/shared'
+import {
+  questionInformation,
+  theme,
+  themeLabelStyles,
+} from '~/ui/test_collections/shared'
 
 const CoverContainer = styled.div`
   padding: 16px;
@@ -60,7 +64,7 @@ class ChartItemCover extends React.Component {
           d.num_responses > 0
             ? parseInt((d.num_responses / set.total) * 100)
             : 0
-        return { percentage, answer: d.answer }
+        return Object.assign({}, d, { percentage, total: set.total })
       })
       return Object.assign({}, set, { data: formattedPercentage })
     })
@@ -117,9 +121,43 @@ class ChartItemCover extends React.Component {
                 barWidth={30}
                 x="answer"
                 y="percentage"
-                labels={da =>
-                  d.type === 'question_items' ? `${da.percentage}%` : ''
+                labels={(datum, active) =>
+                  datum.type === 'question_items' ? `${datum.percentage}%` : ''
                 }
+                events={[
+                  {
+                    target: 'data',
+                    eventHandlers: {
+                      onMouseOver: () => [
+                        {
+                          target: 'labels',
+                          mutation: props => {
+                            const { datum } = props
+                            return {
+                              text: `${datum.num_responses}/${
+                                datum.total
+                              } \ntotal`,
+                              style: Object.assign({}, themeLabelStyles, {
+                                fill:
+                                  d.type === 'question_items'
+                                    ? '#DE8F74'
+                                    : '#86b2b7',
+                                fontSize: 9,
+                                maxWidth: 20,
+                              }),
+                            }
+                          },
+                        },
+                      ],
+                      onMouseOut: () => [
+                        {
+                          target: 'labels',
+                          mutation: props => null,
+                        },
+                      ],
+                    },
+                  },
+                ]}
               />
             ))}
           </VictoryGroup>
