@@ -37,6 +37,9 @@ class Item < ApplicationRecord
   delegate :organization, to: :parent, allow_nil: true
   belongs_to :cloned_from, class_name: 'Item', optional: true
   has_one :comment_thread, as: :record, dependent: :destroy
+  has_one :question_item, class_name: 'Item::QuestionItem'
+
+  scope :questions, -> { where(type: 'Item::QuestionItem') }
 
   before_validation :format_url, if: :saved_change_to_url?
   before_create :generate_name, unless: :name?
@@ -179,6 +182,10 @@ class Item < ApplicationRecord
   def touch_related_cards
     try(:parent_collection_card).try(:touch)
     cards_linked_to_this_item.update_all(updated_at: updated_at)
+  end
+
+  def chart_data
+    {}
   end
 
   def jsonapi_type_name

@@ -2,6 +2,7 @@ require 'rails_helper'
 
 describe Api::V1::QuestionAnswersController, type: :request, json: true do
   let(:test_collection) { create(:test_collection, test_status: :live) }
+  let!(:test_design) { create(:test_design, num_cards: 2, test_collection: test_collection) }
 
   describe 'POST #create' do
     let(:survey_response) { create(:survey_response, test_collection: test_collection) }

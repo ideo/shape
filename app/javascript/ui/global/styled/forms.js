@@ -4,7 +4,7 @@ import MenuItem from '@material-ui/core/MenuItem'
 import MuiCheckbox from '@material-ui/core/Checkbox'
 import AutosizeInput from 'react-input-autosize'
 import TextareaAutosize from 'react-autosize-textarea'
-import styled from 'styled-components'
+import styled, { css } from 'styled-components'
 
 import hexToRgba from '~/utils/hexToRgba'
 import v from '~/utils/variables'
@@ -28,8 +28,7 @@ export const FieldContainer = styled.div`
 `
 FieldContainer.displayName = 'StyledFieldContainer'
 
-/** @component */
-export const Label = styled.label`
+const LabelStyle = css`
   text-transform: uppercase;
   margin-bottom: 20px;
   font-family: ${v.fonts.sans};
@@ -37,6 +36,16 @@ export const Label = styled.label`
   font-weight: ${v.weights.medium};
   letter-spacing: 0.0625rem;
   display: block;
+`
+
+export const LabelText = styled.div`
+  ${LabelStyle};
+`
+LabelText.displayName = 'StyledLabelText'
+
+/** @component */
+export const Label = styled.label`
+  ${LabelStyle};
 `
 Label.displayName = 'StyledLabel'
 
@@ -53,29 +62,24 @@ export const FormButton = styled.button`
   border-radius: 20px;
   color: ${props => {
     switch (props.color) {
-      case 'hollow':
+      case v.colors.transparent:
         return v.colors.blackLava
       default:
         return 'white'
     }
   }};
-  background-color: ${props => {
-    switch (props.color) {
-      case 'blue':
-        return v.colors.ctaButtonBlue
-      case 'hollow':
-        return 'transparent'
-      default:
-        return v.colors.blackLava
-    }
-  }};
+  background-color: ${props => props.color};
   border: ${props =>
-    props.color === 'hollow' ? `1px solid ${v.colors.blackLava}` : 'none'};
+    props.color === v.colors.transparent
+      ? `1px solid ${v.colors.blackLava}`
+      : 'none'};
   transition: all 0.3s;
   &:hover,
   &:focus {
     background-color: ${props =>
-      props.color === 'blue' ? v.colors.ctaButtonBlueHover : v.colors.cloudy};
+      props.color === v.colors.ctaButtonBlue
+        ? v.colors.ctaButtonBlueHover
+        : v.colors.cloudy};
   }
   ${props =>
     props.disabled &&
@@ -89,6 +93,9 @@ export const FormButton = styled.button`
     `};
 `
 FormButton.displayName = 'StyledFormButton'
+FormButton.defaultProps = {
+  color: v.colors.blackLava,
+}
 
 /** @component */
 export const TextButton = styled.button`

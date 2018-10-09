@@ -36,7 +36,12 @@ const StyledDialog = styled(Dialog)`
     font-size: 1rem;
     font-family: ${v.fonts.serif};
     &--error {
+      font-size: 0.9rem;
       color: ${v.colors.orange};
+      margin: 0;
+      margin-top: -12px;
+      margin-bottom: 5px;
+      margin-left: 34px;
     }
   }
   .footer {
@@ -55,6 +60,8 @@ class TermsOfUseModal extends React.Component {
   @observable
   termsChecked = false
   @observable
+  mailingListChecked = false
+  @observable
   isLoading = false
   @observable
   submitted = false
@@ -65,17 +72,24 @@ class TermsOfUseModal extends React.Component {
   }
 
   @action
+  handleMailingListCheck = event => {
+    this.mailingListChecked = event.target.checked
+  }
+
+  @action
   handleSubmit = e => {
     e.preventDefault()
     this.submitted = true
     if (this.termsChecked) {
       const { currentUser } = this.props
       this.isLoading = true
-      currentUser.API_acceptTerms().finally(() => {
-        runInAction(() => {
-          this.isLoading = false
+      currentUser
+        .API_acceptTerms({ mailing_list: this.mailingListChecked })
+        .finally(() => {
+          runInAction(() => {
+            this.isLoading = false
+          })
         })
-      })
     }
   }
 
@@ -118,7 +132,7 @@ class TermsOfUseModal extends React.Component {
                 }
                 label="I agree to the Terms of Use."
               />
-              {!displayError && <div style={{ height: '54px' }} />}
+              {!displayError && <div style={{ height: '6px' }} />}
               {displayError && (
                 <FormHelperText
                   classes={{
@@ -129,6 +143,19 @@ class TermsOfUseModal extends React.Component {
                   Please indicate you agree to the Terms of Use.
                 </FormHelperText>
               )}
+            </FormControl>
+            <FormControl component="fieldset">
+              <FormControlLabel
+                classes={{ label: 'form-control' }}
+                control={
+                  <Checkbox
+                    checked={this.mailingListChecked}
+                    onChange={this.handleMailingListCheck}
+                    value="yes"
+                  />
+                }
+                label="Stay current on new features and case studies by signing up for our mailing list"
+              />
             </FormControl>
 
             <div className="button--center">
