@@ -1,4 +1,5 @@
 class Organization < ApplicationRecord
+  RECENTLY_ACTIVE_RANGE = 90.days
   DEFAULT_TRIAL_ENDS_AT = 90.days
   DEFAULT_TRIAL_USERS_COUNT = 25
   extend FriendlyId
