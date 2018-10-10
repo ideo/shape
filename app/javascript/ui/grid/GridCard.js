@@ -183,8 +183,7 @@ class GridCard extends React.Component {
 
   renderPin() {
     const { card } = this.props
-    const hoverClass =
-      card.isPinnedAndLocked && uiStore.cardMenuOpen.x !== 0 && 'show-on-hover'
+    const hoverClass = card.isPinnedAndLocked && 'show-on-hover'
     return (
       <Tooltip title="pinned" placement="top">
         <PinIconHolder className={hoverClass} locked={card.isPinnedAndLocked}>
@@ -197,7 +196,7 @@ class GridCard extends React.Component {
   openMenu = () => {
     const { card } = this.props
     if (this.props.menuOpen) {
-      uiStore.openCardMenu(false)
+      uiStore.closeCardMenu()
     } else {
       uiStore.openCardMenu(card.id)
     }
@@ -207,10 +206,9 @@ class GridCard extends React.Component {
     const { card } = this.props
     const rect = this.gridCardRef.getBoundingClientRect()
     const x = ev.screenX - rect.left - rect.width
-    const y = ev.pageY - rect.top
-    console.log(ev.pageY, rect.top, y)
+    const y = ev.screenY - rect.top - 120
     if (this.props.menuOpen) {
-      uiStore.openCardMenu(false)
+      uiStore.closeCardMenu()
     } else {
       uiStore.openCardMenu(card.id, {
         x,
@@ -223,7 +221,9 @@ class GridCard extends React.Component {
 
   closeMenu = () => {
     if (this.props.menuOpen) {
-      uiStore.openCardMenu(false)
+      if (!uiStore.cardMenuOpenAndPositioned) {
+        uiStore.closeCardMenu()
+      }
     }
   }
 
@@ -268,7 +268,7 @@ class GridCard extends React.Component {
 
     const firstCardInRow = card.position && card.position.x === 0
     const tagEditorOpen = uiStore.tagsModalOpenId === card.id
-
+    const hoverClass = 'show-on-hover'
     return (
       <StyledGridCard
         dragging={dragging}
@@ -298,7 +298,8 @@ class GridCard extends React.Component {
               {!testCollectionCard && <SelectionCircle cardId={card.id} />}
               <ActionMenu
                 location="GridCard"
-                className="show-on-hover card-menu"
+                className={hoverClass}
+                stylingClass="card-menu"
                 card={card}
                 canEdit={this.canEditCard}
                 canReplace={record.canReplace}

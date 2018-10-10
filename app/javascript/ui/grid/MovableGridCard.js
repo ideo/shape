@@ -32,15 +32,14 @@ const StyledResizeIcon = styled.div`
 `
 
 const StyledCardWrapper = styled.div`
-  z-index: ${props => (props.dragging ? v.zIndex.cardDragging : 0)};
+  z-index: ${props => props.zIndex};
   /* this is for both the ResizeIcon (in this component) and CardMenu (in GridCard) */
   .show-on-hover {
     opacity: 0;
     transition: opacity 0.25s;
   }
   &:hover {
-    z-index: ${props =>
-      props.dragging ? v.zIndex.cardDragging : v.zIndex.gridCard};
+    z-index: ${props => props.zIndex};
   }
   &:hover,
   &.touch-device {
@@ -398,10 +397,20 @@ class MovableGridCard extends React.PureComponent {
       lastPinnedCard,
     }
 
+    let zIndex = 0
+    if (!moveComplete) zIndex = v.zIndex.cardDragging
+    if (
+      uiStore.cardMenuOpenAndPositioned &&
+      uiStore.cardMenuOpen.id === card.id
+    ) {
+      zIndex = v.zIndex.aboveClickWrapper
+    }
+    if (card.id === 42773) console.log('z', zIndex)
     return (
       <StyledCardWrapper
         className={uiStore.isTouchDevice ? 'touch-device' : ''}
         dragging={!moveComplete}
+        zIndex={zIndex}
       >
         <Rnd
           ref={c => {

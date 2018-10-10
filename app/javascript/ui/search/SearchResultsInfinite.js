@@ -86,7 +86,7 @@ class SearchResultsInfinite extends React.Component {
   }
 
   closeMenu = () => {
-    uiStore.openCardMenu(false)
+    uiStore.closeCardMenu()
   }
 
   handleVisibilityChange = index => isVisible => {

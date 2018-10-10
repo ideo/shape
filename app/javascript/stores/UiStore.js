@@ -188,6 +188,10 @@ export default class UiStore {
     this.update('cardMenuOpen', { id, x, y })
   }
 
+  closeCardMenu() {
+    this.update('cardMenuOpen', { id: false, x: 0, y: 0 })
+  }
+
   async popupSnackbar(props = {}) {
     if (this.snackbarConfig.open) {
       this.closeSnackbar()
@@ -224,7 +228,7 @@ export default class UiStore {
   @action
   openMoveMenu({ from: fromCollectionId, cardAction }) {
     this.pageMenuOpen = false
-    this.openCardMenu(false)
+    this.closeCardMenu(false)
     // On move, copy over selected cards to moving cards
     this.movingFromCollectionId = fromCollectionId
     // cardAction can be 'move' or 'link'
@@ -343,7 +347,7 @@ export default class UiStore {
   openBlankContentTool(options = {}) {
     const { viewingCollection } = this
     this.deselectCards()
-    this.openCardMenu(false)
+    this.closeCardMenu(false)
     this.blankContentToolState = {
       ...this.defaultBCTState,
       order: 0,

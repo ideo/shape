@@ -54,6 +54,10 @@ class ActionMenu extends React.Component {
     uiStore.openMoveMenu({ from: this.movingFromCollectionId, cardAction })
   }
 
+  closeCardMenu = () => {
+    this.props.uiStore.closeCardMenu()
+  }
+
   duplicateCard = () => {
     this.openMoveMenu('duplicate')
   }
@@ -169,6 +173,10 @@ class ActionMenu extends React.Component {
       if (actionItem.name === this.itemLoading) {
         actionItem.loading = true
       }
+      action.onClick = () => {
+        this.closeCardMenu()
+        action.onClick()
+      }
     })
     let items = [...actions]
 
@@ -233,12 +241,11 @@ class ActionMenu extends React.Component {
   }
 
   render() {
-    const { className, menuOpen, uiStore } = this.props
-    // console.log('uiStore', uiStore.cardMenuOpen.x, uiStore.cardMenuOpen.y)
-    console.log('render', menuOpen)
+    const { className, menuOpen, stylingClass, uiStore } = this.props
     return (
       <PopoutMenu
         className={className}
+        stylingClass={stylingClass}
         onMouseLeave={this.handleMouseLeave}
         onClick={this.toggleOpen}
         menuItems={this.menuItems}
@@ -253,6 +260,7 @@ class ActionMenu extends React.Component {
 ActionMenu.propTypes = {
   card: MobxPropTypes.objectOrObservableObject.isRequired,
   className: PropTypes.string,
+  stylingClass: PropTypes.string,
   location: PropTypes.string.isRequired,
   menuOpen: PropTypes.bool.isRequired,
   canEdit: PropTypes.bool.isRequired,
@@ -270,7 +278,8 @@ ActionMenu.wrappedComponent.propTypes = {
 ActionMenu.displayName = 'ActionMenu'
 
 ActionMenu.defaultProps = {
-  className: 'card-menu',
+  className: '',
+  stylingClass: 'card-menu',
   onMoveMenu: null,
   afterArchive: null,
   canReplace: false,
