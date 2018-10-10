@@ -1,5 +1,5 @@
 class SurveyResponse < ApplicationRecord
-  belongs_to :test_collection, class_name: 'Collection::TestCollection'
+  belongs_to :test_collection, class_name: 'Collection::TestCollection', touch: true
   has_many :question_answers, dependent: :destroy
 
   after_save :create_open_response_items, if: :completed?
