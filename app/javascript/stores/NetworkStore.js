@@ -1,6 +1,6 @@
 import { Collection } from 'datx'
 import { jsonapi, saveModel } from 'datx-jsonapi'
-import { first } from 'lodash'
+import { first, find } from 'lodash'
 
 import * as networkModels from '~shared/api.network.v1'
 
@@ -21,6 +21,11 @@ class NetworkStore extends jsonapi(Collection) {
 
   get plan() {
     return this.firstResource('plans')
+  }
+
+  get defaultPaymentMethod() {
+    const paymentMethods = this.findAll('payment_methods')
+    return find(paymentMethods, x => x.default) || paymentMethods[0]
   }
 
   loadOrganization(external_id, skipCache = false) {
@@ -77,14 +82,14 @@ class NetworkStore extends jsonapi(Collection) {
     this.fetchAll('plans')
   }
 
-  async createSubscription(organization_id, paymentMethod) {
+  async createSubscription(organization_id) {
     await this.loadSubscription(organization_id)
     if (this.subscription) {
       return
     }
     const newSubscription = new networkModels.Subscription({
       plan_id: this.plan.id,
-      payment_method_id: paymentMethod.id,
+      payment_method_id: this.defaultPaymentMethod.id,
     })
     const subscription = await saveModel(newSubscription)
     this.add(subscription)
@@ -109,14 +114,13 @@ class NetworkStore extends jsonapi(Collection) {
       exp_year: card.exp_year,
       address_zip: card.address_zip,
       address_country: card.country,
-      isDefault: false,
       organization_id: organization.id,
+      isDefault: false,
     })
     try {
       const paymentMethod = await saveModel(newPaymentMethod)
       this.add(paymentMethod)
-      await this.createSubscription(organization.id, paymentMethod)
-      return paymentMethod
+      await this.createSubscription(organization.id)
     } catch (e) {
       throw e
     }
