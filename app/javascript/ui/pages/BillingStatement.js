@@ -2,8 +2,9 @@ import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import ReactRouterPropTypes from 'react-router-prop-types'
 import PrintableInvoice from '~shared/components/compounds/PrintableInvoice'
 import trackError from '~/utils/trackError'
-import Box from '~shared/components/atoms/Box'
+import logo from '~/assets/logo_2x.png'
 import v from '~/utils/variables'
+import Box from '~shared/components/atoms/Box'
 
 @inject('apiStore', 'networkStore')
 @observer
@@ -35,6 +36,8 @@ class BillingStatement extends React.Component {
           invoice={invoice}
           organization={networkStore.organization}
           subscription={networkStore.subscription}
+          brandTitle="Shape"
+          logo={logo}
         />
       </Box>
     ) : null
