@@ -5,7 +5,7 @@ import v from '~/utils/variables'
 import ExpandIcon from '~/ui/icons/ExpandIcon'
 
 const StyledButton = styled.button`
-  color: ${v.colors.cloudy};
+  color: ${v.colors.commonDark};
   &.ql-format-reg {
     font-size: 0.9rem;
     font-family: 'Sentintel', serif;

@@ -35,8 +35,7 @@ import {
 } from './shared'
 
 const PinIconHolder = styled.div`
-  background-color: ${props =>
-    props.locked ? 'transparent' : v.colors.blackLava};
+  background-color: ${props => (props.locked ? 'transparent' : v.colors.black)};
   border-radius: 50%;
   height: 24px;
   margin-left: 10px;
@@ -122,11 +121,11 @@ class GridCard extends React.Component {
     const { record } = this.props
     if (this.isItem) {
       if (record.isGenericFile) {
-        return v.colors.blackLava
+        return v.colors.black
       }
-      return v.colors.gray
+      return v.colors.commonMedium
     }
-    return v.colors.gray
+    return v.colors.commonMedium
   }
 
   get renderIcon() {

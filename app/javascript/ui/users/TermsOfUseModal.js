@@ -37,7 +37,7 @@ const StyledDialog = styled(Dialog)`
     font-family: ${v.fonts.serif};
     &--error {
       font-size: 0.9rem;
-      color: ${v.colors.orange};
+      color: ${v.colors.alert};
       margin: 0;
       margin-top: -12px;
       margin-bottom: 5px;

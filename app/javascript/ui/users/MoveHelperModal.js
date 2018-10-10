@@ -18,7 +18,7 @@ const SpecialDisplayHeading = styled.p`
   font-family: ${v.fonts.sans};
   font-size: 1.25rem;
   font-weight: ${v.weights.book};
-  color: ${v.colors.blackLava};
+  color: ${v.colors.black};
 `
 
 const StyledDialog = styled(Dialog)`

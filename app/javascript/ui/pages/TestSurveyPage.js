@@ -21,9 +21,9 @@ const LogoWrapper = styled.div`
 `
 
 const StyledSurvey = styled.div`
-  background-color: ${v.colors.testLightBlueBg};
+  background-color: ${v.colors.primaryMedium};
   border-radius: 7px;
-  border: 10px solid ${v.colors.testLightBlueBg};
+  border: 10px solid ${v.colors.primaryMedium};
   width: 334px;
   margin: 0 auto;
 `

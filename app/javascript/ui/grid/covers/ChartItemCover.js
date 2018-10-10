@@ -18,7 +18,12 @@ const Tick = props => {
   const emoji = props.emojiScale[props.index]
   if (!emoji) return <div />
   const fontSize = parseInt((emoji.scale || 1) * 24)
-  return <VictoryLabel {...props} style={{ fill: '#DE8F74', fontSize }} />
+  return (
+    <VictoryLabel
+      {...props}
+      style={{ fill: v.colors.tertiaryMedium, fontSize }}
+    />
+  )
 }
 Tick.propTypes = {
   emojiScale: PropTypes.arrayOf(
@@ -99,11 +104,11 @@ class ChartItemCover extends React.Component {
             y="value"
             labels={d => `${d.value}%`}
             style={{
-              data: { fill: '#DE8F74' },
+              data: { fill: v.colors.tertiaryMedium },
               labels: {
                 fontFamily: v.fonts.sans,
                 fontSize: 16,
-                fill: '#DE8F74',
+                fill: v.colors.tertiaryMedium,
               },
             }}
           />

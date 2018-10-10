@@ -50,7 +50,7 @@ const ImageDisplay = styled.img`
   max-width: 100%;
   max-height: 100%;
   height: auto;
-  box-shadow: 0px 2px 16px ${v.colors.gray};
+  box-shadow: 0px 2px 16px ${v.colors.commonMedium};
 `
 
 class ProductDescription extends React.PureComponent {

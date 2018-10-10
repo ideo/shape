@@ -22,7 +22,7 @@ const StyledResizeIcon = styled.div`
   z-index: ${v.zIndex.gridCardBg};
   right: 0.75rem;
   bottom: 0.75rem;
-  color: ${v.colors.gray};
+  color: ${v.colors.commonMedium};
   width: 1.25rem;
   height: 1.25rem;
   svg {
