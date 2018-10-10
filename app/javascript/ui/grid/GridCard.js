@@ -271,6 +271,7 @@ class GridCard extends React.Component {
     const hoverClass = 'show-on-hover'
     return (
       <StyledGridCard
+        className="gridCard"
         dragging={dragging}
         testCollectionCard={testCollectionCard}
         // mostly for E2E checking purposes

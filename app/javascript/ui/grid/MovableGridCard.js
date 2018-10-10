@@ -235,6 +235,10 @@ class MovableGridCard extends React.PureComponent {
       }
       return
     }
+    if (uiStore.cardMenuOpenAndPositioned) {
+      uiStore.closeCardMenu()
+      return
+    }
     if (e.target.className.match(/cancelGridClick/)) return
     if (e.target.tagName === 'A' && e.target.href) return
 
@@ -411,6 +415,7 @@ class MovableGridCard extends React.PureComponent {
         className={uiStore.isTouchDevice ? 'touch-device' : ''}
         dragging={!moveComplete}
         zIndex={zIndex}
+        onClick={this.handleWrapperClick}
       >
         <Rnd
           ref={c => {
