@@ -43,8 +43,8 @@ export const StyledMenuWrapper = styled.div`
     props.position &&
     `
     position: absolute;
-    left: ${props.position.x - 250}px;
-    top: ${props.position.y}px;
+    left: ${props.position.x - 250 + 32}px;
+    top: ${props.position.y + 10}px;
   `} ${props =>
     props.direction === 'right' ? 'left: 0; top: 42px;' : 'right: -32px;'};
 `
