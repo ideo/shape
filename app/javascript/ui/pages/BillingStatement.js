@@ -2,7 +2,6 @@ import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import ReactRouterPropTypes from 'react-router-prop-types'
 import PrintableInvoice from '~shared/components/compounds/PrintableInvoice'
 import trackError from '~/utils/trackError'
-import logo from '~/assets/logo_2x.png'
 import v from '~/utils/variables'
 import Box from '~shared/components/atoms/Box'
 
@@ -37,7 +36,9 @@ class BillingStatement extends React.Component {
           organization={networkStore.organization}
           subscription={networkStore.subscription}
           brandTitle="Shape"
-          logo={logo}
+          logo={
+            'https://s3-us-west-2.amazonaws.com/assets.shape.space/logo_1x.png'
+          }
         />
       </Box>
     ) : null
