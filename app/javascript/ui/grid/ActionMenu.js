@@ -173,9 +173,10 @@ class ActionMenu extends React.Component {
       if (actionItem.name === this.itemLoading) {
         actionItem.loading = true
       }
-      action.onClick = () => {
+      const originOnClick = actionItem.onClick
+      actionItem.onClick = () => {
         this.closeCardMenu()
-        action.onClick()
+        originOnClick()
       }
     })
     let items = [...actions]
