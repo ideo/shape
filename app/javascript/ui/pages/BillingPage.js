@@ -3,17 +3,20 @@ import v from '~/utils/variables'
 import Header from '~/ui/layout/Header'
 import PageContainer from '~/ui/layout/PageContainer'
 import ManagePaymentMethods from '~/ui/billing/ManagePaymentMethods'
+import ManageInvoices from '~/ui/billing/ManageInvoices'
+import Box from '~shared/components/atoms/Box'
 
 class BillingPage extends React.Component {
   render() {
     return (
-      <div>
+      <Box mb={v.headerHeightCompact}>
         <Header />
         <PageContainer marginTop={v.headerHeightCompact}>
           <Heading1>Billing</Heading1>
           <ManagePaymentMethods />
+          <ManageInvoices />
         </PageContainer>
-      </div>
+      </Box>
     )
   }
 }

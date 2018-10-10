@@ -7,8 +7,16 @@ import * as networkModels from '~shared/api.network.v1'
 class NetworkStore extends jsonapi(Collection) {
   static types = Object.values(networkModels).filter(x => !!x.type)
 
+  firstResource(resourceName) {
+    return first(this.findAll(resourceName))
+  }
+
   get organization() {
-    return first(this.findAll('organizations'))
+    return this.firstResource('organizations')
+  }
+
+  get subscription() {
+    return this.firstResource('subscriptions')
   }
 
   loadOrganization(external_id, skipCache = false) {
@@ -59,6 +67,31 @@ class NetworkStore extends jsonapi(Collection) {
       organization_id: organization.id,
     })
     return saveModel(paymentMethod).then(() => this.add(paymentMethod))
+  }
+
+  loadSubscription(organization_id, skipCache = false) {
+    return this.fetchAll(
+      'subscriptions',
+      {
+        filter: { organization_id },
+      },
+      {
+        skipCache,
+      }
+    )
+  }
+
+  loadInvoices(subscription_id) {
+    return this.fetchAll('invoices', {
+      filter: { subscription_id },
+      sort: 'period_start',
+    })
+  }
+
+  loadInvoice(invoice_id) {
+    this.fetch('invoices', invoice_id, {
+      include: ['organization', 'invoice_items', 'payment_methods'],
+    })
   }
 }
 

@@ -26,14 +26,19 @@ import { undoStore } from './index'
 class ApiStore extends jsonapi(datxCollection) {
   @observable
   currentUserId = null
+
   @observable
   currentUserOrganizationId = null
+
   @observable
   currentCommentThreadIds = []
+
   @observable
   currentPageThreadKey = null
+
   @observable
   recentNotifications = new Map()
+
   @observable
   usableTemplates = []
 
