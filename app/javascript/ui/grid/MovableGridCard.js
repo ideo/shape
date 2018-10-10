@@ -403,13 +403,9 @@ class MovableGridCard extends React.PureComponent {
 
     let zIndex = 0
     if (!moveComplete) zIndex = v.zIndex.cardDragging
-    if (
-      uiStore.cardMenuOpenAndPositioned &&
-      uiStore.cardMenuOpen.id === card.id
-    ) {
+    if (uiStore.cardMenuOpen.id === card.id) {
       zIndex = v.zIndex.aboveClickWrapper
     }
-    if (card.id === 42773) console.log('z', zIndex)
     return (
       <StyledCardWrapper
         className={uiStore.isTouchDevice ? 'touch-device' : ''}

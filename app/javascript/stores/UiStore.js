@@ -24,7 +24,7 @@ export default class UiStore {
   @computed
   get cardMenuOpenAndPositioned() {
     const { cardMenuOpen } = this
-    return cardMenuOpen.id && (cardMenuOpen.x || cardMenuOpen.y)
+    return cardMenuOpen.id && !!(cardMenuOpen.x || cardMenuOpen.y)
   }
   @observable
   organizationMenuPage = null
