@@ -6,6 +6,16 @@ class Item
       (1..4).map { |n| { num_responses: 0, answer: n } }
     end
 
+    def grouped_response_data(survey_answers)
+      data = base_data
+      counts = survey_answers.group(QuestionAnswer.arel_table[:answer_number]).count
+      counts.each do |answer_number, count|
+        answer_data = data.find { |d| d[:answer] == answer_number }
+        answer_data[:num_responses] = count
+      end
+      data
+    end
+
     def question_data
       survey_answers = data_source
                        .question_answers
@@ -14,16 +24,11 @@ class Item
                          SurveyResponse.arel_table[:status].eq(:completed),
                        )
 
-      data = base_data
-      survey_answers.each do |answer|
-        answer_data = data.find { |d| d[:answer] == answer.answer_number }
-        answer_data[:num_responses] += 1
-      end
       {
         label: parent.name,
         type: 'question_items',
         total: survey_answers.count,
-        data: data,
+        data: grouped_response_data(survey_answers),
       }
     end
 
@@ -38,16 +43,12 @@ class Item
                        .where(
                          Collection::TestCollection.arel_table[:organization_id].eq(parent.organization_id),
                        )
-      data = base_data
-      survey_answers.each do |answer|
-        answer_data = data.find { |d| d[:answer] == answer.answer_number }
-        answer_data[:num_responses] += 1
-      end
+
       {
         label: parent.organization.name,
         type: 'org_wide',
         total: survey_answers.count,
-        data: data,
+        data: grouped_response_data(survey_answers),
       }
     end
 
