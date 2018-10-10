@@ -20,7 +20,12 @@ export default class UiStore {
   @observable
   blankContentToolState = { ...this.defaultBCTState }
   @observable
-  openCardMenuId = false
+  cardMenuOpen = { id: false, x: 0, y: 0 }
+  @computed
+  get cardMenuOpenAndPositioned() {
+    const { cardMenuOpen } = this
+    return cardMenuOpen.id && (cardMenuOpen.x || cardMenuOpen.y)
+  }
   @observable
   organizationMenuPage = null
   @observable
@@ -178,6 +183,11 @@ export default class UiStore {
     this.dialogConfig.open = null
   }
 
+  openCardMenu(id, opts = {}) {
+    const { x = 0, y = 0 } = opts
+    this.update('cardMenuOpen', { id, x, y })
+  }
+
   async popupSnackbar(props = {}) {
     if (this.snackbarConfig.open) {
       this.closeSnackbar()
@@ -214,7 +224,7 @@ export default class UiStore {
   @action
   openMoveMenu({ from: fromCollectionId, cardAction }) {
     this.pageMenuOpen = false
-    this.openCardMenuId = false
+    this.openCardMenu(false)
     // On move, copy over selected cards to moving cards
     this.movingFromCollectionId = fromCollectionId
     // cardAction can be 'move' or 'link'
@@ -333,7 +343,7 @@ export default class UiStore {
   openBlankContentTool(options = {}) {
     const { viewingCollection } = this
     this.deselectCards()
-    this.openCardMenuId = false
+    this.openCardMenu(false)
     this.blankContentToolState = {
       ...this.defaultBCTState,
       order: 0,

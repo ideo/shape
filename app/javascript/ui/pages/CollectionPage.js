@@ -78,6 +78,11 @@ class CollectionPage extends PageWithApi {
     this.editorTimeout = setTimeout(() => this.setEditor({}), 4000)
   }
 
+  handleAllClick = ev => {
+    const { uiStore } = this.props
+    uiStore.openCardMenu(false)
+  }
+
   receivedChannelData = async data => {
     const { apiStore } = this.props
     const { collection } = this
@@ -370,7 +375,9 @@ class CollectionPage extends PageWithApi {
             {isSubmissionBox &&
               collection.submission_box_type &&
               this.renderSubmissionsCollection()}
-            {uiStore.dragging && <ClickWrapper clickHandlers={[]} />}
+            {(uiStore.dragging || uiStore.cardMenuOpenAndPositioned) && (
+              <ClickWrapper clickHandlers={[this.handleAllClick]} />
+            )}
           </PageContainer>
         )}
         {isLoading && this.loader()}

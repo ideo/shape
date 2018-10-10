@@ -233,7 +233,9 @@ class ActionMenu extends React.Component {
   }
 
   render() {
-    const { className, menuOpen } = this.props
+    const { className, menuOpen, uiStore } = this.props
+    // console.log('uiStore', uiStore.cardMenuOpen.x, uiStore.cardMenuOpen.y)
+    console.log('render', menuOpen)
     return (
       <PopoutMenu
         className={className}
@@ -241,6 +243,7 @@ class ActionMenu extends React.Component {
         onClick={this.toggleOpen}
         menuItems={this.menuItems}
         menuOpen={menuOpen}
+        position={{ x: uiStore.cardMenuOpen.x, y: uiStore.cardMenuOpen.y }}
         width={250}
       />
     )

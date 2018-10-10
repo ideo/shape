@@ -107,7 +107,7 @@ class TestQuestion extends React.Component {
               card={card}
               cardType="items"
               record={card.record}
-              menuOpen={uiStore.openCardMenuId === card.id}
+              menuOpen={uiStore.cardMenuOpen.id === card.id}
               testCollectionCard
             />
           )

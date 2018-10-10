@@ -553,7 +553,7 @@ class CollectionGrid extends React.Component {
           cardType = card.record.internalType
         }
       }
-      const { openCardMenuId } = uiStore
+      const { cardMenuOpen } = uiStore
       grid.push(
         <MovableGridCard
           key={card.id}
@@ -570,7 +570,7 @@ class CollectionGrid extends React.Component {
           onResizeStop={this.onResizeStop}
           routeTo={routingStore.routeTo}
           parent={collection}
-          menuOpen={openCardMenuId === card.id}
+          menuOpen={cardMenuOpen.id === card.id}
           lastPinnedCard={
             card.isPinnedAndLocked && i === this.state.cards.length - 1
           }

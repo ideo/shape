@@ -38,8 +38,13 @@ export const StyledMenuButtonWrapper = styled.div`
 export const StyledMenuWrapper = styled.div`
   position: absolute;
   padding: 10px;
-  top: 14px;
   ${props =>
+    props.position &&
+    `
+    position: absolute;
+    lefe: ${props.position.x}px;
+    top: ${props.position.y}px;
+  `} ${props =>
     props.direction === 'right' ? 'left: 0; top: 42px;' : 'right: -32px;'};
 `
 StyledMenuWrapper.displayName = 'StyledMenuWrapper'
@@ -148,10 +153,12 @@ class PopoutMenu extends React.Component {
       width,
       buttonStyle,
       direction,
+      position,
     } = this.props
 
     const isBct = buttonStyle === 'bct'
     const MenuToggle = isBct ? BctButton : StyledMenuToggle
+    console.log('render', menuOpen)
     return (
       <StyledMenuButtonWrapper
         className={`${className} ${menuOpen && ' open'}`}
@@ -165,7 +172,12 @@ class PopoutMenu extends React.Component {
         >
           <MenuIcon viewBox={isBct ? '-11 -11 26 40' : '0 0 5 18'} />
         </MenuToggle>
-        <StyledMenuWrapper direction={direction} className="menu-wrapper">
+        <StyledMenuWrapper
+          direction={direction}
+          position={position}
+          height={200}
+          className="menu-wrapper"
+        >
           <StyledMenu width={width}>{this.renderMenuItems}</StyledMenu>
         </StyledMenuWrapper>
       </StyledMenuButtonWrapper>
@@ -193,6 +205,10 @@ PopoutMenu.propTypes = {
   disabled: PropTypes.bool,
   buttonStyle: PropTypes.string,
   menuItems: propTypeMenuItem,
+  position: PropTypes.shape({
+    x: PropTypes.number,
+    y: PropTypes.number,
+  }),
   groupedMenuItems: PropTypes.shape({
     top: propTypeMenuItem,
     organizations: propTypeMenuItem,
@@ -212,6 +228,7 @@ PopoutMenu.defaultProps = {
   groupedMenuItems: {},
   className: '',
   menuOpen: false,
+  position: null,
   disabled: false,
   buttonStyle: '',
   width: 200,

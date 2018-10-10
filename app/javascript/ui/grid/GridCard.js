@@ -183,7 +183,8 @@ class GridCard extends React.Component {
 
   renderPin() {
     const { card } = this.props
-    const hoverClass = card.isPinnedAndLocked && 'show-on-hover'
+    const hoverClass =
+      card.isPinnedAndLocked && uiStore.cardMenuOpen.x !== 0 && 'show-on-hover'
     return (
       <Tooltip title="pinned" placement="top">
         <PinIconHolder className={hoverClass} locked={card.isPinnedAndLocked}>
@@ -196,15 +197,33 @@ class GridCard extends React.Component {
   openMenu = () => {
     const { card } = this.props
     if (this.props.menuOpen) {
-      uiStore.update('openCardMenuId', false)
+      uiStore.openCardMenu(false)
     } else {
-      uiStore.update('openCardMenuId', card.id)
+      uiStore.openCardMenu(card.id)
     }
+  }
+
+  openContextMenu = ev => {
+    const { card } = this.props
+    const rect = this.gridCardRef.getBoundingClientRect()
+    const x = ev.screenX - rect.left - rect.width
+    const y = ev.pageY - rect.top
+    console.log(ev.pageY, rect.top, y)
+    if (this.props.menuOpen) {
+      uiStore.openCardMenu(false)
+    } else {
+      uiStore.openCardMenu(card.id, {
+        x,
+        y,
+      })
+    }
+    ev.preventDefault()
+    return false
   }
 
   closeMenu = () => {
     if (this.props.menuOpen) {
-      uiStore.update('openCardMenuId', false)
+      uiStore.openCardMenu(false)
     }
   }
 
@@ -258,6 +277,8 @@ class GridCard extends React.Component {
         data-width={card.width}
         data-height={card.height}
         data-order={card.order}
+        onContextMenu={this.openContextMenu}
+        innerRef={c => (this.gridCardRef = c)}
       >
         {canEditCollection &&
           (!card.isPinnedAndLocked || lastPinnedCard) && (
