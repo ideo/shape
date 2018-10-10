@@ -19,6 +19,10 @@ class NetworkStore extends jsonapi(Collection) {
     return this.firstResource('subscriptions')
   }
 
+  get plan() {
+    return this.firstResource('plans')
+  }
+
   loadOrganization(external_id, skipCache = false) {
     return this.fetchAll(
       'organizations',
@@ -44,31 +48,6 @@ class NetworkStore extends jsonapi(Collection) {
     )
   }
 
-  createPaymentMethod(organization, token) {
-    const { card } = token
-    if (!card) {
-      throw new Error('Missing card')
-    }
-    if (!card.name) {
-      throw new Error('Missing card name')
-    }
-    if (!card.address_zip) {
-      throw new Error('Missing card address zip')
-    }
-
-    const paymentMethod = new networkModels.PaymentMethod({
-      stripe_card_token: token.id,
-      name: card.name,
-      exp_month: card.exp_month,
-      exp_year: card.exp_year,
-      address_zip: card.address_zip,
-      address_country: card.country,
-      isDefault: false,
-      organization_id: organization.id,
-    })
-    return saveModel(paymentMethod).then(() => this.add(paymentMethod))
-  }
-
   loadSubscription(organization_id, skipCache = false) {
     return this.fetchAll(
       'subscriptions',
@@ -92,6 +71,55 @@ class NetworkStore extends jsonapi(Collection) {
     this.fetch('invoices', invoice_id, {
       include: ['organization', 'invoice_items', 'payment_methods'],
     })
+  }
+
+  loadPlans(organization_id) {
+    this.fetchAll('plans')
+  }
+
+  async createSubscription(organization_id, paymentMethod) {
+    await this.loadSubscription(organization_id)
+    if (this.subscription) {
+      return
+    }
+    const newSubscription = new networkModels.Subscription({
+      plan_id: this.plan.id,
+      payment_method_id: paymentMethod.id,
+    })
+    const subscription = await saveModel(newSubscription)
+    this.add(subscription)
+  }
+
+  async createPaymentMethod(organization, token) {
+    const { card } = token
+    if (!card) {
+      throw new Error('Missing card')
+    }
+    if (!card.name) {
+      throw new Error('Missing card name')
+    }
+    if (!card.address_zip) {
+      throw new Error('Missing card address zip')
+    }
+
+    const newPaymentMethod = new networkModels.PaymentMethod({
+      stripe_card_token: token.id,
+      name: card.name,
+      exp_month: card.exp_month,
+      exp_year: card.exp_year,
+      address_zip: card.address_zip,
+      address_country: card.country,
+      isDefault: false,
+      organization_id: organization.id,
+    })
+    try {
+      const paymentMethod = await saveModel(newPaymentMethod)
+      this.add(paymentMethod)
+      await this.createSubscription(organization.id, paymentMethod)
+      return paymentMethod
+    } catch (e) {
+      throw e
+    }
   }
 }
 
