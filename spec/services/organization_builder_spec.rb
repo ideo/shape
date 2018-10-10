@@ -28,7 +28,7 @@ RSpec.describe OrganizationBuilder, type: :service do
       end
 
       it 'should set the trial ends at date' do
-        expect(organization.trial_ends_at).to be_within(1.second)
+        expect(organization.trial_ends_at).to be_within(5.seconds)
           .of(Organization::DEFAULT_TRIAL_ENDS_AT.from_now)
       end
 
