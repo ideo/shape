@@ -22,8 +22,11 @@ StyledSelectionCircle.displayName = 'StyledSelectionCircle'
 @inject('uiStore')
 @observer
 class SelectionCircle extends React.Component {
-  toggleSelected = () => {
+  toggleSelected = e => {
     const { cardId, uiStore } = this.props
+    if (uiStore.captureKeyboardGridClick(e, cardId)) {
+      return
+    }
     uiStore.toggleSelectedCardId(cardId)
   }
 
