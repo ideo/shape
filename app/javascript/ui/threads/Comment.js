@@ -16,7 +16,7 @@ const StyledComment = StyledCommentInput.extend`
   padding: 10px;
   margin-bottom: 5px;
   background: ${props =>
-    props.unread ? v.colors.activityLightBlue : v.colors.activityMedBlue};
+    props.unread ? v.colors.secondaryLight : v.colors.secondaryMedium};
 
   transition: background 1s 0.5s ease;
 

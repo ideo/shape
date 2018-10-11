@@ -37,10 +37,10 @@ describe('ScaleQuestion', () => {
         ).toBe(true)
       })
 
-      it('should set the question border to gray', () => {
+      it('should set the question border to commonMedium', () => {
         expect(wrapper.find('Question')).toHaveStyleRule(
           'border-color',
-          v.colors.gray
+          v.colors.commonMedium
         )
       })
     })

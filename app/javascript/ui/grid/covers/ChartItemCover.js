@@ -18,6 +18,7 @@ import {
   theme,
   themeLabelStyles,
 } from '~/ui/test_collections/shared'
+import v from '~/utils/variables'
 
 const CoverContainer = styled.div`
   padding: 16px;
@@ -27,7 +28,12 @@ const Tick = props => {
   const emoji = props.emojiScale[props.index]
   if (!emoji) return <div />
   const fontSize = parseInt((emoji.scale || 1) * 24)
-  return <VictoryLabel {...props} style={{ fill: '#DE8F74', fontSize }} />
+  return (
+    <VictoryLabel
+      {...props}
+      style={{ fill: v.colors.tertiaryMedium, fontSize }}
+    />
+  )
 }
 Tick.propTypes = {
   emojiScale: PropTypes.arrayOf(
@@ -64,7 +70,11 @@ class ChartItemCover extends React.Component {
           d.num_responses > 0
             ? parseInt((d.num_responses / set.total) * 100)
             : 0
-        return Object.assign({}, d, { percentage, total: set.total })
+        return Object.assign({}, d, {
+          percentage,
+          total: set.total,
+          type: set.type,
+        })
       })
       return Object.assign({}, set, { data: formattedPercentage })
     })
@@ -140,8 +150,8 @@ class ChartItemCover extends React.Component {
                               style: Object.assign({}, themeLabelStyles, {
                                 fill:
                                   d.type === 'question_items'
-                                    ? '#DE8F74'
-                                    : '#86b2b7',
+                                    ? v.colors.tertiaryMedium
+                                    : v.colors.primaryMediumDark,
                                 fontSize: 9,
                                 maxWidth: 20,
                               }),

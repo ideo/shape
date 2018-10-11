@@ -11,8 +11,8 @@ import { uiStore } from '~/stores'
 import { StyledImageCover } from './ImageItemCover'
 
 const StyledLinkCover = styled.div`
-  background: ${v.colors.blackLava};
-  color: ${v.colors.cararra};
+  background: ${v.colors.black};
+  color: ${v.colors.commonLight};
   cursor: pointer;
   width: 100%;
   height: 100%;
@@ -23,7 +23,7 @@ const StyledLinkCover = styled.div`
     padding-bottom: 60px;
     button {
       border: none;
-      background: ${hexToRgba(v.colors.cyan, 0.75)};
+      background: ${hexToRgba(v.colors.primaryLight, 0.75)};
       transition: background 0.2s;
       color: white;
       height: 4rem;
@@ -32,7 +32,7 @@ const StyledLinkCover = styled.div`
       border-radius: 10px;
       cursor: pointer;
       &:hover {
-        background: ${v.colors.cyan};
+        background: ${v.colors.primaryLight};
       }
     }
   }

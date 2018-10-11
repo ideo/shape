@@ -12,7 +12,7 @@ const StyledCommentThreadLoader = TextButton.extend`
   position: relative;
   margin-bottom: 5px;
   background: ${props =>
-    props.disabled ? v.colors.cloudy : v.colors.activityMedBlue};
+    props.disabled ? v.colors.commonDark : v.colors.secondaryMedium};
   width: 100%;
 
   .refreshIcon {

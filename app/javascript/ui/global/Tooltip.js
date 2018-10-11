@@ -8,7 +8,7 @@ import v from '~/utils/variables'
 // https://github.com/mui-org/material-ui/issues/11467
 const styles = {
   tooltip: {
-    backgroundColor: v.colors.blackLava,
+    backgroundColor: v.colors.black,
     fontSize: '0.75rem',
     fontFamily: v.fonts.sans,
     borderRadius: 0,

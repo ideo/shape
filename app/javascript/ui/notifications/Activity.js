@@ -29,7 +29,7 @@ function roleArticle(nextWord) {
 const MAX_ACTORS = 3
 
 export const ActivityText = styled.p`
-  color: ${v.colors.cararra};
+  color: ${v.colors.commonLight};
   font-family: ${v.fonts.sans};
   font-size: 1rem;
   line-height: 1.25;

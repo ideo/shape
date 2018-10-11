@@ -148,7 +148,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     return this.isSharedCollection
   }
 
-  // this marks it with the "sirocco" special color
+  // this marks it with the "offset" special color
   // NOTE: could also use Collection::Global -- except OrgTemplates is not "special"?
   get isSpecialCollection() {
     return (

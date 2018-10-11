@@ -9,7 +9,7 @@ const { CloseIcon } = ICONS
 
 const StyledDialog = styled(MuiDialog)`
   .modal__paper {
-    background-color: ${v.colors.cloudy};
+    background-color: ${v.colors.commonDark};
     border-radius: 6px;
     color: white;
     opacity: 0.95;

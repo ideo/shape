@@ -443,6 +443,24 @@ export default class UiStore {
     return opts.open
   }
 
+  // takes a click event as a parameter
+  captureKeyboardGridClick = (e, cardId) => {
+    const ctrlClick = e.metaKey || e.ctrlKey
+    const shiftClick = e.shiftKey
+    if (ctrlClick || shiftClick) {
+      if (ctrlClick) {
+        // individually select
+        this.toggleSelectedCardId(cardId)
+      }
+      if (shiftClick) {
+        // select everything between
+        this.selectCardsUpTo(cardId)
+      }
+      return true
+    }
+    return false
+  }
+
   // TODO: add a unit test for this
   @action
   selectCardsUpTo(cardId) {

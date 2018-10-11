@@ -33,7 +33,11 @@ class Item
     def generate_name
       # create a name based on the first 40 characters, splitting on words.
       # primarily used for breadcrumb trail (perhaps eventually slugs?)
-      self.name = plain_content.split(' | ').first
+      if plain_content.blank?
+        self.name = 'Text'
+      else
+        self.name = plain_content.split(' | ').first
+      end
       truncate_name
     end
   end

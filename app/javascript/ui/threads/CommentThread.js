@@ -30,11 +30,11 @@ const StyledCommentThread = styled.div`
     `} /* ---- */
     display: block;
     width: 100%;
-    background-color: ${v.colors.activityDarkBlue};
+    background-color: ${v.colors.secondaryDark};
     background: linear-gradient(
-      ${v.colors.activityDarkBlue} 0,
-      ${v.colors.activityDarkBlue} 80%,
-      ${hexToRgba(v.colors.activityDarkBlue, 0)} 100%
+      ${v.colors.secondaryDark} 0,
+      ${v.colors.secondaryDark} 80%,
+      ${hexToRgba(v.colors.secondaryDark, 0)} 100%
     );
     padding: 10px 10px 0 10px;
     text-align: left;
@@ -76,7 +76,7 @@ const StyledHeader = styled.div`
     text-transform: uppercase;
   }
   .unread {
-    color: ${v.colors.orange};
+    color: ${v.colors.alert};
     display: flex;
     flex-basis: content;
     height: 12px;

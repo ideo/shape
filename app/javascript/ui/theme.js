@@ -8,10 +8,10 @@ const theme = createMuiTheme({
   },
   palette: {
     primary: {
-      main: v.colors.sirocco,
+      main: v.colors.offset,
     },
     secondary: {
-      main: v.colors.pacificBlue,
+      main: v.colors.ctaPrimary,
     },
   },
 })

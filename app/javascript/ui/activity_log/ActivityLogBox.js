@@ -30,7 +30,7 @@ export const POSITION_KEY = 'ActivityLog:position'
 export const PAGE_KEY = 'ActivityLog:page'
 
 const StyledActivityLog = styled.div`
-  background-color: ${v.colors.activityDarkBlue};
+  background-color: ${v.colors.secondaryDark};
   box-shadow: 0px 0px 24px -5px rgba(0, 0, 0, 0.33);
   box-sizing: border-box;
   color: white;
@@ -52,7 +52,7 @@ const StyledHeader = styled.div`
 `
 
 const Action = styled.button`
-  color: ${props => (props.active ? 'white' : v.colors.cloudy)};
+  color: ${props => (props.active ? 'white' : v.colors.commonDark)};
   height: 19px;
   margin-right: 10px;
   position: relative;
