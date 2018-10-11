@@ -60,10 +60,34 @@ describe('ChartItemCover', () => {
         datasets: [
           {
             data: [
-              { answer: 1, percentage: 28 },
-              { answer: 2, percentage: 28 },
-              { answer: 3, percentage: 0 },
-              { answer: 4, percentage: 42 },
+              {
+                answer: 1,
+                num_responses: 2,
+                percentage: 28,
+                total: 7,
+                type: 'question_items',
+              },
+              {
+                answer: 2,
+                num_responses: 2,
+                percentage: 28,
+                total: 7,
+                type: 'question_items',
+              },
+              {
+                answer: 3,
+                num_responses: 0,
+                percentage: 0,
+                total: 7,
+                type: 'question_items',
+              },
+              {
+                answer: 4,
+                num_responses: 3,
+                percentage: 42,
+                total: 7,
+                type: 'question_items',
+              },
             ],
             label: 'Super test',
             total: 7,
@@ -71,10 +95,34 @@ describe('ChartItemCover', () => {
           },
           {
             data: [
-              { answer: 1, percentage: 10 },
-              { answer: 2, percentage: 20 },
-              { answer: 3, percentage: 40 },
-              { answer: 4, percentage: 30 },
+              {
+                answer: 1,
+                num_responses: 5,
+                percentage: 10,
+                total: 50,
+                type: 'org_wide',
+              },
+              {
+                answer: 2,
+                num_responses: 10,
+                percentage: 20,
+                total: 50,
+                type: 'org_wide',
+              },
+              {
+                answer: 3,
+                num_responses: 20,
+                percentage: 40,
+                total: 50,
+                type: 'org_wide',
+              },
+              {
+                answer: 4,
+                num_responses: 15,
+                percentage: 30,
+                total: 50,
+                type: 'org_wide',
+              },
             ],
             label: 'Super Org',
             total: 50,
