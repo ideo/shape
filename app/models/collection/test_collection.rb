@@ -30,7 +30,7 @@ class Collection
 
       event :launch, before: proc { |**args|
                                return false unless test_completed?
-                               remove_incomplete_cards
+                               remove_incomplete_question_cards
                                create_test_design_and_move_cards!(initiated_by: args[:initiated_by])
                              } do
         transitions from: :draft, to: :live
@@ -122,7 +122,7 @@ class Collection
       test_design.try(:touch)
     end
 
-    def aasm_event_failed(event, current_state)
+    def aasm_event_failed(event, current_state = '')
       return if errors.present?
       message = "You can't #{event} because the feedback is #{current_state}"
       errors.add(:base, message)
@@ -245,11 +245,6 @@ class Collection
       primary_collection_cards.joins(
         :item,
       ).where(table[:question_type].eq(:question_media))
-                              .where(
-                                table[:filestack_file_id].eq(nil).and(
-                                  table[:url].eq(nil),
-                                ),
-                              )
     end
 
     def incomplete_description_cards
@@ -258,15 +253,23 @@ class Collection
         :item,
       ).where(table[:question_type].eq(:question_description))
                               .where(
-                                table[:content].eq(nil),
+                                table[:content].eq(nil).or(table[:content].eq('')),
                               )
     end
 
-    def remove_incomplete_cards
+    # Returns the question cards that are in the blank default state
+    def incomplete_question_cards
       table = Item::QuestionItem.arel_table
-      primary_collection_cards.joins(
-        :item,
-      ).where(table[:question_type].eq(nil)).destroy_all
+      primary_collection_cards
+        .joins(
+          :item,
+        ).where(table[:question_type].eq(nil))
+        .where(table[:filestack_file_id].eq(nil))
+        .where(table[:url].eq(nil))
+    end
+
+    def remove_incomplete_question_cards
+      incomplete_question_cards.destroy_all
     end
   end
 end
