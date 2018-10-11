@@ -82,7 +82,7 @@ class NetworkStore extends jsonapi(Collection) {
     this.fetchAll('plans')
   }
 
-  async createSubscription(organization_id) {
+  async findOrCreateSubscription(organization_id) {
     await this.loadSubscription(organization_id)
     if (this.subscription) {
       return
@@ -120,7 +120,7 @@ class NetworkStore extends jsonapi(Collection) {
     try {
       const paymentMethod = await saveModel(newPaymentMethod)
       this.add(paymentMethod)
-      await this.createSubscription(organization.id)
+      await this.findOrCreateSubscription(organization.id)
     } catch (e) {
       throw e
     }
