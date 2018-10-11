@@ -129,6 +129,14 @@ export const SmallHelperText = styled.span`
 `
 SmallHelperText.displayName = 'SmallHelperText'
 
+export const SmallActionText = SmallHelperText.extend`
+  color: white;
+  font-weight: 500;
+  letter-spacing: 2.25px;
+  text-transform: uppercase;
+`
+SmallActionText.displayName = 'SmallActionText'
+
 /** @component */
 export const Anchor = styled.a`
   cursor: pointer;

@@ -6,15 +6,26 @@ import VisibilitySensor from 'react-visibility-sensor'
 import FlipMove from 'react-flip-move'
 import _ from 'lodash'
 import pluralize from 'pluralize'
+import styled from 'styled-components'
 
 import { ActivityContainer } from '~/ui/global/styled/layout'
+import GoIcon from '~/ui/icons/GoIcon'
 import InlineLoader from '~/ui/layout/InlineLoader'
 import Notification from '~/ui/notifications/Notification'
+import { SmallActionText } from '~/ui/global/styled/typography'
 import CommentThread from './CommentThread'
 
 function pluralTypeName(name) {
   return pluralize(name).toLowerCase()
 }
+
+const GoIconContainer = styled.span`
+  display: inline-block;
+  margin-bottom: 1px;
+  margin-right: 8px;
+  vertical-align: middle;
+  width: 15px;
+`
 
 @inject('apiStore', 'uiStore')
 @observer
@@ -158,6 +169,7 @@ class CommentThreadContainer extends React.Component {
   @computed
   get showJumpToThreadButton() {
     const { apiStore, uiStore } = this.props
+    if (!uiStore.viewingRecord.isNormalCollection) return false
     const thread = apiStore.findThreadForRecord(uiStore.viewingRecord)
     const idx = this.threads.indexOf(thread)
     return !this.visibleThreads.get(idx)
@@ -261,13 +273,20 @@ class CommentThreadContainer extends React.Component {
     return (
       <Fragment>
         <button
-          style={{ visibility: hideJumpButton }}
+          style={{
+            visibility: hideJumpButton,
+            minHeight: '20px',
+            marginTop: '-30px',
+          }}
           onClick={this.jumpToCurrentThread}
           className="jumpToThread"
         >
-          <h3 style={{ textAlign: 'center' }}>
+          <SmallActionText style={{ textAlign: 'center' }}>
+            <GoIconContainer>
+              <GoIcon />
+            </GoIconContainer>
             Go to {uiStore.viewingRecord.name}
-          </h3>
+          </SmallActionText>
         </button>
         <div
           style={{

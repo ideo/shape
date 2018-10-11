@@ -79,7 +79,7 @@ export const MaxWidthContainer = styled.div`
 MaxWidthContainer.displayName = 'MaxWidthContainer'
 
 export const ActivityContainer = styled.div`
-  margin-top: -2px;
+  margin-top: 12px;
   overflow-y: scroll;
   overflow-x: hidden;
   margin-bottom: 10px;
