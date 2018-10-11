@@ -103,17 +103,11 @@ class ChartItemCover extends React.Component {
             <Heading3>{this.mapQuestionType.questionText}</Heading3>
           </div>
         )}
-        <VictoryChart domainPadding={14} domain={{ y: [0, 80] }} theme={theme}>
-          <VictoryLegend
-            x={4}
-            y={4}
-            borderPadding={0}
-            gutter={0}
-            orientation="vertical"
-            padding={0}
-            rowGutter={0}
-            data={[{ name: 'Age test' }, { name: 'IDEO Organization' }]}
-          />
+        <VictoryChart
+          domainPadding={{ y: 10 }}
+          domain={{ y: [0, 95] }}
+          theme={theme}
+        >
           <VictoryAxis
             style={{
               axis: { stroke: 'transparent' },
@@ -171,6 +165,17 @@ class ChartItemCover extends React.Component {
               />
             ))}
           </VictoryGroup>
+          <VictoryLegend
+            x={4}
+            y={4}
+            borderPadding={0}
+            gutter={0}
+            orientation="vertical"
+            padding={0}
+            rowGutter={0}
+            style={{ fill: 'white' }}
+            data={[{ name: 'Age test' }, { name: 'IDEO Organization' }]}
+          />
         </VictoryChart>
       </CoverContainer>
     )

@@ -38,9 +38,23 @@ export const StyledMenuButtonWrapper = styled.div`
 export const StyledMenuWrapper = styled.div`
   position: absolute;
   padding: 10px;
-  top: 14px;
-  ${props =>
-    props.direction === 'right' ? 'left: 0; top: 42px;' : 'right: -32px;'};
+  z-index: ${v.zIndex.aboveClickWrapper};
+  ${props => {
+    if (props.position) {
+      let adjustLeft = 250
+      if (props.direction === 'right') {
+        adjustLeft = 50
+      }
+      return `
+      position: absolute;
+      left: ${props.position.x - adjustLeft + 32}px;
+      top: ${props.position.y + 10}px;
+      `
+    }
+    return ''
+  }} ${props =>
+    !props.position &&
+    (props.direction === 'right' ? 'left: 0; top: 42px;' : 'right: -32px;')};
 `
 StyledMenuWrapper.displayName = 'StyledMenuWrapper'
 
@@ -141,6 +155,7 @@ class PopoutMenu extends React.Component {
   render() {
     const {
       className,
+      wrapperClassName,
       menuOpen,
       disabled,
       onMouseLeave,
@@ -148,24 +163,33 @@ class PopoutMenu extends React.Component {
       width,
       buttonStyle,
       direction,
+      position,
+      hideDotMenu,
     } = this.props
 
     const isBct = buttonStyle === 'bct'
     const MenuToggle = isBct ? BctButton : StyledMenuToggle
     return (
       <StyledMenuButtonWrapper
-        className={`${className} ${menuOpen && ' open'}`}
+        className={`${wrapperClassName} ${menuOpen && ' open'}`}
         role="presentation"
         onMouseLeave={onMouseLeave}
       >
-        <MenuToggle
-          disabled={disabled}
-          onClick={onClick}
-          className="menu-toggle"
+        {!hideDotMenu && (
+          <MenuToggle
+            disabled={disabled}
+            onClick={onClick}
+            className={`${className} menu-toggle`}
+          >
+            <MenuIcon viewBox={isBct ? '-11 -11 26 40' : '0 0 5 18'} />
+          </MenuToggle>
+        )}
+        <StyledMenuWrapper
+          direction={direction}
+          position={position}
+          height={200}
+          className="menu-wrapper"
         >
-          <MenuIcon viewBox={isBct ? '-11 -11 26 40' : '0 0 5 18'} />
-        </MenuToggle>
-        <StyledMenuWrapper direction={direction} className="menu-wrapper">
           <StyledMenu width={width}>{this.renderMenuItems}</StyledMenu>
         </StyledMenuWrapper>
       </StyledMenuButtonWrapper>
@@ -188,11 +212,17 @@ PopoutMenu.propTypes = {
   onMouseLeave: PropTypes.func,
   onClick: PropTypes.func,
   className: PropTypes.string,
+  wrapperClassName: PropTypes.string,
   width: PropTypes.number,
   menuOpen: PropTypes.bool,
   disabled: PropTypes.bool,
   buttonStyle: PropTypes.string,
   menuItems: propTypeMenuItem,
+  hideDotMenu: PropTypes.bool,
+  position: PropTypes.shape({
+    x: PropTypes.number,
+    y: PropTypes.number,
+  }),
   groupedMenuItems: PropTypes.shape({
     top: propTypeMenuItem,
     organizations: propTypeMenuItem,
@@ -211,12 +241,15 @@ PopoutMenu.defaultProps = {
   menuItems: [],
   groupedMenuItems: {},
   className: '',
+  wrapperClassName: 'card-menu',
   menuOpen: false,
+  position: null,
   disabled: false,
   buttonStyle: '',
   width: 200,
   groupExtraComponent: {},
   direction: 'left',
+  hideDotMenu: false,
 }
 
 export default PopoutMenu

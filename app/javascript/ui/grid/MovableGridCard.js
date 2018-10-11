@@ -32,15 +32,14 @@ const StyledResizeIcon = styled.div`
 `
 
 const StyledCardWrapper = styled.div`
-  z-index: ${props => (props.dragging ? v.zIndex.cardDragging : 0)};
+  z-index: ${props => props.zIndex};
   /* this is for both the ResizeIcon (in this component) and CardMenu (in GridCard) */
   .show-on-hover {
     opacity: 0;
     transition: opacity 0.25s;
   }
   &:hover {
-    z-index: ${props =>
-      props.dragging ? v.zIndex.cardDragging : v.zIndex.gridCard};
+    z-index: ${props => props.zIndex};
   }
   &:hover,
   &.touch-device {
@@ -237,8 +236,11 @@ class MovableGridCard extends React.PureComponent {
       }
       return
     }
-    // this first case means it's probably an SVG/path (e.g. ChartItem)
-    if (!e.target.className || !e.target.className.match) return
+    if (uiStore.cardMenuOpenAndPositioned) {
+      uiStore.closeCardMenu()
+      return
+    }
+    if (!e.target.className.match) return
     if (e.target.className.match(/cancelGridClick/)) return
     if (e.target.tagName === 'A' && e.target.href) return
 
@@ -401,10 +403,17 @@ class MovableGridCard extends React.PureComponent {
       lastPinnedCard,
     }
 
+    let zIndex = 0
+    if (!moveComplete) zIndex = v.zIndex.cardDragging
+    if (uiStore.cardMenuOpen.id === card.id) {
+      zIndex = v.zIndex.aboveClickWrapper
+    }
     return (
       <StyledCardWrapper
         className={uiStore.isTouchDevice ? 'touch-device' : ''}
         dragging={!moveComplete}
+        zIndex={zIndex}
+        onClick={this.handleWrapperClick}
       >
         <Rnd
           ref={c => {

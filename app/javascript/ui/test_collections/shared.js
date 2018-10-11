@@ -7,7 +7,7 @@ import { VictoryTheme } from 'victory'
 import { StyledCommentTextarea } from '~/ui/global/styled/forms'
 import v from '~/utils/variables'
 
-const colorScale = ['#DE8F74', '#C0DBDE']
+const colorScale = [v.colors.tertiaryMedium, v.colors.primaryLight]
 export const themeLabelStyles = {
   fontFamily: v.fonts.sans,
   fontSize: 14,
@@ -19,7 +19,7 @@ export const theme = objectAssignDeep({}, VictoryTheme.grayscale, {
   bar: {
     style: {
       labels: Object.assign({}, themeLabelStyles, {
-        fill: '#DE8F74',
+        fill: v.colors.tertiaryMedium,
       }),
     },
   },
@@ -37,6 +37,9 @@ export const theme = objectAssignDeep({}, VictoryTheme.grayscale, {
       labels: Object.assign({}, themeLabelStyles, {
         fontSize: 10.5,
       }),
+      border: {
+        fill: 'rgba(255, 255, 255, 0.5)',
+      },
       title: themeLabelStyles,
     },
   },

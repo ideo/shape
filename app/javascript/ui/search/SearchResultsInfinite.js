@@ -83,11 +83,11 @@ class SearchResultsInfinite extends React.Component {
   }
 
   openMenu = cardId => () => {
-    uiStore.update('openCardMenuId', cardId)
+    uiStore.openCardMenu(cardId)
   }
 
   closeMenu = () => {
-    uiStore.update('openCardMenuId', false)
+    uiStore.closeCardMenu()
   }
 
   handleVisibilityChange = index => isVisible => {
@@ -148,11 +148,12 @@ class SearchResultsInfinite extends React.Component {
                   <SelectionCircle cardId={card.id} />
                   <ActionMenu
                     location="Search"
-                    className="show-on-hover card-menu"
+                    className="show-on-hover"
+                    wrapperClassName="card-menu"
                     card={card}
                     canEdit={false}
                     canReplace={false}
-                    menuOpen={uiStore.openCardMenuId === card.id}
+                    menuOpen={uiStore.cardMenuOpen.id === card.id}
                     onOpen={this.openMenu(card.id)}
                     onLeave={this.closeMenu}
                   />
