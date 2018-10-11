@@ -172,7 +172,7 @@ describe Collection::TestCollection, type: :model do
     end
   end
 
-  context 'with a  non-ready test with incomplete questions' do
+  context 'with a non-ready test with incomplete questions' do
     let(:test_collection) { create(:test_collection) }
 
     it 'returns false with test_status errors' do
