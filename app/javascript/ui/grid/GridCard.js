@@ -82,6 +82,7 @@ class GridCard extends React.Component {
               item={record}
               height={height}
               dragging={this.props.dragging}
+              cardId={card.id}
             />
           )
         case ITEM_TYPES.FILE: {
@@ -215,8 +216,11 @@ class GridCard extends React.Component {
   }
 
   handleClick = e => {
-    const { dragging, record } = this.props
+    const { card, dragging, record } = this.props
     if (dragging) return
+    if (uiStore.captureKeyboardGridClick(e, card.id)) {
+      return
+    }
     if (record.type === ITEM_TYPES.LINK) {
       this.linkOffsite(record.url)
       return

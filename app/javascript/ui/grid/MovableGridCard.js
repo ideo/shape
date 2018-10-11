@@ -92,7 +92,6 @@ class MovableGridCard extends React.PureComponent {
     const initialOffsetX = e.screenX - e.target.getBoundingClientRect().x
     const initialOffsetY = e.screenY - e.target.getBoundingClientRect().y
 
-    document.body.style['overflow-y'] = 'hidden'
     this.setState({
       initialOffsetX,
       initialOffsetY,
@@ -136,6 +135,8 @@ class MovableGridCard extends React.PureComponent {
     if (Math.abs(x - position.xPos) + Math.abs(y - position.yPos) < 10) {
       return
     }
+
+    document.body.style['overflow-y'] = 'hidden'
 
     if (e.clientY < TOP_SCROLL_TRIGGER) {
       // At top of viewport
@@ -223,19 +224,7 @@ class MovableGridCard extends React.PureComponent {
   // this function gets passed down to the card, so it can place the onClick handler
   handleClick = e => {
     this.scrolling = false
-    const { card, cardType, record } = this.props
-    // TODO: make sure this is cross-browser compatible?
-    if (e.metaKey || e.shiftKey) {
-      if (e.metaKey) {
-        // individually select
-        uiStore.toggleSelectedCardId(card.id)
-      }
-      if (e.shiftKey) {
-        // select everything between
-        uiStore.selectCardsUpTo(card.id)
-      }
-      return
-    }
+    const { cardType, record } = this.props
     if (e.target.className.match(/cancelGridClick/)) return
     if (e.target.tagName === 'A' && e.target.href) return
 

@@ -63,17 +63,19 @@ class TextItemCover extends React.Component {
     return uiStore.textEditingItem === item
   }
 
-  handleEdit = ev => {
-    const { item, dragging } = this.props
+  handleEdit = e => {
+    e.stopPropagation()
+    const { item, dragging, cardId } = this.props
     if (dragging) return false
     if (!item.can_edit_content) return false
     // If already editing, pass event down
     if (uiStore.dragging) return false
     if (this.isEditing) {
-      ev.stopPropagation()
       return false
     }
-    ev.stopPropagation()
+    if (uiStore.captureKeyboardGridClick(e, cardId)) {
+      return false
+    }
     uiStore.update('textEditingItem', this.state.item)
     return null
   }
@@ -192,6 +194,7 @@ class TextItemCover extends React.Component {
 TextItemCover.propTypes = {
   item: MobxPropTypes.objectOrObservableObject.isRequired,
   dragging: PropTypes.bool.isRequired,
+  cardId: PropTypes.string.isRequired,
   height: PropTypes.number,
 }
 
