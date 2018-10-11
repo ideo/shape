@@ -228,7 +228,7 @@ export default class UiStore {
   @action
   openMoveMenu({ from: fromCollectionId, cardAction }) {
     this.pageMenuOpen = false
-    this.closeCardMenu(false)
+    this.closeCardMenu()
     // On move, copy over selected cards to moving cards
     this.movingFromCollectionId = fromCollectionId
     // cardAction can be 'move' or 'link'
