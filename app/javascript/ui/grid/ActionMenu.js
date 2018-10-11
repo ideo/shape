@@ -252,6 +252,7 @@ class ActionMenu extends React.Component {
         menuItems={this.menuItems}
         menuOpen={menuOpen}
         position={{ x: uiStore.cardMenuOpen.x, y: uiStore.cardMenuOpen.y }}
+        direction={uiStore.cardMenuOpen.direction}
         width={250}
       />
     )

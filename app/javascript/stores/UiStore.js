@@ -20,7 +20,7 @@ export default class UiStore {
   @observable
   blankContentToolState = { ...this.defaultBCTState }
   @observable
-  cardMenuOpen = { id: false, x: 0, y: 0 }
+  cardMenuOpen = { id: false, x: 0, y: 0, direction: 'left' }
   @computed
   get cardMenuOpenAndPositioned() {
     const { cardMenuOpen } = this
@@ -184,12 +184,12 @@ export default class UiStore {
   }
 
   openCardMenu(id, opts = {}) {
-    const { x = 0, y = 0 } = opts
-    this.update('cardMenuOpen', { id, x, y })
+    const { x = 0, y = 0, direction = 'left' } = opts
+    this.update('cardMenuOpen', { id, x, y, direction })
   }
 
   closeCardMenu() {
-    this.update('cardMenuOpen', { id: false, x: 0, y: 0 })
+    this.update('cardMenuOpen', { id: false, x: 0, y: 0, direction: 'left' })
   }
 
   async popupSnackbar(props = {}) {

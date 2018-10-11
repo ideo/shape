@@ -80,6 +80,7 @@ class CollectionPage extends PageWithApi {
 
   handleAllClick = ev => {
     const { uiStore } = this.props
+    ev.preventDefault()
     uiStore.closeCardMenu()
   }
 
@@ -376,7 +377,10 @@ class CollectionPage extends PageWithApi {
               collection.submission_box_type &&
               this.renderSubmissionsCollection()}
             {(uiStore.dragging || uiStore.cardMenuOpenAndPositioned) && (
-              <ClickWrapper clickHandlers={[this.handleAllClick]} />
+              <ClickWrapper
+                clickHandlers={[this.handleAllClick]}
+                onContextMenu={this.handleAllClick}
+              />
             )}
           </PageContainer>
         )}

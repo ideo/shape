@@ -39,14 +39,22 @@ export const StyledMenuWrapper = styled.div`
   position: absolute;
   padding: 10px;
   z-index: ${v.zIndex.aboveClickWrapper};
-  ${props =>
-    props.position &&
-    `
-    position: absolute;
-    left: ${props.position.x - 250 + 32}px;
-    top: ${props.position.y + 10}px;
-  `} ${props =>
-    props.direction === 'right' ? 'left: 0; top: 42px;' : 'right: -32px;'};
+  ${props => {
+    if (props.position) {
+      let adjustLeft = 250
+      if (props.direction === 'right') {
+        adjustLeft = 50
+      }
+      return `
+      position: absolute;
+      left: ${props.position.x - adjustLeft + 32}px;
+      top: ${props.position.y + 10}px;
+      `
+    }
+    return ''
+  }} ${props =>
+    !props.position &&
+    (props.direction === 'right' ? 'left: 0; top: 42px;' : 'right: -32px;')};
 `
 StyledMenuWrapper.displayName = 'StyledMenuWrapper'
 
