@@ -1,5 +1,5 @@
 import { Fragment } from 'react'
-import { observable, observe, runInAction } from 'mobx'
+import { computed, observable, observe, runInAction } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import { Element as ScrollElement, scroller } from 'react-scroll'
 import VisibilitySensor from 'react-visibility-sensor'
@@ -103,7 +103,8 @@ class CommentThreadContainer extends React.Component {
 
   handleVisibilityChange = i => isVisible => {
     runInAction(() => {
-      this.visibleThreads[i] = isVisible
+      // this.visibleThreads[i] = isVisible
+      this.visibleThreads.set(i, isVisible)
     })
     const { expandedThread } = this
     if (expandedThread) {
@@ -154,16 +155,12 @@ class CommentThreadContainer extends React.Component {
     return document.getElementById(this.scrollOpts.containerId)
   }
 
+  @computed
   get showJumpToThreadButton() {
-    const { uiStore } = this.props
-    const { expandedThread } = this
-    return (
-      uiStore.viewingRecord &&
-      (uiStore.viewingRecord.isNormalCollection ||
-        uiStore.viewingRecord.internalType === 'items') &&
-      expandedThread &&
-      uiStore.viewingRecord !== this.expandedThread.record
-    )
+    const { apiStore, uiStore } = this.props
+    const thread = apiStore.findThreadForRecord(uiStore.viewingRecord)
+    const idx = this.threads.indexOf(thread)
+    return !this.visibleThreads.get(idx)
   }
 
   get expandedThread() {
@@ -260,19 +257,18 @@ class CommentThreadContainer extends React.Component {
 
   render() {
     const { uiStore } = this.props
+    const hideJumpButton = this.showJumpToThreadButton ? 'visible' : 'hidden'
     return (
       <Fragment>
-        {this.showJumpToThreadButton && (
-          <button onClick={this.jumpToCurrentThread} className="jumpToThread">
-            <h3 style={{ textAlign: 'center' }}>
-              Go to {uiStore.viewingRecord.name}
-            </h3>
-          </button>
-        )}
-        {!this.showJumpToThreadButton && (
-          // take up the same amount of space as the button
-          <div style={{ height: '2rem' }} />
-        )}
+        <button
+          style={{ visibility: hideJumpButton }}
+          onClick={this.jumpToCurrentThread}
+          className="jumpToThread"
+        >
+          <h3 style={{ textAlign: 'center' }}>
+            Go to {uiStore.viewingRecord.name}
+          </h3>
+        </button>
         <div
           style={{
             position: 'absolute',
