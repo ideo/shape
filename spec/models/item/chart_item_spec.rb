@@ -41,17 +41,6 @@ RSpec.describe Item::ChartItem, type: :model do
       end
 
       it 'should return an array of question scale to amount' do
-        expect(chart_item.org_data).to eq(
-          label: test_collection.organization.name,
-          type: 'org_wide',
-          total: 6,
-          data: [
-            { num_responses: 6, answer: 1 },
-            { num_responses: 0, answer: 2 },
-            { num_responses: 0, answer: 3 },
-            { num_responses: 0, answer: 4 },
-          ],
-        )
         expect(chart_item.chart_data).to eq(
           datasets: [
             {
