@@ -10,7 +10,7 @@ export default styled.div`
   .react-tags {
     position: relative;
     padding: 6px 0 1px 6px;
-    border-bottom: 1px solid ${v.colors.cloudy};
+    border-bottom: 1px solid ${v.colors.commonDark};
     /* shared font styles */
     font-size: 1em;
     line-height: 1.2;
@@ -19,7 +19,7 @@ export default styled.div`
     &.is-focused {
       border-width: 2px;
       padding-bottom: 0;
-      border-color: ${v.colors.blackLava};
+      border-color: ${v.colors.black};
     }
   }
 
@@ -33,13 +33,13 @@ export default styled.div`
     margin: 0 6px 6px 0;
     padding: 10px 12px;
     background: ${props =>
-      props.tagColor === 'white' ? 'white' : v.colors.cararra};
+      props.tagColor === 'white' ? 'white' : v.colors.commonLight};
     /* match the font styles */
     font-size: inherit;
     line-height: inherit;
     &:after {
       content: '×';
-      color: ${v.colors.cloudy};
+      color: ${v.colors.commonDark};
       margin-left: 8px;
     }
     &.read-only:after {
@@ -128,7 +128,7 @@ export default styled.div`
     margin-top: 0.5rem;
     margin-left: 0.5rem;
     font-size: 0.9rem;
-    color: ${v.colors.orange};
+    color: ${v.colors.alert};
   }
 
   @media screen and (min-width: 30em) {

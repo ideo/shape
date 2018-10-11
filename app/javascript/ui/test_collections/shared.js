@@ -18,13 +18,13 @@ export const TextInputHolder = StyledCommentTextarea.extend`
   color: white;
   padding: 6px;
   background-color: ${props =>
-    props.hasFocus ? v.colors.testLightBlueBg : v.colors.ctaButtonBlue};
+    props.hasFocus ? v.colors.primaryMedium : v.colors.primaryDark};
   transition: background-color 0.2s;
 `
 
 export const TextResponseHolder = StyledCommentTextarea.extend`
   position: relative;
-  background-color: ${v.colors.desert};
+  background-color: ${v.colors.commonLightest};
   padding: 6px;
   /* to account for the arrow button */
   padding-right: 24px;
@@ -45,7 +45,7 @@ TextInput.displayName = 'TextInput'
 
 export const TestQuestionInput = css`
   background-color: ${props =>
-    props.editable ? v.colors.testLightBlueBg : v.colors.ctaButtonBlue};
+    props.editable ? v.colors.primaryMedium : v.colors.primaryDark};
   border: 0;
   box-sizing: border-box;
   color: white;
@@ -71,9 +71,9 @@ TestQuestionInput.defaultProps = {
 
 export const TestQuestionHolder = styled.div`
   background-color: ${props =>
-    props.userEditable ? v.colors.testLightBlueBg : v.colors.ctaButtonBlue};
+    props.userEditable ? v.colors.primaryMedium : v.colors.primaryDark};
   border-color: ${props =>
-    props.editing ? v.colors.gray : v.colors.testLightBlueBg};
+    props.editing ? v.colors.commonMedium : v.colors.primaryMedium};
   border-bottom-width: 0;
   border-left-width: ${props => (props.editing ? '20px' : '0')};
   border-right-width: ${props => (props.editing ? '20px' : '0')};

@@ -27,7 +27,7 @@ const EditIconHolder = styled.button`
   display: block;
   margin-bottom: -8px;
   svg {
-    fill: ${v.colors.gray};
+    fill: ${v.colors.commonMedium};
     width: 18px;
   }
 `

@@ -27,7 +27,7 @@ const StyledCollectionCover = styled.div`
   width: 100%;
   height: 100%;
   background: ${props =>
-    props.isSpecialCollection ? v.colors.sirocco : v.colors.gray};
+    props.isSpecialCollection ? v.colors.offset : v.colors.commonMedium};
   color: white;
   position: relative;
   overflow: hidden;
@@ -65,7 +65,7 @@ const StyledCardContent = styled.div`
     position: absolute;
     right: 0;
     top: 0;
-    background: ${hexToRgba(v.colors.blackLava, 0.4)};
+    background: ${hexToRgba(v.colors.black, 0.4)};
     width: 100%;
     height: 100%;
   }

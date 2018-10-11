@@ -15,7 +15,7 @@ const StyledVideoCover = styled.div`
     height: 100%;
     button {
       border: none;
-      background: ${hexToRgba(v.colors.cyan, 0.75)};
+      background: ${hexToRgba(v.colors.primaryLight, 0.75)};
       transition: background 0.2s;
       color: white;
       height: 4rem;
@@ -24,7 +24,7 @@ const StyledVideoCover = styled.div`
       border-radius: 10px;
       cursor: pointer;
       &:hover {
-        background: ${v.colors.cyan};
+        background: ${v.colors.primaryLight};
       }
     }
   }

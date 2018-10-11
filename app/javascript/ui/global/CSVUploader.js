@@ -9,7 +9,7 @@ import v from '~/utils/variables'
 const StyledUploader = styled.div`
   height: 20px;
   font-size: 0.8rem;
-  color: ${v.colors.gray};
+  color: ${v.colors.commonMedium};
   font-family: ${v.fonts.sans};
   .icon {
     width: 20px;

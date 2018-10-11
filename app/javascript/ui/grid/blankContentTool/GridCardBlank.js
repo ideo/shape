@@ -80,8 +80,8 @@ const BctBackground = styled.div`
   width: 175px;
   height: 175px;
   border-radius: 50%;
-  border: 8px solid ${v.colors.cyan};
-  background: ${v.colors.aquaHaze};
+  border: 8px solid ${v.colors.primaryLight};
+  background: ${v.colors.primaryLightest};
   transition: ${v.transitionWithDelay};
 
   /* handle "small 4-col" layout i.e. layoutSize == 3 */
@@ -114,10 +114,10 @@ const BctDropzone = styled.div`
     }
     .top,
     .or {
-      color: ${v.colors.cyan};
+      color: ${v.colors.primaryLight};
     }
     .bottom {
-      color: ${v.colors.blackLava};
+      color: ${v.colors.black};
     }
     .or {
       font-size: 0.75rem;
@@ -125,7 +125,7 @@ const BctDropzone = styled.div`
     }
     p {
       font-size: 0.8rem;
-      color: ${v.colors.cloudy};
+      color: ${v.colors.commonDark};
     }
     transition: ${v.transitionWithDelay};
   }
@@ -144,7 +144,7 @@ const BctDropzone = styled.div`
     ${props =>
       props.droppingFile &&
       `
-      background: ${v.colors.cyan};
+      background: ${v.colors.primaryLight};
       &::after {
         content: '+';
         font-size: 4rem;

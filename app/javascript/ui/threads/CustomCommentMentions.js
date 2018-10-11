@@ -14,7 +14,7 @@ export const StyledCommentInput = styled.div`
   }
 
   .public-DraftEditorPlaceholder-root {
-    color: ${v.colors.gray};
+    color: ${v.colors.commonMedium};
     position: absolute;
     z-index: 1;
   }

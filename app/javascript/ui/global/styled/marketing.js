@@ -11,7 +11,7 @@ export const MarketingBack = styled.div`
   width: 100%;
   border: none;
   overflow: auto;
-  color: ${v.colors.nearwhite};
+  color: ${v.colors.commonLightest};
   background: white;
   padding-top: 0px;
 `
@@ -30,9 +30,9 @@ MarketingGradientTop.displayName = 'StyledMarketingGradientTop'
 /** @component */
 export const MarketingFooter = styled.div`
   text-align: center;
-  background: ${v.colors.activityLightBlue};
+  background: ${v.colors.secondaryLight};
   font-family: ${v.fonts.sans};
-  color: ${v.colors.desert};
+  color: ${v.colors.commonLightest};
   font-size: 1rem;
   padding-top: 56px;
   padding-bottom: 22px;
@@ -121,14 +121,14 @@ MarketingH1Bold.displayName = 'StyledMarketingH1Bold'
 
 /** @component */
 export const InvertMarketingH1 = styled(MarketingH1)`
-  color: ${v.colors.desert};
+  color: ${v.colors.commonLightest};
   text-transform: none;
 `
 InvertMarketingH1.displayName = 'StyledInvertMarketingH1'
 
 /** @component */
 export const InvertMarketingH1Bold = styled(MarketingH1Bold)`
-  color: ${v.colors.desert};
+  color: ${v.colors.commonLightest};
   text-transform: none;
 `
 InvertMarketingH1Bold.displayName = 'StyledInvertMarketingH1Bold'
@@ -148,7 +148,7 @@ MarketingH2.displayName = 'StyledMarketingH2'
 
 /** @component */
 export const InvertMarketingH2 = styled(MarketingH2)`
-  color: ${v.colors.desert};
+  color: ${v.colors.commonLightest};
   text-transform: none;
 `
 InvertMarketingH2.displayName = 'StyledInvertMarketingH2'
@@ -199,9 +199,9 @@ MarketingContentLink.displayName = 'StyledMarketingContentLink'
 
 /** @component */
 export const MarketingCallToAction = styled(MarketingContentLink)`
-  background-color: ${v.colors.cautionYellow};
+  background-color: ${v.colors.caution};
   border-radius: 4px;
-  border: 2px solid ${v.colors.cautionYellow};
+  border: 2px solid ${v.colors.caution};
   padding: 12px 16px;
   margin: 0;
   letter-spacing: 0.5px;
@@ -245,7 +245,7 @@ MarketingContent.displayName = 'StyledMarketingContent'
 
 /** @component */
 export const InvertedCentered = styled(MarketingContent)`
-  color: ${v.colors.desert};
+  color: ${v.colors.commonLightest};
   margin: auto;
 `
 InvertedCentered.displayName = 'StyledInverInvertedCentered'
@@ -262,7 +262,7 @@ InvertedFixedWidth.displayName = 'StyledInvertedFixedWidth'
 
 /** @component */
 export const MarketingStyledLink = styled(Anchor)`
-  color: ${v.colors.desert};
+  color: ${v.colors.commonLightest};
   letter-spacing: -0.2px;
   font-size: 18px;
   font-family: ${v.fonts.sans};
@@ -272,13 +272,13 @@ MarketingStyledLink.displayName = 'StyledMarketingStyledLink'
 
 /** @component */
 export const InvertMarketingLink = styled(MarketingStyledLink)`
-  color: ${v.colors.desert};
+  color: ${v.colors.commonLightest};
 `
 InvertMarketingLink.displayName = 'StyledInvertMarketingLink'
 
 /** @component */
 export const InvertMarketingLinkMail = styled(Anchor)`
-  color: ${v.colors.desert};
+  color: ${v.colors.commonLightest};
   letter-spacing: -0.2px;
   font-size: 32px;
   font-family: ${v.fonts.serif};

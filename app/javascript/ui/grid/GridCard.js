@@ -35,8 +35,7 @@ import {
 } from './shared'
 
 const PinIconHolder = styled.div`
-  background-color: ${props =>
-    props.locked ? 'transparent' : v.colors.blackLava};
+  background-color: ${props => (props.locked ? 'transparent' : v.colors.black)};
   border-radius: 50%;
   height: 24px;
   margin-left: 10px;
@@ -83,6 +82,7 @@ class GridCard extends React.Component {
               item={record}
               height={height}
               dragging={this.props.dragging}
+              cardId={card.id}
             />
           )
         case ITEM_TYPES.FILE: {
@@ -122,11 +122,11 @@ class GridCard extends React.Component {
     const { record } = this.props
     if (this.isItem) {
       if (record.isGenericFile) {
-        return v.colors.blackLava
+        return v.colors.black
       }
-      return v.colors.gray
+      return v.colors.commonMedium
     }
-    return v.colors.gray
+    return v.colors.commonMedium
   }
 
   get renderIcon() {
@@ -235,8 +235,11 @@ class GridCard extends React.Component {
   }
 
   handleClick = e => {
-    const { dragging, record } = this.props
+    const { card, dragging, record } = this.props
     if (dragging) return
+    if (uiStore.captureKeyboardGridClick(e, card.id)) {
+      return
+    }
     if (record.type === ITEM_TYPES.LINK) {
       this.linkOffsite(record.url)
       return

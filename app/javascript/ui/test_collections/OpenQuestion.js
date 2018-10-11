@@ -11,7 +11,7 @@ import { QuestionText, TextResponseHolder, TextInput } from './shared'
 
 const QuestionSpacing = css`
   border-bottom-color: ${props =>
-    props.editing ? v.colors.gray : v.colors.testLightBlueBg};
+    props.editing ? v.colors.commonMedium : v.colors.primaryMedium};
   border-bottom-style: solid;
   border-bottom-width: 4px;
 `
@@ -28,7 +28,7 @@ QuestionTextWithSpacing.displayName = 'QuestionTextWithSpacing'
 const TextEnterButton = styled.button`
   opacity: ${props => (props.focused ? 1 : 0)};
   transition: opacity 0.3s;
-  color: ${v.colors.ctaButtonBlue};
+  color: ${v.colors.primaryDark};
   vertical-align: super;
   position: absolute;
   right: 18px;
@@ -38,7 +38,7 @@ const TextEnterButton = styled.button`
 `
 
 const QuestionEntryForm = styled.form`
-  background: ${v.colors.desert};
+  background: ${v.colors.commonLightest};
 `
 QuestionEntryForm.displayName = 'QuestionEntryForm'
 
@@ -105,7 +105,7 @@ class OpenQuestion extends React.Component {
               onChange={this.handleResponse}
               onBlur={() => this.setState({ focused: false })}
               value={this.state.response}
-              color={v.colors.ctaButtonBlue}
+              color={v.colors.primaryDark}
               placeholder="write response here"
               disabled={editing}
             />

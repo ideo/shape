@@ -22,7 +22,7 @@ const StyledResizeIcon = styled.div`
   z-index: ${v.zIndex.gridCardBg};
   right: 0.75rem;
   bottom: 0.75rem;
-  color: ${v.colors.gray};
+  color: ${v.colors.commonMedium};
   width: 1.25rem;
   height: 1.25rem;
   svg {
@@ -91,7 +91,6 @@ class MovableGridCard extends React.PureComponent {
     const initialOffsetX = e.screenX - e.target.getBoundingClientRect().x
     const initialOffsetY = e.screenY - e.target.getBoundingClientRect().y
 
-    document.body.style['overflow-y'] = 'hidden'
     this.setState({
       initialOffsetX,
       initialOffsetY,
@@ -135,6 +134,8 @@ class MovableGridCard extends React.PureComponent {
     if (Math.abs(x - position.xPos) + Math.abs(y - position.yPos) < 10) {
       return
     }
+
+    document.body.style['overflow-y'] = 'hidden'
 
     if (e.clientY < TOP_SCROLL_TRIGGER) {
       // At top of viewport

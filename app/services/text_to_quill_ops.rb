@@ -10,8 +10,7 @@ class TextToQuillOps < SimpleService
   private
 
   def text_to_quill_ops
-    @text.split(/\n+/).map(&:strip).map do |string|
-      { insert: string }
-    end
+    # preserve newlines but squeeze multiple newlines/spaces
+    [{ insert: @text.squeeze("\n ").strip }]
   end
 end

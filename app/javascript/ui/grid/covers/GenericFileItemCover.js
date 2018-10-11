@@ -10,15 +10,15 @@ export const StyledCover = styled.div`
   position: relative;
   width: 100%;
   height: 100%;
-  background: ${v.colors.gray};
+  background: ${v.colors.commonMedium};
   .card-menu {
-    color: ${v.colors.blackLava};
+    color: ${v.colors.black};
   }
 `
 StyledCover.displayName = 'StyledCover'
 
 export const FileContainer = styled.div`
-  background-color: ${v.colors.blackLava};
+  background-color: ${v.colors.black};
   border-radius: 12px;
   height: 100%;
   overflow: hidden;

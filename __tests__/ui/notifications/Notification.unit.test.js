@@ -68,7 +68,7 @@ describe('Notification', () => {
 
       it('should change the styles', () => {
         const ele = wrapper.find('StyledNotification')
-        expect(ele).toHaveStyleRule('background', v.colors.orange)
+        expect(ele).toHaveStyleRule('background', v.colors.alert)
         expect(ele).toHaveStyleRule('margin-right', '0px')
       })
     })

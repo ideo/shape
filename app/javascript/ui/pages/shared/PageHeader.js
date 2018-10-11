@@ -34,7 +34,7 @@ const FixedPageHeader = FixedHeader.extend`
 `
 
 const IconHolder = styled.span`
-  color: ${v.colors.cloudy};
+  color: ${v.colors.commonDark};
   display: block;
   height: 32px;
   ${props =>
@@ -57,12 +57,12 @@ const HeaderFormButton = FormButton.extend`
 HeaderFormButton.displayName = 'HeaderFormButton'
 HeaderFormButton.defaultProps = {
   'data-cy': 'HeaderFormButton',
-  color: v.colors.blackLava,
+  color: v.colors.black,
 }
 
 const LiveTestIndicator = styled.span`
   display: inline-block;
-  color: ${v.colors.orange};
+  color: ${v.colors.alert};
   font-weight: 500;
   font-size: 1rem;
   font-family: ${v.fonts.sans};
@@ -336,7 +336,7 @@ class PageHeader extends React.Component {
                 {record.isUsableTemplate && (
                   <HeaderFormButton
                     width="160"
-                    color={v.colors.ctaButtonBlue}
+                    color={v.colors.primaryDark}
                     onClick={this.openMoveMenuForTemplate}
                   >
                     Use Template
