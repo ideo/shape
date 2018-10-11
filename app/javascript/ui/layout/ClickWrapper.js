@@ -5,7 +5,7 @@ import v from '~/utils/variables'
 
 const StyledClickWrapper = styled.div`
   position: fixed;
-  top: 0;
+  top: ${props => props.top}px;
   left: 0;
   right: 0;
   bottom: 0;
@@ -21,12 +21,19 @@ class ClickWrapper extends React.Component {
   }
 
   render() {
-    return <StyledClickWrapper onClick={this.handleClick} />
+    return (
+      <StyledClickWrapper top={this.props.top} onClick={this.handleClick} />
+    )
   }
 }
 
 ClickWrapper.propTypes = {
-  clickHandlers: PropTypes.arrayOf(PropTypes.func).isRequired,
+  top: PropTypes.number,
+  clickHandlers: PropTypes.arrayOf(PropTypes.func),
+}
+ClickWrapper.defaultProps = {
+  clickHandlers: [],
+  top: 0,
 }
 
 export default ClickWrapper

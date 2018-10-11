@@ -161,4 +161,26 @@ describe('ActivityLogBox', () => {
       expect(localStorage.getItem(PAGE_KEY)).toEqual('notifications')
     })
   })
+
+  describe('handleMoveStart', () => {
+    it('should display the ClickWrapper', () => {
+      expect(wrapper.find('ClickWrapper').exists()).toBeFalsy()
+      component.handleMoveStart()
+      wrapper.update()
+      expect(wrapper.find('ClickWrapper').exists()).toBeTruthy()
+    })
+  })
+
+  describe('handleMoveStop', () => {
+    beforeEach(() => {
+      component.handleMoveStart()
+      wrapper.update()
+    })
+    it('should hide the ClickWrapper', () => {
+      expect(wrapper.find('ClickWrapper').exists()).toBeTruthy()
+      component.handleMoveStop()
+      wrapper.update()
+      expect(wrapper.find('ClickWrapper').exists()).toBeFalsy()
+    })
+  })
 })
