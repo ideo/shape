@@ -31,12 +31,11 @@ RSpec.describe Item::ChartItem, type: :model do
                survey_response: survey_response,
                question: question_item)
       end
-      let!(:chart_item) { create(:chart_item) }
+      let!(:chart_item) { create(:chart_item, data_source: question_item) }
       let(:card) { test_collection.collection_cards.first }
 
       before do
         survey_response.update_attribute(:status, :completed)
-        chart_item.update(data_source: question_item)
         other_test_collection.reload
         card.update(item: chart_item)
       end
