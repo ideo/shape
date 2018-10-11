@@ -181,7 +181,6 @@ class CommentThreadContainer extends React.Component {
       return false
     const thread = apiStore.findThreadForRecord(uiStore.viewingRecord)
     const idx = this.threads.indexOf(thread)
-    console.log('fuck', this.visibleThreads)
     return !this.visibleThreads.get(idx)
   }
 
