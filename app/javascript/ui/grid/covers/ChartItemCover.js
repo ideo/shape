@@ -130,7 +130,7 @@ class ChartItemCover extends React.Component {
                 data={d.data}
                 barWidth={30}
                 x="answer"
-                y="percentage"
+                y={datum => Math.max(datum.percentage, 0.5)}
                 labels={(datum, active) =>
                   datum.type === 'question_items' ? `${datum.percentage}%` : ''
                 }
