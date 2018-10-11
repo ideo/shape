@@ -231,7 +231,11 @@ class ActivityLogBox extends React.Component {
           right: true,
         }}
         disableDragging={false}
+        onDragStart={this.handleDragStart}
+        onResizeStart={this.handleDragStart}
+        onResizeStop={this.handleDragStop}
         onDragStop={(ev, d) => {
+          this.handleDragStop()
           this.updatePosition(d)
         }}
         onResize={(ev, dir, ref, delta, position) => {
