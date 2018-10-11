@@ -64,7 +64,7 @@ FactoryBot.define do
       trait :completed do
         after(:create) do |collection|
           media_question = collection.prelaunch_question_items.detect(&:question_media?)
-          media_question&.update(url: 'something')
+          media_question&.update(type: 'Item::VideoItem', url: 'something', thumbnail_url: 'something', question_type: nil)
           description_question = collection.prelaunch_question_items.detect(&:question_description?)
           description_question&.update(content: 'something')
         end
