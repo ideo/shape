@@ -27,6 +27,14 @@ const GoIconContainer = styled.span`
   width: 15px;
 `
 
+const JumpButton = styled.button`
+  min-height: 20px;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: -30px;
+  visibility: ${props => props.hide};
+`
+
 @inject('apiStore', 'uiStore')
 @observer
 class CommentThreadContainer extends React.Component {
@@ -169,9 +177,11 @@ class CommentThreadContainer extends React.Component {
   @computed
   get showJumpToThreadButton() {
     const { apiStore, uiStore } = this.props
-    if (!uiStore.viewingRecord.isNormalCollection) return false
+    if (!uiStore.viewingRecord || !uiStore.viewingRecord.isNormalCollection)
+      return false
     const thread = apiStore.findThreadForRecord(uiStore.viewingRecord)
     const idx = this.threads.indexOf(thread)
+    console.log('fuck', this.visibleThreads)
     return !this.visibleThreads.get(idx)
   }
 
@@ -272,12 +282,8 @@ class CommentThreadContainer extends React.Component {
     const hideJumpButton = this.showJumpToThreadButton ? 'visible' : 'hidden'
     return (
       <Fragment>
-        <button
-          style={{
-            visibility: hideJumpButton,
-            minHeight: '20px',
-            marginTop: '-30px',
-          }}
+        <JumpButton
+          hide={hideJumpButton}
           onClick={this.jumpToCurrentThread}
           className="jumpToThread"
         >
@@ -285,9 +291,9 @@ class CommentThreadContainer extends React.Component {
             <GoIconContainer>
               <GoIcon />
             </GoIconContainer>
-            Go to {uiStore.viewingRecord.name}
+            Go to {uiStore.viewingRecord && uiStore.viewingRecord.name}
           </SmallActionText>
-        </button>
+        </JumpButton>
         <div
           style={{
             position: 'absolute',
