@@ -37,6 +37,9 @@ export const theme = objectAssignDeep({}, VictoryTheme.grayscale, {
       labels: Object.assign({}, themeLabelStyles, {
         fontSize: 10.5,
       }),
+      border: {
+        fill: 'rgba(255, 255, 255, 0.5)',
+      },
       title: themeLabelStyles,
     },
   },
