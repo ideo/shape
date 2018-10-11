@@ -1,14 +1,24 @@
-import _ from 'lodash'
 import PropTypes from 'prop-types'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import { observable, runInAction } from 'mobx'
-import { VictoryAxis, VictoryBar, VictoryChart, VictoryLabel } from 'victory'
+import {
+  VictoryAxis,
+  VictoryBar,
+  VictoryChart,
+  VictoryGroup,
+  VictoryLabel,
+  VictoryLegend,
+} from 'victory'
 import styled from 'styled-components'
 
 import { apiStore } from '~/stores'
 import { Heading1, Heading3 } from '~/ui/global/styled/typography'
+import {
+  questionInformation,
+  theme,
+  themeLabelStyles,
+} from '~/ui/test_collections/shared'
 import v from '~/utils/variables'
-import { questionInformation } from '~/ui/test_collections/shared'
 
 const CoverContainer = styled.div`
   padding: 16px;
@@ -53,18 +63,22 @@ class ChartItemCover extends React.Component {
 
   get formattedData() {
     const { item } = this.props
-    const formattedData = []
-    const total = Object.keys(item.chart_data).reduce(
-      (previous, key) => previous + item.chart_data[key],
-      0
-    )
-    _.forEach(item.chart_data, (value, key) => {
-      formattedData.push({
-        scale: key,
-        value: value > 0 ? parseInt((value / total) * 100) : 0,
+    const raw = item.chart_data
+    const formatted = raw.datasets.map(set => {
+      const formattedPercentage = set.data.map(d => {
+        const percentage =
+          d.num_responses > 0
+            ? parseInt((d.num_responses / set.total) * 100)
+            : 0
+        return Object.assign({}, d, {
+          percentage,
+          total: set.total,
+          type: set.type,
+        })
       })
+      return Object.assign({}, set, { data: formattedPercentage })
     })
-    return formattedData
+    return { datasets: formatted }
   }
 
   get mapQuestionType() {
@@ -89,29 +103,74 @@ class ChartItemCover extends React.Component {
             <Heading3>{this.mapQuestionType.questionText}</Heading3>
           </div>
         )}
-        <VictoryChart domainPadding={14}>
+        <VictoryChart domainPadding={14} domain={{ y: [0, 80] }} theme={theme}>
+          <VictoryLegend
+            x={4}
+            y={4}
+            borderPadding={0}
+            gutter={0}
+            orientation="vertical"
+            padding={0}
+            rowGutter={0}
+            data={[{ name: 'Age test' }, { name: 'IDEO Organization' }]}
+          />
           <VictoryAxis
             style={{
               axis: { stroke: 'transparent' },
             }}
-            tickValues={[0, 1, 2, 3]}
+            tickValues={[1, 2, 3, 4]}
             tickFormat={this.emojiScale.map(e => e.symbol)}
             tickLabelComponent={<Tick emojiScale={this.emojiScale} />}
           />
-          <VictoryBar
-            data={this.formattedData}
-            x="scale"
-            y="value"
-            labels={d => `${d.value}%`}
-            style={{
-              data: { fill: v.colors.tertiaryMedium },
-              labels: {
-                fontFamily: v.fonts.sans,
-                fontSize: 16,
-                fill: v.colors.tertiaryMedium,
-              },
-            }}
-          />
+          <VictoryGroup offset={30}>
+            {this.formattedData.datasets.map(d => (
+              <VictoryBar
+                key={d.type}
+                padding={10}
+                data={d.data}
+                barWidth={30}
+                x="answer"
+                y={datum => Math.max(datum.percentage, 0.5)}
+                labels={(datum, active) =>
+                  datum.type === 'question_items' ? `${datum.percentage}%` : ''
+                }
+                events={[
+                  {
+                    target: 'data',
+                    eventHandlers: {
+                      onMouseOver: () => [
+                        {
+                          target: 'labels',
+                          mutation: props => {
+                            const { datum } = props
+                            return {
+                              text: `${datum.num_responses}/${
+                                datum.total
+                              } \ntotal`,
+                              style: Object.assign({}, themeLabelStyles, {
+                                fill:
+                                  d.type === 'question_items'
+                                    ? v.colors.tertiaryMedium
+                                    : v.colors.primaryMediumDark,
+                                fontSize: 9,
+                                maxWidth: 20,
+                              }),
+                            }
+                          },
+                        },
+                      ],
+                      onMouseOut: () => [
+                        {
+                          target: 'labels',
+                          mutation: props => null,
+                        },
+                      ],
+                    },
+                  },
+                ]}
+              />
+            ))}
+          </VictoryGroup>
         </VictoryChart>
       </CoverContainer>
     )

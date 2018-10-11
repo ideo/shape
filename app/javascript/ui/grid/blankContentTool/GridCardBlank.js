@@ -23,7 +23,6 @@ import CollectionCard from '~/stores/jsonApi/CollectionCard'
 
 import CollectionCreator from './CollectionCreator'
 import TextItemCreator from './TextItemCreator'
-import VideoCreator from './VideoCreator'
 import LinkCreator from './LinkCreator'
 import BctButtonBox from './BctButtonBox'
 import BctButtonRotation from './BctButtonRotation'
@@ -365,7 +364,8 @@ class GridCardBlank extends React.Component {
         break
       case 'video':
         inner = (
-          <VideoCreator
+          <LinkCreator
+            type="video"
             loading={loading}
             createCard={this.createCard}
             closeBlankContentTool={this.closeBlankContentTool}
@@ -375,6 +375,7 @@ class GridCardBlank extends React.Component {
       case 'link':
         inner = (
           <LinkCreator
+            type="link"
             loading={loading}
             createCard={this.createCard}
             closeBlankContentTool={this.closeBlankContentTool}

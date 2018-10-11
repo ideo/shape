@@ -23,15 +23,15 @@ describe('VideoItemCover', () => {
     )
   })
 
-  it('does not play ReactPlayer by default', () => {
+  it('does not play VideoPlayer by default', () => {
     expect(wrapper.state().playing).toBe(false)
-    expect(wrapper.find('ReactPlayer').props().playing).toBe(false)
+    expect(wrapper.find('VideoPlayer').props().playing).toBe(false)
   })
 
-  it('opens an auto-playing ReactPlayer when clicking the play button', () => {
+  it('opens an auto-playing VideoPlayer when clicking the play button', () => {
     wrapper.find('button').simulate('click')
     expect(wrapper.state().playing).toBe(true)
-    expect(wrapper.find('ReactPlayer').props().playing).toBe(true)
-    expect(wrapper.find('ReactPlayer').props().url).toEqual(fakeVideoItem.url)
+    expect(wrapper.find('VideoPlayer').props().playing).toBe(true)
+    expect(wrapper.find('VideoPlayer').props().url).toEqual(fakeVideoItem.url)
   })
 })

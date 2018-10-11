@@ -240,6 +240,8 @@ class MovableGridCard extends React.PureComponent {
       uiStore.closeCardMenu()
       return
     }
+    // this first case means it's probably an SVG/path (e.g. ChartItem)
+    if (!e.target.className || !e.target.className.match) return
     if (e.target.className.match(/cancelGridClick/)) return
     if (e.target.tagName === 'A' && e.target.href) return
 
