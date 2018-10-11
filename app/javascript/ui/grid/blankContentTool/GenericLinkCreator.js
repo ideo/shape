@@ -5,6 +5,8 @@ import PaddedCardCover from '~/ui/grid/covers/PaddedCardCover'
 import { KEYS } from '~/utils/variables'
 import ValidIndicator from './ValidIndicator'
 
+// NOTE: This component used to be shared between LinkCreator and VideoCreator
+// but now those have merged into one.
 const GenericLinkCreator = ({
   url,
   urlValid,
@@ -16,7 +18,7 @@ const GenericLinkCreator = ({
 }) => {
   let validIndicator = ''
   if (url.length > 3) {
-    validIndicator = <ValidIndicator valid={urlValid} loading={loading} />
+    validIndicator = <ValidIndicator valid={!!urlValid} loading={loading} />
   }
 
   const handleKeyDown = e => {
