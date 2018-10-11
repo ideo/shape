@@ -300,7 +300,7 @@ class GridCard extends React.Component {
               <ActionMenu
                 location="GridCard"
                 className={hoverClass}
-                stylingClass="card-menu"
+                wrapperClassName="card-menu"
                 card={card}
                 canEdit={this.canEditCard}
                 canReplace={record.canReplace}

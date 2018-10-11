@@ -147,7 +147,7 @@ class PopoutMenu extends React.Component {
   render() {
     const {
       className,
-      stylingClass,
+      wrapperClassName,
       menuOpen,
       disabled,
       onMouseLeave,
@@ -163,7 +163,7 @@ class PopoutMenu extends React.Component {
     const MenuToggle = isBct ? BctButton : StyledMenuToggle
     return (
       <StyledMenuButtonWrapper
-        className={`${stylingClass} ${menuOpen && ' open'}`}
+        className={`${wrapperClassName} ${menuOpen && ' open'}`}
         role="presentation"
         onMouseLeave={onMouseLeave}
       >
@@ -204,7 +204,7 @@ PopoutMenu.propTypes = {
   onMouseLeave: PropTypes.func,
   onClick: PropTypes.func,
   className: PropTypes.string,
-  stylingClass: PropTypes.string,
+  wrapperClassName: PropTypes.string,
   width: PropTypes.number,
   menuOpen: PropTypes.bool,
   disabled: PropTypes.bool,
@@ -233,7 +233,7 @@ PopoutMenu.defaultProps = {
   menuItems: [],
   groupedMenuItems: {},
   className: '',
-  stylingClass: 'card-menu',
+  wrapperClassName: 'card-menu',
   menuOpen: false,
   position: null,
   disabled: false,

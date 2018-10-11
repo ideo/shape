@@ -242,11 +242,11 @@ class ActionMenu extends React.Component {
   }
 
   render() {
-    const { className, menuOpen, stylingClass, uiStore } = this.props
+    const { className, menuOpen, wrapperClassName, uiStore } = this.props
     return (
       <PopoutMenu
         className={className}
-        stylingClass={stylingClass}
+        wrapperClassName={wrapperClassName}
         onMouseLeave={this.handleMouseLeave}
         onClick={this.toggleOpen}
         menuItems={this.menuItems}
@@ -261,7 +261,7 @@ class ActionMenu extends React.Component {
 ActionMenu.propTypes = {
   card: MobxPropTypes.objectOrObservableObject.isRequired,
   className: PropTypes.string,
-  stylingClass: PropTypes.string,
+  wrapperClassName: PropTypes.string,
   location: PropTypes.string.isRequired,
   menuOpen: PropTypes.bool.isRequired,
   canEdit: PropTypes.bool.isRequired,
@@ -280,7 +280,7 @@ ActionMenu.displayName = 'ActionMenu'
 
 ActionMenu.defaultProps = {
   className: '',
-  stylingClass: 'card-menu',
+  wrapperClassName: 'card-menu',
   onMoveMenu: null,
   afterArchive: null,
   canReplace: false,

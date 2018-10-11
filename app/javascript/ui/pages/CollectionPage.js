@@ -80,7 +80,7 @@ class CollectionPage extends PageWithApi {
 
   handleAllClick = ev => {
     const { uiStore } = this.props
-    uiStore.openCardMenu(false)
+    uiStore.closeCardMenu()
   }
 
   receivedChannelData = async data => {

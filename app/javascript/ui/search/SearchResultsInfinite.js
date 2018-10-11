@@ -147,7 +147,8 @@ class SearchResultsInfinite extends React.Component {
                   <SelectionCircle cardId={card.id} />
                   <ActionMenu
                     location="Search"
-                    className="show-on-hover card-menu"
+                    className="show-on-hover"
+                    wrapperClassName="card-menu"
                     card={card}
                     canEdit={false}
                     canReplace={false}
