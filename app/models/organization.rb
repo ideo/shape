@@ -150,6 +150,10 @@ class Organization < ApplicationRecord
 
   private
 
+  def should_generate_new_friendly_id?
+    slug.blank? && handle.present?
+  end
+
   def parse_domain_whitelist
     return true unless will_save_change_to_domain_whitelist?
     if domain_whitelist.is_a?(String)

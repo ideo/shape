@@ -18,7 +18,7 @@ class Group < ApplicationRecord
   alias resourceable_can_view? can_view?
   alias resourceable_can_edit? can_edit?
 
-  after_update :update_organization
+  after_save :update_organization
   after_create :create_shared_collection
 
   rolify after_add: :after_role_update,
