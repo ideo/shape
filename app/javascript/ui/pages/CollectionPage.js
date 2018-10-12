@@ -275,8 +275,8 @@ class CollectionPage extends PageWithApi {
               updateCollection={this.updateCollection}
               collection={submissions_collection}
               canEditCollection={false}
-              // Pass in cardIds so grid will re-render when they change
-              cardIds={submissions_collection.cardIds}
+              // Pass in cardProperties so grid will re-render when they change
+              cardProperties={submissions_collection.cardProperties}
               // Pass in BCT state so grid will re-render when open/closed
               blankContentToolState={blankContentToolState}
               submissionSettings={{
@@ -355,9 +355,7 @@ class CollectionPage extends PageWithApi {
                 collection={collection}
                 canEditCollection={collection.can_edit_content}
                 // Pass in cardProperties so grid will re-render when they change
-                cardProperties={collection.collection_cards.map(c =>
-                  _.pick(c, ['id', 'order', 'width', 'height'])
-                )}
+                cardProperties={collection.cardProperties}
                 // Pass in BCT state so grid will re-render when open/closed
                 blankContentToolState={blankContentToolState}
                 movingCardIds={uiMovingCardIds}
