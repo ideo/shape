@@ -201,6 +201,8 @@ class CommentThread extends React.Component {
 
   render() {
     const { thread, expanded } = this.props
+    const unexpandedClickable = !expanded && thread.unreadCount > 0
+    const CommentsTag = unexpandedClickable ? 'button' : 'div'
 
     return (
       <StyledCommentThread hasMore={thread.hasMore} expanded={expanded}>
@@ -223,11 +225,16 @@ class CommentThread extends React.Component {
             {this.renderUnreadCount()}
           </StyledHeader>
         </button>
-        <div className="comments">
+        <CommentsTag
+          className="comments"
+          onClick={
+            unexpandedClickable ? this.props.onClick : ev => ev.preventDefault()
+          }
+        >
           {thread.hasMore &&
             expanded && <CommentThreadLoader thread={thread} />}
           {this.renderComments()}
-        </div>
+        </CommentsTag>
         <CommentEntryForm
           expanded={expanded}
           thread={thread}
