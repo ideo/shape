@@ -113,6 +113,10 @@ export const ThumbnailHolder = styled.span`
 `
 ThumbnailHolder.displayName = 'ThumbnailHolder'
 
+const StyledCommentsWrapper = styled.div`
+  cursor: ${props => (props.clickable ? 'pointer' : 'auto')};
+`
+
 @observer
 class CommentThread extends React.Component {
   @observable
@@ -202,7 +206,6 @@ class CommentThread extends React.Component {
   render() {
     const { thread, expanded } = this.props
     const unexpandedClickable = !expanded && thread.unreadCount > 0
-    const CommentsTag = unexpandedClickable ? 'button' : 'div'
 
     return (
       <StyledCommentThread hasMore={thread.hasMore} expanded={expanded}>
@@ -225,7 +228,8 @@ class CommentThread extends React.Component {
             {this.renderUnreadCount()}
           </StyledHeader>
         </button>
-        <CommentsTag
+        <StyledCommentsWrapper
+          clickable={unexpandedClickable}
           className="comments"
           onClick={
             unexpandedClickable ? this.props.onClick : ev => ev.preventDefault()
@@ -234,7 +238,7 @@ class CommentThread extends React.Component {
           {thread.hasMore &&
             expanded && <CommentThreadLoader thread={thread} />}
           {this.renderComments()}
-        </CommentsTag>
+        </StyledCommentsWrapper>
         <CommentEntryForm
           expanded={expanded}
           thread={thread}
