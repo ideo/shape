@@ -3,6 +3,8 @@ import { Fragment } from 'react'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 import Dotdotdot from 'react-dotdotdot'
+import Hypher from 'hypher'
+import english from 'hyphenation.en-us'
 
 import v from '~/utils/variables'
 import PlainLink from '~/ui/global/PlainLink'
@@ -94,24 +96,38 @@ StyledCardContent.displayName = 'StyledCardContent'
 
 const PositionedCardHeading = CardHeading.extend`
   position: absolute;
-  bottom: 0;
 `
 
 function splitName(name) {
   return name.split(' ')
 }
 
+const Hyphy = new Hypher(english)
+function hyphenate(namePart) {
+  const hyphenated = Hyphy.hyphenateText(namePart, 10)
+  // u00AD is the "soft" hyphenation character Hypher uses
+  if (!hyphenated.includes('\u00AD')) return namePart
+  const parts = hyphenated.split('\u00AD')
+  // u2010 is the "hard" hyphenation character required by the browser
+  return `${parts.slice(0, -1).join('')}\u2010${parts.slice(-1)}`
+}
+
 @inject('uiStore')
 @observer
 class CollectionCover extends React.Component {
-  get name() {
+  get hasIcon() {
     const { collection } = this.props
-    const hasIcon =
+    return (
       collection.isTemplated ||
       collection.isMasterTemplate ||
       collection.isSubmissionBox ||
       collection.isTestCollectionOrTestDesign
-    if (hasIcon) {
+    )
+  }
+
+  get name() {
+    const { collection } = this.props
+    if (this.hasIcon) {
       const nameParts = splitName(collection.name)
       if (!nameParts) return collection.name
       const lastName = nameParts.pop()
@@ -134,8 +150,12 @@ class CollectionCover extends React.Component {
         <Fragment>
           {leftIcon && <IconHolder>{leftIcon}</IconHolder>}
           {nameParts.join(' ')}{' '}
-          <span style={{ whiteSpace: 'nowrap' }}>
-            {lastName}
+          <span
+            style={{
+              hyphens: 'manual',
+            }}
+          >
+            {hyphenate(lastName)}
             &nbsp;
             {rightIcon && <IconHolder>{rightIcon}</IconHolder>}
           </span>
