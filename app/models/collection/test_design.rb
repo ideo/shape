@@ -20,6 +20,15 @@ class Collection
       )
     end
 
+    def complete_collection_cards
+      # This is just excluding any blank question cards, but will still include
+      # blank description or media question cards
+      table = Item.arel_table
+      collection_cards.joins(
+        :item,
+      ).where.not(table[:type].eq('Item::QuestionItem').and(table[:question_type].eq(nil)))
+    end
+
     private
 
     def close_test
