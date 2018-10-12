@@ -24,7 +24,7 @@ const fakeApiStore = ({ findResult = '', findAllResult = [], requestResult = '' 
     findOrganizationById: jest.fn().mockReturnValue({ name: 'abc' }),
     fetchThreads: jest.fn().mockReturnValue(Promise.resolve()),
     fetchNotifications: jest.fn().mockReturnValue(Promise.resolve()),
-    findOrBuildCommentThread: jest.fn().mockReturnValue(Promise.resolve()),
+    findOrBuildCommentThread: jest.fn().mockReturnValue(Promise.resolve({ key: 'x' })),
     findThreadForRecord: jest.fn(),
     createTemplateInstance: jest.fn(),
     moveCards: jest.fn(),
