@@ -196,6 +196,8 @@ class CommentThreadContainer extends React.Component {
       // notification may have been cleared out
       if (!notification) return false
       const { activity } = notification
+      // bug?
+      if (!activity) return false
       if (activity.action === 'mentioned') return true
       const identifier = `${pluralTypeName(activity.target_type)}${
         activity.target_id

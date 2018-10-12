@@ -4,7 +4,6 @@ import Avatar from '~/ui/global/Avatar'
 import v from '~/utils/variables'
 
 export const StyledCommentInput = styled.div`
-  cursor: text;
   padding: 10px;
   padding-right: 45px;
   font-size: 1rem;
