@@ -19,6 +19,15 @@ const Question = styled.div`
   color: white;
   padding: 12px 12px 16px 12px;
   width: 100%;
+  .editable-text {
+    margin: -1px 4px -1px 5px;
+    padding: 2px 3px;
+    transition: background-color 250ms;
+    display: inline-block;
+  }
+  &:hover .editable-text {
+    background-color: rgba(255, 255, 255, 0.5);
+  }
 `
 Question.displayName = 'Question'
 
@@ -55,7 +64,7 @@ const EditableInput = styled(AutosizeInput)`
     background-color: rgba(255, 255, 255, 0.5);
     border: 0;
     padding: 2px 3px;
-    margin: -1px 5px -1px 5px;
+    margin: -1px 2px -1px 5px;
     font-size: 16px;
     font-family: ${v.fonts.sans};
     font-size: 1rem;
@@ -68,6 +77,7 @@ const EditableInput = styled(AutosizeInput)`
     }
   }
 `
+EditableInput.displayName = 'EditableInput'
 
 @observer
 class ScaleQuestion extends React.Component {
@@ -95,9 +105,13 @@ class ScaleQuestion extends React.Component {
     return false
   }
 
-  handleChange = event => {
+  handleInputChange = event => {
     this.setState({ questionContent: event.target.value })
     this.debouncedUpdateQuestionContent()
+  }
+
+  handleKeyPress = event => {
+    if (event.key === 'Enter') this.stopEditingIfContent()
   }
 
   startEditing = () => {
@@ -121,8 +135,12 @@ class ScaleQuestion extends React.Component {
     const { editing, questionContent } = this.state
     if (!editing)
       return (
-        <DisplayText onClick={this.startEditing}>
-          {questionText} {questionContent}?
+        <DisplayText
+          onClick={this.startEditing}
+          alt={`${questionText} ${questionContent}?`}
+        >
+          {questionText}
+          <div className="editable-text">{questionContent}</div>?
         </DisplayText>
       )
     return (
@@ -132,7 +150,8 @@ class ScaleQuestion extends React.Component {
           type="text"
           placeholder="type your category here"
           value={questionContent}
-          onChange={this.handleChange}
+          onChange={this.handleInputChange}
+          onKeyPress={this.handleKeyPress}
           onBlur={this.stopEditingIfContent}
         />
         ?
