@@ -137,7 +137,7 @@ export const emojiSeriesMap = {
 }
 
 export const questionInformation = question => {
-  const { questionType } = question
+  const questionType = question.question_type
   let emojiSeriesName
   let questionText
   let questionTitle

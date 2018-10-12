@@ -1,6 +1,7 @@
 import PropTypes from 'prop-types'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
+import AutosizeInput from 'react-input-autosize'
 import { debounce } from 'lodash'
 
 import Tooltip from '~/ui/global/Tooltip'
@@ -49,11 +50,31 @@ const EmojiButton = styled.button`
 `
 EmojiButton.displayName = 'EmojiButton'
 
+const EditableInput = styled(AutosizeInput)`
+  input {
+    background-color: rgba(255, 255, 255, 0.5);
+    border: 0;
+    padding: 2px 3px;
+    margin: -1px 5px -1px 5px;
+    font-size: 16px;
+    font-family: ${v.fonts.sans};
+    font-size: 1rem;
+    color: ${v.colors.white};
+    &:focus {
+      outline: 0;
+    }
+    &::placeholder {
+      color: ${v.colors.white};
+    }
+  }
+`
+
 @observer
 class ScaleQuestion extends React.Component {
   constructor(props) {
     super(props)
     this.state = {
+      editing: !props.question.content,
       questionContent: props.question.content,
     }
     this.debouncedUpdateQuestionContent = debounce(
@@ -79,6 +100,16 @@ class ScaleQuestion extends React.Component {
     this.debouncedUpdateQuestionContent()
   }
 
+  startEditing = () => {
+    this.setState({ editing: true })
+  }
+
+  stopEditingIfContent = () => {
+    const { questionContent } = this.state
+    if (!questionContent) return
+    this.setState({ editing: false })
+  }
+
   updateQuestionContent = () => {
     const { questionContent } = this.state
     const { question } = this.props
@@ -87,15 +118,24 @@ class ScaleQuestion extends React.Component {
   }
 
   renderEditableCategory = questionText => {
-    const { questionContent } = this.state
+    const { editing, questionContent } = this.state
+    if (!editing)
+      return (
+        <DisplayText onClick={this.startEditing}>
+          {questionText} {questionContent}?
+        </DisplayText>
+      )
     return (
       <DisplayText>
         {questionText}
-        <input
+        <EditableInput
           type="text"
+          placeholder="type your category here"
           value={questionContent}
           onChange={this.handleChange}
+          onBlur={this.stopEditingIfContent}
         />
+        ?
       </DisplayText>
     )
   }
