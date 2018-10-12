@@ -100,6 +100,30 @@ describe('ScaleQuestion', () => {
         expect(input.props().value).toEqual(undefined)
       })
 
+      describe('if not editable', () => {
+        beforeEach(() => {
+          props.question.question_type = 'question_category_satisfaction'
+          props.question.content = 'magic wand'
+          props.editable = false
+          wrapper = shallow(<ScaleQuestion {...props} />)
+        })
+
+        it('should have text, and not editable input field', () => {
+          expect(
+            wrapper
+              .find('Question')
+              .find('StyledDisplayText')
+              .props().alt
+          ).toEqual('How satisifed are you with your current magic wand?')
+          expect(
+            wrapper
+              .find('Question')
+              .find('EditableInput')
+              .exists()
+          ).toEqual(false)
+        })
+      })
+
       describe('if it has content', () => {
         beforeEach(() => {
           props.question.question_type = 'question_category_satisfaction'
