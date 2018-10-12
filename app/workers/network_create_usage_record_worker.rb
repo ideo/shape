@@ -1,4 +1,4 @@
-class NetworkSendSeatUsageWorker
+class NetworkCreateUsageRecordWorker
   include Sidekiq::Worker
 
   def perform

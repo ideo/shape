@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe NetworkSendSeatUsageWorker, type: :worker do
+RSpec.describe NetworkCreateUsageRecordWorker, type: :worker do
   describe '#perform' do
     let(:organization1) { create(:organization) }
     let(:organization2) { create(:organization) }
@@ -11,7 +11,7 @@ RSpec.describe NetworkSendSeatUsageWorker, type: :worker do
         .and_yield(organization2)
       expect(organization1).to receive(:create_network_usage_record)
       expect(organization2).to receive(:create_network_usage_record)
-      NetworkSendSeatUsageWorker.new.perform
+      NetworkCreateUsageRecordWorker.new.perform
     end
   end
 end
