@@ -25,3 +25,6 @@ production:
   notification_mailer:
     every: '4h'
     class: NotificationMailerWorker
+  network_create_usage_record:
+    cron: '30 21 * * *'
+    class: NetworkCreateUsageRecordWorker

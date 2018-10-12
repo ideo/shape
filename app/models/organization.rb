@@ -1,4 +1,8 @@
 class Organization < ApplicationRecord
+  RECENTLY_ACTIVE_RANGE = 90.days
+  DEFAULT_TRIAL_ENDS_AT = 90.days
+  DEFAULT_TRIAL_USERS_COUNT = 25
+
   extend FriendlyId
   friendly_id :slug_candidates, use: %i[slugged finders history]
 
@@ -164,6 +168,40 @@ class Organization < ApplicationRecord
     return network_organization if network_organization.present?
 
     create_network_organization(admin)
+  end
+
+  def calculate_active_users_count!
+    count = all_active_users
+            .where('last_active_at > ?', RECENTLY_ACTIVE_RANGE.ago)
+            .count
+    update_attributes(active_users_count: count)
+  end
+
+  def within_trial_period?
+    trial_ends_at > Time.current
+  end
+
+  def create_network_usage_record
+    calculate_active_users_count!
+    count = active_users_count
+
+    if within_trial_period?
+      return true unless count > DEFAULT_TRIAL_USERS_COUNT
+
+      count -= DEFAULT_TRIAL_USERS_COUNT
+    end
+
+    if NetworkApi::UsageRecord.create(
+      quantity: count,
+      timestamp: Time.current.end_of_day.to_i,
+      external_organization_id: id,
+    )
+      true
+    else
+      false
+    end
+  rescue JsonApiClient::Errors::ServerError
+    false
   end
 
   private

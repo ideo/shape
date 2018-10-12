@@ -10,11 +10,10 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20181009204421) do
+ActiveRecord::Schema.define(version: 20181009212705) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
-  enable_extension "pg_stat_statements"
 
   create_table "activities", force: :cascade do |t|
     t.bigint "actor_id"
@@ -217,6 +216,9 @@ ActiveRecord::Schema.define(version: 20181009204421) do
     t.integer "profile_collection_id"
     t.string "slug"
     t.string "network_subscription_id"
+    t.integer "active_users_count", default: 0, null: false
+    t.datetime "trial_ends_at"
+    t.integer "trial_users_count", default: 0, null: false
     t.index ["slug"], name: "index_organizations_on_slug", unique: true
   end
 
@@ -312,7 +314,7 @@ ActiveRecord::Schema.define(version: 20181009204421) do
     t.index ["provider", "uid"], name: "index_users_on_provider_and_uid", unique: true
   end
 
-  create_table "users_roles", id: :serial, force: :cascade do |t|
+  create_table "users_roles", force: :cascade do |t|
     t.bigint "user_id"
     t.bigint "role_id"
     t.index ["role_id"], name: "index_users_roles_on_role_id"
