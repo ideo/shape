@@ -186,45 +186,67 @@ class CollectionCard extends BaseRecord {
     }
   }
 
+  // Only show archive menu if this is a collection that has items
+  // (Don't show if empty collection, an item, or items)
+  get showArchiveWarning() {
+    let showMenu = false
+    this.selectedCards.forEach(card => {
+      if (
+        card.record.className === 'Collection' &&
+        card.record.collection_cards.length > 0
+      )
+        showMenu = true
+    })
+    return showMenu
+  }
+
+  get selectedCards() {
+    const { selectedCardIds } = uiStore
+    return this.apiStore
+      .findAll('collection_cards')
+      .filter(card => selectedCardIds.indexOf(card.id) > -1)
+  }
+
   async API_archive({ isReplacing = false } = {}) {
     const { selectedCardIds } = uiStore
 
-    const popupAgreed = new Promise((resolve, reject) => {
-      let prompt = 'Are you sure you want to archive this?'
-      const confirmText = 'Archive'
-      let iconName = 'Archive'
-      // check if multiple cards were selected
-      if (selectedCardIds.length > 1) {
-        const removedCount = this.reselectOnlyEditableCards(selectedCardIds)
-        prompt = 'Are you sure you want to archive '
-        if (uiStore.selectedCardIds.length > 1) {
-          prompt += `these ${selectedCardIds.length} objects?`
-        } else {
-          prompt += 'this?'
+    if (this.showArchiveWarning) {
+      const popupAgreed = new Promise((resolve, reject) => {
+        let prompt = 'Are you sure you want to archive this?'
+        const confirmText = 'Archive'
+        let iconName = 'Archive'
+        // check if multiple cards were selected
+        if (selectedCardIds.length > 1) {
+          const removedCount = this.reselectOnlyEditableCards(selectedCardIds)
+          prompt = 'Are you sure you want to archive '
+          if (uiStore.selectedCardIds.length > 1) {
+            prompt += `these ${selectedCardIds.length} objects?`
+          } else {
+            prompt += 'this?'
+          }
+          if (removedCount) {
+            prompt += ` ${removedCount} object${
+              removedCount > 1 ? 's were' : ' was'
+            } not selected due to insufficient permissions.`
+          }
+        } else if (this.link) {
+          iconName = 'Link'
+          prompt = 'Are you sure you want to archive this link?'
+        } else if (this.isTestDesignCollection) {
+          prompt = 'Are you sure you want to archive this test design?'
+          prompt += ' It will close your feedback.'
         }
-        if (removedCount) {
-          prompt += ` ${removedCount} object${
-            removedCount > 1 ? 's were' : ' was'
-          } not selected due to insufficient permissions.`
-        }
-      } else if (this.link) {
-        iconName = 'Link'
-        prompt = 'Are you sure you want to archive this link?'
-      } else if (this.isTestDesignCollection) {
-        prompt = 'Are you sure you want to archive this test design?'
-        prompt += ' It will close your feedback.'
-      }
-      uiStore.confirm({
-        prompt,
-        confirmText,
-        iconName,
-        onCancel: () => resolve(false),
-        onConfirm: () => resolve(true),
+        uiStore.confirm({
+          prompt,
+          confirmText,
+          iconName,
+          onCancel: () => resolve(false),
+          onConfirm: () => resolve(true),
+        })
       })
-    })
-
-    const agreed = await popupAgreed
-    if (!agreed) return false
+      const agreed = await popupAgreed
+      if (!agreed) return false
+    }
     const collection = this.parent
     try {
       await this.apiStore.archiveCards({

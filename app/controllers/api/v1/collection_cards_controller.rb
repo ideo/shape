@@ -206,7 +206,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
   end
 
   def create_notification(card, action)
-    # only notify for archiving of collections (and not link cards)
+    # Only notify for archiving of collections (and not link cards)
     return if card.link?
     ActivityAndNotificationBuilder.call(
       actor: current_user,
