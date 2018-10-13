@@ -104,7 +104,7 @@ function splitName(name) {
 
 const Hyphy = new Hypher(english)
 function hyphenate(namePart) {
-  const hyphenated = Hyphy.hyphenateText(namePart, 10)
+  const hyphenated = Hyphy.hyphenateText(namePart, 14)
   // u00AD is the "soft" hyphenation character Hypher uses
   if (!hyphenated.includes('\u00AD')) return namePart
   const parts = hyphenated.split('\u00AD')
@@ -162,7 +162,7 @@ class CollectionCover extends React.Component {
         </Fragment>
       )
     }
-    return collection.name
+    return <span style={{ hyphens: 'auto' }}>{collection.name}</span>
   }
 
   handleClick = e => {
