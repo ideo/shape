@@ -29,6 +29,10 @@ class Organization < ApplicationRecord
              class_name: 'Collection::Global',
              dependent: :destroy,
              optional: true
+  belongs_to :getting_started_collection,
+             class_name: 'Collection::Global',
+             dependent: :destroy,
+             optional: true
 
   after_create :create_groups
   before_update :parse_domain_whitelist

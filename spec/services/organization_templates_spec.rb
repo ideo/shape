@@ -2,17 +2,16 @@ require 'rails_helper'
 
 RSpec.describe OrganizationTemplates, type: :service do
   let(:organization) { create(:organization) }
+  let(:user) { create(:user) }
   let(:profile_template) { organization.profile_template }
   let(:filestack_file) { create(:filestack_file) }
-  let(:service) { OrganizationTemplates.new(organization) }
+  let(:service) { OrganizationTemplates.new(organization, user) }
 
   before do
     allow(FilestackFile).to receive(:create_from_url).and_return(filestack_file)
   end
 
   describe '#call' do
-    let(:organization) { create(:organization) }
-    let(:user) { create(:user) }
     let(:template_collection) { organization.template_collection }
 
     before do
@@ -23,6 +22,11 @@ RSpec.describe OrganizationTemplates, type: :service do
     it 'should save the attributes on the org' do
       organization.reload
       expect(organization.template_collection_id).to eq template_collection.id
+    end
+
+    it 'does not create getting started template' do
+      organization.reload
+      expect(organization.getting_started_collection).to be_nil
     end
 
     context 'with template collection' do
@@ -105,6 +109,45 @@ RSpec.describe OrganizationTemplates, type: :service do
         expect {
           service.call
         }.to not_change(Collection, :count)
+      end
+    end
+  end
+
+  context 'with getting started template' do
+    describe '#call' do
+      let!(:getting_started_template) do
+        create(:collection,
+               organization: organization,
+               num_cards: 3)
+      end
+      before do
+        ENV['GETTING_STARTED_TEMPLATE_ID'] = getting_started_template.id.to_s
+        service.call
+        profile_template.reload
+      end
+      let(:getting_started_collection) do
+        organization.getting_started_collection
+      end
+
+      it 'duplicates template to organization' do
+        expect(getting_started_collection).not_to eq(getting_started_template)
+        expect(getting_started_collection.persisted?).to be true
+        expect(getting_started_collection).to be_instance_of(Collection::Global)
+        expect(getting_started_collection.system_required?).to be true
+      end
+
+      it 'assigns admin group and user as editor' do
+        expect(getting_started_collection.editors[:groups]).to match_array(
+          [organization.admin_group],
+        )
+        expect(getting_started_collection.editors[:users]).to match_array(
+          [user],
+        )
+      end
+
+      it 'has no viewers' do
+        expect(getting_started_collection.viewers[:users]).to be_empty
+        expect(getting_started_collection.viewers[:groups]).to be_empty
       end
     end
   end
