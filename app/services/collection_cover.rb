@@ -9,7 +9,7 @@ class CollectionCover < SimpleService
   end
 
   def call
-    media = first_media_item
+    media = manually_set_cover || first_media_item
     text = first_text_item
     {
       image_url: media[:content],
@@ -28,6 +28,15 @@ class CollectionCover < SimpleService
 
   private
 
+  def media_item(card)
+    {
+      card_id: card.id,
+      card_order: card.order,
+      item_id: card.item.id,
+      content: card.item.type == 'Item::TextItem' ? cover_text(card.item) : card.item.image_url,
+    }
+  end
+
   def first_shareable_item(type:)
     first_item = nil
     @collection.items_and_linked_items.where(type: type).each do |item|
@@ -37,12 +46,7 @@ class CollectionCover < SimpleService
     end
     return {} unless first_item
     card = CollectionCard.find_by(item_id: first_item.id)
-    {
-      card_id: card.id,
-      card_order: card.order,
-      item_id: first_item.id,
-      content: type == 'Item::TextItem' ? cover_text(first_item) : first_item.image_url,
-    }
+    media_item(card)
   end
 
   def first_media_item
@@ -51,5 +55,11 @@ class CollectionCover < SimpleService
 
   def first_text_item
     first_shareable_item(type: 'Item::TextItem')
+  end
+
+  def manually_set_cover
+    card = @collection.collection_cards.where(is_cover: true).first
+    return if card.nil?
+    media_item(card)
   end
 end

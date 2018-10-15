@@ -1,4 +1,3 @@
-import PropTypes from 'prop-types'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 
