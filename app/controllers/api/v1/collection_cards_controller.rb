@@ -245,6 +245,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
       :width,
       :height,
       :image_contain,
+      :is_cover,
     )
   end
 

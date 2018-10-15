@@ -5,6 +5,7 @@ import styled from 'styled-components'
 
 import ChartItemCover from '~/ui/grid/covers/ChartItemCover'
 import ContainImage from '~/ui/grid/ContainImage'
+import CoverImageToggle from '~/ui/grid/CoverImageToggle'
 import GridCardHotspot from '~/ui/grid/GridCardHotspot'
 import LinkItemCover from '~/ui/grid/covers/LinkItemCover'
 import TextItemCover from '~/ui/grid/covers/TextItemCover'
@@ -236,6 +237,11 @@ class GridCard extends React.Component {
     }).click()
   }
 
+  get canEditCoverImage() {
+    const { card } = this.props
+    return !!card.isNormalCollection
+  }
+
   handleClick = e => {
     const { card, dragging, record } = this.props
     if (dragging) return
@@ -300,8 +306,11 @@ class GridCard extends React.Component {
             <StyledTopRightActions color={this.actionsColor}>
               {record.isDownloadable && <Download record={record} />}
               {record.isImage &&
+                this.canEditCard && <CoverImageToggle card={card} />}
+              {record.isImage &&
                 this.canEditCard && <ContainImage card={card} />}
-              {!testCollectionCard && <SelectionCircle cardId={card.id} />}
+              {!testCollectionCard &&
+                this.canEditCoverImage && <SelectionCircle cardId={card.id} />}
               <ActionMenu
                 location="GridCard"
                 className={hoverClass}
