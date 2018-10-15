@@ -45,7 +45,8 @@ class Group < ApplicationRecord
             if: :validate_handle?
 
   validates :handle,
-            format: { with: /[a-zA-Z0-9\-\_]+/ },
+            # requires at least one letter in it
+            format: { with: /[a-zA-Z0-9\-_]*[a-zA-Z][a-zA-Z0-9\-_]*/ },
             if: :validate_handle?
 
   # Searchkick Config

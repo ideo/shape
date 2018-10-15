@@ -120,15 +120,16 @@ class Organization < ApplicationRecord
     "#{handle}-admins"
   end
 
+  # NOTE: even if none of these work it will fallback to handle-UUID
   def slug_candidates
     [
       :handle,
-      :name,
       [:handle, 1],
-      [:name, 1],
       [:handle, 2],
-      [:name, 2],
       %i[handle id],
+      :name,
+      [:name, 1],
+      [:name, 2],
     ]
   end
 
