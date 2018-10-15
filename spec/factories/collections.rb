@@ -21,8 +21,56 @@ FactoryBot.define do
     factory :user_profile, class: Collection::UserProfile
     factory :submission_box, class: Collection::SubmissionBox
     factory :submissions_collection, class: Collection::SubmissionsCollection
-    factory :test_collection, class: Collection::TestCollection
-    factory :test_design, class: Collection::TestDesign
+    factory :test_design, class: Collection::TestDesign do
+      transient do
+        record_type :question
+      end
+    end
+    factory :test_collection, class: Collection::TestCollection do
+      transient do
+        record_type :question
+      end
+
+      trait :answerable_questions do
+        after(:create) do |collection|
+          collection.prelaunch_question_items.each do |item|
+            item.update(question_type: :question_context)
+          end
+        end
+      end
+
+      trait :open_response_questions do
+        after(:create) do |collection|
+          collection.prelaunch_question_items.each do |item|
+            item.update(question_type: :question_open)
+          end
+        end
+      end
+
+      trait :with_responses do
+        after(:create) do |collection|
+          survey_responses = create_list(:survey_response, 5, test_collection: collection)
+          survey_responses.map do |response|
+            question = response.question_items.select(&:question_useful?).first
+            create(:question_answer,
+                   survey_response: response,
+                   question: question)
+            response.update_attribute(:status, :completed)
+            collection.reload
+          end
+        end
+      end
+
+      trait :completed do
+        after(:create) do |collection|
+          media_question = collection.prelaunch_question_items.detect(&:question_media?)
+          media_question&.update(type: 'Item::VideoItem', url: 'something', thumbnail_url: 'something', question_type: nil)
+          description_question = collection.prelaunch_question_items.detect(&:question_description?)
+          description_question&.update(content: 'something')
+        end
+      end
+    end
+    factory :test_open_responses_collection, class: Collection::TestOpenResponses
 
     after(:build) do |collection, evaluator|
       if evaluator.num_cards > 0

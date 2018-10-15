@@ -12,12 +12,21 @@ describe('ScaleQuestion', () => {
       questionAnswer: fakeQuestionAnswer,
       questionText: 'What do you think?',
       editing: true,
+      emojiSeries: 'usefulness',
       onAnswer: jest.fn(),
     }
     wrapper = shallow(<ScaleQuestion {...props} />)
   })
 
   describe('render()', () => {
+    it('should render the 4 emojis from the emojiSeries', () => {
+      expect(wrapper.find('Emoji').length).toEqual(4)
+    })
+
+    it('should render a tooltip for each emoji', () => {
+      expect(wrapper.find('Tooltip').length).toEqual(4)
+    })
+
     describe('on editing', () => {
       it('should disable all the buttons', () => {
         expect(
@@ -28,10 +37,10 @@ describe('ScaleQuestion', () => {
         ).toBe(true)
       })
 
-      it('should set the question border to gray', () => {
+      it('should set the question border to commonMedium', () => {
         expect(wrapper.find('Question')).toHaveStyleRule(
           'border-color',
-          v.colors.gray
+          v.colors.commonMedium
         )
       })
     })

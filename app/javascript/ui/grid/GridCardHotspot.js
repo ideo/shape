@@ -26,7 +26,7 @@ const StyledHotspot = styled.div`
 
 const HotspotLine = styled.div`
   height: 100%;
-  background: ${v.colors.cyan};
+  background: ${v.colors.primaryLight};
   position: relative;
   left: 7px;
   width: ${props => props.gutter}px;

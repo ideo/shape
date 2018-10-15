@@ -62,35 +62,30 @@ export const FormButton = styled.button`
   border-radius: 20px;
   color: ${props => {
     switch (props.color) {
-      case 'hollow':
-        return v.colors.blackLava
+      case v.colors.transparent:
+        return v.colors.black
       default:
         return 'white'
     }
   }};
-  background-color: ${props => {
-    switch (props.color) {
-      case 'blue':
-        return v.colors.ctaButtonBlue
-      case 'hollow':
-        return 'transparent'
-      default:
-        return v.colors.blackLava
-    }
-  }};
+  background-color: ${props => props.color};
   border: ${props =>
-    props.color === 'hollow' ? `1px solid ${v.colors.blackLava}` : 'none'};
+    props.color === v.colors.transparent
+      ? `1px solid ${v.colors.black}`
+      : 'none'};
   transition: all 0.3s;
   &:hover,
   &:focus {
     background-color: ${props =>
-      props.color === 'blue' ? v.colors.ctaButtonBlueHover : v.colors.cloudy};
+      props.color === v.colors.primaryDark
+        ? v.colors.primaryDarkest
+        : v.colors.commonDark};
   }
   ${props =>
     props.disabled &&
     `background-color: white;
-      border: 1px solid ${v.colors.gray};
-      color:  ${v.colors.gray};
+      border: 1px solid ${v.colors.commonMedium};
+      color:  ${v.colors.commonMedium};
       cursor: initial;
       &:hover, &:focus {
         background-color: white;
@@ -98,6 +93,9 @@ export const FormButton = styled.button`
     `};
 `
 FormButton.displayName = 'StyledFormButton'
+FormButton.defaultProps = {
+  color: v.colors.black,
+}
 
 /** @component */
 export const TextButton = styled.button`
@@ -121,10 +119,10 @@ export const TextField = styled.input`
   outline-width: 0;
   font-size: 1rem;
   border: 0;
-  border-bottom: 0.5px solid ${v.colors.gray};
+  border-bottom: 0.5px solid ${v.colors.commonMedium};
 
   &::placeholder {
-    color: ${v.colors.gray};
+    color: ${v.colors.commonMedium};
   }
 
   &:focus {
@@ -140,7 +138,7 @@ TextField.displayName = 'StyledTextField'
 
 /** @component */
 export const BctTextField = TextField.extend`
-  background: ${v.colors.cararra};
+  background: ${v.colors.commonLight};
 `
 BctTextField.displayName = 'BctTextField'
 
@@ -158,7 +156,7 @@ export const ImageField = styled.span`
   display: block;
   color: white;
   border-radius: 50%;
-  background-color: ${v.colors.gray};
+  background-color: ${v.colors.commonMedium};
 
   span {
     position: absolute;
@@ -180,7 +178,7 @@ export const Pill = styled(Chip)`
     font-family: ${v.fonts.sans};
     font-size: 1rem;
     justify-content: flex-start;
-    background-color: ${v.colors.desert};
+    background-color: ${v.colors.commonLightest};
     border-radius: 0;
   }
 
@@ -199,7 +197,7 @@ export const Select = styled(MuiSelect)`
     font-weight: ${v.weights.book};
   }
   .grayedOut {
-    color: ${v.colors.gray};
+    color: ${v.colors.commonMedium};
   }
 
   .fullWidth {
@@ -219,7 +217,7 @@ export const Select = styled(MuiSelect)`
       background-color: transparent;
     }
     vertical-align: baseline;
-    ${props => props.onDefault && `color: ${v.colors.gray};`} li {
+    ${props => props.onDefault && `color: ${v.colors.commonMedium};`} li {
       font-family: ${v.fonts.sans};
       font-size: 1rem;
       font-weight: ${v.weights.book};
@@ -231,7 +229,7 @@ Select.displayName = 'StyledSelect'
 /** @component */
 export const Checkbox = styled(MuiCheckbox)`
   &.checkbox--error {
-    color: ${v.colors.orange};
+    color: ${v.colors.alert};
   }
 `
 Checkbox.displayName = 'StyledCheckbox'
@@ -250,7 +248,7 @@ export const SelectOption = styled(MenuItem)`
     }
   }
   &.grayedOut {
-    color: ${v.colors.gray};
+    color: ${v.colors.commonMedium};
   }
 `
 SelectOption.displayName = 'StyledSelectOption'
@@ -270,7 +268,7 @@ export const StyledAutosizeInput = styled(AutosizeInput)`
     border-left: none;
     border-top: none;
     border-right: none;
-    border-bottom: 1px solid ${v.colors.blackLava};
+    border-bottom: 1px solid ${v.colors.black};
     &:focus {
       outline: 0;
     }
@@ -303,12 +301,12 @@ export const CommentForm = styled.form`
   position: sticky;
   bottom: 0;
   width: calc(100% - 10px);
-  border-top: 4px solid ${v.colors.activityDarkBlue};
-  background: ${v.colors.activityDarkBlue};
+  border-top: 4px solid ${v.colors.secondaryDark};
+  background: ${v.colors.secondaryDark};
   background: linear-gradient(
-    ${hexToRgba(v.colors.activityDarkBlue, 0)} 0,
-    ${v.colors.activityDarkBlue} 10%,
-    ${v.colors.activityDarkBlue} 100%
+    ${hexToRgba(v.colors.secondaryDark, 0)} 0,
+    ${v.colors.secondaryDark} 10%,
+    ${v.colors.secondaryDark} 100%
   );
   button {
     position: absolute;
@@ -318,7 +316,7 @@ export const CommentForm = styled.form`
     height: 18px;
   }
   .textarea-input {
-    background: ${v.colors.activityMedBlue};
+    background: ${v.colors.secondaryMedium};
     font-family: ${v.fonts.sans};
     margin: 0 5px 0 10px;
     width: calc(100% - 10px);
@@ -340,7 +338,7 @@ export const StyledCommentTextarea = styled.div`
       outline: none;
     }
     ::placeholder {
-      color: ${v.colors.gray};
+      color: ${v.colors.commonMedium};
     }
     /* TODO: cross-browser friendly way to hide scrollbar?
       note this is only for a really long comment (>6 rows) */

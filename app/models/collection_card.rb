@@ -227,9 +227,9 @@ class CollectionCard < ApplicationRecord
     when 'Item::QuestionItem'
       return item.question_type
     when 'Item::TextItem'
-      return 'description'
+      return 'question_description'
     when 'Item::FileItem', 'Item::VideoItem'
-      return 'media'
+      return 'question_media'
     end
   end
 

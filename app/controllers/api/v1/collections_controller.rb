@@ -49,15 +49,6 @@ class Api::V1::CollectionsController < Api::V1::BaseController
     end
   end
 
-  before_action :load_and_authorize_test_collection_launch, only: %i[launch_test]
-  def launch_test
-    if @collection.launch_test!(initiated_by: current_user)
-      render_collection
-    else
-      render_api_errors @collection.errors
-    end
-  end
-
   load_resource only: %i[in_my_collection]
   def in_my_collection
     render json: current_user.in_my_collection?(@collection)
@@ -103,14 +94,6 @@ class Api::V1::CollectionsController < Api::V1::BaseController
     authorize! :manage, @collection
   end
 
-  def render_collection(include: nil)
-    # include collection_cards for UI to receive any updates
-    include ||= Collection.default_relationships_for_api
-    render jsonapi: @collection,
-           include: include,
-           expose: { current_record: @collection }
-  end
-
   def load_collection_with_cards
     @collection = Collection
                   .where(id: params[:id])
@@ -120,14 +103,6 @@ class Api::V1::CollectionsController < Api::V1::BaseController
       [Role::VIEWER, Role::CONTENT_EDITOR, Role::EDITOR],
       @collection.children_and_linked_children,
     )
-  end
-
-  def load_and_authorize_test_collection_launch
-    @collection = Collection.find(params[:id])
-    unless @collection.is_a?(Collection::TestCollection) && @collection.draft?
-      head(401)
-    end
-    authorize! :manage, @collection
   end
 
   def collection_params

@@ -90,6 +90,53 @@ export const fakeLinkItem = {
   rawAttributes: jest.fn().mockReturnValue(fakeLinkItemAttrs),
   getRecordType: jest.fn().mockReturnValue('items'),
 }
+export const fakeChartItemAttrs = {
+  id: "5",
+  type: 'Item::ChartItem',
+  name: '',
+  content: '',
+  chart_data: {
+    0: 3,
+    1: 6,
+    2: 1,
+    3: 8,
+  },
+  chart_data: {
+    datasets: [
+      {
+        label: 'Super test',
+        type: 'question_items',
+        total: 7,
+        data: [
+          { num_responses: 2, answer: 1 },
+          { num_responses: 2, answer: 2 },
+          { num_responses: 0, answer: 3 },
+          { num_responses: 3, answer: 4 },
+        ],
+      },
+      {
+        label: 'Super Org',
+        type: 'org_wide',
+        total: 50,
+        data: [
+          { num_responses: 5, answer: 1 },
+          { num_responses: 10, answer: 2 },
+          { num_responses: 20, answer: 3 },
+          { num_responses: 15, answer: 4 },
+        ],
+      },
+    ],
+  },
+  data_source_id: 3,
+  inherited_tag_list: [],
+  can_edit: false,
+  parent_collection_card: fakeCollectionCard,
+}
+export const fakeChartItem = {
+  ...fakeChartItemAttrs,
+  rawAttributes: jest.fn().mockReturnValue(fakeChartItemAttrs),
+  getRecordType: jest.fn().mockReturnValue('items'),
+}
 export const fakeFileItemAttrs = {
   id: "3",
   type: 'Item::FileItem',
@@ -113,7 +160,7 @@ export const fakeQuestionItem = {
   id: '3',
   ...fakeTextItemAttrs,
   type: 'Item::QuestionItem',
-  question_type: 'description',
+  question_type: 'question_description',
   rawAttributes: jest.fn().mockReturnValue(fakeTextItemAttrs),
   getRecordType: jest.fn().mockReturnValue('items'),
 }
@@ -136,6 +183,12 @@ export const fakeItemCard = {
   API_archive: jest.fn(),
   API_linkToMyCollection: jest.fn(),
   ...fakeJsonApiAttrs,
+}
+
+export const fakeQuestionItemCard = {
+  ...fakeItemCard,
+  record: fakeQuestionItem,
+  card_question_type: fakeQuestionItem.question_type
 }
 
 const fakeCards = [
@@ -294,5 +347,12 @@ export const fakeNotification = {
   combined_actors: [],
   combined_activities_ids: [],
   user: fakeUser,
+  ...fakeJsonApiAttrs,
+}
+export const fakeSurveyResponse = {
+  id: "1",
+  type: 'survey_responses',
+  status: 'in_progress',
+  question_answers: [],
   ...fakeJsonApiAttrs,
 }

@@ -20,7 +20,12 @@ export default class UiStore {
   @observable
   blankContentToolState = { ...this.defaultBCTState }
   @observable
-  openCardMenuId = false
+  cardMenuOpen = { id: false, x: 0, y: 0, direction: 'left' }
+  @computed
+  get cardMenuOpenAndPositioned() {
+    const { cardMenuOpen } = this
+    return cardMenuOpen.id && !!(cardMenuOpen.x || cardMenuOpen.y)
+  }
   @observable
   organizationMenuPage = null
   @observable
@@ -178,6 +183,15 @@ export default class UiStore {
     this.dialogConfig.open = null
   }
 
+  openCardMenu(id, opts = {}) {
+    const { x = 0, y = 0, direction = 'left' } = opts
+    this.update('cardMenuOpen', { id, x, y, direction })
+  }
+
+  closeCardMenu() {
+    this.update('cardMenuOpen', { id: false, x: 0, y: 0, direction: 'left' })
+  }
+
   async popupSnackbar(props = {}) {
     if (this.snackbarConfig.open) {
       this.closeSnackbar()
@@ -214,7 +228,7 @@ export default class UiStore {
   @action
   openMoveMenu({ from: fromCollectionId, cardAction }) {
     this.pageMenuOpen = false
-    this.openCardMenuId = false
+    this.closeCardMenu()
     // On move, copy over selected cards to moving cards
     this.movingFromCollectionId = fromCollectionId
     // cardAction can be 'move' or 'link'
@@ -333,7 +347,7 @@ export default class UiStore {
   openBlankContentTool(options = {}) {
     const { viewingCollection } = this
     this.deselectCards()
-    this.openCardMenuId = false
+    this.closeCardMenu(false)
     this.blankContentToolState = {
       ...this.defaultBCTState,
       order: 0,
@@ -441,6 +455,24 @@ export default class UiStore {
       }
     }
     return opts.open
+  }
+
+  // takes a click event as a parameter
+  captureKeyboardGridClick = (e, cardId) => {
+    const ctrlClick = e.metaKey || e.ctrlKey
+    const shiftClick = e.shiftKey
+    if (ctrlClick || shiftClick) {
+      if (ctrlClick) {
+        // individually select
+        this.toggleSelectedCardId(cardId)
+      }
+      if (shiftClick) {
+        // select everything between
+        this.selectCardsUpTo(cardId)
+      }
+      return true
+    }
+    return false
   }
 
   // TODO: add a unit test for this

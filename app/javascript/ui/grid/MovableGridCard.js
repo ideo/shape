@@ -22,7 +22,7 @@ const StyledResizeIcon = styled.div`
   z-index: ${v.zIndex.gridCardBg};
   right: 0.75rem;
   bottom: 0.75rem;
-  color: ${v.colors.gray};
+  color: ${v.colors.commonMedium};
   width: 1.25rem;
   height: 1.25rem;
   svg {
@@ -32,15 +32,14 @@ const StyledResizeIcon = styled.div`
 `
 
 const StyledCardWrapper = styled.div`
-  z-index: ${props => (props.dragging ? v.zIndex.cardDragging : 0)};
+  z-index: ${props => props.zIndex};
   /* this is for both the ResizeIcon (in this component) and CardMenu (in GridCard) */
   .show-on-hover {
     opacity: 0;
     transition: opacity 0.25s;
   }
   &:hover {
-    z-index: ${props =>
-      props.dragging ? v.zIndex.cardDragging : v.zIndex.gridCard};
+    z-index: ${props => props.zIndex};
   }
   &:hover,
   &.touch-device {
@@ -92,7 +91,6 @@ class MovableGridCard extends React.PureComponent {
     const initialOffsetX = e.screenX - e.target.getBoundingClientRect().x
     const initialOffsetY = e.screenY - e.target.getBoundingClientRect().y
 
-    document.body.style['overflow-y'] = 'hidden'
     this.setState({
       initialOffsetX,
       initialOffsetY,
@@ -136,6 +134,8 @@ class MovableGridCard extends React.PureComponent {
     if (Math.abs(x - position.xPos) + Math.abs(y - position.yPos) < 10) {
       return
     }
+
+    document.body.style['overflow-y'] = 'hidden'
 
     if (e.clientY < TOP_SCROLL_TRIGGER) {
       // At top of viewport
@@ -236,6 +236,11 @@ class MovableGridCard extends React.PureComponent {
       }
       return
     }
+    if (uiStore.cardMenuOpenAndPositioned) {
+      uiStore.closeCardMenu()
+      return
+    }
+    if (!e.target.className.match) return
     if (e.target.className.match(/cancelGridClick/)) return
     if (e.target.tagName === 'A' && e.target.href) return
 
@@ -398,10 +403,17 @@ class MovableGridCard extends React.PureComponent {
       lastPinnedCard,
     }
 
+    let zIndex = 0
+    if (!moveComplete) zIndex = v.zIndex.cardDragging
+    if (uiStore.cardMenuOpen.id === card.id) {
+      zIndex = v.zIndex.aboveClickWrapper
+    }
     return (
       <StyledCardWrapper
         className={uiStore.isTouchDevice ? 'touch-device' : ''}
         dragging={!moveComplete}
+        zIndex={zIndex}
+        onClick={this.handleWrapperClick}
       >
         <Rnd
           ref={c => {
@@ -433,6 +445,7 @@ class MovableGridCard extends React.PureComponent {
             bottomRight:
               canEditCollection &&
               !card.isPinnedAndLocked &&
+              !card.record.isChart &&
               !card.record.isGenericFile,
             bottom: false,
             bottomLeft: false,
