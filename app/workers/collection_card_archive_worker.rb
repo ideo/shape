@@ -5,21 +5,26 @@ class CollectionCardArchiveWorker
   def perform(card_ids, user_id)
     @actor = User.find(user_id)
     collection_cards = CollectionCard.where(id: card_ids)
-    collection_cards.each do |card|
+    collection_cards
+      .includes(:item, :collection)
+      .each do |card|
       next if card.archived?
+      # Check if we should notify before archiving,
+      # because afterwards the collection's cards will be archived
+      notify = notify?(card)
       card.archive!
-      create_notification(card) if notify?(card)
+      create_notification(card) if notify
     end
   end
 
   private
 
   def notify?(card)
-    # Don't notify if link or item_attributes
-    return false if card.link? || card.item_id.present?
-    # Don't notify if collection is empty
-    return false if card.collection_id.present? && card.collection.children.size.zero?
-    true
+    # Only notify if it is a non-link collection that has cards
+    return true if !card.link? &&
+                   card.collection.present? &&
+                   card.collection.children.size.positive?
+    false
   end
 
   def create_notification(card)
