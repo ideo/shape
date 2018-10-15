@@ -58,7 +58,7 @@ class PageWithApi extends React.Component {
   }
 
   checkOrg = ({ match, apiStore, routingStore }) => {
-    const path = `${routingStore.location.pathname}${
+    let path = `${routingStore.location.pathname}${
       routingStore.location.search
     }`
     if (
@@ -79,6 +79,10 @@ class PageWithApi extends React.Component {
       routingStore.routeTo(`/${apiStore.currentOrgSlug}${path}`)
       return false
     } else if (match.params.org !== apiStore.currentOrgSlug) {
+      // remove any "wrong" org from the path
+      if (match.path.indexOf('/:org') === 0) {
+        path = path.replace(/^(\/[\w-]*)/, '') || 'homepage'
+      }
       apiStore.currentUser.switchOrganization(match.params.org, {
         redirectPath: path,
       })
