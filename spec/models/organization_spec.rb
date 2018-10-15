@@ -394,6 +394,30 @@ describe Organization, type: :model do
     end
   end
 
+  describe '#within_trial_period?' do
+    let(:organization) { create(:organization) }
+    context 'trial_ends_at is set' do
+      context 'trial_ends_at is in the future' do
+        it 'returns true' do
+          organization.trial_ends_at = 1.day.from_now
+          expect(organization.within_trial_period?).to be true
+        end
+      end
+      context 'trial_ends_at is in the past' do
+        it 'returns false' do
+          organization.trial_ends_at = 1.day.ago
+          expect(organization.within_trial_period?).to be false
+        end
+      end
+    end
+    context 'trial_ends_at is not set' do
+      it 'returns false' do
+        organization.trial_ends_at = nil
+        expect(organization.within_trial_period?).to be false
+      end
+    end
+  end
+
   describe '#create_network_usage_record' do
     let(:organization) { create(:organization) }
     before do
