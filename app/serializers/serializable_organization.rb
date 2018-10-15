@@ -22,6 +22,6 @@ class SerializableOrganization < BaseJsonSerializer
   end
 
   attribute :trial_ends_at do
-    @object.trial_ends_at.to_date.to_s
+    @object.trial_ends_at ? @object.trial_ends_at.to_date.to_s : nil
   end
 end
