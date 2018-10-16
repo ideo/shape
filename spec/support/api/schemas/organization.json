@@ -5,6 +5,7 @@
     "current_billing_period_end": { "type": "date" },
     "current_billing_period_start": { "type": "date" },
     "domain_whitelist": { "type": "array" },
+    "in_app_billing": { "type": "boolean" },
     "is_within_trial_period": { "type": "boolean" },
     "name": { "type": "string" },
     "price_per_user": { "type": "number" },
