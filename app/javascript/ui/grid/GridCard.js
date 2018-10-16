@@ -73,7 +73,7 @@ class GridCard extends React.Component {
   }
 
   get renderInner() {
-    const { card, record, height } = this.props
+    const { card, record, height, handleClick } = this.props
     if (this.isItem) {
       switch (record.type) {
         case ITEM_TYPES.TEXT:
@@ -83,6 +83,7 @@ class GridCard extends React.Component {
               height={height}
               dragging={this.props.dragging}
               cardId={card.id}
+              handleClick={handleClick}
             />
           )
         case ITEM_TYPES.FILE: {
