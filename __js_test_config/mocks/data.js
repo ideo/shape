@@ -222,6 +222,7 @@ export const fakeCollection = {
   API_updateCards: jest.fn(),
   API_updateName: jest.fn(),
   checkCurrentOrg: jest.fn(),
+  cardProperties: [],
   internalType: 'collections',
   meta: {
     snapshot: {

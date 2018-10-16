@@ -207,6 +207,7 @@ class CollectionCard extends BaseRecord {
       .filter(card => selectedCardIds.indexOf(card.id) > -1)
   }
 
+  // this could really be a static method now that it archives all selected cards
   async API_archive({ isReplacing = false } = {}) {
     const { selectedCardIds } = uiStore
 

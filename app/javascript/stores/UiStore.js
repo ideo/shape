@@ -514,6 +514,8 @@ export default class UiStore {
 
   @action
   expandThread(key, { reset = false } = {}) {
+    // when we expand a thread we also want it to set the ActivityLog to Comments
+    this.update('activityLogPage', 'comments')
     // reset it first, that way if it's expanded offscreen, it will get re-opened/scrolled to
     if (reset) this.expandedThreadKey = null
     this.expandedThreadKey = key
