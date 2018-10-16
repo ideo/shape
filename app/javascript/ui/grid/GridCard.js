@@ -313,6 +313,7 @@ class GridCard extends React.Component {
             <StyledTopRightActions color={this.actionsColor}>
               {record.isDownloadable && <Download record={record} />}
               {record.isImage &&
+                canEditCollection &&
                 this.canEditCard && (
                   <CoverImageToggle
                     card={card}
