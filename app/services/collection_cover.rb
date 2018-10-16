@@ -9,10 +9,7 @@ class CollectionCover < SimpleService
   end
 
   def call
-    media = manually_set_cover || {}
-    if @collection.try(:cached_cover).try(:no_cover) != true
-      media = manually_set_cover || first_media_item
-    end
+    media = cover_media_item
     text = first_text_item
     {
       image_url: media[:content],
@@ -27,6 +24,17 @@ class CollectionCover < SimpleService
 
   def cover_text(text_item)
     text_item.plain_content.truncate(500, separator: /\s/, omission: '')
+  end
+
+  def cover_media_item
+    manual_cover = manually_set_cover
+    return manual_cover if @collection.try(:cached_cover).try(:no_cover) == true
+    if manual_cover.empty?
+      new_cover = first_media_item
+      new_cover.update_column(:is_cover, true)
+      return new_cover
+    end
+    manual_cover
   end
 
   private
