@@ -31,7 +31,9 @@ class CollectionCover < SimpleService
     return manual_cover if @collection.try(:cached_cover).try(:no_cover) == true
     if manual_cover.empty?
       new_cover = first_media_item
-      new_cover.update_column(:is_cover, true)
+      return {} if new_cover.empty?
+      card = CollectionCard.find(new_cover[:card_id])
+      card.update_column(:is_cover, true)
       return new_cover
     end
     manual_cover
@@ -70,7 +72,7 @@ class CollectionCover < SimpleService
 
   def manually_set_cover
     card = @collection.collection_cards.where(is_cover: true).first
-    return if card.nil?
+    return {} if card.nil?
     media_item(card)
   end
 end
