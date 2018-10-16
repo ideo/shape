@@ -204,6 +204,7 @@ export const questionInformation = question => {
       break
     case 'question_category_satisfaction':
       emojiSeriesName = 'category_satisfaction'
+      // the category text gets added later within ScaleQuestion
       questionText = 'How satisifed are you with your current'
       questionTitle = 'Category Satisfaction'
       break

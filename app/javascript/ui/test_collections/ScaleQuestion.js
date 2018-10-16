@@ -20,7 +20,7 @@ const Question = styled.div`
   padding: 12px 12px 16px 12px;
   width: 100%;
   .editable-text {
-    margin: -1px 4px -1px 5px;
+    margin: -1px -1px -1px 5px;
     padding: 2px 3px;
     transition: background-color 250ms;
     display: inline-block;
@@ -85,7 +85,8 @@ class ScaleQuestion extends React.Component {
     super(props)
     this.state = {
       editing: !props.question.content,
-      questionContent: props.question.content,
+      // shouldn't be null otherwise the <input> will complain
+      questionContent: props.question.content || '',
     }
     this.debouncedUpdateQuestionContent = debounce(
       this.updateQuestionContent,
@@ -169,7 +170,11 @@ class ScaleQuestion extends React.Component {
           {this.hasEditableCategory ? (
             this.renderEditableCategory(questionText)
           ) : (
-            <DisplayText>{questionText}</DisplayText>
+            <DisplayText>
+              {questionText}
+              {/* editable category questions have question.content */}
+              {question.content ? ` ${question.content}?` : ''}
+            </DisplayText>
           )}
         </Question>
         <Scale>

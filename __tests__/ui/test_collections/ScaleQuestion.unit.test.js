@@ -97,7 +97,7 @@ describe('ScaleQuestion', () => {
       it('should have editable input field if no content', () => {
         const input = wrapper.find('Question').find('EditableInput')
         expect(input.exists()).toEqual(true)
-        expect(input.props().value).toEqual(undefined)
+        expect(input.props().value).toEqual('')
       })
 
       describe('if not editable', () => {
