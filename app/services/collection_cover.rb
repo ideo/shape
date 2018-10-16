@@ -9,7 +9,10 @@ class CollectionCover < SimpleService
   end
 
   def call
-    media = manually_set_cover || first_media_item
+    media = {}
+    if @collection.cached_cover['no_cover'] != true
+      media = manually_set_cover || first_media_item
+    end
     text = first_text_item
     {
       image_url: media[:content],
