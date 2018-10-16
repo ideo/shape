@@ -147,7 +147,6 @@ class CommentThreadContainer extends React.Component {
 
   handleExpandedThreadChange = async (expandedThreadKey, prevKey) => {
     const thread = this.threads.filter(t => t.key === expandedThreadKey)[0]
-    // no thread
     if (!thread) return
     // no change
     if (thread.id && expandedThreadKey === prevKey) return
