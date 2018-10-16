@@ -239,8 +239,7 @@ class GridCard extends React.Component {
 
   onCollectionCoverChange = () => {
     const { card } = this.props
-    // Re-fetch a collection when the collection cover changes as the previous
-    // cover has been re-assigned.
+    // Reassign the previous cover when a new cover is assigned as the backend will have changed.
     card.parent.reassignCover(card)
   }
 
