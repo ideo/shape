@@ -223,19 +223,7 @@ class MovableGridCard extends React.PureComponent {
   // this function gets passed down to the card, so it can place the onClick handler
   handleClick = e => {
     this.scrolling = false
-    const { card, cardType, record } = this.props
-    // TODO: make sure this is cross-browser compatible?
-    if (e.metaKey || e.shiftKey) {
-      if (e.metaKey) {
-        // individually select
-        uiStore.toggleSelectedCardId(card.id)
-      }
-      if (e.shiftKey) {
-        // select everything between
-        uiStore.selectCardsUpTo(card.id)
-      }
-      return
-    }
+    const { cardType, record } = this.props
     if (uiStore.cardMenuOpenAndPositioned) {
       uiStore.closeCardMenu()
       return
