@@ -37,6 +37,7 @@ class Item
       question_clarity: 7,
       question_excitement: 8,
       question_different: 9,
+      question_category_satisfaction: 10,
     }
 
     def self.unanswerable_question_types
