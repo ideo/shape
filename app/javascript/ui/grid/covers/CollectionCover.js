@@ -95,6 +95,7 @@ const StyledCardContent = styled.div`
 StyledCardContent.displayName = 'StyledCardContent'
 
 const PositionedCardHeading = CardHeading.extend`
+  bottom: 0;
   position: absolute;
 `
 
