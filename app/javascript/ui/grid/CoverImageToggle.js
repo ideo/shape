@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 
@@ -19,9 +20,10 @@ StyledCoverImageToggle.displayName = 'StyledCoverImageToggle'
 @observer
 class CoverImageToggle extends React.Component {
   toggle = e => {
-    const { card } = this.props
+    const { card, onReassign } = this.props
     card.is_cover = !card.is_cover
     card.save()
+    if (card.is_cover) onReassign(card)
   }
 
   render() {
@@ -46,6 +48,7 @@ class CoverImageToggle extends React.Component {
 
 CoverImageToggle.propTypes = {
   card: MobxPropTypes.objectOrObservableObject.isRequired,
+  onReassign: PropTypes.func.isRequired,
 }
 
 export default CoverImageToggle

@@ -273,7 +273,7 @@ class CollectionCard < ApplicationRecord
       parent.collection_cards.where.not(id: id).update(is_cover: false)
     else
       # The cover was de-selected so turn off the cover on the collection
-      parent.cached_cover = { no_cover: true }
+      parent.update(cached_cover: { no_cover: true })
     end
   end
 end

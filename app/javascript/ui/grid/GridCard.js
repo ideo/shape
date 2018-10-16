@@ -242,6 +242,13 @@ class GridCard extends React.Component {
     return !!card.isNormalCollection
   }
 
+  onCollectionCoverChange = () => {
+    const { card } = this.props
+    // Re-fetch a collection when the collection cover changes as the previous
+    // cover has been re-assigned.
+    card.parent.reassignCover(card)
+  }
+
   handleClick = e => {
     const { card, dragging, record } = this.props
     if (dragging) return
@@ -306,7 +313,12 @@ class GridCard extends React.Component {
             <StyledTopRightActions color={this.actionsColor}>
               {record.isDownloadable && <Download record={record} />}
               {record.isImage &&
-                this.canEditCard && <CoverImageToggle card={card} />}
+                this.canEditCard && (
+                  <CoverImageToggle
+                    card={card}
+                    onReassign={this.onCollectionCoverChange}
+                  />
+                )}
               {record.isImage &&
                 this.canEditCard && <ContainImage card={card} />}
               {!testCollectionCard &&
