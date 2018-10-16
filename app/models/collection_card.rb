@@ -10,7 +10,7 @@ class CollectionCard < ApplicationRecord
   accepts_nested_attributes_for :collection, :item
 
   before_validation :assign_order, if: :assign_order?
-  after_save :update_collection_cover, if: :is_cover_changed?
+  after_save :update_collection_cover, if: :saved_change_to_is_cover?
 
   before_create :assign_default_height_and_width
 

@@ -10,7 +10,7 @@ class CollectionCover < SimpleService
 
   def call
     media = manually_set_cover || {}
-    if @collection.cached_cover['no_cover'] != true
+    if @collection.try(:cached_cover).try(:no_cover) != true
       media = manually_set_cover || first_media_item
     end
     text = first_text_item
