@@ -5,7 +5,7 @@ const FilledProfileIcon = () => (
   <Icon fill>
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50 50">
       <g id="Layer_2" data-name="Layer 2">
-        <circle style={{ fill: v.colors.blackLava }} cx="25" cy="25" r="23.5" />
+        <circle style={{ fill: v.colors.black }} cx="25" cy="25" r="23.5" />
       </g>
       <g id="Layer_1" data-name="Layer 1">
         <path

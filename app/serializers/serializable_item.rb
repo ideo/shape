@@ -12,7 +12,7 @@ class SerializableItem < BaseJsonSerializer
   end
 
   attribute :chart_data do
-    @object.cached_chart_data || {}
+    @object.chart_data || {}
   end
 
   attribute :inherited_tag_list do

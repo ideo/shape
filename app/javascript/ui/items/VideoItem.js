@@ -1,6 +1,6 @@
 import { PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
-import ReactPlayer from 'react-player'
+import VideoPlayer from '~/ui/items/VideoPlayer'
 
 const StyledVideoItem = styled.div`
   /* arbitrary styles for now */
@@ -22,7 +22,7 @@ class VideoItem extends React.Component {
     // Examples: https://github.com/CookPete/react-player/blob/master/src/demo/App.js
     return (
       <StyledVideoItem>
-        <ReactPlayer
+        <VideoPlayer
           url={videoUrl}
           playing={false}
           controls

@@ -22,7 +22,7 @@ const StyledBreadcrumbWrapper = styled.div`
   font-size: 1rem;
   font-family: ${v.fonts.sans};
   font-weight: ${v.weights.book};
-  color: ${v.colors.cloudy};
+  color: ${v.colors.commonDark};
   letter-spacing: 1.1px;
 `
 StyledBreadcrumbWrapper.displayName = 'StyledBreadcrumb'
@@ -39,7 +39,7 @@ const StyledBreadcrumbCaret = styled.div`
 const StyledBreadcrumbItem = styled.div`
   display: inline-block;
   a {
-    color: ${v.colors.cloudy};
+    color: ${v.colors.commonDark};
     text-decoration: none;
     display: inline-block;
   }

@@ -7,7 +7,7 @@ import Truncator from 'react-truncator'
 const Container = styled.div`
   align-items: center;
   bottom: 10px;
-  color: ${v.colors.gray};
+  color: ${v.colors.commonMedium};
   display: flex;
   font-family: ${v.fonts.sans};
   font-size: 1rem;
@@ -17,7 +17,7 @@ const Container = styled.div`
   width: calc(100% - 15px);
 `
 const IconHolder = styled.div`
-  background-color: ${v.colors.cararra};
+  background-color: ${v.colors.commonLight};
   border-radius: 50%;
   box-sizing: content-box;
   color: black;
@@ -42,7 +42,7 @@ export const BctButton = styled.button`
   width: 47px;
   height: 47px;
   border-radius: 50%;
-  background: ${v.colors.blackLava};
+  background: ${v.colors.black};
   color: white;
 
   left: ${props => (props.creating ? '100px' : 0)};
@@ -53,7 +53,7 @@ export const BctButton = styled.button`
   transform: ${props => (props.creating ? 'rotate(360deg)' : 'none')};
 
   &:hover {
-    background-color: ${v.colors.cloudy};
+    background-color: ${v.colors.commonDark};
   }
 
   .icon {
@@ -89,7 +89,7 @@ export const StyledBottomLeftIcon = styled.div`
   z-index: ${v.zIndex.gridCard};
   left: 0.25rem;
   bottom: 0;
-  color: ${v.colors.gray};
+  color: ${v.colors.commonMedium};
   width: ${props => (props.iconAmount === 2 ? 75 : 45)}px;
   height: 45px;
   display: flex;
@@ -143,7 +143,7 @@ export const StyledTopRightActions = styled.div`
   }
 `
 StyledTopRightActions.defaultProps = {
-  color: v.colors.gray,
+  color: v.colors.commonMedium,
 }
 StyledTopRightActions.displayName = 'StyledTopRightActions'
 

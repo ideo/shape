@@ -20,7 +20,7 @@ export const ActivityCount = styled.span`
   color: white;
   display: flex;
   border-radius: 50%;
-  background-color: ${v.colors.orange};
+  background-color: ${v.colors.alert};
   align-items: center;
 `
 ActivityCount.displayName = 'ActivityCount'

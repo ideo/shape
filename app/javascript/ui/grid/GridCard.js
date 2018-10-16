@@ -35,8 +35,7 @@ import {
 } from './shared'
 
 const PinIconHolder = styled.div`
-  background-color: ${props =>
-    props.locked ? 'transparent' : v.colors.blackLava};
+  background-color: ${props => (props.locked ? 'transparent' : v.colors.black)};
   border-radius: 50%;
   height: 24px;
   margin-left: 10px;
@@ -74,7 +73,7 @@ class GridCard extends React.Component {
   }
 
   get renderInner() {
-    const { card, record, height } = this.props
+    const { card, record, height, handleClick } = this.props
     if (this.isItem) {
       switch (record.type) {
         case ITEM_TYPES.TEXT:
@@ -83,6 +82,8 @@ class GridCard extends React.Component {
               item={record}
               height={height}
               dragging={this.props.dragging}
+              cardId={card.id}
+              handleClick={handleClick}
             />
           )
         case ITEM_TYPES.FILE: {
@@ -122,11 +123,11 @@ class GridCard extends React.Component {
     const { record } = this.props
     if (this.isItem) {
       if (record.isGenericFile) {
-        return v.colors.blackLava
+        return v.colors.black
       }
-      return v.colors.gray
+      return v.colors.commonMedium
     }
-    return v.colors.gray
+    return v.colors.commonMedium
   }
 
   get renderIcon() {
@@ -196,15 +197,36 @@ class GridCard extends React.Component {
   openMenu = () => {
     const { card } = this.props
     if (this.props.menuOpen) {
-      uiStore.update('openCardMenuId', false)
+      uiStore.closeCardMenu()
     } else {
-      uiStore.update('openCardMenuId', card.id)
+      uiStore.openCardMenu(card.id)
     }
+  }
+
+  openContextMenu = ev => {
+    const { card } = this.props
+    const rect = this.gridCardRef.getBoundingClientRect()
+    const x = ev.screenX - rect.left - rect.width
+    const y = ev.screenY - rect.top - 120
+    const direction = ev.screenX < 250 ? 'right' : 'left'
+    if (this.props.menuOpen) {
+      uiStore.closeCardMenu()
+    } else {
+      uiStore.openCardMenu(card.id, {
+        x,
+        y,
+        direction,
+      })
+    }
+    ev.preventDefault()
+    return false
   }
 
   closeMenu = () => {
     if (this.props.menuOpen) {
-      uiStore.update('openCardMenuId', false)
+      if (!uiStore.cardMenuOpenAndPositioned) {
+        uiStore.closeCardMenu()
+      }
     }
   }
 
@@ -216,8 +238,11 @@ class GridCard extends React.Component {
   }
 
   handleClick = e => {
-    const { dragging, record } = this.props
+    const { card, dragging, record } = this.props
     if (dragging) return
+    if (uiStore.captureKeyboardGridClick(e, card.id)) {
+      return
+    }
     if (record.type === ITEM_TYPES.LINK) {
       this.linkOffsite(record.url)
       return
@@ -249,15 +274,18 @@ class GridCard extends React.Component {
 
     const firstCardInRow = card.position && card.position.x === 0
     const tagEditorOpen = uiStore.tagsModalOpenId === card.id
-
+    const hoverClass = 'show-on-hover'
     return (
       <StyledGridCard
+        className="gridCard"
         dragging={dragging}
         testCollectionCard={testCollectionCard}
         // mostly for E2E checking purposes
         data-width={card.width}
         data-height={card.height}
         data-order={card.order}
+        onContextMenu={this.openContextMenu}
+        innerRef={c => (this.gridCardRef = c)}
       >
         {canEditCollection &&
           (!card.isPinnedAndLocked || lastPinnedCard) && (
@@ -277,7 +305,8 @@ class GridCard extends React.Component {
               {!testCollectionCard && <SelectionCircle cardId={card.id} />}
               <ActionMenu
                 location="GridCard"
-                className="show-on-hover card-menu"
+                className={hoverClass}
+                wrapperClassName="card-menu"
                 card={card}
                 canEdit={this.canEditCard}
                 canReplace={record.canReplace}

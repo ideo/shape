@@ -1,5 +1,7 @@
 class QuestionAnswer < ApplicationRecord
-  belongs_to :survey_response
+  # NOTE: survey_response then touches its test_collection,
+  # so that answering one question can bust the collection caching for viewing charts
+  belongs_to :survey_response, touch: true
   belongs_to :question, class_name: 'Item::QuestionItem'
   belongs_to :open_response_item,
              class_name: 'Item::TextItem',
@@ -32,6 +34,7 @@ class QuestionAnswer < ApplicationRecord
   def update_open_response_item
     item = open_response_item
     return create_open_response_item if item.blank?
+    return destroy_open_response_item_and_card if answer_text.blank?
     item.set_ops_from_plain_text(answer_text)
     item.save
   end

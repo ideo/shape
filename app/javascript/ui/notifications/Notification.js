@@ -21,7 +21,7 @@ function pluralTypeName(name) {
 
 const StyledContainer = styled.div`
   background: ${props =>
-    props.isDefault ? v.colors.activityDarkestBlue : v.colors.orange};
+    props.isDefault ? v.colors.secondaryDarkest : v.colors.alert};
   box-sizing: border-box;
   margin-left: ${props => (props.isDefault ? 10 : 0)}px;
   margin-right: ${props => (props.isDefault ? 10 : 0)}px;

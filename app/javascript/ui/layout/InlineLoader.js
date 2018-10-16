@@ -5,7 +5,7 @@ import v from '~/utils/variables'
 
 const StyledFlex = styled.div`
   background: ${props =>
-    props.background === 'cloudy' ? 'rgba(255, 255, 255, 0.5)' : 'none'};
+    props.background === 'commonDark' ? 'rgba(255, 255, 255, 0.5)' : 'none'};
   display: flex;
   align-items: center;
   justify-content: center;
@@ -30,7 +30,7 @@ InlineLoader.propTypes = {
 }
 InlineLoader.defaultProps = {
   fixed: false,
-  background: 'cloudy',
+  background: 'commonDark',
 }
 
 export default InlineLoader

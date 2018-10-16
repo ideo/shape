@@ -103,7 +103,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   }
 
   get isLaunchableTest() {
-    return this.isTestCollection && this.test_status === 'draft'
+    return this.isTestCollectionOrTestDesign && this.test_status === 'draft'
   }
 
   get isLiveTest() {
@@ -115,11 +115,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   }
 
   get publicTestURL() {
-    let collectionId = this.id
-    if (this.isTestDesign && this.parent_collection_card) {
-      collectionId = this.parent_collection_card.parent_id
-    }
-    return `${process.env.BASE_HOST}/tests/${collectionId}`
+    return `${process.env.BASE_HOST}/tests/${this.testCollectionId}`
   }
 
   get isTemplated() {
@@ -152,7 +148,13 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     return this.isSharedCollection
   }
 
-  // this marks it with the "sirocco" special color
+  get cardProperties() {
+    return this.collection_cards.map(c =>
+      _.pick(c, ['id', 'order', 'width', 'height'])
+    )
+  }
+
+  // this marks it with the "offset" special color
   // NOTE: could also use Collection::Global -- except OrgTemplates is not "special"?
   get isSpecialCollection() {
     return (
@@ -172,6 +174,14 @@ class Collection extends SharedRecordMixin(BaseRecord) {
 
   get isEmpty() {
     return this.collection_cards.length === 0
+  }
+
+  get testCollectionId() {
+    if (this.isTestCollection) return this.id
+    if (this.isTestDesign && this.parent_collection_card) {
+      return this.parent_collection_card.parent_id
+    }
+    return undefined
   }
 
   @action
@@ -238,6 +248,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     }
     this.API_launchTest()
   }
+
   closeTest = async () => {
     await this.API_closeTest()
   }
@@ -248,7 +259,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
 
   API_launchTest() {
     this.apiStore
-      .request(`test_collections/${this.id}/launch`, 'PATCH')
+      .request(`test_collections/${this.testCollectionId}/launch`, 'PATCH')
       .catch(err => {
         uiStore.popupAlert({
           prompt: `You have questions that have not yet been finalized:\n
@@ -259,12 +270,18 @@ class Collection extends SharedRecordMixin(BaseRecord) {
       })
   }
 
-  API_closeTest() {
-    this.apiStore.request(`test_collections/${this.id}/close`, 'PATCH')
+  API_closeTest(collectionId) {
+    this.apiStore.request(
+      `test_collections/${this.testCollectionId}/close`,
+      'PATCH'
+    )
   }
 
   API_reopenTest() {
-    this.apiStore.request(`test_collections/${this.id}/reopen`, 'PATCH')
+    this.apiStore.request(
+      `test_collections/${this.testCollectionId}/reopen`,
+      'PATCH'
+    )
   }
 
   static async createSubmission(parent_id, submissionSettings) {

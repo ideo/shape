@@ -32,7 +32,7 @@ const StyledBlankCreationTool = styled.div`
 StyledBlankCreationTool.displayName = 'StyledBlankCreationTool'
 
 const SubmissionButton = styled.button`
-  background-color: ${v.colors.ctaButtonBlue};
+  background-color: ${v.colors.primaryDark};
   border-radius: 50%;
   color: white;
   font-size: 42px;

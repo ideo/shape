@@ -4,7 +4,7 @@ import styled from 'styled-components'
 import v from '~/utils/variables'
 
 const Link = styled(RouterLink)`
-  color: ${v.colors.pacificBlue};
+  color: ${v.colors.ctaPrimary};
   text-decoration: none;
   &:hover {
     text-decoration: underline;

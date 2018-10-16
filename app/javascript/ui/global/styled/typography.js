@@ -3,7 +3,7 @@ import v from '~/utils/variables'
 
 /** @component */
 export const Heading1 = styled.h1`
-  color: ${v.colors.blackLava};
+  color: ${v.colors.black};
   font-family: ${v.fonts.sans};
   font-size: 2.25rem;
   font-weight: ${v.weights.book};
@@ -29,7 +29,7 @@ export const Heading2 = styled.h2`
   font-size: 1.5rem;
   font-weight: ${v.weights.medium};
   letter-spacing: 0.14375rem;
-  color: ${v.colors.blackLava};
+  color: ${v.colors.black};
 `
 Heading2.displayName = 'Heading2'
 
@@ -59,7 +59,7 @@ export const NumberListText = DisplayText.extend`
 NumberListText.displayName = 'NumberListText'
 
 export const SubduedHeading1 = styled.h1`
-  color: ${v.colors.gray};
+  color: ${v.colors.commonMedium};
   display: inline-block;
   font-weight: 300;
   margin-bottom: 0;
@@ -76,13 +76,13 @@ SubduedHeading1.displayName = 'SubduedHeading1'
 
 /** @component */
 export const SubduedText = DisplayText.extend`
-  color: ${v.colors.cloudy};
+  color: ${v.colors.commonDark};
 `
 SubduedText.displayName = 'SubduedText'
 
 /** @component */
 export const DisplayLink = styled.a`
-  color: ${v.colors.gray};
+  color: ${v.colors.commonMedium};
   font-weight: ${v.weights.book};
   font-family: ${v.fonts.sans};
   font-size: 1rem;
@@ -99,7 +99,7 @@ export const LoudDisplayLink = DisplayLink.extend`
 
 /** @component */
 export const SubduedTitle = styled.span`
-  color: ${v.colors.gray};
+  color: ${v.colors.commonMedium};
   font-weight: ${v.weights.book};
   font-family: ${v.fonts.sans};
   font-size: 1rem;
@@ -123,16 +123,24 @@ SubText.displayName = 'StyledSubText'
 
 /** @component */
 export const SmallHelperText = styled.span`
-  color: ${v.colors.gray};
+  color: ${v.colors.commonMedium};
   font-family: ${v.fonts.sans};
   font-size: 0.75rem;
 `
 SmallHelperText.displayName = 'SmallHelperText'
 
+export const SmallActionText = SmallHelperText.extend`
+  color: white;
+  font-weight: 500;
+  letter-spacing: 2.25px;
+  text-transform: uppercase;
+`
+SmallActionText.displayName = 'SmallActionText'
+
 /** @component */
 export const Anchor = styled.a`
   cursor: pointer;
-  color: ${v.colors.pacificBlue};
+  color: ${v.colors.ctaPrimary};
   text-decoration: none;
   &:hover {
     text-decoration: underline;
@@ -142,7 +150,7 @@ Anchor.displayName = 'StyledAnchor'
 
 // Keep in sync with assets/stylesheets/core/base.scss:quill h1
 export const CardHeading = Heading1.extend`
-  color: ${v.colors.cararra}
+  color: ${v.colors.commonLight}
   margin-bottom: 0.25rem;
   margin-top: 0;
   max-width: 100%;

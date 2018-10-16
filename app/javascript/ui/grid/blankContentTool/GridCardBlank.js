@@ -23,7 +23,6 @@ import CollectionCard from '~/stores/jsonApi/CollectionCard'
 
 import CollectionCreator from './CollectionCreator'
 import TextItemCreator from './TextItemCreator'
-import VideoCreator from './VideoCreator'
 import LinkCreator from './LinkCreator'
 import BctButtonBox from './BctButtonBox'
 import BctButtonRotation from './BctButtonRotation'
@@ -80,8 +79,8 @@ const BctBackground = styled.div`
   width: 175px;
   height: 175px;
   border-radius: 50%;
-  border: 8px solid ${v.colors.cyan};
-  background: ${v.colors.aquaHaze};
+  border: 8px solid ${v.colors.primaryLight};
+  background: ${v.colors.primaryLightest};
   transition: ${v.transitionWithDelay};
 
   /* handle "small 4-col" layout i.e. layoutSize == 3 */
@@ -114,10 +113,10 @@ const BctDropzone = styled.div`
     }
     .top,
     .or {
-      color: ${v.colors.cyan};
+      color: ${v.colors.primaryLight};
     }
     .bottom {
-      color: ${v.colors.blackLava};
+      color: ${v.colors.black};
     }
     .or {
       font-size: 0.75rem;
@@ -125,7 +124,7 @@ const BctDropzone = styled.div`
     }
     p {
       font-size: 0.8rem;
-      color: ${v.colors.cloudy};
+      color: ${v.colors.commonDark};
     }
     transition: ${v.transitionWithDelay};
   }
@@ -144,7 +143,7 @@ const BctDropzone = styled.div`
     ${props =>
       props.droppingFile &&
       `
-      background: ${v.colors.cyan};
+      background: ${v.colors.primaryLight};
       &::after {
         content: '+';
         font-size: 4rem;
@@ -365,7 +364,8 @@ class GridCardBlank extends React.Component {
         break
       case 'video':
         inner = (
-          <VideoCreator
+          <LinkCreator
+            type="video"
             loading={loading}
             createCard={this.createCard}
             closeBlankContentTool={this.closeBlankContentTool}
@@ -375,6 +375,7 @@ class GridCardBlank extends React.Component {
       case 'link':
         inner = (
           <LinkCreator
+            type="link"
             loading={loading}
             createCard={this.createCard}
             closeBlankContentTool={this.closeBlankContentTool}

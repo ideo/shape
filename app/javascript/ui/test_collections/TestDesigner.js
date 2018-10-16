@@ -15,7 +15,7 @@ import QuestionHotEdge from '~/ui/test_collections/QuestionHotEdge'
 import TestQuestion from '~/ui/test_collections/TestQuestion'
 
 const TopBorder = styled.div`
-  background-color: ${v.colors.gray};
+  background-color: ${v.colors.commonMedium};
   border-radius: 7px 7px 0 0;
   height: 16px;
   margin-left: 320px;

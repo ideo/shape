@@ -27,7 +27,8 @@ class CommentThread extends BaseRecord {
     }`
   }
 
-  @computed
+  // don't want @computed here... for some reason this seemed to actually
+  // break the observability (probably because it's on a related record?)
   get unreadCount() {
     const { users_thread } = this
     if (!users_thread) return 0
@@ -74,9 +75,11 @@ class CommentThread extends BaseRecord {
     const apiPath = `comment_threads/${this.id}/comments?page=${page}`
     const res = await this.apiStore.request(apiPath, 'GET')
     runInAction(() => {
+      // simulate backend effect
+      this.comments.forEach(comment => comment.markAsRead())
       this.links = res.links
     })
-    this.importComments(res.data)
+    this.importComments(res.data, { read: true })
   }
 
   async API_saveComment(commentData) {
@@ -119,13 +122,14 @@ class CommentThread extends BaseRecord {
   }
 
   @action
-  importComments(data, { created = false } = {}) {
+  importComments(data, { created = false, read = false } = {}) {
     let newComments = _.union(this.comments.toJS(), data)
     // after we're done creating the temp comment, clear out any prev temp ones
     if (!created) newComments = _.filter(newComments, c => c.persisted)
     data.forEach(comment => {
       const { users_thread } = this
       if (
+        !read &&
         comment.author_id !== this.apiStore.currentUserId &&
         users_thread &&
         comment.updated_at > users_thread.last_viewed_at

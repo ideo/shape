@@ -30,11 +30,11 @@ const StyledCommentThread = styled.div`
     `} /* ---- */
     display: block;
     width: 100%;
-    background-color: ${v.colors.activityDarkBlue};
+    background-color: ${v.colors.secondaryDark};
     background: linear-gradient(
-      ${v.colors.activityDarkBlue} 0,
-      ${v.colors.activityDarkBlue} 80%,
-      ${hexToRgba(v.colors.activityDarkBlue, 0)} 100%
+      ${v.colors.secondaryDark} 0,
+      ${v.colors.secondaryDark} 80%,
+      ${hexToRgba(v.colors.secondaryDark, 0)} 100%
     );
     padding: 10px 10px 0 10px;
     text-align: left;
@@ -76,7 +76,7 @@ const StyledHeader = styled.div`
     text-transform: uppercase;
   }
   .unread {
-    color: ${v.colors.orange};
+    color: ${v.colors.alert};
     display: flex;
     flex-basis: content;
     height: 12px;
@@ -112,6 +112,10 @@ export const ThumbnailHolder = styled.span`
   }
 `
 ThumbnailHolder.displayName = 'ThumbnailHolder'
+
+const StyledCommentsWrapper = styled.div`
+  cursor: ${props => (props.clickable ? 'pointer' : 'auto')};
+`
 
 @observer
 class CommentThread extends React.Component {
@@ -201,6 +205,7 @@ class CommentThread extends React.Component {
 
   render() {
     const { thread, expanded } = this.props
+    const unexpandedClickable = !expanded && thread.unreadCount > 0
 
     return (
       <StyledCommentThread hasMore={thread.hasMore} expanded={expanded}>
@@ -223,11 +228,17 @@ class CommentThread extends React.Component {
             {this.renderUnreadCount()}
           </StyledHeader>
         </button>
-        <div className="comments">
+        <StyledCommentsWrapper
+          clickable={unexpandedClickable}
+          className="comments"
+          onClick={
+            unexpandedClickable ? this.props.onClick : ev => ev.preventDefault()
+          }
+        >
           {thread.hasMore &&
             expanded && <CommentThreadLoader thread={thread} />}
           {this.renderComments()}
-        </div>
+        </StyledCommentsWrapper>
         <CommentEntryForm
           expanded={expanded}
           thread={thread}
