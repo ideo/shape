@@ -13,6 +13,7 @@ class CollectionCover < SimpleService
     if @collection.cached_cover['no_cover'] != true
       media = manually_set_cover || first_media_item
     end
+    debugger
     text = first_text_item
     {
       image_url: media[:content],

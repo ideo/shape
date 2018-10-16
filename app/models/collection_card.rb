@@ -270,7 +270,8 @@ class CollectionCard < ApplicationRecord
   def update_collection_cover
     if is_cover
       # A new cover was selected so turn off other covers
-      parent.collection_cards.where.not(id: id).update(is_cover: false)
+      parent.collection_cards.where.not(id: id).update_all(is_cover: false)
+      parent.cache_cover!
     else
       # The cover was de-selected so turn off the cover on the collection
       parent.update(cached_cover: { no_cover: true })
