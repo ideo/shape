@@ -18,6 +18,13 @@ FactoryBot.define do
     factory :user_collection, class: Collection::UserCollection
     factory :shared_with_me_collection, class: Collection::SharedWithMeCollection
     factory :global_collection, class: Collection::Global
+    factory :getting_started_template_collection, class: Collection::Global do
+      after(:create) do |collection|
+        collection.organization.update_attributes(
+          getting_started_collection: collection,
+        )
+      end
+    end
     factory :user_profile, class: Collection::UserProfile
     factory :submission_box, class: Collection::SubmissionBox
     factory :submissions_collection, class: Collection::SubmissionsCollection

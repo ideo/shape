@@ -163,6 +163,12 @@ class Organization < ApplicationRecord
       parent: user.current_user_collection(id),
     )
 
+    # Change from Collection::Global to regular colleciton
+    user_getting_started.update_attributes(
+      type: 'Collection',
+    )
+    user_getting_started = user_getting_started.becomes(Collection)
+
     CollectionCardBuilder.new(
       params: {
         order: 0,
