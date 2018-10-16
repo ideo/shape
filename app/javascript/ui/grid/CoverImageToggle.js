@@ -23,7 +23,7 @@ class CoverImageToggle extends React.Component {
     const { card, onReassign } = this.props
     card.is_cover = !card.is_cover
     card.save()
-    if (card.is_cover) onReassign(card)
+    if (card.is_cover) onReassign()
   }
 
   render() {
@@ -35,6 +35,7 @@ class CoverImageToggle extends React.Component {
         placement="top"
       >
         <StyledCoverImageToggle
+          className="show-on-hover"
           onClick={this.toggle}
           role="button"
           isCoverImage={card.is_cover}
