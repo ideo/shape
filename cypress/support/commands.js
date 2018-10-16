@@ -109,7 +109,7 @@ Cypress.Commands.add('reorderFirstTwoCards', () => {
 
 Cypress.Commands.add('undo', () => {
   cy.window().then(win => {
-    win.undoStore.captureUndoKeypress({
+    win.captureGlobalKeypress({
       code: 'KeyZ',
       ctrlKey: true,
     })

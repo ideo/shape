@@ -96,7 +96,6 @@ class Activity extends React.PureComponent {
     }
     if (_.includes(['commented', 'mentioned'], action)) {
       const thread = await apiStore.findOrBuildCommentThread(target)
-      uiStore.update('activityLogPage', 'comments')
       uiStore.expandThread(thread.key)
     }
   }

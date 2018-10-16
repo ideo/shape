@@ -184,11 +184,9 @@ class CollectionPage extends PageWithApi {
     collection.checkCurrentOrg()
     if (collection.isNormalCollection) {
       const thread = await apiStore.findOrBuildCommentThread(collection)
+      uiStore.expandThread(thread.key)
       if (location.search) {
-        const menu = uiStore.openOptionalMenus(location.search)
-        if (menu === 'comments') {
-          uiStore.expandThread(thread.key)
-        }
+        uiStore.openOptionalMenus(location.search)
       }
       if (collection.isSubmissionBox && collection.submissions_collection) {
         this.setLoadedSubmissions(false)
