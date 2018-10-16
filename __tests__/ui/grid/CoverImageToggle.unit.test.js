@@ -4,6 +4,7 @@ import v from '~/utils/variables'
 
 const card = fakeCollectionCard
 let props = {}
+let rerender
 const fakeEv = { preventDefault: jest.fn() }
 
 let wrapper, component
@@ -13,7 +14,10 @@ describe('CoverImageToggle', () => {
       card,
       onReassign: jest.fn(),
     }
-    wrapper = shallow(<CoverImageToggle {...props} />)
+    rerender = () => {
+      wrapper = shallow(<CoverImageToggle {...props} />)
+    }
+    rerender()
     component = wrapper.instance()
   })
 
@@ -41,7 +45,7 @@ describe('CoverImageToggle', () => {
     describe('when image is the cover', () => {
       beforeEach(() => {
         props.card.is_cover = true
-        wrapper.setProps(props)
+        rerender()
       })
 
       it('should show the show add cover tooltip', () => {
