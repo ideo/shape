@@ -83,7 +83,7 @@ class Api::V1::UsersController < Api::V1::BaseController
     # NOTE: friendly.find can cause issues here with numeric slugs e.g. "1", so we check for that
     # (these numeric slugs should also be eliminated by new validation rules)
     id = json_api_params[:organization_id]
-    if id.match?(/^[0-9]+$/)
+    if id.is_a?(Integer) || id.to_s.match?(/^[0-9]+$/)
       @organization = Organization.find(id)
     else
       @organization = Organization.friendly.find(id)
