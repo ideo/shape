@@ -96,7 +96,7 @@ class ChartItemCover extends React.Component {
 
   render() {
     return (
-      <CoverContainer>
+      <CoverContainer data-cy="ChartItemCover">
         {this.question && (
           <div>
             <Heading1>{this.mapQuestionType.questionTitle}</Heading1>
