@@ -237,11 +237,6 @@ class GridCard extends React.Component {
     }).click()
   }
 
-  get canEditCoverImage() {
-    const { card } = this.props
-    return !!card.isNormalCollection
-  }
-
   onCollectionCoverChange = () => {
     const { card } = this.props
     // Re-fetch a collection when the collection cover changes as the previous
@@ -322,8 +317,7 @@ class GridCard extends React.Component {
                 )}
               {record.isImage &&
                 this.canEditCard && <ContainImage card={card} />}
-              {!testCollectionCard &&
-                this.canEditCoverImage && <SelectionCircle cardId={card.id} />}
+              {!testCollectionCard && <SelectionCircle cardId={card.id} />}
               <ActionMenu
                 location="GridCard"
                 className={hoverClass}
