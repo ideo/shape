@@ -63,17 +63,19 @@ class TextItemCover extends React.Component {
     return uiStore.textEditingItem === item
   }
 
-  handleEdit = ev => {
-    const { item, dragging } = this.props
-    if (dragging) return false
-    if (!item.can_edit_content) return false
-    // If already editing, pass event down
-    if (uiStore.dragging) return false
-    if (this.isEditing) {
-      ev.stopPropagation()
+  handleClick = e => {
+    e.stopPropagation()
+    const { item, dragging, cardId } = this.props
+    if (dragging || uiStore.dragging || this.isEditing) return false
+    // allow both editors/viewers to capture keyboard clicks
+    if (uiStore.captureKeyboardGridClick(e, cardId)) {
       return false
     }
-    ev.stopPropagation()
+    if (!item.can_edit_content) {
+      // if a viewer, we want to just go to the item page, allow event to propagate
+      this.props.handleClick(e)
+      return true
+    }
     uiStore.update('textEditingItem', this.state.item)
     return null
   }
@@ -176,7 +178,7 @@ class TextItemCover extends React.Component {
           overflowY: isEditing ? 'auto' : 'hidden',
         }}
         class="cancelGridClick"
-        onClick={this.handleEdit}
+        onClick={this.handleClick}
       >
         {this.state.loading && <InlineLoader />}
         {content}
@@ -192,6 +194,8 @@ class TextItemCover extends React.Component {
 TextItemCover.propTypes = {
   item: MobxPropTypes.objectOrObservableObject.isRequired,
   dragging: PropTypes.bool.isRequired,
+  cardId: PropTypes.string.isRequired,
+  handleClick: PropTypes.func.isRequired,
   height: PropTypes.number,
 }
 

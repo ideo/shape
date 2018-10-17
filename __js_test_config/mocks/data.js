@@ -101,6 +101,32 @@ export const fakeChartItemAttrs = {
     2: 1,
     3: 8,
   },
+  chart_data: {
+    datasets: [
+      {
+        label: 'Super test',
+        type: 'question_items',
+        total: 7,
+        data: [
+          { num_responses: 2, answer: 1 },
+          { num_responses: 2, answer: 2 },
+          { num_responses: 0, answer: 3 },
+          { num_responses: 3, answer: 4 },
+        ],
+      },
+      {
+        label: 'Super Org',
+        type: 'org_wide',
+        total: 50,
+        data: [
+          { num_responses: 5, answer: 1 },
+          { num_responses: 10, answer: 2 },
+          { num_responses: 20, answer: 3 },
+          { num_responses: 15, answer: 4 },
+        ],
+      },
+    ],
+  },
   data_source_id: 3,
   inherited_tag_list: [],
   can_edit: false,
@@ -196,6 +222,7 @@ export const fakeCollection = {
   API_updateCards: jest.fn(),
   API_updateName: jest.fn(),
   checkCurrentOrg: jest.fn(),
+  cardProperties: [],
   internalType: 'collections',
   meta: {
     snapshot: {

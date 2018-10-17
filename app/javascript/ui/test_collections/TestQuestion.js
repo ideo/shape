@@ -11,7 +11,7 @@ import ScaleQuestion from '~/ui/test_collections/ScaleQuestion'
 import OpenQuestion from '~/ui/test_collections/OpenQuestion'
 import { apiStore, uiStore } from '~/stores'
 import QuestionAnswer from '~/stores/jsonApi/QuestionAnswer'
-import { QuestionText, questionInformation } from './shared'
+import { QuestionText } from './shared'
 
 const QuestionHolder = styled.div`
   display: flex;
@@ -65,21 +65,16 @@ class TestQuestion extends React.Component {
   renderQuestion() {
     const { parent, card, item, editing, questionAnswer, canEdit } = this.props
     let inner
-
-    const { emojiSeriesName, questionText } = questionInformation(
-      item.question_type
-    )
-
     switch (card.card_question_type) {
       case 'question_useful':
       case 'question_clarity':
       case 'question_excitement':
       case 'question_context':
       case 'question_different':
+      case 'question_category_satisfaction':
         return (
           <ScaleQuestion
-            questionText={questionText}
-            emojiSeries={emojiSeriesName}
+            question={item}
             editing={editing}
             questionAnswer={questionAnswer}
             onAnswer={this.handleQuestionAnswer}
@@ -107,7 +102,7 @@ class TestQuestion extends React.Component {
               card={card}
               cardType="items"
               record={card.record}
-              menuOpen={uiStore.openCardMenuId === card.id}
+              menuOpen={uiStore.cardMenuOpen.id === card.id}
               testCollectionCard
             />
           )

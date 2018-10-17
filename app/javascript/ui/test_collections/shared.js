@@ -1,9 +1,49 @@
 import PropTypes from 'prop-types'
+import objectAssignDeep from 'object-assign-deep'
 import styled, { css } from 'styled-components'
 import TextareaAutosize from 'react-autosize-textarea'
+import { VictoryTheme } from 'victory'
 
 import { StyledCommentTextarea } from '~/ui/global/styled/forms'
 import v from '~/utils/variables'
+
+const colorScale = [v.colors.tertiaryMedium, v.colors.primaryLight]
+export const themeLabelStyles = {
+  fontFamily: v.fonts.sans,
+  fontSize: 14,
+  padding: 10,
+  fill: v.colors.black,
+  stroke: 'transparent',
+}
+export const theme = objectAssignDeep({}, VictoryTheme.grayscale, {
+  bar: {
+    style: {
+      labels: Object.assign({}, themeLabelStyles, {
+        fill: v.colors.tertiaryMedium,
+      }),
+    },
+  },
+  group: {
+    colorScale,
+  },
+  legend: {
+    colorScale,
+    fontSize: 14,
+    gutter: 10,
+    style: {
+      data: {
+        type: 'square',
+      },
+      labels: Object.assign({}, themeLabelStyles, {
+        fontSize: 10.5,
+      }),
+      border: {
+        fill: 'rgba(255, 255, 255, 0.5)',
+      },
+      title: themeLabelStyles,
+    },
+  },
+})
 
 export const QuestionText = styled.p`
   box-sizing: border-box;
@@ -128,9 +168,16 @@ export const emojiSeriesMap = {
     { number: 3, name: 'Different', symbol: '😲' },
     { number: 4, name: 'Very different', symbol: '🤯' },
   ],
+  category_satisfaction: [
+    { number: 1, name: 'Not at all different', symbol: '😏' },
+    { number: 2, name: 'Not very different', symbol: '😐' },
+    { number: 3, name: 'Different', symbol: '😲' },
+    { number: 4, name: 'Very different', symbol: '🤯' },
+  ],
 }
 
-export const questionInformation = questionType => {
+export const questionInformation = question => {
+  const questionType = question.question_type
   let emojiSeriesName
   let questionText
   let questionTitle
@@ -154,6 +201,12 @@ export const questionInformation = questionType => {
       emojiSeriesName = 'different'
       questionText = "How different is this idea from what you've seen before?"
       questionTitle = 'Different'
+      break
+    case 'question_category_satisfaction':
+      emojiSeriesName = 'category_satisfaction'
+      // the category text gets added later within ScaleQuestion
+      questionText = 'How satisifed are you with your current'
+      questionTitle = 'Category Satisfaction'
       break
     case 'question_context':
     default:

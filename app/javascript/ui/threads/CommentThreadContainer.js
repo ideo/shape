@@ -1,20 +1,39 @@
 import { Fragment } from 'react'
-import { observable, observe, runInAction } from 'mobx'
+import { computed, observable, observe, runInAction } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import { Element as ScrollElement, scroller } from 'react-scroll'
 import VisibilitySensor from 'react-visibility-sensor'
 import FlipMove from 'react-flip-move'
 import _ from 'lodash'
 import pluralize from 'pluralize'
+import styled from 'styled-components'
 
 import { ActivityContainer } from '~/ui/global/styled/layout'
+import GoIcon from '~/ui/icons/GoIcon'
 import InlineLoader from '~/ui/layout/InlineLoader'
 import Notification from '~/ui/notifications/Notification'
+import { SmallActionText } from '~/ui/global/styled/typography'
 import CommentThread from './CommentThread'
 
 function pluralTypeName(name) {
   return pluralize(name).toLowerCase()
 }
+
+const GoIconContainer = styled.span`
+  display: inline-block;
+  margin-bottom: 1px;
+  margin-right: 8px;
+  vertical-align: middle;
+  width: 15px;
+`
+
+const JumpButton = styled.button`
+  min-height: 20px;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: -30px;
+  visibility: ${props => props.hide};
+`
 
 @inject('apiStore', 'uiStore')
 @observer
@@ -103,7 +122,8 @@ class CommentThreadContainer extends React.Component {
 
   handleVisibilityChange = i => isVisible => {
     runInAction(() => {
-      this.visibleThreads[i] = isVisible
+      // this.visibleThreads[i] = isVisible
+      this.visibleThreads.set(i, isVisible)
     })
     const { expandedThread } = this
     if (expandedThread) {
@@ -128,8 +148,10 @@ class CommentThreadContainer extends React.Component {
   handleExpandedThreadChange = async (expandedThreadKey, prevKey) => {
     const thread = this.threads.filter(t => t.key === expandedThreadKey)[0]
     if (!thread) return
+    // no change
+    if (thread.id && expandedThreadKey === prevKey) return
     // don't try to load comments of our newly constructed threads
-    if (thread.persisted && thread.id && expandedThreadKey !== prevKey) {
+    if (thread.persisted) {
       runInAction(() => {
         this.loadingThreads = true
       })
@@ -140,9 +162,9 @@ class CommentThreadContainer extends React.Component {
           this.loadingThreads = false
         })
       }
-      // scroll again after any more comments have loaded
-      this.scrollToTopOfNextThread(thread)
     }
+    // scroll again after any more comments have loaded
+    this.scrollToTopOfNextThread(thread)
   }
 
   get threads() {
@@ -154,16 +176,18 @@ class CommentThreadContainer extends React.Component {
     return document.getElementById(this.scrollOpts.containerId)
   }
 
+  @computed
   get showJumpToThreadButton() {
-    const { uiStore } = this.props
-    const { expandedThread } = this
-    return (
-      uiStore.viewingRecord &&
-      (uiStore.viewingRecord.isNormalCollection ||
-        uiStore.viewingRecord.internalType === 'items') &&
-      expandedThread &&
-      uiStore.viewingRecord !== this.expandedThread.record
+    const { apiStore, uiStore } = this.props
+    const { viewingRecord, viewingCollection } = uiStore
+    if (
+      !viewingRecord ||
+      (viewingCollection && !viewingCollection.isNormalCollection)
     )
+      return false
+    const thread = apiStore.findThreadForRecord(uiStore.viewingRecord)
+    const idx = this.threads.indexOf(thread)
+    return !this.visibleThreads.get(idx)
   }
 
   get expandedThread() {
@@ -178,6 +202,8 @@ class CommentThreadContainer extends React.Component {
       // notification may have been cleared out
       if (!notification) return false
       const { activity } = notification
+      // bug?
+      if (!activity) return false
       if (activity.action === 'mentioned') return true
       const identifier = `${pluralTypeName(activity.target_type)}${
         activity.target_id
@@ -260,19 +286,21 @@ class CommentThreadContainer extends React.Component {
 
   render() {
     const { uiStore } = this.props
+    const hideJumpButton = this.showJumpToThreadButton ? 'visible' : 'hidden'
     return (
       <Fragment>
-        {this.showJumpToThreadButton && (
-          <button onClick={this.jumpToCurrentThread} className="jumpToThread">
-            <h3 style={{ textAlign: 'center' }}>
-              Go to {uiStore.viewingRecord.name}
-            </h3>
-          </button>
-        )}
-        {!this.showJumpToThreadButton && (
-          // take up the same amount of space as the button
-          <div style={{ height: '2rem' }} />
-        )}
+        <JumpButton
+          hide={hideJumpButton}
+          onClick={this.jumpToCurrentThread}
+          className="jumpToThread"
+        >
+          <SmallActionText style={{ textAlign: 'center' }}>
+            <GoIconContainer>
+              <GoIcon />
+            </GoIconContainer>
+            Go to {uiStore.viewingRecord && uiStore.viewingRecord.name}
+          </SmallActionText>
+        </JumpButton>
         <div
           style={{
             position: 'absolute',

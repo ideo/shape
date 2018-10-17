@@ -30,7 +30,7 @@ class Collection
 
       event :launch, before: proc { |**args|
                                return false unless test_completed?
-                               remove_incomplete_cards
+                               remove_incomplete_question_items
                                create_test_design_and_move_cards!(initiated_by: args[:initiated_by])
                              } do
         transitions from: :draft, to: :live
@@ -78,15 +78,17 @@ class Collection
 
     def test_completed?
       complete = true
-      unless incomplete_media_cards.count.zero?
+      unless incomplete_media_items.count.zero?
         errors.add(:base,
-                   "Please add an image or video for your idea to question #{incomplete_media_cards.map { |c| c.order + 1 }.to_sentence}")
+                   'Please add an image or video for your idea to question ' +
+                   incomplete_media_items.map { |i| i.parent_collection_card.order + 1 }.to_sentence)
         complete = false
       end
 
-      unless incomplete_description_cards.count.zero?
+      unless incomplete_description_items.count.zero?
         errors.add(:base,
-                   "Please add your idea description to question #{incomplete_description_cards.map { |c| c.order + 1 }.to_sentence}")
+                   'Please add your idea description to question ' +
+                   incomplete_description_items.map { |i| i.parent_collection_card.order + 1 }.to_sentence)
         complete = false
       end
       complete
@@ -122,7 +124,7 @@ class Collection
       test_design.try(:touch)
     end
 
-    def aasm_event_failed(event, current_state)
+    def aasm_event_failed(event, current_state = '')
       return if errors.present?
       message = "You can't #{event} because the feedback is #{current_state}"
       errors.add(:base, message)
@@ -240,33 +242,29 @@ class Collection
     end
 
     # Return array of incomplete media items, with index of item
-    def incomplete_media_cards
-      table = Item::QuestionItem.arel_table
-      primary_collection_cards.joins(
-        :item,
-      ).where(table[:question_type].eq(:question_media))
-                              .where(
-                                table[:filestack_file_id].eq(nil).and(
-                                  table[:url].eq(nil),
-                                ),
-                              )
+    def incomplete_media_items
+      question_items.joins(
+        :parent_collection_card,
+      ).where(question_type: :question_media)
     end
 
-    def incomplete_description_cards
-      table = Item::QuestionItem.arel_table
-      primary_collection_cards.joins(
-        :item,
-      ).where(table[:question_type].eq(:question_description))
-                              .where(
-                                table[:content].eq(nil),
-                              )
+    def incomplete_description_items
+      question_items
+        .joins(
+          :parent_collection_card,
+        ).where(question_type: :question_description, content: [nil, ''])
     end
 
-    def remove_incomplete_cards
-      table = Item::QuestionItem.arel_table
-      primary_collection_cards.joins(
-        :item,
-      ).where(table[:question_type].eq(nil)).destroy_all
+    # Returns the question cards that are in the blank default state
+    def incomplete_question_items
+      question_items
+        .joins(
+          :parent_collection_card,
+        ).where(question_type: nil, filestack_file_id: nil, url: nil)
+    end
+
+    def remove_incomplete_question_items
+      incomplete_question_items.destroy_all
     end
   end
 end

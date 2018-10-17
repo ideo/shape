@@ -58,6 +58,7 @@ const selectOptions = [
   { value: 'question_excitement', label: 'Excitement' },
   { value: 'question_clarity', label: 'Clarity' },
   { value: 'question_different', label: 'Different' },
+  { value: 'question_category_satisfaction', label: 'Category Satisfaction' },
 ]
 
 @observer

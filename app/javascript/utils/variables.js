@@ -47,6 +47,7 @@ export default {
     primaryLightest: '#f0f4f6',
     primaryLight: '#c0dbde',
     primaryMedium: '#9ec1cc',
+    primaryMediumDark: '#86b2b7',
     primaryDark: '#5698ae',
     primaryDarkest: '#35889e',
     secondaryLight: '#73808f',

@@ -47,10 +47,24 @@ FactoryBot.define do
         end
       end
 
+      trait :with_responses do
+        after(:create) do |collection|
+          survey_responses = create_list(:survey_response, 5, test_collection: collection)
+          survey_responses.map do |response|
+            question = response.question_items.select(&:question_useful?).first
+            create(:question_answer,
+                   survey_response: response,
+                   question: question)
+            response.update_attribute(:status, :completed)
+            collection.reload
+          end
+        end
+      end
+
       trait :completed do
         after(:create) do |collection|
           media_question = collection.prelaunch_question_items.detect(&:question_media?)
-          media_question&.update(url: 'something')
+          media_question&.update(type: 'Item::VideoItem', url: 'something', thumbnail_url: 'something', question_type: nil)
           description_question = collection.prelaunch_question_items.detect(&:question_description?)
           description_question&.update(content: 'something')
         end

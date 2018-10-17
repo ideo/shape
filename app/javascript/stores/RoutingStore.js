@@ -19,9 +19,8 @@ class RoutingStore extends RouterStore {
         if (!id) return this.pathTo('homepage')
         return `/${this.slug()}/search?q=${id.replace(/\s/g, '+')}`
       case 'homepage':
-        return `/${this.slug()}`
       default:
-        return ''
+        return `/${this.slug()}`
     }
   }
 

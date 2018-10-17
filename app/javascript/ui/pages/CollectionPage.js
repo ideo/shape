@@ -78,6 +78,12 @@ class CollectionPage extends PageWithApi {
     this.editorTimeout = setTimeout(() => this.setEditor({}), 4000)
   }
 
+  handleAllClick = ev => {
+    const { uiStore } = this.props
+    ev.preventDefault()
+    uiStore.closeCardMenu()
+  }
+
   receivedChannelData = async data => {
     const { apiStore } = this.props
     const { collection } = this
@@ -178,11 +184,9 @@ class CollectionPage extends PageWithApi {
     collection.checkCurrentOrg()
     if (collection.isNormalCollection) {
       const thread = await apiStore.findOrBuildCommentThread(collection)
+      uiStore.expandThread(thread.key)
       if (location.search) {
-        const menu = uiStore.openOptionalMenus(location.search)
-        if (menu === 'comments') {
-          uiStore.expandThread(thread.key)
-        }
+        uiStore.openOptionalMenus(location.search)
       }
       if (collection.isSubmissionBox && collection.submissions_collection) {
         this.setLoadedSubmissions(false)
@@ -269,8 +273,8 @@ class CollectionPage extends PageWithApi {
               updateCollection={this.updateCollection}
               collection={submissions_collection}
               canEditCollection={false}
-              // Pass in cardIds so grid will re-render when they change
-              cardIds={submissions_collection.cardIds}
+              // Pass in cardProperties so grid will re-render when they change
+              cardProperties={submissions_collection.cardProperties}
               // Pass in BCT state so grid will re-render when open/closed
               blankContentToolState={blankContentToolState}
               submissionSettings={{
@@ -349,9 +353,7 @@ class CollectionPage extends PageWithApi {
                 collection={collection}
                 canEditCollection={collection.can_edit_content}
                 // Pass in cardProperties so grid will re-render when they change
-                cardProperties={collection.collection_cards.map(c =>
-                  _.pick(c, ['id', 'order', 'width', 'height'])
-                )}
+                cardProperties={collection.cardProperties}
                 // Pass in BCT state so grid will re-render when open/closed
                 blankContentToolState={blankContentToolState}
                 movingCardIds={uiMovingCardIds}
@@ -370,7 +372,12 @@ class CollectionPage extends PageWithApi {
             {isSubmissionBox &&
               collection.submission_box_type &&
               this.renderSubmissionsCollection()}
-            {uiStore.dragging && <ClickWrapper clickHandlers={[]} />}
+            {(uiStore.dragging || uiStore.cardMenuOpenAndPositioned) && (
+              <ClickWrapper
+                clickHandlers={[this.handleAllClick]}
+                onContextMenu={this.handleAllClick}
+              />
+            )}
           </PageContainer>
         )}
         {isLoading && this.loader()}
