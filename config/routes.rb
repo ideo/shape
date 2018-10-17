@@ -119,6 +119,8 @@ Rails.application.routes.draw do
     post 'ideo_network/users' => 'ideo_network#users'
   end
 
+  resources :reports, only: %i[show]
+
   get 'passthru', to: 'urls#passthru'
   get 'invitations/:token', to: 'invitations#accept', as: :accept_invitation
 

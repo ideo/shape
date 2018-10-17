@@ -148,6 +148,12 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     return this.isSharedCollection
   }
 
+  get cardProperties() {
+    return this.collection_cards.map(c =>
+      _.pick(c, ['id', 'order', 'width', 'height'])
+    )
+  }
+
   // this marks it with the "offset" special color
   // NOTE: could also use Collection::Global -- except OrgTemplates is not "special"?
   get isSpecialCollection() {

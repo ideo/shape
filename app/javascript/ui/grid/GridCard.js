@@ -73,7 +73,7 @@ class GridCard extends React.Component {
   }
 
   get renderInner() {
-    const { card, record, height } = this.props
+    const { card, record, height, handleClick } = this.props
     if (this.isItem) {
       switch (record.type) {
         case ITEM_TYPES.TEXT:
@@ -83,16 +83,20 @@ class GridCard extends React.Component {
               height={height}
               dragging={this.props.dragging}
               cardId={card.id}
+              handleClick={handleClick}
             />
           )
         case ITEM_TYPES.FILE: {
-          if (record.filestack_file.mimetype === 'application/pdf') {
+          if (record.isPdfFile) {
             return <PdfFileItemCover item={record} />
           }
-          if (record.mimeBaseType === 'image') {
+          if (record.isImage) {
             return <ImageItemCover item={record} contain={card.image_contain} />
           }
-          return <GenericFileItemCover item={record} />
+          if (record.filestack_file) {
+            return <GenericFileItemCover item={record} />
+          }
+          return <div style={{ padding: '20px' }}>File not found.</div>
         }
         case ITEM_TYPES.VIDEO:
           return <VideoItemCover item={record} dragging={this.props.dragging} />
@@ -283,6 +287,7 @@ class GridCard extends React.Component {
         data-width={card.width}
         data-height={card.height}
         data-order={card.order}
+        data-cy="GridCard"
         onContextMenu={this.openContextMenu}
         innerRef={c => (this.gridCardRef = c)}
       >

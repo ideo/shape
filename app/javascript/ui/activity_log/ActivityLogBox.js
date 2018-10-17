@@ -178,6 +178,16 @@ class ActivityLogBox extends React.Component {
     this.changePage('comments')
   }
 
+  @action
+  handleMoveStart = () => {
+    this.props.uiStore.update('activityLogMoving', true)
+  }
+
+  @action
+  handleMoveStop = () => {
+    this.props.uiStore.update('activityLogMoving', false)
+  }
+
   get mobileProps() {
     const { uiStore } = this.props
     if (!uiStore.activityLogForceWidth) return {}
@@ -231,7 +241,11 @@ class ActivityLogBox extends React.Component {
           right: true,
         }}
         disableDragging={false}
+        onDragStart={this.handleMoveStart}
+        onResizeStart={this.handleMoveStart}
+        onResizeStop={this.handleMoveStop}
         onDragStop={(ev, d) => {
+          this.handleMoveStop()
           this.updatePosition(d)
         }}
         onResize={(ev, dir, ref, delta, position) => {

@@ -148,8 +148,10 @@ class CommentThreadContainer extends React.Component {
   handleExpandedThreadChange = async (expandedThreadKey, prevKey) => {
     const thread = this.threads.filter(t => t.key === expandedThreadKey)[0]
     if (!thread) return
+    // no change
+    if (thread.id && expandedThreadKey === prevKey) return
     // don't try to load comments of our newly constructed threads
-    if (thread.persisted && thread.id && expandedThreadKey !== prevKey) {
+    if (thread.persisted) {
       runInAction(() => {
         this.loadingThreads = true
       })
@@ -160,9 +162,9 @@ class CommentThreadContainer extends React.Component {
           this.loadingThreads = false
         })
       }
-      // scroll again after any more comments have loaded
-      this.scrollToTopOfNextThread(thread)
     }
+    // scroll again after any more comments have loaded
+    this.scrollToTopOfNextThread(thread)
   }
 
   get threads() {
@@ -177,7 +179,11 @@ class CommentThreadContainer extends React.Component {
   @computed
   get showJumpToThreadButton() {
     const { apiStore, uiStore } = this.props
-    if (!uiStore.viewingRecord || !uiStore.viewingRecord.isNormalCollection)
+    const { viewingRecord, viewingCollection } = uiStore
+    if (
+      !viewingRecord ||
+      (viewingCollection && !viewingCollection.isNormalCollection)
+    )
       return false
     const thread = apiStore.findThreadForRecord(uiStore.viewingRecord)
     const idx = this.threads.indexOf(thread)
@@ -196,6 +202,8 @@ class CommentThreadContainer extends React.Component {
       // notification may have been cleared out
       if (!notification) return false
       const { activity } = notification
+      // bug?
+      if (!activity) return false
       if (activity.action === 'mentioned') return true
       const identifier = `${pluralTypeName(activity.target_type)}${
         activity.target_id
@@ -309,7 +317,10 @@ class CommentThreadContainer extends React.Component {
             />
           ))}
         </div>
-        <ActivityContainer id={this.scrollOpts.containerId}>
+        <ActivityContainer
+          moving={uiStore.activityLogMoving}
+          id={this.scrollOpts.containerId}
+        >
           {this.loadingThreads && <InlineLoader fixed background="none" />}
           <FlipMove disableAllAnimations={!!uiStore.expandedThreadKey}>
             {this.renderThreads()}
