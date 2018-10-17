@@ -46,6 +46,10 @@ class SerializableCollection < BaseJsonSerializer
   belongs_to :organization
   belongs_to :created_by
 
+  attribute :collection_card_count do
+    @object.cached_card_count || 0
+  end
+
   has_many :collection_cards do
     data do
       @object.collection_cards_viewable_by(

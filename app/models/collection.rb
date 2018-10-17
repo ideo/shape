@@ -20,7 +20,8 @@ class Collection < ApplicationRecord
                  :cached_cover,
                  :cached_tag_list,
                  :cached_owned_tag_list,
-                 :cached_org_properties
+                 :cached_org_properties,
+                 :cached_card_count
 
   # callbacks
   after_commit :touch_related_cards, if: :saved_change_to_updated_at?, unless: :destroyed?
@@ -390,6 +391,15 @@ class Collection < ApplicationRecord
   def cache_cover!
     cache_cover
     save
+  end
+
+  def cache_card_count!
+    # not using the store_accessor directly here because of:
+    # https://github.com/rails/rails/pull/32563
+    self.cached_attributes ||= {}
+    self.cached_attributes['cached_card_count'] = collection_cards.count
+    # update without callbacks/timestamps
+    update_column :cached_attributes, cached_attributes
   end
 
   def update_cover_text!(text_item)
