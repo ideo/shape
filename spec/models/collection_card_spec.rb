@@ -289,22 +289,4 @@ RSpec.describe CollectionCard, type: :model do
       end
     end
   end
-
-  describe 'before saving' do
-    context 'when is_cover is set to true' do
-      let(:collection) { create(:collection) }
-      let!(:collection_card_list) { create_list(:collection_card_image, 5, parent: collection) }
-      let(:current_cover) { collection_card_list.last }
-      let(:collection_cards) { collection.collection_cards }
-
-      before do
-        current_cover.update_column(:is_cover, true)
-      end
-
-      it 'should unset any other cards is_cover attribute' do
-        collection_cards.first.update_attribute(:is_cover, true)
-        expect(current_cover.reload.is_cover).to be false
-      end
-    end
-  end
 end
