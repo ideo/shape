@@ -87,13 +87,16 @@ class GridCard extends React.Component {
             />
           )
         case ITEM_TYPES.FILE: {
-          if (record.filestack_file.mimetype === 'application/pdf') {
+          if (record.isPdfFile) {
             return <PdfFileItemCover item={record} />
           }
-          if (record.mimeBaseType === 'image') {
+          if (record.isImage) {
             return <ImageItemCover item={record} contain={card.image_contain} />
           }
-          return <GenericFileItemCover item={record} />
+          if (record.filestack_file) {
+            return <GenericFileItemCover item={record} />
+          }
+          return <div style={{ padding: '20px' }}>File not found.</div>
         }
         case ITEM_TYPES.VIDEO:
           return <VideoItemCover item={record} dragging={this.props.dragging} />
