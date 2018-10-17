@@ -227,7 +227,8 @@ describe('GridCard', () => {
       beforeEach(() => {
         props.card.record = fakeFileItem
         props.record = fakeFileItem
-        fakeFileItem.filestack_file.mimetype = 'application/pdf'
+        fakeFileItem.isPdfFile = true
+        fakeFileItem.isGenericFile = false
         props.cardType = 'items'
         rerender()
       })
@@ -241,7 +242,8 @@ describe('GridCard', () => {
       beforeEach(() => {
         props.card.record = fakeFileItem
         props.record = fakeFileItem
-        fakeFileItem.filestack_file.mimetype = 'application/vnd.powerpoint'
+        fakeFileItem.isGenericFile = true
+        fakeFileItem.isPdfFile = false
         props.cardType = 'items'
         rerender()
       })
