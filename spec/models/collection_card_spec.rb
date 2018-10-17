@@ -272,6 +272,17 @@ RSpec.describe CollectionCard, type: :model do
       expect(current_cover.reload.is_cover).to be false
     end
   end
+  
+  describe 'update_parent_card_count!' do
+    let(:collection) { create(:collection) }
+
+    it 'should update when creating a card in the collection' do
+      collection.cache_card_count!
+      expect(collection.cached_card_count).to eq 0
+      create(:collection_card, parent: collection)
+      expect(collection.cached_card_count).to eq 1
+    end
+  end
 
   context 'archiving' do
     let(:collection) { create(:collection) }
@@ -298,10 +309,16 @@ RSpec.describe CollectionCard, type: :model do
     end
 
     describe 'archive!' do
-      it 'archive and call decrement_card_orders' do
+      it 'should archive and call decrement_card_orders' do
         expect(CollectionCard).to receive(:decrement_counter)
         collection_card.archive!
         expect(collection_card.archived?).to be true
+      end
+
+      it 'should decrement parent cached_card_count' do
+        expect(collection.cached_card_count).to eq 5
+        collection_card.archive!
+        expect(collection.cached_card_count).to eq 4
       end
     end
   end

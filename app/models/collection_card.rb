@@ -13,6 +13,7 @@ class CollectionCard < ApplicationRecord
 
   before_create :assign_default_height_and_width
   after_update :update_collection_cover, if: :saved_change_to_is_cover?
+  after_create :update_parent_card_count!
 
   validates :parent, :order, presence: true
   validate :single_item_or_collection_is_present
@@ -168,6 +169,7 @@ class CollectionCard < ApplicationRecord
   # gets called by child STI classes
   def after_archive_card
     decrement_card_orders!
+    update_parent_card_count!
     cover = parent.cached_cover
     if cover && cover['card_ids'].include?(id)
       # regenerate parent collection cover if archived card was relevant
@@ -276,5 +278,9 @@ class CollectionCard < ApplicationRecord
       # The cover was de-selected so turn off the cover on the collection
       parent.update(cached_cover: { no_cover: true })
     end
+  end
+  
+  def update_parent_card_count!
+    parent.cache_card_count!
   end
 end

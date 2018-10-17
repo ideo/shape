@@ -161,4 +161,21 @@ describe('ActivityLogBox', () => {
       expect(localStorage.getItem(PAGE_KEY)).toEqual('notifications')
     })
   })
+
+  describe('handleMoveStart', () => {
+    it('should update uiStore activityLogMoving', () => {
+      component.handleMoveStart()
+      expect(fakeUiStore.update).toHaveBeenCalledWith('activityLogMoving', true)
+    })
+  })
+
+  describe('handleMoveStop', () => {
+    it('should disable uiStore activityLogMoving', () => {
+      component.handleMoveStop()
+      expect(fakeUiStore.update).toHaveBeenCalledWith(
+        'activityLogMoving',
+        false
+      )
+    })
+  })
 })

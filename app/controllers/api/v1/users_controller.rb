@@ -80,8 +80,14 @@ class Api::V1::UsersController < Api::V1::BaseController
   private
 
   def load_and_authorize_organization
-    # NOTE: friendly.find can cause issues here e.g. a slug of "1"
-    @organization = Organization.find(json_api_params[:organization_id])
+    # NOTE: friendly.find can cause issues here with numeric slugs e.g. "1", so we check for that
+    # (these numeric slugs should also be eliminated by new validation rules)
+    id = json_api_params[:organization_id]
+    if id.is_a?(Integer) || id.to_s.match?(/^[0-9]+$/)
+      @organization = Organization.find(id)
+    else
+      @organization = Organization.friendly.find(id)
+    end
     authorize! :read, @organization
   end
 
