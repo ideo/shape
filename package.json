@@ -74,6 +74,7 @@
     "datx": "^0.11.4",
     "datx-jsonapi": "^0.11.4",
     "draft-js": "^0.10.5",
+    "draft-js-linkify-plugin": "^2.0.1",
     "draft-js-mention-plugin": "^3.0.4",
     "draft-js-plugins-editor": "^2.0.8",
     "eslint-config-prettier": "^3.0.1",
