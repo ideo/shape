@@ -109,8 +109,7 @@ function hyphenate(namePart) {
   // u00AD is the "soft" hyphenation character Hypher uses
   if (!hyphenated.includes('\u00AD')) return namePart
   const parts = hyphenated.split('\u00AD')
-  // u2010 is the "hard" hyphenation character required by the browser
-  return `${parts.slice(0, -1).join('')}\u2010${parts.slice(-1)}`
+  return `${parts.slice(0, -1).join('')}\u00AD${parts.slice(-1)}`
 }
 
 function namePartTooLong(fullName) {
@@ -134,6 +133,7 @@ class CollectionCover extends React.Component {
   get name() {
     const { collection } = this.props
     const tooLong = namePartTooLong(collection.name)
+    const hyphens = tooLong ? 'auto' : 'initial'
     if (this.hasIcon) {
       const nameParts = splitName(collection.name)
       if (!nameParts) return collection.name
@@ -154,7 +154,7 @@ class CollectionCover extends React.Component {
         rightIcon = <TestCollectionIcon />
       }
       return (
-        <Fragment>
+        <span style={{ hyphens }}>
           {leftIcon && <IconHolder>{leftIcon}</IconHolder>}
           {nameParts.join(' ')}{' '}
           <span style={{ hyphens: tooLong ? 'auto' : 'initial' }}>
@@ -162,14 +162,10 @@ class CollectionCover extends React.Component {
             &nbsp;
             {rightIcon && <IconHolder>{rightIcon}</IconHolder>}
           </span>
-        </Fragment>
+        </span>
       )
     }
-    return (
-      <span style={{ hyphens: tooLong ? 'auto' : 'initial' }}>
-        {collection.name}
-      </span>
-    )
+    return <span style={{ hyphens }}>{collection.name}</span>
   }
 
   handleClick = e => {
