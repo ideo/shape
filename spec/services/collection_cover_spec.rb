@@ -19,6 +19,27 @@ RSpec.describe CollectionCover, type: :service do
       it 'gets the first text item' do
         expect(collection_cover['text']).to eq text_item.item.plain_content
       end
+
+      it 'should broadcast the collection update' do
+        expect(CollectionUpdateBroadcaster).to receive(:call).with(collection)
+        collection_cover
+      end
+
+      context 'after archiving the cover item' do
+        before do
+          # for this test we want to check how the cached_cover gets set/updated
+          collection.cache_cover!
+        end
+
+        it 'should automatically set the cover to the next media item' do
+          expect(collection.cached_cover['image_url']).to eq image_item.item.filestack_file_url
+          # should broadcast this update
+          expect(CollectionUpdateBroadcaster).to receive(:call).with(collection)
+          image_item.archive!
+          expect(video_item.reload.is_cover?).to be true
+          expect(collection.cached_cover['image_url']).to eq video_item.item.image_url
+        end
+      end
     end
 
     context 'with an image manually set' do

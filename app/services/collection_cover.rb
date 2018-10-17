@@ -40,8 +40,10 @@ class CollectionCover < SimpleService
 
     new_cover = first_media_item
     return {} if new_cover.empty?
+    # this is the case where the system finds the first/best image for the cover
     card = CollectionCard.find(new_cover[:card_id])
     card.update(is_cover: true)
+    CollectionUpdateBroadcaster.call(@collection)
     new_cover
   end
 

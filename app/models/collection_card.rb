@@ -33,6 +33,7 @@ class CollectionCard < ApplicationRecord
     # propagate to STI models
     propagate
     nullify :templated_from_id
+    nullify :is_cover
     # don't recognize any relations, easiest way to turn them all off
     recognize []
   end

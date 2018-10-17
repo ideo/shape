@@ -95,9 +95,8 @@ class CollectionPage extends PageWithApi {
     if (_.compact([currentId, submissionsId]).indexOf(data.record_id) > -1) {
       this.setEditor(data.current_editor)
       if (
-        !data.processing_done &&
-        (_.isEmpty(data.current_editor) ||
-          data.current_editor.id === apiStore.currentUserId)
+        !_.isEmpty(data.current_editor) &&
+        data.current_editor.id === apiStore.currentUserId
       ) {
         // don't reload your own updates
         return
