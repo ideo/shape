@@ -1,15 +1,14 @@
 import NotificationsContainer from '~/ui/notifications/NotificationsContainer'
 
 import fakeApiStore from '#/mocks/fakeApiStore'
+import fakeUiStore from '#/mocks/fakeUiStore'
 
-let props
-let wrapper
-let component
-
+let props, wrapper, component
 describe('NotificationsContainer', () => {
   beforeEach(() => {
     props = {
       apiStore: fakeApiStore(),
+      uiStore: fakeUiStore,
     }
     wrapper = shallow(<NotificationsContainer.wrappedComponent {...props} />)
     component = wrapper.instance()

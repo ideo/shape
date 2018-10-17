@@ -31,6 +31,14 @@ describe('CommentThreadContainer', () => {
     expect(uiStore.expandThread).toHaveBeenCalledWith(key, { reset: false })
   })
 
+  it('should render the ActivityContainer with moving=false to enable overflow-y scroll', () => {
+    expect(wrapper.find('ActivityContainer').props().moving).toBe(false)
+    expect(wrapper.find('ActivityContainer')).toHaveStyleRule(
+      'overflow-y',
+      'scroll'
+    )
+  })
+
   describe('when on page of expanded thread in view', () => {
     beforeEach(() => {
       component.visibileThreads = {
@@ -41,6 +49,21 @@ describe('CommentThreadContainer', () => {
 
     it('should not show the jump button', () => {
       expect(component.showJumpToThreadButton).toBe(false)
+    })
+  })
+
+  describe('while uiStore.activityLogMoving is true', () => {
+    beforeEach(() => {
+      props.uiStore.activityLogMoving = true
+      wrapper = shallow(<CommentThreadContainer.wrappedComponent {...props} />)
+    })
+
+    it('should render the ActivityContainer with moving=true to disable overflow-y', () => {
+      expect(wrapper.find('ActivityContainer').props().moving).toBe(true)
+      expect(wrapper.find('ActivityContainer')).toHaveStyleRule(
+        'overflow-y',
+        'hidden'
+      )
     })
   })
 })

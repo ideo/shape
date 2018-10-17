@@ -163,24 +163,19 @@ describe('ActivityLogBox', () => {
   })
 
   describe('handleMoveStart', () => {
-    it('should display the ClickWrapper', () => {
-      expect(wrapper.find('ClickWrapper').exists()).toBeFalsy()
+    it('should update uiStore activityLogMoving', () => {
       component.handleMoveStart()
-      wrapper.update()
-      expect(wrapper.find('ClickWrapper').exists()).toBeTruthy()
+      expect(fakeUiStore.update).toHaveBeenCalledWith('activityLogMoving', true)
     })
   })
 
   describe('handleMoveStop', () => {
-    beforeEach(() => {
-      component.handleMoveStart()
-      wrapper.update()
-    })
-    it('should hide the ClickWrapper', () => {
-      expect(wrapper.find('ClickWrapper').exists()).toBeTruthy()
+    it('should disable uiStore activityLogMoving', () => {
       component.handleMoveStop()
-      wrapper.update()
-      expect(wrapper.find('ClickWrapper').exists()).toBeFalsy()
+      expect(fakeUiStore.update).toHaveBeenCalledWith(
+        'activityLogMoving',
+        false
+      )
     })
   })
 })

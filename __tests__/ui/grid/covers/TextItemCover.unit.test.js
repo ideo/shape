@@ -8,6 +8,7 @@ const props = {
   dragging: false,
   height: 200,
   cardId: '1',
+  handleClick: jest.fn(),
 }
 
 let wrapper
