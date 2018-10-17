@@ -5,6 +5,7 @@ import styled from 'styled-components'
 
 import ChartItemCover from '~/ui/grid/covers/ChartItemCover'
 import ContainImage from '~/ui/grid/ContainImage'
+import CoverImageToggle from '~/ui/grid/CoverImageToggle'
 import GridCardHotspot from '~/ui/grid/GridCardHotspot'
 import LinkItemCover from '~/ui/grid/covers/LinkItemCover'
 import TextItemCover from '~/ui/grid/covers/TextItemCover'
@@ -240,6 +241,12 @@ class GridCard extends React.Component {
     }).click()
   }
 
+  onCollectionCoverChange = () => {
+    const { card } = this.props
+    // Reassign the previous cover when a new cover is assigned as the backend will have changed.
+    card.parent.reassignCover(card)
+  }
+
   handleClick = e => {
     const { card, dragging, record } = this.props
     if (dragging) return
@@ -304,6 +311,14 @@ class GridCard extends React.Component {
           uiStore.textEditingItem !== record && (
             <StyledTopRightActions color={this.actionsColor}>
               {record.isDownloadable && <Download record={record} />}
+              {record.isImage &&
+                canEditCollection &&
+                this.canEditCard && (
+                  <CoverImageToggle
+                    card={card}
+                    onReassign={this.onCollectionCoverChange}
+                  />
+                )}
               {record.isImage &&
                 this.canEditCard && <ContainImage card={card} />}
               {!testCollectionCard && <SelectionCircle cardId={card.id} />}

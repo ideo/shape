@@ -19,6 +19,21 @@ RSpec.describe CollectionCover, type: :service do
       end
     end
 
+    context 'with an image manually set' do
+      let!(:collection) { create(:collection) }
+      let!(:text_item) { create(:collection_card_text, parent: collection) }
+      let!(:image_item) { create(:collection_card_image, parent: collection) }
+      let!(:picked_image_item) do
+        create(:collection_card_image, parent: collection,
+                                       is_cover: true)
+      end
+
+      it 'skips the first image item and gets the manually selected image' do
+        expect(collection_cover['image_url']).to_not be_nil
+        expect(collection_cover['image_url']).to eq image_item.item.filestack_file_url
+      end
+    end
+
     context 'with no image' do
       let!(:collection) { create(:collection) }
       let!(:text_item) { create(:collection_card_text, parent: collection) }

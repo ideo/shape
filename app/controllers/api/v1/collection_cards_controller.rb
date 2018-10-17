@@ -30,7 +30,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
       else
         create_notification(card, :created)
       end
-      render jsonapi: card,
+      render jsonapi: card.reload,
              include: [:parent, record: [:filestack_file]],
              expose: { current_record: card.record }
     else
@@ -50,7 +50,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
   def update
     @collection_card.attributes = collection_card_update_params
     if @collection_card.save
-      render jsonapi: @collection_card
+      render jsonapi: @collection_card.reload
     else
       render_api_errors @collection_card.errors
     end
@@ -245,6 +245,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
       :width,
       :height,
       :image_contain,
+      :is_cover,
     )
   end
 
