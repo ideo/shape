@@ -93,6 +93,8 @@ class ChartItemCover extends React.Component {
   }
 
   render() {
+    const currentOrgName = apiStore.currentUserOrganization.name
+    const { testCollection } = this.props
     return (
       <CoverContainer data-cy="ChartItemCover">
         {this.question && (
@@ -172,7 +174,10 @@ class ChartItemCover extends React.Component {
             padding={0}
             rowGutter={0}
             style={{ fill: 'white' }}
-            data={[{ name: 'Age test' }, { name: 'IDEO Organization' }]}
+            data={[
+              { name: testCollection.name },
+              { name: `${currentOrgName} Organization` },
+            ]}
           />
         </VictoryChart>
       </CoverContainer>
@@ -182,6 +187,7 @@ class ChartItemCover extends React.Component {
 
 ChartItemCover.propTypes = {
   item: MobxPropTypes.objectOrObservableObject.isRequired,
+  testCollection: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 
 export default ChartItemCover
