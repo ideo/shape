@@ -113,6 +113,8 @@ export default class UiStore {
   @observable
   activityLogPage = 'comments'
   @observable
+  activityLogMoving = false
+  @observable
   windowWidth = 0
 
   // Comments + Threads

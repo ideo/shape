@@ -317,7 +317,10 @@ class CommentThreadContainer extends React.Component {
             />
           ))}
         </div>
-        <ActivityContainer id={this.scrollOpts.containerId}>
+        <ActivityContainer
+          moving={uiStore.activityLogMoving}
+          id={this.scrollOpts.containerId}
+        >
           {this.loadingThreads && <InlineLoader fixed background="none" />}
           <FlipMove disableAllAnimations={!!uiStore.expandedThreadKey}>
             {this.renderThreads()}

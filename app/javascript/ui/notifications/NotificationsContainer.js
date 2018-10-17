@@ -10,7 +10,7 @@ const NoActivityText = ActivityText.extend`
   padding: 1rem;
 `
 
-@inject('apiStore')
+@inject('apiStore', 'uiStore')
 @observer
 class NotificationsContainer extends React.Component {
   get notifications() {
@@ -28,9 +28,10 @@ class NotificationsContainer extends React.Component {
   }
 
   render() {
+    const { uiStore } = this.props
     const { notifications } = this
     return (
-      <ActivityContainer>
+      <ActivityContainer moving={uiStore.activityLogMoving}>
         {notifications.map(notification => (
           <Notification notification={notification} key={notification.id} />
         ))}
@@ -46,6 +47,7 @@ class NotificationsContainer extends React.Component {
 
 NotificationsContainer.wrappedComponent.propTypes = {
   apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
+  uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 
 export default NotificationsContainer
