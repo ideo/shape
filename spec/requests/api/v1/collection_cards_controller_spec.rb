@@ -591,6 +591,29 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
       patch(path, params: params)
     end
 
+    context 'when is_cover is set to true' do
+      let!(:collection_card_list) { create_list(:collection_card_image, 5, parent: collection) }
+      let(:current_cover) { collection_card_list.last }
+      let(:new_cover) { collection_card_list.first }
+      let(:path) { "/api/v1/collection_cards/#{new_cover.id}" }
+      let(:raw_params) do
+        {
+          is_cover: true,
+        }
+      end
+      let(:params) { json_api_params('collection_cards', raw_params) }
+
+      before do
+        user.add_role(Role::EDITOR, new_cover.item)
+        current_cover.update_column(:is_cover, true)
+      end
+
+      it 'should unset any other cards is_cover attribute' do
+        patch(path, params: params)
+        expect(current_cover.reload.is_cover).to be false
+      end
+    end
+
     context 'without content editor access on the parent collection' do
       let(:user) { create(:user, add_to_org: create(:organization)) }
 

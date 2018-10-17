@@ -49,7 +49,6 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
 
   def update
     @collection_card.attributes = collection_card_update_params
-    debugger
     if @collection_card.save
       update_collection_cover
       render jsonapi: @collection_card.reload
@@ -243,7 +242,6 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
   end
 
   def update_collection_cover
-    debugger
     if @collection_card.is_cover
       # A new cover was selected so turn off other covers
       @collection_card.parent.collection_cards.where.not(id: @collection_card.id).update_all(is_cover: false)
