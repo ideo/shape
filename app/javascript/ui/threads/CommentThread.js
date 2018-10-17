@@ -231,9 +231,7 @@ class CommentThread extends React.Component {
         <StyledCommentsWrapper
           clickable={unexpandedClickable}
           className="comments"
-          onClick={
-            unexpandedClickable ? this.props.onClick : ev => ev.preventDefault()
-          }
+          onClick={unexpandedClickable ? this.props.onClick : () => true}
         >
           {thread.hasMore &&
             expanded && <CommentThreadLoader thread={thread} />}

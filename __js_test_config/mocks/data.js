@@ -309,7 +309,7 @@ export const fakePosition = {
 export const fakeComment = {
   id: "1",
   author: fakeUser,
-  message: 'This is my message to the world.',
+  message: 'This is my message to the world. Go to the source: https://www.ideo.com',
   updated_at: new Date(),
 }
 export const fakeThread = {

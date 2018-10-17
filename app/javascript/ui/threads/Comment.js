@@ -28,6 +28,12 @@ const StyledComment = StyledCommentInput.extend`
   .message {
     font-family: ${v.fonts.sans};
     margin-top: 5px;
+    a,
+    a:hover,
+    a:active,
+    a:visited {
+      color: ${v.colors.ctaPrimary};
+    }
   }
 `
 
