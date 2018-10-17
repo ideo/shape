@@ -103,5 +103,22 @@ describe Api::V1::OrganizationsController, type: :request, json: true, auth: tru
       patch(path, params: params)
       expect(organization.reload.name).to eq('Acme Inc 2.0')
     end
+
+    context 'setting in app billing' do
+      before do
+        organization.update_attributes(in_app_billing: true)
+      end
+
+      it 'does not work if you are not super admin' do
+        patch(path, params: json_api_params('organizations', in_app_billing: false))
+        expect(organization.reload.in_app_billing).to eql(true)
+      end
+
+      it 'works if you are a super admin' do
+        user.add_role(Role::SUPER_ADMIN)
+        patch(path, params: json_api_params('organizations', in_app_billing: false))
+        expect(organization.reload.in_app_billing).to eql(false)
+      end
+    end
   end
 end
