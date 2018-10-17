@@ -1,6 +1,12 @@
 class CollectionCover < SimpleService
   def initialize(collection)
     @collection = collection
+    if collection.cached_cover.blank?
+      # if this collection has no setting for no_cover, default to false
+      @no_cover = false
+    else
+      @no_cover = collection.cached_cover['no_cover']
+    end
     @inheritance = Roles::Inheritance.new(collection)
   end
 
@@ -19,6 +25,7 @@ class CollectionCover < SimpleService
       card_order: [text[:card_order], media[:card_order]].compact.max,
       item_id_text: text[:item_id],
       item_id_media: media[:item_id],
+      no_cover: @no_cover,
     }.as_json
   end
 
@@ -29,7 +36,7 @@ class CollectionCover < SimpleService
   def cover_media_item
     manual_cover = manually_set_cover
     return manual_cover unless manual_cover.empty?
-    return {} if @collection.try(:cached_cover).try(:no_cover) == true
+    return {} if @no_cover
 
     new_cover = first_media_item
     return {} if new_cover.empty?
@@ -51,7 +58,10 @@ class CollectionCover < SimpleService
 
   def first_shareable_item(type:)
     first_item = nil
+    # items_and_linked_items will get collection_cards in order
     @collection.items_and_linked_items.where(type: type).each do |item|
+      # for FileItems we find, skip over any non-images
+      next if item.is_a?(Item::FileItem) && !item.image?
       next if @inheritance.private_child?(item)
       first_item = item
       break

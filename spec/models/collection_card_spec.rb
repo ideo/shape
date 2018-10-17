@@ -257,22 +257,40 @@ RSpec.describe CollectionCard, type: :model do
     end
   end
 
-  context 'when is_cover is set to true' do
+  describe '#update_collection_cover' do
     let(:collection) { create(:collection) }
     let!(:collection_card_list) { create_list(:collection_card_image, 5, parent: collection) }
     let(:current_cover) { collection_card_list.last }
     let(:new_cover) { collection_card_list.first }
 
-    before do
-      current_cover.update_column(:is_cover, true)
+    context 'setting a new collection cover' do
+      before do
+        current_cover.update_column(:is_cover, true)
+      end
+
+      it 'should unset any other cards is_cover attribute' do
+        new_cover.update_attribute(:is_cover, true)
+        expect(current_cover.reload.is_cover).to be false
+      end
     end
 
-    it 'should unset any other cards is_cover attribute' do
-      new_cover.update_attribute(:is_cover, true)
-      expect(current_cover.reload.is_cover).to be false
+    context 'un-setting a collection cover' do
+      before do
+        # set the cover w/ callbacks
+        current_cover.update(is_cover: true)
+      end
+
+      it 'should unset any other cards is_cover attribute' do
+        expect(collection.cached_cover['no_cover']).to be false
+        expect(collection.cached_cover['image_url']).to eq current_cover.item.image_url
+        current_cover.update(is_cover: false)
+        expect(current_cover.reload.is_cover).to be false
+        expect(collection.cached_cover['no_cover']).to be true
+        expect(collection.cached_cover['image_url']).to be nil
+      end
     end
   end
-  
+
   describe 'update_parent_card_count!' do
     let(:collection) { create(:collection) }
 

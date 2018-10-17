@@ -8,6 +8,11 @@ FactoryBot.define do
       collection nil
     end
 
+    factory :collection_card_pdf do
+      item factory: :pdf_file_item, strategy: :build
+      collection nil
+    end
+
     factory :collection_card_video do
       item factory: :video_item, strategy: :build
       collection nil

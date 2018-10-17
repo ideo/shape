@@ -288,6 +288,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     const previousCover = this.collection_cards
       .filter(cc => cc !== newCover)
       .find(cc => cc.is_cover === true)
+    if (!previousCover) return
     previousCover.is_cover = false
   }
 
