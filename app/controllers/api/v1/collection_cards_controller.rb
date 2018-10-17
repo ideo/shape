@@ -50,7 +50,6 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
   def update
     @collection_card.attributes = collection_card_update_params
     if @collection_card.save
-      update_collection_cover
       render jsonapi: @collection_card.reload
     else
       render_api_errors @collection_card.errors
@@ -239,17 +238,6 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
   def broadcast_collection_archive_updates
     return unless @collection_cards.first.present?
     CollectionUpdateBroadcaster.call(@collection_cards.first.parent, current_user)
-  end
-
-  def update_collection_cover
-    if @collection_card.is_cover
-      # A new cover was selected so turn off other covers
-      @collection_card.parent.collection_cards.where.not(id: @collection_card.id).update_all(is_cover: false)
-      @collection_card.parent.cache_cover!
-    else
-      # The cover was de-selected so turn off the cover on the collection
-      @collection_card.parent.update(cached_cover: { no_cover: true })
-    end
   end
 
   def collection_card_update_params
