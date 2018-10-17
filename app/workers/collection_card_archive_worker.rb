@@ -23,6 +23,7 @@ class CollectionCardArchiveWorker
     # Only notify if it is a primary card of a collection that has cards
     return true if card.primary? &&
                    card.collection.present? &&
+                   card.collection.cached_card_count &&
                    card.collection.cached_card_count.positive?
     false
   end
