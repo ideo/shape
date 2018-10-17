@@ -1,10 +1,9 @@
 import Rnd from 'react-rnd'
 import localStorage from 'mobx-localstorage'
-import { observable, observe, runInAction, action } from 'mobx'
+import { observe, runInAction, action } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 
-import ClickWrapper from '~/ui/layout/ClickWrapper'
 import { CloseButton } from '~/ui/global/styled/buttons'
 import NotificationIcon from '~/ui/icons/NotificationIcon'
 import NotificationsContainer from '~/ui/notifications/NotificationsContainer'
@@ -68,8 +67,6 @@ const Action = styled.button`
 @observer
 class ActivityLogBox extends React.Component {
   disposer = null
-  @observable
-  movingOrResizing = false
 
   constructor(props) {
     super(props)
@@ -183,12 +180,12 @@ class ActivityLogBox extends React.Component {
 
   @action
   handleMoveStart = () => {
-    this.movingOrResizing = true
+    this.props.uiStore.update('activityLogMoving', true)
   }
 
   @action
   handleMoveStop = () => {
-    this.movingOrResizing = false
+    this.props.uiStore.update('activityLogMoving', false)
   }
 
   get mobileProps() {
@@ -290,9 +287,6 @@ class ActivityLogBox extends React.Component {
             {this.currentPage === 'comments'
               ? this.renderComments()
               : this.renderNotifications()}
-
-            {/* clickwrapper prevents ActivityLog text selection / scrolling during move */}
-            {this.movingOrResizing && <ClickWrapper top={HEADER_HEIGHT * 2} />}
           </StyledActivityLog>
         </div>
       </Rnd>
