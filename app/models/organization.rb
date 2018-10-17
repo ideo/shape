@@ -104,8 +104,13 @@ class Organization < ApplicationRecord
       # however if they've already been setup as an org member then they don't get "demoted"
       user.add_role(Role::MEMBER, guest_group)
     end
+
     # Set this as the user's current organization if they don't have one
     user.switch_to_organization(self) if user.current_organization_id.blank?
+
+    return true if getting_started_collection.blank? || !user.active?
+
+    create_user_getting_started_collection(user)
   end
 
   def guest_group_name
@@ -150,6 +155,28 @@ class Organization < ApplicationRecord
         master_template: true,
       ),
     )
+  end
+
+  def create_user_getting_started_collection(user)
+    user_getting_started = getting_started_collection.duplicate!(
+      for_user: user,
+      parent: user.current_user_collection(id),
+    )
+
+    # Change from Collection::Global to regular colleciton
+    user_getting_started.update_attributes(
+      type: 'Collection',
+    )
+    user_getting_started = user_getting_started.becomes(Collection)
+
+    CollectionCardBuilder.new(
+      params: {
+        order: 0,
+        collection_id: user_getting_started.id,
+      },
+      parent_collection: user.current_user_collection(id),
+      user: user,
+    ).create
   end
 
   private
