@@ -1,3 +1,4 @@
+import { Fragment } from 'react'
 import { observable, runInAction } from 'mobx'
 import { Grid } from '@material-ui/core'
 import PropTypes from 'prop-types'
@@ -22,6 +23,18 @@ const Instructional = styled.div`
   line-height: 16px;
   color: ${v.colors.gray};
   letter-spacing: 0;
+`
+
+const BillingNoticeWrapper = styled.div`
+  text-align: center;
+`
+
+const BillingNotice = styled.div`
+  font-size: 16px;
+  line-height: 22px;
+  color: #a89f9b;
+  max-width: 500px;
+  margin: 0 auto 20px;
 `
 
 const BlockHeader = styled.h3`
@@ -88,15 +101,18 @@ class BillingInformation extends React.Component {
     if (!this.loaded) {
       return <Loader />
     }
+
     const {
       currentUserOrganization: {
+        in_app_billing,
         active_users_count,
-        trial_users_count,
-        trial_ends_at,
-        is_within_trial_period,
-        price_per_user,
-        current_billing_period_start,
         current_billing_period_end,
+        current_billing_period_start,
+        is_within_trial_period,
+        name,
+        price_per_user,
+        trial_ends_at,
+        trial_users_count,
       },
     } = this.props.apiStore
 
@@ -147,54 +163,72 @@ class BillingInformation extends React.Component {
                 </div>
               )}
             </Block>
-            <Block title="Current Monthly Rate">
-              <FancyDollarAmount>{currentMonthlyRate}</FancyDollarAmount>
-              <Box my={25}>
-                {formatAsDollarAmount(price_per_user)}
-                /person per month
-              </Box>
-              <Instructional>
-                Total monthly rate does not include people covered by free trial
-                conditions.
-              </Instructional>
-            </Block>
-            <Block title="Current Billing Period">
-              <Grid container justify="space-between" spacing={16}>
-                <Grid item>
-                  <Label>Start date:</Label>
-                </Grid>
-                <Grid item>
-                  {formatDate(current_billing_period_start, 'MM/DD/YYYY')}
-                </Grid>
-              </Grid>
-              <Grid container justify="space-between" spacing={16}>
-                <Grid item>
-                  <Label>End date:</Label>
-                </Grid>
-                <Grid item>
-                  {formatDate(current_billing_period_end, 'MM/DD/YYYY')}
-                </Grid>
-              </Grid>
-              {is_within_trial_period && (
-                <div>
-                  <FreeTrial>FREE TRIAL</FreeTrial>
+            {!in_app_billing ? (
+              <Fragment>
+                <Block title="Current Monthly Rate">
+                  <FancyDollarAmount>{currentMonthlyRate}</FancyDollarAmount>
+                  <Box my={25}>
+                    {formatAsDollarAmount(price_per_user)}
+                    /person per month
+                  </Box>
+                  <Instructional>
+                    Total monthly rate does not include people covered by free
+                    trial conditions.
+                  </Instructional>
+                </Block>
+                <Block title="Current Billing Period">
                   <Grid container justify="space-between" spacing={16}>
                     <Grid item>
-                      <Label>Free trials used:</Label>
+                      <Label>Start date:</Label>
                     </Grid>
                     <Grid item>
-                      {trailsUsedCount} of {trial_users_count}
+                      {formatDate(current_billing_period_start, 'MM/DD/YYYY')}
                     </Grid>
                   </Grid>
                   <Grid container justify="space-between" spacing={16}>
                     <Grid item>
-                      <Label>Trial expires:</Label>
+                      <Label>End date:</Label>
                     </Grid>
-                    <Grid item>{trial_ends_at}</Grid>
+                    <Grid item>
+                      {formatDate(current_billing_period_end, 'MM/DD/YYYY')}
+                    </Grid>
                   </Grid>
-                </div>
-              )}
-            </Block>
+                  {is_within_trial_period && (
+                    <div>
+                      <FreeTrial>FREE TRIAL</FreeTrial>
+                      <Grid container justify="space-between" spacing={16}>
+                        <Grid item>
+                          <Label>Free trials used:</Label>
+                        </Grid>
+                        <Grid item>
+                          {trailsUsedCount} of {trial_users_count}
+                        </Grid>
+                      </Grid>
+                      <Grid container justify="space-between" spacing={16}>
+                        <Grid item>
+                          <Label>Trial expires:</Label>
+                        </Grid>
+                        <Grid item>{trial_ends_at}</Grid>
+                      </Grid>
+                    </div>
+                  )}
+                </Block>
+              </Fragment>
+            ) : (
+              <Grid item xs={9}>
+                <BillingNoticeWrapper>
+                  <Box my={20}>
+                    <h3>Current Rate & Billing Period</h3>
+                  </Box>
+                  <BillingNotice>
+                    Billing for {name} instance is not handled by this
+                    application. Email{' '}
+                    <a href="mailto:hello@shape.space">hello@shape.space</a> for
+                    more information.
+                  </BillingNotice>
+                </BillingNoticeWrapper>
+              </Grid>
+            )}
           </Grid>
         </Section>
       </Wrapper>
