@@ -113,6 +113,11 @@ function hyphenate(namePart) {
   return `${parts.slice(0, -1).join('')}\u2010${parts.slice(-1)}`
 }
 
+function namePartTooLong(fullName) {
+  const parts = fullName.split(' ')
+  return parts.some(part => part.length > 14)
+}
+
 @inject('uiStore')
 @observer
 class CollectionCover extends React.Component {
@@ -128,6 +133,7 @@ class CollectionCover extends React.Component {
 
   get name() {
     const { collection } = this.props
+    const tooLong = namePartTooLong(collection.name)
     if (this.hasIcon) {
       const nameParts = splitName(collection.name)
       if (!nameParts) return collection.name
@@ -151,11 +157,7 @@ class CollectionCover extends React.Component {
         <Fragment>
           {leftIcon && <IconHolder>{leftIcon}</IconHolder>}
           {nameParts.join(' ')}{' '}
-          <span
-            style={{
-              hyphens: 'manual',
-            }}
-          >
+          <span style={{ hyphens: tooLong ? 'auto' : 'initial' }}>
             {hyphenate(lastName)}
             &nbsp;
             {rightIcon && <IconHolder>{rightIcon}</IconHolder>}
@@ -163,7 +165,11 @@ class CollectionCover extends React.Component {
         </Fragment>
       )
     }
-    return <span style={{ hyphens: 'auto' }}>{collection.name}</span>
+    return (
+      <span style={{ hyphens: tooLong ? 'auto' : 'initial' }}>
+        {collection.name}
+      </span>
+    )
   }
 
   handleClick = e => {
