@@ -37,9 +37,9 @@ const fakeApiStore = ({ findResult = '', findAllResult = [], requestResult = '' 
       id: "1",
       current_user_collection_id: 99,
       current_organization: {
-        name: 'test org'
+        name: 'Acme Inc'
       },
-      organizations: [{ name: 'test org 1', filestack_file_url: 'test.jpg' }],
+      organizations: [{ name: 'Acme Inc 1', filestack_file_url: 'test.jpg' }],
       name: 'Johnny Appleseed',
       pic_url_square: 'https://s3.amazonaws.com/pic.png',
       groups: [],
@@ -52,9 +52,9 @@ const fakeApiStore = ({ findResult = '', findAllResult = [], requestResult = '' 
     currentUserOrganization: {
       id: "1",
       slug: 'org-slug',
-      name: 'test org',
+      name: 'Acme Inc',
       primary_group: {
-        name: 'test org',
+        name: 'Acme Inc',
       }
     },
     unreadNotifications: [],
