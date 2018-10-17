@@ -7,6 +7,7 @@ class Organization extends BaseRecord {
   static endpoint = apiUrl('organizations')
 
   attributesForAPI = [
+    'in_app_billing',
     'name',
     'domain_whitelist',
     'handle',
