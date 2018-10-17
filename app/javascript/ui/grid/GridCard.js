@@ -104,7 +104,7 @@ class GridCard extends React.Component {
           return <LinkItemCover item={record} dragging={this.props.dragging} />
 
         case ITEM_TYPES.CHART:
-          return <ChartItemCover item={record} />
+          return <ChartItemCover item={record} testCollection={card.parent} />
 
         default:
           return <div>{record.content}</div>

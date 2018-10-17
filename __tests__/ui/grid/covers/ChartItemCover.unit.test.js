@@ -1,7 +1,7 @@
 import ChartItemCover from '~/ui/grid/covers/ChartItemCover'
 import { apiStore } from '~/stores'
 
-import { fakeChartItem } from '#/mocks/data'
+import { fakeChartItem, fakeCollection } from '#/mocks/data'
 
 jest.mock('../../../../app/javascript/stores')
 
@@ -11,6 +11,7 @@ describe('ChartItemCover', () => {
   beforeEach(() => {
     props = {
       item: fakeChartItem,
+      testCollection: fakeCollection,
     }
     rerender = () => {
       wrapper = shallow(<ChartItemCover {...props} />)
@@ -51,6 +52,18 @@ describe('ChartItemCover', () => {
           .first()
           .props().data
       ).toEqual(component.formattedData.datasets[0].data)
+    })
+
+    it('renders a legend with org and test collection name', () => {
+      expect(
+        wrapper
+          .find('VictoryLegend')
+          .first()
+          .props().data
+      ).toEqual([
+        { name: fakeCollection.name },
+        { name: 'Acme Inc Organization' },
+      ])
     })
   })
 
