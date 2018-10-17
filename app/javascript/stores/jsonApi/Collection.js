@@ -284,6 +284,13 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     )
   }
 
+  reassignCover(newCover) {
+    const previousCover = this.collection_cards
+      .filter(cc => cc !== newCover)
+      .find(cc => cc.is_cover === true)
+    previousCover.is_cover = false
+  }
+
   static async createSubmission(parent_id, submissionSettings) {
     const { type, template } = submissionSettings
     if (type === 'template' && template) {

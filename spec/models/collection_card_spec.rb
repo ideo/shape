@@ -257,6 +257,22 @@ RSpec.describe CollectionCard, type: :model do
     end
   end
 
+  context 'when is_cover is set to true' do
+    let(:collection) { create(:collection) }
+    let!(:collection_card_list) { create_list(:collection_card_image, 5, parent: collection) }
+    let(:current_cover) { collection_card_list.last }
+    let(:new_cover) { collection_card_list.first }
+
+    before do
+      current_cover.update_column(:is_cover, true)
+    end
+
+    it 'should unset any other cards is_cover attribute' do
+      new_cover.update_attribute(:is_cover, true)
+      expect(current_cover.reload.is_cover).to be false
+    end
+  end
+  
   describe 'update_parent_card_count!' do
     let(:collection) { create(:collection) }
 
