@@ -151,6 +151,8 @@ Anchor.displayName = 'StyledAnchor'
 // Keep in sync with assets/stylesheets/core/base.scss:quill h1
 export const CardHeading = Heading1.extend`
   color: ${v.colors.commonLight}
+  font-size: 2rem;
+  line-height: 2.25rem;
   margin-bottom: 0.25rem;
   margin-top: 0;
   max-width: 100%;
