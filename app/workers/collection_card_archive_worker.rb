@@ -23,7 +23,7 @@ class CollectionCardArchiveWorker
     # Only notify if it is a non-link collection that has cards
     return true if !card.link? &&
                    card.collection.present? &&
-                   card.collection.children.size.positive?
+                   card.collection.cached_card_count.positive?
     false
   end
 

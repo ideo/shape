@@ -1,3 +1,4 @@
+import _ from 'lodash'
 import { action, observable } from 'mobx'
 
 import { uiStore } from '~/stores'
@@ -186,18 +187,16 @@ class CollectionCard extends BaseRecord {
     }
   }
 
-  // Only show archive menu if this is a collection that has items
-  // (Don't show if empty collection, an item, or items)
+  // Only show archive popup if this is a collection that has cards
+  // Don't show if empty collection, or just link card / item card(s)
   get showArchiveWarning() {
-    let showMenu = false
-    this.selectedCards.forEach(card => {
-      if (
+    return _.some(
+      this.selectedCards,
+      card =>
+        !card.link &&
         card.record.className === 'Collection' &&
-        card.record.collection_cards.length > 0
-      )
-        showMenu = true
-    })
-    return showMenu
+        card.record.collection_card_count > 0
+    )
   }
 
   get selectedCards() {

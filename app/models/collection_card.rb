@@ -11,6 +11,7 @@ class CollectionCard < ApplicationRecord
 
   before_validation :assign_order, if: :assign_order?
   before_create :assign_default_height_and_width
+  after_create :update_parent_card_count!
 
   validates :parent, :order, presence: true
   validate :single_item_or_collection_is_present
@@ -166,6 +167,7 @@ class CollectionCard < ApplicationRecord
   # gets called by child STI classes
   def after_archive_card
     decrement_card_orders!
+    update_parent_card_count!
     cover = parent.cached_cover
     if cover && cover['card_ids'].include?(id)
       # regenerate parent collection cover if archived card was relevant
@@ -263,5 +265,9 @@ class CollectionCard < ApplicationRecord
     return if parent.blank?
 
     errors.add(:parent, 'is read-only so you can\'t save this card') if parent.read_only?
+  end
+
+  def update_parent_card_count!
+    parent.cache_card_count!
   end
 end
