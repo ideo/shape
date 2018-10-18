@@ -68,7 +68,7 @@ class CollectionCover < SimpleService
       first_item = item
       break
     end
-    first_item ? CollectionCard.find_by(item_id: first_item.id) : nil
+    first_item ? @collection.collection_cards.find_by(item_id: first_item.id) : nil
   end
 
   def first_media_item_card

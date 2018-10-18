@@ -57,6 +57,23 @@ RSpec.describe CollectionCover, type: :service do
       end
     end
 
+    context 'with linked items' do
+      let!(:collection) { create(:collection) }
+      let!(:link_image) { create(:collection_card_link_image, parent: collection, order: 0) }
+      let!(:image) { create(:collection_card_image, parent: collection, order: 1) }
+      # to ensure we aren't finding the primary card from the linked collection and setting it as the cover
+      let!(:primary_card_of_link) { create(:collection_card_image, item: link_image.item) }
+
+      before do
+        link_image.item.filestack_file.update(url: 'https://linked/image.jpg')
+      end
+
+      it 'sets the linked image card as the cover' do
+        expect(collection_cover['image_url']).to eq link_image.item.filestack_file_url
+        expect(collection_cover['card_ids']).to include(link_image.id)
+      end
+    end
+
     context 'with no_cover setting' do
       let!(:collection) { create(:collection, cached_cover: { 'no_cover': true }) }
       let!(:text_item) { create(:collection_card_text, parent: collection) }

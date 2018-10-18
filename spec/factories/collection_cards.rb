@@ -35,7 +35,7 @@ FactoryBot.define do
 
     factory :collection_card_link, class: 'CollectionCard::Link' do
       factory :collection_card_link_image do
-        item factory: :image_item, strategy: :build
+        item factory: :file_item, strategy: :build
         collection nil
       end
 
