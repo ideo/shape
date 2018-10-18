@@ -47,6 +47,7 @@ describe Collection::TestCollection, type: :model do
           it 'should create a TestDesign collection and move the questions into it' do
             expect(test_collection.test_design.present?).to be false
             expect(test_collection.errors).to match_array([])
+            # call launch!
             expect(test_collection.launch!(initiated_by: user)).to be true
             expect(test_collection.test_design.created_by).to eq user
             expect(test_collection.test_design.present?).to be true
@@ -63,16 +64,16 @@ describe Collection::TestCollection, type: :model do
             expect(
               test_collection.test_design.collection_cards.map(&:order),
             ).to eq([0, 1, 2, 3])
-            # now the test_collection should have the test design and chart item
+            # now the test_collection should have the chart item, test design in that order
             expect(
               test_collection
               .collection_cards
               .reload
               .map { |card| card.record.class },
-            ).to match_array(
+            ).to eq(
               [
-                Collection::TestDesign,
                 Item::ChartItem,
+                Collection::TestDesign,
               ],
             )
           end
