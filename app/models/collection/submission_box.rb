@@ -14,6 +14,13 @@ class Collection
       file: 3,
     }
 
+    def duplicate!(**args)
+      duplicate = super(args)
+      return duplicate unless duplicate.persisted?
+      duplicate.setup_submissions_collection!
+      duplicate
+    end
+
     def setup_submissions_collection
       build_submissions_collection(
         name: "#{name} Submissions",

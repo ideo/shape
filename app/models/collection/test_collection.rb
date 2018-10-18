@@ -11,7 +11,7 @@ class Collection
              class_name: 'Item::QuestionItem',
              through: :primary_collection_cards
 
-    before_create :setup_default_status_and_questions
+    before_create :setup_default_status_and_questions, unless: :cloned_from_present?
     after_create :add_test_tag
     after_update :touch_test_design, if: :saved_change_to_test_status?
 
@@ -43,6 +43,10 @@ class Collection
       event :reopen do
         transitions from: :closed, to: :live, guard: :test_completed?
       end
+
+      event :return_to_draft do
+        transitions from: %i[live closed], to: :draft
+      end
     end
 
     def self.default_question_types
@@ -52,6 +56,29 @@ class Collection
         question_useful
         question_finish
       ]
+    end
+
+    def duplicate!(**args)
+      # Only copy over test questions in pre-launch state
+      if test_design.present?
+        # If test design has already been created, just dupe that
+        duplicate = test_design.duplicate!(args)
+        duplicate.update(
+          type: 'Collection::TestCollection',
+        )
+        duplicate = duplicate.becomes(Collection::TestCollection)
+        # Had to reload otherwise AASM gets into weird state
+        duplicate.reload
+      else
+        # Otherwise dupe this collection
+        duplicate = super(args)
+      end
+      return duplicate unless duplicate.persisted?
+
+      duplicate.update(
+        name: "Copy of #{name}",
+      )
+      duplicate
     end
 
     # alias method, will delegate to test_design if test is live
@@ -195,8 +222,6 @@ class Collection
     end
 
     def setup_default_status_and_questions
-      # ||= mostly useful for unit tests, otherwise should be nil
-      self.test_status ||= :draft
       self.class
           .default_question_types
           .each_with_index do |question_type, i|
@@ -272,6 +297,10 @@ class Collection
 
     def remove_incomplete_question_items
       incomplete_question_items.destroy_all
+    end
+
+    def cloned_from_present?
+      cloned_from.present?
     end
   end
 end

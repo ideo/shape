@@ -38,6 +38,126 @@ describe Collection::TestCollection, type: :model do
     end
   end
 
+  describe '.duplicate!' do
+    let(:user) { create(:user) }
+    let!(:parent_collection) { create(:collection) }
+    let(:duplicate) do
+      test_collection.duplicate!(
+        for_user: user,
+        copy_parent_card: false,
+        parent: parent_collection,
+      )
+    end
+
+    before do
+      user.add_role(Role::EDITOR, parent_collection)
+      user.add_role(Role::EDITOR, test_collection)
+      test_collection.children.each do |record|
+        user.add_role(Role::EDITOR, record)
+      end
+
+      # Run background jobs to clone cards
+      Sidekiq::Testing.inline!
+    end
+
+    after do
+      Sidekiq::Testing.fake!
+    end
+
+    context 'if in draft status' do
+      let!(:test_collection) { create(:test_collection) }
+      before do
+        expect(test_collection.draft?).to be true
+      end
+
+      it 'copies collection' do
+        expect {
+          duplicate
+        }.to change(Collection, :count).by(1)
+        expect(duplicate).to be_instance_of(Collection::TestCollection)
+        expect(duplicate.draft?).to be true
+      end
+
+      it 'has prelaunch question items' do
+        expect(
+          duplicate.prelaunch_question_items.pluck(:question_type),
+        ).to match_array(
+          test_collection.question_items.pluck(:question_type),
+        )
+      end
+
+      it 'renames it to Copy of {name}' do
+        expect(duplicate.name).to eq("Copy of #{test_collection.name}")
+      end
+    end
+
+    context 'if live' do
+      let!(:test_collection) { create(:test_collection, :completed) }
+      before do
+        test_collection.launch!(initiated_by: user)
+        expect(test_collection.live?).to be true
+      end
+      let!(:survey_response) do
+        create(:survey_response, test_collection: test_collection)
+      end
+
+      it 'only copies test design' do
+        expect {
+          duplicate
+        }.to change(Collection, :count).by(1)
+        expect(duplicate).to be_instance_of(Collection::TestCollection)
+        expect(duplicate.draft?).to be true
+      end
+
+      it 'has prelaunch question items' do
+        expect(
+          duplicate.prelaunch_question_items.pluck(:question_type),
+        ).to match_array(
+          test_collection.question_items.pluck(:question_type),
+        )
+      end
+
+      it 'does not have any responses' do
+        expect(duplicate.survey_responses.count).to eq(0)
+      end
+
+      it 'renames it to Copy of {name}' do
+        expect(duplicate.name).to eq("Copy of #{test_collection.name}")
+      end
+
+      context 'if closed' do
+        before do
+          test_collection.close!
+          expect(test_collection.closed?).to be true
+        end
+
+        it 'only copies test design' do
+          expect {
+            duplicate
+          }.to change(Collection, :count).by(1)
+          expect(duplicate).to be_instance_of(Collection::TestCollection)
+          expect(duplicate.draft?).to be true
+        end
+
+        it 'has prelaunch question items' do
+          expect(
+            duplicate.prelaunch_question_items.pluck(:question_type),
+          ).to match_array(
+            test_collection.question_items.pluck(:question_type),
+          )
+        end
+
+        it 'does not have any responses' do
+          expect(duplicate.survey_responses.count).to eq(0)
+        end
+
+        it 'renames it to Copy of {name}' do
+          expect(duplicate.name).to eq("Copy of #{test_collection.name}")
+        end
+      end
+    end
+  end
+
   context 'with a ready to launch test' do
     let!(:test_collection) { create(:test_collection, :completed) }
 

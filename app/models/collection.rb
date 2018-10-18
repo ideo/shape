@@ -251,7 +251,6 @@ class Collection < ApplicationRecord
     end
     # upgrade to editor unless we're setting up a templated collection
     for_user.upgrade_to_edit_role(c)
-    c.setup_submissions_collection! if is_a?(Collection::SubmissionBox)
 
     CollectionCardDuplicationWorker.perform_async(
       collection_cards.map(&:id),
