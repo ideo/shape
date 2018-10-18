@@ -170,6 +170,14 @@ class Organization < ApplicationRecord
     create_network_organization(admin)
   end
 
+  def create_network_subscription
+    plan = NetworkApi::Plan.first
+    NetworkApi::Subscription.create(
+      organization_id: network_organization.id,
+      plan_id: plan.id,
+    )
+  end
+
   def calculate_active_users_count!
     count = all_active_users
             .where('last_active_at > ?', RECENTLY_ACTIVE_RANGE.ago)
