@@ -168,12 +168,6 @@ export const emojiSeriesMap = {
     { number: 3, name: 'Different', symbol: '😲' },
     { number: 4, name: 'Very different', symbol: '🤯' },
   ],
-  category_satisfaction: [
-    { number: 1, name: 'Not at all different', symbol: '😏' },
-    { number: 2, name: 'Not very different', symbol: '😐' },
-    { number: 3, name: 'Different', symbol: '😲' },
-    { number: 4, name: 'Very different', symbol: '🤯' },
-  ],
 }
 
 export const questionInformation = question => {
@@ -203,7 +197,7 @@ export const questionInformation = question => {
       questionTitle = 'Different'
       break
     case 'question_category_satisfaction':
-      emojiSeriesName = 'category_satisfaction'
+      emojiSeriesName = 'satisfaction'
       // the category text gets added later within ScaleQuestion
       questionText = 'How satisifed are you with your current'
       questionTitle = 'Category Satisfaction'
@@ -212,7 +206,7 @@ export const questionInformation = question => {
     default:
       emojiSeriesName = 'satisfaction'
       questionText = 'How satisfied are you with your current solution?'
-      questionTitle = 'Category Satisfaction'
+      questionTitle = 'Context'
       break
   }
   const emojiSeries = emojiSeriesMap[emojiSeriesName]
