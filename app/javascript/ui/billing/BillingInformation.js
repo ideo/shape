@@ -163,7 +163,7 @@ class BillingInformation extends React.Component {
                 </div>
               )}
             </Block>
-            {!in_app_billing ? (
+            {in_app_billing ? (
               <Fragment>
                 <Block title="Current Monthly Rate">
                   <FancyDollarAmount>{currentMonthlyRate}</FancyDollarAmount>
