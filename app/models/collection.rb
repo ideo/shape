@@ -178,6 +178,7 @@ class Collection < ApplicationRecord
       :parent_collection_card,
       :submissions_collection,
       :submission_template,
+      :collection_to_test,
       roles: %i[users groups resource],
       collection_cards: [
         :parent,
@@ -294,6 +295,10 @@ class Collection < ApplicationRecord
   end
 
   def submission_template
+    nil
+  end
+
+  def collection_to_test
     nil
   end
 

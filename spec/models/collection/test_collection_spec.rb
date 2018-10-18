@@ -8,6 +8,7 @@ describe Collection::TestCollection, type: :model do
     it { should have_many :survey_responses }
     it { should have_many :prelaunch_question_items }
     it { should have_one :test_design }
+    it { should belong_to :collection_to_test }
   end
 
   context 'callbacks' do

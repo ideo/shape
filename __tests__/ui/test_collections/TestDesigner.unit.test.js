@@ -1,5 +1,6 @@
 import TestDesigner from '~/ui/test_collections/TestDesigner'
 import { fakeCollection } from '#/mocks/data'
+import fakeApiStore from '#/mocks/fakeApiStore'
 
 let wrapper, props
 describe('TestDesigner', () => {
@@ -9,6 +10,9 @@ describe('TestDesigner', () => {
     }
     // very basic way to turn fakeCollection into a "test collection"
     props.collection.collection_cards[0].card_question_type = 'question_useful'
+    props.collection.apiStore = fakeApiStore({
+      requestResult: { data: { id: 99, name: 'Parent Collection' } },
+    })
     wrapper = shallow(<TestDesigner {...props} />)
   })
 
@@ -34,5 +38,18 @@ describe('TestDesigner', () => {
     expect(wrapper.find('TestQuestion').get(2).props.position).toEqual(
       'question_end'
     )
+  })
+
+  describe('with draft test_collection', () => {
+    beforeEach(() => {
+      props.collection.test_status = 'draft'
+      wrapper = shallow(<TestDesigner {...props} />)
+    })
+    it('should render the testTypeForm', () => {
+      expect(wrapper.find('RadioControl').exists()).toBeTruthy()
+      expect(wrapper.find('RadioControl').props().selectedValue).toEqual(
+        'media'
+      )
+    })
   })
 })

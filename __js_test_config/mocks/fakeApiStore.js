@@ -10,7 +10,7 @@ const fakeApiStore = ({ findResult = '', findAllResult = [], requestResult = '' 
       .mockReturnValue(Promise.resolve(requestResult))
       .mockName('request'),
     fetch: jest.fn()
-      .mockReturnValue(Promise.resolve())
+      .mockReturnValue(Promise.resolve(requestResult))
       .mockName('fetch'),
     fetchRoles: jest.fn()
       .mockReturnValue(Promise.resolve())

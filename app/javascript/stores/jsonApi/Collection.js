@@ -19,6 +19,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     'tag_list',
     'submission_template_id',
     'submission_box_type',
+    'collection_to_test_id',
   ]
 
   @computed

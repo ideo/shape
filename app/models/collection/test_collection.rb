@@ -10,6 +10,7 @@ class Collection
              source: :item,
              class_name: 'Item::QuestionItem',
              through: :primary_collection_cards
+    belongs_to :collection_to_test, class_name: 'Collection', optional: true
 
     before_create :setup_default_status_and_questions
     after_create :add_test_tag

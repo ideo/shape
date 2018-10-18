@@ -13,6 +13,7 @@ import { apiStore } from '~/stores/'
 import CollectionCard from '~/stores/jsonApi/CollectionCard'
 import QuestionHotEdge from '~/ui/test_collections/QuestionHotEdge'
 import TestQuestion from '~/ui/test_collections/TestQuestion'
+import RadioControl from '~/ui/global/RadioControl'
 
 const TopBorder = styled.div`
   background-color: ${v.colors.commonMedium};
@@ -63,6 +64,31 @@ const selectOptions = [
 
 @observer
 class TestDesigner extends React.Component {
+  constructor(props) {
+    super(props)
+    const { collection_to_test } = props.collection
+    this.state = {
+      testType: collection_to_test ? 'collection' : 'media',
+      collectionToTest: collection_to_test,
+    }
+  }
+
+  async componentDidMount() {
+    if (this.state.collectionToTest) return
+    // if none is set, we look up the parent to provide a default value
+    const { collection } = this.props
+    const { parent_id } = collection.parent_collection_card
+    try {
+      const res = await collection.apiStore.fetch('collections', parent_id)
+      // default setting to the parent collection
+      this.setState({
+        collectionToTest: res.data,
+      })
+    } catch (e) {
+      console.warn(e, 'unable to load parent collection')
+    }
+  }
+
   handleSelectChange = replacingCard => ev =>
     this.createNewQuestionCard({
       replacingCard,
@@ -76,6 +102,22 @@ class TestDesigner extends React.Component {
 
   handleNew = card => () => {
     this.createNewQuestionCard({ order: card.order + 1 })
+  }
+
+  handleTestTypeChange = e => {
+    const { collection } = this.props
+    const { collectionToTest } = this.state
+    const { value } = e.target
+    this.setState({ testType: value })
+    if (value === 'media') {
+      collection.collection_to_test_id = null
+    } else if (collectionToTest) {
+      // also save, if a value is selected...
+      collection.collection_to_test_id = collectionToTest.id
+    } else {
+      return
+    }
+    collection.save()
   }
 
   get canEdit() {
@@ -154,6 +196,36 @@ class TestDesigner extends React.Component {
     )
   }
 
+  renderTestTypeForm() {
+    const { collectionToTest, testType } = this.state
+    // also searchvalue comes from collection_to_test.name.... or something
+
+    return (
+      <form>
+        <RadioControl
+          options={[
+            {
+              value: 'media',
+              label: 'Get feedback on an image, video or idea description',
+            },
+            {
+              value: 'collection',
+              label: (
+                <div>
+                  Get feedback on collection:{' '}
+                  <span>{collectionToTest && collectionToTest.name}</span>
+                </div>
+              ),
+            },
+          ]}
+          name="test_type"
+          onChange={this.handleTestTypeChange}
+          selectedValue={testType}
+        />
+      </form>
+    )
+  }
+
   render() {
     const { collection } = this.props
     const cardCount = collection.collection_cards.length
@@ -199,6 +271,8 @@ class TestDesigner extends React.Component {
 
     return (
       <div>
+        {collection.test_status === 'draft' && this.renderTestTypeForm()}
+
         <TopBorder />
         {inner}
         <BottomBorder />
