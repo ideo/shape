@@ -73,6 +73,10 @@ class Item extends SharedRecordMixin(BaseRecord) {
     return this.filestack_file && this.mimeBaseType === 'image'
   }
 
+  get canBeSetAsCover() {
+    return this.isImage || this.type === ITEM_TYPES.VIDEO
+  }
+
   get isChart() {
     return this.type === ITEM_TYPES.CHART
   }

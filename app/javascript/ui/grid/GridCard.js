@@ -311,7 +311,7 @@ class GridCard extends React.Component {
           uiStore.textEditingItem !== record && (
             <StyledTopRightActions color={this.actionsColor}>
               {record.isDownloadable && <Download record={record} />}
-              {record.isImage &&
+              {record.canBeSetAsCover &&
                 canEditCollection &&
                 this.canEditCard && (
                   <CoverImageToggle
