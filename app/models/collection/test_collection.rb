@@ -59,12 +59,6 @@ class Collection
       if test_design.present?
         # If test design has already been created, just dupe that
         duplicate = test_design.duplicate!(args)
-        duplicate.update(
-          type: 'Collection::TestCollection',
-        )
-        duplicate = duplicate.becomes(Collection::TestCollection)
-        # Had to reload otherwise AASM gets into weird state
-        duplicate.reload
       else
         # Otherwise dupe this collection
         duplicate = super(args)

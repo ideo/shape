@@ -125,6 +125,10 @@ describe Collection::TestCollection, type: :model do
         expect(duplicate.name).to eq("Copy of #{test_collection.name}")
       end
 
+      it 'no longer has a test_collection' do
+        expect(duplicate.test_collection_id).to be_nil
+      end
+
       context 'if closed' do
         before do
           test_collection.close!
