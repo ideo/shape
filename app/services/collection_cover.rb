@@ -5,7 +5,7 @@ class CollectionCover < SimpleService
       # if this collection has no setting for no_cover, default to false
       @no_cover = false
     else
-      @no_cover = collection.cached_cover['no_cover']
+      @no_cover = collection.cached_cover['no_cover'] || false
     end
     @inheritance = Roles::Inheritance.new(collection)
   end
@@ -15,8 +15,8 @@ class CollectionCover < SimpleService
   end
 
   def call
-    media = cover_media_item
-    text = first_text_item
+    media = media_item(cover_media_item_card)
+    text = media_item(first_text_item_card)
     {
       image_url: media[:content],
       text: text[:content],
@@ -33,23 +33,23 @@ class CollectionCover < SimpleService
     text_item.plain_content.truncate(500, separator: /\s/, omission: '')
   end
 
-  def cover_media_item
-    manual_cover = manually_set_cover
-    return manual_cover unless manual_cover.empty?
-    return {} if @no_cover
+  def cover_media_item_card
+    return nil if @no_cover
+    cover_card = find_manually_set_cover
+    return cover_card if cover_card.present?
 
-    new_cover = first_media_item
-    return {} if new_cover.empty?
-    # this is the case where the system finds the first/best image for the cover
-    card = CollectionCard.find(new_cover[:card_id])
-    card.update(is_cover: true)
+    # this is the case where the system looks for the first/best image for the cover
+    cover_card = first_media_item_card
+    return nil unless cover_card.present?
+    cover_card.update(is_cover: true)
     CollectionUpdateBroadcaster.call(@collection)
-    new_cover
+    cover_card
   end
 
   private
 
   def media_item(card)
+    return {} if card.blank?
     {
       card_id: card.id,
       card_order: card.order,
@@ -58,7 +58,7 @@ class CollectionCover < SimpleService
     }
   end
 
-  def first_shareable_item(type:)
+  def first_shareable_item_card(type:)
     first_item = nil
     # items_and_linked_items will get collection_cards in order
     @collection.items_and_linked_items.where(type: type).each do |item|
@@ -68,22 +68,18 @@ class CollectionCover < SimpleService
       first_item = item
       break
     end
-    return {} unless first_item
-    card = CollectionCard.find_by(item_id: first_item.id)
-    media_item(card)
+    first_item ? CollectionCard.find_by(item_id: first_item.id) : nil
   end
 
-  def first_media_item
-    first_shareable_item(type: ['Item::FileItem', 'Item::VideoItem'])
+  def first_media_item_card
+    first_shareable_item_card(type: ['Item::FileItem', 'Item::VideoItem'])
   end
 
-  def first_text_item
-    first_shareable_item(type: 'Item::TextItem')
+  def first_text_item_card
+    first_shareable_item_card(type: 'Item::TextItem')
   end
 
-  def manually_set_cover
-    card = @collection.collection_cards.where(is_cover: true).first
-    return {} if card.nil?
-    media_item(card)
+  def find_manually_set_cover
+    @collection.collection_cards.find_by(is_cover: true)
   end
 end
