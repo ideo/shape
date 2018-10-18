@@ -43,10 +43,6 @@ class Collection
       event :reopen do
         transitions from: :closed, to: :live, guard: :test_completed?
       end
-
-      event :return_to_draft do
-        transitions from: %i[live closed], to: :draft
-      end
     end
 
     def self.default_question_types
