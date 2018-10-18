@@ -44,6 +44,17 @@ class Item
       %i[question_media question_description question_finish]
     end
 
+    def scale_question?
+      %(
+        question_context
+        question_useful
+        question_excitement
+        question_different
+        question_clarity
+        question_category_satisfaction
+      ).include? question_type.to_s
+    end
+
     def requires_roles?
       # NOTE: QuestionItems defer their can_edit access to their parent collection.
       # this is defined in item.rb as to be shared by Questions / FileItems

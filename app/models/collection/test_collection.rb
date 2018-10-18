@@ -205,11 +205,7 @@ class Collection
     def setup_response_graphs(initiated_by:)
       chart_card_builders = []
       question_items.each_with_index do |question, i|
-        next unless question.question_context? ||
-                    question.question_useful? ||
-                    question.question_excitement? ||
-                    question.question_different? ||
-                    question.question_clarity?
+        next unless question.scale_question?
         chart_card_builders.push(
           CollectionCardBuilder.new(
             params: {
