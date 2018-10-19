@@ -36,14 +36,14 @@ const StyledCommentThread = styled.div`
       ${v.colors.secondaryDark} 80%,
       ${hexToRgba(v.colors.secondaryDark, 0)} 100%
     );
-    padding: 10px 10px 0 10px;
+    padding-top: 10px;
     text-align: left;
     font-family: ${v.fonts.sans};
     font-weight: 500;
     font-size: 0.75rem;
   }
   .comments {
-    margin: 5px 10px 0 10px;
+    margin-top: 5px;
     ${props =>
       (!props.expanded || props.hasMore) &&
       `

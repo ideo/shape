@@ -4,7 +4,7 @@ class Api::V1::SurveyResponsesController < Api::V1::BaseController
   before_action :load_test_collection
 
   def create
-    @survey_response = @collection.create_uniq_survey_response
+    @survey_response = @collection.create_uniq_survey_response(user_id: params[:user_id])
     if @survey_response
       render jsonapi: @survey_response
     else

@@ -443,18 +443,8 @@ export default class UiStore {
   openOptionalMenus(params) {
     const opts = queryString.parse(params)
     if (opts) {
-      switch (opts.open) {
-        case 'comments':
-          this.activityLogPage = 'comments'
-          this.activityLogOpen = true
-          break
-        case 'notifications':
-          this.activityLogPage = 'notifications'
-          this.activityLogOpen = true
-          break
-        default:
-          break
-      }
+      this.activityLogPage = opts.open
+      this.activityLogOpen = true
     }
     return opts.open
   }

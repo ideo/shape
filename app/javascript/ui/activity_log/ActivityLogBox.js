@@ -4,9 +4,11 @@ import { observe, runInAction, action } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 
+import ActivityTest from '~/ui/notifications/ActivityTest'
 import { CloseButton } from '~/ui/global/styled/buttons'
 import NotificationIcon from '~/ui/icons/NotificationIcon'
 import NotificationsContainer from '~/ui/notifications/NotificationsContainer'
+import TestCollectionIcon from '~/ui/icons/TestCollectionIcon'
 import { ActivityCount } from '~/ui/notifications/ActivityLogButton'
 import CommentIcon from '~/ui/icons/CommentIcon'
 import CommentThreadContainer from '~/ui/threads/CommentThreadContainer'
@@ -178,6 +180,11 @@ class ActivityLogBox extends React.Component {
     this.changePage('comments')
   }
 
+  handleTests = ev => {
+    ev.preventDefault()
+    this.changePage('tests')
+  }
+
   @action
   handleMoveStart = () => {
     this.props.uiStore.update('activityLogMoving', true)
@@ -211,6 +218,20 @@ class ActivityLogBox extends React.Component {
   renderComments = () => <CommentThreadContainer />
 
   renderNotifications = () => <NotificationsContainer />
+
+  renderTest = () => <ActivityTest />
+
+  renderPage = () => {
+    switch (this.currentPage) {
+      case 'notifications':
+        return this.renderNotifications()
+      case 'tests':
+        return this.renderTest()
+      case 'comments':
+      default:
+        return this.renderComments()
+    }
+  }
 
   render() {
     const { apiStore, uiStore } = this.props
@@ -282,11 +303,15 @@ class ActivityLogBox extends React.Component {
                   </ActivityCount>
                 )}
               </Action>
+              <Action
+                active={this.currentPage === 'tests'}
+                onClick={this.handleTests}
+              >
+                <TestCollectionIcon />
+              </Action>
               <CloseButton size="lg" onClick={this.handleClose} />
             </StyledHeader>
-            {this.currentPage === 'comments'
-              ? this.renderComments()
-              : this.renderNotifications()}
+            {this.renderPage()}
           </StyledActivityLog>
         </div>
       </Rnd>

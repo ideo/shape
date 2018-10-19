@@ -28,7 +28,7 @@ Rails.application.routes.draw do
         resources :collection_cards, only: :index
         resources :roles, only: %i[index create destroy], shallow: true
       end
-      resources :test_collections, only: [] do
+      resources :test_collections, only: %i[show] do
         member do
           patch 'launch'
           patch 'close'

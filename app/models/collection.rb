@@ -78,6 +78,17 @@ class Collection < ApplicationRecord
            through: :collection_cards,
            source: :collection
 
+  has_many :test_collections,
+           inverse_of: :collection_to_test,
+           foreign_key: :collection_to_test_id,
+           class_name: 'Collection::TestCollection'
+
+  has_one :live_test_collection,
+          -> { where(test_status: :live) },
+          inverse_of: :collection_to_test,
+          foreign_key: :collection_to_test_id,
+          class_name: 'Collection::TestCollection'
+
   has_one :comment_thread, as: :record, dependent: :destroy
 
   delegate :parent, :pinned, :pinned?, :pinned_and_locked?,
@@ -179,6 +190,7 @@ class Collection < ApplicationRecord
       :submissions_collection,
       :submission_template,
       :collection_to_test,
+      :live_test_collection,
       roles: %i[users groups resource],
       collection_cards: [
         :parent,

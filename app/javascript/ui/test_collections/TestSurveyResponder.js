@@ -37,8 +37,9 @@ class TestSurveyResponder extends React.Component {
     const { collection } = this.props
     let reachedLastVisibleCard = false
     return collection.collection_cards.filter(card => {
+      // TODO how can menuDisabled be set?
       // turn off the card's actionmenu (dot-dot-dot)
-      card.record.menuDisabled = true
+      // card.record.menuDisabled = true
       if (reachedLastVisibleCard) {
         return false
       } else if (
