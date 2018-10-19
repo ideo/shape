@@ -1,13 +1,16 @@
 import { Flex } from 'reflexbox'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
-import styled from 'styled-components'
+import styled, { ThemeProvider } from 'styled-components'
 import FlipMove from 'react-flip-move'
 
 import { DisplayText, NumberListText } from '~/ui/global/styled/typography'
 import { Select, SelectOption } from '~/ui/global/styled/forms'
 import v, { ITEM_TYPES } from '~/utils/variables'
 import TrashIcon from '~/ui/icons/TrashIcon'
-import { TestQuestionHolder } from '~/ui/test_collections/shared'
+import {
+  TestQuestionHolder,
+  styledTestTheme,
+} from '~/ui/test_collections/shared'
 import { apiStore } from '~/stores/'
 // NOTE: Always import these models after everything else, can lead to odd dependency!
 import CollectionCard from '~/stores/jsonApi/CollectionCard'
@@ -16,7 +19,7 @@ import TestQuestion from '~/ui/test_collections/TestQuestion'
 import RadioControl from '~/ui/global/RadioControl'
 
 const TopBorder = styled.div`
-  background-color: ${v.colors.commonMedium};
+  background-color: ${props => props.theme.borderColorEditing};
   border-radius: 7px 7px 0 0;
   height: 16px;
   margin-left: 320px;
@@ -118,6 +121,13 @@ class TestDesigner extends React.Component {
       return
     }
     collection.save()
+  }
+
+  get styledTheme() {
+    if (this.state.testType === 'collection') {
+      return styledTestTheme('secondary')
+    }
+    return styledTestTheme('primary')
   }
 
   get canEdit() {
@@ -270,13 +280,15 @@ class TestDesigner extends React.Component {
     })
 
     return (
-      <div>
-        {collection.test_status === 'draft' && this.renderTestTypeForm()}
+      <ThemeProvider theme={this.styledTheme}>
+        <div>
+          {collection.test_status === 'draft' && this.renderTestTypeForm()}
 
-        <TopBorder />
-        {inner}
-        <BottomBorder />
-      </div>
+          <TopBorder />
+          {inner}
+          <BottomBorder />
+        </div>
+      </ThemeProvider>
     )
   }
 }
