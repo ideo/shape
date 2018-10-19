@@ -88,5 +88,13 @@ class SerializableCollection < BaseJsonSerializer
     @object.pinned_and_locked? || false
   end
 
+  attribute :template_num_instances do
+    if @object.master_template
+      @object.templated_collections.count
+    else
+      0
+    end
+  end
+
   has_many :roles
 end

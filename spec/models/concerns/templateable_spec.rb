@@ -51,39 +51,78 @@ describe Templateable, type: :concern do
     end
   end
 
-  describe '#update_templated_collections' do
+  describe '#update_template_instances' do
     let(:user) { create(:user) }
     let!(:template) { create(:collection, master_template: true, num_cards: 3, pin_cards: true) }
-    let!(:templated_collection) { create(:collection, template: template, created_by: user) }
+    let!(:template_instance) { create(:collection, template: template, created_by: user) }
 
     context 'with new collections' do
       it 'should copy the template\'s pinned cards into the templated collections' do
-        template.update_templated_collections
-        expect(templated_collection.collection_cards.count).to eq 3
+        template.update_template_instances
+        expect(template_instance.collection_cards.count).to eq(3)
+        expect(template_instance.collection_cards.map(&:templated_from_id)).to match_array(
+          template.collection_cards.map(&:id),
+        )
       end
     end
 
-    context 'with existing templated collection' do
+    context 'with existing template instance' do
+      let!(:template_beginning_card_ids) { template.collection_cards.map(&:id) }
       before do
         template.setup_templated_collection(
           for_user: user,
-          collection: templated_collection,
+          collection: template_instance,
         )
-
-        #  now simulate some changes to both the templated, and template
-        templated_collection.collection_cards << create(:collection_card_text)
-        template.collection_cards.first.update(width: 3)
-        template.collection_cards << create(:collection_card_text, pinned: true)
+      end
+      let!(:deleted_card) do
+        card = template.collection_cards.first
+        card.destroy
+        card
+      end
+      let!(:added_cards) do
+        cards = create_list(:collection_card_text, 2, pinned: true)
+        template.collection_cards << cards[0]
+        template.collection_cards << cards[1]
+        cards
+      end
+      before do
+        # Add a new card directly to the instance
+        template_instance.collection_cards << create(:collection_card_text)
+        template_instance.reload
       end
 
       it 'should update all pinned cards to match any template updates' do
-        template.update_templated_collections
-        expect(templated_collection.collection_cards.count).to eq 5
-        expect(templated_collection.collection_cards.pinned.count).to eq 4
+        expect(template_instance.collection_cards.count).to eq(4)
+        expect(template_instance.collection_cards.pinned.count).to eq(3)
+        template.update_template_instances
+        template_instance.reload
+        # Added 2 cards from master + created Deleted From Template collection
+        expect(template_instance.collection_cards.count).to eq(6)
+        expect(template_instance.collection_cards.pinned.count).to eq(4)
         # unpinned card should get reordered to the end
-        expect(templated_collection.collection_cards.last.pinned?).to eq false
-        # templated card should take on the template pinned card changes
-        expect(templated_collection.collection_cards.first.width).to eq 3
+        expect(template_instance.collection_cards.last.pinned?).to eq false
+      end
+
+      it 'should add new cards into instance' do
+        expect(template_instance.collection_cards.size).to eq(4)
+        template.update_template_instances
+        template_instance.collection_cards.reload
+        expect(template_instance.collection_cards.size).to eq(6)
+        # Two nils - one for card added directly, one for 'Deleted From' collection
+        expect(template_instance.collection_cards.map(&:templated_from_id)).to match_array(
+          added_cards.map(&:id) +
+          template_beginning_card_ids +
+          [nil, nil] - [deleted_card.id],
+        )
+      end
+
+      it 'should move deleted cards into Deleted From Template collection' do
+        template.update_template_instances
+        deleted_from_collection = template_instance.find_or_create_deleted_cards_collection
+        expect(deleted_from_collection.children.size).to eq(1)
+        expect(
+          deleted_from_collection.collection_cards.first.templated_from_id,
+        ).to eq(deleted_card.id)
       end
     end
   end

@@ -190,6 +190,7 @@ class CollectionCard extends BaseRecord {
   // Only show archive popup if this is a collection that has cards
   // Don't show if empty collection, or just link card / item card(s)
   get showArchiveWarning() {
+    if (this.parent.isMasterTemplate) return true
     return _.some(
       this.selectedCards,
       card =>
@@ -235,6 +236,12 @@ class CollectionCard extends BaseRecord {
         } else if (this.isTestDesignCollection) {
           prompt = 'Are you sure you want to archive this test design?'
           prompt += ' It will close your feedback.'
+        } else if (this.parent.isMasterTemplate) {
+          const numInstances = this.parent.template_num_instances
+          prompt = 'Are you sure?'
+          prompt += ` ${numInstances} instance${
+            numInstances === 1 ? '' : 's'
+          } of this template will be affected.`
         }
         uiStore.confirm({
           prompt,

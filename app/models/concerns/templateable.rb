@@ -37,30 +37,78 @@ module Templateable
     end
   end
 
-  def update_templated_collections
-    templated_collections.each do |templated|
-      update_templated_collection(templated)
+  def update_template_instances
+    templated_collections.each do |instance|
+      add_cards_from_master_template(instance)
+      move_cards_deleted_from_master_template(instance)
+      instance.reorder_cards!
     end
   end
 
-  def update_templated_collection(templated)
-    collection_cards.pinned.each do |pin|
-      # this will iterate in order...
-      cc = templated.collection_cards.where(templated_from: pin).first
-      if cc.nil?
-        pin.duplicate!(
-          for_user: templated.created_by,
-          parent: templated,
-        )
-      else
-        cc.update(
-          order: pin.order,
-          height: pin.height,
-          width: pin.width,
-        )
-      end
+  def add_cards_from_master_template(instance)
+    cards_added_to_master_template(instance).each do |card|
+      card.duplicate!(
+        for_user: instance.created_by,
+        parent: instance,
+      )
     end
-    templated.reorder_cards!
+  end
+
+  def move_cards_deleted_from_master_template(instance)
+    cards = cards_removed_from_master_template(instance)
+    return unless cards.present?
+    CardMover.new(
+      from_collection: instance,
+      to_collection: instance.find_or_create_deleted_cards_collection,
+      cards: cards,
+      placement: 'end',
+      card_action: 'move',
+    ).call
+  end
+
+  def find_or_create_deleted_cards_collection
+    coll = collections.find_by(name: 'Deleted From Template')
+    return coll if coll.present?
+    builder = CollectionCardBuilder.new(
+      params: {
+        order: 0,
+        collection_attributes: {
+          name: 'Deleted From Template',
+          type: 'Collection',
+        },
+      },
+      parent_collection: self,
+      user: created_by,
+    )
+    return builder.collection_card.record if builder.create
+  end
+
+  def cards_removed_from_master_template(instance)
+    instance.templated_cards_by_templated_from_id.slice(
+      *(instance.templated_cards_by_templated_from_id.keys - pinned_cards_by_id.keys),
+    ).values
+  end
+
+  def cards_added_to_master_template(instance)
+    pinned_cards_by_id.slice(
+      *(pinned_cards_by_id.keys - instance.templated_cards_by_templated_from_id.keys),
+    ).values
+  end
+
+  def templated_cards_by_templated_from_id
+    @templated_cards_by_templated_from_id ||= collection_cards
+    .where.not(templated_from: nil)
+    .each_with_object({}) do |card, h|
+      h[card.templated_from_id] = card
+    end
+  end
+
+  def pinned_cards_by_id
+    @pinned_cards_by_id ||= collection_cards
+    .pinned
+    .each_with_object({}) do |card, h|
+      h[card.id] = card
+    end
   end
 
   def add_template_tag
