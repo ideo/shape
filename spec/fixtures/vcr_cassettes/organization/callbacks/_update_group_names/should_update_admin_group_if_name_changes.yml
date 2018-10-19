@@ -2,7 +2,7 @@
 http_interactions:
 - request:
     method: get
-    uri: https://ideo-sso-profile-staging.herokuapp.com/api/v1/organizations?filter%5Bclient_id%5D=3695c5fe55ab3db6f9ee25f18c0ef2fe7025eb4717f1a031fd7824a5d8cddbb5&filter%5Bexternal_id%5D=731&page%5Bnumber%5D=1&page%5Bsize%5D=1
+    uri: https://ideo-sso-profile-staging.herokuapp.com/api/v1/organizations?filter%5Bclient_id%5D=3695c5fe55ab3db6f9ee25f18c0ef2fe7025eb4717f1a031fd7824a5d8cddbb5&filter%5Bexternal_id%5D=45&page%5Bnumber%5D=1&page%5Bsize%5D=1
     body:
       encoding: US-ASCII
       string: ''
@@ -25,7 +25,7 @@ http_interactions:
       Server:
       - Cowboy
       Date:
-      - Tue, 02 Oct 2018 21:00:06 GMT
+      - Fri, 19 Oct 2018 18:23:29 GMT
       Connection:
       - keep-alive
       X-Frame-Options:
@@ -43,13 +43,13 @@ http_interactions:
       Content-Type:
       - application/vnd.api+json; charset=utf-8
       Etag:
-      - W/"2ed47117afaf5cfc9c3116811f42adb3"
+      - W/"f3cc4196a84813f065243ec1ff143657"
       Cache-Control:
       - max-age=0, private, must-revalidate
       X-Request-Id:
-      - 2b50563a-5b1e-4f6c-9810-731d3d0e50a5
+      - 6aa77e8b-d922-456e-ae6c-be2e039791bf
       X-Runtime:
-      - '0.045008'
+      - '0.079801'
       Strict-Transport-Security:
       - max-age=31536000; includeSubDomains
       Vary:
@@ -60,17 +60,17 @@ http_interactions:
       - 1.1 vegur
     body:
       encoding: UTF-8
-      string: '{"data":[{"id":"500","type":"organizations","attributes":{"id":500,"name":"Edwardo
-        Bode Organization"},"relationships":{"applications":{"data":[{"type":"applications","id":"17"}]},"application_organizations":{"meta":{"included":false}}}}],"included":[{"id":"17","type":"applications","attributes":{"name":"Shape
+      string: '{"data":[{"id":"669","type":"organizations","attributes":{"id":669,"name":"Daniela
+        Durgan Organization"},"relationships":{"applications":{"data":[{"type":"applications","id":"17"}]},"application_organizations":{"meta":{"included":false}}}}],"included":[{"id":"17","type":"applications","attributes":{"name":"Shape
         -  development","client_id":"3695c5fe55ab3db6f9ee25f18c0ef2fe7025eb4717f1a031fd7824a5d8cddbb5"}}],"meta":{},"jsonapi":{"version":"1.0"}}'
     http_version: 
-  recorded_at: Tue, 02 Oct 2018 21:00:07 GMT
+  recorded_at: Fri, 19 Oct 2018 18:23:29 GMT
 - request:
     method: patch
-    uri: https://ideo-sso-profile-staging.herokuapp.com/api/v1/organizations/500
+    uri: https://ideo-sso-profile-staging.herokuapp.com/api/v1/organizations/669
     body:
       encoding: UTF-8
-      string: '{"data":{"id":500,"type":"organizations","attributes":{"name":"Org
+      string: '{"data":{"id":669,"type":"organizations","attributes":{"name":"Org
         2.0"}}}'
     headers:
       User-Agent:
@@ -91,7 +91,7 @@ http_interactions:
       Server:
       - Cowboy
       Date:
-      - Tue, 02 Oct 2018 21:00:07 GMT
+      - Fri, 19 Oct 2018 18:23:29 GMT
       Connection:
       - keep-alive
       X-Frame-Options:
@@ -109,13 +109,13 @@ http_interactions:
       Content-Type:
       - application/vnd.api+json; charset=utf-8
       Etag:
-      - W/"ff3cce23d964ee4e1bac8b5b06783b59"
+      - W/"b971120daf72fa181651fe11ad731dc0"
       Cache-Control:
       - max-age=0, private, must-revalidate
       X-Request-Id:
-      - b8a1ee62-f0ed-4d8e-9b4d-c1818d2ee192
+      - 756482ef-e8fa-4f59-b210-f3f896ba8938
       X-Runtime:
-      - '0.043735'
+      - '0.061096'
       Strict-Transport-Security:
       - max-age=31536000; includeSubDomains
       Vary:
@@ -126,8 +126,8 @@ http_interactions:
       - 1.1 vegur
     body:
       encoding: UTF-8
-      string: '{"data":{"id":"500","type":"organizations","attributes":{"id":500,"name":"Org
+      string: '{"data":{"id":"669","type":"organizations","attributes":{"id":669,"name":"Org
         2.0"},"relationships":{"applications":{"meta":{"included":false}},"application_organizations":{"meta":{"included":false}}}},"meta":{},"jsonapi":{"version":"1.0"}}'
     http_version: 
-  recorded_at: Tue, 02 Oct 2018 21:00:08 GMT
+  recorded_at: Fri, 19 Oct 2018 18:23:30 GMT
 recorded_with: VCR 4.0.0

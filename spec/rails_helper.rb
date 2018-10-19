@@ -34,6 +34,11 @@ VCR.configure do |config|
   config.ignore_localhost = true
   config.cassette_library_dir = 'spec/fixtures/vcr_cassettes'
   config.hook_into :webmock
+  config.register_request_matcher :path_ignore_id do |req1, req2|
+    path1 = URI(req1.uri).path
+    path2 = URI(req2.uri).path
+    path1.gsub(/\/\d+/, '/x') == path2.gsub(/\/\d+/, '/x')
+  end
 end
 
 # Use fake redis instance for tests
@@ -137,7 +142,7 @@ RSpec.configure do |config|
       options = if vcr_tag.is_a?(Hash)
                   vcr_tag
                 else
-                  { match_requests_on: %i[host path] }
+                  { match_requests_on: %i[method host path] }
                 end
 
       path_data = [example.metadata[:description]]

@@ -1,73 +1,8 @@
 ---
 http_interactions:
 - request:
-    method: post
-    uri: https://ideo-sso-profile-staging.herokuapp.com/api/v1/organizations
-    body:
-      encoding: UTF-8
-      string: '{"data":{"type":"organizations","attributes":{"external_id":"748","name":"Justina
-        Boyle Organization","admin_user_uid":"dd3da51ffdd2382a0ada78363347c8"}}}'
-    headers:
-      User-Agent:
-      - Faraday v0.12.2
-      Content-Type:
-      - application/vnd.api+json
-      Accept:
-      - application/vnd.api+json
-      Authorization:
-      - Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzUxMiJ9.eyJ0eXBlIjoiYXBwbGljYXRpb24iLCJjbGllbnRfaWQiOiIzNjk1YzVmZTU1YWIzZGI2ZjllZTI1ZjE4YzBlZjJmZTcwMjVlYjQ3MTdmMWEwMzFmZDc4MjRhNWQ4Y2RkYmI1IiwidWlkIjoiMDB1ZXFieGc5ZUFpODBTWjQwaDciLCJleHBpcmVzIjoxNTUzNjMyMjI3fQ.FxfLmkVWB70FBcm9rZ3odahqNjTephdbNhtAWAZ2F6Wk34aZVhdxc8yCXgijIq49p5LTx-6pG09hQARvC7jJLNVPo3N2Ht8QgVurrfStCu3LOEMbOrzgJH7wDp62q1UG8A0JCqooSWlZhWmO_vh9J99Q5nrALmafTej1jL2WYnjpPk6K16PlDrOf14nLjhWx9NWn0hm1BAAHjWTC11H1AXhMrvxiLgHuAqupMOBZZUBKBw6MWBRwfWBCyKaB-dbvbLKj0pHFGuScouzOSDzzr4JJq0l2JgSWbxrcsvevH0UTA3XPrQA5ciDAwNdf0PzhcSOIgN14xv-fcGwE8B2HXQ
-      Accept-Encoding:
-      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
-  response:
-    status:
-      code: 200
-      message: OK
-    headers:
-      Server:
-      - Cowboy
-      Date:
-      - Tue, 02 Oct 2018 21:00:15 GMT
-      Connection:
-      - keep-alive
-      X-Frame-Options:
-      - SAMEORIGIN
-      X-Xss-Protection:
-      - 1; mode=block
-      X-Content-Type-Options:
-      - nosniff
-      X-Download-Options:
-      - noopen
-      X-Permitted-Cross-Domain-Policies:
-      - none
-      Referrer-Policy:
-      - strict-origin-when-cross-origin
-      Content-Type:
-      - application/vnd.api+json; charset=utf-8
-      Etag:
-      - W/"639e2e4e58c56fe8635f2bea99d037a3"
-      Cache-Control:
-      - max-age=0, private, must-revalidate
-      X-Request-Id:
-      - 829d7734-5bf0-4655-a206-02db29ac60a6
-      X-Runtime:
-      - '0.083491'
-      Strict-Transport-Security:
-      - max-age=31536000; includeSubDomains
-      Vary:
-      - Origin
-      Transfer-Encoding:
-      - chunked
-      Via:
-      - 1.1 vegur
-    body:
-      encoding: UTF-8
-      string: '{"data":{"id":"821","type":"organizations","attributes":{"id":821,"name":"Amira
-        Kertzmann Organization"},"relationships":{"applications":{"meta":{"included":false}},"application_organizations":{"meta":{"included":false}}}},"meta":{},"jsonapi":{"version":"1.0"}}'
-    http_version: 
-  recorded_at: Tue, 02 Oct 2018 21:00:16 GMT
-- request:
     method: get
-    uri: https://ideo-sso-profile-staging.herokuapp.com/api/v1/organizations?filter%5Bclient_id%5D=3695c5fe55ab3db6f9ee25f18c0ef2fe7025eb4717f1a031fd7824a5d8cddbb5&filter%5Bexternal_id%5D=749&page%5Bnumber%5D=1&page%5Bsize%5D=1
+    uri: https://ideo-sso-profile-staging.herokuapp.com/api/v1/organizations?filter%5Bclient_id%5D=3695c5fe55ab3db6f9ee25f18c0ef2fe7025eb4717f1a031fd7824a5d8cddbb5&filter%5Bexternal_id%5D=15&page%5Bnumber%5D=1&page%5Bsize%5D=1
     body:
       encoding: US-ASCII
       string: ''
@@ -90,7 +25,7 @@ http_interactions:
       Server:
       - Cowboy
       Date:
-      - Tue, 02 Oct 2018 21:00:16 GMT
+      - Fri, 19 Oct 2018 17:52:06 GMT
       Connection:
       - keep-alive
       X-Frame-Options:
@@ -108,13 +43,13 @@ http_interactions:
       Content-Type:
       - application/vnd.api+json; charset=utf-8
       Etag:
-      - W/"c8e59c24dfeeb68f482c374c07414e67"
+      - W/"ee90aab5556ab1eb7b8c6415d90a38bc"
       Cache-Control:
       - max-age=0, private, must-revalidate
       X-Request-Id:
-      - f234a2d7-511c-435d-a2a7-9e5a0059e8e1
+      - 56c48b1f-8131-4968-8194-73fb243ddfea
       X-Runtime:
-      - '0.027326'
+      - '0.050565'
       Strict-Transport-Security:
       - max-age=31536000; includeSubDomains
       Vary:
@@ -125,17 +60,16 @@ http_interactions:
       - 1.1 vegur
     body:
       encoding: UTF-8
-      string: '{"data":[{"id":"506","type":"organizations","attributes":{"id":506,"name":"Monte
-        Bernhard Organization"},"relationships":{"applications":{"data":[{"type":"applications","id":"17"}]},"application_organizations":{"meta":{"included":false}}}}],"included":[{"id":"17","type":"applications","attributes":{"name":"Shape
+      string: '{"data":[{"id":"651","type":"organizations","attributes":{"id":651,"name":"Feest-Huels"},"relationships":{"applications":{"data":[{"type":"applications","id":"17"}]},"application_organizations":{"meta":{"included":false}}}}],"included":[{"id":"17","type":"applications","attributes":{"name":"Shape
         -  development","client_id":"3695c5fe55ab3db6f9ee25f18c0ef2fe7025eb4717f1a031fd7824a5d8cddbb5"}}],"meta":{},"jsonapi":{"version":"1.0"}}'
     http_version: 
-  recorded_at: Tue, 02 Oct 2018 21:00:17 GMT
+  recorded_at: Fri, 19 Oct 2018 17:52:07 GMT
 - request:
     method: patch
-    uri: https://ideo-sso-profile-staging.herokuapp.com/api/v1/organizations/506
+    uri: https://ideo-sso-profile-staging.herokuapp.com/api/v1/organizations/651
     body:
       encoding: UTF-8
-      string: '{"data":{"id":506,"type":"organizations","attributes":{"name":"Acme
+      string: '{"data":{"id":651,"type":"organizations","attributes":{"name":"Acme
         Inc 2.0"}}}'
     headers:
       User-Agent:
@@ -156,7 +90,7 @@ http_interactions:
       Server:
       - Cowboy
       Date:
-      - Tue, 02 Oct 2018 21:00:17 GMT
+      - Fri, 19 Oct 2018 17:52:07 GMT
       Connection:
       - keep-alive
       X-Frame-Options:
@@ -174,13 +108,13 @@ http_interactions:
       Content-Type:
       - application/vnd.api+json; charset=utf-8
       Etag:
-      - W/"8e9fb04ed2dc3439c27a6922ce12a822"
+      - W/"0882043acf28586edfa59c6b9f39c3e7"
       Cache-Control:
       - max-age=0, private, must-revalidate
       X-Request-Id:
-      - 3c916cd9-b133-465e-a1fb-7a1444a03fb0
+      - d9dfe1a3-a8bc-4260-9ff7-e84850b0ab6b
       X-Runtime:
-      - '0.025818'
+      - '0.043450'
       Strict-Transport-Security:
       - max-age=31536000; includeSubDomains
       Vary:
@@ -191,13 +125,13 @@ http_interactions:
       - 1.1 vegur
     body:
       encoding: UTF-8
-      string: '{"data":{"id":"506","type":"organizations","attributes":{"id":506,"name":"Acme
+      string: '{"data":{"id":"651","type":"organizations","attributes":{"id":651,"name":"Acme
         Inc 2.0"},"relationships":{"applications":{"meta":{"included":false}},"application_organizations":{"meta":{"included":false}}}},"meta":{},"jsonapi":{"version":"1.0"}}'
     http_version: 
-  recorded_at: Tue, 02 Oct 2018 21:00:18 GMT
+  recorded_at: Fri, 19 Oct 2018 17:52:08 GMT
 - request:
     method: get
-    uri: https://ideo-sso-profile-staging.herokuapp.com/api/v1/organizations?filter%5Bclient_id%5D=3695c5fe55ab3db6f9ee25f18c0ef2fe7025eb4717f1a031fd7824a5d8cddbb5&filter%5Bexternal_id%5D=749&page%5Bnumber%5D=1&page%5Bsize%5D=1
+    uri: https://ideo-sso-profile-staging.herokuapp.com/api/v1/organizations?filter%5Bclient_id%5D=3695c5fe55ab3db6f9ee25f18c0ef2fe7025eb4717f1a031fd7824a5d8cddbb5&filter%5Bexternal_id%5D=15&page%5Bnumber%5D=1&page%5Bsize%5D=1
     body:
       encoding: US-ASCII
       string: ''
@@ -220,7 +154,7 @@ http_interactions:
       Server:
       - Cowboy
       Date:
-      - Tue, 02 Oct 2018 21:00:18 GMT
+      - Fri, 19 Oct 2018 17:52:08 GMT
       Connection:
       - keep-alive
       X-Frame-Options:
@@ -238,13 +172,13 @@ http_interactions:
       Content-Type:
       - application/vnd.api+json; charset=utf-8
       Etag:
-      - W/"5162ecc96b1e4ee5e12115f0c51365ca"
+      - W/"82caa700161f534870fed439eef8cd40"
       Cache-Control:
       - max-age=0, private, must-revalidate
       X-Request-Id:
-      - f495aac5-031d-4a67-9020-c61315d4225f
+      - 3bc53512-d081-4426-a629-678642825c52
       X-Runtime:
-      - '0.103946'
+      - '0.039042'
       Strict-Transport-Security:
       - max-age=31536000; includeSubDomains
       Vary:
@@ -255,17 +189,17 @@ http_interactions:
       - 1.1 vegur
     body:
       encoding: UTF-8
-      string: '{"data":[{"id":"506","type":"organizations","attributes":{"id":506,"name":"Acme
+      string: '{"data":[{"id":"651","type":"organizations","attributes":{"id":651,"name":"Acme
         Inc 2.0"},"relationships":{"applications":{"data":[{"type":"applications","id":"17"}]},"application_organizations":{"meta":{"included":false}}}}],"included":[{"id":"17","type":"applications","attributes":{"name":"Shape
         -  development","client_id":"3695c5fe55ab3db6f9ee25f18c0ef2fe7025eb4717f1a031fd7824a5d8cddbb5"}}],"meta":{},"jsonapi":{"version":"1.0"}}'
     http_version: 
-  recorded_at: Tue, 02 Oct 2018 21:00:19 GMT
+  recorded_at: Fri, 19 Oct 2018 17:52:09 GMT
 - request:
     method: patch
-    uri: https://ideo-sso-profile-staging.herokuapp.com/api/v1/organizations/506
+    uri: https://ideo-sso-profile-staging.herokuapp.com/api/v1/organizations/651
     body:
       encoding: UTF-8
-      string: '{"data":{"id":506,"type":"organizations","attributes":{}}}'
+      string: '{"data":{"id":651,"type":"organizations","attributes":{}}}'
     headers:
       User-Agent:
       - Faraday v0.12.2
@@ -285,7 +219,7 @@ http_interactions:
       Server:
       - Cowboy
       Date:
-      - Tue, 02 Oct 2018 21:00:19 GMT
+      - Fri, 19 Oct 2018 17:52:09 GMT
       Connection:
       - keep-alive
       X-Frame-Options:
@@ -303,13 +237,13 @@ http_interactions:
       Content-Type:
       - application/vnd.api+json; charset=utf-8
       Etag:
-      - W/"8e9fb04ed2dc3439c27a6922ce12a822"
+      - W/"0882043acf28586edfa59c6b9f39c3e7"
       Cache-Control:
       - max-age=0, private, must-revalidate
       X-Request-Id:
-      - cfd8aa47-b52c-4da6-b027-3ce464d2c2cc
+      - 6ecd8cce-e136-45ce-972c-149f061fcdd2
       X-Runtime:
-      - '0.025840'
+      - '0.030946'
       Strict-Transport-Security:
       - max-age=31536000; includeSubDomains
       Vary:
@@ -320,8 +254,8 @@ http_interactions:
       - 1.1 vegur
     body:
       encoding: UTF-8
-      string: '{"data":{"id":"506","type":"organizations","attributes":{"id":506,"name":"Acme
+      string: '{"data":{"id":"651","type":"organizations","attributes":{"id":651,"name":"Acme
         Inc 2.0"},"relationships":{"applications":{"meta":{"included":false}},"application_organizations":{"meta":{"included":false}}}},"meta":{},"jsonapi":{"version":"1.0"}}'
     http_version: 
-  recorded_at: Tue, 02 Oct 2018 21:00:20 GMT
+  recorded_at: Fri, 19 Oct 2018 17:52:10 GMT
 recorded_with: VCR 4.0.0

@@ -41,7 +41,7 @@ describe Api::V1::OrganizationsController, type: :request, json: true, auth: tru
     end
   end
 
-  describe 'POST #create' do
+  describe 'POST #create', vcr: { match_requests_on: %i[host path] } do
     let(:path) { '/api/v1/organizations/' }
     let!(:current_user) { create(:user) }
     let(:params) {
@@ -52,12 +52,12 @@ describe Api::V1::OrganizationsController, type: :request, json: true, auth: tru
       )
     }
 
-    it 'returns a 200', :vcr do
+    it 'returns a 200' do
       post(path, params: params)
       expect(response.status).to eq(200)
     end
 
-    it 'matches JSON schema', :vcr do
+    it 'matches JSON schema' do
       post(path, params: params)
       expect(json['data']['attributes']).to match_json_schema('organization')
     end
@@ -78,29 +78,27 @@ describe Api::V1::OrganizationsController, type: :request, json: true, auth: tru
     end
   end
 
-  describe 'PATCH #update' do
+  describe 'PATCH #update', vcr: { match_requests_on: %i[host method path_ignore_id] } do
     let!(:organization) { create(:organization, admin: user) }
     let(:path) { "/api/v1/organizations/#{organization.id}" }
     let(:params) {
       json_api_params(
         'organizations',
-        {
-          'name': 'Acme Inc 2.0',
-        }
+        'name': 'Acme Inc 2.0',
       )
     }
 
-    it 'returns a 200', :vcr do
+    it 'returns a 200' do
       patch(path, params: params)
       expect(response.status).to eq(200)
     end
 
-    it 'matches JSON schema', :vcr do
+    it 'matches JSON schema' do
       patch(path, params: params)
       expect(json['data']['attributes']).to match_json_schema('organization')
     end
 
-    it 'updates the name', :vcr do
+    it 'updates the name' do
       expect(organization.name).not_to eq('Acme Inc 2.0')
       patch(path, params: params)
       expect(organization.reload.name).to eq('Acme Inc 2.0')
