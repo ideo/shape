@@ -3,6 +3,16 @@ require 'rails_helper'
 describe Api::V1::TestCollectionsController, type: :request, json: true, auth: true do
   let(:user) { @user }
 
+  describe 'GET #show' do
+    let!(:collection) { create(:test_collection, test_status: :live) }
+    let(:path) { "/api/v1/test_collections/#{collection.id}" }
+
+    it 'returns a 200 without authorizing the user' do
+      get(path)
+      expect(response.status).to eq(200)
+    end
+  end
+
   describe 'PATCH #launch' do
     let(:path) { "/api/v1/test_collections/#{collection.id}/launch" }
 

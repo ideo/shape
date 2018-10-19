@@ -14,7 +14,9 @@ class ActivityTest extends React.Component {
   async componentDidMount() {
     const res = await this.fetchTestCollection()
     const testCollection = res.data
+    const surveyResponse = testCollection.current_user_survey_response
     this.setState({
+      surveyResponse,
       testCollection,
     })
   }

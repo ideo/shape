@@ -96,6 +96,13 @@ class Collection
       complete
     end
 
+    def survey_response_for_user(user_id)
+      SurveyResponse.find_by(
+        test_collection_id: id,
+        user_id: user_id,
+      )
+    end
+
     def test_survey_render_class
       Firestoreable::JSONAPI_CLASS_MAPPINGS.merge(
         'Collection::TestCollection': SerializableTestCollection,
