@@ -31,7 +31,7 @@ describe Templateable, type: :concern do
   end
 
   describe '#setup_templated_collection' do
-    let(:user) { create(:user) }
+    let(:user) { create(:user, current_organization: organization) }
     let(:template) { create(:collection, master_template: true, num_cards: 3, add_editors: [user]) }
     let(:collection) { create(:collection) }
 
@@ -123,6 +123,23 @@ describe Templateable, type: :concern do
         expect(
           deleted_from_collection.collection_cards.first.templated_from_id,
         ).to eq(deleted_card.id)
+        expect(deleted_from_collection.collection_cards.map(&:pinned).uniq).to eq([false])
+      end
+
+      it 'notifies all editors that card has been moved' do
+        expect {
+          template.update_template_instances
+        }.to change(Activity, :count).by(1)
+        expect(
+          Activity.where(
+            action: :archived_from_template,
+            actor_id: user.id,
+            target_id: deleted_from_collection.id,
+            target_type: 'Collection',
+            source_id: deleted_card.record.id,
+            source_type: deleted_card.record.class.name,
+          ).count,
+        ).to eq(1)
       end
     end
   end

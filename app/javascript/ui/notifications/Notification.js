@@ -190,6 +190,7 @@ class Notification extends React.Component {
               action={notification.activity.action}
               actors={this.actors}
               target={notification.activity.target}
+              sourceName={notification.activity.source_name}
               subjectUsers={notification.activity.subject_users}
               subjectGroups={notification.activity.subject_groups}
               actorCount={notification.combined_actor_count}

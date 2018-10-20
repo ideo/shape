@@ -57,13 +57,33 @@ module Templateable
   def move_cards_deleted_from_master_template(instance)
     cards = cards_removed_from_master_template(instance)
     return unless cards.present?
-    CardMover.new(
-      from_collection: instance,
-      to_collection: instance.find_or_create_deleted_cards_collection,
-      cards: cards,
-      placement: 'end',
-      card_action: 'move',
-    ).call
+    deleted_cards_coll = instance.find_or_create_deleted_cards_collection
+    transaction do
+      moved_cards = CardMover.new(
+        from_collection: instance,
+        to_collection: deleted_cards_coll,
+        cards: cards,
+        placement: 'end',
+        card_action: 'move',
+      ).call
+
+      # Unpin all cards so user can edit
+      CollectionCard.where(
+        id: moved_cards.map(&:id),
+      ).update_all(pinned: false)
+
+      # Notify that cards have been moved
+      moved_cards.each do |card|
+        ActivityAndNotificationBuilder.call(
+          actor: instance.created_by,
+          target: deleted_cards_coll, # Assign as target so we can route to it
+          action: :archived_from_template,
+          subject_user_ids: card.record.editors[:users].pluck(:id),
+          subject_group_ids: card.record.editors[:groups].pluck(:id),
+          source: card.record,
+        )
+      end
+    end
   end
 
   def find_or_create_deleted_cards_collection

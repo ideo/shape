@@ -101,7 +101,7 @@ class Activity extends React.PureComponent {
   }
 
   getDataText() {
-    const { action, subjectGroups, target, content } = this.props
+    const { action, subjectGroups, target, content, sourceName } = this.props
     return {
       actorNames: this.actorText(),
       targetName: target.name,
@@ -109,6 +109,7 @@ class Activity extends React.PureComponent {
       targetType: pluralize.singular(target.internalType),
       roleName: this.isRoleAction() && action.split('_')[1],
       message: content ? commentPreview(content) : '',
+      sourceName,
     }
   }
 
@@ -126,6 +127,7 @@ class Activity extends React.PureComponent {
       roleName,
       subjects,
       message,
+      sourceName,
     } = this.getDataText()
 
     switch (action) {
@@ -140,6 +142,18 @@ class Activity extends React.PureComponent {
               {targetName}
               &rdquo;
             </strong>
+          </ActivityText>
+        )
+      case 'archived_from_template':
+        return (
+          <ActivityText>
+            <strong className="source">
+              &ldquo;
+              {sourceName}
+              &rdquo;
+            </strong>
+            was removed from the template by the template editor. This affected
+            <strong className="target">{targetName}</strong>
           </ActivityText>
         )
       case 'added_editor':
@@ -206,6 +220,7 @@ Activity.propTypes = {
     name: PropTypes.string,
     internalType: PropTypes.string,
   }).isRequired,
+  sourceName: PropTypes.string,
   subjectUsers: MobxPropTypes.arrayOrObservableArray,
   subjectGroups: MobxPropTypes.arrayOrObservableArray,
   actorCount: PropTypes.number,
@@ -218,6 +233,7 @@ Activity.defaultProps = {
   subjectGroups: [],
   actorCount: 0,
   content: null,
+  sourceName: '',
 }
 
 export default Activity
