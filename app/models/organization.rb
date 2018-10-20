@@ -39,6 +39,7 @@ class Organization < ApplicationRecord
   before_update :parse_domain_whitelist
   after_update :update_network_name, :update_group_names, if: :saved_change_to_name?
   after_update :check_guests_for_domain_match, if: :saved_change_to_domain_whitelist?
+  after_update :update_subscription, if: :saved_change_to_in_app_billing?
 
   delegate :admins, to: :primary_group
   delegate :members, to: :primary_group
@@ -252,5 +253,33 @@ class Organization < ApplicationRecord
 
     network_organization.name = name
     network_organization.save
+  end
+
+  def create_network_subscription
+    plan = NetworkApi::Plan.first
+    payment_method = NetworkApi::PaymentMethod.find(
+      organization_id: network_organization.id,
+      default: true,
+    ).first
+    NetworkApi::Subscription.create(
+      organization_id: network_organization.id,
+      plan_id: plan.id,
+      payment_method_id: payment_method.id,
+    )
+  end
+
+  def cancel_network_subscription
+    subscription = NetworkApi::Subscription.find(
+      organization_id: network_organization.id,
+    ).first
+    subscription.cancel
+  end
+
+  def update_subscription
+    if in_app_billing
+      create_network_subscription
+    else
+      cancel_network_subscription
+    end
   end
 end

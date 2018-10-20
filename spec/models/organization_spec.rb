@@ -111,6 +111,54 @@ describe Organization, type: :model do
         expect(guest.has_role?(Role::MEMBER, organization.guest_group)).to be true
       end
     end
+
+    describe 'update subscription' do
+      context 'in_app_billing changed to true' do
+        let(:organization) { create(:organization, in_app_billing: false) }
+        it 'creates a new subscription' do
+          plan = double('plan', id: 123)
+          payment_method = double('payment_method', id: 234)
+          network_organization = double('network_organization', id: 345)
+
+          allow(NetworkApi::Plan).to receive(:first).and_return(plan)
+
+          allow(NetworkApi::PaymentMethod).to receive(:find).with(
+            organization_id: network_organization.id,
+            default: true,
+          ).and_return([payment_method])
+
+          allow(organization).to receive(:network_organization).and_return(network_organization)
+
+          allow(NetworkApi::Subscription).to receive(:create)
+
+          expect(NetworkApi::Subscription).to receive(:create).with(
+            organization_id: network_organization.id,
+            plan_id: plan.id,
+            payment_method_id: payment_method.id,
+          )
+
+          organization.update_attributes(in_app_billing: true)
+        end
+      end
+
+      context 'in_app_billing changed to false' do
+        let(:organization) { create(:organization, in_app_billing: true) }
+        it 'cancels the existing subscription' do
+          network_organization = double('network_organization', id: 123)
+          subscription = double('subscription')
+
+          allow(organization).to receive(:network_organization).and_return(network_organization)
+
+          allow(NetworkApi::Subscription).to receive(:find).with(
+            organization_id: network_organization.id,
+          ).and_return([subscription])
+
+          expect(subscription).to receive(:cancel)
+
+          organization.update_attributes(in_app_billing: false)
+        end
+      end
+    end
   end
 
   describe '.create_for_user' do
