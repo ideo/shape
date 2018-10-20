@@ -15,6 +15,7 @@ class ActivityTest extends React.Component {
     const res = await this.fetchTestCollection()
     const testCollection = res.data
     const surveyResponse = testCollection.current_user_survey_response
+    console.log('ActivityTest,viewing', this.props.uiStore.viewingCollection)
     this.setState({
       surveyResponse,
       testCollection,

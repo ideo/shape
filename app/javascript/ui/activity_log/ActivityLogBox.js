@@ -120,6 +120,15 @@ class ActivityLogBox extends React.Component {
     return x
   }
 
+  get hasLiveTestCollection() {
+    const collection = this.props.uiStore.viewingCollection
+    return (
+      collection &&
+      collection.live_test_collection &&
+      collection.live_test_collection.test_status === 'live'
+    )
+  }
+
   setToDefaultPosition() {
     this.updatePosition({
       x: this.defaultX,
@@ -303,12 +312,15 @@ class ActivityLogBox extends React.Component {
                   </ActivityCount>
                 )}
               </Action>
-              <Action
-                active={this.currentPage === 'tests'}
-                onClick={this.handleTests}
-              >
-                <TestCollectionIcon />
-              </Action>
+              {this.hasLiveTestCollection && (
+                <Action
+                  className="liveTest"
+                  active={this.currentPage === 'tests'}
+                  onClick={this.handleTests}
+                >
+                  <TestCollectionIcon />
+                </Action>
+              )}
               <CloseButton size="lg" onClick={this.handleClose} />
             </StyledHeader>
             {this.renderPage()}
