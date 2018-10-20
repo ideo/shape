@@ -116,6 +116,7 @@ describe Api::V1::OrganizationsController, type: :request, json: true, auth: tru
 
       it 'works if you are a super admin' do
         user.add_role(Role::SUPER_ADMIN)
+        expect_any_instance_of(Organization).to receive(:update_subscription)
         patch(path, params: json_api_params('organizations', in_app_billing: false))
         expect(organization.reload.in_app_billing).to eql(false)
       end
