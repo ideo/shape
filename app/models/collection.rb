@@ -214,7 +214,7 @@ class Collection < ApplicationRecord
   end
 
   def duplicate!(
-    for_user:,
+    for_user: nil,
     copy_parent_card: false,
     parent: self.parent
   )
@@ -250,13 +250,13 @@ class Collection < ApplicationRecord
       c.allow_primary_group_view_access
     end
     # upgrade to editor unless we're setting up a templated collection
-    for_user.upgrade_to_edit_role(c)
+    for_user.upgrade_to_edit_role(c) if for_user.present?
     c.setup_submissions_collection! if is_a?(Collection::SubmissionBox)
 
     CollectionCardDuplicationWorker.perform_async(
       collection_cards.map(&:id),
-      for_user.id,
       c.id,
+      for_user.try(:id),
     )
 
     # pick up newly created relationships

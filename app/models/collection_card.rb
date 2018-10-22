@@ -39,7 +39,7 @@ class CollectionCard < ApplicationRecord
   end
 
   def duplicate!(
-    for_user:,
+    for_user: nil,
     parent: self.parent,
     shallow: false,
     placement: 'end',

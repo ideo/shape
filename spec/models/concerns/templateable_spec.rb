@@ -31,6 +31,7 @@ describe Templateable, type: :concern do
   end
 
   describe '#setup_templated_collection' do
+    let(:organization) { create(:organization) }
     let(:user) { create(:user, current_organization: organization) }
     let(:template) { create(:collection, master_template: true, num_cards: 3, add_editors: [user]) }
     let(:collection) { create(:collection) }
@@ -53,7 +54,15 @@ describe Templateable, type: :concern do
 
   describe '#update_template_instances' do
     let(:user) { create(:user) }
-    let!(:template) { create(:collection, master_template: true, num_cards: 3, pin_cards: true) }
+    let(:template_admin) { create(:user) }
+    let!(:template) do
+      create(:collection,
+             master_template: true,
+             num_cards: 3,
+             pin_cards: true,
+             created_by: template_admin,
+             add_editors: [template_admin])
+    end
     let!(:template_instance) { create(:collection, template: template, created_by: user) }
 
     context 'with new collections' do
@@ -85,6 +94,7 @@ describe Templateable, type: :concern do
         template.collection_cards << cards[1]
         cards
       end
+      let(:deleted_from_collection) {  template_instance.find_or_create_deleted_cards_collection }
       before do
         # Add a new card directly to the instance
         template_instance.collection_cards << create(:collection_card_text)
@@ -118,7 +128,6 @@ describe Templateable, type: :concern do
 
       it 'should move deleted cards into Deleted From Template collection' do
         template.update_template_instances
-        deleted_from_collection = template_instance.find_or_create_deleted_cards_collection
         expect(deleted_from_collection.children.size).to eq(1)
         expect(
           deleted_from_collection.collection_cards.first.templated_from_id,
@@ -130,14 +139,18 @@ describe Templateable, type: :concern do
         expect {
           template.update_template_instances
         }.to change(Activity, :count).by(1)
+        deleted_item_in_instance = deleted_from_collection.items.where(
+          cloned_from_id: deleted_card.record.id,
+        ).first
         expect(
           Activity.where(
             action: :archived_from_template,
-            actor_id: user.id,
+            organization_id: template_instance.organization_id,
+            actor_id: template_admin.id,
             target_id: deleted_from_collection.id,
             target_type: 'Collection',
-            source_id: deleted_card.record.id,
-            source_type: deleted_card.record.class.name,
+            source_id: deleted_item_in_instance.id,
+            source_type: 'Item',
           ).count,
         ).to eq(1)
       end

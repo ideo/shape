@@ -13,6 +13,7 @@ module Templateable
 
     after_create :add_template_tag, if: :master_template?
     after_create :add_template_instance_tag, if: :templated?
+    after_save :queue_update_template_instances, if: :master_template?
   end
 
   def profile_template?
@@ -35,6 +36,10 @@ module Templateable
         parent: collection,
       )
     end
+  end
+
+  def queue_update_template_instances
+    UpdateTemplateInstancesWorker.perform_async(id)
   end
 
   def update_template_instances
@@ -75,7 +80,8 @@ module Templateable
       # Notify that cards have been moved
       moved_cards.each do |card|
         ActivityAndNotificationBuilder.call(
-          actor: instance.created_by,
+          actor: created_by || instance.created_by,
+          organization: instance.organization,
           target: deleted_cards_coll, # Assign as target so we can route to it
           action: :archived_from_template,
           subject_user_ids: card.record.editors[:users].pluck(:id),

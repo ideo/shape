@@ -130,6 +130,38 @@ describe Collection, type: :model do
       end
     end
 
+    context 'without user' do
+      let(:duplicate_without_user) do
+        dupe = collection.duplicate!(
+          copy_parent_card: true,
+          parent: parent,
+        )
+        user.roles.reload
+        user.reset_cached_roles!
+        dupe
+      end
+
+      it 'clones the collection' do
+        expect { duplicate_without_user }.to change(Collection, :count).by(1)
+      end
+
+      it 'clones all the collection cards' do
+        expect(CollectionCardDuplicationWorker).to receive(:perform_async).with(
+          collection.collection_cards.map(&:id),
+          instance_of(Integer),
+          nil
+        )
+        duplicate_without_user
+      end
+
+      it 'clones all roles from parent collection - but not user' do
+        expect(duplicate_without_user.editors[:users].map(&:email)).to match(
+          parent.editors[:users].map(&:email),
+        )
+        expect(duplicate_without_user.can_edit?(user)).to be false
+      end
+    end
+
     context 'with copy_parent_card true' do
       let!(:copy_parent_card) { true }
 
@@ -168,7 +200,11 @@ describe Collection, type: :model do
       end
 
       it 'clones all the collection cards' do
-        expect(CollectionCardDuplicationWorker).to receive(:perform_async)
+        expect(CollectionCardDuplicationWorker).to receive(:perform_async).with(
+          collection.collection_cards.map(&:id),
+          instance_of(Integer),
+          user.id,
+        )
         collection.duplicate!(for_user: user)
       end
 

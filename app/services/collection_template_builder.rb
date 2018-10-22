@@ -32,6 +32,7 @@ class CollectionTemplateBuilder
     @collection = @template.templated_collections.create(
       name: created_template_name,
       organization: @parent.organization,
+      created_by: @created_by,
     )
     # make sure to assign these permissions before the template cards are generated
     @collection.inherit_roles_from_parent!(@parent)
