@@ -1,5 +1,11 @@
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import { ActivityContainer } from '~/ui/global/styled/layout'
+import Emoji from '~/ui/icons/Emoji'
+import {
+  EmojiMessageContainer,
+  SurveyClosed,
+} from '~/ui/test_collections/shared'
+import { DisplayText } from '~/ui/global/styled/typography'
 import SurveyResponse from '~/stores/jsonApi/SurveyResponse'
 import TestSurveyResponder from '~/ui/test_collections/TestSurveyResponder'
 
@@ -9,9 +15,16 @@ class ActivityTest extends React.Component {
   state = {
     surveyResponse: null,
     testCollection: null,
+    noTestCollection: false,
   }
 
   async componentDidMount() {
+    if (!this.collection.live_test_collection_id) {
+      this.setState({
+        noTestCollection: true,
+      })
+      return
+    }
     const res = await this.fetchTestCollection()
     const testCollection = res.data
     const surveyResponseResult =
@@ -64,26 +77,35 @@ class ActivityTest extends React.Component {
   render() {
     const { uiStore } = this.props
     const { createSurveyResponse } = this
-    const { surveyResponse, testCollection } = this.state
-    let inner
-    if (!testCollection) return null
-    if (testCollection.test_status === 'live') {
-      inner = (
-        <TestSurveyResponder
-          collection={testCollection}
-          surveyResponse={surveyResponse}
-          createSurveyResponse={createSurveyResponse}
-          editing={false}
-        />
+    const { noTestCollection, surveyResponse, testCollection } = this.state
+    if (noTestCollection) {
+      return (
+        <ActivityContainer moving={uiStore.activityLogMoving}>
+          <SurveyClosed>
+            <EmojiMessageContainer>
+              <Emoji name="Raising hands" symbol="🙌" />
+            </EmojiMessageContainer>
+            <DisplayText>
+              Thank you for stopping by! This feedback is now closed.
+            </DisplayText>
+          </SurveyClosed>
+        </ActivityContainer>
       )
-    } else {
-      inner = <span>next one </span>
     }
-    return (
-      <ActivityContainer moving={uiStore.activityLogMoving}>
-        {inner}
-      </ActivityContainer>
-    )
+    if (!testCollection) return <div />
+    if (testCollection.test_status === 'live') {
+      return (
+        <ActivityContainer moving={uiStore.activityLogMoving}>
+          <TestSurveyResponder
+            collection={testCollection}
+            surveyResponse={surveyResponse}
+            createSurveyResponse={createSurveyResponse}
+            editing={false}
+          />
+        </ActivityContainer>
+      )
+    }
+    return null
   }
 }
 
