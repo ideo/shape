@@ -32,6 +32,10 @@ class Api::V1::SurveyResponsesController < Api::V1::BaseController
     # could eventually be smarter to allow test owners to view their own survey
     # responses
     @survey_response = SurveyResponse.find_by(id: params[:id])
+    if current_user.nil?
+      head 404
+      return false
+    end
     if @survey_response.user_id && @survey_response.user_id != current_user.id
       head 404
       return false
