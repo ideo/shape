@@ -108,7 +108,24 @@ class TestDesigner extends React.Component {
     this.createNewQuestionCard({ order: card.order + 1 })
   }
 
-  handleTestTypeChange = e => {
+  archiveMediaCardsIfDefaultState() {
+    const { collection_cards } = this.props.collection
+    const [first, second, third] = collection_cards
+    // basic check to see if we are (roughly) in the default state
+    const defaultState =
+      first &&
+      second &&
+      third &&
+      first.card_question_type === 'question_media' &&
+      second.card_question_type === 'question_description' &&
+      third.card_question_type === 'question_useful' &&
+      collection_cards.length === 4
+    if (!defaultState) return false
+    // archive the media and description card when switching to testType -> collection
+    return first.API_archiveCards(_.map([first, second], 'id'))
+  }
+
+  handleTestTypeChange = async e => {
     const { collection } = this.props
     const { collectionToTest } = this.state
     const { value } = e.target
@@ -116,7 +133,7 @@ class TestDesigner extends React.Component {
     if (value === 'media') {
       collection.collection_to_test_id = null
     } else if (collectionToTest) {
-      // also save, if a value is selected...
+      await this.archiveMediaCardsIfDefaultState()
       collection.collection_to_test_id = collectionToTest.id
     } else {
       return

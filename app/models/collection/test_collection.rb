@@ -238,6 +238,17 @@ class Collection
       save
     end
 
+    def unarchive_cards!(*args)
+      super(*args)
+      # unarchive snapshot is not perfect, e.g. if you added new cards, may mix old/new cards
+      # so we need to ensure that the question_finish is always at the end
+      item = items.find_by(question_type: Item::QuestionItem.question_types[:question_finish])
+      return unless item.present?
+      card = item.parent_collection_card
+      card.update_column(:order, 9999)
+      reorder_cards!
+    end
+
     # Return array of incomplete media items, with index of item
     def incomplete_media_items
       question_items.joins(

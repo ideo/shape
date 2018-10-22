@@ -8,7 +8,7 @@ class CollectionCardArchiveWorker
     collection_cards
       .includes(:item, :collection)
       .each do |card|
-      next if card.archived?
+      next if card.finished_archiving?
       # Check if we should notify before archiving,
       # because afterwards the collection's cards will be archived
       notify = notify?(card)

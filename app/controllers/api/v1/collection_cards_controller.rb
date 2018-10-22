@@ -59,6 +59,9 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
   before_action :load_and_authorize_cards, only: %i[archive unarchive]
   after_action :broadcast_collection_archive_updates, only: %i[archive unarchive]
   def archive
+    @collection_cards.update_all(archived: true)
+    # should really only be the one parent collection
+    @collection_cards.map(&:parent).uniq.compact.each(&:touch)
     CollectionCardArchiveWorker.perform_async(
       @collection_cards.pluck(:id),
       current_user.id,
