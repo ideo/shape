@@ -190,7 +190,7 @@ class CollectionCard extends BaseRecord {
   // Only show archive popup if this is a collection that has cards
   // Don't show if empty collection, or just link card / item card(s)
   get showArchiveWarning() {
-    if (this.parent.isMasterTemplate) return true
+    if (this.parent.isMasterTemplate) return !this.parent.archiveWarningsSnoozed
     return _.some(
       this.selectedCards,
       card =>
@@ -216,6 +216,7 @@ class CollectionCard extends BaseRecord {
         let prompt = 'Are you sure you want to archive this?'
         const confirmText = 'Archive'
         let iconName = 'Archive'
+        let onToggleSnoozeDialog = null
         // check if multiple cards were selected
         if (selectedCardIds.length > 1) {
           const removedCount = this.reselectOnlyEditableCards(selectedCardIds)
@@ -242,11 +243,15 @@ class CollectionCard extends BaseRecord {
           prompt += ` ${numInstances} instance${
             numInstances === 1 ? '' : 's'
           } of this template will be affected.`
+          onToggleSnoozeDialog = () => {
+            this.parent.toggleSnoozeArchiveWarnings()
+          }
         }
         uiStore.confirm({
           prompt,
           confirmText,
           iconName,
+          onToggleSnoozeDialog,
           onCancel: () => resolve(false),
           onConfirm: () => resolve(true),
         })

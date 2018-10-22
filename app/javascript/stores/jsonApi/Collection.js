@@ -42,6 +42,22 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     this._reorderCards()
   }
 
+  @action
+  toggleSnoozeArchiveWarnings() {
+    if (this.snoozedArchiveWarningsAt) this.snoozedArchiveWarningsAt = undefined
+    else this.snoozedArchiveWarningsAt = Date.now()
+  }
+
+  get archiveWarningsSnoozed() {
+    const oneHourAgo = Date.now() - 1000 * 60 * 60
+    if (
+      this.snoozedArchiveWarningsAt &&
+      this.snoozedArchiveWarningsAt > oneHourAgo
+    )
+      return true
+    return false
+  }
+
   get organization() {
     return this.apiStore.find('organizations', this.organization_id)
   }
