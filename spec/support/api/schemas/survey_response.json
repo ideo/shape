@@ -2,6 +2,6 @@
   "type": "object",
   "properties": {
     "session_uid": { "type": "string" },
-    "user_id": { "type": "integer" }
+    "user_id": { "type": ["integer", "null"] }
   }
 }
