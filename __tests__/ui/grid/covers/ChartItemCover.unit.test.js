@@ -28,20 +28,43 @@ describe('ChartItemCover', () => {
 
     describe('when question is fetched', () => {
       beforeEach(() => {
-        apiStore.fetch.mockReturnValue(
-          Promise.resolve({
-            data: {
-              question_type: 'question_useful',
-            },
-          })
-        )
-        rerender()
+        component.question = { id: 53, question_type: 'question_useful' }
+        wrapper.update()
       })
 
       it('does render the headings when the question is there', async () => {
-        // TODO not working yet
-        // expect(wrapper.find('Heading1').text()).toEqual('')
-        // expect(wrapper.find('Heading3').text()).toEqual('')
+        expect(
+          wrapper
+            .find('Heading1')
+            .children()
+            .text()
+        ).toEqual('Usefulness')
+        expect(
+          wrapper
+            .find('StyledHeading3')
+            .children()
+            .text()
+        ).toEqual('How useful is this idea for you?')
+      })
+
+      describe('when question is a category satsifaction question', () => {
+        beforeEach(() => {
+          component.question = {
+            id: 53,
+            question_type: 'question_category_satisfaction',
+            content: 'donut',
+          }
+          wrapper.update()
+        })
+
+        it('should render the category satisfaction filled-in field', () => {
+          expect(
+            wrapper
+              .find('StyledHeading3')
+              .children()
+              .text()
+          ).toEqual('How satisifed are you with your current donut')
+        })
       })
     })
 
