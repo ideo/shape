@@ -5,7 +5,8 @@ class Api::V1::TestCollectionsController < Api::V1::BaseController
   def show
     render jsonapi: @test_collection,
            class: @test_collection.test_survey_render_class,
-           include: @test_collection.test_survey_render_includes
+           include: @test_collection.test_survey_render_includes,
+           expose: { survey_response_for_user: @test_collection.survey_response_for_user(current_user.id) }
   end
 
   def launch
