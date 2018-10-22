@@ -1,8 +1,8 @@
 import ScaleQuestion from '~/ui/test_collections/ScaleQuestion'
 import { fakeQuestionItem, fakeQuestionAnswer } from '#/mocks/data'
-import v from '~/utils/variables'
+import shallowWithTheme from '#/shallowWithTheme'
 
-let wrapper, props
+let wrapper, props, theme
 const fakeEv = {
   preventDefault: jest.fn(),
 }
@@ -15,7 +15,11 @@ describe('ScaleQuestion', () => {
       emojiSeries: 'usefulness',
       onAnswer: jest.fn(),
     }
-    wrapper = shallow(<ScaleQuestion {...props} />)
+    theme = {
+      borderColor: '#123123',
+      borderColorEditing: '#456456',
+    }
+    wrapper = shallowWithTheme(<ScaleQuestion {...props} />, theme)
   })
 
   describe('render()', () => {
@@ -49,10 +53,10 @@ describe('ScaleQuestion', () => {
         ).toBe(true)
       })
 
-      it('should set the question border to commonMedium', () => {
+      it('should set the question border to editing theme color', () => {
         expect(wrapper.find('Question')).toHaveStyleRule(
           'border-color',
-          v.colors.commonMedium
+          theme.borderColorEditing
         )
       })
     })

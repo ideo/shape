@@ -175,18 +175,6 @@ class CollectionCard extends BaseRecord {
     return removedCount
   }
 
-  async API_archiveSelf() {
-    try {
-      await this.apiStore.archiveCards({
-        cardIds: [this.id],
-        collection: this.parent,
-      })
-      return
-    } catch (e) {
-      uiStore.defaultAlertError()
-    }
-  }
-
   // Only show archive popup if this is a collection that has cards
   // Don't show if empty collection, or just link card / item card(s)
   get showArchiveWarning() {
@@ -206,6 +194,23 @@ class CollectionCard extends BaseRecord {
       .filter(card => selectedCardIds.indexOf(card.id) > -1)
   }
 
+  async API_archiveSelf() {
+    try {
+      await this.apiStore.archiveCards({
+        cardIds: [this.id],
+        collection: this.parent,
+      })
+      return
+    } catch (e) {
+      uiStore.defaultAlertError()
+    }
+  }
+
+  async API_archiveCards(cardIds = []) {
+    uiStore.reselectCardIds(cardIds)
+    return this.API_archive()
+  }
+
   // this could really be a static method now that it archives all selected cards
   async API_archive({ isReplacing = false } = {}) {
     const { selectedCardIds } = uiStore
@@ -219,7 +224,7 @@ class CollectionCard extends BaseRecord {
         if (selectedCardIds.length > 1) {
           const removedCount = this.reselectOnlyEditableCards(selectedCardIds)
           prompt = 'Are you sure you want to archive '
-          if (uiStore.selectedCardIds.length > 1) {
+          if (selectedCardIds.length > 1) {
             prompt += `these ${selectedCardIds.length} objects?`
           } else {
             prompt += 'this?'
