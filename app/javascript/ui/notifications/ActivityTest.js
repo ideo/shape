@@ -19,7 +19,9 @@ class ActivityTest extends React.Component {
       (await this.fetchSurveyResponse(
         testCollection.survey_response_for_user_id
       ))
-    const surveyResponse = surveyResponseResult.data
+    const surveyResponse = surveyResponseResult
+      ? surveyResponseResult.data
+      : null
     this.setState({
       surveyResponse,
       testCollection,
