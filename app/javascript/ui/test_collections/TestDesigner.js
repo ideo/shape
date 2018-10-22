@@ -1,3 +1,4 @@
+import _ from 'lodash'
 import { Flex } from 'reflexbox'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled, { ThemeProvider } from 'styled-components'
@@ -207,27 +208,42 @@ class TestDesigner extends React.Component {
   }
 
   renderTestTypeForm() {
+    const { collection } = this.props
     const { collectionToTest, testType } = this.state
     // also searchvalue comes from collection_to_test.name.... or something
 
+    const isDraft = collection.test_status === 'draft'
+    let options = [
+      {
+        value: 'media',
+        label: 'Get feedback on an image, video or idea description',
+        disabled: !isDraft,
+      },
+      {
+        value: 'collection',
+        label: (
+          <div>
+            Get feedback on collection:{' '}
+            <span style={{ fontWeight: v.weights.medium }}>
+              {collectionToTest && collectionToTest.name}
+            </span>
+          </div>
+        ),
+        disabled:
+          !isDraft ||
+          (collectionToTest && !collectionToTest.isNormalCollection),
+      },
+    ]
+
+    if (!isDraft) {
+      options = _.filter(options, { value: testType })
+    }
+
     return (
-      <form>
+      // maxWidth mainly to force the radio buttons from spanning the page
+      <form style={{ maxWidth: '500px' }}>
         <RadioControl
-          options={[
-            {
-              value: 'media',
-              label: 'Get feedback on an image, video or idea description',
-            },
-            {
-              value: 'collection',
-              label: (
-                <div>
-                  Get feedback on collection:{' '}
-                  <span>{collectionToTest && collectionToTest.name}</span>
-                </div>
-              ),
-            },
-          ]}
+          options={options}
           name="test_type"
           onChange={this.handleTestTypeChange}
           selectedValue={testType}
@@ -282,8 +298,7 @@ class TestDesigner extends React.Component {
     return (
       <ThemeProvider theme={this.styledTheme}>
         <div>
-          {collection.test_status === 'draft' && this.renderTestTypeForm()}
-
+          {this.renderTestTypeForm()}
           <TopBorder />
           {inner}
           <BottomBorder />

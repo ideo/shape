@@ -46,7 +46,7 @@ describe('TestDesigner', () => {
       props.collection.test_status = 'draft'
       wrapper = shallow(<TestDesigner {...props} />)
     })
-    it('should render the testTypeForm', () => {
+    it('should render the testTypeForm set to "media" by default', () => {
       expect(wrapper.find('RadioControl').exists()).toBeTruthy()
       expect(wrapper.find('RadioControl').props().selectedValue).toEqual(
         'media'
@@ -54,7 +54,7 @@ describe('TestDesigner', () => {
     })
   })
 
-  describe('with colleciton_to_test', () => {
+  describe('with collection_to_test', () => {
     beforeEach(() => {
       props.collection.collection_to_test = { ...fakeCollection }
       wrapper = shallow(<TestDesigner {...props} />)
@@ -63,6 +63,12 @@ describe('TestDesigner', () => {
 
     it('should set the state.testType to collection', () => {
       expect(wrapper.state().testType).toEqual('collection')
+    })
+
+    it('should render the testTypeForm set to "collection"', () => {
+      expect(wrapper.find('RadioControl').props().selectedValue).toEqual(
+        'collection'
+      )
     })
 
     it('should use the secondary theme', () => {
