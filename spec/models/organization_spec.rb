@@ -189,6 +189,43 @@ describe Organization, type: :model do
         end
       end
     end
+
+    describe 'notify trial users count exceeded', :vcr do
+      before do
+        allow(TrialUsersCountExceededMailer).to receive(:notify)
+      end
+
+      context 'active users count less than trial users count' do
+        it 'does nothing' do
+          organization = create(:organization, in_app_billing: true, trial_users_count: 10, active_users_count: 7)
+          organization.in_app_billing = true
+          expect(TrialUsersCountExceededMailer).not_to receive(:notify)
+          organization.update_attributes(
+            active_users_count: 8,
+          )
+        end
+      end
+
+      context 'in app billing disabled' do
+        it 'does nothing' do
+          organization = create(:organization, in_app_billing: false, trial_users_count: 5, active_users_count: 10)
+          expect(TrialUsersCountExceededMailer).not_to receive(:notify)
+          organization.update_attributes(
+            active_users_count: 11,
+          )
+        end
+      end
+
+      context 'active users count greater than trail user count and in app billing enabled' do
+        it 'uses the TrailUsersCountExceededMailer' do
+          organization = create(:organization, in_app_billing: true, trial_users_count: 5, active_users_count: 5)
+          expect(TrialUsersCountExceededMailer).to receive(:notify)
+          organization.update_attributes(
+            active_users_count: 6,
+          )
+        end
+      end
+    end
   end
 
   describe '.create_for_user' do
