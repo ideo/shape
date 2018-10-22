@@ -153,7 +153,7 @@ class Activity extends React.PureComponent {
               &rdquo;
             </strong>
             was removed from the template by the template editor. This affected
-            <strong className="target">{targetName}</strong>
+            {this.targetLink(targetName)}
           </ActivityText>
         )
       case 'added_editor':
