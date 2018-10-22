@@ -14,8 +14,14 @@ class ActivityTest extends React.Component {
   async componentDidMount() {
     const res = await this.fetchTestCollection()
     const testCollection = res.data
-    const surveyResponse = testCollection.current_user_survey_response
-    console.log('ActivityTest,viewing', this.props.uiStore.viewingCollection)
+    const surveyResponseResult =
+      testCollection.survey_response_for_user_id &&
+      (await this.fetchSurveyResponse(
+        testCollection.survey_response_for_user_id
+      ))
+    const surveyResponse = surveyResponseResult
+      ? surveyResponseResult.data
+      : null
     this.setState({
       surveyResponse,
       testCollection,
@@ -32,6 +38,11 @@ class ActivityTest extends React.Component {
       'test_collections',
       this.collection.live_test_collection_id
     )
+  }
+
+  fetchSurveyResponse(surveyResponseId) {
+    const { apiStore } = this.props
+    return apiStore.fetch('survey_responses', surveyResponseId)
   }
 
   createSurveyResponse = async () => {

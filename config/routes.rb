@@ -101,7 +101,7 @@ Rails.application.routes.draw do
         get 'users_and_groups', to: 'search#users_and_groups', as: :search_users_and_groups
       end
       # unauthenticated routes:
-      resources :survey_responses, only: %i[create] do
+      resources :survey_responses, only: %i[show create] do
         # not shallow because we always want to look up survey_response by session_uid
         resources :question_answers, only: %i[create update]
       end

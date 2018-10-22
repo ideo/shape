@@ -59,5 +59,22 @@ describe('ActivityTest', () => {
     it('should fetch the test collection', () => {
       expect(props.apiStore.fetch).toHaveBeenCalled()
     })
+
+    describe('if there is a survey response already for the user', () => {
+      beforeEach(() => {
+        const respondedTestCollection = Object.assign({}, testCollection, {
+          survey_response_for_user_id: 57,
+        })
+        props.apiStore.fetch.mockReturnValue({ data: respondedTestCollection })
+        wrapper = shallow(<ActivityTest.wrappedComponent {...props} />)
+      })
+
+      it('should fetch the survey response', () => {
+        expect(props.apiStore.fetch).toHaveBeenCalledWith(
+          'survey_responses',
+          57
+        )
+      })
+    })
   })
 })
