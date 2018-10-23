@@ -115,29 +115,56 @@ describe Organization, type: :model do
     describe 'update subscription' do
       context 'in_app_billing changed to true' do
         let(:organization) { create(:organization, in_app_billing: false) }
-        it 'creates a new subscription' do
-          plan = double('plan', id: 123)
-          payment_method = double('payment_method', id: 234)
-          network_organization = double('network_organization', id: 345)
 
-          allow(NetworkApi::Plan).to receive(:first).and_return(plan)
+        context 'payment method exits' do
+          it 'creates a new subscription' do
+            plan = double('plan', id: 123)
+            payment_method = double('payment_method', id: 234)
+            network_organization = double('network_organization', id: 345)
 
-          allow(NetworkApi::PaymentMethod).to receive(:find).with(
-            organization_id: network_organization.id,
-            default: true,
-          ).and_return([payment_method])
+            allow(NetworkApi::Plan).to receive(:first).and_return(plan)
 
-          allow(organization).to receive(:network_organization).and_return(network_organization)
+            allow(NetworkApi::PaymentMethod).to receive(:find).with(
+              organization_id: network_organization.id,
+              default: true,
+            ).and_return([payment_method])
 
-          allow(NetworkApi::Subscription).to receive(:create)
+            allow(organization).to receive(:network_organization).and_return(network_organization)
 
-          expect(NetworkApi::Subscription).to receive(:create).with(
-            organization_id: network_organization.id,
-            plan_id: plan.id,
-            payment_method_id: payment_method.id,
-          )
+            allow(NetworkApi::Subscription).to receive(:create)
 
-          organization.update_attributes(in_app_billing: true)
+            expect(NetworkApi::Subscription).to receive(:create).with(
+              organization_id: network_organization.id,
+              plan_id: plan.id,
+              payment_method_id: payment_method.id,
+            )
+
+            organization.update_attributes(in_app_billing: true)
+          end
+        end
+
+        context 'payment method does not exist' do
+          it 'creates a new subscription without payment method' do
+            plan = double('plan', id: 123)
+            network_organization = double('network_organization', id: 345)
+
+            allow(NetworkApi::Plan).to receive(:first).and_return(plan)
+
+            allow(NetworkApi::PaymentMethod).to receive(:find).with(
+              organization_id: network_organization.id,
+              default: true,
+            ).and_return([])
+
+            allow(organization).to receive(:network_organization).and_return(network_organization)
+
+            expect(NetworkApi::Subscription).to receive(:create).with(
+              organization_id: network_organization.id,
+              plan_id: plan.id,
+              payment_method_id: nil,
+            )
+
+            organization.update_attributes(in_app_billing: true)
+          end
         end
       end
 

@@ -266,7 +266,7 @@ class Organization < ApplicationRecord
     NetworkApi::Subscription.create(
       organization_id: network_organization.id,
       plan_id: plan.id,
-      payment_method_id: payment_method.id,
+      payment_method_id: payment_method.try(:id),
     )
   end
 
