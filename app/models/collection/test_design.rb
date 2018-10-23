@@ -12,6 +12,18 @@ class Collection
              class_name: 'Item::QuestionItem',
              through: :primary_collection_cards
 
+    def duplicate!(**args)
+      duplicate = super(args)
+      return duplicate unless duplicate.persisted?
+      duplicate = duplicate.becomes(Collection::TestCollection)
+      duplicate.update(
+        test_collection_id: nil,
+        type: 'Collection::TestCollection',
+      )
+      # Had to reload otherwise AASM gets into weird state
+      duplicate.reload
+    end
+
     def question_item_created(question_item)
       return unless question_item.question_open?
       # Create open response collection for this new question item

@@ -25,6 +25,7 @@ FactoryBot.define do
     factory :video_item, class: 'Item::VideoItem' do
       url 'https://www.youtube.com/watch?v=igJ4qADrSwo'
       thumbnail_url { Faker::Company.logo }
+      name '80s Best Dance Hits'
     end
 
     factory :question_item, class: 'Item::QuestionItem' do
