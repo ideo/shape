@@ -56,7 +56,6 @@ describe('ActivityTest', () => {
       })
 
       it('it should render a survey closed message', () => {
-        console.log(wrapper.debug())
         expect(wrapper.find('SurveyClosed').exists()).toBe(true)
       })
     })

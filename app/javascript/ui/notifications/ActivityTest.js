@@ -8,6 +8,7 @@ import {
 import { DisplayText } from '~/ui/global/styled/typography'
 import SurveyResponse from '~/stores/jsonApi/SurveyResponse'
 import TestSurveyResponder from '~/ui/test_collections/TestSurveyResponder'
+import Tooltip from '~/ui/global/Tooltip'
 
 @inject('apiStore', 'uiStore')
 @observer
@@ -82,12 +83,21 @@ class ActivityTest extends React.Component {
       return (
         <ActivityContainer moving={uiStore.activityLogMoving}>
           <SurveyClosed>
-            <EmojiMessageContainer>
-              <Emoji name="Raising hands" symbol="🙌" />
-            </EmojiMessageContainer>
+            <DisplayText>Thank you for stopping by!</DisplayText>
+            <br />
+            <br />
             <DisplayText>
-              Thank you for stopping by! This feedback is now closed.
+              Feedback on {this.collection.name} is finished.
             </DisplayText>
+            <Tooltip
+              classes={{ tooltip: 'Tooltip' }}
+              title="Feedback finished"
+              placement="bottom"
+            >
+              <EmojiMessageContainer>
+                <Emoji name="Timer clock" symbol="⏲️" />
+              </EmojiMessageContainer>
+            </Tooltip>
           </SurveyClosed>
         </ActivityContainer>
       )

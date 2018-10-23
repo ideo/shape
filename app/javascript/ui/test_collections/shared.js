@@ -46,8 +46,8 @@ export const theme = objectAssignDeep({}, VictoryTheme.grayscale, {
 })
 
 export const EmojiMessageContainer = styled.div`
-  margin-top: 20px;
-  font-size: 80px;
+  margin-top: 0px;
+  font-size: 55px;
 `
 
 export const SurveyClosed = styled.div`
