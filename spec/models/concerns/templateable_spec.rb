@@ -92,32 +92,52 @@ describe Templateable, type: :concern do
         cards = create_list(:collection_card_text, 2, pinned: true)
         template.collection_cards << cards[0]
         template.collection_cards << cards[1]
+        template.reorder_cards!
         cards
       end
-      let(:deleted_from_collection) {  template_instance.find_or_create_deleted_cards_collection }
+      let(:deleted_from_collection) { template_instance.find_or_create_deleted_cards_collection }
       before do
         # Add a new card directly to the instance
         template_instance.collection_cards << create(:collection_card_text)
+        template_instance.reorder_cards!
         template_instance.reload
+        template.collection_cards.reload
       end
 
-      it 'should update all pinned cards to match any template updates' do
-        expect(template_instance.collection_cards.count).to eq(4)
-        expect(template_instance.collection_cards.pinned.count).to eq(3)
+      it 'should update all pinned cards to match any height, width and order updates' do
+        # Update master cards height, width and order
+        # Making sure we update the original cards, not any newly-added cards
+        # Starting at index 1, because index 0 has been deleted
+        first_template_card = template.collection_cards.find_by_id(template_beginning_card_ids[1])
+        second_template_card = template.collection_cards.find_by_id(template_beginning_card_ids[2])
+        first_template_card.update(height: 2, width: 2, order: 1)
+        second_template_card.update(order: 0)
+
+        # Update instances
         template.update_template_instances
         template_instance.reload
-        # Added 2 cards from master + created Deleted From Template collection
-        expect(template_instance.collection_cards.count).to eq(6)
-        expect(template_instance.collection_cards.pinned.count).to eq(4)
-        # unpinned card should get reordered to the end
-        expect(template_instance.collection_cards.last.pinned?).to eq false
+        template.collection_cards.reload
+
+        # Instance cards should reflect the updates, and be in the updated order
+        expect(template_instance.collection_cards.pinned[0].height).to eq(1)
+        expect(template_instance.collection_cards.pinned[0].width).to eq(1)
+        expect(template_instance.collection_cards.pinned[0].templated_from_id).to eq(
+          second_template_card.id,
+        )
+        expect(template_instance.collection_cards.pinned[1].height).to eq(2)
+        expect(template_instance.collection_cards.pinned[1].width).to eq(2)
+        expect(template_instance.collection_cards.pinned[1].templated_from_id).to eq(
+          first_template_card.id,
+        )
       end
 
       it 'should add new cards into instance' do
         expect(template_instance.collection_cards.size).to eq(4)
+        expect(template_instance.collection_cards.pinned.count).to eq(3)
         template.update_template_instances
         template_instance.collection_cards.reload
         expect(template_instance.collection_cards.size).to eq(6)
+        expect(template_instance.collection_cards.pinned.count).to eq(4)
         # Two nils - one for card added directly, one for 'Deleted From' collection
         expect(template_instance.collection_cards.map(&:templated_from_id)).to match_array(
           added_cards.map(&:id) +

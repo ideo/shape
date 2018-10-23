@@ -44,6 +44,7 @@ module Templateable
 
   def update_template_instances
     templated_collections.each do |instance|
+      update_cards_on_template_instance(instance)
       add_cards_from_master_template(instance)
       move_cards_deleted_from_master_template(instance)
       instance.reorder_cards!
@@ -55,6 +56,19 @@ module Templateable
       card.duplicate!(
         for_user: instance.created_by,
         parent: instance,
+      )
+    end
+  end
+
+  def update_cards_on_template_instance(instance)
+    master_cards = pinned_cards_by_id
+    instance.collection_cards.pinned.each do |card|
+      master = master_cards[card.templated_from_id]
+      next if master.blank? # Blank if this card was just added
+      card.update(
+        height: master.height,
+        width: master.width,
+        order: master.order,
       )
     end
   end
