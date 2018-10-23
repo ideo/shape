@@ -44,9 +44,9 @@ module Templateable
 
   def update_template_instances
     templated_collections.each do |instance|
+      move_cards_deleted_from_master_template(instance)
       update_cards_on_template_instance(instance)
       add_cards_from_master_template(instance)
-      move_cards_deleted_from_master_template(instance)
       instance.reorder_cards!
     end
   end
