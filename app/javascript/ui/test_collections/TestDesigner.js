@@ -1,21 +1,26 @@
+import _ from 'lodash'
 import { Flex } from 'reflexbox'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
-import styled from 'styled-components'
+import styled, { ThemeProvider } from 'styled-components'
 import FlipMove from 'react-flip-move'
 
 import { DisplayText, NumberListText } from '~/ui/global/styled/typography'
 import { Select, SelectOption } from '~/ui/global/styled/forms'
 import v, { ITEM_TYPES } from '~/utils/variables'
 import TrashIcon from '~/ui/icons/TrashIcon'
-import { TestQuestionHolder } from '~/ui/test_collections/shared'
+import {
+  TestQuestionHolder,
+  styledTestTheme,
+} from '~/ui/test_collections/shared'
 import { apiStore } from '~/stores/'
 // NOTE: Always import these models after everything else, can lead to odd dependency!
 import CollectionCard from '~/stores/jsonApi/CollectionCard'
 import QuestionHotEdge from '~/ui/test_collections/QuestionHotEdge'
 import TestQuestion from '~/ui/test_collections/TestQuestion'
+import RadioControl from '~/ui/global/RadioControl'
 
 const TopBorder = styled.div`
-  background-color: ${v.colors.commonMedium};
+  background-color: ${props => props.theme.borderColorEditing};
   border-radius: 7px 7px 0 0;
   height: 16px;
   margin-left: 320px;
@@ -63,6 +68,31 @@ const selectOptions = [
 
 @observer
 class TestDesigner extends React.Component {
+  constructor(props) {
+    super(props)
+    const { collection_to_test } = props.collection
+    this.state = {
+      testType: collection_to_test ? 'collection' : 'media',
+      collectionToTest: collection_to_test,
+    }
+  }
+
+  async componentDidMount() {
+    if (this.state.collectionToTest) return
+    // if none is set, we look up the parent to provide a default value
+    const { collection } = this.props
+    const { parent_id } = collection.parent_collection_card
+    try {
+      const res = await collection.apiStore.fetch('collections', parent_id)
+      // default setting to the parent collection
+      this.setState({
+        collectionToTest: res.data,
+      })
+    } catch (e) {
+      console.warn(e, 'unable to load parent collection')
+    }
+  }
+
   handleSelectChange = replacingCard => ev =>
     this.createNewQuestionCard({
       replacingCard,
@@ -76,6 +106,46 @@ class TestDesigner extends React.Component {
 
   handleNew = card => () => {
     this.createNewQuestionCard({ order: card.order + 1 })
+  }
+
+  archiveMediaCardsIfDefaultState() {
+    const { collection_cards } = this.props.collection
+    const [first, second, third] = collection_cards
+    // basic check to see if we are (roughly) in the default state
+    const defaultState =
+      first &&
+      second &&
+      third &&
+      first.card_question_type === 'question_media' &&
+      second.card_question_type === 'question_description' &&
+      third.card_question_type === 'question_useful' &&
+      collection_cards.length === 4
+    if (!defaultState) return false
+    // archive the media and description card when switching to testType -> collection
+    return first.API_archiveCards(_.map([first, second], 'id'))
+  }
+
+  handleTestTypeChange = async e => {
+    const { collection } = this.props
+    const { collectionToTest } = this.state
+    const { value } = e.target
+    this.setState({ testType: value })
+    if (value === 'media') {
+      collection.collection_to_test_id = null
+    } else if (collectionToTest) {
+      await this.archiveMediaCardsIfDefaultState()
+      collection.collection_to_test_id = collectionToTest.id
+    } else {
+      return
+    }
+    collection.save()
+  }
+
+  get styledTheme() {
+    if (this.state.testType === 'collection') {
+      return styledTestTheme('secondary')
+    }
+    return styledTestTheme('primary')
   }
 
   get canEdit() {
@@ -154,6 +224,51 @@ class TestDesigner extends React.Component {
     )
   }
 
+  renderTestTypeForm() {
+    const { collection } = this.props
+    const { collectionToTest, testType } = this.state
+    // also searchvalue comes from collection_to_test.name.... or something
+
+    const isDraft = collection.test_status === 'draft'
+    let options = [
+      {
+        value: 'media',
+        label: 'Get feedback on an image, video or idea description',
+        disabled: !isDraft,
+      },
+      {
+        value: 'collection',
+        label: (
+          <div>
+            Get feedback on collection:{' '}
+            <span style={{ fontWeight: v.weights.medium }}>
+              {collectionToTest && collectionToTest.name}
+            </span>
+          </div>
+        ),
+        disabled:
+          !isDraft ||
+          (collectionToTest && !collectionToTest.isNormalCollection),
+      },
+    ]
+
+    if (!isDraft) {
+      options = _.filter(options, { value: testType })
+    }
+
+    return (
+      // maxWidth mainly to force the radio buttons from spanning the page
+      <form style={{ maxWidth: '500px' }}>
+        <RadioControl
+          options={options}
+          name="test_type"
+          onChange={this.handleTestTypeChange}
+          selectedValue={testType}
+        />
+      </form>
+    )
+  }
+
   render() {
     const { collection } = this.props
     const cardCount = collection.collection_cards.length
@@ -198,11 +313,14 @@ class TestDesigner extends React.Component {
     })
 
     return (
-      <div>
-        <TopBorder />
-        {inner}
-        <BottomBorder />
-      </div>
+      <ThemeProvider theme={this.styledTheme}>
+        <div>
+          {this.renderTestTypeForm()}
+          <TopBorder />
+          {inner}
+          <BottomBorder />
+        </div>
+      </ThemeProvider>
     )
   }
 }

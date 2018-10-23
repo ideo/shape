@@ -10,6 +10,7 @@ class Collection
              source: :item,
              class_name: 'Item::QuestionItem',
              through: :primary_collection_cards
+    belongs_to :collection_to_test, class_name: 'Collection', optional: true
 
     before_create :setup_default_status_and_questions, unless: :cloned_from_present?
     after_create :add_test_tag
@@ -254,6 +255,17 @@ class Collection
       update_cached_tag_lists
       # no good way around saving a 2nd time after_create
       save
+    end
+
+    def unarchive_cards!(*args)
+      super(*args)
+      # unarchive snapshot is not perfect, e.g. if you added new cards, may mix old/new cards
+      # so we need to ensure that the question_finish is always at the end
+      item = items.find_by(question_type: Item::QuestionItem.question_types[:question_finish])
+      return unless item.present?
+      card = item.parent_collection_card
+      card.update_column(:order, 9999)
+      reorder_cards!
     end
 
     # Return array of incomplete media items, with index of item
