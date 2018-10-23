@@ -22,14 +22,13 @@ function pluralTypeName(name) {
 
 const GoIconContainer = styled.span`
   display: inline-block;
-  margin-bottom: 1px;
   margin-right: 8px;
   vertical-align: middle;
-  width: 15px;
+  width: 12px;
 `
 
 const JumpButton = styled.button`
-  left: 105px;
+  left: 100px;
   min-height: 20px;
   margin-top: -33px;
   max-width: 250px;
@@ -306,7 +305,7 @@ class CommentThreadContainer extends React.Component {
                 Go to ${uiStore.viewingRecord && uiStore.viewingRecord.name}
               `}
               key="jumpbutton"
-              overrideWidth={265}
+              overrideWidth={270}
               overrideStyle={{ display: 'inline-block' }}
             />
           </SmallActionText>
