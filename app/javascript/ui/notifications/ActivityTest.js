@@ -50,7 +50,6 @@ class ActivityTest extends React.Component {
     const newResponse = new SurveyResponse(
       {
         test_collection_id: this.state.testCollection.id,
-        user_id: apiStore.currentUserId,
       },
       apiStore
     )
@@ -74,6 +73,7 @@ class ActivityTest extends React.Component {
           surveyResponse={surveyResponse}
           createSurveyResponse={createSurveyResponse}
           editing={false}
+          theme="secondary"
         />
       )
     } else {

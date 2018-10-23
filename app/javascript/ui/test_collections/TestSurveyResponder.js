@@ -78,9 +78,14 @@ class TestSurveyResponder extends React.Component {
   }
 
   render() {
-    const { collection, surveyResponse, createSurveyResponse } = this.props
+    const {
+      collection,
+      surveyResponse,
+      createSurveyResponse,
+      theme,
+    } = this.props
     return (
-      <ThemeProvider theme={styledTestTheme('primary')}>
+      <ThemeProvider theme={styledTestTheme(theme)}>
         <div id={this.containerId}>
           {this.viewableCards().map(card => (
             <FlipMove appearAnimation="fade" key={card.id}>
@@ -123,10 +128,12 @@ TestSurveyResponder.propTypes = {
   collection: MobxPropTypes.objectOrObservableObject.isRequired,
   createSurveyResponse: PropTypes.func.isRequired,
   surveyResponse: MobxPropTypes.objectOrObservableObject,
+  theme: PropTypes.string,
 }
 
 TestSurveyResponder.defaultProps = {
   surveyResponse: undefined,
+  theme: 'primary',
 }
 
 export default TestSurveyResponder
