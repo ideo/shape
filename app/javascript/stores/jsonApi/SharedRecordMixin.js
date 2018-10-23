@@ -1,10 +1,23 @@
 import _ from 'lodash'
+import { action, observable } from 'mobx'
 import { undoStore } from '~/stores'
 
 // This contains some shared methods between Collection and Item
 
 const SharedRecordMixin = superclass =>
   class extends superclass {
+    @observable
+    forceMenuDisabled = false
+
+    @action
+    disableMenu() {
+      this.forceMenuDisabled = true
+    }
+
+    get menuDisabled() {
+      return super.menuDisabled || this.forceMenuDisabled
+    }
+
     API_updateName(name) {
       const previousName = this.name
       this.name = name

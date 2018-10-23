@@ -42,7 +42,7 @@ class TestSurveyResponder extends React.Component {
     let reachedLastVisibleCard = false
     return collection.question_cards.filter(card => {
       // turn off the card's actionmenu (dot-dot-dot)
-      card.record.menuDisabled = true
+      card.record.disableMenu()
       if (reachedLastVisibleCard) {
         return false
       } else if (
