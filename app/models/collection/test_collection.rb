@@ -103,7 +103,7 @@ class Collection
       )
     end
 
-    def test_survey_render_class
+    def test_survey_render_class_mappings
       Firestoreable::JSONAPI_CLASS_MAPPINGS.merge(
         'Collection::TestCollection': SerializableTestCollection,
         'Collection::TestDesign': SerializableSimpleCollection,
@@ -113,7 +113,7 @@ class Collection
 
     def test_survey_render_includes
       {
-        collection_cards: [
+        question_cards: [
           :parent,
           record: [:filestack_file],
         ],
@@ -126,7 +126,7 @@ class Collection
         self,
         # Use Firestoreable mappings which already include "Simple" Serializers
         # This uses a special serializer that defers collection cards to test design
-        class: test_survey_render_class,
+        class: test_survey_render_class_mappings,
         include: test_survey_render_includes,
       )
     end

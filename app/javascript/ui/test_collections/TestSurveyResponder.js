@@ -40,7 +40,7 @@ class TestSurveyResponder extends React.Component {
   viewableCards = () => {
     const { collection } = this.props
     let reachedLastVisibleCard = false
-    return collection.collection_cards.filter(card => {
+    return collection.question_cards.filter(card => {
       // turn off the card's actionmenu (dot-dot-dot)
       card.record.menuDisabled = true
       if (reachedLastVisibleCard) {
@@ -67,8 +67,8 @@ class TestSurveyResponder extends React.Component {
 
   scrollToTopOfNextCard = card => {
     const { collection } = this.props
-    const index = collection.collection_cards.indexOf(card)
-    const nextCard = collection.collection_cards[index + 1]
+    const index = collection.question_cards.indexOf(card)
+    const nextCard = collection.question_cards[index + 1]
     if (!nextCard) return
     scroller.scrollTo(`card-${nextCard.id}`, {
       duration: 350,

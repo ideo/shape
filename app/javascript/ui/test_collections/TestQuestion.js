@@ -54,6 +54,8 @@ class TestQuestion extends React.Component {
       await questionAnswer.API_create()
       handleQuestionAnswerCreatedForCard(card)
     } else {
+      // needs to be attached in order to provide the session_uid
+      if (surveyResponse) questionAnswer.survey_response = surveyResponse
       // update values on existing answer and save
       await questionAnswer.API_update({
         answer_text: text,
