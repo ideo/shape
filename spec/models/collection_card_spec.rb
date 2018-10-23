@@ -345,7 +345,7 @@ RSpec.describe CollectionCard, type: :model do
       end
     end
 
-    describe 'archive!' do
+    describe '#archive!' do
       it 'should archive and call decrement_card_orders' do
         expect(CollectionCard).to receive(:decrement_counter)
         collection_card.archive!
@@ -356,6 +356,27 @@ RSpec.describe CollectionCard, type: :model do
         expect(collection.cached_card_count).to eq 5
         collection_card.archive!
         expect(collection.cached_card_count).to eq 4
+      end
+    end
+
+    describe '#archive_all!' do
+      let(:user) { create(:user) }
+
+      it 'should archive all cards in the query' do
+        expect(collection).to receive(:touch)
+        expect {
+          collection_cards.archive_all!(user_id: user.id)
+        }.to change(CollectionCard.active, :count).by(collection_cards.count * -1)
+        # because this is the relation collection.collection_cards, it should now be empty
+        expect(collection_cards).to eq []
+      end
+
+      it 'should call the background worker' do
+        expect(CollectionCardArchiveWorker).to receive(:perform_async).with(
+          collection_cards.map(&:id),
+          user.id,
+        )
+        collection_cards.archive_all!(user_id: user.id)
       end
     end
   end

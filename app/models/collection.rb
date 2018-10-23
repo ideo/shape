@@ -88,7 +88,7 @@ class Collection < ApplicationRecord
   belongs_to :created_by, class_name: 'User', optional: true
   belongs_to :question_item, class_name: 'Item::QuestionItem', optional: true
 
-  validates :name, presence: true, if: :base_collection_type?
+  validates :name, presence: true
   before_validation :inherit_parent_organization_id, on: :create
 
   scope :root, -> { where('jsonb_array_length(breadcrumb) = 1') }
@@ -178,6 +178,7 @@ class Collection < ApplicationRecord
       :parent_collection_card,
       :submissions_collection,
       :submission_template,
+      :collection_to_test,
       roles: %i[users groups resource],
       collection_cards: [
         :parent,
@@ -223,6 +224,7 @@ class Collection < ApplicationRecord
     c.cloned_from = self
     c.created_by = for_user
     c.tag_list = tag_list
+
     # copy organization_id from the collection this is being moved into
     # NOTE: parent is only nil in Colab import -- perhaps we should clean up any Colab import specific code?
     c.organization_id = parent.try(:organization_id) || organization_id
@@ -249,9 +251,9 @@ class Collection < ApplicationRecord
     if parent.is_a? Collection::UserCollection
       c.allow_primary_group_view_access
     end
-    # upgrade to editor unless we're setting up a templated collection
+
+    # Upgrade to editor if provided
     for_user.upgrade_to_edit_role(c) if for_user.present?
-    c.setup_submissions_collection! if is_a?(Collection::SubmissionBox)
 
     CollectionCardDuplicationWorker.perform_async(
       collection_cards.map(&:id),
@@ -297,6 +299,10 @@ class Collection < ApplicationRecord
     nil
   end
 
+  def collection_to_test
+    nil
+  end
+
   def resourceable_class
     # Use top-level class since this is an STI model
     Collection
@@ -331,13 +337,13 @@ class Collection < ApplicationRecord
   # convenience method if card order ever gets out of sync
   def reorder_cards!
     all_collection_cards.active.order(pinned: :desc, order: :asc).each_with_index do |card, i|
-      card.update_attribute(:order, i) unless card.order == i
+      card.update_column(:order, i) unless card.order == i
     end
   end
 
   def reorder_cards_by_collection_name!
     all_collection_cards.active.includes(:collection).order('collections.name ASC').each_with_index do |card, i|
-      card.update_attribute(:order, i) unless card.order == i
+      card.update_column(:order, i) unless card.order == i
     end
   end
 
@@ -405,10 +411,6 @@ class Collection < ApplicationRecord
   def update_cover_text!(text_item)
     cached_cover['text'] = CollectionCover.cover_text(self, text_item)
     save
-  end
-
-  def base_collection_type?
-    self.class.name == 'Collection'
   end
 
   def parent_is_user_collection?
