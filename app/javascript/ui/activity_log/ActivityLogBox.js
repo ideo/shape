@@ -65,6 +65,13 @@ const Action = styled.button`
   }
 `
 
+const TestAction = Action.extend`
+  height: 32px;
+  margin-top: -7px;
+  vertical-align: top;
+  width: 32px;
+`
+
 @inject('apiStore', 'uiStore')
 @observer
 class ActivityLogBox extends React.Component {
@@ -309,13 +316,13 @@ class ActivityLogBox extends React.Component {
                 )}
               </Action>
               {this.hasLiveTestCollection && (
-                <Action
+                <TestAction
                   className="liveTest"
                   active={this.currentPage === 'tests'}
                   onClick={this.handleTests}
                 >
                   <TestCollectionIcon />
-                </Action>
+                </TestAction>
               )}
               <CloseButton size="lg" onClick={this.handleClose} />
             </StyledHeader>

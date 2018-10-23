@@ -7,6 +7,7 @@ import FlipMove from 'react-flip-move'
 import _ from 'lodash'
 import pluralize from 'pluralize'
 import styled from 'styled-components'
+import Truncator from 'react-truncator'
 
 import { ActivityContainer } from '~/ui/global/styled/layout'
 import GoIcon from '~/ui/icons/GoIcon'
@@ -28,11 +29,13 @@ const GoIconContainer = styled.span`
 `
 
 const JumpButton = styled.button`
+  left: 105px;
   min-height: 20px;
-  margin-left: auto;
-  margin-right: auto;
-  margin-top: -30px;
+  margin-top: -33px;
+  max-width: 250px;
+  position: relative;
   visibility: ${props => props.hide};
+  width: 100%;
 `
 
 @inject('apiStore', 'uiStore')
@@ -298,7 +301,14 @@ class CommentThreadContainer extends React.Component {
             <GoIconContainer>
               <GoIcon />
             </GoIconContainer>
-            Go to {uiStore.viewingRecord && uiStore.viewingRecord.name}
+            <Truncator
+              text={`
+                Go to ${uiStore.viewingRecord && uiStore.viewingRecord.name}
+              `}
+              key="jumpbutton"
+              overrideWidth={265}
+              overrideStyle={{ display: 'inline-block' }}
+            />
           </SmallActionText>
         </JumpButton>
         <div
