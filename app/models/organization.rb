@@ -195,6 +195,8 @@ class Organization < ApplicationRecord
 
   def create_network_usage_record
     calculate_active_users_count!
+    return unless in_app_billing
+
     count = active_users_count
 
     if within_trial_period?

@@ -482,9 +482,18 @@ describe Organization, type: :model do
   end
 
   describe '#create_network_usage_record' do
-    let(:organization) { create(:organization) }
+    let(:organization) { create(:organization, in_app_billing: true) }
     before do
       allow(organization).to receive(:calculate_active_users_count!)
+    end
+
+    context 'in app billing is disabled' do
+      it 'does not create a network usage record' do
+        organization = create(:organization, in_app_billing: false)
+        expect(organization).to receive(:calculate_active_users_count!)
+        expect(NetworkApi::UsageRecord).not_to receive(:create)
+        expect(organization.create_network_usage_record).to be true
+      end
     end
 
     context 'within trial period with fewer users than limit' do
@@ -492,9 +501,8 @@ describe Organization, type: :model do
         organization.update_attributes(trial_ends_at: 1.day.from_now)
       end
       it 'does not create the network usage record' do
-        allow(NetworkApi::UsageRecord).to receive(:create)
+        expect(NetworkApi::UsageRecord).not_to receive(:create)
         expect(organization.create_network_usage_record).to be true
-        expect(NetworkApi::UsageRecord).not_to have_received(:create)
       end
     end
 
