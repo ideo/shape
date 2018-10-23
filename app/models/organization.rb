@@ -40,7 +40,6 @@ class Organization < ApplicationRecord
   after_update :update_network_name, :update_group_names, if: :saved_change_to_name?
   after_update :check_guests_for_domain_match, if: :saved_change_to_domain_whitelist?
   after_update :update_subscription, if: :saved_change_to_in_app_billing?
-  after_update :maybe_notify_trial_users_count_exceeded, if: :saved_change_to_active_users_count?
 
   delegate :admins, to: :primary_group
   delegate :members, to: :primary_group
@@ -281,15 +280,5 @@ class Organization < ApplicationRecord
     else
       cancel_network_subscription
     end
-  end
-
-  def maybe_notify_trial_users_count_exceeded
-    return unless !trail_users_count_exceeded_email_sent? &&
-                  within_trial_period? &&
-                  trial_users_exceeded? &&
-                  in_app_billing
-
-    TrialUsersCountExceededMailer.notify(self)
-    update_attributes(trail_users_count_exceeded_email_sent: true)
   end
 end
