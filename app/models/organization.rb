@@ -284,9 +284,12 @@ class Organization < ApplicationRecord
   end
 
   def maybe_notify_trial_users_count_exceeded
-    pp within_trial_period?
-    return unless within_trial_period? && trial_users_exceeded? && in_app_billing
+    return unless !trail_users_count_exceeded_email_sent? &&
+                  within_trial_period? &&
+                  trial_users_exceeded? &&
+                  in_app_billing
 
     TrialUsersCountExceededMailer.notify(self)
+    update_attributes(trail_users_count_exceeded_email_sent: true)
   end
 end

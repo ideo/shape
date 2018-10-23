@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20181016214104) do
+ActiveRecord::Schema.define(version: 20181023184040) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -220,6 +220,7 @@ ActiveRecord::Schema.define(version: 20181016214104) do
     t.datetime "trial_ends_at"
     t.integer "trial_users_count", default: 0, null: false
     t.boolean "in_app_billing", default: true, null: false
+    t.boolean "trail_users_count_exceeded_email_sent", default: false, null: false
     t.index ["slug"], name: "index_organizations_on_slug", unique: true
   end
 

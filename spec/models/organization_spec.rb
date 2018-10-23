@@ -195,10 +195,23 @@ describe Organization, type: :model do
         allow(TrialUsersCountExceededMailer).to receive(:notify)
       end
 
+      context 'already sent' do
+        it 'does nothing' do
+          organization = create(:organization,
+                                in_app_billing: true,
+                                trial_users_count: 10,
+                                active_users_count: 10,
+                                trail_users_count_exceeded_email_sent: true)
+          expect(TrialUsersCountExceededMailer).not_to receive(:notify)
+          organization.update_attributes(
+            active_users_count: 11,
+          )
+        end
+      end
+
       context 'not within trial period' do
         it 'does nothing' do
-          organization = create(:organization, in_app_billing: true, trial_users_count: 10, active_users_count: 5, trial_ends_at: 1.day.ago)
-          organization.in_app_billing = true
+          organization = create(:organization, in_app_billing: true, trial_users_count: 10, active_users_count: 10, trial_ends_at: 1.day.ago)
           expect(TrialUsersCountExceededMailer).not_to receive(:notify)
           organization.update_attributes(
             active_users_count: 11,
@@ -229,11 +242,20 @@ describe Organization, type: :model do
 
       context 'active users count greater than trial user count and in app billing enabled' do
         it 'uses the TrialUsersCountExceededMailer' do
-          organization = create(:organization, in_app_billing: true, trial_users_count: 5, active_users_count: 5, trial_ends_at: 1.day.from_now)
-          expect(TrialUsersCountExceededMailer).to receive(:notify)
+          organization = create(:organization,
+                                in_app_billing: true,
+                                trial_users_count: 5,
+                                active_users_count: 5,
+                                trial_ends_at: 1.day.from_now,
+                                trail_users_count_exceeded_email_sent: false)
+          expect(TrialUsersCountExceededMailer).to receive(:notify).once
           organization.update_attributes(
             active_users_count: 6,
           )
+          organization.update_attributes(
+            active_users_count: 7,
+          )
+          expect(organization.trail_users_count_exceeded_email_sent).to be true
         end
       end
     end
