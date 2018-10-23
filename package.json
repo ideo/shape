@@ -10,7 +10,7 @@
     "test": "jest --watch",
     "lint": "./node_modules/.bin/eslint .",
     "cypress": "./node_modules/.bin/cypress open",
-    "cypress-run": "./node_modules/.bin/cypress run"
+    "cypress-ci": "./node_modules/.bin/cypress run"
   },
   "jest": {
     "testURL": "http://localhost",

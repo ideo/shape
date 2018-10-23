@@ -80,7 +80,10 @@ class ActivityTest extends React.Component {
       inner = <span>next one </span>
     }
     return (
-      <ActivityContainer moving={uiStore.activityLogMoving}>
+      <ActivityContainer
+        data-cy="ActivityLogSurveyResponder"
+        moving={uiStore.activityLogMoving}
+      >
         {inner}
       </ActivityContainer>
     )

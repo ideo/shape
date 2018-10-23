@@ -86,7 +86,7 @@ class TestSurveyPage extends React.Component {
     if (!collection) return null
     if (collection.test_status === 'live') {
       return (
-        <StyledSurvey>
+        <StyledSurvey data-cy="StandaloneTestSurvey">
           <TestSurveyResponder
             collection={collection}
             surveyResponse={surveyResponse}
