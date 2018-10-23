@@ -45,9 +45,7 @@ describe('OpenQuestion', () => {
       props.editing = false
       wrapper = shallow(<OpenQuestion {...props} />)
       wrapper.setState({ response: 'hello' })
-      wrapper
-        .find('QuestionEntryForm')
-        .simulate('submit', { preventDefault: jest.fn() })
+      wrapper.find('form').simulate('submit', { preventDefault: jest.fn() })
     })
 
     it('should call onAnswer prop', () => {

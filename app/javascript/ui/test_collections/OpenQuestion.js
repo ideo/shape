@@ -11,7 +11,7 @@ import { QuestionText, TextResponseHolder, TextInput } from './shared'
 
 const QuestionSpacing = css`
   border-bottom-color: ${props =>
-    props.editing ? v.colors.commonMedium : v.colors.primaryMedium};
+    props.editing ? props.theme.borderColorEditing : props.theme.borderColor};
   border-bottom-style: solid;
   border-bottom-width: 4px;
 `
@@ -36,11 +36,6 @@ const TextEnterButton = styled.button`
   width: 18px;
   height: 18px;
 `
-
-const QuestionEntryForm = styled.form`
-  background: ${v.colors.commonLightest};
-`
-QuestionEntryForm.displayName = 'QuestionEntryForm'
 
 @observer
 class OpenQuestion extends React.Component {
@@ -98,7 +93,7 @@ class OpenQuestion extends React.Component {
     return (
       <div style={{ width: '100%' }}>
         {this.renderQuestion()}
-        <QuestionEntryForm onSubmit={this.handleSubmit}>
+        <form onSubmit={this.handleSubmit}>
           <TextResponseHolder>
             <TextInput
               onFocus={() => this.setState({ focused: true })}
@@ -113,7 +108,7 @@ class OpenQuestion extends React.Component {
               <ReturnArrowIcon />
             </TextEnterButton>
           </TextResponseHolder>
-        </QuestionEntryForm>
+        </form>
       </div>
     )
   }

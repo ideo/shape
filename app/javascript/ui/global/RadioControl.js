@@ -2,31 +2,53 @@ import PropTypes from 'prop-types'
 import Radio from '@material-ui/core/Radio'
 import RadioGroup from '@material-ui/core/RadioGroup'
 import FormControlLabel from '@material-ui/core/FormControlLabel'
-// import { withStyles } from '@material-ui/core/styles'
+import styled from 'styled-components'
 
-// import v from '~/utils/variables'
+const StyledRadioGroup = styled(RadioGroup)`
+  margin-bottom: 25px;
+`
+
+const StyledRadio = styled(Radio)`
+  &.RadioRoot {
+    height: 30px;
+  }
+`
+
+const StyledFormControlLabel = styled(FormControlLabel)`
+  .FormControlLabel {
+    font-size: 1rem;
+  }
+`
 
 class RadioControl extends React.PureComponent {
   render() {
     const { name, options, onChange, selectedValue } = this.props
     const formControls = options.map(option => (
-      <FormControlLabel
+      <StyledFormControlLabel
+        classes={{ label: 'FormControlLabel' }}
         key={option.value}
         value={option.value}
-        control={<Radio color="primary" />}
+        control={
+          <StyledRadio
+            data-cy={`Radio-${option.value}`}
+            disabled={option.disabled}
+            classes={{ root: 'RadioRoot' }}
+            color="primary"
+          />
+        }
         label={option.label}
         labelPlacement="end"
       />
     ))
     return (
-      <RadioGroup
+      <StyledRadioGroup
         aria-label={name}
         name={name}
         value={selectedValue}
         onChange={onChange}
       >
         {formControls}
-      </RadioGroup>
+      </StyledRadioGroup>
     )
   }
 }

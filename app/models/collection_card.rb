@@ -167,6 +167,26 @@ class CollectionCard < ApplicationRecord
     true
   end
 
+  # gets called by API collection_cards_controller
+  def self.archive_all!(user_id:)
+    # should only ever be used on a subset of cards, e.g. not `all`!
+    unless scope_attributes['id'].present? || scope_attributes['parent_id'].present?
+      return false
+    end
+    # capture these before `self` potentially gets altered by archive scope
+    ids = pluck(:id)
+    # ensure we're now working with an unscoped AR::Relation
+    cards = CollectionCard.where(id: ids)
+    # should generally only be the one parent collection
+    parents = cards.map(&:parent).uniq.compact
+    cards.update_all(archived: true)
+    parents.each(&:touch)
+    CollectionCardArchiveWorker.perform_async(
+      ids,
+      user_id,
+    )
+  end
+
   # gets called by child STI classes
   def after_archive_card
     decrement_card_orders!

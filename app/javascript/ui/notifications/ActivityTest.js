@@ -64,7 +64,6 @@ class ActivityTest extends React.Component {
     const newResponse = new SurveyResponse(
       {
         test_collection_id: this.state.testCollection.id,
-        user_id: apiStore.currentUserId,
       },
       apiStore
     )
@@ -102,15 +101,18 @@ class ActivityTest extends React.Component {
         </ActivityContainer>
       )
     }
-    if (!testCollection) return <div />
-    if (testCollection.test_status === 'live') {
+    if (testCollection && testCollection.test_status === 'live') {
       return (
-        <ActivityContainer moving={uiStore.activityLogMoving}>
+        <ActivityContainer
+          data-cy="ActivityLogSurveyResponder"
+          moving={uiStore.activityLogMoving}
+        >
           <TestSurveyResponder
             collection={testCollection}
             surveyResponse={surveyResponse}
             createSurveyResponse={createSurveyResponse}
             editing={false}
+            theme="secondary"
           />
         </ActivityContainer>
       )

@@ -12,5 +12,5 @@ Feature: Creating a Collection
     And I create a normal collection named "Another One" in my empty collection
     And I navigate to the collection named "Another One" via the "CollectionCover"
     Then I should see "Hello World" in a "Breadcrumb"
-    When I navigate to the collection named "Hello World" via the "Breadcrumb"
+    When I navigate to the collection named "Hello World" via the breadcrumb
     Then the URL should match the captured URL

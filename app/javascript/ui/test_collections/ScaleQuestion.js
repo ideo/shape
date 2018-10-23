@@ -12,7 +12,7 @@ import { emojiSeriesMap, questionInformation } from './shared'
 
 const Question = styled.div`
   border-color: ${props =>
-    props.editing ? v.colors.commonMedium : v.colors.primaryMedium};
+    props.editing ? props.theme.borderColorEditing : props.theme.borderColor};
   border-bottom-style: solid;
   border-bottom-width: 4px;
   box-sizing: border-box;
@@ -32,14 +32,13 @@ const Question = styled.div`
 Question.displayName = 'Question'
 
 const Scale = styled.div`
-  background-color: ${v.colors.commonLightest};
+  background-color: ${props => props.theme.responseHolder};
   box-sizing: border-box;
-  color: ${v.colors.primaryDark};
   padding: 7px 13px;
   width: 100%;
 
   span {
-    color: ${v.colors.primaryDark};
+    color: ${props => props.theme.scaleText};
   }
 `
 
