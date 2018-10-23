@@ -340,6 +340,21 @@ describe Organization, type: :model do
     end
   end
 
+  describe '#create_network_subscription' do
+    let!(:organization) { create(:organization) }
+    it 'creates a network subscription with the first plan' do
+      network_organization = double('network_organization', id: 234)
+      plan = double('plan', id: 123)
+      allow(organization).to receive(:network_organization).and_return(network_organization)
+      allow(NetworkApi::Plan).to receive(:first).and_return(plan)
+      expect(NetworkApi::Subscription).to receive(:create).with(
+        organization_id: network_organization.id,
+        plan_id: plan.id,
+      )
+      organization.create_network_subscription
+    end
+  end
+
   describe 'updating organization name' do
     let!(:organization) { create(:organization) }
     let!(:network_organization) { spy('network_organization') }

@@ -17,6 +17,7 @@ RSpec.describe OrganizationBuilder, type: :service do
     context 'with valid params' do
       before do
         allow(builder.organization).to receive(:create_network_organization)
+        allow(builder.organization).to receive(:create_network_subscription)
         user.switch_to_organization(organization)
       end
 
@@ -57,6 +58,9 @@ RSpec.describe OrganizationBuilder, type: :service do
 
       it 'should create the network organization' do
         expect(organization).to have_received(:create_network_organization).with(user)
+      end
+      it 'should create the network organization' do
+        expect(organization).to have_received(:create_network_subscription)
       end
     end
 

@@ -82,17 +82,12 @@ class NetworkStore extends jsonapi(Collection) {
     this.fetchAll('plans')
   }
 
-  async findOrCreateSubscription(organization_id) {
+  async updateSubscription(organization_id) {
     await this.loadSubscription(organization_id)
-    if (this.subscription) {
-      return
+    if (!this.subscription.payment_method_id) {
+      this.subscription.payment_method_id = this.defaultPaymentMethod.id
+      await saveModel(this.subscription)
     }
-    const newSubscription = new networkModels.Subscription({
-      plan_id: this.plan.id,
-      payment_method_id: this.defaultPaymentMethod.id,
-    })
-    const subscription = await saveModel(newSubscription)
-    this.add(subscription)
   }
 
   async createPaymentMethod(organization, token) {
@@ -115,12 +110,11 @@ class NetworkStore extends jsonapi(Collection) {
       address_zip: card.address_zip,
       address_country: card.country,
       organization_id: organization.id,
-      isDefault: false,
     })
     try {
       const paymentMethod = await saveModel(newPaymentMethod)
       this.add(paymentMethod)
-      await this.findOrCreateSubscription(organization.id)
+      await this.updateSubscription(organization.id)
     } catch (e) {
       throw e
     }

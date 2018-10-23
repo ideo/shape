@@ -2,7 +2,7 @@
 http_interactions:
 - request:
     method: get
-    uri: https://ideo-sso-profile-staging.herokuapp.com/api/v1/organizations?filter%5Bclient_id%5D=3695c5fe55ab3db6f9ee25f18c0ef2fe7025eb4717f1a031fd7824a5d8cddbb5&filter%5Bexternal_id%5D=729&page%5Bnumber%5D=1&page%5Bsize%5D=1
+    uri: https://ideo-sso-profile-staging.herokuapp.com/api/v1/organizations?filter%5Bclient_id%5D=3695c5fe55ab3db6f9ee25f18c0ef2fe7025eb4717f1a031fd7824a5d8cddbb5&filter%5Bexternal_id%5D=44&page%5Bnumber%5D=1&page%5Bsize%5D=1
     body:
       encoding: US-ASCII
       string: ''
@@ -25,7 +25,7 @@ http_interactions:
       Server:
       - Cowboy
       Date:
-      - Tue, 02 Oct 2018 21:00:04 GMT
+      - Fri, 19 Oct 2018 18:23:28 GMT
       Connection:
       - keep-alive
       X-Frame-Options:
@@ -47,9 +47,9 @@ http_interactions:
       Cache-Control:
       - max-age=0, private, must-revalidate
       X-Request-Id:
-      - 7b0b13c3-48aa-4ce3-ae7c-828157e6a124
+      - 25a012d5-889c-4c0a-9a32-643ee523d5a4
       X-Runtime:
-      - '0.025281'
+      - '0.062369'
       Strict-Transport-Security:
       - max-age=31536000; includeSubDomains
       Vary:
@@ -62,5 +62,5 @@ http_interactions:
       encoding: UTF-8
       string: '{"data":[],"meta":{},"jsonapi":{"version":"1.0"}}'
     http_version: 
-  recorded_at: Tue, 02 Oct 2018 21:00:05 GMT
+  recorded_at: Fri, 19 Oct 2018 18:23:29 GMT
 recorded_with: VCR 4.0.0

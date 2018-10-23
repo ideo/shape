@@ -18,6 +18,7 @@ class OrganizationBuilder
       setup_user_membership_and_collections
       create_templates
       create_network_organization
+      create_network_subscription
     end
     true
   rescue ActiveRecord::RecordInvalid
@@ -49,6 +50,12 @@ class OrganizationBuilder
 
   def create_network_organization
     @organization.create_network_organization(@user)
+  rescue JsonApiClient::Errors::ApiError
+    raise ActiveRecord::Rollback
+  end
+
+  def create_network_subscription
+    @organization.create_network_subscription
   rescue JsonApiClient::Errors::ApiError
     raise ActiveRecord::Rollback
   end
