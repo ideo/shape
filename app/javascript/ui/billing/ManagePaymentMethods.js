@@ -94,7 +94,10 @@ class ManagePaymentMethods extends React.Component {
             <a href="mailto:help@shape.space">help@shape.space</a>. If you
             cancel, you still may be charged for the current billing period. By
             clicking &quot;Add Card&quot;, you agree to these and our other{' '}
-            <a href="/terms">Terms of Use</a>.
+            <a href="/terms" target="_blank">
+              Terms of Use
+            </a>
+            .
           </FinePrintWrapper>
         )}
       />
