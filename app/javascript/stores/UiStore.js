@@ -442,7 +442,7 @@ export default class UiStore {
   @action
   openOptionalMenus(params) {
     const opts = queryString.parse(params)
-    if (opts) {
+    if (opts && opts.open) {
       this.activityLogPage = opts.open
       this.activityLogOpen = true
     }

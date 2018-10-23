@@ -8,8 +8,6 @@ const {castArray, identity, flow, mapValues} = require('lodash/fp')
 const DEV = process.env.RAILS_ENV === 'development'
 const root = p => path.resolve(__dirname, '..', '..', p)
 
-const prepend = item => array => [item, ...array]
-
 const addReactHotLoader = env => {
   env.config.set('devtool', 'cheap-module-source-map')
   return env
@@ -55,16 +53,6 @@ const addReactSVGLoader = env => {
   return env
 }
 
-const prependBabelPolyfill = mapValues(
-  flow(castArray, prepend(path.resolve(__dirname, 'babelPolyfill.js')))
-)
-
-const addBabelPolyfill = env => {
-  const entry = env.config.get('entry')
-  env.config.set('entry', prependBabelPolyfill(entry))
-  return env
-}
-
 const addTypescriptLoader = env => {
   env.loaders.append('typescript', {
     test: /\.(ts|tsx)?(\.erb)?$/,
@@ -105,7 +93,6 @@ const updateEnvironment = flow(
   DEV ? addReactHotLoader : identity,
   addReactGlobal,
   addReactSVGLoader,
-  addBabelPolyfill,
   addTypescriptLoader,
   addIdeoSSOExternal,
   process.env.ANALYZE ? addBundleAnalyzerPlugin : identity

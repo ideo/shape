@@ -3,7 +3,7 @@ class SerializableTestCollection < SerializableSimpleCollection
 
   attributes :test_status
 
-  has_many :collection_cards do
+  has_many :question_cards do
     data do
       @object.try(:test_design).try(:complete_collection_cards)
     end

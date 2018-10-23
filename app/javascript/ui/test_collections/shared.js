@@ -45,6 +45,24 @@ export const theme = objectAssignDeep({}, VictoryTheme.grayscale, {
   },
 })
 
+export const EmojiMessageContainer = styled.div`
+  margin-top: 0px;
+  font-size: 55px;
+`
+
+export const SurveyClosed = styled.div`
+  border-radius: 7px;
+  margin: 0 auto;
+  background-color: ${v.colors.ctaButtonBlue};
+  width: 272px;
+  padding: 30px;
+  font-size: 1.25rem;
+  font-family: ${v.fonts.sans};
+  color: ${v.colors.white};
+  text-align: center;
+`
+SurveyClosed.displayName = 'SurveyClosed'
+
 export const QuestionText = styled.p`
   box-sizing: border-box;
   color: white !important;
@@ -58,13 +76,15 @@ export const TextInputHolder = StyledCommentTextarea.extend`
   color: white;
   padding: 6px;
   background-color: ${props =>
-    props.hasFocus ? v.colors.primaryMedium : v.colors.primaryDark};
+    props.hasFocus
+      ? props.theme.backgroundColorEditable
+      : props.theme.backgroundColor};
   transition: background-color 0.2s;
 `
 
 export const TextResponseHolder = StyledCommentTextarea.extend`
   position: relative;
-  background-color: ${v.colors.commonLightest};
+  background-color: ${props => props.theme.responseHolder};
   padding: 6px;
   /* to account for the arrow button */
   padding-right: 24px;
@@ -111,9 +131,11 @@ TestQuestionInput.defaultProps = {
 
 export const TestQuestionHolder = styled.div`
   background-color: ${props =>
-    props.userEditable ? v.colors.primaryMedium : v.colors.primaryDark};
+    props.userEditable
+      ? props.theme.backgroundColorEditable
+      : props.theme.backgroundColor};
   border-color: ${props =>
-    props.editing ? v.colors.commonMedium : v.colors.primaryMedium};
+    props.editing ? props.theme.borderColorEditing : props.theme.borderColor};
   border-bottom-width: 0;
   border-left-width: ${props => (props.editing ? '20px' : '0')};
   border-right-width: ${props => (props.editing ? '20px' : '0')};
@@ -216,5 +238,29 @@ export const questionInformation = question => {
     emojiSeriesName,
     questionText,
     questionTitle,
+  }
+}
+
+export const styledTestTheme = (themeName = 'primary') => {
+  // primary theme used for TestType == Media (non-collection test w/ image/video)
+  if (themeName === 'primary') {
+    return {
+      backgroundColor: v.colors.primaryDark,
+      borderColor: v.colors.primaryMedium,
+      borderColorEditing: v.colors.commonMedium,
+      backgroundColorEditable: v.colors.primaryMedium,
+      responseHolder: v.colors.commonLightest,
+      responseHolderFocus: v.colors.commonLightest,
+      scaleText: v.colors.primaryDark,
+    }
+  }
+  // secondary theme used for TestType == Collection
+  return {
+    borderColor: v.colors.secondaryDark,
+    backgroundColor: v.colors.secondaryMedium,
+    borderColorEditing: v.colors.secondaryDark,
+    backgroundColorEditable: v.colors.secondaryLight,
+    responseHolder: v.colors.secondaryLight,
+    scaleText: v.colors.commonLightest,
   }
 }

@@ -24,3 +24,8 @@ Feature: Creating a Test Collection
     Then I should see a collection card named "Test Prototype Feedback Design"
     Then I should see "Get Link" in a "HeaderFormButton"
     Then I should see "Stop Feedback" in a "HeaderFormButton"
+
+    # NOTE: seemingly no way to test clipboard copying in cypress (i.e. "Get Link")
+    When I capture the current URL
+    And I visit the current Test URL
+    Then I should see a "StandaloneTestSurvey"

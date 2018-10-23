@@ -220,12 +220,10 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
         expect(response.status).to eq(200)
       end
 
-      it 'calls the Archive worker' do
-        expect(CollectionCardArchiveWorker).to receive(:perform_async).with(
-          collection_cards.map(&:id),
-          user.id,
-        )
-        patch(path, params: params)
+      it 'archives the cards' do
+        expect {
+          patch(path, params: params)
+        }.to change(CollectionCard.active, :count).by(-3)
       end
 
       it 'broadcasts collection updates' do

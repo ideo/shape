@@ -1,8 +1,9 @@
 import TestDesigner from '~/ui/test_collections/TestDesigner'
 import { fakeCollection } from '#/mocks/data'
 import fakeApiStore from '#/mocks/fakeApiStore'
+import v from '~/utils/variables'
 
-let wrapper, props
+let wrapper, props, component
 describe('TestDesigner', () => {
   beforeEach(() => {
     props = {
@@ -45,11 +46,33 @@ describe('TestDesigner', () => {
       props.collection.test_status = 'draft'
       wrapper = shallow(<TestDesigner {...props} />)
     })
-    it('should render the testTypeForm', () => {
+    it('should render the testTypeForm set to "media" by default', () => {
       expect(wrapper.find('RadioControl').exists()).toBeTruthy()
       expect(wrapper.find('RadioControl').props().selectedValue).toEqual(
         'media'
       )
+    })
+  })
+
+  describe('with collection_to_test', () => {
+    beforeEach(() => {
+      props.collection.collection_to_test = { ...fakeCollection }
+      wrapper = shallow(<TestDesigner {...props} />)
+      component = wrapper.instance()
+    })
+
+    it('should set the state.testType to collection', () => {
+      expect(wrapper.state().testType).toEqual('collection')
+    })
+
+    it('should render the testTypeForm set to "collection"', () => {
+      expect(wrapper.find('RadioControl').props().selectedValue).toEqual(
+        'collection'
+      )
+    })
+
+    it('should use the secondary theme', () => {
+      expect(component.styledTheme.borderColor).toEqual(v.colors.secondaryDark)
     })
   })
 })

@@ -1,7 +1,14 @@
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import { ActivityContainer } from '~/ui/global/styled/layout'
+import Emoji from '~/ui/icons/Emoji'
+import {
+  EmojiMessageContainer,
+  SurveyClosed,
+} from '~/ui/test_collections/shared'
+import { DisplayText } from '~/ui/global/styled/typography'
 import SurveyResponse from '~/stores/jsonApi/SurveyResponse'
 import TestSurveyResponder from '~/ui/test_collections/TestSurveyResponder'
+import Tooltip from '~/ui/global/Tooltip'
 
 @inject('apiStore', 'uiStore')
 @observer
@@ -9,9 +16,16 @@ class ActivityTest extends React.Component {
   state = {
     surveyResponse: null,
     testCollection: null,
+    noTestCollection: false,
   }
 
   async componentDidMount() {
+    if (!this.collection.live_test_collection_id) {
+      this.setState({
+        noTestCollection: true,
+      })
+      return
+    }
     const res = await this.fetchTestCollection()
     const testCollection = res.data
     const surveyResponseResult =
@@ -50,7 +64,6 @@ class ActivityTest extends React.Component {
     const newResponse = new SurveyResponse(
       {
         test_collection_id: this.state.testCollection.id,
-        user_id: apiStore.currentUserId,
       },
       apiStore
     )
@@ -64,26 +77,47 @@ class ActivityTest extends React.Component {
   render() {
     const { uiStore } = this.props
     const { createSurveyResponse } = this
-    const { surveyResponse, testCollection } = this.state
-    let inner
-    if (!testCollection) return null
-    if (testCollection.test_status === 'live') {
-      inner = (
-        <TestSurveyResponder
-          collection={testCollection}
-          surveyResponse={surveyResponse}
-          createSurveyResponse={createSurveyResponse}
-          editing={false}
-        />
+    const { noTestCollection, surveyResponse, testCollection } = this.state
+    if (noTestCollection) {
+      return (
+        <ActivityContainer moving={uiStore.activityLogMoving}>
+          <SurveyClosed>
+            <DisplayText>Thank you for stopping by!</DisplayText>
+            <br />
+            <br />
+            <DisplayText>
+              Feedback on {this.collection.name} is finished.
+            </DisplayText>
+            <Tooltip
+              classes={{ tooltip: 'Tooltip' }}
+              title="Feedback finished"
+              placement="bottom"
+            >
+              <EmojiMessageContainer>
+                <Emoji name="Timer clock" symbol="⏲️" />
+              </EmojiMessageContainer>
+            </Tooltip>
+          </SurveyClosed>
+        </ActivityContainer>
       )
-    } else {
-      inner = <span>next one </span>
     }
-    return (
-      <ActivityContainer moving={uiStore.activityLogMoving}>
-        {inner}
-      </ActivityContainer>
-    )
+    if (testCollection && testCollection.test_status === 'live') {
+      return (
+        <ActivityContainer
+          data-cy="ActivityLogSurveyResponder"
+          moving={uiStore.activityLogMoving}
+        >
+          <TestSurveyResponder
+            collection={testCollection}
+            surveyResponse={surveyResponse}
+            createSurveyResponse={createSurveyResponse}
+            editing={false}
+            theme="secondary"
+          />
+        </ActivityContainer>
+      )
+    }
+    return null
   }
 }
 

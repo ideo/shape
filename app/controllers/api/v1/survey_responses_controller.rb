@@ -1,6 +1,5 @@
 class Api::V1::SurveyResponsesController < Api::V1::BaseController
   skip_before_action :check_api_authentication!
-  # deserializable_resource :survey_response, class: DeserializableSurveyResponse, only: %i[create]
   before_action :load_test_collection, only: %i[create]
 
   before_action :load_and_authorize_survey_response, only: %i[show]
@@ -9,7 +8,7 @@ class Api::V1::SurveyResponsesController < Api::V1::BaseController
   end
 
   def create
-    @survey_response = @collection.create_uniq_survey_response(user_id: json_api_params[:data][:attributes][:user_id])
+    @survey_response = @collection.create_uniq_survey_response(user_id: current_user&.id)
     if @survey_response
       render jsonapi: @survey_response
     else
