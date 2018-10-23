@@ -122,11 +122,7 @@ class ActivityLogBox extends React.Component {
 
   get hasLiveTestCollection() {
     const collection = this.props.uiStore.viewingCollection
-    return (
-      collection &&
-      collection.live_test_collection &&
-      collection.live_test_collection.test_status === 'live'
-    )
+    return collection && collection.live_test_collection
   }
 
   setToDefaultPosition() {
