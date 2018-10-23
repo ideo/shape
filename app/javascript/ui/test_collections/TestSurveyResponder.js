@@ -4,9 +4,13 @@ import PropTypes from 'prop-types'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import FlipMove from 'react-flip-move'
 import { Element as ScrollElement, scroller } from 'react-scroll'
+import { ThemeProvider } from 'styled-components'
 
 // NOTE: Always import these models after everything else, can lead to odd dependency!
-import { TestQuestionHolder } from '~/ui/test_collections/shared'
+import {
+  TestQuestionHolder,
+  styledTestTheme,
+} from '~/ui/test_collections/shared'
 import TestQuestion from '~/ui/test_collections/TestQuestion'
 
 const UNANSWERABLE_QUESTION_TYPES = [
@@ -76,39 +80,41 @@ class TestSurveyResponder extends React.Component {
   render() {
     const { collection, surveyResponse, createSurveyResponse } = this.props
     return (
-      <div id={this.containerId}>
-        {this.viewableCards().map(card => (
-          <FlipMove appearAnimation="fade" key={card.id}>
-            <div>
-              <Flex
-                style={{
-                  width: 'auto',
-                  flexWrap: 'wrap',
-                }}
-              >
-                <TestQuestionHolder editing={false} userEditable={false}>
-                  <ScrollElement name={`card-${card.id}`}>
-                    <TestQuestion
-                      createSurveyResponse={createSurveyResponse}
-                      surveyResponse={surveyResponse}
-                      questionAnswer={this.questionAnswerForCard(card)}
-                      handleQuestionAnswerCreatedForCard={
-                        this.handleQuestionAnswerCreatedForCard
-                      }
-                      parent={collection}
-                      card={card}
-                      item={card.record}
-                      order={card.order}
-                      editing={false}
-                      canEdit={this.canEdit}
-                    />
-                  </ScrollElement>
-                </TestQuestionHolder>
-              </Flex>
-            </div>
-          </FlipMove>
-        ))}
-      </div>
+      <ThemeProvider theme={styledTestTheme('primary')}>
+        <div id={this.containerId}>
+          {this.viewableCards().map(card => (
+            <FlipMove appearAnimation="fade" key={card.id}>
+              <div>
+                <Flex
+                  style={{
+                    width: 'auto',
+                    flexWrap: 'wrap',
+                  }}
+                >
+                  <TestQuestionHolder editing={false} userEditable={false}>
+                    <ScrollElement name={`card-${card.id}`}>
+                      <TestQuestion
+                        createSurveyResponse={createSurveyResponse}
+                        surveyResponse={surveyResponse}
+                        questionAnswer={this.questionAnswerForCard(card)}
+                        handleQuestionAnswerCreatedForCard={
+                          this.handleQuestionAnswerCreatedForCard
+                        }
+                        parent={collection}
+                        card={card}
+                        item={card.record}
+                        order={card.order}
+                        editing={false}
+                        canEdit={this.canEdit}
+                      />
+                    </ScrollElement>
+                  </TestQuestionHolder>
+                </Flex>
+              </div>
+            </FlipMove>
+          ))}
+        </div>
+      </ThemeProvider>
     )
   }
 }
