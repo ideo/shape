@@ -16,7 +16,7 @@ class Collection
 
     def duplicate!(**args)
       duplicate = super(args)
-      return duplicate unless duplicate.persisted?
+      return duplicate if duplicate.new_record? || duplicate.errors.present?
       duplicate.setup_submissions_collection!
       duplicate
     end

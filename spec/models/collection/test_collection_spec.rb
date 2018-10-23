@@ -38,7 +38,7 @@ describe Collection::TestCollection, type: :model do
     end
   end
 
-  describe '.duplicate!' do
+  describe '#duplicate!' do
     let(:user) { create(:user) }
     let!(:parent_collection) { create(:collection) }
     let(:duplicate) do

@@ -88,7 +88,7 @@ class Collection < ApplicationRecord
   belongs_to :created_by, class_name: 'User', optional: true
   belongs_to :question_item, class_name: 'Item::QuestionItem', optional: true
 
-  validates :name, presence: true, if: :base_collection_type?
+  validates :name, presence: true
   before_validation :inherit_parent_organization_id, on: :create
 
   scope :root, -> { where('jsonb_array_length(breadcrumb) = 1') }
@@ -223,6 +223,7 @@ class Collection < ApplicationRecord
     c.cloned_from = self
     c.created_by = for_user
     c.tag_list = tag_list
+
     # copy organization_id from the collection this is being moved into
     # NOTE: parent is only nil in Colab import -- perhaps we should clean up any Colab import specific code?
     c.organization_id = parent.try(:organization_id) || organization_id
@@ -404,10 +405,6 @@ class Collection < ApplicationRecord
   def update_cover_text!(text_item)
     cached_cover['text'] = CollectionCover.cover_text(self, text_item)
     save
-  end
-
-  def base_collection_type?
-    self.class.name == 'Collection'
   end
 
   def parent_is_user_collection?
