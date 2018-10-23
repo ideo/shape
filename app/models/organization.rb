@@ -199,6 +199,10 @@ class Organization < ApplicationRecord
     trial_ends_at > Time.current
   end
 
+  def trial_users_exceeded?
+    active_users_count > trial_users_count
+  end
+
   def create_network_usage_record
     calculate_active_users_count!
     return true unless in_app_billing
@@ -280,7 +284,8 @@ class Organization < ApplicationRecord
   end
 
   def maybe_notify_trial_users_count_exceeded
-    return unless active_users_count > trial_users_count && in_app_billing
+    pp within_trial_period?
+    return unless within_trial_period? && trial_users_exceeded? && in_app_billing
 
     TrialUsersCountExceededMailer.notify(self)
   end

@@ -195,6 +195,17 @@ describe Organization, type: :model do
         allow(TrialUsersCountExceededMailer).to receive(:notify)
       end
 
+      context 'not within trial period' do
+        it 'does nothing' do
+          organization = create(:organization, in_app_billing: true, trial_users_count: 10, active_users_count: 5, trial_ends_at: 1.day.ago)
+          organization.in_app_billing = true
+          expect(TrialUsersCountExceededMailer).not_to receive(:notify)
+          organization.update_attributes(
+            active_users_count: 11,
+          )
+        end
+      end
+
       context 'active users count less than trial users count' do
         it 'does nothing' do
           organization = create(:organization, in_app_billing: true, trial_users_count: 10, active_users_count: 7)
@@ -216,9 +227,9 @@ describe Organization, type: :model do
         end
       end
 
-      context 'active users count greater than trail user count and in app billing enabled' do
-        it 'uses the TrailUsersCountExceededMailer' do
-          organization = create(:organization, in_app_billing: true, trial_users_count: 5, active_users_count: 5)
+      context 'active users count greater than trial user count and in app billing enabled' do
+        it 'uses the TrialUsersCountExceededMailer' do
+          organization = create(:organization, in_app_billing: true, trial_users_count: 5, active_users_count: 5, trial_ends_at: 1.day.from_now)
           expect(TrialUsersCountExceededMailer).to receive(:notify)
           organization.update_attributes(
             active_users_count: 6,
@@ -546,6 +557,23 @@ describe Organization, type: :model do
         organization.trial_ends_at = nil
         expect(organization.within_trial_period?).to be false
       end
+    end
+  end
+
+  describe '#trial_users_exceeded?' do
+    it 'returns true when there are more active users than trial users' do
+      organization = create(:organization, trial_users_count: 5, active_users_count: 6)
+      expect(organization.trial_users_exceeded?).to be true
+    end
+
+    it 'returns true when there are the same number of active users and trial users' do
+      organization = create(:organization, trial_users_count: 5, active_users_count: 5)
+      expect(organization.trial_users_exceeded?).to be false
+    end
+
+    it 'returns false when there are fewer active users than trial users' do
+      organization = create(:organization, trial_users_count: 6, active_users_count: 5)
+      expect(organization.trial_users_exceeded?).to be false
     end
   end
 
