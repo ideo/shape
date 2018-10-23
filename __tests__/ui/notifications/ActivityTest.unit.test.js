@@ -6,14 +6,17 @@ import fakeApiStore from '#/mocks/fakeApiStore'
 import fakeUiStore from '#/mocks/fakeUiStore'
 
 let wrapper, props
+const fakeTestCollection = Object.assign({}, fakeCollection, {
+  live_test_collection_id: 234,
+})
 
 describe('ActivityTest', () => {
   beforeEach(() => {
     const uiStore = fakeUiStore
-    uiStore.viewingCollection = { id: fakeCollection.id }
+    uiStore.viewingCollection = fakeTestCollection
     props = {
       apiStore: fakeApiStore({
-        requestResult: { data: fakeCollection },
+        requestResult: { data: fakeTestCollection },
       }),
       uiStore,
     }
@@ -23,7 +26,7 @@ describe('ActivityTest', () => {
   describe('render', () => {
     describe('with a test collection', () => {
       beforeEach(() => {
-        const testCollection = Object.assign({}, fakeCollection, {
+        const testCollection = Object.assign({}, fakeTestCollection, {
           test_status: 'live',
         })
         wrapper.setState({ testCollection })
@@ -46,10 +49,20 @@ describe('ActivityTest', () => {
         expect(wrapper.find(TestSurveyResponder).exists()).toBe(false)
       })
     })
+
+    describe('with a closed test', () => {
+      beforeEach(() => {
+        wrapper.setState({ noTestCollection: true })
+      })
+
+      it('it should render a survey closed message', () => {
+        expect(wrapper.find('SurveyClosed').exists()).toBe(true)
+      })
+    })
   })
 
   describe('componentDidMount', () => {
-    const testCollection = Object.assign({}, fakeCollection, { id: 99 })
+    const testCollection = Object.assign({}, fakeTestCollection, { id: 99 })
 
     beforeEach(() => {
       props.apiStore.fetch.mockReturnValue(testCollection)

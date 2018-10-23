@@ -45,6 +45,24 @@ export const theme = objectAssignDeep({}, VictoryTheme.grayscale, {
   },
 })
 
+export const EmojiMessageContainer = styled.div`
+  margin-top: 0px;
+  font-size: 55px;
+`
+
+export const SurveyClosed = styled.div`
+  border-radius: 7px;
+  margin: 0 auto;
+  background-color: ${v.colors.ctaButtonBlue};
+  width: 272px;
+  padding: 30px;
+  font-size: 1.25rem;
+  font-family: ${v.fonts.sans};
+  color: ${v.colors.white};
+  text-align: center;
+`
+SurveyClosed.displayName = 'SurveyClosed'
+
 export const QuestionText = styled.p`
   box-sizing: border-box;
   color: white !important;
