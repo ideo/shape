@@ -47,7 +47,7 @@ describe('ChartItemCover', () => {
         ).toEqual('How useful is this idea for you?')
       })
 
-      describe('when question is a category satsifaction question', () => {
+      describe('when question is a category satisfaction question', () => {
         beforeEach(() => {
           component.question = {
             id: 53,
