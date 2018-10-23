@@ -64,6 +64,9 @@ class CollectionCard < ApplicationRecord
     if master_template_card? && parent.templated?
       # if we're cloning from template -> templated collection
       cc.templated_from = self
+    elsif parent.master_template?
+      # Make it pinned if you're duplicating it into a master template
+      cc.pinned = true
     elsif !(parent.templated? || parent.master_template?)
       # copying into a normal (non templated) collection, it should never be pinned
       cc.pinned = false

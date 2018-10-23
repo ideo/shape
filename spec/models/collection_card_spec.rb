@@ -107,6 +107,11 @@ RSpec.describe CollectionCard, type: :model do
         expect(collection_card.pinned?).to be true
         expect(duplicate.pinned?).to be true
       end
+
+      it 'should set pinned even if original was not pinned' do
+        collection_card.update(pinned: false)
+        expect(duplicate.pinned?).to be true
+      end
     end
 
     context 'with linked card and duplicate_linked_records = true' do
