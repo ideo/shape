@@ -12,7 +12,7 @@ class Collection
              through: :primary_collection_cards
     belongs_to :collection_to_test, class_name: 'Collection', optional: true
 
-    before_create :setup_default_status_and_questions
+    before_create :setup_default_status_and_questions, unless: :cloned_from_present?
     after_create :add_test_tag
     after_update :touch_test_design, if: :saved_change_to_test_status?
 
@@ -55,6 +55,23 @@ class Collection
       ]
     end
 
+    def duplicate!(**args)
+      # Only copy over test questions in pre-launch state
+      if test_design.present?
+        # If test design has already been created, just dupe that
+        duplicate = test_design.duplicate!(args)
+      else
+        # Otherwise dupe this collection
+        duplicate = super(args)
+      end
+      return duplicate unless duplicate.persisted?
+
+      duplicate.update(
+        name: "Copy of #{name}",
+      )
+      duplicate
+    end
+
     # alias method, will delegate to test_design if test is live
     def question_items
       if test_design.present?
@@ -91,6 +108,13 @@ class Collection
         errors.add(:base,
                    'Please add your idea description to question ' +
                    incomplete_description_items.map { |i| i.parent_collection_card.order + 1 }.to_sentence)
+        complete = false
+      end
+
+      unless incomplete_category_satisfaction_items.count.zero?
+        errors.add(:base,
+                   'Please add your category to question ' +
+                   incomplete_category_satisfaction_items.map { |i| i.parent_collection_card.order + 1 }.to_sentence)
         complete = false
       end
       complete
@@ -165,13 +189,15 @@ class Collection
         setup_response_graphs(initiated_by: initiated_by).each(&:create)
         test_design.cache_cover!
       end
+      reorder_cards!
       true
     end
 
     def build_test_design_collection_card(initiated_by)
       # build the TestDesign collection and its card
       card_params = {
-        order: 0,
+        # push it to the end, will get resorted after creation is complete
+        order: 999,
         collection_attributes: {
           name: "#{name} Feedback Design",
           type: 'Collection::TestDesign',
@@ -188,16 +214,15 @@ class Collection
     def build_open_response_collection_cards(open_question_items: nil, initiated_by: nil)
       open_question_items ||= question_items.question_open
       open_question_items.map do |open_question|
-        card_params = {
-          order: 0,
-          collection_attributes: {
-            name: "#{open_question.content} Responses",
-            type: 'Collection::TestOpenResponses',
-            question_item_id: open_question.id,
-          },
-        }
         CollectionCardBuilder.new(
-          params: card_params,
+          params: {
+            order: open_question.parent_collection_card.order,
+            collection_attributes: {
+              name: "#{open_question.content} Responses",
+              type: 'Collection::TestOpenResponses',
+              question_item_id: open_question.id,
+            },
+          },
           parent_collection: self,
           user: initiated_by,
         )
@@ -205,8 +230,6 @@ class Collection
     end
 
     def setup_default_status_and_questions
-      # ||= mostly useful for unit tests, otherwise should be nil
-      self.test_status ||= :draft
       self.class
           .default_question_types
           .each_with_index do |question_type, i|
@@ -221,26 +244,22 @@ class Collection
     end
 
     def setup_response_graphs(initiated_by:)
-      chart_card_builders = []
-      question_items.each_with_index do |question, i|
+      question_items.map do |question|
         next unless question.scale_question?
-        chart_card_builders.push(
-          CollectionCardBuilder.new(
-            params: {
-              order: i + 2,
-              height: 2,
-              width: 2,
-              item_attributes: {
-                type: 'Item::ChartItem',
-                data_source: question,
-              },
+        CollectionCardBuilder.new(
+          params: {
+            order: question.parent_collection_card.order,
+            height: 2,
+            width: 2,
+            item_attributes: {
+              type: 'Item::ChartItem',
+              data_source: question,
             },
-            parent_collection: self,
-            user: initiated_by,
-          ),
+          },
+          parent_collection: self,
+          user: initiated_by,
         )
-      end
-      chart_card_builders
+      end.compact
     end
 
     def add_test_tag
@@ -280,6 +299,13 @@ class Collection
         ).where(question_type: :question_description, content: [nil, ''])
     end
 
+    def incomplete_category_satisfaction_items
+      question_items
+        .joins(
+          :parent_collection_card,
+        ).where(question_type: :question_category_satisfaction, content: [nil, ''])
+    end
+
     # Returns the question cards that are in the blank default state
     def incomplete_question_items
       question_items
@@ -290,6 +316,10 @@ class Collection
 
     def remove_incomplete_question_items
       incomplete_question_items.destroy_all
+    end
+
+    def cloned_from_present?
+      cloned_from.present?
     end
   end
 end

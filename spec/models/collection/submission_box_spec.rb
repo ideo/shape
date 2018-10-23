@@ -22,4 +22,22 @@ describe Collection::SubmissionBox, type: :model do
       ).to be true
     end
   end
+
+  describe '#duplicate!' do
+    let(:user) { create(:user) }
+    let(:parent_collection) { create(:collection) }
+    # duplicate! method expects a parent_collection to be present
+    let(:submission_box) { create(:submission_box, parent_collection: parent_collection) }
+    let(:duplicate) { submission_box.duplicate!(for_user: user) }
+
+    before do
+      submission_box.setup_submissions_collection!
+    end
+
+    it 'should also create its own submissions_collection' do
+      expect(submission_box.submissions_collection.present?).to be true
+      expect(duplicate.submissions_collection.present?).to be true
+      expect(duplicate.submissions_collection).not_to eq submission_box.submissions_collection
+    end
+  end
 end

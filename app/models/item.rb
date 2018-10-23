@@ -42,7 +42,7 @@ class Item < ApplicationRecord
   scope :questions, -> { where(type: 'Item::QuestionItem') }
 
   before_validation :format_url, if: :saved_change_to_url?
-  before_create :generate_name, unless: :name?
+  before_create :generate_name, unless: :name_present?
 
   validates :type, presence: true
 
@@ -193,6 +193,10 @@ class Item < ApplicationRecord
   end
 
   private
+
+  def name_present?
+    name.present?
+  end
 
   def reindex_parent_collection
     return if @dont_reindex_parent || !Searchkick.callbacks? || parent.blank?
