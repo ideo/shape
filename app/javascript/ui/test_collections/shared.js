@@ -53,12 +53,12 @@ export const EmojiMessageContainer = styled.div`
 export const SurveyClosed = styled.div`
   border-radius: 7px;
   margin: 0 auto;
-  background-color: ${v.colors.ctaButtonBlue};
+  background-color: ${props => props.theme.backgroundColor};
   width: 272px;
   padding: 30px;
   font-size: 1.25rem;
   font-family: ${v.fonts.sans};
-  color: ${v.colors.white};
+  color: ${props => props.theme.descriptionText};
   text-align: center;
 `
 SurveyClosed.displayName = 'SurveyClosed'
@@ -91,12 +91,12 @@ export const TextResponseHolder = StyledCommentTextarea.extend`
 `
 
 export const TextInput = styled(TextareaAutosize)`
-  color: ${props => (props.color ? props.color : 'white')};
+  color: ${props => props.theme[props.type]};
   font-family: ${v.fonts.sans} !important;
   width: calc(100% - 20px);
 
   ::placeholder {
-    color: ${props => (props.color ? 'inherit' : 'white !important')};
+    color: ${props => props.theme[props.type]} !important;
     opacity: 1;
   }
 }
@@ -250,17 +250,18 @@ export const styledTestTheme = (themeName = 'primary') => {
       borderColorEditing: v.colors.commonMedium,
       backgroundColorEditable: v.colors.primaryMedium,
       responseHolder: v.colors.commonLightest,
-      responseHolderFocus: v.colors.commonLightest,
-      scaleText: v.colors.primaryDark,
+      descriptionText: v.colors.commonLightest,
+      questionText: v.colors.primaryDark,
     }
   }
   // secondary theme used for TestType == Collection
   return {
-    borderColor: v.colors.secondaryDark,
     backgroundColor: v.colors.secondaryMedium,
+    borderColor: v.colors.secondaryDark,
     borderColorEditing: v.colors.secondaryDark,
     backgroundColorEditable: v.colors.secondaryLight,
     responseHolder: v.colors.secondaryLight,
-    scaleText: v.colors.commonLightest,
+    questionText: v.colors.commonLightest,
+    descriptionText: v.colors.commonLightest,
   }
 }

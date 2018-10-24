@@ -31,15 +31,14 @@ describe('TestSurveyResponder', () => {
     // very basic way to turn fakeCollection into a "test collection"
     props.collection.question_cards = []
     cardTypes.forEach((type, i) => {
-      props.collection.question_cards.push(
-        Object.assign({}, fakeQuestionItemCard, {
-          card_question_type: type,
-          record: {
-            ...fakeQuestionItem,
-            id: `${i}`,
-          },
-        })
-      )
+      props.collection.question_cards.push({
+        ...fakeQuestionItemCard,
+        card_question_type: type,
+        record: {
+          ...fakeQuestionItem,
+          id: `${i}`,
+        },
+      })
     })
     wrapper = shallow(<TestSurveyResponder {...props} />)
   })

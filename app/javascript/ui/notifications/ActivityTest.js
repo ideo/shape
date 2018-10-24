@@ -1,4 +1,6 @@
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
+import styled from 'styled-components'
+
 import { ActivityContainer } from '~/ui/global/styled/layout'
 import Emoji from '~/ui/icons/Emoji'
 import {
@@ -9,21 +11,23 @@ import { DisplayText } from '~/ui/global/styled/typography'
 import SurveyResponse from '~/stores/jsonApi/SurveyResponse'
 import TestSurveyResponder from '~/ui/test_collections/TestSurveyResponder'
 import Tooltip from '~/ui/global/Tooltip'
+import CommentThreadHeader from '~/ui/threads/CommentThreadHeader'
+import { threadTitleCss } from '~/ui/threads/CommentThread'
+
+const StyledTestHeader = styled.div`
+  ${threadTitleCss};
+  position: sticky;
+`
 
 @inject('apiStore', 'uiStore')
 @observer
 class ActivityTest extends React.Component {
   state = {
     surveyResponse: null,
-    testCollection: null,
-    noTestCollection: false,
   }
 
   async componentDidMount() {
-    if (!this.collection.live_test_collection_id) {
-      this.setState({
-        noTestCollection: true,
-      })
+    if (!this.testCollection) {
       return
     }
     const res = await this.fetchTestCollection()
@@ -38,7 +42,6 @@ class ActivityTest extends React.Component {
       : null
     this.setState({
       surveyResponse,
-      testCollection,
     })
   }
 
@@ -46,11 +49,16 @@ class ActivityTest extends React.Component {
     return this.props.uiStore.viewingCollection
   }
 
+  get testCollection() {
+    if (!this.collection) return null
+    return this.collection.live_test_collection
+  }
+
   fetchTestCollection() {
     const { apiStore } = this.props
     return apiStore.fetch(
       'test_collections',
-      this.collection.live_test_collection_id
+      this.collection.live_test_collection.id
     )
   }
 
@@ -63,7 +71,7 @@ class ActivityTest extends React.Component {
     const { apiStore } = this.props
     const newResponse = new SurveyResponse(
       {
-        test_collection_id: this.state.testCollection.id,
+        test_collection_id: this.testCollection.id,
       },
       apiStore
     )
@@ -74,19 +82,27 @@ class ActivityTest extends React.Component {
     return surveyResponse
   }
 
-  render() {
-    const { uiStore } = this.props
-    const { createSurveyResponse } = this
-    const { noTestCollection, surveyResponse, testCollection } = this.state
-    if (noTestCollection) {
+  renderInner() {
+    const { collection, createSurveyResponse, testCollection } = this
+    const { surveyResponse } = this.state
+    if (!collection) return null
+    if (!testCollection) {
       return (
-        <ActivityContainer moving={uiStore.activityLogMoving}>
+        <div>
+          {/*
+            NOTE: loading the test collection here would require some workarounds
+            because it is no longer the "live" test collection.
+            So as a fallback, the header here just displays the actual collection being tested
+          */}
+          <StyledTestHeader>
+            <CommentThreadHeader record={collection} />
+          </StyledTestHeader>
           <SurveyClosed>
             <DisplayText>Thank you for stopping by!</DisplayText>
             <br />
             <br />
             <DisplayText>
-              Feedback on {this.collection.name} is finished.
+              Feedback on {collection.name} is finished.
             </DisplayText>
             <Tooltip
               classes={{ tooltip: 'Tooltip' }}
@@ -98,26 +114,47 @@ class ActivityTest extends React.Component {
               </EmojiMessageContainer>
             </Tooltip>
           </SurveyClosed>
-        </ActivityContainer>
+        </div>
       )
     }
-    if (testCollection && testCollection.test_status === 'live') {
+    if (
+      testCollection &&
+      testCollection.test_status === 'live' &&
+      testCollection.question_cards
+    ) {
       return (
-        <ActivityContainer
-          data-cy="ActivityLogSurveyResponder"
-          moving={uiStore.activityLogMoving}
-        >
+        <div>
+          {testCollection && (
+            <StyledTestHeader>
+              <CommentThreadHeader record={testCollection} />
+            </StyledTestHeader>
+          )}
           <TestSurveyResponder
             collection={testCollection}
             surveyResponse={surveyResponse}
             createSurveyResponse={createSurveyResponse}
             editing={false}
             theme="secondary"
+            // for scrolling purposes
+            containerId="InlineTestContainer"
           />
-        </ActivityContainer>
+        </div>
       )
     }
     return null
+  }
+
+  render() {
+    const { uiStore } = this.props
+    return (
+      <ActivityContainer
+        id="InlineTestContainer"
+        data-cy="ActivityLogSurveyResponder"
+        moving={uiStore.activityLogMoving}
+      >
+        {this.renderInner()}
+      </ActivityContainer>
+    )
   }
 }
 

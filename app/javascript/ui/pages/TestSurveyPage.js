@@ -1,4 +1,4 @@
-import styled from 'styled-components'
+import styled, { ThemeProvider } from 'styled-components'
 import { PropTypes as MobxPropTypes } from 'mobx-react'
 
 import v from '~/utils/variables'
@@ -11,6 +11,7 @@ import { LoudDisplayLink } from '~/ui/global/styled/typography'
 import {
   EmojiMessageContainer,
   SurveyClosed,
+  styledTestTheme,
 } from '~/ui/test_collections/shared'
 
 const StyledBg = styled.div`
@@ -85,17 +86,19 @@ class TestSurveyPage extends React.Component {
       )
     }
     return (
-      <StyledSurvey>
-        <SurveyClosed>
-          <EmojiMessageContainer>
-            <Emoji name="Raising hands" symbol="🙌" />
-          </EmojiMessageContainer>
-          <StyledClosedText>
-            Thank you for stopping by! This feedback is now closed.
-          </StyledClosedText>
-          <LearnMoreLink href={'/'}>Learn More About Shape</LearnMoreLink>
-        </SurveyClosed>
-      </StyledSurvey>
+      <ThemeProvider theme={styledTestTheme('primary')}>
+        <StyledSurvey>
+          <SurveyClosed>
+            <EmojiMessageContainer>
+              <Emoji name="Raising hands" symbol="🙌" />
+            </EmojiMessageContainer>
+            <StyledClosedText>
+              Thank you for stopping by! This feedback is now closed.
+            </StyledClosedText>
+            <LearnMoreLink href={'/'}>Learn More About Shape</LearnMoreLink>
+          </SurveyClosed>
+        </StyledSurvey>
+      </ThemeProvider>
     )
   }
 

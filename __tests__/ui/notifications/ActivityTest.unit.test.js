@@ -5,14 +5,15 @@ import { fakeCollection } from '#/mocks/data'
 import fakeApiStore from '#/mocks/fakeApiStore'
 import fakeUiStore from '#/mocks/fakeUiStore'
 
-let wrapper, props
-const fakeTestCollection = Object.assign({}, fakeCollection, {
-  live_test_collection_id: 234,
-})
+let wrapper, props, uiStore
+const fakeTestCollection = {
+  ...fakeCollection,
+  question_cards: fakeCollection.collection_cards,
+}
 
 describe('ActivityTest', () => {
   beforeEach(() => {
-    const uiStore = fakeUiStore
+    uiStore = fakeUiStore
     uiStore.viewingCollection = fakeTestCollection
     props = {
       apiStore: fakeApiStore({
@@ -26,10 +27,13 @@ describe('ActivityTest', () => {
   describe('render', () => {
     describe('with a test collection', () => {
       beforeEach(() => {
-        const testCollection = Object.assign({}, fakeTestCollection, {
+        const testCollection = {
+          ...fakeTestCollection,
+          survey_response_for_user_id: null,
           test_status: 'live',
-        })
-        wrapper.setState({ testCollection })
+        }
+        props.uiStore.viewingCollection.live_test_collection = testCollection
+        wrapper = shallow(<ActivityTest.wrappedComponent {...props} />)
       })
 
       it('should render a test survey responder with collection', () => {
@@ -42,6 +46,7 @@ describe('ActivityTest', () => {
         props.apiStore = fakeApiStore({
           requestResult: { data: {} },
         })
+        props.uiStore.viewingCollection.live_test_collection = null
         wrapper = shallow(<ActivityTest.wrappedComponent {...props} />)
       })
 
@@ -62,10 +67,10 @@ describe('ActivityTest', () => {
   })
 
   describe('componentDidMount', () => {
-    const testCollection = Object.assign({}, fakeTestCollection, { id: 99 })
+    const testCollection = { ...fakeTestCollection, id: 99 }
 
     beforeEach(() => {
-      props.apiStore.fetch.mockReturnValue(testCollection)
+      props.uiStore.viewingCollection.live_test_collection = { id: 99 }
       wrapper = shallow(<ActivityTest.wrappedComponent {...props} />)
     })
 
@@ -75,9 +80,10 @@ describe('ActivityTest', () => {
 
     describe('if there is a survey response already for the user', () => {
       beforeEach(() => {
-        const respondedTestCollection = Object.assign({}, testCollection, {
+        const respondedTestCollection = {
+          ...testCollection,
           survey_response_for_user_id: 57,
-        })
+        }
         props.apiStore.fetch.mockReturnValue({ data: respondedTestCollection })
         wrapper = shallow(<ActivityTest.wrappedComponent {...props} />)
       })

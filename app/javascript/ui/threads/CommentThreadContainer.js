@@ -212,7 +212,7 @@ class CommentThreadContainer extends React.Component {
     })
   }
 
-  contentHeight = () => this.containerDiv.clientHeight
+  contentHeight = () => (this.containerDiv ? this.containerDiv.clientHeight : 0)
 
   expandThread = thread => () => {
     const { uiStore } = this.props

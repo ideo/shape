@@ -38,7 +38,7 @@ const Scale = styled.div`
   width: 100%;
 
   span {
-    color: ${props => props.theme.scaleText};
+    color: ${props => props.theme.questionText};
   }
 `
 
