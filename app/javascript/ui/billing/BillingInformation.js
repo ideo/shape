@@ -36,6 +36,10 @@ const Block = ({ title, children }) => (
     <Box mt={20}>{children}</Box>
   </Grid>
 )
+Block.propTypes = {
+  title: PropTypes.string.isRequired,
+  children: PropTypes.node.isRequired,
+}
 
 const TrialHighlight = styled.div`
   background-color: #c0dbde;
@@ -55,11 +59,6 @@ const Label = styled.span`
   font-size: 16px;
   color: ${v.colors.cloudy};
 `
-
-Block.propTypes = {
-  title: PropTypes.string.isRequired,
-  children: PropTypes.node.isRequired,
-}
 
 @inject('apiStore', 'networkStore')
 @observer
