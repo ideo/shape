@@ -2,6 +2,7 @@ class Organization < ApplicationRecord
   RECENTLY_ACTIVE_RANGE = 90.days
   DEFAULT_TRIAL_ENDS_AT = 90.days
   DEFAULT_TRIAL_USERS_COUNT = 25
+  PRICE_PER_USER = 5.00
 
   extend FriendlyId
   friendly_id :slug_candidates, use: %i[slugged finders history]
@@ -186,6 +187,8 @@ class Organization < ApplicationRecord
   end
 
   def within_trial_period?
+    return false unless trial_ends_at
+
     trial_ends_at > Time.current
   end
 

@@ -56,9 +56,8 @@ export default createMuiTheme({
     },
     // emphasis
     display4: {
-      fontSize: pxToRem(40),
-      fontWeight: 300,
-      fontStyle: 'italic',
+      fontSize: pxToRem(48),
+      color: 'black',
     },
     // paragraph
     body2: {
