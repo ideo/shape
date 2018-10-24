@@ -1,4 +1,4 @@
-import ActivityTest from '~/ui/notifications/ActivityTest'
+import InlineCollectionTest from '~/ui/test_collections/InlineCollectionTest'
 import TestSurveyResponder from '~/ui/test_collections/TestSurveyResponder'
 import { fakeCollection } from '#/mocks/data'
 
@@ -11,7 +11,7 @@ const fakeTestCollection = {
   question_cards: fakeCollection.collection_cards,
 }
 
-describe('ActivityTest', () => {
+describe('InlineCollectionTest', () => {
   beforeEach(() => {
     uiStore = fakeUiStore
     uiStore.viewingCollection = fakeTestCollection
@@ -21,7 +21,7 @@ describe('ActivityTest', () => {
       }),
       uiStore,
     }
-    wrapper = shallow(<ActivityTest.wrappedComponent {...props} />)
+    wrapper = shallow(<InlineCollectionTest.wrappedComponent {...props} />)
   })
 
   describe('render', () => {
@@ -33,7 +33,7 @@ describe('ActivityTest', () => {
           test_status: 'live',
         }
         props.uiStore.viewingCollection.live_test_collection = testCollection
-        wrapper = shallow(<ActivityTest.wrappedComponent {...props} />)
+        wrapper = shallow(<InlineCollectionTest.wrappedComponent {...props} />)
       })
 
       it('should render a test survey responder with collection', () => {
@@ -47,7 +47,7 @@ describe('ActivityTest', () => {
           requestResult: { data: {} },
         })
         props.uiStore.viewingCollection.live_test_collection = null
-        wrapper = shallow(<ActivityTest.wrappedComponent {...props} />)
+        wrapper = shallow(<InlineCollectionTest.wrappedComponent {...props} />)
       })
 
       it('should not render the test survey responder', () => {
@@ -71,7 +71,7 @@ describe('ActivityTest', () => {
 
     beforeEach(() => {
       props.uiStore.viewingCollection.live_test_collection = { id: 99 }
-      wrapper = shallow(<ActivityTest.wrappedComponent {...props} />)
+      wrapper = shallow(<InlineCollectionTest.wrappedComponent {...props} />)
     })
 
     it('should fetch the test collection', () => {
@@ -85,7 +85,7 @@ describe('ActivityTest', () => {
           survey_response_for_user_id: 57,
         }
         props.apiStore.fetch.mockReturnValue({ data: respondedTestCollection })
-        wrapper = shallow(<ActivityTest.wrappedComponent {...props} />)
+        wrapper = shallow(<InlineCollectionTest.wrappedComponent {...props} />)
       })
 
       it('should fetch the survey response', () => {

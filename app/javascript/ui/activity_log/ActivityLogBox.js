@@ -4,7 +4,7 @@ import { observe, runInAction, action } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 
-import ActivityTest from '~/ui/notifications/ActivityTest'
+import InlineCollectionTest from '~/ui/test_collections/InlineCollectionTest'
 import { CloseButton } from '~/ui/global/styled/buttons'
 import NotificationIcon from '~/ui/icons/NotificationIcon'
 import NotificationsContainer from '~/ui/notifications/NotificationsContainer'
@@ -233,7 +233,7 @@ class ActivityLogBox extends React.Component {
 
   renderNotifications = () => <NotificationsContainer />
 
-  renderTest = () => <ActivityTest />
+  renderTest = () => <InlineCollectionTest />
 
   renderPage = () => {
     switch (this.currentPage) {

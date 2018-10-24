@@ -21,7 +21,7 @@ const StyledTestHeader = styled.div`
 
 @inject('apiStore', 'uiStore')
 @observer
-class ActivityTest extends React.Component {
+class InlineCollectionTest extends React.Component {
   state = {
     surveyResponse: null,
   }
@@ -158,9 +158,9 @@ class ActivityTest extends React.Component {
   }
 }
 
-ActivityTest.wrappedComponent.propTypes = {
+InlineCollectionTest.wrappedComponent.propTypes = {
   apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 
-export default ActivityTest
+export default InlineCollectionTest
