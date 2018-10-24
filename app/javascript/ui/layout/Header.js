@@ -134,6 +134,7 @@ class Header extends React.Component {
         width={220}
         menuItems={this.userMenuItems}
         menuOpen={userDropdownOpen}
+        hideDotMenu
       />
     )
   }
