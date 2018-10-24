@@ -289,7 +289,6 @@ class CommentThreadContainer extends React.Component {
   render() {
     const { uiStore, parentWidth } = this.props
     const hideJumpButton = this.showJumpToThreadButton ? 'visible' : 'hidden'
-    console.log('parent w', parentWidth)
     return (
       <Fragment>
         <JumpButton
