@@ -1,4 +1,5 @@
 import { Fragment } from 'react'
+import PropTypes from 'prop-types'
 import { computed, observable, observe, runInAction } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import { Element as ScrollElement, scroller } from 'react-scroll'
@@ -7,6 +8,7 @@ import FlipMove from 'react-flip-move'
 import _ from 'lodash'
 import pluralize from 'pluralize'
 import styled from 'styled-components'
+import Truncator from 'react-truncator'
 
 import { ActivityContainer } from '~/ui/global/styled/layout'
 import GoIcon from '~/ui/icons/GoIcon'
@@ -21,18 +23,18 @@ function pluralTypeName(name) {
 
 const GoIconContainer = styled.span`
   display: inline-block;
-  margin-bottom: 1px;
   margin-right: 8px;
   vertical-align: middle;
-  width: 15px;
+  width: 12px;
 `
 
 const JumpButton = styled.button`
+  left: 20px;
   min-height: 20px;
-  margin-left: auto;
-  margin-right: auto;
-  margin-top: -30px;
+  margin-top: -33px;
+  position: relative;
   visibility: ${props => props.hide};
+  width: 100%;
 `
 
 @inject('apiStore', 'uiStore')
@@ -285,7 +287,7 @@ class CommentThreadContainer extends React.Component {
     ))
 
   render() {
-    const { uiStore } = this.props
+    const { uiStore, parentWidth } = this.props
     const hideJumpButton = this.showJumpToThreadButton ? 'visible' : 'hidden'
     return (
       <Fragment>
@@ -298,7 +300,14 @@ class CommentThreadContainer extends React.Component {
             <GoIconContainer>
               <GoIcon />
             </GoIconContainer>
-            Go to {uiStore.viewingRecord && uiStore.viewingRecord.name}
+            <Truncator
+              text={`
+                Go to ${uiStore.viewingRecord && uiStore.viewingRecord.name}
+              `}
+              key="jumpbutton"
+              overrideWidth={parentWidth > 600 ? parentWidth : parentWidth - 90}
+              overrideStyle={{ display: 'inline-block' }}
+            />
           </SmallActionText>
         </JumpButton>
         <div
@@ -343,6 +352,9 @@ class CommentThreadContainer extends React.Component {
   }
 }
 
+CommentThreadContainer.propTypes = {
+  parentWidth: PropTypes.number.isRequired,
+}
 CommentThreadContainer.wrappedComponent.propTypes = {
   apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,

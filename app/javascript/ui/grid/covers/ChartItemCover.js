@@ -82,7 +82,12 @@ class ChartItemCover extends React.Component {
   }
 
   get mapQuestionType() {
-    const { questionTitle, questionText } = questionInformation(this.question)
+    const { questionTitle } = questionInformation(this.question)
+    let { questionText } = questionInformation(this.question)
+    if (this.question.question_type === 'question_category_satisfaction') {
+      questionText += ` ${this.question.content}`
+    }
+
     return { questionTitle, questionText }
   }
 
