@@ -1,4 +1,5 @@
 import { Fragment } from 'react'
+import PropTypes from 'prop-types'
 import { computed, observable, observe, runInAction } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import { Element as ScrollElement, scroller } from 'react-scroll'
@@ -28,10 +29,9 @@ const GoIconContainer = styled.span`
 `
 
 const JumpButton = styled.button`
-  left: 100px;
+  left: 20px;
   min-height: 20px;
   margin-top: -33px;
-  max-width: 250px;
   position: relative;
   visibility: ${props => props.hide};
   width: 100%;
@@ -287,8 +287,9 @@ class CommentThreadContainer extends React.Component {
     ))
 
   render() {
-    const { uiStore } = this.props
+    const { uiStore, parentWidth } = this.props
     const hideJumpButton = this.showJumpToThreadButton ? 'visible' : 'hidden'
+    console.log('parent w', parentWidth)
     return (
       <Fragment>
         <JumpButton
@@ -305,7 +306,7 @@ class CommentThreadContainer extends React.Component {
                 Go to ${uiStore.viewingRecord && uiStore.viewingRecord.name}
               `}
               key="jumpbutton"
-              overrideWidth={270}
+              overrideWidth={parentWidth > 600 ? parentWidth : parentWidth - 90}
               overrideStyle={{ display: 'inline-block' }}
             />
           </SmallActionText>
@@ -352,6 +353,9 @@ class CommentThreadContainer extends React.Component {
   }
 }
 
+CommentThreadContainer.propTypes = {
+  parentWidth: PropTypes.number.isRequired,
+}
 CommentThreadContainer.wrappedComponent.propTypes = {
   apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,

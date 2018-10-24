@@ -227,7 +227,9 @@ class ActivityLogBox extends React.Component {
     }
   }
 
-  renderComments = () => <CommentThreadContainer />
+  renderComments = () => (
+    <CommentThreadContainer parentWidth={this.position.w} />
+  )
 
   renderNotifications = () => <NotificationsContainer />
 
