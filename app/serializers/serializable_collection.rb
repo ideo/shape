@@ -91,8 +91,8 @@ class SerializableCollection < BaseJsonSerializer
   end
 
   attribute :template_num_instances do
-    if @object.master_template
-      @object.templated_collections.count
+    if @object.master_template?
+      @object.templated_collections.active.count
     else
       0
     end
