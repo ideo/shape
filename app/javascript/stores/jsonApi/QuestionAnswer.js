@@ -1,3 +1,4 @@
+import { runInAction } from 'mobx'
 import BaseRecord from './BaseRecord'
 
 class QuestionAnswer extends BaseRecord {
@@ -22,7 +23,9 @@ class QuestionAnswer extends BaseRecord {
     if (!answer || !answer.persisted) return false
     // make sure to attach this relationship
     answer.survey_response = this.survey_response
-    this.survey_response.question_answers.push(answer)
+    runInAction(() => {
+      this.survey_response.question_answers.push(answer)
+    })
     return answer
   }
 

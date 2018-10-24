@@ -88,9 +88,10 @@ class Collection
       collections.where(type: 'Collection::TestOpenResponses')
     end
 
-    def create_uniq_survey_response
+    def create_uniq_survey_response(user_id: nil)
       survey_responses.create(
         session_uid: SecureRandom.uuid,
+        user_id: user_id,
       )
     end
 
@@ -119,22 +120,38 @@ class Collection
       complete
     end
 
+    def survey_response_for_user(user_id)
+      SurveyResponse.find_by(
+        test_collection_id: id,
+        user_id: user_id,
+      )
+    end
+
+    def test_survey_render_class_mappings
+      Firestoreable::JSONAPI_CLASS_MAPPINGS.merge(
+        'Collection::TestCollection': SerializableTestCollection,
+        'Collection::TestDesign': SerializableSimpleCollection,
+        FilestackFile: SerializableFilestackFile,
+      )
+    end
+
+    def test_survey_render_includes
+      {
+        question_cards: [
+          :parent,
+          record: [:filestack_file],
+        ],
+      }
+    end
+
     def serialized_for_test_survey
       renderer = JSONAPI::Serializable::Renderer.new
       renderer.render(
         self,
         # Use Firestoreable mappings which already include "Simple" Serializers
-        class: Firestoreable::JSONAPI_CLASS_MAPPINGS.merge(
-          'Collection::TestCollection': SerializableTestCollection,
-          'Collection::TestDesign': SerializableSimpleCollection,
-          FilestackFile: SerializableFilestackFile,
-        ),
-        include: {
-          collection_cards: [
-            :parent,
-            record: [:filestack_file],
-          ],
-        },
+        # This uses a special serializer that defers collection cards to test design
+        class: test_survey_render_class_mappings,
+        include: test_survey_render_includes,
       )
     end
 

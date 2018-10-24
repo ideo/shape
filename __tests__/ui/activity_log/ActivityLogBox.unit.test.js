@@ -4,7 +4,7 @@ import ActivityLogBox, {
 } from '~/ui/activity_log/ActivityLogBox'
 import localStorage from 'mobx-localstorage'
 
-import { fakeNotification } from '#/mocks/data'
+import { fakeCollection, fakeNotification } from '#/mocks/data'
 
 import fakeUiStore from '#/mocks/fakeUiStore'
 import fakeApiStore from '#/mocks/fakeApiStore'
@@ -54,6 +54,11 @@ describe('ActivityLogBox', () => {
       expect(wrapper.find('ActivityCount').length).toEqual(2)
     })
 
+    it('should not show the test action', () => {
+      const testAction = wrapper.find('.liveTest')
+      expect(testAction.exists()).toBe(false)
+    })
+
     describe('with no unread comments or notifications', () => {
       beforeEach(() => {
         props.apiStore.unreadNotificationsCount = 0
@@ -64,6 +69,21 @@ describe('ActivityLogBox', () => {
 
       it('should not show the activity count', () => {
         expect(wrapper.find('ActivityCount').exists()).toBeFalsy()
+      })
+    })
+
+    describe('with a viewing collection with a live test', () => {
+      beforeEach(() => {
+        const collectionWithTest = Object.assign({}, fakeCollection, {
+          live_test_collection: { id: 34, test_status: 'live' },
+        })
+        props.uiStore.viewingCollection = collectionWithTest
+        reRender()
+      })
+
+      it('should show the tests action', () => {
+        const testAction = wrapper.find('.liveTest')
+        expect(testAction.exists()).toBe(true)
       })
     })
   })

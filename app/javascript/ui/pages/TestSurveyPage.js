@@ -1,12 +1,18 @@
-import styled from 'styled-components'
+import styled, { ThemeProvider } from 'styled-components'
 import { PropTypes as MobxPropTypes } from 'mobx-react'
 
 import v from '~/utils/variables'
+import Emoji from '~/ui/icons/Emoji'
 import Logo from '~/ui/layout/Logo'
 import TestSurveyResponder from '~/ui/test_collections/TestSurveyResponder'
 import { apiStore } from '~/stores'
 import SurveyResponse from '~/stores/jsonApi/SurveyResponse'
 import { LoudDisplayLink } from '~/ui/global/styled/typography'
+import {
+  EmojiMessageContainer,
+  SurveyClosed,
+  styledTestTheme,
+} from '~/ui/test_collections/shared'
 
 const StyledBg = styled.div`
   background: #e3edee;
@@ -29,26 +35,9 @@ const StyledSurvey = styled.div`
 `
 
 // TODO move blue background, rounded-corner box to shared component
-const StyledSurveyClosed = styled.div`
-  border-radius: 7px;
-  margin: 100px auto 0 auto;
-  background-color: ${v.colors.ctaButtonBlue};
-  width: 272px;
-  padding: 30px;
-  font-size: 1.25rem;
-  font-family: ${v.fonts.sans};
-  color: ${v.colors.white};
-  text-align: center;
-`
-StyledSurveyClosed.displayName = 'StyledSurveyClosed'
 
 const StyledClosedText = styled.div`
   margin: 10px 0 40px 0;
-`
-
-const StyledHandsEmoji = styled.div`
-  margin-top: 20px;
-  font-size: 80px;
 `
 
 const LearnMoreLink = LoudDisplayLink.extend`
@@ -86,7 +75,7 @@ class TestSurveyPage extends React.Component {
     if (!collection) return null
     if (collection.test_status === 'live') {
       return (
-        <StyledSurvey>
+        <StyledSurvey data-cy="StandaloneTestSurvey">
           <TestSurveyResponder
             collection={collection}
             surveyResponse={surveyResponse}
@@ -97,17 +86,19 @@ class TestSurveyPage extends React.Component {
       )
     }
     return (
-      <StyledSurveyClosed>
-        <StyledHandsEmoji>
-          <span role="img" aria-label="Raising Hands">
-            🙌
-          </span>
-        </StyledHandsEmoji>
-        <StyledClosedText>
-          Thank you for stopping by! This feedback is now closed.
-        </StyledClosedText>
-        <LearnMoreLink href={'/'}>Learn More About Shape</LearnMoreLink>
-      </StyledSurveyClosed>
+      <ThemeProvider theme={styledTestTheme('primary')}>
+        <StyledSurvey>
+          <SurveyClosed>
+            <EmojiMessageContainer>
+              <Emoji name="Raising hands" symbol="🙌" />
+            </EmojiMessageContainer>
+            <StyledClosedText>
+              Thank you for stopping by! This feedback is now closed.
+            </StyledClosedText>
+            <LearnMoreLink href={'/'}>Learn More About Shape</LearnMoreLink>
+          </SurveyClosed>
+        </StyledSurvey>
+      </ThemeProvider>
     )
   }
 

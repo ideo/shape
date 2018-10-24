@@ -4,6 +4,7 @@ const fakeJsonApiAttrs = {
   assign: jest.fn(),
   assignRef: jest.fn(),
   save: jest.fn(),
+  disableMenu: jest.fn(),
 }
 export const fakeCollectionCard = {
   id: "11",
@@ -163,6 +164,7 @@ export const fakeQuestionItem = {
   question_type: 'question_description',
   rawAttributes: jest.fn().mockReturnValue(fakeTextItemAttrs),
   getRecordType: jest.fn().mockReturnValue('items'),
+  ...fakeJsonApiAttrs,
 }
 
 export const fakeQuestionAnswer = {

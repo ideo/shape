@@ -30,6 +30,7 @@ class RadioControl extends React.PureComponent {
         value={option.value}
         control={
           <StyledRadio
+            data-cy={`Radio-${option.value}`}
             disabled={option.disabled}
             classes={{ root: 'RadioRoot' }}
             color="primary"

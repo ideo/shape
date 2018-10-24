@@ -23,22 +23,22 @@ const cardTypes = [
 
 describe('TestSurveyResponder', () => {
   beforeEach(() => {
+    // setup the appropriate card type
     props = {
       collection: fakeCollection,
       createSurveyResponse: jest.fn(),
     }
     // very basic way to turn fakeCollection into a "test collection"
-    props.collection.collection_cards = []
+    props.collection.question_cards = []
     cardTypes.forEach((type, i) => {
-      props.collection.collection_cards.push(
-        Object.assign({}, fakeQuestionItemCard, {
-          card_question_type: type,
-          record: {
-            ...fakeQuestionItem,
-            id: `${i}`,
-          },
-        })
-      )
+      props.collection.question_cards.push({
+        ...fakeQuestionItemCard,
+        card_question_type: type,
+        record: {
+          ...fakeQuestionItem,
+          id: `${i}`,
+        },
+      })
     })
     wrapper = shallow(<TestSurveyResponder {...props} />)
   })

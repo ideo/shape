@@ -3,11 +3,10 @@ import PropTypes from 'prop-types'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 
 import { SmallHelperText } from '~/ui/global/styled/typography'
-import v from '~/utils/variables'
 import { TextInputHolder, TextInput } from './shared'
 
 const StyledSmallText = SmallHelperText.extend`
-  color: ${v.colors.ctaButtonBlue};
+  color: ${props => props.theme.questionText};
   margin-left: calc(100% - 35px);
 `
 
@@ -52,6 +51,7 @@ class DescriptionQuestion extends React.Component {
             onFocus={() => this.setState({ focused: true })}
             onBlur={this.handleBlur}
             onChange={this.handleChange}
+            type="descriptionText"
             placeholder={placeholder}
             value={item.content || ''}
             maxLength={maxLength}
