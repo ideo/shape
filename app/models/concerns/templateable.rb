@@ -100,7 +100,6 @@ module Templateable
         order: 0,
         collection_attributes: {
           name: 'Deleted From Template',
-          type: 'Collection',
         },
       },
       parent_collection: self,
