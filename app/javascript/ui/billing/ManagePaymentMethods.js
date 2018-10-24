@@ -5,14 +5,15 @@ import PaymentMethods from '~shared/components/compounds/PaymentMethods'
 import Loader from '~/ui/layout/Loader'
 import EmptyList from '~/ui/billing/EmptyList'
 import styled from 'styled-components'
+import v from '~/utils/variables'
 
 const FinePrintWrapper = styled.div`
   font-family: Gotham;
   font-size: 14px;
   margin: 36px 0;
-  color: #787878;
+  color: ${v.colors.darkGray};
   a {
-    color: #009fe3;
+    color: ${v.colors.pacificBlue};
     text-decoration: none;
   }
 `
@@ -73,8 +74,8 @@ class ManagePaymentMethods extends React.Component {
     if (!this.loaded) {
       return <Loader />
     }
-    const paymentMethods = this.props.networkStore.findAll('payment_methods')
-
+    const { networkStore, apiStore } = this.props
+    const paymentMethods = networkStore.findAll('payment_methods')
     return (
       <PaymentMethods
         paymentMethods={paymentMethods}
@@ -88,9 +89,10 @@ class ManagePaymentMethods extends React.Component {
         FinePrintComponent={() => (
           <FinePrintWrapper>
             By accepting these Terms of Use, after the expiry of any free trial
-            period, you will be charged $5 per month per active user until you
-            cancel. You can cancel at any time by accessing the billing page and
-            unsubscribing or by contacting us at{' '}
+            period, you will be charged $$
+            {apiStore.currentUserOrganization.price_per_user} per month per
+            active user until you cancel. You can cancel at any time by
+            accessing the billing page and unsubscribing or by contacting us at{' '}
             <a href="mailto:help@shape.space">help@shape.space</a>. If you
             cancel, you still may be charged for the current billing period. By
             clicking &quot;Add Card&quot;, you agree to these and our other{' '}

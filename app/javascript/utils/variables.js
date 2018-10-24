@@ -46,6 +46,7 @@ export default {
     ctaButtonBlueHover: '#35889e',
     aquaHaze: '#f0f4f6',
     gray: '#c6c1bf',
+    darkGray: '#787878',
     cloudy: '#a89f9b',
     sirocco: '#6a7c7e',
     blackLava: '#120f0e',
