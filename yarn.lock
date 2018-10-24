@@ -11519,10 +11519,10 @@ react-transition-group@^2.2.1:
     prop-types "^15.5.8"
     warning "^3.0.0"
 
-react-truncator@0.0.4:
-  version "0.0.4"
-  resolved "https://registry.yarnpkg.com/react-truncator/-/react-truncator-0.0.4.tgz#b2af1d5995cdcba18a0a363e7daf1c0c16741767"
-  integrity sha512-lBXWMeMihD7a1BJ7gFsCAcQAq+I/nyfMYK1ZCumIPSemyuP1k0hHythjlZkmetuJm9mrCtOTuw2Pecy92erE5g==
+react-truncator@0.0.5:
+  version "0.0.5"
+  resolved "https://registry.yarnpkg.com/react-truncator/-/react-truncator-0.0.5.tgz#05a7dac49d5f600ba544095d71a8aaeb93dee264"
+  integrity sha512-UI8yX6KFgZLBl9VIrUzkwg7W3RMMrPMf/57c/F6v1cwpZhR6WpYKO3XX0ZulhwL/ZNKzZMAlmqwQ8eYduJloWQ==
   dependencies:
     babel-plugin-transform-class-properties "^6.24.1"
     lodash "^4.17.10"
