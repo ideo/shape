@@ -177,8 +177,8 @@ class CollectionCard extends BaseRecord {
 
   // Only show archive popup if this is a collection that has cards
   // Don't show if empty collection, or just link card / item card(s)
-  get showArchiveWarning() {
-    if (this.parent.isMasterTemplate) return !this.parent.archiveWarningsSnoozed
+  get shouldShowArchiveWarning() {
+    if (this.parent.isMasterTemplate) return this.parent.shouldShowEditWarning
     return _.some(
       this.selectedCards,
       card =>
@@ -216,7 +216,7 @@ class CollectionCard extends BaseRecord {
   async API_archive({ isReplacing = false } = {}) {
     const { selectedCardIds } = uiStore
 
-    if (this.showArchiveWarning) {
+    if (this.shouldShowArchiveWarning) {
       const popupAgreed = new Promise((resolve, reject) => {
         let prompt = 'Are you sure you want to archive this?'
         const confirmText = 'Archive'
@@ -249,7 +249,7 @@ class CollectionCard extends BaseRecord {
             numInstances === 1 ? '' : 's'
           } of this template will be affected.`
           onToggleSnoozeDialog = () => {
-            this.parent.toggleSnoozeArchiveWarnings()
+            this.parent.toggleEditWarnings()
           }
         }
         uiStore.confirm({

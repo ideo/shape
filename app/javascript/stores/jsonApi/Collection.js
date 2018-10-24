@@ -44,19 +44,40 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   }
 
   @action
-  toggleSnoozeArchiveWarnings() {
-    if (this.snoozedArchiveWarningsAt) this.snoozedArchiveWarningsAt = undefined
-    else this.snoozedArchiveWarningsAt = Date.now()
+  toggleEditWarnings() {
+    if (this.snoozedEditWarningsAt) this.snoozedEditWarningsAt = undefined
+    else this.snoozedEditWarningsAt = Date.now()
   }
 
-  get archiveWarningsSnoozed() {
+  get shouldShowEditWarning() {
+    if (!this.isMasterTemplate || this.template_num_instances === 0)
+      return false
     const oneHourAgo = Date.now() - 1000 * 60 * 60
-    if (
-      this.snoozedArchiveWarningsAt &&
-      this.snoozedArchiveWarningsAt > oneHourAgo
-    )
+    if (!this.snoozedEditWarningsAt || this.snoozedEditWarningsAt < oneHourAgo)
       return true
     return false
+  }
+
+  showEditWarningDialog(onCancel, onConfirm) {
+    if (!this.shouldShowEditWarning) return false
+    const iconName = 'Archive'
+    const confirmText = 'Continue'
+    let prompt = 'Are you sure?'
+    prompt += ` ${this.template_num_instances} instance${
+      this.template_num_instances === 1 ? '' : 's'
+    } of this template will be affected.`
+    const onToggleSnoozeDialog = () => {
+      this.toggleEditWarnings()
+    }
+    uiStore.confirm({
+      prompt,
+      confirmText,
+      iconName,
+      onToggleSnoozeDialog,
+      onCancel: () => onCancel(),
+      onConfirm: () => onConfirm(),
+    })
+    return true
   }
 
   get organization() {
