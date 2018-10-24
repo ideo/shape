@@ -273,8 +273,9 @@ class Organization < ApplicationRecord
   def cancel_network_subscription
     subscription = NetworkApi::Subscription.find(
       organization_id: network_organization.id,
+      active: true,
     ).first
-    subscription.cancel
+    subscription.cancel(immediately: true)
   end
 
   def update_subscription

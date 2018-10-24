@@ -178,9 +178,12 @@ describe Organization, type: :model do
 
           allow(NetworkApi::Subscription).to receive(:find).with(
             organization_id: network_organization.id,
+            active: true,
           ).and_return([subscription])
 
-          expect(subscription).to receive(:cancel)
+          expect(subscription).to receive(:cancel).with(
+            immediately: true,
+          )
 
           organization.update_attributes(in_app_billing: false)
         end
