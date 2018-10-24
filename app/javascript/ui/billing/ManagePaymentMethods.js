@@ -89,7 +89,7 @@ class ManagePaymentMethods extends React.Component {
         FinePrintComponent={() => (
           <FinePrintWrapper>
             By accepting these Terms of Use, after the expiry of any free trial
-            period, you will be charged $$
+            period, you will be charged $
             {apiStore.currentUserOrganization.price_per_user} per month per
             active user until you cancel. You can cancel at any time by
             accessing the billing page and unsubscribing or by contacting us at{' '}
