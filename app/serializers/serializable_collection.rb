@@ -9,6 +9,7 @@ class SerializableCollection < BaseJsonSerializer
              :test_status, :collection_to_test_id
 
   has_one :parent_collection_card
+  has_one :live_test_collection
   belongs_to :submissions_collection
   belongs_to :submission_template
   belongs_to :collection_to_test

@@ -1,11 +1,9 @@
 import _ from 'lodash'
 import PropTypes from 'prop-types'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
-// import TextareaAutosize from 'react-autosize-textarea'
 import styled, { css } from 'styled-components'
 
 import ReturnArrowIcon from '~/ui/icons/ReturnArrowIcon'
-import v from '~/utils/variables'
 import DescriptionQuestion from './DescriptionQuestion'
 import { QuestionText, TextResponseHolder, TextInput } from './shared'
 
@@ -28,7 +26,7 @@ QuestionTextWithSpacing.displayName = 'QuestionTextWithSpacing'
 const TextEnterButton = styled.button`
   opacity: ${props => (props.focused ? 1 : 0)};
   transition: opacity 0.3s;
-  color: ${v.colors.primaryDark};
+  color: ${props => props.theme.questionText};
   vertical-align: super;
   position: absolute;
   right: 18px;
@@ -41,9 +39,10 @@ const TextEnterButton = styled.button`
 class OpenQuestion extends React.Component {
   constructor(props) {
     super(props)
+    const { questionAnswer } = props
     this.save = _.debounce(this._save, 1000)
     this.state = {
-      response: '',
+      response: questionAnswer ? questionAnswer.answer_text : '',
       focused: false,
     }
   }
@@ -100,7 +99,7 @@ class OpenQuestion extends React.Component {
               onChange={this.handleResponse}
               onBlur={() => this.setState({ focused: false })}
               value={this.state.response}
-              color={v.colors.primaryDark}
+              type="questionText"
               placeholder="write response here"
               disabled={editing}
             />
@@ -116,11 +115,13 @@ class OpenQuestion extends React.Component {
 
 OpenQuestion.propTypes = {
   item: MobxPropTypes.objectOrObservableObject.isRequired,
+  questionAnswer: MobxPropTypes.objectOrObservableObject,
   editing: PropTypes.bool,
   onAnswer: PropTypes.func,
   canEdit: PropTypes.bool,
 }
 OpenQuestion.defaultProps = {
+  questionAnswer: null,
   editing: false,
   onAnswer: () => null,
   canEdit: false,

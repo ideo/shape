@@ -243,7 +243,7 @@ describe Collection::TestCollection, type: :model do
             it 'should output its collection_cards from the test_design child collection' do
               data = test_collection.serialized_for_test_survey
               card_ids = test_collection.test_design.collection_cards.map(&:id).map(&:to_s)
-              expect(data[:data][:relationships][:collection_cards][:data].map { |i| i[:id] }).to match_array(card_ids)
+              expect(data[:data][:relationships][:question_cards][:data].map { |i| i[:id] }).to match_array(card_ids)
             end
           end
         end
@@ -292,7 +292,7 @@ describe Collection::TestCollection, type: :model do
         it 'should output its collection_cards from the test_design child collection' do
           data = test_collection.serialized_for_test_survey
           card_ids = test_collection.test_design.collection_cards.map(&:id).map(&:to_s)
-          expect(data[:data][:relationships][:collection_cards][:data].map { |i| i[:id] }).to match_array(card_ids)
+          expect(data[:data][:relationships][:question_cards][:data].map { |i| i[:id] }).to match_array(card_ids)
         end
       end
     end

@@ -16,7 +16,9 @@ describe Collection, type: :model do
     it { should have_many :cards_linked_to_this_collection }
     it { should have_many :items }
     it { should have_many :collections }
+    it { should have_many :test_collections }
     it { should have_one :parent_collection_card }
+    it { should have_one :live_test_collection }
     it { should belong_to :cloned_from }
     it { should belong_to :organization }
     it { should belong_to :template }
@@ -30,9 +32,9 @@ describe Collection, type: :model do
       end
 
       it 'should only find active collection cards' do
-        expect {
+        expect do
           collection_cards.first.archive!
-        }.to change(collection.collection_cards, :count).by(-1)
+        end.to change(collection.collection_cards, :count).by(-1)
       end
 
       describe '#touch_related_cards' do
@@ -40,14 +42,14 @@ describe Collection, type: :model do
         let!(:card_linked_to_this_collection) { create(:collection_card_link, collection: collection) }
 
         it 'should update linked cards if updated_at changed' do
-          expect {
+          expect do
             collection.update(updated_at: Time.now) && card_linked_to_this_collection.reload
-          }.to change(card_linked_to_this_collection, :updated_at)
+          end.to change(card_linked_to_this_collection, :updated_at)
         end
         it 'should update linked cards after update' do
-          expect {
+          expect do
             collection.update(name: 'Bobo') && card_linked_to_this_collection.reload
-          }.to change(card_linked_to_this_collection, :updated_at)
+          end.to change(card_linked_to_this_collection, :updated_at)
         end
       end
     end
@@ -343,9 +345,9 @@ describe Collection, type: :model do
     end
 
     it 'unarchives all cards' do
-      expect {
+      expect do
         collection.unarchive_cards!(cards, snapshot)
-      }.to change(collection.collection_cards, :count).by(3)
+      end.to change(collection.collection_cards, :count).by(3)
       expect(cards.first.reload.active?).to be true
     end
 
@@ -401,22 +403,22 @@ describe Collection, type: :model do
       let(:first_card) { collection.collection_cards.first }
 
       it 'updates based on the collection updated_at timestamp' do
-        expect {
+        expect do
           collection.update(updated_at: 10.seconds.from_now)
-        }.to change(collection, :cache_key)
+        end.to change(collection, :cache_key)
       end
 
       it 'updates when roles are updated' do
-        expect {
+        expect do
           # this should "touch" the role updated_at
           user.add_role(Role::EDITOR, collection)
-        }.to change(collection, :cache_key)
+        end.to change(collection, :cache_key)
       end
 
       it 'updates when cards are updated' do
-        expect {
+        expect do
           first_card.update(updated_at: 10.seconds.from_now)
-        }.to change(collection, :cache_key)
+        end.to change(collection, :cache_key)
       end
     end
 

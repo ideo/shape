@@ -87,6 +87,7 @@ class ChartItemCover extends React.Component {
     if (this.question.question_type === 'question_category_satisfaction') {
       questionText += ` ${this.question.content}`
     }
+
     return { questionTitle, questionText }
   }
 

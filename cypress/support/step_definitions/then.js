@@ -29,6 +29,12 @@ Then('I should not see a {string}', selector => {
   cy.locateDataOrClass(selector).should('not.be.visible')
 })
 
+Then('I should see {int} {string}', (num, el) => {
+  cy.locateDataOrClass(el)
+    .its('length')
+    .should('eq', num)
+})
+
 Then('I should see the {word} card as {word}', (pos, size) => {
   // size e.g. "2x1" so we split on 'x'
   const sizes = size.split('x')
