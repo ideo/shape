@@ -11,6 +11,7 @@ import HorizontalDivider from '~shared/components/atoms/HorizontalDivider'
 import Loader from '~/ui/layout/Loader'
 import trackError from '~/utils/trackError'
 import { formatAsDollarAmount, formatDate } from '~shared/utils/formatters'
+import v from '~/utils/variables'
 
 const Wrapper = styled.div`
   font-family: 'Gotham';
@@ -19,7 +20,7 @@ const Wrapper = styled.div`
 const Instructional = styled.div`
   font-size: 12px;
   line-height: 16px;
-  color: #c6c1bf;
+  color: ${v.colors.gray};
   letter-spacing: 0;
 `
 
@@ -52,7 +53,7 @@ const FreeTrial = styled(TrialHighlight)`
 
 const Label = styled.span`
   font-size: 16px;
-  color: #a89f9b;
+  color: ${v.colors.cloudy};
 `
 
 Block.propTypes = {
