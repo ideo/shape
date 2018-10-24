@@ -174,9 +174,14 @@ class Organization < ApplicationRecord
 
   def create_network_subscription
     plan = NetworkApi::Plan.first
+    payment_method = NetworkApi::PaymentMethod.find(
+      organization_id: network_organization.id,
+      default: true,
+    ).first
     NetworkApi::Subscription.create(
       organization_id: network_organization.id,
       plan_id: plan.id,
+      payment_method_id: payment_method.try(:id),
     )
   end
 
@@ -255,19 +260,6 @@ class Organization < ApplicationRecord
 
     network_organization.name = name
     network_organization.save
-  end
-
-  def create_network_subscription
-    plan = NetworkApi::Plan.first
-    payment_method = NetworkApi::PaymentMethod.find(
-      organization_id: network_organization.id,
-      default: true,
-    ).first
-    NetworkApi::Subscription.create(
-      organization_id: network_organization.id,
-      plan_id: plan.id,
-      payment_method_id: payment_method.try(:id),
-    )
   end
 
   def cancel_network_subscription

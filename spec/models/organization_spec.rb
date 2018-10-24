@@ -418,7 +418,7 @@ describe Organization, type: :model do
     end
   end
 
-  describe '#create_network_subscription' do
+  describe '#create_network_subscription', :vcr do
     let!(:organization) { create(:organization) }
     it 'creates a network subscription with the first plan' do
       network_organization = double('network_organization', id: 234)
@@ -428,6 +428,7 @@ describe Organization, type: :model do
       expect(NetworkApi::Subscription).to receive(:create).with(
         organization_id: network_organization.id,
         plan_id: plan.id,
+        payment_method_id: nil,
       )
       organization.create_network_subscription
     end
