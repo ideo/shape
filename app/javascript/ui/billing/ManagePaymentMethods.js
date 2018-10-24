@@ -47,12 +47,12 @@ class ManagePaymentMethods extends React.Component {
   }
 
   makePaymentMethodDefault = async paymentMethod => {
+    const {
+      networkStore: { organization, loadPaymentMethods },
+    } = this.props
     paymentMethod.default = true
     await paymentMethod.save()
-    await this.props.networkStore.loadPaymentMethods(
-      this.props.networkStore.organization.id,
-      true
-    )
+    await loadPaymentMethods(organization.id, true)
     this.forceUpdate()
   }
 
@@ -62,19 +62,20 @@ class ManagePaymentMethods extends React.Component {
   }
 
   tokenCreated = closeModal => async token => {
-    await this.props.networkStore.createPaymentMethod(
-      this.props.networkStore.organization,
-      token
-    )
+    const { networkStore } = this.props
+    await networkStore.createPaymentMethod(networkStore.organization, token)
     this.forceUpdate()
     closeModal()
   }
 
   render() {
+    const { apiStore, networkStore } = this.props
+    if (!apiStore.currentUserOrganization.in_app_billing) {
+      return null
+    }
     if (!this.loaded) {
       return <Loader />
     }
-    const { networkStore, apiStore } = this.props
     const paymentMethods = networkStore.findAll('payment_methods')
     return (
       <PaymentMethods

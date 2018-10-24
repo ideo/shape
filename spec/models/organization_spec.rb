@@ -111,6 +111,84 @@ describe Organization, type: :model do
         expect(guest.has_role?(Role::MEMBER, organization.guest_group)).to be true
       end
     end
+
+    describe 'update subscription' do
+      context 'in_app_billing changed to true' do
+        let(:organization) { create(:organization, in_app_billing: false) }
+
+        context 'payment method exits' do
+          it 'creates a new subscription' do
+            plan = double('plan', id: 123)
+            payment_method = double('payment_method', id: 234)
+            network_organization = double('network_organization', id: 345)
+
+            allow(NetworkApi::Plan).to receive(:first).and_return(plan)
+
+            allow(NetworkApi::PaymentMethod).to receive(:find).with(
+              organization_id: network_organization.id,
+              default: true,
+            ).and_return([payment_method])
+
+            allow(organization).to receive(:network_organization).and_return(network_organization)
+
+            allow(NetworkApi::Subscription).to receive(:create)
+
+            expect(NetworkApi::Subscription).to receive(:create).with(
+              organization_id: network_organization.id,
+              plan_id: plan.id,
+              payment_method_id: payment_method.id,
+            )
+
+            organization.update_attributes(in_app_billing: true)
+          end
+        end
+
+        context 'payment method does not exist' do
+          it 'creates a new subscription without payment method' do
+            plan = double('plan', id: 123)
+            network_organization = double('network_organization', id: 345)
+
+            allow(NetworkApi::Plan).to receive(:first).and_return(plan)
+
+            allow(NetworkApi::PaymentMethod).to receive(:find).with(
+              organization_id: network_organization.id,
+              default: true,
+            ).and_return([])
+
+            allow(organization).to receive(:network_organization).and_return(network_organization)
+
+            expect(NetworkApi::Subscription).to receive(:create).with(
+              organization_id: network_organization.id,
+              plan_id: plan.id,
+              payment_method_id: nil,
+            )
+
+            organization.update_attributes(in_app_billing: true)
+          end
+        end
+      end
+
+      context 'in_app_billing changed to false' do
+        let(:organization) { create(:organization, in_app_billing: true) }
+        it 'cancels the existing subscription' do
+          network_organization = double('network_organization', id: 123)
+          subscription = double('subscription')
+
+          allow(organization).to receive(:network_organization).and_return(network_organization)
+
+          allow(NetworkApi::Subscription).to receive(:find).with(
+            organization_id: network_organization.id,
+            active: true,
+          ).and_return([subscription])
+
+          expect(subscription).to receive(:cancel).with(
+            immediately: true,
+          )
+
+          organization.update_attributes(in_app_billing: false)
+        end
+      end
+    end
   end
 
   describe '.create_for_user' do
@@ -340,7 +418,7 @@ describe Organization, type: :model do
     end
   end
 
-  describe '#create_network_subscription' do
+  describe '#create_network_subscription', :vcr do
     let!(:organization) { create(:organization) }
     it 'creates a network subscription with the first plan' do
       network_organization = double('network_organization', id: 234)
@@ -350,6 +428,7 @@ describe Organization, type: :model do
       expect(NetworkApi::Subscription).to receive(:create).with(
         organization_id: network_organization.id,
         plan_id: plan.id,
+        payment_method_id: nil,
       )
       organization.create_network_subscription
     end
@@ -434,9 +513,18 @@ describe Organization, type: :model do
   end
 
   describe '#create_network_usage_record' do
-    let(:organization) { create(:organization) }
+    let(:organization) { create(:organization, in_app_billing: true) }
     before do
       allow(organization).to receive(:calculate_active_users_count!)
+    end
+
+    context 'in app billing is disabled' do
+      it 'does not create a network usage record' do
+        organization = create(:organization, in_app_billing: false)
+        expect(organization).to receive(:calculate_active_users_count!)
+        expect(NetworkApi::UsageRecord).not_to receive(:create)
+        expect(organization.create_network_usage_record).to be true
+      end
     end
 
     context 'within trial period with fewer users than limit' do
@@ -444,9 +532,8 @@ describe Organization, type: :model do
         organization.update_attributes(trial_ends_at: 1.day.from_now)
       end
       it 'does not create the network usage record' do
-        allow(NetworkApi::UsageRecord).to receive(:create)
+        expect(NetworkApi::UsageRecord).not_to receive(:create)
         expect(organization.create_network_usage_record).to be true
-        expect(NetworkApi::UsageRecord).not_to have_received(:create)
       end
     end
 

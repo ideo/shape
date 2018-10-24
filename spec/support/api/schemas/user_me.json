@@ -1,21 +1,22 @@
 {
   "type": "object",
   "properties": {
-    "first_name": { "type": "string" },
-    "last_name": { "type": "string" },
-    "email": { "type": "string" },
-    "status": { "type": "string" },
-    "pic_url_square": { "type": "string" },
-    "handle": { "type": "string" },
-    "user_profile_collection_id": { "type": ["string", "null"] },
-    "current_user_collection_id": { "type": ["string", "null"] },
+    "is_super_admin": { "type": "boolean" },
     "created_at": { "type": "date" },
-    "terms_accepted": { "type": "boolean" },
+    "current_user_collection_id": { "type": ["string", "null"] },
+    "email": { "type": "string" },
+    "first_name": { "type": "string" },
+    "google_auth_token": { "type": "string" },
+    "handle": { "type": "string" },
+    "last_name": { "type": "string" },
+    "notify_through_email": { "type": "boolean" },
+    "pic_url_square": { "type": "string" },
     "show_helper": { "type": "boolean" },
     "show_move_helper": { "type": "boolean" },
     "show_template_helper": { "type": "boolean" },
-    "notify_through_email": { "type": "boolean" },
-    "google_auth_token": { "type": "string" }
+    "status": { "type": "string" },
+    "terms_accepted": { "type": "boolean" },
+    "user_profile_collection_id": { "type": ["string", "null"] }
   },
   "required": ["email", "first_name", "last_name", "status"]
 }
