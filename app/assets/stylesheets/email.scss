@@ -404,6 +404,11 @@ button {
       font-weight: bold;
       letter-spacing: 1.6px;
       color: #120f0e;
+
+      .highlight {
+        padding: 4px 6px;
+        margin-left: -6px;
+      }
     }
 
     .inner {
@@ -428,18 +433,15 @@ button {
   }
 }
 
-.billing-email .trial-users-count-exceeded {
-  .free-trial {
+.billing-email.trial-users-count-exceeded {
+  .highlight.free-trial {
     background-color: #c0dbde;
-    padding: 4px 6px;
-    margin-left: -6px;
   }
 }
 
-.billing-email .trial-expired {
-  .free-trial-expired {
+.billing-email.trial-expired {
+  .highlight.free-trial-expired {
     background-color: #d66742;
-    padding: 4px 6px;
-    margin-left: -6px;
+    color: white;
   }
 }
