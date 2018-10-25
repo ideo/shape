@@ -13,7 +13,6 @@ module Templateable
 
     after_create :add_template_tag, if: :master_template?
     after_create :add_template_instance_tag, if: :templated?
-    after_save :queue_update_template_instances, if: :master_template?
   end
 
   def profile_template?
@@ -43,11 +42,12 @@ module Templateable
   end
 
   def update_template_instances
-    templated_collections.each do |instance|
+    templated_collections.active.each do |instance|
       move_cards_deleted_from_master_template(instance)
       update_cards_on_template_instance(instance)
       add_cards_from_master_template(instance)
       instance.reorder_cards!
+      instance.touch
     end
   end
 
@@ -65,7 +65,7 @@ module Templateable
     instance.collection_cards.pinned.each do |card|
       master = master_cards[card.templated_from_id]
       next if master.blank? # Blank if this card was just added
-      card.update(
+      card.update_columns(
         height: master.height,
         width: master.width,
         order: master.order,
@@ -78,14 +78,16 @@ module Templateable
     return unless cards.present?
     deleted_cards_coll = instance.find_or_create_deleted_cards_collection
     transaction do
-      moved_cards = CardMover.new(
+      card_mover = CardMover.new(
         from_collection: instance,
         to_collection: deleted_cards_coll,
         cards: cards,
         placement: 'end',
         card_action: 'move',
-      ).call
-
+      )
+      moved_cards = card_mover.call
+      # card_mover will return false if error
+      return false unless moved_cards
       # Unpin all cards so user can edit
       CollectionCard.where(
         id: moved_cards.map(&:id),
@@ -96,7 +98,7 @@ module Templateable
         ActivityAndNotificationBuilder.call(
           actor: created_by || instance.created_by,
           organization: instance.organization,
-          target: deleted_cards_coll, # Assign as target so we can route to it
+          target: instance, # Assign as target so we can route to it
           action: :archived_from_template,
           subject_user_ids: card.record.editors[:users].pluck(:id),
           subject_group_ids: card.record.editors[:groups].pluck(:id),
@@ -122,6 +124,9 @@ module Templateable
     return builder.collection_card.record if builder.create
   end
 
+  # The following methods map the difference between:
+  # - pinned_cards on the master template
+  # - instance cards where templated_from_id == pinned.id
   def cards_removed_from_master_template(instance)
     instance.templated_cards_by_templated_from_id.slice(
       *(instance.templated_cards_by_templated_from_id.keys - pinned_cards_by_id.keys),

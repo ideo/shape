@@ -29,12 +29,13 @@ const GoIconContainer = styled.span`
 `
 
 const JumpButton = styled.button`
-  left: 20px;
+  left: 100px;
   min-height: 20px;
   margin-top: -33px;
   position: relative;
+  text-align: center;
   visibility: ${props => props.hide};
-  width: 100%;
+  width: calc(100% - 140px);
 `
 
 @inject('apiStore', 'uiStore')

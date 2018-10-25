@@ -10,6 +10,11 @@ class CollectionUpdater < SimpleService
     @collection.save.tap do |result|
       # caching collection cover needs to happen after cards have been updated
       cache_collection_cover_if_needed if result
+      # TODO: could ignore this part unless collection_card attrs have changed...
+      if @collection.master_template? && @attributes[:collection_cards_attributes].present?
+        # we just added a template card, so update the instances
+        @collection.queue_update_template_instances
+      end
     end
   end
 

@@ -186,6 +186,12 @@ class CollectionCard < ApplicationRecord
     parents = cards.map(&:parent).uniq.compact
     cards.update_all(archived: true)
     parents.each(&:touch)
+    parents.each do |parent|
+      if parent.master_template?
+        # we just archived a template card, so update the instances
+        parent.queue_update_template_instances
+      end
+    end
     CollectionCardArchiveWorker.perform_async(
       ids,
       user_id,
