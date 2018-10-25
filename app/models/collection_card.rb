@@ -14,6 +14,8 @@ class CollectionCard < ApplicationRecord
   before_create :assign_default_height_and_width
   after_update :update_collection_cover, if: :saved_change_to_is_cover?
   after_create :update_parent_card_count!
+  after_save :set_collection_as_master_template,
+             if: :test_collection_within_master_template_after_save?
 
   validates :parent, :order, presence: true
   validate :single_item_or_collection_is_present
@@ -308,5 +310,14 @@ class CollectionCard < ApplicationRecord
 
   def update_parent_card_count!
     parent.cache_card_count!
+  end
+
+  def test_collection_within_master_template_after_save?
+    return false if collection_id.blank? || !collection.is_a?(Collection::TestCollection)
+    saved_change_to_parent_id? && master_template_card?
+  end
+
+  def set_collection_as_master_template
+    collection.update(master_template: true)
   end
 end

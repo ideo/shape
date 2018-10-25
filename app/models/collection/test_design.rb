@@ -20,6 +20,8 @@ class Collection
       duplicate.update(
         test_collection_id: nil,
         type: 'Collection::TestCollection',
+        # Don't set this to be a master template if the parent is a template
+        master_template: parent.master_template? ? false : master_template,
       )
       # Had to reload otherwise AASM gets into weird state
       duplicate.reload

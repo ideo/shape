@@ -119,4 +119,8 @@ class CardMover
       end
     end
   end
+
+  def set_test_as_template
+
+  end
 end

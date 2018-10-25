@@ -58,6 +58,47 @@ RSpec.describe CollectionCard, type: :model do
     end
   end
 
+  describe 'callbacks' do
+    describe '#set_collection_as_master_template' do
+      let!(:coll_card) { create(:collection_card_collection, collection: collection) }
+
+      context 'with regular collection' do
+        let(:collection) { create(:collection) }
+
+        it 'should not set master_template' do
+          expect(collection.reload.master_template?).to be false
+        end
+      end
+
+      context 'with test collection' do
+        let(:collection) { create(:test_collection, num_cards: 3) }
+
+        it 'should not set master_template' do
+          expect(collection.reload.master_template?).to be false
+        end
+
+        it 'should not pin cards' do
+          expect(collection.primary_collection_cards.any?(&:pinned?)).to be false
+        end
+
+        context 'parent is master template' do
+          before do
+            collection.update(master_template: true)
+            collection.reload
+          end
+
+          it 'sets master_template = true' do
+            expect(collection.master_template?).to be true
+          end
+
+          it 'pins all cards' do
+            expect(collection.primary_collection_cards.all?(&:pinned?)).to be true
+          end
+        end
+      end
+    end
+  end
+
   describe '#duplicate!' do
     let(:user) { create(:user) }
     let!(:collection_card) { create(:collection_card_text) }

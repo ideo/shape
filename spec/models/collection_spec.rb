@@ -72,6 +72,18 @@ describe Collection, type: :model do
     end
   end
 
+  describe 'callbacks' do
+    describe '#pin_all_primary_cards' do
+      let!(:collection) { create(:collection, num_cards: 3) }
+
+      it 'pins cards if master_template = true' do
+        expect(collection.primary_collection_cards.any?(&:pinned?)).to be false
+        collection.update(master_template: true)
+        expect(collection.reload.primary_collection_cards.all?(&:pinned?)).to be true
+      end
+    end
+  end
+
   describe '#inherit_parent_organization_id' do
     let!(:parent_collection) { create(:user_collection) }
     let!(:collection_card) { create(:collection_card, parent: parent_collection) }

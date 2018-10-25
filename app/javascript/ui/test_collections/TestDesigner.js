@@ -151,6 +151,8 @@ class TestDesigner extends React.Component {
   get canEdit() {
     // viewers still see the select forms, but disabled
     const { collection } = this.props
+    // If this is a template instance, don't allow editing
+    if (collection.isTemplated) return false
     return collection.can_edit_content
   }
 

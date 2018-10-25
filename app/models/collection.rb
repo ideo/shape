@@ -27,6 +27,7 @@ class Collection < ApplicationRecord
   after_commit :touch_related_cards, if: :saved_change_to_updated_at?, unless: :destroyed?
   after_commit :reindex_sync, on: :create
   after_commit :update_comment_thread_in_firestore, unless: :destroyed?
+  after_save :pin_all_primary_cards, if: :now_master_template?
 
   # all cards including archived (i.e. undo default :collection_cards scope)
   has_many :all_collection_cards,
@@ -515,5 +516,13 @@ class Collection < ApplicationRecord
     return unless comment_thread.present?
     return unless saved_change_to_name? || saved_change_to_cached_attributes?
     comment_thread.store_in_firestore
+  end
+
+  def pin_all_primary_cards
+    primary_collection_cards.update_all(pinned: true)
+  end
+
+  def now_master_template?
+    saved_change_to_master_template? && master_template?
   end
 end

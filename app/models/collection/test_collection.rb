@@ -13,6 +13,7 @@ class Collection
     belongs_to :collection_to_test, class_name: 'Collection', optional: true
 
     before_create :setup_default_status_and_questions, unless: :cloned_from_present?
+    #before_create :set_as_master_template, if: :parent_is_master_template?
     after_create :add_test_tag
     after_update :touch_test_design, if: :saved_change_to_test_status?
 
@@ -66,9 +67,14 @@ class Collection
       end
       return duplicate unless duplicate.persisted?
 
-      duplicate.update(
-        name: "Copy of #{name}",
-      )
+      if collection_to_test.present?
+        # Point to the parent as the one to test
+        duplicate.collection_to_test = parent
+      elsif !parent.master_template?
+        # Only prefix with 'Copy' if it isn't in a template
+        duplicate.name = "Copy of #{name}"
+      end
+      duplicate.save
       duplicate
     end
 
@@ -177,6 +183,7 @@ class Collection
       transaction do
         return false unless test_design_card_builder.create
         self.test_design = test_design_card_builder.collection_card.record
+        self.template_id = nil # Moves association to the TestDesign
         # move all the cards into the test design collection
         collection_cards
           .where.not(
@@ -202,6 +209,7 @@ class Collection
           name: "#{name} Feedback Design",
           type: 'Collection::TestDesign',
           test_collection_id: id,
+          template_id: template_id,
         },
       }
       CollectionCardBuilder.new(
