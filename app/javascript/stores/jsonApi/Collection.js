@@ -1,6 +1,7 @@
 import _ from 'lodash'
 import { observable, computed, action } from 'mobx'
 import { ReferenceType } from 'datx'
+import pluralize from 'pluralize'
 
 import { apiStore, routingStore, uiStore } from '~/stores'
 import BaseRecord from './BaseRecord'
@@ -41,6 +42,43 @@ class Collection extends SharedRecordMixin(BaseRecord) {
         this.collection_cards.splice(this.collection_cards.indexOf(card), 1)
       )
     this._reorderCards()
+  }
+
+  @action
+  toggleEditWarnings() {
+    if (this.snoozedEditWarningsAt) this.snoozedEditWarningsAt = undefined
+    else this.snoozedEditWarningsAt = Date.now()
+  }
+
+  get shouldShowEditWarning() {
+    if (!this.isMasterTemplate || this.template_num_instances === 0)
+      return false
+    const oneHourAgo = Date.now() - 1000 * 60 * 60
+    if (!this.snoozedEditWarningsAt || this.snoozedEditWarningsAt < oneHourAgo)
+      return true
+    return false
+  }
+
+  showEditWarningDialog(onCancel, onConfirm) {
+    if (!this.shouldShowEditWarning) return false
+    const iconName = 'Archive'
+    const confirmText = 'Continue'
+    let prompt = 'Are you sure?'
+    const num = this.template_num_instances
+    prompt += ` ${num} ${pluralize('instance', num)}`
+    prompt += ` of this template will be affected.`
+    const onToggleSnoozeDialog = () => {
+      this.toggleEditWarnings()
+    }
+    uiStore.confirm({
+      prompt,
+      confirmText,
+      iconName,
+      onToggleSnoozeDialog,
+      onCancel: () => onCancel(),
+      onConfirm: () => onConfirm(),
+    })
+    return true
   }
 
   get organization() {

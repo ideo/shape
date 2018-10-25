@@ -90,6 +90,25 @@ RSpec.describe CollectionCard, type: :model do
       duplicate
     end
 
+    context 'without user' do
+      let(:duplicate_without_user) do
+        collection_card.duplicate!(
+          shallow: shallow,
+          placement: placement,
+          duplicate_linked_records: duplicate_linked_records,
+        )
+      end
+
+      it 'should create copy of card' do
+        expect { duplicate_without_user }.to change(CollectionCard, :count).by(1)
+        expect(duplicate_without_user.id).not_to eq(collection_card.id)
+      end
+
+      it 'should duplicate item' do
+        expect { duplicate_without_user }.to change(Item, :count).by(1)
+      end
+    end
+
     context 'with pinned card from regular collection' do
       let!(:collection_card) { create(:collection_card_text, pinned: true) }
 
