@@ -1,14 +1,14 @@
-<div class="billing-email trial-users-count-exceeded">
-  <div class="subject">Free trial limit reached</div>
-  <div>Your team size have grown beyond the active user limit for your
-    free trial period. Your account will now be charged for each
-    additional active user which exceeds the free trial limit.</div>
+<div class="billing-email trial-expired">
+  <div class="subject">Free trial expired</div>
+  <div>Your free trial period with Shape has expired. Your account will now be charged for all current active users. To continue using Shape please add a payment method to you account.</div>
   <div>
     <div class="organization-name"><%= @organization_name %></div>
     <div>
       <div class="section">
         <div class="inner">
-          <div class="header"><span class="free-trial">FREE TRIAL</span></div>
+          <div class="header">
+            <span class="free-trial-expired">FREE TRIAL EXPIRED</span>
+          </div>
           <dl>
             <dt>Expiration Date:</dt>
             <dd><%= @expiration_date %></dd>
@@ -21,10 +21,6 @@
           <dl>
             <dt>Total users:</dt>
             <dd><%= @total_users_count %></dd>
-            <dt><span class="subtract">Free trials:</span></dt>
-            <dd><span class="subtract">- <%= @trial_users_count %></span></dd>
-            <dt>Prorated Users:</dt>
-            <dd><%= @prorated_users_count %></dd>
           </dl>
         </div>
       </div>

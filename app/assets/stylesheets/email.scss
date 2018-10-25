@@ -374,9 +374,7 @@ button {
   font-size: 1rem;
 }
 
-// trial_users_count_exceeded_mailer
-
-.trial-users-count-exceeded-mailer {
+.billing-email {
   font-family: $gotham-font;
 
   .subject {
@@ -408,12 +406,6 @@ button {
       color: #120f0e;
     }
 
-    .free-trial {
-      background-color: #c0dbde;
-      padding: 4px 6px;
-      margin-left: -6px;
-    }
-
     .inner {
       padding: 0 20px;
       font-size: 16px;
@@ -433,5 +425,21 @@ button {
         color: #a89f9b;
       }
     }
+  }
+}
+
+.billing-email .trial-users-count-exceeded {
+  .free-trial {
+    background-color: #c0dbde;
+    padding: 4px 6px;
+    margin-left: -6px;
+  }
+}
+
+.billing-email .trial-expired {
+  .free-trial-expired {
+    background-color: #d66742;
+    padding: 4px 6px;
+    margin-left: -6px;
   }
 }
