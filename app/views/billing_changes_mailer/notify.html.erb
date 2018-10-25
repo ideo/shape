@@ -1,0 +1,40 @@
+<div class="billing-email billing-changes">
+  <div class="subject"><%= @subject %></div>
+  <div>Congratulations! Your team is growing! New people have joined or been added to Shape. These changes will be reflected in your monthly charge and next billing statment.</div>
+  <div>
+    <div class="organization-name"><%= @organization_name %></div>
+    <div>
+      <div class="section">
+        <div class="inner">
+          <div class="header">ACTIVE PEOPLE</div>
+          <dl>
+            <dt>New users:</dt>
+            <dd><%= @new_users_count %></dd>
+            <dt>Total users:</dt>
+            <dd><%= @total_users_count %></dd>
+          </dl>
+        </div>
+      </div>
+      <div class="section">
+        <div class="inner">
+          <div class="header">MONTHLY CHARGE</div>
+          <dl>
+            <dt><strong>Additional Monthly Charge:</strong></dt>
+            <dd><strong><%= number_to_currency(@additional_monthly_charge) %></strong></dd>
+            <dt>New total monthly charge:</dt>
+            <dd><%= number_to_currency(@next_monthly_charge) %></dd>
+            <dt>&nbsp;</dt>
+            <dd>&nbsp;</dd>
+            <dt class="subdue">Prorated charge this month:</dt>
+            <dd class="subdue"><%= number_to_currency(@prorated_charge_this_month) %></dd>
+            <dt>Next statement date:</dt>
+            <dd><%= @next_statement_date %></dd>
+          </dl>
+        </div>
+      </div>
+      <div class='email-link'>
+        <%= link_to "Go To Shape", @url %>
+      </div>
+    </div>
+  </div>
+</div>
