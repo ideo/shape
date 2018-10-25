@@ -226,9 +226,7 @@ class CollectionGrid extends React.Component {
       const onCancel = () => {
         this.positionCardsFromProps()
       }
-      if (!collection.showEditWarningDialog(onCancel, updateCollectionCard)) {
-        updateCollectionCard()
-      }
+      collection.confirmEdit({ onCancel, onConfirm: updateCollectionCard })
     } else {
       // reset back to normal
       this.positionCardsFromProps()

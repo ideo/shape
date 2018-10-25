@@ -94,7 +94,6 @@ class MoveModal extends React.Component {
       let successMessage
       switch (cardAction) {
         case 'move':
-          // TODO: wrap in apiStore actions that push the appropriate undoActions
           await apiStore.moveCards(data)
           successMessage = 'Items successfully moved!'
           break
@@ -153,9 +152,9 @@ class MoveModal extends React.Component {
       return "You can't move pinned template items out of a template"
     } else if (
       cardAction === 'useTemplate' &&
-      viewingCollection.id === movingFromCollection.id
+      viewingCollection.isMasterTemplate
     ) {
-      return "You can't create a template inside itself"
+      return "You can't create a template instance inside another template. You may be intending to create or duplicate a master template into here instead."
     }
     return ''
   }

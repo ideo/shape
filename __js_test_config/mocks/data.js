@@ -224,6 +224,7 @@ export const fakeCollection = {
   API_updateCards: jest.fn(),
   API_updateName: jest.fn(),
   checkCurrentOrg: jest.fn(),
+  confirmEdit: jest.fn(),
   cardProperties: [],
   internalType: 'collections',
   meta: {
@@ -233,6 +234,10 @@ export const fakeCollection = {
   },
   ...fakeJsonApiAttrs,
 }
+// also set parentCollection on fakeCard
+fakeCollectionCard.parentCollection = { ...fakeCollection }
+
+
 export const fakeGroupAttrs = {
   id: "1",
   name: 'IDEO Products',

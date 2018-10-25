@@ -17,7 +17,7 @@ class Collection
     end
 
     def reorder_cards!
-      return super.reorder_cards! unless profiles?
+      return super unless profiles?
       # profiles collection reorders alphabetically
       reorder_cards_by_collection_name!
     end

@@ -148,6 +148,19 @@ RSpec.describe CollectionCard, type: :model do
       it 'should duplicate item' do
         expect { duplicate_without_user }.to change(Item, :count).by(1)
       end
+
+      context 'in a master template' do
+        let(:collection) { collection_card.parent }
+
+        before do
+          collection.update(master_template: true)
+        end
+
+        it 'should call the UpdateTemplateInstancesWorker' do
+          expect(UpdateTemplateInstancesWorker).to receive(:perform_async).with(collection.id)
+          duplicate
+        end
+      end
     end
 
     context 'with pinned card from regular collection' do
@@ -368,9 +381,9 @@ RSpec.describe CollectionCard, type: :model do
   end
 
   context 'archiving' do
-    let(:collection) { create(:collection) }
-    let!(:collection_card_list) { create_list(:collection_card, 5, parent: collection) }
-    let(:collection_cards) { collection.collection_cards }
+    let(:collection) { create(:collection, num_cards: 5) }
+    # we grab these manually because archiving the cards will alter collection.collection_cards
+    let(:collection_cards) { CollectionCard.where(id: collection.collection_cards.map(&:id)) }
     let(:collection_card) { collection_cards.first }
 
     describe '#decrement_card_orders!' do
@@ -401,7 +414,7 @@ RSpec.describe CollectionCard, type: :model do
       it 'should decrement parent cached_card_count' do
         expect(collection.cached_card_count).to eq 5
         collection_card.archive!
-        expect(collection.cached_card_count).to eq 4
+        expect(collection.reload.cached_card_count).to eq 4
       end
     end
 
@@ -409,20 +422,28 @@ RSpec.describe CollectionCard, type: :model do
       let(:user) { create(:user) }
 
       it 'should archive all cards in the query' do
-        expect(collection).to receive(:touch)
+        expect_any_instance_of(Collection).to receive(:touch)
         expect {
           collection_cards.archive_all!(user_id: user.id)
         }.to change(CollectionCard.active, :count).by(collection_cards.count * -1)
-        # because this is the relation collection.collection_cards, it should now be empty
-        expect(collection_cards).to eq []
+        expect(collection.reload.collection_cards).to eq []
       end
 
-      it 'should call the background worker' do
+      it 'should call the CollectionCardArchiveWorker' do
         expect(CollectionCardArchiveWorker).to receive(:perform_async).with(
           collection_cards.map(&:id),
           user.id,
         )
         collection_cards.archive_all!(user_id: user.id)
+      end
+
+      context 'with a master template collection' do
+        let(:collection) { create(:collection, master_template: true, num_cards: 2) }
+
+        it 'should call the UpdateTemplateInstancesWorker' do
+          expect(UpdateTemplateInstancesWorker).to receive(:perform_async).with(collection.id)
+          collection_cards.archive_all!(user_id: user.id)
+        end
       end
     end
   end

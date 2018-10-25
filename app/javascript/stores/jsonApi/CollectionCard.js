@@ -225,6 +225,7 @@ class CollectionCard extends BaseRecord {
   // this could really be a static method now that it archives all selected cards
   async API_archive({ isReplacing = false } = {}) {
     const { selectedCardIds } = uiStore
+    const collection = this.parentCollection
 
     if (this.shouldShowArchiveWarning) {
       const popupAgreed = new Promise((resolve, reject) => {
@@ -232,8 +233,13 @@ class CollectionCard extends BaseRecord {
         const confirmText = 'Archive'
         let iconName = 'Archive'
         let onToggleSnoozeDialog = null
-        // check if multiple cards were selected
-        if (selectedCardIds.length > 1) {
+        if (collection.isMasterTemplate) {
+          prompt = collection.editWarningPrompt
+          onToggleSnoozeDialog = () => {
+            collection.toggleEditWarnings()
+          }
+        } else if (selectedCardIds.length > 1) {
+          // check if multiple cards were selected
           const removedCount = this.reselectOnlyEditableCards(selectedCardIds)
           prompt = 'Are you sure you want to archive '
           if (selectedCardIds.length > 1) {
@@ -252,15 +258,6 @@ class CollectionCard extends BaseRecord {
         } else if (this.isTestDesignCollection) {
           prompt = 'Are you sure you want to archive this test design?'
           prompt += ' It will close your feedback.'
-        } else if (this.parentCollection.isMasterTemplate) {
-          const numInstances = this.parentCollection.template_num_instances
-          prompt = 'Are you sure?'
-          prompt += ` ${numInstances} instance${
-            numInstances === 1 ? '' : 's'
-          } of this template will be affected.`
-          onToggleSnoozeDialog = () => {
-            this.parentCollection.toggleEditWarnings()
-          }
         }
         uiStore.confirm({
           prompt,
@@ -274,7 +271,6 @@ class CollectionCard extends BaseRecord {
       const agreed = await popupAgreed
       if (!agreed) return false
     }
-    const collection = this.parentCollection
     try {
       await this.apiStore.archiveCards({
         // turn into normal JS array

@@ -120,7 +120,8 @@ class ActivityAndNotificationBuilder < SimpleService
 
   def store_in_firestore
     return unless @created_notifications.present?
-    FirestoreBatchWriter.perform_async(
+    FirestoreBatchWriter.perform_in(
+      3.seconds,
       @created_notifications.compact.map(&:batch_job_identifier),
     )
   end

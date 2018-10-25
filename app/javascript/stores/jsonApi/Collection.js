@@ -59,23 +59,31 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     return false
   }
 
-  showEditWarningDialog(onCancel, onConfirm) {
-    if (!this.shouldShowEditWarning) return false
-    const iconName = 'Archive'
-    const confirmText = 'Continue'
+  get editWarningPrompt() {
     let prompt = 'Are you sure?'
     const num = this.template_num_instances
     prompt += ` ${num} ${pluralize('instance', num)}`
     prompt += ` of this template will be affected.`
+    return prompt
+  }
+
+  // confirmEdit will check if we're in a template and need to confirm changes,
+  // otherwise it will just call onConfirm()
+  confirmEdit({ onCancel, onConfirm }) {
+    if (!this.shouldShowEditWarning) return onConfirm()
+    const iconName = 'Archive'
+    const confirmText = 'Continue'
     const onToggleSnoozeDialog = () => {
       this.toggleEditWarnings()
     }
     uiStore.confirm({
-      prompt,
+      prompt: this.editWarningPrompt,
       confirmText,
       iconName,
       onToggleSnoozeDialog,
-      onCancel: () => onCancel(),
+      onCancel: () => {
+        if (onCancel) onCancel()
+      },
       onConfirm: () => onConfirm(),
     })
     return true
@@ -238,10 +246,12 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     const data = this.toJsonApi()
     delete data.relationships
     // attach nested attributes of cards
-    data.attributes.collection_cards_attributes = _.map(
-      this.collection_cards,
-      card => _.pick(card, ['id', 'order', 'width', 'height'])
-    )
+    if (this.collection_cards) {
+      data.attributes.collection_cards_attributes = _.map(
+        this.collection_cards,
+        card => _.pick(card, ['id', 'order', 'width', 'height'])
+      )
+    }
     return data
   }
 

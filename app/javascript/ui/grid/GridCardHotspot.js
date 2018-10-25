@@ -47,7 +47,11 @@ class GridCardHotspot extends React.Component {
   clickHotspot = () => {
     const { uiStore, card, position } = this.props
     const order = card.order + (position === 'right' ? 1 : 0)
-    uiStore.openBlankContentTool({ order })
+    const collection = card.parentCollection
+    // confirmEdit will check if we're in a template and need to confirm changes
+    collection.confirmEdit({
+      onConfirm: () => uiStore.openBlankContentTool({ order }),
+    })
   }
 
   render() {

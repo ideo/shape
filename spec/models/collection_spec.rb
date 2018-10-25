@@ -368,7 +368,17 @@ describe Collection, type: :model do
       collection.unarchive_cards!(cards, snapshot)
       cards.first.reload
       expect(cards.first.width).to eq 2
-      expect(cards.first.order).to eq 3
+      # should always reorder the cards
+      expect(cards.first.order).to eq 0
+    end
+
+    context 'with a master_template' do
+      let(:collection) { create(:collection, master_template: true, num_cards: 3) }
+
+      it 'should call the UpdateTemplateInstancesWorker' do
+        expect(UpdateTemplateInstancesWorker).to receive(:perform_async).with(collection.id)
+        collection.unarchive_cards!(cards, snapshot)
+      end
     end
   end
 

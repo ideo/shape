@@ -99,6 +99,10 @@ class CollectionCard < ApplicationRecord
     # now that the card exists, we can recalculate the breadcrumb
     cc.record.recalculate_breadcrumb!
     cc.increment_card_orders! if placement == 'beginning'
+    if parent.master_template?
+      # we just added a template card, so update the instances
+      parent.queue_update_template_instances
+    end
 
     cc
   end
@@ -182,11 +186,11 @@ class CollectionCard < ApplicationRecord
     ids = pluck(:id)
     # ensure we're now working with an unscoped AR::Relation
     cards = CollectionCard.where(id: ids)
-    # should generally only be the one parent collection
-    parents = cards.map(&:parent).uniq.compact
     cards.update_all(archived: true)
-    parents.each(&:touch)
+    # should generally only be the one parent collection, but an array to be safe
+    parents = cards.map(&:parent).uniq.compact
     parents.each do |parent|
+      parent.touch
       if parent.master_template?
         # we just archived a template card, so update the instances
         parent.queue_update_template_instances
@@ -194,6 +198,7 @@ class CollectionCard < ApplicationRecord
     end
     CollectionCardArchiveWorker.perform_async(
       ids,
+      # user_id is for the archive notification `actor`
       user_id,
     )
   end

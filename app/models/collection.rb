@@ -269,11 +269,13 @@ class Collection < ApplicationRecord
     # Upgrade to editor if provided
     for_user.upgrade_to_edit_role(c) if for_user.present?
 
-    CollectionCardDuplicationWorker.perform_async(
-      collection_cards.map(&:id),
-      c.id,
-      for_user.try(:id),
-    )
+    if collection_cards.any?
+      CollectionCardDuplicationWorker.perform_async(
+        collection_cards.map(&:id),
+        c.id,
+        for_user.try(:id),
+      )
+    end
 
     # pick up newly created relationships
     c.reload
@@ -334,9 +336,8 @@ class Collection < ApplicationRecord
         # have to reload in order to pick up new parent relationship
         card.item.reload.recalculate_breadcrumb!
       elsif card.collection_id.present?
-        BreadcrumbRecalculationWorker.perform_async(
-          card.collection.id,
-        )
+        # this method will run the async worker if there are >50 children
+        card.collection.recalculate_breadcrumb_tree!
       end
     end
   end
@@ -364,6 +365,10 @@ class Collection < ApplicationRecord
   def unarchive_cards!(cards, card_attrs_snapshot)
     cards.each(&:unarchive!)
     CollectionUpdater.call(self, card_attrs_snapshot)
+    reorder_cards!
+    # if snapshot includes card attrs then CollectionUpdater will trigger the same thing
+    return unless master_template? && card_attrs_snapshot[:collection_cards_attributes].blank?
+    queue_update_template_instances
   end
 
   def allow_primary_group_view_access

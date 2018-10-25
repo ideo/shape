@@ -37,6 +37,13 @@ module Templateable
     end
   end
 
+  # This gets called upon:
+  # - template card archive (CollectionCard.archive_all!)
+  # - template card unarchive (Collection.unarchive_cards!)
+  # - template card create (CollectionCardBuilder)
+  # - template card resize/move (CollectionUpdater)
+  # - duplicate template card (CollectionCard#duplicate)
+  # - move template card (CardMover)
   def queue_update_template_instances
     UpdateTemplateInstancesWorker.perform_async(id)
   end
@@ -44,8 +51,10 @@ module Templateable
   def update_template_instances
     templated_collections.active.each do |instance|
       move_cards_deleted_from_master_template(instance)
-      update_cards_on_template_instance(instance)
       add_cards_from_master_template(instance)
+      # important that update gets called after add, that way
+      # any new cards created above also adopt their new order
+      update_cards_on_template_instance(instance)
       instance.reorder_cards!
       instance.touch
     end
@@ -78,12 +87,15 @@ module Templateable
     return unless cards.present?
     deleted_cards_coll = instance.find_or_create_deleted_cards_collection
     transaction do
+      # TODO: do something here if the cards already exist in the deleted coll?
+      # e.g. when template editor archives/unarchives cards
       card_mover = CardMover.new(
         from_collection: instance,
         to_collection: deleted_cards_coll,
         cards: cards,
         placement: 'end',
         card_action: 'move',
+        user_initiated: false,
       )
       moved_cards = card_mover.call
       # card_mover will return false if error
@@ -96,6 +108,7 @@ module Templateable
       # Notify that cards have been moved
       moved_cards.each do |card|
         ActivityAndNotificationBuilder.call(
+          # TODO: this should really be whoever initiated the action
           actor: created_by || instance.created_by,
           organization: instance.organization,
           target: instance, # Assign as target so we can route to it
@@ -109,7 +122,7 @@ module Templateable
   end
 
   def find_or_create_deleted_cards_collection
-    coll = collections.find_by(name: 'Deleted From Template')
+    coll = deleted_cards_collection
     return coll if coll.present?
     builder = CollectionCardBuilder.new(
       params: {
@@ -122,6 +135,10 @@ module Templateable
       user: created_by,
     )
     return builder.collection_card.record if builder.create
+  end
+
+  def deleted_cards_collection
+    collections.find_by(name: 'Deleted From Template')
   end
 
   # The following methods map the difference between:
