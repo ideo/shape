@@ -13,7 +13,6 @@ class Collection
     belongs_to :collection_to_test, class_name: 'Collection', optional: true
 
     before_create :setup_default_status_and_questions, unless: :cloned_from_present?
-    #before_create :set_as_master_template, if: :parent_is_master_template?
     after_create :add_test_tag
     after_update :touch_test_design, if: :saved_change_to_test_status?
 
@@ -65,13 +64,14 @@ class Collection
         # Otherwise dupe this collection
         duplicate = super(args)
       end
-      return duplicate unless duplicate.persisted?
+
+      return duplicate if duplicate.new_record? || args[:parent].blank?
 
       if collection_to_test.present?
-        # Point to the parent as the one to test
-        duplicate.collection_to_test = parent
-      elsif !parent.master_template?
-        # Only prefix with 'Copy' if it isn't in a template
+        # Point to the new parent as the one to test
+        duplicate.collection_to_test = args[:parent]
+      elsif !args[:parent].master_template?
+        # Prefix with 'Copy' if it isn't still within a template
         duplicate.name = "Copy of #{name}"
       end
       duplicate.save
