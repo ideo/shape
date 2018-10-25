@@ -15,6 +15,8 @@ class CollectionTemplateBuilder
     return false unless create_collection
     place_collection_in_parent
     setup_template_cards
+    # mainly so template_num_instances will be refreshed in API cache
+    @template.touch
     # re-save to capture cover, new breadcrumb + tag lists
     @collection.cache_cover!
     @collection

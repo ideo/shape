@@ -134,9 +134,7 @@ class Activity extends React.PureComponent {
       case 'archived':
         return (
           <ActivityText>
-            <strong className="actor">{actorNames}</strong>
-            {` `}
-            has archived{' '}
+            <strong className="actor">{actorNames}</strong> has archived{' '}
             <strong className="target">
               &ldquo;
               {targetName}
@@ -147,13 +145,13 @@ class Activity extends React.PureComponent {
       case 'archived_from_template':
         return (
           <ActivityText>
+            {this.targetLink(targetName)} has been changed as a result of{' '}
             <strong className="source">
               &ldquo;
               {sourceName}
               &rdquo;
-            </strong>
-            was removed from the template by the template editor. This affected
-            {this.targetLink(targetName)}
+            </strong>{' '}
+            being removed from its template.
           </ActivityText>
         )
       case 'added_editor':

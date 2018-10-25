@@ -48,6 +48,11 @@ class CollectionCardBuilder
         @collection_card.parent.cache_cover! if @collection_card.should_update_parent_collection_cover?
         @collection_card.increment_card_orders!
         record.reload.recalculate_breadcrumb!
+
+        if @parent_collection.master_template?
+          # we just added a template card, so update the instances
+          @parent_collection.queue_update_template_instances
+        end
       end
     end
   end

@@ -187,6 +187,7 @@ class Collection < ApplicationRecord
       :created_by,
       :organization,
       :parent_collection_card,
+      :parent,
       :submissions_collection,
       :submission_template,
       :collection_to_test,
@@ -204,7 +205,7 @@ class Collection < ApplicationRecord
     [
       :created_by,
       :organization,
-      :parent_collection_card,
+      parent_collection_card: %i[parent],
       roles: %i[users groups resource],
       collection_cards: [
         :parent,

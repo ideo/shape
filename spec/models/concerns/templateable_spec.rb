@@ -167,7 +167,7 @@ describe Templateable, type: :concern do
             action: :archived_from_template,
             organization_id: template_instance.organization_id,
             actor_id: template_admin.id,
-            target_id: deleted_from_collection.id,
+            target_id: template_instance.id,
             target_type: 'Collection',
             source_id: deleted_item_in_instance.id,
             source_type: 'Item',
