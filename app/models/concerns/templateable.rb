@@ -124,6 +124,9 @@ module Templateable
     return builder.collection_card.record if builder.create
   end
 
+  # The following methods map the difference between:
+  # - pinned_cards on the master template
+  # - instance cards where templated_from_id == pinned.id
   def cards_removed_from_master_template(instance)
     instance.templated_cards_by_templated_from_id.slice(
       *(instance.templated_cards_by_templated_from_id.keys - pinned_cards_by_id.keys),
