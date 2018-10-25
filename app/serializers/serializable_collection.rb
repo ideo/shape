@@ -9,6 +9,7 @@ class SerializableCollection < BaseJsonSerializer
              :test_status, :collection_to_test_id
 
   has_one :parent_collection_card
+  has_one :parent
   has_one :live_test_collection
   belongs_to :submissions_collection
   belongs_to :submission_template
@@ -91,8 +92,8 @@ class SerializableCollection < BaseJsonSerializer
   end
 
   attribute :template_num_instances do
-    if @object.master_template
-      @object.templated_collections.count
+    if @object.master_template?
+      @object.templated_collections.active.count
     else
       0
     end

@@ -1,6 +1,7 @@
 import _ from 'lodash'
 import { observable, computed, action } from 'mobx'
 import { ReferenceType } from 'datx'
+import pluralize from 'pluralize'
 
 import { apiStore, routingStore, uiStore } from '~/stores'
 import BaseRecord from './BaseRecord'
@@ -63,9 +64,9 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     const iconName = 'Archive'
     const confirmText = 'Continue'
     let prompt = 'Are you sure?'
-    prompt += ` ${this.template_num_instances} instance${
-      this.template_num_instances === 1 ? '' : 's'
-    } of this template will be affected.`
+    const num = this.template_num_instances
+    prompt += ` ${num} ${pluralize('instance', num)}`
+    prompt += ` of this template will be affected.`
     const onToggleSnoozeDialog = () => {
       this.toggleEditWarnings()
     }

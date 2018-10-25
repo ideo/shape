@@ -18,6 +18,14 @@ const styles = {
 
 @withStyles(styles)
 class Tooltip extends React.PureComponent {
+  // using the @withStyles decorator, this syntax is more appropriate
+  static propTypes = {
+    classes: PropTypes.shape({
+      tooltip: PropTypes.string.isRequired,
+      open: PropTypes.string,
+    }).isRequired,
+  }
+
   render() {
     const { classes, ...otherProps } = this.props
     return (
@@ -29,13 +37,6 @@ class Tooltip extends React.PureComponent {
       />
     )
   }
-}
-
-Tooltip.propTypes = {
-  classes: PropTypes.shape({
-    tooltip: PropTypes.string,
-    open: PropTypes.string,
-  }).isRequired,
 }
 
 Tooltip.displayName = 'Tooltip'
