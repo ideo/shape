@@ -30,5 +30,8 @@ production:
     class: NetworkCreateUsageRecordWorker
   # after NetworkCreateUsageRecordWorker
   trail_users_count_exceeded:
-    cron: '40 21 * * *'
+    cron: '35 21 * * *'
     class: TrialUsersCountExceededWorker
+  trial_expired_worker:
+    cron: '40 21 * * *'
+    class: TrialExpiredWorker
