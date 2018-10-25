@@ -26,12 +26,12 @@ production:
     every: '4h'
     class: NotificationMailerWorker
   network_create_usage_record:
-    cron: '30 21 * * *'
+    cron: '0 18 * * * America/Los_Angeles'
     class: NetworkCreateUsageRecordWorker
   # after NetworkCreateUsageRecordWorker
   trial_users_count_exceeded_worker:
-    cron: '35 21 * * *'
+    cron: '5 18 * * * America/Los_Angeles'
     class: TrialUsersCountExceededWorker
   trial_expired_worker:
-    cron: '40 21 * * *'
+    cron: '10 18 * * * America/Los_Angeles'
     class: TrialExpiredWorker
