@@ -35,3 +35,6 @@ production:
   trial_expired_worker:
     cron: '10 18 * * * America/Los_Angeles'
     class: TrialExpiredWorker
+  trial_ending_soon_worker:
+    cron: '15 18 * * * America/Los_Angeles'
+    class: TrialEndingSoonWorker
