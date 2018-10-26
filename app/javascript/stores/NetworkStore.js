@@ -53,11 +53,11 @@ class NetworkStore extends jsonapi(Collection) {
     )
   }
 
-  loadSubscription(organization_id, skipCache = false) {
+  loadActiveSubscription(organization_id, skipCache = false) {
     return this.fetchAll(
       'subscriptions',
       {
-        filter: { organization_id },
+        filter: { organization_id, active: true },
       },
       {
         skipCache,
@@ -65,16 +65,22 @@ class NetworkStore extends jsonapi(Collection) {
     )
   }
 
-  loadInvoices(subscription_id) {
+  loadInvoices(organization_id) {
     return this.fetchAll('invoices', {
-      filter: { subscription_id },
+      filter: { organization_id },
       sort: 'period_start',
     })
   }
 
   loadInvoice(invoice_id) {
     this.fetch('invoices', invoice_id, {
-      include: ['organization', 'invoice_items', 'payment_methods'],
+      include: [
+        'organization',
+        'subscriptions',
+        'subscriptions.plan',
+        'invoice_items',
+        'payment_methods',
+      ],
     })
   }
 
@@ -83,7 +89,7 @@ class NetworkStore extends jsonapi(Collection) {
   }
 
   async updateSubscription(organization_id) {
-    await this.loadSubscription(organization_id)
+    await this.loadActiveSubscription(organization_id)
     if (!this.subscription.payment_method_id) {
       this.subscription.payment_method_id = this.defaultPaymentMethod.id
       await saveModel(this.subscription)

@@ -5,7 +5,7 @@ import trackError from '~/utils/trackError'
 import v from '~/utils/variables'
 import Box from '~shared/components/atoms/Box'
 
-@inject('apiStore', 'networkStore')
+@inject('networkStore')
 @observer
 class BillingStatement extends React.Component {
   componentWillMount() {
@@ -13,11 +13,9 @@ class BillingStatement extends React.Component {
   }
 
   async load() {
-    const { apiStore, networkStore, match } = this.props
+    const { networkStore, match } = this.props
 
     try {
-      await networkStore.loadOrganization(apiStore.currentUserOrganizationId)
-      await networkStore.loadSubscription(networkStore.organization.id)
       await networkStore.loadInvoice(match.params.id)
       this.forceUpdate()
     } catch (e) {
@@ -28,13 +26,12 @@ class BillingStatement extends React.Component {
   render() {
     const { networkStore, match } = this.props
     const invoice = networkStore.find('invoices', match.params.id)
-    const { organization, subscription } = networkStore
-    return invoice && organization && subscription ? (
+    return invoice ? (
       <Box mt={v.headerHeightCompact}>
         <PrintableInvoice
           invoice={invoice}
-          organization={networkStore.organization}
-          subscription={networkStore.subscription}
+          organization={invoice.organization}
+          subscription={invoice.subscriptions[0]}
           brandTitle="Shape"
           logo={
             'https://s3-us-west-2.amazonaws.com/assets.shape.space/logo_1x.png'
@@ -50,7 +47,6 @@ BillingStatement.propTypes = {
 }
 
 BillingStatement.wrappedComponent.propTypes = {
-  apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
   networkStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 
