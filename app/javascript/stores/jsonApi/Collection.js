@@ -1,5 +1,5 @@
 import _ from 'lodash'
-import { observable, computed, action } from 'mobx'
+import { observable, computed, action, runInAction } from 'mobx'
 import { ReferenceType } from 'datx'
 import pluralize from 'pluralize'
 
@@ -46,16 +46,26 @@ class Collection extends SharedRecordMixin(BaseRecord) {
 
   @action
   toggleEditWarnings() {
-    if (this.snoozedEditWarningsAt) this.snoozedEditWarningsAt = undefined
-    else this.snoozedEditWarningsAt = Date.now()
+    if (this.snoozedEditWarningsAt) {
+      this.snoozedEditWarningsAt = undefined
+    } else {
+      this.snoozedEditWarningsAt = Date.now()
+    }
+    uiStore.setSnoozeChecked(!!this.snoozedEditWarningsAt)
   }
 
   get shouldShowEditWarning() {
     if (!this.isMasterTemplate || this.template_num_instances === 0)
       return false
     const oneHourAgo = Date.now() - 1000 * 60 * 60
-    if (!this.snoozedEditWarningsAt || this.snoozedEditWarningsAt < oneHourAgo)
+    if (!this.snoozedEditWarningsAt) return true
+    if (this.snoozedEditWarningsAt < oneHourAgo) {
+      runInAction(() => {
+        // reset the state if time has elapsed, otherwise checkbox remains checked
+        this.snoozedEditWarningsAt = undefined
+      })
       return true
+    }
     return false
   }
 
@@ -80,7 +90,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
       prompt: this.editWarningPrompt,
       confirmText,
       iconName,
-      // TODO: also pass OUR collection snooze status
+      snoozeChecked: !this.shouldShowEditWarning,
       onToggleSnoozeDialog,
       onCancel: () => {
         if (onCancel) onCancel()

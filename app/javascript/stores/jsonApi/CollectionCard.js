@@ -232,8 +232,11 @@ class CollectionCard extends BaseRecord {
         let prompt = 'Are you sure you want to archive this?'
         const confirmText = 'Archive'
         let iconName = 'Archive'
+        let snoozeChecked = null
         let onToggleSnoozeDialog = null
         if (collection.isMasterTemplate) {
+          // Any way to DRY up with collection.confirmEdit?
+          snoozeChecked = collection.shouldShowEditWarning
           prompt = collection.editWarningPrompt
           onToggleSnoozeDialog = () => {
             collection.toggleEditWarnings()
@@ -264,6 +267,7 @@ class CollectionCard extends BaseRecord {
           confirmText,
           iconName,
           onToggleSnoozeDialog,
+          snoozeChecked,
           onCancel: () => resolve(false),
           onConfirm: () => resolve(true),
         })
