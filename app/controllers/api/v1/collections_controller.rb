@@ -54,6 +54,27 @@ class Api::V1::CollectionsController < Api::V1::BaseController
     render json: current_user.in_my_collection?(@collection)
   end
 
+  before_action :load_and_authorize_submission_box_copy, only: %i[duplicate_into_submission_box]
+  def duplicate_into_submission_box
+    # TODO: decide if this should be a service
+    dup = @template_card.duplicate!(
+      for_user: current_user,
+      parent: @submission_box,
+      placement: 'end',
+    )
+    dup.collection.add_submission_box_tag
+    dup.collection.remove_all_viewer_roles
+    dup.update(width: 1, height: 1)
+    # TODO: figure out best check here
+    if dup.persisted?
+      render jsonapi: @submission_box,
+             include: Collection.default_relationships_for_api,
+             meta: { new_card: dup.id.to_s }
+    else
+      render_api_errors dup.errors
+    end
+  end
+
   private
 
   def check_cache
@@ -74,6 +95,13 @@ class Api::V1::CollectionsController < Api::V1::BaseController
     # we are creating a template in this collection so authorize edit_content
     authorize! :edit_content, @parent_collection
     authorize! :read, @template_collection
+  end
+
+  def load_and_authorize_submission_box_copy
+    @submission_box = Collection.find(json_api_params[:to_id])
+    @template_card = CollectionCard.find(json_api_params[:collection_card_id])
+    authorize! :edit, @submission_box
+    authorize! :view, @template_card
   end
 
   def load_and_authorize_collection_update

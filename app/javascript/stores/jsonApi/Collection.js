@@ -100,7 +100,11 @@ class Collection extends SharedRecordMixin(BaseRecord) {
 
   get isUsableTemplate() {
     // you aren't allowed to use the profile template
-    return this.isMasterTemplate && !this.isProfileTemplate
+    return (
+      this.isMasterTemplate &&
+      !this.isProfileTemplate &&
+      !this.is_submission_box_template
+    )
   }
 
   get isLaunchableTest() {
@@ -282,6 +286,14 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     this.apiStore.request(
       `test_collections/${this.testCollectionId}/reopen`,
       'PATCH'
+    )
+  }
+
+  API_DuplicateIntoSubmissionBox(data) {
+    return this.apiStore.request(
+      `collections/duplicate_into_submission_box`,
+      'POST',
+      data
     )
   }
 

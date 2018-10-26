@@ -90,5 +90,9 @@ class SerializableCollection < BaseJsonSerializer
     @object.pinned_and_locked? || false
   end
 
+  attribute :is_submission_box_template do
+    @object.submission_box_template?
+  end
+
   has_many :roles
 end

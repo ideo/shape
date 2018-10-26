@@ -1,6 +1,7 @@
 import _ from 'lodash'
 import pluralize from 'pluralize'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
+import { observable, runInAction } from 'mobx'
 import styled from 'styled-components'
 
 import {
@@ -15,6 +16,7 @@ import AlertIcon from '~/ui/icons/AlertIcon'
 import AddTextIcon from '~/ui/icons/AddTextIcon'
 import AddFileIcon from '~/ui/icons/AddFileIcon'
 import AddLinkIcon from '~/ui/icons/AddLinkIcon'
+import InlineLoader from '~/ui/layout/InlineLoader'
 import TemplateIcon from '~/ui/icons/TemplateIcon'
 import Modal from '~/ui/global/modals/Modal'
 import v from '~/utils/variables'
@@ -42,6 +44,9 @@ const StyledTitleContent = styled.div`
 @inject('apiStore', 'uiStore', 'routingStore')
 @observer
 class SubmissionBoxSettingsModal extends React.Component {
+  @observable
+  loading = false
+
   componentDidMount() {
     const { apiStore } = this.props
     apiStore.fetchUsableTemplates()
@@ -122,12 +127,85 @@ class SubmissionBoxSettingsModal extends React.Component {
     callback()
   }
 
-  chooseTemplate = template => () => {
-    this.confirmSubmissionTemplateChange({ template }, () => {
-      this.updateCollection({
-        submission_template_id: template.id,
-        submission_box_type: 'template',
+  async copyTemplate(template) {
+    const { collection } = this.props
+    const card = template.parent_collection_card
+    const templateCollectionId = card.parent_id
+    const data = {
+      to_id: collection.id,
+      from_id: templateCollectionId,
+      collection_card_id: card.id,
+    }
+    const res = await collection.API_DuplicateIntoSubmissionBox(data)
+    const newTemplateId = res.meta.new_card
+    const newTemplate = collection.collection_cards.find(
+      ccard => ccard.id === newTemplateId
+    ).record
+    return newTemplate
+  }
+
+  get submissions() {
+    const { collection } = this.props
+    return collection.submissions_collection.collection_cards.map(
+      card => card.record
+    )
+  }
+
+  submissionsForTemplate(templateId) {
+    return this.submissions.filter(record => record.template_id === templateId)
+  }
+
+  async deleteUnusedTemplates(newTemplate) {
+    const { collection } = this.props
+    const currentTemplateCards = collection.collection_cards
+      .filter(card => card.record.isMasterTemplate)
+      .filter(card => card.record.id !== newTemplate.id)
+
+    await Promise.all(
+      currentTemplateCards.map(async templateCard => {
+        const submissions = this.submissionsForTemplate(
+          parseInt(templateCard.record.id)
+        )
+        if (!submissions.length) {
+          await templateCard.API_archiveSelf()
+        }
       })
+    )
+  }
+
+  async markSubmissionsInactive() {
+    const { submissions } = this
+    if (!submissions.length) return
+    await Promise.all(
+      submissions.map(async submission => {
+        if (submission.name.indexOf('[Inactive]') === -1) {
+          await submission.API_updateName(`[Inactive] ${submission.name}`)
+        }
+      })
+    )
+  }
+
+  chooseTemplate = template => () => {
+    const { uiStore } = this.props
+    this.confirmSubmissionTemplateChange({ template }, async () => {
+      runInAction(() => {
+        this.loading = true
+      })
+      try {
+        const newTemplate = await this.copyTemplate(template)
+        this.updateCollection({
+          submission_template_id: newTemplate.id,
+          submission_box_type: 'template',
+        })
+        await this.deleteUnusedTemplates(newTemplate)
+        await this.markSubmissionsInactive()
+      } catch (e) {
+        uiStore.alert('Unable to use that template')
+      } finally {
+        runInAction(() => {
+          this.loading = false
+        })
+      }
     })
   }
 
@@ -197,6 +275,7 @@ class SubmissionBoxSettingsModal extends React.Component {
   titleContent = () => (
     <StyledTitleContent>
       <Heading2>Submission Box Settings</Heading2>
+      {this.loading && <InlineLoader />}
       <Row>
         <span
           style={{

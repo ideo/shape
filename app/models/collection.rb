@@ -483,6 +483,14 @@ class Collection < ApplicationRecord
     collections.each(&:processing_done) if processing_status.nil?
   end
 
+  def global_collection?
+    type == 'Collection::Global'
+  end
+
+  def submission_box_template?
+    parent.is_a? Collection::SubmissionBox
+  end
+
   private
 
   def organization_blank?

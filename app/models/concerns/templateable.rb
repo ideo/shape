@@ -87,6 +87,18 @@ module Templateable
     save
   end
 
+  def add_submission_box_tag
+    # create the special #template tag
+    tag(
+      self,
+      with: 'submission_template',
+      on: :tags,
+    )
+    update_cached_tag_lists
+    # no good way around saving a 2nd time after_create
+    save
+  end
+
   # is this collection made from a template?
   def templated?
     template_id.present?
