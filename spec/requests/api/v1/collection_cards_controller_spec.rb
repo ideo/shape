@@ -79,9 +79,9 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
       end
 
       it 'creates record' do
-        expect {
+        expect do
           post(path, params: params)
-        }.to change(Item, :count).by(1)
+        end.to change(Item, :count).by(1)
       end
 
       it 'matches JSON schema' do
@@ -126,7 +126,7 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
     context 'with filestack file attrs' do
       let(:filename) { 'apple.jpg' }
       let(:filestack_file) { build(:filestack_file) }
-      let(:params_with_filestack_file) {
+      let(:params_with_filestack_file) do
         json_api_params(
           'collection_cards',
           'order': 1,
@@ -145,7 +145,7 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
             },
           },
         )
-      }
+      end
 
       it 'returns a 200' do
         post(path, params: params_with_filestack_file)
@@ -153,9 +153,9 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
       end
 
       it 'creates record' do
-        expect {
+        expect do
           post(path, params: params_with_filestack_file)
-        }.to change(FilestackFile, :count).by(1)
+        end.to change(FilestackFile, :count).by(1)
       end
 
       it 'has filename without extension as name' do
@@ -167,7 +167,7 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
 
     context 'with video url attributes' do
       let(:filename) { 'apple.jpg' }
-      let(:params_with_video_item) {
+      let(:params_with_video_item) do
         json_api_params(
           'collection_cards',
           order: 1,
@@ -182,7 +182,7 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
             thumbnail_url: 'https://img.youtube.com/vi/4r7wHMg5Yjg/hqdefault.jpg',
           },
         )
-      }
+      end
 
       it 'returns a 200' do
         post(path, params: params_with_video_item)
@@ -190,9 +190,9 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
       end
 
       it 'creates video item' do
-        expect {
+        expect do
           post(path, params: params_with_video_item)
-        }.to change(Item::VideoItem, :count).by(1)
+        end.to change(Item::VideoItem, :count).by(1)
       end
 
       it 'returns item with given video url' do
@@ -220,12 +220,10 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
         expect(response.status).to eq(200)
       end
 
-      it 'calls the Archive worker' do
-        expect(CollectionCardArchiveWorker).to receive(:perform_async).with(
-          collection_cards.map(&:id),
-          user.id,
-        )
-        patch(path, params: params)
+      it 'archives the cards' do
+        expect {
+          patch(path, params: params)
+        }.to change(CollectionCard.active, :count).by(-3)
       end
 
       it 'broadcasts collection updates' do
@@ -650,9 +648,9 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
       end
 
       it 'creates a new item' do
-        expect {
+        expect do
           patch(path, params: params)
-        }.to change(Item, :count).by(1)
+        end.to change(Item, :count).by(1)
       end
 
       it 'creates an activity' do
@@ -693,9 +691,9 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
         end
 
         it 'creates a QuestionItem card' do
-          expect {
+          expect do
             patch(path, params: params)
-          }.to change(Item::QuestionItem, :count).by(1)
+          end.to change(Item::QuestionItem, :count).by(1)
           expect(json['data']['attributes']['card_question_type']).to eq 'question_description'
         end
       end

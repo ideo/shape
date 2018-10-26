@@ -231,6 +231,10 @@ export const Checkbox = styled(MuiCheckbox)`
   &.checkbox--error {
     color: ${v.colors.alert};
   }
+  &.checkbox--white,
+  &.checkbox--checked-white {
+    color: white !important;
+  }
 `
 Checkbox.displayName = 'StyledCheckbox'
 
@@ -300,7 +304,7 @@ export const CommentForm = styled.form`
   z-index: ${v.zIndex.commentMentions};
   position: sticky;
   bottom: 0;
-  width: calc(100% - 10px);
+  width: 100%;
   border-top: 4px solid ${v.colors.secondaryDark};
   background: ${v.colors.secondaryDark};
   background: linear-gradient(
@@ -318,8 +322,7 @@ export const CommentForm = styled.form`
   .textarea-input {
     background: ${v.colors.secondaryMedium};
     font-family: ${v.fonts.sans};
-    margin: 0 5px 0 10px;
-    width: calc(100% - 10px);
+    width: 100%;
   }
 `
 CommentForm.displayName = 'CommentForm'

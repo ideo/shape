@@ -37,10 +37,22 @@ class Item
       question_clarity: 7,
       question_excitement: 8,
       question_different: 9,
+      question_category_satisfaction: 10,
     }
 
     def self.unanswerable_question_types
       %i[question_media question_description question_finish]
+    end
+
+    def scale_question?
+      %(
+        question_context
+        question_useful
+        question_excitement
+        question_different
+        question_clarity
+        question_category_satisfaction
+      ).include? question_type.to_s
     end
 
     def requires_roles?

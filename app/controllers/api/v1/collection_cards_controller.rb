@@ -30,7 +30,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
       else
         create_notification(card, :created)
       end
-      render jsonapi: card,
+      render jsonapi: card.reload,
              include: [:parent, record: [:filestack_file]],
              expose: { current_record: card.record }
     else
@@ -50,7 +50,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
   def update
     @collection_card.attributes = collection_card_update_params
     if @collection_card.save
-      render jsonapi: @collection_card
+      render jsonapi: @collection_card.reload
     else
       render_api_errors @collection_card.errors
     end
@@ -59,10 +59,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
   before_action :load_and_authorize_cards, only: %i[archive unarchive]
   after_action :broadcast_collection_archive_updates, only: %i[archive unarchive]
   def archive
-    CollectionCardArchiveWorker.perform_async(
-      @collection_cards.pluck(:id),
-      current_user.id,
-    )
+    @collection_cards.archive_all!(user_id: current_user.id)
     render json: { archived: true }
   end
 
@@ -206,7 +203,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
   end
 
   def create_notification(card, action)
-    # only notify for archiving of collections (and not link cards)
+    # Only notify for archiving of collections (and not link cards)
     return if card.link?
     ActivityAndNotificationBuilder.call(
       actor: current_user,
@@ -245,6 +242,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
       :width,
       :height,
       :image_contain,
+      :is_cover,
     )
   end
 

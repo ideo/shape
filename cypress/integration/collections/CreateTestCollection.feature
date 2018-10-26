@@ -2,10 +2,10 @@ Feature: Creating a Test Collection
 
   Scenario: Adding the test collection via the BCT
     Given I login and visit the Test Area
-    When I create a test collection named "Feedback Prototype"
-    Then I should see a collection card named "Feedback Prototype"
-    When I navigate to the collection named "Feedback Prototype" via the "CollectionCover"
-    Then I should see "Feedback Prototype" in a "EditableNameHeading"
+    When I create a test collection named "Test Prototype"
+    Then I should see a collection card named "Test Prototype"
+    When I navigate to the collection named "Test Prototype" via the "CollectionCover"
+    Then I should see "Test Prototype" in a "EditableNameHeading"
     # verify the existence of the default questions
     Then I should see "Photo or Video of Idea" in a "QuestionSelectOption"
     Then I should see "Idea Description" in a "QuestionSelectOption"
@@ -17,9 +17,15 @@ Feature: Creating a Test Collection
     And I add a test description
     And I add an open response question
     When I click the "HeaderFormButton" containing "Get Feedback"
-    Then I should see "Are you sure?" in a "ConfirmPrompt"
-
-    When I click the "ConfirmButton" containing "Launch"
     And I wait for "@apiLaunchTest" to finish
+
+    Then I should see "Usefulness" in a "ChartItemCover"
     # assuming the collection cover is not truncated...
-    Then I should see a collection card named "Feedback Prototype Feedback Design"
+    Then I should see a collection card named "Test Prototype Feedback Design"
+    Then I should see "Get Link" in a "HeaderFormButton"
+    Then I should see "Stop Feedback" in a "HeaderFormButton"
+
+    # NOTE: seemingly no way to test clipboard copying in cypress (i.e. "Get Link")
+    When I capture the current URL
+    And I visit the current Test URL
+    Then I should see a "StandaloneTestSurvey"

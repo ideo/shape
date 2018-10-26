@@ -82,21 +82,26 @@ class ChartItemCover extends React.Component {
   }
 
   get mapQuestionType() {
-    const { questionTitle, questionText } = questionInformation(
-      this.question.question_type
-    )
+    const { questionTitle } = questionInformation(this.question)
+    let { questionText } = questionInformation(this.question)
+    if (this.question.question_type === 'question_category_satisfaction') {
+      questionText += ` ${this.question.content}`
+    }
+
     return { questionTitle, questionText }
   }
 
   get emojiScale() {
     if (!this.question) return []
-    const { emojiSeries } = questionInformation(this.question.question_type)
+    const { emojiSeries } = questionInformation(this.question)
     return emojiSeries
   }
 
   render() {
+    const currentOrgName = apiStore.currentUserOrganization.name
+    const { testCollection } = this.props
     return (
-      <CoverContainer>
+      <CoverContainer data-cy="ChartItemCover">
         {this.question && (
           <div>
             <Heading1>{this.mapQuestionType.questionTitle}</Heading1>
@@ -174,7 +179,10 @@ class ChartItemCover extends React.Component {
             padding={0}
             rowGutter={0}
             style={{ fill: 'white' }}
-            data={[{ name: 'Age test' }, { name: 'IDEO Organization' }]}
+            data={[
+              { name: testCollection.name },
+              { name: `${currentOrgName} Organization` },
+            ]}
           />
         </VictoryChart>
       </CoverContainer>
@@ -184,6 +192,7 @@ class ChartItemCover extends React.Component {
 
 ChartItemCover.propTypes = {
   item: MobxPropTypes.objectOrObservableObject.isRequired,
+  testCollection: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 
 export default ChartItemCover

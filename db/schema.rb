@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20181015181308) do
+ActiveRecord::Schema.define(version: 20181018175707) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -62,6 +62,7 @@ ActiveRecord::Schema.define(version: 20181015181308) do
     t.datetime "archived_at"
     t.string "archive_batch"
     t.boolean "image_contain", default: false
+    t.boolean "is_cover", default: false
     t.index ["collection_id"], name: "index_collection_cards_on_collection_id"
     t.index ["item_id"], name: "index_collection_cards_on_item_id"
     t.index ["parent_id"], name: "index_collection_cards_on_parent_id"
@@ -90,6 +91,7 @@ ActiveRecord::Schema.define(version: 20181015181308) do
     t.integer "processing_status"
     t.integer "question_item_id"
     t.bigint "test_collection_id"
+    t.bigint "collection_to_test_id"
     t.index ["breadcrumb"], name: "index_collections_on_breadcrumb", using: :gin
     t.index ["cloned_from_id"], name: "index_collections_on_cloned_from_id"
     t.index ["organization_id"], name: "index_collections_on_organization_id"
@@ -255,8 +257,10 @@ ActiveRecord::Schema.define(version: 20181015181308) do
     t.datetime "updated_at", null: false
     t.text "session_uid"
     t.integer "status", default: 0
+    t.bigint "user_id"
     t.index ["session_uid"], name: "index_survey_responses_on_session_uid", unique: true
     t.index ["test_collection_id"], name: "index_survey_responses_on_test_collection_id"
+    t.index ["user_id"], name: "index_survey_responses_on_user_id"
   end
 
   create_table "taggings", id: :serial, force: :cascade do |t|

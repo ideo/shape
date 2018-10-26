@@ -27,11 +27,11 @@ describe('TestSurveyPage', () => {
       wrapper = shallow(<TestSurveyPage {...props} />)
     })
 
-    it('renders StyledSurveyClosed', () => {
-      expect(wrapper.find('StyledSurveyClosed').exists()).toEqual(true)
+    it('renders SurveyClosed', () => {
+      expect(wrapper.find('SurveyClosed').exists()).toEqual(true)
       expect(
         wrapper
-          .find('StyledSurveyClosed')
+          .find('SurveyClosed')
           .find('LearnMoreLink')
           .exists()
       ).toEqual(true)

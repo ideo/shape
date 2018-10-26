@@ -9,9 +9,10 @@ import FinishQuestion from '~/ui/test_collections/FinishQuestion'
 import NewQuestionGraphic from '~/ui/icons/NewQuestionGraphic'
 import ScaleQuestion from '~/ui/test_collections/ScaleQuestion'
 import OpenQuestion from '~/ui/test_collections/OpenQuestion'
+import { QuestionText } from '~/ui/test_collections/shared'
 import { apiStore, uiStore } from '~/stores'
+// NOTE: Always import these models after everything else, can lead to odd dependency!
 import QuestionAnswer from '~/stores/jsonApi/QuestionAnswer'
-import { QuestionText, questionInformation } from './shared'
 
 const QuestionHolder = styled.div`
   display: flex;
@@ -31,7 +32,7 @@ class TestQuestion extends React.Component {
       item,
       editing,
       createSurveyResponse,
-      handleQuestionAnswerCreatedForCard,
+      afterQuestionAnswered,
     } = this.props
     let { surveyResponse, questionAnswer } = this.props
     // components should never trigger this when editing, but double-check here
@@ -52,34 +53,31 @@ class TestQuestion extends React.Component {
       )
       questionAnswer.survey_response = surveyResponse
       await questionAnswer.API_create()
-      handleQuestionAnswerCreatedForCard(card)
     } else {
+      // needs to be attached in order to provide the session_uid
+      if (surveyResponse) questionAnswer.survey_response = surveyResponse
       // update values on existing answer and save
       await questionAnswer.API_update({
         answer_text: text,
         answer_number: number,
       })
     }
+    afterQuestionAnswered(card)
   }
 
   renderQuestion() {
     const { parent, card, item, editing, questionAnswer, canEdit } = this.props
     let inner
-
-    const { emojiSeriesName, questionText } = questionInformation(
-      item.question_type
-    )
-
     switch (card.card_question_type) {
       case 'question_useful':
       case 'question_clarity':
       case 'question_excitement':
       case 'question_context':
       case 'question_different':
+      case 'question_category_satisfaction':
         return (
           <ScaleQuestion
-            questionText={questionText}
-            emojiSeries={emojiSeriesName}
+            question={item}
             editing={editing}
             questionAnswer={questionAnswer}
             onAnswer={this.handleQuestionAnswer}
@@ -161,7 +159,7 @@ TestQuestion.propTypes = {
   surveyResponse: MobxPropTypes.objectOrObservableObject,
   questionAnswer: MobxPropTypes.objectOrObservableObject,
   createSurveyResponse: PropTypes.func,
-  handleQuestionAnswerCreatedForCard: PropTypes.func,
+  afterQuestionAnswered: PropTypes.func,
   canEdit: PropTypes.bool,
 }
 
@@ -169,7 +167,7 @@ TestQuestion.defaultProps = {
   surveyResponse: null,
   questionAnswer: null,
   createSurveyResponse: null,
-  handleQuestionAnswerCreatedForCard: null,
+  afterQuestionAnswered: null,
   canEdit: false,
 }
 

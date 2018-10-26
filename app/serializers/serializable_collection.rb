@@ -6,11 +6,14 @@ class SerializableCollection < BaseJsonSerializer
   attributes :created_at, :updated_at, :name, :organization_id,
              :master_template, :template_id,
              :submission_box_type, :submission_box_id, :submission_template_id,
-             :test_status
+             :test_status, :collection_to_test_id
 
   has_one :parent_collection_card
+  has_one :parent
+  has_one :live_test_collection
   belongs_to :submissions_collection
   belongs_to :submission_template
+  belongs_to :collection_to_test
 
   attribute :system_required do
     @object.system_required?
@@ -45,6 +48,10 @@ class SerializableCollection < BaseJsonSerializer
 
   belongs_to :organization
   belongs_to :created_by
+
+  attribute :collection_card_count do
+    @object.cached_card_count || 0
+  end
 
   has_many :collection_cards do
     data do
@@ -82,6 +89,14 @@ class SerializableCollection < BaseJsonSerializer
   attribute :pinned_and_locked do
     # might be nil, particularly in tests
     @object.pinned_and_locked? || false
+  end
+
+  attribute :template_num_instances do
+    if @object.master_template?
+      @object.templated_collections.active.count
+    else
+      0
+    end
   end
 
   has_many :roles

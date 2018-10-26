@@ -20,7 +20,8 @@ class Collection < ApplicationRecord
                  :cached_cover,
                  :cached_tag_list,
                  :cached_owned_tag_list,
-                 :cached_org_properties
+                 :cached_org_properties,
+                 :cached_card_count
 
   # callbacks
   after_commit :touch_related_cards, if: :saved_change_to_updated_at?, unless: :destroyed?
@@ -77,6 +78,17 @@ class Collection < ApplicationRecord
            through: :collection_cards,
            source: :collection
 
+  has_many :test_collections,
+           inverse_of: :collection_to_test,
+           foreign_key: :collection_to_test_id,
+           class_name: 'Collection::TestCollection'
+
+  has_one :live_test_collection,
+          -> { where(test_status: :live) },
+          inverse_of: :collection_to_test,
+          foreign_key: :collection_to_test_id,
+          class_name: 'Collection::TestCollection'
+
   has_one :comment_thread, as: :record, dependent: :destroy
 
   delegate :parent, :pinned, :pinned?, :pinned_and_locked?,
@@ -87,7 +99,7 @@ class Collection < ApplicationRecord
   belongs_to :created_by, class_name: 'User', optional: true
   belongs_to :question_item, class_name: 'Item::QuestionItem', optional: true
 
-  validates :name, presence: true, if: :base_collection_type?
+  validates :name, presence: true
   before_validation :inherit_parent_organization_id, on: :create
 
   scope :root, -> { where('jsonb_array_length(breadcrumb) = 1') }
@@ -175,8 +187,11 @@ class Collection < ApplicationRecord
       :created_by,
       :organization,
       :parent_collection_card,
+      :parent,
       :submissions_collection,
       :submission_template,
+      :collection_to_test,
+      :live_test_collection,
       roles: %i[users groups resource],
       collection_cards: [
         :parent,
@@ -190,7 +205,7 @@ class Collection < ApplicationRecord
     [
       :created_by,
       :organization,
-      :parent_collection_card,
+      parent_collection_card: %i[parent],
       roles: %i[users groups resource],
       collection_cards: [
         :parent,
@@ -213,7 +228,7 @@ class Collection < ApplicationRecord
   end
 
   def duplicate!(
-    for_user:,
+    for_user: nil,
     copy_parent_card: false,
     parent: self.parent
   )
@@ -222,6 +237,7 @@ class Collection < ApplicationRecord
     c.cloned_from = self
     c.created_by = for_user
     c.tag_list = tag_list
+
     # copy organization_id from the collection this is being moved into
     # NOTE: parent is only nil in Colab import -- perhaps we should clean up any Colab import specific code?
     c.organization_id = parent.try(:organization_id) || organization_id
@@ -247,14 +263,13 @@ class Collection < ApplicationRecord
 
     c.enable_org_view_access_if_allowed(parent)
 
-    # upgrade to editor unless we're setting up a templated collection
-    for_user.upgrade_to_edit_role(c)
-    c.setup_submissions_collection! if is_a?(Collection::SubmissionBox)
+    # Upgrade to editor if provided
+    for_user.upgrade_to_edit_role(c) if for_user.present?
 
     CollectionCardDuplicationWorker.perform_async(
       collection_cards.map(&:id),
-      for_user.id,
       c.id,
+      for_user.try(:id),
     )
 
     # pick up newly created relationships
@@ -295,6 +310,10 @@ class Collection < ApplicationRecord
     nil
   end
 
+  def collection_to_test
+    nil
+  end
+
   def resourceable_class
     # Use top-level class since this is an STI model
     Collection
@@ -329,13 +348,13 @@ class Collection < ApplicationRecord
   # convenience method if card order ever gets out of sync
   def reorder_cards!
     all_collection_cards.active.order(pinned: :desc, order: :asc).each_with_index do |card, i|
-      card.update_attribute(:order, i) unless card.order == i
+      card.update_column(:order, i) unless card.order == i
     end
   end
 
   def reorder_cards_by_collection_name!
     all_collection_cards.active.includes(:collection).order('collections.name ASC').each_with_index do |card, i|
-      card.update_attribute(:order, i) unless card.order == i
+      card.update_column(:order, i) unless card.order == i
     end
   end
 
@@ -396,13 +415,18 @@ class Collection < ApplicationRecord
     save
   end
 
+  def cache_card_count!
+    # not using the store_accessor directly here because of:
+    # https://github.com/rails/rails/pull/32563
+    self.cached_attributes ||= {}
+    self.cached_attributes['cached_card_count'] = collection_cards.count
+    # update without callbacks/timestamps
+    update_column :cached_attributes, cached_attributes
+  end
+
   def update_cover_text!(text_item)
     cached_cover['text'] = CollectionCover.cover_text(self, text_item)
     save
-  end
-
-  def base_collection_type?
-    self.class.name == 'Collection'
   end
 
   def org_templates?

@@ -1,10 +1,9 @@
 class SerializableCollectionCard < BaseJsonSerializer
   type 'collection_cards'
   attributes :order, :width, :height, :parent_id, :type, :pinned,
-             :image_contain, :card_question_type
+             :image_contain, :card_question_type, :is_cover
 
   attribute :pinned_and_locked do
-    # rename attr to be without the "?"
     @object.pinned_and_locked?
   end
   attribute :link do

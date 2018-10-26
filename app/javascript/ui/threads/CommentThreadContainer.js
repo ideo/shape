@@ -1,4 +1,5 @@
 import { Fragment } from 'react'
+import PropTypes from 'prop-types'
 import { computed, observable, observe, runInAction } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import { Element as ScrollElement, scroller } from 'react-scroll'
@@ -7,6 +8,7 @@ import FlipMove from 'react-flip-move'
 import _ from 'lodash'
 import pluralize from 'pluralize'
 import styled from 'styled-components'
+import Truncator from 'react-truncator'
 
 import { ActivityContainer } from '~/ui/global/styled/layout'
 import GoIcon from '~/ui/icons/GoIcon'
@@ -21,18 +23,19 @@ function pluralTypeName(name) {
 
 const GoIconContainer = styled.span`
   display: inline-block;
-  margin-bottom: 1px;
   margin-right: 8px;
   vertical-align: middle;
-  width: 15px;
+  width: 12px;
 `
 
 const JumpButton = styled.button`
+  left: 100px;
   min-height: 20px;
-  margin-left: auto;
-  margin-right: auto;
-  margin-top: -30px;
+  margin-top: -33px;
+  position: relative;
+  text-align: center;
   visibility: ${props => props.hide};
+  width: calc(100% - 140px);
 `
 
 @inject('apiStore', 'uiStore')
@@ -148,8 +151,10 @@ class CommentThreadContainer extends React.Component {
   handleExpandedThreadChange = async (expandedThreadKey, prevKey) => {
     const thread = this.threads.filter(t => t.key === expandedThreadKey)[0]
     if (!thread) return
+    // no change
+    if (thread.id && expandedThreadKey === prevKey) return
     // don't try to load comments of our newly constructed threads
-    if (thread.persisted && thread.id && expandedThreadKey !== prevKey) {
+    if (thread.persisted) {
       runInAction(() => {
         this.loadingThreads = true
       })
@@ -160,9 +165,9 @@ class CommentThreadContainer extends React.Component {
           this.loadingThreads = false
         })
       }
-      // scroll again after any more comments have loaded
-      this.scrollToTopOfNextThread(thread)
     }
+    // scroll again after any more comments have loaded
+    this.scrollToTopOfNextThread(thread)
   }
 
   get threads() {
@@ -177,7 +182,11 @@ class CommentThreadContainer extends React.Component {
   @computed
   get showJumpToThreadButton() {
     const { apiStore, uiStore } = this.props
-    if (!uiStore.viewingRecord || !uiStore.viewingRecord.isNormalCollection)
+    const { viewingRecord, viewingCollection } = uiStore
+    if (
+      !viewingRecord ||
+      (viewingCollection && !viewingCollection.isNormalCollection)
+    )
       return false
     const thread = apiStore.findThreadForRecord(uiStore.viewingRecord)
     const idx = this.threads.indexOf(thread)
@@ -206,7 +215,7 @@ class CommentThreadContainer extends React.Component {
     })
   }
 
-  contentHeight = () => this.containerDiv.clientHeight
+  contentHeight = () => (this.containerDiv ? this.containerDiv.clientHeight : 0)
 
   expandThread = thread => () => {
     const { uiStore } = this.props
@@ -279,7 +288,7 @@ class CommentThreadContainer extends React.Component {
     ))
 
   render() {
-    const { uiStore } = this.props
+    const { uiStore, parentWidth } = this.props
     const hideJumpButton = this.showJumpToThreadButton ? 'visible' : 'hidden'
     return (
       <Fragment>
@@ -292,7 +301,14 @@ class CommentThreadContainer extends React.Component {
             <GoIconContainer>
               <GoIcon />
             </GoIconContainer>
-            Go to {uiStore.viewingRecord && uiStore.viewingRecord.name}
+            <Truncator
+              text={`
+                Go to ${uiStore.viewingRecord && uiStore.viewingRecord.name}
+              `}
+              key="jumpbutton"
+              overrideWidth={parentWidth > 600 ? parentWidth : parentWidth - 90}
+              overrideStyle={{ display: 'inline-block' }}
+            />
           </SmallActionText>
         </JumpButton>
         <div
@@ -311,7 +327,10 @@ class CommentThreadContainer extends React.Component {
             />
           ))}
         </div>
-        <ActivityContainer id={this.scrollOpts.containerId}>
+        <ActivityContainer
+          moving={uiStore.activityLogMoving}
+          id={this.scrollOpts.containerId}
+        >
           {this.loadingThreads && <InlineLoader fixed background="none" />}
           <FlipMove disableAllAnimations={!!uiStore.expandedThreadKey}>
             {this.renderThreads()}
@@ -334,6 +353,9 @@ class CommentThreadContainer extends React.Component {
   }
 }
 
+CommentThreadContainer.propTypes = {
+  parentWidth: PropTypes.number.isRequired,
+}
 CommentThreadContainer.wrappedComponent.propTypes = {
   apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,

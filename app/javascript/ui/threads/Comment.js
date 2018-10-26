@@ -4,6 +4,7 @@ import { PropTypes as MobxPropTypes } from 'mobx-react'
 import { EditorState, convertFromRaw } from 'draft-js'
 import Editor from 'draft-js-plugins-editor'
 import createMentionPlugin from 'draft-js-mention-plugin'
+import createLinkifyPlugin from 'draft-js-linkify-plugin'
 
 import v from '~/utils/variables'
 import { DisplayText } from '~/ui/global/styled/typography'
@@ -27,6 +28,12 @@ const StyledComment = StyledCommentInput.extend`
   .message {
     font-family: ${v.fonts.sans};
     margin-top: 5px;
+    a,
+    a:hover,
+    a:active,
+    a:visited {
+      color: ${v.colors.ctaPrimary};
+    }
   }
 `
 
@@ -34,6 +41,7 @@ class Comment extends React.Component {
   constructor(props) {
     super(props)
     this.mentionPlugin = createMentionPlugin()
+    this.linkifyPlugin = createLinkifyPlugin({ target: '_blank' })
     this.state = {
       editorState: EditorState.createEmpty(),
     }
@@ -56,7 +64,7 @@ class Comment extends React.Component {
       // otherwise this use case will go away
       return comment.message
     }
-    const plugins = [this.mentionPlugin]
+    const plugins = [this.mentionPlugin, this.linkifyPlugin]
     return (
       <Editor
         readOnly

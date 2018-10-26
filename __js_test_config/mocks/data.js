@@ -4,6 +4,7 @@ const fakeJsonApiAttrs = {
   assign: jest.fn(),
   assignRef: jest.fn(),
   save: jest.fn(),
+  disableMenu: jest.fn(),
 }
 export const fakeCollectionCard = {
   id: "11",
@@ -163,6 +164,7 @@ export const fakeQuestionItem = {
   question_type: 'question_description',
   rawAttributes: jest.fn().mockReturnValue(fakeTextItemAttrs),
   getRecordType: jest.fn().mockReturnValue('items'),
+  ...fakeJsonApiAttrs,
 }
 
 export const fakeQuestionAnswer = {
@@ -222,6 +224,7 @@ export const fakeCollection = {
   API_updateCards: jest.fn(),
   API_updateName: jest.fn(),
   checkCurrentOrg: jest.fn(),
+  cardProperties: [],
   internalType: 'collections',
   meta: {
     snapshot: {
@@ -308,7 +311,7 @@ export const fakePosition = {
 export const fakeComment = {
   id: "1",
   author: fakeUser,
-  message: 'This is my message to the world.',
+  message: 'This is my message to the world. Go to the source: https://www.ideo.com',
   updated_at: new Date(),
 }
 export const fakeThread = {

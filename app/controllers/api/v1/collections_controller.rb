@@ -111,6 +111,7 @@ class Api::V1::CollectionsController < Api::V1::BaseController
       :tag_list,
       :submission_template_id,
       :submission_box_type,
+      :collection_to_test_id,
       collection_cards_attributes: %i[id order width height],
     )
   end

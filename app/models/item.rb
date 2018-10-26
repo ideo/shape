@@ -42,7 +42,7 @@ class Item < ApplicationRecord
   scope :questions, -> { where(type: 'Item::QuestionItem') }
 
   before_validation :format_url, if: :saved_change_to_url?
-  before_create :generate_name, unless: :name?
+  before_create :generate_name, unless: :name_present?
 
   validates :type, presence: true
 
@@ -68,7 +68,7 @@ class Item < ApplicationRecord
   end
 
   def duplicate!(
-    for_user:,
+    for_user: nil,
     copy_parent_card: false,
     parent: self.parent
   )
@@ -97,7 +97,7 @@ class Item < ApplicationRecord
       i.roles << role.duplicate!(assign_resource: i)
     end
     # upgrade to editor unless we're setting up a templated collection
-    for_user.upgrade_to_edit_role(i)
+    for_user.upgrade_to_edit_role(i) if for_user.present?
 
     # Method from HasFilestackFile
     filestack_file_duplicate!(i)
@@ -193,6 +193,10 @@ class Item < ApplicationRecord
   end
 
   private
+
+  def name_present?
+    name.present?
+  end
 
   def reindex_parent_collection
     return if @dont_reindex_parent || !Searchkick.callbacks? || parent.blank?

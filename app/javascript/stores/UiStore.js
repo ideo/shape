@@ -86,6 +86,7 @@ export default class UiStore {
     confirmText: 'OK',
     cancelText: 'Cancel',
     fadeOutTime: undefined,
+    onToggleSnoozeDialog: null,
     onClose: () => this.closeDialog(),
   }
   defaultSnackbarProps = {
@@ -112,6 +113,8 @@ export default class UiStore {
   activityLogPosition = { x: 0, y: 0, w: 1, h: 1 }
   @observable
   activityLogPage = 'comments'
+  @observable
+  activityLogMoving = false
   @observable
   windowWidth = 0
 
@@ -440,19 +443,9 @@ export default class UiStore {
   @action
   openOptionalMenus(params) {
     const opts = queryString.parse(params)
-    if (opts) {
-      switch (opts.open) {
-        case 'comments':
-          this.activityLogPage = 'comments'
-          this.activityLogOpen = true
-          break
-        case 'notifications':
-          this.activityLogPage = 'notifications'
-          this.activityLogOpen = true
-          break
-        default:
-          break
-      }
+    if (opts && opts.open) {
+      this.activityLogPage = opts.open
+      this.activityLogOpen = true
     }
     return opts.open
   }
@@ -514,6 +507,8 @@ export default class UiStore {
 
   @action
   expandThread(key, { reset = false } = {}) {
+    // when we expand a thread we also want it to set the ActivityLog to Comments
+    this.update('activityLogPage', 'comments')
     // reset it first, that way if it's expanded offscreen, it will get re-opened/scrolled to
     if (reset) this.expandedThreadKey = null
     this.expandedThreadKey = key

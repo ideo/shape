@@ -1,8 +1,9 @@
 import PropTypes from 'prop-types'
-import { Fragment } from 'react'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 import Dotdotdot from 'react-dotdotdot'
+import Hypher from 'hypher'
+import english from 'hyphenation.en-us'
 
 import v from '~/utils/variables'
 import PlainLink from '~/ui/global/PlainLink'
@@ -93,25 +94,46 @@ const StyledCardContent = styled.div`
 StyledCardContent.displayName = 'StyledCardContent'
 
 const PositionedCardHeading = CardHeading.extend`
-  position: absolute;
   bottom: 0;
+  position: absolute;
 `
 
 function splitName(name) {
   return name.split(' ')
 }
 
+const Hyphy = new Hypher(english)
+function hyphenate(namePart) {
+  const hyphenated = Hyphy.hyphenateText(namePart, 14)
+  // u00AD is the "soft" hyphenation character Hypher uses
+  if (!hyphenated.includes('\u00AD')) return namePart
+  const parts = hyphenated.split('\u00AD')
+  return `${parts.slice(0, -1).join('')}\u00AD${parts.slice(-1)}`
+}
+
+function namePartTooLong(fullName) {
+  const parts = fullName.split(' ')
+  return parts.some(part => part.length > 14)
+}
+
 @inject('uiStore')
 @observer
 class CollectionCover extends React.Component {
-  get name() {
+  get hasIcon() {
     const { collection } = this.props
-    const hasIcon =
+    return (
       collection.isTemplated ||
       collection.isMasterTemplate ||
       collection.isSubmissionBox ||
       collection.isTestCollectionOrTestDesign
-    if (hasIcon) {
+    )
+  }
+
+  get name() {
+    const { collection } = this.props
+    const tooLong = namePartTooLong(collection.name)
+    const hyphens = tooLong ? 'auto' : 'initial'
+    if (this.hasIcon) {
       const nameParts = splitName(collection.name)
       if (!nameParts) return collection.name
       const lastName = nameParts.pop()
@@ -131,18 +153,18 @@ class CollectionCover extends React.Component {
         rightIcon = <TestCollectionIcon />
       }
       return (
-        <Fragment>
+        <span style={{ hyphens }}>
           {leftIcon && <IconHolder>{leftIcon}</IconHolder>}
           {nameParts.join(' ')}{' '}
-          <span style={{ whiteSpace: 'nowrap' }}>
-            {lastName}
+          <span style={{ hyphens: tooLong ? 'auto' : 'initial' }}>
+            {hyphenate(lastName)}
             &nbsp;
             {rightIcon && <IconHolder>{rightIcon}</IconHolder>}
           </span>
-        </Fragment>
+        </span>
       )
     }
-    return collection.name
+    return <span style={{ hyphens }}>{collection.name}</span>
   }
 
   handleClick = e => {

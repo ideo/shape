@@ -5,6 +5,7 @@ import styled from 'styled-components'
 
 import ChartItemCover from '~/ui/grid/covers/ChartItemCover'
 import ContainImage from '~/ui/grid/ContainImage'
+import CoverImageToggle from '~/ui/grid/CoverImageToggle'
 import GridCardHotspot from '~/ui/grid/GridCardHotspot'
 import LinkItemCover from '~/ui/grid/covers/LinkItemCover'
 import TextItemCover from '~/ui/grid/covers/TextItemCover'
@@ -73,7 +74,7 @@ class GridCard extends React.Component {
   }
 
   get renderInner() {
-    const { card, record, height } = this.props
+    const { card, record, height, handleClick } = this.props
     if (this.isItem) {
       switch (record.type) {
         case ITEM_TYPES.TEXT:
@@ -83,16 +84,20 @@ class GridCard extends React.Component {
               height={height}
               dragging={this.props.dragging}
               cardId={card.id}
+              handleClick={handleClick}
             />
           )
         case ITEM_TYPES.FILE: {
-          if (record.filestack_file.mimetype === 'application/pdf') {
+          if (record.isPdfFile) {
             return <PdfFileItemCover item={record} />
           }
-          if (record.mimeBaseType === 'image') {
+          if (record.isImage) {
             return <ImageItemCover item={record} contain={card.image_contain} />
           }
-          return <GenericFileItemCover item={record} />
+          if (record.filestack_file) {
+            return <GenericFileItemCover item={record} />
+          }
+          return <div style={{ padding: '20px' }}>File not found.</div>
         }
         case ITEM_TYPES.VIDEO:
           return <VideoItemCover item={record} dragging={this.props.dragging} />
@@ -100,7 +105,7 @@ class GridCard extends React.Component {
           return <LinkItemCover item={record} dragging={this.props.dragging} />
 
         case ITEM_TYPES.CHART:
-          return <ChartItemCover item={record} />
+          return <ChartItemCover item={record} testCollection={card.parent} />
 
         default:
           return <div>{record.content}</div>
@@ -236,6 +241,12 @@ class GridCard extends React.Component {
     }).click()
   }
 
+  onCollectionCoverChange = () => {
+    const { card } = this.props
+    // Reassign the previous cover when a new cover is assigned as the backend will have changed.
+    card.parent.reassignCover(card)
+  }
+
   handleClick = e => {
     const { card, dragging, record } = this.props
     if (dragging) return
@@ -283,6 +294,7 @@ class GridCard extends React.Component {
         data-width={card.width}
         data-height={card.height}
         data-order={card.order}
+        data-cy="GridCard"
         onContextMenu={this.openContextMenu}
         innerRef={c => (this.gridCardRef = c)}
       >
@@ -299,6 +311,14 @@ class GridCard extends React.Component {
           uiStore.textEditingItem !== record && (
             <StyledTopRightActions color={this.actionsColor}>
               {record.isDownloadable && <Download record={record} />}
+              {record.canBeSetAsCover &&
+                canEditCollection &&
+                this.canEditCard && (
+                  <CoverImageToggle
+                    card={card}
+                    onReassign={this.onCollectionCoverChange}
+                  />
+                )}
               {record.isImage &&
                 this.canEditCard && <ContainImage card={card} />}
               {!testCollectionCard && <SelectionCircle cardId={card.id} />}

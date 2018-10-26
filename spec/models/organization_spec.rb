@@ -111,6 +111,18 @@ describe Organization, type: :model do
         expect(guest.has_role?(Role::MEMBER, organization.guest_group)).to be true
       end
     end
+
+    describe '#friendly_id' do
+      let(:organization) { create(:organization) }
+
+      it 'generates slug after primary group is saved' do
+        expect(
+          organization.reload.slug,
+        ).to eq(
+          organization.primary_group.handle.parameterize,
+        )
+      end
+    end
   end
 
   describe '.create_for_user' do

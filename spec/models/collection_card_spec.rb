@@ -90,6 +90,25 @@ RSpec.describe CollectionCard, type: :model do
       duplicate
     end
 
+    context 'without user' do
+      let(:duplicate_without_user) do
+        collection_card.duplicate!(
+          shallow: shallow,
+          placement: placement,
+          duplicate_linked_records: duplicate_linked_records,
+        )
+      end
+
+      it 'should create copy of card' do
+        expect { duplicate_without_user }.to change(CollectionCard, :count).by(1)
+        expect(duplicate_without_user.id).not_to eq(collection_card.id)
+      end
+
+      it 'should duplicate item' do
+        expect { duplicate_without_user }.to change(Item, :count).by(1)
+      end
+    end
+
     context 'with pinned card from regular collection' do
       let!(:collection_card) { create(:collection_card_text, pinned: true) }
 
@@ -105,6 +124,11 @@ RSpec.describe CollectionCard, type: :model do
 
       it 'should set pinned to true on the duplicate' do
         expect(collection_card.pinned?).to be true
+        expect(duplicate.pinned?).to be true
+      end
+
+      it 'should set pinned even if original was not pinned' do
+        collection_card.update(pinned: false)
         expect(duplicate.pinned?).to be true
       end
     end
@@ -257,6 +281,51 @@ RSpec.describe CollectionCard, type: :model do
     end
   end
 
+  describe '#update_collection_cover' do
+    let(:collection) { create(:collection) }
+    let!(:collection_card_list) { create_list(:collection_card_image, 5, parent: collection) }
+    let(:current_cover) { collection_card_list.last }
+    let(:new_cover) { collection_card_list.first }
+
+    context 'setting a new collection cover' do
+      before do
+        current_cover.update_column(:is_cover, true)
+      end
+
+      it 'should unset any other cards is_cover attribute' do
+        new_cover.update_attribute(:is_cover, true)
+        expect(current_cover.reload.is_cover).to be false
+      end
+    end
+
+    context 'un-setting a collection cover' do
+      before do
+        # set the cover w/ callbacks
+        current_cover.update(is_cover: true)
+      end
+
+      it 'should unset any other cards is_cover attribute' do
+        expect(collection.cached_cover['no_cover']).to be false
+        expect(collection.cached_cover['image_url']).to eq current_cover.item.image_url
+        current_cover.update(is_cover: false)
+        expect(current_cover.reload.is_cover).to be false
+        expect(collection.cached_cover['no_cover']).to be true
+        expect(collection.cached_cover['image_url']).to be nil
+      end
+    end
+  end
+
+  describe 'update_parent_card_count!' do
+    let(:collection) { create(:collection) }
+
+    it 'should update when creating a card in the collection' do
+      collection.cache_card_count!
+      expect(collection.cached_card_count).to eq 0
+      create(:collection_card, parent: collection)
+      expect(collection.cached_card_count).to eq 1
+    end
+  end
+
   context 'archiving' do
     let(:collection) { create(:collection) }
     let!(:collection_card_list) { create_list(:collection_card, 5, parent: collection) }
@@ -281,11 +350,38 @@ RSpec.describe CollectionCard, type: :model do
       end
     end
 
-    describe 'archive!' do
-      it 'archive and call decrement_card_orders' do
+    describe '#archive!' do
+      it 'should archive and call decrement_card_orders' do
         expect(CollectionCard).to receive(:decrement_counter)
         collection_card.archive!
         expect(collection_card.archived?).to be true
+      end
+
+      it 'should decrement parent cached_card_count' do
+        expect(collection.cached_card_count).to eq 5
+        collection_card.archive!
+        expect(collection.cached_card_count).to eq 4
+      end
+    end
+
+    describe '#archive_all!' do
+      let(:user) { create(:user) }
+
+      it 'should archive all cards in the query' do
+        expect(collection).to receive(:touch)
+        expect {
+          collection_cards.archive_all!(user_id: user.id)
+        }.to change(CollectionCard.active, :count).by(collection_cards.count * -1)
+        # because this is the relation collection.collection_cards, it should now be empty
+        expect(collection_cards).to eq []
+      end
+
+      it 'should call the background worker' do
+        expect(CollectionCardArchiveWorker).to receive(:perform_async).with(
+          collection_cards.map(&:id),
+          user.id,
+        )
+        collection_cards.archive_all!(user_id: user.id)
       end
     end
   end

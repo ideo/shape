@@ -51,8 +51,15 @@ module Archivable
     self.class.archive_as.present? && try(self.class.archive_as)
   end
 
+  def finished_archiving?
+    # NOTE: archiving takes a two-step process involving the CollectionCardArchiveWorker
+    # 1. synchronously set the card archived = true, so that they are immediately hidden from the collection
+    # 2. worker runs archive! which sets archived_at / archived_batch and archives the underlying relations
+    archived? && archived_at.present?
+  end
+
   def archive!
-    return true if archived?
+    return true if finished_archiving?
     # make sure the `archive_as` relation object is actually present
     if archive_as_object.present?
       # treat this archive! as if you had triggered it on the parent

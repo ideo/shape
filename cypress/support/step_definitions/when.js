@@ -1,4 +1,5 @@
 /* global When */
+import _ from 'lodash'
 
 const FLIPMOVE_DELAY = 350
 
@@ -40,7 +41,7 @@ When('I close the snackbar', () => {
     .find('button')
     .click()
   // allow it to disappear
-  cy.wait(400)
+  cy.wait(1200)
 })
 
 // ----------------------
@@ -99,13 +100,27 @@ When(
   (name, el) => {
     cy.locateWith(el, name)
       .last()
-      .click()
+      .click({ force: true })
     cy.wait('@apiGetCollection')
   }
 )
 
+When('I navigate to the collection named {string} via the breadcrumb', name => {
+  cy.locateWith('Breadcrumb', name)
+    .last()
+    .find('a')
+    .click({ force: true })
+  cy.wait('@apiGetCollection')
+})
+
 When('I click the {string} containing {string}', (el, text) => {
   cy.locateDataOrClassWith(el, text)
+    .first()
+    .click()
+})
+
+When('I click the {string}', el => {
+  cy.locateDataOrClass(el)
     .first()
     .click()
 })
@@ -124,6 +139,14 @@ When('I capture the current URL', () => {
 
 When('I logout and visit the Marketing Page', () => {
   cy.logout()
-  cy.wait(400)
+  // not sure what's up with this, seems to still be logged in if you don't wait
+  cy.wait(5000)
   cy.visit('/')
+})
+
+When('I visit the current Test URL', () => {
+  cy.get('@url').then(url => {
+    const id = _.last(url.split('/'))
+    cy.visit(`/tests/${id}`)
+  })
 })
