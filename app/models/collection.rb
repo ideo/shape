@@ -231,8 +231,23 @@ class Collection < ApplicationRecord
   def duplicate!(
     for_user: nil,
     copy_parent_card: false,
-    parent: self.parent
+    parent: self.parent,
+    building_template_instance: false
   )
+
+    # check if we are cloning a template inside a template instance;
+    # - this means we should likewise turn the template dup into its own instance
+    if master_template? && building_template_instance
+      builder = CollectionTemplateBuilder.new(
+        parent: parent,
+        template: self,
+        placement: parent_collection_card.order,
+        created_by: for_user,
+        # in this case the card has already been created
+        parent_card: parent_collection_card,
+      )
+      return builder.call
+    end
     # Clones collection and all embedded items/collections
     c = amoeba_dup
     c.cloned_from = self
@@ -494,6 +509,11 @@ class Collection < ApplicationRecord
   def inside_a_master_template?
     return true if master_template?
     parents.where(master_template: true).any?
+  end
+
+  def inside_a_template_instance?
+    return true if template_id.present?
+    parents.where.not(template_id: nil).any?
   end
 
   # check for template instances anywhere in the entire collection tree

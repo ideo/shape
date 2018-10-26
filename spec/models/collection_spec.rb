@@ -163,7 +163,7 @@ describe Collection, type: :model do
         expect(CollectionCardDuplicationWorker).to receive(:perform_async).with(
           collection.collection_cards.map(&:id),
           instance_of(Integer),
-          nil
+          nil,
         )
         duplicate_without_user
       end

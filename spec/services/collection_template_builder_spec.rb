@@ -115,13 +115,12 @@ RSpec.describe CollectionTemplateBuilder, type: :service do
 
       it 're-assigns collection_to_test to collection instance' do
         expect(test_collection.collection_to_test).to eq(template)
-        expect(test_instance.master_template?).to be true
+        # should be an instance of the test collection
+        expect(test_instance.template).to eq test_collection
+        expect(test_instance.master_template?).to be false
+        expect(test_instance.is_a?(Collection::TestCollection)).to be true
+        # test should point to the new instance parent
         expect(test_instance.collection_to_test).to eq(instance)
-      end
-
-      it 'should not prefix test name with "My"' do
-        expect(test_instance.name).to eq(test_collection.name)
-        expect(test_instance.name).not_to match(/^My/i)
       end
     end
   end

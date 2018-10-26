@@ -8,7 +8,7 @@ class CardMover
     cards:,
     placement: 'beginning',
     card_action: 'move', # 'move' or 'link'
-    user_initiated: true
+    reassign_permissions: true
   )
     @from_collection = from_collection
     @to_collection = to_collection
@@ -16,7 +16,9 @@ class CardMover
     # retain array of cards being moved
     @moving_cards = cards.to_a
     @card_action = card_action
-    @user_initiated = user_initiated
+    # this setting can be used the case where you know the cards already have
+    # the correct permissions and you just want to move them
+    @reassign_permissions = reassign_permissions
     @errors = []
   end
 
@@ -26,7 +28,7 @@ class CardMover
     move_cards
     recalculate_cached_values
     update_template_instances
-    assign_permissions if @card_action == 'move' && @user_initiated
+    assign_permissions
     @moving_cards
   end
 
@@ -134,6 +136,8 @@ class CardMover
   end
 
   def assign_permissions
+    return if @to_collection == @from_collection
+    return unless @card_action == 'move' && @reassign_permissions
     @moving_cards.each do |card|
       # assign each role from the @to_collection to our newly moved cards
       to_permissions.each do |role_name, entity|
@@ -146,9 +150,5 @@ class CardMover
         ).call
       end
     end
-  end
-
-  def set_test_as_template
-
   end
 end

@@ -45,7 +45,8 @@ class CollectionCard < ApplicationRecord
     parent: self.parent,
     shallow: false,
     placement: 'end',
-    duplicate_linked_records: false
+    duplicate_linked_records: false,
+    building_template_instance: false
   )
     if record.is_a? Collection::SharedWithMeCollection
       errors.add(:collection, 'cannot be a SharedWithMeCollection for duplication')
@@ -92,7 +93,10 @@ class CollectionCard < ApplicationRecord
         for_user: for_user,
         parent: parent,
       }
-      cc.collection = collection.duplicate!(opts) if collection.present?
+      coll_opts = opts.merge(
+        building_template_instance: building_template_instance,
+      )
+      cc.collection = collection.duplicate!(coll_opts) if collection.present?
       cc.item = item.duplicate!(opts) if item.present?
     end
 

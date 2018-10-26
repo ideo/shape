@@ -67,6 +67,8 @@ class Collection
 
       return duplicate if duplicate.new_record? || args[:parent].blank?
 
+      duplicate.type = 'Collection::TestCollection'
+      duplicate = duplicate.becomes(Collection::TestCollection)
       if collection_to_test.present?
         # Point to the new parent as the one to test
         duplicate.collection_to_test = args[:parent]

@@ -214,6 +214,7 @@ RSpec.describe CollectionCard, type: :model do
 
     context 'for collection' do
       let!(:collection_card_collection) { create(:collection_card_collection) }
+      let(:collection) { collection_card_collection.collection }
       let(:duplicate) do
         collection_card_collection.duplicate!(
           for_user: user,
@@ -221,11 +222,33 @@ RSpec.describe CollectionCard, type: :model do
       end
 
       before do
-        user.add_role(Role::EDITOR, collection_card_collection.collection)
+        user.add_role(Role::EDITOR, collection)
       end
 
       it 'should duplicate collection' do
         expect { duplicate }.to change(Collection, :count).by(1)
+      end
+
+      context 'with a master template collection' do
+        before do
+          collection.update(master_template: true)
+        end
+
+        it 'simply copies the template' do
+          expect(duplicate.collection.master_template?).to be true
+        end
+
+        context 'inside a template instance' do
+          before do
+            # fake like the collection_card is in a template instance
+            collection.parent.update(template_id: 99)
+          end
+
+          it 'calls the TemplateBuilder to create an instance of the template' do
+            expect(duplicate.collection.master_template?).to be false
+            expect(duplicate.collection.template).to eq collection
+          end
+        end
       end
     end
 

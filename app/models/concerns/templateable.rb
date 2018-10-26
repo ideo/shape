@@ -33,6 +33,7 @@ module Templateable
       cc.duplicate!(
         for_user: for_user,
         parent: collection,
+        building_template_instance: true,
       )
     end
   end
@@ -62,6 +63,9 @@ module Templateable
 
   def add_cards_from_master_template(instance)
     cards_added_to_master_template(instance).each do |card|
+      if [Collection::TestCollection, Collection::TestDesign].include?(instance.class)
+        next unless card.card_question_type.present?
+      end
       card.duplicate!(
         for_user: instance.created_by,
         parent: instance,
@@ -85,6 +89,11 @@ module Templateable
   def move_cards_deleted_from_master_template(instance)
     cards = cards_removed_from_master_template(instance)
     return unless cards.present?
+    if [Collection::TestCollection, Collection::TestDesign].include?(instance.class)
+      # for tests, we just delete any pinned cards that were removed from the master
+      CollectionCard.where(id: cards.pluck(:id)).destroy_all
+      return
+    end
     deleted_cards_coll = instance.find_or_create_deleted_cards_collection
     transaction do
       # TODO: do something here if the cards already exist in the deleted coll?
@@ -95,7 +104,9 @@ module Templateable
         cards: cards,
         placement: 'end',
         card_action: 'move',
-        user_initiated: false,
+        # don't need to go through the hassle of reassigning roles,
+        # the cards being moved already have the correct ones
+        reassign_permissions: false,
       )
       moved_cards = card_mover.call
       # card_mover will return false if error
