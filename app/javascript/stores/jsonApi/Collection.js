@@ -77,21 +77,27 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     return prompt
   }
 
-  // confirmEdit will check if we're in a template and need to confirm changes,
-  // otherwise it will just call onConfirm()
-  confirmEdit({ onCancel, onConfirm }) {
-    if (!this.shouldShowEditWarning) return onConfirm()
-    const iconName = 'Archive'
+  get confirmEditOptions() {
+    const iconName = 'Template'
     const confirmText = 'Continue'
     const onToggleSnoozeDialog = () => {
       this.toggleEditWarnings()
     }
-    uiStore.confirm({
+    return {
       prompt: this.editWarningPrompt,
       confirmText,
       iconName,
       snoozeChecked: !this.shouldShowEditWarning,
       onToggleSnoozeDialog,
+    }
+  }
+
+  // confirmEdit will check if we're in a template and need to confirm changes,
+  // otherwise it will just call onConfirm()
+  confirmEdit({ onCancel, onConfirm }) {
+    if (!this.shouldShowEditWarning) return onConfirm()
+    uiStore.confirm({
+      ...this.confirmEditOptions,
       onCancel: () => {
         if (onCancel) onCancel()
       },

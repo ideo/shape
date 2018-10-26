@@ -235,12 +235,11 @@ class CollectionCard extends BaseRecord {
         let snoozeChecked = null
         let onToggleSnoozeDialog = null
         if (collection.isMasterTemplate) {
-          // Any way to DRY up with collection.confirmEdit?
-          snoozeChecked = collection.shouldShowEditWarning
-          prompt = collection.editWarningPrompt
-          onToggleSnoozeDialog = () => {
-            collection.toggleEditWarnings()
-          }
+          ;({
+            snoozeChecked,
+            prompt,
+            onToggleSnoozeDialog,
+          } = collection.confirmEditOptions)
         } else if (selectedCardIds.length > 1) {
           // check if multiple cards were selected
           const removedCount = this.reselectOnlyEditableCards(selectedCardIds)
