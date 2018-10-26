@@ -198,6 +198,14 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
         expect(response.status).to eq(401)
       end
     end
+
+    context 'trying to create inside a template' do
+      let(:to_collection) { create(:collection, master_template: true, organization: organization) }
+      it 'returns a 400' do
+        post(path, params: params)
+        expect(response.status).to eq(400)
+      end
+    end
   end
 
   describe 'PATCH #update' do

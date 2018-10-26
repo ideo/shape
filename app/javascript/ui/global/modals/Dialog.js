@@ -98,6 +98,7 @@ Dialog.propTypes = {
     'Ok',
     'TestGraph',
     'Mail',
+    'Template',
   ]),
   children: PropTypes.node.isRequired,
   open: PropTypes.bool.isRequired,

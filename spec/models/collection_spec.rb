@@ -72,6 +72,18 @@ describe Collection, type: :model do
     end
   end
 
+  describe 'callbacks' do
+    describe '#pin_all_primary_cards' do
+      let!(:collection) { create(:collection, num_cards: 3) }
+
+      it 'pins cards if master_template = true' do
+        expect(collection.primary_collection_cards.any?(&:pinned?)).to be false
+        collection.update(master_template: true)
+        expect(collection.reload.primary_collection_cards.all?(&:pinned?)).to be true
+      end
+    end
+  end
+
   describe '#inherit_parent_organization_id' do
     let!(:parent_collection) { create(:user_collection) }
     let!(:collection_card) { create(:collection_card, parent: parent_collection) }
@@ -182,7 +194,7 @@ describe Collection, type: :model do
         expect(CollectionCardDuplicationWorker).to receive(:perform_async).with(
           collection.collection_cards.map(&:id),
           instance_of(Integer),
-          nil
+          nil,
         )
         duplicate_without_user
       end
@@ -387,7 +399,17 @@ describe Collection, type: :model do
       collection.unarchive_cards!(cards, snapshot)
       cards.first.reload
       expect(cards.first.width).to eq 2
-      expect(cards.first.order).to eq 3
+      # should always reorder the cards
+      expect(cards.first.order).to eq 0
+    end
+
+    context 'with a master_template' do
+      let(:collection) { create(:collection, master_template: true, num_cards: 3) }
+
+      it 'should call the UpdateTemplateInstancesWorker' do
+        expect(UpdateTemplateInstancesWorker).to receive(:perform_async).with(collection.id)
+        collection.unarchive_cards!(cards, snapshot)
+      end
     end
   end
 

@@ -33,6 +33,10 @@ module Breadcrumbable
     end
   end
 
+  def parents
+    Collection.where(id: breadcrumb)
+  end
+
   # Override this method in any classes to restrict
   # this object from the breadcrumb
   def breadcrumbable?

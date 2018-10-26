@@ -110,9 +110,16 @@ describe Templateable, type: :concern do
         # Starting at index 1, because index 0 has been deleted
         first_template_card = template.collection_cards.find_by_id(template_beginning_card_ids[1])
         second_template_card = template.collection_cards.find_by_id(template_beginning_card_ids[2])
-        first_template_card.update(height: 2, width: 2, order: 1)
-        second_template_card.update(order: 0)
-
+        # fake bumping all cards to the end
+        template.collection_cards.update_all(order: 100)
+        template.update(
+          collection_cards_attributes: [
+            { id: first_template_card.id, height: 2, width: 2, order: 1 },
+            { id: second_template_card.id, order: 0 },
+          ],
+        )
+        # now first and second should be swapped, all other cards should get reordered after
+        template.reorder_cards!
         # Update instances
         template.update_template_instances
         template_instance.reload

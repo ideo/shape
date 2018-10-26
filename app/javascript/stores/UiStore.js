@@ -86,6 +86,7 @@ export default class UiStore {
     confirmText: 'OK',
     cancelText: 'Cancel',
     fadeOutTime: undefined,
+    snoozeChecked: false,
     onToggleSnoozeDialog: null,
     onClose: () => this.closeDialog(),
   }
@@ -179,6 +180,11 @@ export default class UiStore {
       open: 'confirm',
       ...props,
     })
+  }
+
+  @action
+  setSnoozeChecked(val) {
+    this.dialogConfig.snoozeChecked = val
   }
 
   @action

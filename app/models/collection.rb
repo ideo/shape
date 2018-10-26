@@ -27,6 +27,7 @@ class Collection < ApplicationRecord
   after_commit :touch_related_cards, if: :saved_change_to_updated_at?, unless: :destroyed?
   after_commit :reindex_sync, on: :create
   after_commit :update_comment_thread_in_firestore, unless: :destroyed?
+  after_save :pin_all_primary_cards, if: :now_master_template?
 
   # all cards including archived (i.e. undo default :collection_cards scope)
   has_many :all_collection_cards,
@@ -230,8 +231,23 @@ class Collection < ApplicationRecord
   def duplicate!(
     for_user: nil,
     copy_parent_card: false,
-    parent: self.parent
+    parent: self.parent,
+    building_template_instance: false
   )
+
+    # check if we are cloning a template inside a template instance;
+    # - this means we should likewise turn the template dup into its own instance
+    if master_template? && building_template_instance
+      builder = CollectionTemplateBuilder.new(
+        parent: parent,
+        template: self,
+        placement: parent_collection_card.order,
+        created_by: for_user,
+        # in this case the card has already been created
+        parent_card: parent_collection_card,
+      )
+      return builder.call
+    end
     # Clones collection and all embedded items/collections
     c = amoeba_dup
     c.cloned_from = self
@@ -266,11 +282,13 @@ class Collection < ApplicationRecord
     # Upgrade to editor if provided
     for_user.upgrade_to_edit_role(c) if for_user.present?
 
-    CollectionCardDuplicationWorker.perform_async(
-      collection_cards.map(&:id),
-      c.id,
-      for_user.try(:id),
-    )
+    if collection_cards.any?
+      CollectionCardDuplicationWorker.perform_async(
+        collection_cards.map(&:id),
+        c.id,
+        for_user.try(:id),
+      )
+    end
 
     # pick up newly created relationships
     c.reload
@@ -331,9 +349,8 @@ class Collection < ApplicationRecord
         # have to reload in order to pick up new parent relationship
         card.item.reload.recalculate_breadcrumb!
       elsif card.collection_id.present?
-        BreadcrumbRecalculationWorker.perform_async(
-          card.collection.id,
-        )
+        # this method will run the async worker if there are >50 children
+        card.collection.recalculate_breadcrumb_tree!
       end
     end
   end
@@ -361,6 +378,10 @@ class Collection < ApplicationRecord
   def unarchive_cards!(cards, card_attrs_snapshot)
     cards.each(&:unarchive!)
     CollectionUpdater.call(self, card_attrs_snapshot)
+    reorder_cards!
+    # if snapshot includes card attrs then CollectionUpdater will trigger the same thing
+    return unless master_template? && card_attrs_snapshot[:collection_cards_attributes].blank?
+    queue_update_template_instances
   end
 
   def enable_org_view_access_if_allowed(parent)
@@ -488,6 +509,21 @@ class Collection < ApplicationRecord
     collections.each(&:processing_done) if processing_status.nil?
   end
 
+  def inside_a_master_template?
+    return true if master_template?
+    parents.where(master_template: true).any?
+  end
+
+  def inside_a_template_instance?
+    return true if template_id.present?
+    parents.where.not(template_id: nil).any?
+  end
+
+  # check for template instances anywhere in the entire collection tree
+  def any_template_instance_children?
+    Collection.in_collection(id).where.not(template_id: nil).any?
+  end
+
   private
 
   def organization_blank?
@@ -519,5 +555,13 @@ class Collection < ApplicationRecord
     return unless comment_thread.present?
     return unless saved_change_to_name? || saved_change_to_cached_attributes?
     comment_thread.store_in_firestore
+  end
+
+  def pin_all_primary_cards
+    primary_collection_cards.update_all(pinned: true)
+  end
+
+  def now_master_template?
+    saved_change_to_master_template? && master_template?
   end
 end

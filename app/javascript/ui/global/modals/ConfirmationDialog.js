@@ -19,10 +19,6 @@ const StyledFormControlLabel = styled(FormControlLabel)`
 StyledFormControlLabel.displayName = 'snoozeDialogMessage'
 
 class ConfirmationDialog extends React.PureComponent {
-  state = {
-    snoozeChecked: false,
-  }
-
   handleCancel = ev => {
     if (ev) ev.preventDefault()
     const { onCancel } = this.props
@@ -38,7 +34,6 @@ class ConfirmationDialog extends React.PureComponent {
 
   handleToggleSnoozeDialog = ev => {
     ev.preventDefault()
-    this.setState({ snoozeChecked: !this.state.snoozeChecked })
     this.props.onToggleSnoozeDialog()
   }
 
@@ -47,8 +42,13 @@ class ConfirmationDialog extends React.PureComponent {
   }
 
   render() {
-    const { snoozeChecked } = this.state
-    const { cancelText, confirmText, prompt, onToggleSnoozeDialog } = this.props
+    const {
+      cancelText,
+      confirmText,
+      prompt,
+      onToggleSnoozeDialog,
+      snoozeChecked,
+    } = this.props
 
     const modalProps = {
       ...this.props,
@@ -109,6 +109,7 @@ ConfirmationDialog.propTypes = {
   confirmText: PropTypes.string,
   cancelText: PropTypes.string,
   onToggleSnoozeDialog: PropTypes.func,
+  snoozeChecked: PropTypes.bool,
 }
 ConfirmationDialog.defaultProps = {
   ...Dialog.defaultProps,
@@ -119,6 +120,7 @@ ConfirmationDialog.defaultProps = {
   confirmText: 'OK',
   cancelText: 'Cancel',
   onToggleSnoozeDialog: null,
+  snoozeChecked: false,
 }
 
 export default ConfirmationDialog

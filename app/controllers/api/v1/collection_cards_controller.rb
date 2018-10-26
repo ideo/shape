@@ -192,14 +192,24 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
   end
 
   def check_valid_duplication
+    @errors = []
     @cards.each do |card|
       collection = card.collection
       next unless collection.present?
       if @to_collection.within_collection_or_self?(collection)
-        @errors = 'You can\'t move a collection inside of itself.'
+        @errors << 'You can\'t duplicate a collection inside of itself.'
+        break
+      end
+      if @to_collection.inside_a_master_template? && collection.any_template_instance_children?
+        @errors << 'You can\'t duplicate an instance of a template inside a master template.'
+        break
       end
     end
-    @errors ? head(400) : true
+    if @errors.present?
+      render json: { errors: @errors }, status: :bad_request
+      return
+    end
+    true
   end
 
   def create_notification(card, action)

@@ -67,6 +67,8 @@ class SerializableCollection < BaseJsonSerializer
   end
 
   attribute :can_edit_content do
+    # NOTE: this also ends up coming into play when you are an editor
+    # but the collection is "pinned_and_locked"
     @current_ability.can?(:edit_content, @object)
   end
 

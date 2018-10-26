@@ -2,13 +2,14 @@
 class CollectionTemplateBuilder
   attr_reader :collection, :errors
 
-  def initialize(parent:, template:, placement: 'beginning', created_by: nil)
+  def initialize(parent:, template:, placement: 'beginning', created_by: nil, parent_card: nil)
     @parent = parent
     @template = template
     @placement = placement
     @created_by = created_by
-    @collection = Collection.new
+    @collection = template.class.new
     @errors = @collection.errors
+    @parent_card = parent_card
   end
 
   def call
@@ -44,6 +45,20 @@ class CollectionTemplateBuilder
     @collection
   end
 
+  def place_collection_in_parent
+    unless @parent_card.present?
+      card = @parent.primary_collection_cards.create(
+        width: 1,
+        height: 1,
+        pinned: @parent.master_template?,
+        collection: @collection,
+        order: order_placement,
+      )
+      card.increment_card_orders! if @placement == 'beginning'
+    end
+    @collection.recalculate_breadcrumb!
+  end
+
   def setup_template_cards
     @template.setup_templated_collection(
       for_user: @created_by,
@@ -59,15 +74,15 @@ class CollectionTemplateBuilder
     end
   end
 
-  def place_collection_in_parent
-    card = @parent.primary_collection_cards.create(
-      width: 1,
-      height: 1,
-      pinned: @parent.master_template?,
-      collection: @collection,
-      order: @placement == 'beginning' ? 0 : @parent.collection_cards.count,
-    )
-    card.increment_card_orders! if @placement == 'beginning'
-    @collection.recalculate_breadcrumb!
+  def order_placement
+    last = @parent.collection_cards.count
+    case @placement
+    when 'beginning'
+      0
+    when 'end'
+      last
+    else
+      @placement.is_a?(Integer) ? @placement : last
+    end
   end
 end

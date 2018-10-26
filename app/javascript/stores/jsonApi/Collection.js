@@ -1,5 +1,5 @@
 import _ from 'lodash'
-import { observable, computed, action } from 'mobx'
+import { observable, computed, action, runInAction } from 'mobx'
 import { ReferenceType } from 'datx'
 import pluralize from 'pluralize'
 
@@ -46,36 +46,61 @@ class Collection extends SharedRecordMixin(BaseRecord) {
 
   @action
   toggleEditWarnings() {
-    if (this.snoozedEditWarningsAt) this.snoozedEditWarningsAt = undefined
-    else this.snoozedEditWarningsAt = Date.now()
+    if (this.snoozedEditWarningsAt) {
+      this.snoozedEditWarningsAt = undefined
+    } else {
+      this.snoozedEditWarningsAt = Date.now()
+    }
+    uiStore.setSnoozeChecked(!!this.snoozedEditWarningsAt)
   }
 
   get shouldShowEditWarning() {
     if (!this.isMasterTemplate || this.template_num_instances === 0)
       return false
     const oneHourAgo = Date.now() - 1000 * 60 * 60
-    if (!this.snoozedEditWarningsAt || this.snoozedEditWarningsAt < oneHourAgo)
+    if (!this.snoozedEditWarningsAt) return true
+    if (this.snoozedEditWarningsAt < oneHourAgo) {
+      runInAction(() => {
+        // reset the state if time has elapsed, otherwise checkbox remains checked
+        this.snoozedEditWarningsAt = undefined
+      })
       return true
+    }
     return false
   }
 
-  showEditWarningDialog(onCancel, onConfirm) {
-    if (!this.shouldShowEditWarning) return false
-    const iconName = 'Archive'
-    const confirmText = 'Continue'
+  get editWarningPrompt() {
     let prompt = 'Are you sure?'
     const num = this.template_num_instances
     prompt += ` ${num} ${pluralize('instance', num)}`
     prompt += ` of this template will be affected.`
+    return prompt
+  }
+
+  get confirmEditOptions() {
+    const iconName = 'Template'
+    const confirmText = 'Continue'
     const onToggleSnoozeDialog = () => {
       this.toggleEditWarnings()
     }
-    uiStore.confirm({
-      prompt,
+    return {
+      prompt: this.editWarningPrompt,
       confirmText,
       iconName,
+      snoozeChecked: !this.shouldShowEditWarning,
       onToggleSnoozeDialog,
-      onCancel: () => onCancel(),
+    }
+  }
+
+  // confirmEdit will check if we're in a template and need to confirm changes,
+  // otherwise it will just call onConfirm()
+  confirmEdit({ onCancel, onConfirm }) {
+    if (!this.shouldShowEditWarning) return onConfirm()
+    uiStore.confirm({
+      ...this.confirmEditOptions,
+      onCancel: () => {
+        if (onCancel) onCancel()
+      },
       onConfirm: () => onConfirm(),
     })
     return true
@@ -138,7 +163,12 @@ class Collection extends SharedRecordMixin(BaseRecord) {
 
   get isUsableTemplate() {
     // you aren't allowed to use the profile template
-    return this.isMasterTemplate && !this.isProfileTemplate
+    return (
+      this.isMasterTemplate &&
+      !this.isProfileTemplate &&
+      !this.isTestDesign &&
+      !this.isTestCollection
+    )
   }
 
   get isLaunchableTest() {
@@ -233,10 +263,12 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     const data = this.toJsonApi()
     delete data.relationships
     // attach nested attributes of cards
-    data.attributes.collection_cards_attributes = _.map(
-      this.collection_cards,
-      card => _.pick(card, ['id', 'order', 'width', 'height'])
-    )
+    if (this.collection_cards) {
+      data.attributes.collection_cards_attributes = _.map(
+        this.collection_cards,
+        card => _.pick(card, ['id', 'order', 'width', 'height'])
+      )
+    }
     return data
   }
 

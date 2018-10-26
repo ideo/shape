@@ -63,7 +63,12 @@ class ActionMenu extends React.Component {
   }
 
   moveCard = () => {
-    this.openMoveMenu('move')
+    const { card, uiStore } = this.props
+    const collection = card.parentCollection
+    collection.confirmEdit({
+      onCancel: () => uiStore.closeMoveMenu(),
+      onConfirm: () => this.openMoveMenu('move'),
+    })
   }
 
   linkCard = () => {

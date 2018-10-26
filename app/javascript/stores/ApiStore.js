@@ -321,7 +321,7 @@ class ApiStore extends jsonapi(datxCollection) {
       }
     )
     if (undoable) {
-      const snapshot = collection.toJsonApi()
+      const snapshot = collection.toJsonApiWithCards()
       undoStore.pushUndoAction({
         message: 'Archive undone',
         apiCall: () => this.unarchiveCards({ cardIds, snapshot }),
