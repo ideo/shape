@@ -105,7 +105,10 @@ class TestDesigner extends React.Component {
   }
 
   handleNew = card => () => {
-    this.createNewQuestionCard({ order: card.order + 1 })
+    const { collection } = this.props
+    collection.confirmEdit({
+      onConfirm: () => this.createNewQuestionCard({ order: card.order + 1 }),
+    })
   }
 
   archiveMediaCardsIfDefaultState() {
@@ -228,6 +231,7 @@ class TestDesigner extends React.Component {
 
   renderTestTypeForm() {
     const { collection } = this.props
+    const canEdit = collection.can_edit
     const { collectionToTest, testType } = this.state
     // also searchvalue comes from collection_to_test.name.... or something
 
@@ -236,7 +240,7 @@ class TestDesigner extends React.Component {
       {
         value: 'media',
         label: 'Get feedback on an image, video or idea description',
-        disabled: !isDraft,
+        disabled: !isDraft || !canEdit,
       },
       {
         value: 'collection',
@@ -250,11 +254,12 @@ class TestDesigner extends React.Component {
         ),
         disabled:
           !isDraft ||
+          !canEdit ||
           (collectionToTest && !collectionToTest.isNormalCollection),
       },
     ]
 
-    if (!isDraft) {
+    if (!isDraft || !canEdit) {
       options = _.filter(options, { value: testType })
     }
 
