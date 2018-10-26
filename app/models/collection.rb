@@ -187,6 +187,7 @@ class Collection < ApplicationRecord
       :created_by,
       :organization,
       :parent_collection_card,
+      :parent,
       :submissions_collection,
       :submission_template,
       :collection_to_test,
@@ -204,7 +205,7 @@ class Collection < ApplicationRecord
     [
       :created_by,
       :organization,
-      :parent_collection_card,
+      parent_collection_card: %i[parent],
       roles: %i[users groups resource],
       collection_cards: [
         :parent,
@@ -227,7 +228,7 @@ class Collection < ApplicationRecord
   end
 
   def duplicate!(
-    for_user:,
+    for_user: nil,
     copy_parent_card: false,
     parent: self.parent
   )
@@ -263,13 +264,14 @@ class Collection < ApplicationRecord
     if parent.is_a? Collection::UserCollection
       c.allow_primary_group_view_access
     end
-    # upgrade to editor unless we're setting up a templated collection
-    for_user.upgrade_to_edit_role(c)
+
+    # Upgrade to editor if provided
+    for_user.upgrade_to_edit_role(c) if for_user.present?
 
     CollectionCardDuplicationWorker.perform_async(
       collection_cards.map(&:id),
-      for_user.id,
       c.id,
+      for_user.try(:id),
     )
 
     # pick up newly created relationships

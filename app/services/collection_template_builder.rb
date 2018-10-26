@@ -15,6 +15,8 @@ class CollectionTemplateBuilder
     return false unless create_collection
     place_collection_in_parent
     setup_template_cards
+    # mainly so template_num_instances will be refreshed in API cache
+    @template.touch
     # re-save to capture cover, new breadcrumb + tag lists
     @collection.cache_cover!
     @collection
@@ -32,6 +34,7 @@ class CollectionTemplateBuilder
     @collection = @template.templated_collections.create(
       name: created_template_name,
       organization: @parent.organization,
+      created_by: @created_by,
     )
     # make sure to assign these permissions before the template cards are generated
     @collection.inherit_roles_from_parent!(@parent)

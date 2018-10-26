@@ -82,4 +82,37 @@ describe('Collection', () => {
       })
     })
   })
+
+  describe('shouldShowEditWarning', () => {
+    it('should be false for non-template', () => {
+      expect(collection.shouldShowEditWarning).toBe(false)
+    })
+
+    describe('for a template', () => {
+      beforeEach(() => {
+        collection.master_template = true
+        collection.template_num_instances = 10
+      })
+
+      it('should be true', () => {
+        expect(collection.shouldShowEditWarning).toBe(true)
+      })
+
+      it('should be false once snoozed', () => {
+        collection.toggleEditWarnings()
+        expect(collection.shouldShowEditWarning).toBe(false)
+      })
+
+      it('should be true if snooze toggled', () => {
+        collection.toggleEditWarnings()
+        collection.toggleEditWarnings()
+        expect(collection.shouldShowEditWarning).toBe(true)
+      })
+
+      it('should be false if no instances', () => {
+        collection.template_num_instances = 0
+        expect(collection.shouldShowEditWarning).toBe(false)
+      })
+    })
+  })
 })

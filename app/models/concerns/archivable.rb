@@ -55,7 +55,7 @@ module Archivable
     # NOTE: archiving takes a two-step process involving the CollectionCardArchiveWorker
     # 1. synchronously set the card archived = true, so that they are immediately hidden from the collection
     # 2. worker runs archive! which sets archived_at / archived_batch and archives the underlying relations
-    archived? && archived_at.present? && archived_batch.present?
+    archived? && archived_at.present?
   end
 
   def archive!

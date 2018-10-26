@@ -42,6 +42,10 @@ RSpec.describe CollectionTemplateBuilder, type: :service do
       expect(collection.collection_cards.count).to eq template.collection_cards.count
     end
 
+    it 'should assign current user as created_by' do
+      expect(collection.created_by).to eq user
+    end
+
     it 'should place the collection instance in the parent collection' do
       collection # evaluate builder.call
       parent.reload

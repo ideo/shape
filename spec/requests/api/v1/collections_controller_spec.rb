@@ -128,6 +128,20 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
         expect(collections_json.first['attributes']).to match_json_schema('collection', strict: false)
       end
     end
+
+    context 'as master template' do
+      before do
+        collection.update_attributes(master_template: true)
+      end
+      let!(:template_instances) do
+        create_list(:collection, 3, template: collection, created_by: user)
+      end
+
+      it 'includes number of template instances' do
+        get(path)
+        expect(json['data']['attributes']['template_num_instances']).to eq(3)
+      end
+    end
   end
 
   describe 'POST #create_template' do

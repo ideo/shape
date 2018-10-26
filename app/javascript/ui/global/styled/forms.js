@@ -231,6 +231,10 @@ export const Checkbox = styled(MuiCheckbox)`
   &.checkbox--error {
     color: ${v.colors.alert};
   }
+  &.checkbox--white,
+  &.checkbox--checked-white {
+    color: white !important;
+  }
 `
 Checkbox.displayName = 'StyledCheckbox'
 

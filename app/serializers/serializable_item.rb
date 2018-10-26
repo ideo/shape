@@ -5,6 +5,7 @@ class SerializableItem < BaseJsonSerializer
              :url, :thumbnail_url, :icon_url, :question_type,
              :data_source_type, :data_source_id
   has_one :parent_collection_card
+  has_one :parent
   belongs_to :data_source
 
   attribute :tag_list do
@@ -24,7 +25,6 @@ class SerializableItem < BaseJsonSerializer
     @object.cached_filestack_file_url || ''
   end
 
-  has_one :parent
   belongs_to :filestack_file
 
   attribute :breadcrumb, if: -> { @object == @current_record } do

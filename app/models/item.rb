@@ -68,7 +68,7 @@ class Item < ApplicationRecord
   end
 
   def duplicate!(
-    for_user:,
+    for_user: nil,
     copy_parent_card: false,
     parent: self.parent
   )
@@ -97,7 +97,7 @@ class Item < ApplicationRecord
       i.roles << role.duplicate!(assign_resource: i)
     end
     # upgrade to editor unless we're setting up a templated collection
-    for_user.upgrade_to_edit_role(i)
+    for_user.upgrade_to_edit_role(i) if for_user.present?
 
     # Method from HasFilestackFile
     filestack_file_duplicate!(i)

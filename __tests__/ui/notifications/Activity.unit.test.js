@@ -47,6 +47,28 @@ describe('Activity', () => {
       })
     })
 
+    describe('with the archived_from_template action', () => {
+      beforeEach(() => {
+        props.action = 'archived_from_template'
+        props.target = {
+          name: 'Plants Instance',
+          internalType: 'collections',
+          id: 10,
+        }
+        props.sourceName = 'The Master Template'
+        wrapper.setProps(props)
+      })
+
+      it('should render the message with source', () => {
+        expect(wrapper.find('.source').text()).toEqual('“The Master Template”')
+      })
+
+      it('should render a link to the target', () => {
+        const link = findPart('target')
+        expect(link.props().to).toEqual('/collections/10')
+      })
+    })
+
     describe('with the added role action', () => {
       beforeEach(() => {
         props.action = 'added_member'

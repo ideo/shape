@@ -57,6 +57,15 @@ class CollectionCard extends BaseRecord {
     return this.pinned_and_locked
   }
 
+  get parentCollection() {
+    if (this.parent) return this.parent
+    if (this.parent_id) {
+      return this.apiStore.find('collections', this.parent_id)
+    }
+    // `null` parent may result in an error depending on what you're trying to do
+    return null
+  }
+
   // This sets max W/H based on number of visible columns. Used by Grid + CollectionCover.
   // e.g. "maxWidth" might temporarily be 2 cols even though this card.width == 4
   @action
@@ -103,9 +112,9 @@ class CollectionCard extends BaseRecord {
       const res = await this.apiStore.request('collection_cards', 'POST', {
         data: this.toJsonApi(),
       })
-      this.parent.addCard(res.data)
+      this.parentCollection.addCard(res.data)
       uiStore.closeBlankContentTool()
-      uiStore.trackEvent('create', this.parent)
+      uiStore.trackEvent('create', this.parentCollection)
       return res.data
     } catch (e) {
       uiStore.defaultAlertError()
@@ -121,10 +130,10 @@ class CollectionCard extends BaseRecord {
         'PATCH',
         { data: this.toJsonApi() }
       )
-      this.parent.removeCard(replacing)
-      this.parent.addCard(res.data)
+      this.parentCollection.removeCard(replacing)
+      this.parentCollection.addCard(res.data)
       uiStore.closeBlankContentTool()
-      uiStore.trackEvent('replace', this.parent)
+      uiStore.trackEvent('replace', this.parentCollection)
       return res.data
     } catch (e) {
       return uiStore.defaultAlertError()
@@ -134,7 +143,7 @@ class CollectionCard extends BaseRecord {
   async API_destroy() {
     try {
       this.destroy()
-      this.parent.removeCard(this)
+      this.parentCollection.removeCard(this)
       return
     } catch (e) {
       uiStore.defaultAlertError()
@@ -177,7 +186,9 @@ class CollectionCard extends BaseRecord {
 
   // Only show archive popup if this is a collection that has cards
   // Don't show if empty collection, or just link card / item card(s)
-  get showArchiveWarning() {
+  get shouldShowArchiveWarning() {
+    if (this.parentCollection.isMasterTemplate)
+      return this.parentCollection.shouldShowEditWarning
     return _.some(
       this.selectedCards,
       card =>
@@ -198,7 +209,7 @@ class CollectionCard extends BaseRecord {
     try {
       await this.apiStore.archiveCards({
         cardIds: [this.id],
-        collection: this.parent,
+        collection: this.parentCollection,
       })
       return
     } catch (e) {
@@ -215,11 +226,12 @@ class CollectionCard extends BaseRecord {
   async API_archive({ isReplacing = false } = {}) {
     const { selectedCardIds } = uiStore
 
-    if (this.showArchiveWarning) {
+    if (this.shouldShowArchiveWarning) {
       const popupAgreed = new Promise((resolve, reject) => {
         let prompt = 'Are you sure you want to archive this?'
         const confirmText = 'Archive'
         let iconName = 'Archive'
+        let onToggleSnoozeDialog = null
         // check if multiple cards were selected
         if (selectedCardIds.length > 1) {
           const removedCount = this.reselectOnlyEditableCards(selectedCardIds)
@@ -240,11 +252,21 @@ class CollectionCard extends BaseRecord {
         } else if (this.isTestDesignCollection) {
           prompt = 'Are you sure you want to archive this test design?'
           prompt += ' It will close your feedback.'
+        } else if (this.parentCollection.isMasterTemplate) {
+          const numInstances = this.parentCollection.template_num_instances
+          prompt = 'Are you sure?'
+          prompt += ` ${numInstances} instance${
+            numInstances === 1 ? '' : 's'
+          } of this template will be affected.`
+          onToggleSnoozeDialog = () => {
+            this.parentCollection.toggleEditWarnings()
+          }
         }
         uiStore.confirm({
           prompt,
           confirmText,
           iconName,
+          onToggleSnoozeDialog,
           onCancel: () => resolve(false),
           onConfirm: () => resolve(true),
         })
@@ -252,7 +274,7 @@ class CollectionCard extends BaseRecord {
       const agreed = await popupAgreed
       if (!agreed) return false
     }
-    const collection = this.parent
+    const collection = this.parentCollection
     try {
       await this.apiStore.archiveCards({
         // turn into normal JS array
@@ -274,6 +296,7 @@ class CollectionCard extends BaseRecord {
       if (collection) {
         this.apiStore.fetch('collections', collection.id, true)
       }
+      console.warn(e)
       uiStore.defaultAlertError()
     }
     return false

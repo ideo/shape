@@ -26,7 +26,8 @@
     "test_can_reopen": { "type": ["boolean"] },
     "pinned_and_locked": { "type": ["boolean"] },
     "processing_status": { "type": ["string", "null"] },
-    "collection_card_count": { "type": ["integer"] }
+    "collection_card_count": { "type": ["integer"] },
+    "template_num_instances": { "type": ["integer"] }
   },
   "required": ["name", "type", "created_at", "cover"]
 }

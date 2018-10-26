@@ -43,11 +43,16 @@ class CollectionCardBuilder
         if @collection_card.record_type == :collection
           # NOTE: should items created in My Collection get this access as well?
           record.allow_primary_group_view_access if record.parent_is_user_collection?
-          record.update(created_by: @user)
+          record.update(created_by: @user) if @user.present?
         end
         @collection_card.parent.cache_cover! if @collection_card.should_update_parent_collection_cover?
         @collection_card.increment_card_orders!
         record.reload.recalculate_breadcrumb!
+
+        if @parent_collection.master_template?
+          # we just added a template card, so update the instances
+          @parent_collection.queue_update_template_instances
+        end
       end
     end
   end
