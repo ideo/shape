@@ -39,7 +39,7 @@ function shapecopydb {
       echo "Failed to drop local database."
       return 1
     fi
-  elif [ "$1" = "development" ] || [ "$1" = "staging" ]; then
+  elif [ "$1" = "development" ] || [ "$1" = "staging" ] || [ "$1" = "test" ]; then
     echo "Loading the last backup into $1..." &&
     heroku pg:backups restore `heroku pg:backups public-url -a shape-production` DATABASE_URL -a shape-$1 &&
 
