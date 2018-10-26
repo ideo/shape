@@ -35,13 +35,23 @@ class Collection
       )
     end
 
-    def complete_collection_cards
-      # This is just excluding any blank question cards, but will still include
-      # blank description or media question cards
-      table = Item.arel_table
-      collection_cards.joins(
-        :item,
-      ).where.not(table[:type].eq('Item::QuestionItem').and(table[:question_type].eq(nil)))
+    def complete_question_cards
+      # # This is just excluding any blank question cards
+      # table = Item.arel_table
+      # collection_cards.joins(
+      #   :item,
+      # ).where.not(
+      #   table[:type].eq('Item::QuestionItem').and(table[:question_type].eq(nil))
+      # )
+      # NOTE: there is probably a way to directly query for this like above,
+      # but this was the most straightforward
+      valid_items = items.reject do |i|
+        i.is_a?(Item::QuestionItem) && i.question_type.blank? ||
+          i.question_type == 'question_open' && i.content.blank? ||
+          i.question_type == 'question_category_satisfaction' && i.content.blank? ||
+          i.question_type == 'question_media'
+      end
+      valid_items.collect(&:parent_collection_card)
     end
 
     private

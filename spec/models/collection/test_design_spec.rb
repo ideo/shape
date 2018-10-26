@@ -51,6 +51,40 @@ describe Collection::TestDesign, type: :model do
     end
   end
 
+  describe '#complete_question_cards' do
+    let!(:test_collection) { create(:test_collection, :completed) }
+    let!(:test_design) do
+      test_collection.launch!(initiated_by: create(:user))
+      # Need to call reload because test_collection relationship is stale
+      test_collection.test_design.reload
+    end
+    let(:extra_question_cards) do
+      create_list(:collection_card_question, 4, parent: test_design)
+    end
+
+    before do
+      card = extra_question_cards.first
+      # incomplete because it doesn't have content
+      card.item.update(question_type: :question_open)
+      card = extra_question_cards.second
+      # incomplete because it doesn't have content
+      card.item.update(question_type: :question_category_satisfaction)
+      card = extra_question_cards.third
+      # incomplete because it doesn't have a type
+      card.item.update(question_type: nil)
+      card = extra_question_cards.fourth
+      # incomplete because it doesn't have media
+      card.item.update(question_type: :question_media)
+    end
+
+    it 'should only get completed question cards' do
+      # all the default cards + 4 incomplete
+      expect(test_design.collection_cards.count).to eq 8
+      # all the default cards only
+      expect(test_design.complete_question_cards.count).to eq 4
+    end
+  end
+
   describe 'callbacks' do
     describe '#close_test' do
       let!(:test_collection) { create(:test_collection, :completed) }
