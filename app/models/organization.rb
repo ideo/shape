@@ -94,23 +94,11 @@ class Organization < ApplicationRecord
       Collection::UserProfile.find_or_create_for_user(user: user, organization: self)
     end
 
-    if matches_domain_whitelist?(user)
-      # add them as an org member
-      user.add_role(Role::MEMBER, primary_group)
-      # remove guest role if exists, do this second so that you don't temporarily lose org membership
-      user.remove_role(Role::MEMBER, guest_group)
-    elsif !primary_group.can_view?(user)
-      # or else as a guest member if their domain doesn't match,
-      # however if they've already been setup as an org member then they don't get "demoted"
-      user.add_role(Role::MEMBER, guest_group)
-    end
+    check_user_email_domain(user)
 
     # Set this as the user's current organization if they don't have one
     user.switch_to_organization(self) if user.current_organization_id.blank?
-
-    return true if getting_started_collection.blank? || !user.active?
-
-    create_user_getting_started_collection(user)
+    find_or_create_user_getting_started_collection(user)
   end
 
   def guest_group_name
@@ -142,8 +130,9 @@ class Organization < ApplicationRecord
     ]
   end
 
-  def all_active_users
-    User.active.where(id: (
+  # NOTE: use #users.active to filter to active only
+  def users
+    User.where(id: (
       primary_group.user_ids +
       guest_group.user_ids
     ))
@@ -158,26 +147,49 @@ class Organization < ApplicationRecord
     )
   end
 
-  def create_user_getting_started_collection(user)
+  def find_or_create_user_getting_started_collection(user)
+    return if getting_started_collection.blank?
+    user_collection = user.current_user_collection(id)
+    # should find it even if you had archived it
+    existing = Collection.find_by(
+      created_by: user,
+      organization: self,
+      cloned_from: getting_started_collection,
+    )
+    return existing if existing.present?
     user_getting_started = getting_started_collection.duplicate!(
       for_user: user,
-      parent: user.current_user_collection(id),
+      parent: user_collection,
     )
 
     # Change from Collection::Global to regular colleciton
-    user_getting_started.update_attributes(
-      type: 'Collection',
-    )
+    user_getting_started.update_attributes(type: nil)
     user_getting_started = user_getting_started.becomes(Collection)
 
     CollectionCardBuilder.new(
       params: {
-        order: 0,
+        # put it after SharedWithMe
+        order: 1,
         collection_id: user_getting_started.id,
       },
-      parent_collection: user.current_user_collection(id),
+      parent_collection: user_collection,
       user: user,
     ).create
+    user_collection.reorder_cards!
+    user_getting_started
+  end
+
+  def check_user_email_domain(user)
+    if matches_domain_whitelist?(user)
+      # add them as an org member
+      user.add_role(Role::MEMBER, primary_group)
+      # remove guest role if exists, do this second so that you don't temporarily lose org membership
+      user.remove_role(Role::MEMBER, guest_group)
+    elsif !primary_group.can_view?(user)
+      # or else as a guest member if their domain doesn't match,
+      # however if they've already been setup as an org member then they don't get "demoted"
+      user.add_role(Role::MEMBER, guest_group)
+    end
   end
 
   private

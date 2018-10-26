@@ -1,7 +1,6 @@
 class OrganizationTemplates < SimpleService
-  def initialize(organization, user)
+  def initialize(organization)
     @org = organization
-    @user = user
   end
 
   def call

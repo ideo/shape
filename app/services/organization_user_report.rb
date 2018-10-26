@@ -5,8 +5,8 @@ class OrganizationUserReport
     CSV.generate do |csv|
       csv << %w[name count]
       Organization.find_each do |org|
-        next if org.all_active_users.count <= 1
-        csv << [org.name, org.all_active_users.count]
+        next if org.users.active.count <= 1
+        csv << [org.name, org.users.active.count]
       end
     end
   end
