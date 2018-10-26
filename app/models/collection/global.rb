@@ -9,8 +9,12 @@ class Collection
       organization.profile_collection_id == id
     end
 
+    def getting_started?
+      organization.getting_started_collection_id == id
+    end
+
     def system_required?
-      return true if profiles?
+      return true if profiles? || getting_started?
       # org templates collection is only required if it contains the profile_template
       # NOTE: could search all its children if they're required but seems like overkill?
       org_templates? && collection_ids.include?(organization.profile_template_id)

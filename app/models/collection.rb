@@ -260,10 +260,8 @@ class Collection < ApplicationRecord
     parent.roles.each do |role|
       c.roles << role.duplicate!(assign_resource: c)
     end
-    # NOTE: different from `parent_is_user_collection?` since `parent` is passed in
-    if parent.is_a? Collection::UserCollection
-      c.allow_primary_group_view_access
-    end
+
+    c.enable_org_view_access_if_allowed(parent)
 
     # Upgrade to editor if provided
     for_user.upgrade_to_edit_role(c) if for_user.present?
@@ -365,8 +363,13 @@ class Collection < ApplicationRecord
     CollectionUpdater.call(self, card_attrs_snapshot)
   end
 
-  def allow_primary_group_view_access
-    organization.primary_group.add_role(Role::VIEWER, self)
+  def enable_org_view_access_if_allowed(parent)
+    # If parent is user collection, allow primary group to see it
+    # As long as it isn't the 'Getting Started' collection
+    return false unless parent.is_a?(Collection::UserCollection) &&
+                        (cloned_from.blank? || !cloned_from.getting_started?)
+
+    organization.primary_group.add_role(Role::VIEWER, self).try(:persisted?)
   end
 
   def reindex_sync
@@ -426,15 +429,15 @@ class Collection < ApplicationRecord
     save
   end
 
-  def parent_is_user_collection?
-    parent.is_a? Collection::UserCollection
-  end
-
   def org_templates?
     false
   end
 
   def profiles?
+    false
+  end
+
+  def getting_started?
     false
   end
 

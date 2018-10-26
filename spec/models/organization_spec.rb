@@ -184,21 +184,53 @@ describe Organization, type: :model do
     let(:user) { create(:user, email: 'jill@ideo.com') }
     let(:organization) { create(:organization, domain_whitelist: ['ideo.com']) }
 
-    before do
-      organization.setup_user_membership_and_collections(user)
-    end
-
     it 'should create a UserCollection and SharedWithMeCollection for the user' do
+      organization.setup_user_membership_and_collections(user)
       expect(user.collections.size).to eq(2)
     end
 
     it 'adds as an org member if they match the domain' do
+      organization.setup_user_membership_and_collections(user)
       expect(user.has_role?(Role::MEMBER, organization.primary_group)).to be true
     end
 
     it 'should set the user to be on the current organization' do
+      organization.setup_user_membership_and_collections(user)
       expect(user.current_organization).to eq(organization)
       expect(user.current_user_collection_id).not_to be nil
+    end
+
+    context 'with getting_started collection' do
+      let!(:getting_started_template) do
+        create(:global_collection,
+               name: 'Getting Started with Shape',
+               organization: organization,
+               num_cards: 3)
+      end
+      before do
+        organization.update_attributes(
+          getting_started_collection: getting_started_template,
+        )
+      end
+      let(:user_getting_started_collection) do
+        user.current_user_collection.collections.where(
+          name: 'Getting Started with Shape'
+        ).first
+      end
+
+      it 'copies collection to user' do
+        organization.setup_user_membership_and_collections(user)
+        expect(user_getting_started_collection.persisted?).to be true
+        expect(user_getting_started_collection).not_to eq(getting_started_template)
+        expect(user_getting_started_collection.editors).to eq(
+          users: [user],
+          groups: [],
+        )
+        expect(user_getting_started_collection.viewers).to eq(
+          users: [],
+          groups: [],
+        )
+      end
     end
   end
 
@@ -264,13 +296,13 @@ describe Organization, type: :model do
     end
   end
 
-  describe '#all_active_users' do
+  describe '#users.active' do
     let(:member) { create(:user) }
     let(:guest) { create(:user) }
     let(:organization) { create(:organization, member: member, guest: guest) }
 
     it 'should count the number of users' do
-      expect(organization.all_active_users.count).to eq 2
+      expect(organization.users.active.count).to eq 2
     end
   end
 end
