@@ -95,9 +95,6 @@ describe Api::V1::SearchController, type: :request, json: true, auth: true, sear
           )
         end
 
-        before do
-        end
-
         it 'returns only the amount for the page' do
           get(path, params: { query: 'shared name', per_page: 2 })
           expect(json['data'].size).to eq(2)
