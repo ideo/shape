@@ -69,8 +69,9 @@ class CollectionCard < ApplicationRecord
     elsif parent.master_template?
       # Make it pinned if you're duplicating it into a master template
       cc.pinned = true
-    elsif !(parent.templated? || parent.master_template?)
-      # copying into a normal (non templated) collection, it should never be pinned
+    else
+      # copying into a normal (non templated) collection, it should never be pinned;
+      # likewise even if you duplicate a pinned card in your own instance
       cc.pinned = false
     end
     # defaults to self.parent, unless one is passed in
