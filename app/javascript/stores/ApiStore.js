@@ -315,7 +315,7 @@ class ApiStore extends jsonapi(datxCollection) {
       .replace(/\s/g, '+')
       .replace(/#/g, '%23')
     // TODO: pagination?
-    const templates = await this.fetchAllPages(`search?query=${q}`)
+    const templates = await this.fetchAllPages(`search?query=${q}&per_page=50`)
     runInAction(() => {
       this.usableTemplates = templates.filter(c => c.isUsableTemplate)
     })

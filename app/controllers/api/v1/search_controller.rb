@@ -48,7 +48,7 @@ class Api::V1::SearchController < Api::V1::BaseController
       untagged_query,
       fields: %w[name^5 tags^3 content],
       where: where_clause,
-      per_page: 10,
+      per_page: params[:per_page] || 10,
       page: page,
     )
   end
