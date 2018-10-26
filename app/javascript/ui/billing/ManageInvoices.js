@@ -20,10 +20,7 @@ class ManagePaymentMethods extends React.Component {
 
     try {
       await networkStore.loadOrganization(apiStore.currentUserOrganizationId)
-      await networkStore.loadSubscription(networkStore.organization.id)
-      if (networkStore.subscription) {
-        await networkStore.loadInvoices(networkStore.subscription)
-      }
+      await networkStore.loadInvoices(networkStore.organization.id)
       runInAction(() => (this.loaded = true))
     } catch (e) {
       trackError(e)
