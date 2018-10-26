@@ -16,7 +16,6 @@ class OrganizationTemplates < SimpleService
     return if @org.getting_started_collection.present? || getting_started_template.blank?
 
     getting_started_collection = getting_started_template.duplicate!(
-      for_user: @user,
       copy_parent_card: true,
       parent: @org.template_collection,
     )

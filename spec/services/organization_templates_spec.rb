@@ -136,13 +136,11 @@ RSpec.describe OrganizationTemplates, type: :service do
         expect(getting_started_collection.system_required?).to be true
       end
 
-      it 'assigns admin group and user as editor' do
+      it 'assigns admin group as editor' do
         expect(getting_started_collection.editors[:groups]).to match_array(
           [organization.admin_group],
         )
-        expect(getting_started_collection.editors[:users]).to match_array(
-          [user],
-        )
+        expect(getting_started_collection.editors[:users]).to be_empty
       end
 
       it 'has no viewers' do
