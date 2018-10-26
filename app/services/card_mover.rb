@@ -125,6 +125,10 @@ class CardMover
         @errors << 'You can\'t move a collection inside of itself.'
         return true
       end
+      if @to_collection.inside_a_master_template? && collection.any_template_instance_children?
+        @errors << 'You can\'t move an instance of a template inside a master template.'
+        return true
+      end
     end
     false
   end

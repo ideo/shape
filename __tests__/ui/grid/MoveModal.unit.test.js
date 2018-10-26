@@ -116,7 +116,7 @@ describe('MoveModal', () => {
       it('should show an alert dialog on failure', async () => {
         await component.moveCards('top')
         expect(uiStore.alert).toHaveBeenCalledWith(
-          'You cannot move a collection within itself'
+          'You cannot move a collection within itself.'
         )
       })
     })

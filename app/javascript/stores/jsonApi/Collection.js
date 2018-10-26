@@ -80,6 +80,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
       prompt: this.editWarningPrompt,
       confirmText,
       iconName,
+      // TODO: also pass OUR collection snooze status
       onToggleSnoozeDialog,
       onCancel: () => {
         if (onCancel) onCancel()

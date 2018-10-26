@@ -491,6 +491,16 @@ class Collection < ApplicationRecord
     collections.each(&:processing_done) if processing_status.nil?
   end
 
+  def inside_a_master_template?
+    return true if master_template?
+    parents.where(master_template: true).any?
+  end
+
+  # check for template instances anywhere in the entire collection tree
+  def any_template_instance_children?
+    Collection.in_collection(id).where.not(template_id: nil).any?
+  end
+
   private
 
   def organization_blank?

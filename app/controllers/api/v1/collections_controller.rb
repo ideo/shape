@@ -71,7 +71,7 @@ class Api::V1::CollectionsController < Api::V1::BaseController
       authorize! :read, @parent_collection
       return
     end
-    if @parent_collection.master_template?
+    if @parent_collection.inside_a_master_template?
       # we don't allow creating instances inside of master templates --
       # can get too convoluted to handle nested "trickling down" of template updates
       head(400)

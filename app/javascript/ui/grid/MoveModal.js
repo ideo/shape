@@ -135,7 +135,11 @@ class MoveModal extends React.Component {
       runInAction(() => {
         this.isLoading = false
       })
-      uiStore.alert('You cannot move a collection within itself')
+      let message = 'You cannot move a collection within itself.'
+      if (e && e.error && e.error[0]) {
+        message = e.error[0]
+      }
+      uiStore.alert(message)
     }
   }
 
