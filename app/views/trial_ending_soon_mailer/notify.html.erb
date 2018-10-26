@@ -1,0 +1,24 @@
+<div class="billing-email trial-ending-soon">
+  <div class="subject">Add payment method</div>
+  <div>Your free trial period is ending soon. To keep your content accessible, please go to the Shape billing page and add a payment method to your account.</div>
+  <div>
+    <div class="organization-name"><%= @organization_name %></div>
+    <div>
+      <div class="section">
+        <div class="inner">
+          <div class="header">
+            <span class="highlight free-trial">FREE TRIAL</span>
+            <span class="highlight ending-in"><%= @ending_in %></span>
+          </div>
+          <dl>
+            <dt>Expiration Date:</dt>
+            <dd><%= @expiration_date %></dd>
+          </dl>
+        </div>
+      </div>
+      <div class='email-link'>
+        <%= link_to "Add Payment Method", @url %>
+      </div>
+    </div>
+  </div>
+</div>
