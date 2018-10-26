@@ -299,6 +299,18 @@ class ApiStore extends jsonapi(datxCollection) {
     return this.request('collections/create_template', 'POST', data)
   }
 
+  async fetchAllPages(url, page = 1, acc = []) {
+    // {page: 1, total: 15, size: 10}
+    const res = await this.request(`${url}&page=${page}`)
+    const { meta } = res
+    const { links } = res
+    const all = [...acc, ...res.data]
+    if (meta.size > 0 && links.last !== page) {
+      await this.fetchAllPages(url, page + 1, all)
+    }
+    return all
+  }
+
   async fetchUsableTemplates() {
     const other = ''
     let q = `#template ${other}`
@@ -306,9 +318,9 @@ class ApiStore extends jsonapi(datxCollection) {
       .replace(/\s/g, '+')
       .replace(/#/g, '%23')
     // TODO: pagination?
-    const res = await this.request(`search?query=${q}`)
+    const templates = await this.fetchAllPages(`search?query=${q}`)
     runInAction(() => {
-      this.usableTemplates = res.data.filter(c => c.isUsableTemplate)
+      this.usableTemplates = templates.filter(c => c.isUsableTemplate)
     })
   }
 
