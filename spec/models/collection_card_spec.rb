@@ -239,9 +239,11 @@ RSpec.describe CollectionCard, type: :model do
         end
 
         context 'inside a template instance' do
-          before do
-            # fake like the collection_card is in a template instance
-            collection.parent.update(template_id: 99)
+          let(:duplicate) do
+            collection_card_collection.duplicate!(
+              for_user: user,
+              building_template_instance: true,
+            )
           end
 
           it 'calls the TemplateBuilder to create an instance of the template' do
