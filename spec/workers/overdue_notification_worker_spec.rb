@@ -51,28 +51,14 @@ RSpec.describe OverdueNotificationWorker, type: :worker do
     it 'sends mail to organizations that meet the criteria' do
       expect(BillingOverdueMailer).not_to receive(:notify).with(in_app_billing_disabled)
       expect(BillingOverdueMailer).not_to receive(:notify).with(overdue_at_not_set)
-      expect(BillingOverdueMailer).not_to receive(:notify).with(
-        overdue_3_days, 3
-      )
-      expect(BillingOverdueMailer).not_to receive(:notify).with(
-        overdue_9_days, 9
-      )
+      expect(BillingOverdueMailer).not_to receive(:notify).with(overdue_3_days)
+      expect(BillingOverdueMailer).not_to receive(:notify).with(overdue_9_days)
 
-      expect(BillingOverdueMailer).to receive(:notify).with(
-        overdue_1_day, 1
-      )
-      expect(BillingOverdueMailer).to receive(:notify).with(
-        overdue_7_days, 7
-      )
-      expect(BillingOverdueMailer).to receive(:notify).with(
-        overdue_10_days, 10
-      )
-      expect(BillingOverdueMailer).to receive(:notify).with(
-        overdue_11_days, 11
-      )
-      expect(BillingOverdueMailer).to receive(:notify).with(
-        overdue_100_days, 100
-      )
+      expect(BillingOverdueMailer).to receive(:notify).with(overdue_1_day)
+      expect(BillingOverdueMailer).to receive(:notify).with(overdue_7_days)
+      expect(BillingOverdueMailer).to receive(:notify).with(overdue_10_days)
+      expect(BillingOverdueMailer).to receive(:notify).with(overdue_11_days)
+      expect(BillingOverdueMailer).to receive(:notify).with(overdue_100_days)
 
       OverdueNotificationWorker.new.perform
     end
