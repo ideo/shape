@@ -1,9 +1,9 @@
 <div class="billing-email trial-ending-soon">
-  <div class="subject">Add payment method</div>
+  <div class="subject">Payment Overdue</div>
   <div>
     Please add a payment method to continue using Shape at
     <%= @organization_name %>. The <%= @organization_name%> instance
-    of Shape will be frozen on <%= @account_freeze_date %> if you do
+    of Shape will be frozen on <strong><%= @account_freeze_date %></strong> if you do
     not add a valid payment method.
   </div>
   <div>
