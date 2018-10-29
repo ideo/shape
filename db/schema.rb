@@ -14,6 +14,7 @@ ActiveRecord::Schema.define(version: 20181029205523) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
+  enable_extension "pg_stat_statements"
 
   create_table "activities", force: :cascade do |t|
     t.bigint "actor_id"
@@ -319,7 +320,7 @@ ActiveRecord::Schema.define(version: 20181029205523) do
     t.index ["provider", "uid"], name: "index_users_on_provider_and_uid", unique: true
   end
 
-  create_table "users_roles", force: :cascade do |t|
+  create_table "users_roles", id: :serial, force: :cascade do |t|
     t.bigint "user_id"
     t.bigint "role_id"
     t.index ["role_id"], name: "index_users_roles_on_role_id"

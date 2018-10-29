@@ -10,7 +10,6 @@ RSpec.describe TrialExpiredMailer, type: :mailer do
 
     before do
       allow(organization).to receive(:network_organization).and_return(network_organization)
-      allow(NetworkApi::PaymentMethod).to receive(:find).with(organization_id: network_organization.id).and_return([])
       user_a.add_role(Role::ADMIN, organization.admin_group)
       user_b.add_role(Role::ADMIN, organization.admin_group)
     end
@@ -37,6 +36,10 @@ RSpec.describe TrialExpiredMailer, type: :mailer do
     end
 
     context 'missing payment method' do
+      before do
+        organization.update_attributes(has_payment_method: false)
+      end
+
       it 'renders the link to billing' do
         mail = TrialExpiredMailer.notify(organization)
         expect(mail.body.encoded).to match("Add payment method: #{root_url}/billing")
@@ -44,8 +47,11 @@ RSpec.describe TrialExpiredMailer, type: :mailer do
     end
 
     context 'has payment method' do
+      before do
+        organization.update_attributes(has_payment_method: true)
+      end
+
       it 'does not render the link to billing' do
-        allow(NetworkApi::PaymentMethod).to receive(:find).with(organization_id: network_organization.id).and_return(['a payment method'])
         mail = TrialExpiredMailer.notify(organization)
         expect(mail.body.encoded).not_to match("Add payment method: #{root_url}/billing")
       end
