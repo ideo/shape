@@ -5,6 +5,7 @@ import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import _ from 'lodash'
 import styled from 'styled-components'
 
+import CollectionSort from '~/ui/grid/CollectionSort'
 import Loader from '~/ui/layout/Loader'
 import MovableGridCard from '~/ui/grid/MovableGridCard'
 import CollectionCard from '~/stores/jsonApi/CollectionCard'
@@ -22,6 +23,14 @@ const StyledGrid = styled.div`
   }
 `
 StyledGrid.displayName = 'StyledGrid'
+
+const SortContainer = styled.div`
+  margin-bottom: 15px;
+  margin-left: auto;
+  margin-right: 5px;
+  margin-top: -15px;
+  text-align: right;
+`
 
 const calculateDistance = (pos1, pos2) => {
   // pythagoras!
@@ -593,7 +602,7 @@ class CollectionGrid extends React.Component {
   }
 
   render() {
-    const { uiStore } = this.props
+    const { sorting, uiStore } = this.props
     const { gridSettings } = uiStore
     const { rows } = this.state
     if (uiStore.isLoading) return <Loader />
@@ -602,6 +611,7 @@ class CollectionGrid extends React.Component {
 
     return (
       <StyledGrid minHeight={minHeight}>
+        {sorting && <SortContainer><CollectionSort /></SortContainer>}
         {this.renderPositionedCards()}
       </StyledGrid>
     )
@@ -631,6 +641,7 @@ CollectionGrid.propTypes = {
     type: PropTypes.string,
     template: MobxPropTypes.objectOrObservableObject,
   }),
+  sorting: PropTypes.bool,
 }
 CollectionGrid.wrappedComponent.propTypes = {
   routingStore: MobxPropTypes.objectOrObservableObject.isRequired,
@@ -640,6 +651,7 @@ CollectionGrid.defaultProps = {
   addEmptyCard: true,
   submissionSettings: null,
   blankContentToolState: null,
+  sorting: false,
 }
 CollectionGrid.displayName = 'CollectionGrid'
 

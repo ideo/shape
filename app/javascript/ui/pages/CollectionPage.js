@@ -283,6 +283,7 @@ class CollectionPage extends PageWithApi {
               movingCardIds={[]}
               movingCards={false}
               sortBy="order"
+              sorting
             />
           </div>
         )}
