@@ -33,6 +33,7 @@ class Activity < ApplicationRecord
     moved: 11,
     linked: 12,
     duplicated: 13,
+    archived_from_template: 14,
   }
 
   def self.map_move_action(move_action)
@@ -60,6 +61,7 @@ class Activity < ApplicationRecord
   def should_notify?
     %w[
       archived
+      archived_from_template
       added_editor
       added_member
       added_admin

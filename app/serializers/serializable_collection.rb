@@ -9,6 +9,7 @@ class SerializableCollection < BaseJsonSerializer
              :test_status, :collection_to_test_id
 
   has_one :parent_collection_card
+  has_one :parent
   has_one :live_test_collection
   belongs_to :submissions_collection
   belongs_to :submission_template
@@ -34,7 +35,7 @@ class SerializableCollection < BaseJsonSerializer
     @object.type || @object.class.name
   end
 
-  attribute :breadcrumb, if: -> { @object == @current_record } do
+  attribute :breadcrumb, if: -> { @current_record.nil? || @object == @current_record } do
     Breadcrumb::ForUser.new(
       @object,
       @current_user,
@@ -66,6 +67,8 @@ class SerializableCollection < BaseJsonSerializer
   end
 
   attribute :can_edit_content do
+    # NOTE: this also ends up coming into play when you are an editor
+    # but the collection is "pinned_and_locked"
     @current_ability.can?(:edit_content, @object)
   end
 
@@ -92,6 +95,14 @@ class SerializableCollection < BaseJsonSerializer
 
   attribute :is_submission_box_template do
     @object.submission_box_template?
+  end
+  
+  attribute :template_num_instances do
+    if @object.master_template?
+      @object.templated_collections.active.count
+    else
+      0
+    end
   end
 
   has_many :roles

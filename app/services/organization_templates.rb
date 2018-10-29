@@ -7,7 +7,26 @@ class OrganizationTemplates < SimpleService
     setup_template_collection
     setup_profile_template
     setup_profile_collection
+    setup_getting_started_collection
     @org.save
+  end
+
+  def setup_getting_started_collection
+    return if @org.getting_started_collection.present? || getting_started_template.blank?
+
+    getting_started_collection = getting_started_template.duplicate!(
+      copy_parent_card: true,
+      parent: @org.template_collection,
+    )
+    return unless getting_started_collection.persisted?
+    unless getting_started_collection.is_a?(Collection::Global)
+      getting_started_collection.update_attributes(
+        type: Collection::Global.to_s,
+      )
+      getting_started_collection = getting_started_collection.becomes(Collection::Global)
+    end
+    @org.admin_group.add_role(Role::EDITOR, getting_started_collection)
+    @org.update_attributes(getting_started_collection: getting_started_collection)
   end
 
   private
@@ -110,5 +129,9 @@ class OrganizationTemplates < SimpleService
     )
     @org.primary_group.add_role(Role::VIEWER, @org.profile_collection)
     @org.guest_group.add_role(Role::VIEWER, @org.profile_collection)
+  end
+
+  def getting_started_template
+    @getting_started_template ||= Collection.find_by(id: ENV['GETTING_STARTED_TEMPLATE_ID'])
   end
 end

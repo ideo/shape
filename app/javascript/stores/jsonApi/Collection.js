@@ -1,6 +1,7 @@
 import _ from 'lodash'
-import { observable, computed, action } from 'mobx'
+import { observable, computed, action, runInAction } from 'mobx'
 import { ReferenceType } from 'datx'
+import pluralize from 'pluralize'
 
 import { apiStore, routingStore, uiStore } from '~/stores'
 import BaseRecord from './BaseRecord'
@@ -41,6 +42,68 @@ class Collection extends SharedRecordMixin(BaseRecord) {
         this.collection_cards.splice(this.collection_cards.indexOf(card), 1)
       )
     this._reorderCards()
+  }
+
+  @action
+  toggleEditWarnings() {
+    if (this.snoozedEditWarningsAt) {
+      this.snoozedEditWarningsAt = undefined
+    } else {
+      this.snoozedEditWarningsAt = Date.now()
+    }
+    uiStore.setSnoozeChecked(!!this.snoozedEditWarningsAt)
+  }
+
+  get shouldShowEditWarning() {
+    if (!this.isMasterTemplate || this.template_num_instances === 0)
+      return false
+    const oneHourAgo = Date.now() - 1000 * 60 * 60
+    if (!this.snoozedEditWarningsAt) return true
+    if (this.snoozedEditWarningsAt < oneHourAgo) {
+      runInAction(() => {
+        // reset the state if time has elapsed, otherwise checkbox remains checked
+        this.snoozedEditWarningsAt = undefined
+      })
+      return true
+    }
+    return false
+  }
+
+  get editWarningPrompt() {
+    let prompt = 'Are you sure?'
+    const num = this.template_num_instances
+    prompt += ` ${num} ${pluralize('instance', num)}`
+    prompt += ` of this template will be affected.`
+    return prompt
+  }
+
+  get confirmEditOptions() {
+    const iconName = 'Template'
+    const confirmText = 'Continue'
+    const onToggleSnoozeDialog = () => {
+      this.toggleEditWarnings()
+    }
+    return {
+      prompt: this.editWarningPrompt,
+      confirmText,
+      iconName,
+      snoozeChecked: !this.shouldShowEditWarning,
+      onToggleSnoozeDialog,
+    }
+  }
+
+  // confirmEdit will check if we're in a template and need to confirm changes,
+  // otherwise it will just call onConfirm()
+  confirmEdit({ onCancel, onConfirm }) {
+    if (!this.shouldShowEditWarning) return onConfirm()
+    uiStore.confirm({
+      ...this.confirmEditOptions,
+      onCancel: () => {
+        if (onCancel) onCancel()
+      },
+      onConfirm: () => onConfirm(),
+    })
+    return true
   }
 
   get organization() {
@@ -103,7 +166,9 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     return (
       this.isMasterTemplate &&
       !this.isProfileTemplate &&
-      !this.is_submission_box_template
+      !this.is_submission_box_template &&
+      !this.isTestDesign &&
+      !this.isTestCollection
     )
   }
 
@@ -199,10 +264,12 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     const data = this.toJsonApi()
     delete data.relationships
     // attach nested attributes of cards
-    data.attributes.collection_cards_attributes = _.map(
-      this.collection_cards,
-      card => _.pick(card, ['id', 'order', 'width', 'height'])
-    )
+    if (this.collection_cards) {
+      data.attributes.collection_cards_attributes = _.map(
+        this.collection_cards,
+        card => _.pick(card, ['id', 'order', 'width', 'height'])
+      )
+    }
     return data
   }
 

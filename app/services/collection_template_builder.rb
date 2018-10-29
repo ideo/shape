@@ -2,19 +2,22 @@
 class CollectionTemplateBuilder
   attr_reader :collection, :errors
 
-  def initialize(parent:, template:, placement: 'beginning', created_by: nil)
+  def initialize(parent:, template:, placement: 'beginning', created_by: nil, parent_card: nil)
     @parent = parent
     @template = template
     @placement = placement
     @created_by = created_by
-    @collection = Collection.new
+    @collection = template.class.new
     @errors = @collection.errors
+    @parent_card = parent_card
   end
 
   def call
     return false unless create_collection
     place_collection_in_parent
     setup_template_cards
+    # mainly so template_num_instances will be refreshed in API cache
+    @template.touch
     # re-save to capture cover, new breadcrumb + tag lists
     @collection.cache_cover!
     @collection
@@ -32,6 +35,7 @@ class CollectionTemplateBuilder
     @collection = @template.templated_collections.create(
       name: created_template_name,
       organization: @parent.organization,
+      created_by: @created_by,
     )
     # make sure to assign these permissions before the template cards are generated
     @collection.inherit_roles_from_parent!(@parent)
@@ -39,6 +43,20 @@ class CollectionTemplateBuilder
     @collection.reload
     @created_by.add_role(Role::EDITOR, @collection)
     @collection
+  end
+
+  def place_collection_in_parent
+    unless @parent_card.present?
+      card = @parent.primary_collection_cards.create(
+        width: 1,
+        height: 1,
+        pinned: @parent.master_template?,
+        collection: @collection,
+        order: order_placement,
+      )
+      card.increment_card_orders! if @placement == 'beginning'
+    end
+    @collection.recalculate_breadcrumb!
   end
 
   def setup_template_cards
@@ -56,15 +74,15 @@ class CollectionTemplateBuilder
     end
   end
 
-  def place_collection_in_parent
-    card = @parent.primary_collection_cards.create(
-      width: 1,
-      height: 1,
-      pinned: @parent.master_template?,
-      collection: @collection,
-      order: @placement == 'beginning' ? 0 : @parent.collection_cards.count,
-    )
-    card.increment_card_orders! if @placement == 'beginning'
-    @collection.recalculate_breadcrumb!
+  def order_placement
+    last = @parent.collection_cards.count
+    case @placement
+    when 'beginning'
+      0
+    when 'end'
+      last
+    else
+      @placement.is_a?(Integer) ? @placement : last
+    end
   end
 end

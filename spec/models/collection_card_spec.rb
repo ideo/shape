@@ -58,6 +58,47 @@ RSpec.describe CollectionCard, type: :model do
     end
   end
 
+  describe 'callbacks' do
+    describe '#set_collection_as_master_template' do
+      let!(:coll_card) { create(:collection_card_collection, collection: collection) }
+
+      context 'with regular collection' do
+        let(:collection) { create(:collection) }
+
+        it 'should not set master_template' do
+          expect(collection.reload.master_template?).to be false
+        end
+      end
+
+      context 'with test collection' do
+        let(:collection) { create(:test_collection, num_cards: 3) }
+
+        it 'should not set master_template' do
+          expect(collection.reload.master_template?).to be false
+        end
+
+        it 'should not pin cards' do
+          expect(collection.primary_collection_cards.any?(&:pinned?)).to be false
+        end
+
+        context 'parent is master template' do
+          before do
+            collection.update(master_template: true)
+            collection.reload
+          end
+
+          it 'sets master_template = true' do
+            expect(collection.master_template?).to be true
+          end
+
+          it 'pins all cards' do
+            expect(collection.primary_collection_cards.all?(&:pinned?)).to be true
+          end
+        end
+      end
+    end
+  end
+
   describe '#duplicate!' do
     let(:user) { create(:user) }
     let!(:collection_card) { create(:collection_card_text) }
@@ -88,6 +129,38 @@ RSpec.describe CollectionCard, type: :model do
     it 'should not call increment_card_orders!' do
       expect_any_instance_of(CollectionCard).not_to receive(:increment_card_orders!)
       duplicate
+    end
+
+    context 'without user' do
+      let(:duplicate_without_user) do
+        collection_card.duplicate!(
+          shallow: shallow,
+          placement: placement,
+          duplicate_linked_records: duplicate_linked_records,
+        )
+      end
+
+      it 'should create copy of card' do
+        expect { duplicate_without_user }.to change(CollectionCard, :count).by(1)
+        expect(duplicate_without_user.id).not_to eq(collection_card.id)
+      end
+
+      it 'should duplicate item' do
+        expect { duplicate_without_user }.to change(Item, :count).by(1)
+      end
+
+      context 'in a master template' do
+        let(:collection) { collection_card.parent }
+
+        before do
+          collection.update(master_template: true)
+        end
+
+        it 'should call the UpdateTemplateInstancesWorker' do
+          expect(UpdateTemplateInstancesWorker).to receive(:perform_async).with(collection.id)
+          duplicate
+        end
+      end
     end
 
     context 'with pinned card from regular collection' do
@@ -141,6 +214,7 @@ RSpec.describe CollectionCard, type: :model do
 
     context 'for collection' do
       let!(:collection_card_collection) { create(:collection_card_collection) }
+      let(:collection) { collection_card_collection.collection }
       let(:duplicate) do
         collection_card_collection.duplicate!(
           for_user: user,
@@ -148,11 +222,35 @@ RSpec.describe CollectionCard, type: :model do
       end
 
       before do
-        user.add_role(Role::EDITOR, collection_card_collection.collection)
+        user.add_role(Role::EDITOR, collection)
       end
 
       it 'should duplicate collection' do
         expect { duplicate }.to change(Collection, :count).by(1)
+      end
+
+      context 'with a master template collection' do
+        before do
+          collection.update(master_template: true)
+        end
+
+        it 'simply copies the template' do
+          expect(duplicate.collection.master_template?).to be true
+        end
+
+        context 'inside a template instance' do
+          let(:duplicate) do
+            collection_card_collection.duplicate!(
+              for_user: user,
+              building_template_instance: true,
+            )
+          end
+
+          it 'calls the TemplateBuilder to create an instance of the template' do
+            expect(duplicate.collection.master_template?).to be false
+            expect(duplicate.collection.template).to eq collection
+          end
+        end
       end
     end
 
@@ -308,9 +406,9 @@ RSpec.describe CollectionCard, type: :model do
   end
 
   context 'archiving' do
-    let(:collection) { create(:collection) }
-    let!(:collection_card_list) { create_list(:collection_card, 5, parent: collection) }
-    let(:collection_cards) { collection.collection_cards }
+    let(:collection) { create(:collection, num_cards: 5) }
+    # we grab these manually because archiving the cards will alter collection.collection_cards
+    let(:collection_cards) { CollectionCard.where(id: collection.collection_cards.map(&:id)) }
     let(:collection_card) { collection_cards.first }
 
     describe '#decrement_card_orders!' do
@@ -341,7 +439,7 @@ RSpec.describe CollectionCard, type: :model do
       it 'should decrement parent cached_card_count' do
         expect(collection.cached_card_count).to eq 5
         collection_card.archive!
-        expect(collection.cached_card_count).to eq 4
+        expect(collection.reload.cached_card_count).to eq 4
       end
     end
 
@@ -349,20 +447,28 @@ RSpec.describe CollectionCard, type: :model do
       let(:user) { create(:user) }
 
       it 'should archive all cards in the query' do
-        expect(collection).to receive(:touch)
+        expect_any_instance_of(Collection).to receive(:touch)
         expect {
           collection_cards.archive_all!(user_id: user.id)
         }.to change(CollectionCard.active, :count).by(collection_cards.count * -1)
-        # because this is the relation collection.collection_cards, it should now be empty
-        expect(collection_cards).to eq []
+        expect(collection.reload.collection_cards).to eq []
       end
 
-      it 'should call the background worker' do
+      it 'should call the CollectionCardArchiveWorker' do
         expect(CollectionCardArchiveWorker).to receive(:perform_async).with(
           collection_cards.map(&:id),
           user.id,
         )
         collection_cards.archive_all!(user_id: user.id)
+      end
+
+      context 'with a master template collection' do
+        let(:collection) { create(:collection, master_template: true, num_cards: 2) }
+
+        it 'should call the UpdateTemplateInstancesWorker' do
+          expect(UpdateTemplateInstancesWorker).to receive(:perform_async).with(collection.id)
+          collection_cards.archive_all!(user_id: user.id)
+        end
       end
     end
   end

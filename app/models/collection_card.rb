@@ -14,6 +14,8 @@ class CollectionCard < ApplicationRecord
   before_create :assign_default_height_and_width
   after_update :update_collection_cover, if: :saved_change_to_is_cover?
   after_create :update_parent_card_count!
+  after_save :set_collection_as_master_template,
+             if: :test_collection_within_master_template_after_save?
 
   validates :parent, :order, presence: true
   validate :single_item_or_collection_is_present
@@ -39,11 +41,12 @@ class CollectionCard < ApplicationRecord
   end
 
   def duplicate!(
-    for_user:,
+    for_user: nil,
     parent: self.parent,
     shallow: false,
     placement: 'end',
-    duplicate_linked_records: false
+    duplicate_linked_records: false,
+    building_template_instance: false
   )
     if record.is_a? Collection::SharedWithMeCollection
       errors.add(:collection, 'cannot be a SharedWithMeCollection for duplication')
@@ -67,8 +70,9 @@ class CollectionCard < ApplicationRecord
     elsif parent.master_template?
       # Make it pinned if you're duplicating it into a master template
       cc.pinned = true
-    elsif !(parent.templated? || parent.master_template?)
-      # copying into a normal (non templated) collection, it should never be pinned
+    else
+      # copying into a normal (non templated) collection, it should never be pinned;
+      # likewise even if you duplicate a pinned card in your own instance
       cc.pinned = false
     end
     # defaults to self.parent, unless one is passed in
@@ -89,7 +93,10 @@ class CollectionCard < ApplicationRecord
         for_user: for_user,
         parent: parent,
       }
-      cc.collection = collection.duplicate!(opts) if collection.present?
+      coll_opts = opts.merge(
+        building_template_instance: building_template_instance,
+      )
+      cc.collection = collection.duplicate!(coll_opts) if collection.present?
       cc.item = item.duplicate!(opts) if item.present?
     end
 
@@ -97,6 +104,10 @@ class CollectionCard < ApplicationRecord
     # now that the card exists, we can recalculate the breadcrumb
     cc.record.recalculate_breadcrumb!
     cc.increment_card_orders! if placement == 'beginning'
+    if parent.master_template?
+      # we just added a template card, so update the instances
+      parent.queue_update_template_instances
+    end
 
     cc
   end
@@ -180,12 +191,19 @@ class CollectionCard < ApplicationRecord
     ids = pluck(:id)
     # ensure we're now working with an unscoped AR::Relation
     cards = CollectionCard.where(id: ids)
-    # should generally only be the one parent collection
-    parents = cards.map(&:parent).uniq.compact
     cards.update_all(archived: true)
-    parents.each(&:touch)
+    # should generally only be the one parent collection, but an array to be safe
+    parents = cards.map(&:parent).uniq.compact
+    parents.each do |parent|
+      parent.touch
+      if parent.master_template?
+        # we just archived a template card, so update the instances
+        parent.queue_update_template_instances
+      end
+    end
     CollectionCardArchiveWorker.perform_async(
       ids,
+      # user_id is for the archive notification `actor`
       user_id,
     )
   end
@@ -308,5 +326,14 @@ class CollectionCard < ApplicationRecord
 
   def update_parent_card_count!
     parent.cache_card_count!
+  end
+
+  def test_collection_within_master_template_after_save?
+    return false if collection_id.blank? || !collection.is_a?(Collection::TestCollection)
+    saved_change_to_parent_id? && master_template_card?
+  end
+
+  def set_collection_as_master_template
+    collection.update(master_template: true)
   end
 end

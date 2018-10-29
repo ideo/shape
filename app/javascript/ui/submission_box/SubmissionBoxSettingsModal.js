@@ -263,7 +263,11 @@ class SubmissionBoxSettingsModal extends React.Component {
       submission_template_id,
       submission_box_type,
     } = this.props.collection
-    const template = this.templates.find(t => t.id === submission_template_id)
+    const { apiStore } = this.props
+    let template
+    if (submission_template_id) {
+      template = apiStore.find('collections', submission_template_id)
+    }
     if (template) {
       return this.submissionBoxRowForTemplate(template)
     } else if (submission_box_type && submission_box_type !== 'template') {

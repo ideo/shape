@@ -260,7 +260,10 @@ class PageHeader extends React.Component {
 
   get launchTestButton() {
     const { record } = this.props
-    if (record.can_edit && (record.isLaunchableTest || record.isClosedTest)) {
+    if (
+      record.can_edit_content &&
+      (record.isLaunchableTest || record.isClosedTest)
+    ) {
       if (record.isLaunchableTest) {
         return (
           <HeaderFormButton onClick={record.launchTest}>

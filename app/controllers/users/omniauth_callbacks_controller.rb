@@ -25,6 +25,6 @@ class Users::OmniauthCallbacksController < Devise::OmniauthCallbacksController
   def setup_org_membership
     return unless @user.current_organization.present?
     # double check if they're now signed in with a whitelisted email
-    @user.current_organization.setup_user_membership(@user)
+    @user.current_organization.check_user_email_domain(@user)
   end
 end

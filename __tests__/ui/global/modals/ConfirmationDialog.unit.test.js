@@ -37,6 +37,10 @@ describe('ConfirmationDialog', () => {
       expect(alert.props().open).toBe(true)
     })
 
+    it('should not show snooze warning', () => {
+      expect(wrapper.find('snoozeDialogMessage').exists()).toBe(false)
+    })
+
     describe('handleCancel', () => {
       describe('with onCancel prop', () => {
         beforeEach(() => {
@@ -75,6 +79,22 @@ describe('ConfirmationDialog', () => {
 
       it('should close the modal', () => {
         expect(props.onClose).toHaveBeenCalled()
+      })
+    })
+
+    describe('onToggleSnoozeDialog provided', () => {
+      beforeEach(() => {
+        props.onToggleSnoozeDialog = jest.fn()
+        wrapper.setProps(props)
+      })
+
+      it('should show snooze warning', () => {
+        expect(wrapper.find('snoozeDialogMessage').exists()).toBe(true)
+      })
+
+      it('should call onToggleSnoozeDialog if label clicked', () => {
+        wrapper.find('snoozeDialogMessage').simulate('click', fakeEvent)
+        expect(props.onToggleSnoozeDialog.mock.calls.length).toBe(1)
       })
     })
   })

@@ -128,6 +128,20 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
         expect(collections_json.first['attributes']).to match_json_schema('collection', strict: false)
       end
     end
+
+    context 'as master template' do
+      before do
+        collection.update_attributes(master_template: true)
+      end
+      let!(:template_instances) do
+        create_list(:collection, 3, template: collection, created_by: user)
+      end
+
+      it 'includes number of template instances' do
+        get(path)
+        expect(json['data']['attributes']['template_num_instances']).to eq(3)
+      end
+    end
   end
 
   describe 'POST #create_template' do
@@ -182,6 +196,14 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
       it 'returns a 401' do
         post(path, params: params)
         expect(response.status).to eq(401)
+      end
+    end
+
+    context 'trying to create inside a template' do
+      let(:to_collection) { create(:collection, master_template: true, organization: organization) }
+      it 'returns a 400' do
+        post(path, params: params)
+        expect(response.status).to eq(400)
       end
     end
   end

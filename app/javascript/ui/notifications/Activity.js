@@ -101,7 +101,7 @@ class Activity extends React.PureComponent {
   }
 
   getDataText() {
-    const { action, subjectGroups, target, content } = this.props
+    const { action, subjectGroups, target, content, sourceName } = this.props
     return {
       actorNames: this.actorText(),
       targetName: target.name,
@@ -109,6 +109,7 @@ class Activity extends React.PureComponent {
       targetType: pluralize.singular(target.internalType),
       roleName: this.isRoleAction() && action.split('_')[1],
       message: content ? commentPreview(content) : '',
+      sourceName,
     }
   }
 
@@ -126,20 +127,31 @@ class Activity extends React.PureComponent {
       roleName,
       subjects,
       message,
+      sourceName,
     } = this.getDataText()
 
     switch (action) {
       case 'archived':
         return (
           <ActivityText>
-            <strong className="actor">{actorNames}</strong>
-            {` `}
-            has archived{' '}
+            <strong className="actor">{actorNames}</strong> has archived{' '}
             <strong className="target">
               &ldquo;
               {targetName}
               &rdquo;
             </strong>
+          </ActivityText>
+        )
+      case 'archived_from_template':
+        return (
+          <ActivityText>
+            {this.targetLink(targetName)} has been changed as a result of{' '}
+            <strong className="source">
+              &ldquo;
+              {sourceName}
+              &rdquo;
+            </strong>{' '}
+            being removed from its template.
           </ActivityText>
         )
       case 'added_editor':
@@ -206,6 +218,7 @@ Activity.propTypes = {
     name: PropTypes.string,
     internalType: PropTypes.string,
   }).isRequired,
+  sourceName: PropTypes.string,
   subjectUsers: MobxPropTypes.arrayOrObservableArray,
   subjectGroups: MobxPropTypes.arrayOrObservableArray,
   actorCount: PropTypes.number,
@@ -218,6 +231,7 @@ Activity.defaultProps = {
   subjectGroups: [],
   actorCount: 0,
   content: null,
+  sourceName: '',
 }
 
 export default Activity

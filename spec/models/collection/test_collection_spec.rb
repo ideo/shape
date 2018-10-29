@@ -93,7 +93,7 @@ describe Collection::TestCollection, type: :model do
     end
 
     context 'if live' do
-      let!(:test_collection) { create(:test_collection, :completed) }
+      let(:test_collection) { create(:test_collection, :completed) }
       before do
         test_collection.launch!(initiated_by: user)
         expect(test_collection.live?).to be true
@@ -128,6 +128,35 @@ describe Collection::TestCollection, type: :model do
 
       it 'no longer has a test_collection' do
         expect(duplicate.test_collection_id).to be_nil
+      end
+
+      context 'if template instance' do
+        let(:template) { create(:collection, master_template: true) }
+        let(:parent_collection) { create(:collection) }
+        let!(:test_template_instance) do
+          create(:test_collection,
+                 :completed,
+                 parent_collection: parent_collection,
+                 collection_to_test: parent_collection,
+                 template: template)
+        end
+        before do
+          test_template_instance.launch!(initiated_by: user)
+          expect(test_template_instance.live?).to be true
+        end
+
+        it 'moves templated_from to TestDesign' do
+          expect(test_template_instance.template).to be_nil
+          expect(
+            test_template_instance.test_design.template,
+          ).to eq(template)
+        end
+
+        it 'keeps collection_to_test on TestCollection' do
+          expect(
+            test_template_instance.collection_to_test,
+          ).to eq(parent_collection)
+        end
       end
 
       context 'if closed' do

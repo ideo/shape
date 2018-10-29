@@ -37,6 +37,23 @@ RSpec.describe Item, type: :model do
       expect(duplicate.parent_collection_card).to be_nil
     end
 
+    context 'without user' do
+      let(:duplicate_without_user) do
+        item.duplicate!(
+          copy_parent_card: copy_parent_card,
+        )
+      end
+
+      it 'clones the item' do
+        expect { duplicate_without_user }.to change(Item, :count).by(1)
+        expect(duplicate_without_user).not_to eq(item)
+      end
+
+      it 'references the current item as cloned_from' do
+        expect(duplicate_without_user.cloned_from).to eq(item)
+      end
+    end
+
     context 'with roles' do
       before do
         user.add_role(Role::EDITOR, collection)

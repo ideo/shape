@@ -12,7 +12,8 @@ class ActivityAndNotificationBuilder < SimpleService
     combine: false,
     content: nil,
     source: nil,
-    destination: nil
+    destination: nil,
+    organization: nil
   )
     @actor = actor
     @target = target
@@ -27,6 +28,7 @@ class ActivityAndNotificationBuilder < SimpleService
     @content = content
     @source = source
     @destination = destination
+    @organization = organization || actor.current_organization
     @errors = []
     @activity = nil
     @created_notifications = []
@@ -46,7 +48,7 @@ class ActivityAndNotificationBuilder < SimpleService
       actor: @actor,
       target: @target,
       action: @action,
-      organization: @actor.current_organization,
+      organization: @organization,
       content: @content,
       source: @source,
       destination: @destination,
@@ -118,7 +120,8 @@ class ActivityAndNotificationBuilder < SimpleService
 
   def store_in_firestore
     return unless @created_notifications.present?
-    FirestoreBatchWriter.perform_async(
+    FirestoreBatchWriter.perform_in(
+      3.seconds,
       @created_notifications.compact.map(&:batch_job_identifier),
     )
   end

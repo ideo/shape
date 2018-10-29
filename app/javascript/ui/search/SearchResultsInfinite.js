@@ -136,7 +136,12 @@ class SearchResultsInfinite extends React.Component {
           >
             <div>
               <StyledBreadcrumb>
-                <Breadcrumb record={collection} isHomepage={false} />
+                <Breadcrumb
+                  record={collection}
+                  isHomepage={false}
+                  // re-mount every time the record / breadcrumb changes
+                  key={`${collection.identifier}_${collection.breadcrumbSize}`}
+                />
               </StyledBreadcrumb>
               <StyledSearchResult
                 {...gridSettings}

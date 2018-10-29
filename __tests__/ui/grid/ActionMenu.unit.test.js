@@ -56,12 +56,22 @@ describe('ActionMenu', () => {
       expect(card.beginReplacing).toHaveBeenCalled()
     })
 
-    it('calls selectCardId and openMoveMenu on moveCard action', () => {
+    it('calls collection.confirmEdit on move action', () => {
       component.moveCard()
-      expect(props.uiStore.selectCardId).toHaveBeenCalledWith(card.id)
-      expect(props.uiStore.openMoveMenu).toHaveBeenCalledWith({
-        from: props.uiStore.viewingCollection.id,
-        cardAction: 'move',
+      expect(props.card.parentCollection.confirmEdit).toHaveBeenCalledWith({
+        onConfirm: expect.any(Function),
+        onCancel: expect.any(Function),
+      })
+    })
+
+    describe('assuming confirmEdit warning disabled', () => {
+      it('calls selectCardId and openMoveMenu on move action', () => {
+        component.openMoveMenu('move')
+        expect(props.uiStore.selectCardId).toHaveBeenCalledWith(card.id)
+        expect(props.uiStore.openMoveMenu).toHaveBeenCalledWith({
+          from: props.uiStore.viewingCollection.id,
+          cardAction: 'move',
+        })
       })
     })
 

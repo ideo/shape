@@ -88,9 +88,9 @@ ActiveRecord::Schema.define(version: 20181018175707) do
     t.integer "submission_box_type"
     t.bigint "submission_box_id"
     t.integer "test_status"
+    t.integer "processing_status"
     t.integer "question_item_id"
     t.bigint "test_collection_id"
-    t.integer "processing_status"
     t.bigint "collection_to_test_id"
     t.index ["breadcrumb"], name: "index_collections_on_breadcrumb", using: :gin
     t.index ["cloned_from_id"], name: "index_collections_on_cloned_from_id"
@@ -223,6 +223,7 @@ ActiveRecord::Schema.define(version: 20181018175707) do
     t.integer "profile_template_id"
     t.integer "profile_collection_id"
     t.string "slug"
+    t.integer "getting_started_collection_id"
     t.index ["slug"], name: "index_organizations_on_slug", unique: true
   end
 

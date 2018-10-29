@@ -64,11 +64,19 @@ class Collection
         # Otherwise dupe this collection
         duplicate = super(args)
       end
-      return duplicate unless duplicate.persisted?
 
-      duplicate.update(
-        name: "Copy of #{name}",
-      )
+      return duplicate if duplicate.new_record? || args[:parent].blank?
+
+      duplicate.type = 'Collection::TestCollection'
+      duplicate = duplicate.becomes(Collection::TestCollection)
+      if collection_to_test.present?
+        # Point to the new parent as the one to test
+        duplicate.collection_to_test = args[:parent]
+      elsif !args[:parent].master_template?
+        # Prefix with 'Copy' if it isn't still within a template
+        duplicate.name = "Copy of #{name}"
+      end
+      duplicate.save
       duplicate
     end
 
@@ -177,6 +185,7 @@ class Collection
       transaction do
         return false unless test_design_card_builder.create
         self.test_design = test_design_card_builder.collection_card.record
+        self.template_id = nil # Moves association to the TestDesign
         # move all the cards into the test design collection
         collection_cards
           .where.not(
@@ -202,6 +211,7 @@ class Collection
           name: "#{name} Feedback Design",
           type: 'Collection::TestDesign',
           test_collection_id: id,
+          template_id: template_id,
         },
       }
       CollectionCardBuilder.new(

@@ -83,6 +83,25 @@ describe Api::V1::SearchController, type: :request, json: true, auth: true, sear
         expect(json['data'].size).to eq(1)
         expect(json['data'].first['id'].to_i).to eq(collection_with_tags.id)
       end
+
+      context 'with a per_page param set' do
+        let!(:collections) do
+          create_list(
+            :collection,
+            4,
+            name: 'shared name',
+            organization: organization,
+            add_editors: [current_user],
+          )
+        end
+
+        it 'returns only the amount for the page' do
+          get(path, params: { query: 'shared name', per_page: 2 })
+          expect(json['data'].size).to eq(2)
+          expect(json['meta']['page']).to eq(1)
+          expect(json['links']['last']).to eq(2)
+        end
+      end
     end
 
     context 'if user cannot view collection' do

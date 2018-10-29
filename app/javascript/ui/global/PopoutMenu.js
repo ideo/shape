@@ -16,6 +16,11 @@ export const StyledMenuButtonWrapper = styled.div`
     display: block;
     opacity: 1;
     animation: fadeInFromNone 0.25s;
+    ${props =>
+      props.hideDotMenu &&
+      `
+      margin-top: 25px;
+    `};
   }
   @keyframes fadeInFromNone {
     0% {
@@ -174,6 +179,7 @@ class PopoutMenu extends React.Component {
         className={`${wrapperClassName} ${menuOpen && ' open'}`}
         role="presentation"
         onMouseLeave={onMouseLeave}
+        hideDotMenu={hideDotMenu}
       >
         {!hideDotMenu && (
           <MenuToggle
