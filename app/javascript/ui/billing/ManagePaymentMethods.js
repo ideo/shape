@@ -57,7 +57,8 @@ class ManagePaymentMethods extends React.Component {
   }
 
   destroyPaymentMethod = async paymentMethod => {
-    await this.props.networkStore.remove(paymentMethod, true)
+    await this.props.networkStore.remove(paymentMethod, paymentMethod.id, true)
+    await this.props.networkStore.remove(paymentMethod, paymentMethod.id)
     this.forceUpdate()
   }
 
