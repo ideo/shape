@@ -36,7 +36,7 @@ const createNamedRoutes = () => {
 
 before(() => {
   // clean out the DB before running the suite
-  cy.exec('bin/spring rake cypress:db_setup')
+  cy.exec('bin/rake cypress:db_setup')
 })
 
 beforeEach(() => {

@@ -177,6 +177,7 @@
     "react-router-enzyme-context": "^1.2.0",
     "react-styleguidist": "^7.0.9",
     "react-test-renderer": "^16.2.0",
+    "wait-on": "^3.1.0",
     "webpack-bundle-analyzer": "^2.11.1",
     "webpack-dev-server": "^3.1.3"
   },
