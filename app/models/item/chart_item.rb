@@ -37,7 +37,7 @@ class Item
 
     def calc_total_score(data, total)
       total_score = data.reduce(0) do |acc, d|
-        mult = (d[:answer] - 1 == 0 ? 0 : (d[:answer] - 1) / 3.0) * 100
+        mult = (d[:answer] - 1) / 3.0 * 100
         acc + mult * d[:num_responses]
       end
       Integer(total_score / total)
@@ -61,7 +61,6 @@ class Item
         label: parent.organization.name,
         type: 'org_wide',
         total: total,
-        total_score: calc_total_score(data, total),
         data: data,
       }
     end
