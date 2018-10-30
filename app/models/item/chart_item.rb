@@ -17,30 +17,14 @@ class Item
     end
 
     def question_data
-      survey_answers = data_source
-                       .question_answers
-                       .joins(:survey_response)
-                       .where(
-                         SurveyResponse.arel_table[:status].eq(:completed),
-                       )
-
-      data = grouped_response_data(survey_answers)
-      total = survey_answers.count
+      # NOTE: the only currently supported data_source is a question_item
+      survey_answers = data_source.completed_survey_answers
       {
         label: parent.name,
         type: 'question_items',
         total: survey_answers.count,
-        total_score: calc_total_score(data, total),
         data: grouped_response_data(survey_answers),
       }
-    end
-
-    def calc_total_score(data, total)
-      total_score = data.reduce(0) do |acc, d|
-        mult = (d[:answer] - 1 == 0 ? 0 : (d[:answer] - 1) / 3.0) * 100
-        acc + mult * d[:num_responses]
-      end
-      Integer(total_score / total)
     end
 
     def org_data
@@ -55,14 +39,11 @@ class Item
                          Collection::TestCollection.arel_table[:organization_id].eq(parent.organization_id),
                        )
 
-      data = grouped_response_data(survey_answers)
-      total = survey_answers.count
       {
         label: parent.organization.name,
         type: 'org_wide',
-        total: total,
-        total_score: calc_total_score(data, total),
-        data: data,
+        total: survey_answers.count,
+        data: grouped_response_data(survey_answers),
       }
     end
 

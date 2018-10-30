@@ -47,7 +47,6 @@ RSpec.describe Item::ChartItem, type: :model do
               label: test_collection.name,
               type: 'question_items',
               total: 1,
-              total_score: 0,
               data: [
                 { num_responses: 1, answer: 1 },
                 { num_responses: 0, answer: 2 },
@@ -59,7 +58,6 @@ RSpec.describe Item::ChartItem, type: :model do
               label: test_collection.organization.name,
               type: 'org_wide',
               total: 6,
-              total_score: 0,
               data: [
                 { num_responses: 6, answer: 1 },
                 { num_responses: 0, answer: 2 },
