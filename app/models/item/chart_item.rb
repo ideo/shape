@@ -6,12 +6,7 @@ class Item
       (1..4).map { |n| { num_responses: 0, answer: n } }
     end
 
-    def survey_answers
-      # NOTE: the only currently supported data_source is a question_item
-      @survey_answers ||= data_source.completed_survey_answers
-    end
-
-    def grouped_response_data
+    def grouped_response_data(survey_answers)
       data = base_data
       counts = survey_answers.group(QuestionAnswer.arel_table[:answer_number]).count
       counts.each do |answer_number, count|
@@ -22,11 +17,13 @@ class Item
     end
 
     def question_data
+      # NOTE: the only currently supported data_source is a question_item
+      survey_answers = data_source.completed_survey_answers
       {
         label: parent.name,
         type: 'question_items',
         total: survey_answers.count,
-        data: grouped_response_data,
+        data: grouped_response_data(survey_answers),
       }
     end
 
@@ -42,13 +39,11 @@ class Item
                          Collection::TestCollection.arel_table[:organization_id].eq(parent.organization_id),
                        )
 
-      data = grouped_response_data
-      total = survey_answers.count
       {
         label: parent.organization.name,
         type: 'org_wide',
-        total: total,
-        data: data,
+        total: survey_answers.count,
+        data: grouped_response_data(survey_answers),
       }
     end
 
