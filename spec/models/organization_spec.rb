@@ -512,6 +512,23 @@ describe Organization, type: :model do
     end
   end
 
+  describe '#trial_users_exceeded?' do
+    it 'returns true when there are more active users than trial users' do
+      organization = create(:organization, trial_users_count: 5, active_users_count: 6)
+      expect(organization.trial_users_exceeded?).to be true
+    end
+
+    it 'returns true when there are the same number of active users and trial users' do
+      organization = create(:organization, trial_users_count: 5, active_users_count: 5)
+      expect(organization.trial_users_exceeded?).to be false
+    end
+
+    it 'returns false when there are fewer active users than trial users' do
+      organization = create(:organization, trial_users_count: 6, active_users_count: 5)
+      expect(organization.trial_users_exceeded?).to be false
+    end
+  end
+
   describe '#create_network_usage_record' do
     let(:organization) { create(:organization, in_app_billing: true) }
     before do

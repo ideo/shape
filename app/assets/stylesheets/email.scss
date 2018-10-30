@@ -6,7 +6,7 @@ $color-gray-bg: #f0f2f4;
 $color-gray-boulder: #787878;
 $color-gray-tundora: #4A4A4A;
 $color-blacklava: #120f0e;
-$header-font: 'Gotham', 'Verdana', sans-serif;
+$gotham-font: 'Gotham', 'Verdana', sans-serif;
 $sentinel-font: 'Sentinel', Palatino, Georgia, serif;
 $sentinel-lt-font: 'Sentinel-Light', 'Sentinel', Palatino, Georgia, serif;
 
@@ -21,7 +21,7 @@ $sentinel-lt-font: 'Sentinel-Light', 'Sentinel', Palatino, Georgia, serif;
   max-width: 710px;
   margin: 0 auto;
   background-color: $color-gray-bg;
-   -webkit-font-smoothing: antialiased;
+  -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale; color: $color-blacklava;
 
   a, a:visited {
@@ -51,7 +51,7 @@ $sentinel-lt-font: 'Sentinel-Light', 'Sentinel', Palatino, Georgia, serif;
   }
 
   h1, h2, h3, h4, h5, h6 {
-    font-family: $header-font;
+    font-family: $gotham-font;
     font-weight: bold;
   }
 
@@ -106,7 +106,7 @@ $sentinel-lt-font: 'Sentinel-Light', 'Sentinel', Palatino, Georgia, serif;
 
   .email-link {
     a {
-      font-family: $header-font;
+      font-family: $gotham-font;
       text-align: center;
       text-transform: uppercase;
       color: $color-white;
@@ -159,7 +159,7 @@ $sentinel-lt-font: 'Sentinel-Light', 'Sentinel', Palatino, Georgia, serif;
 // Invite mailer
 .header {
   color: #120F0E;
-  font-family: $header-font;
+  font-family: $gotham-font;
   font-size: 22px;
   font-weight: 600;
   height: 26px;
@@ -225,7 +225,7 @@ button {
   width: 12px;
 }
 
-.buttons__NotificationButton {
+.button_sg_NotificationButton {
   background-color: #d66742;
   border-radius: 50%;
   cursor: pointer;
@@ -239,7 +239,7 @@ button {
 .Moment {
   color: white;
   display: inline-block;
-  font-family: $header-font;
+  font-family: $gotham-font;
   font-size: 0.75rem;
   font-weight: 500;
   white-space: nowrap;
@@ -252,7 +252,7 @@ button {
 
 .Activity__ActivityText {
   color: #f2f1ee;
-  font-family: $header-font;
+  font-family: $gotham-font;
   font-size: 1rem;
   font-weight: 300;
   line-height: 1.25;
@@ -260,7 +260,7 @@ button {
   margin-top: 3px;
 
   span {
-    font-family: $header-font;
+    font-family: $gotham-font;
   }
 }
 
@@ -274,7 +274,7 @@ button {
   color: white;
   display: flex;
   height: 70px;
-  font-family: $header-font;
+  font-family: $gotham-font;
   font-size: 23px;
   .name {
     text-transform: uppercase;
@@ -284,7 +284,7 @@ button {
 .CommentThread__title {
   background-color: #3f526a;
   color: white;
-  font-family: $header-font;
+  font-family: $gotham-font;
   font-weight: 500;
   font-size: 0.75rem;
   padding: 10px 10px 0 10px;
@@ -312,12 +312,12 @@ button {
 }
 
 .CommentThread_timestamp {
-  font-family: $header-font;
+  font-family: $gotham-font;
   margin-left: auto;
 }
 
 .Comments {
-  font-family: $header-font;
+  font-family: $gotham-font;
   margin: 5px 10px 0 10px;
 }
 
@@ -327,7 +327,7 @@ button {
   padding: 10px;
   padding-right: 45px;
   font-size: 1rem;
-  font-family: $header-font;
+  font-family: $gotham-font;
   padding: 10px;
   margin-bottom: 5px;
   background: #5a6a7c;
@@ -370,6 +370,68 @@ button {
 .typography__DisplayText {
   color: white;
   font-weight: 400;
-  font-family: $header-font;
+  font-family: $gotham-font;
   font-size: 1rem;
+}
+
+// trial_users_count_exceeded_mailer
+
+.trial-users-count-exceeded-mailer {
+  font-family: $gotham-font;
+
+  .subject {
+    font-size: 36px;
+    line-height: 0.72;
+    text-align: center;
+    color: #120f0e;
+    margin-bottom: 40px;
+  }
+
+  .organization-name {
+    margin: 24px 0;
+    background-color: #3f526a;
+    padding: 24px;
+    text-align: center;
+    color: white;
+    font-size: 24px;
+  }
+
+  .section {
+    margin: 0 30px;
+    padding-bottom: 30px;
+    border-bottom: 1px solid #c6c1bf;
+
+    .header {
+      font-size: 16px;
+      font-weight: bold;
+      letter-spacing: 1.6px;
+      color: #120f0e;
+    }
+
+    .free-trial {
+      background-color: #c0dbde;
+      padding: 4px 6px;
+      margin-left: -6px;
+    }
+
+    .inner {
+      padding: 0 20px;
+      font-size: 16px;
+      line-height: 1.63;
+      color: #120f0e;
+      overflow: auto;
+
+      dt {
+        float: left;
+        clear: left;
+      }
+      dd {
+        float: right;
+      }
+
+      .subtract {
+        color: #a89f9b;
+      }
+    }
+  }
 }

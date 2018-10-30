@@ -198,6 +198,10 @@ class Organization < ApplicationRecord
     trial_ends_at > Time.current
   end
 
+  def trial_users_exceeded?
+    active_users_count > trial_users_count
+  end
+
   def create_network_usage_record
     calculate_active_users_count!
     return true unless in_app_billing
