@@ -48,9 +48,12 @@ import 'firebase/firestore'
 
 */
 
+// disable firestore in cypress automated tests -- doesn't really work
+const cypress = navigator && navigator.userAgent === 'cypress'
+
 const config = process.env.GOOGLE_FIRESTORE_SHAPE_MARKETING
 let db = {}
-if (config) {
+if (config && !cypress) {
   firebase.initializeApp(JSON.parse(config))
   db = firebase.firestore()
   db.settings({
@@ -77,4 +80,4 @@ export function readFirebaseValue(collection, id) {
     })
 }
 
-export default firebase
+export default { db }

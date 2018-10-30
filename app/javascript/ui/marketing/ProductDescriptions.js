@@ -1,5 +1,5 @@
-import ProductDescription from '~/ui/marketing/ProductDescription.js'
-import firebase from '~/vendor/firebaseMarketing.js'
+import ProductDescription from '~/ui/marketing/ProductDescription'
+import { db } from '~/vendor/firebaseMarketing'
 import styled from 'styled-components'
 import v from '~/utils/variables'
 
@@ -17,28 +17,27 @@ class ProductDescriptions extends React.PureComponent {
     this.state = { products: [] }
   }
   componentDidMount() {
-    let db = {}
-    db = firebase.firestore()
-
-    const productDescriptions = []
-    db.collection('productDescriptions')
-      .orderBy('order')
-      .get()
-      .then(snapshot => {
-        snapshot.forEach(product => {
-          productDescriptions.push(
-            <ProductDescription
-              key={product.id}
-              id={product.id}
-              order={product.data().order}
-              title={product.data().title}
-              description={product.data().description}
-              imageUrl={product.data().imageUrl}
-            />
-          )
+    if (db && db.collection) {
+      const productDescriptions = []
+      db.collection('productDescriptions')
+        .orderBy('order')
+        .get()
+        .then(snapshot => {
+          snapshot.forEach(product => {
+            productDescriptions.push(
+              <ProductDescription
+                key={product.id}
+                id={product.id}
+                order={product.data().order}
+                title={product.data().title}
+                description={product.data().description}
+                imageUrl={product.data().imageUrl}
+              />
+            )
+          })
+          this.setState({ products: productDescriptions })
         })
-        this.setState({ products: productDescriptions })
-      })
+    }
   }
 
   render() {
