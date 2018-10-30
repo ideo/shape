@@ -14,6 +14,8 @@ RSpec.describe SubmissionBoxTemplateSetter, type: :service do
       user: user,
     )
   end
+  let(:dup_template_card) { template_setter.dup }
+  let(:dup_template) { dup_template_card.collection }
 
   before do
     # Required so the submissions_collection exists on submission_box
@@ -30,20 +32,23 @@ RSpec.describe SubmissionBoxTemplateSetter, type: :service do
 
     it 'should remove all viewer roles' do
       template_setter.call
-      dup = template_setter.dup
-      expect(dup.collection.viewers[:users].count).to eq 0
+      expect(dup_template.viewers[:users].count).to eq 0
+    end
+
+    it 'should name the new template with the submission box' do
+      template_setter.call
+      expect(dup_template.name).to eq "#{submission_box.name} #{template_card.collection.name}"
     end
 
     it 'should set the duplicate template card size to 1x1' do
       template_setter.call
-      dup = template_setter.dup
-      expect(dup.width).to eq 1
-      expect(dup.height).to eq 1
+      expect(dup_template_card.width).to eq 1
+      expect(dup_template_card.height).to eq 1
     end
 
     it 'should add a special tag to the submission box' do
       template_setter.call
-      expect(template_setter.dup.collection.reload.owned_tag_list).to include('submission_template')
+      expect(dup_template.reload.owned_tag_list).to include('submission_template')
     end
 
     context 'with existing submissions' do

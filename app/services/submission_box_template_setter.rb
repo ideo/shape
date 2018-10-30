@@ -24,6 +24,7 @@ class SubmissionBoxTemplateSetter < SimpleService
       placement: 'end',
     )
     @dup.collection.remove_all_viewer_roles
+    @dup.collection.update(name: "#{@submission_box.name} #{@dup.collection.name}")
     @dup.update(width: 1, height: 1)
     @dup.collection.add_submission_box_tag
   end

@@ -165,7 +165,7 @@ class SubmissionBoxSettingsModal extends React.Component {
         })
         // Re-fetch submissions collection as submissions names change
         const { apiStore } = this.props
-        apiStore.fetch(
+        await apiStore.fetch(
           'collections',
           collection.submissions_collection.id,
           true
