@@ -14,7 +14,7 @@ class TrialEndingSoonWorker
 
       next if organization.has_payment_method?
 
-      TrialEndingSoonMailer.notify(organization, days_until_trial_ends)
+      TrialEndingSoonMailer.notify(organization, days_until_trial_ends).deliver_now
     end
   end
 end
