@@ -151,42 +151,8 @@ class SubmissionBoxSettingsModal extends React.Component {
     )
   }
 
-  submissionsForTemplate(templateId) {
-    return this.submissions.filter(record => record.template_id === templateId)
-  }
-
-  async deleteUnusedTemplates(newTemplate) {
-    const { collection } = this.props
-    const currentTemplateCards = collection.collection_cards
-      .filter(card => card.record.isMasterTemplate)
-      .filter(card => card.record.id !== newTemplate.id)
-
-    await Promise.all(
-      currentTemplateCards.map(async templateCard => {
-        const submissions = this.submissionsForTemplate(
-          parseInt(templateCard.record.id)
-        )
-        if (!submissions.length) {
-          await templateCard.API_archiveSelf()
-        }
-      })
-    )
-  }
-
-  async markSubmissionsInactive() {
-    const { submissions } = this
-    if (!submissions.length) return
-    await Promise.all(
-      submissions.map(async submission => {
-        if (submission.name.indexOf('[Inactive]') === -1) {
-          await submission.API_updateName(`[Inactive] ${submission.name}`)
-        }
-      })
-    )
-  }
-
   chooseTemplate = template => () => {
-    const { uiStore } = this.props
+    const { collection, uiStore } = this.props
     this.confirmSubmissionTemplateChange({ template }, async () => {
       runInAction(() => {
         this.loading = true
@@ -197,8 +163,13 @@ class SubmissionBoxSettingsModal extends React.Component {
           submission_template_id: newTemplate.id,
           submission_box_type: 'template',
         })
-        await this.deleteUnusedTemplates(newTemplate)
-        await this.markSubmissionsInactive()
+        // Re-fetch submissions collection as submissions names change
+        const { apiStore } = this.props
+        apiStore.fetch(
+          'collections',
+          collection.submissions_collection.id,
+          true
+        )
       } catch (e) {
         uiStore.alert('Unable to use that template')
       } finally {

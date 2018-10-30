@@ -56,22 +56,17 @@ class Api::V1::CollectionsController < Api::V1::BaseController
 
   before_action :load_and_authorize_submission_box_copy, only: %i[duplicate_into_submission_box]
   def duplicate_into_submission_box
-    # TODO: decide if this should be a service
-    dup = @template_card.duplicate!(
-      for_user: current_user,
-      parent: @submission_box,
-      placement: 'end',
+    setter = SubmissionBoxTemplateSetter.new(
+      submission_box: @submission_box,
+      template_card: @template_card,
+      user: current_user,
     )
-    dup.collection.add_submission_box_tag
-    dup.collection.remove_all_viewer_roles
-    dup.update(width: 1, height: 1)
-    # TODO: figure out best check here
-    if dup.persisted?
+    if setter.call
       render jsonapi: @submission_box,
              include: Collection.default_relationships_for_api,
-             meta: { new_card: dup.id.to_s }
+             meta: { new_card: setter.dup.id.to_s }
     else
-      render_api_errors dup.errors
+      render_api_errors setter.errors
     end
   end
 
@@ -107,7 +102,7 @@ class Api::V1::CollectionsController < Api::V1::BaseController
     @submission_box = Collection.find(json_api_params[:to_id])
     @template_card = CollectionCard.find(json_api_params[:collection_card_id])
     authorize! :edit, @submission_box
-    authorize! :view, @template_card
+    authorize! :read, @template_card
   end
 
   def load_and_authorize_collection_update
