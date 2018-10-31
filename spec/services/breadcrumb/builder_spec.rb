@@ -33,6 +33,15 @@ RSpec.describe Breadcrumb::Builder, type: :service do
       end
     end
 
+    context 'in a submissions collection' do
+      let(:submission_box) { create(:submission_box) }
+      let(:collection) { create(:submissions_collection, num_cards: 1, submission_box: submission_box) }
+
+      it 'should have breadcrumb from submission box collection, skipping submissions collection' do
+        expect(breadcrumb).to match_array([submission_box.id])
+      end
+    end
+
     describe '.in_collection' do
       let!(:subcollections) { create_list(:collection, 2, num_cards: 2, parent_collection: collection) }
 

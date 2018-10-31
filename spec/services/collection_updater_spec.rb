@@ -56,33 +56,5 @@ RSpec.describe CollectionUpdater, type: :service do
         expect(collection.errors).not_to be_empty
       end
     end
-
-    context 'with submission box' do
-      let(:collection) { create(:submission_box) }
-      let(:template) { create(:collection, master_template: true) }
-      let(:attributes) do
-        {
-          submission_box_type: :template,
-          submission_template_id: template.id,
-        }
-      end
-
-      it 'will setup the submissions collection when choosing a submission_box_type' do
-        expect(collection.submissions_collection.present?).to be false
-        CollectionUpdater.call(collection, attributes)
-        expect(collection.submissions_collection.present?).to be true
-      end
-
-      it 'will only create the submissions collection once' do
-        # first one should create
-        expect {
-          CollectionUpdater.call(collection, attributes)
-        }.to change(Collection, :count)
-        # second one should not
-        expect {
-          CollectionUpdater.call(collection, attributes)
-        }.not_to change(Collection, :count)
-      end
-    end
   end
 end

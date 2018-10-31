@@ -12,12 +12,17 @@ class SubmissionBoxTemplateSetter < SimpleService
   end
 
   def call
+    unless @submission_box.is_a? Collection::SubmissionBox
+      @errors << 'You need to use a SubmissionBox'
+      return false
+    end
     if @submission_box_type.to_s == 'template' && @template_card.nil?
       @errors << 'You need a template card to set type as template'
       return false
     end
     duplicate_template_card if @template_card.present?
     set_template
+    build_submissions_collection_if_needed
     delete_unused_templates
     update_submission_names
     true
@@ -42,6 +47,11 @@ class SubmissionBoxTemplateSetter < SimpleService
       submission_template: @dup.present? ? @dup.collection : nil,
       submission_box_type: @submission_box_type,
     )
+  end
+
+  def build_submissions_collection_if_needed
+    return if @submission_box.submissions_collection.present?
+    @submission_box.setup_submissions_collection!
   end
 
   def delete_unused_templates

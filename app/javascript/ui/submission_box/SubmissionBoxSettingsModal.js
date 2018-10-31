@@ -133,13 +133,16 @@ class SubmissionBoxSettingsModal extends React.Component {
     try {
       await collection.API_setSubmissionBoxTemplate(data)
       uiStore.update('submissionBoxSettingsOpen', false)
-      uiStore.update('loadedSubmissions', true)
-      // Re-fetch submissions collection as submissions names change
-      await apiStore.fetch(
-        'collections',
-        collection.submissions_collection.id,
-        true
-      )
+      if (collection.submissions_collection) {
+        // Re-fetch submissions collection as submissions names change
+        await apiStore.fetch(
+          'collections',
+          collection.submissions_collection.id,
+          true
+        )
+        // this will update the CollectionPage
+        uiStore.update('loadedSubmissions', true)
+      }
     } catch (e) {
       uiStore.alert('Unable to use that template')
     } finally {

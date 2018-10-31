@@ -104,6 +104,7 @@ class RolesSummary extends React.Component {
     const { roles } = this.props
     const role = _.find(roles, { name: roleName })
     if (role && role.label) ({ label } = role)
+    if (!role) return ''
     return pluralize(_.startCase(label))
   }
 
