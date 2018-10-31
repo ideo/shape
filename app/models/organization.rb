@@ -227,6 +227,9 @@ class Organization < ApplicationRecord
     false
   end
 
+  def update_payment_status
+  end
+
   private
 
   def parse_domain_whitelist

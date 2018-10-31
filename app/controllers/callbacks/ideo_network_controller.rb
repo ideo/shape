@@ -1,6 +1,31 @@
 class Callbacks::IdeoNetworkController < ApplicationController
   before_action :authenticate_request
 
+  def payment_methods
+    application_organization_id = params.dig(
+      'data',
+      'relationships',
+      'application_organizations',
+      'relationships',
+      'application_organization',
+      'data',
+      'id',
+    )
+    application_organization = params.fetch('included', []).find do |x|
+      x['id'] == application_organization_id && x['type'] == 'application_organizations'
+    end
+    return head :bad_request unless application_organization
+
+    organization_id = application_organization.dig('attributes', 'external_id')
+    return head :bad_request unless organization_id
+
+    organization = Organization.find(organization_id)
+    organization.update_payment_status
+    head :ok
+  rescue ActiveRecord::RecordNotFound
+    head :not_found
+  end
+
   def users
     if user.present?
       if event == :updated
