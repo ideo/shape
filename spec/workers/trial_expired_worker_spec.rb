@@ -34,6 +34,13 @@ RSpec.describe TrialExpiredWorker, type: :worker do
     end
 
     it 'sends notices to organizations that meet the criteria' do
+      mailer = double
+      allow(mailer).to receive(:deliver_now)
+      allow(TrialExpiredMailer).to receive(:notify).and_return(mailer)
+      allow(TrialExpiredMailer).to receive_message_chain(:notify, :deliver_now)
+
+      expect(mailer).to receive(:deliver_now).twice
+
       expect(TrialExpiredMailer).to receive(:notify).with(should_process_a)
       expect(TrialExpiredMailer).to receive(:notify).with(should_process_b)
       expect(TrialExpiredMailer).not_to receive(:notify).with(already_sent)
@@ -43,6 +50,7 @@ RSpec.describe TrialExpiredWorker, type: :worker do
     end
 
     it 'updates the organizations to indicate the email has been sent' do
+      allow(TrialExpiredMailer).to receive_message_chain(:notify, :deliver_now)
       expect(should_process_a.trial_expired_email_sent).to be false
       expect(should_process_b.trial_expired_email_sent).to be false
       TrialExpiredWorker.new.perform

@@ -49,6 +49,12 @@ RSpec.describe OverdueNotificationWorker, type: :worker do
     end
 
     it 'sends mail to organizations that meet the criteria' do
+      mailer = double
+      allow(mailer).to receive(:deliver_now)
+      allow(BillingOverdueMailer).to receive(:notify).and_return(mailer)
+
+      expect(mailer).to receive(:deliver_now).exactly(5).times
+
       expect(BillingOverdueMailer).not_to receive(:notify).with(in_app_billing_disabled)
       expect(BillingOverdueMailer).not_to receive(:notify).with(overdue_at_not_set)
       expect(BillingOverdueMailer).not_to receive(:notify).with(overdue_3_days)

@@ -70,6 +70,7 @@ RSpec.describe NetworkCreateUsageRecordWorker, type: :worker do
       end
 
       it 'calls #create_network_usage_record for each Organization' do
+        allow(BillingChangesMailer).to receive_message_chain(:notify, :deliver_now)
         allow(Organization).to receive(:find_each)
           .and_yield(active_user_count_does_not_change)
           .and_yield(active_user_count_goes_down)
@@ -122,11 +123,14 @@ RSpec.describe NetworkCreateUsageRecordWorker, type: :worker do
       end
 
       it 'send a notification when all criteria are met' do
+        mailer = double
+        allow(mailer).to receive(:deliver_now)
         allow(Organization).to receive(:find_each)
           .and_yield(all_criteria_met)
         expect(BillingChangesMailer).to receive(:notify).with(
           all_criteria_met, 5
-        )
+        ).and_return(mailer)
+        expect(mailer).to receive(:deliver_now)
         NetworkCreateUsageRecordWorker.new.perform
       end
     end
