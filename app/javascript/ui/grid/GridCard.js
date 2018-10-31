@@ -210,9 +210,9 @@ class GridCard extends React.Component {
   openContextMenu = ev => {
     const { card } = this.props
     const rect = this.gridCardRef.getBoundingClientRect()
-    const x = ev.screenX - rect.left - rect.width
+    const x = ev.clientX - rect.left - rect.width
     const y = ev.screenY - rect.top - 120
-    const direction = ev.screenX < 250 ? 'right' : 'left'
+    const direction = ev.clientX < 250 ? 'right' : 'left'
     if (this.props.menuOpen) {
       uiStore.closeCardMenu()
     } else {
