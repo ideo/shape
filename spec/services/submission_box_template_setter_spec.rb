@@ -48,7 +48,7 @@ RSpec.describe SubmissionBoxTemplateSetter, type: :service do
 
     it 'should add a special tag to the submission box' do
       template_setter.call
-      expect(dup_template.reload.owned_tag_list).to include('submission_template')
+      expect(dup_template.reload.owned_tag_list).to include('submission-template')
     end
 
     context 'with existing submissions' do

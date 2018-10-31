@@ -212,7 +212,7 @@ module Templateable
     # create the special #template tag
     tag(
       self,
-      with: 'submission_template',
+      with: 'submission-template',
       on: :tags,
     )
     update_cached_tag_lists
