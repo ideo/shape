@@ -10,6 +10,7 @@ class SubmissionBoxTemplateSetter < SimpleService
 
   def call
     duplicate_template_card
+    set_template
     delete_unused_templates
     update_submission_names
     @dup
@@ -27,6 +28,13 @@ class SubmissionBoxTemplateSetter < SimpleService
     @dup.collection.update(name: "#{@submission_box.name} #{@dup.collection.name}")
     @dup.update(width: 1, height: 1)
     @dup.collection.add_submission_box_tag
+  end
+
+  def set_template
+    @submission_box.update(
+      submission_template: @dup.collection,
+      submission_box_type: :template,
+    )
   end
 
   def delete_unused_templates

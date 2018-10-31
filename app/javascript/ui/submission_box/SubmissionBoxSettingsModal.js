@@ -127,7 +127,7 @@ class SubmissionBoxSettingsModal extends React.Component {
     callback()
   }
 
-  async copyTemplate(template) {
+  async setTemplateAndCreateCopy(template) {
     const { collection } = this.props
     const card = template.parent_collection_card
     const templateCollectionId = card.parent_id
@@ -136,12 +136,7 @@ class SubmissionBoxSettingsModal extends React.Component {
       from_id: templateCollectionId,
       collection_card_id: card.id,
     }
-    const res = await collection.API_DuplicateIntoSubmissionBox(data)
-    const newTemplateId = res.meta.new_card
-    const newTemplate = collection.collection_cards.find(
-      ccard => ccard.id === newTemplateId
-    ).record
-    return newTemplate
+    await collection.API_DuplicateIntoSubmissionBox(data)
   }
 
   get submissions() {
@@ -158,11 +153,7 @@ class SubmissionBoxSettingsModal extends React.Component {
         this.loading = true
       })
       try {
-        const newTemplate = await this.copyTemplate(template)
-        this.updateCollection({
-          submission_template_id: newTemplate.id,
-          submission_box_type: 'template',
-        })
+        await this.setTemplateAndCreateCopy(template)
         // Re-fetch submissions collection as submissions names change
         const { apiStore } = this.props
         await apiStore.fetch(

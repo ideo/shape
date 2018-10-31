@@ -30,6 +30,12 @@ RSpec.describe SubmissionBoxTemplateSetter, type: :service do
       end.to change(submission_box.collection_cards, :count).by(1)
     end
 
+    it 'should set the submission box to use the new template' do
+      service = template_setter.call
+      expect(submission_box.submission_template_id).to eq service.dup.collection.id
+      expect(submission_box.submission_box_type).to eq 'template'
+    end
+
     it 'should remove all viewer roles' do
       template_setter.call
       expect(dup_template.viewers[:users].count).to eq 0
@@ -48,7 +54,7 @@ RSpec.describe SubmissionBoxTemplateSetter, type: :service do
 
     it 'should add a special tag to the submission box' do
       template_setter.call
-      expect(dup_template.reload.owned_tag_list).to include('submission-template')
+      expect(dup_template.reload.cached_owned_tag_list).to include('submission-template')
     end
 
     context 'with existing submissions' do

@@ -63,8 +63,7 @@ class Api::V1::CollectionsController < Api::V1::BaseController
     )
     if setter.call
       render jsonapi: @submission_box,
-             include: Collection.default_relationships_for_api,
-             meta: { new_card: setter.dup.id.to_s }
+             include: Collection.default_relationships_for_api
     else
       render_api_errors setter.errors
     end
