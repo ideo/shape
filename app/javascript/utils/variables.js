@@ -86,8 +86,8 @@ export default {
     popoutMenu: 201,
     // NOTE: if globalHeader is > pageHeader
     // then it will also be above the EditableName ClickWrapper
-    globalHeader: 503,
-    pageHeader: 502,
+    globalHeader: 201,
+    pageHeader: 200,
     scrollIndicator: 200,
     gridCard: 150,
     gridCardTop: 151,
