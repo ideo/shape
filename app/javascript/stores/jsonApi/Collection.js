@@ -166,6 +166,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     return (
       this.isMasterTemplate &&
       !this.isProfileTemplate &&
+      !this.is_submission_box_template &&
       !this.isTestDesign &&
       !this.isTestCollection
     )
@@ -352,6 +353,14 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     this.apiStore.request(
       `test_collections/${this.testCollectionId}/reopen`,
       'PATCH'
+    )
+  }
+
+  API_setSubmissionBoxTemplate(data) {
+    return this.apiStore.request(
+      `collections/set_submission_box_template`,
+      'POST',
+      data
     )
   }
 

@@ -141,6 +141,12 @@ module Resourceable
     end
   end
 
+  def remove_all_viewer_roles
+    (viewers[:users] + viewers[:groups]).each do |viewer|
+      viewer.remove_role(Role::VIEWER, self)
+    end
+  end
+
   private
 
   def raise_role_name_not_set(role_name)

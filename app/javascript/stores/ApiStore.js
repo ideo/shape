@@ -309,8 +309,7 @@ class ApiStore extends jsonapi(datxCollection) {
   }
 
   async fetchUsableTemplates() {
-    const other = ''
-    let q = `#template ${other}`
+    let q = `#template`
     q = _.trim(q)
       .replace(/\s/g, '+')
       .replace(/#/g, '%23')

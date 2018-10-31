@@ -40,4 +40,20 @@ describe Collection::SubmissionBox, type: :model do
       expect(duplicate.submissions_collection).not_to eq submission_box.submissions_collection
     end
   end
+
+  describe '#archive' do
+    let(:submission_box) { create(:submission_box) }
+
+    before do
+      submission_box.setup_submissions_collection!
+    end
+
+    it 'should also archive the submissions_collection' do
+      expect(submission_box.archived?).to be false
+      expect(submission_box.submissions_collection.archived?).to be false
+      submission_box.archive!
+      expect(submission_box.archived?).to be true
+      expect(submission_box.submissions_collection.archived?).to be true
+    end
+  end
 end

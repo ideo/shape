@@ -4,8 +4,9 @@ class Collection
     has_one :submissions_collection,
             class_name: 'Collection::SubmissionsCollection',
             dependent: :destroy
-
     validate :submission_template_is_a_master_template
+    # also archive the submissions_collection along with collection defaults
+    self.archive_with += %i[submissions_collection]
 
     enum submission_box_type: {
       template: 0,

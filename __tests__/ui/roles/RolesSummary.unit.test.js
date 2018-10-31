@@ -8,18 +8,19 @@ const emptyProps = {
   roles: [],
   handleClick: jest.fn(),
 }
-const canEditProps = {
-  ...emptyProps,
-  canEdit: true,
-}
 
-const editorRole = Object.assign({}, fakeRole)
-const viewerRole = Object.assign({}, fakeRole)
+const editorRole = { ...fakeRole }
+const viewerRole = { ...fakeRole }
 viewerRole.name = 'viewer'
 
 const editorsAndViewersProps = {
   roles: [editorRole, viewerRole],
   handleClick: jest.fn(),
+}
+
+const canEditProps = {
+  ...editorsAndViewersProps,
+  canEdit: true,
 }
 
 let wrapper
@@ -138,8 +139,8 @@ describe('RolesSummary', () => {
       wrapper = shallow(<RolesSummary {...emptyProps} canEdit />)
     })
 
-    it('renders editor label', () => {
-      expect(wrapper.render().text()).toMatch(/editors/i)
+    it('does not render editor label', () => {
+      expect(wrapper.render().text()).not.toMatch(/editors/i)
     })
 
     it('does not render viewer label', () => {

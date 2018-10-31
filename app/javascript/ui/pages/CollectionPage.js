@@ -109,14 +109,13 @@ class CollectionPage extends PageWithApi {
     const { apiStore } = this.props
     await apiStore.fetch('collections', this.collection.id, true)
     if (this.collection.submissions_collection) {
-      this.setLoadedSubmissions(true)
+      this.setLoadedSubmissions(false)
       await apiStore.fetch(
         'collections',
         this.collection.submissions_collection.id,
         true
       )
-      apiStore.request(this.requestPath(this.props))
-      this.setLoadedSubmissions(false)
+      this.setLoadedSubmissions(true)
     }
   }
 
