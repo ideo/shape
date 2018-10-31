@@ -228,6 +228,14 @@ class Organization < ApplicationRecord
   end
 
   def update_payment_status
+    payment_method = NetworkApi::PaymentMethod.find(
+      organization_id: network_organization.id,
+      default: true,
+    ).first
+    update_attributes!(
+      has_payment_method: payment_method ? true : false,
+      overdue_at: payment_method ? nil : overdue_at,
+    )
   end
 
   private
