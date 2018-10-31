@@ -4,6 +4,7 @@ import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import { Grid } from '@material-ui/core'
 import { MaxWidthContainer } from '~/ui/global/styled/layout'
 import ClockIcon from '~/ui/icons/ClockIcon'
+import CloseIcon from '~/ui/icons/CloseIcon'
 import v from '~/utils/variables'
 
 const Banner = styled.div`
@@ -11,7 +12,7 @@ const Banner = styled.div`
   color: white;
   font-family: ${v.fonts.sans};
   font-size: 20px;
-  margin: 0 -${v.containerPadding.horizontal};
+  margin: 20px -999rem;
   padding: 20px;
 
   a {
@@ -20,8 +21,8 @@ const Banner = styled.div`
 `
 
 const IconWrapper = styled.div`
-  width: 32px;
-  height: 32px;
+  width: ${props => props.width || '32'}px;
+  height: ${props => props.height || props.height || '32'}px;
 `
 
 const Action = styled.div`
@@ -62,7 +63,14 @@ class OverdueBanner extends React.Component {
                     Add payment method <Link to="/billing">here.</Link>
                   </div>
                 ) : (
-                  <div>Contact your admin for assistance.</div>
+                  <Grid container>
+                    <Grid item>Contact your admin for assistance.</Grid>
+                    <Grid item>
+                      <IconWrapper>
+                        <CloseIcon />
+                      </IconWrapper>
+                    </Grid>
+                  </Grid>
                 )}
               </Action>
             </Grid>
