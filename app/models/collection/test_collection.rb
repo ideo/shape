@@ -72,7 +72,7 @@ class Collection
       if collection_to_test.present?
         # Point to the new parent as the one to test
         duplicate.collection_to_test = args[:parent]
-      elsif !args[:parent].master_template?
+      elsif !parent.master_template? && !args[:parent].master_template?
         # Prefix with 'Copy' if it isn't still within a template
         duplicate.name = "Copy of #{name}"
       end

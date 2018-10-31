@@ -162,7 +162,9 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   }
 
   get isUsableTemplate() {
-    // you aren't allowed to use the profile template
+    // you aren't allowed to use the profile template;
+    // you also don't use test templates, since duplicating them or
+    // creating them within another template is the way to do that
     return (
       this.isMasterTemplate &&
       !this.isProfileTemplate &&

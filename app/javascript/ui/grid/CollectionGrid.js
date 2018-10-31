@@ -611,7 +611,11 @@ class CollectionGrid extends React.Component {
 
     return (
       <StyledGrid minHeight={minHeight}>
-        {sorting && <SortContainer><CollectionSort /></SortContainer>}
+        {sorting && (
+          <SortContainer>
+            <CollectionSort />
+          </SortContainer>
+        )}
         {this.renderPositionedCards()}
       </StyledGrid>
     )

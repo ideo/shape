@@ -70,6 +70,7 @@ module Templateable
       card.duplicate!(
         for_user: instance.created_by,
         parent: instance,
+        building_template_instance: true,
       )
     end
   end

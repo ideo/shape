@@ -1,4 +1,3 @@
-import PropTypes from 'prop-types'
 import MenuItem from '@material-ui/core/MenuItem'
 import styled from 'styled-components'
 
@@ -16,6 +15,8 @@ const ExplanationText = DisplayText.extend`
 class CollectionSort extends React.Component {
   get sortingItems() {
     // TODO replace these with real data
+    const { opts } = this
+    if (opts) return opts
     return [
       { name: 'Created date', value: 'created_at' },
       { name: 'Last updated', value: 'updated_at' },
