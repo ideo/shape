@@ -10,6 +10,7 @@ RSpec.describe SubmissionBoxTemplateSetter, type: :service do
   let(:template_setter) do
     SubmissionBoxTemplateSetter.new(
       submission_box: submission_box,
+      submission_box_type: 'template',
       template_card: template_card,
       user: user,
     )
@@ -31,7 +32,8 @@ RSpec.describe SubmissionBoxTemplateSetter, type: :service do
     end
 
     it 'should set the submission box to use the new template' do
-      service = template_setter.call
+      service = template_setter
+      expect(template_setter.call).to be true
       expect(submission_box.submission_template_id).to eq service.dup.collection.id
       expect(submission_box.submission_box_type).to eq 'template'
     end
@@ -83,6 +85,7 @@ RSpec.describe SubmissionBoxTemplateSetter, type: :service do
         SubmissionBoxTemplateSetter.new(
           submission_box: submission_box,
           template_card: template_card1,
+          submission_box_type: 'template',
           user: user,
         )
       end
@@ -103,6 +106,22 @@ RSpec.describe SubmissionBoxTemplateSetter, type: :service do
 
       it 'should not delete templates that have been submitted with' do
         expect(submission_box.collections.include?(previous_used_template)).to be true
+      end
+    end
+
+    context 'with a non-template type' do
+      let(:template_setter) do
+        SubmissionBoxTemplateSetter.new(
+          submission_box: submission_box,
+          submission_box_type: 'text',
+          user: user,
+        )
+      end
+
+      it 'should set the submission box to use the new template' do
+        expect(template_setter.call).to be true
+        expect(submission_box.submission_template_id).to be nil
+        expect(submission_box.submission_box_type).to eq 'text'
       end
     end
   end

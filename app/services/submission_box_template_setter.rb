@@ -7,14 +7,20 @@ class SubmissionBoxTemplateSetter < SimpleService
     @template_card = template_card
     @submission_box_type = submission_box_type
     @user = user
+    @dup = nil
+    @errors = []
   end
 
   def call
+    if @submission_box_type.to_s == 'template' && @template_card.nil?
+      @errors << 'You need a template card to set type as template'
+      return false
+    end
     duplicate_template_card if @template_card.present?
     set_template
     delete_unused_templates
     update_submission_names
-    @dup
+    true
   end
 
   private
@@ -41,9 +47,11 @@ class SubmissionBoxTemplateSetter < SimpleService
   def delete_unused_templates
     old_templates = @submission_box.collections
                                    .where(master_template: true)
-                                   .where.not(
-                                     id: @dup.collection.id,
-                                   )
+    if @dup.present?
+      old_templates = old_templates.where.not(
+        id: @dup.collection.id,
+      )
+    end
     old_templates.each do |template|
       existing = @submission_box.submissions_collection.collections.find_by(
         template_id: template.id,
