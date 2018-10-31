@@ -24,4 +24,12 @@ class SerializableOrganization < BaseJsonSerializer
   attribute :trial_ends_at do
     @object.trial_ends_at ? @object.trial_ends_at.to_date.to_s : nil
   end
+
+  attribute :overdue do
+    @object.overdue_at ? 1.week.ago > @object.overdue_at : false
+  end
+
+  attribute :inaccessible_at do
+    @object.overdue_at ? (@object.overdue_at + 2.week).to_s(:mdy) : nil
+  end
 end
