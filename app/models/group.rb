@@ -61,6 +61,10 @@ class Group < ApplicationRecord
     }
   end
 
+  def should_index?
+    active?
+  end
+
   # Default for .roles are those where a
   # user is admin/member of this group
   def roles

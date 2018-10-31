@@ -65,6 +65,13 @@ class GridCard extends React.Component {
     return record.can_edit
   }
 
+  get canContentEditCard() {
+    if (this.canEditCard) return true
+    const { isSharedCollection, record } = this.props
+    if (isSharedCollection) return false
+    return record.can_edit_content
+  }
+
   get isItem() {
     return this.props.cardType === 'items'
   }
@@ -210,7 +217,7 @@ class GridCard extends React.Component {
   openContextMenu = ev => {
     const { card } = this.props
     const rect = this.gridCardRef.getBoundingClientRect()
-    const x = ev.screenX - rect.left - rect.width
+    const x = ev.clientX - rect.left - rect.width * 0.95
     const y = ev.screenY - rect.top - 120
     const direction = ev.screenX < 250 ? 'right' : 'left'
     if (this.props.menuOpen) {
@@ -312,15 +319,14 @@ class GridCard extends React.Component {
             <StyledTopRightActions color={this.actionsColor}>
               {record.isDownloadable && <Download record={record} />}
               {record.canBeSetAsCover &&
-                canEditCollection &&
-                this.canEditCard && (
+                canEditCollection && (
                   <CoverImageToggle
                     card={card}
                     onReassign={this.onCollectionCoverChange}
                   />
                 )}
               {record.isImage &&
-                this.canEditCard && <ContainImage card={card} />}
+                this.canContentEditCard && <ContainImage card={card} />}
               {!testCollectionCard && <SelectionCircle cardId={card.id} />}
               <ActionMenu
                 location="GridCard"

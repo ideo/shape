@@ -46,6 +46,7 @@ module Templateable
   # - duplicate template card (CollectionCard#duplicate)
   # - move template card (CardMover)
   def queue_update_template_instances
+    return unless master_template?
     UpdateTemplateInstancesWorker.perform_async(id)
   end
 

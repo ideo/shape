@@ -39,6 +39,6 @@ class HomeController < ApplicationController
   end
 
   def require_dev_env
-    redirect_to login_url unless Rails.env.development?
+    redirect_to login_url if Rails.env.production?
   end
 end

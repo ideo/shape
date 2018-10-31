@@ -9,11 +9,14 @@ class Collection
       false
     end
 
-    private
+    # override to create the correct breadcrumb trail
+    def parent
+      submission_box
+    end
 
-    # override to mimic the submission_box breadcrumb
-    def calculate_breadcrumb
-      self.breadcrumb = submission_box.breadcrumb
+    # don't shown this in the breadcrumb since it's tucked into the submission_box
+    def breadcrumbable?
+      false
     end
   end
 end

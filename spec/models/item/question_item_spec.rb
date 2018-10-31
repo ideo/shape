@@ -32,7 +32,7 @@ RSpec.describe Item::QuestionItem, type: :model do
     end
   end
 
-  context 'role access within a test collection' do
+  context 'with a launched test collection' do
     let(:user) { create(:user) }
     let(:user2) { create(:user) }
     let(:test_collection) { create(:test_collection) }
@@ -42,10 +42,30 @@ RSpec.describe Item::QuestionItem, type: :model do
     let(:question_card) { create(:collection_card_question, parent: test_design) }
     let(:question_item) { question_card.item }
 
-    it 'should defer to parent for resourceable capabilities' do
-      expect(question_item.can_edit?(user)).to be true
-      expect(question_item.can_edit?(user2)).to be false
-      expect(question_item.can_view?(user2)).to be true
+    describe '#score' do
+      let!(:response) { create(:survey_response, test_collection: test_collection) }
+      # cheating here because a survey_response should really only have one answer per question
+      let!(:answer1) { create(:question_answer, survey_response: response, question: question_item, answer_number: 1) }
+      let!(:answer2) { create(:question_answer, survey_response: response, question: question_item, answer_number: 2) }
+      let!(:answer3) { create(:question_answer, survey_response: response, question: question_item, answer_number: 2) }
+      let!(:answer4) { create(:question_answer, survey_response: response, question: question_item, answer_number: 4) }
+      before do
+        response.update(status: :completed)
+        question_item.update(question_type: :question_useful)
+      end
+
+      it 'should calculate the score based on answer_numbers' do
+        # should be 0 + 1 + 1 + 3 / 12 = 42%
+        expect(question_item.score).to eq 42
+      end
+    end
+
+    context 'role access within a test collection' do
+      it 'should defer to parent for resourceable capabilities' do
+        expect(question_item.can_edit?(user)).to be true
+        expect(question_item.can_edit?(user2)).to be false
+        expect(question_item.can_view?(user2)).to be true
+      end
     end
   end
 end

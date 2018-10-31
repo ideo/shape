@@ -21,8 +21,10 @@ module Breadcrumb
     def build(object)
       return unless object.is_a?(Breadcrumbable) && object.breadcrumbable?
       parent = object.parent
-      return [] unless parent.present? && parent.is_a?(Breadcrumbable) && parent.breadcrumbable?
-      @breadcrumb = (parent.breadcrumb + [parent.id])
+      return [] unless parent.present? && parent.is_a?(Breadcrumbable)
+      @breadcrumb = parent.breadcrumb
+      @breadcrumb += [parent.id] if parent.breadcrumbable?
+      @breadcrumb
     end
   end
 end

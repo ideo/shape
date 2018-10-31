@@ -6,14 +6,15 @@ Given('I visit the Marketing Page', () => {
 })
 
 Given('I login and visit My Collection', () => {
-  cy.login({ userId: 1 })
+  // user 4 is our test user
+  cy.login({ userId: 4 })
   // go to My Collection
   cy.visit('/')
   cy.wait('@apiGetCurrentUser')
 })
 
 Given('I login and visit the Test Area', () => {
-  cy.login({ userId: 1 })
+  cy.login({ userId: 4 })
   // go to My Collection
   cy.visit('/')
   cy.wait('@apiGetCurrentUser')
