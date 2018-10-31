@@ -356,9 +356,9 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     )
   }
 
-  API_DuplicateIntoSubmissionBox(data) {
+  API_setSubmissionBoxTemplate(data) {
     return this.apiStore.request(
-      `collections/duplicate_into_submission_box`,
+      `collections/set_submission_box_template`,
       'POST',
       data
     )

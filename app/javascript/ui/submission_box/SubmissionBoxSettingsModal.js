@@ -127,16 +127,17 @@ class SubmissionBoxSettingsModal extends React.Component {
     callback()
   }
 
-  async setTemplateAndCreateCopy(template) {
+  // you can either set it to be a template, or a type like "text"
+  async setTemplate({ template = null, type = '' } = {}) {
     const { collection } = this.props
-    const card = template.parent_collection_card
-    const templateCollectionId = card.parent_id
+    const templateCardId = template ? template.parent_collection_card.id : null
+    const submission_box_type = template ? 'template' : type
     const data = {
-      to_id: collection.id,
-      from_id: templateCollectionId,
-      collection_card_id: card.id,
+      box_id: collection.id,
+      template_card_id: templateCardId,
+      submission_box_type,
     }
-    await collection.API_DuplicateIntoSubmissionBox(data)
+    await collection.API_setSubmissionBoxTemplate(data)
   }
 
   get submissions() {
@@ -153,7 +154,7 @@ class SubmissionBoxSettingsModal extends React.Component {
         this.loading = true
       })
       try {
-        await this.setTemplateAndCreateCopy(template)
+        await this.setTemplate({ template })
         // Re-fetch submissions collection as submissions names change
         const { apiStore } = this.props
         await apiStore.fetch(
@@ -174,10 +175,7 @@ class SubmissionBoxSettingsModal extends React.Component {
   chooseSubmissionBoxType = type => () => {
     this.confirmSubmissionTemplateChange({ type }, () => {
       this.props.collection.submission_template = null
-      this.updateCollection({
-        submission_template_id: null,
-        submission_box_type: type,
-      })
+      this.setTemplate({ type })
     })
   }
 

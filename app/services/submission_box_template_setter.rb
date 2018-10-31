@@ -2,14 +2,15 @@ class SubmissionBoxTemplateSetter < SimpleService
   attr_reader :errors
   attr_reader :dup
 
-  def initialize(submission_box:, template_card:, user:)
+  def initialize(submission_box:, template_card: nil, submission_box_type:, user:)
     @submission_box = submission_box
     @template_card = template_card
+    @submission_box_type = submission_box_type
     @user = user
   end
 
   def call
-    duplicate_template_card
+    duplicate_template_card if @template_card.present?
     set_template
     delete_unused_templates
     update_submission_names
@@ -32,8 +33,8 @@ class SubmissionBoxTemplateSetter < SimpleService
 
   def set_template
     @submission_box.update(
-      submission_template: @dup.collection,
-      submission_box_type: :template,
+      submission_template: @dup.present? ? @dup.collection : nil,
+      submission_box_type: @submission_box_type,
     )
   end
 

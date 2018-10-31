@@ -54,11 +54,12 @@ class Api::V1::CollectionsController < Api::V1::BaseController
     render json: current_user.in_my_collection?(@collection)
   end
 
-  before_action :load_and_authorize_submission_box_copy, only: %i[duplicate_into_submission_box]
-  def duplicate_into_submission_box
+  before_action :load_and_authorize_set_submission_box_template, only: %i[set_submission_box_template]
+  def set_submission_box_template
     setter = SubmissionBoxTemplateSetter.new(
       submission_box: @submission_box,
       template_card: @template_card,
+      submission_box_type: json_api_params[:submission_box_type],
       user: current_user,
     )
     if setter.call
@@ -97,10 +98,11 @@ class Api::V1::CollectionsController < Api::V1::BaseController
     authorize! :read, @template_collection
   end
 
-  def load_and_authorize_submission_box_copy
-    @submission_box = Collection.find(json_api_params[:to_id])
-    @template_card = CollectionCard.find(json_api_params[:collection_card_id])
+  def load_and_authorize_set_submission_box_template
+    @submission_box = Collection.find(json_api_params[:box_id])
     authorize! :edit, @submission_box
+    return true if json_api_params[:template_card_id].blank?
+    @template_card = CollectionCard.find(json_api_params[:template_card_id])
     authorize! :read, @template_card
   end
 
