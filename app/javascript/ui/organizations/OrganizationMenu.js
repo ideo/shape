@@ -86,6 +86,7 @@ class OrganizationMenu extends React.Component {
       await apiStore.currentUser.switchOrganization(newOrg.id, {
         redirectPath: 'homepage',
       })
+      uiStore.update('orgCreated', true)
       onClose()
     } catch (err) {
       uiStore.alert(err.error[0])
