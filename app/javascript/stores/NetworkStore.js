@@ -1,6 +1,7 @@
 import { Collection } from 'datx'
 import { jsonapi, saveModel } from 'datx-jsonapi'
 import { first, find } from 'lodash'
+import { apiUrl as networkApiUrl } from '~shared/api.network.v1/util'
 
 import * as networkModels from '~shared/api.network.v1'
 
@@ -124,6 +125,16 @@ class NetworkStore extends jsonapi(Collection) {
     } catch (e) {
       throw e
     }
+  }
+
+  async removePaymentMethod(paymentMethod) {
+    // we don't use the built in model#destroy or collection#remove
+    // because they have bugs in them.
+    await this.request(
+      `${networkApiUrl('payment_methods')}/${paymentMethod.id}`,
+      'DELETE'
+    )
+    this.remove(paymentMethod, paymentMethod.id)
   }
 }
 
