@@ -80,6 +80,7 @@ module Archivable
       return archive_as_object.try(:unarchive!)
     end
     run_callbacks :unarchive do
+      # NOTE: unarchiving the batch will also unarchive "self"
       unarchive_batch!
       true
     end
@@ -92,11 +93,18 @@ module Archivable
   end
 
   def unarchive_batch!
+    # legacy items did not have archive_batch -- don't want to unarchive all of them!
+    return if archive_batch.blank?
     # unarchive all Cards/Items/Collections that match this archive_batch
     [CollectionCard, Collection, Item].each do |model|
       model
         .where(archive_batch: archive_batch)
-        .update_all(archived: false, archived_at: nil, archive_batch: nil)
+        .update_all(
+          archived: false,
+          archived_at: nil,
+          archive_batch: nil,
+          unarchived_at: Time.now,
+        )
     end
   end
 
@@ -122,9 +130,5 @@ module Archivable
 
   def archive_self!(batch)
     update(archived: true, archived_at: Time.now, archive_batch: batch)
-  end
-
-  def unarchive_self!
-    update(archived: false, archived_at: nil, archive_batch: nil)
   end
 end

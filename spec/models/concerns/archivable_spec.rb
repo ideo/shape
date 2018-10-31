@@ -88,7 +88,11 @@ describe Archivable, type: :concern do
       it 'can be unarchived' do
         collection.archive!
         expect(collection.reload.archived?).to be true
-        collection.unarchive!
+        expect {
+          collection.unarchive!
+          # have to reload because it happens via update_all
+          collection.reload
+        }.to change(collection, :unarchived_at)
         expect(collection.reload.archived?).to be false
       end
 
@@ -109,6 +113,7 @@ describe Archivable, type: :concern do
           collection.unarchive!
         }.to change(Item.active, :count).by(2)
         expect(collection_card.reload.active?).to be true
+        expect(collection_card.unarchived_at).not_to be nil
       end
     end
   end
