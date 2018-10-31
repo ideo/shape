@@ -208,6 +208,16 @@ module Templateable
     save
   end
 
+  def add_submission_box_tag
+    tag(
+      self,
+      with: 'submission-template',
+      on: :tags,
+    )
+    update_cached_tag_lists
+    save
+  end
+
   # is this collection made from a template?
   def templated?
     template_id.present?

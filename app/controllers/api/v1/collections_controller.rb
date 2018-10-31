@@ -54,6 +54,22 @@ class Api::V1::CollectionsController < Api::V1::BaseController
     render json: current_user.in_my_collection?(@collection)
   end
 
+  before_action :load_and_authorize_set_submission_box_template, only: %i[set_submission_box_template]
+  def set_submission_box_template
+    setter = SubmissionBoxTemplateSetter.new(
+      submission_box: @submission_box,
+      template_card: @template_card,
+      submission_box_type: json_api_params[:submission_box_type],
+      user: current_user,
+    )
+    if setter.call
+      render jsonapi: @submission_box,
+             include: Collection.default_relationships_for_api
+    else
+      render_api_errors setter.errors
+    end
+  end
+
   private
 
   def check_cache
@@ -80,6 +96,14 @@ class Api::V1::CollectionsController < Api::V1::BaseController
     # we are creating a template in this collection so authorize edit_content
     authorize! :edit_content, @parent_collection
     authorize! :read, @template_collection
+  end
+
+  def load_and_authorize_set_submission_box_template
+    @submission_box = Collection.find(json_api_params[:box_id])
+    authorize! :edit, @submission_box
+    return true if json_api_params[:template_card_id].blank?
+    @template_card = CollectionCard.find(json_api_params[:template_card_id])
+    authorize! :read, @template_card
   end
 
   def load_and_authorize_collection_update

@@ -24,6 +24,7 @@ Rails.application.routes.draw do
         end
         collection do
           post 'create_template'
+          post 'set_submission_box_template'
         end
         resources :collection_cards, only: :index
         resources :roles, only: %i[index create destroy], shallow: true

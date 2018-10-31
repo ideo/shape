@@ -93,6 +93,10 @@ class SerializableCollection < BaseJsonSerializer
     @object.pinned_and_locked? || false
   end
 
+  attribute :is_submission_box_template do
+    @object.submission_box_template?
+  end
+  
   attribute :template_num_instances do
     if @object.master_template?
       @object.templated_collections.active.count

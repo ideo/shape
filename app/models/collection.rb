@@ -509,6 +509,14 @@ class Collection < ApplicationRecord
     collections.each(&:processing_done) if processing_status.nil?
   end
 
+  def global_collection?
+    type == 'Collection::Global'
+  end
+
+  def submission_box_template?
+    parent.is_a? Collection::SubmissionBox
+  end
+  
   def inside_a_master_template?
     return true if master_template?
     parents.where(master_template: true).any?

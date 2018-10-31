@@ -199,6 +199,10 @@ class ActionMenu extends React.Component {
       if (!card.can_move) {
         items = _.reject(items, { name: 'Move' })
       }
+      if (card.record && card.record.is_submission_box_template) {
+        items = _.reject(items, { name: 'Archive' })
+        items = _.reject(items, { name: 'Move' })
+      }
     } else {
       const viewActions = [
         'Duplicate',
