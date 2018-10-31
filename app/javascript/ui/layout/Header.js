@@ -16,6 +16,7 @@ import ClickWrapper from '~/ui/layout/ClickWrapper'
 import { FixedHeader, MaxWidthContainer } from '~/ui/global/styled/layout'
 import v from '~/utils/variables'
 import { uiStore } from '~/stores'
+import OverdueBanner from '~/ui/layout/OverdueBanner'
 
 /* global IdeoSSO */
 
@@ -200,6 +201,7 @@ class Header extends React.Component {
             </Box>
           </Flex>
         </MaxWidthContainer>
+        <OverdueBanner />
       </FixedHeader>
     )
   }
