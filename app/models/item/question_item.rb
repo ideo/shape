@@ -61,6 +61,24 @@ class Item
       false
     end
 
+    def completed_survey_answers
+      question_answers
+        .joins(:survey_response)
+        .where(
+          SurveyResponse.arel_table[:status].eq(:completed),
+        )
+    end
+
+    def score
+      return unless scale_question?
+      # answers are 1-4, but scored on a scale of 0-3
+      points = completed_survey_answers.sum('answer_number - 1') || 0
+      total = completed_survey_answers.count * 3
+      # don't want to divide by 0
+      return 0 if total.zero?
+      (points * 100.0 / total).round
+    end
+
     private
 
     def notify_test_design_collection_of_creation?

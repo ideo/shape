@@ -67,16 +67,15 @@ class ChartItemCover extends React.Component {
     const formatted = raw.datasets.map(set => {
       const formattedPercentage = set.data.map(d => {
         const percentage =
-          d.num_responses > 0
-            ? parseInt((d.num_responses / set.total) * 100)
-            : 0
-        return Object.assign({}, d, {
+          set.total > 0 ? parseInt((d.num_responses / set.total) * 100) : 0
+        return {
+          ...d,
           percentage,
           total: set.total,
           type: set.type,
-        })
+        }
       })
-      return Object.assign({}, set, { data: formattedPercentage })
+      return { ...set, data: formattedPercentage }
     })
     return { datasets: formatted }
   }

@@ -17,13 +17,8 @@ class Item
     end
 
     def question_data
-      survey_answers = data_source
-                       .question_answers
-                       .joins(:survey_response)
-                       .where(
-                         SurveyResponse.arel_table[:status].eq(:completed),
-                       )
-
+      # NOTE: the only currently supported data_source is a question_item
+      survey_answers = data_source.completed_survey_answers
       {
         label: parent.name,
         type: 'question_items',
