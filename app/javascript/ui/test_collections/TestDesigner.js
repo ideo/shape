@@ -13,11 +13,12 @@ import {
   styledTestTheme,
 } from '~/ui/test_collections/shared'
 import { apiStore } from '~/stores/'
-// NOTE: Always import these models after everything else, can lead to odd dependency!
-import CollectionCard from '~/stores/jsonApi/CollectionCard'
 import QuestionHotEdge from '~/ui/test_collections/QuestionHotEdge'
 import TestQuestion from '~/ui/test_collections/TestQuestion'
 import RadioControl from '~/ui/global/RadioControl'
+import PinnedIcon from '~/ui/icons/PinnedIcon'
+// NOTE: Always import these models after everything else, can lead to odd dependency!
+import CollectionCard from '~/stores/jsonApi/CollectionCard'
 
 const TopBorder = styled.div`
   background-color: ${props => props.theme.borderColorEditing};
@@ -225,6 +226,10 @@ class TestDesigner extends React.Component {
               <TrashIcon />
             </TrashButton>
           )}
+        <div style={{ color: v.colors.commonMedium }}>
+          {card.isPinnedAndLocked && <PinnedIcon locked />}
+          {card.isPinnedInTemplate && <PinnedIcon />}
+        </div>
       </QuestionSelectHolder>
     )
   }

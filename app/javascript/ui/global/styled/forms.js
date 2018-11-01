@@ -205,7 +205,7 @@ export const Select = styled(MuiSelect)`
   }
 
   .fixedWidth {
-    width: 240px;
+    width: 230px;
   }
 
   .selectmenu: {

@@ -23,6 +23,9 @@ import TestDesigner from '~/ui/test_collections/TestDesigner'
 import v from '~/utils/variables'
 import Collection from '~/stores/jsonApi/Collection'
 
+// more global way to do this?
+pluralize.addPluralRule(/canvas$/i, 'canvases')
+
 const isHomepage = ({ params }) => params.org && !params.id
 
 @inject('apiStore', 'uiStore', 'routingStore')
