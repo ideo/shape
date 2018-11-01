@@ -14,7 +14,7 @@ import CloseIcon from '~/ui/icons/CloseIcon'
 
 const StyledDialog = styled(Dialog)`
   .modal__paper {
-    border-left: 17px solid ${v.colors.blackLava};
+    border-left: 17px solid ${v.colors.black};
     max-width: 760px;
     width: 100%;
   }

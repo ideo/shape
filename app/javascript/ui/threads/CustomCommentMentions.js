@@ -4,7 +4,6 @@ import Avatar from '~/ui/global/Avatar'
 import v from '~/utils/variables'
 
 export const StyledCommentInput = styled.div`
-  cursor: text;
   padding: 10px;
   padding-right: 45px;
   font-size: 1rem;
@@ -14,7 +13,7 @@ export const StyledCommentInput = styled.div`
   }
 
   .public-DraftEditorPlaceholder-root {
-    color: ${v.colors.gray};
+    color: ${v.colors.commonMedium};
     position: absolute;
     z-index: 1;
   }

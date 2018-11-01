@@ -18,7 +18,7 @@ class Group < ApplicationRecord
   alias resourceable_can_view? can_view?
   alias resourceable_can_edit? can_edit?
 
-  after_update :update_organization
+  after_save :update_organization
   after_create :create_shared_collection
 
   rolify after_add: :after_role_update,
@@ -45,7 +45,8 @@ class Group < ApplicationRecord
             if: :validate_handle?
 
   validates :handle,
-            format: { with: /[a-zA-Z0-9\-\_]+/ },
+            # requires at least one letter in it
+            format: { with: /[a-zA-Z0-9\-_]*[a-zA-Z][a-zA-Z0-9\-_]*/ },
             if: :validate_handle?
 
   # Searchkick Config
@@ -58,6 +59,10 @@ class Group < ApplicationRecord
       # listing this way makes it easier to search Users/Groups together
       organization_ids: [organization_id],
     }
+  end
+
+  def should_index?
+    active?
   end
 
   # Default for .roles are those where a

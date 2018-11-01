@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20181029205523) do
+ActiveRecord::Schema.define(version: 20181031164042) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -62,6 +62,8 @@ ActiveRecord::Schema.define(version: 20181029205523) do
     t.datetime "archived_at"
     t.string "archive_batch"
     t.boolean "image_contain", default: false
+    t.boolean "is_cover", default: false
+    t.datetime "unarchived_at"
     t.index ["collection_id"], name: "index_collection_cards_on_collection_id"
     t.index ["item_id"], name: "index_collection_cards_on_item_id"
     t.index ["parent_id"], name: "index_collection_cards_on_parent_id"
@@ -88,6 +90,10 @@ ActiveRecord::Schema.define(version: 20181029205523) do
     t.bigint "submission_box_id"
     t.integer "test_status"
     t.integer "processing_status"
+    t.integer "question_item_id"
+    t.bigint "test_collection_id"
+    t.bigint "collection_to_test_id"
+    t.datetime "unarchived_at"
     t.index ["breadcrumb"], name: "index_collections_on_breadcrumb", using: :gin
     t.index ["cloned_from_id"], name: "index_collections_on_cloned_from_id"
     t.index ["organization_id"], name: "index_collections_on_organization_id"
@@ -188,8 +194,12 @@ ActiveRecord::Schema.define(version: 20181029205523) do
     t.string "archive_batch"
     t.string "icon_url"
     t.integer "question_type"
+    t.string "data_source_type"
+    t.bigint "data_source_id"
+    t.datetime "unarchived_at"
     t.index ["breadcrumb"], name: "index_items_on_breadcrumb", using: :gin
     t.index ["cloned_from_id"], name: "index_items_on_cloned_from_id"
+    t.index ["data_source_type", "data_source_id"], name: "index_items_on_data_source_type_and_data_source_id"
   end
 
   create_table "notifications", force: :cascade do |t|
@@ -225,6 +235,7 @@ ActiveRecord::Schema.define(version: 20181029205523) do
     t.boolean "trial_expired_email_sent", default: false, null: false
     t.datetime "overdue_at"
     t.boolean "has_payment_method", default: false, null: false
+    t.integer "getting_started_collection_id"
     t.index ["slug"], name: "index_organizations_on_slug", unique: true
   end
 
@@ -235,6 +246,7 @@ ActiveRecord::Schema.define(version: 20181029205523) do
     t.integer "answer_number"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "open_response_item_id"
     t.index ["question_id"], name: "index_question_answers_on_question_id"
     t.index ["survey_response_id"], name: "index_question_answers_on_survey_response_id"
   end
@@ -256,8 +268,11 @@ ActiveRecord::Schema.define(version: 20181029205523) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.text "session_uid"
+    t.integer "status", default: 0
+    t.bigint "user_id"
     t.index ["session_uid"], name: "index_survey_responses_on_session_uid", unique: true
     t.index ["test_collection_id"], name: "index_survey_responses_on_test_collection_id"
+    t.index ["user_id"], name: "index_survey_responses_on_user_id"
   end
 
   create_table "taggings", id: :serial, force: :cascade do |t|
@@ -314,6 +329,7 @@ ActiveRecord::Schema.define(version: 20181029205523) do
     t.boolean "show_move_helper", default: true
     t.boolean "show_template_helper", default: true
     t.datetime "last_active_at"
+    t.boolean "mailing_list", default: false
     t.index ["email"], name: "index_users_on_email"
     t.index ["handle"], name: "index_users_on_handle", unique: true
     t.index ["invitation_token"], name: "index_users_on_invitation_token"

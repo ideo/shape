@@ -67,7 +67,7 @@ export const FixedHeader = styled.header`
   position: fixed;
   top: 0;
   width: calc(100% - ${v.containerPadding.horizontal}*2);
-  background: ${v.colors.cararra};
+  background: ${v.colors.commonLight};
   padding: 1rem ${v.containerPadding.horizontal};
   @media print {
     display: none;
@@ -86,11 +86,13 @@ export const MaxWidthContainer = styled.div`
 MaxWidthContainer.displayName = 'MaxWidthContainer'
 
 export const ActivityContainer = styled.div`
-  margin-top: -2px;
-  overflow-y: scroll;
+  margin-top: 12px;
+  overflow-y: ${props => (props.moving ? 'hidden' : 'scroll')};
   overflow-x: hidden;
   margin-bottom: 10px;
   height: 100%;
+  padding-left: 10px;
+  padding-right: 10px;
   position: relative;
 `
 ActivityContainer.displayName = 'ActivityContainer'
@@ -98,9 +100,9 @@ ActivityContainer.displayName = 'ActivityContainer'
 export const FadeHeader = styled.div`
   border-radius: 1px;
   background: linear-gradient(
-    ${v.colors.activityDarkBlue} 0,
-    ${v.colors.activityDarkBlue} 40%,
-    ${hexToRgba(v.colors.activityDarkBlue, 0)} 100%
+    ${v.colors.secondaryDark} 0,
+    ${v.colors.secondaryDark} 40%,
+    ${hexToRgba(v.colors.secondaryDark, 0)} 100%
   );
   height: 27px;
   position: fixed;

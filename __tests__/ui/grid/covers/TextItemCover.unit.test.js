@@ -5,8 +5,10 @@ import { fakeTextItem } from '#/mocks/data'
 const item = fakeTextItem
 const props = {
   item,
-  height: 200,
   dragging: false,
+  height: 200,
+  cardId: '1',
+  handleClick: jest.fn(),
 }
 
 let wrapper

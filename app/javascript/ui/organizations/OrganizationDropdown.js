@@ -187,6 +187,7 @@ class OrganizationDropdown extends React.Component {
           width={220}
           groupedMenuItems={this.menuItems}
           menuOpen={this.props.open}
+          hideDotMenu
           groupExtraComponent={{
             organizations: apiStore.currentUser.organizations.length > 10 && (
               <StyledSearchHolder>

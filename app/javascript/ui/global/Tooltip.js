@@ -8,7 +8,7 @@ import v from '~/utils/variables'
 // https://github.com/mui-org/material-ui/issues/11467
 const styles = {
   tooltip: {
-    backgroundColor: v.colors.blackLava,
+    backgroundColor: v.colors.black,
     fontSize: '0.75rem',
     fontFamily: v.fonts.sans,
     borderRadius: 0,
@@ -16,7 +16,16 @@ const styles = {
   },
 }
 
+@withStyles(styles)
 class Tooltip extends React.PureComponent {
+  // using the @withStyles decorator, this syntax is more appropriate
+  static propTypes = {
+    classes: PropTypes.shape({
+      tooltip: PropTypes.string.isRequired,
+      open: PropTypes.string,
+    }).isRequired,
+  }
+
   render() {
     const { classes, ...otherProps } = this.props
     return (
@@ -30,11 +39,6 @@ class Tooltip extends React.PureComponent {
   }
 }
 
-Tooltip.propTypes = {
-  classes: PropTypes.shape({
-    tooltip: PropTypes.string,
-    open: PropTypes.string,
-  }).isRequired,
-}
+Tooltip.displayName = 'Tooltip'
 
-export default withStyles(styles)(Tooltip)
+export default Tooltip

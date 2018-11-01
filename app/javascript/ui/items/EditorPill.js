@@ -15,7 +15,7 @@ const StyledEditorPill = styled.div`
   min-width: 400px;
   min-height: 40px;
   border-radius: 5px;
-  background-color: ${v.colors.cloudy};
+  background-color: ${v.colors.commonDark};
   padding: 10px 20px;
   color: white;
 

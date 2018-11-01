@@ -1,4 +1,3 @@
-import _ from 'lodash'
 import { observable, action } from 'mobx'
 import { routingStore, uiStore } from '~/stores'
 
@@ -56,22 +55,9 @@ export default class UndoStore {
     return this.performUndo(undoAction)
   }
 
-  captureUndoKeypress = e => {
-    if (e.code === 'KeyZ' && (e.metaKey || e.ctrlKey)) {
-      if (this.currentlyUndoing) return false
-      if (uiStore.cancelUndo) return false
-      const { activeElement } = document
-      if (activeElement.nodeName === 'INPUT') return false
-      if (
-        _.intersection(activeElement.classList, [
-          'ql-editor',
-          'public-DraftEditor-content',
-        ]).length > 0
-      ) {
-        return false
-      }
-      this.undoLastAction()
-    }
-    return false
+  handleUndoKeypress = () => {
+    if (this.currentlyUndoing) return false
+    if (uiStore.cancelUndo) return false
+    return this.undoLastAction()
   }
 }

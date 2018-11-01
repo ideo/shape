@@ -2,11 +2,18 @@ class SerializableItem < BaseJsonSerializer
   ROLES_LIMIT = 5
   type 'items'
   attributes :type, :name, :content, :text_data,
-             :url, :thumbnail_url, :icon_url, :question_type
+             :url, :thumbnail_url, :icon_url, :question_type,
+             :data_source_type, :data_source_id
   has_one :parent_collection_card
+  has_one :parent
+  belongs_to :data_source
 
   attribute :tag_list do
     @object.cached_tag_list || []
+  end
+
+  attribute :chart_data do
+    @object.chart_data || {}
   end
 
   attribute :inherited_tag_list do
@@ -18,7 +25,6 @@ class SerializableItem < BaseJsonSerializer
     @object.cached_filestack_file_url || ''
   end
 
-  has_one :parent
   belongs_to :filestack_file
 
   attribute :breadcrumb, if: -> { @object == @current_record } do

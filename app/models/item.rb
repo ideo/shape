@@ -37,9 +37,12 @@ class Item < ApplicationRecord
   delegate :organization, to: :parent, allow_nil: true
   belongs_to :cloned_from, class_name: 'Item', optional: true
   has_one :comment_thread, as: :record, dependent: :destroy
+  has_one :question_item, class_name: 'Item::QuestionItem'
+
+  scope :questions, -> { where(type: 'Item::QuestionItem') }
 
   before_validation :format_url, if: :saved_change_to_url?
-  before_create :generate_name, unless: :name?
+  before_create :generate_name, unless: :name_present?
 
   validates :type, presence: true
 
@@ -65,7 +68,7 @@ class Item < ApplicationRecord
   end
 
   def duplicate!(
-    for_user:,
+    for_user: nil,
     copy_parent_card: false,
     parent: self.parent
   )
@@ -94,7 +97,7 @@ class Item < ApplicationRecord
       i.roles << role.duplicate!(assign_resource: i)
     end
     # upgrade to editor unless we're setting up a templated collection
-    for_user.upgrade_to_edit_role(i)
+    for_user.upgrade_to_edit_role(i) if for_user.present?
 
     # Method from HasFilestackFile
     filestack_file_duplicate!(i)
@@ -181,11 +184,19 @@ class Item < ApplicationRecord
     cards_linked_to_this_item.update_all(updated_at: updated_at)
   end
 
+  def chart_data
+    {}
+  end
+
   def jsonapi_type_name
     'items'
   end
 
   private
+
+  def name_present?
+    name.present?
+  end
 
   def reindex_parent_collection
     return if @dont_reindex_parent || !Searchkick.callbacks? || parent.blank?

@@ -21,8 +21,8 @@ RSpec.describe CollectionCardDuplicationWorker, type: :worker do
       before do
         CollectionCardDuplicationWorker.new.perform(
           card_ids,
-          user.id,
           duplicate.id,
+          user.id,
         )
         duplicate.reload
       end
@@ -54,8 +54,8 @@ RSpec.describe CollectionCardDuplicationWorker, type: :worker do
 
         CollectionCardDuplicationWorker.new.perform(
           card_ids,
-          user.id,
           duplicate.id,
+          user.id,
         )
       end
 
@@ -63,7 +63,15 @@ RSpec.describe CollectionCardDuplicationWorker, type: :worker do
         expect_any_instance_of(Collection).to receive(:processing_done)
         CollectionCardDuplicationWorker.new.perform(
           card_ids,
+          duplicate.id,
           user.id,
+        )
+      end
+
+      it 'clones all items if user not provided' do
+        expect_any_instance_of(Collection).to receive(:processing_done)
+        CollectionCardDuplicationWorker.new.perform(
+          card_ids,
           duplicate.id,
         )
       end
@@ -77,8 +85,8 @@ RSpec.describe CollectionCardDuplicationWorker, type: :worker do
         user.remove_role(Role::EDITOR, hidden_item)
         CollectionCardDuplicationWorker.new.perform(
           card_ids,
-          user.id,
           duplicate.id,
+          user.id,
         )
         duplicate.reload
       end

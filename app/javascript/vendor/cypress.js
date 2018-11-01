@@ -1,4 +1,5 @@
 import { apiStore, uiStore, undoStore } from '~/stores'
+import captureGlobalKeypress from '~/utils/captureGlobalKeypress'
 
 const cypress = navigator && navigator.userAgent === 'cypress'
 if (cypress) {
@@ -6,4 +7,5 @@ if (cypress) {
   window.apiStore = apiStore
   window.uiStore = uiStore
   window.undoStore = undoStore
+  window.captureGlobalKeypress = captureGlobalKeypress
 }

@@ -20,7 +20,12 @@ export default class UiStore {
   @observable
   blankContentToolState = { ...this.defaultBCTState }
   @observable
-  openCardMenuId = false
+  cardMenuOpen = { id: false, x: 0, y: 0, direction: 'left' }
+  @computed
+  get cardMenuOpenAndPositioned() {
+    const { cardMenuOpen } = this
+    return cardMenuOpen.id && !!(cardMenuOpen.x || cardMenuOpen.y)
+  }
   @observable
   organizationMenuPage = null
   @observable
@@ -81,6 +86,8 @@ export default class UiStore {
     confirmText: 'OK',
     cancelText: 'Cancel',
     fadeOutTime: undefined,
+    snoozeChecked: false,
+    onToggleSnoozeDialog: null,
     onClose: () => this.closeDialog(),
   }
   defaultSnackbarProps = {
@@ -107,6 +114,8 @@ export default class UiStore {
   activityLogPosition = { x: 0, y: 0, w: 1, h: 1 }
   @observable
   activityLogPage = 'comments'
+  @observable
+  activityLogMoving = false
   @observable
   windowWidth = 0
 
@@ -174,8 +183,22 @@ export default class UiStore {
   }
 
   @action
+  setSnoozeChecked(val) {
+    this.dialogConfig.snoozeChecked = val
+  }
+
+  @action
   closeDialog() {
     this.dialogConfig.open = null
+  }
+
+  openCardMenu(id, opts = {}) {
+    const { x = 0, y = 0, direction = 'left' } = opts
+    this.update('cardMenuOpen', { id, x, y, direction })
+  }
+
+  closeCardMenu() {
+    this.update('cardMenuOpen', { id: false, x: 0, y: 0, direction: 'left' })
   }
 
   async popupSnackbar(props = {}) {
@@ -214,7 +237,7 @@ export default class UiStore {
   @action
   openMoveMenu({ from: fromCollectionId, cardAction }) {
     this.pageMenuOpen = false
-    this.openCardMenuId = false
+    this.closeCardMenu()
     // On move, copy over selected cards to moving cards
     this.movingFromCollectionId = fromCollectionId
     // cardAction can be 'move' or 'link'
@@ -333,7 +356,7 @@ export default class UiStore {
   openBlankContentTool(options = {}) {
     const { viewingCollection } = this
     this.deselectCards()
-    this.openCardMenuId = false
+    this.closeCardMenu(false)
     this.blankContentToolState = {
       ...this.defaultBCTState,
       order: 0,
@@ -426,21 +449,29 @@ export default class UiStore {
   @action
   openOptionalMenus(params) {
     const opts = queryString.parse(params)
-    if (opts) {
-      switch (opts.open) {
-        case 'comments':
-          this.activityLogPage = 'comments'
-          this.activityLogOpen = true
-          break
-        case 'notifications':
-          this.activityLogPage = 'notifications'
-          this.activityLogOpen = true
-          break
-        default:
-          break
-      }
+    if (opts && opts.open) {
+      this.activityLogPage = opts.open
+      this.activityLogOpen = true
     }
     return opts.open
+  }
+
+  // takes a click event as a parameter
+  captureKeyboardGridClick = (e, cardId) => {
+    const ctrlClick = e.metaKey || e.ctrlKey
+    const shiftClick = e.shiftKey
+    if (ctrlClick || shiftClick) {
+      if (ctrlClick) {
+        // individually select
+        this.toggleSelectedCardId(cardId)
+      }
+      if (shiftClick) {
+        // select everything between
+        this.selectCardsUpTo(cardId)
+      }
+      return true
+    }
+    return false
   }
 
   // TODO: add a unit test for this
@@ -482,6 +513,8 @@ export default class UiStore {
 
   @action
   expandThread(key, { reset = false } = {}) {
+    // when we expand a thread we also want it to set the ActivityLog to Comments
+    this.update('activityLogPage', 'comments')
     // reset it first, that way if it's expanded offscreen, it will get re-opened/scrolled to
     if (reset) this.expandedThreadKey = null
     this.expandedThreadKey = key

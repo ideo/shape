@@ -23,6 +23,7 @@ import UserSettings from '~/ui/users/UserSettings'
 import v from '~/utils/variables'
 import firebaseClient from '~/vendor/firestore'
 import MuiTheme from '~/ui/global/MuiTheme'
+import captureGlobalKeypress from '~/utils/captureGlobalKeypress'
 
 const AppWrapper = styled.div`
   /* used by terms of use modal to blur the whole site */
@@ -48,21 +49,20 @@ const FixedActivityLogWrapper = styled.div`
 
 // withRouter allows it to respond automatically to routing changes in props
 @withRouter
-@inject('apiStore', 'uiStore', 'routingStore', 'undoStore')
+@inject('apiStore', 'uiStore', 'routingStore')
 @observer
 class Routes extends React.Component {
   componentDidMount() {
-    const { apiStore, undoStore } = this.props
+    const { apiStore } = this.props
     apiStore.loadCurrentUserAndGroups().then(() => {
       initZendesk(apiStore.currentUser)
       firebaseClient.authenticate(apiStore.currentUser.google_auth_token)
     })
-    document.addEventListener('keydown', undoStore.captureUndoKeypress)
+    document.addEventListener('keydown', captureGlobalKeypress)
   }
 
   componentWillUnmount() {
-    const { undoStore } = this.props
-    document.removeEventListener('keydown', undoStore.captureUndoKeypress)
+    document.removeEventListener('keydown', captureGlobalKeypress)
   }
 
   handleWindowResize = ({ windowWidth }) => {
@@ -149,7 +149,6 @@ Routes.wrappedComponent.propTypes = {
   apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
   routingStore: MobxPropTypes.objectOrObservableObject.isRequired,
-  undoStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 
 export default Routes

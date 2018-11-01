@@ -21,16 +21,14 @@ function pluralTypeName(name) {
 
 const StyledContainer = styled.div`
   background: ${props =>
-    props.isDefault ? v.colors.activityDarkestBlue : v.colors.orange};
+    props.isDefault ? v.colors.secondaryDarkest : v.colors.alert};
   box-sizing: border-box;
-  margin-left: ${props => (props.isDefault ? 10 : 0)}px;
-  margin-right: ${props => (props.isDefault ? 10 : 0)}px;
   margin-top: 4px;
   min-height: ${props => (props.isDefault ? 75 : 62)}px;
   padding: ${props => (props.isDefault ? '12px' : '8px 32px')};
   position: relative;
   transition: ${v.transitionWithDelay};
-  width: calc(100% - ${props => (props.isDefault ? '20px' : '0px')});
+  width: 100%;
 
   &.show-read {
     opacity: 0;
@@ -190,6 +188,7 @@ class Notification extends React.Component {
               action={notification.activity.action}
               actors={this.actors}
               target={notification.activity.target}
+              sourceName={notification.activity.source_name}
               subjectUsers={notification.activity.subject_users}
               subjectGroups={notification.activity.subject_groups}
               actorCount={notification.combined_actor_count}

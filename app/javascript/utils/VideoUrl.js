@@ -5,6 +5,11 @@ import _ from 'lodash'
 import v from '~/utils/variables'
 import { parseUrl } from './url'
 
+// e.g.
+// https://ford.rev.vbrick.com/#/videos/08ebc122-eaa4-4ae4-839a-8497c044d409 (public)
+// https://ford.rev.vbrick.com/#/videos/20706f6e-4ae0-4b2a-b715-1be405e0f280 (private)
+const VBRICK_DOMAIN = 'ford.rev.vbrick.com'
+
 class VideoUrl {
   // Returns object with video { service, id, normalizedUrl }
   // Attrs are null if video URL is not valid
@@ -18,17 +23,27 @@ class VideoUrl {
 
     if (!this.isValid(url)) return retv
 
-    const data = getVideoId(url)
+    const data = this.getVideoId(url)
     const { service } = data
     let { id } = data
     if (service === 'vimeo' && !id) {
-      ;({ id } = this.vimeoPrivate(url))
+      id = this.vimeoPrivate(url).id
     }
     retv.service = service
     retv.id = id
     retv.normalizedUrl = this.normalizedUrl(service, id)
 
     return retv
+  }
+
+  static getVideoId(url) {
+    // wrapper for 'get-video-id' that includes Ford vbrick
+    let { id, service } = getVideoId(url)
+    if (url.match(new RegExp(VBRICK_DOMAIN, 'g'))) {
+      service = 'vbrick'
+      id = _.last(url.split('videos/'))
+    }
+    return { id, service }
   }
 
   // Returns a URL that can be used throughout our system
@@ -39,6 +54,9 @@ class VideoUrl {
         return `https://www.youtube.com/watch?v=${id}`
       case 'vimeo':
         return `https://vimeo.com/${id}`
+      case 'vbrick':
+        // same note as above, have to check if this
+        return `https://${VBRICK_DOMAIN}/#/videos/${id}`
       default:
         return null
     }
@@ -59,19 +77,23 @@ class VideoUrl {
   }
 
   static getAPIdetails(url) {
-    const { id, service } = getVideoId(url)
+    const { id, service } = this.getVideoId(url)
     if (service === 'vimeo' && !id) {
       return this.vimeoPrivate()
     }
     if (!service || !id) return {}
     if (!this.isValid(url)) return {}
 
-    if (service === 'youtube') {
-      return this.getYoutubeDetails(id)
-    } else if (service === 'vimeo') {
-      return this.getVimeoDetails(id)
+    switch (service) {
+      case 'youtube':
+        return this.getYoutubeDetails(id)
+      case 'vimeo':
+        return this.getVimeoDetails(id)
+      case 'vbrick':
+        return this.getVbrickDetails(id)
+      default:
+        return {}
     }
-    return {}
   }
 
   static async getYoutubeDetails(id) {
@@ -119,8 +141,27 @@ class VideoUrl {
     }
   }
 
+  static async getVbrickDetails(id) {
+    const apiUrl = `https://${VBRICK_DOMAIN}/api/v1/videos/${id}/details`
+    try {
+      const response = await axios.get(apiUrl)
+      const { data } = response
+      if (data.id) {
+        return {
+          name: data.title,
+          thumbnailUrl: data.thumbnailUrl,
+        }
+      }
+      return {}
+    } catch (e) {
+      // could be a 404, or a 401...
+      // until we have a vbrick login, hard to test how to respond to private/unauthorized
+      return {}
+    }
+  }
+
   static isValid(url) {
-    const { id, service } = getVideoId(url)
+    const { id, service } = this.getVideoId(url)
     if (service === 'vimeo' && !id) {
       return !!Object.keys(this.vimeoPrivate(url)).length
     }
@@ -134,8 +175,11 @@ class VideoUrl {
         // ensure id is numeric (unless vimeo changes their format!)
         // ensure id is not identifying a group/id
         return /\d+/.test(id) && !/groups\/(\d+)$/.test(url)
-      default:
+      case 'vbrick':
         return true
+      default:
+        // unsupported service, e.g. Vine, Videopress
+        return false
     }
   }
 }

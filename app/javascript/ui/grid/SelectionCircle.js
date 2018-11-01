@@ -10,11 +10,11 @@ const StyledSelectionCircle = styled.div`
   width: 14px;
   height: 14px;
   border-radius: 14px;
-  border: 1px solid ${v.colors.gray};
+  border: 1px solid ${v.colors.commonMedium};
   margin: 5px;
   &.selected {
-    border-color: ${v.colors.gray};
-    background-color: ${v.colors.gray};
+    border-color: ${v.colors.commonMedium};
+    background-color: ${v.colors.commonMedium};
   }
 `
 StyledSelectionCircle.displayName = 'StyledSelectionCircle'
@@ -22,8 +22,11 @@ StyledSelectionCircle.displayName = 'StyledSelectionCircle'
 @inject('uiStore')
 @observer
 class SelectionCircle extends React.Component {
-  toggleSelected = () => {
+  toggleSelected = e => {
     const { cardId, uiStore } = this.props
+    if (uiStore.captureKeyboardGridClick(e, cardId)) {
+      return
+    }
     uiStore.toggleSelectedCardId(cardId)
   }
 

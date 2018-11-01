@@ -61,14 +61,20 @@ describe('MoveModal', () => {
         )
       })
     })
-    describe('trying to create a template inside itself', () => {
+    describe('trying to create a template inside another template', () => {
       it('should return an error message', () => {
         const message = component.moveErrors({
-          viewingCollection: { id: 1, can_edit_content: true },
+          viewingCollection: {
+            id: 1,
+            can_edit_content: true,
+            isMasterTemplate: true,
+          },
           movingFromCollection: { id: 1 },
           cardAction: 'useTemplate',
         })
-        expect(message).toEqual("You can't create a template inside itself")
+        expect(message).toContain(
+          "You can't create a template instance inside another template"
+        )
       })
     })
     describe('with edit access and no issues', () => {
@@ -110,7 +116,7 @@ describe('MoveModal', () => {
       it('should show an alert dialog on failure', async () => {
         await component.moveCards('top')
         expect(uiStore.alert).toHaveBeenCalledWith(
-          'You cannot move a collection within itself'
+          'You cannot move a collection within itself.'
         )
       })
     })

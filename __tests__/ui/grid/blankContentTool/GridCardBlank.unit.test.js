@@ -32,8 +32,7 @@ beforeEach(() => {
 describe('GridCardBlank', () => {
   describe('when creating a new card', () => {
     it('renders the content creation buttons', () => {
-      // TODO: change back to 7 when test collections are enabled
-      expect(wrapper.find('BctButtonBox').length).toBe(6)
+      expect(wrapper.find('BctButtonBox').length).toBe(7)
     })
 
     it('renders the close button', () => {
@@ -54,11 +53,11 @@ describe('GridCardBlank', () => {
       expect(FilestackUpload.pickImages).toHaveBeenCalled()
     })
 
-    it('opens VideoCreator with onClick handler', () => {
+    it('opens LinkCreator (video) with onClick handler', () => {
       component.startCreating('video')()
       wrapper.update()
       expect(wrapper.state().creating).toEqual('video')
-      expect(wrapper.find('VideoCreator').exists()).toBe(true)
+      expect(wrapper.find('LinkCreator').props().type).toEqual('video')
     })
 
     it('opens TextItemCreator with onClick handler', () => {
@@ -68,11 +67,11 @@ describe('GridCardBlank', () => {
       expect(wrapper.find('TextItemCreator').exists()).toBe(true)
     })
 
-    it('opens LinkCreator with onClick handler', () => {
+    it('opens LinkCreator (link) with onClick handler', () => {
       component.startCreating('link')()
       wrapper.update()
       expect(wrapper.state().creating).toEqual('link')
-      expect(wrapper.find('LinkCreator').exists()).toBe(true)
+      expect(wrapper.find('LinkCreator').props().type).toEqual('link')
     })
 
     it('calls API_create when creating', async () => {

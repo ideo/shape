@@ -98,6 +98,11 @@ gem 'jwt', '~> 1.5'
 # looking up records by slug
 gem 'friendly_id', '~> 5.1.0'
 
+# State machine for ruby classes
+gem 'aasm', '~> 5.0'
+# mailchimp API
+gem 'gibbon', '~> 3.2'
+
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
   gem 'byebug', platforms: [:mri, :mingw, :x64_mingw]

@@ -6,7 +6,9 @@ import OkIcon from '~/ui/icons/OkIcon'
 import AlertIcon from '~/ui/icons/AlertIcon'
 import InfoIcon from '~/ui/icons/InfoIcon'
 import LinkIcon from '~/ui/icons/LinkIcon'
+import TemplateIcon from '~/ui/icons/TemplateIcon'
 import TestGraphIcon from '~/ui/icons/TestGraphIcon'
+import MailIcon from '~/ui/icons/MailIcon'
 
 export default {
   ArchiveIcon,
@@ -18,4 +20,6 @@ export default {
   InfoIcon,
   LinkIcon,
   TestGraphIcon,
+  TemplateIcon: () => <TemplateIcon circled />,
+  MailIcon,
 }

@@ -1,6 +1,7 @@
 import _ from 'lodash'
-import { observable, computed, action } from 'mobx'
+import { observable, computed, action, runInAction } from 'mobx'
 import { ReferenceType } from 'datx'
+import pluralize from 'pluralize'
 
 import { apiStore, routingStore, uiStore } from '~/stores'
 import { apiUrl } from '~/utils/url'
@@ -22,6 +23,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     'tag_list',
     'submission_template_id',
     'submission_box_type',
+    'collection_to_test_id',
   ]
 
   @computed
@@ -43,6 +45,68 @@ class Collection extends SharedRecordMixin(BaseRecord) {
         this.collection_cards.splice(this.collection_cards.indexOf(card), 1)
       )
     this._reorderCards()
+  }
+
+  @action
+  toggleEditWarnings() {
+    if (this.snoozedEditWarningsAt) {
+      this.snoozedEditWarningsAt = undefined
+    } else {
+      this.snoozedEditWarningsAt = Date.now()
+    }
+    uiStore.setSnoozeChecked(!!this.snoozedEditWarningsAt)
+  }
+
+  get shouldShowEditWarning() {
+    if (!this.isMasterTemplate || this.template_num_instances === 0)
+      return false
+    const oneHourAgo = Date.now() - 1000 * 60 * 60
+    if (!this.snoozedEditWarningsAt) return true
+    if (this.snoozedEditWarningsAt < oneHourAgo) {
+      runInAction(() => {
+        // reset the state if time has elapsed, otherwise checkbox remains checked
+        this.snoozedEditWarningsAt = undefined
+      })
+      return true
+    }
+    return false
+  }
+
+  get editWarningPrompt() {
+    let prompt = 'Are you sure?'
+    const num = this.template_num_instances
+    prompt += ` ${num} ${pluralize('instance', num)}`
+    prompt += ` of this template will be affected.`
+    return prompt
+  }
+
+  get confirmEditOptions() {
+    const iconName = 'Template'
+    const confirmText = 'Continue'
+    const onToggleSnoozeDialog = () => {
+      this.toggleEditWarnings()
+    }
+    return {
+      prompt: this.editWarningPrompt,
+      confirmText,
+      iconName,
+      snoozeChecked: !this.shouldShowEditWarning,
+      onToggleSnoozeDialog,
+    }
+  }
+
+  // confirmEdit will check if we're in a template and need to confirm changes,
+  // otherwise it will just call onConfirm()
+  confirmEdit({ onCancel, onConfirm }) {
+    if (!this.shouldShowEditWarning) return onConfirm()
+    uiStore.confirm({
+      ...this.confirmEditOptions,
+      onCancel: () => {
+        if (onCancel) onCancel()
+      },
+      onConfirm: () => onConfirm(),
+    })
+    return true
   }
 
   get organization() {
@@ -102,23 +166,29 @@ class Collection extends SharedRecordMixin(BaseRecord) {
 
   get isUsableTemplate() {
     // you aren't allowed to use the profile template
-    return this.isMasterTemplate && !this.isProfileTemplate
+    return (
+      this.isMasterTemplate &&
+      !this.isProfileTemplate &&
+      !this.is_submission_box_template &&
+      !this.isTestDesign &&
+      !this.isTestCollection
+    )
   }
 
   get isLaunchableTest() {
-    return this.isTestCollection && this.test_status === 'draft'
+    return this.isTestCollectionOrTestDesign && this.test_status === 'draft'
   }
 
   get isLiveTest() {
     return this.isTestCollectionOrTestDesign && this.test_status === 'live'
   }
 
+  get isClosedTest() {
+    return this.isTestCollectionOrTestDesign && this.test_status === 'closed'
+  }
+
   get publicTestURL() {
-    let collectionId = this.id
-    if (this.isTestDesign && this.parent_collection_card) {
-      collectionId = this.parent_collection_card.parent_id
-    }
-    return `${process.env.BASE_HOST}/tests/${collectionId}`
+    return `${process.env.BASE_HOST}/tests/${this.testCollectionId}`
   }
 
   get isTemplated() {
@@ -151,7 +221,13 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     return this.isSharedCollection
   }
 
-  // this marks it with the "sirocco" special color
+  get cardProperties() {
+    return this.collection_cards.map(c =>
+      _.pick(c, ['id', 'order', 'width', 'height'])
+    )
+  }
+
+  // this marks it with the "offset" special color
   // NOTE: could also use Collection::Global -- except OrgTemplates is not "special"?
   get isSpecialCollection() {
     return (
@@ -173,6 +249,14 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     return this.collection_cards.length === 0
   }
 
+  get testCollectionId() {
+    if (this.isTestCollection) return this.id
+    if (this.isTestDesign && this.parent_collection_card) {
+      return this.parent_collection_card.parent_id
+    }
+    return undefined
+  }
+
   @action
   addCard(card) {
     this.collection_cards.unshift(card)
@@ -183,10 +267,12 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     const data = this.toJsonApi()
     delete data.relationships
     // attach nested attributes of cards
-    data.attributes.collection_cards_attributes = _.map(
-      this.collection_cards,
-      card => _.pick(card, ['id', 'order', 'width', 'height'])
-    )
+    if (this.collection_cards) {
+      data.attributes.collection_cards_attributes = _.map(
+        this.collection_cards,
+        card => _.pick(card, ['id', 'order', 'width', 'height'])
+      )
+    }
     return data
   }
 
@@ -235,17 +321,58 @@ class Collection extends SharedRecordMixin(BaseRecord) {
       uiStore.alert('Only editors are allowed to launch the test.')
       return
     }
-    uiStore.confirm({
-      prompt:
-        'Are you sure? Once you get your first response, you can no longer change your test.',
-      confirmText: 'Launch',
-      iconName: 'TestGraph',
-      onConfirm: () => this.API_launchTest(),
-    })
+    this.API_launchTest()
+  }
+
+  closeTest = async () => {
+    await this.API_closeTest()
+  }
+
+  reopenTest = async () => {
+    await this.API_reopenTest()
   }
 
   API_launchTest() {
-    this.apiStore.request(`collections/${this.id}/launch_test`, 'PATCH')
+    this.apiStore
+      .request(`test_collections/${this.testCollectionId}/launch`, 'PATCH')
+      .catch(err => {
+        uiStore.popupAlert({
+          prompt: `You have questions that have not yet been finalized:\n
+           ${err.error.map(e => ` ${e.detail}`)}
+          `,
+          fadeOutTime: 10 * 1000,
+        })
+      })
+  }
+
+  API_closeTest(collectionId) {
+    this.apiStore.request(
+      `test_collections/${this.testCollectionId}/close`,
+      'PATCH'
+    )
+  }
+
+  API_reopenTest() {
+    this.apiStore.request(
+      `test_collections/${this.testCollectionId}/reopen`,
+      'PATCH'
+    )
+  }
+
+  API_setSubmissionBoxTemplate(data) {
+    return this.apiStore.request(
+      `collections/set_submission_box_template`,
+      'POST',
+      data
+    )
+  }
+
+  reassignCover(newCover) {
+    const previousCover = this.collection_cards
+      .filter(cc => cc !== newCover)
+      .find(cc => cc.is_cover === true)
+    if (!previousCover) return
+    previousCover.is_cover = false
   }
 
   static async createSubmission(parent_id, submissionSettings) {

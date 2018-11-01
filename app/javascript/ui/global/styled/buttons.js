@@ -46,7 +46,7 @@ CloseButton.propTypes = {
 }
 CloseButton.defaultProps = {
   size: 'sm',
-  color: v.colors.cloudy,
+  color: v.colors.commonDark,
   position: 'absolute',
 }
 
@@ -58,8 +58,9 @@ export const CircledIcon = styled.button`
   justify-content: center;
   position: relative;
   width: 32px;
-  ${props => props.active && `background-color: ${v.colors.gray};`} &:hover {
-    background-color: ${v.colors.gray};
+  ${props =>
+    props.active && `background-color: ${v.colors.commonMedium};`} &:hover {
+    background-color: ${v.colors.commonMedium};
   }
 
   .icon {
@@ -70,7 +71,8 @@ export const CircledIcon = styled.button`
 CircledIcon.displayName = 'StyledCircledIcon'
 
 export const NotificationButton = styled.button`
-  background-color: ${props => (props.read ? v.colors.gray : v.colors.orange)};
+  background-color: ${props =>
+    props.read ? v.colors.commonMedium : v.colors.alert};
   border-radius: 50%;
   cursor: ${props => (props.read ? 'default' : 'pointer')};
   display: inline-block;

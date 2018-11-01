@@ -208,9 +208,13 @@ describe Api::V1::UsersController, type: :request, json: true, auth: true do
     let!(:switch_organization) { create(:organization) }
     let!(:organization) { user.current_organization }
     let(:path) { '/api/v1/users/switch_org' }
-    let!(:params) { { organization_id: switch_organization.id }.to_json }
+    let(:params) { { organization_id: switch_organization.id.to_s }.to_json }
+    let(:slug_params) { { organization_id: switch_organization.slug.to_s }.to_json }
+    # catch a use case where we had an error using Organization.friendly.find
+    let!(:bad_org) { create(:organization, slug: switch_organization.id) }
 
     before do
+      organization.update(slug: 'sluggity-slug')
       user.add_role(Role::MEMBER, switch_organization.primary_group)
     end
 
@@ -224,6 +228,13 @@ describe Api::V1::UsersController, type: :request, json: true, auth: true do
         switch_organization,
       )
       post(path, params: params)
+    end
+
+    it 'it switches the users current org when using the slug' do
+      expect(user).to receive(:switch_to_organization).with(
+        switch_organization,
+      )
+      post(path, params: slug_params)
     end
   end
 end

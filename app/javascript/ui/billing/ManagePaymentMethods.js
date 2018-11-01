@@ -11,9 +11,9 @@ const FinePrintWrapper = styled.div`
   font-family: Gotham;
   font-size: 14px;
   margin: 36px 0;
-  color: ${v.colors.darkGray};
+  color: ${v.colors.commonDarkest};
   a {
-    color: ${v.colors.pacificBlue};
+    color: ${v.colors.ctaPrimary};
     text-decoration: none;
   }
 `
@@ -57,7 +57,7 @@ class ManagePaymentMethods extends React.Component {
   }
 
   destroyPaymentMethod = async paymentMethod => {
-    await this.props.networkStore.remove(paymentMethod, true)
+    await this.props.networkStore.removePaymentMethod(paymentMethod)
     this.forceUpdate()
   }
 

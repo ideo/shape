@@ -49,18 +49,25 @@ class Api::V1::CollectionsController < Api::V1::BaseController
     end
   end
 
-  before_action :load_and_authorize_test_collection_launch, only: %i[launch_test]
-  def launch_test
-    if @collection.launch_test!(initiated_by: current_user)
-      render_collection
-    else
-      render_api_errors @collection.errors
-    end
-  end
-
   load_resource only: %i[in_my_collection]
   def in_my_collection
     render json: current_user.in_my_collection?(@collection)
+  end
+
+  before_action :load_and_authorize_set_submission_box_template, only: %i[set_submission_box_template]
+  def set_submission_box_template
+    setter = SubmissionBoxTemplateSetter.new(
+      submission_box: @submission_box,
+      template_card: @template_card,
+      submission_box_type: json_api_params[:submission_box_type],
+      user: current_user,
+    )
+    if setter.call
+      render jsonapi: @submission_box,
+             include: Collection.default_relationships_for_api
+    else
+      render_api_errors setter.errors
+    end
   end
 
   private
@@ -80,9 +87,23 @@ class Api::V1::CollectionsController < Api::V1::BaseController
       authorize! :read, @parent_collection
       return
     end
+    if @parent_collection.inside_a_master_template?
+      # we don't allow creating instances inside of master templates --
+      # can get too convoluted to handle nested "trickling down" of template updates
+      head(400)
+      return
+    end
     # we are creating a template in this collection so authorize edit_content
     authorize! :edit_content, @parent_collection
     authorize! :read, @template_collection
+  end
+
+  def load_and_authorize_set_submission_box_template
+    @submission_box = Collection.find(json_api_params[:box_id])
+    authorize! :edit, @submission_box
+    return true if json_api_params[:template_card_id].blank?
+    @template_card = CollectionCard.find(json_api_params[:template_card_id])
+    authorize! :read, @template_card
   end
 
   def load_and_authorize_collection_update
@@ -103,14 +124,6 @@ class Api::V1::CollectionsController < Api::V1::BaseController
     authorize! :manage, @collection
   end
 
-  def render_collection(include: nil)
-    # include collection_cards for UI to receive any updates
-    include ||= Collection.default_relationships_for_api
-    render jsonapi: @collection,
-           include: include,
-           expose: { current_record: @collection }
-  end
-
   def load_collection_with_cards
     @collection = Collection
                   .where(id: params[:id])
@@ -122,20 +135,13 @@ class Api::V1::CollectionsController < Api::V1::BaseController
     )
   end
 
-  def load_and_authorize_test_collection_launch
-    @collection = Collection.find(params[:id])
-    unless @collection.is_a?(Collection::TestCollection) && @collection.draft?
-      head(401)
-    end
-    authorize! :manage, @collection
-  end
-
   def collection_params
     params.require(:collection).permit(
       :name,
       :tag_list,
       :submission_template_id,
       :submission_box_type,
+      :collection_to_test_id,
       collection_cards_attributes: %i[id order width height],
     )
   end
