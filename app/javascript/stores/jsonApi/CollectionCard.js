@@ -284,7 +284,10 @@ class CollectionCard extends BaseRecord {
       if (collection) {
         collection.removeCardIds(selectedCardIds)
         uiStore.trackEvent('archive', collection)
-        if (collection.collection_cards.length === 0) {
+        if (
+          collection.collection_cards.length === 0 &&
+          !collection.isSubmissionsCollection
+        ) {
           uiStore.openBlankContentTool()
         }
       }
