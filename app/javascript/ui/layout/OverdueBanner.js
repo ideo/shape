@@ -21,8 +21,14 @@ const Banner = styled.div`
 `
 
 const IconWrapper = styled.div`
-  width: ${props => props.width || '32'}px;
-  height: ${props => props.height || props.height || '32'}px;
+  width: ${props => props.width || props.height || '32'}px;
+  height: ${props => props.height || props.width || '32'}px;
+`
+
+const ClickableIconWrapper = styled(IconWrapper)`
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
 `
 
 const Action = styled.div`
@@ -33,11 +39,21 @@ const Action = styled.div`
 @inject('apiStore')
 @observer
 class OverdueBanner extends React.Component {
+  state = {
+    hidden: false,
+  }
+
+  hide = () => this.setState({ hidden: true })
+
   render() {
     const currentOrganization = this.props.apiStore.currentUser
       .current_organization
 
-    if (!currentOrganization.overdue || !currentOrganization.in_app_billing) {
+    if (
+      this.state.hidden ||
+      !currentOrganization.overdue ||
+      !currentOrganization.in_app_billing
+    ) {
       return null
     }
 
@@ -47,14 +63,16 @@ class OverdueBanner extends React.Component {
       <Banner>
         <MaxWidthContainer>
           <Grid container justify="space-between" alignItems="center">
-            <Grid item xs={1}>
-              <IconWrapper>
-                <ClockIcon />
-              </IconWrapper>
-            </Grid>
-            <Grid item xs={8}>
-              {currentOrganization.name} account is overdue. Your content will
-              become inaccessible on {currentOrganization.inaccessible_at}.
+            <Grid item xs={9} container spacing={16} alignItems="flex-end">
+              <Grid item>
+                <IconWrapper>
+                  <ClockIcon />
+                </IconWrapper>
+              </Grid>
+              <Grid item>
+                {currentOrganization.name} account is overdue. Your content will
+                become inaccessible on {currentOrganization.inaccessible_at}.
+              </Grid>
             </Grid>
             <Grid item xs={3}>
               <Action>
@@ -63,12 +81,12 @@ class OverdueBanner extends React.Component {
                     Add payment method <Link to="/billing">here.</Link>
                   </div>
                 ) : (
-                  <Grid container>
+                  <Grid container spacing={16} alignItems="flex-end">
                     <Grid item>Contact your admin for assistance.</Grid>
                     <Grid item>
-                      <IconWrapper>
+                      <ClickableIconWrapper onClick={this.hide}>
                         <CloseIcon />
-                      </IconWrapper>
+                      </ClickableIconWrapper>
                     </Grid>
                   </Grid>
                 )}

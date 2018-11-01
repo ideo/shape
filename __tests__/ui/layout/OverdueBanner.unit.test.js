@@ -88,6 +88,15 @@ describe('OverdueBanner', () => {
         expect(wrapper.find('Link').length).toEqual(0)
         expect(wrapper.html()).toMatch('Contact your admin for assistance.')
       })
+
+      it('allows the overdue banner to be hidden', () => {
+        const wrapper = render()
+        wrapper
+          .find('CloseIcon')
+          .parent()
+          .simulate('click')
+        expect(wrapper.update().type()).toEqual(null)
+      })
     })
   })
 })
