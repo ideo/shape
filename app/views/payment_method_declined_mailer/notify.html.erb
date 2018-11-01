@@ -1,0 +1,42 @@
+<div class="billing-email trial-users-count-exceeded">
+  <div class="subject"><%= @subject %></div>
+  <div><%= message %></div>
+  <div>
+    <div class="organization-name"><%= @organization_name %></div>
+    <div>
+      <div class="section">
+        <div class="inner">
+          <div class="header">
+            <% if @replaced %>
+              Payment Methods
+            <% else %>
+              Payment Method
+            <% end %>
+          </div>
+          <dl>
+            <dt><%= @payment_method.type %> ending in <%= @payment_method.last4 %></dt>
+            <dd><%= @type %></dd>
+            <% if @replaced %>
+              <dt><%= @replacement_payment_method.type %> ending in <%= @replacement_payment_method.last4 %></dt>
+              <dd>CHARGED</dd>
+            <% end %>
+          </dl>
+        </div>
+      </div>
+      <div class="section">
+        <div class="inner">
+          <div class="header">MONTHLY CHARGE</div>
+          <dl>
+            <dt>Next monthly charge:</dt>
+            <dd><%= number_to_currency(@next_monthly_charge) %></dd>
+            <dt>Next statement date:</dt>
+            <dd><%= @next_statement_date %></dd>
+          </dl>
+        </div>
+      </div>
+      <div class='email-link'>
+        <%= link_to @billing_button_text, @url %>
+      </div>
+    </div>
+  </div>
+</div>
