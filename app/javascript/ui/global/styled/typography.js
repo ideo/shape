@@ -67,6 +67,7 @@ export const SubduedHeading1 = styled.h1`
   margin-left: 8px;
   padding-top: 18px;
   text-transform: none;
+  white-space: nowrap;
 `
 SubduedHeading1.displayName = 'SubduedHeading1'
 

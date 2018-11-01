@@ -101,8 +101,10 @@ class TestDesigner extends React.Component {
     })
 
   handleTrash = card => {
-    // TODO: might *not* want to skipPrompt if the test is currently live
-    card.API_archiveSelf()
+    const { collection } = this.props
+    collection.confirmEdit({
+      onConfirm: () => card.API_archiveSelf(),
+    })
   }
 
   handleNew = card => () => {
