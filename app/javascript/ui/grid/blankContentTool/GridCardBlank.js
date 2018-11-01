@@ -52,8 +52,8 @@ const StyledBlankCreationTool = styled.div`
   .foreground {
     position: relative;
     z-index: ${v.zIndex.gridCard};
-    left: ${props => (props.replacing ? '25%' : 'auto')};
-    width: ${props => (props.replacing ? '50%' : '100%')};
+    left: auto;
+    width: 100%;
     &.foreground-bottom {
       top: 120px;
       margin: 0 auto;
@@ -479,18 +479,17 @@ class GridCardBlank extends React.Component {
               Icon={AddFileIcon}
             />
           )}
-          {!isReplacing &&
-            (!creating || creating === 'link') && (
-              <BctButtonBox
-                tooltip="Add URL"
-                type="link"
-                creating={creating}
-                size={size}
-                onClick={this.startCreating('link')}
-                Icon={AddLinkIcon}
-              />
-            )}
-          {(isReplacing || creating === 'video') && (
+          {(!creating || creating === 'link') && (
+            <BctButtonBox
+              tooltip="Add URL"
+              type="link"
+              creating={creating}
+              size={size}
+              onClick={this.startCreating('link')}
+              Icon={AddLinkIcon}
+            />
+          )}
+          {((isReplacing && creating !== 'link') || creating === 'video') && (
             <BctButtonRotation disabled={isReplacing}>
               {videoBctBox}
             </BctButtonRotation>

@@ -42,7 +42,7 @@ class Item extends SharedRecordMixin(BaseRecord) {
   get canReplace() {
     if (!this.can_edit_content) return false
     return _.includes(
-      [ITEM_TYPES.IMAGE, ITEM_TYPES.FILE, ITEM_TYPES.VIDEO],
+      [ITEM_TYPES.IMAGE, ITEM_TYPES.FILE, ITEM_TYPES.VIDEO, ITEM_TYPES.LINK],
       this.type
     )
   }
