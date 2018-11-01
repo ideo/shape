@@ -5,6 +5,7 @@ class Collection < ApplicationRecord
   include RealtimeEditorsViewers
   include HasActivities
   include Templateable
+  include Testable
 
   resourceable roles: [Role::EDITOR, Role::CONTENT_EDITOR, Role::VIEWER],
                edit_role: Role::EDITOR,
@@ -78,17 +79,6 @@ class Collection < ApplicationRecord
   has_many :collections_and_linked_collections,
            through: :collection_cards,
            source: :collection
-
-  has_many :test_collections,
-           inverse_of: :collection_to_test,
-           foreign_key: :collection_to_test_id,
-           class_name: 'Collection::TestCollection'
-
-  has_one :live_test_collection,
-          -> { where(test_status: :live) },
-          inverse_of: :collection_to_test,
-          foreign_key: :collection_to_test_id,
-          class_name: 'Collection::TestCollection'
 
   has_one :comment_thread, as: :record, dependent: :destroy
 
@@ -516,7 +506,7 @@ class Collection < ApplicationRecord
   def submission_box_template?
     parent.is_a? Collection::SubmissionBox
   end
-  
+
   def inside_a_master_template?
     return true if master_template?
     parents.where(master_template: true).any?
