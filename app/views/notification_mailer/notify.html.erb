@@ -102,6 +102,8 @@
                 <span class="bold"><%= notification.activity.actor.name %></span> commented on <%= notification.activity.target.name %>
               <% when "mentioned" %>
                 <span class="bold"><%= notification.activity.actor.name %></span> mentioned you in a comment for <span class="bold"><%= notification.activity.target.name %></span>
+              <% when "archived_from_template" %>
+                <span class="bold"><%= notification.activity.target.name %> has been changed as a result of <%= notification.activity.source.present? && notification.source.respond_to?(:name) ? notification.activity.source.name : 'something' %> being removed from its template.</span>
               <% end %>
               </p>
             </div>
