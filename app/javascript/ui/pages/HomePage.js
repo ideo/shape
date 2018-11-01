@@ -7,6 +7,7 @@ import backOutImage from '~/assets/back_out_of_new_org.png'
 class HomePage extends React.Component {
   async componentDidMount() {
     const { uiStore } = this.props
+    if (this.userHasOrg) return
     const confirmed = await this.confirmNewOrganization()
     if (confirmed) {
       uiStore.openOrgCreateModal()
