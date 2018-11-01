@@ -19,6 +19,14 @@ class Item
       true
     end
 
+    def mime_base_type
+      filestack_file && filestack_file.mimetype.split('/').first
+    end
+
+    def image?
+      filestack_file && mime_base_type == 'image'
+    end
+
     private
 
     # on_create callback

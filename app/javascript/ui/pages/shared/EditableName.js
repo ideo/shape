@@ -30,7 +30,7 @@ const StyledEditableName = styled.div`
       border-left: none;
       border-top: none;
       border-right: none;
-      border-bottom: 1px solid ${v.colors.blackLava};
+      border-bottom: 1px solid ${v.colors.black};
       &:focus {
         outline: 0;
       }

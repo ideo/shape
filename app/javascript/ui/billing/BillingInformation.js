@@ -21,7 +21,7 @@ const Wrapper = styled.div`
 const Instructional = styled.div`
   font-size: 12px;
   line-height: 16px;
-  color: ${v.colors.gray};
+  color: ${v.colors.commonMedium};
   letter-spacing: 0;
 `
 
@@ -70,7 +70,7 @@ const FreeTrial = styled(TrialHighlight)`
 
 const Label = styled.span`
   font-size: 16px;
-  color: ${v.colors.cloudy};
+  color: ${v.colors.commonDark};
 `
 
 @inject('apiStore', 'networkStore')

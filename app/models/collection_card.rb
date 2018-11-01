@@ -10,7 +10,12 @@ class CollectionCard < ApplicationRecord
   accepts_nested_attributes_for :collection, :item
 
   before_validation :assign_order, if: :assign_order?
+
   before_create :assign_default_height_and_width
+  after_update :update_collection_cover, if: :saved_change_to_is_cover?
+  after_create :update_parent_card_count!
+  after_save :set_collection_as_master_template,
+             if: :test_collection_within_master_template_after_save?
 
   validates :parent, :order, presence: true
   validate :single_item_or_collection_is_present
@@ -30,16 +35,18 @@ class CollectionCard < ApplicationRecord
     # propagate to STI models
     propagate
     nullify :templated_from_id
+    nullify :is_cover
     # don't recognize any relations, easiest way to turn them all off
     recognize []
   end
 
   def duplicate!(
-    for_user:,
+    for_user: nil,
     parent: self.parent,
     shallow: false,
     placement: 'end',
-    duplicate_linked_records: false
+    duplicate_linked_records: false,
+    building_template_instance: false
   )
     if record.is_a? Collection::SharedWithMeCollection
       errors.add(:collection, 'cannot be a SharedWithMeCollection for duplication')
@@ -60,8 +67,12 @@ class CollectionCard < ApplicationRecord
     if master_template_card? && parent.templated?
       # if we're cloning from template -> templated collection
       cc.templated_from = self
-    elsif !(parent.templated? || parent.master_template?)
-      # copying into a normal (non templated) collection, it should never be pinned
+    elsif parent.master_template?
+      # Make it pinned if you're duplicating it into a master template
+      cc.pinned = true
+    else
+      # copying into a normal (non templated) collection, it should never be pinned;
+      # likewise even if you duplicate a pinned card in your own instance
       cc.pinned = false
     end
     # defaults to self.parent, unless one is passed in
@@ -82,7 +93,10 @@ class CollectionCard < ApplicationRecord
         for_user: for_user,
         parent: parent,
       }
-      cc.collection = collection.duplicate!(opts) if collection.present?
+      coll_opts = opts.merge(
+        building_template_instance: building_template_instance,
+      )
+      cc.collection = collection.duplicate!(coll_opts) if collection.present?
       cc.item = item.duplicate!(opts) if item.present?
     end
 
@@ -90,6 +104,10 @@ class CollectionCard < ApplicationRecord
     # now that the card exists, we can recalculate the breadcrumb
     cc.record.recalculate_breadcrumb!
     cc.increment_card_orders! if placement == 'beginning'
+    if parent.master_template?
+      # we just added a template card, so update the instances
+      parent.queue_update_template_instances
+    end
 
     cc
   end
@@ -163,9 +181,37 @@ class CollectionCard < ApplicationRecord
     true
   end
 
+  # gets called by API collection_cards_controller
+  def self.archive_all!(user_id:)
+    # should only ever be used on a subset of cards, e.g. not `all`!
+    unless scope_attributes['id'].present? || scope_attributes['parent_id'].present?
+      return false
+    end
+    # capture these before `self` potentially gets altered by archive scope
+    ids = pluck(:id)
+    # ensure we're now working with an unscoped AR::Relation
+    cards = CollectionCard.where(id: ids)
+    cards.update_all(archived: true)
+    # should generally only be the one parent collection, but an array to be safe
+    parents = cards.map(&:parent).uniq.compact
+    parents.each do |parent|
+      parent.touch
+      if parent.master_template?
+        # we just archived a template card, so update the instances
+        parent.queue_update_template_instances
+      end
+    end
+    CollectionCardArchiveWorker.perform_async(
+      ids,
+      # user_id is for the archive notification `actor`
+      user_id,
+    )
+  end
+
   # gets called by child STI classes
   def after_archive_card
     decrement_card_orders!
+    update_parent_card_count!
     cover = parent.cached_cover
     if cover && cover['card_ids'].include?(id)
       # regenerate parent collection cover if archived card was relevant
@@ -227,9 +273,9 @@ class CollectionCard < ApplicationRecord
     when 'Item::QuestionItem'
       return item.question_type
     when 'Item::TextItem'
-      return 'description'
+      return 'question_description'
     when 'Item::FileItem', 'Item::VideoItem'
-      return 'media'
+      return 'question_media'
     end
   end
 
@@ -263,5 +309,31 @@ class CollectionCard < ApplicationRecord
     return if parent.blank?
 
     errors.add(:parent, 'is read-only so you can\'t save this card') if parent.read_only?
+  end
+
+  def update_collection_cover
+    parent.cached_cover ||= {}
+    if is_cover
+      # A new cover was selected so turn off other covers
+      parent.collection_cards.where.not(id: id).update_all(is_cover: false)
+      parent.cached_cover['no_cover'] = false
+    else
+      # The cover was de-selected so turn off the cover on the collection
+      parent.cached_cover['no_cover'] = true
+    end
+    parent.cache_cover!
+  end
+
+  def update_parent_card_count!
+    parent.cache_card_count!
+  end
+
+  def test_collection_within_master_template_after_save?
+    return false if collection_id.blank? || !collection.is_a?(Collection::TestCollection)
+    saved_change_to_parent_id? && master_template_card?
+  end
+
+  def set_collection_as_master_template
+    collection.update(master_template: true)
   end
 end

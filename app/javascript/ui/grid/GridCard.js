@@ -3,7 +3,9 @@ import { Fragment } from 'react'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 
+import ChartItemCover from '~/ui/grid/covers/ChartItemCover'
 import ContainImage from '~/ui/grid/ContainImage'
+import CoverImageToggle from '~/ui/grid/CoverImageToggle'
 import GridCardHotspot from '~/ui/grid/GridCardHotspot'
 import LinkItemCover from '~/ui/grid/covers/LinkItemCover'
 import TextItemCover from '~/ui/grid/covers/TextItemCover'
@@ -34,8 +36,7 @@ import {
 } from './shared'
 
 const PinIconHolder = styled.div`
-  background-color: ${props =>
-    props.locked ? 'transparent' : v.colors.blackLava};
+  background-color: ${props => (props.locked ? 'transparent' : v.colors.black)};
   border-radius: 50%;
   height: 24px;
   margin-left: 10px;
@@ -64,6 +65,13 @@ class GridCard extends React.Component {
     return record.can_edit
   }
 
+  get canContentEditCard() {
+    if (this.canEditCard) return true
+    const { isSharedCollection, record } = this.props
+    if (isSharedCollection) return false
+    return record.can_edit_content
+  }
+
   get isItem() {
     return this.props.cardType === 'items'
   }
@@ -73,7 +81,7 @@ class GridCard extends React.Component {
   }
 
   get renderInner() {
-    const { card, record, height } = this.props
+    const { card, record, height, handleClick } = this.props
     if (this.isItem) {
       switch (record.type) {
         case ITEM_TYPES.TEXT:
@@ -82,21 +90,30 @@ class GridCard extends React.Component {
               item={record}
               height={height}
               dragging={this.props.dragging}
+              cardId={card.id}
+              handleClick={handleClick}
             />
           )
         case ITEM_TYPES.FILE: {
-          if (record.filestack_file.mimetype === 'application/pdf') {
+          if (record.isPdfFile) {
             return <PdfFileItemCover item={record} />
           }
-          if (record.mimeBaseType === 'image') {
+          if (record.isImage) {
             return <ImageItemCover item={record} contain={card.image_contain} />
           }
-          return <GenericFileItemCover item={record} />
+          if (record.filestack_file) {
+            return <GenericFileItemCover item={record} />
+          }
+          return <div style={{ padding: '20px' }}>File not found.</div>
         }
         case ITEM_TYPES.VIDEO:
           return <VideoItemCover item={record} dragging={this.props.dragging} />
         case ITEM_TYPES.LINK:
           return <LinkItemCover item={record} dragging={this.props.dragging} />
+
+        case ITEM_TYPES.CHART:
+          return <ChartItemCover item={record} testCollection={card.parent} />
+
         default:
           return <div>{record.content}</div>
       }
@@ -117,11 +134,11 @@ class GridCard extends React.Component {
     const { record } = this.props
     if (this.isItem) {
       if (record.isGenericFile) {
-        return v.colors.blackLava
+        return v.colors.black
       }
-      return v.colors.gray
+      return v.colors.commonMedium
     }
-    return v.colors.gray
+    return v.colors.commonMedium
   }
 
   get renderIcon() {
@@ -191,15 +208,36 @@ class GridCard extends React.Component {
   openMenu = () => {
     const { card } = this.props
     if (this.props.menuOpen) {
-      uiStore.update('openCardMenuId', false)
+      uiStore.closeCardMenu()
     } else {
-      uiStore.update('openCardMenuId', card.id)
+      uiStore.openCardMenu(card.id)
     }
+  }
+
+  openContextMenu = ev => {
+    const { card } = this.props
+    const rect = this.gridCardRef.getBoundingClientRect()
+    const x = ev.clientX - rect.left - rect.width * 0.95
+    const y = ev.screenY - rect.top - 120
+    const direction = ev.screenX < 250 ? 'right' : 'left'
+    if (this.props.menuOpen) {
+      uiStore.closeCardMenu()
+    } else {
+      uiStore.openCardMenu(card.id, {
+        x,
+        y,
+        direction,
+      })
+    }
+    ev.preventDefault()
+    return false
   }
 
   closeMenu = () => {
     if (this.props.menuOpen) {
-      uiStore.update('openCardMenuId', false)
+      if (!uiStore.cardMenuOpenAndPositioned) {
+        uiStore.closeCardMenu()
+      }
     }
   }
 
@@ -210,9 +248,18 @@ class GridCard extends React.Component {
     }).click()
   }
 
+  onCollectionCoverChange = () => {
+    const { card } = this.props
+    // Reassign the previous cover when a new cover is assigned as the backend will have changed.
+    card.parent.reassignCover(card)
+  }
+
   handleClick = e => {
-    const { dragging, record } = this.props
+    const { card, dragging, record } = this.props
     if (dragging) return
+    if (uiStore.captureKeyboardGridClick(e, card.id)) {
+      return
+    }
     if (record.type === ITEM_TYPES.LINK) {
       this.linkOffsite(record.url)
       return
@@ -244,15 +291,19 @@ class GridCard extends React.Component {
 
     const firstCardInRow = card.position && card.position.x === 0
     const tagEditorOpen = uiStore.tagsModalOpenId === card.id
-
+    const hoverClass = 'show-on-hover'
     return (
       <StyledGridCard
+        className="gridCard"
         dragging={dragging}
         testCollectionCard={testCollectionCard}
         // mostly for E2E checking purposes
         data-width={card.width}
         data-height={card.height}
         data-order={card.order}
+        data-cy="GridCard"
+        onContextMenu={this.openContextMenu}
+        innerRef={c => (this.gridCardRef = c)}
       >
         {canEditCollection &&
           (!card.isPinnedAndLocked || lastPinnedCard) && (
@@ -267,12 +318,20 @@ class GridCard extends React.Component {
           uiStore.textEditingItem !== record && (
             <StyledTopRightActions color={this.actionsColor}>
               {record.isDownloadable && <Download record={record} />}
+              {record.canBeSetAsCover &&
+                canEditCollection && (
+                  <CoverImageToggle
+                    card={card}
+                    onReassign={this.onCollectionCoverChange}
+                  />
+                )}
               {record.isImage &&
-                this.canEditCard && <ContainImage card={card} />}
+                this.canContentEditCard && <ContainImage card={card} />}
               {!testCollectionCard && <SelectionCircle cardId={card.id} />}
               <ActionMenu
                 location="GridCard"
-                className="show-on-hover card-menu"
+                className={hoverClass}
+                wrapperClassName="card-menu"
                 card={card}
                 canEdit={this.canEditCard}
                 canReplace={record.canReplace}

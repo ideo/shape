@@ -24,16 +24,14 @@ describe('ContainImage', () => {
       })
 
       it('should show the fill tile with image tooltip', () => {
-        expect(wrapper.find('WithStyles(Tooltip)').props().title).toEqual(
+        expect(wrapper.find('Tooltip').props().title).toEqual(
           'fill tile with image'
         )
       })
     })
 
     it('should show the show whole image tooltip', () => {
-      expect(wrapper.find('WithStyles(Tooltip)').props().title).toEqual(
-        'show whole image'
-      )
+      expect(wrapper.find('Tooltip').props().title).toEqual('show whole image')
     })
   })
 

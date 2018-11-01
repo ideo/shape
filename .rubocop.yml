@@ -84,6 +84,7 @@ Metrics/BlockLength:
     - 'config/routes.rb'
     - 'Guardfile'
     - 'spec/**/*.rb'
+    - 'lib/tasks/cypress.rake'
 
 Layout/IndentArray:
   EnforcedStyle: 'consistent'

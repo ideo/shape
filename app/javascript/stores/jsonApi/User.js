@@ -15,7 +15,7 @@ class User extends BaseRecord {
     return this.apiStore.currentUserId === this.id
   }
 
-  async API_updateCurrentUser(option) {
+  async API_updateCurrentUser(option = {}) {
     try {
       return await this.apiStore.request('users/update_current_user', 'PATCH', {
         user: option,
@@ -26,8 +26,11 @@ class User extends BaseRecord {
     }
   }
 
-  API_acceptTerms() {
-    return this.API_updateCurrentUser({ terms_accepted: true })
+  API_acceptTerms({ mailing_list = false }) {
+    return this.API_updateCurrentUser({
+      terms_accepted: true,
+      mailing_list,
+    })
   }
 
   API_hideHelper(type = '') {

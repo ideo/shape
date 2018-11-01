@@ -1,17 +1,15 @@
 import _ from 'lodash'
 import PropTypes from 'prop-types'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
-// import TextareaAutosize from 'react-autosize-textarea'
 import styled, { css } from 'styled-components'
 
 import ReturnArrowIcon from '~/ui/icons/ReturnArrowIcon'
-import v from '~/utils/variables'
 import DescriptionQuestion from './DescriptionQuestion'
 import { QuestionText, TextResponseHolder, TextInput } from './shared'
 
 const QuestionSpacing = css`
   border-bottom-color: ${props =>
-    props.editing ? v.colors.gray : v.colors.testLightBlueBg};
+    props.editing ? props.theme.borderColorEditing : props.theme.borderColor};
   border-bottom-style: solid;
   border-bottom-width: 4px;
 `
@@ -28,7 +26,7 @@ QuestionTextWithSpacing.displayName = 'QuestionTextWithSpacing'
 const TextEnterButton = styled.button`
   opacity: ${props => (props.focused ? 1 : 0)};
   transition: opacity 0.3s;
-  color: ${v.colors.ctaButtonBlue};
+  color: ${props => props.theme.questionText};
   vertical-align: super;
   position: absolute;
   right: 18px;
@@ -37,18 +35,14 @@ const TextEnterButton = styled.button`
   height: 18px;
 `
 
-const QuestionEntryForm = styled.form`
-  background: ${v.colors.desert};
-`
-QuestionEntryForm.displayName = 'QuestionEntryForm'
-
 @observer
 class OpenQuestion extends React.Component {
   constructor(props) {
     super(props)
+    const { questionAnswer } = props
     this.save = _.debounce(this._save, 1000)
     this.state = {
-      response: '',
+      response: questionAnswer ? questionAnswer.answer_text : '',
       focused: false,
     }
   }
@@ -98,14 +92,14 @@ class OpenQuestion extends React.Component {
     return (
       <div style={{ width: '100%' }}>
         {this.renderQuestion()}
-        <QuestionEntryForm onSubmit={this.handleSubmit}>
+        <form onSubmit={this.handleSubmit}>
           <TextResponseHolder>
             <TextInput
               onFocus={() => this.setState({ focused: true })}
               onChange={this.handleResponse}
               onBlur={() => this.setState({ focused: false })}
               value={this.state.response}
-              color={v.colors.ctaButtonBlue}
+              type="questionText"
               placeholder="write response here"
               disabled={editing}
             />
@@ -113,7 +107,7 @@ class OpenQuestion extends React.Component {
               <ReturnArrowIcon />
             </TextEnterButton>
           </TextResponseHolder>
-        </QuestionEntryForm>
+        </form>
       </div>
     )
   }
@@ -121,11 +115,13 @@ class OpenQuestion extends React.Component {
 
 OpenQuestion.propTypes = {
   item: MobxPropTypes.objectOrObservableObject.isRequired,
+  questionAnswer: MobxPropTypes.objectOrObservableObject,
   editing: PropTypes.bool,
   onAnswer: PropTypes.func,
   canEdit: PropTypes.bool,
 }
 OpenQuestion.defaultProps = {
+  questionAnswer: null,
   editing: false,
   onAnswer: () => null,
   canEdit: false,

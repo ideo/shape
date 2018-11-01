@@ -9,9 +9,10 @@ import FinishQuestion from '~/ui/test_collections/FinishQuestion'
 import NewQuestionGraphic from '~/ui/icons/NewQuestionGraphic'
 import ScaleQuestion from '~/ui/test_collections/ScaleQuestion'
 import OpenQuestion from '~/ui/test_collections/OpenQuestion'
+import { QuestionText } from '~/ui/test_collections/shared'
 import { apiStore, uiStore } from '~/stores'
+// NOTE: Always import these models after everything else, can lead to odd dependency!
 import QuestionAnswer from '~/stores/jsonApi/QuestionAnswer'
-import { QuestionText } from './shared'
 
 const QuestionHolder = styled.div`
   display: flex;
@@ -24,9 +25,15 @@ const QuestionCardWrapper = styled.div`
 `
 
 @observer
-class TestQuestionEditor extends React.Component {
+class TestQuestion extends React.Component {
   handleQuestionAnswer = async ({ text, number }) => {
-    const { item, editing, createSurveyResponse } = this.props
+    const {
+      card,
+      item,
+      editing,
+      createSurveyResponse,
+      afterQuestionAnswered,
+    } = this.props
     let { surveyResponse, questionAnswer } = this.props
     // components should never trigger this when editing, but double-check here
     if (editing) return
@@ -47,38 +54,37 @@ class TestQuestionEditor extends React.Component {
       questionAnswer.survey_response = surveyResponse
       await questionAnswer.API_create()
     } else {
+      // needs to be attached in order to provide the session_uid
+      if (surveyResponse) questionAnswer.survey_response = surveyResponse
       // update values on existing answer and save
       await questionAnswer.API_update({
         answer_text: text,
         answer_number: number,
       })
     }
+    afterQuestionAnswered(card)
   }
 
   renderQuestion() {
     const { parent, card, item, editing, questionAnswer, canEdit } = this.props
     let inner
     switch (card.card_question_type) {
-      case 'context':
+      case 'question_useful':
+      case 'question_clarity':
+      case 'question_excitement':
+      case 'question_context':
+      case 'question_different':
+      case 'question_category_satisfaction':
         return (
           <ScaleQuestion
-            questionText="How satisfied are you with your current solution?"
-            editing={editing}
-            questionAnswer={questionAnswer}
-            onAnswer={this.handleQuestionAnswer}
-          />
-        )
-      case 'useful':
-        return (
-          <ScaleQuestion
-            questionText="How useful is this idea for you?"
-            emojiSeries="thumbs"
+            question={item}
             editing={editing}
             questionAnswer={questionAnswer}
             onAnswer={this.handleQuestionAnswer}
           />
         )
       case 'media':
+      case 'question_media':
         if (
           item.type === 'Item::QuestionItem' ||
           uiStore.blankContentToolState.replacingId === card.id
@@ -99,13 +105,13 @@ class TestQuestionEditor extends React.Component {
               card={card}
               cardType="items"
               record={card.record}
-              menuOpen={uiStore.openCardMenuId === card.id}
+              menuOpen={uiStore.cardMenuOpen.id === card.id}
               testCollectionCard
             />
           )
         }
         return <QuestionCardWrapper>{inner}</QuestionCardWrapper>
-      case 'description':
+      case 'question_description':
         if (editing) {
           return (
             <DescriptionQuestion
@@ -117,7 +123,7 @@ class TestQuestionEditor extends React.Component {
         }
         return <QuestionText>{item.content}</QuestionText>
 
-      case 'open':
+      case 'question_open':
         return (
           <OpenQuestion
             item={item}
@@ -127,7 +133,7 @@ class TestQuestionEditor extends React.Component {
             onAnswer={this.handleQuestionAnswer}
           />
         )
-      case 'finish':
+      case 'question_finish':
         return <FinishQuestion />
       default:
         return <NewQuestionGraphic />
@@ -144,7 +150,7 @@ class TestQuestionEditor extends React.Component {
   }
 }
 
-TestQuestionEditor.propTypes = {
+TestQuestion.propTypes = {
   // parent is the parent collection
   parent: MobxPropTypes.objectOrObservableObject.isRequired,
   card: MobxPropTypes.objectOrObservableObject.isRequired,
@@ -153,14 +159,16 @@ TestQuestionEditor.propTypes = {
   surveyResponse: MobxPropTypes.objectOrObservableObject,
   questionAnswer: MobxPropTypes.objectOrObservableObject,
   createSurveyResponse: PropTypes.func,
+  afterQuestionAnswered: PropTypes.func,
   canEdit: PropTypes.bool,
 }
 
-TestQuestionEditor.defaultProps = {
+TestQuestion.defaultProps = {
   surveyResponse: null,
   questionAnswer: null,
   createSurveyResponse: null,
+  afterQuestionAnswered: null,
   canEdit: false,
 }
 
-export default TestQuestionEditor
+export default TestQuestion

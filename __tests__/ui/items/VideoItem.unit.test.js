@@ -12,11 +12,11 @@ describe('VideoItem', () => {
     wrapper = shallow(<VideoItem {...props} />)
   })
 
-  it('renders the React player', () => {
-    expect(wrapper.find('ReactPlayer').exists()).toBe(true)
+  it('renders the VideoPlayer', () => {
+    expect(wrapper.find('VideoPlayer').exists()).toBe(true)
   })
 
-  it('passes the video url to the React player', () => {
-    expect(wrapper.find('ReactPlayer').props().url).toEqual(fakeVideoItem.url)
+  it('passes the video url to the VideoPlayer', () => {
+    expect(wrapper.find('VideoPlayer').props().url).toEqual(fakeVideoItem.url)
   })
 })

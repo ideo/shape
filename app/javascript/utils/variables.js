@@ -4,6 +4,12 @@ export const ITEM_TYPES = {
   VIDEO: 'Item::VideoItem',
   LINK: 'Item::LinkItem',
   QUESTION: 'Item::QuestionItem',
+  CHART: 'Item::ChartItem',
+}
+
+export const COLLECTION_TYPES = {
+  TEST: 'Collection::TestCollection',
+  TEST_DESIGN: 'Collection::TestDesign',
 }
 
 export const KEYS = {
@@ -32,29 +38,30 @@ export default {
   transitionWithDelay: 'all 0.3s 0.2s',
 
   colors: {
-    cararra: '#f2f1ee',
-    desert: '#f5f4f3',
-    cyan: '#b3cdd5',
-    cyanLt: '#c0dbde',
-    testLightBlueBg: '#9ec1cc',
-    pacificBlue: '#00a0e0',
-    activityLightBlue: '#73808f',
-    activityMedBlue: '#5a6a7c',
-    activityDarkBlue: '#3f526a',
-    activityDarkestBlue: '#242d37',
-    ctaButtonBlue: '#5698ae',
-    ctaButtonBlueHover: '#35889e',
-    aquaHaze: '#f0f4f6',
-    gray: '#c6c1bf',
-    darkGray: '#787878',
-    cloudy: '#a89f9b',
-    sirocco: '#6a7c7e',
-    blackLava: '#120f0e',
-    orange: '#d66742',
+    black: '#120f0e',
     white: '#ffffff',
-    nearwhite: '#f7f7f7',
-    cautionYellow: '#fcf113',
+    commonLightest: '#f5f4f3',
+    commonLight: '#f2f1ee',
+    commonMedium: '#c6c1bf',
+    commonDark: '#a89f9b',
+    commonDarkest: '#787878',
+    primaryLightest: '#f0f4f6',
+    primaryLight: '#c0dbde',
+    primaryMedium: '#9ec1cc',
+    primaryMediumDark: '#86b2b7',
+    primaryDark: '#5698ae',
+    primaryDarkest: '#35889e',
+    secondaryLight: '#73808f',
+    secondaryMedium: '#5a6a7c',
+    secondaryDark: '#3f526a',
+    secondaryDarkest: '#242d37',
+    tertiaryMedium: '#de8f74',
+    ctaPrimary: '#00a0e0',
+    alert: '#d66742',
+    caution: '#fcf113',
+    offset: '#6a7c7e',
     placeholderGray: '#bcbcbc',
+    transparent: 'transparent',
   },
 
   iconSizes: {
@@ -75,13 +82,13 @@ export default {
   zIndex: {
     aboveClickWrapper: 501,
     clickWrapper: 500,
-    cardDragging: 250,
-    activityLog: 201,
-    popoutMenu: 201,
+    activityLog: 251,
     // NOTE: if globalHeader is > pageHeader
     // then it will also be above the EditableName ClickWrapper
-    globalHeader: 201,
-    pageHeader: 200,
+    globalHeader: 221,
+    pageHeader: 220,
+    cardDragging: 210,
+    popoutMenu: 201,
     scrollIndicator: 200,
     gridCard: 150,
     gridCardTop: 151,

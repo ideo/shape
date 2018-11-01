@@ -181,6 +181,10 @@ class CollectionGrid extends React.Component {
     }
   }
 
+  positionCardsFromProps = () => {
+    this.positionCards(this.props.collection.collection_cards)
+  }
+
   onDragOrResizeStop = () => {
     const placeholder =
       _.find(this.state.cards, { cardType: 'placeholder' }) || {}
@@ -208,16 +212,24 @@ class CollectionGrid extends React.Component {
       if (original.height !== height || original.width !== width) {
         undoMessage = 'Card resize undone'
       }
-      // this will assign the update attributes to the card
-      this.props.updateCollection({
-        card: original,
-        updates: { order, width, height },
-        undoMessage,
-      })
-      this.positionCards(this.props.collection.collection_cards)
+      // If a template, warn that any instances will be updated
+      const { collection } = this.props
+      const updateCollectionCard = () => {
+        // this will assign the update attributes to the card
+        this.props.updateCollection({
+          card: original,
+          updates: { order, width, height },
+          undoMessage,
+        })
+        this.positionCardsFromProps()
+      }
+      const onCancel = () => {
+        this.positionCardsFromProps()
+      }
+      collection.confirmEdit({ onCancel, onConfirm: updateCollectionCard })
     } else {
       // reset back to normal
-      this.positionCards(this.props.collection.collection_cards)
+      this.positionCardsFromProps()
     }
   }
 
@@ -553,7 +565,7 @@ class CollectionGrid extends React.Component {
           cardType = card.record.internalType
         }
       }
-      const { openCardMenuId } = uiStore
+      const { cardMenuOpen } = uiStore
       grid.push(
         <MovableGridCard
           key={card.id}
@@ -570,7 +582,7 @@ class CollectionGrid extends React.Component {
           onResizeStop={this.onResizeStop}
           routeTo={routingStore.routeTo}
           parent={collection}
-          menuOpen={openCardMenuId === card.id}
+          menuOpen={cardMenuOpen.id === card.id}
           lastPinnedCard={
             card.isPinnedAndLocked && i === this.state.cards.length - 1
           }

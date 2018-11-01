@@ -14,7 +14,7 @@ const FloatedPositioning = styled.div`
 `
 
 const StyledButton = styled.button`
-  background: ${v.colors.ctaButtonBlue};
+  background: ${v.colors.primaryDark};
   border-radius: 100%;
   color: white;
   float: right;

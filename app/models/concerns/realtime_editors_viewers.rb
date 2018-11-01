@@ -11,6 +11,13 @@ module RealtimeEditorsViewers
     publish_to_channel unless dont_notify
   end
 
+  def single_edit(user = nil)
+    Cache.delete(editing_cache_key)
+    publish_to_channel(
+      current_editor: user ? user.as_json : {},
+    )
+  end
+
   # Track viewers by user_id
   # Using an increment counter was prone to dupe issues (e.g. same user with two browser windows open)
   def started_viewing(user, dont_notify: false)
@@ -43,13 +50,14 @@ module RealtimeEditorsViewers
     User.find(user_id).as_json
   end
 
-  def publish_to_channel(data = {})
-    data.merge!(
+  def publish_to_channel(merge_data = {})
+    defaults = {
       current_editor: currently_editing_user_as_json,
       num_viewers: num_viewers,
       record_id: id.to_s,
       record_type: jsonapi_type_name,
-    )
+    }
+    data = defaults.merge!(merge_data)
     if is_a?(Item::TextItem)
       data[:item_text_data] = text_data.as_json
     end

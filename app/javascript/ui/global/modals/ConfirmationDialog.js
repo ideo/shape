@@ -1,6 +1,22 @@
 import PropTypes from 'prop-types'
-import { FormActionsContainer, TextButton } from '~/ui/global/styled/forms'
+import FormControlLabel from '@material-ui/core/FormControlLabel'
+import styled from 'styled-components'
+
+import {
+  FormActionsContainer,
+  TextButton,
+  Checkbox,
+} from '~/ui/global/styled/forms'
 import Dialog from './Dialog'
+
+const StyledFormControlLabel = styled(FormControlLabel)`
+  margin-top: -10px;
+  margin-bottom: 30px;
+  .form-control {
+    color: white;
+  }
+`
+StyledFormControlLabel.displayName = 'snoozeDialogMessage'
 
 class ConfirmationDialog extends React.PureComponent {
   handleCancel = ev => {
@@ -16,12 +32,23 @@ class ConfirmationDialog extends React.PureComponent {
     this.props.onClose()
   }
 
+  handleToggleSnoozeDialog = ev => {
+    ev.preventDefault()
+    this.props.onToggleSnoozeDialog()
+  }
+
   get isOpen() {
     return this.props.open === 'confirm'
   }
 
   render() {
-    const { cancelText, confirmText, prompt } = this.props
+    const {
+      cancelText,
+      confirmText,
+      prompt,
+      onToggleSnoozeDialog,
+      snoozeChecked,
+    } = this.props
 
     const modalProps = {
       ...this.props,
@@ -34,6 +61,23 @@ class ConfirmationDialog extends React.PureComponent {
       <Dialog {...modalProps}>
         <form>
           <p data-cy="ConfirmPrompt">{prompt}</p>
+          {onToggleSnoozeDialog && (
+            <StyledFormControlLabel
+              classes={{ label: 'form-control' }}
+              onClick={this.handleToggleSnoozeDialog}
+              control={
+                <Checkbox
+                  checked={snoozeChecked}
+                  classes={{
+                    root: 'checkbox--white',
+                    checked: 'checkbox--checked-white',
+                  }}
+                  value="yes"
+                />
+              }
+              label="Please don’t show me this warning for a while."
+            />
+          )}
           <FormActionsContainer>
             <TextButton
               data-cy="CancelButton"
@@ -64,6 +108,8 @@ ConfirmationDialog.propTypes = {
   onCancel: PropTypes.func,
   confirmText: PropTypes.string,
   cancelText: PropTypes.string,
+  onToggleSnoozeDialog: PropTypes.func,
+  snoozeChecked: PropTypes.bool,
 }
 ConfirmationDialog.defaultProps = {
   ...Dialog.defaultProps,
@@ -73,6 +119,8 @@ ConfirmationDialog.defaultProps = {
   onCancel: null,
   confirmText: 'OK',
   cancelText: 'Cancel',
+  onToggleSnoozeDialog: null,
+  snoozeChecked: false,
 }
 
 export default ConfirmationDialog

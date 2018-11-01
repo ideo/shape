@@ -9,11 +9,9 @@ class Collection
       false
     end
 
-    private
-
-    # override to mimic the submission_box breadcrumb
-    def calculate_breadcrumb
-      self.breadcrumb = submission_box.breadcrumb
+    def parent
+      # not actually parent by db relation, but parent for breadcrumb purposes
+      submission_box
     end
   end
 end

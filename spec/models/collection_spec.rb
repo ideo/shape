@@ -16,7 +16,9 @@ describe Collection, type: :model do
     it { should have_many :cards_linked_to_this_collection }
     it { should have_many :items }
     it { should have_many :collections }
+    it { should have_many :test_collections }
     it { should have_one :parent_collection_card }
+    it { should have_one :live_test_collection }
     it { should belong_to :cloned_from }
     it { should belong_to :organization }
     it { should belong_to :template }
@@ -30,9 +32,9 @@ describe Collection, type: :model do
       end
 
       it 'should only find active collection cards' do
-        expect {
+        expect do
           collection_cards.first.archive!
-        }.to change(collection.collection_cards, :count).by(-1)
+        end.to change(collection.collection_cards, :count).by(-1)
       end
 
       describe '#touch_related_cards' do
@@ -40,14 +42,14 @@ describe Collection, type: :model do
         let!(:card_linked_to_this_collection) { create(:collection_card_link, collection: collection) }
 
         it 'should update linked cards if updated_at changed' do
-          expect {
+          expect do
             collection.update(updated_at: Time.now) && card_linked_to_this_collection.reload
-          }.to change(card_linked_to_this_collection, :updated_at)
+          end.to change(card_linked_to_this_collection, :updated_at)
         end
         it 'should update linked cards after update' do
-          expect {
+          expect do
             collection.update(name: 'Bobo') && card_linked_to_this_collection.reload
-          }.to change(card_linked_to_this_collection, :updated_at)
+          end.to change(card_linked_to_this_collection, :updated_at)
         end
       end
     end
@@ -70,6 +72,18 @@ describe Collection, type: :model do
     end
   end
 
+  describe 'callbacks' do
+    describe '#pin_all_primary_cards' do
+      let!(:collection) { create(:collection, num_cards: 3) }
+
+      it 'pins cards if master_template = true' do
+        expect(collection.primary_collection_cards.any?(&:pinned?)).to be false
+        collection.update(master_template: true)
+        expect(collection.reload.primary_collection_cards.all?(&:pinned?)).to be true
+      end
+    end
+  end
+
   describe '#inherit_parent_organization_id' do
     let!(:parent_collection) { create(:user_collection) }
     let!(:collection_card) { create(:collection_card, parent: parent_collection) }
@@ -80,17 +94,48 @@ describe Collection, type: :model do
     end
   end
 
-  describe '#allow_primary_group_view_access' do
+  describe '#enable_org_view_access_if_allowed' do
     let!(:organization) { create(:organization) }
     # organization: nil == allow organization to inherit
     let(:collection) { create(:collection, organization: organization) }
 
-    before do
-      collection.allow_primary_group_view_access
+    context 'if parent is user collection' do
+      let(:parent_collection) do
+        create(:user_collection, organization: organization)
+      end
+
+      it 'does give view access' do
+        expect(collection.enable_org_view_access_if_allowed(parent_collection)).to be true
+        expect(organization.primary_group.has_role?(Role::VIEWER, collection)).to be true
+      end
+
+      context 'if cloned from Getting Started collection' do
+        let!(:getting_started_template_collection) {
+          create(:getting_started_template_collection,
+                 organization: organization)
+        }
+        before do
+          organization.reload
+          collection.update_attributes(
+            cloned_from: getting_started_template_collection,
+          )
+        end
+
+        it 'does not give view access' do
+          expect(organization.getting_started_collection).to eq(getting_started_template_collection)
+          expect(collection.enable_org_view_access_if_allowed(parent_collection)).to be false
+          expect(organization.primary_group.has_role?(Role::VIEWER, collection)).to be false
+        end
+      end
     end
 
-    it 'gives view access to its organization\'s primary group' do
-      expect(organization.primary_group.has_role?(Role::VIEWER, collection)).to be true
+    context 'if parent is not user collection' do
+      let(:parent_collection) { create(:collection, organization: organization) }
+
+      it 'does not give view access to its organization\'s primary group' do
+        expect(collection.enable_org_view_access_if_allowed(parent_collection)).to be false
+        expect(organization.primary_group.has_role?(Role::VIEWER, collection)).to be false
+      end
     end
   end
 
@@ -127,6 +172,38 @@ describe Collection, type: :model do
       it 'creates a duplicate that is not archived' do
         expect(collection.archived?).to be true
         expect(duplicate.archived?).to be false
+      end
+    end
+
+    context 'without user' do
+      let(:duplicate_without_user) do
+        dupe = collection.duplicate!(
+          copy_parent_card: true,
+          parent: parent,
+        )
+        user.roles.reload
+        user.reset_cached_roles!
+        dupe
+      end
+
+      it 'clones the collection' do
+        expect { duplicate_without_user }.to change(Collection, :count).by(1)
+      end
+
+      it 'clones all the collection cards' do
+        expect(CollectionCardDuplicationWorker).to receive(:perform_async).with(
+          collection.collection_cards.map(&:id),
+          instance_of(Integer),
+          nil,
+        )
+        duplicate_without_user
+      end
+
+      it 'clones all roles from parent collection - but not user' do
+        expect(duplicate_without_user.editors[:users].map(&:email)).to match(
+          parent.editors[:users].map(&:email),
+        )
+        expect(duplicate_without_user.can_edit?(user)).to be false
       end
     end
 
@@ -168,7 +245,11 @@ describe Collection, type: :model do
       end
 
       it 'clones all the collection cards' do
-        expect(CollectionCardDuplicationWorker).to receive(:perform_async)
+        expect(CollectionCardDuplicationWorker).to receive(:perform_async).with(
+          collection.collection_cards.map(&:id),
+          instance_of(Integer),
+          user.id,
+        )
         collection.duplicate!(for_user: user)
       end
 
@@ -287,6 +368,87 @@ describe Collection, type: :model do
     end
   end
 
+  describe '#unarchive_cards!' do
+    let(:collection) { create(:collection, num_cards: 3) }
+    let(:cards) { collection.all_collection_cards }
+    let(:snapshot) do
+      {
+        id: collection.id,
+        attributes: {
+          collection_cards_attributes: cards.map do |card|
+            { id: card.id, order: 3, width: 2, height: 1 }
+          end,
+        },
+      }
+    end
+
+    before do
+      collection.archive!
+      expect(cards.first.archived?).to be true
+    end
+
+    it 'unarchives all cards' do
+      expect do
+        collection.unarchive_cards!(cards, snapshot)
+      end.to change(collection.collection_cards, :count).by(3)
+      expect(cards.first.reload.active?).to be true
+    end
+
+    it 'applies snapshot to revert the state' do
+      expect(cards.first.width).to eq 1 # default
+      collection.unarchive_cards!(cards, snapshot)
+      cards.first.reload
+      expect(cards.first.width).to eq 2
+      # should always reorder the cards
+      expect(cards.first.order).to eq 0
+    end
+
+    context 'with a master_template' do
+      let(:collection) { create(:collection, master_template: true, num_cards: 3) }
+
+      it 'should call the UpdateTemplateInstancesWorker' do
+        expect(UpdateTemplateInstancesWorker).to receive(:perform_async).with(collection.id)
+        collection.unarchive_cards!(cards, snapshot)
+      end
+    end
+  end
+
+  describe '#update_processing_status' do
+    let(:collection) { create(:collection) }
+
+    context 'processing = :duplicating' do
+      let(:processing) { true }
+
+      it 'marks collections as duplicating' do
+        expect(collection.duplicating?).to be false
+        collection.update_processing_status(Collection.processing_statuses[:duplicating])
+        expect(collection.duplicating?).to be true
+      end
+    end
+
+    context 'processing = nil' do
+      let(:processing) { false }
+
+      before do
+        collection.update_attributes(
+          processing_status: Collection.processing_statuses[:duplicating],
+        )
+      end
+
+      it 'marks collection as not processing' do
+        expect(collection.duplicating?).to be true
+        collection.update_processing_status(nil)
+        expect(collection.duplicating?).to be false
+      end
+
+      it 'broadcasts processing has stopped' do
+        expect(collection).to receive(:processing_done).once
+        collection.update_processing_status(nil)
+      end
+    end
+  end
+
+  # Caching methods
   context 'caching and stored attributes' do
     describe '#cache_key' do
       let(:user) { create(:user) }
@@ -294,22 +456,22 @@ describe Collection, type: :model do
       let(:first_card) { collection.collection_cards.first }
 
       it 'updates based on the collection updated_at timestamp' do
-        expect {
+        expect do
           collection.update(updated_at: 10.seconds.from_now)
-        }.to change(collection, :cache_key)
+        end.to change(collection, :cache_key)
       end
 
       it 'updates when roles are updated' do
-        expect {
+        expect do
           # this should "touch" the role updated_at
           user.add_role(Role::EDITOR, collection)
-        }.to change(collection, :cache_key)
+        end.to change(collection, :cache_key)
       end
 
       it 'updates when cards are updated' do
-        expect {
+        expect do
           first_card.update(updated_at: 10.seconds.from_now)
-        }.to change(collection, :cache_key)
+        end.to change(collection, :cache_key)
       end
     end
 
@@ -351,74 +513,17 @@ describe Collection, type: :model do
       end
     end
 
-    describe '#unarchive_cards!' do
+    describe '#cache_card_count!' do
       let(:collection) { create(:collection, num_cards: 3) }
-      let(:cards) { collection.all_collection_cards }
-      let(:snapshot) do
-        {
-          id: collection.id,
-          attributes: {
-            collection_cards_attributes: cards.map do |card|
-              { id: card.id, order: 3, width: 2, height: 1 }
-            end,
-          },
-        }
-      end
 
-      before do
-        collection.archive!
-        expect(cards.first.archived?).to be true
-      end
-
-      it 'unarchives all cards' do
-        expect {
-          collection.unarchive_cards!(cards, snapshot)
-        }.to change(collection.collection_cards, :count).by(3)
-        expect(cards.first.reload.active?).to be true
-      end
-
-      it 'applies snapshot to revert the state' do
-        expect(cards.first.width).to eq 1 # default
-        collection.unarchive_cards!(cards, snapshot)
-        cards.first.reload
-        expect(cards.first.width).to eq 2
-        expect(cards.first.order).to eq 3
+      it 'should calculate and not clobber other cached attrs' do
+        expect(collection.cached_cover).to be nil
+        collection.cache_cover!
+        collection.cache_card_count!
+        expect(collection.cached_card_count).to eq 3
+        expect(collection.cached_cover).not_to be nil
       end
     end
-  end
-
-  describe '#update_processing_status' do
-    let(:collection) { create(:collection) }
-
-    context 'processing = :duplicating' do
-      let(:processing) { true }
-
-      it 'marks collections as duplicating' do
-        expect(collection.duplicating?).to be false
-        collection.update_processing_status(Collection.processing_statuses[:duplicating])
-        expect(collection.duplicating?).to be true
-      end
-    end
-
-    context 'processing = nil' do
-      let(:processing) { false }
-
-      before do
-        collection.update_attributes(
-          processing_status: Collection.processing_statuses[:duplicating],
-        )
-      end
-
-      it 'marks collection as not processing' do
-        expect(collection.duplicating?).to be true
-        collection.update_processing_status(nil)
-        expect(collection.duplicating?).to be false
-      end
-
-      it 'broadcasts processing has stopped' do
-        expect(collection).to receive(:processing_done).once
-        collection.update_processing_status(nil)
-      end
-    end
+    # <- end Caching methods
   end
 end

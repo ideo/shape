@@ -51,8 +51,15 @@ module Archivable
     self.class.archive_as.present? && try(self.class.archive_as)
   end
 
+  def finished_archiving?
+    # NOTE: archiving takes a two-step process involving the CollectionCardArchiveWorker
+    # 1. synchronously set the card archived = true, so that they are immediately hidden from the collection
+    # 2. worker runs archive! which sets archived_at / archived_batch and archives the underlying relations
+    archived? && archived_at.present?
+  end
+
   def archive!
-    return true if archived?
+    return true if finished_archiving?
     # make sure the `archive_as` relation object is actually present
     if archive_as_object.present?
       # treat this archive! as if you had triggered it on the parent
@@ -73,6 +80,7 @@ module Archivable
       return archive_as_object.try(:unarchive!)
     end
     run_callbacks :unarchive do
+      # NOTE: unarchiving the batch will also unarchive "self"
       unarchive_batch!
       true
     end
@@ -85,15 +93,26 @@ module Archivable
   end
 
   def unarchive_batch!
+    # legacy items did not have archive_batch -- don't want to unarchive all of them!
+    return if archive_batch.blank?
     # unarchive all Cards/Items/Collections that match this archive_batch
     [CollectionCard, Collection, Item].each do |model|
       model
         .where(archive_batch: archive_batch)
-        .update_all(archived: false, archived_at: nil, archive_batch: nil)
+        .update_all(
+          archived: false,
+          archived_at: nil,
+          archive_batch: nil,
+          unarchived_at: Time.now,
+        )
     end
   end
 
   private
+
+  def archived_on_previous_save?
+    saved_change_to_archived? && archived?
+  end
 
   def archive_relations!(batch)
     return unless self.class.archive_with.present?
@@ -111,9 +130,5 @@ module Archivable
 
   def archive_self!(batch)
     update(archived: true, archived_at: Time.now, archive_batch: batch)
-  end
-
-  def unarchive_self!
-    update(archived: false, archived_at: nil, archive_batch: nil)
   end
 end

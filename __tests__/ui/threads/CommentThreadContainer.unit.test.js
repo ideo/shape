@@ -31,16 +31,39 @@ describe('CommentThreadContainer', () => {
     expect(uiStore.expandThread).toHaveBeenCalledWith(key, { reset: false })
   })
 
-  describe('when on page of expanded thread', () => {
+  it('should render the ActivityContainer with moving=false to enable overflow-y scroll', () => {
+    expect(wrapper.find('ActivityContainer').props().moving).toBe(false)
+    expect(wrapper.find('ActivityContainer')).toHaveStyleRule(
+      'overflow-y',
+      'scroll'
+    )
+  })
+
+  describe('when on page of expanded thread in view', () => {
     beforeEach(() => {
-      const thread = { id: 3, key: 'abc345', record: fakeCollection }
+      component.visibileThreads = {
+        get: jest.fn().mockReturnValue(true),
+      }
       uiStore.viewingRecord = fakeCollection
-      const { key } = thread
-      uiStore.expandedThreadKey = key
     })
 
     it('should not show the jump button', () => {
-      expect(wrapper.find('.jumpToThread').exists()).toBeFalsy()
+      expect(component.showJumpToThreadButton).toBe(false)
+    })
+  })
+
+  describe('while uiStore.activityLogMoving is true', () => {
+    beforeEach(() => {
+      props.uiStore.activityLogMoving = true
+      wrapper = shallow(<CommentThreadContainer.wrappedComponent {...props} />)
+    })
+
+    it('should render the ActivityContainer with moving=true to disable overflow-y', () => {
+      expect(wrapper.find('ActivityContainer').props().moving).toBe(true)
+      expect(wrapper.find('ActivityContainer')).toHaveStyleRule(
+        'overflow-y',
+        'hidden'
+      )
     })
   })
 })

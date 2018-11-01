@@ -64,12 +64,15 @@ class Api::V1::UsersController < Api::V1::BaseController
   before_action :load_and_authorize_organization, only: %i[switch_org]
   def switch_org
     if current_user.switch_to_organization(@organization)
-      render jsonapi: current_user, include:
-        [:groups, organizations: [:primary_group], current_organization: %i[primary_group guest_group]], class: {
-          User: SerializableCurrentUser,
-          Group: SerializableGroup,
-          Organization: SerializableOrganization,
-        }
+      render jsonapi: current_user,
+             include: [
+               :groups, organizations: [:primary_group], current_organization: %i[primary_group guest_group]
+             ],
+             class: {
+               User: SerializableCurrentUser,
+               Group: SerializableGroup,
+               Organization: SerializableOrganization,
+             }
     else
       render_api_errors current_user.errors
     end
@@ -78,7 +81,14 @@ class Api::V1::UsersController < Api::V1::BaseController
   private
 
   def load_and_authorize_organization
-    @organization = Organization.friendly.find(json_api_params[:organization_id])
+    # NOTE: friendly.find can cause issues here with numeric slugs e.g. "1", so we check for that
+    # (these numeric slugs should also be eliminated by new validation rules)
+    id = json_api_params[:organization_id]
+    if id.is_a?(Integer) || id.to_s.match?(/^[0-9]+$/)
+      @organization = Organization.find(id)
+    else
+      @organization = Organization.friendly.find(id)
+    end
     authorize! :read, @organization
   end
 
@@ -90,6 +100,7 @@ class Api::V1::UsersController < Api::V1::BaseController
       :show_move_helper,
       :show_template_helper,
       :notify_through_email,
+      :mailing_list,
     )
   end
 

@@ -20,14 +20,21 @@ Rails.application.routes.draw do
       resources :activities, only: %i[create]
       resources :collections, except: %i[index] do
         member do
-          patch 'launch_test'
           get 'in_my_collection'
         end
         collection do
           post 'create_template'
+          post 'set_submission_box_template'
         end
         resources :collection_cards, only: :index
         resources :roles, only: %i[index create destroy], shallow: true
+      end
+      resources :test_collections, only: %i[show] do
+        member do
+          patch 'launch'
+          patch 'close'
+          patch 'reopen'
+        end
       end
       resources :collection_cards, shallow: true, except: %i[show] do
         member do
@@ -95,7 +102,7 @@ Rails.application.routes.draw do
         get 'users_and_groups', to: 'search#users_and_groups', as: :search_users_and_groups
       end
       # unauthenticated routes:
-      resources :survey_responses, only: %i[create] do
+      resources :survey_responses, only: %i[show create] do
         # not shallow because we always want to look up survey_response by session_uid
         resources :question_answers, only: %i[create update]
       end
@@ -112,6 +119,8 @@ Rails.application.routes.draw do
   namespace :callbacks do
     post 'ideo_network/users' => 'ideo_network#users'
   end
+
+  resources :reports, only: %i[show]
 
   get 'passthru', to: 'urls#passthru'
   get 'invitations/:token', to: 'invitations#accept', as: :accept_invitation

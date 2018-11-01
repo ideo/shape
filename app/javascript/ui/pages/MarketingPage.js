@@ -25,11 +25,11 @@ import {
   InvertedFixedWidth,
 } from '~/ui/global/styled/marketing.js'
 import poweredByIdeo from '~/assets/Powered-by-IDEO-Inverted.png'
-import MarketingMenu from '~/ui/marketing/MarketingMenu.js'
-import SubscribeEmail from '~/ui/marketing/SubscribeEmail.js'
-import ProductDescriptions from '~/ui/marketing/ProductDescriptions.js'
-import BetaSticker from '~/ui/marketing/BetaSticker.js'
-import firebase from '~/vendor/firebaseMarketing.js'
+import MarketingMenu from '~/ui/marketing/MarketingMenu'
+import SubscribeEmail from '~/ui/marketing/SubscribeEmail'
+import ProductDescriptions from '~/ui/marketing/ProductDescriptions'
+import BetaSticker from '~/ui/marketing/BetaSticker'
+import { db } from '~/vendor/firebaseMarketing'
 
 class MarketingPage extends React.Component {
   constructor(props) {
@@ -43,19 +43,18 @@ class MarketingPage extends React.Component {
 
   componentDidMount() {
     const textValues = {}
-    let db = {}
-    db = firebase.firestore()
-
-    db.collection('pageText')
-      .get()
-      .then(snapshot => {
-        snapshot.forEach(pageText => {
-          const key = pageText.id
-          const { value } = pageText.data()
-          textValues[key] = value
+    if (db && db.collection) {
+      db.collection('pageText')
+        .get()
+        .then(snapshot => {
+          snapshot.forEach(pageText => {
+            const key = pageText.id
+            const { value } = pageText.data()
+            textValues[key] = value
+          })
+          this.setState({ pageTexts: textValues })
         })
-        this.setState({ pageTexts: textValues })
-      })
+    }
   }
 
   render() {

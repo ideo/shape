@@ -19,6 +19,7 @@ module Firestoreable
     'Item::FileItem': SerializableSimpleItem,
     'Item::LinkItem': SerializableSimpleItem,
     'Item::QuestionItem': SerializableSimpleItem,
+    'Item::ChartItem': SerializableSimpleItem,
     'CollectionCard::Primary': SerializableCollectionCard,
     'CollectionCard::Link': SerializableCollectionCard,
   }.freeze
@@ -29,7 +30,7 @@ module Firestoreable
 
   def store_in_firestore
     # store this single record in a batch job
-    FirestoreBatchWriter.perform_async([batch_job_identifier])
+    FirestoreBatchWriter.perform_in(3.seconds, [batch_job_identifier])
   end
 
   def delete_from_firestore

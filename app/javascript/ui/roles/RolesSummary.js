@@ -36,7 +36,7 @@ StyledAvatarGroup.displayName = 'StyledAvatarGroup'
 const StyledRoleTitle = styled.div`
   font-family: ${v.fonts.sans};
   text-align: ${props => props.align || 'left'};
-  color: ${v.colors.cloudy};
+  color: ${v.colors.commonDark};
   font-size: 1rem;
   font-weight: ${v.weights.book};
   margin: 0 0 6px 0;
@@ -46,7 +46,7 @@ StyledRoleTitle.displayName = 'StyledRoleTitle'
 const StyledSeparator = styled.div`
   width: 1px;
   height: 30px;
-  background-color: ${v.colors.cloudy};
+  background-color: ${v.colors.commonDark};
   display: inline-block;
 `
 
@@ -58,7 +58,7 @@ const StyledAddUserBtn = styled.div`
   height: 30px;
   border-radius: 30px;
   background-color: white;
-  color: ${v.colors.gray};
+  color: ${v.colors.commonMedium};
   line-height: 30px;
   font-size: 1.5rem;
   text-align: center;
@@ -104,6 +104,7 @@ class RolesSummary extends React.Component {
     const { roles } = this.props
     const role = _.find(roles, { name: roleName })
     if (role && role.label) ({ label } = role)
+    if (!role) return ''
     return pluralize(_.startCase(label))
   }
 
@@ -112,7 +113,7 @@ class RolesSummary extends React.Component {
     // If there aren't any editors or viewers, render with add user button
     // If there aren't any editors but are viewers, don't render label/button
     if (editors.length === 0 && !this.props.canEdit) return ''
-    if (editors.length === 0 && viewers.length > 0) return ''
+    if (editors.length === 0 && viewers.length === 0) return ''
 
     const editorAvatars = editors.map(editor => (
       <Avatar

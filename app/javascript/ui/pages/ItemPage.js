@@ -47,11 +47,9 @@ class ItemPage extends PageWithApi {
     uiStore.setViewingItem(item)
     if (item.parent) item.parent.checkCurrentOrg()
     const thread = await apiStore.findOrBuildCommentThread(item)
+    uiStore.expandThread(thread.key)
     if (location.search) {
-      const menu = uiStore.openOptionalMenus(location.search)
-      if (menu === 'comments') {
-        uiStore.expandThread(thread.key)
-      }
+      uiStore.openOptionalMenus(location.search)
     }
   }
 

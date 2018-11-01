@@ -125,7 +125,56 @@ describe('GridCard', () => {
         ).toBe(true)
       })
     })
+
+    describe('with an image file', () => {
+      beforeEach(() => {
+        props.card.record = { ...fakeFileItem }
+        props.record = props.card.record
+        props.record.canBeSetAsCover = true
+        props.record.isImage = true
+        props.cardType = 'items'
+        rerender()
+      })
+
+      it('renders a CoverImageToggle', () => {
+        expect(wrapper.find('CoverImageToggle').exists()).toBeTruthy()
+      })
+
+      it('renders a ContainImage', () => {
+        expect(wrapper.find('ContainImage').exists()).toBeTruthy()
+      })
+    })
+
+    describe('with a pdf file', () => {
+      beforeEach(() => {
+        props.card.record = { ...fakeFileItem }
+        props.record = props.card.record
+        props.record.isPdfFile = true
+        props.cardType = 'items'
+        rerender()
+      })
+
+      it('renders a generic file cover', () => {
+        expect(wrapper.find('PdfFileItemCover').exists()).toBeTruthy()
+      })
+    })
+
+    describe('with a generic file', () => {
+      beforeEach(() => {
+        props.card.record = { ...fakeFileItem }
+        props.record = props.card.record
+        props.record.isGenericFile = true
+        props.cardType = 'items'
+        rerender()
+      })
+
+      it('renders a generic file cover', () => {
+        expect(wrapper.find('GenericFileItemCover').exists()).toBeTruthy()
+      })
+    })
   })
+  // -------------------
+  // <--- end 'with item'
 
   describe('with collection', () => {
     describe('as viewer', () => {
@@ -220,34 +269,6 @@ describe('GridCard', () => {
             .find('LinkedCollectionIcon')
             .exists()
         ).toBe(true)
-      })
-    })
-
-    describe('with a pdf file', () => {
-      beforeEach(() => {
-        props.card.record = fakeFileItem
-        props.record = fakeFileItem
-        fakeFileItem.filestack_file.mimetype = 'application/pdf'
-        props.cardType = 'items'
-        rerender()
-      })
-
-      it('renders a generic file cover', () => {
-        expect(wrapper.find('PdfFileItemCover').exists()).toBeTruthy()
-      })
-    })
-
-    describe('with a generic file', () => {
-      beforeEach(() => {
-        props.card.record = fakeFileItem
-        props.record = fakeFileItem
-        fakeFileItem.filestack_file.mimetype = 'application/vnd.powerpoint'
-        props.cardType = 'items'
-        rerender()
-      })
-
-      it('renders a generic file cover', () => {
-        expect(wrapper.find('GenericFileItemCover').exists()).toBeTruthy()
       })
     })
   })

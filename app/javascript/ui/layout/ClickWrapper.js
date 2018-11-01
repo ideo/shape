@@ -21,12 +21,21 @@ class ClickWrapper extends React.Component {
   }
 
   render() {
-    return <StyledClickWrapper onClick={this.handleClick} />
+    return (
+      <StyledClickWrapper
+        onClick={this.handleClick}
+        onContextMenu={this.props.onContextMenu}
+      />
+    )
   }
 }
 
 ClickWrapper.propTypes = {
   clickHandlers: PropTypes.arrayOf(PropTypes.func).isRequired,
+  onContextMenu: PropTypes.func,
+}
+ClickWrapper.defaultProps = {
+  onContextMenu: () => null,
 }
 
 export default ClickWrapper

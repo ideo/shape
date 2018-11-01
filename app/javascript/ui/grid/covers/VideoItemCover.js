@@ -2,10 +2,10 @@ import PropTypes from 'prop-types'
 import { PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 import { Flex, Box } from 'reflexbox'
-import ReactPlayer from 'react-player'
 
 import v from '~/utils/variables'
 import hexToRgba from '~/utils/hexToRgba'
+import VideoPlayer from '~/ui/items/VideoPlayer'
 import { StyledImageCover } from './ImageItemCover'
 
 const StyledVideoCover = styled.div`
@@ -15,7 +15,7 @@ const StyledVideoCover = styled.div`
     height: 100%;
     button {
       border: none;
-      background: ${hexToRgba(v.colors.cyan, 0.75)};
+      background: ${hexToRgba(v.colors.primaryLight, 0.75)};
       transition: background 0.2s;
       color: white;
       height: 4rem;
@@ -24,7 +24,7 @@ const StyledVideoCover = styled.div`
       border-radius: 10px;
       cursor: pointer;
       &:hover {
-        background: ${v.colors.cyan};
+        background: ${v.colors.primaryLight};
       }
     }
   }
@@ -39,9 +39,6 @@ const StyledVideoCover = styled.div`
 StyledVideoCover.displayName = 'StyledVideoCover'
 
 class VideoItemCover extends React.PureComponent {
-  // NOTE: this could later be managed in global state
-  // e.g. only 1 video playing at a time, clicking outside could revert it back to non-playing mode
-  // also -- could listen for pause events within the player so that we know when it's not playing
   state = {
     playing: false,
   }
@@ -68,7 +65,7 @@ class VideoItemCover extends React.PureComponent {
           </Flex>
         </StyledImageCover>
         <div className="playing">
-          <ReactPlayer
+          <VideoPlayer
             url={item.url}
             controls
             playing={this.state.playing}

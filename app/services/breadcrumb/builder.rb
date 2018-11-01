@@ -22,7 +22,10 @@ module Breadcrumb
       return unless object.is_a?(Breadcrumbable) && object.breadcrumbable?
       parent = object.parent
       return [] unless parent.present? && parent.is_a?(Breadcrumbable) && parent.breadcrumbable?
-      @breadcrumb = (parent.breadcrumb + [parent.id])
+      @breadcrumb = parent.breadcrumb
+      # easiest way to short circuit this for SubmissionsCollections which should not be in the breadcrumb trail
+      @breadcrumb += [parent.id] unless parent.is_a? Collection::SubmissionsCollection
+      @breadcrumb
     end
   end
 end

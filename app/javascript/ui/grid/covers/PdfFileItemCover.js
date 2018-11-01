@@ -10,12 +10,12 @@ export const StyledPdfCover = styled.div`
   position: relative;
   width: 100%;
   height: 100%;
-  background: ${v.colors.gray};
+  background: ${v.colors.commonMedium};
 
   .fileInfo {
     align-items: center;
     bottom: 0;
-    color: ${v.colors.gray};
+    color: ${v.colors.commonMedium};
     display: flex;
     font-family: ${v.fonts.sans};
     font-size: 1rem;
@@ -33,8 +33,8 @@ export const StyledPdfCover = styled.div`
   }
 
   .card-menu {
-    border-color: ${v.colors.blackLava};
-    color: ${v.colors.blackLava};
+    border-color: ${v.colors.black};
+    color: ${v.colors.black};
   }
 `
 StyledPdfCover.displayName = 'StyledPdfCover'

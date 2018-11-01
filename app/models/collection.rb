@@ -20,12 +20,14 @@ class Collection < ApplicationRecord
                  :cached_cover,
                  :cached_tag_list,
                  :cached_owned_tag_list,
-                 :cached_org_properties
+                 :cached_org_properties,
+                 :cached_card_count
 
   # callbacks
   after_commit :touch_related_cards, if: :saved_change_to_updated_at?, unless: :destroyed?
   after_commit :reindex_sync, on: :create
   after_commit :update_comment_thread_in_firestore, unless: :destroyed?
+  after_save :pin_all_primary_cards, if: :now_master_template?
 
   # all cards including archived (i.e. undo default :collection_cards scope)
   has_many :all_collection_cards,
@@ -77,6 +79,17 @@ class Collection < ApplicationRecord
            through: :collection_cards,
            source: :collection
 
+  has_many :test_collections,
+           inverse_of: :collection_to_test,
+           foreign_key: :collection_to_test_id,
+           class_name: 'Collection::TestCollection'
+
+  has_one :live_test_collection,
+          -> { where(test_status: :live) },
+          inverse_of: :collection_to_test,
+          foreign_key: :collection_to_test_id,
+          class_name: 'Collection::TestCollection'
+
   has_one :comment_thread, as: :record, dependent: :destroy
 
   delegate :parent, :pinned, :pinned?, :pinned_and_locked?,
@@ -85,8 +98,9 @@ class Collection < ApplicationRecord
   belongs_to :organization
   belongs_to :cloned_from, class_name: 'Collection', optional: true
   belongs_to :created_by, class_name: 'User', optional: true
+  belongs_to :question_item, class_name: 'Item::QuestionItem', optional: true
 
-  validates :name, presence: true, if: :base_collection_type?
+  validates :name, presence: true
   before_validation :inherit_parent_organization_id, on: :create
 
   scope :root, -> { where('jsonb_array_length(breadcrumb) = 1') }
@@ -174,8 +188,11 @@ class Collection < ApplicationRecord
       :created_by,
       :organization,
       :parent_collection_card,
+      :parent,
       :submissions_collection,
       :submission_template,
+      :collection_to_test,
+      :live_test_collection,
       roles: %i[users groups resource],
       collection_cards: [
         :parent,
@@ -189,7 +206,7 @@ class Collection < ApplicationRecord
     [
       :created_by,
       :organization,
-      :parent_collection_card,
+      parent_collection_card: %i[parent],
       roles: %i[users groups resource],
       collection_cards: [
         :parent,
@@ -212,15 +229,31 @@ class Collection < ApplicationRecord
   end
 
   def duplicate!(
-    for_user:,
+    for_user: nil,
     copy_parent_card: false,
-    parent: self.parent
+    parent: self.parent,
+    building_template_instance: false
   )
+
+    # check if we are cloning a template inside a template instance;
+    # - this means we should likewise turn the template dup into its own instance
+    if master_template? && building_template_instance
+      builder = CollectionTemplateBuilder.new(
+        parent: parent,
+        template: self,
+        placement: parent_collection_card.order,
+        created_by: for_user,
+        # in this case the card has already been created
+        parent_card: parent_collection_card,
+      )
+      return builder.call
+    end
     # Clones collection and all embedded items/collections
     c = amoeba_dup
     c.cloned_from = self
     c.created_by = for_user
     c.tag_list = tag_list
+
     # copy organization_id from the collection this is being moved into
     # NOTE: parent is only nil in Colab import -- perhaps we should clean up any Colab import specific code?
     c.organization_id = parent.try(:organization_id) || organization_id
@@ -243,19 +276,19 @@ class Collection < ApplicationRecord
     parent.roles.each do |role|
       c.roles << role.duplicate!(assign_resource: c)
     end
-    # NOTE: different from `parent_is_user_collection?` since `parent` is passed in
-    if parent.is_a? Collection::UserCollection
-      c.allow_primary_group_view_access
-    end
-    # upgrade to editor unless we're setting up a templated collection
-    for_user.upgrade_to_edit_role(c)
-    c.setup_submissions_collection! if is_a?(Collection::SubmissionBox)
 
-    CollectionCardDuplicationWorker.perform_async(
-      collection_cards.map(&:id),
-      for_user.id,
-      c.id,
-    )
+    c.enable_org_view_access_if_allowed(parent)
+
+    # Upgrade to editor if provided
+    for_user.upgrade_to_edit_role(c) if for_user.present?
+
+    if collection_cards.any?
+      CollectionCardDuplicationWorker.perform_async(
+        collection_cards.map(&:id),
+        c.id,
+        for_user.try(:id),
+      )
+    end
 
     # pick up newly created relationships
     c.reload
@@ -295,6 +328,10 @@ class Collection < ApplicationRecord
     nil
   end
 
+  def collection_to_test
+    nil
+  end
+
   def resourceable_class
     # Use top-level class since this is an STI model
     Collection
@@ -312,9 +349,8 @@ class Collection < ApplicationRecord
         # have to reload in order to pick up new parent relationship
         card.item.reload.recalculate_breadcrumb!
       elsif card.collection_id.present?
-        BreadcrumbRecalculationWorker.perform_async(
-          card.collection.id,
-        )
+        # this method will run the async worker if there are >50 children
+        card.collection.recalculate_breadcrumb_tree!
       end
     end
   end
@@ -329,23 +365,32 @@ class Collection < ApplicationRecord
   # convenience method if card order ever gets out of sync
   def reorder_cards!
     all_collection_cards.active.order(pinned: :desc, order: :asc).each_with_index do |card, i|
-      card.update_attribute(:order, i) unless card.order == i
+      card.update_column(:order, i) unless card.order == i
     end
   end
 
   def reorder_cards_by_collection_name!
     all_collection_cards.active.includes(:collection).order('collections.name ASC').each_with_index do |card, i|
-      card.update_attribute(:order, i) unless card.order == i
+      card.update_column(:order, i) unless card.order == i
     end
   end
 
   def unarchive_cards!(cards, card_attrs_snapshot)
     cards.each(&:unarchive!)
     CollectionUpdater.call(self, card_attrs_snapshot)
+    reorder_cards!
+    # if snapshot includes card attrs then CollectionUpdater will trigger the same thing
+    return unless master_template? && card_attrs_snapshot[:collection_cards_attributes].blank?
+    queue_update_template_instances
   end
 
-  def allow_primary_group_view_access
-    organization.primary_group.add_role(Role::VIEWER, self)
+  def enable_org_view_access_if_allowed(parent)
+    # If parent is user collection, allow primary group to see it
+    # As long as it isn't the 'Getting Started' collection
+    return false unless parent.is_a?(Collection::UserCollection) &&
+                        (cloned_from.blank? || !cloned_from.getting_started?)
+
+    organization.primary_group.add_role(Role::VIEWER, self).try(:persisted?)
   end
 
   def reindex_sync
@@ -391,17 +436,18 @@ class Collection < ApplicationRecord
     save
   end
 
+  def cache_card_count!
+    # not using the store_accessor directly here because of:
+    # https://github.com/rails/rails/pull/32563
+    self.cached_attributes ||= {}
+    self.cached_attributes['cached_card_count'] = collection_cards.count
+    # update without callbacks/timestamps
+    update_column :cached_attributes, cached_attributes
+  end
+
   def update_cover_text!(text_item)
     cached_cover['text'] = CollectionCover.cover_text(self, text_item)
     save
-  end
-
-  def base_collection_type?
-    self.class.name == 'Collection'
-  end
-
-  def parent_is_user_collection?
-    parent.is_a? Collection::UserCollection
   end
 
   def org_templates?
@@ -409,6 +455,10 @@ class Collection < ApplicationRecord
   end
 
   def profiles?
+    false
+  end
+
+  def getting_started?
     false
   end
 
@@ -459,6 +509,29 @@ class Collection < ApplicationRecord
     collections.each(&:processing_done) if processing_status.nil?
   end
 
+  def global_collection?
+    type == 'Collection::Global'
+  end
+
+  def submission_box_template?
+    parent.is_a? Collection::SubmissionBox
+  end
+  
+  def inside_a_master_template?
+    return true if master_template?
+    parents.where(master_template: true).any?
+  end
+
+  def inside_a_template_instance?
+    return true if template_id.present?
+    parents.where.not(template_id: nil).any?
+  end
+
+  # check for template instances anywhere in the entire collection tree
+  def any_template_instance_children?
+    Collection.in_collection(id).where.not(template_id: nil).any?
+  end
+
   private
 
   def organization_blank?
@@ -490,5 +563,13 @@ class Collection < ApplicationRecord
     return unless comment_thread.present?
     return unless saved_change_to_name? || saved_change_to_cached_attributes?
     comment_thread.store_in_firestore
+  end
+
+  def pin_all_primary_cards
+    primary_collection_cards.update_all(pinned: true)
+  end
+
+  def now_master_template?
+    saved_change_to_master_template? && master_template?
   end
 end

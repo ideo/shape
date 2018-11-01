@@ -4,8 +4,9 @@ class Collection
     has_one :submissions_collection,
             class_name: 'Collection::SubmissionsCollection',
             dependent: :destroy
-
     validate :submission_template_is_a_master_template
+    # also archive the submissions_collection along with collection defaults
+    self.archive_with += %i[submissions_collection]
 
     enum submission_box_type: {
       template: 0,
@@ -13,6 +14,13 @@ class Collection
       link: 2,
       file: 3,
     }
+
+    def duplicate!(**args)
+      duplicate = super(args)
+      return duplicate if duplicate.new_record? || duplicate.errors.present?
+      duplicate.setup_submissions_collection!
+      duplicate
+    end
 
     def setup_submissions_collection
       build_submissions_collection(
