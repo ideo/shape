@@ -28,6 +28,7 @@ class RoutingStore extends RouterStore {
     // close the org/roles menus if either are open when we route to a new page
     uiStore.update('organizationMenuPage', null)
     uiStore.update('rolesMenuOpen', null)
+    uiStore.closeDialog()
     if (!id && type !== 'homepage') {
       // in this case, type is a path like '/' or '/terms'
       this.push(type)
