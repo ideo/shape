@@ -88,6 +88,8 @@ export default class UiStore {
     fadeOutTime: undefined,
     snoozeChecked: false,
     onToggleSnoozeDialog: null,
+    image: null,
+    options: [],
     onClose: () => this.closeDialog(),
   }
   defaultSnackbarProps = {

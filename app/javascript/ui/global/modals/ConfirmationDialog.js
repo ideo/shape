@@ -4,9 +4,11 @@ import styled from 'styled-components'
 
 import {
   FormActionsContainer,
-  TextButton,
+  SmallTextButton,
   Checkbox,
 } from '~/ui/global/styled/forms'
+import { ConfirmText } from '~/ui/global/styled/typography'
+import v from '~/utils/variables'
 import Dialog from './Dialog'
 
 const StyledFormControlLabel = styled(FormControlLabel)`
@@ -18,6 +20,20 @@ const StyledFormControlLabel = styled(FormControlLabel)`
 `
 StyledFormControlLabel.displayName = 'snoozeDialogMessage'
 
+const ConfirmOption = ConfirmText.extend`
+  color: black;
+  display: block;
+  float: left;
+  margin-bottom: 70px;
+  margin-left: 35px;
+  margin-right: 30px;
+  width: 190px;
+
+  &:last-child {
+    margin-right: 0;
+  }
+`
+
 class ConfirmationDialog extends React.PureComponent {
   handleCancel = ev => {
     if (ev) ev.preventDefault()
@@ -28,7 +44,7 @@ class ConfirmationDialog extends React.PureComponent {
 
   handleConfirm = ev => {
     ev.preventDefault()
-    this.props.onConfirm()
+    this.props.onConfirm(true)
     this.props.onClose()
   }
 
@@ -45,22 +61,29 @@ class ConfirmationDialog extends React.PureComponent {
     const {
       cancelText,
       confirmText,
+      options,
       prompt,
       onToggleSnoozeDialog,
       snoozeChecked,
+      image,
     } = this.props
 
     const modalProps = {
       ...this.props,
       onClose: this.handleCancel,
       open: this.isOpen,
-      maxWidth: 'sm',
+      maxWidth: image ? 'md' : 'sm',
+      iconImageOverride: image,
+      backgroundColor: image ? v.colors.white : v.colors.commonDark,
     }
 
     return (
       <Dialog {...modalProps}>
         <form>
           <p data-cy="ConfirmPrompt">{prompt}</p>
+          {options.map(option => (
+            <ConfirmOption key={option}>{option}</ConfirmOption>
+          ))}
           {onToggleSnoozeDialog && (
             <StyledFormControlLabel
               classes={{ label: 'form-control' }}
@@ -78,21 +101,21 @@ class ConfirmationDialog extends React.PureComponent {
               label="Please don’t show me this warning for a while."
             />
           )}
-          <FormActionsContainer>
-            <TextButton
+          <FormActionsContainer style={{ clear: 'both' }}>
+            <SmallTextButton
               data-cy="CancelButton"
-              maxWidth={150}
+              maxWidth={options.length ? 200 : 150}
               onClick={this.handleCancel}
             >
               {cancelText}
-            </TextButton>
-            <TextButton
+            </SmallTextButton>
+            <SmallTextButton
               data-cy="ConfirmButton"
-              maxWidth={150}
+              maxWidth={options.length ? 200 : 150}
               onClick={this.handleConfirm}
             >
               {confirmText}
-            </TextButton>
+            </SmallTextButton>
           </FormActionsContainer>
         </form>
       </Dialog>
@@ -104,6 +127,8 @@ ConfirmationDialog.propTypes = {
   ...Dialog.childPropTypes,
   prompt: PropTypes.string,
   open: PropTypes.string,
+  options: PropTypes.arrayOf(PropTypes.node),
+  image: PropTypes.string,
   onConfirm: PropTypes.func,
   onCancel: PropTypes.func,
   confirmText: PropTypes.string,
@@ -115,6 +140,8 @@ ConfirmationDialog.defaultProps = {
   ...Dialog.defaultProps,
   prompt: '',
   open: '',
+  options: [],
+  image: null,
   onConfirm: null,
   onCancel: null,
   confirmText: 'OK',
