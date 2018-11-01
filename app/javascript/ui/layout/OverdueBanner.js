@@ -36,21 +36,17 @@ const Action = styled.div`
   text-align: right;
 `
 
-@inject('apiStore')
+@inject('apiStore', 'uiStore')
 @observer
 class OverdueBanner extends React.Component {
-  state = {
-    hidden: false,
-  }
-
-  hide = () => this.setState({ hidden: true })
+  hide = () => this.props.uiStore.hideOverdueBanner()
 
   render() {
     const currentOrganization = this.props.apiStore.currentUser
       .current_organization
 
     if (
-      this.state.hidden ||
+      !this.props.uiStore.overdueBannerVisible ||
       !currentOrganization.overdue ||
       !currentOrganization.in_app_billing
     ) {
@@ -101,6 +97,7 @@ class OverdueBanner extends React.Component {
 
 OverdueBanner.wrappedComponent.propTypes = {
   apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
+  uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 
 export default OverdueBanner

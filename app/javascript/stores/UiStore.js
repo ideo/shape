@@ -133,6 +133,8 @@ export default class UiStore {
   dragging = false
   @observable
   textEditingItem = null
+  @observable
+  overdueBannerVisible = true
 
   @action
   startDragging() {
@@ -540,5 +542,10 @@ export default class UiStore {
         this.trackedRecords[identifier] = null
       }, TIMEOUT)
     )
+  }
+
+  @action
+  hideOverdueBanner() {
+    this.overdueBannerVisible = false
   }
 }

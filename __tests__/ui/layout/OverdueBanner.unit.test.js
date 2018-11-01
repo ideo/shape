@@ -1,4 +1,5 @@
 import OverdueBanner from '~/ui/layout/OverdueBanner'
+import UiStore from '~/stores/UiStore'
 
 const apiStore = {
   currentUser: {
@@ -11,7 +12,12 @@ const apiStore = {
 }
 
 function render() {
-  return shallow(<OverdueBanner.wrappedComponent apiStore={apiStore} />)
+  return shallow(
+    <OverdueBanner.wrappedComponent
+      apiStore={apiStore}
+      uiStore={new UiStore()}
+    />
+  )
 }
 
 describe('OverdueBanner', () => {
