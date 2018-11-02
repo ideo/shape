@@ -29,7 +29,7 @@ import MarketingMenu from '~/ui/marketing/MarketingMenu'
 import SubscribeEmail from '~/ui/marketing/SubscribeEmail'
 import ProductDescriptions from '~/ui/marketing/ProductDescriptions'
 import BetaSticker from '~/ui/marketing/BetaSticker'
-import { db } from '~/vendor/firebaseMarketing'
+import db from '~/vendor/firebaseMarketing'
 
 class MarketingPage extends React.Component {
   constructor(props) {
