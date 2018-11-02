@@ -1,29 +1,28 @@
 class Callbacks::IdeoNetworkController < ApplicationController
   before_action :authenticate_request
 
-  def payment_methods
-    application_organization_id = params.dig(
-      'data',
-      'relationships',
-      'application_organizations',
-      'relationships',
-      'application_organization',
-      'data',
-      'id',
-    )
-    application_organization = params.fetch('included', []).find do |x|
-      x['id'] == application_organization_id && x['type'] == 'application_organizations'
+  def invoices
+    event = params[:event]
+    if event == 'invoice.payment_failed'
+      process_invoice_payment_failed_event
+    else
+      logger.debug("Unsupported invoice event: #{event}")
+      head :bad_request
+      return
     end
-    return head :bad_request unless application_organization
+  end
 
-    organization_id = application_organization.dig('attributes', 'external_id')
-    return head :bad_request unless organization_id
-
-    organization = Organization.find(organization_id)
-    organization.update_payment_status
-    head :ok
-  rescue ActiveRecord::RecordNotFound
-    head :not_found
+  def payment_methods
+    event = params[:event]
+    if event == 'payment_method.created'
+      process_payment_method_created
+    elsif event == 'payment_method.expiring'
+      process_payment_method_expiring
+    else
+      logger.debug("Unsupported payment event: #{event}")
+      head :bad_request
+      return
+    end
   end
 
   def users
@@ -52,6 +51,50 @@ class Callbacks::IdeoNetworkController < ApplicationController
     user.destroy
   end
 
+  def process_invoice_payment_failed_event
+    application_organization = find_included('application_organization')
+    payment_method = find_included('payment_method')
+    return head :bad_request unless application_organization && payment_method
+
+    organization_id = application_organization.dig('attributes', 'external_id')
+    begin
+      organization = Organization.find(organization_id)
+      InvoicePaymentFailedMailer.notify(organization.id, payment_method['id']).deliver_later
+    rescue ActiveRecord::RecordNotFound
+      return head :not_found
+    end
+    head :ok
+  end
+
+  def process_payment_method_created
+    application_organization = find_included('application_organization')
+    return head :bad_request unless application_organization
+
+    organization_id = application_organization.dig('attributes', 'external_id')
+    begin
+      organization = Organization.find(organization_id)
+      organization.update_payment_status
+      return head :ok
+    rescue ActiveRecord::RecordNotFound
+      return head :not_found
+    end
+  end
+
+  def process_payment_method_expiring
+    payment_method_id = params.dig('data', 'attributes', 'id')
+    application_organization = find_included('application_organization')
+    return head :bad_request unless payment_method_id && application_organization
+
+    organization_id = application_organization.dig('attributes', 'external_id')
+    begin
+      organization = Organization.find(organization_id)
+      PaymentMethodExpiringMailer.notify(organization.id, payment_method_id).deliver_later
+    rescue ActiveRecord::RecordNotFound
+      return head :not_found
+    end
+    head :ok
+  end
+
   def event
     params[:event].to_sym
   end
@@ -76,5 +119,11 @@ class Callbacks::IdeoNetworkController < ApplicationController
     return true if request.headers['HTTP_AUTHORIZATION'] == ENV['IDEO_SSO_CLIENT_SECRET']
 
     head :unauthorized
+  end
+
+  def find_included(type)
+    params.fetch('included', []).find do |resource|
+      resource['type'] == type.pluralize
+    end
   end
 end
