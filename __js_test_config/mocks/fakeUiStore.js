@@ -72,6 +72,7 @@ const fakeUiStore = {
   activityLogPage: 'comments',
   pageMenuOpen: false,
   searchText: '',
+  collectionCardSortOrder: '',
 }
 
 export default fakeUiStore
