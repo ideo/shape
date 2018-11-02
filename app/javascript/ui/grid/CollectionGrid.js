@@ -602,7 +602,7 @@ class CollectionGrid extends React.Component {
   }
 
   render() {
-    const { sorting, uiStore } = this.props
+    const { sorting, uiStore, collection } = this.props
     const { gridSettings } = uiStore
     const { rows } = this.state
     if (uiStore.isLoading) return <Loader />
@@ -613,7 +613,7 @@ class CollectionGrid extends React.Component {
       <StyledGrid minHeight={minHeight}>
         {sorting && (
           <SortContainer>
-            <CollectionSort />
+            <CollectionSort collection={collection} />
           </SortContainer>
         )}
         {this.renderPositionedCards()}

@@ -24,7 +24,7 @@ class Api::V1::BaseController < ApplicationController
       'Collection::TestDesign': SerializableCollection,
       'Collection::TestOpenResponses': SerializableCollection,
       'Collection::SubmissionBox': SerializableCollection,
-      'Collection::SubmissionsCollection': SerializableCollection,
+      'Collection::SubmissionsCollection': SerializableSubmissionsCollection,
       'Collection::UserProfile': SerializableCollection,
       'CollectionCard::Primary': SerializableCollectionCard,
       'CollectionCard::Link': SerializableCollectionCard,

@@ -1,3 +1,4 @@
+# This is currently only applicable to Collections
 module Testable
   extend ActiveSupport::Concern
 
@@ -8,13 +9,13 @@ module Testable
              class_name: 'Collection::TestCollection'
 
     has_one :latest_test_collection,
-            -> { active.order(updated_at: :desc) },
+            -> { active.where(test_status: %i[live closed]).order(updated_at: :desc) },
             inverse_of: :collection_to_test,
             foreign_key: :collection_to_test_id,
             class_name: 'Collection::TestCollection'
 
     has_one :live_test_collection,
-            -> { active.where(test_status: :live) },
+            -> { active.live },
             inverse_of: :collection_to_test,
             foreign_key: :collection_to_test_id,
             class_name: 'Collection::TestCollection'
@@ -24,7 +25,7 @@ module Testable
     def order_by_score(question_type)
       where
         .not(cached_test_scores: nil)
-        .order("cached_test_scores->'question_#{question_type}' DESC NULLS LAST")
+        .order("cached_test_scores->'#{question_type}' DESC NULLS LAST")
     end
   end
 
@@ -33,6 +34,10 @@ module Testable
     return scores unless latest_test_collection.present?
     latest_test_collection.question_items.scale_questions.each do |question|
       scores[question.question_type] = question.score
+    end
+    unless scores.empty?
+      # total == average score
+      scores['total'] = (scores.values.sum / scores.values.count).round
     end
     scores
   end

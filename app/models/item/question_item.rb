@@ -82,6 +82,7 @@ class Item
     def score
       return unless scale_question?
       # answers are 1-4, but scored on a scale of 0-3
+      # TODO: change the answer_numbers on the emojiScale to go 0-3 to match? (would need to migrate old answers)
       points = completed_survey_answers.sum('answer_number - 1') || 0
       total = completed_survey_answers.count * 3
       # don't want to divide by 0
