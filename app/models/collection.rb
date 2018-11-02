@@ -345,8 +345,22 @@ class Collection < ApplicationRecord
     end
   end
 
-  def collection_cards_viewable_by(cached_cards, user)
-    cached_cards ||= collection_cards.includes(:item, :collection)
+  def collection_cards_viewable_by(cached_cards, user, card_order: nil)
+    if card_order
+      if card_order == 'total' || card_order.include?('question_')
+        collection_order = "cached_test_scores->'#{card_order}'"
+        order = "collections.#{collection_order} DESC NULLS LAST"
+      else
+        # e.g. updated_at
+        order = { card_order => :desc }
+      end
+      cached_cards = collection_cards
+                     .unscope(:order)
+                     .includes(:item, :collection)
+                     .order(order)
+    else
+      cached_cards ||= collection_cards.includes(:item, :collection)
+    end
     cached_cards.select do |collection_card|
       collection_card.record.can_view?(user)
     end

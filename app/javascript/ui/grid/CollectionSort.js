@@ -1,9 +1,12 @@
+import _ from 'lodash'
+import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import MenuItem from '@material-ui/core/MenuItem'
 import styled from 'styled-components'
 
 import { Select } from '~/ui/global/styled/forms'
 import { DisplayText } from '~/ui/global/styled/typography'
 import v from '~/utils/variables'
+import { questionTitle } from '~/ui/test_collections/shared'
 
 const StyledGrid = styled.div``
 StyledGrid.displayName = 'StyledGrid'
@@ -12,24 +15,36 @@ const ExplanationText = DisplayText.extend`
   color: ${v.colors.commonMedium};
 `
 
+@inject('uiStore')
+@observer
 class CollectionSort extends React.Component {
   get sortingItems() {
-    // TODO replace these with real data
-    const { opts } = this
-    if (opts) return opts
-    return [
+    const { collection } = this.props
+    const opts = [
       { name: 'Created date', value: 'created_at' },
       { name: 'Last updated', value: 'updated_at' },
-      { name: 'Result: Usesfullness', value: 'question_useful' },
-      { name: 'Result: Exciting', value: 'question_exciting' },
     ]
+    _.each(collection.sort_options, opt => {
+      opts.push({
+        name: `Result: ${questionTitle(opt)}`,
+        value: opt,
+      })
+    })
+    return opts
   }
 
-  handleSortChange = ev => {
+  handleSortChange = async ev => {
     ev.preventDefault()
+    const { collection, uiStore } = this.props
+    // console.log(ev.target.value)
+    uiStore.update('collectionCardSortOrder', ev.target.value)
+    await collection.API_sortCards()
   }
 
   render() {
+    const { uiStore } = this.props
+    const value = uiStore.collectionCardSortOrder
+
     return (
       <div>
         <ExplanationText>sort by: </ExplanationText>
@@ -39,7 +54,7 @@ class CollectionSort extends React.Component {
           disableUnderline
           name="CollectionSort"
           onChange={this.handleSortChange}
-          value={this.sortingItems[0].value}
+          value={value}
         >
           {this.sortingItems.map(item => (
             <MenuItem key={item.name} value={item.value}>
@@ -52,7 +67,11 @@ class CollectionSort extends React.Component {
   }
 }
 
-CollectionSort.propTypes = {}
-CollectionSort.defaultProps = {}
+CollectionSort.propTypes = {
+  collection: MobxPropTypes.objectOrObservableObject.isRequired,
+}
+CollectionSort.wrappedComponent.propTypes = {
+  uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
+}
 
 export default CollectionSort

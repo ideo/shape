@@ -1,7 +1,7 @@
 class Api::V1::CollectionsController < Api::V1::BaseController
   deserializable_resource :collection, class: DeserializableCollection, only: %i[update]
   load_and_authorize_resource :collection_card, only: [:create]
-  load_and_authorize_resource except: %i[me update destroy in_my_collection]
+  load_and_authorize_resource except: %i[update destroy in_my_collection]
   # NOTE: these have to be in the following order
   before_action :load_and_authorize_collection_update, only: %i[update]
   before_action :load_collection_with_cards, only: %i[show update]
@@ -9,6 +9,10 @@ class Api::V1::CollectionsController < Api::V1::BaseController
   before_action :check_cache, only: %i[show]
   def show
     log_organization_view_activity
+    if @collection.is_a?(Collection::SharedWithMeCollection)
+      # SharedCollection has special behavior where it sorts by most recently updated
+      params[:card_order] = 'updated_at'
+    end
     render_collection
   end
 
@@ -74,7 +78,7 @@ class Api::V1::CollectionsController < Api::V1::BaseController
 
   def check_cache
     fresh_when(
-      last_modified: @collection.updated_at.utc,
+      last_modified: Time.now,
       etag: @collection.cache_key,
     )
   end

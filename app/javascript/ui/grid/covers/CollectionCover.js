@@ -14,6 +14,7 @@ import FilledProfileIcon from '~/ui/icons/FilledProfileIcon'
 import SubmissionBoxIconLg from '~/ui/icons/SubmissionBoxIconLg'
 import TemplateIcon from '~/ui/icons/TemplateIcon'
 import TestCollectionIcon from '~/ui/icons/TestCollectionIcon'
+import { questionTitle } from '~/ui/test_collections/shared'
 import { routingStore } from '~/stores'
 
 const IconHolder = styled.span`
@@ -167,6 +168,21 @@ class CollectionCover extends React.Component {
     return <span style={{ hyphens }}>{collection.name}</span>
   }
 
+  get collectionScore() {
+    const { collection, uiStore } = this.props
+    const order = uiStore.collectionCardSortOrder
+    // don't display score for ordering like 'updated_at'
+    if (order !== 'total' && order.indexOf('question_') === -1) return ''
+
+    const orderName = questionTitle(order)
+    const score = collection.test_scores[order]
+    return (
+      <div>
+        Result: {orderName}: {score}
+      </div>
+    )
+  }
+
   handleClick = e => {
     const { dragging } = this.props
     if (dragging) {
@@ -209,6 +225,7 @@ class CollectionCover extends React.Component {
               </Dotdotdot>
             </PositionedCardHeading>
           </div>
+          {this.collectionScore}
           <div className="bottom">
             <Dotdotdot clamp="auto">{cover.text}</Dotdotdot>
           </div>

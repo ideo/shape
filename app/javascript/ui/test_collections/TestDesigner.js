@@ -272,7 +272,7 @@ class TestDesigner extends React.Component {
 
     return (
       // maxWidth mainly to force the radio buttons from spanning the page
-      <form style={{ maxWidth: '500px' }}>
+      <form style={{ maxWidth: '750px' }}>
         <RadioControl
           options={options}
           name="test_type"

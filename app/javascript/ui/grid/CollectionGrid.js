@@ -406,14 +406,13 @@ class CollectionGrid extends React.Component {
     const cards = [...collectionCards]
     // props might get passed in e.g. nextProps for componentWillReceiveProps
     if (!opts.props) opts.props = this.props
-    const { gridW, gridH, gutter, cols, sortBy, addEmptyCard } = opts.props
+    const { gridW, gridH, gutter, cols, addEmptyCard } = opts.props
     let row = 0
     const matrix = []
     // create an empty row
     matrix.push(_.fill(Array(cols), null))
     if (addEmptyCard) this.addEmptyCard(cards)
-    const sortedCards = _.sortBy(cards, sortBy)
-    _.each(sortedCards, (card, i) => {
+    _.each(cards, (card, i) => {
       // we don't actually want to "re-position" the dragging card
       // because its position is being determined by the drag (i.e. mouse cursor)
       if (opts.dragging === card.id) {
@@ -471,8 +470,8 @@ class CollectionGrid extends React.Component {
         //  - shrink to 1x1
         // 4. Likewise if prevPrevCard is 1x2 and there is a short gap to the (bottom) right:
         //  - shrink to 1x1
-        const prevCard = sortedCards[i - 1]
-        const prevPrevCard = sortedCards[i - 2]
+        const prevCard = cards[i - 1]
+        const prevPrevCard = cards[i - 2]
         if (!itFits && cols === 2) {
           const canFitOneRow =
             prevCard &&
@@ -605,7 +604,7 @@ class CollectionGrid extends React.Component {
     const { sorting, uiStore, collection } = this.props
     const { gridSettings } = uiStore
     const { rows } = this.state
-    if (uiStore.isLoading) return <Loader />
+    if (uiStore.isLoading || collection.reloading) return <Loader />
 
     const minHeight = rows * (gridSettings.gridH + gridSettings.gutter)
 
@@ -629,7 +628,6 @@ const gridConfigProps = {
   gridH: PropTypes.number.isRequired,
   gridW: PropTypes.number.isRequired,
   gutter: PropTypes.number.isRequired,
-  sortBy: PropTypes.string.isRequired,
 }
 
 CollectionGrid.propTypes = {

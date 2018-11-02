@@ -1,3 +1,4 @@
+import _ from 'lodash'
 import PropTypes from 'prop-types'
 import objectAssignDeep from 'object-assign-deep'
 import styled, { css } from 'styled-components'
@@ -239,6 +240,14 @@ export const questionInformation = question => {
     questionText,
     questionTitle,
   }
+}
+
+export const questionTitle = question_type => {
+  if (question_type !== 'total') {
+    const info = questionInformation({ question_type })
+    return info.questionTitle
+  }
+  return _.startCase(question_type)
 }
 
 export const styledTestTheme = (themeName = 'primary') => {
