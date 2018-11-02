@@ -14,7 +14,8 @@ describe Collection::SubmissionsCollection, type: :model do
   end
 
   describe '#sort_options' do
-    let(:submissions_collection) { create(:submissions_collection) }
+    let(:submission_box) { create(:submission_box) }
+    let(:submissions_collection) { create(:submissions_collection, submission_box: submission_box) }
     let(:submissions) { create_list(:collection, 2, parent_collection: submissions_collection) }
     before do
       submissions.first.update(cached_test_scores: { 'question_clarity' => 33 })
