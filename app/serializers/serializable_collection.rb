@@ -67,6 +67,11 @@ class SerializableCollection < BaseJsonSerializer
     end
   end
 
+  # expose this for the front-end to be aware
+  attribute :card_order do
+    @card_order || 'order'
+  end
+
   attribute :can_edit do
     @current_ability.can?(:edit, @object)
   end

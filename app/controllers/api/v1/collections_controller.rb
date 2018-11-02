@@ -78,7 +78,7 @@ class Api::V1::CollectionsController < Api::V1::BaseController
 
   def check_cache
     fresh_when(
-      last_modified: Time.now,
+      last_modified: @collection.updated_at.utc,
       etag: @collection.cache_key,
     )
   end

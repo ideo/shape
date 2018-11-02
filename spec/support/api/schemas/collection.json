@@ -15,6 +15,7 @@
     "breadcrumb": { "type": ["array", "null"] },
     "can_edit": { "type": ["boolean"] },
     "can_edit_content": { "type": ["boolean"] },
+    "card_order": { "type": ["string"] },
     "tag_list": { "type": ["array", "null"] },
     "inherited_tag_list": { "type": ["array", "null"] },
     "cover": { "type": ["object"] },

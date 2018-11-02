@@ -170,9 +170,11 @@ class CollectionCover extends React.Component {
   }
 
   get hasCollectionScore() {
-    const { uiStore } = this.props
+    const { uiStore, inSubmissionsCollection } = this.props
+    // scores only apply to cards within a SubmissionsCollection
+    if (!inSubmissionsCollection) return false
     const order = uiStore.collectionCardSortOrder
-    return order === 'total' && order.indexOf('question_') > -1
+    return order === 'total' || order.indexOf('question_') > -1
   }
 
   get collectionScore() {
@@ -248,6 +250,7 @@ CollectionCover.propTypes = {
   width: PropTypes.number.isRequired,
   height: PropTypes.number.isRequired,
   collection: MobxPropTypes.objectOrObservableObject.isRequired,
+  inSubmissionsCollection: PropTypes.bool,
   dragging: PropTypes.bool,
   onClick: PropTypes.func,
 }
@@ -255,6 +258,7 @@ CollectionCover.wrappedComponent.propTypes = {
   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 CollectionCover.defaultProps = {
+  inSubmissionsCollection: false,
   dragging: false,
   onClick: null,
 }

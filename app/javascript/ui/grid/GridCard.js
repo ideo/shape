@@ -103,6 +103,10 @@ class GridCard extends React.Component {
           height={card.maxHeight}
           collection={record}
           dragging={this.props.dragging}
+          inSubmissionsCollection={
+            card.parentCollection &&
+            card.parentCollection.isSubmissionsCollection
+          }
         />
       )
     }

@@ -191,12 +191,7 @@ class CollectionPage extends PageWithApi {
       }
       if (collection.isSubmissionBox && collection.submissions_collection) {
         this.setLoadedSubmissions(false)
-        // await apiStore.fetch(
-        //   'collections',
-        //   collection.submissions_collection.id,
-        //   true
-        // )
-
+        // NOTE: if other collections get sortable features we may move this logic
         uiStore.update('collectionCardSortOrder', 'updated_at')
         await Collection.fetchSubmissionsCollection(
           collection.submissions_collection.id,

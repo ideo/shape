@@ -216,6 +216,7 @@ export const fakeCollection = {
     text: 'Lorem ipsum blockchain boogie',
     name: 'Proto-typo',
   },
+  card_order: 'order',
   collection_cards: fakeCards,
   parent_collection_card: fakeCollectionCard,
   // This is a computed property on the collection store

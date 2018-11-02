@@ -406,13 +406,21 @@ class CollectionGrid extends React.Component {
     const cards = [...collectionCards]
     // props might get passed in e.g. nextProps for componentWillReceiveProps
     if (!opts.props) opts.props = this.props
-    const { gridW, gridH, gutter, cols, addEmptyCard } = opts.props
+    const { collection, gridW, gridH, gutter, cols, addEmptyCard } = opts.props
     let row = 0
     const matrix = []
     // create an empty row
     matrix.push(_.fill(Array(cols), null))
     if (addEmptyCard) this.addEmptyCard(cards)
-    _.each(cards, (card, i) => {
+    let sortedCards = cards
+    if (collection.card_order === 'order') {
+      // For most collections, we will be sorting by `order`. In that case we call
+      // `sortBy` in order to sort our placeholder/blank cards in the correct order.
+      // NOTE: If we ever have something like "sort by updated_at" + the ability to pop open BCT,
+      // we may need to amend this
+      sortedCards = _.sortBy(cards, 'order')
+    }
+    _.each(sortedCards, (card, i) => {
       // we don't actually want to "re-position" the dragging card
       // because its position is being determined by the drag (i.e. mouse cursor)
       if (opts.dragging === card.id) {
@@ -470,8 +478,8 @@ class CollectionGrid extends React.Component {
         //  - shrink to 1x1
         // 4. Likewise if prevPrevCard is 1x2 and there is a short gap to the (bottom) right:
         //  - shrink to 1x1
-        const prevCard = cards[i - 1]
-        const prevPrevCard = cards[i - 2]
+        const prevCard = sortedCards[i - 1]
+        const prevPrevCard = sortedCards[i - 2]
         if (!itFits && cols === 2) {
           const canFitOneRow =
             prevCard &&
