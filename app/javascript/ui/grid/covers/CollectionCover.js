@@ -11,6 +11,7 @@ import { CardHeading } from '~/ui/global/styled/typography'
 import hexToRgba from '~/utils/hexToRgba'
 import ProfileIcon from '~/ui/icons/ProfileIcon'
 import FilledProfileIcon from '~/ui/icons/FilledProfileIcon'
+import { RoundPill } from '~/ui/global/styled/forms'
 import SubmissionBoxIconLg from '~/ui/icons/SubmissionBoxIconLg'
 import TemplateIcon from '~/ui/icons/TemplateIcon'
 import TestCollectionIcon from '~/ui/icons/TestCollectionIcon'
@@ -168,18 +169,24 @@ class CollectionCover extends React.Component {
     return <span style={{ hyphens }}>{collection.name}</span>
   }
 
+  get hasCollectionScore() {
+    const { uiStore } = this.props
+    const order = uiStore.collectionCardSortOrder
+    return order === 'total' && order.indexOf('question_') > -1
+  }
+
   get collectionScore() {
     const { collection, uiStore } = this.props
     const order = uiStore.collectionCardSortOrder
     // don't display score for ordering like 'updated_at'
-    if (order !== 'total' && order.indexOf('question_') === -1) return ''
+    if (!this.hasCollectionScore) return ''
 
     const orderName = questionTitle(order)
     const score = collection.test_scores[order]
     return (
-      <div>
-        Result: {orderName}: {score}
-      </div>
+      <RoundPill>
+        Result: {orderName}: <strong>{score}%</strong>
+      </RoundPill>
     )
   }
 
@@ -225,9 +232,11 @@ class CollectionCover extends React.Component {
               </Dotdotdot>
             </PositionedCardHeading>
           </div>
-          {this.collectionScore}
           <div className="bottom">
-            <Dotdotdot clamp="auto">{cover.text}</Dotdotdot>
+            {this.collectionScore}
+            <Dotdotdot clamp={this.hasCollectionScore ? 2 : 'auto'}>
+              {cover.text}
+            </Dotdotdot>
           </div>
         </StyledCardContent>
       </StyledCollectionCover>

@@ -189,6 +189,22 @@ export const Pill = styled(Chip)`
 `
 Pill.displayName = 'StyledPill'
 
+export const RoundPill = styled.div`
+  background-color: ${v.colors.commonLight};
+  border-radius: 15px;
+  color: ${v.colors.commonDark};
+  display: inline-block;
+  font-family: ${v.fonts.sans};
+  font-size: 1rem;
+  margin-bottom: 8px;
+  padding: 5px 10px;
+  width: auto;
+
+  strong {
+    font-weight: ${v.weights.medium};
+  }
+`
+
 /** @component */
 export const Select = styled(MuiSelect)`
   .select {
