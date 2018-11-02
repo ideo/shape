@@ -92,6 +92,7 @@ describe 'Ideo Profile API Requests' do
   end
 
   describe 'POST #payment_methods' do
+    let!(:organization) { create(:organization) }
     describe 'unsupported invoice event' do
       it 'renders bad request' do
         post(

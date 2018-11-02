@@ -1,25 +1,20 @@
 <div class="billing-email trial-users-count-exceeded">
   <div class="subject"><%= @subject %></div>
-  <div><%= message %></div>
+  <div>
+    The defualt payment method on file for your account
+    is <strong>expiring</strong> soon. Please go to the Shape billing
+    page to update your payment method or add a new payment method to your account.  </div>
   <div>
     <div class="organization-name"><%= @organization_name %></div>
     <div>
       <div class="section">
         <div class="inner">
           <div class="header">
-            <% if @replaced %>
-              Payment Methods
-            <% else %>
-              Payment Method
-            <% end %>
+            Payment Method
           </div>
           <dl>
-            <dt><%= @payment_method.type %> ending in <%= @payment_method.last4 %></dt>
-            <dd><%= @type %></dd>
-            <% if @replaced %>
-              <dt><%= @replacement_payment_method.type %> ending in <%= @replacement_payment_method.last4 %></dt>
-              <dd>CHARGED</dd>
-            <% end %>
+            <dt><%= @payment_method.brand %> ending in <%= @payment_method.last4 %></dt>
+            <dd>EXPIRING</dd>
           </dl>
         </div>
       </div>
@@ -35,7 +30,7 @@
         </div>
       </div>
       <div class='email-link'>
-        <%= link_to @billing_button_text, @url %>
+        <%= link_to 'Go To Billing', @url %>
       </div>
     </div>
   </div>

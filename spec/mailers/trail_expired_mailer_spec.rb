@@ -42,7 +42,7 @@ RSpec.describe TrialExpiredMailer, type: :mailer do
 
       it 'renders the link to billing' do
         mail = TrialExpiredMailer.notify(organization)
-        expect(mail.body.encoded).to match("Add payment method: #{root_url}/billing")
+        expect(mail.body.encoded).to match("Add payment method: #{root_url}billing")
       end
     end
 
@@ -53,7 +53,7 @@ RSpec.describe TrialExpiredMailer, type: :mailer do
 
       it 'does not render the link to billing' do
         mail = TrialExpiredMailer.notify(organization)
-        expect(mail.body.encoded).not_to match("Add payment method: #{root_url}/billing")
+        expect(mail.body.encoded).not_to match("Add payment method: #{root_url}billing")
       end
     end
   end
