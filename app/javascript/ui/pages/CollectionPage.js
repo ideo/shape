@@ -23,6 +23,9 @@ import TestDesigner from '~/ui/test_collections/TestDesigner'
 import v from '~/utils/variables'
 import Collection from '~/stores/jsonApi/Collection'
 
+// more global way to do this?
+pluralize.addPluralRule(/canvas$/i, 'canvases')
+
 const isHomepage = ({ params }) => params.org && !params.id
 
 @inject('apiStore', 'uiStore', 'routingStore')
@@ -188,10 +191,11 @@ class CollectionPage extends PageWithApi {
       }
       if (collection.isSubmissionBox && collection.submissions_collection) {
         this.setLoadedSubmissions(false)
-        await apiStore.fetch(
-          'collections',
+        // NOTE: if other collections get sortable features we may move this logic
+        uiStore.update('collectionCardSortOrder', 'updated_at')
+        await Collection.fetchSubmissionsCollection(
           collection.submissions_collection.id,
-          true
+          { order: 'updated_at' }
         )
         this.setLoadedSubmissions(true)
         // Also subscribe to updates for the submission boxes
@@ -281,7 +285,7 @@ class CollectionPage extends PageWithApi {
               }}
               movingCardIds={[]}
               movingCards={false}
-              sortBy="order"
+              sorting
             />
           </div>
         )}
@@ -329,8 +333,6 @@ class CollectionPage extends PageWithApi {
     const { movingCardIds, cardAction } = uiStore
     // only tell the Grid to hide "movingCards" if we're moving and not linking
     const uiMovingCardIds = cardAction === 'move' ? movingCardIds : []
-    // SharedCollection has special behavior where it sorts by most recently updated
-    const sortBy = collection.isSharedCollection ? 'updated_at' : 'order'
 
     const requiresTestDesigner =
       collection.isLaunchableTest || collection.isTestDesign
@@ -357,7 +359,6 @@ class CollectionPage extends PageWithApi {
                 movingCardIds={uiMovingCardIds}
                 // passing length prop seems to properly trigger a re-render
                 movingCards={uiStore.movingCardIds.length}
-                sortBy={sortBy}
                 // don't add the extra row for submission box
                 addEmptyCard={!isSubmissionBox}
               />

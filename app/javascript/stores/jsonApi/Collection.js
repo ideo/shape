@@ -14,6 +14,8 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   // starts null before it is loaded
   @observable
   inMyCollection = null
+  @observable
+  reloading = false
 
   attributesForAPI = [
     'name',
@@ -52,6 +54,11 @@ class Collection extends SharedRecordMixin(BaseRecord) {
       this.snoozedEditWarningsAt = Date.now()
     }
     uiStore.setSnoozeChecked(!!this.snoozedEditWarningsAt)
+  }
+
+  @action
+  setReloading(value) {
+    this.reloading = value
   }
 
   get shouldShowEditWarning() {
@@ -162,7 +169,9 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   }
 
   get isUsableTemplate() {
-    // you aren't allowed to use the profile template
+    // you aren't allowed to use the profile template;
+    // you also don't use test templates, since duplicating them or
+    // creating them within another template is the way to do that
     return (
       this.isMasterTemplate &&
       !this.isProfileTemplate &&
@@ -314,7 +323,9 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   }
 
   launchTest = () => {
-    if (!this.can_edit) {
+    // TODO: If you're an instance editor of a submission e.g. can_edit_content...
+    // should not be able to launch until something(?) is set on the submission_box
+    if (!this.can_edit_content) {
       uiStore.alert('Only editors are allowed to launch the test.')
       return
     }
@@ -370,6 +381,17 @@ class Collection extends SharedRecordMixin(BaseRecord) {
       .find(cc => cc.is_cover === true)
     if (!previousCover) return
     previousCover.is_cover = false
+  }
+
+  static fetchSubmissionsCollection(id, { order } = {}) {
+    return apiStore.request(`collections/${id}?card_order=${order}`)
+  }
+
+  async API_sortCards() {
+    const order = uiStore.collectionCardSortOrder
+    this.setReloading(true)
+    await this.apiStore.request(`collections/${this.id}?card_order=${order}`)
+    this.setReloading(false)
   }
 
   static async createSubmission(parent_id, submissionSettings) {

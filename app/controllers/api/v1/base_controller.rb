@@ -24,7 +24,7 @@ class Api::V1::BaseController < ApplicationController
       'Collection::TestDesign': SerializableCollection,
       'Collection::TestOpenResponses': SerializableCollection,
       'Collection::SubmissionBox': SerializableCollection,
-      'Collection::SubmissionsCollection': SerializableCollection,
+      'Collection::SubmissionsCollection': SerializableSubmissionsCollection,
       'Collection::UserProfile': SerializableCollection,
       'CollectionCard::Primary': SerializableCollectionCard,
       'CollectionCard::Link': SerializableCollectionCard,
@@ -72,7 +72,10 @@ class Api::V1::BaseController < ApplicationController
     include ||= Collection.default_relationships_for_api
     render jsonapi: @collection,
            include: include,
-           expose: { current_record: @collection }
+           expose: {
+             current_record: @collection,
+             card_order: params[:card_order],
+           }
   end
 
   def check_api_authentication!

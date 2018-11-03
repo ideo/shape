@@ -54,23 +54,20 @@ DisplayText.displayName = 'StyledDisplayText'
 export const NumberListText = DisplayText.extend`
   display: inline-block;
   font-weight: ${v.weights.medium};
-  min-width: 22px;
+  min-width: 25px;
 `
 NumberListText.displayName = 'NumberListText'
 
 export const SubduedHeading1 = styled.h1`
   color: ${v.colors.commonMedium};
+  font-size: 1.5rem;
   display: inline-block;
   font-weight: 300;
   margin-bottom: 0;
-  margin-left: 16px;
-  padding-top: 8px;
+  margin-left: 8px;
+  padding-top: 18px;
   text-transform: none;
-
-  @media only screen and (max-width: ${v.responsive.smallBreakpoint}px) {
-    font-size: 1.5rem;
-    padding-top: 20px;
-  }
+  white-space: nowrap;
 `
 SubduedHeading1.displayName = 'SubduedHeading1'
 

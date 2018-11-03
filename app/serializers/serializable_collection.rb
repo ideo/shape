@@ -31,6 +31,10 @@ class SerializableCollection < BaseJsonSerializer
     @object.cached_cover || {}
   end
 
+  attribute :test_scores do
+    @object.cached_test_scores || {}
+  end
+
   attribute :type do
     @object.type || @object.class.name
   end
@@ -58,8 +62,14 @@ class SerializableCollection < BaseJsonSerializer
       @object.collection_cards_viewable_by(
         @object.collection_cards,
         @current_user,
+        card_order: @card_order,
       )
     end
+  end
+
+  # expose this for the front-end to be aware
+  attribute :card_order do
+    @card_order || 'order'
   end
 
   attribute :can_edit do
@@ -96,7 +106,7 @@ class SerializableCollection < BaseJsonSerializer
   attribute :is_submission_box_template do
     @object.submission_box_template?
   end
-  
+
   attribute :template_num_instances do
     if @object.master_template?
       @object.templated_collections.active.count

@@ -5,6 +5,7 @@ class Collection < ApplicationRecord
   include RealtimeEditorsViewers
   include HasActivities
   include Templateable
+  include Testable
 
   resourceable roles: [Role::EDITOR, Role::CONTENT_EDITOR, Role::VIEWER],
                edit_role: Role::EDITOR,
@@ -24,7 +25,9 @@ class Collection < ApplicationRecord
                  :cached_card_count
 
   # callbacks
+  after_touch :touch_related_cards, unless: :destroyed?
   after_commit :touch_related_cards, if: :saved_change_to_updated_at?, unless: :destroyed?
+
   after_commit :reindex_sync, on: :create
   after_commit :update_comment_thread_in_firestore, unless: :destroyed?
   after_save :pin_all_primary_cards, if: :now_master_template?
@@ -78,17 +81,6 @@ class Collection < ApplicationRecord
   has_many :collections_and_linked_collections,
            through: :collection_cards,
            source: :collection
-
-  has_many :test_collections,
-           inverse_of: :collection_to_test,
-           foreign_key: :collection_to_test_id,
-           class_name: 'Collection::TestCollection'
-
-  has_one :live_test_collection,
-          -> { where(test_status: :live) },
-          inverse_of: :collection_to_test,
-          foreign_key: :collection_to_test_id,
-          class_name: 'Collection::TestCollection'
 
   has_one :comment_thread, as: :record, dependent: :destroy
 
@@ -355,8 +347,22 @@ class Collection < ApplicationRecord
     end
   end
 
-  def collection_cards_viewable_by(cached_cards, user)
-    cached_cards ||= collection_cards.includes(:item, :collection)
+  def collection_cards_viewable_by(cached_cards, user, card_order: nil)
+    if card_order
+      if card_order == 'total' || card_order.include?('question_')
+        collection_order = "cached_test_scores->'#{card_order}'"
+        order = "collections.#{collection_order} DESC NULLS LAST"
+      else
+        # e.g. updated_at
+        order = { card_order => :desc }
+      end
+      cached_cards = collection_cards
+                     .unscope(:order)
+                     .includes(:item, :collection)
+                     .order(order)
+    else
+      cached_cards ||= collection_cards.includes(:item, :collection)
+    end
     cached_cards.select do |collection_card|
       collection_card.record.can_view?(user)
     end
@@ -467,10 +473,11 @@ class Collection < ApplicationRecord
     false
   end
 
-  def cache_key
+  def cache_key(card_order = 'order')
     "#{jsonapi_cache_key}" \
       "/#{ActiveRecord::Migrator.current_version}" \
       "/#{ENV['HEROKU_RELEASE_VERSION']}" \
+      "/order_#{card_order}" \
       "/cards_#{collection_cards.maximum(:updated_at).to_i}" \
       "/roles_#{roles.maximum(:updated_at).to_i}"
   end
@@ -516,7 +523,7 @@ class Collection < ApplicationRecord
   def submission_box_template?
     parent.is_a? Collection::SubmissionBox
   end
-  
+
   def inside_a_master_template?
     return true if master_template?
     parents.where(master_template: true).any?

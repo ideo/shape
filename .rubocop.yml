@@ -73,6 +73,9 @@ Style/Documentation:
 Style/FrozenStringLiteralComment:
   Enabled: false
 
+Style/Lambda:
+  Enabled: false
+
 Metrics/LineLength:
   Max: 140
   Exclude:

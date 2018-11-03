@@ -50,7 +50,7 @@ const EmojiHolder = styled.div`
 `
 
 const EmojiButton = styled.button`
-  opacity: ${props => (props.selected ? 1 : 0.5)};
+  opacity: ${props => (props.selected ? 1 : 0.25)};
   transition: opacity 0.3s;
   &:hover {
     opacity: 1;

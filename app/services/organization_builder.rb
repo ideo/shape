@@ -1,11 +1,13 @@
 class OrganizationBuilder
   attr_reader :organization, :errors
 
-  def initialize(params, user)
+  def initialize(params, user, with_templates: true)
     @organization = Organization.new(name: params[:name])
     @errors = @organization.errors
     @user = user
     @params = params
+    # mainly just in tests that we don't need this overhead
+    @with_templates = with_templates
   end
 
   def save
@@ -14,7 +16,7 @@ class OrganizationBuilder
       update_primary_group!
       add_role
       setup_user_membership_and_collections
-      create_templates
+      create_templates if @with_templates
     end
     true
   rescue ActiveRecord::RecordInvalid

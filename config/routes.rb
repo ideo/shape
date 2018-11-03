@@ -111,7 +111,7 @@ Rails.application.routes.draw do
 
   resources :tests, only: %i[show]
 
-  authenticate :user, ->(u) { u.has_cached_role?(Role::SUPER_ADMIN) } do
+  authenticate :user, ->(u) { Rails.env.development? || u.has_cached_role?(Role::SUPER_ADMIN) } do
     require 'sidekiq/web'
     mount Sidekiq::Web => '/sidekiq'
   end

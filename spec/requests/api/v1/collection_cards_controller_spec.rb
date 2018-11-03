@@ -2,11 +2,12 @@ require 'rails_helper'
 
 describe Api::V1::CollectionCardsController, type: :request, json: true, auth: true do
   let(:user) { @user }
+  let(:organization) { create(:organization_without_groups) }
   let(:collection) do
-    create(:collection, add_editors: [user], organization: user.current_organization)
+    create(:collection, add_editors: [user], organization: organization)
   end
   let(:subcollection) do
-    create(:collection, add_editors: [user], organization: user.current_organization)
+    create(:collection, add_editors: [user], organization: organization)
   end
 
   before do
@@ -70,7 +71,7 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
 
     context 'success' do
       let(:collection) do
-        create(:collection, add_content_editors: [user], organization: user.current_organization)
+        create(:collection, add_content_editors: [user], organization: organization)
       end
 
       it 'returns a 200' do
@@ -350,10 +351,8 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
       it 'moves new cards to the front of the collection' do
         patch(path, params: params)
         combined_cards = to_collection.reload.collection_cards
-        # expect to find moved card at the front
-        expect(combined_cards.first).to eq moving_cards.first
-        # expect not to find moved cards at the end
-        expect(combined_cards.last).not_to eq moving_cards.last
+        # expect to find moved cards at the front
+        expect(combined_cards.first(2)).to match_array moving_cards
         expect(combined_cards.count).to eq 5
       end
 
@@ -549,7 +548,7 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
   end
 
   describe 'PATCH #update' do
-    let(:collection) { create(:collection, organization: user.current_organization) }
+    let(:collection) { create(:collection, organization: organization) }
     let(:collection_card) { create(:collection_card_text, parent: collection) }
     let(:path) { "/api/v1/collection_cards/#{collection_card.id}" }
     let(:raw_params) do
@@ -604,7 +603,7 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
   end
 
   describe 'PATCH #replace' do
-    let(:collection) { create(:collection, organization: user.current_organization) }
+    let(:collection) { create(:collection, organization: organization) }
     let(:collection_card) { create(:collection_card_text, parent: collection) }
     let(:path) { "/api/v1/collection_cards/#{collection_card.id}/replace" }
     let(:raw_params) do
@@ -675,7 +674,7 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
       end
 
       context 'with question item params' do
-        let(:collection) { create(:test_collection, organization: user.current_organization) }
+        let(:collection) { create(:test_collection, organization: organization) }
         let(:raw_params) do
           {
             order: 2,
