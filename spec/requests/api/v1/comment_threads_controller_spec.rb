@@ -3,7 +3,7 @@ require 'rails_helper'
 describe Api::V1::CommentThreadsController, type: :request, json: true, auth: true do
   let(:user) { @user }
 
-  describe 'GET #index' do
+  describe 'GET #index', create_org: true do
     let(:path) { '/api/v1/comment_threads' }
     let!(:comment_threads) do
       create_list(
