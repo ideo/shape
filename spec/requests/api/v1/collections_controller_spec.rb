@@ -56,14 +56,25 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
       }
       let(:path) { "/api/v1/collections/#{collection.id}" }
 
+      before do
+        collection.collection_cards.each do |cc|
+          user.add_role(Role::VIEWER, cc.record)
+        end
+      end
+
       it 'should sort by updated_at by default' do
         get(path)
         expect(json['data']['attributes']['card_order']).to eq 'updated_at'
       end
     end
 
-    context 'with sort options', only: true do
+    context 'with sort options' do
       let(:path) { "/api/v1/collections/#{collection.id}?card_order=updated_at" }
+      before do
+        collection.collection_cards.each do |cc|
+          user.add_role(Role::VIEWER, cc.record)
+        end
+      end
 
       it 'should sort by the passed in card_order param' do
         get(path)

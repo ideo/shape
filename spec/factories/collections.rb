@@ -1,13 +1,3 @@
-def add_users(role, users, collection)
-  users.each do |user|
-    user.add_role(role, collection)
-    collection.collection_cards.each do |cc|
-      next unless cc.record.present?
-      user.add_role(role, cc.record)
-    end
-  end
-end
-
 FactoryBot.define do
   factory :collection do
     transient do
@@ -121,14 +111,19 @@ FactoryBot.define do
 
     after(:create) do |collection, evaluator|
       if evaluator.add_editors.present?
-        # method defined at the top of this file
-        add_users(Role::EDITOR, evaluator.add_editors, collection)
+        evaluator.add_editors.each do |user|
+          user.add_role(Role::EDITOR, collection)
+        end
       end
       if evaluator.add_content_editors.present?
-        add_users(Role::CONTENT_EDITOR, evaluator.add_content_editors, collection)
+        evaluator.add_content_editors.each do |user|
+          user.add_role(Role::CONTENT_EDITOR, collection)
+        end
       end
       if evaluator.add_viewers.present?
-        add_users(Role::VIEWER, evaluator.add_viewers, collection)
+        evaluator.add_viewers.each do |user|
+          user.add_role(Role::VIEWER, collection)
+        end
       end
     end
   end
