@@ -50,6 +50,15 @@ module Templateable
     UpdateTemplateInstancesWorker.perform_async(id)
   end
 
+  def update_test_template_instance_types!
+    return unless is_a?(Collection::TestCollection) || is_a?(Collection::TestDesign)
+    templated_collections.active.each do |instance|
+      instance.update(
+        collection_to_test_id: collection_to_test_id.nil? ? nil : instance.parent.id,
+      )
+    end
+  end
+
   def update_template_instances
     templated_collections.active.each do |instance|
       move_cards_deleted_from_master_template(instance)
@@ -70,6 +79,7 @@ module Templateable
       card.duplicate!(
         for_user: instance.created_by,
         parent: instance,
+        building_template_instance: true,
       )
     end
   end

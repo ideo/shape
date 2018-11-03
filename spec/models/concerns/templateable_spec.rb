@@ -52,6 +52,29 @@ describe Templateable, type: :concern do
     end
   end
 
+  describe '#update_test_template_instance_types!' do
+    let(:parent_collection) { create(:collection) }
+    let!(:template) do
+      create(:test_collection,
+             master_template: true,
+             parent_collection: parent_collection,
+             collection_to_test_id: parent_collection.id)
+    end
+    let(:instance_parent) { create(:collection) }
+    let!(:template_instance) do
+      create(:test_collection, template: template, parent_collection: instance_parent)
+    end
+
+    it 'should update all instances with collection_to_test setting' do
+      expect {
+        template.update_test_template_instance_types!
+        template_instance.reload
+      }.to change(template_instance, :collection_to_test_id)
+      # collection_to_test in instance should refer to its own parent
+      expect(template_instance.collection_to_test_id).to eq instance_parent.id
+    end
+  end
+
   describe '#update_template_instances' do
     let(:user) { create(:user) }
     let(:template_admin) { create(:user) }

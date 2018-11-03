@@ -16,12 +16,14 @@ describe Collection, type: :model do
     it { should have_many :cards_linked_to_this_collection }
     it { should have_many :items }
     it { should have_many :collections }
-    it { should have_many :test_collections }
     it { should have_one :parent_collection_card }
-    it { should have_one :live_test_collection }
     it { should belong_to :cloned_from }
     it { should belong_to :organization }
     it { should belong_to :template }
+    # these come from Testable concern
+    it { should have_many :test_collections }
+    it { should have_one :latest_test_collection }
+    it { should have_one :live_test_collection }
 
     describe '#collection_cards' do
       let!(:collection) { create(:collection, num_cards: 3) }
@@ -303,15 +305,15 @@ describe Collection, type: :model do
   end
 
   describe '#collection_cards_viewable_by' do
-    let!(:collection) { create(:collection, num_cards: 3) }
+    let!(:collection) { create(:collection, num_cards: 3, record_type: :collection) }
     let!(:subcollection_card) { create(:collection_card_collection, parent: collection) }
     let(:cards) { collection.collection_cards }
     let(:user) { create(:user) }
 
     before do
       user.add_role(Role::VIEWER, collection)
-      collection.items.each do |item|
-        user.add_role(Role::VIEWER, item)
+      collection.collections.each do |coll|
+        user.add_role(Role::VIEWER, coll)
       end
       user.add_role(Role::VIEWER, subcollection_card.collection)
     end
@@ -343,6 +345,25 @@ describe Collection, type: :model do
       it 'should not include card' do
         expect(collection.collection_cards_viewable_by(cards, user)).not_to include(private_card)
         expect(collection.collection_cards_viewable_by(cards, user)).to match_array(cards - [private_card])
+      end
+    end
+
+    context 'with card_order param' do
+      it 'should return results according to the updated_at param' do
+        viewable = collection.collection_cards_viewable_by(cards, user, card_order: 'updated_at')
+        expect(viewable.first).to eq(cards.sort_by(&:updated_at).reverse.first)
+        expect(viewable.last).to eq(cards.sort_by(&:updated_at).first)
+      end
+
+      it 'should return results according to the cached_test_scores sorting param' do
+        scored1 = collection.collections.first
+        scored1.update(cached_test_scores: { 'question_useful' => 30 })
+        scored2 = collection.collections.last
+        scored2.update(cached_test_scores: { 'question_useful' => 20 })
+
+        viewable = collection.collection_cards_viewable_by(cards, user, card_order: 'question_useful')
+        expect(viewable.first).to eq(scored1.parent_collection_card)
+        expect(viewable.second).to eq(scored2.parent_collection_card)
       end
     end
   end
