@@ -25,7 +25,9 @@ class Collection < ApplicationRecord
                  :cached_card_count
 
   # callbacks
+  after_touch :touch_related_cards, unless: :destroyed?
   after_commit :touch_related_cards, if: :saved_change_to_updated_at?, unless: :destroyed?
+
   after_commit :reindex_sync, on: :create
   after_commit :update_comment_thread_in_firestore, unless: :destroyed?
   after_save :pin_all_primary_cards, if: :now_master_template?
@@ -471,10 +473,11 @@ class Collection < ApplicationRecord
     false
   end
 
-  def cache_key
+  def cache_key(card_order = 'order')
     "#{jsonapi_cache_key}" \
       "/#{ActiveRecord::Migrator.current_version}" \
       "/#{ENV['HEROKU_RELEASE_VERSION']}" \
+      "/order_#{card_order}" \
       "/cards_#{collection_cards.maximum(:updated_at).to_i}" \
       "/roles_#{roles.maximum(:updated_at).to_i}"
   end
