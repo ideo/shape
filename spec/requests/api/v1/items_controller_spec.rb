@@ -145,7 +145,7 @@ describe Api::V1::ItemsController, type: :request, json: true, auth: true do
     end
   end
 
-  describe 'POST #duplicate' do
+  describe 'POST #duplicate', create_org: true do
     let!(:item) { create(:text_item, add_editors: [user]) }
     let(:path) { "/api/v1/items/#{item.id}/duplicate" }
 
