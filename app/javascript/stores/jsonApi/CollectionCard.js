@@ -125,12 +125,14 @@ class CollectionCard extends BaseRecord {
   async API_replace({ replacingId }) {
     try {
       const replacing = this.apiStore.find('collection_cards', replacingId)
+      this.parentCollection.removeCard(replacing)
+      // need to remove the item to reset its type (in case it changed)
+      this.apiStore.remove(replacing.record)
       const res = await this.apiStore.request(
         `collection_cards/${replacingId}/replace`,
         'PATCH',
         { data: this.toJsonApi() }
       )
-      this.parentCollection.removeCard(replacing)
       this.parentCollection.addCard(res.data)
       uiStore.closeBlankContentTool()
       uiStore.trackEvent('replace', this.parentCollection)
