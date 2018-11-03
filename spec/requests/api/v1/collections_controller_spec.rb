@@ -3,12 +3,11 @@ require 'rails_helper'
 describe Api::V1::CollectionsController, type: :request, json: true, auth: true do
   let(:user) { @user }
 
-  describe 'GET #show' do
+  describe 'GET #show', create_org: true do
     let!(:collection) {
       create(:collection, num_cards: 5, add_viewers: [user])
     }
     let(:path) { "/api/v1/collections/#{collection.id}" }
-    let(:user) { @user }
 
     it 'returns a 200' do
       get(path)

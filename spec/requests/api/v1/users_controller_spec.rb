@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-describe Api::V1::UsersController, type: :request, json: true, auth: true do
+describe Api::V1::UsersController, type: :request, json: true, auth: true, create_org: true do
   let(:user) { @user }
 
   describe 'GET #index' do

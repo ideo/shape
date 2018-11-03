@@ -1,11 +1,13 @@
 class OrganizationBuilder
   attr_reader :organization, :errors
 
-  def initialize(params, user)
+  def initialize(params, user, full_setup: true)
     @organization = Organization.new(name: params[:name])
     @errors = @organization.errors
     @user = user
     @params = params
+    # mainly just in tests that we don't need this overhead
+    @full_setup = full_setup
   end
 
   def save
@@ -16,9 +18,11 @@ class OrganizationBuilder
       update_primary_group!
       add_role
       setup_user_membership_and_collections
-      create_templates
-      create_network_organization
-      create_network_subscription
+      if @full_setup
+        create_templates
+        create_network_organization
+        create_network_subscription
+      end
     end
     true
   rescue ActiveRecord::RecordInvalid

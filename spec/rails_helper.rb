@@ -88,10 +88,13 @@ RSpec.configure do |config|
   end
 
   config.before(:each, auth: true) do
-    user = log_in_as_user
-    # Make sure user is part of org - all permissions needs it
-    Organization.create_for_user(user)
-    DatabaseCleaner.strategy = :transaction
+    log_in_as_user
+  end
+
+  # `create_org` only makes sense within specs also tagged `auth`
+  config.before(:each, create_org: true) do
+    # @user from `log_in_as_user` above
+    create_org_for_user(@user)
   end
 
   config.around(:each, auth: true) do |example|
