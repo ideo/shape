@@ -75,7 +75,9 @@ describe('InlineCollectionTest', () => {
     })
 
     it('should fetch the test collection', () => {
-      expect(props.apiStore.fetch).toHaveBeenCalled()
+      expect(props.apiStore.request).toHaveBeenCalledWith(
+        `test_collections/${testCollection.id}`
+      )
     })
 
     describe('if there is a survey response already for the user', () => {
@@ -84,7 +86,9 @@ describe('InlineCollectionTest', () => {
           ...testCollection,
           survey_response_for_user_id: 57,
         }
-        props.apiStore.fetch.mockReturnValue({ data: respondedTestCollection })
+        props.apiStore.request.mockReturnValue({
+          data: respondedTestCollection,
+        })
         wrapper = shallow(<InlineCollectionTest.wrappedComponent {...props} />)
       })
 
