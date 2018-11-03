@@ -18,18 +18,13 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
     builder = CollectionCardBuilder.new(params: card_params,
                                         type: type,
                                         parent_collection: @collection,
-                                        user: current_user,
-                                        replacing_card: @replacing_card)
+                                        user: current_user)
 
     if builder.create
       card = builder.collection_card
       # reload the user's roles
       current_user.reload.reset_cached_roles!
-      if @replacing_card.present?
-        create_notification(card, :replaced)
-      else
-        create_notification(card, :created)
-      end
+      create_notification(card, :created)
       render jsonapi: card.reload,
              include: [:parent, record: [:filestack_file]],
              expose: { current_record: card.record }
@@ -73,10 +68,16 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
   before_action :load_and_authorize_replacing_card, only: %i[replace]
   after_action :broadcast_replacing_updates, only: %i[replace]
   def replace
-    if @replacing_card.archive!
-      create
+    builder = CollectionCardReplacer.new(replacing_card: @replacing_card,
+                                         params: collection_card_params)
+    if builder.replace
+      card = builder.replacing_card
+      create_notification(card, :replaced)
+      render jsonapi: card.reload,
+             include: [:parent, record: [:filestack_file]],
+             expose: { current_record: card.record }
     else
-      render_api_errors @collection_card.errors
+      render_api_errors builder.errors
     end
   end
 
