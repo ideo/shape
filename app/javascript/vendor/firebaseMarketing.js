@@ -52,18 +52,18 @@ import 'firebase/firestore'
 const cypress = navigator && navigator.userAgent === 'cypress'
 
 const config = process.env.GOOGLE_FIRESTORE_SHAPE_MARKETING
-let db = {}
+const db = {}
 if (config && !cypress) {
   firebase.initializeApp(JSON.parse(config))
-  db = firebase.firestore()
-  db.settings({
+  db.store = firebase.firestore()
+  db.store.settings({
     // recommending setting for Firestore 5.0+
     timestampsInSnapshots: true,
   })
 }
 
 export function readFirebaseValue(collection, id) {
-  const docRef = db.collection(collection).doc(id)
+  const docRef = db.store.collection(collection).doc(id)
 
   docRef
     .get()
@@ -80,4 +80,4 @@ export function readFirebaseValue(collection, id) {
     })
 }
 
-export default { db }
+export default db.store

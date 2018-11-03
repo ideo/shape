@@ -4,6 +4,7 @@ import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import Modal from '~/ui/global/modals/Modal'
 import GroupModify from '~/ui/groups/GroupModify'
 import RolesMenu from '~/ui/roles/RolesMenu'
+import InlineLoader from '~/ui/layout/InlineLoader'
 import Loader from '~/ui/layout/Loader'
 import Group from '~/stores/jsonApi/Group'
 import Organization from '~/stores/jsonApi/Organization'
@@ -78,17 +79,21 @@ class OrganizationMenu extends React.Component {
     const { apiStore, uiStore, onClose } = this.props
     const newOrg = new Organization(organizationData, apiStore)
     try {
-      this.isLoading = true
+      runInAction(() => {
+        this.isLoading = true
+      })
       await newOrg.save()
       await apiStore.currentUser.switchOrganization(newOrg.id, {
         redirectPath: 'homepage',
       })
-      this.isLoading = false
       uiStore.update('orgCreated', true)
       onClose()
     } catch (err) {
-      this.isLoading = false
       uiStore.alert(err.error[0])
+    } finally {
+      runInAction(() => {
+        this.isLoading = false
+      })
     }
   }
 
@@ -149,11 +154,14 @@ class OrganizationMenu extends React.Component {
 
   renderCreateOrganization() {
     return (
-      <GroupModify
-        group={{}}
-        onSave={this.createOrganization}
-        groupType="Organization"
-      />
+      <div>
+        {this.isLoading && <InlineLoader />}
+        <GroupModify
+          group={{}}
+          onSave={this.createOrganization}
+          groupType="Organization"
+        />
+      </div>
     )
   }
 
