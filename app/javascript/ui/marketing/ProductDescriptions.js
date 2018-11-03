@@ -1,5 +1,5 @@
 import ProductDescription from '~/ui/marketing/ProductDescription'
-import { db } from '~/vendor/firebaseMarketing'
+import db from '~/vendor/firebaseMarketing'
 import styled from 'styled-components'
 import v from '~/utils/variables'
 
