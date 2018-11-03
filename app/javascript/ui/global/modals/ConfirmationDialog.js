@@ -1,4 +1,5 @@
 import PropTypes from 'prop-types'
+import { PropTypes as MobxPropTypes } from 'mobx-react'
 import FormControlLabel from '@material-ui/core/FormControlLabel'
 import styled from 'styled-components'
 
@@ -127,7 +128,7 @@ ConfirmationDialog.propTypes = {
   ...Dialog.childPropTypes,
   prompt: PropTypes.string,
   open: PropTypes.string,
-  options: PropTypes.arrayOf(PropTypes.node),
+  options: MobxPropTypes.arrayOrObservableArray,
   image: PropTypes.string,
   onConfirm: PropTypes.func,
   onCancel: PropTypes.func,
