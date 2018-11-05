@@ -59,13 +59,6 @@ class Organization < ApplicationRecord
     primary_group.can_edit?(user) || admin_group.can_edit?(user) || guest_group.can_edit?(user)
   end
 
-  def self.create_for_user(user)
-    name = [user.first_name, user.last_name, 'Organization'].compact.join(' ')
-    builder = OrganizationBuilder.new({ name: name }, user)
-    builder.save
-    builder.organization
-  end
-
   # NOTE: this method can be called many times for the same org
   def setup_user_membership_and_collections(user)
     # make sure they're on the org
@@ -79,10 +72,6 @@ class Organization < ApplicationRecord
     Roles::RemoveUserRolesFromOrganization.call(self, user)
     profile = Collection::UserProfile.find_by(user: user, organization: self)
     profile.archive! if profile.present?
-
-    if user.organizations.count.zero?
-      Organization.create_for_user(user)
-    end
 
     # Set current org as one they are a member of
     # If nil, that is fine as they shouldn't have a current organization

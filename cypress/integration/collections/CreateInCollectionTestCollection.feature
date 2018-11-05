@@ -26,6 +26,6 @@ Feature: Creating an "in-collection" Test Collection
     # NOTE: seemingly no way to test clipboard copying in cypress (i.e. "Get Link")
     When I capture the current URL
     And I visit the current Test URL
-    And I wait for '@apiGetCollection' to finish
-    And I wait for '@apiGetTestCollection' to finish
+    And I wait for "@apiGetCollection" to finish
+    And I wait for "@apiGetTestCollection" to finish
     Then I should see a "ActivityLogSurveyResponder"

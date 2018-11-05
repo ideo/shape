@@ -56,9 +56,8 @@ class InlineCollectionTest extends React.Component {
 
   fetchTestCollection() {
     const { apiStore } = this.props
-    return apiStore.fetch(
-      'test_collections',
-      this.collection.live_test_collection.id
+    return apiStore.request(
+      `test_collections/${this.collection.live_test_collection.id}`
     )
   }
 
