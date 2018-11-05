@@ -1,6 +1,8 @@
 import { routingStore, uiStore } from '~/stores'
 import BaseRecord from './BaseRecord'
 
+/* global IdeoSSO */
+
 class User extends BaseRecord {
   get name() {
     return [this.first_name, this.last_name].join(' ')
@@ -8,6 +10,17 @@ class User extends BaseRecord {
 
   get isCurrentUser() {
     return this.apiStore.currentUserId === this.id
+  }
+
+  async logout() {
+    const { apiStore } = this
+    await apiStore.request('/sessions', 'DELETE')
+    try {
+      // Log user out of IDEO network, back to homepage
+      await IdeoSSO.logout('/')
+    } catch (e) {
+      window.location = '/login'
+    }
   }
 
   async API_updateCurrentUser(option = {}) {

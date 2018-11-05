@@ -13,6 +13,8 @@ class HomePage extends React.Component {
       uiStore.openOrgCreateModal()
     } else {
       uiStore.closeDialog()
+      const { apiStore } = this.props
+      apiStore.currentUser.logout()
     }
   }
 
