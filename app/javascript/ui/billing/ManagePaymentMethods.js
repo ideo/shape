@@ -3,6 +3,7 @@ import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import trackError from '~/utils/trackError'
 import PaymentMethods from '~shared/components/compounds/PaymentMethods'
 import Loader from '~/ui/layout/Loader'
+import AddCardModal from '~/ui/global/modals/AddCardModal'
 import EmptyList from '~/ui/billing/EmptyList'
 import styled from 'styled-components'
 import v from '~/utils/variables'
@@ -84,6 +85,8 @@ class ManagePaymentMethods extends React.Component {
         makePaymentMethodDefault={this.makePaymentMethodDefault}
         destroyPaymentMethod={this.destroyPaymentMethod}
         tokenCreated={this.tokenCreated}
+        ModalContainer={AddCardModal}
+        BackdropComponent={({ children }) => <div />}
         NoPaymentMethodsComponent={() => (
           <EmptyList>No payments methods currently on file</EmptyList>
         )}
