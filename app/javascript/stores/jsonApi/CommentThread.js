@@ -102,7 +102,7 @@ class CommentThread extends BaseRecord {
     // simulate the updated_at update so that the thread will move to most recent
     this.updated_at = new Date()
     // dynamically set the endpoint to belong to this thread
-    Comment.endpoint = `comment_threads/${this.id}/comments`
+    Comment.endpoint = apiUrl(`comment_threads/${this.id}/comments`)
     // create an unsaved comment so that we can see it immediately
     const comment = new Comment(commentData, this.apiStore)
     comment.addReference('author', this.apiStore.currentUser, {
