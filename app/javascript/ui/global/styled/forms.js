@@ -105,14 +105,9 @@ export const TextButton = styled.button`
   font-weight: 500;
   letter-spacing: 0.09375rem;
   cursor: pointer;
-  color: ${v.colors.black};
   max-width: ${props => (props.maxWidth ? `${props.maxWidth}px` : 'none')};
 `
 TextButton.displayName = 'StyledTextButton'
-
-export const SmallTextButton = TextButton.extend`
-  font-size: 0.75rem;
-`
 
 /** @component */
 export const TextField = styled.input`

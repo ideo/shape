@@ -38,8 +38,9 @@ const CenteredPaddedContent = styled.div`
 `
 
 const IconHolder = styled.span`
+  display: block;
+  margin: 30px auto;
   width: 84px;
-  margin-bottom: 30px;
 `
 
 const ImageHolder = styled.span`

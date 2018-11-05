@@ -5,7 +5,7 @@ import styled from 'styled-components'
 
 import {
   FormActionsContainer,
-  SmallTextButton,
+  TextButton,
   Checkbox,
 } from '~/ui/global/styled/forms'
 import { ConfirmText } from '~/ui/global/styled/typography'
@@ -35,6 +35,11 @@ const ConfirmOption = ConfirmText.extend`
   }
 `
 
+const OptionsButton = TextButton.extend`
+  color: ${v.colors.black};
+  font-size: 0.75rem;
+`
+
 class ConfirmationDialog extends React.PureComponent {
   handleCancel = ev => {
     if (ev) ev.preventDefault()
@@ -56,6 +61,11 @@ class ConfirmationDialog extends React.PureComponent {
 
   get isOpen() {
     return this.props.open === 'confirm'
+  }
+
+  get ButtonEl() {
+    if (this.props.options.length) return OptionsButton
+    return TextButton
   }
 
   render() {
@@ -103,20 +113,20 @@ class ConfirmationDialog extends React.PureComponent {
             />
           )}
           <FormActionsContainer style={{ clear: 'both' }}>
-            <SmallTextButton
+            <this.ButtonEl
               data-cy="CancelButton"
               maxWidth={options.length ? 200 : 150}
               onClick={this.handleCancel}
             >
               {cancelText}
-            </SmallTextButton>
-            <SmallTextButton
+            </this.ButtonEl>
+            <this.ButtonEl
               data-cy="ConfirmButton"
               maxWidth={options.length ? 200 : 150}
               onClick={this.handleConfirm}
             >
               {confirmText}
-            </SmallTextButton>
+            </this.ButtonEl>
           </FormActionsContainer>
         </form>
       </Dialog>
