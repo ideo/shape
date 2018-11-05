@@ -67,6 +67,11 @@ const selectOptions = [
   { value: 'question_category_satisfaction', label: 'Category Satisfaction' },
 ]
 
+function optionSort(a, b) {
+  if (b.value === '') return 1
+  return a.label.localeCompare(b.label)
+}
+
 @observer
 class TestDesigner extends React.Component {
   constructor(props) {
@@ -208,7 +213,7 @@ class TestDesigner extends React.Component {
             value={card.card_question_type || ''}
             onChange={this.handleSelectChange(card)}
           >
-            {selectOptions.map(opt => (
+            {selectOptions.sort(optionSort).map(opt => (
               <SelectOption
                 key={opt.value}
                 classes={{
