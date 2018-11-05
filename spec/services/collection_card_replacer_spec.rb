@@ -64,6 +64,37 @@ RSpec.describe CollectionCardReplacer, type: :service do
         builder.replace
         expect(item.can_edit?(user)).to be true
       end
+
+      context 'with filestack_file_attributes' do
+        let(:params) do
+          {
+            item_attributes: {
+              type: 'Item::FileItem',
+              filestack_file_attributes: {
+                url: 'https://process.filestackapi.com/AKbadkt4jRcKqMsj60Izaz/resize=width:1200,fit:max/rotate=deg:exif/wvW29dKNT8q4kpa6NrTK',
+                handle: 'wvW29dKNT8q4kpa6NrTK',
+                filename: 'Elephant_statue_in_Butterfly_Park.jpg',
+                size: 6_812_242,
+                mimetype: 'image/jpeg',
+              },
+            },
+          }
+        end
+
+        it 'should create a new filestack file for the item' do
+          expect(item.filestack_file_id).to be nil
+          expect do
+            builder.replace
+          end.to change(FilestackFile, :count).by(1)
+          expect(item.filestack_file_id).to eq FilestackFile.last.id
+          # have to refetch since it's now a new model type
+          id = item.id
+          item = Item.find(id)
+          expect(item.is_a?(Item::FileItem)).to be true
+          # should clear any previous attrs
+          expect(item.text_data.present?).to be false
+        end
+      end
     end
   end
 end

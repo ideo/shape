@@ -5,16 +5,18 @@ class CollectionCardReplacer
   def initialize(replacing_card:, params:)
     @replacing_card = replacing_card
     @item = @replacing_card.item
-    @params = params
+    @attrs = params[:item_attributes]
     @errors = nil
   end
 
   def replace
-    if @item.blank? || @params[:item_attributes].blank?
+    if @item.blank? || @attrs.blank?
       @replacing_card.errors.add(:item, "can't be blank")
+      # initially use card errors
       @errors = @replacing_card.errors
       return false
     end
+    # now capture errors on the item
     @errors = @item.errors
     assign_item_attributes
     @item.save
@@ -31,8 +33,11 @@ class CollectionCardReplacer
       updated_at: Time.now,
     ).attributes
     # set the passed in attrs
-    @item.attributes = @params[:item_attributes]
+    @item.attributes = @attrs
     # the class type may have changed
-    @item = @item.becomes(@params[:item_attributes][:type].constantize)
+    @item = @item.becomes(@attrs[:type].constantize)
+    # this needs to happen after the @item.becomes
+    return unless @attrs[:filestack_file_attributes].present?
+    @item.filestack_file_attributes = @attrs[:filestack_file_attributes]
   end
 end
