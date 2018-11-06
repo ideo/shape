@@ -425,7 +425,7 @@ class GridCardBlank extends React.Component {
     )
     const testBctBox = (
       <BctButtonBox
-        tooltip="Create test"
+        tooltip="Get feedback"
         type="testCollection"
         creating={creating}
         size={size}
