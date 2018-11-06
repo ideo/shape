@@ -1,7 +1,7 @@
 import Deactivated from '~/ui/layout/Deactivated'
 import { Link } from 'react-router-dom'
 
-describe('GlobalSearch', () => {
+describe('Deactivated', () => {
   const apiStore = {
     currentUser: {
       current_organization: {
