@@ -10,6 +10,7 @@ import ChannelManager from '~/utils/ChannelManager'
 import CollectionGrid from '~/ui/grid/CollectionGrid'
 import FloatingActionButton from '~/ui/global/FloatingActionButton'
 import Loader from '~/ui/layout/Loader'
+import Deactivated from '~/ui/layout/Deactivated'
 import MoveModal from '~/ui/grid/MoveModal'
 import PageContainer from '~/ui/layout/PageContainer'
 import PageError from '~/ui/global/PageError'
@@ -306,6 +307,9 @@ class CollectionPage extends PageWithApi {
   )
 
   render() {
+    if (this.props.apiStore.currentUser.current_organization.deactivated) {
+      return <Deactivated />
+    }
     // this.error comes from PageWithApi
     if (this.error) return <PageError error={this.error} />
     const { collection } = this

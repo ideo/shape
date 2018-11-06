@@ -10,6 +10,7 @@ import ImageItem from '~/ui/items/ImageItem'
 import Loader from '~/ui/layout/Loader'
 import MoveModal from '~/ui/grid/MoveModal'
 import PageContainer from '~/ui/layout/PageContainer'
+import Deactivated from '~/ui/layout/Deactivated'
 import PageHeader from '~/ui/pages/shared/PageHeader'
 import PageWithApi from '~/ui/pages/PageWithApi'
 import PageError from '~/ui/global/PageError'
@@ -120,6 +121,10 @@ class ItemPage extends PageWithApi {
   }
 
   render() {
+    if (this.props.apiStore.currentUser.current_organization.deactivated) {
+      return <Deactivated />
+    }
+
     const { uiStore } = this.props
     // this.error comes from PageWithApi
     if (this.error) return <PageError error={this.error} />
