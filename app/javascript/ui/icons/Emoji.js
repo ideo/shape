@@ -22,8 +22,8 @@ function emojiFallback(symbol) {
   const fallback = emojiFallbackMap[symbol]
   if (!fallback) {
     trackError(new Error(`Missing emoji: ${symbol}`), {
-      source: 'findOrBuildCommentThread',
-      name: 'fetchThreads',
+      source: 'Emoji',
+      name: 'emojiFallback',
     })
     return EmojiError
   }
