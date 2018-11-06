@@ -112,10 +112,11 @@ class TestDesigner extends React.Component {
     })
   }
 
-  handleNew = card => () => {
+  handleNew = (card, addBefore) => () => {
     const { collection } = this.props
+    const order = addBefore ? card.order - 0.5 : card.order + 1
     collection.confirmEdit({
-      onConfirm: () => this.createNewQuestionCard({ order: card.order + 1 }),
+      onConfirm: () => this.createNewQuestionCard({ order }),
     })
   }
 
@@ -189,8 +190,8 @@ class TestDesigner extends React.Component {
     return card.API_create()
   }
 
-  renderHotEdge(card) {
-    return <QuestionHotEdge onAdd={this.handleNew(card)} />
+  renderHotEdge(card, addBefore = false) {
+    return <QuestionHotEdge onAdd={this.handleNew(card, addBefore)} />
   }
 
   renderQuestionSelectForm(card) {
@@ -310,6 +311,10 @@ class TestDesigner extends React.Component {
                 flexWrap: 'wrap',
               }}
             >
+              {i === 0 &&
+                this.canEdit &&
+                card.card_question_type !== 'question_finish' &&
+                this.renderHotEdge(card, true)}
               {this.renderQuestionSelectForm(card)}
               <TestQuestionHolder editing userEditable={userEditable}>
                 <TestQuestion
