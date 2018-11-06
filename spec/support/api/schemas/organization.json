@@ -4,6 +4,7 @@
     "active_users_count": { "type": "number" },
     "current_billing_period_end": { "type": "date" },
     "current_billing_period_start": { "type": "date" },
+    "deactivated": { "type": "boolean" },
     "domain_whitelist": { "type": "array" },
     "in_app_billing": { "type": "boolean" },
     "inaccessible_at": { "type": "date" },
