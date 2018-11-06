@@ -303,6 +303,7 @@ class GridCardBlank extends React.Component {
       height,
       // `parent` is the collection this card belongs to
       parent_id: parent.id,
+      image_contain: this.props.defaultShowWholeImage,
     }
     // apply nested attrs
     Object.assign(attrs, nested)
@@ -576,6 +577,7 @@ GridCardBlank.propTypes = {
   replacingId: PropTypes.string,
   order: PropTypes.number,
   testCollectionCard: PropTypes.bool,
+  defaultShowWholeImage: PropTypes.bool,
 }
 GridCardBlank.wrappedComponent.propTypes = {
   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
@@ -587,6 +589,7 @@ GridCardBlank.defaultProps = {
   replacingId: null,
   order: null,
   testCollectionCard: false,
+  defaultShowWholeImage: false,
 }
 
 // give a name to the injected component for unit tests
