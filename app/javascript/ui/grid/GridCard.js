@@ -315,7 +315,7 @@ class GridCard extends React.Component {
                 wrapperClassName="card-menu"
                 card={card}
                 canEdit={this.canEditCard}
-                canReplace={record.canReplace}
+                canReplace={record.canReplace && !card.link}
                 menuOpen={menuOpen}
                 onOpen={this.openMenu}
                 onLeave={this.closeMenu}
