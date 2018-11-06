@@ -311,10 +311,7 @@ class TestDesigner extends React.Component {
                 flexWrap: 'wrap',
               }}
             >
-              {i === 0 &&
-                this.canEdit &&
-                card.card_question_type !== 'question_finish' &&
-                this.renderHotEdge(card, true)}
+              {i === 0 && this.canEdit && this.renderHotEdge(card, true)}
               {this.renderQuestionSelectForm(card)}
               <TestQuestionHolder editing userEditable={userEditable}>
                 <TestQuestion
