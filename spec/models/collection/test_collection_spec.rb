@@ -327,6 +327,11 @@ describe Collection::TestCollection, type: :model do
           expect(test_collection.reopen!).to be true
           expect(test_collection.live?).to be true
         end
+
+        it 'should call the launch_test! method on itself with `reopening` param' do
+          expect(test_collection).to receive(:launch_test!).with(initiated_by: user, reopening: true)
+          test_collection.reopen!(initiated_by: user)
+        end
       end
 
       describe '#serialized_for_test_survey' do
@@ -339,6 +344,83 @@ describe Collection::TestCollection, type: :model do
           card_ids = test_collection.test_design.collection_cards.map(&:id).map(&:to_s)
           expect(data[:data][:relationships][:question_cards][:data].map { |i| i[:id] }).to match_array(card_ids)
         end
+      end
+    end
+  end
+
+  context 'with a submission box template' do
+    let(:submission_box) { create(:submission_box) }
+    let(:submission_template) { create(:collection, master_template: true, parent_collection: submission_box) }
+    let!(:test_collection) do
+      create(:test_collection, :completed, master_template: true, parent_collection: submission_template)
+    end
+    let(:submission) { create(:collection, :submission, parent_collection: submission_box.submissions_collection) }
+    let(:submission_test) { create(:test_collection, :completed, template: test_collection, parent_collection: submission) }
+
+    before do
+      submission_box.setup_submissions_collection!
+      submission_box.update(submission_template: submission_template)
+    end
+
+    describe '#launch!' do
+      context 'with valid draft collection (default status)' do
+        it 'should launch without creating a TestDesign collection' do
+          expect(test_collection.launch!).to be true
+          expect(test_collection.test_status).to eq 'live'
+          expect(test_collection.test_design.present?).to be false
+        end
+
+        it 'should find all submissions and mark their tests as launchable' do
+          # make sure this is now persisted
+          submission_test.reload
+          test_collection.launch!
+          submission.reload
+          expect(submission.submission_attrs['launchable_test_id']).to eq submission_test.id
+          expect(submission.submission_attrs['test_status']).to eq 'draft'
+          expect(submission.submission_attrs['template_test_id']).to eq test_collection.id
+        end
+      end
+    end
+
+    describe '#launchable?' do
+      it 'should only return true when the master template test has launched' do
+        expect(submission_test.launchable?).to be false
+        test_collection.launch!
+        expect(submission_test.launchable?).to be true
+      end
+    end
+
+    describe '#update_cached_submission_status' do
+      it 'should update the submission test_status accordingly' do
+        test_collection.launch!
+        expect(submission_test.launch!).to be true
+        expect(submission.reload.submission_attrs['test_status']).to eq 'live'
+      end
+    end
+  end
+
+  context 'with an in-collection test' do
+    let(:parent_collection) { create(:collection) }
+    let!(:live_test_collection) do
+      create(:test_collection,
+             test_status: :live,
+             parent_collection: parent_collection,
+             collection_to_test: parent_collection)
+    end
+    let!(:test_collection) do
+      create(:test_collection,
+             :completed,
+             parent_collection: parent_collection,
+             collection_to_test: parent_collection)
+    end
+
+    describe '#launchable?' do
+      it 'should only return true if there are no other live tests' do
+        expect(test_collection.launchable?).to be false
+        live_test_collection.close!
+        # make sure it picks up the related test now being closed
+        parent_collection.reload
+        expect(test_collection.launchable?).to be true
       end
     end
   end

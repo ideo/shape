@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20181101191730) do
+ActiveRecord::Schema.define(version: 20181106065121) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -68,6 +68,7 @@ ActiveRecord::Schema.define(version: 20181101191730) do
     t.index ["item_id"], name: "index_collection_cards_on_item_id"
     t.index ["parent_id"], name: "index_collection_cards_on_parent_id"
     t.index ["templated_from_id"], name: "index_collection_cards_on_templated_from_id"
+    t.index ["type"], name: "index_collection_cards_on_type"
   end
 
   create_table "collections", force: :cascade do |t|
@@ -103,6 +104,7 @@ ActiveRecord::Schema.define(version: 20181101191730) do
     t.index ["submission_template_id"], name: "index_collections_on_submission_template_id"
     t.index ["template_id"], name: "index_collections_on_template_id"
     t.index ["test_status"], name: "index_collections_on_test_status"
+    t.index ["type"], name: "index_collections_on_type"
   end
 
   create_table "comment_threads", force: :cascade do |t|
@@ -202,6 +204,7 @@ ActiveRecord::Schema.define(version: 20181101191730) do
     t.index ["breadcrumb"], name: "index_items_on_breadcrumb", using: :gin
     t.index ["cloned_from_id"], name: "index_items_on_cloned_from_id"
     t.index ["data_source_type", "data_source_id"], name: "index_items_on_data_source_type_and_data_source_id"
+    t.index ["type"], name: "index_items_on_type"
   end
 
   create_table "notifications", force: :cascade do |t|

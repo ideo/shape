@@ -165,6 +165,8 @@ class TestDesigner extends React.Component {
     // viewers still see the select forms, but disabled
     const { collection } = this.props
     // If this is a template instance, don't allow editing
+    // NOTE: if we ever allow template instance editors to add their own questions at the end
+    // (before the finish card?) then we may want to individually check canEdit on a per card basis
     if (collection.isTemplated) return false
     return collection.can_edit_content
   }

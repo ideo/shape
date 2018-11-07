@@ -29,20 +29,27 @@ class Collection
 
       error_on_all_events :aasm_event_failed
 
-      event :launch, before: proc { |**args|
-                               return false unless test_completed?
-                               remove_incomplete_question_items
-                               create_test_design_and_move_cards!(initiated_by: args[:initiated_by])
-                             } do
+      event :launch,
+            guard: :completed_and_launchable?,
+            after_commit: proc { |**args|
+                            launch_test!(initiated_by: args[:initiated_by])
+                          } do
         transitions from: :draft, to: :live
       end
 
-      event :close do
+      event :close,
+            after_commit: proc {
+                            update_cached_submission_status if inside_a_submission?
+                          } do
         transitions from: :live, to: :closed
       end
 
-      event :reopen do
-        transitions from: :closed, to: :live, guard: :test_completed?
+      event :reopen,
+            guard: :can_reopen?,
+            after_commit: proc { |**args|
+                            launch_test!(initiated_by: args[:initiated_by], reopening: true)
+                          } do
+        transitions from: :closed, to: :live
       end
     end
 
@@ -53,6 +60,94 @@ class Collection
         question_useful
         question_finish
       ]
+    end
+
+    def launch_test!(initiated_by: nil, reopening: false)
+      # remove the "blanks"
+      remove_incomplete_question_items
+      if submission_box_template_test?
+        update_submissions_launch_status
+        # submission box master template test doesn't create a test_design, move cards, etc.
+        return true
+      end
+      update_cached_submission_status if inside_a_submission?
+      # TODO: Perhaps need to do *some* of this setup when reopening?
+      create_test_design_and_move_cards!(initiated_by: initiated_by) unless reopening
+    end
+
+    def update_cached_submission_status
+      # we need to track any changes in the cached test_status
+      submission = parent_submission
+      submission.submission_attrs['test_status'] = test_status
+      submission.save
+    end
+
+    def update_submissions_launch_status
+      return unless master_template?
+      # TODO: Probably should move to a worker, e.g. if hundreds or thousands of submissions
+      parent_submission_box.submissions_collection.collections.each do |c|
+        # find the launchable test within this particular submission
+        launchable_test = Collection.in_collection(c).find_by(template_id: id)
+        next unless launchable_test.present?
+        if launchable_test.is_a?(Collection::TestDesign)
+          launchable_test = launchable_test.test_collection
+        end
+        c.update(
+          submission_attrs: {
+            # this should have already been set but want to preserve the value as true
+            submission: true,
+            template_test_id: id,
+            launchable_test_id: launchable_test.id,
+            test_status: launchable_test.test_status,
+          },
+        )
+      end
+    end
+
+    # various checks for if this test_collection is in a launchable state
+    # note that `test_completed?` is independent from this
+    def launchable?
+      return false unless draft? || closed?
+      # is this in a submission? If so, am I tied to a test template, and is that one launched?
+      return template.live? if templated? && inside_a_submission?
+      # standalone tests otherwise don't really have any restrictions
+      return true unless collection_to_test_id.present?
+      # lastly -- make sure there is not another live in-collection test for the same collection
+      collection_to_test.live_test_collection.blank?
+    end
+
+    def test_completed?
+      complete = true
+      unless incomplete_media_items.count.zero?
+        errors.add(:base,
+                   'Please add an image or video for your idea to question ' +
+                   incomplete_media_items.map { |i| i.parent_collection_card.order + 1 }.to_sentence)
+        complete = false
+      end
+
+      unless incomplete_description_items.count.zero?
+        errors.add(:base,
+                   'Please add your idea description to question ' +
+                   incomplete_description_items.map { |i| i.parent_collection_card.order + 1 }.to_sentence)
+        complete = false
+      end
+
+      unless incomplete_category_satisfaction_items.count.zero?
+        errors.add(:base,
+                   'Please add your category to question ' +
+                   incomplete_category_satisfaction_items.map { |i| i.parent_collection_card.order + 1 }.to_sentence)
+        complete = false
+      end
+      complete
+    end
+
+    def completed_and_launchable?
+      test_completed? && launchable?
+    end
+
+    def can_reopen?
+      return false unless launchable? && test_completed?
+      test_design.present? || submission_box_template_test?
     end
 
     def duplicate!(**args)
@@ -80,16 +175,12 @@ class Collection
       duplicate
     end
 
-    # alias method, will delegate to test_design if test is live
+    # alias method, will delegate to test_design if available
     def question_items
       if test_design.present?
         return test_design.question_items
       end
       prelaunch_question_items
-    end
-
-    def can_reopen?
-      closed? && test_design.present?
     end
 
     def test_open_response_collections
@@ -101,31 +192,6 @@ class Collection
         session_uid: SecureRandom.uuid,
         user_id: user_id,
       )
-    end
-
-    def test_completed?
-      complete = true
-      unless incomplete_media_items.count.zero?
-        errors.add(:base,
-                   'Please add an image or video for your idea to question ' +
-                   incomplete_media_items.map { |i| i.parent_collection_card.order + 1 }.to_sentence)
-        complete = false
-      end
-
-      unless incomplete_description_items.count.zero?
-        errors.add(:base,
-                   'Please add your idea description to question ' +
-                   incomplete_description_items.map { |i| i.parent_collection_card.order + 1 }.to_sentence)
-        complete = false
-      end
-
-      unless incomplete_category_satisfaction_items.count.zero?
-        errors.add(:base,
-                   'Please add your category to question ' +
-                   incomplete_category_satisfaction_items.map { |i| i.parent_collection_card.order + 1 }.to_sentence)
-        complete = false
-      end
-      complete
     end
 
     def survey_response_for_user(user_id)

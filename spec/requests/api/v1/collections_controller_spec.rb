@@ -16,7 +16,8 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
 
     it 'matches JSON schema' do
       get(path)
-      expect(json['data']['attributes']).to match_json_schema('collection')
+      # we don't use strict matching since some attrs only appear conditionally
+      expect(json['data']['attributes']).to match_json_schema('collection', strict: false)
     end
 
     it 'should include breadcrumb' do
@@ -214,7 +215,7 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
       it 'matches Collection schema' do
         post(path, params: params)
         expect(response.status).to eq(200)
-        expect(json['data']['attributes']).to match_json_schema('collection')
+        expect(json['data']['attributes']).to match_json_schema('collection', strict: false)
       end
 
       it 'broadcasts collection updates' do
@@ -315,7 +316,7 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
 
     it 'matches Collection schema' do
       patch(path, params: params)
-      expect(json['data']['attributes']).to match_json_schema('collection')
+      expect(json['data']['attributes']).to match_json_schema('collection', strict: false)
     end
 
     it 'updates the name' do
