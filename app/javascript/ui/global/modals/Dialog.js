@@ -9,7 +9,7 @@ const { CloseIcon } = ICONS
 
 const StyledDialog = styled(MuiDialog)`
   .modal__paper {
-    background-color: ${props => props.backgroundColor};
+    background-color: ${props => props.variant.backgroundColor};
     border-radius: 6px;
     color: white;
     opacity: 0.95;
@@ -97,7 +97,8 @@ class Dialog extends React.PureComponent {
         aria-labelledby="Confirmation"
         BackdropProps={{ invisible: true }}
         maxWidth={maxWidth}
-        backgroundColor={backgroundColor}
+        // using suggestion here: https://git.io/fpUnP
+        variant={{ backgroundColor }}
       >
         <ModalCloseButton onClick={this.handleClose}>
           <CloseIcon />
