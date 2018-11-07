@@ -190,6 +190,55 @@ describe Organization, type: :model do
       end
     end
 
+    describe 'update deactivated' do
+      context 'changed to true' do
+        let(:organization) { create(:organization, deactivated: false) }
+        it 'cancels the existing subscription' do
+          network_organization = double('network_organization', id: 123)
+          subscription = double('subscription')
+
+          allow(organization).to receive(:network_organization).and_return(network_organization)
+
+          allow(NetworkApi::Subscription).to receive(:find).with(
+            organization_id: network_organization.id,
+            active: true,
+          ).and_return([subscription])
+
+          expect(subscription).to receive(:cancel).with(
+            immediately: true,
+          )
+
+          organization.update_attributes(deactivated: true)
+        end
+      end
+
+      context 'changed to false' do
+        let(:organization) { create(:organization, deactivated: true) }
+        it 'creates a new subscription with existing payment method' do
+          plan = double('plan', id: 123)
+          network_organization = double('network_organization', id: 345)
+          payment_method = double(id: 456)
+
+          allow(NetworkApi::Plan).to receive(:first).and_return(plan)
+
+          allow(NetworkApi::PaymentMethod).to receive(:find).with(
+            organization_id: network_organization.id,
+            default: true,
+          ).and_return([payment_method])
+
+          allow(organization).to receive(:network_organization).and_return(network_organization)
+
+          expect(NetworkApi::Subscription).to receive(:create).with(
+            organization_id: network_organization.id,
+            plan_id: plan.id,
+            payment_method_id: payment_method.id,
+          )
+
+          organization.update_attributes(deactivated: false)
+        end
+      end
+    end
+
     describe '#friendly_id' do
       let(:organization) { create(:organization) }
 
