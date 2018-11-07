@@ -38,6 +38,7 @@ describe('BillingInformation', () => {
         price_per_user: 1.23,
         current_billing_period_start: '01/01/2015',
         current_billing_period_end: '01/31/2015',
+        deactivated: false,
       },
     }
     networkStore = {
@@ -45,6 +46,17 @@ describe('BillingInformation', () => {
       loadPlans: jest.fn(() => Promise.resolve()),
     }
   })
+
+  describe('organization is deactivated', () => {
+    beforeEach(() => {
+      apiStore.currentUserOrganization.deactivated = true
+    })
+
+    it('renders nothing', async () => {
+      await render(apiStore, networkStore)
+    })
+  })
+
   describe('in app billing enabled', () => {
     beforeEach(() => {
       apiStore.currentUserOrganization.in_app_billing = true

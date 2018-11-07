@@ -113,10 +113,15 @@ class BillingInformation extends React.Component {
         price_per_user,
         trial_ends_at,
         trial_users_count,
+        deactivated,
       },
     } = this.props.apiStore
 
-    const trialsUsedCount =
+    if (deactivated) {
+      return null
+    }
+
+    const trailsUsedCount =
       active_users_count > trial_users_count
         ? trial_users_count
         : active_users_count
