@@ -1,12 +1,11 @@
 class CollectionCardBuilder
   attr_reader :collection_card, :errors
 
-  def initialize(params:, parent_collection:, user: nil, type: 'primary', replacing_card: nil)
+  def initialize(params:, parent_collection:, user: nil, type: 'primary')
     @collection_card = parent_collection.send("#{type}_collection_cards").build(params)
     @errors = @collection_card.errors
     @user = user
     @parent_collection = parent_collection
-    @replacing_card = replacing_card
   end
 
   def create
@@ -30,10 +29,6 @@ class CollectionCardBuilder
   def create_collection_card
     # NOTE: for now you can *only* create pinned cards in a master template
     @collection_card.pinned = true if @collection_card.master_template_card?
-    if @replacing_card.present?
-      @collection_card.pinned = @replacing_card.pinned
-      @collection_card.templated_from_id = @replacing_card.templated_from_id
-    end
 
     # TODO: rollback transaction if these later actions fail; add errors, return false
     @collection_card.save.tap do |result|

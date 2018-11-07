@@ -384,7 +384,9 @@ class ApiStore extends jsonapi(datxCollection) {
   // what's listed below but it was trying to do `this.find(obj, id)` with no id
   remove(obj, id) {
     if (typeof obj === 'object') {
-      this.__removeModel(obj)
+      runInAction(() => {
+        this.__removeModel(obj)
+      })
     } else {
       super.remove(obj, id)
     }

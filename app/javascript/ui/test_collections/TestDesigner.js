@@ -12,11 +12,11 @@ import {
   TestQuestionHolder,
   styledTestTheme,
 } from '~/ui/test_collections/shared'
-import { apiStore } from '~/stores/'
 import QuestionHotEdge from '~/ui/test_collections/QuestionHotEdge'
 import TestQuestion from '~/ui/test_collections/TestQuestion'
 import RadioControl from '~/ui/global/RadioControl'
 import PinnedIcon from '~/ui/icons/PinnedIcon'
+import { apiStore } from '~/stores'
 // NOTE: Always import these models after everything else, can lead to odd dependency!
 import CollectionCard from '~/stores/jsonApi/CollectionCard'
 
@@ -289,13 +289,15 @@ class TestDesigner extends React.Component {
     const inner = collection.collection_cards.map((card, i) => {
       let position
       const item = card.record
+      // blank item can occur briefly while the placeholder card/item is being replaced
+      if (!item) return null
       if (i === 0) position = 'question_beginning'
       if (i === cardCount - 1) position = 'question_end'
       const userEditable = [
         'media',
         'question_media',
         'question_description',
-      ].includes(card.record.question_type)
+      ].includes(item.question_type)
       return (
         <FlipMove appearAnimation="fade" key={card.id}>
           <div>
