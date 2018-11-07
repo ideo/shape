@@ -96,6 +96,7 @@ class PageWithApi extends React.Component {
   fetchData = props => {
     if (!_.isFunction(this.requestPath)) return null
     const { apiStore, uiStore } = props
+    uiStore.update('isLoading', true)
     return apiStore
       .request(this.requestPath(props))
       .then(response => {
