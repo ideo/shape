@@ -6,56 +6,38 @@ jest.mock('../../../app/javascript/utils/apiSaveModel', () => ({
 }))
 
 describe('ReactivateAccount', () => {
-  const apiStore = {
-    currentUser: {
-      current_organization: {
+  const props = {
+    apiStore: {
+      currentUserOrganization: {
+        deactivated: false,
         name: 'foo',
-        primary_group: {},
+        primary_group: {
+          filestack_file_url: 'foo://bar/baz',
+        },
       },
     },
   }
-  let wrapper
-  beforeEach(() => {
-    wrapper = shallow(
-      <ReactivateAccount.wrappedComponent apiStore={apiStore} />
-    )
-  })
+
+  const render = () =>
+    shallow(<ReactivateAccount.wrappedComponent {...props} />)
 
   describe('organization account not deactivated', () => {
     beforeEach(() => {
-      wrapper.setProps({
-        apiStore: {
-          currentUser: {
-            current_organization: {
-              name: 'foo',
-              deactivated: false,
-            },
-          },
-        },
-      })
+      props.apiStore.currentUserOrganization.deactivated = false
     })
 
     it('renders nothing', () => {
-      expect(wrapper.type()).toEqual(null)
+      expect(render().type()).toEqual(null)
     })
   })
 
   describe('organization account is deactivated', () => {
     beforeEach(() => {
-      wrapper.setProps({
-        apiStore: {
-          currentUser: {
-            current_organization: {
-              name: 'foo',
-              deactivated: true,
-            },
-          },
-        },
-      })
+      props.apiStore.currentUserOrganization.deactivated = true
     })
 
     it('renders a message about the account being closed', () => {
-      expect(wrapper.html()).toEqual(
+      expect(render().html()).toEqual(
         expect.stringContaining('This account is closed.')
       )
     })

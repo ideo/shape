@@ -121,7 +121,7 @@ class BillingInformation extends React.Component {
       return null
     }
 
-    const trailsUsedCount =
+    const trialsUsedCount =
       active_users_count > trial_users_count
         ? trial_users_count
         : active_users_count

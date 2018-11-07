@@ -38,7 +38,7 @@ class ReactivateAccount extends React.Component {
 
   reactivate = async () => {
     runInAction(() => (this.working = true))
-    const organization = this.props.apiStore.currentUser.current_organization
+    const organization = this.props.apiStore.currentUserOrganization
     organization.deactivated = false
     try {
       await apiSaveModel(organization)
