@@ -94,6 +94,7 @@ Dialog.propTypes = {
     'Back',
     'Celebrate',
     'Close',
+    'CloseSubtractGroup',
     'Leave',
     'Link',
     'Mail',

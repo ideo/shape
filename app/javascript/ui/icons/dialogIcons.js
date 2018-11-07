@@ -3,6 +3,7 @@ import ArchiveIcon from '~/ui/icons/ArchiveIcon'
 import BackIcon from '~/ui/icons/BackIcon'
 import CelebrateIcon from '~/ui/icons/CelebrateIcon'
 import CloseIcon from '~/ui/icons/CloseIcon'
+import CloseSubtractGroupIcon from '~/ui/icons/CloseSubtractGroupIcon'
 import InfoIcon from '~/ui/icons/InfoIcon'
 import LeaveIcon from '~/ui/icons/LeaveIcon'
 import LinkIcon from '~/ui/icons/LinkIcon'
@@ -17,6 +18,7 @@ export default {
   ArchiveIcon,
   BackIcon,
   CloseIcon,
+  CloseSubtractGroupIcon,
   InfoIcon,
   LeaveIcon,
   LinkIcon,
