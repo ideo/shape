@@ -3,6 +3,7 @@ import { animateScroll } from 'react-scroll'
 import { observable, action, runInAction, computed } from 'mobx'
 import queryString from 'query-string'
 import sleep from '~/utils/sleep'
+import { setScrollHeight } from '~/utils/scrolling'
 import v from '~/utils/variables'
 
 export default class UiStore {
@@ -63,6 +64,10 @@ export default class UiStore {
   gridSettings = { ...this.defaultGridSettings }
   @observable
   viewingCollection = null
+  @observable
+  previousViewingCollection = null
+  @observable
+  previousCollectionScrollHeight = 0
   @observable
   viewingItem = null
   @observable
@@ -404,12 +409,21 @@ export default class UiStore {
   @action
   setViewingCollection(collection = null) {
     // called when loading a new CollectionPage
+    if (
+      collection &&
+      this.previousViewingCollection &&
+      collection.id === this.previousViewingCollection.id
+    ) {
+      setScrollHeight(this.previousCollectionScrollHeight)
+    }
+    this.previousViewingCollection = this.viewingCollection
     this.viewingCollection = collection
     this.deselectCards()
   }
 
   @action
   setViewingItem(item = null) {
+    this.previousViewingCollection = this.viewingCollection
     this.viewingItem = item
   }
 

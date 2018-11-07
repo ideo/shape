@@ -1,5 +1,7 @@
 import { RouterStore } from 'mobx-react-router'
+
 import { apiStore, uiStore } from '~/stores'
+import { currentScrollPosition } from '~/utils/scrolling'
 
 // mobx-react-router with a couple of helper methods
 class RoutingStore extends RouterStore {
@@ -25,6 +27,10 @@ class RoutingStore extends RouterStore {
   }
 
   routeTo = (type, id = null) => {
+    // only update the scroll position on collection pages.
+    if (uiStore.viewingCollection) {
+      uiStore.update('previousCollectionScrollHeight', currentScrollPosition())
+    }
     // close the org/roles menus if either are open when we route to a new page
     uiStore.update('organizationMenuPage', null)
     uiStore.update('rolesMenuOpen', null)
@@ -42,6 +48,7 @@ class RoutingStore extends RouterStore {
   pathContains = str => this.location.pathname.indexOf(str) > -1
 
   updatePreviousPageBeforeSearch(page) {
+    uiStore.setViewingCollection(null)
     if (page.pathname.indexOf('/search') === -1) {
       this.previousPageBeforeSearch = page.pathname
     }

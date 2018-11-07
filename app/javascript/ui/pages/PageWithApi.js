@@ -32,9 +32,7 @@ class PageWithApi extends React.Component {
   }
 
   componentWillUnmount() {
-    const { uiStore } = this.props
     this.unmounted = true
-    uiStore.setViewingCollection(null)
   }
 
   @action
