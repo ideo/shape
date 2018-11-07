@@ -89,6 +89,7 @@
     "hyphenation.en-us": "^0.2.1",
     "hypher": "^0.2.5",
     "i18n-iso-countries": "3.7.3",
+    "if-emoji": "^0.1.0",
     "lodash": "~4.17.4",
     "mime-types": "^2.1.19",
     "mobx": "^4.4.0",

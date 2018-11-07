@@ -340,17 +340,20 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     await this.API_reopenTest()
   }
 
+  // eslint-disable-next-line
+  displayTestErrors(err) {
+    uiStore.popupAlert({
+      prompt: `You have questions that have not yet been finalized:\n
+       ${err.error.map(e => ` ${e.detail}`)}
+      `,
+      fadeOutTime: 10 * 1000,
+    })
+  }
+
   API_launchTest() {
     this.apiStore
       .request(`test_collections/${this.testCollectionId}/launch`, 'PATCH')
-      .catch(err => {
-        uiStore.popupAlert({
-          prompt: `You have questions that have not yet been finalized:\n
-           ${err.error.map(e => ` ${e.detail}`)}
-          `,
-          fadeOutTime: 10 * 1000,
-        })
-      })
+      .catch(this.displayTestErrors)
   }
 
   API_closeTest(collectionId) {
@@ -361,10 +364,9 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   }
 
   API_reopenTest() {
-    this.apiStore.request(
-      `test_collections/${this.testCollectionId}/reopen`,
-      'PATCH'
-    )
+    this.apiStore
+      .request(`test_collections/${this.testCollectionId}/reopen`, 'PATCH')
+      .catch(this.displayTestErrors)
   }
 
   API_setSubmissionBoxTemplate(data) {

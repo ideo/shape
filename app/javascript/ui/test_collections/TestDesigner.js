@@ -67,6 +67,11 @@ const selectOptions = [
   { value: 'question_category_satisfaction', label: 'Category Satisfaction' },
 ]
 
+function optionSort(a, b) {
+  if (b.value === '') return 1
+  return a.label.localeCompare(b.label)
+}
+
 @observer
 class TestDesigner extends React.Component {
   constructor(props) {
@@ -107,10 +112,11 @@ class TestDesigner extends React.Component {
     })
   }
 
-  handleNew = card => () => {
+  handleNew = (card, addBefore) => () => {
     const { collection } = this.props
+    const order = addBefore ? card.order - 0.5 : card.order + 1
     collection.confirmEdit({
-      onConfirm: () => this.createNewQuestionCard({ order: card.order + 1 }),
+      onConfirm: () => this.createNewQuestionCard({ order }),
     })
   }
 
@@ -184,8 +190,8 @@ class TestDesigner extends React.Component {
     return card.API_create()
   }
 
-  renderHotEdge(card) {
-    return <QuestionHotEdge onAdd={this.handleNew(card)} />
+  renderHotEdge(card, addBefore = false) {
+    return <QuestionHotEdge onAdd={this.handleNew(card, addBefore)} />
   }
 
   renderQuestionSelectForm(card) {
@@ -208,7 +214,7 @@ class TestDesigner extends React.Component {
             value={card.card_question_type || ''}
             onChange={this.handleSelectChange(card)}
           >
-            {selectOptions.map(opt => (
+            {selectOptions.sort(optionSort).map(opt => (
               <SelectOption
                 key={opt.value}
                 classes={{
@@ -307,6 +313,7 @@ class TestDesigner extends React.Component {
                 flexWrap: 'wrap',
               }}
             >
+              {i === 0 && this.canEdit && this.renderHotEdge(card, true)}
               {this.renderQuestionSelectForm(card)}
               <TestQuestionHolder editing userEditable={userEditable}>
                 <TestQuestion

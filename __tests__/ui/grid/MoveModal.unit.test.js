@@ -46,6 +46,7 @@ describe('MoveModal', () => {
         )
       })
     })
+
     describe('moving pinned items out of a template', () => {
       it('should return an error message', () => {
         const message = component.moveErrors({
@@ -77,6 +78,7 @@ describe('MoveModal', () => {
         )
       })
     })
+
     describe('with edit access and no issues', () => {
       it('should not return an error message', () => {
         const message = component.moveErrors({
@@ -85,6 +87,23 @@ describe('MoveModal', () => {
           cardAction: 'move',
         })
         expect(message).toBeFalsy()
+      })
+    })
+
+    describe('when moving into a test collection or design', () => {
+      it('should return an error message', () => {
+        const viewingCollection = {
+          id: 1,
+          isTestCollection: true,
+          can_edit_content: true,
+        }
+        const movingFromCollection = { id: 1 }
+        const message = component.moveErrors({
+          viewingCollection,
+          movingFromCollection,
+          cardAction: 'move',
+        })
+        expect(message).toContain("You can't move cards into a test collection")
       })
     })
   })

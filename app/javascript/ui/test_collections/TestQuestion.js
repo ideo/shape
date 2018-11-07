@@ -97,6 +97,7 @@ class TestQuestion extends React.Component {
               order={card.order}
               replacingId={card.id}
               testCollectionCard
+              defaultShowWholeImage
             />
           )
         } else {

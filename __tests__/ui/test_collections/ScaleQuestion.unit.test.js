@@ -83,10 +83,10 @@ describe('ScaleQuestion', () => {
         wrapper = shallow(<ScaleQuestion {...props} />)
       })
 
-      it('should set the emoji opacity to 0.25', () => {
+      it('should set the emoji opacity to 0.2', () => {
         expect(wrapper.find('EmojiButton').at(0)).toHaveStyleRule(
           'opacity',
-          '0.25'
+          '0.2'
         )
       })
     })
