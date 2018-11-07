@@ -9,13 +9,16 @@ const { CloseIcon } = ICONS
 
 const StyledDialog = styled(MuiDialog)`
   .modal__paper {
-    background-color: ${v.colors.commonDark};
+    background-color: ${props => props.variant.backgroundColor};
     border-radius: 6px;
     color: white;
     opacity: 0.95;
     width: 100%;
     &-sm {
       max-width: 425px;
+    }
+    &-md {
+      max-width: 560px;
     }
   }
 `
@@ -35,10 +38,14 @@ const CenteredPaddedContent = styled.div`
 `
 
 const IconHolder = styled.span`
+  display: block;
+  margin: 30px auto;
   width: 84px;
-  margin-top: 25px;
-  margin-bottom: 30px;
+`
+
+const ImageHolder = styled.span`
   display: inline-block;
+  margin-top: 25px;
 `
 
 const PromptText = styled.span`
@@ -58,28 +65,46 @@ class Dialog extends React.PureComponent {
   }
 
   get icon() {
-    const { iconName } = this.props
+    const { iconName, iconImageOverride } = this.props
+    if (iconImageOverride) {
+      return (
+        <ImageHolder>
+          <img
+            style={{ width: '450px', marginLeft: '-25px' }}
+            src={iconImageOverride}
+            alt=""
+          />
+        </ImageHolder>
+      )
+    }
     const icon = ICONS[`${iconName}Icon`]
-    return icon ? React.createElement(icon) : ''
+    const iconEl = icon ? React.createElement(icon) : ''
+    return <IconHolder>{iconEl}</IconHolder>
   }
 
   render() {
-    const { children, open, maxWidth } = this.props
+    const { children, backgroundColor, open, maxWidth } = this.props
     return (
       <StyledDialog
         open={open}
-        classes={{ paper: 'modal__paper', paperWidthSm: 'modal__paper-sm' }}
+        classes={{
+          paper: 'modal__paper',
+          paperWidthSm: 'modal__paper-sm',
+          paperWidthMd: 'modal__paper-md',
+        }}
         onClose={this.handleClose}
         onBackdropClick={this.handleClose}
         aria-labelledby="Confirmation"
         BackdropProps={{ invisible: true }}
         maxWidth={maxWidth}
+        // using suggestion here: https://git.io/fpUnP
+        variant={{ backgroundColor }}
       >
         <ModalCloseButton onClick={this.handleClose}>
           <CloseIcon />
         </ModalCloseButton>
         <CenteredPaddedContent>
-          <IconHolder>{this.icon}</IconHolder>
+          {this.icon}
           <PromptText>{children}</PromptText>
         </CenteredPaddedContent>
       </StyledDialog>
@@ -100,14 +125,18 @@ Dialog.propTypes = {
     'Mail',
     'Template',
   ]),
+  iconImageOverride: PropTypes.string,
   children: PropTypes.node.isRequired,
   open: PropTypes.bool.isRequired,
   onClose: PropTypes.func.isRequired,
   maxWidth: PropTypes.string,
+  backgroundColor: PropTypes.oneOf(Object.values(v.colors)),
 }
 Dialog.defaultProps = {
   iconName: 'Alert',
   maxWidth: 'xs', // 'xs' == 360px
+  iconImageOverride: null,
+  backgroundColor: v.colors.commonDark,
 }
 // all propTypes except required `children` node, to be used by Information/ConfirmationModal
 const { children, ...childPropTypes } = Dialog.propTypes
