@@ -1,25 +1,27 @@
+import AlertIcon from '~/ui/icons/AlertIcon'
 import ArchiveIcon from '~/ui/icons/ArchiveIcon'
 import BackIcon from '~/ui/icons/BackIcon'
+import CelebrateIcon from '~/ui/icons/CelebrateIcon'
 import CloseIcon from '~/ui/icons/CloseIcon'
-import LeaveIcon from '~/ui/icons/LeaveIcon'
-import OkIcon from '~/ui/icons/OkIcon'
-import AlertIcon from '~/ui/icons/AlertIcon'
 import InfoIcon from '~/ui/icons/InfoIcon'
+import LeaveIcon from '~/ui/icons/LeaveIcon'
 import LinkIcon from '~/ui/icons/LinkIcon'
+import MailIcon from '~/ui/icons/MailIcon'
+import OkIcon from '~/ui/icons/OkIcon'
 import TemplateIcon from '~/ui/icons/TemplateIcon'
 import TestGraphIcon from '~/ui/icons/TestGraphIcon'
-import MailIcon from '~/ui/icons/MailIcon'
 
 export default {
+  CelebrateIcon,
+  AlertIcon,
   ArchiveIcon,
   BackIcon,
   CloseIcon,
-  LeaveIcon,
-  OkIcon,
-  AlertIcon,
   InfoIcon,
+  LeaveIcon,
   LinkIcon,
-  TestGraphIcon,
-  TemplateIcon: () => <TemplateIcon circled />,
   MailIcon,
+  OkIcon,
+  TemplateIcon: () => <TemplateIcon circled />,
+  TestGraphIcon,
 }
