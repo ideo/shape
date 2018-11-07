@@ -12,6 +12,7 @@ class Organization extends BaseRecord {
     'domain_whitelist',
     'handle',
     'filestack_file_attributes',
+    'deactivated',
   ]
 }
 
