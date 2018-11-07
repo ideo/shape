@@ -254,7 +254,7 @@ class PageHeader extends React.Component {
       icon = <TemplateIcon circled />
     } else if (record.isSubmissionBox) {
       icon = <SubmissionBoxIconLg />
-    } else if (record.isTestCollectionOrTestDesign) {
+    } else if (record.launchableTestId) {
       icon = <TestCollectionIcon />
     }
     if (icon) {

@@ -365,7 +365,7 @@ describe Collection::TestCollection, type: :model do
     describe '#launch!' do
       context 'with valid draft collection (default status)' do
         it 'should launch without creating a TestDesign collection' do
-          expect(test_collection.launch!).to be true
+          expect(test_collection.launch!(initiated_by: user)).to be true
           expect(test_collection.test_status).to eq 'live'
           expect(test_collection.test_design.present?).to be false
         end
@@ -373,12 +373,50 @@ describe Collection::TestCollection, type: :model do
         it 'should find all submissions and mark their tests as launchable' do
           # make sure this is now persisted
           submission_test.reload
-          test_collection.launch!
+          test_collection.launch!(initiated_by: user)
           submission.reload
-          expect(submission.submission_attrs['launchable_test_id']).to eq submission_test.id
-          expect(submission.submission_attrs['test_status']).to eq 'draft'
-          expect(submission.submission_attrs['template_test_id']).to eq test_collection.id
+          submission_template.reload
+          expect(submission_template.submission_attrs).to eq(
+            'template' => true,
+            'test_status' => 'live',
+            'launchable_test_id' => test_collection.id,
+          )
+          expect(submission.submission_attrs).to eq(
+            'submission' => true,
+            'test_status' => 'draft',
+            'template_test_id' => test_collection.id,
+            'launchable_test_id' => submission_test.id,
+          )
         end
+      end
+
+      context 'launching submission test' do
+        it 'should update the test_status' do
+          test_collection.launch!(initiated_by: user)
+          submission_test.launch!(initiated_by: user)
+          submission.reload
+          expect(submission.submission_attrs['test_status']).to eq 'live'
+        end
+      end
+    end
+
+    describe '#close!' do
+      before do
+        # persist submissions_collection relations
+        submission_test.reload
+        submission_box.reload
+        test_collection.launch!(initiated_by: user)
+        submission_test.launch!(initiated_by: user)
+      end
+
+      it 'should find all submissions and close their tests' do
+        expect(submission_test.test_status).to eq 'live'
+        expect(submission.reload.submission_attrs['test_status']).to eq 'live'
+        test_collection.close!
+        submission.reload
+        submission_test.reload
+        expect(submission.submission_attrs['test_status']).to eq 'closed'
+        expect(submission_test.test_status).to eq 'closed'
       end
     end
 
@@ -397,6 +435,8 @@ describe Collection::TestCollection, type: :model do
         expect(submission.reload.submission_attrs['test_status']).to eq 'live'
       end
     end
+
+    describe ''
   end
 
   context 'with an in-collection test' do

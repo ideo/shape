@@ -21,6 +21,13 @@ class SurveyResponse < ApplicationRecord
       status: all_questions_answered? ? :completed : :in_progress,
       updated_at: Time.current # Explicitly set in case status does not change
     )
+    cache_test_scores!
+  end
+
+  def cache_test_scores!
+    collection_to_test = test_collection.collection_to_test
+    return unless collection_to_test.present?
+    collection_to_test.cache_test_scores!
   end
 
   private

@@ -22,7 +22,6 @@ describe Collection, type: :model do
     it { should belong_to :template }
     # these come from Testable concern
     it { should have_many :test_collections }
-    it { should have_one :latest_test_collection }
     it { should have_one :live_test_collection }
 
     describe '#collection_cards' do

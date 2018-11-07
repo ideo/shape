@@ -38,9 +38,7 @@ class Collection
       end
 
       event :close,
-            after_commit: proc {
-                            update_cached_submission_status if inside_a_submission?
-                          } do
+            after_commit: :after_close_test do
         transitions from: :live, to: :closed
       end
 
@@ -66,33 +64,52 @@ class Collection
       # remove the "blanks"
       remove_incomplete_question_items
       if submission_box_template_test?
+        parent_submission_box_template.update(
+          submission_attrs: {
+            template: true,
+            launchable_test_id: id,
+            test_status: test_status,
+          },
+        )
         update_submissions_launch_status
         # submission box master template test doesn't create a test_design, move cards, etc.
         return true
       end
-      update_cached_submission_status if inside_a_submission?
+      update_cached_submission_status(parent_submission) if inside_a_submission?
       # TODO: Perhaps need to do *some* of this setup when reopening?
       create_test_design_and_move_cards!(initiated_by: initiated_by) unless reopening
     end
 
-    def update_cached_submission_status
+    def after_close_test
+      if inside_a_submission?
+        update_cached_submission_status(parent_submission)
+      elsif submission_box_template_test?
+        update_cached_submission_status(parent_submission_box_template)
+        close_all_submissions_tests!
+      end
+    end
+
+    def update_cached_submission_status(related)
+      # `related` will be either a submission, or a submission_template
       # we need to track any changes in the cached test_status
-      submission = parent_submission
-      submission.submission_attrs['test_status'] = test_status
-      submission.save
+      related.submission_attrs ||= {}
+      related.submission_attrs['test_status'] = test_status
+      related.save
     end
 
     def update_submissions_launch_status
       return unless master_template?
       # TODO: Probably should move to a worker, e.g. if hundreds or thousands of submissions
-      parent_submission_box.submissions_collection.collections.each do |c|
+      parent_submission_box.submissions_collection.collections.each do |submission|
         # find the launchable test within this particular submission
-        launchable_test = Collection.in_collection(c).find_by(template_id: id)
+        launchable_test = Collection
+                          .in_collection(submission)
+                          .find_by(template_id: id)
         next unless launchable_test.present?
         if launchable_test.is_a?(Collection::TestDesign)
           launchable_test = launchable_test.test_collection
         end
-        c.update(
+        submission.update(
           submission_attrs: {
             # this should have already been set but want to preserve the value as true
             submission: true,
@@ -101,7 +118,19 @@ class Collection
             test_status: launchable_test.test_status,
           },
         )
+        # e.g. if we switched which test is running, we want to switch to the latest one
+        submission.cache_test_scores!
       end
+    end
+
+    def close_all_submissions_tests!
+      test_ids = parent_submission_box.submissions_collection.collections.map do |c|
+        next unless c.submission_attrs['test_status'] == 'live'
+        c.submission_attrs['launchable_test_id']
+      end.compact
+      # another one that could maybe use a bg worker (if lots of tests)
+      # we use the AASM method to ensure that callbacks are carried through
+      Collection::TestCollection.where(id: test_ids).each(&:close!)
     end
 
     # various checks for if this test_collection is in a launchable state
@@ -109,11 +138,26 @@ class Collection
     def launchable?
       return false unless draft? || closed?
       # is this in a submission? If so, am I tied to a test template, and is that one launched?
-      return template.live? if templated? && inside_a_submission?
+      if inside_a_submission?
+        return false unless submission_test_launchable?
+      end
       # standalone tests otherwise don't really have any restrictions
       return true unless collection_to_test_id.present?
       # lastly -- make sure there is not another live in-collection test for the same collection
       collection_to_test.live_test_collection.blank?
+    end
+
+    def submission_test_launchable?
+      # This checks if the parent template has been launched, which indicates that the
+      # submission box editors have enabled the related submission tests
+      test_template = nil
+      if templated?
+        test_template = template
+      elsif test_design.present? && test_design.templated?
+        # the template relation gets moved to the test_design after launch, e.g. for 'reopen'
+        test_template = test_design.template
+      end
+      test_template ? test_template.live? : true
     end
 
     def test_completed?

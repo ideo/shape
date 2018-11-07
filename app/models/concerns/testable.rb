@@ -8,11 +8,11 @@ module Testable
              foreign_key: :collection_to_test_id,
              class_name: 'Collection::TestCollection'
 
-    has_one :latest_test_collection,
-            -> { active.where(test_status: %i[live closed]).order(updated_at: :desc) },
-            inverse_of: :collection_to_test,
-            foreign_key: :collection_to_test_id,
-            class_name: 'Collection::TestCollection'
+    # has_one :latest_test_collection,
+    #         -> { active.where(test_status: %i[live closed]).order(updated_at: :desc) },
+    #         inverse_of: :collection_to_test,
+    #         foreign_key: :collection_to_test_id,
+    #         class_name: 'Collection::TestCollection'
 
     has_one :live_test_collection,
             -> { active.live },
@@ -29,10 +29,13 @@ module Testable
     end
   end
 
+  # NOTE: For now, this is only applicable to tests within submission box submissions
   def collect_test_scores
     scores = {}
-    return scores unless latest_test_collection.present?
-    latest_test_collection.question_items.scale_questions.each do |question|
+    return score unless submission_attrs.present?
+    launchable_test = Collection.find_by(id: submission_attrs['launchable_test_id'])
+    return scores unless launchable_test.present?
+    launchable_test.question_items.scale_questions.each do |question|
       scores[question.question_type] = question.score
     end
     unless scores.empty?

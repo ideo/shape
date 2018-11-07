@@ -354,6 +354,7 @@ class Collection < ApplicationRecord
       if card_order == 'total' || card_order.include?('question_')
         collection_order = "cached_test_scores->'#{card_order}'"
         order = "collections.#{collection_order} DESC NULLS LAST"
+        puts "order #{order}"
       else
         # e.g. updated_at
         order = { card_order => :desc }
@@ -552,16 +553,22 @@ class Collection < ApplicationRecord
     parents.find_by("cached_attributes->'submission_attrs'->>'submission' = 'true'")
   end
 
+  def parent_submission_box_template
+    @parent_submission_box_template ||= begin
+      return nil unless inside_a_submission_box?
+      template_id = parent_submission_box&.submission_template_id
+      return nil unless template_id.present?
+      parents.find_by(id: template_id)
+    end
+  end
+
   def submission_box_template?
     return false unless master_template? && inside_a_submission_box?
     id == parent_submission_box&.submission_template_id
   end
 
   def inside_a_submission_box_template?
-    return false unless inside_a_submission_box?
-    template_id = parent_submission_box&.submission_template_id
-    return false unless template_id.present?
-    parents.where(id: template_id).any?
+    parent_submission_box_template.present?
   end
 
   def inside_a_submission_box?

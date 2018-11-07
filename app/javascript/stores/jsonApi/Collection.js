@@ -139,6 +139,13 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     return this.submission_attrs && this.submission_attrs.submission
   }
 
+  get isSubmissionBoxTemplateOrTest() {
+    return (
+      this.is_submission_box_template ||
+      (this.submission_attrs && this.submission_attrs.template)
+    )
+  }
+
   get isTestCollection() {
     return this.type === 'Collection::TestCollection'
   }
@@ -201,7 +208,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
       return this.id
     } else if (this.isTestDesign) {
       return this.test_collection_id
-    } else if (this.isSubmission) {
+    } else if (this.submission_attrs) {
       return this.submission_attrs.launchable_test_id
     }
     return undefined
@@ -229,6 +236,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   }
 
   get publicTestURL() {
+    // TODO: for the submission_box_template_test, this will eventually go to the global "submission box test link"
     return `${process.env.BASE_HOST}/tests/${this.launchableTestId}`
   }
 
@@ -364,7 +372,24 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   }
 
   launchTest = () => this._performTestAction('launch')
-  closeTest = () => this._performTestAction('close')
+
+  closeTest = () => {
+    const onConfirm = () => this._performTestAction('close')
+    if (this.isSubmissionBoxTemplateOrTest) {
+      let prompt = 'Are you sure you want to stop all active tests?'
+      const num = this.template_num_instances
+      prompt += ` ${num} ${pluralize('submission', num)} will be affected.`
+      return uiStore.confirm({
+        iconName: 'Alert',
+        prompt,
+        confirmText: 'Stop feedback',
+        cancelText: 'No',
+        onConfirm,
+      })
+    }
+    return onConfirm()
+  }
+
   reopenTest = () => this._performTestAction('reopen')
 
   async _fetchSubmissionTest() {
@@ -378,7 +403,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     // possible actions = 'launch', 'close', 'reopen'
     if (!_.includes(['launch', 'close', 'reopen'], actionName)) return false
     let collection = this
-    if (this.isSubmission) {
+    if (this.submission_attrs) {
       collection = await this._fetchSubmissionTest()
     }
     if (_.includes(['launch', 'reopen'], actionName)) {
@@ -411,7 +436,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
         })
       })
     // refetch yourself
-    if (this.isSubmission) this.apiStore.request(`collections/${this.id}`)
+    if (this.submission_attrs) this.apiStore.request(`collections/${this.id}`)
   }
 
   API_setSubmissionBoxTemplate(data) {

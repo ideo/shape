@@ -68,9 +68,9 @@ class SerializableCollection < BaseJsonSerializer
     end
   end
 
-  # expose this for the front-end to be aware
-  attribute :card_order do
-    @card_order || (@object.is_a?(Collection::SubmissionsCollection) ? 'updated_at' : 'order')
+  # expose this for the front-end to be aware, only matters for current collection
+  attribute :card_order, if: -> { @object == @current_record } do
+    @card_order || 'order'
   end
 
   attribute :can_edit do
@@ -110,7 +110,7 @@ class SerializableCollection < BaseJsonSerializer
     @object.submission_box_template_test?
   end
 
-  attribute :submission_attrs, if: -> { @object.submission? } do
+  attribute :submission_attrs, if: -> { @object.submission_attrs.present? } do
     @object.submission_attrs
   end
 
