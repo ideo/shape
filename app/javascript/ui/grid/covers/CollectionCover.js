@@ -11,7 +11,7 @@ import { CardHeading } from '~/ui/global/styled/typography'
 import hexToRgba from '~/utils/hexToRgba'
 import ProfileIcon from '~/ui/icons/ProfileIcon'
 import FilledProfileIcon from '~/ui/icons/FilledProfileIcon'
-import { RoundPill } from '~/ui/global/styled/forms'
+import { FormButton, RoundPill } from '~/ui/global/styled/forms'
 import SubmissionBoxIconLg from '~/ui/icons/SubmissionBoxIconLg'
 import TemplateIcon from '~/ui/icons/TemplateIcon'
 import TestCollectionIcon from '~/ui/icons/TestCollectionIcon'
@@ -24,6 +24,11 @@ const IconHolder = styled.span`
   margin-right: 5px;
   vertical-align: middle;
   width: 27px;
+`
+
+const LaunchButton = FormButton.extend`
+  font-size: 0.9rem;
+  width: 100%;
 `
 
 const StyledCollectionCover = styled.div`
@@ -192,6 +197,36 @@ class CollectionCover extends React.Component {
     )
   }
 
+  get hasLaunchTestButton() {
+    const { collection } = this.props
+    // This button only appears for tests inside submissions
+    if (!collection.is_inside_a_submission) return false
+    return (
+      collection.launchableTestId === collection.id && collection.launchable
+    )
+  }
+
+  get launchTestButton() {
+    const { collection, uiStore } = this.props
+    if (!this.hasLaunchTestButton) return ''
+    let launchCollection = collection.launchTest
+    let buttonText = 'Get Feedback'
+    if (collection.isClosedTest) {
+      buttonText = 'Re-open Feedback'
+      launchCollection = collection.reopenTest
+    }
+
+    return (
+      <LaunchButton
+        className="cancelGridClick"
+        onClick={launchCollection}
+        disabled={uiStore.launchButtonLoading}
+      >
+        {buttonText}
+      </LaunchButton>
+    )
+  }
+
   handleClick = e => {
     const { dragging } = this.props
     if (dragging) {
@@ -235,10 +270,13 @@ class CollectionCover extends React.Component {
             </PositionedCardHeading>
           </div>
           <div className="bottom">
+            {this.launchTestButton}
             {this.collectionScore}
-            <Dotdotdot clamp={this.hasCollectionScore ? 2 : 'auto'}>
-              {cover.text}
-            </Dotdotdot>
+            {!this.hasLaunchTestButton && (
+              <Dotdotdot clamp={this.hasCollectionScore ? 2 : 'auto'}>
+                {cover.text}
+              </Dotdotdot>
+            )}
           </div>
         </StyledCardContent>
       </StyledCollectionCover>
