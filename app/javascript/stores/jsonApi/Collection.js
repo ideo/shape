@@ -428,8 +428,9 @@ class Collection extends SharedRecordMixin(BaseRecord) {
         let prompt = `You have questions that have not yet been finalized:\n
            ${errorMessages}
           `
-        // omit the extra wording for 'close' message
-        if (actionName === 'close') prompt = errorMessages
+        // omit the extra wording for close and reopen
+        // for reopen: what if there are actually incomplete questions... ?
+        if (_.includes(['close', 'reopen'], actionName)) prompt = errorMessages
         uiStore.popupAlert({
           prompt,
           fadeOutTime: 10 * 1000,
