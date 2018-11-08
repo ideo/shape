@@ -47,6 +47,26 @@ RSpec.describe CollectionUpdater, type: :service do
       end
     end
 
+    context 'with a master template' do
+      let(:attributes) do
+        { name: 'My new name', collection_to_test_id: 999, collection_cards_attributes: { id: first_card.id } }
+      end
+
+      before do
+        collection.update(master_template: true)
+      end
+
+      it 'calls queue_update_template_instances if collection_cards_attributes present' do
+        expect(collection).to receive(:queue_update_template_instances)
+        CollectionUpdater.call(collection, attributes)
+      end
+
+      it 'calls update_test_template_instance_types if collection_to_test setting has changed' do
+        expect(collection).to receive(:update_test_template_instance_types!)
+        CollectionUpdater.call(collection, attributes)
+      end
+    end
+
     context 'with invalid attributes' do
       let(:attributes) { { name: nil } }
       let(:result) { CollectionUpdater.call(collection, attributes) }
@@ -54,34 +74,6 @@ RSpec.describe CollectionUpdater, type: :service do
       it 'returns false with errors on collection' do
         expect(result).to be false
         expect(collection.errors).not_to be_empty
-      end
-    end
-
-    context 'with submission box' do
-      let(:collection) { create(:submission_box) }
-      let(:template) { create(:collection, master_template: true) }
-      let(:attributes) do
-        {
-          submission_box_type: :template,
-          submission_template_id: template.id,
-        }
-      end
-
-      it 'will setup the submissions collection when choosing a submission_box_type' do
-        expect(collection.submissions_collection.present?).to be false
-        CollectionUpdater.call(collection, attributes)
-        expect(collection.submissions_collection.present?).to be true
-      end
-
-      it 'will only create the submissions collection once' do
-        # first one should create
-        expect {
-          CollectionUpdater.call(collection, attributes)
-        }.to change(Collection, :count)
-        # second one should not
-        expect {
-          CollectionUpdater.call(collection, attributes)
-        }.not_to change(Collection, :count)
       end
     end
   end

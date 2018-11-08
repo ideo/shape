@@ -12,7 +12,7 @@ class Item
 
     scope :answerable, -> {
       where.not(
-        question_type: Item::QuestionItem.unanswerable_question_types,
+        question_type: unanswerable_question_types,
       )
     }
     has_many :chart_items,
@@ -23,7 +23,13 @@ class Item
 
     scope :not_answerable, -> {
       where(
-        question_type: Item::QuestionItem.unanswerable_question_types,
+        question_type: unanswerable_question_types,
+      )
+    }
+
+    scope :scale_questions, -> {
+      where(
+        question_type: scale_question_types,
       )
     }
 
@@ -40,19 +46,23 @@ class Item
       question_category_satisfaction: 10,
     }
 
-    def self.unanswerable_question_types
-      %i[question_media question_description question_finish]
-    end
-
-    def scale_question?
-      %(
+    def self.scale_question_types
+      %i[
         question_context
         question_useful
         question_excitement
         question_different
         question_clarity
         question_category_satisfaction
-      ).include? question_type.to_s
+      ]
+    end
+
+    def self.unanswerable_question_types
+      %i[question_media question_description question_finish]
+    end
+
+    def scale_question?
+      self.class.scale_question_types.include? question_type.to_sym
     end
 
     def requires_roles?
@@ -72,6 +82,7 @@ class Item
     def score
       return unless scale_question?
       # answers are 1-4, but scored on a scale of 0-3
+      # TODO: change the answer_numbers on the emojiScale to go 0-3 to match? (would need to migrate old answers)
       points = completed_survey_answers.sum('answer_number - 1') || 0
       total = completed_survey_answers.count * 3
       # don't want to divide by 0

@@ -1,6 +1,7 @@
 import _ from 'lodash'
 import pluralize from 'pluralize'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
+import { observable, runInAction } from 'mobx'
 import styled from 'styled-components'
 
 import {
@@ -15,6 +16,7 @@ import AlertIcon from '~/ui/icons/AlertIcon'
 import AddTextIcon from '~/ui/icons/AddTextIcon'
 import AddFileIcon from '~/ui/icons/AddFileIcon'
 import AddLinkIcon from '~/ui/icons/AddLinkIcon'
+import InlineLoader from '~/ui/layout/InlineLoader'
 import TemplateIcon from '~/ui/icons/TemplateIcon'
 import Modal from '~/ui/global/modals/Modal'
 import v from '~/utils/variables'
@@ -42,6 +44,9 @@ const StyledTitleContent = styled.div`
 @inject('apiStore', 'uiStore', 'routingStore')
 @observer
 class SubmissionBoxSettingsModal extends React.Component {
+  @observable
+  loading = false
+
   componentDidMount() {
     const { apiStore } = this.props
     apiStore.fetchUsableTemplates()
@@ -88,16 +93,6 @@ class SubmissionBoxSettingsModal extends React.Component {
     })
   }
 
-  updateCollection = async (attrs = {}) => {
-    const { collection, uiStore } = this.props
-    Object.keys(attrs).forEach(key => {
-      collection[key] = attrs[key]
-    })
-    await collection.save()
-    uiStore.update('submissionBoxSettingsOpen', false)
-    uiStore.update('loadedSubmissions', true)
-  }
-
   confirmSubmissionTemplateChange = ({ type, template } = {}, callback) => {
     const { uiStore, collection } = this.props
     if (collection.countSubmissions) {
@@ -122,22 +117,58 @@ class SubmissionBoxSettingsModal extends React.Component {
     callback()
   }
 
+  // you can either set it to be a template, or a type like "text"
+  async setTemplate({ template = null, type = '' } = {}) {
+    runInAction(() => {
+      this.loading = true
+    })
+    const { collection, uiStore, apiStore } = this.props
+    const templateCardId = template ? template.parent_collection_card.id : null
+    const submission_box_type = template ? 'template' : type
+    const data = {
+      box_id: collection.id,
+      template_card_id: templateCardId,
+      submission_box_type,
+    }
+    try {
+      await collection.API_setSubmissionBoxTemplate(data)
+      uiStore.update('submissionBoxSettingsOpen', false)
+      if (collection.submissions_collection) {
+        // Re-fetch submissions collection as submissions names change
+        await apiStore.fetch(
+          'collections',
+          collection.submissions_collection.id,
+          true
+        )
+        // this will update the CollectionPage
+        uiStore.update('loadedSubmissions', true)
+      }
+    } catch (e) {
+      uiStore.alert('Unable to use that template')
+    } finally {
+      runInAction(() => {
+        this.loading = false
+      })
+    }
+  }
+
+  get submissions() {
+    const { collection } = this.props
+    return collection.submissions_collection.collection_cards.map(
+      card => card.record
+    )
+  }
+
   chooseTemplate = template => () => {
     this.confirmSubmissionTemplateChange({ template }, () => {
-      this.updateCollection({
-        submission_template_id: template.id,
-        submission_box_type: 'template',
-      })
+      this.setTemplate({ template })
     })
   }
 
-  chooseSubmissionBoxType = type => () => {
+  chooseNonTemplateType = type => () => {
     this.confirmSubmissionTemplateChange({ type }, () => {
       this.props.collection.submission_template = null
-      this.updateCollection({
-        submission_template_id: null,
-        submission_box_type: type,
-      })
+      this.setTemplate({ type })
     })
   }
 
@@ -152,7 +183,7 @@ class SubmissionBoxSettingsModal extends React.Component {
       <SubmissionBoxRow
         key={type.name}
         noSpacing
-        onClick={this.chooseSubmissionBoxType(type.name)}
+        onClick={this.chooseNonTemplateType(type.name)}
       >
         <BctButton>
           <type.Icon />
@@ -201,6 +232,7 @@ class SubmissionBoxSettingsModal extends React.Component {
   titleContent = () => (
     <StyledTitleContent>
       <Heading2>Submission Box Settings</Heading2>
+      {this.loading && <InlineLoader />}
       <Row>
         <span
           style={{

@@ -11,9 +11,11 @@ import { CardHeading } from '~/ui/global/styled/typography'
 import hexToRgba from '~/utils/hexToRgba'
 import ProfileIcon from '~/ui/icons/ProfileIcon'
 import FilledProfileIcon from '~/ui/icons/FilledProfileIcon'
+import { RoundPill } from '~/ui/global/styled/forms'
 import SubmissionBoxIconLg from '~/ui/icons/SubmissionBoxIconLg'
 import TemplateIcon from '~/ui/icons/TemplateIcon'
 import TestCollectionIcon from '~/ui/icons/TestCollectionIcon'
+import { questionTitle } from '~/ui/test_collections/shared'
 import { routingStore } from '~/stores'
 
 const IconHolder = styled.span`
@@ -167,6 +169,29 @@ class CollectionCover extends React.Component {
     return <span style={{ hyphens }}>{collection.name}</span>
   }
 
+  get hasCollectionScore() {
+    const { uiStore, inSubmissionsCollection } = this.props
+    // scores only apply to cards within a SubmissionsCollection
+    if (!inSubmissionsCollection) return false
+    const order = uiStore.collectionCardSortOrder
+    return order === 'total' || order.indexOf('question_') > -1
+  }
+
+  get collectionScore() {
+    const { collection, uiStore } = this.props
+    const order = uiStore.collectionCardSortOrder
+    // don't display score for ordering like 'updated_at'
+    if (!this.hasCollectionScore) return ''
+
+    const orderName = questionTitle(order)
+    const score = collection.test_scores[order]
+    return (
+      <RoundPill>
+        Result: {orderName}: <strong>{score}%</strong>
+      </RoundPill>
+    )
+  }
+
   handleClick = e => {
     const { dragging } = this.props
     if (dragging) {
@@ -210,7 +235,10 @@ class CollectionCover extends React.Component {
             </PositionedCardHeading>
           </div>
           <div className="bottom">
-            <Dotdotdot clamp="auto">{cover.text}</Dotdotdot>
+            {this.collectionScore}
+            <Dotdotdot clamp={this.hasCollectionScore ? 2 : 'auto'}>
+              {cover.text}
+            </Dotdotdot>
           </div>
         </StyledCardContent>
       </StyledCollectionCover>
@@ -222,6 +250,7 @@ CollectionCover.propTypes = {
   width: PropTypes.number.isRequired,
   height: PropTypes.number.isRequired,
   collection: MobxPropTypes.objectOrObservableObject.isRequired,
+  inSubmissionsCollection: PropTypes.bool,
   dragging: PropTypes.bool,
   onClick: PropTypes.func,
 }
@@ -229,6 +258,7 @@ CollectionCover.wrappedComponent.propTypes = {
   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 CollectionCover.defaultProps = {
+  inSubmissionsCollection: false,
   dragging: false,
   onClick: null,
 }

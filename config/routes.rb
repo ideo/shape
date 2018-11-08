@@ -24,6 +24,7 @@ Rails.application.routes.draw do
         end
         collection do
           post 'create_template'
+          post 'set_submission_box_template'
         end
         resources :collection_cards, only: :index
         resources :roles, only: %i[index create destroy], shallow: true
@@ -110,7 +111,7 @@ Rails.application.routes.draw do
 
   resources :tests, only: %i[show]
 
-  authenticate :user, ->(u) { u.has_cached_role?(Role::SUPER_ADMIN) } do
+  authenticate :user, ->(u) { Rails.env.development? || u.has_cached_role?(Role::SUPER_ADMIN) } do
     require 'sidekiq/web'
     mount Sidekiq::Web => '/sidekiq'
   end

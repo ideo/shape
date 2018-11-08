@@ -125,40 +125,6 @@ describe Organization, type: :model do
     end
   end
 
-  describe '.create_for_user' do
-    let!(:user) { create(:user) }
-    let(:organization) { Organization.create_for_user(user) }
-
-    it 'creates org' do
-      expect { organization }.to change(Organization, :count).by(1)
-    end
-
-    it 'has name: FirstName LastName Organization' do
-      org_name = "#{user.first_name} #{user.last_name} Organization"
-      expect(organization.name).to eq(org_name)
-      expect(organization.slug).to eq(org_name.parameterize)
-    end
-
-    it 'adds user as admin of org\'s primary group' do
-      expect(organization.admins[:users]).to match_array([user])
-    end
-
-    it 'sets user.current_organization' do
-      organization
-      expect(user.reload.current_organization).to eq(organization)
-    end
-
-    context 'with user.last_name blank' do
-      before do
-        user.update_attributes(last_name: nil)
-      end
-
-      it 'has name: FirstName Organization' do
-        expect(organization.name).to eq("#{user.first_name} Organization")
-      end
-    end
-  end
-
   describe '#setup_user_membership' do
     let(:user) { create(:user, email: 'jill@ideo.com') }
     let(:guest) { create(:user, email: 'jack@gmail.com') }
@@ -278,20 +244,6 @@ describe Organization, type: :model do
         organization.remove_user_membership(user)
         organization.setup_user_membership(user)
         expect(profile.reload.archived).to be false
-      end
-    end
-
-    context 'for a user where this was their only organization' do
-      let(:user) { create(:user) }
-
-      before do
-        user.roles.destroy_all
-        user.reload
-      end
-
-      it 'should create a new organization' do
-        expect(Organization).to receive(:create_for_user)
-        organization.remove_user_membership(user)
       end
     end
   end

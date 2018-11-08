@@ -161,10 +161,7 @@ class Breadcrumb extends React.Component {
               title={item.name}
               placement="top"
             >
-              <Link to={path}>
-                {item.truncatedName}
-                ...
-              </Link>
+              <Link to={path}>{item.truncatedName}…</Link>
             </Tooltip>
           ) : (
             <Link to={path}>{item.name}</Link>

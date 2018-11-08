@@ -309,8 +309,7 @@ class ApiStore extends jsonapi(datxCollection) {
   }
 
   async fetchUsableTemplates() {
-    const other = ''
-    let q = `#template ${other}`
+    let q = `#template`
     q = _.trim(q)
       .replace(/\s/g, '+')
       .replace(/#/g, '%23')
@@ -385,7 +384,9 @@ class ApiStore extends jsonapi(datxCollection) {
   // what's listed below but it was trying to do `this.find(obj, id)` with no id
   remove(obj, id) {
     if (typeof obj === 'object') {
-      this.__removeModel(obj)
+      runInAction(() => {
+        this.__removeModel(obj)
+      })
     } else {
       super.remove(obj, id)
     }

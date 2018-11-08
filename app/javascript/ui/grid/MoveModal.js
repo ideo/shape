@@ -159,6 +159,11 @@ class MoveModal extends React.Component {
       viewingCollection.isMasterTemplate
     ) {
       return "You can't create a template instance inside another template. You may be intending to create or duplicate a master template into here instead."
+    } else if (
+      viewingCollection.isTestCollection ||
+      viewingCollection.isTestDesign
+    ) {
+      return "You can't move cards into a test collection"
     }
     return ''
   }

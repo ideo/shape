@@ -9,14 +9,17 @@ class Collection
       false
     end
 
-    # override to create the correct breadcrumb trail
     def parent
+      # not actually parent by db relation, but parent for breadcrumb purposes
       submission_box
     end
 
-    # don't shown this in the breadcrumb since it's tucked into the submission_box
-    def breadcrumbable?
-      false
+    def sort_options
+      collections
+        .unscope(:order)
+        .select('jsonb_object_keys(cached_test_scores) as types')
+        .group('types')
+        .map(&:types)
     end
   end
 end

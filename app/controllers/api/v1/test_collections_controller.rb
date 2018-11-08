@@ -40,13 +40,13 @@ class Api::V1::TestCollectionsController < Api::V1::BaseController
     if @test_collection.blank?
       head 404
       return false
-    else
-      return true
     end
+    true
   end
 
   def load_and_authorize_test_collection
     return unless load_test_collection
-    authorize! :manage, @test_collection
+    # e.g. as editor of a test template instance, you can still launch the test
+    authorize! :edit_content, @test_collection
   end
 end

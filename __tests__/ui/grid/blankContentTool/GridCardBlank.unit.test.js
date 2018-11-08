@@ -112,7 +112,7 @@ describe('GridCardBlank', () => {
 
     it('only renders video and image content creation buttons', () => {
       // only render video + image buttons
-      expect(wrapper.find('BctButtonBox').length).toBe(2)
+      expect(wrapper.find('BctButtonBox').length).toBe(3)
     })
 
     it('calls API_replace with replacingId', async () => {

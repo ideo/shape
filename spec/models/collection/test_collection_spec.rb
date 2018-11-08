@@ -2,7 +2,8 @@ require 'rails_helper'
 
 describe Collection::TestCollection, type: :model do
   let(:user) { create(:user) }
-  let(:test_collection) { create(:test_collection) }
+  let(:test_parent) { create(:collection) }
+  let(:test_collection) { create(:test_collection, parent_collection: test_parent) }
 
   context 'associations' do
     it { should have_many :survey_responses }
@@ -25,7 +26,7 @@ describe Collection::TestCollection, type: :model do
 
     describe '#add_test_tag' do
       it 'should add the #test tag after_create' do
-        expect(test_collection.cached_owned_tag_list).to match_array(['test'])
+        expect(test_collection.cached_owned_tag_list).to match_array(['feedback'])
       end
     end
   end
@@ -66,15 +67,14 @@ describe Collection::TestCollection, type: :model do
     end
 
     context 'if in draft status' do
-      let!(:test_collection) { create(:test_collection) }
       before do
         expect(test_collection.draft?).to be true
       end
 
       it 'copies collection' do
-        expect {
+        expect do
           duplicate
-        }.to change(Collection, :count).by(1)
+        end.to change(Collection, :count).by(1)
         expect(duplicate).to be_instance_of(Collection::TestCollection)
         expect(duplicate.draft?).to be true
       end
@@ -93,7 +93,7 @@ describe Collection::TestCollection, type: :model do
     end
 
     context 'if live' do
-      let(:test_collection) { create(:test_collection, :completed) }
+      let(:test_collection) { create(:test_collection, :completed, parent_collection: test_parent) }
       before do
         test_collection.launch!(initiated_by: user)
         expect(test_collection.live?).to be true
@@ -103,9 +103,9 @@ describe Collection::TestCollection, type: :model do
       end
 
       it 'only copies test design' do
-        expect {
+        expect do
           duplicate
-        }.to change(Collection, :count).by(1)
+        end.to change(Collection, :count).by(1)
         expect(duplicate).to be_instance_of(Collection::TestCollection)
         expect(duplicate.draft?).to be true
       end
@@ -130,35 +130,6 @@ describe Collection::TestCollection, type: :model do
         expect(duplicate.test_collection_id).to be_nil
       end
 
-      context 'if template instance' do
-        let(:template) { create(:collection, master_template: true) }
-        let(:parent_collection) { create(:collection) }
-        let!(:test_template_instance) do
-          create(:test_collection,
-                 :completed,
-                 parent_collection: parent_collection,
-                 collection_to_test: parent_collection,
-                 template: template)
-        end
-        before do
-          test_template_instance.launch!(initiated_by: user)
-          expect(test_template_instance.live?).to be true
-        end
-
-        it 'moves templated_from to TestDesign' do
-          expect(test_template_instance.template).to be_nil
-          expect(
-            test_template_instance.test_design.template,
-          ).to eq(template)
-        end
-
-        it 'keeps collection_to_test on TestCollection' do
-          expect(
-            test_template_instance.collection_to_test,
-          ).to eq(parent_collection)
-        end
-      end
-
       context 'if closed' do
         before do
           test_collection.close!
@@ -166,9 +137,9 @@ describe Collection::TestCollection, type: :model do
         end
 
         it 'only copies test design' do
-          expect {
+          expect do
             duplicate
-          }.to change(Collection, :count).by(1)
+          end.to change(Collection, :count).by(1)
           expect(duplicate).to be_instance_of(Collection::TestCollection)
           expect(duplicate.draft?).to be true
         end
@@ -189,11 +160,56 @@ describe Collection::TestCollection, type: :model do
           expect(duplicate.name).to eq("Copy of #{test_collection.name}")
         end
       end
+
+      context 'if template instance' do
+        let(:template) { create(:collection, master_template: true) }
+        let(:instance_parent) { create(:collection) }
+        let(:test_collection) do
+          create(:test_collection,
+                 :completed,
+                 parent_collection: instance_parent,
+                 collection_to_test: instance_parent,
+                 template: template)
+        end
+
+        it 'sets the duplicate collection_to_test to its own parent' do
+          expect(duplicate.collection_to_test).to eq parent_collection
+        end
+      end
+    end
+  end
+
+  context 'if template instance' do
+    let(:template) { create(:collection, master_template: true) }
+    let(:parent_collection) { create(:collection) }
+    let!(:test_template_instance) do
+      create(:test_collection,
+             :completed,
+             parent_collection: parent_collection,
+             collection_to_test: parent_collection,
+             template: template)
+    end
+    before do
+      test_template_instance.launch!(initiated_by: user)
+      expect(test_template_instance.live?).to be true
+    end
+
+    it 'moves templated_from to TestDesign' do
+      expect(test_template_instance.template).to be_nil
+      expect(
+        test_template_instance.test_design.template,
+      ).to eq(template)
+    end
+
+    it 'keeps collection_to_test on TestCollection' do
+      expect(
+        test_template_instance.collection_to_test,
+      ).to eq(parent_collection)
     end
   end
 
   context 'with a ready to launch test' do
-    let!(:test_collection) { create(:test_collection, :completed) }
+    let!(:test_collection) { create(:test_collection, :completed, parent_collection: test_parent) }
 
     context 'launching a test' do
       describe '#launch!' do

@@ -1,3 +1,4 @@
+import _ from 'lodash'
 import PropTypes from 'prop-types'
 import objectAssignDeep from 'object-assign-deep'
 import styled, { css } from 'styled-components'
@@ -168,26 +169,26 @@ export const emojiSeriesMap = {
   ],
   satisfaction: [
     { number: 1, name: 'Very unsatisfied', symbol: '😡' },
-    { number: 2, name: 'Somewhat unsatisfied', symbol: '☹️' },
-    { number: 3, name: 'Mostly Satisfied', symbol: '😊' },
+    { number: 2, name: 'Somewhat unsatisfied', scale: 0.6, symbol: '☹️' },
+    { number: 3, name: 'Mostly Satisfied', scale: 0.6, symbol: '😊' },
     { number: 4, name: 'Very satisfied', symbol: '😍' },
   ],
   clarity: [
     { number: 1, name: 'Totally unclear', symbol: '🤷‍♀️' },
-    { number: 2, name: 'Somewhat unclear', symbol: '🕶' },
-    { number: 3, name: 'Mostly clear', symbol: '👓' },
+    { number: 2, name: 'Somewhat unclear', scale: 0.6, symbol: '🕶' },
+    { number: 3, name: 'Mostly clear', scale: 0.6, symbol: '👓' },
     { number: 4, name: 'Totally clear', symbol: '🔬' },
   ],
   excitement: [
     { number: 1, name: 'Totally unexciting', symbol: '😴' },
-    { number: 2, name: 'Unexciting', symbol: '😔' },
-    { number: 3, name: 'Exciting', symbol: '🙂' },
+    { number: 2, name: 'Unexciting', scale: 0.6, symbol: '😔' },
+    { number: 3, name: 'Exciting', scale: 0.6, symbol: '🙂' },
     { number: 4, name: 'Totally exciting', symbol: '😍' },
   ],
   different: [
     { number: 1, name: 'Not at all different', symbol: '😏' },
-    { number: 2, name: 'Not very different', symbol: '😐' },
-    { number: 3, name: 'Different', symbol: '😲' },
+    { number: 2, name: 'Not very different', scale: 0.6, symbol: '😐' },
+    { number: 3, name: 'Different', scale: 0.6, symbol: '😲' },
     { number: 4, name: 'Very different', symbol: '🤯' },
   ],
 }
@@ -239,6 +240,14 @@ export const questionInformation = question => {
     questionText,
     questionTitle,
   }
+}
+
+export const questionTitle = question_type => {
+  if (question_type !== 'total') {
+    const info = questionInformation({ question_type })
+    return info.questionTitle
+  }
+  return _.startCase(question_type)
 }
 
 export const styledTestTheme = (themeName = 'primary') => {

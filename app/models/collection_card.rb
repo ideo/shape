@@ -96,8 +96,12 @@ class CollectionCard < ApplicationRecord
       coll_opts = opts.merge(
         building_template_instance: building_template_instance,
       )
-      cc.collection = collection.duplicate!(coll_opts) if collection.present?
-      cc.item = item.duplicate!(opts) if item.present?
+      if collection.present?
+        cc.collection = collection.duplicate!(coll_opts)
+        set_collection_as_master_template if master_template_card? && collection.is_a?(Collection::TestCollection)
+      elsif item.present?
+        cc.item = item.duplicate!(opts)
+      end
     end
 
     return cc unless cc.save

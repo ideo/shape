@@ -111,7 +111,7 @@ describe Api::V1::RolesController, type: :request, json: true, auth: true do
     end
   end
 
-  describe 'DELETE #destroy' do
+  describe 'DELETE #destroy', create_org: true do
     # Note: it's important that the group be in the user's current org,
     # or else the API won't give access to it
     let(:organization) { user.current_organization }
@@ -182,7 +182,7 @@ describe Api::V1::RolesController, type: :request, json: true, auth: true do
         end
       end
 
-      context 'as viewer', auth: false do
+      context 'as viewer', auth: false, create_org: false do
         # Needs org and editor created because auth is false
         let!(:organization) { create(:organization) }
         let!(:editor) { create(:user, add_to_org: organization) }

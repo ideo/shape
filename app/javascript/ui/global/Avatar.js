@@ -26,24 +26,22 @@ const StyledAvatar = styled(MuiAvatar)`
 @observer
 class Avatar extends React.Component {
   @observable
-  url = null
-
-  constructor(props) {
-    super(props)
-    this.setUrl(props.url)
-  }
-
-  componentWillReceiveProps({ url }) {
-    this.setUrl(url)
-  }
+  error = false
 
   @action
-  setUrl(url) {
-    this.url = url
+  setError(val) {
+    this.error = val
+  }
+
+  get url() {
+    if (this.error) {
+      return Avatar.defaultProps.url
+    }
+    return this.props.url
   }
 
   onError = () => {
-    this.setUrl(Avatar.defaultProps.url)
+    this.setError(true)
   }
 
   handleClick = () => {

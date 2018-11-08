@@ -45,7 +45,7 @@ describe Api::V1::GroupsController, type: :request, json: true, auth: true do
     end
   end
 
-  describe 'POST #create' do
+  describe 'POST #create', create_org: true do
     let!(:organization) { create(:organization) }
     let!(:group) { create(:group, add_admins: [user]) }
     let(:current_user) { user }

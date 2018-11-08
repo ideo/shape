@@ -75,15 +75,9 @@ class Header extends React.Component {
     this.setState({ userDropdownOpen: false })
   }
 
-  handleLogout = async () => {
+  handleLogout = () => {
     const { apiStore } = this.props
-    await apiStore.request('/sessions', 'DELETE')
-    try {
-      // Log user out of IDEO network, back to homepage
-      await IdeoSSO.logout('/')
-    } catch (e) {
-      window.location = '/login'
-    }
+    apiStore.currentUser.logout()
   }
 
   get clickHandlers() {
