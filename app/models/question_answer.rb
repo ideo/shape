@@ -74,9 +74,7 @@ class QuestionAnswer < ApplicationRecord
   end
 
   def update_collection_test_scores
-    # this only applies if there is a collection_to_test
-    collection_to_test = survey_response.test_collection.collection_to_test
-    return unless collection_to_test.present?
-    collection_to_test.cache_test_scores!
+    return unless survey_response.completed?
+    survey_response.cache_test_scores!
   end
 end

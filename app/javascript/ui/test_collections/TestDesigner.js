@@ -99,24 +99,29 @@ class TestDesigner extends React.Component {
     }
   }
 
-  handleSelectChange = replacingCard => ev =>
-    this.createNewQuestionCard({
-      replacingCard,
-      questionType: ev.target.value,
-    })
-
-  handleTrash = card => {
+  confirmEdit = action => {
     const { collection } = this.props
     collection.confirmEdit({
-      onConfirm: () => card.API_archiveSelf(),
+      onConfirm: () => action(),
     })
   }
 
+  handleSelectChange = replacingCard => ev =>
+    this.confirmEdit(() => {
+      this.createNewQuestionCard({
+        replacingCard,
+        questionType: ev.target.value,
+      })
+    })
+
+  handleTrash = card => {
+    this.confirmEdit(() => card.API_archiveSelf())
+  }
+
   handleNew = (card, addBefore) => () => {
-    const { collection } = this.props
-    const order = addBefore ? card.order - 0.5 : card.order + 1
-    collection.confirmEdit({
-      onConfirm: () => this.createNewQuestionCard({ order }),
+    this.confirmEdit(() => {
+      const order = addBefore ? card.order - 0.5 : card.order + 1
+      this.createNewQuestionCard({ order })
     })
   }
 
@@ -137,20 +142,22 @@ class TestDesigner extends React.Component {
     return first.API_archiveCards(_.map([first, second], 'id'))
   }
 
-  handleTestTypeChange = async e => {
+  handleTestTypeChange = e => {
     const { collection } = this.props
     const { collectionToTest } = this.state
     const { value } = e.target
-    this.setState({ testType: value })
-    if (value === 'media') {
-      collection.collection_to_test_id = null
-    } else if (collectionToTest) {
-      await this.archiveMediaCardsIfDefaultState()
-      collection.collection_to_test_id = collectionToTest.id
-    } else {
-      return
-    }
-    collection.save()
+    this.confirmEdit(async () => {
+      this.setState({ testType: value })
+      if (value === 'media') {
+        collection.collection_to_test_id = null
+      } else if (collectionToTest) {
+        await this.archiveMediaCardsIfDefaultState()
+        collection.collection_to_test_id = collectionToTest.id
+      } else {
+        return
+      }
+      collection.save()
+    })
   }
 
   get styledTheme() {
@@ -164,6 +171,8 @@ class TestDesigner extends React.Component {
     // viewers still see the select forms, but disabled
     const { collection } = this.props
     // If this is a template instance, don't allow editing
+    // NOTE: if we ever allow template instance editors to add their own questions at the end
+    // (before the finish card?) then we may want to individually check canEdit on a per card basis
     if (collection.isTemplated) return false
     return collection.can_edit_content
   }

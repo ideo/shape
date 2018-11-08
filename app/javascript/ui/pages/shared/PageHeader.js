@@ -254,7 +254,7 @@ class PageHeader extends React.Component {
       icon = <TemplateIcon circled />
     } else if (record.isSubmissionBox) {
       icon = <SubmissionBoxIconLg />
-    } else if (record.isTestCollectionOrTestDesign) {
+    } else if (record.launchableTestId) {
       icon = <TestCollectionIcon />
     }
     if (icon) {
@@ -267,15 +267,17 @@ class PageHeader extends React.Component {
     const { record } = this.props
     if (
       record.can_edit_content &&
-      (record.isLaunchableTest || record.isClosedTest)
+      (record.isDraftTest || record.isClosedTest)
     ) {
-      if (record.isLaunchableTest) {
+      if (record.isDraftTest) {
         return (
           <HeaderFormButton onClick={record.launchTest}>
-            Get Feedback
+            {record.is_submission_box_template_test
+              ? 'Launch Tests'
+              : 'Get Feedback'}
           </HeaderFormButton>
         )
-      } else if (record.isClosedTest && record.test_can_reopen) {
+      } else if (record.isClosedTest) {
         return (
           <HeaderFormButton
             onClick={record.reopenTest}

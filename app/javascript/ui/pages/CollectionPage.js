@@ -329,13 +329,10 @@ class CollectionPage extends PageWithApi {
     } = uiStore
 
     // submissions_collection will only exist for submission boxes
-    const { isSubmissionBox } = collection
+    const { isSubmissionBox, requiresTestDesigner } = collection
     const { movingCardIds, cardAction } = uiStore
     // only tell the Grid to hide "movingCards" if we're moving and not linking
     const uiMovingCardIds = cardAction === 'move' ? movingCardIds : []
-
-    const requiresTestDesigner =
-      collection.isLaunchableTest || collection.isTestDesign
 
     return (
       <Fragment>

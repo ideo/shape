@@ -64,6 +64,8 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   get shouldShowEditWarning() {
     if (!this.isMasterTemplate || this.template_num_instances === 0)
       return false
+    // if we already have the confirmation open, don't try to re-open
+    if (uiStore.dialogConfig.open === 'confirm') return false
     const oneHourAgo = Date.now() - 1000 * 60 * 60
     if (!this.snoozedEditWarningsAt) return true
     if (this.snoozedEditWarningsAt < oneHourAgo) {
@@ -133,6 +135,17 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     return this.type === 'Collection::SubmissionsCollection'
   }
 
+  get isSubmission() {
+    return this.submission_attrs && this.submission_attrs.submission
+  }
+
+  get isSubmissionBoxTemplateOrTest() {
+    return (
+      this.is_submission_box_template ||
+      (this.submission_attrs && this.submission_attrs.template)
+    )
+  }
+
   get isTestCollection() {
     return this.type === 'Collection::TestCollection'
   }
@@ -181,20 +194,50 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     )
   }
 
-  get isLaunchableTest() {
-    return this.isTestCollectionOrTestDesign && this.test_status === 'draft'
+  get requiresTestDesigner() {
+    // this determines if it should display the TestDesigner in CollectionPage,
+    return (
+      this.isTestDesign ||
+      (this.isTestCollection && this.test_status === 'draft') ||
+      this.is_submission_box_template_test
+    )
+  }
+
+  get launchableTestId() {
+    if (this.isTestCollection) {
+      return this.id
+    } else if (this.isTestDesign) {
+      return this.test_collection_id
+    } else if (this.submission_attrs) {
+      return this.submission_attrs.launchable_test_id
+    }
+    return undefined
+  }
+
+  get launchableTestStatus() {
+    if (this.isTestCollectionOrTestDesign) {
+      return this.test_status
+    }
+    if (!this.submission_attrs) return null
+    return this.submission_attrs.test_status
+  }
+
+  get isDraftTest() {
+    // NOTE: we show this even if the test is not necessarily "launchable", so that you can click it and see why
+    return this.launchableTestStatus === 'draft'
   }
 
   get isLiveTest() {
-    return this.isTestCollectionOrTestDesign && this.test_status === 'live'
+    return this.launchableTestStatus === 'live'
   }
 
   get isClosedTest() {
-    return this.isTestCollectionOrTestDesign && this.test_status === 'closed'
+    return this.launchableTestStatus === 'closed'
   }
 
   get publicTestURL() {
-    return `${process.env.BASE_HOST}/tests/${this.testCollectionId}`
+    // TODO: for the submission_box_template_test, this will eventually go to the global "submission box test link"
+    return `${process.env.BASE_HOST}/tests/${this.launchableTestId}`
   }
 
   get isTemplated() {
@@ -253,14 +296,6 @@ class Collection extends SharedRecordMixin(BaseRecord) {
 
   get isEmpty() {
     return this.collection_cards.length === 0
-  }
-
-  get testCollectionId() {
-    if (this.isTestCollection) return this.id
-    if (this.isTestDesign && this.parent_collection_card) {
-      return this.parent_collection_card.parent_id
-    }
-    return undefined
   }
 
   @action
@@ -322,51 +357,87 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     }
   }
 
-  launchTest = () => {
-    // TODO: If you're an instance editor of a submission e.g. can_edit_content...
-    // should not be able to launch until something(?) is set on the submission_box
-    if (!this.can_edit_content) {
-      uiStore.alert('Only editors are allowed to launch the test.')
-      return
+  checkLaunchability() {
+    if (!this.can_edit_content || !this.launchable) {
+      // TODO: More specific messaging around why e.g. if this is a submission template...
+      let message = 'Only editors are allowed to launch the test.'
+      if (this.is_submission_box_template_test) {
+        message =
+          'You must close any other live tests before launching this one.'
+      }
+      uiStore.alert(message)
+      return false
     }
-    this.API_launchTest()
+    return true
   }
 
-  closeTest = async () => {
-    await this.API_closeTest()
+  launchTest = () => this._performTestAction('launch')
+
+  closeTest = () => {
+    const onConfirm = () => this._performTestAction('close')
+    if (this.isSubmissionBoxTemplateOrTest) {
+      let prompt = 'Are you sure you want to stop all active tests?'
+      const num = this.template_num_instances
+      prompt += ` ${num} ${pluralize('submission', num)} will be affected.`
+      return uiStore.confirm({
+        iconName: 'Alert',
+        prompt,
+        confirmText: 'Stop feedback',
+        cancelText: 'No',
+        onConfirm,
+      })
+    }
+    return onConfirm()
   }
 
-  reopenTest = async () => {
-    await this.API_reopenTest()
+  reopenTest = () => this._performTestAction('reopen')
+
+  async _fetchSubmissionTest() {
+    // if it's a submission we have to look up its test in order to launch
+    if (!this.launchableTestId) return false
+    const res = await this.apiStore.fetch('collections', this.launchableTestId)
+    return res.data
   }
 
-  // eslint-disable-next-line
-  displayTestErrors(err) {
-    uiStore.popupAlert({
-      prompt: `You have questions that have not yet been finalized:\n
-       ${err.error.map(e => ` ${e.detail}`)}
-      `,
-      fadeOutTime: 10 * 1000,
-    })
+  async _performTestAction(actionName) {
+    // possible actions = 'launch', 'close', 'reopen'
+    if (!_.includes(['launch', 'close', 'reopen'], actionName)) return false
+    let collection = this
+    if (this.submission_attrs) {
+      collection = await this._fetchSubmissionTest()
+    }
+    if (_.includes(['launch', 'reopen'], actionName)) {
+      if (collection.checkLaunchability()) {
+        // called with 'this' so that we know if the submission is calling it
+        return this.API_performTestAction(actionName)
+      }
+      return false
+    }
+    // e.g. for close
+    return this.API_performTestAction(actionName)
   }
 
-  API_launchTest() {
-    this.apiStore
-      .request(`test_collections/${this.testCollectionId}/launch`, 'PATCH')
-      .catch(this.displayTestErrors)
-  }
-
-  API_closeTest(collectionId) {
-    this.apiStore.request(
-      `test_collections/${this.testCollectionId}/close`,
-      'PATCH'
-    )
-  }
-
-  API_reopenTest() {
-    this.apiStore
-      .request(`test_collections/${this.testCollectionId}/reopen`, 'PATCH')
-      .catch(this.displayTestErrors)
+  API_performTestAction = async actionName => {
+    await this.apiStore
+      .request(
+        `test_collections/${this.launchableTestId}/${actionName}`,
+        'PATCH'
+      )
+      .catch(err => {
+        const errorMessages = err.error.map(e => ` ${e.detail}`)
+        let prompt = `You have questions that have not yet been finalized:\n
+           ${errorMessages}
+          `
+        // omit the extra wording for close and reopen
+        // for reopen: what if there are actually incomplete questions... ?
+        if (_.includes(['close', 'reopen'], actionName)) prompt = errorMessages
+        uiStore.popupAlert({
+          prompt,
+          fadeOutTime: 10 * 1000,
+        })
+      })
+    // refetch yourself
+    if (this.submission_attrs) this.apiStore.request(`collections/${this.id}`)
   }
 
   API_setSubmissionBoxTemplate(data) {

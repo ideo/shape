@@ -18,6 +18,10 @@ class CollectionTemplateBuilder
     setup_template_cards
     # mainly so template_num_instances will be refreshed in API cache
     @template.touch
+    if @parent.is_a? Collection::SubmissionsCollection
+      # this will get persisted when calling cache_cover!
+      @collection.submission_attrs = { submission: true }
+    end
     # re-save to capture cover, new breadcrumb + tag lists
     @collection.cache_cover!
     @collection

@@ -95,6 +95,19 @@ RSpec.describe CollectionTemplateBuilder, type: :service do
       end
     end
 
+    context 'with a submissions_collection parent' do
+      let(:parent) { create(:submissions_collection, submission_box: create(:submission_box)) }
+
+      it 'should create a new collection that is marked as a "submission"' do
+        expect(instance.template).to eq template
+        expect(instance.submission?).to be true
+      end
+
+      it 'should be named "User\'s" instance' do
+        expect(instance.name).to eq "#{user.first_name}'s #{template.name}"
+      end
+    end
+
     context 'with a test template as a sub-collection' do
       let!(:test_collection) do
         create(:test_collection,

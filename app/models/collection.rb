@@ -22,7 +22,8 @@ class Collection < ApplicationRecord
                  :cached_tag_list,
                  :cached_owned_tag_list,
                  :cached_org_properties,
-                 :cached_card_count
+                 :cached_card_count,
+                 :submission_attrs
 
   # callbacks
   after_touch :touch_related_cards, unless: :destroyed?
@@ -193,7 +194,8 @@ class Collection < ApplicationRecord
     ]
   end
 
-  # similar to above but requires `collection/item` instead of `record`
+  # similar to above but for AR .includes(...)
+  # requires `collection/item` instead of `record`
   def self.default_relationships_for_query
     [
       :created_by,
@@ -352,6 +354,7 @@ class Collection < ApplicationRecord
       if card_order == 'total' || card_order.include?('question_')
         collection_order = "cached_test_scores->'#{card_order}'"
         order = "collections.#{collection_order} DESC NULLS LAST"
+        puts "order #{order}"
       else
         # e.g. updated_at
         order = { card_order => :desc }
@@ -474,11 +477,18 @@ class Collection < ApplicationRecord
   end
 
   def cache_key(card_order = 'order')
+    test_details = ''
+    if test_collection?
+      # make sure these details factor into caching
+      test_details = "launchable=#{launchable?}&can_reopen=#{can_reopen?}"
+    end
+
     "#{jsonapi_cache_key}" \
       "/#{ActiveRecord::Migrator.current_version}" \
       "/#{ENV['HEROKU_RELEASE_VERSION']}" \
       "/order_#{card_order}" \
       "/cards_#{collection_cards.maximum(:updated_at).to_i}" \
+      "/#{test_details}" \
       "/roles_#{roles.maximum(:updated_at).to_i}"
   end
 
@@ -489,10 +499,6 @@ class Collection < ApplicationRecord
 
   def jsonapi_type_name
     'collections'
-  end
-
-  def test_collection?
-    is_a?(Collection::TestCollection) || is_a?(Collection::TestDesign)
   end
 
   def update_processing_status(status = nil)
@@ -516,12 +522,17 @@ class Collection < ApplicationRecord
     collections.each(&:processing_done) if processing_status.nil?
   end
 
-  def global_collection?
-    type == 'Collection::Global'
+  # =================================
+  # Various boolean queries/checks
+  # - many are related to test collections and submission_boxes
+  # - could perhaps be moved into a helper module?
+  # =================================
+  def test_collection?
+    is_a?(Collection::TestCollection) || is_a?(Collection::TestDesign)
   end
 
-  def submission_box_template?
-    parent.is_a? Collection::SubmissionBox
+  def global_collection?
+    type == 'Collection::Global'
   end
 
   def inside_a_master_template?
@@ -530,14 +541,61 @@ class Collection < ApplicationRecord
   end
 
   def inside_a_template_instance?
-    return true if template_id.present?
+    return true if templated?
     parents.where.not(template_id: nil).any?
+  end
+
+  def parent_submission_box
+    parents.find_by(type: 'Collection::SubmissionBox')
+  end
+
+  def parent_submission
+    parents.find_by("cached_attributes->'submission_attrs'->>'submission' = 'true'")
+  end
+
+  def parent_submission_box_template
+    @parent_submission_box_template ||= begin
+      return nil unless inside_a_submission_box?
+      template_id = parent_submission_box&.submission_template_id
+      return nil unless template_id.present?
+      parents.find_by(id: template_id)
+    end
+  end
+
+  def submission_box_template?
+    return false unless master_template? && inside_a_submission_box?
+    id == parent_submission_box&.submission_template_id
+  end
+
+  def inside_a_submission_box_template?
+    parent_submission_box_template.present?
+  end
+
+  def inside_a_submission_box?
+    return true if is_a?(Collection::SubmissionBox)
+    parents.where(type: 'Collection::SubmissionBox').any?
+  end
+
+  def submission_box_template_test?
+    return false unless is_a?(Collection::TestCollection)
+    master_template? && inside_a_submission_box_template?
+  end
+
+  def submission?
+    submission_attrs.present? && submission_attrs['submission']
+  end
+
+  def inside_a_submission?
+    parents.where("cached_attributes->'submission_attrs'->>'submission' = 'true'").any?
   end
 
   # check for template instances anywhere in the entire collection tree
   def any_template_instance_children?
     Collection.in_collection(id).where.not(template_id: nil).any?
   end
+
+  # =================================
+  # <--- end boolean checks
 
   private
 
