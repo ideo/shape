@@ -150,7 +150,7 @@ class Organization < ApplicationRecord
     NetworkApi::Organization.create(
       external_id: id,
       name: name,
-      admin_user_uid: admin.try(:uid),
+      admin_user_uid: admin.try(:uid) || '',
     )
   end
 
@@ -310,6 +310,8 @@ class Organization < ApplicationRecord
       organization_id: network_organization.id,
       active: true,
     ).first
+    return unless subscription
+
     subscription.cancel(immediately: true)
   end
 
