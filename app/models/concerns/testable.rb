@@ -8,12 +8,6 @@ module Testable
              foreign_key: :collection_to_test_id,
              class_name: 'Collection::TestCollection'
 
-    # has_one :latest_test_collection,
-    #         -> { active.where(test_status: %i[live closed]).order(updated_at: :desc) },
-    #         inverse_of: :collection_to_test,
-    #         foreign_key: :collection_to_test_id,
-    #         class_name: 'Collection::TestCollection'
-
     has_one :live_test_collection,
             -> { active.live },
             inverse_of: :collection_to_test,

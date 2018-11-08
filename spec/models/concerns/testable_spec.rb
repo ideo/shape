@@ -2,10 +2,7 @@ require 'rails_helper'
 
 describe Testable, type: :concern do
   context 'with scored collections' do
-    let(:collection) { create(:collection) }
-    let(:older_test_collection) do
-      create(:test_collection, collection_to_test: collection, test_status: :live, updated_at: 1.week.ago)
-    end
+    let(:collection) { create(:collection, :submission) }
     let(:test_collection) { create(:test_collection, collection_to_test: collection, test_status: :live) }
     let(:useful_question) { test_collection.question_items.where(question_type: :question_useful).first }
     let(:clarity_question_card) { create(:collection_card_question, parent: test_collection) }
@@ -13,6 +10,8 @@ describe Testable, type: :concern do
     let(:survey_responses) { create_list(:survey_response, 3, test_collection: test_collection, status: :completed) }
 
     before do
+      collection.submission_attrs['launchable_test_id'] = test_collection.id
+      collection.save
       clarity_question.update(question_type: :question_clarity)
       survey_responses.each_with_index do |sr, i|
         sr.question_answers.create(question: useful_question, answer_number: i + 1)
