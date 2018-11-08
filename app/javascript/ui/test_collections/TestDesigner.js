@@ -12,11 +12,11 @@ import {
   TestQuestionHolder,
   styledTestTheme,
 } from '~/ui/test_collections/shared'
-import { apiStore } from '~/stores/'
 import QuestionHotEdge from '~/ui/test_collections/QuestionHotEdge'
 import TestQuestion from '~/ui/test_collections/TestQuestion'
 import RadioControl from '~/ui/global/RadioControl'
 import PinnedIcon from '~/ui/icons/PinnedIcon'
+import { apiStore } from '~/stores'
 // NOTE: Always import these models after everything else, can lead to odd dependency!
 import CollectionCard from '~/stores/jsonApi/CollectionCard'
 
@@ -67,6 +67,11 @@ const selectOptions = [
   { value: 'question_category_satisfaction', label: 'Category Satisfaction' },
 ]
 
+function optionSort(a, b) {
+  if (b.value === '') return 1
+  return a.label.localeCompare(b.label)
+}
+
 @observer
 class TestDesigner extends React.Component {
   constructor(props) {
@@ -113,10 +118,11 @@ class TestDesigner extends React.Component {
     this.confirmEdit(() => card.API_archiveSelf())
   }
 
-  handleNew = card => () => {
-    this.confirmEdit(() =>
-      this.createNewQuestionCard({ order: card.order + 1 })
-    )
+  handleNew = (card, addBefore) => () => {
+    this.confirmEdit(() => {
+      const order = addBefore ? card.order - 0.5 : card.order + 1
+      this.createNewQuestionCard({ order })
+    })
   }
 
   archiveMediaCardsIfDefaultState() {
@@ -193,8 +199,8 @@ class TestDesigner extends React.Component {
     return card.API_create()
   }
 
-  renderHotEdge(card) {
-    return <QuestionHotEdge onAdd={this.handleNew(card)} />
+  renderHotEdge(card, addBefore = false) {
+    return <QuestionHotEdge onAdd={this.handleNew(card, addBefore)} />
   }
 
   renderQuestionSelectForm(card) {
@@ -217,7 +223,7 @@ class TestDesigner extends React.Component {
             value={card.card_question_type || ''}
             onChange={this.handleSelectChange(card)}
           >
-            {selectOptions.map(opt => (
+            {selectOptions.sort(optionSort).map(opt => (
               <SelectOption
                 key={opt.value}
                 classes={{
@@ -298,13 +304,15 @@ class TestDesigner extends React.Component {
     const inner = collection.collection_cards.map((card, i) => {
       let position
       const item = card.record
+      // blank item can occur briefly while the placeholder card/item is being replaced
+      if (!item) return null
       if (i === 0) position = 'question_beginning'
       if (i === cardCount - 1) position = 'question_end'
       const userEditable = [
         'media',
         'question_media',
         'question_description',
-      ].includes(card.record.question_type)
+      ].includes(item.question_type)
       return (
         <FlipMove appearAnimation="fade" key={card.id}>
           <div>
@@ -314,6 +322,7 @@ class TestDesigner extends React.Component {
                 flexWrap: 'wrap',
               }}
             >
+              {i === 0 && this.canEdit && this.renderHotEdge(card, true)}
               {this.renderQuestionSelectForm(card)}
               <TestQuestionHolder editing userEditable={userEditable}>
                 <TestQuestion

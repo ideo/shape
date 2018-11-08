@@ -26,7 +26,7 @@ describe Collection::TestCollection, type: :model do
 
     describe '#add_test_tag' do
       it 'should add the #test tag after_create' do
-        expect(test_collection.cached_owned_tag_list).to match_array(['test'])
+        expect(test_collection.cached_owned_tag_list).to match_array(['feedback'])
       end
     end
   end
@@ -72,9 +72,9 @@ describe Collection::TestCollection, type: :model do
       end
 
       it 'copies collection' do
-        expect {
+        expect do
           duplicate
-        }.to change(Collection, :count).by(1)
+        end.to change(Collection, :count).by(1)
         expect(duplicate).to be_instance_of(Collection::TestCollection)
         expect(duplicate.draft?).to be true
       end
@@ -103,9 +103,9 @@ describe Collection::TestCollection, type: :model do
       end
 
       it 'only copies test design' do
-        expect {
+        expect do
           duplicate
-        }.to change(Collection, :count).by(1)
+        end.to change(Collection, :count).by(1)
         expect(duplicate).to be_instance_of(Collection::TestCollection)
         expect(duplicate.draft?).to be true
       end
@@ -137,9 +137,9 @@ describe Collection::TestCollection, type: :model do
         end
 
         it 'only copies test design' do
-          expect {
+          expect do
             duplicate
-          }.to change(Collection, :count).by(1)
+          end.to change(Collection, :count).by(1)
           expect(duplicate).to be_instance_of(Collection::TestCollection)
           expect(duplicate.draft?).to be true
         end

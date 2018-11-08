@@ -604,8 +604,10 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
 
   describe 'PATCH #replace' do
     let(:collection) { create(:collection, organization: organization) }
-    let(:collection_card) { create(:collection_card_text, parent: collection) }
+    let(:collection_card) { create(:collection_card_image, parent: collection) }
+    let(:item) { collection_card.item }
     let(:path) { "/api/v1/collection_cards/#{collection_card.id}/replace" }
+    let(:editor) { create(:user) }
     let(:raw_params) do
       {
         order: 1,
@@ -615,9 +617,11 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
         parent_id: collection.id,
         # create with a nested item
         item_attributes: {
-          content: 'This is my item content',
-          text_data: { ops: [{ insert: 'This is my item content.' }] },
-          type: 'Item::TextItem',
+          type: 'Item::LinkItem',
+          url: 'http://item.link.url.net/123',
+          name: 'A linkable linked article',
+          content: 'Some text that would go inside, lorem ipsum.',
+          icon_url: 'http://icon.url',
         },
       }
     end
@@ -625,6 +629,8 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
 
     context 'with record and collection content edit access' do
       before do
+        editor.add_role(Role::EDITOR, collection_card.item)
+        editor.add_role(Role::EDITOR, collection)
         user.add_role(Role::CONTENT_EDITOR, collection_card.item)
         user.add_role(Role::CONTENT_EDITOR, collection)
       end
@@ -640,16 +646,26 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
         expect(json['data']['attributes']['parent_id']).to eq collection.id
       end
 
-      it 'archives the existing card' do
-        expect(collection_card.archived).to eq(false)
-        patch(path, params: params)
-        expect(collection_card.reload.archived).to eq(true)
-      end
-
-      it 'creates a new item' do
+      it 'updates the existing item with the new type' do
+        expect(item.is_a?(Item::FileItem)).to be true
+        expect(item.filestack_file.present?).to be true
         expect do
           patch(path, params: params)
-        end.to change(Item, :count).by(1)
+        end.not_to change(Item, :count)
+        # have to refetch since it's now a new model type
+        id = item.id
+        item = Item.find(id)
+        expect(item.is_a?(Item::LinkItem)).to be true
+        # should clear any previous attrs
+        expect(item.filestack_file.present?).to be false
+      end
+
+      it 'preserves the roles' do
+        expect(item.can_edit?(editor)).to be true
+        expect(item.can_edit_content?(user)).to be true
+        patch(path, params: params)
+        expect(item.can_edit?(editor)).to be true
+        expect(item.can_edit_content?(user)).to be true
       end
 
       it 'creates an activity' do
@@ -657,7 +673,7 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
           actor: user,
           target: anything,
           action: :replaced,
-          subject_user_ids: [user.id],
+          subject_user_ids: [editor.id],
           subject_group_ids: [],
           source: nil,
           destination: nil,
@@ -675,6 +691,8 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
 
       context 'with question item params' do
         let(:collection) { create(:test_collection, organization: organization) }
+        # will be question_useful by default
+        let(:collection_card) { create(:collection_card_question, parent: collection) }
         let(:raw_params) do
           {
             order: 2,
@@ -689,10 +707,10 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
           }
         end
 
-        it 'creates a QuestionItem card' do
+        it 'replaces the QuestionItem' do
           expect do
             patch(path, params: params)
-          end.to change(Item::QuestionItem, :count).by(1)
+          end.not_to change(Item::QuestionItem, :count)
           expect(json['data']['attributes']['card_question_type']).to eq 'question_description'
         end
       end

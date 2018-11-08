@@ -386,7 +386,7 @@ class Collection
       # create the special #test tag
       tag(
         self,
-        with: 'test',
+        with: 'feedback',
         on: :tags,
       )
       update_cached_tag_lists

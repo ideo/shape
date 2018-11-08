@@ -127,32 +127,6 @@ RSpec.describe CollectionCardBuilder, type: :service do
       end
     end
 
-    context 'replacing a card' do
-      let(:replacing_card) { create(:collection_card_text, pinned: true, templated_from_id: 99) }
-      let(:builder) do
-        CollectionCardBuilder.new(
-          params: params.merge(
-            item_attributes: {
-              name: 'My item name',
-              content: 'My Text Content goes here',
-              text_data: { ops: [] },
-              type: 'Item::TextItem',
-            },
-          ),
-          parent_collection: parent,
-          user: user,
-          replacing_card: replacing_card,
-        )
-      end
-
-      it 'should copy pinned and templated_from_id attributes from replacing_card' do
-        expect(builder.create).to be true
-        created_card = builder.collection_card
-        expect(created_card.pinned).to be true
-        expect(created_card.templated_from_id).to eq 99
-      end
-    end
-
     context 'error because the item has no type' do
       # attempt to build card without any item or collection
       let(:builder) do

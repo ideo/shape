@@ -29,6 +29,12 @@ describe('TestDesigner', () => {
     )
   })
 
+  it('renders the question options alphabetically', () => {
+    const select = wrapper.find('StyledSelect StyledSelectOption')
+    expect(select.get(0).props.value).toEqual('question_category_satisfaction')
+    expect(select.get(1).props.value).toEqual('question_clarity')
+  })
+
   it('passes position props for beginning and end', () => {
     expect(wrapper.find('TestQuestion').get(0).props.position).toEqual(
       'question_beginning'
