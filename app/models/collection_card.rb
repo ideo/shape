@@ -46,7 +46,8 @@ class CollectionCard < ApplicationRecord
     shallow: false,
     placement: 'end',
     duplicate_linked_records: false,
-    building_template_instance: false
+    building_template_instance: false,
+    async: true
   )
     if record.is_a? Collection::SharedWithMeCollection
       errors.add(:collection, 'cannot be a SharedWithMeCollection for duplication')
@@ -61,6 +62,7 @@ class CollectionCard < ApplicationRecord
         parent: parent,
         shallow: shallow,
         placement: placement,
+        async: async,
       )
     end
     cc = amoeba_dup
@@ -92,6 +94,7 @@ class CollectionCard < ApplicationRecord
       opts = {
         for_user: for_user,
         parent: parent,
+        async: async,
       }
       coll_opts = opts.merge(
         building_template_instance: building_template_instance,
