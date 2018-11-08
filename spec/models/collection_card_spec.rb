@@ -105,12 +105,14 @@ RSpec.describe CollectionCard, type: :model do
     let(:shallow) { false }
     let(:duplicate_linked_records) { false }
     let(:placement) { 'end' }
+    let(:async) { true }
     let(:duplicate) do
       collection_card.duplicate!(
         for_user: user,
         shallow: shallow,
         placement: placement,
         duplicate_linked_records: duplicate_linked_records,
+        async: async,
       )
     end
 
@@ -197,6 +199,21 @@ RSpec.describe CollectionCard, type: :model do
         expect { duplicate }.to change(Collection, :count).by(1)
         expect(duplicate.primary?).to be true
         expect(duplicate.record.id).not_to eq(collection.id)
+      end
+
+      context 'when async is set to false' do
+        let(:async) { false }
+
+        it 'should call duplicate on the parent collection card with async false' do
+          expect(parent_collection_card).to receive(:duplicate!).with(
+            for_user: anything,
+            parent: anything,
+            shallow: anything,
+            placement: anything,
+            async: false,
+          )
+          duplicate
+        end
       end
     end
 
@@ -448,9 +465,9 @@ RSpec.describe CollectionCard, type: :model do
 
       it 'should archive all cards in the query' do
         expect_any_instance_of(Collection).to receive(:touch)
-        expect {
+        expect do
           collection_cards.archive_all!(user_id: user.id)
-        }.to change(CollectionCard.active, :count).by(collection_cards.count * -1)
+        end.to change(CollectionCard.active, :count).by(collection_cards.count * -1)
         expect(collection.reload.collection_cards).to eq []
       end
 
