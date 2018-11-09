@@ -227,7 +227,7 @@ class Collection < ApplicationRecord
     copy_parent_card: false,
     parent: self.parent,
     building_template_instance: false,
-    async: true
+    system_collection: false
   )
 
     # check if we are cloning a template inside a template instance;
@@ -279,15 +279,15 @@ class Collection < ApplicationRecord
 
     if collection_cards.any?
       # TODO: look up way to remove duplication here
-      if async
-        CollectionCardDuplicationWorker.perform_async(
+      if system_colllection
+        CollectionCardDuplicationWorker.new.perform(
           collection_cards.map(&:id),
           c.id,
           for_user.try(:id),
-          async,
+          true,
         )
       else
-        CollectionCardDuplicationWorker.new.perform(
+        CollectionCardDuplicationWorker.perform_async(
           collection_cards.map(&:id),
           c.id,
           for_user.try(:id),

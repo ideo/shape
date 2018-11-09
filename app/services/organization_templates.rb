@@ -17,7 +17,7 @@ class OrganizationTemplates < SimpleService
     getting_started_collection = getting_started_template.duplicate!(
       copy_parent_card: true,
       parent: @org.template_collection,
-      async: false,
+      system_collection: true,
     )
     return unless getting_started_collection.persisted?
     unless getting_started_collection.is_a?(Collection::Global)

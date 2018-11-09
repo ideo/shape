@@ -105,14 +105,14 @@ RSpec.describe CollectionCard, type: :model do
     let(:shallow) { false }
     let(:duplicate_linked_records) { false }
     let(:placement) { 'end' }
-    let(:async) { true }
+    let(:system_collection) { false }
     let(:duplicate) do
       collection_card.duplicate!(
         for_user: user,
         shallow: shallow,
         placement: placement,
         duplicate_linked_records: duplicate_linked_records,
-        async: async,
+        system_collection: system_collection,
       )
     end
 
@@ -201,16 +201,16 @@ RSpec.describe CollectionCard, type: :model do
         expect(duplicate.record.id).not_to eq(collection.id)
       end
 
-      context 'when async is set to false' do
-        let(:async) { false }
+      context 'when system_collection is set to true' do
+        let(:system_collection) { true }
 
-        it 'should call duplicate on the parent collection card with async false' do
+        it 'should call duplicate on the parent collection card with system_collection true' do
           expect(parent_collection_card).to receive(:duplicate!).with(
             for_user: anything,
             parent: anything,
             shallow: anything,
             placement: anything,
-            async: false,
+            system_collection: true,
           )
           duplicate
         end

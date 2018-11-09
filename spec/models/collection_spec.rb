@@ -283,7 +283,7 @@ describe Collection, type: :model do
       end
     end
 
-    context 'with async set to false' do
+    context 'with system_collection set to true' do
       let(:instance_double) do
         double('CollectionCardDuplicationWorker')
       end
@@ -299,9 +299,9 @@ describe Collection, type: :model do
           anything,
           anything,
           anything,
-          false,
+          true,
         )
-        collection.duplicate!(for_user: user, async: false)
+        collection.duplicate!(for_user: user, system_collection: true)
       end
     end
   end
