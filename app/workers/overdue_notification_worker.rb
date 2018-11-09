@@ -2,9 +2,7 @@ class OverdueNotificationWorker
   include Sidekiq::Worker
 
   def perform
-    Organization.where(
-      in_app_billing: true,
-    ).where.not(
+    Organization.billable.where.not(
       overdue_at: nil,
     ).find_each do |organization|
       days_overdue = (Time.current - organization.overdue_at).to_i / 1.day

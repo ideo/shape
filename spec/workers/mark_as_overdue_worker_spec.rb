@@ -12,6 +12,17 @@ RSpec.describe MarkAsOverdueWorker, type: :worker do
              overdue_at: nil)
     end
 
+    let!(:deactivated) do
+      create(:organization,
+             deactivated: true,
+             in_app_billing: true,
+             trial_ends_at: 1.week.ago,
+             has_payment_method: false,
+             active_users_count: 10,
+             trial_users_count: 5,
+             overdue_at: nil)
+    end
+
     let!(:has_payment_method) do
       create(:organization,
              in_app_billing: true,
@@ -66,6 +77,7 @@ RSpec.describe MarkAsOverdueWorker, type: :worker do
       MarkAsOverdueWorker.new.perform
 
       [
+        deactivated,
         in_app_billing_disabled,
         has_payment_method,
         already_set_as_overdue,

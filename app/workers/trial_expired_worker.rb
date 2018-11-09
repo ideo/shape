@@ -2,9 +2,8 @@ class TrialExpiredWorker
   include Sidekiq::Worker
 
   def perform
-    Organization.where(
+    Organization.billable.where(
       trial_expired_email_sent: false,
-      in_app_billing: true,
     ).where(
       'trial_ends_at < ?', Time.current
     ).find_each do |organization|

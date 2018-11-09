@@ -7,6 +7,12 @@ RSpec.describe OverdueNotificationWorker, type: :worker do
              in_app_billing: false,
              overdue_at: 1.month.ago)
     end
+    let!(:deactivated) do
+      create(:organization,
+             deactivated: true,
+             in_app_billing: true,
+             overdue_at: 1.month.ago)
+    end
     let!(:overdue_at_not_set) do
       create(:organization,
              in_app_billing: true,
@@ -56,6 +62,7 @@ RSpec.describe OverdueNotificationWorker, type: :worker do
       expect(mailer).to receive(:deliver_now).exactly(5).times
 
       expect(BillingOverdueMailer).not_to receive(:notify).with(in_app_billing_disabled)
+      expect(BillingOverdueMailer).not_to receive(:notify).with(deactivated)
       expect(BillingOverdueMailer).not_to receive(:notify).with(overdue_at_not_set)
       expect(BillingOverdueMailer).not_to receive(:notify).with(overdue_3_days)
       expect(BillingOverdueMailer).not_to receive(:notify).with(overdue_9_days)
