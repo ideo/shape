@@ -10,7 +10,7 @@ class CollectionCardDuplicationWorker
     collection_cards.each do |card|
       # Skip duplicating any cards this user can't view (if user provided)
       # If a system collection don't check if user can view
-      next if for_user.present? && !card.record.can_view?(for_user)
+      next if for_user.present? && !system_collection && !card.record.can_view?(for_user)
       # duplicating each card in order, each subsequent one should be placed at the end
       card.duplicate!(for_user: for_user,
                       parent: parent_collection,
