@@ -1,6 +1,9 @@
 namespace :billing do
   desc 'migrate existing organization to billing'
   task migrate: :environment do
+    plan = NetworkApi::Plan.first
+    throw 'Must have an existing subscription plan!' unless plan
+
     enterprise_client_ids = [
       85,  # kyu collective
       87,  # Beacon Programs
@@ -36,7 +39,6 @@ namespace :billing do
     puts "END Disabling in app billing for enterprise clients\n\n"
 
     puts 'BEGIN Creating subscriptions'
-    plan = NetworkApi::Plan.first
     Organization.where.not(id: enterprise_client_ids).find_each do |organization|
       NetworkApi::Subscription.create(
         organization_id: organization.network_organization.id,
@@ -47,7 +49,6 @@ namespace :billing do
     puts "END Creating subscriptions\n\n"
 
     puts 'BEGIN setting trial ending date'
-    plan = NetworkApi::Plan.first
     Organization.where.not(id: enterprise_client_ids).find_each do |organization|
       days_left_in_trial = (Organization::DEFAULT_TRIAL_ENDS_AT - (Time.current - organization.created_at)) / 1.day
       days_left_in_trial = 0 if days_left_in_trial.negative?
