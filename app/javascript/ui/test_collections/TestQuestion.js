@@ -135,7 +135,13 @@ class TestQuestion extends React.Component {
           />
         )
       case 'question_finish':
-        return <FinishQuestion />
+        // TODO: The case where you see the FinishQuestion after finishing all available submissions
+        // parent.is_submission_box_template_test will not be true, but we still want to enable this case
+        return (
+          <FinishQuestion
+            submissionBox={parent.is_submission_box_template_test}
+          />
+        )
       default:
         return <NewQuestionGraphic />
     }
