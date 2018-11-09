@@ -57,7 +57,7 @@ describe Collection::SubmissionBox, type: :model do
     end
   end
 
-  describe '#available_submissions_to_test' do
+  describe '#available_submission_tests' do
     let(:user) { create(:user) }
     let(:user2) { create(:user) }
     let(:organization) { create(:organization) }
@@ -97,9 +97,9 @@ describe Collection::SubmissionBox, type: :model do
     end
 
     it 'should find any tests that you have view access to' do
-      expect(submission_box.available_submissions_to_test(for_user: user))
+      expect(submission_box.available_submission_tests(for_user: user))
         .to match_array([submission_test])
-      expect(submission_box.available_submissions_to_test(for_user: user2))
+      expect(submission_box.available_submission_tests(for_user: user2))
         .to match_array([submission_test, submission_test2])
     end
 
@@ -109,15 +109,15 @@ describe Collection::SubmissionBox, type: :model do
       end
 
       it 'should find any tests that you have not completed' do
-        expect(submission_box.available_submissions_to_test(for_user: user))
+        expect(submission_box.available_submission_tests(for_user: user))
           .to match_array([])
       end
     end
 
-    describe '#random_next_submission_to_test' do
+    describe '#random_next_submission_test' do
       it 'should find one of the tests you have access to' do
         # only one available, so not "random", but just checking that the function works
-        expect(submission_box.random_next_submission_to_test(for_user: user))
+        expect(submission_box.random_next_submission_test(for_user: user))
           .to eq(submission_test)
       end
     end

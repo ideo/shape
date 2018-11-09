@@ -45,7 +45,7 @@ class Collection
       (items + collections + submissions_collection.children)
     end
 
-    def available_submissions_to_test(for_user:)
+    def available_submission_tests(for_user:)
       return [] unless submission_box_type == 'template'
       test_ids = submissions_collection.collections.map do |submission|
         submission.submission_attrs['launchable_test_id']
@@ -63,9 +63,9 @@ class Collection
         .viewable_by(for_user, organization)
     end
 
-    def random_next_submission_to_test(for_user:)
+    def random_next_submission_test(for_user:)
       # will be nil if none are available
-      available = available_submissions_to_test(for_user: for_user)
+      available = available_submission_tests(for_user: for_user)
       return nil if available.empty?
       # need to use inner query to combine `order` + `distinct`
       Collection::TestCollection
