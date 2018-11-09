@@ -279,7 +279,7 @@ class Collection < ApplicationRecord
 
     if collection_cards.any?
       # TODO: look up way to remove duplication here
-      if system_colllection
+      if system_collection
         CollectionCardDuplicationWorker.new.perform(
           collection_cards.map(&:id),
           c.id,

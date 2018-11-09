@@ -196,7 +196,7 @@ describe Collection, type: :model do
           collection.collection_cards.map(&:id),
           instance_of(Integer),
           nil,
-          true,
+          false,
         )
         duplicate_without_user
       end
@@ -251,7 +251,7 @@ describe Collection, type: :model do
           collection.collection_cards.map(&:id),
           instance_of(Integer),
           user.id,
-          true,
+          false,
         )
         collection.duplicate!(for_user: user)
       end
