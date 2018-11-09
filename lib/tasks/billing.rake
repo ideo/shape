@@ -21,11 +21,8 @@ namespace :billing do
       admin_role = NetworkApi::Role.find(name: 'admin', resource_id: network_organization.id, resource_type: 'Organization').first ||
                    NetworkApi::Role.create(name: 'admin', resource_id: network_organization.id, resource_type: 'Organization')
 
-      organization.admins[:users].each do |admin|
+      organization.admins[:users].active.each do |admin|
         puts "    Adding #{organization.name} admin role to #{admin.email}"
-        # many users are missing uid's
-        next unless admin.uid
-
         NetworkApi::UsersRole.create_by_uid(user_uid: admin.uid, role_id: admin_role.id)
       end
     end
