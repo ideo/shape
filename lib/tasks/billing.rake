@@ -55,4 +55,3 @@ namespace :billing do
     puts "END setting trial ending date\n\n"
   end
 end
-p
