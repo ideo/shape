@@ -45,6 +45,35 @@ class Collection
       (items + collections + submissions_collection.children)
     end
 
+    def available_submissions_to_test(for_user:)
+      return [] unless submission_box_type == 'template'
+      test_ids = submissions_collection.collections.map do |submission|
+        submission.submission_attrs['launchable_test_id']
+      end
+      user_responses = SurveyResponse.where(
+        test_collection_id: test_ids,
+        user_id: for_user.id,
+        status: 'completed',
+      )
+      # omit any tests where the user has already completed their response
+      test_ids -= user_responses.pluck(:test_collection_id)
+      return [] if test_ids.empty?
+      Collection::TestCollection
+        .where(id: test_ids, test_status: 'live')
+        .viewable_by(for_user, organization)
+    end
+
+    def random_next_submission_to_test(for_user:)
+      # will be nil if none are available
+      available = available_submissions_to_test(for_user: for_user)
+      return nil if available.empty?
+      # need to use inner query to combine `order` + `distinct`
+      Collection::TestCollection
+        .from(available, :collections)
+        .order('RANDOM()')
+        .first
+    end
+
     private
 
     def submission_template_is_a_master_template

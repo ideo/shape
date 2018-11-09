@@ -56,4 +56,70 @@ describe Collection::SubmissionBox, type: :model do
       expect(submission_box.submissions_collection.archived?).to be true
     end
   end
+
+  describe '#available_submissions_to_test' do
+    let(:user) { create(:user) }
+    let(:user2) { create(:user) }
+    let(:organization) { create(:organization) }
+    let(:submission_box) { create(:submission_box, organization: organization, submission_box_type: :template) }
+    let(:submissions_collection) { submission_box.submissions_collection }
+    let(:submission) do
+      create(:collection, :submission, parent_collection: submissions_collection, organization: organization)
+    end
+    let(:submission_test) do
+      create(
+        :test_collection,
+        test_status: :live,
+        parent_collection: submission,
+        organization: organization,
+        add_viewers: [organization.primary_group],
+      )
+    end
+    let(:submission2) do
+      create(:collection, :submission, parent_collection: submissions_collection, organization: organization)
+    end
+    let(:submission_test2) do
+      create(
+        :test_collection,
+        test_status: :live,
+        parent_collection: submission2,
+        organization: organization,
+        add_viewers: [user2],
+      )
+    end
+
+    before do
+      submission_box.setup_submissions_collection!
+      submission.update(submission_attrs: { submission: true, launchable_test_id: submission_test.id })
+      submission2.update(submission_attrs: { submission: true, launchable_test_id: submission_test2.id })
+      user.add_role(Role::MEMBER, organization.primary_group)
+      user2.add_role(Role::MEMBER, organization.primary_group)
+    end
+
+    it 'should find any tests that you have view access to' do
+      expect(submission_box.available_submissions_to_test(for_user: user))
+        .to match_array([submission_test])
+      expect(submission_box.available_submissions_to_test(for_user: user2))
+        .to match_array([submission_test, submission_test2])
+    end
+
+    context 'with survey_responses' do
+      let!(:survey_response) do
+        create(:survey_response, status: :completed, test_collection: submission_test, user: user)
+      end
+
+      it 'should find any tests that you have not completed' do
+        expect(submission_box.available_submissions_to_test(for_user: user))
+          .to match_array([])
+      end
+    end
+
+    describe '#random_next_submission_to_test' do
+      it 'should find one of the tests you have access to' do
+        # only one available, so not "random", but just checking that the function works
+        expect(submission_box.random_next_submission_to_test(for_user: user))
+          .to eq(submission_test)
+      end
+    end
+  end
 end
