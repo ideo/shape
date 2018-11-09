@@ -149,6 +149,7 @@ class Organization < ApplicationRecord
     user_getting_started = getting_started_collection.duplicate!(
       for_user: user,
       parent: user_collection,
+      async: false,
     )
 
     # Change from Collection::Global to regular colleciton

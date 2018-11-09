@@ -291,7 +291,7 @@ class Collection < ApplicationRecord
           collection_cards.map(&:id),
           c.id,
           for_user.try(:id),
-          async,
+          false,
         )
       end
     end
