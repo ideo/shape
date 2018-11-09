@@ -5,6 +5,19 @@ describe Organization, type: :model do
     it { should validate_presence_of(:name) }
   end
 
+  describe 'billable scope' do
+    it 'only includes organizations with in app billing that are not deactivated' do
+      billable = create(:organization, in_app_billing: true, deactivated: false)
+      in_app_billing_false = create(:organization, in_app_billing: false, deactivated: false)
+      deactivated_true = create(:organization, in_app_billing: true, deactivated: true)
+
+      expect(Organization.billable.length).to be 1
+      expect(Organization.billable).to include(billable)
+      expect(Organization.billable).not_to include(in_app_billing_false)
+      expect(Organization.billable).not_to include(deactivated_true)
+    end
+  end
+
   context 'associations' do
     it { should have_many :collections }
     it { should have_many :groups }

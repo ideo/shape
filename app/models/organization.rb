@@ -52,6 +52,8 @@ class Organization < ApplicationRecord
 
   validates :name, presence: true
 
+  scope :billable, -> { where(in_app_billing: true, deactivated: false) }
+
   def can_view?(user)
     primary_group.can_view?(user) || admin_group.can_view?(user) || guest_group.can_view?(user)
   end
