@@ -120,7 +120,7 @@ export default class UiStore {
   @observable
   activityLogPosition = { x: 0, y: 0, w: 1, h: 1 }
   @observable
-  activityLogPage = 'comments'
+  activityLogPage = null
   @observable
   activityLogMoving = false
   @observable
@@ -467,9 +467,17 @@ export default class UiStore {
   @action
   openOptionalMenus(params) {
     const opts = queryString.parse(params)
-    if (opts && opts.open) {
-      this.activityLogPage = opts.open
-      this.activityLogOpen = true
+    if (opts) {
+      if (opts.open) {
+        this.activityLogPage = opts.open
+        this.activityLogOpen = true
+      }
+      if (opts.testing_completed) {
+        this.alert(
+          'No ideas are ready to test yet. Please come back later.',
+          'Clock'
+        )
+      }
     }
     return opts.open
   }

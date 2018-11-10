@@ -241,6 +241,8 @@ class CommentThreadContainer extends React.Component {
     // have to wait for this thread to expand so the next one is actually lower,
     // then we can scroll down to the top of the next thread.
     setTimeout(() => {
+      // may have switched pages at some point e.g. on load of ?open=xxx
+      if (this.props.uiStore.activityLogPage !== 'comments') return
       scroller.scrollTo(`thread-${nextIdx}`, {
         ...this.scrollOpts,
         duration,
