@@ -173,7 +173,7 @@ describe Resourceable, type: :concern do
     end
   end
 
-  describe '.viewable_by', do
+  describe '.viewable_by' do
     let(:organization) { create(:organization, member: user) }
     let(:collection) { create(:collection, organization: organization, add_viewers: [user]) }
     let(:group_collection) { create(:collection, organization: organization, add_viewers: [organization.primary_group]) }
