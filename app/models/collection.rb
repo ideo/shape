@@ -142,6 +142,7 @@ class Collection < ApplicationRecord
   def search_data
     user_ids = (editors[:users].pluck(:id) + viewers[:users].pluck(:id)).uniq
     group_ids = (editors[:groups].pluck(:id) + viewers[:groups].pluck(:id)).uniq
+    parent_ids = breadcrumb
     {
       name: name,
       tags: all_tag_names,
@@ -150,6 +151,7 @@ class Collection < ApplicationRecord
       organization_id: organization_id,
       user_ids: user_ids,
       group_ids: group_ids,
+      parent_ids: parent_ids,
     }
   end
 

@@ -102,6 +102,54 @@ describe Api::V1::SearchController, type: :request, json: true, auth: true, sear
           expect(json['links']['last']).to eq(2)
         end
       end
+
+      context 'when searching within a collection' do
+        let!(:parent_collection) do
+          create(:collection,
+                 add_editors: [current_user],
+                 organization: organization)
+        end
+        let!(:collections) do
+          create_list(
+            :collection,
+            3,
+            name: 'shared name',
+            organization: organization,
+            add_editors: [current_user],
+            parent_collection: parent_collection,
+          )
+        end
+        let!(:other_collection) do
+          create(:collection,
+                 name: 'other collection',
+                 parent_collection: parent_collection,
+                 add_editors: [current_user],
+                 organization: organization)
+        end
+        let!(:orphan_collection) do
+          create(
+            :collection,
+            name: 'shared name',
+            organization: organization,
+            add_editors: [current_user],
+          )
+        end
+
+        before do
+          Collection.reindex
+          Collection.searchkick_index.refresh
+        end
+
+        it 'should return all collections with no actual query' do
+          get(path, params: { query: "Within(#{parent_collection.id})" })
+          expect(json['data'].size).to eq(4)
+        end
+
+        it 'should return collections within the collection that match the name' do
+          get(path, params: { query: "Within(#{parent_collection.id}) shared" })
+          expect(json['data'].size).to eq(3)
+        end
+      end
     end
 
     context 'if user cannot view collection' do
