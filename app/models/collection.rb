@@ -227,7 +227,8 @@ class Collection < ApplicationRecord
     copy_parent_card: false,
     parent: self.parent,
     building_template_instance: false,
-    system_collection: false
+    system_collection: false,
+    synchronous: false
   )
 
     # check if we are cloning a template inside a template instance;
@@ -278,21 +279,17 @@ class Collection < ApplicationRecord
     for_user.upgrade_to_edit_role(c) if for_user.present?
 
     if collection_cards.any?
-      # TODO: look up way to remove duplication here
-      if system_collection
-        CollectionCardDuplicationWorker.new.perform(
-          collection_cards.map(&:id),
-          c.id,
-          for_user.try(:id),
-          true,
-        )
+      worker_opts = [
+        collection_cards.map(&:id),
+        c.id,
+        for_user.try(:id),
+        system_collection,
+        synchronous,
+      ]
+      if synchronous
+        CollectionCardDuplicationWorker.new.perform(*worker_opts)
       else
-        CollectionCardDuplicationWorker.perform_async(
-          collection_cards.map(&:id),
-          c.id,
-          for_user.try(:id),
-          false,
-        )
+        CollectionCardDuplicationWorker.perform_async(*worker_opts)
       end
     end
 

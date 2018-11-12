@@ -197,6 +197,7 @@ describe Collection, type: :model do
           instance_of(Integer),
           nil,
           false,
+          false,
         )
         duplicate_without_user
       end
@@ -252,6 +253,7 @@ describe Collection, type: :model do
           instance_of(Integer),
           user.id,
           false,
+          false,
         )
         collection.duplicate!(for_user: user)
       end
@@ -283,7 +285,7 @@ describe Collection, type: :model do
       end
     end
 
-    context 'with system_collection set to true' do
+    context 'with system_collection and synchronous settings' do
       let(:instance_double) do
         double('CollectionCardDuplicationWorker')
       end
@@ -300,8 +302,9 @@ describe Collection, type: :model do
           anything,
           anything,
           true,
+          true,
         )
-        collection.duplicate!(for_user: user, system_collection: true)
+        collection.duplicate!(for_user: user, system_collection: true, synchronous: true)
       end
     end
   end

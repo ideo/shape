@@ -71,7 +71,8 @@ class Item < ApplicationRecord
     for_user: nil,
     copy_parent_card: false,
     parent: self.parent,
-    system_collection: false
+    system_collection: false,
+    synchronous: false
   )
     # Clones item
     i = amoeba_dup
@@ -90,6 +91,7 @@ class Item < ApplicationRecord
         shallow: true,
         parent: parent,
         system_collection: system_collection,
+        synchronous: synchronous,
       )
       i.parent_collection_card.item = i
     end

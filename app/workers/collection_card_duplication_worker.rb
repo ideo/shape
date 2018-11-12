@@ -2,7 +2,7 @@ class CollectionCardDuplicationWorker
   include Sidekiq::Worker
   sidekiq_options queue: 'critical'
 
-  def perform(card_ids, parent_collection_id, for_user_id = nil, system_collection = false)
+  def perform(card_ids, parent_collection_id, for_user_id = nil, system_collection = false, synchronous = false)
     collection_cards = CollectionCard.active.where(id: card_ids).ordered
     for_user = User.find(for_user_id) if for_user_id.present?
     parent_collection = Collection.find(parent_collection_id)
@@ -15,7 +15,8 @@ class CollectionCardDuplicationWorker
       card.duplicate!(for_user: for_user,
                       parent: parent_collection,
                       placement: 'end',
-                      system_collection: system_collection)
+                      system_collection: system_collection,
+                      synchronous: synchronous)
     end
     parent_collection.update_processing_status(nil)
   end

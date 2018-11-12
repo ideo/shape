@@ -18,6 +18,7 @@ class OrganizationTemplates < SimpleService
       copy_parent_card: true,
       parent: @org.template_collection,
       system_collection: true,
+      synchronous: true,
     )
     return unless getting_started_collection.persisted?
     unless getting_started_collection.is_a?(Collection::Global)

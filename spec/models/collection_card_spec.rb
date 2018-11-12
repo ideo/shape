@@ -211,6 +211,7 @@ RSpec.describe CollectionCard, type: :model do
             shallow: anything,
             placement: anything,
             system_collection: true,
+            synchronous: false,
           )
           duplicate
         end
