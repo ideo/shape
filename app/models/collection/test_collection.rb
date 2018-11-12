@@ -133,6 +133,7 @@ class Collection
         next unless c.submission_attrs['test_status'] == 'live'
         c.submission_attrs['launchable_test_id']
       end.compact
+
       # another one that could maybe use a bg worker (if lots of tests)
       # we use the AASM method to ensure that callbacks are carried through
       Collection::TestCollection.where(id: test_ids).each(&:close!)

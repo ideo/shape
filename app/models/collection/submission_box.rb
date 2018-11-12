@@ -46,7 +46,7 @@ class Collection
     end
 
     def available_submission_tests(for_user:, omit_id: nil)
-      return [] unless submission_box_type == 'template'
+      return [] unless submission_box_type == 'template' && submission_template.present?
       sub_attrs = submission_template.submission_attrs
       # none are available if the editor has not launched
       return [] if sub_attrs.blank? || sub_attrs['test_status'] != 'live'

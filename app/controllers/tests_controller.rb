@@ -21,11 +21,11 @@ class TestsController < ApplicationController
       redirect_to_collection_to_test(@collection.collection_to_test)
     elsif @collection.submission_test?
       @next_submission_test = @collection
-        .parent_submission_box
-        .random_next_submission_test(
-          for_user: current_user,
-          omit_id: @collection.id,
-        )
+                              .parent_submission_box
+                              .random_next_submission_test(
+                                for_user: current_user,
+                                omit_id: @collection.id,
+                              )
     end
   rescue ActiveRecord::RecordNotFound
     redirect_to root_url
