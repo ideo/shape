@@ -11,9 +11,22 @@
     <div>
       <div class="section">
         <div class="inner">
-          <div class="header">
-            Payment Overdue
-          </div>
+          <div class="header">ACTIVE PEOPLE</div>
+          <dl>
+            <dt>Current total:</dt>
+            <dd><%= @total_users_count %></dd>
+          </dl>
+        </div>
+      </div>
+      <div class="section">
+        <div class="inner">
+          <div class="header">MONTHLY CHARGE</div>
+          <dl>
+            <dt>Next monthly charge:</dt>
+            <dd><%= number_to_currency(@next_monthly_charge) %></dd>
+            <dt>Next statement date:</dt>
+            <dd><%= @next_statement_date %></dd>
+          </dl>
         </div>
       </div>
       <div class='email-link'>
