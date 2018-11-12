@@ -111,10 +111,10 @@ describe Collection, type: :model do
       end
 
       context 'if cloned from Getting Started collection' do
-        let!(:getting_started_template_collection) {
+        let!(:getting_started_template_collection) do
           create(:getting_started_template_collection,
                  organization: organization)
-        }
+        end
         before do
           organization.reload
           collection.update_attributes(
@@ -196,6 +196,8 @@ describe Collection, type: :model do
           collection.collection_cards.map(&:id),
           instance_of(Integer),
           nil,
+          false,
+          false,
         )
         duplicate_without_user
       end
@@ -250,6 +252,8 @@ describe Collection, type: :model do
           collection.collection_cards.map(&:id),
           instance_of(Integer),
           user.id,
+          false,
+          false,
         )
         collection.duplicate!(for_user: user)
       end
@@ -278,6 +282,29 @@ describe Collection, type: :model do
         # roles shouldn't match because we're removing Viewer and replacing w/ Editor
         expect(duplicate.roles.map(&:name)).not_to match(collection.roles.map(&:name))
         expect(duplicate.can_edit?(user)).to be true
+      end
+    end
+
+    context 'with system_collection and synchronous settings' do
+      let(:instance_double) do
+        double('CollectionCardDuplicationWorker')
+      end
+
+      before do
+        allow(CollectionCardDuplicationWorker).to receive(:new).and_return(instance_double)
+        allow(instance_double).to receive(:perform).and_return true
+      end
+
+      it 'should call synchronously' do
+        expect(CollectionCardDuplicationWorker).to receive(:new)
+        expect(instance_double).to receive(:perform).with(
+          anything,
+          anything,
+          anything,
+          true,
+          true,
+        )
+        collection.duplicate!(for_user: user, system_collection: true, synchronous: true)
       end
     end
   end
