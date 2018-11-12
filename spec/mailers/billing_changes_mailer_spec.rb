@@ -41,9 +41,11 @@ RSpec.describe BillingChangesMailer, type: :mailer do
       expect(mail.body.encoded).to include("Total users: #{organization.active_users_count}")
       expect(mail.body.encoded).to include("Additional Monthly Charge: #{format_currency(Organization::PRICE_PER_USER * new_active_users)}")
       expect(mail.body.encoded).to include("New total monthly charge: #{format_currency(Organization::PRICE_PER_USER * organization.active_users_count)}")
-      prorated_charge = new_active_users * (Organization::PRICE_PER_USER / (
-      (Time.current.end_of_month.day - Time.current.day) + 1
-      )).round(2)
+
+      price_per_user_day = Organization::PRICE_PER_USER / Time.days_in_month(Time.current.month)
+      days_remaining_in_month = (Time.current.end_of_month.day - Time.current.day) + 1
+      prorated_charge = (new_active_users * price_per_user_day * days_remaining_in_month).round(2)
+
       expect(mail.body.encoded).to include("Prorated charge this month: #{format_currency(prorated_charge)}")
       expect(mail.body.encoded).to include("Next statement date: #{Time.now.utc.end_of_month.to_s(:mdy)}")
       expect(mail.body.encoded).to include("Go To Shape: #{root_url}")

@@ -14,9 +14,11 @@ class BillingChangesMailer < ApplicationMailer
     @additional_monthly_charge = Organization::PRICE_PER_USER * @new_users_count
     @next_monthly_charge = Organization::PRICE_PER_USER * @total_users_count
     @next_statement_date = Time.now.utc.end_of_month.to_s(:mdy)
-    @prorated_charge_this_month = @new_users_count * (Organization::PRICE_PER_USER / (
-      (Time.current.end_of_month.day - Time.current.day) + 1
-    )).round(2)
+
+    price_per_user_day = Organization::PRICE_PER_USER / Time.days_in_month(Time.current.month)
+    days_remaining_in_month = (Time.current.end_of_month.day - Time.current.day) + 1
+    Rails.logger.debug "#{price_per_user_day} #{days_remaining_in_month}"
+    @prorated_charge_this_month = (@new_users_count * price_per_user_day * days_remaining_in_month).round(2)
     @url = root_url
 
     mail to: payment_method.user.email, subject: @subject
