@@ -58,6 +58,7 @@ class OverdueBanner extends React.Component {
 
     if (
       !this.props.uiStore.overdueBannerVisible ||
+      currentOrganization.deactivated ||
       !currentOrganization.overdue ||
       !currentOrganization.in_app_billing
     ) {

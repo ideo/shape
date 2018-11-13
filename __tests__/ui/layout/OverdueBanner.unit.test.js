@@ -21,10 +21,11 @@ function render() {
 }
 
 describe('OverdueBanner', () => {
-  describe('current organization overdue, in_app_billing disabled', () => {
+  describe('in_app_billing disabled', () => {
     beforeEach(() => {
       apiStore.currentUser.current_organization.overdue = true
       apiStore.currentUser.current_organization.in_app_billing = false
+      apiStore.currentUser.current_organization.deactivated = false
     })
 
     it('should render nothing', () => {
@@ -32,21 +33,23 @@ describe('OverdueBanner', () => {
     })
   })
 
-  describe('current organization not overdue, in_app_billing disabled', () => {
-    beforeEach(() => {
-      apiStore.currentUser.current_organization.overdue = false
-      apiStore.currentUser.current_organization.in_app_billing = false
-    })
-
-    it('should render nothing', () => {
-      expect(render().type()).toEqual(null)
-    })
-  })
-
-  describe('current organization not overdue, in_app_billing enabled', () => {
+  describe('current organization not overdue', () => {
     beforeEach(() => {
       apiStore.currentUser.current_organization.overdue = false
       apiStore.currentUser.current_organization.in_app_billing = true
+      apiStore.currentUser.current_organization.deactivated = false
+    })
+
+    it('should render nothing', () => {
+      expect(render().type()).toEqual(null)
+    })
+  })
+
+  describe('current organization is deactivated', () => {
+    beforeEach(() => {
+      apiStore.currentUser.current_organization.overdue = true
+      apiStore.currentUser.current_organization.in_app_billing = true
+      apiStore.currentUser.current_organization.deactivated = true
     })
 
     it('should render nothing', () => {
@@ -58,6 +61,7 @@ describe('OverdueBanner', () => {
     beforeEach(() => {
       apiStore.currentUser.current_organization.overdue = true
       apiStore.currentUser.current_organization.in_app_billing = true
+      apiStore.currentUser.current_organization.deactivated = false
     })
 
     it('should render an overdue message', () => {
