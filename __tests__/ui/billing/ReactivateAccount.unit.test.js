@@ -41,27 +41,5 @@ describe('ReactivateAccount', () => {
         expect.stringContaining('This account is closed.')
       )
     })
-
-    // describe('reactivating account', () => {
-    //   describe('success', () => {
-    //     beforeEach(() => {
-    //       mockApiSaveModel.mockImplementation(() => Promise.resolve())
-    //     })
-
-    //     it('shows a success alert', () => {
-    //       wrapper.find('button').simulate('click')
-    //       const alertDialog = wrapper.find('AlertDialog')
-    //       expect(alertDialog.props().prompt).toEqual(
-    //         'Your account has been reactivated!'
-    //       )
-    //     })
-    //   })
-
-    //   describe('failure', () => {
-    //     it('tracks the error', () => {
-    //       wrapper.find('button').simulate('click')
-    //     })
-    //   })
-    // })
   })
 })
