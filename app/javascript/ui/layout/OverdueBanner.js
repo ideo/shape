@@ -8,11 +8,22 @@ import CloseIcon from '~/ui/icons/CloseIcon'
 import v from '~/utils/variables'
 
 const Banner = styled.div`
-  background-color: ${v.colors.orange};
+  background-color: ${v.colors.alert};
   color: white;
   font-family: ${v.fonts.sans};
   font-size: 20px;
-  margin: 20px -999rem;
+  margin-top: 20px;
+  margin-bottom: 20px;
+  margin-left: calc(-100vw / 2 + ${v.maxWidth - 2 * v.fonts.baseSize}px / 2);
+  margin-right: calc(-100vw / 2 + ${v.maxWidth - 2 * v.fonts.baseSize}px / 2);
+
+  @media only screen and (max-width: ${v.maxWidth +
+      v.containerPadding.horizontal * v.fonts.baseSize}px) {
+    margin-left: -${v.containerPadding.horizontal}rem;
+    margin-right: -${v.containerPadding.horizontal}rem;
+    padding: 20px ${v.containerPadding.horizontal}rem;
+  }
+
   padding: 20px;
 
   a {
@@ -60,12 +71,12 @@ class OverdueBanner extends React.Component {
         <MaxWidthContainer>
           <Grid container justify="space-between" alignItems="center">
             <Grid item xs={9} container spacing={16} alignItems="flex-end">
-              <Grid item>
+              <Grid item xs={1}>
                 <IconWrapper>
                   <ClockIcon />
                 </IconWrapper>
               </Grid>
-              <Grid item>
+              <Grid item xs={11}>
                 {currentOrganization.name} account is overdue. Your content will
                 become inaccessible on {currentOrganization.inaccessible_at}.
               </Grid>
