@@ -215,6 +215,17 @@ class Organization < ApplicationRecord
     false
   end
 
+  def update_payment_status
+    payment_method = NetworkApi::PaymentMethod.find(
+      organization_id: network_organization.id,
+      default: true,
+    ).first
+    update_attributes!(
+      has_payment_method: payment_method ? true : false,
+      overdue_at: payment_method ? nil : overdue_at,
+    )
+  end
+
   def find_or_create_user_getting_started_collection(user)
     return if getting_started_collection.blank?
 

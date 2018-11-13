@@ -116,7 +116,7 @@ class BillingInformation extends React.Component {
       },
     } = this.props.apiStore
 
-    const trailsUsedCount =
+    const trialsUsedCount =
       active_users_count > trial_users_count
         ? trial_users_count
         : active_users_count
@@ -146,7 +146,7 @@ class BillingInformation extends React.Component {
                   <TrialHighlight>
                     <Box my={20} p={10}>
                       <Grid container justify="space-between">
-                        <Grid item>{trailsUsedCount}</Grid>
+                        <Grid item>{trialsUsedCount}</Grid>
                         <Grid item>People on free trial</Grid>
                       </Grid>
                     </Box>
@@ -201,7 +201,7 @@ class BillingInformation extends React.Component {
                           <Label>Free trials used:</Label>
                         </Grid>
                         <Grid item>
-                          {trailsUsedCount} of {trial_users_count}
+                          {trialsUsedCount} of {trial_users_count}
                         </Grid>
                       </Grid>
                       <Grid container justify="space-between" spacing={16}>

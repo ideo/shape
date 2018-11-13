@@ -26,9 +26,21 @@ production:
     every: '4h'
     class: NotificationMailerWorker
   network_create_usage_record:
-    cron: '30 21 * * *'
+    cron: '0 18 * * * America/Los_Angeles'
     class: NetworkCreateUsageRecordWorker
   # after NetworkCreateUsageRecordWorker
-  trail_users_count_exceeded:
-    cron: '40 21 * * *'
+  trial_users_count_exceeded:
+    cron: '5 18 * * * America/Los_Angeles'
     class: TrialUsersCountExceededWorker
+  trial_expired:
+    cron: '10 18 * * * America/Los_Angeles'
+    class: TrialExpiredWorker
+  trial_ending_soon:
+    cron: '15 18 * * * America/Los_Angeles'
+    class: TrialEndingSoonWorker
+  mark_as_overdue:
+    cron: '20 18 * * * America/Los_Angeles'
+    class: MarkAsOverdueWorker
+  overdue_notifier:
+    cron: '25 18 * * * America/Los_Angeles'
+    class: OverdueNotifierWorker

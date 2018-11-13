@@ -1,6 +1,72 @@
 require 'rails_helper'
 
 describe 'Ideo Profile API Requests' do
+  let(:json_headers) do
+    {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json',
+    }
+  end
+  let(:valid_headers) do
+    json_headers.merge(
+      'Authorization': 'shared_secret_key_abc123',
+    )
+  end
+
+  before do
+    ENV['IDEO_SSO_CLIENT_SECRET'] = 'shared_secret_key_abc123'
+  end
+
+  describe 'POST #payment_methods' do
+    it 'responds with bad request if the params are not valid' do
+      post(
+        '/callbacks/ideo_network/payment_methods',
+        params: {}.to_json,
+        headers: valid_headers,
+      )
+      expect(response.status).to eq(400)
+    end
+
+    it 'responds with bad request if no application organization is found' do
+      post(
+        '/callbacks/ideo_network/payment_methods',
+        params: { data: { relationships: { application_organizations: { relationships: { application_organization: { data: { id: 123 } } } } } } }.to_json,
+        headers: valid_headers,
+      )
+      expect(response.status).to eq(400)
+    end
+
+    it 'responds with bad request if application organization has no organization_id' do
+      post(
+        '/callbacks/ideo_network/payment_methods',
+        params: { data: { relationships: { application_organizations: { relationships: { application_organization: { data: { id: 123 } } } } } }, included: [{ id: 123, type: 'application_organizations' }] }.to_json,
+        headers: valid_headers,
+      )
+      expect(response.status).to eq(400)
+    end
+
+    it 'responds with bad request if unable to find organization' do
+      post(
+        '/callbacks/ideo_network/payment_methods',
+        params: { data: { relationships: { application_organizations: { relationships: { application_organization: { data: { id: 123 } } } } } }, included: [{ id: 123, type: 'application_organizations', attributes: { external_id: 234 } }] }.to_json,
+        headers: valid_headers,
+      )
+      expect(response.status).to eq(404)
+    end
+
+    it 'responds 200 with correct params' do
+      organization = create(:organization)
+      allow(Organization).to receive(:find).with(organization.id).and_return(organization)
+      expect(organization).to receive(:update_payment_status)
+      post(
+        '/callbacks/ideo_network/payment_methods',
+        params: { data: { relationships: { application_organizations: { relationships: { application_organization: { data: { id: 123 } } } } } }, included: [{ id: 123, type: 'application_organizations', attributes: { external_id: organization.id } }] }.to_json,
+        headers: valid_headers,
+      )
+      expect(response.status).to eq(200)
+    end
+  end
+
   describe 'POST #user' do
     let!(:user) { create(:user) }
     let(:uid) { user.uid }
@@ -12,22 +78,6 @@ describe 'Ideo Profile API Requests' do
         email: user.email,
         picture: user.picture,
       }
-    end
-    # These are the headers the request from profile.ideo.com will have
-    let(:json_headers) do
-      {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-      }
-    end
-    let(:valid_headers) do
-      json_headers.merge(
-        'Authorization': 'shared_secret_key_abc123',
-      )
-    end
-
-    before do
-      ENV['IDEO_SSO_CLIENT_SECRET'] = 'shared_secret_key_abc123'
     end
 
     context 'event: updated' do

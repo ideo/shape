@@ -230,9 +230,12 @@ ActiveRecord::Schema.define(version: 20181031164042) do
     t.integer "active_users_count", default: 0, null: false
     t.datetime "trial_ends_at"
     t.integer "trial_users_count", default: 0, null: false
-    t.integer "getting_started_collection_id"
     t.boolean "in_app_billing", default: true, null: false
     t.boolean "trial_users_count_exceeded_email_sent", default: false, null: false
+    t.boolean "trial_expired_email_sent", default: false, null: false
+    t.datetime "overdue_at"
+    t.boolean "has_payment_method", default: false, null: false
+    t.integer "getting_started_collection_id"
     t.index ["slug"], name: "index_organizations_on_slug", unique: true
   end
 
@@ -325,8 +328,8 @@ ActiveRecord::Schema.define(version: 20181031164042) do
     t.datetime "last_notification_mail_sent"
     t.boolean "show_move_helper", default: true
     t.boolean "show_template_helper", default: true
-    t.boolean "mailing_list", default: false
     t.datetime "last_active_at"
+    t.boolean "mailing_list", default: false
     t.index ["email"], name: "index_users_on_email"
     t.index ["handle"], name: "index_users_on_handle", unique: true
     t.index ["invitation_token"], name: "index_users_on_invitation_token"

@@ -609,4 +609,50 @@ describe Organization, type: :model do
       end
     end
   end
+
+  describe '#update_payment_status' do
+    let(:network_organization) { double(id: 123) }
+
+    context 'default payment method exists' do
+      let(:organization) { create(:organization, has_payment_method: false, overdue_at: 2.days.ago) }
+
+      before do
+        allow(organization).to receive(:network_organization).and_return(network_organization)
+        allow(NetworkApi::PaymentMethod).to receive(:find).with(
+          organization_id: network_organization.id,
+          default: true,
+        ).and_return(['a payment method'])
+      end
+
+      it 'sets has_payment_method to true' do
+        organization.update_payment_status
+        expect(organization.has_payment_method).to be true
+        expect(organization.overdue_at).to be nil
+      end
+
+      it 'sets overdue_at to nil' do
+      end
+    end
+
+    context 'default payment method does not exist' do
+      let(:organization) { create(:organization, has_payment_method: true, overdue_at: 2.days.ago) }
+
+      before do
+        allow(organization).to receive(:network_organization).and_return(network_organization)
+        allow(NetworkApi::PaymentMethod).to receive(:find).with(
+          organization_id: network_organization.id,
+          default: true,
+        ).and_return([])
+      end
+
+      it 'sets has_payment_method to false' do
+        organization.update_payment_status
+        expect(organization.has_payment_method).to be false
+      end
+
+      it 'does not change overdue_at' do
+        expect { organization.update_payment_status }.not_to change { organization.overdue_at.round }
+      end
+    end
+  end
 end
