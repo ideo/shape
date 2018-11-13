@@ -34,7 +34,7 @@ RSpec.describe TrialEndingSoonMailer, type: :mailer do
       expect(mail.body.encoded).to include('Free trial ending in 2 days')
       expect(mail.body.encoded).to include('Add payment method')
       expect(mail.body.encoded).to include("Trial Expiration Date: #{organization.trial_ends_at.to_s(:mdy)}")
-      expect(mail.body.encoded).to include("Add payment method: #{root_url}/billing")
+      expect(mail.body.encoded).to include("Add payment method: #{root_url}billing")
       mail = TrialEndingSoonMailer.notify(organization, 7)
       expect(mail.body.encoded).to include('Free trial ending in 1 week')
       mail = TrialEndingSoonMailer.notify(organization, 14)

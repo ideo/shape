@@ -12,7 +12,7 @@ class TrialEndingSoonMailer < ApplicationMailer
                   '2 weeks'
                 end
     @ending_in = "ending in #{ending_in}"
-    @url = "#{root_url}/billing"
+    @url = "#{root_url}billing"
     subject = "Shape trial #{@ending_in} - Add payment method"
     mail to: emails, subject: subject
   end

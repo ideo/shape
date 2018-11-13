@@ -118,6 +118,7 @@ Rails.application.routes.draw do
 
   namespace :callbacks do
     post 'ideo_network/payment_methods' => 'ideo_network#payment_methods'
+    post 'ideo_network/invoices' => 'ideo_network#invoices'
     post 'ideo_network/users' => 'ideo_network#users'
   end
 

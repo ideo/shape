@@ -6,7 +6,7 @@ class BillingOverdueMailer < ApplicationMailer
     @total_users_count = organization.active_users_count
     @next_monthly_charge = Organization::PRICE_PER_USER * @total_users_count
     @next_statement_date = Time.now.utc.end_of_month.to_s(:mdy)
-    @url = "#{root_url}/billing"
+    @url = "#{root_url}billing"
     subject = 'Shape Payment Overdue'
     mail to: emails, subject: subject
   end

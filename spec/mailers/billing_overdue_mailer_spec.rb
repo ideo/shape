@@ -28,7 +28,7 @@ RSpec.describe BillingOverdueMailer, type: :mailer do
     it 'renders details' do
       mail = BillingOverdueMailer.notify(organization)
       expect(mail.body.encoded).to include("Please add a payment method to continue using Shape at #{organization.name}. The #{organization.name} instance of Shape will be frozen on #{(organization.overdue_at + 2.weeks).to_s(:mdy)} if you do not add a valid payment method.")
-      expect(mail.body.encoded).to include("Add payment method: #{root_url}/billing")
+      expect(mail.body.encoded).to include("Add payment method: #{root_url}billing")
     end
   end
 end
