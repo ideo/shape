@@ -22,6 +22,7 @@ import EditorPill from '~/ui/items/EditorPill'
 import TestDesigner from '~/ui/test_collections/TestDesigner'
 import v from '~/utils/variables'
 import Collection from '~/stores/jsonApi/Collection'
+import OverdueBanner from '~/ui/layout/OverdueBanner'
 
 const isHomepage = ({ params }) => params.org && !params.id
 
@@ -340,6 +341,7 @@ class CollectionPage extends PageWithApi {
         <PageHeader record={collection} isHomepage={this.isHomepage} />
         {!isLoading && (
           <PageContainer>
+            <OverdueBanner />
             {this.renderEditorPill}
             {requiresTestDesigner && this.renderTestDesigner()}
             {!requiresTestDesigner && (

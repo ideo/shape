@@ -10,6 +10,7 @@ import v from '~/utils/variables'
 import Header from '~/ui/layout/Header'
 import PageContainer from '~/ui/layout/PageContainer'
 import termsMarkdown from '~/markdown/TermsOfUse'
+import OverdueBanner from '~/ui/layout/OverdueBanner'
 
 const StyledMarkdown = styled(ReactMarkdown)`
   h2 {
@@ -38,6 +39,7 @@ class TermsPage extends React.PureComponent {
         <Header />
         <PageContainer marginTop={v.headerHeightCompact}>
           <Heading1>Legal</Heading1>
+          <OverdueBanner />
           <StyledTitle>Terms of Use</StyledTitle>
           <StyledLink href="https://www.ideo.com/privacy" target="_blank">
             Privacy Policy

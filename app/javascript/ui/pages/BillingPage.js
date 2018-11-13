@@ -7,6 +7,7 @@ import SuperAdminBillingControls from '~/ui/billing/SuperAdminBillingControls'
 import ManagePaymentMethods from '~/ui/billing/ManagePaymentMethods'
 import ManageInvoices from '~/ui/billing/ManageInvoices'
 import Box from '~shared/components/atoms/Box'
+import OverdueBanner from '~/ui/layout/OverdueBanner'
 
 class BillingPage extends React.Component {
   render() {
@@ -15,6 +16,7 @@ class BillingPage extends React.Component {
         <Header />
         <PageContainer marginTop={v.headerHeightCompact}>
           <Heading1>Billing</Heading1>
+          <OverdueBanner />
           <SuperAdminBillingControls />
           <BillingInformation />
           <ManagePaymentMethods />

@@ -23,7 +23,7 @@ export default {
   headerHeightCompact: 100,
   maxWidth: 1320,
   containerPadding: {
-    horizontal: '2rem',
+    horizontal: 2,
   },
 
   // Keep in sync with assets/stylesheets/core/base.scss
@@ -69,6 +69,7 @@ export default {
   },
 
   fonts: {
+    baseSize: 16,
     sans: "'Gotham', sans-serif",
     serif: "'Sentinel', serif",
   },
