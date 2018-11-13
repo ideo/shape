@@ -45,7 +45,7 @@ RSpec.describe CollectionCardDuplicationWorker, type: :worker do
         expect_any_instance_of(Collection).to receive(
           :update_processing_status,
         ).with(
-          Collection.processing_statuses[:duplicating]
+          Collection.processing_statuses[:duplicating],
         ).once
 
         expect_any_instance_of(Collection).to receive(
@@ -80,6 +80,7 @@ RSpec.describe CollectionCardDuplicationWorker, type: :worker do
     context 'with items you can\'t see' do
       let!(:hidden_item) { collection.items.first }
       let!(:viewable_items) { collection.items - [hidden_item] }
+      let(:system_collection) { false }
 
       before do
         user.remove_role(Role::EDITOR, hidden_item)
@@ -87,6 +88,7 @@ RSpec.describe CollectionCardDuplicationWorker, type: :worker do
           card_ids,
           duplicate.id,
           user.id,
+          system_collection,
         )
         duplicate.reload
       end
@@ -95,6 +97,14 @@ RSpec.describe CollectionCardDuplicationWorker, type: :worker do
         # Use cloned_from to get original items
         expect(duplicate.items.map(&:cloned_from)).to match_array(viewable_items)
         expect(duplicate.items(&:cloned_from)).not_to include(hidden_item)
+      end
+
+      context 'with a system collection' do
+        let(:system_collection) { true }
+
+        it 'duplicates all items' do
+          expect(duplicate.items.map(&:cloned_from)).to match_array(collection.items)
+        end
       end
     end
   end

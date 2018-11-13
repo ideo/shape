@@ -263,32 +263,30 @@ class CollectionPage extends PageWithApi {
     const { blankContentToolState, gridSettings, loadedSubmissions } = uiStore
     const { submissionTypeName, submissions_collection } = collection
 
+    if (!submissions_collection || !loadedSubmissions) {
+      return this.loader()
+    }
+
     return (
       <div>
-        {!loadedSubmissions ? (
-          <Loader />
-        ) : (
-          <div>
-            {this.submissionsPageSeparator}
-            <CollectionGrid
-              {...gridSettings}
-              updateCollection={this.updateCollection}
-              collection={submissions_collection}
-              canEditCollection={false}
-              // Pass in cardProperties so grid will re-render when they change
-              cardProperties={submissions_collection.cardProperties}
-              // Pass in BCT state so grid will re-render when open/closed
-              blankContentToolState={blankContentToolState}
-              submissionSettings={{
-                type: collection.submission_box_type,
-                template: collection.submission_template,
-              }}
-              movingCardIds={[]}
-              movingCards={false}
-              sorting
-            />
-          </div>
-        )}
+        {this.submissionsPageSeparator}
+        <CollectionGrid
+          {...gridSettings}
+          updateCollection={this.updateCollection}
+          collection={submissions_collection}
+          canEditCollection={false}
+          // Pass in cardProperties so grid will re-render when they change
+          cardProperties={submissions_collection.cardProperties}
+          // Pass in BCT state so grid will re-render when open/closed
+          blankContentToolState={blankContentToolState}
+          submissionSettings={{
+            type: collection.submission_box_type,
+            template: collection.submission_template,
+          }}
+          movingCardIds={[]}
+          movingCards={false}
+          sorting
+        />
         <FloatingActionButton
           toolTip={`Add ${submissionTypeName}`}
           onClick={this.onAddSubmission}
