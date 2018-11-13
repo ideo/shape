@@ -44,3 +44,6 @@ production:
   overdue_notifier:
     cron: '25 18 * * * America/Los_Angeles'
     class: OverdueNotifierWorker
+  charges_limit:
+    cron: '30 18 * * * America/Los_Angeles'
+    class: ChargesLimitWorker

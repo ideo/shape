@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20181031164042) do
+ActiveRecord::Schema.define(version: 20181105224054) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -236,6 +236,9 @@ ActiveRecord::Schema.define(version: 20181031164042) do
     t.datetime "overdue_at"
     t.boolean "has_payment_method", default: false, null: false
     t.integer "getting_started_collection_id"
+    t.boolean "sent_high_charges_low_email", default: false, null: false
+    t.boolean "sent_high_charges_middle_email", default: false, null: false
+    t.boolean "sent_high_charges_high_email", default: false, null: false
     t.index ["slug"], name: "index_organizations_on_slug", unique: true
   end
 

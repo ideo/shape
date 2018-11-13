@@ -1,0 +1,9 @@
+<div class="billing-email">
+  <div class="subject"><%= @subject %></div>
+  <div>
+    <%= @organization_name %> has <%= @active_users_count %> active
+    users and monthly charge will be
+    <%= number_to_currency(@next_monthly_charge) %>. Please reach out
+    to <%= @organization_name %> to arrange a new billing method.
+  </div>
+</div>
