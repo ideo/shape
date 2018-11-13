@@ -11,6 +11,16 @@ RSpec.describe ChargesLimitWorker, type: :worker do
              sent_high_charges_high_email: false)
     end
 
+    let!(:deactivated) do
+      create(:organization,
+             in_app_billing: true,
+             deactivated: true,
+             active_users_count: ChargesLimitWorker::LOW + 1,
+             sent_high_charges_low_email: false,
+             sent_high_charges_middle_email: false,
+             sent_high_charges_high_email: false)
+    end
+
     let!(:users_in_low_range_not_sent) do
       create(:organization,
              in_app_billing: true,
@@ -99,6 +109,7 @@ RSpec.describe ChargesLimitWorker, type: :worker do
       expect(mailer).to receive(:deliver_now).exactly(4).times
 
       expect(ChargesLimitMailer).not_to receive(:notify).with(in_app_billing_disabled)
+      expect(ChargesLimitMailer).not_to receive(:notify).with(deactivated)
       expect(ChargesLimitMailer).to receive(:notify).with(users_in_low_range_not_sent)
       expect(ChargesLimitMailer).not_to receive(:notify).with(users_in_low_range_already_sent)
       expect(ChargesLimitMailer).to receive(:notify).with(users_in_middle_range_not_sent)
