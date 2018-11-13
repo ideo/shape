@@ -11,7 +11,7 @@ class Item
 
     # build up a plaintext string of all the text content, with elements separated by pipes "|"
     # e.g. "Mission Statement | How might we do x..."
-    def plain_content(only_first_line: false)
+    def plain_content(only_first_line: false, splitter: ' | ')
       return '' unless text_data.present? && text_data['ops'].present?
       text = ''
       text_data['ops'].each_with_index do |data, i|
@@ -21,7 +21,7 @@ class Item
         # sometimes the data['insert'] is just a newline, ignore
         next if t.empty?
         return t if only_first_line
-        text += ' | ' if i.positive?
+        text += splitter if i.positive?
         text += t
       end
       text
