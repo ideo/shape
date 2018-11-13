@@ -17,6 +17,7 @@ class GciExport
     CSV.generate do |csv|
       csv << [
         'person name',
+        'email',
         'profile url',
         'last sign in',
         'profile last update',
@@ -39,6 +40,7 @@ class GciExport
         item_activities_count = profile_items.collect { |i| i.activities.where.not(action: %i[commented mentioned]).count }.sum
         row = [
           user.name,
+          user.email,
           "https://www.shape.space/network-leads/collections/#{profile.id}",
           user.last_sign_in_at,
           profile.updated_at,
