@@ -37,16 +37,19 @@ class Api::V1::SearchController < Api::V1::BaseController
   end
 
   def in_collection_where_clause(query)
-    within_collection_id = query.scan(%r{Within\([A-z\/]*(\d+)}).flatten[0]
+    # add "within" search params
+    within_collection_id = query.scan(%r{within\([A-z\/]*(\d+)}i).flatten[0]
     where_clause = {}
     where_clause[:parent_ids] = { all: [within_collection_id.to_i] } if within_collection_id
     where_clause
   end
 
   def modify_query(query)
-    within_collection_id = query.scan(%r{Within\([A-z\/]*(\d+)}).flatten[0]
+    # remove any "within" clause from the query
+    within_collection_id = query.scan(%r{within\([A-z\/]*(\d+)}i).flatten[0]
+    # remove any hashtag elements from the query
     modified_query = query.sub(/#\w+\s/, '')
-    modified_query = modified_query.sub(/Within\(.*\)/, '')
+    modified_query = modified_query.sub(/within\(.*\)/i, '')
     if within_collection_id.present? && modified_query.blank?
       modified_query = '*'
     end
@@ -69,6 +72,7 @@ class Api::V1::SearchController < Api::V1::BaseController
     where_clause = where_clause.merge(in_collection_where_clause(query))
 
     modified_query = modify_query(query)
+
     Collection.search(
       modified_query,
       fields: %w[name^5 tags^3 content],
