@@ -152,6 +152,9 @@ class Collection < ApplicationRecord
       user_ids: user_ids,
       group_ids: group_ids,
       parent_ids: parent_ids,
+      activity_dates: activities.map do |activity|
+        activity.updated_at.to_date
+      end.uniq,
     }
   end
 
