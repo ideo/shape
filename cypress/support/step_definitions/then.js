@@ -53,3 +53,24 @@ Then('the URL should match the captured URL', () => {
       .should('eq', url)
   })
 })
+
+Then('I should see the no global search resuls for {string}', name => {
+  cy.locateDataOrClass('.test-noSearchResults')
+    .first()
+    .should('be.visible')
+})
+
+Then(
+  'I should see the {string} collection in the global search results',
+  name => {
+    cy.locateWith('CollectionCover', name)
+      .last()
+      .should('be.visible')
+  }
+)
+
+Then('I should see {int} search results', amount => {
+  cy.locateDataOrClass('CollectionCover')
+    .its('length')
+    .should('eq', amount)
+})

@@ -112,6 +112,7 @@ class SearchBar extends React.Component {
           onFocus={this.handleFocus(true)}
           onBlur={this.handleFocus(false)}
           onChange={this.handleTextChange}
+          className="test-search"
         />
         {value && (
           <button onClick={this.clearSearch} className="close">

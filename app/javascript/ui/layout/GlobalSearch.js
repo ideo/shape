@@ -36,12 +36,14 @@ class GlobalSearchBar extends React.Component {
   render() {
     const { routingStore } = this.props
     return (
-      <SearchBar
-        focused={routingStore.pathContains('/search')}
-        value={this.searchText}
-        onChange={this.handleTextChange}
-        onClear={this.clearSearch}
-      />
+      <div id="test-globalSearch">
+        <SearchBar
+          focused={routingStore.pathContains('/search')}
+          value={this.searchText}
+          onChange={this.handleTextChange}
+          onClear={this.clearSearch}
+        />
+      </div>
     )
   }
 }

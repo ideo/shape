@@ -150,3 +150,17 @@ When('I visit the current Test URL', () => {
     cy.visit(`/tests/${id}`)
   })
 })
+
+When('I search for the {string} collection', query => {
+  cy.globallySearch({ query })
+})
+
+When('I search for {string} within the current page', query => {
+  cy.location('pathname').then(path => {
+    cy.globallySearch({ query, within: path })
+  })
+})
+
+When('I clear the search results', () => {
+  cy.globallyClearSearch()
+})

@@ -20,7 +20,7 @@ Cypress.Commands.add(
   (subject, selector) => {
     let findSelector = `[data-cy="${selector}"]`
     if (selector.indexOf('.') === 0) {
-      findSelector = `[class^="${selector.substring(1)}-"]`
+      findSelector = `[class^="${selector.substring(1)}"]`
     }
     if (subject) {
       return subject.find(findSelector)
@@ -125,6 +125,23 @@ Cypress.Commands.add('selectBctType', ({ type, empty = false }) => {
   cy.locate(`BctButton-${type}`)
     .first()
     .click({ force: true })
+})
+
+Cypress.Commands.add('globallySearch', ({ query, within }) => {
+  let fullQuery = query
+  if (within) {
+    fullQuery = `Within(${within}) ${query}`
+  }
+  cy.get('#test-globalSearch .test-search')
+    .first()
+    .type(fullQuery, { force: true })
+})
+
+Cypress.Commands.add('globallyClearSearch', () => {
+  cy.get('#test-globalSearch .close')
+    .first()
+    .click({ force: true })
+  cy.wait(1000)
 })
 
 // NOTE: https://stackoverflow.com/a/47537751/260495

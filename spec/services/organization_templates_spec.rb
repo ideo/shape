@@ -105,9 +105,9 @@ RSpec.describe OrganizationTemplates, type: :service do
     context 'with collections already created' do
       it 'should not create duplicate collections' do
         # calling service.call a second time...
-        expect {
+        expect do
           service.call
-        }.to not_change(Collection, :count)
+        end.to not_change(Collection, :count)
       end
     end
   end
@@ -121,14 +121,17 @@ RSpec.describe OrganizationTemplates, type: :service do
       end
       before do
         ENV['GETTING_STARTED_TEMPLATE_ID'] = getting_started_template.id.to_s
-        service.call
-        profile_template.reload
+        allow(getting_started_template).to receive(:duplicate!)
+        allow(Collection).to receive(:find_by).and_call_original
+        allow(Collection).to receive(:find_by).with(id: getting_started_template.id.to_s).and_return(getting_started_template)
       end
       let(:getting_started_collection) do
         organization.getting_started_collection
       end
 
       it 'duplicates template to organization' do
+        service.call
+        profile_template.reload
         expect(getting_started_collection).not_to eq(getting_started_template)
         expect(getting_started_collection.persisted?).to be true
         expect(getting_started_collection).to be_instance_of(Collection::Global)
@@ -136,6 +139,8 @@ RSpec.describe OrganizationTemplates, type: :service do
       end
 
       it 'assigns admin group as editor' do
+        service.call
+        profile_template.reload
         expect(getting_started_collection.editors[:groups]).to match_array(
           [organization.admin_group],
         )
@@ -143,8 +148,18 @@ RSpec.describe OrganizationTemplates, type: :service do
       end
 
       it 'has no viewers' do
+        service.call
         expect(getting_started_collection.viewers[:users]).to be_empty
         expect(getting_started_collection.viewers[:groups]).to be_empty
+      end
+
+      it 'duplicates the getting started collection synchronously' do
+        expect(getting_started_template).to receive(:duplicate!).with(
+          copy_parent_card: anything,
+          parent: anything,
+          async: false,
+        )
+        service.call
       end
     end
   end

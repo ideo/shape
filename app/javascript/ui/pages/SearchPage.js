@@ -95,7 +95,7 @@ class SearchPage extends PageWithApi {
         return <Loader />
       }
       return (
-        <div>
+        <div className="test-noSearchResults">
           No results found for &quot;
           {this.searchQuery(this.props)}
           &quot;.
