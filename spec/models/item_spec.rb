@@ -112,4 +112,53 @@ RSpec.describe Item, type: :model do
       expect(collection.cached_cover['text']).not_to eq second_item.plain_content
     end
   end
+
+  describe '#search_data' do
+    it 'includes tags' do
+      item = create(:text_item)
+      item.tag_list.add('foo')
+      item.tag_list.add('bar')
+      item.save
+      item.reload
+      expect(item.search_data[:tags]).to include('foo')
+      expect(item.search_data[:tags]).to include('bar')
+    end
+
+    it 'includes the name' do
+      item = create(:text_item, name: 'derp')
+      expect(item.search_data[:name]).to eql('derp')
+    end
+
+    context 'TextItem' do
+      it 'incluldes the content of the text item in the search content' do
+        item = create(:text_item)
+        expect(item.search_data[:content]).to include(item.plain_content)
+      end
+    end
+
+    context 'FileItem' do
+      it 'incluldes the filename in the search content' do
+        item = create(:file_item)
+        expect(item.search_data[:content]).to include(item.filestack_file.filename)
+      end
+    end
+
+    context 'other types' do
+      it 'incluldes the item content in the search content' do
+        link_item = create(:link_item)
+        expect(link_item.search_data[:content]).to include(link_item.content)
+      end
+
+      it 'does not include nil content' do
+        video_item = create(:video_item)
+        expect(video_item.search_data[:content]).to eq('')
+
+        question_item = create(:question_item)
+        expect(question_item.search_data[:content]).to eq('')
+
+        chart_item = create(:chart_item)
+        expect(chart_item.search_data[:content]).to eq('')
+      end
+    end
+  end
 end
