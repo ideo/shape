@@ -58,6 +58,8 @@ class Api::V1::SearchController < Api::V1::BaseController
           activity_dates: {
             gt: ending,
           },
+        }, {
+          activity_dates: nil,
         }]
       else
         where_clause[:activity_dates] = {

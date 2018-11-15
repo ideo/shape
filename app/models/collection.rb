@@ -143,6 +143,9 @@ class Collection < ApplicationRecord
     user_ids = (editors[:users].pluck(:id) + viewers[:users].pluck(:id)).uniq
     group_ids = (editors[:groups].pluck(:id) + viewers[:groups].pluck(:id)).uniq
     parent_ids = breadcrumb
+    activity_dates = activities.map do |activity|
+      activity.updated_at.to_date
+    end.uniq
     {
       name: name,
       tags: all_tag_names,
@@ -152,9 +155,7 @@ class Collection < ApplicationRecord
       user_ids: user_ids,
       group_ids: group_ids,
       parent_ids: parent_ids,
-      activity_dates: activities.map do |activity|
-        activity.updated_at.to_date
-      end.uniq,
+      activity_dates: activity_dates.empty? ? nil : activity_dates,
     }
   end
 

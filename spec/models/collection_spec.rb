@@ -414,11 +414,15 @@ describe Collection, type: :model do
       expect(collection.search_data[:group_ids]).to match_array(groups.map(&:id))
     end
 
+    it 'sets activity date to nil when no activity' do
+      expect(collection.search_data[:activity_dates]).to be nil
+    end
+
     it 'includes activity dates, without duplicates' do
       organization = create(:organization)
       user = create(:user)
       activity1 = collection.activities.create(actor: user, organization: organization)
-      activity2 = collection.activities.create(actor: user, organization: organization)
+      collection.activities.create(actor: user, organization: organization)
       activity3 = collection.activities.create(actor: user, organization: organization, updated_at: 1.week.from_now)
       expected_activity_dates = [activity1.updated_at.to_date, activity3.updated_at.to_date]
       expect(collection.search_data[:activity_dates]).to match_array(expected_activity_dates)
