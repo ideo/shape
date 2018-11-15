@@ -17,8 +17,6 @@ namespace :cypress do
     # via dependent: :destroy this will also remove everything in the test area
     my_collection.collections.where(name: 'Cypress Test Area').destroy_all
     create_cards(my_collection, user)
-    Item.all.each(&:save)
-    Collection.all.each(&:save)
     Collection.reindex
   end
 
