@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20181106065121) do
+ActiveRecord::Schema.define(version: 20181114015125) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -201,6 +201,7 @@ ActiveRecord::Schema.define(version: 20181106065121) do
     t.string "data_source_type"
     t.bigint "data_source_id"
     t.datetime "unarchived_at"
+    t.jsonb "data_settings"
     t.index ["breadcrumb"], name: "index_items_on_breadcrumb", using: :gin
     t.index ["cloned_from_id"], name: "index_items_on_cloned_from_id"
     t.index ["data_source_type", "data_source_id"], name: "index_items_on_data_source_type_and_data_source_id"

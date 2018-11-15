@@ -24,6 +24,7 @@ import CollectionCard from '~/stores/jsonApi/CollectionCard'
 import CollectionCreator from './CollectionCreator'
 import TextItemCreator from './TextItemCreator'
 import LinkCreator from './LinkCreator'
+import DataItemCreator from './DataItemCreator'
 import BctButtonBox from './BctButtonBox'
 import BctButtonRotation from './BctButtonRotation'
 
@@ -383,6 +384,15 @@ class GridCardBlank extends React.Component {
           />
         )
         break
+      case 'data':
+        inner = (
+          <DataItemCreator
+            loading={loading}
+            createCard={this.createCard}
+            closeBlankContentTool={this.closeBlankContentTool}
+          />
+        )
+        break
       case 'text':
         // TextItemCreator is the only one that `returns`
         // since it doesn't use the BctBackground
@@ -501,6 +511,16 @@ class GridCardBlank extends React.Component {
           {creating === 'submissionBox' && (
             <BctButtonRotation>{submissionBctBox}</BctButtonRotation>
           )}
+          {creating === 'data' && (
+            <BctButtonRotation>
+              <BctButtonBox
+                type="data"
+                creating={creating}
+                size={size}
+                Icon={TestCollectionIcon}
+              />
+            </BctButtonRotation>
+          )}
           {creating === 'template' && (
             <BctButtonRotation>
               <BctButtonBox
@@ -521,7 +541,6 @@ class GridCardBlank extends React.Component {
             >
               {videoBctBox}
               {submissionBctBox}
-              {/* DISABLING UNTIL TEST COLLECTIONS ARE READY */}
               {testBctBox}
               <PopoutMenu
                 buttonStyle="bct"
@@ -533,6 +552,11 @@ class GridCardBlank extends React.Component {
                     name: 'Create Template',
                     iconRight: <TemplateIcon size="small" />,
                     onClick: this.startCreating('template'),
+                  },
+                  {
+                    name: 'Create Data Item',
+                    iconRight: <TestCollectionIcon />,
+                    onClick: this.startCreating('data'),
                   },
                 ]}
               />

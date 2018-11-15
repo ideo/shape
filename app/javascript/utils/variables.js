@@ -5,6 +5,7 @@ export const ITEM_TYPES = {
   LINK: 'Item::LinkItem',
   QUESTION: 'Item::QuestionItem',
   CHART: 'Item::ChartItem',
+  DATA: 'Item::DataItem',
 }
 
 export const COLLECTION_TYPES = {

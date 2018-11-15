@@ -1,9 +1,10 @@
 class SerializableItem < BaseJsonSerializer
-  ROLES_LIMIT = 5
   type 'items'
   attributes :type, :name, :content, :text_data,
              :url, :thumbnail_url, :icon_url, :question_type,
              :data_source_type, :data_source_id
+
+  has_many :roles
   has_one :parent_collection_card
   has_one :parent
   belongs_to :data_source
@@ -46,6 +47,4 @@ class SerializableItem < BaseJsonSerializer
     # might be nil, particularly in tests
     @object.pinned_and_locked? || false
   end
-
-  has_many :roles
 end

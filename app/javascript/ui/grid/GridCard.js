@@ -13,6 +13,7 @@ import ImageItemCover from '~/ui/grid/covers/ImageItemCover'
 import VideoItemCover from '~/ui/grid/covers/VideoItemCover'
 import GenericFileItemCover from '~/ui/grid/covers/GenericFileItemCover'
 import CollectionCover from '~/ui/grid/covers/CollectionCover'
+import DataItemCover from '~/ui/grid/covers/DataItemCover'
 
 import Activity from '~/stores/jsonApi/Activity'
 import ActionMenu from '~/ui/grid/ActionMenu'
@@ -93,6 +94,9 @@ class GridCard extends React.Component {
 
         case ITEM_TYPES.CHART:
           return <ChartItemCover item={record} testCollection={card.parent} />
+
+        case ITEM_TYPES.DATA:
+          return <DataItemCover item={record} />
 
         default:
           return <div>{record.content}</div>
