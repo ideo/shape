@@ -34,6 +34,7 @@ class Activity < ApplicationRecord
     linked: 12,
     duplicated: 13,
     archived_from_template: 14,
+    viewed: 15,
   }
 
   def self.map_move_action(move_action)

@@ -45,6 +45,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
   def update
     @collection_card.attributes = collection_card_update_params
     if @collection_card.save
+      create_notification(@collection_card, :edited)
       render jsonapi: @collection_card.reload
     else
       render_api_errors @collection_card.errors
