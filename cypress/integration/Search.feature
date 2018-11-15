@@ -17,4 +17,4 @@ Feature: Search
 
     When I clear the search results
     And I search for "Inner" within the current page
-    Then I should see 2 search results
+    Then I should see 1 search results
