@@ -103,6 +103,73 @@ describe Api::V1::SearchController, type: :request, json: true, auth: true, sear
         end
       end
 
+      context 'searching by collection activity date' do
+        let!(:collection_with_activity_in_range1) do
+          collection = create(:collection, name: 'foo', organization: organization, add_viewers: [current_user])
+          activity = collection.activities.create!(actor: current_user, organization: organization)
+          activity.update_column(:updated_at, 2.day.ago)
+          collection
+        end
+        let!(:collection_with_activity_in_range2) do
+          collection = create(:collection, name: 'bar', organization: organization, add_viewers: [current_user])
+          activity = collection.activities.create!(actor: current_user, organization: organization)
+          activity.update_column(:updated_at, 2.days.from_now)
+          collection
+        end
+        let!(:collection_with_activity_out_of_range1) do
+          collection = create(:collection, name: 'baz', organization: organization, add_viewers: [current_user])
+          activity = collection.activities.create!(actor: current_user, organization: organization)
+          activity.update_column(:updated_at, 1.week.ago)
+          collection
+        end
+        let!(:collection_with_activity_out_of_range2) do
+          collection = create(:collection, name: 'qux', organization: organization, add_viewers: [current_user])
+          activity = collection.activities.create!(actor: current_user, organization: organization)
+          activity.update_column(:updated_at, 1.week.from_now)
+          collection
+        end
+        let!(:collection_with_no_activity) do
+          create(:collection, name: 'quxx', organization: organization, add_viewers: [current_user])
+        end
+
+        before do
+          Collection.reindex
+          Collection.searchkick_index.refresh
+        end
+
+        context 'updated within date range' do
+          it 'includes collections with activity in the date range' do
+            query = "Updated(#{3.days.ago.strftime('%d/%m/%Y')}, #{3.days.from_now.strftime('%d/%m/%Y')})"
+
+            get(path, params: { query: query })
+            expect(json['data']).to include(an_object_satisfying { |x| x['id'] == collection_with_activity_in_range1.id.to_s })
+            expect(json['data']).to include(an_object_satisfying { |x| x['id'] == collection_with_activity_in_range2.id.to_s })
+            expect(json['data']).not_to include(an_object_satisfying { |x| x['id'] == collection_with_activity_out_of_range1.id.to_s })
+            expect(json['data']).not_to include(an_object_satisfying { |x| x['id'] == collection_with_activity_out_of_range2.id.to_s })
+            expect(json['meta']['size']).to eq(2)
+          end
+
+          it 'works with search terms' do
+            query = "foo Updated(#{3.days.ago.strftime('%d/%m/%Y')}, #{3.days.from_now.strftime('%d/%m/%Y')})"
+            get(path, params: { query: query })
+            expect(json['data']).to include(an_object_satisfying { |x| x['id'] == collection_with_activity_in_range1.id.to_s })
+            expect(json['meta']['size']).to eq(1)
+          end
+        end
+
+        context 'not updated within date range' do
+          it 'includes collections with activity outside of the date range' do
+            query = "NotUpdated(#{3.days.ago.strftime('%d/%m/%Y')}, #{3.days.from_now.strftime('%d/%m/%Y')})"
+            get(path, params: { query: query })
+            expect(json['data']).not_to include(an_object_satisfying { |x| x['id'] == collection_with_activity_in_range1.id.to_s })
+            expect(json['data']).not_to include(an_object_satisfying { |x| x['id'] == collection_with_activity_in_range2.id.to_s })
+            expect(json['data']).to include(an_object_satisfying { |x| x['id'] == collection_with_activity_out_of_range1.id.to_s })
+            expect(json['data']).to include(an_object_satisfying { |x| x['id'] == collection_with_activity_out_of_range2.id.to_s })
+            expect(json['data']).to include(an_object_satisfying { |x| x['id'] == collection_with_no_activity.id.to_s })
+          end
+        end
+      end
+
       context 'when searching within a collection' do
         let!(:parent_collection) do
           create(:collection,
