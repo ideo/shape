@@ -1,5 +1,5 @@
 class Search
-  def initialize(options)
+  def initialize(options = {})
     default_options = {
       fields: %w[handle^6 name^5 tags^3 content],
       per_page: 10,
@@ -15,7 +15,7 @@ class Search
       f = filter.new(query)
       if f.match?
         where = where.merge(f.where)
-        query = f.clean_query
+        query = f.modify_query
       end
     end
 

@@ -14,7 +14,7 @@ class Search
         where
       end
 
-      def clean_query
+      def modify_query
         @query.gsub(/#\w+\s*/, '')
       end
     end

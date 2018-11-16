@@ -35,7 +35,7 @@ class Search
         where_clause
       end
 
-      def clean_query
+      def modify_query
         @query.sub(REGEXP, '')
       end
     end

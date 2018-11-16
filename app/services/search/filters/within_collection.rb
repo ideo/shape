@@ -10,7 +10,7 @@ class Search
         where
       end
 
-      def clean_query
+      def modify_query
         @query.sub(REGEXP, '')
       end
     end
