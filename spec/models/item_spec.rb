@@ -130,21 +130,21 @@ RSpec.describe Item, type: :model do
     end
 
     context 'TextItem' do
-      it 'incluldes the content of the text item in the search content' do
+      it 'includes the content of the text item in the search content' do
         item = create(:text_item)
         expect(item.search_data[:content]).to include(item.plain_content)
       end
     end
 
     context 'FileItem' do
-      it 'incluldes the filename in the search content' do
+      it 'includes the filename in the search content' do
         item = create(:file_item)
         expect(item.search_data[:content]).to include(item.filestack_file.filename)
       end
     end
 
     context 'other types' do
-      it 'incluldes the item content in the search content' do
+      it 'includes the item content in the search content' do
         link_item = create(:link_item)
         expect(link_item.search_data[:content]).to include(link_item.content)
       end
