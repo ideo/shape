@@ -28,6 +28,10 @@ class Search
   private
 
   def filters
-    [Filters::Tag, Filters::WithinCollection]
+    [
+      Filters::Tag,
+      Filters::WithinCollection,
+      Filters::ActivityDateRange,
+    ]
   end
 end
