@@ -17,7 +17,6 @@ namespace :cypress do
     # via dependent: :destroy this will also remove everything in the test area
     my_collection.collections.where(name: 'Cypress Test Area').destroy_all
     create_cards(my_collection, user)
-    Collection.reindex
   end
 
   def create_cards(collection, user)
@@ -45,5 +44,18 @@ namespace :cypress do
       user: user,
     )
     builder.create
+
+    builder = CollectionCardBuilder.new(
+      params: {
+        order: 1,
+        collection_attributes: {
+          name: 'Another',
+        },
+      },
+      parent_collection: card.collection,
+      user: user,
+    )
+    builder.create
+    card.collection.reindex
   end
 end

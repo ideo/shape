@@ -157,7 +157,8 @@ When('I search for the {string} collection', query => {
 
 When('I search for {string} within the current page', query => {
   cy.location('pathname').then(path => {
-    cy.globallySearch({ query, within: path })
+    const id = _.last(path.split('/'))
+    cy.globallySearch({ query, within: id })
   })
 })
 

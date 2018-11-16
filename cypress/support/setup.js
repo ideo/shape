@@ -38,7 +38,7 @@ const createNamedRoutes = () => {
 
 before(() => {
   // clean out the DB before running the suite
-  cy.exec('bin/rake cypress:db_setup')
+  cy.exec('bin/rake cypress:db_setup', { timeout: 140000 })
 })
 
 beforeEach(() => {

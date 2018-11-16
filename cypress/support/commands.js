@@ -135,6 +135,7 @@ Cypress.Commands.add('globallySearch', ({ query, within }) => {
   cy.get('#test-globalSearch .test-search')
     .first()
     .type(fullQuery, { force: true })
+  cy.wait(1600)
 })
 
 Cypress.Commands.add('globallyClearSearch', () => {
