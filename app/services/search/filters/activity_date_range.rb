@@ -36,7 +36,7 @@ class Search
       end
 
       def modify_query
-        @query.sub(REGEXP, '')
+        remove_regexp
       end
     end
   end
