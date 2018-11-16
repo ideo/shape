@@ -56,6 +56,32 @@ namespace :cypress do
       user: user,
     )
     builder.create
+
+    builder = CollectionCardBuilder.new(
+      params: {
+        order: 1,
+        collection_attributes: {
+          name: 'Has children',
+        },
+      },
+      parent_collection: card.collection,
+      user: user,
+    )
+    builder.create
+    has_children_card = builder.collection_card
+    builder = CollectionCardBuilder.new(
+      params: {
+        order: 1,
+        collection_attributes: {
+          name: 'child 1',
+        },
+      },
+      parent_collection: has_children_card.collection,
+      user: user,
+    )
+    builder.create
+
     card.collection.reindex
+    has_children_card.collection.reindex
   end
 end

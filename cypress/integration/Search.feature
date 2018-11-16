@@ -11,10 +11,10 @@ Feature: Search
     Then I should see the "Inner" collection in the global search results
 
     When I clear the search results
+    And I navigate to the collection named "Has children" via the "CollectionCover"
     And I search for "" within the current page
-    Then I should see 2 search results
-    Then I should see the "Inner" collection in the global search results
+    Then I should see 1 search results
 
     When I clear the search results
-    And I search for "Inner" within the current page
+    And I search for "child" within the current page
     Then I should see 1 search results
