@@ -9,6 +9,7 @@ import AddCollectionIcon from '~/ui/icons/AddCollectionIcon'
 import AddFileIcon from '~/ui/icons/AddFileIcon'
 import AddVideoIcon from '~/ui/icons/AddVideoIcon'
 import AddLinkIcon from '~/ui/icons/AddLinkIcon'
+import ReportIcon from '~/ui/icons/ReportIcon'
 import TemplateIcon from '~/ui/icons/TemplateIcon'
 import TestCollectionIcon from '~/ui/icons/TestCollectionIcon'
 import SubmissionBoxIcon from '~/ui/icons/SubmissionBoxIcon'
@@ -517,7 +518,7 @@ class GridCardBlank extends React.Component {
                 type="data"
                 creating={creating}
                 size={size}
-                Icon={TestCollectionIcon}
+                Icon={() => <ReportIcon size="large" />}
               />
             </BctButtonRotation>
           )}
@@ -550,12 +551,12 @@ class GridCardBlank extends React.Component {
                 menuItems={[
                   {
                     name: 'Create Template',
-                    iconRight: <TemplateIcon size="small" />,
+                    iconLeft: <TemplateIcon size="small" />,
                     onClick: this.startCreating('template'),
                   },
                   {
-                    name: 'Create Data Item',
-                    iconRight: <TestCollectionIcon />,
+                    name: 'Create Report',
+                    iconLeft: <ReportIcon />,
                     onClick: this.startCreating('data'),
                   },
                 ]}

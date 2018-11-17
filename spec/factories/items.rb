@@ -41,6 +41,10 @@ FactoryBot.define do
       data_source factory: :question_item
     end
 
+    factory :data_item, class: 'Item::DataItem' do
+      data_settings { { d_measure: 'participants' } }
+    end
+
     after(:create) do |item, evaluator|
       if evaluator.add_editors.present?
         evaluator.add_editors.each do |user|
