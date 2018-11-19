@@ -449,6 +449,9 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     uiStore.update('launchButtonLoading', false)
     // refetch yourself
     if (this.submission_attrs) this.apiStore.request(`collections/${this.id}`)
+    if (this.parent && this.parent.submission_attrs) {
+      this.apiStore.request(`collections/${this.parent.id}`)
+    }
   }
 
   API_setSubmissionBoxTemplate(data) {

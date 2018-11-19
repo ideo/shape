@@ -13,6 +13,10 @@ const { cover } = fakeCollection
 let wrapper
 describe('CollectionCover', () => {
   beforeEach(() => {
+    props.collection = {
+      ...fakeCollection,
+      is_inside_a_submission: false,
+    }
     wrapper = shallow(<CollectionCover.wrappedComponent {...props} />)
   })
 
@@ -37,5 +41,26 @@ describe('CollectionCover', () => {
         .children()
         .text()
     ).toContain(cover.text)
+  })
+
+  it('does not render the launch test button if not in a submission', () => {
+    expect(wrapper.find('LaunchButton').exists()).toBeFalsy()
+  })
+
+  describe('with a launchable submission test', () => {
+    beforeEach(() => {
+      props.collection = {
+        ...fakeCollection,
+        id: '99',
+        is_inside_a_submission: true,
+        launchableTestId: '99',
+        launchable: true,
+      }
+      wrapper = shallow(<CollectionCover.wrappedComponent {...props} />)
+    })
+
+    it('renders the launch test button', () => {
+      expect(wrapper.find('LaunchButton').exists()).toBeTruthy()
+    })
   })
 })
