@@ -26,7 +26,7 @@ module Testable
   # NOTE: For now, this is only applicable to tests within submission box submissions
   def collect_test_scores
     scores = {}
-    return score unless submission_attrs.present?
+    return scores unless submission_attrs.present?
     launchable_test = Collection.find_by(id: submission_attrs['launchable_test_id'])
     return scores unless launchable_test.present?
     launchable_test.question_items.scale_questions.each do |question|

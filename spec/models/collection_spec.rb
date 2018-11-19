@@ -111,10 +111,10 @@ describe Collection, type: :model do
       end
 
       context 'if cloned from Getting Started collection' do
-        let!(:getting_started_template_collection) {
+        let!(:getting_started_template_collection) do
           create(:getting_started_template_collection,
                  organization: organization)
-        }
+        end
         before do
           organization.reload
           collection.update_attributes(
@@ -196,6 +196,8 @@ describe Collection, type: :model do
           collection.collection_cards.map(&:id),
           instance_of(Integer),
           nil,
+          false,
+          false,
         )
         duplicate_without_user
       end
@@ -250,6 +252,8 @@ describe Collection, type: :model do
           collection.collection_cards.map(&:id),
           instance_of(Integer),
           user.id,
+          false,
+          false,
         )
         collection.duplicate!(for_user: user)
       end
@@ -278,6 +282,29 @@ describe Collection, type: :model do
         # roles shouldn't match because we're removing Viewer and replacing w/ Editor
         expect(duplicate.roles.map(&:name)).not_to match(collection.roles.map(&:name))
         expect(duplicate.can_edit?(user)).to be true
+      end
+    end
+
+    context 'with system_collection and synchronous settings' do
+      let(:instance_double) do
+        double('CollectionCardDuplicationWorker')
+      end
+
+      before do
+        allow(CollectionCardDuplicationWorker).to receive(:new).and_return(instance_double)
+        allow(instance_double).to receive(:perform).and_return true
+      end
+
+      it 'should call synchronously' do
+        expect(CollectionCardDuplicationWorker).to receive(:new)
+        expect(instance_double).to receive(:perform).with(
+          anything,
+          anything,
+          anything,
+          true,
+          true,
+        )
+        collection.duplicate!(for_user: user, system_collection: true, synchronous: true)
       end
     end
   end
@@ -385,6 +412,20 @@ describe Collection, type: :model do
 
     it 'includes all group_ids' do
       expect(collection.search_data[:group_ids]).to match_array(groups.map(&:id))
+    end
+
+    it 'sets activity date to nil when no activity' do
+      expect(collection.search_data[:activity_dates]).to be nil
+    end
+
+    it 'includes activity dates, without duplicates' do
+      organization = create(:organization)
+      user = create(:user)
+      activity1 = collection.activities.create(actor: user, organization: organization)
+      collection.activities.create(actor: user, organization: organization)
+      activity3 = collection.activities.create(actor: user, organization: organization, updated_at: 1.week.from_now)
+      expected_activity_dates = [activity1.updated_at.to_date, activity3.updated_at.to_date]
+      expect(collection.search_data[:activity_dates]).to match_array(expected_activity_dates)
     end
   end
 

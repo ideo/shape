@@ -5,7 +5,19 @@ import BaseRecord from './BaseRecord'
 
 class User extends BaseRecord {
   get name() {
-    return [this.first_name, this.last_name].join(' ')
+    const nameDisplay = [this.first_name, this.last_name].join(' ')
+    return nameDisplay.trim() || this.email
+  }
+
+  get nameWithHints() {
+    const hints = []
+    if (this.isCurrentUser) {
+      hints.push('(you)')
+    }
+    if (this.status === 'pending') {
+      hints.push('(pending)')
+    }
+    return [this.name, ...hints].join(' ').trim()
   }
 
   get isCurrentUser() {

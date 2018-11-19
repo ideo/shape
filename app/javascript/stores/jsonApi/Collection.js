@@ -16,6 +16,8 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   inMyCollection = null
   @observable
   reloading = false
+  @observable
+  nextAvailableTestPath = null
 
   attributesForAPI = [
     'name',
@@ -214,6 +216,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     return undefined
   }
 
+  @computed
   get launchableTestStatus() {
     if (this.isTestCollectionOrTestDesign) {
       return this.test_status
@@ -454,6 +457,24 @@ class Collection extends SharedRecordMixin(BaseRecord) {
       'POST',
       data
     )
+  }
+
+  async API_getNextAvailableTest() {
+    runInAction(() => {
+      this.nextAvailableTestPath = null
+    })
+    const res = await this.apiStore.request(
+      `test_collections/${this.id}/next_available`
+    )
+    if (!res.data) return
+    const path = routingStore.pathTo('collections', res.data.id)
+
+    this.setNextAvailableTestPath(`${path}?open=tests`)
+  }
+
+  @action
+  setNextAvailableTestPath(path) {
+    this.nextAvailableTestPath = path
   }
 
   reassignCover(newCover) {

@@ -20,6 +20,10 @@ describe Testable, type: :concern do
     end
 
     describe '#collect_test_scores' do
+      it 'should return empty for an unscored collection' do
+        expect(test_collection.collect_test_scores).to be_empty
+      end
+
       it 'should collect all the scale question scores' do
         # useful answers 1, 2, 3 == 0, 1, 2 on a scale of 3... 3/9 total = 33%
         # clarity answers 2, 3, 4 == 1, 2, 3 on a scale of 3... 6/9 total = 67%

@@ -390,15 +390,17 @@ class PageHeader extends React.Component {
                         </span>
                       </HeaderFormButton>
                     </CopyToClipboard>
-                    <HeaderFormButton
-                      width="170"
-                      color={v.colors.transparent}
-                      style={{ marginLeft: 10 }}
-                      onClick={record.closeTest}
-                      disabled={uiStore.launchButtonLoading}
-                    >
-                      Stop Feedback
-                    </HeaderFormButton>
+                    {record.can_edit_content && (
+                      <HeaderFormButton
+                        width="170"
+                        color={v.colors.transparent}
+                        style={{ marginLeft: 10 }}
+                        onClick={record.closeTest}
+                        disabled={uiStore.launchButtonLoading}
+                      >
+                        Stop Feedback
+                      </HeaderFormButton>
+                    )}
                   </Fragment>
                 )}
               </Flex>

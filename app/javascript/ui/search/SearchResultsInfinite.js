@@ -8,7 +8,6 @@ import FlipMove from 'react-flip-move'
 import VisibilitySensor from 'react-visibility-sensor'
 
 import { uiStore } from '~/stores'
-import CollectionCard from '~/stores/jsonApi/CollectionCard'
 import v from '~/utils/variables'
 import Breadcrumb from '~/ui/layout/Breadcrumb'
 import Loader from '~/ui/layout/Loader'
@@ -120,8 +119,7 @@ class SearchResultsInfinite extends React.Component {
       let card = collection.parent_collection_card
       if (!collection.parent_collection_card) {
         // catch for special/global templates that don't have a parent card
-        card = new CollectionCard()
-        card.id = `card-${i}`
+        card = { id: `card-${i}` }
       }
       return (
         <FlipMove appearAnimation="fade" key={collection.id}>

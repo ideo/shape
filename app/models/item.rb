@@ -18,7 +18,8 @@ class Item < ApplicationRecord
   acts_as_taggable
 
   store_accessor :cached_attributes,
-                 :cached_tag_list, :cached_filestack_file_url,
+                 :cached_tag_list,
+                 :cached_filestack_file_url,
                  :cached_filestack_file_info
 
   # The card that 'holds' this item and determines its breadcrumb
@@ -70,7 +71,9 @@ class Item < ApplicationRecord
   def duplicate!(
     for_user: nil,
     copy_parent_card: false,
-    parent: self.parent
+    parent: self.parent,
+    system_collection: false,
+    synchronous: false
   )
     # Clones item
     i = amoeba_dup
@@ -88,6 +91,8 @@ class Item < ApplicationRecord
         for_user: for_user,
         shallow: true,
         parent: parent,
+        system_collection: system_collection,
+        synchronous: synchronous,
       )
       i.parent_collection_card.item = i
     end

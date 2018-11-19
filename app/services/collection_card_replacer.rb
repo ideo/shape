@@ -19,7 +19,9 @@ class CollectionCardReplacer
     # now capture errors on the item
     @errors = @item.errors
     assign_item_attributes
-    @item.save
+    result = @item.save
+    update_template_instances
+    result
   end
 
   private
@@ -39,5 +41,10 @@ class CollectionCardReplacer
     # this needs to happen after the @item.becomes
     return unless @attrs[:filestack_file_attributes].present?
     @item.filestack_file_attributes = @attrs[:filestack_file_attributes]
+  end
+
+  def update_template_instances
+    return unless @replacing_card.parent.submission_box_template_test?
+    @replacing_card.parent.queue_update_template_instances
   end
 end

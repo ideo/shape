@@ -120,7 +120,7 @@ export default class UiStore {
   @observable
   activityLogPosition = { x: 0, y: 0, w: 1, h: 1 }
   @observable
-  activityLogPage = 'comments'
+  activityLogPage = null
   @observable
   activityLogMoving = false
   @observable
@@ -469,9 +469,17 @@ export default class UiStore {
   @action
   openOptionalMenus(params) {
     const opts = queryString.parse(params)
-    if (opts && opts.open) {
-      this.activityLogPage = opts.open
-      this.activityLogOpen = true
+    if (opts) {
+      if (opts.open) {
+        this.activityLogPage = opts.open
+        this.activityLogOpen = true
+      }
+      if (opts.testing_completed) {
+        this.alert(
+          'No ideas are ready to test yet. Please come back later.',
+          'Clock'
+        )
+      }
     }
     return opts.open
   }
@@ -533,10 +541,12 @@ export default class UiStore {
 
   @action
   expandThread(key, { reset = false } = {}) {
-    // when we expand a thread we also want it to set the ActivityLog to Comments
-    this.update('activityLogPage', 'comments')
-    // reset it first, that way if it's expanded offscreen, it will get re-opened/scrolled to
-    if (reset) this.expandedThreadKey = null
+    if (key) {
+      // when we expand a thread we also want it to set the ActivityLog to Comments
+      this.update('activityLogPage', 'comments')
+      // reset it first, that way if it's expanded offscreen, it will get re-opened/scrolled to
+      if (reset) this.expandedThreadKey = null
+    }
     this.expandedThreadKey = key
   }
 

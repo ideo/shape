@@ -142,6 +142,10 @@ class Collection < ApplicationRecord
   def search_data
     user_ids = (editors[:users].pluck(:id) + viewers[:users].pluck(:id)).uniq
     group_ids = (editors[:groups].pluck(:id) + viewers[:groups].pluck(:id)).uniq
+    parent_ids = breadcrumb
+    activity_dates = activities.map do |activity|
+      activity.updated_at.to_date
+    end.uniq
     {
       name: name,
       tags: all_tag_names,
@@ -150,6 +154,8 @@ class Collection < ApplicationRecord
       organization_id: organization_id,
       user_ids: user_ids,
       group_ids: group_ids,
+      parent_ids: parent_ids,
+      activity_dates: activity_dates.empty? ? nil : activity_dates,
     }
   end
 
@@ -226,7 +232,9 @@ class Collection < ApplicationRecord
     for_user: nil,
     copy_parent_card: false,
     parent: self.parent,
-    building_template_instance: false
+    building_template_instance: false,
+    system_collection: false,
+    synchronous: false
   )
 
     # check if we are cloning a template inside a template instance;
@@ -277,11 +285,18 @@ class Collection < ApplicationRecord
     for_user.upgrade_to_edit_role(c) if for_user.present?
 
     if collection_cards.any?
-      CollectionCardDuplicationWorker.perform_async(
+      worker_opts = [
         collection_cards.map(&:id),
         c.id,
         for_user.try(:id),
-      )
+        system_collection,
+        synchronous,
+      ]
+      if synchronous
+        CollectionCardDuplicationWorker.new.perform(*worker_opts)
+      else
+        CollectionCardDuplicationWorker.perform_async(*worker_opts)
+      end
     end
 
     # pick up newly created relationships
@@ -587,6 +602,11 @@ class Collection < ApplicationRecord
 
   def inside_a_submission?
     parents.where("cached_attributes->'submission_attrs'->>'submission' = 'true'").any?
+  end
+
+  def submission_test?
+    return unless inside_a_submission?
+    parent_submission.submission_attrs['launchable_test_id'] == id
   end
 
   # check for template instances anywhere in the entire collection tree

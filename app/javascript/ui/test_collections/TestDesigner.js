@@ -167,14 +167,28 @@ class TestDesigner extends React.Component {
     return styledTestTheme('primary')
   }
 
+  get canEditQuestions() {
+    const {
+      isTemplated,
+      can_edit_content,
+      test_status,
+      launchable,
+    } = this.props.collection
+    // We allow content editors (e.g. template instance) to edit the question content
+    // but not necessarily add or change the questions themselves, once the editor "launches"
+    if (isTemplated)
+      return can_edit_content && (test_status !== 'draft' || launchable)
+    return can_edit_content
+  }
+
   get canEdit() {
     // viewers still see the select forms, but disabled
-    const { collection } = this.props
+    const { isTemplated, can_edit_content } = this.props.collection
     // If this is a template instance, don't allow editing
     // NOTE: if we ever allow template instance editors to add their own questions at the end
     // (before the finish card?) then we may want to individually check canEdit on a per card basis
-    if (collection.isTemplated) return false
-    return collection.can_edit_content
+    if (isTemplated) return false
+    return can_edit_content
   }
 
   createNewQuestionCard = async ({
@@ -332,7 +346,7 @@ class TestDesigner extends React.Component {
                   item={item}
                   position={position}
                   order={card.order}
-                  canEdit={this.canEdit}
+                  canEdit={this.canEditQuestions}
                 />
               </TestQuestionHolder>
               {this.canEdit &&

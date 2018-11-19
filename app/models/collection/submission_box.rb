@@ -42,7 +42,48 @@ class Collection
     # this override is so that Roles::AddToChildren will also add the same roles
     # to all the submissions (which are technically children of the submissions_collection)
     def children
+      return super if submissions_collection.nil?
       (items + collections + submissions_collection.children)
+    end
+
+    def available_submission_tests(for_user:, omit_id: nil)
+      return [] unless submission_box_type == 'template' && submission_template.present?
+      sub_attrs = submission_template.submission_attrs
+      # none are available if the editor has not launched
+      return [] if sub_attrs.blank? || sub_attrs['test_status'] != 'live'
+      test_ids = submissions_collection.collections.map do |submission|
+        submission.submission_attrs['launchable_test_id']
+      end
+      if for_user.present?
+        user_responses = SurveyResponse.where(
+          test_collection_id: test_ids,
+          user_id: for_user.id,
+          status: 'completed',
+        )
+        # omit any tests where the user has already completed their response
+        test_ids -= user_responses.pluck(:test_collection_id)
+      end
+      test_ids -= [omit_id] if omit_id
+      return [] if test_ids.empty?
+
+      possible_tests = Collection::TestCollection.where(id: test_ids, test_status: 'live')
+      master_test = Collection::TestCollection.find sub_attrs['launchable_test_id']
+      if master_test.collection_to_test.present?
+        return [] unless for_user
+        return possible_tests.viewable_by(for_user, organization)
+      end
+      possible_tests
+    end
+
+    def random_next_submission_test(for_user:, omit_id: nil)
+      # will be nil if none are available
+      available = available_submission_tests(for_user: for_user, omit_id: omit_id)
+      return nil if available.empty?
+      # need to use inner query to combine `order` + `distinct`
+      Collection::TestCollection
+        .from(available, :collections)
+        .order('RANDOM()')
+        .first
     end
 
     private
