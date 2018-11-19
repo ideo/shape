@@ -80,6 +80,9 @@ class Item < ApplicationRecord
       name: name,
       tags: tags.map(&:name),
       content: search_content,
+      user_ids: parent.search_user_ids,
+      group_ids: parent.search_group_ids,
+      organization_id: parent.organization_id,
     }
   end
 

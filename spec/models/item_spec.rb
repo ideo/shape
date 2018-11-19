@@ -114,8 +114,11 @@ RSpec.describe Item, type: :model do
   end
 
   describe '#search_data' do
+    let!(:collection) { create(:collection) }
+    let!(:parent_collection_card) { create(:collection_card, parent: collection) }
+
     it 'includes tags' do
-      item = create(:text_item)
+      item = create(:text_item, parent_collection_card: parent_collection_card)
       item.tag_list.add('foo')
       item.tag_list.add('bar')
       item.save
@@ -125,38 +128,53 @@ RSpec.describe Item, type: :model do
     end
 
     it 'includes the name' do
-      item = create(:text_item, name: 'derp')
+      item = create(:text_item, name: 'derp', parent_collection_card: parent_collection_card)
       expect(item.search_data[:name]).to eql('derp')
+    end
+
+    it 'includes user_ids from the parent' do
+      item = create(:text_item, parent_collection_card: parent_collection_card)
+      expect(item.search_data[:user_ids]).to eql(collection.search_user_ids)
+    end
+
+    it 'includes group_ids from the parent' do
+      item = create(:text_item, parent_collection_card: parent_collection_card)
+      expect(item.search_data[:group_ids]).to eql(collection.search_group_ids)
+    end
+
+    it 'includes organization_id from the parent' do
+      item = create(:text_item, parent_collection_card: parent_collection_card)
+      expect(item.search_data[:organization_id]).to eql(collection.organization_id)
     end
 
     context 'TextItem' do
       it 'includes the content of the text item in the search content' do
-        item = create(:text_item)
+        item = create(:text_item, parent_collection_card: parent_collection_card)
         expect(item.search_data[:content]).to include(item.plain_content)
       end
     end
 
     context 'FileItem' do
       it 'includes the filename in the search content' do
-        item = create(:file_item)
+        item = create(:file_item, parent_collection_card: parent_collection_card)
         expect(item.search_data[:content]).to include(item.filestack_file.filename)
       end
     end
 
     context 'other types' do
       it 'includes the item content in the search content' do
-        link_item = create(:link_item)
+        link_item = create(:link_item, parent_collection_card: parent_collection_card)
         expect(link_item.search_data[:content]).to include(link_item.content)
       end
 
       it 'does not include nil content' do
-        video_item = create(:video_item)
+        video_item = create(:video_item, parent_collection_card: parent_collection_card)
         expect(video_item.search_data[:content]).to eq('')
 
-        question_item = create(:question_item)
+        question_item = create(:question_item, parent_collection_card: parent_collection_card)
         expect(question_item.search_data[:content]).to eq('')
 
-        chart_item = create(:chart_item)
+        chart_item = create(:chart_item, parent_collection_card: parent_collection_card)
         expect(chart_item.search_data[:content]).to eq('')
       end
     end
