@@ -8,7 +8,7 @@ RSpec.describe Item::DataItem, type: :model do
     it 'should call the DataReport service' do
       allow(item).to receive(:report).and_return(service_double)
       expect(service_double).to receive(:call)
-      item.data_values
+      item.data
     end
   end
 end
