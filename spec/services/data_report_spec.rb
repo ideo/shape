@@ -17,11 +17,7 @@ RSpec.describe DataReport, type: :service do
       end
 
       before do
-      end
-      let(:item) do
-        create(
-          :data_item,
-          parent_collection: parent_collection,
+        item.update(
           data_settings: {
             d_measure: 'participants',
           },
