@@ -7,7 +7,9 @@ class Api::V1::SearchController < Api::V1::BaseController
         total: results.total_count,
         size: results.size,
       },
-      jsonapi: results, include: [:parent_collection_card]
+      jsonapi: results, include: [:parent_collection_card], expose: {
+        force_breadcrumbs: @force_breadcrumbs = true,
+      }
     )
   end
 
