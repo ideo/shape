@@ -15,6 +15,7 @@ import ActionMenu from '~/ui/grid/ActionMenu'
 import SelectionCircle from '~/ui/grid/SelectionCircle'
 import CollectionCover from '~/ui/grid/covers/CollectionCover'
 import CollectionIcon from '~/ui/icons/CollectionIcon'
+import GridCard from '~/ui/grid/GridCard'
 import { StyledTopRightActions, StyledBottomLeftIcon } from '~/ui/grid/shared'
 
 const StyledSearchResult = styled.div`
@@ -114,15 +115,15 @@ class SearchResultsInfinite extends React.Component {
       total,
     } = this.props
 
-    const results = searchResults.map((collection, i) => {
+    const results = searchResults.map((result, i) => {
       // ActionMenu is rendered as if we were operating on the parent_collection_card
-      let card = collection.parent_collection_card
-      if (!collection.parent_collection_card) {
+      let card = result.parent_collection_card
+      if (!result.parent_collection_card) {
         // catch for special/global templates that don't have a parent card
         card = { id: `card-${i}` }
       }
       return (
-        <FlipMove appearAnimation="fade" key={collection.id}>
+        <FlipMove appearAnimation="fade" key={result.id}>
           <VisibilitySensor
             partialVisibility
             scrollCheck
@@ -135,10 +136,10 @@ class SearchResultsInfinite extends React.Component {
             <div>
               <StyledBreadcrumb>
                 <Breadcrumb
-                  record={collection}
+                  record={result}
                   isHomepage={false}
                   // re-mount every time the record / breadcrumb changes
-                  key={`${collection.identifier}_${collection.breadcrumbSize}`}
+                  key={`${result.identifier}_${result.breadcrumbSize}`}
                 />
               </StyledBreadcrumb>
               <StyledSearchResult
@@ -161,15 +162,32 @@ class SearchResultsInfinite extends React.Component {
                     onLeave={this.closeMenu}
                   />
                 </StyledTopRightActions>
-                <StyledBottomLeftIcon>
-                  <CollectionIcon />
-                </StyledBottomLeftIcon>
-                <CollectionCover
-                  onClick={this.routeToCollection(collection.id)}
-                  collection={collection}
-                  width={gridSettings.cols}
-                  height={1}
-                />
+                {result.type === 'Collection' ? (
+                  <Fragment>
+                    <StyledBottomLeftIcon>
+                      <CollectionIcon />
+                    </StyledBottomLeftIcon>
+                    <CollectionCover
+                      onClick={this.routeToCollection(result.id)}
+                      collection={result}
+                      width={gridSettings.cols}
+                      height={1}
+                    />
+                  </Fragment>
+                ) : (
+                  <GridCard
+                    card={result.parent_collection_card}
+                    cardType={result.internalType}
+                    height={1}
+                    record={result}
+                    cardId={card.id}
+                    lastPinnedCard={false}
+                    canEditCollection={false}
+                    isSharedCollection={false}
+                    menuOpen={false}
+                    dragging={false}
+                  />
+                )}
               </StyledSearchResult>
             </div>
           </VisibilitySensor>
