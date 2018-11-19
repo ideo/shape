@@ -604,6 +604,11 @@ class Collection < ApplicationRecord
     parents.where("cached_attributes->'submission_attrs'->>'submission' = 'true'").any?
   end
 
+  def submission_test?
+    return unless inside_a_submission?
+    parent_submission.submission_attrs['launchable_test_id'] == id
+  end
+
   # check for template instances anywhere in the entire collection tree
   def any_template_instance_children?
     Collection.in_collection(id).where.not(template_id: nil).any?

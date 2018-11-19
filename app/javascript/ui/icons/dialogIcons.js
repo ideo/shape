@@ -1,6 +1,7 @@
 import ArchiveIcon from '~/ui/icons/ArchiveIcon'
 import BackIcon from '~/ui/icons/BackIcon'
 import CloseIcon from '~/ui/icons/CloseIcon'
+import ClockIcon from '~/ui/icons/ClockIcon'
 import LeaveIcon from '~/ui/icons/LeaveIcon'
 import OkIcon from '~/ui/icons/OkIcon'
 // NOTE: we import this one as just AlertIcon for consistency
@@ -15,6 +16,7 @@ export default {
   ArchiveIcon,
   BackIcon,
   CloseIcon,
+  ClockIcon,
   LeaveIcon,
   OkIcon,
   AlertIcon,

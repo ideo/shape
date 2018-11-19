@@ -32,6 +32,12 @@ class InlineCollectionTest extends React.Component {
     }
     const res = await this.fetchTestCollection()
     const testCollection = res.data
+    // for submission tests, want to know if any other tests can be taken next
+    if (testCollection.is_submission_test) {
+      // don't need to `await` this, can happen async
+      // this will also set nextAvailableTestPath on the testCollection
+      testCollection.API_getNextAvailableTest()
+    }
     const surveyResponseResult =
       testCollection.survey_response_for_user_id &&
       (await this.fetchSurveyResponse(
@@ -45,6 +51,10 @@ class InlineCollectionTest extends React.Component {
     })
   }
 
+  componentWillUnmount() {
+    this.unmounted = true
+  }
+
   get collection() {
     return this.props.uiStore.viewingCollection
   }
@@ -56,9 +66,8 @@ class InlineCollectionTest extends React.Component {
 
   fetchTestCollection() {
     const { apiStore } = this.props
-    return apiStore.fetch(
-      'test_collections',
-      this.collection.live_test_collection.id
+    return apiStore.request(
+      `test_collections/${this.collection.live_test_collection.id}`
     )
   }
 

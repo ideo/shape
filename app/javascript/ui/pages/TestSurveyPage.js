@@ -41,6 +41,8 @@ const StyledClosedText = styled.div`
 `
 
 const LearnMoreLink = LoudDisplayLink.extend`
+  font-size: 0.75rem;
+  letter-spacing: 2px;
   color: ${v.colors.white};
 `
 LearnMoreLink.displayName = 'LearnMoreLink'
@@ -53,6 +55,11 @@ class TestSurveyPage extends React.Component {
   constructor(props) {
     super(props)
     this.collection = props.collection || apiStore.sync(window.collectionData)
+    if (window.nextAvailableId) {
+      this.collection.setNextAvailableTestPath(
+        `/tests/${window.nextAvailableId}`
+      )
+    }
   }
 
   createSurveyResponse = async () => {
@@ -85,16 +92,18 @@ class TestSurveyPage extends React.Component {
         </StyledSurvey>
       )
     }
+    let message = 'Thank you for stopping by! This feedback is now closed.'
+    if (window.noneAvailable) {
+      message = 'No ideas are ready to test yet. Please come back later.'
+    }
     return (
       <ThemeProvider theme={styledTestTheme('primary')}>
         <StyledSurvey>
           <SurveyClosed>
             <EmojiMessageContainer>
-              <Emoji name="Raising hands" symbol="🙌" />
+              <Emoji scale={2} name="Raising hands" symbol="🙌" />
             </EmojiMessageContainer>
-            <StyledClosedText>
-              Thank you for stopping by! This feedback is now closed.
-            </StyledClosedText>
+            <StyledClosedText>{message}</StyledClosedText>
             <LearnMoreLink href={'/'}>Learn More About Shape</LearnMoreLink>
           </SurveyClosed>
         </StyledSurvey>

@@ -71,7 +71,8 @@ class Collection
             test_status: test_status,
           },
         )
-        update_submissions_launch_status
+        # make sure all templates get the latest question setup
+        queue_update_template_instances
         # submission box master template test doesn't create a test_design, move cards, etc.
         return true
       end
@@ -97,30 +98,34 @@ class Collection
       related.save
     end
 
+    # This gets called by template update worker when you launch
     def update_submissions_launch_status
       return unless master_template?
-      # TODO: Probably should move to a worker, e.g. if hundreds or thousands of submissions
       parent_submission_box.submissions_collection.collections.each do |submission|
-        # find the launchable test within this particular submission
-        launchable_test = Collection
-                          .in_collection(submission)
-                          .find_by(template_id: id)
-        next unless launchable_test.present?
-        if launchable_test.is_a?(Collection::TestDesign)
-          launchable_test = launchable_test.test_collection
-        end
-        submission.update(
-          submission_attrs: {
-            # this should have already been set but want to preserve the value as true
-            submission: true,
-            template_test_id: id,
-            launchable_test_id: launchable_test.id,
-            test_status: launchable_test.test_status,
-          },
-        )
-        # e.g. if we switched which test is running, we want to switch to the latest one
-        submission.cache_test_scores!
+        update_submission_launch_status(submission)
       end
+    end
+
+    def update_submission_launch_status(submission)
+      # find the launchable test within this particular submission
+      launchable_test = Collection
+                        .in_collection(submission)
+                        .find_by(template_id: id)
+      return unless launchable_test.present?
+      if launchable_test.is_a?(Collection::TestDesign)
+        launchable_test = launchable_test.test_collection
+      end
+      submission.update(
+        submission_attrs: {
+          # this should have already been set but want to preserve the value as true
+          submission: true,
+          template_test_id: id,
+          launchable_test_id: launchable_test.id,
+          test_status: launchable_test.test_status,
+        },
+      )
+      # e.g. if we switched which test is running, we want to switch to the latest one
+      submission.cache_test_scores!
     end
 
     def close_all_submissions_tests!
@@ -128,6 +133,7 @@ class Collection
         next unless c.submission_attrs['test_status'] == 'live'
         c.submission_attrs['launchable_test_id']
       end.compact
+
       # another one that could maybe use a bg worker (if lots of tests)
       # we use the AASM method to ensure that callbacks are carried through
       Collection::TestCollection.where(id: test_ids).each(&:close!)
