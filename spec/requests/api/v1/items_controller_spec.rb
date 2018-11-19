@@ -23,6 +23,16 @@ describe Api::V1::ItemsController, type: :request, json: true, auth: true do
       expect(json['data']['attributes']['can_edit']).to eq(false)
     end
 
+    it 'creates an activity for viewing the item' do
+      expect(ActivityAndNotificationBuilder).to receive(:call).with(
+        actor: @user,
+        target: item,
+        action: :viewed,
+        content: anything,
+      )
+      get(path)
+    end
+
     context 'with editor' do
       let!(:item) { create(:text_item, add_editors: [user]) }
 
@@ -82,12 +92,12 @@ describe Api::V1::ItemsController, type: :request, json: true, auth: true do
       create(:collection_card_text, item: item, parent: parent)
     end
     let(:path) { "/api/v1/items/#{item.id}" }
-    let(:params) {
+    let(:params) do
       json_api_params(
         'items',
         content: 'The wheels on the bus...',
       )
-    }
+    end
 
     it 'returns a 200' do
       patch(path, params: params)
@@ -130,13 +140,13 @@ describe Api::V1::ItemsController, type: :request, json: true, auth: true do
     end
 
     context 'with cancel_sync == true' do
-      let(:params) {
+      let(:params) do
         json_api_params(
           'items',
           { content: 'The wheels on the bus...' },
           cancel_sync: true,
         )
-      }
+      end
 
       it 'returns a 204 no content' do
         patch(path, params: params)

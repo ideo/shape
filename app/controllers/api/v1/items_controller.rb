@@ -4,6 +4,7 @@ class Api::V1::ItemsController < Api::V1::BaseController
   load_and_authorize_resource except: %i[update in_my_collection]
 
   def show
+    log_item_activity(:viewed)
     render jsonapi: @item,
            include: [:filestack_file, :parent, :parent_collection_card, roles: %i[users groups resource]],
            expose: { current_record: @item }
@@ -21,7 +22,7 @@ class Api::V1::ItemsController < Api::V1::BaseController
   def update
     @item.attributes = item_params
     if @item.save
-      create_edit_notification
+      log_item_activity(:edited)
       CollectionUpdateBroadcaster.call(@item.parent, current_user)
       # cancel_sync means we don't want to render the item JSON
       return if @cancel_sync
@@ -82,11 +83,11 @@ class Api::V1::ItemsController < Api::V1::BaseController
     )
   end
 
-  def create_edit_notification
+  def log_item_activity(activity)
     ActivityAndNotificationBuilder.call(
       actor: current_user,
       target: @item,
-      action: :edited,
+      action: activity,
       content: @item.content,
     )
   end
