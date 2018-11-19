@@ -1,3 +1,4 @@
 class SerializableDataItem < SerializableItem
-  attributes :data_settings, :data_values
+  attributes :data_settings,
+             :data
 end

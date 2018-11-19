@@ -2,21 +2,21 @@
 import { PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 
-const StyledDataItemCover = styled.div`
+export const StyledDataItemCover = styled.div`
   h4 {
     font-size: 2rem;
   }
   text-align: center;
 `
+StyledDataItemCover.displayName = 'StyledDataItemCover'
 
 class DataItemCover extends React.PureComponent {
   render() {
     const { item } = this.props
     return (
       <StyledDataItemCover>
-        <h4>{item.data_values}</h4>
-        <br />
-        {item.data_settings.d_measure}
+        <h4>{item.data.count}</h4>
+        <div>{item.data_settings.d_measure}</div>
       </StyledDataItemCover>
     )
   }

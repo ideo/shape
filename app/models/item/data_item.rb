@@ -9,7 +9,7 @@ class Item
       DataReport.new(self)
     end
 
-    def data_values
+    def data
       report.call
     end
   end

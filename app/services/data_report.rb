@@ -7,6 +7,11 @@ class DataReport < SimpleService
     @measure = data_item.d_measure
     @filters = data_item.d_filters
     @timeframe = data_item.d_timeframe
+    @data = {
+      # e.g. if there was a chart of values...
+      values: [],
+      count: 0,
+    }
   end
 
   def call
@@ -14,6 +19,7 @@ class DataReport < SimpleService
     return unless @query
     @query = filtered_query
     calculate
+    @data
   end
 
   private
@@ -36,10 +42,10 @@ class DataReport < SimpleService
   def calculate
     case @measure
     when 'participants', 'viewers'
-      @query
-        .select(:actor_id)
-        .distinct
-        .count
+      @data[:count] = @query
+                      .select(:actor_id)
+                      .distinct
+                      .count
     end
   end
 end
