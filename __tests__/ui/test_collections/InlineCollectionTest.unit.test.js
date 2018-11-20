@@ -75,7 +75,7 @@ describe('InlineCollectionTest', () => {
     })
 
     it('should fetch the test collection', () => {
-      expect(props.apiStore.fetch).toHaveBeenCalled()
+      expect(props.apiStore.request).toHaveBeenCalled()
     })
 
     describe('if there is a survey response already for the user', () => {
@@ -84,7 +84,9 @@ describe('InlineCollectionTest', () => {
           ...testCollection,
           survey_response_for_user_id: 57,
         }
-        props.apiStore.fetch.mockReturnValue({ data: respondedTestCollection })
+        props.apiStore.request.mockReturnValue({
+          data: respondedTestCollection,
+        })
         wrapper = shallow(<InlineCollectionTest.wrappedComponent {...props} />)
       })
 
@@ -93,6 +95,23 @@ describe('InlineCollectionTest', () => {
           'survey_responses',
           57
         )
+      })
+    })
+
+    describe('if the testCollection is_submission_test', () => {
+      beforeEach(() => {
+        const respondedTestCollection = {
+          ...testCollection,
+          is_submission_test: true,
+        }
+        props.apiStore.request.mockReturnValue({
+          data: respondedTestCollection,
+        })
+        wrapper = shallow(<InlineCollectionTest.wrappedComponent {...props} />)
+      })
+
+      it('should check for the next available test', () => {
+        expect(testCollection.API_getNextAvailableTest).toHaveBeenCalled()
       })
     })
   })

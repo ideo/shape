@@ -70,10 +70,12 @@ class QuestionAnswer < ApplicationRecord
   end
 
   def update_survey_response
+    return if survey_response.destroyed?
     survey_response.question_answer_created_or_destroyed
   end
 
   def update_collection_test_scores
+    return if survey_response.destroyed?
     return unless survey_response.completed?
     survey_response.cache_test_scores!
   end

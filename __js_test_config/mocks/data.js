@@ -227,6 +227,7 @@ export const fakeCollection = {
   API_archive: jest.fn(),
   API_updateCards: jest.fn(),
   API_updateName: jest.fn(),
+  API_getNextAvailableTest: jest.fn(),
   checkCurrentOrg: jest.fn(),
   confirmEdit: jest.fn(),
   cardProperties: [],

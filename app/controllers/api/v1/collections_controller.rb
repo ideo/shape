@@ -13,6 +13,7 @@ class Api::V1::CollectionsController < Api::V1::BaseController
       # special behavior where it defaults to newest first
       params[:card_order] ||= 'updated_at'
     end
+    log_collection_activity(:viewed)
     render_collection
   end
 
@@ -37,6 +38,7 @@ class Api::V1::CollectionsController < Api::V1::BaseController
   def update
     updated = CollectionUpdater.call(@collection, collection_params)
     if updated
+      log_collection_activity(:edited)
       return if @cancel_sync
       render_collection
     else
@@ -159,6 +161,14 @@ class Api::V1::CollectionsController < Api::V1::BaseController
       actor: current_user,
       target: organization.primary_group,
       action: :joined,
+    )
+  end
+
+  def log_collection_activity(activity)
+    ActivityAndNotificationBuilder.call(
+      actor: current_user,
+      target: @collection,
+      action: activity,
     )
   end
 
