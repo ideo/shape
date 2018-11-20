@@ -82,11 +82,11 @@ class Breadcrumb extends React.Component {
       const [klass, id, crumbName] = item
       let name = crumbName
       const crumbRecord = apiStore.find(klass, id)
-      if (crumbRecord.type === ITEM_TYPES.LINK) {
-        // link items have no page to link to
-        return null
-      }
       if (crumbRecord) {
+        if (crumbRecord.type === ITEM_TYPES.LINK) {
+          // link items have no page to link to
+          return null
+        }
         name = crumbRecord.name
       }
       return items.push({
