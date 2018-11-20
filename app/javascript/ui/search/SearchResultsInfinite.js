@@ -8,7 +8,7 @@ import FlipMove from 'react-flip-move'
 import VisibilitySensor from 'react-visibility-sensor'
 
 import { uiStore } from '~/stores'
-import v from '~/utils/variables'
+import v, { ITEM_TYPES } from '~/utils/variables'
 import Breadcrumb from '~/ui/layout/Breadcrumb'
 import Loader from '~/ui/layout/Loader'
 import ActionMenu from '~/ui/grid/ActionMenu'
@@ -17,9 +17,12 @@ import CollectionCover from '~/ui/grid/covers/CollectionCover'
 import CollectionIcon from '~/ui/icons/CollectionIcon'
 import GridCard from '~/ui/grid/GridCard'
 import { StyledTopRightActions, StyledBottomLeftIcon } from '~/ui/grid/shared'
+import { compact } from 'lodash'
 
 const StyledSearchResult = styled.div`
-  height: ${props => props.gridH}px;
+  width: ${({ width }) => uiStore.gridWidthFor(width)}px;
+  height: ${({ height, gridH }) =>
+    height ? uiStore.gridHeightFor(height) : gridH}px;
   max-width: ${props => props.gridMaxW}px;
   background: transparent;
   margin-bottom: ${props => props.gutter}px;
@@ -48,6 +51,10 @@ const StyledScrollIndicator = styled.div`
     props.active ? v.colors.commonMedium : v.colors.commonDark};
   z-index: ${v.zIndex.scrollIndicator};
 `
+
+const isCollection = result => result.internalType === 'collections'
+
+const shouldNotRender = result => result.type === ITEM_TYPES.TEXT
 
 @observer
 class SearchResultsInfinite extends React.Component {
@@ -112,16 +119,21 @@ class SearchResultsInfinite extends React.Component {
       gridMaxW,
       hasMore,
       loadMore,
-      total,
+      // total, using filtered length because of hidden text items
     } = this.props
 
     const results = searchResults.map((result, i) => {
+      if (shouldNotRender(result)) {
+        return null
+      }
+
       // ActionMenu is rendered as if we were operating on the parent_collection_card
       let card = result.parent_collection_card
       if (!result.parent_collection_card) {
         // catch for special/global templates that don't have a parent card
         card = { id: `card-${i}` }
       }
+
       return (
         <FlipMove appearAnimation="fade" key={result.id}>
           <VisibilitySensor
@@ -144,6 +156,10 @@ class SearchResultsInfinite extends React.Component {
               </StyledBreadcrumb>
               <StyledSearchResult
                 {...gridSettings}
+                {...{
+                  width: result.parent_collection_card.width,
+                  height: result.parent_collection_card.height,
+                }}
                 gridMaxW={gridMaxW}
                 onMouseEnter={this.handleMouseOver(i + 1)}
                 onMouseLeave={this.handleMouseOver(i + 1, false)}
@@ -162,7 +178,7 @@ class SearchResultsInfinite extends React.Component {
                     onLeave={this.closeMenu}
                   />
                 </StyledTopRightActions>
-                {result.type === 'Collection' ? (
+                {isCollection(result) ? (
                   <Fragment>
                     <StyledBottomLeftIcon>
                       <CollectionIcon />
@@ -178,14 +194,9 @@ class SearchResultsInfinite extends React.Component {
                   <GridCard
                     card={result.parent_collection_card}
                     cardType={result.internalType}
-                    height={1}
                     record={result}
                     cardId={card.id}
-                    lastPinnedCard={false}
-                    canEditCollection={false}
-                    isSharedCollection={false}
                     menuOpen={false}
-                    dragging={false}
                   />
                 )}
               </StyledSearchResult>
@@ -194,10 +205,13 @@ class SearchResultsInfinite extends React.Component {
         </FlipMove>
       )
     })
+
+    const filteredResults = compact(results)
+
     return (
       <Fragment>
         <StyledScrollIndicator active={this.hovering}>
-          {this.firstVisible}/{total}
+          {this.firstVisible}/{filteredResults.length}
         </StyledScrollIndicator>
         <InfiniteScroll
           useWindow
@@ -207,7 +221,7 @@ class SearchResultsInfinite extends React.Component {
           loadMore={loadMore}
           hasMore={hasMore}
         >
-          {results}
+          {filteredResults}
         </InfiniteScroll>
       </Fragment>
     )
