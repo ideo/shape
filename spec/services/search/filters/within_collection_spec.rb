@@ -4,17 +4,19 @@ RSpec.describe Search::Filters::WithinCollection do
   describe '#where' do
     context 'when there is not a within match in the query' do
       it 'returns empty where criteria' do
-        result = Search::Filters::WithinCollection.new('foo bar baz').where
-        expect(result).to eq({})
+        result = Search::Filters::WithinCollection.new('foo bar baz').options
+        expect(result).to eq(where: {})
       end
     end
 
     context 'when there is a within match in the query' do
       it 'returns a where for the parent ids' do
-        result = Search::Filters::WithinCollection.new('foo within(bar/123) baz').where
+        result = Search::Filters::WithinCollection.new('foo within(bar/123) baz').options
         expect(result).to eq(
-          parent_ids: {
-            all: [123],
+          where: {
+            parent_ids: {
+              all: [123],
+            },
           },
         )
       end

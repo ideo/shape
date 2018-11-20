@@ -50,7 +50,7 @@ RSpec.describe Search do
     filter_instance = double('filter_instance')
 
     expect(filter_instance).to receive(:match?).and_return(true)
-    expect(filter_instance).to receive(:where).and_return(foo: 'bar')
+    expect(filter_instance).to receive(:options).and_return(where: { foo: 'bar' })
     expect(filter_instance).to receive(:modify_query).and_return('derp')
 
     expect(filter).to receive(:new).with(search_term).and_return(filter_instance)

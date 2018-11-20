@@ -4,17 +4,19 @@ RSpec.describe Search::Filters::Tag do
   describe '#where' do
     context 'when there are not tags in the query' do
       it 'returns empty where criteria' do
-        result = Search::Filters::Tag.new('foo bar baz qux').where
-        expect(result).to eq({})
+        result = Search::Filters::Tag.new('foo bar baz qux').options
+        expect(result).to eq(where: {})
       end
     end
 
     context 'when there are tags in the query' do
       it 'returns a where for the tags' do
-        result = Search::Filters::Tag.new('foo #bar baz #qux').where
+        result = Search::Filters::Tag.new('foo #bar baz #qux').options
         expect(result).to eq(
-          tags: {
-            all: %w[bar qux],
+          where: {
+            tags: {
+              all: %w[bar qux],
+            },
           },
         )
       end

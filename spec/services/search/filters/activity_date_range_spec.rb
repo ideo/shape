@@ -4,18 +4,20 @@ RSpec.describe Search::Filters::ActivityDateRange do
   describe '#where' do
     context 'when there is no match in the query' do
       it 'returns empty where criteria' do
-        result = Search::Filters::ActivityDateRange.new('foo bar baz').where
+        result = Search::Filters::ActivityDateRange.new('foo bar baz').options
         expect(result).to eq({})
       end
     end
 
     context 'when there is a match for updated in the query' do
       it 'returns a where the included date' do
-        result = Search::Filters::ActivityDateRange.new('foo Updated(20/10/1990,  30/1/2001) baz').where
+        result = Search::Filters::ActivityDateRange.new('foo Updated(20/10/1990,  30/1/2001) baz').options
         expect(result).to eq(
-          activity_dates: {
-            gte: Date.strptime('20/10/1990', '%d/%m/%Y'),
-            lte: Date.strptime('30/1/2001', '%d/%m/%Y'),
+          where: {
+            activity_dates: {
+              gte: Date.strptime('20/10/1990', '%d/%m/%Y'),
+              lte: Date.strptime('30/1/2001', '%d/%m/%Y'),
+            },
           },
         )
       end
