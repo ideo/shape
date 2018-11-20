@@ -1,35 +1,25 @@
 import PropTypes from 'prop-types'
 
-import { BctTextField, FormButton } from '~/ui/global/styled/forms'
 import PaddedCardCover from '~/ui/grid/covers/PaddedCardCover'
 import { ITEM_TYPES, KEYS } from '~/utils/variables'
+import MeasureSelect from '~/ui/reporting/MeasureSelect'
 
 class DataItemCreator extends React.Component {
-  state = {
-    inputText: '',
-  }
-
-  onInputChange = e => {
-    this.setState({
-      inputText: e.target.value,
-    })
-  }
-
   handleKeyDown = e => {
     if (e.keyCode === KEYS.ESC) {
       this.props.closeBlankContentTool()
     }
   }
 
-  createItem = e => {
-    e.preventDefault()
-    if (!this.state.inputText) return
-    const { inputText } = this.state
+  createItem = value => {
     const { createCard } = this.props
     createCard({
       item_attributes: {
         type: ITEM_TYPES.DATA,
-        name: inputText,
+        name: 'Report',
+        data_settings: {
+          d_measure: value,
+        },
       },
     })
   }
@@ -37,22 +27,8 @@ class DataItemCreator extends React.Component {
   render() {
     return (
       <PaddedCardCover>
-        <form className="form" onSubmit={this.createItem}>
-          <BctTextField
-            autoFocus
-            data-cy="DataItemCreatorTextField"
-            placeholder="Report name"
-            value={this.state.inputText}
-            onChange={this.onInputChange}
-            onKeyDown={this.handleKeyDown}
-          />
-          <FormButton
-            data-cy="DataItemCreatorFormButton"
-            disabled={this.props.loading}
-            width={125}
-          >
-            Add
-          </FormButton>
+        <form className="form">
+          <MeasureSelect onSelect={this.createItem} />
         </form>
       </PaddedCardCover>
     )

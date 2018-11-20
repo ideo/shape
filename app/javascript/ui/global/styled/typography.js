@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types'
 import styled from 'styled-components'
 import v from '~/utils/variables'
 
@@ -120,11 +121,17 @@ SubText.displayName = 'StyledSubText'
 
 /** @component */
 export const SmallHelperText = styled.span`
-  color: ${v.colors.commonMedium};
+  color: ${props => props.color};
   font-family: ${v.fonts.sans};
   font-size: 0.75rem;
 `
 SmallHelperText.displayName = 'SmallHelperText'
+SmallHelperText.propTypes = {
+  color: PropTypes.oneOf(Object.values(v.colors)),
+}
+SmallHelperText.defaultProps = {
+  color: v.colors.commonMedium,
+}
 
 export const SmallActionText = SmallHelperText.extend`
   color: white;
@@ -165,3 +172,9 @@ export const CardHeading = Heading1.extend`
   }
 `
 CardHeading.displayName = 'CardHeading'
+
+export const HugeNumber = Heading1.extend`
+  font-size: 4.5rem;
+  font-weight: ${v.weights.book};
+  line-height: 3.75rem;
+`

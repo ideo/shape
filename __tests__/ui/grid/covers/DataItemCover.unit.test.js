@@ -21,15 +21,48 @@ describe('DataItemCover', () => {
   it('renders the data values', () => {
     expect(
       wrapper
-        .find('StyledDataItemCover h4')
-        .at(0)
+        .find('.count')
+        .children()
         .text()
     ).toContain(props.item.data.count)
     expect(
       wrapper
-        .find('StyledDataItemCover div')
-        .at(0)
+        .find('.measure')
+        .children()
         .text()
     ).toContain(props.item.data_settings.d_measure)
+  })
+
+  describe('clicking measure', () => {
+    describe('when editor', () => {
+      beforeEach(() => {
+        props.item.can_edit_content = true
+        wrapper.setProps(props)
+        wrapper
+          .find('.measure')
+          .at(0)
+          .simulate('click')
+      })
+
+      it('should set the select state to true', () => {
+        expect(wrapper.state().selectOpen).toBe(true)
+      })
+    })
+
+    describe('when not editor', () => {
+      beforeEach(() => {
+        props.item.can_edit_content = false
+        wrapper.setState({ selectOpen: false })
+        wrapper.setProps(props)
+        wrapper
+          .find('.measure')
+          .at(0)
+          .simulate('click')
+      })
+
+      it('should not set the select state to true', () => {
+        expect(wrapper.state().selectOpen).toBe(false)
+      })
+    })
   })
 })

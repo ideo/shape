@@ -75,6 +75,11 @@ class Api::V1::ItemsController < Api::V1::BaseController
       :name,
       :content,
       { text_data: {} },
+      { data_settings: %i[
+        d_measure
+        d_filters
+        d_timeframe
+      ] },
       :url,
       :image,
       :archived,

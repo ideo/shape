@@ -228,9 +228,15 @@ class MovableGridCard extends React.PureComponent {
       uiStore.closeCardMenu()
       return
     }
+    const formTags = ['SELECT', 'OPTION']
+    console.log('adsf', record.type)
+    if (!e.target.className) return
     if (!e.target.className.match) return
     if (e.target.className.match(/cancelGridClick/)) return
+    if (e.target.className.match(/selectMenu/)) return
     if (e.target.tagName === 'A' && e.target.href) return
+    if (formTags.includes(e.target.tagName)) return
+    if (record.type === 'Item::DataItem') return
 
     // timeout is just a stupid thing so that Draggable doesn't complain about unmounting
     setTimeout(() => {

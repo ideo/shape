@@ -22,6 +22,7 @@ class Item extends SharedRecordMixin(BaseRecord) {
     'archived',
     'tag_list',
     'filestack_file_attributes',
+    'data_settings',
   ]
 
   get justText() {
@@ -99,6 +100,13 @@ Item.type = 'items'
 Item.defaults = {
   text_data: '',
   can_edit: false,
+  data: {
+    values: [],
+    count: 0,
+  },
+  data_settings: {
+    d_measure: null,
+  },
 }
 
 export default Item

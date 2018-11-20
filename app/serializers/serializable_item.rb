@@ -2,7 +2,7 @@ class SerializableItem < BaseJsonSerializer
   type 'items'
   attributes :type, :name, :content, :text_data,
              :url, :thumbnail_url, :icon_url, :question_type,
-             :data_source_type, :data_source_id
+             :data_source_type, :data_source_id, :data_settings
 
   has_many :roles
   has_one :parent_collection_card
