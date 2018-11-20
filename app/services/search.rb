@@ -30,6 +30,8 @@ class Search
       Filters::Tag,
       Filters::WithinCollection,
       Filters::ActivityDateRange,
+      Filters::TypeCollection,
+      Filters::TypeItem,
     ]
   end
 end

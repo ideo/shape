@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe Search::Filters::Tag do
-  describe '#where' do
+  describe '#options' do
     context 'when there are not tags in the query' do
       it 'returns empty where criteria' do
         result = Search::Filters::Tag.new('foo bar baz qux').options
@@ -23,7 +23,7 @@ RSpec.describe Search::Filters::Tag do
     end
   end
 
-  describe 'modify_query' do
+  describe '#modify_query' do
     context 'when there are not tags in the query' do
       it 'returns the query unmodified' do
         result = Search::Filters::Tag.new('foo bar baz qux').modify_query

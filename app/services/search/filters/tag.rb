@@ -9,10 +9,6 @@ class Search
         where[:tags] = { all: tags } if tags.count.positive?
         { where: where }
       end
-
-      def modify_query
-        @query.gsub(/#{REGEXP}\s*/, '')
-      end
     end
   end
 end

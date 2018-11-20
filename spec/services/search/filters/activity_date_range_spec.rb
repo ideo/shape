@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe Search::Filters::ActivityDateRange do
-  describe '#where' do
+  describe '#options' do
     context 'when there is no match in the query' do
       it 'returns empty where criteria' do
         result = Search::Filters::ActivityDateRange.new('foo bar baz').options
@@ -24,7 +24,7 @@ RSpec.describe Search::Filters::ActivityDateRange do
     end
   end
 
-  describe 'modify_query' do
+  describe '#modify_query' do
     context 'when there is no match in the query' do
       it 'returns the query unmodified' do
         result = Search::Filters::ActivityDateRange.new('foo bar baz').modify_query

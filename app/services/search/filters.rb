@@ -12,6 +12,10 @@ class Search
       def remove_regexp
         @query.gsub(/#{self.class::REGEXP}\s*/, '')
       end
+
+      def modify_query
+        remove_regexp
+      end
     end
   end
 end

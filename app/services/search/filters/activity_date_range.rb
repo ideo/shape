@@ -34,10 +34,6 @@ class Search
         end
         { where: where }
       end
-
-      def modify_query
-        remove_regexp
-      end
     end
   end
 end

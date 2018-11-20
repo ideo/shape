@@ -9,10 +9,6 @@ class Search
         where[:parent_ids] = { all: [within_collection_id.to_i] } if within_collection_id
         { where: where }
       end
-
-      def modify_query
-        remove_regexp
-      end
     end
   end
 end
