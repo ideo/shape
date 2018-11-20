@@ -1,5 +1,10 @@
 import SearchResultsInfinite from '~/ui/search/SearchResultsInfinite'
-import { fakeCollection, fakeVideoItem, fakeTextItem } from '#/mocks/data'
+import {
+  fakeCollection,
+  fakeLinkItem,
+  fakeTextItem,
+  fakeVideoItem,
+} from '#/mocks/data'
 
 let wrapper, props
 
@@ -10,6 +15,7 @@ beforeEach(() => {
       fakeCollection,
       fakeTextItem,
       fakeVideoItem,
+      fakeLinkItem,
     ],
     gridSettings: { cols: 4 },
     gridMaxW: 100,
@@ -24,6 +30,8 @@ beforeEach(() => {
 
 describe('SearchResultsInfinite', () => {
   it('displays the search results', () => {
+    // 4 because 2 collections and 2 items, text items are not
+    // rendered
     expect(wrapper.find('StyledSearchResult').length).toEqual(4)
     expect(
       wrapper
@@ -36,13 +44,13 @@ describe('SearchResultsInfinite', () => {
         .find('GridCard')
         .at(0)
         .props().record
-    ).toEqual(fakeTextItem)
+    ).toEqual(fakeVideoItem)
     expect(
       wrapper
         .find('GridCard')
         .at(1)
         .props().record
-    ).toEqual(fakeVideoItem)
+    ).toEqual(fakeLinkItem)
   })
 
   it('routes to collection on click', () => {

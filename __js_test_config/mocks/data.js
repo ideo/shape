@@ -80,6 +80,7 @@ export const fakeImageItem = {
 }
 export const fakeLinkItemAttrs = {
   id: '3',
+  internalType: 'items',
   type: 'Item::LinkItem',
   name: 'Independent.uk',
   content: 'The best news under the sun',
