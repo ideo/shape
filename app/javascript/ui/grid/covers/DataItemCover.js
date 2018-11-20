@@ -4,7 +4,6 @@ import { PropTypes as MobxPropTypes } from 'mobx-react'
 import { runInAction } from 'mobx'
 import styled from 'styled-components'
 
-import { apiStore } from '~/stores'
 import MeasureSelect from '~/ui/reporting/MeasureSelect'
 import {
   SmallHelperText,

@@ -5,6 +5,7 @@
     "name": { "type": ["string", "null"] },
     "content": { "type": ["string", "null"] },
     "text_data": { "type": "object" },
+    "data_settings": { "type": "object" },
     "url": { "type": ["string", "null"] },
     "thumbnail_url": { "type": ["string", "null"] },
     "icon_url": { "type": ["string", "null"] },

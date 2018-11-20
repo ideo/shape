@@ -2,7 +2,6 @@ import PropTypes from 'prop-types'
 import { PropTypes as MobxPropTypes } from 'mobx-react'
 import MenuItem from '@material-ui/core/MenuItem'
 
-import PaddedCardCover from '~/ui/grid/covers/PaddedCardCover'
 import { Select } from '~/ui/global/styled/forms'
 
 const measureOptions = [

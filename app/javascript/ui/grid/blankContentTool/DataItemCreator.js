@@ -36,7 +36,6 @@ class DataItemCreator extends React.Component {
 }
 
 DataItemCreator.propTypes = {
-  loading: PropTypes.bool.isRequired,
   createCard: PropTypes.func.isRequired,
   closeBlankContentTool: PropTypes.func.isRequired,
 }
