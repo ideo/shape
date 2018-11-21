@@ -4,17 +4,23 @@ import MenuItem from '@material-ui/core/MenuItem'
 
 import { Select } from '~/ui/global/styled/forms'
 
-const measureOptions = [
-  { name: 'Select Measure...', value: null },
-  { name: 'Participants', value: 'participants' },
-  { name: 'Viewers', value: 'viewers' },
-]
+const dataOptions = {
+  measure: [
+    { name: 'Select Measure...', value: null },
+    { name: 'Participants', value: 'participants' },
+    { name: 'Viewers', value: 'viewers' },
+  ],
+  timeframe: [
+    { name: 'Month', value: 'month' },
+    { name: 'Ever', value: 'ever' },
+  ],
+}
 
 class MeasureSelect extends React.Component {
   get currentValue() {
-    const { item } = this.props
+    const { item, dataSettingsName } = this.props
     if (!item) return null
-    return item.data_settings.d_measure
+    return item.data_settings[`d_${dataSettingsName}`]
   }
 
   handleChange = ev => {
@@ -24,8 +30,9 @@ class MeasureSelect extends React.Component {
   }
 
   render() {
+    const { dataSettingsName } = this.props
     return (
-      <form className="form">
+      <form className="form" style={{ display: 'inline-block' }}>
         <Select
           classes={{ root: 'select', selectMenu: 'selectMenu' }}
           displayEmpty
@@ -33,8 +40,9 @@ class MeasureSelect extends React.Component {
           name="role"
           onChange={this.handleChange}
           value={this.currentValue}
+          inline
         >
-          {measureOptions.map(opt => (
+          {dataOptions[dataSettingsName].map(opt => (
             <MenuItem key={opt.value} value={opt.value}>
               {opt.name}
             </MenuItem>
@@ -46,6 +54,7 @@ class MeasureSelect extends React.Component {
 }
 
 MeasureSelect.propTypes = {
+  dataSettingsName: PropTypes.string.isRequired,
   item: MobxPropTypes.objectOrObservableObject,
   onSelect: PropTypes.func,
 }

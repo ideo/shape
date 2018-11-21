@@ -207,11 +207,11 @@ export const RoundPill = styled.div`
 
 /** @component */
 export const Select = styled(MuiSelect)`
-  .select {
-    font-family: ${v.fonts.sans};
-    font-size: 1rem;
-    font-weight: ${v.weights.book};
-  }
+  ${props => props.inline && 'display: inline-block;'}
+  font-family: ${v.fonts.sans};
+  font-size: ${props => (props.inline ? 'inherit !important' : '1rem')};
+  font-weight: ${v.weights.book};
+
   .grayedOut {
     color: ${v.colors.commonMedium};
   }
@@ -224,7 +224,7 @@ export const Select = styled(MuiSelect)`
     width: 230px;
   }
 
-  .selectmenu: {
+  .selectMenu: {
     background-color: transparent;
     &:focus {
       background-color: transparent;
@@ -235,7 +235,7 @@ export const Select = styled(MuiSelect)`
     vertical-align: baseline;
     ${props => props.onDefault && `color: ${v.colors.commonMedium};`} li {
       font-family: ${v.fonts.sans};
-      font-size: 1rem;
+      font-size: ${props => (props.inline ? 'inherit' : '1rem')};
       font-weight: ${v.weights.book};
     }
   }

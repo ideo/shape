@@ -19,8 +19,8 @@ const StyledDataItemCover = styled.div`
   padding: 15px 0;
   text-align: left;
 
-  .measure {
-    width: calc(100% - 60px);
+  .measure,
+  .timeframe {
     ${props =>
       props.editable &&
       `
@@ -39,13 +39,22 @@ class DataItemCover extends React.PureComponent {
     const { item } = this.props
     const { data_settings } = item
     const editable = item.can_edit_content
-    const timeframeControl = editable ? (
-      <button onClick={this.handleTimeframeClick}>
-        {data_settings.d_timeframe}
-      </button>
-    ) : (
-      <span>{data_settings.d_timeframe}</span>
-    )
+    let timeframeControl = <span>{data_settings.d_timeframe}</span>
+    if (this.state.selectOpen) {
+      timeframeControl = (
+        <MeasureSelect
+          dataSettingsName="timeframe"
+          item={item}
+          onSelect={this.onSelectTimeframe}
+        />
+      )
+    } else if (editable) {
+      timeframeControl = (
+        <button onClick={this.handleEditClick} className="timeframe">
+          {data_settings.d_timeframe}
+        </button>
+      )
+    }
     return (
       <span>
         within the {''} Organization {timeframeControl}
@@ -53,10 +62,23 @@ class DataItemCover extends React.PureComponent {
     )
   }
 
-  onSelect = async value => {
+  onSelectTimeframe = value => {
+    console.log('onselecttime', value)
+    this.saveSettings({
+      d_timeframe: value,
+    })
+  }
+
+  onSelectMeasure = value => {
+    this.saveSettings({
+      d_measure: value,
+    })
+  }
+
+  async saveSettings(settings) {
     const { item } = this.props
     runInAction(() => {
-      item.data_settings.d_measure = value
+      item.data_settings = Object.assign({}, item.data_settings, settings)
     })
     const res = await item.save()
     // TODO: investigate why data isn't being updated with just `save()`
@@ -66,7 +88,7 @@ class DataItemCover extends React.PureComponent {
     this.setState({ selectOpen: false })
   }
 
-  handleMeasureClick = ev => {
+  handleEditClick = ev => {
     const { item } = this.props
     if (!item.can_edit_content) return
     this.setState({ selectOpen: true })
@@ -79,19 +101,22 @@ class DataItemCover extends React.PureComponent {
         className="cancelGridClick"
         editable={item.can_edit_content}
       >
-        <Heading3 className="measure" onClick={this.handleMeasureClick}>
+        <Heading3 className="measure" onClick={this.handleEditClick}>
           {item.data_settings.d_measure}
         </Heading3>
-        {this.state.selectOpen ? (
-          <MeasureSelect item={item} onSelect={this.onSelect} />
-        ) : (
-          <Fragment>
-            <HugeNumber className="count">{item.data.count}</HugeNumber>
-            <SmallHelperText color={v.colors.black}>
-              {this.withinText}
-            </SmallHelperText>
-          </Fragment>
+        {this.state.selectOpen && (
+          <MeasureSelect
+            dataSettingsName="measure"
+            item={item}
+            onSelect={this.onSelectMeasure}
+          />
         )}
+        <Fragment>
+          <HugeNumber className="count">{item.data.count}</HugeNumber>
+          <SmallHelperText color={v.colors.black}>
+            {this.withinText}
+          </SmallHelperText>
+        </Fragment>
       </StyledDataItemCover>
     )
   }
