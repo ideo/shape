@@ -53,6 +53,7 @@ class DataReport < SimpleService
                          .distinct
                          .group("date_trunc('#{@timeframe}', created_at) ")
                          .count
+                         .map { |k, v| { date: k, amount: v } }
       end
     end
   end

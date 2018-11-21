@@ -3,6 +3,15 @@ import { Fragment } from 'react'
 import { PropTypes as MobxPropTypes } from 'mobx-react'
 import { runInAction } from 'mobx'
 import styled from 'styled-components'
+import {
+  VictoryArea,
+  VictoryAxis,
+  VictoryBar,
+  VictoryChart,
+  VictoryGroup,
+  VictoryLabel,
+  VictoryLegend,
+} from 'victory'
 
 import MeasureSelect from '~/ui/reporting/MeasureSelect'
 import {
@@ -11,6 +20,7 @@ import {
   HugeNumber,
 } from '~/ui/global/styled/typography'
 import v from '~/utils/variables'
+import { theme } from '~/ui/test_collections/shared'
 
 const StyledDataItemCover = styled.div`
   background-color: ${v.colors.commonLight};
@@ -93,6 +103,46 @@ class DataItemCover extends React.PureComponent {
     this.setState({ selectOpen: true })
   }
 
+  get formattedValues() {
+    const { item } = this.props
+    const {
+      data: { values },
+    } = item
+    if (!values) return []
+    return values.map(value =>
+      Object.assign({}, value, {
+        date: new Date(value.date).toLocaleString('locale', {
+          month: 'long',
+        }),
+      })
+    )
+  }
+
+  renderSingleValue() {
+    const { item } = this.props
+    return (
+      <Fragment>
+        <HugeNumber className="count">{item.data.value}</HugeNumber>
+        <SmallHelperText color={v.colors.black}>
+          {this.withinText}
+        </SmallHelperText>
+      </Fragment>
+    )
+  }
+
+  renderTimeframeValues() {
+    return (
+      <VictoryChart theme={theme}>
+        <VictoryArea
+          style={{ data: { fill: '#c43a31' } }}
+          data={this.formattedValues}
+          y="amount"
+          x="date"
+        />
+      </VictoryChart>
+    )
+  }
+
   render() {
     const { item } = this.props
     return (
@@ -110,12 +160,9 @@ class DataItemCover extends React.PureComponent {
             onSelect={this.onSelectMeasure}
           />
         )}
-        <Fragment>
-          <HugeNumber className="count">{item.data.value}</HugeNumber>
-          <SmallHelperText color={v.colors.black}>
-            {this.withinText}
-          </SmallHelperText>
-        </Fragment>
+        {item.data_settings.d_timeframe === 'ever'
+          ? this.renderSingleValue()
+          : this.renderTimeframeValues()}
       </StyledDataItemCover>
     )
   }
