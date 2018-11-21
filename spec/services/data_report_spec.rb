@@ -25,7 +25,7 @@ RSpec.describe DataReport, type: :service do
       end
 
       it 'should calculate the number of participants in the organization' do
-        expect(data[:count]).to eq 3
+        expect(data[:value]).to eq 3
       end
     end
   end

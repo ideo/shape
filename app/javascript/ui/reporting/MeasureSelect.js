@@ -11,8 +11,8 @@ const dataOptions = {
     { name: 'Viewers', value: 'viewers' },
   ],
   timeframe: [
-    { name: 'Month', value: 'month' },
-    { name: 'Ever', value: 'ever' },
+    { name: 'month', value: 'month' },
+    { name: 'ever', value: 'ever' },
   ],
 }
 

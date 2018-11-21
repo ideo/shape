@@ -63,7 +63,6 @@ class DataItemCover extends React.PureComponent {
   }
 
   onSelectTimeframe = value => {
-    console.log('onselecttime', value)
     this.saveSettings({
       d_timeframe: value,
     })
@@ -112,7 +111,7 @@ class DataItemCover extends React.PureComponent {
           />
         )}
         <Fragment>
-          <HugeNumber className="count">{item.data.count}</HugeNumber>
+          <HugeNumber className="count">{item.data.value}</HugeNumber>
           <SmallHelperText color={v.colors.black}>
             {this.withinText}
           </SmallHelperText>

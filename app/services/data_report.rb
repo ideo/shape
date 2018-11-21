@@ -10,7 +10,7 @@ class DataReport < SimpleService
     @data = {
       # e.g. if there was a chart of values...
       values: [],
-      count: 0,
+      value: 0,
     }
   end
 
@@ -42,7 +42,7 @@ class DataReport < SimpleService
   def calculate
     case @measure
     when 'participants', 'viewers'
-      @data[:count] = @query
+      @data[:value] = @query
                       .select(:actor_id)
                       .distinct
                       .count

@@ -8,7 +8,7 @@ describe('DataItemCover', () => {
     props.item = {
       ...fakeItem,
       data: {
-        count: 5,
+        value: 5,
       },
       data_settings: {
         d_measure: 'participants',
@@ -24,7 +24,7 @@ describe('DataItemCover', () => {
         .find('.count')
         .children()
         .text()
-    ).toContain(props.item.data.count)
+    ).toContain(props.item.data.value)
     expect(
       wrapper
         .find('.measure')
