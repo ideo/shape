@@ -36,7 +36,21 @@ class DataItemCover extends React.PureComponent {
 
   // eslint-disable-next-line
   get withinText() {
-    return `within the ${''} Organization ever`
+    const { item } = this.props
+    const { data_settings } = item
+    const editable = item.can_edit_content
+    const timeframeControl = editable ? (
+      <button onClick={this.handleTimeframeClick}>
+        {data_settings.d_timeframe}
+      </button>
+    ) : (
+      <span>{data_settings.d_timeframe}</span>
+    )
+    return (
+      <span>
+        within the {''} Organization {timeframeControl}
+      </span>
+    )
   }
 
   onSelect = async value => {

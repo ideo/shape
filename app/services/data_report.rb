@@ -46,6 +46,14 @@ class DataReport < SimpleService
                       .select(:actor_id)
                       .distinct
                       .count
+
+      # TODO: sql injection?
+      if @timeframe && @timeframe != 'ever'
+        @data[:values] = @query
+                         .distinct
+                         .group("date_trunc('#{@timeframe}', created_at) ")
+                         .count
+      end
     end
   end
 end

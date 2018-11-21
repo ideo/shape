@@ -304,6 +304,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
         ],
         data_settings: [
           :d_measure,
+          :d_timeframe,
         ],
       ],
     )
