@@ -3,15 +3,7 @@ import { Fragment } from 'react'
 import { PropTypes as MobxPropTypes } from 'mobx-react'
 import { runInAction } from 'mobx'
 import styled from 'styled-components'
-import {
-  VictoryArea,
-  VictoryAxis,
-  VictoryBar,
-  VictoryChart,
-  VictoryGroup,
-  VictoryLabel,
-  VictoryLegend,
-} from 'victory'
+import { VictoryArea, VictoryChart } from 'victory'
 
 import MeasureSelect from '~/ui/reporting/MeasureSelect'
 import {
@@ -40,6 +32,21 @@ const StyledDataItemCover = styled.div`
     `};
   }
 `
+
+const shortMonths = [
+  'Jan',
+  'Feb',
+  'Mar',
+  'Apr',
+  'May',
+  'Jun',
+  'Jul',
+  'Aug',
+  'Sep',
+  'Oct',
+  'Nov',
+  'Dec',
+]
 
 class DataItemCover extends React.PureComponent {
   state = { selectOpen: false }
@@ -111,9 +118,7 @@ class DataItemCover extends React.PureComponent {
     if (!values) return []
     return values.map(value =>
       Object.assign({}, value, {
-        date: new Date(value.date).toLocaleString('locale', {
-          month: 'long',
-        }),
+        date: shortMonths[new Date(value.date).getMonth()],
       })
     )
   }
