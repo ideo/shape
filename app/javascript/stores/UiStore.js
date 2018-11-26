@@ -142,6 +142,8 @@ export default class UiStore {
   textEditingItem = null
   @observable
   collectionCardSortOrder = 'updated_at'
+  @observable
+  launchButtonLoading = false
 
   @action
   startDragging() {
