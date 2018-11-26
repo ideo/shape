@@ -323,6 +323,9 @@ class User < ApplicationRecord
   private
 
   def change_network_admin(action)
+    # must have uid for network request
+    return true unless uid
+
     NetworkOrganizationUserSyncWorker.perform_async(
       uid, id, NetworkApi::Organization::ADMIN_ROLE, action
     )
