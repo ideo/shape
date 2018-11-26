@@ -226,10 +226,13 @@ class GridCard extends React.Component {
   linkOffsite = url => {
     const { record } = this.props
     Activity.trackActivity('viewed', record)
-    Object.assign(document.createElement('a'), {
+    const anchor = Object.assign(document.createElement('a'), {
       target: '_blank',
       href: url,
-    }).click()
+    })
+    document.body.append(anchor)
+    anchor.click()
+    anchor.remove()
   }
 
   onCollectionCoverChange = () => {

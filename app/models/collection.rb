@@ -138,10 +138,16 @@ class Collection < ApplicationRecord
     ]
   end
 
+  def search_user_ids
+    (editors[:users].pluck(:id) + viewers[:users].pluck(:id)).uniq
+  end
+
+  def search_group_ids
+    (editors[:groups].pluck(:id) + viewers[:groups].pluck(:id)).uniq
+  end
+
   # By default all string fields are searchable
   def search_data
-    user_ids = (editors[:users].pluck(:id) + viewers[:users].pluck(:id)).uniq
-    group_ids = (editors[:groups].pluck(:id) + viewers[:groups].pluck(:id)).uniq
     parent_ids = breadcrumb
     activity_dates = activities.map do |activity|
       activity.updated_at.to_date
@@ -152,8 +158,8 @@ class Collection < ApplicationRecord
       item_tags: items.map(&:tags).flatten.map(&:name),
       content: search_content,
       organization_id: organization_id,
-      user_ids: user_ids,
-      group_ids: group_ids,
+      user_ids: search_user_ids,
+      group_ids: search_group_ids,
       parent_ids: parent_ids,
       activity_dates: activity_dates.empty? ? nil : activity_dates,
     }

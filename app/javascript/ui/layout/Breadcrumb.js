@@ -3,11 +3,11 @@ import PropTypes from 'prop-types'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 import { Link } from 'react-router-dom'
-import { floor, round, sumBy } from 'lodash'
+import { floor, round, sumBy, compact } from 'lodash'
 
 import { apiStore, routingStore } from '~/stores'
 import Tooltip from '~/ui/global/Tooltip'
-import v from '~/utils/variables'
+import v, { ITEM_TYPES } from '~/utils/variables'
 
 const BreadcrumbPadding = styled.div`
   height: 1.7rem;
@@ -83,6 +83,10 @@ class Breadcrumb extends React.Component {
       let name = crumbName
       const crumbRecord = apiStore.find(klass, id)
       if (crumbRecord) {
+        if (crumbRecord.type === ITEM_TYPES.LINK) {
+          // link items have no page to link to
+          return null
+        }
         name = crumbRecord.name
       }
       return items.push({
@@ -93,7 +97,7 @@ class Breadcrumb extends React.Component {
         ellipses: false,
       })
     })
-    return items
+    return compact(items)
   }
 
   totalNameLength = items =>
