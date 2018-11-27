@@ -1,5 +1,7 @@
 import _ from 'lodash'
+import { Fragment } from 'react'
 import PropTypes from 'prop-types'
+import styled from 'styled-components'
 import { action, observable } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import { Heading3 } from '~/ui/global/styled/typography'
@@ -12,6 +14,18 @@ import { uiStore } from '~/stores'
 function sortUserOrGroup(a, b) {
   return a.entity.name.localeCompare(b.entity.name)
 }
+
+const ScrollArea = styled.div`
+  flex: 1 1 auto;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+`
+
+const FooterArea = styled.div`
+  flex: 0 0 auto;
+  padding-top: 24px;
+  padding-bottom: 24px;
+`
 
 @inject('apiStore', 'routingStore')
 @observer
@@ -162,31 +176,34 @@ class RolesMenu extends React.Component {
     const addRoleTypes = fixedRole ? [fixedRole] : roleTypes
 
     return (
-      <div>
-        <Heading3>{title}</Heading3>
-        {sortedRoleEntities.map(
-          combined =>
-            // NOTE: content_editor is a "hidden" role for now
-            combined.role.name !== 'content_editor' && (
-              <RoleSelect
-                enabled={
-                  canEdit && this.notCurrentUser(combined.entity, combined.role)
-                }
-                key={`${combined.entity.id}_${combined.entity.internalType}_r${
-                  combined.role.id
-                }`}
-                role={combined.role}
-                roleTypes={roleTypes}
-                roleLabels={submissionBox ? { viewer: 'participant' } : {}}
-                entity={combined.entity}
-                onDelete={this.deleteRoles}
-                onCreate={this.createRoles}
-              />
-            )
-        )}
-        <FormSpacer />
+      <Fragment>
+        <ScrollArea>
+          <Heading3>{title}</Heading3>
+          {sortedRoleEntities.map(
+            combined =>
+              // NOTE: content_editor is a "hidden" role for now
+              combined.role.name !== 'content_editor' && (
+                <RoleSelect
+                  enabled={
+                    canEdit &&
+                    this.notCurrentUser(combined.entity, combined.role)
+                  }
+                  key={`${combined.entity.id}_${
+                    combined.entity.internalType
+                  }_r${combined.role.id}`}
+                  role={combined.role}
+                  roleTypes={roleTypes}
+                  roleLabels={submissionBox ? { viewer: 'participant' } : {}}
+                  entity={combined.entity}
+                  onDelete={this.deleteRoles}
+                  onCreate={this.createRoles}
+                />
+              )
+          )}
+          <FormSpacer />
+        </ScrollArea>
         {canEdit && (
-          <div>
+          <FooterArea>
             <Heading3>{addCallout}</Heading3>
             <RolesAdd
               searchableItems={this.searchableItems}
@@ -196,9 +213,9 @@ class RolesMenu extends React.Component {
               onCreateUsers={this.onCreateUsers}
               ownerType={ownerType}
             />
-          </div>
+          </FooterArea>
         )}
-      </div>
+      </Fragment>
     )
   }
 }
