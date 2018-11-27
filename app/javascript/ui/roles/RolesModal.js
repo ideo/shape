@@ -45,7 +45,12 @@ class RolesModal extends React.Component {
     const title = `Sharing: ${record.name}`
 
     return (
-      <Modal title={title} onClose={this.handleClose} open={this.isOpen}>
+      <Modal
+        title={title}
+        onClose={this.handleClose}
+        open={this.isOpen}
+        noScroll
+      >
         <RolesMenu
           canEdit={record.can_edit}
           ownerId={record.id}
