@@ -19,6 +19,7 @@ class DataItemCreator extends React.Component {
         name: 'Report',
         data_settings: {
           d_measure: value,
+          d_timeframe: 'ever',
         },
       },
     })
@@ -28,7 +29,10 @@ class DataItemCreator extends React.Component {
     return (
       <PaddedCardCover>
         <form className="form">
-          <MeasureSelect onSelect={this.createItem} />
+          <MeasureSelect
+            onSelect={this.createItem}
+            dataSettingsName="measure"
+          />
         </form>
       </PaddedCardCover>
     )

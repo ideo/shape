@@ -137,14 +137,21 @@ class DataItemCover extends React.PureComponent {
 
   renderTimeframeValues() {
     return (
-      <VictoryChart theme={theme}>
-        <VictoryArea
-          style={{ data: { fill: '#c43a31' } }}
-          data={this.formattedValues}
-          y="amount"
-          x="date"
-        />
-      </VictoryChart>
+      <Fragment>
+        {this.state.selectOpen && (
+          <SmallHelperText color={v.colors.black}>
+            {this.withinText}
+          </SmallHelperText>
+        )}
+        <VictoryChart theme={theme}>
+          <VictoryArea
+            style={{ data: { fill: '#c43a31' } }}
+            data={this.formattedValues}
+            y="amount"
+            x="date"
+          />
+        </VictoryChart>
+      </Fragment>
     )
   }
 
