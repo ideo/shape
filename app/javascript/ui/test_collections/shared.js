@@ -34,10 +34,8 @@ export const theme = objectAssignDeep({}, VictoryTheme.grayscale, {
     },
   },
   axis: {
-    padding: { left: 20, right: 20 },
     style: {
       tickLabels: themeLabelStyles,
-      padding: { left: 20, right: 20 },
     },
   },
   group: {

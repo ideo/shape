@@ -1,4 +1,4 @@
-// import PropTypes from 'prop-types'
+import PropTypes from 'prop-types'
 import { Fragment } from 'react'
 import { PropTypes as MobxPropTypes } from 'mobx-react'
 import { runInAction } from 'mobx'
@@ -24,7 +24,7 @@ import { theme } from '~/ui/test_collections/shared'
 class CustomLabel extends React.Component {
   static defaultEvents = VictoryTooltip.defaultEvents
   render() {
-    const { data, datum, index, maxAmount } = this.props
+    const { data, datum, height, index, maxAmount } = this.props
     let active
     if (datum.amount >= maxAmount) {
       active = true
@@ -33,17 +33,19 @@ class CustomLabel extends React.Component {
     }
     let dx = 0
     if (parseInt(index) === 0) {
-      dx = 15
+      dx = 10
     } else if (parseInt(index) === data.length - 1) {
-      dx = -15
+      dx = -10
     }
     return (
       <g>
-        <VictoryLabel dx={dx} active={active} {...this.props} />
+        <VictoryLabel {...this.props} active={active} />
         <VictoryTooltip
           active={active}
           {...this.props}
           dx={dx}
+          dy={5}
+          style={{ fontSize: height === 1 ? '18px' : '12px' }}
           text={`${datum.amount}`}
           orientation="top"
           pointerLength={0}
@@ -55,11 +57,13 @@ class CustomLabel extends React.Component {
 }
 
 const TickLabel = props => {
-  console.log('props', props)
   let dx
-  if (props.x === 0) dx = 20
-  if (props.x === 450) dx = -20
-  return <VictoryLabel {...props} dx={dx} />
+  if (props.x === 0) dx = 12
+  if (props.x === 450) dx = -12
+  const updatedStyle = Object.assign({}, props.style, {
+    fontSize: '10px',
+  })
+  return <VictoryLabel {...props} dx={dx} dy={5} style={updatedStyle} />
 }
 
 const StyledDataItemCover = styled.div`
@@ -194,41 +198,55 @@ class DataItemCover extends React.PureComponent {
   }
 
   renderTimeframeValues() {
+    const { height } = this.props
     return (
       <Fragment>
         <SmallHelperText color={v.colors.black}>
           {this.withinText}
         </SmallHelperText>
-        <VictoryChart
-          theme={theme}
-          domain={{ y: [0, this.maxAmount] }}
-          domainPadding={{ y: 0 }}
-          padding={{ top: 0, left: 0, right: 0, bottom: 10 }}
-          height={150}
-          containerComponent={<VictoryVoronoiContainer />}
+        <div
+          style={{
+            position: 'absolute',
+            top: '106px',
+            width: '100%',
+            height: '100%',
+          }}
         >
-          <VictoryAxis
-            tickLabelComponent={<TickLabel />}
-            style={{
-              axis: {
-                stroke: v.colors.commonMedium,
-                strokeWidth: 30,
-                transform: 'translateY(20px)',
-              },
-            }}
-          />
-          <VictoryArea
-            labels={d => (d.amount >= this.maxAmount ? d.amount : '')}
-            labelComponent={<CustomLabel maxAmount={this.maxAmount} />}
-            style={{
-              data: { fill: '#c43a31' },
-              labels: { fill: 'black' },
-            }}
-            data={this.formattedValues}
-            y="amount"
-            x="date"
-          />
-        </VictoryChart>
+          <VictoryChart
+            theme={theme}
+            domainPadding={{ y: 0 }}
+            padding={{ top: 0, left: 0, right: 0, bottom: 10 }}
+            height={200}
+            containerComponent={<VictoryVoronoiContainer />}
+          >
+            <VictoryAxis
+              tickLabelComponent={<TickLabel height={height} />}
+              offsetY={23}
+              style={{
+                axis: {
+                  stroke: v.colors.commonMedium,
+                  strokeWidth: 25,
+                  transform: 'translateY(22px)',
+                },
+              }}
+            />
+            <VictoryArea
+              labels={d => (d.amount >= this.maxAmount ? d.amount : '')}
+              labelComponent={
+                <CustomLabel height={height} maxAmount={this.maxAmount} />
+              }
+              style={{
+                data: { fill: '#c43a31' },
+                labels: {
+                  fill: 'black',
+                },
+              }}
+              data={this.formattedValues}
+              y="amount"
+              x="date"
+            />
+          </VictoryChart>
+        </div>
       </Fragment>
     )
   }
@@ -264,6 +282,10 @@ class DataItemCover extends React.PureComponent {
 
 DataItemCover.propTypes = {
   item: MobxPropTypes.objectOrObservableObject.isRequired,
+  height: PropTypes.number,
+}
+DataItemCover.defaultProps = {
+  height: 1,
 }
 
 export default DataItemCover
