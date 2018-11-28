@@ -11,7 +11,7 @@ import v from '~/utils/variables'
 const colorScale = [v.colors.tertiaryMedium, v.colors.primaryLight]
 export const themeLabelStyles = {
   fontFamily: v.fonts.sans,
-  fontSize: '18px',
+  fontSize: '10px',
   padding: 10,
   fill: v.colors.black,
   stroke: 'transparent',

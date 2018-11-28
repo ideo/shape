@@ -24,7 +24,7 @@ import { theme } from '~/ui/test_collections/shared'
 class CustomLabel extends React.Component {
   static defaultEvents = VictoryTooltip.defaultEvents
   render() {
-    const { data, datum, height, index, maxAmount } = this.props
+    const { data, datum, index, maxAmount } = this.props
     let active
     if (datum.amount >= maxAmount) {
       active = true
@@ -39,13 +39,12 @@ class CustomLabel extends React.Component {
     }
     return (
       <g>
-        <VictoryLabel {...this.props} active={active} />
         <VictoryTooltip
           active={active}
           {...this.props}
           dx={dx}
-          dy={5}
-          style={{ fontSize: height === 1 ? '18px' : '12px' }}
+          dy={0}
+          style={{ fontSize: '10px', fontWeight: 'normal' }}
           text={`${datum.amount}`}
           orientation="top"
           pointerLength={0}
@@ -198,7 +197,6 @@ class DataItemCover extends React.PureComponent {
   }
 
   renderTimeframeValues() {
-    const { height } = this.props
     return (
       <Fragment>
         <SmallHelperText color={v.colors.black}>
@@ -206,35 +204,32 @@ class DataItemCover extends React.PureComponent {
         </SmallHelperText>
         <div
           style={{
+            bottom: 0,
             position: 'absolute',
-            top: '106px',
             width: '100%',
             height: '100%',
           }}
         >
           <VictoryChart
             theme={theme}
-            domainPadding={{ y: 0 }}
-            padding={{ top: 0, left: 0, right: 0, bottom: 10 }}
-            height={200}
-            containerComponent={<VictoryVoronoiContainer />}
+            domainPadding={{ y: 80 }}
+            padding={{ top: 0, left: 0, right: 0, bottom: 0 }}
           >
             <VictoryAxis
-              tickLabelComponent={<TickLabel height={height} />}
-              offsetY={23}
+              tickLabelComponent={<TickLabel />}
               style={{
                 axis: {
                   stroke: v.colors.commonMedium,
                   strokeWidth: 25,
                   transform: 'translateY(22px)',
                 },
+                ticks: { height: 1, size: 1 },
+                tickLabel: { height: 4, fontSize: '10px' },
               }}
             />
             <VictoryArea
               labels={d => (d.amount >= this.maxAmount ? d.amount : '')}
-              labelComponent={
-                <CustomLabel height={height} maxAmount={this.maxAmount} />
-              }
+              labelComponent={<CustomLabel maxAmount={this.maxAmount} />}
               style={{
                 data: { fill: '#c43a31' },
                 labels: {
