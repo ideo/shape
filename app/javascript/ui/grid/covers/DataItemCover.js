@@ -1,4 +1,3 @@
-import PropTypes from 'prop-types'
 import { Fragment } from 'react'
 import { PropTypes as MobxPropTypes } from 'mobx-react'
 import { runInAction } from 'mobx'
@@ -144,12 +143,26 @@ class DataItemCover extends React.PureComponent {
     })
   }
 
-  async saveSettings(settings) {
+  get correctGridSize() {
     const { item } = this.props
+    const { data_settings } = item
+    const size = data_settings.d_timeframe === 'ever' ? 1 : 2
+    return { width: size, height: size }
+  }
+
+  async saveSettings(settings) {
+    const { card, item } = this.props
     runInAction(() => {
       item.data_settings = Object.assign({}, item.data_settings, settings)
     })
     const res = await item.save()
+    // If the timeframe changed we have to resize the card
+    if (settings.d_timeframe) {
+      const { height, width } = this.correctGridSize
+      card.height = height
+      card.width = width
+      await card.save()
+    }
     // TODO: investigate why data isn't being updated with just `save()`
     runInAction(() => {
       item.update(res.data)
@@ -207,13 +220,14 @@ class DataItemCover extends React.PureComponent {
             bottom: 0,
             position: 'absolute',
             width: '100%',
-            height: '100%',
+            height: 'calc(100% - 60px)',
           }}
         >
           <VictoryChart
             theme={theme}
             domainPadding={{ y: 80 }}
-            padding={{ top: 0, left: 0, right: 0, bottom: 0 }}
+            padding={{ top: 0, left: 0, right: 0, bottom: 20 }}
+            containerComponent={<VictoryVoronoiContainer />}
           >
             <VictoryAxis
               tickLabelComponent={<TickLabel />}
@@ -223,8 +237,6 @@ class DataItemCover extends React.PureComponent {
                   strokeWidth: 25,
                   transform: 'translateY(22px)',
                 },
-                ticks: { height: 1, size: 1 },
-                tickLabel: { height: 4, fontSize: '10px' },
               }}
             />
             <VictoryArea
@@ -277,10 +289,7 @@ class DataItemCover extends React.PureComponent {
 
 DataItemCover.propTypes = {
   item: MobxPropTypes.objectOrObservableObject.isRequired,
-  height: PropTypes.number,
-}
-DataItemCover.defaultProps = {
-  height: 1,
+  card: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 
 export default DataItemCover
