@@ -87,7 +87,6 @@ class FilestackUpload {
 
   static transformedImageUrl(handle) {
     return this.client.transform(handle, {
-      resize: { fit: 'max', width: 1200 },
       rotate: { deg: 'exif' },
     })
   }

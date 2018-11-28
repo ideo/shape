@@ -3,7 +3,14 @@ import { Fragment } from 'react'
 import { PropTypes as MobxPropTypes } from 'mobx-react'
 import { runInAction } from 'mobx'
 import styled from 'styled-components'
-import { VictoryArea, VictoryChart } from 'victory'
+import {
+  VictoryArea,
+  VictoryAxis,
+  VictoryChart,
+  VictoryLabel,
+  VictoryTooltip,
+  VictoryVoronoiContainer,
+} from 'victory'
 
 import MeasureSelect from '~/ui/reporting/MeasureSelect'
 import {
@@ -13,6 +20,47 @@ import {
 } from '~/ui/global/styled/typography'
 import v from '~/utils/variables'
 import { theme } from '~/ui/test_collections/shared'
+
+class CustomLabel extends React.Component {
+  static defaultEvents = VictoryTooltip.defaultEvents
+  render() {
+    const { data, datum, index, maxAmount } = this.props
+    let active
+    if (datum.amount >= maxAmount) {
+      active = true
+    } else {
+      active = this.props.active
+    }
+    let dx = 0
+    if (parseInt(index) === 0) {
+      dx = 15
+    } else if (parseInt(index) === data.length - 1) {
+      dx = -15
+    }
+    return (
+      <g>
+        <VictoryLabel dx={dx} active={active} {...this.props} />
+        <VictoryTooltip
+          active={active}
+          {...this.props}
+          dx={dx}
+          text={`${datum.amount}`}
+          orientation="top"
+          pointerLength={0}
+          flyoutStyle={{ stroke: 'transparent', fill: 'transparent' }}
+        />
+      </g>
+    )
+  }
+}
+
+const TickLabel = props => {
+  console.log('props', props)
+  let dx
+  if (props.x === 0) dx = 20
+  if (props.x === 450) dx = -20
+  return <VictoryLabel {...props} dx={dx} />
+}
 
 const StyledDataItemCover = styled.div`
   background-color: ${v.colors.commonLight};
@@ -48,7 +96,9 @@ const shortMonths = [
   'Dec',
 ]
 
+// eslint-disable-next-line
 class DataItemCover extends React.PureComponent {
+  // TODO rename from selectOpen to editing
   state = { selectOpen: false }
 
   // eslint-disable-next-line
@@ -123,6 +173,14 @@ class DataItemCover extends React.PureComponent {
     )
   }
 
+  get maxAmount() {
+    return Math.max(...this.formattedValues.map(d => d.amount))
+  }
+
+  get minAmount() {
+    return Math.min(...this.formattedValues.map(d => d.amount))
+  }
+
   renderSingleValue() {
     const { item } = this.props
     return (
@@ -138,14 +196,34 @@ class DataItemCover extends React.PureComponent {
   renderTimeframeValues() {
     return (
       <Fragment>
-        {this.state.selectOpen && (
-          <SmallHelperText color={v.colors.black}>
-            {this.withinText}
-          </SmallHelperText>
-        )}
-        <VictoryChart theme={theme}>
+        <SmallHelperText color={v.colors.black}>
+          {this.withinText}
+        </SmallHelperText>
+        <VictoryChart
+          theme={theme}
+          domain={{ y: [0, this.maxAmount] }}
+          domainPadding={{ y: 0 }}
+          padding={{ top: 0, left: 0, right: 0, bottom: 10 }}
+          height={150}
+          containerComponent={<VictoryVoronoiContainer />}
+        >
+          <VictoryAxis
+            tickLabelComponent={<TickLabel />}
+            style={{
+              axis: {
+                stroke: v.colors.commonMedium,
+                strokeWidth: 30,
+                transform: 'translateY(20px)',
+              },
+            }}
+          />
           <VictoryArea
-            style={{ data: { fill: '#c43a31' } }}
+            labels={d => (d.amount >= this.maxAmount ? d.amount : '')}
+            labelComponent={<CustomLabel maxAmount={this.maxAmount} />}
+            style={{
+              data: { fill: '#c43a31' },
+              labels: { fill: 'black' },
+            }}
             data={this.formattedValues}
             y="amount"
             x="date"
@@ -162,7 +240,11 @@ class DataItemCover extends React.PureComponent {
         className="cancelGridClick"
         editable={item.can_edit_content}
       >
-        <Heading3 className="measure" onClick={this.handleEditClick}>
+        <Heading3
+          className="measure"
+          onClick={this.handleEditClick}
+          style={{ marginBottom: 0 }}
+        >
           {item.data_settings.d_measure}
         </Heading3>
         {this.state.selectOpen && (

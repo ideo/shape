@@ -11,17 +11,33 @@ import v from '~/utils/variables'
 const colorScale = [v.colors.tertiaryMedium, v.colors.primaryLight]
 export const themeLabelStyles = {
   fontFamily: v.fonts.sans,
-  fontSize: 14,
+  fontSize: '18px',
   padding: 10,
   fill: v.colors.black,
   stroke: 'transparent',
+  textTransform: 'uppercase',
 }
 export const theme = objectAssignDeep({}, VictoryTheme.grayscale, {
   bar: {
     style: {
       labels: Object.assign({}, themeLabelStyles, {
         fill: v.colors.tertiaryMedium,
+        fontSize: 14,
       }),
+    },
+  },
+  area: {
+    style: {
+      labels: Object.assign({}, themeLabelStyles, {
+        fill: v.colors.tertiaryMedium,
+      }),
+    },
+  },
+  axis: {
+    padding: { left: 20, right: 20 },
+    style: {
+      tickLabels: themeLabelStyles,
+      padding: { left: 20, right: 20 },
     },
   },
   group: {
