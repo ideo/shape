@@ -102,7 +102,7 @@ const shortMonths = [
 
 // eslint-disable-next-line
 class DataItemCover extends React.PureComponent {
-  state = { editting: false }
+  state = { editing: false }
 
   // eslint-disable-next-line
   get withinText() {
@@ -112,7 +112,7 @@ class DataItemCover extends React.PureComponent {
     let timeframeControl = <span>{data_settings.d_timeframe}</span>
     let targetControl
 
-    if (this.state.editting) {
+    if (this.state.editing) {
       targetControl = (
         <TargetSelect item={item} onSelect={this.onSelectTarget} />
       )
@@ -187,13 +187,13 @@ class DataItemCover extends React.PureComponent {
     runInAction(() => {
       item.update(res.data)
     })
-    this.setState({ editting: false })
+    this.setState({ editing: false })
   }
 
   handleEditClick = ev => {
     const { item } = this.props
     if (!item.can_edit_content) return
-    this.setState({ editting: true })
+    this.setState({ editing: true })
   }
 
   get formattedValues() {
@@ -292,7 +292,7 @@ class DataItemCover extends React.PureComponent {
         >
           {item.data_settings.d_measure}
         </Heading3>
-        {this.state.editting && (
+        {this.state.editing && (
           <MeasureSelect
             dataSettingsName="measure"
             item={item}
