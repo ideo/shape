@@ -210,6 +210,11 @@ class DataItemCover extends React.PureComponent {
   }
 
   renderTimeframeValues() {
+    // If there isn't enough data yet
+    console.log(this.formattedValues.length)
+    if (this.formattedValues.length < 2) {
+      return <SmallHelperText>Not enough data yet</SmallHelperText>
+    }
     return (
       <Fragment>
         <SmallHelperText color={v.colors.black}>
