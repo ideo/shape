@@ -4,9 +4,9 @@
     <title>
       Shape <%= "| #{ENV['SHAPE_APP']}" unless ENV['SHAPE_APP'] == 'production' %>
     </title>
-    <%= csrf_meta_tags %>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <%= render partial: '/layouts/favicons' %>
+    <%= render 'layouts/metatags_and_favicons' %>
+    <%= render 'layouts/trackers_and_widgets_head' %>
+
     <script type="text/javascript"
       src="<%= ideo_sso_js_sdk_url %>">
     </script>
@@ -14,15 +14,12 @@
       IdeoSSO.init(<%= ideo_sso_init_params.to_json.html_safe %>)
     </script>
 
-    <%= render partial: '/layouts/trackers_and_widgets' %>
-
     <%= stylesheet_link_tag 'application', media: 'all' %>
-    <%= action_cable_meta_tag %>
     <%= javascript_pack_tag 'babel-polyfill' %>
   </head>
 
   <body>
-
+    <%= render 'layouts/trackers_and_widgets_body' %>
     <div>
       <%= yield %>
     </div>
