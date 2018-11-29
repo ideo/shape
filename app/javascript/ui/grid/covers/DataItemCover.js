@@ -184,7 +184,7 @@ class DataItemCover extends React.PureComponent {
     if (!values) return []
     return values.map(value =>
       Object.assign({}, value, {
-        date: shortMonths[new Date(value.date).getMonth()],
+        date: shortMonths[new Date(value.date).getMonth() + 1],
       })
     )
   }
@@ -211,7 +211,6 @@ class DataItemCover extends React.PureComponent {
 
   renderTimeframeValues() {
     // If there isn't enough data yet
-    console.log(this.formattedValues.length)
     if (this.formattedValues.length < 2) {
       return <SmallHelperText>Not enough data yet</SmallHelperText>
     }
