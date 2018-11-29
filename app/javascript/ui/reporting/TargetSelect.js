@@ -15,29 +15,29 @@ class TargetSelect extends React.Component {
   @observable
   collections = []
 
-  async componentDidMount() {
+  async componentWillMount() {
     try {
       const res = await this.props.apiStore.searchCollections({ perPage: 100 })
       runInAction(() => (this.collections = res.data))
     } catch (e) {
       trackError(e)
     }
-    if (this.collectionFilter) {
-      runInAction(() => (this.type = 'Collection'))
-    }
+    runInAction(
+      () => (this.type = this.collectionFilter ? 'Collection' : 'Organization')
+    )
   }
 
   get currentValue() {
     return this.collectionFilter ? 'Collection' : this.type
   }
 
-  handleChange = ev => {
-    ev.preventDefault()
+  handleChange = e => {
+    e.preventDefault()
     const { onSelect } = this.props
-    const { value } = ev.target
+    const { value } = e.target
     runInAction(() => (this.type = value))
     if (value === 'Organization') {
-      onSelect(null)
+      onSelect()
     } else if (this.collectionFilter) {
       onSelect(this.collectionFilter.target)
     }
@@ -74,6 +74,7 @@ class TargetSelect extends React.Component {
             </MenuItem>
           ))}
         </Select>
+        {this.type}
         {this.type === 'Collection' && (
           <AutoComplete
             options={this.collections.map(x => ({
