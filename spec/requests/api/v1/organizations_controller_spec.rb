@@ -28,6 +28,7 @@ describe Api::V1::OrganizationsController, type: :request, json: true, auth: tru
 
     before do
       user.add_role(Role::MEMBER, organization.primary_group)
+      organization.update(slug: 'some-slug')
     end
 
     it 'returns a 200' do
@@ -44,13 +45,13 @@ describe Api::V1::OrganizationsController, type: :request, json: true, auth: tru
   describe 'POST #create' do
     let(:path) { '/api/v1/organizations/' }
     let!(:current_user) { create(:user) }
-    let(:params) {
+    let(:params) do
       json_api_params(
         'organizations',
         'name': 'IDEO U',
         'handle': 'ideo-u',
       )
-    }
+    end
 
     it 'returns a 200' do
       post(path, params: params)
@@ -63,12 +64,12 @@ describe Api::V1::OrganizationsController, type: :request, json: true, auth: tru
     end
 
     context 'with invalid params' do
-      let(:params) {
+      let(:params) do
         json_api_params(
           'organizations',
           'name': nil,
         )
-      }
+      end
 
       it 'returns a 400 with organization errors' do
         post(path, params: params)
@@ -81,14 +82,12 @@ describe Api::V1::OrganizationsController, type: :request, json: true, auth: tru
   describe 'PATCH #update' do
     let!(:organization) { create(:organization, admin: user) }
     let(:path) { "/api/v1/organizations/#{organization.id}" }
-    let(:params) {
+    let(:params) do
       json_api_params(
         'organizations',
-        {
-          'name': 'Acme Inc 2.0',
-        }
+        'name': 'Acme Inc 2.0',
       )
-    }
+    end
 
     it 'returns a 200' do
       patch(path, params: params)

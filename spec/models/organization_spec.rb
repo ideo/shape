@@ -115,6 +115,10 @@ describe Organization, type: :model do
     describe '#friendly_id' do
       let(:organization) { create(:organization) }
 
+      before do
+        organization.save
+      end
+
       it 'generates slug after primary group is saved' do
         expect(
           organization.reload.slug,
@@ -180,7 +184,7 @@ describe Organization, type: :model do
       end
       let(:user_getting_started_collection) do
         user.current_user_collection.collections.where(
-          name: 'Getting Started with Shape'
+          name: 'Getting Started with Shape',
         ).first
       end
 
