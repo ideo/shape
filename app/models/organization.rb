@@ -34,7 +34,7 @@ class Organization < ApplicationRecord
              dependent: :destroy,
              optional: true
 
-  after_create :create_groups
+  after_commit :create_groups, on: :create
   before_update :parse_domain_whitelist
   after_update :update_group_names, if: :saved_change_to_name?
   after_update :check_guests_for_domain_match, if: :saved_change_to_domain_whitelist?
