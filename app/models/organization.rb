@@ -34,7 +34,7 @@ class Organization < ApplicationRecord
              dependent: :destroy,
              optional: true
 
-  after_commit :create_groups, on: :create
+  after_create :create_groups
   before_update :parse_domain_whitelist
   after_update :update_group_names, if: :saved_change_to_name?
   after_update :check_guests_for_domain_match, if: :saved_change_to_domain_whitelist?
@@ -205,10 +205,14 @@ class Organization < ApplicationRecord
   end
 
   def create_groups
-    create_primary_group(name: name, organization: self)
-    create_guest_group(name: guest_group_name, organization: self, handle: guest_group_handle)
-    create_admin_group(name: admin_group_name, organization: self, handle: admin_group_handle)
-    save # Save primary group attr
+    primary_group = create_primary_group(name: name, organization: self)
+    guest_group = create_guest_group(name: guest_group_name, organization: self, handle: guest_group_handle)
+    admin_group = create_admin_group(name: admin_group_name, organization: self, handle: admin_group_handle)
+    update_columns(
+      primary_group_id: primary_group.id,
+      guest_group_id: guest_group.id,
+      admin_group_id: admin_group.id,
+    )
   end
 
   def update_group_names
