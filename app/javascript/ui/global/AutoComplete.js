@@ -5,6 +5,7 @@ import { withStyles, withTheme } from '@material-ui/core/styles'
 import Input from '@material-ui/core/Input'
 import Chip from '@material-ui/core/Chip'
 import Creatable from 'react-select/lib/Creatable'
+import Select from 'react-select'
 import { pick } from 'lodash'
 
 import Option from '~/ui/global/AutocompleteOption'
@@ -110,8 +111,8 @@ const selectStyles = theme => ({
 })
 
 const SelectWrapped = props => {
-  const { classes, theme, ...other } = props
-  return (
+  const { classes, theme, creatable, ...other } = props
+  return creatable ? (
     <Creatable
       formatCreateLabel={inputValue => `Invite email ${inputValue}`}
       styles={selectStyles(theme)}
@@ -121,6 +122,16 @@ const SelectWrapped = props => {
         Option,
       }}
       noOptionsMessage={() => 'No results found'}
+      {...other}
+    />
+  ) : (
+    <Select
+      styles={selectStyles(theme)}
+      components={{
+        valueComponent: valueComponent(classes),
+        DropdownIndicator,
+        Option,
+      }}
       {...other}
     />
   )
@@ -152,24 +163,29 @@ SelectWrapped.propTypes = {
 
 class AutoComplete extends React.Component {
   state = {
-    multi: null,
+    option: this.props.options.find(x => x.value === this.props.value),
   }
 
-  handleChange = multi => {
+  handleChange = option => {
     this.setState({
-      multi,
+      option,
     })
-    let fullOption = this.props.options.find(x => x === multi)
+    let fullOption = this.props.options.find(x => x === option)
     if (!fullOption || !fullOption.data) {
-      fullOption = Object.assign({}, { data: { custom: multi.value } })
+      fullOption = Object.assign({}, { data: { custom: option.value } })
     }
     this.props.onOptionSelect(fullOption.data)
   }
 
   render() {
-    const { classes, keepSelectedOptions, options } = this.props
-    const { multi } = this.state
-
+    const {
+      classes,
+      keepSelectedOptions,
+      options,
+      placeholder,
+      creatable,
+    } = this.props
+    const { option } = this.state
     return (
       <div className={classes.root}>
         <Input
@@ -177,10 +193,11 @@ class AutoComplete extends React.Component {
           inputProps={{
             classes,
             multi: true,
-            value: keepSelectedOptions ? multi : null,
+            value: keepSelectedOptions ? option : null,
             options,
             onChange: this.handleChange,
-            placeholder: 'email address or username',
+            placeholder,
+            creatable,
             instanceId: 'react-select-chip',
             id: 'react-select-chip',
             name: 'react-select-chip',
@@ -207,11 +224,17 @@ AutoComplete.propTypes = {
   ).isRequired,
   onOptionSelect: PropTypes.func.isRequired,
   keepSelectedOptions: PropTypes.bool,
+  placeholder: PropTypes.string,
+  creatable: PropTypes.bool,
+  value: PropTypes.number,
 }
 
 AutoComplete.defaultProps = {
   onSelect: () => {},
   keepSelectedOptions: false,
+  creatable: false,
+  placeholder: '',
+  value: undefined,
 }
 
 export default withStyles(styles)(AutoComplete)
