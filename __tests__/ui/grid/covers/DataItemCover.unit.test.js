@@ -44,15 +44,15 @@ describe('DataItemCover', () => {
           .simulate('click')
       })
 
-      it('should set the select state to true', () => {
-        expect(wrapper.state().selectOpen).toBe(true)
+      it('should set the editing state to true', () => {
+        expect(wrapper.state().editing).toBe(true)
       })
     })
 
     describe('when not editor', () => {
       beforeEach(() => {
         props.item.can_edit_content = false
-        wrapper.setState({ selectOpen: false })
+        wrapper.setState({ editing: false })
         wrapper.setProps(props)
         wrapper
           .find('.measure')
@@ -60,8 +60,8 @@ describe('DataItemCover', () => {
           .simulate('click')
       })
 
-      it('should not set the select state to true', () => {
-        expect(wrapper.state().selectOpen).toBe(false)
+      it('should not set the editing state to true', () => {
+        expect(wrapper.state().editing).toBe(false)
       })
     })
   })

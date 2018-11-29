@@ -75,10 +75,10 @@ class Api::V1::ItemsController < Api::V1::BaseController
       :name,
       :content,
       { text_data: {} },
-      { data_settings: %i[
-        d_measure
-        d_filters
-        d_timeframe
+      { data_settings: [
+        :d_measure,
+        :d_timeframe,
+        d_filters: %i[type target],
       ] },
       :url,
       :image,

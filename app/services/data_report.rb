@@ -17,6 +17,7 @@ class DataReport < SimpleService
   def call
     @query = generate_base_query
     return unless @query
+
     @query = filtered_query
     calculate
     @data
@@ -34,9 +35,24 @@ class DataReport < SimpleService
   end
 
   def filtered_query
-    # default, within entire org
-    @query
-      .where(organization_id: @data_item.parent.organization_id)
+    collection_filter = @filters&.find { |x| x['type'] == 'Collection' }
+    if collection_filter
+      @query.where(target_type: %w[Collection Item])
+            .joins(%(left join collections on
+                       activities.target_id = collections.id and
+                       activities.target_type = 'Collection'))
+            .joins(%(left join items on
+                       activities.target_id = items.id and
+                       activities.target_type = 'Item'))
+            .where(%(collections.breadcrumb @> ':collection_id' or
+                       items.breadcrumb @> ':collection_id' or
+                       collections.id = :collection_id),
+                   collection_id: collection_filter['target'])
+    else
+      # default, within entire org
+      @query
+        .where(organization_id: @data_item.parent.organization_id)
+    end
   end
 
   def calculate

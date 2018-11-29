@@ -3,6 +3,7 @@ import { Collection as datxCollection, assignModel, ReferenceType } from 'datx'
 import { jsonapi } from 'datx-jsonapi'
 import _ from 'lodash'
 import moment from 'moment-mini'
+import queryString from 'query-string'
 
 import trackError from '~/utils/trackError'
 import Activity from './jsonApi/Activity'
@@ -124,6 +125,13 @@ class ApiStore extends jsonapi(datxCollection) {
 
   searchUsersAndGroups(query) {
     return this.request(`search/users_and_groups?query=${query}`)
+  }
+
+  searchCollections(params) {
+    const defaultParams = { query: '' }
+    return this.request(
+      `search?${queryString.stringify(_.merge(defaultParams, params))}`
+    )
   }
 
   async fetchRoles(group) {

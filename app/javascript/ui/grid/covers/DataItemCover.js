@@ -12,6 +12,9 @@ import {
 } from 'victory'
 
 import MeasureSelect from '~/ui/reporting/MeasureSelect'
+import TargetSelect from '~/ui/reporting/TargetSelect'
+import TargetButton from '~/ui/reporting/TargetButton'
+import EditableButton from '~/ui/reporting/EditableButton'
 import {
   SmallHelperText,
   Heading3,
@@ -71,15 +74,14 @@ const StyledDataItemCover = styled.div`
   padding: 15px 0;
   text-align: left;
 
-  .measure,
-  .timeframe {
+  .measure {
     ${props =>
       props.editable &&
       `
-    &:hover {
-      background-color: ${v.colors.primaryLight};
-    }
-    `};
+      &:hover {
+        background-color: ${v.colors.primaryLight};
+      }
+`};
   }
 `
 
@@ -100,8 +102,7 @@ const shortMonths = [
 
 // eslint-disable-next-line
 class DataItemCover extends React.PureComponent {
-  // TODO rename from selectOpen to editing
-  state = { selectOpen: false }
+  state = { editing: false }
 
   // eslint-disable-next-line
   get withinText() {
@@ -109,7 +110,13 @@ class DataItemCover extends React.PureComponent {
     const { data_settings } = item
     const editable = item.can_edit_content
     let timeframeControl = <span>{data_settings.d_timeframe}</span>
-    if (this.state.selectOpen) {
+    let targetControl
+
+    if (this.state.editing) {
+      targetControl = (
+        <TargetSelect item={item} onSelect={this.onSelectTarget} />
+      )
+
       timeframeControl = (
         <MeasureSelect
           dataSettingsName="timeframe"
@@ -118,15 +125,22 @@ class DataItemCover extends React.PureComponent {
         />
       )
     } else if (editable) {
+      targetControl = (
+        <TargetButton
+          item={item}
+          editable={editable}
+          onClick={this.handleEditClick}
+        />
+      )
       timeframeControl = (
-        <button onClick={this.handleEditClick} className="timeframe">
+        <EditableButton editable={editable} onClick={this.handleEditClick}>
           {data_settings.d_timeframe}
-        </button>
+        </EditableButton>
       )
     }
     return (
       <span>
-        within the {''} Organization {timeframeControl}
+        within the {''} {targetControl} {timeframeControl}
       </span>
     )
   }
@@ -134,6 +148,12 @@ class DataItemCover extends React.PureComponent {
   onSelectTimeframe = value => {
     this.saveSettings({
       d_timeframe: value,
+    })
+  }
+
+  onSelectTarget = value => {
+    this.saveSettings({
+      d_filters: value ? [{ type: 'Collection', target: Number(value) }] : [],
     })
   }
 
@@ -167,13 +187,13 @@ class DataItemCover extends React.PureComponent {
     runInAction(() => {
       item.update(res.data)
     })
-    this.setState({ selectOpen: false })
+    this.setState({ editing: false })
   }
 
   handleEditClick = ev => {
     const { item } = this.props
     if (!item.can_edit_content) return
-    this.setState({ selectOpen: true })
+    this.setState({ editing: true })
   }
 
   get formattedValues() {
@@ -276,7 +296,7 @@ class DataItemCover extends React.PureComponent {
         >
           {item.data_settings.d_measure}
         </Heading3>
-        {this.state.selectOpen && (
+        {this.state.editing && (
           <MeasureSelect
             dataSettingsName="measure"
             item={item}
