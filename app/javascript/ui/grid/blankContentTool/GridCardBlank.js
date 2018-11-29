@@ -279,6 +279,19 @@ class GridCardBlank extends React.Component {
     this.createCard(attrs)
   }
 
+  createDefaultReportCard = () => {
+    this.createCard({
+      item_attributes: {
+        type: ITEM_TYPES.DATA,
+        name: 'Report',
+        data_settings: {
+          d_measure: 'participants',
+          d_timeframe: 'ever',
+        },
+      },
+    })
+  }
+
   pickImages = () => {
     const { replacingId } = this
     const filestackMethod = !replacingId
@@ -557,7 +570,7 @@ class GridCardBlank extends React.Component {
                   {
                     name: 'Create Report',
                     iconLeft: <ReportIcon />,
-                    onClick: this.startCreating('data'),
+                    onClick: this.createDefaultReportCard,
                   },
                 ]}
               />
