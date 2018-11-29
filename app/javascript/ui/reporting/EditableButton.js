@@ -3,6 +3,9 @@ import v from '~/utils/variables'
 import PropTypes from 'prop-types'
 
 const StyledButton = styled.button`
+  color: inherit;
+  font-size: inherit;
+  text-transform: inherit;
   ${props =>
     props.editable &&
     `

@@ -74,7 +74,6 @@ class TargetSelect extends React.Component {
             </MenuItem>
           ))}
         </Select>
-        {this.type}
         {this.type === 'Collection' && (
           <AutoComplete
             options={this.collections.map(x => ({

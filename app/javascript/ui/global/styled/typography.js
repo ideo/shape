@@ -46,6 +46,7 @@ Heading3.displayName = 'StyledHeading3'
 
 /** @component */
 export const DisplayText = styled.span`
+  color: ${props => props.color || v.colors.black};
   font-weight: ${v.weights.book};
   font-family: ${v.fonts.sans};
   font-size: 1rem;
@@ -154,7 +155,7 @@ Anchor.displayName = 'StyledAnchor'
 
 // Keep in sync with assets/stylesheets/core/base.scss:quill h1
 export const CardHeading = Heading1.extend`
-  color: ${v.colors.commonLight}
+  color: ${props => props.color || v.colors.commonLight}
   font-size: 2rem;
   line-height: 2.25rem;
   margin-bottom: 0.25rem;

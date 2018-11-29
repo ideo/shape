@@ -16,6 +16,8 @@ import TargetSelect from '~/ui/reporting/TargetSelect'
 import TargetButton from '~/ui/reporting/TargetButton'
 import EditableButton from '~/ui/reporting/EditableButton'
 import {
+  CardHeading,
+  DisplayText,
   SmallHelperText,
   Heading3,
   HugeNumber,
@@ -85,6 +87,16 @@ const StyledDataItemCover = styled.div`
   }
 `
 
+// TODO add to shared colors
+const GraphKey = styled.span`
+  background-color: #c43a31;
+  display: inline-block;
+  height: 16px;
+  margin-right: 10px;
+  vertical-align: middle;
+  width: 16px;
+`
+
 const shortMonths = [
   'Jan',
   'Feb',
@@ -111,6 +123,7 @@ class DataItemCover extends React.PureComponent {
     const editable = item.can_edit_content
     let timeframeControl = <span>{data_settings.d_timeframe}</span>
     let targetControl
+    let measureControl
 
     if (this.state.editing) {
       targetControl = (
@@ -122,6 +135,13 @@ class DataItemCover extends React.PureComponent {
           dataSettingsName="timeframe"
           item={item}
           onSelect={this.onSelectTimeframe}
+        />
+      )
+      measureControl = (
+        <MeasureSelect
+          dataSettingsName="measure"
+          item={item}
+          onSelect={this.onSelectMeasure}
         />
       )
     } else if (editable) {
@@ -137,11 +157,30 @@ class DataItemCover extends React.PureComponent {
           {data_settings.d_timeframe}
         </EditableButton>
       )
+      measureControl = (
+        <EditableButton editable={editable} onClick={this.handleEditClick}>
+          {data_settings.d_measure}
+        </EditableButton>
+      )
+    }
+
+    if (data_settings.d_timeframe === 'ever') {
+      return (
+        <span>
+          within the {''} {targetControl} {timeframeControl}
+        </span>
+      )
     }
     return (
-      <span>
-        within the {''} {targetControl} {timeframeControl}
-      </span>
+      <Fragment>
+        <Heading3>
+          {measureControl} per {timeframeControl}
+        </Heading3>
+        <SmallHelperText color={v.colors.black}>
+          <GraphKey />
+          {targetControl}
+        </SmallHelperText>
+      </Fragment>
     )
   }
 
@@ -221,6 +260,20 @@ class DataItemCover extends React.PureComponent {
     const { item } = this.props
     return (
       <Fragment>
+        <Heading3
+          className="measure"
+          onClick={this.handleEditClick}
+          style={{ marginBottom: 0 }}
+        >
+          {item.data_settings.d_measure}
+        </Heading3>
+        {this.state.editing && (
+          <MeasureSelect
+            dataSettingsName="measure"
+            item={item}
+            onSelect={this.onSelectMeasure}
+          />
+        )}
         <HugeNumber className="count">{item.data.value}</HugeNumber>
         <SmallHelperText color={v.colors.black}>
           {this.withinText}
@@ -230,18 +283,18 @@ class DataItemCover extends React.PureComponent {
   }
 
   renderTimeframeValues() {
+    const { item } = this.props
     // If there isn't enough data yet
     if (this.formattedValues.length < 2) {
       return <SmallHelperText>Not enough data yet</SmallHelperText>
     }
     return (
       <Fragment>
-        <SmallHelperText color={v.colors.black}>
-          {this.withinText}
-        </SmallHelperText>
+        <CardHeading color={v.colors.black}>{item.name}</CardHeading>
+        <DisplayText>{this.withinText}</DisplayText>
         <div
           style={{
-            bottom: 0,
+            bottom: '-18px',
             position: 'absolute',
             width: '100%',
             height: 'calc(100% - 60px)',
@@ -255,6 +308,7 @@ class DataItemCover extends React.PureComponent {
           >
             <VictoryAxis
               tickLabelComponent={<TickLabel />}
+              offsetY={33}
               style={{
                 axis: {
                   stroke: v.colors.commonMedium,
@@ -289,20 +343,6 @@ class DataItemCover extends React.PureComponent {
         className="cancelGridClick"
         editable={item.can_edit_content}
       >
-        <Heading3
-          className="measure"
-          onClick={this.handleEditClick}
-          style={{ marginBottom: 0 }}
-        >
-          {item.data_settings.d_measure}
-        </Heading3>
-        {this.state.editing && (
-          <MeasureSelect
-            dataSettingsName="measure"
-            item={item}
-            onSelect={this.onSelectMeasure}
-          />
-        )}
         {item.data_settings.d_timeframe === 'ever'
           ? this.renderSingleValue()
           : this.renderTimeframeValues()}
