@@ -81,9 +81,23 @@ describe('GridCardBlank', () => {
       expect(newCard.API_create).toHaveBeenCalled()
     })
 
-    it('adds the card record to the uiStore as a new card', async () => {
+    fit('adds the card record to the uiStore as a new card', async () => {
+      const card = {
+        record: {
+          id: 1,
+        },
+      }
+      CollectionCard.mockImplementation(() => ({
+        API_create: jest.fn().mockResolvedValue(card),
+      }))
       await wrapper.instance().createCard()
-      expect(fakeUiStore.addNewCard).toHaveBeenCalled()
+      return new Promise(resolve => {
+        setTimeout(() => {
+          expect(fakeUiStore.addNewCard).toHaveBeenCalled()
+          expect(fakeUiStore.addNewCard).toHaveBeenCalledWith(card.record.id)
+          resolve()
+        })
+      })
     })
   })
 
