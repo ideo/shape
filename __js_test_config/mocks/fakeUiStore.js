@@ -47,7 +47,8 @@ const fakeUiStore = {
   isLoading: false,
   selectedCardIds: [],
   selectCardId: jest.fn(),
-  setViewingCollection: jest.fn(), setViewingItem: jest.fn(),
+  setViewingCollection: jest.fn(),
+  setViewingItem: jest.fn(),
   viewingCollection: null,
   movingFromCollectionId: null,
   movingCardIds: [],
@@ -73,6 +74,9 @@ const fakeUiStore = {
   pageMenuOpen: false,
   searchText: '',
   collectionCardSortOrder: '',
+  addNewCard: jest.fn(),
+  removeNewCard: jest.fn(),
+  isNewCard: jest.fn(),
 }
 
 export default fakeUiStore

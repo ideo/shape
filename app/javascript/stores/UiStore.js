@@ -144,6 +144,8 @@ export default class UiStore {
   collectionCardSortOrder = 'updated_at'
   @observable
   launchButtonLoading = false
+  @observable
+  newCards = []
 
   @action
   startDragging() {
@@ -570,5 +572,25 @@ export default class UiStore {
         this.trackedRecords[identifier] = null
       }, TIMEOUT)
     )
+  }
+
+  @action
+  addNewCard(id) {
+    if (!this.isNewCard(id)) {
+      this.newCards.push(id)
+    }
+  }
+
+  @action
+  removeNewCard(id) {
+    const index = this.newCards.indexOf(id)
+    if (index === -1) {
+      return
+    }
+    this.newCards.splice(index, 1)
+  }
+
+  isNewCard(id) {
+    return this.newCards.indexOf(id) !== -1
   }
 }
