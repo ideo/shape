@@ -2,9 +2,10 @@ require 'rails_helper'
 
 RSpec.describe OrganizationTemplates, type: :service do
   let(:organization) { create(:organization) }
+  let(:user) { create(:user, current_organization: organization) }
   let(:profile_template) { organization.profile_template }
   let(:filestack_file) { create(:filestack_file) }
-  let(:service) { OrganizationTemplates.new(organization) }
+  let(:service) { OrganizationTemplates.new(organization, user) }
 
   before do
     allow(FilestackFile).to receive(:create_from_url).and_return(filestack_file)
