@@ -67,7 +67,7 @@ class DataReport < SimpleService
       if @timeframe && @timeframe != 'ever'
         @data[:values] = @query
                          .distinct
-                         .group("date_trunc('#{@timeframe}', created_at) ")
+                         .group("date_trunc('#{@timeframe}', activities.created_at) ")
                          .count
                          .map { |k, v| { date: k, amount: v } }
       end

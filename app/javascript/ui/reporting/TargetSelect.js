@@ -75,14 +75,14 @@ class TargetSelect extends React.Component {
           ))}
         </Select>
         {this.type === 'Collection' && (
-          <div style={{ display: 'inline-block' }}>
+          <div style={{ display: 'inline-block', marginBottom: '10px' }}>
             <AutoComplete
               options={this.collections.map(x => ({
                 value: x.id,
                 label: x.name,
                 data: x,
               }))}
-              onOptionSelect={option => this.props.onSelect(option.custom)}
+              onOptionSelect={option => this.props.onSelect(option)}
               placeholder="Collection name"
               value={selected && selected.id}
               keepSelectedOptions

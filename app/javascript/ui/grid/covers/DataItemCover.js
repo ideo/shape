@@ -132,6 +132,11 @@ class DataItemCover extends React.Component {
     return uiStore.editingCardId === card.id
   }
 
+  toggleEditing() {
+    const { card, uiStore } = this.props
+    uiStore.toggleEditingCardId(card.id)
+  }
+
   get withinText() {
     const { item } = this.props
     const { data_settings } = item
@@ -207,8 +212,11 @@ class DataItemCover extends React.Component {
 
   onSelectTarget = value => {
     this.saveSettings({
-      d_filters: value ? [{ type: 'Collection', target: Number(value) }] : [],
+      d_filters: value
+        ? [{ type: 'Collection', target: Number(value.id) }]
+        : [],
     })
+    this.toggleEditing()
   }
 
   onSelectMeasure = value => {
@@ -240,7 +248,7 @@ class DataItemCover extends React.Component {
     // TODO: investigate why data isn't being updated with just `save()`
     runInAction(() => {
       item.update(res.data)
-      this.editing = false
+      this.toggleEditing()
       uiStore.toggleEditingCardId(card.id)
     })
   }
@@ -299,48 +307,53 @@ class DataItemCover extends React.Component {
   }
 
   renderTimeframeValues() {
-    // If there isn't enough data yet
-    if (this.formattedValues.length < 2) {
-      return <DisplayText>Not enough data yet</DisplayText>
-    }
     return (
       <Fragment>
         <AboveChartContainer>
           <DisplayText>{this.withinText}</DisplayText>
+          <br />
+          {this.formattedValues.length < 2 && (
+            <DisplayText>
+              <br />
+              Not enough data yet
+            </DisplayText>
+          )}
         </AboveChartContainer>
-        <ChartContainer>
-          <VictoryChart
-            theme={theme}
-            domainPadding={{ y: 80 }}
-            padding={{ top: 0, left: 0, right: 0, bottom: 20 }}
-            containerComponent={<VictoryVoronoiContainer />}
-          >
-            <VictoryAxis
-              tickLabelComponent={<TickLabel />}
-              offsetY={33}
-              style={{
-                axis: {
-                  stroke: v.colors.commonMedium,
-                  strokeWidth: 25,
-                  transform: 'translateY(22px)',
-                },
-              }}
-            />
-            <VictoryArea
-              labels={d => (d.amount >= this.maxAmount ? d.amount : '')}
-              labelComponent={<CustomLabel maxAmount={this.maxAmount} />}
-              style={{
-                data: { fill: v.colors.tertiaryDark },
-                labels: {
-                  fill: 'black',
-                },
-              }}
-              data={this.formattedValues}
-              y="amount"
-              x="date"
-            />
-          </VictoryChart>
-        </ChartContainer>
+        {this.formattedValues.length >= 2 && (
+          <ChartContainer>
+            <VictoryChart
+              theme={theme}
+              domainPadding={{ y: 80 }}
+              padding={{ top: 0, left: 0, right: 0, bottom: 20 }}
+              containerComponent={<VictoryVoronoiContainer />}
+            >
+              <VictoryAxis
+                tickLabelComponent={<TickLabel />}
+                offsetY={33}
+                style={{
+                  axis: {
+                    stroke: v.colors.commonMedium,
+                    strokeWidth: 25,
+                    transform: 'translateY(22px)',
+                  },
+                }}
+              />
+              <VictoryArea
+                labels={d => (d.amount >= this.maxAmount ? d.amount : '')}
+                labelComponent={<CustomLabel maxAmount={this.maxAmount} />}
+                style={{
+                  data: { fill: v.colors.tertiaryDark },
+                  labels: {
+                    fill: 'black',
+                  },
+                }}
+                data={this.formattedValues}
+                y="amount"
+                x="date"
+              />
+            </VictoryChart>
+          </ChartContainer>
+        )}
       </Fragment>
     )
   }
@@ -349,7 +362,7 @@ class DataItemCover extends React.Component {
     const { item, uiStore } = this.props
     if (uiStore.isNewCard(item.id)) {
       uiStore.removeNewCard(item.id)
-      runInAction(() => (this.editing = true))
+      this.toggleEditing()
     }
     return (
       <StyledDataItemCover

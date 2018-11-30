@@ -344,7 +344,10 @@ class GridCard extends React.Component {
           )}
         {this.renderIcon}
         {/* onClick placed here so it's separate from hotspot click */}
-        <StyledGridCardInner onClick={this.handleClick}>
+        <StyledGridCardInner
+          onClick={this.handleClick}
+          overflow={record.isData}
+        >
           {this.renderInner}
         </StyledGridCardInner>
         <TagEditorModal
