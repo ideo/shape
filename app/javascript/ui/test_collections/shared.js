@@ -1,10 +1,10 @@
 import _ from 'lodash'
 import PropTypes from 'prop-types'
-import objectAssignDeep from 'object-assign-deep'
 import styled, { css } from 'styled-components'
 import TextareaAutosize from 'react-autosize-textarea'
 import { VictoryTheme } from 'victory'
 
+import objectAssignDeep from '~/vendor/object-assign-deep'
 import { StyledCommentTextarea } from '~/ui/global/styled/forms'
 import v from '~/utils/variables'
 
