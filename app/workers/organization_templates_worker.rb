@@ -26,6 +26,7 @@ class OrganizationTemplatesWorker
       synchronous: true,
     )
     return unless getting_started_collection.persisted?
+
     unless getting_started_collection.is_a?(Collection::Global)
       getting_started_collection.update_attributes(
         type: Collection::Global.to_s,
@@ -33,8 +34,7 @@ class OrganizationTemplatesWorker
       getting_started_collection = getting_started_collection.becomes(Collection::Global)
     end
     organization.admin_group.add_role(Role::EDITOR, getting_started_collection)
-    organization.update_attributes(getting_started_collection: getting_started_collection)
-    getting_started_collection
+    organization.update_attributes!(getting_started_collection: getting_started_collection)
   end
 
   def create_user_getting_started_collection(organization, user)

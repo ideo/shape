@@ -26,19 +26,19 @@ RSpec.describe OrganizationTemplatesWorker, type: :service do
         allow_any_instance_of(User)
           .to receive(:current_user_collection).and_return(user_collection)
         OrganizationTemplatesWorker.new.perform(
-          organization_id: organization.id,
-          org_template_id: getting_started_template.id,
-          user_id: user.id,
+          organization.id,
+          getting_started_template.id,
+          user.id,
         )
       end
 
       let(:getting_started_collection) do
-        organization.getting_started_collection
+        organization.reload.getting_started_collection
       end
 
       it 'duplicates template to organization' do
         expect(getting_started_collection).not_to eq(getting_started_template)
-        expect(organization.getting_started_collection.persisted?).to be true
+        expect(getting_started_collection.persisted?).to be true
         expect(getting_started_collection).to be_instance_of(Collection::Global)
         expect(getting_started_collection.system_required?).to be true
       end
