@@ -16,7 +16,6 @@ import TargetSelect from '~/ui/reporting/TargetSelect'
 import TargetButton from '~/ui/reporting/TargetButton'
 import EditableButton from '~/ui/reporting/EditableButton'
 import {
-  CardHeading,
   DisplayText,
   SmallHelperText,
   Heading3,
@@ -87,9 +86,8 @@ const StyledDataItemCover = styled.div`
   }
 `
 
-// TODO add to shared colors
 const GraphKey = styled.span`
-  background-color: #c43a31;
+  background-color: ${v.colors.tertiaryDark};
   display: inline-block;
   height: 16px;
   margin-right: 10px;
@@ -283,14 +281,12 @@ class DataItemCover extends React.PureComponent {
   }
 
   renderTimeframeValues() {
-    const { item } = this.props
     // If there isn't enough data yet
     if (this.formattedValues.length < 2) {
       return <SmallHelperText>Not enough data yet</SmallHelperText>
     }
     return (
       <Fragment>
-        <CardHeading color={v.colors.black}>{item.name}</CardHeading>
         <DisplayText>{this.withinText}</DisplayText>
         <div
           style={{
@@ -321,7 +317,7 @@ class DataItemCover extends React.PureComponent {
               labels={d => (d.amount >= this.maxAmount ? d.amount : '')}
               labelComponent={<CustomLabel maxAmount={this.maxAmount} />}
               style={{
-                data: { fill: '#c43a31' },
+                data: { fill: v.colors.tertiaryDark },
                 labels: {
                   fill: 'black',
                 },
@@ -355,5 +351,4 @@ DataItemCover.propTypes = {
   item: MobxPropTypes.objectOrObservableObject.isRequired,
   card: MobxPropTypes.objectOrObservableObject.isRequired,
 }
-
 export default DataItemCover

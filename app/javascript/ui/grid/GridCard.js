@@ -18,6 +18,7 @@ import DataItemCover from '~/ui/grid/covers/DataItemCover'
 import Activity from '~/stores/jsonApi/Activity'
 import ActionMenu from '~/ui/grid/ActionMenu'
 import CollectionIcon from '~/ui/icons/CollectionIcon'
+import EditButton from '~/ui/reporting/EditButton'
 import LinkIcon from '~/ui/icons/LinkIcon'
 import Download from '~/ui/grid/Download'
 import FilestackUpload from '~/utils/FilestackUpload'
@@ -96,7 +97,14 @@ class GridCard extends React.Component {
           return <ChartItemCover item={record} testCollection={card.parent} />
 
         case ITEM_TYPES.DATA:
-          return <DataItemCover height={height} item={record} card={card} />
+          return (
+            <DataItemCover
+              height={height}
+              item={record}
+              card={card}
+              editing={card.id === uiStore.editingCardId}
+            />
+          )
 
         default:
           return <div>{record.content}</div>
@@ -239,6 +247,13 @@ class GridCard extends React.Component {
     anchor.remove()
   }
 
+  // Only data cards are editable right now
+  editCard = ev => {
+    ev.preventDefault()
+    const { card } = this.props
+    uiStore.toggleEditingCardId(card.id)
+  }
+
   onCollectionCoverChange = () => {
     const { card } = this.props
     // Reassign the previous cover when a new cover is assigned as the backend will have changed.
@@ -316,6 +331,7 @@ class GridCard extends React.Component {
                     onReassign={this.onCollectionCoverChange}
                   />
                 )}
+              {record.isData && <EditButton onClick={this.editCard} />}
               {record.isImage &&
                 this.canContentEditCard && <ContainImage card={card} />}
               {!testCollectionCard && <SelectionCircle cardId={card.id} />}

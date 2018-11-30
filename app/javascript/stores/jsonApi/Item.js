@@ -82,6 +82,10 @@ class Item extends SharedRecordMixin(BaseRecord) {
     return this.type === ITEM_TYPES.CHART || this.type === ITEM_TYPES.DATA
   }
 
+  get isData() {
+    return this.type === ITEM_TYPES.DATA
+  }
+
   API_updateWithoutSync({ cancel_sync } = {}) {
     const { apiStore } = this
     const data = this.toJsonApi()

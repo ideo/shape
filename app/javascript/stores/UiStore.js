@@ -141,9 +141,20 @@ export default class UiStore {
   @observable
   textEditingItem = null
   @observable
+  editingCardId = null
+  @observable
   collectionCardSortOrder = 'updated_at'
   @observable
   launchButtonLoading = false
+
+  @action
+  toggleEditingCardId(cardId) {
+    if (this.editingCardId === cardId) {
+      this.editingCardId = null
+    } else {
+      this.editingCardId = cardId
+    }
+  }
 
   @action
   startDragging() {
