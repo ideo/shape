@@ -3,12 +3,16 @@ require 'rails_helper'
 RSpec.describe OrganizationTemplates, type: :service do
   let(:organization) { create(:organization) }
   let(:user) { create(:user, current_organization: organization) }
+  let(:user_collection) { create(:user_collection, organization: organization, add_editors: [user]) }
   let(:profile_template) { organization.profile_template }
   let(:filestack_file) { create(:filestack_file) }
   let(:service) { OrganizationTemplates.new(organization, user) }
 
   before do
+    allow(OrganizationTemplatesWorker).to receive_message_chain(:new, :perform)
     allow(FilestackFile).to receive(:create_from_url).and_return(filestack_file)
+    allow_any_instance_of(User)
+      .to receive(:current_user_collection).and_return(user_collection)
   end
 
   describe '#call' do
@@ -129,23 +133,12 @@ RSpec.describe OrganizationTemplates, type: :service do
         organization.getting_started_collection
       end
 
-      it 'duplicates template to organization' do
-        expect(getting_started_collection).not_to eq(getting_started_template)
-        expect(getting_started_collection.persisted?).to be true
-        expect(getting_started_collection).to be_instance_of(Collection::Global)
-        expect(getting_started_collection.system_required?).to be true
-      end
-
-      it 'assigns admin group as editor' do
-        expect(getting_started_collection.editors[:groups]).to match_array(
-          [organization.admin_group],
+      it 'invokes the OrganizationTemplatesWorker' do
+        expect(OrganizationTemplatesWorker.new).to have_received(:perform).with(
+          organization.id,
+          getting_started_template.id,
+          user.id,
         )
-        expect(getting_started_collection.editors[:users]).to be_empty
-      end
-
-      it 'has no viewers' do
-        expect(getting_started_collection.viewers[:users]).to be_empty
-        expect(getting_started_collection.viewers[:groups]).to be_empty
       end
     end
   end

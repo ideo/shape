@@ -26,11 +26,14 @@ class OrganizationTemplates < SimpleService
 
   def setup_template_collection
     return if @org.template_collection.present?
+
     # Create templates collection
-    template_collection = @org.create_template_collection(
+    template_collection = Collection::Global.create(
       name: "#{@org.name} Templates",
       organization: @org,
     )
+    @org.template_collection = template_collection
+    @org.save!
 
     @org.admin_group.add_role(Role::EDITOR, template_collection)
     LinkToSharedCollectionsWorker.new.perform(
