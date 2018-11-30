@@ -225,7 +225,7 @@ class CollectionCover extends React.Component {
             <PositionedCardHeading>
               <Dotdotdot clamp={height > 1 ? 6 : 3}>
                 <PlainLink
-                  className="no-select"
+                  className="no-select cancelGridClick"
                   onClick={this.handleClick}
                   to={routingStore.pathTo('collections', collection.id)}
                 >
