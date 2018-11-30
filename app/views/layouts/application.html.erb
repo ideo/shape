@@ -5,14 +5,18 @@
       Shape <%= "| #{ENV['SHAPE_APP']}" unless ENV['SHAPE_APP'] == 'production' %>
     </title>
     <%= render 'layouts/metatags_and_favicons' %>
-    <%= render 'layouts/trackers_and_widgets_head' %>
 
     <script type="text/javascript"
       src="<%= ideo_sso_js_sdk_url %>">
     </script>
     <script>
       IdeoSSO.init(<%= ideo_sso_init_params.to_json.html_safe %>)
+      // useful variables for analytics
+      window.analytics = {
+        LOGGED_IN: <%= user_signed_in? %>
+      }
     </script>
+    <%= render 'layouts/trackers_and_widgets_head' %>
 
     <%= stylesheet_link_tag 'application', media: 'all' %>
     <%= javascript_pack_tag 'babel-polyfill' %>
