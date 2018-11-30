@@ -86,6 +86,18 @@ const StyledDataItemCover = styled.div`
   }
 `
 
+const AboveChartContainer = styled.div`
+  position: absolute;
+  z-index: ${v.zIndex.floatOverContent};
+`
+
+const ChartContainer = styled.div`
+  bottom: -18px;
+  height: calc(100% - 60px);
+  position: absolute;
+  width: 100%;
+`
+
 const GraphKey = styled.span`
   background-color: ${v.colors.tertiaryDark};
   display: inline-block;
@@ -228,6 +240,7 @@ class DataItemCover extends React.Component {
     // TODO: investigate why data isn't being updated with just `save()`
     runInAction(() => {
       item.update(res.data)
+      this.editing = false
       uiStore.toggleEditingCardId(card.id)
     })
   }
@@ -288,19 +301,14 @@ class DataItemCover extends React.Component {
   renderTimeframeValues() {
     // If there isn't enough data yet
     if (this.formattedValues.length < 2) {
-      return <SmallHelperText>Not enough data yet</SmallHelperText>
+      return <DisplayText>Not enough data yet</DisplayText>
     }
     return (
       <Fragment>
-        <DisplayText>{this.withinText}</DisplayText>
-        <div
-          style={{
-            bottom: '-18px',
-            position: 'absolute',
-            width: '100%',
-            height: 'calc(100% - 60px)',
-          }}
-        >
+        <AboveChartContainer>
+          <DisplayText>{this.withinText}</DisplayText>
+        </AboveChartContainer>
+        <ChartContainer>
           <VictoryChart
             theme={theme}
             domainPadding={{ y: 80 }}
@@ -332,16 +340,16 @@ class DataItemCover extends React.Component {
               x="date"
             />
           </VictoryChart>
-        </div>
+        </ChartContainer>
       </Fragment>
     )
   }
 
   render() {
-    const { card, item, uiStore } = this.props
+    const { item, uiStore } = this.props
     if (uiStore.isNewCard(item.id)) {
       uiStore.removeNewCard(item.id)
-      uiStore.toggleEditingCardId(card.id)
+      runInAction(() => (this.editing = true))
     }
     return (
       <StyledDataItemCover
