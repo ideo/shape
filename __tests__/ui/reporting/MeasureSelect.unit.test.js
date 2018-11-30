@@ -13,26 +13,61 @@ describe('MeasureSelect', () => {
       },
     }
     props.onSelect = jest.fn()
+    props.dataSettingsName = 'measure'
     wrapper = shallow(<MeasureSelect {...props} />)
   })
 
-  describe('render', () => {
-    it('renders 4 possible options', () => {
-      expect(wrapper.find(MenuItem).length).toEqual(3)
+  describe('measure', () => {
+    beforeEach(() => {
+      props.dataSettingsName = 'measure'
+      wrapper.setProps(props)
+    })
+
+    describe('render', () => {
+      it('renders possible options', () => {
+        expect(wrapper.find(MenuItem).length).toEqual(3)
+      })
+    })
+
+    describe('on select change', () => {
+      beforeEach(() => {
+        const fakeEv = {
+          target: { value: 'participants' },
+          preventDefault: jest.fn(),
+        }
+        wrapper.instance().handleChange(fakeEv)
+      })
+
+      it('calls onSelect prop with value of select', () => {
+        expect(props.onSelect).toHaveBeenCalledWith('participants')
+      })
     })
   })
 
-  describe('on select change', () => {
+  describe('timeframe', () => {
     beforeEach(() => {
-      const fakeEv = {
-        target: { value: 'participants' },
-        preventDefault: jest.fn(),
-      }
-      wrapper.instance().handleChange(fakeEv)
+      props.dataSettingsName = 'timeframe'
+      wrapper.setProps(props)
     })
 
-    it('calls onSelect prop with value of select', () => {
-      expect(props.onSelect).toHaveBeenCalledWith('participants')
+    describe('render', () => {
+      it('renders possible options', () => {
+        expect(wrapper.find(MenuItem).length).toEqual(2)
+      })
+    })
+
+    describe('on select change', () => {
+      beforeEach(() => {
+        const fakeEv = {
+          target: { value: 'ever' },
+          preventDefault: jest.fn(),
+        }
+        wrapper.instance().handleChange(fakeEv)
+      })
+
+      it('calls onSelect prop with value of select', () => {
+        expect(props.onSelect).toHaveBeenCalledWith('ever')
+      })
     })
   })
 })
