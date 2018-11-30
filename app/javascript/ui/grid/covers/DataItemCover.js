@@ -228,7 +228,6 @@ class DataItemCover extends React.Component {
     // TODO: investigate why data isn't being updated with just `save()`
     runInAction(() => {
       item.update(res.data)
-      this.editing = false
       uiStore.toggleEditingCardId(card.id)
     })
   }
@@ -339,10 +338,10 @@ class DataItemCover extends React.Component {
   }
 
   render() {
-    const { item, uiStore } = this.props
+    const { card, item, uiStore } = this.props
     if (uiStore.isNewCard(item.id)) {
       uiStore.removeNewCard(item.id)
-      runInAction(() => (this.editing = true))
+      uiStore.toggleEditingCardId(card.id)
     }
     return (
       <StyledDataItemCover

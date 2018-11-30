@@ -77,6 +77,7 @@ const fakeUiStore = {
   addNewCard: jest.fn(),
   removeNewCard: jest.fn(),
   isNewCard: jest.fn(),
+  toggleEditingCardId: jest.fn(),
 }
 
 export default fakeUiStore
