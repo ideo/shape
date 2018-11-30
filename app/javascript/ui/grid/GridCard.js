@@ -97,14 +97,7 @@ class GridCard extends React.Component {
           return <ChartItemCover item={record} testCollection={card.parent} />
 
         case ITEM_TYPES.DATA:
-          return (
-            <DataItemCover
-              height={height}
-              item={record}
-              card={card}
-              editing={card.id === uiStore.editingCardId}
-            />
-          )
+          return <DataItemCover height={height} item={record} card={card} />
 
         default:
           return <div>{record.content}</div>

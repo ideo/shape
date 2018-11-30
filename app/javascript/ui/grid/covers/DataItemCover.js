@@ -1,6 +1,6 @@
 import { Fragment } from 'react'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
-import { runInAction, observable } from 'mobx'
+import { runInAction, computed } from 'mobx'
 import styled from 'styled-components'
 import {
   VictoryArea,
@@ -114,8 +114,11 @@ const shortMonths = [
 @inject('uiStore')
 @observer
 class DataItemCover extends React.Component {
-  @observable
-  editing: false
+  @computed
+  get editing() {
+    const { card, uiStore } = this.props
+    return uiStore.editingCardId === card.id
+  }
 
   get withinText() {
     const { item } = this.props
@@ -210,7 +213,7 @@ class DataItemCover extends React.Component {
   }
 
   async saveSettings(settings) {
-    const { card, item } = this.props
+    const { card, item, uiStore } = this.props
     runInAction(() => {
       item.data_settings = Object.assign({}, item.data_settings, settings)
     })
@@ -226,13 +229,14 @@ class DataItemCover extends React.Component {
     runInAction(() => {
       item.update(res.data)
       this.editing = false
+      uiStore.toggleEditingCardId(card.id)
     })
   }
 
   handleEditClick = ev => {
-    const { item } = this.props
+    const { card, item, uiStore } = this.props
     if (!item.can_edit_content) return
-    runInAction(() => (this.editing = true))
+    uiStore.toggleEditingCardId(card.id)
   }
 
   get formattedValues() {
