@@ -1,6 +1,6 @@
 import { Fragment } from 'react'
-import { PropTypes as MobxPropTypes } from 'mobx-react'
-import { runInAction } from 'mobx'
+import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
+import { runInAction, observable } from 'mobx'
 import styled from 'styled-components'
 import {
   VictoryArea,
@@ -110,11 +110,13 @@ const shortMonths = [
   'Dec',
 ]
 
-// eslint-disable-next-line
-class DataItemCover extends React.PureComponent {
-  state = { editing: false }
+// eslint-disable-next-line react/no-multi-comp
+@inject('uiStore')
+@observer
+class DataItemCover extends React.Component {
+  @observable
+  editing: false
 
-  // eslint-disable-next-line
   get withinText() {
     const { item } = this.props
     const { data_settings } = item
@@ -123,7 +125,7 @@ class DataItemCover extends React.PureComponent {
     let targetControl
     let measureControl
 
-    if (this.state.editing) {
+    if (this.editing) {
       targetControl = (
         <TargetSelect item={item} onSelect={this.onSelectTarget} />
       )
@@ -223,14 +225,14 @@ class DataItemCover extends React.PureComponent {
     // TODO: investigate why data isn't being updated with just `save()`
     runInAction(() => {
       item.update(res.data)
+      this.editing = false
     })
-    this.setState({ editing: false })
   }
 
   handleEditClick = ev => {
     const { item } = this.props
     if (!item.can_edit_content) return
-    this.setState({ editing: true })
+    runInAction(() => (this.editing = true))
   }
 
   get formattedValues() {
@@ -265,7 +267,7 @@ class DataItemCover extends React.PureComponent {
         >
           {item.data_settings.d_measure}
         </Heading3>
-        {this.state.editing && (
+        {this.editing && (
           <MeasureSelect
             dataSettingsName="measure"
             item={item}
@@ -333,7 +335,11 @@ class DataItemCover extends React.PureComponent {
   }
 
   render() {
-    const { item } = this.props
+    const { item, uiStore } = this.props
+    if (uiStore.isNewCard(item.id)) {
+      uiStore.removeNewCard(item.id)
+      runInAction(() => (this.editing = true))
+    }
     return (
       <StyledDataItemCover
         className="cancelGridClick"
@@ -351,4 +357,9 @@ DataItemCover.propTypes = {
   item: MobxPropTypes.objectOrObservableObject.isRequired,
   card: MobxPropTypes.objectOrObservableObject.isRequired,
 }
+
+DataItemCover.wrappedComponent.propTypes = {
+  uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
+}
+
 export default DataItemCover

@@ -80,6 +80,11 @@ describe('GridCardBlank', () => {
       const newCard = CollectionCard.mock.instances[0]
       expect(newCard.API_create).toHaveBeenCalled()
     })
+
+    it('adds the card record to the uiStore as a new card', async () => {
+      await wrapper.instance().createCard()
+      expect(fakeUiStore.addNewCard).toHaveBeenCalled()
+    })
   })
 
   describe('with an empty collection', () => {
