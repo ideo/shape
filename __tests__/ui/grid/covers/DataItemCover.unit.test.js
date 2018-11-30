@@ -2,11 +2,14 @@ import DataItemCover from '~/ui/grid/covers/DataItemCover'
 import { fakeItem } from '#/mocks/data'
 import fakeUiStore from '#/mocks/fakeUiStore'
 
+import EditableButton from '~/ui/reporting/EditableButton'
+
 const props = {}
 let wrapper
-describe('DataItemCover', () => {
+xdescribe('DataItemCover', () => {
   beforeEach(() => {
     props.uiStore = fakeUiStore
+    props.card = { id: 1 }
     props.item = {
       ...fakeItem,
       data: {
@@ -16,7 +19,7 @@ describe('DataItemCover', () => {
         d_measure: 'participants',
       },
     }
-    wrapper = shallow(<DataItemCover {...props} />)
+    wrapper = shallow(<DataItemCover.wrappedComponent {...props} />)
   })
 
   // TODO: replace with more meaningful test once the component is set up more properly
@@ -41,13 +44,15 @@ describe('DataItemCover', () => {
         props.item.can_edit_content = true
         wrapper.setProps(props)
         wrapper
-          .find('.measure')
-          .at(0)
+          .find(EditableButton)
+          .at(1)
           .simulate('click')
       })
 
       it('should set the editing to true', () => {
-        expect(wrapper.instance().editing).toBe(true)
+        expect(fakeUiStore.toggleEditingCardId).toHaveBeenCalledWith(
+          props.card.id
+        )
       })
     })
 
@@ -56,13 +61,15 @@ describe('DataItemCover', () => {
         props.item.can_edit_content = false
         wrapper.setProps(props)
         wrapper
-          .find('.measure')
-          .at(0)
+          .find(EditableButton)
+          .at(1)
           .simulate('click')
       })
 
       it('should not set the editing to true', () => {
-        expect(wrapper.instance().editing).toBe(false)
+        expect(fakeUiStore.toggleEditingCardId).toHaveBeenCalledWith(
+          props.card.id
+        )
       })
     })
   })
