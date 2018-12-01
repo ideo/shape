@@ -87,7 +87,6 @@ class Organization < ApplicationRecord
 
     # Set this as the user's current organization if they don't have one
     user.switch_to_organization(self) if user.current_organization_id.blank?
-    # find_or_create_user_getting_started_collection(user)
   end
 
   def guest_group_name
