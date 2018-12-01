@@ -1,6 +1,7 @@
 class OrganizationTemplates < SimpleService
-  def initialize(organization)
+  def initialize(organization, user)
     @org = organization
+    @user = user
   end
 
   def call
@@ -14,32 +15,25 @@ class OrganizationTemplates < SimpleService
   def setup_getting_started_collection
     return if @org.getting_started_collection.present? || getting_started_template.blank?
 
-    getting_started_collection = getting_started_template.duplicate!(
-      copy_parent_card: true,
-      parent: @org.template_collection,
-      system_collection: true,
-      synchronous: true,
+    OrganizationTemplatesWorker.new.perform(
+      @org.id,
+      getting_started_template.id,
+      @user.id,
     )
-    return unless getting_started_collection.persisted?
-    unless getting_started_collection.is_a?(Collection::Global)
-      getting_started_collection.update_attributes(
-        type: Collection::Global.to_s,
-      )
-      getting_started_collection = getting_started_collection.becomes(Collection::Global)
-    end
-    @org.admin_group.add_role(Role::EDITOR, getting_started_collection)
-    @org.update_attributes(getting_started_collection: getting_started_collection)
   end
 
   private
 
   def setup_template_collection
     return if @org.template_collection.present?
+
     # Create templates collection
-    template_collection = @org.create_template_collection(
+    template_collection = Collection::Global.create(
       name: "#{@org.name} Templates",
       organization: @org,
     )
+    @org.template_collection = template_collection
+    @org.save!
 
     @org.admin_group.add_role(Role::EDITOR, template_collection)
     LinkToSharedCollectionsWorker.new.perform(

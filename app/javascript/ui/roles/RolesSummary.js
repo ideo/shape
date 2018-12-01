@@ -118,7 +118,7 @@ class RolesSummary extends React.Component {
     const editorAvatars = editors.map(editor => (
       <Avatar
         key={`${editor.internalType}_${editor.id}`}
-        title={editor.name}
+        title={editor.nameWithHints || editor.name}
         url={editor.pic_url_square || editor.filestack_file_url}
         size={AVATAR_SIZE}
         className="editor"
@@ -144,7 +144,7 @@ class RolesSummary extends React.Component {
     const viewerAvatars = viewers.map(viewer => (
       <Avatar
         key={`${viewer.internalType}_${viewer.id}`}
-        title={viewer.name}
+        title={viewer.nameWithHints || viewer.name}
         url={viewer.pic_url_square || viewer.filestack_file_url}
         size={AVATAR_SIZE}
         className="viewer"

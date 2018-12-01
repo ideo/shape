@@ -31,6 +31,7 @@
     "template_num_instances": { "type": ["integer"] },
     "is_submission_box_template": { "type": ["boolean"] },
     "is_submission_box_template_test": { "type": ["boolean"] },
+    "is_inside_a_submission": { "type": ["boolean"] },
     "submission_attrs": { "type": ["object"] },
     "launchable": { "type": ["boolean"] },
     "test_collection_id": { "type": ["string"] }

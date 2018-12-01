@@ -138,18 +138,30 @@ class Collection < ApplicationRecord
     ]
   end
 
+  def search_user_ids
+    (editors[:users].pluck(:id) + viewers[:users].pluck(:id)).uniq
+  end
+
+  def search_group_ids
+    (editors[:groups].pluck(:id) + viewers[:groups].pluck(:id)).uniq
+  end
+
   # By default all string fields are searchable
   def search_data
-    user_ids = (editors[:users].pluck(:id) + viewers[:users].pluck(:id)).uniq
-    group_ids = (editors[:groups].pluck(:id) + viewers[:groups].pluck(:id)).uniq
+    parent_ids = breadcrumb
+    activity_dates = activities.map do |activity|
+      activity.updated_at.to_date
+    end.uniq
     {
       name: name,
       tags: all_tag_names,
       item_tags: items.map(&:tags).flatten.map(&:name),
       content: search_content,
       organization_id: organization_id,
-      user_ids: user_ids,
-      group_ids: group_ids,
+      user_ids: search_user_ids,
+      group_ids: search_group_ids,
+      parent_ids: parent_ids,
+      activity_dates: activity_dates.empty? ? nil : activity_dates,
     }
   end
 
@@ -596,6 +608,11 @@ class Collection < ApplicationRecord
 
   def inside_a_submission?
     parents.where("cached_attributes->'submission_attrs'->>'submission' = 'true'").any?
+  end
+
+  def submission_test?
+    return unless inside_a_submission?
+    parent_submission.submission_attrs['launchable_test_id'] == id
   end
 
   # check for template instances anywhere in the entire collection tree

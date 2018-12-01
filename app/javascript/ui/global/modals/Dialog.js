@@ -118,6 +118,7 @@ Dialog.propTypes = {
     'Archive',
     'Back',
     'Close',
+    'Clock',
     'Leave',
     'Link',
     'Ok',

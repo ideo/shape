@@ -14,6 +14,7 @@ import VideoItemCover from '~/ui/grid/covers/VideoItemCover'
 import GenericFileItemCover from '~/ui/grid/covers/GenericFileItemCover'
 import CollectionCover from '~/ui/grid/covers/CollectionCover'
 
+import Activity from '~/stores/jsonApi/Activity'
 import ActionMenu from '~/ui/grid/ActionMenu'
 import CollectionIcon from '~/ui/icons/CollectionIcon'
 import LinkIcon from '~/ui/icons/LinkIcon'
@@ -223,10 +224,15 @@ class GridCard extends React.Component {
   }
 
   linkOffsite = url => {
-    Object.assign(document.createElement('a'), {
+    const { record } = this.props
+    Activity.trackActivity('viewed', record)
+    const anchor = Object.assign(document.createElement('a'), {
       target: '_blank',
       href: url,
-    }).click()
+    })
+    document.body.append(anchor)
+    anchor.click()
+    anchor.remove()
   }
 
   onCollectionCoverChange = () => {

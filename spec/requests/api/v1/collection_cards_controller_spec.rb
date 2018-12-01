@@ -222,9 +222,9 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
       end
 
       it 'archives the cards' do
-        expect {
+        expect do
           patch(path, params: params)
-        }.to change(CollectionCard.active, :count).by(-3)
+        end.to change(CollectionCard.active, :count).by(-3)
       end
 
       it 'broadcasts collection updates' do
@@ -584,6 +584,19 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
       expect(CollectionUpdateBroadcaster).to receive(:call).with(
         collection,
         user,
+      )
+      patch(path, params: params)
+    end
+
+    it 'creates an activity' do
+      expect(ActivityAndNotificationBuilder).to receive(:call).with(
+        actor: user,
+        target: anything,
+        action: :edited,
+        subject_user_ids: [user.id],
+        subject_group_ids: [],
+        source: nil,
+        destination: nil,
       )
       patch(path, params: params)
     end

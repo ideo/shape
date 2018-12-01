@@ -41,8 +41,9 @@ class OrganizationBuilder
 
   def create_templates
     # Create templates after membership has been setup correctly
-    OrganizationTemplates.call(@organization)
+    OrganizationTemplates.call(@organization, @user)
     # call this additionally to create the UserProfile and Getting Started after the templates have been created
+    # TODO: ensure that the user template creator doesn't get called at this point
     @organization.setup_user_membership(@user)
   end
 end

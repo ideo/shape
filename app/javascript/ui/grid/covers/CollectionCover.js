@@ -11,7 +11,7 @@ import { CardHeading } from '~/ui/global/styled/typography'
 import hexToRgba from '~/utils/hexToRgba'
 import ProfileIcon from '~/ui/icons/ProfileIcon'
 import FilledProfileIcon from '~/ui/icons/FilledProfileIcon'
-import { RoundPill } from '~/ui/global/styled/forms'
+import { FormButton, RoundPill } from '~/ui/global/styled/forms'
 import SubmissionBoxIconLg from '~/ui/icons/SubmissionBoxIconLg'
 import TemplateIcon from '~/ui/icons/TemplateIcon'
 import TestCollectionIcon from '~/ui/icons/TestCollectionIcon'
@@ -25,6 +25,17 @@ const IconHolder = styled.span`
   vertical-align: middle;
   width: 27px;
 `
+
+const LaunchButton = FormButton.extend`
+  font-size: 0.9rem;
+  padding: 0 1rem;
+  width: auto;
+  background-color: ${v.colors.alert};
+  &:hover {
+    background-color: ${v.colors.tertiaryMedium};
+  }
+`
+LaunchButton.displayName = 'LaunchButton'
 
 const StyledCollectionCover = styled.div`
   width: 100%;
@@ -192,6 +203,42 @@ class CollectionCover extends React.Component {
     )
   }
 
+  get hasLaunchTestButton() {
+    const { collection } = this.props
+    // This button only appears for tests inside submissions
+    if (!collection.is_inside_a_submission) return false
+    return (
+      collection.launchableTestId === collection.id &&
+      // if it's live you have the option to close
+      // otherwise it must be launchable to see a launch or re-open button
+      (collection.isLiveTest || collection.launchable)
+    )
+  }
+
+  get launchTestButton() {
+    const { collection, uiStore } = this.props
+    if (!this.hasLaunchTestButton) return ''
+    let launchCollection = collection.launchTest
+    let buttonText = 'Start Feedback'
+    if (collection.isLiveTest) {
+      buttonText = 'Stop Feedback'
+      launchCollection = collection.closeTest
+    } else if (collection.isClosedTest) {
+      buttonText = 'Re-open Feedback'
+      launchCollection = collection.reopenTest
+    }
+
+    return (
+      <LaunchButton
+        className="cancelGridClick"
+        onClick={launchCollection}
+        disabled={uiStore.launchButtonLoading}
+      >
+        {buttonText}
+      </LaunchButton>
+    )
+  }
+
   handleClick = e => {
     const { dragging } = this.props
     if (dragging) {
@@ -235,10 +282,13 @@ class CollectionCover extends React.Component {
             </PositionedCardHeading>
           </div>
           <div className="bottom">
+            {this.launchTestButton}
             {this.collectionScore}
-            <Dotdotdot clamp={this.hasCollectionScore ? 2 : 'auto'}>
-              {cover.text}
-            </Dotdotdot>
+            {!this.hasLaunchTestButton && (
+              <Dotdotdot clamp={this.hasCollectionScore ? 2 : 'auto'}>
+                {cover.text}
+              </Dotdotdot>
+            )}
           </div>
         </StyledCardContent>
       </StyledCollectionCover>

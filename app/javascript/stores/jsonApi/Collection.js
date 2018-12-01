@@ -16,6 +16,8 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   inMyCollection = null
   @observable
   reloading = false
+  @observable
+  nextAvailableTestPath = null
 
   attributesForAPI = [
     'name',
@@ -214,6 +216,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     return undefined
   }
 
+  @computed
   get launchableTestStatus() {
     if (this.isTestCollectionOrTestDesign) {
       return this.test_status
@@ -418,26 +421,37 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   }
 
   API_performTestAction = async actionName => {
-    await this.apiStore
-      .request(
-        `test_collections/${this.launchableTestId}/${actionName}`,
-        'PATCH'
-      )
-      .catch(err => {
-        const errorMessages = err.error.map(e => ` ${e.detail}`)
-        let prompt = `You have questions that have not yet been finalized:\n
-           ${errorMessages}
-          `
-        // omit the extra wording for close and reopen
-        // for reopen: what if there are actually incomplete questions... ?
-        if (_.includes(['close', 'reopen'], actionName)) prompt = errorMessages
-        uiStore.popupAlert({
-          prompt,
-          fadeOutTime: 10 * 1000,
+    // this will disable any test launch/close/reopen buttons until loading is complete
+    uiStore.update('launchButtonLoading', true)
+    try {
+      await this.apiStore
+        .request(
+          `test_collections/${this.launchableTestId}/${actionName}`,
+          'PATCH'
+        )
+        .catch(err => {
+          const errorMessages = err.error.map(e => ` ${e.detail}`)
+          let prompt = `You have questions that have not yet been finalized:\n
+             ${errorMessages}
+            `
+          // omit the extra wording for close and reopen
+          // for reopen: what if there are actually incomplete questions... ?
+          if (_.includes(['close', 'reopen'], actionName))
+            prompt = errorMessages
+          uiStore.popupAlert({
+            prompt,
+            fadeOutTime: 10 * 1000,
+          })
         })
-      })
+    } catch (e) {
+      uiStore.update('launchButtonLoading', false)
+    }
+    uiStore.update('launchButtonLoading', false)
     // refetch yourself
     if (this.submission_attrs) this.apiStore.request(`collections/${this.id}`)
+    if (this.parent && this.parent.submission_attrs) {
+      this.apiStore.request(`collections/${this.parent.id}`)
+    }
   }
 
   API_setSubmissionBoxTemplate(data) {
@@ -446,6 +460,24 @@ class Collection extends SharedRecordMixin(BaseRecord) {
       'POST',
       data
     )
+  }
+
+  async API_getNextAvailableTest() {
+    runInAction(() => {
+      this.nextAvailableTestPath = null
+    })
+    const res = await this.apiStore.request(
+      `test_collections/${this.id}/next_available`
+    )
+    if (!res.data) return
+    const path = routingStore.pathTo('collections', res.data.id)
+
+    this.setNextAvailableTestPath(`${path}?open=tests`)
+  }
+
+  @action
+  setNextAvailableTestPath(path) {
+    this.nextAvailableTestPath = path
   }
 
   reassignCover(newCover) {

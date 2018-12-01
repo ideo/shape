@@ -114,6 +114,10 @@ class SerializableCollection < BaseJsonSerializer
     @object.submission_attrs
   end
 
+  attribute :is_inside_a_submission, if: -> { @object.inside_a_submission? } do
+    @object.inside_a_submission?
+  end
+
   attribute :template_num_instances do
     if @object.master_template?
       @object.templated_collections.active.count

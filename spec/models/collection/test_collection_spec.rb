@@ -370,23 +370,9 @@ describe Collection::TestCollection, type: :model do
           expect(test_collection.test_design.present?).to be false
         end
 
-        it 'should find all submissions and mark their tests as launchable' do
-          # make sure this is now persisted
-          submission_test.reload
+        it 'should call the UpdateTemplateInstancesWorker' do
+          expect(UpdateTemplateInstancesWorker).to receive(:perform_async).with(test_collection.id)
           test_collection.launch!(initiated_by: user)
-          submission.reload
-          submission_template.reload
-          expect(submission_template.submission_attrs).to eq(
-            'template' => true,
-            'test_status' => 'live',
-            'launchable_test_id' => test_collection.id,
-          )
-          expect(submission.submission_attrs).to eq(
-            'submission' => true,
-            'test_status' => 'draft',
-            'template_test_id' => test_collection.id,
-            'launchable_test_id' => submission_test.id,
-          )
         end
       end
 
@@ -400,12 +386,37 @@ describe Collection::TestCollection, type: :model do
       end
     end
 
+    describe '#update_submissions_launch_status' do
+      # gets called from within UpdateTemplateInstancesWorker
+      it 'should find all submissions and mark their tests as launchable when launching' do
+        # make sure this is now persisted
+        submission_test.reload
+        test_collection.launch!(initiated_by: user)
+        test_collection.update_submissions_launch_status
+        submission.reload
+        submission_template.reload
+        expect(submission_template.submission_attrs).to eq(
+          'template' => true,
+          'test_status' => 'live',
+          'launchable_test_id' => test_collection.id,
+        )
+        expect(submission.submission_attrs).to eq(
+          'submission' => true,
+          'test_status' => 'draft',
+          'template_test_id' => test_collection.id,
+          'launchable_test_id' => submission_test.id,
+        )
+      end
+    end
+
     describe '#close!' do
       before do
         # persist submissions_collection relations
         submission_test.reload
         submission_box.reload
         test_collection.launch!(initiated_by: user)
+        # simulate bg worker
+        test_collection.update_submissions_launch_status
         submission_test.launch!(initiated_by: user)
       end
 
