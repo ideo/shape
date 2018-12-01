@@ -92,8 +92,8 @@ const AboveChartContainer = styled.div`
 `
 
 const ChartContainer = styled.div`
-  bottom: -18px;
-  height: calc(100% - 60px);
+  bottom: 0px;
+  height: 92%;
   position: absolute;
   width: 100%;
 `
@@ -324,12 +324,12 @@ class DataItemCover extends React.Component {
             <VictoryChart
               theme={theme}
               domainPadding={{ y: 80 }}
-              padding={{ top: 0, left: 0, right: 0, bottom: 20 }}
+              padding={{ top: 0, left: 0, right: 0, bottom: 0 }}
               containerComponent={<VictoryVoronoiContainer />}
             >
               <VictoryAxis
                 tickLabelComponent={<TickLabel />}
-                offsetY={33}
+                offsetY={13}
                 style={{
                   axis: {
                     stroke: v.colors.commonMedium,
