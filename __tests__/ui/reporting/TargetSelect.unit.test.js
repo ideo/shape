@@ -173,10 +173,12 @@ describe('TargetSelect', () => {
               {
                 label: 'foo',
                 value: 1,
+                data: { id: 1, name: 'foo' },
               },
               {
                 label: 'bar',
                 value: 2,
+                data: { id: 2, name: 'bar' },
               },
             ])
             expect(p.placeholder).toEqual('Collection name')

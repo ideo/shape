@@ -45,7 +45,7 @@ RSpec.describe DataReport, type: :service do
       end
     end
 
-    context 'filtering by collection' do
+    xcontext 'filtering by collection' do
       let(:other_collection) { create(:collection, organization: organization) }
       let(:parent_collection) { create(:collection, organization: organization) }
       let(:child_collection) { create(:collection, organization: organization, parent_collection: parent_collection) }
