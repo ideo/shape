@@ -38,6 +38,8 @@ class OrganizationTemplatesWorker
   end
 
   def create_user_getting_started_collection(organization, user)
-    organization.find_or_create_user_getting_started_collection(user)
+    getting_started_collection = organization.find_or_create_user_getting_started_collection(user, synchronous: true)
+    CollectionUpdateBroadcaster.call(getting_started_collection, user)
+    CollectionUpdateBroadcaster.call(getting_started_collection.parent, user)
   end
 end
