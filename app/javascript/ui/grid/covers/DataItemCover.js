@@ -145,11 +145,14 @@ class DataItemCover extends React.Component {
     let targetControl
     let measureControl
 
+    targetControl = (
+      <TargetButton
+        item={item}
+        editable={editable}
+        onClick={this.handleEditClick}
+      />
+    )
     if (this.editing) {
-      targetControl = (
-        <TargetSelect item={item} onSelect={this.onSelectTarget} />
-      )
-
       timeframeControl = (
         <MeasureSelect
           dataSettingsName="timeframe"
@@ -165,13 +168,6 @@ class DataItemCover extends React.Component {
         />
       )
     } else if (editable) {
-      targetControl = (
-        <TargetButton
-          item={item}
-          editable={editable}
-          onClick={this.handleEditClick}
-        />
-      )
       timeframeControl = (
         <EditableButton editable={editable} onClick={this.handleEditClick}>
           {data_settings.d_timeframe}
