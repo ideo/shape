@@ -12,7 +12,6 @@ import {
 } from 'victory'
 
 import MeasureSelect from '~/ui/reporting/MeasureSelect'
-import TargetSelect from '~/ui/reporting/TargetSelect'
 import TargetButton from '~/ui/reporting/TargetButton'
 import EditableButton from '~/ui/reporting/EditableButton'
 import {
@@ -142,10 +141,9 @@ class DataItemCover extends React.Component {
     const { data_settings } = item
     const editable = item.can_edit_content
     let timeframeControl = <span>{data_settings.d_timeframe}</span>
-    let targetControl
     let measureControl
 
-    targetControl = (
+    const targetControl = (
       <TargetButton
         item={item}
         editable={editable}
