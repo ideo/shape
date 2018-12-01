@@ -18,7 +18,6 @@ class DataReport < SimpleService
     @query = generate_base_query
     return unless @query
 
-    @query = filtered_query
     calculate
     @data
   end
@@ -66,6 +65,7 @@ class DataReport < SimpleService
       # TODO: sql injection?
       if @timeframe && @timeframe != 'ever'
         @data[:values] = @query
+                         .select(:actor_id)
                          .distinct
                          .group("date_trunc('#{@timeframe}', activities.created_at) ")
                          .count
