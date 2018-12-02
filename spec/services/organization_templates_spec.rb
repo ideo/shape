@@ -9,7 +9,7 @@ RSpec.describe OrganizationTemplates, type: :service do
   let(:service) { OrganizationTemplates.new(organization, user) }
 
   before do
-    allow(OrganizationTemplatesWorker).to receive_message_chain(:new, :perform)
+    allow(OrganizationTemplatesWorker).to receive(:perform_async)
     allow(FilestackFile).to receive(:create_from_url).and_return(filestack_file)
     allow_any_instance_of(User)
       .to receive(:current_user_collection).and_return(user_collection)
@@ -110,9 +110,9 @@ RSpec.describe OrganizationTemplates, type: :service do
     context 'with collections already created' do
       it 'should not create duplicate collections' do
         # calling service.call a second time...
-        expect {
+        expect do
           service.call
-        }.to not_change(Collection, :count)
+        end.to not_change(Collection, :count)
       end
     end
   end
@@ -134,7 +134,7 @@ RSpec.describe OrganizationTemplates, type: :service do
       end
 
       it 'invokes the OrganizationTemplatesWorker' do
-        expect(OrganizationTemplatesWorker.new).to have_received(:perform).with(
+        expect(OrganizationTemplatesWorker).to have_received(:perform_async).with(
           organization.id,
           getting_started_template.id,
           user.id,

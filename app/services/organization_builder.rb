@@ -16,8 +16,8 @@ class OrganizationBuilder
       update_primary_group!
       add_role
       setup_user_membership_and_collections
-      create_templates if @with_templates
     end
+    create_templates if @with_templates
     true
   rescue ActiveRecord::RecordInvalid
     # invalid params, transaction will be rolled back

@@ -15,7 +15,7 @@ class OrganizationTemplates < SimpleService
   def setup_getting_started_collection
     return if @org.getting_started_collection.present? || getting_started_template.blank?
 
-    OrganizationTemplatesWorker.new.perform(
+    OrganizationTemplatesWorker.perform_async(
       @org.id,
       getting_started_template.id,
       @user.id,
