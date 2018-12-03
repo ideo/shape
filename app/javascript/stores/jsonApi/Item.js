@@ -81,6 +81,21 @@ class Item extends SharedRecordMixin(BaseRecord) {
     return this.type === ITEM_TYPES.CHART
   }
 
+  get originalImageUrl() {
+    const { filestack_file_url } = this
+    if (!filestack_file_url) return ''
+    return filestack_file_url.replace(/resize=width:[0-9]*,fit:max\//, '')
+  }
+
+  imageUrl(width = 1200) {
+    const { filestack_file_url } = this
+    if (!filestack_file_url) return ''
+    return filestack_file_url.replace(
+      /resize=width:[0-9]*/,
+      `resize=width:${width}`
+    )
+  }
+
   API_updateWithoutSync({ cancel_sync } = {}) {
     const { apiStore } = this
     const data = this.toJsonApi()
