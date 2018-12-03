@@ -1,6 +1,8 @@
 class Item
   class FileItem < Item
     has_filestack_file_options required: true
+    # e.g. for replace action
+    before_update :generate_name, unless: :name_present?
 
     def image_url
       filestack_file_url
