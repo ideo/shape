@@ -11,6 +11,8 @@ import {
   VictoryVoronoiContainer,
 } from 'victory'
 
+import OrganicGridPng from '~/assets/organic_grid_black.png'
+import OrganicGrid from '~/ui/icons/OrganicGrid'
 import MeasureSelect from '~/ui/reporting/MeasureSelect'
 import TargetButton from '~/ui/reporting/TargetButton'
 import EditableButton from '~/ui/reporting/EditableButton'
@@ -102,7 +104,8 @@ const ChartContainer = styled.div`
 `
 
 const GraphKey = styled.span`
-  background-color: ${v.colors.tertiaryDark};
+  background: url(${OrganicGridPng});
+  background-size: 150%;
   display: inline-block;
   height: 16px;
   margin-right: 10px;
@@ -319,6 +322,7 @@ class DataItemCover extends React.Component {
         </AboveChartContainer>
         {this.formattedValues.length >= 2 && (
           <ChartContainer>
+            <OrganicGrid />
             <VictoryChart
               theme={theme}
               domainPadding={{ y: 80 }}
@@ -340,7 +344,7 @@ class DataItemCover extends React.Component {
                 labels={d => (d.amount >= this.maxAmount ? d.amount : '')}
                 labelComponent={<CustomLabel maxAmount={this.maxAmount} />}
                 style={{
-                  data: { fill: v.colors.tertiaryDark },
+                  data: { fill: 'url(#organicGrid)' },
                   labels: {
                     fill: 'black',
                   },
