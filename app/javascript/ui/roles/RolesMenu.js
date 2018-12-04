@@ -4,8 +4,10 @@ import PropTypes from 'prop-types'
 import styled from 'styled-components'
 import { action, observable } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
-import { Heading3 } from '~/ui/global/styled/typography'
-import { FormSpacer } from '~/ui/global/styled/forms'
+import { Collapse } from '@material-ui/core'
+import { Heading3, DisplayText } from '~/ui/global/styled/typography'
+import { Row, RowItemLeft } from '~/ui/global/styled/layout'
+import DropdownIcon from '~/ui/icons/DropdownIcon'
 import RolesAdd from '~/ui/roles/RolesAdd'
 import RoleSelect from '~/ui/roles/RoleSelect'
 import { uiStore } from '~/stores'
@@ -27,11 +29,33 @@ const FooterArea = styled.div`
   padding-bottom: 24px;
 `
 
+const StyledRow = styled(Row)`
+  cursor: pointer;
+  margin-left: 0;
+`
+const StyledCollapseToggle = styled.button`
+  .icon {
+    width: 24px;
+    transform: translateY(4px);
+  }
+`
+const StyledExpandToggle = styled.button`
+  .icon {
+    width: 24px;
+    transform: translateY(2px) rotate(-90deg);
+  }
+`
+
 @inject('apiStore', 'routingStore')
 @observer
 class RolesMenu extends React.Component {
   @observable
   searchableItems = []
+
+  constructor(props) {
+    super(props)
+    this.state = {}
+  }
 
   componentDidMount() {
     const { apiStore, ownerType } = this.props
@@ -56,6 +80,38 @@ class RolesMenu extends React.Component {
       this.setSearchableItems([...groups, ...users])
       this.filterSearchableItems()
     })
+  }
+
+  entityGroups(entities) {
+    const groups = [
+      {
+        panelTitle: 'Pending Invitations',
+        startOpen: false,
+        entities: entities.filter(
+          role =>
+            role.entity.internalType === 'users' &&
+            role.entity.status === 'pending'
+        ),
+      },
+      {
+        panelTitle: 'Active Users',
+        startOpen: true,
+        entities: entities.filter(
+          role =>
+            role.entity.internalType !== 'users' ||
+            role.entity.status !== 'pending'
+        ),
+      },
+    ]
+
+    // init state for each group
+    groups.forEach(group => {
+      if (typeof this.state[group.panelTitle] === 'undefined') {
+        this.setState({ [group.panelTitle]: group.startOpen })
+      }
+    })
+
+    return groups
   }
 
   filterSearchableItems() {
@@ -168,6 +224,7 @@ class RolesMenu extends React.Component {
       })
     })
     const sortedRoleEntities = roleEntities.sort(sortUserOrGroup)
+    const entityGroups = this.entityGroups(sortedRoleEntities)
     const roleTypes =
       ownerType === 'groups' ? ['member', 'admin'] : ['editor', 'viewer']
 
@@ -179,28 +236,67 @@ class RolesMenu extends React.Component {
       <Fragment>
         <ScrollArea>
           <Heading3>{title}</Heading3>
-          {sortedRoleEntities.map(
-            combined =>
-              // NOTE: content_editor is a "hidden" role for now
-              combined.role.name !== 'content_editor' && (
-                <RoleSelect
-                  enabled={
-                    canEdit &&
-                    this.notCurrentUser(combined.entity, combined.role)
-                  }
-                  key={`${combined.entity.id}_${
-                    combined.entity.internalType
-                  }_r${combined.role.id}`}
-                  role={combined.role}
-                  roleTypes={roleTypes}
-                  roleLabels={submissionBox ? { viewer: 'participant' } : {}}
-                  entity={combined.entity}
-                  onDelete={this.deleteRoles}
-                  onCreate={this.createRoles}
-                />
-              )
-          )}
-          <FormSpacer />
+          {entityGroups.map(group => {
+            const { panelTitle, entities } = group
+            if (entities.length === 0) return null
+
+            return (
+              <div key={panelTitle}>
+                <StyledRow
+                  align="center"
+                  onClick={() => {
+                    this.setState({
+                      [panelTitle]: !this.state[panelTitle],
+                    })
+                  }}
+                >
+                  <DisplayText>
+                    {panelTitle} ({entities.length})
+                  </DisplayText>
+                  <RowItemLeft style={{ marginLeft: '0px' }}>
+                    {this.state[panelTitle] ? (
+                      <StyledCollapseToggle aria-label="Collapse">
+                        <DropdownIcon />
+                      </StyledCollapseToggle>
+                    ) : (
+                      <StyledExpandToggle aria-label="Expand">
+                        <DropdownIcon />
+                      </StyledExpandToggle>
+                    )}
+                  </RowItemLeft>
+                </StyledRow>
+                <Collapse
+                  in={this.state[panelTitle]}
+                  timeout="auto"
+                  unmountOnExit
+                >
+                  {entities.map(
+                    combined =>
+                      // NOTE: content_editor is a "hidden" role for now
+                      combined.role.name !== 'content_editor' && (
+                        <RoleSelect
+                          enabled={
+                            canEdit &&
+                            this.notCurrentUser(combined.entity, combined.role)
+                          }
+                          key={`${combined.entity.id}_${
+                            combined.entity.internalType
+                          }_r${combined.role.id}`}
+                          role={combined.role}
+                          roleTypes={roleTypes}
+                          roleLabels={
+                            submissionBox ? { viewer: 'participant' } : {}
+                          }
+                          entity={combined.entity}
+                          onDelete={this.deleteRoles}
+                          onCreate={this.createRoles}
+                        />
+                      )
+                  )}
+                </Collapse>
+              </div>
+            )
+          })}
         </ScrollArea>
         {canEdit && (
           <FooterArea>
