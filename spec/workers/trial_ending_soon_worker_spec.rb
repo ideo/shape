@@ -8,6 +8,13 @@ RSpec.describe TrialEndingSoonWorker, type: :worker do
              has_payment_method: false,
              trial_ends_at: 7.days.from_now)
     end
+    let!(:deactivated) do
+      create(:organization,
+             deactivated: true,
+             in_app_billing: true,
+             has_payment_method: false,
+             trial_ends_at: 7.days.from_now)
+    end
     let!(:has_payment_method) do
       create(:organization,
              in_app_billing: false,
@@ -75,6 +82,7 @@ RSpec.describe TrialEndingSoonWorker, type: :worker do
       )
       expect(TrialEndingSoonMailer).not_to receive(:notify).with(has_payment_method)
       expect(TrialEndingSoonMailer).not_to receive(:notify).with(in_app_billing_disabled)
+      expect(TrialEndingSoonMailer).not_to receive(:notify).with(deactivated)
       expect(TrialEndingSoonMailer).not_to receive(:notify).with(trial_ended_2_days_ago)
       expect(TrialEndingSoonMailer).not_to receive(:notify).with(trial_ends_in_1_day)
       expect(TrialEndingSoonMailer).not_to receive(:notify).with(trial_ends_in_3_days)

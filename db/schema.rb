@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20181106065121) do
+ActiveRecord::Schema.define(version: 20181106211944) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
   enable_extension "pg_stat_statements"
@@ -243,6 +243,7 @@ ActiveRecord::Schema.define(version: 20181106065121) do
     t.boolean "sent_high_charges_low_email", default: false, null: false
     t.boolean "sent_high_charges_middle_email", default: false, null: false
     t.boolean "sent_high_charges_high_email", default: false, null: false
+    t.boolean "deactivated", default: false, null: false
     t.index ["slug"], name: "index_organizations_on_slug", unique: true
   end
 

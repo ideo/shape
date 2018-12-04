@@ -14,6 +14,13 @@ RSpec.describe TrialExpiredWorker, type: :worker do
              in_app_billing: false,
              trial_ends_at: 1.day.ago)
     end
+    let!(:deactivated) do
+      create(:organization,
+             trial_expired_email_sent: false,
+             in_app_billing: true,
+             deactivated: true,
+             trial_ends_at: 1.day.ago)
+    end
     let!(:trial_has_not_ended) do
       create(:organization,
              trial_expired_email_sent: false,
@@ -45,6 +52,7 @@ RSpec.describe TrialExpiredWorker, type: :worker do
       expect(TrialExpiredMailer).to receive(:notify).with(should_process_b)
       expect(TrialExpiredMailer).not_to receive(:notify).with(already_sent)
       expect(TrialExpiredMailer).not_to receive(:notify).with(in_app_billing_disabled)
+      expect(TrialExpiredMailer).not_to receive(:notify).with(deactivated)
       expect(TrialExpiredMailer).not_to receive(:notify).with(trial_has_not_ended)
       TrialExpiredWorker.new.perform
     end

@@ -7,6 +7,7 @@ class NetworkCreateUsageRecordWorker
 
       next unless organization.create_network_usage_record &&
                   organization.in_app_billing &&
+                  !organization.deactivated? &&
                   !organization.within_trial_period?
 
       new_active_users_count = organization.reload.active_users_count - active_users_count

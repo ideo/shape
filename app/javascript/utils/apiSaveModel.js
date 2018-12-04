@@ -8,7 +8,7 @@ import { pick } from 'lodash'
 const MODEL_PERSISTED_KEY = 'jsonapiPersisted'
 
 const apiSaveModel = function(model, options) {
-  if (!model.attributesForApi) {
+  if (!model.attributesForAPI) {
     return saveModel(model, options)
   }
   const data = modelToJsonApi(model)

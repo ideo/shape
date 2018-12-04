@@ -44,12 +44,15 @@ class Organization < ApplicationRecord
   after_update :update_network_name, :update_group_names, if: :saved_change_to_name?
   after_update :check_guests_for_domain_match, if: :saved_change_to_domain_whitelist?
   after_update :update_subscription, if: :saved_change_to_in_app_billing?
+  after_update :update_deactivated, if: :saved_change_to_deactivated?
 
   delegate :admins, to: :primary_group
   delegate :members, to: :primary_group
   delegate :handle, to: :primary_group, allow_nil: true
 
   validates :name, presence: true
+
+  scope :billable, -> { where(in_app_billing: true, deactivated: false) }
 
   def can_view?(user)
     primary_group.can_view?(user) || admin_group.can_view?(user) || guest_group.can_view?(user)
@@ -336,6 +339,14 @@ class Organization < ApplicationRecord
       create_network_subscription
     else
       cancel_network_subscription
+    end
+  end
+
+  def update_deactivated
+    if deactivated
+      cancel_network_subscription
+    else
+      create_network_subscription
     end
   end
 end

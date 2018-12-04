@@ -2,8 +2,7 @@ class TrialEndingSoonWorker
   include Sidekiq::Worker
 
   def perform
-    Organization.where(
-      in_app_billing: true,
+    Organization.billable.where(
       has_payment_method: false,
     ).where(
       'trial_ends_at < ?', 15.days.from_now

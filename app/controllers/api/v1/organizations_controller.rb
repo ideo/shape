@@ -37,6 +37,7 @@ class Api::V1::OrganizationsController < Api::V1::BaseController
       :domain,
       :whitelist,
       :handle,
+      :deactivated,
       filestack_file_attributes: Group.filestack_file_attributes_whitelist,
     ]
     params_allowed << :in_app_billing if current_user.has_role?(Role::SUPER_ADMIN)

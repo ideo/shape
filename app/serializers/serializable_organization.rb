@@ -1,6 +1,6 @@
 class SerializableOrganization < BaseJsonSerializer
   type 'organizations'
-  attributes :name, :domain_whitelist, :slug, :active_users_count, :trial_users_count, :in_app_billing
+  attributes :name, :domain_whitelist, :slug, :active_users_count, :trial_users_count, :in_app_billing, :deactivated
   belongs_to :primary_group
   belongs_to :guest_group
   belongs_to :admin_group

@@ -18,6 +18,15 @@ RSpec.describe TrialUsersCountExceededWorker, type: :worker do
              active_users_count: 10,
              trial_users_count: 5)
     end
+    let!(:deactivated) do
+      create(:organization,
+             trial_users_count_exceeded_email_sent: false,
+             in_app_billing: true,
+             deactivated: true,
+             trial_ends_at: 1.day.ago,
+             active_users_count: 10,
+             trial_users_count: 5)
+    end
     let!(:trial_has_not_ended) do
       create(:organization,
              trial_users_count_exceeded_email_sent: false,
@@ -61,6 +70,7 @@ RSpec.describe TrialUsersCountExceededWorker, type: :worker do
       expect(TrialUsersCountExceededMailer).to receive(:notify).with(should_process_b)
       expect(TrialUsersCountExceededMailer).not_to receive(:notify).with(already_sent)
       expect(TrialUsersCountExceededMailer).not_to receive(:notify).with(in_app_billing_disabled)
+      expect(TrialUsersCountExceededMailer).not_to receive(:notify).with(deactivated)
       expect(TrialUsersCountExceededMailer).not_to receive(:notify).with(trial_has_not_ended)
       expect(TrialUsersCountExceededMailer).not_to receive(:notify).with(trial_users_count_not_exceeding)
       TrialUsersCountExceededWorker.new.perform

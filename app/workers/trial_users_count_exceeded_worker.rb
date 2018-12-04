@@ -2,9 +2,8 @@ class TrialUsersCountExceededWorker
   include Sidekiq::Worker
 
   def perform
-    Organization.where(
+    Organization.billable.where(
       trial_users_count_exceeded_email_sent: false,
-      in_app_billing: true,
     ).where(
       'trial_ends_at < ?', Time.current
     ).where(

@@ -45,6 +45,19 @@ RSpec.describe NetworkCreateUsageRecordWorker, type: :worker do
         organization
       end
 
+      let(:deactivated) do
+        organization = create(:organization,
+                              deactivated: true,
+                              in_app_billing: true,
+                              trial_ends_at: 1.day.ago,
+                              active_users_count: 10)
+        allow(organization).to receive(:create_network_usage_record) do
+          organization.update_attributes(active_users_count: 15)
+          true
+        end
+        organization
+      end
+
       let(:within_trial_period) do
         organization = create(:organization,
                               in_app_billing: true,
@@ -111,6 +124,13 @@ RSpec.describe NetworkCreateUsageRecordWorker, type: :worker do
       it 'does not send a notification when in app billing is disabled' do
         allow(Organization).to receive(:find_each)
           .and_yield(in_app_billing_disabled)
+        expect(BillingChangesMailer).not_to receive(:notify)
+        NetworkCreateUsageRecordWorker.new.perform
+      end
+
+      it 'does not send a notification when in organization is deactivated' do
+        allow(Organization).to receive(:find_each)
+          .and_yield(deactivated)
         expect(BillingChangesMailer).not_to receive(:notify)
         NetworkCreateUsageRecordWorker.new.perform
       end

@@ -6,8 +6,7 @@ class ChargesLimitWorker
   HIGH = 9500 / Organization::PRICE_PER_USER
 
   def perform
-    Organization.where(
-      in_app_billing: true,
+    Organization.billable.where(
       active_users_count: LOW...MIDDLE,
       sent_high_charges_low_email: false,
     ).find_each do |organization|
@@ -15,8 +14,7 @@ class ChargesLimitWorker
       organization.update_attributes!(sent_high_charges_low_email: true)
     end
 
-    Organization.where(
-      in_app_billing: true,
+    Organization.billable.where(
       active_users_count: MIDDLE...HIGH,
       sent_high_charges_middle_email: false,
     ).find_each do |organization|
@@ -24,8 +22,7 @@ class ChargesLimitWorker
       organization.update_attributes!(sent_high_charges_middle_email: true)
     end
 
-    Organization.where(
-      in_app_billing: true,
+    Organization.billable.where(
       sent_high_charges_high_email: false,
     ).where(
       Organization.arel_table[:active_users_count].gteq(HIGH),
