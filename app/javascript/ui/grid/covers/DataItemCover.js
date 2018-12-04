@@ -74,13 +74,17 @@ const StyledDataItemCover = styled.div`
   padding: 15px 0;
   text-align: left;
 
-  .measure {
+  .editableMetric {
     ${props =>
       props.editable &&
       `
-      &:hover {
-        background-color: ${v.colors.primaryLight};
-      }
+    &:hover {
+      background-color: ${v.colors.primaryLight};
+    }
+    ${props.editing &&
+      `
+      background-color: ${v.colors.primaryLight};
+`};
 `};
   }
 `
@@ -152,28 +156,32 @@ class DataItemCover extends React.Component {
     )
     if (this.editing) {
       timeframeControl = (
-        <MeasureSelect
-          dataSettingsName="timeframe"
-          item={item}
-          onSelect={this.onSelectTimeframe}
-        />
+        <span className="editableMetric">
+          <MeasureSelect
+            dataSettingsName="timeframe"
+            item={item}
+            onSelect={this.onSelectTimeframe}
+          />
+        </span>
       )
       measureControl = (
-        <MeasureSelect
-          dataSettingsName="measure"
-          item={item}
-          onSelect={this.onSelectMeasure}
-        />
+        <span className="editableMetric">
+          <MeasureSelect
+            dataSettingsName="measure"
+            item={item}
+            onSelect={this.onSelectMeasure}
+          />
+        </span>
       )
     } else if (editable) {
       timeframeControl = (
         <EditableButton editable={editable} onClick={this.handleEditClick}>
-          {data_settings.d_timeframe}
+          <span className="editableMetric">{data_settings.d_timeframe}</span>
         </EditableButton>
       )
       measureControl = (
         <EditableButton editable={editable} onClick={this.handleEditClick}>
-          {data_settings.d_measure}
+          <span className="editableMetric">{data_settings.d_measure}</span>
         </EditableButton>
       )
     }
@@ -278,12 +286,8 @@ class DataItemCover extends React.Component {
     const { item } = this.props
     return (
       <Fragment>
-        <Heading3
-          className="measure"
-          onClick={this.handleEditClick}
-          style={{ marginBottom: 0 }}
-        >
-          {item.data_settings.d_measure}
+        <Heading3 onClick={this.handleEditClick} style={{ marginBottom: 0 }}>
+          <span className="editableMetric">{item.data_settings.d_measure}</span>
         </Heading3>
         {this.editing && (
           <MeasureSelect
@@ -362,6 +366,7 @@ class DataItemCover extends React.Component {
       <StyledDataItemCover
         className="cancelGridClick"
         editable={item.can_edit_content}
+        editing={this.editing}
       >
         {item.data_settings.d_timeframe === 'ever'
           ? this.renderSingleValue()
