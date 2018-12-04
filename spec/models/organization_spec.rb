@@ -350,7 +350,7 @@ describe Organization, type: :model do
         expect(NetworkApi::Organization).to have_received(:create).with(
           external_id: organization.id,
           name: organization.name,
-          admin_user_uid: nil,
+          admin_user_uid: '',
         )
       end
     end
