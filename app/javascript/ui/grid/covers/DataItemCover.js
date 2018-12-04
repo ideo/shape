@@ -358,15 +358,22 @@ class DataItemCover extends React.Component {
     const { item } = this.props
     return (
       <Fragment>
-        <Heading3 onClick={this.handleEditClick} style={{ marginBottom: 0 }}>
-          <span className="editableMetric">{item.data_settings.d_measure}</span>
-        </Heading3>
-        {this.editing && (
-          <MeasureSelect
-            dataSettingsName="measure"
-            item={item}
-            onSelect={this.onSelectMeasure}
-          />
+        {!this.editing ? (
+          <Heading3 onClick={this.handleEditClick} style={{ marginBottom: 0 }}>
+            <span className="editableMetric">
+              {item.data_settings.d_measure}
+            </span>
+          </Heading3>
+        ) : (
+          <Heading3>
+            <span className="editableMetric">
+              <MeasureSelect
+                dataSettingsName="measure"
+                item={item}
+                onSelect={this.onSelectMeasure}
+              />
+            </span>
+          </Heading3>
         )}
         <HugeNumber className="count">{item.data.value}</HugeNumber>
         <SmallHelperText color={v.colors.black}>

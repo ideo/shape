@@ -212,7 +212,7 @@ export const Select = styled(MuiSelect)`
   font-size: ${props => (props.inline ? 'inherit !important' : '1rem')};
   font-weight: ${props =>
     props.inline ? 'inherit !important' : v.weights.book};
-  letter-spacing: 0;
+  letter-spacing: ${props => (props.inline ? 'inherit !important' : '1px')};;
   ${props =>
     props.inline &&
     `
