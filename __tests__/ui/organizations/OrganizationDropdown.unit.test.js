@@ -23,7 +23,13 @@ describe('OrganizationDropdown', () => {
       routingStore,
       uiStore: fakeUiStore,
     }
-    itemNames = ['People & Groups', 'New Organization', 'Settings', 'Legal']
+    itemNames = [
+      'People & Groups',
+      'New Organization',
+      'Settings',
+      'Billing',
+      'Legal',
+    ]
     wrapper = shallow(<OrganizationDropdown.wrappedComponent {...props} />)
     component = wrapper.instance()
     props.uiStore.alert.mockClear()
@@ -84,6 +90,12 @@ describe('OrganizationDropdown', () => {
           component.menuItems.bottom.find(item => item.name === 'Settings')
         ).toBeFalsy()
       })
+
+      it('should not show the billing link', () => {
+        expect(
+          component.menuItems.bottom.find(item => item.name === 'Billing')
+        ).toBeFalsy()
+      })
     })
   })
 
@@ -105,6 +117,20 @@ describe('OrganizationDropdown', () => {
       // findOrganizationById to lookup the name for the confirm dialog
       expect(props.apiStore.findOrganizationById).toHaveBeenCalledWith(orgId)
       expect(props.uiStore.confirm).toHaveBeenCalled()
+    })
+  })
+
+  describe('handleBilling', () => {
+    beforeEach(() => {
+      component.handleBilling()
+    })
+
+    it('should call the on item click handler', () => {
+      expect(props.onItemClick).toHaveBeenCalled()
+    })
+
+    it('should route to the billing page', () => {
+      expect(props.routingStore.routeTo).toHaveBeenCalledWith('/billing')
     })
   })
 

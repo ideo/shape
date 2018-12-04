@@ -46,5 +46,13 @@ FactoryBot.define do
         user.reset_cached_roles!
       end
     end
+
+    trait :recently_active do
+      last_active_at((Organization::RECENTLY_ACTIVE_RANGE - 1.day).ago)
+    end
+
+    trait :not_recently_active do
+      last_active_at((Organization::RECENTLY_ACTIVE_RANGE + 1.day).ago)
+    end
   end
 end

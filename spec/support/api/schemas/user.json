@@ -1,14 +1,15 @@
 {
   "type": "object",
   "properties": {
-    "first_name": { "type": "string" },
-    "last_name": { "type": "string" },
+    "created_at": { "type": "date" },
     "email": { "type": "string" },
-    "status": { "type": "string" },
-    "pic_url_square": { "type": "string" },
+    "first_name": { "type": "string" },
     "handle": { "type": "string" },
-    "user_profile_collection_id": { "type": ["string", "null"] },
-    "created_at": { "type": "date" }
+    "is_super_admin": { "type": "boolean" },
+    "last_name": { "type": "string" },
+    "pic_url_square": { "type": "string" },
+    "status": { "type": "string" },
+    "user_profile_collection_id": { "type": ["string", "null"] }
   },
   "required": ["email", "first_name", "last_name", "status"]
 }

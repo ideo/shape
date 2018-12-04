@@ -100,7 +100,16 @@ class TermsOfUseModal extends React.Component {
 
   render() {
     const { currentUser } = this.props
+    const organization = currentUser.current_organization
+    const showBillingInformation =
+      !organization ||
+      (organization &&
+        organization.in_app_billing &&
+        organization.primary_group.can_edit)
     const displayError = this.submitted && !this.termsChecked
+    const trialUsersCount =
+      (organization && organization.trial_users_count) || 25
+    const trialPricePerUser = (organization && organization.price_per_user) || 5
     return (
       <StyledDialog
         classes={{ root: 'root__dialog', paper: 'modal__paper' }}
@@ -114,7 +123,9 @@ class TermsOfUseModal extends React.Component {
             <StyledLogo width={128} />
             <Heading1 wrapLine>Hello {currentUser.first_name}!</Heading1>
             <p>
-              Welcome to Shape. Before you proceed, please take a moment to
+              {showBillingInformation
+                ? `Welcome to your 3 month free trial of Shape. The first ${trialUsersCount} people who use Shape at your organization will be free for the first 6 months. Shape licenses are $${trialPricePerUser} per person per month. Please take a moment to`
+                : 'Welcome to Shape. Before you proceed, please take a moment to'}{' '}
               review our{' '}
               <Link target="_blank" to="/terms">
                 Terms of Use

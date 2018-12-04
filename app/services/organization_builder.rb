@@ -1,23 +1,29 @@
 class OrganizationBuilder
   attr_reader :organization, :errors
 
-  def initialize(params, user, with_templates: true)
+  def initialize(params, user, full_setup: true)
     @organization = Organization.new(name: params[:name])
     @errors = @organization.errors
     @user = user
     @params = params
     # mainly just in tests that we don't need this overhead
-    @with_templates = with_templates
+    @full_setup = full_setup
   end
 
   def save
     @organization.transaction do
+      @organization.trial_ends_at = Organization::DEFAULT_TRIAL_ENDS_AT.from_now
+      @organization.trial_users_count = Organization::DEFAULT_TRIAL_USERS_COUNT
       @organization.save!
       update_primary_group!
       add_role
       setup_user_membership_and_collections
+      if @full_setup
+        create_templates
+        create_network_organization
+        create_network_subscription
+      end
     end
-    create_templates if @with_templates
     true
   rescue ActiveRecord::RecordInvalid
     # invalid params, transaction will be rolled back
@@ -45,5 +51,17 @@ class OrganizationBuilder
     # call this additionally to create the UserProfile and Getting Started after the templates have been created
     # TODO: ensure that the user template creator doesn't get called at this point
     @organization.setup_user_membership(@user)
+  end
+
+  def create_network_organization
+    @organization.create_network_organization(@user)
+  rescue JsonApiClient::Errors::ApiError
+    raise ActiveRecord::Rollback
+  end
+
+  def create_network_subscription
+    @organization.create_network_subscription
+  rescue JsonApiClient::Errors::ApiError
+    raise ActiveRecord::Rollback
   end
 end

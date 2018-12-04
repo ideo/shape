@@ -7,7 +7,7 @@ const StyledContainer = styled.main`
   display: block;
   max-width: ${v.maxWidth}px;
   margin: ${props => props.marginTop}px auto 0;
-  padding: 0 ${v.containerPadding.horizontal};
+  padding: 0 ${v.containerPadding.horizontal}rem;
   position: relative;
 `
 

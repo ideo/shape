@@ -21,6 +21,14 @@ const StyledDialog = styled(Dialog)`
   .modal__padding {
     padding-left: 45px;
   }
+  .modal__no-scroll {
+    padding-top: 0px;
+    padding-bottom: 0px;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: hidden;
+    display: flex;
+    flex-direction: column;
+  }
 `
 
 const StyledDialogTitle = styled(DialogTitle)`
@@ -101,6 +109,7 @@ class Modal extends React.Component {
       open,
       title,
       disableBackdropClick,
+      noScroll,
     } = this.props
     let wrappedTitle = title
     if (typeof title === 'string') {
@@ -140,7 +149,11 @@ class Modal extends React.Component {
         >
           {wrappedTitle}
         </StyledDialogTitle>
-        <DialogContent classes={{ root: 'modal__padding' }}>
+        <DialogContent
+          classes={{
+            root: ['modal__padding', noScroll && 'modal__no-scroll'].join(' '),
+          }}
+        >
           {children}
         </DialogContent>
       </StyledDialog>
@@ -154,6 +167,7 @@ Modal.propTypes = {
   open: PropTypes.bool,
   onBack: PropTypes.func,
   disableBackdropClick: PropTypes.bool,
+  noScroll: PropTypes.bool,
 }
 
 Modal.defaultProps = {
@@ -162,6 +176,7 @@ Modal.defaultProps = {
   open: false,
   onBack: null,
   disableBackdropClick: false,
+  noScroll: false,
 }
 
 export default Modal

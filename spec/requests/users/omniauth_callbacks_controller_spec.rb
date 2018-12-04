@@ -47,6 +47,27 @@ describe Users::OmniauthCallbacksController, type: :request do
       expect(User.find_by_uid(user.uid)).not_to be_nil
     end
 
+    context 'pending user is an admin of current organization' do
+      let!(:pending_user) do
+        organization = create(:organization)
+        create(:user, :pending, current_organization: organization)
+      end
+
+      before do
+        get('/invitations', params: { token: pending_user.invitation_token })
+      end
+
+      it 'adds the user as a network admin' do
+        allow(pending_user).to receive(:add_network_admin)
+        post(path)
+        expect(pending_user).not_to have_received(:add_network_admin)
+
+        pending_user.add_role(Role::ADMIN, pending_user.current_organization.admin_group)
+        post(path)
+        expect(pending_user).to have_received(:add_network_admin)
+      end
+    end
+
     context 'with updated email and pic' do
       let!(:email) { 'newemail@user.com' }
       let!(:picture) { 'newpic.jpg' }

@@ -451,6 +451,40 @@ describe User, type: :model do
     end
   end
 
+  context 'network admin management' do
+    let(:user) { create(:user) }
+
+    before do
+      allow(NetworkOrganizationUserSyncWorker).to receive(:perform_async)
+    end
+
+    describe '#add_network_admin' do
+      it 'returns early when the user uid is not set' do
+        pending_user = create(:user, :pending)
+        expect(NetworkOrganizationUserSyncWorker).not_to receive(:perform_async)
+        expect(pending_user.add_network_admin).to be true
+      end
+
+      it 'uses the network api to add the user as org admin' do
+        user.add_network_admin
+        expect(NetworkOrganizationUserSyncWorker).to have_received(:perform_async).with(user.uid, user.id, NetworkApi::Organization::ADMIN_ROLE, :add)
+      end
+    end
+
+    describe '#remove_network_admin' do
+      it 'returns early when the user uid is not set' do
+        pending_user = create(:user, :pending)
+        expect(NetworkOrganizationUserSyncWorker).not_to receive(:perform_async)
+        expect(pending_user.add_network_admin).to be true
+      end
+
+      it 'uses the network api to remove the user as org admin' do
+        user.remove_network_admin
+        expect(NetworkOrganizationUserSyncWorker).to have_received(:perform_async).with(user.uid, user.id, NetworkApi::Organization::ADMIN_ROLE, :remove)
+      end
+    end
+  end
+
   describe '#in_my_collection' do
     let(:user_collection) { create(:user_collection) }
     let(:card_in_collection) { create(:collection_card_collection, parent: user_collection) }

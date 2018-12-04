@@ -1,4 +1,5 @@
 import SearchPage from '~/ui/pages/SearchPage'
+import Deactivated from '~/ui/layout/Deactivated'
 import fakeApiStore from '#/mocks/fakeApiStore'
 import fakeUiStore from '#/mocks/fakeUiStore'
 import fakeRoutingStore from '#/mocks/fakeRoutingStore'
@@ -40,5 +41,23 @@ describe('SearchPage', () => {
         .at(0)
         .text()
     ).toContain(`No results found for "${query}".`)
+  })
+
+  describe('organization is deactivated', () => {
+    beforeEach(() => {
+      wrapper.setProps({
+        apiStore: {
+          currentUser: {
+            current_organization: {
+              deactivated: true,
+            },
+          },
+        },
+      })
+    })
+
+    it('renders the Deactivated component', () => {
+      expect(wrapper.equals(<Deactivated />)).toEqual(true)
+    })
   })
 })

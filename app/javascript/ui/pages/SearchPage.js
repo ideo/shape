@@ -7,6 +7,7 @@ import v from '~/utils/variables'
 import PageWithApi from '~/ui/pages/PageWithApi'
 import Loader from '~/ui/layout/Loader'
 import Header from '~/ui/layout/Header'
+import Deactivated from '~/ui/layout/Deactivated'
 import MoveModal from '~/ui/grid/MoveModal'
 import PageContainer from '~/ui/layout/PageContainer'
 import SearchResultsInfinite from '~/ui/search/SearchResultsInfinite'
@@ -117,6 +118,10 @@ class SearchPage extends PageWithApi {
   }
 
   render() {
+    if (this.props.apiStore.currentUser.current_organization.deactivated) {
+      return <Deactivated />
+    }
+
     return (
       <Fragment>
         <Header />

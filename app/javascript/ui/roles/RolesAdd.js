@@ -210,7 +210,7 @@ class RolesAdd extends React.Component {
   render() {
     const { roleTypes } = this.props
     return (
-      <div style={{ marginBottom: '1rem' }}>
+      <div>
         {this.loading && <InlineLoader />}
         {this.renderPillList()}
         <Row>
@@ -237,10 +237,10 @@ class RolesAdd extends React.Component {
             </RowItemRight>
           </RightAligner>
         </Row>
-        <Row style={{ marginBottom: '4rem' }}>
+        <Row>
           <EmailCSVUploader onComplete={this.handleEmailInput} />
         </Row>
-        <FormActionsContainer>
+        <FormActionsContainer style={{ paddingBottom: '0' }}>
           <FormButton
             onClick={this.confirmSave}
             disabled={this.selectedUsers.length === 0}

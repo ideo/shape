@@ -95,6 +95,11 @@ class OrganizationDropdown extends React.Component {
     this.props.routingStore.routeTo('/settings')
   }
 
+  handleBilling = ev => {
+    this.props.onItemClick()
+    this.props.routingStore.routeTo('/billing')
+  }
+
   handleLegal = ev => {
     this.props.onItemClick()
     this.props.routingStore.routeTo('/terms')
@@ -160,11 +165,16 @@ class OrganizationDropdown extends React.Component {
       ],
     }
     // put this in the middle at index 1
-    if (userCanEdit)
+    if (userCanEdit) {
+      items.bottom.splice(1, 0, {
+        name: 'Billing',
+        onClick: this.handleBilling,
+      })
       items.bottom.splice(1, 0, {
         name: 'Settings',
         onClick: this.handleOrgSettings,
       })
+    }
     return items
   }
 
