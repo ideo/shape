@@ -8,6 +8,7 @@ import v from '~/utils/variables'
 class MarketingRoutes extends React.Component {
   theme = createMuiTheme({
     typography: {
+      useNextVariants: true,
       // Use the Shape font instead of the default Roboto font.
       fontFamily: v.fonts.sans,
     },
