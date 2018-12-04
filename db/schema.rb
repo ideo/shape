@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20181114015125) do
+ActiveRecord::Schema.define(version: 20181204090132) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -30,6 +30,7 @@ ActiveRecord::Schema.define(version: 20181114015125) do
     t.string "destination_type"
     t.bigint "destination_id"
     t.index ["actor_id"], name: "index_activities_on_actor_id"
+    t.index ["created_at"], name: "index_activities_on_created_at"
     t.index ["destination_type", "destination_id"], name: "index_activities_on_destination_type_and_destination_id"
     t.index ["organization_id"], name: "index_activities_on_organization_id"
     t.index ["source_type", "source_id"], name: "index_activities_on_source_type_and_source_id"

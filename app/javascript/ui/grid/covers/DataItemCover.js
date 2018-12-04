@@ -1,6 +1,7 @@
 import { Fragment } from 'react'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import { runInAction, computed } from 'mobx'
+import moment from 'moment-mini'
 import styled from 'styled-components'
 import {
   VictoryArea,
@@ -106,21 +107,6 @@ const GraphKey = styled.span`
   width: 16px;
 `
 
-const shortMonths = [
-  'Jan',
-  'Feb',
-  'Mar',
-  'Apr',
-  'May',
-  'Jun',
-  'Jul',
-  'Aug',
-  'Sep',
-  'Oct',
-  'Nov',
-  'Dec',
-]
-
 // eslint-disable-next-line react/no-multi-comp
 @inject('uiStore')
 @observer
@@ -214,6 +200,8 @@ class DataItemCover extends React.Component {
   }
 
   onSelectMeasure = value => {
+    // don't allow setting null measure
+    if (!value) return
     this.saveSettings({
       d_measure: value,
     })
@@ -261,7 +249,10 @@ class DataItemCover extends React.Component {
     if (!values) return []
     return values.map(value =>
       Object.assign({}, value, {
-        date: shortMonths[new Date(value.date).getMonth() + 1],
+        date: moment(`${value.date} 00+0000`)
+          .utc()
+          .subtract(1, 'months')
+          .format('MMM'),
       })
     )
   }

@@ -17,7 +17,7 @@ class DataReport < SimpleService
   def call
     @query = generate_base_query
     return unless @query
-
+    @query = filtered_query
     calculate
     @data
   end
@@ -57,19 +57,35 @@ class DataReport < SimpleService
   def calculate
     case @measure
     when 'participants', 'viewers'
-      @data[:value] = @query
-                      .select(:actor_id)
-                      .distinct
-                      .count
-
-      # TODO: sql injection?
       if @timeframe && @timeframe != 'ever'
-        @data[:values] = @query
-                         .select(:actor_id)
-                         .distinct
-                         .group("date_trunc('#{@timeframe}', activities.created_at) ")
-                         .count
-                         .map { |k, v| { date: k, amount: v } }
+        min = [@query.select('min(activities.created_at)').to_a.first.min, 6.months.ago].max
+        query = %{
+          SELECT
+              series.date,
+              (
+                SELECT COUNT(DISTINCT(actor_id))
+                  FROM (#{@query.select(:actor_id, :created_at).to_sql}) mod_activities
+                  WHERE
+                    created_at BETWEEN series.date - INTERVAL '1 month' AND series.date
+              )
+          FROM
+            GENERATE_SERIES(
+              ('#{min.beginning_of_month}'::DATE + INTERVAL '1 month'),
+              date_trunc('MONTH', now() + INTERVAL '1 month')::DATE,
+              INTERVAL '1 month'
+            ) AS series
+          ORDER BY series.date;
+        }
+        values = Activity.connection.execute(query)
+                         .map { |val| { date: val['date'], amount: val['count'] } }
+
+        @data[:values] = values
+      else
+        @data[:value] = @query
+                        .select(:actor_id)
+                        .distinct
+                        .count
+
       end
     end
   end
