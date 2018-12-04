@@ -48,6 +48,11 @@ describe Api::V1::UsersController, type: :request, json: true, auth: true, creat
       allow(GoogleAuthService).to receive(:create_custom_token).and_return('token')
     end
 
+    it 'updates the users last_active_at timestamp' do
+      expect { get(path) }.to change(user, :last_active_at)
+      expect(user.last_active_at).to be_within(1.second).of(Time.current)
+    end
+
     it 'returns a 200' do
       get(path)
       expect(response.status).to eq(200)

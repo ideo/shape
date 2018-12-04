@@ -1,9 +1,11 @@
+import { apiUrl } from '~/utils/url'
+
 import BaseRecord from './BaseRecord'
 
 class Role extends BaseRecord {
   static type = 'roles'
   static endpoint(collectionId) {
-    return `collections/${collectionId}/roles`
+    return apiUrl(`collections/${collectionId}/roles`)
   }
 
   get label() {

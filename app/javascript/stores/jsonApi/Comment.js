@@ -1,7 +1,13 @@
 import { observable, action } from 'mobx'
+
+import { apiUrl } from '~/utils/url'
+
 import BaseRecord from './BaseRecord'
 
 class Comment extends BaseRecord {
+  static type = 'comments'
+  static endpoint = apiUrl('comments')
+
   @observable
   unread = false
 
@@ -15,8 +21,6 @@ class Comment extends BaseRecord {
     this.unread = false
   }
 }
-
-Comment.type = 'comments'
 
 Comment.defaults = {
   draftjs_data: {},

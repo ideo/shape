@@ -10,8 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20181106065121) do
-
+ActiveRecord::Schema.define(version: 20181106211944) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
   enable_extension "pg_stat_statements"
@@ -231,7 +230,20 @@ ActiveRecord::Schema.define(version: 20181106065121) do
     t.integer "profile_template_id"
     t.integer "profile_collection_id"
     t.string "slug"
+    t.string "network_subscription_id"
+    t.integer "active_users_count", default: 0, null: false
+    t.datetime "trial_ends_at"
+    t.integer "trial_users_count", default: 0, null: false
+    t.boolean "in_app_billing", default: true, null: false
+    t.boolean "trial_users_count_exceeded_email_sent", default: false, null: false
+    t.boolean "trial_expired_email_sent", default: false, null: false
+    t.datetime "overdue_at"
+    t.boolean "has_payment_method", default: false, null: false
     t.integer "getting_started_collection_id"
+    t.boolean "sent_high_charges_low_email", default: false, null: false
+    t.boolean "sent_high_charges_middle_email", default: false, null: false
+    t.boolean "sent_high_charges_high_email", default: false, null: false
+    t.boolean "deactivated", default: false, null: false
     t.index ["slug"], name: "index_organizations_on_slug", unique: true
   end
 
@@ -324,6 +336,7 @@ ActiveRecord::Schema.define(version: 20181106065121) do
     t.datetime "last_notification_mail_sent"
     t.boolean "show_move_helper", default: true
     t.boolean "show_template_helper", default: true
+    t.datetime "last_active_at"
     t.boolean "mailing_list", default: false
     t.index ["email"], name: "index_users_on_email"
     t.index ["handle"], name: "index_users_on_handle", unique: true

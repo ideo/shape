@@ -20,6 +20,9 @@ class SerializableGroup < BaseJsonSerializer
   has_many :roles
 
   attribute :can_edit do
-    @current_ability.can?(:edit, @object)
+    # we do not use the ability here because this should work before
+    # the terms have been accepted, to have conditional messaging on
+    # the front end
+    @object.can_edit? @current_user
   end
 end

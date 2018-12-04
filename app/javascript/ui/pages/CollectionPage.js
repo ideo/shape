@@ -10,6 +10,7 @@ import ChannelManager from '~/utils/ChannelManager'
 import CollectionGrid from '~/ui/grid/CollectionGrid'
 import FloatingActionButton from '~/ui/global/FloatingActionButton'
 import Loader from '~/ui/layout/Loader'
+import Deactivated from '~/ui/layout/Deactivated'
 import MoveModal from '~/ui/grid/MoveModal'
 import PageContainer from '~/ui/layout/PageContainer'
 import PageError from '~/ui/global/PageError'
@@ -22,6 +23,7 @@ import EditorPill from '~/ui/items/EditorPill'
 import TestDesigner from '~/ui/test_collections/TestDesigner'
 import v from '~/utils/variables'
 import Collection from '~/stores/jsonApi/Collection'
+import OverdueBanner from '~/ui/layout/OverdueBanner'
 
 // more global way to do this?
 pluralize.addPluralRule(/canvas$/i, 'canvases')
@@ -307,6 +309,9 @@ class CollectionPage extends PageWithApi {
   )
 
   render() {
+    if (this.props.apiStore.currentUser.current_organization.deactivated) {
+      return <Deactivated />
+    }
     // this.error comes from PageWithApi
     if (this.error) return <PageError error={this.error} />
     const { collection } = this
@@ -337,6 +342,7 @@ class CollectionPage extends PageWithApi {
         <PageHeader record={collection} isHomepage={this.isHomepage} />
         {!isLoading && (
           <PageContainer>
+            <OverdueBanner />
             {this.renderEditorPill}
             {requiresTestDesigner && this.renderTestDesigner()}
             {!requiresTestDesigner && (

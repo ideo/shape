@@ -32,11 +32,15 @@ class Api::V1::OrganizationsController < Api::V1::BaseController
   private
 
   def organization_params
-    params.require(:organization).permit(
+    params_allowed = [
       :name,
-      :domain_whitelist,
+      :domain,
+      :whitelist,
       :handle,
+      :deactivated,
       filestack_file_attributes: Group.filestack_file_attributes_whitelist,
-    )
+    ]
+    params_allowed << :in_app_billing if current_user.has_role?(Role::SUPER_ADMIN)
+    params.require(:organization).permit(params_allowed)
   end
 end

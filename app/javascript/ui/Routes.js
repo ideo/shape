@@ -3,7 +3,6 @@ import { Switch, Route, Redirect, withRouter } from 'react-router-dom'
 import { MuiThemeProvider } from '@material-ui/core/styles'
 import WindowSizeListener from 'react-window-size-listener'
 import styled from 'styled-components'
-
 import ActivityLogBox from '~/ui/activity_log/ActivityLogBox'
 import DialogWrapper from '~/ui/global/modals/DialogWrapper'
 import ErrorBoundary from '~/ui/global/ErrorBoundary'
@@ -15,6 +14,8 @@ import Loader from '~/ui/layout/Loader'
 import SearchPage from '~/ui/pages/SearchPage'
 import SettingsPage from '~/ui/pages/SettingsPage'
 import TermsPage from '~/ui/pages/TermsPage'
+import BillingPage from '~/ui/pages/BillingPage'
+import BillingStatement from '~/ui/pages/BillingStatement'
 import TermsOfUseModal from '~/ui/users/TermsOfUseModal'
 import initZendesk from '~/vendor/zendesk'
 import OrganizationSettings from '~/ui/organizations/OrganizationSettings'
@@ -109,6 +110,8 @@ class Routes extends React.Component {
               <Route path="/search" component={SearchPage} />
               <Route path="/:org/search" component={SearchPage} />
               <Route path="/terms" component={TermsPage} />
+              <Route path="/billing" component={BillingPage} />
+              <Route path="/print/invoices/:id" component={BillingStatement} />
               <Route
                 path="/settings"
                 render={() => (

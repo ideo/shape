@@ -1,13 +1,18 @@
 import { ReferenceType } from 'datx'
 import { action } from 'mobx'
 
+import { apiUrl } from '~/utils/url'
 import trackError from '~/utils/trackError'
+
 import BaseRecord from './BaseRecord'
 import Collection from './Collection'
 import Item from './Item'
 import Group from './Group'
 
 class Activity extends BaseRecord {
+  static type = 'activities'
+  static endpoint = apiUrl('activities')
+
   @action
   setTarget(value) {
     let model
@@ -47,7 +52,6 @@ class Activity extends BaseRecord {
   }
 }
 
-Activity.type = 'activities'
 Activity.defaults = {
   target: undefined,
 }

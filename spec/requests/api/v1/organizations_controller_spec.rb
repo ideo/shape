@@ -3,6 +3,116 @@ require 'rails_helper'
 describe Api::V1::OrganizationsController, type: :request, json: true, auth: true do
   let(:user) { @user }
 
+  context 'serialzable organization' do
+    let!(:organization) { create(:organization) }
+    let(:path) { '/api/v1/organizations/current' }
+
+    before do
+      user.update_attributes(current_organization: organization)
+    end
+
+    describe '#is_within_trial_period' do
+      context 'trial already ended' do
+        it 'is false' do
+          organization.update_attributes(trial_ends_at: 1.day.ago)
+          get(path)
+          expect(json['data']['attributes']['is_within_trial_period']).to eq(false)
+        end
+      end
+
+      context 'trial ending in the future' do
+        it 'is true' do
+          organization.update_attributes(trial_ends_at: 1.day.from_now)
+          get(path)
+          expect(json['data']['attributes']['is_within_trial_period']).to eq(true)
+        end
+      end
+    end
+
+    describe '#price_per_user' do
+      it 'pulls price per user from the Organization constant' do
+        get(path)
+        expect(json['data']['attributes']['price_per_user']).to eq(Organization::PRICE_PER_USER)
+      end
+    end
+
+    describe '#current_billing_period_start' do
+      it 'should be the start of the current month' do
+        get(path)
+        expect(json['data']['attributes']['current_billing_period_start']).to eq(Time.now.utc.beginning_of_month.to_s)
+      end
+    end
+
+    describe '#current_billing_period_end' do
+      it 'should be the end of the current month' do
+        get(path)
+        expect(json['data']['attributes']['current_billing_period_end']).to eq(Time.now.utc.end_of_month.to_s)
+      end
+    end
+
+    describe '#trial_ends_at' do
+      context 'trial_ends_at is not set' do
+        it 'is nil' do
+          organization.update_attributes(trial_ends_at: nil)
+          get(path)
+          expect(json['data']['attributes']['trial_ends_at']).to eq(nil)
+        end
+      end
+
+      context 'trial_ends_at is set' do
+        it 'includes a formatted date' do
+          organization.update_attributes(trial_ends_at: 1.day.from_now)
+          get(path)
+          expect(json['data']['attributes']['trial_ends_at']).to eq(1.day.from_now.to_date.to_s)
+        end
+      end
+    end
+
+    describe '#overdue' do
+      context 'overdue at is not set' do
+        it 'is false' do
+          organization.update_attributes(overdue_at: nil)
+          get(path)
+          expect(json['data']['attributes']['overdue']).to eq(false)
+        end
+      end
+
+      context 'overdue less than one week' do
+        it 'is false' do
+          organization.update_attributes(overdue_at: 6.days.ago)
+          get(path)
+          expect(json['data']['attributes']['overdue']).to eq(false)
+        end
+      end
+
+      context 'overdue more than one week' do
+        it 'is true' do
+          organization.update_attributes(overdue_at: 8.days.ago)
+          get(path)
+          expect(json['data']['attributes']['overdue']).to eq(true)
+        end
+      end
+    end
+
+    describe '#inaccessible_at' do
+      context 'overdue_at is not set' do
+        it 'is nil' do
+          organization.update_attributes(overdue_at: nil)
+          get(path)
+          expect(json['data']['attributes']['inaccessible_at']).to eq(nil)
+        end
+      end
+
+      context 'overdue_at is set' do
+        it 'is set to 2 weeks after the overdue_at date' do
+          organization.update_attributes(overdue_at: 1.week.from_now)
+          get(path)
+          expect(json['data']['attributes']['inaccessible_at']).to eq(3.weeks.from_now.to_s(:mdy))
+        end
+      end
+    end
+  end
+
   describe 'GET #current' do
     let!(:organization) { create(:organization) }
     let(:path) { '/api/v1/organizations/current' }
@@ -42,7 +152,7 @@ describe Api::V1::OrganizationsController, type: :request, json: true, auth: tru
     end
   end
 
-  describe 'POST #create' do
+  describe 'POST #create', vcr: { match_requests_on: %i[host path] } do
     let(:path) { '/api/v1/organizations/' }
     let!(:current_user) { create(:user) }
     let(:params) do
@@ -79,7 +189,7 @@ describe Api::V1::OrganizationsController, type: :request, json: true, auth: tru
     end
   end
 
-  describe 'PATCH #update' do
+  describe 'PATCH #update', vcr: { match_requests_on: %i[host method path_ignore_id] } do
     let!(:organization) { create(:organization, admin: user) }
     let(:path) { "/api/v1/organizations/#{organization.id}" }
     let(:params) do
@@ -103,6 +213,24 @@ describe Api::V1::OrganizationsController, type: :request, json: true, auth: tru
       expect(organization.name).not_to eq('Acme Inc 2.0')
       patch(path, params: params)
       expect(organization.reload.name).to eq('Acme Inc 2.0')
+    end
+
+    context 'setting in app billing' do
+      before do
+        organization.update_attributes(in_app_billing: true)
+      end
+
+      it 'does not work if you are not super admin' do
+        patch(path, params: json_api_params('organizations', in_app_billing: false))
+        expect(organization.reload.in_app_billing).to eql(true)
+      end
+
+      it 'works if you are a super admin' do
+        user.add_role(Role::SUPER_ADMIN)
+        expect_any_instance_of(Organization).to receive(:update_subscription)
+        patch(path, params: json_api_params('organizations', in_app_billing: false))
+        expect(organization.reload.in_app_billing).to eql(false)
+      end
     end
   end
 end

@@ -1,0 +1,45 @@
+<div class="billing-email trial-expired">
+  <div class="subject">Free trial expired</div>
+  <div>Your free trial period with Shape has expired. Your account will now be charged for all current active users. To continue using Shape please add a payment method to you account.</div>
+  <div>
+    <div class="organization-name"><%= @organization_name %></div>
+    <div>
+      <div class="section">
+        <div class="inner">
+          <div class="header">
+            <span class="highlight free-trial-expired">FREE TRIAL EXPIRED</span>
+          </div>
+          <dl>
+            <dt>Expiration Date:</dt>
+            <dd><%= @expiration_date %></dd>
+          </dl>
+        </div>
+      </div>
+      <div class="section">
+        <div class="inner">
+          <div class="header">ACTIVE PEOPLE</div>
+          <dl>
+            <dt>Total users:</dt>
+            <dd><%= @total_users_count %></dd>
+          </dl>
+        </div>
+      </div>
+      <div class="section">
+        <div class="inner">
+          <div class="header">MONTHLY CHARGE</div>
+          <dl>
+            <dt>Next monthly charge:</dt>
+            <dd><%= number_to_currency(@next_monthly_charge) %></dd>
+            <dt>Next statement date:</dt>
+            <dd><%= @next_statement_date %></dd>
+          </dl>
+        </div>
+      </div>
+      <% if @missing_payment_method %>
+      <div class='email-link'>
+        <%= link_to "Add Payment Method", @url %>
+      </div>
+      <% end %>
+    </div>
+  </div>
+</div>

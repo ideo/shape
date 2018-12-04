@@ -15,15 +15,26 @@ RSpec.describe OrganizationBuilder, type: :service do
                               user)
     }
     context 'with valid params' do
-      let!(:result) { builder.save }
-      let!(:organization) { builder.organization }
-
       before do
+        allow(builder.organization).to receive(:create_network_organization)
+        allow(builder.organization).to receive(:create_network_subscription)
         user.switch_to_organization(organization)
       end
 
+      let!(:result) { builder.save }
+      let!(:organization) { builder.organization }
+
       it 'should return true' do
         expect(result).to be true
+      end
+
+      it 'should set the trial ends at date' do
+        expect(organization.trial_ends_at).to be_within(5.seconds)
+          .of(Organization::DEFAULT_TRIAL_ENDS_AT.from_now)
+      end
+
+      it 'should set the default trial user count' do
+        expect(organization.trial_users_count).to eql(Organization::DEFAULT_TRIAL_USERS_COUNT)
       end
 
       it 'should add the user as an admin role' do
@@ -43,6 +54,13 @@ RSpec.describe OrganizationBuilder, type: :service do
         expect(OrganizationTemplates).to receive(:call).with(organization, user)
         builder.save
         expect(user.user_profile_for_org(organization.id)).not_to be nil
+      end
+
+      it 'should create the network organization' do
+        expect(organization).to have_received(:create_network_organization).with(user)
+      end
+      it 'should create the network organization' do
+        expect(organization).to have_received(:create_network_subscription)
       end
     end
 

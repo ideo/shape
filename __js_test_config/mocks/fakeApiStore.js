@@ -1,30 +1,39 @@
-const fakeApiStore = ({ findResult = '', findAllResult = [], requestResult = '' } = {}) => {
+const fakeApiStore = ({
+  findResult = '',
+  findAllResult = [],
+  requestResult = '',
+} = {}) => {
   return {
     add: jest.fn().mockName('add'),
     removeAll: jest.fn().mockName('removeAll'),
-    find: jest.fn()
-      .mockReturnValue(findResult),
-    findAll: jest.fn()
-      .mockReturnValue(findAllResult),
-    request: jest.fn()
+    find: jest.fn().mockReturnValue(findResult),
+    findAll: jest.fn().mockReturnValue(findAllResult),
+    request: jest
+      .fn()
       .mockReturnValue(Promise.resolve(requestResult))
       .mockName('request'),
-    fetch: jest.fn()
+    fetch: jest
+      .fn()
       .mockReturnValue(Promise.resolve(requestResult))
       .mockName('fetch'),
-    fetchRoles: jest.fn()
+    fetchRoles: jest
+      .fn()
       .mockReturnValue(Promise.resolve())
       .mockName('fetchRoles'),
     sync: jest.fn().mockName('sync'),
     loadCurrentUser: jest.fn(),
     loadCurrentUserGroups: jest.fn().mockReturnValue(Promise.resolve()),
     loadCurrentUserAndGroups: jest.fn().mockReturnValue(Promise.resolve()),
-    searchUsersAndGroups: jest.fn().mockReturnValue(Promise.resolve({ data: [] })),
+    searchUsersAndGroups: jest
+      .fn()
+      .mockReturnValue(Promise.resolve({ data: [] })),
     setCurrentUserId: jest.fn(),
     findOrganizationById: jest.fn().mockReturnValue({ name: 'abc' }),
     fetchThreads: jest.fn().mockReturnValue(Promise.resolve()),
     fetchNotifications: jest.fn().mockReturnValue(Promise.resolve()),
-    findOrBuildCommentThread: jest.fn().mockReturnValue(Promise.resolve({ key: 'x' })),
+    findOrBuildCommentThread: jest
+      .fn()
+      .mockReturnValue(Promise.resolve({ key: 'x' })),
     findThreadForRecord: jest.fn(),
     createTemplateInstance: jest.fn(),
     moveCards: jest.fn(),
@@ -32,12 +41,13 @@ const fakeApiStore = ({ findResult = '', findAllResult = [], requestResult = '' 
     duplicateCards: jest.fn(),
     checkInMyCollection: jest.fn(),
     unreadActivityCount: 0,
-    currentUserId: "1",
+    currentUserId: '1',
     currentUser: {
-      id: "1",
+      id: '1',
       current_user_collection_id: 99,
       current_organization: {
-        name: 'Acme Inc'
+        name: 'Acme Inc',
+        deactivated: false,
       },
       organizations: [{ name: 'Acme Inc 1', filestack_file_url: 'test.jpg' }],
       name: 'Johnny Appleseed',
@@ -50,28 +60,28 @@ const fakeApiStore = ({ findResult = '', findAllResult = [], requestResult = '' 
     // NOTE: important that this matches currentUserOrganization.slug
     currentOrgSlug: 'org-slug',
     currentUserOrganization: {
-      id: "1",
+      id: '1',
       slug: 'org-slug',
       name: 'Acme Inc',
       primary_group: {
         name: 'Acme Inc',
-      }
+      },
     },
     unreadNotifications: [],
     recentNotifications: new Map(),
     currentThreads: [
       {
-        id: "1",
+        id: '1',
         key: 'abc-1',
         record: { name: 'abc' },
         comments: [],
       },
       {
-        id: "2",
+        id: '2',
         key: 'abc-2',
         record: { name: 'xyz' },
         comments: [],
-      }
+      },
     ],
     collections: [],
     items: [],

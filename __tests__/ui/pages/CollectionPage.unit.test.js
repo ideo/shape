@@ -1,5 +1,6 @@
 import CollectionPage from '~/ui/pages/CollectionPage'
 import ChannelManager from '~/utils/ChannelManager'
+import Deactivated from '~/ui/layout/Deactivated'
 import fakeApiStore from '#/mocks/fakeApiStore'
 import fakeUiStore from '#/mocks/fakeUiStore'
 import fakeRoutingStore from '#/mocks/fakeRoutingStore'
@@ -52,6 +53,24 @@ describe('CollectionPage', () => {
   it('passes collection to the CollectionGrid', () => {
     const grid = wrapper.find('CollectionGrid')
     expect(grid.props().collection).toBe(collection)
+  })
+
+  describe('organization is deactivated', () => {
+    beforeEach(() => {
+      wrapper.setProps({
+        apiStore: {
+          currentUser: {
+            current_organization: {
+              deactivated: true,
+            },
+          },
+        },
+      })
+    })
+
+    it('renders the Deactivated component', () => {
+      expect(wrapper.equals(<Deactivated />)).toEqual(true)
+    })
   })
 
   describe('componentWillReceiveProps()', () => {

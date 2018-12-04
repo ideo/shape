@@ -22,7 +22,7 @@ RSpec.describe Group, type: :model do
         group.update(name: '12345')
       end
 
-      it 'should update the organization name' do
+      it 'should update the organization name', :vcr do
         expect(organization.name).to eq('12345')
       end
     end
