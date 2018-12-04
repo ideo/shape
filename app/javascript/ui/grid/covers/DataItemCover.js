@@ -4,6 +4,7 @@ import { runInAction, computed } from 'mobx'
 import moment from 'moment-mini'
 import styled from 'styled-components'
 import {
+  Flyout,
   VictoryArea,
   VictoryAxis,
   VictoryChart,
@@ -25,6 +26,20 @@ import {
 } from '~/ui/global/styled/typography'
 import v from '~/utils/variables'
 import { theme } from '~/ui/test_collections/shared'
+
+const DotFlyout = props => (
+  <g>
+    <Flyout {...props} />
+    <circle
+      cx={props.x}
+      cy={props.y + 8}
+      r="4"
+      stroke={v.colors.white}
+      strokeWidth={0.5}
+      fill={v.colors.black}
+    />
+  </g>
+)
 
 class CustomLabel extends React.Component {
   static defaultEvents = VictoryTooltip.defaultEvents
@@ -63,6 +78,7 @@ class CustomLabel extends React.Component {
         <VictoryTooltip
           {...this.props}
           cornerRadius={2}
+          flyoutComponent={<DotFlyout />}
           height={40}
           width={140}
           dx={dx * 5}
