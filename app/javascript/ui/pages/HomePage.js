@@ -1,13 +1,38 @@
 import CollectionPage from '~/ui/pages/CollectionPage'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
+import backOutImage from '~/assets/back_out_of_new_org.png'
 
 @inject('apiStore', 'uiStore')
 @observer
 class HomePage extends React.Component {
-  componentDidMount() {
-    if (this.userHasOrg) return
+  async componentDidMount() {
     const { uiStore } = this.props
-    uiStore.openOrgCreateModal()
+    if (this.userHasOrg) return
+    const confirmed = await this.confirmNewOrganization()
+    if (confirmed) {
+      uiStore.openOrgCreateModal()
+    } else {
+      uiStore.closeDialog()
+      const { apiStore } = this.props
+      apiStore.currentUser.logout()
+    }
+  }
+
+  confirmNewOrganization() {
+    const { uiStore } = this.props
+    return new Promise((resolve, reject) => {
+      uiStore.confirm({
+        options: [
+          'Are you looking for your team? You may need to ask for an invitation.',
+          'Create an organization and invite your team to get started!',
+        ],
+        image: backOutImage,
+        confirmText: 'Create Organization',
+        cancelText: 'Come back later',
+        onConfirm: () => resolve(true),
+        onCancel: () => resolve(false),
+      })
+    })
   }
 
   get userHasOrg() {

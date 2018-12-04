@@ -7,7 +7,9 @@ class Api::V1::SearchController < Api::V1::BaseController
         total: results.total_count,
         size: results.size,
       },
-      jsonapi: results, include: [:parent_collection_card]
+      jsonapi: results, include: [:parent_collection_card], expose: {
+        force_breadcrumbs: @force_breadcrumbs = true,
+      }
     )
   end
 
@@ -31,7 +33,6 @@ class Api::V1::SearchController < Api::V1::BaseController
 
   def search_collections(query)
     # search for tags via hashtag e.g. "#template"
-    tags = query.scan(/#\w+/).flatten.map { |tag| tag.delete('#') }
     where_clause = {
       organization_id: current_organization.id,
     }
@@ -42,28 +43,24 @@ class Api::V1::SearchController < Api::V1::BaseController
         { group_ids: current_user_current_group_ids },
       ]
     end
-    where_clause[:tags] = { all: tags } if tags.count.positive?
-    untagged_query = query.sub(/#\w+\s/, '')
-    Collection.search(
-      untagged_query,
-      fields: %w[name^5 tags^3 content],
+
+    Search.new(
+      index_name: Collection,
       where: where_clause,
       per_page: params[:per_page] || 10,
       page: page,
-    )
+    ).search(query)
   end
 
   def search_users_and_groups(query)
-    Searchkick.search(
-      query,
+    Search.new(
       index_name: [User, Group],
       match: :word_start,
-      fields: %w[handle^5 name],
       where: {
         organization_ids: [current_organization.id],
       },
       per_page: 6,
-    )
+    ).search(query)
   end
 
   def current_user_current_group_ids

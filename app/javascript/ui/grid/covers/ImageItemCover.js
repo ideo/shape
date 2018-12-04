@@ -15,8 +15,9 @@ StyledImageCover.displayName = 'StyledImageCover'
 class ImageItemCover extends React.PureComponent {
   render() {
     const { contain, item } = this.props
-    const { filestack_file_url } = item
-    return <StyledImageCover url={filestack_file_url} contain={contain} />
+    const retina = window.devicePixelRatio && window.devicePixelRatio > 1
+    const imageUrl = item.imageUrl(retina ? 2400 : 1200)
+    return <StyledImageCover url={imageUrl} contain={contain} />
   }
 }
 

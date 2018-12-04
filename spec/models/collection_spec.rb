@@ -16,12 +16,13 @@ describe Collection, type: :model do
     it { should have_many :cards_linked_to_this_collection }
     it { should have_many :items }
     it { should have_many :collections }
-    it { should have_many :test_collections }
     it { should have_one :parent_collection_card }
-    it { should have_one :live_test_collection }
     it { should belong_to :cloned_from }
     it { should belong_to :organization }
     it { should belong_to :template }
+    # these come from Testable concern
+    it { should have_many :test_collections }
+    it { should have_one :live_test_collection }
 
     describe '#collection_cards' do
       let!(:collection) { create(:collection, num_cards: 3) }
@@ -110,10 +111,10 @@ describe Collection, type: :model do
       end
 
       context 'if cloned from Getting Started collection' do
-        let!(:getting_started_template_collection) {
+        let!(:getting_started_template_collection) do
           create(:getting_started_template_collection,
                  organization: organization)
-        }
+        end
         before do
           organization.reload
           collection.update_attributes(
@@ -195,6 +196,8 @@ describe Collection, type: :model do
           collection.collection_cards.map(&:id),
           instance_of(Integer),
           nil,
+          false,
+          false,
         )
         duplicate_without_user
       end
@@ -249,6 +252,8 @@ describe Collection, type: :model do
           collection.collection_cards.map(&:id),
           instance_of(Integer),
           user.id,
+          false,
+          false,
         )
         collection.duplicate!(for_user: user)
       end
@@ -279,6 +284,29 @@ describe Collection, type: :model do
         expect(duplicate.can_edit?(user)).to be true
       end
     end
+
+    context 'with system_collection and synchronous settings' do
+      let(:instance_double) do
+        double('CollectionCardDuplicationWorker')
+      end
+
+      before do
+        allow(CollectionCardDuplicationWorker).to receive(:new).and_return(instance_double)
+        allow(instance_double).to receive(:perform).and_return true
+      end
+
+      it 'should call synchronously' do
+        expect(CollectionCardDuplicationWorker).to receive(:new)
+        expect(instance_double).to receive(:perform).with(
+          anything,
+          anything,
+          anything,
+          true,
+          true,
+        )
+        collection.duplicate!(for_user: user, system_collection: true, synchronous: true)
+      end
+    end
   end
 
   describe '#all_tag_names' do
@@ -303,15 +331,15 @@ describe Collection, type: :model do
   end
 
   describe '#collection_cards_viewable_by' do
-    let!(:collection) { create(:collection, num_cards: 3) }
+    let!(:collection) { create(:collection, num_cards: 3, record_type: :collection) }
     let!(:subcollection_card) { create(:collection_card_collection, parent: collection) }
     let(:cards) { collection.collection_cards }
     let(:user) { create(:user) }
 
     before do
       user.add_role(Role::VIEWER, collection)
-      collection.items.each do |item|
-        user.add_role(Role::VIEWER, item)
+      collection.collections.each do |coll|
+        user.add_role(Role::VIEWER, coll)
       end
       user.add_role(Role::VIEWER, subcollection_card.collection)
     end
@@ -345,6 +373,25 @@ describe Collection, type: :model do
         expect(collection.collection_cards_viewable_by(cards, user)).to match_array(cards - [private_card])
       end
     end
+
+    context 'with card_order param' do
+      it 'should return results according to the updated_at param' do
+        viewable = collection.collection_cards_viewable_by(cards, user, card_order: 'updated_at')
+        expect(viewable.first).to eq(cards.sort_by(&:updated_at).reverse.first)
+        expect(viewable.last).to eq(cards.sort_by(&:updated_at).first)
+      end
+
+      it 'should return results according to the cached_test_scores sorting param' do
+        scored1 = collection.collections.first
+        scored1.update(cached_test_scores: { 'question_useful' => 30 })
+        scored2 = collection.collections.last
+        scored2.update(cached_test_scores: { 'question_useful' => 20 })
+
+        viewable = collection.collection_cards_viewable_by(cards, user, card_order: 'question_useful')
+        expect(viewable.first).to eq(scored1.parent_collection_card)
+        expect(viewable.second).to eq(scored2.parent_collection_card)
+      end
+    end
   end
 
   describe '#search_data' do
@@ -365,6 +412,20 @@ describe Collection, type: :model do
 
     it 'includes all group_ids' do
       expect(collection.search_data[:group_ids]).to match_array(groups.map(&:id))
+    end
+
+    it 'sets activity date to nil when no activity' do
+      expect(collection.search_data[:activity_dates]).to be nil
+    end
+
+    it 'includes activity dates, without duplicates' do
+      organization = create(:organization)
+      user = create(:user)
+      activity1 = collection.activities.create(actor: user, organization: organization)
+      collection.activities.create(actor: user, organization: organization)
+      activity3 = collection.activities.create(actor: user, organization: organization, updated_at: 1.week.from_now)
+      expected_activity_dates = [activity1.updated_at.to_date, activity3.updated_at.to_date]
+      expect(collection.search_data[:activity_dates]).to match_array(expected_activity_dates)
     end
   end
 

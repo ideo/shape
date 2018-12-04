@@ -5,6 +5,7 @@ import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import _ from 'lodash'
 import styled from 'styled-components'
 
+import CollectionSort from '~/ui/grid/CollectionSort'
 import Loader from '~/ui/layout/Loader'
 import MovableGridCard from '~/ui/grid/MovableGridCard'
 import CollectionCard from '~/stores/jsonApi/CollectionCard'
@@ -22,6 +23,14 @@ const StyledGrid = styled.div`
   }
 `
 StyledGrid.displayName = 'StyledGrid'
+
+const SortContainer = styled.div`
+  margin-bottom: 15px;
+  margin-left: auto;
+  margin-right: 5px;
+  margin-top: -15px;
+  text-align: right;
+`
 
 const calculateDistance = (pos1, pos2) => {
   // pythagoras!
@@ -397,13 +406,21 @@ class CollectionGrid extends React.Component {
     const cards = [...collectionCards]
     // props might get passed in e.g. nextProps for componentWillReceiveProps
     if (!opts.props) opts.props = this.props
-    const { gridW, gridH, gutter, cols, sortBy, addEmptyCard } = opts.props
+    const { collection, gridW, gridH, gutter, cols, addEmptyCard } = opts.props
+    const card_order = collection.card_order || 'order'
     let row = 0
     const matrix = []
     // create an empty row
     matrix.push(_.fill(Array(cols), null))
     if (addEmptyCard) this.addEmptyCard(cards)
-    const sortedCards = _.sortBy(cards, sortBy)
+    let sortedCards = cards
+    if (card_order === 'order') {
+      // For most collections, we will be sorting by `order`. In that case we call
+      // `sortBy` in order to sort our placeholder/blank cards in the correct order.
+      // NOTE: If we ever have something like "sort by updated_at" + the ability to pop open BCT,
+      // we may need to amend this
+      sortedCards = _.sortBy(cards, 'order')
+    }
     _.each(sortedCards, (card, i) => {
       // we don't actually want to "re-position" the dragging card
       // because its position is being determined by the drag (i.e. mouse cursor)
@@ -593,15 +610,20 @@ class CollectionGrid extends React.Component {
   }
 
   render() {
-    const { uiStore } = this.props
+    const { sorting, uiStore, collection } = this.props
     const { gridSettings } = uiStore
     const { rows } = this.state
-    if (uiStore.isLoading) return <Loader />
+    if (uiStore.isLoading || collection.reloading) return <Loader />
 
     const minHeight = rows * (gridSettings.gridH + gridSettings.gutter)
 
     return (
       <StyledGrid minHeight={minHeight}>
+        {sorting && (
+          <SortContainer>
+            <CollectionSort collection={collection} />
+          </SortContainer>
+        )}
         {this.renderPositionedCards()}
       </StyledGrid>
     )
@@ -615,7 +637,6 @@ const gridConfigProps = {
   gridH: PropTypes.number.isRequired,
   gridW: PropTypes.number.isRequired,
   gutter: PropTypes.number.isRequired,
-  sortBy: PropTypes.string.isRequired,
 }
 
 CollectionGrid.propTypes = {
@@ -631,6 +652,7 @@ CollectionGrid.propTypes = {
     type: PropTypes.string,
     template: MobxPropTypes.objectOrObservableObject,
   }),
+  sorting: PropTypes.bool,
 }
 CollectionGrid.wrappedComponent.propTypes = {
   routingStore: MobxPropTypes.objectOrObservableObject.isRequired,
@@ -640,6 +662,7 @@ CollectionGrid.defaultProps = {
   addEmptyCard: true,
   submissionSettings: null,
   blankContentToolState: null,
+  sorting: false,
 }
 CollectionGrid.displayName = 'CollectionGrid'
 

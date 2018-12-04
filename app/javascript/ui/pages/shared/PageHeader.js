@@ -227,11 +227,16 @@ class PageHeader extends React.Component {
     const { record, uiStore } = this.props
     // not enough room to show in the header of a live Test
     if (record.isLiveTest) return null
-    if (uiStore.windowWidth < v.responsive.smallBreakpoint) return null
+    if (uiStore.windowWidth < v.responsive.medBreakpoint) return null
     if (record.inherited_tag_list.length) {
       let tagList = record.inherited_tag_list.map(tag => `#${tag}`).join(',')
-      if (tagList.length > 24) {
-        tagList = `${tagList.slice(0, 21)}...`
+      if (tagList.length > 22) {
+        tagList = (
+          <span>
+            {tagList.slice(0, 19)}
+            <span style={{ fontSize: '1rem' }}>…</span>
+          </span>
+        )
       }
       return <SubduedHeading1>{tagList}</SubduedHeading1>
     }
@@ -249,7 +254,7 @@ class PageHeader extends React.Component {
       icon = <TemplateIcon circled />
     } else if (record.isSubmissionBox) {
       icon = <SubmissionBoxIconLg />
-    } else if (record.isTestCollectionOrTestDesign) {
+    } else if (record.launchableTestId) {
       icon = <TestCollectionIcon />
     }
     if (icon) {
@@ -259,23 +264,29 @@ class PageHeader extends React.Component {
   }
 
   get launchTestButton() {
-    const { record } = this.props
+    const { record, uiStore } = this.props
     if (
       record.can_edit_content &&
-      (record.isLaunchableTest || record.isClosedTest)
+      (record.isDraftTest || record.isClosedTest)
     ) {
-      if (record.isLaunchableTest) {
+      if (record.isDraftTest) {
         return (
-          <HeaderFormButton onClick={record.launchTest}>
-            Get Feedback
+          <HeaderFormButton
+            onClick={record.launchTest}
+            disabled={uiStore.launchButtonLoading}
+          >
+            {record.is_submission_box_template_test
+              ? 'Launch Tests'
+              : 'Get Feedback'}
           </HeaderFormButton>
         )
-      } else if (record.isClosedTest && record.test_can_reopen) {
+      } else if (record.isClosedTest) {
         return (
           <HeaderFormButton
             onClick={record.reopenTest}
             color={v.colors.transparent}
             width="200"
+            disabled={uiStore.launchButtonLoading}
           >
             Re-open Feedback
           </HeaderFormButton>
@@ -379,14 +390,17 @@ class PageHeader extends React.Component {
                         </span>
                       </HeaderFormButton>
                     </CopyToClipboard>
-                    <HeaderFormButton
-                      width="170"
-                      color={v.colors.transparent}
-                      style={{ marginLeft: 10 }}
-                      onClick={record.closeTest}
-                    >
-                      Stop Feedback
-                    </HeaderFormButton>
+                    {record.can_edit_content && (
+                      <HeaderFormButton
+                        width="170"
+                        color={v.colors.transparent}
+                        style={{ marginLeft: 10 }}
+                        onClick={record.closeTest}
+                        disabled={uiStore.launchButtonLoading}
+                      >
+                        Stop Feedback
+                      </HeaderFormButton>
+                    )}
                   </Fragment>
                 )}
               </Flex>

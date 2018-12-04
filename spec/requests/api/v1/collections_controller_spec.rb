@@ -4,9 +4,9 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
   let(:user) { @user }
 
   describe 'GET #show', create_org: true do
-    let!(:collection) {
+    let!(:collection) do
       create(:collection, num_cards: 5, add_viewers: [user])
-    }
+    end
     let(:path) { "/api/v1/collections/#{collection.id}" }
 
     it 'returns a 200' do
@@ -16,7 +16,8 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
 
     it 'matches JSON schema' do
       get(path)
-      expect(json['data']['attributes']).to match_json_schema('collection')
+      # we don't use strict matching since some attrs only appear conditionally
+      expect(json['data']['attributes']).to match_json_schema('collection', strict: false)
     end
 
     it 'should include breadcrumb' do
@@ -41,19 +42,59 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
       expect(json['data']['attributes']['can_edit']).to eq(false)
     end
 
-    it 'logs a joined activity for the current user and org' do
-      expect(ActivityAndNotificationBuilder).to receive(:call).with(
+    it 'logs a viewed and org joined activity for the current user' do
+      expect(ActivityAndNotificationBuilder).to receive(:call).once.ordered.with(
         actor: @user,
         target: @user.current_organization.primary_group,
         action: :joined,
       )
+      expect(ActivityAndNotificationBuilder).to receive(:call).once.ordered.with(
+        actor: @user,
+        target: collection,
+        action: :viewed,
+      )
       get(path)
     end
 
+    context 'with SharedWithMeCollection' do
+      let!(:collection) do
+        create(:shared_with_me_collection, num_cards: 5, add_viewers: [user])
+      end
+      let(:path) { "/api/v1/collections/#{collection.id}" }
+
+      before do
+        collection.collection_cards.each do |cc|
+          user.add_role(Role::VIEWER, cc.record)
+        end
+      end
+
+      it 'should sort by updated_at by default' do
+        get(path)
+        expect(json['data']['attributes']['card_order']).to eq 'updated_at'
+      end
+    end
+
+    context 'with sort options' do
+      let(:path) { "/api/v1/collections/#{collection.id}?card_order=updated_at" }
+      before do
+        collection.collection_cards.each do |cc|
+          user.add_role(Role::VIEWER, cc.record)
+        end
+      end
+
+      it 'should sort by the passed in card_order param' do
+        get(path)
+        expect(json['data']['attributes']['card_order']).to eq 'updated_at'
+        cards = json['data']['relationships']['collection_cards']['data']
+        # kind of a hacky way to say that the first card is "newer" than the second
+        expect(cards.first['id'] > cards.second['id']).to be true
+      end
+    end
+
     context 'with editor' do
-      let!(:collection) {
+      let!(:collection) do
         create(:collection, num_cards: 5, add_editors: [user])
-      }
+      end
 
       it 'returns can_edit as true' do
         get(path)
@@ -96,9 +137,9 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
       end
 
       context 'with editor' do
-        let!(:collection) {
+        let!(:collection) do
           create(:collection, num_cards: 5, add_editors: [user])
-        }
+        end
 
         it 'includes only editors' do
           get(path)
@@ -179,7 +220,7 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
       it 'matches Collection schema' do
         post(path, params: params)
         expect(response.status).to eq(200)
-        expect(json['data']['attributes']).to match_json_schema('collection')
+        expect(json['data']['attributes']).to match_json_schema('collection', strict: false)
       end
 
       it 'broadcasts collection updates' do
@@ -213,7 +254,7 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
       create(:collection_card_text, order: 0, width: 1, parent: collection)
     end
     let(:path) { "/api/v1/collections/#{collection.id}" }
-    let(:raw_params) {
+    let(:raw_params) do
       {
         id: collection.id,
         name: 'Who let the dogs out?',
@@ -225,13 +266,13 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
           },
         ],
       }
-    }
-    let(:params) {
+    end
+    let(:params) do
       json_api_params(
         'collections',
         raw_params,
       )
-    }
+    end
 
     before do
       user.add_role(Role::VIEWER, collection_card.item)
@@ -253,7 +294,7 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
       end
 
       context 'updating collection cards attributes' do
-        let(:raw_params) {
+        let(:raw_params) do
           {
             id: collection.id,
             collection_cards_attributes: [
@@ -264,7 +305,7 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
               },
             ],
           }
-        }
+        end
 
         it 'returns a 200' do
           patch(path, params: params)
@@ -280,7 +321,7 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
 
     it 'matches Collection schema' do
       patch(path, params: params)
-      expect(json['data']['attributes']).to match_json_schema('collection')
+      expect(json['data']['attributes']).to match_json_schema('collection', strict: false)
     end
 
     it 'updates the name' do
@@ -305,14 +346,23 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
       patch(path, params: params)
     end
 
+    it 'logs a edited activity for the collection' do
+      expect(ActivityAndNotificationBuilder).to receive(:call).with(
+        actor: @user,
+        target: collection,
+        action: :edited,
+      )
+      patch(path, params: params)
+    end
+
     context 'with cancel_sync == true' do
-      let(:params) {
+      let(:params) do
         json_api_params(
           'collections',
           raw_params,
           cancel_sync: true,
         )
-      }
+      end
 
       it 'returns a 204 no content' do
         patch(path, params: params)

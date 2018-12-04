@@ -53,6 +53,15 @@ module Resourceable
         .pluck(:user_id)
         .uniq
     end
+
+    # more global way to query resources where you have ANY role (user or group)
+    def viewable_by(user, organization)
+      group_ids = user.organization_group_ids(organization)
+      joined = all.left_joins(roles: %i[users_roles groups_roles])
+      joined.where(UsersRole.arel_table[:user_id].eq(user.id)).or(
+        joined.where(GroupsRole.arel_table[:group_id].in(group_ids)),
+      ).distinct # because of left joins
+    end
   end
 
   def can_edit?(user_or_group)

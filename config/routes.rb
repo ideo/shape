@@ -34,6 +34,7 @@ Rails.application.routes.draw do
           patch 'launch'
           patch 'close'
           patch 'reopen'
+          get 'next_available'
         end
       end
       resources :collection_cards, shallow: true, except: %i[show] do
@@ -109,9 +110,13 @@ Rails.application.routes.draw do
     end
   end
 
-  resources :tests, only: %i[show]
+  resources :tests, only: %i[show] do
+    collection do
+      get 'completed'
+    end
+  end
 
-  authenticate :user, ->(u) { u.has_cached_role?(Role::SUPER_ADMIN) } do
+  authenticate :user, ->(u) { Rails.env.development? || u.has_cached_role?(Role::SUPER_ADMIN) } do
     require 'sidekiq/web'
     mount Sidekiq::Web => '/sidekiq'
   end

@@ -18,6 +18,7 @@ import {
   theme,
   themeLabelStyles,
 } from '~/ui/test_collections/shared'
+import Tooltip from '~/ui/global/Tooltip'
 import v from '~/utils/variables'
 
 const CoverContainer = styled.div`
@@ -29,10 +30,17 @@ const Tick = props => {
   if (!emoji) return <div />
   const fontSize = parseInt((emoji.scale || 1) * 24)
   return (
-    <VictoryLabel
-      {...props}
-      style={{ fill: v.colors.tertiaryMedium, fontSize }}
-    />
+    <Tooltip
+      classes={{ tooltip: 'Tooltip' }}
+      title={emoji.name}
+      placement="top"
+      open={props.isHovered}
+    >
+      <VictoryLabel
+        {...props}
+        style={{ fill: v.colors.tertiaryMedium, fontSize }}
+      />
+    </Tooltip>
   )
 }
 Tick.propTypes = {
@@ -119,6 +127,26 @@ class ChartItemCover extends React.Component {
             tickValues={[1, 2, 3, 4]}
             tickFormat={this.emojiScale.map(e => e.symbol)}
             tickLabelComponent={<Tick emojiScale={this.emojiScale} />}
+            events={[
+              {
+                eventHandlers: {
+                  onMouseOver: () => [
+                    {
+                      target: 'tickLabels',
+                      mutation: props => ({
+                        isHovered: true,
+                      }),
+                    },
+                  ],
+                  onMouseOut: () => [
+                    {
+                      target: 'labels',
+                      mutation: props => null,
+                    },
+                  ],
+                },
+              },
+            ]}
           />
           <VictoryGroup offset={30}>
             {this.formattedData.datasets.map(d => (

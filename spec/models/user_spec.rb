@@ -459,6 +459,12 @@ describe User, type: :model do
     end
 
     describe '#add_network_admin' do
+      it 'returns early when the user uid is not set' do
+        pending_user = create(:user, :pending)
+        expect(NetworkOrganizationUserSyncWorker).not_to receive(:perform_async)
+        expect(pending_user.add_network_admin).to be true
+      end
+
       it 'uses the network api to add the user as org admin' do
         user.add_network_admin
         expect(NetworkOrganizationUserSyncWorker).to have_received(:perform_async).with(user.uid, user.id, NetworkApi::Organization::ADMIN_ROLE, :add)
@@ -466,6 +472,12 @@ describe User, type: :model do
     end
 
     describe '#remove_network_admin' do
+      it 'returns early when the user uid is not set' do
+        pending_user = create(:user, :pending)
+        expect(NetworkOrganizationUserSyncWorker).not_to receive(:perform_async)
+        expect(pending_user.add_network_admin).to be true
+      end
+
       it 'uses the network api to remove the user as org admin' do
         user.remove_network_admin
         expect(NetworkOrganizationUserSyncWorker).to have_received(:perform_async).with(user.uid, user.id, NetworkApi::Organization::ADMIN_ROLE, :remove)

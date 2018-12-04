@@ -1,6 +1,29 @@
+import PropTypes from 'prop-types'
+import styled from 'styled-components'
+import v from '~/utils/variables'
 import Icon from './Icon'
 
-const PinnedIcon = () => (
+export const PinIconHolder = styled.div`
+  background-color: ${props => (props.locked ? 'transparent' : v.colors.black)};
+  border-radius: 50%;
+  height: 24px;
+  margin-left: 10px;
+  margin-top: 10px;
+  text-align: center;
+  width: 24px;
+
+  .icon {
+    height: 25px;
+    width: 25px;
+
+    svg {
+      margin-right: 1px;
+      width: 80%;
+    }
+  }
+`
+
+export const PinnedInnerIcon = () => (
   <Icon fill>
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50 50">
       <path
@@ -15,5 +38,20 @@ const PinnedIcon = () => (
     </svg>
   </Icon>
 )
+
+const PinnedIcon = ({ className, locked }) => (
+  <PinIconHolder className={className} locked={locked}>
+    <PinnedInnerIcon />
+  </PinIconHolder>
+)
+
+PinnedIcon.propTypes = {
+  className: PropTypes.string,
+  locked: PropTypes.bool,
+}
+PinnedIcon.defaultProps = {
+  className: '',
+  locked: false,
+}
 
 export default PinnedIcon

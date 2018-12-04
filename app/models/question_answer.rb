@@ -11,6 +11,7 @@ class QuestionAnswer < ApplicationRecord
   delegate :completed?, to: :survey_response, prefix: true
 
   after_commit :update_survey_response, on: %i[create destroy], if: :survey_response_present?
+  after_commit :update_collection_test_scores, if: :survey_response_present?
   before_save :update_open_response_item, if: :update_open_response_item?
   before_destroy :destroy_open_response_item_and_card, if: :open_response_item_present?
 
@@ -69,6 +70,13 @@ class QuestionAnswer < ApplicationRecord
   end
 
   def update_survey_response
+    return if survey_response.destroyed?
     survey_response.question_answer_created_or_destroyed
+  end
+
+  def update_collection_test_scores
+    return if survey_response.destroyed?
+    return unless survey_response.completed?
+    survey_response.cache_test_scores!
   end
 end

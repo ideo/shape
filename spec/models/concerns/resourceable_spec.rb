@@ -172,4 +172,16 @@ describe Resourceable, type: :concern do
       end
     end
   end
+
+  describe '.viewable_by' do
+    let(:organization) { create(:organization, member: user) }
+    let(:collection) { create(:collection, organization: organization, add_viewers: [user]) }
+    let(:group_collection) { create(:collection, organization: organization, add_viewers: [organization.primary_group]) }
+    let(:other_collection) { create(:collection, organization: organization) }
+
+    it 'should return all collections you have access to via user or group roles' do
+      expect(Collection.viewable_by(user, organization)).to include(collection, group_collection)
+      expect(Collection.viewable_by(user, organization)).not_to include(other_collection)
+    end
+  end
 end

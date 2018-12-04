@@ -27,7 +27,7 @@ class SerializableItem < BaseJsonSerializer
 
   belongs_to :filestack_file
 
-  attribute :breadcrumb, if: -> { @object == @current_record } do
+  attribute :breadcrumb, if: -> { @object == @current_record || @force_breadcrumbs } do
     Breadcrumb::ForUser.new(
       @object,
       @current_user,

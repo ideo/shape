@@ -8,6 +8,7 @@ class SerializableCollection < BaseJsonSerializer
              :submission_box_type, :submission_box_id, :submission_template_id,
              :test_status, :collection_to_test_id
 
+  has_many :roles
   has_one :parent_collection_card
   has_one :parent
   has_one :live_test_collection
@@ -29,6 +30,10 @@ class SerializableCollection < BaseJsonSerializer
 
   attribute :cover do
     @object.cached_cover || {}
+  end
+
+  attribute :test_scores do
+    @object.cached_test_scores || {}
   end
 
   attribute :type do
@@ -58,8 +63,14 @@ class SerializableCollection < BaseJsonSerializer
       @object.collection_cards_viewable_by(
         @object.collection_cards,
         @current_user,
+        card_order: @card_order,
       )
     end
+  end
+
+  # expose this for the front-end to be aware, only matters for current collection
+  attribute :card_order, if: -> { @object == @current_record } do
+    @card_order || 'order'
   end
 
   attribute :can_edit do
@@ -72,10 +83,8 @@ class SerializableCollection < BaseJsonSerializer
     @current_ability.can?(:edit_content, @object)
   end
 
-  attribute :test_can_reopen do
-    @object.respond_to?(:can_reopen?) && @object.can_reopen?
-  end
-
+  # NOTE: a lot of these boolean attributes could probably be omitted if not applicable, which would potentially
+  # slim down the API request for collections
   attribute :is_org_template_collection do
     @object.org_templates?
   end
@@ -96,7 +105,19 @@ class SerializableCollection < BaseJsonSerializer
   attribute :is_submission_box_template do
     @object.submission_box_template?
   end
-  
+
+  attribute :is_submission_box_template_test do
+    @object.submission_box_template_test?
+  end
+
+  attribute :submission_attrs, if: -> { @object.submission_attrs.present? } do
+    @object.submission_attrs
+  end
+
+  attribute :is_inside_a_submission, if: -> { @object.inside_a_submission? } do
+    @object.inside_a_submission?
+  end
+
   attribute :template_num_instances do
     if @object.master_template?
       @object.templated_collections.active.count
@@ -105,5 +126,11 @@ class SerializableCollection < BaseJsonSerializer
     end
   end
 
-  has_many :roles
+  attribute :launchable, if: -> { @object.test_collection? } do
+    @object.launchable?
+  end
+
+  attribute :test_collection_id, if: -> { @object.is_a?(Collection::TestDesign) } do
+    @object.test_collection.id.to_s
+  end
 end

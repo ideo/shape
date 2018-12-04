@@ -11,9 +11,11 @@ import { CardHeading } from '~/ui/global/styled/typography'
 import hexToRgba from '~/utils/hexToRgba'
 import ProfileIcon from '~/ui/icons/ProfileIcon'
 import FilledProfileIcon from '~/ui/icons/FilledProfileIcon'
+import { FormButton, RoundPill } from '~/ui/global/styled/forms'
 import SubmissionBoxIconLg from '~/ui/icons/SubmissionBoxIconLg'
 import TemplateIcon from '~/ui/icons/TemplateIcon'
 import TestCollectionIcon from '~/ui/icons/TestCollectionIcon'
+import { questionTitle } from '~/ui/test_collections/shared'
 import { routingStore } from '~/stores'
 
 const IconHolder = styled.span`
@@ -23,6 +25,17 @@ const IconHolder = styled.span`
   vertical-align: middle;
   width: 27px;
 `
+
+const LaunchButton = FormButton.extend`
+  font-size: 0.9rem;
+  padding: 0 1rem;
+  width: auto;
+  background-color: ${v.colors.alert};
+  &:hover {
+    background-color: ${v.colors.tertiaryMedium};
+  }
+`
+LaunchButton.displayName = 'LaunchButton'
 
 const StyledCollectionCover = styled.div`
   width: 100%;
@@ -167,6 +180,65 @@ class CollectionCover extends React.Component {
     return <span style={{ hyphens }}>{collection.name}</span>
   }
 
+  get hasCollectionScore() {
+    const { uiStore, inSubmissionsCollection } = this.props
+    // scores only apply to cards within a SubmissionsCollection
+    if (!inSubmissionsCollection) return false
+    const order = uiStore.collectionCardSortOrder
+    return order === 'total' || order.indexOf('question_') > -1
+  }
+
+  get collectionScore() {
+    const { collection, uiStore } = this.props
+    const order = uiStore.collectionCardSortOrder
+    // don't display score for ordering like 'updated_at'
+    if (!this.hasCollectionScore) return ''
+
+    const orderName = questionTitle(order)
+    const score = collection.test_scores[order]
+    return (
+      <RoundPill>
+        Result: {orderName}: <strong>{score}%</strong>
+      </RoundPill>
+    )
+  }
+
+  get hasLaunchTestButton() {
+    const { collection } = this.props
+    // This button only appears for tests inside submissions
+    if (!collection.is_inside_a_submission) return false
+    return (
+      collection.launchableTestId === collection.id &&
+      // if it's live you have the option to close
+      // otherwise it must be launchable to see a launch or re-open button
+      (collection.isLiveTest || collection.launchable)
+    )
+  }
+
+  get launchTestButton() {
+    const { collection, uiStore } = this.props
+    if (!this.hasLaunchTestButton) return ''
+    let launchCollection = collection.launchTest
+    let buttonText = 'Start Feedback'
+    if (collection.isLiveTest) {
+      buttonText = 'Stop Feedback'
+      launchCollection = collection.closeTest
+    } else if (collection.isClosedTest) {
+      buttonText = 'Re-open Feedback'
+      launchCollection = collection.reopenTest
+    }
+
+    return (
+      <LaunchButton
+        className="cancelGridClick"
+        onClick={launchCollection}
+        disabled={uiStore.launchButtonLoading}
+      >
+        {buttonText}
+      </LaunchButton>
+    )
+  }
+
   handleClick = e => {
     const { dragging } = this.props
     if (dragging) {
@@ -200,7 +272,7 @@ class CollectionCover extends React.Component {
             <PositionedCardHeading>
               <Dotdotdot clamp={height > 1 ? 6 : 3}>
                 <PlainLink
-                  className="no-select"
+                  className="no-select cancelGridClick"
                   onClick={this.handleClick}
                   to={routingStore.pathTo('collections', collection.id)}
                 >
@@ -210,7 +282,13 @@ class CollectionCover extends React.Component {
             </PositionedCardHeading>
           </div>
           <div className="bottom">
-            <Dotdotdot clamp="auto">{cover.text}</Dotdotdot>
+            {this.launchTestButton}
+            {this.collectionScore}
+            {!this.hasLaunchTestButton && (
+              <Dotdotdot clamp={this.hasCollectionScore ? 2 : 'auto'}>
+                {cover.text}
+              </Dotdotdot>
+            )}
           </div>
         </StyledCardContent>
       </StyledCollectionCover>
@@ -222,6 +300,7 @@ CollectionCover.propTypes = {
   width: PropTypes.number.isRequired,
   height: PropTypes.number.isRequired,
   collection: MobxPropTypes.objectOrObservableObject.isRequired,
+  inSubmissionsCollection: PropTypes.bool,
   dragging: PropTypes.bool,
   onClick: PropTypes.func,
 }
@@ -229,6 +308,7 @@ CollectionCover.wrappedComponent.propTypes = {
   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 CollectionCover.defaultProps = {
+  inSubmissionsCollection: false,
   dragging: false,
   onClick: null,
 }

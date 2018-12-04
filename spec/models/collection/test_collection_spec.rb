@@ -2,7 +2,8 @@ require 'rails_helper'
 
 describe Collection::TestCollection, type: :model do
   let(:user) { create(:user) }
-  let(:test_collection) { create(:test_collection) }
+  let(:test_parent) { create(:collection) }
+  let(:test_collection) { create(:test_collection, parent_collection: test_parent) }
 
   context 'associations' do
     it { should have_many :survey_responses }
@@ -25,7 +26,7 @@ describe Collection::TestCollection, type: :model do
 
     describe '#add_test_tag' do
       it 'should add the #test tag after_create' do
-        expect(test_collection.cached_owned_tag_list).to match_array(['test'])
+        expect(test_collection.cached_owned_tag_list).to match_array(['feedback'])
       end
     end
   end
@@ -66,15 +67,14 @@ describe Collection::TestCollection, type: :model do
     end
 
     context 'if in draft status' do
-      let!(:test_collection) { create(:test_collection) }
       before do
         expect(test_collection.draft?).to be true
       end
 
       it 'copies collection' do
-        expect {
+        expect do
           duplicate
-        }.to change(Collection, :count).by(1)
+        end.to change(Collection, :count).by(1)
         expect(duplicate).to be_instance_of(Collection::TestCollection)
         expect(duplicate.draft?).to be true
       end
@@ -93,7 +93,7 @@ describe Collection::TestCollection, type: :model do
     end
 
     context 'if live' do
-      let(:test_collection) { create(:test_collection, :completed) }
+      let(:test_collection) { create(:test_collection, :completed, parent_collection: test_parent) }
       before do
         test_collection.launch!(initiated_by: user)
         expect(test_collection.live?).to be true
@@ -103,9 +103,9 @@ describe Collection::TestCollection, type: :model do
       end
 
       it 'only copies test design' do
-        expect {
+        expect do
           duplicate
-        }.to change(Collection, :count).by(1)
+        end.to change(Collection, :count).by(1)
         expect(duplicate).to be_instance_of(Collection::TestCollection)
         expect(duplicate.draft?).to be true
       end
@@ -130,35 +130,6 @@ describe Collection::TestCollection, type: :model do
         expect(duplicate.test_collection_id).to be_nil
       end
 
-      context 'if template instance' do
-        let(:template) { create(:collection, master_template: true) }
-        let(:parent_collection) { create(:collection) }
-        let!(:test_template_instance) do
-          create(:test_collection,
-                 :completed,
-                 parent_collection: parent_collection,
-                 collection_to_test: parent_collection,
-                 template: template)
-        end
-        before do
-          test_template_instance.launch!(initiated_by: user)
-          expect(test_template_instance.live?).to be true
-        end
-
-        it 'moves templated_from to TestDesign' do
-          expect(test_template_instance.template).to be_nil
-          expect(
-            test_template_instance.test_design.template,
-          ).to eq(template)
-        end
-
-        it 'keeps collection_to_test on TestCollection' do
-          expect(
-            test_template_instance.collection_to_test,
-          ).to eq(parent_collection)
-        end
-      end
-
       context 'if closed' do
         before do
           test_collection.close!
@@ -166,9 +137,9 @@ describe Collection::TestCollection, type: :model do
         end
 
         it 'only copies test design' do
-          expect {
+          expect do
             duplicate
-          }.to change(Collection, :count).by(1)
+          end.to change(Collection, :count).by(1)
           expect(duplicate).to be_instance_of(Collection::TestCollection)
           expect(duplicate.draft?).to be true
         end
@@ -189,11 +160,56 @@ describe Collection::TestCollection, type: :model do
           expect(duplicate.name).to eq("Copy of #{test_collection.name}")
         end
       end
+
+      context 'if template instance' do
+        let(:template) { create(:collection, master_template: true) }
+        let(:instance_parent) { create(:collection) }
+        let(:test_collection) do
+          create(:test_collection,
+                 :completed,
+                 parent_collection: instance_parent,
+                 collection_to_test: instance_parent,
+                 template: template)
+        end
+
+        it 'sets the duplicate collection_to_test to its own parent' do
+          expect(duplicate.collection_to_test).to eq parent_collection
+        end
+      end
+    end
+  end
+
+  context 'if template instance' do
+    let(:template) { create(:collection, master_template: true) }
+    let(:parent_collection) { create(:collection) }
+    let!(:test_template_instance) do
+      create(:test_collection,
+             :completed,
+             parent_collection: parent_collection,
+             collection_to_test: parent_collection,
+             template: template)
+    end
+    before do
+      test_template_instance.launch!(initiated_by: user)
+      expect(test_template_instance.live?).to be true
+    end
+
+    it 'moves templated_from to TestDesign' do
+      expect(test_template_instance.template).to be_nil
+      expect(
+        test_template_instance.test_design.template,
+      ).to eq(template)
+    end
+
+    it 'keeps collection_to_test on TestCollection' do
+      expect(
+        test_template_instance.collection_to_test,
+      ).to eq(parent_collection)
     end
   end
 
   context 'with a ready to launch test' do
-    let!(:test_collection) { create(:test_collection, :completed) }
+    let!(:test_collection) { create(:test_collection, :completed, parent_collection: test_parent) }
 
     context 'launching a test' do
       describe '#launch!' do
@@ -311,6 +327,11 @@ describe Collection::TestCollection, type: :model do
           expect(test_collection.reopen!).to be true
           expect(test_collection.live?).to be true
         end
+
+        it 'should call the launch_test! method on itself with `reopening` param' do
+          expect(test_collection).to receive(:launch_test!).with(initiated_by: user, reopening: true)
+          test_collection.reopen!(initiated_by: user)
+        end
       end
 
       describe '#serialized_for_test_survey' do
@@ -323,6 +344,134 @@ describe Collection::TestCollection, type: :model do
           card_ids = test_collection.test_design.collection_cards.map(&:id).map(&:to_s)
           expect(data[:data][:relationships][:question_cards][:data].map { |i| i[:id] }).to match_array(card_ids)
         end
+      end
+    end
+  end
+
+  context 'with a submission box template' do
+    let(:submission_box) { create(:submission_box) }
+    let(:submission_template) { create(:collection, master_template: true, parent_collection: submission_box) }
+    let!(:test_collection) do
+      create(:test_collection, :completed, master_template: true, parent_collection: submission_template)
+    end
+    let(:submission) { create(:collection, :submission, parent_collection: submission_box.submissions_collection) }
+    let(:submission_test) { create(:test_collection, :completed, template: test_collection, parent_collection: submission) }
+
+    before do
+      submission_box.setup_submissions_collection!
+      submission_box.update(submission_template: submission_template)
+    end
+
+    describe '#launch!' do
+      context 'with valid draft collection (default status)' do
+        it 'should launch without creating a TestDesign collection' do
+          expect(test_collection.launch!(initiated_by: user)).to be true
+          expect(test_collection.test_status).to eq 'live'
+          expect(test_collection.test_design.present?).to be false
+        end
+
+        it 'should call the UpdateTemplateInstancesWorker' do
+          expect(UpdateTemplateInstancesWorker).to receive(:perform_async).with(test_collection.id)
+          test_collection.launch!(initiated_by: user)
+        end
+      end
+
+      context 'launching submission test' do
+        it 'should update the test_status' do
+          test_collection.launch!(initiated_by: user)
+          submission_test.launch!(initiated_by: user)
+          submission.reload
+          expect(submission.submission_attrs['test_status']).to eq 'live'
+        end
+      end
+    end
+
+    describe '#update_submissions_launch_status' do
+      # gets called from within UpdateTemplateInstancesWorker
+      it 'should find all submissions and mark their tests as launchable when launching' do
+        # make sure this is now persisted
+        submission_test.reload
+        test_collection.launch!(initiated_by: user)
+        test_collection.update_submissions_launch_status
+        submission.reload
+        submission_template.reload
+        expect(submission_template.submission_attrs).to eq(
+          'template' => true,
+          'test_status' => 'live',
+          'launchable_test_id' => test_collection.id,
+        )
+        expect(submission.submission_attrs).to eq(
+          'submission' => true,
+          'test_status' => 'draft',
+          'template_test_id' => test_collection.id,
+          'launchable_test_id' => submission_test.id,
+        )
+      end
+    end
+
+    describe '#close!' do
+      before do
+        # persist submissions_collection relations
+        submission_test.reload
+        submission_box.reload
+        test_collection.launch!(initiated_by: user)
+        # simulate bg worker
+        test_collection.update_submissions_launch_status
+        submission_test.launch!(initiated_by: user)
+      end
+
+      it 'should find all submissions and close their tests' do
+        expect(submission_test.test_status).to eq 'live'
+        expect(submission.reload.submission_attrs['test_status']).to eq 'live'
+        test_collection.close!
+        submission.reload
+        submission_test.reload
+        expect(submission.submission_attrs['test_status']).to eq 'closed'
+        expect(submission_test.test_status).to eq 'closed'
+      end
+    end
+
+    describe '#launchable?' do
+      it 'should only return true when the master template test has launched' do
+        expect(submission_test.launchable?).to be false
+        test_collection.launch!
+        expect(submission_test.launchable?).to be true
+      end
+    end
+
+    describe '#update_cached_submission_status' do
+      it 'should update the submission test_status accordingly' do
+        test_collection.launch!
+        expect(submission_test.launch!).to be true
+        expect(submission.reload.submission_attrs['test_status']).to eq 'live'
+      end
+    end
+
+    describe ''
+  end
+
+  context 'with an in-collection test' do
+    let(:parent_collection) { create(:collection) }
+    let!(:live_test_collection) do
+      create(:test_collection,
+             test_status: :live,
+             parent_collection: parent_collection,
+             collection_to_test: parent_collection)
+    end
+    let!(:test_collection) do
+      create(:test_collection,
+             :completed,
+             parent_collection: parent_collection,
+             collection_to_test: parent_collection)
+    end
+
+    describe '#launchable?' do
+      it 'should only return true if there are no other live tests' do
+        expect(test_collection.launchable?).to be false
+        live_test_collection.close!
+        # make sure it picks up the related test now being closed
+        parent_collection.reload
+        expect(test_collection.launchable?).to be true
       end
     end
   end

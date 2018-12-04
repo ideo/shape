@@ -48,8 +48,8 @@ describe('With Narrow Window', () => {
       .map(link => link.text())
   })
 
-  it('truncates to ...', () => {
-    expect(titles).toEqual(['My Collection', '...', 'Use Cases'])
+  it('truncates to …', () => {
+    expect(titles).toEqual(['My Collection', '…', 'Use Cases'])
   })
 })
 

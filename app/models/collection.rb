@@ -5,6 +5,7 @@ class Collection < ApplicationRecord
   include RealtimeEditorsViewers
   include HasActivities
   include Templateable
+  include Testable
 
   resourceable roles: [Role::EDITOR, Role::CONTENT_EDITOR, Role::VIEWER],
                edit_role: Role::EDITOR,
@@ -21,10 +22,13 @@ class Collection < ApplicationRecord
                  :cached_tag_list,
                  :cached_owned_tag_list,
                  :cached_org_properties,
-                 :cached_card_count
+                 :cached_card_count,
+                 :submission_attrs
 
   # callbacks
+  after_touch :touch_related_cards, unless: :destroyed?
   after_commit :touch_related_cards, if: :saved_change_to_updated_at?, unless: :destroyed?
+
   after_commit :reindex_sync, on: :create
   after_commit :update_comment_thread_in_firestore, unless: :destroyed?
   after_save :pin_all_primary_cards, if: :now_master_template?
@@ -78,17 +82,6 @@ class Collection < ApplicationRecord
   has_many :collections_and_linked_collections,
            through: :collection_cards,
            source: :collection
-
-  has_many :test_collections,
-           inverse_of: :collection_to_test,
-           foreign_key: :collection_to_test_id,
-           class_name: 'Collection::TestCollection'
-
-  has_one :live_test_collection,
-          -> { where(test_status: :live) },
-          inverse_of: :collection_to_test,
-          foreign_key: :collection_to_test_id,
-          class_name: 'Collection::TestCollection'
 
   has_one :comment_thread, as: :record, dependent: :destroy
 
@@ -145,18 +138,30 @@ class Collection < ApplicationRecord
     ]
   end
 
+  def search_user_ids
+    (editors[:users].pluck(:id) + viewers[:users].pluck(:id)).uniq
+  end
+
+  def search_group_ids
+    (editors[:groups].pluck(:id) + viewers[:groups].pluck(:id)).uniq
+  end
+
   # By default all string fields are searchable
   def search_data
-    user_ids = (editors[:users].pluck(:id) + viewers[:users].pluck(:id)).uniq
-    group_ids = (editors[:groups].pluck(:id) + viewers[:groups].pluck(:id)).uniq
+    parent_ids = breadcrumb
+    activity_dates = activities.map do |activity|
+      activity.updated_at.to_date
+    end.uniq
     {
       name: name,
       tags: all_tag_names,
       item_tags: items.map(&:tags).flatten.map(&:name),
       content: search_content,
       organization_id: organization_id,
-      user_ids: user_ids,
-      group_ids: group_ids,
+      user_ids: search_user_ids,
+      group_ids: search_group_ids,
+      parent_ids: parent_ids,
+      activity_dates: activity_dates.empty? ? nil : activity_dates,
     }
   end
 
@@ -201,7 +206,8 @@ class Collection < ApplicationRecord
     ]
   end
 
-  # similar to above but requires `collection/item` instead of `record`
+  # similar to above but for AR .includes(...)
+  # requires `collection/item` instead of `record`
   def self.default_relationships_for_query
     [
       :created_by,
@@ -232,7 +238,9 @@ class Collection < ApplicationRecord
     for_user: nil,
     copy_parent_card: false,
     parent: self.parent,
-    building_template_instance: false
+    building_template_instance: false,
+    system_collection: false,
+    synchronous: false
   )
 
     # check if we are cloning a template inside a template instance;
@@ -283,11 +291,18 @@ class Collection < ApplicationRecord
     for_user.upgrade_to_edit_role(c) if for_user.present?
 
     if collection_cards.any?
-      CollectionCardDuplicationWorker.perform_async(
+      worker_opts = [
         collection_cards.map(&:id),
         c.id,
         for_user.try(:id),
-      )
+        system_collection,
+        synchronous,
+      ]
+      if synchronous
+        CollectionCardDuplicationWorker.new.perform(*worker_opts)
+      else
+        CollectionCardDuplicationWorker.perform_async(*worker_opts)
+      end
     end
 
     # pick up newly created relationships
@@ -355,8 +370,23 @@ class Collection < ApplicationRecord
     end
   end
 
-  def collection_cards_viewable_by(cached_cards, user)
-    cached_cards ||= collection_cards.includes(:item, :collection)
+  def collection_cards_viewable_by(cached_cards, user, card_order: nil)
+    if card_order
+      if card_order == 'total' || card_order.include?('question_')
+        collection_order = "cached_test_scores->'#{card_order}'"
+        order = "collections.#{collection_order} DESC NULLS LAST"
+        puts "order #{order}"
+      else
+        # e.g. updated_at
+        order = { card_order => :desc }
+      end
+      cached_cards = collection_cards
+                     .unscope(:order)
+                     .includes(:item, :collection)
+                     .order(order)
+    else
+      cached_cards ||= collection_cards.includes(:item, :collection)
+    end
     cached_cards.select do |collection_card|
       collection_card.record.can_view?(user)
     end
@@ -467,11 +497,19 @@ class Collection < ApplicationRecord
     false
   end
 
-  def cache_key
+  def cache_key(card_order = 'order')
+    test_details = ''
+    if test_collection?
+      # make sure these details factor into caching
+      test_details = "launchable=#{launchable?}&can_reopen=#{can_reopen?}"
+    end
+
     "#{jsonapi_cache_key}" \
       "/#{ActiveRecord::Migrator.current_version}" \
       "/#{ENV['HEROKU_RELEASE_VERSION']}" \
+      "/order_#{card_order}" \
       "/cards_#{collection_cards.maximum(:updated_at).to_i}" \
+      "/#{test_details}" \
       "/roles_#{roles.maximum(:updated_at).to_i}"
   end
 
@@ -482,10 +520,6 @@ class Collection < ApplicationRecord
 
   def jsonapi_type_name
     'collections'
-  end
-
-  def test_collection?
-    is_a?(Collection::TestCollection) || is_a?(Collection::TestDesign)
   end
 
   def update_processing_status(status = nil)
@@ -509,28 +543,85 @@ class Collection < ApplicationRecord
     collections.each(&:processing_done) if processing_status.nil?
   end
 
+  # =================================
+  # Various boolean queries/checks
+  # - many are related to test collections and submission_boxes
+  # - could perhaps be moved into a helper module?
+  # =================================
+  def test_collection?
+    is_a?(Collection::TestCollection) || is_a?(Collection::TestDesign)
+  end
+
   def global_collection?
     type == 'Collection::Global'
   end
 
-  def submission_box_template?
-    parent.is_a? Collection::SubmissionBox
-  end
-  
   def inside_a_master_template?
     return true if master_template?
     parents.where(master_template: true).any?
   end
 
   def inside_a_template_instance?
-    return true if template_id.present?
+    return true if templated?
     parents.where.not(template_id: nil).any?
+  end
+
+  def parent_submission_box
+    parents.find_by(type: 'Collection::SubmissionBox')
+  end
+
+  def parent_submission
+    parents.find_by("cached_attributes->'submission_attrs'->>'submission' = 'true'")
+  end
+
+  def parent_submission_box_template
+    @parent_submission_box_template ||= begin
+      return nil unless inside_a_submission_box?
+      template_id = parent_submission_box&.submission_template_id
+      return nil unless template_id.present?
+      parents.find_by(id: template_id)
+    end
+  end
+
+  def submission_box_template?
+    return false unless master_template? && inside_a_submission_box?
+    id == parent_submission_box&.submission_template_id
+  end
+
+  def inside_a_submission_box_template?
+    parent_submission_box_template.present?
+  end
+
+  def inside_a_submission_box?
+    return true if is_a?(Collection::SubmissionBox)
+    parents.where(type: 'Collection::SubmissionBox').any?
+  end
+
+  def submission_box_template_test?
+    return false unless is_a?(Collection::TestCollection)
+    master_template? && inside_a_submission_box_template?
+  end
+
+  def submission?
+    submission_attrs.present? && submission_attrs['submission']
+  end
+
+  def inside_a_submission?
+    parents.where("cached_attributes->'submission_attrs'->>'submission' = 'true'").any?
+  end
+
+  def submission_test?
+    return unless inside_a_submission?
+    parent_submission.submission_attrs['launchable_test_id'] == id
   end
 
   # check for template instances anywhere in the entire collection tree
   def any_template_instance_children?
     Collection.in_collection(id).where.not(template_id: nil).any?
   end
+
+  # =================================
+  # <--- end boolean checks
 
   private
 

@@ -255,6 +255,10 @@ describe Organization, type: :model do
     describe '#friendly_id' do
       let(:organization) { create(:organization) }
 
+      before do
+        organization.save
+      end
+
       it 'generates slug after primary group is saved' do
         expect(
           organization.reload.slug,
@@ -304,39 +308,6 @@ describe Organization, type: :model do
       organization.setup_user_membership_and_collections(user)
       expect(user.current_organization).to eq(organization)
       expect(user.current_user_collection_id).not_to be nil
-    end
-
-    context 'with getting_started collection' do
-      let!(:getting_started_template) do
-        create(:global_collection,
-               name: 'Getting Started with Shape',
-               organization: organization,
-               num_cards: 3)
-      end
-      before do
-        organization.update_attributes(
-          getting_started_collection: getting_started_template,
-        )
-      end
-      let(:user_getting_started_collection) do
-        user.current_user_collection.collections.where(
-          name: 'Getting Started with Shape',
-        ).first
-      end
-
-      it 'copies collection to user' do
-        organization.setup_user_membership_and_collections(user)
-        expect(user_getting_started_collection.persisted?).to be true
-        expect(user_getting_started_collection).not_to eq(getting_started_template)
-        expect(user_getting_started_collection.editors).to eq(
-          users: [user],
-          groups: [],
-        )
-        expect(user_getting_started_collection.viewers).to eq(
-          users: [],
-          groups: [],
-        )
-      end
     end
   end
 
@@ -441,7 +412,7 @@ describe Organization, type: :model do
         expect(NetworkApi::Organization).to have_received(:create).with(
           external_id: organization.id,
           name: organization.name,
-          admin_user_uid: nil,
+          admin_user_uid: '',
         )
       end
     end

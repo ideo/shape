@@ -50,6 +50,15 @@ module Templateable
     UpdateTemplateInstancesWorker.perform_async(id)
   end
 
+  def update_test_template_instance_types!
+    return unless is_a?(Collection::TestCollection) || is_a?(Collection::TestDesign)
+    templated_collections.active.each do |instance|
+      instance.update(
+        collection_to_test_id: collection_to_test_id.nil? ? nil : instance.parent.id,
+      )
+    end
+  end
+
   def update_template_instances
     templated_collections.active.each do |instance|
       move_cards_deleted_from_master_template(instance)
@@ -60,6 +69,10 @@ module Templateable
       instance.reorder_cards!
       instance.touch
     end
+
+    return unless submission_box_template_test?
+    # method in test_collection to update all submissions
+    update_submissions_launch_status
   end
 
   def add_cards_from_master_template(instance)
@@ -70,6 +83,7 @@ module Templateable
       card.duplicate!(
         for_user: instance.created_by,
         parent: instance,
+        building_template_instance: true,
       )
     end
   end
@@ -83,6 +97,17 @@ module Templateable
         height: master.height,
         width: master.width,
         order: master.order,
+      )
+      next unless is_a?(Collection::TestCollection) && inside_a_submission_box_template?
+      # copy more details over if we are still setting up our submission template test
+      test = card.parent
+      next unless test.is_a?(Collection::TestCollection) && !test.launchable?
+      card.item.update(
+        type: master.item.type,
+        content: master.item.content,
+        url: master.item.url,
+        filestack_file_id: master.item.filestack_file_id,
+        question_type: master.item.question_type,
       )
     end
   end

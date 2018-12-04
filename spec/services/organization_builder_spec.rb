@@ -51,7 +51,7 @@ RSpec.describe OrganizationBuilder, type: :service do
       end
 
       it 'should create the templates' do
-        expect(OrganizationTemplates).to receive(:call).with(organization)
+        expect(OrganizationTemplates).to receive(:call).with(organization, user)
         builder.save
         expect(user.user_profile_for_org(organization.id)).not_to be nil
       end

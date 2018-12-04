@@ -12,12 +12,13 @@ import {
   TestQuestionHolder,
   styledTestTheme,
 } from '~/ui/test_collections/shared'
-import { apiStore } from '~/stores/'
-// NOTE: Always import these models after everything else, can lead to odd dependency!
-import CollectionCard from '~/stores/jsonApi/CollectionCard'
 import QuestionHotEdge from '~/ui/test_collections/QuestionHotEdge'
 import TestQuestion from '~/ui/test_collections/TestQuestion'
 import RadioControl from '~/ui/global/RadioControl'
+import PinnedIcon from '~/ui/icons/PinnedIcon'
+import { apiStore } from '~/stores'
+// NOTE: Always import these models after everything else, can lead to odd dependency!
+import CollectionCard from '~/stores/jsonApi/CollectionCard'
 
 const TopBorder = styled.div`
   background-color: ${props => props.theme.borderColorEditing};
@@ -66,6 +67,11 @@ const selectOptions = [
   { value: 'question_category_satisfaction', label: 'Category Satisfaction' },
 ]
 
+function optionSort(a, b) {
+  if (b.value === '') return 1
+  return a.label.localeCompare(b.label)
+}
+
 @observer
 class TestDesigner extends React.Component {
   constructor(props) {
@@ -93,21 +99,29 @@ class TestDesigner extends React.Component {
     }
   }
 
+  confirmEdit = action => {
+    const { collection } = this.props
+    collection.confirmEdit({
+      onConfirm: () => action(),
+    })
+  }
+
   handleSelectChange = replacingCard => ev =>
-    this.createNewQuestionCard({
-      replacingCard,
-      questionType: ev.target.value,
+    this.confirmEdit(() => {
+      this.createNewQuestionCard({
+        replacingCard,
+        questionType: ev.target.value,
+      })
     })
 
   handleTrash = card => {
-    // TODO: might *not* want to skipPrompt if the test is currently live
-    card.API_archiveSelf()
+    this.confirmEdit(() => card.API_archiveSelf())
   }
 
-  handleNew = card => () => {
-    const { collection } = this.props
-    collection.confirmEdit({
-      onConfirm: () => this.createNewQuestionCard({ order: card.order + 1 }),
+  handleNew = (card, addBefore) => () => {
+    this.confirmEdit(() => {
+      const order = addBefore ? card.order - 0.5 : card.order + 1
+      this.createNewQuestionCard({ order })
     })
   }
 
@@ -128,20 +142,22 @@ class TestDesigner extends React.Component {
     return first.API_archiveCards(_.map([first, second], 'id'))
   }
 
-  handleTestTypeChange = async e => {
+  handleTestTypeChange = e => {
     const { collection } = this.props
     const { collectionToTest } = this.state
     const { value } = e.target
-    this.setState({ testType: value })
-    if (value === 'media') {
-      collection.collection_to_test_id = null
-    } else if (collectionToTest) {
-      await this.archiveMediaCardsIfDefaultState()
-      collection.collection_to_test_id = collectionToTest.id
-    } else {
-      return
-    }
-    collection.save()
+    this.confirmEdit(async () => {
+      this.setState({ testType: value })
+      if (value === 'media') {
+        collection.collection_to_test_id = null
+      } else if (collectionToTest) {
+        await this.archiveMediaCardsIfDefaultState()
+        collection.collection_to_test_id = collectionToTest.id
+      } else {
+        return
+      }
+      collection.save()
+    })
   }
 
   get styledTheme() {
@@ -151,12 +167,28 @@ class TestDesigner extends React.Component {
     return styledTestTheme('primary')
   }
 
+  get canEditQuestions() {
+    const {
+      isTemplated,
+      can_edit_content,
+      test_status,
+      launchable,
+    } = this.props.collection
+    // We allow content editors (e.g. template instance) to edit the question content
+    // but not necessarily add or change the questions themselves, once the editor "launches"
+    if (isTemplated)
+      return can_edit_content && (test_status !== 'draft' || launchable)
+    return can_edit_content
+  }
+
   get canEdit() {
     // viewers still see the select forms, but disabled
-    const { collection } = this.props
+    const { isTemplated, can_edit_content } = this.props.collection
     // If this is a template instance, don't allow editing
-    if (collection.isTemplated) return false
-    return collection.can_edit_content
+    // NOTE: if we ever allow template instance editors to add their own questions at the end
+    // (before the finish card?) then we may want to individually check canEdit on a per card basis
+    if (isTemplated) return false
+    return can_edit_content
   }
 
   createNewQuestionCard = async ({
@@ -181,8 +213,8 @@ class TestDesigner extends React.Component {
     return card.API_create()
   }
 
-  renderHotEdge(card) {
-    return <QuestionHotEdge onAdd={this.handleNew(card)} />
+  renderHotEdge(card, addBefore = false) {
+    return <QuestionHotEdge onAdd={this.handleNew(card, addBefore)} />
   }
 
   renderQuestionSelectForm(card) {
@@ -205,7 +237,7 @@ class TestDesigner extends React.Component {
             value={card.card_question_type || ''}
             onChange={this.handleSelectChange(card)}
           >
-            {selectOptions.map(opt => (
+            {selectOptions.sort(optionSort).map(opt => (
               <SelectOption
                 key={opt.value}
                 classes={{
@@ -225,6 +257,10 @@ class TestDesigner extends React.Component {
               <TrashIcon />
             </TrashButton>
           )}
+        <div style={{ color: v.colors.commonMedium }}>
+          {card.isPinnedAndLocked && <PinnedIcon locked />}
+          {card.isPinnedInTemplate && <PinnedIcon />}
+        </div>
       </QuestionSelectHolder>
     )
   }
@@ -265,7 +301,7 @@ class TestDesigner extends React.Component {
 
     return (
       // maxWidth mainly to force the radio buttons from spanning the page
-      <form style={{ maxWidth: '500px' }}>
+      <form style={{ maxWidth: '750px' }}>
         <RadioControl
           options={options}
           name="test_type"
@@ -282,13 +318,15 @@ class TestDesigner extends React.Component {
     const inner = collection.collection_cards.map((card, i) => {
       let position
       const item = card.record
+      // blank item can occur briefly while the placeholder card/item is being replaced
+      if (!item) return null
       if (i === 0) position = 'question_beginning'
       if (i === cardCount - 1) position = 'question_end'
       const userEditable = [
         'media',
         'question_media',
         'question_description',
-      ].includes(card.record.question_type)
+      ].includes(item.question_type)
       return (
         <FlipMove appearAnimation="fade" key={card.id}>
           <div>
@@ -298,6 +336,7 @@ class TestDesigner extends React.Component {
                 flexWrap: 'wrap',
               }}
             >
+              {i === 0 && this.canEdit && this.renderHotEdge(card, true)}
               {this.renderQuestionSelectForm(card)}
               <TestQuestionHolder editing userEditable={userEditable}>
                 <TestQuestion
@@ -307,7 +346,7 @@ class TestDesigner extends React.Component {
                   item={item}
                   position={position}
                   order={card.order}
-                  canEdit={this.canEdit}
+                  canEdit={this.canEditQuestions}
                 />
               </TestQuestionHolder>
               {this.canEdit &&

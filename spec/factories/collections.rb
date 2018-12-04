@@ -28,6 +28,14 @@ FactoryBot.define do
     factory :user_profile, class: Collection::UserProfile
     factory :submission_box, class: Collection::SubmissionBox
     factory :submissions_collection, class: Collection::SubmissionsCollection
+
+    trait :submission do
+      after(:create) do |collection|
+        # needed for `inside_a_submission?` check
+        collection.update(submission_attrs: { submission: true })
+      end
+    end
+
     factory :test_design, class: Collection::TestDesign do
       transient do
         record_type :question

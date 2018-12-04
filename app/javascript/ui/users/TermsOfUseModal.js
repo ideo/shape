@@ -15,6 +15,11 @@ import v from '~/utils/variables'
 import poweredByIdeo from '~/assets/Powered-by-IDEO.png'
 
 const StyledDialog = styled(Dialog)`
+  // This ensures terms of use dialog always stays on top of all others.
+  &.root__dialog {
+    position: absolute;
+    z-index: 1500;
+  }
   .modal__paper {
     padding: 20px;
     max-width: 475px;
@@ -107,7 +112,7 @@ class TermsOfUseModal extends React.Component {
     const trialPricePerUser = (organization && organization.price_per_user) || 5
     return (
       <StyledDialog
-        classes={{ paper: 'modal__paper' }}
+        classes={{ root: 'root__dialog', paper: 'modal__paper' }}
         open
         BackdropProps={{
           invisible: true,

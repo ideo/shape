@@ -24,6 +24,6 @@ class SerializableUser < BaseJsonSerializer
   end
 
   attribute :is_super_admin do
-    @current_user.has_role?(Role::SUPER_ADMIN)
+    @current_user ? @current_user.has_role?(Role::SUPER_ADMIN) : false
   end
 end
