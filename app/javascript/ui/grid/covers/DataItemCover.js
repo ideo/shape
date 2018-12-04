@@ -1,6 +1,7 @@
 import { Fragment } from 'react'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import { runInAction, computed } from 'mobx'
+import moment from 'moment-mini'
 import styled from 'styled-components'
 import {
   VictoryArea,
@@ -27,33 +28,85 @@ import { theme } from '~/ui/test_collections/shared'
 
 class CustomLabel extends React.Component {
   static defaultEvents = VictoryTooltip.defaultEvents
+
+  get isLastDataPoint() {
+    const { data, index } = this.props
+    return parseInt(index) === data.length - 1
+  }
+
+  renderAmountMark(datum, totalData) {
+    const { maxAmount, minAmount } = this.props
+    if (datum.amount >= maxAmount) return true
+    if (datum.amount <= minAmount) return true
+    if (this.isLastDataPoint) return true
+    return false
+  }
+
   render() {
-    const { data, datum, index, maxAmount } = this.props
-    let active
-    if (datum.amount >= maxAmount) {
-      active = true
-    } else {
-      active = this.props.active
-    }
+    const { data, datum, dataSettings, index, x, y } = this.props
+    const showAlways = this.renderAmountMark(datum, data.length - 1)
     let dx = 0
     if (parseInt(index) === 0) {
       dx = 10
-    } else if (parseInt(index) === data.length - 1) {
+    } else if (this.isLastDataPoint) {
       dx = -10
     }
+    const momentDate = moment(datum.date)
+    const text = `${datum.amount} ${dataSettings.d_measure}\n
+      ${
+        this.isLastDataPoint
+          ? 'in last 30 days'
+          : `in ${momentDate.format('MMMM')} ${momentDate.year()}`
+      }`
     return (
       <g>
         <VictoryTooltip
-          active={active}
           {...this.props}
-          dx={dx}
+          cornerRadius={2}
+          height={40}
+          width={140}
+          dx={dx * 5}
           dy={0}
-          style={{ fontSize: '10px', fontWeight: 'normal' }}
-          text={`${datum.amount}`}
+          style={{
+            fill: 'white',
+            fontFamily: v.fonts.sans,
+            fontSize: '12px',
+            fontWeight: 'normal',
+          }}
+          text={text}
           orientation="top"
           pointerLength={0}
-          flyoutStyle={{ stroke: 'transparent', fill: 'transparent' }}
+          flyoutStyle={{
+            transform: 'translateY(-5px)',
+            stroke: 'transparent',
+            fill: v.colors.black,
+            opacity: 0.8,
+          }}
         />
+        {showAlways && (
+          <Fragment>
+            <VictoryTooltip
+              active={showAlways}
+              {...this.props}
+              dx={dx}
+              dy={-5}
+              style={{ fontSize: '10px', fontWeight: 'normal' }}
+              text={`${datum.amount}`}
+              orientation="top"
+              pointerLength={0}
+              flyoutStyle={{ stroke: 'transparent', fill: 'transparent' }}
+            />
+            <line
+              x1={x}
+              x2={x + 6}
+              y1={y + 8}
+              y2={y + 8}
+              dx={dx}
+              stroke="black"
+              strokeWidth={1}
+            />
+          </Fragment>
+        )}
       </g>
     )
   }
@@ -272,7 +325,7 @@ class DataItemCover extends React.Component {
     if (!values) return []
     return values.map(value =>
       Object.assign({}, value, {
-        date: shortMonths[new Date(value.date).getMonth() + 1],
+        month: shortMonths[new Date(value.date).getMonth() + 1],
       })
     )
   }
@@ -308,6 +361,7 @@ class DataItemCover extends React.Component {
   }
 
   renderTimeframeValues() {
+    const { item } = this.props
     return (
       <Fragment>
         <AboveChartContainer>
@@ -341,8 +395,14 @@ class DataItemCover extends React.Component {
                 }}
               />
               <VictoryArea
-                labels={d => (d.amount >= this.maxAmount ? d.amount : '')}
-                labelComponent={<CustomLabel maxAmount={this.maxAmount} />}
+                labels={d => d.amount}
+                labelComponent={
+                  <CustomLabel
+                    dataSettings={item.data_settings}
+                    minAmount={this.minAmount}
+                    maxAmount={this.maxAmount}
+                  />
+                }
                 style={{
                   data: { fill: 'url(#organicGrid)' },
                   labels: {
@@ -351,7 +411,7 @@ class DataItemCover extends React.Component {
                 }}
                 data={this.formattedValues}
                 y="amount"
-                x="date"
+                x="month"
               />
             </VictoryChart>
           </ChartContainer>
