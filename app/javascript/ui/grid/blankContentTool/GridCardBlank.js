@@ -52,8 +52,8 @@ const StyledBlankCreationTool = styled.div`
   .foreground {
     position: relative;
     z-index: ${v.zIndex.gridCard};
-    left: ${props => (props.replacing ? '25%' : 'auto')};
-    width: ${props => (props.replacing ? '50%' : '100%')};
+    left: auto;
+    width: 100%;
     &.foreground-bottom {
       top: 120px;
       margin: 0 auto;
@@ -303,6 +303,7 @@ class GridCardBlank extends React.Component {
       height,
       // `parent` is the collection this card belongs to
       parent_id: parent.id,
+      image_contain: this.props.defaultShowWholeImage,
     }
     // apply nested attrs
     Object.assign(attrs, nested)
@@ -425,7 +426,7 @@ class GridCardBlank extends React.Component {
     )
     const testBctBox = (
       <BctButtonBox
-        tooltip="Create test"
+        tooltip="Get feedback"
         type="testCollection"
         creating={creating}
         size={size}
@@ -479,18 +480,17 @@ class GridCardBlank extends React.Component {
               Icon={AddFileIcon}
             />
           )}
-          {!isReplacing &&
-            (!creating || creating === 'link') && (
-              <BctButtonBox
-                tooltip="Add URL"
-                type="link"
-                creating={creating}
-                size={size}
-                onClick={this.startCreating('link')}
-                Icon={AddLinkIcon}
-              />
-            )}
-          {(isReplacing || creating === 'video') && (
+          {(!creating || creating === 'link') && (
+            <BctButtonBox
+              tooltip="Add URL"
+              type="link"
+              creating={creating}
+              size={size}
+              onClick={this.startCreating('link')}
+              Icon={AddLinkIcon}
+            />
+          )}
+          {((isReplacing && creating !== 'link') || creating === 'video') && (
             <BctButtonRotation disabled={isReplacing}>
               {videoBctBox}
             </BctButtonRotation>
@@ -577,6 +577,7 @@ GridCardBlank.propTypes = {
   replacingId: PropTypes.string,
   order: PropTypes.number,
   testCollectionCard: PropTypes.bool,
+  defaultShowWholeImage: PropTypes.bool,
 }
 GridCardBlank.wrappedComponent.propTypes = {
   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
@@ -588,6 +589,7 @@ GridCardBlank.defaultProps = {
   replacingId: null,
   order: null,
   testCollectionCard: false,
+  defaultShowWholeImage: false,
 }
 
 // give a name to the injected component for unit tests

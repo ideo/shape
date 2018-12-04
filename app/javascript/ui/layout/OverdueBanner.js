@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import { Grid } from '@material-ui/core'
 import { MaxWidthContainer } from '~/ui/global/styled/layout'
-import ClockIcon from '~/ui/icons/ClockIcon'
+import OverdueClockIcon from '~/ui/icons/OverdueClockIcon'
 import CloseIcon from '~/ui/icons/CloseIcon'
 import v from '~/utils/variables'
 
@@ -73,7 +73,7 @@ class OverdueBanner extends React.Component {
             <Grid item xs={9} container spacing={16} alignItems="flex-end">
               <Grid item xs={1}>
                 <IconWrapper>
-                  <ClockIcon />
+                  <OverdueClockIcon />
                 </IconWrapper>
               </Grid>
               <Grid item xs={11}>

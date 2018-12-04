@@ -1,7 +1,7 @@
 class Api::V1::CollectionsController < Api::V1::BaseController
   deserializable_resource :collection, class: DeserializableCollection, only: %i[update]
   load_and_authorize_resource :collection_card, only: [:create]
-  load_and_authorize_resource except: %i[me update destroy in_my_collection]
+  load_and_authorize_resource except: %i[update destroy in_my_collection]
   # NOTE: these have to be in the following order
   before_action :load_and_authorize_collection_update, only: %i[update]
   before_action :load_collection_with_cards, only: %i[show update]
@@ -9,6 +9,11 @@ class Api::V1::CollectionsController < Api::V1::BaseController
   before_action :check_cache, only: %i[show]
   def show
     log_organization_view_activity
+    if @collection.class.in? [Collection::SharedWithMeCollection, Collection::SubmissionsCollection]
+      # special behavior where it defaults to newest first
+      params[:card_order] ||= 'updated_at'
+    end
+    log_collection_activity(:viewed)
     render_collection
   end
 
@@ -33,6 +38,7 @@ class Api::V1::CollectionsController < Api::V1::BaseController
   def update
     updated = CollectionUpdater.call(@collection, collection_params)
     if updated
+      log_collection_activity(:edited)
       return if @cancel_sync
       render_collection
     else
@@ -75,7 +81,7 @@ class Api::V1::CollectionsController < Api::V1::BaseController
   def check_cache
     fresh_when(
       last_modified: @collection.updated_at.utc,
-      etag: @collection.cache_key,
+      etag: @collection.cache_key(params[:card_order]),
     )
   end
 
@@ -155,6 +161,14 @@ class Api::V1::CollectionsController < Api::V1::BaseController
       actor: current_user,
       target: organization.primary_group,
       action: :joined,
+    )
+  end
+
+  def log_collection_activity(activity)
+    ActivityAndNotificationBuilder.call(
+      actor: current_user,
+      target: @collection,
+      action: activity,
     )
   end
 

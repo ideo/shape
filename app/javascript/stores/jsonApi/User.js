@@ -3,16 +3,41 @@ import { apiUrl } from '~/utils/url'
 
 import BaseRecord from './BaseRecord'
 
+/* global IdeoSSO */
+
 class User extends BaseRecord {
   static type = 'users'
   static endpoint = apiUrl('users')
 
   get name() {
-    return [this.first_name, this.last_name].join(' ')
+    const nameDisplay = [this.first_name, this.last_name].join(' ')
+    return nameDisplay.trim() || this.email
+  }
+
+  get nameWithHints() {
+    const hints = []
+    if (this.isCurrentUser) {
+      hints.push('(you)')
+    }
+    if (this.status === 'pending') {
+      hints.push('(pending)')
+    }
+    return [this.name, ...hints].join(' ').trim()
   }
 
   get isCurrentUser() {
     return this.apiStore.currentUserId === this.id
+  }
+
+  async logout() {
+    const { apiStore } = this
+    await apiStore.request('/sessions', 'DELETE')
+    try {
+      // Log user out of IDEO network, back to homepage
+      await IdeoSSO.logout('/')
+    } catch (e) {
+      window.location = '/login'
+    }
   }
 
   async API_updateCurrentUser(option = {}) {

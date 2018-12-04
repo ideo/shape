@@ -1,7 +1,9 @@
 <div id="react-root"></div>
 
 <script>
-  window.collectionData = <%= @collection.serialized_for_test_survey.to_json.html_safe %>
+  window.collectionData = <%= @collection.serialized_for_test_survey.to_json.html_safe %>;
+  window.nextAvailableId = <%= @next_submission_test ? @next_submission_test.id : 'null' %>;
+  window.noneAvailable = <%= params[:action] == 'completed' %>;
 </script>
 
 <%= javascript_pack_tag 'test-survey-app' %>

@@ -99,5 +99,22 @@ describe('InlineCollectionTest', () => {
         )
       })
     })
+
+    describe('if the testCollection is_submission_test', () => {
+      beforeEach(() => {
+        const respondedTestCollection = {
+          ...testCollection,
+          is_submission_test: true,
+        }
+        props.apiStore.request.mockReturnValue({
+          data: respondedTestCollection,
+        })
+        wrapper = shallow(<InlineCollectionTest.wrappedComponent {...props} />)
+      })
+
+      it('should check for the next available test', () => {
+        expect(testCollection.API_getNextAvailableTest).toHaveBeenCalled()
+      })
+    })
   })
 })

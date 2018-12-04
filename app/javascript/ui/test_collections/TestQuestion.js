@@ -6,6 +6,7 @@ import GridCard from '~/ui/grid/GridCard'
 import GridCardBlank from '~/ui/grid/blankContentTool/GridCardBlank'
 import DescriptionQuestion from '~/ui/test_collections/DescriptionQuestion'
 import FinishQuestion from '~/ui/test_collections/FinishQuestion'
+import NextTestQuestion from '~/ui/test_collections/NextTestQuestion'
 import NewQuestionGraphic from '~/ui/icons/NewQuestionGraphic'
 import ScaleQuestion from '~/ui/test_collections/ScaleQuestion'
 import OpenQuestion from '~/ui/test_collections/OpenQuestion'
@@ -97,6 +98,7 @@ class TestQuestion extends React.Component {
               order={card.order}
               replacingId={card.id}
               testCollectionCard
+              defaultShowWholeImage
             />
           )
         } else {
@@ -134,7 +136,17 @@ class TestQuestion extends React.Component {
           />
         )
       case 'question_finish':
-        return <FinishQuestion />
+        if (parent.nextAvailableTestPath) {
+          return <NextTestQuestion path={parent.nextAvailableTestPath} />
+        }
+        return (
+          <FinishQuestion
+            submissionBox={
+              parent.is_submission_box_template_test ||
+              parent.is_submission_test
+            }
+          />
+        )
       default:
         return <NewQuestionGraphic />
     }

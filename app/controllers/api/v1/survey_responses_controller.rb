@@ -8,6 +8,8 @@ class Api::V1::SurveyResponsesController < Api::V1::BaseController
   end
 
   def create
+    # NOTE: because we create a unique session_uid every time, this means that for submission box
+    # tests we aren't really "progressing" you through ones you haven't seen, unless you're logged in.
     @survey_response = @collection.create_uniq_survey_response(user_id: current_user&.id)
     if @survey_response
       render jsonapi: @survey_response

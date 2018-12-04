@@ -1,9 +1,11 @@
 class Collection
   class TestDesign < Collection
     belongs_to :test_collection, class_name: 'Collection::TestCollection'
-    delegate :can_reopen?, :test_status,
+    delegate :can_reopen?,
+             :launchable?,
+             :test_status,
+             :collection_to_test,
              to: :test_collection
-    delegate :collection_to_test, to: :test_collection
 
     after_commit :close_test, if: :archived_on_previous_save?
 

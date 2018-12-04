@@ -228,9 +228,17 @@ class MovableGridCard extends React.PureComponent {
       uiStore.closeCardMenu()
       return
     }
-    if (!e.target.className.match) return
-    if (e.target.className.match(/cancelGridClick/)) return
-    if (e.target.tagName === 'A' && e.target.href) return
+
+    if (
+      !e.target.className.match ||
+      // cancel for elements matching or inside a .cancelGridClick
+      e.target.className.match(/cancelGridClick/) ||
+      e.target.closest('.cancelGridClick') ||
+      // cancel for links within the card as these should handle their own routing
+      (e.target.tagName === 'A' && e.target.href)
+    ) {
+      return
+    }
 
     // timeout is just a stupid thing so that Draggable doesn't complain about unmounting
     setTimeout(() => {

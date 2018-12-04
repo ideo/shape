@@ -18,6 +18,15 @@ class CollectionTemplateBuilder
     setup_template_cards
     # mainly so template_num_instances will be refreshed in API cache
     @template.touch
+    if @parent.is_a? Collection::SubmissionsCollection
+      # this will get persisted when calling cache_cover!
+      @collection.submission_attrs = { submission: true }
+      submission_template = @parent.submission_box.submission_template
+      if (test_id = submission_template.try(:submission_attrs).try(:[], 'launchable_test_id'))
+        master_test = Collection::TestCollection.find(test_id)
+        master_test.update_submission_launch_status(@collection)
+      end
+    end
     # re-save to capture cover, new breadcrumb + tag lists
     @collection.cache_cover!
     @collection

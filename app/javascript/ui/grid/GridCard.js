@@ -1,7 +1,6 @@
 import PropTypes from 'prop-types'
 import { Fragment } from 'react'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
-import styled from 'styled-components'
 
 import ChartItemCover from '~/ui/grid/covers/ChartItemCover'
 import ContainImage from '~/ui/grid/ContainImage'
@@ -15,6 +14,7 @@ import VideoItemCover from '~/ui/grid/covers/VideoItemCover'
 import GenericFileItemCover from '~/ui/grid/covers/GenericFileItemCover'
 import CollectionCover from '~/ui/grid/covers/CollectionCover'
 
+import Activity from '~/stores/jsonApi/Activity'
 import ActionMenu from '~/ui/grid/ActionMenu'
 import CollectionIcon from '~/ui/icons/CollectionIcon'
 import LinkIcon from '~/ui/icons/LinkIcon'
@@ -34,26 +34,6 @@ import {
   StyledGridCardInner,
   StyledTopRightActions,
 } from './shared'
-
-const PinIconHolder = styled.div`
-  background-color: ${props => (props.locked ? 'transparent' : v.colors.black)};
-  border-radius: 50%;
-  height: 24px;
-  margin-left: 10px;
-  margin-top: 10px;
-  text-align: center;
-  width: 24px;
-
-  .icon {
-    height: 25px;
-    width: 25px;
-
-    svg {
-      margin-right: 1px;
-      width: 80%;
-    }
-  }
-`
 
 @observer
 class GridCard extends React.Component {
@@ -124,6 +104,10 @@ class GridCard extends React.Component {
           height={card.maxHeight}
           collection={record}
           dragging={this.props.dragging}
+          inSubmissionsCollection={
+            card.parentCollection &&
+            card.parentCollection.isSubmissionsCollection
+          }
         />
       )
     }
@@ -195,12 +179,10 @@ class GridCard extends React.Component {
 
   renderPin() {
     const { card } = this.props
-    const hoverClass = card.isPinnedAndLocked && 'show-on-hover'
+    const hoverClass = card.isPinnedAndLocked ? 'show-on-hover' : ''
     return (
       <Tooltip title="pinned" placement="top">
-        <PinIconHolder className={hoverClass} locked={card.isPinnedAndLocked}>
-          <PinnedIcon />
-        </PinIconHolder>
+        <PinnedIcon className={hoverClass} locked={card.isPinnedAndLocked} />
       </Tooltip>
     )
   }
@@ -242,10 +224,15 @@ class GridCard extends React.Component {
   }
 
   linkOffsite = url => {
-    Object.assign(document.createElement('a'), {
+    const { record } = this.props
+    Activity.trackActivity('viewed', record)
+    const anchor = Object.assign(document.createElement('a'), {
       target: '_blank',
       href: url,
-    }).click()
+    })
+    document.body.append(anchor)
+    anchor.click()
+    anchor.remove()
   }
 
   onCollectionCoverChange = () => {
@@ -334,7 +321,7 @@ class GridCard extends React.Component {
                 wrapperClassName="card-menu"
                 card={card}
                 canEdit={this.canEditCard}
-                canReplace={record.canReplace}
+                canReplace={record.canReplace && !card.link}
                 menuOpen={menuOpen}
                 onOpen={this.openMenu}
                 onLeave={this.closeMenu}

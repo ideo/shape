@@ -156,7 +156,7 @@ class VideoUrl {
     } catch (e) {
       // could be a 404, or a 401...
       // until we have a vbrick login, hard to test how to respond to private/unauthorized
-      return {}
+      return this.vimeoPrivate()
     }
   }
 

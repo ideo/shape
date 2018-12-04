@@ -29,20 +29,25 @@ class Collection
 
       error_on_all_events :aasm_event_failed
 
-      event :launch, before: proc { |**args|
-                               return false unless test_completed?
-                               remove_incomplete_question_items
-                               create_test_design_and_move_cards!(initiated_by: args[:initiated_by])
-                             } do
+      event :launch,
+            guard: :completed_and_launchable?,
+            after_commit: proc { |**args|
+                            launch_test!(initiated_by: args[:initiated_by])
+                          } do
         transitions from: :draft, to: :live
       end
 
-      event :close do
+      event :close,
+            after_commit: :after_close_test do
         transitions from: :live, to: :closed
       end
 
-      event :reopen do
-        transitions from: :closed, to: :live, guard: :test_completed?
+      event :reopen,
+            guard: :can_reopen?,
+            after_commit: proc { |**args|
+                            launch_test!(initiated_by: args[:initiated_by], reopening: true)
+                          } do
+        transitions from: :closed, to: :live
       end
     end
 
@@ -55,52 +60,110 @@ class Collection
       ]
     end
 
-    def duplicate!(**args)
-      # Only copy over test questions in pre-launch state
-      if test_design.present?
-        # If test design has already been created, just dupe that
-        duplicate = test_design.duplicate!(args)
-      else
-        # Otherwise dupe this collection
-        duplicate = super(args)
+    def launch_test!(initiated_by: nil, reopening: false)
+      # remove the "blanks"
+      remove_incomplete_question_items
+      if submission_box_template_test?
+        parent_submission_box_template.update(
+          submission_attrs: {
+            template: true,
+            launchable_test_id: id,
+            test_status: test_status,
+          },
+        )
+        # make sure all templates get the latest question setup
+        queue_update_template_instances
+        # submission box master template test doesn't create a test_design, move cards, etc.
+        return true
       end
+      update_cached_submission_status(parent_submission) if inside_a_submission?
+      # TODO: Perhaps need to do *some* of this setup when reopening?
+      create_test_design_and_move_cards!(initiated_by: initiated_by) unless reopening
+    end
 
-      return duplicate if duplicate.new_record? || args[:parent].blank?
-
-      duplicate.type = 'Collection::TestCollection'
-      duplicate = duplicate.becomes(Collection::TestCollection)
-      if collection_to_test.present?
-        # Point to the new parent as the one to test
-        duplicate.collection_to_test = args[:parent]
-      elsif !args[:parent].master_template?
-        # Prefix with 'Copy' if it isn't still within a template
-        duplicate.name = "Copy of #{name}"
+    def after_close_test
+      if inside_a_submission?
+        update_cached_submission_status(parent_submission)
+      elsif submission_box_template_test?
+        update_cached_submission_status(parent_submission_box_template)
+        close_all_submissions_tests!
       end
-      duplicate.save
-      duplicate
     end
 
-    # alias method, will delegate to test_design if test is live
-    def question_items
-      if test_design.present?
-        return test_design.question_items
+    def update_cached_submission_status(related)
+      # `related` will be either a submission, or a submission_template
+      # we need to track any changes in the cached test_status
+      related.submission_attrs ||= {}
+      related.submission_attrs['test_status'] = test_status
+      related.save
+    end
+
+    # This gets called by template update worker when you launch
+    def update_submissions_launch_status
+      return unless master_template?
+      parent_submission_box.submissions_collection.collections.each do |submission|
+        update_submission_launch_status(submission)
       end
-      prelaunch_question_items
     end
 
-    def can_reopen?
-      closed? && test_design.present?
-    end
-
-    def test_open_response_collections
-      collections.where(type: 'Collection::TestOpenResponses')
-    end
-
-    def create_uniq_survey_response(user_id: nil)
-      survey_responses.create(
-        session_uid: SecureRandom.uuid,
-        user_id: user_id,
+    def update_submission_launch_status(submission)
+      # find the launchable test within this particular submission
+      launchable_test = Collection
+                        .in_collection(submission)
+                        .find_by(template_id: id)
+      return unless launchable_test.present?
+      if launchable_test.is_a?(Collection::TestDesign)
+        launchable_test = launchable_test.test_collection
+      end
+      submission.update(
+        submission_attrs: {
+          # this should have already been set but want to preserve the value as true
+          submission: true,
+          template_test_id: id,
+          launchable_test_id: launchable_test.id,
+          test_status: launchable_test.test_status,
+        },
       )
+      # e.g. if we switched which test is running, we want to switch to the latest one
+      submission.cache_test_scores!
+    end
+
+    def close_all_submissions_tests!
+      test_ids = parent_submission_box.submissions_collection.collections.map do |c|
+        next unless c.submission_attrs['test_status'] == 'live'
+        c.submission_attrs['launchable_test_id']
+      end.compact
+
+      # another one that could maybe use a bg worker (if lots of tests)
+      # we use the AASM method to ensure that callbacks are carried through
+      Collection::TestCollection.where(id: test_ids).each(&:close!)
+    end
+
+    # various checks for if this test_collection is in a launchable state
+    # note that `test_completed?` is independent from this
+    def launchable?
+      return false unless draft? || closed?
+      # is this in a submission? If so, am I tied to a test template, and is that one launched?
+      if inside_a_submission?
+        return false unless submission_test_launchable?
+      end
+      # standalone tests otherwise don't really have any restrictions
+      return true unless collection_to_test_id.present?
+      # lastly -- make sure there is not another live in-collection test for the same collection
+      collection_to_test.live_test_collection.blank?
+    end
+
+    def submission_test_launchable?
+      # This checks if the parent template has been launched, which indicates that the
+      # submission box editors have enabled the related submission tests
+      test_template = nil
+      if templated?
+        test_template = template
+      elsif test_design.present? && test_design.templated?
+        # the template relation gets moved to the test_design after launch, e.g. for 'reopen'
+        test_template = test_design.template
+      end
+      test_template ? test_template.live? : true
     end
 
     def test_completed?
@@ -126,6 +189,59 @@ class Collection
         complete = false
       end
       complete
+    end
+
+    def completed_and_launchable?
+      test_completed? && launchable?
+    end
+
+    def can_reopen?
+      return false unless launchable? && test_completed?
+      test_design.present? || submission_box_template_test?
+    end
+
+    def duplicate!(**args)
+      # Only copy over test questions in pre-launch state
+      if test_design.present?
+        # If test design has already been created, just dupe that
+        duplicate = test_design.duplicate!(args)
+      else
+        # Otherwise dupe this collection
+        duplicate = super(args)
+      end
+
+      return duplicate if duplicate.new_record? || args[:parent].blank?
+
+      duplicate.type = 'Collection::TestCollection'
+      duplicate = duplicate.becomes(Collection::TestCollection)
+      if collection_to_test.present?
+        # Point to the new parent as the one to test
+        duplicate.collection_to_test = args[:parent]
+      elsif !parent.master_template? && !args[:parent].master_template?
+        # Prefix with 'Copy' if it isn't still within a template
+        duplicate.name = "Copy of #{name}"
+      end
+      duplicate.save
+      duplicate
+    end
+
+    # alias method, will delegate to test_design if available
+    def question_items
+      if test_design.present?
+        return test_design.question_items
+      end
+      prelaunch_question_items
+    end
+
+    def test_open_response_collections
+      collections.where(type: 'Collection::TestOpenResponses')
+    end
+
+    def create_uniq_survey_response(user_id: nil)
+      survey_responses.create(
+        session_uid: SecureRandom.uuid,
+        user_id: user_id,
+      )
     end
 
     def survey_response_for_user(user_id)
@@ -276,7 +392,7 @@ class Collection
       # create the special #test tag
       tag(
         self,
-        with: 'test',
+        with: 'feedback',
         on: :tags,
       )
       update_cached_tag_lists

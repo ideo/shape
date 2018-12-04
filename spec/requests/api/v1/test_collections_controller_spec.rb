@@ -71,7 +71,13 @@ describe Api::V1::TestCollectionsController, type: :request, json: true, auth: t
     let(:path) { "/api/v1/test_collections/#{collection.id}/reopen" }
 
     context 'with an already closed test collection' do
-      let!(:collection) { create(:test_collection, :completed, test_status: :closed, add_editors: [user]) }
+      let!(:collection) { create(:test_collection, :completed, add_editors: [user]) }
+
+      before do
+        # make sure the test_design is set up, otherwise `can_reopen?` will be false
+        collection.launch!(initiated_by: user)
+        collection.close!
+      end
 
       it 'should allow the reopen action' do
         patch(path)

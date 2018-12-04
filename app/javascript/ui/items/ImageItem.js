@@ -13,11 +13,11 @@ StyledImage.displayName = 'StyledImage'
 class ImageItem extends React.PureComponent {
   render() {
     const { item, onCancel } = this.props
-    const { filestack_file_url } = item
+    const { originalImageUrl } = item
     return (
       <div>
         <CloseButton onClick={onCancel} />
-        <StyledImage src={filestack_file_url} alt={item.name} />
+        <StyledImage src={originalImageUrl} alt={item.name} />
       </div>
     )
   }
