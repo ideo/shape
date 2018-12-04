@@ -32,7 +32,7 @@ const DotFlyout = props => (
     <Flyout {...props} />
     <circle
       cx={props.x}
-      cy={props.y + 8}
+      cy={props.y + 9}
       r="4"
       stroke={v.colors.white}
       strokeWidth={0.5}
@@ -114,12 +114,12 @@ class CustomLabel extends React.Component {
             />
             <line
               x1={x}
-              x2={x + 6}
-              y1={y + 8}
-              y2={y + 8}
+              x2={x + 8}
+              y1={y + 9}
+              y2={y + 9}
               dx={dx}
               stroke="black"
-              strokeWidth={1}
+              strokeWidth={0.75}
             />
           </Fragment>
         )}
