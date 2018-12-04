@@ -100,12 +100,15 @@ class Breadcrumb extends React.Component {
     return compact(items)
   }
 
-  totalNameLength = items =>
-    sumBy(
-      items,
-      item =>
-        item.truncatedName ? item.truncatedName.length : item.name.length
-    )
+  totalNameLength = items => {
+    if (!items) return 0
+    return sumBy(items, item => {
+      let len = 0
+      if (item.truncatedName) len = item.truncatedName.length
+      else if (item.name) len = item.name.length
+      return len
+    })
+  }
 
   charsToTruncateForItems = items =>
     this.totalNameLength(items) - this.calculateMaxChars()

@@ -75,6 +75,7 @@ export const fakeImageItemAttrs = {
 }
 export const fakeImageItem = {
   ...fakeImageItemAttrs,
+  imageUrl: jest.fn().mockReturnValue('http://fake.url/img'),
   rawAttributes: jest.fn().mockReturnValue(fakeTextItemAttrs),
   getRecordType: jest.fn().mockReturnValue('items'),
 }

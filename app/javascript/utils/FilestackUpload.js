@@ -8,7 +8,7 @@ export const MAX_SIZE = 25 * 1024 * 1024
 const imageUploadConfig = {
   accept: ['.pdf', 'image/*', 'application/*', 'text/*', '.docx', '.ppt'],
   maxFiles: 1,
-  imageMax: [1200, 1200],
+  imageMax: [7500, 7500],
   maxSize: MAX_SIZE,
   transformations: {
     crop: {

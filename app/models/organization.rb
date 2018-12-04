@@ -87,7 +87,6 @@ class Organization < ApplicationRecord
 
     # Set this as the user's current organization if they don't have one
     user.switch_to_organization(self) if user.current_organization_id.blank?
-    find_or_create_user_getting_started_collection(user)
   end
 
   def guest_group_name
@@ -136,7 +135,7 @@ class Organization < ApplicationRecord
     )
   end
 
-  def find_or_create_user_getting_started_collection(user)
+  def find_or_create_user_getting_started_collection(user, synchronous: false)
     return if getting_started_collection.blank?
     user_collection = user.current_user_collection(id)
     # should find it even if you had archived it
@@ -150,6 +149,7 @@ class Organization < ApplicationRecord
       for_user: user,
       parent: user_collection,
       system_collection: true,
+      synchronous: synchronous,
     )
 
     # Change from Collection::Global to regular colleciton
@@ -205,10 +205,14 @@ class Organization < ApplicationRecord
   end
 
   def create_groups
-    create_primary_group(name: name, organization: self)
-    create_guest_group(name: guest_group_name, organization: self, handle: guest_group_handle)
-    create_admin_group(name: admin_group_name, organization: self, handle: admin_group_handle)
-    save # Save primary group attr
+    primary_group = create_primary_group(name: name, organization: self)
+    guest_group = create_guest_group(name: guest_group_name, organization: self, handle: guest_group_handle)
+    admin_group = create_admin_group(name: admin_group_name, organization: self, handle: admin_group_handle)
+    update_columns(
+      primary_group_id: primary_group.id,
+      guest_group_id: guest_group.id,
+      admin_group_id: admin_group.id,
+    )
   end
 
   def update_group_names

@@ -118,8 +118,7 @@ describe Api::V1::UsersController, type: :request, json: true, auth: true, creat
       let!(:org2_user) do
         create(:user,
                first_name: find_user.first_name,
-               last_name: find_user.last_name
-               )
+               last_name: find_user.last_name)
       end
 
       before do
@@ -140,11 +139,11 @@ describe Api::V1::UsersController, type: :request, json: true, auth: true, creat
     let(:emails) { Array.new(3).map { Faker::Internet.email } }
     let(:users_json) { json_included_objects_of_type('users') }
     let(:path) { '/api/v1/users/create_from_emails' }
-    let(:params) {
+    let(:params) do
       {
         'emails': emails,
       }.to_json
-    }
+    end
 
     it 'returns a 200' do
       post(path, params: params)
@@ -211,6 +210,7 @@ describe Api::V1::UsersController, type: :request, json: true, auth: true, creat
 
     before do
       organization.update(slug: 'sluggity-slug')
+      switch_organization.update(slug: 'glug-2')
       user.add_role(Role::MEMBER, switch_organization.primary_group)
     end
 

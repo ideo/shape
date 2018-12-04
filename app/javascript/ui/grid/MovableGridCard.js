@@ -229,13 +229,20 @@ class MovableGridCard extends React.PureComponent {
       return
     }
     const formTags = ['SELECT', 'OPTION']
-    if (!e.target.className) return
-    if (!e.target.className.match) return
-    if (e.target.className.match(/cancelGridClick/)) return
-    if (e.target.className.match(/selectMenu/)) return
-    if (e.target.tagName === 'A' && e.target.href) return
-    if (formTags.includes(e.target.tagName)) return
-    if (record.type === 'Item::DataItem') return
+    if (
+      !e.target.className ||
+      !e.target.className.match ||
+      // cancel for elements matching or inside a .cancelGridClick
+      e.target.className.match(/cancelGridClick/) ||
+      e.target.closest('.cancelGridClick') ||
+      e.target.className.match(/selectMenu/) ||
+      // cancel for links within the card as these should handle their own routing
+      (e.target.tagName === 'A' && e.target.href) ||
+      formTags.includes(e.target.tagName) ||
+      record.type === 'Item::DataItem'
+    ) {
+      return
+    }
 
     // timeout is just a stupid thing so that Draggable doesn't complain about unmounting
     setTimeout(() => {
