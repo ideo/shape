@@ -173,7 +173,6 @@ describe Organization, type: :model do
             expect(NetworkApi::Subscription).to receive(:create).with(
               organization_id: network_organization.id,
               plan_id: plan.id,
-              payment_method_id: nil,
             )
 
             organization.update_attributes(in_app_billing: true)
@@ -449,17 +448,47 @@ describe Organization, type: :model do
 
   describe '#create_network_subscription', :vcr do
     let!(:organization) { create(:organization) }
-    it 'creates a network subscription with the first plan' do
-      network_organization = double('network_organization', id: 234)
-      plan = double('plan', id: 123)
-      allow(organization).to receive(:network_organization).and_return(network_organization)
+    let!(:network_organization) { double('network_organization', id: 234) }
+    let!(:plan) { double('plan', id: 123) }
+
+    before do
       allow(NetworkApi::Plan).to receive(:first).and_return(plan)
-      expect(NetworkApi::Subscription).to receive(:create).with(
-        organization_id: network_organization.id,
-        plan_id: plan.id,
-        payment_method_id: nil,
-      )
-      organization.create_network_subscription
+      allow(organization).to receive(:network_organization).and_return(network_organization)
+    end
+
+    context 'has a payment method' do
+      let(:payment_method) { double('payment_method', id: 234) }
+      before do
+        allow(NetworkApi::PaymentMethod).to receive(:find).with(
+          organization_id: network_organization.id,
+          default: true,
+        ).and_return([payment_method])
+      end
+      it 'creates a network subscription with the first plan' do
+        expect(NetworkApi::Subscription).to receive(:create).with(
+          organization_id: network_organization.id,
+          plan_id: plan.id,
+          payment_method_id: payment_method.id,
+        )
+        organization.create_network_subscription
+      end
+    end
+
+    context 'does not have a payment method' do
+      before do
+        allow(NetworkApi::PaymentMethod).to receive(:find).with(
+          organization_id: network_organization.id,
+          default: true,
+        ).and_return([])
+      end
+
+      it 'creates a network subscription with the first plan' do
+        expect(NetworkApi::Subscription).to receive(:create).with(
+          organization_id: network_organization.id,
+          plan_id: plan.id,
+        )
+        organization.create_network_subscription
+      end
     end
   end
 
