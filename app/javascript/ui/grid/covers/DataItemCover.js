@@ -4,6 +4,7 @@ import { runInAction, computed } from 'mobx'
 import moment from 'moment-mini'
 import styled from 'styled-components'
 import {
+  Flyout,
   VictoryArea,
   VictoryAxis,
   VictoryChart,
@@ -12,6 +13,8 @@ import {
   VictoryVoronoiContainer,
 } from 'victory'
 
+import OrganicGridPng from '~/assets/organic_grid_black.png'
+import OrganicGrid from '~/ui/icons/OrganicGrid'
 import MeasureSelect from '~/ui/reporting/MeasureSelect'
 import TargetButton from '~/ui/reporting/TargetButton'
 import EditableButton from '~/ui/reporting/EditableButton'
@@ -24,35 +27,107 @@ import {
 import v from '~/utils/variables'
 import { theme } from '~/ui/test_collections/shared'
 
+const utcMoment = date =>
+  moment(`${date} 00+0000`)
+    .utc()
+    .subtract(1, 'months')
+
+const DotFlyout = props => (
+  <g>
+    <Flyout {...props} />
+    <circle
+      cx={props.x}
+      cy={props.y + 9}
+      r="4"
+      stroke={v.colors.white}
+      strokeWidth={0.5}
+      fill={v.colors.black}
+    />
+  </g>
+)
+
 class CustomLabel extends React.Component {
   static defaultEvents = VictoryTooltip.defaultEvents
+
+  get isLastDataPoint() {
+    const { data, index } = this.props
+    return parseInt(index) === data.length - 1
+  }
+
+  renderAmountMark(datum, totalData) {
+    const { maxAmount, minAmount } = this.props
+    if (datum.amount >= maxAmount) return true
+    if (datum.amount <= minAmount) return true
+    if (this.isLastDataPoint) return true
+    return false
+  }
+
   render() {
-    const { data, datum, index, maxAmount } = this.props
-    let active
-    if (datum.amount >= maxAmount) {
-      active = true
-    } else {
-      active = this.props.active
-    }
+    const { data, datum, dataSettings, index, x, y } = this.props
+    const showAlways = this.renderAmountMark(datum, data.length - 1)
     let dx = 0
     if (parseInt(index) === 0) {
       dx = 10
-    } else if (parseInt(index) === data.length - 1) {
+    } else if (this.isLastDataPoint) {
       dx = -10
     }
+    const momentDate = utcMoment(datum.date)
+    const text = `${datum.amount} ${dataSettings.d_measure}\n
+      ${
+        this.isLastDataPoint
+          ? 'in last 30 days'
+          : `in ${momentDate.format('MMMM')} ${momentDate.year()}`
+      }`
     return (
       <g>
         <VictoryTooltip
-          active={active}
           {...this.props}
-          dx={dx}
+          cornerRadius={2}
+          flyoutComponent={<DotFlyout />}
+          height={40}
+          width={140}
+          dx={dx * 5}
           dy={0}
-          style={{ fontSize: '10px', fontWeight: 'normal' }}
-          text={`${datum.amount}`}
+          style={{
+            fill: 'white',
+            fontFamily: v.fonts.sans,
+            fontSize: '12px',
+            fontWeight: 'normal',
+          }}
+          text={text}
           orientation="top"
           pointerLength={0}
-          flyoutStyle={{ stroke: 'transparent', fill: 'transparent' }}
+          flyoutStyle={{
+            transform: 'translateY(-5px)',
+            stroke: 'transparent',
+            fill: v.colors.black,
+            opacity: 0.8,
+          }}
         />
+        {showAlways && (
+          <Fragment>
+            <VictoryTooltip
+              active={showAlways}
+              {...this.props}
+              dx={dx}
+              dy={-5}
+              style={{ fontSize: '10px', fontWeight: 'normal' }}
+              text={`${datum.amount}`}
+              orientation="top"
+              pointerLength={0}
+              flyoutStyle={{ stroke: 'transparent', fill: 'transparent' }}
+            />
+            <line
+              x1={x}
+              x2={x + 8}
+              y1={y + 9}
+              y2={y + 9}
+              dx={dx}
+              stroke="black"
+              strokeWidth={0.75}
+            />
+          </Fragment>
+        )}
       </g>
     )
   }
@@ -75,13 +150,17 @@ const StyledDataItemCover = styled.div`
   padding: 15px 0;
   text-align: left;
 
-  .measure {
+  .editableMetric {
     ${props =>
       props.editable &&
       `
-      &:hover {
-        background-color: ${v.colors.primaryLight};
-      }
+    &:hover {
+      background-color: ${v.colors.primaryLight};
+    }
+    ${props.editing &&
+      `
+      background-color: ${v.colors.primaryLight};
+`};
 `};
   }
 `
@@ -99,7 +178,8 @@ const ChartContainer = styled.div`
 `
 
 const GraphKey = styled.span`
-  background-color: ${v.colors.tertiaryDark};
+  background: url(${OrganicGridPng});
+  background-size: 150%;
   display: inline-block;
   height: 16px;
   margin-right: 10px;
@@ -138,28 +218,32 @@ class DataItemCover extends React.Component {
     )
     if (this.editing) {
       timeframeControl = (
-        <MeasureSelect
-          dataSettingsName="timeframe"
-          item={item}
-          onSelect={this.onSelectTimeframe}
-        />
+        <span className="editableMetric">
+          <MeasureSelect
+            dataSettingsName="timeframe"
+            item={item}
+            onSelect={this.onSelectTimeframe}
+          />
+        </span>
       )
       measureControl = (
-        <MeasureSelect
-          dataSettingsName="measure"
-          item={item}
-          onSelect={this.onSelectMeasure}
-        />
+        <span className="editableMetric">
+          <MeasureSelect
+            dataSettingsName="measure"
+            item={item}
+            onSelect={this.onSelectMeasure}
+          />
+        </span>
       )
     } else if (editable) {
       timeframeControl = (
         <EditableButton editable={editable} onClick={this.handleEditClick}>
-          {data_settings.d_timeframe}
+          <span className="editableMetric">{data_settings.d_timeframe}</span>
         </EditableButton>
       )
       measureControl = (
         <EditableButton editable={editable} onClick={this.handleEditClick}>
-          {data_settings.d_measure}
+          <span className="editableMetric">{data_settings.d_measure}</span>
         </EditableButton>
       )
     }
@@ -249,10 +333,7 @@ class DataItemCover extends React.Component {
     if (!values) return []
     return values.map(value =>
       Object.assign({}, value, {
-        date: moment(`${value.date} 00+0000`)
-          .utc()
-          .subtract(1, 'months')
-          .format('MMM'),
+        month: utcMoment(value.date).format('MMM'),
       })
     )
   }
@@ -269,19 +350,22 @@ class DataItemCover extends React.Component {
     const { item } = this.props
     return (
       <Fragment>
-        <Heading3
-          className="measure"
-          onClick={this.handleEditClick}
-          style={{ marginBottom: 0 }}
-        >
-          {item.data_settings.d_measure}
-        </Heading3>
-        {this.editing && (
-          <MeasureSelect
-            dataSettingsName="measure"
-            item={item}
-            onSelect={this.onSelectMeasure}
-          />
+        {!this.editing ? (
+          <Heading3 onClick={this.handleEditClick} style={{ marginBottom: 0 }}>
+            <span className="editableMetric">
+              {item.data_settings.d_measure}
+            </span>
+          </Heading3>
+        ) : (
+          <Heading3>
+            <span className="editableMetric">
+              <MeasureSelect
+                dataSettingsName="measure"
+                item={item}
+                onSelect={this.onSelectMeasure}
+              />
+            </span>
+          </Heading3>
         )}
         <HugeNumber className="count">{item.data.value}</HugeNumber>
         <SmallHelperText color={v.colors.black}>
@@ -292,6 +376,7 @@ class DataItemCover extends React.Component {
   }
 
   renderTimeframeValues() {
+    const { item } = this.props
     return (
       <Fragment>
         <AboveChartContainer>
@@ -306,6 +391,7 @@ class DataItemCover extends React.Component {
         </AboveChartContainer>
         {this.formattedValues.length >= 2 && (
           <ChartContainer>
+            <OrganicGrid />
             <VictoryChart
               theme={theme}
               domainPadding={{ y: 80 }}
@@ -324,17 +410,23 @@ class DataItemCover extends React.Component {
                 }}
               />
               <VictoryArea
-                labels={d => (d.amount >= this.maxAmount ? d.amount : '')}
-                labelComponent={<CustomLabel maxAmount={this.maxAmount} />}
+                labels={d => d.amount}
+                labelComponent={
+                  <CustomLabel
+                    dataSettings={item.data_settings}
+                    minAmount={this.minAmount}
+                    maxAmount={this.maxAmount}
+                  />
+                }
                 style={{
-                  data: { fill: v.colors.tertiaryDark },
+                  data: { fill: 'url(#organicGrid)' },
                   labels: {
                     fill: 'black',
                   },
                 }}
                 data={this.formattedValues}
                 y="amount"
-                x="date"
+                x="month"
               />
             </VictoryChart>
           </ChartContainer>
@@ -353,6 +445,7 @@ class DataItemCover extends React.Component {
       <StyledDataItemCover
         className="cancelGridClick"
         editable={item.can_edit_content}
+        editing={this.editing}
       >
         {item.data_settings.d_timeframe === 'ever'
           ? this.renderSingleValue()

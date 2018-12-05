@@ -210,7 +210,16 @@ export const Select = styled(MuiSelect)`
   ${props => props.inline && 'display: inline-block;'}
   font-family: ${v.fonts.sans};
   font-size: ${props => (props.inline ? 'inherit !important' : '1rem')};
-  font-weight: ${v.weights.book};
+  font-weight: ${props =>
+    props.inline ? 'inherit !important' : v.weights.book};
+  letter-spacing: ${props => (props.inline ? 'inherit !important' : '1px')};;
+  ${props =>
+    props.inline &&
+    `
+  margin-bottom: -9px;
+  margin-top: -6px;
+  `}
+
 
   .grayedOut {
     color: ${v.colors.commonMedium};
@@ -224,7 +233,7 @@ export const Select = styled(MuiSelect)`
     width: 230px;
   }
 
-  .selectMenu: {
+  .selectMenu {
     background-color: transparent;
     &:focus {
       background-color: transparent;
