@@ -233,6 +233,7 @@ class OrganizationMenu extends React.Component {
   render() {
     const { open, uiStore, apiStore, locked } = this.props
     let content, title, onBack, onEdit
+    let noScroll = false
     switch (this.currentPage) {
       case 'addGroup':
         content = this.renderAddGroup()
@@ -263,6 +264,7 @@ class OrganizationMenu extends React.Component {
             })
           }
           content = this.renderEditRoles()
+          noScroll = true
         }
         if (this.editGroup.can_edit) {
           onEdit = () => {
@@ -285,6 +287,7 @@ class OrganizationMenu extends React.Component {
         onBack={onBack}
         onEdit={onEdit}
         open={open}
+        noScroll={noScroll}
       >
         {content}
       </Modal>
