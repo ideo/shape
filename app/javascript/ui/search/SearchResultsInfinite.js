@@ -186,13 +186,13 @@ class SearchResultsInfinite extends React.Component {
                     <CollectionCover
                       onClick={this.routeToCollection(result.id)}
                       collection={result}
-                      width={gridSettings.cols}
-                      height={1}
+                      width={card.maxWidth}
+                      height={card.maxHeight}
                     />
                   </Fragment>
                 ) : (
                   <GridCard
-                    card={result.parent_collection_card}
+                    card={card}
                     cardType={result.internalType}
                     record={result}
                     cardId={card.id}
