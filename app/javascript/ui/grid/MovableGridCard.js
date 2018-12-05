@@ -228,14 +228,18 @@ class MovableGridCard extends React.PureComponent {
       uiStore.closeCardMenu()
       return
     }
-
+    const formTags = ['SELECT', 'OPTION']
     if (
+      !e.target.className ||
       !e.target.className.match ||
       // cancel for elements matching or inside a .cancelGridClick
       e.target.className.match(/cancelGridClick/) ||
       e.target.closest('.cancelGridClick') ||
+      e.target.className.match(/selectMenu/) ||
       // cancel for links within the card as these should handle their own routing
-      (e.target.tagName === 'A' && e.target.href)
+      (e.target.tagName === 'A' && e.target.href) ||
+      formTags.includes(e.target.tagName) ||
+      record.type === 'Item::DataItem'
     ) {
       return
     }

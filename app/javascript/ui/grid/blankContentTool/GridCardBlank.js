@@ -9,6 +9,7 @@ import AddCollectionIcon from '~/ui/icons/AddCollectionIcon'
 import AddFileIcon from '~/ui/icons/AddFileIcon'
 import AddVideoIcon from '~/ui/icons/AddVideoIcon'
 import AddLinkIcon from '~/ui/icons/AddLinkIcon'
+import ReportIcon from '~/ui/icons/ReportIcon'
 import TemplateIcon from '~/ui/icons/TemplateIcon'
 import TestCollectionIcon from '~/ui/icons/TestCollectionIcon'
 import SubmissionBoxIcon from '~/ui/icons/SubmissionBoxIcon'
@@ -24,6 +25,7 @@ import CollectionCard from '~/stores/jsonApi/CollectionCard'
 import CollectionCreator from './CollectionCreator'
 import TextItemCreator from './TextItemCreator'
 import LinkCreator from './LinkCreator'
+import DataItemCreator from './DataItemCreator'
 import BctButtonBox from './BctButtonBox'
 import BctButtonRotation from './BctButtonRotation'
 
@@ -277,6 +279,19 @@ class GridCardBlank extends React.Component {
     this.createCard(attrs)
   }
 
+  createDefaultReportCard = () => {
+    this.createCard({
+      item_attributes: {
+        type: ITEM_TYPES.DATA,
+        name: 'Report',
+        data_settings: {
+          d_measure: 'participants',
+          d_timeframe: 'ever',
+        },
+      },
+    })
+  }
+
   pickImages = () => {
     const { replacingId } = this
     const filestackMethod = !replacingId
@@ -316,6 +331,7 @@ class GridCardBlank extends React.Component {
       } else {
         newCard = await card.API_create()
       }
+      uiStore.addNewCard(newCard.record.id)
       // afterCreate can come passed down from props
       if (afterCreate) afterCreate(newCard)
       // or separately from the createCard action (e.g. CollectionCreator)
@@ -377,6 +393,15 @@ class GridCardBlank extends React.Component {
         inner = (
           <LinkCreator
             type="link"
+            loading={loading}
+            createCard={this.createCard}
+            closeBlankContentTool={this.closeBlankContentTool}
+          />
+        )
+        break
+      case 'data':
+        inner = (
+          <DataItemCreator
             loading={loading}
             createCard={this.createCard}
             closeBlankContentTool={this.closeBlankContentTool}
@@ -501,6 +526,16 @@ class GridCardBlank extends React.Component {
           {creating === 'submissionBox' && (
             <BctButtonRotation>{submissionBctBox}</BctButtonRotation>
           )}
+          {creating === 'data' && (
+            <BctButtonRotation>
+              <BctButtonBox
+                type="data"
+                creating={creating}
+                size={size}
+                Icon={() => <ReportIcon size="large" />}
+              />
+            </BctButtonRotation>
+          )}
           {creating === 'template' && (
             <BctButtonRotation>
               <BctButtonBox
@@ -521,7 +556,6 @@ class GridCardBlank extends React.Component {
             >
               {videoBctBox}
               {submissionBctBox}
-              {/* DISABLING UNTIL TEST COLLECTIONS ARE READY */}
               {testBctBox}
               <PopoutMenu
                 buttonStyle="bct"
@@ -531,8 +565,13 @@ class GridCardBlank extends React.Component {
                 menuItems={[
                   {
                     name: 'Create Template',
-                    iconRight: <TemplateIcon size="small" />,
+                    iconLeft: <TemplateIcon size="small" />,
                     onClick: this.startCreating('template'),
+                  },
+                  {
+                    name: 'Create Report',
+                    iconLeft: <ReportIcon />,
+                    onClick: this.createDefaultReportCard,
                   },
                 ]}
               />

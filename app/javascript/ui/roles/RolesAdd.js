@@ -217,6 +217,8 @@ class RolesAdd extends React.Component {
           <AutoComplete
             options={this.mapItems()}
             onOptionSelect={this.onUserSelected}
+            placeholder="email address or username"
+            creatable
           />
           <RightAligner>
             <RowItemRight>

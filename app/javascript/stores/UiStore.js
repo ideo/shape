@@ -141,9 +141,22 @@ export default class UiStore {
   @observable
   textEditingItem = null
   @observable
+  editingCardId = null
+  @observable
   collectionCardSortOrder = 'updated_at'
   @observable
   launchButtonLoading = false
+  @observable
+  newCards = []
+
+  @action
+  toggleEditingCardId(cardId) {
+    if (this.editingCardId === cardId) {
+      this.editingCardId = null
+    } else {
+      this.editingCardId = cardId
+    }
+  }
 
   @action
   startDragging() {
@@ -570,5 +583,25 @@ export default class UiStore {
         this.trackedRecords[identifier] = null
       }, TIMEOUT)
     )
+  }
+
+  @action
+  addNewCard(id) {
+    if (!this.isNewCard(id)) {
+      this.newCards.push(id)
+    }
+  }
+
+  @action
+  removeNewCard(id) {
+    const index = this.newCards.indexOf(id)
+    if (index === -1) {
+      return
+    }
+    this.newCards.splice(index, 1)
+  }
+
+  isNewCard(id) {
+    return this.newCards.indexOf(id) !== -1
   }
 }

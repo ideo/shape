@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types'
 import styled from 'styled-components'
 import v from '~/utils/variables'
 
@@ -45,6 +46,7 @@ Heading3.displayName = 'StyledHeading3'
 
 /** @component */
 export const DisplayText = styled.span`
+  color: ${props => props.color || v.colors.black};
   font-weight: ${v.weights.book};
   font-family: ${v.fonts.sans};
   font-size: 1rem;
@@ -120,11 +122,17 @@ SubText.displayName = 'StyledSubText'
 
 /** @component */
 export const SmallHelperText = styled.span`
-  color: ${v.colors.commonMedium};
+  color: ${props => props.color};
   font-family: ${v.fonts.sans};
   font-size: 0.75rem;
 `
 SmallHelperText.displayName = 'SmallHelperText'
+SmallHelperText.propTypes = {
+  color: PropTypes.oneOf(Object.values(v.colors)),
+}
+SmallHelperText.defaultProps = {
+  color: v.colors.commonMedium,
+}
 
 export const SmallActionText = SmallHelperText.extend`
   color: white;
@@ -147,7 +155,7 @@ Anchor.displayName = 'StyledAnchor'
 
 // Keep in sync with assets/stylesheets/core/base.scss:quill h1
 export const CardHeading = Heading1.extend`
-  color: ${v.colors.commonLight}
+  color: ${props => props.color || v.colors.commonLight}
   font-size: 2rem;
   line-height: 2.25rem;
   margin-bottom: 0.25rem;
@@ -165,3 +173,9 @@ export const CardHeading = Heading1.extend`
   }
 `
 CardHeading.displayName = 'CardHeading'
+
+export const HugeNumber = Heading1.extend`
+  font-size: 4.5rem;
+  font-weight: ${v.weights.book};
+  line-height: 3.75rem;
+`
