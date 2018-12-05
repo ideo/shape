@@ -1,8 +1,10 @@
 import { createMuiTheme } from '@material-ui/core/styles'
 import v from '~/utils/variables'
 
-const theme = createMuiTheme({
+export default createMuiTheme({
   typography: {
+    // https://material-ui.com/style/typography/#migration-to-typography-v2
+    useNextVariants: true,
     // Use the Shape font instead of the default Roboto font.
     fontFamily: v.fonts.sans,
   },
@@ -15,5 +17,3 @@ const theme = createMuiTheme({
     },
   },
 })
-
-export default theme

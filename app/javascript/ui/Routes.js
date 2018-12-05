@@ -21,7 +21,7 @@ import OrganizationSettings from '~/ui/organizations/OrganizationSettings'
 import UserSettings from '~/ui/users/UserSettings'
 import v from '~/utils/variables'
 import firebaseClient from '~/vendor/firestore'
-import MuiTheme from '~/ui/global/MuiTheme'
+import MuiTheme from '~/ui/theme'
 import captureGlobalKeypress from '~/utils/captureGlobalKeypress'
 
 const AppWrapper = styled.div`
