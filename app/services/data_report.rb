@@ -10,7 +10,7 @@ class DataReport < SimpleService
     @data = {
       # e.g. if there was a chart of values...
       values: [],
-      count: 0,
+      value: 0,
     }
   end
 
@@ -34,18 +34,59 @@ class DataReport < SimpleService
   end
 
   def filtered_query
-    # default, within entire org
-    @query
-      .where(organization_id: @data_item.parent.organization_id)
+    collection_filter = @filters&.find { |x| x['type'] == 'Collection' }
+    if collection_filter
+      @query.where(target_type: %w[Collection Item])
+            .joins(%(left join collections on
+                       activities.target_id = collections.id and
+                       activities.target_type = 'Collection'))
+            .joins(%(left join items on
+                       activities.target_id = items.id and
+                       activities.target_type = 'Item'))
+            .where(%(collections.breadcrumb @> ':collection_id' or
+                       items.breadcrumb @> ':collection_id' or
+                       collections.id = :collection_id),
+                   collection_id: collection_filter['target'])
+    else
+      # default, within entire org
+      @query
+        .where(organization_id: @data_item.parent.organization_id)
+    end
   end
 
   def calculate
     case @measure
     when 'participants', 'viewers'
-      @data[:count] = @query
-                      .select(:actor_id)
-                      .distinct
-                      .count
+      if @timeframe && @timeframe != 'ever'
+        min = [@query.select('min(activities.created_at)').to_a.first.min, 6.months.ago].max
+        query = %{
+          SELECT
+              series.date,
+              (
+                SELECT COUNT(DISTINCT(actor_id))
+                  FROM (#{@query.select(:actor_id, :created_at).to_sql}) mod_activities
+                  WHERE
+                    created_at BETWEEN series.date - INTERVAL '1 month' AND series.date
+              )
+          FROM
+            GENERATE_SERIES(
+              ('#{min.beginning_of_month}'::DATE + INTERVAL '1 month'),
+              date_trunc('MONTH', now() + INTERVAL '1 month')::DATE,
+              INTERVAL '1 month'
+            ) AS series
+          ORDER BY series.date;
+        }
+        values = Activity.connection.execute(query)
+                         .map { |val| { date: val['date'], amount: val['count'] } }
+
+        @data[:values] = values
+      else
+        @data[:value] = @query
+                        .select(:actor_id)
+                        .distinct
+                        .count
+
+      end
     end
   end
 end

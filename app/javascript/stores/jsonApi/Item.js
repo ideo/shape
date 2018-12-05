@@ -79,7 +79,11 @@ class Item extends SharedRecordMixin(BaseRecord) {
   }
 
   get isChart() {
-    return this.type === ITEM_TYPES.CHART
+    return this.type === ITEM_TYPES.CHART || this.type === ITEM_TYPES.DATA
+  }
+
+  get isData() {
+    return this.type === ITEM_TYPES.DATA
   }
 
   get originalImageUrl() {

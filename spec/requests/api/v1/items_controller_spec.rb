@@ -96,6 +96,11 @@ describe Api::V1::ItemsController, type: :request, json: true, auth: true do
       json_api_params(
         'items',
         content: 'The wheels on the bus...',
+        data_settings: {
+          d_measure: 'participants',
+          d_timeframe: 'ever',
+          d_filters: [{ type: 'Collection', target: 1 }],
+        },
       )
     end
 
@@ -113,6 +118,20 @@ describe Api::V1::ItemsController, type: :request, json: true, auth: true do
       expect(item.content).not_to eq('The wheels on the bus...')
       patch(path, params: params)
       expect(item.reload.content).to eq('The wheels on the bus...')
+    end
+
+    it 'updates the data_settings' do
+      expect(item.data_settings).not_to eq(
+        'd_measure' => 'participants',
+        'd_timeframe' => 'ever',
+        'd_filters' => [{ 'type' => 'Collection', 'target' => 1 }],
+      )
+      patch(path, params: params)
+      expect(item.reload.data_settings).to eq(
+        'd_measure' => 'participants',
+        'd_timeframe' => 'ever',
+        'd_filters' => [{ 'type' => 'Collection', 'target' => 1 }],
+      )
     end
 
     it 'touches the parent (after_commit)' do
