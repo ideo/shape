@@ -27,10 +27,7 @@ import {
 import v from '~/utils/variables'
 import { theme } from '~/ui/test_collections/shared'
 
-const utcMoment = date =>
-  moment(`${date} 00+0000`)
-    .utc()
-    .subtract(1, 'months')
+const utcMoment = date => moment(`${date} 00+0000`).utc()
 
 const DotFlyout = props => (
   <g>
@@ -76,7 +73,7 @@ class CustomLabel extends React.Component {
       ${
         this.isLastDataPoint
           ? 'in last 30 days'
-          : `in ${momentDate.format('MMMM')} ${momentDate.year()}`
+          : `${momentDate.format('MMMM D YYYY')}`
       }`
     return (
       <g>
@@ -331,11 +328,10 @@ class DataItemCover extends React.Component {
       data: { values },
     } = item
     if (!values) return []
-    return values.map(value =>
-      Object.assign({}, value, {
-        month: utcMoment(value.date).format('MMM'),
-      })
-    )
+    return values.map((value, i) => ({
+      ...value,
+      month: utcMoment(value.date).format('MMM DD'),
+    }))
   }
 
   get maxAmount() {
@@ -400,6 +396,7 @@ class DataItemCover extends React.Component {
             >
               <VictoryAxis
                 tickLabelComponent={<TickLabel />}
+                tickFormat={(t, i) => ((i + 3) % 4 === 0 ? t : '')}
                 offsetY={13}
                 style={{
                   axis: {
