@@ -168,11 +168,14 @@ class Organization < ApplicationRecord
       organization_id: network_organization.id,
       default: true,
     ).first
-    NetworkApi::Subscription.create(
+    subscription_params = {
       organization_id: network_organization.id,
       plan_id: plan.id,
-      payment_method_id: payment_method.try(:id),
-    )
+    }
+    if payment_method
+      subscription_params[:payment_method_id] = payment_method.id
+    end
+    NetworkApi::Subscription.create(subscription_params)
   end
 
   def calculate_active_users_count!

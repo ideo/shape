@@ -11,7 +11,7 @@ class OrganizationBuilder
   end
 
   def save
-    @organization.transaction do
+    result = @organization.transaction do
       @organization.trial_ends_at = Organization::DEFAULT_TRIAL_ENDS_AT.from_now
       @organization.trial_users_count = Organization::DEFAULT_TRIAL_USERS_COUNT
       @organization.save!
@@ -23,8 +23,9 @@ class OrganizationBuilder
         create_network_organization
         create_network_subscription
       end
+      true
     end
-    true
+    !result.nil?
   rescue ActiveRecord::RecordInvalid
     # invalid params, transaction will be rolled back
     false
