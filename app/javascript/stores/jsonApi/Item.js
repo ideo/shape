@@ -28,6 +28,7 @@ class Item extends SharedRecordMixin(BaseRecord) {
     'archived',
     'tag_list',
     'filestack_file_attributes',
+    'data_settings',
   ]
 
   get justText() {
@@ -84,7 +85,11 @@ class Item extends SharedRecordMixin(BaseRecord) {
   }
 
   get isChart() {
-    return this.type === ITEM_TYPES.CHART
+    return this.type === ITEM_TYPES.CHART || this.type === ITEM_TYPES.DATA
+  }
+
+  get isData() {
+    return this.type === ITEM_TYPES.DATA
   }
 
   get originalImageUrl() {
@@ -120,6 +125,13 @@ class Item extends SharedRecordMixin(BaseRecord) {
 Item.defaults = {
   text_data: '',
   can_edit: false,
+  data: {
+    values: [],
+    count: 0,
+  },
+  data_settings: {
+    d_measure: null,
+  },
 }
 
 export default Item

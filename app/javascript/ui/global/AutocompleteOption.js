@@ -1,27 +1,66 @@
 import _ from 'lodash'
 import React from 'react'
 import PropTypes from 'prop-types'
+import styled from 'styled-components'
+
 import { Row, RowItemLeft } from '~/ui/global/styled/layout'
 import { DisplayText } from '~/ui/global/styled/typography'
 import { SelectOption } from '~/ui/global/styled/forms'
+import CollectionIcon from '~/ui/icons/CollectionIcon'
 import Avatar from '~/ui/global/Avatar'
+
+const AvatarHolder = styled.span`
+  height: 60px;
+  flex-grow: 0;
+  width: 40px;
+
+  svg {
+    margin-left: 5px;
+    margin-top: 25px;
+  }
+  img,
+  svg {
+    height: 60px;
+    object-fit: cover;
+    width: 40px;
+  }
+`
 
 class AutocompleteOption extends React.Component {
   handleClick = event => {
     this.props.selectOption(this.props.data, event)
   }
 
+  renderUserAvatar() {
+    const { data } = this.props
+    const entity = data.data
+    const url = entity.pic_url_square || entity.filestack_file_url
+    return <Avatar url={url} title={entity.name} key={entity.id} size={38} />
+  }
+
+  renderCollectionAvatar() {
+    const { data } = this.props
+    const entity = data.data
+    let content
+    content = <CollectionIcon viewBox="50 50 170 170" />
+    if (entity.cover.image_url) {
+      content = <img src={entity.cover.image_url} alt={entity.name} />
+    }
+    return <AvatarHolder>{content}</AvatarHolder>
+  }
+
   render() {
     const { children, isFocused, data, onFocus } = this.props
     let content = children
-    const user = data.data
-    if (user) {
-      const url = user.pic_url_square || user.filestack_file_url
-      const name = _.trim(user.name) ? user.name : user.email
+    const entity = data.data
+    if (entity) {
+      const name = _.trim(entity.name) ? entity.name : entity.email
       content = (
         <Row align="center" noSpacing>
           <span>
-            <Avatar url={url} title={user.name} key={user.id} size={38} />
+            {entity.internalType === 'collections'
+              ? this.renderCollectionAvatar()
+              : this.renderUserAvatar()}
           </span>
           <RowItemLeft>
             <DisplayText>{name}</DisplayText>

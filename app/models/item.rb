@@ -221,6 +221,10 @@ class Item < ApplicationRecord
     {}
   end
 
+  def data
+    {}
+  end
+
   def jsonapi_type_name
     'items'
   end

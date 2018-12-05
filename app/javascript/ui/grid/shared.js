@@ -108,8 +108,11 @@ StyledBottomLeftIcon.displayName = 'StyledBottomLeftIcon'
 export const StyledGridCardInner = styled.div`
   position: relative;
   height: 100%;
+  ${props =>
+    !props.overflow &&
+    `
   overflow: hidden;
-  z-index: 1;
+  `} z-index: 1;
   /*
   // related to userSelectHack from Rnd / Draggable
   // disable blue text selection on Draggables

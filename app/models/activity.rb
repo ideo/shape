@@ -17,6 +17,9 @@ class Activity < ApplicationRecord
   belongs_to :source, polymorphic: true, optional: true
   belongs_to :destination, polymorphic: true, optional: true
 
+  scope :where_participated, -> { where(action: participant_actions) }
+  scope :where_viewed, -> { where(action: viewer_actions) }
+
   # add explicit values so it's not tied to the order of the array
   enum action: {
     archived: 0,
@@ -36,6 +39,16 @@ class Activity < ApplicationRecord
     archived_from_template: 14,
     viewed: 15,
   }
+
+  def self.participant_actions
+    %i[
+      created edited replaced moved duplicated
+    ]
+  end
+
+  def self.viewer_actions
+    %i[viewed]
+  end
 
   def self.map_move_action(move_action)
     case move_action

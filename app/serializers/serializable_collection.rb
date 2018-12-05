@@ -1,6 +1,4 @@
 class SerializableCollection < BaseJsonSerializer
-  ROLES_LIMIT = 5
-
   type 'collections'
 
   attributes :created_at, :updated_at, :name, :organization_id,

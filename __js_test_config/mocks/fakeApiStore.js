@@ -27,6 +27,7 @@ const fakeApiStore = ({
     searchUsersAndGroups: jest
       .fn()
       .mockReturnValue(Promise.resolve({ data: [] })),
+    searchCollections: jest.fn().mockReturnValue(Promise.resolve({ data: [] })),
     setCurrentUserId: jest.fn(),
     findOrganizationById: jest.fn().mockReturnValue({ name: 'abc' }),
     fetchThreads: jest.fn().mockReturnValue(Promise.resolve()),

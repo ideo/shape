@@ -302,6 +302,10 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
           :mimetype,
           docinfo: {},
         ],
+        data_settings: [
+          :d_measure,
+          :d_timeframe,
+        ],
       ],
     )
   end

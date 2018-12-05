@@ -1,6 +1,7 @@
 FactoryBot.define do
   factory :item do
     transient do
+      parent_collection nil
       add_editors []
       add_viewers []
     end
@@ -39,6 +40,22 @@ FactoryBot.define do
 
     factory :chart_item, class: 'Item::ChartItem' do
       data_source factory: :question_item
+    end
+
+    factory :data_item, class: 'Item::DataItem' do
+      data_settings { { d_measure: 'participants' } }
+    end
+
+    after(:build) do |item, evaluator|
+      if evaluator.parent_collection
+        item.parent_collection_card = build(
+          :collection_card,
+          parent: evaluator.parent_collection,
+          order: evaluator.parent_collection.collection_cards.count,
+          width: 1,
+          height: 1,
+        )
+      end
     end
 
     after(:create) do |item, evaluator|
