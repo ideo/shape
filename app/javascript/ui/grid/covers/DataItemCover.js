@@ -292,7 +292,6 @@ class DataItemCover extends React.Component {
   }
 
   renderTimeframeValues() {
-    // TODO try and move more styling to theme
     return (
       <Fragment>
         <AboveChartContainer>
