@@ -61,24 +61,15 @@ class DataReport < SimpleService
         min = [@query.select('min(activities.created_at)').to_a.first.min, 6.months.ago].max
         query = %{
           SELECT
-            (CASE WHEN series.date > now()
-              THEN now()::DATE
-              ELSE series.date
-            END) date,
+            LEAST(series.date, now()::DATE) date,
               (
                 SELECT COUNT(DISTINCT(actor_id))
                   FROM (#{@query.select(:actor_id, :created_at).to_sql}) mod_activities
                   WHERE
                     created_at BETWEEN
-                      (CASE WHEN series.date > now()
-                        THEN now()
-                        ELSE series.date
-                      END) - INTERVAL '30 days'
+                      LEAST(series.date, now()::DATE) - INTERVAL '30 days'
                       AND
-                      (CASE WHEN series.date > now()
-                        THEN now()
-                        ELSE series.date
-                      END)
+                      LEAST(series.date, now()::DATE)
               )
           FROM
             GENERATE_SERIES(
@@ -90,7 +81,7 @@ class DataReport < SimpleService
         }
         values = Activity.connection.execute(query)
                          .map { |val| { date: val['date'], amount: val['count'] } }
-                         .uniq # this will filter out dupe when final series.date == now()
+                         .uniq { |i| i[:date] } # this will filter out dupe when final series.date == now()
 
         @data[:values] = values
       else
