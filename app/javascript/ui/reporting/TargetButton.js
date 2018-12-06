@@ -50,8 +50,11 @@ TargetButton.wrappedComponent.propTypes = {
 
 TargetButton.propTypes = {
   item: MobxPropTypes.objectOrObservableObject.isRequired,
-  editable: PropTypes.bool.isRequired,
+  editable: PropTypes.bool,
   onClick: PropTypes.func.isRequired,
+}
+TargetButton.defaultProps = {
+  editable: false,
 }
 
 export default TargetButton

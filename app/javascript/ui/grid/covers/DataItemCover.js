@@ -4,26 +4,25 @@ import { runInAction, computed } from 'mobx'
 import moment from 'moment-mini'
 import styled from 'styled-components'
 import {
-  Flyout,
   VictoryArea,
   VictoryAxis,
   VictoryChart,
   VictoryLabel,
-  VictoryTooltip,
   VictoryVoronoiContainer,
 } from 'victory'
 
-import OrganicGridPng from '~/assets/organic_grid_black.png'
-import OrganicGrid from '~/ui/icons/OrganicGrid'
-import MeasureSelect from '~/ui/reporting/MeasureSelect'
-import TargetButton from '~/ui/reporting/TargetButton'
-import EditableButton from '~/ui/reporting/EditableButton'
 import {
   DisplayText,
   SmallHelperText,
   Heading3,
   HugeNumber,
 } from '~/ui/global/styled/typography'
+import ChartTooltip from '~/ui/global/ChartTooltip'
+import EditableButton from '~/ui/reporting/EditableButton'
+import MeasureSelect from '~/ui/reporting/MeasureSelect'
+import OrganicGridPng from '~/assets/organic_grid_black.png'
+import OrganicGrid from '~/ui/icons/OrganicGrid'
+import TargetButton from '~/ui/reporting/TargetButton'
 import v from '~/utils/variables'
 import { theme } from '~/ui/test_collections/shared'
 
@@ -31,107 +30,6 @@ const utcMoment = date =>
   moment(`${date} 00+0000`)
     .utc()
     .subtract(1, 'months')
-
-const DotFlyout = props => (
-  <g>
-    <Flyout {...props} />
-    <circle
-      cx={props.x}
-      cy={props.y + 9}
-      r="4"
-      stroke={v.colors.white}
-      strokeWidth={0.5}
-      fill={v.colors.black}
-    />
-  </g>
-)
-
-class CustomLabel extends React.Component {
-  static defaultEvents = VictoryTooltip.defaultEvents
-
-  get isLastDataPoint() {
-    const { data, index } = this.props
-    return parseInt(index) === data.length - 1
-  }
-
-  renderAmountMark(datum, totalData) {
-    const { maxAmount, minAmount } = this.props
-    if (datum.amount >= maxAmount) return true
-    if (datum.amount <= minAmount) return true
-    if (this.isLastDataPoint) return true
-    return false
-  }
-
-  render() {
-    const { data, datum, dataSettings, index, x, y } = this.props
-    const showAlways = this.renderAmountMark(datum, data.length - 1)
-    let dx = 0
-    if (parseInt(index) === 0) {
-      dx = 10
-    } else if (this.isLastDataPoint) {
-      dx = -10
-    }
-    const momentDate = utcMoment(datum.date)
-    const text = `${datum.amount} ${dataSettings.d_measure}\n
-      ${
-        this.isLastDataPoint
-          ? 'in last 30 days'
-          : `in ${momentDate.format('MMMM')} ${momentDate.year()}`
-      }`
-    return (
-      <g>
-        <VictoryTooltip
-          {...this.props}
-          cornerRadius={2}
-          flyoutComponent={<DotFlyout />}
-          height={40}
-          width={140}
-          dx={dx * 5}
-          dy={0}
-          style={{
-            fill: 'white',
-            fontFamily: v.fonts.sans,
-            fontSize: '12px',
-            fontWeight: 'normal',
-          }}
-          text={text}
-          orientation="top"
-          pointerLength={0}
-          flyoutStyle={{
-            transform: 'translateY(-5px)',
-            stroke: 'transparent',
-            fill: v.colors.black,
-            opacity: 0.8,
-          }}
-        />
-        {showAlways && (
-          <Fragment>
-            <VictoryTooltip
-              active={showAlways}
-              {...this.props}
-              dx={dx}
-              dy={-5}
-              style={{ fontSize: '10px', fontWeight: 'normal' }}
-              text={`${datum.amount}`}
-              orientation="top"
-              pointerLength={0}
-              flyoutStyle={{ stroke: 'transparent', fill: 'transparent' }}
-            />
-            <line
-              x1={x}
-              x2={x + 8}
-              y1={y + 9}
-              y2={y + 9}
-              dx={dx}
-              stroke="black"
-              strokeWidth={0.75}
-            />
-          </Fragment>
-        )}
-      </g>
-    )
-  }
-}
 
 const TickLabel = props => {
   let dx
@@ -164,6 +62,7 @@ const StyledDataItemCover = styled.div`
 `};
   }
 `
+StyledDataItemCover.displayName = 'StyledDataItemCover'
 
 const AboveChartContainer = styled.div`
   position: absolute;
@@ -202,22 +101,12 @@ class DataItemCover extends React.Component {
     uiStore.toggleEditingCardId(card.id)
   }
 
-  get withinText() {
+  get timeframeControl() {
     const { item } = this.props
     const { data_settings } = item
     const editable = item.can_edit_content
-    let timeframeControl = <span>{data_settings.d_timeframe}</span>
-    let measureControl
-
-    const targetControl = (
-      <TargetButton
-        item={item}
-        editable={editable}
-        onClick={this.handleEditClick}
-      />
-    )
     if (this.editing) {
-      timeframeControl = (
+      return (
         <span className="editableMetric">
           <MeasureSelect
             dataSettingsName="timeframe"
@@ -226,9 +115,25 @@ class DataItemCover extends React.Component {
           />
         </span>
       )
-      measureControl = (
+    } else if (editable) {
+      return (
+        <EditableButton editable={editable} onClick={this.handleEditClick}>
+          <span className="editableMetric">{data_settings.d_timeframe}</span>
+        </EditableButton>
+      )
+    }
+    return <span>{data_settings.d_timeframe}</span>
+  }
+
+  get measureControl() {
+    const { item } = this.props
+    const { data_settings } = item
+    const editable = item.can_edit_content
+    if (this.editing) {
+      return (
         <span className="editableMetric">
           <MeasureSelect
+            className="editableMetric metric-measure"
             dataSettingsName="measure"
             item={item}
             onSelect={this.onSelectMeasure}
@@ -236,33 +141,46 @@ class DataItemCover extends React.Component {
         </span>
       )
     } else if (editable) {
-      timeframeControl = (
-        <EditableButton editable={editable} onClick={this.handleEditClick}>
-          <span className="editableMetric">{data_settings.d_timeframe}</span>
-        </EditableButton>
-      )
-      measureControl = (
+      return (
         <EditableButton editable={editable} onClick={this.handleEditClick}>
           <span className="editableMetric">{data_settings.d_measure}</span>
         </EditableButton>
       )
     }
+    return null
+  }
 
+  get targetControl() {
+    const { item } = this.props
+    const editable = item.can_edit_content
+
+    return (
+      <TargetButton
+        item={item}
+        editable={editable}
+        onClick={this.handleEditClick}
+      />
+    )
+  }
+
+  get withinText() {
+    const { item } = this.props
+    const { data_settings } = item
     if (data_settings.d_timeframe === 'ever') {
       return (
-        <span>
-          within the {''} {targetControl} {timeframeControl}
+        <span className="withinText">
+          within the {''} {this.targetControl} {this.timeframeControl}
         </span>
       )
     }
     return (
       <Fragment>
         <Heading3>
-          {measureControl} per {timeframeControl}
+          {this.measureControl} per {this.timeframeControl}
         </Heading3>
         <SmallHelperText color={v.colors.black}>
           <GraphKey />
-          {targetControl}
+          {this.targetControl}
         </SmallHelperText>
       </Fragment>
     )
@@ -346,27 +264,25 @@ class DataItemCover extends React.Component {
     return Math.min(...this.formattedValues.map(d => d.amount))
   }
 
+  renderLabelText = datum => {
+    const { item } = this.props
+    const momentDate = utcMoment(datum.date)
+    const text = `${datum.amount} ${item.data_settings.d_measure}\n
+                        ${
+                          this.isLastDataPoint
+                            ? 'in last 30 days'
+                            : `in ${momentDate.format(
+                                'MMMM'
+                              )} ${momentDate.year()}`
+                        }`
+    return text
+  }
+
   renderSingleValue() {
     const { item } = this.props
     return (
       <Fragment>
-        {!this.editing ? (
-          <Heading3 onClick={this.handleEditClick} style={{ marginBottom: 0 }}>
-            <span className="editableMetric">
-              {item.data_settings.d_measure}
-            </span>
-          </Heading3>
-        ) : (
-          <Heading3>
-            <span className="editableMetric">
-              <MeasureSelect
-                dataSettingsName="measure"
-                item={item}
-                onSelect={this.onSelectMeasure}
-              />
-            </span>
-          </Heading3>
-        )}
+        <Heading3>{this.measureControl}</Heading3>
         <HugeNumber className="count">{item.data.value}</HugeNumber>
         <SmallHelperText color={v.colors.black}>
           {this.withinText}
@@ -376,14 +292,14 @@ class DataItemCover extends React.Component {
   }
 
   renderTimeframeValues() {
-    const { item } = this.props
+    // TODO try and move more styling to theme
     return (
       <Fragment>
         <AboveChartContainer>
           <DisplayText>{this.withinText}</DisplayText>
           <br />
           {this.formattedValues.length < 2 && (
-            <DisplayText>
+            <DisplayText className="noDataMessage">
               <br />
               Not enough data yet
             </DisplayText>
@@ -412,10 +328,10 @@ class DataItemCover extends React.Component {
               <VictoryArea
                 labels={d => d.amount}
                 labelComponent={
-                  <CustomLabel
-                    dataSettings={item.data_settings}
+                  <ChartTooltip
                     minAmount={this.minAmount}
                     maxAmount={this.maxAmount}
+                    textRenderer={this.renderLabelText}
                   />
                 }
                 style={{
