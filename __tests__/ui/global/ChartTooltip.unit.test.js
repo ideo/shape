@@ -32,7 +32,7 @@ describe('ChartTooltip', () => {
     })
 
     it('should render with the text renderer', () => {
-      expect(props.textRenderer).toHaveBeenCalledWith(props.datum)
+      expect(props.textRenderer).toHaveBeenCalledWith(props.datum, false)
     })
 
     it('should render a tooltip', () => {
