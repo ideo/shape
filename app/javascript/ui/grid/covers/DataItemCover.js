@@ -28,6 +28,23 @@ import v from '~/utils/variables'
 import { theme } from '~/ui/test_collections/shared'
 
 const utcMoment = date => moment(`${date} 00+0000`).utc()
+const nearMonth = momentDate => {
+  const mStart = momentDate.clone().startOf('month')
+  const mEnd = momentDate.clone().endOf('month')
+  const startDiff = Math.abs(mStart.diff(momentDate, 'days'))
+  const endDiff = Math.abs(
+    momentDate
+      .clone()
+      .endOf('month')
+      .diff(momentDate, 'days')
+  )
+  if (startDiff <= 2) {
+    return mStart.subtract(1, 'month')
+  } else if (endDiff <= 2) {
+    return mEnd
+  }
+  return false
+}
 
 const DotFlyout = props => (
   <g>
@@ -69,12 +86,17 @@ class CustomLabel extends React.Component {
       dx = -10
     }
     const momentDate = utcMoment(datum.date)
+    let monthRange = `${momentDate
+      .clone()
+      .subtract(1, 'months')
+      .format('MMM D')} - ${momentDate.format('MMM D')}`
+
+    const near = nearMonth(momentDate)
+    if (near) {
+      monthRange = `in ${near.format('MMMM')}`
+    }
     const text = `${datum.amount} ${dataSettings.d_measure}\n
-      ${
-        this.isLastDataPoint
-          ? 'in last 30 days'
-          : `${momentDate.format('MMMM D YYYY')}`
-      }`
+      ${this.isLastDataPoint ? 'in last 30 days' : monthRange}`
     return (
       <g>
         <VictoryTooltip
@@ -330,7 +352,7 @@ class DataItemCover extends React.Component {
     if (!values) return []
     return values.map((value, i) => ({
       ...value,
-      month: utcMoment(value.date).format('MMM DD'),
+      month: value.date,
     }))
   }
 
@@ -371,6 +393,14 @@ class DataItemCover extends React.Component {
     )
   }
 
+  displayXAxisText = (d, i) => {
+    const near = nearMonth(moment(d).utc())
+    if (near) {
+      return `${near.format('MMM')}`
+    }
+    return ''
+  }
+
   renderTimeframeValues() {
     const { item } = this.props
     return (
@@ -396,7 +426,7 @@ class DataItemCover extends React.Component {
             >
               <VictoryAxis
                 tickLabelComponent={<TickLabel />}
-                tickFormat={(t, i) => ((i + 3) % 4 === 0 ? t : '')}
+                tickFormat={this.displayXAxisText}
                 offsetY={13}
                 style={{
                   axis: {
