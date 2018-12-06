@@ -138,6 +138,18 @@ describe('DataItemCover', () => {
       expect(label).toContain('in last 30 days')
     })
 
+    it('displays x-axis labels for dates near the end of the month', () => {
+      let label
+      // if it's not near month end, the label is blank
+      label = wrapper.instance().displayXAxisText('2018-10-06')
+      expect(label).toEqual('')
+      // should display the short name of the month that previously ended
+      label = wrapper.instance().displayXAxisText('2018-01-02')
+      expect(label).toEqual('Dec')
+      label = wrapper.instance().displayXAxisText('2018-12-31')
+      expect(label).toEqual('Dec')
+    })
+
     describe('with not enough timeline data', () => {
       beforeEach(() => {
         props.item.data.values = []

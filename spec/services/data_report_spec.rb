@@ -132,7 +132,7 @@ RSpec.describe DataReport, type: :service do
         end
       end
 
-      context 'with a participant measure and a timeframe' do
+      context 'with a participant measure and a timeframe', only: true do
         it 'calculates the number of participants in the collection, child collections, and items in those collections' do
           data_item.update(
             data_settings: {

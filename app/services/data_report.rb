@@ -57,9 +57,13 @@ class DataReport < SimpleService
   def calculate
     case @measure
     when 'participants', 'viewers'
+      # TODO: respect the actual timeframe value
+      # currently it is hardcoded to weekly data points that show "past 30 days" activity
       if @timeframe && @timeframe != 'ever'
         min = [@query.select('min(activities.created_at)').to_a.first.min, 6.months.ago].max
-        query = %{
+        # doing the BETWEEN upper limit we actually query "date + 1", meaning for January 1
+        # we are actually finding all activities created before January 2 00:00
+        sql = %{
           SELECT
             LEAST(series.date, now()::DATE) date,
               (
@@ -67,19 +71,19 @@ class DataReport < SimpleService
                   FROM (#{@query.select(:actor_id, :created_at).to_sql}) mod_activities
                   WHERE
                     created_at BETWEEN
-                      LEAST(series.date, now()::DATE) - INTERVAL '30 days'
+                      LEAST(series.date, now()::DATE) - 30
                       AND
-                      LEAST(series.date, now()::DATE)
+                      LEAST(series.date, now()::DATE) + 1
               )
           FROM
             GENERATE_SERIES(
-              ('#{min.beginning_of_month}'::DATE + INTERVAL '1 month'),
+              ('#{min.beginning_of_month}'::DATE + INTERVAL '30 days'),
               now()::DATE + INTERVAL '1 week',
               INTERVAL '1 week'
             ) AS series
           ORDER BY series.date;
         }
-        values = Activity.connection.execute(query)
+        values = Activity.connection.execute(sql)
                          .map { |val| { date: val['date'], amount: val['count'] } }
                          .uniq { |i| i[:date] } # this will filter out dupe when final series.date == now()
 

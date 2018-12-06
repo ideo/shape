@@ -283,7 +283,7 @@ class DataItemCover extends React.Component {
     const momentDate = utcMoment(datum.date)
     let monthRange = `${momentDate
       .clone()
-      .subtract(1, 'months')
+      .subtract(30, 'days')
       .format('MMM D')} - ${momentDate.format('MMM D')}`
 
     const near = nearMonth(momentDate)
