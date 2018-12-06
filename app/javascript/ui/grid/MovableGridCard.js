@@ -230,8 +230,7 @@ class MovableGridCard extends React.PureComponent {
     }
     const formTags = ['SELECT', 'OPTION']
     if (
-      !e.target.className ||
-      !e.target.className.match ||
+      typeof e.target.className !== 'string' ||
       // cancel for elements matching or inside a .cancelGridClick
       e.target.className.match(/cancelGridClick/) ||
       e.target.closest('.cancelGridClick') ||
