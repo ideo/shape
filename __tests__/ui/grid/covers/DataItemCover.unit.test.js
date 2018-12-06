@@ -128,7 +128,7 @@ describe('DataItemCover', () => {
       // NOTE: code pulls the actual month back by 1
       const datum = { date: '2018-10-01', amount: 34, month: 'Sep' }
       const label = wrapper.instance().renderLabelText(datum)
-      expect(label).toContain('in September 2018')
+      expect(label).toContain('in September')
     })
 
     it('renders in last 30 days for label for last data item', () => {
