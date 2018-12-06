@@ -264,12 +264,12 @@ class DataItemCover extends React.Component {
     return Math.min(...this.formattedValues.map(d => d.amount))
   }
 
-  renderLabelText = datum => {
+  renderLabelText = (datum, isLastDataPoint) => {
     const { item } = this.props
     const momentDate = utcMoment(datum.date)
     const text = `${datum.amount} ${item.data_settings.d_measure}\n
                         ${
-                          this.isLastDataPoint
+                          isLastDataPoint
                             ? 'in last 30 days'
                             : `in ${momentDate.format(
                                 'MMMM'

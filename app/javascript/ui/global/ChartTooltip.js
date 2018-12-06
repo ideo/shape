@@ -44,7 +44,7 @@ class ChartTooltip extends React.Component {
     } else if (this.isLastDataPoint) {
       dx = -10
     }
-    const text = textRenderer(datum)
+    const text = textRenderer(datum, this.isLastDataPoint)
     return (
       <g>
         <VictoryTooltip

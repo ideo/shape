@@ -131,6 +131,13 @@ describe('DataItemCover', () => {
       expect(label).toContain('in September 2018')
     })
 
+    it('renders in last 30 days for label for last data item', () => {
+      // NOTE: code pulls the actual month back by 1
+      const datum = { date: '2018-10-01', amount: 34, month: 'Sep' }
+      const label = wrapper.instance().renderLabelText(datum, true)
+      expect(label).toContain('in last 30 days')
+    })
+
     describe('with not enough timeline data', () => {
       beforeEach(() => {
         props.item.data.values = []
