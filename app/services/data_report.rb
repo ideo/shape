@@ -30,6 +30,8 @@ class DataReport < SimpleService
       Activity.where_participated
     when 'viewers'
       Activity.where_viewed
+    when 'activity'
+      Activity.where_active
     end
   end
 
@@ -55,45 +57,53 @@ class DataReport < SimpleService
   end
 
   def calculate
-    case @measure
-    when 'participants', 'viewers'
-      # TODO: respect the actual timeframe value
-      # currently it is hardcoded to weekly data points that show "past 30 days" activity
-      if @timeframe && @timeframe != 'ever'
-        min = [@query.select('min(activities.created_at)').to_a.first.min, 6.months.ago].max
-        # doing the BETWEEN upper limit we actually query "date + 1", meaning for January 1
-        # we are actually finding all activities created before January 2 00:00
-        sql = %{
-          SELECT
-            LEAST(series.date, now()::DATE) date,
-              (
-                SELECT COUNT(DISTINCT(actor_id))
-                  FROM (#{@query.select(:actor_id, :created_at).to_sql}) mod_activities
-                  WHERE
-                    created_at BETWEEN
-                      LEAST(series.date, now()::DATE) - 30
-                      AND
-                      LEAST(series.date, now()::DATE) + 1
-              )
-          FROM
-            GENERATE_SERIES(
-              ('#{min.beginning_of_month}'::DATE + INTERVAL '30 days'),
-              now()::DATE + INTERVAL '1 week',
-              INTERVAL '1 week'
-            ) AS series
-          ORDER BY series.date;
-        }
-        values = Activity.connection.execute(sql)
-                         .map { |val| { date: val['date'], amount: val['count'] } }
-                         .uniq { |i| i[:date] } # this will filter out dupe when final series.date == now()
-
-        @data[:values] = values
+    if @timeframe && @timeframe != 'ever'
+      min = [@query.select('min(activities.created_at)').to_a.first.min, 6.months.ago].max
+      case @measure
+      when 'participants', 'viewers'
+        selection = 'count(distinct(actor_id))'
       else
+        selection = 'count(*)'
+      end
+
+      # TODO: respect the actual timeframe value
+      # currently it is hardcoded to weekly data points that show "past 30 days" activity.
+      # Doing the BETWEEN upper limit we actually query "date + 1", meaning for January 1
+      # we are actually finding all activities created before January 2 00:00
+      sql = %{
+        SELECT
+          LEAST(series.date, now()::DATE) date,
+          (
+            SELECT #{selection}
+              FROM (#{@query.select(:id, :actor_id, :created_at).to_sql}) mod_activities
+              WHERE
+                created_at BETWEEN
+                  LEAST(series.date, now()::DATE) - 30
+                  AND
+                  LEAST(series.date, now()::DATE) + 1
+          )
+        FROM
+          GENERATE_SERIES(
+            ('#{min.beginning_of_month}'::DATE + INTERVAL '30 days'),
+            now()::DATE + INTERVAL '1 week',
+            INTERVAL '1 week'
+          ) AS series
+        ORDER BY series.date;
+      }
+      values = Activity.connection.execute(sql)
+                       .map { |val| { date: val['date'], amount: val['count'] } }
+                       .uniq { |i| i[:date] } # this will filter out dupe when final series.date == now()
+
+      @data[:values] = values
+    else
+      case @measure
+      when 'participants', 'viewers'
         @data[:value] = @query
                         .select(:actor_id)
                         .distinct
                         .count
-
+      else
+        @data[:value] = @query.count
       end
     end
   end

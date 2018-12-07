@@ -1,3 +1,4 @@
+import pluralize from 'pluralize'
 import { Fragment } from 'react'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import { runInAction, computed } from 'mobx'
@@ -39,7 +40,7 @@ const nearMonth = momentDate => {
   )
   if (startDiff <= 2) {
     return mStart.subtract(1, 'month')
-  } else if (endDiff <= 2) {
+  } else if (endDiff <= 3) {
     return mEnd
   }
   return false
@@ -290,7 +291,7 @@ class DataItemCover extends React.Component {
     if (near) {
       monthRange = `in ${near.format('MMMM')}`
     }
-    const text = `${datum.amount} ${d_measure}\n
+    const text = `${datum.amount} ${pluralize(d_measure)}\n
       ${isLastDataPoint ? 'in last 30 days' : monthRange}`
 
     return text
@@ -314,8 +315,6 @@ class DataItemCover extends React.Component {
     const near = nearMonth(utc)
     if (near) {
       return `${near.format('MMM')}`
-    } else if (utc.diff(moment().utc(), 'days') === 0) {
-      return 'Today'
     }
     return ''
   }

@@ -9,6 +9,7 @@ const dataOptions = {
     { name: 'Select Measure...', value: null },
     { name: 'Participants', value: 'participants' },
     { name: 'Viewers', value: 'viewers' },
+    { name: 'Activity', value: 'activity' },
   ],
   timeframe: [
     { name: 'month', value: 'month' },
