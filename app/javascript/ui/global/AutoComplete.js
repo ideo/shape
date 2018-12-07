@@ -115,7 +115,6 @@ const SelectWrapped = props => {
   const { classes, theme, creatable, options, optionSearch, ...other } = props
   if (optionSearch) {
     // Option search will do an async search for options.
-    console.log('selectwrapped', options.length)
     return (
       <AsyncSelect
         loadOptions={optionSearch}
@@ -185,7 +184,6 @@ class AutoComplete extends React.Component {
   }
 
   handleChange = option => {
-    console.log('handleChange', option)
     this.setState({
       option,
     })

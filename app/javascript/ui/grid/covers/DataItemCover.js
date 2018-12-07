@@ -215,7 +215,6 @@ class DataItemCover extends React.Component {
   }
 
   onSelectTarget = value => {
-    console.log('selecttarget', value)
     this.saveSettings({
       d_filters: value
         ? [{ type: 'Collection', target: Number(value.custom) }]
