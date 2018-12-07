@@ -55,8 +55,8 @@ export default {
     secondaryMedium: '#5a6a7c',
     secondaryDark: '#3f526a',
     secondaryDarkest: '#242d37',
-    tertiaryDark: '#c43a31',
     tertiaryMedium: '#de8f74',
+    tertiaryDark: '#c43a31',
     ctaPrimary: '#00a0e0',
     alert: '#d66742',
     caution: '#fcf113',
@@ -98,6 +98,7 @@ export default {
     itemClose: 10,
     floatOverContent: 2,
     gridCardBg: 1,
+    aboveVictoryChart: 100,
   },
 
   quillDefaults: {

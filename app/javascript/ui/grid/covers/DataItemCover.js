@@ -81,7 +81,7 @@ StyledDataItemCover.displayName = 'StyledDataItemCover'
 
 const AboveChartContainer = styled.div`
   position: absolute;
-  z-index: ${v.zIndex.floatOverContent};
+  z-index: ${v.zIndex.aboveVictoryChart};
 `
 
 const ChartContainer = styled.div`
@@ -277,14 +277,6 @@ class DataItemCover extends React.Component {
       ...value,
       month: value.date,
     }))
-  }
-
-  get maxAmount() {
-    return Math.max(...this.formattedValues.map(d => d.amount))
-  }
-
-  get minAmount() {
-    return Math.min(...this.formattedValues.map(d => d.amount))
   }
 
   renderLabelText = (datum, isLastDataPoint) => {
