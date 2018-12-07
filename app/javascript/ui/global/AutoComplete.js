@@ -2,6 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import styled from 'styled-components'
 import { withStyles, withTheme } from '@material-ui/core/styles'
+import AsyncSelect from 'react-select/lib/Async'
 import Input from '@material-ui/core/Input'
 import Chip from '@material-ui/core/Chip'
 import Creatable from 'react-select/lib/Creatable'
@@ -111,7 +112,24 @@ const selectStyles = theme => ({
 })
 
 const SelectWrapped = props => {
-  const { classes, theme, creatable, ...other } = props
+  const { classes, theme, creatable, options, optionSearch, ...other } = props
+  if (optionSearch) {
+    // Option search will do an async search for options.
+    console.log('selectwrapped', options.length)
+    return (
+      <AsyncSelect
+        loadOptions={optionSearch}
+        defaultOptions
+        styles={selectStyles(theme)}
+        components={{
+          valueComponent: valueComponent(classes),
+          DropdownIndicator,
+          Option,
+        }}
+        {...other}
+      />
+    )
+  }
   return creatable ? (
     <Creatable
       formatCreateLabel={inputValue => `Invite email ${inputValue}`}
@@ -167,6 +185,7 @@ class AutoComplete extends React.Component {
   }
 
   handleChange = option => {
+    console.log('handleChange', option)
     this.setState({
       option,
     })
@@ -182,6 +201,7 @@ class AutoComplete extends React.Component {
       classes,
       keepSelectedOptions,
       options,
+      optionSearch,
       placeholder,
       creatable,
     } = this.props
@@ -195,6 +215,7 @@ class AutoComplete extends React.Component {
             multi: true,
             value: keepSelectedOptions ? option : null,
             options,
+            optionSearch,
             onChange: this.handleChange,
             placeholder,
             creatable,
@@ -223,6 +244,7 @@ AutoComplete.propTypes = {
     })
   ).isRequired,
   onOptionSelect: PropTypes.func.isRequired,
+  optionSearch: PropTypes.func,
   keepSelectedOptions: PropTypes.bool,
   placeholder: PropTypes.string,
   creatable: PropTypes.bool,
@@ -235,6 +257,7 @@ AutoComplete.defaultProps = {
   creatable: false,
   placeholder: '',
   value: undefined,
+  optionSearch: null,
 }
 
 export default withStyles(styles)(AutoComplete)

@@ -23,6 +23,7 @@ import MeasureSelect from '~/ui/reporting/MeasureSelect'
 import OrganicGridPng from '~/assets/organic_grid_black.png'
 import OrganicGrid from '~/ui/icons/OrganicGrid'
 import TargetButton from '~/ui/reporting/TargetButton'
+import TargetSelect from '~/ui/reporting/TargetSelect'
 import v from '~/utils/variables'
 import { theme } from '~/ui/test_collections/shared'
 
@@ -161,13 +162,20 @@ class DataItemCover extends React.Component {
         </EditableButton>
       )
     }
-    return null
+    return <span>{data_settings.d_measure}</span>
   }
 
   get targetControl() {
     const { item } = this.props
     const editable = item.can_edit_content
 
+    if (this.editing) {
+      return (
+        <span className="editableMetric">
+          <TargetSelect item={item} onSelect={this.onSelectTarget} />
+        </span>
+      )
+    }
     return (
       <TargetButton
         item={item}
@@ -207,9 +215,10 @@ class DataItemCover extends React.Component {
   }
 
   onSelectTarget = value => {
+    console.log('selecttarget', value)
     this.saveSettings({
       d_filters: value
-        ? [{ type: 'Collection', target: Number(value.id) }]
+        ? [{ type: 'Collection', target: Number(value.custom) }]
         : [],
     })
     this.toggleEditing()

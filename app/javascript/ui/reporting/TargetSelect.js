@@ -6,6 +6,14 @@ import trackError from '~/utils/trackError'
 import { Select } from '~/ui/global/styled/forms'
 import AutoComplete from '~/ui/global/AutoComplete'
 
+function formatCollections(collections) {
+  return collections.map(collection => ({
+    value: collection.id,
+    label: collection.name,
+    data: collection,
+  }))
+}
+
 @inject('apiStore')
 @observer
 class TargetSelect extends React.Component {
@@ -15,17 +23,25 @@ class TargetSelect extends React.Component {
   @observable
   collections = []
 
-  async componentWillMount() {
+  async componentDidMount() {
+    const defaultCollections = await this.collectionSearch(' ')
+    runInAction(() => (this.collections = defaultCollections))
+  }
+
+  async collectionSearch(term) {
     try {
-      const res = await this.props.apiStore.searchCollections({ perPage: 100 })
-      runInAction(() => (this.collections = res.data))
+      const res = await this.props.apiStore.searchCollections({
+        query: term,
+        perPage: 100,
+      })
+      return formatCollections(res.data)
     } catch (e) {
       trackError(e)
+      return []
     }
-    runInAction(
-      () => (this.type = this.collectionFilter ? 'Collection' : 'Organization')
-    )
   }
+
+  onSearch = value => this.collectionSearch(value)
 
   get currentValue() {
     return this.collectionFilter ? 'Collection' : this.type
@@ -77,11 +93,8 @@ class TargetSelect extends React.Component {
         {this.type === 'Collection' && (
           <div style={{ display: 'inline-block', marginBottom: '10px' }}>
             <AutoComplete
-              options={this.collections.map(x => ({
-                value: x.id,
-                label: x.name,
-                data: x,
-              }))}
+              options={this.collections}
+              optionSearch={this.onSearch}
               onOptionSelect={option => this.props.onSelect(option)}
               placeholder="Collection name"
               value={selected && selected.id}
