@@ -21,6 +21,7 @@
 .byebug_history
 
 /.env
+/.env.test
 /public/packs
 /public/packs-test
 /node_modules
