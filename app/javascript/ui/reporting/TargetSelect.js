@@ -25,8 +25,12 @@ class TargetSelect extends React.Component {
   collections = []
 
   async componentDidMount() {
+    const { item } = this.props
     const defaultCollections = await this.collectionSearch(' ')
-    runInAction(() => (this.collections = defaultCollections))
+    runInAction(() => {
+      this.collections = defaultCollections
+      this.type = item.data_settings.d_filters[0].type
+    })
   }
 
   async collectionSearch(term) {
@@ -74,6 +78,7 @@ class TargetSelect extends React.Component {
       this.collections.find(
         x => Number(x.id) === Number(this.collectionFilter.target)
       )
+    console.log('r', this.type)
     return (
       <form className="form" style={{ display: 'inline-block' }}>
         <Select
