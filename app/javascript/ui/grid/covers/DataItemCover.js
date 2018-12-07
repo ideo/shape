@@ -177,11 +177,13 @@ class DataItemCover extends React.Component {
       )
     }
     return (
-      <TargetButton
-        item={item}
-        editable={editable}
-        onClick={this.handleEditClick}
-      />
+      <span className="editableMetric">
+        <TargetButton
+          item={item}
+          editable={editable}
+          onClick={this.handleEditClick}
+        />
+      </span>
     )
   }
 
