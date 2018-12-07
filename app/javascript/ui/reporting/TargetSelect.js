@@ -5,6 +5,7 @@ import MenuItem from '@material-ui/core/MenuItem'
 import trackError from '~/utils/trackError'
 import { Select } from '~/ui/global/styled/forms'
 import AutoComplete from '~/ui/global/AutoComplete'
+import v from '~/utils/variables'
 
 function formatCollections(collections) {
   return collections.map(collection => ({
@@ -91,7 +92,13 @@ class TargetSelect extends React.Component {
           ))}
         </Select>
         {this.type === 'Collection' && (
-          <div style={{ display: 'inline-block', marginBottom: '10px' }}>
+          <div
+            style={{
+              display: 'inline-block',
+              marginBottom: '10px',
+              backgroundColor: v.colors.commonLight,
+            }}
+          >
             <AutoComplete
               options={this.collections}
               optionSearch={this.onSearch}
