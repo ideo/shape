@@ -34,7 +34,11 @@ RSpec.describe OrganizationBuilder, type: :service do
       end
 
       it 'should set the default trial user count' do
-        expect(organization.trial_users_count).to eql(Organization::DEFAULT_TRIAL_USERS_COUNT)
+        expect(organization.trial_users_count).to eq Organization::DEFAULT_TRIAL_USERS_COUNT
+      end
+
+      it 'should initialize the active_users_count to 1' do
+        expect(organization.active_users_count).to eq 1
       end
 
       it 'should add the user as an admin role' do

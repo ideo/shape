@@ -48,11 +48,9 @@ FactoryBot.define do
     end
 
     trait :recently_active do
-      last_active_at((Organization::RECENTLY_ACTIVE_RANGE - 1.day).ago)
-    end
-
-    trait :not_recently_active do
-      last_active_at((Organization::RECENTLY_ACTIVE_RANGE + 1.day).ago)
+      after(:create) do |user|
+        create(:activity, organization: user.current_organization, actor: user)
+      end
     end
   end
 end
