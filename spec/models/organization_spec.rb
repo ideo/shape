@@ -523,13 +523,21 @@ describe Organization, type: :model do
   end
 
   describe '#calculate_active_users_count!' do
-    let(:pending_user) { create(:user, :recently_active, status: User.statuses[:pending], first_name: 'pending_user') }
-    let(:deleted_user) { create(:user, :recently_active, status: User.statuses[:deleted], first_name: 'deleted_user') }
-    let(:recently_active_user) { create(:user, :recently_active, first_name: 'recently_active_user') }
-    let(:recently_active_guest_user) { create(:user, :recently_active, first_name: 'recently_active_guest_user') }
-    let(:not_recently_active_user) { create(:user, :not_recently_active, first_name: 'not_recently_active_user') }
-    let(:not_recently_active_guest_user) { create(:user, :not_recently_active, first_name: 'not_recently_active_guest_user') }
     let(:organization) { create(:organization) }
+    let(:pending_user) do
+      create(:user, :recently_active, current_organization: organization, status: User.statuses[:pending], first_name: 'pending_user')
+    end
+    let(:deleted_user) do
+      create(:user, :recently_active, current_organization: organization, status: User.statuses[:deleted], first_name: 'deleted_user')
+    end
+    let(:recently_active_user) do
+      create(:user, :recently_active, current_organization: organization, first_name: 'recently_active_user')
+    end
+    let(:recently_active_guest_user) do
+      create(:user, :recently_active, current_organization: organization, first_name: 'recently_active_guest_user')
+    end
+    let(:not_recently_active_user) { create(:user, first_name: 'not_recently_active_user') }
+    let(:not_recently_active_guest_user) { create(:user, first_name: 'not_recently_active_guest_user') }
 
     before do
       pending_user.add_role(Role::MEMBER, organization.primary_group)

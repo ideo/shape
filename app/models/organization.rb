@@ -179,9 +179,14 @@ class Organization < ApplicationRecord
   end
 
   def calculate_active_users_count!
-    count = users.active
-                 .where('last_active_at > ?', RECENTLY_ACTIVE_RANGE.ago)
-                 .count
+    count = Activity
+            .joins(:actor)
+            .where(User.arel_table[:status].eq(User.statuses[:active]))
+            .where(organization_id: id)
+            .where(Activity.arel_table[:created_at].gt(RECENTLY_ACTIVE_RANGE.ago))
+            .select(:actor_id)
+            .distinct
+            .count
     update_attributes(active_users_count: count)
   end
 
