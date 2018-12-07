@@ -37,9 +37,9 @@ class ChartTooltip extends React.Component {
     return parseInt(index) === data.length - 1
   }
 
-  isFirstPointOfType(typeFunc) {
+  isFirstPointOfType(typeAmount) {
     const { data, index } = this.props
-    const all = data.filter(d => d.amount === typeFunc)
+    const all = data.filter(d => d.amount === typeAmount)
     if (!all.length) return false
     const firstIdx = all[0]._x - 1
     return parseInt(index) === firstIdx
@@ -49,13 +49,13 @@ class ChartTooltip extends React.Component {
     return this.isFirstPointOfType(this.maxAmount)
   }
 
-  get firstMinPoint() {
+  get isFirstMinPoint() {
     return this.isFirstPointOfType(this.minAmount)
   }
 
   renderAmountMark(datum, totalData) {
     if (this.isFirstMaxPoint) return true
-    if (this.firstMinPoint) return true
+    if (this.isFirstMinPoint) return true
     if (this.isLastDataPoint) return true
     return false
   }

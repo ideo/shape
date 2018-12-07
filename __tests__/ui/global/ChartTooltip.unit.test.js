@@ -4,10 +4,10 @@ let props, wrapper, render, data
 describe('ChartTooltip', () => {
   beforeEach(() => {
     data = [
-      { date: '2018-07-01', amount: 10 },
-      { date: '2018-08-01', amount: 26 },
-      { date: '2018-09-01', amount: 90 },
-      { date: '2018-10-01', amount: 60 },
+      { date: '2018-07-01', amount: 10, _x: 1 },
+      { date: '2018-08-01', amount: 26, _x: 2 },
+      { date: '2018-09-01', amount: 90, _x: 3 },
+      { date: '2018-10-01', amount: 60, _x: 4 },
     ]
     props = {
       minAmount: 10,
@@ -79,6 +79,21 @@ describe('ChartTooltip', () => {
 
     it('should render a line', () => {
       expect(wrapper.find('line').exists()).toBe(true)
+    })
+
+    describe('with two highest value items of same value', () => {
+      beforeEach(() => {
+        data.push({ date: '2018-11-01', amount: 90 })
+        data.push({ date: '2018-12-01', amount: 58 })
+        props.datum = data[4]
+        props.index = 4
+        render()
+      })
+
+      it('should only render the tooltip for the first', () => {
+        expect(wrapper.find('VictoryTooltip').length).toBe(1)
+        expect(wrapper.find('line').exists()).toBe(false)
+      })
     })
   })
 
