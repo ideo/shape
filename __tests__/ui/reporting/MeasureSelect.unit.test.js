@@ -52,7 +52,7 @@ describe('MeasureSelect', () => {
 
     describe('render', () => {
       it('renders possible options', () => {
-        expect(wrapper.find(MenuItem).length).toEqual(2)
+        expect(wrapper.find(MenuItem).length).toEqual(3)
       })
     })
 
