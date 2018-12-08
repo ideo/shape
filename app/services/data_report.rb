@@ -60,7 +60,7 @@ class DataReport < SimpleService
       # TODO: respect the actual timeframe value
       # currently it is hardcoded to weekly data points that show "past 30 days" activity
       if @timeframe && @timeframe != 'ever'
-        if @query.count == 0
+        if @query.count.zero?
           @data[:values] = []
           return
         end
