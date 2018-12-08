@@ -60,6 +60,10 @@ class DataReport < SimpleService
       # TODO: respect the actual timeframe value
       # currently it is hardcoded to weekly data points that show "past 30 days" activity
       if @timeframe && @timeframe != 'ever'
+        if @query.count == 0
+          @data[:values] = []
+          return
+        end
         min = [@query.select('min(activities.created_at)').to_a.first.min, 6.months.ago].max
         # doing the BETWEEN upper limit we actually query "date + 1", meaning for January 1
         # we are actually finding all activities created before January 2 00:00

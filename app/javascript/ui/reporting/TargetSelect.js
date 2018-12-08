@@ -21,15 +21,14 @@ class TargetSelect extends React.Component {
   @observable
   type = 'Organization'
 
-  @observable
-  collections = []
-
-  async componentDidMount() {
-    const { item } = this.props
-    const defaultCollections = await this.collectionSearch(' ')
+  componentDidMount() {
+    const {
+      item: {
+        data_settings: { d_filters },
+      },
+    } = this.props
     runInAction(() => {
-      this.collections = defaultCollections
-      this.type = item.data_settings.d_filters[0].type
+      this.type = d_filters[0].type
     })
   }
 
@@ -73,12 +72,6 @@ class TargetSelect extends React.Component {
   }
 
   render() {
-    const selected =
-      this.collectionFilter &&
-      this.collections.find(
-        x => Number(x.id) === Number(this.collectionFilter.target)
-      )
-    console.log('r', this.type)
     return (
       <form className="form" style={{ display: 'inline-block' }}>
         <Select
@@ -105,11 +98,10 @@ class TargetSelect extends React.Component {
             }}
           >
             <AutoComplete
-              options={this.collections}
+              options={[]}
               optionSearch={this.onSearch}
               onOptionSelect={option => this.props.onSelect(option)}
               placeholder="Collection name"
-              value={selected && selected.id}
               keepSelectedOptions
               style={{ display: 'inline-block' }}
             />
