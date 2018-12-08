@@ -30,10 +30,6 @@ describe('TargetSelect', () => {
       wrapper.instance().componentDidMount()
     })
 
-    it('loads the collections', () => {
-      expect(wrapper.instance().collections).toEqual(searchResult.data)
-    })
-
     describe('collection filter is present', () => {
       beforeEach(() => {
         props.item.data_settings.d_filters = [{ type: 'Collection', target: 1 }]
@@ -169,20 +165,7 @@ describe('TargetSelect', () => {
             ]
             wrapper.update()
             const p = wrapper.find(AutoComplete).props()
-            expect(p.options).toEqual([
-              {
-                label: 'foo',
-                value: 1,
-                data: { id: 1, name: 'foo' },
-              },
-              {
-                label: 'bar',
-                value: 2,
-                data: { id: 2, name: 'bar' },
-              },
-            ])
             expect(p.placeholder).toEqual('Collection name')
-            expect(p.value).toEqual(1)
             expect(p.keepSelectedOptions).toEqual(true)
             done()
           }, 100)

@@ -27,6 +27,7 @@ class TargetSelect extends React.Component {
         data_settings: { d_filters },
       },
     } = this.props
+    if (!d_filters || d_filters.length === 0) return
     runInAction(() => {
       this.type = d_filters[0].type
     })
