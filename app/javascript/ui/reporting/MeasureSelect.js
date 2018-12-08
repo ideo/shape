@@ -13,6 +13,7 @@ const dataOptions = {
   ],
   timeframe: [
     { name: 'month', value: 'month' },
+    { name: 'week', value: 'week' },
     { name: 'ever', value: 'ever' },
   ],
 }

@@ -43,6 +43,26 @@ RSpec.describe DataReport, type: :service do
           expect(report.call[:value]).to eq 2
         end
       end
+
+      context 'with an activity measure' do
+        let(:actor) { create(:user) }
+        before do
+          # viewed does not count towards activity
+          create_list(:activity, 2, actor: actor, organization: organization, action: :viewed)
+          # commented does
+          create_list(:activity, 3, actor: actor, organization: organization, action: :commented)
+          data_item.update(
+            data_settings: {
+              d_measure: 'activity',
+            },
+          )
+        end
+
+        it 'should calculate the number of activities in the organization' do
+          # 3 comments should count, even if they are the same actor
+          expect(report.call[:value]).to eq 3
+        end
+      end
     end
 
     context 'filtering by collection' do
@@ -132,7 +152,7 @@ RSpec.describe DataReport, type: :service do
         end
       end
 
-      context 'with a participant measure and a timeframe', only: true do
+      context 'with a participant measure and a timeframe' do
         it 'calculates the number of participants in the collection, child collections, and items in those collections' do
           data_item.update(
             data_settings: {
