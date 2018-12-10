@@ -3,8 +3,7 @@ class Api::V1::UsersController < Api::V1::BaseController
   # /organizations/:id/users
   load_and_authorize_resource :organization, only: %i[index]
   def index
-    # show all other active users in the system
-    # i.e. like Trello, is not limited to your org but anyone who's registered
+    # show all other active users in the organization
     @users = User.all_active_except(current_user.id, in_org: @organization)
     render jsonapi: @users, fields:
       {
