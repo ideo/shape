@@ -32,6 +32,8 @@ class DataReport < SimpleService
       Activity.where_viewed
     when 'activity'
       Activity.where_active
+    when 'content'
+      Activity.where_content
     end
   end
 
@@ -69,7 +71,7 @@ class DataReport < SimpleService
     case @measure
     when 'participants', 'viewers'
       selection = 'count(distinct(actor_id))'
-    when 'activity'
+    when 'activity', 'content'
       selection = 'count(*)'
     else
       return
@@ -111,7 +113,7 @@ class DataReport < SimpleService
               .select(:actor_id)
               .distinct
               .count
-    when 'activity'
+    when 'activity', 'content'
       value = @query.count
     else
       return

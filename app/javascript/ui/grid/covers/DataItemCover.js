@@ -118,7 +118,7 @@ class DataItemCover extends React.Component {
 
   get timeframeControl() {
     const { item } = this.props
-    const { data_settings } = item
+    const { timeframe } = item
     const editable = item.can_edit_content
     if (this.editing) {
       return (
@@ -133,16 +133,16 @@ class DataItemCover extends React.Component {
     } else if (editable) {
       return (
         <EditableButton editable={editable} onClick={this.handleEditClick}>
-          <span className="editableMetric">{data_settings.d_timeframe}</span>
+          <span className="editableMetric">{timeframe}</span>
         </EditableButton>
       )
     }
-    return <span>{data_settings.d_timeframe}</span>
+    return <span>{timeframe}</span>
   }
 
   get measureControl() {
     const { item } = this.props
-    const { data_settings } = item
+    const { measure } = item
     const editable = item.can_edit_content
     if (this.editing) {
       return (
@@ -158,7 +158,7 @@ class DataItemCover extends React.Component {
     } else if (editable) {
       return (
         <EditableButton editable={editable} onClick={this.handleEditClick}>
-          <span className="editableMetric">{data_settings.d_measure}</span>
+          <span className="editableMetric">{measure.name}</span>
         </EditableButton>
       )
     }
@@ -180,8 +180,8 @@ class DataItemCover extends React.Component {
 
   get withinText() {
     const { item } = this.props
-    const { data_settings } = item
-    if (data_settings.d_timeframe === 'ever') {
+    const { timeframe } = item
+    if (timeframe === 'ever') {
       return (
         <span className="withinText">
           within the {''} {this.targetControl} {this.timeframeControl}
@@ -226,8 +226,8 @@ class DataItemCover extends React.Component {
 
   get correctGridSize() {
     const { item } = this.props
-    const { data_settings } = item
-    const size = data_settings.d_timeframe === 'ever' ? 1 : 2
+    const { timeframe } = item
+    const size = timeframe === 'ever' ? 1 : 2
     return { width: size, height: size }
   }
 
@@ -280,19 +280,23 @@ class DataItemCover extends React.Component {
 
   renderLabelText = (datum, isLastDataPoint) => {
     const { item } = this.props
-    const { d_measure } = item.data_settings
+    const { timeframe, measureTooltip } = item
     const momentDate = utcMoment(datum.date)
-    let monthRange = `${momentDate
+    let timeRange = `${momentDate
       .clone()
-      .subtract(30, 'days')
+      .subtract(1, timeframe)
       .format('MMM D')} - ${momentDate.format('MMM D')}`
 
-    const near = nearMonth(momentDate)
-    if (near) {
-      monthRange = `in ${near.format('MMMM')}`
+    let dayTimeframe = '7 days'
+    if (timeframe === 'month') {
+      timeRange = `in ${momentDate
+        .clone()
+        .subtract(1, 'month')
+        .format('MMMM')}`
+      dayTimeframe = '30 days'
     }
-    const text = `${datum.amount} ${pluralize(d_measure)}\n
-      ${isLastDataPoint ? 'in last 30 days' : monthRange}`
+    const text = `${datum.amount} ${pluralize(measureTooltip)}\n
+      ${isLastDataPoint ? `in last ${dayTimeframe}` : timeRange}`
 
     return text
   }
@@ -391,7 +395,7 @@ class DataItemCover extends React.Component {
         editable={item.can_edit_content}
         editing={this.editing}
       >
-        {item.data_settings.d_timeframe === 'ever'
+        {item.timeframe === 'ever'
           ? this.renderSingleValue()
           : this.renderTimeframeValues()}
       </StyledDataItemCover>

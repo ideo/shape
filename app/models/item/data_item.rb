@@ -10,6 +10,7 @@ class Item
       participants
       viewers
       activity
+      content
     ].freeze
     VALID_TIMEFRAMES = %w[
       ever

@@ -92,7 +92,7 @@ class FilestackUpload {
   }
 
   static preview(handle, id) {
-    return this.client.preview('WBVeP019TZirWWZLFO7u', { id })
+    return this.client.preview(handle, { id })
   }
 
   static makeDropPane(opts = {}, uploadOpts = {}) {
