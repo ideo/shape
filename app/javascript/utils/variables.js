@@ -13,6 +13,13 @@ export const COLLECTION_TYPES = {
   TEST_DESIGN: 'Collection::TestDesign',
 }
 
+export const DATA_MEASURES = [
+  { name: 'Participants', value: 'participants' },
+  { name: 'Viewers', value: 'viewers' },
+  { name: 'Activity', value: 'activity' },
+  { name: 'Content Use', value: 'content', tooltip: 'content activities' },
+]
+
 export const KEYS = {
   ENTER: 13,
   ESC: 27,

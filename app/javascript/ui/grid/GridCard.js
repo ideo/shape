@@ -21,7 +21,6 @@ import CollectionIcon from '~/ui/icons/CollectionIcon'
 import EditButton from '~/ui/reporting/EditButton'
 import LinkIcon from '~/ui/icons/LinkIcon'
 import Download from '~/ui/grid/Download'
-import FilestackUpload from '~/utils/FilestackUpload'
 import LinkedCollectionIcon from '~/ui/icons/LinkedCollectionIcon'
 import RequiredCollectionIcon from '~/ui/icons/RequiredCollectionIcon'
 import PinnedIcon from '~/ui/icons/PinnedIcon'
@@ -264,13 +263,14 @@ class GridCard extends React.Component {
       return
     }
     if (record.isPdfFile) {
-      FilestackUpload.preview(record.filestack_file.handle, 'filePreview')
+      // TODO: could replace with preview
+      Activity.trackActivity('downloaded', record)
       return
     } else if (record.mimeBaseType === 'image') {
       this.props.handleClick(e)
       return
     } else if (record.isGenericFile) {
-      // TODO: will replace with preview
+      // TODO: could replace with preview
       this.linkOffsite(record.filestack_file.url)
       return
     }

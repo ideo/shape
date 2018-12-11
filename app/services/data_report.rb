@@ -32,6 +32,8 @@ class DataReport < SimpleService
       Activity.where_viewed
     when 'activity'
       Activity.where_active
+    when 'content'
+      Activity.where_content
     when 'collections'
       Collection.searchable
     when 'items'
@@ -116,15 +118,19 @@ class DataReport < SimpleService
 
   def calculate_timeframe_values
     sql_table = query_table.table_name
-    min = [@query.select("min(#{sql_table}.created_at)").to_a.first.min, 6.months.ago].max
+    earliest = @query.select("min(#{sql_table}.created_at)").to_a.first.min
+    return unless earliest.present?
+
+    min = [earliest, 6.months.ago].max
     case @measure
     when 'participants', 'viewers'
       selection = 'count(distinct(actor_id))'
-    when 'activity', 'collections', 'items', 'records'
+    when 'activity', 'content', 'collections', 'items', 'records'
       selection = 'count(*)'
     else
       return
     end
+
     # Doing the BETWEEN upper limit we actually query "date + 1", meaning for January 1
     # we are actually finding all activities/collections created before January 2 00:00
     columns = %i[id created_at]
@@ -163,7 +169,7 @@ class DataReport < SimpleService
               .select(:actor_id)
               .distinct
               .count
-    when 'activity', 'collections', 'items', 'records'
+    when 'activity', 'content', 'collections', 'items', 'records'
       value = @query.count
     else
       return

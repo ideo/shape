@@ -43,7 +43,7 @@ FactoryBot.define do
     end
 
     factory :data_item, class: 'Item::DataItem' do
-      data_settings { { d_measure: 'participants' } }
+      data_settings { { d_measure: 'participants', d_timeframe: 'ever' } }
     end
 
     after(:build) do |item, evaluator|

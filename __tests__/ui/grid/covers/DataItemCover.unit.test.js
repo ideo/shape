@@ -23,6 +23,10 @@ describe('DataItemCover', () => {
         d_measure: 'participants',
         d_timeframe: 'ever',
       },
+      // simulate model helper methods
+      measure: 'participants',
+      measureTooltip: 'participants',
+      timeframe: 'ever',
     }
     props.card = { id: 1, record: props.item, width: 1, height: 1 }
     props.uiStore.editingCardId = 0
@@ -50,7 +54,7 @@ describe('DataItemCover', () => {
 
   describe('with an ever timeframe', () => {
     beforeEach(() => {
-      props.item.data_settings.d_timeframe = 'ever'
+      props.item.timeframe = 'ever'
       wrapper.setProps(props)
     })
 
@@ -107,7 +111,7 @@ describe('DataItemCover', () => {
 
   describe('with a month timeframe', () => {
     beforeEach(() => {
-      props.item.data_settings.d_timeframe = 'month'
+      props.item.timeframe = 'month'
       props.item.data.values = [
         { date: '2018-07-10', amount: 25 },
         { date: '2018-08-10', amount: 30 },
