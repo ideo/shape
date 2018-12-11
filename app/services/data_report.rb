@@ -52,8 +52,7 @@ class DataReport < SimpleService
               .joins(%(left join items on
                          activities.target_id = items.id and
                          activities.target_type = 'Item'))
-              .where(%(collections.breadcrumb @> ':collection_id' or
-                         items.breadcrumb @> ':collection_id' or
+              .where(%(coalesce(collections.breadcrumb, items.breadcrumb) @> ':collection_id' or
                          collections.id = :collection_id),
                      collection_id: collection_filter['target'])
       elsif @measure == 'records'
@@ -126,7 +125,6 @@ class DataReport < SimpleService
     else
       return
     end
-
     # Doing the BETWEEN upper limit we actually query "date + 1", meaning for January 1
     # we are actually finding all activities/collections created before January 2 00:00
     columns = %i[id created_at]

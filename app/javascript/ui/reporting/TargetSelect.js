@@ -1,3 +1,4 @@
+import _ from 'lodash'
 import PropTypes from 'prop-types'
 import { observable, runInAction } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
@@ -5,6 +6,15 @@ import MenuItem from '@material-ui/core/MenuItem'
 import trackError from '~/utils/trackError'
 import { Select } from '~/ui/global/styled/forms'
 import AutoComplete from '~/ui/global/AutoComplete'
+import v from '~/utils/variables'
+
+function formatCollections(collections) {
+  return collections.map(collection => ({
+    value: collection.id,
+    label: collection.name,
+    data: collection,
+  }))
+}
 
 @inject('apiStore')
 @observer
@@ -12,20 +22,34 @@ class TargetSelect extends React.Component {
   @observable
   type = 'Organization'
 
-  @observable
-  collections = []
-
-  async componentWillMount() {
-    try {
-      const res = await this.props.apiStore.searchCollections({ perPage: 100 })
-      runInAction(() => (this.collections = res.data))
-    } catch (e) {
-      trackError(e)
-    }
-    runInAction(
-      () => (this.type = this.collectionFilter ? 'Collection' : 'Organization')
-    )
+  constructor(props) {
+    super(props)
+    this.debouncedSearch = _.debounce((term, callback) => {
+      this.props.apiStore
+        .searchCollections({
+          query: term,
+          per_page: 30,
+        })
+        .then(res => callback(formatCollections(res.data)))
+        .catch(e => {
+          trackError(e)
+        })
+    }, 350)
   }
+
+  componentDidMount() {
+    const {
+      item: {
+        data_settings: { d_filters },
+      },
+    } = this.props
+    if (!d_filters || d_filters.length === 0) return
+    runInAction(() => {
+      this.type = d_filters[0].type
+    })
+  }
+
+  onSearch = (value, callback) => this.debouncedSearch(value, callback)
 
   get currentValue() {
     return this.collectionFilter ? 'Collection' : this.type
@@ -38,8 +62,8 @@ class TargetSelect extends React.Component {
     runInAction(() => (this.type = value))
     if (value === 'Organization') {
       onSelect()
-    } else if (this.collectionFilter) {
-      onSelect(this.collectionFilter.target)
+    } else if (this.collectionFilter && this.collectionFilter.target) {
+      onSelect({ custom: this.collectionFilter.target })
     }
   }
 
@@ -52,11 +76,6 @@ class TargetSelect extends React.Component {
   }
 
   render() {
-    const selected =
-      this.collectionFilter &&
-      this.collections.find(
-        x => Number(x.id) === Number(this.collectionFilter.target)
-      )
     return (
       <form className="form" style={{ display: 'inline-block' }}>
         <Select
@@ -75,16 +94,18 @@ class TargetSelect extends React.Component {
           ))}
         </Select>
         {this.type === 'Collection' && (
-          <div style={{ display: 'inline-block', marginBottom: '10px' }}>
+          <div
+            style={{
+              display: 'inline-block',
+              marginBottom: '10px',
+              backgroundColor: v.colors.commonLight,
+            }}
+          >
             <AutoComplete
-              options={this.collections.map(x => ({
-                value: x.id,
-                label: x.name,
-                data: x,
-              }))}
+              options={[]}
+              optionSearch={this.onSearch}
               onOptionSelect={option => this.props.onSelect(option)}
               placeholder="Collection name"
-              value={selected && selected.id}
               keepSelectedOptions
               style={{ display: 'inline-block' }}
             />
