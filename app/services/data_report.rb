@@ -32,27 +32,78 @@ class DataReport < SimpleService
       Activity.where_viewed
     when 'activity'
       Activity.where_active
+    when 'collections'
+      Collection.searchable
+    when 'items'
+      Item
+    when 'records'
+      CollectionCard::Primary
     end
   end
 
   def filtered_query
     collection_filter = @filters&.find { |x| x['type'] == 'Collection' }
     if collection_filter
-      @query.where(target_type: %w[Collection Item])
-            .joins(%(left join collections on
-                       activities.target_id = collections.id and
-                       activities.target_type = 'Collection'))
-            .joins(%(left join items on
-                       activities.target_id = items.id and
-                       activities.target_type = 'Item'))
-            .where(%(collections.breadcrumb @> ':collection_id' or
+      if query_activities?
+        @query.where(target_type: %w[Collection Item])
+              .joins(%(left join collections on
+                         activities.target_id = collections.id and
+                         activities.target_type = 'Collection'))
+              .joins(%(left join items on
+                         activities.target_id = items.id and
+                         activities.target_type = 'Item'))
+              .where(%(collections.breadcrumb @> ':collection_id' or
+                         items.breadcrumb @> ':collection_id' or
+                         collections.id = :collection_id),
+                     collection_id: collection_filter['target'])
+      elsif @measure == 'records'
+        @query.joins(%(left join collections on
+                         collection_cards.collection_id = collections.id
+                         ))
+              .joins(%(left join items on
+                         collection_cards.item_id = items.id
+                         ))
+              .where(%(collections.breadcrumb @> ':collection_id' or
                        items.breadcrumb @> ':collection_id' or
                        collections.id = :collection_id),
-                   collection_id: collection_filter['target'])
+                     collection_id: collection_filter['target'])
+      else
+        @query.where(%(breadcrumb @> ':collection_id' or
+                       id = :collection_id),
+                     collection_id: collection_filter['target'])
+      end
     else
       # default, within entire org
-      @query
-        .where(organization_id: @data_item.parent.organization_id)
+      if @measure == 'items'
+        @query
+          .joins(parent_collection_card: :parent)
+          .where('collections.organization_id = ?', @data_item.parent.organization_id)
+      elsif @measure == 'records'
+        @query
+          .joins(:parent)
+          .where('collections.organization_id = ?', @data_item.parent.organization_id)
+      else
+        @query
+          .where(organization_id: @data_item.parent.organization_id)
+      end
+    end
+  end
+
+  def query_activities?
+    !%w[collections items records].include?(@measure)
+  end
+
+  def query_table
+    return Activity if query_activities?
+    case @measure
+    when 'collections', 'records'
+      Collection
+    when 'items'
+      Item
+    when 'records'
+      CollectionCard
+    else
+      return
     end
   end
 
@@ -65,24 +116,27 @@ class DataReport < SimpleService
   end
 
   def calculate_timeframe_values
-    min = [@query.select('min(activities.created_at)').to_a.first.min, 6.months.ago].max
+    sql_table = query_table.table_name
+    min = [@query.select("min(#{sql_table}.created_at)").to_a.first.min, 6.months.ago].max
     case @measure
     when 'participants', 'viewers'
       selection = 'count(distinct(actor_id))'
-    when 'activity'
+    when 'activity', 'collections', 'items', 'records'
       selection = 'count(*)'
     else
       return
     end
 
     # Doing the BETWEEN upper limit we actually query "date + 1", meaning for January 1
-    # we are actually finding all activities created before January 2 00:00
+    # we are actually finding all activities/collections created before January 2 00:00
+    columns = %i[id created_at]
+    columns.push(:actor_id) if query_activities?
     sql = %{
       SELECT
         LEAST(series.date, now()::DATE) date,
         (
           SELECT #{selection}
-            FROM (#{@query.select(:id, :actor_id, :created_at).to_sql}) mod_activities
+            FROM (#{@query.select(*columns).to_sql}) inner_query
             WHERE
               created_at BETWEEN
                 LEAST(series.date, now()::DATE) - INTERVAL '1 #{@timeframe}'
@@ -97,9 +151,9 @@ class DataReport < SimpleService
         ) AS series
       ORDER BY series.date;
     }
-    values = Activity.connection.execute(sql)
-                     .map { |val| { date: val['date'], amount: val['count'] } }
-                     .uniq { |i| i[:date] } # this will filter out dupe when final series.date == now()
+    values = query_table.connection.execute(sql)
+                        .map { |val| { date: val['date'], amount: val['count'] } }
+                        .uniq { |i| i[:date] } # this will filter out dupe when final series.date == now()
 
     @data[:values] = values
   end
@@ -111,7 +165,7 @@ class DataReport < SimpleService
               .select(:actor_id)
               .distinct
               .count
-    when 'activity'
+    when 'activity', 'collections', 'items', 'records'
       value = @query.count
     else
       return

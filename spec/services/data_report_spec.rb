@@ -63,6 +63,59 @@ RSpec.describe DataReport, type: :service do
           expect(report.call[:value]).to eq 3
         end
       end
+
+      context 'with a content, collections measure' do
+        let! (:collections) { create_list(:collection, 3, organization: organization) }
+
+        before do
+          data_item.update(
+            data_settings: {
+              d_measure: 'collections',
+            },
+          )
+        end
+
+        it 'should calculate the number of collections total in the org' do
+          # NOTE: an extra collection is created in the first before
+          expect(report.call[:value]).to eq 4
+        end
+      end
+
+      context 'with a content, items measure' do
+        let (:collection) { create(:collection, organization: organization) }
+        let! (:items) { create_list(:text_item, 5, parent_collection: collection) }
+
+        before do
+          data_item.update(
+            data_settings: {
+              d_measure: 'items',
+            },
+          )
+        end
+
+        it 'should calculate the number of items total in the org' do
+          # NOTE: an extra item to account for the actual data item
+          expect(report.call[:value]).to eq 6
+        end
+      end
+
+      context 'with a content, items and collections measure' do
+        let (:collection) { create(:collection, organization: organization) }
+        let! (:items) { create_list(:text_item, 5, parent_collection: collection) }
+
+        before do
+          data_item.update(
+            data_settings: {
+              d_measure: 'records',
+            },
+          )
+        end
+
+        it 'should calculate the number of items & collections total in the org' do
+          # NOTE: an extra item to account for the actual data item
+          expect(report.call[:value]).to eq 6
+        end
+      end
     end
 
     context 'filtering by collection' do
@@ -152,6 +205,63 @@ RSpec.describe DataReport, type: :service do
         end
       end
 
+      context 'with a collections measure' do
+        let!(:other_child_collection) { create(:collection, organization: organization, parent_collection: parent_collection) }
+
+        before do
+          data_item.update(
+            data_settings: {
+              d_measure: 'collections',
+              d_filters: [{ type: 'Collection', target: parent_collection.id }],
+            },
+          )
+        end
+
+        it 'should calculate the number of collections in the collection' do
+          expect(report.call[:value]).to eq 4
+        end
+      end
+
+      context 'with an items measure' do
+        let! (:parent_items) { create_list(:text_item, 5, parent_collection: parent_collection) }
+        let! (:child_items) { create_list(:text_item, 3, parent_collection: child_collection) }
+        let! (:child_child_items) { create_list(:text_item, 2, parent_collection: child_child_collection) }
+
+        before do
+          data_item.update(
+            data_settings: {
+              d_measure: 'items',
+              d_filters: [{ type: 'Collection', target: parent_collection.id }],
+            },
+          )
+        end
+
+        it 'should calculate the number of collections in the collection' do
+          # NOTE: plus 1 question item + actual data item
+          expect(report.call[:value]).to eq 12
+        end
+      end
+
+      context 'with an collections & items measure' do
+        let!(:other_child_collection) { create(:collection, organization: organization, parent_collection: parent_collection) }
+        let! (:parent_items) { create_list(:text_item, 5, parent_collection: parent_collection) }
+        let! (:child_items) { create_list(:text_item, 3, parent_collection: other_child_collection) }
+        let! (:child_child_items) { create_list(:text_item, 2, parent_collection: child_child_collection) }
+
+        before do
+          data_item.update(
+            data_settings: {
+              d_measure: 'records',
+              d_filters: [{ type: 'Collection', target: parent_collection.id }],
+            },
+          )
+        end
+
+        it 'should calculate the number of collections & items in the collection' do
+          expect(report.call[:value]).to eq 15
+        end
+      end
+
       context 'with a participant measure and a timeframe' do
         it 'calculates the number of participants in the collection, child collections, and items in those collections' do
           data_item.update(
@@ -183,6 +293,49 @@ RSpec.describe DataReport, type: :service do
           expect(values.first[:amount]).to eq 5
           # the rest are more recent
           expect(values.last[:amount]).to eq 9
+        end
+      end
+
+      context 'with a collections measure' do
+        let!(:other_child_collection) { create(:collection, organization: organization, parent_collection: parent_collection, created_at: 2.months.ago) }
+
+        before do
+          data_item.update(
+            data_settings: {
+              d_measure: 'collections',
+              d_timeframe: 'month',
+              d_filters: [{ type: 'Collection', target: parent_collection.id }],
+            },
+          )
+        end
+
+        it 'should calculalate collection counds on a timeline' do
+          values = report.call[:values]
+          expect(values.first[:amount]).to eq 1
+          # the rest are more recent
+          expect(values.last[:amount]).to eq 3
+        end
+      end
+
+      context 'with an collections & items measure' do
+        let!(:other_child_collection) { create(:collection, organization: organization, parent_collection: parent_collection, created_at: 2.months.ago) }
+        let! (:new_cards) { create_list(:collection_card_text, 3, parent: other_child_collection) }
+        let! (:old_cards) { create_list(:collection_card_text, 5, parent: other_child_collection, created_at: 2.months.ago) }
+
+        before do
+          data_item.update(
+            data_settings: {
+              d_measure: 'records',
+              d_timeframe: 'month',
+              d_filters: [{ type: 'Collection', target: parent_collection.id }],
+            },
+          )
+        end
+
+        it 'should calculalate collection & item counts on a timeline' do
+          values = report.call[:values]
+          expect(values.first[:amount]).to eq 5
+          expect(values.last[:amount]).to eq 8
         end
       end
     end
