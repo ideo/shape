@@ -1,3 +1,4 @@
+import _ from 'lodash'
 import PropTypes from 'prop-types'
 import { observable, runInAction } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
@@ -21,6 +22,21 @@ class TargetSelect extends React.Component {
   @observable
   type = 'Organization'
 
+  constructor(props) {
+    super(props)
+    this.debouncedSearch = _.debounce((term, callback) => {
+      this.props.apiStore
+        .searchCollections({
+          query: term,
+          per_page: 30,
+        })
+        .then(res => callback(formatCollections(res.data)))
+        .catch(e => {
+          trackError(e)
+        })
+    }, 350)
+  }
+
   componentDidMount() {
     const {
       item: {
@@ -33,20 +49,7 @@ class TargetSelect extends React.Component {
     })
   }
 
-  async collectionSearch(term) {
-    try {
-      const res = await this.props.apiStore.searchCollections({
-        query: term,
-        perPage: 100,
-      })
-      return formatCollections(res.data)
-    } catch (e) {
-      trackError(e)
-      return []
-    }
-  }
-
-  onSearch = value => this.collectionSearch(value)
+  onSearch = (value, callback) => this.debouncedSearch(value, callback)
 
   get currentValue() {
     return this.collectionFilter ? 'Collection' : this.type
@@ -59,8 +62,8 @@ class TargetSelect extends React.Component {
     runInAction(() => (this.type = value))
     if (value === 'Organization') {
       onSelect()
-    } else if (this.collectionFilter) {
-      onSelect(this.collectionFilter.target)
+    } else if (this.collectionFilter && this.collectionFilter.target) {
+      onSelect({ custom: this.collectionFilter.target })
     }
   }
 
