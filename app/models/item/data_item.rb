@@ -11,6 +11,9 @@ class Item
       viewers
       activity
       content
+      collections
+      items
+      records
     ].freeze
     VALID_TIMEFRAMES = %w[
       ever
