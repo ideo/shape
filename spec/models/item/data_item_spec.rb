@@ -6,7 +6,7 @@ RSpec.describe Item::DataItem, type: :model do
 
     it 'should validate that d_measure is one the valid measures' do
       expect(item.update(d_measure: 'something_bad')).to eq(false)
-      expect(item.errors).to match_array(['Data settings measure must be one of participants, viewers, activity, content'])
+      expect(item.errors).to match_array(['Data settings measure must be one of participants, viewers, activity, content, collections, items, records'])
       expect(item.update(d_measure: 'viewers')).to eq(true)
       expect(item.errors.empty?).to be true
     end
