@@ -3,15 +3,13 @@ import { PropTypes as MobxPropTypes } from 'mobx-react'
 import MenuItem from '@material-ui/core/MenuItem'
 
 import { Select } from '~/ui/global/styled/forms'
+import { DATA_MEASURES } from '~/utils/variables'
 
 const dataOptions = {
-  measure: [
-    { name: 'Select Measure...', value: null },
-    { name: 'Participants', value: 'participants' },
-    { name: 'Viewers', value: 'viewers' },
-  ],
+  measure: [{ name: 'Select Measure...', value: null }, ...DATA_MEASURES],
   timeframe: [
     { name: 'month', value: 'month' },
+    { name: 'week', value: 'week' },
     { name: 'ever', value: 'ever' },
   ],
 }

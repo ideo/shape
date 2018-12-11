@@ -3,7 +3,7 @@ import { observable } from 'mobx'
 import { routingStore } from '~/stores'
 import trackError from '~/utils/trackError'
 import FilestackUpload from '~/utils/FilestackUpload'
-import { ITEM_TYPES } from '~/utils/variables'
+import { ITEM_TYPES, DATA_MEASURES } from '~/utils/variables'
 import BaseRecord from './BaseRecord'
 import SharedRecordMixin from './SharedRecordMixin'
 
@@ -90,6 +90,25 @@ class Item extends SharedRecordMixin(BaseRecord) {
     const { filestack_file_url } = this
     if (!filestack_file_url) return ''
     return filestack_file_url.replace(/resize=width:[0-9]*,fit:max\//, '')
+  }
+
+  get measure() {
+    const { data_settings } = this
+    if (!data_settings || !data_settings.d_measure) return {}
+    const measure = _.find(DATA_MEASURES, { value: data_settings.d_measure })
+    if (!measure) return {}
+    return measure
+  }
+
+  get timeframe() {
+    const { data_settings } = this
+    if (!data_settings || !data_settings.d_timeframe) return ''
+    return data_settings.d_timeframe
+  }
+
+  get measureTooltip() {
+    const { measure } = this
+    return measure.tooltip || measure.name.toLowerCase()
   }
 
   imageUrl(width = 1200) {
