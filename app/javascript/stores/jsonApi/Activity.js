@@ -35,7 +35,6 @@ class Activity extends BaseRecord {
   attributesForAPI = ['action', 'target_type', 'target_id']
 
   static trackActivity(actionName, target) {
-    console.log('trackActivity', actionName, target)
     const activity = new Activity(
       {
         action: actionName,
