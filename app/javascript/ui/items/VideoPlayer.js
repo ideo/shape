@@ -4,27 +4,52 @@ import ReactPlayer from 'react-player'
 import VideoUrl from '~/utils/VideoUrl'
 
 class VideoPlayer extends React.PureComponent {
+  state = {
+    vimeoError: false,
+  }
+
+  catchVimeoError = () => {
+    this.setState({
+      vimeoError: true,
+    })
+  }
+
   render() {
+    const { vimeoError } = this.state
     const { url, width, height, playing } = this.props
     const videoId = VideoUrl.getVideoId(url)
+    let embedSrc = ''
 
+    if (videoId.service !== 'vbrick' && !vimeoError) {
+      let onError = null
+      if (videoId.service === 'vimeo') {
+        onError = this.catchVimeoError
+      }
+      return <ReactPlayer {...this.props} onError={onError} />
+    }
     if (videoId.service === 'vbrick') {
-      let embedSrc = `https://ford.rev.vbrick.com/embed?id=${videoId.id}`
+      embedSrc = `https://ford.rev.vbrick.com/embed?id=${videoId.id}`
       if (playing) {
         embedSrc += '&autoplay'
       }
-      return (
-        <iframe
-          title="vbrick"
-          width={width}
-          height={height}
-          src={embedSrc}
-          frameBorder="0"
-          allowFullScreen
-        />
-      )
+    } else {
+      embedSrc = `https://player.vimeo.com/video/${videoId.id}`
+      if (playing) {
+        // NOTE: chrome and some browsers require mute in order to autoplay
+        embedSrc += '?autoplay=1'
+      }
     }
-    return <ReactPlayer {...this.props} />
+    return (
+      <iframe
+        style={{ backgroundColor: 'black' }}
+        title="video player"
+        width={width}
+        height={height}
+        src={embedSrc}
+        frameBorder="0"
+        allowFullScreen
+      />
+    )
   }
 }
 
