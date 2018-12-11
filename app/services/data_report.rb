@@ -35,7 +35,7 @@ class DataReport < SimpleService
     when 'content'
       Activity.where_content
     when 'collections'
-      Collection.data_accessible
+      Collection.data_collectable
     when 'items'
       Item
     when 'records'
