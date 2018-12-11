@@ -91,7 +91,9 @@ class Comment extends React.Component {
             size={32}
             className="author-img"
           />
-          <DisplayText className="author">{comment.author.name}</DisplayText>
+          <DisplayText className="author" color={v.colors.white}>
+            {comment.author.name}
+          </DisplayText>
           <span className="timestamp">
             <Moment date={comment.updated_at} />
           </span>
