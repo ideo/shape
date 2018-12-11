@@ -109,7 +109,7 @@ export const StyledGridCardInner = styled.div`
   position: relative;
   height: 100%;
   ${props =>
-    !props.overflow &&
+    !props.hasOverflow &&
     `
   overflow: hidden;
   `} z-index: 1;
