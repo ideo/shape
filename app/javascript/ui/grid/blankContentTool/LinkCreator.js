@@ -66,7 +66,7 @@ class LinkCreator extends React.Component {
     const { name, thumbnailUrl } = await VideoUrl.getAPIdetails(url)
     if (this.canceled) return
     this.setState({ loading: false })
-    if (name && thumbnailUrl) {
+    if (name) {
       this.setState({ name, thumbnailUrl, urlValid: 'video' })
     } else {
       this.setState({ urlValid: false })
