@@ -27,7 +27,7 @@ class VideoUrl {
     const { service } = data
     let { id } = data
     if (service === 'vimeo' && !id) {
-      id = this.vimeoPrivate(url).id
+      id = this.privateVideoDefaults({ url }).id
     }
     retv.service = service
     retv.id = id
@@ -62,15 +62,21 @@ class VideoUrl {
     }
   }
 
-  static vimeoPrivate(url) {
-    const parsedUrl = parseUrl(url)
-    if (parsedUrl.pathname.split('/').length > 2) {
-      // the "id" in this case e.g. '123123/232323' is the pathname minus the first '/'
-      const id = parsedUrl.pathname.slice(1)
+  static privateVideoDefaults({ url, id } = {}) {
+    let videoId = id
+    if (url) {
+      // NOTE: this URL parsing logic is mainly just for Vimeo
+      const parsedUrl = parseUrl(url)
+      if (parsedUrl.pathname.split('/').length > 2) {
+        // the "id" in this case e.g. '123123/232323' is the pathname minus the first '/'
+        videoId = parsedUrl.pathname.slice(1)
+      }
+    }
+    if (videoId) {
       return {
         name: v.defaults.video.name,
         thumbnailUrl: v.defaults.video.thumbnailUrl,
-        id,
+        id: videoId,
       }
     }
     return {}
@@ -79,7 +85,7 @@ class VideoUrl {
   static getAPIdetails(url) {
     const { id, service } = this.getVideoId(url)
     if (service === 'vimeo' && !id) {
-      return this.vimeoPrivate()
+      return this.vimeoPrivate({ url })
     }
     if (!service || !id) return {}
     if (!this.isValid(url)) return {}
@@ -114,6 +120,7 @@ class VideoUrl {
         thumbnailUrl: thumb.url,
       }
     } catch (e) {
+      // there is no embedding of private youtube videos, so no point to allow it
       return {}
     }
   }
@@ -137,7 +144,7 @@ class VideoUrl {
         thumbnailUrl: thumbnail.link,
       }
     } catch (e) {
-      return {}
+      return this.privateVideoDefaults({ id })
     }
   }
 
@@ -156,14 +163,14 @@ class VideoUrl {
     } catch (e) {
       // could be a 404, or a 401...
       // until we have a vbrick login, hard to test how to respond to private/unauthorized
-      return this.vimeoPrivate()
+      return this.privateVideoDefaults({ id })
     }
   }
 
   static isValid(url) {
     const { id, service } = this.getVideoId(url)
     if (service === 'vimeo' && !id) {
-      return !!Object.keys(this.vimeoPrivate(url)).length
+      return !!Object.keys(this.privateVideoDefaults({ url })).length
     }
 
     if (!service || !id) return false
