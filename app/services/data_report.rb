@@ -43,8 +43,7 @@ class DataReport < SimpleService
             .joins(%(left join items on
                        activities.target_id = items.id and
                        activities.target_type = 'Item'))
-            .where(%(collections.breadcrumb @> ':collection_id' or
-                       items.breadcrumb @> ':collection_id' or
+            .where(%(coalesce(collections.breadcrumb, items.breadcrumb) @> ':collection_id' or
                        collections.id = :collection_id),
                    collection_id: collection_filter['target'])
     else
@@ -60,6 +59,10 @@ class DataReport < SimpleService
       # TODO: respect the actual timeframe value
       # currently it is hardcoded to weekly data points that show "past 30 days" activity
       if @timeframe && @timeframe != 'ever'
+        if @query.count.zero?
+          @data[:values] = []
+          return
+        end
         min = [@query.select('min(activities.created_at)').to_a.first.min, 6.months.ago].max
         # doing the BETWEEN upper limit we actually query "date + 1", meaning for January 1
         # we are actually finding all activities created before January 2 00:00
