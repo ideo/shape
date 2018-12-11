@@ -10,5 +10,6 @@ class SerializableSimpleCollection < BaseJsonSerializer
     @object.type || @object.class.name
   end
 
+  has_one :parent_collection_card
   has_many :collection_cards
 end

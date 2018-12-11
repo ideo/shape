@@ -23,6 +23,7 @@ import MeasureSelect from '~/ui/reporting/MeasureSelect'
 import OrganicGridPng from '~/assets/organic_grid_black.png'
 import OrganicGrid from '~/ui/icons/OrganicGrid'
 import TargetButton from '~/ui/reporting/TargetButton'
+import TargetSelect from '~/ui/reporting/TargetSelect'
 import v from '~/utils/variables'
 import { theme } from '~/ui/test_collections/shared'
 
@@ -80,7 +81,7 @@ StyledDataItemCover.displayName = 'StyledDataItemCover'
 
 const AboveChartContainer = styled.div`
   position: absolute;
-  z-index: ${v.zIndex.floatOverContent};
+  z-index: ${v.zIndex.aboveVictoryChart};
 `
 
 const ChartContainer = styled.div`
@@ -161,19 +162,28 @@ class DataItemCover extends React.Component {
         </EditableButton>
       )
     }
-    return null
+    return <span>{data_settings.d_measure}</span>
   }
 
   get targetControl() {
     const { item } = this.props
     const editable = item.can_edit_content
 
+    if (this.editing) {
+      return (
+        <span className="editableMetric">
+          <TargetSelect item={item} onSelect={this.onSelectTarget} />
+        </span>
+      )
+    }
     return (
-      <TargetButton
-        item={item}
-        editable={editable}
-        onClick={this.handleEditClick}
-      />
+      <span className="editableMetric">
+        <TargetButton
+          item={item}
+          editable={editable}
+          onClick={this.handleEditClick}
+        />
+      </span>
     )
   }
 
@@ -209,7 +219,7 @@ class DataItemCover extends React.Component {
   onSelectTarget = value => {
     this.saveSettings({
       d_filters: value
-        ? [{ type: 'Collection', target: Number(value.id) }]
+        ? [{ type: 'Collection', target: Number(value.custom) }]
         : [],
     })
     this.toggleEditing()
@@ -267,14 +277,6 @@ class DataItemCover extends React.Component {
       ...value,
       month: value.date,
     }))
-  }
-
-  get maxAmount() {
-    return Math.max(...this.formattedValues.map(d => d.amount))
-  }
-
-  get minAmount() {
-    return Math.min(...this.formattedValues.map(d => d.amount))
   }
 
   renderLabelText = (datum, isLastDataPoint) => {
