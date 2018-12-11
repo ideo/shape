@@ -22,15 +22,40 @@ const DotFlyout = props => (
 class ChartTooltip extends React.Component {
   static defaultEvents = VictoryTooltip.defaultEvents
 
+  get maxAmount() {
+    const { data } = this.props
+    return Math.max(...data.map(d => d.amount))
+  }
+
+  get minAmount() {
+    const { data } = this.props
+    return Math.min(...data.map(d => d.amount))
+  }
+
   get isLastDataPoint() {
     const { data, index } = this.props
     return parseInt(index) === data.length - 1
   }
 
+  isFirstPointOfType(typeAmount) {
+    const { data, index } = this.props
+    const all = data.filter(d => d.amount === typeAmount)
+    if (!all.length) return false
+    const firstIdx = all[0]._x - 1
+    return parseInt(index) === firstIdx
+  }
+
+  get isFirstMaxPoint() {
+    return this.isFirstPointOfType(this.maxAmount)
+  }
+
+  get isFirstMinPoint() {
+    return this.isFirstPointOfType(this.minAmount)
+  }
+
   renderAmountMark(datum, totalData) {
-    const { maxAmount, minAmount } = this.props
-    if (datum.amount >= maxAmount) return true
-    if (datum.amount <= minAmount) return true
+    if (this.isFirstMaxPoint) return true
+    if (this.isFirstMinPoint) return true
     if (this.isLastDataPoint) return true
     return false
   }
