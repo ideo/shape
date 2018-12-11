@@ -92,7 +92,7 @@ describe('TargetSelect', () => {
           render()
           event.target.value = 'foo'
           wrapper.instance().handleChange(event)
-          expect(props.onSelect).toHaveBeenCalledWith(1)
+          expect(props.onSelect).toHaveBeenCalledWith({ custom: 1 })
         })
       })
 
