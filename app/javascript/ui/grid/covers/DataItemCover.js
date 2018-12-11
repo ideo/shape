@@ -163,7 +163,7 @@ class DataItemCover extends React.Component {
         </EditableButton>
       )
     }
-    return <span>{measure}</span>
+    return <span>{measure.name}</span>
   }
 
   get targetControl() {

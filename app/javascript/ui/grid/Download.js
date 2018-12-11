@@ -16,12 +16,10 @@ const IconHolder = styled.a`
 
 class Download extends React.Component {
   trackDownload = ev => {
-    // ev.preventDefault()
     const { record } = this.props
     const file = record.filestack_file
     if (file.url) {
       Activity.trackActivity('downloaded', record)
-      // window.open(file.url, '_blank')
     }
   }
 
@@ -37,9 +35,9 @@ class Download extends React.Component {
         <IconHolder
           className="show-on-hover"
           href={file.url}
-          download
           target="_blank"
           onClick={this.trackDownload}
+          download
         >
           <DownloadIcon />
         </IconHolder>
