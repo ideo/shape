@@ -6,14 +6,16 @@ describe Api::V1::UsersController, type: :request, json: true, auth: true, creat
   describe 'GET #index' do
     let!(:organization) { user.current_organization }
     let!(:org_users) { create_list(:user, 3) }
+    let!(:org_guests) { create_list(:user, 1) }
     let!(:other_org) { create(:organization) }
     let!(:other_org_users) { create_list(:user, 3) }
-    let!(:pending_users) { create_list(:user, 3, :pending) }
+    let!(:pending_users) { create_list(:user, 2, :pending) }
     let(:path) { "/api/v1/organizations/#{organization.id}/users" }
 
     before do
       user.add_role(Role::MEMBER, organization.primary_group)
       org_users.each { |u| u.add_role(Role::MEMBER, organization.primary_group) }
+      org_guests.each { |u| u.add_role(Role::MEMBER, organization.guest_group) }
       other_org_users.each { |u| u.add_role(Role::MEMBER, other_org.primary_group) }
     end
 
@@ -24,7 +26,7 @@ describe Api::V1::UsersController, type: :request, json: true, auth: true, creat
 
     it 'includes all active users in the organization, not including current user' do
       get(path)
-      expect(json_object_ids).to match_array(org_users.map(&:id))
+      expect(json_object_ids).to match_array((org_users + org_guests).map(&:id))
     end
   end
 
