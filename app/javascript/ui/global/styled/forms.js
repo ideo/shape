@@ -271,7 +271,7 @@ Checkbox.displayName = 'StyledCheckbox'
 export const SelectOption = styled(MenuItem)`
   &.selectOption {
     display: block;
-    padding: 12px 10px 18px 20px;
+    padding: 12px 10px 12px 20px;
     position: relative;
 
     &::before {
