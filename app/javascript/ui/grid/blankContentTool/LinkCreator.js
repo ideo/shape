@@ -16,6 +16,8 @@ class LinkCreator extends React.Component {
       name: '',
       thumbnailUrl: '',
       meta: {},
+      passwordRequired: false,
+      password: '',
     }
     this.canceled = false
     this.parseMetadata = _.debounce(this._parseMetadata, 500)
@@ -47,6 +49,23 @@ class LinkCreator extends React.Component {
     return this.parseMetadata(url)
   }
 
+  onPasswordChange = e => {
+    const password = e.target.value
+    const { url } = this.state
+    this.setState({
+      loading: true,
+      password,
+    })
+    if (VideoUrl.isValid(url)) {
+      return this.lookupVideoAPI(url, password)
+    }
+    this.setState({
+      urlValid: false,
+      loading: false,
+    })
+    return false
+  }
+
   _parseMetadata = async url => {
     if (url.length <= 3) return
     const meta = await parseURLMeta(url)
@@ -62,12 +81,16 @@ class LinkCreator extends React.Component {
     }
   }
 
-  _lookupVideoAPI = async url => {
-    const { name, thumbnailUrl } = await VideoUrl.getAPIdetails(url)
+  _lookupVideoAPI = async (url, password = '') => {
+    const {
+      name,
+      thumbnailUrl,
+      passwordRequired,
+    } = await VideoUrl.getAPIdetails(url, password)
     if (this.canceled) return
     this.setState({ loading: false })
     if (name) {
-      this.setState({ name, thumbnailUrl, urlValid: 'video' })
+      this.setState({ name, thumbnailUrl, urlValid: 'video', passwordRequired })
     } else {
       this.setState({ urlValid: false })
     }
@@ -122,7 +145,7 @@ class LinkCreator extends React.Component {
 
   render() {
     const { type } = this.props
-    const { url, urlValid } = this.state
+    const { url, urlValid, passwordRequired, password } = this.state
     const loading = this.props.loading || this.state.loading
 
     return (
@@ -134,6 +157,9 @@ class LinkCreator extends React.Component {
         onChange={this.onUrlChange}
         onClose={this.props.closeBlankContentTool}
         loading={loading}
+        password={password}
+        passwordField={passwordRequired}
+        onPasswordChange={this.onPasswordChange}
       />
     )
   }

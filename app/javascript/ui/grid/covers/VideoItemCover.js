@@ -58,7 +58,7 @@ class VideoItemCover extends React.PureComponent {
     // as well as getting around the fact that videos currently have thumbnail_url required
     if (thumbnail === v.defaults.video.thumbnailUrl) {
       thumbnail = null
-      bgColor = v.colors.commonMedium
+      bgColor = v.colors.commonDark
     }
     return (
       <StyledVideoCover playing={this.state.playing}>
