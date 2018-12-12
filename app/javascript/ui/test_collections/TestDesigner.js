@@ -241,7 +241,8 @@ class TestDesigner extends React.Component {
               <SelectOption
                 key={opt.value}
                 classes={{
-                  root: !opt.value ? 'grayedOut' : '',
+                  root: !opt.value ? 'grayedOut' : 'selectOption',
+                  selected: 'selected',
                 }}
                 disabled={!opt.value}
                 value={opt.value}
