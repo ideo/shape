@@ -209,21 +209,20 @@ export const RoundPill = styled.div`
 export const Select = styled(MuiSelect)`
   ${props => props.inline && 'display: inline-block;'}
   font-family: ${v.fonts.sans};
+  border-radius: 0;
   font-size: ${props => (props.inline ? 'inherit !important' : '1rem')};
   font-weight: ${props =>
     props.inline ? 'inherit !important' : v.weights.book};
-  letter-spacing: ${props => (props.inline ? 'inherit !important' : '1px')};;
+  letter-spacing: ${props => (props.inline ? 'inherit !important' : '1px')};
+  padding-bottom: 0;
+  padding-top: 0;
+
   ${props =>
     props.inline &&
     `
   margin-bottom: -9px;
   margin-top: -6px;
-  `}
-  padding-bottom: 0;
-  padding-top: 0;
-
-
-  .grayedOut {
+  `} .grayedOut {
     color: ${v.colors.commonMedium};
   }
 
@@ -237,6 +236,7 @@ export const Select = styled(MuiSelect)`
 
   .selectMenu {
     background-color: transparent;
+    border-radius: 0;
     padding-bottom: 0;
     padding-top: 0;
     vertical-align: baseline;
@@ -271,6 +271,7 @@ Checkbox.displayName = 'StyledCheckbox'
 export const SelectOption = styled(MenuItem)`
   &.selectOption {
     display: block;
+    height: auto;
     padding: 12px 10px 12px 20px;
     position: relative;
 
