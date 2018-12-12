@@ -15,10 +15,19 @@ const GenericLinkCreator = ({
   onSubmit,
   onChange,
   onClose,
+  password,
+  passwordField,
+  onPasswordChange,
 }) => {
-  let validIndicator = ''
+  let validIndicator, pwValidIndicator
   if (url.length > 3) {
     validIndicator = <ValidIndicator valid={!!urlValid} loading={loading} />
+  }
+
+  if (passwordField) {
+    pwValidIndicator = (
+      <ValidIndicator top={58} valid={false} loading={loading} />
+    )
   }
 
   const handleKeyDown = e => {
@@ -38,7 +47,17 @@ const GenericLinkCreator = ({
           onChange={onChange}
           onKeyDown={handleKeyDown}
         />
+        {passwordField && (
+          <BctTextField
+            type="password"
+            autoFocus
+            placeholder="Enter password"
+            value={password}
+            onChange={onPasswordChange}
+          />
+        )}
         {validIndicator}
+        {pwValidIndicator}
         <FormButton disabled={loading} data-cy="LinkCreatorFormButton">
           Add
         </FormButton>
@@ -50,11 +69,20 @@ const GenericLinkCreator = ({
 GenericLinkCreator.propTypes = {
   url: PropTypes.string.isRequired,
   urlValid: PropTypes.bool.isRequired,
+  password: PropTypes.string,
+  passwordField: PropTypes.bool,
+  onPasswordChange: PropTypes.func,
   placeholder: PropTypes.string.isRequired,
   onSubmit: PropTypes.func.isRequired,
   onChange: PropTypes.func.isRequired,
   onClose: PropTypes.func.isRequired,
   loading: PropTypes.bool.isRequired,
+}
+
+GenericLinkCreator.defaultProps = {
+  password: '',
+  passwordField: false,
+  onPasswordChange: null,
 }
 
 export default GenericLinkCreator

@@ -69,26 +69,19 @@ describe('parse', () => {
         expect(service).toEqual('vimeo')
       })
     })
+
+    it('returns id and service for private urls', () => {
+      const { id, service } = VideoUrl.parse('https://vimeo.com/12345678/9876')
+      expect(id).toEqual('12345678/9876')
+      expect(service).toEqual('vimeo')
+    })
   })
 })
 
 describe('privateVideoDefaults', () => {
-  describe('with url', () => {
-    it('gets the vimeo collection/id', () => {
-      const details = VideoUrl.privateVideoDefaults({
-        url: 'https://vimeo.com/123/456',
-      })
-      expect(details.thumbnailUrl).toEqual(v.defaults.video.thumbnailUrl)
-      expect(details.id).toEqual('123/456')
-    })
-  })
-  describe('with id', () => {
-    it('sets the default attributes', () => {
-      const details = VideoUrl.privateVideoDefaults({
-        id: 'some-id',
-      })
-      expect(details.thumbnailUrl).toEqual(v.defaults.video.thumbnailUrl)
-      expect(details.id).toEqual('some-id')
-    })
+  it('sets the default attributes', () => {
+    const details = VideoUrl.privateVideoDefaults('some-id')
+    expect(details.thumbnailUrl).toEqual(v.defaults.video.thumbnailUrl)
+    expect(details.id).toEqual('some-id')
   })
 })
