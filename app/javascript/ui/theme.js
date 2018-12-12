@@ -16,4 +16,12 @@ export default createMuiTheme({
       main: v.colors.ctaPrimary,
     },
   },
+  overrides: {
+    MuiList: {
+      padding: {
+        paddingBottom: 0,
+        paddingTop: 0,
+      },
+    },
+  },
 })
