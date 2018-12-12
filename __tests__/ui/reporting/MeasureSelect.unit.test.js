@@ -1,5 +1,5 @@
 import MeasureSelect from '~/ui/reporting/MeasureSelect'
-import MenuItem from '@material-ui/core/MenuItem'
+import { SelectOption } from '~/ui/global/styled/forms'
 import { fakeItem } from '#/mocks/data'
 
 const props = {}
@@ -25,7 +25,7 @@ describe('MeasureSelect', () => {
 
     describe('render', () => {
       it('renders possible options', () => {
-        expect(wrapper.find(MenuItem).length).toEqual(8)
+        expect(wrapper.find(SelectOption).length).toEqual(6)
       })
     })
 
@@ -52,7 +52,7 @@ describe('MeasureSelect', () => {
 
     describe('render', () => {
       it('renders possible options', () => {
-        expect(wrapper.find(MenuItem).length).toEqual(3)
+        expect(wrapper.find(SelectOption).length).toEqual(3)
       })
     })
 
