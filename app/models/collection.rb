@@ -146,14 +146,6 @@ class Collection < ApplicationRecord
       ]
   end
 
-  def search_user_ids
-    (editors[:users].pluck(:id) + viewers[:users].pluck(:id)).uniq
-  end
-
-  def search_group_ids
-    (editors[:groups].pluck(:id) + viewers[:groups].pluck(:id)).uniq
-  end
-
   # By default all string fields are searchable
   def search_data
     parent_ids = breadcrumb

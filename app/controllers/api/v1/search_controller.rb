@@ -8,7 +8,7 @@ class Api::V1::SearchController < Api::V1::BaseController
         size: results.size,
       },
       jsonapi: results,
-      include: [:parent_collection_card],
+      include: %i[parent_collection_card filestack_file],
       class: jsonapi_class.merge(
         Collection: SerializableSimpleCollection,
       ),

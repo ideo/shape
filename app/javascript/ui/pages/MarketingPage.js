@@ -1,6 +1,8 @@
 import { Fragment } from 'react'
 import { Box } from 'reflexbox'
 import { Element as ScrollElement } from 'react-scroll'
+import ReactRouterPropTypes from 'react-router-prop-types'
+import queryString from 'query-string'
 
 import {
   MarketingBack,
@@ -52,6 +54,15 @@ class MarketingPage extends React.Component {
             const { value } = pageText.data()
             textValues[key] = value
           })
+          if (this.props.location.search) {
+            const params = queryString.parse(this.props.location.search)
+            if (params && params.campaign === 'alt7') {
+              textValues.footerHeader = textValues.footerHeader.replace(
+                '$5',
+                '$7'
+              )
+            }
+          }
           this.setState({ pageTexts: textValues })
         })
     }
@@ -192,4 +203,7 @@ class MarketingPage extends React.Component {
   }
 }
 
+MarketingPage.propTypes = {
+  location: ReactRouterPropTypes.location.isRequired,
+}
 export default MarketingPage

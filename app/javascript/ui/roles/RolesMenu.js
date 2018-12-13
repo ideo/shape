@@ -26,7 +26,7 @@ const ScrollArea = styled.div`
 const FooterArea = styled.div`
   flex: 0 0 auto;
   padding-top: 24px;
-  padding-bottom: 24px;
+  padding-bottom: 84px;
 `
 
 const StyledRow = styled(Row)`

@@ -115,7 +115,8 @@ class User < ApplicationRecord
   def self.all_active_except(user_id, in_org: nil)
     users = active.where.not(id: user_id).order(first_name: :asc)
     if in_org
-      users = users.where(id: in_org.primary_group.user_ids)
+      user_ids = in_org.primary_group.user_ids + in_org.guest_group.user_ids
+      users = users.where(id: user_ids)
     end
     users
   end
