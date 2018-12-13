@@ -315,7 +315,10 @@ class GridCard extends React.Component {
           )}
         {!record.menuDisabled &&
           uiStore.textEditingItem !== record && (
-            <StyledTopRightActions color={this.actionsColor}>
+            <StyledTopRightActions
+              color={this.actionsColor}
+              className="show-on-hover"
+            >
               {record.isDownloadable && <Download record={record} />}
               {record.canBeSetAsCover &&
                 canEditCollection && (

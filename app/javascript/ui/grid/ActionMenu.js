@@ -251,7 +251,13 @@ class ActionMenu extends React.Component {
   }
 
   render() {
-    const { className, menuOpen, wrapperClassName, uiStore } = this.props
+    const {
+      className,
+      location,
+      menuOpen,
+      wrapperClassName,
+      uiStore,
+    } = this.props
     return (
       <PopoutMenu
         className={className}
@@ -260,6 +266,7 @@ class ActionMenu extends React.Component {
         onClick={this.toggleOpen}
         menuItems={this.menuItems}
         menuOpen={menuOpen}
+        buttonStyle={location === 'GridCard' ? 'card' : ''}
         position={{ x: uiStore.cardMenuOpen.x, y: uiStore.cardMenuOpen.y }}
         direction={uiStore.cardMenuOpen.direction}
         width={250}

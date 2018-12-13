@@ -1,3 +1,4 @@
+import CardActionHolder from '~/ui/icons/CardActionHolder'
 import CoverImageToggle from '~/ui/grid/CoverImageToggle'
 import { fakeCollectionCard } from '#/mocks/data'
 import v from '~/utils/variables'
@@ -29,16 +30,8 @@ describe('CoverImageToggle', () => {
       })
 
       it('should set the svg fill to light gray', () => {
-        const ele = wrapper.find('StyledCoverImageToggle')
-        expect(ele).toHaveStyleRule('fill', v.colors.commonMedium, {
-          modifier: 'svg',
-        })
-      })
-
-      it('should show the show add cover tooltip', () => {
-        expect(wrapper.find('Tooltip').props().title).toEqual(
-          'make cover image'
-        )
+        const ele = wrapper.find(CardActionHolder)
+        expect(ele.props().color).toEqual(v.colors.commonMedium)
       })
     })
 
@@ -48,24 +41,16 @@ describe('CoverImageToggle', () => {
         rerender()
       })
 
-      it('should show the show add cover tooltip', () => {
-        expect(wrapper.find('Tooltip').props().title).toEqual(
-          'remove as cover image'
-        )
-      })
-
       it('should set the svg fill to black', () => {
-        const ele = wrapper.find('StyledCoverImageToggle')
-        expect(ele).toHaveStyleRule('fill', v.colors.black, {
-          modifier: 'svg',
-        })
+        const ele = wrapper.find(CardActionHolder)
+        expect(ele.props().color).toEqual(v.colors.black)
       })
     })
   })
 
   describe('toggle()', () => {
     beforeEach(() => {
-      wrapper.find('StyledCoverImageToggle').simulate('click', fakeEv)
+      wrapper.find(CardActionHolder).simulate('click', fakeEv)
     })
 
     it('should toggle the card is_cover property', () => {

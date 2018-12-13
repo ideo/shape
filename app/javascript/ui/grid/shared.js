@@ -125,24 +125,36 @@ export const StyledGridCardInner = styled.div`
 StyledGridCardInner.displayName = 'StyledGridCardInner'
 
 export const StyledTopRightActions = styled.div`
+  align-items: center;
+  background-color: ${v.colors.commonLightest};
+  border-radius: 4px;
+  display: flex;
+  height: 34px;
   position: absolute;
-  top: 0.35rem;
   right: 0.25rem;
+  top: 0.35rem;
   z-index: ${v.zIndex.gridCardTop};
+
   .show-on-hover {
-    color: ${props => props.color};
     border-color: ${props => props.color};
+    color: ${props => props.color};
   }
+
   .selected {
     border-color: ${props => props.color};
     background-color: ${props => props.color};
   }
   .card-menu {
-    margin-top: 0.25rem;
+    color: ${props => props.color};
     display: inline-block;
     vertical-align: top;
     z-index: ${v.zIndex.gridCardTop};
-    color: ${props => props.color};
+  }
+
+  svg {
+    &:hover {
+      svg: ${v.colors.black};
+    }
   }
 `
 StyledTopRightActions.defaultProps = {
