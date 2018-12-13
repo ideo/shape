@@ -111,6 +111,14 @@ class Item extends SharedRecordMixin(BaseRecord) {
     return measure.tooltip || measure.name.toLowerCase()
   }
 
+  get collectionFilter() {
+    if (!this.data_settings) return null
+    return (
+      this.data_settings.d_filters &&
+      _.find(this.data_settings.d_filters, { type: 'Collection' })
+    )
+  }
+
   imageUrl(width = 1200) {
     const { filestack_file_url } = this
     if (!filestack_file_url) return ''

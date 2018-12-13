@@ -87,9 +87,11 @@ class Item < ApplicationRecord
     }
   end
 
+  # this is utilized by DataReport when we set up temp items to know their organization_id
+  attr_writer :organization_id
   def organization_id
     # NOTE: this will have to lookup via collection_card -> parent
-    try(:parent).try(:organization_id)
+    @organization_id ||= try(:parent).try(:organization_id)
   end
 
   def children

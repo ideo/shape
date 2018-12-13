@@ -18,6 +18,9 @@ export const DATA_MEASURES = [
   { name: 'Viewers', value: 'viewers' },
   { name: 'Activity', value: 'activity' },
   { name: 'Content Use', value: 'content', tooltip: 'content activities' },
+  { name: 'Collections', value: 'collections' },
+  { name: 'Items', value: 'items' },
+  { name: 'Collections & Items', value: 'records' },
 ]
 
 export const KEYS = {

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20181204090132) do
+ActiveRecord::Schema.define(version: 20181212191943) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -100,6 +100,7 @@ ActiveRecord::Schema.define(version: 20181204090132) do
     t.index ["breadcrumb"], name: "index_collections_on_breadcrumb", using: :gin
     t.index ["cached_test_scores"], name: "index_collections_on_cached_test_scores", using: :gin
     t.index ["cloned_from_id"], name: "index_collections_on_cloned_from_id"
+    t.index ["created_at"], name: "index_collections_on_created_at"
     t.index ["organization_id"], name: "index_collections_on_organization_id"
     t.index ["submission_box_id"], name: "index_collections_on_submission_box_id"
     t.index ["submission_template_id"], name: "index_collections_on_submission_template_id"
@@ -205,6 +206,7 @@ ActiveRecord::Schema.define(version: 20181204090132) do
     t.jsonb "data_settings"
     t.index ["breadcrumb"], name: "index_items_on_breadcrumb", using: :gin
     t.index ["cloned_from_id"], name: "index_items_on_cloned_from_id"
+    t.index ["created_at"], name: "index_items_on_created_at"
     t.index ["data_source_type", "data_source_id"], name: "index_items_on_data_source_type_and_data_source_id"
     t.index ["type"], name: "index_items_on_type"
   end
@@ -234,6 +236,19 @@ ActiveRecord::Schema.define(version: 20181204090132) do
     t.integer "profile_collection_id"
     t.string "slug"
     t.integer "getting_started_collection_id"
+    t.string "network_subscription_id"
+    t.integer "active_users_count", default: 0, null: false
+    t.datetime "trial_ends_at"
+    t.integer "trial_users_count", default: 0, null: false
+    t.boolean "in_app_billing", default: true, null: false
+    t.boolean "trial_users_count_exceeded_email_sent", default: false, null: false
+    t.boolean "trial_expired_email_sent", default: false, null: false
+    t.datetime "overdue_at"
+    t.boolean "has_payment_method", default: false, null: false
+    t.boolean "sent_high_charges_low_email", default: false, null: false
+    t.boolean "sent_high_charges_middle_email", default: false, null: false
+    t.boolean "sent_high_charges_high_email", default: false, null: false
+    t.boolean "deactivated", default: false, null: false
     t.index ["slug"], name: "index_organizations_on_slug", unique: true
   end
 
@@ -327,6 +342,7 @@ ActiveRecord::Schema.define(version: 20181204090132) do
     t.boolean "show_move_helper", default: true
     t.boolean "show_template_helper", default: true
     t.boolean "mailing_list", default: false
+    t.datetime "last_active_at"
     t.index ["email"], name: "index_users_on_email"
     t.index ["handle"], name: "index_users_on_handle", unique: true
     t.index ["invitation_token"], name: "index_users_on_invitation_token"

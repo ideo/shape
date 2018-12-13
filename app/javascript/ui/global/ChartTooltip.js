@@ -53,6 +53,20 @@ class ChartTooltip extends React.Component {
     return this.isFirstPointOfType(this.minAmount)
   }
 
+  get xOffset() {
+    const { x } = this.props
+    // Ratio is the general amount between x's to move them toward center
+    const ratio = 6
+    if (x < 52) {
+      return 14 - x / ratio
+    }
+    if (x > 398) {
+      const diff = 450 - x
+      return -(14 - diff / ratio)
+    }
+    return 0
+  }
+
   renderAmountMark(datum, totalData) {
     if (this.isFirstMaxPoint) return true
     if (this.isFirstMinPoint) return true
@@ -61,14 +75,9 @@ class ChartTooltip extends React.Component {
   }
 
   render() {
-    const { data, datum, index, textRenderer, x, y } = this.props
+    const { data, datum, textRenderer, x, y } = this.props
     const showAlways = this.renderAmountMark(datum, data.length - 1)
-    let dx = 0
-    if (parseInt(index) === 0) {
-      dx = 10
-    } else if (this.isLastDataPoint) {
-      dx = -10
-    }
+    const dx = this.xOffset
     const text = textRenderer(datum, this.isLastDataPoint)
     return (
       <g>

@@ -2,9 +2,8 @@ import _ from 'lodash'
 import PropTypes from 'prop-types'
 import { observable, runInAction } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
-import MenuItem from '@material-ui/core/MenuItem'
 import trackError from '~/utils/trackError'
-import { Select } from '~/ui/global/styled/forms'
+import { Select, SelectOption } from '~/ui/global/styled/forms'
 import AutoComplete from '~/ui/global/AutoComplete'
 import v from '~/utils/variables'
 
@@ -18,13 +17,20 @@ function formatCollections(collections) {
 
 @inject('apiStore')
 @observer
-class TargetSelect extends React.Component {
+class DataTargetSelect extends React.Component {
   @observable
   type = 'Organization'
+  @observable
+  editing = false
 
   constructor(props) {
     super(props)
     this.debouncedSearch = _.debounce((term, callback) => {
+      if (!term) {
+        callback()
+        return
+      }
+
       this.props.apiStore
         .searchCollections({
           query: term,
@@ -52,27 +58,36 @@ class TargetSelect extends React.Component {
   onSearch = (value, callback) => this.debouncedSearch(value, callback)
 
   get currentValue() {
-    return this.collectionFilter ? 'Collection' : this.type
+    const { item, targetCollection } = this.props
+    if (targetCollection && !this.editing) {
+      return targetCollection.name
+    }
+    return item.collectionFilter ? 'Collection' : this.type
   }
 
   handleChange = e => {
     e.preventDefault()
-    const { onSelect } = this.props
+    const { item, onSelect } = this.props
+    const { collectionFilter } = item
     const { value } = e.target
     runInAction(() => (this.type = value))
+
     if (value === 'Organization') {
       onSelect()
-    } else if (this.collectionFilter && this.collectionFilter.target) {
-      onSelect({ custom: this.collectionFilter.target })
+    } else if (value === 'Collection') {
+      runInAction(() => (this.editing = true))
+    } else if (collectionFilter && collectionFilter.target) {
+      onSelect({ custom: collectionFilter.target })
     }
   }
 
-  get collectionFilter() {
-    const { item } = this.props
-    return (
-      item.data_settings.d_filters &&
-      item.data_settings.d_filters.find(x => x.type === 'Collection')
-    )
+  get selectOptions() {
+    const options = ['Organization', 'Collection']
+    const { targetCollection } = this.props
+    if (targetCollection && !this.editing) {
+      options.push(targetCollection.name)
+    }
+    return options
   }
 
   render() {
@@ -87,47 +102,54 @@ class TargetSelect extends React.Component {
           value={this.currentValue}
           inline
         >
-          {['Organization', 'Collection'].map(opt => (
-            <MenuItem key={opt} value={opt}>
+          {this.selectOptions.map(opt => (
+            <SelectOption
+              classes={{ root: 'selectOption', selected: 'selected' }}
+              key={opt}
+              value={opt}
+            >
               {opt}
-            </MenuItem>
+            </SelectOption>
           ))}
         </Select>
-        {this.type === 'Collection' && (
-          <div
-            style={{
-              display: 'inline-block',
-              marginBottom: '10px',
-              backgroundColor: v.colors.commonLight,
-            }}
-          >
-            <AutoComplete
-              options={[]}
-              optionSearch={this.onSearch}
-              onOptionSelect={option => this.props.onSelect(option)}
-              placeholder="Collection name"
-              keepSelectedOptions
-              style={{ display: 'inline-block' }}
-            />
-          </div>
-        )}
+        {this.type === 'Collection' &&
+          this.editing && (
+            <div
+              style={{
+                display: 'inline-block',
+                marginBottom: '10px',
+                backgroundColor: v.colors.commonLight,
+              }}
+            >
+              <AutoComplete
+                options={[]}
+                optionSearch={this.onSearch}
+                onOptionSelect={option => this.props.onSelect(option)}
+                placeholder="Collection name"
+                keepSelectedOptions
+                style={{ display: 'inline-block' }}
+              />
+            </div>
+          )}
       </form>
     )
   }
 }
 
-TargetSelect.wrappedComponent.propTypes = {
+DataTargetSelect.wrappedComponent.propTypes = {
   apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 
-TargetSelect.propTypes = {
+DataTargetSelect.propTypes = {
   item: MobxPropTypes.objectOrObservableObject,
+  targetCollection: MobxPropTypes.objectOrObservableObject,
   onSelect: PropTypes.func,
 }
 
-TargetSelect.defaultProps = {
+DataTargetSelect.defaultProps = {
   item: null,
+  targetCollection: null,
   onSelect: null,
 }
 
-export default TargetSelect
+export default DataTargetSelect

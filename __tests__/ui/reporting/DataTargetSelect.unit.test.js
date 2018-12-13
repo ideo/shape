@@ -1,4 +1,4 @@
-import TargetSelect from '~/ui/reporting/TargetSelect'
+import DataTargetSelect from '~/ui/reporting/DataTargetSelect'
 import fakeApiStore from '#/mocks/fakeApiStore'
 import { Select } from '~/ui/global/styled/forms'
 import AutoComplete from '~/ui/global/AutoComplete'
@@ -8,10 +8,10 @@ let wrapper
 const props = {}
 
 const render = () => {
-  wrapper = shallow(<TargetSelect.wrappedComponent {...props} />)
+  wrapper = shallow(<DataTargetSelect.wrappedComponent {...props} />)
 }
 
-describe('TargetSelect', () => {
+describe('DataTargetSelect', () => {
   beforeEach(() => {
     props.apiStore = fakeApiStore()
     props.item = {
@@ -86,9 +86,7 @@ describe('TargetSelect', () => {
       describe('collectionFilter present', () => {
         it('calls onSelect with the collectionFilter target', () => {
           props.onSelect.mockReset()
-          props.item.data_settings.d_filters = [
-            { type: 'Collection', target: 1 },
-          ]
+          props.item.collectionFilter = { type: 'Collection', target: 1 }
           render()
           event.target.value = 'foo'
           wrapper.instance().handleChange(event)
@@ -99,7 +97,7 @@ describe('TargetSelect', () => {
       describe('collectionFilter not present', () => {
         it('does not call onSelect', () => {
           props.onSelect.mockReset()
-          props.item.data_settings.d_filters = []
+          props.item.collectionFilter = null
           render()
           event.target.value = 'foo'
           wrapper.instance().handleChange(event)
@@ -120,9 +118,7 @@ describe('TargetSelect', () => {
     describe('Select value', () => {
       describe('collectionFilter present', () => {
         it('sets the current value to Collection', () => {
-          props.item.data_settings.d_filters = [
-            { type: 'Collection', target: 1 },
-          ]
+          props.item.collectionFilter = { type: 'Collection', target: 1 }
           render()
           expect(wrapper.find(Select).props().value).toEqual('Collection')
         })
@@ -130,7 +126,7 @@ describe('TargetSelect', () => {
 
       describe('collectionFilter not present', () => {
         it('sets the current value to type', () => {
-          props.item.data_settings.d_filters = []
+          props.item.collectionFilter = null
           render()
           expect(wrapper.find(Select).props().value).toEqual(
             wrapper.instance().type
@@ -153,28 +149,29 @@ describe('TargetSelect', () => {
 
     describe('Collection name autocomplete', () => {
       describe('when type is Collection', () => {
-        it('renders the AutoComplete', done => {
+        it('renders the AutoComplete while editing', () => {
           props.item.data_settings.d_filters = [
             { type: 'Collection', target: 1 },
           ]
           render()
-          setTimeout(() => {
-            wrapper.instance().collections = [
-              { id: 1, name: 'foo' },
-              { id: 2, name: 'bar' },
-            ]
-            wrapper.update()
-            const p = wrapper.find(AutoComplete).props()
-            expect(p.placeholder).toEqual('Collection name')
-            expect(p.keepSelectedOptions).toEqual(true)
-            done()
-          }, 100)
+          wrapper.instance().editing = true
+          wrapper.update()
+          const p = wrapper.find(AutoComplete).props()
+          expect(p.placeholder).toEqual('Collection name')
+          expect(p.keepSelectedOptions).toEqual(true)
+        })
+        it('does not render the AutoComplete unless editing', () => {
+          props.item.data_settings.d_filters = [
+            { type: 'Collection', target: 1 },
+          ]
+          render()
+          expect(wrapper.find(AutoComplete).length).toEqual(0)
         })
       })
 
       describe('when type is not Collection', () => {
         it('does not render the Autocomplete', () => {
-          props.item.data_settings.d_filters = []
+          props.item.collectionFilter = null
           render()
           expect(wrapper.find(AutoComplete).length).toEqual(0)
         })

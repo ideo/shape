@@ -1,7 +1,7 @@
 import pluralize from 'pluralize'
 import { Fragment } from 'react'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
-import { runInAction, computed } from 'mobx'
+import { runInAction, observable, computed } from 'mobx'
 import moment from 'moment-mini'
 import styled from 'styled-components'
 import {
@@ -23,10 +23,11 @@ import EditableButton from '~/ui/reporting/EditableButton'
 import MeasureSelect from '~/ui/reporting/MeasureSelect'
 import OrganicGridPng from '~/assets/organic_grid_black.png'
 import OrganicGrid from '~/ui/icons/OrganicGrid'
-import TargetButton from '~/ui/reporting/TargetButton'
-import TargetSelect from '~/ui/reporting/TargetSelect'
+import DataTargetButton from '~/ui/reporting/DataTargetButton'
+import DataTargetSelect from '~/ui/reporting/DataTargetSelect'
 import v from '~/utils/variables'
 import { theme } from '~/ui/test_collections/shared'
+import trackError from '~/utils/trackError'
 
 const utcMoment = date => moment(`${date} 00+0000`).utc()
 const nearMonth = momentDate => {
@@ -103,9 +104,31 @@ const GraphKey = styled.span`
 `
 
 // eslint-disable-next-line react/no-multi-comp
-@inject('uiStore')
+@inject('uiStore', 'apiStore')
 @observer
 class DataItemCover extends React.Component {
+  @observable
+  targetCollection = null
+
+  componentDidMount() {
+    const { collectionFilter } = this.props.item
+    if (collectionFilter && collectionFilter.target) {
+      this.loadTargetCollection(collectionFilter.target)
+    }
+  }
+
+  async loadTargetCollection(target) {
+    const { apiStore } = this.props
+    try {
+      const res = await apiStore.fetch('collections', target)
+      runInAction(() => {
+        this.targetCollection = res.data
+      })
+    } catch (e) {
+      trackError(e)
+    }
+  }
+
   @computed
   get editing() {
     const { card, uiStore } = this.props
@@ -173,14 +196,18 @@ class DataItemCover extends React.Component {
     if (this.editing) {
       return (
         <span className="editableMetric">
-          <TargetSelect item={item} onSelect={this.onSelectTarget} />
+          <DataTargetSelect
+            item={item}
+            targetCollection={this.targetCollection}
+            onSelect={this.onSelectTarget}
+          />
         </span>
       )
     }
     return (
       <span className="editableMetric">
-        <TargetButton
-          item={item}
+        <DataTargetButton
+          targetCollection={this.targetCollection}
           editable={editable}
           onClick={this.handleEditClick}
         />
@@ -194,7 +221,8 @@ class DataItemCover extends React.Component {
     if (timeframe === 'ever') {
       return (
         <span className="withinText">
-          within the {''} {this.targetControl} {this.timeframeControl}
+          within {!item.collectionFilter ? 'the ' : ''}
+          {this.targetControl} {this.timeframeControl}
         </span>
       )
     }
@@ -218,11 +246,19 @@ class DataItemCover extends React.Component {
   }
 
   onSelectTarget = value => {
+    const collectionId = (value && value.custom) || null
     this.saveSettings({
       d_filters: value
-        ? [{ type: 'Collection', target: Number(value.custom) }]
+        ? [{ type: 'Collection', target: Number(collectionId) }]
         : [],
     })
+    if (collectionId) {
+      this.loadTargetCollection(collectionId)
+    } else {
+      runInAction(() => {
+        this.targetCollection = null
+      })
+    }
     this.toggleEditing()
   }
 
@@ -270,10 +306,10 @@ class DataItemCover extends React.Component {
 
   get formattedValues() {
     const { item } = this.props
+    if (!item.data || !item.data.values) return []
     const {
       data: { values },
     } = item
-    if (!values) return []
     return values.map((value, i) => ({
       ...value,
       month: value.date,
@@ -412,6 +448,7 @@ DataItemCover.propTypes = {
 
 DataItemCover.wrappedComponent.propTypes = {
   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
+  apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 
 export default DataItemCover
