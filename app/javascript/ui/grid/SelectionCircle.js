@@ -5,13 +5,18 @@ import styled from 'styled-components'
 import v from '~/utils/variables'
 
 const StyledSelectionCircle = styled.div`
+  border: 2px solid ${v.colors.commonMedium};
+  border-radius: 50%;
   display: inline-block;
-  vertical-align: top;
-  width: 14px;
-  height: 14px;
-  border-radius: 14px;
-  border: 1px solid ${v.colors.commonMedium};
+  height: 22px;
   margin: 5px;
+  vertical-align: top;
+  width: 22px;
+
+  &:hover {
+    border-color: ${v.colors.black};
+  }
+
   &.selected {
     border-color: ${v.colors.commonMedium};
     background-color: ${v.colors.commonMedium};

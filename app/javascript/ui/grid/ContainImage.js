@@ -1,14 +1,8 @@
 import { PropTypes as MobxPropTypes } from 'mobx-react'
+
+import CardActionHolder from '~/ui/icons/CardActionHolder'
 import ContainImageIcon from '~/ui/icons/ContainImageIcon'
-import styled from 'styled-components'
-
-import Tooltip from '~/ui/global/Tooltip'
-
-const ButtonWrapper = styled.button`
-  height: 27px;
-  width: 27px;
-`
-ButtonWrapper.displayName = 'ButtonWrapper'
+import v from '~/utils/variables'
 
 class ContainImage extends React.Component {
   toggleSelected = ev => {
@@ -23,15 +17,16 @@ class ContainImage extends React.Component {
     const { image_contain } = card
 
     return (
-      <Tooltip
-        classes={{ tooltip: 'Tooltip' }}
-        title={!image_contain ? 'show whole image' : 'fill tile with image'}
-        placement="top"
+      <CardActionHolder
+        className="show-on-hover"
+        color={image_contain ? v.colors.black : v.colors.commonMedium}
+        onClick={this.toggleSelected}
+        tooltipText={
+          !image_contain ? 'show whole image' : 'fill tile with image'
+        }
       >
-        <ButtonWrapper className="show-on-hover" onClick={this.toggleSelected}>
-          <ContainImageIcon />
-        </ButtonWrapper>
-      </Tooltip>
+        <ContainImageIcon />
+      </CardActionHolder>
     )
   }
 }

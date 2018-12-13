@@ -1,22 +1,19 @@
 import PropTypes from 'prop-types'
-import styled from 'styled-components'
 
+import CardActionHolder from '~/ui/icons/CardActionHolder'
 import EditPencilIcon from '~/ui/icons/EditPencilIcon'
-
-const IconHolder = styled.span`
-  display: inline-block;
-  height: 16px;
-  vertical-align: middle;
-  margin-top: 5px;
-  width: 16px;
-`
 
 class EditButton extends React.Component {
   render() {
     return (
-      <IconHolder onClick={this.props.onClick} className="show-on-hover">
+      <CardActionHolder
+        className="show-on-hover"
+        onClick={this.props.onClick}
+        size={26}
+        tooltipText="Edit"
+      >
         <EditPencilIcon />
-      </IconHolder>
+      </CardActionHolder>
     )
   }
 }
