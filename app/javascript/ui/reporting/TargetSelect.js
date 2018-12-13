@@ -2,9 +2,8 @@ import _ from 'lodash'
 import PropTypes from 'prop-types'
 import { observable, runInAction } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
-import MenuItem from '@material-ui/core/MenuItem'
 import trackError from '~/utils/trackError'
-import { Select } from '~/ui/global/styled/forms'
+import { Select, SelectOption } from '~/ui/global/styled/forms'
 import AutoComplete from '~/ui/global/AutoComplete'
 import v from '~/utils/variables'
 
@@ -88,9 +87,13 @@ class TargetSelect extends React.Component {
           inline
         >
           {['Organization', 'Collection'].map(opt => (
-            <MenuItem key={opt} value={opt}>
+            <SelectOption
+              classes={{ root: 'selectOption', selected: 'selected' }}
+              key={opt}
+              value={opt}
+            >
               {opt}
-            </MenuItem>
+            </SelectOption>
           ))}
         </Select>
         {this.type === 'Collection' && (

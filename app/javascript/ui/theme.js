@@ -23,5 +23,11 @@ export default createMuiTheme({
         paddingTop: 0,
       },
     },
+    MuiPaper: {
+      root: {
+        borderRadius: '1px !important',
+        boxShadow: '0px 0px 8px 0px rgba(0, 0, 0, 0.2) !important',
+      },
+    },
   },
 })
