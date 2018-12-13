@@ -1,6 +1,7 @@
 import DataItemCover from '~/ui/grid/covers/DataItemCover'
 import { fakeItem } from '#/mocks/data'
 import fakeUiStore from '#/mocks/fakeUiStore'
+import fakeApiStore from '#/mocks/fakeApiStore'
 
 import { Heading3 } from '~/ui/global/styled/typography'
 import v from '~/utils/variables'
@@ -9,9 +10,11 @@ const props = {}
 const fakeEv = { preventDefault: jest.fn() }
 let wrapper, render
 const uiStore = fakeUiStore
+const apiStore = fakeApiStore()
 describe('DataItemCover', () => {
   beforeEach(() => {
     props.uiStore = uiStore
+    props.apiStore = apiStore
     props.item = {
       ...fakeItem,
       can_edit_content: true,
@@ -180,6 +183,17 @@ describe('DataItemCover', () => {
       it('should show selects for timeframe and measure', () => {
         expect(wrapper.find('MeasureSelect').length).toEqual(2)
       })
+    })
+  })
+
+  describe('with a target collection', () => {
+    beforeEach(() => {
+      props.item.collectionFilter = { target: 123 }
+      render()
+    })
+
+    it('should call apiStore.fetch with target id', () => {
+      expect(apiStore.fetch).toHaveBeenCalledWith('collections', 123)
     })
   })
 })

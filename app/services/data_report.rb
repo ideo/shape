@@ -66,7 +66,7 @@ class DataReport < SimpleService
 
   def filtered_query
     collection_filter = @filters&.find { |x| x['type'] == 'Collection' }
-    if collection_filter
+    if collection_filter && collection_filter['target']
       collection_opts = { collection_id: collection_filter['target'] }
       if measure_queries_activities?
         @query.where(target_type: %w[Collection Item])
