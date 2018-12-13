@@ -63,13 +63,22 @@ class Item < ApplicationRecord
   # Use queue to bulk reindex every 5m (with Sidekiq Scheduled Job/ActiveJob)
   searchkick callbacks: :queue
 
+  # active == don't index archived items
+  scope :search_import, -> do
+    active.includes(
+      :tags,
+      :taggings,
+      parent_collection_card: :parent,
+    )
+  end
+
   def search_content
     text = []
     case self
     when Item::TextItem
       text << plain_content
     when Item::FileItem
-      text << filestack_file.filename
+      text << filestack_file.filename if filestack_file.present?
     else
       text << content
     end
@@ -81,9 +90,10 @@ class Item < ApplicationRecord
       name: name,
       tags: tags.map(&:name),
       content: search_content,
-      user_ids: parent.search_user_ids,
-      group_ids: parent.search_group_ids,
-      organization_id: parent.organization_id,
+      # NOTE: could change this back to defer to parent if we ever remove item roles
+      user_ids: search_user_ids,
+      group_ids: search_group_ids,
+      organization_id: organization_id,
     }
   end
 

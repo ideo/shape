@@ -8,7 +8,7 @@ import FlipMove from 'react-flip-move'
 import VisibilitySensor from 'react-visibility-sensor'
 
 import { uiStore } from '~/stores'
-import v, { ITEM_TYPES } from '~/utils/variables'
+import v from '~/utils/variables'
 import Breadcrumb from '~/ui/layout/Breadcrumb'
 import Loader from '~/ui/layout/Loader'
 import ActionMenu from '~/ui/grid/ActionMenu'
@@ -54,8 +54,6 @@ const StyledScrollIndicator = styled.div`
 
 const isCollection = result => result.internalType === 'collections'
 
-const shouldNotRender = result => result.type === ITEM_TYPES.TEXT
-
 @observer
 class SearchResultsInfinite extends React.Component {
   visibleItems = observable.map({})
@@ -66,6 +64,10 @@ class SearchResultsInfinite extends React.Component {
 
   routeToCollection = id => () => {
     this.props.routeTo('collections', id)
+  }
+
+  routeToItem = id => () => {
+    this.props.routeTo('items', id)
   }
 
   @action
@@ -123,15 +125,17 @@ class SearchResultsInfinite extends React.Component {
     } = this.props
 
     const results = searchResults.map((result, i) => {
-      if (shouldNotRender(result)) {
-        return null
-      }
-
       // ActionMenu is rendered as if we were operating on the parent_collection_card
       let card = result.parent_collection_card
+      // need to make this available in the reverse direction
+      card.record = result
       if (!result.parent_collection_card) {
         // catch for special/global templates that don't have a parent card
-        card = { id: `card-${i}` }
+        card = {
+          id: `card-${i}`,
+          width: 1,
+          height: 1,
+        }
       }
 
       return (
@@ -157,8 +161,8 @@ class SearchResultsInfinite extends React.Component {
               <StyledSearchResult
                 {...gridSettings}
                 {...{
-                  width: result.parent_collection_card.width,
-                  height: result.parent_collection_card.height,
+                  width: card.width,
+                  height: card.height,
                 }}
                 gridMaxW={gridMaxW}
                 onMouseEnter={this.handleMouseOver(i + 1)}
@@ -197,6 +201,10 @@ class SearchResultsInfinite extends React.Component {
                     record={result}
                     cardId={card.id}
                     menuOpen={false}
+                    // NOTE: this will have to get modified when we eventually
+                    // turn off item routing for videos and images
+                    handleClick={this.routeToItem(result.id)}
+                    searchResult
                   />
                 )}
               </StyledSearchResult>
