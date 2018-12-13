@@ -62,7 +62,7 @@ class GridCard extends React.Component {
   }
 
   get renderInner() {
-    const { card, record, height, handleClick, searchResult } = this.props
+    const { card, record, height, handleClick } = this.props
     if (this.isItem) {
       switch (record.type) {
         case ITEM_TYPES.TEXT:
@@ -73,7 +73,6 @@ class GridCard extends React.Component {
               dragging={this.props.dragging}
               cardId={card.id}
               handleClick={handleClick}
-              searchResult={searchResult}
             />
           )
         case ITEM_TYPES.FILE: {
@@ -350,7 +349,7 @@ class GridCard extends React.Component {
         {/* onClick placed here so it's separate from hotspot click */}
         <StyledGridCardInner
           onClick={this.handleClick}
-          hasOverflow={record.isData}
+          overflow={record.isData}
         >
           {this.renderInner}
         </StyledGridCardInner>
@@ -376,7 +375,6 @@ GridCard.propTypes = {
   menuOpen: PropTypes.bool,
   lastPinnedCard: PropTypes.bool,
   testCollectionCard: PropTypes.bool,
-  searchResult: PropTypes.bool,
 }
 
 GridCard.defaultProps = {
@@ -388,7 +386,6 @@ GridCard.defaultProps = {
   menuOpen: false,
   lastPinnedCard: false,
   testCollectionCard: false,
-  searchResult: false,
 }
 
 export default GridCard

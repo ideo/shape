@@ -124,6 +124,16 @@ export const StyledGridCardInner = styled.div`
 `
 StyledGridCardInner.displayName = 'StyledGridCardInner'
 
+// TODO copy shared from right/left
+export const StyledTopLeftActions = styled.div`
+  align-items: center;
+  display: flex;
+  left: 0.25rem;
+  position: absolute;
+  top: 0.35rem;
+  z-index: ${v.zIndex.gridCardTop};
+`
+
 export const StyledTopRightActions = styled.div`
   align-items: center;
   background-color: ${v.colors.commonLightest};
@@ -134,11 +144,6 @@ export const StyledTopRightActions = styled.div`
   right: 0.25rem;
   top: 0.35rem;
   z-index: ${v.zIndex.gridCardTop};
-
-  .show-on-hover {
-    border-color: ${props => props.color};
-    color: ${props => props.color};
-  }
 
   .selected {
     border-color: ${props => props.color};
