@@ -59,7 +59,7 @@ class VideoPlayer extends React.PureComponent {
       <div style={{ height: '100%', position: 'relative' }}>
         <StyledTopLeftActions className="show-on-hover">
           <span className={`videoDrag`}>
-            <CardActionHolder className="show-on-hover">
+            <CardActionHolder className="show-on-hover" disableHover>
               <DragIcon />
             </CardActionHolder>
           </span>
