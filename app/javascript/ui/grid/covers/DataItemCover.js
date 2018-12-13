@@ -270,10 +270,10 @@ class DataItemCover extends React.Component {
 
   get formattedValues() {
     const { item } = this.props
+    if (!item.data || !item.data.values) return []
     const {
       data: { values },
     } = item
-    if (!values) return []
     return values.map((value, i) => ({
       ...value,
       month: value.date,

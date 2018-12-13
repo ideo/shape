@@ -15,6 +15,10 @@ class DataReport < SimpleService
   end
 
   def call
+    if @measure == 'records'
+      # special case
+      return combine_collection_and_item_reports
+    end
     @query = generate_base_query
     return unless @query
     @query = filtered_query
@@ -23,6 +27,25 @@ class DataReport < SimpleService
   end
 
   private
+
+  def combine_collection_and_item_reports
+    # create temp DataItems to create item and collection reports
+    d_items = @data_item.amoeba_dup
+    d_items.organization_id = @data_item.organization_id
+    d_items.d_measure = 'items'
+    d_collections = @data_item.amoeba_dup
+    d_collections.organization_id = @data_item.organization_id
+    d_collections.d_measure = 'collections'
+    item_data = d_items.data
+    collection_data = d_collections.data
+    # now combine the two reports
+    @data[:value] = item_data[:value] + collection_data[:value]
+    @data[:values] =
+      (item_data[:values] + collection_data[:values]).group_by { |x| x[:date] }.map do |date, values|
+        { date: date, amount: values.map { |x| x[:amount] }.sum }
+      end
+    @data
+  end
 
   def generate_base_query
     case @measure
@@ -35,18 +58,17 @@ class DataReport < SimpleService
     when 'content'
       Activity.where_content
     when 'collections'
-      Collection.data_collectable
+      Collection.data_collectable.active
     when 'items'
-      Item
-    when 'records'
-      CollectionCard::Primary
+      Item.active
     end
   end
 
   def filtered_query
     collection_filter = @filters&.find { |x| x['type'] == 'Collection' }
     if collection_filter
-      if query_activities?
+      collection_opts = { collection_id: collection_filter['target'] }
+      if measure_queries_activities?
         @query.where(target_type: %w[Collection Item])
               .joins(%(left join collections on
                          activities.target_id = collections.id and
@@ -56,53 +78,39 @@ class DataReport < SimpleService
                          activities.target_type = 'Item'))
               .where(%(coalesce(collections.breadcrumb, items.breadcrumb) @> ':collection_id' or
                          collections.id = :collection_id),
-                     collection_id: collection_filter['target'])
-      elsif @measure == 'records'
-        @query.joins(%(left join collections on
-                         collection_cards.collection_id = collections.id
-                         ))
-              .joins(%(left join items on
-                         collection_cards.item_id = items.id
-                         ))
-              .where(%(collections.breadcrumb @> ':collection_id' or
-                       items.breadcrumb @> ':collection_id' or
-                       collections.id = :collection_id),
-                     collection_id: collection_filter['target'])
-      else
+                     collection_opts)
+      elsif @measure == 'collections'
         @query.where(%(breadcrumb @> ':collection_id' or
                        id = :collection_id),
-                     collection_id: collection_filter['target'])
+                     collection_opts)
+      elsif @measure == 'items'
+        @query.where(%(breadcrumb @> ':collection_id'),
+                     collection_opts)
       end
     else
       # default, within entire org
       if @measure == 'items'
         @query
           .joins(parent_collection_card: :parent)
-          .where('collections.organization_id = ?', @data_item.parent.organization_id)
-      elsif @measure == 'records'
-        @query
-          .joins(:parent)
-          .where('collections.organization_id = ?', @data_item.parent.organization_id)
+          .where('collections.organization_id = ?', @data_item.organization_id)
       else
         @query
-          .where(organization_id: @data_item.parent.organization_id)
+          .where(organization_id: @data_item.organization_id)
       end
     end
   end
 
-  def query_activities?
+  def measure_queries_activities?
     !%w[collections items records].include?(@measure)
   end
 
   def query_table
-    return Activity if query_activities?
+    return Activity if measure_queries_activities?
     case @measure
-    when 'collections', 'records'
+    when 'collections'
       Collection
     when 'items'
       Item
-    when 'records'
-      CollectionCard
     else
       return
     end
@@ -125,7 +133,7 @@ class DataReport < SimpleService
     case @measure
     when 'participants', 'viewers'
       selection = 'count(distinct(actor_id))'
-    when 'activity', 'content', 'collections', 'items', 'records'
+    when 'activity', 'content', 'collections', 'items'
       selection = 'count(*)'
     else
       return
@@ -134,7 +142,7 @@ class DataReport < SimpleService
     # Doing the BETWEEN upper limit we actually query "date + 1", meaning for January 1
     # we are actually finding all activities/collections created before January 2 00:00
     columns = %i[id created_at]
-    columns.push(:actor_id) if query_activities?
+    columns.push(:actor_id) if measure_queries_activities?
     sql = %{
       SELECT
         LEAST(series.date, now()::DATE) date,
@@ -169,7 +177,7 @@ class DataReport < SimpleService
               .select(:actor_id)
               .distinct
               .count
-    when 'activity', 'content', 'collections', 'items', 'records'
+    when 'activity', 'content', 'collections', 'items'
       value = @query.count
     else
       return
