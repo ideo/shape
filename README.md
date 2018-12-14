@@ -23,6 +23,10 @@ cd shape/
 gem install bundler
 bundle install
 yarn install
+
+# Initialize and update the git submodule for Network React Components
+git submodule init
+git submodule update
 ```
 
 Setup the `.env` file with valid credentials:
