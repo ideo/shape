@@ -216,11 +216,8 @@ describe Collection, type: :model do
     context 'with copy_parent_card true' do
       let!(:copy_parent_card) { true }
 
-      it 'duplicates parent' do
-        expect(duplicate.id).not_to eq(collection.parent_collection_card.id)
-      end
-
       it 'creates duplicate with parent_collection as its parent' do
+        expect(duplicate.id).not_to eq(collection.id)
         expect(duplicate.parent).to eq parent_collection
       end
 
