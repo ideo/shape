@@ -23,7 +23,8 @@ class Collection < ApplicationRecord
                  :cached_owned_tag_list,
                  :cached_org_properties,
                  :cached_card_count,
-                 :submission_attrs
+                 :submission_attrs,
+                 :getting_started_shell
 
   # callbacks
   after_touch :touch_related_cards, unless: :destroyed?
@@ -266,6 +267,10 @@ class Collection < ApplicationRecord
     # NOTE: parent is only nil in Colab import -- perhaps we should clean up any Colab import specific code?
     c.organization_id = parent.try(:organization_id) || organization_id
 
+    if system_collection && parent.try(:cloned_from).try(:getting_started?)
+      c.getting_started_shell = true
+    end
+
     # save the dupe collection first so that we can reference it later
     # return if it didn't work for whatever reason
     return c unless c.save
@@ -290,7 +295,7 @@ class Collection < ApplicationRecord
     # Upgrade to editor if provided
     for_user.upgrade_to_edit_role(c) if for_user.present?
 
-    if collection_cards.any?
+    if collection_cards.any? && !c.getting_started_shell
       worker_opts = [
         collection_cards.map(&:id),
         c.id,
