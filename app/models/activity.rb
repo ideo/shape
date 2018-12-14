@@ -19,6 +19,10 @@ class Activity < ApplicationRecord
 
   scope :where_participated, -> { where(action: participant_actions) }
   scope :where_viewed, -> { where(action: viewer_actions) }
+  scope :where_active, -> { where(action: activity_actions) }
+  scope :where_content, -> {
+    where(action: content_actions, target_type: 'Item')
+  }
 
   # add explicit values so it's not tied to the order of the array
   enum action: {
@@ -42,12 +46,32 @@ class Activity < ApplicationRecord
 
   def self.participant_actions
     %i[
-      created edited replaced moved duplicated
+      created
+      commented
+      edited
+      replaced
+      moved
+      duplicated
     ]
   end
 
   def self.viewer_actions
     %i[viewed]
+  end
+
+  def self.activity_actions
+    participant_actions + %i[
+      archived
+      downloaded
+    ]
+  end
+
+  def self.content_actions
+    %i[
+      downloaded
+      viewed
+      duplicated
+    ]
   end
 
   def self.map_move_action(move_action)

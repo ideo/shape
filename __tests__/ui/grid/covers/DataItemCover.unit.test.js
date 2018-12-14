@@ -1,6 +1,7 @@
 import DataItemCover from '~/ui/grid/covers/DataItemCover'
 import { fakeItem } from '#/mocks/data'
 import fakeUiStore from '#/mocks/fakeUiStore'
+import fakeApiStore from '#/mocks/fakeApiStore'
 
 import { Heading3 } from '~/ui/global/styled/typography'
 import v from '~/utils/variables'
@@ -9,9 +10,11 @@ const props = {}
 const fakeEv = { preventDefault: jest.fn() }
 let wrapper, render
 const uiStore = fakeUiStore
+const apiStore = fakeApiStore()
 describe('DataItemCover', () => {
   beforeEach(() => {
     props.uiStore = uiStore
+    props.apiStore = apiStore
     props.item = {
       ...fakeItem,
       can_edit_content: true,
@@ -23,6 +26,10 @@ describe('DataItemCover', () => {
         d_measure: 'participants',
         d_timeframe: 'ever',
       },
+      // simulate model helper methods
+      measure: 'participants',
+      measureTooltip: 'participants',
+      timeframe: 'ever',
     }
     props.card = { id: 1, record: props.item, width: 1, height: 1 }
     props.uiStore.editingCardId = 0
@@ -50,7 +57,7 @@ describe('DataItemCover', () => {
 
   describe('with an ever timeframe', () => {
     beforeEach(() => {
-      props.item.data_settings.d_timeframe = 'ever'
+      props.item.timeframe = 'ever'
       wrapper.setProps(props)
     })
 
@@ -107,7 +114,7 @@ describe('DataItemCover', () => {
 
   describe('with a month timeframe', () => {
     beforeEach(() => {
-      props.item.data_settings.d_timeframe = 'month'
+      props.item.timeframe = 'month'
       props.item.data.values = [
         { date: '2018-07-10', amount: 25 },
         { date: '2018-08-10', amount: 30 },
@@ -128,7 +135,7 @@ describe('DataItemCover', () => {
       // NOTE: code pulls the actual month back by 1
       const datum = { date: '2018-10-01', amount: 34, month: 'Sep' }
       const label = wrapper.instance().renderLabelText(datum)
-      expect(label).toContain('in September 2018')
+      expect(label).toContain('in September')
     })
 
     it('renders in last 30 days for label for last data item', () => {
@@ -136,6 +143,18 @@ describe('DataItemCover', () => {
       const datum = { date: '2018-10-01', amount: 34, month: 'Sep' }
       const label = wrapper.instance().renderLabelText(datum, true)
       expect(label).toContain('in last 30 days')
+    })
+
+    it('displays x-axis labels for dates near the end of the month', () => {
+      let label
+      // if it's not near month end, the label is blank
+      label = wrapper.instance().displayXAxisText('2018-10-06')
+      expect(label).toEqual('')
+      // should display the short name of the month that previously ended
+      label = wrapper.instance().displayXAxisText('2018-01-02')
+      expect(label).toEqual('Dec')
+      label = wrapper.instance().displayXAxisText('2018-12-31')
+      expect(label).toEqual('Dec')
     })
 
     describe('with not enough timeline data', () => {
@@ -164,6 +183,17 @@ describe('DataItemCover', () => {
       it('should show selects for timeframe and measure', () => {
         expect(wrapper.find('MeasureSelect').length).toEqual(2)
       })
+    })
+  })
+
+  describe('with a target collection', () => {
+    beforeEach(() => {
+      props.item.collectionFilter = { target: 123 }
+      render()
+    })
+
+    it('should call apiStore.fetch with target id', () => {
+      expect(apiStore.fetch).toHaveBeenCalledWith('collections', 123)
     })
   })
 })

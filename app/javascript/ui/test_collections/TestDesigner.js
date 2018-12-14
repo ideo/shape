@@ -223,7 +223,7 @@ class TestDesigner extends React.Component {
       <QuestionSelectHolder>
         <NumberListText>{card.order + 1}.</NumberListText>
         {card.card_question_type === 'question_finish' ? (
-          <DisplayText>End of Survey</DisplayText>
+          <DisplayText color={v.colors.white}>End of Survey</DisplayText>
         ) : (
           <Select
             classes={{
@@ -241,7 +241,8 @@ class TestDesigner extends React.Component {
               <SelectOption
                 key={opt.value}
                 classes={{
-                  root: !opt.value ? 'grayedOut' : '',
+                  root: !opt.value ? 'grayedOut' : 'selectOption',
+                  selected: 'selected',
                 }}
                 disabled={!opt.value}
                 value={opt.value}

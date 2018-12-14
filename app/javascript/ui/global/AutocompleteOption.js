@@ -56,7 +56,7 @@ class AutocompleteOption extends React.Component {
     if (entity) {
       const name = _.trim(entity.name) ? entity.name : entity.email
       content = (
-        <Row align="center" noSpacing>
+        <Row align="center" noSpacing style={{ height: '38px' }}>
           <span>
             {entity.internalType === 'collections'
               ? this.renderCollectionAvatar()

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20181204090132) do
+ActiveRecord::Schema.define(version: 20181212191943) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -100,6 +100,7 @@ ActiveRecord::Schema.define(version: 20181204090132) do
     t.index ["breadcrumb"], name: "index_collections_on_breadcrumb", using: :gin
     t.index ["cached_test_scores"], name: "index_collections_on_cached_test_scores", using: :gin
     t.index ["cloned_from_id"], name: "index_collections_on_cloned_from_id"
+    t.index ["created_at"], name: "index_collections_on_created_at"
     t.index ["organization_id"], name: "index_collections_on_organization_id"
     t.index ["submission_box_id"], name: "index_collections_on_submission_box_id"
     t.index ["submission_template_id"], name: "index_collections_on_submission_template_id"
@@ -205,6 +206,7 @@ ActiveRecord::Schema.define(version: 20181204090132) do
     t.jsonb "data_settings"
     t.index ["breadcrumb"], name: "index_items_on_breadcrumb", using: :gin
     t.index ["cloned_from_id"], name: "index_items_on_cloned_from_id"
+    t.index ["created_at"], name: "index_items_on_created_at"
     t.index ["data_source_type", "data_source_id"], name: "index_items_on_data_source_type_and_data_source_id"
     t.index ["type"], name: "index_items_on_type"
   end

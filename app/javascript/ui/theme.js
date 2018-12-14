@@ -74,4 +74,18 @@ export default createMuiTheme({
       main: v.colors.ctaPrimary,
     },
   },
+  overrides: {
+    MuiList: {
+      padding: {
+        paddingBottom: 0,
+        paddingTop: 0,
+      },
+    },
+    MuiPaper: {
+      root: {
+        borderRadius: '1px !important',
+        boxShadow: '0px 0px 8px 0px rgba(0, 0, 0, 0.2) !important',
+      },
+    },
+  },
 })

@@ -6,6 +6,7 @@ import { Flex, Box } from 'reflexbox'
 import v from '~/utils/variables'
 import hexToRgba from '~/utils/hexToRgba'
 import VideoPlayer from '~/ui/items/VideoPlayer'
+import Activity from '~/stores/jsonApi/Activity'
 import { StyledImageCover } from './ImageItemCover'
 
 const StyledVideoCover = styled.div`
@@ -44,10 +45,12 @@ class VideoItemCover extends React.PureComponent {
   }
 
   playVideo = () => {
+    const { item, dragging } = this.props
     // don't play the video if we drag by grabbing the play button
-    if (this.props.dragging) return
+    if (dragging) return
     // prevent GridCard handleClick handler, e.g. navigating to VideoItem
     this.setState({ playing: true })
+    Activity.trackActivity('viewed', item)
   }
 
   render() {

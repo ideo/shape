@@ -136,6 +136,7 @@ class ScaleQuestion extends React.Component {
     if (!editing)
       return (
         <DisplayText
+          color={v.colors.white}
           onClick={this.startEditing}
           alt={`${questionText} ${questionContent}?`}
         >
@@ -144,7 +145,7 @@ class ScaleQuestion extends React.Component {
         </DisplayText>
       )
     return (
-      <DisplayText>
+      <DisplayText color={v.colors.white}>
         {questionText}
         <EditableInput
           type="text"
@@ -169,7 +170,7 @@ class ScaleQuestion extends React.Component {
           {this.hasEditableCategory ? (
             this.renderEditableCategory(questionText)
           ) : (
-            <DisplayText>
+            <DisplayText color={v.colors.white}>
               {questionText}
               {/* editable category questions have question.content */}
               {question.content ? ` ${question.content}?` : ''}

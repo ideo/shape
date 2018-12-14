@@ -162,6 +162,12 @@ RSpec.describe Item, type: :model do
     end
 
     context 'other types' do
+      let(:orphaned_item) { create(:text_item) }
+
+      it 'does not blow up on orphaned items' do
+        expect(orphaned_item.search_data[:organization_id]).to be nil
+      end
+
       it 'includes the item content in the search content' do
         link_item = create(:link_item, parent_collection_card: parent_collection_card)
         expect(link_item.search_data[:content]).to include(link_item.content)
