@@ -34,7 +34,13 @@ cp .env.example .env
 Create the database and migrate:
 
 ```
-rails db:setup
+rails db:setup 
+
+# get access to Shell commands in Terminal
+source ./shell-commands
+
+# copy production data to your local database
+shapecopydb local
 ```
 
 Run tests:
