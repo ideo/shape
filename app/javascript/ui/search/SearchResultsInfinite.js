@@ -127,9 +127,7 @@ class SearchResultsInfinite extends React.Component {
     const results = searchResults.map((result, i) => {
       // ActionMenu is rendered as if we were operating on the parent_collection_card
       let card = result.parent_collection_card
-      // need to make this available in the reverse direction
-      card.record = result
-      if (!result.parent_collection_card) {
+      if (!card) {
         // catch for special/global templates that don't have a parent card
         card = {
           id: `card-${i}`,
@@ -137,6 +135,8 @@ class SearchResultsInfinite extends React.Component {
           height: 1,
         }
       }
+      // need to make this available in the reverse direction
+      card.record = result
 
       return (
         <FlipMove appearAnimation="fade" key={result.id}>
@@ -190,8 +190,8 @@ class SearchResultsInfinite extends React.Component {
                     <CollectionCover
                       onClick={this.routeToCollection(result.id)}
                       collection={result}
-                      width={card.maxWidth}
-                      height={card.maxHeight}
+                      width={card.maxWidth || card.width}
+                      height={card.maxHeight || card.height}
                     />
                   </Fragment>
                 ) : (

@@ -76,9 +76,10 @@ function optionSort(a, b) {
 class TestDesigner extends React.Component {
   constructor(props) {
     super(props)
-    const { collection_to_test } = props.collection
+    const { collection_to_test, collection_to_test_id } = props.collection
+    const hasCollectionToTest = collection_to_test && collection_to_test_id
     this.state = {
-      testType: collection_to_test ? 'collection' : 'media',
+      testType: hasCollectionToTest ? 'collection' : 'media',
       collectionToTest: collection_to_test,
     }
   }
@@ -223,7 +224,7 @@ class TestDesigner extends React.Component {
       <QuestionSelectHolder>
         <NumberListText>{card.order + 1}.</NumberListText>
         {card.card_question_type === 'question_finish' ? (
-          <DisplayText color={v.colors.white}>End of Survey</DisplayText>
+          <DisplayText>End of Survey</DisplayText>
         ) : (
           <Select
             classes={{
