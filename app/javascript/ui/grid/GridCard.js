@@ -349,7 +349,7 @@ class GridCard extends React.Component {
         {/* onClick placed here so it's separate from hotspot click */}
         <StyledGridCardInner
           onClick={this.handleClick}
-          overflow={record.isData}
+          hasOverflow={record.isData}
         >
           {this.renderInner}
         </StyledGridCardInner>
