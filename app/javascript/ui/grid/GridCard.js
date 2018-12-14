@@ -39,8 +39,14 @@ import {
 @observer
 class GridCard extends React.Component {
   get canEditCard() {
-    const { isSharedCollection, canEditCollection, card, record } = this.props
-    if (isSharedCollection) return false
+    const {
+      isSharedCollection,
+      canEditCollection,
+      card,
+      record,
+      searchResult,
+    } = this.props
+    if (isSharedCollection || searchResult) return false
     // you can always edit your link cards, regardless of record.can_edit
     if (canEditCollection && card.link) return true
     return record.can_edit
@@ -48,8 +54,8 @@ class GridCard extends React.Component {
 
   get canContentEditCard() {
     if (this.canEditCard) return true
-    const { isSharedCollection, record } = this.props
-    if (isSharedCollection) return false
+    const { isSharedCollection, record, searchResult } = this.props
+    if (isSharedCollection || searchResult) return false
     return record.can_edit_content
   }
 
@@ -62,7 +68,7 @@ class GridCard extends React.Component {
   }
 
   get renderInner() {
-    const { card, record, height, handleClick } = this.props
+    const { card, record, height, handleClick, searchResult } = this.props
     if (this.isItem) {
       switch (record.type) {
         case ITEM_TYPES.TEXT:
@@ -73,6 +79,7 @@ class GridCard extends React.Component {
               dragging={this.props.dragging}
               cardId={card.id}
               handleClick={handleClick}
+              searchResult={searchResult}
             />
           )
         case ITEM_TYPES.FILE: {
@@ -220,11 +227,18 @@ class GridCard extends React.Component {
   }
 
   closeMenu = () => {
+    // this happens when you mouse off the ActionMenu
     if (this.props.menuOpen) {
+      // if we right-clicked, keep the menu open
       if (!uiStore.cardMenuOpenAndPositioned) {
         uiStore.closeCardMenu()
       }
     }
+  }
+
+  closeContextMenu = () => {
+    // this happens any time you mouse off the whole card
+    uiStore.closeCardMenu()
   }
 
   linkOffsite = url => {
@@ -286,11 +300,12 @@ class GridCard extends React.Component {
       menuOpen,
       lastPinnedCard,
       testCollectionCard,
+      searchResult,
     } = this.props
 
     const firstCardInRow = card.position && card.position.x === 0
     const tagEditorOpen = uiStore.tagsModalOpenId === card.id
-    const hoverClass = 'show-on-hover'
+
     return (
       <StyledGridCard
         className="gridCard"
@@ -303,6 +318,7 @@ class GridCard extends React.Component {
         data-cy="GridCard"
         onContextMenu={this.openContextMenu}
         innerRef={c => (this.gridCardRef = c)}
+        onMouseLeave={this.closeContextMenu}
       >
         {canEditCollection &&
           (!card.isPinnedAndLocked || lastPinnedCard) && (
@@ -332,12 +348,12 @@ class GridCard extends React.Component {
                 this.canContentEditCard && <ContainImage card={card} />}
               {!testCollectionCard && <SelectionCircle cardId={card.id} />}
               <ActionMenu
-                location="GridCard"
-                className={hoverClass}
+                location={searchResult ? 'Search' : 'GridCard'}
+                className="show-on-hover"
                 wrapperClassName="card-menu"
                 card={card}
                 canEdit={this.canEditCard}
-                canReplace={record.canReplace && !card.link}
+                canReplace={record.canReplace && !card.link && !searchResult}
                 menuOpen={menuOpen}
                 onOpen={this.openMenu}
                 onLeave={this.closeMenu}
@@ -375,6 +391,7 @@ GridCard.propTypes = {
   menuOpen: PropTypes.bool,
   lastPinnedCard: PropTypes.bool,
   testCollectionCard: PropTypes.bool,
+  searchResult: PropTypes.bool,
 }
 
 GridCard.defaultProps = {
@@ -386,6 +403,7 @@ GridCard.defaultProps = {
   menuOpen: false,
   lastPinnedCard: false,
   testCollectionCard: false,
+  searchResult: false,
 }
 
 export default GridCard

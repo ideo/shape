@@ -14,6 +14,7 @@ import GridCardBlank from '~/ui/grid/blankContentTool/GridCardBlank'
 import AddSubmission from '~/ui/grid/blankContentTool/AddSubmission'
 import GridCardEmpty from '~/ui/grid/GridCardEmpty'
 import ResizeIcon from '~/ui/icons/ResizeIcon'
+import { StyledCardWrapper } from '~/ui/grid/shared'
 
 const StyledResizeIcon = styled.div`
   position: absolute;
@@ -28,25 +29,6 @@ const StyledResizeIcon = styled.div`
   svg {
     width: 60%;
     height: 60%;
-  }
-`
-
-const StyledCardWrapper = styled.div`
-  z-index: ${props => props.zIndex};
-  /* this is for both the ResizeIcon (in this component) and CardMenu (in GridCard) */
-  .show-on-hover {
-    opacity: 0;
-    transition: opacity 0.25s;
-  }
-  &:hover {
-    z-index: ${props => props.zIndex};
-  }
-  &:hover,
-  &.touch-device {
-    .show-on-hover {
-      /* don't show hover items while dragging */
-      opacity: ${props => (props.dragging ? 0 : 1)};
-    }
   }
 `
 
