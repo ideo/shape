@@ -57,6 +57,7 @@ class Organization < ApplicationRecord
   def setup_user_membership_and_collections(user)
     # make sure they're on the org
     Collection::UserCollection.find_or_create_for_user(user, self)
+    find_or_create_user_getting_started_collection(user)
     setup_user_membership(user)
   end
 
