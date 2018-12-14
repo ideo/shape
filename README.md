@@ -23,6 +23,10 @@ cd shape/
 gem install bundler
 bundle install
 yarn install
+
+# Initialize and update the git submodule for Network React Components
+git submodule init
+git submodule update
 ```
 
 Setup the `.env` file with valid credentials:
@@ -34,7 +38,13 @@ cp .env.example .env
 Create the database and migrate:
 
 ```
-rails db:setup
+rails db:setup 
+
+# get access to Shell commands in Terminal
+source ./shell-commands
+
+# copy production data to your local database
+shapecopydb local
 ```
 
 Run tests:
