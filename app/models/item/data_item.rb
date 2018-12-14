@@ -6,11 +6,21 @@ class Item
                    :d_timeframe
 
     def report
-      DataReport.new(self)
+      url.present? ? external_report : internal_report
     end
 
     def data
       report.call
+    end
+
+    private
+
+    def internal_report
+      DataReport.new(self)
+    end
+
+    def external_report
+      ExternalDataReport.new(self)
     end
   end
 end
