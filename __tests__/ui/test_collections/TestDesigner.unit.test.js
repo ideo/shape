@@ -63,6 +63,7 @@ describe('TestDesigner', () => {
   describe('with collection_to_test', () => {
     beforeEach(() => {
       props.collection.collection_to_test = { ...fakeCollection }
+      props.collection.collection_to_test_id = fakeCollection.id
       wrapper = shallow(<TestDesigner {...props} />)
       component = wrapper.instance()
     })
