@@ -80,7 +80,7 @@ class User extends BaseRecord {
         routingStore.routeTo(redirectPath, redirectId)
       }
     } catch (e) {
-      if (e.status === 404) {
+      if (e.status === 404 || e.status === 401) {
         routingStore.routeTo('homepage')
       }
     }
