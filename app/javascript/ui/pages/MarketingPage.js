@@ -56,7 +56,7 @@ class MarketingPage extends React.Component {
           })
           if (this.props.location.search) {
             const params = queryString.parse(this.props.location.search)
-            if (params && params.campaign === 'alt7') {
+            if (params && params.campaign === 'alphapt7') {
               textValues.footerHeader = textValues.footerHeader.replace(
                 '$5',
                 '$7'

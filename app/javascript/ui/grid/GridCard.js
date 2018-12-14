@@ -21,7 +21,6 @@ import CollectionIcon from '~/ui/icons/CollectionIcon'
 import EditButton from '~/ui/reporting/EditButton'
 import LinkIcon from '~/ui/icons/LinkIcon'
 import Download from '~/ui/grid/Download'
-import FilestackUpload from '~/utils/FilestackUpload'
 import LinkedCollectionIcon from '~/ui/icons/LinkedCollectionIcon'
 import RequiredCollectionIcon from '~/ui/icons/RequiredCollectionIcon'
 import PinnedIcon from '~/ui/icons/PinnedIcon'
@@ -63,7 +62,7 @@ class GridCard extends React.Component {
   }
 
   get renderInner() {
-    const { card, record, height, handleClick } = this.props
+    const { card, record, height, handleClick, searchResult } = this.props
     if (this.isItem) {
       switch (record.type) {
         case ITEM_TYPES.TEXT:
@@ -74,6 +73,7 @@ class GridCard extends React.Component {
               dragging={this.props.dragging}
               cardId={card.id}
               handleClick={handleClick}
+              searchResult={searchResult}
             />
           )
         case ITEM_TYPES.FILE: {
@@ -264,13 +264,14 @@ class GridCard extends React.Component {
       return
     }
     if (record.isPdfFile) {
-      FilestackUpload.preview(record.filestack_file.handle, 'filePreview')
+      // TODO: could replace with preview
+      Activity.trackActivity('downloaded', record)
       return
     } else if (record.mimeBaseType === 'image') {
       this.props.handleClick(e)
       return
     } else if (record.isGenericFile) {
-      // TODO: will replace with preview
+      // TODO: could replace with preview
       this.linkOffsite(record.filestack_file.url)
       return
     }
@@ -372,6 +373,7 @@ GridCard.propTypes = {
   menuOpen: PropTypes.bool,
   lastPinnedCard: PropTypes.bool,
   testCollectionCard: PropTypes.bool,
+  searchResult: PropTypes.bool,
 }
 
 GridCard.defaultProps = {
@@ -383,6 +385,7 @@ GridCard.defaultProps = {
   menuOpen: false,
   lastPinnedCard: false,
   testCollectionCard: false,
+  searchResult: false,
 }
 
 export default GridCard

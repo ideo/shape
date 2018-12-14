@@ -104,6 +104,16 @@ module Resourceable
     role_user_ids(Role::VIEWER)
   end
 
+  def search_user_ids
+    # slightly different from allowed_user_ids because the search methods
+    # intentionally separate user_ids and group_ids
+    (editors[:users].pluck(:id) + viewers[:users].pluck(:id)).uniq
+  end
+
+  def search_group_ids
+    (editors[:groups].pluck(:id) + viewers[:groups].pluck(:id)).uniq
+  end
+
   # get all [role] users, both individual and via group, for this item/collection
   def role_user_ids(role_name)
     return unless editable_and_viewable?

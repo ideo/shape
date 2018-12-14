@@ -22,28 +22,62 @@ const DotFlyout = props => (
 class ChartTooltip extends React.Component {
   static defaultEvents = VictoryTooltip.defaultEvents
 
+  get maxAmount() {
+    const { data } = this.props
+    return Math.max(...data.map(d => d.amount))
+  }
+
+  get minAmount() {
+    const { data } = this.props
+    return Math.min(...data.map(d => d.amount))
+  }
+
   get isLastDataPoint() {
     const { data, index } = this.props
     return parseInt(index) === data.length - 1
   }
 
+  isFirstPointOfType(typeAmount) {
+    const { data, index } = this.props
+    const all = data.filter(d => d.amount === typeAmount)
+    if (!all.length) return false
+    const firstIdx = all[0]._x - 1
+    return parseInt(index) === firstIdx
+  }
+
+  get isFirstMaxPoint() {
+    return this.isFirstPointOfType(this.maxAmount)
+  }
+
+  get isFirstMinPoint() {
+    return this.isFirstPointOfType(this.minAmount)
+  }
+
+  get xOffset() {
+    const { x } = this.props
+    // Ratio is the general amount between x's to move them toward center
+    const ratio = 6
+    if (x < 52) {
+      return 14 - x / ratio
+    }
+    if (x > 398) {
+      const diff = 450 - x
+      return -(14 - diff / ratio)
+    }
+    return 0
+  }
+
   renderAmountMark(datum, totalData) {
-    const { maxAmount, minAmount } = this.props
-    if (datum.amount >= maxAmount) return true
-    if (datum.amount <= minAmount) return true
+    if (this.isFirstMaxPoint) return true
+    if (this.isFirstMinPoint) return true
     if (this.isLastDataPoint) return true
     return false
   }
 
   render() {
-    const { data, datum, index, textRenderer, x, y } = this.props
+    const { data, datum, textRenderer, x, y } = this.props
     const showAlways = this.renderAmountMark(datum, data.length - 1)
-    let dx = 0
-    if (parseInt(index) === 0) {
-      dx = 10
-    } else if (this.isLastDataPoint) {
-      dx = -10
-    }
+    const dx = this.xOffset
     const text = textRenderer(datum, this.isLastDataPoint)
     return (
       <g>

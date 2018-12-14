@@ -1,6 +1,8 @@
 import VideoItemCover from '~/ui/grid/covers/VideoItemCover'
-
 import { fakeVideoItem } from '#/mocks/data'
+
+// so that it doesn't actually try to track the activity with a request
+jest.mock('../../../../app/javascript/stores/jsonApi/Activity')
 
 const props = {
   item: fakeVideoItem,

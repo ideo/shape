@@ -209,19 +209,20 @@ export const RoundPill = styled.div`
 export const Select = styled(MuiSelect)`
   ${props => props.inline && 'display: inline-block;'}
   font-family: ${v.fonts.sans};
+  border-radius: 0;
   font-size: ${props => (props.inline ? 'inherit !important' : '1rem')};
   font-weight: ${props =>
     props.inline ? 'inherit !important' : v.weights.book};
-  letter-spacing: ${props => (props.inline ? 'inherit !important' : '1px')};;
+  letter-spacing: ${props => (props.inline ? 'inherit !important' : '1px')};
+  padding-bottom: 0;
+  padding-top: 0;
+
   ${props =>
     props.inline &&
     `
   margin-bottom: -9px;
   margin-top: -6px;
-  `}
-
-
-  .grayedOut {
+  `} .grayedOut {
     color: ${v.colors.commonMedium};
   }
 
@@ -235,13 +236,16 @@ export const Select = styled(MuiSelect)`
 
   .selectMenu {
     background-color: transparent;
+    border-radius: 0;
+    padding-bottom: 0;
+    padding-top: 0;
+    vertical-align: baseline;
     &:focus {
       background-color: transparent;
     }
     &:hover {
       background-color: transparent;
     }
-    vertical-align: baseline;
     ${props => props.onDefault && `color: ${v.colors.commonMedium};`} li {
       font-family: ${v.fonts.sans};
       font-size: ${props => (props.inline ? 'inherit' : '1rem')};
@@ -266,16 +270,50 @@ Checkbox.displayName = 'StyledCheckbox'
 /** @component */
 export const SelectOption = styled(MenuItem)`
   &.selectOption {
-    align-items: center;
-    display: flex;
-    height: 38px;
-    margin-bottom: 4px;
-    margin-top: 4px;
-    padding: 0 4px;
-    &:hover: {
-      opacity: 1;
+    display: block;
+    height: auto;
+    padding: 12px 10px 12px 20px;
+    position: relative;
+
+    &::before {
+      background-color: transparent;
+      content: '';
+      display: block;
+      height: 100%;
+      left: 0;
+      position: absolute;
+      top: 0;
+      width: 8px;
+
+      &:hover {
+        background-color: ${v.colors.black};
+      }
+    }
+
+    &::after {
+      background-color: ${v.colors.commonMedium};
+      bottom: 0;
+      content: '';
+      display: block;
+      height: 1px;
+      left: 0;
+      position: absolute;
+      width: 100%;
+    }
+
+    &:hover {
+      background-color: inherit !important;
+      &::before {
+        background-color: ${v.colors.black} !important;
+      }
     }
   }
+
+  &.selected {
+    background-color: inherit !important;
+    border-left-color: ${v.colors.black};
+  }
+
   &.grayedOut {
     color: ${v.colors.commonMedium};
   }

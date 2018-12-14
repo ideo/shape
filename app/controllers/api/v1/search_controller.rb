@@ -7,9 +7,14 @@ class Api::V1::SearchController < Api::V1::BaseController
         total: results.total_count,
         size: results.size,
       },
-      jsonapi: results, include: [:parent_collection_card], expose: {
+      jsonapi: results,
+      include: %i[parent_collection_card filestack_file],
+      class: jsonapi_class.merge(
+        Collection: SerializableSimpleCollection,
+      ),
+      expose: {
         force_breadcrumbs: @force_breadcrumbs = true,
-      }
+      },
     )
   end
 

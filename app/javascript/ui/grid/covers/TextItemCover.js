@@ -65,13 +65,13 @@ class TextItemCover extends React.Component {
 
   handleClick = e => {
     e.stopPropagation()
-    const { item, dragging, cardId } = this.props
+    const { item, dragging, cardId, searchResult } = this.props
     if (dragging || uiStore.dragging || this.isEditing) return false
     // allow both editors/viewers to capture keyboard clicks
     if (uiStore.captureKeyboardGridClick(e, cardId)) {
       return false
     }
-    if (!item.can_edit_content) {
+    if (!item.can_edit_content || searchResult) {
       // if a viewer, we want to just go to the item page, allow event to propagate
       this.props.handleClick(e)
       return true
@@ -197,10 +197,12 @@ TextItemCover.propTypes = {
   cardId: PropTypes.string.isRequired,
   handleClick: PropTypes.func.isRequired,
   height: PropTypes.number,
+  searchResult: PropTypes.bool,
 }
 
 TextItemCover.defaultProps = {
   height: null,
+  searchResult: false,
 }
 
 export default TextItemCover

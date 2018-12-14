@@ -101,6 +101,7 @@ class Collection < ApplicationRecord
   scope :user, -> { where(type: 'Collection::UserCollection') }
   scope :shared_with_me, -> { where(type: 'Collection::SharedWithMeCollection') }
   scope :searchable, -> { where.not(type: unsearchable_types).or(where(type: nil)) }
+  scope :data_collectable, -> { where.not(type: uncollectable_types).or(where(type: nil)) }
   scope :master_template, -> { where(master_template: true) }
 
   accepts_nested_attributes_for :collection_cards
@@ -138,12 +139,11 @@ class Collection < ApplicationRecord
     ]
   end
 
-  def search_user_ids
-    (editors[:users].pluck(:id) + viewers[:users].pluck(:id)).uniq
-  end
-
-  def search_group_ids
-    (editors[:groups].pluck(:id) + viewers[:groups].pluck(:id)).uniq
+  def self.uncollectable_types
+    Collection.unsearchable_types +
+      [
+        'Collection::GlobalCollection',
+      ]
   end
 
   # By default all string fields are searchable

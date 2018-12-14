@@ -173,7 +173,7 @@ class CollectionCard extends BaseRecord {
     }
     try {
       await this.apiStore.request('collection_cards/link', 'POST', data)
-      if (!this.record.inMyCollection) {
+      if (this.record && !this.record.inMyCollection) {
         this.apiStore.checkInMyCollection(this.record)
       }
       uiStore.alertOk('Added to your collection')

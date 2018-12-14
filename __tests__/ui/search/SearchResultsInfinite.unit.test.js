@@ -30,9 +30,8 @@ beforeEach(() => {
 
 describe('SearchResultsInfinite', () => {
   it('displays the search results', () => {
-    // 4 because 2 collections and 2 items, text items are not
-    // rendered
-    expect(wrapper.find('StyledSearchResult').length).toEqual(4)
+    // 5 because 2 collections and 3 items
+    expect(wrapper.find('StyledSearchResult').length).toEqual(5)
     expect(
       wrapper
         .find('CollectionCover')
@@ -44,13 +43,13 @@ describe('SearchResultsInfinite', () => {
         .find('GridCard')
         .at(0)
         .props().record
-    ).toEqual(fakeVideoItem)
+    ).toEqual(fakeTextItem)
     expect(
       wrapper
         .find('GridCard')
         .at(1)
         .props().record
-    ).toEqual(fakeLinkItem)
+    ).toEqual(fakeVideoItem)
   })
 
   it('routes to collection on click', () => {

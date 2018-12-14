@@ -24,3 +24,9 @@ jest.mock('mobx', () => ({
   ...require.requireActual('mobx'),
   observe: jest.fn(),
 }))
+
+window.CONFIG = {
+  stripeApiKey: '',
+  clientId: '',
+  networkApiBaseUrl: '',
+}

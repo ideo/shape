@@ -5,7 +5,7 @@ import Activity from '~/stores/jsonApi/Activity'
 import DownloadIcon from '~/ui/icons/DownloadIcon'
 import Tooltip from '~/ui/global/Tooltip'
 
-const IconHolder = styled.button`
+const IconHolder = styled.a`
   display: inline-block;
   margin-right: 5px;
   margin-top: 5px;
@@ -15,24 +15,30 @@ const IconHolder = styled.button`
 `
 
 class Download extends React.Component {
-  download = ev => {
-    ev.preventDefault()
+  trackDownload = ev => {
     const { record } = this.props
     const file = record.filestack_file
     if (file.url) {
       Activity.trackActivity('downloaded', record)
-      window.open(file.url, '_blank')
     }
   }
 
   render() {
+    const { record } = this.props
+    const file = record.filestack_file
     return (
       <Tooltip
         classes={{ tooltip: 'Tooltip' }}
         title="Download"
         placement="top"
       >
-        <IconHolder className="show-on-hover" onClick={this.download}>
+        <IconHolder
+          className="show-on-hover"
+          href={file.url}
+          target="_blank"
+          onClick={this.trackDownload}
+          download
+        >
           <DownloadIcon />
         </IconHolder>
       </Tooltip>
