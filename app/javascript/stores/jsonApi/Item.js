@@ -2,6 +2,7 @@ import _ from 'lodash'
 import { observable } from 'mobx'
 
 import { apiUrl } from '~/utils/url'
+import { capitalizeSnakecase } from '~/utils/stringUtils'
 import { routingStore } from '~/stores'
 import trackError from '~/utils/trackError'
 import FilestackUpload from '~/utils/FilestackUpload'
@@ -101,7 +102,12 @@ class Item extends SharedRecordMixin(BaseRecord) {
     const { data_settings } = this
     if (!data_settings || !data_settings.d_measure) return {}
     const measure = _.find(DATA_MEASURES, { value: data_settings.d_measure })
-    if (!measure) return {}
+    if (!measure) {
+      const measureName = capitalizeSnakecase(data_settings.d_measure)
+      return {
+        name: measureName,
+      }
+    }
     return measure
   }
 

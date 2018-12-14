@@ -12,7 +12,6 @@ class ExternalDataReport < SimpleService
   end
 
   def call
-    # base_query
     calculate
     @data
   end
@@ -37,7 +36,7 @@ class ExternalDataReport < SimpleService
   def calculate
     values = base_query.map do |metric|
       {
-        date: metric['measured_at'],
+        date: Date.parse(metric['measured_at']).to_s,
         amount: metric['number']
       }
     end
