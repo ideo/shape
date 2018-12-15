@@ -78,6 +78,7 @@ export const StyledGridCardOverlay = styled.div`
   /* make the overlay not capture any clicks */
   pointer-events: none;
 `
+StyledGridCardOverlay.displayName = 'StyledGridCardOverlay'
 
 export const StyledGridCard = styled.div`
   z-index: 1;
