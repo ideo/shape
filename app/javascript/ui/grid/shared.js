@@ -66,6 +66,19 @@ export const BctButton = styled.button`
 `
 BctButton.displayName = 'BctButton'
 
+export const StyledGridCardOverlay = styled.div`
+  z-index: 2;
+  height: 100%;
+  width: 100%;
+  background: ${v.colors.primaryMedium};
+  opacity: 0.6;
+  top: 0;
+  left: 0;
+  position: absolute;
+  /* make the overlay not capture any clicks */
+  pointer-events: none;
+`
+
 export const StyledGridCard = styled.div`
   z-index: 1;
   position: relative;

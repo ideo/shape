@@ -31,6 +31,7 @@ import { uiStore } from '~/stores'
 import v, { ITEM_TYPES } from '~/utils/variables'
 import {
   StyledGridCard,
+  StyledGridCardOverlay,
   StyledBottomLeftIcon,
   StyledGridCardInner,
   StyledTopRightActions,
@@ -65,6 +66,11 @@ class GridCard extends React.Component {
 
   get isCollection() {
     return this.props.cardType === 'collections'
+  }
+
+  get isSelected() {
+    const { card } = this.props
+    return uiStore.isSelected(card.id)
   }
 
   get renderInner() {
@@ -362,6 +368,8 @@ class GridCard extends React.Component {
             </StyledTopRightActions>
           )}
         {this.renderIcon}
+
+        {this.isSelected && <StyledGridCardOverlay />}
         {/* onClick placed here so it's separate from hotspot click */}
         <StyledGridCardInner
           onClick={this.handleClick}
