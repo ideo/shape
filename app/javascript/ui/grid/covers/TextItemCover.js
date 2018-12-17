@@ -7,6 +7,7 @@ import styled from 'styled-components'
 
 import { apiStore, routingStore, uiStore } from '~/stores'
 import v from '~/utils/variables'
+import { QuillStyleWrapper } from '~/ui/global/styled/typography'
 import ActionCableConsumer from '~/utils/ActionCableConsumer'
 import InlineLoader from '~/ui/layout/InlineLoader'
 import TextItem from '~/ui/items/TextItem'
@@ -180,12 +181,16 @@ class TextItemCover extends React.Component {
         class="cancelGridClick"
         onClick={this.handleClick}
       >
-        {this.state.loading && <InlineLoader />}
-        {content}
-        {this.state.readMore &&
-          !isEditing && (
-            <StyledReadMore onClick={this.expand}>read more...</StyledReadMore>
-          )}
+        <QuillStyleWrapper>
+          {this.state.loading && <InlineLoader />}
+          {content}
+          {this.state.readMore &&
+            !isEditing && (
+              <StyledReadMore onClick={this.expand}>
+                read more...
+              </StyledReadMore>
+            )}
+        </QuillStyleWrapper>
       </PaddedCardCover>
     )
   }
