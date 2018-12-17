@@ -67,20 +67,36 @@ export const BctButton = styled.button`
 BctButton.displayName = 'BctButton'
 
 export const StyledGridCard = styled.div`
-  z-index: 1;
-  position: relative;
-  height: 100%;
-  width: 100%;
   background: white;
-  padding: 0;
+  box-shadow: ${props =>
+    props.dragging ? '1px 1px 5px 2px rgba(0, 0, 0, 0.25)' : ''};
   cursor: ${props => {
     if (props.dragging) return 'grabbing'
     else if (props.testCollectionCard) return 'auto'
     return 'pointer'
   }};
-  box-shadow: ${props =>
-    props.dragging ? '1px 1px 5px 2px rgba(0, 0, 0, 0.25)' : ''};
+  height: 100%;
   opacity: ${props => (props.dragging ? '0.95' : '1')};
+  padding: 0;
+  position: relative;
+  width: 100%;
+  z-index: 1;
+  ${props =>
+    props.selected &&
+    `
+  &:after {
+    background: ${v.colors.primaryDark};
+    content: '';
+    height: 100%;
+    left: 0;
+    opacity: 0.34;
+    pointer-events: none;
+    position: absolute;
+    width: 100%;
+    top: 0;
+    z-index: ${v.zIndex.cardDragging};
+  }
+  `};
 `
 StyledGridCard.displayName = 'StyledGridCard'
 
