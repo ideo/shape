@@ -2,6 +2,8 @@ import _ from 'lodash'
 import PropTypes from 'prop-types'
 import styled from 'styled-components'
 
+import CardActionHolder from '~/ui/icons/CardActionHolder'
+import CardMenuIcon from '~/ui/icons/CardMenuIcon'
 import MenuIcon from '~/ui/icons/MenuIcon'
 import { BctButton } from '~/ui/grid/shared'
 import v from '~/utils/variables'
@@ -70,12 +72,17 @@ export const StyledMenu = styled.ul`
 `
 
 export const StyledMenuToggle = styled.button`
-  padding: 2px 5px 0;
+  margin-left: -5px;
+  padding: 2px 5px 0 0;
   .icon {
-    width: 14px;
-    height: 14px;
+    width: ${props => props.size}px;
+    height: ${props => props.size}px;
   }
 `
+StyledMenuToggle.defaultTypes = {
+  size: 14,
+}
+
 StyledMenuToggle.displayName = 'StyledMenuToggle'
 
 export const StyledMenuItem = styled.li`
@@ -173,7 +180,16 @@ class PopoutMenu extends React.Component {
     } = this.props
 
     const isBct = buttonStyle === 'bct'
+    const isCard = buttonStyle === 'card'
     const MenuToggle = isBct ? BctButton : StyledMenuToggle
+    let icon = <MenuIcon viewBox="0 0 5 18" />
+    if (isBct) icon = <MenuIcon viewBox="-11 -11 26 40" />
+    if (isCard)
+      icon = (
+        <CardActionHolder>
+          <CardMenuIcon />
+        </CardActionHolder>
+      )
     return (
       <StyledMenuButtonWrapper
         className={`${wrapperClassName} ${menuOpen && ' open'}`}
@@ -185,9 +201,10 @@ class PopoutMenu extends React.Component {
           <MenuToggle
             disabled={disabled}
             onClick={onClick}
+            size={isCard ? 28 : 14}
             className={`${className} menu-toggle`}
           >
-            <MenuIcon viewBox={isBct ? '-11 -11 26 40' : '0 0 5 18'} />
+            {icon}
           </MenuToggle>
         )}
         <StyledMenuWrapper

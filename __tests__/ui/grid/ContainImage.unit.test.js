@@ -1,3 +1,4 @@
+import CardActionHolder from '~/ui/icons/CardActionHolder'
 import ContainImage from '~/ui/grid/ContainImage'
 import { fakeCollectionCard } from '#/mocks/data'
 
@@ -24,20 +25,22 @@ describe('ContainImage', () => {
       })
 
       it('should show the fill tile with image tooltip', () => {
-        expect(wrapper.find('Tooltip').props().title).toEqual(
+        expect(wrapper.find(CardActionHolder).props().tooltipText).toEqual(
           'fill tile with image'
         )
       })
     })
 
     it('should show the show whole image tooltip', () => {
-      expect(wrapper.find('Tooltip').props().title).toEqual('show whole image')
+      expect(wrapper.find(CardActionHolder).props().tooltipText).toEqual(
+        'show whole image'
+      )
     })
   })
 
   describe('toggleSelected()', () => {
     beforeEach(() => {
-      wrapper.find('ButtonWrapper').simulate('click', fakeEv)
+      wrapper.find(CardActionHolder).simulate('click', fakeEv)
     })
 
     it('should toggle the card image_contain property', () => {

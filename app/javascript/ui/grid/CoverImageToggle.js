@@ -1,21 +1,9 @@
 import PropTypes from 'prop-types'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
-import styled from 'styled-components'
 
+import CardActionHolder from '~/ui/icons/CardActionHolder'
 import CoverImageToggleIcon from '~/ui/icons/CoverImageToggleIcon'
-import Tooltip from '~/ui/global/Tooltip'
 import v from '~/utils/variables'
-
-const StyledCoverImageToggle = styled.div`
-  display: inline-block;
-  height: 26px;
-  width: 14px;
-  svg {
-    fill: ${props =>
-      props.isCoverImage ? v.colors.black : v.colors.commonMedium};
-  }
-`
-StyledCoverImageToggle.displayName = 'StyledCoverImageToggle'
 
 @observer
 class CoverImageToggle extends React.Component {
@@ -29,20 +17,17 @@ class CoverImageToggle extends React.Component {
   render() {
     const { card } = this.props
     return (
-      <Tooltip
-        classes={{ tooltip: 'Tooltip' }}
-        title={card.is_cover ? 'remove as cover image' : 'make cover image'}
-        placement="top"
+      <CardActionHolder
+        className="show-on-hover"
+        color={card.is_cover ? v.colors.black : v.colors.commonMedium}
+        onClick={this.toggle}
+        tooltipText={
+          card.is_cover ? 'remove as cover image' : 'make cover image'
+        }
+        role="button"
       >
-        <StyledCoverImageToggle
-          className="show-on-hover"
-          onClick={this.toggle}
-          role="button"
-          isCoverImage={card.is_cover}
-        >
-          <CoverImageToggleIcon />
-        </StyledCoverImageToggle>
-      </Tooltip>
+        <CoverImageToggleIcon />
+      </CardActionHolder>
     )
   }
 }

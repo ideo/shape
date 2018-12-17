@@ -3,7 +3,8 @@ import { PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 
 export const StyledImageCover = styled.div`
-  background-image: url(${props => props.url});
+  ${props => props.url && `background-image: url(${props.url});`}
+  ${props => props.bgColor && `background-color: ${props.bgColor};`}
   background-size: ${props => (props.contain ? 'contain' : 'cover')};
   background-position: center;
   background-repeat: no-repeat;

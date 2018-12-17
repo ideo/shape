@@ -14,6 +14,7 @@ import GridCardBlank from '~/ui/grid/blankContentTool/GridCardBlank'
 import AddSubmission from '~/ui/grid/blankContentTool/AddSubmission'
 import GridCardEmpty from '~/ui/grid/GridCardEmpty'
 import ResizeIcon from '~/ui/icons/ResizeIcon'
+import { StyledCardWrapper } from '~/ui/grid/shared'
 
 const StyledResizeIcon = styled.div`
   position: absolute;
@@ -31,25 +32,6 @@ const StyledResizeIcon = styled.div`
   }
 `
 
-const StyledCardWrapper = styled.div`
-  z-index: ${props => props.zIndex};
-  /* this is for both the ResizeIcon (in this component) and CardMenu (in GridCard) */
-  .show-on-hover {
-    opacity: 0;
-    transition: opacity 0.25s;
-  }
-  &:hover {
-    z-index: ${props => props.zIndex};
-  }
-  &:hover,
-  &.touch-device {
-    .show-on-hover {
-      /* don't show hover items while dragging */
-      opacity: ${props => (props.dragging ? 0 : 1)};
-    }
-  }
-`
-
 const cardCSSTransition = 'transform 0.4s, width 0.25s, height 0.25s'
 const TOP_SCROLL_TRIGGER = 210
 
@@ -60,6 +42,7 @@ class MovableGridCard extends React.PureComponent {
       timeoutId: null,
       // this is really just used so that it will reset when you finish dragging
       dragging: false,
+      dragHandleRequired: false,
       resizing: false,
       moveComplete: true,
       // track where on the page the mouse position is, e.g. if browser is stretched wide
@@ -67,6 +50,14 @@ class MovableGridCard extends React.PureComponent {
       initialOffsetY: 0,
       x: props.position.xPos,
       y: props.position.yPos,
+    }
+  }
+
+  componentDidMount() {
+    const videoHandle =
+      this.gridCardRef && this.gridCardRef.querySelector('.videoDrag')
+    if (videoHandle) {
+      this.setState({ dragHandleRequired: true })
     }
   }
 
@@ -348,7 +339,14 @@ class MovableGridCard extends React.PureComponent {
       position: { width },
     } = this.props
 
-    const { dragging, resizing, moveComplete, x, y } = this.state
+    const {
+      dragging,
+      dragHandleRequired,
+      resizing,
+      moveComplete,
+      x,
+      y,
+    } = this.state
 
     if (cardType === 'placeholder') {
       return this.renderPlaceholder()
@@ -413,6 +411,7 @@ class MovableGridCard extends React.PureComponent {
         dragging={!moveComplete}
         zIndex={zIndex}
         onClick={this.handleWrapperClick}
+        innerRef={c => (this.gridCardRef = c)}
       >
         <Rnd
           ref={c => {
@@ -430,6 +429,7 @@ class MovableGridCard extends React.PureComponent {
           maxWidth={maxWidth}
           maxHeight={maxHeight}
           dragAxis="none"
+          dragHandleClassName={dragHandleRequired ? '.videoDrag' : null}
           cancel=".no-drag"
           size={{ width, height }}
           position={{ x, y }}

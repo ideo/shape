@@ -1,4 +1,5 @@
 import VideoUrl from '~/utils/VideoUrl'
+import v from '~/utils/variables'
 
 const validYoutubeUrls = [
   'http://www.youtube.com/watch?v=-wtIM49CWuI',
@@ -68,5 +69,19 @@ describe('parse', () => {
         expect(service).toEqual('vimeo')
       })
     })
+
+    it('returns id and service for private urls', () => {
+      const { id, service } = VideoUrl.parse('https://vimeo.com/12345678/9876')
+      expect(id).toEqual('12345678/9876')
+      expect(service).toEqual('vimeo')
+    })
+  })
+})
+
+describe('privateVideoDefaults', () => {
+  it('sets the default attributes', () => {
+    const details = VideoUrl.privateVideoDefaults('some-id')
+    expect(details.thumbnailUrl).toEqual(v.defaults.video.thumbnailUrl)
+    expect(details.id).toEqual('some-id')
   })
 })

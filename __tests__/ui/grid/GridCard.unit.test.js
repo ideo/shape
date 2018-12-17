@@ -1,4 +1,5 @@
 import GridCard from '~/ui/grid/GridCard'
+import { uiStore } from '~/stores'
 
 import {
   fakeItemCard,
@@ -19,6 +20,7 @@ const props = {
   menuOpen: false,
   canEditCollection: false,
   isSharedCollection: false,
+  searchResult: false,
 }
 
 let wrapper, rerender
@@ -270,6 +272,30 @@ describe('GridCard', () => {
             .exists()
         ).toBe(true)
       })
+    })
+  })
+
+  describe('when selected', () => {
+    beforeEach(() => {
+      uiStore.toggleSelectedCardId(props.card.id)
+      rerender()
+    })
+
+    it('renders the colored to indicate selection', () => {
+      expect(wrapper.find('StyledGridCard').props().selected).toBe(true)
+    })
+  })
+
+  describe('with searchResult', () => {
+    beforeEach(() => {
+      props.searchResult = true
+      props.record.can_edit = true
+      props.record.menuDisabled = false
+      rerender()
+    })
+
+    it('disables canEdit functionality', () => {
+      expect(wrapper.find('ActionMenu').props().canEdit).toBe(false)
     })
   })
 })

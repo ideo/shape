@@ -25,9 +25,9 @@ const StyledTitleItem = RowItem.extend`
 const EditIconHolder = styled.button`
   cursor: pointer;
   display: block;
-  margin-bottom: -8px;
   svg {
     fill: ${v.colors.commonMedium};
+    margin-bottom: -2px;
     width: 18px;
   }
 `
