@@ -84,7 +84,7 @@ export const StyledGridCard = styled.div`
   ${props =>
     props.selected &&
     `
-  &:after {
+  &:before {
     background: ${v.colors.primaryDark};
     content: '';
     height: 100%;
@@ -94,7 +94,7 @@ export const StyledGridCard = styled.div`
     position: absolute;
     width: 100%;
     top: 0;
-    z-index: ${v.zIndex.cardDragging};
+    z-index: ${v.zIndex.gridCardTop};
   }
   `};
 `
