@@ -19,9 +19,9 @@ class ExternalDataReport < SimpleService
   private
 
   def base_query
-    NetworkApi::AppMetric.
-      where(json_api_query_params).
-      order(measured_at: :asc)
+    NetworkApi::AppMetric
+      .where(json_api_query_params)
+      .order(measured_at: :asc)
   end
 
   def json_api_query_params
@@ -37,7 +37,7 @@ class ExternalDataReport < SimpleService
     values = base_query.map do |metric|
       {
         date: Date.parse(metric['measured_at']).to_s,
-        amount: metric['number']
+        amount: metric['number'],
       }
     end
 
