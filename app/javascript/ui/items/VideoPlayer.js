@@ -2,6 +2,7 @@ import PropTypes from 'prop-types'
 import ReactPlayer from 'react-player'
 import { StyledTopLeftActions } from '~/ui/grid/shared'
 
+import { FullAbsolute, FullAbsoluteParent } from '~/ui/global/styled/layout'
 import CardActionHolder from '~/ui/icons/CardActionHolder'
 import DragIcon from '~/ui/icons/DragIcon'
 import VideoUrl from '~/utils/VideoUrl'
@@ -56,7 +57,7 @@ class VideoPlayer extends React.PureComponent {
       )
     }
     return (
-      <div style={{ height: '100%', position: 'relative' }}>
+      <FullAbsoluteParent>
         <StyledTopLeftActions className="show-on-hover">
           <span className={`videoDrag`}>
             <CardActionHolder className="show-on-hover" disableHover>
@@ -64,17 +65,8 @@ class VideoPlayer extends React.PureComponent {
             </CardActionHolder>
           </span>
         </StyledTopLeftActions>
-        <div
-          style={{
-            height: '100%',
-            position: 'absolute',
-            top: 0,
-            width: '100%',
-          }}
-        >
-          {player}
-        </div>
-      </div>
+        <FullAbsolute>{player}</FullAbsolute>
+      </FullAbsoluteParent>
     )
   }
 }
