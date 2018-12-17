@@ -110,3 +110,16 @@ export const FadeHeader = styled.div`
   width: 100%;
   z-index: 100;
 `
+
+export const FullAbsoluteParent = styled.div`
+  height: 100%;
+  position: relative;
+  width: 100%;
+`
+
+export const FullAbsolute = styled.div`
+  height: 100%;
+  position: absolute;
+  top: 0;
+  width: 100%;
+`

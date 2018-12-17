@@ -1,6 +1,6 @@
 class Api::V1::SearchController < Api::V1::BaseController
   def search
-    results = search_collections(params[:query])
+    results = search_records(params[:query])
     render(
       meta: {
         page: page,
@@ -13,7 +13,7 @@ class Api::V1::SearchController < Api::V1::BaseController
         Collection: SerializableSimpleCollection,
       ),
       expose: {
-        force_breadcrumbs: @force_breadcrumbs = true,
+        force_breadcrumbs: true,
       },
     )
   end
@@ -36,7 +36,7 @@ class Api::V1::SearchController < Api::V1::BaseController
     params[:page].present? ? params[:page].to_i : 1
   end
 
-  def search_collections(query)
+  def search_records(query)
     # search for tags via hashtag e.g. "#template"
     where_clause = {
       organization_id: current_organization.id,
@@ -50,6 +50,7 @@ class Api::V1::SearchController < Api::V1::BaseController
     end
 
     Search.new(
+      # NOTE: This index may get replaced based on filters e.g. "type:item"
       index_name: Collection,
       where: where_clause,
       per_page: params[:per_page] || 10,

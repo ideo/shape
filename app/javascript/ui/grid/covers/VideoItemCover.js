@@ -55,10 +55,21 @@ class VideoItemCover extends React.PureComponent {
 
   render() {
     const { item } = this.props
-    const url = item.thumbnail_url
+    let thumbnail = item.thumbnail_url
+    let bgColor = null
+    // NOTE: This is sort of a workaround to disable the default thumbnail_url (gradient square)
+    // as well as getting around the fact that videos currently have thumbnail_url required
+    if (thumbnail === v.defaults.video.thumbnailUrl) {
+      thumbnail = null
+      bgColor = v.colors.commonDark
+    }
     return (
       <StyledVideoCover playing={this.state.playing}>
-        <StyledImageCover className="not-playing" url={url}>
+        <StyledImageCover
+          className="not-playing"
+          url={thumbnail}
+          bgColor={bgColor}
+        >
           <Flex className="inner" align="center" justify="center">
             <Box>
               <button className="cancelGridClick" onClick={this.playVideo}>

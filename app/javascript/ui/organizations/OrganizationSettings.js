@@ -1,6 +1,6 @@
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 
-import { Heading2 } from '~/ui/global/styled/typography'
+import { Heading3 } from '~/ui/global/styled/typography'
 import TagEditor from '~/ui/pages/shared/TagEditor'
 
 @inject('apiStore', 'routingStore')
@@ -27,7 +27,7 @@ class OrganizationSettings extends React.Component {
   render() {
     return (
       <div>
-        <Heading2>Official Domains</Heading2>
+        <Heading3>Official Domains</Heading3>
         <p>
           Any new people added to {this.organization.name} without these email
           domains will be considered guests.

@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types'
-import styled from 'styled-components'
+import styled, { css } from 'styled-components'
 
 import v from '~/utils/variables'
 import Truncator from 'react-truncator'
@@ -67,22 +67,60 @@ export const BctButton = styled.button`
 BctButton.displayName = 'BctButton'
 
 export const StyledGridCard = styled.div`
-  z-index: 1;
-  position: relative;
-  height: 100%;
-  width: 100%;
   background: white;
-  padding: 0;
+  box-shadow: ${props =>
+    props.dragging ? '1px 1px 5px 2px rgba(0, 0, 0, 0.25)' : ''};
   cursor: ${props => {
     if (props.dragging) return 'grabbing'
     else if (props.testCollectionCard) return 'auto'
     return 'pointer'
   }};
-  box-shadow: ${props =>
-    props.dragging ? '1px 1px 5px 2px rgba(0, 0, 0, 0.25)' : ''};
+  height: 100%;
   opacity: ${props => (props.dragging ? '0.95' : '1')};
+  padding: 0;
+  position: relative;
+  width: 100%;
+  z-index: 1;
+  ${props =>
+    props.selected &&
+    `
+  &:after {
+    background: ${v.colors.primaryDark};
+    content: '';
+    height: 100%;
+    left: 0;
+    opacity: 0.45;
+    pointer-events: none;
+    position: absolute;
+    width: 100%;
+    top: 0;
+    z-index: ${v.zIndex.cardDragging};
+  }
+  `};
 `
 StyledGridCard.displayName = 'StyledGridCard'
+
+export const StyledCardWrapper = styled.div`
+  z-index: ${props => props.zIndex};
+  /* this is for both the ResizeIcon (in this component) and CardMenu (in GridCard) */
+  .show-on-hover {
+    opacity: 0;
+    transition: opacity 0.25s;
+  }
+  &:hover {
+    z-index: ${props => props.zIndex};
+  }
+  &:hover,
+  &.touch-device {
+    .show-on-hover {
+      /* don't show hover items while dragging */
+      opacity: ${props => (props.dragging ? 0 : 1)};
+    }
+  }
+`
+StyledCardWrapper.defaultProps = {
+  zIndex: 1,
+}
 
 export const StyledBottomLeftIcon = styled.div`
   position: absolute;
@@ -109,7 +147,7 @@ export const StyledGridCardInner = styled.div`
   position: relative;
   height: 100%;
   ${props =>
-    !props.overflow &&
+    !props.hasOverflow &&
     `
   overflow: hidden;
   `} z-index: 1;
@@ -124,25 +162,40 @@ export const StyledGridCardInner = styled.div`
 `
 StyledGridCardInner.displayName = 'StyledGridCardInner'
 
-export const StyledTopRightActions = styled.div`
+const TopActions = css`
+  align-items: center;
+  display: flex;
   position: absolute;
   top: 0.35rem;
-  right: 0.25rem;
   z-index: ${v.zIndex.gridCardTop};
-  .show-on-hover {
-    color: ${props => props.color};
-    border-color: ${props => props.color};
-  }
+`
+export const StyledTopLeftActions = styled.div`
+  ${TopActions};
+  left: 0.25rem;
+`
+
+export const StyledTopRightActions = styled.div`
+  ${TopActions};
+  background-color: ${v.colors.commonLightest};
+  border-radius: 4px;
+  height: 34px;
+  right: 0.25rem;
+
   .selected {
     border-color: ${props => props.color};
     background-color: ${props => props.color};
   }
   .card-menu {
-    margin-top: 0.25rem;
+    color: ${props => props.color};
     display: inline-block;
     vertical-align: top;
     z-index: ${v.zIndex.gridCardTop};
-    color: ${props => props.color};
+  }
+
+  svg {
+    &:hover {
+      svg: ${v.colors.black};
+    }
   }
 `
 StyledTopRightActions.defaultProps = {

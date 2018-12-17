@@ -11,12 +11,8 @@ import { uiStore } from '~/stores'
 import v from '~/utils/variables'
 import Breadcrumb from '~/ui/layout/Breadcrumb'
 import Loader from '~/ui/layout/Loader'
-import ActionMenu from '~/ui/grid/ActionMenu'
-import SelectionCircle from '~/ui/grid/SelectionCircle'
-import CollectionCover from '~/ui/grid/covers/CollectionCover'
-import CollectionIcon from '~/ui/icons/CollectionIcon'
 import GridCard from '~/ui/grid/GridCard'
-import { StyledTopRightActions, StyledBottomLeftIcon } from '~/ui/grid/shared'
+import { StyledCardWrapper } from '~/ui/grid/shared'
 import { compact } from 'lodash'
 
 const StyledSearchResult = styled.div`
@@ -52,8 +48,6 @@ const StyledScrollIndicator = styled.div`
   z-index: ${v.zIndex.scrollIndicator};
 `
 
-const isCollection = result => result.internalType === 'collections'
-
 @observer
 class SearchResultsInfinite extends React.Component {
   visibleItems = observable.map({})
@@ -61,14 +55,6 @@ class SearchResultsInfinite extends React.Component {
   firstVisible = 1
   @observable
   hovering = false
-
-  routeToCollection = id => () => {
-    this.props.routeTo('collections', id)
-  }
-
-  routeToItem = id => () => {
-    this.props.routeTo('items', id)
-  }
 
   @action
   markFirstVisible = index => {
@@ -127,9 +113,7 @@ class SearchResultsInfinite extends React.Component {
     const results = searchResults.map((result, i) => {
       // ActionMenu is rendered as if we were operating on the parent_collection_card
       let card = result.parent_collection_card
-      // need to make this available in the reverse direction
-      card.record = result
-      if (!result.parent_collection_card) {
+      if (!card) {
         // catch for special/global templates that don't have a parent card
         card = {
           id: `card-${i}`,
@@ -137,6 +121,8 @@ class SearchResultsInfinite extends React.Component {
           height: 1,
         }
       }
+      // need to make this available in the reverse direction
+      card.record = result
 
       return (
         <FlipMove appearAnimation="fade" key={result.id}>
@@ -149,7 +135,7 @@ class SearchResultsInfinite extends React.Component {
               top: v.headerHeightCompact + gridSettings.gridH / 2,
             }}
           >
-            <div>
+            <StyledCardWrapper>
               <StyledBreadcrumb>
                 <Breadcrumb
                   record={result}
@@ -168,47 +154,21 @@ class SearchResultsInfinite extends React.Component {
                 onMouseEnter={this.handleMouseOver(i + 1)}
                 onMouseLeave={this.handleMouseOver(i + 1, false)}
               >
-                <StyledTopRightActions className="show-on-hover">
-                  <SelectionCircle cardId={card.id} />
-                  <ActionMenu
-                    location="Search"
-                    className="show-on-hover"
-                    wrapperClassName="card-menu"
-                    card={card}
-                    canEdit={false}
-                    canReplace={false}
-                    menuOpen={uiStore.cardMenuOpen.id === card.id}
-                    onOpen={this.openMenu(card.id)}
-                    onLeave={this.closeMenu}
-                  />
-                </StyledTopRightActions>
-                {isCollection(result) ? (
-                  <Fragment>
-                    <StyledBottomLeftIcon>
-                      <CollectionIcon />
-                    </StyledBottomLeftIcon>
-                    <CollectionCover
-                      onClick={this.routeToCollection(result.id)}
-                      collection={result}
-                      width={card.maxWidth}
-                      height={card.maxHeight}
-                    />
-                  </Fragment>
-                ) : (
-                  <GridCard
-                    card={card}
-                    cardType={result.internalType}
-                    record={result}
-                    cardId={card.id}
-                    menuOpen={false}
-                    // NOTE: this will have to get modified when we eventually
-                    // turn off item routing for videos and images
-                    handleClick={this.routeToItem(result.id)}
-                    searchResult
-                  />
-                )}
+                <GridCard
+                  card={card}
+                  cardType={result.internalType}
+                  record={result}
+                  cardId={card.id}
+                  menuOpen={uiStore.cardMenuOpen.id === card.id}
+                  // NOTE: this will have to get modified when we eventually
+                  // turn off item routing for videos and images
+                  handleClick={() =>
+                    this.props.routeTo(result.internalType, result.id)
+                  }
+                  searchResult
+                />
               </StyledSearchResult>
-            </div>
+            </StyledCardWrapper>
           </VisibilitySensor>
         </FlipMove>
       )

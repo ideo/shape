@@ -3,7 +3,7 @@ import styled from 'styled-components'
 
 const StyledValidIndicator = styled.div`
   position: absolute;
-  top: 18px;
+  top: ${props => props.top}px;
   right: -24px;
   font-size: 1.25rem;
   font-weight: bold;
@@ -16,8 +16,8 @@ const StyledValidIndicator = styled.div`
   }
 `
 
-const ValidIndicator = ({ valid, loading }) => (
-  <StyledValidIndicator className={valid ? 'valid' : 'invalid'}>
+const ValidIndicator = ({ valid, loading, top }) => (
+  <StyledValidIndicator className={valid ? 'valid' : 'invalid'} top={top}>
     {!loading && (valid ? '✔' : 'x')}
     {loading && '...'}
   </StyledValidIndicator>
@@ -26,6 +26,10 @@ const ValidIndicator = ({ valid, loading }) => (
 ValidIndicator.propTypes = {
   valid: PropTypes.bool.isRequired,
   loading: PropTypes.bool.isRequired,
+  top: PropTypes.number,
+}
+ValidIndicator.defaultProps = {
+  top: 18,
 }
 
 export default ValidIndicator

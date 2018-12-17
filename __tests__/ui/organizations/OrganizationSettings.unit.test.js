@@ -1,5 +1,6 @@
 import OrganizationSettings from '~/ui/organizations/OrganizationSettings'
 import fakeApiStore from '#/mocks/fakeApiStore'
+import { Heading3 } from '~/ui/global/styled/typography'
 
 let wrapper, component, apiStore, routingStore, props, organization
 
@@ -30,7 +31,7 @@ describe('OrganizationSettings', () => {
     })
 
     it('renders the page with TagEditor for domain whitelist', () => {
-      expect(wrapper.find('Heading2').exists()).toBeTruthy()
+      expect(wrapper.find(Heading3).exists()).toBeTruthy()
       expect(wrapper.find('TagEditor').props().record).toEqual(organization)
       expect(wrapper.find('TagEditor').props().tagField).toEqual(
         'domain_whitelist'

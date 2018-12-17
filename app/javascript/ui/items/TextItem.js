@@ -6,6 +6,7 @@ import styled from 'styled-components'
 
 import v from '~/utils/variables'
 import { CloseButton } from '~/ui/global/styled/buttons'
+import { QuillStyleWrapper } from '~/ui/global/styled/typography'
 import EditorPill from '~/ui/items/EditorPill'
 import TextItemToolbar from '~/ui/items/TextItemToolbar'
 import ChannelManager from '~/utils/ChannelManager'
@@ -404,7 +405,10 @@ class TextItem extends React.Component {
           position={fullPageView ? 'absolute' : 'fixed'}
         />
         {this.renderEditorPill}
-        <ReactQuill {...quillProps} value={this.textData} />
+
+        <QuillStyleWrapper>
+          <ReactQuill {...quillProps} value={this.textData} />
+        </QuillStyleWrapper>
       </StyledContainer>
     )
   }

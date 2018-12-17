@@ -1,7 +1,12 @@
 import { Flex } from 'reflexbox'
 import styled from 'styled-components'
 
+import v from '~/utils/variables'
+
 export const StyledTitleAndRoles = styled(Flex)`
+  @media only screen and (max-width: ${v.responsive.smallBreakpoint}px) {
+    padding-top: 4px;
+  }
   .page-menu {
     position: relative;
     top: -4px;
@@ -12,6 +17,13 @@ export const StyledTitleAndRoles = styled(Flex)`
   }
   &.user-profile .title {
     cursor: pointer;
+  }
+  .title {
+    padding-top: 4px;
+
+    @media only screen and (max-width: ${v.responsive.smallBreakpoint}px) {
+      padding-top: 10px;
+    }
   }
 `
 

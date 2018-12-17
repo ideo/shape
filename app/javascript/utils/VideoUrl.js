@@ -25,10 +25,7 @@ class VideoUrl {
 
     const data = this.getVideoId(url)
     const { service } = data
-    let { id } = data
-    if (service === 'vimeo' && !id) {
-      id = this.vimeoPrivate(url).id
-    }
+    const { id } = data
     retv.service = service
     retv.id = id
     retv.normalizedUrl = this.normalizedUrl(service, id)
@@ -42,6 +39,12 @@ class VideoUrl {
     if (url.match(new RegExp(VBRICK_DOMAIN, 'g'))) {
       service = 'vbrick'
       id = _.last(url.split('videos/'))
+    } else if (service === 'vimeo' && !id) {
+      const parsedUrl = parseUrl(url)
+      if (parsedUrl.pathname.split('/').length > 2) {
+        // the "id" in this case e.g. '123123/232323' is the pathname minus the first '/'
+        id = parsedUrl.pathname.slice(1)
+      }
     }
     return { id, service }
   }
@@ -62,25 +65,16 @@ class VideoUrl {
     }
   }
 
-  static vimeoPrivate(url) {
-    const parsedUrl = parseUrl(url)
-    if (parsedUrl.pathname.split('/').length > 2) {
-      // the "id" in this case e.g. '123123/232323' is the pathname minus the first '/'
-      const id = parsedUrl.pathname.slice(1)
-      return {
-        name: v.defaults.video.name,
-        thumbnailUrl: v.defaults.video.thumbnailUrl,
-        id,
-      }
+  static privateVideoDefaults(id) {
+    return {
+      name: v.defaults.video.name,
+      thumbnailUrl: v.defaults.video.thumbnailUrl,
+      id,
     }
-    return {}
   }
 
-  static getAPIdetails(url) {
+  static getAPIdetails(url, password = '') {
     const { id, service } = this.getVideoId(url)
-    if (service === 'vimeo' && !id) {
-      return this.vimeoPrivate()
-    }
     if (!service || !id) return {}
     if (!this.isValid(url)) return {}
 
@@ -88,7 +82,7 @@ class VideoUrl {
       case 'youtube':
         return this.getYoutubeDetails(id)
       case 'vimeo':
-        return this.getVimeoDetails(id)
+        return this.getVimeoDetails(id, password)
       case 'vbrick':
         return this.getVbrickDetails(id)
       default:
@@ -114,11 +108,15 @@ class VideoUrl {
         thumbnailUrl: thumb.url,
       }
     } catch (e) {
+      // there is no embedding of private youtube videos, so no point to allow it
       return {}
     }
   }
 
-  static async getVimeoDetails(id) {
+  static async getVimeoDetails(id, password = '') {
+    if (id.indexOf('/') > 0) {
+      return this.getVimeoPrivateDetails(id)
+    }
     const apiUrl = `https://api.vimeo.com/videos/${id}`
     try {
       const config = {
@@ -126,6 +124,7 @@ class VideoUrl {
           Authorization: `Bearer ${process.env.VIMEO_V3_API_KEY}`,
         },
       }
+      if (password) config.params = { password }
       const response = await axios.get(apiUrl, config)
       const { data } = response
       const thumbnail = _.find(
@@ -137,7 +136,34 @@ class VideoUrl {
         thumbnailUrl: thumbnail.link,
       }
     } catch (e) {
-      return {}
+      const { response } = e
+      let passwordRequired = false
+      if (
+        response &&
+        response.data &&
+        response.data.invalid_parameters &&
+        response.data.invalid_parameters.length &&
+        response.data.invalid_parameters[0].field === 'password'
+      ) {
+        passwordRequired = true
+      }
+      return {
+        ...this.privateVideoDefaults(id),
+        passwordRequired,
+      }
+    }
+  }
+
+  static async getVimeoPrivateDetails(id) {
+    const apiUrl = `https://vimeo.com/api/oembed.json?url=https://vimeo.com/${id}`
+    try {
+      const { data } = await axios.get(apiUrl)
+      return {
+        name: data.title,
+        thumbnailUrl: data.thumbnail_url,
+      }
+    } catch (e) {
+      return this.privateVideoDefaults(id)
     }
   }
 
@@ -156,16 +182,12 @@ class VideoUrl {
     } catch (e) {
       // could be a 404, or a 401...
       // until we have a vbrick login, hard to test how to respond to private/unauthorized
-      return this.vimeoPrivate()
+      return this.privateVideoDefaults(id)
     }
   }
 
   static isValid(url) {
     const { id, service } = this.getVideoId(url)
-    if (service === 'vimeo' && !id) {
-      return !!Object.keys(this.vimeoPrivate(url)).length
-    }
-
     if (!service || !id) return false
     switch (service) {
       case 'youtube':

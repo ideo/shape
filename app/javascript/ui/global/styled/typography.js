@@ -1,25 +1,28 @@
 import PropTypes from 'prop-types'
-import styled from 'styled-components'
+import styled, { css } from 'styled-components'
 import v from '~/utils/variables'
 
-/** @component */
-export const Heading1 = styled.h1`
+const Heading1Css = css`
   color: ${v.colors.black};
   font-family: ${v.fonts.sans};
-  font-size: 2.25rem;
+  font-size: 1.75rem;
   font-weight: ${v.weights.book};
-  line-height: 2.5rem;
+  line-height: 2rem;
   margin-bottom: 0.5rem;
   margin-top: 0.5rem;
   text-transform: none;
   white-space: ${props =>
     props.wrapLine ? 'normal' : 'nowrap'}; /* better this way for responsive? */
 
-  @media only screen and (max-width: ${v.responsive.smallBreakpoint}px) {
+  @media only screen and (max-width: ${v.responsive.largeBreakpoint}px) {
     padding: 1rem 0;
-    font-size: 2rem;
-    line-height: 2.2rem;
+    font-size: 1.5rem;
+    line-height: 1.75rem;
   }
+`
+/** @component */
+export const Heading1 = styled.h1`
+  ${Heading1Css};
 `
 Heading1.displayName = 'Heading1'
 
@@ -68,7 +71,7 @@ export const SubduedHeading1 = styled.h1`
   font-weight: 300;
   margin-bottom: 0;
   margin-left: 8px;
-  padding-top: 18px;
+  padding-top: 12px;
   text-transform: none;
   white-space: nowrap;
 `
@@ -154,29 +157,58 @@ export const Anchor = styled.a`
 `
 Anchor.displayName = 'StyledAnchor'
 
-// Keep in sync with assets/stylesheets/core/base.scss:quill h1
-export const CardHeading = Heading1.extend`
-  color: ${props => props.color || v.colors.commonLight}
-  font-size: 2rem;
-  line-height: 2.25rem;
+export const CardHeadingCss = css`
+  ${Heading1Css};
+  color: ${props => props.color || v.colors.commonLight};
   margin-bottom: 0.25rem;
   margin-top: 0;
   max-width: 100%;
   transition: all 0.33s 0.25s;
   white-space: normal;
 
-  @media only screen
-    and (min-width: ${v.responsive.medBreakpoint}px)
-    and (max-width: ${v.responsive.largeBreakpoint}px) {
+  @media only screen and (min-width: ${v.responsive
+      .medBreakpoint}px) and (max-width: ${v.responsive.largeBreakpoint}px) {
     padding: 0;
-    font-size: 1.75rem;
-    line-height: 2rem;
   }
 `
+export const CardHeading = Heading1.extend`
+  ${CardHeadingCss};
+`
 CardHeading.displayName = 'CardHeading'
+
+export const TextItemHeading1Css = css`
+  ${CardHeadingCss};
+
+  && {
+    color: ${v.colors.black};
+    margin-bottom: 0.75rem;
+  }
+`
 
 export const HugeNumber = Heading1.extend`
   font-size: 4.5rem;
   font-weight: ${v.weights.book};
   line-height: 3.75rem;
+`
+
+export const QuillStyleWrapper = styled.div`
+  .quill {
+    h1 {
+      ${TextItemHeading1Css};
+      color: ${v.colors.black};
+    }
+
+    h1,
+    h3 {
+      margin-bottom: 0.75rem;
+    }
+
+    p {
+      margin-bottom: 0.625rem;
+    }
+
+    p + h3 {
+      margin-top: 0.85rem;
+    }
+  }
 `

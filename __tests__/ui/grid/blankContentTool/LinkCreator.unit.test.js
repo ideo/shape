@@ -49,6 +49,23 @@ describe('LinkCreator', () => {
     })
   })
 
+  describe('with video password props', () => {
+    it('sends password props to GenericLinkCreator', () => {
+      component.setState({
+        passwordRequired: true,
+        password: '1234',
+      })
+      wrapper.update()
+
+      expect(wrapper.find('GenericLinkCreator').props().password).toEqual(
+        '1234'
+      )
+      expect(
+        wrapper.find('GenericLinkCreator').props().passwordField
+      ).toBeTruthy()
+    })
+  })
+
   describe('with generic link url', () => {
     it('calls createCard with link metadata when link is valid', () => {
       const meta = {
