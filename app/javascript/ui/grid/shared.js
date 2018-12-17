@@ -66,35 +66,37 @@ export const BctButton = styled.button`
 `
 BctButton.displayName = 'BctButton'
 
-export const StyledGridCardOverlay = styled.div`
-  z-index: 2;
-  height: 100%;
-  width: 100%;
-  background: ${v.colors.primaryMedium};
-  opacity: 0.6;
-  top: 0;
-  left: 0;
-  position: absolute;
-  /* make the overlay not capture any clicks */
-  pointer-events: none;
-`
-StyledGridCardOverlay.displayName = 'StyledGridCardOverlay'
-
 export const StyledGridCard = styled.div`
-  z-index: 1;
-  position: relative;
-  height: 100%;
-  width: 100%;
   background: white;
-  padding: 0;
+  box-shadow: ${props =>
+    props.dragging ? '1px 1px 5px 2px rgba(0, 0, 0, 0.25)' : ''};
   cursor: ${props => {
     if (props.dragging) return 'grabbing'
     else if (props.testCollectionCard) return 'auto'
     return 'pointer'
   }};
-  box-shadow: ${props =>
-    props.dragging ? '1px 1px 5px 2px rgba(0, 0, 0, 0.25)' : ''};
+  height: 100%;
   opacity: ${props => (props.dragging ? '0.95' : '1')};
+  padding: 0;
+  position: relative;
+  width: 100%;
+  z-index: 1;
+  ${props =>
+    props.selected &&
+    `
+  &:after {
+    background: ${v.colors.primaryDark};
+    content: '';
+    height: 100%;
+    left: 0;
+    opacity: 0.45;
+    pointer-events: none;
+    position: absolute;
+    width: 100%;
+    top: 0;
+    z-index: ${v.zIndex.cardDragging};
+  }
+  `};
 `
 StyledGridCard.displayName = 'StyledGridCard'
 

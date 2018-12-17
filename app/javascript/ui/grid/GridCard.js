@@ -31,7 +31,6 @@ import { uiStore } from '~/stores'
 import v, { ITEM_TYPES } from '~/utils/variables'
 import {
   StyledGridCard,
-  StyledGridCardOverlay,
   StyledBottomLeftIcon,
   StyledGridCardInner,
   StyledTopRightActions,
@@ -325,6 +324,7 @@ class GridCard extends React.Component {
         onContextMenu={this.openContextMenu}
         innerRef={c => (this.gridCardRef = c)}
         onMouseLeave={this.closeContextMenu}
+        selected={this.isSelected}
       >
         {canEditCollection &&
           (!card.isPinnedAndLocked || lastPinnedCard) && (
@@ -368,8 +368,6 @@ class GridCard extends React.Component {
             </StyledTopRightActions>
           )}
         {this.renderIcon}
-
-        {this.isSelected && <StyledGridCardOverlay />}
         {/* onClick placed here so it's separate from hotspot click */}
         <StyledGridCardInner
           onClick={this.handleClick}
