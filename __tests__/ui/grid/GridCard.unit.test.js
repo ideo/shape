@@ -281,8 +281,8 @@ describe('GridCard', () => {
       rerender()
     })
 
-    it('renders the colored overlay to indicate selection', () => {
-      expect(wrapper.find('StyledGridCardOverlay').exists()).toBe(true)
+    it('renders the colored to indicate selection', () => {
+      expect(wrapper.find('StyledGridCard').props().selected).toBe(true)
     })
   })
 
