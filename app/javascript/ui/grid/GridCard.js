@@ -304,6 +304,7 @@ class GridCard extends React.Component {
         data-cy="GridCard"
         onContextMenu={this.openContextMenu}
         innerRef={c => (this.gridCardRef = c)}
+        selected={uiStore.isSelected(card.id)}
       >
         {canEditCollection &&
           (!card.isPinnedAndLocked || lastPinnedCard) && (
