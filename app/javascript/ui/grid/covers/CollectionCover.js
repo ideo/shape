@@ -91,10 +91,10 @@ const StyledCardContent = styled.div`
     height: ${props => calcSectionHeight(props)};
   }
   .top {
-    top: ${pad}px;
+    top: ${props => props.gutter / 2 + pad}px;
   }
   .bottom {
-    bottom: ${props => (props.height === 1 ? `${pad / 2}` : pad)}px;
+    bottom: ${props => (props.height === 1 ? 6 : pad)}px;
   }
   ${props =>
     props.width > 1 &&
@@ -285,7 +285,7 @@ class CollectionCover extends React.Component {
             {this.launchTestButton}
             {this.collectionScore}
             {!this.hasLaunchTestButton && (
-              <Dotdotdot clamp={this.hasCollectionScore ? 2 : 'auto'}>
+              <Dotdotdot clamp={this.hasCollectionScore ? 2 : 3}>
                 {cover.text}
               </Dotdotdot>
             )}

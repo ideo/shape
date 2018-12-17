@@ -26,22 +26,6 @@ h1 {
   margin-bottom: 1rem;
 }
 
-// Keep in sync with ui/global/styled/typography:CardHeading
-.quill h1 {
-  font-size: 2rem;
-  font-weight: 300;
-  line-height: 2.25rem;
-  margin-bottom: 0.25rem;
-  text-transform: none;
-
-  @media only screen
-    and (min-width: $medBreakpoint)
-    and (max-width: $largeBreakpoint) {
-    font-size: 2rem;
-    line-height: 2.2rem;
-  }
-}
-
 h2 {
   font-size: 2rem;
   margin-bottom: 1rem;
