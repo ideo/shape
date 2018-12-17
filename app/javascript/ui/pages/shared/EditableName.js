@@ -11,7 +11,13 @@ import ClickWrapper from '~/ui/layout/ClickWrapper'
 
 const StyledName = styled.div`
   display: block;
+  margin-top: 0;
   vertical-align: top;
+
+  h1 {
+    margin-bottom: 0;
+    padding: 0;
+  }
 `
 StyledName.displayName = 'StyledName'
 

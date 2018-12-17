@@ -40,11 +40,12 @@ const IconHolder = styled.span`
   ${props =>
     props.align === 'left'
       ? 'margin-right: 12px;'
-      : 'margin-left: 6px;'} margin-top: 14px;
+      : 'margin-left: 6px;'} margin-top: 12px;
   width: 32px;
 
   @media only screen and (max-width: ${v.responsive.smallBreakpoint}px) {
     height: 36px;
+    margin-top: 8px;
     width: 20px;
   }
 `
@@ -322,7 +323,7 @@ class PageHeader extends React.Component {
               justify="space-between"
             >
               <Flex
-                align="flex-start"
+                align="center"
                 className="title"
                 onClick={this.handleTitleClick}
               >
@@ -410,7 +411,7 @@ class PageHeader extends React.Component {
                   alignItems: 'flex-end',
                   whiteSpace: 'nowrap',
                   height: '60px',
-                  marginTop: '-10px',
+                  marginTop: '-12px',
                 }}
                 ref={ref => {
                   this.updateActionsWidth(ref)

@@ -29,7 +29,7 @@ export const KEYS = {
 }
 
 export default {
-  globalHeaderHeight: 73,
+  globalHeaderHeight: 82,
   headerHeight: 192,
   headerHeightCompact: 100,
   maxWidth: 1320,
