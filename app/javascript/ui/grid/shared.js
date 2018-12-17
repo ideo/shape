@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types'
-import styled from 'styled-components'
+import styled, { css } from 'styled-components'
 
 import v from '~/utils/variables'
 import Truncator from 'react-truncator'
@@ -160,7 +160,7 @@ export const StyledGridCardInner = styled.div`
 `
 StyledGridCardInner.displayName = 'StyledGridCardInner'
 
-const TopActions = styled.css`
+const TopActions = css`
   align-items: center;
   display: flex;
   position: absolute;
@@ -168,10 +168,12 @@ const TopActions = styled.css`
   z-index: ${v.zIndex.gridCardTop};
 `
 export const StyledTopLeftActions = styled.div`
-  ${TopActions} left: 0.25rem;
+  ${TopActions};
+  left: 0.25rem;
 `
 
 export const StyledTopRightActions = styled.div`
+  ${TopActions};
   background-color: ${v.colors.commonLightest};
   border-radius: 4px;
   height: 34px;
