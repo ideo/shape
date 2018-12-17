@@ -32,11 +32,11 @@ class Item
     private
 
     def internal_report
-      DataReport.new(self)
+      DataReport::Internal.new(self)
     end
 
     def external_report
-      ExternalDataReport.new(self)
+      DataReport::External.new(self)
     end
 
     def data_settings_validations
