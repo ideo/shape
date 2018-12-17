@@ -240,8 +240,10 @@ class CollectionCover extends React.Component {
   }
 
   handleClick = e => {
-    const { dragging } = this.props
-    if (dragging) {
+    const { dragging, uiStore } = this.props
+    const makingSelection =
+      (e.metaKey || e.ctrlKey || e.shiftKey) && uiStore.selectedCardIds.length
+    if (dragging || makingSelection) {
       e.preventDefault()
       return false
     }
