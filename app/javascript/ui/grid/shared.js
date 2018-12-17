@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types'
-import styled from 'styled-components'
+import styled, { css } from 'styled-components'
 
 import v from '~/utils/variables'
 import Truncator from 'react-truncator'
@@ -160,26 +160,24 @@ export const StyledGridCardInner = styled.div`
 `
 StyledGridCardInner.displayName = 'StyledGridCardInner'
 
-// TODO copy shared from right/left
-export const StyledTopLeftActions = styled.div`
+const TopActions = css`
   align-items: center;
   display: flex;
-  left: 0.25rem;
   position: absolute;
   top: 0.35rem;
   z-index: ${v.zIndex.gridCardTop};
 `
+export const StyledTopLeftActions = styled.div`
+  ${TopActions};
+  left: 0.25rem;
+`
 
 export const StyledTopRightActions = styled.div`
-  align-items: center;
+  ${TopActions};
   background-color: ${v.colors.commonLightest};
   border-radius: 4px;
-  display: flex;
   height: 34px;
-  position: absolute;
   right: 0.25rem;
-  top: 0.35rem;
-  z-index: ${v.zIndex.gridCardTop};
 
   .selected {
     border-color: ${props => props.color};
