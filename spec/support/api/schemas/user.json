@@ -5,7 +5,6 @@
     "email": { "type": "string" },
     "first_name": { "type": "string" },
     "handle": { "type": "string" },
-    "is_super_admin": { "type": "boolean" },
     "last_name": { "type": "string" },
     "pic_url_square": { "type": "string" },
     "status": { "type": "string" },
