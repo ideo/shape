@@ -74,6 +74,7 @@ class User < ApplicationRecord
     active: 0,
     pending: 1,
     deleted: 2,
+    archived: 3,
   }
 
   # to turn off devise validatable for uniqueness of email

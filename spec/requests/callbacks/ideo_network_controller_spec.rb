@@ -274,7 +274,7 @@ describe 'Ideo Profile API Requests' do
         expect(response.status).to eq(200)
       end
 
-      it 'deletes the user' do
+      it 'archives the user' do
         expect(User.find_by_id(user.id)).to eq(user)
 
         post(
@@ -283,7 +283,7 @@ describe 'Ideo Profile API Requests' do
           headers: valid_headers,
         )
 
-        expect(User.find_by_id(user.id)).to be_nil
+        expect(User.find_by_id(user.id).archived?).to be true
       end
 
       it 'returns a 200 if user does not exist' do
