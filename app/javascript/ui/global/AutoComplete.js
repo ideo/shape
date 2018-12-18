@@ -5,7 +5,7 @@ import { withStyles, withTheme } from '@material-ui/core/styles'
 import AsyncSelect from 'react-select/lib/Async'
 import Input from '@material-ui/core/Input'
 import Chip from '@material-ui/core/Chip'
-import Creatable from 'react-select/lib/Creatable'
+import AsyncCreatable from 'react-select/lib/AsyncCreatable'
 import Select from 'react-select'
 import { pick } from 'lodash'
 
@@ -113,7 +113,7 @@ const selectStyles = theme => ({
 
 const SelectWrapped = props => {
   const { classes, theme, creatable, options, optionSearch, ...other } = props
-  if (optionSearch) {
+  if (optionSearch && !creatable) {
     // Option search will do an async search for options.
     return (
       <AsyncSelect
@@ -129,16 +129,19 @@ const SelectWrapped = props => {
       />
     )
   }
-  return creatable ? (
-    <Creatable
-      formatCreateLabel={inputValue => `Invite email ${inputValue}`}
+  return optionSearch && creatable ? (
+    <AsyncCreatable
+      loadOptions={optionSearch}
+      defaultOptions
       styles={selectStyles(theme)}
+      formatCreateLabel={inputValue => `Invite email ${inputValue}`}
       components={{
         valueComponent: valueComponent(classes),
         DropdownIndicator,
         Option,
       }}
       noOptionsMessage={() => 'No results found'}
+      options={options}
       {...other}
     />
   ) : (
@@ -149,6 +152,7 @@ const SelectWrapped = props => {
         DropdownIndicator,
         Option,
       }}
+      options={options}
       {...other}
     />
   )
@@ -187,7 +191,8 @@ class AutoComplete extends React.Component {
     this.setState({
       option,
     })
-    let fullOption = this.props.options.find(x => x === option)
+    // let fullOption = this.props.options.find(x => x === option)
+    let fullOption = option
     if (!fullOption || !fullOption.data) {
       fullOption = Object.assign({}, { data: { custom: option.value } })
     }

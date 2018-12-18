@@ -59,8 +59,10 @@ class Api::V1::SearchController < Api::V1::BaseController
   end
 
   def search_users_and_groups(query)
+    indexes = [User]
+    indexes << Group unless params[:users_only]
     Search.new(
-      index_name: [User, Group],
+      index_name: indexes,
       match: :word_start,
       where: {
         organization_ids: [current_organization.id],
