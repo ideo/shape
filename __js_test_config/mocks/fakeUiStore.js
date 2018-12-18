@@ -79,6 +79,7 @@ const fakeUiStore = {
   isNewCard: jest.fn(),
   editingCardId: 0,
   toggleEditingCardId: jest.fn(),
+  autocompleteMenuClosed: jest.fn(),
 }
 
 export default fakeUiStore

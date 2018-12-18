@@ -40,27 +40,29 @@ class RolesAdd extends React.Component {
     this.selectedRole = first
     uiStore.autocompleteMenuClosed()
 
-    this.debouncedSearch = _.debounce((term, callback) => {
-      if (!term) {
-        uiStore.autocompleteMenuClosed()
-        callback()
-        return
-      }
+    this.debouncedSearch = _.debounce(this._autocompleteSearch, 350)
+  }
 
-      const { ownerType } = this.props
-      let searchMethod = 'searchUsersAndGroups'
-      if (ownerType === 'groups') {
-        searchMethod = 'searchUsers'
-      }
-      apiStore[searchMethod](term)
-        .then(res => {
-          uiStore.update('autocompleteValues', res.data.length)
-          callback(this.mapItems(res.data))
-        })
-        .catch(e => {
-          trackError(e)
-        })
-    }, 350)
+  _autocompleteSearch = (term, callback) => {
+    if (!term) {
+      uiStore.autocompleteMenuClosed()
+      callback()
+      return
+    }
+
+    const { ownerType } = this.props
+    let searchMethod = 'searchUsersAndGroups'
+    if (ownerType === 'groups') {
+      searchMethod = 'searchUsers'
+    }
+    apiStore[searchMethod](term)
+      .then(res => {
+        uiStore.update('autocompleteValues', res.data.length)
+        callback(this.mapItems(res.data))
+      })
+      .catch(e => {
+        trackError(e)
+      })
   }
 
   onSearch = (value, callback) => this.debouncedSearch(value, callback)

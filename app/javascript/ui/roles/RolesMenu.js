@@ -1,8 +1,6 @@
-import _ from 'lodash'
 import { Fragment } from 'react'
 import PropTypes from 'prop-types'
 import styled from 'styled-components'
-import { action, observable } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import { Collapse } from '@material-ui/core'
 import { Heading3, DisplayText } from '~/ui/global/styled/typography'
@@ -49,38 +47,7 @@ const StyledExpandToggle = styled.button`
 @inject('apiStore', 'routingStore')
 @observer
 class RolesMenu extends React.Component {
-  @observable
-  searchableItems = []
-
-  constructor(props) {
-    super(props)
-    this.state = {}
-  }
-
-  componentDidMount() {
-    const { apiStore, ownerType } = this.props
-    const organizationId = apiStore.currentUserOrganizationId
-    const req = type =>
-      this.props.apiStore.request(
-        `organizations/${organizationId}/${type}`,
-        'GET'
-      )
-    // Groups should not be addable to other groups, return nothing for
-    // consistency
-    const reqs =
-      ownerType === 'groups'
-        ? [req('users'), Promise.resolve({ data: [] })]
-        : [req('users'), req('groups')]
-
-    Promise.all(reqs).then(res => {
-      const users = res[0].data
-      const groups = res[1].data
-      this.visibleUsers = users
-      this.visibleGroups = groups
-      this.setSearchableItems([...groups, ...users])
-      this.filterSearchableItems()
-    })
-  }
+  state = {}
 
   entityGroups(entities) {
     const groups = [
@@ -114,31 +81,6 @@ class RolesMenu extends React.Component {
     return groups
   }
 
-  filterSearchableItems() {
-    const filteredUsers = this.filterSearchableUsers(this.visibleUsers)
-    const filteredGroups = this.filterSearchableGroups(this.visibleGroups)
-    this.setSearchableItems([...filteredGroups, ...filteredUsers])
-  }
-
-  filterSearchableUsers(userRoles) {
-    const { roles } = this.props
-    return _.reject(userRoles, userRole =>
-      roles.find(role => role.users.find(user => user.id === userRole.id))
-    )
-  }
-
-  filterSearchableGroups(groupRoles) {
-    const { roles } = this.props
-    return _.reject(groupRoles, groupRole =>
-      roles.find(role => role.groups.find(group => group.id === groupRole.id))
-    )
-  }
-
-  @action
-  setSearchableItems(items) {
-    this.searchableItems = items
-  }
-
   deleteRoles = (role, entity, opts = {}) =>
     role.API_delete(entity, opts).then(res => {
       // We should do a page reload to get the correct user's new org
@@ -147,9 +89,7 @@ class RolesMenu extends React.Component {
         window.location.reload()
       }
       if (!opts.isSwitching) {
-        const saveReturn = this.props.onSave(res, { roleName: role.name })
-        this.filterSearchableItems()
-        return saveReturn
+        return this.props.onSave(res, { roleName: role.name })
       }
       return {}
     })
@@ -170,11 +110,7 @@ class RolesMenu extends React.Component {
     }
     return apiStore
       .request(`${ownerType}/${ownerId}/roles`, 'POST', data)
-      .then(res => {
-        const saveReturn = onSave(res, { roleName })
-        this.filterSearchableItems()
-        return saveReturn
-      })
+      .then(res => onSave(res, { roleName }))
       .catch(err => {
         uiStore.alert(err.error[0])
       })
@@ -187,11 +123,6 @@ class RolesMenu extends React.Component {
       .catch(err => {
         uiStore.alert(err.error[0])
       })
-  }
-
-  onUserSearch = searchTerm => {
-    const { apiStore } = this.props
-    return apiStore.request(`users/search?query=${searchTerm}`)
   }
 
   notCurrentUser(entity) {
@@ -302,7 +233,6 @@ class RolesMenu extends React.Component {
           <FooterArea menuOpen={uiStore.autocompleteValues > 0}>
             <Heading3>{addCallout}</Heading3>
             <RolesAdd
-              searchableItems={this.searchableItems}
               roleTypes={addRoleTypes}
               roleLabels={submissionBox ? { viewer: 'participant' } : {}}
               onCreateRoles={this.createRoles}
