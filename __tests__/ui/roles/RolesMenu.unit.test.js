@@ -1,7 +1,7 @@
 import { observable } from 'mobx'
 import RolesMenu from '~/ui/roles/RolesMenu'
 
-import { fakeOrganization, fakeUser, fakeRole } from '#/mocks/data'
+import { fakeUser, fakeRole } from '#/mocks/data'
 
 const apiStore = observable({
   request: jest.fn().mockReturnValue(Promise.resolve({ data: [] })),
@@ -42,73 +42,6 @@ describe('RolesMenu', () => {
     component = wrapper.instance()
   })
 
-  describe('componentDidMount', () => {
-    beforeEach(() => {
-      component.filterSearchableItems = jest.fn()
-      apiStore.request.mockReturnValue(Promise.resolve({ data: [] }))
-    })
-
-    it('should request all the organization groups and users', () => {
-      expect(apiStore.request).toHaveBeenCalledWith(
-        `organizations/${fakeOrganization.id}/users`,
-        'GET'
-      )
-      expect(apiStore.request).toHaveBeenCalledWith(
-        `organizations/${fakeOrganization.id}/groups`,
-        'GET'
-      )
-    })
-  })
-
-  describe('filterSearchableItems', () => {
-    let roles
-    let visibleUsers
-    let visibleGroups
-
-    beforeEach(() => {
-      roles = [
-        { id: 23, users: [{ id: 3, internalType: 'users' }], groups: [] },
-        { id: 26, groups: [{ id: 6, internalType: 'groups' }], users: [] },
-      ]
-      visibleUsers = [
-        { id: 3, internalType: 'users' },
-        { id: 33, internalType: 'users' },
-      ]
-      visibleGroups = [
-        { id: 6, internalType: 'groups' },
-        { id: 64, internalType: 'groups' },
-      ]
-      wrapper.setProps(props)
-      component.visibleUsers = visibleUsers
-      component.visibleGroups = visibleGroups
-      props.roles = roles
-      component.filterSearchableItems()
-    })
-
-    it('should filter out users in roles from visible users', () => {
-      expect(component.searchableItems).toContainEqual(visibleUsers[1])
-      expect(component.searchableItems).not.toContainEqual(visibleUsers[0])
-    })
-
-    it('should filter out groups in roles from visible groups', () => {
-      expect(component.searchableItems).toContainEqual(visibleGroups[1])
-      expect(component.searchableItems).not.toContainEqual(visibleGroups[0])
-    })
-  })
-
-  describe('onUserSearch', () => {
-    describe('when a user is found', () => {
-      it('should api request the users search route', done => {
-        component.onUserSearch('mary').then(() => {
-          expect(apiStore.request).toHaveBeenCalledWith(
-            'users/search?query=mary'
-          )
-          done()
-        })
-      })
-    })
-  })
-
   describe('deleteRoles', () => {
     const role = fakeRole
     const user = { id: 4, internalType: 'users' }
@@ -139,10 +72,6 @@ describe('RolesMenu', () => {
         expect(props.onSave).toHaveBeenCalledWith(fakeData, {
           roleName: fakeRole.name,
         })
-      })
-
-      it('should filter the searchable items', () => {
-        expect(component.filterSearchableItems).toHaveBeenCalled()
       })
     })
   })
@@ -179,10 +108,6 @@ describe('RolesMenu', () => {
 
       it('should call onSave', () => {
         expect(props.onSave).toHaveBeenCalled()
-      })
-
-      it('should filter the searchable items', () => {
-        expect(component.filterSearchableItems).toHaveBeenCalled()
       })
 
       describe('when not switching roles', () => {

@@ -291,20 +291,32 @@ describe Organization, type: :model do
 
   describe '#setup_user_membership_and_collections' do
     let(:user) { create(:user, email: 'jill@ideo.com') }
-    let(:organization) { create(:organization, domain_whitelist: ['ideo.com']) }
+    let(:getting_started) { create(:global_collection) }
+    let!(:subcollection_cards) { create_list(:collection_card_collection, 2, parent: getting_started) }
+    let!(:item_cards) { create_list(:collection_card_text, 2, parent: getting_started) }
+    let!(:organization) do
+      # adding `member: user` will call user.setup_user_membership_and_collections
+      create(:organization, domain_whitelist: ['ideo.com'], getting_started_collection: getting_started, member: user)
+    end
 
-    it 'should create a UserCollection and SharedWithMeCollection for the user' do
-      organization.setup_user_membership_and_collections(user)
-      expect(user.collections.size).to eq(2)
+    it 'should create a UserCollection, SharedWithMeCollection and Getting Started collection for the user' do
+      expect(user.collections.size).to eq(3)
+      # SharedWithMe and Getting Started live within the user collection
+      expect(user.current_user_collection.collections.size).to eq(2)
+    end
+
+    it 'should set the Getting Started copy collections to getting_started_shell' do
+      gs_copy = user.current_user_collection.collections.last
+      expect(gs_copy.cloned_from).to eq getting_started
+      # all collections in the copy should be marked with the getting_started_shell attr
+      expect(gs_copy.collections.map(&:getting_started_shell).all?).to eq true
     end
 
     it 'adds as an org member if they match the domain' do
-      organization.setup_user_membership_and_collections(user)
       expect(user.has_role?(Role::MEMBER, organization.primary_group)).to be true
     end
 
     it 'should set the user to be on the current organization' do
-      organization.setup_user_membership_and_collections(user)
       expect(user.current_organization).to eq(organization)
       expect(user.current_user_collection_id).not_to be nil
     end

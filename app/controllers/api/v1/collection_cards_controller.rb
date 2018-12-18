@@ -119,24 +119,15 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
   before_action :check_valid_duplication, only: %i[duplicate]
   def duplicate
     placement = json_api_params[:placement]
-    should_update_cover = false
-    # reverse cards for 'beginning' since they get duplicated one by one to the front
-    @cards = @cards.reverse if placement == 'beginning'
-    new_cards = []
-    @cards.each do |card|
-      dup = card.duplicate!(
-        for_user: current_user,
-        parent: @to_collection,
-        placement: placement,
-        duplicate_linked_records: true,
-      )
-      should_update_cover ||= dup.should_update_parent_collection_cover?
-      @from_collection = Collection.find(json_api_params[:from_id])
+    new_cards = CollectionCardDuplicator.call(
+      to_collection: @to_collection,
+      cards: @cards,
+      placement: placement,
+      for_user: current_user,
+    )
+    new_cards.each do |card|
       create_notification(card, :duplicated)
-      new_cards << dup
     end
-    @to_collection.reorder_cards!
-    @to_collection.cache_cover! if should_update_cover
     # NOTE: for some odd reason the json api refuses to render the newly created cards here,
     # so we end up re-fetching the to_collection later in the front-end
     render jsonapi: @to_collection.reload,

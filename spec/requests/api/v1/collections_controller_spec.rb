@@ -182,6 +182,22 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
         expect(json['data']['attributes']['template_num_instances']).to eq(3)
       end
     end
+
+    context 'with getting_started_shell collection' do
+      let(:getting_started) { create(:collection, num_cards: 2) }
+      before do
+        user.add_role(Role::EDITOR, collection)
+        collection.update(getting_started_shell: true, cloned_from: getting_started)
+      end
+
+      it 'calls the PopulateGettingStartedShellCollection service' do
+        expect(PopulateGettingStartedShellCollection).to receive(:call).with(
+          collection,
+          for_user: user,
+        )
+        get(path)
+      end
+    end
   end
 
   describe 'POST #create_template' do

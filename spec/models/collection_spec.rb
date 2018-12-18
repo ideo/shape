@@ -145,7 +145,10 @@ describe Collection, type: :model do
     let!(:parent_collection_user) { create(:user) }
     let!(:collection_user) { create(:user) }
     let!(:parent_collection) { create(:collection) }
-    let!(:collection) { create(:collection, num_cards: 3, tag_list: %w[Prototype Other]) }
+    let(:organization) { parent_collection.organization }
+    let!(:collection) do
+      create(:collection, num_cards: 3, tag_list: %w[Prototype Other], organization: organization)
+    end
     let!(:parent_collection_card) do
       create(:collection_card_collection, parent: parent_collection, collection: collection)
     end
@@ -213,11 +216,8 @@ describe Collection, type: :model do
     context 'with copy_parent_card true' do
       let!(:copy_parent_card) { true }
 
-      it 'duplicates parent' do
-        expect(duplicate.id).not_to eq(collection.parent_collection_card.id)
-      end
-
       it 'creates duplicate with parent_collection as its parent' do
+        expect(duplicate.id).not_to eq(collection.id)
         expect(duplicate.parent).to eq parent_collection
       end
 
@@ -305,6 +305,32 @@ describe Collection, type: :model do
           true,
         )
         collection.duplicate!(for_user: user, system_collection: true, synchronous: true)
+      end
+    end
+
+    context 'with a collection inside the system-generated getting started collection' do
+      let(:getting_started_collection) { create(:global_collection, organization: organization) }
+      let(:duplicate) do
+        collection.duplicate!(
+          for_user: user,
+          copy_parent_card: copy_parent_card,
+          parent: parent,
+          system_collection: true,
+        )
+      end
+
+      before do
+        parent_collection.update(cloned_from: getting_started_collection)
+        organization.update(getting_started_collection: getting_started_collection)
+      end
+
+      it 'should mark the duplicate as a getting_started_shell' do
+        expect(duplicate.getting_started_shell).to be true
+      end
+
+      it 'should not create any collection cards' do
+        expect(CollectionCardDuplicationWorker).not_to receive(:new)
+        expect(duplicate.collection_cards.count).to eq 0
       end
     end
   end

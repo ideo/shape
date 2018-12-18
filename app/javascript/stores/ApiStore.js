@@ -134,6 +134,12 @@ class ApiStore extends jsonapi(datxCollection) {
     return this.request(`search/users_and_groups?query=${query}`)
   }
 
+  searchUsers(query) {
+    return this.request(
+      `search/users_and_groups?query=${query}&users_only=true`
+    )
+  }
+
   searchCollections(params) {
     const defaultParams = { query: '' }
     return this.request(

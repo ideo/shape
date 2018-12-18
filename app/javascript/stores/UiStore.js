@@ -150,6 +150,8 @@ export default class UiStore {
   launchButtonLoading = false
   @observable
   newCards = []
+  @observable
+  autocompleteValues = 0
 
   @action
   toggleEditingCardId(cardId) {
@@ -610,5 +612,10 @@ export default class UiStore {
 
   isNewCard(id) {
     return this.newCards.indexOf(id) !== -1
+  }
+
+  @action
+  autocompleteMenuClosed() {
+    this.autocompleteValues = 0
   }
 }

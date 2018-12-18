@@ -1,7 +1,7 @@
 import _ from 'lodash'
 import PropTypes from 'prop-types'
 import { observable, action } from 'mobx'
-import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
+import { observer } from 'mobx-react'
 import styled from 'styled-components'
 import MenuItem from '@material-ui/core/MenuItem'
 
@@ -17,7 +17,7 @@ import AutoComplete from '~/ui/global/AutoComplete'
 import PillList from '~/ui/global/PillList'
 import EmailCSVUploader from '~/ui/global/EmailCSVUploader'
 import InlineLoader from '~/ui/layout/InlineLoader'
-import { uiStore } from '~/stores'
+import { apiStore, uiStore } from '~/stores'
 
 const RightAligner = styled.span`
   margin-right: 30px;
@@ -38,15 +38,44 @@ class RolesAdd extends React.Component {
     super(props)
     const [first] = this.props.roleTypes
     this.selectedRole = first
+    uiStore.autocompleteMenuClosed()
+
+    this.debouncedSearch = _.debounce(this._autocompleteSearch, 350)
   }
+
+  _autocompleteSearch = (term, callback) => {
+    if (!term) {
+      uiStore.autocompleteMenuClosed()
+      callback()
+      return
+    }
+
+    const { ownerType } = this.props
+    let searchMethod = 'searchUsersAndGroups'
+    if (ownerType === 'groups') {
+      searchMethod = 'searchUsers'
+    }
+    apiStore[searchMethod](term)
+      .then(res => {
+        uiStore.update('autocompleteValues', res.data.length)
+        callback(this.mapItems(res.data))
+      })
+      .catch(e => {
+        trackError(e)
+      })
+  }
+
+  onSearch = (value, callback) => this.debouncedSearch(value, callback)
 
   @action
   onUserSelected = data => {
     let existing = null
     let entity = data
+
     // check if the input is just an email string e.g. "person@email.com"
     const emailInput = !data.id
     if (emailInput && !isEmail(data.custom)) {
+      if (!data.custom) return
       // try filtering out for emails within the string
       // NOTE: this will re-call onUserSelected with any valid emails
       this.handleEmailInput(_.filter(data.custom.match(/[^\s,]+/g), isEmail))
@@ -160,9 +189,8 @@ class RolesAdd extends React.Component {
     })
   }
 
-  mapItems() {
-    const { searchableItems } = this.props
-    return searchableItems.map(item => {
+  mapItems = searchableItems =>
+    searchableItems.map(item => {
       let value
       if (item.internalType === 'users') {
         value = item.email || item.name
@@ -173,7 +201,6 @@ class RolesAdd extends React.Component {
       }
       return { value, label: item.name, data: item }
     })
-  }
 
   labelFor = roleType => {
     const { roleLabels } = this.props
@@ -215,7 +242,8 @@ class RolesAdd extends React.Component {
         {this.renderPillList()}
         <Row>
           <AutoComplete
-            options={this.mapItems()}
+            options={[]}
+            optionSearch={this.onSearch}
             onOptionSelect={this.onUserSelected}
             placeholder="email address or username"
             creatable
@@ -256,7 +284,6 @@ class RolesAdd extends React.Component {
 }
 
 RolesAdd.propTypes = {
-  searchableItems: MobxPropTypes.arrayOrObservableArray.isRequired,
   roleTypes: PropTypes.arrayOf(PropTypes.string).isRequired,
   roleLabels: PropTypes.shape({
     editor: PropTypes.string,

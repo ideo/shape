@@ -121,6 +121,12 @@ export const SubText = styled.span`
   vertical-align: super;
   font-family: ${v.fonts.serif};
   font-size: 0.75rem;
+  ${props =>
+    props.compact &&
+    `
+    display: block;
+    margin-top: -7px;
+  `};
 `
 SubText.displayName = 'StyledSubText'
 
