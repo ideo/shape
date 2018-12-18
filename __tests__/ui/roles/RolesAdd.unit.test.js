@@ -1,4 +1,7 @@
 import RolesAdd from '~/ui/roles/RolesAdd'
+import { apiStore } from '~/stores'
+
+jest.mock('../../../app/javascript/stores')
 
 let props
 let wrapper
@@ -15,6 +18,32 @@ describe('RolesAdd', () => {
       ownerType: 'collections',
     }
     wrapper = mount(<RolesAdd {...props} />)
+  })
+
+  describe('_autocompleteSearch', () => {
+    // test the non-debounced function
+
+    describe('with groups', () => {
+      beforeEach(() => {
+        wrapper = mount(<RolesAdd {...props} ownerType="groups" />)
+      })
+
+      it('should call apiStore to search users only', () => {
+        wrapper.instance()._autocompleteSearch('person', jest.fn())
+        expect(apiStore.searchUsers).toHaveBeenCalledWith('person')
+      })
+    })
+
+    describe('with collections', () => {
+      beforeEach(() => {
+        wrapper = mount(<RolesAdd {...props} ownerType="collections" />)
+      })
+
+      it('should call apiStore to search users only', () => {
+        wrapper.instance()._autocompleteSearch('person', jest.fn())
+        expect(apiStore.searchUsersAndGroups).toHaveBeenCalledWith('person')
+      })
+    })
   })
 
   describe('onUserSelected', () => {
