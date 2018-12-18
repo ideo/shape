@@ -39,7 +39,7 @@ const DropdownIndicator = () => (
 
 const LoadingIndicator = () => (
   <LoadingContainer>
-    <Loader size="25" containerHeight="30px" />
+    <Loader size={25} containerHeight="30px" />
   </LoadingContainer>
 )
 
