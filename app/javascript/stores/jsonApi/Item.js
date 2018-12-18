@@ -101,7 +101,12 @@ class Item extends SharedRecordMixin(BaseRecord) {
     const { data_settings } = this
     if (!data_settings || !data_settings.d_measure) return {}
     const measure = _.find(DATA_MEASURES, { value: data_settings.d_measure })
-    if (!measure) return {}
+    if (!measure) {
+      const measureName = _.capitalize(data_settings.d_measure)
+      return {
+        name: measureName,
+      }
+    }
     return measure
   }
 

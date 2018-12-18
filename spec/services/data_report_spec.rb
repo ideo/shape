@@ -1,11 +1,11 @@
 require 'rails_helper'
 
-RSpec.describe DataReport, type: :service do
+RSpec.describe DataReport::Internal, type: :service do
   let(:organization) { create(:organization_without_groups) }
   # parent needed for calculations that lookup org id
   let(:parent_collection) { create(:collection, organization: organization) }
   let(:data_item) { create(:data_item, parent_collection: parent_collection) }
-  let(:report) { DataReport.new(data_item) }
+  let(:report) { DataReport::Internal.new(data_item) }
 
   describe '#call' do
     context 'filtering by organization' do

@@ -6,7 +6,9 @@ RSpec.describe Item::DataItem, type: :model do
 
     it 'should validate that d_measure is one the valid measures' do
       expect(item.update(d_measure: 'something_bad')).to eq(false)
-      expect(item.errors).to match_array(['Data settings measure must be one of participants, viewers, activity, content, collections, items, records'])
+      expect(item.errors).to match_array(
+        ['Data settings measure must be one of participants, viewers, activity, content, collections, items, records'],
+      )
       expect(item.update(d_measure: 'viewers')).to eq(true)
       expect(item.errors.empty?).to be true
     end
@@ -18,9 +20,10 @@ RSpec.describe Item::DataItem, type: :model do
       expect(item.errors.empty?).to be true
     end
   end
-  describe '#data_values' do
+
+  describe '#data' do
     let(:item) { create(:data_item) }
-    let(:service_double) { double('DataReport') }
+    let(:service_double) { double('DataReport::Internal') }
 
     it 'should call the DataReport service' do
       allow(item).to receive(:report).and_return(service_double)
