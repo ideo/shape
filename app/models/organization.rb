@@ -54,9 +54,10 @@ class Organization < ApplicationRecord
   end
 
   # NOTE: this method can be called many times for the same org
-  def setup_user_membership_and_collections(user)
+  def setup_user_membership_and_collections(user, synchronous: false)
     # make sure they're on the org
     Collection::UserCollection.find_or_create_for_user(user, self)
+    find_or_create_user_getting_started_collection(user, synchronous: synchronous)
     setup_user_membership(user)
   end
 
