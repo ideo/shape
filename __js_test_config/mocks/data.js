@@ -230,6 +230,7 @@ export const fakeCollection = {
   API_updateCards: jest.fn(),
   API_updateName: jest.fn(),
   API_getNextAvailableTest: jest.fn(),
+  API_clearCollectionCover: jest.fn(),
   checkCurrentOrg: jest.fn(),
   confirmEdit: jest.fn(),
   cardProperties: [],

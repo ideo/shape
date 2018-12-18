@@ -34,6 +34,7 @@ const TopRightHolder = styled.div`
   width: ${props => props.width}px;
   z-index: ${v.zIndex.gridCardTop};
 `
+TopRightHolder.displayName = 'TopRightHolder'
 
 @inject('apiStore')
 @observer

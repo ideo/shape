@@ -16,6 +16,7 @@ const Option = styled.span`
   height: 32px;
   width: 32px;
 `
+Option.displayName = 'QuickOption'
 
 class QuickOptionSelector extends React.Component {
   handleClick = option => {
