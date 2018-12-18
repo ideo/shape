@@ -38,9 +38,11 @@ class RolesAdd extends React.Component {
     super(props)
     const [first] = this.props.roleTypes
     this.selectedRole = first
+    uiStore.autocompleteMenuClosed()
 
     this.debouncedSearch = _.debounce((term, callback) => {
       if (!term) {
+        uiStore.autocompleteMenuClosed()
         callback()
         return
       }
@@ -52,6 +54,7 @@ class RolesAdd extends React.Component {
       }
       apiStore[searchMethod](term)
         .then(res => {
+          uiStore.update('autocompleteValues', res.data.length)
           callback(this.mapItems(res.data))
         })
         .catch(e => {
@@ -70,6 +73,7 @@ class RolesAdd extends React.Component {
     // check if the input is just an email string e.g. "person@email.com"
     const emailInput = !data.id
     if (emailInput && !isEmail(data.custom)) {
+      if (!data.custom) return
       // try filtering out for emails within the string
       // NOTE: this will re-call onUserSelected with any valid emails
       this.handleEmailInput(_.filter(data.custom.match(/[^\s,]+/g), isEmail))
@@ -236,7 +240,6 @@ class RolesAdd extends React.Component {
         {this.renderPillList()}
         <Row>
           <AutoComplete
-            // options={this.mapItems()}
             options={[]}
             optionSearch={this.onSearch}
             onOptionSelect={this.onUserSelected}
