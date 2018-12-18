@@ -21,6 +21,7 @@ Rails.application.routes.draw do
       resources :collections, except: %i[index] do
         member do
           get 'in_my_collection'
+          post 'clear_collection_cover'
         end
         collection do
           post 'create_template'

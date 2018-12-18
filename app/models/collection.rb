@@ -543,6 +543,11 @@ class Collection < ApplicationRecord
     collections.each(&:processing_done) if processing_status.nil?
   end
 
+  def clear_collection_cover
+    cover = primary_collection_cards.where(is_cover: true).first
+    cover.update(is_cover: false)
+  end
+
   # =================================
   # Various boolean queries/checks
   # - many are related to test collections and submission_boxes

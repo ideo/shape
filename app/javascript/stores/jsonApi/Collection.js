@@ -129,6 +129,10 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     return this.type === 'Collection::SharedWithMeCollection'
   }
 
+  get canSetACover() {
+    return !this.isSharedCollection && !this.isUserCollection
+  }
+
   get isSubmissionBox() {
     return this.type === 'Collection::SubmissionBox'
   }
@@ -459,6 +463,13 @@ class Collection extends SharedRecordMixin(BaseRecord) {
       `collections/set_submission_box_template`,
       'POST',
       data
+    )
+  }
+
+  API_clearCollectionCover() {
+    return this.apiStore.request(
+      `collections/${this.id}/clear_collection_cover`,
+      'POST'
     )
   }
 

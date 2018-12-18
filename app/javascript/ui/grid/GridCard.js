@@ -5,6 +5,7 @@ import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import ChartItemCover from '~/ui/grid/covers/ChartItemCover'
 import ContainImage from '~/ui/grid/ContainImage'
 import CoverImageToggle from '~/ui/grid/CoverImageToggle'
+import CoverImageSelector from '~/ui/grid/CoverImageSelector'
 import GridCardHotspot from '~/ui/grid/GridCardHotspot'
 import LinkItemCover from '~/ui/grid/covers/LinkItemCover'
 import TextItemCover from '~/ui/grid/covers/TextItemCover'
@@ -315,6 +316,7 @@ class GridCard extends React.Component {
     return (
       <StyledGridCard
         className="gridCard"
+        id={`gridCard-${card.id}`}
         dragging={dragging}
         testCollectionCard={testCollectionCard}
         // mostly for E2E checking purposes
@@ -343,6 +345,9 @@ class GridCard extends React.Component {
               className="show-on-hover"
             >
               {record.isDownloadable && <Download record={record} />}
+              {record.canSetACover && (
+                <CoverImageSelector card={card} parentRef={this.gridCardRef} />
+              )}
               {record.canBeSetAsCover &&
                 canEditCollection && (
                   <CoverImageToggle
