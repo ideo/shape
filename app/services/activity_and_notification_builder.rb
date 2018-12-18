@@ -65,18 +65,21 @@ class ActivityAndNotificationBuilder < SimpleService
     group_user_ids = Group.where(id: @subject_group_ids).user_ids
     @omit_user_ids += Group.where(id: @omit_group_ids).user_ids
     all_user_ids = @subject_user_ids + group_user_ids
-    all_user_ids.uniq.each do |user_id|
-      next if user_id == @actor.id
-      next if @omit_user_ids.include? user_id
+    User
+      .where(id: all_user_ids)
+      .where.not(status: :archived)
+      .find_each do |user|
+      next if user.id == @actor.id
+      next if @omit_user_ids.include? user.id
       if @combine
-        if (notif = combine_existing_notifications(user_id))
+        if (notif = combine_existing_notifications(user.id))
           @created_notifications << notif
           next
         end
       end
       notif = Notification.create(
         activity: @activity,
-        user_id: user_id,
+        user_id: user.id,
       )
       @created_notifications << notif if notif
     end
