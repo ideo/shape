@@ -13,6 +13,7 @@ class Api::V1::CollectionsController < Api::V1::BaseController
       # special behavior where it defaults to newest first
       params[:card_order] ||= 'updated_at'
     end
+    check_getting_started_shell
     log_collection_activity(:viewed)
     render_collection
   end
@@ -119,6 +120,12 @@ class Api::V1::CollectionsController < Api::V1::BaseController
     else
       authorize! :edit_content, @collection
     end
+  end
+
+  def check_getting_started_shell
+    return unless @collection.getting_started_shell && @collection.can_edit?(current_user)
+    PopulateGettingStartedShellCollection.call(@collection, for_user: current_user)
+    @collection.reload
   end
 
   def load_and_authorize_collection_destroy

@@ -1,14 +1,14 @@
 class OrganizationTemplatesWorker
   include Sidekiq::Worker
 
-  def perform(organization_id, org_template_id, user_id)
+  def perform(organization_id, original_getting_started_id, user_id)
     organization = Organization.find(organization_id)
-    org_getting_started_template = Collection.find(org_template_id)
+    original_getting_started_collection = Collection.find(original_getting_started_id)
     user = User.find(user_id)
 
     create_org_getting_started_collection(
       organization,
-      org_getting_started_template,
+      original_getting_started_collection,
     )
     create_user_getting_started_collection(organization, user)
   end
@@ -17,9 +17,9 @@ class OrganizationTemplatesWorker
 
   def create_org_getting_started_collection(
     organization,
-    org_getting_started_template
+    original_getting_started_collection
   )
-    getting_started_collection = org_getting_started_template.duplicate!(
+    getting_started_collection = original_getting_started_collection.duplicate!(
       copy_parent_card: true,
       parent: organization.template_collection,
       system_collection: true,

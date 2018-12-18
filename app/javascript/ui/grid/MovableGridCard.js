@@ -42,7 +42,6 @@ class MovableGridCard extends React.PureComponent {
       timeoutId: null,
       // this is really just used so that it will reset when you finish dragging
       dragging: false,
-      dragHandleRequired: false,
       resizing: false,
       moveComplete: true,
       // track where on the page the mouse position is, e.g. if browser is stretched wide
@@ -50,14 +49,6 @@ class MovableGridCard extends React.PureComponent {
       initialOffsetY: 0,
       x: props.position.xPos,
       y: props.position.yPos,
-    }
-  }
-
-  componentDidMount() {
-    const videoHandle =
-      this.gridCardRef && this.gridCardRef.querySelector('.videoDrag')
-    if (videoHandle) {
-      this.setState({ dragHandleRequired: true })
     }
   }
 
@@ -339,14 +330,7 @@ class MovableGridCard extends React.PureComponent {
       position: { width },
     } = this.props
 
-    const {
-      dragging,
-      dragHandleRequired,
-      resizing,
-      moveComplete,
-      x,
-      y,
-    } = this.state
+    const { dragging, resizing, moveComplete, x, y } = this.state
 
     if (cardType === 'placeholder') {
       return this.renderPlaceholder()
@@ -429,7 +413,6 @@ class MovableGridCard extends React.PureComponent {
           maxWidth={maxWidth}
           maxHeight={maxHeight}
           dragAxis="none"
-          dragHandleClassName={dragHandleRequired ? '.videoDrag' : null}
           cancel=".no-drag"
           size={{ width, height }}
           position={{ x, y }}
