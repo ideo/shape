@@ -26,7 +26,7 @@ const ScrollArea = styled.div`
 const FooterArea = styled.div`
   flex: 0 0 auto;
   padding-top: 24px;
-  padding-bottom: 84px;
+  padding-bottom: ${props => (props.menuOpen ? 100 : 30)}px;
 `
 
 const StyledRow = styled(Row)`
@@ -299,7 +299,7 @@ class RolesMenu extends React.Component {
           })}
         </ScrollArea>
         {canEdit && (
-          <FooterArea>
+          <FooterArea menuOpen={uiStore.autocompleteValues > 0}>
             <Heading3>{addCallout}</Heading3>
             <RolesAdd
               searchableItems={this.searchableItems}

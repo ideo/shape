@@ -11,6 +11,7 @@ import { pick } from 'lodash'
 
 import Option from '~/ui/global/AutocompleteOption'
 import SearchIcon from '~/ui/icons/SearchIcon'
+import { uiStore } from '~/stores'
 
 const SearchIconContainer = styled.span`
   display: block;
@@ -140,7 +141,11 @@ const SelectWrapped = props => {
         DropdownIndicator,
         Option,
       }}
-      noOptionsMessage={() => 'No results found'}
+      noOptionsMessage={() => {
+        uiStore.autocompleteMenuClosed()
+        return 'No results found'
+      }}
+      onMenuClose={() => uiStore.autocompleteMenuClosed()}
       options={options}
       {...other}
     />
@@ -188,11 +193,14 @@ class AutoComplete extends React.Component {
   }
 
   handleChange = option => {
+    uiStore.autocompleteMenuClosed()
     this.setState({
       option,
     })
-    // let fullOption = this.props.options.find(x => x === option)
     let fullOption = option
+    if (this.props.options && this.props.options.length) {
+      fullOption = this.props.options.find(x => x === option)
+    }
     if (!fullOption || !fullOption.data) {
       fullOption = Object.assign({}, { data: { custom: option.value } })
     }
