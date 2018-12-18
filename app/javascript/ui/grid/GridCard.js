@@ -17,8 +17,10 @@ import DataItemCover from '~/ui/grid/covers/DataItemCover'
 
 import Activity from '~/stores/jsonApi/Activity'
 import ActionMenu from '~/ui/grid/ActionMenu'
+import CardActionHolder from '~/ui/icons/CardActionHolder'
 import CollectionIcon from '~/ui/icons/CollectionIcon'
 import EditButton from '~/ui/reporting/EditButton'
+import FullScreenIcon from '~/ui/icons/FullScreenIcon'
 import LinkIcon from '~/ui/icons/LinkIcon'
 import Download from '~/ui/grid/Download'
 import LinkedCollectionIcon from '~/ui/icons/LinkedCollectionIcon'
@@ -27,7 +29,7 @@ import PinnedIcon from '~/ui/icons/PinnedIcon'
 import SelectionCircle from '~/ui/grid/SelectionCircle'
 import TagEditorModal from '~/ui/pages/shared/TagEditorModal'
 import Tooltip from '~/ui/global/Tooltip'
-import { uiStore } from '~/stores'
+import { routingStore, uiStore } from '~/stores'
 import v, { ITEM_TYPES } from '~/utils/variables'
 import {
   StyledGridCard,
@@ -286,6 +288,8 @@ class GridCard extends React.Component {
       // TODO: could replace with preview
       Activity.trackActivity('downloaded', record)
       return
+    } else if (record.type === ITEM_TYPES.VIDEO || record.isImage) {
+      return
     } else if (record.mimeBaseType === 'image') {
       this.props.handleClick(e)
       return
@@ -353,6 +357,15 @@ class GridCard extends React.Component {
               {record.isData && <EditButton onClick={this.editCard} />}
               {record.isImage &&
                 this.canContentEditCard && <ContainImage card={card} />}
+              {record.isImage && (
+                <CardActionHolder
+                  className="show-on-hover"
+                  onClick={() => routingStore.routeTo('items', card.record.id)}
+                  tooltipText="go to page"
+                >
+                  <FullScreenIcon />
+                </CardActionHolder>
+              )}
               {!testCollectionCard && <SelectionCircle cardId={card.id} />}
               <ActionMenu
                 location={searchResult ? 'Search' : 'GridCard'}
