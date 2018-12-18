@@ -9,6 +9,7 @@ import AsyncCreatable from 'react-select/lib/AsyncCreatable'
 import Select from 'react-select'
 import { pick } from 'lodash'
 
+import Loader from '~/ui/layout/Loader'
 import Option from '~/ui/global/AutocompleteOption'
 import SearchIcon from '~/ui/icons/SearchIcon'
 import { uiStore } from '~/stores'
@@ -24,11 +25,22 @@ const SearchIconContainer = styled.span`
     width: 22px;
   }
 `
+const LoadingContainer = SearchIconContainer.extend`
+  left: auto;
+  top: 0;
+  right: 30px;
+`
 
 const DropdownIndicator = () => (
   <SearchIconContainer>
     <SearchIcon />
   </SearchIconContainer>
+)
+
+const LoadingIndicator = () => (
+  <LoadingContainer>
+    <Loader size="25" containerHeight="30px" />
+  </LoadingContainer>
 )
 
 const valueComponent = classes => valueProps => {
@@ -123,6 +135,7 @@ const SelectWrapped = props => {
         styles={selectStyles(theme)}
         components={{
           valueComponent: valueComponent(classes),
+          LoadingIndicator,
           DropdownIndicator,
           Option,
         }}
@@ -138,6 +151,7 @@ const SelectWrapped = props => {
       formatCreateLabel={inputValue => `Invite email ${inputValue}`}
       components={{
         valueComponent: valueComponent(classes),
+        LoadingIndicator,
         DropdownIndicator,
         Option,
       }}
