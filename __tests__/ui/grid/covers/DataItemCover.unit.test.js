@@ -1,5 +1,5 @@
 import DataItemCover from '~/ui/grid/covers/DataItemCover'
-import { fakeItem } from '#/mocks/data'
+import { fakeTextItem } from '#/mocks/data'
 import fakeUiStore from '#/mocks/fakeUiStore'
 import fakeApiStore from '#/mocks/fakeApiStore'
 
@@ -16,7 +16,7 @@ describe('DataItemCover', () => {
     props.uiStore = uiStore
     props.apiStore = apiStore
     props.item = {
-      ...fakeItem,
+      ...fakeTextItem,
       can_edit_content: true,
       data: {
         value: 5,
@@ -194,6 +194,19 @@ describe('DataItemCover', () => {
 
     it('should call apiStore.fetch with target id', () => {
       expect(apiStore.fetch).toHaveBeenCalledWith('collections', 123)
+    })
+
+    describe('onSelectTarget', () => {
+      it('should work with a collection object', () => {
+        wrapper
+          .instance()
+          .onSelectTarget({ id: 1, internalType: 'collections' })
+        expect(apiStore.fetch).toHaveBeenCalledWith('collections', 1)
+      })
+      it('should work with a custom object', () => {
+        wrapper.instance().onSelectTarget({ custom: 1 })
+        expect(apiStore.fetch).toHaveBeenCalledWith('collections', 1)
+      })
     })
   })
 })

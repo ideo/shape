@@ -246,7 +246,13 @@ class DataItemCover extends React.Component {
   }
 
   onSelectTarget = value => {
-    const collectionId = (value && value.custom) || null
+    let collectionId = null
+    if (value && value.internalType && value.internalType === 'collections') {
+      collectionId = value.id
+    } else if (value && value.custom) {
+      collectionId = value.custom
+    }
+
     this.saveSettings({
       d_filters: value
         ? [{ type: 'Collection', target: Number(collectionId) }]
