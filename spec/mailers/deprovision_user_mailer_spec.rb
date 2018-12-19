@@ -9,7 +9,7 @@ RSpec.describe DeprovisionUserMailer, type: :mailer do
       DeprovisionUserMailer.missing_org_admin(user.id, group.id)
     end
     it 'should send to the ideo support email' do
-      expect(mail.to).to eql([Shape::SUPPORT_EMAIL])
+      expect(mail.to).to eql([Shape::ZENDESK_EMAIL])
     end
 
     it 'renders the subject' do
@@ -28,7 +28,7 @@ RSpec.describe DeprovisionUserMailer, type: :mailer do
       DeprovisionUserMailer.missing_group_admin(user.id, group.id)
     end
     it 'should send to the ideo support email' do
-      expect(mail.to).to eql([Shape::SUPPORT_EMAIL])
+      expect(mail.to).to eql([Shape::ZENDESK_EMAIL])
     end
 
     it 'renders the subject' do
@@ -47,7 +47,7 @@ RSpec.describe DeprovisionUserMailer, type: :mailer do
       DeprovisionUserMailer.missing_collection_editor(user.id, collection.id)
     end
     it 'should send to the ideo support email' do
-      expect(mail.to).to eql([Shape::SUPPORT_EMAIL])
+      expect(mail.to).to eql([Shape::ZENDESK_EMAIL])
     end
 
     it 'renders the subject' do
