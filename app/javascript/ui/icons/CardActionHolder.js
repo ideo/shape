@@ -22,8 +22,8 @@ export const StyledIcon = styled.span`
 StyledIcon.displayName = 'StyledIcon'
 
 const CardActionHolder = ({
+  active,
   children,
-  color,
   onClick,
   disableHover,
   size,
@@ -33,7 +33,7 @@ const CardActionHolder = ({
     <StyledIcon
       className="icon"
       disableHover={disableHover}
-      fill={color}
+      fill={active ? v.colors.black : v.colors.commonMedium}
       size={size}
       onClick={onClick}
     >
@@ -43,15 +43,15 @@ const CardActionHolder = ({
 )
 
 CardActionHolder.propTypes = {
+  active: PropTypes.bool,
   children: PropTypes.node.isRequired,
-  color: PropTypes.oneOf(Object.values(v.colors)),
   disableHover: PropTypes.bool,
   onClick: PropTypes.func,
   size: PropTypes.number,
   tooltipText: PropTypes.string,
 }
 CardActionHolder.defaultProps = {
-  color: v.colors.commonMedium,
+  active: false,
   disableHover: false,
   onClick: () => {},
   size: 32,

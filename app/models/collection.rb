@@ -545,6 +545,7 @@ class Collection < ApplicationRecord
 
   def clear_collection_cover
     cover = primary_collection_cards.where(is_cover: true).first
+    return if cover.nil?
     cover.update(is_cover: false)
   end
 

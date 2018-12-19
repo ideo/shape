@@ -1,15 +1,18 @@
 import { Fragment } from 'react'
 import ReactDOM from 'react-dom'
+import _ from 'lodash'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import { observable, runInAction } from 'mobx'
 import styled from 'styled-components'
 
 import CardActionHolder from '~/ui/icons/CardActionHolder'
+import CollectionCard from '~/stores/jsonApi/CollectionCard'
 import CoverImageToggleIcon from '~/ui/icons/CoverImageToggleIcon'
+import FilestackUpload from '~/utils/FilestackUpload'
 import QuickOptionSelector from '~/ui/global/QuickOptionSelector'
 import UploadIcon from '~/ui/icons/UploadIcon'
 import XIcon from '~/ui/icons/XIcon'
-import v from '~/utils/variables'
+import v, { ITEM_TYPES } from '~/utils/variables'
 
 const removeOption = {
   type: 'remove',
@@ -17,6 +20,7 @@ const removeOption = {
   icon: <XIcon />,
 }
 const uploadOption = {
+  type: 'upload',
   title: 'upload new image',
   icon: <UploadIcon />,
 }
@@ -36,7 +40,7 @@ const TopRightHolder = styled.div`
 `
 TopRightHolder.displayName = 'TopRightHolder'
 
-@inject('apiStore')
+@inject('apiStore', 'uiStore')
 @observer
 class CoverImageSelector extends React.Component {
   @observable
@@ -58,13 +62,16 @@ class CoverImageSelector extends React.Component {
     const { apiStore, card } = this.props
     const res = await apiStore.fetch('collections', card.record.id)
     const collection = res.data
-    return collection.collection_cards
-      .filter(ccard => ccard.record.isImage)
-      .map(ccard => ({
-        cardId: ccard.id,
-        title: ccard.record.name,
-        imageUrl: ccard.record.filestack_file_url,
-      }))
+    return _.take(
+      collection.collection_cards
+        .filter(ccard => ccard.record.isImage)
+        .map(ccard => ({
+          cardId: ccard.id,
+          title: ccard.record.name,
+          imageUrl: ccard.record.filestack_file_url,
+        })),
+      9
+    )
   }
 
   async populateAllOptions() {
@@ -80,10 +87,35 @@ class CoverImageSelector extends React.Component {
     )
   }
 
+  async createCard(file) {
+    const { apiStore, uiStore, card } = this.props
+    const collection = apiStore.find('collections', card.record.id)
+    await collection.API_clearCollectionCover()
+    const attrs = {
+      item_attributes: {
+        type: ITEM_TYPES.FILE,
+        filestack_file_attributes: FilestackUpload.filestackFileAttrs(file),
+      },
+    }
+    const cardAttrs = {
+      order: 1,
+      height: 1,
+      widht: 1,
+      parent_id: collection.id,
+      is_cover: true,
+    }
+    Object.assign(cardAttrs, attrs)
+    const newLocalCard = new CollectionCard(cardAttrs, apiStore)
+    newLocalCard.parent = collection
+    const newCard = await newLocalCard.API_create()
+    uiStore.addNewCard(newCard.record.id)
+    apiStore.fetch('collections', collection.id, true)
+  }
+
   handleClick = ev => {
     ev.preventDefault()
     this.populateAllOptions()
-    runInAction(() => (this.open = true))
+    runInAction(() => (this.open = !this.open))
   }
 
   onOptionSelect = async option => {
@@ -96,6 +128,10 @@ class CoverImageSelector extends React.Component {
       await selectedCard.save()
     } else if (option.type === 'remove') {
       await collection.API_clearCollectionCover()
+    } else if (option.type === 'upload') {
+      FilestackUpload.pickImage({
+        onSuccess: file => this.createCard(file),
+      })
     }
     apiStore.fetch('collections', collection.id, true)
   }
@@ -104,6 +140,7 @@ class CoverImageSelector extends React.Component {
     return (
       <Fragment>
         <CardActionHolder
+          active={this.open}
           className="show-on-hover"
           tooltipText="select cover image"
           role="button"
@@ -134,6 +171,7 @@ CoverImageSelector.propTypes = {
 }
 CoverImageSelector.wrappedComponent.propTypes = {
   apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
+  uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 
 export default CoverImageSelector

@@ -275,6 +275,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
       :item_id,
       :type,
       :image_contain,
+      :is_cover,
       collection_attributes: %i[
         id
         type
@@ -302,9 +303,9 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
           :mimetype,
           docinfo: {},
         ],
-        data_settings: [
-          :d_measure,
-          :d_timeframe,
+        data_settings: %i[
+          d_measure
+          d_timeframe
         ],
       ],
     )

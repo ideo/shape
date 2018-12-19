@@ -3,10 +3,6 @@ import styled from 'styled-components'
 
 import Tooltip from '~/ui/global/Tooltip'
 
-const OptionsHolder = styled.div`
-  height: 32px;
-`
-
 const Option = styled.span`
   background-color: ${props => props.color || 'transparent'};
   background-image: ${props => (props.image ? `url(${props.image})` : 'none')};
@@ -27,7 +23,7 @@ class QuickOptionSelector extends React.Component {
   render() {
     const { options } = this.props
     return (
-      <OptionsHolder>
+      <div>
         {options.map(option => (
           <Tooltip
             classes={{ tooltip: 'Tooltip' }}
@@ -46,7 +42,7 @@ class QuickOptionSelector extends React.Component {
             </button>
           </Tooltip>
         ))}
-      </OptionsHolder>
+      </div>
     )
   }
 }

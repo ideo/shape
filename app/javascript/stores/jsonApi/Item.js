@@ -75,7 +75,7 @@ class Item extends SharedRecordMixin(BaseRecord) {
   }
 
   get canBeSetAsCover() {
-    return this.isImage || this.type === ITEM_TYPES.VIDEO
+    return this.isImage
   }
 
   get canSetACover() {
