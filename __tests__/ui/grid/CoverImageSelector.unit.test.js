@@ -1,9 +1,13 @@
 import CoverImageSelector from '~/ui/grid/CoverImageSelector'
 import CardActionHolder from '~/ui/icons/CardActionHolder'
+import FilestackUpload from '~/utils/FilestackUpload'
 import fakeApiStore from '#/mocks/fakeApiStore'
+import fakeUiStore from '#/mocks/fakeUiStore'
 import { fakeCollection, fakeCollectionCard } from '#/mocks/data'
 
-let apiStore, card, collection
+jest.mock('../../../app/javascript/utils/FilestackUpload')
+
+let apiStore, card, collection, uiStore
 let props = {}
 let rerender
 const fakeEv = { preventDefault: jest.fn() }
@@ -17,6 +21,7 @@ describe('CoverImageSelector', () => {
     apiStore = fakeApiStore({
       requestResult,
     })
+    uiStore = fakeUiStore
 
     const modalRoot = document.createElement('div')
     modalRoot.setAttribute('id', `gridCard-${card.id}`)
@@ -26,6 +31,7 @@ describe('CoverImageSelector', () => {
     props = {
       card,
       apiStore,
+      uiStore,
     }
     rerender = () => {
       wrapper = shallow(<CoverImageSelector.wrappedComponent {...props} />)
@@ -82,6 +88,17 @@ describe('CoverImageSelector', () => {
 
       it('should close the selector', () => {
         expect(component.open).toBe(false)
+      })
+    })
+
+    describe('with an upload action', () => {
+      beforeEach(() => {
+        component.onOptionSelect({ type: 'upload' })
+        wrapper.update()
+      })
+
+      it('should call the filestdk upload picker', () => {
+        expect(FilestackUpload.pickImage).toHaveBeenCalled()
       })
     })
   })
