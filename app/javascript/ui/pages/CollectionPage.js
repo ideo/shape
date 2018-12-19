@@ -1,9 +1,10 @@
+import PropTypes from 'prop-types'
 import _ from 'lodash'
 import { Fragment } from 'react'
 import pluralize from 'pluralize'
-import ReactRouterPropTypes from 'react-router-prop-types'
 import { action, observable } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
+import { animateScroll as scroll } from 'react-scroll'
 
 import ClickWrapper from '~/ui/layout/ClickWrapper'
 import ChannelManager from '~/utils/ChannelManager'
@@ -12,10 +13,8 @@ import FloatingActionButton from '~/ui/global/FloatingActionButton'
 import Loader from '~/ui/layout/Loader'
 import MoveModal from '~/ui/grid/MoveModal'
 import PageContainer from '~/ui/layout/PageContainer'
-import PageError from '~/ui/global/PageError'
 import PageHeader from '~/ui/pages/shared/PageHeader'
 import PageSeparator from '~/ui/global/PageSeparator'
-import PageWithApi from '~/ui/pages/PageWithApi'
 import PlusIcon from '~/ui/icons/PlusIcon'
 import SubmissionBoxSettingsModal from '~/ui/submission_box/SubmissionBoxSettingsModal'
 import EditorPill from '~/ui/items/EditorPill'
@@ -26,13 +25,9 @@ import Collection from '~/stores/jsonApi/Collection'
 // more global way to do this?
 pluralize.addPluralRule(/canvas$/i, 'canvases')
 
-const isHomepage = ({ params }) => params.org && !params.id
-
 @inject('apiStore', 'uiStore', 'routingStore')
 @observer
-class CollectionPage extends PageWithApi {
-  @observable
-  loadingSubmissions = false
+class CollectionPage extends React.Component {
   @observable
   currentEditor = {}
 
@@ -44,26 +39,84 @@ class CollectionPage extends PageWithApi {
     this.reloadData = _.debounce(this._reloadData, 1500)
   }
 
-  componentWillMount() {
-    this.subscribeToChannel(this.props.match.params.id)
+  componentDidMount() {
+    this.onAPILoad()
   }
 
-  componentWillReceiveProps(nextProps) {
-    super.componentWillReceiveProps(nextProps)
-    // when navigating between collections, close BCT
-    const previousId = this.props.match.params.id
-    const currentId = nextProps.match.params.id
+  componentDidUpdate(prevProps) {
+    const { collection, uiStore } = this.props
+    const previousId = prevProps.collection.id
+    const currentId = collection.id
     if (currentId !== previousId) {
+      scroll.scrollToTop({ duration: 0 })
       ChannelManager.unsubscribeAllFromChannel(this.channelName)
-      this.subscribeToChannel(currentId)
+      // when navigating between collections, close BCT
       this.props.uiStore.closeBlankContentTool()
-      this.setLoadedSubmissions(false)
+      this.onAPILoad()
+    } else if (collection.isSubmissionBox && !uiStore.loadedSubmissions) {
+      this.checkSubmissionBox()
     }
   }
 
   componentWillUnmount() {
-    super.componentWillUnmount()
+    // super.componentWillUnmount()
     ChannelManager.unsubscribeAllFromChannel(this.channelName)
+  }
+
+  get collection() {
+    // TODO: replace all references to this.collection with this.props.collection
+    return this.props.collection
+  }
+
+  async onAPILoad() {
+    const { collection, apiStore, uiStore, routingStore } = this.props
+    this.subscribeToChannel(collection.id)
+
+    // setViewingCollection has to happen first bc we use it in openBlankContentTool
+    uiStore.setViewingCollection(collection)
+    if (collection.isSubmissionsCollection) {
+      // NOTE: SubmissionsCollections are not meant to be viewable, so we route
+      // back to the SubmissionBox instead
+      routingStore.routeTo('collections', collection.submission_box_id)
+      return
+    }
+    if (collection.collection_card_count === 0) {
+      uiStore.openBlankContentTool()
+    }
+    collection.checkCurrentOrg()
+    if (collection.isNormalCollection) {
+      const thread = await apiStore.findOrBuildCommentThread(collection)
+      uiStore.expandThread(thread.key)
+      if (routingStore.query) {
+        uiStore.openOptionalMenus(routingStore.query)
+      }
+      this.checkSubmissionBox()
+    } else {
+      apiStore.clearUnpersistedThreads()
+    }
+    if (collection.processing_status) {
+      const message = `${collection.processing_status}...`
+      uiStore.popupSnackbar({ message })
+    }
+  }
+
+  async checkSubmissionBox() {
+    const { collection, uiStore } = this.props
+    if (collection.isSubmissionBox && collection.submissions_collection) {
+      this.setLoadedSubmissions(false)
+      // NOTE: if other collections get sortable features we may move this logic
+      uiStore.update('collectionCardSortOrder', 'updated_at')
+
+      console.log('ay YAYYAYAYA')
+
+      await Collection.fetchSubmissionsCollection(
+        collection.submissions_collection.id,
+        { order: 'updated_at' }
+      )
+      this.setLoadedSubmissions(true)
+      // Also subscribe to updates for the submission boxes
+      this.subscribeToChannel(collection.submissions_collection.id)
+    }
   }
 
   subscribeToChannel(id) {
@@ -88,8 +141,7 @@ class CollectionPage extends PageWithApi {
   }
 
   receivedChannelData = async data => {
-    const { apiStore } = this.props
-    const { collection } = this
+    const { collection, apiStore } = this.props
     // catch if receivedData happens after reload
     if (!collection) return
     const currentId = collection.id
@@ -135,81 +187,6 @@ class CollectionPage extends PageWithApi {
     uiStore.update('loadedSubmissions', val)
   }
 
-  get isHomepage() {
-    return isHomepage(this.props.match)
-  }
-
-  get collection() {
-    const { match, apiStore } = this.props
-    if (this.isHomepage) {
-      return apiStore.find(
-        'collections',
-        apiStore.currentUser.current_user_collection_id
-      )
-    }
-    return apiStore.find('collections', match.params.id)
-  }
-
-  get roles() {
-    const { apiStore, match } = this.props
-    return apiStore
-      .findAll('roles')
-      .filter(
-        role => role.resource && role.resource.id === parseInt(match.params.id)
-      )
-  }
-
-  requestPath = props => {
-    const { match, apiStore } = props
-    if (isHomepage(match)) {
-      return `collections/${apiStore.currentUser.current_user_collection_id}`
-    }
-    return `collections/${match.params.id}`
-  }
-
-  onAPILoad = async response => {
-    this.updateError(null)
-    const collection = response.data
-    const { apiStore, uiStore, routingStore, location } = this.props
-    // setViewingCollection has to happen first bc we use it in openBlankContentTool
-    uiStore.setViewingCollection(collection)
-    if (collection.isSubmissionsCollection) {
-      // NOTE: SubmissionsCollections are not meant to be viewable, so we route
-      // back to the SubmissionBox instead
-      routingStore.routeTo('collections', collection.submission_box_id)
-      return
-    }
-    if (!collection.collection_cards.length) {
-      uiStore.openBlankContentTool()
-    }
-    collection.checkCurrentOrg()
-    if (collection.isNormalCollection) {
-      const thread = await apiStore.findOrBuildCommentThread(collection)
-      uiStore.expandThread(thread.key)
-      if (location.search) {
-        uiStore.openOptionalMenus(location.search)
-      }
-      if (collection.isSubmissionBox && collection.submissions_collection) {
-        this.setLoadedSubmissions(false)
-        // NOTE: if other collections get sortable features we may move this logic
-        uiStore.update('collectionCardSortOrder', 'updated_at')
-        await Collection.fetchSubmissionsCollection(
-          collection.submissions_collection.id,
-          { order: 'updated_at' }
-        )
-        this.setLoadedSubmissions(true)
-        // Also subscribe to updates for the submission boxes
-        this.subscribeToChannel(collection.submissions_collection.id)
-      }
-    } else {
-      apiStore.clearUnpersistedThreads()
-    }
-    if (collection.processing_status) {
-      const message = `${collection.processing_status}...`
-      uiStore.popupSnackbar({ message })
-    }
-  }
-
   onAddSubmission = ev => {
     ev.preventDefault()
     const { id } = this.collection.submissions_collection
@@ -221,7 +198,7 @@ class CollectionPage extends PageWithApi {
   }
 
   updateCollection = ({ card, updates, undoMessage } = {}) => {
-    const { collection } = this
+    const { collection } = this.props
     // this will assign the update attrs to the card and push an undo action
     collection.API_updateCards({ card, updates, undoMessage })
     const { uiStore } = this.props
@@ -229,7 +206,7 @@ class CollectionPage extends PageWithApi {
   }
 
   get submissionsPageSeparator() {
-    const { collection } = this
+    const { collection } = this.props
     const { submissionTypeName, submissions_collection } = collection
     if (!submissions_collection) return ''
     return (
@@ -258,8 +235,7 @@ class CollectionPage extends PageWithApi {
   }
 
   renderSubmissionsCollection() {
-    const { collection } = this
-    const { uiStore } = this.props
+    const { collection, uiStore } = this.props
     const { blankContentToolState, gridSettings, loadedSubmissions } = uiStore
     const { submissionTypeName, submissions_collection } = collection
 
@@ -307,23 +283,25 @@ class CollectionPage extends PageWithApi {
   )
 
   render() {
-    // this.error comes from PageWithApi
-    if (this.error) return <PageError error={this.error} />
-    const { collection } = this
+    const { collection, isHomepage, uiStore } = this.props
+    if (!collection) {
+      return this.loader()
+    }
+
     // NOTE: if we have first loaded the slimmer SerializableSimpleCollection via the CommentThread
     // then some fields like `can_edit` will be undefined.
     // So we check if the full Collection has loaded via the `can_edit` attr
     // Also, checking meta.snapshot seems to load more consistently than just collection.can_edit
-    if (!collection || collection.meta.snapshot.can_edit === undefined) {
-      return this.loader()
-    }
+    const isLoading =
+      collection.meta.snapshot.can_edit === undefined ||
+      (collection.collection_card_count > 0 &&
+        collection.collection_cards.length === 0) ||
+      uiStore.isLoading
 
-    const { uiStore } = this.props
     const {
       blankContentToolState,
       submissionBoxSettingsOpen,
       gridSettings,
-      isLoading,
     } = uiStore
 
     // submissions_collection will only exist for submission boxes
@@ -334,7 +312,7 @@ class CollectionPage extends PageWithApi {
 
     return (
       <Fragment>
-        <PageHeader record={collection} isHomepage={this.isHomepage} />
+        <PageHeader record={collection} isHomepage={isHomepage} />
         {!isLoading && (
           <PageContainer>
             {this.renderEditorPill}
@@ -343,7 +321,6 @@ class CollectionPage extends PageWithApi {
               <CollectionGrid
                 // pull in cols, gridW, gridH, gutter
                 {...gridSettings}
-                gridSettings={gridSettings}
                 updateCollection={this.updateCollection}
                 collection={collection}
                 canEditCollection={collection.can_edit_content}
@@ -381,13 +358,16 @@ class CollectionPage extends PageWithApi {
 }
 
 CollectionPage.propTypes = {
-  match: ReactRouterPropTypes.match.isRequired,
-  location: ReactRouterPropTypes.location.isRequired,
+  collection: MobxPropTypes.objectOrObservableObject.isRequired,
+  isHomepage: PropTypes.bool,
 }
 CollectionPage.wrappedComponent.propTypes = {
   apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
   routingStore: MobxPropTypes.objectOrObservableObject.isRequired,
+}
+CollectionPage.defaultProps = {
+  isHomepage: false,
 }
 
 export default CollectionPage

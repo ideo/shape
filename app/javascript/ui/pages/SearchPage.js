@@ -4,7 +4,6 @@ import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import queryString from 'query-string'
 
 import v from '~/utils/variables'
-import PageWithApi from '~/ui/pages/PageWithApi'
 import Loader from '~/ui/layout/Loader'
 import Header from '~/ui/layout/Header'
 import MoveModal from '~/ui/grid/MoveModal'
@@ -13,7 +12,8 @@ import SearchResultsInfinite from '~/ui/search/SearchResultsInfinite'
 
 @inject('apiStore', 'uiStore', 'routingStore')
 @observer
-class SearchPage extends PageWithApi {
+class SearchPage extends React.Component {
+  unmounted = false
   @observable
   searchResults = []
   @observable
@@ -30,39 +30,46 @@ class SearchPage extends PageWithApi {
     }
     // initialize SearchBar to the queryString, e.g. when directly loading a search URL
     uiStore.update('searchText', query)
-    super.componentDidMount()
+
+    this.fetchData()
   }
 
   @action
-  componentWillReceiveProps(nextProps) {
+  componentDidUpdate(prevProps) {
     // i.e. you are on SearchPage and perform a new search
     // NOTE: important to do this here to "reset" infinite scroll!
-    if (this.searchQuery(nextProps) !== this.searchQuery(this.props)) {
+    if (this.searchQuery(prevProps) !== this.searchQuery(this.props)) {
       this.searchResults.replace([])
+      this.fetchData()
     }
-    if (!this.searchQuery(nextProps)) {
-      nextProps.routingStore.leaveSearch()
-      return
+    if (!this.searchQuery(this.props)) {
+      this.props.routingStore.leaveSearch()
     }
-    super.componentWillReceiveProps(nextProps)
   }
 
   componentWillUnmount() {
     const { uiStore } = this.props
     uiStore.update('searchText', '')
+    this.unmounted = true
   }
 
-  searchQuery = (props, opts = {}) => {
-    let query = queryString.parse(props.location.search).q
-    if (!query) return ''
-    if (opts.url) query = query.replace(/\s/g, '+').replace(/#/g, '%23')
-    return query
-  }
+  fetchData = (page = 1) => {
+    const { apiStore, uiStore } = this.props
+    uiStore.update('pageError', null)
+    uiStore.update('isLoading', true)
 
-  requestPath = props => {
-    const q = this.searchQuery(props, { url: true })
-    const page = props.page || 1
-    return `search?query=${q}&page=${page}`
+    return apiStore
+      .request(this.requestPath(page))
+      .then(res => {
+        if (this.unmounted) return
+        this.onAPILoad(res)
+        uiStore.update('isLoading', false)
+      })
+      .catch(err => {
+        uiStore.update('pageError', err)
+        uiStore.update('isLoading', false)
+        // trackError(err, { name: 'PageApiFetch' })
+      })
   }
 
   @action
@@ -82,10 +89,23 @@ class SearchPage extends PageWithApi {
     }
   }
 
+  searchQuery = (props, opts = {}) => {
+    let query = queryString.parse(props.location.search).q
+    if (!query) return ''
+    if (opts.url) query = query.replace(/\s/g, '+').replace(/#/g, '%23')
+    return query
+  }
+
+  requestPath = (page = 1) => {
+    const { props } = this
+    const q = this.searchQuery(props, { url: true })
+    return `search?query=${q}&page=${page}`
+  }
+
   handleInfiniteLoad = page => {
     // for some reason it seems to trigger one extra page even when !hasMore
     if (!this.hasMore) return
-    this.fetchData({ ...this.props, page })
+    this.fetchData(page)
   }
 
   renderSearchResults = () => {
@@ -110,7 +130,7 @@ class SearchPage extends PageWithApi {
         gridMaxW={uiStore.gridMaxW}
         searchResults={this.searchResults}
         loadMore={this.handleInfiniteLoad}
-        hasMore={this.hasMore}
+        hasMore={this.hasMore && !uiStore.isLoading}
         total={this.total}
       />
     )
@@ -131,6 +151,8 @@ class SearchPage extends PageWithApi {
 
 SearchPage.wrappedComponent.propTypes = {
   apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
+  uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
+  routingStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 
 export default SearchPage

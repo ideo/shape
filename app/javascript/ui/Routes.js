@@ -9,8 +9,11 @@ import DialogWrapper from '~/ui/global/modals/DialogWrapper'
 import ErrorBoundary from '~/ui/global/ErrorBoundary'
 import Header from '~/ui/layout/Header'
 import HomePage from '~/ui/pages/HomePage'
-import CollectionPage from '~/ui/pages/CollectionPage'
-import ItemPage from '~/ui/pages/ItemPage'
+import {
+  CollectionApiWrapper,
+  MyCollectionApiWrapper,
+  ItemApiWrapper,
+} from '~/ui/pages/PageWithApiWrapper'
 import Loader from '~/ui/layout/Loader'
 import SearchPage from '~/ui/pages/SearchPage'
 import SettingsPage from '~/ui/pages/SettingsPage'
@@ -99,13 +102,26 @@ class Routes extends React.Component {
             )}
             {/* Switch will stop when it finds the first matching path */}
             <Switch>
-              <Route exact path="/" component={HomePage} />
+              <Route
+                exact
+                path="/"
+                render={() =>
+                  apiStore.currentOrgSlug ? (
+                    <Redirect to={`/${apiStore.currentOrgSlug}`} />
+                  ) : (
+                    <HomePage />
+                  )
+                }
+              />
               {/* These routes are doubled up so that the non-org route
                 will route you to the org one */}
-              <Route path="/collections/:id" component={CollectionPage} />
-              <Route path="/:org/collections/:id" component={CollectionPage} />
-              <Route path="/items/:id" component={ItemPage} />
-              <Route path="/:org/items/:id" component={ItemPage} />
+              <Route path="/collections/:id" component={CollectionApiWrapper} />
+              <Route
+                path="/:org/collections/:id"
+                component={CollectionApiWrapper}
+              />
+              <Route path="/items/:id" component={ItemApiWrapper} />
+              <Route path="/:org/items/:id" component={ItemApiWrapper} />
               <Route path="/search" component={SearchPage} />
               <Route path="/:org/search" component={SearchPage} />
               <Route path="/terms" component={TermsPage} />
@@ -133,7 +149,11 @@ class Routes extends React.Component {
                 render={() => <Redirect to="/" />}
               />
               {/* have to put this last to catch all org slugs */}
-              <Route exact path="/:org" component={CollectionPage} />
+              <Route
+                exact
+                path="/:org"
+                render={props => <MyCollectionApiWrapper {...props} />}
+              />
             </Switch>
           </MuiThemeProvider>
         </ErrorBoundary>
