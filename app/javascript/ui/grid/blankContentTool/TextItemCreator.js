@@ -1,5 +1,4 @@
 import PropTypes from 'prop-types'
-import ReactQuill from 'react-quill'
 import _ from 'lodash'
 import styled from 'styled-components'
 
@@ -62,39 +61,20 @@ class TextItemCreator extends React.Component {
   }
 
   render() {
-    // re-bind enter to create the item instead of doing a linebreak
-    // const bindings = {
-    //   esc: {
-    //     key: KEYS.ESC,
-    //     handler: () => {
-    //       this.onTextChange.cancel()
-    //       this.props.closeBlankContentTool()
-    //     },
-    //   },
-    // }
-
-    const quillProps = {
-      readOnly: true,
-      theme: null,
-    }
-
     const { item } = this
-    const textData = item.text_data ? item.toJSON().text_data : null
+    const { height } = this.props
 
     return (
-      <StyledTextItemCreator height={this.props.height}>
-        {!this.props.loading && (
-          <TextItem
-            item={item}
-            actionCableConsumer={ActionCableConsumer}
-            currentUserId={apiStore.currentUser.id}
-            onUpdatedData={this.onTextChange}
-            onCancel={this.onCancel}
-            onSave={this.createTextItem}
-            onExpand={item.id ? this.expand : null}
-          />
-        )}
-        {this.props.loading && <ReactQuill {...quillProps} value={textData} />}
+      <StyledTextItemCreator height={height}>
+        <TextItem
+          item={item}
+          actionCableConsumer={ActionCableConsumer}
+          currentUserId={apiStore.currentUser.id}
+          onUpdatedData={this.onTextChange}
+          onCancel={this.onCancel}
+          onSave={this.createTextItem}
+          onExpand={item.id ? this.expand : null}
+        />
       </StyledTextItemCreator>
     )
   }
