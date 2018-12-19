@@ -21,6 +21,6 @@ class BillingChangesMailer < ApplicationMailer
     @prorated_charge_this_month = (@new_users_count * price_per_user_day * days_remaining_in_month).round(2)
     @url = root_url
 
-    mail to: payment_method.user.email, subject: @subject
+    mail to: payment_method.user.email, subject: @subject, users: [payment_method.user]
   end
 end

@@ -11,6 +11,6 @@ class PaymentMethodExpiringMailer < ApplicationMailer
     @url = "#{root_url}billing"
 
     @subject = 'Shape default payment method is expiring soon'
-    mail to: @payment_method.user.email, subject: @subject
+    mail to: @payment_method.user.email, subject: @subject, users: [@payment_method.user]
   end
 end

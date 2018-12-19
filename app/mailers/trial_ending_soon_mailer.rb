@@ -1,6 +1,7 @@
 class TrialEndingSoonMailer < ApplicationMailer
   def notify(organization, days_from_now)
-    emails = organization.admins[:users].map(&:email)
+    users = organization.admins[:users]
+    emails = users.map(&:email)
     @organization_name = organization.name
     @expiration_date = organization.trial_ends_at.to_s(:mdy)
     ending_in = case days_from_now
@@ -14,6 +15,6 @@ class TrialEndingSoonMailer < ApplicationMailer
     @ending_in = "ending in #{ending_in}"
     @url = "#{root_url}billing"
     subject = "Shape trial #{@ending_in} - Add payment method"
-    mail to: emails, subject: subject
+    mail to: emails, subject: subject, users: users
   end
 end

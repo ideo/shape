@@ -11,6 +11,8 @@ class InvoicePaymentFailedMailer < ApplicationMailer
     @url = "#{root_url}billing"
 
     @subject = 'Shape invoice payment failed'
-    mail to: @payment_method.user.email, subject: @subject
+    mail to: @payment_method.user.email,
+         subject: @subject,
+         users: [@payment_method.user]
   end
 end
