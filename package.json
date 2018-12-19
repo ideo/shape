@@ -64,7 +64,7 @@
   },
   "dependencies": {
     "@firebase/app-types": "^0.3.2",
-    "@material-ui/core": "3.5",
+    "@material-ui/core": "^1.5",
     "@rails/webpacker": "4.0.0-pre.2",
     "actioncable": "^5.2.0",
     "axios": "^0.18.0",
