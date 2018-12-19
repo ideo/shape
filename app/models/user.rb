@@ -322,6 +322,11 @@ class User < ApplicationRecord
     end
   end
 
+  def archive!
+    archived!
+    DeprovisionUserWorker.perform_async(id)
+  end
+
   private
 
   def change_network_admin(action)
