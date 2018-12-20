@@ -3,6 +3,7 @@ import { Switch, Route, Redirect, withRouter } from 'react-router-dom'
 import { MuiThemeProvider } from '@material-ui/core/styles'
 import WindowSizeListener from 'react-window-size-listener'
 import styled from 'styled-components'
+
 import ActivityLogBox from '~/ui/activity_log/ActivityLogBox'
 import DialogWrapper from '~/ui/global/modals/DialogWrapper'
 import ErrorBoundary from '~/ui/global/ErrorBoundary'
@@ -22,7 +23,7 @@ import OrganizationSettings from '~/ui/organizations/OrganizationSettings'
 import UserSettings from '~/ui/users/UserSettings'
 import v from '~/utils/variables'
 import firebaseClient from '~/vendor/firestore'
-import MuiTheme from '~/ui/theme'
+import MuiTheme, { BillingMuiTheme } from '~/ui/theme'
 import captureGlobalKeypress from '~/utils/captureGlobalKeypress'
 
 const AppWrapper = styled.div`
@@ -110,8 +111,25 @@ class Routes extends React.Component {
               <Route path="/search" component={SearchPage} />
               <Route path="/:org/search" component={SearchPage} />
               <Route path="/terms" component={TermsPage} />
-              <Route path="/billing" component={BillingPage} />
-              <Route path="/print/invoices/:id" component={BillingStatement} />
+
+              <Route
+                path="/billing"
+                render={() => (
+                  // There must be a better way to apply BillingMuiTheme to all billing pages,
+                  // however sticking MuiThemeProvider within the <Switch> made it angry
+                  <MuiThemeProvider theme={BillingMuiTheme}>
+                    <BillingPage />
+                  </MuiThemeProvider>
+                )}
+              />
+              <Route
+                path="/print/invoices/:id"
+                render={props => (
+                  <MuiThemeProvider theme={BillingMuiTheme}>
+                    <BillingStatement {...props} />
+                  </MuiThemeProvider>
+                )}
+              />
               <Route
                 path="/settings"
                 render={() => (
