@@ -1,4 +1,3 @@
-// import _ from 'lodash'
 import PropTypes from 'prop-types'
 import ReactRouterPropTypes from 'react-router-prop-types'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
@@ -138,7 +137,6 @@ PageWithApiWrapper.propTypes = {
   match: ReactRouterPropTypes.match.isRequired,
   location: ReactRouterPropTypes.location.isRequired,
   render: PropTypes.func.isRequired,
-  // requestPath: PropTypes.string.isRequired,
   fetchType: PropTypes.string.isRequired,
   fetchId: PropTypes.func,
 }

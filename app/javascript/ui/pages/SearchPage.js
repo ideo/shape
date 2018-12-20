@@ -1,3 +1,4 @@
+import ReactRouterPropTypes from 'react-router-prop-types'
 import { Fragment } from 'react'
 import { action, observable } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
@@ -22,8 +23,8 @@ class SearchPage extends React.Component {
   total = 0
 
   componentDidMount() {
-    const { uiStore, routingStore } = this.props
-    const query = this.searchQuery(this.props)
+    const { uiStore, routingStore, location } = this.props
+    const query = this.searchQuery(location)
     if (!query) {
       routingStore.leaveSearch()
       return
@@ -36,14 +37,15 @@ class SearchPage extends React.Component {
 
   @action
   componentDidUpdate(prevProps) {
+    const { routingStore, location } = this.props
     // i.e. you are on SearchPage and perform a new search
     // NOTE: important to do this here to "reset" infinite scroll!
-    if (this.searchQuery(prevProps) !== this.searchQuery(this.props)) {
+    if (this.searchQuery(prevProps.location) !== this.searchQuery(location)) {
       this.searchResults.replace([])
       this.fetchData()
     }
-    if (!this.searchQuery(this.props)) {
-      this.props.routingStore.leaveSearch()
+    if (!this.searchQuery(location)) {
+      routingStore.leaveSearch()
     }
   }
 
@@ -89,16 +91,15 @@ class SearchPage extends React.Component {
     }
   }
 
-  searchQuery = (props, opts = {}) => {
-    let query = queryString.parse(props.location.search).q
+  searchQuery = (location, opts = {}) => {
+    let query = queryString.parse(location.search).q
     if (!query) return ''
     if (opts.url) query = query.replace(/\s/g, '+').replace(/#/g, '%23')
     return query
   }
 
   requestPath = (page = 1) => {
-    const { props } = this
-    const q = this.searchQuery(props, { url: true })
+    const q = this.searchQuery(this.props.location, { url: true })
     return `search?query=${q}&page=${page}`
   }
 
@@ -109,7 +110,7 @@ class SearchPage extends React.Component {
   }
 
   renderSearchResults = () => {
-    const { uiStore, routingStore } = this.props
+    const { uiStore, routingStore, location } = this.props
     if (this.searchResults.length === 0) {
       if (uiStore.isLoading) {
         return <Loader />
@@ -117,7 +118,7 @@ class SearchPage extends React.Component {
       return (
         <div>
           No results found for &quot;
-          {this.searchQuery(this.props)}
+          {this.searchQuery(location)}
           &quot;.
         </div>
       )
@@ -149,6 +150,9 @@ class SearchPage extends React.Component {
   }
 }
 
+SearchPage.propTypes = {
+  location: ReactRouterPropTypes.location.isRequired,
+}
 SearchPage.wrappedComponent.propTypes = {
   apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
