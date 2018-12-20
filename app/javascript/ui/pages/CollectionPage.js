@@ -106,9 +106,6 @@ class CollectionPage extends React.Component {
       this.setLoadedSubmissions(false)
       // NOTE: if other collections get sortable features we may move this logic
       uiStore.update('collectionCardSortOrder', 'updated_at')
-
-      console.log('ay YAYYAYAYA')
-
       await Collection.fetchSubmissionsCollection(
         collection.submissions_collection.id,
         { order: 'updated_at' }
@@ -147,6 +144,7 @@ class CollectionPage extends React.Component {
     const currentId = collection.id
     const submissions = collection.submissions_collection
     const submissionsId = submissions ? submissions.id : ''
+
     if (_.compact([currentId, submissionsId]).indexOf(data.record_id) > -1) {
       this.setEditor(data.current_editor)
       if (
