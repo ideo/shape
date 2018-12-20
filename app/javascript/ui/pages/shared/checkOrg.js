@@ -27,6 +27,7 @@ const checkOrg = match => {
     if (match.path.indexOf('/:org') === 0) {
       path = path.replace(/^(\/[\w-]*)/, '') || 'homepage'
     }
+
     apiStore.currentUser.switchOrganization(org, {
       redirectPath: path,
     })

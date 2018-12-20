@@ -45,7 +45,10 @@ class PageWithApiWrapper extends React.Component {
   }
 
   get fetchId() {
+    // will use a custom function (passed in prop)
+    // or else default to match.params.id
     const { fetchId, apiStore, match } = this.props
+    if (!fetchId) return match.params.id
     return fetchId(apiStore, match.params.id)
   }
 
@@ -108,7 +111,7 @@ PageWithApiWrapper.wrappedComponent.propTypes = {
   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 PageWithApiWrapper.defaultProps = {
-  fetchId: (apiStore, routeId) => routeId,
+  fetchId: null,
 }
 export default PageWithApiWrapper
 
