@@ -7,8 +7,9 @@ import PageError from '~/ui/global/PageError'
 import CollectionPage from '~/ui/pages/CollectionPage'
 import ItemPage from '~/ui/pages/ItemPage'
 import trackError from '~/utils/trackError'
+import checkOrg from '~/ui/pages/shared/checkOrg'
 
-@inject('apiStore', 'uiStore', 'routingStore')
+@inject('apiStore', 'uiStore')
 @observer
 class PageWithApiWrapper extends React.Component {
   unmounted = false
@@ -34,7 +35,7 @@ class PageWithApiWrapper extends React.Component {
   }
 
   componentDidUpdate(prevProps) {
-    if (this.checkOrg() && this.requiresFetch(prevProps)) {
+    if (checkOrg(this.props.match) && this.requiresFetch(prevProps)) {
       this.fetchData()
     }
   }
@@ -64,44 +65,6 @@ class PageWithApiWrapper extends React.Component {
       prevLocation.search === location.search
     ) {
       // if no change, then no need to re-fetch data
-      return false
-    }
-    return true
-  }
-
-  checkOrg = () => {
-    const { match, apiStore, routingStore } = this.props
-    const { org } = match.params
-    let path = `${routingStore.location.pathname}${
-      routingStore.location.search
-    }`
-
-    if (
-      match.path !== '/' &&
-      match.path !== '/:org' &&
-      !match.path.match(/^(\/:org)?\/search/gi) &&
-      !match.path.match(/^\/collections|items/gi)
-    ) {
-      // escape if we're not on homepage, search, or /collections/items
-      return true
-    }
-
-    if (match.path !== '/' && !apiStore.currentOrgSlug) {
-      // no org available, e.g. we need to set up a new org
-      routingStore.routeTo('/')
-      return false
-    }
-    if (!org) {
-      routingStore.routeTo(`/${apiStore.currentOrgSlug}${path}`)
-      return false
-    } else if (org !== apiStore.currentOrgSlug) {
-      // remove any "wrong" org from the path
-      if (match.path.indexOf('/:org') === 0) {
-        path = path.replace(/^(\/[\w-]*)/, '') || 'homepage'
-      }
-      apiStore.currentUser.switchOrganization(org, {
-        redirectPath: path,
-      })
       return false
     }
     return true
@@ -143,7 +106,6 @@ PageWithApiWrapper.propTypes = {
 PageWithApiWrapper.wrappedComponent.propTypes = {
   apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
-  routingStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 PageWithApiWrapper.defaultProps = {
   fetchId: (apiStore, routeId) => routeId,

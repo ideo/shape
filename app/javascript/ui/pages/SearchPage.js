@@ -10,6 +10,7 @@ import Header from '~/ui/layout/Header'
 import MoveModal from '~/ui/grid/MoveModal'
 import PageContainer from '~/ui/layout/PageContainer'
 import SearchResultsInfinite from '~/ui/search/SearchResultsInfinite'
+import checkOrg from '~/ui/pages/shared/checkOrg'
 
 @inject('apiStore', 'uiStore', 'routingStore')
 @observer
@@ -38,9 +39,8 @@ class SearchPage extends React.Component {
   @action
   componentDidUpdate(prevProps) {
     const { routingStore, location } = this.props
-    // i.e. you are on SearchPage and perform a new search
-    // NOTE: important to do this here to "reset" infinite scroll!
-    if (this.searchQuery(prevProps.location) !== this.searchQuery(location)) {
+    if (checkOrg(this.props.match) && this.requiresFetch(prevProps)) {
+      // NOTE: important to do this here to "reset" infinite scroll!
       this.searchResults.replace([])
       this.fetchData()
     }
@@ -53,6 +53,16 @@ class SearchPage extends React.Component {
     const { uiStore } = this.props
     uiStore.update('searchText', '')
     this.unmounted = true
+  }
+
+  requiresFetch = prevProps => {
+    const { location, match } = this.props
+    const { org } = match.params
+    if (org && prevProps.match && org !== prevProps.match.params.org) {
+      return true
+    }
+    // i.e. you are on SearchPage and perform a new search
+    return this.searchQuery(prevProps.location) !== this.searchQuery(location)
   }
 
   fetchData = (page = 1) => {
@@ -151,6 +161,7 @@ class SearchPage extends React.Component {
 }
 
 SearchPage.propTypes = {
+  match: ReactRouterPropTypes.match.isRequired,
   location: ReactRouterPropTypes.location.isRequired,
 }
 SearchPage.wrappedComponent.propTypes = {

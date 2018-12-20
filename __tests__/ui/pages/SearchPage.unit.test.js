@@ -3,7 +3,8 @@ import fakeApiStore from '#/mocks/fakeApiStore'
 import fakeUiStore from '#/mocks/fakeUiStore'
 import fakeRoutingStore from '#/mocks/fakeRoutingStore'
 
-let wrapper, location, apiStore, uiStore, routingStore, props
+let wrapper, location, match
+let apiStore, uiStore, routingStore, props
 const query = 'stuff'
 
 beforeEach(() => {
@@ -16,7 +17,13 @@ beforeEach(() => {
     search: `?q=${query}`,
     pathname: `/${apiStore.currentUserOrganization.slug}/search?q=${query}`,
   }
-  props = { apiStore, uiStore, routingStore, location }
+  match = {
+    path: '/search',
+    params: {
+      org: apiStore.currentUserOrganization.slug,
+    },
+  }
+  props = { apiStore, uiStore, routingStore, location, match }
 
   wrapper = shallow(<SearchPage.wrappedComponent {...props} />)
 })
