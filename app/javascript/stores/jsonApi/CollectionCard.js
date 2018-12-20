@@ -112,8 +112,9 @@ class CollectionCard extends BaseRecord {
       const res = await this.apiStore.request('collection_cards', 'POST', {
         data: this.toJsonApi(),
       })
+      // important to close BCT before adding the new card so that the grid reflows properly
+      uiStore.closeBlankContentTool({ force: true })
       this.parentCollection.addCard(res.data)
-      uiStore.closeBlankContentTool()
       uiStore.trackEvent('create', this.parentCollection)
       return res.data
     } catch (e) {
