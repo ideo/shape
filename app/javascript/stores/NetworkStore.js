@@ -13,6 +13,9 @@ class NetworkStore extends jsonapi(Collection) {
   }
 
   get organization() {
+    // NOTE: the way these methods work is that you are really only meant to have
+    // one org, subscription, plan in session at a time.
+    // That's why the load methods clear everything out first.
     return this.firstResource('organizations')
   }
 
@@ -30,6 +33,8 @@ class NetworkStore extends jsonapi(Collection) {
   }
 
   loadOrganization(external_id, skipCache = false) {
+    // see note above about clearing everything out on load
+    this.removeAll('organizations')
     return this.fetchAll(
       'organizations',
       {
@@ -42,6 +47,7 @@ class NetworkStore extends jsonapi(Collection) {
   }
 
   loadPaymentMethods(organization_id, skipCache = false) {
+    this.removeAll('payment_methods')
     return this.fetchAll(
       'payment_methods',
       {
@@ -55,6 +61,7 @@ class NetworkStore extends jsonapi(Collection) {
   }
 
   loadActiveSubscription(organization_id, skipCache = false) {
+    this.removeAll('subscriptions')
     return this.fetchAll(
       'subscriptions',
       {
@@ -67,6 +74,7 @@ class NetworkStore extends jsonapi(Collection) {
   }
 
   loadInvoices(organization_id) {
+    this.removeAll('invoices')
     return this.fetchAll('invoices', {
       filter: { organization_id },
       sort: 'period_start',

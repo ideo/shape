@@ -20,7 +20,10 @@ class ManagePaymentMethods extends React.Component {
 
     try {
       await networkStore.loadOrganization(apiStore.currentUserOrganizationId)
-      await networkStore.loadInvoices(networkStore.organization.id)
+      if (networkStore.organization) {
+        // if no org there's probably an error, e.g. on dev when the external_id org isn't there
+        await networkStore.loadInvoices(networkStore.organization.id)
+      }
       runInAction(() => (this.loaded = true))
     } catch (e) {
       trackError(e)
