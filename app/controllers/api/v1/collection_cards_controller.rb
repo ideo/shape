@@ -13,7 +13,11 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
            include: [
              :parent,
              record: [:filestack_file],
-           ]
+           ],
+           expose: {
+             card_order: params[:card_order],
+             current_record: @collection,
+           }
   end
 
   def create
