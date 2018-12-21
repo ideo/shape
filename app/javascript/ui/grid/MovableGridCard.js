@@ -10,6 +10,7 @@ import propShapes from '~/utils/propShapes'
 import PositionedGridCard from '~/ui/grid/PositionedGridCard'
 import GridCard from '~/ui/grid/GridCard'
 import GridCardPlaceholder from '~/ui/grid/GridCardPlaceholder'
+import GridCardPagination from '~/ui/grid/GridCardPagination'
 import GridCardBlank from '~/ui/grid/blankContentTool/GridCardBlank'
 import AddSubmission from '~/ui/grid/blankContentTool/AddSubmission'
 import GridCardEmpty from '~/ui/grid/GridCardEmpty'
@@ -270,6 +271,12 @@ class MovableGridCard extends React.PureComponent {
     </PositionedGridCard>
   )
 
+  renderPagination = () => (
+    <PositionedGridCard {...this.styleProps()}>
+      <GridCardPagination collection={uiStore.viewingCollection} />
+    </PositionedGridCard>
+  )
+
   renderBlank = cardType => {
     const { card, parent } = this.props
     const styleProps = this.styleProps()
@@ -338,6 +345,8 @@ class MovableGridCard extends React.PureComponent {
       return this.renderBlank(cardType)
     } else if (cardType === 'empty') {
       return this.renderEmpty({ beginningOfRow: card.position.x === 0 })
+    } else if (cardType === 'pagination') {
+      return this.renderPagination()
     }
 
     const { gridW, gridH, cols } = uiStore.gridSettings

@@ -44,7 +44,7 @@ class CollectionPage extends React.Component {
   }
 
   componentDidUpdate(prevProps) {
-    const { collection, uiStore } = this.props
+    const { collection } = this.props
     const previousId = prevProps.collection.id
     const currentId = collection.id
     if (currentId !== previousId) {
@@ -53,8 +53,6 @@ class CollectionPage extends React.Component {
       // when navigating between collections, close BCT
       this.props.uiStore.closeBlankContentTool()
       this.onAPILoad()
-    } else if (collection.isSubmissionBox && !uiStore.loadedSubmissions) {
-      this.checkSubmissionBox()
     }
   }
 

@@ -75,6 +75,8 @@ class CollectionGrid extends React.Component {
   }
 
   componentWillReceiveProps(nextProps) {
+    // TODO: refactor this into componentDidUpdate
+    // and only re-initialize under the right conditions (of props changing)
     this.initialize(nextProps)
   }
 
@@ -396,6 +398,21 @@ class CollectionGrid extends React.Component {
     cards.push(emptyCard)
   }
 
+  addPaginationCard = cards => {
+    if (_.find(cards, { id: 'pagination' })) return
+    let order = cards.length
+    const max = _.maxBy(cards, 'order')
+    if (max) order = max.order + 1
+    const paginationCard = {
+      id: 'pagination',
+      cardType: 'pagination',
+      width: 1,
+      height: 1,
+      order,
+    }
+    cards.push(paginationCard)
+  }
+
   // Sorts cards and sets state.cards after doing so
   @action
   positionCards = (collectionCards = [], opts = {}) => {
@@ -408,6 +425,7 @@ class CollectionGrid extends React.Component {
     const matrix = []
     // create an empty row
     matrix.push(_.fill(Array(cols), null))
+    if (collection.hasMore) this.addPaginationCard(cards)
     if (addEmptyCard) this.addEmptyCard(cards)
     let sortedCards = cards
     if (card_order === 'order') {
@@ -570,7 +588,9 @@ class CollectionGrid extends React.Component {
       i += 1
       let record = {}
       let { cardType } = card
-      if (!_.includes(['placeholder', 'blank', 'empty'], cardType)) {
+      if (
+        !_.includes(['placeholder', 'blank', 'empty', 'pagination'], cardType)
+      ) {
         // TODO: some kind of error catch if no record?
         if (card.record) {
           ;({ record } = card)

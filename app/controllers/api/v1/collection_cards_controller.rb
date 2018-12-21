@@ -5,9 +5,15 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
   before_action :load_and_authorize_parent_collection_for_update, only: %i[update]
   after_action :broadcast_collection_create_updates, only: %i[create update]
 
-  load_and_authorize_resource :collection, only: %i[index]
+  before_action :load_and_authorize_parent_collection_with_cards, only: %i[index]
   def index
-    render jsonapi: @collection.collection_cards
+    params[:page] ||= 1
+    params[:card_order] ||= @collection.default_card_order
+    render jsonapi: @collection_cards,
+           include: [
+             :parent,
+             record: [:filestack_file],
+           ]
   end
 
   def create
@@ -137,6 +143,29 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
   end
 
   private
+
+  def load_and_authorize_parent_collection_with_cards
+    @collection = Collection
+                  .where(id: params[:collection_id])
+                  .includes(collection_cards: [
+                    :parent,
+                    :collection,
+                    item: [:filestack_file],
+                  ])
+                  .first
+    current_user.precache_roles_for(
+      [Role::VIEWER, Role::CONTENT_EDITOR, Role::EDITOR],
+      @collection.children_and_linked_children,
+    )
+    authorize! :read, @collection
+
+    @collection_cards = @collection.collection_cards_viewable_by(
+      @collection.collection_cards,
+      current_user,
+      card_order: params[:card_order],
+      page: params[:page] || 1,
+    )
+  end
 
   def load_and_authorize_parent_collection
     @collection = Collection.find(collection_card_params[:parent_id])
@@ -293,9 +322,9 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
           :mimetype,
           docinfo: {},
         ],
-        data_settings: [
-          :d_measure,
-          :d_timeframe,
+        data_settings: %i[
+          d_measure
+          d_timeframe
         ],
       ],
     )

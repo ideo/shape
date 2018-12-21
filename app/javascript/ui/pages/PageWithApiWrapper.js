@@ -73,15 +73,20 @@ class PageWithApiWrapper extends React.Component {
     return true
   }
 
-  fetchData = () => {
-    const { apiStore, uiStore, fetchType } = this.props
+  fetchData = async () => {
+    const { apiStore, uiStore, fetchType, afterFetch } = this.props
     uiStore.update('pageError', null)
 
     return apiStore
       .request(`${fetchType}/${this.fetchId}`)
       .then(res => {
         if (this.unmounted) return
-        this.setState({ data: res.data })
+        const { data } = res
+        this.setState({ data }, async () => {
+          if (afterFetch) {
+            await afterFetch(data)
+          }
+        })
       })
       .catch(err => {
         uiStore.update('pageError', err)
@@ -105,6 +110,7 @@ PageWithApiWrapper.propTypes = {
   render: PropTypes.func.isRequired,
   fetchType: PropTypes.string.isRequired,
   fetchId: PropTypes.func,
+  afterFetch: PropTypes.func,
 }
 PageWithApiWrapper.wrappedComponent.propTypes = {
   apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
@@ -112,6 +118,7 @@ PageWithApiWrapper.wrappedComponent.propTypes = {
 }
 PageWithApiWrapper.defaultProps = {
   fetchId: null,
+  afterFetch: null,
 }
 export default PageWithApiWrapper
 
@@ -119,6 +126,7 @@ export const CollectionApiWrapper = routerProps => (
   <PageWithApiWrapper
     {...routerProps}
     fetchType="collections"
+    afterFetch={collection => collection.API_fetchCards()}
     render={collection => <CollectionPage collection={collection} />}
   />
 )
@@ -128,6 +136,7 @@ export const MyCollectionApiWrapper = routerProps => (
     {...routerProps}
     fetchType="collections"
     fetchId={apiStore => apiStore.currentUserCollectionId}
+    afterFetch={collection => collection.API_fetchCards()}
     render={collection => <CollectionPage collection={collection} isHomepage />}
   />
 )

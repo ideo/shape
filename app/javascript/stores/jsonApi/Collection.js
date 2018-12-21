@@ -18,6 +18,12 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   reloading = false
   @observable
   nextAvailableTestPath = null
+  @observable
+  currentPage = 1
+  @observable
+  currentOrder = 1
+  @observable
+  totalPages = 1
 
   attributesForAPI = [
     'name',
@@ -30,6 +36,11 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   @computed
   get cardIds() {
     return this.collection_cards.map(card => card.id)
+  }
+
+  @computed
+  get hasMore() {
+    return this.totalPages > this.currentPage
   }
 
   @action
@@ -320,6 +331,32 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     return data
   }
 
+  async API_fetchCards({ page = 1, order } = {}) {
+    runInAction(() => {
+      this.currentPage = page
+      this.currentOrder = order
+    })
+    let params = `?page=${page}`
+    if (order) {
+      params += `&card_order=${order}`
+    }
+    const apiPath = `collections/${this.id}/collection_cards${params}`
+    const res = await this.apiStore.request(apiPath)
+    const { data, links } = res
+    runInAction(() => {
+      this.totalPages = links.last
+      if (page === 1) {
+        this.collection_cards.replace(data)
+      } else {
+        this.collection_cards = this.collection_cards.concat(data)
+      }
+    })
+  }
+
+  API_fetchNextCards() {
+    this.API_fetchCards({ page: this.currentPage + 1 })
+  }
+
   API_updateCards({ card, updates, undoMessage } = {}) {
     // this works a little differently than the typical "undo" snapshot...
     // we snapshot the collection_cards.attributes so that they can be reverted
@@ -342,6 +379,8 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   // after we reorder a single card, we want to make sure everything goes into sequential order
   @action
   _reorderCards() {
+    // ****
+    // TODO: make this work with card pagination!!
     if (this.collection_cards) {
       this.collection_cards.replace(_.sortBy(this.collection_cards, 'order'))
       _.each(this.collection_cards, (card, i) => {
@@ -488,8 +527,11 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     previousCover.is_cover = false
   }
 
-  static fetchSubmissionsCollection(id, { order } = {}) {
-    return apiStore.request(`collections/${id}?card_order=${order}`)
+  static async fetchSubmissionsCollection(id, { order } = {}) {
+    const res = await apiStore.request(`collections/${id}`)
+    const collection = res.data
+    collection.API_fetchCards({ order })
+    return collection
   }
 
   async API_sortCards() {

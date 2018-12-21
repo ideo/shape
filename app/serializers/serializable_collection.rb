@@ -62,6 +62,7 @@ class SerializableCollection < BaseJsonSerializer
         @object.collection_cards,
         @current_user,
         card_order: @card_order,
+        page: @page || 1,
       )
     end
   end
