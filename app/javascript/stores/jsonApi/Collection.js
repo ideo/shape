@@ -21,7 +21,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   @observable
   currentPage = 1
   @observable
-  currentOrder = 1
+  currentOrder = 'order'
   @observable
   totalPages = 1
 
@@ -334,11 +334,11 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   async API_fetchCards({ page = 1, order } = {}) {
     runInAction(() => {
       this.currentPage = page
-      this.currentOrder = order
+      if (order) this.currentOrder = order
     })
     let params = `?page=${page}`
-    if (order) {
-      params += `&card_order=${order}`
+    if (this.currentOrder !== 'order') {
+      params += `&card_order=${this.currentOrder}`
     }
     const apiPath = `collections/${this.id}/collection_cards${params}`
     const res = await this.apiStore.request(apiPath)
@@ -346,6 +346,8 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     runInAction(() => {
       this.totalPages = links.last
       if (page === 1) {
+        // NOTE: If we ever want to "remember" collections where you've previously loaded 50+
+        // we could think about handling this differently.
         this.collection_cards.replace(data)
       } else {
         this.collection_cards = this.collection_cards.concat(data)
@@ -482,6 +484,10 @@ class Collection extends SharedRecordMixin(BaseRecord) {
             fadeOutTime: 10 * 1000,
           })
         })
+      if (_.includes(['launch', 'reopen'], actionName)) {
+        // then refetch the cards -- particularly if you just launched
+        this.API_fetchCards()
+      }
     } catch (e) {
       uiStore.update('launchButtonLoading', false)
     }
@@ -537,7 +543,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   async API_sortCards() {
     const order = uiStore.collectionCardSortOrder
     this.setReloading(true)
-    await this.apiStore.request(`collections/${this.id}?card_order=${order}`)
+    await this.API_fetchCards({ order })
     this.setReloading(false)
   }
 

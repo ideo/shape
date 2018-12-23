@@ -29,17 +29,9 @@ class GridCardPagination extends React.Component {
     this.update('loading', true)
     await collection.API_fetchNextCards()
     this.update('loading', false)
-
-    setTimeout(() => {
-      if (collection.hasMore && this.visible) {
-        // re-check if we need to load more
-        this.fetchNextCards()
-      }
-    }, 2000)
   }
 
   handleVisibilityChange = isVisible => {
-    // console.log({ isVisible })
     this.update('visible', isVisible)
     if (isVisible && !this.loading) {
       const { collection } = this.props
@@ -64,7 +56,6 @@ class GridCardPagination extends React.Component {
 
 GridCardPagination.propTypes = {
   collection: MobxPropTypes.objectOrObservableObject.isRequired,
-  // hasMore: PropTypes.bool.isRequired,
 }
 
 export default GridCardPagination

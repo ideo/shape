@@ -387,7 +387,7 @@ class Collection < ApplicationRecord
     CollectionCard
       .where(id: ids)
       .order(order)
-      .includes(:collection, item: [:filestack_file])
+      .includes(:parent, :collection, item: [:filestack_file])
       .page(page)
   end
 

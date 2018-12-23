@@ -69,6 +69,8 @@ class CollectionPage extends React.Component {
   async onAPILoad() {
     const { collection, apiStore, uiStore, routingStore } = this.props
     this.subscribeToChannel(collection.id)
+    // do this here, asynchronously -- don't need to await to perform other actions
+    collection.API_fetchCards()
 
     // setViewingCollection has to happen first bc we use it in openBlankContentTool
     uiStore.setViewingCollection(collection)
@@ -100,17 +102,17 @@ class CollectionPage extends React.Component {
 
   async checkSubmissionBox() {
     const { collection, uiStore } = this.props
-    if (collection.isSubmissionBox && collection.submissions_collection) {
+    if (collection.isSubmissionBox && collection.submissions_collection_id) {
       this.setLoadedSubmissions(false)
       // NOTE: if other collections get sortable features we may move this logic
       uiStore.update('collectionCardSortOrder', 'updated_at')
       await Collection.fetchSubmissionsCollection(
-        collection.submissions_collection.id,
+        collection.submissions_collection_id,
         { order: 'updated_at' }
       )
       this.setLoadedSubmissions(true)
       // Also subscribe to updates for the submission boxes
-      this.subscribeToChannel(collection.submissions_collection.id)
+      this.subscribeToChannel(collection.submissions_collection_id)
     }
   }
 

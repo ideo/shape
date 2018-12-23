@@ -420,7 +420,7 @@ class CollectionGrid extends React.Component {
     // props might get passed in e.g. nextProps for componentWillReceiveProps
     if (!opts.props) opts.props = this.props
     const { collection, gridW, gridH, gutter, cols, addEmptyCard } = opts.props
-    const card_order = collection.card_order || 'order'
+    const { currentOrder } = collection
     let row = 0
     const matrix = []
     // create an empty row
@@ -428,7 +428,7 @@ class CollectionGrid extends React.Component {
     if (collection.hasMore) this.addPaginationCard(cards)
     if (addEmptyCard) this.addEmptyCard(cards)
     let sortedCards = cards
-    if (card_order === 'order') {
+    if (currentOrder === 'order') {
       // For most collections, we will be sorting by `order`. In that case we call
       // `sortBy` in order to sort our placeholder/blank cards in the correct order.
       // NOTE: If we ever have something like "sort by updated_at" + the ability to pop open BCT,

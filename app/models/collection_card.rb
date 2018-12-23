@@ -1,7 +1,7 @@
 class CollectionCard < ApplicationRecord
   include Archivable
 
-  paginates_per 25
+  paginates_per 50
 
   belongs_to :parent, class_name: 'Collection'
   belongs_to :collection, optional: true

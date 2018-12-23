@@ -67,11 +67,6 @@ class SerializableCollection < BaseJsonSerializer
     end
   end
 
-  # expose this for the front-end to be aware, only matters for current collection
-  attribute :card_order, if: -> { @object == @current_record } do
-    @card_order || 'order'
-  end
-
   attribute :can_edit do
     @current_ability.can?(:edit, @object)
   end
@@ -80,6 +75,11 @@ class SerializableCollection < BaseJsonSerializer
     # NOTE: this also ends up coming into play when you are an editor
     # but the collection is "pinned_and_locked"
     @current_ability.can?(:edit_content, @object)
+  end
+
+  attribute :submissions_collection_id, if: -> { @object.is_a? Collection::SubmissionBox } do
+    # might be nil before object exists
+    @object.submissions_collection.try(:id)
   end
 
   # NOTE: a lot of these boolean attributes could probably be omitted if not applicable, which would potentially
@@ -113,9 +113,9 @@ class SerializableCollection < BaseJsonSerializer
     @object.submission_attrs
   end
 
-  attribute :is_inside_a_submission, if: -> { @object.inside_a_submission? } do
-    @object.inside_a_submission?
-  end
+  # attribute :is_inside_a_submission, if: -> { @object.inside_a_submission? } do
+  #   @object.inside_a_submission?
+  # end
 
   attribute :template_num_instances do
     if @object.master_template?
