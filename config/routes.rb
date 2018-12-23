@@ -118,6 +118,7 @@ Rails.application.routes.draw do
 
   authenticate :user, ->(u) { Rails.env.development? || u.has_cached_role?(Role::SUPER_ADMIN) } do
     require 'sidekiq/web'
+    require 'sidekiq-scheduler/web'
     mount Sidekiq::Web => '/sidekiq'
   end
 
