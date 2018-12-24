@@ -67,6 +67,10 @@ class SerializableCollection < BaseJsonSerializer
     end
   end
 
+  attribute :card_order, if: -> { @object == @current_record } do
+    @card_order || 'order'
+  end
+
   attribute :can_edit do
     @current_ability.can?(:edit, @object)
   end

@@ -386,8 +386,8 @@ class Collection < ApplicationRecord
     # pluck viewable ids and then convert to a paginated query
     CollectionCard
       .where(id: ids)
+      .includes(:collection, item: [:filestack_file])
       .order(order)
-      .includes(:parent, :collection, item: [:filestack_file])
       .page(page)
   end
 
