@@ -8,7 +8,7 @@ describe('GridCardPagination', () => {
       collection: fakeCollection,
       nextPage: 2,
     }
-    props.collection.hasMore = true
+    props.collection.totalPages = 2
     props.collection.API_fetchCards.mockClear()
     wrapper = shallow(<GridCardPagination {...props} />)
     component = wrapper.instance()
@@ -25,12 +25,12 @@ describe('GridCardPagination', () => {
     })
   })
 
-  describe('when collection.hasMore == false', () => {
+  describe('when collection.totalPages < nextPage', () => {
     beforeEach(() => {
       wrapper.setProps({
         collection: {
           ...props.collection,
-          hasMore: false,
+          totalPages: 1,
         },
       })
       wrapper.update()
