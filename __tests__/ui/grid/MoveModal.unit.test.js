@@ -11,7 +11,6 @@ describe('MoveModal', () => {
     uiStore.viewingCollection = {
       id: 3,
       API_fetchCards: jest.fn(),
-      API_fetchNextCards: jest.fn(),
     }
     props = {
       apiStore: fakeApiStore({

@@ -43,6 +43,11 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     return this.totalPages > this.currentPage
   }
 
+  @computed
+  get nextPage() {
+    return this.currentPage + 1
+  }
+
   @action
   removeCard(card) {
     this.collection_cards.splice(this.collection_cards.indexOf(card), 1)
@@ -353,10 +358,6 @@ class Collection extends SharedRecordMixin(BaseRecord) {
         this.collection_cards = this.collection_cards.concat(data)
       }
     })
-  }
-
-  API_fetchNextCards() {
-    this.API_fetchCards({ page: this.currentPage + 1 })
   }
 
   API_updateCards({ card, updates, undoMessage } = {}) {
