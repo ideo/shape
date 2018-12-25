@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types'
 import { observable, action } from 'mobx'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 
@@ -22,21 +23,20 @@ class GridCardPagination extends React.Component {
     this[field] = val
   }
 
-  fetchNextCards = async () => {
-    if (this.unmounted) return
-    const { collection } = this.props
-    if (!collection.hasMore) return
-    this.update('loading', true)
-    await collection.API_fetchNextCards()
-    this.update('loading', false)
+  async fetchNextPage() {
+    const { collection, nextPage } = this.props
+    if (!this.loading) {
+      if (!collection.hasMore) return
+      this.update('loading', true)
+      await collection.API_fetchCards({ page: nextPage })
+      this.update('loading', false)
+    }
   }
 
   handleVisibilityChange = isVisible => {
     this.update('visible', isVisible)
-    if (isVisible && !this.loading) {
-      const { collection } = this.props
-      if (!collection.hasMore) return
-      this.fetchNextCards()
+    if (isVisible) {
+      this.fetchNextPage()
     }
   }
 
@@ -56,6 +56,7 @@ class GridCardPagination extends React.Component {
 
 GridCardPagination.propTypes = {
   collection: MobxPropTypes.objectOrObservableObject.isRequired,
+  nextPage: PropTypes.number.isRequired,
 }
 
 export default GridCardPagination
