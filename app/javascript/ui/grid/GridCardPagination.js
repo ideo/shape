@@ -14,6 +14,14 @@ class GridCardPagination extends React.Component {
   @observable
   visible = false
 
+  componentDidUpdate(prevProps) {
+    // the case where the pagination card is still visible on the page
+    // and now the next page needs to be fetched
+    if (this.visible && this.props.nextPage !== prevProps.nextPage) {
+      this.fetchNextPage()
+    }
+  }
+
   componentWillUnmount() {
     this.unmounted = true
   }
@@ -25,12 +33,10 @@ class GridCardPagination extends React.Component {
 
   async fetchNextPage() {
     const { collection, nextPage } = this.props
-    if (!this.loading) {
-      if (!collection.hasMore) return
-      this.update('loading', true)
-      await collection.API_fetchCards({ page: nextPage })
-      this.update('loading', false)
-    }
+    if (nextPage > collection.totalPages) return
+    this.update('loading', true)
+    await collection.API_fetchCards({ page: nextPage })
+    this.update('loading', false)
   }
 
   handleVisibilityChange = isVisible => {
