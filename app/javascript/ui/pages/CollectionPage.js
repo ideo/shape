@@ -25,7 +25,7 @@ import Collection from '~/stores/jsonApi/Collection'
 // more global way to do this?
 pluralize.addPluralRule(/canvas$/i, 'canvases')
 
-@inject('apiStore', 'uiStore', 'routingStore')
+@inject('apiStore', 'uiStore', 'routingStore', 'undoStore')
 @observer
 class CollectionPage extends React.Component {
   @observable
@@ -67,10 +67,20 @@ class CollectionPage extends React.Component {
   }
 
   async onAPILoad() {
-    const { collection, apiStore, uiStore, routingStore } = this.props
+    const {
+      collection,
+      apiStore,
+      uiStore,
+      routingStore,
+      undoStore,
+    } = this.props
     this.subscribeToChannel(collection.id)
     // do this here, asynchronously -- don't need to await to perform other actions
-    collection.API_fetchCards()
+    collection.API_fetchCards().then(() => {
+      if (undoStore.undoAfterRoute) {
+        undoStore.performUndoAfterRoute()
+      }
+    })
 
     // setViewingCollection has to happen first bc we use it in openBlankContentTool
     uiStore.setViewingCollection(collection)
@@ -363,6 +373,7 @@ CollectionPage.wrappedComponent.propTypes = {
   apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
   routingStore: MobxPropTypes.objectOrObservableObject.isRequired,
+  undoStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 CollectionPage.defaultProps = {
   isHomepage: false,

@@ -3,6 +3,7 @@ import ChannelManager from '~/utils/ChannelManager'
 import fakeApiStore from '#/mocks/fakeApiStore'
 import fakeUiStore from '#/mocks/fakeUiStore'
 import fakeRoutingStore from '#/mocks/fakeRoutingStore'
+import fakeUndoStore from '#/mocks/fakeUndoStore'
 import { fakeCollection } from '#/mocks/data'
 
 jest.mock('../../../app/javascript/utils/ChannelManager')
@@ -14,7 +15,7 @@ const collections = [
   Object.assign({}, fakeCollection, { id: 3 }),
 ]
 const collection = collections[0]
-let wrapper, apiStore, uiStore, routingStore
+let wrapper, apiStore, uiStore, routingStore, undoStore
 let props
 
 beforeEach(() => {
@@ -26,14 +27,15 @@ beforeEach(() => {
   apiStore.collections = collections
   uiStore = fakeUiStore
   routingStore = fakeRoutingStore
+  undoStore = fakeUndoStore
   props = {
     apiStore,
     uiStore,
     routingStore,
+    undoStore,
     collection,
     isHomepage: false,
   }
-
   wrapper = shallow(<CollectionPage.wrappedComponent {...props} />)
 })
 
@@ -66,35 +68,6 @@ describe('CollectionPage', () => {
       })
     })
   })
-
-  // this is a function in PageWithApi
-  // describe('checkOrg', () => {
-  //   describe('when the route match.params.org does not match apiStore.currentOrgSlug', () => {
-  //     beforeEach(() => {
-  //       props.match.params.org = 'different-slug'
-  //       wrapper = shallow(<CollectionPage.wrappedComponent {...props} />)
-  //     })
-  //
-  //     it('calls routingStore to make sure /:org namespace is in the path', () => {
-  //       expect(apiStore.currentUser.switchOrganization).toHaveBeenCalledWith(
-  //         'different-slug',
-  //         { redirectPath: routingStore.location.pathname }
-  //       )
-  //     })
-  //   })
-  //   describe('when the route does not have match.params.org', () => {
-  //     beforeEach(() => {
-  //       props.match.params.org = null
-  //       wrapper = shallow(<CollectionPage.wrappedComponent {...props} />)
-  //     })
-  //
-  //     it('calls routingStore to make sure /:org namespace is in the path', () => {
-  //       expect(routingStore.routeTo).toHaveBeenCalledWith(
-  //         `/${apiStore.currentOrgSlug}${routingStore.location.pathname}`
-  //       )
-  //     })
-  //   })
-  // })
 
   describe('updateCollection', () => {
     beforeEach(() => {
@@ -149,6 +122,24 @@ describe('CollectionPage', () => {
 
     it('should call uiStore to open the comments', () => {
       expect(uiStore.openOptionalMenus).toHaveBeenCalledWith('?open=comments')
+    })
+  })
+
+  describe('with undoAfterRoute', () => {
+    beforeEach(() => {
+      wrapper = shallow(
+        <CollectionPage.wrappedComponent
+          {...props}
+          undoStore={{
+            ...undoStore,
+            undoAfterRoute: 'do something',
+          }}
+        />
+      )
+    })
+
+    it('should call undoStore to perform the action', () => {
+      expect(undoStore.performUndoAfterRoute).toHaveBeenCalled()
     })
   })
 })
