@@ -62,9 +62,9 @@ RSpec.describe TrialUsersCountExceededWorker, type: :worker do
 
     it 'sends notices to organizations that meet the criteria' do
       mailer = double
-      allow(mailer).to receive(:deliver_now)
+      allow(mailer).to receive(:deliver_later)
       allow(TrialUsersCountExceededMailer).to receive(:notify).and_return(mailer)
-      expect(mailer).to receive(:deliver_now).twice
+      expect(mailer).to receive(:deliver_later).twice
 
       expect(TrialUsersCountExceededMailer).to receive(:notify).with(should_process_a)
       expect(TrialUsersCountExceededMailer).to receive(:notify).with(should_process_b)
@@ -77,7 +77,7 @@ RSpec.describe TrialUsersCountExceededWorker, type: :worker do
     end
 
     it 'updates the organizations to indicate the email has been sent' do
-      allow(TrialUsersCountExceededMailer).to receive_message_chain(:notify, :deliver_now)
+      allow(TrialUsersCountExceededMailer).to receive_message_chain(:notify, :deliver_later)
       TrialUsersCountExceededWorker.new.perform
       expect(should_process_a.reload.trial_users_count_exceeded_email_sent).to be true
       expect(should_process_b.reload.trial_users_count_exceeded_email_sent).to be true

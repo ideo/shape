@@ -9,7 +9,7 @@ class OverdueNotificationWorker
 
       next unless days_overdue == 1 || days_overdue == 7 || days_overdue >= 10
 
-      BillingOverdueMailer.notify(organization).deliver_now
+      BillingOverdueMailer.notify(organization).deliver_later
     end
   end
 end

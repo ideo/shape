@@ -66,10 +66,10 @@ RSpec.describe TrialEndingSoonWorker, type: :worker do
 
     it 'sends notices to organizations that meet the criteria' do
       mailer = double
-      allow(mailer).to receive(:deliver_now)
+      allow(mailer).to receive(:deliver_later)
       allow(TrialEndingSoonMailer).to receive(:notify).and_return(mailer)
 
-      expect(mailer).to receive(:deliver_now).thrice
+      expect(mailer).to receive(:deliver_later).thrice
 
       expect(TrialEndingSoonMailer).to receive(:notify).with(
         trial_ends_in_2_days, 2

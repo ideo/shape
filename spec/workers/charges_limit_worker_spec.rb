@@ -104,9 +104,9 @@ RSpec.describe ChargesLimitWorker, type: :worker do
 
     it 'notifies for organizations that meet the criteria' do
       mailer = double
-      allow(mailer).to receive(:deliver_now)
+      allow(mailer).to receive(:deliver_later)
       allow(ChargesLimitMailer).to receive(:notify).and_return(mailer)
-      expect(mailer).to receive(:deliver_now).exactly(4).times
+      expect(mailer).to receive(:deliver_later).exactly(4).times
 
       expect(ChargesLimitMailer).not_to receive(:notify).with(in_app_billing_disabled)
       expect(ChargesLimitMailer).not_to receive(:notify).with(deactivated)
