@@ -1,6 +1,8 @@
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import v from '~/utils/variables'
 
+const MAX_RETRIES = 20
+
 @inject('apiStore', 'uiStore')
 @observer
 class ZendeskWidget extends React.Component {
@@ -26,16 +28,16 @@ class ZendeskWidget extends React.Component {
     )
   }
 
-  waitForZendesk = () => {
+  waitForZendesk = (count = 0) => {
     const { initialized } = this.state
     const { zE } = window
     if (initialized) return
-    if (zE && zE.identify) {
+    if (count > MAX_RETRIES) return
+
+    if (zE) {
       this.setState({ initialized: true })
     } else {
-      // for some reason zE will be initialized but zE.identify is undefined
-      // unless we wait a few secs
-      setTimeout(() => this.waitForZendesk(), 1000)
+      setTimeout(() => this.waitForZendesk(count + 1), 1000)
     }
   }
 
@@ -43,7 +45,7 @@ class ZendeskWidget extends React.Component {
     const { zE } = window
     if (user) {
       const { name, email } = user
-      zE.identify({ name, email })
+      zE('webWidget', 'identify', { name, email })
       this.setState({ identified: true })
     }
   }
