@@ -203,7 +203,10 @@ class MoveModal extends React.Component {
       }
       helperProps.recordName = templateName
       helperProps.type = 'template'
-    } else if (!apiStore.currentUser.show_move_helper) {
+    } else if (
+      !apiStore.currentUser.show_move_helper ||
+      uiStore.dismissedMoveHelper
+    ) {
       return null
     }
     return (
