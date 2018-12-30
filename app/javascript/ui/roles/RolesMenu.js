@@ -4,7 +4,8 @@ import styled from 'styled-components'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import { Collapse } from '@material-ui/core'
 import { Heading3, DisplayText } from '~/ui/global/styled/typography'
-import { Row, RowItemLeft } from '~/ui/global/styled/layout'
+import { Row, RowItemLeft, RowItemRight } from '~/ui/global/styled/layout'
+import SearchButton from '~/ui/global/SearchButton'
 import DropdownIcon from '~/ui/icons/DropdownIcon'
 import RolesAdd from '~/ui/roles/RolesAdd'
 import RoleSelect from '~/ui/roles/RoleSelect'
@@ -28,6 +29,9 @@ const FooterArea = styled.div`
   padding-bottom: ${props => (props.menuOpen ? 100 : 30)}px;
 `
 
+const StyledHeaderRow = styled(Row)`
+  margin-left: 0;
+`
 const StyledRow = styled(Row)`
   cursor: pointer;
   margin-left: 0;
@@ -48,7 +52,9 @@ const StyledExpandToggle = styled.button`
 @inject('apiStore', 'routingStore')
 @observer
 class RolesMenu extends React.Component {
-  state = {}
+  state = {
+    searchText: '',
+  }
 
   entityGroups(entities) {
     const groups = [
@@ -80,6 +86,33 @@ class RolesMenu extends React.Component {
     })
 
     return groups
+  }
+
+  updateSearchText = searchText => {
+    this.setState({ searchText })
+  }
+
+  handleSearchChange = value => {
+    this.updateSearchText(value)
+  }
+
+  clearSearch = () => this.updateSearchText('')
+
+  filterEntitiesForSearch = item => {
+    const entity = item.entity || null
+    const search = this.state.searchText.toLocaleLowerCase()
+    const searchFields = []
+    if (!search || !entity) return true
+
+    if (entity.internalType === 'users') {
+      searchFields.push('first_name', 'last_name', 'email')
+    } else if (entity.internalType === 'groups') {
+      searchFields.push('name')
+    }
+    return searchFields.some(
+      field =>
+        entity[field] && entity[field].toLocaleLowerCase().indexOf(search) >= 0
+    )
   }
 
   deleteRoles = (role, entity, opts = {}) =>
@@ -155,7 +188,9 @@ class RolesMenu extends React.Component {
         roleEntities.push(Object.assign({}, { role, entity: group }))
       })
     })
-    const sortedRoleEntities = roleEntities.sort(sortUserOrGroup)
+    const sortedRoleEntities = roleEntities
+      .filter(this.filterEntitiesForSearch)
+      .sort(sortUserOrGroup)
     const entityGroups = this.entityGroups(sortedRoleEntities)
     const roleTypes =
       ownerType === 'groups' ? ['member', 'admin'] : ['editor', 'viewer']
@@ -167,7 +202,17 @@ class RolesMenu extends React.Component {
     return (
       <Fragment>
         <ScrollArea>
-          <Heading3>{title}</Heading3>
+          <StyledHeaderRow align="flex-end">
+            <Heading3>{title}</Heading3>
+            <RowItemRight>
+              <SearchButton
+                value={this.state.searchText}
+                onChange={this.handleSearchChange}
+                onClear={this.clearSearch}
+              />
+            </RowItemRight>
+          </StyledHeaderRow>
+
           {entityGroups.map(group => {
             const { panelTitle, entities } = group
             if (entities.length === 0) return null
