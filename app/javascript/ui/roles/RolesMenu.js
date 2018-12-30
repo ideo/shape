@@ -79,14 +79,26 @@ class RolesMenu extends React.Component {
     ]
 
     // init state for each group
-    groups.forEach(group => {
-      if (typeof this.state[group.panelTitle] === 'undefined') {
-        this.setState({ [group.panelTitle]: group.startOpen })
-      }
-    })
+    groups.forEach(group => this.initPanel(group, group.startOpen))
 
     return groups
   }
+
+  togglePanel = panel => {
+    this.updatePanel(panel, !this.isOpenPanel(panel))
+  }
+
+  initPanel = (panel, defaultValue) => {
+    if (typeof this.state[panel.panelTitle] === 'undefined') {
+      this.updatePanel(panel, defaultValue)
+    }
+  }
+
+  updatePanel = (panel, status) => {
+    this.setState({ [panel.panelTitle]: status })
+  }
+
+  isOpenPanel = panel => !!this.state[panel.panelTitle]
 
   updateSearchText = searchText => {
     this.setState({ searchText })
@@ -221,17 +233,13 @@ class RolesMenu extends React.Component {
               <div key={panelTitle}>
                 <StyledRow
                   align="center"
-                  onClick={() => {
-                    this.setState({
-                      [panelTitle]: !this.state[panelTitle],
-                    })
-                  }}
+                  onClick={() => this.togglePanel(group)}
                 >
                   <DisplayText>
                     {panelTitle} ({entities.length})
                   </DisplayText>
                   <RowItemLeft style={{ marginLeft: '0px' }}>
-                    {this.state[panelTitle] ? (
+                    {this.isOpenPanel(group) ? (
                       <StyledCollapseToggle aria-label="Collapse">
                         <DropdownIcon />
                       </StyledCollapseToggle>
@@ -243,7 +251,7 @@ class RolesMenu extends React.Component {
                   </RowItemLeft>
                 </StyledRow>
                 <Collapse
-                  in={this.state[panelTitle]}
+                  in={this.isOpenPanel(group)}
                   timeout="auto"
                   unmountOnExit
                 >
