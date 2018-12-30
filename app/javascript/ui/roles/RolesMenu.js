@@ -17,6 +17,7 @@ function sortUserOrGroup(a, b) {
 
 const ScrollArea = styled.div`
   flex: 1 1 auto;
+  min-height: 100px;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
 `
