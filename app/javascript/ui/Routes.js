@@ -7,6 +7,7 @@ import styled from 'styled-components'
 import ActivityLogBox from '~/ui/activity_log/ActivityLogBox'
 import DialogWrapper from '~/ui/global/modals/DialogWrapper'
 import ErrorBoundary from '~/ui/global/ErrorBoundary'
+import ZendeskWidget from '~/ui/global/ZendeskWidget'
 import Header from '~/ui/layout/Header'
 import HomePage from '~/ui/pages/HomePage'
 import CollectionPage from '~/ui/pages/CollectionPage'
@@ -16,7 +17,6 @@ import SearchPage from '~/ui/pages/SearchPage'
 import SettingsPage from '~/ui/pages/SettingsPage'
 import TermsPage from '~/ui/pages/TermsPage'
 import TermsOfUseModal from '~/ui/users/TermsOfUseModal'
-import initZendesk from '~/vendor/zendesk'
 import OrganizationSettings from '~/ui/organizations/OrganizationSettings'
 import UserSettings from '~/ui/users/UserSettings'
 import v from '~/utils/variables'
@@ -54,7 +54,6 @@ class Routes extends React.Component {
   componentDidMount() {
     const { apiStore } = this.props
     apiStore.loadCurrentUserAndGroups().then(() => {
-      initZendesk(apiStore.currentUser)
       firebaseClient.authenticate(apiStore.currentUser.google_auth_token)
     })
     document.addEventListener('keydown', captureGlobalKeypress)
@@ -88,6 +87,7 @@ class Routes extends React.Component {
             {/* Global components are rendered here */}
             <WindowSizeListener onResize={this.handleWindowResize} />
             <DialogWrapper />
+            <ZendeskWidget />
 
             <Header />
             <FixedBoundary className="fixed_boundary" />
