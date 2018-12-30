@@ -1,5 +1,28 @@
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
+import styled from 'styled-components'
 import v from '~/utils/variables'
+
+// NOTE: While it would be wonderful to show/hide the badge when the Zendesk widget
+// is opened, Zendesk's new web API for listening to events via zE('webWidget:on', 'open')
+// and zE('webWidget:on', 'close') are currently useless because the "open" doesn't trigger
+// when opened via API and the "close" event doesn't trigger when closed via the "Cancel" button :-(
+
+const FloatingButton = styled.button`
+  position: fixed;
+  right: 0px;
+  bottom: 60px;
+  background-color: ${v.colors.black};
+  color: ${v.colors.white};
+  font-family: ${v.fonts.sans};
+  padding: 5px;
+  transform: rotate(-90deg) translateX(100%);
+  transform-origin: right bottom;
+  z-index: ${v.zIndex.aboveClickWrapper};
+
+  @media only screen and (max-width: ${v.responsive.smallBreakpoint}px) {
+    display: none;
+  }
+`
 
 const MAX_RETRIES = 20
 
@@ -9,7 +32,6 @@ class ZendeskWidget extends React.Component {
   state = {
     initialized: false,
     identified: false,
-    hidden: false,
   }
 
   componentDidMount() {
@@ -35,6 +57,7 @@ class ZendeskWidget extends React.Component {
     if (count > MAX_RETRIES) return
 
     if (zE) {
+      zE('webWidget', 'hide')
       this.setState({ initialized: true })
     } else {
       setTimeout(() => this.waitForZendesk(count + 1), 1000)
@@ -50,20 +73,11 @@ class ZendeskWidget extends React.Component {
     }
   }
 
-  hide = () => {
-    const { hidden } = this.state
+  handleClick = ev => {
     const { zE } = window
-    if (hidden) return
-    zE.hide()
-    this.setState({ hidden: true })
-  }
-
-  show = () => {
-    const { hidden } = this.state
-    const { zE } = window
-    if (!hidden) return
-    zE.show()
-    this.setState({ hidden: false })
+    // NOTE: We must use Zendesk's legacy web API here because there is not yet support for
+    // hideOnClose in their new equivalent of .activate() and their event hooks are inconsistent
+    zE.activate({ hideOnClose: true })
   }
 
   render() {
@@ -71,8 +85,7 @@ class ZendeskWidget extends React.Component {
     if (!initialized) return null
 
     if (!identified) this.identify(this.user)
-    this.isMobile ? this.hide() : this.show()
-    return null
+    return <FloatingButton onClick={this.handleClick}>Support</FloatingButton>
   }
 }
 
