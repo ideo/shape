@@ -1,6 +1,7 @@
 import { Fragment } from 'react'
 import { observable, runInAction } from 'mobx'
-import { Grid } from '@material-ui/core'
+import Grid from '@material-ui/core/Grid'
+import Hidden from '@material-ui/core/Hidden'
 import PropTypes from 'prop-types'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
@@ -19,7 +20,7 @@ const Wrapper = styled.div`
 `
 
 const Instructional = styled.div`
-  font-size: 12px;
+  font-size: 0.75rem;
   line-height: 16px;
   color: ${v.colors.commonMedium};
   letter-spacing: 0;
@@ -30,7 +31,7 @@ const BillingNoticeWrapper = styled.div`
 `
 
 const BillingNotice = styled.div`
-  font-size: 16px;
+  font-size: 1rem;
   line-height: 22px;
   color: #a89f9b;
   max-width: 500px;
@@ -38,15 +39,23 @@ const BillingNotice = styled.div`
 `
 
 const BlockHeader = styled.h3`
-  font-size: 16px;
+  font-size: 1rem;
   letter-spacing: 0.5px;
   font-weight: 500;
+
+  @media only screen and (max-width: ${v.responsive.muiSmBreakpoint}px) {
+    margin-bottom: 0.25rem;
+  }
 `
 
 const Block = ({ title, children }) => (
-  <Grid item xs={3}>
+  <Grid item sm={12} md={4} lg={3}>
     <BlockHeader>{title}</BlockHeader>
-    <Box mt={20}>{children}</Box>
+    <Box mt={1}>{children}</Box>
+    <Hidden mdUp>
+      {/* add spacing once the blocks stack at small sizes */}
+      <Box mb={24} />
+    </Hidden>
   </Grid>
 )
 Block.propTypes = {
@@ -59,7 +68,7 @@ const TrialHighlight = styled.div`
 `
 
 const FreeTrial = styled(TrialHighlight)`
-  font-size: 16px;
+  font-size: 1rem;
   line-height: 11px;
   letter-spacing: 0.5px;
   padding: 8px;
@@ -69,7 +78,7 @@ const FreeTrial = styled(TrialHighlight)`
 `
 
 const Label = styled.span`
-  font-size: 16px;
+  font-size: 1rem;
   color: ${v.colors.commonDark};
 `
 

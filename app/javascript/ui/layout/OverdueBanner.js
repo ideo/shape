@@ -11,7 +11,7 @@ const Banner = styled.div`
   background-color: ${v.colors.alert};
   color: white;
   font-family: ${v.fonts.sans};
-  font-size: 20px;
+  font-size: 1.33rem;
   margin-top: 20px;
   margin-bottom: 20px;
   margin-left: calc(-100vw / 2 + ${v.maxWidth - 2 * v.fonts.baseSize}px / 2);
@@ -43,7 +43,7 @@ const ClickableIconWrapper = styled(IconWrapper)`
 `
 
 const Action = styled.div`
-  font-size: 16px;
+  font-size: 1rem;
   text-align: right;
 `
 
@@ -71,7 +71,14 @@ class OverdueBanner extends React.Component {
       <Banner>
         <MaxWidthContainer>
           <Grid container justify="space-between" alignItems="center">
-            <Grid item xs={9} container spacing={16} alignItems="flex-end">
+            <Grid
+              item
+              xs={12}
+              md={9}
+              container
+              spacing={16}
+              alignItems="flex-end"
+            >
               <Grid item xs={1}>
                 <IconWrapper>
                   <OverdueClockIcon />
@@ -82,7 +89,7 @@ class OverdueBanner extends React.Component {
                 become inaccessible on {currentOrganization.inaccessible_at}.
               </Grid>
             </Grid>
-            <Grid item xs={3}>
+            <Grid item xs={12} md={3}>
               <Action>
                 {userCanEdit ? (
                   <div>

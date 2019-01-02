@@ -44,6 +44,8 @@ export default {
     // based on going from 3 -> 2 cols
     medBreakpoint: 1060,
     largeBreakpoint: 1308,
+    // material-ui Grid `sm` == 960px
+    muiSmBreakpoint: 960,
   },
 
   transitionWithDelay: 'all 0.3s 0.2s',
