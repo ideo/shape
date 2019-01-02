@@ -30,8 +30,10 @@ const StyledSurvey = styled.div`
   background-color: ${v.colors.primaryMedium};
   border-radius: 7px;
   border: 10px solid ${v.colors.primaryMedium};
-  width: 334px;
+  box-sizing: border-box;
+  width: 100%;
   margin: 0 auto;
+  max-width: 580px;
 `
 
 // TODO move blue background, rounded-corner box to shared component
