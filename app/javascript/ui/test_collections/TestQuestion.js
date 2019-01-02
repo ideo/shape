@@ -21,8 +21,18 @@ const QuestionHolder = styled.div`
 `
 
 const QuestionCardWrapper = styled.div`
-  width: 334px;
-  height: 250px;
+  position: relative;
+  width: 100%;
+`
+
+const QuestionCardSpacer = styled.div`
+  padding-bottom: 74.85%; /* 250/334px */
+`
+
+const QuestionCardInner = styled.div`
+  position: absolute;
+  width: 100%;
+  height: 100%;
 `
 
 @observer
@@ -112,7 +122,12 @@ class TestQuestion extends React.Component {
             />
           )
         }
-        return <QuestionCardWrapper>{inner}</QuestionCardWrapper>
+        return (
+          <QuestionCardWrapper>
+            <QuestionCardInner>{inner}</QuestionCardInner>
+            <QuestionCardSpacer />
+          </QuestionCardWrapper>
+        )
       case 'question_description':
         if (editing) {
           return (
