@@ -45,6 +45,11 @@ const fakeApiStore = ({
     duplicateCards: jest.fn(),
     checkInMyCollection: jest.fn(),
     unreadActivityCount: 0,
+
+    usersThreadPagesToLoad: 1,
+    loadingThreads: false,
+    hasOlderThreads: false,
+
     currentUserId: '1',
     currentUser: {
       id: '1',
