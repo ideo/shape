@@ -1,8 +1,11 @@
+import { scroller } from 'react-scroll'
+
 import CommentThreadContainer from '~/ui/threads/CommentThreadContainer'
 import fakeUiStore from '#/mocks/fakeUiStore'
 import fakeApiStore from '#/mocks/fakeApiStore'
-
 import { fakeCollection } from '#/mocks/data'
+
+jest.mock('react-scroll')
 
 let wrapper, props, component, apiStore, uiStore
 describe('CommentThreadContainer', () => {
@@ -13,9 +16,43 @@ describe('CommentThreadContainer', () => {
     props = {
       uiStore,
       apiStore,
+      loadingThreads: false,
     }
     wrapper = shallow(<CommentThreadContainer.wrappedComponent {...props} />)
     component = wrapper.instance()
+  })
+
+  describe('componentDidMount', () => {
+    it('should scroll to bottom if no threads are expanded', () => {
+      expect(scroller.scrollTo).toHaveBeenCalledWith(
+        `thread-${apiStore.currentThreads.length}`,
+        {
+          ...component.scrollOpts,
+          delay: 0,
+        }
+      )
+    })
+  })
+
+  describe('componentDidUpdate', () => {
+    it('should set loadingThreads true', () => {
+      wrapper.setProps({ loadingThreads: true })
+      expect(component.loadingThreads).toEqual(true)
+    })
+
+    it('should set loadingThreads false and scrollToTopOfNextThread if expanded', () => {
+      wrapper.setProps({
+        loadingThreads: false,
+        uiStore: {
+          ...fakeUiStore,
+          expandedThreadKey: apiStore.currentThreads[0].key,
+        },
+      })
+      wrapper.update()
+      component = wrapper.instance()
+      expect(component.loadingThreads).toEqual(false)
+      expect(component.expandedThread).toEqual(apiStore.currentThreads[0])
+    })
   })
 
   it('renders a CommentThread for each of apiStore.currentThreads', () => {
@@ -37,6 +74,14 @@ describe('CommentThreadContainer', () => {
       'overflow-y',
       'scroll'
     )
+  })
+
+  describe('loadMorePages', () => {
+    it('should close expanded thread and call apiStore.loadNextThreadPage', () => {
+      component.loadMorePages()
+      expect(props.uiStore.expandThread).toHaveBeenCalledWith(null)
+      expect(props.apiStore.loadNextThreadPage).toHaveBeenCalled()
+    })
   })
 
   describe('when on page of expanded thread in view', () => {
