@@ -116,7 +116,6 @@ export class FirebaseClient {
       // unsubscribe to any previous listener
       this.userThreadListener()
     }
-    console.log('listenForUsersThreads', pages)
     const PER_PAGE = 20
     this.userThreadListener = db
       .collection('users_threads')
@@ -129,11 +128,6 @@ export class FirebaseClient {
             const usersThread = apiStore.syncFromFirestore(doc.data())
             this.subscribeToThread(usersThread)
           })
-          console.log(
-            'comment threads total',
-            querySnapshot.size,
-            PER_PAGE * pages
-          )
           if (querySnapshot.size < PER_PAGE * pages) {
             apiStore.update('hasOlderThreads', false)
             this.checkIfFinishedLoading()
