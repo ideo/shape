@@ -2,12 +2,6 @@
 :verbose: true
 :namespace: sidekiq
 :concurrency: 7
-development:
-  :concurrency: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
-staging:
-  :concurrency: 7
-production:
-  :concurrency: 10
 :queues:
   - [critical, 10]
   - [mailers, 5]
@@ -15,7 +9,9 @@ production:
   - [default, 2]
   - [low, 1]
 :enabled: true
-:schedule:
+
+# Sidekiq scheduler setup, shared amongst all environments
+default_schedule: &default_schedule
   searchkick_reindex_worker:
     every: '1m'
     class: SearchkickReindexWorker
@@ -25,25 +21,40 @@ production:
   notification_mailer:
     every: '4h'
     class: NotificationMailerWorker
-  network_create_usage_record:
-    cron: '0 18 * * * America/Los_Angeles'
-    class: NetworkCreateUsageRecordWorker
-  # after NetworkCreateUsageRecordWorker
-  trial_users_count_exceeded:
-    cron: '5 18 * * * America/Los_Angeles'
-    class: TrialUsersCountExceededWorker
-  trial_expired:
-    cron: '10 18 * * * America/Los_Angeles'
-    class: TrialExpiredWorker
-  trial_ending_soon:
-    cron: '15 18 * * * America/Los_Angeles'
-    class: TrialEndingSoonWorker
-  mark_as_overdue:
-    cron: '20 18 * * * America/Los_Angeles'
-    class: MarkAsOverdueWorker
-  overdue_notifier:
-    cron: '25 18 * * * America/Los_Angeles'
-    class: OverdueNotificationWorker
-  charges_limit:
-    cron: '30 18 * * * America/Los_Angeles'
-    class: ChargesLimitWorker
+
+# env specific setup
+development:
+  :concurrency: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
+  :schedule:
+    <<: *default_schedule
+staging:
+  :concurrency: 7
+  :schedule:
+    <<: *default_schedule
+production:
+  :concurrency: 10
+  :schedule:
+    <<: *default_schedule
+    # we only schedule daily billing jobs on heroku envs (which includes heroku staging)
+    network_create_usage_record:
+      cron: '0 18 * * * America/Los_Angeles'
+      class: NetworkCreateUsageRecordWorker
+    # after NetworkCreateUsageRecordWorker
+    trial_users_count_exceeded:
+      cron: '5 18 * * * America/Los_Angeles'
+      class: TrialUsersCountExceededWorker
+    trial_expired:
+      cron: '10 18 * * * America/Los_Angeles'
+      class: TrialExpiredWorker
+    trial_ending_soon:
+      cron: '15 18 * * * America/Los_Angeles'
+      class: TrialEndingSoonWorker
+    mark_as_overdue:
+      cron: '20 18 * * * America/Los_Angeles'
+      class: MarkAsOverdueWorker
+    overdue_notifier:
+      cron: '25 18 * * * America/Los_Angeles'
+      class: OverdueNotificationWorker
+    charges_limit:
+      cron: '30 18 * * * America/Los_Angeles'
+      class: ChargesLimitWorker
