@@ -301,12 +301,12 @@ class User < ApplicationRecord
     Organization.all
   end
 
-  def add_network_admin
-    change_network_admin :add
+  def add_network_admin(org_id)
+    change_network_admin :add, org_id
   end
 
-  def remove_network_admin
-    change_network_admin :remove
+  def remove_network_admin(org_id)
+    change_network_admin :remove, org_id
   end
 
   def in_my_collection?(item_or_collection)
@@ -328,12 +328,12 @@ class User < ApplicationRecord
 
   private
 
-  def change_network_admin(action)
+  def change_network_admin(action, org_id)
     # must have uid for network request
     return true unless uid
 
     NetworkOrganizationUserSyncWorker.perform_async(
-      uid, id, NetworkApi::Organization::ADMIN_ROLE, action
+      uid, org_id, NetworkApi::Organization::ADMIN_ROLE, action
     )
   end
 
@@ -367,12 +367,12 @@ class User < ApplicationRecord
     if group.primary? && role.name == Role::ADMIN.to_s
       unless has_role?(Role::ADMIN, group.organization.admin_group)
         add_role(Role::ADMIN, group.organization.admin_group)
-        add_network_admin
+        add_network_admin(group.organization.id)
       end
     elsif group.admin?
       unless has_role?(Role::ADMIN, group.organization.primary_group)
         add_role(Role::ADMIN, group.organization.primary_group)
-        add_network_admin
+        add_network_admin(group.organization.id)
       end
     end
   end
@@ -384,13 +384,13 @@ class User < ApplicationRecord
     if group.primary? && role.name == Role::ADMIN.to_s
       if has_role?(Role::ADMIN, group.organization.admin_group)
         remove_role(Role::ADMIN, group.organization.admin_group)
-        remove_network_admin
+        remove_network_admin(group.organization.id)
       end
     elsif group.admin? && has_role?(Role::ADMIN, group.organization.primary_group)
       # if removing them from the admin group,
       # convert them back to a normal member of the org
       remove_role(Role::ADMIN, group.organization.primary_group)
-      remove_network_admin
+      remove_network_admin(group.organization.id)
       add_role(Role::MEMBER, group.organization.primary_group)
     end
   end
