@@ -25,6 +25,36 @@ RSpec.describe InvitationMailer, type: :mailer do
       it 'renders the body' do
         expect(mail.body.encoded).to match("#{invited_by.name} has invited you to join \"#{invited_to.name}\"")
       end
+
+      context 'on staging env' do
+        # this is actually testing ApplicationMailer
+        let(:group) { create(:group, id: ::IDEO_PRODUCTS_GROUP_ID, organization: organization) }
+        let!(:shape_app) { ENV['SHAPE_APP'] }
+
+        before do
+          ENV['SHAPE_APP'] = 'staging'
+        end
+
+        after do
+          ENV['SHAPE_APP'] = shape_app
+        end
+
+        context 'with user in IDEO Products group' do
+          before do
+            user.add_role(Role::MEMBER, group)
+          end
+
+          it 'sends the email' do
+            expect(mail.to).to eq([user.email])
+          end
+        end
+
+        context 'with user not in IDEO Products group' do
+          it 'skips sending the email' do
+            expect(mail.to).to be_nil
+          end
+        end
+      end
     end
 
     context 'with a group' do

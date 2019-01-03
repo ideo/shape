@@ -1,6 +1,7 @@
 import { action, runInAction, observable, computed } from 'mobx'
 import { Collection as datxCollection, assignModel, ReferenceType } from 'datx'
 import { jsonapi } from 'datx-jsonapi'
+import { apiUrl } from '~/utils/url'
 import _ from 'lodash'
 import moment from 'moment-mini'
 import queryString from 'query-string'
@@ -26,14 +27,19 @@ import { undoStore } from './index'
 class ApiStore extends jsonapi(datxCollection) {
   @observable
   currentUserId = null
+
   @observable
   currentUserOrganizationId = null
+
   @observable
   currentCommentThreadIds = []
+
   @observable
   currentPageThreadKey = null
+
   @observable
   recentNotifications = new Map()
+
   @observable
   usableTemplates = []
 
@@ -45,17 +51,13 @@ class ApiStore extends jsonapi(datxCollection) {
     if (!_.has(options, 'skipCache')) {
       options.skipCache = true
     }
-    return super.request(path, method, data, options)
+    return super.request(apiUrl(path), method, data, options)
   }
 
   @action
-  setCurrentUserId(id) {
+  setCurrentUserInfo({ id, organizationId }) {
     this.currentUserId = id
-  }
-
-  @action
-  setCurrentUserOrganizationId(id) {
-    this.currentUserOrganizationId = id
+    this.currentUserOrganizationId = organizationId || null
   }
 
   @action
@@ -72,6 +74,9 @@ class ApiStore extends jsonapi(datxCollection) {
 
   @computed
   get currentUser() {
+    if (!this.currentUserId) {
+      return null
+    }
     return this.find('users', this.currentUserId)
   }
 
@@ -84,6 +89,14 @@ class ApiStore extends jsonapi(datxCollection) {
     const { currentUser } = this
     if (!this.currentUser) return null
     return currentUser.current_user_collection_id
+  }
+
+  @computed
+  get currentOrgIsDeactivated() {
+    const org =
+      this.currentUserOrganization || this.currentUser.current_organization
+    if (!org) return true
+    return org.deactivated
   }
 
   @computed
@@ -104,11 +117,13 @@ class ApiStore extends jsonapi(datxCollection) {
   async loadCurrentUser() {
     try {
       const res = await this.request('users/me')
-      this.setCurrentUserId(res.data.id)
-      const { current_organization } = this.currentUser
-      this.setCurrentUserOrganizationId(
-        current_organization ? current_organization.id : null
-      )
+      const currentUser = res.data
+      this.setCurrentUserInfo({
+        id: currentUser.id,
+        organizationId:
+          currentUser.current_organization &&
+          currentUser.current_organization.id,
+      })
     } catch (e) {
       trackError(e, { source: 'loadCurrentUser', name: 'fetchUser' })
     }

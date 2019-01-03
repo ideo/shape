@@ -4,6 +4,7 @@ import fakeUiStore from '#/mocks/fakeUiStore'
 import fakeUndoStore from '#/mocks/fakeUndoStore'
 import { fakeUser } from '#/mocks/data'
 
+jest.mock('~shared/utils/countryOptions')
 jest.mock('firebase/auth')
 jest.mock('firebase/app', () => ({
   firestore: jest.fn().mockReturnValue({ settings: jest.fn() }),

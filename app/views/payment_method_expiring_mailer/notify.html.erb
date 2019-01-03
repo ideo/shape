@@ -1,0 +1,37 @@
+<div class="billing-email trial-users-count-exceeded">
+  <div class="subject"><%= @subject %></div>
+  <div>
+    The defualt payment method on file for your account
+    is <strong>expiring</strong> soon. Please go to the Shape billing
+    page to update your payment method or add a new payment method to your account.  </div>
+  <div>
+    <div class="organization-name"><%= @organization_name %></div>
+    <div>
+      <div class="section">
+        <div class="inner">
+          <div class="header">
+            Payment Method
+          </div>
+          <dl>
+            <dt><%= @payment_method.brand %> ending in <%= @payment_method.last4 %></dt>
+            <dd>EXPIRING</dd>
+          </dl>
+        </div>
+      </div>
+      <div class="section">
+        <div class="inner">
+          <div class="header">MONTHLY CHARGE</div>
+          <dl>
+            <dt>Next monthly charge:</dt>
+            <dd><%= number_to_currency(@next_monthly_charge) %></dd>
+            <dt>Next statement date:</dt>
+            <dd><%= @next_statement_date %></dd>
+          </dl>
+        </div>
+      </div>
+      <div class='email-link'>
+        <%= link_to 'Go To Billing', @url %>
+      </div>
+    </div>
+  </div>
+</div>

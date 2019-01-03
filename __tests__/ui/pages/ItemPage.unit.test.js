@@ -1,4 +1,5 @@
 import ItemPage from '~/ui/pages/ItemPage'
+import Deactivated from '~/ui/layout/Deactivated'
 import fakeApiStore from '#/mocks/fakeApiStore'
 import fakeUiStore from '#/mocks/fakeUiStore'
 import fakeRoutingStore from '#/mocks/fakeRoutingStore'
@@ -33,6 +34,20 @@ describe('ItemPage', () => {
 
   it('renders the ItemPageContainer', () => {
     expect(wrapper.find('ItemPageContainer').exists()).toEqual(true)
+  })
+
+  describe('organization is deactivated', () => {
+    beforeEach(() => {
+      wrapper.setProps({
+        apiStore: {
+          currentOrgIsDeactivated: true,
+        },
+      })
+    })
+
+    it('renders the Deactivated component', () => {
+      expect(wrapper.equals(<Deactivated />)).toEqual(true)
+    })
   })
 
   describe('updateItemName', () => {

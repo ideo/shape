@@ -26,10 +26,6 @@ class NotificationDigest < SimpleService
       notification_ids: notification_ids,
       comment_thread_ids: comment_thread_ids,
     )
-    if ENV['SHAPE_APP'] == 'staging'
-      products_group = Group.find(::IDEO_PRODUCTS_GROUP_ID)
-      deliver &&= products_group.user_ids.include?(user.id)
-    end
     if deliver
       mailer.deliver_later
     end

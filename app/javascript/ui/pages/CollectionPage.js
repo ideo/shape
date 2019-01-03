@@ -11,6 +11,7 @@ import ChannelManager from '~/utils/ChannelManager'
 import CollectionGrid from '~/ui/grid/CollectionGrid'
 import FloatingActionButton from '~/ui/global/FloatingActionButton'
 import Loader from '~/ui/layout/Loader'
+import Deactivated from '~/ui/layout/Deactivated'
 import MoveModal from '~/ui/grid/MoveModal'
 import PageContainer from '~/ui/layout/PageContainer'
 import PageHeader from '~/ui/pages/shared/PageHeader'
@@ -21,6 +22,7 @@ import EditorPill from '~/ui/items/EditorPill'
 import TestDesigner from '~/ui/test_collections/TestDesigner'
 import v from '~/utils/variables'
 import Collection from '~/stores/jsonApi/Collection'
+import OverdueBanner from '~/ui/layout/OverdueBanner'
 
 // more global way to do this?
 pluralize.addPluralRule(/canvas$/i, 'canvases')
@@ -291,11 +293,13 @@ class CollectionPage extends React.Component {
   )
 
   render() {
-    const { collection, isHomepage, uiStore } = this.props
+    const { collection, isHomepage, apiStore, uiStore } = this.props
+    if (apiStore.currentOrgIsDeactivated) {
+      return <Deactivated />
+    }
     if (!collection) {
       return this.loader()
     }
-
     // NOTE: if we have first loaded the slimmer SerializableSimpleCollection via the CommentThread
     // then some fields like `can_edit` will be undefined.
     // So we check if the full Collection has loaded via the `can_edit` attr
@@ -323,6 +327,7 @@ class CollectionPage extends React.Component {
         <PageHeader record={collection} isHomepage={isHomepage} />
         {!isLoading && (
           <PageContainer>
+            <OverdueBanner />
             {this.renderEditorPill}
             {requiresTestDesigner && this.renderTestDesigner()}
             {!requiresTestDesigner && (

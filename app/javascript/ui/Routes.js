@@ -18,13 +18,15 @@ import Loader from '~/ui/layout/Loader'
 import SearchPage from '~/ui/pages/SearchPage'
 import SettingsPage from '~/ui/pages/SettingsPage'
 import TermsPage from '~/ui/pages/TermsPage'
+import BillingPage from '~/ui/pages/BillingPage'
+import BillingStatement from '~/ui/pages/BillingStatement'
 import TermsOfUseModal from '~/ui/users/TermsOfUseModal'
 import initZendesk from '~/vendor/zendesk'
 import OrganizationSettings from '~/ui/organizations/OrganizationSettings'
 import UserSettings from '~/ui/users/UserSettings'
 import v from '~/utils/variables'
 import firebaseClient from '~/vendor/firestore'
-import MuiTheme from '~/ui/theme'
+import MuiTheme, { BillingMuiTheme } from '~/ui/theme'
 import captureGlobalKeypress from '~/utils/captureGlobalKeypress'
 
 const AppWrapper = styled.div`
@@ -125,6 +127,25 @@ class Routes extends React.Component {
               <Route path="/search" component={SearchPage} />
               <Route path="/:org/search" component={SearchPage} />
               <Route path="/terms" component={TermsPage} />
+
+              <Route
+                path="/billing"
+                render={() => (
+                  // There must be a better way to apply BillingMuiTheme to all billing pages,
+                  // however sticking MuiThemeProvider within the <Switch> made it angry
+                  <MuiThemeProvider theme={BillingMuiTheme}>
+                    <BillingPage />
+                  </MuiThemeProvider>
+                )}
+              />
+              <Route
+                path="/print/invoices/:id"
+                render={props => (
+                  <MuiThemeProvider theme={BillingMuiTheme}>
+                    <BillingStatement {...props} />
+                  </MuiThemeProvider>
+                )}
+              />
               <Route
                 path="/settings"
                 render={() => (

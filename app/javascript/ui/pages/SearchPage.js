@@ -7,6 +7,7 @@ import queryString from 'query-string'
 import v from '~/utils/variables'
 import Loader from '~/ui/layout/Loader'
 import Header from '~/ui/layout/Header'
+import Deactivated from '~/ui/layout/Deactivated'
 import MoveModal from '~/ui/grid/MoveModal'
 import PageContainer from '~/ui/layout/PageContainer'
 import SearchResultsInfinite from '~/ui/search/SearchResultsInfinite'
@@ -148,6 +149,11 @@ class SearchPage extends React.Component {
   }
 
   render() {
+    const { apiStore } = this.props
+    if (apiStore.currentOrgIsDeactivated) {
+      return <Deactivated />
+    }
+
     return (
       <Fragment>
         <Header />

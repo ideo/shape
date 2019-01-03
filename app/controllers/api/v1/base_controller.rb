@@ -79,7 +79,7 @@ class Api::V1::BaseController < ApplicationController
   end
 
   def check_api_authentication!
-    head(401) unless user_signed_in?
+    head(401) unless user_signed_in? && current_user.active?
   end
 
   def current_organization

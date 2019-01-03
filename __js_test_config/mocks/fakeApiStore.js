@@ -51,6 +51,7 @@ const fakeApiStore = ({
       current_user_collection_id: 99,
       current_organization: {
         name: 'Acme Inc',
+        deactivated: false,
       },
       organizations: [{ name: 'Acme Inc 1', filestack_file_url: 'test.jpg' }],
       name: 'Johnny Appleseed',

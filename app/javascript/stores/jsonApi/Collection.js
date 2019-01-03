@@ -4,12 +4,15 @@ import { ReferenceType } from 'datx'
 import pluralize from 'pluralize'
 
 import { apiStore, routingStore, uiStore } from '~/stores'
+import { apiUrl } from '~/utils/url'
+
 import BaseRecord from './BaseRecord'
 import CollectionCard from './CollectionCard'
 import SharedRecordMixin from './SharedRecordMixin'
 
 class Collection extends SharedRecordMixin(BaseRecord) {
   static type = 'collections'
+  static endpoint = apiUrl('collections')
 
   // starts null before it is loaded
   @observable

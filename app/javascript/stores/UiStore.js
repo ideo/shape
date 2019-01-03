@@ -139,6 +139,8 @@ export default class UiStore {
   @observable
   textEditingItem = null
   @observable
+  overdueBannerVisible = true
+  @observable
   editingCardId = null
   @observable
   collectionCardSortOrder = 'updated_at'
@@ -574,6 +576,11 @@ export default class UiStore {
         this.trackedRecords[identifier] = null
       }, TIMEOUT)
     )
+  }
+
+  @action
+  hideOverdueBanner() {
+    this.overdueBannerVisible = false
   }
 
   @action

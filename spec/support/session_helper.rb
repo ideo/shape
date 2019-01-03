@@ -8,7 +8,7 @@ module SessionHelper
   # This used to be a method on Organization -- no longer used outside of tests
   def create_org_for_user(user)
     name = [user.first_name, user.last_name, 'Organization'].compact.join(' ')
-    builder = OrganizationBuilder.new({ name: name }, user, with_templates: false)
+    builder = OrganizationBuilder.new({ name: name }, user, full_setup: false)
     builder.save
     builder.organization
   end
