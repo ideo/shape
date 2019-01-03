@@ -59,11 +59,7 @@ describe('CollectionPage', () => {
     beforeEach(() => {
       wrapper.setProps({
         apiStore: {
-          currentUser: {
-            current_organization: {
-              deactivated: true,
-            },
-          },
+          currentOrgIsDeactivated: true,
         },
       })
     })

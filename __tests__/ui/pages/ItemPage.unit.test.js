@@ -54,11 +54,7 @@ describe('ItemPage', () => {
     beforeEach(() => {
       wrapper.setProps({
         apiStore: {
-          currentUser: {
-            current_organization: {
-              deactivated: true,
-            },
-          },
+          currentOrgIsDeactivated: true,
         },
       })
     })

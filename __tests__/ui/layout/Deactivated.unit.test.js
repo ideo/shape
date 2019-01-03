@@ -3,11 +3,9 @@ import { Link } from 'react-router-dom'
 
 describe('Deactivated', () => {
   const apiStore = {
-    currentUser: {
-      current_organization: {
-        name: 'foo',
-        primary_group: {},
-      },
+    currentUserOrganization: {
+      name: 'foo',
+      primary_group: {},
     },
   }
   const render = () =>
@@ -22,7 +20,7 @@ describe('Deactivated', () => {
 
   describe('user is an admin', () => {
     beforeEach(() => {
-      apiStore.currentUser.current_organization.primary_group.can_edit = true
+      apiStore.currentUserOrganization.primary_group.can_edit = true
     })
 
     it('links to the billing page', () => {
@@ -35,7 +33,7 @@ describe('Deactivated', () => {
 
   describe('user is not an admin', () => {
     beforeEach(() => {
-      apiStore.currentUser.current_organization.primary_group.can_edit = false
+      apiStore.currentUserOrganization.primary_group.can_edit = false
     })
 
     it('advises the user to contact their admin', () => {
