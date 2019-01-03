@@ -73,7 +73,7 @@ class User < ApplicationRecord
   enum status: {
     active: 0,
     pending: 1,
-    deleted: 2,
+    archived: 2,
   }
 
   # to turn off devise validatable for uniqueness of email
@@ -319,6 +319,11 @@ class User < ApplicationRecord
     else
       @in_my_collection.include? "Collection_#{item_or_collection.breadcrumb.first}"
     end
+  end
+
+  def archive!
+    archived!
+    DeprovisionUserWorker.perform_async(id)
   end
 
   private

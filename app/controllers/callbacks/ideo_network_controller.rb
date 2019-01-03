@@ -48,7 +48,7 @@ class Callbacks::IdeoNetworkController < ApplicationController
   end
 
   def process_user_deleted
-    user.destroy
+    user.archive!
   end
 
   def process_invoice_payment_failed_event

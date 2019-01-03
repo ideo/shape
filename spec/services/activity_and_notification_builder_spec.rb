@@ -159,5 +159,21 @@ RSpec.describe ActivityAndNotificationBuilder, type: :service do
         expect(notification.combined_activities_ids.count).to eq 3
       end
     end
+
+    context 'some users to be notified are archived' do
+      let(:subject_users) do
+        [
+          create_list(:user, 2),
+          create_list(:user, 2, status: :archived),
+        ].flatten
+      end
+
+      it 'does not create notifications for the archived users' do
+        expect { builder.call }.to change(Notification, :count).by(2)
+        Notification.all.includes(:user).each do |notification|
+          expect(notification.user).not_to be_archived
+        end
+      end
+    end
   end
 end

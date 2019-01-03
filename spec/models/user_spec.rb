@@ -505,4 +505,12 @@ describe User, type: :model do
       expect(user.in_my_collection?(card_not_in_collection.collection)).to be false
     end
   end
+
+  describe '#archive!' do
+    it 'archives the user' do
+      expect(DeprovisionUserWorker).to receive(:perform_async).with(user.id)
+      expect(user).to receive(:archived!)
+      user.archive!
+    end
+  end
 end
