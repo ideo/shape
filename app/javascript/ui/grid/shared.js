@@ -167,7 +167,7 @@ const TopActions = css`
   display: flex;
   position: absolute;
   top: 0.35rem;
-  z-index: ${v.zIndex.gridCardTop};
+  z-index: ${v.zIndex.popoutMenu};
 `
 export const StyledTopLeftActions = styled.div`
   ${TopActions};

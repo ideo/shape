@@ -31,8 +31,8 @@ const backgroundOption = {
 }
 
 const TopRightHolder = styled.div`
-  left: 216px;
   max-width: 192px;
+  right: 5px;
   position: absolute;
   top: 46px;
   width: ${props => props.width}px;

@@ -23,7 +23,7 @@ class QuickOptionSelector extends React.Component {
   render() {
     const { options } = this.props
     return (
-      <div>
+      <div style={{ fontSize: 0 }}>
         {options.map(option => (
           <Tooltip
             classes={{ tooltip: 'Tooltip' }}
