@@ -309,7 +309,8 @@ class CollectionPage extends PageWithApi {
   )
 
   render() {
-    if (this.props.apiStore.currentUser.current_organization.deactivated) {
+    const { apiStore, uiStore } = this.props
+    if (apiStore.currentOrgIsDeactivated) {
       return <Deactivated />
     }
     // this.error comes from PageWithApi
@@ -323,7 +324,6 @@ class CollectionPage extends PageWithApi {
       return this.loader()
     }
 
-    const { uiStore } = this.props
     const {
       blankContentToolState,
       submissionBoxSettingsOpen,

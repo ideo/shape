@@ -118,7 +118,8 @@ class SearchPage extends PageWithApi {
   }
 
   render() {
-    if (this.props.apiStore.currentUser.current_organization.deactivated) {
+    const { apiStore } = this.props
+    if (apiStore.currentOrgIsDeactivated) {
       return <Deactivated />
     }
 

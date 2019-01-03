@@ -80,6 +80,9 @@ class Api::V1::CollectionsController < Api::V1::BaseController
   private
 
   def check_cache
+    if @collection.organization.deactivated?
+      head(404)
+    end
     fresh_when(
       last_modified: @collection.updated_at.utc,
       etag: @collection.cache_key(params[:card_order]),

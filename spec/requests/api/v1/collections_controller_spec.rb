@@ -198,6 +198,18 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
         get(path)
       end
     end
+
+    context 'with deactivated org' do
+      before do
+        # don't invoke callbacks, just mark as deactivated
+        collection.organization.update_column(:deactivated, true)
+      end
+
+      it 'should return a 404' do
+        get(path)
+        expect(response.status).to eq(404)
+      end
+    end
   end
 
   describe 'POST #create_template' do

@@ -32,11 +32,8 @@ const StyledSubHeader = styled.div`
 class Deactivated extends React.Component {
   render() {
     const {
-      apiStore: {
-        currentUser: { current_organization: organization },
-      },
+      apiStore: { currentUserOrganization: organization },
     } = this.props
-    console.log(organization)
     return (
       <PageContainer>
         <Wrapper>

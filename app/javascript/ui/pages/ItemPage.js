@@ -121,11 +121,11 @@ class ItemPage extends PageWithApi {
   }
 
   render() {
-    if (this.props.apiStore.currentUser.current_organization.deactivated) {
+    const { apiStore, uiStore } = this.props
+    if (apiStore.currentOrgIsDeactivated) {
       return <Deactivated />
     }
 
-    const { uiStore } = this.props
     // this.error comes from PageWithApi
     if (this.error) return <PageError error={this.error} />
 

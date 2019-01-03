@@ -334,6 +334,7 @@ class Organization < ApplicationRecord
   end
 
   def cancel_network_subscription
+    return unless network_organization
     subscription = NetworkApi::Subscription.find(
       organization_id: network_organization.id,
       active: true,
