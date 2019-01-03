@@ -10,8 +10,10 @@ import CollectionCard from '~/stores/jsonApi/CollectionCard'
 import CoverImageToggleIcon from '~/ui/icons/CoverImageToggleIcon'
 import FilestackUpload from '~/utils/FilestackUpload'
 import QuickOptionSelector from '~/ui/global/QuickOptionSelector'
+import SingleCrossIcon from '~/ui/icons/SingleCrossIcon'
 import UploadIcon from '~/ui/icons/UploadIcon'
 import XIcon from '~/ui/icons/XIcon'
+import { SmallBreak } from '~/ui/global/styled/layout'
 import v, { ITEM_TYPES } from '~/utils/variables'
 
 const removeOption = {
@@ -40,13 +42,26 @@ const TopRightHolder = styled.div`
 `
 TopRightHolder.displayName = 'TopRightHolder'
 
+const filterOptions = [
+  {
+    type: 'nothing',
+    title: 'no cover effect',
+    icon: <SingleCrossIcon />,
+  },
+  {
+    type: 'transparent_gray',
+    title: 'dark overlay effect',
+    color: v.colors.commonMedium,
+  },
+]
+
 @inject('apiStore', 'uiStore')
 @observer
 class CoverImageSelector extends React.Component {
   @observable
   open = false
   @observable
-  options = []
+  imageOptions = []
   @observable
   parentCard = null
 
@@ -75,12 +90,12 @@ class CoverImageSelector extends React.Component {
   }
 
   async populateAllOptions() {
-    const imageOptions = await this.fetchOptions()
+    const imageOptionsAll = await this.fetchOptions()
     runInAction(
       () =>
-        (this.options = [
+        (this.imageOptions = [
           removeOption,
-          ...imageOptions,
+          ...imageOptionsAll,
           backgroundOption,
           uploadOption,
         ])
@@ -118,7 +133,7 @@ class CoverImageSelector extends React.Component {
     runInAction(() => (this.open = !this.open))
   }
 
-  onOptionSelect = async option => {
+  onImageOptionSelect = async option => {
     const { apiStore, card } = this.props
     const collection = apiStore.find('collections', card.record.id)
     runInAction(() => (this.open = false))
@@ -133,6 +148,15 @@ class CoverImageSelector extends React.Component {
         onSuccess: file => this.createCard(file),
       })
     }
+    apiStore.fetch('collections', collection.id, true)
+  }
+
+  onFilterOptionSelect = async option => {
+    const { apiStore, card } = this.props
+    const collection = apiStore.find('collections', card.record.id)
+    runInAction(() => (this.open = false))
+    card.filter = option.type
+    await card.save()
     apiStore.fetch('collections', collection.id, true)
   }
 
@@ -152,11 +176,16 @@ class CoverImageSelector extends React.Component {
           ReactDOM.createPortal(
             <TopRightHolder
               className="show-on-hover"
-              width={this.options.length * 32}
+              width={this.imageOptions.length * 32}
             >
               <QuickOptionSelector
-                options={this.options}
-                onSelect={this.onOptionSelect}
+                options={this.imageOptions}
+                onSelect={this.onImageOptionSelect}
+              />
+              <SmallBreak />
+              <QuickOptionSelector
+                options={filterOptions}
+                onSelect={this.onFilterOptionSelect}
               />
             </TopRightHolder>,
             this.parentCard
