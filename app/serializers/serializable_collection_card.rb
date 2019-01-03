@@ -1,7 +1,7 @@
 class SerializableCollectionCard < BaseJsonSerializer
   type 'collection_cards'
   attributes :order, :width, :height, :parent_id, :type, :pinned,
-             :image_contain, :card_question_type, :is_cover
+             :image_contain, :card_question_type, :is_cover, :filter
 
   attribute :pinned_and_locked do
     @object.pinned_and_locked?

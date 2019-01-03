@@ -30,6 +30,11 @@ class CollectionCard < ApplicationRecord
   scope :pinned, -> { where(pinned: true) }
   scope :unpinned, -> { where(pinned: false) }
 
+  enum filter: {
+    nothing: 0,
+    transparent_gray: 1,
+  }
+
   amoeba do
     enable
     # propagate to STI models
