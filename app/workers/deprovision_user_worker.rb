@@ -17,8 +17,10 @@ class DeprovisionUserWorker
       case role.resource
       when Group
         other_admin = role.resource.admins[:users].find(&:active?)
+        # this group is OK if there are other admins available
         next if other_admin
 
+        # otherwise... the user being deprovisioned is the last admin
         if role.resource.admin?
           DeprovisionUserMailer.missing_org_admin(user.id, role.resource.id).deliver_later
         else
@@ -33,6 +35,7 @@ class DeprovisionUserWorker
         end
       when Collection
         other_editor = role.resource.editors[:users].find(&:active?)
+        # this collection is OK if there are other editors available
         next if other_editor
 
         role.resource.organization.admin_group.add_role Role::EDITOR, role.resource

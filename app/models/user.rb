@@ -73,8 +73,7 @@ class User < ApplicationRecord
   enum status: {
     active: 0,
     pending: 1,
-    deleted: 2,
-    archived: 3,
+    archived: 2,
   }
 
   # to turn off devise validatable for uniqueness of email
