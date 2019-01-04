@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20181212191943) do
+ActiveRecord::Schema.define(version: 20190103230243) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -65,6 +65,7 @@ ActiveRecord::Schema.define(version: 20181212191943) do
     t.boolean "image_contain", default: false
     t.boolean "is_cover", default: false
     t.datetime "unarchived_at"
+    t.integer "filter", default: 0
     t.index ["collection_id"], name: "index_collection_cards_on_collection_id"
     t.index ["item_id"], name: "index_collection_cards_on_item_id"
     t.index ["parent_id"], name: "index_collection_cards_on_parent_id"
@@ -91,9 +92,9 @@ ActiveRecord::Schema.define(version: 20181212191943) do
     t.integer "submission_box_type"
     t.bigint "submission_box_id"
     t.integer "test_status"
+    t.integer "processing_status"
     t.integer "question_item_id"
     t.bigint "test_collection_id"
-    t.integer "processing_status"
     t.bigint "collection_to_test_id"
     t.datetime "unarchived_at"
     t.jsonb "cached_test_scores"
@@ -236,19 +237,6 @@ ActiveRecord::Schema.define(version: 20181212191943) do
     t.integer "profile_collection_id"
     t.string "slug"
     t.integer "getting_started_collection_id"
-    t.string "network_subscription_id"
-    t.integer "active_users_count", default: 0, null: false
-    t.datetime "trial_ends_at"
-    t.integer "trial_users_count", default: 0, null: false
-    t.boolean "in_app_billing", default: true, null: false
-    t.boolean "trial_users_count_exceeded_email_sent", default: false, null: false
-    t.boolean "trial_expired_email_sent", default: false, null: false
-    t.datetime "overdue_at"
-    t.boolean "has_payment_method", default: false, null: false
-    t.boolean "sent_high_charges_low_email", default: false, null: false
-    t.boolean "sent_high_charges_middle_email", default: false, null: false
-    t.boolean "sent_high_charges_high_email", default: false, null: false
-    t.boolean "deactivated", default: false, null: false
     t.index ["slug"], name: "index_organizations_on_slug", unique: true
   end
 
@@ -342,7 +330,6 @@ ActiveRecord::Schema.define(version: 20181212191943) do
     t.boolean "show_move_helper", default: true
     t.boolean "show_template_helper", default: true
     t.boolean "mailing_list", default: false
-    t.datetime "last_active_at"
     t.index ["email"], name: "index_users_on_email"
     t.index ["handle"], name: "index_users_on_handle", unique: true
     t.index ["invitation_token"], name: "index_users_on_invitation_token"

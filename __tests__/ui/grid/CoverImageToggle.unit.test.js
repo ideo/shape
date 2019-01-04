@@ -1,7 +1,6 @@
 import CardActionHolder from '~/ui/icons/CardActionHolder'
 import CoverImageToggle from '~/ui/grid/CoverImageToggle'
 import { fakeCollectionCard } from '#/mocks/data'
-import v from '~/utils/variables'
 
 const card = fakeCollectionCard
 let props = {}
@@ -29,9 +28,9 @@ describe('CoverImageToggle', () => {
         wrapper.setProps(props)
       })
 
-      it('should set the svg fill to light gray', () => {
+      it('should set active to false', () => {
         const ele = wrapper.find(CardActionHolder)
-        expect(ele.props().color).toEqual(v.colors.commonMedium)
+        expect(ele.props().active).toBe(false)
       })
     })
 
@@ -41,9 +40,9 @@ describe('CoverImageToggle', () => {
         rerender()
       })
 
-      it('should set the svg fill to black', () => {
+      it('should set active to true', () => {
         const ele = wrapper.find(CardActionHolder)
-        expect(ele.props().color).toEqual(v.colors.black)
+        expect(ele.props().active).toBe(true)
       })
     })
   })

@@ -3,6 +3,7 @@ import CardActionHolder from '~/ui/icons/CardActionHolder'
 import FilestackUpload from '~/utils/FilestackUpload'
 import fakeApiStore from '#/mocks/fakeApiStore'
 import fakeUiStore from '#/mocks/fakeUiStore'
+
 import { fakeCollection, fakeCollectionCard } from '#/mocks/data'
 
 jest.mock('../../../app/javascript/utils/FilestackUpload')
@@ -64,7 +65,7 @@ describe('CoverImageSelector', () => {
     })
 
     it('should set the list of options from the api', () => {
-      expect(component.options.length).toEqual(3)
+      expect(component.imageOptions.length).toEqual(3)
     })
   })
 
@@ -79,7 +80,7 @@ describe('CoverImageSelector', () => {
       beforeEach(() => {
         apiStore.find.mockReset()
         apiStore.find.mockReturnValue(collection)
-        component.onOptionSelect({ type: 'remove' })
+        component.onImageOptionSelect({ type: 'remove' })
       })
 
       it('should call clear collection cover for the collection', () => {
@@ -93,7 +94,7 @@ describe('CoverImageSelector', () => {
 
     describe('with an upload action', () => {
       beforeEach(() => {
-        component.onOptionSelect({ type: 'upload' })
+        component.onImageOptionSelect({ type: 'upload' })
         wrapper.update()
       })
 

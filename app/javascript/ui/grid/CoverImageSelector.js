@@ -2,7 +2,7 @@ import { Fragment } from 'react'
 import ReactDOM from 'react-dom'
 import _ from 'lodash'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
-import { observable, runInAction } from 'mobx'
+import { observable, runInAction, toJS } from 'mobx'
 import styled from 'styled-components'
 
 import CardActionHolder from '~/ui/icons/CardActionHolder'
@@ -179,7 +179,7 @@ class CoverImageSelector extends React.Component {
               width={this.imageOptions.length * 32}
             >
               <QuickOptionSelector
-                options={this.imageOptions}
+                options={toJS(this.imageOptions)}
                 onSelect={this.onImageOptionSelect}
               />
               <SmallBreak />
