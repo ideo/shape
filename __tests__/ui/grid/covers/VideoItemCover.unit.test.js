@@ -1,6 +1,8 @@
 import VideoItemCover from '~/ui/grid/covers/VideoItemCover'
-
 import { fakeVideoItem } from '#/mocks/data'
+
+// because of Activity.trackActivity('viewed', item)
+jest.mock('../../../../app/javascript/stores/jsonApi/Activity')
 
 const props = {
   item: fakeVideoItem,

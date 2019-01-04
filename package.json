@@ -26,7 +26,7 @@
       "__js_test_config"
     ],
     "moduleNameMapper": {
-      ".+\\.(css|styl|less|sass|scss|png|jpg|svg|ttf|woff|woff2)$": "identity-obj-proxy"
+      ".+\\.(css|styl|less|sass|scss|png|jpg|svg|ttf|woff|woff2|otf)$": "identity-obj-proxy"
     },
     "testPathIgnorePatterns": [
       "/config/webpack/"
@@ -52,13 +52,19 @@
       "__tests__",
       "<rootDir>"
     ],
+    "globals": {
+      "ts-jest": {
+        "useBabelrc": true
+      }
+    },
     "transform": {
-      "^.+\\.js$": "babel-jest"
+      "^.+\\.js$": "babel-jest",
+      "^.+\\.tsx?$": "ts-jest"
     }
   },
   "dependencies": {
     "@firebase/app-types": "^0.3.2",
-    "@material-ui/core": "3.5",
+    "@material-ui/core": "^1.5",
     "@rails/webpacker": "4.0.0-pre.2",
     "actioncable": "^5.2.0",
     "axios": "^0.18.0",
@@ -134,6 +140,7 @@
     "styled-components": "^3.2.1",
     "styled-loaders-react": "ideo/styled-loaders-react",
     "svg-react-loader": "^0.4.5",
+    "ts-jest": "^23.1.4",
     "ts-loader": "4.2.0",
     "typescript": "2.8.3",
     "victory": "^30.4.1",

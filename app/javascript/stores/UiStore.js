@@ -1,9 +1,7 @@
 import _ from 'lodash'
 import { animateScroll } from 'react-scroll'
 import { observable, action, runInAction, computed } from 'mobx'
-import queryString from 'query-string'
 import sleep from '~/utils/sleep'
-import { setScrollHeight } from '~/utils/scrolling'
 import v from '~/utils/variables'
 
 export default class UiStore {
@@ -18,6 +16,8 @@ export default class UiStore {
     collectionId: null,
     blankType: null,
   }
+  @observable
+  pageError = null
   @observable
   blankContentToolState = { ...this.defaultBCTState }
   @observable
@@ -66,8 +66,6 @@ export default class UiStore {
   viewingCollection = null
   @observable
   previousViewingCollection = null
-  @observable
-  previousCollectionScrollHeight = 0
   @observable
   viewingItem = null
   @observable
@@ -141,6 +139,8 @@ export default class UiStore {
   @observable
   textEditingItem = null
   @observable
+  overdueBannerVisible = true
+  @observable
   editingCardId = null
   @observable
   collectionCardSortOrder = 'updated_at'
@@ -148,6 +148,8 @@ export default class UiStore {
   launchButtonLoading = false
   @observable
   newCards = []
+  @observable
+  autocompleteValues = 0
 
   @action
   toggleEditingCardId(cardId) {
@@ -410,9 +412,9 @@ export default class UiStore {
   }
 
   @action
-  closeBlankContentTool() {
+  closeBlankContentTool({ force = false } = {}) {
     const { viewingCollection } = this
-    if (viewingCollection && viewingCollection.isEmpty) {
+    if (!force && viewingCollection && viewingCollection.isEmpty) {
       // shouldn't be allowed to close BCT on empty collection, send back to default
       // -- also helps with the setup of SubmissionBox where you can close the bottom BCT
       this.openBlankContentTool()
@@ -423,14 +425,6 @@ export default class UiStore {
 
   @action
   setViewingCollection(collection = null) {
-    // called when loading a new CollectionPage
-    if (
-      collection &&
-      this.previousViewingCollection &&
-      collection.id === this.previousViewingCollection.id
-    ) {
-      setScrollHeight(this.previousCollectionScrollHeight)
-    }
     this.previousViewingCollection = this.viewingCollection
     this.viewingCollection = collection
     this.deselectCards()
@@ -480,8 +474,7 @@ export default class UiStore {
   }
 
   @action
-  openOptionalMenus(params) {
-    const opts = queryString.parse(params)
+  openOptionalMenus(opts = {}) {
     if (opts) {
       if (opts.open) {
         this.activityLogPage = opts.open
@@ -586,6 +579,11 @@ export default class UiStore {
   }
 
   @action
+  hideOverdueBanner() {
+    this.overdueBannerVisible = false
+  }
+
+  @action
   addNewCard(id) {
     if (!this.isNewCard(id)) {
       this.newCards.push(id)
@@ -603,5 +601,10 @@ export default class UiStore {
 
   isNewCard(id) {
     return this.newCards.indexOf(id) !== -1
+  }
+
+  @action
+  autocompleteMenuClosed() {
+    this.autocompleteValues = 0
   }
 }

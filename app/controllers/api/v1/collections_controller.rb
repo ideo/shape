@@ -9,10 +9,7 @@ class Api::V1::CollectionsController < Api::V1::BaseController
   before_action :check_cache, only: %i[show]
   def show
     log_organization_view_activity
-    if @collection.class.in? [Collection::SharedWithMeCollection, Collection::SubmissionsCollection]
-      # special behavior where it defaults to newest first
-      params[:card_order] ||= 'updated_at'
-    end
+    check_getting_started_shell
     log_collection_activity(:viewed)
     render_collection
   end
@@ -86,6 +83,9 @@ class Api::V1::CollectionsController < Api::V1::BaseController
   private
 
   def check_cache
+    if @collection.organization.deactivated?
+      head(404)
+    end
     fresh_when(
       last_modified: @collection.updated_at.utc,
       etag: @collection.cache_key(params[:card_order]),
@@ -126,6 +126,12 @@ class Api::V1::CollectionsController < Api::V1::BaseController
     else
       authorize! :edit_content, @collection
     end
+  end
+
+  def check_getting_started_shell
+    return unless @collection.getting_started_shell && @collection.can_edit?(current_user)
+    PopulateGettingStartedShellCollection.call(@collection, for_user: current_user)
+    @collection.reload
   end
 
   def load_and_authorize_collection_destroy

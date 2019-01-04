@@ -5,9 +5,19 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
   before_action :load_and_authorize_parent_collection_for_update, only: %i[update]
   after_action :broadcast_collection_create_updates, only: %i[create update]
 
-  load_and_authorize_resource :collection, only: %i[index]
+  before_action :load_and_authorize_parent_collection_with_cards, only: %i[index]
   def index
-    render jsonapi: @collection.collection_cards
+    params[:page] ||= 1
+    params[:card_order] ||= @collection.default_card_order
+    render jsonapi: @collection_cards,
+           include: [
+             :parent,
+             record: [:filestack_file],
+           ],
+           expose: {
+             card_order: params[:card_order],
+             current_record: @collection,
+           }
   end
 
   def create
@@ -119,24 +129,15 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
   before_action :check_valid_duplication, only: %i[duplicate]
   def duplicate
     placement = json_api_params[:placement]
-    should_update_cover = false
-    # reverse cards for 'beginning' since they get duplicated one by one to the front
-    @cards = @cards.reverse if placement == 'beginning'
-    new_cards = []
-    @cards.each do |card|
-      dup = card.duplicate!(
-        for_user: current_user,
-        parent: @to_collection,
-        placement: placement,
-        duplicate_linked_records: true,
-      )
-      should_update_cover ||= dup.should_update_parent_collection_cover?
-      @from_collection = Collection.find(json_api_params[:from_id])
+    new_cards = CollectionCardDuplicator.call(
+      to_collection: @to_collection,
+      cards: @cards,
+      placement: placement,
+      for_user: current_user,
+    )
+    new_cards.each do |card|
       create_notification(card, :duplicated)
-      new_cards << dup
     end
-    @to_collection.reorder_cards!
-    @to_collection.cache_cover! if should_update_cover
     # NOTE: for some odd reason the json api refuses to render the newly created cards here,
     # so we end up re-fetching the to_collection later in the front-end
     render jsonapi: @to_collection.reload,
@@ -146,6 +147,29 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
   end
 
   private
+
+  def load_and_authorize_parent_collection_with_cards
+    @collection = Collection
+                  .where(id: params[:collection_id])
+                  .includes(collection_cards: [
+                    :parent,
+                    :collection,
+                    item: [:filestack_file],
+                  ])
+                  .first
+    current_user.precache_roles_for(
+      [Role::VIEWER, Role::CONTENT_EDITOR, Role::EDITOR],
+      @collection.children_and_linked_children,
+    )
+    authorize! :read, @collection
+
+    @collection_cards = @collection.collection_cards_viewable_by(
+      @collection.collection_cards,
+      current_user,
+      card_order: params[:card_order],
+      page: params[:page] || 1,
+    )
+  end
 
   def load_and_authorize_parent_collection
     @collection = Collection.find(collection_card_params[:parent_id])

@@ -5,12 +5,14 @@ import { withStyles, withTheme } from '@material-ui/core/styles'
 import AsyncSelect from 'react-select/lib/Async'
 import Input from '@material-ui/core/Input'
 import Chip from '@material-ui/core/Chip'
-import Creatable from 'react-select/lib/Creatable'
+import AsyncCreatable from 'react-select/lib/AsyncCreatable'
 import Select from 'react-select'
 import { pick } from 'lodash'
 
+import Loader from '~/ui/layout/Loader'
 import Option from '~/ui/global/AutocompleteOption'
 import SearchIcon from '~/ui/icons/SearchIcon'
+import { uiStore } from '~/stores'
 
 const SearchIconContainer = styled.span`
   display: block;
@@ -23,11 +25,22 @@ const SearchIconContainer = styled.span`
     width: 22px;
   }
 `
+const LoadingContainer = SearchIconContainer.extend`
+  left: auto;
+  top: 0;
+  right: 30px;
+`
 
 const DropdownIndicator = () => (
   <SearchIconContainer>
     <SearchIcon />
   </SearchIconContainer>
+)
+
+const LoadingIndicator = () => (
+  <LoadingContainer>
+    <Loader size={25} containerHeight="30px" />
+  </LoadingContainer>
 )
 
 const valueComponent = classes => valueProps => {
@@ -113,7 +126,7 @@ const selectStyles = theme => ({
 
 const SelectWrapped = props => {
   const { classes, theme, creatable, options, optionSearch, ...other } = props
-  if (optionSearch) {
+  if (optionSearch && !creatable) {
     // Option search will do an async search for options.
     return (
       <AsyncSelect
@@ -122,6 +135,7 @@ const SelectWrapped = props => {
         styles={selectStyles(theme)}
         components={{
           valueComponent: valueComponent(classes),
+          LoadingIndicator,
           DropdownIndicator,
           Option,
         }}
@@ -129,16 +143,24 @@ const SelectWrapped = props => {
       />
     )
   }
-  return creatable ? (
-    <Creatable
-      formatCreateLabel={inputValue => `Invite email ${inputValue}`}
+  return optionSearch && creatable ? (
+    <AsyncCreatable
+      loadOptions={optionSearch}
+      defaultOptions
       styles={selectStyles(theme)}
+      formatCreateLabel={inputValue => `Invite email ${inputValue}`}
       components={{
         valueComponent: valueComponent(classes),
+        LoadingIndicator,
         DropdownIndicator,
         Option,
       }}
-      noOptionsMessage={() => 'No results found'}
+      noOptionsMessage={() => {
+        uiStore.autocompleteMenuClosed()
+        return 'No results found'
+      }}
+      onMenuClose={() => uiStore.autocompleteMenuClosed()}
+      options={options}
       {...other}
     />
   ) : (
@@ -149,6 +171,7 @@ const SelectWrapped = props => {
         DropdownIndicator,
         Option,
       }}
+      options={options}
       {...other}
     />
   )
@@ -184,10 +207,14 @@ class AutoComplete extends React.Component {
   }
 
   handleChange = option => {
+    uiStore.autocompleteMenuClosed()
     this.setState({
       option,
     })
-    let fullOption = this.props.options.find(x => x === option)
+    let fullOption = option
+    if (this.props.options && this.props.options.length) {
+      fullOption = this.props.options.find(x => x === option)
+    }
     if (!fullOption || !fullOption.data) {
       fullOption = Object.assign({}, { data: { custom: option.value } })
     }

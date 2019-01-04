@@ -3,6 +3,10 @@ import { PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 import { Flex, Box } from 'reflexbox'
 
+import { StyledTopLeftActions } from '~/ui/grid/shared'
+import { FullAbsolute, FullAbsoluteParent } from '~/ui/global/styled/layout'
+import CardActionHolder from '~/ui/icons/CardActionHolder'
+import DragIcon from '~/ui/icons/DragIcon'
 import v from '~/utils/variables'
 import hexToRgba from '~/utils/hexToRgba'
 import VideoPlayer from '~/ui/items/VideoPlayer'
@@ -79,13 +83,22 @@ class VideoItemCover extends React.PureComponent {
           </Flex>
         </StyledImageCover>
         <div className="playing">
-          <VideoPlayer
-            url={item.url}
-            controls
-            playing={this.state.playing}
-            width="100%"
-            height="100%"
-          />
+          <FullAbsoluteParent>
+            <StyledTopLeftActions className="show-on-hover">
+              <CardActionHolder className="show-on-hover" disableHover>
+                <DragIcon />
+              </CardActionHolder>
+            </StyledTopLeftActions>
+            <FullAbsolute>
+              <VideoPlayer
+                url={item.url}
+                controls
+                playing={this.state.playing}
+                width="100%"
+                height="100%"
+              />
+            </FullAbsolute>
+          </FullAbsoluteParent>
         </div>
       </StyledVideoCover>
     )

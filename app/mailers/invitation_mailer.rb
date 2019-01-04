@@ -17,6 +17,7 @@ class InvitationMailer < ApplicationMailer
       @url = invited_to_url
     end
     mail to: @user.email,
-         subject: "Your invitation to \"#{@invited_to.name}\" on Shape"
+         subject: "Your invitation to \"#{@invited_to.name}\" on Shape",
+         users: [@user]
   end
 end

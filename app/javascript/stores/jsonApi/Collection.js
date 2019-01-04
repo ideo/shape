@@ -4,12 +4,15 @@ import { ReferenceType } from 'datx'
 import pluralize from 'pluralize'
 
 import { apiStore, routingStore, uiStore } from '~/stores'
+import { apiUrl } from '~/utils/url'
+
 import BaseRecord from './BaseRecord'
 import CollectionCard from './CollectionCard'
 import SharedRecordMixin from './SharedRecordMixin'
 
 class Collection extends SharedRecordMixin(BaseRecord) {
   static type = 'collections'
+  static endpoint = apiUrl('collections')
 
   // starts null before it is loaded
   @observable
@@ -18,6 +21,12 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   reloading = false
   @observable
   nextAvailableTestPath = null
+  @observable
+  currentPage = 1
+  @observable
+  currentOrder = 'order'
+  @observable
+  totalPages = 1
 
   attributesForAPI = [
     'name',
@@ -30,6 +39,16 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   @computed
   get cardIds() {
     return this.collection_cards.map(card => card.id)
+  }
+
+  @computed
+  get hasMore() {
+    return this.totalPages > this.currentPage
+  }
+
+  @computed
+  get nextPage() {
+    return this.currentPage + 1
   }
 
   @action
@@ -324,6 +343,30 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     return data
   }
 
+  async API_fetchCards({ page = 1, order } = {}) {
+    runInAction(() => {
+      this.currentPage = page
+      if (order) this.currentOrder = order
+    })
+    let params = `?page=${page}`
+    if (this.currentOrder !== 'order') {
+      params += `&card_order=${this.currentOrder}`
+    }
+    const apiPath = `collections/${this.id}/collection_cards${params}`
+    const res = await this.apiStore.request(apiPath)
+    const { data, links } = res
+    runInAction(() => {
+      this.totalPages = links.last
+      if (page === 1) {
+        // NOTE: If we ever want to "remember" collections where you've previously loaded 50+
+        // we could think about handling this differently.
+        this.collection_cards.replace(data)
+      } else {
+        this.collection_cards = this.collection_cards.concat(data)
+      }
+    })
+  }
+
   API_updateCards({ card, updates, undoMessage } = {}) {
     // this works a little differently than the typical "undo" snapshot...
     // we snapshot the collection_cards.attributes so that they can be reverted
@@ -346,6 +389,8 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   // after we reorder a single card, we want to make sure everything goes into sequential order
   @action
   _reorderCards() {
+    // ****
+    // TODO: make this work with card pagination!!
     if (this.collection_cards) {
       this.collection_cards.replace(_.sortBy(this.collection_cards, 'order'))
       _.each(this.collection_cards, (card, i) => {
@@ -447,6 +492,10 @@ class Collection extends SharedRecordMixin(BaseRecord) {
             fadeOutTime: 10 * 1000,
           })
         })
+      if (_.includes(['launch', 'reopen'], actionName)) {
+        // then refetch the cards -- particularly if you just launched
+        this.API_fetchCards()
+      }
     } catch (e) {
       uiStore.update('launchButtonLoading', false)
     }
@@ -499,14 +548,17 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     previousCover.is_cover = false
   }
 
-  static fetchSubmissionsCollection(id, { order } = {}) {
-    return apiStore.request(`collections/${id}?card_order=${order}`)
+  static async fetchSubmissionsCollection(id, { order } = {}) {
+    const res = await apiStore.request(`collections/${id}`)
+    const collection = res.data
+    collection.API_fetchCards({ order })
+    return collection
   }
 
   async API_sortCards() {
     const order = uiStore.collectionCardSortOrder
     this.setReloading(true)
-    await this.apiStore.request(`collections/${this.id}?card_order=${order}`)
+    await this.API_fetchCards({ order })
     this.setReloading(false)
   }
 

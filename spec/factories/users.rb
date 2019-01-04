@@ -46,5 +46,11 @@ FactoryBot.define do
         user.reset_cached_roles!
       end
     end
+
+    trait :recently_active do
+      after(:create) do |user|
+        create(:activity, organization: user.current_organization, actor: user)
+      end
+    end
   end
 end

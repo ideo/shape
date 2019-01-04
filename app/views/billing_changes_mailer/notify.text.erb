@@ -1,0 +1,24 @@
+<%= @subject %> for your organization: <%= @organization_name %>
+
+Congratulations! Your team is growing! New people have joined or been added to Shape. These changes will be reflected in your monthly charge and next billing statment.
+
+ACTIVE PEOPLE
+
+  New users: <%= @new_users_count %>
+
+  Total users: <%= @total_users_count %>
+
+
+MONTHLY CHARGE
+
+  Additional Monthly Charge: <%= number_to_currency(@additional_monthly_charge) %>
+
+  New total monthly charge: <%= number_to_currency(@next_monthly_charge) %>
+
+
+  Prorated charge this month: <%= number_to_currency(@prorated_charge_this_month) %>
+
+  Next statement date: <%= @next_statement_date %>
+
+
+Go To Shape: <%= @url %>

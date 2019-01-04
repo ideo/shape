@@ -1,4 +1,7 @@
 import RolesAdd from '~/ui/roles/RolesAdd'
+import { apiStore } from '~/stores'
+
+jest.mock('../../../app/javascript/stores')
 
 let props
 let wrapper
@@ -15,6 +18,32 @@ describe('RolesAdd', () => {
       ownerType: 'collections',
     }
     wrapper = mount(<RolesAdd {...props} />)
+  })
+
+  describe('_autocompleteSearch', () => {
+    // test the non-debounced function
+
+    describe('with groups', () => {
+      beforeEach(() => {
+        wrapper = mount(<RolesAdd {...props} ownerType="groups" />)
+      })
+
+      it('should call apiStore to search users only', () => {
+        wrapper.instance()._autocompleteSearch('person', jest.fn())
+        expect(apiStore.searchUsers).toHaveBeenCalledWith('person')
+      })
+    })
+
+    describe('with collections', () => {
+      beforeEach(() => {
+        wrapper = mount(<RolesAdd {...props} ownerType="collections" />)
+      })
+
+      it('should call apiStore to search users only', () => {
+        wrapper.instance()._autocompleteSearch('person', jest.fn())
+        expect(apiStore.searchUsersAndGroups).toHaveBeenCalledWith('person')
+      })
+    })
   })
 
   describe('onUserSelected', () => {
@@ -97,7 +126,7 @@ describe('RolesAdd', () => {
   describe('mapItems', () => {
     describe('with groups', () => {
       it('should map groups with handle as the value', () => {
-        props.searchableItems = [
+        const searchableItems = [
           {
             id: 3,
             name: 'groupname',
@@ -105,25 +134,23 @@ describe('RolesAdd', () => {
             internalType: 'groups',
           },
         ]
-        wrapper.setProps(props)
-        expect(wrapper.instance().mapItems()[0]).toEqual({
+        expect(wrapper.instance().mapItems(searchableItems)[0]).toEqual({
           value: 'group-name',
           label: 'groupname',
-          data: props.searchableItems[0],
+          data: searchableItems[0],
         })
       })
     })
 
     describe('with users', () => {
       it('should map users with email as the value', () => {
-        props.searchableItems = [
+        const searchableItems = [
           { id: 3, name: 'user', email: 'user@u.com', internalType: 'users' },
         ]
-        wrapper.setProps(props)
-        expect(wrapper.instance().mapItems()[0]).toEqual({
+        expect(wrapper.instance().mapItems(searchableItems)[0]).toEqual({
           value: 'user@u.com',
           label: 'user',
-          data: props.searchableItems[0],
+          data: searchableItems[0],
         })
       })
     })

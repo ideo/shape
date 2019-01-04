@@ -72,6 +72,9 @@ class SubscribeEmail extends React.Component {
         >
           <input type="hidden" name="u" value="2f039cb306f0565682c88c494" />
           <input type="hidden" name="id" value="b141f584d3" />
+          {/* Add to Mailchimp Group IDEOProduct: Shape */}
+          <input type="hidden" name="group[1][2]" id="group_2" value="1" />
+
           <SubscribeInput
             id="mce-EMAIL"
             name="EMAIL"

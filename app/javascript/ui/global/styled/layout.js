@@ -66,15 +66,22 @@ export const FixedHeader = styled.header`
   z-index: ${props => props.zIndex};
   position: fixed;
   top: 0;
-  width: calc(100% - ${v.containerPadding.horizontal}*2);
+  width: calc(100% - ${v.containerPadding.horizontal}rem * 2);
   background: ${v.colors.commonLight};
-  padding: 1rem ${v.containerPadding.horizontal};
+  padding: 1rem ${v.containerPadding.horizontal}rem;
+  @media print {
+    display: none;
+  }
 `
 FixedHeader.displayName = 'FixedHeader'
 
 export const MaxWidthContainer = styled.div`
   max-width: ${v.maxWidth}px;
   margin: 0 auto;
+  @media print {
+    margin: 0;
+    max-width: none;
+  }
 `
 MaxWidthContainer.displayName = 'MaxWidthContainer'
 

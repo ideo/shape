@@ -1,8 +1,12 @@
 import { uiStore } from '~/stores'
+import { apiUrl } from '~/utils/url'
+
 import BaseRecord from './BaseRecord'
 
 class Group extends BaseRecord {
   static type = 'groups'
+  static endpoint = apiUrl('groups')
+
   attributesForAPI = ['name', 'handle', 'filestack_file_attributes']
 
   // NOTE: Because we're never directly hitting the groups/{id} API endpoint,

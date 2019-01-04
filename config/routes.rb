@@ -119,10 +119,13 @@ Rails.application.routes.draw do
 
   authenticate :user, ->(u) { Rails.env.development? || u.has_cached_role?(Role::SUPER_ADMIN) } do
     require 'sidekiq/web'
+    require 'sidekiq-scheduler/web'
     mount Sidekiq::Web => '/sidekiq'
   end
 
   namespace :callbacks do
+    post 'ideo_network/payment_methods' => 'ideo_network#payment_methods'
+    post 'ideo_network/invoices' => 'ideo_network#invoices'
     post 'ideo_network/users' => 'ideo_network#users'
   end
 

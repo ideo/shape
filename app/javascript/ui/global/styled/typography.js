@@ -53,6 +53,7 @@ export const DisplayText = styled.span`
   font-weight: ${v.weights.book};
   font-family: ${v.fonts.sans};
   font-size: 1rem;
+  text-transform: none;
 `
 DisplayText.displayName = 'StyledDisplayText'
 
@@ -120,6 +121,12 @@ export const SubText = styled.span`
   vertical-align: super;
   font-family: ${v.fonts.serif};
   font-size: 0.75rem;
+  ${props =>
+    props.compact &&
+    `
+    display: block;
+    margin-top: -7px;
+  `};
 `
 SubText.displayName = 'StyledSubText'
 

@@ -22,7 +22,7 @@ class Item
     ].freeze
 
     def report
-      DataReport.new(self)
+      url.present? ? external_report : internal_report
     end
 
     def data
@@ -30,6 +30,14 @@ class Item
     end
 
     private
+
+    def internal_report
+      DataReport::Internal.new(self)
+    end
+
+    def external_report
+      DataReport::External.new(self)
+    end
 
     def data_settings_validations
       unless VALID_MEASURES.include?(d_measure.to_s)

@@ -4,7 +4,7 @@ import PropTypes from 'prop-types'
 import styled from 'styled-components'
 
 import { Row, RowItemLeft } from '~/ui/global/styled/layout'
-import { DisplayText } from '~/ui/global/styled/typography'
+import { DisplayText, SubText } from '~/ui/global/styled/typography'
 import { SelectOption } from '~/ui/global/styled/forms'
 import CollectionIcon from '~/ui/icons/CollectionIcon'
 import Avatar from '~/ui/global/Avatar'
@@ -63,8 +63,11 @@ class AutocompleteOption extends React.Component {
               : this.renderUserAvatar()}
           </span>
           <RowItemLeft>
-            <DisplayText>{name}</DisplayText>
-            <br />
+            <div>
+              <DisplayText>{name}</DisplayText>
+              <br />
+              {entity.email && <SubText compact>{entity.email}</SubText>}
+            </div>
           </RowItemLeft>
         </Row>
       )

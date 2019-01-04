@@ -6,6 +6,7 @@ RSpec.describe MailchimpSubscription, type: :service do
     let(:user) { create(:user) }
 
     before do
+      ENV['MAILCHIMP_API_KEY'] = 'shared_secret_key_abc123'
       allow(Gibbon::Request).to receive_message_chain('new.lists.members') { fake_request }
     end
 

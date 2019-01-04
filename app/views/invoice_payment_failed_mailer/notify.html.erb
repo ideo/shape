@@ -1,0 +1,38 @@
+<div class="billing-email trial-users-count-exceeded">
+  <div class="subject"><%= @subject %></div>
+  <div>
+    The default payment method on file for your account has
+    been <strong>declined</strong>. Please go to the Shape billing page
+    to add a new payment method for your account.
+  </div>
+  <div>
+    <div class="organization-name"><%= @organization_name %></div>
+    <div>
+      <div class="section">
+        <div class="inner">
+          <div class="header">
+            Payment Method
+          </div>
+          <dl>
+            <dt><%= @payment_method.brand %> ending in <%= @payment_method.last4 %></dt>
+            <dd>DECLINED</dd>
+          </dl>
+        </div>
+      </div>
+      <div class="section">
+        <div class="inner">
+          <div class="header">MONTHLY CHARGE</div>
+          <dl>
+            <dt>Next monthly charge:</dt>
+            <dd><%= number_to_currency(@next_monthly_charge) %></dd>
+            <dt>Next statement date:</dt>
+            <dd><%= @next_statement_date %></dd>
+          </dl>
+        </div>
+      </div>
+      <div class='email-link'>
+        <%= link_to 'Add Payment Method', @url %>
+      </div>
+    </div>
+  </div>
+</div>

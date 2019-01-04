@@ -3,7 +3,8 @@ import _ from 'lodash'
 const fakeJsonApiAttrs = {
   assign: jest.fn(),
   assignRef: jest.fn(),
-  save: jest.fn(),
+  save: jest.fn().mockReturnValue({}),
+  update: jest.fn().mockReturnValue({}),
   disableMenu: jest.fn(),
 }
 export const fakeCollectionCard = {
@@ -231,6 +232,7 @@ export const fakeCollection = {
   API_updateName: jest.fn(),
   API_getNextAvailableTest: jest.fn(),
   API_clearCollectionCover: jest.fn(),
+  API_fetchCards: jest.fn().mockReturnValue(Promise.resolve({})),
   checkCurrentOrg: jest.fn(),
   confirmEdit: jest.fn(),
   cardProperties: [],

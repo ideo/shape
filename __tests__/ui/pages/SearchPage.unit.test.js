@@ -1,9 +1,14 @@
 import SearchPage from '~/ui/pages/SearchPage'
+import Deactivated from '~/ui/layout/Deactivated'
 import fakeApiStore from '#/mocks/fakeApiStore'
 import fakeUiStore from '#/mocks/fakeUiStore'
 import fakeRoutingStore from '#/mocks/fakeRoutingStore'
 
-let wrapper, location, match, apiStore, uiStore, routingStore, props
+// needed for checkOrg import
+jest.mock('../../../app/javascript/stores')
+
+let wrapper, location, match
+let apiStore, uiStore, routingStore, props
 const query = 'stuff'
 
 beforeEach(() => {
@@ -40,5 +45,19 @@ describe('SearchPage', () => {
         .at(0)
         .text()
     ).toContain(`No results found for "${query}".`)
+  })
+
+  describe('organization is deactivated', () => {
+    beforeEach(() => {
+      wrapper.setProps({
+        apiStore: {
+          currentOrgIsDeactivated: true,
+        },
+      })
+    })
+
+    it('renders the Deactivated component', () => {
+      expect(wrapper.equals(<Deactivated />)).toEqual(true)
+    })
   })
 })

@@ -1,4 +1,3 @@
-import CollectionPage from '~/ui/pages/CollectionPage'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import backOutImage from '~/assets/back_out_of_new_org.png'
 
@@ -16,6 +15,10 @@ class HomePage extends React.Component {
       const { apiStore } = this.props
       apiStore.currentUser.logout()
     }
+  }
+
+  componentWillUnmount() {
+    this.props.uiStore.closeDialog()
   }
 
   confirmNewOrganization() {
@@ -43,12 +46,8 @@ class HomePage extends React.Component {
   render() {
     if (!this.userHasOrg) {
       // User needs to set up their Org...
-      return <div />
     }
-    return (
-      // Otherwise Home just renders the CollectionPage
-      <CollectionPage {...this.props} />
-    )
+    return <div />
   }
 }
 

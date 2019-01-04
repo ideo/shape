@@ -1,9 +1,14 @@
 import { routingStore, uiStore } from '~/stores'
+import { apiUrl } from '~/utils/url'
+
 import BaseRecord from './BaseRecord'
 
 /* global IdeoSSO */
 
 class User extends BaseRecord {
+  static type = 'users'
+  static endpoint = apiUrl('users')
+
   get name() {
     const nameDisplay = [this.first_name, this.last_name].join(' ')
     return nameDisplay.trim() || this.email
@@ -80,12 +85,11 @@ class User extends BaseRecord {
         routingStore.routeTo(redirectPath, redirectId)
       }
     } catch (e) {
-      if (e.status === 404) {
+      if (e.status === 404 || e.status === 401) {
         routingStore.routeTo('homepage')
       }
     }
   }
 }
-User.type = 'users'
 
 export default User

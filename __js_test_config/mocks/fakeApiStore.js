@@ -27,6 +27,9 @@ const fakeApiStore = ({
     searchUsersAndGroups: jest
       .fn()
       .mockReturnValue(Promise.resolve({ data: [] })),
+    searchUsers: jest
+      .fn()
+      .mockReturnValue(Promise.resolve({ data: [] })),
     searchCollections: jest.fn().mockReturnValue(Promise.resolve({ data: [] })),
     setCurrentUserId: jest.fn(),
     findOrganizationById: jest.fn().mockReturnValue({ name: 'abc' }),
@@ -48,6 +51,7 @@ const fakeApiStore = ({
       current_user_collection_id: 99,
       current_organization: {
         name: 'Acme Inc',
+        deactivated: false,
       },
       organizations: [{ name: 'Acme Inc 1', filestack_file_url: 'test.jpg' }],
       name: 'Johnny Appleseed',
