@@ -84,7 +84,7 @@ class Organization < ApplicationRecord
 
   def matches_domain_whitelist?(user)
     email_domain = user.email.split('@').last
-    domain_whitelist.include? email_domain
+    (domain_whitelist + autojoin_domains).uniq.include?(email_domain)
   end
 
   def setup_user_membership(user)
@@ -93,7 +93,7 @@ class Organization < ApplicationRecord
       Collection::UserProfile.find_or_create_for_user(user: user, organization: self)
     end
 
-    check_user_email_domain(user)
+    check_email_domains_and_join_org_group(user)
 
     # Set this as the user's current organization if they don't have one
     user.switch_to_organization(self) if user.current_organization_id.blank?
@@ -273,7 +273,7 @@ class Organization < ApplicationRecord
     user_getting_started
   end
 
-  def check_user_email_domain(user)
+  def check_email_domains_and_join_org_group(user)
     if matches_domain_whitelist?(user)
       # add them as an org member
       user.add_role(Role::MEMBER, primary_group)

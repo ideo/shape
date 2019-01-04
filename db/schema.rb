@@ -249,7 +249,8 @@ ActiveRecord::Schema.define(version: 20190104004056) do
     t.boolean "sent_high_charges_middle_email", default: false, null: false
     t.boolean "sent_high_charges_high_email", default: false, null: false
     t.boolean "deactivated", default: false, null: false
-    t.jsonb "autojoin_whitelist", default: []
+    t.jsonb "autojoin_domains", default: []
+    t.index ["autojoin_domains"], name: "index_organizations_on_autojoin_domains", using: :gin
     t.index ["slug"], name: "index_organizations_on_slug", unique: true
   end
 
