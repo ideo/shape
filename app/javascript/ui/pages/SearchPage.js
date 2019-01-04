@@ -1,20 +1,22 @@
+import ReactRouterPropTypes from 'react-router-prop-types'
 import { Fragment } from 'react'
 import { action, observable } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import queryString from 'query-string'
 
 import v from '~/utils/variables'
-import PageWithApi from '~/ui/pages/PageWithApi'
 import Loader from '~/ui/layout/Loader'
 import Header from '~/ui/layout/Header'
 import Deactivated from '~/ui/layout/Deactivated'
 import MoveModal from '~/ui/grid/MoveModal'
 import PageContainer from '~/ui/layout/PageContainer'
 import SearchResultsInfinite from '~/ui/search/SearchResultsInfinite'
+import checkOrg from '~/ui/pages/shared/checkOrg'
 
 @inject('apiStore', 'uiStore', 'routingStore')
 @observer
-class SearchPage extends PageWithApi {
+class SearchPage extends React.Component {
+  unmounted = false
   @observable
   searchResults = []
   @observable
@@ -23,47 +25,64 @@ class SearchPage extends PageWithApi {
   total = 0
 
   componentDidMount() {
-    const { uiStore, routingStore } = this.props
-    const query = this.searchQuery(this.props)
+    const { uiStore, routingStore, location } = this.props
+    const query = this.searchQuery(location)
     if (!query) {
       routingStore.leaveSearch()
       return
     }
     // initialize SearchBar to the queryString, e.g. when directly loading a search URL
     uiStore.update('searchText', query)
-    super.componentDidMount()
+
+    this.fetchData()
   }
 
   @action
-  componentWillReceiveProps(nextProps) {
-    // i.e. you are on SearchPage and perform a new search
-    // NOTE: important to do this here to "reset" infinite scroll!
-    if (this.searchQuery(nextProps) !== this.searchQuery(this.props)) {
+  componentDidUpdate(prevProps) {
+    const { routingStore, location } = this.props
+    if (checkOrg(this.props.match) && this.requiresFetch(prevProps)) {
+      // NOTE: important to do this here to "reset" infinite scroll!
       this.searchResults.replace([])
+      this.fetchData()
     }
-    if (!this.searchQuery(nextProps)) {
-      nextProps.routingStore.leaveSearch()
-      return
+    if (!this.searchQuery(location)) {
+      routingStore.leaveSearch()
     }
-    super.componentWillReceiveProps(nextProps)
   }
 
   componentWillUnmount() {
     const { uiStore } = this.props
     uiStore.update('searchText', '')
+    this.unmounted = true
   }
 
-  searchQuery = (props, opts = {}) => {
-    let query = queryString.parse(props.location.search).q
-    if (!query) return ''
-    if (opts.url) query = query.replace(/\s/g, '+').replace(/#/g, '%23')
-    return query
+  requiresFetch = prevProps => {
+    const { location, match } = this.props
+    const { org } = match.params
+    if (org && prevProps.match && org !== prevProps.match.params.org) {
+      return true
+    }
+    // i.e. you are on SearchPage and perform a new search
+    return this.searchQuery(prevProps.location) !== this.searchQuery(location)
   }
 
-  requestPath = props => {
-    const q = this.searchQuery(props, { url: true })
-    const page = props.page || 1
-    return `search?query=${q}&page=${page}`
+  fetchData = (page = 1) => {
+    const { apiStore, uiStore } = this.props
+    uiStore.update('pageError', null)
+    uiStore.update('isLoading', true)
+
+    return apiStore
+      .request(this.requestPath(page))
+      .then(res => {
+        if (this.unmounted) return
+        this.onAPILoad(res)
+        uiStore.update('isLoading', false)
+      })
+      .catch(err => {
+        uiStore.update('pageError', err)
+        uiStore.update('isLoading', false)
+        // trackError(err, { name: 'PageApiFetch' })
+      })
   }
 
   @action
@@ -83,14 +102,26 @@ class SearchPage extends PageWithApi {
     }
   }
 
+  searchQuery = (location, opts = {}) => {
+    let query = queryString.parse(location.search).q
+    if (!query) return ''
+    if (opts.url) query = query.replace(/\s/g, '+').replace(/#/g, '%23')
+    return query
+  }
+
+  requestPath = (page = 1) => {
+    const q = this.searchQuery(this.props.location, { url: true })
+    return `search?query=${q}&page=${page}`
+  }
+
   handleInfiniteLoad = page => {
     // for some reason it seems to trigger one extra page even when !hasMore
     if (!this.hasMore) return
-    this.fetchData({ ...this.props, page })
+    this.fetchData(page)
   }
 
   renderSearchResults = () => {
-    const { uiStore, routingStore } = this.props
+    const { uiStore, routingStore, location } = this.props
     if (this.searchResults.length === 0) {
       if (uiStore.isLoading) {
         return <Loader />
@@ -98,7 +129,7 @@ class SearchPage extends PageWithApi {
       return (
         <div>
           No results found for &quot;
-          {this.searchQuery(this.props)}
+          {this.searchQuery(location)}
           &quot;.
         </div>
       )
@@ -111,7 +142,7 @@ class SearchPage extends PageWithApi {
         gridMaxW={uiStore.gridMaxW}
         searchResults={this.searchResults}
         loadMore={this.handleInfiniteLoad}
-        hasMore={this.hasMore}
+        hasMore={this.hasMore && !uiStore.isLoading}
         total={this.total}
       />
     )
@@ -135,8 +166,14 @@ class SearchPage extends PageWithApi {
   }
 }
 
+SearchPage.propTypes = {
+  match: ReactRouterPropTypes.match.isRequired,
+  location: ReactRouterPropTypes.location.isRequired,
+}
 SearchPage.wrappedComponent.propTypes = {
   apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
+  uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
+  routingStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 
 export default SearchPage

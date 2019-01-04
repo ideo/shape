@@ -4,7 +4,11 @@ import fakeApiStore from '#/mocks/fakeApiStore'
 import fakeUiStore from '#/mocks/fakeUiStore'
 import fakeRoutingStore from '#/mocks/fakeRoutingStore'
 
-let wrapper, location, match, apiStore, uiStore, routingStore, props
+// needed for checkOrg import
+jest.mock('../../../app/javascript/stores')
+
+let wrapper, location, match
+let apiStore, uiStore, routingStore, props
 const query = 'stuff'
 
 beforeEach(() => {

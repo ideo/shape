@@ -75,7 +75,6 @@ class Api::V1::BaseController < ApplicationController
            include: include,
            expose: {
              current_record: @collection,
-             card_order: params[:card_order],
            }
   end
 

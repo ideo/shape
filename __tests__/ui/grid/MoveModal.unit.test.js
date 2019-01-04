@@ -8,7 +8,10 @@ let props, wrapper, component
 const uiStore = fakeUiStore
 describe('MoveModal', () => {
   beforeEach(() => {
-    uiStore.viewingCollection = { id: 3 }
+    uiStore.viewingCollection = {
+      id: 3,
+      API_fetchCards: jest.fn(),
+    }
     props = {
       apiStore: fakeApiStore({
         requestResult: { data: fakeCollection },
@@ -148,6 +151,7 @@ describe('MoveModal', () => {
         props.uiStore.movingFromCollectionId = 3
         props.uiStore.cardAction = 'move'
         props.uiStore.viewingCollection = {
+          ...uiStore.viewingCollection,
           id: 4,
           can_edit_content: true,
         }
@@ -185,6 +189,7 @@ describe('MoveModal', () => {
         props.uiStore.movingFromCollectionId = 3
         props.uiStore.cardAction = 'link'
         props.uiStore.viewingCollection = {
+          ...uiStore.viewingCollection,
           id: 4,
           can_edit_content: true,
         }
@@ -220,6 +225,7 @@ describe('MoveModal', () => {
         props.uiStore.movingFromCollectionId = 3
         props.uiStore.cardAction = 'useTemplate'
         props.uiStore.viewingCollection = {
+          ...uiStore.viewingCollection,
           id: 4,
           can_edit_content: true,
         }
@@ -235,11 +241,9 @@ describe('MoveModal', () => {
           placement: 'beginning',
         })
         // expect the collection to reload
-        expect(props.apiStore.fetch).toHaveBeenCalledWith(
-          'collections',
-          props.uiStore.viewingCollection.id,
-          true
-        )
+        expect(
+          props.uiStore.viewingCollection.API_fetchCards
+        ).toHaveBeenCalled()
       })
 
       it('should show a success message', () => {

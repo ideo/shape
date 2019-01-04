@@ -9,10 +9,6 @@ class Api::V1::CollectionsController < Api::V1::BaseController
   before_action :check_cache, only: %i[show]
   def show
     log_organization_view_activity
-    if @collection.class.in? [Collection::SharedWithMeCollection, Collection::SubmissionsCollection]
-      # special behavior where it defaults to newest first
-      params[:card_order] ||= 'updated_at'
-    end
     check_getting_started_shell
     log_collection_activity(:viewed)
     render_collection

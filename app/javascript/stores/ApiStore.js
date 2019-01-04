@@ -51,9 +51,6 @@ class ApiStore extends jsonapi(datxCollection) {
     if (!_.has(options, 'skipCache')) {
       options.skipCache = true
     }
-    if (undoStore.undoAfterRoute) {
-      undoStore.performUndoAfterRoute()
-    }
     return super.request(apiUrl(path), method, data, options)
   }
 
@@ -86,6 +83,12 @@ class ApiStore extends jsonapi(datxCollection) {
   @computed
   get currentUserOrganization() {
     return this.find('organizations', this.currentUserOrganizationId)
+  }
+
+  get currentUserCollectionId() {
+    const { currentUser } = this
+    if (!this.currentUser) return null
+    return currentUser.current_user_collection_id
   }
 
   @computed

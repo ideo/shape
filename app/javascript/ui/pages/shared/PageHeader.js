@@ -229,7 +229,7 @@ class PageHeader extends React.Component {
     // not enough room to show in the header of a live Test
     if (record.isLiveTest) return null
     if (uiStore.windowWidth < v.responsive.medBreakpoint) return null
-    if (record.inherited_tag_list.length) {
+    if (record.inherited_tag_list && record.inherited_tag_list.length) {
       let tagList = record.inherited_tag_list.map(tag => `#${tag}`).join(',')
       if (tagList.length > 22) {
         tagList = (
