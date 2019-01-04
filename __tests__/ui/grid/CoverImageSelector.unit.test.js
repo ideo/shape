@@ -69,7 +69,7 @@ describe('CoverImageSelector', () => {
     })
   })
 
-  describe('onOpionSelect', () => {
+  describe('onImageOpionSelect', () => {
     describe('with an image', () => {
       it('should set the selecteds card cover to true', () => {})
 
@@ -101,6 +101,26 @@ describe('CoverImageSelector', () => {
       it('should call the filestdk upload picker', () => {
         expect(FilestackUpload.pickImage).toHaveBeenCalled()
       })
+    })
+  })
+
+  describe('onFilterOpionSelect', () => {
+    beforeEach(() => {
+      apiStore.find.mockReset()
+      apiStore.find.mockReturnValue(collection)
+      component.onFilterOptionSelect({ type: 'nothing' })
+    })
+
+    it('should close the menu', () => {
+      expect(component.open).toBe(false)
+    })
+
+    it('should save the card', () => {
+      expect(props.card.save).toHaveBeenCalled()
+    })
+
+    it('should refetch the collection', () => {
+      expect(apiStore.fetch).toHaveBeenCalled()
     })
   })
 })
