@@ -147,7 +147,7 @@ class CoverImageSelector extends React.Component {
       const collection = apiStore.find('collections', card.record.id)
       return collection.API_clearCollectionCover()
     }
-    const item = apiStore.find('items', card.record.id)
+    const item = card.record
     item.thumbnail_url = ''
     return item.save()
   }

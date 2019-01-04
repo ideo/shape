@@ -17,6 +17,10 @@ let component, wrapper
 describe('CoverImageSelector', () => {
   beforeEach(() => {
     card = fakeCollectionCard
+    card.record = {
+      id: 3,
+      internalType: 'collections',
+    }
     collection = fakeCollection
     const requestResult = { data: collection }
     apiStore = fakeApiStore({
@@ -83,8 +87,33 @@ describe('CoverImageSelector', () => {
         component.onImageOptionSelect({ type: 'remove' })
       })
 
-      it('should call clear collection cover for the collection', () => {
-        expect(collection.API_clearCollectionCover).toHaveBeenCalled()
+      describe('when removing a collection cover', () => {
+        beforeEach(() => {
+          apiStore.find.mockReset()
+          apiStore.find.mockReturnValue(collection)
+          component.onImageOptionSelect({ type: 'remove' })
+        })
+
+        it('should call clear collection cover for the collection', () => {
+          expect(collection.API_clearCollectionCover).toHaveBeenCalled()
+        })
+      })
+
+      describe('when removing an item cover', () => {
+        beforeEach(() => {
+          props.card.record = {
+            internalType: 'items',
+            id: 3,
+            thumbnail_url: '',
+            save: jest.fn(),
+          }
+          wrapper.setProps(props)
+          component.onImageOptionSelect({ type: 'remove' })
+        })
+
+        it('should set the thumbnail_url on the item and save', () => {
+          expect(props.card.record.save).toHaveBeenCalled()
+        })
       })
 
       it('should close the selector', () => {
