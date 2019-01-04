@@ -27,7 +27,7 @@ class Users::OmniauthCallbacksController < Devise::OmniauthCallbacksController
     return unless @user.current_organization.present? &&
                   @user.has_role?(Role::ADMIN, @user.current_organization.admin_group)
 
-    @user.add_network_admin
+    @user.add_network_admin(@user.current_organization.id)
   end
 
   def setup_org_membership
