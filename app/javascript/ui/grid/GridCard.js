@@ -276,12 +276,12 @@ class GridCard extends React.Component {
     card.parent.reassignCover(card)
   }
 
-  hasNoCover() {
+  get hasCover() {
     const { record } = this.props
     if (record.internalType === 'collections') {
-      return record.cover.image_url
+      return !!record.cover.image_url
     }
-    return record.thumbnail_url
+    return !!record.thumbnail_url
   }
 
   handleClick = e => {
@@ -402,7 +402,7 @@ class GridCard extends React.Component {
           onClick={this.handleClick}
           hasOverflow={record.isData}
           filter={card.filter}
-          forceFilter={this.hasNoCover}
+          forceFilter={!this.hasCover}
         >
           {this.renderInner}
         </StyledGridCardInner>
