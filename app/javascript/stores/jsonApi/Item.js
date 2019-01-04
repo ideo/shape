@@ -26,6 +26,7 @@ class Item extends SharedRecordMixin(BaseRecord) {
     'image',
     'archived',
     'tag_list',
+    'thumbnail_url',
     'filestack_file_attributes',
     'data_settings',
   ]

@@ -75,6 +75,7 @@ class CoverImageSelector extends React.Component {
 
   async fetchOptions() {
     const { apiStore, card } = this.props
+    if (card.record.internalType === 'items') return []
     const res = await apiStore.fetch('collections', card.record.id)
     const collection = res.data
     return _.take(
@@ -102,7 +103,7 @@ class CoverImageSelector extends React.Component {
     )
   }
 
-  async createCard(file) {
+  createCard = async file => {
     const { apiStore, uiStore, card } = this.props
     const collection = apiStore.find('collections', card.record.id)
     await collection.API_clearCollectionCover()
@@ -127,10 +128,28 @@ class CoverImageSelector extends React.Component {
     apiStore.fetch('collections', collection.id, true)
   }
 
+  changeCover = async file => {
+    const { apiStore, card } = this.props
+    const item = apiStore.find('items', card.record.id)
+    item.thumbnail_url = file.url
+    return item.save()
+  }
+
   handleClick = ev => {
     ev.preventDefault()
     this.populateAllOptions()
     runInAction(() => (this.open = !this.open))
+  }
+
+  async clearCover() {
+    const { apiStore, card } = this.props
+    if (card.record.internalType === 'collections') {
+      const collection = apiStore.find('collections', card.record.id)
+      return collection.API_clearCollectionCover()
+    }
+    const item = apiStore.find('items', card.record.id)
+    item.thumbnail_url = ''
+    return item.save()
   }
 
   onImageOptionSelect = async option => {
@@ -142,13 +161,22 @@ class CoverImageSelector extends React.Component {
       selectedCard.is_cover = true
       await selectedCard.save()
     } else if (option.type === 'remove') {
-      await collection.API_clearCollectionCover()
+      await this.clearCover()
     } else if (option.type === 'upload') {
+      const afterPickAction =
+        card.record.internalType === 'collections'
+          ? this.createCard
+          : this.changeCover
       FilestackUpload.pickImage({
-        onSuccess: file => this.createCard(file),
+        onSuccess: file => afterPickAction(file),
       })
     }
-    apiStore.fetch('collections', collection.id, true)
+    if (collection) {
+      apiStore.fetch('collections', collection.id, true)
+    } else {
+      // Fetch the current page's collection to reload any card changes
+      apiStore.fetch('collections', card.parent.id, true)
+    }
   }
 
   onFilterOptionSelect = async option => {

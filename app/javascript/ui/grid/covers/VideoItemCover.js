@@ -14,10 +14,14 @@ import Activity from '~/stores/jsonApi/Activity'
 import { StyledImageCover } from './ImageItemCover'
 
 const StyledVideoCover = styled.div`
+  background: ${v.colors.commonLight};
   width: 100%;
   height: 100%;
   .inner {
     height: 100%;
+    position: absolute;
+    width: 100%;
+    z-index: ${v.zIndex.gridCardBg};
     button {
       border: none;
       background: ${hexToRgba(v.colors.primaryLight, 0.75)};
@@ -39,6 +43,7 @@ const StyledVideoCover = styled.div`
   .playing {
     height: 100%;
     display: ${props => (props.playing ? 'block' : 'none')};
+    z-index: ${v.zIndex.gridCardBg};
   }
 `
 StyledVideoCover.displayName = 'StyledVideoCover'
@@ -60,19 +65,17 @@ class VideoItemCover extends React.PureComponent {
   render() {
     const { item } = this.props
     let thumbnail = item.thumbnail_url
-    let bgColor = null
     // NOTE: This is sort of a workaround to disable the default thumbnail_url (gradient square)
     // as well as getting around the fact that videos currently have thumbnail_url required
     if (thumbnail === v.defaults.video.thumbnailUrl) {
       thumbnail = null
-      bgColor = v.colors.commonDark
     }
     return (
       <StyledVideoCover playing={this.state.playing}>
         <StyledImageCover
           className="not-playing"
           url={thumbnail}
-          bgColor={bgColor}
+          bgColor={v.colors.commonDark}
         >
           <Flex className="inner" align="center" justify="center">
             <Box>
@@ -81,6 +84,7 @@ class VideoItemCover extends React.PureComponent {
               </button>
             </Box>
           </Flex>
+          <div className="overlay" />
         </StyledImageCover>
         <div className="playing">
           <FullAbsoluteParent>

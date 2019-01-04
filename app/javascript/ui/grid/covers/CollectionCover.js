@@ -8,7 +8,6 @@ import english from 'hyphenation.en-us'
 import v from '~/utils/variables'
 import PlainLink from '~/ui/global/PlainLink'
 import { CardHeading } from '~/ui/global/styled/typography'
-import hexToRgba from '~/utils/hexToRgba'
 import ProfileIcon from '~/ui/icons/ProfileIcon'
 import FilledProfileIcon from '~/ui/icons/FilledProfileIcon'
 import { FormButton, RoundPill } from '~/ui/global/styled/forms'
@@ -75,17 +74,6 @@ const calcSectionHeight = props => {
 }
 
 const StyledCardContent = styled.div`
-  .overlay {
-    position: absolute;
-    right: 0;
-    top: 0;
-    ${props =>
-      props.filter === 'transparent_gray' &&
-      `
-      background: ${hexToRgba(v.colors.black, 0.4)};
-    `} width: 100%;
-    height: 100%;
-  }
   .top,
   .bottom {
     position: absolute;
