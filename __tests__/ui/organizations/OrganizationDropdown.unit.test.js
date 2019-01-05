@@ -23,7 +23,13 @@ describe('OrganizationDropdown', () => {
       routingStore,
       uiStore: fakeUiStore,
     }
-    itemNames = ['People & Groups', 'New Organization', 'Settings', 'Legal']
+    itemNames = [
+      'People & Groups',
+      'New Organization',
+      'Settings',
+      'Contact Support',
+      'Legal',
+    ]
     wrapper = shallow(<OrganizationDropdown.wrappedComponent {...props} />)
     component = wrapper.instance()
     props.uiStore.alert.mockClear()
