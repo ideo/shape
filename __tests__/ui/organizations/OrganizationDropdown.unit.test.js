@@ -114,6 +114,26 @@ describe('OrganizationDropdown', () => {
     })
   })
 
+  describe('handleZendesk', () => {
+    const zEBackup = global.zE
+    beforeEach(() => {
+      global.zE = { activate: jest.fn() }
+      component.handleZendesk()
+    })
+
+    it('should call the on item click handler', () => {
+      expect(props.onItemClick).toHaveBeenCalled()
+    })
+
+    it('should activate the Zendesk widget', () => {
+      expect(global.zE.activate).toHaveBeenCalledWith({ hideOnClose: true })
+    })
+
+    afterEach(() => {
+      global.zE = zEBackup
+    })
+  })
+
   describe('handleLegal', () => {
     beforeEach(() => {
       component.handleLegal()
