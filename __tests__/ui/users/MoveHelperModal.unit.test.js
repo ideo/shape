@@ -1,15 +1,19 @@
 import MoveHelperModal from '~/ui/users/MoveHelperModal'
 import { fakeUser } from '#/mocks/data'
+import fakeUiStore from '#/mocks/fakeUiStore'
 
 let props, wrapper, component
 
 describe('MoveHelperModal', () => {
   beforeEach(() => {
+    const uiStore = fakeUiStore
     fakeUser.show_move_helper = true
     props = {
       currentUser: fakeUser,
+      type: 'move',
+      uiStore,
     }
-    wrapper = shallow(<MoveHelperModal {...props} />)
+    wrapper = shallow(<MoveHelperModal.wrappedComponent {...props} />)
     component = wrapper.instance()
   })
 
