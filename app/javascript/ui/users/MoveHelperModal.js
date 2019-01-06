@@ -53,7 +53,7 @@ class MoveHelperModal extends React.Component {
     e.preventDefault()
     const { currentUser, type, uiStore } = this.props
     this.submitted = true
-    uiStore.dismissMoveHelper()
+    uiStore.update('dismissedMoveHelper', true)
     if (this.dontShowChecked) {
       currentUser.API_hideHelper(type)
     }

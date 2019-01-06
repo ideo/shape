@@ -285,15 +285,11 @@ export default class UiStore {
 
   @action
   closeMoveMenu({ deselect = true } = {}) {
+    this.dismissedMoveHelper = false
     this.templateName = ''
     this.movingCardIds.replace([])
     this.movingFromCollectionId = null
     if (deselect) this.deselectCards()
-  }
-
-  @action
-  dismissMoveHelper({ deselect = true } = {}) {
-    this.dismissedMoveHelper = true
   }
 
   @computed
