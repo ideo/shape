@@ -123,8 +123,12 @@ MoveHelperModal.propTypes = {
   currentUser: MobxPropTypes.objectOrObservableObject.isRequired,
   recordName: PropTypes.string,
   type: PropTypes.string,
+}
+
+MoveHelperModal.wrappedComponent.propTypes = {
   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }
+
 MoveHelperModal.defaultProps = {
   type: 'move', // types are 'move' or 'template'
   recordName: null,
