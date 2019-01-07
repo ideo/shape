@@ -30,6 +30,13 @@ describe('MoveHelperModal', () => {
       expect(component.submitted).toBe(true)
     })
 
+    it('should set dismissedMoveHelper to true', () => {
+      expect(props.uiStore.update).toHaveBeenCalledWith(
+        'dismissedMoveHelper',
+        true
+      )
+    })
+
     describe('after checking the dont show again box', () => {
       beforeEach(() => {
         component.dontShowChecked = true
