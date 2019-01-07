@@ -149,8 +149,7 @@ class CoverImageSelector extends React.Component {
     }
     const item = card.record
     item.thumbnail_url = ''
-    await item.save()
-    return apiStore.fetch('items', item.id)
+    return item.save()
   }
 
   onImageOptionSelect = async option => {
