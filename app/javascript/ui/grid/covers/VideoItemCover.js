@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types'
-import { PropTypes as MobxPropTypes } from 'mobx-react'
+import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 import { Flex, Box } from 'reflexbox'
 
@@ -48,6 +48,7 @@ const StyledVideoCover = styled.div`
 `
 StyledVideoCover.displayName = 'StyledVideoCover'
 
+@observer
 class VideoItemCover extends React.PureComponent {
   state = {
     playing: false,

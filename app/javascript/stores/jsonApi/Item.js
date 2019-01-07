@@ -168,6 +168,7 @@ Item.defaults = {
   data_settings: {
     d_measure: null,
   },
+  thumbnail_url: '',
 }
 
 export default Item
