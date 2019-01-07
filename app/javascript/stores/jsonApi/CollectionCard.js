@@ -23,6 +23,7 @@ class CollectionCard extends BaseRecord {
     'item_attributes',
     'image_contain',
     'is_cover',
+    'hidden',
   ]
 
   @observable

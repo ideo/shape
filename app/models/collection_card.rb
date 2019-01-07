@@ -31,6 +31,7 @@ class CollectionCard < ApplicationRecord
   scope :ordered, -> { order(order: :asc) }
   scope :pinned, -> { where(pinned: true) }
   scope :unpinned, -> { where(pinned: false) }
+  scope :visible, -> { where(hidden: false) }
 
   enum filter: {
     nothing: 0,

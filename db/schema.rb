@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20190103230243) do
+ActiveRecord::Schema.define(version: 20190107220606) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -66,6 +66,7 @@ ActiveRecord::Schema.define(version: 20190103230243) do
     t.boolean "is_cover", default: false
     t.datetime "unarchived_at"
     t.integer "filter", default: 0
+    t.boolean "hidden", default: false
     t.index ["collection_id"], name: "index_collection_cards_on_collection_id"
     t.index ["item_id"], name: "index_collection_cards_on_item_id"
     t.index ["parent_id"], name: "index_collection_cards_on_parent_id"
@@ -92,8 +93,8 @@ ActiveRecord::Schema.define(version: 20190103230243) do
     t.integer "submission_box_type"
     t.bigint "submission_box_id"
     t.integer "test_status"
-    t.integer "question_item_id"
     t.integer "processing_status"
+    t.integer "question_item_id"
     t.bigint "test_collection_id"
     t.bigint "collection_to_test_id"
     t.datetime "unarchived_at"
@@ -237,8 +238,8 @@ ActiveRecord::Schema.define(version: 20190103230243) do
     t.integer "profile_collection_id"
     t.string "slug"
     t.integer "getting_started_collection_id"
-    t.string "network_subscription_id"	
-    t.integer "active_users_count", default: 0, null: false	
+    t.string "network_subscription_id"
+    t.integer "active_users_count", default: 0, null: false
     t.datetime "trial_ends_at"
     t.integer "trial_users_count", default: 0, null: false
     t.boolean "in_app_billing", default: true, null: false

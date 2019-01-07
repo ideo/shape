@@ -416,7 +416,7 @@ class CollectionGrid extends React.Component {
   // Sorts cards and sets state.cards after doing so
   @action
   positionCards = (collectionCards = [], opts = {}) => {
-    const cards = [...collectionCards]
+    const cards = [...collectionCards].filter(c => !c.hidden)
     // props might get passed in e.g. nextProps for componentWillReceiveProps
     if (!opts.props) opts.props = this.props
     const { collection, gridW, gridH, gutter, cols, addEmptyCard } = opts.props

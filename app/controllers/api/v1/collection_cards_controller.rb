@@ -302,6 +302,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
       :image_contain,
       :is_cover,
       :filter,
+      :hidden,
       collection_attributes: %i[
         id
         type

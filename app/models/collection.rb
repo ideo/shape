@@ -393,13 +393,13 @@ class Collection < ApplicationRecord
 
   # convenience method if card order ever gets out of sync
   def reorder_cards!
-    all_collection_cards.active.order(pinned: :desc, order: :asc).each_with_index do |card, i|
+    all_collection_cards.active.visible.order(pinned: :desc, order: :asc).each_with_index do |card, i|
       card.update_column(:order, i) unless card.order == i
     end
   end
 
   def reorder_cards_by_collection_name!
-    all_collection_cards.active.includes(:collection).order('collections.name ASC').each_with_index do |card, i|
+    all_collection_cards.active.visible.includes(:collection).order('collections.name ASC').each_with_index do |card, i|
       card.update_column(:order, i) unless card.order == i
     end
   end
