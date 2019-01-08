@@ -23,7 +23,13 @@ describe('OrganizationDropdown', () => {
       routingStore,
       uiStore: fakeUiStore,
     }
-    itemNames = ['People & Groups', 'New Organization', 'Settings', 'Legal']
+    itemNames = [
+      'People & Groups',
+      'New Organization',
+      'Settings',
+      'Contact Support',
+      'Legal',
+    ]
     wrapper = shallow(<OrganizationDropdown.wrappedComponent {...props} />)
     component = wrapper.instance()
     props.uiStore.alert.mockClear()
@@ -105,6 +111,26 @@ describe('OrganizationDropdown', () => {
       // findOrganizationById to lookup the name for the confirm dialog
       expect(props.apiStore.findOrganizationById).toHaveBeenCalledWith(orgId)
       expect(props.uiStore.confirm).toHaveBeenCalled()
+    })
+  })
+
+  describe('handleZendesk', () => {
+    const zEBackup = global.zE
+    beforeEach(() => {
+      global.zE = { activate: jest.fn() }
+      component.handleZendesk()
+    })
+
+    it('should call the on item click handler', () => {
+      expect(props.onItemClick).toHaveBeenCalled()
+    })
+
+    it('should activate the Zendesk widget', () => {
+      expect(global.zE.activate).toHaveBeenCalledWith({ hideOnClose: true })
+    })
+
+    afterEach(() => {
+      global.zE = zEBackup
     })
   })
 
