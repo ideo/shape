@@ -74,10 +74,10 @@ class CoverImageSelector extends React.Component {
   }
 
   async fetchOptions() {
-    const { apiStore, card } = this.props
+    const { card } = this.props
+    const collection = card.record
     if (card.record.internalType === 'items') return []
-    const res = await apiStore.fetch('collections', card.record.id, true)
-    const collection = res.data
+    await card.record.API_fetchCards()
     return _.take(
       collection.collection_cards
         .filter(ccard => ccard.record.isImage)
@@ -86,13 +86,12 @@ class CoverImageSelector extends React.Component {
           title: ccard.record.name,
           imageUrl: ccard.record.filestack_file_url,
         })),
-      11
+      9
     )
   }
 
   async populateAllOptions() {
     const imageOptionsAll = await this.fetchOptions()
-    console.log(imageOptionsAll.length)
     runInAction(
       () =>
         (this.imageOptions = [
