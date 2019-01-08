@@ -8,7 +8,10 @@ import {
   Heading2,
   Heading3,
   SmallHelperText,
+  DisplayText,
 } from '~/ui/global/styled/typography'
+import { Checkbox } from '~/ui/global/styled/forms'
+import FormControlLabel from '@material-ui/core/FormControlLabel'
 import { Row, RowItemLeft } from '~/ui/global/styled/layout'
 import { ThumbnailHolder } from '~/ui/threads/CommentThread'
 import { BctButton } from '~/ui/grid/shared'
@@ -229,6 +232,13 @@ class SubmissionBoxSettingsModal extends React.Component {
     return ''
   }
 
+  updateHidden = ev => {
+    ev.preventDefault()
+    const { collection } = this.props
+    collection.submissions_hidden = !collection.submissions_hidden
+    return collection.save()
+  }
+
   titleContent = () => (
     <StyledTitleContent>
       <Heading2>Submission Box Settings</Heading2>
@@ -250,6 +260,27 @@ class SubmissionBoxSettingsModal extends React.Component {
             create their own instance of the template that you choose. Use one
             of our templates or create your own.
           </SmallHelperText>
+          <FormControlLabel
+            style={{ marginLeft: '-42px' }}
+            classes={{ label: 'form-control' }}
+            control={
+              <Checkbox
+                checked={this.props.collection.submissions_hidden}
+                onChange={this.updateHidden}
+                value="yes"
+              />
+            }
+            label={
+              <div style={{ marginLeft: '-4px' }}>
+                <DisplayText>Hide new submission</DisplayText>
+                <br />
+                <SmallHelperText>
+                  When this box is checked, submissions will not show up until
+                  the participant chooses to submit it.
+                </SmallHelperText>
+              </div>
+            }
+          />
         </RowItemLeft>
       </Row>
       <Heading3>Submission Format</Heading3>

@@ -154,6 +154,7 @@ class Api::V1::CollectionsController < Api::V1::BaseController
       :submission_template_id,
       :submission_box_type,
       :collection_to_test_id,
+      :submissions_hidden,
       collection_cards_attributes: %i[id order width height],
     )
   end

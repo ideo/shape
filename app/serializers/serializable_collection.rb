@@ -4,7 +4,7 @@ class SerializableCollection < BaseJsonSerializer
   attributes :created_at, :updated_at, :name, :organization_id,
              :master_template, :template_id,
              :submission_box_type, :submission_box_id, :submission_template_id,
-             :test_status, :collection_to_test_id
+             :test_status, :collection_to_test_id, :hide_submissions
 
   has_many :roles
   has_one :parent_collection_card
