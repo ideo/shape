@@ -20,6 +20,10 @@ describe('CoverImageSelector', () => {
     card.record = {
       id: 3,
       internalType: 'collections',
+      API_fetchCards: jest.fn(),
+      collection_cards: [
+        { id: 1, record: { id: 1, name: '', filestack_file_url: '' } },
+      ],
     }
     collection = fakeCollection
     const requestResult = { data: collection }

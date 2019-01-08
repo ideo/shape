@@ -92,6 +92,7 @@ class CoverImageSelector extends React.Component {
 
   async populateAllOptions() {
     const imageOptionsAll = await this.fetchOptions()
+    console.log(imageOptionsAll)
     runInAction(
       () =>
         (this.imageOptions = [
