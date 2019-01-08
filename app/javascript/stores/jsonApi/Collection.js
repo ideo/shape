@@ -8,6 +8,7 @@ import { apiUrl } from '~/utils/url'
 
 import BaseRecord from './BaseRecord'
 import CollectionCard from './CollectionCard'
+import Role from './Role'
 import SharedRecordMixin from './SharedRecordMixin'
 
 class Collection extends SharedRecordMixin(BaseRecord) {
@@ -576,6 +577,11 @@ class Collection extends SharedRecordMixin(BaseRecord) {
 Collection.refDefaults = {
   collection_cards: {
     model: CollectionCard,
+    type: ReferenceType.TO_MANY,
+    defaultValue: [],
+  },
+  roles: {
+    model: Role,
     type: ReferenceType.TO_MANY,
     defaultValue: [],
   },

@@ -109,11 +109,6 @@ class ApiStore extends jsonapi(datxCollection) {
     return _.first(this.currentUser.organizations.filter(org => org.id === id))
   }
 
-  async loadCurrentUserAndGroups() {
-    await this.loadCurrentUser()
-    await this.loadCurrentUserGroups()
-  }
-
   async loadCurrentUser() {
     try {
       const res = await this.request('users/me')
@@ -126,18 +121,6 @@ class ApiStore extends jsonapi(datxCollection) {
       })
     } catch (e) {
       trackError(e, { source: 'loadCurrentUser', name: 'fetchUser' })
-    }
-  }
-
-  async loadCurrentUserGroups({ orgOnly = false } = {}) {
-    try {
-      let { groups } = this.currentUser
-      if (orgOnly) {
-        groups = groups.filter(g => g.isOrgGroup)
-      }
-      groups.map(group => this.fetchRoles(group))
-    } catch (e) {
-      trackError(e, { source: 'loadCurrentUserGroups', name: 'fetchGroups' })
     }
   }
 
@@ -158,10 +141,16 @@ class ApiStore extends jsonapi(datxCollection) {
     )
   }
 
-  async fetchRoles(group) {
-    const res = await this.request(`groups/${group.id}/roles`, 'GET')
+  async fetchRoles(resource) {
+    const res = await this.request(
+      `${resource.internalType}/${resource.id}/roles`,
+      'GET'
+    )
     const roles = res.data
+    resource.roles = roles
+    roles.forEach(role => (role.resource = resource))
     this.add(roles, 'roles')
+    return roles
   }
 
   @action
@@ -410,6 +399,42 @@ class ApiStore extends jsonapi(datxCollection) {
     runInAction(() => {
       record.inMyCollection = res.__response.data
     })
+  }
+
+  async searchRoles(
+    record,
+    { page = 1, query = '', status = 'active', reset = false } = {}
+  ) {
+    const params = queryString.stringify({
+      query,
+      page,
+      status,
+      resource_id: record.id,
+      resource_type: record.className,
+    })
+    const apiPath = `search/users_and_groups?${params}`
+    _.each(record.roles, role => {
+      role.capturePrevLists({ reset })
+    })
+    try {
+      const res = await this.request(apiPath)
+      const roles = res.data
+      // if the record doesn't have any roles yet, make the association
+      if (!record.roles.length) {
+        record.roles = roles
+      }
+      _.each(roles, role => {
+        role.resource = record
+        role.updateCount(status, res.meta.total)
+        // first page load should automatically set role.users and role.groups via datx
+        // next page loads we need to manually concatenate
+        if (!reset) {
+          role.mergePrevLists()
+        }
+      })
+    } catch (e) {
+      console.warn('uh oh', e.message)
+    }
   }
 
   // NOTE: had to override datx PureCollection, it looks like it is meant to do

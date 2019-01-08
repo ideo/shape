@@ -54,7 +54,7 @@ class Group < ApplicationRecord
 
   def search_data
     {
-      name: name,
+      name: name.downcase,
       handle: handle,
       # listing this way makes it easier to search Users/Groups together
       organization_ids: [organization_id],

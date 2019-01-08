@@ -18,12 +18,6 @@ class OrganizationSettings extends React.Component {
     return apiStore.currentUserOrganization
   }
 
-  afterDomainWhitelistUpdate = () => {
-    // need to reload in case updating the domains altered any group memberships
-    const { apiStore } = this.props
-    apiStore.loadCurrentUserGroups({ orgOnly: true })
-  }
-
   render() {
     return (
       <div>
@@ -40,7 +34,6 @@ class OrganizationSettings extends React.Component {
           record={this.organization}
           tagField="domain_whitelist"
           tagColor="white"
-          afterSave={this.afterDomainWhitelistUpdate}
         />
       </div>
     )

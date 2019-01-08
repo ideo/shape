@@ -80,7 +80,7 @@ class User extends BaseRecord {
       await this.apiStore.request('users/switch_org', 'POST', {
         organization_id: organizationId,
       })
-      await this.apiStore.loadCurrentUserAndGroups()
+      await this.apiStore.loadCurrentUser()
       if (redirectPath) {
         routingStore.routeTo(redirectPath, redirectId)
       }

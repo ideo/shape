@@ -33,7 +33,7 @@ class Api::V1::RolesController < Api::V1::BaseController
       new_role: !json_api_params[:is_switching],
     )
     if assigner.call
-      render jsonapi: record.roles.reload, include: %i[users groups resource]
+      head :no_content
     else
       render_api_errors assigner.errors
     end
@@ -53,7 +53,8 @@ class Api::V1::RolesController < Api::V1::BaseController
       group: @group,
       is_switching: json_api_params[:is_switching],
     )
-      render jsonapi: @role.resource.roles.reload, include: %i[users groups resource]
+      # don't render anything
+      head :no_content
     else
       render_api_errors remove_roles.errors
     end

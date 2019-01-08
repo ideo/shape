@@ -2,7 +2,7 @@ import OrganizationSettings from '~/ui/organizations/OrganizationSettings'
 import fakeApiStore from '#/mocks/fakeApiStore'
 import { Heading3 } from '~/ui/global/styled/typography'
 
-let wrapper, component, apiStore, routingStore, props, organization
+let wrapper, apiStore, routingStore, props, organization
 
 beforeEach(() => {
   apiStore = fakeApiStore()
@@ -27,7 +27,6 @@ describe('OrganizationSettings', () => {
     beforeEach(() => {
       organization.primary_group.can_edit = true
       wrapper = shallow(<OrganizationSettings.wrappedComponent {...props} />)
-      component = wrapper.instance()
     })
 
     it('renders the page with TagEditor for domain whitelist', () => {
@@ -36,13 +35,6 @@ describe('OrganizationSettings', () => {
       expect(wrapper.find('TagEditor').props().tagField).toEqual(
         'domain_whitelist'
       )
-    })
-
-    it('reloads org groups after saving the domain whitelist', () => {
-      component.afterDomainWhitelistUpdate()
-      expect(props.apiStore.loadCurrentUserGroups).toHaveBeenCalledWith({
-        orgOnly: true,
-      })
     })
   })
 })

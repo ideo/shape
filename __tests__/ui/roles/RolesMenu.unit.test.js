@@ -32,7 +32,6 @@ describe('RolesMenu', () => {
     props = {
       ownerId: 1,
       ownerType: 'collections',
-      roles: [],
       apiStore,
       uiStore,
       routingStore,

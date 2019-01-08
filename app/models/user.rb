@@ -85,29 +85,31 @@ class User < ApplicationRecord
   searchkick callbacks: false, word_start: %i[name handle]
   after_commit :reindex
   alias searchkick_reindex reindex
-  scope :search_import, -> { active.includes(:roles) }
+  scope :search_import, -> { includes(:roles) }
 
   def search_data
     {
-      name: name,
+      name: name.downcase,
       handle: handle,
       email: email,
-      organization_ids: organizations.map(&:id),
+      status: status,
+      organization_ids: organization_ids,
+      group_ids: group_ids,
     }
   end
 
   def should_index?
-    active?
+    active? || pending?
   end
 
   def should_reindex?
     # called after_commit
-    (saved_changes.keys & %w[first_name last_name handle email]).present?
+    (saved_changes.keys & %w[first_name last_name handle email status]).present?
   end
 
-  def reindex
+  def reindex(force: false)
+    return searchkick_reindex if force
     return unless should_reindex?
-
     Searchkick.callbacks(:async) do
       searchkick_reindex
     end
@@ -353,9 +355,9 @@ class User < ApplicationRecord
     reset_cached_roles!
     # Reindex record if it is a searchkick model
     resource = role.resource
-    if role.resource.is_a?(Group) && role.resource.primary?
-      # user added/removed from an org should update search index
-      reindex
+    if resource.is_a?(Group)
+      # user added/removed from a group/org should update search index
+      reindex(force: true)
     end
     resource.reindex if resource && Searchkick.callbacks? && resource.searchable?
   end
