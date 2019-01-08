@@ -33,7 +33,7 @@ const StyledSurvey = styled.div`
   box-sizing: border-box;
   width: 100%;
   margin: 0 auto;
-  max-width: 580px;
+  max-width: 580px; /* responsive but constrain media QuestionCards to 420px tall */
 `
 
 // TODO move blue background, rounded-corner box to shared component
