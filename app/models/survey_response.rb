@@ -25,9 +25,8 @@ class SurveyResponse < ApplicationRecord
   end
 
   def cache_test_scores!
-    collection_to_test = test_collection.collection_to_test
-    return unless collection_to_test.present?
-    collection_to_test.cache_test_scores!
+    return unless test_collection.inside_a_submission?
+    test_collection.parent_submission.cache_test_scores!
   end
 
   private

@@ -130,7 +130,7 @@ class Collection
 
     def close_all_submissions_tests!
       test_ids = parent_submission_box.submissions_collection.collections.map do |c|
-        next unless c.submission_attrs['test_status'] == 'live'
+        next unless c.try(:submission_attrs).try(:[], 'test_status') == 'live'
         c.submission_attrs['launchable_test_id']
       end.compact
 
@@ -146,6 +146,9 @@ class Collection
       # is this in a submission? If so, am I tied to a test template, and is that one launched?
       if inside_a_submission?
         return false unless submission_test_launchable?
+      end
+      if inside_a_submission_box_template?
+        return false if parent_submission_box_template.try(:submission_attrs).try(:[], 'test_status') == 'live'
       end
       # standalone tests otherwise don't really have any restrictions
       return true unless collection_to_test_id.present?
