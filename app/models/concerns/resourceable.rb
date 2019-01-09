@@ -7,6 +7,8 @@ module Resourceable
     class_attribute :edit_role
     class_attribute :content_edit_role
     class_attribute :view_role
+
+    belongs_to :roles_anchor_collection, class_name: 'Collection', optional: true
   end
 
   class_methods do
@@ -64,23 +66,32 @@ module Resourceable
     end
   end
 
+  def roles_anchor
+    roles_anchor_collection || self
+  end
+
+  def anchored_roles
+    return roles if is_a?(Group)
+    roles_anchor.roles
+  end
+
   def can_edit?(user_or_group)
     return true if user_or_group.has_cached_role?(Role::SUPER_ADMIN)
     raise_role_name_not_set(:edit_role) if self.class.edit_role.blank?
-    user_or_group.has_role_by_identifier?(self.class.edit_role, resource_identifier)
+    user_or_group.has_role_by_identifier?(self.class.edit_role, roles_anchor.resource_identifier)
   end
 
   def can_edit_content?(user_or_group)
     return true if can_edit?(user_or_group)
     return false if self.class.content_edit_role.blank?
-    user_or_group.has_role_by_identifier?(self.class.content_edit_role, resource_identifier)
+    user_or_group.has_role_by_identifier?(self.class.content_edit_role, roles_anchor.resource_identifier)
   end
 
   def can_view?(user_or_group)
     return true if can_edit?(user_or_group)
     return true if can_edit_content?(user_or_group)
     raise_role_name_not_set(:view_role) if self.class.view_role.blank?
-    user_or_group.has_role_by_identifier?(self.class.view_role, resource_identifier)
+    user_or_group.has_role_by_identifier?(self.class.view_role, roles_anchor.resource_identifier)
   end
 
   def resourceable_class
