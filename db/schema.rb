@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20181212191943) do
+ActiveRecord::Schema.define(version: 20190104004056) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -91,9 +91,9 @@ ActiveRecord::Schema.define(version: 20181212191943) do
     t.integer "submission_box_type"
     t.bigint "submission_box_id"
     t.integer "test_status"
+    t.integer "processing_status"
     t.integer "question_item_id"
     t.bigint "test_collection_id"
-    t.integer "processing_status"
     t.bigint "collection_to_test_id"
     t.datetime "unarchived_at"
     t.jsonb "cached_test_scores"
@@ -249,6 +249,8 @@ ActiveRecord::Schema.define(version: 20181212191943) do
     t.boolean "sent_high_charges_middle_email", default: false, null: false
     t.boolean "sent_high_charges_high_email", default: false, null: false
     t.boolean "deactivated", default: false, null: false
+    t.jsonb "autojoin_domains", default: []
+    t.index ["autojoin_domains"], name: "index_organizations_on_autojoin_domains", using: :gin
     t.index ["slug"], name: "index_organizations_on_slug", unique: true
   end
 

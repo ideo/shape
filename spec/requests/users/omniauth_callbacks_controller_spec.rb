@@ -113,5 +113,17 @@ describe Users::OmniauthCallbacksController, type: :request do
         expect(user.has_role?(Role::MEMBER, organization.primary_group)).to be true
       end
     end
+
+    context 'with email domain matching autojoinable organization whitelist' do
+      let!(:organization) { create(:organization, autojoin_domains: ['mycompany.org']) }
+      let!(:user) { create(:user, email: 'user@mycompany.org') }
+
+      it 'autojoins organization if they login with their company email' do
+        expect(organization.can_view?(user)).to be false
+        post(path)
+        user.reset_cached_roles!
+        expect(organization.can_view?(user)).to be true
+      end
+    end
   end
 end
