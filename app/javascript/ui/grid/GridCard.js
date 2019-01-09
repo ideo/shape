@@ -357,7 +357,7 @@ class GridCard extends React.Component {
               {record.isData && <EditButton onClick={this.editCard} />}
               {record.isImage &&
                 this.canContentEditCard && <ContainImage card={card} />}
-              {record.isImage && (
+              {(record.isImage || record.isText) && (
                 <CardActionHolder
                   className="show-on-hover"
                   onClick={() => routingStore.routeTo('items', card.record.id)}
