@@ -170,11 +170,16 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
     )
     authorize! :read, @collection
 
+    # ensure per_page is between 50 and 200
+    per_page = [params[:per_page].to_i, CollectionCard::DEFAULT_PER_PAGE].max
+    per_page = [per_page, 200].min
+
     @collection_cards = @collection.collection_cards_viewable_by(
       @collection.collection_cards,
       current_user,
       card_order: params[:card_order],
       page: params[:page] || 1,
+      per_page: per_page,
     )
   end
 

@@ -339,11 +339,11 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     return data
   }
 
-  async API_fetchCards({ page = 1, order } = {}) {
+  async API_fetchCards({ page = 1, per_page = 50, order } = {}) {
     runInAction(() => {
       if (order) this.currentOrder = order
     })
-    let params = `?page=${page}`
+    let params = `?page=${page}&per_page=${per_page}`
     if (this.currentOrder !== 'order') {
       params += `&card_order=${this.currentOrder}`
     }

@@ -171,15 +171,11 @@ class CollectionPage extends React.Component {
   }
 
   async _reloadData() {
-    const { apiStore } = this.props
-    await apiStore.fetch('collections', this.collection.id, true)
+    const { collection } = this.props
+    collection.API_fetchCards({ per_page: collection.collection_cards.length })
     if (this.collection.submissions_collection) {
       this.setLoadedSubmissions(false)
-      await apiStore.fetch(
-        'collections',
-        this.collection.submissions_collection.id,
-        true
-      )
+      await this.collection.submissions_collection.API_fetchCards()
       this.setLoadedSubmissions(true)
     }
   }

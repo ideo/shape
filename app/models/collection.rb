@@ -366,7 +366,11 @@ class Collection < ApplicationRecord
     end
   end
 
-  def collection_cards_viewable_by(cached_cards, user, card_order: nil, page: 1)
+  def collection_cards_viewable_by(
+    cached_cards,
+    user,
+    card_order: nil, page: 1, per_page: CollectionCard::DEFAULT_PER_PAGE
+  )
     cached_cards ||= collection_cards.includes(:item, :collection)
     order = { order: :asc }
     if card_order
@@ -389,6 +393,7 @@ class Collection < ApplicationRecord
       .includes(:collection, item: [:filestack_file])
       .order(order)
       .page(page)
+      .per(per_page)
   end
 
   # convenience method if card order ever gets out of sync
