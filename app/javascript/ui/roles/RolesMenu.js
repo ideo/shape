@@ -1,3 +1,4 @@
+import _ from 'lodash'
 import { Fragment } from 'react'
 import PropTypes from 'prop-types'
 import styled from 'styled-components'
@@ -55,14 +56,21 @@ class RolesMenu extends React.Component {
   state = {
     searchText: '',
     groups: [],
+    pendingPanelOpen: false,
+    activePanelOpen: true,
     page: {
       pending: 1,
       active: 1,
     },
   }
 
+  constructor(props) {
+    super(props)
+    this.debouncedInit = _.debounce(this.initializeRolesAndGroups, 300)
+  }
+
   componentDidMount() {
-    this.initializeRolesAndGroups({ reset: true })
+    this.initializeRolesAndGroups({ reset: true, page: 1 })
   }
 
   async initializeRolesAndGroups({
@@ -72,13 +80,18 @@ class RolesMenu extends React.Component {
     status = 'both',
   } = {}) {
     const { apiStore, record } = this.props
+    const { searchText } = this.state
 
     if (!skipSearch) {
       if (status === 'both' || status === 'active') {
-        await apiStore.searchRoles(record, { reset, page })
+        await apiStore.searchRoles(record, { reset, page, query: searchText })
       }
       if (status === 'both' || status === 'pending') {
-        await apiStore.searchRoles(record, { status: 'pending', page })
+        await apiStore.searchRoles(record, {
+          status: 'pending',
+          page,
+          query: searchText,
+        })
       }
     }
 
@@ -98,71 +111,62 @@ class RolesMenu extends React.Component {
         roleEntities.push(Object.assign({}, { role, entity: group }))
       })
     })
-    const sortedRoleEntities = roleEntities
-      .filter(this.filterEntitiesForSearch)
-      .sort(sortUserOrGroup)
+    const sortedRoleEntities = roleEntities.sort(sortUserOrGroup)
 
     const groups = this.setupEntityGroups(sortedRoleEntities, counts)
 
     this.setState(prevState => ({
       groups,
       page: {
-        pending: status === 'pending' ? page : prevState.page.pending,
-        active: status === 'active' ? page : prevState.page.active,
+        pending:
+          status === 'pending' || status === 'both'
+            ? page
+            : prevState.page.pending,
+        active:
+          status === 'active' || status === 'both'
+            ? page
+            : prevState.page.active,
       },
     }))
   }
 
-  setupEntityGroups(entities, counts) {
-    const groups = [
-      {
-        panelTitle: 'Pending Invitations',
-        status: 'pending',
-        startOpen: false,
-        count: counts.pending,
-        entities: entities.filter(
-          role =>
-            role.entity.internalType === 'users' &&
-            role.entity.status === 'pending'
-        ),
-      },
-      {
-        panelTitle: 'Active Users',
-        status: 'active',
-        startOpen: true,
-        count: counts.active,
-        entities: entities.filter(
-          role =>
-            role.entity.internalType !== 'users' ||
-            role.entity.status !== 'pending'
-        ),
-      },
-    ]
-
-    // init state for each group
-    groups.forEach(group => this.initPanel(group, group.startOpen))
-
-    return groups
-  }
+  setupEntityGroups = (entities, counts) => [
+    {
+      panelTitle: 'Pending Invitations',
+      status: 'pending',
+      count: counts.pending,
+      entities: entities.filter(
+        role =>
+          role.entity.internalType === 'users' &&
+          role.entity.status === 'pending'
+      ),
+    },
+    {
+      panelTitle: 'Active Users',
+      status: 'active',
+      count: counts.active,
+      entities: entities.filter(
+        role =>
+          role.entity.internalType !== 'users' ||
+          role.entity.status !== 'pending'
+      ),
+    },
+  ]
 
   togglePanel = panel => {
     this.updatePanel(panel, !this.isOpenPanel(panel))
   }
 
-  initPanel = (panel, defaultValue) => {
-    if (typeof this.state[panel.panelTitle] === 'undefined') {
-      this.updatePanel(panel, defaultValue)
-    }
+  updatePanel = (panel, isOpen) => {
+    this.setState({ [`${panel.status}PanelOpen`]: isOpen })
   }
 
-  updatePanel = (panel, status) => {
-    this.setState({ [panel.panelTitle]: status })
-  }
-
-  isOpenPanel = panel => !!this.state[panel.panelTitle]
+  isOpenPanel = panel => this.state[`${panel.status}PanelOpen`]
 
   updateSearchText = searchText => {
-    this.setState({ searchText })
+    this.setState({ searchText }, () => {
+      this.debouncedInit({ reset: true, page: 1 })
+    })
   }
 
   handleSearchChange = value => {
@@ -170,23 +174,6 @@ class RolesMenu extends React.Component {
   }
 
   clearSearch = () => this.updateSearchText('')
-
-  filterEntitiesForSearch = item => {
-    const entity = item.entity || null
-    const search = this.state.searchText.toLocaleLowerCase()
-    const searchFields = []
-    if (!search || !entity) return true
-
-    if (entity.internalType === 'users') {
-      searchFields.push('first_name', 'last_name', 'email')
-    } else if (entity.internalType === 'groups') {
-      searchFields.push('name')
-    }
-    return searchFields.some(
-      field =>
-        entity[field] && entity[field].toLocaleLowerCase().indexOf(search) >= 0
-    )
-  }
 
   deleteRoles = (role, entity, opts = {}) =>
     role.API_delete(entity, opts).then(res => {
@@ -218,7 +205,7 @@ class RolesMenu extends React.Component {
     return apiStore
       .request(`${ownerType}/${ownerId}/roles`, 'POST', data)
       .then(res => {
-        this.initializeRolesAndGroups({ reset: true })
+        this.initializeRolesAndGroups({ reset: true, page: 1 })
       })
       .catch(err => {
         uiStore.alert(err.error[0])

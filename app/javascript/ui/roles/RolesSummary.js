@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types'
-import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
+import { PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 import _ from 'lodash'
 import pluralize from 'pluralize'
@@ -66,7 +66,8 @@ const StyledAddUserBtn = styled.div`
 `
 StyledAddUserBtn.displayName = 'StyledAddUserBtn'
 
-@observer
+// NOTE: intentionally not an observer so that searching roles within the menu doesn't affect this list on the fly
+// however it will automatically update after you close the RolesModal
 class RolesSummary extends React.Component {
   get editors() {
     const { roles } = this.props

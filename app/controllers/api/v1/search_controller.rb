@@ -68,6 +68,7 @@ class Api::V1::SearchController < Api::V1::BaseController
   def search_users_and_groups
     Search.new(
       index_name: @indexes,
+      fields: %w[name^5 email^2 handle],
       match: :word_start,
       where: {
         organization_ids: [current_organization.id],
@@ -81,12 +82,16 @@ class Api::V1::SearchController < Api::V1::BaseController
     status = params[:status] || 'active'
     search_opts = {
       index_name: [User],
-      order: {
+      fields: %w[name^5 email^2 handle],
+      order: [
         name: :asc,
-      },
-      per_page: 10,
+      ],
+      per_page: 50,
       page: @page,
     }
+    if status == 'pending'
+      search_opts[:order] << { email: :asc }
+    end
     if @resource.is_a?(Group)
       search_opts[:index_name] = [User]
       search_opts[:where] = {
