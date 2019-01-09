@@ -6,6 +6,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
   after_action :broadcast_collection_create_updates, only: %i[create update]
 
   before_action :load_and_authorize_parent_collection_with_cards, only: %i[index]
+  before_action :check_cache, only: %i[index]
   def index
     params[:page] ||= 1
     params[:card_order] ||= @collection.default_card_order
@@ -147,6 +148,13 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
   end
 
   private
+
+  def check_cache
+    fresh_when(
+      last_modified: @collection.updated_at.utc,
+      etag: "#{@collection.cache_key(params[:card_order])}/cards/#{params[:page]}",
+    )
+  end
 
   def load_and_authorize_parent_collection_with_cards
     @collection = Collection
