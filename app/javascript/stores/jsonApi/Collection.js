@@ -341,7 +341,6 @@ class Collection extends SharedRecordMixin(BaseRecord) {
 
   async API_fetchCards({ page = 1, order } = {}) {
     runInAction(() => {
-      this.currentPage = page
       if (order) this.currentOrder = order
     })
     let params = `?page=${page}`
@@ -353,6 +352,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     const { data, links } = res
     runInAction(() => {
       this.totalPages = links.last
+      this.currentPage = page
       if (page === 1) {
         // NOTE: If we ever want to "remember" collections where you've previously loaded 50+
         // we could think about handling this differently.
