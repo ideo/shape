@@ -235,7 +235,7 @@ class CollectionCard extends BaseRecord {
   }
 
   // this could really be a static method now that it archives all selected cards
-  async API_archive({ isReplacing = false } = {}) {
+  async API_archive({ isReplacing = false, onCancel = null } = {}) {
     const { selectedCardIds } = uiStore
     const collection = this.parentCollection
 
@@ -279,7 +279,12 @@ class CollectionCard extends BaseRecord {
           iconName,
           onToggleSnoozeDialog,
           snoozeChecked,
-          onCancel: () => resolve(false),
+          onCancel: () => {
+            if (_.isFunction(onCancel)) {
+              onCancel()
+            }
+            resolve(false)
+          },
           onConfirm: () => resolve(true),
         })
       })

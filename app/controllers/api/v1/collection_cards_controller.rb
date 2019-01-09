@@ -73,8 +73,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
   def unarchive
     @collection = Collection.find(json_api_params[:collection_snapshot][:id])
     @collection.unarchive_cards!(@collection_cards, collection_snapshot_params)
-    render jsonapi: @collection.reload,
-           include: Collection.default_relationships_for_api
+    render jsonapi: @collection.reload
   end
 
   before_action :load_and_authorize_replacing_card, only: %i[replace]
