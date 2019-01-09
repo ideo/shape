@@ -124,7 +124,7 @@ class TermsOfUseModal extends React.Component {
             <Heading1 wrapLine>Hello {currentUser.first_name}!</Heading1>
             <p>
               {showBillingInformation
-                ? `Welcome to your 3 month free trial of Shape. The first ${trialUsersCount} people who use Shape at your organization will be free for the first 6 months. Shape licenses are $${trialPricePerUser} per person per month. Please take a moment to`
+                ? `Welcome to your 1 month free trial of Shape. The first ${trialUsersCount} people who use Shape at your organization will be free for the first month. Shape licenses are $${trialPricePerUser} per person per month. Please take a moment to`
                 : 'Welcome to Shape. Before you proceed, please take a moment to'}{' '}
               review our{' '}
               <Link target="_blank" to="/terms">
