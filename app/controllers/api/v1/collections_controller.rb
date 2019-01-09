@@ -76,7 +76,7 @@ class Api::V1::CollectionsController < Api::V1::BaseController
   private
 
   def check_cache
-    if @collection.organization.deactivated?
+    if @collection.archived? || @collection.organization.deactivated?
       head(404)
     end
     fresh_when(
