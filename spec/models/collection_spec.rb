@@ -272,19 +272,6 @@ describe Collection, type: :model do
       end
     end
 
-    context 'with viewer role' do
-      before do
-        user.add_role(Role::VIEWER, collection)
-      end
-
-      it 'upgrades viewer user to editor role upon duplication' do
-        expect(collection.can_edit?(user)).to be false
-        # roles shouldn't match because we're removing Viewer and replacing w/ Editor
-        expect(duplicate.roles.map(&:name)).not_to match(collection.roles.map(&:name))
-        expect(duplicate.can_edit?(user)).to be true
-      end
-    end
-
     context 'with system_collection and synchronous settings' do
       let(:instance_double) do
         double('CollectionCardDuplicationWorker')

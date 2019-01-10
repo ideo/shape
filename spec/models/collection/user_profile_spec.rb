@@ -53,6 +53,11 @@ describe Collection::UserProfile, type: :model do
       expect(user_profile.collection_cards.first.record.can_edit?(user)).to be true
     end
 
+    it 'should set the organization admin_group as editor of profile and items' do
+      expect(user_profile.can_edit?(organization.admin_group)).to be true
+      expect(user_profile.collection_cards.first.record.can_edit?(organization.admin_group)).to be true
+    end
+
     it 'should copy the pinned status of the template cards' do
       expect(user_profile.collection_cards.first.pinned?).to be true
     end

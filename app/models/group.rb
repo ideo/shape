@@ -118,6 +118,11 @@ class Group < ApplicationRecord
     resourceable_can_edit?(user)
   end
 
+  # just to make Groups play nice with resourceable shared methods
+  def roles_anchor_collection_id
+    nil
+  end
+
   private
 
   def create_shared_collection

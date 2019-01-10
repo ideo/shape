@@ -32,7 +32,12 @@ RSpec.describe CollectionCardBuilder, type: :service do
 
       it 'should add the user as editor to the card\'s child collection' do
         expect(builder.create).to be true
-        expect(user.has_role?(Role::EDITOR, builder.collection_card.collection)).to be true
+        expect(builder.collection_card.collection.can_edit?(user)).to be true
+      end
+
+      it 'should anchor its roles to the parent collection' do
+        expect(builder.create).to be true
+        expect(builder.collection_card.collection.roles_anchor).to eq parent
       end
 
       it 'should increase order of additional cards' do
