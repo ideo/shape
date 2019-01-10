@@ -50,6 +50,7 @@ GEM
       erubi (~> 1.4)
       rails-dom-testing (~> 2.0)
       rails-html-sanitizer (~> 1.0, >= 1.0.3)
+    active_record_query_trace (1.5.4)
     activejob (5.1.6)
       activesupport (= 5.1.6)
       globalid (>= 0.3.6)
@@ -486,6 +487,7 @@ PLATFORMS
 DEPENDENCIES
   aasm (~> 5.0)
   action-cable-testing
+  active_record_query_trace
   acts-as-taggable-on
   amoeba
   appsignal
