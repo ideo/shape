@@ -233,4 +233,26 @@ describe Api::V1::OrganizationsController, type: :request, json: true, auth: tru
       end
     end
   end
+
+  describe 'PATCH #add_terms_text', vcr: { match_requests_on: %i[host method path_ignore_id] } do
+    let!(:current_user) { create(:user) }
+    let!(:organization) { create(:organization, admin: user) }
+    let(:path) { "/api/v1/organizations/#{organization.id}" }
+
+    it 'returns a 200' do
+      patch(path)
+      expect(response.status).to eq(200)
+    end
+
+    it 'updates the the terms_text_item' do
+      expect(organization.terms_text_item_id).to be nil
+      patch(path, params: params)
+      expect(organization.terms_text_item_id).not_to be nil
+    end
+
+    it 'sets the current user as an editor of the terms text item' do
+      patch(path, params: params)
+      expect(user.has_role?(:editor, organization.terms_text_item)).to be true
+    end
+  end
 end

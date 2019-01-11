@@ -4,11 +4,11 @@ class Api::V1::OrganizationsController < Api::V1::BaseController
 
   # The logged-in user's current organization context
   def current
-    render jsonapi: current_organization, include: [:primary_group]
+    render jsonapi: current_organization, include: %i[primary_group terms_text_item]
   end
 
   def show
-    render jsonapi: @organization
+    render jsonapi: @organization, include: [:terms_text_item]
   end
 
   def update
@@ -29,6 +29,14 @@ class Api::V1::OrganizationsController < Api::V1::BaseController
     end
   end
 
+  def add_terms_text
+    if @organization.create_terms_text_item(current_user)
+      render jsonapi: @organization, include: [:terms_text_item]
+    else
+      render_api_errors @organization.errors
+    end
+  end
+
   private
 
   def organization_params
@@ -38,6 +46,7 @@ class Api::V1::OrganizationsController < Api::V1::BaseController
       :whitelist,
       :handle,
       :deactivated,
+      :terms_text_item_id,
       filestack_file_attributes: Group.filestack_file_attributes_whitelist,
     ]
     params_allowed << :in_app_billing if current_user.has_role?(Role::SUPER_ADMIN)

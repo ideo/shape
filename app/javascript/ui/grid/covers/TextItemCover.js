@@ -60,7 +60,8 @@ class TextItemCover extends React.Component {
 
   @computed
   get isEditing() {
-    const { item } = this.props
+    const { item, overrideEditing } = this.props
+    if (overrideEditing) return true
     return uiStore.textEditingItem === item
   }
 
@@ -203,11 +204,13 @@ TextItemCover.propTypes = {
   handleClick: PropTypes.func.isRequired,
   height: PropTypes.number,
   searchResult: PropTypes.bool,
+  overrideEditing: PropTypes.bool,
 }
 
 TextItemCover.defaultProps = {
   height: null,
   searchResult: false,
+  overrideEditing: false,
 }
 
 export default TextItemCover
