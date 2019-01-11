@@ -12,6 +12,7 @@ class Api::V1::OrganizationsController < Api::V1::BaseController
   end
 
   def update
+    debugger
     @organization.attributes = organization_params
     if @organization.save
       render jsonapi: @organization
@@ -32,6 +33,16 @@ class Api::V1::OrganizationsController < Api::V1::BaseController
   def add_terms_text
     if @organization.create_terms_text_item(current_user)
       render jsonapi: @organization, include: [:terms_text_item]
+    else
+      render_api_errors @organization.errors
+    end
+  end
+
+  def remove_terms_text
+    @organization.terms_text_item = nil
+    @organization.terms_text_item_id = nil
+    if @organization.save
+      render jsonapi: @organization
     else
       render_api_errors @organization.errors
     end

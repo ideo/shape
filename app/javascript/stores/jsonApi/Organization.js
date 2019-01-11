@@ -15,6 +15,13 @@ class Organization extends BaseRecord {
     )
   }
 
+  API_removeTermsTextItem() {
+    return this.apiStore.request(
+      `/organizations/${this.id}/remove_terms_text`,
+      'PATCH'
+    )
+  }
+
   attributesForAPI = [
     'in_app_billing',
     'name',
@@ -32,7 +39,7 @@ Organization.refDefaults = {
   terms_text_item: {
     model: Item,
     type: ReferenceType.TO_ONE,
-    defaultValue: {},
+    defaultValue: null,
   },
 }
 

@@ -80,7 +80,11 @@ class OrganizationSettings extends React.Component {
   handleCustomTermToggle = async ev => {
     ev.preventDefault()
     if (this.organization.terms_text_item_id) {
-      this.organization.terms_text_item_id = null
+      runInAction(() => {
+        this.organization.terms_text_item = null
+        delete this.organization.terms_text_item
+      })
+      return this.organization.API_removeTermsTextItem()
     }
     return this.organization.API_createTermsTextItem()
   }

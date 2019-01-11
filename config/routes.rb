@@ -72,6 +72,7 @@ Rails.application.routes.draw do
         end
         member do
           patch 'add_terms_text'
+          patch 'remove_terms_text'
         end
         resources :collections, only: %i[create]
         resources :groups, only: %i[index]

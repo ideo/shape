@@ -255,4 +255,21 @@ describe Api::V1::OrganizationsController, type: :request, json: true, auth: tru
       expect(user.has_role?(:editor, organization.terms_text_item)).to be true
     end
   end
+
+  describe 'PATCH #remove_terms_text', vcr: { match_requests_on: %i[host method path_ignore_id] } do
+    let!(:current_user) { create(:user) }
+    let!(:organization) { create(:organization, admin: user, terms_text_item_id: 3) }
+    let(:path) { "/api/v1/organizations/#{organization.id}" }
+
+    it 'returns a 200' do
+      patch(path)
+      expect(response.status).to eq(200)
+    end
+
+    it 'clears the the terms_text_item' do
+      expect(organization.terms_text_item_id).to be 3
+      patch(path, params: params)
+      expect(organization.terms_text_item_id).not_to be nil
+    end
+  end
 end
