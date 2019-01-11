@@ -103,7 +103,9 @@ describe('CollectionPage', () => {
       })
 
       it('should reload the data', () => {
-        expect(apiStore.fetch).toHaveBeenCalledWith('collections', 99, true)
+        expect(collection.API_fetchCards).toHaveBeenCalledWith({
+          per_page: collection.collection_cards.length,
+        })
       })
     })
   })

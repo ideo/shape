@@ -7,8 +7,7 @@ class CardMover
     to_collection:,
     cards:,
     placement: 'beginning',
-    card_action: 'move', # 'move' or 'link'
-    reassign_permissions: true
+    card_action: 'move' # 'move' or 'link'
   )
     @from_collection = from_collection
     @to_collection = to_collection
@@ -16,9 +15,6 @@ class CardMover
     # retain array of cards being moved
     @moving_cards = cards.to_a
     @card_action = card_action
-    # this setting can be used the case where you know the cards already have
-    # the correct permissions and you just want to move them
-    @reassign_permissions = reassign_permissions
     @errors = []
   end
 
@@ -137,12 +133,21 @@ class CardMover
 
   def assign_permissions
     return if @to_collection == @from_collection
-    return unless @card_action == 'move' && @reassign_permissions
+    return unless @card_action == 'move'
     @moving_cards.each do |card|
+      # TODO: test this...
+      record = card.record
+      next if record.same_roles_anchor? @to_collection
+      if @to_collection.includes_all_roles? record
+        record.update(roles_anchor_collection_id: @to_collection.roles_anchor.id)
+        record.roles.destroy_all
+        next
+      end
+
       # assign each role from the @to_collection to our newly moved cards
       to_permissions.each do |role_name, entity|
         Roles::MassAssign.new(
-          object: card.record,
+          object: record,
           role_name: role_name,
           users: entity[:users],
           groups: entity[:groups],

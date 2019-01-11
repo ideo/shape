@@ -253,6 +253,8 @@ class Collection < ApplicationRecord
     c.cloned_from = self
     c.created_by = for_user
     c.tag_list = tag_list
+    # copy roles from parent (i.e. where it's being placed)
+    c.roles_anchor_collection_id = parent.roles_anchor.id
 
     # copy organization_id from the collection this is being moved into
     # NOTE: parent is only nil in Colab import -- perhaps we should clean up any Colab import specific code?
@@ -276,15 +278,7 @@ class Collection < ApplicationRecord
       c.parent_collection_card.collection = c
     end
 
-    # copy roles from parent (i.e. where it's being placed)
-    parent.roles.each do |role|
-      c.roles << role.duplicate!(assign_resource: c)
-    end
-
     c.enable_org_view_access_if_allowed(parent)
-
-    # Upgrade to editor if provided
-    for_user.upgrade_to_edit_role(c) if for_user.present?
 
     if collection_cards.any? && !c.getting_started_shell
       worker_opts = [
@@ -366,8 +360,15 @@ class Collection < ApplicationRecord
     end
   end
 
-  def collection_cards_viewable_by(cached_cards, user, card_order: nil, page: 1)
-    cached_cards ||= collection_cards.includes(:item, :collection)
+  def collection_cards_viewable_by(
+    cached_cards,
+    user,
+    card_order: nil, page: 1, per_page: CollectionCard::DEFAULT_PER_PAGE
+  )
+    can_view_collection = can_view?(user)
+    return [] unless can_view_collection
+
+    cached_cards ||= collection_cards.includes(item: :roles_anchor_collection, collection: :roles_anchor_collection)
     order = { order: :asc }
     if card_order
       if card_order == 'total' || card_order.include?('question_')
@@ -380,15 +381,19 @@ class Collection < ApplicationRecord
     end
 
     # card.can_view? delegates to the underlying record (item/collection)
+    # if the roles_anchor is the same as mine, we can skip this check because the user can view me
+    roles_anchor_id = roles_anchor.id
     ids = cached_cards
-          .select { |card| card.can_view?(user) }
+          .select { |card| card.record.roles_anchor_collection_id == roles_anchor_id || card.can_view?(user) }
           .pluck(:id)
+
     # pluck viewable ids and then convert to a paginated query
     CollectionCard
       .where(id: ids)
       .includes(:collection, item: [:filestack_file])
       .order(order)
       .page(page)
+      .per(per_page)
   end
 
   # convenience method if card order ever gets out of sync
@@ -418,7 +423,8 @@ class Collection < ApplicationRecord
     # As long as it isn't the 'Getting Started' collection
     return false unless parent.is_a?(Collection::UserCollection) &&
                         (cloned_from.blank? || !cloned_from.getting_started?)
-
+    # collections created in My Collection always get unanchored
+    unanchor_and_inherit_roles_from_anchor!
     organization.primary_group.add_role(Role::VIEWER, self).try(:persisted?)
   end
 
@@ -510,7 +516,7 @@ class Collection < ApplicationRecord
       "/cards_#{collection_cards.maximum(:updated_at).to_i}" \
       "/#{test_details}" \
       "/#{getting_started_shell}" \
-      "/roles_#{roles.maximum(:updated_at).to_i}"
+      "/roles_#{anchored_roles.maximum(:updated_at).to_i}"
   end
 
   def remove_comment_followers!
@@ -549,6 +555,21 @@ class Collection < ApplicationRecord
 
     # Broadcast that this collection is no longer being edited
     collections.each(&:processing_done) if processing_status.nil?
+  end
+
+  def reset_permissions!
+    all_collections = Collection.in_collection(self)
+    all_items = Item.in_collection(self)
+    [all_collections, all_items].each do |records|
+      records.update_all(roles_anchor_collection_id: roles_anchor.id)
+      records.find_each do |record|
+        if record.roles.present?
+          record.roles.destroy_all
+        else
+          record.touch
+        end
+      end
+    end
   end
 
   # =================================

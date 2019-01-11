@@ -73,9 +73,9 @@ class TextItemCover extends React.Component {
       return false
     }
     if (!item.can_edit_content || searchResult) {
-      // if a viewer, we want to just go to the item page, allow event to propagate
-      this.props.handleClick(e)
-      return true
+      // if a viewer, there's nothing to do on the generic click action
+      // likewise on search results, never pop open the inline editor
+      return false
     }
     uiStore.update('textEditingItem', this.state.item)
     return null

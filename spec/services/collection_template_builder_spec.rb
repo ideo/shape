@@ -24,11 +24,6 @@ RSpec.describe CollectionTemplateBuilder, type: :service do
       expect(instance.name).to eq "My #{template.name}"
     end
 
-    it 'should give the creator editor access to collection and its items' do
-      expect(instance.can_edit?(user)).to be true
-      expect(instance.collection_cards.first.record.can_edit?(user)).to be true
-    end
-
     it 'should give parent collection users the same access to collection and its items' do
       expect(instance.can_view?(viewer)).to be true
       expect(instance.collection_cards.first.record.can_view?(viewer)).to be true
@@ -60,22 +55,6 @@ RSpec.describe CollectionTemplateBuilder, type: :service do
       expect(instance.owned_tag_list).to include(template.name.parameterize)
     end
 
-    context 'when parent is a submissions_collection' do
-      let(:submission_box) { create(:submission_box, add_editors: [user], add_viewers: [viewer]) }
-      let(:parent) { create(:submissions_collection, submission_box: submission_box) }
-
-      it 'should create a new collection that is linked to the template' do
-        expect(instance.name).to eq "#{user.first_name}'s #{template.name}"
-      end
-
-      it 'should assign permissions from the submission_box' do
-        expect(instance.can_edit?(user)).to be true
-        expect(instance.collection_cards.first.record.can_edit?(user)).to be true
-        expect(instance.can_view?(viewer)).to be true
-        expect(instance.collection_cards.first.record.can_view?(viewer)).to be true
-      end
-    end
-
     context 'when parent is a master_template' do
       let(:parent) { create(:collection, master_template: true) }
 
@@ -96,7 +75,8 @@ RSpec.describe CollectionTemplateBuilder, type: :service do
     end
 
     context 'with a submissions_collection parent' do
-      let(:parent) { create(:submissions_collection, submission_box: create(:submission_box)) }
+      let(:submission_box) { create(:submission_box, add_editors: [user], add_viewers: [viewer]) }
+      let(:parent) { create(:submissions_collection, submission_box: submission_box) }
 
       it 'should create a new collection that is marked as a "submission"' do
         expect(instance.template).to eq template
@@ -105,6 +85,22 @@ RSpec.describe CollectionTemplateBuilder, type: :service do
 
       it 'should be named "User\'s" instance' do
         expect(instance.name).to eq "#{user.first_name}'s #{template.name}"
+      end
+
+      it 'should give the creator editor access to collection and its items' do
+        expect(instance.can_edit?(user)).to be true
+        expect(instance.collection_cards.first.record.can_edit?(user)).to be true
+      end
+
+      it 'should create a new collection that is linked to the template' do
+        expect(instance.name).to eq "#{user.first_name}'s #{template.name}"
+      end
+
+      it 'should assign permissions from the submission_box' do
+        expect(instance.can_edit?(user)).to be true
+        expect(instance.collection_cards.first.record.can_edit?(user)).to be true
+        expect(instance.can_view?(viewer)).to be true
+        expect(instance.collection_cards.first.record.can_view?(viewer)).to be true
       end
     end
 

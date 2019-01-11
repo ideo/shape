@@ -32,10 +32,9 @@ class Collection
       )
       profile_collection.reorder_cards!
 
+      # copy roles down from the profile_collection
+      profile.inherit_roles_from_parent!
       user.add_role(Role::EDITOR, profile.becomes(Collection))
-      # add org primary group as viewer... admins also as content editor
-      organization.primary_group.add_role(Role::VIEWER, profile.becomes(Collection))
-      organization.guest_group.add_role(Role::VIEWER, profile.becomes(Collection))
       organization.admin_group.add_role(Role::EDITOR, profile.becomes(Collection))
       # create the templated cards from the Profile Template
       organization.profile_template.setup_templated_collection(
@@ -103,12 +102,6 @@ class Collection
   def unarchive_and_reset_permissions!
     unarchive!
     user.add_role(Role::EDITOR, becomes(Collection))
-    AddRolesToChildrenWorker.perform_async(
-      [user.id],
-      [],
-      Role::EDITOR,
-      id,
-      self.class.base_class.name,
-    )
+    reset_permissions!
   end
 end

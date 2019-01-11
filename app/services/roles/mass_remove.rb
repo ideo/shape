@@ -8,70 +8,33 @@ module Roles
                    role_name:,
                    users: [],
                    groups: [],
-                   remove_from_children_sync: false,
+                   propagate_to_children: false,
+                   removed_by: nil,
                    fully_remove: false)
       @object = object
       @role_name = role_name
-      @remove_from_children_sync = remove_from_children_sync
+      @removed_by = removed_by
+      # @remove_from_children_sync = remove_from_children_sync
       @fully_remove = fully_remove
       @users = users
       @groups = groups
       @errors = []
+      @previous_anchor_id = nil
+      @propagate_to_children = propagate_to_children
     end
 
     def call
+      unanchor_object
       remove_role_from_object(@object)
       unfollow_comment_thread
       unfollow_groups_comment_threads
       remove_links_from_shared_collections if @fully_remove
-      remove_org_membership if @fully_remove
-      remove_roles_from_children
+      remove_org_membership_if_necessary if @fully_remove
+      remove_roles_from_children if @propagate_to_children
+      true
     end
 
     private
-
-    def remove_links_from_shared_collections
-      UnlinkFromSharedCollectionsWorker.perform_async(
-        shared_user_ids,
-        group_ids,
-        collections_to_link,
-        items_to_link,
-      )
-    end
-
-    # Removes roles synchronously from children,
-    # and asynchronously from grandchildren
-    def remove_roles_from_children
-      if @remove_from_children_sync
-        children.all? do |child|
-          remove_role_from_object(child) &&
-            remove_roles_from_grandchildren(child)
-        end
-      else
-        MassRemoveRolesWorker.perform_async(
-          @object.id,
-          @object.class.name,
-          @role_name,
-          @users.map(&:id),
-          @groups.map(&:id),
-        )
-        true
-      end
-    end
-
-    def remove_roles_from_grandchildren(child)
-      return true unless child.respond_to?(:children)
-      child.children.each do |grandchild|
-        MassRemoveRolesWorker.perform_async(
-          grandchild.id,
-          grandchild.class.name,
-          @role_name,
-          @users.map(&:id),
-          @groups.map(&:id),
-        )
-      end
-      true
-    end
 
     def remove_role_from_object(object)
       role = object.roles.find_by(name: @role_name)
@@ -105,7 +68,50 @@ module Roles
       true
     end
 
-    def remove_org_membership
+    def unfollow_comment_thread
+      return unless @object.item_or_collection?
+      return unless @object.comment_thread.present?
+      RemoveCommentThreadFollowers.perform_async(
+        @object.comment_thread.id,
+        @users.map(&:id),
+        @groups.map(&:id),
+      )
+    end
+
+    def unfollow_groups_comment_threads
+      return unless @object.is_a?(Group)
+      thread_ids = @object.groups_threads.pluck(:comment_thread_id)
+      return if thread_ids.empty?
+      RemoveCommentThreadFollowers.perform_async(
+        thread_ids,
+        @users.map(&:id),
+      )
+    end
+
+    def remove_links_from_shared_collections
+      UnlinkFromSharedCollectionsWorker.perform_async(
+        shared_user_ids,
+        group_ids,
+        collections_to_link,
+        items_to_link,
+      )
+    end
+
+    # def remove_roles_from_grandchildren(child)
+    #   return true unless child.respond_to?(:children)
+    #   child.children.each do |grandchild|
+    #     MassRemoveRolesWorker.perform_async(
+    #       grandchild.id,
+    #       grandchild.class.name,
+    #       @role_name,
+    #       @users.map(&:id),
+    #       @groups.map(&:id),
+    #     )
+    #   end
+    #   true
+    # end
+
+    def remove_org_membership_if_necessary
       return unless @object.is_a?(Group) && (@object.guest? || @object.primary?)
       @users.each do |user|
         # if someone is in both primary + guest for whatever reason, removing them
@@ -122,23 +128,16 @@ module Roles
       @object.children
     end
 
-    def unfollow_comment_thread
-      return unless @object.is_a?(Item) || @object.is_a?(Collection)
-      return unless @object.comment_thread.present?
-      RemoveCommentThreadFollowers.perform_async(
-        @object.comment_thread.id,
+    def remove_roles_from_children
+      AddRolesToChildrenWorker.perform_async(
+        @removed_by.id,
         @users.map(&:id),
         @groups.map(&:id),
-      )
-    end
-
-    def unfollow_groups_comment_threads
-      return unless @object.is_a?(Group)
-      thread_ids = @object.groups_threads.pluck(:comment_thread_id)
-      return if thread_ids.empty?
-      RemoveCommentThreadFollowers.perform_async(
-        thread_ids,
-        @users.map(&:id),
+        @role_name,
+        @object.id,
+        @object.class.name,
+        @previous_anchor_id,
+        'remove',
       )
     end
   end

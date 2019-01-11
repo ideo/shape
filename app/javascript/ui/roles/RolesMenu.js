@@ -81,8 +81,9 @@ class RolesMenu extends React.Component {
     return groups
   }
 
-  deleteRoles = (role, entity, opts = {}) =>
-    role.API_delete(entity, opts).then(res => {
+  deleteRoles = (role, entity, opts = {}) => {
+    const { ownerId, ownerType } = this.props
+    role.API_delete(entity, ownerId, ownerType, opts).then(res => {
       // We should do a page reload to get the correct user's new org
       if (opts.organizationChange) {
         this.props.routingStore.routeTo('homepage')
@@ -93,6 +94,7 @@ class RolesMenu extends React.Component {
       }
       return {}
     })
+  }
 
   createRoles = (entities, roleName, opts = {}) => {
     const { apiStore, ownerId, ownerType, onSave } = this.props

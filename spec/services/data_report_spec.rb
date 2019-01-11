@@ -101,7 +101,7 @@ RSpec.describe DataReport::Internal, type: :service do
         end
       end
 
-      context 'with a content, items and collections measure', only: true do
+      context 'with a content, items and collections measure' do
         let(:collection) { create(:collection, organization: organization) }
         let!(:items) { create_list(:text_item, 5, parent_collection: collection) }
 

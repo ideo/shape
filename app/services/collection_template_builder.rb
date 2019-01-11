@@ -47,10 +47,14 @@ class CollectionTemplateBuilder
       created_by: @created_by,
     )
     # make sure to assign these permissions before the template cards are generated
-    @collection.inherit_roles_from_parent!(@parent)
+    # binding.pry
+    @collection.inherit_roles_anchor_from_parent!(@parent)
+    if @parent.is_a? Collection::SubmissionsCollection
+      @collection.unanchor_and_inherit_roles_from_anchor!
+      @created_by.upgrade_to_edit_role(@collection)
+    end
     # capture newly added roles
     @collection.reload
-    @created_by.add_role(Role::EDITOR, @collection)
     @collection
   end
 

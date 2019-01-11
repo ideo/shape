@@ -31,9 +31,12 @@ class Users::OmniauthCallbacksController < Devise::OmniauthCallbacksController
   end
 
   def setup_org_membership
+    # check if they are signed in with an autojoinable domain
+    OrganizationAutojoiner.new(@user).autojoin
     return unless @user.current_organization.present?
 
     # double check if they're now signed in with a whitelisted email
-    @user.current_organization.check_user_email_domain(@user)
+    # TODO: will not need this when we lock invitations to the invited email
+    @user.current_organization.check_email_domains_and_join_org_group(@user)
   end
 end

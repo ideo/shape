@@ -22,7 +22,7 @@ class Item
     ].freeze
 
     def report
-      url.present? ? external_report : internal_report
+      external_report? ? external_report : internal_report
     end
 
     def data
@@ -30,6 +30,10 @@ class Item
     end
 
     private
+
+    def external_report?
+      url.present?
+    end
 
     def internal_report
       DataReport::Internal.new(self)
@@ -40,7 +44,8 @@ class Item
     end
 
     def data_settings_validations
-      unless VALID_MEASURES.include?(d_measure.to_s)
+      if !external_report? &&
+         !VALID_MEASURES.include?(d_measure.to_s)
         errors.add(:data_settings, "measure must be one of #{VALID_MEASURES.join(', ')}")
       end
       return if VALID_TIMEFRAMES.include?(d_timeframe.to_s)
