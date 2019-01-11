@@ -12,7 +12,6 @@ class Api::V1::OrganizationsController < Api::V1::BaseController
   end
 
   def update
-    debugger
     @organization.attributes = organization_params
     if @organization.save
       render jsonapi: @organization
