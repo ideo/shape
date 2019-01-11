@@ -41,10 +41,10 @@ class Collection
 
     # this override is so that Roles::AddToChildren will also add the same roles
     # to all the submissions (which are technically children of the submissions_collection)
-    def children
-      return super if submissions_collection.nil?
-      (items + collections + submissions_collection.children)
-    end
+    # def children
+    #   return super if submissions_collection.nil?
+    #   (items + collections + submissions_collection.children)
+    # end
 
     def available_submission_tests(for_user:, omit_id: nil)
       return [] unless submission_box_type == 'template' && submission_template.present?

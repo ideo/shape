@@ -77,7 +77,7 @@ describe('RolesMenu', () => {
   })
 
   describe('createRoles', () => {
-    describe('with a users', () => {
+    describe('with users', () => {
       let users
       let opts
 

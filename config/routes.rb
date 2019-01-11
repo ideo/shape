@@ -27,7 +27,15 @@ Rails.application.routes.draw do
           post 'set_submission_box_template'
         end
         resources :collection_cards, only: :index
-        resources :roles, only: %i[index create destroy], shallow: true
+        resources :roles, only: %i[index create destroy]
+      end
+      resources :items, except: %i[index] do
+        member do
+          post 'duplicate'
+          patch 'archive'
+          get 'in_my_collection'
+        end
+        resources :roles, only: %i[index create destroy]
       end
       resources :test_collections, only: %i[show] do
         member do
@@ -50,20 +58,12 @@ Rails.application.routes.draw do
           post 'link'
           post 'duplicate'
         end
-        resources :items, shallow: true, except: :index do
-          member do
-            post 'duplicate'
-            patch 'archive'
-            get 'in_my_collection'
-          end
-          resources :roles, only: %i[index create]
-        end
       end
       resources :groups, except: :delete do
-        resources :roles, only: %i[index create archive destroy]
         member do
           patch 'archive'
         end
+        resources :roles, only: %i[index create destroy]
       end
       resources :organizations, except: :delete do
         collection do

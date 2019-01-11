@@ -75,9 +75,31 @@ module Resourceable
     "Collection_#{roles_anchor_collection_id}"
   end
 
+  def same_roles_anchor?(resource)
+    roles_anchor_resource_identifier == resource.roles_anchor_resource_identifier
+  end
+
+  def includes_all_roles?(resource)
+    return false unless item_or_collection? && resource.item_or_collection?
+    %i[viewers editors].each do |role_name|
+      my_role = send(role_name)
+      their_role = resource.send(role_name)
+      %i[users groups].each do |role_owner|
+        mine = my_role.try(:[], role_owner).pluck(:id)
+        theirs = their_role.try(:[], role_owner).pluck(:id)
+        return false unless (mine & theirs) == theirs
+      end
+    end
+    true
+  end
+
   def anchored_roles
     return roles if is_a?(Group)
     roles_anchor.roles
+  end
+
+  def item_or_collection?
+    is_a?(Item) || is_a?(Collection)
   end
 
   def can_edit?(user_or_group)

@@ -102,12 +102,6 @@ class Collection
   def unarchive_and_reset_permissions!
     unarchive!
     user.add_role(Role::EDITOR, becomes(Collection))
-    AddRolesToChildrenWorker.perform_async(
-      [user.id],
-      [],
-      Role::EDITOR,
-      id,
-      self.class.base_class.name,
-    )
+    reset_permissions!
   end
 end

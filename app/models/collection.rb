@@ -516,7 +516,7 @@ class Collection < ApplicationRecord
       "/cards_#{collection_cards.maximum(:updated_at).to_i}" \
       "/#{test_details}" \
       "/#{getting_started_shell}" \
-      "/roles_#{roles.maximum(:updated_at).to_i}"
+      "/roles_#{anchored_roles.maximum(:updated_at).to_i}"
   end
 
   def remove_comment_followers!
@@ -555,6 +555,21 @@ class Collection < ApplicationRecord
 
     # Broadcast that this collection is no longer being edited
     collections.each(&:processing_done) if processing_status.nil?
+  end
+
+  def reset_permissions!
+    all_collections = Collection.in_collection(self)
+    all_items = Item.in_collection(self)
+    [all_collections, all_items].each do |records|
+      records.update_all(roles_anchor_collection_id: roles_anchor.id)
+      records.find_each do |record|
+        if record.roles.present?
+          record.roles.destroy_all
+        else
+          record.touch
+        end
+      end
+    end
   end
 
   # =================================
