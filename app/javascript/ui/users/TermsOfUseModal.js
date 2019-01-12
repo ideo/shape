@@ -129,7 +129,7 @@ class TermsOfUseModal extends React.Component {
               <Link target="_blank" to="/terms">
                 Terms of Use
               </Link>
-              .
+              {orgTermsOfUse}.
             </p>
             <FormControl component="fieldset">
               <FormControlLabel

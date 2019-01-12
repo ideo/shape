@@ -515,6 +515,7 @@ class Collection < ApplicationRecord
       "/cards_#{collection_cards.maximum(:updated_at).to_i}" \
       "/#{test_details}" \
       "/#{getting_started_shell}" \
+      "/#{organization.updated_at}" \
       "/roles_#{roles.maximum(:updated_at).to_i}"
   end
 

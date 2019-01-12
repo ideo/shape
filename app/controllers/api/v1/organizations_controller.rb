@@ -30,7 +30,7 @@ class Api::V1::OrganizationsController < Api::V1::BaseController
   end
 
   def add_terms_text
-    if @organization.create_terms_text_item(current_user)
+    if @organization.create_terms_text_item
       render jsonapi: @organization, include: [:terms_text_item]
     else
       render_api_errors @organization.errors

@@ -296,14 +296,14 @@ class Organization < ApplicationRecord
     end
   end
 
-  def create_terms_text_item(user)
+  def create_terms_text_item
     item = Item.create(
       type: 'Item::TextItem',
       name: "#{name} Terms",
       content: 'Terms',
       text_data: { a: {} },
     )
-    user.add_role(Role::EDITOR, item)
+    admin_group.add_role(Role::EDITOR, item)
     self.terms_text_item = item
     save
     item

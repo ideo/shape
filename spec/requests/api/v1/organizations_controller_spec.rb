@@ -234,7 +234,7 @@ describe Api::V1::OrganizationsController, type: :request, json: true, auth: tru
     end
   end
 
-  describe 'PATCH #add_terms_text', vcr: { match_requests_on: %i[host method path_ignore_id] } do
+  describe 'PATCH #add_terms_text' do
     let!(:current_user) { @user }
     let!(:organization) { create(:organization, admin: user) }
     let(:path) { "/api/v1/organizations/#{organization.id}/add_terms_text" }
@@ -243,10 +243,6 @@ describe Api::V1::OrganizationsController, type: :request, json: true, auth: tru
         'organizations',
         'name': 'Acme Inc 2.0',
       )
-    end
-
-    before do
-      user.add_role(Role::ADMIN, organization.primary_group)
     end
 
     it 'returns a 200' do
@@ -261,15 +257,17 @@ describe Api::V1::OrganizationsController, type: :request, json: true, auth: tru
       expect(organization.terms_text_item_id).not_to be nil
     end
 
-    it 'sets the current user as an editor of the terms text item' do
+    it 'sets the admin group as editor of the terms text item' do
       patch(path, params: params)
       organization.reload
       organization.terms_text_item.reload
-      expect(user.has_role?(:editor, organization.terms_text_item)).to be true
+      expect(organization.admin_group.has_role?(:editor, organization.terms_text_item)).to be true
+      # user should be able to edit via admin_group membership
+      expect(organization.terms_text_item.can_edit?(user)).to be true
     end
   end
 
-  describe 'PATCH #remove_terms_text', vcr: { match_requests_on: %i[host method path_ignore_id] } do
+  describe 'PATCH #remove_terms_text' do
     let!(:current_user) { @user }
     let!(:organization) { create(:organization, admin: user, terms_text_item_id: 3) }
     let(:path) { "/api/v1/organizations/#{organization.id}/remove_terms_text" }
@@ -278,10 +276,6 @@ describe Api::V1::OrganizationsController, type: :request, json: true, auth: tru
         'organizations',
         'name': 'Acme Inc 2.0',
       )
-    end
-
-    before do
-      user.add_role(Role::ADMIN, organization.primary_group)
     end
 
     it 'returns a 200' do

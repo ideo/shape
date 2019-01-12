@@ -10,14 +10,14 @@ class Organization extends BaseRecord {
 
   API_createTermsTextItem() {
     return this.apiStore.request(
-      `/organizations/${this.id}/add_terms_text`,
+      `organizations/${this.id}/add_terms_text`,
       'PATCH'
     )
   }
 
   API_removeTermsTextItem() {
     return this.apiStore.request(
-      `/organizations/${this.id}/remove_terms_text`,
+      `organizations/${this.id}/remove_terms_text`,
       'PATCH'
     )
   }

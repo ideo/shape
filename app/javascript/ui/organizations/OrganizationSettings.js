@@ -171,7 +171,7 @@ class OrganizationSettings extends React.Component {
                 <LabelTextStandalone>
                   {`Include ${this.organization.name} Terms of Use `}
                 </LabelTextStandalone>
-                <SmallHelperText>
+                <SmallHelperText color={v.colors.commonDark}>
                   If you choose to include your own Terms of Use you are
                   responsible for the contents, legal applicability and
                   enforcement of the same. By ticking this box you agree that in
