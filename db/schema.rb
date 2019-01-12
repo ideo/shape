@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20190104004056) do
+ActiveRecord::Schema.define(version: 20190110222910) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -163,6 +163,8 @@ ActiveRecord::Schema.define(version: 20190104004056) do
     t.integer "current_shared_collection_id"
     t.datetime "archived_at"
     t.string "archive_batch"
+    t.jsonb "autojoin_emails", default: []
+    t.index ["autojoin_emails"], name: "index_groups_on_autojoin_emails", using: :gin
     t.index ["handle"], name: "index_groups_on_handle"
     t.index ["organization_id"], name: "index_groups_on_organization_id"
   end
@@ -250,6 +252,7 @@ ActiveRecord::Schema.define(version: 20190104004056) do
     t.boolean "sent_high_charges_high_email", default: false, null: false
     t.boolean "deactivated", default: false, null: false
     t.jsonb "autojoin_domains", default: []
+    t.bigint "terms_text_item_id"
     t.index ["autojoin_domains"], name: "index_organizations_on_autojoin_domains", using: :gin
     t.index ["slug"], name: "index_organizations_on_slug", unique: true
   end

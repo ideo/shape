@@ -127,6 +127,7 @@ class Routes extends React.Component {
               <Route path="/search" component={SearchPage} />
               <Route path="/:org/search" component={SearchPage} />
               <Route path="/terms" component={TermsPage} />
+              <Route path="/terms/:org" component={TermsPage} />
 
               <Route
                 path="/billing"

@@ -14,7 +14,8 @@
     "price_per_user": { "type": "number" },
     "slug": { "type": "string" },
     "trial_ends_at": { "type": "date" },
-    "trial_users_count": { "type": "number" }
+    "trial_users_count": { "type": "number" },
+    "terms_text_item_id": { "type": ["integer", "null"] }
   },
   "required": ["name"]
 }
