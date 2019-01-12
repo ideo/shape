@@ -5,7 +5,6 @@ import Dialog from '@material-ui/core/Dialog'
 import DialogContent from '@material-ui/core/DialogContent'
 import FormControl from '@material-ui/core/FormControl'
 import FormControlLabel from '@material-ui/core/FormControlLabel'
-import FormHelperText from '@material-ui/core/FormHelperText'
 
 import { FormButton, Checkbox } from '~/ui/global/styled/forms'
 import { Heading1, Anchor } from '~/ui/global/styled/typography'
@@ -63,18 +62,11 @@ const StyledLogo = styled(Logo)`
 @observer
 class TermsOfUseModal extends React.Component {
   @observable
-  termsChecked = false
-  @observable
   mailingListChecked = false
   @observable
   isLoading = false
   @observable
   submitted = false
-
-  @action
-  handleTermsCheck = event => {
-    this.termsChecked = event.target.checked
-  }
 
   @action
   handleMailingListCheck = event => {
@@ -85,17 +77,15 @@ class TermsOfUseModal extends React.Component {
   handleSubmit = e => {
     e.preventDefault()
     this.submitted = true
-    if (this.termsChecked) {
-      const { currentUser } = this.props
-      this.isLoading = true
-      currentUser
-        .API_acceptTerms({ mailing_list: this.mailingListChecked })
-        .finally(() => {
-          runInAction(() => {
-            this.isLoading = false
-          })
+    const { currentUser } = this.props
+    this.isLoading = true
+    currentUser
+      .API_acceptTerms({ mailing_list: this.mailingListChecked })
+      .finally(() => {
+        runInAction(() => {
+          this.isLoading = false
         })
-    }
+      })
   }
 
   render() {
@@ -106,10 +96,19 @@ class TermsOfUseModal extends React.Component {
       (organization &&
         organization.in_app_billing &&
         organization.primary_group.can_edit)
-    const displayError = this.submitted && !this.termsChecked
     const trialUsersCount =
       (organization && organization.trial_users_count) || 25
     const trialPricePerUser = (organization && organization.price_per_user) || 5
+    const orgTermsOfUse = organization.terms_text_item_id && (
+      <span>
+        {' '}
+        and {organization.name}
+        &apos;s{' '}
+        <Link target="_blank" to={`/terms/${organization.name}`}>
+          Terms of Use
+        </Link>
+      </span>
+    )
     return (
       <StyledDialog
         classes={{ root: 'root__dialog', paper: 'modal__paper' }}
@@ -124,42 +123,14 @@ class TermsOfUseModal extends React.Component {
             <Heading1 wrapLine>Hello {currentUser.first_name}!</Heading1>
             <p>
               {showBillingInformation
-                ? `Welcome to your 3 month free trial of Shape. The first ${trialUsersCount} people who use Shape at your organization will be free for the first 6 months. Shape licenses are $${trialPricePerUser} per person per month. Please take a moment to`
+                ? `Welcome to your 1 month free trial of Shape. The first ${trialUsersCount} people who use Shape at your organization will be free for the first month. Shape licenses are $${trialPricePerUser} per person per month. Please take a moment to`
                 : 'Welcome to Shape. Before you proceed, please take a moment to'}{' '}
               review our{' '}
               <Link target="_blank" to="/terms">
                 Terms of Use
               </Link>
-              .
+              {orgTermsOfUse}.
             </p>
-
-            <FormControl component="fieldset" required error={displayError}>
-              <FormControlLabel
-                classes={{ label: 'form-control' }}
-                control={
-                  <Checkbox
-                    classes={{
-                      root: displayError ? 'checkbox--error' : '',
-                    }}
-                    checked={this.termsChecked}
-                    onChange={this.handleTermsCheck}
-                    value="yes"
-                  />
-                }
-                label="I agree to the Terms of Use."
-              />
-              {!displayError && <div style={{ height: '6px' }} />}
-              {displayError && (
-                <FormHelperText
-                  classes={{
-                    root: 'form-control',
-                    error: 'form-control--error',
-                  }}
-                >
-                  Please indicate you agree to the Terms of Use.
-                </FormHelperText>
-              )}
-            </FormControl>
             <FormControl component="fieldset">
               <FormControlLabel
                 classes={{ label: 'form-control' }}
@@ -173,6 +144,17 @@ class TermsOfUseModal extends React.Component {
                 label="Stay current on new features and case studies by signing up for our mailing list"
               />
             </FormControl>
+
+            <p>
+              <br />
+            </p>
+            <p>
+              By clicking ‘Continue’ you agree to Shape’s{' '}
+              <Link target="_blank" to="/terms">
+                Terms of Use
+              </Link>
+              {orgTermsOfUse}.
+            </p>
 
             <div className="button--center">
               <FormButton disabled={this.isLoading}>Continue</FormButton>

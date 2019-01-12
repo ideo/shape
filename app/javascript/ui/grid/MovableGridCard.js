@@ -406,7 +406,7 @@ class MovableGridCard extends React.PureComponent {
     }
     return (
       <StyledCardWrapper
-        className={uiStore.isTouchDevice ? 'touch-device' : ''}
+        className={uiStore.isTouchDevice && cols === 1 ? 'touch-device' : ''}
         dragging={!moveComplete}
         zIndex={zIndex}
         onClick={this.handleWrapperClick}

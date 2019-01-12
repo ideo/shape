@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types'
 import { observable, action } from 'mobx'
-import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
+import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 import Dialog from '@material-ui/core/Dialog'
 import DialogContent from '@material-ui/core/DialogContent'
@@ -33,6 +33,7 @@ const StyledDialog = styled(Dialog)`
 `
 StyledDialog.displayName = 'StyledDialog'
 
+@inject('uiStore')
 @observer
 class MoveHelperModal extends React.Component {
   @observable
@@ -50,8 +51,9 @@ class MoveHelperModal extends React.Component {
   @action
   handleSubmit = e => {
     e.preventDefault()
-    const { currentUser, type } = this.props
+    const { currentUser, type, uiStore } = this.props
     this.submitted = true
+    uiStore.update('dismissedMoveHelper', true)
     if (this.dontShowChecked) {
       currentUser.API_hideHelper(type)
     }
@@ -122,6 +124,11 @@ MoveHelperModal.propTypes = {
   recordName: PropTypes.string,
   type: PropTypes.string,
 }
+
+MoveHelperModal.wrappedComponent.propTypes = {
+  uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
+}
+
 MoveHelperModal.defaultProps = {
   type: 'move', // types are 'move' or 'template'
   recordName: null,

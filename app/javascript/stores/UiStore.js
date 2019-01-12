@@ -73,6 +73,8 @@ export default class UiStore {
   @observable
   isLoading = false
   @observable
+  dismissedMoveHelper = false
+  @observable
   movingCardIds = []
   @observable
   movingFromCollectionId = null
@@ -262,6 +264,7 @@ export default class UiStore {
 
   @action
   openMoveMenu({ from: fromCollectionId, cardAction }) {
+    this.dismissedMoveHelper = false
     this.pageMenuOpen = false
     this.closeCardMenu()
     // On move, copy over selected cards to moving cards
@@ -282,6 +285,7 @@ export default class UiStore {
 
   @action
   closeMoveMenu({ deselect = true } = {}) {
+    this.dismissedMoveHelper = false
     this.templateName = ''
     this.movingCardIds.replace([])
     this.movingFromCollectionId = null

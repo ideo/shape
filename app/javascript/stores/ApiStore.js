@@ -361,11 +361,13 @@ class ApiStore extends jsonapi(datxCollection) {
     return archiveResult
   }
 
-  unarchiveCards({ cardIds, snapshot }) {
-    return this.request('collection_cards/unarchive', 'PATCH', {
+  async unarchiveCards({ cardIds, snapshot }) {
+    const res = await this.request('collection_cards/unarchive', 'PATCH', {
       card_ids: cardIds,
       collection_snapshot: snapshot,
     })
+    const collection = res.data
+    collection.API_fetchCards()
   }
 
   moveCards(data) {
