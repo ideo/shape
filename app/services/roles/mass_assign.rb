@@ -33,7 +33,7 @@ module Roles
 
     def call
       return false unless valid_object_and_role_name?
-      unanchor_object
+      unanchor_object # from shared methods
       assign_role_to_users
       setup_org_membership if newly_invited?
       notify_users if newly_invited?
@@ -85,7 +85,7 @@ module Roles
       return unless @object.respond_to?(:children)
       return if @object.children.blank?
       params = [
-        @invited_by.id,
+        @invited_by.try(:id),
         @added_users.map(&:id),
         @added_groups.map(&:id),
         @role_name,
@@ -95,9 +95,9 @@ module Roles
         'add',
       ]
       if @synchronous
-        AddRolesToChildrenWorker.new.perform(*params)
+        ModifyChildrenRolesWorker.new.perform(*params)
       else
-        AddRolesToChildrenWorker.perform_async(*params)
+        ModifyChildrenRolesWorker.perform_async(*params)
       end
     end
 

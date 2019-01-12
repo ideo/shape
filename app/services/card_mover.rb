@@ -135,7 +135,6 @@ class CardMover
     return if @to_collection == @from_collection
     return unless @card_action == 'move'
     @moving_cards.each do |card|
-      # TODO: test this...
       record = card.record
       next if record.same_roles_anchor? @to_collection
       if @to_collection.includes_all_roles? record

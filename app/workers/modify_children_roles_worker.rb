@@ -1,4 +1,4 @@
-class AddRolesToChildrenWorker
+class ModifyChildrenRolesWorker
   include Sidekiq::Worker
   sidekiq_options queue: 'critical'
 
@@ -13,17 +13,17 @@ class AddRolesToChildrenWorker
     method = 'add'
   )
     user = User.where(id: user_id).first
-    users_to_add = User.where(id: user_ids)
-    groups_to_add = Group.where(id: group_ids)
+    subject_users = User.where(id: user_ids)
+    subject_groups = Group.where(id: group_ids)
     object = object_class.safe_constantize.find(object_id)
     # no need to proceed unless this object has children
     return unless object.children.any?
-    Roles::AddToChildren.new(
+    Roles::ModifyChildren.new(
       user: user,
       role_name: role_name,
       parent: object,
-      users_to_add: users_to_add,
-      groups_to_add: groups_to_add,
+      subject_users: subject_users,
+      subject_groups: subject_groups,
       previous_anchor_id: previous_anchor_id,
       method: method,
     ).call
