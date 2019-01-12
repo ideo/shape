@@ -74,7 +74,10 @@ class Api::V1::CollectionsController < Api::V1::BaseController
   end
 
   def submit
-    @collection.roles_anchor_collection = @collection.parent_submission_box
+    Roles::MergeToChild.call(
+      parent: @collection.parent_submission_box,
+      child: @collection,
+    )
     if @collection.save
       render jsonapi: @collection,
              include: Collection.default_relationships_for_api
