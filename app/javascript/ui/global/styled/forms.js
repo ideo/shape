@@ -1,4 +1,5 @@
 import Chip from '@material-ui/core/Chip'
+import FormControlLabel from '@material-ui/core/FormControlLabel'
 import MuiSelect from '@material-ui/core/Select'
 import MenuItem from '@material-ui/core/MenuItem'
 import MuiCheckbox from '@material-ui/core/Checkbox'
@@ -42,6 +43,18 @@ export const LabelText = styled.div`
   ${LabelStyle};
 `
 LabelText.displayName = 'StyledLabelText'
+
+export const LabelTextStandalone = styled.div`
+  ${LabelStyle};
+  margin-bottom: 0;
+  margin-top: 12px;
+`
+
+export const LabelContainer = styled(FormControlLabel)`
+  && {
+    align-items: flex-start;
+  }
+`
 
 /** @component */
 export const Label = styled.label`
