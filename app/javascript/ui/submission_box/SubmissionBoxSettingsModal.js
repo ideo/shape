@@ -272,7 +272,7 @@ class SubmissionBoxSettingsModal extends React.Component {
             }
             label={
               <div style={{ marginLeft: '-4px' }}>
-                <DisplayText>Hide new submission</DisplayText>
+                <DisplayText>Hide new submissions</DisplayText>
                 <br />
                 <SmallHelperText>
                   When this box is checked, submissions will not show up until

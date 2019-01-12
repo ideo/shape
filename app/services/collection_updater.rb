@@ -19,6 +19,15 @@ class CollectionUpdater < SimpleService
           @collection.update_test_template_instance_types!
         end
       end
+
+      # check if hide_submissions was toggled off
+      # `break result` means break from this block and return result
+      break result unless @collection.is_a?(Collection::SubmissionBox)
+      break result unless @collection.saved_change_to_hide_submissions && !@collection.hide_submissions
+      @collection.submissions.find_each do |submission|
+        # TODO: something like this???
+        # Roles::Inheritance.new(@collection, submission).merge_down
+      end
     end
   end
 
