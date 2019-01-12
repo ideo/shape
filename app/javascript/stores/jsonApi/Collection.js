@@ -444,6 +444,9 @@ class Collection extends SharedRecordMixin(BaseRecord) {
 
   reopenTest = () => this._performTestAction('reopen')
 
+  submitSubmission = () =>
+    this.apiStore.request(`collections/${this.id}/submit`, 'PATCH')
+
   async _fetchSubmissionTest() {
     // if it's a submission we have to look up its test in order to launch
     if (!this.launchableTestId) return false

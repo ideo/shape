@@ -1,3 +1,4 @@
+import _ from 'lodash'
 import PropTypes from 'prop-types'
 import { Fragment } from 'react'
 import { observable, action } from 'mobx'
@@ -264,6 +265,20 @@ class PageHeader extends React.Component {
     return null
   }
 
+  get viewers() {
+    const { record } = this.props
+    const { roles } = record
+    const viewerRole = _.find(roles, { name: 'viewer' })
+    if (!viewerRole) return []
+    return [...viewerRole.users, ...viewerRole.groups]
+  }
+
+  isCurrentlyHiddenSubmission() {
+    const { record } = this.props
+    if (!record.isSubmissionBox) return false
+    return record.is_inside_hidden_submission_box && this.viewers.length
+  }
+
   get launchTestButton() {
     const { record, uiStore } = this.props
     if (
@@ -293,6 +308,16 @@ class PageHeader extends React.Component {
           </HeaderFormButton>
         )
       }
+    }
+    if (this.isCurrentlyHiddenSubmission) {
+      return (
+        <HeaderFormButton
+          onClick={record.submitSubmission}
+          disabled={uiStore.launchButtonLoading}
+        >
+          Submit
+        </HeaderFormButton>
+      )
     }
     return null
   }

@@ -235,7 +235,7 @@ class SubmissionBoxSettingsModal extends React.Component {
   updateHidden = ev => {
     ev.preventDefault()
     const { collection } = this.props
-    collection.submissions_hidden = !collection.submissions_hidden
+    collection.hide_submissions = !collection.hide_submissions
     return collection.save()
   }
 

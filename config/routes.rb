@@ -21,6 +21,7 @@ Rails.application.routes.draw do
       resources :collections, except: %i[index] do
         member do
           get 'in_my_collection'
+          patch 'submit'
         end
         collection do
           post 'create_template'

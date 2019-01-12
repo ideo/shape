@@ -117,6 +117,10 @@ class SerializableCollection < BaseJsonSerializer
     @object.submission_box_template_test?
   end
 
+  attribute :is_inside_hidden_submission_box do
+    @object.inside_hidden_submission_box?
+  end
+
   attribute :submission_attrs, if: -> { @object.submission_attrs.present? } do
     @object.submission_attrs
   end
