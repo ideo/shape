@@ -235,14 +235,18 @@ describe Api::V1::OrganizationsController, type: :request, json: true, auth: tru
   end
 
   describe 'PATCH #add_terms_text', vcr: { match_requests_on: %i[host method path_ignore_id] } do
-    let!(:current_user) { create(:user) }
+    let!(:current_user) { @user }
     let!(:organization) { create(:organization, admin: user) }
-    let(:path) { "/api/v1/organizations/#{organization.id}" }
+    let(:path) { "/api/v1/organizations/#{organization.id}/add_terms_text" }
     let(:params) do
       json_api_params(
         'organizations',
         'name': 'Acme Inc 2.0',
       )
+    end
+
+    before do
+      user.add_role(Role::ADMIN, organization.primary_group)
     end
 
     it 'returns a 200' do
@@ -253,24 +257,31 @@ describe Api::V1::OrganizationsController, type: :request, json: true, auth: tru
     it 'updates the the terms_text_item' do
       expect(organization.terms_text_item_id).to be nil
       patch(path, params: params)
+      organization.reload
       expect(organization.terms_text_item_id).not_to be nil
     end
 
     it 'sets the current user as an editor of the terms text item' do
       patch(path, params: params)
+      organization.reload
+      organization.terms_text_item.reload
       expect(user.has_role?(:editor, organization.terms_text_item)).to be true
     end
   end
 
   describe 'PATCH #remove_terms_text', vcr: { match_requests_on: %i[host method path_ignore_id] } do
-    let!(:current_user) { create(:user) }
+    let!(:current_user) { @user }
     let!(:organization) { create(:organization, admin: user, terms_text_item_id: 3) }
-    let(:path) { "/api/v1/organizations/#{organization.id}" }
+    let(:path) { "/api/v1/organizations/#{organization.id}/remove_terms_text" }
     let(:params) do
       json_api_params(
         'organizations',
         'name': 'Acme Inc 2.0',
       )
+    end
+
+    before do
+      user.add_role(Role::ADMIN, organization.primary_group)
     end
 
     it 'returns a 200' do

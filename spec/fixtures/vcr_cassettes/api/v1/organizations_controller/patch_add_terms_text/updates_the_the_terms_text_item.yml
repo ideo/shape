@@ -1,0 +1,139 @@
+---
+http_interactions:
+- request:
+    method: get
+    uri: https://profile.ideo.com/api/v1/organizations?filter%5Bclient_id%5D=456c92569bafa8d035162e6a4a8a7c99ee7de4ee8c187383c310422081bb02e4&filter%5Bexternal_id%5D=10&page%5Bnumber%5D=1&page%5Bsize%5D=1
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      User-Agent:
+      - Faraday v0.12.2
+      Content-Type:
+      - application/vnd.api+json
+      Accept:
+      - application/vnd.api+json
+      Authorization:
+      - Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzUxMiJ9.eyJ0eXBlIjoiYXBwbGljYXRpb24iLCJjbGllbnRfaWQiOiI0NTZjOTI1NjliYWZhOGQwMzUxNjJlNmE0YThhN2M5OWVlN2RlNGVlOGMxODczODNjMzEwNDIyMDgxYmIwMmU0IiwidWlkIjoiMDB1Y3kzdW53aE9wbHhzZHowaDciLCJleHBpcmVzIjoxNTU1OTc0NTAyfQ.ZXa-_6zQe5jyC4-g5gonWjgAsVcgFmEBS2FTsEImuj7vaN2inLxhFjdJ85SDHJaBkczOIIzjLOM5gLsfs5DWvV3DTR8Ox5NJeH_OwY7317z_cVVUTB2Oyu54B8zduLDiqyQ3DCYMHEXn6CwjliP_Z32CTCxdI--ED_nu1wCMAtxhjHShvyWS-QLXvN0MbcxTU0dTYzdEsSzCW4qWuYSxLzlh32CW6GUwystqvXe69wMi6Dlz4IC5OEpksK8DBsDCe6eNFqcUtJyTr42tzcHi2hI7JyHpXFRPpacybIrnZwjYMIb4hDdBKKyko0JhQ95-2lFuoLCGElTIkCeuLavViA
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Server:
+      - Cowboy
+      Date:
+      - Sat, 12 Jan 2019 00:46:57 GMT
+      Connection:
+      - keep-alive
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Xss-Protection:
+      - 1; mode=block
+      X-Content-Type-Options:
+      - nosniff
+      X-Download-Options:
+      - noopen
+      X-Permitted-Cross-Domain-Policies:
+      - none
+      Referrer-Policy:
+      - strict-origin-when-cross-origin
+      Content-Type:
+      - application/vnd.api+json; charset=utf-8
+      Set-Cookie:
+      - _sso_profile_session=NDBqdFZ3YXRnVCs2VjlVcGdRQkpmdTRyaEUyV0ozUUVSanNGL1NZY2VCSnRaSHdLYzd0cFgwSXdVZFRhUjBXSE5JemZ5U2dabkxZcTBhTEcxZnQzbHNBUHRoOTY3ZzVVUFRVZkhuNEt3S0NYQ2RyL1Vnb2NxeFRVN2RsVnlTa3EtLWNuT3dsdmJETzdKMzFyNS9KcmdudEE9PQ%3D%3D--411fb22fb7c206d9387670f0ad3cdd5a5782f5f5;
+        path=/; expires=Sat, 12 Jan 2019 04:46:58 -0000; HttpOnly; secure
+      - rack.session=BAh7BkkiD3Nlc3Npb25faWQGOgZFVEkiRTkyNDJlMTVkYjA0ZDI1YzMwNTQ0%0AYmIxMjQzOWU1OTU3ZGUxMzhjMjc0OTFkYjQ2YzdlNzFiMzEzYWE4YjJjYzMG%0AOwBG%0A--100243c284dd687a2aeea272e0434a0263ee2811;
+        path=/; expires=Sat, 12 Jan 2019 04:46:58 -0000; HttpOnly; secure
+      Etag:
+      - W/"9cb0f11ceff0010d135e52d64db2d726"
+      Cache-Control:
+      - max-age=0, private, must-revalidate
+      X-Request-Id:
+      - a95712f5-dfd5-4734-97f4-bf6e4525ff24
+      X-Runtime:
+      - '0.042992'
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains
+      Vary:
+      - Origin
+      Transfer-Encoding:
+      - chunked
+      Via:
+      - 1.1 vegur
+    body:
+      encoding: UTF-8
+      string: '{"data":[],"meta":{},"jsonapi":{"version":"1.0"}}'
+    http_version: 
+  recorded_at: Sat, 12 Jan 2019 00:46:58 GMT
+- request:
+    method: get
+    uri: https://profile.ideo.com/api/v1/organizations?filter%5Bclient_id%5D=456c92569bafa8d035162e6a4a8a7c99ee7de4ee8c187383c310422081bb02e4&filter%5Bexternal_id%5D=10&page%5Bnumber%5D=1&page%5Bsize%5D=1
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      User-Agent:
+      - Faraday v0.12.2
+      Content-Type:
+      - application/vnd.api+json
+      Accept:
+      - application/vnd.api+json
+      Authorization:
+      - Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzUxMiJ9.eyJ0eXBlIjoiYXBwbGljYXRpb24iLCJjbGllbnRfaWQiOiI0NTZjOTI1NjliYWZhOGQwMzUxNjJlNmE0YThhN2M5OWVlN2RlNGVlOGMxODczODNjMzEwNDIyMDgxYmIwMmU0IiwidWlkIjoiMDB1Y3kzdW53aE9wbHhzZHowaDciLCJleHBpcmVzIjoxNTU1OTc0NTAyfQ.ZXa-_6zQe5jyC4-g5gonWjgAsVcgFmEBS2FTsEImuj7vaN2inLxhFjdJ85SDHJaBkczOIIzjLOM5gLsfs5DWvV3DTR8Ox5NJeH_OwY7317z_cVVUTB2Oyu54B8zduLDiqyQ3DCYMHEXn6CwjliP_Z32CTCxdI--ED_nu1wCMAtxhjHShvyWS-QLXvN0MbcxTU0dTYzdEsSzCW4qWuYSxLzlh32CW6GUwystqvXe69wMi6Dlz4IC5OEpksK8DBsDCe6eNFqcUtJyTr42tzcHi2hI7JyHpXFRPpacybIrnZwjYMIb4hDdBKKyko0JhQ95-2lFuoLCGElTIkCeuLavViA
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Server:
+      - Cowboy
+      Date:
+      - Sat, 12 Jan 2019 00:46:58 GMT
+      Connection:
+      - keep-alive
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Xss-Protection:
+      - 1; mode=block
+      X-Content-Type-Options:
+      - nosniff
+      X-Download-Options:
+      - noopen
+      X-Permitted-Cross-Domain-Policies:
+      - none
+      Referrer-Policy:
+      - strict-origin-when-cross-origin
+      Content-Type:
+      - application/vnd.api+json; charset=utf-8
+      Set-Cookie:
+      - _sso_profile_session=V2VWejNkRUh4czJneWViSUhIVkJVR0VwbGlUWDBLdW9RamUvcHBkVHZDVmpRKy9zdTF0Y09lOWJsVy80czgvbVA2dXdUWm1CYXBMcHhMdUlPMGJXZ1g4cE5pSHA3ZWs1MFlySFZLTmJwYSs4UjJ4bmsyMWMyQldhNzM3R2d1T1ctLXFINW1ET2E0NEpvck9Tand0Y29HeGc9PQ%3D%3D--c749051af1da13958451fe4f707250e7b55f9ed8;
+        path=/; expires=Sat, 12 Jan 2019 04:46:58 -0000; HttpOnly; secure
+      - rack.session=BAh7BkkiD3Nlc3Npb25faWQGOgZFVEkiRWE3OTgzODFmYjk0YWZkOWYzZThm%0AZTUxNjhkNjc5YzM0MmJjNzEzNDQyNzY2N2ZiMjIxZmFjZjU0YWVlNDhlYjMG%0AOwBG%0A--08c7dee050bd0206771943d5b74d94b915e87cee;
+        path=/; expires=Sat, 12 Jan 2019 04:46:58 -0000; HttpOnly; secure
+      Etag:
+      - W/"9cb0f11ceff0010d135e52d64db2d726"
+      Cache-Control:
+      - max-age=0, private, must-revalidate
+      X-Request-Id:
+      - 65cd8505-da9a-4dc2-b267-0229138c039d
+      X-Runtime:
+      - '0.017085'
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains
+      Vary:
+      - Origin
+      Transfer-Encoding:
+      - chunked
+      Via:
+      - 1.1 vegur
+    body:
+      encoding: UTF-8
+      string: '{"data":[],"meta":{},"jsonapi":{"version":"1.0"}}'
+    http_version: 
+  recorded_at: Sat, 12 Jan 2019 00:46:58 GMT
+recorded_with: VCR 4.0.0
