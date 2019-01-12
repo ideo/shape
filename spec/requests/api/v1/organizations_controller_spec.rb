@@ -240,18 +240,18 @@ describe Api::V1::OrganizationsController, type: :request, json: true, auth: tru
     let(:path) { "/api/v1/organizations/#{organization.id}" }
 
     it 'returns a 200' do
-      patch(path)
+      patch(path, params: {})
       expect(response.status).to eq(200)
     end
 
     it 'updates the the terms_text_item' do
       expect(organization.terms_text_item_id).to be nil
-      patch(path)
+      patch(path, params: {})
       expect(organization.terms_text_item_id).not_to be nil
     end
 
     it 'sets the current user as an editor of the terms text item' do
-      patch(path)
+      patch(path, params: {})
       expect(user.has_role?(:editor, organization.terms_text_item)).to be true
     end
   end
@@ -262,7 +262,7 @@ describe Api::V1::OrganizationsController, type: :request, json: true, auth: tru
     let(:path) { "/api/v1/organizations/#{organization.id}" }
 
     it 'returns a 200' do
-      patch(path)
+      patch(path, params: {})
       expect(response.status).to eq(200)
     end
 
