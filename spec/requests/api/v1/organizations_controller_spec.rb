@@ -246,12 +246,12 @@ describe Api::V1::OrganizationsController, type: :request, json: true, auth: tru
 
     it 'updates the the terms_text_item' do
       expect(organization.terms_text_item_id).to be nil
-      patch(path, params: params)
+      patch(path)
       expect(organization.terms_text_item_id).not_to be nil
     end
 
     it 'sets the current user as an editor of the terms text item' do
-      patch(path, params: params)
+      patch(path)
       expect(user.has_role?(:editor, organization.terms_text_item)).to be true
     end
   end
@@ -268,7 +268,7 @@ describe Api::V1::OrganizationsController, type: :request, json: true, auth: tru
 
     it 'clears the the terms_text_item' do
       expect(organization.terms_text_item_id).to be 3
-      patch(path, params: params)
+      patch(path)
       expect(organization.terms_text_item_id).not_to be nil
     end
   end
