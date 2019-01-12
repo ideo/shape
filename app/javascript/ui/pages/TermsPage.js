@@ -1,10 +1,13 @@
 import ReactMarkdown from 'react-markdown'
+import ReactQuill from 'react-quill'
 import styled from 'styled-components'
 
+import { apiStore } from '~/stores'
 import {
   Heading1,
   DisplayText,
   DisplayLink,
+  QuillStyleWrapper,
 } from '~/ui/global/styled/typography'
 import v from '~/utils/variables'
 import Header from '~/ui/layout/Header'
@@ -34,17 +37,39 @@ const StyledLink = DisplayLink.extend`
 
 class TermsPage extends React.PureComponent {
   render() {
+    let inner
+    inner = (
+      <div>
+        <StyledTitle>Terms of Use</StyledTitle>
+        <StyledLink href="https://www.ideo.com/privacy" target="_blank">
+          Privacy Policy
+        </StyledLink>
+        <StyledMarkdown source={termsMarkdown} />
+      </div>
+    )
+    if (this.props.location.pathname !== '/terms') {
+      const organization = apiStore.currentUserOrganization
+      const quillProps = {
+        readOnly: true,
+        theme: null,
+      }
+      const textData = organization.terms_text_item.toJSON().text_data
+      inner = (
+        <div>
+          <StyledTitle>{organization.name} Terms of Use</StyledTitle>
+          <QuillStyleWrapper style={{ marginTop: '1.5rem' }}>
+            <ReactQuill {...quillProps} value={textData} />
+          </QuillStyleWrapper>
+        </div>
+      )
+    }
     return (
       <div>
         <Header />
         <PageContainer marginTop={v.headerHeightCompact}>
           <Heading1>Legal</Heading1>
           <OverdueBanner />
-          <StyledTitle>Terms of Use</StyledTitle>
-          <StyledLink href="https://www.ideo.com/privacy" target="_blank">
-            Privacy Policy
-          </StyledLink>
-          <StyledMarkdown source={termsMarkdown} />
+          {inner}
         </PageContainer>
       </div>
     )
