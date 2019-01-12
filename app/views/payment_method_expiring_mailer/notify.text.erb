@@ -1,0 +1,14 @@
+<%= @subject %> for <%= @organization_name %>
+
+The defualt payment method on file for your account is expiring soon. Please go to the Shape billing page to update your payment method or add a new payment method to your account.
+
+PAYMENT METHOD
+
+  <%= @payment_method.brand %> ending in <%= @payment_method.last4 %>: EXPIRING
+
+MONTHLY CHARGE
+
+  Next monthly charge: <%= number_to_currency(@next_monthly_charge) %>
+  Next statement date: <%= @next_statement_date %>
+
+Go to billing: <%= @url %>

@@ -56,41 +56,6 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
       get(path)
     end
 
-    context 'with SharedWithMeCollection' do
-      let!(:collection) do
-        create(:shared_with_me_collection, num_cards: 5, add_viewers: [user])
-      end
-      let(:path) { "/api/v1/collections/#{collection.id}" }
-
-      before do
-        collection.collection_cards.each do |cc|
-          user.add_role(Role::VIEWER, cc.record)
-        end
-      end
-
-      it 'should sort by updated_at by default' do
-        get(path)
-        expect(json['data']['attributes']['card_order']).to eq 'updated_at'
-      end
-    end
-
-    context 'with sort options' do
-      let(:path) { "/api/v1/collections/#{collection.id}?card_order=updated_at" }
-      before do
-        collection.collection_cards.each do |cc|
-          user.add_role(Role::VIEWER, cc.record)
-        end
-      end
-
-      it 'should sort by the passed in card_order param' do
-        get(path)
-        expect(json['data']['attributes']['card_order']).to eq 'updated_at'
-        cards = json['data']['relationships']['collection_cards']['data']
-        # kind of a hacky way to say that the first card is "newer" than the second
-        expect(cards.first['id'] > cards.second['id']).to be true
-      end
-    end
-
     context 'with editor' do
       let!(:collection) do
         create(:collection, num_cards: 5, add_editors: [user])
@@ -111,26 +76,6 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
         collection.items.each { |item| user.add_role(Role::VIEWER, item) }
       end
 
-      it 'returns all collection cards' do
-        get(path)
-        expect(collection_cards_json.map { |cc| cc['id'].to_i }).to match_array(collection.collection_card_ids)
-      end
-
-      it 'matches CollectionCard schema' do
-        get(path)
-        expect(collection_cards_json.first['attributes']).to match_json_schema('collection_card')
-      end
-
-      it 'returns all items' do
-        get(path)
-        expect(items_json.map { |i| i['id'].to_i }).to match_array(collection.item_ids)
-      end
-
-      it 'matches Item schema' do
-        get(path)
-        expect(items_json.first['attributes']).to match_json_schema('item', strict: false)
-      end
-
       it 'includes viewers' do
         get(path)
         expect(users_json.map { |u| u['id'].to_i }).to match_array([user.id])
@@ -145,27 +90,6 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
           get(path)
           expect(users_json.map { |u| u['id'].to_i }).to match_array([user.id])
         end
-      end
-    end
-
-    context 'with nested collection' do
-      let!(:nested_collection) { create(:collection, add_editors: [user]) }
-      let(:collections_json) { json_included_objects_of_type('collections') }
-
-      before do
-        create(:collection_card_collection,
-               parent: collection,
-               collection: nested_collection)
-      end
-
-      it 'returns nested Collection' do
-        get(path)
-        expect(collections_json.map { |c| c['id'].to_i }).to include(nested_collection.id)
-      end
-
-      it 'matches Collection schema' do
-        get(path)
-        expect(collections_json.first['attributes']).to match_json_schema('collection', strict: false)
       end
     end
 
@@ -196,6 +120,29 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
           for_user: user,
         )
         get(path)
+      end
+    end
+
+    context 'with deactivated org' do
+      before do
+        # don't invoke callbacks, just mark as deactivated
+        collection.organization.update_column(:deactivated, true)
+      end
+
+      it 'should return a 404' do
+        get(path)
+        expect(response.status).to eq(404)
+      end
+    end
+
+    context 'with archived collection' do
+      before do
+        collection.archive!
+      end
+
+      it 'should return a 404' do
+        get(path)
+        expect(response.status).to eq(404)
       end
     end
   end

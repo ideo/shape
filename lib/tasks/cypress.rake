@@ -4,11 +4,13 @@ namespace :cypress do
     email = 'cypress-test@ideo.com'
     user = User.find_by(email: email)
     unless user.present?
-      user = FactoryBot.create(:user, email: email, id: 4)
+      user = FactoryBot.create(:user, email: email, id: 4).becomes(User)
     end
     organization = Organization.find_by(name: 'CypressTest')
     unless organization.present?
-      builder = OrganizationBuilder.new({ name: 'CypressTest' }, user)
+      builder = OrganizationBuilder.new(
+        { name: 'CypressTest' }, user, full_setup: false
+      )
       builder.save
       organization = builder.organization
     end

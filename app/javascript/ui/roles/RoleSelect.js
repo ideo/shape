@@ -120,7 +120,7 @@ class RoleSelect extends React.Component {
         >
           {roleTypes.map(roleType => (
             <MenuItem key={roleType} value={roleType}>
-              {this.labelFor(roleType)}
+              <DisplayText>{this.labelFor(roleType)}</DisplayText>
             </MenuItem>
           ))}
         </Select>

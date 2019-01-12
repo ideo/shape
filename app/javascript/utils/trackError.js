@@ -6,7 +6,7 @@ export default function trackError(err, opts = {}) {
     opts.source || 'Any',
     opts.message || err.message,
     opts.name || err.name,
-    err.stack.split('\n')
+    err.stack ? err.stack.split('\n') : ''
   )
 }
 

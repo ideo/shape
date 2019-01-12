@@ -434,8 +434,24 @@ describe Collection::TestCollection, type: :model do
     describe '#launchable?' do
       it 'should only return true when the master template test has launched' do
         expect(submission_test.launchable?).to be false
+        # editor launches the template test for everyone to launch their submissions
         test_collection.launch!
         expect(submission_test.launchable?).to be true
+      end
+
+      context 'with multiple tests in the submission template' do
+        let!(:test_collection2) do
+          create(:test_collection, :completed, master_template: true, parent_collection: submission_template)
+        end
+
+        it 'should only return true when no other tests are running' do
+          expect(test_collection2.launchable?).to be true
+          expect(test_collection.launch!(initiated_by: user)).to be true
+          expect(test_collection.test_status).to eq 'live'
+          # now that the first test is running, test2 can't be launched
+          test_collection2.parent_submission_box_template.reload
+          expect(test_collection2.launchable?).to be false
+        end
       end
     end
 

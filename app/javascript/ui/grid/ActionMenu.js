@@ -29,14 +29,18 @@ class ActionMenu extends React.Component {
 
   callCardAction = async (name, methodName) => {
     const { uiStore, card } = this.props
+    let onCancel
     if (methodName === 'API_archive') {
       uiStore.selectCardId(card.id)
+      onCancel = () => {
+        uiStore.toggleSelectedCardId(card.id)
+      }
       uiStore.closeMoveMenu({ deselect: false })
     } else {
       uiStore.closeMoveMenu({ deselect: true })
     }
     this.setLoading(name)
-    const result = await card[methodName]()
+    const result = await card[methodName]({ onCancel })
     this.setLoading()
     return result
   }

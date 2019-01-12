@@ -11,6 +11,12 @@ module DataReport
       NetworkApi::AppMetric
         .where(json_api_query_params)
         .order(measured_at: :asc)
+        .per(records_per_page)
+    end
+
+    # Include up to 100 records
+    def records_per_page
+      100
     end
 
     def json_api_query_params

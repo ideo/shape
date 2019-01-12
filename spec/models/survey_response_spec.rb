@@ -105,4 +105,19 @@ RSpec.describe SurveyResponse, type: :model do
       end
     end
   end
+
+  describe '#cache_test_scores!' do
+    let(:submission) { create(:collection) }
+    let!(:test_collection) { create(:test_collection, :answerable_questions, parent_collection: submission) }
+    let!(:survey_response) { create(:survey_response, test_collection: test_collection) }
+
+    before do
+      submission.update(submission_attrs: { submission: true, launchable_test_id: test_collection.id })
+    end
+
+    it 'should call cache_test_scores! on the parent_submission' do
+      survey_response.cache_test_scores!
+      expect(test_collection.parent_submission.cached_test_scores).to eq('total' => 0, 'question_context' => 0)
+    end
+  end
 end

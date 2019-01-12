@@ -5,6 +5,7 @@ class CollectionUpdateBroadcaster < SimpleService
   end
 
   def call
+    return if @collection.nil?
     # single_edit method comes from RealtimeEditorsViewers concern
     @collection.single_edit(@user)
   end

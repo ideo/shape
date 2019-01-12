@@ -37,6 +37,7 @@ Rails.application.routes.draw do
           get 'next_available'
         end
       end
+      resources :items, only: %i[create]
       resources :collection_cards, shallow: true, except: %i[show] do
         member do
           patch 'replace'
@@ -68,6 +69,10 @@ Rails.application.routes.draw do
       resources :organizations, except: :delete do
         collection do
           get 'current'
+        end
+        member do
+          patch 'add_terms_text'
+          patch 'remove_terms_text'
         end
         resources :collections, only: %i[create]
         resources :groups, only: %i[index]
@@ -118,10 +123,13 @@ Rails.application.routes.draw do
 
   authenticate :user, ->(u) { Rails.env.development? || u.has_cached_role?(Role::SUPER_ADMIN) } do
     require 'sidekiq/web'
+    require 'sidekiq-scheduler/web'
     mount Sidekiq::Web => '/sidekiq'
   end
 
   namespace :callbacks do
+    post 'ideo_network/payment_methods' => 'ideo_network#payment_methods'
+    post 'ideo_network/invoices' => 'ideo_network#invoices'
     post 'ideo_network/users' => 'ideo_network#users'
   end
 

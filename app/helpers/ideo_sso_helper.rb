@@ -30,6 +30,18 @@ module IdeoSsoHelper
     ENV['IDEO_SSO_CLIENT_ID']
   end
 
+  def ideo_sso_api_base_url
+    "#{ENV['IDEO_SSO_HOST']}#{ENV['IDEO_SSO_API_PATH']}"
+  end
+
+  def stripe_js_sdk_url
+    'https://js.stripe.com/v3/'
+  end
+
+  def stripe_js_api_key
+    ENV['STRIPE_JS_API_KEY']
+  end
+
   def ideo_sso_redirect_url
     return unless ENV['BASE_HOST'].present? && ENV['IDEO_SSO_REDIRECT_PATH'].present?
 

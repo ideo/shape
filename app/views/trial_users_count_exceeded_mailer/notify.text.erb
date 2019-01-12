@@ -1,0 +1,23 @@
+Free trial limit reached for your organization: <%= @organization_name %>
+
+Your team size have grown beyond the active user limit for your free trial period. Your account will now be charged for each additional active user which exceeds the free trial limit.
+
+Trial Expiration Date: <%= @expiration_date %>
+
+ACTIVE PEOPLE
+
+  Total users: <%= @total_users_count %>
+
+  Free trials: - <%= @trial_users_count %>
+
+  Prorated Users: <%= @prorated_users_count %>
+
+MONTHLY CHARGE
+
+  Next monthly charge: <%= number_to_currency(@next_monthly_charge) %>
+
+  Next statement date: <%= @next_statement_date %>
+
+<% if @missing_payment_method %>
+  Add payment method: <%= @url %>
+<% end %>

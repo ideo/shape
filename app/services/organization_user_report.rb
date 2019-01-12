@@ -4,8 +4,7 @@ class OrganizationUserReport
   def self.all_user_counts
     CSV.generate do |csv|
       csv << %w[name total active_last_3_months]
-      Organization.find_each do |org|
-        next if org.users.active.count <= 1
+      Organization.where(deactivated: false).find_each do |org|
         active_users = org.users.active
         recent = active_users.where('last_sign_in_at > ?', 3.months.ago)
         csv << [org.name, active_users.count, recent.count]

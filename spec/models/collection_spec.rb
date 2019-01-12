@@ -418,6 +418,13 @@ describe Collection, type: :model do
         expect(viewable.second).to eq(scored2.parent_collection_card)
       end
     end
+
+    context 'with pagination' do
+      it 'should only show the appropriate page' do
+        # just make a simple 1 per-page request
+        expect(collection.collection_cards_viewable_by(cards, user, per_page: 1)).to match_array([cards.first])
+      end
+    end
   end
 
   describe '#search_data' do

@@ -28,6 +28,7 @@ describe('OrganizationDropdown', () => {
       'New Organization',
       'Settings',
       'Contact Support',
+      'Billing',
       'Legal',
     ]
     wrapper = shallow(<OrganizationDropdown.wrappedComponent {...props} />)
@@ -90,6 +91,12 @@ describe('OrganizationDropdown', () => {
           component.menuItems.bottom.find(item => item.name === 'Settings')
         ).toBeFalsy()
       })
+
+      it('should not show the billing link', () => {
+        expect(
+          component.menuItems.bottom.find(item => item.name === 'Billing')
+        ).toBeFalsy()
+      })
     })
   })
 
@@ -131,6 +138,20 @@ describe('OrganizationDropdown', () => {
 
     afterEach(() => {
       global.zE = zEBackup
+    })
+  })
+
+  describe('handleBilling', () => {
+    beforeEach(() => {
+      component.handleBilling()
+    })
+
+    it('should call the on item click handler', () => {
+      expect(props.onItemClick).toHaveBeenCalled()
+    })
+
+    it('should route to the billing page', () => {
+      expect(props.routingStore.routeTo).toHaveBeenCalledWith('/billing')
     })
   })
 

@@ -47,6 +47,31 @@ describe Users::OmniauthCallbacksController, type: :request do
       expect(User.find_by_uid(user.uid)).not_to be_nil
     end
 
+    context 'pending user is an admin of current organization' do
+      let!(:pending_user) do
+        organization = create(:organization)
+        create(:user, :pending, current_organization: organization)
+      end
+
+      before do
+        get('/invitations', params: { token: pending_user.invitation_token })
+      end
+
+      it 'adds the user as a network admin' do
+        allow(pending_user).to receive(:add_network_admin)
+        post(path)
+        expect(pending_user).not_to have_received(:add_network_admin).with(
+          organization.id,
+        )
+
+        pending_user.add_role(Role::ADMIN, pending_user.current_organization.admin_group)
+        post(path)
+        expect(pending_user).to have_received(:add_network_admin).with(
+          pending_user.current_organization.id,
+        )
+      end
+    end
+
     context 'with updated email and pic' do
       let!(:email) { 'newemail@user.com' }
       let!(:picture) { 'newpic.jpg' }
@@ -86,6 +111,33 @@ describe Users::OmniauthCallbacksController, type: :request do
         post(path)
         expect(user.has_role?(Role::MEMBER, organization.guest_group)).to be false
         expect(user.has_role?(Role::MEMBER, organization.primary_group)).to be true
+      end
+    end
+
+    context 'with email domain matching autojoinable organization whitelist' do
+      let!(:organization) { create(:organization, autojoin_domains: ['mycompany.org']) }
+      let!(:user) { create(:user, email: 'user@mycompany.org') }
+
+      it 'autojoins organization if they login with their company email' do
+        expect(organization.can_view?(user)).to be false
+        post(path)
+        user.reset_cached_roles!
+        expect(organization.can_view?(user)).to be true
+      end
+    end
+
+    context 'with email matching autojoinable group' do
+      let!(:organization) { create(:organization) }
+      let!(:group) { create(:group, organization: organization, autojoin_emails: ['special@person.com']) }
+      let!(:user) { create(:user, email: 'special@person.com') }
+
+      it 'autojoins organization if they login with a matching email' do
+        expect(organization.can_view?(user)).to be false
+        expect(group.can_view?(user)).to be false
+        post(path)
+        user.reset_cached_roles!
+        expect(organization.can_view?(user)).to be true
+        expect(group.can_view?(user)).to be true
       end
     end
   end

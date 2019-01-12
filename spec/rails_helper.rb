@@ -1,9 +1,9 @@
 # This file is copied to spec/ when you run 'rails generate rspec:install'
 require 'spec_helper'
 ENV['RAILS_ENV'] ||= 'test'
-require File.expand_path('../../config/environment', __FILE__)
+require File.expand_path('../config/environment', __dir__)
 # Prevent database truncation if the environment is production
-abort("The Rails environment is running in production mode!") if Rails.env.production?
+abort('The Rails environment is running in production mode!') if Rails.env.production?
 require 'rspec/rails'
 # Add additional requires below this line. Rails is not loaded until this point!
 
@@ -28,6 +28,18 @@ ActiveRecord::Migration.maintain_test_schema!
 
 require 'sidekiq/testing'
 Sidekiq::Testing.fake!
+
+require 'vcr'
+VCR.configure do |config|
+  config.ignore_localhost = true
+  config.cassette_library_dir = 'spec/fixtures/vcr_cassettes'
+  config.hook_into :webmock
+  config.register_request_matcher :path_ignore_id do |req1, req2|
+    path1 = URI(req1.uri).path
+    path2 = URI(req2.uri).path
+    path1.gsub(/\/\d+/, '/x') == path2.gsub(/\/\d+/, '/x')
+  end
+end
 
 # Use fake redis instance for tests
 require 'fakeredis/rspec'
@@ -85,6 +97,12 @@ RSpec.configure do |config|
     create_org_for_user(@user)
   end
 
+  config.around(:each, auth: true) do |example|
+    VCR.use_cassette('auth_organization_create_for_user', {
+                       match_requests_on: %i[host path],
+                     }, &example)
+  end
+
   config.before(:each, truncate: true) do
     DatabaseCleaner.strategy = :truncation
   end
@@ -119,6 +137,33 @@ RSpec.configure do |config|
   #   c.example_status_persistence_file_path = "tmp/rspec_failures.txt"
   #   c.run_all_when_everything_filtered = true
   # end
+
+  # Add VCR to tagged tests
+  config.around(:each) do |example|
+    vcr_tag = example.metadata[:vcr]
+    if vcr_tag
+      options = if vcr_tag.is_a?(Hash)
+                  vcr_tag
+                else
+                  { match_requests_on: %i[method host path] }
+                end
+
+      path_data = [example.metadata[:description]]
+      parent = example.example_group
+      while parent != RSpec::ExampleGroups
+        path_data << parent.metadata[:description]
+        parent = parent.parent
+      end
+
+      name = path_data.map do |str|
+        str.underscore.delete('.').gsub(%r{[^\w\/]+}, '_').gsub(%r{\/$/}, '')
+      end.reverse.join('/')
+
+      VCR.use_cassette(name, options, &example)
+    else
+      example.run
+    end
+  end
 end
 
 # better readability and ability to chain "not changes"

@@ -1,7 +1,11 @@
+import { apiUrl } from '~/utils/url'
 import { runInAction } from 'mobx'
 import BaseRecord from './BaseRecord'
 
 class QuestionAnswer extends BaseRecord {
+  static type = 'question_answers'
+  static endpoint = apiUrl('question_answers')
+
   async API_save(method = 'POST') {
     try {
       const id = this.persisted ? `/${this.id}` : ''
@@ -34,6 +38,5 @@ class QuestionAnswer extends BaseRecord {
     return this.API_save('PATCH')
   }
 }
-QuestionAnswer.type = 'question_answers'
 
 export default QuestionAnswer
