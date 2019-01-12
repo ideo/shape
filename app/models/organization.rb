@@ -39,6 +39,10 @@ class Organization < ApplicationRecord
              class_name: 'Collection::Global',
              dependent: :destroy,
              optional: true
+  belongs_to :terms_text_item,
+             class_name: 'Item::TextItem',
+             dependent: :destroy,
+             optional: true
 
   after_create :create_groups
   before_update :parse_domain_whitelist
@@ -290,6 +294,19 @@ class Organization < ApplicationRecord
       # however if they've already been setup as an org member then they don't get "demoted"
       user.add_role(Role::MEMBER, guest_group)
     end
+  end
+
+  def create_terms_text_item
+    item = Item.create(
+      type: 'Item::TextItem',
+      name: "#{name} Terms",
+      content: 'Terms',
+      text_data: { a: {} },
+    )
+    admin_group.add_role(Role::EDITOR, item)
+    self.terms_text_item = item
+    save
+    item
   end
 
   private
