@@ -233,4 +233,60 @@ describe Api::V1::OrganizationsController, type: :request, json: true, auth: tru
       end
     end
   end
+
+  describe 'PATCH #add_terms_text' do
+    let!(:current_user) { @user }
+    let!(:organization) { create(:organization, admin: user) }
+    let(:path) { "/api/v1/organizations/#{organization.id}/add_terms_text" }
+    let(:params) do
+      json_api_params(
+        'organizations',
+        'name': 'Acme Inc 2.0',
+      )
+    end
+
+    it 'returns a 200' do
+      patch(path, params: params)
+      expect(response.status).to eq(200)
+    end
+
+    it 'updates the the terms_text_item' do
+      expect(organization.terms_text_item_id).to be nil
+      patch(path, params: params)
+      organization.reload
+      expect(organization.terms_text_item_id).not_to be nil
+    end
+
+    it 'sets the admin group as editor of the terms text item' do
+      patch(path, params: params)
+      organization.reload
+      organization.terms_text_item.reload
+      expect(organization.admin_group.has_role?(:editor, organization.terms_text_item)).to be true
+      # user should be able to edit via admin_group membership
+      expect(organization.terms_text_item.can_edit?(user)).to be true
+    end
+  end
+
+  describe 'PATCH #remove_terms_text' do
+    let!(:current_user) { @user }
+    let!(:organization) { create(:organization, admin: user, terms_text_item_id: 3) }
+    let(:path) { "/api/v1/organizations/#{organization.id}/remove_terms_text" }
+    let(:params) do
+      json_api_params(
+        'organizations',
+        'name': 'Acme Inc 2.0',
+      )
+    end
+
+    it 'returns a 200' do
+      patch(path, params: params)
+      expect(response.status).to eq(200)
+    end
+
+    it 'clears the the terms_text_item' do
+      expect(organization.terms_text_item_id).to be 3
+      patch(path, params: params)
+      expect(organization.terms_text_item_id).not_to be nil
+    end
+  end
 end

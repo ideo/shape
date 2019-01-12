@@ -1,9 +1,10 @@
 class SerializableOrganization < BaseJsonSerializer
   type 'organizations'
-  attributes :name, :domain_whitelist, :slug, :active_users_count, :trial_users_count, :in_app_billing, :deactivated
+  attributes :name, :domain_whitelist, :slug, :active_users_count, :trial_users_count, :in_app_billing, :deactivated, :terms_text_item_id
   belongs_to :primary_group
   belongs_to :guest_group
   belongs_to :admin_group
+  belongs_to :terms_text_item
 
   attribute :is_within_trial_period do
     @object.within_trial_period?

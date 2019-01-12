@@ -46,6 +46,7 @@ Rails.application.routes.draw do
           get 'next_available'
         end
       end
+      resources :items, only: %i[create]
       resources :collection_cards, shallow: true, except: %i[show] do
         member do
           patch 'replace'
@@ -69,6 +70,10 @@ Rails.application.routes.draw do
       resources :organizations, except: :delete do
         collection do
           get 'current'
+        end
+        member do
+          patch 'add_terms_text'
+          patch 'remove_terms_text'
         end
         resources :collections, only: %i[create]
         resources :groups, only: %i[index]
