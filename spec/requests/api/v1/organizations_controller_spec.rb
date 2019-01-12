@@ -241,6 +241,7 @@ describe Api::V1::OrganizationsController, type: :request, json: true, auth: tru
     let(:params) do
       json_api_params(
         'organizations',
+        'name': 'Acme Inc 2.0',
       )
     end
 
@@ -268,6 +269,7 @@ describe Api::V1::OrganizationsController, type: :request, json: true, auth: tru
     let(:params) do
       json_api_params(
         'organizations',
+        'name': 'Acme Inc 2.0',
       )
     end
 
