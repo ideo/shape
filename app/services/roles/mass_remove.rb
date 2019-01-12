@@ -115,7 +115,7 @@ module Roles
 
     def remove_roles_from_children
       ModifyChildrenRolesWorker.perform_async(
-        @removed_by.id,
+        @removed_by.try(:id),
         @users.map(&:id),
         @groups.map(&:id),
         @role_name,

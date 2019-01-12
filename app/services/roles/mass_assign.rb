@@ -85,7 +85,7 @@ module Roles
       return unless @object.respond_to?(:children)
       return if @object.children.blank?
       params = [
-        @invited_by.id,
+        @invited_by.try(:id),
         @added_users.map(&:id),
         @added_groups.map(&:id),
         @role_name,
