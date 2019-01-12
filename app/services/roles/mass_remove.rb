@@ -14,7 +14,6 @@ module Roles
       @object = object
       @role_name = role_name
       @removed_by = removed_by
-      # @remove_from_children_sync = remove_from_children_sync
       @fully_remove = fully_remove
       @users = users
       @groups = groups
@@ -24,7 +23,7 @@ module Roles
     end
 
     def call
-      unanchor_object
+      unanchor_object # from shared methods
       remove_role_from_object(@object)
       unfollow_comment_thread
       unfollow_groups_comment_threads
@@ -97,20 +96,6 @@ module Roles
       )
     end
 
-    # def remove_roles_from_grandchildren(child)
-    #   return true unless child.respond_to?(:children)
-    #   child.children.each do |grandchild|
-    #     MassRemoveRolesWorker.perform_async(
-    #       grandchild.id,
-    #       grandchild.class.name,
-    #       @role_name,
-    #       @users.map(&:id),
-    #       @groups.map(&:id),
-    #     )
-    #   end
-    #   true
-    # end
-
     def remove_org_membership_if_necessary
       return unless @object.is_a?(Group) && (@object.guest? || @object.primary?)
       @users.each do |user|
@@ -129,7 +114,7 @@ module Roles
     end
 
     def remove_roles_from_children
-      AddRolesToChildrenWorker.perform_async(
+      ModifyChildrenRolesWorker.perform_async(
         @removed_by.id,
         @users.map(&:id),
         @groups.map(&:id),

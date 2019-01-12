@@ -529,6 +529,25 @@ describe Collection, type: :model do
     end
   end
 
+  describe '#reset_permissions!' do
+    let(:user) { create(:user) }
+    let(:collection) { create(:collection, num_cards: 1, add_editors: [user]) }
+    let!(:subcollection) { create(:collection, parent_collection: collection, add_viewers: [user]) }
+
+    it 'resets all sub-items and collections to be anchored to the parent' do
+      expect(subcollection.roles).not_to be_empty
+      collection.reset_permissions!
+      # update_all doesn't automatically reload the models so we need to
+      collection.items.first.reload
+      subcollection.reload
+      expect(collection.items.first.roles_anchor_collection_id).to eq collection.id
+      expect(collection.items.first.can_edit?(user)).to be true
+      expect(subcollection.roles).to be_empty
+      expect(subcollection.roles_anchor_collection_id).to eq collection.id
+      expect(subcollection.can_edit?(user)).to be true
+    end
+  end
+
   # Caching methods
   context 'caching and stored attributes' do
     describe '#cache_key' do

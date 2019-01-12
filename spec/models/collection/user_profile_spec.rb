@@ -100,20 +100,13 @@ describe Collection::UserProfile, type: :model do
       end
     end
 
-    context 'un-archiving a member' do
+    context 'unarchiving a member' do
       before do
         user_profile.archive!
       end
 
-      it 'should un-archive the profile and re-add user as editor' do
+      it 'should unarchive the profile and re-add user as editor' do
         expect(user_profile.archived?).to be true
-        expect(AddRolesToChildrenWorker).to receive(:perform_async).with(
-          [user.id],
-          [],
-          Role::EDITOR,
-          user_profile.id,
-          'Collection',
-        )
         found = Collection::UserProfile.find_or_create_for_user(
           user: user,
           organization: organization,
@@ -121,6 +114,9 @@ describe Collection::UserProfile, type: :model do
         expect(user_profile.reload.archived?).to be false
         # make sure it found the same one
         expect(found.id).to eq user_profile.id
+        # should be back as editor
+        expect(user_profile.can_edit?(user)).to be true
+        expect(user_profile.items.first.can_edit?(user)).to be true
       end
     end
   end
