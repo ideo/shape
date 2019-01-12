@@ -65,8 +65,6 @@ ActiveRecord::Schema.define(version: 20190110222910) do
     t.boolean "image_contain", default: false
     t.boolean "is_cover", default: false
     t.datetime "unarchived_at"
-    t.integer "filter", default: 0
-    t.boolean "hidden", default: false
     t.index ["collection_id"], name: "index_collection_cards_on_collection_id"
     t.index ["item_id"], name: "index_collection_cards_on_item_id"
     t.index ["parent_id"], name: "index_collection_cards_on_parent_id"
@@ -99,7 +97,6 @@ ActiveRecord::Schema.define(version: 20190110222910) do
     t.bigint "collection_to_test_id"
     t.datetime "unarchived_at"
     t.jsonb "cached_test_scores"
-    t.boolean "hide_submissions", default: false
     t.index ["breadcrumb"], name: "index_collections_on_breadcrumb", using: :gin
     t.index ["cached_test_scores"], name: "index_collections_on_cached_test_scores", using: :gin
     t.index ["cloned_from_id"], name: "index_collections_on_cloned_from_id"
@@ -166,6 +163,8 @@ ActiveRecord::Schema.define(version: 20190110222910) do
     t.integer "current_shared_collection_id"
     t.datetime "archived_at"
     t.string "archive_batch"
+    t.jsonb "autojoin_emails", default: []
+    t.index ["autojoin_emails"], name: "index_groups_on_autojoin_emails", using: :gin
     t.index ["handle"], name: "index_groups_on_handle"
     t.index ["organization_id"], name: "index_groups_on_organization_id"
   end
