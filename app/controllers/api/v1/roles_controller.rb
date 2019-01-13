@@ -22,10 +22,12 @@ class Api::V1::RolesController < Api::V1::BaseController
   # /[collections/items/groups]/:id/roles
   def create
     is_switching = json_api_params[:is_switching]
+    send_invites = json_api_params[:send_invites].presence || true,
     service = Roles::MassAssign.new(
       mass_assignment_params.merge(
         invited_by: current_user,
         new_role: !is_switching,
+        send_invites: send_invites,
       ),
     )
     if service.call
