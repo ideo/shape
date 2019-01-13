@@ -77,6 +77,15 @@ const theme = {
       main: v.colors.ctaPrimary,
     },
   },
+  breakpoints: {
+    values: {
+      xs: 0, // default
+      sm: v.responsive.smallBreakpoint,
+      md: v.responsive.medBreakpoint,
+      lg: v.responsive.largeBreakpoint,
+      xl: 1920, // default
+    },
+  },
   overrides: {
     MuiList: {
       padding: {
