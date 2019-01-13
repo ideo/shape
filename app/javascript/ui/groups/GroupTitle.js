@@ -33,6 +33,7 @@ const StyledTitleItem = styled(Grid)`
 const StyledHeading2 = Heading2.extend`
   margin-bottom: 0;
 `
+StyledHeading2.displayName = 'StyledHeading2'
 
 const EditIconHolder = styled.button`
   cursor: pointer;
