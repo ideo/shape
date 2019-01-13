@@ -45,6 +45,10 @@ const StyledDialogTitle = styled(DialogTitle)`
   align-items: center;
   display: flex;
   min-height: 50px;
+  @media only screen and (max-width: ${v.responsive.smallBreakpoint}px) {
+    padding-top: 14px !important;
+    min-height: 30px;
+  }
 `
 
 const StyledHeading2 = styled(Heading2)`

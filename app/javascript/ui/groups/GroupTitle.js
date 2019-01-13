@@ -30,6 +30,10 @@ const StyledTitleItem = styled(Grid)`
   padding-left: 14px;
 `
 
+const StyledHeading2 = Heading2.extend`
+  margin-bottom: 0;
+`
+
 const EditIconHolder = styled.button`
   cursor: pointer;
   display: block;
@@ -148,7 +152,7 @@ class GroupTitle extends React.Component {
             {this.editing ? (
               this.renderAutosize(group.name, 1.5, this.updateGroupName)
             ) : (
-              <Heading2>{group.name}</Heading2>
+              <StyledHeading2>{group.name}</StyledHeading2>
             )}
           </StyledTitleItem>
           <StyledTitleItem item>

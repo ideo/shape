@@ -2,7 +2,8 @@ import { Fragment } from 'react'
 import PropTypes from 'prop-types'
 import styled from 'styled-components'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
-import { Collapse } from '@material-ui/core'
+import { Collapse, Grid } from '@material-ui/core'
+import v from '~/utils/variables'
 import { Heading3, DisplayText } from '~/ui/global/styled/typography'
 import { Row, RowItemLeft } from '~/ui/global/styled/layout'
 import DropdownIcon from '~/ui/icons/DropdownIcon'
@@ -27,6 +28,13 @@ const FooterArea = styled.div`
   padding-bottom: ${props => (props.menuOpen ? 100 : 30)}px;
 `
 
+const StyledHeaderGrid = styled(Grid)`
+  /* align with Row width */
+  padding-right: 6%;
+  @media only screen and (max-width: ${v.responsive.smallBreakpoint}px) {
+    padding-right: 0;
+  }
+`
 const StyledRow = styled(Row)`
   cursor: pointer;
   margin-left: 0;
@@ -166,7 +174,15 @@ class RolesMenu extends React.Component {
     return (
       <Fragment>
         <ScrollArea>
-          <Heading3>{title}</Heading3>
+          <StyledHeaderGrid container justify="space-between" align="flex-end">
+            <Grid item xs={10} sm>
+              <Heading3>{title}</Heading3>
+            </Grid>
+            <Grid item xs sm={'auto'}>
+              {/* TODO: Search button goes here once added */}
+            </Grid>
+          </StyledHeaderGrid>
+
           {entityGroups.map(group => {
             const { panelTitle, entities } = group
             if (entities.length === 0) return null
