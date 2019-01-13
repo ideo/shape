@@ -17,9 +17,19 @@ const StyledDialog = styled(Dialog)`
     border-left: 17px solid ${v.colors.black};
     max-width: 760px;
     width: 100%;
+    @media only screen and (max-width: ${v.responsive.smallBreakpoint}px) {
+      border-left: 0px;
+      height: 100%;
+      margin: 0;
+      max-height: 100%;
+    }
   }
   .modal__padding {
     padding-left: 45px;
+    @media only screen and (max-width: ${v.responsive.smallBreakpoint}px) {
+      padding-left: 16px;
+      padding-right: 16px;
+    }
   }
   .modal__no-scroll {
     padding-top: 0px;
@@ -48,6 +58,10 @@ export const ModalCloseButton = styled.button`
   position: absolute;
   top: 24px;
   width: 14px;
+  @media only screen and (max-width: ${v.responsive.smallBreakpoint}px) {
+    right: 10px;
+    top: 10px;
+  }
 `
 ModalCloseButton.displayName = 'ModalCloseButton'
 
@@ -58,6 +72,10 @@ const BackIconHolder = styled.button`
   position: absolute;
   top: 33px;
   width: 15px;
+
+  @media only screen and (max-width: ${v.responsive.smallBreakpoint}px) {
+    left: 4px;
+  }
 
   svg {
     height: 18px;
