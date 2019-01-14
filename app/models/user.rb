@@ -82,7 +82,7 @@ class User < ApplicationRecord
   end
 
   # Searchkick Config
-  searchkick callbacks: false, word_start: %i[name handle]
+  searchkick callbacks: false, word_start: %i[name handle email]
   after_commit :reindex
   alias searchkick_reindex reindex
   scope :search_import, -> { includes(:roles) }

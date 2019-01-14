@@ -83,6 +83,7 @@ class Api::V1::SearchController < Api::V1::BaseController
     search_opts = {
       index_name: [User],
       fields: %w[name^5 email^2 handle],
+      match: :word_start,
       order: [
         name: :asc,
       ],
