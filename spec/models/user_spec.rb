@@ -231,7 +231,6 @@ describe User, type: :model do
         email: user.email.downcase,
         handle: user.handle.downcase,
         status: user.status,
-        group_ids: [],
         organization_ids: [],
       )
     end

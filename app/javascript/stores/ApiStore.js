@@ -425,6 +425,7 @@ class ApiStore extends jsonapi(datxCollection) {
       const res = await this.request(apiPath)
       const roles = res.data
 
+      // role records may have changed if this collection/item was just unanchored
       const roleIds = _.map(roles, 'id')
       const recordRoleIds = _.map(record.roles, 'id')
 

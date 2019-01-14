@@ -94,7 +94,6 @@ class User < ApplicationRecord
       email: email&.downcase,
       status: status,
       organization_ids: organization_ids,
-      group_ids: group_ids,
     }
   end
 
@@ -108,8 +107,7 @@ class User < ApplicationRecord
   end
 
   def reindex(force: false)
-    return searchkick_reindex if force
-    return unless should_reindex?
+    return unless should_reindex? || force
     Searchkick.callbacks(:async) do
       searchkick_reindex
     end
@@ -353,12 +351,12 @@ class User < ApplicationRecord
 
   def after_role_update(role)
     reset_cached_roles!
-    # Reindex record if it is a searchkick model
     resource = role.resource
-    if resource.is_a?(Group)
-      # user added/removed from a group/org should update search index
+    if resource.is_a?(Group) && role.resource.primary?
+      # user added/removed from an org should update search index
       reindex(force: true)
     end
+    # Reindex record if it is a searchkick model
     resource.reindex if resource && Searchkick.callbacks? && resource.searchable?
   end
 

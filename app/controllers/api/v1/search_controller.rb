@@ -97,7 +97,7 @@ class Api::V1::SearchController < Api::V1::BaseController
       search_opts[:index_name] = [User]
       search_opts[:where] = {
         status: status,
-        group_ids: [@resource.id],
+        _id: @resource.user_ids,
       }
     else
       search_opts[:where] = {
