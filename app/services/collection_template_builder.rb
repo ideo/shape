@@ -21,6 +21,9 @@ class CollectionTemplateBuilder
     if @parent.is_a? Collection::SubmissionsCollection
       # this will get persisted when calling cache_cover!
       @collection.submission_attrs = { submission: true }
+      if @parent.submission_box.hide_submissions
+        @collection.submission_attrs['hidden'] = true
+      end
       submission_template = @parent.submission_box.submission_template
       if (test_id = submission_template.try(:submission_attrs).try(:[], 'launchable_test_id'))
         master_test = Collection::TestCollection.find(test_id)

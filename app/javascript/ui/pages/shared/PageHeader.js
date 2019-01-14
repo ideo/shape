@@ -295,7 +295,9 @@ class PageHeader extends React.Component {
   get isCurrentlyHiddenSubmission() {
     const { record } = this.props
     if (record.isSubmissionBox) return false
-    return record.is_inside_hidden_submission_box && !this.viewers.length
+    return (
+      record.is_inside_hidden_submission_box && record.submission_attrs.hidden
+    )
   }
 
   get launchTestButton() {

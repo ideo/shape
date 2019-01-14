@@ -33,6 +33,7 @@ module Roles
       # Find all children that are unanchored (have their own roles)
       # If the user can edit, then continue adding the roles
       children.where(roles_anchor_collection_id: nil).find_each do |child|
+        next if child.submission? && child.submission_attrs['hidden']
         if @user.nil? || child.can_edit?(@user)
           # just alter the roles at this one level, since we are already searching through *all* levels of children
           params = {
