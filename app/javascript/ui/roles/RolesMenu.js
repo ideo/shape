@@ -1,10 +1,15 @@
+import _ from 'lodash'
 import { Fragment } from 'react'
 import PropTypes from 'prop-types'
 import styled from 'styled-components'
+import { observable, runInAction } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import { Collapse } from '@material-ui/core'
+
+import { ShowMoreButton } from '~/ui/global/styled/forms'
 import { Heading3, DisplayText } from '~/ui/global/styled/typography'
-import { Row, RowItemLeft } from '~/ui/global/styled/layout'
+import { Row, RowItemLeft, RowItemRight } from '~/ui/global/styled/layout'
+import SearchButton from '~/ui/global/SearchButton'
 import DropdownIcon from '~/ui/icons/DropdownIcon'
 import RolesAdd from '~/ui/roles/RolesAdd'
 import RoleSelect from '~/ui/roles/RoleSelect'
@@ -17,6 +22,7 @@ function sortUserOrGroup(a, b) {
 
 const ScrollArea = styled.div`
   flex: 1 1 auto;
+  min-height: 100px;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
 `
@@ -27,6 +33,9 @@ const FooterArea = styled.div`
   padding-bottom: ${props => (props.menuOpen ? 100 : 30)}px;
 `
 
+const StyledHeaderRow = styled(Row)`
+  margin-left: 0;
+`
 const StyledRow = styled(Row)`
   cursor: pointer;
   margin-left: 0;
@@ -47,39 +56,136 @@ const StyledExpandToggle = styled.button`
 @inject('apiStore', 'routingStore')
 @observer
 class RolesMenu extends React.Component {
-  state = {}
-
-  entityGroups(entities) {
-    const groups = [
-      {
-        panelTitle: 'Pending Invitations',
-        startOpen: false,
-        entities: entities.filter(
-          role =>
-            role.entity.internalType === 'users' &&
-            role.entity.status === 'pending'
-        ),
-      },
-      {
-        panelTitle: 'Active Users',
-        startOpen: true,
-        entities: entities.filter(
-          role =>
-            role.entity.internalType !== 'users' ||
-            role.entity.status !== 'pending'
-        ),
-      },
-    ]
-
-    // init state for each group
-    groups.forEach(group => {
-      if (typeof this.state[group.panelTitle] === 'undefined') {
-        this.setState({ [group.panelTitle]: group.startOpen })
-      }
-    })
-
-    return groups
+  state = {
+    searchText: '',
+    groups: [],
+    pendingPanelOpen: false,
+    activePanelOpen: true,
+    page: {
+      pending: 1,
+      active: 1,
+    },
   }
+
+  @observable
+  loadingMore = false
+
+  constructor(props) {
+    super(props)
+    this.debouncedInit = _.debounce(this.initializeRolesAndGroups, 300)
+  }
+
+  componentDidMount() {
+    this.initializeRolesAndGroups({ reset: true, page: 1 })
+  }
+
+  async initializeRolesAndGroups({
+    reset = false,
+    page = 1,
+    skipSearch = false,
+    status = 'both',
+  } = {}) {
+    const { apiStore, record } = this.props
+    const { searchText } = this.state
+
+    if (!skipSearch) {
+      runInAction(() => {
+        this.loadingMore = true
+      })
+      if (status === 'both' || status === 'active') {
+        await apiStore.searchRoles(record, { reset, page, query: searchText })
+      }
+      if (status === 'both' || status === 'pending') {
+        await apiStore.searchRoles(record, {
+          status: 'pending',
+          page,
+          query: searchText,
+        })
+      }
+      runInAction(() => {
+        this.loadingMore = false
+      })
+    }
+
+    const roleEntities = []
+    const counts = {
+      // the total counts are stored on each role, just need to grab one
+      pending: record.roles[0].pendingCount,
+      active: record.roles[0].activeCount,
+    }
+    record.roles.forEach(role => {
+      role.users.forEach(user => {
+        roleEntities.push(Object.assign({}, { role, entity: user }))
+      })
+      // TODO remove when implemented
+      if (!role.groups) return
+      role.groups.forEach(group => {
+        roleEntities.push(Object.assign({}, { role, entity: group }))
+      })
+    })
+    const sortedRoleEntities = roleEntities.sort(sortUserOrGroup)
+
+    const groups = this.setupEntityGroups(sortedRoleEntities, counts)
+
+    this.setState(prevState => ({
+      groups,
+      page: {
+        pending:
+          status === 'pending' || status === 'both'
+            ? page
+            : prevState.page.pending,
+        active:
+          status === 'active' || status === 'both'
+            ? page
+            : prevState.page.active,
+      },
+    }))
+  }
+
+  setupEntityGroups = (entities, counts) => [
+    {
+      panelTitle: 'Pending Invitations',
+      status: 'pending',
+      count: counts.pending,
+      entities: entities.filter(
+        role =>
+          role.entity.internalType === 'users' &&
+          role.entity.status === 'pending'
+      ),
+    },
+    {
+      panelTitle: 'Active Users',
+      status: 'active',
+      count: counts.active,
+      entities: entities.filter(
+        role =>
+          role.entity.internalType !== 'users' ||
+          role.entity.status !== 'pending'
+      ),
+    },
+  ]
+
+  togglePanel = panel => {
+    this.updatePanel(panel, !this.isOpenPanel(panel))
+  }
+
+  updatePanel = (panel, isOpen) => {
+    this.setState({ [`${panel.status}PanelOpen`]: isOpen })
+  }
+
+  isOpenPanel = panel => this.state[`${panel.status}PanelOpen`]
+
+  updateSearchText = searchText => {
+    this.setState({ searchText }, () => {
+      this.debouncedInit({ reset: true, page: 1 })
+    })
+  }
+
+  handleSearchChange = value => {
+    this.updateSearchText(value)
+  }
+
+  clearSearch = () => this.updateSearchText('')
 
   deleteRoles = (role, entity, opts = {}) => {
     const { ownerId, ownerType } = this.props
@@ -90,14 +196,14 @@ class RolesMenu extends React.Component {
         window.location.reload()
       }
       if (!opts.isSwitching) {
-        return this.props.onSave(res, { roleName: role.name })
+        this.initializeRolesAndGroups({ skipSearch: true })
       }
       return {}
     })
   }
 
   createRoles = (entities, roleName, opts = {}) => {
-    const { apiStore, ownerId, ownerType, onSave } = this.props
+    const { apiStore, ownerId, ownerType } = this.props
     const userIds = entities
       .filter(entity => entity.internalType === 'users')
       .map(user => user.id)
@@ -112,10 +218,20 @@ class RolesMenu extends React.Component {
     }
     return apiStore
       .request(`${ownerType}/${ownerId}/roles`, 'POST', data)
-      .then(res => onSave(res, { roleName }))
+      .then(res => {
+        this.initializeRolesAndGroups({ reset: true, page: 1 })
+      })
       .catch(err => {
         uiStore.alert(err.error[0])
       })
+  }
+
+  nextPage = status => () => {
+    const page = this.state.page[status]
+    this.initializeRolesAndGroups({
+      status,
+      page: page + 1,
+    })
   }
 
   onCreateUsers = emails => {
@@ -139,25 +255,14 @@ class RolesMenu extends React.Component {
     const {
       addCallout,
       canEdit,
-      roles,
       ownerType,
       title,
       fixedRole,
       submissionBox,
     } = this.props
-    const roleEntities = []
-    roles.forEach(role => {
-      role.users.forEach(user => {
-        roleEntities.push(Object.assign({}, { role, entity: user }))
-      })
-      // TODO remove when implemented
-      if (!role.groups) return
-      role.groups.forEach(group => {
-        roleEntities.push(Object.assign({}, { role, entity: group }))
-      })
-    })
-    const sortedRoleEntities = roleEntities.sort(sortUserOrGroup)
-    const entityGroups = this.entityGroups(sortedRoleEntities)
+
+    const { groups } = this.state
+
     const roleTypes =
       ownerType === 'groups' ? ['member', 'admin'] : ['editor', 'viewer']
 
@@ -168,26 +273,32 @@ class RolesMenu extends React.Component {
     return (
       <Fragment>
         <ScrollArea>
-          <Heading3>{title}</Heading3>
-          {entityGroups.map(group => {
-            const { panelTitle, entities } = group
+          <StyledHeaderRow align="flex-end">
+            <Heading3>{title}</Heading3>
+            <RowItemRight>
+              <SearchButton
+                value={this.state.searchText}
+                onChange={this.handleSearchChange}
+                onClear={this.clearSearch}
+              />
+            </RowItemRight>
+          </StyledHeaderRow>
+
+          {groups.map(group => {
+            const { panelTitle, entities, count, status } = group
             if (entities.length === 0) return null
 
             return (
               <div key={panelTitle}>
                 <StyledRow
                   align="center"
-                  onClick={() => {
-                    this.setState({
-                      [panelTitle]: !this.state[panelTitle],
-                    })
-                  }}
+                  onClick={() => this.togglePanel(group)}
                 >
                   <DisplayText>
-                    {panelTitle} ({entities.length})
+                    {panelTitle} ({count})
                   </DisplayText>
                   <RowItemLeft style={{ marginLeft: '0px' }}>
-                    {this.state[panelTitle] ? (
+                    {this.isOpenPanel(group) ? (
                       <StyledCollapseToggle aria-label="Collapse">
                         <DropdownIcon />
                       </StyledCollapseToggle>
@@ -199,7 +310,7 @@ class RolesMenu extends React.Component {
                   </RowItemLeft>
                 </StyledRow>
                 <Collapse
-                  in={this.state[panelTitle]}
+                  in={this.isOpenPanel(group)}
                   timeout="auto"
                   unmountOnExit
                 >
@@ -226,6 +337,14 @@ class RolesMenu extends React.Component {
                         />
                       )
                   )}
+                  {entities.length < count && (
+                    <ShowMoreButton
+                      disabled={this.loadingMore}
+                      onClick={this.nextPage(status)}
+                    >
+                      {this.loadingMore ? 'Loading...' : 'Show more...'}
+                    </ShowMoreButton>
+                  )}
                 </Collapse>
               </div>
             )
@@ -249,14 +368,13 @@ class RolesMenu extends React.Component {
 }
 
 RolesMenu.propTypes = {
+  record: MobxPropTypes.objectOrObservableObject.isRequired,
   canEdit: PropTypes.bool,
   ownerId: PropTypes.string.isRequired,
   ownerType: PropTypes.string.isRequired,
   fixedRole: PropTypes.string,
-  roles: MobxPropTypes.arrayOrObservableArray,
   title: PropTypes.string,
   addCallout: PropTypes.string,
-  onSave: PropTypes.func.isRequired,
   submissionBox: PropTypes.bool,
 }
 RolesMenu.wrappedComponent.propTypes = {
@@ -266,7 +384,6 @@ RolesMenu.wrappedComponent.propTypes = {
 RolesMenu.defaultProps = {
   canEdit: false,
   fixedRole: null,
-  roles: [],
   title: 'Shared with',
   addCallout: 'Add groups or people:',
   submissionBox: false,

@@ -34,7 +34,7 @@ describe('Routes', () => {
       wrapper = shallow(<Routes.wrappedComponent {...props} />)
     })
     it('makes an API call to fetch the user', () => {
-      expect(apiStore.loadCurrentUserAndGroups).toHaveBeenCalled()
+      expect(apiStore.loadCurrentUser).toHaveBeenCalled()
     })
 
     it('does not blur the content if terms have been accepted', () => {

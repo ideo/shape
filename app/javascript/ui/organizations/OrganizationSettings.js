@@ -89,12 +89,6 @@ class OrganizationSettings extends React.Component {
     return this.organization.API_createTermsTextItem()
   }
 
-  afterDomainWhitelistUpdate = () => {
-    // need to reload in case updating the domains altered any group memberships
-    const { apiStore } = this.props
-    apiStore.loadCurrentUserGroups({ orgOnly: true })
-  }
-
   get textData() {
     const item = this.organization.terms_text_item
     return item.toJSON().text_data
@@ -151,7 +145,6 @@ class OrganizationSettings extends React.Component {
           record={this.organization}
           tagField="domain_whitelist"
           tagColor="white"
-          afterSave={this.afterDomainWhitelistUpdate}
         />
         <br />
         <Heading2>Terms of Use</Heading2>

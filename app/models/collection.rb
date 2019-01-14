@@ -199,7 +199,7 @@ class Collection < ApplicationRecord
       :submission_template,
       :collection_to_test,
       :live_test_collection,
-      roles: %i[users groups resource],
+      roles: %i[pending_users users groups resource],
     ]
   end
 
