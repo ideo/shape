@@ -15,10 +15,12 @@ import RolesModal from '~/ui/roles/RolesModal'
 import RolesSummary from '~/ui/roles/RolesSummary'
 import FilledProfileIcon from '~/ui/icons/FilledProfileIcon'
 import ProfileIcon from '~/ui/icons/ProfileIcon'
+import HiddenIcon from '~/ui/icons/HiddenIcon'
 import TemplateIcon from '~/ui/icons/TemplateIcon'
 import SystemIcon from '~/ui/icons/SystemIcon'
 import LinkIconSm from '~/ui/icons/LinkIconSm'
 import TestCollectionIcon from '~/ui/icons/TestCollectionIcon'
+import Tooltip from '~/ui/global/Tooltip'
 import SubmissionBoxIconLg from '~/ui/icons/SubmissionBoxIconLg'
 import TagEditorModal from '~/ui/pages/shared/TagEditorModal'
 import { FixedHeader, MaxWidthContainer } from '~/ui/global/styled/layout'
@@ -225,6 +227,23 @@ class PageHeader extends React.Component {
     return null
   }
 
+  get hiddenIcon() {
+    if (this.isCurrentlyHiddenSubmission) {
+      return (
+        <Tooltip
+          classes={{ tooltip: 'Tooltip' }}
+          title="Your submission is hidden. Click to make it visible to others."
+          placement="top"
+        >
+          <IconHolder align="right">
+            <HiddenIcon />
+          </IconHolder>
+        </Tooltip>
+      )
+    }
+    return null
+  }
+
   get collectionTypeOrInheritedTags() {
     const { record, uiStore } = this.props
     // not enough room to show in the header of a live Test
@@ -312,6 +331,7 @@ class PageHeader extends React.Component {
     if (this.isCurrentlyHiddenSubmission) {
       return (
         <HeaderFormButton
+          color={v.colors.alert}
           onClick={record.submitSubmission}
           disabled={uiStore.launchButtonLoading}
         >
@@ -368,6 +388,7 @@ class PageHeader extends React.Component {
                   }}
                 >
                   {this.collectionTypeIcon}
+                  {this.hiddenIcon}
                   {record.isLiveTest && (
                     <LiveTestIndicator>Live</LiveTestIndicator>
                   )}
