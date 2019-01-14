@@ -1,4 +1,3 @@
-import _ from 'lodash'
 import PropTypes from 'prop-types'
 import { Fragment } from 'react'
 import { observable, action } from 'mobx'
@@ -284,20 +283,9 @@ class PageHeader extends React.Component {
     return null
   }
 
-  get viewers() {
-    const { record } = this.props
-    const { roles } = record
-    const viewerRole = _.find(roles, { name: 'viewer' })
-    if (!viewerRole) return []
-    return [...viewerRole.users, ...viewerRole.groups]
-  }
-
   get isCurrentlyHiddenSubmission() {
     const { record } = this.props
-    if (record.isSubmissionBox) return false
-    return (
-      record.is_inside_hidden_submission_box && record.submission_attrs.hidden
-    )
+    return record.isHiddenSubmission
   }
 
   get launchTestButton() {
