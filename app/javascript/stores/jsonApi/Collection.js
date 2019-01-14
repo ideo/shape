@@ -510,12 +510,14 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     }
   }
 
-  API_setSubmissionBoxTemplate(data) {
-    return this.apiStore.request(
+  async API_setSubmissionBoxTemplate(data) {
+    await this.apiStore.request(
       `collections/set_submission_box_template`,
       'POST',
       data
     )
+    // refetch cards because we just created a new one, for the template
+    return this.API_fetchCards()
   }
 
   API_clearCollectionCover() {
