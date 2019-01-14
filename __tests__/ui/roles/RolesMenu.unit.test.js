@@ -1,10 +1,11 @@
 import { observable } from 'mobx'
 import RolesMenu from '~/ui/roles/RolesMenu'
 
-import { fakeUser, fakeRole } from '#/mocks/data'
+import { fakeUser, fakeRole, fakeCollection } from '#/mocks/data'
 
 const apiStore = observable({
   request: jest.fn().mockReturnValue(Promise.resolve({ data: [] })),
+  searchRoles: jest.fn().mockReturnValue(Promise.resolve({ data: [] })),
   fetchAll: jest.fn(),
   find: jest.fn().mockReturnValue(Promise.resolve({ roles: [] })),
   remove: jest.fn(),
@@ -12,10 +13,7 @@ const apiStore = observable({
   currentUser: fakeUser,
   currentUserOrganizationId: 1,
 })
-const uiStore = observable({
-  rolesMenuOpen: null,
-  update: jest.fn(),
-})
+
 let props
 
 jest.mock('../../../app/javascript/stores/jsonApi/Role')
@@ -29,14 +27,18 @@ describe('RolesMenu', () => {
       pathTo: jest.fn(),
       routeTo: jest.fn(),
     }
+    const record = {
+      ...fakeCollection,
+      roles: [{ pendingCount: 0, activeCount: 0, users: [] }],
+    }
     props = {
+      record,
       ownerId: 1,
       ownerType: 'collections',
       apiStore,
-      uiStore,
       routingStore,
-      onSave: jest.fn(),
     }
+    apiStore.searchRoles.mockClear()
     wrapper = shallow(<RolesMenu.wrappedComponent {...props} />)
     component = wrapper.instance()
   })
@@ -68,10 +70,8 @@ describe('RolesMenu', () => {
         await component.deleteRoles(role, user, { isSwitching: false })
       })
 
-      it('should call the onSave prop after the request is done', () => {
-        expect(props.onSave).toHaveBeenCalledWith(fakeData, {
-          roleName: fakeRole.name,
-        })
+      it('should call apiStore.searchRoles after the request is done', () => {
+        expect(apiStore.searchRoles).toHaveBeenCalled()
       })
     })
   })
@@ -106,8 +106,8 @@ describe('RolesMenu', () => {
         )
       })
 
-      it('should call onSave', () => {
-        expect(props.onSave).toHaveBeenCalled()
+      it('should call apiStore.searchRoles after the request is done', () => {
+        expect(apiStore.searchRoles).toHaveBeenCalled()
       })
 
       describe('when not switching roles', () => {
