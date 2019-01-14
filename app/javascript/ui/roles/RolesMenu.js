@@ -2,8 +2,11 @@ import _ from 'lodash'
 import { Fragment } from 'react'
 import PropTypes from 'prop-types'
 import styled from 'styled-components'
+import { observable, runInAction } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import { Collapse } from '@material-ui/core'
+
+import { ShowMoreButton } from '~/ui/global/styled/forms'
 import { Heading3, DisplayText } from '~/ui/global/styled/typography'
 import { Row, RowItemLeft, RowItemRight } from '~/ui/global/styled/layout'
 import SearchButton from '~/ui/global/SearchButton'
@@ -64,6 +67,9 @@ class RolesMenu extends React.Component {
     },
   }
 
+  @observable
+  loadingMore = false
+
   constructor(props) {
     super(props)
     this.debouncedInit = _.debounce(this.initializeRolesAndGroups, 300)
@@ -83,6 +89,9 @@ class RolesMenu extends React.Component {
     const { searchText } = this.state
 
     if (!skipSearch) {
+      runInAction(() => {
+        this.loadingMore = true
+      })
       if (status === 'both' || status === 'active') {
         await apiStore.searchRoles(record, { reset, page, query: searchText })
       }
@@ -93,6 +102,9 @@ class RolesMenu extends React.Component {
           query: searchText,
         })
       }
+      runInAction(() => {
+        this.loadingMore = false
+      })
     }
 
     const roleEntities = []
@@ -326,9 +338,12 @@ class RolesMenu extends React.Component {
                       )
                   )}
                   {entities.length < count && (
-                    <button onClick={this.nextPage(status)}>
-                      Show more...
-                    </button>
+                    <ShowMoreButton
+                      disabled={this.loadingMore}
+                      onClick={this.nextPage(status)}
+                    >
+                      {this.loadingMore ? 'Loading...' : 'Show more...'}
+                    </ShowMoreButton>
                   )}
                 </Collapse>
               </div>
