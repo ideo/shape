@@ -1,5 +1,6 @@
 import _ from 'lodash'
 import { observable } from 'mobx'
+import { ReferenceType } from 'datx'
 
 import { apiUrl } from '~/utils/url'
 import { routingStore } from '~/stores'
@@ -7,6 +8,7 @@ import trackError from '~/utils/trackError'
 import FilestackUpload from '~/utils/FilestackUpload'
 import { ITEM_TYPES, DATA_MEASURES } from '~/utils/variables'
 import BaseRecord from './BaseRecord'
+import Role from './Role'
 import SharedRecordMixin from './SharedRecordMixin'
 
 class Item extends SharedRecordMixin(BaseRecord) {
@@ -173,6 +175,13 @@ Item.defaults = {
     d_measure: null,
   },
   thumbnail_url: '',
+}
+Item.refDefaults = {
+  roles: {
+    model: Role,
+    type: ReferenceType.TO_MANY,
+    defaultValue: [],
+  },
 }
 
 export default Item

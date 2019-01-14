@@ -343,7 +343,7 @@ class PageHeader extends React.Component {
     return (
       <FixedPageHeader>
         <MaxWidthContainer>
-          <RolesModal record={rolesRecord} roles={rolesRecord.roles} />
+          <RolesModal record={rolesRecord} open={!!uiStore.rolesMenuOpen} />
           <Breadcrumb
             record={record}
             isHomepage={isHomepage}

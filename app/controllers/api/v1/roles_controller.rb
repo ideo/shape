@@ -29,7 +29,7 @@ class Api::V1::RolesController < Api::V1::BaseController
       ),
     )
     if service.call
-      render jsonapi: record.roles.reload, include: %i[users groups resource]
+      head :no_content
     else
       render_api_errors assigner.errors
     end
@@ -56,27 +56,13 @@ class Api::V1::RolesController < Api::V1::BaseController
       ),
     )
     if service.call
-      render jsonapi: record.roles.reload, include: %i[users groups resource]
+      head :no_content
     else
       render_api_errors remove_roles.errors
     end
   end
 
   private
-
-  # def remove_role(role:, user: nil, group: nil, is_switching: false)
-  #   resource = role.resource
-  #
-  #   Roles::MassRemove.new(
-  #     object: resource,
-  #     role_name: role.name,
-  #     users: [user].compact,
-  #     groups: [group].compact,
-  #     removed_by: current_user,
-  #     propagate_to_children: true,
-  #     fully_remove: !is_switching,
-  #   ).call
-  # end
 
   def role_params
     json_api_params.require(:role).permit(:name)
