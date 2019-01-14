@@ -98,13 +98,6 @@ class CardMover
     @to_collection.queue_update_template_instances if @to_collection.master_template?
   end
 
-  def to_permissions
-    {
-      Role::EDITOR => @to_collection.editors,
-      Role::VIEWER => @to_collection.viewers,
-    }
-  end
-
   def to_collection_invalid
     # these only apply for moving actions
     return unless @card_action == 'move'
@@ -135,24 +128,7 @@ class CardMover
     return if @to_collection == @from_collection
     return unless @card_action == 'move'
     @moving_cards.each do |card|
-      record = card.record
-      next if record.same_roles_anchor? @to_collection
-      if @to_collection.includes_all_roles? record
-        record.update(roles_anchor_collection_id: @to_collection.roles_anchor.id)
-        record.roles.destroy_all
-        next
-      end
-
-      # assign each role from the @to_collection to our newly moved cards
-      to_permissions.each do |role_name, entity|
-        Roles::MassAssign.new(
-          object: record,
-          role_name: role_name,
-          users: entity[:users],
-          groups: entity[:groups],
-          propagate_to_children: true,
-        ).call
-      end
+      Roles::MergeToChild.call(parent: @to_collection, child: card.record)
     end
   end
 end

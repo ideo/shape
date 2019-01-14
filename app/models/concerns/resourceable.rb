@@ -202,6 +202,11 @@ module Resourceable
     update_column(:roles_anchor_collection_id, parent.roles_anchor.id)
   end
 
+  def unanchor!
+    update_column(:roles_anchor_collection_id, nil)
+    reload
+  end
+
   def unanchor_and_inherit_roles_from_anchor!
     inherit_roles_from_parent!(roles_anchor)
     update_column(:roles_anchor_collection_id, nil)

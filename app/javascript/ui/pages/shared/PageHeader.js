@@ -1,3 +1,4 @@
+import _ from 'lodash'
 import PropTypes from 'prop-types'
 import { Fragment } from 'react'
 import { observable, action } from 'mobx'
@@ -14,10 +15,12 @@ import RolesModal from '~/ui/roles/RolesModal'
 import RolesSummary from '~/ui/roles/RolesSummary'
 import FilledProfileIcon from '~/ui/icons/FilledProfileIcon'
 import ProfileIcon from '~/ui/icons/ProfileIcon'
+import HiddenIcon from '~/ui/icons/HiddenIcon'
 import TemplateIcon from '~/ui/icons/TemplateIcon'
 import SystemIcon from '~/ui/icons/SystemIcon'
 import LinkIconSm from '~/ui/icons/LinkIconSm'
 import TestCollectionIcon from '~/ui/icons/TestCollectionIcon'
+import Tooltip from '~/ui/global/Tooltip'
 import SubmissionBoxIconLg from '~/ui/icons/SubmissionBoxIconLg'
 import TagEditorModal from '~/ui/pages/shared/TagEditorModal'
 import { FixedHeader, MaxWidthContainer } from '~/ui/global/styled/layout'
@@ -224,6 +227,23 @@ class PageHeader extends React.Component {
     return null
   }
 
+  get hiddenIcon() {
+    if (this.isCurrentlyHiddenSubmission) {
+      return (
+        <Tooltip
+          classes={{ tooltip: 'Tooltip' }}
+          title="Your submission is hidden. Click to make it visible to others."
+          placement="top"
+        >
+          <IconHolder align="right">
+            <HiddenIcon />
+          </IconHolder>
+        </Tooltip>
+      )
+    }
+    return null
+  }
+
   get collectionTypeOrInheritedTags() {
     const { record, uiStore } = this.props
     // not enough room to show in the header of a live Test
@@ -264,6 +284,22 @@ class PageHeader extends React.Component {
     return null
   }
 
+  get viewers() {
+    const { record } = this.props
+    const { roles } = record
+    const viewerRole = _.find(roles, { name: 'viewer' })
+    if (!viewerRole) return []
+    return [...viewerRole.users, ...viewerRole.groups]
+  }
+
+  get isCurrentlyHiddenSubmission() {
+    const { record } = this.props
+    if (record.isSubmissionBox) return false
+    return (
+      record.is_inside_hidden_submission_box && record.submission_attrs.hidden
+    )
+  }
+
   get launchTestButton() {
     const { record, uiStore } = this.props
     if (
@@ -293,6 +329,17 @@ class PageHeader extends React.Component {
           </HeaderFormButton>
         )
       }
+    }
+    if (this.isCurrentlyHiddenSubmission) {
+      return (
+        <HeaderFormButton
+          color={v.colors.alert}
+          onClick={record.submitSubmission}
+          disabled={uiStore.launchButtonLoading}
+        >
+          Submit
+        </HeaderFormButton>
+      )
     }
     return null
   }
@@ -343,6 +390,7 @@ class PageHeader extends React.Component {
                   }}
                 >
                   {this.collectionTypeIcon}
+                  {this.hiddenIcon}
                   {record.isLiveTest && (
                     <LiveTestIndicator>Live</LiveTestIndicator>
                   )}

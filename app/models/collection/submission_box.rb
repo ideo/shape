@@ -34,6 +34,11 @@ class Collection
       submissions_collection.save
     end
 
+    def submissions
+      return [] unless submissions_collection
+      submissions_collection.collections
+    end
+
     def destroyable?
       # destroyable if it hasn't finished setting up
       submission_box_type.nil?
@@ -44,7 +49,7 @@ class Collection
       sub_attrs = submission_template.submission_attrs
       # none are available if the editor has not launched
       return [] if sub_attrs.blank? || sub_attrs['test_status'] != 'live'
-      test_ids = submissions_collection.collections.map do |submission|
+      test_ids = submissions.map do |submission|
         submission.submission_attrs['launchable_test_id']
       end
       if for_user.present?

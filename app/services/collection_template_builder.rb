@@ -21,6 +21,9 @@ class CollectionTemplateBuilder
     if @parent.is_a? Collection::SubmissionsCollection
       # this will get persisted when calling cache_cover!
       @collection.submission_attrs = { submission: true }
+      if @parent.submission_box.hide_submissions
+        @collection.submission_attrs['hidden'] = true
+      end
       submission_template = @parent.submission_box.submission_template
       if (test_id = submission_template.try(:submission_attrs).try(:[], 'launchable_test_id'))
         master_test = Collection::TestCollection.find(test_id)
@@ -47,10 +50,13 @@ class CollectionTemplateBuilder
       created_by: @created_by,
     )
     # make sure to assign these permissions before the template cards are generated
-    # binding.pry
     @collection.inherit_roles_anchor_from_parent!(@parent)
     if @parent.is_a? Collection::SubmissionsCollection
-      @collection.unanchor_and_inherit_roles_from_anchor!
+      if @parent.submission_box.hide_submissions
+        @collection.unanchor!
+      else
+        @collection.unanchor_and_inherit_roles_from_anchor!
+      end
       @created_by.upgrade_to_edit_role(@collection)
     end
     # capture newly added roles

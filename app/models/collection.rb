@@ -632,6 +632,10 @@ class Collection < ApplicationRecord
     master_template? && inside_a_submission_box_template?
   end
 
+  def inside_hidden_submission_box?
+    parent_submission_box&.hide_submissions
+  end
+
   def submission?
     submission_attrs.present? && submission_attrs['submission']
   end
