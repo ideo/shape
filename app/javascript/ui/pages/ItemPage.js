@@ -9,9 +9,7 @@ import ImageItem from '~/ui/items/ImageItem'
 import Loader from '~/ui/layout/Loader'
 import MoveModal from '~/ui/grid/MoveModal'
 import PageContainer from '~/ui/layout/PageContainer'
-import Deactivated from '~/ui/layout/Deactivated'
 import PageHeader from '~/ui/pages/shared/PageHeader'
-import PageError from '~/ui/global/PageError'
 import TextItem from '~/ui/items/TextItem'
 import VideoItem from '~/ui/items/VideoItem'
 import { ITEM_TYPES } from '~/utils/variables'
@@ -122,14 +120,7 @@ class ItemPage extends React.Component {
   }
 
   render() {
-    const { apiStore, uiStore } = this.props
-    if (apiStore.currentOrgIsDeactivated) {
-      return <Deactivated />
-    }
-
-    // this.error comes from PageWithApi
-    if (this.error) return <PageError error={this.error} />
-
+    const { uiStore } = this.props
     const { item } = this.state
     if (!item) return <Loader />
     if (item.isPdfFile) {

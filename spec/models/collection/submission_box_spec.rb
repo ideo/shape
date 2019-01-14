@@ -57,36 +57,6 @@ describe Collection::SubmissionBox, type: :model do
     end
   end
 
-  describe '#children' do
-    let(:submission_box) { create(:submission_box) }
-    let!(:text_card) { create(:collection_card_text, parent: submission_box) }
-
-    context 'with submissions_collection' do
-      let(:submissions_collection) { submission_box.submissions_collection }
-      let(:subcollection) { create(:collection, parent_collection: submissions_collection, num_cards: 2) }
-
-      before do
-        submission_box.setup_submissions_collection!
-        # have to persist all the new relations
-        submission_box.reload
-        subcollection.reload
-        submissions_collection.reload
-      end
-
-      it 'should include the submissions_collection children' do
-        expect(submission_box.children).to include(text_card.item)
-        expect(submission_box.children).to include(subcollection)
-      end
-    end
-
-    context 'with no submissions_collection' do
-      it 'should defer to the usual method' do
-        submission_box.reload
-        expect(submission_box.children).to match_array([text_card.item])
-      end
-    end
-  end
-
   describe '#available_submission_tests' do
     let(:user) { create(:user) }
     let(:user2) { create(:user) }

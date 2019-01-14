@@ -52,8 +52,9 @@ describe('RolesMenu', () => {
     })
 
     describe('when switching a role', () => {
-      it('should make an call role delete with the correct data', () => {
-        expect(role.API_delete).toHaveBeenCalledWith(user, {
+      it('should make a call to delete role with the correct data', () => {
+        const { ownerId, ownerType } = props
+        expect(role.API_delete).toHaveBeenCalledWith(user, ownerId, ownerType, {
           isSwitching: true,
         })
       })
@@ -76,7 +77,7 @@ describe('RolesMenu', () => {
   })
 
   describe('createRoles', () => {
-    describe('with a users', () => {
+    describe('with users', () => {
       let users
       let opts
 

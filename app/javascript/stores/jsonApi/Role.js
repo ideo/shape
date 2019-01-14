@@ -51,13 +51,20 @@ class Role extends BaseRecord {
     this.groups.replace(_.uniqBy([...this.groups, ...this.prevGroups], 'id'))
   }
 
-  API_delete(entity, opts = {}) {
+  API_delete(entity, ownerId, ownerType, opts = {}) {
+    const params = {
+      role: {
+        name: this.name,
+      },
+      is_switching: opts.isSwitching,
+    }
+    if (entity.internalType === 'groups') {
+      params.group_ids = [entity.id]
+    } else {
+      params.user_ids = [entity.id]
+    }
     return this.apiStore
-      .request(
-        `${entity.internalType}/${entity.id}/roles/${this.id}`,
-        'DELETE',
-        { is_switching: opts.isSwitching }
-      )
+      .request(`${ownerType}/${ownerId}/roles/${this.id}`, 'DELETE', params)
       .then(res => {
         runInAction(() => {
           if (entity.internalType === 'users') {
@@ -71,6 +78,7 @@ class Role extends BaseRecord {
       })
   }
 
+  // NOTE: RolesMenu also has its own createRoles method -- not sure if this one is used anywhere?
   API_create() {
     // TODO why can't the API figure out where name is if calling toJsonApi?
     return this.apiStore.request(

@@ -34,7 +34,7 @@ class CollectionCardBuilder
     @collection_card.save.tap do |result|
       if result
         record = @collection_card.record
-        record.inherit_roles_from_parent!
+        record.inherit_roles_anchor_from_parent!
         if @collection_card.record_type == :collection
           # NOTE: should items created in My Collection get this access as well?
           record.enable_org_view_access_if_allowed(@parent_collection)

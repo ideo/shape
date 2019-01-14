@@ -1,4 +1,5 @@
 import PageWithApiWrapper from '~/ui/pages/PageWithApiWrapper'
+import Deactivated from '~/ui/layout/Deactivated'
 import { apiStore, uiStore, routingStore } from '~/stores'
 
 jest.mock('../../../app/javascript/stores')
@@ -89,6 +90,20 @@ describe('PageWithApiWrapper', () => {
       expect(wrapper.find('FakeComponent').props().collection).toEqual(
         fakeCollection
       )
+    })
+
+    describe('organization is deactivated', () => {
+      beforeEach(() => {
+        wrapper.setProps({
+          apiStore: {
+            currentOrgIsDeactivated: true,
+          },
+        })
+      })
+
+      it('renders the Deactivated component', () => {
+        expect(wrapper.equals(<Deactivated />)).toEqual(true)
+      })
     })
   })
 })

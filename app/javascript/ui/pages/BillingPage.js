@@ -11,7 +11,20 @@ import ManagePaymentMethods from '~/ui/billing/ManagePaymentMethods'
 import ManageInvoices from '~/ui/billing/ManageInvoices'
 import OverdueBanner from '~/ui/layout/OverdueBanner'
 
+import { apiStore, routingStore } from '~/stores'
+
 class BillingPage extends React.Component {
+  componentDidMount() {
+    // kick out if you're not an org admin (i.e. primary_group admin)
+    if (!apiStore.currentUserOrganization.primary_group.can_edit) {
+      routingStore.routeTo('homepage')
+    }
+    IdeoSSO.getUserInfo().catch(e => {
+      // for some reason currentUser.logout() does not seem to be behaving here.
+      IdeoSSO.logout('/login')
+    })
+  }
+
   render() {
     return (
       <Box mb={v.headerHeightCompact}>

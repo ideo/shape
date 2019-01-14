@@ -164,7 +164,7 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
 
     context 'success' do
       let(:collection) do
-        create(:collection, add_content_editors: [user], organization: organization)
+        create(:collection, add_editors: [user], organization: organization)
       end
 
       it 'returns a 200' do

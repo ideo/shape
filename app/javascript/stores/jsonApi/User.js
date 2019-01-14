@@ -77,10 +77,12 @@ class User extends BaseRecord {
     { redirectPath = null, redirectId = null } = {}
   ) {
     try {
+      this.apiStore.update('switchingOrgs', true)
       await this.apiStore.request('users/switch_org', 'POST', {
         organization_id: organizationId,
       })
       await this.apiStore.loadCurrentUser()
+      this.apiStore.update('switchingOrgs', false)
       if (redirectPath) {
         routingStore.routeTo(redirectPath, redirectId)
       }

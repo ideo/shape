@@ -28,10 +28,12 @@ module Roles
       @failed_groups = []
       @roles = []
       @errors = []
+      @previous_anchor_id = nil
     end
 
     def call
       return false unless valid_object_and_role_name?
+      unanchor_object # from shared methods
       assign_role_to_users
       setup_org_membership if newly_invited?
       notify_users if newly_invited?
@@ -81,17 +83,21 @@ module Roles
 
     def add_roles_to_children
       return unless @object.respond_to?(:children)
+      return if @object.children.blank?
       params = [
+        @invited_by.try(:id),
         @added_users.map(&:id),
         @added_groups.map(&:id),
         @role_name,
         @object.id,
         @object.class.name,
+        @previous_anchor_id,
+        'add',
       ]
       if @synchronous
-        AddRolesToChildrenWorker.new.perform(*params)
+        ModifyChildrenRolesWorker.new.perform(*params)
       else
-        AddRolesToChildrenWorker.perform_async(*params)
+        ModifyChildrenRolesWorker.perform_async(*params)
       end
     end
 
@@ -109,7 +115,7 @@ module Roles
 
     def add_editors_as_comment_thread_followers
       return unless @role_name.to_sym == Role::EDITOR
-      return unless @object.is_a?(Item) || @object.is_a?(Collection)
+      return unless @object.item_or_collection?
       return unless @object.comment_thread.present?
       AddCommentThreadFollowers.perform_async(
         @object.comment_thread.id,

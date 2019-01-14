@@ -7,8 +7,7 @@ class CardMover
     to_collection:,
     cards:,
     placement: 'beginning',
-    card_action: 'move', # 'move' or 'link'
-    reassign_permissions: true
+    card_action: 'move' # 'move' or 'link'
   )
     @from_collection = from_collection
     @to_collection = to_collection
@@ -16,9 +15,6 @@ class CardMover
     # retain array of cards being moved
     @moving_cards = cards.to_a
     @card_action = card_action
-    # this setting can be used the case where you know the cards already have
-    # the correct permissions and you just want to move them
-    @reassign_permissions = reassign_permissions
     @errors = []
   end
 
@@ -102,13 +98,6 @@ class CardMover
     @to_collection.queue_update_template_instances if @to_collection.master_template?
   end
 
-  def to_permissions
-    {
-      Role::EDITOR => @to_collection.editors,
-      Role::VIEWER => @to_collection.viewers,
-    }
-  end
-
   def to_collection_invalid
     # these only apply for moving actions
     return unless @card_action == 'move'
@@ -137,18 +126,9 @@ class CardMover
 
   def assign_permissions
     return if @to_collection == @from_collection
-    return unless @card_action == 'move' && @reassign_permissions
+    return unless @card_action == 'move'
     @moving_cards.each do |card|
-      # assign each role from the @to_collection to our newly moved cards
-      to_permissions.each do |role_name, entity|
-        Roles::MassAssign.new(
-          object: card.record,
-          role_name: role_name,
-          users: entity[:users],
-          groups: entity[:groups],
-          propagate_to_children: true,
-        ).call
-      end
+      Roles::MergeToChild.call(parent: @to_collection, child: card.record)
     end
   end
 end

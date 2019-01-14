@@ -119,6 +119,8 @@ class Item < ApplicationRecord
     i = amoeba_dup
     i.cloned_from = self
     i.tag_list = tag_list
+    # copy roles from parent (i.e. where it's being placed)
+    i.roles_anchor_collection_id = parent.roles_anchor.id
 
     # save the dupe item first so that we can reference it later
     # return if it didn't work for whatever reason
@@ -136,13 +138,6 @@ class Item < ApplicationRecord
       )
       i.parent_collection_card.item = i
     end
-
-    # copy roles from parent (i.e. where it's being placed)
-    parent.roles.each do |role|
-      i.roles << role.duplicate!(assign_resource: i)
-    end
-    # upgrade to editor unless we're setting up a templated collection
-    for_user.upgrade_to_edit_role(i) if for_user.present?
 
     # Method from HasFilestackFile
     filestack_file_duplicate!(i)
