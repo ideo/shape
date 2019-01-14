@@ -52,10 +52,10 @@ class CollectionTemplateBuilder
     # make sure to assign these permissions before the template cards are generated
     @collection.inherit_roles_anchor_from_parent!(@parent)
     if @parent.is_a? Collection::SubmissionsCollection
+      @collection.unanchor_and_inherit_roles_from_anchor!
       if @parent.submission_box.hide_submissions
-        @collection.unanchor!
-      else
-        @collection.unanchor_and_inherit_roles_from_anchor!
+        # definitely could be a better way than copying the viewer roles only to delete them...
+        @collection.roles.where(name: Role::VIEWER).destroy_all
       end
       @created_by.upgrade_to_edit_role(@collection)
     end

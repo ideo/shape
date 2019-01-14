@@ -164,6 +164,11 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     return this.submission_attrs && this.submission_attrs.submission
   }
 
+  get isHiddenSubmission() {
+    if (!this.isSubmission) return false
+    return this.is_inside_hidden_submission_box && this.submission_attrs.hidden
+  }
+
   get isSubmissionBoxTemplateOrTest() {
     return (
       this.is_submission_box_template ||
