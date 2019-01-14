@@ -11,7 +11,6 @@ import ChannelManager from '~/utils/ChannelManager'
 import CollectionGrid from '~/ui/grid/CollectionGrid'
 import FloatingActionButton from '~/ui/global/FloatingActionButton'
 import Loader from '~/ui/layout/Loader'
-import Deactivated from '~/ui/layout/Deactivated'
 import MoveModal from '~/ui/grid/MoveModal'
 import PageContainer from '~/ui/layout/PageContainer'
 import PageHeader from '~/ui/pages/shared/PageHeader'
@@ -171,15 +170,11 @@ class CollectionPage extends React.Component {
   }
 
   async _reloadData() {
-    const { apiStore } = this.props
-    await apiStore.fetch('collections', this.collection.id, true)
+    const { collection } = this.props
+    collection.API_fetchCards({ per_page: collection.collection_cards.length })
     if (this.collection.submissions_collection) {
       this.setLoadedSubmissions(false)
-      await apiStore.fetch(
-        'collections',
-        this.collection.submissions_collection.id,
-        true
-      )
+      await this.collection.submissions_collection.API_fetchCards()
       this.setLoadedSubmissions(true)
     }
   }
@@ -293,10 +288,7 @@ class CollectionPage extends React.Component {
   )
 
   render() {
-    const { collection, isHomepage, apiStore, uiStore } = this.props
-    if (apiStore.currentOrgIsDeactivated) {
-      return <Deactivated />
-    }
+    const { collection, isHomepage, uiStore } = this.props
     if (!collection) {
       return this.loader()
     }

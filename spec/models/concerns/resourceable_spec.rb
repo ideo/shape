@@ -184,4 +184,53 @@ describe Resourceable, type: :concern do
       expect(Collection.viewable_by(user, organization)).not_to include(other_collection)
     end
   end
+
+  context 'with anchored_roles' do
+    let(:subcollection) { create(:collection, parent_collection: collection, roles_anchor_collection: collection) }
+    let(:item) { create(:text_item, parent_collection: subcollection, roles_anchor_collection: collection) }
+
+    before do
+      user.add_role(Role::VIEWER, collection)
+      group.add_role(Role::VIEWER, collection)
+    end
+
+    it 'should refer to the roles_anchor to get its roles' do
+      expect(item.anchored_roles).to eq collection.roles
+    end
+
+    it 'should have the same access as its anchor' do
+      expect(item.can_view?(user)).to be true
+      expect(item.can_view?(group)).to be true
+    end
+
+    it 'should use the roles_anchor for its dynamic methods' do
+      expect(item.viewers).to eq collection.viewers
+    end
+
+    describe '#inherit_roles_anchor_from_parent!' do
+      let(:item) { create(:text_item, parent_collection: subcollection, roles_anchor_collection: nil) }
+
+      it 'should copy roles anchor from its parent' do
+        expect(item.anchored_roles).to be_empty
+        item.inherit_roles_anchor_from_parent!
+        expect(item.anchored_roles).to eq subcollection.anchored_roles
+        expect(item.anchored_roles).to eq collection.roles
+      end
+    end
+
+    describe '#unanchor_and_inherit_roles_from_anchor!' do
+      it 'should duplicate all the roles onto the resource and remove the roles_anchor_collection' do
+        expect(item.roles_anchor_collection_id).to eq collection.id
+        expect(item.roles).to be_empty
+        expect(item.can_view?(user)).to be true
+        # now unanchor...
+        item.unanchor_and_inherit_roles_from_anchor!
+        # should be anchored to itself
+        expect(item.roles_anchor_collection_id).to be_nil
+        expect(item.roles_anchor).to eq item
+        expect(item.roles.count).to eq collection.roles.count
+        expect(item.can_view?(user)).to be true
+      end
+    end
+  end
 end

@@ -134,6 +134,17 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
         expect(response.status).to eq(404)
       end
     end
+
+    context 'with archived collection' do
+      before do
+        collection.archive!
+      end
+
+      it 'should return a 404' do
+        get(path)
+        expect(response.status).to eq(404)
+      end
+    end
   end
 
   describe 'POST #create_template' do

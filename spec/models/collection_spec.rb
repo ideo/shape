@@ -272,19 +272,6 @@ describe Collection, type: :model do
       end
     end
 
-    context 'with viewer role' do
-      before do
-        user.add_role(Role::VIEWER, collection)
-      end
-
-      it 'upgrades viewer user to editor role upon duplication' do
-        expect(collection.can_edit?(user)).to be false
-        # roles shouldn't match because we're removing Viewer and replacing w/ Editor
-        expect(duplicate.roles.map(&:name)).not_to match(collection.roles.map(&:name))
-        expect(duplicate.can_edit?(user)).to be true
-      end
-    end
-
     context 'with system_collection and synchronous settings' do
       let(:instance_double) do
         double('CollectionCardDuplicationWorker')
@@ -418,6 +405,13 @@ describe Collection, type: :model do
         expect(viewable.second).to eq(scored2.parent_collection_card)
       end
     end
+
+    context 'with pagination' do
+      it 'should only show the appropriate page' do
+        # just make a simple 1 per-page request
+        expect(collection.collection_cards_viewable_by(cards, user, per_page: 1)).to match_array([cards.first])
+      end
+    end
   end
 
   describe '#search_data' do
@@ -532,6 +526,25 @@ describe Collection, type: :model do
         expect(collection).to receive(:processing_done).once
         collection.update_processing_status(nil)
       end
+    end
+  end
+
+  describe '#reset_permissions!' do
+    let(:user) { create(:user) }
+    let(:collection) { create(:collection, num_cards: 1, add_editors: [user]) }
+    let!(:subcollection) { create(:collection, parent_collection: collection, add_viewers: [user]) }
+
+    it 'resets all sub-items and collections to be anchored to the parent' do
+      expect(subcollection.roles).not_to be_empty
+      collection.reset_permissions!
+      # update_all doesn't automatically reload the models so we need to
+      collection.items.first.reload
+      subcollection.reload
+      expect(collection.items.first.roles_anchor_collection_id).to eq collection.id
+      expect(collection.items.first.can_edit?(user)).to be true
+      expect(subcollection.roles).to be_empty
+      expect(subcollection.roles_anchor_collection_id).to eq collection.id
+      expect(subcollection.can_edit?(user)).to be true
     end
   end
 

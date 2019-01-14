@@ -2,24 +2,23 @@ require 'rails_helper'
 
 RSpec.describe Roles::MassRemove, type: :service do
   let(:organization) { create(:organization) }
-  let(:collection) { create(:collection, num_cards: 5) }
-  let!(:subcollection_card) do
-    create(:collection_card_collection, parent: collection)
-  end
-  let(:subcollection) { subcollection_card.collection }
-  let(:grandchildren) { create_list(:collection_card_text, 3, parent: subcollection) }
+  let(:collection) { create(:collection) }
+  let(:object) { collection }
   let(:users) { create_list(:user, 1, add_to_org: organization) }
   let(:groups) { create_list(:group, 1) }
   let(:role_name) { Role::EDITOR }
   let(:remove_from_children_sync) { true }
+  let(:propagate_to_children) { false }
+  let(:removed_by) { create(:user) }
   let(:fully_remove) { false }
   let(:mass_remove) do
     Roles::MassRemove.new(
-      object: collection,
+      object: object,
       role_name: role_name,
       users: users,
       groups: groups,
-      remove_from_children_sync: remove_from_children_sync,
+      propagate_to_children: propagate_to_children,
+      removed_by: removed_by,
       fully_remove: fully_remove,
     )
   end
@@ -29,44 +28,66 @@ RSpec.describe Roles::MassRemove, type: :service do
     let(:groups) { create_list(:group, 1) }
     let(:group) { groups.first }
     let(:user_3) { create(:user) }
-    let!(:role) { user.add_role(role_name, collection) }
+    let(:collection) { create(:collection, num_cards: 3, add_editors: [user, group]) }
 
     before do
-      collection.items.each do |item|
-        user.add_role(role_name, item)
-        group.add_role(role_name, item)
-      end
-      user.add_role(role_name, subcollection)
-      group.add_role(role_name, subcollection)
+      collection.items.update_all(roles_anchor_collection_id: collection.id)
     end
 
-    it 'should remove editor role from all card items' do
+    it 'should automatically change roles on anchored children items' do
       expect(collection.items.all? do |item|
-        user.has_role?(role_name, item) && group.has_role?(role_name, item)
+        item.reload
+        item.can_edit?(user) && item.can_edit?(group)
       end).to be true
 
       expect(mass_remove.call).to be true
-      user.reload
-      group.reload
 
       expect(collection.items.all? do |item|
-        user.has_role?(role_name, item) && group.has_role?(role_name, item)
+        item.reload
+        item.can_edit?(user) && item.can_edit?(group)
       end).to be false
     end
 
-    it 'should remove editor role from sub-collection' do
-      expect(user.has_role?(role_name, subcollection)).to be true
-      expect(group.has_role?(role_name, subcollection)).to be true
-      expect(mass_remove.call).to be true
-      user.reload
-      group.reload
-      expect(user.has_role?(role_name, subcollection)).to be false
-      expect(group.has_role?(role_name, subcollection)).to be false
+    context 'with propagate_to_children true' do
+      let(:propagate_to_children) { true }
+      let(:previous_anchor_id) { nil }
+
+      it 'should call ModifyChildrenRolesWorker with method = remove' do
+        expect(ModifyChildrenRolesWorker).to receive(:perform_async).with(
+          removed_by.id,
+          users.map(&:id),
+          groups.map(&:id),
+          role_name,
+          object.id,
+          object.class.name,
+          previous_anchor_id,
+          'remove',
+        )
+        mass_remove.call
+      end
+
+      context 'with previous anchor' do
+        let(:previous_anchor_id) { 99 }
+        let(:object) { create(:collection, roles_anchor_collection_id: previous_anchor_id) }
+
+        it 'should call ModifyChildrenRolesWorker with previous_anchor_id' do
+          expect(ModifyChildrenRolesWorker).to receive(:perform_async).with(
+            removed_by.id,
+            users.map(&:id),
+            groups.map(&:id),
+            role_name,
+            object.id,
+            object.class.name,
+            previous_anchor_id,
+            'remove',
+          )
+          mass_remove.call
+        end
+      end
     end
 
     context 'with fully_remove true' do
       let!(:fully_remove) { true }
-      let!(:object) { organization.primary_group }
 
       it 'removes links from user collections' do
         expect(UnlinkFromSharedCollectionsWorker).to receive(:perform_async).with(
@@ -114,17 +135,6 @@ RSpec.describe Roles::MassRemove, type: :service do
           create_list(:collection_comment_thread, 2, add_group_followers: [object])
         end
 
-        let(:mass_remove) do
-          Roles::MassRemove.new(
-            object: object,
-            role_name: role_name,
-            users: users,
-            groups: groups,
-            remove_from_children_sync: remove_from_children_sync,
-            fully_remove: fully_remove,
-          )
-        end
-
         it 'should link all the groups shared collection cards' do
           expect(UnlinkFromSharedCollectionsWorker).to receive(:perform_async).with(
             users.map(&:id),
@@ -169,13 +179,6 @@ RSpec.describe Roles::MassRemove, type: :service do
       end
     end
 
-    context 'remove_from_children_sync = true' do
-      it 'should call worker for each grandchild' do
-        expect(MassRemoveRolesWorker).to receive(:perform_async).exactly(grandchildren.count).times
-        mass_remove.call
-      end
-    end
-
     context 'with another user that has the same role' do
       before do
         collection.items.each { |i| user_3.add_role(role_name, i) }
@@ -203,17 +206,6 @@ RSpec.describe Roles::MassRemove, type: :service do
         expect(user.has_role?(role_name, collection)).to be true
         expect(mass_remove.call).to be true
         expect(user.reload.has_role?(role_name, collection)).to be false
-      end
-
-      it 'queues worker for itself again to remove children' do
-        expect(MassRemoveRolesWorker).to receive(:perform_async).with(
-          collection.id,
-          collection.class.name,
-          Role::EDITOR,
-          users.map(&:id),
-          groups.map(&:id),
-        )
-        mass_remove.call
       end
     end
 

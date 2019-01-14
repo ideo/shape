@@ -1,8 +1,9 @@
 class Organization < ApplicationRecord
   RECENTLY_ACTIVE_RANGE = 90.days
-  DEFAULT_TRIAL_ENDS_AT = 90.days
+  DEFAULT_TRIAL_ENDS_AT = 30.days
   DEFAULT_TRIAL_USERS_COUNT = 25
   PRICE_PER_USER = 5.00
+  SUPER_ADMIN_EMAIL = ENV['SUPER_ADMIN_EMAIL'] || 'admin@shape.space'.freeze
 
   extend FriendlyId
   friendly_id :slug_candidates, use: %i[slugged finders history]
@@ -36,6 +37,10 @@ class Organization < ApplicationRecord
              optional: true
   belongs_to :getting_started_collection,
              class_name: 'Collection::Global',
+             dependent: :destroy,
+             optional: true
+  belongs_to :terms_text_item,
+             class_name: 'Item::TextItem',
              dependent: :destroy,
              optional: true
 
@@ -84,7 +89,7 @@ class Organization < ApplicationRecord
 
   def matches_domain_whitelist?(user)
     email_domain = user.email.split('@').last
-    domain_whitelist.include? email_domain
+    (domain_whitelist + autojoin_domains).uniq.include?(email_domain)
   end
 
   def setup_user_membership(user)
@@ -93,7 +98,7 @@ class Organization < ApplicationRecord
       Collection::UserProfile.find_or_create_for_user(user: user, organization: self)
     end
 
-    check_user_email_domain(user)
+    check_email_domains_and_join_org_group(user)
 
     # Set this as the user's current organization if they don't have one
     user.switch_to_organization(self) if user.current_organization_id.blank?
@@ -180,9 +185,14 @@ class Organization < ApplicationRecord
   end
 
   def calculate_active_users_count!
+    # We only want to count activity users have done within this particular org
+    # e.g. a user may have logged in recently and been "active" but in a different org
+
+    # TODO: refactor last_active_at to be a json of org_id => timestamp e.g. { "1": timestamp, "22" : timestamp }
     count = Activity
             .joins(:actor)
             .where(User.arel_table[:status].eq(User.statuses[:active]))
+            .where(User.arel_table[:email].not_eq(SUPER_ADMIN_EMAIL))
             .where(organization_id: id)
             .where(Activity.arel_table[:created_at].gt(RECENTLY_ACTIVE_RANGE.ago))
             .select(:actor_id)
@@ -273,7 +283,7 @@ class Organization < ApplicationRecord
     user_getting_started
   end
 
-  def check_user_email_domain(user)
+  def check_email_domains_and_join_org_group(user)
     if matches_domain_whitelist?(user)
       # add them as an org member
       user.add_role(Role::MEMBER, primary_group)
@@ -284,6 +294,19 @@ class Organization < ApplicationRecord
       # however if they've already been setup as an org member then they don't get "demoted"
       user.add_role(Role::MEMBER, guest_group)
     end
+  end
+
+  def create_terms_text_item
+    item = Item.create(
+      type: 'Item::TextItem',
+      name: "#{name} Terms",
+      content: 'Terms',
+      text_data: { a: {} },
+    )
+    admin_group.add_role(Role::EDITOR, item)
+    self.terms_text_item = item
+    save
+    item
   end
 
   private

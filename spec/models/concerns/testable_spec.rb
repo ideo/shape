@@ -69,5 +69,16 @@ describe Testable, type: :concern do
         expect(Collection.order_by_score('total').count).to eq 2
       end
     end
+
+    describe '#cache_test_scores!' do
+      it 'should collect test scores and save them on the collection' do
+        collection.cache_test_scores!
+        expect(collection.cached_test_scores).to eq(
+          'question_useful' => 33,
+          'question_clarity' => 67,
+          'total' => 50,
+        )
+      end
+    end
   end
 end

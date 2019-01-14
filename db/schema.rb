@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20190107220606) do
+ActiveRecord::Schema.define(version: 20190110222910) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -99,11 +99,14 @@ ActiveRecord::Schema.define(version: 20190107220606) do
     t.bigint "collection_to_test_id"
     t.datetime "unarchived_at"
     t.jsonb "cached_test_scores"
+    t.bigint "roles_anchor_collection_id"
+    t.boolean "hide_submissions", default: false
     t.index ["breadcrumb"], name: "index_collections_on_breadcrumb", using: :gin
     t.index ["cached_test_scores"], name: "index_collections_on_cached_test_scores", using: :gin
     t.index ["cloned_from_id"], name: "index_collections_on_cloned_from_id"
     t.index ["created_at"], name: "index_collections_on_created_at"
     t.index ["organization_id"], name: "index_collections_on_organization_id"
+    t.index ["roles_anchor_collection_id"], name: "index_collections_on_roles_anchor_collection_id"
     t.index ["submission_box_id"], name: "index_collections_on_submission_box_id"
     t.index ["submission_template_id"], name: "index_collections_on_submission_template_id"
     t.index ["template_id"], name: "index_collections_on_template_id"
@@ -165,6 +168,8 @@ ActiveRecord::Schema.define(version: 20190107220606) do
     t.integer "current_shared_collection_id"
     t.datetime "archived_at"
     t.string "archive_batch"
+    t.jsonb "autojoin_emails", default: []
+    t.index ["autojoin_emails"], name: "index_groups_on_autojoin_emails", using: :gin
     t.index ["handle"], name: "index_groups_on_handle"
     t.index ["organization_id"], name: "index_groups_on_organization_id"
   end
@@ -206,10 +211,12 @@ ActiveRecord::Schema.define(version: 20190107220606) do
     t.bigint "data_source_id"
     t.datetime "unarchived_at"
     t.jsonb "data_settings"
+    t.bigint "roles_anchor_collection_id"
     t.index ["breadcrumb"], name: "index_items_on_breadcrumb", using: :gin
     t.index ["cloned_from_id"], name: "index_items_on_cloned_from_id"
     t.index ["created_at"], name: "index_items_on_created_at"
     t.index ["data_source_type", "data_source_id"], name: "index_items_on_data_source_type_and_data_source_id"
+    t.index ["roles_anchor_collection_id"], name: "index_items_on_roles_anchor_collection_id"
     t.index ["type"], name: "index_items_on_type"
   end
 
@@ -251,6 +258,9 @@ ActiveRecord::Schema.define(version: 20190107220606) do
     t.boolean "sent_high_charges_middle_email", default: false, null: false
     t.boolean "sent_high_charges_high_email", default: false, null: false
     t.boolean "deactivated", default: false, null: false
+    t.jsonb "autojoin_domains", default: []
+    t.bigint "terms_text_item_id"
+    t.index ["autojoin_domains"], name: "index_organizations_on_autojoin_domains", using: :gin
     t.index ["slug"], name: "index_organizations_on_slug", unique: true
   end
 

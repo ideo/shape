@@ -49,8 +49,8 @@ RSpec.describe Roles::MassAssign, type: :service do
       expect(groups.all? { |group| group.has_role?(:editor, object) }).to be true
     end
 
-    it 'does not call AddRolesToChildrenWorker' do
-      expect(AddRolesToChildrenWorker).not_to receive(:perform_async)
+    it 'does not call ModifyChildrenRolesWorker' do
+      expect(ModifyChildrenRolesWorker).not_to receive(:perform_async)
       assign_role.call
     end
 
@@ -97,19 +97,52 @@ RSpec.describe Roles::MassAssign, type: :service do
     end
 
     context 'with propagate_to_children true' do
+      let(:invited_by) { create(:user) }
       let!(:propagate_to_children) { true }
 
       describe 'with collection' do
-        it 'calls AddRolesToChildrenWorker' do
-          expect(AddRolesToChildrenWorker).to receive(:perform_async).with(
+        it 'calls ModifyChildrenRolesWorker' do
+          expect(ModifyChildrenRolesWorker).to receive(:perform_async).with(
+            invited_by.id,
             users.map(&:id),
             groups.map(&:id),
             role_name,
             object.id,
             object.class.name,
+            nil,
+            'add',
           )
           assign_role.call
         end
+      end
+    end
+
+    context 'with anchored collection' do
+      let(:anchor) { create(:collection, organization: organization, add_editors: [invited_by]) }
+      let(:object) { create(:collection, organization: organization, num_cards: 2, roles_anchor_collection: anchor) }
+      let(:invited_by) { create(:user) }
+      let!(:propagate_to_children) { true }
+
+      it 'unanchors the object and inherits the roles' do
+        expect(object.roles).to be_empty
+        expect(object.roles_anchor).to eq anchor
+        assign_role.call
+        expect(object.roles).not_to be_empty
+        expect(object.roles_anchor).to eq object
+      end
+
+      it 'calls ModifyChildrenRolesWorker with previous_anchor id' do
+        expect(ModifyChildrenRolesWorker).to receive(:perform_async).with(
+          invited_by.id,
+          users.map(&:id),
+          groups.map(&:id),
+          role_name,
+          object.id,
+          object.class.name,
+          anchor.id,
+          'add',
+        )
+        assign_role.call
       end
     end
 

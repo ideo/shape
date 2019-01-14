@@ -32,6 +32,9 @@ class ApiStore extends jsonapi(datxCollection) {
   currentUserOrganizationId = null
 
   @observable
+  switchingOrgs = false
+
+  @observable
   currentCommentThreadIds = []
 
   @observable
@@ -372,11 +375,13 @@ class ApiStore extends jsonapi(datxCollection) {
     return archiveResult
   }
 
-  unarchiveCards({ cardIds, snapshot }) {
-    return this.request('collection_cards/unarchive', 'PATCH', {
+  async unarchiveCards({ cardIds, snapshot }) {
+    const res = await this.request('collection_cards/unarchive', 'PATCH', {
       card_ids: cardIds,
       collection_snapshot: snapshot,
     })
+    const collection = res.data
+    collection.API_fetchCards()
   }
 
   moveCards(data) {
@@ -410,6 +415,12 @@ class ApiStore extends jsonapi(datxCollection) {
     runInAction(() => {
       record.inMyCollection = res.__response.data
     })
+  }
+
+  // default action for updating any basic apiStore value
+  @action
+  update(name, value) {
+    this[name] = value
   }
 
   // NOTE: had to override datx PureCollection, it looks like it is meant to do

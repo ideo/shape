@@ -75,6 +75,29 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
       end
     end
 
+    context 'with pagination options' do
+      let(:path) { "/api/v1/collections/#{collection.id}/collection_cards?per_page=2&page=2" }
+
+      before do
+        Kernel.silence_warnings do
+          # it uses this as a minimum so we change it here, otherwise we'd need 50+ cards to test
+          CollectionCard::DEFAULT_PER_PAGE = 2
+        end
+      end
+
+      after do
+        Kernel.silence_warnings do
+          CollectionCard::DEFAULT_PER_PAGE = 50
+        end
+      end
+
+      it 'includes only the correct page of collection cards' do
+        get(path)
+        # should be the second page of 2 cards
+        expect(json['data'].map { |cc| cc['id'].to_i }).to match_array(collection.collection_card_ids.slice(2, 2))
+      end
+    end
+
     context 'with sort options' do
       let(:path) { "/api/v1/collections/#{collection.id}/collection_cards?card_order=updated_at" }
       let(:collection_json) do
@@ -141,7 +164,7 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
 
     context 'success' do
       let(:collection) do
-        create(:collection, add_content_editors: [user], organization: organization)
+        create(:collection, add_editors: [user], organization: organization)
       end
 
       it 'returns a 200' do

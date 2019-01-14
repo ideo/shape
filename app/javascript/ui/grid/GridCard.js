@@ -23,6 +23,7 @@ import CollectionIcon from '~/ui/icons/CollectionIcon'
 import EditButton from '~/ui/reporting/EditButton'
 import FullScreenIcon from '~/ui/icons/FullScreenIcon'
 import LinkIcon from '~/ui/icons/LinkIcon'
+import HiddenIcon from '~/ui/icons/HiddenIcon'
 import Download from '~/ui/grid/Download'
 import LinkedCollectionIcon from '~/ui/icons/LinkedCollectionIcon'
 import RequiredCollectionIcon from '~/ui/icons/RequiredCollectionIcon'
@@ -195,6 +196,18 @@ class GridCard extends React.Component {
         {icon}
       </StyledBottomLeftIcon>
     )
+  }
+
+  get renderHidden() {
+    const { record } = this.props
+    if (record.submission_attrs && record.submission_attrs.hidden) {
+      return (
+        <StyledBottomLeftIcon small iconAmount={1} iconPos={2}>
+          <HiddenIcon />
+        </StyledBottomLeftIcon>
+      )
+    }
+    return null
   }
 
   renderPin() {
@@ -372,7 +385,7 @@ class GridCard extends React.Component {
               {record.isData && <EditButton onClick={this.editCard} />}
               {record.isImage &&
                 this.canContentEditCard && <ContainImage card={card} />}
-              {record.isImage && (
+              {(record.isImage || record.isText) && (
                 <CardActionHolder
                   className="show-on-hover"
                   onClick={() => routingStore.routeTo('items', card.record.id)}
@@ -397,6 +410,7 @@ class GridCard extends React.Component {
             </StyledTopRightActions>
           )}
         {this.renderIcon}
+        {this.renderHidden}
         {/* onClick placed here so it's separate from hotspot click */}
         <StyledGridCardInner
           onClick={this.handleClick}

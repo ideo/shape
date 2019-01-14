@@ -80,10 +80,24 @@ class Api::V1::CollectionsController < Api::V1::BaseController
     end
   end
 
+  def submit
+    @collection.submission_attrs['hidden'] = false
+    Roles::MergeToChild.call(
+      parent: @collection.parent_submission_box,
+      child: @collection,
+    )
+    if @collection.save
+      render jsonapi: @collection,
+             include: Collection.default_relationships_for_api
+    else
+      render_api_errors @collection.errors
+    end
+  end
+
   private
 
   def check_cache
-    if @collection.organization.deactivated?
+    if @collection.archived? || @collection.organization.deactivated?
       head(404)
     end
     fresh_when(
@@ -161,6 +175,7 @@ class Api::V1::CollectionsController < Api::V1::BaseController
       :submission_template_id,
       :submission_box_type,
       :collection_to_test_id,
+      :hide_submissions,
       collection_cards_attributes: %i[id order width height],
     )
   end

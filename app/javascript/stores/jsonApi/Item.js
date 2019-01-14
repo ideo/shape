@@ -80,6 +80,10 @@ class Item extends SharedRecordMixin(BaseRecord) {
     return this.filestack_file && this.mimeBaseType === 'image'
   }
 
+  get isText() {
+    return this.type === ITEM_TYPES.TEXT
+  }
+
   get canBeSetAsCover() {
     return this.isImage
   }
