@@ -56,8 +56,8 @@ class TermsPage extends React.PureComponent {
       const textData = organization.terms_text_item.toJSON().text_data
       inner = (
         <div>
-          <StyledTitle>{organization.name} Terms of Use</StyledTitle>
-          <QuillStyleWrapper style={{ marginTop: '1.5rem' }}>
+          <StyledTitle>{organization.termsName} Terms of Use</StyledTitle>
+          <QuillStyleWrapper>
             <ReactQuill {...quillProps} value={textData} />
           </QuillStyleWrapper>
         </div>

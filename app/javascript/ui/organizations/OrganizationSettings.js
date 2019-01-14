@@ -169,7 +169,7 @@ class OrganizationSettings extends React.Component {
             label={
               <div style={{ maxWidth: '582px' }}>
                 <LabelTextStandalone>
-                  {`Include ${this.organization.name} Terms of Use `}
+                  {`Include ${this.organization.termsName} Terms of Use `}
                 </LabelTextStandalone>
                 <SmallHelperText color={v.colors.commonDark}>
                   If you choose to include your own Terms of Use you are

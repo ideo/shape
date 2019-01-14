@@ -4,9 +4,17 @@ import { ReferenceType } from 'datx'
 import BaseRecord from './BaseRecord'
 import Item from './Item'
 
+const MOON_ORG_ID = '137'
 class Organization extends BaseRecord {
   static type = 'organizations'
   static endpoint = apiUrl('organizations')
+
+  get termsName() {
+    if (this.id === MOON_ORG_ID) {
+      return 'SMAP'
+    }
+    return this.name
+  }
 
   API_createTermsTextItem() {
     return this.apiStore.request(

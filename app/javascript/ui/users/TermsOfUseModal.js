@@ -102,7 +102,7 @@ class TermsOfUseModal extends React.Component {
     const orgTermsOfUse = organization.terms_text_item_id && (
       <span>
         {' '}
-        and {organization.name}
+        and {organization.termsName}
         &apos;s{' '}
         <Link target="_blank" to={`/terms/${organization.name}`}>
           Terms of Use
