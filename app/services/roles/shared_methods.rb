@@ -37,5 +37,13 @@ module Roles
       end
       (group_user_ids + @users.map(&:id)).uniq
     end
+
+    def unanchor_object
+      # note this will always return nil for Groups
+      return if @object.roles_anchor_collection_id.nil?
+      # store this for later querying
+      @previous_anchor_id = @object.roles_anchor_collection_id
+      @object.unanchor_and_inherit_roles_from_anchor!
+    end
   end
 end

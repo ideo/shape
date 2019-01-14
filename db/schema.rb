@@ -98,6 +98,7 @@ ActiveRecord::Schema.define(version: 20190110222910) do
     t.datetime "unarchived_at"
     t.jsonb "cached_test_scores"
     t.bigint "roles_anchor_collection_id"
+    t.boolean "hide_submissions", default: false
     t.index ["breadcrumb"], name: "index_collections_on_breadcrumb", using: :gin
     t.index ["cached_test_scores"], name: "index_collections_on_cached_test_scores", using: :gin
     t.index ["cloned_from_id"], name: "index_collections_on_cloned_from_id"

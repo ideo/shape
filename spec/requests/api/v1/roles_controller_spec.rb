@@ -120,17 +120,24 @@ describe Api::V1::RolesController, type: :request, json: true, auth: true do
     let!(:viewers) { create_list(:user, 2, add_to_org: organization) }
     let(:num_cards) { 0 }
     let(:params) { { 'is_switching': false }.to_json }
+    let!(:collection) do
+      create(:collection,
+             num_cards: num_cards,
+             add_editors: [editor],
+             add_viewers: (viewers + [group]))
+    end
 
     context 'for a user' do
       let(:remove_viewer) { viewers[0] }
-      let(:path) { "/api/v1/users/#{remove_viewer.id}/roles/#{role.id}" }
-      let!(:collection) do
-        create(:collection,
-               num_cards: num_cards,
-               add_editors: [editor],
-               add_viewers: (viewers + [group]))
+      let(:params) do
+        {
+          role: { name: 'viewer' },
+          user_ids: [remove_viewer.id],
+          is_switching: false,
+        }.to_json
       end
       let(:role) { collection.roles.find_by(name: Role::VIEWER) }
+      let(:path) { "/api/v1/collections/#{collection.id}/roles/#{role.id}" }
 
       it 'returns a 200' do
         delete(path, params: params)
@@ -218,8 +225,15 @@ describe Api::V1::RolesController, type: :request, json: true, auth: true do
                add_editors: [group],
                add_viewers: viewers)
       end
-      let!(:role) { collection.roles.find_by(name: Role::EDITOR) }
-      let(:path) { "/api/v1/groups/#{group.id}/roles/#{role.id}" }
+      let(:params) do
+        {
+          role: { name: 'editor' },
+          group_ids: [group.id],
+          is_switching: false,
+        }.to_json
+      end
+      let(:role) { collection.roles.find_by(name: Role::EDITOR) }
+      let(:path) { "/api/v1/collections/#{collection.id}/roles/#{role.id}" }
 
       before do
         editor.add_role(Role::ADMIN, group)

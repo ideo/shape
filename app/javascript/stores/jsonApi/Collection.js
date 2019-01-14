@@ -148,6 +148,10 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     return this.type === 'Collection::SharedWithMeCollection'
   }
 
+  get canSetACover() {
+    return !this.isSharedCollection && !this.isUserCollection
+  }
+
   get isSubmissionBox() {
     return this.type === 'Collection::SubmissionBox'
   }
@@ -207,7 +211,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     // you also don't use test templates, since duplicating them or
     // creating them within another template is the way to do that
     return (
-      this.isMasterTemplate &&
+      !!this.isMasterTemplate &&
       !this.isProfileTemplate &&
       !this.is_submission_box_template &&
       !this.isTestDesign &&
@@ -440,6 +444,9 @@ class Collection extends SharedRecordMixin(BaseRecord) {
 
   reopenTest = () => this._performTestAction('reopen')
 
+  submitSubmission = () =>
+    this.apiStore.request(`collections/${this.id}/submit`, 'PATCH')
+
   async _fetchSubmissionTest() {
     // if it's a submission we have to look up its test in order to launch
     if (!this.launchableTestId) return false
@@ -508,6 +515,13 @@ class Collection extends SharedRecordMixin(BaseRecord) {
       `collections/set_submission_box_template`,
       'POST',
       data
+    )
+  }
+
+  API_clearCollectionCover() {
+    return this.apiStore.request(
+      `collections/${this.id}/clear_collection_cover`,
+      'POST'
     )
   }
 

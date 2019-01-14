@@ -150,6 +150,7 @@ describe('PageHeader', () => {
         wrapper
           .find('HeaderFormButton')
           .children()
+          .first()
           .text()
       ).toEqual('Use Template')
     })
