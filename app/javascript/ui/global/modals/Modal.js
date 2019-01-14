@@ -153,12 +153,6 @@ class Modal extends React.Component {
         aria-labelledby={title}
         BackdropProps={{ invisible: true }}
       >
-        {/* if onClose is not supplied, then the modal is "locked" until user takes an action */}
-        {_.isFunction(onClose) && (
-          <ModalCloseButton onClick={this.handleClose}>
-            <CloseIcon />
-          </ModalCloseButton>
-        )}
         {/*
           NOTE: DialogTitle / DialogContent need to be direct children of Dialog
           for built-in scrolling to work (where title remains fixed at top)
@@ -176,6 +170,12 @@ class Modal extends React.Component {
           )}
           {wrappedTitle}
         </StyledDialogTitle>
+        {/* if onClose is not supplied, then the modal is "locked" until user takes an action */}
+        {_.isFunction(onClose) && (
+          <ModalCloseButton onClick={this.handleClose}>
+            <CloseIcon />
+          </ModalCloseButton>
+        )}
         <DialogContent
           classes={{
             root: ['modal__padding', noScroll && 'modal__no-scroll'].join(' '),
