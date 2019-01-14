@@ -49,7 +49,7 @@ const StyledVideoCover = styled.div`
 StyledVideoCover.displayName = 'StyledVideoCover'
 
 @observer
-class VideoItemCover extends React.PureComponent {
+class VideoItemCover extends React.Component {
   state = {
     playing: false,
   }

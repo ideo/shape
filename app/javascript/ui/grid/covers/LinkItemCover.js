@@ -1,4 +1,4 @@
-import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
+import { PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 import { Flex, Box } from 'reflexbox'
 
@@ -41,8 +41,7 @@ const StyledLinkCover = styled.div`
 `
 StyledLinkCover.displayName = 'StyledLinkCover'
 
-@observer
-class LinkItemCover extends React.PureComponent {
+class LinkItemCover extends React.Component {
   state = {
     iconError: false,
   }
