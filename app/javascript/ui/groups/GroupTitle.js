@@ -134,7 +134,7 @@ class GroupTitle extends React.Component {
   render() {
     const { group } = this.props
     return (
-      <Row>
+      <Row style={{ margin: 0 }}>
         <RowItem>
           <EditAvatarButton
             canEdit={this.editing}

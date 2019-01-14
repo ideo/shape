@@ -45,6 +45,7 @@ const StyledDialogTitle = styled(DialogTitle)`
   align-items: center;
   display: flex;
   min-height: 50px;
+  position: relative;
   @media only screen and (max-width: ${v.responsive.smallBreakpoint}px) {
     padding-top: 14px !important;
     min-height: 30px;
@@ -74,11 +75,15 @@ const BackIconHolder = styled.button`
   display: block;
   left: 10px;
   position: absolute;
-  top: 33px;
+  top: 50%;
+  transform: translateY(-50%);
   width: 15px;
 
   @media only screen and (max-width: ${v.responsive.smallBreakpoint}px) {
-    left: 4px;
+    margin-left: -8px;
+    margin-right: 8px;
+    position: static;
+    transform: none;
   }
 
   svg {
@@ -148,12 +153,6 @@ class Modal extends React.Component {
         aria-labelledby={title}
         BackdropProps={{ invisible: true }}
       >
-        {/* onBack is an optional button */}
-        {_.isFunction(onBack) && (
-          <BackIconHolder onClick={onBack}>
-            <ArrowIcon />
-          </BackIconHolder>
-        )}
         {/* if onClose is not supplied, then the modal is "locked" until user takes an action */}
         {_.isFunction(onClose) && (
           <ModalCloseButton onClick={this.handleClose}>
@@ -169,6 +168,12 @@ class Modal extends React.Component {
           disableTypography
           id="sharing"
         >
+          {/* onBack is an optional button */}
+          {_.isFunction(onBack) && (
+            <BackIconHolder onClick={onBack}>
+              <ArrowIcon />
+            </BackIconHolder>
+          )}
           {wrappedTitle}
         </StyledDialogTitle>
         <DialogContent
