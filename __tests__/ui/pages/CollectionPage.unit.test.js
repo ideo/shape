@@ -1,6 +1,5 @@
 import CollectionPage from '~/ui/pages/CollectionPage'
 import ChannelManager from '~/utils/ChannelManager'
-import Deactivated from '~/ui/layout/Deactivated'
 import fakeApiStore from '#/mocks/fakeApiStore'
 import fakeUiStore from '#/mocks/fakeUiStore'
 import fakeRoutingStore from '#/mocks/fakeRoutingStore'
@@ -143,20 +142,6 @@ describe('CollectionPage', () => {
 
     it('should call undoStore to perform the action', () => {
       expect(undoStore.performUndoAfterRoute).toHaveBeenCalled()
-    })
-  })
-
-  describe('organization is deactivated', () => {
-    beforeEach(() => {
-      wrapper.setProps({
-        apiStore: {
-          currentOrgIsDeactivated: true,
-        },
-      })
-    })
-
-    it('renders the Deactivated component', () => {
-      expect(wrapper.equals(<Deactivated />)).toEqual(true)
     })
   })
 })

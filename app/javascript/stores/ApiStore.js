@@ -32,6 +32,9 @@ class ApiStore extends jsonapi(datxCollection) {
   currentUserOrganizationId = null
 
   @observable
+  switchingOrgs = false
+
+  @observable
   currentCommentThreadIds = []
 
   @observable
@@ -412,6 +415,12 @@ class ApiStore extends jsonapi(datxCollection) {
     runInAction(() => {
       record.inMyCollection = res.__response.data
     })
+  }
+
+  // default action for updating any basic apiStore value
+  @action
+  update(name, value) {
+    this[name] = value
   }
 
   // NOTE: had to override datx PureCollection, it looks like it is meant to do

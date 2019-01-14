@@ -4,6 +4,7 @@ import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import { animateScroll as scroll } from 'react-scroll'
 
 import PageError from '~/ui/global/PageError'
+import Deactivated from '~/ui/layout/Deactivated'
 import CollectionPage from '~/ui/pages/CollectionPage'
 import ItemPage from '~/ui/pages/ItemPage'
 import trackError from '~/utils/trackError'
@@ -91,9 +92,14 @@ class PageWithApiWrapper extends React.Component {
   }
 
   render() {
-    const { uiStore } = this.props
+    const { apiStore, uiStore } = this.props
     const { data } = this.state
-    if (uiStore.pageError) return <PageError error={uiStore.pageError} />
+    if (apiStore.currentOrgIsDeactivated) {
+      return <Deactivated />
+    }
+    if (uiStore.pageError) {
+      return <PageError error={uiStore.pageError} />
+    }
     if (!data) return ''
 
     return this.props.render(data)
