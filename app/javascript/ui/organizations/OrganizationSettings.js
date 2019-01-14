@@ -69,6 +69,7 @@ class OrganizationSettings extends React.Component {
           record={this.organization}
           tagField="domain_whitelist"
           tagColor="white"
+          afterSave={this.afterDomainWhitelistUpdate}
         />
         <br />
         <Heading2>Terms of Use</Heading2>

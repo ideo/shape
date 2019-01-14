@@ -29,6 +29,7 @@ describe('OrganizationSettings', () => {
     beforeEach(() => {
       organization.primary_group.can_edit = true
       wrapper = shallow(<OrganizationSettings.wrappedComponent {...props} />)
+      component = wrapper.instance()
     })
 
     it('renders the page with TagEditor for domain whitelist', () => {
@@ -40,6 +41,7 @@ describe('OrganizationSettings', () => {
 
     it('reloads org groups after saving the domain whitelist', () => {
       component.afterDomainWhitelistUpdate()
+
       expect(props.apiStore.loadCurrentUserGroups).toHaveBeenCalledWith({
         orgOnly: true,
       })
