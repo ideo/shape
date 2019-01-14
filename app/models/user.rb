@@ -89,9 +89,9 @@ class User < ApplicationRecord
 
   def search_data
     {
-      name: name.downcase,
-      handle: handle.downcase,
-      email: email.downcase,
+      name: name&.downcase,
+      handle: handle&.downcase,
+      email: email&.downcase,
       status: status,
       organization_ids: organization_ids,
       group_ids: group_ids,

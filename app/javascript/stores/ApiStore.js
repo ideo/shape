@@ -424,8 +424,12 @@ class ApiStore extends jsonapi(datxCollection) {
     try {
       const res = await this.request(apiPath)
       const roles = res.data
-      // if the record doesn't have any roles yet, make the association
-      if (!record.roles.length) {
+
+      const roleIds = _.map(roles, 'id')
+      const recordRoleIds = _.map(record.roles, 'id')
+
+      // if the record doesn't have any roles yet -- or they have changed -- make the association
+      if (!record.roles.length || _.difference(roleIds, recordRoleIds).length) {
         record.roles = roles
       }
       _.each(roles, role => {

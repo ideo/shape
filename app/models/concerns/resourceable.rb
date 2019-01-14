@@ -209,8 +209,7 @@ module Resourceable
 
   def unanchor_and_inherit_roles_from_anchor!
     inherit_roles_from_parent!(roles_anchor)
-    update_column(:roles_anchor_collection_id, nil)
-    reload
+    unanchor!
   end
 
   def remove_all_viewer_roles

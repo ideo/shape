@@ -130,7 +130,7 @@ class Api::V1::SearchController < Api::V1::BaseController
         total: results.total_count,
         size: results.size,
       },
-      jsonapi: @resource.roles,
+      jsonapi: @resource.anchored_roles,
       include: %i[users groups],
       expose: {
         user_ids: users.pluck(:id),
