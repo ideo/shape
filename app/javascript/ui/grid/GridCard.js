@@ -124,7 +124,6 @@ class GridCard extends React.Component {
           height={card.maxHeight}
           collection={record}
           dragging={this.props.dragging}
-          filter={card.filter}
           inSubmissionsCollection={
             card.parentCollection &&
             card.parentCollection.isSubmissionsCollection
@@ -350,7 +349,6 @@ class GridCard extends React.Component {
         data-height={card.height}
         data-order={card.order}
         data-cy="GridCard"
-        filter={card.filter}
         onContextMenu={this.openContextMenu}
         innerRef={c => (this.gridCardRef = c)}
         onMouseLeave={this.closeContextMenu}
