@@ -1,31 +1,20 @@
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import { runInAction } from 'mobx'
 import FormControl from '@material-ui/core/FormControl'
-import ReactQuill from 'react-quill'
 
 import {
   Checkbox,
-  FormButton,
   LabelContainer,
   LabelTextStandalone,
 } from '~/ui/global/styled/forms'
-import {
-  Heading2,
-  SmallHelperText,
-  QuillStyleWrapper,
-} from '~/ui/global/styled/typography'
+import { Heading2, SmallHelperText } from '~/ui/global/styled/typography'
 import TagEditor from '~/ui/pages/shared/TagEditor'
-import TextItemToolbar from '~/ui/items/TextItemToolbar'
+import TextEditor from '~/ui/global/TextEditor'
 import v from '~/utils/variables'
 
 @inject('apiStore', 'routingStore')
 @observer
 class OrganizationSettings extends React.Component {
-  constructor() {
-    super()
-    this.quillEditor = undefined
-  }
-
   componentDidMount() {
     // kick out if you're not an org admin (i.e. primary_group admin)
     if (!this.organization.primary_group.can_edit) {
@@ -33,48 +22,11 @@ class OrganizationSettings extends React.Component {
     }
     const { apiStore } = this.props
     apiStore.fetch('organizations', this.organization.id)
-    this.attachQuillRefs()
-  }
-
-  componentDidUpdate() {
-    this.attachQuillRefs()
-  }
-
-  attachQuillRefs = () => {
-    if (!this.reactQuillRef) return
-    if (typeof this.reactQuillRef.getEditor !== 'function') return
-    this.quillEditor = this.reactQuillRef.getEditor()
   }
 
   get organization() {
     const { apiStore } = this.props
     return apiStore.currentUserOrganization
-  }
-
-  handleChange = (content, delta, source, editor) => {
-    const { quillEditor } = this
-    const item = this.organization.terms_text_item
-    setTimeout(() => {
-      runInAction(() => {
-        item.content = quillEditor.root.innerHTML
-        item.text_data = quillEditor.getContents()
-      })
-    }, 5)
-  }
-
-  handleBlur = (range, source, editor) => {
-    const selection = editor.getSelection()
-    if (selection) {
-      // we just pasted... so blur + refocus to stay within the editor
-      this.quillEditor.blur()
-      this.quillEditor.focus()
-    }
-  }
-
-  handleSave = ev => {
-    ev.preventDefault()
-    const item = this.organization.terms_text_item
-    item.save()
   }
 
   handleCustomTermToggle = async ev => {
@@ -89,44 +41,16 @@ class OrganizationSettings extends React.Component {
     return this.organization.API_createTermsTextItem()
   }
 
-  get textData() {
-    const item = this.organization.terms_text_item
-    return item.toJSON().text_data
+  afterDomainWhitelistUpdate = () => {
+    // need to reload in case updating the domains altered any group memberships
+    const { apiStore } = this.props
+    apiStore.loadCurrentUserGroups({ orgOnly: true })
   }
 
   renderTermsTextBox() {
     if (!this.organization.terms_text_item) return null
 
-    const quillProps = {
-      ...v.quillDefaults,
-      ref: c => {
-        this.reactQuillRef = c
-      },
-      theme: 'snow',
-      onChange: this.handleChange,
-      onBlur: this.handleBlur,
-      readOnly: false,
-      modules: {
-        toolbar: '#quill-toolbar',
-      },
-    }
-    return (
-      <form>
-        <div
-          style={{
-            background: 'white',
-            maxWidth: '850px',
-            padding: '6px 10px',
-          }}
-        >
-          <TextItemToolbar fullPageView onExpand={() => {}} />
-          <QuillStyleWrapper>
-            <ReactQuill {...quillProps} value={this.textData} />
-          </QuillStyleWrapper>
-        </div>
-        <FormButton onClick={this.handleSave}>Save</FormButton>
-      </form>
-    )
+    return <TextEditor item={this.organization.terms_text_item} />
   }
 
   render() {
