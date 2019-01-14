@@ -57,7 +57,7 @@ class TermsPage extends React.PureComponent {
       inner = (
         <div>
           <StyledTitle>{organization.termsName} Terms of Use</StyledTitle>
-          <QuillStyleWrapper>
+          <QuillStyleWrapper style={{ marginTop: '1.5rem' }}>
             <ReactQuill {...quillProps} value={textData} />
           </QuillStyleWrapper>
         </div>
