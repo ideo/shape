@@ -5,6 +5,7 @@ class BillingChangesMailer < ApplicationMailer
                      .find(default: true, organization_id: organization.network_organization.id)
                      .first
 
+    return unless payment_method.present?
     @new_users_count = new_active_users_count
 
     @subject = "#{new_active_users_count} new #{'user'.pluralize(@new_users_count)} joined Shape"
