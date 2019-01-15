@@ -7,79 +7,113 @@
 */
 
 const touMarkdown = `
-Please read these Terms of Use (**"Terms"** or **"TOU"**) carefully before using the Platform (as defined below). By using the Platform, you are agreeing to be bound by the Terms. If you have entered into a separate access, license or services agreement with IDEO for use of the Platform, then the terms of that agreement shall control if it conflicts with the Terms.
+Please read these Terms of Use (**"Terms" **or** "TOU"**) carefully before using the Platform (as defined below). By using the Platform, you are agreeing to be bound by the Terms. If you have entered into a separate access, license or services agreement with IDEO for use of the Platform, then the terms of that agreement shall control if it conflicts with the Terms.
 
-The Terms govern the use of the Platform, which is licensed solely to the person using it (**"You"**) by IDEO LP, a Delaware limited partnership, with a principal place of business at 150 Forest Avenue, Palo Alto, California 94301, USA (**"IDEO"**).
+The Terms govern the use of the Platform, which is licensed solely to the person using it (**"You"**) by IDEO LP, a Delaware limited partnership, with a principal place of business at 501 The Embarcadero, San Francisco, California 94105, USA (**"IDEO"**).
 
 
 
-## DEFINITIONS
+1.
+**DEFINITIONS**
 "**Personal Data**" means information which can be used to identify a person including but not limited to name, email address, or images.
 
-**"Site"** means the website owned and operated by IDEO that is accessed at [www.shape.space](https://www.shape.space) or any successor Site, and which is intended by the parties to incorporate the Platform to which these Terms apply.
+**"Site"** means the website owned and operated by IDEO that is accessed at [www.shape.space](www.shape.space) or any successor Site, and which is intended by the parties to incorporate the Platform to which these Terms apply.
 
-**"Platform"** means the online platform owned by IDEO known as "Shape," and which may be accessed at the Site.  The Platform includes  all source code, object code, architecture, designs, functionality, content (excluding User Content), features, templates, and documentation or other websites embodied in and related to the Platform, as well as all uploads, updates and customisations to any of the foregoing, including New Features.
+**"Platform"** means the online platform owned by IDEO known as "Shape," and which may be accessed at the Site. The Platform includes all source code, object code, architecture, designs, functionality, content (excluding User Content), features, templates, and documentation or other websites embodied in and related to the Platform, as well as all uploads, updates and customisations to any of the foregoing, including New Features.
 
 **"User"** means any user, or team of users of the Platform.
 
-"**User Content**" means all copyrighted content created, or owned, by a User and incorporated on the Platform including but not limited to postings and communication from and between u=Users of the Platform.
+"**User Content**" means all copyrighted content created, or owned, by a User and incorporated on the Platform including but not limited to postings and communication from and between Users of the Platform.
+
+"**Survey**" means the survey template feature of the Platform that allows Users to obtain anonymous feedback from a distribution of respondents.
+
+"**Respondents" **means respondents to a survey distributed by User or IDEO on User's behalf.
 
 
 
-## LICENSE; OWNERSHIP
-**2.1 License; Restrictions.  **Subject to Your compliance with the Terms, IDEO grants to You during the Term, a personal, non-transferable, non-exclusive license, without right to sublicense, to: (i) access and use the Platform for the purposes necessary to access, register on and utilize the Site including: making submissions and postings to the Platform; using templates and other IDEO content available on the Platform; forming teams and communicating with other Users; and recording and undertaking research. The Platform and Site are the proprietary property of IDEO. You shall not, and shall not permit any third party to, use or copy the Platform, the Site or any element thereof except as expressly permitted herein. You shall not adapt, modify, disassemble, decompile or reverse engineer the Platform in whole or in part or introduce any virus or trojan horse, software code or programs, which are intended to or are likely to be harmful or affect the functionality of the Platform or the Site, or let any third party do so, except only to the extent the foregoing are not permitted to be restricted under applicable law. All rights not expressly granted herein are retained by IDEO. No right or license is granted or implied to You under any of IDEO's patents, copyrights, trademarks, trade names, service marks or other intellectual property rights beyond the rights set forth in these Terms.
+1.
+**LICENSE; OWNERSHIP**
+
+**2.1 License; Restrictions.  **Subject to Your compliance with the Terms, IDEO grants to You during the Term, a personal, non-transferable, non-exclusive license, without right to sublicense, to access and use the Platform for the purposes necessary to access, register on and utilize the Site including: making submissions and postings to the Platform; using templates and other IDEO content available on the Platform; forming teams and communicating with other Users; and recording and undertaking research. The Platform and Site are the proprietary property of IDEO. You shall not, and shall not permit any third party to, use or copy the Platform, the Site or any element thereof except as expressly permitted herein. You shall not adapt, modify, disassemble, decompile or reverse engineer the Platform in whole or in part or introduce any virus or trojan horse, software code or programs, which are intended to or are likely to be harmful or affect the functionality of the Platform or the Site, or let any third party do so, except only to the extent the foregoing are not permitted to be restricted under applicable law. All rights not expressly granted herein are retained by IDEO. No right or license is granted or implied to You under any of IDEO's patents, copyrights, trademarks, trade names, service marks or other intellectual property rights beyond the rights set forth in these Terms.
 
 **2.2 Ownership.  **IDEO retains all right, title and interest in and to the Platform and the Site. Title to and ownership of any modifications or customisations of the Platform shall be held exclusively by IDEO. You grant IDEO the right and license to make, use, sell, reproduce, modify, sublicense, disclose, distribute and otherwise exploit error reports, corrections, and suggestions provided by You directly or indirectly (for example, in the reporting of faults) concerning the Platform and modifications based thereon. You acknowledge that IDEO owns all intellectual property and other rights in any reports or other material generated using Analytics Data (as defined in Section 2.3 below). You agree to perform such acts, and execute and deliver such instruments and documents, and do all other things as may be reasonably necessary to evidence or perfect the rights of IDEO set forth in this Section 2.2.
 
 **2.3 Use of Analytics Data.**  You acknowledge and grant IDEO the right to use, create, process, review, evaluate, copy, analyse Analytics Data. **"Analytics Data"** as used in these Terms means data generated by and in relation to the Platform and the Site including but not limited to:
 
 
-(a) Participation levels and general behavior patterns of Users by category;
 
-(b) Industry sector and occupation data of Users;
+1.
+Participation levels and general behavior patterns of Users by category;
 
-(c) Level and nature of collaboration between Users;
 
-(d) Level and format of device of Users (such as desktop computer, mobile device);
+1.
+Industry sector and occupation data of Users;
 
-(e) Time spent by Users on Site;
 
-(f) Behaviour of Users on individual functions of the Platform, and any feature of the Site;
+1.
+Level and nature of collaboration between Users;
 
-(g) Data related to User content (such as the effectiveness of the Platform in facilitating User objectives and analysing return on investment);
 
-(h) Trending topics among Users; and
+1.
+Level and format of device of Users (such as desktop computer, mobile device);
 
-(i) Impact of bugs or Platform errors on User activity.
 
+1.
+Time spent by Users on Site;
+
+
+1.
+Behaviour of Users on individual functions of the Platform, and any feature of the Site;
+
+
+1.
+Data related to User Content (such as the effectiveness of the Platform in facilitating User objectives and analysing return on investment);
+
+
+1.
+Data related to Surveys such as response rate and quality
+
+
+1.
+Trending topics among Users; and
+
+
+1.
+Impact of bugs or Platform errors on User activity.
 IDEO uses Analytics Data primarily for its internal purposes to improve IDEO products and services, tailor such services to Users, and to add to its innovation development and learnings.
 
 Where Analytics Data is disclosed to or accessed by any third party (except IDEO subcontractors including third party providers of tools who may have access), (i) personally identifiable information will be anonymised, and (ii) business information will be  de-identified, and aggregated.
 
 **2.4 Personal Data on the Site.  **In addition to IDEO's use of Analytics Data, IDEO will process Your Personal Data in accordance with IDEO's [Privacy Policy](https://www.ideo.com/privacy) (as updated from time to time).
 
-As part of Your use of the Platform and its features, You may receive Personal Data from other Users, Your own team members, employees and associates of IDEO, as well as individuals involved in research of concepts and testing. You agree to comply with applicable privacy laws in relation to such Personal Data including but not limited to:
+As part of Your use of the Platform and its features, You may receive Personal Data from other Users, Your own team members, employees and associates of IDEO, as well as Respondents or other individuals involved in research of concepts and testing. You agree to comply with applicable privacy laws in relation to such Personal Data including but not limited to:
 
-(a) Ensuring you have the legal right (such as consent) to post Personal Data on the Site;
+(a)	Ensuring you have the legal right (such as consent) to post Personal Data on the Site;
 
-(b) Using Personal Data only for the purposes authorized by the individual to whom the Personal Data relates;
+(b)	Using Personal Data only for the purposes authorized by the individual to whom the Personal Data relates;
 
-(c) Only using Personal Data received by IDEO (including but not limited to research feedback materials that identify an individual such as name, images, video, voice recordings (**"Feedback Materials"**) for Your internal evaluation purposes related to the particular project, concept, product, or service about which You sought feedback from IDEO;
+(c)	Refraining from collecting Personal Data in Surveys at all - IDEO will not obtain consent for this type of collection from Respondents. Surveys are intended to be anonymous to Users.
 
-(d) Using Personal Data for legitimate purposes only and only for the duration that is necessary;
+(d) Only using Personal Data received by IDEO (including but not limited to research feedback materials that identify an individual such as name, images, video, voice recordings (**"Feedback Materials"**) for Your internal evaluation purposes related to the particular project, concept, product, or service about which You sought feedback from IDEO;
 
-(e) On request for deletion, copies or amendment of the Personal Data held, stored or posted by You on the Site (or obtained via the Site), (i) informing IDEO of such requests; and (ii) complying with such requests in accordance with applicable laws.
+(e)	Using Personal Data for legitimate purposes only and only for the duration that is necessary;
 
-**2.5** **Acceptable Use Policy**. IDEO retains the right to review, edit or delete from the Platform any User Content IDEO deems, in its discretion, illegal, offensive, damaging to the reputation of IDEO, or otherwise inappropriate, including disrupting the normal flow of the Site or Platform, participating in negative dialogue on the Platform or otherwise acting in a manner that negatively affects other Users; or posting any unsolicited chain letters, advertising, promotional materials, contests, or any other commercial or non-commercial solicitations. IDEO does not assess or guarantee the quality or safety of any events or activities organized in connection with Users' participation on the Platform, and Your decision to participate in any such events and communicate with Users of the Site or Platform is entirely at Your own risk. IDEO has the right to investigate violations of this TOU or conduct that affects the Platform or the Site. IDEO may also consult and cooperate with law enforcement authorities and regulators regarding Users who violate the law. You are solely responsible for all of Your communications and interactions with other Users of the Platform and with other persons with whom You communicate or interact as a result of Your use of the Platform.
+(f)	On request for deletion, copies or amendment of the Personal Data held, stored or posted by You on the Site (or obtained via the Site), (i) informing IDEO of such requests; and (ii) complying with such requests in accordance with applicable laws.
 
-
-
-## LIABILITY.
-You acknowledge and agree that IDEO does not control or dictate Your use of the Platform or Site (except as regards Section 2.5 of this TOU), including but not limited to Your postings, Your contributions, use of other user contributions to the Platform, interaction with other Users, or individuals You contact as part of research activities on the Platform. Therefore, You agree to defend and indemnify IDEO, its employees, directors, contractors, and assigns from and against any claims, including reasonable legal and expert fees and costs incurred by IDEO in connection with Your use of the Platform or Site, where a third party alleges (i) that it has been damaged by such use, (ii) any claim of misappropriation or infringement by Your use of the Site or Platform, (iii) any claim of infringement by You of Personal Data rights of any individual, or (iv) any claim of third party intellectual property infringement or breach of confidentiality due to Your User Content.
+**2.5** **Acceptable Use Policy**. IDEO retains the right to review, edit or delete from the Platform any User Content IDEO deems, in its discretion, illegal, offensive, damaging to the reputation of IDEO, or otherwise inappropriate, including disrupting the normal flow of the Site or Platform, participating in negative dialogue on the Platform or otherwise acting in a manner that negatively affects other Users or Respondents; or posting any unsolicited chain letters, advertising, promotional materials, contests, or any other commercial or non-commercial solicitations. IDEO does not assess or guarantee the quality or safety of any events or activities organized in connection with Users' participation on the Platform, and Your decision to participate in any such events and communicate with Users of the Site or Platform is entirely at Your own risk. IDEO has the right to investigate violations of this TOU or conduct that affects the Platform or the Site. IDEO may also consult and cooperate with law enforcement authorities and regulators regarding Users who violate the law. You are solely responsible for all of Your communications and interactions with other Users of the Platform, Respondents and with other persons with whom You communicate or interact as a result of Your use of the Platform.
 
 
 
-## WARRANTY DISCLAIMER; LIMITATION OF LIABILITY
+1.
+**LIABILITY.**
+
+You acknowledge and agree that IDEO does not control or dictate Your use of the Platform or Site (except as regards Section 2.5 of this TOU), including but not limited to Your postings, Your contributions, use of other user contributions to the Platform, interaction with other Users, content or format of Surveys distributed by your or on your behalf, or individuals You contact as part of research activities on the Platform. Therefore, You agree to defend and indemnify IDEO, its employees, directors, contractors, and assigns from and against any claims, including reasonable legal and expert fees and costs incurred by IDEO in connection with Your use of the Platform or Site, where a third party alleges (i) that it has been damaged by such use, (ii) any claim of misappropriation or infringement by Your use of the Site or Platform, (iii) any claim of infringement by You of Personal Data rights of any individual, or (iv) any claim of third party intellectual property infringement or breach of confidentiality due to Your User Content (v) breach of applicable law including but not limited to laws related to discriminatory behavior.
+
+
+
+1.
+**WARRANTY DISCLAIMER; LIMITATION OF LIABILITY**
+
 EXCEPT AS MAY BE EXPRESSLY SET FORTH HEREUNDER, THE PLATFORM AND SITE ARE PROVIDED "AS IS" AND IDEO MAKES NO WARRANTIES OF ANY KIND, WHETHER EXPRESS, IMPLIED OR STATUTORY, INCLUDING ANY WARRANTIES OF MERCHANTABILITY, NON-INFRINGEMENT OF INTELLECTUAL PROPERTY RIGHTS, OR FITNESS FOR A PARTICULAR PURPOSE, ALL OF WHICH ARE EXPRESSLY DISCLAIMED.
 
 IN NO EVENT SHALL IDEO BE LIABLE FOR ANY INCIDENTAL, CONSEQUENTIAL, SPECIAL, OR INDIRECT DAMAGES OF ANY KIND, INCLUDING WITHOUT LIMITATION THOSE RELATING TO LOSS OF USE, INTERRUPTION OF BUSINESS AND/OR COST OF PROCUREMENT OF SUBSTITUTE GOODS, REGARDLESS OF THE FORM OF ACTION, WHETHER IN CONTRACT, TORT OR OTHERWISE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. IN NO EVENT SHALL IDEO'S AGGREGATE LIABILITY EXCEED $10,000.
@@ -88,10 +122,12 @@ NOTHING IN THESE TERMS SHALL EXCLUDE OR RESTRICT IDEO'S LIABILITY FOR FRAUD, OR 
 
 
 
-## PAYMENT, TERM AND TERMINATION.
-**5.1 ** **Free Trials**. Where You signed up as part of a free trial, You will not be charged until Your free trial period expires, after which You will be charged automatically on an ongoing basis in accordance with the following section:
+1.
+**PAYMENT, TERM AND TERMINATION. **
 
-**5.2 Payment Terms. Your first payment shall be made in advance, at the monthly price stated at checkout on the billing page, and shall continue in monthly rolling payments on an ongoing basis thereafter, until You choose to cancel. IDEO shall collect these payments every month using the credit card or bank account details provided to IDEO at checkout for the first payment. You can cancel any time and, upon cancellation, Your subscription will terminate at the end of that current billing cycle. This means that if You took out Your subscription on March 1, and cancel 15 days into the billing cycle e.g on March 15, Your cancellation will take effect on March 30. The minimum purchase period is one month**. **You can cancel by amending Your billing settings on the billing page and unsubscribing.**
+**5.1 ** **Free Trials**. Where You signed yourself or other Users up as part of a free trial, You will not be charged: (a) until Your free trial period expires in accordance with the applicable offer you redeem on the billing page; b) unless you exceed the number of Users who may benefit from the applicable offer, after/in excess of which You will be charged automatically on an ongoing basis in accordance with the following section:
+
+**5.2 Payment Terms. Your first payment shall be made on the first day of the month after you sign up, at the monthly price per active user stated at checkout on the billing page, and shall continue in monthly rolling payments on an ongoing basis thereafter, until You choose to cancel. "Active User" means a person who accesses and views the Platform within a 3 month period. If a user has accessed the instance but then takes no action and does not view Shape for 3 months, they become inactive and You will no longer be charged for them. Charges related to Active Users will be calculated on a prorated basis in their first month depending on when they join. So, if e.g 5 Users join 8 days from the end of a 30-day month, on the first day of the following month, You will pay [the monthly price] x (8/30) x 5 for those 5 Users and full price for the following full months. IDEO shall collect these payments every month using the credit card or bank account details provided to IDEO at checkout for the first payment. You can cancel any time and, upon cancellation, Your subscription will terminate at the end of that current billing cycle. This means that if You took out Your subscription on March 1, and cancel 15 days into the billing cycle e.g on March 15, Your cancellation will take effect on March 30. The minimum purchase period is one month**. **You can cancel by amending Your billing settings on the billing page and unsubscribing.**
 
 **5.3 Term.**  The Terms shall remain in full force and effect until terminated as provided herein.
 
@@ -101,8 +137,10 @@ NOTHING IN THESE TERMS SHALL EXCLUDE OR RESTRICT IDEO'S LIABILITY FOR FRAUD, OR 
 
 
 
-## MISCELLANEOUS
-**6.1  Entire Agreement; No Waiver; Severability.** If any provision of these Terms is found to be invalid or unenforceable, such provision shall be severed from the Terms.
+1.
+**MISCELLANEOUS**
+
+**6.1  Entire Agreement; No Waiver; Severability.** If any provision of these Terms is found to be invalid or unenforceable, such provision shall be severed from the Terms. No additional or  adjacent agreement or terms of use by any party other than IDEO shall contravene or supercede the Terms. In any conflict between contractual provisions located on the Platform or connected to the Platform, and the Terms, whether or not additional third party provisions are explicitly agreed by User, these Terms shall control.
 
 **6.2** **Amendment of Terms**. IDEO reserves the right to amend these Terms at its discretion without further notice or approval by You, except as required under applicable law. Your continued use of the Platform or Site following the posting of changes or modifications will constitute and confirm Your agreement to and acceptance of such changes or modifications. If You do not agree to the amended TOU, please discontinue using the Site and Platform. Because our services are evolving over time, we may change or discontinue all or any part of the Platform or Site, at any time and without notice, at our sole discretion.
 
@@ -113,7 +151,6 @@ NOTHING IN THESE TERMS SHALL EXCLUDE OR RESTRICT IDEO'S LIABILITY FOR FRAUD, OR 
 **6.5  Notices. ** Any notice You wish to give in accordance with the Terms shall be in writing and mailed or delivered to IDEO at:  General Counsel, 150 Forest Avenue, Palo Alto, California 94301, with an email copy to [legalnotice@ideo.com](mailto:legalnotice@ideo.com). Notices shall be deemed to have been duly given upon delivery when sent by express mail or certified mail, return receipt requested.
 
 **6.6  Publicity.**  You shall not use IDEO's name, marks, or logos in any way without IDEO's prior written consent in each instance which may be withheld in IDEO's sole discretion.
-
 `
 
 export default touMarkdown
