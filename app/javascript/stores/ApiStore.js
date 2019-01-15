@@ -434,7 +434,7 @@ class ApiStore extends jsonapi(datxCollection) {
         record.roles = roles
       }
       _.each(roles, role => {
-        role.resource = record
+        if (!role.resource) role.resource = record
         role.updateCount(status, res.meta.total)
         // first page load should automatically set role.users and role.groups via datx
         // next page loads we need to manually concatenate
