@@ -323,7 +323,8 @@ class User < ApplicationRecord
 
   def archive!
     archived!
-    DeprovisionUserWorker.perform_async(id)
+    # NOTE: this is disabled, was creating way too many Zendesk tickets
+    # DeprovisionUserWorker.perform_async(id)
   end
 
   private
