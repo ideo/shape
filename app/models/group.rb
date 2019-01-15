@@ -51,6 +51,7 @@ class Group < ApplicationRecord
 
   # Searchkick Config
   searchkick callbacks: :async, word_start: %i[name handle]
+  scope :search_import, -> { where(archived: false) }
 
   def search_data
     {
