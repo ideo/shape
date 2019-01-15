@@ -34,16 +34,14 @@ class Collection
       submissions_collection.save
     end
 
+    def submissions
+      return [] unless submissions_collection
+      submissions_collection.collections
+    end
+
     def destroyable?
       # destroyable if it hasn't finished setting up
       submission_box_type.nil?
-    end
-
-    # this override is so that Roles::AddToChildren will also add the same roles
-    # to all the submissions (which are technically children of the submissions_collection)
-    def children
-      return super if submissions_collection.nil?
-      (items + collections + submissions_collection.children)
     end
 
     def available_submission_tests(for_user:, omit_id: nil)
@@ -51,7 +49,7 @@ class Collection
       sub_attrs = submission_template.submission_attrs
       # none are available if the editor has not launched
       return [] if sub_attrs.blank? || sub_attrs['test_status'] != 'live'
-      test_ids = submissions_collection.collections.map do |submission|
+      test_ids = submissions.map do |submission|
         submission.submission_attrs['launchable_test_id']
       end
       if for_user.present?

@@ -4,9 +4,13 @@ class SerializableCollection < BaseJsonSerializer
   attributes :created_at, :updated_at, :name, :organization_id,
              :master_template, :template_id,
              :submission_box_type, :submission_box_id, :submission_template_id,
-             :test_status, :collection_to_test_id
+             :test_status, :collection_to_test_id, :hide_submissions
 
-  has_many :roles
+  has_many :roles do
+    data do
+      @object.anchored_roles
+    end
+  end
   has_one :parent_collection_card
   has_one :parent
   has_one :live_test_collection
@@ -113,13 +117,17 @@ class SerializableCollection < BaseJsonSerializer
     @object.submission_box_template_test?
   end
 
+  attribute :is_inside_hidden_submission_box do
+    @object.inside_hidden_submission_box?
+  end
+
   attribute :submission_attrs, if: -> { @object.submission_attrs.present? } do
     @object.submission_attrs
   end
 
-  # attribute :is_inside_a_submission, if: -> { @object.inside_a_submission? } do
-  #   @object.inside_a_submission?
-  # end
+  attribute :is_inside_a_submission, if: -> { @object.inside_a_submission? } do
+    @object.inside_a_submission?
+  end
 
   attribute :template_num_instances do
     if @object.master_template?

@@ -49,15 +49,9 @@ describe Api::V1::RolesController, type: :request, json: true, auth: true do
       let!(:collection) { create(:collection, organization: organization, add_editors: [user]) }
       let(:path) { "/api/v1/collections/#{collection.id}/roles" }
 
-      it 'returns a 200' do
+      it 'returns a 204 no_content' do
         post(path, params: params)
-        expect(response.status).to eq(200)
-      end
-
-      it 'returns one role' do
-        post(path, params: params)
-        expect(json['data'].size).to eq(1)
-        expect(json['data'].first['attributes']['name']).to eq('editor')
+        expect(response.status).to eq(204)
       end
 
       it 'adds role to users' do
@@ -83,9 +77,9 @@ describe Api::V1::RolesController, type: :request, json: true, auth: true do
       let!(:collection_card) { create(:collection_card, item: item, parent: collection) }
       let(:path) { "/api/v1/items/#{item.id}/roles" }
 
-      it 'returns a 200' do
+      it 'returns a 204 no_content' do
         post(path, params: params)
-        expect(response.status).to eq(200)
+        expect(response.status).to eq(204)
       end
 
       it 'adds role to users' do
@@ -94,14 +88,14 @@ describe Api::V1::RolesController, type: :request, json: true, auth: true do
       end
     end
 
-    context 'on an group' do
+    context 'on a group' do
       let!(:group) { create(:group, organization: organization, add_admins: [user]) }
       let(:path) { "/api/v1/groups/#{group.id}/roles" }
       let!(:role_name) { 'member' }
 
-      it 'returns a 200' do
+      it 'returns a 204 no_content' do
         post(path, params: params)
-        expect(response.status).to eq(200)
+        expect(response.status).to eq(204)
       end
 
       it 'adds role to users' do
@@ -120,21 +114,28 @@ describe Api::V1::RolesController, type: :request, json: true, auth: true do
     let!(:viewers) { create_list(:user, 2, add_to_org: organization) }
     let(:num_cards) { 0 }
     let(:params) { { 'is_switching': false }.to_json }
+    let!(:collection) do
+      create(:collection,
+             num_cards: num_cards,
+             add_editors: [editor],
+             add_viewers: (viewers + [group]))
+    end
 
     context 'for a user' do
       let(:remove_viewer) { viewers[0] }
-      let(:path) { "/api/v1/users/#{remove_viewer.id}/roles/#{role.id}" }
-      let!(:collection) do
-        create(:collection,
-               num_cards: num_cards,
-               add_editors: [editor],
-               add_viewers: (viewers + [group]))
+      let(:params) do
+        {
+          role: { name: 'viewer' },
+          user_ids: [remove_viewer.id],
+          is_switching: false,
+        }.to_json
       end
       let(:role) { collection.roles.find_by(name: Role::VIEWER) }
+      let(:path) { "/api/v1/collections/#{collection.id}/roles/#{role.id}" }
 
-      it 'returns a 200' do
+      it 'returns a 204 no_content' do
         delete(path, params: params)
-        expect(response.status).to eq(200)
+        expect(response.status).to eq(204)
       end
 
       it 'matches Role schema' do
@@ -203,9 +204,9 @@ describe Api::V1::RolesController, type: :request, json: true, auth: true do
         context 'trying to remove yourself' do
           let(:path) { "/api/v1/users/#{remove_viewer.id}/roles/#{role.id}" }
 
-          it 'returns 200' do
+          it 'returns a 204 no_content' do
             delete(path, params: params)
-            expect(response.status).to eq(200)
+            expect(response.status).to eq(204)
           end
         end
       end
@@ -218,16 +219,23 @@ describe Api::V1::RolesController, type: :request, json: true, auth: true do
                add_editors: [group],
                add_viewers: viewers)
       end
-      let!(:role) { collection.roles.find_by(name: Role::EDITOR) }
-      let(:path) { "/api/v1/groups/#{group.id}/roles/#{role.id}" }
+      let(:params) do
+        {
+          role: { name: 'editor' },
+          group_ids: [group.id],
+          is_switching: false,
+        }.to_json
+      end
+      let(:role) { collection.roles.find_by(name: Role::EDITOR) }
+      let(:path) { "/api/v1/collections/#{collection.id}/roles/#{role.id}" }
 
       before do
         editor.add_role(Role::ADMIN, group)
       end
 
-      it 'returns 200' do
+      it 'returns a 204 no_content' do
         delete(path, params: params)
-        expect(response.status).to eq(200)
+        expect(response.status).to eq(204)
       end
 
       it 'deletes the GroupsRole record' do
@@ -269,10 +277,11 @@ describe Api::V1::RolesController, type: :request, json: true, auth: true do
       context 'user is not group member/admin' do
         before do
           editor.remove_role(Role::ADMIN, group)
+          editor.reload
         end
 
         it 'returns a 401' do
-          delete(path)
+          delete(path, params: params)
           expect(response.status).to eq(401)
         end
       end
@@ -282,9 +291,9 @@ describe Api::V1::RolesController, type: :request, json: true, auth: true do
           editor.add_role(Role::EDITOR, collection)
         end
 
-        it 'returns a 200' do
+        it 'returns a 204 no_content' do
           delete(path, params: params)
-          expect(response.status).to eq(200)
+          expect(response.status).to eq(204)
         end
 
         it 'deletes the GroupsRole record' do

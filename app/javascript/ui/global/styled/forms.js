@@ -122,6 +122,18 @@ export const TextButton = styled.button`
 `
 TextButton.displayName = 'StyledTextButton'
 
+export const ShowMoreButton = styled.button`
+  width: 100%;
+  text-align: center;
+  font-family: ${v.fonts.sans};
+  font-size: 0.875rem;
+  color: ${v.colors.commonMedium};
+  &:hover {
+    color: ${v.colors.black};
+  }
+`
+ShowMoreButton.displayName = 'ShowMoreButton'
+
 /** @component */
 export const TextField = styled.input`
   font-family: ${v.fonts.sans};

@@ -18,6 +18,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
            expose: {
              card_order: params[:card_order],
              current_record: @collection,
+             parent: @collection,
            }
   end
 
@@ -35,8 +36,9 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
       card = builder.collection_card
       # reload the user's roles
       current_user.reload.reset_cached_roles!
+      card.reload
       create_notification(card, :created)
-      render jsonapi: card.reload,
+      render jsonapi: card,
              include: [:parent, record: [:filestack_file]],
              expose: { current_record: card.record }
     else
@@ -253,6 +255,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
   def create_notification(card, action)
     # Only notify for archiving of collections (and not link cards)
     return if card.link?
+
     ActivityAndNotificationBuilder.call(
       actor: current_user,
       target: card.record,

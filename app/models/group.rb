@@ -54,7 +54,7 @@ class Group < ApplicationRecord
 
   def search_data
     {
-      name: name,
+      name: name.downcase,
       handle: handle,
       # listing this way makes it easier to search Users/Groups together
       organization_ids: [organization_id],
@@ -116,6 +116,11 @@ class Group < ApplicationRecord
     return true if guest? && organization.primary_group.can_edit?(user)
     # otherwise pass through to the normal resourceable method
     resourceable_can_edit?(user)
+  end
+
+  # just to make Groups play nice with resourceable shared methods
+  def roles_anchor_collection_id
+    nil
   end
 
   private

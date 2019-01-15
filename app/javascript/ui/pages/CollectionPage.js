@@ -11,7 +11,6 @@ import ChannelManager from '~/utils/ChannelManager'
 import CollectionGrid from '~/ui/grid/CollectionGrid'
 import FloatingActionButton from '~/ui/global/FloatingActionButton'
 import Loader from '~/ui/layout/Loader'
-import Deactivated from '~/ui/layout/Deactivated'
 import MoveModal from '~/ui/grid/MoveModal'
 import PageContainer from '~/ui/layout/PageContainer'
 import PageHeader from '~/ui/pages/shared/PageHeader'
@@ -289,10 +288,7 @@ class CollectionPage extends React.Component {
   )
 
   render() {
-    const { collection, isHomepage, apiStore, uiStore } = this.props
-    if (apiStore.currentOrgIsDeactivated) {
-      return <Deactivated />
-    }
+    const { collection, isHomepage, uiStore } = this.props
     if (!collection) {
       return this.loader()
     }

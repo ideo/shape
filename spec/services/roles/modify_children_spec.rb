@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe Roles::AddToChildren, type: :service do
+RSpec.describe Roles::ModifyChildren, type: :service do
   let!(:collection) { create(:collection, num_cards: 5) }
   let!(:subcollection_card) do
     create(:collection_card_collection, parent: collection)
@@ -9,15 +9,17 @@ RSpec.describe Roles::AddToChildren, type: :service do
   let(:group) { create(:group) }
   let(:users) { [user] }
   let(:groups) { [group] }
+  let(:method) { 'add' }
   let(:add_to_children) do
     # NOTE: Groups have shared collections so there will be existing group
     # roles when creating a group that will spoil the tests.
     GroupsRole.delete_all
-    Roles::AddToChildren.new(
+    Roles::ModifyChildren.new(
       role_name: role_name,
       parent: collection,
-      users_to_add: users,
-      groups_to_add: groups,
+      subject_users: users,
+      subject_groups: groups,
+      method: method,
     )
   end
 

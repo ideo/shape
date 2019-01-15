@@ -92,6 +92,9 @@ module RolifyExtensions
   end
 
   def add_resource_role(role, resource)
+    # anchored items/collections aren't allowed to have their own roles, you need to unanchor them first
+    return false if resource.roles_anchor_collection_id.present?
+
     existing = existing_resource_role_for_self(role)
     # if we're adding someone as editor/admin who's previously a different role
     should_upgrade = (
@@ -115,6 +118,9 @@ module RolifyExtensions
   end
 
   def remove_role(role_name, resource = nil)
+    # anchored items/collections aren't allowed to have their own roles, you need to unanchor them first
+    return false if resource.roles_anchor_collection_id.present?
+
     if resource.blank?
       role = Role.where(name: role_name, resource: nil).first
     else
@@ -154,6 +160,8 @@ module RolifyExtensions
 
   def upgrade_to_edit_role(resource)
     return unless is_a? User
+    return true if resource.can_edit? self
+
     other_roles = Role
                   .for_resource(resource)
                   .where.not(name: resource.class.edit_role)
