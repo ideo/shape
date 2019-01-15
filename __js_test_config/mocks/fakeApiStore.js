@@ -21,9 +21,7 @@ const fakeApiStore = ({
       .mockReturnValue(Promise.resolve())
       .mockName('fetchRoles'),
     sync: jest.fn().mockName('sync'),
-    loadCurrentUser: jest.fn(),
-    loadCurrentUserGroups: jest.fn().mockReturnValue(Promise.resolve()),
-    loadCurrentUserAndGroups: jest.fn().mockReturnValue(Promise.resolve()),
+    loadCurrentUser: jest.fn().mockReturnValue(Promise.resolve()),
     searchUsersAndGroups: jest
       .fn()
       .mockReturnValue(Promise.resolve({ data: [] })),
@@ -31,6 +29,7 @@ const fakeApiStore = ({
       .fn()
       .mockReturnValue(Promise.resolve({ data: [] })),
     searchCollections: jest.fn().mockReturnValue(Promise.resolve({ data: [] })),
+    searchRoles: jest.fn().mockReturnValue(Promise.resolve({ data: [] })),
     setCurrentUserId: jest.fn(),
     findOrganizationById: jest.fn().mockReturnValue({ name: 'abc' }),
     fetchThreads: jest.fn().mockReturnValue(Promise.resolve()),

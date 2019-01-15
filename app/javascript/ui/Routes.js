@@ -58,7 +58,7 @@ const FixedActivityLogWrapper = styled.div`
 class Routes extends React.Component {
   componentDidMount() {
     const { apiStore } = this.props
-    apiStore.loadCurrentUserAndGroups().then(() => {
+    apiStore.loadCurrentUser().then(() => {
       firebaseClient.authenticate(apiStore.currentUser.google_auth_token)
     })
     document.addEventListener('keydown', captureGlobalKeypress)

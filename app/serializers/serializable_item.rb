@@ -4,7 +4,12 @@ class SerializableItem < BaseJsonSerializer
              :url, :thumbnail_url, :icon_url, :question_type,
              :data_source_type, :data_source_id, :data_settings
 
-  has_many :roles
+  has_many :roles do
+    data do
+      @object.anchored_roles
+    end
+  end
+
   has_one :parent_collection_card
   has_one :parent
   belongs_to :data_source

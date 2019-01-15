@@ -132,7 +132,7 @@ module Templateable
         card_action: 'move',
         # don't need to go through the hassle of reassigning roles,
         # the cards being moved already have the correct ones
-        reassign_permissions: false,
+        # reassign_permissions: false,
       )
       moved_cards = card_mover.call
       # card_mover will return false if error

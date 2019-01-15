@@ -123,20 +123,6 @@ class OrganizationMenu extends React.Component {
     this.goToEditGroupRoles(group)
   }
 
-  onRolesSave = (res, { roleName = '' } = {}) => {
-    const { apiStore, organization } = this.props
-    const { editGroup } = this
-    if (roleName === 'admin' && editGroup.isOrgGroup) {
-      if (editGroup.is_primary) {
-        // reload the admin group
-        apiStore.fetchRoles(organization.admin_group)
-      } else if (editGroup.is_admin) {
-        // reload primary group
-        apiStore.fetchRoles(organization.primary_group)
-      }
-    }
-  }
-
   @action
   handleClose = ev => {
     this.props.onClose()
@@ -193,14 +179,13 @@ class OrganizationMenu extends React.Component {
     }
     return (
       <RolesMenu
+        record={this.editGroup}
         canEdit={this.editGroup.can_edit}
         ownerId={this.editGroup.id}
         ownerType="groups"
         fixedRole={fixedRole}
         title="Members:"
         addCallout="Add people:"
-        roles={this.editGroup.groupRoles}
-        onSave={this.onRolesSave}
       />
     )
   }

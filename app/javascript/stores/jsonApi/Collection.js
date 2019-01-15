@@ -8,6 +8,7 @@ import { apiUrl } from '~/utils/url'
 
 import BaseRecord from './BaseRecord'
 import CollectionCard from './CollectionCard'
+import Role from './Role'
 import SharedRecordMixin from './SharedRecordMixin'
 
 class Collection extends SharedRecordMixin(BaseRecord) {
@@ -148,6 +149,10 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     return this.type === 'Collection::SharedWithMeCollection'
   }
 
+  get canSetACover() {
+    return !this.isSharedCollection && !this.isUserCollection
+  }
+
   get isSubmissionBox() {
     return this.type === 'Collection::SubmissionBox'
   }
@@ -158,6 +163,11 @@ class Collection extends SharedRecordMixin(BaseRecord) {
 
   get isSubmission() {
     return this.submission_attrs && this.submission_attrs.submission
+  }
+
+  get isHiddenSubmission() {
+    if (!this.isSubmission) return false
+    return this.is_inside_hidden_submission_box && this.submission_attrs.hidden
   }
 
   get isSubmissionBoxTemplateOrTest() {
@@ -207,7 +217,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     // you also don't use test templates, since duplicating them or
     // creating them within another template is the way to do that
     return (
-      this.isMasterTemplate &&
+      !!this.isMasterTemplate &&
       !this.isProfileTemplate &&
       !this.is_submission_box_template &&
       !this.isTestDesign &&
@@ -440,6 +450,9 @@ class Collection extends SharedRecordMixin(BaseRecord) {
 
   reopenTest = () => this._performTestAction('reopen')
 
+  submitSubmission = () =>
+    this.apiStore.request(`collections/${this.id}/submit`, 'PATCH')
+
   async _fetchSubmissionTest() {
     // if it's a submission we have to look up its test in order to launch
     if (!this.launchableTestId) return false
@@ -503,11 +516,20 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     }
   }
 
-  API_setSubmissionBoxTemplate(data) {
-    return this.apiStore.request(
+  async API_setSubmissionBoxTemplate(data) {
+    await this.apiStore.request(
       `collections/set_submission_box_template`,
       'POST',
       data
+    )
+    // refetch cards because we just created a new one, for the template
+    return this.API_fetchCards()
+  }
+
+  API_clearCollectionCover() {
+    return this.apiStore.request(
+      `collections/${this.id}/clear_collection_cover`,
+      'POST'
     )
   }
 
@@ -576,6 +598,11 @@ class Collection extends SharedRecordMixin(BaseRecord) {
 Collection.refDefaults = {
   collection_cards: {
     model: CollectionCard,
+    type: ReferenceType.TO_MANY,
+    defaultValue: [],
+  },
+  roles: {
+    model: Role,
     type: ReferenceType.TO_MANY,
     defaultValue: [],
   },

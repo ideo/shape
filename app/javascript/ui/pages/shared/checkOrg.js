@@ -1,14 +1,16 @@
 import { apiStore, routingStore } from '~/stores'
 
 const checkOrg = match => {
+  // if we're already mid-switch don't start another one
+  if (apiStore.switchingOrgs) return true
+
   const { org } = match.params
   let path = `${routingStore.location.pathname}${routingStore.location.search}`
 
   if (
     match.path !== '/' &&
     match.path !== '/:org' &&
-    !match.path.match(/^(\/:org)?\/search/gi) &&
-    !match.path.match(/^\/collections|items/gi)
+    !match.path.match(/^(\/:org)?\/collections|items|search/gi)
   ) {
     // escape if we're not on homepage, search, or /collections/items
     return true

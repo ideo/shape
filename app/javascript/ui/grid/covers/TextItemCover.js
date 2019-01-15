@@ -3,27 +3,24 @@ import ReactDOM from 'react-dom'
 import { computed } from 'mobx'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import ReactQuill from 'react-quill'
-import styled from 'styled-components'
 
 import { apiStore, routingStore, uiStore } from '~/stores'
 import v from '~/utils/variables'
+import { ShowMoreButton } from '~/ui/global/styled/forms'
 import { QuillStyleWrapper } from '~/ui/global/styled/typography'
 import ActionCableConsumer from '~/utils/ActionCableConsumer'
 import InlineLoader from '~/ui/layout/InlineLoader'
 import TextItem from '~/ui/items/TextItem'
 import PaddedCardCover from './PaddedCardCover'
 
-const StyledReadMore = styled.div`
+const StyledReadMore = ShowMoreButton.extend`
   z-index: ${v.zIndex.gridCard};
   position: absolute;
   bottom: 0;
   left: 0;
-  width: 100%;
-  text-align: center;
   padding: 0.5rem;
-  opacity: 0.95;
+  opacity: 0.975;
   background: white;
-  font-size: 0.9rem;
 
   &:hover {
     background: ${v.colors.commonLightest};
@@ -187,7 +184,7 @@ class TextItemCover extends React.Component {
           {this.state.readMore &&
             !isEditing && (
               <StyledReadMore onClick={this.expand}>
-                read more...
+                Read more...
               </StyledReadMore>
             )}
         </QuillStyleWrapper>

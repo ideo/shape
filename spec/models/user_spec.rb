@@ -225,11 +225,12 @@ describe User, type: :model do
     let!(:user) { create(:user) }
     let(:organizations) { create_list(:organization, 2) }
 
-    it 'should include name, email, handle, organization_ids' do
+    it 'should include downcased name, email, handle, organization_ids' do
       expect(user.search_data).to eq(
-        name: user.name,
-        email: user.email,
-        handle: user.handle,
+        name: user.name.downcase,
+        email: user.email.downcase,
+        handle: user.handle.downcase,
+        status: user.status,
         organization_ids: [],
       )
     end
@@ -238,6 +239,7 @@ describe User, type: :model do
       before do
         user.add_role(:member, organizations[0].primary_group)
         user.add_role(:member, organizations[1].primary_group)
+        user.reload
       end
 
       it 'should have org ids' do
@@ -509,7 +511,8 @@ describe User, type: :model do
 
   describe '#archive!' do
     it 'archives the user' do
-      expect(DeprovisionUserWorker).to receive(:perform_async).with(user.id)
+      # -- worker is disabled, see note in user.rb
+      # expect(DeprovisionUserWorker).to receive(:perform_async).with(user.id)
       expect(user).to receive(:archived!)
       user.archive!
     end
