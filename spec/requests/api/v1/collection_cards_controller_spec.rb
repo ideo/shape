@@ -98,6 +98,26 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
       end
     end
 
+    context 'with hidden options' do
+      before do
+        collection.collection_cards.last.update(hidden: true)
+      end
+
+      it 'should omit hidden cards by default' do
+        get(path)
+        expect(json['data'].count).to eq 4
+      end
+
+      context 'with hidden = true' do
+        let(:path) { "/api/v1/collections/#{collection.id}/collection_cards?hidden=true" }
+
+        it 'should include hidden cards' do
+          get(path)
+          expect(json['data'].count).to eq 5
+        end
+      end
+    end
+
     context 'with sort options' do
       let(:path) { "/api/v1/collections/#{collection.id}/collection_cards?card_order=updated_at" }
       let(:collection_json) do

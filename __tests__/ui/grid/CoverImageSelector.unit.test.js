@@ -29,6 +29,7 @@ describe('CoverImageSelector', () => {
     const requestResult = { data: collection }
     apiStore = fakeApiStore({
       requestResult,
+      findResult: collection,
     })
     uiStore = fakeUiStore
 
@@ -131,13 +132,13 @@ describe('CoverImageSelector', () => {
         wrapper.update()
       })
 
-      it('should call the filestdk upload picker', () => {
+      it('should call the filestack upload picker', () => {
         expect(FilestackUpload.pickImage).toHaveBeenCalled()
       })
     })
   })
 
-  describe('onFilterOpionSelect', () => {
+  describe('onFilterOptionSelect', () => {
     beforeEach(() => {
       apiStore.find.mockReset()
       apiStore.find.mockReturnValue(collection)

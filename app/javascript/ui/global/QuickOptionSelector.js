@@ -26,6 +26,7 @@ class QuickOptionSelector extends React.Component {
       <div style={{ fontSize: 0 }}>
         {options.map(option => (
           <Tooltip
+            key={`${option.title} ${option.cardId}`}
             classes={{ tooltip: 'Tooltip' }}
             placement="top"
             title={option.title}
@@ -51,7 +52,7 @@ class QuickOptionSelector extends React.Component {
 QuickOptionSelector.propTypes = {
   options: PropTypes.arrayOf(
     PropTypes.shape({
-      cardId: PropTypes.number,
+      cardId: PropTypes.string,
       title: PropTypes.string,
       imageUrl: PropTypes.string,
       icon: PropTypes.node,

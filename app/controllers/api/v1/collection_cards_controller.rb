@@ -182,6 +182,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
       card_order: params[:card_order],
       page: params[:page] || 1,
       per_page: per_page,
+      hidden: params[:hidden].present?,
     )
   end
 

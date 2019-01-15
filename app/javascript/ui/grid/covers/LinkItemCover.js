@@ -42,7 +42,7 @@ const StyledLinkCover = styled.div`
 StyledLinkCover.displayName = 'StyledLinkCover'
 
 @observer
-class LinkItemCover extends React.PureComponent {
+class LinkItemCover extends React.Component {
   state = {
     iconError: false,
   }

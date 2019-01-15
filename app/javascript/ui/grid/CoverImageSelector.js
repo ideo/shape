@@ -2,8 +2,9 @@ import { Fragment } from 'react'
 import ReactDOM from 'react-dom'
 import _ from 'lodash'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
-import { observable, runInAction, toJS } from 'mobx'
+import { observable, action, runInAction, toJS } from 'mobx'
 import styled from 'styled-components'
+import FlipMove from 'react-flip-move'
 
 import CardActionHolder from '~/ui/icons/CardActionHolder'
 import CollectionCard from '~/stores/jsonApi/CollectionCard'
@@ -64,6 +65,8 @@ class CoverImageSelector extends React.Component {
   imageOptions = []
   @observable
   parentCard = null
+  @observable
+  loading = false
 
   componentDidMount() {
     const { card } = this.props
@@ -73,11 +76,16 @@ class CoverImageSelector extends React.Component {
     })
   }
 
+  @action
+  setLoading(val) {
+    this.loading = val
+  }
+
   async fetchOptions() {
     const { card } = this.props
     const collection = card.record
     if (card.record.internalType === 'items') return []
-    await card.record.API_fetchCards()
+    await card.record.API_fetchCards({ hidden: true })
     return _.take(
       collection.collection_cards
         .filter(ccard => ccard.record.isImage)
@@ -91,7 +99,9 @@ class CoverImageSelector extends React.Component {
   }
 
   async populateAllOptions() {
+    this.setLoading(true)
     const imageOptionsAll = await this.fetchOptions()
+    this.setLoading(false)
     runInAction(
       () =>
         (this.imageOptions = [
@@ -126,6 +136,7 @@ class CoverImageSelector extends React.Component {
     newLocalCard.parent = collection
     const newCard = await newLocalCard.API_create()
     uiStore.addNewCard(newCard.record.id)
+    // get collection with new collection_cover info attached
     apiStore.fetch('collections', collection.id, true)
   }
 
@@ -207,15 +218,23 @@ class CoverImageSelector extends React.Component {
               className="show-on-hover"
               width={this.imageOptions.length * 32}
             >
-              <QuickOptionSelector
-                options={toJS(this.imageOptions)}
-                onSelect={this.onImageOptionSelect}
-              />
-              <SmallBreak />
-              <QuickOptionSelector
-                options={filterOptions}
-                onSelect={this.onFilterOptionSelect}
-              />
+              {!this.loading && (
+                <FlipMove
+                  appearAnimation="elevator"
+                  duration={300}
+                  easing="ease-out"
+                >
+                  <QuickOptionSelector
+                    options={toJS(this.imageOptions)}
+                    onSelect={this.onImageOptionSelect}
+                  />
+                  <SmallBreak />
+                  <QuickOptionSelector
+                    options={filterOptions}
+                    onSelect={this.onFilterOptionSelect}
+                  />
+                </FlipMove>
+              )}
             </TopRightHolder>,
             this.parentCard
           )}

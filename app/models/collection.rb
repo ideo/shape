@@ -363,7 +363,7 @@ class Collection < ApplicationRecord
   def collection_cards_viewable_by(
     cached_cards,
     user,
-    card_order: nil, page: 1, per_page: CollectionCard::DEFAULT_PER_PAGE
+    card_order: nil, page: 1, per_page: CollectionCard::DEFAULT_PER_PAGE, hidden: false
   )
     can_view_collection = can_view?(user)
     return [] unless can_view_collection
@@ -388,8 +388,10 @@ class Collection < ApplicationRecord
           .pluck(:id)
 
     # pluck viewable ids and then convert to a paginated query
-    CollectionCard
-      .where(id: ids)
+    cards = CollectionCard.where(id: ids)
+    # `hidden` means include both hidden and unhidden cards
+    cards = cards.where(hidden: false) unless hidden
+    cards
       .includes(:collection, item: [:filestack_file])
       .order(order)
       .page(page)
@@ -562,6 +564,7 @@ class Collection < ApplicationRecord
     cover = primary_collection_cards.where(is_cover: true).first
     return if cover.nil?
     cover.update(is_cover: false)
+    touch
   end
 
   def reset_permissions!
