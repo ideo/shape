@@ -242,7 +242,7 @@ class CollectionCover extends React.Component {
   }
 
   render() {
-    const { height, width, filter, collection, uiStore, onClick } = this.props
+    const { height, width, collection, uiStore, onClick } = this.props
     const { cover } = collection
     const { gridW, gutter } = uiStore.gridSettings
 
@@ -259,7 +259,6 @@ class CollectionCover extends React.Component {
           width={width}
           gutter={gutter}
           gridW={gridW}
-          filter={filter}
         >
           <div className="overlay" />
           <div className="top">
@@ -297,7 +296,6 @@ CollectionCover.propTypes = {
   inSubmissionsCollection: PropTypes.bool,
   dragging: PropTypes.bool,
   onClick: PropTypes.func,
-  filter: PropTypes.string,
 }
 CollectionCover.wrappedComponent.propTypes = {
   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
@@ -306,7 +304,6 @@ CollectionCover.defaultProps = {
   inSubmissionsCollection: false,
   dragging: false,
   onClick: null,
-  filter: 'nothing',
 }
 
 CollectionCover.displayName = 'CollectionCover'
