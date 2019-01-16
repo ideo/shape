@@ -214,7 +214,7 @@ class CollectionCard < ApplicationRecord
         parent.queue_update_template_instances
       end
     end
-    CollectionCardArchiveWorker.new.perform(
+    CollectionCardArchiveWorker.perform_async(
       ids,
       # user_id is for the archive notification `actor`
       user_id,
