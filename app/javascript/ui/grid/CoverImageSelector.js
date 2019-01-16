@@ -56,7 +56,7 @@ const filterOptions = [
   },
 ]
 
-@inject('apiStore', 'uiStore')
+@inject('apiStore')
 @observer
 class CoverImageSelector extends React.Component {
   @observable
@@ -114,7 +114,7 @@ class CoverImageSelector extends React.Component {
   }
 
   createCard = async file => {
-    const { apiStore, uiStore, card } = this.props
+    const { apiStore, card } = this.props
     const collection = apiStore.find('collections', card.record.id)
     await collection.API_clearCollectionCover()
     const attrs = {
@@ -132,10 +132,9 @@ class CoverImageSelector extends React.Component {
       hidden: true,
     }
     Object.assign(cardAttrs, attrs)
-    const newLocalCard = new CollectionCard(cardAttrs, apiStore)
-    newLocalCard.parent = collection
-    const newCard = await newLocalCard.API_create()
-    uiStore.addNewCard(newCard.record.id)
+    const newCard = new CollectionCard(cardAttrs, apiStore)
+    newCard.parent = collection
+    await newCard.API_create()
     // get collection with new collection_cover info attached
     apiStore.fetch('collections', collection.id, true)
   }
@@ -248,7 +247,6 @@ CoverImageSelector.propTypes = {
 }
 CoverImageSelector.wrappedComponent.propTypes = {
   apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
-  uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 
 export default CoverImageSelector
