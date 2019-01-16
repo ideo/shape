@@ -77,6 +77,13 @@ describe('CommentThreadContainer', () => {
   })
 
   describe('loadMorePages', () => {
+    beforeEach(() => {
+      wrapper.setProps({ apiStore: { ...apiStore, hasOlderThreads: true } })
+    })
+    it('should render "Load older threads" button if more threads available', () => {
+      expect(wrapper.find('ShowMoreButton').exists()).toBeTruthy()
+    })
+
     it('should close expanded thread and call apiStore.loadNextThreadPage', () => {
       component.loadMorePages()
       expect(props.uiStore.expandThread).toHaveBeenCalledWith(null)
