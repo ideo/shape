@@ -29,7 +29,7 @@ class QuickOptionSelector extends React.Component {
             classes={{ tooltip: 'Tooltip' }}
             placement="top"
             title={option.title}
-            key={`${option.title} ${option.cardId}`}
+            key={`${option.title} ${option.cardId || option.imageUrl}`}
             PopperProps={{ style: { pointerEvents: 'none' } }}
           >
             <button onClick={e => this.handleClick(option, e)}>

@@ -86,20 +86,28 @@ class Item extends SharedRecordMixin(BaseRecord) {
     return this.type === ITEM_TYPES.TEXT
   }
 
-  get canBeSetAsCover() {
-    return this.isImage
-  }
-
-  get canSetACover() {
-    return this.type === ITEM_TYPES.VIDEO || this.type === ITEM_TYPES.LINK
-  }
-
   get isChart() {
     return this.type === ITEM_TYPES.CHART || this.type === ITEM_TYPES.DATA
   }
 
   get isData() {
     return this.type === ITEM_TYPES.DATA
+  }
+
+  get isVideo() {
+    return this.type === ITEM_TYPES.VIDEO
+  }
+
+  get isLink() {
+    return this.type === ITEM_TYPES.LINK
+  }
+
+  get canBeSetAsCover() {
+    return this.isImage
+  }
+
+  get canSetACover() {
+    return this.isVideo || this.isLink
   }
 
   get originalImageUrl() {

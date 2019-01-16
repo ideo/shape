@@ -16,6 +16,7 @@ class CollectionCard < ApplicationRecord
 
   before_create :assign_default_height_and_width
   after_update :update_collection_cover, if: :saved_change_to_is_cover?
+  after_update :touch_collection, if: :saved_change_to_filter?
   after_create :update_parent_card_count!
   after_save :set_collection_as_master_template,
              if: :test_collection_within_master_template_after_save?
@@ -354,5 +355,10 @@ class CollectionCard < ApplicationRecord
 
   def set_collection_as_master_template
     collection.update(master_template: true)
+  end
+
+  def touch_collection
+    return unless collection.present?
+    collection.touch
   end
 end

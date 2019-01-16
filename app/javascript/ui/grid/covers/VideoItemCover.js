@@ -54,6 +54,8 @@ class VideoItemCover extends React.Component {
     playing: false,
   }
 
+  componentDidMount() {}
+
   playVideo = () => {
     const { item, dragging } = this.props
     // don't play the video if we drag by grabbing the play button
@@ -65,28 +67,26 @@ class VideoItemCover extends React.Component {
 
   render() {
     const { item } = this.props
-    let thumbnail = item.thumbnail_url
-    // NOTE: This is sort of a workaround to disable the default thumbnail_url (gradient square)
-    // as well as getting around the fact that videos currently have thumbnail_url required
-    if (thumbnail === v.defaults.video.thumbnailUrl) {
-      thumbnail = null
-    }
+    const thumbnail = item.thumbnail_url
+    const showPlayer = !thumbnail
     return (
-      <StyledVideoCover playing={this.state.playing}>
-        <StyledImageCover
-          className="not-playing"
-          url={thumbnail}
-          bgColor={v.colors.commonDark}
-        >
-          <Flex className="inner" align="center" justify="center">
-            <Box>
-              <button className="cancelGridClick" onClick={this.playVideo}>
-                &#9658;
-              </button>
-            </Box>
-          </Flex>
-          <div className="overlay" />
-        </StyledImageCover>
+      <StyledVideoCover playing={this.state.playing || showPlayer}>
+        {thumbnail && (
+          <StyledImageCover
+            className="not-playing"
+            url={thumbnail}
+            bgColor={v.colors.commonDark}
+          >
+            <Flex className="inner" align="center" justify="center">
+              <Box>
+                <button className="cancelGridClick" onClick={this.playVideo}>
+                  &#9658;
+                </button>
+              </Box>
+            </Flex>
+            <div className="overlay" />
+          </StyledImageCover>
+        )}
         <div className="playing">
           <FullAbsoluteParent>
             <StyledTopLeftActions className="show-on-hover">

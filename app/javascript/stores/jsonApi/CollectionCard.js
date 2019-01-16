@@ -24,6 +24,7 @@ class CollectionCard extends BaseRecord {
     'image_contain',
     'is_cover',
     'hidden',
+    'filter',
   ]
 
   @observable

@@ -12,7 +12,7 @@ let apiStore, card, collection, uiStore
 let props = {}
 let rerender
 const fakeEv = { preventDefault: jest.fn() }
-let component, wrapper
+let component, wrapper, innerWrapper
 
 describe('CoverImageSelector', () => {
   beforeEach(() => {
@@ -43,9 +43,11 @@ describe('CoverImageSelector', () => {
       apiStore,
       uiStore,
     }
-    rerender = () => {
-      wrapper = shallow(<CoverImageSelector.wrappedComponent {...props} />)
+    rerender = (opts = {}) => {
+      const newProps = { ...props, ...opts }
+      wrapper = shallow(<CoverImageSelector.wrappedComponent {...newProps} />)
       component = wrapper.instance()
+      innerWrapper = shallow(component.renderInner())
     }
     rerender()
   })
@@ -54,11 +56,28 @@ describe('CoverImageSelector', () => {
     it('should render a card action holder', () => {
       expect(wrapper.find(CardActionHolder).exists()).toBe(true)
     })
+  })
 
-    describe('when the selector is open', () => {
+  describe('renderInner()', () => {
+    it('should render the QuickOptionSelectors for images and filters', () => {
+      expect(innerWrapper.find('QuickOptionSelector').length).toEqual(2)
+    })
+
+    describe('with a VideoItem that has no thumbnail_url', () => {
       beforeEach(() => {
-        component.open = true
-        wrapper.update()
+        rerender({
+          card: {
+            record: {
+              internalType: 'items',
+              type: 'Item::VideoItem',
+              thumbnail_url: null,
+            },
+          },
+        })
+      })
+
+      it('should not render the second QuickOptionSelector for filters', () => {
+        expect(innerWrapper.find('QuickOptionSelector').length).toEqual(1)
       })
     })
   })
@@ -151,10 +170,6 @@ describe('CoverImageSelector', () => {
 
     it('should save the card', () => {
       expect(props.card.save).toHaveBeenCalled()
-    })
-
-    it('should refetch the collection', () => {
-      expect(apiStore.fetch).toHaveBeenCalled()
     })
   })
 })

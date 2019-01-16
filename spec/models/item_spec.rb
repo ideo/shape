@@ -12,6 +12,27 @@ RSpec.describe Item, type: :model do
     it { should belong_to :cloned_from }
   end
 
+  context 'callbacks' do
+    describe '#cache_previous_thumbnail_url' do
+      let(:item) { create(:video_item) }
+
+      it 'should save the previous thumbnail_url in the cached array' do
+        prev_url = item.thumbnail_url
+        expect {
+          item.update(thumbnail_url: 'http://new.image.com/x.jpg')
+        }.to change(item, :previous_thumbnail_urls)
+        expect(item.reload.previous_thumbnail_urls).to match_array([prev_url])
+      end
+
+      it 'should save up to 9 thumbnail_urls' do
+        (1..10).each do |i|
+          item.update(thumbnail_url: "http://new.image.com/x#{i}.jpg")
+        end
+        expect(item.reload.previous_thumbnail_urls.count).to eq 9
+      end
+    end
+  end
+
   describe '#duplicate!' do
     let(:user) { create(:user) }
     let!(:collection) { create(:collection, num_cards: 1) }

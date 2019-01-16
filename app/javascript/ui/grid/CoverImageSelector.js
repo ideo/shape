@@ -27,10 +27,15 @@ const uploadOption = {
   title: 'upload new image',
   icon: <UploadIcon />,
 }
-const backgroundOption = {
+const collectionBackgroundOption = {
   type: 'remove',
   title: 'gray',
   color: v.colors.commonDark,
+}
+const linkBackgroundOption = {
+  type: 'remove',
+  title: 'black',
+  color: v.colors.black,
 }
 
 const TopRightHolder = styled.div`
@@ -81,11 +86,22 @@ class CoverImageSelector extends React.Component {
     this.loading = val
   }
 
+  get recordIsCollection() {
+    return this.props.card.record.internalType === 'collections'
+  }
+
   async fetchOptions() {
     const { card } = this.props
-    const collection = card.record
-    if (card.record.internalType === 'items') return []
-    await card.record.API_fetchCards({ hidden: true })
+    const { record } = card
+    if (!this.recordIsCollection) {
+      if (!record.previous_thumbnail_urls) return []
+      return record.previous_thumbnail_urls.map(url => ({
+        title: 'previous image',
+        imageUrl: url,
+      }))
+    }
+    const collection = record
+    await collection.API_fetchCards({ hidden: true })
     return _.take(
       collection.collection_cards
         .filter(ccard => ccard.record.isImage)
@@ -99,18 +115,22 @@ class CoverImageSelector extends React.Component {
   }
 
   async populateAllOptions() {
+    const { record } = this.props.card
     this.setLoading(true)
     const imageOptionsAll = await this.fetchOptions()
     this.setLoading(false)
-    runInAction(
-      () =>
-        (this.imageOptions = [
-          removeOption,
-          ...imageOptionsAll,
-          backgroundOption,
-          uploadOption,
-        ])
-    )
+    let bgOption = null
+    if (this.recordIsCollection) {
+      bgOption = collectionBackgroundOption
+    } else if (record.isLink) {
+      bgOption = linkBackgroundOption
+    }
+    runInAction(() => {
+      const options = [removeOption, ...imageOptionsAll]
+      if (bgOption) options.push(bgOption)
+      options.push(uploadOption)
+      this.imageOptions = options
+    })
   }
 
   createCard = async file => {
@@ -126,7 +146,7 @@ class CoverImageSelector extends React.Component {
     const cardAttrs = {
       order: null,
       height: 1,
-      widht: 1,
+      width: 1,
       parent_id: collection.id,
       is_cover: true,
       hidden: true,
@@ -165,7 +185,6 @@ class CoverImageSelector extends React.Component {
 
   onImageOptionSelect = async option => {
     const { apiStore, card } = this.props
-    const collection = apiStore.find('collections', card.record.id)
     runInAction(() => (this.open = false))
     if (option.cardId) {
       const selectedCard = apiStore.find('collection_cards', option.cardId)
@@ -181,22 +200,54 @@ class CoverImageSelector extends React.Component {
       FilestackUpload.pickImage({
         onSuccess: file => afterPickAction(file),
       })
+    } else if (!this.recordIsCollection && option.imageUrl) {
+      // we are picking a previous_thumbnail_url
+      const item = card.record
+      // update back to the selected one
+      item.thumbnail_url = option.imageUrl
+      item.save()
     }
-    if (collection) {
-      apiStore.fetch('collections', collection.id, true)
-    } else {
-      // Fetch the current page's collection to reload any card changes
-      apiStore.fetch('collections', card.parent.id, true)
+    if (this.recordIsCollection) {
+      apiStore.fetch('collections', card.record.id, true)
     }
   }
 
   onFilterOptionSelect = async option => {
-    const { apiStore, card } = this.props
-    const collection = apiStore.find('collections', card.record.id)
+    const { card } = this.props
     runInAction(() => (this.open = false))
     card.filter = option.type
     await card.save()
-    apiStore.fetch('collections', collection.id, true)
+  }
+
+  get showFilters() {
+    const { record } = this.props.card
+    if (this.recordIsCollection) return true
+    return !!record.thumbnail_url
+  }
+
+  renderInner() {
+    return (
+      <TopRightHolder
+        className="show-on-hover"
+        width={this.imageOptions.length * 32}
+      >
+        {!this.loading && (
+          <FlipMove appearAnimation="elevator" duration={300} easing="ease-out">
+            <QuickOptionSelector
+              options={toJS(this.imageOptions)}
+              onSelect={this.onImageOptionSelect}
+            />
+            <SmallBreak />
+            {this.showFilters && (
+              <QuickOptionSelector
+                options={filterOptions}
+                onSelect={this.onFilterOptionSelect}
+              />
+            )}
+          </FlipMove>
+        )}
+      </TopRightHolder>
+    )
   }
 
   render() {
@@ -212,31 +263,7 @@ class CoverImageSelector extends React.Component {
           <CoverImageToggleIcon />
         </CardActionHolder>
         {this.open &&
-          ReactDOM.createPortal(
-            <TopRightHolder
-              className="show-on-hover"
-              width={this.imageOptions.length * 32}
-            >
-              {!this.loading && (
-                <FlipMove
-                  appearAnimation="elevator"
-                  duration={300}
-                  easing="ease-out"
-                >
-                  <QuickOptionSelector
-                    options={toJS(this.imageOptions)}
-                    onSelect={this.onImageOptionSelect}
-                  />
-                  <SmallBreak />
-                  <QuickOptionSelector
-                    options={filterOptions}
-                    onSelect={this.onFilterOptionSelect}
-                  />
-                </FlipMove>
-              )}
-            </TopRightHolder>,
-            this.parentCard
-          )}
+          ReactDOM.createPortal(this.renderInner(), this.parentCard)}
       </Fragment>
     )
   }

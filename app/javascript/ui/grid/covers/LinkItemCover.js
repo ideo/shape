@@ -99,7 +99,7 @@ class LinkItemCover extends React.Component {
     const { truncatedName, truncatedContent } = this.clamp()
     return (
       <StyledLinkCover>
-        <StyledImageCover url={thumbnail_url} bgColor={v.colors.commonDark}>
+        <StyledImageCover url={thumbnail_url} bgColor={v.colors.black}>
           <Flex className="inner" align="center" justify="center">
             <Box style={{ width: '100%' }}>
               <CardHeading className="name">{truncatedName}</CardHeading>
