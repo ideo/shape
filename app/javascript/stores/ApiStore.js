@@ -83,11 +83,6 @@ class ApiStore extends jsonapi(datxCollection) {
   }
 
   @action
-  update(name, value) {
-    this[name] = value
-  }
-
-  @action
   addCurrentCommentThread(id) {
     // no need to do anything if we're already on this thread
     if (this.currentCommentThreadIds.indexOf(id) > -1) return
