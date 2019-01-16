@@ -1,9 +1,14 @@
 import { routingStore, uiStore } from '~/stores'
+import { apiUrl } from '~/utils/url'
+
 import BaseRecord from './BaseRecord'
 
 /* global IdeoSSO */
 
 class User extends BaseRecord {
+  static type = 'users'
+  static endpoint = apiUrl('users')
+
   get name() {
     const nameDisplay = [this.first_name, this.last_name].join(' ')
     return nameDisplay.trim() || this.email
@@ -72,10 +77,12 @@ class User extends BaseRecord {
     { redirectPath = null, redirectId = null } = {}
   ) {
     try {
+      this.apiStore.update('switchingOrgs', true)
       await this.apiStore.request('users/switch_org', 'POST', {
         organization_id: organizationId,
       })
-      await this.apiStore.loadCurrentUserAndGroups()
+      await this.apiStore.loadCurrentUser()
+      this.apiStore.update('switchingOrgs', false)
       if (redirectPath) {
         routingStore.routeTo(redirectPath, redirectId)
       }
@@ -86,6 +93,5 @@ class User extends BaseRecord {
     }
   }
 }
-User.type = 'users'
 
 export default User

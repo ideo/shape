@@ -1,4 +1,6 @@
 export default function trackError(err, opts = {}) {
+  // 404 not really an "error" don't need to alert appsignal
+  if (err && err.status === 404) return
   if (process.env.NODE_ENV === 'development') {
     console.error(err) // eslint-disable-line no-console
   }

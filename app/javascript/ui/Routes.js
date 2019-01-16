@@ -7,21 +7,26 @@ import styled from 'styled-components'
 import ActivityLogBox from '~/ui/activity_log/ActivityLogBox'
 import DialogWrapper from '~/ui/global/modals/DialogWrapper'
 import ErrorBoundary from '~/ui/global/ErrorBoundary'
+import ZendeskWidget from '~/ui/global/ZendeskWidget'
 import Header from '~/ui/layout/Header'
 import HomePage from '~/ui/pages/HomePage'
-import CollectionPage from '~/ui/pages/CollectionPage'
-import ItemPage from '~/ui/pages/ItemPage'
+import {
+  CollectionApiWrapper,
+  MyCollectionApiWrapper,
+  ItemApiWrapper,
+} from '~/ui/pages/PageWithApiWrapper'
 import Loader from '~/ui/layout/Loader'
 import SearchPage from '~/ui/pages/SearchPage'
 import SettingsPage from '~/ui/pages/SettingsPage'
 import TermsPage from '~/ui/pages/TermsPage'
+import BillingPage from '~/ui/pages/BillingPage'
+import BillingStatement from '~/ui/pages/BillingStatement'
 import TermsOfUseModal from '~/ui/users/TermsOfUseModal'
-import initZendesk from '~/vendor/zendesk'
 import OrganizationSettings from '~/ui/organizations/OrganizationSettings'
 import UserSettings from '~/ui/users/UserSettings'
 import v from '~/utils/variables'
 import firebaseClient from '~/vendor/firestore'
-import MuiTheme from '~/ui/theme'
+import MuiTheme, { BillingMuiTheme } from '~/ui/theme'
 import captureGlobalKeypress from '~/utils/captureGlobalKeypress'
 
 const AppWrapper = styled.div`
@@ -53,8 +58,7 @@ const FixedActivityLogWrapper = styled.div`
 class Routes extends React.Component {
   componentDidMount() {
     const { apiStore } = this.props
-    apiStore.loadCurrentUserAndGroups().then(() => {
-      initZendesk(apiStore.currentUser)
+    apiStore.loadCurrentUser().then(() => {
       firebaseClient.authenticate(apiStore.currentUser.google_auth_token)
     })
     document.addEventListener('keydown', captureGlobalKeypress)
@@ -88,6 +92,7 @@ class Routes extends React.Component {
             {/* Global components are rendered here */}
             <WindowSizeListener onResize={this.handleWindowResize} />
             <DialogWrapper />
+            <ZendeskWidget />
 
             <Header />
             <FixedBoundary className="fixed_boundary" />
@@ -99,16 +104,49 @@ class Routes extends React.Component {
             )}
             {/* Switch will stop when it finds the first matching path */}
             <Switch>
-              <Route exact path="/" component={HomePage} />
+              <Route
+                exact
+                path="/"
+                render={() =>
+                  apiStore.currentOrgSlug ? (
+                    <Redirect to={`/${apiStore.currentOrgSlug}`} />
+                  ) : (
+                    <HomePage />
+                  )
+                }
+              />
               {/* These routes are doubled up so that the non-org route
                 will route you to the org one */}
-              <Route path="/collections/:id" component={CollectionPage} />
-              <Route path="/:org/collections/:id" component={CollectionPage} />
-              <Route path="/items/:id" component={ItemPage} />
-              <Route path="/:org/items/:id" component={ItemPage} />
+              <Route path="/collections/:id" component={CollectionApiWrapper} />
+              <Route
+                path="/:org/collections/:id"
+                component={CollectionApiWrapper}
+              />
+              <Route path="/items/:id" component={ItemApiWrapper} />
+              <Route path="/:org/items/:id" component={ItemApiWrapper} />
               <Route path="/search" component={SearchPage} />
               <Route path="/:org/search" component={SearchPage} />
               <Route path="/terms" component={TermsPage} />
+              <Route path="/terms/:org" component={TermsPage} />
+
+              <Route
+                path="/billing"
+                render={() => (
+                  // There must be a better way to apply BillingMuiTheme to all billing pages,
+                  // however sticking MuiThemeProvider within the <Switch> made it angry
+                  <MuiThemeProvider theme={BillingMuiTheme}>
+                    <BillingPage />
+                  </MuiThemeProvider>
+                )}
+              />
+              <Route
+                path="/print/invoices/:id"
+                render={props => (
+                  <MuiThemeProvider theme={BillingMuiTheme}>
+                    <BillingStatement {...props} />
+                  </MuiThemeProvider>
+                )}
+              />
               <Route
                 path="/settings"
                 render={() => (
@@ -133,7 +171,11 @@ class Routes extends React.Component {
                 render={() => <Redirect to="/" />}
               />
               {/* have to put this last to catch all org slugs */}
-              <Route exact path="/:org" component={CollectionPage} />
+              <Route
+                exact
+                path="/:org"
+                render={props => <MyCollectionApiWrapper {...props} />}
+              />
             </Switch>
           </MuiThemeProvider>
         </ErrorBoundary>

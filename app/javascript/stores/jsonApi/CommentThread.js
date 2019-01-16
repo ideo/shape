@@ -1,8 +1,10 @@
 import { observable, action, computed, runInAction } from 'mobx'
 import _ from 'lodash'
+import { ReferenceType } from 'datx'
 
 import { uiStore } from '~/stores'
-import { ReferenceType } from 'datx'
+import { apiUrl } from '~/utils/url'
+
 import BaseRecord from './BaseRecord'
 import Comment from './Comment'
 import User from './User'
@@ -12,6 +14,8 @@ const PER_PAGE = 50
 
 class CommentThread extends BaseRecord {
   static type = 'comment_threads'
+  static endpoint = apiUrl('comment_threads')
+
   @observable
   comments = []
   @observable
@@ -98,7 +102,7 @@ class CommentThread extends BaseRecord {
     // simulate the updated_at update so that the thread will move to most recent
     this.updated_at = new Date()
     // dynamically set the endpoint to belong to this thread
-    Comment.endpoint = `comment_threads/${this.id}/comments`
+    Comment.endpoint = apiUrl(`comment_threads/${this.id}/comments`)
     // create an unsaved comment so that we can see it immediately
     const comment = new Comment(commentData, this.apiStore)
     comment.addReference('author', this.apiStore.currentUser, {

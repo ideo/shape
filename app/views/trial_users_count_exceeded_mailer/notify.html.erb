@@ -1,0 +1,51 @@
+<div class="billing-email trial-users-count-exceeded">
+  <div class="subject">Free trial limit reached</div>
+  <div>Your team size have grown beyond the active user limit for your
+    free trial period. Your account will now be charged for each
+    additional active user which exceeds the free trial limit.</div>
+  <div>
+    <div class="organization-name"><%= @organization_name %></div>
+    <div>
+      <div class="section">
+        <div class="inner">
+          <div class="header">
+            <span class="highlight free-trial">FREE TRIAL</span>
+          </div>
+          <dl>
+            <dt>Expiration Date:</dt>
+            <dd><%= @expiration_date %></dd>
+          </dl>
+        </div>
+      </div>
+      <div class="section">
+        <div class="inner">
+          <div class="header">ACTIVE PEOPLE</div>
+          <dl>
+            <dt>Total users:</dt>
+            <dd><%= @total_users_count %></dd>
+            <dt class="subdue">Free trials:</dt>
+            <dd class="subdue">- <%= @trial_users_count %></dd>
+            <dt>Prorated Users:</dt>
+            <dd><%= @prorated_users_count %></dd>
+          </dl>
+        </div>
+      </div>
+      <div class="section">
+        <div class="inner">
+          <div class="header">MONTHLY CHARGE</div>
+          <dl>
+            <dt>Next monthly charge:</dt>
+            <dd><%= number_to_currency(@next_monthly_charge) %></dd>
+            <dt>Next statement date:</dt>
+            <dd><%= @next_statement_date %></dd>
+          </dl>
+        </div>
+      </div>
+      <% if @missing_payment_method %>
+      <div class='email-link'>
+        <%= link_to "Add Payment Method", @url %>
+      </div>
+      <% end %>
+    </div>
+  </div>
+</div>

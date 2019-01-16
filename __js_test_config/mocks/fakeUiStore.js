@@ -45,6 +45,7 @@ const fakeUiStore = {
   resetSelectionAndBCT: jest.fn(),
   rolesMenuOpen: false,
   isLoading: false,
+  dismissedMoveHelper: false,
   selectedCardIds: [],
   selectCardId: jest.fn(),
   setViewingCollection: jest.fn(),
@@ -80,6 +81,7 @@ const fakeUiStore = {
   editingCardId: 0,
   toggleEditingCardId: jest.fn(),
   autocompleteMenuClosed: jest.fn(),
+  captureKeyboardGridClick: jest.fn(),
 }
 
 export default fakeUiStore

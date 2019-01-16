@@ -21,13 +21,22 @@ Rails.application.routes.draw do
       resources :collections, except: %i[index] do
         member do
           get 'in_my_collection'
+          patch 'submit'
         end
         collection do
           post 'create_template'
           post 'set_submission_box_template'
         end
         resources :collection_cards, only: :index
-        resources :roles, only: %i[index create destroy], shallow: true
+        resources :roles, only: %i[index create destroy]
+      end
+      resources :items, except: %i[index] do
+        member do
+          post 'duplicate'
+          patch 'archive'
+          get 'in_my_collection'
+        end
+        resources :roles, only: %i[index create destroy]
       end
       resources :test_collections, only: %i[show] do
         member do
@@ -37,6 +46,7 @@ Rails.application.routes.draw do
           get 'next_available'
         end
       end
+      resources :items, only: %i[create]
       resources :collection_cards, shallow: true, except: %i[show] do
         member do
           patch 'replace'
@@ -50,24 +60,20 @@ Rails.application.routes.draw do
           post 'link'
           post 'duplicate'
         end
-        resources :items, shallow: true, except: :index do
-          member do
-            post 'duplicate'
-            patch 'archive'
-            get 'in_my_collection'
-          end
-          resources :roles, only: %i[index create]
-        end
       end
       resources :groups, except: :delete do
-        resources :roles, only: %i[index create archive destroy]
         member do
           patch 'archive'
         end
+        resources :roles, only: %i[index create destroy]
       end
       resources :organizations, except: :delete do
         collection do
           get 'current'
+        end
+        member do
+          patch 'add_terms_text'
+          patch 'remove_terms_text'
         end
         resources :collections, only: %i[create]
         resources :groups, only: %i[index]
@@ -118,10 +124,13 @@ Rails.application.routes.draw do
 
   authenticate :user, ->(u) { Rails.env.development? || u.has_cached_role?(Role::SUPER_ADMIN) } do
     require 'sidekiq/web'
+    require 'sidekiq-scheduler/web'
     mount Sidekiq::Web => '/sidekiq'
   end
 
   namespace :callbacks do
+    post 'ideo_network/payment_methods' => 'ideo_network#payment_methods'
+    post 'ideo_network/invoices' => 'ideo_network#invoices'
     post 'ideo_network/users' => 'ideo_network#users'
   end
 

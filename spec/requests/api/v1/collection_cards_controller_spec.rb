@@ -36,6 +36,99 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
       get(path)
       expect(json['data'].map { |cc| cc['id'].to_i }).to match_array(collection.collection_card_ids)
     end
+
+    describe 'included' do
+      let(:items_json) { json_included_objects_of_type('items') }
+
+      before do
+        collection.items.each { |item| user.add_role(Role::VIEWER, item) }
+      end
+
+      it 'returns all items' do
+        get(path)
+        expect(items_json.map { |i| i['id'].to_i }).to match_array(collection.item_ids)
+      end
+
+      it 'matches Item schema' do
+        get(path)
+        expect(items_json.first['attributes']).to match_json_schema('item', strict: false)
+      end
+    end
+
+    context 'with nested collection' do
+      let!(:nested_collection) { create(:collection, add_editors: [user]) }
+      let!(:nested_card) do
+        create(:collection_card_collection,
+               parent: collection,
+               collection: nested_collection)
+      end
+      let(:collections_json) { json_included_objects_of_type('collections') }
+
+      it 'returns nested Collection' do
+        get(path)
+        expect(collections_json.map { |c| c['id'].to_i }).to include(nested_collection.id)
+      end
+
+      it 'matches Collection schema' do
+        get(path)
+        expect(collections_json.first['attributes']).to match_json_schema('collection', strict: false)
+      end
+    end
+
+    context 'with pagination options' do
+      let(:path) { "/api/v1/collections/#{collection.id}/collection_cards?per_page=2&page=2" }
+
+      before do
+        Kernel.silence_warnings do
+          # it uses this as a minimum so we change it here, otherwise we'd need 50+ cards to test
+          CollectionCard::DEFAULT_PER_PAGE = 2
+        end
+      end
+
+      after do
+        Kernel.silence_warnings do
+          CollectionCard::DEFAULT_PER_PAGE = 50
+        end
+      end
+
+      it 'includes only the correct page of collection cards' do
+        get(path)
+        # should be the second page of 2 cards
+        expect(json['data'].map { |cc| cc['id'].to_i }).to match_array(collection.collection_card_ids.slice(2, 2))
+      end
+    end
+
+    context 'with sort options' do
+      let(:path) { "/api/v1/collections/#{collection.id}/collection_cards?card_order=updated_at" }
+      let(:collection_json) do
+        json['included'].select { |c| c['id'].to_i == collection.id }.first
+      end
+
+      it 'should sort by the passed in card_order param' do
+        get(path)
+        expect(collection_json['attributes']['card_order']).to eq 'updated_at'
+        cards = json['data']
+        # kind of a hacky way to say that the first card is "newer" than the second
+        expect(cards.first['id'] > cards.second['id']).to be true
+      end
+
+      context 'with SharedWithMeCollection' do
+        let!(:collection) do
+          create(:shared_with_me_collection, num_cards: 5, add_viewers: [user])
+        end
+
+        before do
+          collection.collection_cards.each do |cc|
+            user.add_role(Role::VIEWER, cc.record)
+          end
+        end
+
+        it 'should sort by updated_at by default' do
+          get(path)
+          expect(collection_json['attributes']['card_order']).to eq 'updated_at'
+        end
+      end
+    end
   end
 
   describe 'POST #create' do
@@ -71,7 +164,7 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
 
     context 'success' do
       let(:collection) do
-        create(:collection, add_content_editors: [user], organization: organization)
+        create(:collection, add_editors: [user], organization: organization)
       end
 
       it 'returns a 200' do

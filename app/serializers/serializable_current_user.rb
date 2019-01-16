@@ -13,4 +13,8 @@ class SerializableCurrentUser < SerializableUser
   attribute :current_user_collection_id do
     @object.current_user_collection_id.to_s
   end
+
+  attribute :is_super_admin do
+    @current_user ? @current_user.has_role?(Role::SUPER_ADMIN) : false
+  end
 end

@@ -1,15 +1,19 @@
 import MoveHelperModal from '~/ui/users/MoveHelperModal'
 import { fakeUser } from '#/mocks/data'
+import fakeUiStore from '#/mocks/fakeUiStore'
 
 let props, wrapper, component
 
 describe('MoveHelperModal', () => {
   beforeEach(() => {
+    const uiStore = fakeUiStore
     fakeUser.show_move_helper = true
     props = {
       currentUser: fakeUser,
+      type: 'move',
+      uiStore,
     }
-    wrapper = shallow(<MoveHelperModal {...props} />)
+    wrapper = shallow(<MoveHelperModal.wrappedComponent {...props} />)
     component = wrapper.instance()
   })
 
@@ -24,6 +28,13 @@ describe('MoveHelperModal', () => {
 
     it('should set submitted to true', () => {
       expect(component.submitted).toBe(true)
+    })
+
+    it('should set dismissedMoveHelper to true', () => {
+      expect(props.uiStore.update).toHaveBeenCalledWith(
+        'dismissedMoveHelper',
+        true
+      )
     })
 
     describe('after checking the dont show again box', () => {

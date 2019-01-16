@@ -3,7 +3,7 @@ import fakeUiStore from '#/mocks/fakeUiStore'
 import fakeApiStore from '#/mocks/fakeApiStore'
 
 let wrapper, component, props, apiStore, uiStore, shallowRender
-describe('MovableGridCard', () => {
+describe('GridCardEmpty', () => {
   beforeEach(() => {
     const emptyCard = {
       id: 'empty',

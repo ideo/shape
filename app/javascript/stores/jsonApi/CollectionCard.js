@@ -3,9 +3,13 @@ import { action, observable } from 'mobx'
 
 import { uiStore } from '~/stores'
 import { ITEM_TYPES, COLLECTION_TYPES } from '~/utils/variables'
+import { apiUrl } from '~/utils/url'
 import BaseRecord from './BaseRecord'
 
 class CollectionCard extends BaseRecord {
+  static type = 'collection_cards'
+  static endpoint = apiUrl('collection_cards')
+
   attributesForAPI = [
     'type',
     'order',
@@ -231,7 +235,7 @@ class CollectionCard extends BaseRecord {
   }
 
   // this could really be a static method now that it archives all selected cards
-  async API_archive({ isReplacing = false } = {}) {
+  async API_archive({ isReplacing = false, onCancel = null } = {}) {
     const { selectedCardIds } = uiStore
     const collection = this.parentCollection
 
@@ -275,7 +279,12 @@ class CollectionCard extends BaseRecord {
           iconName,
           onToggleSnoozeDialog,
           snoozeChecked,
-          onCancel: () => resolve(false),
+          onCancel: () => {
+            if (_.isFunction(onCancel)) {
+              onCancel()
+            }
+            resolve(false)
+          },
           onConfirm: () => resolve(true),
         })
       })
@@ -312,6 +321,5 @@ class CollectionCard extends BaseRecord {
     return false
   }
 }
-CollectionCard.type = 'collection_cards'
 
 export default CollectionCard

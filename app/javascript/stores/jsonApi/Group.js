@@ -1,20 +1,15 @@
 import { uiStore } from '~/stores'
+import { apiUrl } from '~/utils/url'
+import { ReferenceType } from 'datx'
+
+import Role from './Role'
 import BaseRecord from './BaseRecord'
 
 class Group extends BaseRecord {
   static type = 'groups'
-  attributesForAPI = ['name', 'handle', 'filestack_file_attributes']
+  static endpoint = apiUrl('groups')
 
-  // NOTE: Because we're never directly hitting the groups/{id} API endpoint,
-  // group.roles relationship never gets set up.
-  // However we have the related roles in the apiStore so we can just look them up.
-  get groupRoles() {
-    const { apiStore } = this
-    return apiStore.findAll('roles').filter(
-      // Some roles in the Api store don't have a resource included
-      role => role.resource && role.resource === this
-    )
-  }
+  attributesForAPI = ['name', 'handle', 'filestack_file_attributes']
 
   get isNormalGroup() {
     return !this.isOrgGroup
@@ -33,8 +28,7 @@ class Group extends BaseRecord {
       await this.apiStore.request(`groups/${this.id}/archive`, 'PATCH')
       const roleForCurrentUser = role =>
         role.users.find(user => user.id === this.apiStore.currentUserId)
-      const { groupRoles } = this
-      if (groupRoles.find(roleForCurrentUser)) {
+      if (this.roles.find(roleForCurrentUser)) {
         window.location.reload()
       } else {
         this.apiStore.loadCurrentUser()
@@ -48,6 +42,14 @@ class Group extends BaseRecord {
     })
     return onAgree
   }
+}
+
+Group.refDefaults = {
+  roles: {
+    model: Role,
+    type: ReferenceType.TO_MANY,
+    defaultValue: [],
+  },
 }
 
 export default Group

@@ -7,6 +7,8 @@ module Resourceable
     class_attribute :edit_role
     class_attribute :content_edit_role
     class_attribute :view_role
+
+    belongs_to :roles_anchor_collection, class_name: 'Collection', optional: true
   end
 
   class_methods do
@@ -34,9 +36,9 @@ module Resourceable
       #      .editors[:users] returns all users that are editors
       define_method role_name.to_s.pluralize.to_sym do
         # There's only one role with a name per resource
-        role = roles.where(name: role_name)
-                    .includes(:users, :groups)
-                    .first
+        role = anchored_roles.where(name: role_name)
+                             .includes(:users, :groups)
+                             .first
 
         return { users: [], groups: [] } if role.blank?
 
@@ -64,23 +66,59 @@ module Resourceable
     end
   end
 
+  def roles_anchor
+    roles_anchor_collection || self
+  end
+
+  def roles_anchor_resource_identifier
+    return resource_identifier if roles_anchor_collection_id.nil?
+    "Collection_#{roles_anchor_collection_id}"
+  end
+
+  def same_roles_anchor?(resource)
+    roles_anchor_resource_identifier == resource.roles_anchor_resource_identifier
+  end
+
+  def includes_all_roles?(resource)
+    return false unless item_or_collection? && resource.item_or_collection?
+    %i[viewers editors].each do |role_name|
+      my_role = send(role_name)
+      their_role = resource.send(role_name)
+      %i[users groups].each do |role_owner|
+        mine = my_role.try(:[], role_owner).pluck(:id)
+        theirs = their_role.try(:[], role_owner).pluck(:id)
+        return false unless (mine & theirs) == theirs
+      end
+    end
+    true
+  end
+
+  def anchored_roles
+    return roles if is_a?(Group)
+    roles_anchor.roles
+  end
+
+  def item_or_collection?
+    is_a?(Item) || is_a?(Collection)
+  end
+
   def can_edit?(user_or_group)
     return true if user_or_group.has_cached_role?(Role::SUPER_ADMIN)
     raise_role_name_not_set(:edit_role) if self.class.edit_role.blank?
-    user_or_group.has_role_by_identifier?(self.class.edit_role, resource_identifier)
+    user_or_group.has_role_by_identifier?(self.class.edit_role, roles_anchor_resource_identifier)
   end
 
   def can_edit_content?(user_or_group)
     return true if can_edit?(user_or_group)
     return false if self.class.content_edit_role.blank?
-    user_or_group.has_role_by_identifier?(self.class.content_edit_role, resource_identifier)
+    user_or_group.has_role_by_identifier?(self.class.content_edit_role, roles_anchor_resource_identifier)
   end
 
   def can_view?(user_or_group)
     return true if can_edit?(user_or_group)
     return true if can_edit_content?(user_or_group)
     raise_role_name_not_set(:view_role) if self.class.view_role.blank?
-    user_or_group.has_role_by_identifier?(self.class.view_role, resource_identifier)
+    user_or_group.has_role_by_identifier?(self.class.view_role, roles_anchor_resource_identifier)
   end
 
   def resourceable_class
@@ -158,6 +196,20 @@ module Resourceable
       new_role.name = Role::EDITOR if new_role.name.to_sym == Role::CONTENT_EDITOR
       new_role.save
     end
+  end
+
+  def inherit_roles_anchor_from_parent!(parent = self.parent)
+    update_column(:roles_anchor_collection_id, parent.roles_anchor.id)
+  end
+
+  def unanchor!
+    update_column(:roles_anchor_collection_id, nil)
+    reload
+  end
+
+  def unanchor_and_inherit_roles_from_anchor!
+    inherit_roles_from_parent!(roles_anchor)
+    unanchor!
   end
 
   def remove_all_viewer_roles

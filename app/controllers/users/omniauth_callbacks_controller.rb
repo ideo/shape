@@ -8,6 +8,7 @@ class Users::OmniauthCallbacksController < Devise::OmniauthCallbacksController
     @user = User.from_omniauth(request.env['omniauth.auth'], pending_user)
     if @user.save
       setup_org_membership
+      setup_network_roles
       # this will throw if @user is not activated
       # will also redirect to stored path from any previous 401
       sign_in_and_redirect @user, event: :authentication
@@ -22,9 +23,20 @@ class Users::OmniauthCallbacksController < Devise::OmniauthCallbacksController
 
   private
 
+  def setup_network_roles
+    return unless @user.current_organization.present? &&
+                  @user.has_role?(Role::ADMIN, @user.current_organization.admin_group)
+
+    @user.add_network_admin(@user.current_organization.id)
+  end
+
   def setup_org_membership
+    # check if they are signed in with an autojoinable domain
+    OrganizationAutojoiner.new(@user).autojoin
     return unless @user.current_organization.present?
+
     # double check if they're now signed in with a whitelisted email
-    @user.current_organization.check_user_email_domain(@user)
+    # TODO: will not need this when we lock invitations to the invited email
+    @user.current_organization.check_email_domains_and_join_org_group(@user)
   end
 end

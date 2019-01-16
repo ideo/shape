@@ -3,7 +3,8 @@ class UrlsController < ApplicationController
   before_action :authenticate_user!
 
   def passthru
-    html = HTTParty.get(params.require(:url))
+    url = params.require(:url)
+    html = HTTParty.get(URI.encode(url))
     render html: html.response.body.html_safe
   end
 end

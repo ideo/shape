@@ -4,9 +4,13 @@ class SerializableCollection < BaseJsonSerializer
   attributes :created_at, :updated_at, :name, :organization_id,
              :master_template, :template_id,
              :submission_box_type, :submission_box_id, :submission_template_id,
-             :test_status, :collection_to_test_id
+             :test_status, :collection_to_test_id, :hide_submissions
 
-  has_many :roles
+  has_many :roles do
+    data do
+      @object.anchored_roles
+    end
+  end
   has_one :parent_collection_card
   has_one :parent
   has_one :live_test_collection
@@ -62,11 +66,11 @@ class SerializableCollection < BaseJsonSerializer
         @object.collection_cards,
         @current_user,
         card_order: @card_order,
+        page: @page || 1,
       )
     end
   end
 
-  # expose this for the front-end to be aware, only matters for current collection
   attribute :card_order, if: -> { @object == @current_record } do
     @card_order || 'order'
   end
@@ -79,6 +83,11 @@ class SerializableCollection < BaseJsonSerializer
     # NOTE: this also ends up coming into play when you are an editor
     # but the collection is "pinned_and_locked"
     @current_ability.can?(:edit_content, @object)
+  end
+
+  attribute :submissions_collection_id, if: -> { @object.is_a? Collection::SubmissionBox } do
+    # might be nil before object exists
+    @object.submissions_collection.try(:id)
   end
 
   # NOTE: a lot of these boolean attributes could probably be omitted if not applicable, which would potentially
@@ -106,6 +115,10 @@ class SerializableCollection < BaseJsonSerializer
 
   attribute :is_submission_box_template_test do
     @object.submission_box_template_test?
+  end
+
+  attribute :is_inside_hidden_submission_box do
+    @object.inside_hidden_submission_box?
   end
 
   attribute :submission_attrs, if: -> { @object.submission_attrs.present? } do

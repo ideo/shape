@@ -1,5 +1,4 @@
 import { Fragment } from 'react'
-import ReactRouterPropTypes from 'react-router-prop-types'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 
@@ -11,8 +10,6 @@ import Loader from '~/ui/layout/Loader'
 import MoveModal from '~/ui/grid/MoveModal'
 import PageContainer from '~/ui/layout/PageContainer'
 import PageHeader from '~/ui/pages/shared/PageHeader'
-import PageWithApi from '~/ui/pages/PageWithApi'
-import PageError from '~/ui/global/PageError'
 import TextItem from '~/ui/items/TextItem'
 import VideoItem from '~/ui/items/VideoItem'
 import { ITEM_TYPES } from '~/utils/variables'
@@ -26,31 +23,28 @@ ItemPageContainer.displayName = 'ItemPageContainer'
 
 @inject('apiStore', 'uiStore', 'routingStore')
 @observer
-class ItemPage extends PageWithApi {
+class ItemPage extends React.Component {
   state = {
+    // item is kept in state so that client can make local updates
+    // e.g. updateItem method
     item: null,
   }
 
   componentDidMount() {
-    super.componentDidMount()
-    const { match, apiStore } = this.props
-    const item = apiStore.find('items', match.params.id)
-    if (item && item.id) {
-      this.setState({ item })
-    }
+    this.onAPILoad()
   }
 
-  onAPILoad = async response => {
-    const { apiStore, uiStore, location } = this.props
-    const item = response.data
-    this.setState({ item })
-    uiStore.setViewingItem(item)
-    if (item.parent) item.parent.checkCurrentOrg()
-    const thread = await apiStore.findOrBuildCommentThread(item)
-    uiStore.expandThread(thread.key)
-    if (location.search) {
-      uiStore.openOptionalMenus(location.search)
-    }
+  onAPILoad = () => {
+    const { item, apiStore, uiStore, routingStore } = this.props
+    this.setState({ item }, async () => {
+      uiStore.setViewingItem(item)
+      if (item.parent) item.parent.checkCurrentOrg()
+      const thread = await apiStore.findOrBuildCommentThread(item)
+      uiStore.expandThread(thread.key)
+      if (routingStore.query) {
+        uiStore.openOptionalMenus(routingStore.query)
+      }
+    })
   }
 
   updateItem = itemTextData => {
@@ -63,9 +57,15 @@ class ItemPage extends PageWithApi {
     item.API_updateWithoutSync({ cancel_sync })
 
   cancel = () => {
+    const { uiStore } = this.props
     const { item } = this.state
     if (item.can_edit_content) this.save(item)
-    this.props.routingStore.push(item.parentPath)
+
+    if (uiStore.previousViewingCollection) {
+      window.history.back()
+    } else {
+      this.props.routingStore.push(item.parentPath)
+    }
   }
 
   // could be smarter or broken out once we want to do different things per type
@@ -121,9 +121,6 @@ class ItemPage extends PageWithApi {
 
   render() {
     const { uiStore } = this.props
-    // this.error comes from PageWithApi
-    if (this.error) return <PageError error={this.error} />
-
     const { item } = this.state
     if (!item) return <Loader />
     if (item.isPdfFile) {
@@ -158,8 +155,7 @@ class ItemPage extends PageWithApi {
 }
 
 ItemPage.propTypes = {
-  match: ReactRouterPropTypes.match.isRequired,
-  location: ReactRouterPropTypes.location.isRequired,
+  item: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 ItemPage.wrappedComponent.propTypes = {
   apiStore: MobxPropTypes.objectOrObservableObject.isRequired,

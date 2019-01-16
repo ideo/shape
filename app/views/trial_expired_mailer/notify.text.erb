@@ -1,0 +1,19 @@
+Free trial expired for your organization: <%= @organization_name %>
+
+Your free trial period with Shape has expired. Your account will now be charged for all current active users. To continue using Shape please add a payment method to you account.
+
+Trial Expiration Date: <%= @expiration_date %>
+
+ACTIVE PEOPLE
+
+  Total users: <%= @total_users_count %>
+
+MONTHLY CHARGE
+
+  Next monthly charge: <%= number_to_currency(@next_monthly_charge) %>
+
+  Next statement date: <%= @next_statement_date %>
+
+<% if @missing_payment_method %>
+  Add payment method: <%= @url %>
+<% end %>

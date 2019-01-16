@@ -73,7 +73,7 @@ class User < ApplicationRecord
   enum status: {
     active: 0,
     pending: 1,
-    deleted: 2,
+    archived: 2,
   }
 
   # to turn off devise validatable for uniqueness of email
@@ -82,31 +82,32 @@ class User < ApplicationRecord
   end
 
   # Searchkick Config
-  searchkick callbacks: false, word_start: %i[name handle]
+  searchkick callbacks: false, word_start: %i[name handle email]
   after_commit :reindex
   alias searchkick_reindex reindex
-  scope :search_import, -> { active.includes(:roles) }
+  scope :search_import, -> { where(status: %i[active pending]) }
 
   def search_data
     {
-      name: name,
-      handle: handle,
-      email: email,
-      organization_ids: organizations.map(&:id),
+      name: name&.downcase,
+      handle: handle&.downcase,
+      email: email&.downcase,
+      status: status,
+      organization_ids: organization_ids,
     }
   end
 
   def should_index?
-    active?
+    active? || pending?
   end
 
   def should_reindex?
     # called after_commit
-    (saved_changes.keys & %w[first_name last_name handle email]).present?
+    (saved_changes.keys & %w[first_name last_name handle email status]).present?
   end
 
-  def reindex
-    return unless should_reindex?
+  def reindex(force: false)
+    return unless should_reindex? || force
     Searchkick.callbacks(:async) do
       searchkick_reindex
     end
@@ -225,12 +226,14 @@ class User < ApplicationRecord
       # if within same org, we already have the current_user_collection id
       return Collection.find(current_user_collection_id)
     end
+
     # TODO: rename "user" to user_collection
     collections.user.find_by_organization_id(org_id)
   end
 
   def current_shared_collection(org_id = current_organization_id)
     return nil unless current_organization_id
+
     collections.shared_with_me.find_by_organization_id(org_id)
   end
 
@@ -260,8 +263,10 @@ class User < ApplicationRecord
     if has_cached_role?(Role::SUPER_ADMIN)
       return current_organization.groups
     end
+
     groups = current_org_groups.to_a
     return [] if groups.blank?
+
     organization = current_organization
     if groups.include?(organization.primary_group)
       # org members get to see the guest group
@@ -292,7 +297,16 @@ class User < ApplicationRecord
   # -- override has_many relation for SUPER_ADMIN purposes --
   def organizations
     return super unless has_cached_role?(Role::SUPER_ADMIN)
+
     Organization.all
+  end
+
+  def add_network_admin(org_id)
+    change_network_admin :add, org_id
+  end
+
+  def remove_network_admin(org_id)
+    change_network_admin :remove, org_id
   end
 
   def in_my_collection?(item_or_collection)
@@ -307,7 +321,22 @@ class User < ApplicationRecord
     end
   end
 
+  def archive!
+    archived!
+    # NOTE: this is disabled, was creating way too many Zendesk tickets
+    # DeprovisionUserWorker.perform_async(id)
+  end
+
   private
+
+  def change_network_admin(action, org_id)
+    # must have uid for network request
+    return true unless uid
+
+    NetworkOrganizationUserSyncWorker.perform_async(
+      uid, org_id, NetworkApi::Organization::ADMIN_ROLE, action
+    )
+  end
 
   def update_profile_names
     user_profiles.each do |profile|
@@ -323,37 +352,46 @@ class User < ApplicationRecord
 
   def after_role_update(role)
     reset_cached_roles!
-    # Reindex record if it is a searchkick model
     resource = role.resource
-    if role.resource.is_a?(Group) && role.resource.primary?
+    if resource.is_a?(Group) && role.resource.primary?
       # user added/removed from an org should update search index
-      reindex
+      reindex(force: true)
     end
+    # Reindex record if it is a searchkick model
     resource.reindex if resource && Searchkick.callbacks? && resource.searchable?
   end
 
   def sync_groups_after_adding(role)
     return unless role.resource.is_a?(Group)
+
     group = role.resource
     if group.primary? && role.name == Role::ADMIN.to_s
-      add_role(Role::ADMIN, group.organization.admin_group) unless
-        has_role?(Role::ADMIN, group.organization.admin_group)
+      unless has_role?(Role::ADMIN, group.organization.admin_group)
+        add_role(Role::ADMIN, group.organization.admin_group)
+        add_network_admin(group.organization.id)
+      end
     elsif group.admin?
-      add_role(Role::ADMIN, group.organization.primary_group) unless
-        has_role?(Role::ADMIN, group.organization.primary_group)
+      unless has_role?(Role::ADMIN, group.organization.primary_group)
+        add_role(Role::ADMIN, group.organization.primary_group)
+        add_network_admin(group.organization.id)
+      end
     end
   end
 
   def sync_groups_after_removing(role)
     return unless role.resource.is_a?(Group)
+
     group = role.resource
     if group.primary? && role.name == Role::ADMIN.to_s
-      remove_role(Role::ADMIN, group.organization.admin_group) if
-        has_role?(Role::ADMIN, group.organization.admin_group)
+      if has_role?(Role::ADMIN, group.organization.admin_group)
+        remove_role(Role::ADMIN, group.organization.admin_group)
+        remove_network_admin(group.organization.id)
+      end
     elsif group.admin? && has_role?(Role::ADMIN, group.organization.primary_group)
       # if removing them from the admin group,
       # convert them back to a normal member of the org
       remove_role(Role::ADMIN, group.organization.primary_group)
+      remove_network_admin(group.organization.id)
       add_role(Role::MEMBER, group.organization.primary_group)
     end
   end

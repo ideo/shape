@@ -4,6 +4,7 @@ import fakeUiStore from '#/mocks/fakeUiStore'
 import fakeUndoStore from '#/mocks/fakeUndoStore'
 import { fakeUser } from '#/mocks/data'
 
+jest.mock('~shared/utils/countryOptions')
 jest.mock('firebase/auth')
 jest.mock('firebase/app', () => ({
   firestore: jest.fn().mockReturnValue({ settings: jest.fn() }),
@@ -33,7 +34,7 @@ describe('Routes', () => {
       wrapper = shallow(<Routes.wrappedComponent {...props} />)
     })
     it('makes an API call to fetch the user', () => {
-      expect(apiStore.loadCurrentUserAndGroups).toHaveBeenCalled()
+      expect(apiStore.loadCurrentUser).toHaveBeenCalled()
     })
 
     it('does not blur the content if terms have been accepted', () => {

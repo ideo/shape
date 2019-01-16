@@ -21,14 +21,16 @@ class Api::V1::UsersController < Api::V1::BaseController
   end
 
   def me
+    current_user.update_attributes(last_active_at: Time.current)
     render jsonapi: current_user, include: [
       :groups,
       organizations: %i[primary_group],
-      current_organization: %i[primary_group guest_group admin_group],
+      current_organization: %i[primary_group guest_group admin_group terms_text_item],
     ], class: {
       User: SerializableCurrentUser,
       Group: SerializableGroup,
       Organization: SerializableOrganization,
+      'Item::TextItem': SerializableItem,
     }
   end
 

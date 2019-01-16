@@ -75,7 +75,9 @@ describe('InlineCollectionTest', () => {
     })
 
     it('should fetch the test collection', () => {
-      expect(props.apiStore.request).toHaveBeenCalled()
+      expect(props.apiStore.request).toHaveBeenCalledWith(
+        `test_collections/${testCollection.id}`
+      )
     })
 
     describe('if there is a survey response already for the user', () => {

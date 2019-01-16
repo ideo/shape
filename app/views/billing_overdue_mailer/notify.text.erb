@@ -1,0 +1,14 @@
+Payment Overdue
+
+Please add a payment method to continue using Shape at <%= @organization_name %>. The <%= @organization_name%> instance of Shape will be frozen on <%= @account_freeze_date %> if you do not add a valid payment method.
+
+ACTIVE PEOPLE
+
+  Total users: <%= @total_users_count %>
+
+MONTHLY CHARGE
+
+  Next monthly charge: <%= number_to_currency(@next_monthly_charge) %>
+  Next statement date: <%= @next_statement_date %>
+
+Add payment method: <%= @url %>

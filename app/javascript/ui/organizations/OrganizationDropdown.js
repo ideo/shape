@@ -95,9 +95,22 @@ class OrganizationDropdown extends React.Component {
     this.props.routingStore.routeTo('/settings')
   }
 
+  handleBilling = ev => {
+    this.props.onItemClick()
+    this.props.routingStore.routeTo('/billing')
+  }
+
   handleLegal = ev => {
     this.props.onItemClick()
     this.props.routingStore.routeTo('/terms')
+  }
+
+  handleZendesk = ev => {
+    const { zE } = window
+    this.props.onItemClick()
+    if (zE && zE.activate) {
+      zE.activate({ hideOnClose: true })
+    }
   }
 
   handleSearchChange = text => {
@@ -156,15 +169,21 @@ class OrganizationDropdown extends React.Component {
       organizations: [...this.organizationItems],
       bottom: [
         { name: 'New Organization', onClick: this.handleNewOrg },
+        { name: 'Contact Support', onClick: this.handleZendesk },
         { name: 'Legal', onClick: this.handleLegal },
       ],
     }
-    // put this in the middle at index 1
-    if (userCanEdit)
+    // splice these into the correct placement
+    if (userCanEdit) {
       items.bottom.splice(1, 0, {
         name: 'Settings',
         onClick: this.handleOrgSettings,
       })
+      items.bottom.splice(3, 0, {
+        name: 'Billing',
+        onClick: this.handleBilling,
+      })
+    }
     return items
   }
 

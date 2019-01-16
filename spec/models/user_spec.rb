@@ -225,11 +225,12 @@ describe User, type: :model do
     let!(:user) { create(:user) }
     let(:organizations) { create_list(:organization, 2) }
 
-    it 'should include name, email, handle, organization_ids' do
+    it 'should include downcased name, email, handle, organization_ids' do
       expect(user.search_data).to eq(
-        name: user.name,
-        email: user.email,
-        handle: user.handle,
+        name: user.name.downcase,
+        email: user.email.downcase,
+        handle: user.handle.downcase,
+        status: user.status,
         organization_ids: [],
       )
     end
@@ -238,6 +239,7 @@ describe User, type: :model do
       before do
         user.add_role(:member, organizations[0].primary_group)
         user.add_role(:member, organizations[1].primary_group)
+        user.reload
       end
 
       it 'should have org ids' do
@@ -451,6 +453,41 @@ describe User, type: :model do
     end
   end
 
+  context 'network admin management' do
+    let(:user) { create(:user) }
+    let(:organization) { create(:organization) }
+
+    before do
+      allow(NetworkOrganizationUserSyncWorker).to receive(:perform_async)
+    end
+
+    describe '#add_network_admin' do
+      it 'returns early when the user uid is not set' do
+        pending_user = create(:user, :pending)
+        expect(NetworkOrganizationUserSyncWorker).not_to receive(:perform_async)
+        expect(pending_user.add_network_admin(organization.id)).to be true
+      end
+
+      it 'uses the network api to add the user as org admin' do
+        user.add_network_admin(organization.id)
+        expect(NetworkOrganizationUserSyncWorker).to have_received(:perform_async).with(user.uid, organization.id, NetworkApi::Organization::ADMIN_ROLE, :add)
+      end
+    end
+
+    describe '#remove_network_admin' do
+      it 'returns early when the user uid is not set' do
+        pending_user = create(:user, :pending)
+        expect(NetworkOrganizationUserSyncWorker).not_to receive(:perform_async)
+        expect(pending_user.add_network_admin(organization.id)).to be true
+      end
+
+      it 'uses the network api to remove the user as org admin' do
+        user.remove_network_admin(organization.id)
+        expect(NetworkOrganizationUserSyncWorker).to have_received(:perform_async).with(user.uid, organization.id, NetworkApi::Organization::ADMIN_ROLE, :remove)
+      end
+    end
+  end
+
   describe '#in_my_collection' do
     let(:user_collection) { create(:user_collection) }
     let(:card_in_collection) { create(:collection_card_collection, parent: user_collection) }
@@ -469,6 +506,15 @@ describe User, type: :model do
     end
     it 'should return false if collection is not in user collection' do
       expect(user.in_my_collection?(card_not_in_collection.collection)).to be false
+    end
+  end
+
+  describe '#archive!' do
+    it 'archives the user' do
+      # -- worker is disabled, see note in user.rb
+      # expect(DeprovisionUserWorker).to receive(:perform_async).with(user.id)
+      expect(user).to receive(:archived!)
+      user.archive!
     end
   end
 end

@@ -28,6 +28,6 @@ class NotificationMailer < ApplicationMailer
     # TODO: Figure out user's timezone if we want to include the proper timestamp?
     # subject += "since#{@last_notification_mail_sent.strftime('%l:%M%P (%B %d, %Y)')}"
 
-    mail to: @user.email, subject: subject
+    mail to: @user.email, subject: subject, users: [@user]
   end
 end

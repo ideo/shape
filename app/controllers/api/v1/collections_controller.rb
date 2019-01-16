@@ -9,10 +9,6 @@ class Api::V1::CollectionsController < Api::V1::BaseController
   before_action :check_cache, only: %i[show]
   def show
     log_organization_view_activity
-    if @collection.class.in? [Collection::SharedWithMeCollection, Collection::SubmissionsCollection]
-      # special behavior where it defaults to newest first
-      params[:card_order] ||= 'updated_at'
-    end
     check_getting_started_shell
     log_collection_activity(:viewed)
     render_collection
@@ -77,9 +73,26 @@ class Api::V1::CollectionsController < Api::V1::BaseController
     end
   end
 
+  def submit
+    @collection.submission_attrs['hidden'] = false
+    Roles::MergeToChild.call(
+      parent: @collection.parent_submission_box,
+      child: @collection,
+    )
+    if @collection.save
+      render jsonapi: @collection,
+             include: Collection.default_relationships_for_api
+    else
+      render_api_errors @collection.errors
+    end
+  end
+
   private
 
   def check_cache
+    if @collection.archived? || @collection.organization.deactivated?
+      head(404)
+    end
     fresh_when(
       last_modified: @collection.updated_at.utc,
       etag: @collection.cache_key(params[:card_order]),
@@ -155,6 +168,7 @@ class Api::V1::CollectionsController < Api::V1::BaseController
       :submission_template_id,
       :submission_box_type,
       :collection_to_test_id,
+      :hide_submissions,
       collection_cards_attributes: %i[id order width height],
     )
   end

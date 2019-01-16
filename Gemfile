@@ -117,6 +117,7 @@ group :development, :test do
   gem 'database_cleaner'
   gem 'rails-controller-testing'
   gem 'action-cable-testing'
+  gem 'active_record_query_trace'
 end
 
 group :development do
@@ -138,6 +139,8 @@ group :test do
   gem 'fakeredis', require: 'fakeredis/rspec'
   gem 'shoulda-matchers', '~> 3.1'
   gem 'json-schema'
+  gem 'vcr'
+  gem 'webmock'
 end
 
 group :production do

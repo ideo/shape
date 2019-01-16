@@ -113,13 +113,15 @@ class MoveModal extends React.Component {
           }
           await apiStore.createTemplateInstance(data)
           successMessage = 'Your template instance has been created!'
-          // refresh the current collection to get the new template
-          await apiStore.fetch('collections', collectionId, true)
           break
         }
         default:
           return
       }
+      // always refresh the current collection
+      // TODO: what if you "moved/duplicated to BOTTOM"?
+      await viewingCollection.API_fetchCards()
+
       runInAction(() => {
         this.isLoading = false
       })
@@ -203,7 +205,10 @@ class MoveModal extends React.Component {
       }
       helperProps.recordName = templateName
       helperProps.type = 'template'
-    } else if (!apiStore.currentUser.show_move_helper) {
+    } else if (
+      !apiStore.currentUser.show_move_helper ||
+      uiStore.dismissedMoveHelper
+    ) {
       return null
     }
     return (

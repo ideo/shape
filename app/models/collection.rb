@@ -199,11 +199,7 @@ class Collection < ApplicationRecord
       :submission_template,
       :collection_to_test,
       :live_test_collection,
-      roles: %i[users groups resource],
-      collection_cards: [
-        :parent,
-        record: [:filestack_file],
-      ],
+      roles: %i[pending_users users groups resource],
     ]
   end
 
@@ -215,11 +211,6 @@ class Collection < ApplicationRecord
       :organization,
       parent_collection_card: %i[parent],
       roles: %i[users groups resource],
-      collection_cards: [
-        :parent,
-        :collection,
-        item: [:filestack_file],
-      ],
     ]
   end
 
@@ -262,6 +253,8 @@ class Collection < ApplicationRecord
     c.cloned_from = self
     c.created_by = for_user
     c.tag_list = tag_list
+    # copy roles from parent (i.e. where it's being placed)
+    c.roles_anchor_collection_id = parent.roles_anchor.id
 
     # copy organization_id from the collection this is being moved into
     # NOTE: parent is only nil in Colab import -- perhaps we should clean up any Colab import specific code?
@@ -285,15 +278,7 @@ class Collection < ApplicationRecord
       c.parent_collection_card.collection = c
     end
 
-    # copy roles from parent (i.e. where it's being placed)
-    parent.roles.each do |role|
-      c.roles << role.duplicate!(assign_resource: c)
-    end
-
     c.enable_org_view_access_if_allowed(parent)
-
-    # Upgrade to editor if provided
-    for_user.upgrade_to_edit_role(c) if for_user.present?
 
     if collection_cards.any? && !c.getting_started_shell
       worker_opts = [
@@ -375,26 +360,40 @@ class Collection < ApplicationRecord
     end
   end
 
-  def collection_cards_viewable_by(cached_cards, user, card_order: nil)
+  def collection_cards_viewable_by(
+    cached_cards,
+    user,
+    card_order: nil, page: 1, per_page: CollectionCard::DEFAULT_PER_PAGE
+  )
+    can_view_collection = can_view?(user)
+    return [] unless can_view_collection
+
+    cached_cards ||= collection_cards.includes(item: :roles_anchor_collection, collection: :roles_anchor_collection)
+    order = { order: :asc }
     if card_order
       if card_order == 'total' || card_order.include?('question_')
         collection_order = "cached_test_scores->'#{card_order}'"
         order = "collections.#{collection_order} DESC NULLS LAST"
-        puts "order #{order}"
       else
         # e.g. updated_at
         order = { card_order => :desc }
       end
-      cached_cards = collection_cards
-                     .unscope(:order)
-                     .includes(:item, :collection)
-                     .order(order)
-    else
-      cached_cards ||= collection_cards.includes(:item, :collection)
     end
-    cached_cards.select do |collection_card|
-      collection_card.record.can_view?(user)
-    end
+
+    # card.can_view? delegates to the underlying record (item/collection)
+    # if the roles_anchor is the same as mine, we can skip this check because the user can view me
+    roles_anchor_id = roles_anchor.id
+    ids = cached_cards
+          .select { |card| card.record.roles_anchor_collection_id == roles_anchor_id || card.can_view?(user) }
+          .pluck(:id)
+
+    # pluck viewable ids and then convert to a paginated query
+    CollectionCard
+      .where(id: ids)
+      .includes(:collection, item: [:filestack_file])
+      .order(order)
+      .page(page)
+      .per(per_page)
   end
 
   # convenience method if card order ever gets out of sync
@@ -424,7 +423,8 @@ class Collection < ApplicationRecord
     # As long as it isn't the 'Getting Started' collection
     return false unless parent.is_a?(Collection::UserCollection) &&
                         (cloned_from.blank? || !cloned_from.getting_started?)
-
+    # collections created in My Collection always get unanchored
+    unanchor_and_inherit_roles_from_anchor!
     organization.primary_group.add_role(Role::VIEWER, self).try(:persisted?)
   end
 
@@ -516,7 +516,8 @@ class Collection < ApplicationRecord
       "/cards_#{collection_cards.maximum(:updated_at).to_i}" \
       "/#{test_details}" \
       "/#{getting_started_shell}" \
-      "/roles_#{roles.maximum(:updated_at).to_i}"
+      "/#{organization.updated_at}" \
+      "/roles_#{anchored_roles.maximum(:updated_at).to_i}"
   end
 
   def remove_comment_followers!
@@ -526,6 +527,14 @@ class Collection < ApplicationRecord
 
   def jsonapi_type_name
     'collections'
+  end
+
+  def default_card_order
+    if self.class.in? [Collection::SharedWithMeCollection, Collection::SubmissionsCollection]
+      # special behavior where it defaults to newest first
+      return 'updated_at'
+    end
+    'order'
   end
 
   def update_processing_status(status = nil)
@@ -547,6 +556,21 @@ class Collection < ApplicationRecord
 
     # Broadcast that this collection is no longer being edited
     collections.each(&:processing_done) if processing_status.nil?
+  end
+
+  def reset_permissions!
+    all_collections = Collection.in_collection(self)
+    all_items = Item.in_collection(self)
+    [all_collections, all_items].each do |records|
+      records.update_all(roles_anchor_collection_id: roles_anchor.id)
+      records.find_each do |record|
+        if record.roles.present?
+          record.roles.destroy_all
+        else
+          record.touch
+        end
+      end
+    end
   end
 
   # =================================
@@ -606,6 +630,10 @@ class Collection < ApplicationRecord
   def submission_box_template_test?
     return false unless is_a?(Collection::TestCollection)
     master_template? && inside_a_submission_box_template?
+  end
+
+  def inside_hidden_submission_box?
+    parent_submission_box&.hide_submissions
   end
 
   def submission?

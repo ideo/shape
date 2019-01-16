@@ -1,6 +1,7 @@
 import { action, runInAction, observable, computed } from 'mobx'
 import { Collection as datxCollection, assignModel, ReferenceType } from 'datx'
 import { jsonapi } from 'datx-jsonapi'
+import { apiUrl } from '~/utils/url'
 import _ from 'lodash'
 import moment from 'moment-mini'
 import queryString from 'query-string'
@@ -26,10 +27,16 @@ import { undoStore } from './index'
 class ApiStore extends jsonapi(datxCollection) {
   @observable
   currentUserId = null
+
   @observable
   currentUserOrganizationId = null
+
+  @observable
+  switchingOrgs = false
+
   @observable
   currentCommentThreadIds = []
+
   @observable
   usersThreadPagesToLoad = 1
   @observable
@@ -38,8 +45,10 @@ class ApiStore extends jsonapi(datxCollection) {
   hasOlderThreads = false
   @observable
   currentPageThreadKey = null
+
   @observable
   recentNotifications = new Map()
+
   @observable
   usableTemplates = []
 
@@ -51,20 +60,13 @@ class ApiStore extends jsonapi(datxCollection) {
     if (!_.has(options, 'skipCache')) {
       options.skipCache = true
     }
-    if (undoStore.undoAfterRoute) {
-      undoStore.performUndoAfterRoute()
-    }
-    return super.request(path, method, data, options)
+    return super.request(apiUrl(path), method, data, options)
   }
 
   @action
-  setCurrentUserId(id) {
+  setCurrentUserInfo({ id, organizationId }) {
     this.currentUserId = id
-  }
-
-  @action
-  setCurrentUserOrganizationId(id) {
-    this.currentUserOrganizationId = id
+    this.currentUserOrganizationId = organizationId || null
   }
 
   @action
@@ -94,12 +96,29 @@ class ApiStore extends jsonapi(datxCollection) {
 
   @computed
   get currentUser() {
+    if (!this.currentUserId) {
+      return null
+    }
     return this.find('users', this.currentUserId)
   }
 
   @computed
   get currentUserOrganization() {
     return this.find('organizations', this.currentUserOrganizationId)
+  }
+
+  get currentUserCollectionId() {
+    const { currentUser } = this
+    if (!this.currentUser) return null
+    return currentUser.current_user_collection_id
+  }
+
+  @computed
+  get currentOrgIsDeactivated() {
+    const org =
+      this.currentUserOrganization || this.currentUser.current_organization
+    if (!org) return true
+    return org.deactivated
   }
 
   @computed
@@ -112,33 +131,18 @@ class ApiStore extends jsonapi(datxCollection) {
     return _.first(this.currentUser.organizations.filter(org => org.id === id))
   }
 
-  async loadCurrentUserAndGroups() {
-    await this.loadCurrentUser()
-    await this.loadCurrentUserGroups()
-  }
-
   async loadCurrentUser() {
     try {
       const res = await this.request('users/me')
-      this.setCurrentUserId(res.data.id)
-      const { current_organization } = this.currentUser
-      this.setCurrentUserOrganizationId(
-        current_organization ? current_organization.id : null
-      )
+      const currentUser = res.data
+      this.setCurrentUserInfo({
+        id: currentUser.id,
+        organizationId:
+          currentUser.current_organization &&
+          currentUser.current_organization.id,
+      })
     } catch (e) {
       trackError(e, { source: 'loadCurrentUser', name: 'fetchUser' })
-    }
-  }
-
-  async loadCurrentUserGroups({ orgOnly = false } = {}) {
-    try {
-      let { groups } = this.currentUser
-      if (orgOnly) {
-        groups = groups.filter(g => g.isOrgGroup)
-      }
-      groups.map(group => this.fetchRoles(group))
-    } catch (e) {
-      trackError(e, { source: 'loadCurrentUserGroups', name: 'fetchGroups' })
     }
   }
 
@@ -159,10 +163,16 @@ class ApiStore extends jsonapi(datxCollection) {
     )
   }
 
-  async fetchRoles(group) {
-    const res = await this.request(`groups/${group.id}/roles`, 'GET')
+  async fetchRoles(resource) {
+    const res = await this.request(
+      `${resource.internalType}/${resource.id}/roles`,
+      'GET'
+    )
     const roles = res.data
+    resource.roles = roles
+    roles.forEach(role => (role.resource = resource))
     this.add(roles, 'roles')
+    return roles
   }
 
   @action
@@ -374,11 +384,13 @@ class ApiStore extends jsonapi(datxCollection) {
     return archiveResult
   }
 
-  unarchiveCards({ cardIds, snapshot }) {
-    return this.request('collection_cards/unarchive', 'PATCH', {
+  async unarchiveCards({ cardIds, snapshot }) {
+    const res = await this.request('collection_cards/unarchive', 'PATCH', {
       card_ids: cardIds,
       collection_snapshot: snapshot,
     })
+    const collection = res.data
+    collection.API_fetchCards()
   }
 
   moveCards(data) {
@@ -412,6 +424,53 @@ class ApiStore extends jsonapi(datxCollection) {
     runInAction(() => {
       record.inMyCollection = res.__response.data
     })
+  }
+
+  async searchRoles(
+    record,
+    { page = 1, query = '', status = 'active', reset = false } = {}
+  ) {
+    const params = queryString.stringify({
+      query,
+      page,
+      status,
+      resource_id: record.id,
+      resource_type: record.className,
+    })
+    const apiPath = `search/users_and_groups?${params}`
+    _.each(record.roles, role => {
+      role.capturePrevLists({ reset })
+    })
+    try {
+      const res = await this.request(apiPath)
+      const roles = res.data
+
+      // role records may have changed if this collection/item was just unanchored
+      const roleIds = _.map(roles, 'id')
+      const recordRoleIds = _.map(record.roles, 'id')
+
+      // if the record doesn't have any roles yet -- or they have changed -- make the association
+      if (!record.roles.length || _.difference(roleIds, recordRoleIds).length) {
+        record.roles = roles
+      }
+      _.each(roles, role => {
+        role.resource = record
+        role.updateCount(status, res.meta.total)
+        // first page load should automatically set role.users and role.groups via datx
+        // next page loads we need to manually concatenate
+        if (!reset) {
+          role.mergePrevLists()
+        }
+      })
+    } catch (e) {
+      console.warn('Error with searchRoles', e.message)
+    }
+  }
+
+  // default action for updating any basic apiStore value
+  @action
+  update(name, value) {
+    this[name] = value
   }
 
   // NOTE: had to override datx PureCollection, it looks like it is meant to do

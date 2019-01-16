@@ -1,4 +1,5 @@
 import Chip from '@material-ui/core/Chip'
+import FormControlLabel from '@material-ui/core/FormControlLabel'
 import MuiSelect from '@material-ui/core/Select'
 import MenuItem from '@material-ui/core/MenuItem'
 import MuiCheckbox from '@material-ui/core/Checkbox'
@@ -42,6 +43,18 @@ export const LabelText = styled.div`
   ${LabelStyle};
 `
 LabelText.displayName = 'StyledLabelText'
+
+export const LabelTextStandalone = styled.div`
+  ${LabelStyle};
+  margin-bottom: 0;
+  margin-top: 12px;
+`
+
+export const LabelContainer = styled(FormControlLabel)`
+  && {
+    align-items: flex-start;
+  }
+`
 
 /** @component */
 export const Label = styled.label`
@@ -108,6 +121,18 @@ export const TextButton = styled.button`
   max-width: ${props => (props.maxWidth ? `${props.maxWidth}px` : 'none')};
 `
 TextButton.displayName = 'StyledTextButton'
+
+export const ShowMoreButton = styled.button`
+  width: 100%;
+  text-align: center;
+  font-family: ${v.fonts.sans};
+  font-size: 0.875rem;
+  color: ${v.colors.commonMedium};
+  &:hover {
+    color: ${v.colors.black};
+  }
+`
+ShowMoreButton.displayName = 'ShowMoreButton'
 
 /** @component */
 export const TextField = styled.input`

@@ -138,7 +138,7 @@ export const StyledBottomLeftIcon = styled.div`
     width: 18px;
     height: 18px;
     bottom: 0.75rem;
-    left: 0.75rem;
+    left: ${props.iconPos === 2 ? 3.25 : 0.75}rem;
   `};
 `
 StyledBottomLeftIcon.displayName = 'StyledBottomLeftIcon'
