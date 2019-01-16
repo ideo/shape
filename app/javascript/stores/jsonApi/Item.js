@@ -28,6 +28,7 @@ class Item extends SharedRecordMixin(BaseRecord) {
     'image',
     'archived',
     'tag_list',
+    'thumbnail_url',
     'filestack_file_attributes',
     'data_settings',
   ]
@@ -85,16 +86,28 @@ class Item extends SharedRecordMixin(BaseRecord) {
     return this.type === ITEM_TYPES.TEXT
   }
 
-  get canBeSetAsCover() {
-    return this.isImage || this.type === ITEM_TYPES.VIDEO
-  }
-
   get isChart() {
     return this.type === ITEM_TYPES.CHART || this.type === ITEM_TYPES.DATA
   }
 
   get isData() {
     return this.type === ITEM_TYPES.DATA
+  }
+
+  get isVideo() {
+    return this.type === ITEM_TYPES.VIDEO
+  }
+
+  get isLink() {
+    return this.type === ITEM_TYPES.LINK
+  }
+
+  get canBeSetAsCover() {
+    return this.isImage
+  }
+
+  get canSetACover() {
+    return this.isVideo || this.isLink
   }
 
   get originalImageUrl() {
@@ -169,6 +182,7 @@ Item.defaults = {
   data_settings: {
     d_measure: null,
   },
+  thumbnail_url: '',
 }
 Item.refDefaults = {
   roles: {

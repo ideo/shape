@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types'
-import { PropTypes as MobxPropTypes } from 'mobx-react'
+import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 import { Flex, Box } from 'reflexbox'
 
@@ -14,10 +14,14 @@ import Activity from '~/stores/jsonApi/Activity'
 import { StyledImageCover } from './ImageItemCover'
 
 const StyledVideoCover = styled.div`
+  background: ${v.colors.commonLight};
   width: 100%;
   height: 100%;
   .inner {
     height: 100%;
+    position: absolute;
+    width: 100%;
+    z-index: ${v.zIndex.gridCardBg};
     button {
       border: none;
       background: ${hexToRgba(v.colors.primaryLight, 0.75)};
@@ -39,14 +43,18 @@ const StyledVideoCover = styled.div`
   .playing {
     height: 100%;
     display: ${props => (props.playing ? 'block' : 'none')};
+    z-index: ${v.zIndex.gridCardBg};
   }
 `
 StyledVideoCover.displayName = 'StyledVideoCover'
 
-class VideoItemCover extends React.PureComponent {
+@observer
+class VideoItemCover extends React.Component {
   state = {
     playing: false,
   }
+
+  componentDidMount() {}
 
   playVideo = () => {
     const { item, dragging } = this.props
@@ -59,29 +67,26 @@ class VideoItemCover extends React.PureComponent {
 
   render() {
     const { item } = this.props
-    let thumbnail = item.thumbnail_url
-    let bgColor = null
-    // NOTE: This is sort of a workaround to disable the default thumbnail_url (gradient square)
-    // as well as getting around the fact that videos currently have thumbnail_url required
-    if (thumbnail === v.defaults.video.thumbnailUrl) {
-      thumbnail = null
-      bgColor = v.colors.commonDark
-    }
+    const thumbnail = item.thumbnail_url
+    const showPlayer = !thumbnail
     return (
-      <StyledVideoCover playing={this.state.playing}>
-        <StyledImageCover
-          className="not-playing"
-          url={thumbnail}
-          bgColor={bgColor}
-        >
-          <Flex className="inner" align="center" justify="center">
-            <Box>
-              <button className="cancelGridClick" onClick={this.playVideo}>
-                &#9658;
-              </button>
-            </Box>
-          </Flex>
-        </StyledImageCover>
+      <StyledVideoCover playing={this.state.playing || showPlayer}>
+        {thumbnail && (
+          <StyledImageCover
+            className="not-playing"
+            url={thumbnail}
+            bgColor={v.colors.commonDark}
+          >
+            <Flex className="inner" align="center" justify="center">
+              <Box>
+                <button className="cancelGridClick" onClick={this.playVideo}>
+                  &#9658;
+                </button>
+              </Box>
+            </Flex>
+            <div className="overlay" />
+          </StyledImageCover>
+        )}
         <div className="playing">
           <FullAbsoluteParent>
             <StyledTopLeftActions className="show-on-hover">

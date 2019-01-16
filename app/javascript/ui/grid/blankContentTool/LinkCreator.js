@@ -118,6 +118,7 @@ class LinkCreator extends React.Component {
         name,
         thumbnail_url: thumbnailUrl,
       },
+      filter: 'nothing',
     }
     this.props.createCard(attrs)
   }

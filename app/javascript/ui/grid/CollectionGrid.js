@@ -416,7 +416,9 @@ class CollectionGrid extends React.Component {
   // Sorts cards and sets state.cards after doing so
   @action
   positionCards = (collectionCards = [], opts = {}) => {
-    const cards = [...collectionCards]
+    // even though hidden cards are not loaded by default in the API, we still filter here because
+    // it's possible that some hidden cards were loaded in memory via the CoverImageSelector
+    const cards = [...collectionCards].filter(c => !c.hidden)
     // props might get passed in e.g. nextProps for componentWillReceiveProps
     if (!opts.props) opts.props = this.props
     const { collection, gridW, gridH, gutter, cols, addEmptyCard } = opts.props

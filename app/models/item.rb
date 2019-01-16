@@ -20,7 +20,8 @@ class Item < ApplicationRecord
   store_accessor :cached_attributes,
                  :cached_tag_list,
                  :cached_filestack_file_url,
-                 :cached_filestack_file_info
+                 :cached_filestack_file_info,
+                 :previous_thumbnail_urls
 
   # The card that 'holds' this item and determines its breadcrumb
   has_one :parent_collection_card,
@@ -48,6 +49,7 @@ class Item < ApplicationRecord
   validates :type, presence: true
 
   before_save :cache_attributes
+  before_update :cache_previous_thumbnail_url, if: :will_save_change_to_thumbnail_url?
   after_commit :touch_related_cards, if: :saved_change_to_updated_at?, unless: :destroyed?
   after_commit :reindex_parent_collection, unless: :destroyed?
   after_commit :update_parent_collection_if_needed, unless: :destroyed?
@@ -190,7 +192,7 @@ class Item < ApplicationRecord
   end
 
   def truncate_name
-    self.name = name.truncate(40, separator: /[,?\.\s]+/, omission: '')
+    self.name = name ? name.truncate(40, separator: /[,?\.\s]+/, omission: '') : 'item'
   end
 
   def dont_reindex_parent!
@@ -252,5 +254,11 @@ class Item < ApplicationRecord
 
     # Remove spaces
     url.strip!
+  end
+
+  def cache_previous_thumbnail_url
+    thumbs = previous_thumbnail_urls || []
+    thumbs.unshift(thumbnail_url_was)
+    self.previous_thumbnail_urls = thumbs.reject(&:blank?).uniq.slice(0, 9)
   end
 end

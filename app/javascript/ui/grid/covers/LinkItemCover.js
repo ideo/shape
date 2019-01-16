@@ -1,4 +1,4 @@
-import { PropTypes as MobxPropTypes } from 'mobx-react'
+import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 import { Flex, Box } from 'reflexbox'
 
@@ -11,7 +11,7 @@ import { uiStore } from '~/stores'
 import { StyledImageCover } from './ImageItemCover'
 
 const StyledLinkCover = styled.div`
-  background: ${v.colors.black};
+  background: ${v.colors.commonLight};
   color: ${v.colors.commonLight};
   cursor: pointer;
   width: 100%;
@@ -21,6 +21,8 @@ const StyledLinkCover = styled.div`
     height: 100%;
     padding: 20px 20px;
     padding-bottom: 60px;
+    position: absolute;
+    z-index: ${v.zIndex.gridCardBg};
     button {
       border: none;
       background: ${hexToRgba(v.colors.primaryLight, 0.75)};
@@ -39,7 +41,8 @@ const StyledLinkCover = styled.div`
 `
 StyledLinkCover.displayName = 'StyledLinkCover'
 
-class LinkItemCover extends React.PureComponent {
+@observer
+class LinkItemCover extends React.Component {
   state = {
     iconError: false,
   }
@@ -96,7 +99,7 @@ class LinkItemCover extends React.PureComponent {
     const { truncatedName, truncatedContent } = this.clamp()
     return (
       <StyledLinkCover>
-        <StyledImageCover url={thumbnail_url}>
+        <StyledImageCover url={thumbnail_url} bgColor={v.colors.black}>
           <Flex className="inner" align="center" justify="center">
             <Box style={{ width: '100%' }}>
               <CardHeading className="name">{truncatedName}</CardHeading>
@@ -104,6 +107,7 @@ class LinkItemCover extends React.PureComponent {
               <GridCardIconWithName text={url} icon={this.icon} />
             </Box>
           </Flex>
+          <div className="overlay" />
         </StyledImageCover>
       </StyledLinkCover>
     )

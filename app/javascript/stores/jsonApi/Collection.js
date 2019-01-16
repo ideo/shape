@@ -2,6 +2,7 @@ import _ from 'lodash'
 import { observable, computed, action, runInAction } from 'mobx'
 import { ReferenceType } from 'datx'
 import pluralize from 'pluralize'
+import queryString from 'query-string'
 
 import { apiStore, routingStore, uiStore } from '~/stores'
 import { apiUrl } from '~/utils/url'
@@ -349,15 +350,28 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     return data
   }
 
-  async API_fetchCards({ page = 1, per_page = 50, order } = {}) {
+  async API_fetchCards({
+    page = 1,
+    per_page = 50,
+    order,
+    hidden = false,
+  } = {}) {
     runInAction(() => {
       if (order) this.currentOrder = order
     })
-    let params = `?page=${page}&per_page=${per_page}`
-    if (this.currentOrder !== 'order') {
-      params += `&card_order=${this.currentOrder}`
+    const params = {
+      page,
+      per_page,
     }
-    const apiPath = `collections/${this.id}/collection_cards${params}`
+    if (this.currentOrder !== 'order') {
+      params.card_order = this.currentOrder
+    }
+    if (hidden) {
+      params.hidden = true
+    }
+    const apiPath = `collections/${
+      this.id
+    }/collection_cards?${queryString.stringify(params)}`
     const res = await this.apiStore.request(apiPath)
     const { data, links } = res
     runInAction(() => {
@@ -527,10 +541,14 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   }
 
   API_clearCollectionCover() {
-    return this.apiStore.request(
-      `collections/${this.id}/clear_collection_cover`,
-      'POST'
-    )
+    return this.apiStore
+      .request(`collections/${this.id}/clear_collection_cover`, 'POST')
+      .catch(err => {
+        console.warn(err)
+        uiStore.alert(
+          'Unable to change the collection cover. This may be a special collection that you cannot edit.'
+        )
+      })
   }
 
   async API_getNextAvailableTest() {

@@ -43,6 +43,13 @@ class Api::V1::CollectionsController < Api::V1::BaseController
     end
   end
 
+  load_and_authorize_resource only: %i[clear_collection_cover]
+  def clear_collection_cover
+    @collection.clear_collection_cover
+    @collection.reload
+    render_collection
+  end
+
   before_action :load_and_authorize_collection_destroy, only: %i[destroy]
   def destroy
     if @collection.destroy

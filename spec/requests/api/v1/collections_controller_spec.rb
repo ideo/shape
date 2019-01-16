@@ -334,6 +334,23 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
     end
   end
 
+  describe 'POST #clear_collection_cover' do
+    let!(:collection) { create(:collection, add_editors: [user]) }
+    let(:collection_card) do
+      create(:collection_card_image, order: 0, width: 1, parent: collection, is_cover: true)
+    end
+    let(:path) { "/api/v1/collections/#{collection.id}/clear_collection_cover" }
+
+    before do
+      user.add_role(Role::VIEWER, collection_card.item)
+      post(path)
+    end
+
+    it 'should clear the cover from the collection' do
+      expect(collection_card.reload.is_cover).to be false
+    end
+  end
+
   describe 'DELETE #destroy' do
     let(:path) { "/api/v1/collections/#{collection.id}" }
 

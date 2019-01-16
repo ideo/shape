@@ -412,6 +412,16 @@ describe Collection, type: :model do
         expect(collection.collection_cards_viewable_by(cards, user, per_page: 1)).to match_array([cards.first])
       end
     end
+
+    context 'with hidden option' do
+      before do
+        collection.collection_cards.last.update(hidden: true)
+      end
+
+      it 'should only show the un-hidden cards' do
+        expect(collection.collection_cards_viewable_by(cards, user)).to match_array(cards.where(hidden: false))
+      end
+    end
   end
 
   describe '#search_data' do

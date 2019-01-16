@@ -182,6 +182,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
       card_order: params[:card_order],
       page: params[:page] || 1,
       per_page: per_page,
+      hidden: params[:hidden].present?,
     )
   end
 
@@ -294,6 +295,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
       :height,
       :image_contain,
       :is_cover,
+      :filter,
     )
   end
 
@@ -314,6 +316,9 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
       :item_id,
       :type,
       :image_contain,
+      :is_cover,
+      :filter,
+      :hidden,
       collection_attributes: %i[
         id
         type

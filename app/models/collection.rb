@@ -363,7 +363,7 @@ class Collection < ApplicationRecord
   def collection_cards_viewable_by(
     cached_cards,
     user,
-    card_order: nil, page: 1, per_page: CollectionCard::DEFAULT_PER_PAGE
+    card_order: nil, page: 1, per_page: CollectionCard::DEFAULT_PER_PAGE, hidden: false
   )
     can_view_collection = can_view?(user)
     return [] unless can_view_collection
@@ -388,8 +388,10 @@ class Collection < ApplicationRecord
           .pluck(:id)
 
     # pluck viewable ids and then convert to a paginated query
-    CollectionCard
-      .where(id: ids)
+    cards = CollectionCard.where(id: ids)
+    # `hidden` means include both hidden and unhidden cards
+    cards = cards.where(hidden: false) unless hidden
+    cards
       .includes(:collection, item: [:filestack_file])
       .order(order)
       .page(page)
@@ -398,13 +400,13 @@ class Collection < ApplicationRecord
 
   # convenience method if card order ever gets out of sync
   def reorder_cards!
-    all_collection_cards.active.order(pinned: :desc, order: :asc).each_with_index do |card, i|
+    all_collection_cards.active.visible.order(pinned: :desc, order: :asc).each_with_index do |card, i|
       card.update_column(:order, i) unless card.order == i
     end
   end
 
   def reorder_cards_by_collection_name!
-    all_collection_cards.active.includes(:collection).order('collections.name ASC').each_with_index do |card, i|
+    all_collection_cards.active.visible.includes(:collection).order('collections.name ASC').each_with_index do |card, i|
       card.update_column(:order, i) unless card.order == i
     end
   end
@@ -556,6 +558,13 @@ class Collection < ApplicationRecord
 
     # Broadcast that this collection is no longer being edited
     collections.each(&:processing_done) if processing_status.nil?
+  end
+
+  def clear_collection_cover
+    cover = primary_collection_cards.where(is_cover: true).first
+    return if cover.nil?
+    cover.update(is_cover: false)
+    touch
   end
 
   def reset_permissions!

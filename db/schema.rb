@@ -65,6 +65,8 @@ ActiveRecord::Schema.define(version: 20190110222910) do
     t.boolean "image_contain", default: false
     t.boolean "is_cover", default: false
     t.datetime "unarchived_at"
+    t.boolean "hidden", default: false
+    t.integer "filter", default: 1
     t.index ["collection_id"], name: "index_collection_cards_on_collection_id"
     t.index ["item_id"], name: "index_collection_cards_on_item_id"
     t.index ["parent_id"], name: "index_collection_cards_on_parent_id"
