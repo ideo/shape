@@ -68,7 +68,7 @@ class VideoUrl {
   static privateVideoDefaults(id) {
     return {
       name: v.defaults.video.name,
-      thumbnailUrl: v.defaults.video.thumbnailUrl,
+      thumbnailUrl: null,
       id,
     }
   }
