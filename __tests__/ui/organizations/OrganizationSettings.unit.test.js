@@ -3,7 +3,7 @@ import fakeApiStore from '#/mocks/fakeApiStore'
 import { LabelContainer } from '~/ui/global/styled/forms'
 import TextEditor from '~/ui/global/TextEditor'
 
-let wrapper, component, apiStore, routingStore, props, organization
+let wrapper, apiStore, routingStore, props, organization
 
 beforeEach(() => {
   apiStore = fakeApiStore()
@@ -17,7 +17,6 @@ describe('OrganizationSettings', () => {
     beforeEach(() => {
       organization.primary_group.can_edit = false
       wrapper = shallow(<OrganizationSettings.wrappedComponent {...props} />)
-      component = wrapper.instance()
     })
 
     it('kicks you out back to the homepage', () => {
@@ -29,7 +28,6 @@ describe('OrganizationSettings', () => {
     beforeEach(() => {
       organization.primary_group.can_edit = true
       wrapper = shallow(<OrganizationSettings.wrappedComponent {...props} />)
-      component = wrapper.instance()
     })
 
     it('renders the page with TagEditor for domain whitelist', () => {
@@ -37,14 +35,6 @@ describe('OrganizationSettings', () => {
       expect(wrapper.find('TagEditor').props().tagField).toEqual(
         'domain_whitelist'
       )
-    })
-
-    it('reloads org groups after saving the domain whitelist', () => {
-      component.afterDomainWhitelistUpdate()
-
-      expect(props.apiStore.loadCurrentUserGroups).toHaveBeenCalledWith({
-        orgOnly: true,
-      })
     })
 
     it('should render a checkbox to add custom terms', () => {
