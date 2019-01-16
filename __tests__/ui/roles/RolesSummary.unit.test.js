@@ -1,5 +1,3 @@
-import _ from 'lodash'
-
 import RolesSummary from '~/ui/roles/RolesSummary'
 
 import { fakeRole, fakeUser } from '#/mocks/data'
@@ -7,6 +5,7 @@ import { fakeRole, fakeUser } from '#/mocks/data'
 const emptyProps = {
   roles: [],
   handleClick: jest.fn(),
+  rolesMenuOpen: false,
 }
 
 const editorRole = { ...fakeRole }
@@ -15,6 +14,7 @@ viewerRole.name = 'viewer'
 
 const editorsAndViewersProps = {
   roles: [editorRole, viewerRole],
+  rolesMenuOpen: false,
   handleClick: jest.fn(),
 }
 
@@ -60,8 +60,8 @@ describe('RolesSummary', () => {
   describe('with custom label', () => {
     beforeEach(() => {
       const newProps = {
+        ...emptyProps,
         roles: [editorRole, { ...viewerRole, label: 'participant' }],
-        handleClick: jest.fn(),
       }
       wrapper = shallow(<RolesSummary {...newProps} />)
     })
@@ -79,7 +79,10 @@ describe('RolesSummary', () => {
 
   describe('with only viewers', () => {
     beforeEach(() => {
-      const onlyViewersProps = _.merge({}, emptyProps, { roles: [viewerRole] })
+      const onlyViewersProps = {
+        ...emptyProps,
+        roles: [viewerRole],
+      }
       wrapper = shallow(<RolesSummary {...onlyViewersProps} />)
     })
 
@@ -95,8 +98,11 @@ describe('RolesSummary', () => {
 
   describe('with only editors', () => {
     beforeEach(() => {
-      const props = _.merge({}, emptyProps, { roles: [editorRole] })
-      wrapper = shallow(<RolesSummary {...props} />)
+      const newProps = {
+        ...emptyProps,
+        roles: [editorRole],
+      }
+      wrapper = shallow(<RolesSummary {...newProps} />)
     })
 
     it('renders 2 editors and label', () => {
@@ -120,8 +126,11 @@ describe('RolesSummary', () => {
         fakeUser,
         fakeUser,
       ]
-      const props = _.merge({}, editorsAndViewersProps, { roles: [editorRole] })
-      wrapper = shallow(<RolesSummary {...props} />)
+      const newProps = {
+        ...editorsAndViewersProps,
+        roles: [editorRole],
+      }
+      wrapper = shallow(<RolesSummary {...newProps} />)
     })
 
     it('renders only 5 editors', () => {
