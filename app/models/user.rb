@@ -91,10 +91,15 @@ class User < ApplicationRecord
     {
       name: name&.downcase,
       handle: handle&.downcase,
-      email: email&.downcase,
+      email: email_search_tokens,
       status: status,
       organization_ids: organization_ids,
     }
+  end
+
+  def email_search_tokens
+    parts = email.downcase.split('@')
+    "#{email} #{parts.join(' ')}"
   end
 
   def should_index?
