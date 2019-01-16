@@ -165,7 +165,6 @@ class ApiStore extends jsonapi(datxCollection) {
     )
     const roles = res.data
     resource.roles = roles
-    roles.forEach(role => (role.resource = resource))
     this.add(roles, 'roles')
     return roles
   }
@@ -449,7 +448,6 @@ class ApiStore extends jsonapi(datxCollection) {
         record.roles = roles
       }
       _.each(roles, role => {
-        if (!role.resource) role.resource = record
         role.updateCount(status, res.meta.total)
         // first page load should automatically set role.users and role.groups via datx
         // next page loads we need to manually concatenate

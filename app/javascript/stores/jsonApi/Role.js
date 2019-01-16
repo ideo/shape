@@ -21,14 +21,6 @@ class Role extends BaseRecord {
   @observable
   prevGroups = []
 
-  get label() {
-    const { name, resource } = this
-    if (name === 'viewer' && resource && resource.isSubmissionBox) {
-      return 'participant'
-    }
-    return name
-  }
-
   @action
   updateCount(type, count) {
     if (['pending', 'active'].indexOf(type) === -1) return
@@ -76,21 +68,6 @@ class Role extends BaseRecord {
           }
         })
       })
-  }
-
-  // NOTE: RolesMenu also has its own createRoles method -- not sure if this one is used anywhere?
-  API_create() {
-    // TODO why can't the API figure out where name is if calling toJsonApi?
-    return this.apiStore.request(
-      `collections/${this.resourceId}/roles`,
-      'POST',
-      {
-        role: {
-          name: this.name,
-        },
-        user_ids: this.users.map(user => user.id),
-      }
-    )
   }
 }
 

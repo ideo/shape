@@ -260,6 +260,7 @@ class RolesMenu extends React.Component {
 
   render() {
     const {
+      record,
       addCallout,
       canEdit,
       ownerType,
@@ -331,6 +332,7 @@ class RolesMenu extends React.Component {
                           key={`${combined.entity.id}_${
                             combined.entity.internalType
                           }_r${combined.role.id}`}
+                          record={record}
                           role={combined.role}
                           roleTypes={roleTypes}
                           roleLabels={
