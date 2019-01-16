@@ -15,8 +15,7 @@ import GoIcon from '~/ui/icons/GoIcon'
 import InlineLoader from '~/ui/layout/InlineLoader'
 import Notification from '~/ui/notifications/Notification'
 import { SmallActionText } from '~/ui/global/styled/typography'
-import { FormButton } from '~/ui/global/styled/forms'
-import v from '~/utils/variables'
+import { ShowMoreButton } from '~/ui/global/styled/forms'
 import CommentThread from './CommentThread'
 
 function pluralTypeName(name) {
@@ -378,13 +377,9 @@ class CommentThreadContainer extends React.Component {
         >
           <div id="ctc-older-threads">
             {apiStore.hasOlderThreads && (
-              <FormButton
-                width={250}
-                onClick={this.loadMorePages}
-                color={v.colors.primaryDark}
-              >
-                Load older threads
-              </FormButton>
+              <ShowMoreButton darkBg onClick={this.loadMorePages}>
+                Load older threads...
+              </ShowMoreButton>
             )}
           </div>
           {this.loadingThreads && <InlineLoader fixed background="none" />}
