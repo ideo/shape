@@ -33,6 +33,20 @@ module Breadcrumbable
     end
   end
 
+  def all_children_ids
+    all_collections = Collection.where('breadcrumb @> ?', [id].to_s)
+    all_items = Item.where('breadcrumb @> ?', [id].to_s)
+    all_collections + all_items
+  end
+
+  def all_children_collection_ids
+    Collection.where('breadcrumb @> ?', [id].to_s).where(archived: false).map(&:id)
+  end
+
+  def all_children_item_ids
+    Item.where('breadcrumb @> ?', [id].to_s).where(archived: false).map(&:id)
+  end
+
   def parents
     Collection.where(id: breadcrumb)
   end
