@@ -2,7 +2,7 @@ import PropTypes from 'prop-types'
 import _ from 'lodash'
 import { Fragment } from 'react'
 import pluralize from 'pluralize'
-import { action, observable } from 'mobx'
+import { action, observable, runInAction } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import { animateScroll as scroll } from 'react-scroll'
 
@@ -31,6 +31,8 @@ pluralize.addPluralRule(/canvas$/i, 'canvases')
 class CollectionPage extends React.Component {
   @observable
   currentEditor = {}
+  @observable
+  cardsFetched = false
 
   editorTimeout = null
   channelName = 'CollectionViewingChannel'
@@ -49,6 +51,9 @@ class CollectionPage extends React.Component {
     const previousId = prevProps.collection.id
     const currentId = collection.id
     if (currentId !== previousId) {
+      runInAction(() => {
+        this.cardsFetched = false
+      })
       scroll.scrollToTop({ duration: 0 })
       ChannelManager.unsubscribeAllFromChannel(this.channelName)
       // when navigating between collections, close BCT
@@ -78,6 +83,12 @@ class CollectionPage extends React.Component {
     this.subscribeToChannel(collection.id)
     // do this here, asynchronously -- don't need to await to perform other actions
     collection.API_fetchCards().then(() => {
+      runInAction(() => {
+        this.cardsFetched = true
+      })
+      if (collection.collection_cards.length === 0) {
+        uiStore.openBlankContentTool()
+      }
       if (undoStore.undoAfterRoute) {
         undoStore.performUndoAfterRoute()
       }
@@ -90,9 +101,6 @@ class CollectionPage extends React.Component {
       // back to the SubmissionBox instead
       routingStore.routeTo('collections', collection.submission_box_id)
       return
-    }
-    if (collection.collection_card_count === 0) {
-      uiStore.openBlankContentTool()
     }
     collection.checkCurrentOrg()
     if (collection.isNormalCollection) {
@@ -298,8 +306,7 @@ class CollectionPage extends React.Component {
     // Also, checking meta.snapshot seems to load more consistently than just collection.can_edit
     const isLoading =
       collection.meta.snapshot.can_edit === undefined ||
-      (collection.collection_card_count > 0 &&
-        collection.collection_cards.length === 0) ||
+      (!this.cardsFetched && collection.collection_cards.length === 0) ||
       uiStore.isLoading
 
     const {

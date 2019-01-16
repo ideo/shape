@@ -371,6 +371,7 @@ StyledAutosizeInput.displayName = 'StyledAutosizeInput'
 /** @component */
 export const EditAvatarButton = styled.button`
   cursor: auto;
+  display: block;
   ${props =>
     props.canEdit &&
     `

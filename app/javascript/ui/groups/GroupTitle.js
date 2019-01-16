@@ -2,6 +2,7 @@ import PropTypes from 'prop-types'
 import { action, observable } from 'mobx'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
+import Grid from '@material-ui/core/Grid'
 import { Row, RowItem } from '~/ui/global/styled/layout'
 import { SubduedTitle, Heading2 } from '~/ui/global/styled/typography'
 import {
@@ -15,12 +16,24 @@ import FilestackUpload from '~/utils/FilestackUpload'
 import v from '~/utils/variables'
 import { uiStore } from '~/stores'
 
-const StyledTitleItem = RowItem.extend`
+const StyledTitleGrid = styled(Grid)`
   align-self: baseline;
   margin-bottom: 0;
-  margin-left: 14px;
   margin-top: 8px;
+
+  @media only screen and (min-width: ${v.responsive.smallBreakpoint + 1}px) {
+    flex-wrap: nowrap !important;
+  }
 `
+
+const StyledTitleItem = styled(Grid)`
+  padding-left: 14px;
+`
+
+const StyledHeading2 = Heading2.extend`
+  margin-bottom: 0;
+`
+StyledHeading2.displayName = 'StyledHeading2'
 
 const EditIconHolder = styled.button`
   cursor: pointer;
@@ -121,7 +134,7 @@ class GroupTitle extends React.Component {
   render() {
     const { group } = this.props
     return (
-      <Row>
+      <Row style={{ margin: 0 }}>
         <RowItem>
           <EditAvatarButton
             canEdit={this.editing}
@@ -135,21 +148,23 @@ class GroupTitle extends React.Component {
             />
           </EditAvatarButton>
         </RowItem>
-        <StyledTitleItem>
-          {this.editing ? (
-            this.renderAutosize(group.name, 1.5, this.updateGroupName)
-          ) : (
-            <Heading2>{group.name}</Heading2>
-          )}
-        </StyledTitleItem>
-        <StyledTitleItem>
-          {this.editing ? (
-            this.renderAutosize(group.handle, 1, this.updateGroupHandle)
-          ) : (
-            <SubduedTitle>@{group.handle}</SubduedTitle>
-          )}
-        </StyledTitleItem>
-        <StyledTitleItem>{this.renderControls()}</StyledTitleItem>
+        <StyledTitleGrid container justify="flex-start" alignItems="baseline">
+          <StyledTitleItem item>
+            {this.editing ? (
+              this.renderAutosize(group.name, 1.5, this.updateGroupName)
+            ) : (
+              <StyledHeading2>{group.name}</StyledHeading2>
+            )}
+          </StyledTitleItem>
+          <StyledTitleItem item>
+            {this.editing ? (
+              this.renderAutosize(group.handle, 1, this.updateGroupHandle)
+            ) : (
+              <SubduedTitle>@{group.handle}</SubduedTitle>
+            )}
+          </StyledTitleItem>
+          <StyledTitleItem item>{this.renderControls()}</StyledTitleItem>
+        </StyledTitleGrid>
       </Row>
     )
   }

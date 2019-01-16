@@ -11,10 +11,19 @@ const StyledSearchButton = styled.div`
   background: ${v.colors.commonLightest};
   position: relative;
   min-width: 40px;
+  max-width: ${props => (props.open ? '250px' : '40px')};
+  width: 100%;
   height: 40px;
   text-align: center;
   display: flex;
   align-items: center;
+  transition: all 0.5s ease-in-out;
+
+  @media only screen and (max-width: ${v.responsive.smallBreakpoint}px) {
+    /* encourage input width to take up the full screen minus our 16px viewport gutters */
+    max-width: ${props => (props.open ? 'calc(100vw - 32px)' : '0px')};
+    width: 100vw;
+  }
 
   input {
     flex: 1 1 auto;
@@ -22,9 +31,9 @@ const StyledSearchButton = styled.div`
     background: none;
     outline: none;
     border: none;
-    max-width: ${props => (props.open ? '250px' : '0px')};
     margin-right: ${props => (props.open ? '30px' : '0px')};
     transition: all 0.5s ease-in-out;
+    width: 100%;
     &::placeholder {
       color: ${v.colors.commonDark};
     }
