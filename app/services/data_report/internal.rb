@@ -162,13 +162,12 @@ module DataReport
         value = @query
                 .select(:actor_id)
                 .distinct
-        @data[:value] = value
       when 'activity', 'content', 'collections', 'items'
-        value = @query.count
+        value = @query
       else
         return
       end
-      return @data[:value] if @show_users
+      return @data[:value] = value if @show_users
       @data[:value] = value.count
     end
   end
