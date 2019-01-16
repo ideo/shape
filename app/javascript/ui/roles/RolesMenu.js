@@ -4,7 +4,7 @@ import PropTypes from 'prop-types'
 import styled from 'styled-components'
 import { observable, runInAction } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
-import { Collapse, Grid } from '@material-ui/core'
+import { Collapse } from '@material-ui/core'
 import v from '~/utils/variables'
 
 import { ShowMoreButton } from '~/ui/global/styled/forms'
@@ -34,11 +34,13 @@ const FooterArea = styled.div`
   padding-bottom: ${props => (props.menuOpen ? 100 : 30)}px;
 `
 
-const StyledHeaderGrid = styled(Grid)`
-  /* align with Row width */
-  padding-right: 6%;
+const StyledHeaderRow = styled(Row)`
+  flex-wrap: wrap;
+  justify-content: space-between;
+  margin-left: 0;
+
   @media only screen and (max-width: ${v.responsive.smallBreakpoint}px) {
-    padding-right: 0;
+    width: 100%;
   }
 `
 const StyledRow = styled(Row)`
@@ -278,18 +280,14 @@ class RolesMenu extends React.Component {
     return (
       <Fragment>
         <ScrollArea>
-          <StyledHeaderGrid container justify="space-between" align="flex-end">
-            <Grid item xs={10} sm>
-              <Heading3>{title}</Heading3>
-            </Grid>
-            <Grid item xs sm={'auto'}>
-              <SearchButton
-                value={this.state.searchText}
-                onChange={this.handleSearchChange}
-                onClear={this.clearSearch}
-              />
-            </Grid>
-          </StyledHeaderGrid>
+          <StyledHeaderRow align="flex-end">
+            <Heading3>{title}</Heading3>
+            <SearchButton
+              value={this.state.searchText}
+              onChange={this.handleSearchChange}
+              onClear={this.clearSearch}
+            />
+          </StyledHeaderRow>
 
           {groups.map(group => {
             const { panelTitle, entities, count, status } = group
