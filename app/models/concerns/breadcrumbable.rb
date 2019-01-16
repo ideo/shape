@@ -34,9 +34,7 @@ module Breadcrumbable
   end
 
   def all_children_ids
-    all_collections = Collection.where('breadcrumb @> ?', [id].to_s)
-    all_items = Item.where('breadcrumb @> ?', [id].to_s)
-    all_collections + all_items
+    all_children_collection_ids + all_children_item_ids
   end
 
   def all_children_collection_ids
