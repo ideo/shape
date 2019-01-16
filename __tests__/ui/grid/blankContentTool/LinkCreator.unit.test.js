@@ -36,6 +36,7 @@ describe('LinkCreator', () => {
           name: component.state.name,
           thumbnail_url: component.state.thumbnailUrl,
         },
+        filter: 'nothing',
       })
     })
 
