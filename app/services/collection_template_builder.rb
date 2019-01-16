@@ -18,18 +18,7 @@ class CollectionTemplateBuilder
     setup_template_cards
     # mainly so template_num_instances will be refreshed in API cache
     @template.touch
-    if @parent.is_a? Collection::SubmissionsCollection
-      # this will get persisted when calling cache_cover!
-      @collection.submission_attrs = { submission: true }
-      if @parent.submission_box.hide_submissions
-        @collection.submission_attrs['hidden'] = true
-      end
-      submission_template = @parent.submission_box.submission_template
-      if (test_id = submission_template.try(:submission_attrs).try(:[], 'launchable_test_id'))
-        master_test = Collection::TestCollection.find(test_id)
-        master_test.update_submission_launch_status(@collection)
-      end
-    end
+    setup_submission if creating_a_submission?
     # re-save to capture cover, new breadcrumb + tag lists
     @collection.cache_cover!
     @collection
@@ -51,7 +40,7 @@ class CollectionTemplateBuilder
     )
     # make sure to assign these permissions before the template cards are generated
     @collection.inherit_roles_anchor_from_parent!(@parent)
-    if @parent.is_a? Collection::SubmissionsCollection
+    if creating_a_submission?
       @collection.unanchor_and_inherit_roles_from_anchor!
       if @parent.submission_box.hide_submissions
         # definitely could be a better way than copying the viewer roles only to delete them...
@@ -86,7 +75,7 @@ class CollectionTemplateBuilder
   end
 
   def created_template_name
-    if @parent.is_a? Collection::SubmissionsCollection
+    if creating_a_submission?
       "#{@created_by.first_name}'s #{@template.name}"
     else
       "My #{@template.name}"
@@ -103,5 +92,22 @@ class CollectionTemplateBuilder
     else
       @placement.is_a?(Integer) ? @placement : last
     end
+  end
+
+  def setup_submission
+    # this will get persisted when calling cache_cover!
+    @collection.submission_attrs = { submission: true }
+    if @parent.submission_box.hide_submissions
+      @collection.submission_attrs['hidden'] = true
+    end
+    submission_template = @parent.submission_box.submission_template
+    test_id = submission_template.try(:submission_attrs).try(:[], 'launchable_test_id')
+    return unless test_id.present?
+    master_test = Collection::TestCollection.find(test_id)
+    master_test.update_submission_launch_status(@collection)
+  end
+
+  def creating_a_submission?
+    @parent.is_a? Collection::SubmissionsCollection
   end
 end

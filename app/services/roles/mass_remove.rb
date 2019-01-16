@@ -114,6 +114,7 @@ module Roles
     end
 
     def remove_roles_from_children
+      return if @object.is_a?(Group) || @object.try(:children).blank?
       ModifyChildrenRolesWorker.perform_async(
         @removed_by.try(:id),
         @users.map(&:id),

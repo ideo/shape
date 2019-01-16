@@ -52,23 +52,37 @@ RSpec.describe Roles::MassRemove, type: :service do
       let(:propagate_to_children) { true }
       let(:previous_anchor_id) { nil }
 
-      it 'should call ModifyChildrenRolesWorker with method = remove' do
-        expect(ModifyChildrenRolesWorker).to receive(:perform_async).with(
-          removed_by.id,
-          users.map(&:id),
-          groups.map(&:id),
-          role_name,
-          object.id,
-          object.class.name,
-          previous_anchor_id,
-          'remove',
-        )
-        mass_remove.call
+      before do
+        object.reload # reload to get object.children
+      end
+
+      context 'with no children' do
+        let(:collection) { create(:collection, add_editors: [user]) }
+        it 'should not call ModifyChildrenRolesWorker' do
+          expect(ModifyChildrenRolesWorker).not_to receive(:perform_async)
+          mass_remove.call
+        end
+      end
+
+      context 'with children' do
+        it 'should call ModifyChildrenRolesWorker with method = remove' do
+          expect(ModifyChildrenRolesWorker).to receive(:perform_async).with(
+            removed_by.id,
+            users.map(&:id),
+            groups.map(&:id),
+            role_name,
+            object.id,
+            object.class.name,
+            previous_anchor_id,
+            'remove',
+          )
+          mass_remove.call
+        end
       end
 
       context 'with previous anchor' do
         let(:previous_anchor_id) { 99 }
-        let(:object) { create(:collection, roles_anchor_collection_id: previous_anchor_id) }
+        let(:object) { create(:collection, num_cards: 1, roles_anchor_collection_id: previous_anchor_id) }
 
         it 'should call ModifyChildrenRolesWorker with previous_anchor_id' do
           expect(ModifyChildrenRolesWorker).to receive(:perform_async).with(
@@ -151,6 +165,13 @@ RSpec.describe Roles::MassRemove, type: :service do
             users.map(&:id),
           )
           mass_remove.call
+        end
+
+        context 'with propagate_to_children true' do
+          it 'still should not call ModifyChildrenRolesWorker' do
+            expect(ModifyChildrenRolesWorker).not_to receive(:perform_async)
+            mass_remove.call
+          end
         end
 
         context 'when the object is a primary group' do

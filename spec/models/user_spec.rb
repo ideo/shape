@@ -511,7 +511,8 @@ describe User, type: :model do
 
   describe '#archive!' do
     it 'archives the user' do
-      expect(DeprovisionUserWorker).to receive(:perform_async).with(user.id)
+      # -- worker is disabled, see note in user.rb
+      # expect(DeprovisionUserWorker).to receive(:perform_async).with(user.id)
       expect(user).to receive(:archived!)
       user.archive!
     end
