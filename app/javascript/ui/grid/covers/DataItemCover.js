@@ -30,9 +30,11 @@ import { theme } from '~/ui/test_collections/shared'
 import trackError from '~/utils/trackError'
 
 const utcMoment = date => moment(`${date} 00+0000`).utc()
-const nearMonth = momentDate => {
+const nearMonth = (momentDate, timeframe) => {
   const mStart = momentDate.clone().startOf('month')
   const mEnd = momentDate.clone().endOf('month')
+  const startAllowance = timeframe === 'day' ? 0 : 2
+  const endAllowance = timeframe === 'day' ? -1 : 3
   const startDiff = Math.abs(mStart.diff(momentDate, 'days'))
   const endDiff = Math.abs(
     momentDate
@@ -40,9 +42,9 @@ const nearMonth = momentDate => {
       .endOf('month')
       .diff(momentDate, 'days')
   )
-  if (startDiff <= 2) {
+  if (startDiff <= startAllowance) {
     return mStart.subtract(1, 'month')
-  } else if (endDiff <= 3) {
+  } else if (endDiff <= endAllowance) {
     return mEnd
   }
   return false
@@ -339,6 +341,9 @@ class DataItemCover extends React.Component {
         .format('MMMM')}`
       dayTimeframe = '30 days'
     }
+    if (timeframe === 'day') {
+      timeRange = `on ${momentDate.format('MMM D')}`
+    }
     const text = `${datum.amount} ${pluralize(measureTooltip)}\n
       ${isLastDataPoint ? `in last ${dayTimeframe}` : timeRange}`
 
@@ -359,8 +364,10 @@ class DataItemCover extends React.Component {
   }
 
   displayXAxisText = (d, i) => {
+    const { item } = this.props
+    const { timeframe } = item
     const utc = utcMoment(d)
-    const near = nearMonth(utc)
+    const near = nearMonth(utc, timeframe)
     if (near) {
       return `${near.format('MMM')}`
     }
