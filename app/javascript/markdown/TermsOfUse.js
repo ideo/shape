@@ -2,8 +2,9 @@
   converted with GD2md google drive add-on
   https://chrome.google.com/webstore/detail/gd2md-html/igffnbdfnodiaphfmfaiiaegmoljbghf?utm_source=permalink
   * GD2md-html version 1.0β11
-  * Tue May 08 2018 14:40:16 GMT-0700 (PDT)
-  * Source doc: https://docs.google.com/a/ideo.com/open?id=1veCkq8brapK_d12JDqNe5Fq165t_bngFbHzzsW0Bvew
+  * Thur Jan 17 2019
+  * Source doc: orig: https://docs.google.com/document/d/1TjROaj21PCAyxjwhrzCMMNejwvzTYxD1FwZuFt6HceY/edit
+  * Source doc: copy: https://docs.google.com/document/d/1veCkq8brapK_d12JDqNe5Fq165t_bngFbHzzsW0Bvew/edit
 */
 
 const touMarkdown = `
@@ -17,7 +18,7 @@ The Terms govern the use of the Platform, which is licensed solely to the person
 **DEFINITIONS**
 "**Personal Data**" means information which can be used to identify a person including but not limited to name, email address, or images.
 
-**"Site"** means the website owned and operated by IDEO that is accessed at [www.shape.space](www.shape.space) or any successor Site, and which is intended by the parties to incorporate the Platform to which these Terms apply.
+**"Site"** means the website owned and operated by IDEO that is accessed at [www.shape.space](https://www.shape.space) or any successor Site, and which is intended by the parties to incorporate the Platform to which these Terms apply.
 
 **"Platform"** means the online platform owned by IDEO known as "Shape," and which may be accessed at the Site. The Platform includes all source code, object code, architecture, designs, functionality, content (excluding User Content), features, templates, and documentation or other websites embodied in and related to the Platform, as well as all uploads, updates and customisations to any of the foregoing, including New Features.
 
