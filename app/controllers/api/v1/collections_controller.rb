@@ -6,11 +6,10 @@ class Api::V1::CollectionsController < Api::V1::BaseController
   before_action :load_and_authorize_collection_update, only: %i[update]
   before_action :load_collection_with_cards, only: %i[show update]
 
+  before_action :log_viewing_activities, only: %i[show]
   before_action :check_cache, only: %i[show]
   def show
-    log_organization_view_activity
     check_getting_started_shell
-    log_collection_activity(:viewed)
     render_collection
   end
 
@@ -104,6 +103,11 @@ class Api::V1::CollectionsController < Api::V1::BaseController
       last_modified: @collection.updated_at.utc,
       etag: @collection.cache_key(params[:card_order]),
     )
+  end
+
+  def log_viewing_activities
+    log_organization_view_activity
+    log_collection_activity(:viewed)
   end
 
   def load_and_authorize_template_and_parent
