@@ -100,6 +100,17 @@ class FilestackUpload {
     const uploadConfig = Object.assign({}, multiImageUploadConfig, uploadOpts)
     return this.client.makeDropPane(config, uploadConfig)
   }
+
+  static filestackFileAttrs(file) {
+    return {
+      url: file.url,
+      handle: file.handle,
+      filename: file.filename,
+      size: file.size,
+      mimetype: file.mimetype,
+      docinfo: file.docinfo,
+    }
+  }
 }
 
 export default FilestackUpload

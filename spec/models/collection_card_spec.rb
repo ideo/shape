@@ -60,8 +60,6 @@ RSpec.describe CollectionCard, type: :model do
 
   describe 'callbacks' do
     describe '#set_collection_as_master_template' do
-      let!(:coll_card) { create(:collection_card_collection, collection: collection) }
-
       context 'with regular collection' do
         let(:collection) { create(:collection) }
 
@@ -95,6 +93,22 @@ RSpec.describe CollectionCard, type: :model do
             expect(collection.primary_collection_cards.all?(&:pinned?)).to be true
           end
         end
+      end
+    end
+
+    describe '#touch_collection' do
+      let(:card) { create(:collection_card_collection) }
+
+      it 'should touch its collection if filter attribute changed' do
+        expect {
+          card.update(filter: 'nothing')
+        }.to change(card.collection, :updated_at)
+      end
+
+      it 'should not touch its collection if filter attribute did not change' do
+        expect {
+          card.update(height: 2)
+        }.not_to change(card.collection, :updated_at)
       end
     end
   end

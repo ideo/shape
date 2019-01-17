@@ -69,6 +69,13 @@ StyledAddUserBtn.displayName = 'StyledAddUserBtn'
 // NOTE: intentionally not an observer so that searching roles within the menu doesn't affect this list on the fly
 // however it will automatically update after you close the RolesModal
 class RolesSummary extends React.Component {
+  shouldComponentUpdate(nextProps, nextState) {
+    // while the rolesMenu is open, the users/groups attached to roles might be changing (e.g. searching)
+    // and we want the RolesSummary to ignore all that (see note above)
+    if (nextProps.rolesMenuOpen) return false
+    return true
+  }
+
   get editors() {
     const { roles } = this.props
     const editorRole = _.find(roles, { name: 'editor' })
@@ -189,6 +196,7 @@ RolesSummary.propTypes = {
   roles: MobxPropTypes.arrayOrObservableArray,
   handleClick: PropTypes.func.isRequired,
   canEdit: PropTypes.bool,
+  rolesMenuOpen: PropTypes.bool.isRequired,
 }
 
 RolesSummary.defaultProps = {

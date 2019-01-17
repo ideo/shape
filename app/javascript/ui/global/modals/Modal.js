@@ -17,9 +17,19 @@ const StyledDialog = styled(Dialog)`
     border-left: 17px solid ${v.colors.black};
     max-width: 760px;
     width: 100%;
+    @media only screen and (max-width: ${v.responsive.smallBreakpoint}px) {
+      border-left: 0px;
+      height: 100%;
+      margin: 0;
+      max-height: 100%;
+    }
   }
   .modal__padding {
     padding-left: 45px;
+    @media only screen and (max-width: ${v.responsive.smallBreakpoint}px) {
+      padding-left: 16px;
+      padding-right: 16px;
+    }
   }
   .modal__no-scroll {
     padding-top: 0px;
@@ -34,6 +44,11 @@ const StyledDialogTitle = styled(DialogTitle)`
   align-items: center;
   display: flex;
   min-height: 50px;
+  position: relative;
+  @media only screen and (max-width: ${v.responsive.smallBreakpoint}px) {
+    padding-top: 14px !important;
+    min-height: 30px;
+  }
 `
 
 const StyledHeading2 = styled(Heading2)`
@@ -47,6 +62,10 @@ export const ModalCloseButton = styled.button`
   position: absolute;
   top: 24px;
   width: 14px;
+  @media only screen and (max-width: ${v.responsive.smallBreakpoint}px) {
+    right: 10px;
+    top: 10px;
+  }
 `
 ModalCloseButton.displayName = 'ModalCloseButton'
 
@@ -55,8 +74,16 @@ const BackIconHolder = styled.button`
   display: block;
   left: 10px;
   position: absolute;
-  top: 33px;
+  top: 50%;
+  transform: translateY(-50%);
   width: 15px;
+
+  @media only screen and (max-width: ${v.responsive.smallBreakpoint}px) {
+    margin-left: -8px;
+    margin-right: 8px;
+    position: static;
+    transform: none;
+  }
 
   svg {
     height: 18px;
@@ -125,18 +152,6 @@ class Modal extends React.Component {
         aria-labelledby={title}
         BackdropProps={{ invisible: true }}
       >
-        {/* onBack is an optional button */}
-        {_.isFunction(onBack) && (
-          <BackIconHolder onClick={onBack}>
-            <ArrowIcon />
-          </BackIconHolder>
-        )}
-        {/* if onClose is not supplied, then the modal is "locked" until user takes an action */}
-        {_.isFunction(onClose) && (
-          <ModalCloseButton onClick={this.handleClose}>
-            <CloseIcon />
-          </ModalCloseButton>
-        )}
         {/*
           NOTE: DialogTitle / DialogContent need to be direct children of Dialog
           for built-in scrolling to work (where title remains fixed at top)
@@ -146,8 +161,20 @@ class Modal extends React.Component {
           disableTypography
           id="sharing"
         >
+          {/* onBack is an optional button */}
+          {_.isFunction(onBack) && (
+            <BackIconHolder onClick={onBack}>
+              <ArrowIcon />
+            </BackIconHolder>
+          )}
           {wrappedTitle}
         </StyledDialogTitle>
+        {/* if onClose is not supplied, then the modal is "locked" until user takes an action */}
+        {_.isFunction(onClose) && (
+          <ModalCloseButton onClick={this.handleClose}>
+            <CloseIcon />
+          </ModalCloseButton>
+        )}
         <DialogContent
           classes={{
             root: ['modal__padding', noScroll && 'modal__no-scroll'].join(' '),

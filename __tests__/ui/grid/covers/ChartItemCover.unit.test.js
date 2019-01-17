@@ -63,7 +63,7 @@ describe('ChartItemCover', () => {
               .find('StyledHeading3')
               .children()
               .text()
-          ).toEqual('How satisifed are you with your current donut')
+          ).toEqual('How satisfied are you with your current donut')
         })
       })
     })

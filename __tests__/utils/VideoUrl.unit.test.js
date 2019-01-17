@@ -1,5 +1,4 @@
 import VideoUrl from '~/utils/VideoUrl'
-import v from '~/utils/variables'
 
 const validYoutubeUrls = [
   'http://www.youtube.com/watch?v=-wtIM49CWuI',
@@ -81,7 +80,7 @@ describe('parse', () => {
 describe('privateVideoDefaults', () => {
   it('sets the default attributes', () => {
     const details = VideoUrl.privateVideoDefaults('some-id')
-    expect(details.thumbnailUrl).toEqual(v.defaults.video.thumbnailUrl)
+    expect(details.thumbnailUrl).toEqual(null)
     expect(details.id).toEqual('some-id')
   })
 })

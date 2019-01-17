@@ -2,7 +2,6 @@ import { PropTypes as MobxPropTypes } from 'mobx-react'
 
 import CardActionHolder from '~/ui/icons/CardActionHolder'
 import ContainImageIcon from '~/ui/icons/ContainImageIcon'
-import v from '~/utils/variables'
 
 class ContainImage extends React.Component {
   toggleSelected = ev => {
@@ -19,7 +18,7 @@ class ContainImage extends React.Component {
     return (
       <CardActionHolder
         className="show-on-hover"
-        color={image_contain ? v.colors.black : v.colors.commonMedium}
+        active={image_contain}
         onClick={this.toggleSelected}
         tooltipText={
           !image_contain ? 'show whole image' : 'fill tile with image'

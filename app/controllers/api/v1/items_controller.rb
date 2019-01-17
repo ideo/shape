@@ -84,6 +84,7 @@ class Api::V1::ItemsController < Api::V1::BaseController
       :image,
       :archived,
       :tag_list,
+      :thumbnail_url,
       filestack_file_attributes: Item.filestack_file_attributes_whitelist,
     )
   end

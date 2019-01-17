@@ -12,7 +12,9 @@
     "pinned": { "type": "boolean" },
     "pinned_and_locked": { "type": "boolean" },
     "image_contain": { "type": "boolean" },
-    "is_cover": { "type": "boolean" }
+    "is_cover": { "type": "boolean" },
+    "filter": { "type": "string" },
+    "hidden": { "type": "boolean" }
   },
   "required": ["order", "width", "height", "type", "link"]
 }

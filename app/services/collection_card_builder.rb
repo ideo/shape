@@ -41,6 +41,7 @@ class CollectionCardBuilder
           record.update(created_by: @user) if @user.present?
         end
         @collection_card.parent.cache_cover! if @collection_card.should_update_parent_collection_cover?
+        @collection_card.update_collection_cover if @collection_card.is_cover
         @collection_card.increment_card_orders!
         record.reload.recalculate_breadcrumb!
 

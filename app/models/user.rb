@@ -85,7 +85,7 @@ class User < ApplicationRecord
   searchkick callbacks: false, word_start: %i[name handle email]
   after_commit :reindex
   alias searchkick_reindex reindex
-  scope :search_import, -> { includes(:roles) }
+  scope :search_import, -> { where(status: %i[active pending]) }
 
   def search_data
     {

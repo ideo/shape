@@ -123,3 +123,8 @@ export const FullAbsolute = styled.div`
   top: 0;
   width: 100%;
 `
+
+export const SmallBreak = styled.div`
+  display: block;
+  height: 5px;
+`

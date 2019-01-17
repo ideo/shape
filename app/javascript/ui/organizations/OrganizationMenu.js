@@ -82,14 +82,14 @@ class OrganizationMenu extends React.Component {
       runInAction(() => {
         this.isLoading = true
       })
-      await newOrg.save()
+      await newOrg.create()
       await apiStore.currentUser.switchOrganization(newOrg.id, {
         redirectPath: 'homepage',
       })
       uiStore.update('orgCreated', true)
       onClose()
     } catch (err) {
-      uiStore.alert(err.error[0])
+      uiStore.alert(err.error ? err.error[0] : 'There was an error.')
     } finally {
       runInAction(() => {
         this.isLoading = false
