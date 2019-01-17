@@ -168,7 +168,7 @@ class Api::V1::CollectionsController < Api::V1::BaseController
                   .first
     current_user.precache_roles_for(
       [Role::VIEWER, Role::CONTENT_EDITOR, Role::EDITOR],
-      @collection.children_and_linked_children,
+      ([@collection] + Collection.where(id: @collection.breadcrumb)),
     )
   end
 

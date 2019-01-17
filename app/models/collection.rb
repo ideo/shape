@@ -24,7 +24,8 @@ class Collection < ApplicationRecord
                  :cached_org_properties,
                  :cached_card_count,
                  :submission_attrs,
-                 :getting_started_shell
+                 :getting_started_shell,
+                 :cached_roles_identifier
 
   # callbacks
   after_touch :touch_related_cards, unless: :destroyed?
@@ -361,36 +362,52 @@ class Collection < ApplicationRecord
   end
 
   def collection_cards_viewable_by(
-    cached_cards,
     user,
     card_order: nil, page: 1, per_page: CollectionCard::DEFAULT_PER_PAGE, hidden: false
   )
-    can_view_collection = can_view?(user)
-    return [] unless can_view_collection
-
-    cached_cards ||= collection_cards.includes(item: :roles_anchor_collection, collection: :roles_anchor_collection)
     order = { order: :asc }
+    collection_order = nil
     if card_order
       if card_order == 'total' || card_order.include?('question_')
-        collection_order = "cached_test_scores->'#{card_order}'"
-        order = "collections.#{collection_order} DESC NULLS LAST"
+        collection_order = "collections.cached_test_scores->'#{card_order}'"
+        order = "#{collection_order} DESC NULLS LAST"
       else
         # e.g. updated_at
         order = { card_order => :desc }
       end
     end
 
-    # card.can_view? delegates to the underlying record (item/collection)
-    # if the roles_anchor is the same as mine, we can skip this check because the user can view me
-    roles_anchor_id = roles_anchor.id
-    ids = cached_cards
-          .select { |card| card.record.roles_anchor_collection_id == roles_anchor_id || card.can_view?(user) }
-          .pluck(:id)
-
-    # pluck viewable ids and then convert to a paginated query
-    cards = CollectionCard.where(id: ids)
+    cards = all_collection_cards.active
     # `hidden` means include both hidden and unhidden cards
-    cards = cards.where(hidden: false) unless hidden
+    cards = cards.visible unless hidden
+
+    unless user.has_cached_role?(Role::SUPER_ADMIN)
+      group_ids = user.current_org_group_ids
+      join_sql = %(
+        left join items on items.id = collection_cards.item_id
+        left join collections on collections.id = collection_cards.collection_id
+        join roles on (
+          roles.resource_identifier = coalesce(
+            items.cached_attributes->>'cached_roles_identifier', collections.cached_attributes->>'cached_roles_identifier'
+          )
+        )
+        left join users_roles on
+        users_roles.role_id = roles.id and
+        users_roles.user_id = #{user.id}
+        left join groups_roles on
+        groups_roles.role_id = roles.id and
+        groups_roles.group_id IN (#{group_ids.present? ? group_ids.join(',') : 'NULL'})
+      )
+
+      fields = ['collection_cards.*']
+      fields << collection_order if collection_order.present?
+      cards = cards
+        .joins(join_sql)
+        .select(*fields)
+        .where('coalesce(users_roles.id, groups_roles.id) IS NOT NULL')
+        .distinct
+    end
+
     cards
       .includes(:collection, item: [:filestack_file])
       .order(order)
@@ -571,7 +588,14 @@ class Collection < ApplicationRecord
     all_collections = Collection.in_collection(self)
     all_items = Item.in_collection(self)
     [all_collections, all_items].each do |records|
-      records.update_all(roles_anchor_collection_id: roles_anchor.id)
+      records.update_all(
+        %(roles_anchor_collection_id = #{roles_anchor.id},
+          cached_attributes = jsonb_set(
+            cached_attributes, '{cached_roles_identifier}',
+            to_json('#{roles_anchor.resource_identifier}'::text)::jsonb
+          )
+        ),
+      )
       records.find_each do |record|
         if record.roles.present?
           record.roles.destroy_all
@@ -642,7 +666,7 @@ class Collection < ApplicationRecord
   end
 
   def inside_hidden_submission_box?
-    parent_submission_box&.hide_submissions
+    !!parent_submission_box&.hide_submissions
   end
 
   def submission?

@@ -286,7 +286,7 @@ ActiveRecord::Schema.define(version: 20190117195055) do
     t.datetime "updated_at", null: false
     t.string "resource_identifier"
     t.index ["name", "resource_type", "resource_id"], name: "index_roles_on_name_and_resource_type_and_resource_id"
-    t.index ["resource_identifier"], name: "index_roles_on_resource_identifier"
+    t.index ["resource_identifier", "name"], name: "index_roles_on_resource_identifier_and_name", unique: true
     t.index ["resource_type", "resource_id"], name: "index_roles_on_resource_type_and_resource_id"
   end
 

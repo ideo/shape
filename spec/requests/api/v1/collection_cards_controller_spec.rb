@@ -34,6 +34,7 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
 
     it 'includes all collection cards' do
       get(path)
+      expect(json['data'].count).to eq 5
       expect(json['data'].map { |cc| cc['id'].to_i }).to match_array(collection.collection_card_ids)
     end
 
@@ -52,6 +53,17 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
       it 'matches Item schema' do
         get(path)
         expect(items_json.first['attributes']).to match_json_schema('item', strict: false)
+      end
+    end
+
+    context 'with permissions' do
+      before do
+        user.remove_role(Role::VIEWER, collection.items.last)
+      end
+
+      it 'only shows items viewable by the user' do
+        get(path)
+        expect(json['data'].count).to eq 4
       end
     end
 

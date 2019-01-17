@@ -218,6 +218,28 @@ describe Resourceable, type: :concern do
       end
     end
 
+    describe '#cache_roles_identifier!' do
+      it 'should cache the anchored_role identifier on create' do
+        expect(collection.cached_roles_identifier).to eq collection.resource_identifier
+        expect(item.cached_roles_identifier).to eq collection.resource_identifier
+      end
+
+      it 'should cache the anchored_role identifier on update' do
+        item.update(roles_anchor_collection_id: 99)
+        expect(item.cached_roles_identifier).to eq 'Collection_99'
+      end
+    end
+
+    describe '#unanchor' do
+      it 'should update the anchored collection values' do
+        expect(item.roles_anchor_collection_id).to eq collection.id
+        expect(item.roles_anchor_resource_identifier).to eq collection.resource_identifier
+        item.unanchor!
+        expect(item.roles_anchor_collection_id).to be nil
+        expect(item.cached_roles_identifier).to eq item.resource_identifier
+      end
+    end
+
     describe '#unanchor_and_inherit_roles_from_anchor!' do
       it 'should duplicate all the roles onto the resource and remove the roles_anchor_collection' do
         expect(item.roles_anchor_collection_id).to eq collection.id
