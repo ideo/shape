@@ -1,15 +1,14 @@
 import RoleSelect from '~/ui/roles/RoleSelect'
 
-import { fakeRole } from '#/mocks/data'
+import { fakeRole, fakeCollection } from '#/mocks/data'
 
-let props
-let wrapper
-let component
+let props, wrapper, component, updateRecord
 
 describe('RoleSelect', () => {
   beforeEach(() => {
     props = {
       role: fakeRole,
+      record: fakeCollection,
       roleTypes: ['viewer', 'editor'],
       entity: fakeRole.users[0],
       onDelete: jest.fn(),
@@ -17,6 +16,11 @@ describe('RoleSelect', () => {
     }
     wrapper = shallow(<RoleSelect {...props} />)
     component = wrapper.instance()
+
+    updateRecord = record => {
+      props.record = record
+      wrapper.setProps(props)
+    }
   })
 
   describe('render', () => {
@@ -75,11 +79,11 @@ describe('RoleSelect', () => {
     describe('when deleting the current user from an org group', () => {
       beforeEach(() => {
         props.entity.isCurrentUser = true
-        props.role = {
-          name: 'admin',
-          resource: { internalType: 'groups', is_primary: true },
-        }
-        wrapper.setProps(props)
+        updateRecord({
+          id: 1,
+          internalType: 'groups',
+          is_primary: true,
+        })
         component.deleteRole()
       })
 
@@ -93,31 +97,28 @@ describe('RoleSelect', () => {
   })
 
   describe('resourceType', () => {
-    let groupResource
-    const updateRole = role => {
-      props.role = role
-      wrapper.setProps(props)
-    }
-
-    beforeEach(() => {
-      groupResource = { internalType: 'groups' }
-    })
-
     it('should return organization when its a primary/guest group', () => {
-      updateRole({
-        name: 'admin',
-        resource: Object.assign({}, groupResource, { is_primary: true }),
+      updateRecord({
+        id: 1,
+        internalType: 'groups',
+        is_primary: true,
       })
       expect(component.resourceType).toEqual('organization')
     })
 
     it('should return group when its a normal group', () => {
-      updateRole({ name: 'admin', resource: groupResource })
+      updateRecord({
+        id: 1,
+        internalType: 'groups',
+      })
       expect(component.resourceType).toEqual('group')
     })
 
     it('should return item when its an item', () => {
-      updateRole({ name: 'admin', resource: { internalType: 'items' } })
+      updateRecord({
+        id: 1,
+        internalType: 'items',
+      })
       expect(component.resourceType).toEqual('item')
     })
   })

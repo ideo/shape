@@ -253,6 +253,7 @@ export const fakeGroupAttrs = {
   id: '1',
   name: 'IDEO Products',
   handle: 'ideo-products',
+  internalType: 'groups',
   filestack_file_url: 'https://cdn.filestackcontent.com/i4iKADquTQCWMAvyz02R',
   roles: [],
   can_edit: true,
