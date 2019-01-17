@@ -29,7 +29,6 @@ class Organization extends BaseRecord {
     'handle',
     'filestack_file_attributes',
     'deactivated',
-    'terms_text_item_id',
   ]
 }
 
