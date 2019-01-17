@@ -1,7 +1,7 @@
 import TagEditor from '~/ui/pages/shared/TagEditor'
 import { fakeCollection } from '#/mocks/data'
 
-let wrapper, props, record
+let wrapper, props, record, component
 describe('TagEditor', () => {
   beforeEach(() => {
     record = fakeCollection
@@ -11,6 +11,7 @@ describe('TagEditor', () => {
       tagField: 'tag_list',
     }
     wrapper = shallow(<TagEditor {...props} />)
+    component = wrapper.instance()
   })
 
   it('renders ReactTags with record[tagField]', () => {
@@ -21,5 +22,10 @@ describe('TagEditor', () => {
     expect(wrapper.find('ReactTags').props().tags[0].name).toEqual(
       record.tag_list[0]
     )
+  })
+
+  it('calls the patch method to save the model', () => {
+    component._saveTags()
+    expect(record.patch).toHaveBeenCalled()
   })
 })
