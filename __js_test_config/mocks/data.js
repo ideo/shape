@@ -4,6 +4,8 @@ const fakeJsonApiAttrs = {
   assign: jest.fn(),
   assignRef: jest.fn(),
   save: jest.fn().mockReturnValue({}),
+  create: jest.fn().mockReturnValue({}),
+  patch: jest.fn().mockReturnValue({}),
   update: jest.fn().mockReturnValue({}),
   disableMenu: jest.fn(),
 }

@@ -21,6 +21,7 @@ describe('OrganizationMenu', () => {
       onClose: jest.fn(),
       organization: {
         save: jest.fn(),
+        create: jest.fn(),
         name: 'Space',
         primary_group: {
           id: 1,
@@ -130,13 +131,13 @@ describe('OrganizationMenu', () => {
   })
 
   describe('createOrganization', () => {
-    let saveFn
+    let createFn
 
     beforeEach(async () => {
-      saveFn = jest.fn().mockReturnValue(Promise.resolve({}))
+      createFn = jest.fn().mockReturnValue(Promise.resolve({}))
       Organization.mockImplementation(() => ({
         id: 3,
-        save: saveFn,
+        create: createFn,
         assign: jest.fn(),
       }))
       await component.createOrganization({ name: 'hello' })
@@ -153,7 +154,7 @@ describe('OrganizationMenu', () => {
     })
 
     it('should save the newly created organization', () => {
-      expect(saveFn).toHaveBeenCalled()
+      expect(createFn).toHaveBeenCalled()
     })
 
     describe('with orgCreated state', () => {
