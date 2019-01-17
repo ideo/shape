@@ -28,7 +28,7 @@ module RolifyExtensions
       name: role_names,
       resource_identifier: resource_identifiers,
     )
-    roles += role_via_org_groups(role_names, resource_identifiers)
+    roles += role_via_current_org_groups(role_names, resource_identifiers)
 
     found = {}
     roles.each do |role|

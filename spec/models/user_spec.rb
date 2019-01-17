@@ -228,7 +228,7 @@ describe User, type: :model do
     it 'should include downcased name, email, handle, organization_ids' do
       expect(user.search_data).to eq(
         name: user.name.downcase,
-        email: user.email.downcase,
+        email: user.email_search_tokens,
         handle: user.handle.downcase,
         status: user.status,
         organization_ids: [],
@@ -303,22 +303,20 @@ describe User, type: :model do
     end
   end
 
-  describe '#current_org_groups_roles_identifiers' do
+  describe '#roles_via_current_org_groups' do
     let!(:user) { create(:user) }
     let(:organization) { create(:organization, member: user) }
     let(:group) { create(:group, organization: organization) }
     let(:collection) { create(:collection) }
-    let(:item) { create(:text_item) }
 
     before do
       user.add_role(Role::MEMBER, group)
       group.add_role(Role::EDITOR, collection)
-      group.add_role(Role::VIEWER, item)
     end
 
-    it 'should include all group role identifiers' do
-      expect(group.roles_to_resources.size).to eq(2)
-      expect(user.current_org_groups_roles_identifiers).to eq(group.roles_to_resources.map(&:identifier))
+    it 'should include all group roles' do
+      role = user.role_via_current_org_groups(Role::EDITOR, collection.resource_identifier)
+      expect(role).to eq(collection.roles.where(name: Role::EDITOR))
     end
   end
 
