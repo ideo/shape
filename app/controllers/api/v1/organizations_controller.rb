@@ -52,8 +52,7 @@ class Api::V1::OrganizationsController < Api::V1::BaseController
   def organization_params
     params_allowed = [
       :name,
-      :domain,
-      :whitelist,
+      :domain_whitelist,
       :handle,
       :deactivated,
       :terms_text_item_id,
