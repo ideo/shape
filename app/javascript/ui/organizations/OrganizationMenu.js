@@ -82,7 +82,7 @@ class OrganizationMenu extends React.Component {
       runInAction(() => {
         this.isLoading = true
       })
-      await newOrg.save()
+      await newOrg.create()
       await apiStore.currentUser.switchOrganization(newOrg.id, {
         redirectPath: 'homepage',
       })

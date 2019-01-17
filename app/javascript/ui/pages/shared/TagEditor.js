@@ -43,7 +43,7 @@ class TagEditor extends React.Component {
   _saveTags = async () => {
     const { record, tagField, afterSave } = this.props
     record[tagField] = _.map([...this.tags], t => t.name).join(',')
-    await record.save()
+    await record.patch()
     if (afterSave) afterSave()
   }
 

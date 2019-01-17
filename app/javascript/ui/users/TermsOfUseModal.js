@@ -99,16 +99,17 @@ class TermsOfUseModal extends React.Component {
     const trialUsersCount =
       (organization && organization.trial_users_count) || 25
     const trialPricePerUser = (organization && organization.price_per_user) || 5
-    const orgTermsOfUse = organization.terms_text_item_id && (
-      <span>
-        {' '}
-        and {organization.name}
-        &apos;s{' '}
-        <Link target="_blank" to={`/terms/${organization.name}`}>
-          Terms of Use
-        </Link>
-      </span>
-    )
+    const orgTermsOfUse = organization &&
+      organization.terms_text_item_id && (
+        <span>
+          {' '}
+          and {organization.name}
+          &apos;s{' '}
+          <Link target="_blank" to={`/terms/${organization.name}`}>
+            Terms of Use
+          </Link>
+        </span>
+      )
     return (
       <StyledDialog
         classes={{ root: 'root__dialog', paper: 'modal__paper' }}

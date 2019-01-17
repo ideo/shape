@@ -339,7 +339,6 @@ class Collection extends SharedRecordMixin(BaseRecord) {
 
   toJsonApiWithCards() {
     const data = this.toJsonApi()
-    delete data.relationships
     // attach nested attributes of cards
     if (this.collection_cards) {
       data.attributes.collection_cards_attributes = _.map(
