@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20190110222910) do
+ActiveRecord::Schema.define(version: 20190117195055) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -84,7 +84,7 @@ ActiveRecord::Schema.define(version: 20190110222910) do
     t.jsonb "breadcrumb"
     t.boolean "archived", default: false
     t.integer "created_by_id"
-    t.jsonb "cached_attributes"
+    t.jsonb "cached_attributes", default: {}
     t.integer "template_id"
     t.datetime "archived_at"
     t.string "archive_batch"
@@ -102,6 +102,7 @@ ActiveRecord::Schema.define(version: 20190110222910) do
     t.bigint "roles_anchor_collection_id"
     t.boolean "hide_submissions", default: false
     t.index ["breadcrumb"], name: "index_collections_on_breadcrumb", using: :gin
+    t.index ["cached_attributes"], name: "index_collections_on_cached_attributes", using: :gin
     t.index ["cached_test_scores"], name: "index_collections_on_cached_test_scores", using: :gin
     t.index ["cloned_from_id"], name: "index_collections_on_cloned_from_id"
     t.index ["created_at"], name: "index_collections_on_created_at"
@@ -202,7 +203,7 @@ ActiveRecord::Schema.define(version: 20190110222910) do
     t.string "url"
     t.jsonb "text_data"
     t.string "thumbnail_url"
-    t.jsonb "cached_attributes"
+    t.jsonb "cached_attributes", default: {}
     t.datetime "archived_at"
     t.string "archive_batch"
     t.string "icon_url"
@@ -213,6 +214,7 @@ ActiveRecord::Schema.define(version: 20190110222910) do
     t.jsonb "data_settings"
     t.bigint "roles_anchor_collection_id"
     t.index ["breadcrumb"], name: "index_items_on_breadcrumb", using: :gin
+    t.index ["cached_attributes"], name: "index_items_on_cached_attributes", using: :gin
     t.index ["cloned_from_id"], name: "index_items_on_cloned_from_id"
     t.index ["created_at"], name: "index_items_on_created_at"
     t.index ["data_source_type", "data_source_id"], name: "index_items_on_data_source_type_and_data_source_id"
