@@ -167,7 +167,7 @@ module DataReport
       else
         return
       end
-      return @data[:value] = value if @show_users
+      return @data[:value] = value if @return_records
       @data[:value] = value.count
     end
   end

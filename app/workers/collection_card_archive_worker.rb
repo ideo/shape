@@ -35,7 +35,7 @@ class CollectionCardArchiveWorker
       actor: @actor,
       target: card.record,
       action: :archived,
-      subject_user_ids: participants.map(&:actor_id),
+      subject_user_ids: participants.pluck(:actor_id),
       subject_group_ids: [],
     )
   end
@@ -46,7 +46,7 @@ class CollectionCardArchiveWorker
       d_timeframe: 'ever',
       d_filters: [{ 'type' => 'Collection', 'target' => record.id }],
     }
-    report = DataReport::Internal.new(record, override_measures: measures, show_users: true).call
+    report = DataReport::Internal.new(record, override_measures: measures, return_records: true).call
     report[:value]
   end
 end
