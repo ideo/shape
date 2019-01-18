@@ -136,6 +136,7 @@ export class FirebaseClient {
           }
         },
         error => {
+          this.escapeLoader()
           trackError(error, { name: 'Firestore:UserThreads' })
         }
       )
@@ -180,11 +181,21 @@ export class FirebaseClient {
             })
         },
         error => {
-          trackError(error, { name: 'Firestore:CommentThreads' })
+          this.escapeLoader()
+          trackError(error, {
+            name: 'Firestore:CommentThreads',
+            message: `thread ${threadUid}; ${error && error.message}`,
+          })
         }
       )
     this.listeners.push(this.commentThreadsListener)
     this.listeners.push(this.commentsListener)
+  }
+
+  escapeLoader = () => {
+    setTimeout(() => {
+      apiStore.update('loadingThreads', false)
+    }, 2500)
   }
 
   checkIfFinishedLoading = () => {
