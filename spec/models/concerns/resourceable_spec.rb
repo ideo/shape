@@ -119,33 +119,6 @@ describe Resourceable, type: :concern do
     end
   end
 
-  describe '#inherit_roles_from_parent!' do
-    let(:other_user) { create(:user) }
-    let(:card) { create(:collection_card_text, parent: collection) }
-    let(:item) { card.item }
-
-    before do
-      item.inherit_roles_from_parent!
-    end
-
-    context 'with editors and viewers' do
-      let(:collection) { create(:collection, add_editors: [user], add_viewers: [other_user]) }
-
-      it 'should copy roles from parent to newly created child' do
-        expect(item.editors[:users]).to match_array(collection.editors[:users])
-        expect(item.viewers[:users]).to match_array(collection.viewers[:users])
-      end
-    end
-
-    context 'with content editors' do
-      let(:collection) { create(:collection, add_content_editors: [user]) }
-
-      it 'should make the content editors into editors of the child content' do
-        expect(item.editors[:users]).to match_array(collection.content_editors[:users])
-      end
-    end
-  end
-
   context 'getting all editors and viewers' do
     let(:group_members) { create_list(:user, 2) }
     let(:group) { create(:group, add_members: group_members) }
@@ -208,7 +181,8 @@ describe Resourceable, type: :concern do
     end
 
     describe '#inherit_roles_anchor_from_parent!' do
-      let(:item) { create(:text_item, parent_collection: subcollection, roles_anchor_collection: nil) }
+      let(:other_collection) { create(:collection, roles_anchor_collection: subcollection) }
+      let(:item) { create(:text_item, parent_collection: subcollection, roles_anchor_collection: other_collection) }
 
       it 'should copy roles anchor from its parent' do
         expect(item.anchored_roles).to be_empty
@@ -230,16 +204,6 @@ describe Resourceable, type: :concern do
       end
     end
 
-    describe '#unanchor' do
-      it 'should update the anchored collection values' do
-        expect(item.roles_anchor_collection_id).to eq collection.id
-        expect(item.roles_anchor_resource_identifier).to eq collection.resource_identifier
-        item.unanchor!
-        expect(item.roles_anchor_collection_id).to be nil
-        expect(item.cached_roles_identifier).to eq item.resource_identifier
-      end
-    end
-
     describe '#unanchor_and_inherit_roles_from_anchor!' do
       it 'should duplicate all the roles onto the resource and remove the roles_anchor_collection' do
         expect(item.roles_anchor_collection_id).to eq collection.id
@@ -252,6 +216,33 @@ describe Resourceable, type: :concern do
         expect(item.roles_anchor).to eq item
         expect(item.roles.count).to eq collection.roles.count
         expect(item.can_view?(user)).to be true
+      end
+
+      context 'with related roles on parent' do
+        let(:other_user) { create(:user) }
+        let(:card) { create(:collection_card_text, parent: collection) }
+        let(:item) { card.item }
+
+        before do
+          item.reload.unanchor_and_inherit_roles_from_anchor!
+        end
+
+        context 'with editors and viewers' do
+          let(:collection) { create(:collection, add_editors: [user], add_viewers: [other_user]) }
+
+          it 'should copy roles from parent to newly created child' do
+            expect(item.editors[:users]).to match_array(collection.editors[:users])
+            expect(item.viewers[:users]).to match_array(collection.viewers[:users])
+          end
+        end
+
+        context 'with content editors' do
+          let(:collection) { create(:collection, add_content_editors: [user]) }
+
+          it 'should make the content editors into editors of the child content' do
+            expect(item.editors[:users]).to match_array(collection.content_editors[:users])
+          end
+        end
       end
     end
   end

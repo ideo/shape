@@ -13,8 +13,7 @@ class Collection
     belongs_to :collection_to_test, class_name: 'Collection', optional: true
 
     before_create :setup_default_status_and_questions, unless: :cloned_from_present?
-    after_create :add_test_tag
-    after_create :update_items_roles_anchor
+    after_create :add_test_tag, :add_child_roles
     after_update :touch_test_design, if: :saved_change_to_test_status?
 
     enum test_status: {
@@ -404,8 +403,7 @@ class Collection
       save
     end
 
-    def update_items_roles_anchor
-      # now that we have an id
+    def add_child_roles
       items.each(&:inherit_roles_anchor_from_parent!)
     end
 

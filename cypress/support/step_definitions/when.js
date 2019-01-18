@@ -82,6 +82,7 @@ When('I add an open response question', () => {
   cy.locateWith('QuestionSelectOption', 'Open Response')
     .first()
     .click()
+  cy.wait(FLIPMOVE_DELAY)
   cy.wait('@apiReplaceCollectionCard')
   // have to wait for the flipmove fade-in
   cy.wait(FLIPMOVE_DELAY)
@@ -116,13 +117,13 @@ When('I navigate to the collection named {string} via the breadcrumb', name => {
 When('I click the {string} containing {string}', (el, text) => {
   cy.locateDataOrClassWith(el, text)
     .first()
-    .click()
+    .click({ force: true })
 })
 
 When('I click the {string}', el => {
   cy.locateDataOrClass(el)
     .first()
-    .click()
+    .click({ force: true })
 })
 
 When('I wait for {string} to finish', apiCall => {

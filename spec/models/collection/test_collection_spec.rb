@@ -2,8 +2,10 @@ require 'rails_helper'
 
 describe Collection::TestCollection, type: :model do
   let(:user) { create(:user) }
-  let(:test_parent) { create(:collection) }
-  let(:test_collection) { create(:test_collection, parent_collection: test_parent) }
+  let(:test_parent) { create(:collection, add_editors: [user]) }
+  let(:test_collection) do
+    create(:test_collection, parent_collection: test_parent, roles_anchor_collection: test_parent)
+  end
 
   context 'associations' do
     it { should have_many :survey_responses }
@@ -14,10 +16,6 @@ describe Collection::TestCollection, type: :model do
 
   context 'callbacks' do
     describe '#setup_default_status_and_questions' do
-      before do
-        user.add_role(Role::EDITOR, test_collection)
-      end
-
       it 'should set the test_status to "draft"' do
         expect(test_collection.test_status).to eq 'draft'
       end
@@ -27,10 +25,13 @@ describe Collection::TestCollection, type: :model do
         expect(test_collection.items.count).to eq 4
       end
 
-      it 'sets up the anchored roles on the items', only: true do
-        item = test_collection.items.first
-        expect(item.roles_anchor_collection_id).to eq test_collection.id
-        expect(item.cached_roles_identifier).to eq test_collection.resource_identifier
+      it 'sets up the anchored roles on the items' do
+        expect(test_collection.roles_anchor_collection_id).to eq test_parent.id
+        test_collection.reload
+        items = test_collection.items
+        item = items.first
+        expect(items.all? { |i| i.roles_anchor_collection_id == test_parent.id }).to be true
+        expect(item.cached_roles_identifier).to eq test_parent.resource_identifier
         expect(test_collection.can_edit?(user)).to be true
         expect(item.can_edit?(user)).to be true
       end
@@ -104,13 +105,17 @@ describe Collection::TestCollection, type: :model do
     end
 
     context 'if live' do
-      let(:test_collection) { create(:test_collection, :completed, parent_collection: test_parent) }
-      before do
-        test_collection.launch!(initiated_by: user)
-        expect(test_collection.live?).to be true
+      let(:test_collection) do
+        create(:test_collection, :completed, parent_collection: test_parent, roles_anchor_collection_id: test_parent.id)
       end
       let!(:survey_response) do
         create(:survey_response, test_collection: test_collection)
+      end
+
+      before do
+        test_collection.launch!(initiated_by: user)
+        test_collection.reload
+        expect(test_collection.live?).to be true
       end
 
       it 'only copies test design' do
@@ -119,6 +124,11 @@ describe Collection::TestCollection, type: :model do
         end.to change(Collection, :count).by(1)
         expect(duplicate).to be_instance_of(Collection::TestCollection)
         expect(duplicate.draft?).to be true
+      end
+
+      it 'has the right permissions' do
+        expect(test_collection.items.all? { |i| i.can_view?(user) }).to be true
+        expect(test_collection.items.first.cached_roles_identifier).to eq test_parent.resource_identifier
       end
 
       it 'has prelaunch question items' do

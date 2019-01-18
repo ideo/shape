@@ -9,7 +9,7 @@ module Resourceable
     class_attribute :view_role
 
     belongs_to :roles_anchor_collection, class_name: 'Collection', optional: true
-    after_commit :cache_roles_identifier!
+    after_commit :cache_roles_identifier!, unless: :destroyed?
   end
 
   class_methods do
@@ -71,12 +71,15 @@ module Resourceable
     roles_anchor_collection || self
   end
 
-  def cache_roles_identifier!
+  def cache_roles_identifier!(reanchor: true)
     return unless item_or_collection?
+    if reanchor && parent.present? && roles.empty? && roles_anchor_collection_id.nil?
+      # sort of a catch for items to automatically inherit parent roles_anchor if none was given
+      anchor_id = parent&.roles_anchor&.id
+      update_column :roles_anchor_collection_id, anchor_id if anchor_id
+    end
     self.cached_roles_identifier = roles_anchor_resource_identifier
-    return unless will_save_change_to_cached_attributes?
-    # update without callbacks/timestamps
-    update_column :cached_attributes, cached_attributes
+    update_column :cached_attributes, cached_attributes if will_save_change_to_cached_attributes?
   end
 
   def roles_anchor_resource_identifier
@@ -188,7 +191,31 @@ module Resourceable
     true
   end
 
-  # NOTE: This should only ever be called on a newly created record, e.g. in CollectionCardBuilder
+  def inherit_roles_anchor_from_parent!(parent = self.parent)
+    update_column(:roles_anchor_collection_id, parent.roles_anchor.id)
+    cache_roles_identifier!
+    reload
+  end
+
+  # Should either be called on a new record, or in MassAssign where it properly modifies children roles
+  def unanchor_and_inherit_roles_from_anchor!
+    # NOTE: these next two steps have to happen back to back
+    inherit_roles_from_parent!(roles_anchor)
+    update_column(:roles_anchor_collection_id, nil)
+    # make sure we don't automatically re-anchor in this case, as we are explicitly unanchoring
+    cache_roles_identifier!(reanchor: false)
+    reload
+  end
+
+  def remove_all_viewer_roles
+    (viewers[:users] + viewers[:groups]).each do |viewer|
+      viewer.remove_role(Role::VIEWER, self)
+    end
+  end
+
+  private
+
+  # only makes sense to call this method if there are no roles and you have unanchored the resource
   def inherit_roles_from_parent!(parent = self.parent)
     return false unless requires_roles?
     return false unless parent.present?
@@ -205,32 +232,8 @@ module Resourceable
       new_role.name = Role::EDITOR if new_role.name.to_sym == Role::CONTENT_EDITOR
       new_role.save
     end
-  end
-
-  def inherit_roles_anchor_from_parent!(parent = self.parent)
-    update_column(:roles_anchor_collection_id, parent.roles_anchor.id)
-    cache_roles_identifier!
     reload
   end
-
-  def unanchor!
-    update_column(:roles_anchor_collection_id, nil)
-    cache_roles_identifier!
-    reload
-  end
-
-  def unanchor_and_inherit_roles_from_anchor!
-    inherit_roles_from_parent!(roles_anchor)
-    unanchor!
-  end
-
-  def remove_all_viewer_roles
-    (viewers[:users] + viewers[:groups]).each do |viewer|
-      viewer.remove_role(Role::VIEWER, self)
-    end
-  end
-
-  private
 
   def raise_role_name_not_set(role_name)
     raise StandardError, "Pass in `#{role_name}` to #{self.class.name}'s resourceable definition to use this method"

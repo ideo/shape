@@ -365,6 +365,7 @@ describe Collection, type: :model do
       let(:private_card) { cards[0] }
 
       before do
+        private_card.record.unanchor_and_inherit_roles_from_anchor!
         user.remove_role(Role::VIEWER, private_card.record)
       end
 
@@ -378,6 +379,7 @@ describe Collection, type: :model do
       let(:private_card) { subcollection_card }
 
       before do
+        private_card.record.unanchor_and_inherit_roles_from_anchor!
         user.remove_role(Role::VIEWER, subcollection_card.collection)
       end
 
