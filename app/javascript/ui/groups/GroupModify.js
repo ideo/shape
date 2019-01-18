@@ -132,6 +132,7 @@ class GroupModify extends React.Component {
           <TextField
             id="groupName"
             type="text"
+            data-cy="TextField_groupName"
             value={this.editingGroup.name}
             onChange={this.handleNameChange}
             placeholder={`Enter ${groupType} Name`}
@@ -142,6 +143,7 @@ class GroupModify extends React.Component {
           <TextField
             id="grouphandle"
             type="text"
+            data-cy="TextField_groupHandle"
             value={this.editingGroup.handle}
             onChange={this.handleHandleChange}
             placeholder={`@${groupType.toLowerCase()}-handle`}
@@ -154,7 +156,12 @@ class GroupModify extends React.Component {
           </button>
         </FieldContainer>
         <FormActionsContainer>
-          <FormButton onClick={this.handleSave} width={190} type="submit">
+          <FormButton
+            data-cy="FormButton_submitGroup"
+            onClick={this.handleSave}
+            width={190}
+            type="submit"
+          >
             {groupType === 'Group' ? 'Add Members' : 'Save'}
           </FormButton>
         </FormActionsContainer>

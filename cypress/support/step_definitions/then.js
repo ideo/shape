@@ -10,6 +10,10 @@ Then('I should see {string} in a {string}', (text, el) => {
   cy.locateDataOrClassWith(el, text).should('be.visible')
 })
 
+Then('I should see the value {string} in a {string}', (text, el) => {
+  cy.locateDataOrClass(el).should('have.value', text)
+})
+
 Then('I should see a {string} in the first card', el => {
   cy.locateDataOrClass('GridCard')
     .first()
@@ -52,4 +56,10 @@ Then('the URL should match the captured URL', () => {
       .as('url')
       .should('eq', url)
   })
+})
+
+Then('I should see {string} in the URL', slug => {
+  cy.url()
+    .as('url')
+    .should('match', new RegExp(slug))
 })

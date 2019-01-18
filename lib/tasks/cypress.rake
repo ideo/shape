@@ -1,6 +1,10 @@
 namespace :cypress do
   desc 'set up the test env for cypress E2E testing'
   task db_setup: :environment do
+    # clear out any orgs we created
+    # NOTE: have to do this first, or else it gets mad if we do this after the user is loaded
+    Organization.where('slug LIKE ?', 'our-test-org%').destroy_all
+
     email = 'cypress-test@ideo.com'
     user = User.find_by(email: email)
     unless user.present?
@@ -15,6 +19,7 @@ namespace :cypress do
       organization = builder.organization
     end
     user.switch_to_organization(organization)
+
     my_collection = user.current_user_collection
     # via dependent: :destroy this will also remove everything in the test area
     my_collection.collections.where(name: 'Cypress Test Area').destroy_all

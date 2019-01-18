@@ -150,3 +150,14 @@ When('I visit the current Test URL', () => {
     cy.visit(`/tests/${id}`)
   })
 })
+
+// ----------------------
+// Organization Menu
+// ----------------------
+
+When('I fill out the organization name with {string}', orgName => {
+  cy.locate('TextField_groupName')
+    .first()
+    .click()
+    .type(orgName)
+})
