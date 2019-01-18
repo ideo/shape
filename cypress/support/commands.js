@@ -3,9 +3,10 @@ import _ from 'lodash'
 // commands please read more here:
 // https://on.cypress.io/custom-commands
 
-Cypress.Commands.add('login', ({ userId } = {}) =>
-  cy.request('GET', `/login_as?id=${userId}`)
-)
+Cypress.Commands.add('login', ({ userId } = {}) => {
+  cy.request('GET', `/login_as.json?id=${userId}`)
+  cy.wait(100)
+})
 
 Cypress.Commands.add('logout', () => {
   cy.request('DELETE', '/api/v1/sessions')
