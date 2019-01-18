@@ -9,8 +9,7 @@ module Resourceable
     class_attribute :view_role
 
     belongs_to :roles_anchor_collection, class_name: 'Collection', optional: true
-    after_commit :cache_roles_identifier!, if: :saved_change_to_roles_anchor?, on: %i[update]
-    after_create :cache_roles_identifier!, if: :item_or_collection?
+    after_commit :cache_roles_identifier!
   end
 
   class_methods do
@@ -73,7 +72,9 @@ module Resourceable
   end
 
   def cache_roles_identifier!
+    return unless item_or_collection?
     self.cached_roles_identifier = roles_anchor_resource_identifier
+    return unless will_save_change_to_cached_attributes?
     # update without callbacks/timestamps
     update_column :cached_attributes, cached_attributes
   end
@@ -208,6 +209,8 @@ module Resourceable
 
   def inherit_roles_anchor_from_parent!(parent = self.parent)
     update_column(:roles_anchor_collection_id, parent.roles_anchor.id)
+    cache_roles_identifier!
+    reload
   end
 
   def unanchor!
@@ -228,11 +231,6 @@ module Resourceable
   end
 
   private
-
-  def saved_change_to_roles_anchor?
-    return false unless item_or_collection?
-    try(:saved_change_to_roles_anchor_collection_id?)
-  end
 
   def raise_role_name_not_set(role_name)
     raise StandardError, "Pass in `#{role_name}` to #{self.class.name}'s resourceable definition to use this method"

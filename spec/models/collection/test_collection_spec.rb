@@ -14,6 +14,10 @@ describe Collection::TestCollection, type: :model do
 
   context 'callbacks' do
     describe '#setup_default_status_and_questions' do
+      before do
+        user.add_role(Role::EDITOR, test_collection)
+      end
+
       it 'should set the test_status to "draft"' do
         expect(test_collection.test_status).to eq 'draft'
       end
@@ -21,6 +25,14 @@ describe Collection::TestCollection, type: :model do
       it 'should create the default setup with its attached cards and items' do
         expect(test_collection.collection_cards.count).to eq 4
         expect(test_collection.items.count).to eq 4
+      end
+
+      it 'sets up the anchored roles on the items', only: true do
+        item = test_collection.items.first
+        expect(item.roles_anchor_collection_id).to eq test_collection.id
+        expect(item.cached_roles_identifier).to eq test_collection.resource_identifier
+        expect(test_collection.can_edit?(user)).to be true
+        expect(item.can_edit?(user)).to be true
       end
     end
 
@@ -41,7 +53,6 @@ describe Collection::TestCollection, type: :model do
   end
 
   describe '#duplicate!' do
-    let(:user) { create(:user) }
     let!(:parent_collection) { create(:collection) }
     let(:duplicate) do
       test_collection.duplicate!(
