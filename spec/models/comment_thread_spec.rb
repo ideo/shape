@@ -55,4 +55,17 @@ RSpec.describe CommentThread, type: :model do
       expect(user.comment_threads).to include(comment_thread)
     end
   end
+
+  describe '#update_firestore_users_threads' do
+    let(:comment_thread) { create(:collection_comment_thread) }
+    let(:users_thread) { create(:users_thread, comment_thread: comment_thread) }
+
+    it 'should update the users_threads on update' do
+      expect(FirestoreBatchWriter).to receive(:perform_in).with(
+        3.seconds,
+        [users_thread.batch_job_identifier],
+      )
+      comment_thread.update(updated_at: Time.now)
+    end
+  end
 end

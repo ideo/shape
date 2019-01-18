@@ -8,6 +8,9 @@ class UsersThread < ApplicationRecord
     self.last_viewed_at = Time.now
   end
 
+  # gets cached on serialized_for_firestore
+  delegate :updated_at, to: :comment_thread
+
   def update_last_viewed!
     update(last_viewed_at: Time.now)
     store_in_firestore

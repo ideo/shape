@@ -73,6 +73,7 @@ ThumbnailHolder.displayName = 'ThumbnailHolder'
 const StyledCommentsWrapper = styled.div`
   cursor: ${props => (props.clickable ? 'pointer' : 'auto')};
 `
+StyledCommentsWrapper.displayName = 'StyledCommentsWrapper'
 
 @observer
 class CommentThread extends React.Component {
@@ -102,7 +103,7 @@ class CommentThread extends React.Component {
 
   render() {
     const { thread, expanded } = this.props
-    const unexpandedClickable = !expanded && thread.unreadCount > 0
+    const unexpandedClickable = !expanded
 
     return (
       <StyledCommentThread hasMore={thread.hasMore} expanded={expanded}>

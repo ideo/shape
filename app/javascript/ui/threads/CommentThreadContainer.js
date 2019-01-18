@@ -15,6 +15,7 @@ import GoIcon from '~/ui/icons/GoIcon'
 import InlineLoader from '~/ui/layout/InlineLoader'
 import Notification from '~/ui/notifications/Notification'
 import { SmallActionText } from '~/ui/global/styled/typography'
+import { ShowMoreButton } from '~/ui/global/styled/forms'
 import CommentThread from './CommentThread'
 
 function pluralTypeName(name) {
@@ -61,6 +62,10 @@ class CommentThreadContainer extends React.Component {
 
   constructor(props) {
     super(props)
+    runInAction(() => {
+      this.loadingThreads = props.loadingThreads
+    })
+
     this.disposers = {}
     this.disposers.expanded = observe(
       props.uiStore,
@@ -115,7 +120,26 @@ class CommentThreadContainer extends React.Component {
   }
 
   componentDidMount() {
-    this.jumpToCurrentThread()
+    const hasCurrentThread = this.jumpToCurrentThread()
+    if (!hasCurrentThread) {
+      this.scrollToBottom()
+    }
+  }
+
+  componentDidUpdate() {
+    const { loadingThreads } = this.props
+    if (this.loadingThreads !== loadingThreads) {
+      runInAction(() => {
+        this.loadingThreads = loadingThreads
+      })
+      // just finished loading, make sure to re-scroll as needed
+      if (!this.loadingThreads) {
+        const { expandedThread } = this
+        if (expandedThread) {
+          this.scrollToTopOfNextThread(expandedThread)
+        }
+      }
+    }
   }
 
   componentWillUnmount() {
@@ -125,7 +149,6 @@ class CommentThreadContainer extends React.Component {
 
   handleVisibilityChange = i => isVisible => {
     runInAction(() => {
-      // this.visibleThreads[i] = isVisible
       this.visibleThreads.set(i, isVisible)
     })
     const { expandedThread } = this
@@ -215,7 +238,12 @@ class CommentThreadContainer extends React.Component {
     })
   }
 
-  contentHeight = () => (this.containerDiv ? this.containerDiv.clientHeight : 0)
+  contentHeight = () => {
+    let h = this.containerDiv ? this.containerDiv.clientHeight : 0
+    // TODO: we may not actually use this "older threads" button
+    h -= document.getElementById('ctc-older-threads').clientHeight || 0
+    return h
+  }
 
   expandThread = thread => () => {
     const { uiStore } = this.props
@@ -251,6 +279,13 @@ class CommentThreadContainer extends React.Component {
     }, 50)
   }
 
+  scrollToBottom = () => {
+    scroller.scrollTo(`thread-${this.threads.length}`, {
+      ...this.scrollOpts,
+      delay: 0,
+    })
+  }
+
   afterSubmit = thread => () => {
     this.scrollToTopOfNextThread(thread)
   }
@@ -263,9 +298,16 @@ class CommentThreadContainer extends React.Component {
   jumpToCurrentThread = () => {
     const { apiStore, uiStore } = this.props
     const thread = apiStore.findThreadForRecord(uiStore.viewingRecord)
-    if (!thread) return
+    if (!thread) return false
     uiStore.expandThread(thread.key)
     this.scrollToTopOfNextThread(thread)
+    return true
+  }
+
+  loadMorePages = () => {
+    const { apiStore, uiStore } = this.props
+    uiStore.expandThread(null)
+    apiStore.loadNextThreadPage()
   }
 
   renderThreads = () =>
@@ -290,7 +332,7 @@ class CommentThreadContainer extends React.Component {
     ))
 
   render() {
-    const { uiStore, parentWidth } = this.props
+    const { apiStore, uiStore, parentWidth } = this.props
     const hideJumpButton = this.showJumpToThreadButton ? 'visible' : 'hidden'
     return (
       <Fragment>
@@ -333,6 +375,13 @@ class CommentThreadContainer extends React.Component {
           moving={uiStore.activityLogMoving}
           id={this.scrollOpts.containerId}
         >
+          <div id="ctc-older-threads">
+            {apiStore.hasOlderThreads && (
+              <ShowMoreButton darkBg onClick={this.loadMorePages}>
+                Load older threads...
+              </ShowMoreButton>
+            )}
+          </div>
           {this.loadingThreads && <InlineLoader fixed background="none" />}
           <FlipMove disableAllAnimations={!!uiStore.expandedThreadKey}>
             {this.renderThreads()}
@@ -357,10 +406,12 @@ class CommentThreadContainer extends React.Component {
 
 CommentThreadContainer.propTypes = {
   parentWidth: PropTypes.number.isRequired,
+  loadingThreads: PropTypes.bool.isRequired,
 }
 CommentThreadContainer.wrappedComponent.propTypes = {
   apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }
+CommentThreadContainer.displayName = 'CommentThreadContainer'
 
 export default CommentThreadContainer

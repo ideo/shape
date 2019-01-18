@@ -36,7 +36,6 @@ class CollectionSort extends React.Component {
   handleSortChange = async ev => {
     ev.preventDefault()
     const { collection, uiStore } = this.props
-    // console.log(ev.target.value)
     uiStore.update('collectionCardSortOrder', ev.target.value)
     await collection.API_sortCards()
   }

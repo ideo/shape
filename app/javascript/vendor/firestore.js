@@ -25,9 +25,10 @@ if (process.env.GOOGLE_CLOUD_BROWSER_KEY && !cypress) {
 
 export class FirebaseClient {
   subscribedThreadIds = []
+  loadedThreadIds = []
   constructor() {
     this.listeners = []
-    this.disposer = observe(apiStore, 'currentUserOrganizationId', change => {
+    observe(apiStore, 'currentUserOrganizationId', change => {
       if (
         change.type === 'update' &&
         change.oldValue &&
@@ -35,6 +36,15 @@ export class FirebaseClient {
       ) {
         this.stopListening()
         this.startListening()
+      }
+    })
+    observe(apiStore, 'usersThreadPagesToLoad', change => {
+      if (
+        change.type === 'update' &&
+        change.oldValue &&
+        change.newValue !== change.oldValue
+      ) {
+        this.listenForUsersThreads(apiStore.currentUserId, change.newValue)
       }
     })
   }
@@ -100,17 +110,30 @@ export class FirebaseClient {
     this.listeners.push(this.notificationsListener)
   }
 
-  listenForUsersThreads = userId => {
+  listenForUsersThreads = (userId, pages = 1) => {
     const orgId = apiStore.currentUserOrganizationId
+    if (this.userThreadListener) {
+      // unsubscribe to any previous listener
+      this.userThreadListener()
+    }
+    const PER_PAGE = 20
     this.userThreadListener = db
       .collection('users_threads')
       .where('data.attributes.identifier', '==', `${orgId}_${userId}`)
+      .orderBy('data.attributes.updated_at', 'desc')
+      .limit(PER_PAGE * pages)
       .onSnapshot(
         querySnapshot => {
           querySnapshot.forEach(doc => {
             const usersThread = apiStore.syncFromFirestore(doc.data())
             this.subscribeToThread(usersThread)
           })
+          if (querySnapshot.size < PER_PAGE * pages) {
+            apiStore.update('hasOlderThreads', false)
+            this.checkIfFinishedLoading()
+          } else {
+            apiStore.update('hasOlderThreads', true)
+          }
         },
         error => {
           trackError(error, { name: 'Firestore:UserThreads' })
@@ -129,6 +152,7 @@ export class FirebaseClient {
     const threadId = usersThread.comment_thread_id
     // check if we're already listening for this thread
     if (this.subscribedThreadIds.indexOf(threadId) > -1) return
+    apiStore.update('loadingThreads', true)
     this.subscribedThreadIds.push(threadId)
     const threadUid = threadId.toString()
     this.commentThreadsListener = db
@@ -151,6 +175,8 @@ export class FirebaseClient {
                 thread,
                 comments,
               })
+              this.loadedThreadIds.push(threadId)
+              this.checkIfFinishedLoading()
             })
         },
         error => {
@@ -159,6 +185,13 @@ export class FirebaseClient {
       )
     this.listeners.push(this.commentThreadsListener)
     this.listeners.push(this.commentsListener)
+  }
+
+  checkIfFinishedLoading = () => {
+    if (!apiStore.loadingThreads) return
+    if (this.loadedThreadIds.length === this.subscribedThreadIds.length) {
+      apiStore.update('loadingThreads', false)
+    }
   }
 }
 
