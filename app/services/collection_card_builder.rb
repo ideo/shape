@@ -44,6 +44,7 @@ class CollectionCardBuilder
         @collection_card.update_collection_cover if @collection_card.is_cover
         @collection_card.increment_card_orders!
         record.reload.recalculate_breadcrumb!
+        record.cache_roles_identifier!
 
         if @parent_collection.master_template?
           # we just added a template card, so update the instances
