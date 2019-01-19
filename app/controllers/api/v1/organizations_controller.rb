@@ -47,6 +47,11 @@ class Api::V1::OrganizationsController < Api::V1::BaseController
     end
   end
 
+  def check_payments
+    @organization.update_payment_status
+    render jsonapi: @organization
+  end
+
   private
 
   def organization_params

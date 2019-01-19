@@ -292,4 +292,28 @@ describe Api::V1::OrganizationsController, type: :request, json: true, auth: tru
       expect(organization.terms_text_item_id).not_to be nil
     end
   end
+
+  describe 'GET #check_payments' do
+    let!(:current_user) { @user }
+    let!(:organization) { create(:organization, admin: user) }
+    let(:path) { "/api/v1/organizations/#{organization.id}/check_payments" }
+    let(:payment_method) { double('payment_method', id: 234) }
+    let(:network_organization) { double('network organization', id: 22) }
+    before do
+      allow(NetworkApi::Organization).to receive(:find_by_external_id).with(organization.id).and_return(network_organization)
+      allow(NetworkApi::PaymentMethod).to receive(:find).with(
+        organization_id: network_organization.id,
+        default: true,
+      ).and_return([payment_method])
+    end
+
+    it 'calls NetworkApi::PaymentMethod to check status' do
+      expect(NetworkApi::PaymentMethod).to receive(:find).with(
+        organization_id: network_organization.id,
+        default: true,
+      )
+      get(path)
+      expect(response.status).to eq(200)
+    end
+  end
 end
