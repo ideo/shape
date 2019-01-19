@@ -462,6 +462,12 @@ class ApiStore extends jsonapi(datxCollection) {
     }
   }
 
+  checkCurrentOrganizationPayments() {
+    return this.request(
+      `organizations/${this.currentUserOrganizationId}/check_payments`
+    )
+  }
+
   // default action for updating any basic apiStore value
   @action
   update(name, value) {

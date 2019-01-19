@@ -75,6 +75,7 @@ Rails.application.routes.draw do
         member do
           patch 'add_terms_text'
           patch 'remove_terms_text'
+          get 'check_payments'
         end
         resources :collections, only: %i[create]
         resources :groups, only: %i[index]
