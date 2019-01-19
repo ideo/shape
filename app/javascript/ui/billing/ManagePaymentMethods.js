@@ -31,12 +31,15 @@ class ManagePaymentMethods extends React.Component {
 
   async loadPaymentMethods() {
     const { apiStore, networkStore } = this.props
-
+    const { currentUserOrganization } = apiStore
     try {
       await networkStore.loadOrganization(apiStore.currentUserOrganizationId)
       if (networkStore.organization) {
         // if no org there's probably an error, e.g. on dev when the external_id org isn't there
         await networkStore.loadPaymentMethods(networkStore.organization.id)
+        if (this.paymentMethods.length > 0 && currentUserOrganization.overdue) {
+          apiStore.checkCurrentOrganizationPayments()
+        }
       }
       runInAction(() => (this.loaded = true))
       this.forceUpdate()
@@ -65,22 +68,29 @@ class ManagePaymentMethods extends React.Component {
     this.forceUpdate()
   }
 
+  get paymentMethods() {
+    const { networkStore } = this.props
+    return networkStore.findAll('payment_methods')
+  }
+
   tokenCreated = closeModal => async token => {
+    const { apiStore } = this.props
     const { networkStore } = this.props
     await networkStore.createPaymentMethod(networkStore.organization, token)
+    apiStore.checkCurrentOrganizationPayments()
     this.forceUpdate()
     closeModal()
   }
 
   render() {
-    const { apiStore, networkStore } = this.props
+    const { apiStore } = this.props
+    const { paymentMethods } = this
     if (!apiStore.currentUserOrganization.in_app_billing) {
       return null
     }
     if (!this.loaded) {
       return <Loader />
     }
-    const paymentMethods = networkStore.findAll('payment_methods')
     return (
       <PaymentMethods
         paymentMethods={paymentMethods}

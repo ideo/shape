@@ -32,7 +32,7 @@ class NetworkStore extends jsonapi(Collection) {
     return find(paymentMethods, x => x.default) || paymentMethods[0]
   }
 
-  loadOrganization(external_id, skipCache = false) {
+  loadOrganization = (external_id, skipCache = false) => {
     // see note above about clearing everything out on load
     this.removeAll('organizations')
     return this.fetchAll(
@@ -46,7 +46,7 @@ class NetworkStore extends jsonapi(Collection) {
     )
   }
 
-  loadPaymentMethods(organization_id, skipCache = false) {
+  loadPaymentMethods = (organization_id, skipCache = false) => {
     this.removeAll('payment_methods')
     return this.fetchAll(
       'payment_methods',
@@ -60,7 +60,7 @@ class NetworkStore extends jsonapi(Collection) {
     )
   }
 
-  loadActiveSubscription(organization_id, skipCache = false) {
+  loadActiveSubscription = (organization_id, skipCache = false) => {
     this.removeAll('subscriptions')
     return this.fetchAll(
       'subscriptions',
@@ -73,7 +73,7 @@ class NetworkStore extends jsonapi(Collection) {
     )
   }
 
-  loadInvoices(organization_id) {
+  loadInvoices = organization_id => {
     this.removeAll('invoices')
     return this.fetchAll('invoices', {
       filter: { organization_id },
@@ -81,7 +81,7 @@ class NetworkStore extends jsonapi(Collection) {
     })
   }
 
-  loadInvoice(invoice_id) {
+  loadInvoice = invoice_id => {
     this.fetch('invoices', invoice_id, {
       include: [
         'organization',
