@@ -22,6 +22,8 @@ class OrganizationBuilder
       setup_user_membership_and_collections
       if @full_setup
         create_templates
+        # this check is for running Cypress, don't create real Network orgs for every test org
+        return true if @user.email == 'cypress-test@ideo.com'
         create_network_organization
         create_network_subscription
       end

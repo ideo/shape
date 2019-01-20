@@ -27,6 +27,12 @@ RSpec.describe Roles::ModifyChildren, type: :service do
     let(:user) { create(:user) }
     let(:role_name) { Role::EDITOR }
 
+    before do
+      # items will automatically get their roles_anchors but we want to remove them
+      Collection.in_collection(collection).update_all(roles_anchor_collection_id: nil)
+      Item.in_collection(collection).update_all(roles_anchor_collection_id: nil)
+    end
+
     it 'should create new roles for each user/item' do
       expect { add_to_children.call }.to change(UsersRole, :count).by(6)
     end

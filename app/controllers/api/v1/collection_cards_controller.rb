@@ -170,11 +170,6 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
     per_page = [params[:per_page].to_i, CollectionCard::DEFAULT_PER_PAGE].max
     per_page = [per_page, 200].min
 
-    current_user.precache_roles_for(
-      [Role::VIEWER, Role::CONTENT_EDITOR, Role::EDITOR],
-      @collection.children_and_linked_children,
-    )
-
     @collection_cards = @collection.collection_cards_viewable_by(
       current_user,
       card_order: params[:card_order],

@@ -83,6 +83,7 @@ RSpec.describe CollectionCardDuplicationWorker, type: :worker do
       let(:system_collection) { false }
 
       before do
+        hidden_item.unanchor_and_inherit_roles_from_anchor!
         user.remove_role(Role::EDITOR, hidden_item)
         CollectionCardDuplicationWorker.new.perform(
           card_ids,

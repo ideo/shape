@@ -24,8 +24,7 @@ class Collection < ApplicationRecord
                  :cached_org_properties,
                  :cached_card_count,
                  :submission_attrs,
-                 :getting_started_shell,
-                 :cached_roles_identifier
+                 :getting_started_shell
 
   # callbacks
   after_touch :touch_related_cards, unless: :destroyed?
@@ -383,36 +382,61 @@ class Collection < ApplicationRecord
 
     unless user.has_cached_role?(Role::SUPER_ADMIN)
       group_ids = user.current_org_group_ids
-      join_sql = %(
-        left join items on items.id = collection_cards.item_id
-        left join collections on collections.id = collection_cards.collection_id
-        join roles on (
-          roles.resource_identifier = coalesce(
-            items.cached_attributes->>'cached_roles_identifier', collections.cached_attributes->>'cached_roles_identifier'
+      resource_identifier_sql = %(
+        CASE WHEN COALESCE(
+          items.roles_anchor_collection_id,
+          collections.roles_anchor_collection_id
+        ) IS NOT NULL
+        THEN
+          CONCAT('Collection_', COALESCE(
+            items.roles_anchor_collection_id,
+            collections.roles_anchor_collection_id
+          ))
+        ELSE
+          CONCAT(
+            (CASE WHEN collection_cards.item_id IS NOT NULL THEN 'Item' ELSE 'Collection' END),
+            '_',
+            COALESCE(collection_cards.item_id, collection_cards.collection_id)
           )
+        END
+      )
+      join_sql = %(
+        LEFT JOIN items ON items.id = collection_cards.item_id
+        LEFT JOIN collections ON collections.id = collection_cards.collection_id
+        JOIN roles ON (
+          roles.resource_identifier = #{resource_identifier_sql}
         )
-        left join users_roles on
+        LEFT JOIN users_roles ON
         users_roles.role_id = roles.id and
         users_roles.user_id = #{user.id}
-        left join groups_roles on
+        LEFT JOIN groups_roles ON
         groups_roles.role_id = roles.id and
         groups_roles.group_id IN (#{group_ids.present? ? group_ids.join(',') : 'NULL'})
       )
 
       fields = ['collection_cards.*']
       fields << collection_order if collection_order.present?
+
       cards = cards
-        .joins(join_sql)
-        .select(*fields)
-        .where('coalesce(users_roles.id, groups_roles.id) IS NOT NULL')
-        .distinct
+              .joins(join_sql)
+              .select(*fields)
+              .where('coalesce(users_roles.id, groups_roles.id) IS NOT NULL')
+              .distinct
     end
 
+    cards = cards
+            .includes(:collection, item: [:filestack_file])
+            .order(order)
+            .page(page)
+            .per(per_page)
+
+    # precache roles because these will be referred to in the serializers (e.g. can_edit?)
+    user.precache_roles_for(
+      [Role::VIEWER, Role::CONTENT_EDITOR, Role::EDITOR],
+      cards.map(&:record),
+    )
+
     cards
-      .includes(:collection, item: [:filestack_file])
-      .order(order)
-      .page(page)
-      .per(per_page)
   end
 
   # convenience method if card order ever gets out of sync
@@ -588,14 +612,7 @@ class Collection < ApplicationRecord
     all_collections = Collection.in_collection(self)
     all_items = Item.in_collection(self)
     [all_collections, all_items].each do |records|
-      records.update_all(
-        %(roles_anchor_collection_id = #{roles_anchor.id},
-          cached_attributes = jsonb_set(
-            cached_attributes, '{cached_roles_identifier}',
-            to_json('#{roles_anchor.resource_identifier}'::text)::jsonb
-          )
-        ),
-      )
+      records.update_all(roles_anchor_collection_id: roles_anchor.id)
       records.find_each do |record|
         if record.roles.present?
           record.roles.destroy_all

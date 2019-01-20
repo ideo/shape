@@ -39,7 +39,6 @@ RSpec.describe CollectionCardBuilder, type: :service do
       it 'should anchor its roles to the parent collection' do
         expect(builder.create).to be true
         expect(collection.roles_anchor).to eq parent
-        expect(collection.cached_roles_identifier).to eq parent.resource_identifier
       end
 
       it 'should increase order of additional cards' do

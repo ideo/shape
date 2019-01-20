@@ -1,5 +1,13 @@
 require 'rails_helper'
 
+def remove_access(collection_cards, user)
+  collection_cards.each do |card|
+    card.record.unanchor_and_inherit_roles_from_anchor!
+    user.remove_role(Role::EDITOR, card.record)
+    user.remove_role(Role::VIEWER, card.record)
+  end
+end
+
 describe Api::V1::CollectionCardsController, type: :request, json: true, auth: true do
   let(:user) { @user }
   let(:organization) { create(:organization_without_groups) }
@@ -58,6 +66,7 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
 
     context 'with permissions' do
       before do
+        collection.items.last.unanchor_and_inherit_roles_from_anchor!
         user.remove_role(Role::VIEWER, collection.items.last)
       end
 
@@ -334,13 +343,19 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
     let(:path) { '/api/v1/collection_cards/archive' }
     let(:params) { { card_ids: collection_cards.map(&:id) }.to_json }
 
-    context 'with record edit access' do
+    context 'without record edit access' do
       before do
-        collection_cards.each do |card|
-          user.add_role(Role::EDITOR, card.collection)
-        end
+        remove_access(collection_cards, user)
       end
 
+      it 'returns a 401' do
+        patch(path, params: params)
+        expect(response.status).to eq(401)
+      end
+    end
+
+    # record access automatically inherited
+    context 'with record edit access' do
       it 'returns a 200' do
         patch(path, params: params)
         expect(response.status).to eq(200)
@@ -358,13 +373,6 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
           user,
         )
         patch(path, params: params)
-      end
-    end
-
-    context 'without record edit access' do
-      it 'returns a 401' do
-        patch(path, params: params)
-        expect(response.status).to eq(401)
       end
     end
   end
@@ -387,11 +395,19 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
     end
     let(:params) { raw_params.to_json }
 
+    context 'without record edit access' do
+      before do
+        remove_access(collection_cards, user)
+      end
+
+      it 'returns a 401' do
+        patch(path, params: params)
+        expect(response.status).to eq(401)
+      end
+    end
+
     context 'with record edit access' do
       before do
-        collection_cards.each do |card|
-          user.add_role(Role::EDITOR, card.collection)
-        end
         allow(Collection).to receive(:find).and_return(collection)
       end
 
@@ -411,13 +427,6 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
           user,
         )
         patch(path, params: params)
-      end
-    end
-
-    context 'without record edit access' do
-      it 'returns a 401' do
-        patch(path, params: params)
-        expect(response.status).to eq(401)
       end
     end
   end
@@ -538,6 +547,10 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
         create(:collection, num_cards: 3, add_editors: [user])
       end
 
+      before do
+        remove_access(from_collection.collection_cards, user)
+      end
+
       it 'returns a 401' do
         # by default user won't have any role added to the records within the cards
         post(path, params: params)
@@ -611,6 +624,10 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
         create(:collection, num_cards: 3, add_editors: [user])
       end
 
+      before do
+        remove_access(from_collection.collection_cards, user)
+      end
+
       it 'returns a 401' do
         # by default user won't have any role added to the records within the cards
         post(path, params: params)
@@ -661,7 +678,7 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
         first_cards = to_collection.collection_cards.first(2)
         expect(first_cards.map(&:item)).not_to match_array moving_cards.map(&:item)
         # names should match, in same order
-        expect(first_cards.map(&:item).map(&:name)).to eq moving_cards.map(&:item).map(&:name)
+        expect(first_cards.map(&:item).map(&:name)).to match_array moving_cards.map(&:item).map(&:name)
         expect(to_collection.collection_cards.first.primary?).to be true
       end
 
@@ -855,6 +872,10 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
     end
 
     context 'without record edit access' do
+      before do
+        remove_access([collection_card], user)
+      end
+
       it 'returns a 401' do
         patch(path, params: params)
         expect(response.status).to eq(401)

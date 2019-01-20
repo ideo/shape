@@ -21,8 +21,7 @@ class Item < ApplicationRecord
                  :cached_tag_list,
                  :cached_filestack_file_url,
                  :cached_filestack_file_info,
-                 :previous_thumbnail_urls,
-                 :cached_roles_identifier
+                 :previous_thumbnail_urls
 
   # The card that 'holds' this item and determines its breadcrumb
   has_one :parent_collection_card,

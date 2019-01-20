@@ -9,7 +9,7 @@ module Resourceable
     class_attribute :view_role
 
     belongs_to :roles_anchor_collection, class_name: 'Collection', optional: true
-    after_commit :cache_roles_identifier!, unless: :destroyed?
+    after_commit :reanchor_if_no_roles!, unless: :destroyed?
   end
 
   class_methods do
@@ -71,15 +71,12 @@ module Resourceable
     roles_anchor_collection || self
   end
 
-  def cache_roles_identifier!(reanchor: true)
+  def reanchor_if_no_roles!
     return unless item_or_collection?
-    if reanchor && parent.present? && roles.empty? && roles_anchor_collection_id.nil?
-      # sort of a catch for items to automatically inherit parent roles_anchor if none was given
-      anchor_id = parent&.roles_anchor&.id
-      update_column :roles_anchor_collection_id, anchor_id if anchor_id
-    end
-    self.cached_roles_identifier = roles_anchor_resource_identifier
-    update_column :cached_attributes, cached_attributes if will_save_change_to_cached_attributes?
+    return unless parent.present? && roles.empty? && roles_anchor_collection_id.nil?
+    # sort of a catch for items to automatically inherit parent roles_anchor if none was given
+    anchor_id = parent&.roles_anchor&.id
+    update_column :roles_anchor_collection_id, anchor_id if anchor_id
   end
 
   def roles_anchor_resource_identifier
@@ -193,7 +190,6 @@ module Resourceable
 
   def inherit_roles_anchor_from_parent!(parent = self.parent)
     update_column(:roles_anchor_collection_id, parent.roles_anchor.id)
-    cache_roles_identifier!
     reload
   end
 
@@ -201,9 +197,11 @@ module Resourceable
   def unanchor_and_inherit_roles_from_anchor!
     # NOTE: these next two steps have to happen back to back
     inherit_roles_from_parent!(roles_anchor)
+    unanchor!
+  end
+
+  def unanchor!
     update_column(:roles_anchor_collection_id, nil)
-    # make sure we don't automatically re-anchor in this case, as we are explicitly unanchoring
-    cache_roles_identifier!(reanchor: false)
     reload
   end
 

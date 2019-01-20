@@ -20,6 +20,7 @@ RSpec.describe Roles::Inheritance, type: :service do
 
     context 'same editors and viewers on all items' do
       before do
+        all_objects.each(&:unanchor_and_inherit_roles_from_anchor!)
         add_roles(Role::EDITOR, editors, all_objects)
         add_roles(Role::VIEWER, viewers, all_objects)
       end

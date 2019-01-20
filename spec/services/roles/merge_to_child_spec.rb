@@ -28,6 +28,7 @@ RSpec.describe Roles::MergeToChild, type: :service do
       let(:other_user) { create(:user) }
 
       before do
+        child.unanchor_and_inherit_roles_from_anchor!
         other_user.add_role(Role::VIEWER, collection)
       end
 

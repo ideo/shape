@@ -102,7 +102,6 @@ ActiveRecord::Schema.define(version: 20190117195055) do
     t.bigint "roles_anchor_collection_id"
     t.boolean "hide_submissions", default: false
     t.index ["breadcrumb"], name: "index_collections_on_breadcrumb", using: :gin
-    t.index ["cached_attributes"], name: "index_collections_on_cached_attributes", using: :gin
     t.index ["cached_test_scores"], name: "index_collections_on_cached_test_scores", using: :gin
     t.index ["cloned_from_id"], name: "index_collections_on_cloned_from_id"
     t.index ["created_at"], name: "index_collections_on_created_at"
@@ -214,7 +213,6 @@ ActiveRecord::Schema.define(version: 20190117195055) do
     t.jsonb "data_settings"
     t.bigint "roles_anchor_collection_id"
     t.index ["breadcrumb"], name: "index_items_on_breadcrumb", using: :gin
-    t.index ["cached_attributes"], name: "index_items_on_cached_attributes", using: :gin
     t.index ["cloned_from_id"], name: "index_items_on_cloned_from_id"
     t.index ["created_at"], name: "index_items_on_created_at"
     t.index ["data_source_type", "data_source_id"], name: "index_items_on_data_source_type_and_data_source_id"

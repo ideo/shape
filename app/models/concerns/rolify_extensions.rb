@@ -23,7 +23,8 @@ module RolifyExtensions
 
   def precache_roles_for(role_names, resources)
     return unless @has_role_by_identifier.present? && is_a?(User)
-    resource_identifiers = resources.map(&:resource_identifier)
+    return unless resources.present?
+    resource_identifiers = resources.map(&:roles_anchor_resource_identifier).uniq
     roles = rolify_roles.where(
       name: role_names,
       resource_identifier: resource_identifiers,

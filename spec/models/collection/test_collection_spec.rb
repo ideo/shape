@@ -31,7 +31,7 @@ describe Collection::TestCollection, type: :model do
         items = test_collection.items
         item = items.first
         expect(items.all? { |i| i.roles_anchor_collection_id == test_parent.id }).to be true
-        expect(item.cached_roles_identifier).to eq test_parent.resource_identifier
+        expect(item.roles_anchor).to eq test_parent
         expect(test_collection.can_edit?(user)).to be true
         expect(item.can_edit?(user)).to be true
       end
@@ -128,7 +128,7 @@ describe Collection::TestCollection, type: :model do
 
       it 'has the right permissions' do
         expect(test_collection.items.all? { |i| i.can_view?(user) }).to be true
-        expect(test_collection.items.first.cached_roles_identifier).to eq test_parent.resource_identifier
+        expect(test_collection.items.first.roles_anchor).to eq test_parent
       end
 
       it 'has prelaunch question items' do

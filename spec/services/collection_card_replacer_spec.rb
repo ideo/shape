@@ -41,6 +41,7 @@ RSpec.describe CollectionCardReplacer, type: :service do
       let(:item) { collection_card.item }
 
       before do
+        item.unanchor_and_inherit_roles_from_anchor!
         user.add_role(Role::EDITOR, item)
       end
 

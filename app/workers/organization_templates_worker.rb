@@ -11,6 +11,9 @@ class OrganizationTemplatesWorker
       original_getting_started_collection,
     )
     create_user_getting_started_collection(organization, user)
+  rescue ActiveRecord::RecordNotFound
+    # org was already deleted, e.g. in a test
+    false
   end
 
   private
