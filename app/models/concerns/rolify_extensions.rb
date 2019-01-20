@@ -77,8 +77,9 @@ module RolifyExtensions
     @has_cached_role[role_name.to_s]
   end
 
-  # Rolify was super slow in adding roles once there became thousands,
-  # so we wrote our own method
+  # Override Rolify method for optimizations + customizations
+  # NOTE: add_role will not do anything on anchored items/collections
+  # you must make sure to unanchor first if you want it to have its own roles
   def add_role(role_name, resource = nil)
     role = Role.find_or_create(role_name, resource)
     return add_resource_role(role, resource) if resource.present?
