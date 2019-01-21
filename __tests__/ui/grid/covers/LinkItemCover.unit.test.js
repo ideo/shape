@@ -10,6 +10,7 @@ describe('LinkItemCover', () => {
   beforeEach(() => {
     props = {
       item: fakeLinkItem,
+      cardHeight: 1,
       dragging: false,
     }
     rerender = () => {
@@ -29,64 +30,68 @@ describe('LinkItemCover', () => {
   })
 
   describe('clamp', () => {
+    const cardHeights = [1, 2]
+    const breakpoints = [
+      {
+        name: 'mobile',
+        width: 480,
+        maxTitle: 53,
+        maxBody: 90,
+      },
+      {
+        name: 'small',
+        width: 768,
+        maxTitle: 46,
+        maxBody: 79,
+      },
+      {
+        name: 'medium',
+        width: 1090,
+        maxTitle: 35,
+        maxBody: 61,
+      },
+      {
+        name: 'large',
+        width: 2000,
+        maxTitle: 40,
+        maxBody: 80,
+      },
+    ]
+
     describe('with a short name', () => {
       beforeEach(() => {
         props.item.name = 'The Verge '
         props.item.content =
-          'E-sports like the Overwatch League, NBA 2K League, and the League of Legends Championship Series are looking to taking on the NBA and NFL with more structure and big-name owners.'
+          'E-sports like the Overwatch League, NBA 2K League, Mega Man II, and the League of Legends Championship Series are looking to taking on the NBA and NFL with more structure and big-name owners.'
         wrapper.setProps(props)
         rerender()
       })
 
-      describe('on the mobile breakpoint', () => {
-        beforeEach(() => {
-          uiStore.windowWidth = 480
-          rerender()
-        })
+      breakpoints.forEach(breakpoint => {
+        describe(`on the ${breakpoint.name} breakpoint`, () => {
+          cardHeights.forEach(height => {
+            const heightLabel = height === 1 ? 'single' : 'double'
+            describe(`at ${heightLabel} square height`, () => {
+              beforeEach(() => {
+                props.cardHeight = height
+                uiStore.windowWidth = breakpoint.width
+                rerender()
+              })
 
-        it('should clamp the content down to 90 characters', () => {
-          expect(wrapper.find('.content').text().length).toEqual(90)
-        })
-      })
-
-      describe('on the small breakpoint', () => {
-        beforeEach(() => {
-          uiStore.windowWidth = 768
-          rerender()
-        })
-
-        it('should clamp the content down to 79 characters', () => {
-          expect(wrapper.find('.content').text().length).toEqual(79)
-        })
-      })
-
-      describe('on the middle breakpoint', () => {
-        beforeEach(() => {
-          uiStore.windowWidth = 1090
-          rerender()
-        })
-
-        it('should clamp the content down to 61 characters', () => {
-          expect(wrapper.find('.content').text().length).toEqual(61)
-        })
-      })
-
-      describe('on the large breakpoint', () => {
-        beforeEach(() => {
-          uiStore.windowWidth = 2000
-          rerender()
-        })
-
-        it('should clamp the content down to 80 characters', () => {
-          expect(wrapper.find('.content').text().length).toEqual(80)
+              const limit = breakpoint.maxBody * height
+              it(`should clamp the content down to ${limit} characters`, () => {
+                expect(wrapper.find('.content').text().length).toEqual(limit)
+              })
+            })
+          })
         })
       })
     })
 
-    describe('with a name longer then 30 characters', () => {
+    describe('with a name longer then 106 characters', () => {
       beforeEach(() => {
         props.item.name =
-          'Soccer News, Live Scores, Results & Transfers | Goal.com US'
+          'Soccer News, Live Scores, Results & Transfers | Goal.com US | The latest soccer news, live scores, results, and rumours from around the world'
         props.item.content =
           'The latest soccer news, live scores, results, rumours, transfers'
         wrapper.setProps(props)
@@ -97,67 +102,28 @@ describe('LinkItemCover', () => {
         expect(wrapper.find('.content').text()).toEqual('')
       })
 
-      describe('on the mobile breakpoint', () => {
-        beforeEach(() => {
-          uiStore.windowWidth = 480
-          rerender()
-        })
+      breakpoints.forEach(breakpoint => {
+        describe(`on the ${breakpoint.name} breakpoint`, () => {
+          cardHeights.forEach(height => {
+            const heightLabel = height === 1 ? 'single' : 'double'
+            describe(`at ${heightLabel} square height`, () => {
+              beforeEach(() => {
+                props.cardHeight = height
+                uiStore.windowWidth = breakpoint.width
+                rerender()
+              })
 
-        it('should clamp the name to 53 characters', () => {
-          expect(
-            wrapper
-              .find('.name')
-              .dive()
-              .text().length
-          ).toEqual(53)
-        })
-      })
-
-      describe('on the small breakpoint', () => {
-        beforeEach(() => {
-          uiStore.windowWidth = 768
-          rerender()
-        })
-
-        it('should clamp the name to 46 characters', () => {
-          expect(
-            wrapper
-              .find('.name')
-              .dive()
-              .text().length
-          ).toEqual(46)
-        })
-      })
-
-      describe('on the middle breakpoint', () => {
-        beforeEach(() => {
-          uiStore.windowWidth = 1090
-          rerender()
-        })
-
-        it('should clamp the name to 35 characters', () => {
-          expect(
-            wrapper
-              .find('.name')
-              .dive()
-              .text().length
-          ).toEqual(35)
-        })
-      })
-
-      describe('on the large breakpoint', () => {
-        beforeEach(() => {
-          uiStore.windowWidth = 2090
-          rerender()
-        })
-
-        it('should clamp the name to 40 characters', () => {
-          expect(
-            wrapper
-              .find('.name')
-              .dive()
-              .text().length
-          ).toEqual(40)
+              const limit = breakpoint.maxTitle * height
+              it(`should clamp the name down to ${limit} characters`, () => {
+                expect(
+                  wrapper
+                    .find('.name')
+                    .dive()
+                    .text().length
+                ).toEqual(limit)
+              })
+            })
+          })
         })
       })
     })
