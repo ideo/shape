@@ -8,13 +8,13 @@ RSpec.describe CollectionCardDuplicationWorker, type: :worker do
     let(:card_ids) { collection.collection_cards.collect(&:id) }
 
     before do
-      Roles::MassAssign.new(
+      Roles::MassAssign.call(
         object: collection,
         role_name: Role::EDITOR,
         users: [user],
         propagate_to_children: true,
         synchronous: true,
-      ).call
+      )
     end
 
     context 'with access to all items' do

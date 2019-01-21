@@ -623,6 +623,16 @@ class Collection < ApplicationRecord
     end
   end
 
+  def submit_submission!
+    return unless submission?
+    Roles::MergeToChild.call(
+      parent: parent_submission_box,
+      child: self,
+    )
+    submission_attrs['hidden'] = false
+    save
+  end
+
   # =================================
   # Various boolean queries/checks
   # - many are related to test collections and submission_boxes
@@ -683,7 +693,7 @@ class Collection < ApplicationRecord
   end
 
   def inside_hidden_submission_box?
-    !!parent_submission_box&.hide_submissions
+    parent_submission_box&.hide_submissions == true
   end
 
   def submission?

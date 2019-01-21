@@ -351,6 +351,28 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
     end
   end
 
+  describe 'PATCH #submit' do
+    let(:submission_box) { create(:submission_box, hide_submissions: true) }
+    let(:submissions_collection) { submission_box.submissions_collection }
+    let(:collection) { create(:collection, :submission, parent_collection: submissions_collection, add_editors: [user]) }
+    let(:path) { "/api/v1/collections/#{collection.id}/submit" }
+
+    before do
+      submission_box.setup_submissions_collection!
+      collection.submission_attrs['hidden'] = true
+      collection.save
+    end
+
+    it 'should submit the submission' do
+      expect(Roles::MergeToChild).to receive(:call).with(
+        parent: submission_box,
+        child: collection,
+      )
+      patch(path)
+      expect(collection.reload.submission_attrs['hidden']).to be false
+    end
+  end
+
   describe 'DELETE #destroy' do
     let(:path) { "/api/v1/collections/#{collection.id}" }
 

@@ -24,9 +24,9 @@ class CollectionUpdater < SimpleService
       # `break result` means break from this block and return result
       break result unless @collection.is_a?(Collection::SubmissionBox)
       break result unless @collection.saved_change_to_hide_submissions && !@collection.hide_submissions
-      @collection.submissions.find_each do |submission|
-        Roles::MergeToChild.call(parent: @collection, child: submission)
-      end
+      # TODO: Kind of an edge case of someone toggling the "hide submissions" feature
+      # but we may want to put this in a worker if there are >100's of submissions
+      @collection.submissions.find_each(&:submit_submission!)
     end
   end
 

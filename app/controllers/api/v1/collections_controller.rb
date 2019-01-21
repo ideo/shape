@@ -80,12 +80,7 @@ class Api::V1::CollectionsController < Api::V1::BaseController
   end
 
   def submit
-    @collection.submission_attrs['hidden'] = false
-    Roles::MergeToChild.call(
-      parent: @collection.parent_submission_box,
-      child: @collection,
-    )
-    if @collection.save
+    if @collection.submit_submission!
       render jsonapi: @collection,
              include: Collection.default_relationships_for_api
     else

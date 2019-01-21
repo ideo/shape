@@ -67,6 +67,31 @@ RSpec.describe CollectionUpdater, type: :service do
       end
     end
 
+    context 'with a submission box' do
+      let!(:collection) { create(:submission_box, hide_submissions: true) }
+      let(:submissions_collection) { collection.submissions_collection }
+      let(:submission) { create(:collection, :submission, parent_collection: submissions_collection) }
+      let(:attributes) do
+        { hide_submissions: false }
+      end
+
+      before do
+        collection.setup_submissions_collection!
+        submission.submission_attrs['hidden'] = true
+        submission.save
+      end
+
+      it 'submits all submissions if you un-set the hide_submissions option' do
+        expect(Roles::MergeToChild).to receive(:call).with(
+          parent: collection,
+          child: submission,
+        )
+        CollectionUpdater.call(collection, attributes)
+        submission.reload
+        expect(submission.submission_attrs['hidden']).to be false
+      end
+    end
+
     context 'with invalid attributes' do
       let(:attributes) { { name: nil } }
       let(:result) { CollectionUpdater.call(collection, attributes) }

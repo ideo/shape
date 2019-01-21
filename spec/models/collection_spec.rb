@@ -561,6 +561,26 @@ describe Collection, type: :model do
     end
   end
 
+  describe '#submit_submission' do
+    let(:submission_box) { create(:submission_box) }
+    let(:submission) { create(:collection, :submission, parent_collection: submission_box.submissions_collection) }
+
+    before do
+      submission_box.setup_submissions_collection!
+      submission.submission_attrs['hidden'] = true
+      submission.save
+    end
+
+    it 'should unset the hidden attribute and merge roles from the SubmissionBox' do
+      expect(Roles::MergeToChild).to receive(:call).with(
+        parent: submission_box,
+        child: submission,
+      )
+      submission.submit_submission!
+      expect(submission.submission_attrs['hidden']).to be false
+    end
+  end
+
   # Caching methods
   context 'caching and stored attributes' do
     describe '#cache_key' do
