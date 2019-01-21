@@ -38,14 +38,36 @@ describe('LinkItemCover', () => {
         rerender()
       })
 
+      describe('on the mobile breakpoint', () => {
+        beforeEach(() => {
+          uiStore.windowWidth = 480
+          rerender()
+        })
+
+        it('should clamp the content down to 90 characters', () => {
+          expect(wrapper.find('.content').text().length).toEqual(90)
+        })
+      })
+
+      describe('on the small breakpoint', () => {
+        beforeEach(() => {
+          uiStore.windowWidth = 768
+          rerender()
+        })
+
+        it('should clamp the content down to 79 characters', () => {
+          expect(wrapper.find('.content').text().length).toEqual(79)
+        })
+      })
+
       describe('on the middle breakpoint', () => {
         beforeEach(() => {
           uiStore.windowWidth = 1090
           rerender()
         })
 
-        it('should clamp the content down to 40 characters', () => {
-          expect(wrapper.find('.content').text().length).toEqual(40)
+        it('should clamp the content down to 61 characters', () => {
+          expect(wrapper.find('.content').text().length).toEqual(61)
         })
       })
 
@@ -75,19 +97,51 @@ describe('LinkItemCover', () => {
         expect(wrapper.find('.content').text()).toEqual('')
       })
 
+      describe('on the mobile breakpoint', () => {
+        beforeEach(() => {
+          uiStore.windowWidth = 480
+          rerender()
+        })
+
+        it('should clamp the name to 53 characters', () => {
+          expect(
+            wrapper
+              .find('.name')
+              .dive()
+              .text().length
+          ).toEqual(53)
+        })
+      })
+
+      describe('on the small breakpoint', () => {
+        beforeEach(() => {
+          uiStore.windowWidth = 768
+          rerender()
+        })
+
+        it('should clamp the name to 46 characters', () => {
+          expect(
+            wrapper
+              .find('.name')
+              .dive()
+              .text().length
+          ).toEqual(46)
+        })
+      })
+
       describe('on the middle breakpoint', () => {
         beforeEach(() => {
           uiStore.windowWidth = 1090
           rerender()
         })
 
-        it('should clamp the name to 28 characters', () => {
+        it('should clamp the name to 35 characters', () => {
           expect(
             wrapper
               .find('.name')
               .dive()
               .text().length
-          ).toEqual(28)
+          ).toEqual(35)
         })
       })
 
