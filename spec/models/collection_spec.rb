@@ -345,7 +345,7 @@ describe Collection, type: :model do
 
   describe '#collection_cards_viewable_by' do
     let!(:collection) { create(:collection, num_cards: 3, record_type: :collection) }
-    let!(:subcollection_card) { create(:collection_card_collection, parent: collection) }
+    let!(:subcollection_card) { create(:collection_card_collection, order: 4, parent: collection) }
     let(:cards) { collection.collection_cards }
     let(:user) { create(:user) }
 
@@ -412,7 +412,8 @@ describe Collection, type: :model do
     context 'with pagination' do
       it 'should only show the appropriate page' do
         # just make a simple 1 per-page request
-        expect(collection.collection_cards_viewable_by(user, per_page: 1)).to match_array([cards.first])
+        first_page = collection.collection_cards_viewable_by(user, per_page: 1)
+        expect(first_page).to match_array([cards.first])
       end
     end
 

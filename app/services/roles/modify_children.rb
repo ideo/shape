@@ -22,7 +22,6 @@ module Roles
 
     def call
       return false unless %w[add remove].include? @method
-      return if @parent.try(:children).blank?
       modify_children_roles(Collection.in_collection(@parent))
       modify_children_roles(Item.in_collection(@parent))
       true
@@ -39,11 +38,12 @@ module Roles
       # Find all children that are unanchored (have their own roles)
       children.where(roles_anchor_collection_id: nil).find_each do |child|
         # don't pass down any roles from parent -> child if the child is a hidden submission
-        next if child.is_a?(Collection) && child.submission? && child.submission_attrs['hidden']
+        next if hidden_submission?(child)
         # If the user can edit, then continue adding the roles
         next unless @user.nil? || child.can_edit?(@user)
-        # don't modify private children
-        next if @inheritance.private_child?(child)
+        # don't modify private children, other than unhidden submissions
+
+        next if @inheritance.private_child?(child) && !unhidden_submission?(child)
 
         # just alter the roles at this one level, since we are already searching through *all* levels of children
         params = {
@@ -56,6 +56,14 @@ module Roles
         role_service = @method == 'add' ? Roles::MassAssign : Roles::MassRemove
         role_service.call(params)
       end
+    end
+
+    def hidden_submission?(child)
+      child.is_a?(Collection) && child.submission? && child.submission_attrs['hidden']
+    end
+
+    def unhidden_submission?(child)
+      child.is_a?(Collection) && child.submission? && !child.submission_attrs['hidden']
     end
 
     def modify_anchored_children(children)

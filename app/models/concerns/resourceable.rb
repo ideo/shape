@@ -74,9 +74,9 @@ module Resourceable
   def reanchor_if_no_roles!
     return unless item_or_collection?
     return unless parent.present? && roles.empty? && roles_anchor_collection_id.nil?
-    # sort of a catch for items to automatically inherit parent roles_anchor if none was given
-    anchor_id = parent&.roles_anchor&.id
-    update_column :roles_anchor_collection_id, anchor_id if anchor_id
+    # sort of a catch for items to automatically inherit parent roles_anchor if no roles exist
+    # generally should only be after create
+    reanchor!
   end
 
   def roles_anchor_resource_identifier
@@ -203,6 +203,21 @@ module Resourceable
   def unanchor!
     update_column(:roles_anchor_collection_id, nil)
     reload
+  end
+
+  def reanchor!(parent: self.parent, propagate: false)
+    anchor_id = parent&.roles_anchor&.id
+    return unless anchor_id
+    update_column(:roles_anchor_collection_id, anchor_id)
+    touch
+    return unless propagate && is_a?(Collection)
+    roles.destroy_all
+    [Item, Collection].each do |klass|
+      klass
+        .in_collection(self)
+        .where(roles_anchor_collection_id: id)
+        .update_all(roles_anchor_collection_id: anchor_id, updated_at: Time.current)
+    end
   end
 
   def remove_all_viewer_roles

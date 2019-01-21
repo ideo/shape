@@ -94,8 +94,13 @@ class Api::V1::CollectionsController < Api::V1::BaseController
     if @collection.archived? || @collection.organization.deactivated?
       head(404)
     end
+    if @collection.is_a?(Collection::SubmissionsCollection)
+      last_modified = @collection.submission_box.updated_at.utc
+    else
+      last_modified = @collection.updated_at.utc
+    end
     fresh_when(
-      last_modified: @collection.updated_at.utc,
+      last_modified: last_modified,
       etag: @collection.cache_key(params[:card_order]),
     )
   end

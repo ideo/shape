@@ -625,12 +625,14 @@ class Collection < ApplicationRecord
 
   def submit_submission!
     return unless submission?
+    # have to unset this before we can call MergeToChild
+    submission_attrs['hidden'] = false
+    result = save
     Roles::MergeToChild.call(
       parent: parent_submission_box,
       child: self,
     )
-    submission_attrs['hidden'] = false
-    save
+    result
   end
 
   # =================================

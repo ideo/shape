@@ -11,9 +11,6 @@ RSpec.describe Roles::ModifyChildren, type: :service do
   let(:groups) { [group] }
   let(:method) { 'add' }
   let(:add_to_children) do
-    # NOTE: Groups have shared collections so there will be existing group
-    # roles when creating a group that will spoil the tests.
-    GroupsRole.delete_all
     Roles::ModifyChildren.new(
       role_name: role_name,
       parent: collection,
@@ -28,6 +25,9 @@ RSpec.describe Roles::ModifyChildren, type: :service do
     let(:role_name) { Role::EDITOR }
 
     before do
+      # NOTE: Groups have shared collections so there will be existing group
+      # roles when creating a group that will spoil the tests.
+      GroupsRole.delete_all
       # unanchor everything so that they actually have their own roles
       Collection.in_collection(collection).each(&:unanchor_and_inherit_roles_from_anchor!)
       Item.in_collection(collection).each(&:unanchor_and_inherit_roles_from_anchor!)
@@ -96,6 +96,46 @@ RSpec.describe Roles::ModifyChildren, type: :service do
         # 1 subcollection and 5 items should all get modified
         expect(Roles::MassAssign).to receive(:call).exactly(6).times
         expect(add_to_children.call).to be true
+      end
+    end
+
+    context 'with a submission box' do
+      let(:submission_box) { create(:submission_box, add_editors: [user], add_viewers: [group]) }
+      let(:collection) { submission_box }
+      let(:submission) { create(:collection, :submission, parent_collection: submission_box.submissions_collection) }
+      let(:submission_creator) { create(:user) }
+      before do
+        submission_box.setup_submissions_collection!
+        submission.unanchor!
+        submission_creator.add_role(Role::EDITOR, submission)
+        # to avoid MassAssign confusion
+        subcollection.destroy
+      end
+
+      context 'with a hidden submission' do
+        before do
+          submission.submission_attrs['hidden'] = true
+          submission.save
+        end
+        it 'does not call Roles::MassAssign' do
+          expect(Roles::MassAssign).not_to receive(:call).with(
+            hash_including(
+              object: submission,
+            ),
+          )
+          add_to_children.call
+        end
+      end
+
+      context 'with an unhidden submission' do
+        it 'calls Roles::MassAssign' do
+          expect(Roles::MassAssign).to receive(:call).with(
+            hash_including(
+              object: submission,
+            ),
+          )
+          add_to_children.call
+        end
       end
     end
 
