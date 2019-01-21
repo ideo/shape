@@ -208,8 +208,7 @@ module Resourceable
   def reanchor!(parent: self.parent, propagate: false)
     anchor_id = parent&.roles_anchor&.id
     return unless anchor_id
-    update_column(:roles_anchor_collection_id, anchor_id)
-    touch
+    update_columns(roles_anchor_collection_id: anchor_id, updated_at: Time.current)
     return unless propagate && is_a?(Collection)
     roles.destroy_all
     [Item, Collection].each do |klass|
