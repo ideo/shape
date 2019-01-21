@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20190110222910) do
+ActiveRecord::Schema.define(version: 20190117195055) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -84,7 +84,7 @@ ActiveRecord::Schema.define(version: 20190110222910) do
     t.jsonb "breadcrumb"
     t.boolean "archived", default: false
     t.integer "created_by_id"
-    t.jsonb "cached_attributes"
+    t.jsonb "cached_attributes", default: {}
     t.integer "template_id"
     t.datetime "archived_at"
     t.string "archive_batch"
@@ -202,7 +202,7 @@ ActiveRecord::Schema.define(version: 20190110222910) do
     t.string "url"
     t.jsonb "text_data"
     t.string "thumbnail_url"
-    t.jsonb "cached_attributes"
+    t.jsonb "cached_attributes", default: {}
     t.datetime "archived_at"
     t.string "archive_batch"
     t.string "icon_url"
@@ -284,7 +284,7 @@ ActiveRecord::Schema.define(version: 20190110222910) do
     t.datetime "updated_at", null: false
     t.string "resource_identifier"
     t.index ["name", "resource_type", "resource_id"], name: "index_roles_on_name_and_resource_type_and_resource_id"
-    t.index ["resource_identifier"], name: "index_roles_on_resource_identifier"
+    t.index ["resource_identifier", "name"], name: "index_roles_on_resource_identifier_and_name", unique: true
     t.index ["resource_type", "resource_id"], name: "index_roles_on_resource_type_and_resource_id"
   end
 

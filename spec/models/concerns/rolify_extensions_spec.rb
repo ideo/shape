@@ -19,7 +19,7 @@ describe RolifyExtensions, type: :concern do
         expect {
           user.add_role(Role::EDITOR, collection)
         }.to change {
-          user.reload.has_role_by_identifier?(Role::EDITOR, collection.resource_identifier)
+          user.reload.has_role_by_identifier?(Role::EDITOR, collection.roles_anchor_resource_identifier)
         }.from(false).to(true)
       end
 
@@ -28,7 +28,7 @@ describe RolifyExtensions, type: :concern do
         expect {
           user.remove_role(Role::EDITOR, collection)
         }.to change {
-          user.reload.has_role_by_identifier?(Role::EDITOR, collection.resource_identifier)
+          user.reload.has_role_by_identifier?(Role::EDITOR, collection.roles_anchor_resource_identifier)
         }.from(true).to(false)
       end
     end
@@ -36,10 +36,10 @@ describe RolifyExtensions, type: :concern do
 
   describe '#has_role_by_identifier?' do
     let(:has_editor_role) do
-      user.has_role_by_identifier?(Role::EDITOR, collection.resource_identifier)
+      user.has_role_by_identifier?(Role::EDITOR, collection.roles_anchor_resource_identifier)
     end
     let(:has_viewer_role) do
-      user.has_role_by_identifier?(Role::VIEWER, collection.resource_identifier)
+      user.has_role_by_identifier?(Role::VIEWER, collection.roles_anchor_resource_identifier)
     end
 
     it 'returns true if user has role' do
@@ -86,6 +86,7 @@ describe RolifyExtensions, type: :concern do
       user.add_role(Role::EDITOR, collection)
       collection_cards.each do |cc|
         group.add_role(Role::VIEWER, cc.item)
+        cc.record.unanchor_and_inherit_roles_from_anchor!
       end
       user.reset_cached_roles!
     end
@@ -98,15 +99,15 @@ describe RolifyExtensions, type: :concern do
     it 'precaches role relationships into @has_role_by_identifier' do
       # perform one query to prime the @has_role_by_identifier hash
       # (e.g. this may happen during load_and_authorize_resource)
-      user.has_role_by_identifier? Role::EDITOR, collection.resource_identifier
+      user.has_role_by_identifier? Role::EDITOR, collection.roles_anchor_resource_identifier
       has_roles = user.precache_roles_for(
         [Role::VIEWER, Role::CONTENT_EDITOR, Role::EDITOR],
         collection.children_and_linked_children,
       )
       expect(has_roles).to include(
-        ['editor', collection.resource_identifier] => true,
-        ['viewer', collection_cards.first.record.resource_identifier] => true,
-        ['viewer', collection_cards.second.record.resource_identifier] => true,
+        ['editor', collection.roles_anchor_resource_identifier] => true,
+        ['viewer', collection_cards.first.record.roles_anchor_resource_identifier] => true,
+        ['viewer', collection_cards.second.record.roles_anchor_resource_identifier] => true,
       )
     end
   end

@@ -85,7 +85,6 @@ Rails.application.routes.draw do
       resources :users do
         collection do
           get 'me'
-          get 'search'
           post 'create_from_emails'
           patch 'update_current_user'
           post 'switch_org'

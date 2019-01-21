@@ -167,7 +167,11 @@ class Header extends React.Component {
               <GlobalSearch className="search-bar" />
               <StyledAvatarAndDropdown>
                 {this.renderOrgDropdown}
-                <button className="orgBtn" onClick={this.handleOrgClick(true)}>
+                <button
+                  className="orgBtn"
+                  data-cy="OrgMenuBtn"
+                  onClick={this.handleOrgClick(true)}
+                >
                   <Avatar
                     title={primaryGroup.name}
                     url={primaryGroup.filestack_file_url}

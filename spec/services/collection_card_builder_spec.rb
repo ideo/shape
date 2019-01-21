@@ -29,15 +29,16 @@ RSpec.describe CollectionCardBuilder, type: :service do
           user: user,
         )
       end
+      let(:collection) { builder.collection_card.collection }
 
       it 'should add the user as editor to the card\'s child collection' do
         expect(builder.create).to be true
-        expect(builder.collection_card.collection.can_edit?(user)).to be true
+        expect(collection.can_edit?(user)).to be true
       end
 
       it 'should anchor its roles to the parent collection' do
         expect(builder.create).to be true
-        expect(builder.collection_card.collection.roles_anchor).to eq parent
+        expect(collection.roles_anchor).to eq parent
       end
 
       it 'should increase order of additional cards' do
@@ -47,26 +48,26 @@ RSpec.describe CollectionCardBuilder, type: :service do
 
       it 'should create the collection with organization inherited from parent' do
         expect(builder.create).to be true
-        created_collection = builder.collection_card.collection
+        created_collection = collection
         # this behavior comes from collection before_validation
         expect(created_collection.organization).to eq organization
       end
 
       it 'should set the collections created by to current user' do
         expect(builder.create).to be true
-        created_collection = builder.collection_card.collection
+        created_collection = collection
         expect(created_collection.created_by).to eq user
       end
 
       it 'should calculate the breadcrumb for the card\'s child collection' do
         expect(builder.create).to be true
-        created_collection = builder.collection_card.collection
+        created_collection = collection
         expect(created_collection.breadcrumb).to eq [parent.id]
       end
 
       it 'should not give the primary group view access to the collection by default' do
         expect(builder.create).to be true
-        expect(organization.primary_group.has_role?(Role::VIEWER, builder.collection_card.collection)).to be false
+        expect(organization.primary_group.has_role?(Role::VIEWER, collection)).to be false
       end
 
       it 'should set user show_helper to false if it was true' do
@@ -82,7 +83,7 @@ RSpec.describe CollectionCardBuilder, type: :service do
 
         it 'should give the primary group view access to the collection' do
           expect(builder.create).to be true
-          expect(organization.primary_group.has_role?(Role::VIEWER, builder.collection_card.collection)).to be true
+          expect(organization.primary_group.has_role?(Role::VIEWER, collection)).to be true
         end
       end
 

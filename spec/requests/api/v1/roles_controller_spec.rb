@@ -2,6 +2,13 @@ require 'rails_helper'
 
 describe Api::V1::RolesController, type: :request, json: true, auth: true do
   let(:user) { @user }
+  let(:instance_double) { double('Roles') }
+
+  before do
+    allow(Roles::MassRemove).to receive(:new).and_return(instance_double)
+    allow(Roles::MassAssign).to receive(:new).and_return(instance_double)
+    allow(instance_double).to receive(:call).and_return(true)
+  end
 
   describe 'GET #index' do
     let!(:collection) { create(:collection, add_editors: [user]) }
@@ -55,18 +62,17 @@ describe Api::V1::RolesController, type: :request, json: true, auth: true do
       end
 
       it 'adds role to users' do
+        expect(Roles::MassAssign).to receive(:new).with(
+          hash_including(
+            object: collection,
+            users: users,
+            role_name: Role::EDITOR.to_s,
+            propagate_to_children: true,
+            new_role: true,
+            invited_by: user,
+          ),
+        )
         post(path, params: params)
-        expect(users.all? { |u| u.reload.has_role?(:editor, collection) }).to be true
-      end
-
-      context 'with pending users' do
-        let!(:pending_users) { create_list(:user, 3, :pending) }
-        let!(:user_ids) { pending_users.map(&:id) }
-
-        it 'adds role to users' do
-          post(path, params: params)
-          expect(pending_users.all? { |u| u.reload.has_role?(:editor, collection) }).to be true
-        end
       end
     end
 
@@ -83,8 +89,17 @@ describe Api::V1::RolesController, type: :request, json: true, auth: true do
       end
 
       it 'adds role to users' do
+        expect(Roles::MassAssign).to receive(:new).with(
+          hash_including(
+            object: item,
+            users: users,
+            role_name: Role::EDITOR.to_s,
+            propagate_to_children: true,
+            new_role: true,
+            invited_by: user,
+          ),
+        )
         post(path, params: params)
-        expect(users.all? { |u| u.reload.has_role?(:editor, item) }).to be true
       end
     end
 
@@ -99,8 +114,16 @@ describe Api::V1::RolesController, type: :request, json: true, auth: true do
       end
 
       it 'adds role to users' do
+        expect(Roles::MassAssign).to receive(:new).with(
+          hash_including(
+            object: group,
+            users: users,
+            role_name: role_name,
+            new_role: true,
+            invited_by: user,
+          ),
+        )
         post(path, params: params)
-        expect(users.all? { |u| u.reload.has_role?(:member, group) }).to be true
       end
     end
   end
@@ -122,7 +145,7 @@ describe Api::V1::RolesController, type: :request, json: true, auth: true do
     end
 
     context 'for a user' do
-      let(:remove_viewer) { viewers[0] }
+      let(:remove_viewer) { viewers.first }
       let(:params) do
         {
           role: { name: 'viewer' },
@@ -138,48 +161,17 @@ describe Api::V1::RolesController, type: :request, json: true, auth: true do
         expect(response.status).to eq(204)
       end
 
-      it 'matches Role schema' do
-        delete(path, params: params)
-        expect(viewers.first.reload.has_role?(Role::VIEWER, collection)).to be false
-      end
-
-      it 'deletes the UserRole' do
-        expect { delete(path, params: params) }.to change(UsersRole, :count).by(-1)
-      end
-
-      it 'does not delete Role' do
-        expect { delete(path, params: params) }.not_to change(Role, :count)
-        expect(Role.exists?(role.id))
-      end
-
-      it 'does not delete the Group role' do
-        delete(path, params: params)
-        expect(group.reload.has_role?(Role::VIEWER, collection)).to be true
-      end
-
       context 'with cards/children' do
-        let!(:num_cards) { 3 }
-
-        before do
-          collection.items.each(&:inherit_roles_from_parent!)
-        end
-
         it 'removes roles' do
-          expect(
-            collection.items.all? do |item|
-              remove_viewer.has_role?(Role::VIEWER, item)
-            end,
-          ).to be true
-
-          Sidekiq::Testing.inline! do
-            delete(path, params: params)
-            remove_viewer.reload
-            expect(
-              collection.items.all? do |item|
-                remove_viewer.has_role?(Role::VIEWER, item)
-              end,
-            ).to be false
-          end
+          expect(Roles::MassRemove).to receive(:new).with(
+            hash_including(
+              object: collection,
+              role_name: Role::VIEWER.to_s,
+              propagate_to_children: true,
+              fully_remove: true,
+            ),
+          )
+          delete(path, params: params)
         end
       end
 
@@ -189,11 +181,18 @@ describe Api::V1::RolesController, type: :request, json: true, auth: true do
         let!(:editor) { create(:user, add_to_org: organization) }
 
         before do
-          log_in_as_user(viewers.first)
+          collection.update(organization: organization)
+          log_in_as_user(remove_viewer)
         end
 
         context 'trying to remove someone else' do
-          let(:path) { "/api/v1/users/#{editor.id}/roles/#{role.id}" }
+          let(:params) do
+            {
+              role: { name: 'viewer' },
+              user_ids: [viewers.last.id],
+              is_switching: false,
+            }.to_json
+          end
 
           it 'returns 401' do
             delete(path, params: params)
@@ -202,11 +201,22 @@ describe Api::V1::RolesController, type: :request, json: true, auth: true do
         end
 
         context 'trying to remove yourself' do
-          let(:path) { "/api/v1/users/#{remove_viewer.id}/roles/#{role.id}" }
-
           it 'returns a 204 no_content' do
             delete(path, params: params)
             expect(response.status).to eq(204)
+          end
+
+          it 'removes yourself' do
+            expect(Roles::MassRemove).to receive(:new).with(
+              hash_including(
+                object: collection,
+                role_name: Role::VIEWER.to_s,
+                propagate_to_children: true,
+                removed_by: remove_viewer,
+                fully_remove: true,
+              ),
+            )
+            delete(path, params: params)
           end
         end
       end
@@ -238,39 +248,17 @@ describe Api::V1::RolesController, type: :request, json: true, auth: true do
         expect(response.status).to eq(204)
       end
 
-      it 'deletes the GroupsRole record' do
-        expect { delete(path, params: params) }.to change(GroupsRole, :count).by(-1)
-        expect(group.reload.has_role?(Role::EDITOR, collection)).to be false
-      end
-
-      it 'does not delete the viewer role' do
-        delete(path, params: params)
-        expect(viewers.first.reload.has_role?(Role::VIEWER, collection)).to be true
-      end
-
       context 'with cards/children' do
-        let!(:num_cards) { 3 }
-
-        before do
-          collection.items.each(&:inherit_roles_from_parent!)
-        end
-
         it 'removes roles' do
-          expect(
-            collection.items.all? do |item|
-              group.has_role?(Role::EDITOR, item)
-            end,
-          ).to be true
-
-          Sidekiq::Testing.inline! do
-            delete(path, params: params)
-            group.reload
-            expect(
-              collection.items.all? do |item|
-                group.has_role?(Role::EDITOR, item)
-              end,
-            ).to be false
-          end
+          expect(Roles::MassRemove).to receive(:new).with(
+            hash_including(
+              object: collection,
+              role_name: Role::EDITOR.to_s,
+              propagate_to_children: true,
+              fully_remove: true,
+            ),
+          )
+          delete(path, params: params)
         end
       end
 
@@ -283,22 +271,6 @@ describe Api::V1::RolesController, type: :request, json: true, auth: true do
         it 'returns a 401' do
           delete(path, params: params)
           expect(response.status).to eq(401)
-        end
-      end
-
-      context 'user is also collection admin' do
-        before do
-          editor.add_role(Role::EDITOR, collection)
-        end
-
-        it 'returns a 204 no_content' do
-          delete(path, params: params)
-          expect(response.status).to eq(204)
-        end
-
-        it 'deletes the GroupsRole record' do
-          expect { delete(path, params: params) }.to change(GroupsRole, :count).by(-1)
-          expect(group.reload.has_role?(Role::EDITOR, collection)).to be false
         end
       end
     end

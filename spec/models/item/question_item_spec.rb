@@ -39,7 +39,20 @@ RSpec.describe Item::QuestionItem, type: :model do
     let(:test_design) do
       create(:test_design, test_collection: test_collection, add_editors: [user], add_viewers: [user2])
     end
-    let(:question_card) { create(:collection_card_question, parent: test_design) }
+    let(:question_card) do
+      # use builder so that it actually handles the right permissions
+      builder = CollectionCardBuilder.new(
+        params: {
+          item_attributes: {
+            type: 'Item::QuestionItem',
+            question_type: :question_useful,
+          },
+        },
+        parent_collection: test_design,
+      )
+      builder.create
+      builder.collection_card
+    end
     let(:question_item) { question_card.item }
 
     describe '#score' do

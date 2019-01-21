@@ -27,6 +27,12 @@ RSpec.describe Roles::ModifyChildren, type: :service do
     let(:user) { create(:user) }
     let(:role_name) { Role::EDITOR }
 
+    before do
+      # unanchor everything so that they actually have their own roles
+      Collection.in_collection(collection).each(&:unanchor_and_inherit_roles_from_anchor!)
+      Item.in_collection(collection).each(&:unanchor_and_inherit_roles_from_anchor!)
+    end
+
     it 'should create new roles for each user/item' do
       expect { add_to_children.call }.to change(UsersRole, :count).by(6)
     end
@@ -85,18 +91,26 @@ RSpec.describe Roles::ModifyChildren, type: :service do
           propagate_to_children: false,
         }
       end
-      let(:instance_double) do
-        double('Roles::MassAssign')
-      end
-
-      before do
-        allow(Roles::MassAssign).to receive(:new).and_return(instance_double)
-        allow(instance_double).to receive(:call).and_return(true)
-      end
 
       it 'should call MassAssign to save roles on the child item' do
-        expect(Roles::MassAssign).to receive(:new).with(params)
+        # 1 subcollection and 5 items should all get modified
+        expect(Roles::MassAssign).to receive(:call).exactly(6).times
         expect(add_to_children.call).to be true
+      end
+    end
+
+    context 'with private child' do
+      let(:other_user) { create(:user) }
+      let!(:collection) { create(:collection, add_editors: [other_user]) }
+
+      before do
+        subcollection.unanchor_and_inherit_roles_from_anchor!
+        other_user.remove_role(Role::EDITOR, subcollection)
+      end
+
+      it 'should not add the parent roles to the child' do
+        expect(Roles::MassAssign).not_to receive(:call)
+        add_to_children.call
       end
     end
   end

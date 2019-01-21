@@ -196,7 +196,7 @@ class RolesMenu extends React.Component {
 
   deleteRoles = (role, entity, opts = {}) => {
     const { ownerId, ownerType } = this.props
-    role.API_delete(entity, ownerId, ownerType, opts).then(res => {
+    return role.API_delete(entity, ownerId, ownerType, opts).then(res => {
       // We should do a page reload to get the correct user's new org
       if (opts.organizationChange) {
         this.props.routingStore.routeTo('homepage')
@@ -260,6 +260,7 @@ class RolesMenu extends React.Component {
 
   render() {
     const {
+      record,
       addCallout,
       canEdit,
       ownerType,
@@ -331,6 +332,7 @@ class RolesMenu extends React.Component {
                           key={`${combined.entity.id}_${
                             combined.entity.internalType
                           }_r${combined.role.id}`}
+                          record={record}
                           role={combined.role}
                           roleTypes={roleTypes}
                           roleLabels={

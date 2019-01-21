@@ -35,21 +35,19 @@ const DisplayTextPadded = DisplayText.extend`
 
 class RoleSelect extends React.Component {
   get isGuestOrAdminGroup() {
-    const { role } = this.props
-    if (role.resource && role.resource.internalType === 'groups') {
-      return role.resource.isGuestOrAdmin
+    const { record } = this.props
+    if (record && record.internalType === 'groups') {
+      return record.isGuestOrAdmin
     }
     return false
   }
 
   get resourceType() {
-    const { role } = this.props
-    if (role.resource.internalType === 'groups') {
-      return role.resource.is_primary || role.resource.is_guest
-        ? 'organization'
-        : 'group'
+    const { record } = this.props
+    if (record.internalType === 'groups') {
+      return record.is_primary || record.is_guest ? 'organization' : 'group'
     }
-    return role.resource.internalType.slice(0, -1)
+    return record.internalType.slice(0, -1)
   }
 
   onRoleRemove = ev => {
@@ -107,7 +105,7 @@ class RoleSelect extends React.Component {
   }
 
   render() {
-    const { enabled, role, roleTypes, entity } = this.props
+    const { enabled, record, role, roleTypes, entity } = this.props
     let select
     if (!this.isGuestOrAdminGroup && enabled) {
       select = (
@@ -135,8 +133,8 @@ class RoleSelect extends React.Component {
     const showLeaveIcon =
       enabled ||
       (entity.isCurrentUser &&
-        !role.resource.system_required &&
-        !role.resource.pinned_and_locked)
+        !record.system_required &&
+        !record.pinned_and_locked)
     return (
       <Row>
         <span>
@@ -181,6 +179,7 @@ class RoleSelect extends React.Component {
 }
 
 RoleSelect.propTypes = {
+  record: MobxPropTypes.objectOrObservableObject.isRequired,
   role: MobxPropTypes.objectOrObservableObject.isRequired,
   roleTypes: PropTypes.arrayOf(PropTypes.string).isRequired,
   entity: MobxPropTypes.objectOrObservableObject.isRequired,

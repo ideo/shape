@@ -358,19 +358,20 @@ describe Collection, type: :model do
     end
 
     it 'should show all cards without limiting' do
-      expect(collection.collection_cards_viewable_by(cards, user)).to match_array(cards)
+      expect(collection.collection_cards_viewable_by(user)).to match_array(cards)
     end
 
     context 'if one item is private' do
       let(:private_card) { cards[0] }
 
       before do
+        private_card.record.unanchor_and_inherit_roles_from_anchor!
         user.remove_role(Role::VIEWER, private_card.record)
       end
 
       it 'should not include card' do
-        expect(collection.collection_cards_viewable_by(cards, user)).not_to include(private_card)
-        expect(collection.collection_cards_viewable_by(cards, user)).to match_array(cards - [private_card])
+        expect(collection.collection_cards_viewable_by(user)).not_to include(private_card)
+        expect(collection.collection_cards_viewable_by(user)).to match_array(cards - [private_card])
       end
     end
 
@@ -378,20 +379,22 @@ describe Collection, type: :model do
       let(:private_card) { subcollection_card }
 
       before do
+        private_card.record.unanchor_and_inherit_roles_from_anchor!
         user.remove_role(Role::VIEWER, subcollection_card.collection)
       end
 
       it 'should not include card' do
-        expect(collection.collection_cards_viewable_by(cards, user)).not_to include(private_card)
-        expect(collection.collection_cards_viewable_by(cards, user)).to match_array(cards - [private_card])
+        expect(collection.collection_cards_viewable_by(user)).not_to include(private_card)
+        expect(collection.collection_cards_viewable_by(user)).to match_array(cards - [private_card])
       end
     end
 
     context 'with card_order param' do
       it 'should return results according to the updated_at param' do
-        viewable = collection.collection_cards_viewable_by(cards, user, card_order: 'updated_at')
-        expect(viewable.first).to eq(cards.sort_by(&:updated_at).reverse.first)
-        expect(viewable.last).to eq(cards.sort_by(&:updated_at).first)
+        viewable = collection.collection_cards_viewable_by(user, card_order: 'updated_at')
+        sorted = cards.sort_by(&:updated_at).reverse
+        expect(viewable.first).to eq(sorted.first)
+        expect(viewable.last).to eq(sorted.last)
       end
 
       it 'should return results according to the cached_test_scores sorting param' do
@@ -400,7 +403,7 @@ describe Collection, type: :model do
         scored2 = collection.collections.last
         scored2.update(cached_test_scores: { 'question_useful' => 20 })
 
-        viewable = collection.collection_cards_viewable_by(cards, user, card_order: 'question_useful')
+        viewable = collection.collection_cards_viewable_by(user, card_order: 'question_useful')
         expect(viewable.first).to eq(scored1.parent_collection_card)
         expect(viewable.second).to eq(scored2.parent_collection_card)
       end
@@ -409,7 +412,7 @@ describe Collection, type: :model do
     context 'with pagination' do
       it 'should only show the appropriate page' do
         # just make a simple 1 per-page request
-        expect(collection.collection_cards_viewable_by(cards, user, per_page: 1)).to match_array([cards.first])
+        expect(collection.collection_cards_viewable_by(user, per_page: 1)).to match_array([cards.first])
       end
     end
 
@@ -419,7 +422,7 @@ describe Collection, type: :model do
       end
 
       it 'should only show the un-hidden cards' do
-        expect(collection.collection_cards_viewable_by(cards, user)).to match_array(cards.where(hidden: false))
+        expect(collection.collection_cards_viewable_by(user)).to match_array(cards.where(hidden: false))
       end
     end
   end
@@ -555,6 +558,26 @@ describe Collection, type: :model do
       expect(subcollection.roles).to be_empty
       expect(subcollection.roles_anchor_collection_id).to eq collection.id
       expect(subcollection.can_edit?(user)).to be true
+    end
+  end
+
+  describe '#submit_submission' do
+    let(:submission_box) { create(:submission_box) }
+    let(:submission) { create(:collection, :submission, parent_collection: submission_box.submissions_collection) }
+
+    before do
+      submission_box.setup_submissions_collection!
+      submission.submission_attrs['hidden'] = true
+      submission.save
+    end
+
+    it 'should unset the hidden attribute and merge roles from the SubmissionBox' do
+      expect(Roles::MergeToChild).to receive(:call).with(
+        parent: submission_box,
+        child: submission,
+      )
+      submission.submit_submission!
+      expect(submission.submission_attrs['hidden']).to be false
     end
   end
 

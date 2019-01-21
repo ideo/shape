@@ -11,7 +11,6 @@ RSpec.describe Roles::MergeToChild, type: :service do
     )
   end
 
-  # NOTE: some similar tests exist in card_mover_spec where this logic was originally needed
   describe '#call' do
     context 'with same roles anchor' do
       before do
@@ -19,7 +18,7 @@ RSpec.describe Roles::MergeToChild, type: :service do
       end
 
       it 'should not assign any permissions' do
-        expect(Roles::MassAssign).not_to receive(:new)
+        expect(Roles::MassAssign).not_to receive(:call)
         merge_service.call
       end
     end
@@ -28,11 +27,12 @@ RSpec.describe Roles::MergeToChild, type: :service do
       let(:other_user) { create(:user) }
 
       before do
+        child.unanchor_and_inherit_roles_from_anchor!
         other_user.add_role(Role::VIEWER, collection)
       end
 
       it 'should not assign any permissions and destroy card roles' do
-        expect(Roles::MassAssign).not_to receive(:new)
+        expect(Roles::MassAssign).not_to receive(:call)
         expect(child.roles).not_to be_empty
         expect(child.can_view?(other_user)).to be false
         merge_service.call

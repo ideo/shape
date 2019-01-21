@@ -21,12 +21,12 @@ class OrganizationAutojoiner
       next if org.can_view? @user
       org.setup_user_membership_and_collections(@user)
       if @group
-        Roles::MassAssign.new(
+        Roles::MassAssign.call(
           object: @group,
           role_name: Role::MEMBER,
           users: [@user],
           new_role: true,
-        ).call
+        )
       end
       org
     end.compact

@@ -202,6 +202,7 @@ RSpec.describe Roles::MassRemove, type: :service do
 
     context 'with another user that has the same role' do
       before do
+        collection.items.each(&:unanchor_and_inherit_roles_from_anchor!)
         collection.items.each { |i| user_3.add_role(role_name, i) }
       end
 

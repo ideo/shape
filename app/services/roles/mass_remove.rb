@@ -1,5 +1,5 @@
 module Roles
-  class MassRemove
+  class MassRemove < SimpleService
     include Roles::SharedMethods
 
     attr_reader :errors

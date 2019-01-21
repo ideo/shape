@@ -60,17 +60,6 @@ class SerializableCollection < BaseJsonSerializer
     @object.cached_card_count || 0
   end
 
-  has_many :collection_cards do
-    data do
-      @object.collection_cards_viewable_by(
-        @object.collection_cards,
-        @current_user,
-        card_order: @card_order,
-        page: @page || 1,
-      )
-    end
-  end
-
   attribute :card_order, if: -> { @object == @current_record } do
     @card_order || 'order'
   end
@@ -118,15 +107,19 @@ class SerializableCollection < BaseJsonSerializer
   end
 
   attribute :is_inside_hidden_submission_box do
-    @object.inside_hidden_submission_box?
+    @inside_hidden_submission_box.nil? ?
+      @object.inside_hidden_submission_box? :
+      @inside_hidden_submission_box
   end
 
   attribute :submission_attrs, if: -> { @object.submission_attrs.present? } do
     @object.submission_attrs
   end
 
-  attribute :is_inside_a_submission, if: -> { @object.inside_a_submission? } do
-    @object.inside_a_submission?
+  attribute :is_inside_a_submission do
+    @inside_a_submission.nil? ?
+      @object.inside_a_submission? :
+      @inside_a_submission
   end
 
   attribute :template_num_instances do

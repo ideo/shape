@@ -1,7 +1,8 @@
 {
   "type": "object",
   "properties": {
-    "name": { "type": "string" }
+    "name": { "type": "string" },
+    "label": { "type": "string" }
   },
   "required": ["name"]
 }

@@ -34,10 +34,6 @@ class Api::V1::UsersController < Api::V1::BaseController
     }
   end
 
-  def search
-    render jsonapi: search_users(params[:query])
-  end
-
   # Create new pending users from email addresses
   def create_from_emails
     cpu = CreatePendingUsers.new(
@@ -101,17 +97,6 @@ class Api::V1::UsersController < Api::V1::BaseController
       :show_template_helper,
       :notify_through_email,
       :mailing_list,
-    )
-  end
-
-  def search_users(query)
-    return [] if query.blank?
-
-    User.search(
-      query.downcase,
-      fields: ['name^2', { email: :exact }],
-      match: :word_start,
-      where: { organization_ids: current_organization.id },
     )
   end
 end

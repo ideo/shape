@@ -23,12 +23,13 @@ module RolifyExtensions
 
   def precache_roles_for(role_names, resources)
     return unless @has_role_by_identifier.present? && is_a?(User)
-    resource_identifiers = resources.map(&:resource_identifier)
+    return unless resources.present?
+    resource_identifiers = resources.map(&:roles_anchor_resource_identifier).uniq
     roles = rolify_roles.where(
       name: role_names,
       resource_identifier: resource_identifiers,
     )
-    roles += role_via_org_groups(role_names, resource_identifiers)
+    roles += role_via_current_org_groups(role_names, resource_identifiers)
 
     found = {}
     roles.each do |role|
@@ -76,8 +77,9 @@ module RolifyExtensions
     @has_cached_role[role_name.to_s]
   end
 
-  # Rolify was super slow in adding roles once there became thousands,
-  # so we wrote our own method
+  # Override Rolify method for optimizations + customizations
+  # NOTE: add_role will not do anything on anchored items/collections
+  # you must make sure to unanchor first if you want it to have its own roles
   def add_role(role_name, resource = nil)
     role = Role.find_or_create(role_name, resource)
     return add_resource_role(role, resource) if resource.present?

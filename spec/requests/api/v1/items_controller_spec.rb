@@ -64,6 +64,7 @@ describe Api::V1::ItemsController, type: :request, json: true, auth: true do
       let!(:item) { collection_card.item }
 
       before do
+        item.unanchor!
         user.add_role(Role::VIEWER, item.becomes(Item))
         item.reload
         item.recalculate_breadcrumb!

@@ -5,8 +5,9 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
   before_action :load_and_authorize_parent_collection_for_update, only: %i[update]
   after_action :broadcast_collection_create_updates, only: %i[create update]
 
-  before_action :load_and_authorize_parent_collection_with_cards, only: %i[index]
+  before_action :load_and_authorize_parent_collection_for_index, only: %i[index]
   before_action :check_cache, only: %i[index]
+  before_action :load_collection_cards, only: %i[index]
   def index
     params[:page] ||= 1
     params[:card_order] ||= @collection.default_card_order
@@ -19,6 +20,8 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
              card_order: params[:card_order],
              current_record: @collection,
              parent: @collection,
+             inside_a_submission: @collection.submission? || @collection.inside_a_submission?,
+             inside_hidden_submission_box: @collection.hide_submissions || @collection.inside_hidden_submission_box?,
            }
   end
 
@@ -157,27 +160,17 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
     )
   end
 
-  def load_and_authorize_parent_collection_with_cards
-    @collection = Collection
-                  .where(id: params[:collection_id])
-                  .includes(collection_cards: [
-                    :parent,
-                    :collection,
-                    item: [:filestack_file],
-                  ])
-                  .first
-    current_user.precache_roles_for(
-      [Role::VIEWER, Role::CONTENT_EDITOR, Role::EDITOR],
-      @collection.children_and_linked_children,
-    )
+  def load_and_authorize_parent_collection_for_index
+    @collection = Collection.find(params[:collection_id])
     authorize! :read, @collection
+  end
 
+  def load_collection_cards
     # ensure per_page is between 50 and 200
     per_page = [params[:per_page].to_i, CollectionCard::DEFAULT_PER_PAGE].max
     per_page = [per_page, 200].min
 
     @collection_cards = @collection.collection_cards_viewable_by(
-      @collection.collection_cards,
       current_user,
       card_order: params[:card_order],
       page: params[:page] || 1,

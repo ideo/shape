@@ -17,7 +17,11 @@ class GridCardPagination extends React.Component {
   componentDidUpdate(prevProps) {
     // the case where the pagination card is still visible on the page
     // and now the next page needs to be fetched
-    if (this.visible && this.props.nextPage !== prevProps.nextPage) {
+    if (
+      this.visible &&
+      !this.loading &&
+      this.props.nextPage !== prevProps.nextPage
+    ) {
       this.fetchNextPage()
     }
   }
@@ -36,7 +40,10 @@ class GridCardPagination extends React.Component {
     if (nextPage > collection.totalPages) return
     this.update('loading', true)
     await collection.API_fetchCards({ page: nextPage })
-    this.update('loading', false)
+    // just in case it loads the next page quickly, prevent quickly loading 2 pages in a row
+    setTimeout(() => {
+      this.update('loading', false)
+    }, 1000)
   }
 
   handleVisibilityChange = isVisible => {
@@ -47,6 +54,9 @@ class GridCardPagination extends React.Component {
   }
 
   render() {
+    const loader = <Loader size={60} containerHeight="100%" />
+    // while loading, don't re-trigger the VisibilitySensor
+    if (this.loading) return loader
     return (
       <VisibilitySensor
         partialVisibility
@@ -54,7 +64,7 @@ class GridCardPagination extends React.Component {
         intervalDelay={300}
         onChange={this.handleVisibilityChange}
       >
-        <Loader size={60} containerHeight="100%" />
+        {loader}
       </VisibilitySensor>
     )
   }

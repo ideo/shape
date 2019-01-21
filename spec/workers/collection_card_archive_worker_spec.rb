@@ -28,10 +28,7 @@ RSpec.describe CollectionCardArchiveWorker, type: :worker do
     end
 
     before do
-      collection_cards.each do |card|
-        user.add_role(Role::EDITOR, card.collection)
-      end
-      user.add_role(Role::EDITOR, subcollection_card.collection)
+      user.add_role(Role::EDITOR, collection)
     end
 
     context 'with collection cards' do

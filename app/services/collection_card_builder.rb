@@ -37,13 +37,16 @@ class CollectionCardBuilder
         record.inherit_roles_anchor_from_parent!
         if @collection_card.record_type == :collection
           # NOTE: should items created in My Collection get this access as well?
+          # this will change the roles_anchor, which will get re-cached later
           record.enable_org_view_access_if_allowed(@parent_collection)
           record.update(created_by: @user) if @user.present?
         end
         @collection_card.parent.cache_cover! if @collection_card.should_update_parent_collection_cover?
         @collection_card.update_collection_cover if @collection_card.is_cover
         @collection_card.increment_card_orders!
-        record.reload.recalculate_breadcrumb!
+        record.reload
+        # will also cache roles identifier and update breadcrumb
+        record.save
 
         if @parent_collection.master_template?
           # we just added a template card, so update the instances

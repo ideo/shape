@@ -2,8 +2,10 @@ require 'rails_helper'
 
 describe Collection::TestCollection, type: :model do
   let(:user) { create(:user) }
-  let(:test_parent) { create(:collection) }
-  let(:test_collection) { create(:test_collection, parent_collection: test_parent) }
+  let(:test_parent) { create(:collection, add_editors: [user]) }
+  let(:test_collection) do
+    create(:test_collection, parent_collection: test_parent, roles_anchor_collection: test_parent)
+  end
 
   context 'associations' do
     it { should have_many :survey_responses }
@@ -21,6 +23,17 @@ describe Collection::TestCollection, type: :model do
       it 'should create the default setup with its attached cards and items' do
         expect(test_collection.collection_cards.count).to eq 4
         expect(test_collection.items.count).to eq 4
+      end
+
+      it 'sets up the anchored roles on the items' do
+        expect(test_collection.roles_anchor_collection_id).to eq test_parent.id
+        test_collection.reload
+        items = test_collection.items
+        item = items.first
+        expect(items.all? { |i| i.roles_anchor_collection_id == test_parent.id }).to be true
+        expect(item.roles_anchor).to eq test_parent
+        expect(test_collection.can_edit?(user)).to be true
+        expect(item.can_edit?(user)).to be true
       end
     end
 
@@ -41,7 +54,6 @@ describe Collection::TestCollection, type: :model do
   end
 
   describe '#duplicate!' do
-    let(:user) { create(:user) }
     let!(:parent_collection) { create(:collection) }
     let(:duplicate) do
       test_collection.duplicate!(
@@ -93,13 +105,17 @@ describe Collection::TestCollection, type: :model do
     end
 
     context 'if live' do
-      let(:test_collection) { create(:test_collection, :completed, parent_collection: test_parent) }
-      before do
-        test_collection.launch!(initiated_by: user)
-        expect(test_collection.live?).to be true
+      let(:test_collection) do
+        create(:test_collection, :completed, parent_collection: test_parent, roles_anchor_collection_id: test_parent.id)
       end
       let!(:survey_response) do
         create(:survey_response, test_collection: test_collection)
+      end
+
+      before do
+        test_collection.launch!(initiated_by: user)
+        test_collection.reload
+        expect(test_collection.live?).to be true
       end
 
       it 'only copies test design' do
@@ -108,6 +124,11 @@ describe Collection::TestCollection, type: :model do
         end.to change(Collection, :count).by(1)
         expect(duplicate).to be_instance_of(Collection::TestCollection)
         expect(duplicate.draft?).to be true
+      end
+
+      it 'has the right permissions' do
+        expect(test_collection.items.all? { |i| i.can_view?(user) }).to be true
+        expect(test_collection.items.first.roles_anchor).to eq test_parent
       end
 
       it 'has prelaunch question items' do
