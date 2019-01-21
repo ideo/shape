@@ -33,6 +33,14 @@ module Breadcrumbable
     end
   end
 
+  def all_child_collections
+    Collection.in_collection(self)
+  end
+
+  def all_child_items
+    Item.in_collection(self)
+  end
+
   def parents
     Collection.where(id: breadcrumb)
   end
@@ -72,17 +80,15 @@ module Breadcrumbable
     return recalculate_breadcrumb! unless is_a?(Collection)
     # start with self
     recalculate_breadcrumb!
-    child_collections = Collection.in_collection(self)
-    child_items = Item.in_collection(self)
-    num = child_collections.count + child_items.count
+    num = all_child_collections.count + all_child_items.count
 
     # If greater than 50 items, queue to worker
     if num > 50 && !force_sync
       BreadcrumbRecalculationWorker.perform_async(id)
     else
       # Otherwise perform immediately
-      child_collections.find_each(&:recalculate_breadcrumb!)
-      child_items.find_each(&:recalculate_breadcrumb!)
+      all_child_collections.find_each(&:recalculate_breadcrumb!)
+      all_child_items.find_each(&:recalculate_breadcrumb!)
     end
     true
   end
