@@ -17,6 +17,7 @@ module Roles
       @role_name = role_name
       @previous_anchor_id = previous_anchor_id
       @method = method
+      @inheritance = Roles::Inheritance.new(@parent)
     end
 
     def call
@@ -41,6 +42,9 @@ module Roles
         next if child.is_a?(Collection) && child.submission? && child.submission_attrs['hidden']
         # If the user can edit, then continue adding the roles
         next unless @user.nil? || child.can_edit?(@user)
+        # don't modify private children
+        next if @inheritance.private_child?(child)
+
         # just alter the roles at this one level, since we are already searching through *all* levels of children
         params = {
           object: child,
@@ -50,7 +54,7 @@ module Roles
           propagate_to_children: false,
         }
         role_service = @method == 'add' ? Roles::MassAssign : Roles::MassRemove
-        role_service.new(params).call
+        role_service.call(params)
       end
     end
 
