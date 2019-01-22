@@ -100,13 +100,13 @@ describe Api::V1::CommentThreadsController, type: :request, json: true, auth: tr
   describe 'POST #create' do
     let(:path) { '/api/v1/comment_threads' }
     let(:collection) { create(:collection) }
-    let(:params) {
+    let(:params) do
       json_api_params(
         'comment_threads',
         record_id: collection.id,
         record_type: 'Collection',
       )
-    }
+    end
 
     context 'with access to record' do
       before do
@@ -132,6 +132,44 @@ describe Api::V1::CommentThreadsController, type: :request, json: true, auth: tr
       it 'returns a 401' do
         expect(response.status).to eq(401)
       end
+    end
+  end
+
+  describe 'PATCH #subscribe' do
+    let!(:comment_thread) { create(:item_comment_thread, num_comments: 1, add_followers: [user]) }
+    let(:path) { "/api/v1/comment_threads/#{comment_thread.id}/subscribe" }
+
+    before do
+      user.add_role(Role::EDITOR, comment_thread.record)
+      comment_thread.users_thread_for(user).update(subscribed: false)
+      patch(path, params: {})
+    end
+
+    it 'returns a 200' do
+      expect(response.status).to eq(200)
+    end
+
+    it 'sets subscribed on the user thread to true' do
+      expect(comment_thread.users_thread_for(user).subscribed).to be true
+    end
+  end
+
+  describe 'PATCH #unsubscribe' do
+    let!(:comment_thread) { create(:item_comment_thread, num_comments: 1, add_followers: [user]) }
+    let(:path) { "/api/v1/comment_threads/#{comment_thread.id}/unsubscribe" }
+
+    before do
+      user.add_role(Role::EDITOR, comment_thread.record)
+      comment_thread.users_thread_for(user).update(subscribed: true)
+      patch(path, params: {})
+    end
+
+    it 'returns a 200' do
+      expect(response.status).to eq(200)
+    end
+
+    it 'sets subscribed on the user thread to true' do
+      expect(comment_thread.users_thread_for(user).subscribed).to be false
     end
   end
 end

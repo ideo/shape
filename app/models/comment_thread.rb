@@ -24,6 +24,10 @@ class CommentThread < ApplicationRecord
       .where('updated_at > ?', ut.last_viewed_at)
   end
 
+  def users_thread_for(user)
+    users_threads.where(user_id: user.id).first
+  end
+
   def unread_comment_count_for(user)
     unread_comments_for(user).count
   end

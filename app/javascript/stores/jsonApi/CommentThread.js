@@ -125,6 +125,16 @@ class CommentThread extends BaseRecord {
     return this.apiStore.request(apiPath, 'POST')
   }
 
+  API_subscribe() {
+    const apiPath = `comment_threads/${this.id}/subscribe`
+    return this.apiStore.request(apiPath, 'PATCH')
+  }
+
+  API_unsubscribe() {
+    const apiPath = `comment_threads/${this.id}/unsubscribe`
+    return this.apiStore.request(apiPath, 'PATCH')
+  }
+
   @action
   importComments(data, { created = false, read = false } = {}) {
     let newComments = _.union(this.comments.toJS(), data)
