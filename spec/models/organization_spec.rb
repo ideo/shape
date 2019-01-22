@@ -185,6 +185,7 @@ describe Organization, type: :model do
         it 'cancels the existing subscription' do
           network_organization = double('network_organization', id: 123)
           subscription = double('subscription')
+          payment_method = double('payment_method')
 
           allow(organization).to receive(:network_organization).and_return(network_organization)
 
@@ -192,6 +193,10 @@ describe Organization, type: :model do
             organization_id: network_organization.id,
             active: true,
           ).and_return([subscription])
+          allow(NetworkApi::PaymentMethod).to receive(:find).with(
+            organization_id: network_organization.id,
+            default: true,
+          ).and_return([payment_method])
 
           expect(subscription).to receive(:cancel).with(
             immediately: true,
@@ -205,41 +210,57 @@ describe Organization, type: :model do
     describe 'update deactivated' do
       context 'changed to true' do
         let(:organization) { create(:organization, deactivated: false) }
-        it 'cancels the existing subscription' do
-          network_organization = double('network_organization', id: 123)
-          subscription = double('subscription')
+        let(:network_organization) { double('network_organization', id: 345) }
+        let(:subscription) { double('subscription') }
+        let(:payment_method) { double(id: 456) }
 
+        before do
           allow(organization).to receive(:network_organization).and_return(network_organization)
 
           allow(NetworkApi::Subscription).to receive(:find).with(
             organization_id: network_organization.id,
             active: true,
           ).and_return([subscription])
+          allow(NetworkApi::PaymentMethod).to receive(:find).with(
+            organization_id: network_organization.id,
+            default: true,
+          ).and_return([payment_method])
+        end
 
+        it 'cancels the existing subscription' do
           expect(subscription).to receive(:cancel).with(
             immediately: true,
           )
-
           organization.update_attributes(deactivated: true)
+        end
+
+        context 'with no payment_method' do
+          let(:payment_method) { nil }
+
+          it 'updates the organization but does not cancel the subscription' do
+            expect(subscription).not_to receive(:cancel)
+            organization.update_attributes(deactivated: true)
+            expect(organization.deactivated).to be true
+          end
         end
       end
 
       context 'changed to false' do
         let(:organization) { create(:organization, deactivated: true) }
-        it 'creates a new subscription with existing payment method' do
-          plan = double('plan', id: 123)
-          network_organization = double('network_organization', id: 345)
-          payment_method = double(id: 456)
+        let(:network_organization) { double('network_organization', id: 345) }
+        let(:plan) { double('plan', id: 123) }
+        let(:payment_method) { double(id: 456) }
 
+        before do
           allow(NetworkApi::Plan).to receive(:first).and_return(plan)
-
           allow(NetworkApi::PaymentMethod).to receive(:find).with(
             organization_id: network_organization.id,
             default: true,
           ).and_return([payment_method])
-
           allow(organization).to receive(:network_organization).and_return(network_organization)
+        end
 
+        it 'creates a new subscription with existing payment method' do
           expect(NetworkApi::Subscription).to receive(:create).with(
             organization_id: network_organization.id,
             plan_id: plan.id,
