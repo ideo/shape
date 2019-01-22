@@ -6,12 +6,14 @@ import styled from 'styled-components'
 import Dotdotdot from 'react-dotdotdot'
 
 import { routingStore } from '~/stores'
-import Link from '~/ui/global/Link'
-import Moment from '~/ui/global/Moment'
-import v, { ITEM_TYPES } from '~/utils/variables'
 import CollectionIcon from '~/ui/icons/CollectionIcon'
 import CommentIconFilled from '~/ui/icons/CommentIconFilled'
+import Link from '~/ui/global/Link'
+import Moment from '~/ui/global/Moment'
+import FollowIcon from '~/ui/icons/FollowIcon'
 import TextIcon from '~/ui/icons/TextIcon'
+import Tooltip from '~/ui/global/Tooltip'
+import v, { ITEM_TYPES } from '~/utils/variables'
 
 const StyledHeader = styled.div`
   align-items: flex-start;
@@ -69,6 +71,13 @@ export const ThumbnailHolder = styled.span`
   }
 `
 ThumbnailHolder.displayName = 'ThumbnailHolder'
+
+export const FollowHolder = styled.span`
+  color: ${props =>
+    props.isFollowed ? v.colors.commonLight : v.colors.secondaryLight};
+  height: 15px;
+  width: 15px;
+`
 
 @observer
 class CommentThreadHeader extends React.Component {
@@ -138,6 +147,24 @@ class CommentThreadHeader extends React.Component {
     )
   }
 
+  renderFollow = () => {
+    const {
+      thread: { users_thread },
+    } = this.props
+    const tooltipText = users_thread.subscribed ? 'Unfollow' : 'Follow'
+    return (
+      <FollowHolder isFollowed={users_thread.subscribed}>
+        <Tooltip
+          classes={{ tooltip: 'Tooltip' }}
+          title={tooltipText}
+          placement="top"
+        >
+          <FollowIcon />
+        </Tooltip>
+      </FollowHolder>
+    )
+  }
+
   render() {
     const { thread } = this.props
 
@@ -159,6 +186,7 @@ class CommentThreadHeader extends React.Component {
             <span className="timestamp">
               <Moment date={thread.updated_at} />
             </span>
+            {this.renderFollow()}
             {this.renderUnreadCount()}
           </Fragment>
         )}

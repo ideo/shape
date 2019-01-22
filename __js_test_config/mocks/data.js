@@ -338,6 +338,9 @@ export const fakeThread = {
   key: 'collection-1',
   unread_count: 2,
   comments: [fakeComment, fakeComment, fakeComment],
+  users_thread: {
+    subscribed: true,
+  },
   latestUnreadComments: [fakeComment, fakeComment],
   API_saveComment: jest.fn().mockReturnValue(Promise.resolve({})),
   API_fetchComments: jest.fn().mockReturnValue(Promise.resolve({})),

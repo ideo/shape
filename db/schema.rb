@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20190117195055) do
+ActiveRecord::Schema.define(version: 20190122183523) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -65,8 +65,8 @@ ActiveRecord::Schema.define(version: 20190117195055) do
     t.boolean "image_contain", default: false
     t.boolean "is_cover", default: false
     t.datetime "unarchived_at"
+    t.integer "filter", default: 0
     t.boolean "hidden", default: false
-    t.integer "filter", default: 1
     t.index ["collection_id"], name: "index_collection_cards_on_collection_id"
     t.index ["item_id"], name: "index_collection_cards_on_item_id"
     t.index ["parent_id"], name: "index_collection_cards_on_parent_id"
@@ -99,8 +99,8 @@ ActiveRecord::Schema.define(version: 20190117195055) do
     t.bigint "collection_to_test_id"
     t.datetime "unarchived_at"
     t.jsonb "cached_test_scores"
-    t.bigint "roles_anchor_collection_id"
     t.boolean "hide_submissions", default: false
+    t.bigint "roles_anchor_collection_id"
     t.index ["breadcrumb"], name: "index_collections_on_breadcrumb", using: :gin
     t.index ["cached_test_scores"], name: "index_collections_on_cached_test_scores", using: :gin
     t.index ["cloned_from_id"], name: "index_collections_on_cloned_from_id"
@@ -374,6 +374,7 @@ ActiveRecord::Schema.define(version: 20190117195055) do
     t.bigint "comment_thread_id"
     t.datetime "last_viewed_at"
     t.datetime "created_at", null: false
+    t.boolean "subscribed", default: true
     t.index ["user_id", "comment_thread_id"], name: "by_users_comment_thread", unique: true
   end
 

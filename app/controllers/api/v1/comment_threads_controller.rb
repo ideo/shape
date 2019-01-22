@@ -1,5 +1,6 @@
 class Api::V1::CommentThreadsController < Api::V1::BaseController
   deserializable_resource :comment_thread, class: DeserializableCommentThread, only: %i[create]
+  before_action :load_and_authorize_thread_by_record, only: %i[find_by_record subscribe unsubscribe]
 
   before_action :load_users_comment_threads, only: %i[index]
   def index
@@ -28,13 +29,18 @@ class Api::V1::CommentThreadsController < Api::V1::BaseController
     end
   end
 
-  before_action :load_and_authorize_thread_by_record, only: %i[find_by_record]
   def find_by_record
     if @comment_thread
       render jsonapi: @comment_thread, include: thread_relations
     else
       render jsonapi: nil
     end
+  end
+
+  def subscribe
+  end
+
+  def unsubscribe
   end
 
   private

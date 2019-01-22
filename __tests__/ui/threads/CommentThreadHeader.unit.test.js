@@ -1,6 +1,8 @@
-import CommentThreadHeader from '~/ui/threads/CommentThreadHeader'
+import CommentThreadHeader, {
+  FollowHolder,
+} from '~/ui/threads/CommentThreadHeader'
 import { fakeThread } from '#/mocks/data'
-import { ITEM_TYPES } from '~/utils/variables'
+import v, { ITEM_TYPES } from '~/utils/variables'
 import { routingStore } from '~/stores'
 
 jest.mock('../../../app/javascript/stores')
@@ -142,6 +144,36 @@ describe('CommentThreadHeader', () => {
     it('should not render the timestamp or unreadCount', () => {
       expect(wrapper.find('Moment').exists()).toBeFalsy()
       expect(wrapper.find('CommentIcon').exists()).toBeFalsy()
+    })
+  })
+
+  describe('when subscribed', () => {
+    beforeEach(() => {
+      props = {
+        thread: fakeThread,
+      }
+      props.thread.users_thread.subscribed = true
+      wrapper = shallow(<CommentThreadHeader {...props} />)
+    })
+
+    it('should render the follow icon in dark color', () => {
+      const holder = wrapper.find(FollowHolder)
+      expect(holder).toHaveStyleRule('color', v.colors.commonLight)
+    })
+  })
+
+  describe('when unsubscribed', () => {
+    beforeEach(() => {
+      props = {
+        thread: fakeThread,
+      }
+      props.thread.users_thread.subscribed = false
+      wrapper = shallow(<CommentThreadHeader {...props} />)
+    })
+
+    it('should render the follow icon in dark color', () => {
+      const holder = wrapper.find(FollowHolder)
+      expect(holder).toHaveStyleRule('color', v.colors.secondaryLight)
     })
   })
 })
