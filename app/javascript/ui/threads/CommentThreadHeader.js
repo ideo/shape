@@ -38,8 +38,8 @@ const StyledHeader = styled.div`
     display: flex;
     flex-basis: content;
     height: 12px;
-    width: 25px;
-    margin-left: 10px;
+    width: 20px;
+    margin-left: 4px;
     svg {
       margin-left: 4px;
       height: 100%;
@@ -76,6 +76,7 @@ export const FollowHolder = styled.span`
   color: ${props =>
     props.isFollowed ? v.colors.commonLight : v.colors.secondaryLight};
   height: 15px;
+  margin-top: -1px;
   width: 15px;
 `
 
@@ -137,6 +138,7 @@ class CommentThreadHeader extends React.Component {
 
   renderUnreadCount = () => {
     const { thread } = this.props
+    if (!thread.unreadCount) return null
     return (
       <span className={`unread ${thread.unreadCount && 'show-unread'}`}>
         <span className="inner">
@@ -186,8 +188,8 @@ class CommentThreadHeader extends React.Component {
             <span className="timestamp">
               <Moment date={thread.updated_at} />
             </span>
-            {this.renderFollow()}
             {this.renderUnreadCount()}
+            {this.renderFollow()}
           </Fragment>
         )}
       </StyledHeader>
