@@ -176,6 +176,11 @@ describe('CommentThreadHeader', () => {
         button.simulate('click', fakeEv)
         expect(props.thread.API_unsubscribe).toHaveBeenCalled()
       })
+
+      it('should set user_thread subscribed to false when clicking', () => {
+        button.simulate('click', fakeEv)
+        expect(props.thread.users_thread.subscribed).toBe(false)
+      })
     })
 
     describe('when unsubscribed', () => {
@@ -195,6 +200,11 @@ describe('CommentThreadHeader', () => {
       it('should call API_subscribe when clicking', () => {
         button.simulate('click', fakeEv)
         expect(props.thread.API_subscribe).toHaveBeenCalled()
+      })
+
+      it('should set user_thread subscribed to true when clicking', () => {
+        button.simulate('click', fakeEv)
+        expect(props.thread.users_thread.subscribed).toBe(true)
       })
     })
   })
