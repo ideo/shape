@@ -120,8 +120,11 @@ class CommentThreadHeader extends React.Component {
     const { users_thread } = thread
     if (users_thread.subscribed) {
       thread.API_unsubscribe()
+      users_thread.subscribed = false
+    } else {
+      thread.API_subscribe()
+      users_thread.subscribed = true
     }
-    thread.API_subscribe()
   }
 
   renderThumbnail() {

@@ -101,5 +101,7 @@ class Api::V1::CommentThreadsController < Api::V1::BaseController
     return false if users_thread.nil?
     users_thread.subscribed = to_subscribe
     users_thread.save
+    @comment_thread.update_firestore_users_threads
+    users_thread
   end
 end
