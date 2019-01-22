@@ -4,7 +4,6 @@ import styled from 'styled-components'
 import { Grid, Switch } from '@material-ui/core'
 import Box from '~shared/components/atoms/Box'
 import trackError from '~/utils/trackError'
-import apiSaveModel from '~/utils/apiSaveModel'
 
 const Wrapper = styled.div`
   font-family: 'Gotham';
@@ -30,7 +29,7 @@ class SuperAdminBillingControls extends React.Component {
     currentUserOrganization.in_app_billing = !currentUserOrganization.in_app_billing
     try {
       runInAction(() => (this.changingInAppBilling = true))
-      await apiSaveModel(currentUserOrganization)
+      await currentUserOrganization.patch()
       runInAction(() => (this.changingInAppBilling = false))
     } catch (e) {
       trackError(e)
