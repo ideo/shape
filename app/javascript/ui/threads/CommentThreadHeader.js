@@ -114,6 +114,16 @@ class CommentThreadHeader extends React.Component {
     return routingStore.pathTo('homepage')
   }
 
+  toggleSubscribe = ev => {
+    ev.preventDefault()
+    const { thread } = this.props
+    const { users_thread } = thread
+    if (users_thread.subscribed) {
+      thread.API_unsubscribe()
+    }
+    thread.API_subscribe()
+  }
+
   renderThumbnail() {
     const { record } = this
     let content
@@ -161,7 +171,9 @@ class CommentThreadHeader extends React.Component {
           title={tooltipText}
           placement="top"
         >
-          <FollowIcon />
+          <button onClick={this.toggleSubscribe}>
+            <FollowIcon />
+          </button>
         </Tooltip>
       </FollowHolder>
     )

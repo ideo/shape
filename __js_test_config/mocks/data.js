@@ -344,6 +344,8 @@ export const fakeThread = {
   latestUnreadComments: [fakeComment, fakeComment],
   API_saveComment: jest.fn().mockReturnValue(Promise.resolve({})),
   API_fetchComments: jest.fn().mockReturnValue(Promise.resolve({})),
+  API_subscribe: jest.fn().mockReturnValue(Promise.resolve({})),
+  API_unsubscribe: jest.fn().mockReturnValue(Promise.resolve({})),
 }
 export const fakeActivity = {
   id: '1',

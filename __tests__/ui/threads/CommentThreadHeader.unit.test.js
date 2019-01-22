@@ -8,6 +8,7 @@ import { routingStore } from '~/stores'
 jest.mock('../../../app/javascript/stores')
 
 let wrapper, props
+const fakeEv = { preventDefault: jest.fn() }
 
 describe('CommentThreadHeader', () => {
   describe('with a thread', () => {
@@ -147,33 +148,54 @@ describe('CommentThreadHeader', () => {
     })
   })
 
-  describe('when subscribed', () => {
+  describe('subscriptions', () => {
+    let button
     beforeEach(() => {
       props = {
         thread: fakeThread,
       }
-      props.thread.users_thread.subscribed = true
       wrapper = shallow(<CommentThreadHeader {...props} />)
+      button = wrapper
+        .find(FollowHolder)
+        .find('button')
+        .first()
     })
 
-    it('should render the follow icon in dark color', () => {
-      const holder = wrapper.find(FollowHolder)
-      expect(holder).toHaveStyleRule('color', v.colors.commonLight)
-    })
-  })
+    describe('when subscribed', () => {
+      beforeEach(() => {
+        props.thread.users_thread.subscribed = true
+        wrapper = shallow(<CommentThreadHeader {...props} />)
+      })
 
-  describe('when unsubscribed', () => {
-    beforeEach(() => {
-      props = {
-        thread: fakeThread,
-      }
-      props.thread.users_thread.subscribed = false
-      wrapper = shallow(<CommentThreadHeader {...props} />)
+      it('should render the follow icon in dark color', () => {
+        const holder = wrapper.find(FollowHolder)
+        expect(holder).toHaveStyleRule('color', v.colors.commonLight)
+      })
+
+      it('should call API_unsubscribe when clicking', () => {
+        button.simulate('click', fakeEv)
+        expect(props.thread.API_unsubscribe).toHaveBeenCalled()
+      })
     })
 
-    it('should render the follow icon in dark color', () => {
-      const holder = wrapper.find(FollowHolder)
-      expect(holder).toHaveStyleRule('color', v.colors.secondaryLight)
+    describe('when unsubscribed', () => {
+      beforeEach(() => {
+        props = {
+          thread: fakeThread,
+        }
+        props.thread.users_thread.subscribed = false
+        wrapper = shallow(<CommentThreadHeader {...props} />)
+      })
+
+      it('should render the follow icon in dark color', () => {
+        const holder = wrapper.find(FollowHolder)
+        expect(holder).toHaveStyleRule('color', v.colors.secondaryLight)
+      })
+
+      it('should call API_subscribe when clicking', () => {
+        button.simulate('click', fakeEv)
+        expect(props.thread.API_subscribe).toHaveBeenCalled()
+      })
     })
   })
 })
