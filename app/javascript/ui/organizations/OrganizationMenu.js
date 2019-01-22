@@ -10,6 +10,7 @@ import Group from '~/stores/jsonApi/Group'
 import Organization from '~/stores/jsonApi/Organization'
 import OrganizationPeople from '~/ui/organizations/OrganizationPeople'
 import GroupTitle from '~/ui/groups/GroupTitle'
+import googleTagManager from '~/vendor/googleTagManager'
 
 @inject('apiStore', 'uiStore')
 @observer
@@ -87,6 +88,11 @@ class OrganizationMenu extends React.Component {
         redirectPath: 'homepage',
       })
       uiStore.update('orgCreated', true)
+      googleTagManager.push({
+        event: 'formSubmission',
+        formType: 'New Org',
+      })
+
       onClose()
     } catch (err) {
       uiStore.alert(err.error ? err.error[0] : 'There was an error.')
