@@ -207,9 +207,12 @@ class CollectionCard extends BaseRecord {
     return _.some(
       this.selectedCards,
       card =>
-        !card.link &&
-        card.record.className === 'Collection' &&
-        card.record.collection_card_count > 0
+        // look for any records you can't edit, that way this will trigger reselectOnlyEditableCards()
+        !card.record.can_edit ||
+        // otherwise warn for collections w/ cards
+        (!card.link &&
+          card.record.className === 'Collection' &&
+          card.record.collection_card_count > 0)
     )
   }
 
