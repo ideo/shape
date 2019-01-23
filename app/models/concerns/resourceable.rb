@@ -166,7 +166,7 @@ module Resourceable
     return unless editable_and_viewable?
     user_ids_for_role = UsersRole
                         .joins(:role)
-                        .where(Role.arel_table[:resource_identifier].eq(resource_identifier))
+                        .where(Role.arel_table[:resource_identifier].eq(roles_anchor_resource_identifier))
                         .where(Role.arel_table[:name].eq(role_name))
                         .pluck(:user_id)
                         .uniq
