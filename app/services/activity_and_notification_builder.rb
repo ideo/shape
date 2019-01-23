@@ -71,6 +71,7 @@ class ActivityAndNotificationBuilder < SimpleService
       .find_each do |user|
       next if user.id == @actor.id
       next if @omit_user_ids.include? user.id
+      next unless subscribed?(user) && @action != :mentioned
       if @combine
         if (notif = combine_existing_notifications(user.id))
           @created_notifications << notif
@@ -127,5 +128,11 @@ class ActivityAndNotificationBuilder < SimpleService
       3.seconds,
       @created_notifications.compact.map(&:batch_job_identifier),
     )
+  end
+
+  def subscribed?(user)
+    users_thread = @target.try(:comment_thread).users_thread_for(user)
+    return false if users_thread.nil?
+    users_thread.subscribed
   end
 end

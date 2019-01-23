@@ -28,6 +28,12 @@ RSpec.describe ActivityAndNotificationBuilder, type: :service do
       destination: destination,
     )
   end
+  let!(:comment_thread) { create(:collection_comment_thread, record: target) }
+  let!(:users_thread) { create(:users_thread, comment_thread: comment_thread, user: subject_users[0], subscribed: true) }
+
+  before do
+    target.reload
+  end
 
   describe '#call' do
     it 'creates one new activity' do
@@ -36,6 +42,16 @@ RSpec.describe ActivityAndNotificationBuilder, type: :service do
 
     context 'with multiple users' do
       let(:subject_users) { create_list(:user, 2) }
+
+      before do
+        subject_users.each do |user|
+          next if user.users_threads.any?
+          create(:users_thread,
+                 comment_thread: comment_thread,
+                 user: user,
+                 subscribed: true)
+        end
+      end
 
       it 'creates notifications for each user' do
         expect { builder.call }.to change(Notification, :count).by(2)
@@ -64,6 +80,18 @@ RSpec.describe ActivityAndNotificationBuilder, type: :service do
 
     context 'with a user and a group' do
       let(:subject_groups) { [create(:group, add_members: [create(:user)])] }
+
+      before do
+        subject_groups.each do |group|
+          group.members[:users].each do |user|
+            next if user.users_threads.any?
+            create(:users_thread,
+                   comment_thread: comment_thread,
+                   user: user,
+                   subscribed: true)
+          end
+        end
+      end
 
       it 'creates notifications for each user and each user in group' do
         expect { builder.call }.to change(Notification, :count).by(2)
@@ -166,6 +194,16 @@ RSpec.describe ActivityAndNotificationBuilder, type: :service do
           create_list(:user, 2),
           create_list(:user, 2, status: :archived),
         ].flatten
+      end
+
+      before do
+        subject_users.each do |user|
+          next if user.users_threads.any?
+          create(:users_thread,
+                 comment_thread: comment_thread,
+                 user: user,
+                 subscribed: true)
+        end
       end
 
       it 'does not create notifications for the archived users' do
