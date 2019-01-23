@@ -36,10 +36,24 @@ RSpec.describe CommentThread, type: :model do
     let(:user) { create(:user) }
 
     it 'should create a user thread for the given user' do
-      expect {
+      expect do
         comment_thread.add_user_follower!(user.id)
-      }.to change(comment_thread.users_threads, :count).by(1)
+      end.to change(comment_thread.users_threads, :count).by(1)
       expect(user.comment_threads).to include(comment_thread)
+    end
+
+    context 'with an existing unsubscribed user thread' do
+      let!(:users_thread) do
+        create(:users_thread,
+               comment_thread: comment_thread,
+               user: user,
+               subscribed: false)
+      end
+
+      it 'should not subscribe the user' do
+        existing_ut = comment_thread.users_threads.find_by(user_id: user.id)
+        expect(existing_ut.subscribed).to be false
+      end
     end
   end
 
@@ -49,9 +63,9 @@ RSpec.describe CommentThread, type: :model do
     let(:group) { create(:group, add_members: [user]) }
 
     it 'should create a group thread and user thread the group\'s users' do
-      expect {
+      expect do
         comment_thread.add_group_follower!(group.id)
-      }.to change(comment_thread.groups_threads, :count).by(1)
+      end.to change(comment_thread.groups_threads, :count).by(1)
       expect(user.comment_threads).to include(comment_thread)
     end
   end
