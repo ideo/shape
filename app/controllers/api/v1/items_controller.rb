@@ -62,6 +62,13 @@ class Api::V1::ItemsController < Api::V1::BaseController
     render json: current_user.in_my_collection?(@item)
   end
 
+  # similar method exists in collections_controller
+  def restore_permissions
+    Roles::MergeToChild.call(parent: @item.parent, child: @item)
+    render jsonapi: @item.reload
+    # no error case needed... ?
+  end
+
   private
 
   def load_and_authorize_item_update

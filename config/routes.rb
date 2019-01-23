@@ -23,6 +23,7 @@ Rails.application.routes.draw do
           get 'in_my_collection'
           post 'clear_collection_cover'
           patch 'submit'
+          patch 'restore_permissions'
         end
         collection do
           post 'create_template'
@@ -36,6 +37,7 @@ Rails.application.routes.draw do
           post 'duplicate'
           patch 'archive'
           get 'in_my_collection'
+          patch 'restore_permissions'
         end
         resources :roles, only: %i[index create destroy]
       end

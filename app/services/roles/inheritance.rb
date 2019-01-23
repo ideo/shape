@@ -23,12 +23,14 @@ module Roles
 
     # if inherit is false for either role, then the child is "private"
     def private_child?(child)
+      return false if @parent.nil?
       !inherit_from_parent?(child)
     end
 
     private
 
     def inherit_role_from_parent?(child, add_user_ids: [], role_name:)
+      return true if child.same_roles_anchor? @parent
       @parent_allowed_user_ids = allowed_user_ids(@parent, role_name)
       @child_allowed_user_ids = allowed_user_ids(child, role_name)
       proposed_user_ids = (@child_allowed_user_ids + add_user_ids).uniq

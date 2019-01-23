@@ -79,6 +79,11 @@ class SerializableCollection < BaseJsonSerializer
     @object.submissions_collection.try(:id)
   end
 
+  attribute :is_private do
+    # TODO: replace with cached attr
+    Roles::Inheritance.new(@object.parent).private_child?(@object)
+  end
+
   # NOTE: a lot of these boolean attributes could probably be omitted if not applicable, which would potentially
   # slim down the API request for collections
   attribute :is_org_template_collection do

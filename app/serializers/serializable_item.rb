@@ -28,6 +28,11 @@ class SerializableItem < BaseJsonSerializer
     []
   end
 
+  attribute :is_private do
+    # TODO: replace with cached attr
+    Roles::Inheritance.new(@object.parent).private_child?(@object)
+  end
+
   attribute :filestack_file_url do
     @object.cached_filestack_file_url || ''
   end

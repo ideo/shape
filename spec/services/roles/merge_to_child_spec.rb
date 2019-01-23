@@ -31,7 +31,7 @@ RSpec.describe Roles::MergeToChild, type: :service do
         other_user.add_role(Role::VIEWER, collection)
       end
 
-      it 'should not assign any permissions and destroy card roles' do
+      it 'should reanchor the child to the parent, destroying child-specific roles' do
         expect(Roles::MassAssign).not_to receive(:call)
         expect(child.roles).not_to be_empty
         expect(child.can_view?(other_user)).to be false

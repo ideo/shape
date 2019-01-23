@@ -60,12 +60,14 @@ FactoryBot.define do
 
     after(:create) do |item, evaluator|
       if evaluator.add_editors.present?
+        item.unanchor_and_inherit_roles_from_anchor!
         evaluator.add_editors.each do |user|
           user.add_role(Role::EDITOR, item.becomes(Item))
         end
       end
 
       if evaluator.add_viewers.present?
+        item.unanchor_and_inherit_roles_from_anchor!
         evaluator.add_viewers.each do |user|
           user.add_role(Role::VIEWER, item.becomes(Item))
         end
