@@ -76,6 +76,17 @@ RSpec.describe ActivityAndNotificationBuilder, type: :service do
           expect { builder.call }.not_to change(ActivitySubject, :count)
         end
       end
+
+      context 'with one unsubscribed user' do
+        before do
+          subject_users[1].users_threads[0].update(subscribed: false)
+          subject_users[1].reload
+        end
+
+        it 'creates notifications for just one user' do
+          expect { builder.call }.to change(Notification, :count).by(1)
+        end
+      end
     end
 
     context 'with a user and a group' do
