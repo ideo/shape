@@ -195,7 +195,11 @@ class CommentThreadContainer extends React.Component {
 
   get threads() {
     const { apiStore } = this.props
-    return apiStore.currentThreads
+    return apiStore.currentThreads.filter(
+      t =>
+        t.key === apiStore.currentPageThreadKey ||
+        (t.users_thread && t.users_thread.subscribed)
+    )
   }
 
   get containerDiv() {

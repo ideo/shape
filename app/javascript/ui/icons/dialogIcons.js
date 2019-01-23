@@ -6,6 +6,7 @@ import CelebrateIcon from '~/ui/icons/CelebrateIcon'
 import ClockIcon from '~/ui/icons/ClockIcon'
 import CloseIcon from '~/ui/icons/CloseIcon'
 import CloseSubtractGroupIcon from '~/ui/icons/CloseSubtractGroupIcon'
+import HiddenIcon from '~/ui/icons/HiddenIcon'
 import InfoIcon from '~/ui/icons/InfoIcon'
 import LeaveIcon from '~/ui/icons/LeaveIcon'
 import LinkIcon from '~/ui/icons/LinkIcon'
@@ -23,6 +24,7 @@ export default {
   ClockIcon,
   CloseIcon,
   CloseSubtractGroupIcon,
+  HiddenIcon,
   InfoIcon,
   LeaveIcon,
   LinkIcon,

@@ -5,7 +5,7 @@ import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 import Dotdotdot from 'react-dotdotdot'
 
-import { routingStore } from '~/stores'
+import { routingStore, uiStore } from '~/stores'
 import CollectionIcon from '~/ui/icons/CollectionIcon'
 import CommentIconFilled from '~/ui/icons/CommentIconFilled'
 import Link from '~/ui/global/Link'
@@ -121,6 +121,11 @@ class CommentThreadHeader extends React.Component {
     if (users_thread.subscribed) {
       thread.API_unsubscribe()
       users_thread.subscribed = false
+      uiStore.popupAlert({
+        iconName: 'Hidden',
+        open: 'info',
+        prompt: `You have stopped following ${thread.record.name}`,
+      })
     } else {
       thread.API_subscribe()
       users_thread.subscribed = true
@@ -166,6 +171,7 @@ class CommentThreadHeader extends React.Component {
     const {
       thread: { users_thread },
     } = this.props
+    if (!users_thread) return null
     const tooltipText = users_thread.subscribed ? 'Unfollow' : 'Follow'
     return (
       <FollowHolder isFollowed={users_thread.subscribed}>

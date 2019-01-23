@@ -3,7 +3,7 @@ import CommentThreadHeader, {
 } from '~/ui/threads/CommentThreadHeader'
 import { fakeThread } from '#/mocks/data'
 import v, { ITEM_TYPES } from '~/utils/variables'
-import { routingStore } from '~/stores'
+import { routingStore, uiStore } from '~/stores'
 
 jest.mock('../../../app/javascript/stores')
 
@@ -180,6 +180,11 @@ describe('CommentThreadHeader', () => {
       it('should set user_thread subscribed to false when clicking', () => {
         button.simulate('click', fakeEv)
         expect(props.thread.users_thread.subscribed).toBe(false)
+      })
+
+      it('should show an alert when clicking', () => {
+        button.simulate('click', fakeEv)
+        expect(uiStore.popupAlert).toHaveBeenCalled()
       })
     })
 
