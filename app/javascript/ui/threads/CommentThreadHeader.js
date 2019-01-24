@@ -77,6 +77,7 @@ export const FollowHolder = styled.span`
     props.isFollowed ? v.colors.commonLight : v.colors.secondaryLight};
   height: 15px;
   margin-left: 7px;
+  margin-right: 8px;
   margin-top: 3px;
   width: 15px;
 `
