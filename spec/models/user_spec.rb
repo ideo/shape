@@ -132,7 +132,6 @@ describe User, type: :model do
   end
 
   describe '.from_omniauth' do
-    let(:pending_user) { nil }
     let(:auth) do
       Hashie::Mash.new(
         provider: 'ideo',
@@ -152,7 +151,7 @@ describe User, type: :model do
         },
       )
     end
-    let(:from_omniauth) { User.from_omniauth(auth, pending_user) }
+    let(:from_omniauth) { User.from_omniauth(auth) }
 
     context 'with existing user' do
       let!(:existing_user) { create(:user, provider: 'ideo', uid: '123') }
@@ -165,15 +164,6 @@ describe User, type: :model do
         expect(from_omniauth.picture).to eq auth.extra.raw_info.picture
         expect(from_omniauth.picture_medium).to eq auth.extra.raw_info.picture_medium
         expect(from_omniauth.picture_large).to eq auth.extra.raw_info.picture_large
-      end
-    end
-
-    context 'with pending user' do
-      let!(:pending_user) { create(:user) }
-
-      it 'updates existing user if found' do
-        expect(from_omniauth.id).to eq pending_user.id
-        expect(from_omniauth.email).to eq auth.info.email
       end
     end
 
