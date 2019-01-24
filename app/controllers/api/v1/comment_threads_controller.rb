@@ -95,7 +95,7 @@ class Api::V1::CommentThreadsController < Api::V1::BaseController
   end
 
   def toggle_subscribed(to_subscribe)
-    users_thread = @comment_thread.users_threads_for(current_user).first
+    users_thread = @comment_thread.users_thread_for(current_user).first
     return false if users_thread.nil?
     users_thread.subscribed = to_subscribe
     users_thread.save
