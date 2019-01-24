@@ -122,10 +122,12 @@ RSpec.describe CollectionCover, type: :service do
 
       before do
         shared_data.each do |obj|
+          obj.unanchor_and_inherit_roles_from_anchor!
           editor.add_role(Role::EDITOR, obj)
           viewer.add_role(Role::VIEWER, obj)
         end
         private_data.each do |obj|
+          obj.unanchor_and_inherit_roles_from_anchor!
           editor.add_role(Role::EDITOR, obj)
         end
       end
