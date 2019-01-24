@@ -311,7 +311,6 @@ class ApiStore extends jsonapi(datxCollection) {
         })
       }
     }
-    console.log('thread key', thread.key)
     this.setCurrentPageThreadKey(thread.key)
     return thread
   }
