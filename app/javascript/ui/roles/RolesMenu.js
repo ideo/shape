@@ -136,6 +136,7 @@ class RolesMenu extends React.Component {
 
     this.setState(prevState => ({
       groups,
+      pendingPanelOpen: counts.active === 0 && counts.pending > 0,
       page: {
         pending:
           status === 'pending' || status === 'both'
