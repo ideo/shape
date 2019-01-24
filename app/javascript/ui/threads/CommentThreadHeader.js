@@ -9,7 +9,6 @@ import { routingStore, uiStore } from '~/stores'
 import CollectionIcon from '~/ui/icons/CollectionIcon'
 import CommentIconFilled from '~/ui/icons/CommentIconFilled'
 import Link from '~/ui/global/Link'
-import Moment from '~/ui/global/Moment'
 import FollowIcon from '~/ui/icons/FollowIcon'
 import TextIcon from '~/ui/icons/TextIcon'
 import Tooltip from '~/ui/global/Tooltip'
@@ -76,7 +75,7 @@ export const FollowHolder = styled.span`
   color: ${props =>
     props.isFollowed ? v.colors.commonLight : v.colors.secondaryLight};
   height: 15px;
-  margin-top: -1px;
+  margin-top: 3px;
   width: 15px;
 `
 
@@ -206,9 +205,6 @@ class CommentThreadHeader extends React.Component {
         </Dotdotdot>
         {thread && (
           <Fragment>
-            <span className="timestamp">
-              <Moment date={thread.updated_at} />
-            </span>
             {this.renderUnreadCount()}
             {this.renderFollow()}
           </Fragment>
