@@ -1,11 +1,6 @@
 class Users::OmniauthCallbacksController < Devise::OmniauthCallbacksController
   def ideo
-    if session[:pending_user_token]
-      # if this is nil for whatever reason, it will later end up creating a new User
-      pending_user = User.pending_user_with_token(session[:pending_user_token])
-      session[:pending_user_token] = nil
-    end
-    @user = User.from_omniauth(request.env['omniauth.auth'], pending_user)
+    @user = User.from_omniauth(request.env['omniauth.auth'])
     if @user.save
       setup_org_membership
       setup_network_roles
