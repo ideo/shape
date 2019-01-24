@@ -39,6 +39,7 @@ const StyledHeader = styled.div`
     height: 12px;
     width: 20px;
     margin-left: 4px;
+    margin-top: 5px;
     svg {
       margin-left: 4px;
       height: 100%;
@@ -75,6 +76,7 @@ export const FollowHolder = styled.span`
   color: ${props =>
     props.isFollowed ? v.colors.commonLight : v.colors.secondaryLight};
   height: 15px;
+  margin-left: 7px;
   margin-top: 3px;
   width: 15px;
 `
