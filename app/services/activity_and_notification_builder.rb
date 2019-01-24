@@ -131,6 +131,7 @@ class ActivityAndNotificationBuilder < SimpleService
   end
 
   def subscribed?(user)
+    return true unless @target.is_a? Collection
     return false if @target.comment_thread.nil?
     users_thread = @target.comment_thread.users_thread_for(user)
     return false if users_thread.nil?
