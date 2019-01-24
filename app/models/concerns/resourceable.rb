@@ -209,8 +209,15 @@ module Resourceable
     anchor_id = parent&.roles_anchor&.id
     return unless anchor_id
     update_columns(roles_anchor_collection_id: anchor_id, updated_at: Time.current)
+    # now that its reanchored, cache private = false
+    self.class.where(id: id).update_all(%(
+      cached_attributes = jsonb_set(
+        cached_attributes, '{cached_inheritance}', '{"private": false, "updated_at": "#{Time.current}"}'::jsonb
+      )
+    ))
     return unless propagate && is_a?(Collection)
     roles.destroy_all
+
     [Item, Collection].each do |klass|
       klass
         .in_collection(self)

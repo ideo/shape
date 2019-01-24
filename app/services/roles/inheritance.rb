@@ -24,9 +24,15 @@ module Roles
     # if inherit is false for either role, then the child is "private"
     def private_child?(child)
       return false if @parent.nil?
-      return false if child.same_roles_anchor? @parent
       cached = child.cached_inheritance
-      max_updated = [@parent.roles.maximum(:updated_at), child.roles.maximum(:updated_at)].max
+      if child.same_roles_anchor? @parent
+        if cached.present? && cached['private']
+          child.cached_inheritance = { private: false, updated_at: Time.current }
+          child.save
+        end
+        return false
+      end
+      max_updated = [@parent.roles.maximum(:updated_at) || 0, child.roles.maximum(:updated_at) || 0].max
       if !cached || cached['updated_at'].to_time.to_i < max_updated.to_i
         child.cached_inheritance = {
           updated_at: child.roles.maximum(:updated_at),
