@@ -271,6 +271,7 @@ class ApiStore extends jsonapi(datxCollection) {
         this.__removeModel(ct)
       }
     })
+    this.setCurrentPageThreadKey(null)
   }
 
   async findOrBuildCommentThread(record) {
@@ -310,6 +311,7 @@ class ApiStore extends jsonapi(datxCollection) {
         })
       }
     }
+    console.log('thread key', thread.key)
     this.setCurrentPageThreadKey(thread.key)
     return thread
   }
