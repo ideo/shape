@@ -31,6 +31,10 @@ class BaseRecord extends jsonapi(Model) {
     return this.meta.type
   }
 
+  get baseApiPath() {
+    return `${this.internalType}/${this.id}`
+  }
+
   get className() {
     // very simple version of singularize, just cut off the 's' at the end
     const name = this.internalType.slice(0, -1)
@@ -58,6 +62,10 @@ class BaseRecord extends jsonapi(Model) {
     }
     delete data.relationships
     return data
+  }
+
+  refetch() {
+    this.apiStore.fetch(this.internalType, this.id, true)
   }
 
   async create() {

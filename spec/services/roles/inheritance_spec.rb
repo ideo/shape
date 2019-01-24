@@ -95,38 +95,31 @@ RSpec.describe Roles::Inheritance, type: :service do
       end
     end
 
-    context 'when adding new roles, passing in potential child roles' do
+    context 'when removing roles, passing in potential removed users and groups' do
       let(:addtl_viewer) { create(:user) }
 
-      before do
-        add_roles(Role::EDITOR, editors, all_objects)
-        add_roles(Role::VIEWER, viewers, all_objects)
-      end
-
-      it 'returns true for child' do
-        add_roles(Role::VIEWER, addtl_viewer, collection)
-        add_user_ids = [addtl_viewer.id]
-        inherit = inheritance.inherit_from_parent?(
-          item,
-          add_user_ids: add_user_ids,
-          role_name: Role::VIEWER,
-        )
-        expect(inherit).to be true
-      end
-    end
-
-    context 'with group members' do
-      context 'group includes same users' do
-        let(:group_members) { editors }
-        let(:group) { create(:group, add_members: group_members) }
-
+      context 'where role exists on parent' do
         before do
-          add_roles(Role::EDITOR, editors, collection)
-          add_roles(Role::EDITOR, group, item)
+          addtl_viewer.add_role(Role::VIEWER, collection)
+          addtl_viewer.add_role(Role::VIEWER, item)
         end
 
-        it 'should return true because group members == editors' do
-          expect(inheritance.inherit_from_parent?(item)).to be true
+        it 'should return false to indicate breaking inheritance' do
+          expect(
+            inheritance.inherit_from_parent?(item, remove_identifiers: ["User_#{addtl_viewer.id}"]),
+          ).to be false
+        end
+      end
+
+      context 'where role does not exist on parent' do
+        before do
+          addtl_viewer.add_role(Role::VIEWER, item)
+        end
+
+        it 'should return true to indicate matching inheritance' do
+          expect(
+            inheritance.inherit_from_parent?(item, remove_identifiers: ["User_#{addtl_viewer.id}"]),
+          ).to be true
         end
       end
     end

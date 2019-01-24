@@ -30,7 +30,11 @@ Rails.application.routes.draw do
           post 'set_submission_box_template'
         end
         resources :collection_cards, only: :index
-        resources :roles, only: %i[index create destroy]
+        resources :roles, only: %i[index create destroy] do
+          collection do
+            get 'will_become_private'
+          end
+        end
       end
       resources :items, except: %i[index] do
         member do
@@ -39,7 +43,11 @@ Rails.application.routes.draw do
           get 'in_my_collection'
           patch 'restore_permissions'
         end
-        resources :roles, only: %i[index create destroy]
+        resources :roles, only: %i[index create destroy] do
+          collection do
+            get 'will_become_private'
+          end
+        end
       end
       resources :test_collections, only: %i[show] do
         member do

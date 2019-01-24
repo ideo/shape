@@ -4,18 +4,21 @@ module Roles
       @parent = parent
     end
 
-    def inherit_from_parent?(child, add_user_ids: [], role_name: '')
+    def inherit_from_parent?(child, remove_identifiers: [], role_name: '')
       # Yes if there are no child roles yet
-      return true if child.roles.empty?
-
-      if add_user_ids.empty? && role_name.blank?
+      return true if child.same_roles_anchor?(@parent) && remove_identifiers.empty?
+      if remove_identifiers.empty? && role_name.blank?
         # generic case: check that both Editors and Viewers would inherit
         # NOTE: Role::CONTENT_EDITOR is not yet represented here, because it's
         # not a selectable role on the frontend.
         inherit_role_from_parent?(child, role_name: Role::EDITOR) &&
           inherit_role_from_parent?(child, role_name: Role::VIEWER)
       elsif role_name
-        inherit_role_from_parent?(child, add_user_ids: add_user_ids, role_name: role_name)
+        inherit_role_from_parent?(
+          child,
+          remove_identifiers: remove_identifiers,
+          role_name: role_name,
+        )
       else
         false
       end
@@ -45,31 +48,32 @@ module Roles
 
     private
 
-    def inherit_role_from_parent?(child, add_user_ids: [], role_name:)
-      return true if child.same_roles_anchor? @parent
-      @parent_allowed_user_ids = allowed_user_ids(@parent, role_name)
-      @child_allowed_user_ids = allowed_user_ids(child, role_name)
-      proposed_user_ids = (@child_allowed_user_ids + add_user_ids).uniq
-      should_inherit?(proposed_user_ids)
+    def inherit_role_from_parent?(child, remove_identifiers: [], role_name:)
+      @parent_allowed_identifiers = allowed_identifiers(@parent, role_name)
+      proposed_identifiers = allowed_identifiers(child, role_name)
+      if remove_identifiers.present?
+        proposed_identifiers -= remove_identifiers
+      end
+      should_inherit?(proposed_identifiers)
     end
 
     # Tests to see if children permissions are same or more permissive than parent
     # If so, apply roles. If not, ignore this object.
-    def should_inherit?(proposed_user_ids)
+    def should_inherit?(proposed_identifiers)
       # We need to check that the proposed_roles will be fully represented
       #  in the parent, e.g.
       #  TRUE: We are proposing [A, B, C] as editors, and [A, B, C ... (any others)] are parent editors
       #  FALSE: We are proposing [A, B, C] as editors, and [A, D] are parent editors
-      intersection = @parent_allowed_user_ids & proposed_user_ids
-      (@parent_allowed_user_ids - intersection).empty?
+      intersection = @parent_allowed_identifiers & proposed_identifiers
+      (@parent_allowed_identifiers - intersection).empty?
     end
 
-    def allowed_user_ids(resource, role_name)
+    def allowed_identifiers(resource, role_name)
       if role_name == Role::EDITOR
-        resource.editor_user_ids
+        resource.user_and_group_identifiers_with_edit_access
       else
         # include both editors and viewers
-        resource.allowed_user_ids
+        resource.user_and_group_identifiers_with_view_access
       end
     end
   end

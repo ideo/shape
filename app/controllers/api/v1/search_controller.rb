@@ -131,7 +131,7 @@ class Api::V1::SearchController < Api::V1::BaseController
         size: results.size,
       },
       jsonapi: @resource.anchored_roles,
-      include: %i[users groups],
+      include: %i[users groups resource],
       expose: {
         user_ids: users.pluck(:id),
         group_ids: groups.pluck(:id),

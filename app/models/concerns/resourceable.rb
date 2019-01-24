@@ -143,12 +143,16 @@ module Resourceable
     self.class.where(id: id).user_ids
   end
 
-  def editor_user_ids
-    role_user_ids(Role::EDITOR)
+  def user_and_group_identifiers_with_view_access
+    user_ids = role_user_ids([Role::VIEWER, Role::EDITOR]).map { |id| "User_#{id}" }
+    group_ids = role_group_ids([Role::VIEWER, Role::EDITOR]).map { |id| "Group_#{id}" }
+    user_ids + group_ids
   end
 
-  def viewer_user_ids
-    role_user_ids(Role::VIEWER)
+  def user_and_group_identifiers_with_edit_access
+    user_ids = role_user_ids(Role::EDITOR).map { |id| "User_#{id}" }
+    group_ids = role_group_ids(Role::EDITOR).map { |id| "Group_#{id}" }
+    user_ids + group_ids
   end
 
   def search_user_ids
@@ -161,21 +165,25 @@ module Resourceable
     (editors[:groups].pluck(:id) + viewers[:groups].pluck(:id)).uniq
   end
 
-  # get all [role] users, both individual and via group, for this item/collection
+  # # get all [role] users, both individual and via group, for this item/collection
   def role_user_ids(role_name)
     return unless editable_and_viewable?
-    user_ids_for_role = UsersRole
-                        .joins(:role)
-                        .where(Role.arel_table[:resource_identifier].eq(roles_anchor_resource_identifier))
-                        .where(Role.arel_table[:name].eq(role_name))
-                        .pluck(:user_id)
-                        .uniq
-    group_ids = send(role_name.to_s.pluralize)[:groups].pluck(:id)
-    (user_ids_for_role + Group.where(id: group_ids).user_ids).uniq
+    UsersRole
+      .joins(:role)
+      .where(Role.arel_table[:resource_identifier].eq(roles_anchor_resource_identifier))
+      .where(Role.arel_table[:name].in(role_name))
+      .pluck(:user_id)
+      .uniq
   end
 
-  def allowed_user_ids
-    (editor_user_ids + viewer_user_ids).uniq
+  def role_group_ids(role_name)
+    return unless editable_and_viewable?
+    GroupsRole
+      .joins(:role)
+      .where(Role.arel_table[:resource_identifier].eq(roles_anchor_resource_identifier))
+      .where(Role.arel_table[:name].in(role_name))
+      .pluck(:group_id)
+      .uniq
   end
 
   def editable_and_viewable?

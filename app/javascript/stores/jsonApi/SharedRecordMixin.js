@@ -1,5 +1,6 @@
 import _ from 'lodash'
 import { action, observable } from 'mobx'
+import queryString from 'query-string'
 import { undoStore } from '~/stores'
 
 // This contains some shared methods between Collection and Item
@@ -28,8 +29,7 @@ const SharedRecordMixin = superclass =>
       const data = this.toJsonApi()
       // cancel sync so that name edits don't roundtrip and interfere with your <input>
       data.cancel_sync = true
-      const apiPath = `${this.internalType}/${this.id}`
-      return this.apiStore.request(apiPath, 'PATCH', { data })
+      return this.apiStore.request(this.baseApiPath, 'PATCH', { data })
     }
 
     API_revertTo({ snapshot } = {}) {
@@ -49,13 +49,26 @@ const SharedRecordMixin = superclass =>
         data = this.toJsonApi()
       }
       data.cancel_sync = true
-      const apiPath = `${this.internalType}/${this.id}`
-      return this.apiStore.request(apiPath, 'PATCH', { data })
+      return this.apiStore.request(this.baseApiPath, 'PATCH', { data })
     }
 
     API_restorePermissions() {
-      const apiPath = `${this.internalType}/${this.id}/restore_permissions`
+      const apiPath = `${this.baseApiPath}/restore_permissions`
       return this.apiStore.request(apiPath, 'PATCH')
+    }
+
+    async API_willBecomePrivate({ removing, roleName }) {
+      const apiPath = `${this.baseApiPath}/roles/will_become_private`
+      const remove_identifiers = [`${removing.className}_${removing.id}`]
+      const params = {
+        role_name: roleName,
+        remove_identifiers,
+      }
+      const res = await this.apiStore.request(
+        `${apiPath}?${queryString.stringify(params)}`,
+        'GET'
+      )
+      return res.__response.data
     }
 
     pushUndo({ snapshot, message = '', apiCall } = {}) {

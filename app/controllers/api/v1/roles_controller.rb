@@ -62,6 +62,21 @@ class Api::V1::RolesController < Api::V1::BaseController
     end
   end
 
+  def will_become_private
+    inheritance = Roles::Inheritance.new(record.parent)
+    remove_identifiers = if params[:remove_identifiers].is_a?(Array)
+                           params[:remove_identifiers]
+                         else
+                           [params[:remove_identifiers]]
+                         end
+    inherit = inheritance.inherit_from_parent?(
+      record,
+      remove_identifiers: remove_identifiers,
+      role_name: params[:role_name],
+    )
+    render json: !inherit
+  end
+
   private
 
   def role_params
@@ -79,8 +94,8 @@ class Api::V1::RolesController < Api::V1::BaseController
   def authorize_remove_role_from_record
     # you can always choose to "leave" something even if not editor
     if json_api_params[:group_ids].blank? &&
-      json_api_params[:user_ids].count == 1 &&
-      json_api_params[:user_ids].first.to_i == current_user.id
+       json_api_params[:user_ids].count == 1 &&
+       json_api_params[:user_ids].first.to_i == current_user.id
       return true
     end
     authorize! :manage, record
